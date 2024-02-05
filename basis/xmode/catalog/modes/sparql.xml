@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+  Oracle SQL*Plus mode by Thiemo Kellner <thiemo@users.sourceforge.net>
+    based on shellscript mode
+  -->
+
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="lineComment" VALUE="#" />
+        <PROPERTY NAME="indentOpenBrackets" VALUE="{" />
+        <PROPERTY NAME="indentCloseBrackets" VALUE="}" />
+    </PROPS>
+    <RULES IGNORE_CASE="TRUE" HIGHLIGHT_DIGITS="TRUE">
+        <!-- Comments -->
+        <EOL_SPAN TYPE="COMMENT1">#</EOL_SPAN>
+
+        <SPAN TYPE="MARKUP" NO_LINE_BREAK="TRUE">
+            <BEGIN>&lt;</BEGIN>
+            <END>&gt;</END>
+        </SPAN>
+
+        <MARK_FOLLOWING TYPE="COMMENT2">?</MARK_FOLLOWING>
+        <MARK_FOLLOWING TYPE="COMMENT2">$</MARK_FOLLOWING>
+        <MARK_PREVIOUS TYPE="COMMENT4" MATCH_TYPE="OPERATOR">:</MARK_PREVIOUS>
+        <MARK_FOLLOWING TYPE="LITERAL4">@</MARK_FOLLOWING> <!-- language tag -->
+
+        <!-- Literals -->
+        <SPAN TYPE="LITERAL1" DELEGATE="LITERAL" ESCAPE="\">
+            <BEGIN>"</BEGIN>
+            <END>"</END>
+        </SPAN>
+        <SPAN TYPE="LITERAL1" ESCAPE="\">
+            <BEGIN>'</BEGIN>
+            <END>'</END>
+        </SPAN>
+
+        <!-- Operators -->
+        <SEQ TYPE="OPERATOR">!=</SEQ> <!-- inequality -->
+        <SEQ TYPE="OPERATOR">&amp;&amp;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;</SEQ>
+        <SEQ TYPE="OPERATOR">&gt;=</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;&gt;</SEQ> <!-- inequality -->
+        <SEQ TYPE="OPERATOR">&lt;</SEQ>
+        <SEQ TYPE="OPERATOR">&lt;=</SEQ>
+        <SEQ TYPE="OPERATOR">*</SEQ> <!-- quantifier -->
+        <SEQ TYPE="OPERATOR">+</SEQ> <!-- quantifier -->
+        <SEQ TYPE="OPERATOR">.</SEQ> <!-- triple joining operator also ; -->
+        <SEQ TYPE="OPERATOR">/</SEQ>
+        <SEQ TYPE="OPERATOR">;</SEQ> <!-- triple joining operator also . -->
+        <SEQ TYPE="OPERATOR">=</SEQ>
+        <SEQ TYPE="OPERATOR">?</SEQ> <!-- quantifier -->
+        <SEQ TYPE="OPERATOR">^</SEQ>
+        <SEQ TYPE="OPERATOR">^^</SEQ>
+        <SEQ TYPE="OPERATOR">|</SEQ>
+        <SEQ TYPE="OPERATOR">||</SEQ>
+
+        <!-- functions in general -->
+        <SEQ_REGEXP TYPE="FUNCTION" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">[a-zA-Z-_]+\s*\(</SEQ_REGEXP>
+        <SEQ TYPE="FUNCTION">)</SEQ> -->
+
+        <!-- keywords -->
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">add\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">as\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">ask\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">clear\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">construct\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">copy\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">create\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">data\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">default\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">delete\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">describe\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">distinct\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">drop\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">exists\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">filter\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">from\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">graph\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">group by\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">having\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">insert\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">limit\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">load\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">minus\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">move\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">named\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">not\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">not exists\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">offset\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">optional\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">order by\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">prefix\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">reduced\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">select\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">service\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">silent\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">union\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">update\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">using\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">values\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD1" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">where\b</SEQ_REGEXP>
+        <SEQ_REGEXP TYPE="KEYWORD2" AT_WHITESPACE_END="FALSE" AT_WORD_START="TRUE">with\b</SEQ_REGEXP>
+        <KEYWORDS>
+            <!-- predefined functions -->
+            <COMMENT3>abs</COMMENT3>
+            <COMMENT3>avg</COMMENT3>
+            <COMMENT3>bind</COMMENT3>
+            <COMMENT3>bnode</COMMENT3>
+            <COMMENT3>bound</COMMENT3>
+            <COMMENT3>card</COMMENT3>
+            <COMMENT3>ceil</COMMENT3>
+            <COMMENT3>coalesce</COMMENT3>
+            <COMMENT3>concat</COMMENT3>
+            <COMMENT3>contains</COMMENT3>
+            <COMMENT3>count</COMMENT3>
+            <COMMENT3>datatype</COMMENT3>
+            <COMMENT3>day</COMMENT3>
+            <COMMENT3>encode_for_uri</COMMENT3>
+            <!--<COMMENT3>eval</COMMENT3>-->
+            <COMMENT3>filter</COMMENT3>
+            <COMMENT3>flatten</COMMENT3>
+            <COMMENT3>floor</COMMENT3>
+            <COMMENT3>groupconcat</COMMENT3>
+            <COMMENT3>hours</COMMENT3>
+            <COMMENT3>if</COMMENT3>
+            <COMMENT3>in</COMMENT3>
+            <COMMENT3>iri</COMMENT3>
+            <COMMENT3>isBLANK</COMMENT3>
+            <COMMENT3>isIRI</COMMENT3>
+            <COMMENT3>isLITERAL</COMMENT3>
+            <COMMENT3>isNUMERIC</COMMENT3>
+            <COMMENT3>isTRIPLE</COMMENT3>
+            <COMMENT3>isURI</COMMENT3>
+            <COMMENT3>lang</COMMENT3>
+            <COMMENT3>langMATCHES</COMMENT3>
+            <COMMENT3>lcase</COMMENT3>
+            <COMMENT3>max</COMMENT3>
+            <COMMENT3>md5</COMMENT3>
+            <COMMENT3>min</COMMENT3>
+            <COMMENT3>minutes</COMMENT3>
+            <COMMENT3>month</COMMENT3>
+            <COMMENT3>not in</COMMENT3>
+            <COMMENT3>now</COMMENT3>
+            <COMMENT3>object</COMMENT3>
+            <COMMENT3>predicate</COMMENT3>
+            <COMMENT3>rand</COMMENT3>
+            <COMMENT3>regex</COMMENT3>
+            <COMMENT3>replace</COMMENT3>
+            <COMMENT3>round</COMMENT3>
+            <COMMENT3>sample</COMMENT3>
+            <COMMENT3>seconds</COMMENT3>
+            <COMMENT3>sha1</COMMENT3>
+            <COMMENT3>sha256</COMMENT3>
+            <COMMENT3>sha384</COMMENT3>
+            <COMMENT3>sha512</COMMENT3>
+            <COMMENT3>str</COMMENT3>
+            <COMMENT3>strafter</COMMENT3>
+            <COMMENT3>strbefore</COMMENT3>
+            <COMMENT3>strdt</COMMENT3>
+            <COMMENT3>strends</COMMENT3>
+            <COMMENT3>strlang</COMMENT3>
+            <COMMENT3>strlen</COMMENT3>
+            <COMMENT3>strstarts</COMMENT3>
+            <COMMENT3>struuid</COMMENT3>
+            <COMMENT3>subject</COMMENT3>
+            <!--<COMMENT3>substitute</COMMENT3>-->
+            <COMMENT3>substr</COMMENT3>
+            <COMMENT3>sum</COMMENT3>
+            <COMMENT3>timezone</COMMENT3>
+            <COMMENT3>triple</COMMENT3>
+            <COMMENT3>tz</COMMENT3>
+            <COMMENT3>ucase</COMMENT3>
+            <COMMENT3>uri</COMMENT3>
+            <COMMENT3>uuid</COMMENT3>
+            <COMMENT3>xsd:boolean</COMMENT3>
+            <COMMENT3>xsd:dateTime</COMMENT3>
+            <COMMENT3>xsd:decimal</COMMENT3>
+            <COMMENT3>xsd:double</COMMENT3>
+            <COMMENT3>xsd:float</COMMENT3>
+            <COMMENT3>xsd:integer</COMMENT3>
+            <COMMENT3>xsd:string</COMMENT3>
+            <COMMENT3>year</COMMENT3>
+        </KEYWORDS>
+
+    </RULES>
+
+    <RULES SET="LITERAL" DEFAULT="LITERAL1" ESCAPE="\">
+        <!-- Variables -->
+        <!--<SPAN TYPE="KEYWORD2" NO_LINE_BREAK="TRUE">
+            <BEGIN>${</BEGIN>
+            <END>}</END>
+        </SPAN>
+
+        <MARK_FOLLOWING TYPE="KEYWORD2">$</MARK_FOLLOWING>-->
+    </RULES>
+
+    <RULES SET="PREFIXED_NAME" DEFAULT="LITERAL2" ESCAPE="\">
+        <MARK_FOLLOWING TYPE="LITERAL2">:</MARK_FOLLOWING>
+    </RULES>
+</MODE>

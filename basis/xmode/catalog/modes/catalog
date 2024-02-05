@@ -514,6 +514,10 @@
         FILE_NAME_GLOB="*.{py,pyw,sc,jy}"
         FIRST_LINE_GLOB="#!*/*python*" />
 
+<MODE NAME="qdoc"   	FILE="qdoc.xml"
+        FILE_NAME_GLOB="*.{qdoc}"
+        FIRST_LINE_GLOB="/*!" />
+
 <MODE NAME="rebol"		FILE="rebol.xml"
         FILE_NAME_GLOB="*.r" />
 
@@ -616,6 +620,9 @@
 
 <MODE NAME="smi-mib"		FILE="smi-mib.xml"
         FILE_NAME_GLOB="*{.mib,-MIB.txt}" />
+
+<MODE NAME="sparql"     	FILE="sparql.xml"
+        FILE_NAME_GLOB="*.{rq,sparql}" />
 
 <MODE NAME="sqr"		FILE="sqr.xml"
         FILE_NAME_GLOB="*.{sqr,sqc}" />
