@@ -702,7 +702,7 @@ ARM-INSTRUCTION: LDRpre-encode  ( 1 bw 111 0 00 01 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: LDRuoff-encode ( 1 bw 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDR (literal): Load Register (literal).
-ARM-INSTRUCTION: LDRl-encode ( 1 bw 011 0 00 imm19 Rt -- )
+ARM-INSTRUCTION: LDRl-encode ( 0 bw 011 0 00 imm19 Rt -- )
 
 ! LDR (register): Load Register (register).
 ARM-INSTRUCTION: LDRr-encode ( 1 bw 111 0 00 01 1 Rm option3 S 1 0 Rn Rt -- )
