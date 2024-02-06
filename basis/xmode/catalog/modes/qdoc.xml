@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!--  -->
+
+
+<!--
+    This mode file for QDoc, which is a documentation file format used by
+    The Qt Group, www.qt.io
+-->
+<MODE>
+    <PROPS>
+        <PROPERTY NAME="wordBreakChars" VALUE="" />
+    </PROPS>
+    <RULES IGNORE_CASE="FALSE"
+		HIGHLIGHT_DIGITS="TRUE"
+		DIGIT_RE="(0[lL]?|[1-9]\d{0,9}(\d{0,9}[lL])?|0[xX]\p{XDigit}{1,8}(\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\.[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))">
+
+        <SPAN TYPE="FUNCTION" NO_LINE_BREAK="TRUE">
+          <BEGIN>{</BEGIN>
+          <END>}</END>
+        </SPAN>
+        <KEYWORDS>
+
+
+            <!-- topic commands -->
+            <KEYWORD1>\class</KEYWORD1>
+            <KEYWORD1>\enum</KEYWORD1>
+            <KEYWORD1>\example</KEYWORD1>
+            <KEYWORD1>\externalpage</KEYWORD1>
+            <KEYWORD1>\fn (function)</KEYWORD1>
+            <KEYWORD1>\group</KEYWORD1>
+            <KEYWORD1>\headerfile</KEYWORD1>
+            <KEYWORD1>\macro</KEYWORD1>
+            <KEYWORD1>\module</KEYWORD1>
+            <KEYWORD1>\namespace</KEYWORD1>
+            <KEYWORD1>\page</KEYWORD1>
+            <KEYWORD1>\property</KEYWORD1>
+            <KEYWORD1>\qmlattachedproperty</KEYWORD1>
+            <KEYWORD1>\qmlattachedsignal</KEYWORD1>
+            <KEYWORD1>\qmlvaluetype</KEYWORD1>
+            <KEYWORD1>\qmlmethod</KEYWORD1>
+            <KEYWORD1>\qmltype</KEYWORD1>
+            <KEYWORD1>\qmlproperty</KEYWORD1>
+            <KEYWORD1>\qmlsignal</KEYWORD1>
+            <KEYWORD1>\qmlmodule</KEYWORD1>
+            <KEYWORD1>\inqmlmodule</KEYWORD1>
+            <KEYWORD1>\instantiates</KEYWORD1>
+            <KEYWORD1>\typealias</KEYWORD1>
+            <KEYWORD1>\typedef</KEYWORD1>
+            <KEYWORD1>\variable</KEYWORD1>
+
+
+
+
+
+            <!-- context commands  -->
+            <KEYWORD2>\abstract</KEYWORD2>
+            <KEYWORD2>\default</KEYWORD2>
+            <KEYWORD2>\deprecated</KEYWORD2>
+            <KEYWORD2>\ingroup</KEYWORD2>
+            <KEYWORD2>\inheaderfile</KEYWORD2>
+            <KEYWORD2>\inherits</KEYWORD2>
+            <KEYWORD2>\inmodule</KEYWORD2>
+            <KEYWORD2>\internal</KEYWORD2>
+            <KEYWORD2>\nextpage</KEYWORD2>
+            <KEYWORD2>\nonreentrant</KEYWORD2>
+            <KEYWORD2>\overload</KEYWORD2>
+            <KEYWORD2>\preliminary</KEYWORD2>
+            <KEYWORD2>\previouspage</KEYWORD2>
+            <KEYWORD2>\qmlabstract</KEYWORD2>
+            <KEYWORD2>\qmldefault</KEYWORD2>
+            <KEYWORD2>\qtcmakepackage</KEYWORD2>
+            <KEYWORD2>\readonly</KEYWORD2>
+            <KEYWORD2>\reentrant</KEYWORD2>
+            <KEYWORD2>\reimp</KEYWORD2>
+            <KEYWORD2>\relates</KEYWORD2>
+            <KEYWORD2>\required</KEYWORD2>
+            <KEYWORD2>\since</KEYWORD2>
+            <KEYWORD2>\startpage</KEYWORD2>
+            <KEYWORD2>\subtitle</KEYWORD2>
+            <KEYWORD2>\threadsafe</KEYWORD2>
+            <KEYWORD2>\title</KEYWORD2>
+            <KEYWORD2>\wrapper</KEYWORD2>
+
+
+
+            <!-- markup commands -->
+            <KEYWORD3>\a</KEYWORD3>
+            <KEYWORD3>\annotatedlist</KEYWORD3>
+            <KEYWORD3>\b</KEYWORD3>
+            <KEYWORD3>\badcode</KEYWORD3>
+            <INVALID>\bold</INVALID>
+            <KEYWORD3>\brief</KEYWORD3>
+            <KEYWORD3>\c</KEYWORD3>
+            <KEYWORD3>\caption</KEYWORD3>
+            <KEYWORD3>\code</KEYWORD3>
+            <KEYWORD3>\endcode</KEYWORD3>
+            <KEYWORD3>\codeline</KEYWORD3>
+            <KEYWORD3>\div</KEYWORD3>
+            <KEYWORD3>\dots</KEYWORD3>
+            <KEYWORD3>\e</KEYWORD3>
+            <KEYWORD3>\else</KEYWORD3>
+            <KEYWORD3>\endif</KEYWORD3>
+            <KEYWORD3>\footnote</KEYWORD3>
+            <KEYWORD3>\generatelist</KEYWORD3>
+            <KEYWORD3>\header</KEYWORD3>
+            <INVALID>\i</INVALID>
+            <KEYWORD3>\if</KEYWORD3>
+            <KEYWORD3>\image</KEYWORD3>
+            <KEYWORD3>\include</KEYWORD3>
+            <KEYWORD3>\input</KEYWORD3>
+            <KEYWORD3>\inlineimage</KEYWORD3>
+            <KEYWORD3>\keyword</KEYWORD3>
+            <KEYWORD3>\l</KEYWORD3>
+            <KEYWORD3>\legalese</KEYWORD3>
+            <KEYWORD3>\li</KEYWORD3>
+            <KEYWORD3>\list</KEYWORD3>
+            <KEYWORD3>\endlist</KEYWORD3>
+            <KEYWORD3>\meta</KEYWORD3>
+            <KEYWORD3>\noautolist</KEYWORD3>
+            <INVALID>\o</INVALID>
+            <KEYWORD3>\note</KEYWORD3>
+            <KEYWORD3>\omit</KEYWORD3>
+            <KEYWORD3>\printline</KEYWORD3>
+            <KEYWORD3>\printto</KEYWORD3>
+            <KEYWORD3>\printuntil</KEYWORD3>
+            <KEYWORD3>\qml</KEYWORD3>
+            <KEYWORD3>\quotation</KEYWORD3>
+            <KEYWORD3>\quotefile</KEYWORD3>
+            <KEYWORD3>\quotefromfile</KEYWORD3>
+            <KEYWORD3>\raw</KEYWORD3>
+            <KEYWORD3>\row</KEYWORD3>
+            <KEYWORD3>\sa</KEYWORD3>
+            <KEYWORD3>\section1</KEYWORD3>
+            <KEYWORD3>\section2</KEYWORD3>
+            <KEYWORD3>\section3</KEYWORD3>
+            <KEYWORD3>\section4</KEYWORD3>
+            <KEYWORD3>\skipline</KEYWORD3>
+            <KEYWORD3>\skipto</KEYWORD3>
+            <KEYWORD3>\skipuntil</KEYWORD3>
+            <KEYWORD3>\snippet</KEYWORD3>
+            <KEYWORD3>\span</KEYWORD3>
+            <KEYWORD3>\sub</KEYWORD3>
+            <KEYWORD3>\sup</KEYWORD3>
+            <KEYWORD3>\table</KEYWORD3>
+            <KEYWORD3>\endtable</KEYWORD3>
+            <KEYWORD3>\tableofcontents</KEYWORD3>
+            <KEYWORD3>\target</KEYWORD3>
+            <KEYWORD3>\tt</KEYWORD3>
+            <KEYWORD3>\uicontrol</KEYWORD3>
+            <KEYWORD3>\underline</KEYWORD3>
+            <KEYWORD3>\unicode</KEYWORD3>
+            <KEYWORD3>\warning</KEYWORD3>
+            <KEYWORD3>\\</KEYWORD3>
+
+            <INVALID>\qmlclass</INVALID>
+        </KEYWORDS>
+    </RULES>
+
+</MODE>

@@ -52,10 +52,10 @@ CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 
 MEMO: colors ( -- assoc )
     {
-        "resource:basis/colors/rgb.txt"
-        "resource:basis/colors/css-colors.txt"
-        "resource:basis/colors/factor-colors.txt"
-        "resource:basis/colors/solarized-colors.txt"
+        "vocab:colors/rgb.txt"
+        "vocab:colors/css-colors.txt"
+        "vocab:colors/factor-colors.txt"
+        "vocab:colors/solarized-colors.txt"
     } [
         utf8 file-lines parse-colors
     ] [ assoc-union ] map-reduce ;

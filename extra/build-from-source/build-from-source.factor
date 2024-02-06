@@ -386,5 +386,6 @@ ERROR: no-output-file path ;
             [ length 2 >= ]
             [ "v" head? ]
             [ second digit? ]
+            [ last digit? ]
         } 1&&
     ] filter ;

@@ -88,12 +88,20 @@ IN: codebase-analyzer
 : swift-files ( paths -- paths' ) [ ".swift" tail? ] filter ;
 
 : c-file? ( path -- ? )
-    >lower file-extension { "h" "c" } member? ;
+    >lower file-extension { "c" } member? ;
 : c-files ( paths -- paths' ) [ c-file? ] filter ;
 
+: c-header-file? ( path -- ? )
+    >lower file-extension { "h" } member? ;
+: c-header-files ( paths -- paths' ) [ c-header-file? ] filter ;
+
 : cpp-file? ( path -- ? )
-    >lower file-extension { "h" "hh" "hpp" "cc" "cpp" } member? ;
+    >lower file-extension { "cc" "cpp" } member? ;
 : cpp-files ( paths -- paths' ) [ cpp-file? ] filter ;
+
+: cpp-header-file? ( path -- ? )
+    >lower file-extension { "h" "hh" "hpp" } member? ;
+: cpp-header-files ( paths -- paths' ) [ cpp-header-file? ] filter ;
 
 : python-file? ( path -- ? )
     >lower file-extension {
