@@ -110,7 +110,7 @@ big-endian off
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! ! x86.64 version
 ! ! pic-tail-reg 5 [RIP+] LEA
 ! ! 0 JMP f rc-relative rel-word-pic-tail
@@ -130,7 +130,7 @@ big-endian off
     absolute-call rel-word-pic
 ] JIT-WORD-CALL jit-define
 
-! Factor Clinic 2024 Code:
+! ! Factor 2024 Clinic Code:
 ! 0 BL rc-relative-arm64-branch rel-word
 
 
@@ -139,7 +139,7 @@ big-endian off
     ! RAX CALL ;
     absolute-call rel-dlsym ;
 
-! Factor 2024 Clinic Code
+! ! Factor 2024 Clinic Code
 ! 0 return-reg MOV f rc-absolute-cell rel-dlsym
 ! return-reg BL;
 
@@ -149,7 +149,7 @@ big-endian off
     arg1s arg1 MOVr
     name jit-call ;
 
-! Factor 2024 Clinic Code
+! ! Factor 2024 Clinic Code
 ! arg1s arg1 MOVr
 ! name jit-call ;
 
@@ -162,7 +162,7 @@ big-endian off
     arg2s arg2 MOVr
     name jit-call ;
 
-! Factor 2024 Clinic Code
+! ! Factor 2024 Clinic Code
 ! arg1s arg1 MOVr
 ! arg2s arg2 MOVr
 ! name jit-call ;
@@ -170,7 +170,7 @@ big-endian off
 
 : jit-load-vm ( -- ) ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! 0 0 vm-reg MOVZ 0 rc-absolute-arm64-movz rel-vm
 
 : jit-load-context ( -- )
@@ -199,7 +199,7 @@ big-endian off
     context-datastack-offset ctx-reg ds-reg LDRuoff
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! context-datastack-top-offset ctx-reg ds-reg LDRuoff
 ! context-retainstack-top-offset ctx-reg rs-reg LDRuoff
 
@@ -217,7 +217,7 @@ big-endian off
     jit-restore-context
 ] JIT-PRIMITIVE jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! ctx-reg is preserved across the call because it is 
 ! ! non-volatile in the C ABI
 ! jit-save-context
@@ -248,7 +248,7 @@ big-endian off
     NOP NOP f rc-absolute-cell rel-literal
 ] PIC-CHECK-TUPLE jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp1 CMPr
 
@@ -356,7 +356,7 @@ big-endian off
     jit-push-param
     jit-jump-quot ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 
 ! jit-save-context
 ! vm-reg "new_context" jit-call-1arg
@@ -370,7 +370,7 @@ big-endian off
 : jit-delete-current-context ( -- )
     vm-reg "delete_context" jit-call-1arg ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! vm-reg "delete_context" jit-call-1arg ;
 
 ! Resets the active context and instead the passed in quotation
@@ -394,14 +394,14 @@ big-endian off
     ! Jump to quotation arg1
     jit-jump-quot ;
 
-! Factor 2024 Clinic Code:
-jit-save-context
-vm-reg "reset_context" jit-call-1arg
-ctx-reg jit-switch-context
-! arg1 ds-reg [] MOV
-! ds-reg 8 SUB
-pop-arg1
-jit-jump-quot ;
+! ! Factor 2024 Clinic Code:
+! jit-save-context
+! vm-reg "reset_context" jit-call-1arg
+! ctx-reg jit-switch-context
+! ! arg1 ds-reg [] MOV
+! ! ds-reg 8 SUB
+! pop-arg1
+! jit-jump-quot ;
 
 [
     ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
@@ -411,11 +411,7 @@ jit-jump-quot ;
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-! Factor 2024 Clinic Code:
-! ! ! ! x86.32
-! ! 0 EAX MOVABS rc-absolute rel-safepoint
-! ! ! x86.64
-! ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
+! ! Factor 2024 Clinic Code:
 ! 0 temp0 0 MOVZ rc–arm-64-???? rel-safepoint
 
 
@@ -544,7 +540,7 @@ jit-jump-quot ;
     push0
 ] JIT-PUSH-LITERAL jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! [
 !    0 f rc-absolute-cell rel-literal
 !    [ temp0 MOVwi ]
@@ -637,7 +633,7 @@ jit-jump-quot ;
     absolute-jump rel-word
 ] JIT-IF jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! load boolean
 ! temp0 ds-reg [] MOVZ !these inputs might be in the wrong order
 ! ! pop boolean
@@ -650,7 +646,7 @@ jit-jump-quot ;
 ! 0 Br f rc-relative-arm64-branch rel-word
 
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! load and pop boolean
 ! pop0
 ! ! compare boolean with f
@@ -671,7 +667,7 @@ jit-jump-quot ;
     r>
 ] JIT-DIP jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! >r
 ! push-link-reg
 ! 0 BL rc-relative-arm64-branch rel-word
@@ -724,7 +720,7 @@ jit-jump-quot ;
     temp0 BR
 ] JIT-EXECUTE jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! pop0
 ! word-entry-point-offset temp0 temp0 ADDi
 ! temp0 Br
@@ -738,7 +734,7 @@ jit-jump-quot ;
     push-link-reg
 ] JIT-PROLOG jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! stack-reg stack-frame-size bootstrap-cell - SUB
 ! stack-frame-size stack-reg stack-reg SUBi
 ! push-link-reg
@@ -750,7 +746,7 @@ jit-jump-quot ;
     stack-frame-size stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! stack-reg stack-frame-size bootstrap-cell - ADD
 ! pop-link-reg
 ! stack-frame-size stack-reg stack-reg ADDi
@@ -772,7 +768,7 @@ jit-jump-quot ;
     NOP f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 ds-reg temp1 LDRr
@@ -797,7 +793,7 @@ jit-jump-quot ;
     ] jit-conditional
 ] PIC-TUPLE jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! temp0 temp1 MOV
 ! temp1 temp0 MOVr (put temp1 into temp0)
 !  ! temp1/32 tag-mask get AND
@@ -820,7 +816,7 @@ jit-jump-quot ;
     NOP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 temp1 CMPr
@@ -833,7 +829,7 @@ jit-jump-quot ;
     absolute-jump rel-word
 ] PIC-HIT jit-define
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! 0 EQ B.cond f rc-relative-arm64-bcond rel-word
 
 
@@ -920,7 +916,7 @@ jit-jump-quot ;
     ! ds-reg [] temp1 MOV
     1 push-down0 ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! temp3 0 MOV t rc-absolute-cell rel-literal
 ! 0 0 temp3 MOVZ t rc-? rel-?
 ! ! temp1 \ f type-number MOV
@@ -957,7 +953,7 @@ jit-jump-quot ;
         jit-call
     ] jit-conditional ; inline
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! : jit-overflow ( insn func -- )
 !     ! SUB in arm64 takes two registers instead of one (should be SUBi?)
 !     ds-reg ds-reg 8 SUBi
@@ -984,7 +980,7 @@ jit-jump-quot ;
     [ temp0 temp1 temp0 ] dip execute( arg2 arg1 dst -- )
     1 push-down0 ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! temp0 ds-reg [] MOV
 ! ! ds-reg bootstrap-cell SUB
 ! pop0
@@ -1002,7 +998,7 @@ jit-jump-quot ;
     temp0 temp1 temp2 SDIV
     temp1 temp0 temp2 temp0 MSUB ;
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! temp1 ds-reg [] MOV
 ! 0 ds-reg temp1 [] MOVZ
 ! ! div-arg ds-reg bootstrap-cell neg [+] MOV
@@ -1100,7 +1096,7 @@ jit-jump-quot ;
         FPCR arg1 MRS
     ] }
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! FPCR arg1 MRS
 ! FPSR XZR MSRr
 
@@ -1149,7 +1145,7 @@ jit-jump-quot ;
         f RET
     ] }
 
-    ! Factor 2024 Clinic Code:
+    ! ! Factor 2024 Clinic Code:
     ! ! arg4 ds-reg [] MOV
     ! ! ds-reg bootstrap-cell SUB
 	! pop0
@@ -1318,7 +1314,7 @@ jit-jump-quot ;
         ! rs-reg temp0 SUB
         temp0 rs-reg rs-reg SUBr
     ] }
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! ! temp0 ds-reg [] MOV
 ! ! ds-reg bootstrap-cell SUB
 ! pop0
@@ -1384,7 +1380,7 @@ jit-jump-quot ;
         1 push-down0
     ] }
 
-! Factor 2024 Clinic Code:
+! ! Factor 2024 Clinic Code:
 ! string-nth-fast [
 !     	!! load string index from stack
 !     	! temp0 ds-reg bootstrap-cell neg [+] MOV
