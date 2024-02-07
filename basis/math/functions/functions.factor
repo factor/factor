@@ -43,11 +43,11 @@ M: bignum ^n
 M: ratio ^n
     [ >fraction ] dip '[ _ ^n ] bi@ / ;
 
-M: float ^n (^n) ;
+M: float ^n [ >float fpow ] unless-zero ;
 
 M: complex ^n (^n) ;
 
-: integer^ ( x y -- z )
+: ^integer ( x y -- z )
     dup 0 >= [ ^n ] [ [ recip ] dip neg ^n ] if ; inline
 
 PRIVATE>
@@ -99,7 +99,7 @@ PRIVATE>
 : ^ ( x y -- x^y )
     {
         { [ over zero? ] [ 0^ ] }
-        { [ dup integer? ] [ integer^ ] }
+        { [ dup integer? ] [ ^integer ] }
         { [ 2dup real^? ] [ [ >float ] bi@ fpow ] }
         [ ^complex ]
     } cond ; inline
