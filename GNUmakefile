@@ -74,6 +74,7 @@ ifdef CONFIG
 		vm/entry_points.o \
 		vm/errors.o \
 		vm/factor.o \
+		vm/format.o \
 		vm/full_collector.o \
 		vm/gc.o \
 		vm/image.o \
