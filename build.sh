@@ -562,9 +562,9 @@ set_current_branch() {
 update_boot_image() {
     set_boot_image_vars
     $ECHO "Deleting old images..."
-    rm -f "checksums.txt*" > /dev/null 2>&1
-    rm -f "$BOOT_IMAGE.{?,??}" > /dev/null 2>&1
-    rm -f "temp/staging.*.image" > /dev/null 2>&1
+    rm -f checksums.txt* > /dev/null 2>&1
+    rm -f "$BOOT_IMAGE".{?,??} > /dev/null 2>&1
+    rm -f temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url "$CHECKSUM_URL"
         local factorcode_md5
