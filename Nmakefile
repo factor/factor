@@ -100,6 +100,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\entry_points.obj \
 	vm\errors.obj \
 	vm\factor.obj \
+	vm\format.obj \
 	vm\full_collector.obj \
 	vm\gc.obj \
 	vm\image.obj \
