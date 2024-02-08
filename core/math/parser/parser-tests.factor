@@ -510,3 +510,7 @@ unit-test
 } [
     trouble CHAR: e 0 rot set-nth trouble drop
 ] unit-test
+
+{ "143.99999999999997" } [ 0x1.1ffffffffffffp7 number>string ] unit-test
+{ "144.0" } [ 0x1.2p7 number>string ] unit-test
+{ "144.00000000000003" } [ 0x1.2000000000001p7 number>string ] unit-test
