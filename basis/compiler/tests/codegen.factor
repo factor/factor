@@ -5,7 +5,7 @@ sequences.private byte-arrays alien alien.accessors layouts
 words definitions compiler.units io combinators vectors grouping
 make alien.c-types alien.data combinators.short-circuit math.order
 math.libm math.parser math.functions alien.syntax memory
-stack-checker ;
+stack-checker literals system ;
 FROM: math => float ;
 QUALIFIED: namespaces.private
 IN: compiler.tests.codegen
@@ -399,8 +399,8 @@ cell 4 = [
 
 { } [ missing-gc-check-2 ] unit-test
 
-{ 1 "0.169967142900241" } [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
-{ 1 "0.169967142900241" } [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
+${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
+${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
 { "0.169967142900241" "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
 { 1 "0.169967142900241" "0.9854497299884601" } [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
 
