@@ -68,6 +68,8 @@ enum relocation_class {
   RC_RELATIVE_ARM64_BCOND,
   // Absolute address stored in bits 20:5 of an ARM64 instruction
   RC_ABSOLUTE_ARM64_MOVZ,
+  // relative address in a pointer-width location
+  RC_RELATIVE_CELL,
 };
 
 static const cell rel_absolute_ppc_2_mask = 0x0000ffff;
