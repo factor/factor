@@ -394,7 +394,7 @@ big-endian off
     ! Jump to quotation arg1
     jit-jump-quot ;
 
-! ! Factor 2024 Clinic Code:
+! Factor 2024 Clinic Code:
 ! jit-save-context
 ! vm-reg "reset_context" jit-call-1arg
 ! ctx-reg jit-switch-context
@@ -1148,27 +1148,27 @@ big-endian off
     ! ! Factor 2024 Clinic Code:
     ! ! arg4 ds-reg [] MOV
     ! ! ds-reg bootstrap-cell SUB
-	! pop0
+    ! pop0
     ! jit-load-context
     ! ! arg1 ctx-reg context-callstack-bottom-offset [+] MOV
     ! context-callstack-top-offset ctx-reg arg1 LDRuoff
     ! ! arg2 arg4 callstack-top-offset [+] LEA
-	! callstack-top-offset temp0 arg2 ADDi
+    ! callstack-top-offset temp0 arg2 ADDi
     ! ! arg3 arg4 callstack-length-offset [+] MOV
     ! callstack-length-offset arg4 arg3 LDRuoff ! *
     ! ! arg3 tag-bits get SHR
-	! tag-bits get arg3 arg3 LSRi
+    ! tag-bits get arg3 arg3 LSRi
     ! ! arg1 arg3 SUB
-	! arg3 arg1 arg1 SUBr
+    ! arg3 arg1 arg1 SUBr
     ! ! RSP arg1 MOV
-	! arg1 stack-reg MOVsp
+    ! arg1 stack-reg MOVsp
     ! ! RSP 32 SUB
-	! 32 stack-reg stack-reg SUBi
+    ! 32 stack-reg stack-reg SUBi
     ! "factor_memcpy" jit-call
     ! ! RSP 32 ADD
-	! 32 stack-reg stack-reg ADDi
+    ! 32 stack-reg stack-reg ADDi
     ! ! 0 RET
-	! f RET
+    ! f RET
 
 
     ! ## Fixnums
