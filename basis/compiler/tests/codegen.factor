@@ -401,8 +401,8 @@ cell 4 = [
 
 ${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
 ${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
-{ "0.169967142900241" "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
-{ 1 "0.169967142900241" "0.9854497299884601" } [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
+${ os macosx? "0.169967142900241" "0.16996714290024104" ? "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
+${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? "0.9854497299884601" } [ 1.4 1 [ swap >float [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
 
 { 6.0 } [ 1.0 [ >float 3.0 + [ B{ 0 0 0 0 } 0 set-alien-float ] [ 2.0 + ] bi ] compile-call ] unit-test
 
