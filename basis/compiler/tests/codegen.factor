@@ -399,6 +399,7 @@ cell 4 = [
 
 { } [ missing-gc-check-2 ] unit-test
 
+! XXX: investigate this mac vs linux/win difference
 ${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 [ 1 swap fcos ] compile-call number>string ] unit-test
 ${ 1 os macosx? "0.169967142900241" "0.16996714290024104" ? } [ 1.4 1 [ swap fcos ] compile-call number>string ] unit-test
 ${ os macosx? "0.169967142900241" "0.16996714290024104" ? "0.9854497299884601" } [ 1.4 [ [ fcos ] [ fsin ] bi ] compile-call [ number>string ] bi@ ] unit-test
