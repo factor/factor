@@ -22,7 +22,6 @@
 		<PROPERTY NAME="unindentThisLine"
 			VALUE="^.*(default:\s*|case.*:.*)$" />
 		<PROPERTY NAME="electricKeys" VALUE=":" />
-		<PROPERTY NAME="doubleBracketIndent" VALUE="true" />
 	</PROPS>
 	<RULES IGNORE_CASE="FALSE"
 		HIGHLIGHT_DIGITS="TRUE"
@@ -108,25 +107,18 @@
 			<KEYWORD1>if</KEYWORD1>
 			<KEYWORD1>instanceof</KEYWORD1>
 			<KEYWORD1>new</KEYWORD1>
-			<KEYWORD1>record</KEYWORD1>
 			<KEYWORD1>return</KEYWORD1>
 			<KEYWORD1>strictfp</KEYWORD1>
 			<KEYWORD1>switch</KEYWORD1>
 			<KEYWORD1>throw</KEYWORD1>
 			<KEYWORD1>try</KEYWORD1>
 			<KEYWORD1>while</KEYWORD1>
-			<KEYWORD1>yield</KEYWORD1>
 			<!--}}}-->
 
 			<!--{{{ structure keywords -->
-			<KEYWORD2>abstract</KEYWORD2>
-			<KEYWORD2>enum</KEYWORD2>
-			<KEYWORD2>extends</KEYWORD2>
 			<KEYWORD2>final</KEYWORD2>
 			<KEYWORD2>implements</KEYWORD2>
-			<KEYWORD2>import</KEYWORD2> 
 			<KEYWORD2>native</KEYWORD2>
-			<KEYWORD2>package</KEYWORD2>
 			<KEYWORD2>private</KEYWORD2>
 			<KEYWORD2>protected</KEYWORD2>
 			<KEYWORD2>public</KEYWORD2>
@@ -135,28 +127,14 @@
 			<KEYWORD2>throws</KEYWORD2>
 			<KEYWORD2>transient</KEYWORD2>
 			<KEYWORD2>volatile</KEYWORD2>
+			<KEYWORD2>abstract</KEYWORD2>
+			<KEYWORD2>extends</KEYWORD2>
+			<KEYWORD2>import</KEYWORD2> 
+			<KEYWORD2>package</KEYWORD2>
+			<KEYWORD2>enum</KEYWORD2>
 			<KEYWORD3>void</KEYWORD3>
 			<!--}}}-->
 
-			<!--{{{ Module related keywords -->
-			<KEYWORD2>module</KEYWORD2>
-			<KEYWORD2>open</KEYWORD2>
-			<KEYWORD2>requires</KEYWORD2>
-			<KEYWORD2>exports</KEYWORD2>
-			<KEYWORD2>opens</KEYWORD2>
-			<KEYWORD2>to</KEYWORD2>
-			<KEYWORD2>uses</KEYWORD2>
-			<KEYWORD2>provides</KEYWORD2>
-			<KEYWORD2>with</KEYWORD2>
-			<KEYWORD2>transitive</KEYWORD2>
-			<!--}}}-->
-			
-			<!--{{{ sealed class keywords -->
-			<KEYWORD2>sealed</KEYWORD2>
-			<KEYWORD2>permits</KEYWORD2>
-			<KEYWORD2>non-sealed</KEYWORD2>
-			<!--}}}-->
-			
 			<!--{{{ types -->
 			<KEYWORD3>boolean</KEYWORD3>
 			<KEYWORD3>byte</KEYWORD3>
@@ -251,7 +229,7 @@
 			<END>}</END>
 		</SPAN_REGEXP>
 
-		<!-- for the common usage of the cvs keyword $Id: java.xml 25558 2022-06-02 20:36:50Z daleanson $ -->
+		<!-- for the common usage of the cvs keyword $Id: java.xml 24893 2019-01-17 20:10:18Z daleanson $ -->
 		<SPAN_REGEXP TYPE="LABEL" HASH_CHAR="@version" NO_WORD_BREAK="FALSE" DELEGATE="JAVADOC_PARAM">
 			<BEGIN>@version\s+\$</BEGIN>
 			<END>$</END>

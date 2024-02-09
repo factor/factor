@@ -10,13 +10,13 @@
       <MARK_FOLLOWING TYPE="KEYWORD1">$</MARK_FOLLOWING>
 
       <!-- weird stuff -->
-      <SPAN TYPE="KEYWORD3" ESCAPE="\">
+      <SPAN TYPE="KEYWORD3" DELEGATE="EXEC" ESCAPE="\">
          <BEGIN>[</BEGIN>
          <END>]</END>
       </SPAN>
 
       <!-- Literals -->
-      <SPAN TYPE="LITERAL1" ESCAPE="\" NO_LINE_BREAK="TRUE">
+      <SPAN TYPE="LITERAL1" DELEGATE="LITERAL" ESCAPE="\" NO_LINE_BREAK="TRUE">
          <BEGIN>"</BEGIN>
          <END>"</END>
       </SPAN>
