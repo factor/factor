@@ -5,7 +5,7 @@ calendar.private combinators combinators.smart generalizations
 io io.streams.string kernel math math.functions math.parser
 multiline namespaces peg.ebnf present prettyprint quotations
 sequences sequences.generalizations splitting strings unicode ;
-FROM: math.parser.private => format-float ;
+FROM: math.parser.private => format-float* ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
@@ -57,7 +57,7 @@ ERROR: unknown-format-directive value ;
     ] keepd neg? [ CHAR: - prefix ] when ;
 
 : format-float-fast ( x digits string -- string )
-    [ "" -1 ] 2dip "C" format-float ;
+    [ "" -1 ] 2dip "C" format-float* ;
 
 : format-fast-scientific? ( x digits -- x' digits ? )
     over float? [ t ]
@@ -68,10 +68,8 @@ ERROR: unknown-format-directive value ;
     ] if ;
 
 : format-scientific ( x digits -- string )
-    format-fast-scientific?  [
-        [ "e" format-float-fast ]
-        [ [ ".0e" "e" replace ] [ drop ] if-zero ] bi
-    ] [ format-scientific-simple ] if ;
+    format-fast-scientific?
+    [ "e" format-float-fast ] [ format-scientific-simple ] if ;
 
 : format-fast-decimal? ( x digits -- x' digits ? )
     over float? [ t ]
@@ -87,10 +85,8 @@ ERROR: unknown-format-directive value ;
     ] if ; inline
 
 : format-decimal ( x digits -- string )
-    format-fast-decimal? [
-        [ "f" format-float-fast ]
-        [ [ ".0" ?tail drop ] [ drop ] if-zero ] bi
-    ] [ format-decimal-simple ] if ;
+    format-fast-decimal?
+    [ "f" format-float-fast ] [ format-decimal-simple ] if ;
 
 EBNF: parse-printf [=[
 
