@@ -3,8 +3,6 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "fmt/format.h"
-
 namespace factor {
 
 void factor_vm::primitive_bignum_to_fixnum() {
@@ -229,33 +227,23 @@ void factor_vm::primitive_format_float() {
     ctx->replace(tag<byte_array>(array));
     return;
   }
-
-  if (format[0]) {
-
-    switch (format[0]) {
-      case 'f': localized_stream << std::fixed; break;
-      case 'e': localized_stream << std::scientific; break;
-    }
-    if (isupper(format[0])) {
-      localized_stream << std::uppercase;
-    }
-    if (fill[0] != '\0') {
-      localized_stream << std::setfill(fill[0]);
-    }
-    if (width >= 0) {
-      localized_stream << std::setw(static_cast<int>(width));
-    }
-    if (precision >= 0) {
-      localized_stream << std::setprecision(static_cast<int>(precision));
-    }
-
-    localized_stream << value;
-
-  } else {
-
-    localized_stream << fmt::format("{}", value);
+  switch (format[0]) {
+    case 'f': localized_stream << std::fixed; break;
+    case 'e': localized_stream << std::scientific; break;
   }
-
+  if (isupper(format[0])) {
+    localized_stream << std::uppercase;
+  }
+  if (fill[0] != '\0') {
+    localized_stream << std::setfill(fill[0]);
+  }
+  if (width >= 0) {
+    localized_stream << std::setw(static_cast<int>(width));
+  }
+  if (precision >= 0) {
+    localized_stream << std::setprecision(static_cast<int>(precision));
+  }
+  localized_stream << value;
   const std::string& tmp = localized_stream.str();
   const char* cstr = tmp.c_str();
   size_t size = tmp.length();
