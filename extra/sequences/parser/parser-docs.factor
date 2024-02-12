@@ -1,6 +1,6 @@
 ! Copyright (C) 2024 Aleksander Sabak.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.markup help.syntax kernel math quotations sequences
+USING: help.markup help.syntax kernel math quotations sequences
 sequences.parser ;
 IN: sequences.parser
 
