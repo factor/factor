@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Björn Lindqvist
 ! See https://factorcode.org/license.txt for BSD license
-USING: help.markup help.syntax kernel literals system ;
+USING: help.markup help.syntax kernel layouts literals system ;
 IN: math.affine-transforms
 
 ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
@@ -10,7 +10,7 @@ ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
   { $example
     "USING: math.affine-transforms math.functions prettyprint ;\n45 deg>rad <rotation> { 0 4 } a.v ."
     ! XXX: investigate this windows vs mac/linux difference
-    $[ os windows?
+    $[ os windows? 64-bit? and
     "{ -2.8284271247461903 2.8284271247461903 }"
     "{ -2.82842712474619 2.8284271247461903 }" ? ]
   }
