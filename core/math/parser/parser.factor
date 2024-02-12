@@ -993,7 +993,7 @@ CONSTANT: lookup-table {
 
 : general-format ( s f e -- str )
     swap >dec [ length ] keep
-    2over swap [ + ] [ neg ] bi [ 1 max ] bi@ + 17 >
+    2over swap [ + ] [ neg ] bi [ 0 max ] [ 1 max ] bi* + 17 >
     [ exponential-format ] [ decimal-format ] if ; inline
 
 : float>dec ( n -- str )
