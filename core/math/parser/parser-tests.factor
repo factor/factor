@@ -480,6 +480,7 @@ unit-test
 
 { "deadbeef" } [ B{ 222 173 190 239 } bytes>hex-string ] unit-test
 { B{ 222 173 190 239 } } [ "deADbeEF" hex-string>bytes ] unit-test
+[ "0" hex-string>bytes ] [ invalid-hex-string-length? ] must-fail-with
 
 {
     B{ 49 46 53 53 69 43 48 53 }
