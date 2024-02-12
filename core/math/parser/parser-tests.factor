@@ -514,6 +514,7 @@ unit-test
 { "143.99999999999997" } [ 0x1.1ffffffffffffp7 number>string ] unit-test
 { "144.0" } [ 0x1.2p7 number>string ] unit-test
 { "144.00000000000003" } [ 0x1.2000000000001p7 number>string ] unit-test
+{ "0.16996714290024104" } [ 0x1.5c17bbc13570bp-3 number>string ] unit-test
 
 { 0x80000000000000000000000000000000 } [ 0 φ ] unit-test
 
