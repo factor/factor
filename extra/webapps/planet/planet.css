@@ -42,6 +42,10 @@ pre, code {
     color: #000000;
 }
 
+hr {
+   height: 1px;
+}
+
 @media screen and (max-width: 600px) {
     .infobox {
         display: none;
