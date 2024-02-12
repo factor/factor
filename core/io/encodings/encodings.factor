@@ -142,7 +142,7 @@ M: decoder stream-read-unsafe
         ] [ 4drop 0 ] if*
     ] if ; inline
 
-M: decoder stream-contents* (stream-contents-by-element) ; inline
+M: decoder stream-contents* stream-contents-by-element ; inline
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
