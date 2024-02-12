@@ -636,7 +636,7 @@ HELP: arg-where
     { "seq" sequence } { "quot" quotation }
     { "indices" object }
 }
-{ $description "Push a sequence of all indices in " { $snippet "seq" } " where " { $snippet "quot" } "applied to the element at each index is true." } ;
+{ $description "Push a sequence of all indices in " { $snippet "seq" } " where " { $snippet "quot" } " applied to the element at each index is true." } ;
 
 HELP: assoc-zip-with
 { $values
