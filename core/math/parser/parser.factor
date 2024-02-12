@@ -534,7 +534,7 @@ M: ratio >base
     >bin 52 bin-float-value ;
 
 : bin-float-expt ( exponent -- str )
-    10 >base "p" prepend ;
+    >dec "p" prepend ;
 
 : (bin-float>base) ( value-quot n -- str )
     double>bits
@@ -566,8 +566,7 @@ M: ratio >base
 
 : 1000/ ( n -- m ) 2361183241434822607 * -71 shift ; inline
 
-: ⌊nlog10_2-log10_4/3⌋ ( n -- m )
-    631305 * 261663 - -21 shift ; inline
+: ⌊nlog10_2-log10_4/3⌋ ( n -- m ) 631305 * 261663 - -21 shift ; inline
 
 : 100/mod ( n -- t ρ≠0? )
     656 * [ -16 shift ] [ 16 2^ 1 - bitand 656 >= ] bi ; inline
@@ -576,8 +575,7 @@ M: ratio >base
     double>bits [ float-sign ] [ (mantissa-expt) ] bi ; inline
 
 : mantissa-expt-normalize* ( F E -- F' E' )
-    [ -1022 ] [ [ 52 2^ bitor ] [ 1023 - ] bi* ] if-zero
-    52 - ; inline
+    [ -1022 ] [ [ 52 2^ bitor ] [ 1023 - ] bi* ] if-zero 52 - ; inline
 
 : shorter-interval? ( F E -- ? )
     [ zero? ] [ 1 > ] bi* and ; inline
@@ -927,29 +925,25 @@ CONSTANT: lookup-table {
     φ β δi :> δi
     F φ β zi :> ( zi zi? )
     zi s/r
-    dup δi <=> {
-        { +gt+ [ f ] }
-        { +lt+ [
-            w∈I? not over zero? zi? and and
-            [ [ [ 1 - ] [ drop 1000 ] bi* ] when ] keep not
-        ] }
-        { +eq+ [
+    dup δi 2dup > [ 2drop f ] [
+        number= [
             F φ β xi :> ( xi-odd? xi? )
             xi-odd? [ w∈I? not xi? or ] unless*
-        ] }
-    } case [
+        ] [
+            w∈I? not over zero? zi? and and
+            [ [ [ 1 - ] [ drop 1000 ] bi* ] when ] keep not
+        ] if
+    ] if [
         drop strip-zeroes k - 3 +
     ] [
         50 + δi 2/ - :> D
         D 100/mod :> ( t ρ≠0? )
-        10 * t + {
-            { [ ρ≠0? ] [ ] }
-            { [
-                F φ β yi :> ( yi-odd? yi? )
-                D 50 - even? yi-odd? eq? over odd? yi? and or
-            ] [ 1 - ] }
-            [ ]
-        } cond 2 k -
+        10 * t + ρ≠0? [
+            F φ β yi :> ( yi-odd? yi? )
+            D 50 - even? yi-odd? eq? over odd? yi? and or [
+                1 -
+            ] when
+        ] unless 2 k -
     ] if ; inline
 
 : k0 ( E -- k0 ) ⌊nlog10_2-log10_4/3⌋ neg ; inline
