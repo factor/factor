@@ -5,7 +5,7 @@ calendar.private combinators combinators.smart generalizations
 io io.streams.string kernel math math.functions math.parser
 multiline namespaces peg.ebnf present prettyprint quotations
 sequences sequences.generalizations splitting strings unicode ;
-FROM: math.parser.private => format-float* ;
+FROM: math.parser.private => format-float ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
@@ -57,7 +57,7 @@ ERROR: unknown-format-directive value ;
     ] keepd neg? [ CHAR: - prefix ] when ;
 
 : format-float-fast ( x digits string -- string )
-    [ "" -1 ] 2dip "C" format-float* ;
+    [ "" -1 ] 2dip "C" format-float ;
 
 : format-fast-scientific? ( x digits -- x' digits ? )
     over float? [ t ]

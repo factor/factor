@@ -495,7 +495,7 @@ unit-test
 
 ! Missing locale
 { "" } [
-    33.4 "" 4 4 "f" "missing" format-float*
+    33.4 "" 4 4 "f" "missing" format-float
 ] unit-test
 
 ! Literal byte arrays are mutable, so (format-float) isn't foldable.
@@ -654,7 +654,7 @@ unit-test
     {                1e23                "1e23"  }
 } [| tuple |
     tuple first2 :> ( n str )
-    { str } [ n format-float ] unit-test
+    { str } [ n float>dec ] unit-test
 ] each
 
 {
@@ -720,7 +720,7 @@ unit-test
        6.447847606411378e49
        5.465125341473931e80
 } [| n |
-    { n } [ n format-float dec> ] unit-test
+    { n } [ n float>dec dec> ] unit-test
 ] each
 
 {
@@ -739,6 +739,6 @@ unit-test
     0x455FCEB5B44D932F
     0x45B5C534DA985042
 } [| n |
-    { n } [ n bits>double format-float dec> double>bits ]
+    { n } [ n bits>double float>dec dec> double>bits ]
     unit-test
 ] each

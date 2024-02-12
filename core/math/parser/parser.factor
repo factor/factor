@@ -7,6 +7,16 @@ IN: math.parser
 
 <PRIVATE
 PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
+
+: format-string ( format -- format )
+    0 suffix >byte-array ; foldable
+
+! Used as primitive for formatting vocabulary
+: format-float ( n fill width precision format locale -- string )
+    [ format-string ] 4dip
+    [ format-string ] bi@
+    (format-float) >string ; inline
+
 PRIVATE>
 
 : digit> ( ch -- n )
@@ -413,30 +423,30 @@ CONSTANT: ONES B{
     48 49 50 51 52 53 54 55 56 57 48 49 50 51 52 53 54 55 56 57
 }
 
-: (two-digit) ( num accum -- num' accum )
+: two-digit ( num accum -- num' accum )
     [
         100 /mod [ TENS nth-unsafe ] [ ONES nth-unsafe ] bi
     ] dip [ push ] keep [ push ] keep ; inline
 
-: (one-digit) ( num accum -- num' accum )
+: one-digit ( num accum -- num' accum )
     [ 10 /mod CHAR: 0 + ] dip [ push ] keep ; inline
 
-: (bignum>dec) ( num accum -- num' accum )
+: bignum>dec ( num accum -- num' accum )
     [ over most-positive-fixnum > ]
-    [ { bignum sbuf } declare (two-digit) ] while
+    [ { bignum sbuf } declare two-digit ] while
     [ >fixnum ] dip ; inline
 
-: (fixnum>dec) ( num accum -- num' accum )
+: fixnum>dec ( num accum -- num' accum )
     { fixnum sbuf } declare
-    [ over 10 >= ] [ (two-digit) ] while
-    [ over zero? ] [ (one-digit) ] until ; inline
+    [ over 10 >= ] [ two-digit ] while
+    [ over zero? ] [ one-digit ] until ; inline
 
-GENERIC: (positive>dec) ( num -- str )
+GENERIC: positive>dec ( num -- str )
 
-M: bignum (positive>dec)
-    12 <sbuf> (bignum>dec) (fixnum>dec) "" like reverse! nip ; inline
+M: bignum positive>dec
+    12 <sbuf> bignum>dec fixnum>dec "" like reverse! nip ; inline
 
-: (count-digits) ( digits n -- digits' )
+: count-digits ( digits n -- digits' )
     {
         { [ dup 10 < ] [ drop ] }
         { [ dup 100 < ] [ drop 1 fixnum+fast ] }
@@ -462,33 +472,34 @@ M: bignum (positive>dec)
                 ] if fixnum+fast
             ] [
                 [ 12 fixnum+fast ] [ 1,000,000,000,000 /i ] bi*
-                (count-digits)
+                count-digits
             ] if
         ]
     } cond ; inline recursive
 
-M: fixnum (positive>dec)
-    1 over (count-digits) <sbuf> (fixnum>dec) "" like reverse! nip ; inline
-
-: (positive>base) ( num radix -- str )
-    dup 1 <= [ invalid-radix ] when
-    [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
-    reverse! ; inline
+M: fixnum positive>dec
+    1 over count-digits <sbuf> fixnum>dec "" like reverse! nip ; inline
 
 : positive>base ( num radix -- str )
-    dup 10 = [ drop (positive>dec) ] [ (positive>base) ] if ; inline
+    {
+        { 10 [ positive>dec ] }
+        [
+            dup 1 <= [ invalid-radix ] when
+            [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
+            reverse!
+        ]
+    } case ;
 
 PRIVATE>
 
 GENERIC#: >base 1 ( n radix -- str )
 
-: number>string ( n -- str ) 10 >base ; inline
-
 : >bin ( n -- str ) 2 >base ; inline
 : >oct ( n -- str ) 8 >base ; inline
+: >dec ( n -- str ) 10 >base ; inline
 : >hex ( n -- str ) 16 >base ; inline
 
-ALIAS: >dec number>string
+ALIAS: number>string >dec
 
 M: integer >base
     {
@@ -549,14 +560,6 @@ M: ratio >base
         { 2  [ [ float>bin-value ] swap (bin-float>base) ] }
         [ invalid-radix ]
     } case ;
-
-: format-string ( format -- format )
-    0 suffix >byte-array ; foldable
-
-: format-float* ( n fill width precision format locale -- string )
-    [ format-string ] 4dip
-    [ format-string ] bi@
-    (format-float) >string ; inline
 
 ! Dragonbox algorithm
 
@@ -993,12 +996,12 @@ CONSTANT: lookup-table {
     2over swap [ + ] [ neg ] bi [ 1 max ] bi@ + 17 >
     [ exponential-format ] [ decimal-format ] if ; inline
 
-: format-float ( n -- str )
+: float>dec ( n -- str )
     >double< dragonbox general-format ; inline
 
 : float>base ( n radix -- str )
     {
-        { 10 [ format-float ] }
+        { 10 [ float>dec ] }
         [ bin-float>base ]
     } case ; inline
 
