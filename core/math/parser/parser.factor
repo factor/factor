@@ -1019,8 +1019,10 @@ M: float >base
 
 : # ( n -- ) number>string % ; inline
 
+ERROR: invalid-hex-string-length n ;
+
 : hex-string>bytes ( hex-string -- bytes )
-    dup length 2/ <byte-array> [
+    dup length dup even? [ invalid-hex-string-length ] unless 2/ <byte-array> [
         [
             [ digit> ] 2dip over even? [
                 [ 16 * ] [ 2/ ] [ set-nth-unsafe ] tri*
