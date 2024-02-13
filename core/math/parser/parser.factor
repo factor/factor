@@ -515,7 +515,7 @@ M: ratio >base
 : mantissa-expt ( bits -- mantissa expt )
     (mantissa-expt) mantissa-expt-normalize ;
 
-: float-sign ( bits -- str ) 63 bit? "-" "" ? ; inline
+: sign-negative? ( bits -- ? ) 63 bit? ; inline
 
 : bin-float-value ( str size -- str' )
     CHAR: 0 pad-head [ CHAR: 0 = ] trim-tail
@@ -535,7 +535,7 @@ M: ratio >base
 
 : (bin-float>base) ( value-quot n -- str )
     double>bits
-    [ float-sign swap ] [
+    [ sign-negative? "-" "" ? swap ] [
         mantissa-expt rot [ bin-float-expt ] bi*
     ] bi 3append ; inline
 
@@ -560,11 +560,12 @@ M: ratio >base
 : 100/mod ( n -- t ρ≠0? )
     656 * [ -16 shift ] [ 16 2^ 1 - bitand 656 >= ] bi ; inline
 
-: >double< ( n -- s F E )
-    double>bits [ float-sign ] [ (mantissa-expt) ] bi ; inline
+: >float< ( n -- s F E )
+    double>bits [ sign-negative? ] [ (mantissa-expt) ] bi ; inline
 
 : mantissa-expt-normalize* ( F E -- F' E' )
-    [ -1022 ] [ [ 52 2^ bitor ] [ 1023 - ] bi* ] if-zero 52 - ; inline
+    [ -1022 ] [ [ 52 2^ bitor ] [ 1023 - ] bi* ] if-zero
+    52 - >fixnum ; inline
 
 : shorter-interval? ( F E -- ? )
     [ zero? ] [ 1 > ] bi* and ; inline
@@ -967,23 +968,43 @@ CONSTANT: lookup-table {
     [ mantissa-expt-normalize* ] [ shorter-interval? ] 2bi
     [ shorter-interval ] [ normal-interval ] if ; inline
 
-: exponential-format ( sign-str e f-length f-str -- str )
-    [ + 1 - ] dip 1 cut [ "." glue ] unless-empty
-    "e" append swap >dec 3append ; inline
+: ?minus ( accum ? -- accum ) [ CHAR: - over push ] when ; inline
 
-: decimal-format ( sign-str e f-length f-str -- str )
-    2over + neg? [ pick neg CHAR: 0 pad-head ] when
-    pick 0 > [ 2over + CHAR: 0 pad-tail ] when
-    nip swap neg 0 max cut*
-    [ [ "0" ] when-empty ] bi@ "." glue append ; inline
+: ?exponent ( accum e -- accum )
+    CHAR: e pick push
+    dup 0 >= [ CHAR: + pick push ] when
+    >dec over push-all ; inline
 
-: general-format ( s f e -- str )
-    swap >dec [ length ] keep
-    2over swap [ + ] [ neg ] bi [ 0 max ] [ 1 max ] bi* + 17 >
-    [ exponential-format ] [ decimal-format ] if ; inline
+: exponential-format ( neg? f-str f-len e -- sbuf )
+    + 1 - [ 24 <sbuf> ] 3dip
+    [ ?minus ]
+    [ unclip-slice pick push [
+        CHAR: . pick push over push-all
+    ] unless-empty ]
+    [ ?exponent ] tri* ; inline
 
-: float>dec ( n -- str )
-    >double< dragonbox general-format ; inline
+: decimal-format ( neg? f-str f-len e -- sbuf )
+    [ 19 <sbuf> ] 4dip {
+        { [ dup 0 >= ] [ nip 0 swap 1 ] }
+        { [ 2dup neg <= ] [ over + neg 1 swap ] }
+        [ nip neg 0 0 ]
+    } cond [ cut-slice* ] 2dip rot
+    [ ?minus ] 4dip
+    [ over push-all ] 3dip
+    [ CHAR: 0 <string> over push-all CHAR: . over push ]
+    [ CHAR: 0 <string> over push-all ]
+    [ over push-all ] tri* ; inline
+
+: (format) ( neg? f e quot -- str )
+    [ >dec dup length ] 2dip call "" like ; inline
+
+: general-format ( neg? f e -- str )
+    [
+        2dup [ + ] [ neg ] bi [ 0 max ] bi@ + 17 >
+        [ exponential-format ] [ decimal-format ] if
+    ] (format) ; inline
+
+: float>dec ( n -- str ) >float< dragonbox general-format ; inline
 
 : float>base ( n radix -- str )
     {
