@@ -80,17 +80,46 @@ check_ret() {
     fi
 }
 
+download_with_wget() {
+    local url="$1"
+    local filename
+    filename=$(basename "$url")
+    $ECHO filename is "$filename"
+    $ECHO wget -nd --prefer-family=IPv4 -O "$filename" "$url"
+    wget -nd --prefer-family=IPv4 -O "$filename" "$url"
+}
+
+download_with_curl() {
+    local url="$1"
+    local filename
+    filename=$(basename "$url")
+    curl -L -f -o "$filename" "$url"
+}
+
+download_with_downloader() {
+    local url="$1"
+    if [[ -z $DOWNLOADER_NAME ]] ; then
+        set_downloader
+    fi
+    if [[ $DOWNLOADER_NAME == 'wget' ]]; then
+        download_with_wget "$url"
+    elif [[ $DOWNLOADER_NAME == 'curl' ]]; then
+        download_with_curl "$url"
+    else
+        $ECHO "error: wget or curl required in download_with_downloader"
+        exit_script 12
+    fi
+}
+
 set_downloader() {
     if test_program_installed wget; then
-        DOWNLOADER="wget -nd --prefer-family=IPv4"
         DOWNLOADER_NAME=wget
         return
     fi
-    if test_program_installed curl; then
-        DOWNLOADER="curl -L -f -O"
-        DOWNLOADER_NAME=curl
-        return
-    fi
+    # if test_program_installed curl; then
+    #     DOWNLOADER_NAME=curl
+    #     return
+    # fi
     $ECHO "error: wget or curl required"
     exit_script 11
 }
@@ -341,7 +370,7 @@ echo_build_info() {
     $ECHO "GIT_URL=$GIT_URL"
     $ECHO "CHECKSUM_URL=$CHECKSUM_URL"
     $ECHO "BOOT_IMAGE_URL=$BOOT_IMAGE_URL"
-    $ECHO "DOWNLOADER=$DOWNLOADER"
+    $ECHO "DOWNLOADER_NAME=$DOWNLOADER_NAME"
     $ECHO "CC=$CC"
     $ECHO "CXX=$CXX"
     $ECHO "MAKE=$MAKE"
@@ -513,20 +542,15 @@ current_git_branch() {
     git describe --all --exact-match 2>/dev/null
 }
 
+
 check_url() {
     if [[ $DOWNLOADER_NAME == 'wget' ]]; then
-    if wget -S --spider --prefer-family=IPv4 "$1" 2>&1 | grep -q 'HTTP/1.1 200 OK'; then
-            return 0
-        else
-            return 1
-        fi
+        wget -S --spider --prefer-family=IPv4 "$1" 2>&1 | grep -q 'HTTP/[12].[01] [23]..' && return 0 || return 1
     elif [[ $DOWNLOADER_NAME == 'curl' ]]; then
-        local code
-        code=$(curl -4 -sL -w "%{http_code}\\n" "$1" -o /dev/null)
-        if [[ $code -eq 200 ]]; then return 0; else return 1; fi
+        curl -4 -sL -w "%{http_code}\\n" "$1" -o /dev/null | grep -qE '^(2[0-9]{2})$' && return 0 || return 1
     else
-        $ECHO "error: wget or curl required in check_url"
-        exit_script 12
+        echo "error: wget or curl required to check URL"
+        exit 12
     fi
 }
 
@@ -590,12 +614,10 @@ get_boot_image() {
 }
 
 get_url() {
-    if [[ -z $DOWNLOADER ]] ; then
-        set_downloader;
+    if [[ -z $DOWNLOADER_NAME ]] ; then
+        set_downloader_name
     fi
-    $ECHO "$DOWNLOADER" "$1" ;
-    $DOWNLOADER "$1"
-    check_ret "$DOWNLOADER"
+    download_with_downloader "$1"
 }
 
 get_config_info() {
@@ -610,12 +632,12 @@ copy_fresh_image() {
 }
 
 check_launch_factor() {
-    ./$FACTOR_BINARY -e=
+    "./$FACTOR_BINARY" -e=
     check_ret "Could not launch ./$FACTOR_BINARY"
 }
 
 is_boot_image_outdated() {
-    ./$FACTOR_BINARY "-e=USE: system \"\" to-refresh 2drop length 0 > 1 0 ? exit"
+    "./$FACTOR_BINARY" "-e=USE: system \"\" to-refresh 2drop length 0 > 1 0 ? exit"
     return $?
 }
 
@@ -628,21 +650,24 @@ info_boot_image() {
         set_md5sum
         local disk_md5
         disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
-        $ECHO "Boot image @factorcode.org md5: $factorcode_md5";
-        $ECHO "Boot image @local disk     md5: $disk_md5";
+        $ECHO "Boot image @factorcode.org md5: $factorcode_md5"
+        $ECHO "Boot image @local disk     md5: $disk_md5"
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
             $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
             $ECHO "Your disk boot image and the one on downloads.factorcode.org mismatch"
         fi
     fi
+}
 
+info_check_factor_refresh_all_locally() {
+    prepare_build_info
     check_launch_factor
-    is_boot_image_outdated
-    if [[ $? -eq 0 ]]; then
-        $ECHO "Your disk boot image is up-to-date"
+
+    if is_boot_image_outdated; then
+        $ECHO "Your Factor image is consistent with the local source code."
     else
-        $ECHO "Your disk boot image needs to be updated"
+        $ECHO "Your Factor image is not consistent with the local source code."
     fi
 }
 
@@ -731,7 +756,8 @@ usage() {
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
     $ECHO "  deps-macosx - install git on MacOSX using port"
-    $ECHO "  info-boot-image - print remote and disk boot image MD5, status disk boot image"
+    $ECHO "  info-boot-image - print remote and disk boot image MD5"
+    $ECHO "  info-check-factor-refresh-all-locally - check if local sources would cause refresh-all to change the image"
     $ECHO "  self-bootstrap - make local boot image, bootstrap"
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
@@ -773,6 +799,8 @@ case "$1" in
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
     info-boot-image) info_boot_image ;;
+    info-check-factor-refresh-all-locally) info_check_factor_refresh_all_locally ;;
+    update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
     self-bootstrap) get_config_info; make_boot_image; bootstrap  ;;
     self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
@@ -784,7 +812,6 @@ case "$1" in
     make-target) FIND_MAKE_TARGET=true; ECHO=false; find_build_info; exit_script 0;;
     report|info) find_build_info ;;
     full-report) find_build_info; check_installed_programs; check_libraries ;;
-    update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
     update-script) update_script ;;
     *) usage ;;
 esac
