@@ -5,12 +5,19 @@ calendar.private combinators combinators.smart generalizations
 io io.streams.string kernel math math.functions math.parser
 multiline namespaces peg.ebnf present prettyprint quotations
 sequences sequences.generalizations splitting strings unicode ;
-FROM: math.parser.private => format-float ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
 
 <PRIVATE
+
+PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
+
+: pad-null ( format -- format )
+    0 over length 1 + <byte-array> [ copy ] keep ; foldable
+
+: format-float ( n fill width precision format locale -- string )
+    [ pad-null ] 4dip [ pad-null ] bi@ (format-float) >string ; inline
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ; inline
@@ -72,8 +79,7 @@ ERROR: unknown-format-directive value ;
     [ "e" format-float-fast ] [ format-scientific-simple ] if ;
 
 : format-fast-decimal? ( x digits -- x' digits ? )
-    over float? [ t ]
-    [
+    over float? [ t ] [
         2dup
         [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
         [ over ratio?

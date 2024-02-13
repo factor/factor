@@ -4,6 +4,36 @@ USING: calendar formatting kernel literals math math.functions
 sequences strings system tools.test ;
 IN: formatting.tests
 
+{
+    B{ 49 46 53 53 69 43 48 53 }
+} [
+    155000.0 B{ 0 } -1 3 B{ 69 0 } B{ 67 0 } (format-float)
+] unit-test
+
+{
+    B{ 32 32 32 32 32 32 32 49 46 53 53 69 43 48 53 }
+} [
+    155000.0 B{ 0 } 15 3 B{ 69 0 } B{ 67 0 } (format-float)
+] unit-test
+
+! Missing locale
+{ "" } [
+    33.4 "" 4 4 "f" "missing" format-float
+] unit-test
+
+! Literal byte arrays are mutable, so (format-float) isn't foldable.
+: trouble ( -- str ba )
+    155000.0 B{ } -1 3 B{ 69 0 } [
+        B{ 67 0 } (format-float) >string
+    ] keep ;
+
+{
+    "1.55E+05"
+    "1.550e+05"
+} [
+    trouble CHAR: e 0 rot set-nth trouble drop
+] unit-test
+
 [ "%s" printf ] must-infer
 [ "%s" sprintf ] must-infer
 

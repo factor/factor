@@ -5,20 +5,6 @@ layouts make math math.order math.private sbufs sequences
 sequences.private strings ;
 IN: math.parser
 
-<PRIVATE
-PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
-
-: format-string ( format -- format )
-    0 suffix >byte-array ; foldable
-
-! Used as primitive for formatting vocabulary
-: format-float ( n fill width precision format locale -- string )
-    [ format-string ] 4dip
-    [ format-string ] bi@
-    (format-float) >string ; inline
-
-PRIVATE>
-
 : digit> ( ch -- n )
     {
         { [ dup CHAR: 9 <= ] [ CHAR: 0 -      dup  0 < [ drop 255 ] when ] }
