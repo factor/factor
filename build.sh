@@ -13,7 +13,6 @@ ARCH=
 WORD=
 GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
-SCRIPT_ARGS="$*"
 
 test_program_installed() {
     command -v "$1" >/dev/null 2>&1
@@ -21,7 +20,7 @@ test_program_installed() {
 
 # return 1 on found
 test_programs_installed() {
-    local installed=0;
+    local installed=0
     $ECHO -n "Checking for all($*)..."
     for cmd in "$@" ;
     do
@@ -45,7 +44,7 @@ exit_script() {
 }
 
 ensure_program_installed() {
-    local installed=0;
+    local installed=0
     $ECHO -n "Checking for any($*)..."
     for cmd in "$@" ;
     do
@@ -426,7 +425,7 @@ update_script_name() {
 update_script() {
   set_current_branch
   local -r update_script=$(update_script_name)
-  local -r shell_path=$(echo "$SHELL")
+  local -r shell_path="$SHELL"
   {
     echo "#!$shell_path"
     echo "set -ex"
@@ -537,8 +536,8 @@ set_boot_image_vars() {
     set_current_branch
     local url="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/checksums.txt"
     $ECHO "Getting checksum from ${url}"
-    check_url $url
-    if [[ $? -eq 0 ]]; then
+
+    if check_url "$url"; then
         $ECHO "got checksum!"
         CHECKSUM_URL="$url"
         BOOT_IMAGE_URL="https://downloads.factorcode.org/images/${CURRENT_BRANCH}/${BOOT_IMAGE}"
@@ -572,8 +571,8 @@ update_boot_image() {
         set_md5sum
         local disk_md5
         disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
-        $ECHO "Factorcode md5: $factorcode_md5";
-        $ECHO "Disk md5: $disk_md5";
+        $ECHO "Factorcode md5: $factorcode_md5"
+        $ECHO "Disk md5: $disk_md5"
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
             $ECHO "Your disk boot image matches the one on downloads.factorcode.org."
         else
