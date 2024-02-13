@@ -968,18 +968,18 @@ CONSTANT: lookup-table {
     [ mantissa-expt-normalize* ] [ shorter-interval? ] 2bi
     [ shorter-interval ] [ normal-interval ] if ; inline
 
-: ?minus ( accum ? -- accum ) [ CHAR: - over push ] when ; inline
+: ?minus ( accum ? -- accum ) [ CHAR: - suffix! ] when ; inline
 
 : ?exponent ( accum e -- accum )
-    CHAR: e pick push
-    dup 0 >= [ CHAR: + pick push ] when
-    >dec over push-all ; inline
+    [ CHAR: e suffix! ] dip
+    [ 0 >= [ CHAR: + suffix! ] when ]
+    [ >dec append! ] bi ; inline
 
 : exponential-format ( neg? f-str f-len e -- sbuf )
     + 1 - [ 24 <sbuf> ] 3dip
     [ ?minus ]
     [ unclip-slice pick push [
-        CHAR: . pick push over push-all
+        CHAR: . pick push append!
     ] unless-empty ]
     [ ?exponent ] tri* ; inline
 
@@ -988,12 +988,13 @@ CONSTANT: lookup-table {
         { [ dup 0 >= ] [ nip 0 swap 1 ] }
         { [ 2dup neg <= ] [ over + neg 1 swap ] }
         [ nip neg 0 0 ]
-    } cond [ cut-slice* ] 2dip rot
-    [ ?minus ] 4dip
-    [ over push-all ] 3dip
-    [ CHAR: 0 <string> over push-all CHAR: . over push ]
-    [ CHAR: 0 <string> over push-all ]
-    [ over push-all ] tri* ; inline
+    } cond [ cut-slice* ] 2dip rot {
+        [ ?minus ]
+        [ append! ]
+        [ CHAR: 0 <string> append! CHAR: . suffix! ]
+        [ CHAR: 0 <string> append! ]
+        [ append! ]
+    } spread ; inline
 
 : (format) ( neg? f e quot -- str )
     [ >dec dup length ] 2dip call "" like ; inline
