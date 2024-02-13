@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
-USING: calendar formatting kernel literals math math.functions
-sequences strings system tools.test ;
+USING: calendar formatting formatting.private kernel literals
+math math.functions sequences strings system tools.test ;
 IN: formatting.tests
 
 {

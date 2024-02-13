@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar calendar.english
-calendar.private combinators combinators.smart generalizations
-io io.streams.string kernel math math.functions math.parser
-multiline namespaces peg.ebnf present prettyprint quotations
-sequences sequences.generalizations splitting strings unicode ;
+USING: accessors arrays assocs byte-arrays calendar
+calendar.english calendar.private combinators combinators.smart
+generalizations io io.streams.string kernel math math.functions
+math.parser multiline namespaces peg.ebnf present prettyprint
+quotations sequences sequences.generalizations splitting strings
+unicode ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
