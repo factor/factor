@@ -205,6 +205,17 @@ CONSTANT: all-primitives {
         }
     }
     {
+        "formatting.private"
+        {
+            {
+                "(format-float)" ( n fill width precision format locale -- byte-array )
+                "format_float"
+                { float byte-array fixnum fixnum byte-array byte-array } { byte-array }
+                make-flushable
+            }
+        }
+    }
+    {
         "generic.single.private"
         {
             { "inline-cache-miss" ( generic methods index cache -- ) f f f f }
@@ -390,17 +401,6 @@ CONSTANT: all-primitives {
             {
                 "float>bits" ( x -- n ) "float_bits"
                 { real } { integer } make-foldable
-            }
-        }
-    }
-    {
-        "math.parser.private"
-        {
-            {
-                "(format-float)" ( n fill width precision format locale -- byte-array )
-                "format_float"
-                { float byte-array fixnum fixnum byte-array byte-array } { byte-array }
-                make-flushable
             }
         }
     }

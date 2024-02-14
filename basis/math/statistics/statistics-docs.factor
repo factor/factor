@@ -5,7 +5,7 @@ IN: math.statistics
 HELP: geometric-mean
 { $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the geometric mean of all elements in " { $snippet "seq" } ". The geometric mean measures the central tendency of a data set and minimizes the effects of extreme values." }
-{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.81712059283214" } }
+{ $examples { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } geometric-mean ." "1.8171205928321397" } }
 { $errors "Throws a " { $link signal-error. } " (square-root of 0) if the sequence is empty." } ;
 
 HELP: harmonic-mean

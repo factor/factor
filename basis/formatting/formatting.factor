@@ -1,16 +1,24 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
-USING: accessors arrays assocs calendar calendar.english
-calendar.private combinators combinators.smart generalizations
-io io.streams.string kernel math math.functions math.parser
-multiline namespaces peg.ebnf present prettyprint quotations
-sequences sequences.generalizations splitting strings unicode ;
-FROM: math.parser.private => format-float ;
+USING: accessors arrays assocs byte-arrays calendar
+calendar.english calendar.private combinators combinators.smart
+generalizations io io.streams.string kernel math math.functions
+math.parser multiline namespaces peg.ebnf present prettyprint
+quotations sequences sequences.generalizations splitting strings
+unicode ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
 
 <PRIVATE
+
+PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
+
+: pad-null ( format -- format )
+    0 over length 1 + <byte-array> [ copy ] keep ; foldable
+
+: format-float ( n fill width precision format locale -- string )
+    [ pad-null ] 4dip [ pad-null ] bi@ (format-float) >string ; inline
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ; inline
@@ -68,14 +76,11 @@ ERROR: unknown-format-directive value ;
     ] if ;
 
 : format-scientific ( x digits -- string )
-    format-fast-scientific?  [
-        [ "e" format-float-fast ]
-        [ [ ".0e" "e" replace ] [ drop ] if-zero ] bi
-    ] [ format-scientific-simple ] if ;
+    format-fast-scientific?
+    [ "e" format-float-fast ] [ format-scientific-simple ] if ;
 
 : format-fast-decimal? ( x digits -- x' digits ? )
-    over float? [ t ]
-    [
+    over float? [ t ] [
         2dup
         [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
         [ over ratio?
@@ -87,10 +92,8 @@ ERROR: unknown-format-directive value ;
     ] if ; inline
 
 : format-decimal ( x digits -- string )
-    format-fast-decimal? [
-        [ "f" format-float-fast ]
-        [ [ ".0" ?tail drop ] [ drop ] if-zero ] bi
-    ] [ format-decimal-simple ] if ;
+    format-fast-decimal?
+    [ "f" format-float-fast ] [ format-decimal-simple ] if ;
 
 EBNF: parse-printf [=[
 
