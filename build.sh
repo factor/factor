@@ -116,10 +116,10 @@ set_downloader() {
         DOWNLOADER_NAME=wget
         return
     fi
-    # if test_program_installed curl; then
-    #     DOWNLOADER_NAME=curl
-    #     return
-    # fi
+    if test_program_installed curl; then
+        DOWNLOADER_NAME=curl
+        return
+    fi
     $ECHO "error: wget or curl required"
     exit_script 11
 }
