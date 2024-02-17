@@ -18,14 +18,17 @@ setlocal expandtab tabstop=4 shiftwidth=4 softtabstop=4
 
 " Try to limit lines to 64 characters.
 setlocal textwidth=64 colorcolumn=+1
-hi ColorColumn ctermbg=darkgrey guibg=#1e2528
 
 " Teach Vim what comments look like.
-setlocal comments+=b:!,b:#!
+setlocal comments=b:!,f:#!
+setlocal commentstring=!\ %s
 
 " Make all of these characters part of a word (useful for
 " skipping over words with w, e, and b)
 setlocal iskeyword=33-126,128-255
+
+" matchit patterns
+let b:match_words = '\<<PRIVATE\>:\<PRIVATE>\>'
 
 " Insert closing brackets and quotes, spaces, stack effects ...
 " examples ("|" is the position of the cursor):
