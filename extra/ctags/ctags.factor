@@ -4,7 +4,7 @@
 ! Simple Ctags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 
-USING: assocs definitions io.backend io.encodings.ascii io.files
+USING: assocs definitions io.backend io.encodings.utf8 io.files
 kernel make math.parser present sequences sorting vocabs ;
 IN: ctags
 
@@ -29,4 +29,4 @@ PRIVATE>
     all-words locations sort-keys make-ctags ;
 
 : write-ctags ( path -- )
-    [ ctags ] dip ascii set-file-lines ;
+    [ ctags ] dip utf8 set-file-lines ;
