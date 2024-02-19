@@ -843,6 +843,9 @@ PRIVATE>
     index-of-last
     over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
 
+: last2 ( seq -- penultimate ultimate )
+    2 tail* first2 ; inline
+
 <PRIVATE
 
 : last-unsafe ( seq -- elt )

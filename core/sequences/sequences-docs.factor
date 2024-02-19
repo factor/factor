@@ -909,6 +909,11 @@ HELP: last
 { $description "Outputs the last element of a sequence." }
 { $errors "Throws an error if the sequence is empty." } ;
 
+HELP: last2
+{ $values { "seq" sequence } { "penultimate" object } { "ultimate" object } }
+{ $description "Outputs the last two elements of a sequence." }
+{ $errors "Throws an error if the sequence has fewer than two elements." } ;
+
 HELP: pop*
 { $values { "seq" "a resizable mutable sequence" } }
 { $description "Removes the last element and shortens the sequence." }
@@ -1325,7 +1330,7 @@ HELP: tail*
 { head head* head-slice head-slice* } related-words
 { cut cut* cut-slice cut-slice* } related-words
 { unclip unclip-slice unclip-last unclip-last-slice } related-words
-{ first last but-last but-last-slice rest rest-slice } related-words
+{ first first2 last last2 but-last but-last-slice rest rest-slice } related-words
 
 HELP: shorter?
 { $values { "seq1" sequence } { "seq2" sequence } { "?" boolean } }
@@ -2051,7 +2056,7 @@ ARTICLE: "sequences-access" "Accessing sequence elements"
 "Extracting the last element:"
 { $subsections last ?last }
 "Unpacking sequences:"
-{ $subsections first2 first3 first4 }
+{ $subsections first2 first3 first4 last2 }
 { $see-also nth } ;
 
 ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"

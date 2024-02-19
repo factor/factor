@@ -73,8 +73,7 @@ DEFER: next-token
 
 ! Words for removing syntax that should be ignored
 : ends-with-quote? ( token -- ? )
-    2 tail* [ first CHAR: \ = not ] 
-            [ second CHAR: " =    ] bi and ;
+    last2 [ CHAR: \ = not ] [ CHAR: " = ] bi* and ;
 
 : end-string? ( token -- ? )
     dup length 1 = [ quotation-mark? ] [ ends-with-quote? ] if ;
