@@ -9,3 +9,6 @@ io.encodings.string tools.test io.encodings.binary ;
 
 { "hello" } [ "hello" utf8 encode >string ] unit-test
 { "\0h\0e" } [ "he" utf16be encode >string ] unit-test
+
+{ B{ 97 98 99 } } [ "abc" binary encode ] unit-test
+{ B{ 97 98 99 } } [ "abc" utf8 encode ] unit-test
