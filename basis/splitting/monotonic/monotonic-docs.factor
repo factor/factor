@@ -60,7 +60,7 @@ HELP: upward-slices
     { "seq" sequence }
     { "slices" "a sequence of upward-slices" }
 }
-{ $description "Returns an array of monotonically increasing slices of type " { $link downward-slice } ". Slices of one element are discarded." } ;
+{ $description "Returns an array of monotonically increasing slices of type " { $link upward-slice } ". Slices of one element are discarded." } ;
 
 HELP: trends
 { $values
