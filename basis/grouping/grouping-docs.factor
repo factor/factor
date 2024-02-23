@@ -172,7 +172,7 @@ HELP: monotonic?
     "Testing if a sequence is non-decreasing:"
     { $example "USING: grouping math prettyprint ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
     "Testing if a sequence is decreasing:"
-    { $example "USING: grouping math prettyprint ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
+    { $example "USING: grouping math prettyprint ;" "{ 9 8 6 7 } [ > ] monotonic? ." "f" }
 } ;
 
 HELP: all-equal?
