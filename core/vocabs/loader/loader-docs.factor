@@ -5,11 +5,13 @@ IN: vocabs.loader
 ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
 "You can work with code outside of the Factor source tree by adding additional directories to the list of vocabulary roots."
 $nl
-"There are three ways of doing this."
+"There are four ways of doing this:"
 $nl
 "The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
 $nl
-"The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
+"The second way is to use the " { $snippet "-roots=" } " command-line argument. The format is the same as for the environment variable."
+$nl
+"The third way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
 { $subsections ".factor-roots" }
 "Finally, you can add vocabulary roots by calling a word from your " { $snippet ".factor-rc" } " file (see " { $link ".factor-rc" } "):"
 { $subsections add-vocab-root } ;

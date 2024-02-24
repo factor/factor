@@ -95,6 +95,7 @@ ARTICLE: "standard-cli-args" "Command line switches for general usage"
     { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate and then exit Factor." } }
     { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } " or " { $vocab-link "ui.tools" } "." } }
     { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
+    { { $snippet "-roots=" { $emphasis "paths" } } { "Specify additional vocabulary roots. The list is colon-separated on Unix and semicolon-separated on Windows." } }
 } ;
 
 ARTICLE: ".factor-boot-rc" "Bootstrap initialization file"
