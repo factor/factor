@@ -436,11 +436,14 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ remove! drop ] if ;
 
+: scroll-distance ( wParam -- n )
+    [ hi-word 80 /f ] [ lo-word ] bi MK_SHIFT mask? [ 10 * ] when ;
+
 : mouse-scroll ( wParam -- direction )
-    hi-word -80 /f 0 swap 2array ;
+    scroll-distance neg 0 swap 2array ;
 
 : mouse-horizontal-scroll ( wParam -- direction )
-    hi-word 80 /f 0 2array ;
+    scroll-distance 0 2array ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
