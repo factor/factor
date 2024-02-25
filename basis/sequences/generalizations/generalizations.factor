@@ -38,6 +38,15 @@ MACRO: set-firstn ( n -- quot )
 MACRO: ?firstn ( n -- quot )
     dup '[ _ f pad-tail _ firstn-unsafe ] ;
 
+: lastn ( seq n -- elts... )
+    [ tail-slice* ] [ firstn-unsafe ] bi ; inline
+
+: ?lastn ( seq n -- elts... )
+    [ f pad-head ] [ lastn ] bi ; inline
+
+: set-lastn ( elts... seq n -- )
+    [ tail-slice* ] [ set-firstn-unsafe ] bi ; inline
+
 : nappend ( n -- seq ) narray concat ; inline
 
 : nappend-as ( n exemplar -- seq )
