@@ -395,7 +395,7 @@ although it may be a bad idea to modify them.
 This { $link POSTPONE: \ } word requires a little explanation. It works like a sort of escape, allowing us to put a reference to the 
 next word on the stack, without executing it. This is exactly what we need, because { $link edit } is a word that takes words 
 themselves as arguments. This mechanism is similar to quotations, but while a quotation creates a new anonymous function, 
-here we are directly refering to the word { $snippet "multiple?" } .
+here we are directly referring to the word { $snippet "multiple?" } .
 
 Back to our task, you may notice that the words { $snippet "[2..b]" } and { $snippet "multiple?" } are just helper functions that you may not 
 want to expose directly. To hide them from view, you can wrap them in a private block like this
