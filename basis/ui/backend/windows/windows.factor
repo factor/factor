@@ -436,8 +436,8 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ remove! drop ] if ;
 
-: mouse-scroll ( wParam -- array )
-    >lo-hi [ -80 /f ] map ;
+: mouse-scroll ( wParam -- direction )
+    hi-word -80 /f 0 swap 2array ;
 
 : mouse-horizontal-scroll ( wParam -- direction )
     hi-word 80 /f 0 2array ;
