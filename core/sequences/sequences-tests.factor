@@ -290,6 +290,17 @@ unit-test
 { f } [ { } ?last ] unit-test
 { 9 } [ 10 <iota> ?last ] unit-test
 
+[ f last ] [ bounds-error? ] must-fail-with
+{ 1 } [ { 1 } last ] unit-test
+{ 2 } [ { 1 2 } last ] unit-test
+{ 3 } [ { 1 2 3 } last ] unit-test
+
+[ f last2 ] [ bounds-error? ] must-fail-with
+[ { 1 } last2 ] [ bounds-error? ] must-fail-with
+{ 1 2 } [ { 1 2 } last2 ] unit-test
+{ 2 3 } [ { 1 2 3 } last2 ] unit-test
+{ 3 4 } [ { 1 2 3 4 } last2 ] unit-test
+
 [ -1/0. 0 remove-nth! ] must-fail
 { "" } [ "" [ CHAR: \s = ] trim ] unit-test
 { "" } [ "" [ CHAR: \s = ] trim-head ] unit-test

@@ -840,11 +840,11 @@ PRIVATE>
 : append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt )
-    index-of-last
-    over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
+    index-of-last bounds-check-head nth-unsafe ; inline
 
 : last2 ( seq -- penultimate ultimate )
-    2 tail* first2 ; inline
+    index-of-last [ [ 1 - ] keep ] dip pick 0 <
+    [ nip bounds-error ] [ '[ _ nth-unsafe ] bi@ ] if ; inline
 
 <PRIVATE
 
