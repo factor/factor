@@ -436,8 +436,14 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ remove! drop ] if ;
 
-: mouse-scroll ( wParam -- array )
-    >lo-hi [ -80 /f ] map ;
+: scroll-distance ( wParam -- n )
+    [ hi-word 80 /f ] [ lo-word ] bi MK_SHIFT mask? [ 10 * ] when ;
+
+: mouse-scroll ( wParam -- direction )
+    scroll-distance -2 * 0 swap 2array ;
+
+: mouse-horizontal-scroll ( wParam -- direction )
+    scroll-distance 0 2array ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
@@ -495,8 +501,14 @@ SYMBOL: nc-buttons
     TrackMouseEvent win32-error=0/f
     >lo-hi swap window move-hand fire-motion ;
 
+: (handle-mousewheel) ( direction hWnd -- )
+    hand-loc get-global swap window send-scroll ; inline
+
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-scroll hand-loc get-global hWnd window send-scroll ;
+    wParam mouse-scroll hWnd (handle-mousewheel) ;
+
+:: handle-wm-mousehwheel ( hWnd uMsg wParam lParam -- )
+    wParam mouse-horizontal-scroll hWnd (handle-mousewheel) ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     ! message sent if windows needs application to stop dragging
@@ -567,6 +579,7 @@ wm-handlers [
 
         ${ WM_MOUSEMOVE [ handle-wm-mousemove 0 ] }
         ${ WM_MOUSEWHEEL [ handle-wm-mousewheel 0 ] }
+        ${ WM_MOUSEHWHEEL [ handle-wm-mousehwheel 0 ] }
         ${ WM_CANCELMODE [ handle-wm-cancelmode 0 ] }
         ${ WM_MOUSELEAVE [ handle-wm-mouseleave 0 ] }
     } expand-keys-set-at

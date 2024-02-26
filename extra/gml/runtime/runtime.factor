@@ -143,16 +143,9 @@ ERROR: gml-stack-underflow ;
 : check-stack ( seq n -- seq n )
     2dup swap length > [ gml-stack-underflow ] when ; inline
 
-: lastn ( seq n -- elts... )
-    check-stack
-    [ tail-slice* ] keep firstn-unsafe ; inline
-
 : popn ( seq n -- elts... )
     check-stack
     [ lastn ] [ over length swap - swap shorten ] 2bi ; inline
-
-: set-lastn ( elts... seq n -- )
-    [ tail-slice* ] keep set-firstn-unsafe ; inline
 
 : pushn ( elts... seq n -- )
     [ over length + swap lengthen ] 2keep set-lastn ; inline

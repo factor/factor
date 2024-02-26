@@ -68,7 +68,6 @@ ALIAS: y second
 : calc-y ( slope x point -- y ) first2 [ - * ] dip + ;
 : calc-x ( slope y point -- x ) first2 swap [ - swap / ] dip + ;
 : y-at ( x point1 point2 -- y ) dupd calc-line-slope -rot calc-y ;
-: last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
 
 ! Due to the way adjusted-tail-slice works, the first element of
 ! pairs is <= xmin, and if the first is < xmin, then the second is

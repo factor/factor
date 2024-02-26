@@ -121,8 +121,6 @@ CONSTRUCTOR: <commit> commit ( tree parents author committer -- obj ) ;
 TUPLE: tree hash tree parents author committer gpgsig message ;
 CONSTRUCTOR: <tree> tree ( -- obj ) ;
 
-: last2 ( seq -- penultimate ultimate ) 2 tail* first2 ;
-
 : gmt-offset>duration ( string -- duration )
     3 cut [ string>number ] bi@
     [ hours ] [ minutes ] bi* time+ ;

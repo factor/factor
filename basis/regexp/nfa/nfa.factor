@@ -5,9 +5,9 @@ math namespaces regexp.ast regexp.classes
 regexp.transition-tables sequences sets unicode vectors ;
 IN: regexp.nfa
 
-! This uses unicode for ch>upper and ch>lower
-! but case-insensitive matching should be done by case-folding everything
-! before processing starts
+! This uses unicode for ch>upper and ch>lower but
+! case-insensitive matching should be done by case-folding
+! everything before processing starts
 
 SYMBOL: option-stack
 

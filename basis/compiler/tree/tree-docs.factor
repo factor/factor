@@ -22,8 +22,9 @@ HELP: #call
     { "word" { "The " { $link word } " to call." } }
     { "in-d" { "Sequence of input variables to the call. The items are ordered from top to bottom of the stack." } }
     { "out-d" { "Output values of the call." } }
-    { "method" { "If the called word is generic and inlined here, then 'method' contains the inlined " { $link quotation } "." } }
     { "body" { "If the called word is generic and inlined, then 'body' is a sequence of SSA nodes built from the inlined method." } }
+    { "method" { "If the called word is generic and inlined here, then 'method' contains the inlined " { $link quotation } "." } }
+    { "class" { "a class" } }
     { "info" { "If the called word is generic and inlined, then the info slot contains an assoc of value infos for the body of the inlined generic. It is set during the propagation pass of the optimizer." } }
   }
 } ;
@@ -65,6 +66,7 @@ HELP: #phi
 HELP: #push
 { $class-description "SSA tree node that puts a literal value on the stack. It has the following slots:"
   { $slots
+    { "literal" { "A literal data value." } }
     { "out-d" { "A one item array containing the " { $link <value> } " of the literal being pushed." } }
   }
 }
@@ -83,6 +85,10 @@ HELP: #shuffle
 { $class-description "SSA tree node that represents a stack shuffling operation such as " { $link swap } ". It has the following slots:"
   { $slots
     { "mapping" { "An " { $link assoc } " that shows how the shuffle output values (the keys) correspond to their inputs (the values)." } }
+    { "in-d" { "Sequence of datastack input variables." } }
+    { "out-d" { "Output datastack values." } }
+    { "in-r" { "Sequence of retainstack inputs." } }
+    { "out-r" { "Output retainstack values." } }
   }
 } ;
 
@@ -91,17 +97,26 @@ HELP: node,
 { $description "Emits a node to the " { $link stack-visitor } " variable." } ;
 
 ARTICLE: "compiler.tree" "High-level optimizer operating on lexical tree SSA IR"
-"Node types:"
+"The base node type:"
 { $subsections
-  #call
+  node
+}
+"Nodes for data:"
+{ $subsections
   #declare
+  #introduce
   #shuffle
+  #renaming
+  #copy
+  #push
 }
 "Nodes for control flow:"
 { $subsections
+  #call
   #call-recursive
   #enter-recursive
   #recursive
+  #return
   #return-recursive
   #terminate
 }
@@ -115,8 +130,9 @@ ARTICLE: "compiler.tree" "High-level optimizer operating on lexical tree SSA IR"
 }
 "Nodes for branching:"
 { $subsections
-  #dispatch
+  #branch
   #if
+  #dispatch
   #phi
 } ;
 
