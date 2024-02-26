@@ -3,7 +3,7 @@
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Not all functions have been wrapped.
 USING: alien alien.c-types alien.libraries alien.syntax
-combinators system ;
+classes.struct combinators system ;
 IN: db.sqlite.ffi
 
 << "sqlite" {
@@ -461,3 +461,400 @@ FUNCTION: sqlite3* sqlite3_db_handle ( sqlite3_stmt* pStmt )
 FUNCTION: c-string sqlite3_db_filename ( sqlite3* db, c-string zDbName )
 FUNCTION: int sqlite3_db_readonly ( sqlite3* db, c-string zDbName )
 
+C-TYPE: sqlite3_io_methods
+C-TYPE: sqlite3_mutex
+C-TYPE: sqlite3_api_routines
+C-TYPE: sqlite3_vfs
+TYPEDEF: void* sqlite3_syscall_ptr
+STRUCT: sqlite3_vfs
+  { iVersion int }
+  { szOsFile int }
+  { mxPathname int }
+  { pNext sqlite3_vfs* }
+  { zName char* }
+  { pAppData void* }
+  { xOpen void* }
+  { xDelete void* }
+  { xAccess void* }
+  { xFullPathname void* }
+  { xDlOpen void* }
+  { xDlError void* }
+  { xDlSym void* }
+  { xDlClose void* }
+  { xRandomness void* }
+  { xSleep void* }
+  { xCurrentTime void* }
+  { xGetLastError void* }
+  { xCurrentTimeInt64 void* }
+  { xSetSystemCall void* }
+  { xGetSystemCall void* }
+  { xNextSystemCall void* } ;
+
+FUNCTION: sqlite3_stmt* sqlite3_next_stmt ( sqlite3* pDb, sqlite3_stmt* pStmt )
+
+FUNCTION: void* sqlite3_commit_hook ( sqlite3* dummy, void* dummy, void* dummy )
+
+FUNCTION: void* sqlite3_rollback_hook ( sqlite3* dummy, void* dummy, void* dummy )
+
+FUNCTION: void* sqlite3_update_hook ( sqlite3* dummy, void* dummy, void* dummy )
+
+FUNCTION: int sqlite3_enable_shared_cache ( int dummy )
+
+FUNCTION: int sqlite3_release_memory ( int dummy )
+
+FUNCTION: int sqlite3_db_release_memory ( sqlite3* dummy )
+
+FUNCTION: longlong sqlite3_soft_heap_limit64 ( sqlite3_int64 N )
+
+FUNCTION: void sqlite3_soft_heap_limit ( int N )
+
+FUNCTION: int sqlite3_table_column_metadata ( sqlite3* db, char* zDbName, char* zTableName, char* zColumnName, char** pzDataType, char** pzCollSeq, int* pNotNull, int* pPrimaryKey, int* pAutoinc )
+
+FUNCTION: int sqlite3_load_extension ( sqlite3* db, char* zFile, char* zProc, char** pzErrMsg )
+
+FUNCTION: int sqlite3_enable_load_extension ( sqlite3* db, int onoff )
+
+FUNCTION: int sqlite3_auto_extension ( void* xEntryPoint )
+
+FUNCTION: int sqlite3_cancel_auto_extension ( void* xEntryPoint )
+
+FUNCTION: void sqlite3_reset_auto_extension ( )
+
+C-TYPE: sqlite3_vtab
+C-TYPE: sqlite3_index_info
+C-TYPE: sqlite3_vtab_cursor
+C-TYPE: sqlite3_module
+STRUCT: sqlite3_module
+  { iVersion int }
+  { xCreate void* }
+  { xConnect void* }
+  { xBestIndex void* }
+  { xDisconnect void* }
+  { xDestroy void* }
+  { xOpen void* }
+  { xClose void* }
+  { xFilter void* }
+  { xNext void* }
+  { xEof void* }
+  { xColumn void* }
+  { xRowid void* }
+  { xUpdate void* }
+  { xBegin void* }
+  { xSync void* }
+  { xCommit void* }
+  { xRollback void* }
+  { xFindFunction void* }
+  { xRename void* }
+  { xSavepoint void* }
+  { xRelease void* }
+  { xRollbackTo void* }
+  { xShadowName void* } ;
+
+STRUCT: sqlite3_index_constraint
+  { iColumn int }
+  { op uchar }
+  { usable uchar }
+  { iTermOffset int } ;
+
+STRUCT: sqlite3_index_orderby
+  { iColumn int }
+  { desc uchar } ;
+
+STRUCT: sqlite3_index_constraint_usage
+  { argvIndex int }
+  { omit uchar } ;
+
+STRUCT: sqlite3_index_info
+  { nConstraint int }
+  { aConstraint sqlite3_index_constraint* }
+  { nOrderBy int }
+  { aOrderBy sqlite3_index_orderby* }
+  { aConstraintUsage sqlite3_index_constraint_usage* }
+  { idxNum int }
+  { idxStr char* }
+  { needToFreeIdxStr int }
+  { orderByConsumed int }
+  { estimatedCost double }
+  { estimatedRows sqlite3_int64 }
+  { idxFlags int }
+  { colUsed sqlite3_uint64 } ;
+
+FUNCTION: int sqlite3_create_module ( sqlite3* db, char* zName, sqlite3_module* p, void* pClientData )
+
+FUNCTION: int sqlite3_create_module_v2 ( sqlite3* db, char* zName, sqlite3_module* p, void* pClientData, void* xDestroy )
+
+STRUCT: sqlite3_vtab
+  { pModule sqlite3_module* }
+  { nRef int }
+  { zErrMsg char* } ;
+
+STRUCT: sqlite3_vtab_cursor
+  { pVtab sqlite3_vtab* } ;
+
+FUNCTION: int sqlite3_declare_vtab ( sqlite3* dummy, char* zSQL )
+
+FUNCTION: int sqlite3_overload_function ( sqlite3* dummy, char* zFuncName, int nArg )
+
+C-TYPE: sqlite3_blob
+FUNCTION: int sqlite3_blob_open ( sqlite3* dummy, char* zDb, char* zTable, char* zColumn, sqlite3_int64 iRow, int flags, sqlite3_blob** ppBlob )
+
+FUNCTION: int sqlite3_blob_reopen ( sqlite3_blob* dummy, sqlite3_int64 dummy )
+
+FUNCTION: int sqlite3_blob_close ( sqlite3_blob* dummy )
+
+FUNCTION: int sqlite3_blob_bytes ( sqlite3_blob* dummy )
+
+FUNCTION: int sqlite3_blob_read ( sqlite3_blob* dummy, void* Z, int N, int iOffset )
+
+FUNCTION: int sqlite3_blob_write ( sqlite3_blob* dummy, void* z, int n, int iOffset )
+
+FUNCTION: sqlite3_vfs* sqlite3_vfs_find ( char* zVfsName )
+
+FUNCTION: int sqlite3_vfs_register ( sqlite3_vfs* dummy, int makeDflt )
+
+FUNCTION: int sqlite3_vfs_unregister ( sqlite3_vfs* dummy )
+
+FUNCTION: sqlite3_mutex* sqlite3_mutex_alloc ( int dummy )
+
+FUNCTION: void sqlite3_mutex_free ( sqlite3_mutex* dummy )
+
+FUNCTION: void sqlite3_mutex_enter ( sqlite3_mutex* dummy )
+
+FUNCTION: int sqlite3_mutex_try ( sqlite3_mutex* dummy )
+
+FUNCTION: void sqlite3_mutex_leave ( sqlite3_mutex* dummy )
+
+C-TYPE: sqlite3_mutex_methods
+STRUCT: sqlite3_mutex_methods
+  { xMutexInit void* }
+  { xMutexEnd void* }
+  { xMutexAlloc void* }
+  { xMutexFree void* }
+  { xMutexEnter void* }
+  { xMutexTry void* }
+  { xMutexLeave void* }
+  { xMutexHeld void* }
+  { xMutexNotheld void* } ;
+
+FUNCTION: int sqlite3_mutex_held ( sqlite3_mutex* dummy )
+
+FUNCTION: int sqlite3_mutex_notheld ( sqlite3_mutex* dummy )
+
+FUNCTION: sqlite3_mutex* sqlite3_db_mutex ( sqlite3* dummy )
+
+FUNCTION: int sqlite3_file_control ( sqlite3* dummy, char* zDbName, int op, void* dummy )
+
+FUNCTION: int sqlite3_test_control ( int op )
+
+FUNCTION: int sqlite3_keyword_count ( )
+
+FUNCTION: int sqlite3_keyword_name ( int dummy, char** dummy, int* dummy )
+
+FUNCTION: int sqlite3_keyword_check ( char* dummy, int dummy )
+
+C-TYPE: sqlite3_str
+FUNCTION: sqlite3_str* sqlite3_str_new ( sqlite3* dummy )
+
+FUNCTION: char* sqlite3_str_finish ( sqlite3_str* dummy )
+
+FUNCTION: void sqlite3_str_appendf ( sqlite3_str* dummy, char* zFormat )
+
+! FUNCTION: void sqlite3_str_vappendf ( sqlite3_str* dummy, char* zFormat, va_list dummy )
+
+FUNCTION: void sqlite3_str_append ( sqlite3_str* dummy, char* zIn, int N )
+
+FUNCTION: void sqlite3_str_appendall ( sqlite3_str* dummy, char* zIn )
+
+FUNCTION: void sqlite3_str_appendchar ( sqlite3_str* dummy, int N, char C )
+
+FUNCTION: void sqlite3_str_reset ( sqlite3_str* dummy )
+
+FUNCTION: int sqlite3_str_errcode ( sqlite3_str* dummy )
+
+FUNCTION: int sqlite3_str_length ( sqlite3_str* dummy )
+
+FUNCTION: char* sqlite3_str_value ( sqlite3_str* dummy )
+
+FUNCTION: int sqlite3_status ( int op, int* pCurrent, int* pHighwater, int resetFlag )
+
+FUNCTION: int sqlite3_status64 ( int op, sqlite3_int64* pCurrent, sqlite3_int64* pHighwater, int resetFlag )
+
+FUNCTION: int sqlite3_db_status ( sqlite3* dummy, int op, int* pCur, int* pHiwtr, int resetFlg )
+
+FUNCTION: int sqlite3_stmt_status ( sqlite3_stmt* dummy, int op, int resetFlg )
+
+C-TYPE: sqlite3_pcache
+C-TYPE: sqlite3_pcache_page
+STRUCT: sqlite3_pcache_page
+  { pBuf void* }
+  { pExtra void* } ;
+
+C-TYPE: sqlite3_pcache_methods2
+STRUCT: sqlite3_pcache_methods2
+  { iVersion int }
+  { pArg void* }
+  { xInit void* }
+  { xShutdown void* }
+  { xCreate void* }
+  { xCachesize void* }
+  { xPagecount void* }
+  { xFetch void* }
+  { xUnpin void* }
+  { xRekey void* }
+  { xTruncate void* }
+  { xDestroy void* }
+  { xShrink void* } ;
+
+C-TYPE: sqlite3_pcache_methods
+STRUCT: sqlite3_pcache_methods
+  { pArg void* }
+  { xInit void* }
+  { xShutdown void* }
+  { xCreate void* }
+  { xCachesize void* }
+  { xPagecount void* }
+  { xFetch void* }
+  { xUnpin void* }
+  { xRekey void* }
+  { xTruncate void* }
+  { xDestroy void* } ;
+
+C-TYPE: sqlite3_backup
+FUNCTION: sqlite3_backup* sqlite3_backup_init ( sqlite3* pDest, char* zDestName, sqlite3* pSource, char* zSourceName )
+
+FUNCTION: int sqlite3_backup_step ( sqlite3_backup* p, int nPage )
+
+FUNCTION: int sqlite3_backup_finish ( sqlite3_backup* p )
+
+FUNCTION: int sqlite3_backup_remaining ( sqlite3_backup* p )
+
+FUNCTION: int sqlite3_backup_pagecount ( sqlite3_backup* p )
+
+FUNCTION: int sqlite3_unlock_notify ( sqlite3* pBlocked, void* xNotify, void* pNotifyArg )
+
+FUNCTION: int sqlite3_stricmp ( char* dummy, char* dummy )
+
+FUNCTION: int sqlite3_strnicmp ( char* dummy, char* dummy, int dummy )
+
+FUNCTION: int sqlite3_strglob ( char* zGlob, char* zStr )
+
+FUNCTION: int sqlite3_strlike ( char* zGlob, char* zStr, uint cEsc )
+
+FUNCTION: void sqlite3_log ( int iErrCode, char* zFormat )
+
+FUNCTION: void* sqlite3_wal_hook ( sqlite3* dummy, void* dummy, void* dummy )
+
+FUNCTION: int sqlite3_wal_autocheckpoint ( sqlite3* db, int N )
+
+FUNCTION: int sqlite3_wal_checkpoint ( sqlite3* db, char* zDb )
+
+FUNCTION: int sqlite3_wal_checkpoint_v2 ( sqlite3* db, char* zDb, int eMode, int* pnLog, int* pnCkpt )
+
+FUNCTION: int sqlite3_vtab_config ( sqlite3* dummy, int op )
+
+FUNCTION: int sqlite3_vtab_on_conflict ( sqlite3* dummy )
+
+FUNCTION: int sqlite3_vtab_nochange ( sqlite3_context* dummy )
+
+FUNCTION: char* sqlite3_vtab_collation ( sqlite3_index_info* dummy, int dummy )
+
+FUNCTION: int sqlite3_stmt_scanstatus ( sqlite3_stmt* pStmt, int idx, int iScanStatusOp, void* pOut )
+
+FUNCTION: void sqlite3_stmt_scanstatus_reset ( sqlite3_stmt* dummy )
+
+FUNCTION: int sqlite3_db_cacheflush ( sqlite3* dummy )
+
+FUNCTION: int sqlite3_system_errno ( sqlite3* dummy )
+
+STRUCT: sqlite3_snapshot
+  { hidden uchar[48] } ;
+
+FUNCTION: int sqlite3_snapshot_get ( sqlite3* db, char* zSchema, sqlite3_snapshot** ppSnapshot )
+
+FUNCTION: int sqlite3_snapshot_open ( sqlite3* db, char* zSchema, sqlite3_snapshot* pSnapshot )
+
+FUNCTION: void sqlite3_snapshot_free ( sqlite3_snapshot* dummy )
+
+FUNCTION: int sqlite3_snapshot_cmp ( sqlite3_snapshot* p1, sqlite3_snapshot* p2 )
+
+FUNCTION: int sqlite3_snapshot_recover ( sqlite3* db, char* zDb )
+
+FUNCTION: uchar* sqlite3_serialize ( sqlite3* db, char* zSchema, sqlite3_int64* piSize, uint mFlags )
+
+FUNCTION: int sqlite3_deserialize ( sqlite3* db, char* zSchema, uchar* pData, sqlite3_int64 szDb, sqlite3_int64 szBuf, uint mFlags )
+
+C-TYPE: sqlite3_rtree_geometry
+C-TYPE: sqlite3_rtree_query_info
+TYPEDEF: double sqlite3_rtree_dbl
+FUNCTION: int sqlite3_rtree_geometry_callback ( sqlite3* db, char* zGeom, void* xGeom, void* pContext )
+
+STRUCT: sqlite3_rtree_geometry
+  { pContext void* }
+  { nParam int }
+  { aParam sqlite3_rtree_dbl* }
+  { pUser void* }
+  { xDelUser void* } ;
+
+FUNCTION: int sqlite3_rtree_query_callback ( sqlite3* db, char* zQueryFunc, void* xQueryFunc, void* pContext, void* xDestructor )
+
+STRUCT: sqlite3_rtree_query_info
+  { pContext void* }
+  { nParam int }
+  { aParam sqlite3_rtree_dbl* }
+  { pUser void* }
+  { xDelUser void* }
+  { aCoord sqlite3_rtree_dbl* }
+  { anQueue uint* }
+  { nCoord int }
+  { iLevel int }
+  { mxLevel int }
+  { iRowid sqlite3_int64 }
+  { rParentScore sqlite3_rtree_dbl }
+  { eParentWithin int }
+  { eWithin int }
+  { rScore sqlite3_rtree_dbl }
+  { apSqlParam sqlite3_value** } ;
+
+C-TYPE: Fts5ExtensionApi
+C-TYPE: Fts5Context
+C-TYPE: Fts5PhraseIter
+TYPEDEF: void* fts5_extension_function
+STRUCT: Fts5PhraseIter
+  { a uchar* }
+  { b uchar* } ;
+
+STRUCT: Fts5ExtensionApi
+  { iVersion int }
+  { xUserData void* }
+  { xColumnCount void* }
+  { xRowCount void* }
+  { xColumnTotalSize void* }
+  { xTokenize void* }
+  { xPhraseCount void* }
+  { xPhraseSize void* }
+  { xInstCount void* }
+  { xInst void* }
+  { xRowid void* }
+  { xColumnText void* }
+  { xColumnSize void* }
+  { xQueryPhrase void* }
+  { xSetAuxdata void* }
+  { xGetAuxdata void* }
+  { xPhraseFirst void* }
+  { xPhraseNext void* }
+  { xPhraseFirstColumn void* }
+  { xPhraseNextColumn void* } ;
+
+C-TYPE: Fts5Tokenizer
+C-TYPE: fts5_tokenizer
+STRUCT: fts5_tokenizer
+  { xCreate void* }
+  { xDelete void* }
+  { xTokenize void* } ;
+
+C-TYPE: fts5_api
+STRUCT: fts5_api
+  { iVersion int }
+  { xCreateTokenizer void* }
+  { xFindTokenizer void* }
+  { xCreateFunction void* } ;
