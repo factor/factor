@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays calendar.format
-calendar.parser combinators db db.errors db.sqlite.errors
-db.sqlite.ffi db.types io.backend io.encodings.string
-io.encodings.utf8 kernel math namespaces present sequences
-serialize urls ;
+USING: accessors alien.c-types alien.data alien.strings arrays
+calendar.format calendar.parser combinators db db.errors
+db.sqlite.errors db.sqlite.ffi db.types io.backend
+io.encodings.string io.encodings.utf8 kernel math namespaces
+present sequences serialize urls ;
 IN: db.sqlite.lib
 
 : sqlite-compile-options ( -- seq )
@@ -18,7 +18,7 @@ ERROR: sqlite-error < db-error n string ;
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
-    db-connection get handle>> sqlite3_errmsg
+    db-connection get handle>> sqlite3_errmsg alien>native-string
     parse-sqlite-sql-error throw ;
 
 : sqlite-check-result ( n -- )
@@ -29,7 +29,7 @@ ERROR: sqlite-error < db-error n string ;
     } case ;
 
 : sqlite-open ( path -- db )
-    normalize-path
+    normalize-path native-string>alien
     { void* } [ sqlite3_open sqlite-check-result ]
     with-out-parameters ;
 
@@ -37,12 +37,13 @@ ERROR: sqlite-error < db-error n string ;
     sqlite3_close sqlite-check-result ;
 
 : sqlite-prepare ( db sql -- handle )
-    utf8 encode dup length
+    [ native-string>alien ] [ length ] bi
     { void* void* }
     [ sqlite3_prepare_v2 sqlite-check-result ]
     with-out-parameters drop ;
 
 : sqlite-bind-parameter-index ( handle name -- index )
+    native-string>alien
     sqlite3_bind_parameter_index ;
 
 : parameter-index ( handle name text -- handle name text )
@@ -133,9 +134,9 @@ ERROR: sqlite-error < db-error n string ;
 : sqlite-clear-bindings ( handle -- )
     sqlite3_clear_bindings sqlite-check-result ;
 : sqlite-#columns ( query -- int ) sqlite3_column_count ;
-: sqlite-column ( handle index -- string ) sqlite3_column_text ;
-: sqlite-column-name ( handle index -- string ) sqlite3_column_name ;
-: sqlite-column-type ( handle index -- string ) sqlite3_column_type ;
+: sqlite-column ( handle index -- string ) sqlite3_column_text alien>native-string ;
+: sqlite-column-name ( handle index -- string ) sqlite3_column_name alien>native-string ;
+: sqlite-column-type ( handle index -- string ) sqlite3_column_type alien>native-string ;
 
 
 : sqlite3-column-null ( sqlite n obj -- obj/f )
@@ -175,15 +176,15 @@ ERROR: sqlite-error < db-error n string ;
         { UNSIGNED-BIG-INTEGER [ sqlite3-column-uint64 ] }
         { BOOLEAN [ sqlite3-column-int 1 = ] }
         { DOUBLE [ sqlite3-column-double ] }
-        { TEXT [ sqlite3_column_text ] }
-        { VARCHAR [ sqlite3_column_text ] }
-        { DATE [ sqlite3_column_text dup [ ymd>timestamp ] when ] }
-        { TIME [ sqlite3_column_text dup [ hms>duration ] when ] }
-        { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
-        { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
+        { TEXT [ sqlite3_column_text alien>native-string ] }
+        { VARCHAR [ sqlite3_column_text alien>native-string ] }
+        { DATE [ sqlite3_column_text [ alien>native-string ymd>timestamp ] ?call ] }
+        { TIME [ sqlite3_column_text [ alien>native-string hms>duration ] ?call ] }
+        { TIMESTAMP [ sqlite3_column_text [ alien>native-string ymdhms>timestamp ] ?call ] }
+        { DATETIME [ sqlite3_column_text [ alien>native-string ymdhms>timestamp ] ?call ] }
+        { URL [ sqlite3_column_text [ alien>native-string >url ] ?call ] }
+        { FACTOR-BLOB [ sqlite-column-blob [ alien>native-string bytes>object ] ?call ] }
         { BLOB [ sqlite-column-blob ] }
-        { URL [ sqlite3_column_text dup [ >url ] when ] }
-        { FACTOR-BLOB [ sqlite-column-blob dup [ bytes>object ] when ] }
         [ no-sql-type ]
     } case ;
 
@@ -200,5 +201,11 @@ ERROR: sqlite-error < db-error n string ;
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
 
+: sqlite3-version ( -- string )
+    sqlite3_libversion alien>native-string ;
+
 : current-sqlite-filename ( -- path/f )
-    db-connection get [ handle>> f sqlite3_db_filename ] [ f ] if* ;
+    db-connection get [
+        handle>> native-string>alien f sqlite3_db_filename
+        alien>native-string
+    ] [ f ] if* ;

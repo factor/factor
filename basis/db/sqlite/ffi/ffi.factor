@@ -131,15 +131,15 @@ CONSTANT: SQLITE_SYNC_DATAONLY      0x00010
 
 LIBRARY: sqlite
 
-FUNCTION: c-string sqlite3_libversion ( )
+FUNCTION: char* sqlite3_libversion ( )
 
-FUNCTION: c-string sqlite3_sourceid ( )
+FUNCTION: char* sqlite3_sourceid ( )
 
 FUNCTION: int sqlite3_libversion_number ( )
 
-FUNCTION: int sqlite3_compileoption_used ( c-string zOptName )
+FUNCTION: int sqlite3_compileoption_used ( char* zOptName )
 
-FUNCTION: c-string sqlite3_compileoption_get ( int N )
+FUNCTION: char* sqlite3_compileoption_get ( int N )
 
 FUNCTION: int sqlite3_threadsafe ( )
 
@@ -153,7 +153,7 @@ FUNCTION: int sqlite3_close ( sqlite3* dummy )
 FUNCTION: int sqlite3_close_v2 ( sqlite3* dummy )
 
 TYPEDEF: void* sqlite3_callback
-FUNCTION: int sqlite3_exec ( sqlite3* dummy, c-string sql, void* callback, void* dummy, char** errmsg )
+FUNCTION: int sqlite3_exec ( sqlite3* dummy, char* sql, void* callback, void* dummy, char** errmsg )
 
 C-TYPE: sqlite3_file
 STRUCT: sqlite3_io_methods
@@ -190,7 +190,7 @@ STRUCT: sqlite3_vfs
   { szOsFile int }
   { mxPathname int }
   { pNext sqlite3_vfs* }
-  { zName c-string }
+  { zName char* }
   { pAppData void* }
   { xOpen void* }
   { xDelete void* }
@@ -244,7 +244,7 @@ FUNCTION: int sqlite3_total_changes ( sqlite3* dummy )
 
 FUNCTION: void sqlite3_interrupt ( sqlite3* dummy )
 
-FUNCTION: int sqlite3_complete ( c-string sql )
+FUNCTION: int sqlite3_complete ( char* sql )
 
 FUNCTION: int sqlite3_complete16 ( void* sql )
 
@@ -252,17 +252,17 @@ FUNCTION: int sqlite3_busy_handler ( sqlite3* dummy, void* dummy, void* dummy )
 
 FUNCTION: int sqlite3_busy_timeout ( sqlite3* dummy, int ms )
 
-FUNCTION: int sqlite3_get_table ( sqlite3* db, c-string zSql, char*** pazResult, int* pnRow, int* pnColumn, char** pzErrmsg )
+FUNCTION: int sqlite3_get_table ( sqlite3* db, char* zSql, char*** pazResult, int* pnRow, int* pnColumn, char** pzErrmsg )
 
 FUNCTION: void sqlite3_free_table ( char** result )
 
-FUNCTION: c-string sqlite3_mprintf ( c-string dummy )
+FUNCTION: char* sqlite3_mprintf ( char* dummy )
 
-! FUNCTION: c-string sqlite3_vmprintf ( c-string dummy, va_list dummy )
+! FUNCTION: char* sqlite3_vmprintf ( char* dummy, va_list dummy )
 
-FUNCTION: c-string sqlite3_snprintf ( int dummy, c-string dummy, c-string dummy )
+FUNCTION: char* sqlite3_snprintf ( int dummy, char* dummy, char* dummy )
 
-! FUNCTION: c-string sqlite3_vsnprintf ( int dummy, c-string dummy, c-string dummy, va_list dummy )
+! FUNCTION: char* sqlite3_vsnprintf ( int dummy, char* dummy, char* dummy, va_list dummy )
 
 FUNCTION: void* sqlite3_malloc ( int dummy )
 
@@ -292,48 +292,48 @@ FUNCTION: int sqlite3_trace_v2 ( sqlite3* dummy, uint uMask, void* xCallback, vo
 
 FUNCTION: void sqlite3_progress_handler ( sqlite3* dummy, int dummy, void* dummy, void* dummy )
 
-FUNCTION: int sqlite3_open ( c-string filename, sqlite3** ppDb )
+FUNCTION: int sqlite3_open ( char* filename, sqlite3** ppDb )
 
 FUNCTION: int sqlite3_open16 ( void* filename, sqlite3** ppDb )
 
-FUNCTION: int sqlite3_open_v2 ( c-string filename, sqlite3** ppDb, int flags, c-string zVfs )
+FUNCTION: int sqlite3_open_v2 ( char* filename, sqlite3** ppDb, int flags, char* zVfs )
 
-FUNCTION: c-string sqlite3_uri_parameter ( c-string zFilename, c-string zParam )
+FUNCTION: char* sqlite3_uri_parameter ( char* zFilename, char* zParam )
 
-FUNCTION: int sqlite3_uri_boolean ( c-string zFile, c-string zParam, int bDefault )
+FUNCTION: int sqlite3_uri_boolean ( char* zFile, char* zParam, int bDefault )
 
-FUNCTION: longlong sqlite3_uri_int64 ( c-string dummy, c-string dummy, sqlite3_int64 dummy )
+FUNCTION: longlong sqlite3_uri_int64 ( char* dummy, char* dummy, sqlite3_int64 dummy )
 
 FUNCTION: int sqlite3_errcode ( sqlite3* db )
 
 FUNCTION: int sqlite3_extended_errcode ( sqlite3* db )
 
-FUNCTION: c-string sqlite3_errmsg ( sqlite3* dummy )
+FUNCTION: char* sqlite3_errmsg ( sqlite3* dummy )
 
 FUNCTION: void* sqlite3_errmsg16 ( sqlite3* dummy )
 
-FUNCTION: c-string sqlite3_errstr ( int dummy )
+FUNCTION: char* sqlite3_errstr ( int dummy )
 
 C-TYPE: sqlite3_stmt
 FUNCTION: int sqlite3_limit ( sqlite3* dummy, int id, int newVal )
 
-FUNCTION: int sqlite3_prepare ( sqlite3* db, c-string zSql, int nByte, sqlite3_stmt** ppStmt, char** pzTail )
+FUNCTION: int sqlite3_prepare ( sqlite3* db, char* zSql, int nByte, sqlite3_stmt** ppStmt, char** pzTail )
 
-FUNCTION: int sqlite3_prepare_v2 ( sqlite3* db, c-string zSql, int nByte, sqlite3_stmt** ppStmt, char** pzTail )
+FUNCTION: int sqlite3_prepare_v2 ( sqlite3* db, char* zSql, int nByte, sqlite3_stmt** ppStmt, char** pzTail )
 
-FUNCTION: int sqlite3_prepare_v3 ( sqlite3* db, c-string  zSql, int nByte, uint prepFlags, sqlite3_stmt** ppStmt, char** pzTail )
+FUNCTION: int sqlite3_prepare_v3 ( sqlite3* db, char*  zSql, int nByte, uint prepFlags, sqlite3_stmt** ppStmt, char** pzTail )
 
-FUNCTION: int sqlite3_prepare16 ( sqlite3* db, c-string zSql, int nByte, sqlite3_stmt** ppStmt, void** pzTail )
+FUNCTION: int sqlite3_prepare16 ( sqlite3* db, char* zSql, int nByte, sqlite3_stmt** ppStmt, void** pzTail )
 
 FUNCTION: int sqlite3_prepare16_v2 ( sqlite3* db, void* zSql, int nByte, sqlite3_stmt** ppStmt, void** pzTail )
 
 FUNCTION: int sqlite3_prepare16_v3 ( sqlite3* db, void* zSql, int nByte, uint prepFlags, sqlite3_stmt** ppStmt, void** pzTail )
 
-FUNCTION: c-string sqlite3_sql ( sqlite3_stmt* pStmt )
+FUNCTION: char* sqlite3_sql ( sqlite3_stmt* pStmt )
 
-FUNCTION: c-string sqlite3_expanded_sql ( sqlite3_stmt* pStmt )
+FUNCTION: char* sqlite3_expanded_sql ( sqlite3_stmt* pStmt )
 
-FUNCTION: c-string sqlite3_normalized_sql ( sqlite3_stmt* pStmt )
+FUNCTION: char* sqlite3_normalized_sql ( sqlite3_stmt* pStmt )
 
 FUNCTION: int sqlite3_stmt_readonly ( sqlite3_stmt* pStmt )
 
@@ -371,31 +371,31 @@ FUNCTION: int sqlite3_bind_zeroblob64 ( sqlite3_stmt* dummy, int dummy, sqlite3_
 
 FUNCTION: int sqlite3_bind_parameter_count ( sqlite3_stmt* dummy )
 
-FUNCTION: c-string sqlite3_bind_parameter_name ( sqlite3_stmt* dummy, int dummy )
+FUNCTION: char* sqlite3_bind_parameter_name ( sqlite3_stmt* dummy, int dummy )
 
-FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* dummy, c-string zName )
+FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* dummy, char* zName )
 
 FUNCTION: int sqlite3_clear_bindings ( sqlite3_stmt* dummy )
 
 FUNCTION: int sqlite3_column_count ( sqlite3_stmt* pStmt )
 
-FUNCTION: c-string sqlite3_column_name ( sqlite3_stmt* dummy, int N )
+FUNCTION: char* sqlite3_column_name ( sqlite3_stmt* dummy, int N )
 
 FUNCTION: void* sqlite3_column_name16 ( sqlite3_stmt* dummy, int N )
 
-FUNCTION: c-string sqlite3_column_database_name ( sqlite3_stmt* dummy, int dummy )
+FUNCTION: char* sqlite3_column_database_name ( sqlite3_stmt* dummy, int dummy )
 
 FUNCTION: void* sqlite3_column_database_name16 ( sqlite3_stmt* dummy, int dummy )
 
-FUNCTION: c-string sqlite3_column_table_name ( sqlite3_stmt* dummy, int dummy )
+FUNCTION: char* sqlite3_column_table_name ( sqlite3_stmt* dummy, int dummy )
 
 FUNCTION: void* sqlite3_column_table_name16 ( sqlite3_stmt* dummy, int dummy )
 
-FUNCTION: c-string sqlite3_column_origin_name ( sqlite3_stmt* dummy, int dummy )
+FUNCTION: char* sqlite3_column_origin_name ( sqlite3_stmt* dummy, int dummy )
 
 FUNCTION: void* sqlite3_column_origin_name16 ( sqlite3_stmt* dummy, int dummy )
 
-FUNCTION: c-string sqlite3_column_decltype ( sqlite3_stmt* dummy, int dummy )
+FUNCTION: char* sqlite3_column_decltype ( sqlite3_stmt* dummy, int dummy )
 
 FUNCTION: void* sqlite3_column_decltype16 ( sqlite3_stmt* dummy, int dummy )
 
@@ -411,7 +411,7 @@ FUNCTION: int sqlite3_column_int ( sqlite3_stmt* dummy, int iCol )
 
 FUNCTION: longlong sqlite3_column_int64 ( sqlite3_stmt* dummy, int iCol )
 
-FUNCTION: c-string sqlite3_column_text ( sqlite3_stmt* dummy, int iCol )
+FUNCTION: char* sqlite3_column_text ( sqlite3_stmt* dummy, int iCol )
 
 FUNCTION: void* sqlite3_column_text16 ( sqlite3_stmt* dummy, int iCol )
 
@@ -455,9 +455,9 @@ FUNCTION: int sqlite3_value_int ( sqlite3_value* dummy )
 
 FUNCTION: longlong sqlite3_value_int64 ( sqlite3_value* dummy )
 
-FUNCTION: void* sqlite3_value_pointer ( sqlite3_value* dummy, c-string dummy )
+FUNCTION: void* sqlite3_value_pointer ( sqlite3_value* dummy, char* dummy )
 
-FUNCTION: c-string sqlite3_value_text ( sqlite3_value* dummy )
+FUNCTION: char* sqlite3_value_text ( sqlite3_value* dummy )
 
 FUNCTION: void* sqlite3_value_text16 ( sqlite3_value* dummy )
 
@@ -500,7 +500,7 @@ FUNCTION: void sqlite3_result_blob64 ( sqlite3_context* dummy, void* dummy, sqli
 
 FUNCTION: void sqlite3_result_double ( sqlite3_context* dummy, double dummy )
 
-FUNCTION: void sqlite3_result_error ( sqlite3_context* dummy, c-string dummy, int dummy )
+FUNCTION: void sqlite3_result_error ( sqlite3_context* dummy, char* dummy, int dummy )
 
 FUNCTION: void sqlite3_result_error16 ( sqlite3_context* dummy, void* dummy, int dummy )
 
@@ -516,9 +516,9 @@ FUNCTION: void sqlite3_result_int64 ( sqlite3_context* dummy, sqlite3_int64 dumm
 
 FUNCTION: void sqlite3_result_null ( sqlite3_context* dummy )
 
-FUNCTION: void sqlite3_result_text ( sqlite3_context* dummy, c-string dummy, int dummy, void* dummy )
+FUNCTION: void sqlite3_result_text ( sqlite3_context* dummy, char* dummy, int dummy, void* dummy )
 
-FUNCTION: void sqlite3_result_text64 ( sqlite3_context* dummy, c-string dummy, sqlite3_uint64 dummy, void* dummy, uchar encoding )
+FUNCTION: void sqlite3_result_text64 ( sqlite3_context* dummy, char* dummy, sqlite3_uint64 dummy, void* dummy, uchar encoding )
 
 FUNCTION: void sqlite3_result_text16 ( sqlite3_context* dummy, void* dummy, int dummy, void* dummy )
 
@@ -528,7 +528,7 @@ FUNCTION: void sqlite3_result_text16be ( sqlite3_context* dummy, void* dummy, in
 
 FUNCTION: void sqlite3_result_value ( sqlite3_context* dummy, sqlite3_value* dummy )
 
-FUNCTION: void sqlite3_result_pointer ( sqlite3_context* dummy, void* dummy, c-string dummy, void* dummy )
+FUNCTION: void sqlite3_result_pointer ( sqlite3_context* dummy, void* dummy, char* dummy, void* dummy )
 
 FUNCTION: void sqlite3_result_zeroblob ( sqlite3_context* dummy, int n )
 
@@ -536,9 +536,9 @@ FUNCTION: int sqlite3_result_zeroblob64 ( sqlite3_context* dummy, sqlite3_uint64
 
 FUNCTION: void sqlite3_result_subtype ( sqlite3_context* dummy, uint dummy )
 
-FUNCTION: int sqlite3_create_collation ( sqlite3* dummy, c-string zName, int eTextRep, void* pArg, void* xCompare )
+FUNCTION: int sqlite3_create_collation ( sqlite3* dummy, char* zName, int eTextRep, void* pArg, void* xCompare )
 
-FUNCTION: int sqlite3_create_collation_v2 ( sqlite3* dummy, c-string zName, int eTextRep, void* pArg, void* xCompare, void* xDestroy )
+FUNCTION: int sqlite3_create_collation_v2 ( sqlite3* dummy, char* zName, int eTextRep, void* pArg, void* xCompare, void* xDestroy )
 
 FUNCTION: int sqlite3_create_collation16 ( sqlite3* dummy, void* zName, int eTextRep, void* pArg, void* xCompare )
 
@@ -548,13 +548,13 @@ FUNCTION: int sqlite3_collation_needed16 ( sqlite3* dummy, void* dummy, void* du
 
 FUNCTION: int sqlite3_sleep ( int dummy )
 
-C-GLOBAL: c-string sqlite3_temp_directory
+C-GLOBAL: char* sqlite3_temp_directory
 
-C-GLOBAL: c-string sqlite3_data_directory
+C-GLOBAL: char* sqlite3_data_directory
 
 FUNCTION: int sqlite3_win32_set_directory ( ulong type, void* zValue )
 
-FUNCTION: int sqlite3_win32_set_directory8 ( ulong type, c-string zValue )
+FUNCTION: int sqlite3_win32_set_directory8 ( ulong type, char* zValue )
 
 FUNCTION: int sqlite3_win32_set_directory16 ( ulong type, void* zValue )
 
@@ -562,9 +562,9 @@ FUNCTION: int sqlite3_get_autocommit ( sqlite3* dummy )
 
 FUNCTION: sqlite3* sqlite3_db_handle ( sqlite3_stmt* dummy )
 
-FUNCTION: c-string sqlite3_db_filename ( sqlite3* db, c-string zDbName )
+FUNCTION: char* sqlite3_db_filename ( sqlite3* db, char* zDbName )
 
-FUNCTION: int sqlite3_db_readonly ( sqlite3* db, c-string zDbName )
+FUNCTION: int sqlite3_db_readonly ( sqlite3* db, char* zDbName )
 
 FUNCTION: sqlite3_stmt* sqlite3_next_stmt ( sqlite3* pDb, sqlite3_stmt* pStmt )
 
@@ -584,9 +584,9 @@ FUNCTION: longlong sqlite3_soft_heap_limit64 ( sqlite3_int64 N )
 
 FUNCTION: void sqlite3_soft_heap_limit ( int N )
 
-FUNCTION: int sqlite3_table_column_metadata ( sqlite3* db, c-string zDbName, c-string zTableName, c-string zColumnName, char** pzDataType, char** pzCollSeq, int* pNotNull, int* pPrimaryKey, int* pAutoinc )
+FUNCTION: int sqlite3_table_column_metadata ( sqlite3* db, char* zDbName, char* zTableName, char* zColumnName, char** pzDataType, char** pzCollSeq, int* pNotNull, int* pPrimaryKey, int* pAutoinc )
 
-FUNCTION: int sqlite3_load_extension ( sqlite3* db, c-string zFile, c-string zProc, char** pzErrMsg )
+FUNCTION: int sqlite3_load_extension ( sqlite3* db, char* zFile, char* zProc, char** pzErrMsg )
 
 FUNCTION: int sqlite3_enable_load_extension ( sqlite3* db, int onoff )
 
@@ -647,7 +647,7 @@ STRUCT: sqlite3_index_info
   { aOrderBy sqlite3_index_orderby* }
   { aConstraintUsage sqlite3_index_constraint_usage* }
   { idxNum int }
-  { idxStr c-string }
+  { idxStr char* }
   { needToFreeIdxStr int }
   { orderByConsumed int }
   { estimatedCost double }
@@ -655,24 +655,24 @@ STRUCT: sqlite3_index_info
   { idxFlags int }
   { colUsed sqlite3_uint64 } ;
 
-FUNCTION: int sqlite3_create_module ( sqlite3* db, c-string zName, sqlite3_module* p, void* pClientData )
+FUNCTION: int sqlite3_create_module ( sqlite3* db, char* zName, sqlite3_module* p, void* pClientData )
 
-FUNCTION: int sqlite3_create_module_v2 ( sqlite3* db, c-string zName, sqlite3_module* p, void* pClientData, void* xDestroy )
+FUNCTION: int sqlite3_create_module_v2 ( sqlite3* db, char* zName, sqlite3_module* p, void* pClientData, void* xDestroy )
 
 STRUCT: sqlite3_vtab
   { pModule sqlite3_module* }
   { nRef int }
-  { zErrMsg c-string } ;
+  { zErrMsg char* } ;
 
 STRUCT: sqlite3_vtab_cursor
   { pVtab sqlite3_vtab* } ;
 
-FUNCTION: int sqlite3_declare_vtab ( sqlite3* dummy, c-string zSQL )
+FUNCTION: int sqlite3_declare_vtab ( sqlite3* dummy, char* zSQL )
 
-FUNCTION: int sqlite3_overload_function ( sqlite3* dummy, c-string zFuncName, int nArg )
+FUNCTION: int sqlite3_overload_function ( sqlite3* dummy, char* zFuncName, int nArg )
 
 C-TYPE: sqlite3_blob
-FUNCTION: int sqlite3_blob_open ( sqlite3* dummy, c-string zDb, c-string zTable, c-string zColumn, sqlite3_int64 iRow, int flags, sqlite3_blob** ppBlob )
+FUNCTION: int sqlite3_blob_open ( sqlite3* dummy, char* zDb, char* zTable, char* zColumn, sqlite3_int64 iRow, int flags, sqlite3_blob** ppBlob )
 
 FUNCTION: int sqlite3_blob_reopen ( sqlite3_blob* dummy, sqlite3_int64 dummy )
 
@@ -684,7 +684,7 @@ FUNCTION: int sqlite3_blob_read ( sqlite3_blob* dummy, void* Z, int N, int iOffs
 
 FUNCTION: int sqlite3_blob_write ( sqlite3_blob* dummy, void* z, int n, int iOffset )
 
-FUNCTION: sqlite3_vfs* sqlite3_vfs_find ( c-string zVfsName )
+FUNCTION: sqlite3_vfs* sqlite3_vfs_find ( char* zVfsName )
 
 FUNCTION: int sqlite3_vfs_register ( sqlite3_vfs* dummy, int makeDflt )
 
@@ -718,7 +718,7 @@ FUNCTION: int sqlite3_mutex_notheld ( sqlite3_mutex* dummy )
 
 FUNCTION: sqlite3_mutex* sqlite3_db_mutex ( sqlite3* dummy )
 
-FUNCTION: int sqlite3_file_control ( sqlite3* dummy, c-string zDbName, int op, void* dummy )
+FUNCTION: int sqlite3_file_control ( sqlite3* dummy, char* zDbName, int op, void* dummy )
 
 FUNCTION: int sqlite3_test_control ( int op )
 
@@ -726,20 +726,20 @@ FUNCTION: int sqlite3_keyword_count ( )
 
 FUNCTION: int sqlite3_keyword_name ( int dummy, char** dummy, int* dummy )
 
-FUNCTION: int sqlite3_keyword_check ( c-string dummy, int dummy )
+FUNCTION: int sqlite3_keyword_check ( char* dummy, int dummy )
 
 C-TYPE: sqlite3_str
 FUNCTION: sqlite3_str* sqlite3_str_new ( sqlite3* dummy )
 
-FUNCTION: c-string sqlite3_str_finish ( sqlite3_str* dummy )
+FUNCTION: char* sqlite3_str_finish ( sqlite3_str* dummy )
 
-FUNCTION: void sqlite3_str_appendf ( sqlite3_str* dummy, c-string zFormat )
+FUNCTION: void sqlite3_str_appendf ( sqlite3_str* dummy, char* zFormat )
 
-! FUNCTION: void sqlite3_str_vappendf ( sqlite3_str* dummy, c-string zFormat, va_list dummy )
+! FUNCTION: void sqlite3_str_vappendf ( sqlite3_str* dummy, char* zFormat, va_list dummy )
 
-FUNCTION: void sqlite3_str_append ( sqlite3_str* dummy, c-string zIn, int N )
+FUNCTION: void sqlite3_str_append ( sqlite3_str* dummy, char* zIn, int N )
 
-FUNCTION: void sqlite3_str_appendall ( sqlite3_str* dummy, c-string zIn )
+FUNCTION: void sqlite3_str_appendall ( sqlite3_str* dummy, char* zIn )
 
 FUNCTION: void sqlite3_str_appendchar ( sqlite3_str* dummy, int N, char C )
 
@@ -749,7 +749,7 @@ FUNCTION: int sqlite3_str_errcode ( sqlite3_str* dummy )
 
 FUNCTION: int sqlite3_str_length ( sqlite3_str* dummy )
 
-FUNCTION: c-string sqlite3_str_value ( sqlite3_str* dummy )
+FUNCTION: char* sqlite3_str_value ( sqlite3_str* dummy )
 
 FUNCTION: int sqlite3_status ( int op, int* pCurrent, int* pHighwater, int resetFlag )
 
@@ -796,7 +796,7 @@ STRUCT: sqlite3_pcache_methods
   { xDestroy void* } ;
 
 C-TYPE: sqlite3_backup
-FUNCTION: sqlite3_backup* sqlite3_backup_init ( sqlite3* pDest, c-string zDestName, sqlite3* pSource, c-string zSourceName )
+FUNCTION: sqlite3_backup* sqlite3_backup_init ( sqlite3* pDest, char* zDestName, sqlite3* pSource, char* zSourceName )
 
 FUNCTION: int sqlite3_backup_step ( sqlite3_backup* p, int nPage )
 
@@ -808,23 +808,23 @@ FUNCTION: int sqlite3_backup_pagecount ( sqlite3_backup* p )
 
 FUNCTION: int sqlite3_unlock_notify ( sqlite3* pBlocked, void* xNotify, void* pNotifyArg )
 
-FUNCTION: int sqlite3_stricmp ( c-string dummy, c-string dummy )
+FUNCTION: int sqlite3_stricmp ( char* dummy, char* dummy )
 
-FUNCTION: int sqlite3_strnicmp ( c-string dummy, c-string dummy, int dummy )
+FUNCTION: int sqlite3_strnicmp ( char* dummy, char* dummy, int dummy )
 
-FUNCTION: int sqlite3_strglob ( c-string zGlob, c-string zStr )
+FUNCTION: int sqlite3_strglob ( char* zGlob, char* zStr )
 
-FUNCTION: int sqlite3_strlike ( c-string zGlob, c-string zStr, uint cEsc )
+FUNCTION: int sqlite3_strlike ( char* zGlob, char* zStr, uint cEsc )
 
-FUNCTION: void sqlite3_log ( int iErrCode, c-string zFormat )
+FUNCTION: void sqlite3_log ( int iErrCode, char* zFormat )
 
 FUNCTION: void* sqlite3_wal_hook ( sqlite3* dummy, void* dummy, void* dummy )
 
 FUNCTION: int sqlite3_wal_autocheckpoint ( sqlite3* db, int N )
 
-FUNCTION: int sqlite3_wal_checkpoint ( sqlite3* db, c-string zDb )
+FUNCTION: int sqlite3_wal_checkpoint ( sqlite3* db, char* zDb )
 
-FUNCTION: int sqlite3_wal_checkpoint_v2 ( sqlite3* db, c-string zDb, int eMode, int* pnLog, int* pnCkpt )
+FUNCTION: int sqlite3_wal_checkpoint_v2 ( sqlite3* db, char* zDb, int eMode, int* pnLog, int* pnCkpt )
 
 FUNCTION: int sqlite3_vtab_config ( sqlite3* dummy, int op )
 
@@ -832,7 +832,7 @@ FUNCTION: int sqlite3_vtab_on_conflict ( sqlite3* dummy )
 
 FUNCTION: int sqlite3_vtab_nochange ( sqlite3_context* dummy )
 
-FUNCTION: c-string sqlite3_vtab_collation ( sqlite3_index_info* dummy, int dummy )
+FUNCTION: char* sqlite3_vtab_collation ( sqlite3_index_info* dummy, int dummy )
 
 FUNCTION: int sqlite3_stmt_scanstatus ( sqlite3_stmt* pStmt, int idx, int iScanStatusOp, void* pOut )
 
@@ -845,24 +845,24 @@ FUNCTION: int sqlite3_system_errno ( sqlite3* dummy )
 STRUCT: sqlite3_snapshot
   { hidden uchar[48] } ;
 
-FUNCTION: int sqlite3_snapshot_get ( sqlite3* db, c-string zSchema, sqlite3_snapshot** ppSnapshot )
+FUNCTION: int sqlite3_snapshot_get ( sqlite3* db, char* zSchema, sqlite3_snapshot** ppSnapshot )
 
-FUNCTION: int sqlite3_snapshot_open ( sqlite3* db, c-string zSchema, sqlite3_snapshot* pSnapshot )
+FUNCTION: int sqlite3_snapshot_open ( sqlite3* db, char* zSchema, sqlite3_snapshot* pSnapshot )
 
 FUNCTION: void sqlite3_snapshot_free ( sqlite3_snapshot* dummy )
 
 FUNCTION: int sqlite3_snapshot_cmp ( sqlite3_snapshot* p1, sqlite3_snapshot* p2 )
 
-FUNCTION: int sqlite3_snapshot_recover ( sqlite3* db, c-string zDb )
+FUNCTION: int sqlite3_snapshot_recover ( sqlite3* db, char* zDb )
 
-FUNCTION: c-string sqlite3_serialize ( sqlite3* db, c-string zSchema, sqlite3_int64* piSize, uint mFlags )
+FUNCTION: char* sqlite3_serialize ( sqlite3* db, char* zSchema, sqlite3_int64* piSize, uint mFlags )
 
-FUNCTION: int sqlite3_deserialize ( sqlite3* db, c-string zSchema, c-string pData, sqlite3_int64 szDb, sqlite3_int64 szBuf, uint mFlags )
+FUNCTION: int sqlite3_deserialize ( sqlite3* db, char* zSchema, char* pData, sqlite3_int64 szDb, sqlite3_int64 szBuf, uint mFlags )
 
 C-TYPE: sqlite3_rtree_geometry
 C-TYPE: sqlite3_rtree_query_info
 TYPEDEF: double sqlite3_rtree_dbl
-FUNCTION: int sqlite3_rtree_geometry_callback ( sqlite3* db, c-string zGeom, void* xGeom, void* pContext )
+FUNCTION: int sqlite3_rtree_geometry_callback ( sqlite3* db, char* zGeom, void* xGeom, void* pContext )
 
 STRUCT: sqlite3_rtree_geometry
   { pContext void* }
@@ -871,7 +871,7 @@ STRUCT: sqlite3_rtree_geometry
   { pUser void* }
   { xDelUser void* } ;
 
-FUNCTION: int sqlite3_rtree_query_callback ( sqlite3* db, c-string zQueryFunc, void* xQueryFunc, void* pContext, void* xDestructor )
+FUNCTION: int sqlite3_rtree_query_callback ( sqlite3* db, char* zQueryFunc, void* xQueryFunc, void* pContext, void* xDestructor )
 
 STRUCT: sqlite3_rtree_query_info
   { pContext void* }
@@ -896,8 +896,8 @@ C-TYPE: Fts5Context
 C-TYPE: Fts5PhraseIter
 TYPEDEF: void* fts5_extension_function
 STRUCT: Fts5PhraseIter
-  { a c-string }
-  { b c-string } ;
+  { a char* }
+  { b char* } ;
 
 STRUCT: Fts5ExtensionApi
   { iVersion int }
