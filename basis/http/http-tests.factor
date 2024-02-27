@@ -230,7 +230,7 @@ http.server.dispatchers db.tuples ;
 
 : test-db-file ( -- path ) "test.db" temp-file ;
 
-: test-db ( -- db ) test-db-file <sqlite-db> ;
+: test-db ( -- db ) test-db-file <sqlite3-db> ;
 
 : add-addr ( url -- url' )
     >url clone "addr" get set-url-addr ;

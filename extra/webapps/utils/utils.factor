@@ -2,8 +2,8 @@ USING: accessors db.sqlite http.server io.files.temp io.servers
 io.sockets.secure.debug kernel ;
 IN: webapps.utils
 
-: <temp-sqlite-db> ( name -- db )
-    temp-file <sqlite-db> ;
+: <temp-sqlite3-db> ( name -- db )
+    temp-file <sqlite3-db> ;
 
 : <test-http-server> ( -- threaded-server )
     <http-server>

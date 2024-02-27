@@ -10,7 +10,7 @@ HELP: <alloy>
 { $examples
     "The " { $vocab-link "webapps.counter" } " vocabulary uses an alloy to configure the counter:"
     { $code
-        ": counter-db ( -- db ) \"counter.db\" <sqlite-db> ;
+        ": counter-db ( -- db ) \"counter.db\" <sqlite3-db> ;
 
 : run-counter ( -- )
     <counter-app>

@@ -5,7 +5,7 @@ splitting webapps.utils webapps.wiki websites.concatenative ;
 IN: webapps.wiki.example
 
 : wiki-db ( -- db )
-    "wiki.db" <temp-sqlite-db> ;
+    "wiki.db" <temp-sqlite3-db> ;
 
 : insert-page ( file-name -- )
     dup ".txt" ?tail [

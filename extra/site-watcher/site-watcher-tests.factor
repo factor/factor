@@ -7,7 +7,7 @@ IN: site-watcher.tests
 "site-watcher.db" temp-file ?delete-file
 
 :: fake-sites ( -- seq )
-    "site-watcher.db" <temp-sqlite-db> [
+    "site-watcher.db" <temp-sqlite3-db> [
         account ensure-table
         site ensure-table
         watching-site ensure-table

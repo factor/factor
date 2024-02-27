@@ -51,7 +51,7 @@ M: foo call-responder*
 
 "auth-test.db" temp-file ?delete-file
 
-"auth-test.db" temp-file <sqlite-db> [
+"auth-test.db" temp-file <sqlite3-db> [
 
     <request> "GET" >>method init-request
     session ensure-table

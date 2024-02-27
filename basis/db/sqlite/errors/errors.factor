@@ -3,10 +3,10 @@
 USING: db.errors kernel multiline peg.ebnf sequences strings ;
 IN: db.sqlite.errors
 
-TUPLE: unparsed-sqlite-error error ;
-C: <unparsed-sqlite-error> unparsed-sqlite-error
+TUPLE: unparsed-sqlite3-error error ;
+C: <unparsed-sqlite3-error> unparsed-sqlite3-error
 
-EBNF: parse-sqlite-sql-error [=[
+EBNF: parse-sqlite3-sql-error [=[
 
 AlreadyExists = " already exists"
 
@@ -18,5 +18,5 @@ SqliteError =
     | "no such table: " .+:table
       => [[ table >string <sql-table-missing> ]]
     | .*:error
-      => [[ error >string <unparsed-sqlite-error> ]]
+      => [[ error >string <unparsed-sqlite3-error> ]]
 ]=]

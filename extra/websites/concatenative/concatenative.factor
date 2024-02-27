@@ -31,7 +31,7 @@ webapps.mason.backend.watchdog
 websites.factorcode ;
 IN: websites.concatenative
 
-: website-db ( -- db ) "~/website.db" <sqlite-db> ;
+: website-db ( -- db ) "~/website.db" <sqlite3-db> ;
 
 : init-factor-db ( -- )
     mason-db [ init-mason-db ] with-db

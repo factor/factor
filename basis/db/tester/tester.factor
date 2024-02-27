@@ -16,13 +16,13 @@ IN: db.tester
 : postgresql-template1-db ( -- postgresql-db )
     \ postgresql-db get-global clone "template1" >>database ;
 
-: sqlite-test-db ( -- sqlite-db )
+: sqlite-test-db ( -- sqlite3-db )
     cpu name>> "tuples-test." ".db" surround
-    temp-file <sqlite-db> ;
+    temp-file <sqlite3-db> ;
 
 ! These words leak resources, but are useful for interactive testing
-: set-sqlite-db ( -- )
-    sqlite-db db-open db-connection set ;
+: set-sqlite3-db ( -- )
+    sqlite3-db db-open db-connection set ;
 
 : set-postgresql-db ( -- )
     postgresql-db db-open db-connection set ;

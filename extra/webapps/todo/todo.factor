@@ -120,7 +120,7 @@ furnace.alloy ;
         allow-deactivation ;
 
 : todo-db ( -- db )
-    "todo.db" <temp-sqlite-db> ;
+    "todo.db" <temp-sqlite3-db> ;
 
 : init-todo-db ( -- )
     todo-db [

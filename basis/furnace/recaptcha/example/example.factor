@@ -7,7 +7,7 @@ IN: furnace.recaptcha.example
 
 TUPLE: recaptcha-app < dispatcher recaptcha ;
 
-: recaptcha-db ( -- obj ) "resource:recaptcha-example" <sqlite-db> ;
+: recaptcha-db ( -- obj ) "resource:recaptcha-example" <sqlite3-db> ;
 
 : <recaptcha-challenge> ( -- obj )
     <page-action>

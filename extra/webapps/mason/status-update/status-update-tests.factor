@@ -6,7 +6,7 @@ IN: webapps.mason.status-update.tests
 {
     T{ builder { host-name "hej" } { os "os" } { cpu "cpu" } }
 } [
-    "mason-test.db" temp-file <sqlite-db> [
+    "mason-test.db" temp-file <sqlite3-db> [
         [
             init-mason-db
             "hej" "os" "cpu" find-builder

@@ -127,4 +127,4 @@ TUPLE: reporting-site site-id email url up? changed? last-up? error last-error ;
 : site-watcher-path ( -- path ) "site-watcher.db" cache-file ; inline
 
 : with-site-watcher-db ( quot -- )
-    site-watcher-path <sqlite-db> swap with-db ; inline
+    site-watcher-path <sqlite3-db> swap with-db ; inline

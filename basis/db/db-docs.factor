@@ -277,7 +277,7 @@ ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
 { $code "USING: db.sqlite db io.files io.files.temp ;
 : with-book-db ( quot -- )
-    \"book.db\" temp-file <sqlite-db> swap with-db ; inline" }
+    \"book.db\" temp-file <sqlite3-db> swap with-db ; inline" }
 "Now let's create the table manually:"
 { $code "\"create table books
     (id integer primary key, title text, author text, date_published timestamp,
@@ -300,8 +300,8 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 
 "SQLite example combinator:"
 { $code "USING: db.sqlite db io.files io.files.temp ;
-: with-sqlite-db ( quot -- )
-    \"my-database.db\" temp-file <sqlite-db> swap with-db ; inline" }
+: with-sqlite3-db ( quot -- )
+    \"my-database.db\" temp-file <sqlite3-db> swap with-db ; inline" }
 
 "PostgreSQL example combinator:"
 { $code "USING: db.postgresql db ;

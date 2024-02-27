@@ -49,7 +49,7 @@ ${
 ] unit-test
 
 : db-path ( -- path ) "test-" cell number>string ".db" 3append temp-file ;
-: test.db ( -- sqlite-db ) db-path <sqlite-db> ;
+: test.db ( -- sqlite3-db ) db-path <sqlite3-db> ;
 
 db-path ?delete-file
 

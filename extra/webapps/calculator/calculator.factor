@@ -32,7 +32,7 @@ TUPLE: calculator < dispatcher ;
         <calculator-action> >>default ;
 
 ! Deployment example
-: calculator-db ( -- db ) "calculator.db" <temp-sqlite-db> ;
+: calculator-db ( -- db ) "calculator.db" <temp-sqlite3-db> ;
 
 : <calculator-app> ( -- dispatcher )
     <calculator> calculator-db <alloy> ;

@@ -5,7 +5,7 @@ db.sqlite kernel locals tools.test ;
 
 [| path |
 
-    path <sqlite-db> [
+    path <sqlite3-db> [
 
         [
             "insert into foo (id) values('1');" sql-command

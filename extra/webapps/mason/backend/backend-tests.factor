@@ -7,7 +7,7 @@ IN: webapps.mason.backend.tests
 { 0 1 2 } [
     ! Do it in a with-transaction to simulate semantics of
     ! with-mason-db
-    "mason-test.db" <temp-sqlite-db> [
+    "mason-test.db" <temp-sqlite3-db> [
         [
             init-mason-db
 

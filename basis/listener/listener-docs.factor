@@ -72,7 +72,7 @@ $nl
 "Nested listeners can be useful for testing code in other dynamic scopes. For example, when doing database maintenance using the " { $vocab-link "db.tuples" } " vocabulary, it can be useful to start a listener with a database connection:"
 { $code
     "USING: db db.sqlite listener ;"
-    "\"data.db\" <sqlite-db> [ listener ] with-db"
+    "\"data.db\" <sqlite3-db> [ listener ] with-db"
 }
 "Starting a nested listener:"
 { $subsections listener }

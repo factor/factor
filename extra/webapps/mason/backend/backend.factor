@@ -82,7 +82,7 @@ counter "COUNTER" {
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
 
-: mason-db ( -- db ) "~/mason.db" <sqlite-db> ;
+: mason-db ( -- db ) "~/mason.db" <sqlite3-db> ;
 
 : with-mason-db ( quot -- )
     mason-db [ with-transaction ] with-db ; inline

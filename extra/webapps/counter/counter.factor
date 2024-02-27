@@ -32,7 +32,7 @@ M: counter-app init-session* drop 0 count sset ;
 ! Deployment example
 USING: db.sqlite furnace.alloy namespaces ;
 
-: counter-db ( -- db ) "counter.db" <sqlite-db> ;
+: counter-db ( -- db ) "counter.db" <sqlite3-db> ;
 
 : run-counter ( -- )
     <counter-app>

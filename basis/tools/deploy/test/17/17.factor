@@ -12,7 +12,7 @@ person "PEOPLE" {
 } define-persistent
 
 : db-deploy-test ( -- )
-    "test.db" temp-file <sqlite-db> [
+    "test.db" temp-file <sqlite3-db> [
         person recreate-table
 
         person new

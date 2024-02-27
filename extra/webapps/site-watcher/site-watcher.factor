@@ -61,7 +61,7 @@ IN: webapps.site-watcher
         allow-deactivation ;
 
 : site-watcher-db ( -- db )
-    "test.db" <temp-sqlite-db> ;
+    "test.db" <temp-sqlite3-db> ;
 
 : <site-watcher-app> ( -- dispatcher )
     <site-watcher>

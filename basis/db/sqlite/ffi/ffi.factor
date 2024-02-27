@@ -43,7 +43,7 @@ CONSTANT: SQLITE_NOTADB      26  ! File opened that is not a database file
 CONSTANT: SQLITE_NOTICE      27  ! Notifications from sqlite3_log()
 CONSTANT: SQLITE_WARNING     28  ! Warnings from sqlite3_log()
 
-CONSTANT: sqlite-error-messages {
+CONSTANT: sqlite3-error-messages {
     "Successful result"
     "SQL error or missing database"
     "An internal logic error in SQLite"
