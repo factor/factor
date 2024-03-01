@@ -126,7 +126,6 @@ Common arguments:
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
-    -ea=<code>       evaluate <code> with auto-use
     -no-user-init    suppress loading of .factor-rc
     -roots=<paths>   a list of path-delimited extra vocab roots
 
