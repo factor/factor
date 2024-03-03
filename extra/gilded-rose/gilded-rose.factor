@@ -52,7 +52,7 @@ TUPLE: Item
 
         i this Items>> nth SellIn>> 0 < [
             i this Items>> nth Name>> "Aged Brie" = not [
-                i this Items>> nth Name>> "Backstage passes to a TAFKAL80ETC concert" = [
+                i this Items>> nth Name>> "Backstage passes to a TAFKAL80ETC concert" = not [
                     i this Items>> nth Quality>> 0 > [
                         i this Items>> nth Name>> "Sulfuras, Hand of Ragnaros" = not [
                             i this Items>> nth Quality>> 1 -
