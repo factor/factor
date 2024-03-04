@@ -3,7 +3,7 @@
 USING: help.markup help.syntax kernel strings ;
 IN: gilded-rose
 
-ARTICLE: "gilded-rose" "gilded-rose"
+ARTICLE: "gilded-rose" "Gilded Rose"
 "The " { $vocab-link "gilded-rose" } " vocab contains the Gilded Rose kata, "
 "which is a bit of source code for you to practice refactoring. See the history "
 "behind the original code, as well as the task description in the READMEs "
