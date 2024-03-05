@@ -7,14 +7,14 @@ HELP: add-signal-handler
 { $values
     { "handler" { $quotation ( -- ) } } { "sig" "a signal number" }
 }
-{ $description "Adds a signal handler for " { $snippet "sig" } ". If " { $snippet "sig" } " is raised, the signal handler will be run in a freshly-spawned Factor thread concurrently with any already established signal handlers for " { $snippet "sig" } ". Signal constants are available in the " { $vocab-link "unix.ffi" } " vocabulary." }
+{ $description "Adds a signal handler for " { $snippet "sig" } ". If " { $snippet "sig" } " is raised, the signal handler will be run in a freshly-spawned Factor thread concurrently with any already established signal handlers for " { $snippet "sig" } ". Signal constants are available in the " { $vocab-link "libc" } " vocabulary." }
 { $notes "Only certain signals can be handled. See " { $link "unix.signals:allowed-signals" } " for more information. The handler quotation will be run in its own freshly-spawned thread." } ;
 
 HELP: remove-signal-handler
 { $values
     { "handler" { $quotation ( -- ) } } { "sig" "a signal handler" }
 }
-{ $description "Removes a signal handler for " { $snippet "sig" } ". " { $snippet "handler" } " must be the same quotation object that was passed to " { $link add-signal-handler } ". Signal constants are available in the " { $vocab-link "unix.ffi" } " vocabulary." } ;
+{ $description "Removes a signal handler for " { $snippet "sig" } ". " { $snippet "handler" } " must be the same quotation object that was passed to " { $link add-signal-handler } ". Signal constants are available in the " { $vocab-link "libc" } " vocabulary." } ;
 
 { add-signal-handler remove-signal-handler } related-words
 
