@@ -148,3 +148,11 @@ M: macosx strerror
         1024 [ malloc &free ] keep [ strerror_r ] keepd nip
         alien>native-string
     ] with-destructors ;
+
+CONSTANT: LC_ALL      0
+CONSTANT: LC_COLLATE  1
+CONSTANT: LC_CTYPE    2
+CONSTANT: LC_MONETARY 3
+CONSTANT: LC_NUMERIC  4
+CONSTANT: LC_TIME     5
+CONSTANT: LC_MESSAGES 6
