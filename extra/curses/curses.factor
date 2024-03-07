@@ -12,14 +12,14 @@ IN: curses
 
 SYMBOL: current-window
 
-CONSTANT: COLOR_BLACK 0
-CONSTANT: COLOR_RED   1
-CONSTANT: COLOR_GREEN 2
-CONSTANT: COLOR_YELLO 3
-CONSTANT: COLOR_BLUE  4
-CONSTANT: COLOR_MAGEN 5
-CONSTANT: COLOR_CYAN  6
-CONSTANT: COLOR_WHITE 7
+CONSTANT: COLOR_BLACK   0
+CONSTANT: COLOR_RED     1
+CONSTANT: COLOR_GREEN   2
+CONSTANT: COLOR_YELLOW  3
+CONSTANT: COLOR_BLUE    4
+CONSTANT: COLOR_MAGENTA 5
+CONSTANT: COLOR_CYAN    6
+CONSTANT: COLOR_WHITE   7
 
 CONSTANT: A_NORMAL      0
 CONSTANT: A_ATTRIBUTES  -256
@@ -40,6 +40,7 @@ CONSTANT: A_LOW         134217728
 CONSTANT: A_RIGHT       268435456
 CONSTANT: A_TOP         536870912
 CONSTANT: A_VERTICAL    1073741824
+CONSTANT: A_ITALIC      2147483648
 
 CONSTANT: KEY_CODE_YES  0o400  /* A wchar_t contains a key code */
 CONSTANT: KEY_MIN       0o401  /* Minimum curses key */
@@ -158,11 +159,11 @@ CONSTANT: KEY_F0        0o410  /* Function keys.  Space for 64 */
 : BUTTON4_CLICKED        ( -- mask ) 4 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON4_DOUBLE_CLICKED ( -- mask ) 4 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON4_TRIPLE_CLICKED ( -- mask ) 4 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
-
-: BUTTON1_RESERVED_EVENT ( -- mask ) 1 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
-: BUTTON2_RESERVED_EVENT ( -- mask ) 2 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
-: BUTTON3_RESERVED_EVENT ( -- mask ) 3 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
-: BUTTON4_RESERVED_EVENT ( -- mask ) 4 ffi:NCURSES_RESERVED_EVENT ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON5_RELEASED       ( -- mask ) 5 ffi:NCURSES_BUTTON_RELEASED ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON5_PRESSED        ( -- mask ) 5 ffi:NCURSES_BUTTON_PRESSED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON5_CLICKED        ( -- mask ) 5 ffi:NCURSES_BUTTON_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON5_DOUBLE_CLICKED ( -- mask ) 5 ffi:NCURSES_DOUBLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
+: BUTTON5_TRIPLE_CLICKED ( -- mask ) 5 ffi:NCURSES_TRIPLE_CLICKED  ffi:NCURSES_MOUSE_MASK ; inline
 
 : BUTTON_CTRL            ( -- mask ) 5 0o01 ffi:NCURSES_MOUSE_MASK ; inline
 : BUTTON_SHIFT           ( -- mask ) 5 0o02 ffi:NCURSES_MOUSE_MASK ; inline
@@ -204,6 +205,7 @@ TUPLE: curses-window < disposable
 
     idcok idlok immedok
     { keypad initial: t }
+    { nodelay initial: f }
 
     { encoding initial: utf8 } ;
 
@@ -228,6 +230,8 @@ M: curses-window dispose* ( window -- )
         [ [ ptr>> ] [ scrollok>> >BOOLEAN ] bi ffi:scrollok curses-error ]
         [ [ ptr>> ] [ leaveok>> >BOOLEAN ] bi ffi:leaveok curses-error ]
         [ [ ptr>> ] [ keypad>> >BOOLEAN ] bi ffi:keypad curses-error ]
+        [ [ ptr>> ] [ nodelay>> ] bi [ ffi:TRUE ffi:nodelay
+        curses-error ] [ drop ] if ]
     } cleave ;
 
 : apply-global-options ( window -- )
@@ -387,10 +391,10 @@ PRIVATE>
 : ccolor ( foreground background -- )
     current-window get wccolor ;
 
-: wccbox ( window -- )
+: wcbox ( window -- )
     ptr>> 0 0 ffi:box curses-error ;
 : cbox ( -- )
-    current-window get wccbox ;
+    current-window get wcbox ;
 
 SYMBOLS: +pressed+ +released+ +clicked+ +double+ +triple+ ;
 
@@ -427,6 +431,7 @@ TUPLE: mouse-event
         { [ dup 2 button-n? ] [ [ 2 >>button ] dip 2 fill-in-type ] }
         { [ dup 3 button-n? ] [ [ 3 >>button ] dip 3 fill-in-type ] }
         { [ dup 4 button-n? ] [ [ 4 >>button ] dip 4 fill-in-type ] }
+        { [ dup 5 button-n? ] [ [ 5 >>button ] dip 5 fill-in-type ] }
     } cond
     {
         [ BUTTON_CTRL  bitand 0 = not [ t >>ctrl  ] when drop ]
@@ -482,3 +487,5 @@ PRIVATE>
     ptr>> _maxx>> 1 + ;
 : get-max-x ( -- x )
     current-window get wget-max-x ;
+
+ALIAS: set-escdelay ffi:set-ESCDELAY
