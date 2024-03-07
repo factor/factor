@@ -176,3 +176,17 @@ M: linux strerror
     [
         1024 [ malloc &free ] keep strerror_r
     ] with-destructors ;
+
+CONSTANT: LC_CTYPE           0
+CONSTANT: LC_NUMERIC         1
+CONSTANT: LC_TIME            2
+CONSTANT: LC_COLLATE         3
+CONSTANT: LC_MONETARY        4
+CONSTANT: LC_MESSAGES        5
+CONSTANT: LC_ALL             6
+CONSTANT: LC_PAPER           7
+CONSTANT: LC_NAME            8
+CONSTANT: LC_ADDRESS         9
+CONSTANT: LC_TELEPHONE       10
+CONSTANT: LC_MEASUREMENT     11
+CONSTANT: LC_IDENTIFICATION  12

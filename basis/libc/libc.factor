@@ -123,5 +123,7 @@ FUNCTION: int system ( c-string command )
 
 DESTRUCTOR: free
 
+FUNCTION: c-string setlocale ( int category, c-string locale )
+
 ! For libc.linux, libc.windows, libc.macosx...
 << "libc." os name>> append require >>
