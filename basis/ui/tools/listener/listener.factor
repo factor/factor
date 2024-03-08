@@ -4,17 +4,18 @@ USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
 documents.elements fonts hashtables help help.markup help.tips
-io io.styles kernel lexer listener literals math math.vectors
-models models.arrow models.delay namespaces parser prettyprint
-sequences source-files.errors splitting strings system threads
-ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.operations ui.pens.solid ui.theme
-ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.error-list ui.tools.listener.completion
-ui.tools.listener.history ui.tools.listener.popups vocabs
-vocabs.loader vocabs.parser vocabs.refresh words ;
+io io.styles kernel lexer listener listener.private literals
+math math.vectors models models.arrow models.delay namespaces
+parser prettyprint sequences source-files.errors splitting
+strings system threads ui ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.glass ui.gadgets.labeled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.operations
+ui.pens.solid ui.theme ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.error-list
+ui.tools.listener.completion ui.tools.listener.history
+ui.tools.listener.popups vocabs vocabs.loader vocabs.parser
+vocabs.refresh words ;
 IN: ui.tools.listener
 
 TUPLE: interactor < source-editor
@@ -116,6 +117,9 @@ M: word (print-input)
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
 
+: no-input? ( lines -- ? )
+    [ length 1 = ] keep { [ empty? ] [ first empty? ] } 1|| and ;
+
 : interactor-continue ( obj interactor -- )
     [ mailbox>> mailbox-put ] [ scroll>bottom ] bi ;
 
@@ -124,6 +128,36 @@ M: word (print-input)
     [ print-input ]
     [ clear-editor drop ]
     [ model>> clear-undo drop ] 2tri ;
+
+: consume-char ( interactor -- seq )
+    control-value {   
+        { [ dup no-input?    ] [      ] }
+        { [ dup first empty? ] [ rest ] }
+        [ clone dup 0 swap [ rest ] change-nth ]
+    } cond [ { "" } ] when-empty ;
+
+: consume-n-chars ( n interactor -- seq )
+    control-value join-lines swap tail split-lines [ { "" } ] when-empty ;
+
+: consume-line ( interactor -- seq )
+    control-value rest [ { "" } ] when-empty ;
+
+: write-back-unused ( quot -- )
+    [ set-control-value ] [ model>> clear-undo ] tri ; inline
+
+: interactor-read-unsafe-finish ( n interactor -- )
+    [ consume-n-chars ] write-back-unused ;
+
+DEFER: get-listener
+: interactor-read-until-finish ( str chr -- str chr )
+    over length 1 + get-listener input>> 
+    interactor-read-unsafe-finish ;
+
+: interactor-read1-finish ( interactor -- )
+    [ consume-char ] write-back-unused ;
+
+: interactor-readln-finish ( interactor -- )
+    [ consume-line ] write-back-unused ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -145,11 +179,37 @@ M: word (print-input)
         } cleave
     ] [ drop f ] if ;
 
+
+: yield-if-empty ( interactor -- obj )
+    dup control-value no-input? [ interactor-yield ] 
+                                [ control-value    ] if ;
+
+:: yield-if-underfilled ( n interactor -- obj )
+    interactor control-value join-lines length n <  
+    [ interactor interactor-yield ]
+    [ interactor control-value ] if ;
+
 : interactor-read ( interactor -- lines )
-    [ interactor-yield ] [ interactor-finish ] bi ;
+    [ yield-if-empty ] [ interactor-finish ] bi ;
+
+:: yield-until-full ( n interactor -- obj )
+    n interactor yield-if-underfilled {
+        { [ dup not ] [ ] }
+        { [ dup join-lines length n < ] [ drop n interactor yield-until-full ] }
+        [  ]
+    } cond ;
+
+: interactor-read-unsafe ( n interactor -- lines )
+    [ yield-until-full ] [ interactor-read-unsafe-finish ] 2bi ;
+
+: interactor-readln ( interactor -- lines )
+    [ yield-if-empty ] [ interactor-readln-finish ] bi ;
+
+: interactor-read1 ( interactor -- char )
+    [ yield-if-empty ] [ interactor-read1-finish ] bi ;
 
 M: interactor stream-readln
-    interactor-read ?first ;
+    interactor-readln ?first ;
 
 : (call-listener) ( quot command listener -- )
     input>> dup interactor-busy? [ 3drop ] [
@@ -161,12 +221,12 @@ M: interactor stream-readln
 M:: interactor stream-read-unsafe ( n buf interactor -- count )
     n [ 0 ] [
         drop
-        interactor interactor-read dup [ join-lines ] when
+        n interactor interactor-read-unsafe dup [ join-lines ] when
         n index-or-length [ head-slice 0 buf copy ] keep
     ] if-zero ;
 
 M: interactor stream-read1
-    dup interactor-read {
+    dup interactor-read1 {
         { [ dup not ] [ 2drop f ] }
         { [ dup empty? ] [ drop stream-read1 ] }
         { [ dup first empty? ] [ 2drop CHAR: \n ] }
@@ -175,12 +235,13 @@ M: interactor stream-read1
 
 M: interactor stream-read-until
     swap '[
-        _ interactor-read [
+        _ yield-if-empty [
             join-lines CHAR: \n suffix
             [ _ member? ] dupd find
             [ [ head ] when* ] dip dup not
         ] [ f f f ] if*
-    ] [ drop ] produce swap [ concat "" prepend-as ] dip ;
+    ] [ drop ] produce swap [ concat "" prepend-as ] dip 
+    interactor-read-until-finish ;
 
 M: interactor dispose drop ;
 
@@ -362,11 +423,32 @@ M: object accept-completion-hook 2drop ;
 : try-parse ( lines -- quot/f )
     [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
+SYMBOL: +from-listener?+
+
+! Must be inlined to avoid adding this operation to the callstack
+: set-from-listener? ( -- ? )
+    get-callstack callstack>array second \ listener-step = ; inline
+
+MACRO: (stream-read-quot) ( q1 q2 -- quot/f )
+    '[ 
+        dup @ dup array? [
+            over @ try-parse
+            or* [ stream-read-quot ] unless
+        ] [ nip ] if 
+    ] ;
+
+: step-read-quot ( interactor -- quot/f )
+    [ interactor-yield ] 
+    [ interactor-finish ] (stream-read-quot) ;
+
+: direct-read-quot ( interactor -- quot/f )
+    [ yield-if-empty ] 
+    [ interactor-readln-finish 1 head ] (stream-read-quot) ;
+
 M: interactor stream-read-quot
-    dup interactor-yield dup array? [
-        over interactor-finish try-parse
-        or* [ stream-read-quot ] unless
-    ] [ nip ] if ;
+    set-from-listener?
+        [ step-read-quot ]
+        [ direct-read-quot ] if ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
