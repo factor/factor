@@ -61,7 +61,7 @@ MACRO: cleave-array ( quots -- quot )
     [ 4dip ] dip call ; inline
 
 : 3tri* ( o s t  u v w  x y z  p q r -- )
-    [ 6 ndip ] 2dip [ 4dip ] dip call ; inline
+    [ 6 ndip ] 2dip [ 3dip ] dip call ; inline
 
 : 4tri* ( l m n o  s t u v  w x y z  p q r -- )
     [ 8 ndip ] 2dip [ 4dip ] dip call ; inline
