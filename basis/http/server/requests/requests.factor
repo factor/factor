@@ -48,11 +48,11 @@ upload-limit [ 200,000,000 ] initialize
 
 : parse-content-length-safe ( request -- content-length )
     "content-length" header [
-        dup string>number [
-            nip dup 0 upload-limit get between? [
+        ?string>number [
+            dup 0 upload-limit get between? [
                 invalid-content-length
             ] unless
-        ] [ invalid-content-length ] if*
+        ] [ invalid-content-length ] if
     ] [ content-length-missing ] if* ;
 
 : parse-content ( request content-type -- post-data )

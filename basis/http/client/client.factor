@@ -293,28 +293,6 @@ SYMBOL: request-socket
 : http-get* ( url -- response data )
     <get-request> http-request* ;
 
-: file-too-old? ( file duration -- ? )
-    over file-exists? [
-        [ file-info created>> ago ] dip after?
-    ] [ 2drop t ] if ;
-
-: download-name ( url -- name )
-    present file-name "?" split1 drop "/" ?tail drop ;
-
-: download-to ( url file -- )
-    binary [
-        <get-request> [ write ] with-http-request drop
-    ] with-file-writer ;
-
-: ?download-to ( url file -- )
-    dup file-exists? [ 2drop ] [ download-to ] if ;
-
-: ?download-update-to ( url file duration -- )
-    2dup file-too-old? [ drop download-to ] [ 3drop ] if ;
-
-: download ( url -- )
-    dup download-name download-to ;
-
 : <post-request> ( post-data url -- request )
     "POST" <client-request>
         swap >>post-data ;
