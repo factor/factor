@@ -34,6 +34,14 @@ CONSTANT: write-flags flags{ O_WRONLY O_CREAT O_TRUNC }
 M: unix (file-writer)
     open-write <fd> init-fd <output-port> ;
 
+CONSTANT: secure-write-flags flags{ O_WRONLY O_CREAT O_TRUNC O_EXCL }
+
+: open-secure-write ( path -- fd )
+    secure-write-flags file-mode open-file ;
+
+M: unix (file-writer-secure)
+    open-secure-write <fd> init-fd <output-port> ;
+
 CONSTANT: append-flags flags{ O_WRONLY O_APPEND O_CREAT }
 
 : open-append ( path -- fd )
