@@ -27,6 +27,8 @@ SYNTAX: shuffle(
 
 : 2reach ( v w x y z -- v w x y z v w ) 5 npick 5 npick ; inline
 
+: dupdd ( x y z -- x x y z ) [ dupd ] dip ; inline
+
 : nipdd ( w x y z -- x y z ) roll drop ; inline
 
 : spind ( w x y z -- y x w z ) [ spin ] dip ; inline
