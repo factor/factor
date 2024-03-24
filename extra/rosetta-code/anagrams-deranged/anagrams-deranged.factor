@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs http.client io.encodings.utf8 io.files
+USING: assocs http.download io.encodings.utf8 io.files
 io.files.temp kernel math math.combinatorics sequences sorting
 strings urls ;
 
@@ -15,8 +15,8 @@ IN: rosettacode.anagrams-deranged
 ! in the same position in both words.
 
 ! The task is to use the word list at
-! https://www.puzzlers.org/pub/wordlists/unixdict.txt to find and
-! show the longest deranged anagram.
+! https://raw.githubusercontent.com/quinnj/Rosetta-Julia/master/unixdict.txt
+! to find and show show the longest deranged anagram.
 
 : derangement? ( str1 str2 -- ? ) [ = not ] 2all? ;
 
@@ -41,8 +41,8 @@ IN: rosettacode.anagrams-deranged
     deranged-anagrams [ first length ] sort-by last ;
 
 : default-word-list ( -- path )
-    URL" https://puzzlers.org/pub/wordlists/unixdict.txt"
-    "unixdict.txt" temp-file [ ?download-to ] keep ;
+    URL" https://raw.githubusercontent.com/quinnj/Rosetta-Julia/master/unixdict.txt"
+    "unixdict.txt" temp-file download-to ;
 
 : longest-deranged-anagrams ( -- anagrams )
     default-word-list (longest-deranged-anagrams) ;

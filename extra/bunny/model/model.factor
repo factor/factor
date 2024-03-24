@@ -1,5 +1,5 @@
 USING: accessors alien.c-types alien.data arrays combinators
-destructors http.client io io.encodings.ascii io.files
+destructors http.download io io.encodings.ascii io.files
 io.files.temp kernel math math.parser math.vectors opengl
 opengl.capabilities opengl.demo-support opengl.gl sequences
 specialized-arrays splitting vectors ;
@@ -46,7 +46,7 @@ CONSTANT: model-url
 "https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
-    model-url model-path [ ?download-to ] keep ;
+    model-url model-path download-to ;
 
 :: (draw-triangle) ( ns vs triple -- )
     triple [| elt |

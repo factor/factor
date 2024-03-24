@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image checksums checksums.md5
-http.client io.files kernel math.parser splitting urls ;
+http.client http.download io.files kernel math.parser splitting
+urls ;
 IN: bootstrap.image.download
 
 CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
@@ -26,9 +27,8 @@ CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
     need-new-image? [ "Boot image corrupt" throw ] when ;
 
 : download-image ( image -- )
-    [ download-url swap >url derive-url download ]
-    [ verify-image ]
-    bi ;
+    [ download-url ] dip >url derive-url
+    download verify-image ;
 
 : maybe-download-image ( image -- ? )
     dup need-new-image? [ download-image t ] [ drop f ] if ;

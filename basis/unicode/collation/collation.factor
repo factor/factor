@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit combinators.smart fry kernel make
-math math.order math.parser namespaces sequences
-simple-flat-file splitting strings unicode.data ;
+combinators.short-circuit combinators.smart kernel make math
+math.order math.parser namespaces sequences simple-flat-file
+splitting strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
