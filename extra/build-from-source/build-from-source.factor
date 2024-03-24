@@ -2,11 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar calendar.format cli.git
 combinators combinators.short-circuit continuations formatting
-github html.parser html.parser.analyzer http.client io
-io.directories io.encodings.string io.encodings.utf8 io.files
-io.launcher io.pathnames json kernel layouts math namespaces qw
-semver sequences sequences.extras sorting sorting.human
-sorting.specification splitting system unicode ;
+github html.parser html.parser.analyzer http.client
+http.download io io.directories io.encodings.string
+io.encodings.utf8 io.files io.launcher io.pathnames json kernel
+layouts math namespaces qw semver sequences sequences.extras
+sorting sorting.human sorting.specification splitting system
+unicode ;
 IN: build-from-source
 
 INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
@@ -184,7 +185,7 @@ ERROR: no-output-file path ;
     ] with-directory ; inline
 
 : ?download ( path -- )
-    dup file-name file-exists? [ drop ] [ download ] if ; inline
+    dup file-name file-exists? [ drop ] [ download drop ] if ; inline
 
 : with-tar-gz ( path quot -- )
     '[
