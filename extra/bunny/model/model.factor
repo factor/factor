@@ -46,7 +46,7 @@ CONSTANT: model-url
 "https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
-    model-url model-path download-to ;
+    model-url model-path download-once-to ;
 
 :: (draw-triangle) ( ns vs triple -- )
     triple [| elt |

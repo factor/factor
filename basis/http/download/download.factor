@@ -76,16 +76,16 @@ IN: http.download
 : download-temporary-name ( url -- prefix suffix )
     [ "temp." ".temp" ] dip download-name prepend ;
 
-: download-file-to ( url file -- path )
+PRIVATE>
+
+: download-to ( url file -- path )
     [
         [ download-temporary-name binary ] keep
         '[ _ http-write-request ] with-unique-file-writer
     ] dip [ move-file ] keep ;
 
-PRIVATE>
-
-: download-to ( url file -- path )
-    dup file-exists? [ nip ] [ download-file-to ] if ;
+: download-once-to ( url file -- path )
+    dup file-exists? [ nip ] [ download-to ] if ;
 
 : download-outdated-to ( url file duration -- path )
     2dup delete-when-old [ drop download-to ] [ drop nip ] if ;

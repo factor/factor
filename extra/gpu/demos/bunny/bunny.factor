@@ -149,7 +149,7 @@ CONSTANT: bunny-model-url
 "https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
-    bunny-model-url bunny-model-path download-to ;
+    bunny-model-url bunny-model-path download-once-to ;
 
 : get-bunny-data ( bunny-state -- )
     download-bunny bunny-data

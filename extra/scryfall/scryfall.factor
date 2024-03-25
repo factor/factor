@@ -53,7 +53,7 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
     ensure-scryfall-images-directory
     normal-images [
         dup scryfall>local dup delete-when-zero-size
-        [ download-to ] [ nip ] if
+        [ download-once-to ] [ nip ] if
     ] map
     [ load-image ] map ;
 
@@ -61,7 +61,7 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
     ensure-scryfall-images-directory
     small-images [
         dup scryfall>local dup delete-when-zero-size
-        [ download-to ] [ nip ] if
+        [ download-once-to ] [ nip ] if
     ] map
     [ load-image ] map ;
 
