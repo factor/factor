@@ -24,8 +24,12 @@ IN: http.download
 
 : file-zero-size? ( path -- ? ) 0 file-size= ;
 
-: delete-when-zero-size ( path -- deleted? )
-    dup file-zero-size? [ ?delete-file t ] [ drop f ] if ;
+: delete-when-zero-size ( path -- deleted-or-not-exists? )
+    dup file-exists? [
+        dup file-zero-size? [ ?delete-file t ] [ drop f ] if
+    ] [
+        drop t
+    ] if ;
 
 : delete-when-file-size-mismatches? ( file size -- deleted? )
     dupd file-size= [ drop f ] [ ?delete-file t ] if ;
