@@ -44,21 +44,26 @@ IN: http.download
     dup file-extension
     [ ?tail drop ]
     [
-        ?string>number
+        [ string>number ]
         [ 1 + number>string append ]
-        [ ".1" 3append ] if
+        [ ".1" 3append ] ?if
     ] bi ;
 
-: ?parenthesis-number ( str -- n/str ? )
-    dup { [ "(" head? ] [ ")" tail? ] } 1&&
-    [ rest but-last ?string>number ] [ f ] if ;
+: ?parenthesis-number ( str -- n/f )
+    [
+        {
+            [ "(" head? ]
+            [ ")" tail? ]
+            [ rest but-last string>number ]
+        } 1&&
+    ] [ drop f ] ?unless ;
 
 : increment-file-name ( path -- path' )
     [
         file-stem " " split1-last
-        ?parenthesis-number
+        [ ?parenthesis-number ]
         [ 1 + number>string "(" ")" surround " " glue ]
-        [ "(1)" append " " glue ] if
+        [ "(1)" append " " glue ] ?if
     ] [
         file-extension
     ] bi "." glue ;

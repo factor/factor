@@ -383,9 +383,6 @@ PRIVATE>
 : string>number ( str -- n/f )
     10 <number-parse> [ @first-char ] require-next-digit ;
 
-: ?string>number ( str -- n/str ? )
-    dup string>number [ nip t ] [ f ] if* ;
-
 : base> ( str radix -- n/f )
     <number-parse> [ @first-char-no-radix ] require-next-digit ;
 
