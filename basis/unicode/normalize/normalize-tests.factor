@@ -27,7 +27,7 @@ IN: unicode.normalize.tests
 ! Could use simple-flat-file after some cleanup
 : parse-normalization-tests ( -- tests )
     "https://downloads.factorcode.org/misc/UCD/15.1.0/NormalizationTest.txt"
-    "NormalizationTest-15.1.0.txt" cache-file download-to
+    "NormalizationTest-15.1.0.txt" cache-file download-once-to
     utf8 file-lines [ "#" head? ] reject
     [ "@" head? ] split*-when
     2 <groups> [ first2 [ first ] dip 2array ] map

@@ -62,10 +62,8 @@ TUPLE: maxlicense max-count current-count times ;
 : process ( max line -- max ) split-line inc-current-count update-time ;
 
 MEMO: mlijobs ( -- lines )
-    "mlijobs.txt" temp-file dup file-exists? [
-        URL" https://rosettacode.org/resources/mlijobs.txt"
-        over download-to
-    ] unless ascii file-lines ;
+    URL" https://raw.githubusercontent.com/def-/nim-unsorted/master/mlijobs.txt"
+    "mlijobs.txt" temp-file download-once-to ascii file-lines ;
 
 PRIVATE>
 

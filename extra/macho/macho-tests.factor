@@ -24,11 +24,11 @@ STRING: validation-output
 
 : a.macho ( -- path )
     URL" https://downloads.factorcode.org/misc/a.macho"
-    "a.macho" cache-file download-to ;
+    "a.macho" cache-file download-once-to ;
 
 : a2.macho ( -- path )
     URL" https://downloads.factorcode.org/misc/a2.macho"
-    "a2.macho" cache-file download-to ;
+    "a2.macho" cache-file download-once-to ;
 
 cpu ppc? [
     { $ validation-output }

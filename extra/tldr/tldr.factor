@@ -26,7 +26,7 @@ CONSTANT: tldr-zip URL" https://tldr-pages.github.io/assets/tldr.zip"
 
 : download-tldr ( -- )
     "tldr" cache-file dup make-directory [
-        tldr-zip "tldr.zip" download-to drop
+        tldr-zip "tldr.zip" download-once-to drop
         { "unzip" "tldr.zip" } try-process
     ] with-directory ;
 

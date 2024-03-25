@@ -19,7 +19,7 @@ IN: rosetta-code.ordered-words
 MEMO: word-list ( -- seq )
     URL" https://raw.githubusercontent.com/quinnj/Rosetta-Julia/master/unixdict.txt"
     "unixdict.txt" temp-file
-    download-to utf8 file-lines ;
+    download-once-to utf8 file-lines ;
 
 : ordered-word? ( word -- ? )
     >lower [ <= ] monotonic? ;
