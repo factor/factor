@@ -8,13 +8,9 @@ IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
 
-CONSTANT: db-url "https://software77.net/geo-ip/?DL=1"
+CONSTANT: db-url "https://raw.githubusercontent.com/webeng/Ip2Country/master/IpToCountry.csv"
 
-: download-db ( -- path )
-    db-path dup file-exists? [
-        db-url over ".gz" append download-once-to
-        { "gunzip" } over ".gz" append absolute-path suffix try-process
-    ] unless ;
+: download-db ( -- path ) db-url download-once ;
 
 TUPLE: ip-entry from to registry assigned city cntry country ;
 
