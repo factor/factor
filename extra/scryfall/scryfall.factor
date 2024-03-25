@@ -281,5 +281,5 @@ MEMO: all-cards-by-name ( -- assoc )
 : standard-dragons. ( -- )
     standard-cards
     "Dragon" filter-creature-type
+    sort-by-cmc
     normal-cards. ;
-
