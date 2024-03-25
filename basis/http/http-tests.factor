@@ -1,9 +1,16 @@
-USING: destructors http http.server http.server.requests http.client
-http.client.private tools.test multiline fry io.streams.string io.crlf
-io.encodings.utf8 io.encodings.latin1 io.encodings.binary io.encodings.string
-io.encodings.ascii kernel arrays splitting sequences assocs io.sockets db
-db.sqlite make continuations urls hashtables accessors namespaces xml.data
-random combinators.short-circuit literals ;
+USING: accessors combinators.short-circuit continuations db
+db.sqlite db.tuples destructors furnace furnace.actions
+furnace.alloy furnace.auth furnace.auth.login
+furnace.conversations furnace.db furnace.redirection
+furnace.sessions html.components html.forms http http.client
+http.client.private http.download http.server
+http.server.dispatchers http.server.redirection
+http.server.requests http.server.responses http.server.static io
+io.crlf io.directories io.encodings.ascii io.encodings.binary
+io.encodings.utf8 io.files io.files.temp io.servers io.sockets
+io.streams.string kernel literals locals make multiline
+namespaces random sequences splitting threads tools.test urls
+validators xml xml.data xml.traversal ;
 IN: http.tests
 
 { "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
@@ -216,12 +223,6 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server.static furnace.sessions furnace.alloy
-furnace.actions furnace.auth furnace.auth.login furnace.db
-io.servers io.files io.files.temp io.directories io
-threads
-http.server.responses http.server.redirection furnace.redirection
-http.server.dispatchers db.tuples ;
 
 : add-quit-action ( responder -- responder )
     <action>
@@ -254,8 +255,6 @@ http.server.dispatchers db.tuples ;
             server-addrs random "addr" set @
         ] with-threaded-server
     ] with-variable ; inline
-
-USING: locals ;
 
 :: test-with-db-persistence ( db-persistence quot -- )
     db-persistence [
@@ -343,10 +342,6 @@ test-db <db-persistence> [
         [ "Goodbye" ] [ "http://localhost/quit" add-addr http-get nip ] unit-test
 
 ] test-with-db-persistence
-
-USING: html.components html.forms
-xml xml.traversal validators
-furnace furnace.conversations ;
 
 SYMBOL: a
 
@@ -442,7 +437,7 @@ test-db <db-persistence> [
     ! Check that download throws errors (reported by Chris Double)
     [
         [
-            "http://localhost/tweet_my_twat" add-addr download
+            "http://localhost/tweet_my_twat" add-addr download drop
         ] with-temp-directory
     ] must-fail
 

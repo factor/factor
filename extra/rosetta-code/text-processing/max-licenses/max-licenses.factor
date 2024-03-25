@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors http.client io io.encodings.ascii io.files
+USING: accessors http.download io io.encodings.ascii io.files
 io.files.temp kernel math math.parser sequences
 splitting urls ;
 IN: rosetta-code.text-processing.max-licenses
