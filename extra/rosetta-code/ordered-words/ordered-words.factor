@@ -1,8 +1,7 @@
 ! Copyright (c) 2012 Anonymous
 ! See https://factorcode.org/license.txt for BSD license.
-USING: grouping http.client io io.encodings.utf8 io.files
-io.files.temp kernel math sequences sequences.extras
-unicode urls ;
+USING: grouping http.download io io.encodings.utf8 io.files
+io.files.temp math sequences sequences.extras unicode urls ;
 IN: rosetta-code.ordered-words
 
 ! https://rosettacode.org/wiki/Ordered_words
@@ -18,9 +17,9 @@ IN: rosetta-code.ordered-words
 ! this page.
 
 MEMO: word-list ( -- seq )
-    URL" https://puzzlers.org/pub/wordlists/unixdict.txt"
+    URL" https://raw.githubusercontent.com/quinnj/Rosetta-Julia/master/unixdict.txt"
     "unixdict.txt" temp-file
-    [ ?download-to ] [ utf8 file-lines ] bi ;
+    download-once-to utf8 file-lines ;
 
 : ordered-word? ( word -- ? )
     >lower [ <= ] monotonic? ;

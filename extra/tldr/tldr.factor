@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: assocs combinators command-line http.client io
+USING: assocs combinators command-line http.download io
 io.directories io.encodings.utf8 io.files io.files.temp
 io.launcher io.pathnames json kernel namespaces regexp sequences
 splitting system urls wrap.strings ;
@@ -26,7 +26,7 @@ CONSTANT: tldr-zip URL" https://tldr-pages.github.io/assets/tldr.zip"
 
 : download-tldr ( -- )
     "tldr" cache-file dup make-directory [
-        tldr-zip "tldr.zip" download-to
+        tldr-zip "tldr.zip" download-once-to drop
         { "unzip" "tldr.zip" } try-process
     ] with-directory ;
 

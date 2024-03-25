@@ -30,6 +30,8 @@ HOOK: (file-reader) io-backend ( path -- stream )
 
 HOOK: (file-writer) io-backend ( path -- stream )
 
+HOOK: (file-writer-secure) io-backend ( path -- stream )
+
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
@@ -37,6 +39,9 @@ HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-writer> ( path encoding -- stream )
     [ normalize-path (file-writer) { file-writer } declare ] dip <encoder> ; inline
+
+: <file-writer-secure> ( path encoding -- stream )
+    [ normalize-path (file-writer-secure) { file-writer } declare ] dip <encoder> ; inline
 
 : <file-appender> ( path encoding -- stream )
     [ normalize-path (file-appender) { file-writer } declare ] dip <encoder> ; inline
@@ -52,6 +57,9 @@ HOOK: (file-appender) io-backend ( path -- stream )
 
 : with-file-writer ( path encoding quot -- )
     [ <file-writer> ] dip with-output-stream ; inline
+
+: with-file-writer-secure ( path encoding quot -- )
+    [ <file-writer-secure> ] dip with-output-stream ; inline
 
 : set-file-lines ( seq path encoding -- )
     [ [ print ] each ] with-file-writer ;

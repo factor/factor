@@ -3,11 +3,6 @@ io.streams.string kernel namespaces sequences splitting
 tools.test urls ;
 IN: http.client.tests
 
-{ "foo.txt" } [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
-{ "foo.txt" } [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
-{ "foo.txt" } [ "http://www.arc.com/foo.txt/" download-name ] unit-test
-{ "www.arc.com" } [ "http://www.arc.com////" download-name ] unit-test
-
 {
     T{ request
         { url T{ url { protocol "http" } { host "www.apple.com" } { port 80 } { path "/index.html" } } }

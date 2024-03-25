@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 USING: arrays ascii assocs combinators combinators.smart
-http.client io.encodings.ascii io.files io.files.temp kernel
+http.download io.encodings.ascii io.files io.files.temp kernel
 math math.statistics ranges sequences sequences.private sorting
 splitting urls ;
 IN: spelling
@@ -58,7 +58,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
 MEMO: default-dictionary ( -- counts )
     URL" https://norvig.com/big.txt" "big.txt" temp-file
-    [ ?download-to ] [ load-dictionary ] bi ;
+    download-once-to load-dictionary ;
 
 : (correct) ( word dictionary -- word/f )
     corrections ?first ;

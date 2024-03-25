@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators command-line io kernel math
 math.functions math.parser math.primes.pollard-rho-brent
-ranges math.statistics namespaces sequences
-sequences.product sets sorting splitting ;
+math.statistics namespaces ranges sequences sequences.product
+sets sorting splitting ;
 IN: math.primes.factors
 
 : factors ( n -- seq ) pollard-rho-brent-factors ; flushable

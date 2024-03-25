@@ -74,6 +74,7 @@ CONSTANT: word-renames {
     { "assoc-all-value?" { "all-values?" "0.100" } }
     { "assoc-any-key?" { "any-key?" "0.100" } }
     { "assoc-any-value?" { "any-value?" "0.100" } }
+    { "?download-to" { "download-once-to" "0.100" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

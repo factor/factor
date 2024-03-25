@@ -783,7 +783,7 @@ HELP: remove-nth
 
 HELP: move
 { $values { "to" "an index in " { $snippet "seq" } } { "from" "an index in " { $snippet "seq" } } { "seq" "a mutable sequence" } }
-{ $description "Sets the element with index " { $snippet "m" } " to the element with index " { $snippet "n" } "." }
+{ $description "Sets the element with index " { $snippet "to" } " to the element with index " { $snippet "from" } "." }
 { $side-effects "seq" } ;
 
 HELP: remove!
@@ -1008,7 +1008,7 @@ $nl
 
 HELP: check-slice
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } }
-{ $description "Ensures that " { $snippet "m" } " is less than or equal to " { $snippet "m" } ", and that both indices are within bounds for " { $snippet "seq" } "." }
+{ $description "Ensures that " { $snippet "from" } " is less than or equal to " { $snippet "to" } ", and that both indices are within bounds for " { $snippet "seq" } "." }
 { $errors "Throws a " { $link slice-error } " if the preconditions are not met." } ;
 
 HELP: collapse-slice

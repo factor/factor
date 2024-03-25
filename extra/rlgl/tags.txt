@@ -1,1 +1,3 @@
-bindings opengl games
+bindings
+games
+opengl
