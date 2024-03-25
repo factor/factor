@@ -12,6 +12,13 @@ IN: bootstrap.assembler.arm
 
 big-endian off
 
+: context-callstack-top-offset ( -- n ) 0 bootstrap-cells ; inline
+: context-callstack-bottom-offset ( -- n ) 2 bootstrap-cells ; inline
+: context-datastack-offset ( -- n ) 3 bootstrap-cells ; inline
+: context-retainstack-offset ( -- n ) 4 bootstrap-cells ; inline
+: context-callstack-save-offset ( -- n ) 5 bootstrap-cells ; inline
+: context-callstack-seg-offset ( -- n ) 8 bootstrap-cells ; inline
+
 ! X0-X17  volatile     scratch registers
 ! X0-X8                parameter registers
 ! X0                   result register
@@ -108,7 +115,7 @@ big-endian off
     ! ! 0 JMP f rc-relative rel-word-pic-tail
     ! 0 Br f rc-relative-arm64-branch rel-word-pic-tail
     absolute-jump rel-word-pic-tail
-] JIT-WORD-JUMP jit-define
+    ] JIT-WORD-JUMP jit-define
 
 ! ! Factor 2024 Clinic Code:
 ! ! ! x86.64 version
@@ -238,6 +245,15 @@ big-endian off
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BLR
     pop-link-reg ;
+
+[
+    jit-save-context
+    vm-reg arg2 MOVr
+    "lazy_jit_compile" jit-call
+]
+[ jit-call-quot ]
+[ jit-jump-quot ]
+\ lazy-jit-compile define-combinator-primitive
 
 [
     ! temp2 0 MOV f rc-absolute-cell rel-literal
@@ -417,7 +433,6 @@ big-endian off
 
 ! C to Factor entry point
 [
-    0xabcd BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -518,13 +533,7 @@ big-endian off
     ! ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
     ! ! need a parameter here.
 
-    ! ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
-    ! 0xffff RET f rc-absolute-2 rel-untagged
-    4 words temp0 ADR
-    2 temp0 temp0 LDRHuoff
-    temp0 stack-reg stack-reg ADDr
     f RET
-    NOP f rc-absolute-2 rel-untagged
 ] CALLBACK-STUB jit-define
 
 [
@@ -803,7 +812,7 @@ big-endian off
 ! ! [ JNE ]
 ! ! [ temp1 temp0 tuple-class-offset [+] MOV ]
 ! [ NE B.cond ] [
-! 	tuple-class-offset temp0 temp1 LDUR
+!   tuple-class-offset temp0 temp1 LDUR
 ! ] jit-conditional
 
 
@@ -924,7 +933,7 @@ big-endian off
 ! ! temp0 ds-reg [] MOV
 ! ! ds-reg bootstrap-cell SUB
 ! pop0
-! 	! ds-reg [] temp0 CMP
+!   ! ds-reg [] temp0 CMP
 ! temp0 ds-reg [] CMPr 
 ! ! [ temp1 temp3 ] dip execute( dst src -- )
 ! [ temp1 temp3 ] dip execute( dst src -- )
@@ -1024,7 +1033,6 @@ big-endian off
 
     ! ## Entry points
     { c-to-factor [
-            0x1234 BRK
             arg1 arg2 MOVr
             vm-reg "begin_callback" jit-call-1arg
 
@@ -1382,26 +1390,26 @@ big-endian off
 
 ! ! Factor 2024 Clinic Code:
 ! string-nth-fast [
-!     	!! load string index from stack
-!     	! temp0 ds-reg bootstrap-cell neg [+] MOV
+!       !! load string index from stack
+!       ! temp0 ds-reg bootstrap-cell neg [+] MOV
 ! 0 ds-reg bootstrap-cell neg [+] temp0 MOVZ
-!     	! temp0 tag-bits get SHR
-! 	tag-bits get temp0 LSRi
-!     	!! load string from stack
-!     	! temp1 ds-reg [] MOV
-! 	0 ds-reg temp1 [] MOVZ
-!     	!! load character
-!     	! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
-! 	temp0 temp1 string-offset [++] temp0 8-bit-version MOVZ
-!     	! temp0 temp0 8-bit-version-of MOVZX
-! 	temp0 8-bit-version-of UXTB temp0 MOVZ
-!     	! temp0 tag-bits get SHL
-! 	tag-bits get temp0 LSLi
-!     	!! store character to stack
-!     	! ds-reg bootstrap-cell SUB
-!     	! ds-reg [] temp0 MOV
-! 	pop0
-! 	]
+!       ! temp0 tag-bits get SHR
+!   tag-bits get temp0 LSRi
+!       !! load string from stack
+!       ! temp1 ds-reg [] MOV
+!   0 ds-reg temp1 [] MOVZ
+!       !! load character
+!       ! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
+!   temp0 temp1 string-offset [++] temp0 8-bit-version MOVZ
+!       ! temp0 temp0 8-bit-version-of MOVZX
+!   temp0 8-bit-version-of UXTB temp0 MOVZ
+!       ! temp0 tag-bits get SHL
+!   tag-bits get temp0 LSLi
+!       !! store character to stack
+!       ! ds-reg bootstrap-cell SUB
+!       ! ds-reg [] temp0 MOV
+!   pop0
+!   ]
 
 
     { tag [
