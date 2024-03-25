@@ -201,16 +201,16 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-premodern ( seq -- seq' ) "premodern" filter-legalities ;
 : filter-predh ( seq -- seq' ) "predh" filter-legalities ;
 
-: filter-any-red ( seq -- seq' ) [ "colors" of "R" swap member? ] filter ;
-: filter-only-red ( seq -- seq' ) [ "colors" of { "R" } = ] filter ;
-: filter-any-blue ( seq -- seq' ) [ "colors" of "U" swap member? ] filter ;
-: filter-only-blue ( seq -- seq' ) [ "colors" of { "U" } = ] filter ;
-: filter-any-green ( seq -- seq' ) [ "colors" of "G" swap member? ] filter ;
-: filter-only-green ( seq -- seq' ) [ "colors" of { "G" } = ] filter ;
-: filter-any-black ( seq -- seq' ) [ "colors" of "B" swap member? ] filter ;
-: filter-only-black ( seq -- seq' ) [ "colors" of { "B" } = ] filter ;
-: filter-any-white ( seq -- seq' ) [ "colors" of "W" swap member? ] filter ;
-: filter-only-white ( seq -- seq' ) [ "colors" of { "W" } = ] filter ;
+: filter-red-any ( seq -- seq' ) [ "colors" of "R" swap member? ] filter ;
+: filter-red-only ( seq -- seq' ) [ "colors" of { "R" } = ] filter ;
+: filter-blue-any ( seq -- seq' ) [ "colors" of "U" swap member? ] filter ;
+: filter-blue-only ( seq -- seq' ) [ "colors" of { "U" } = ] filter ;
+: filter-green-any ( seq -- seq' ) [ "colors" of "G" swap member? ] filter ;
+: filter-green-only ( seq -- seq' ) [ "colors" of { "G" } = ] filter ;
+: filter-black-any ( seq -- seq' ) [ "colors" of "B" swap member? ] filter ;
+: filter-black-only ( seq -- seq' ) [ "colors" of { "B" } = ] filter ;
+: filter-white-any ( seq -- seq' ) [ "colors" of "W" swap member? ] filter ;
+: filter-white-only ( seq -- seq' ) [ "colors" of { "W" } = ] filter ;
 : filter-multi-color ( seq -- seq' ) [ "colors" of length 1 > ] filter ;
 : filter-cmc= ( seq n -- seq' ) >float '[ "cmc" of _ = ] filter ;
 : filter-cmc< ( seq n -- seq' ) >float '[ "cmc" of _ < ] filter ;
