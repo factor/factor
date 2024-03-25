@@ -1,7 +1,7 @@
 ! Copyright (c) 2023 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: anagrams assocs combinators.short-circuit http.client
+USING: anagrams assocs combinators.short-circuit http.download
 io.encodings.utf8 io.files io.files.temp kernel math
 math.combinatorics math.functions math.order math.parser
 project-euler.common ranges sequences splitting ;

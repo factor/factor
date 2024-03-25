@@ -1,9 +1,10 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar checksums combinators.short-circuit
-http.client io io.backend io.directories io.encodings.binary
-io.files io.files.info io.files.unique io.pathnames kernel math
+http.client io io.directories io.encodings.binary io.files
+io.files.info io.files.unique io.pathnames kernel math
 math.order math.parser present sequences shuffle splitting ;
+
 IN: http.download
 
 : file-too-old-or-not-exists? ( file duration -- ? )
@@ -86,6 +87,9 @@ PRIVATE>
 
 : download-once-to ( url file -- path )
     dup file-exists? [ nip ] [ download-to ] if ;
+
+: download-once ( url -- path )
+    dup download-name download-once-to ;
 
 : download-outdated-to ( url file duration -- path )
     2dup delete-when-old [ drop download-to ] [ drop nip ] if ;

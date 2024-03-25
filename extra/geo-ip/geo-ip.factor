@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart csv
-grouping http.client interval-maps io.encodings.ascii io.files
+grouping http.download interval-maps io.encodings.ascii io.files
 io.files.temp io.launcher io.pathnames ip-parser kernel math
 math.parser sequences splitting strings ;
 IN: geo-ip
