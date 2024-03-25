@@ -1,6 +1,6 @@
 namespace factor {
 
-#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - sizeof(cell) * 5) // omg
+#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - sizeof(cell) * 6) // omg
 
 // void c_to_factor(cell quot);
 // void lazy_jit_compile(cell quot);
