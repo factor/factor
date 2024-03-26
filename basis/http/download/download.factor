@@ -7,18 +7,18 @@ math.order math.parser present sequences shuffle splitting ;
 
 IN: http.download
 
-: file-too-old-or-not-exists? ( file duration -- ? )
+: file-too-old-or-not-exists? ( path duration -- ? )
     [ ?file-info [ created>> ] ?call ]
     [ ago ] bi*
     over [ before? ] [ 2drop t ] if ;
 
-: delete-when-old ( file duration -- deleted? )
+: delete-when-old ( path duration -- deleted? )
     dupd file-too-old-or-not-exists? [ ?delete-file t ] [ drop f ] if ;
 
-: file-matches-checksum? ( file checksum-type bytes -- ? )
+: file-matches-checksum? ( path checksum-type bytes -- ? )
     [ checksum-file ] dip = ;
 
-: delete-when-checksum-mismatches ( file checksum-type bytes -- deleted? )
+: delete-when-checksum-mismatches ( path checksum-type bytes -- deleted? )
     dupdd file-matches-checksum? [ drop f ] [ ?delete-file t ] if ;
 
 : file-size= ( path n -- ? ) [ ?file-info [ size>> ] ?call ] dip = ;
@@ -32,7 +32,7 @@ IN: http.download
         drop t
     ] if ;
 
-: delete-when-file-size-mismatches? ( file size -- deleted? )
+: delete-when-file-size-mismatches? ( path size -- deleted? )
     dupd file-size= [ drop f ] [ ?delete-file t ] if ;
 
 : download-name ( url -- name )
@@ -84,19 +84,19 @@ IN: http.download
 
 PRIVATE>
 
-: download-to ( url file -- path )
+: download-to ( url path -- path )
     [
         [ download-temporary-name binary ] keep
         '[ _ http-write-request ] with-unique-file-writer
     ] dip [ move-file ] keep ;
 
-: download-once-to ( url file -- path )
+: download-once-to ( url path -- path )
     dup file-exists? [ nip ] [ download-to ] if ;
 
 : download-once ( url -- path )
     dup download-name download-once-to ;
 
-: download-outdated-to ( url file duration -- path )
+: download-outdated-to ( url path duration -- path )
     2dup delete-when-old [ drop download-to ] [ drop nip ] if ;
 
 : download ( url -- path )
