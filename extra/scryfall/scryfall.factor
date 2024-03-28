@@ -1,14 +1,20 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-http.download images.loader images.viewer io io.directories json
-json.http kernel math math.statistics namespaces sequences
-sequences.extras sets sorting splitting ui.gadgets.panes unicode
-urls ;
+combinators grouping http.download images.loader images.viewer
+io io.directories json json.http kernel math math.parser
+math.statistics namespaces sequences sequences.extras sets
+sorting splitting ui.gadgets.panes unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
+CONSTANT: scryfall-artwork-json-path "resource:scryfall-artwork-json"
+CONSTANT: scryfall-default-json-path "resource:scryfall-default-json"
+CONSTANT: scryfall-all-json-path "resource:scryfall-all-json"
+CONSTANT: scryfall-rulings-json-path "resource:scryfall-rulings-json"
 CONSTANT: scryfall-images-path "resource:scryfall-images/"
+
+: ?print ( str/f -- ) [ print ] [ nl ] if* ;
 
 : download-scryfall-bulk-json ( -- json )
     "https://api.scryfall.com/bulk-data" http-get-json nip ;
@@ -16,30 +22,34 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 : find-scryfall-json ( type -- json/f )
     [ download-scryfall-bulk-json "data" of ] dip '[ "type" of _ = ] filter ?first ;
 
-: scryfall-oracle-uri ( -- uri )
-    "oracle_cards" find-scryfall-json "download_uri" of ;
+: load-scryfall-json ( type path -- uri )
+    [ find-scryfall-json "download_uri" of ] dip
+    6 hours download-outdated-to path>json ;
 
-: scryfall-unique-artwork-uri ( -- uri )
-    "unique_artwork" find-scryfall-json "download_uri" of ;
+MEMO: mtg-oracle-cards ( -- json )
+    "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
 
-: scryfall-default-cards-uri ( -- uri )
-    "default_cards" find-scryfall-json "download_uri" of ;
+MEMO: mtg-artwork-cards ( -- json )
+    "unique_artwork" scryfall-artwork-json-path load-scryfall-json ;
 
-: scryfall-all-cards-uri ( -- uri )
-    "all_cards" find-scryfall-json "download_uri" of ;
+MEMO: scryfall-default-cards-json ( -- json )
+    "default_cards" scryfall-default-json-path load-scryfall-json ;
 
-: scryfall-rulings-uri ( -- uri )
-    "rulings" find-scryfall-json "download_uri" of ;
+MEMO: scryfall-all-cards-json ( -- json )
+    "all_cards" scryfall-all-json-path load-scryfall-json ;
 
-: download-scryfall-oracle-cards-json ( -- path )
-    scryfall-oracle-uri scryfall-oracle-json-path 120 hours download-outdated-to ;
+MEMO: scryfall-rulings-json ( -- json )
+    "rulings" scryfall-rulings-json-path load-scryfall-json ;
 
 : ensure-scryfall-images-directory ( -- )
     scryfall-images-path make-directories ;
 
-: scryfall>local ( string -- path )
+: scryfall-local-image-path ( string -- path )
     >url path>> "/" ?head drop "/" "-" replace
     scryfall-images-path "" prepend-as ;
+
+: map-card-faces ( assoc quot -- seq )
+    [ "card_faces" of ] dip map ; inline
 
 : card>image-uris ( assoc -- seq )
     [ "image_uris" of ]
@@ -49,27 +59,20 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 : small-images ( seq -- seq' ) [ "small" of ] map ;
 : normal-images ( seq -- seq' ) [ "normal" of ] map ;
 
+: download-scryfall-image ( assoc -- path )
+    dup scryfall-local-image-path dup delete-when-zero-size
+    [ download-once-to ] [ nip ] if ;
+
 : download-normal-images ( seq -- seq' )
     ensure-scryfall-images-directory
-    normal-images [
-        dup scryfall>local dup delete-when-zero-size
-        [ download-once-to ] [ nip ] if
-    ] map
-    [ load-image ] map ;
+    normal-images [ download-scryfall-image load-image ] map ;
 
 : download-small-images ( seq -- seq' )
     ensure-scryfall-images-directory
-    small-images [
-        dup scryfall>local dup delete-when-zero-size
-        [ download-once-to ] [ nip ] if
-    ] map
-    [ load-image ] map ;
-
-MEMO: scryfall-cards-json ( -- json )
-    download-scryfall-oracle-cards-json path>json ;
+    small-images [ download-scryfall-image load-image ] map ;
 
 MEMO: all-cards-by-name ( -- assoc )
-    scryfall-cards-json
+    mtg-oracle-cards
     [ "name" of ] collect-by
     [ first ] map-values ;
 
@@ -245,7 +248,7 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-rare ( seq -- seq' ) '[ "rarity" of "rare" = ] filter ;
 : filter-mythic ( seq -- seq' ) '[ "rarity" of "mythic" = ] filter ;
 
-: standard-cards ( -- seq' ) scryfall-cards-json filter-standard ;
+: standard-cards ( -- seq' ) mtg-oracle-cards filter-standard ;
 
 : sort-by-cmc ( assoc -- assoc' ) [ "cmc" of ] sort-by ;
 : histogram-by-cmc ( assoc -- assoc' ) [ "cmc" of ] histogram-by sort-keys ;
@@ -268,6 +271,10 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : images. ( seq -- ) [ <image-gadget> ] map gadgets. ;
 
+: normal-images-grid. ( seq -- )
+    4 group
+    [ [ card>image-uris ] map concat download-normal-images images. ] each ;
+
 : small-card. ( assoc -- )
     card>image-uris download-small-images images. ;
 
@@ -278,8 +285,85 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : normal-cards. ( seq -- ) [ normal-card. ] each ;
 
+: card-face-summary. ( seq -- )
+    {
+        [ "name" of write bl ]
+        [ "mana_cost" of ?print ]
+        [ "type_line" of ?print ]
+        [ [ "power" of ] [ "toughness" of ] bi 2dup and [ "/" glue print ] [ 2drop ] if ]
+        [ "oracle_text" of ?print ]
+    } cleave nl ;
+
+: card-face-summaries. ( seq -- ) [ card-face-summary. ] each ;
+
+: card-summary. ( assoc -- )
+    {
+        [
+            [ "card_faces" of ]
+            [ [ length number>string "Card Faces: " prepend print ] [ card-face-summaries. ] bi ]
+            [ card-face-summary. ] ?if
+        ]
+    } cleave nl nl nl ;
+
+: card-summaries. ( seq -- ) [ card-summary. ] each ;
+
+: card-summary-with-pic. ( assoc -- )
+    [ normal-card. ]
+    [ card-summary. ] bi ;
+
+: card-summaries-with-pics. ( seq -- ) [ card-summary-with-pic. ] each ;
+
 : standard-dragons. ( -- )
     standard-cards
     "Dragon" filter-creature-type
     sort-by-cmc
     normal-cards. ;
+
+: collect-by-cmc ( seq -- seq' ) [ "cmc" of ] collect-by ;
+
+MEMO: mtg-sets-by-abbrev ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set" of ] [ "set_name" of ] bi ] H{ } map>assoc ;
+
+MEMO: mtg-sets-by-name ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set_name" of ] [ "set" of ] bi ] H{ } map>assoc ;
+
+: filter-mtg-set ( seq abbrev -- seq ) '[ "set" of _ = ] filter ;
+
+: unique-set-names ( seq -- seq' ) [ "set_name" of ] map members ;
+: unique-set-abbrevs ( seq -- seq' ) [ "set" of ] map members ;
+
+: standard-set-names ( -- seq ) standard-cards unique-set-names ;
+: standard-set-abbrevs ( -- seq ) standard-cards unique-set-abbrevs ;
+
+
+: sets-by-release-date ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set_name" of ] [ "released_at" of ] bi ] H{ } map>assoc
+    sort-values ;
+
+: collect-cards-by-set-abbrev ( seq -- assoc ) [ "set" of ] collect-by ;
+: collect-cards-by-set-name ( seq -- assoc ) [ "set_name" of ] collect-by ;
+: cards-by-set-abbrev ( -- assoc ) mtg-oracle-cards collect-cards-by-set-abbrev ;
+: cards-by-set-name ( -- assoc ) mtg-oracle-cards collect-cards-by-set-name ;
+
+: mid-cards ( -- seq ) mtg-oracle-cards [ "set" of "mid" = ] filter ;
+: vow-cards ( -- seq ) mtg-oracle-cards [ "set" of "vow" = ] filter ;
+: neo-cards ( -- seq ) mtg-oracle-cards [ "set" of "neo" = ] filter ;
+: snc-cards ( -- seq ) mtg-oracle-cards [ "set" of "snc" = ] filter ;
+
+: dmu-cards ( -- seq ) mtg-oracle-cards [ "set" of "dmu" = ] filter ;
+: bro-cards ( -- seq ) mtg-oracle-cards [ "set" of "bro" = ] filter ;
+: one-cards ( -- seq ) mtg-oracle-cards [ "set" of "one" = ] filter ;
+: mom-cards ( -- seq ) mtg-oracle-cards [ "set" of "mom" = ] filter ;
+: mat-cards ( -- seq ) mtg-oracle-cards [ "set" of "mat" = ] filter ;
+
+: woe-cards ( -- seq ) mtg-oracle-cards [ "set" of "woe" = ] filter ;
+: lci-cards ( -- seq ) mtg-oracle-cards [ "set" of "lci" = ] filter ;
+: mkm-cards ( -- seq ) mtg-oracle-cards [ "set" of "mkm" = ] filter ;
+: otj-cards ( -- seq ) mtg-oracle-cards [ "set" of "otj" = ] filter ;
+
+ERROR: unknown-mtg-card name ;
+: card-by-name. ( name -- )
+    [ all-cards-by-name ] dip ?of [ normal-card. ] [ unknown-mtg-card ] if ;
