@@ -1,8 +1,8 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-combinators http.download images.loader images.viewer io
-io.directories json json.http kernel math math.parser
+combinators grouping http.download images.loader images.viewer
+io io.directories json json.http kernel math math.parser
 math.statistics namespaces sequences sequences.extras sets
 sorting splitting ui.gadgets.panes unicode urls ;
 IN: scryfall
@@ -24,12 +24,12 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
 : load-scryfall-json ( type path -- uri )
     [ find-scryfall-json "download_uri" of ] dip
-    120 hours download-outdated-to path>json ;
+    6 hours download-outdated-to path>json ;
 
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
 
-: mtg-artwork-cards ( -- json )
+MEMO: mtg-artwork-cards ( -- json )
     "unique_artwork" scryfall-artwork-json-path load-scryfall-json ;
 
 MEMO: scryfall-default-cards-json ( -- json )
@@ -271,6 +271,10 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : images. ( seq -- ) [ <image-gadget> ] map gadgets. ;
 
+: normal-images-grid. ( seq -- )
+    4 group
+    [ [ card>image-uris ] map concat download-normal-images images. ] each ;
+
 : small-card. ( assoc -- )
     card>image-uris download-small-images images. ;
 
@@ -316,3 +320,50 @@ MEMO: all-cards-by-name ( -- assoc )
     normal-cards. ;
 
 : collect-by-cmc ( seq -- seq' ) [ "cmc" of ] collect-by ;
+
+MEMO: mtg-sets-by-abbrev ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set" of ] [ "set_name" of ] bi ] H{ } map>assoc ;
+
+MEMO: mtg-sets-by-name ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set_name" of ] [ "set" of ] bi ] H{ } map>assoc ;
+
+: filter-mtg-set ( seq abbrev -- seq ) '[ "set" of _ = ] filter ;
+
+: unique-set-names ( seq -- seq' ) [ "set_name" of ] map members ;
+: unique-set-abbrevs ( seq -- seq' ) [ "set" of ] map members ;
+
+: standard-set-names ( -- seq ) standard-cards unique-set-names ;
+: standard-set-abbrevs ( -- seq ) standard-cards unique-set-abbrevs ;
+
+
+: sets-by-release-date ( -- assoc )
+    scryfall-all-cards-json
+    [ [ "set_name" of ] [ "released_at" of ] bi ] H{ } map>assoc
+    sort-values ;
+
+: collect-cards-by-set-abbrev ( seq -- assoc ) [ "set" of ] collect-by ;
+: collect-cards-by-set-name ( seq -- assoc ) [ "set_name" of ] collect-by ;
+: cards-by-set-abbrev ( -- assoc ) mtg-oracle-cards collect-cards-by-set-abbrev ;
+: cards-by-set-name ( -- assoc ) mtg-oracle-cards collect-cards-by-set-name ;
+
+: mid-cards ( -- seq ) mtg-oracle-cards [ "set" of "mid" = ] filter ;
+: vow-cards ( -- seq ) mtg-oracle-cards [ "set" of "vow" = ] filter ;
+: neo-cards ( -- seq ) mtg-oracle-cards [ "set" of "neo" = ] filter ;
+: snc-cards ( -- seq ) mtg-oracle-cards [ "set" of "snc" = ] filter ;
+
+: dmu-cards ( -- seq ) mtg-oracle-cards [ "set" of "dmu" = ] filter ;
+: bro-cards ( -- seq ) mtg-oracle-cards [ "set" of "bro" = ] filter ;
+: one-cards ( -- seq ) mtg-oracle-cards [ "set" of "one" = ] filter ;
+: mom-cards ( -- seq ) mtg-oracle-cards [ "set" of "mom" = ] filter ;
+: mat-cards ( -- seq ) mtg-oracle-cards [ "set" of "mat" = ] filter ;
+
+: woe-cards ( -- seq ) mtg-oracle-cards [ "set" of "woe" = ] filter ;
+: lci-cards ( -- seq ) mtg-oracle-cards [ "set" of "lci" = ] filter ;
+: mkm-cards ( -- seq ) mtg-oracle-cards [ "set" of "mkm" = ] filter ;
+: otj-cards ( -- seq ) mtg-oracle-cards [ "set" of "otj" = ] filter ;
+
+ERROR: unknown-mtg-card name ;
+: card-by-name. ( name -- )
+    [ all-cards-by-name ] dip ?of [ normal-card. ] [ unknown-mtg-card ] if ;
