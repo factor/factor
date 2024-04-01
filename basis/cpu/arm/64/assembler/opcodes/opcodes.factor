@@ -274,7 +274,7 @@ ARM-INSTRUCTION: ANDSi-encode ( bw 11 100100 (N)immrimms Rn Rd -- )
 ARM-INSTRUCTION: ANDSsr-encode ( bw 11 01010 shift2 0 Rm imm6 Rn Rd -- )
 
 ! ASR (immediate): Arithmetic Shift Right (immediate): an alias of SBFM.
-ARM-INSTRUCTION: ASRi-encode ( bw 00 100110 0 immr 011111 Rn Rd -- )
+ARM-INSTRUCTION: ASRi-encode ( bw 00 100110 1 immr 111111 Rn Rd -- )
 
 ! ASR (register): Arithmetic Shift Right (register): an alias of ASRV.
 ARM-INSTRUCTION: ASRr-encode ( bw 0 0 11010110 Rm 0010 10 Rn Rd -- )

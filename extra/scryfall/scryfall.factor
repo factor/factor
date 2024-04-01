@@ -231,17 +231,29 @@ MEMO: all-cards-by-name ( -- assoc )
     ] bi@ 2array sift ;
 
 : type-line-of ( assoc -- string ) "type_line" of parse-type-line ;
-: any-type? ( seq name -- ? ) [ type-line-of ] dip '[ first _ member-of? ] any? ;
-: any-subtype? ( seq name -- ? ) [ type-line-of ] dip '[ second _ member-of? ] any? ;
+: any-type? ( seq name -- ? ) [ type-line-of ] dip >lower '[ first [ >lower ] map _ member-of? ] any? ;
+: any-subtype? ( seq name -- ? ) [ type-line-of ] dip >lower '[ second [ >lower ] map _ member-of? ] any? ;
 
-: filter-creature-type ( seq type -- seq' ) '[ _ any-subtype? ] filter ;
-
+: filter-basic ( seq -- seq' ) [ "Basic" any-type? ] filter ;
+: filter-basic-subtype ( seq text -- seq' ) [ filter-basic ] dip '[ _ any-subtype? ] filter ;
 : filter-land ( seq -- seq' ) [ "Land" any-type? ] filter ;
+: filter-land-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
 : filter-creature ( seq -- seq' ) [ "Creature" any-type? ] filter ;
+: filter-creature-subtype ( seq text -- seq' ) [ filter-creature ] dip '[ _ any-subtype? ] filter ;
 : filter-enchantment ( seq -- seq' ) [ "Enchantment" any-type? ] filter ;
+: filter-enchantment-subtype ( seq text -- seq' ) [ filter-enchantment ] dip '[ _ any-subtype? ] filter ;
 : filter-instant ( seq -- seq' ) [ "Instant" any-type? ] filter ;
+: filter-instant-subtype ( seq text -- seq' ) [ filter-instant ] dip '[ _ any-subtype? ] filter ;
 : filter-sorcery ( seq -- seq' ) [ "Sorcery" any-type? ] filter ;
+: filter-sorcery-subtype ( seq text -- seq' ) [ filter-sorcery ] dip '[ _ any-subtype? ] filter ;
 : filter-planeswalker ( seq -- seq' ) [ "Planeswalker" any-type? ] filter ;
+: filter-planeswalker-subtype ( seq text -- seq' ) [ filter-planeswalker ] dip '[ _ any-subtype? ] filter ;
+: filter-legendary ( seq -- seq' ) [ "Legendary" any-type? ] filter ;
+: filter-legendary-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-battle ( seq -- seq' ) [ "Battle" any-type? ] filter ;
+: filter-battle-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-artifact ( seq -- seq' ) [ "Artifact" any-type? ] filter ;
+: filter-artifact-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
 
 : filter-common ( seq -- seq' ) '[ "rarity" of "common" = ] filter ;
 : filter-uncommon ( seq -- seq' ) '[ "rarity" of "uncommon" = ] filter ;
@@ -249,6 +261,8 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-mythic ( seq -- seq' ) '[ "rarity" of "mythic" = ] filter ;
 
 : standard-cards ( -- seq' ) mtg-oracle-cards filter-standard ;
+: historic-cards ( -- seq' ) mtg-oracle-cards filter-historic ;
+: modern-cards ( -- seq' ) mtg-oracle-cards filter-modern ;
 
 : sort-by-cmc ( assoc -- assoc' ) [ "cmc" of ] sort-by ;
 : histogram-by-cmc ( assoc -- assoc' ) [ "cmc" of ] histogram-by sort-keys ;
@@ -315,7 +329,7 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : standard-dragons. ( -- )
     standard-cards
-    "Dragon" filter-creature-type
+    "Dragon" filter-creature-subtype
     sort-by-cmc
     normal-cards. ;
 
