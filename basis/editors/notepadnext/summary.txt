@@ -1,0 +1,1 @@
+NotepadNext editor integration
