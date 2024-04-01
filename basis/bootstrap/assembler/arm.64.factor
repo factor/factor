@@ -1225,7 +1225,8 @@ big-endian off
         ! ! if shift count was negative, move temp3 to temp2
         ! shift-arg 0 CMP
         ! temp2 temp3 CMOVGE
-        temp2 temp1 temp0 PL CSEL
+        0 temp0 CMPi
+        temp2 temp1 temp0 MI CSEL
         ! ! push to stack
         ! ds-reg [] temp2 MOV
         1 push-down0
