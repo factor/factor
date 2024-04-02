@@ -23,7 +23,6 @@ M: linux find-notepadnext-path
 
 M: notepadnext editor-command
     '[
-        find-notepadnext-path ,
-        _ ,
+        find-notepadnext-path , _ ,
         "-n" , _ ,
     ] { } make ;
