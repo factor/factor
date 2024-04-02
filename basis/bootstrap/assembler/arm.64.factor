@@ -247,6 +247,15 @@ big-endian off
     pop-link-reg ;
 
 [
+    ! arg1 ds-reg [] MOV
+    ! ds-reg bootstrap-cell SUB
+    pop-arg1
+]
+[ jit-call-quot ]
+[ jit-jump-quot ]
+\ (call) define-combinator-primitive
+
+[
     jit-save-context
     vm-reg arg2 MOVr
     "lazy_jit_compile" jit-call
