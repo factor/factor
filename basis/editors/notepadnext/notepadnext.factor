@@ -25,5 +25,5 @@ M: notepadnext editor-command
     '[
         find-notepadnext-path ,
         _ ,
-        _ drop ! "-n" , _ ,
+        "-n" , _ ,
     ] { } make ;
