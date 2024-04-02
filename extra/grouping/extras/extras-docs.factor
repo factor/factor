@@ -1,4 +1,4 @@
-USING: arrays grouping help.markup help.syntax kernel math
+USING: arrays assocs grouping help.markup help.syntax kernel math
 quotations sequences ;
 IN: grouping.extras
 
