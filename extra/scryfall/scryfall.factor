@@ -1,10 +1,11 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-combinators grouping http.download images.loader images.viewer
-io io.directories json json.http kernel math math.parser
-math.statistics namespaces sequences sequences.extras sets
-sorting splitting ui.gadgets.panes unicode urls ;
+combinators combinators.short-circuit grouping http.download
+images.loader images.viewer io io.directories json json.http
+kernel math math.parser math.statistics namespaces sequences
+sequences.extras sets sorting splitting strings ui.gadgets.panes
+unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -50,6 +51,9 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : map-card-faces ( assoc quot -- seq )
     [ "card_faces" of ] dip map ; inline
+
+: filter-card-faces ( assoc quot -- seq )
+    '[ [ "card_faces" of ] [ ] [ 1array ] ?if _ any? ] filter ; inline
 
 : card>image-uris ( assoc -- seq )
     [ "image_uris" of ]
@@ -234,6 +238,9 @@ MEMO: all-cards-by-name ( -- assoc )
 : any-type? ( seq name -- ? ) [ type-line-of ] dip >lower '[ first [ >lower ] map _ member-of? ] any? ;
 : any-subtype? ( seq name -- ? ) [ type-line-of ] dip >lower '[ second [ >lower ] map _ member-of? ] any? ;
 
+: filter-type ( seq text -- seq' ) '[ _ any-type? ] filter ;
+: filter-subtype ( seq text -- seq' ) '[ _ any-subtype? ] filter ;
+
 : filter-basic ( seq -- seq' ) [ "Basic" any-type? ] filter ;
 : filter-basic-subtype ( seq text -- seq' ) [ filter-basic ] dip '[ _ any-subtype? ] filter ;
 : filter-land ( seq -- seq' ) [ "Land" any-type? ] filter ;
@@ -275,6 +282,30 @@ MEMO: all-cards-by-name ( -- assoc )
     '[ "oracle_text" of >lower _ subseq-of? ] filter ;
 
 : filter-flash ( seq -- seq' ) "Flash" filter-by-oracle-text ;
+
+: power>n ( string -- n/f )
+    [ "*" = ] [ drop -1 ] [ string>number ] ?if ;
+
+: mtg<  ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ < ] } 2&& ;
+: mtg<= ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ <= ] } 2&& ;
+: mtg>  ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ > ] } 2&& ;
+: mtg>= ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ >= ] } 2&& ;
+: mtg=  ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ = ] } 2&& ;
+
+: filter-power=* ( seq -- seq' ) [ "power" of "*" = ] filter-card-faces ;
+: filter-toughness=* ( seq -- seq' ) [ "toughness" of "*" = ] filter-card-faces ;
+
+: filter-power= ( seq n -- seq' ) '[ "power" of _ mtg= ] filter-card-faces ;
+: filter-power< ( seq n -- seq' ) '[ "power" of _ mtg< ] filter-card-faces ;
+: filter-power> ( seq n -- seq' ) '[ "power" of _ mtg> ] filter-card-faces ;
+: filter-power<= ( seq n -- seq' ) '[ "power" of _ mtg<= ] filter-card-faces ;
+: filter-power>= ( seq n -- seq' ) '[ "power" of _ mtg>= ] filter-card-faces ;
+
+: filter-toughness= ( seq n -- seq' ) '[ "toughness" of _ mtg= ] filter-card-faces ;
+: filter-toughness< ( seq n -- seq' ) '[ "toughness" of _ mtg< ] filter-card-faces ;
+: filter-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] filter-card-faces ;
+: filter-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] filter-card-faces ;
+: filter-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] filter-card-faces ;
 
 : map-props ( seq props -- seq' ) '[ _ intersect-keys ] map ;
 
