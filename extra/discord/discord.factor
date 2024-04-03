@@ -73,6 +73,8 @@ TUPLE: discord-bot
     discord-post-request json-request ;
 : discord-post-json ( payload route -- json )
     [ >json ] dip discord-post-request add-json-header json-request ;
+: discord-post-json-no-resp ( payload route -- )
+    [ >json ] dip discord-post-request add-json-header http-request 2drop ;
 : discord-patch-json ( payload route -- json )
     [ >json ] dip discord-patch-request add-json-header json-request ;
 : discord-delete-json ( route -- json )
@@ -104,13 +106,12 @@ TUPLE: discord-bot
 : delete-discord-application-guild-command ( application-id -- json )
     "/applications/%s/commands" sprintf discord-delete-json ;
 
-: create-interaction-response ( interaction-id interaction-token -- json )
-    [ H{ { "type" 4 } { "data" "pang" } } clone ] 2dip
-    "/webhooks/%s/%s/messages/callback" sprintf discord-post ;
-
+: create-interaction-response ( json interaction-id interaction-token -- )
+    "/interactions/%s/%s/callback" sprintf discord-post-json-no-resp ;
 : get-original-interaction-response ( application-id interaction-token -- json )
     "/webhooks/%s/%s/messages/@original" sprintf discord-get ;
-
+: edit-interaction-response ( json application-id interaction-token -- json )
+    "/webhooks/%s/%s/messages/@original" sprintf discord-patch-json ;
 
 
 : send-message* ( string channel-id -- json )
