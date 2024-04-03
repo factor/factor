@@ -17,7 +17,8 @@ TUPLE: discord-webhook url id token ;
 
 TUPLE: discord-bot-config
     client-id client-secret
-    token application-id guild-id channel-id permissions
+    token application-id guild-id channel-id
+    permissions intents
     user-callback obey-names
     metadata
     discord-bot mailbox connect-thread ;
@@ -138,7 +139,11 @@ TUPLE: discord-bot
 : get-discord-bot-gateway ( -- json ) "/gateway/bot" discord-get ;
 
 : gateway-identify-json ( -- json )
-    \ discord-bot get config>> token>> [[ {
+    \ discord-bot get
+    [ config>> ] ?call
+    [ [ token>> ] ?call "0" or  ]
+    [ [ intents>> ] ?call 3276541 or ] bi
+    [[ {
         "op": 2,
         "d": {
             "token": "%s",
@@ -148,7 +153,7 @@ TUPLE: discord-bot
                 "device": "discord.factor"
             },
             "large_threshold": 250,
-            "intents": 3276541
+            "intents": %d
         }
     }]] sprintf json> >json ;
 
