@@ -364,6 +364,13 @@ unit-test
 { f } [ "1_2_" string>number ] unit-test
 { 123 } [ "1_2_3" string>number ] unit-test
 
+{ { 1 1 1 1 0 1 1 } } [ 123 2 >base-digits ] unit-test
+{ { 4 4 3 } } [ 123 5 >base-digits ] unit-test
+{ 123 } [ { 1 1 1 1 0 1 1 } 2 base-digits> ] unit-test
+{ 123 } [ { 4 4 3 } 5 base-digits> ] unit-test
+{ 8902 } [ { 8 9 0 2 } digits> ] unit-test
+{ { 2 5 9 6 } } [ 2596 >digits ] unit-test
+
 ! #372
 ! hex float requires exponent
 { f } [ "0x1.0" string>number ] unit-test
