@@ -1,5 +1,5 @@
 USING: byte-arrays help.markup help.syntax math
-math.parser.private prettyprint make sequences
+math.parser.private prettyprint kernel make sequences
 strings ;
 
 IN: math.parser
@@ -133,3 +133,73 @@ HELP: hex-string>bytes
 } ;
 
 { bytes>hex-string hex-string>bytes } related-words
+
+HELP: >dec
+{ $values
+    { "n" integer }
+    { "str" string }
+}
+{ $description "Converts an integer to its string representation in decimal." } ;
+
+HELP: dec>
+{ $values
+    { "str" string }
+    { "n/f" { $maybe integer } }
+}
+{ $description "Converts a string representing a decimal integer to an integer.
+Returns " { $link f } " if the string cannot be converted." } ;
+
+HELP: invalid-hex-string-length
+{ $values
+    { "n" integer }
+}
+{ $description "Throws an " { $link invalid-hex-string-length } " error." }
+{ $error-description "A hex string must have an even number of characters, as
+bytes are interpreted in pairs." } ;
+
+HELP: invalid-radix
+{ $values
+    { "radix" object }
+}
+{ $description "Throws an " { $link invalid-radix } " error." }
+{ $error-description "For the word it is used in, an invalid radix is one that
+does not exist in the domain of valid radixes. In many cases, for example,
+negative and floating point radixes are not allowed." } ;
+
+HELP: string>digits
+{ $values
+    { "str" string }
+    { "digits" object }
+}
+{ $description "Converts a string of digits represented in base 36 to a byte
+array (" { $link "byte-arrays" } ")." } ;
+
+HELP: >base-digits
+{ $values
+    { "n" integer } { "radix" object }
+    { "seq" sequence }
+}
+{ $description "Converts a real number to a list of its digits in the given"
+" radix. The result is a sequence of integer digits." } ;
+
+HELP: >digits
+{ $values
+    { "n" integer }
+    { "seq" sequence }
+}
+{ $description "Converts an integer to the sequence of its decimal digits." } ;
+
+HELP: base-digits>
+{ $values
+    { "seq" sequence } { "radix" object }
+    { "n" integer }
+}
+{ $description "Converts a sequence of digits (each 'digit' can be any "
+"positive integer) in a given radix to an integer." } ;
+
+HELP: digits>
+{ $values
+    { "seq" sequence }
+    { "n" integer }
+}
+{ $description "Converts a sequence of decimal digits to an integer." } ;
