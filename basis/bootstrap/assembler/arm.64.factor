@@ -965,7 +965,7 @@ big-endian off
     ! ds-reg [] arg3 MOV
     push-down-arg3
     ! [ JNO ]
-    [ VC B.cond ] [
+    [ 8 fixnum+fast VC B.cond ] [
         ! arg3 vm-reg MOV
         vm-reg arg3 MOVr
         jit-call
