@@ -871,6 +871,8 @@ ERROR: slice-error-of from to seq ;
     [ find drop ] keepd swap
     [ cut ] [ f over like ] if* ; inline
 
+: ?cut ( seq n -- before after ) [ index-or-length head ] [ index-or-length tail ] 2bi ;
+
 : nth* ( n seq -- elt )
     [ length 1 - swap - ] [ nth ] bi ; inline
 
@@ -1207,3 +1209,11 @@ INSTANCE: virtual-zip-index immutable-sequence
         2dup _ exchange-unsafe
         [ 1 - ] [ 1 + ] [ 1 + ] tri*
     ] [ pick 0 > ] swap while 3drop ;
+
+: sequence-cartesian-product ( seqs -- seqs' )
+    dup length 1 <= [
+        [ [ 1array ] map ] map concat
+    ] [
+        2 cut [ first2 cartesian-product concat ] dip swap
+        [ [ suffix ] cartesian-map concat ] reduce
+    ] if ;
