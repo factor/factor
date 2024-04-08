@@ -907,7 +907,7 @@ ARM-INSTRUCTION: LDXRB-encode ( 00 001000 0 1 0 11111 0 11111 Rn Rt -- )
 ARM-INSTRUCTION: LDXRH-encode ( 01 001000 0 1 0 11111 0 11111 Rn Rt -- )
 
 ! LSL (immediate): Logical Shift Left (immediate): an alias of UBFM.
-ARM-INSTRUCTION: LSLi-encode ( bw 10 100110 bw immr bw 00000 Rn Rd -- )
+ARM-INSTRUCTION: LSLi-encode ( bw 10 100110 bw immr imms Rn Rd -- )
 
 ! LSL (register): Logical Shift Left (register): an alias of LSLV.
 ARM-INSTRUCTION: LSLr-encode ( bw 0 0 11010110 Rm 0010 00 Rn Rd -- )
