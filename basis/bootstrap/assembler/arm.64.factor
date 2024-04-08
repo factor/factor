@@ -78,12 +78,13 @@ big-endian off
 : push-arg2 ( -- ) 8 ds-reg arg2 STRpre ;
 
 : push-down0 ( n -- ) neg bootstrap-cells ds-reg temp0 STRpre ;
-: push-down-arg3 ( -- ) -8 ds-reg arg3 STRpre ;
+: push-down-arg3 ( -- ) -8 ds-rg arg3 STRpre ;
 
 : store0 ( -- ) 0 ds-reg temp0 STRuoff ;
 : store1 ( -- ) 0 ds-reg temp1 STRuoff ;
 : store0/1 ( -- ) -8 ds-reg temp1 temp0 STPsoff ;
 : store0/2 ( -- ) -8 ds-reg temp2 temp0 STPsoff ;
+: store2/0 ( -- ) -8 ds-reg temp0 temp2 STPsoff ;
 : store1/0 ( -- ) -8 ds-reg temp0 temp1 STPsoff ;
 : store1/2 ( -- ) -16 ds-reg temp2 temp1 STPsoff ;
 
@@ -1298,7 +1299,7 @@ big-endian off
         ! ! push to stack
         ! ds-reg [] mod-arg MOV
         ! ds-reg bootstrap-cell neg [+] div-arg MOV
-        store0/2
+        store2/0
     ] }
 
     ! ### Mul
