@@ -1386,10 +1386,12 @@ big-endian off
         ! ! load string from stack
         ! temp1 ds-reg [] MOV
         load1/0
+        temp1 untag
         ! ! load character
         ! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
         ! temp0 temp0 8-bit-version-of MOVZX
         ! temp0 tag-bits get SHL
+        string-offset temp0 temp0 ADDi
         temp1 temp0 temp0 LDRBr
         temp0 tag
         ! ! store character to stack
