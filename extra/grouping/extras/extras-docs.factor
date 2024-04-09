@@ -1,17 +1,24 @@
-USING: arrays grouping help.markup help.syntax kernel math
+USING: arrays assocs grouping help.markup help.syntax kernel math
 quotations sequences ;
 IN: grouping.extras
 
 HELP: group-by
 { $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "groups" "a new assoc" } }
-{ $description "Groups the elements by the key received by applying quot to each element in the sequence." }
+{ $description "Groups consecutive elements by the key received by applying quot to each element in the sequence." }
 { $examples
   { $example
     "USING: grouping.extras unicode.data prettyprint sequences strings ;"
     "\"THis String Has  CasE!\" [ category ] group-by [ last >string ] { } map-as ."
     "{ \"TH\" \"is\" \" \" \"S\" \"tring\" \" \" \"H\" \"as\" \"  \" \"C\" \"as\" \"E\" \"!\" }"
   }
+  { $example
+    "USING: grouping.extras prettyprint sequences strings ;"
+    "{ \"apple\" \"anchovy\" \"banana\" \"anise\" \"bagel\" \"bratwurst\" } [ first 1string ] group-by ."
+    "V{\n    { \"a\" V{ \"apple\" \"anchovy\" } }\n    { \"b\" V{ \"banana\" } }\n    { \"a\" V{ \"anise\" } }\n    { \"b\" V{ \"bagel\" \"bratwurst\" } }\n}"
+  }
 } ;
+
+{ group-by collect-by } related-words
 
 HELP: <n-groups>
 { $values

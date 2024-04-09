@@ -522,3 +522,23 @@ strings tools.test ;
 
 { "34_01_" } [ 2 0 3 "01_34_" [ exchange-subseq ] keep ] unit-test
 { "cdebaf" } [ 3 0 2 "abcdef" [ exchange-subseq ] keep ] unit-test
+
+{ { } } [ { } sequence-cartesian-product ] unit-test
+{ { } } [ { { } } sequence-cartesian-product ] unit-test
+{ { } } [ { { 1 2 } { } } sequence-cartesian-product ] unit-test
+{ { { 1 } { 2 } } } [ { { 1 2 } } sequence-cartesian-product ] unit-test
+
+{
+    {
+        { 1 3 5 6 { 9 } }
+        { 1 3 5 7 { 9 } }
+        { 1 4 5 6 { 9 } }
+        { 1 4 5 7 { 9 } }
+        { 2 3 5 6 { 9 } }
+        { 2 3 5 7 { 9 } }
+        { 2 4 5 6 { 9 } }
+        { 2 4 5 7 { 9 } }
+    }
+} [
+    { { 1 2 } { 3 4 } { 5 } { 6 7 } { { 9 } } } sequence-cartesian-product
+] unit-test

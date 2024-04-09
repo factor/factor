@@ -1,10 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math.order sequences sorting ;
+USING: arrays assocs kernel math.order quotations sequences
+sorting ;
 IN: sorting.specification
 
 : execute-comparator ( obj1 obj2 word -- <=>/f )
     execute( obj1 obj2 -- <=> ) dup +eq+ eq? [ drop f ] when ;
+
+: call-accessor ( obj1 obj2 quot -- obj1' obj2' )
+    '[ _ call( obj -- value ) ] bi@ ;
 
 : execute-accessor ( obj1 obj2 word -- obj1' obj2' )
     '[ _ execute( tuple -- value ) ] bi@ ;
@@ -14,7 +18,7 @@ IN: sorting.specification
     [
         dup array? [
             unclip-last-slice
-            [ [ execute-accessor ] each ] dip
+            [ [ dup quotation? [ call-accessor ] [ execute-accessor ] if ] each ] dip
         ] when execute-comparator
     ] 2with map-find drop +eq+ or ;
 
