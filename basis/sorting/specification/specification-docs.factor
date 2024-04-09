@@ -8,7 +8,7 @@ HELP: compare-with-spec
 { $values
   { "obj1" object }
   { "obj2" object }
-  { "sort-spec" "a sequence of sequences of accessors and a comparator" }
+  { "sort-spec" "a sequence of sequences of accessors/quotations and a comparator" }
   { "<=>" { $link +lt+ } ", " { $link +eq+ } " or " { $link +gt+ } }
 }
 { $description "Compares two objects using a chain of intrinsic linear orders such that if two objects are " { $link +eq+ } ", then the next ordering is tried." } ;
