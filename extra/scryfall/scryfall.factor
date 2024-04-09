@@ -3,9 +3,10 @@
 USING: accessors arrays assocs assocs.extras calendar
 combinators combinators.short-circuit grouping http.download
 images.loader images.viewer io io.directories json json.http
-kernel math math.parser math.statistics namespaces sequences
-sequences.extras sets sorting splitting strings ui.gadgets.panes
-unicode urls ;
+kernel math math.combinatorics math.order math.parser
+math.statistics namespaces sequences sequences.deep
+sequences.extras sets sorting sorting.specification splitting
+strings ui.gadgets.panes unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -83,6 +84,7 @@ MEMO: all-cards-by-name ( -- assoc )
 : find-card-by-name ( seq name -- card ) '[ "name" of _ = ] filter ;
 : cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
 : cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
+: cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
 : cards-by-color-identity ( seq -- assoc ) [ "color_identity" of ] collect-by-multi ;
 : red-color-identity ( seq -- seq' ) cards-by-color-identity "R" of ;
 : blue-color-identity ( seq -- seq' ) cards-by-color-identity "U" of ;
@@ -96,7 +98,21 @@ MEMO: all-cards-by-name ( -- assoc )
 : find-any-color-identities ( cards colors -- cards' )
     [ cards-by-color-identity ] dip [ of ] with map union-all ;
 
-: color-identity-complement ( seq -- seq' ) [ { "W" "U" "B" "R" "G" } ] dip diff ;
+: color-identity-complement ( seq -- seq' ) [ { "B" "G" "R" "U" "W" } ] dip diff ;
+
+: split-mana-cost ( string -- seq )
+    f like [ " // " split1 swap ] { } loop>sequence nip ;
+
+: casting-cost-combinations ( seq -- seq' )
+    sequence-cartesian-product [ [ first ] sort-by ] map ;
+
+: parse-mana-cost ( string -- seq )
+    split-mana-cost
+    [
+        "{}" split harvest
+        [ "/" split ] map
+        casting-cost-combinations
+    ] map ;
 
 : remove-color-identities ( cards colors -- cards' )
     dupd find-any-color-identities diff ;
@@ -274,12 +290,17 @@ MEMO: all-cards-by-name ( -- assoc )
 : sort-by-cmc ( assoc -- assoc' ) [ "cmc" of ] sort-by ;
 : histogram-by-cmc ( assoc -- assoc' ) [ "cmc" of ] histogram-by sort-keys ;
 
-: filter-by-oracle-text ( seq string -- seq' )
-    '[ "oracle_text" of _ subseq-of? ] filter ;
+: filter-by-itext-prop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] filter ;
 
-: filter-by-oracle-itext ( seq string -- seq' )
-    >lower
-    '[ "oracle_text" of >lower _ subseq-of? ] filter ;
+: filter-by-text-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] filter ;
+
+: filter-by-oracle-text ( seq string -- seq' ) "oracle_text" filter-by-text-prop ;
+: filter-by-oracle-itext ( seq string -- seq' ) "oracle_text" filter-by-itext-prop ;
+
+: filter-by-name-text ( seq string -- seq' ) "name" filter-by-text-prop ;
+: filter-by-name-itext ( seq string -- seq' ) "name" filter-by-itext-prop ;
 
 : filter-flash ( seq -- seq' ) "Flash" filter-by-oracle-text ;
 
@@ -405,10 +426,31 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : mat-cards ( -- seq ) mtg-oracle-cards [ "set" of "mat" = ] filter ;
 
 : woe-cards ( -- seq ) mtg-oracle-cards [ "set" of "woe" = ] filter ;
+: woe-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "wot" = ] filter ;
+: woe-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "woe" "wot" } member? ] filter ;
+
 : lci-cards ( -- seq ) mtg-oracle-cards [ "set" of "lci" = ] filter ;
 : mkm-cards ( -- seq ) mtg-oracle-cards [ "set" of "mkm" = ] filter ;
 : otj-cards ( -- seq ) mtg-oracle-cards [ "set" of "otj" = ] filter ;
+: otj-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "big" = ] filter ;
+: otj-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "otj" "big" } member? ] filter ;
 
 ERROR: unknown-mtg-card name ;
+: card-by-name ( name -- card )
+    [ all-cards-by-name ] dip ?of [ unknown-mtg-card ] unless ;
+
 : card-by-name. ( name -- )
-    [ all-cards-by-name ] dip ?of [ normal-card. ] [ unknown-mtg-card ] if ;
+    card-by-name normal-card. ;
+
+: sort-cards-by-colors ( seq -- seq' )
+    {
+        { [ "color_identity" of length ] <=> }
+        { [ "color_identity" of sort ?first "A" or ] <=> }
+        { [ "cmc" of ] <=> }
+        { [ "mana_cost" of length ] <=> }
+        { [ "Creature" any-type? -1 1 ? ] <=> }
+        { [ "name" of ] <=> }
+    }
+    sort-with-spec ;
+
+: cards-by-color. ( seq -- ) sort-cards-by-colors normal-cards. ;
