@@ -78,7 +78,7 @@ big-endian off
 : push-arg2 ( -- ) 8 ds-reg arg2 STRpre ;
 
 : push-down0 ( n -- ) neg bootstrap-cells ds-reg temp0 STRpre ;
-: push-down-arg3 ( -- ) -8 ds-rg arg3 STRpre ;
+: push-down-arg3 ( -- ) -8 ds-reg arg3 STRpre ;
 
 : store0 ( -- ) 0 ds-reg temp0 STRuoff ;
 : store1 ( -- ) 0 ds-reg temp1 STRuoff ;
