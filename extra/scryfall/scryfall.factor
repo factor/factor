@@ -1,9 +1,9 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-combinators combinators.short-circuit grouping http.download
-images.loader images.viewer io io.directories json json.http
-kernel math math.combinatorics math.order math.parser
+calendar.parser combinators combinators.short-circuit grouping
+http.download images.loader images.viewer io io.directories json
+json.http kernel math math.combinatorics math.order math.parser
 math.statistics namespaces sequences sequences.deep
 sequences.extras sets sorting sorting.specification splitting
 strings ui.gadgets.panes unicode urls ;
@@ -442,15 +442,42 @@ ERROR: unknown-mtg-card name ;
 : card-by-name. ( name -- )
     card-by-name normal-card. ;
 
-: sort-cards-by-colors ( seq -- seq' )
+: sort-by-colors ( seq -- seq' )
     {
         { [ "color_identity" of length ] <=> }
         { [ "color_identity" of sort ?first "A" or ] <=> }
         { [ "cmc" of ] <=> }
         { [ "mana_cost" of length ] <=> }
         { [ "Creature" any-type? -1 1 ? ] <=> }
+        { [ "power" of -1 1 ? ] <=> }
+        { [ "toughness" of -1 1 ? ] <=> }
         { [ "name" of ] <=> }
     }
     sort-with-spec ;
 
-: cards-by-color. ( seq -- ) sort-cards-by-colors normal-cards. ;
+: cards-by-color. ( seq -- ) sort-by-colors normal-cards. ;
+
+CONSTANT: rarity-to-number H{
+    { "common" 0 }
+    { "uncommon" 1 }
+    { "rare" 2 }
+    { "mythic" 3 }
+}
+
+: sort-by-rarity ( seq -- seq' )
+    {
+        { [ "rarity" of rarity-to-number at ] <=> }
+        { [ "color_identity" of length ] <=> }
+        { [ "color_identity" of sort ?first "A" or ] <=> }
+        { [ "cmc" of ] <=> }
+        { [ "mana_cost" of length ] <=> }
+        { [ "name" of ] <=> }
+    } sort-with-spec ;
+
+: cards-by-rarity. ( seq -- ) sort-by-rarity normal-cards. ;
+
+: sort-by-release ( seq -- seq' )
+    {
+        { [ "released_at" of ymd>timestamp ] <=> }
+        { [ "set" of ] <=> }
+    } sort-with-spec ;
