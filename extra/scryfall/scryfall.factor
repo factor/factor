@@ -194,11 +194,11 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-sultai-exact ( seq -- seq' ) { "B" "G" "U" } find-exact-color-identities ;
 : filter-temur-exact ( seq -- seq' ) { "G" "U" "R" } find-exact-color-identities ;
 
-: filter-non-white ( seq -- seq' ) { "U" "B" "R" "G" } find-any-color-identities ;
-: filter-non-blue ( seq -- seq' ) { "W" "B" "R" "G" } find-any-color-identities ;
-: filter-non-black ( seq -- seq' ) { "W" "U" "R" "G" } find-any-color-identities ;
-: filter-non-red ( seq -- seq' ) { "W" "U" "B" "G" } find-any-color-identities ;
-: filter-non-green ( seq -- seq' ) { "W" "U" "B" "R" } find-any-color-identities ;
+: filter-non-white ( seq -- seq' ) { "U" "B" "R" "G" } find-only-color-identities ;
+: filter-non-blue ( seq -- seq' ) { "W" "B" "R" "G" } find-only-color-identities ;
+: filter-non-black ( seq -- seq' ) { "W" "U" "R" "G" } find-only-color-identities ;
+: filter-non-red ( seq -- seq' ) { "W" "U" "B" "G" } find-only-color-identities ;
+: filter-non-green ( seq -- seq' ) { "W" "U" "B" "R" } find-only-color-identities ;
 
 : filter-legalities ( seq name -- seq' ) '[ "legalities" of _ of "legal" = ] filter ;
 : filter-standard ( seq -- seq' ) "standard" filter-legalities ;
