@@ -78,22 +78,21 @@ MEMO: scryfall-rulings-json ( -- json )
     ensure-scryfall-images-directory
     small-images [ download-scryfall-image load-image ] map ;
 
-: filter-card-by-name ( seq name -- card ) >lower '[ "name" of >lower _ = ] filter ;
-: cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
-: cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
-: cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
-: cards-by-color-identity ( seq -- assoc ) [ "color_identity" of ] collect-by-multi ;
-: red-color-identity ( seq -- seq' ) cards-by-color-identity "R" of ;
-: blue-color-identity ( seq -- seq' ) cards-by-color-identity "U" of ;
-: green-color-identity ( seq -- seq' ) cards-by-color-identity "G" of ;
-: black-color-identity ( seq -- seq' ) cards-by-color-identity "B" of ;
-: white-color-identity ( seq -- seq' ) cards-by-color-identity "W" of ;
+: collect-cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
+: collect-cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
+: collect-cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
+: collect-cards-by-color-identity ( seq -- assoc ) [ "color_identity" of ] collect-by-multi ;
+: red-color-identity ( seq -- seq' ) collect-cards-by-color-identity "R" of ;
+: blue-color-identity ( seq -- seq' ) collect-cards-by-color-identity "U" of ;
+: green-color-identity ( seq -- seq' ) collect-cards-by-color-identity "G" of ;
+: black-color-identity ( seq -- seq' ) collect-cards-by-color-identity "B" of ;
+: white-color-identity ( seq -- seq' ) collect-cards-by-color-identity "W" of ;
 
 : find-card-by-color-identity-intersect ( cards colors -- cards' )
-    [ cards-by-color-identity ] dip [ of ] with map intersect-all ;
+    [ collect-cards-by-color-identity ] dip [ of ] with map intersect-all ;
 
 : find-any-color-identities ( cards colors -- cards' )
-    [ cards-by-color-identity ] dip [ of ] with map union-all ;
+    [ collect-cards-by-color-identity ] dip [ of ] with map union-all ;
 
 : color-identity-complement ( seq -- seq' ) [ { "B" "G" "R" "U" "W" } ] dip diff ;
 
@@ -434,9 +433,6 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : otj-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "big" = ] filter ;
 : otj-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "otj" "big" } member? ] filter ;
 
-: cards-by-name. ( seq name -- )
-    filter-by-name-itext normal-cards. ;
-
 : sort-by-colors ( seq -- seq' )
     {
         { [ "color_identity" of length ] <=> }
@@ -476,6 +472,8 @@ CONSTANT: rarity-to-number H{
         { [ "released_at" of ymd>timestamp ] <=> }
         { [ "set" of ] <=> }
     } sort-with-spec ;
+
+: cards-by-name. ( seq name -- ) filter-by-name-itext sort-by-release normal-cards. ;
 
 : filter-mtg-cheat-sheet ( seq -- seq' )
     [
