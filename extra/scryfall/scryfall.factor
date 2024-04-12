@@ -1,12 +1,13 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-calendar.parser combinators combinators.short-circuit grouping
-http.download images.loader images.viewer io io.directories json
-json.http kernel math math.combinatorics math.order math.parser
-math.statistics namespaces sequences sequences.deep
-sequences.extras sets sorting sorting.specification splitting
-strings ui.gadgets.panes unicode urls ;
+calendar.parser combinators combinators.short-circuit
+combinators.smart grouping http.download images.loader
+images.viewer io io.directories json json.http kernel math
+math.combinatorics math.order math.parser math.statistics
+namespaces sequences sequences.deep sequences.extras sets
+sorting sorting.specification splitting strings ui.gadgets.panes
+unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -16,6 +17,7 @@ CONSTANT: scryfall-all-json-path "resource:scryfall-all-json"
 CONSTANT: scryfall-rulings-json-path "resource:scryfall-rulings-json"
 CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
+: ?write ( str/f -- ) [ write ] when* ;
 : ?print ( str/f -- ) [ print ] [ nl ] if* ;
 
 : download-scryfall-bulk-json ( -- json )
@@ -76,12 +78,7 @@ MEMO: scryfall-rulings-json ( -- json )
     ensure-scryfall-images-directory
     small-images [ download-scryfall-image load-image ] map ;
 
-MEMO: all-cards-by-name ( -- assoc )
-    mtg-oracle-cards
-    [ "name" of ] collect-by
-    [ first ] map-values ;
-
-: find-card-by-name ( seq name -- card ) '[ "name" of _ = ] filter ;
+: filter-card-by-name ( seq name -- card ) >lower '[ "name" of >lower _ = ] filter ;
 : cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
 : cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
 : cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
@@ -303,6 +300,9 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-by-name-itext ( seq string -- seq' ) "name" filter-by-itext-prop ;
 
 : filter-flash ( seq -- seq' ) "Flash" filter-by-oracle-text ;
+: filter-cycling ( seq -- seq' ) "Cycling" filter-by-oracle-text ;
+: filter-disguise ( seq -- seq' ) "Disguise" filter-by-oracle-text ;
+: filter-madness ( seq -- seq' ) "Madness" filter-by-oracle-text ;
 
 : power>n ( string -- n/f )
     [ "*" = ] [ drop -1 ] [ string>number ] ?if ;
@@ -351,25 +351,24 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : normal-cards. ( seq -- ) [ normal-card. ] each ;
 
-: card-face-summary. ( seq -- )
+! rarity is only on main card `json` (if there are two faces)
+: card-face-summary. ( json seq -- )
     {
-        [ "name" of write bl ]
-        [ "mana_cost" of ?print ]
-        [ "type_line" of ?print ]
-        [ [ "power" of ] [ "toughness" of ] bi 2dup and [ "/" glue print ] [ 2drop ] if ]
-        [ "oracle_text" of ?print ]
-    } cleave nl ;
+        [ nip "name" of write bl ]
+        [ nip "mana_cost" of ?write ]
+        [ nip "type_line" of ?write ]
+        [ drop bl "--" write bl "rarity" of >title ?print ]
+        [ nip [ "power" of ] [ "toughness" of ] bi 2dup and [ "/" glue print ] [ 2drop ] if ]
+        [ nip "oracle_text" of ?print ]
+    } 2cleave nl ;
 
-: card-face-summaries. ( seq -- ) [ card-face-summary. ] each ;
+: card-face-summaries. ( json seq -- ) [ card-face-summary. ] with each ;
 
 : card-summary. ( assoc -- )
-    {
-        [
-            [ "card_faces" of ]
-            [ [ length number>string "Card Faces: " prepend print ] [ card-face-summaries. ] bi ]
-            [ card-face-summary. ] ?if
-        ]
-    } cleave nl nl nl ;
+    dup
+    [ "card_faces" of ]
+    [ [ length number>string "Card Faces: " prepend print ] [ card-face-summaries. ] bi ]
+    [ card-face-summary. ] ?if nl nl nl ;
 
 : card-summaries. ( seq -- ) [ card-summary. ] each ;
 
@@ -435,12 +434,8 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : otj-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "big" = ] filter ;
 : otj-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "otj" "big" } member? ] filter ;
 
-ERROR: unknown-mtg-card name ;
-: card-by-name ( name -- card )
-    [ all-cards-by-name ] dip ?of [ unknown-mtg-card ] unless ;
-
-: card-by-name. ( name -- )
-    card-by-name normal-card. ;
+: cards-by-name. ( seq name -- )
+    filter-by-name-itext normal-cards. ;
 
 : sort-by-colors ( seq -- seq' )
     {
@@ -481,3 +476,17 @@ CONSTANT: rarity-to-number H{
         { [ "released_at" of ymd>timestamp ] <=> }
         { [ "set" of ] <=> }
     } sort-with-spec ;
+
+: filter-mtg-cheat-sheet ( seq -- seq' )
+    [
+        {
+            [ filter-instant ]
+            [ filter-flash ]
+            [ filter-cycling ]
+            [ filter-disguise ]
+            [ filter-madness ]
+        } cleave
+    ] { } append-outputs-as sort-by-colors ;
+
+: mtg-cheat-sheet. ( seq -- ) filter-mtg-cheat-sheet normal-cards. ;
+: mtg-cheat-sheet-text. ( seq -- ) filter-mtg-cheat-sheet card-summaries. ;
