@@ -91,23 +91,26 @@ PRIVATE>
 : download-as ( url path -- path )
     [ download-to-temporary-file ] dip [ ?move-file ] keep ;
 
-: download-into ( url path -- path )
+: download-into ( url directory -- path )
     [ [ download-to-temporary-file ] keep ] dip
     dup make-directories to-directory nip
     [ move-file ] keep ;
 
+: download ( url -- path )
+    dup download-name download-as ;
+
 : download-once-as ( url path -- path )
     dup file-exists? [ nip ] [ download-as ] if ;
 
-: download-once-into ( url path -- path ) to-directory download-once-as ;
+: download-once-into ( url directory -- path ) to-directory download-once-as ;
 
 : download-once ( url -- path ) "resource:" download-once-into ;
 
-: download-outdated-as ( url path duration -- path )
+: download-outdated-as ( url path duration -- path' )
     2dup delete-when-old [ drop download-as ] [ drop nip ] if ;
 
-: download-outdated-into ( url path duration -- path )
+: download-outdated-into ( url directory duration -- path )
     [ to-directory ] dip download-outdated-as ;
 
-: download ( url -- path )
-    dup download-name download-as ;
+: download-outdated ( url duration -- path )
+    [ dup download-name "resource:" to-directory nip ] dip download-outdated-as ;
