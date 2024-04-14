@@ -28,7 +28,7 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
 : load-scryfall-json ( type path -- uri )
     [ find-scryfall-json "download_uri" of ] dip
-    6 hours download-outdated-to path>json ;
+    10 days download-outdated-as path>json ;
 
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
@@ -68,7 +68,7 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : download-scryfall-image ( assoc -- path )
     dup scryfall-local-image-path dup delete-when-zero-size
-    [ download-once-to ] [ nip ] if ;
+    [ download-once-as ] [ nip ] if ;
 
 : download-normal-images ( seq -- seq' )
     ensure-scryfall-images-directory
@@ -219,6 +219,11 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-oldschool ( seq -- seq' ) "oldschool" filter-legalities ;
 : filter-premodern ( seq -- seq' ) "premodern" filter-legalities ;
 : filter-predh ( seq -- seq' ) "predh" filter-legalities ;
+
+: spanish-standard-cards ( -- seq )
+    scryfall-all-cards-json
+    filter-standard
+    [ "lang" of "es" = ] filter ;
 
 : filter-red-any ( seq -- seq' ) [ "colors" of "R" swap member? ] filter ;
 : filter-red-only ( seq -- seq' ) [ "colors" of { "R" } = ] filter ;

@@ -98,7 +98,7 @@ CONSTANT: datasets-path "resource:datasets/"
             "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/t10k-images-idx3-ubyte.gz"
             "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/t10k-labels-idx1-ubyte.gz"
         }
-        [ [ download-once ] parallel-each ]
+        [ [ download-once-into ] parallel-each ]
         [ [ dup file-stem file-exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]
         [ [ file-stem binary file-contents ] map ] tri
         first4 {

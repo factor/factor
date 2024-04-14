@@ -58,7 +58,7 @@ CONSTANT: ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
 MEMO: default-dictionary ( -- counts )
     URL" https://norvig.com/big.txt" "big.txt" temp-file
-    download-once-to load-dictionary ;
+    download-once-as load-dictionary ;
 
 : (correct) ( word dictionary -- word/f )
     corrections ?first ;

@@ -26,7 +26,7 @@ IN: zealot.factor
     [ download-boot-checksum-branch ] if ;
 
 : download-boot-image ( path url -- )
-    '[ _ my-arch-name "boot.%s.image" sprintf download-to drop ] with-directory ;
+    '[ _ my-arch-name "boot.%s.image" sprintf download-as drop ] with-directory ;
 
 : arch-git-boot-image-path ( arch git-id -- str )
     "https://downloads.factorcode.org/images/build/boot.%s.image.%s" sprintf ;
