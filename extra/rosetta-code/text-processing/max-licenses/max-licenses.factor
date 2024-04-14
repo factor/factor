@@ -63,7 +63,7 @@ TUPLE: maxlicense max-count current-count times ;
 
 MEMO: mlijobs ( -- lines )
     URL" https://raw.githubusercontent.com/def-/nim-unsorted/master/mlijobs.txt"
-    "mlijobs.txt" temp-file download-once-to ascii file-lines ;
+    "mlijobs.txt" temp-file download-once-as ascii file-lines ;
 
 PRIVATE>
 

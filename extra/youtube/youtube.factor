@@ -73,5 +73,5 @@ CONSTANT: video-info-url URL" https://www.youtube.com/get_video_info"
         video-formats [ "type" of "video/mp4" head? ] find nip
         video-download-url
     ] [
-        "title" of sanitize ".mp4" append download-once-to
+        "title" of sanitize ".mp4" append download-once-as
     ] tri ;

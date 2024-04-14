@@ -19,7 +19,7 @@ IN: unicode.collation.tests
 
 : collation-test-lines ( -- lines )
     "https://downloads.factorcode.org/misc/UCA/15.1.0/CollationTest_SHIFTED.txt"
-    "CollationTest_SHIFTED_15.1.0.txt" cache-file download-once-to
+    "CollationTest_SHIFTED_15.1.0.txt" cache-file download-once-as
     utf8 file-lines [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )

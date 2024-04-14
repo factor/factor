@@ -10,13 +10,13 @@ HELP: download
 { $notes "Use this to download the file every time." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
-HELP: download-to
+HELP: download-as
 { $values { "url" { $or url string } } { "path" "a pathname string" } }
 { $description "Downloads the contents of the URL to a file with the given pathname and returns the pathname." }
 { $notes "Use this to download the file every time." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
-HELP: download-once-to
+HELP: download-once-as
 { $values { "url" { $or url string } } { "path" "a pathname string" } }
 { $description "If the file exists on disk, returns that pathname without downloading anything. Otherwise, downloads the contents of the URL to a file with the given pathname and returns the pathname." }
 { $notes "Use this if the contents of the URL are not expected to change." }
@@ -29,8 +29,8 @@ ARTICLE: "http.download" "HTTP Download Utilities"
 "Utilities to retrieve a " { $link url } " and save the contents to a file:"
 { $subsections
     download
-    download-to
-    download-once-to
+    download-as
+    download-once-as
 }
 ;
 

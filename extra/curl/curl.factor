@@ -34,7 +34,7 @@ DESTRUCTOR: fclose
 
 PRIVATE>
 
-: curl-download-to ( url path -- )
+: curl-download-as ( url path -- )
     [
         curl-init
         [ swap curl-set-file ]

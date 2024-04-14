@@ -42,7 +42,7 @@ IN: rosettacode.anagrams-deranged
 
 : default-word-list ( -- path )
     URL" https://raw.githubusercontent.com/quinnj/Rosetta-Julia/master/unixdict.txt"
-    "unixdict.txt" temp-file download-once-to ;
+    "unixdict.txt" temp-file download-once-as ;
 
 : longest-deranged-anagrams ( -- anagrams )
     default-word-list (longest-deranged-anagrams) ;

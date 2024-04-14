@@ -12,7 +12,7 @@ IN: http.download
     [ ago ] bi*
     over [ before? ] [ 2drop t ] if ;
 
-: delete-when-old ( path duration -- deleted? )
+: delete-when-old ( path duration -- deleted/missing? )
     dupd file-too-old-or-not-exists? [ ?delete-file t ] [ drop f ] if ;
 
 : file-matches-checksum? ( path checksum-type bytes -- ? )
@@ -84,20 +84,30 @@ IN: http.download
 
 PRIVATE>
 
-: download-to ( url path -- path )
-    [
-        [ download-temporary-name binary ] keep
-        '[ _ http-write-request ] with-unique-file-writer
-    ] dip [ move-file ] keep ;
+: download-to-temporary-file ( url -- path )
+    [ download-temporary-name binary ] keep
+    '[ _ http-write-request ] with-unique-file-writer ;
 
-: download-once-to ( url path -- path )
-    dup file-exists? [ nip ] [ download-to ] if ;
+: download-as ( url path -- path )
+    [ download-to-temporary-file ] dip [ ?move-file ] keep ;
 
-: download-once ( url -- path )
-    dup download-name download-once-to ;
+: download-into ( url path -- path )
+    [ [ download-to-temporary-file ] keep ] dip
+    dup make-directories to-directory nip
+    [ move-file ] keep ;
 
-: download-outdated-to ( url path duration -- path )
-    2dup delete-when-old [ drop download-to ] [ drop nip ] if ;
+: download-once-as ( url path -- path )
+    dup file-exists? [ nip ] [ download-as ] if ;
+
+: download-once-into ( url path -- path ) to-directory download-once-as ;
+
+: download-once ( url -- path ) "resource:" download-once-into ;
+
+: download-outdated-as ( url path duration -- path )
+    2dup delete-when-old [ drop download-as ] [ drop nip ] if ;
+
+: download-outdated-into ( url path duration -- path )
+    [ to-directory ] dip download-outdated-as ;
 
 : download ( url -- path )
-    dup download-name download-to ;
+    dup download-name download-as ;

@@ -42,7 +42,7 @@ IN: project-euler.098
 
 : wordlist ( -- seq )
     "https://projecteuler.net/project/resources/p098_words.txt"
-    "p098_words.txt" temp-file download-once-to
+    "p098_words.txt" temp-file download-once-as
     utf8 file-contents "," split [ rest-slice but-last ] map ;
 
 : squarelist ( n -- seq )
