@@ -903,20 +903,12 @@ big-endian off
 
     ! ### Comparisons
     { both-fixnums? [
-        ! temp0 ds-reg [] MOV
-        ! ds-reg bootstrap-cell SUB
         load1/0
-        ! temp0 ds-reg [] OR
         temp1 temp0 temp0 ORRr
-        ! temp0 tag-mask get TEST
         tag-mask get temp0 TSTi
-        ! temp0 \ f type-number MOV
         \ f type-number temp0 MOVwi
-        ! temp1 1 tag-fixnum MOV
         1 tag-fixnum temp1 MOVwi
-        ! temp0 temp1 CMOVE
         temp0 temp1 temp0 EQ CSEL
-        ! ds-reg [] temp0 MOV
         1 push-down0
     ] }
     { eq? [ EQ jit-compare ] }
