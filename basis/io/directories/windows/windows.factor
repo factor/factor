@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: system io.directories alien.strings
-io.pathnames io.backend io.files.windows destructors
+io.pathnames io.backend io.files.windows literals destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
 fry continuations classes.struct windows.time ;
