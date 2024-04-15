@@ -116,19 +116,7 @@ big-endian off
     ! ! 0 JMP f rc-relative rel-word-pic-tail
     ! 0 Br f rc-relative-arm64-branch rel-word-pic-tail
     absolute-jump rel-word-pic-tail
-    ] JIT-WORD-JUMP jit-define
-
-! ! Factor 2024 Clinic Code:
-! ! ! x86.64 version
-! ! pic-tail-reg 5 [RIP+] LEA
-! ! 0 JMP f rc-relative rel-word-pic-tail
-! ! ! x86.32 version
-! ! pic-tail-reg 0 MOV 0 rc-absolute-cell rel-here
-! ! 0 JMP f rc-relative rel-word-pic-tail
-! ! vvv OUR IMPLEMENTATION ATTEMPT vvv
-! 4 pic-tail-reg ADR
-! 0 Br rc-relative-arm64-branch rel-word
-
+] JIT-WORD-JUMP jit-define
 
 [
     ! ! 0 CALL f rc-relative rel-word-pic
@@ -138,29 +126,12 @@ big-endian off
     absolute-call rel-word-pic
 ] JIT-WORD-CALL jit-define
 
-! ! Factor 2024 Clinic Code:
-! 0 BL rc-relative-arm64-branch rel-word
-
-
 : jit-call ( name -- )
-    ! RAX 0 MOV f rc-absolute-cell rel-dlsym
-    ! RAX CALL ;
     absolute-call rel-dlsym ;
 
-! ! Factor 2024 Clinic Code
-! 0 return-reg MOV f rc-absolute-cell rel-dlsym
-! return-reg BL;
-
 :: jit-call-1arg ( arg1s name -- )
-    ! arg1 arg1s MOVr
-    ! name jit-call ;
     arg1s arg1 MOVr
     name jit-call ;
-
-! ! Factor 2024 Clinic Code
-! arg1s arg1 MOVr
-! name jit-call ;
-
 
 :: jit-call-2arg ( arg1s arg2s name -- )
     ! arg1 arg1s MOV
@@ -170,16 +141,7 @@ big-endian off
     arg2s arg2 MOVr
     name jit-call ;
 
-! ! Factor 2024 Clinic Code
-! arg1s arg1 MOVr
-! arg2s arg2 MOVr
-! name jit-call ;
-
-
 : jit-load-vm ( -- ) ;
-
-! ! Factor 2024 Clinic Code:
-! 0 0 vm-reg MOVZ 0 rc-absolute-arm64-movz rel-vm
 
 : jit-load-context ( -- )
     ! ctx-reg vm-reg vm-context-offset [+] MOV ;
@@ -207,11 +169,6 @@ big-endian off
     context-datastack-offset ctx-reg ds-reg LDRuoff
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
-! ! Factor 2024 Clinic Code:
-! context-datastack-top-offset ctx-reg ds-reg LDRuoff
-! context-retainstack-top-offset ctx-reg rs-reg LDRuoff
-
-
 [
     ! ! ctx-reg is preserved across the call because it is non-volatile
     ! ! in the C ABI
@@ -225,23 +182,12 @@ big-endian off
     jit-restore-context
 ] JIT-PRIMITIVE jit-define
 
-! ! Factor 2024 Clinic Code:
-! ! ctx-reg is preserved across the call because it is 
-! ! non-volatile in the C ABI
-! jit-save-context
-! ! call the primitive
-! vm-reg arg1 MOVr
-! 0 BL rc-relative-arm64-branch rel-dlsym
-! jit-restore-context
-
-
 : jit-jump-quot ( -- )
     ! arg1 quot-entry-point-offset [+] JMP ;
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BR ;
 
 : jit-call-quot ( -- )
-    ! arg1 quot-entry-point-offset [+] CALL ;
     push-link-reg
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BLR
@@ -273,10 +219,6 @@ big-endian off
     3 words Br
     NOP NOP f rc-absolute-cell rel-literal
 ] PIC-CHECK-TUPLE jit-define
-
-! ! Factor 2024 Clinic Code:
-! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
-! temp2 temp1 CMPr
 
 
 ! Inline cache miss entry points
@@ -382,22 +324,8 @@ big-endian off
     jit-push-param
     jit-jump-quot ;
 
-! ! Factor 2024 Clinic Code:
-
-! jit-save-context
-! vm-reg "new_context" jit-call-1arg
-! jit-pop-quot-and-param
-! jit-save-context
-! return-reg jit-switch-context
-! jit-push-param
-! jit-jump-quot ;
-
-
 : jit-delete-current-context ( -- )
     vm-reg "delete_context" jit-call-1arg ;
-
-! ! Factor 2024 Clinic Code:
-! vm-reg "delete_context" jit-call-1arg ;
 
 ! Resets the active context and instead the passed in quotation
 ! becomes the new code that it executes.
@@ -420,26 +348,12 @@ big-endian off
     ! Jump to quotation arg1
     jit-jump-quot ;
 
-! Factor 2024 Clinic Code:
-! jit-save-context
-! vm-reg "reset_context" jit-call-1arg
-! ctx-reg jit-switch-context
-! ! arg1 ds-reg [] MOV
-! ! ds-reg 8 SUB
-! pop-arg1
-! jit-jump-quot ;
-
 [
-    ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
     3 words temp0 LDRl
     0 temp0 W0 STRuoff
     3 words Br
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
-
-! ! Factor 2024 Clinic Code:
-! 0 temp0 0 MOVZ rc–arm-64-???? rel-safepoint
-
 
 ! C to Factor entry point
 [
@@ -451,8 +365,7 @@ big-endian off
     ! frame-reg PUSH
     ! frame-reg stack-reg MOV
 
-    ! ! Save all non-volatile registers
-    ! nv-regs [ PUSH ] each
+    ! Save all non-volatile registers
     -16 SP X19 X18 STPpre
     -16 SP X21 X20 STPpre
     -16 SP X23 X22 STPpre
@@ -464,74 +377,52 @@ big-endian off
 
     jit-save-tib
 
-    ! ! Load VM into vm-reg
-    ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+    ! Load VM into vm-reg
     2 words vm-reg LDRl
     3 words Br
     NOP NOP 0 rc-absolute-cell rel-vm
 
-    ! ! Save old context
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! nv-reg PUSH
+    ! Save old context
     vm-context-offset vm-reg ctx-reg LDRuoff
     8 SP ctx-reg STRuoff
 
-    ! ! Switch over to the spare context
-    ! nv-reg vm-reg vm-spare-context-offset [+] MOV
-    ! vm-reg vm-context-offset [+] nv-reg MOV
+    ! Switch over to the spare context
     vm-spare-context-offset vm-reg ctx-reg LDRuoff
     vm-context-offset vm-reg ctx-reg STRuoff
 
-    ! ! Save C callstack pointer
-    ! nv-reg context-callstack-save-offset [+] stack-reg MOV
-
+    ! Save C callstack pointer
     stack-reg temp0 MOVsp
     context-callstack-save-offset ctx-reg temp0 STRuoff
-    ! stack-reg X24 MOVsp
-    ! NOP
 
-    ! ! Load Factor stack pointers
-    ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
+    ! Load Factor stack pointers
     context-callstack-bottom-offset ctx-reg temp0 LDRuoff
     temp0 stack-reg MOVsp
 
     ctx-reg jit-update-tib
     jit-install-seh
 
-    ! rs-reg nv-reg context-retainstack-offset [+] MOV
-    ! ds-reg nv-reg context-datastack-offset [+] MOV
     context-retainstack-offset ctx-reg rs-reg LDRuoff
     context-datastack-offset ctx-reg ds-reg LDRuoff
 
-    ! ! Call into Factor code
-    ! link-reg 0 MOV f rc-absolute-cell rel-word
-    ! link-reg CALL
+    ! Call into Factor code
     3 words temp0 LDRl
     temp0 BLR
     3 words Br
     NOP NOP f rc-absolute-cell rel-word
 
-    ! ! Load C callstack pointer
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! stack-reg nv-reg context-callstack-save-offset [+] MOV
+    ! Load C callstack pointer
     vm-context-offset vm-reg ctx-reg LDRuoff
 
     context-callstack-save-offset ctx-reg temp0 LDRuoff
     temp0 stack-reg MOVsp
-    ! X24 stack-reg MOVsp
-    ! NOP
 
-    ! ! Load old context
-    ! nv-reg POP
-    ! vm-reg vm-context-offset [+] nv-reg MOV
+    ! Load old context
     8 SP ctx-reg LDRuoff
     vm-context-offset vm-reg ctx-reg STRuoff
 
     jit-restore-tib
 
-    ! ! Restore non-volatile registers
-    ! nv-regs <reversed> [ POP ] each
-    ! frame-reg POP
+    ! Restore non-volatile registers
     16 SP X30 LDRpost
     16 SP X29 X28 LDPpost
     16 SP X27 X26 LDPpost
@@ -540,34 +431,20 @@ big-endian off
     16 SP X21 X20 LDPpost
     16 SP X19 X18 LDPpost
 
-    ! ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
-    ! ! need a parameter here.
+    ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! need a parameter here.
 
     f RET
 ] CALLBACK-STUB jit-define
 
 [
-    ! ! load literal
-    ! temp0 0 MOV f rc-absolute-cell rel-literal
+    ! load literal
     2 words temp0 LDRl
     3 words Br
     NOP NOP f rc-absolute-cell rel-literal
-    ! ! increment datastack pointer
-    ! ds-reg bootstrap-cell ADD
-    ! ! store literal on datastack
-    ! ds-reg [] temp0 MOV
+    ! store literal on datastack
     push0
 ] JIT-PUSH-LITERAL jit-define
-
-! ! Factor 2024 Clinic Code:
-! [
-!    0 f rc-absolute-cell rel-literal
-!    [ temp0 MOVwi ]
-!    [ -16 shift 1 swap temp0 MOVK ]
-!    bi
-!    push0
-! ] JIT-PUSH-LITERAL jit-define
-
 
 ! The *-signal-handler subprimitives are special-cased in vm/quotations.cpp
 ! not to trigger generation of a stack frame, so they can
@@ -633,83 +510,32 @@ big-endian off
     16 SP X1 X0 LDPpost ;
 
 [
-    ! ! load boolean
-    ! temp0 ds-reg [] MOV
-    ! ! pop boolean
-    ! ds-reg bootstrap-cell SUB
+    ! pop boolean
     pop0
-    ! ! compare boolean with f
-    ! temp0 \ f type-number CMP
+    ! compare boolean with f
     \ f type-number temp0 CMPi
-    ! ! jump to true branch if not equal
-    ! ! 0 JNE f rc-relative rel-word
-    ! 0 NE B.cond f rc-relative-arm64-bcond rel-word
+    ! skip over true branch if equal
     5 words EQ B.cond
+    ! jump to true branch
     absolute-jump rel-word
-    ! ! jump to false branch if equal
-    ! ! 0 JMP f rc-relative rel-word
-    ! 0 Br f rc-relative-arm64-branch rel-word
+    ! jump to false branch
     absolute-jump rel-word
 ] JIT-IF jit-define
 
-! ! Factor 2024 Clinic Code:
-! ! load boolean
-! temp0 ds-reg [] MOVZ !these inputs might be in the wrong order
-! ! pop boolean
-! ds-reg bootstrap-cell SUBi
-! ! ! compare boolean with f
-! \ f type-number temp0 CMPr
-! ! jump to true branch if not equal
-! 0 NE B.cond f rc-relative-arm64-bcond rel-word
-! ! jump to false branch if equal
-! 0 Br f rc-relative-arm64-branch rel-word
-
-
-! ! Factor 2024 Clinic Code:
-! ! load and pop boolean
-! pop0
-! ! compare boolean with f
-! \ f type-number temp0 CMPr
-! ! jump to true branch if not equal
-! 0 NE B.cond f rc-relative-arm64-bcond rel-word
-! ! jump to false branch if equal
-! 0 Br f rc-relative-arm64-branch rel-word
-
-
 [
     >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r>
 ] JIT-DIP jit-define
 
-! ! Factor 2024 Clinic Code:
-! >r
-! push-link-reg
-! 0 BL rc-relative-arm64-branch rel-word
-! pop-link-reg
-! r>
-
-
 [
     >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r> r>
 ] JIT-2DIP jit-define
 
 [
     >r >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r> r> r>
 ] JIT-3DIP jit-define
@@ -739,37 +565,17 @@ big-endian off
     temp0 BR
 ] JIT-EXECUTE jit-define
 
-! ! Factor 2024 Clinic Code:
-! pop0
-! word-entry-point-offset temp0 temp0 ADDi
-! temp0 Br
-
-
 ! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
 [
     ! ! make room for LR plus magic number of callback, 16byte align
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
     stack-frame-size stack-reg stack-reg SUBi
     push-link-reg
 ] JIT-PROLOG jit-define
 
-! ! Factor 2024 Clinic Code:
-! ! stack-reg stack-frame-size bootstrap-cell - SUB
-! stack-frame-size stack-reg stack-reg SUBi
-! push-link-reg
-
-
 [
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
     pop-link-reg
     stack-frame-size stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
-
-! ! Factor 2024 Clinic Code:
-! ! stack-reg stack-frame-size bootstrap-cell - ADD
-! pop-link-reg
-! stack-frame-size stack-reg stack-reg ADDi
-
 
 [ f RET ] JIT-RETURN jit-define
 
@@ -788,10 +594,11 @@ big-endian off
 ] PIC-LOAD jit-define
 
 ! ! Factor 2024 Clinic Code:
+! ! this arm relocation could actually work
+! ! due to the small bitwidth required  
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 ds-reg temp1 LDRr
-
 
 [
     ! temp1/32 tag-mask get AND
@@ -812,20 +619,6 @@ big-endian off
     ] jit-conditional
 ] PIC-TUPLE jit-define
 
-! ! Factor 2024 Clinic Code:
-! ! temp0 temp1 MOV
-! temp1 temp0 MOVr (put temp1 into temp0)
-!  ! temp1/32 tag-mask get AND
-! tag-mask get temp1 temp1 ANDi (get the tag from the temp1 addr)
-! ! temp1/32 tuple type-number CMP
-! tuple type-number temp1 CMPi 
-! ! [ JNE ]
-! ! [ temp1 temp0 tuple-class-offset [+] MOV ]
-! [ NE B.cond ] [
-!   tuple-class-offset temp0 temp1 LDUR
-! ] jit-conditional
-
-
 [
     ! temp1/32 0x7f CMP f rc-absolute-1 rel-untagged
     4 words temp2 ADR
@@ -836,6 +629,8 @@ big-endian off
 ] PIC-CHECK-TAG jit-define
 
 ! ! Factor 2024 Clinic Code:
+! ! this arm relocation could actually work
+! ! due to the small bitwidth required  
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 temp1 CMPr
@@ -847,10 +642,6 @@ big-endian off
     5 words NE B.cond
     absolute-jump rel-word
 ] PIC-HIT jit-define
-
-! ! Factor 2024 Clinic Code:
-! 0 EQ B.cond f rc-relative-arm64-bcond rel-word
-
 
 ! ! ! Megamorphic caches
 
@@ -912,123 +703,48 @@ big-endian off
 
 ! Comparisons
 : jit-compare ( cond -- )
-    ! ! load t
-    ! temp3 0 MOV t rc-absolute-cell rel-literal
+    ! load t
     2 words temp3 LDRl
     3 words Br
     NOP NOP t rc-absolute-cell rel-literal
-    ! ! load f
-    ! temp1 \ f type-number MOV
+    ! load f
     \ f type-number temp2 MOVwi
-    ! ! load first value
-    ! temp0 ds-reg [] MOV
-    ! ! adjust stack pointer
-    ! ds-reg bootstrap-cell SUB
+    ! load values
     load1/0
-    ! ! compare with second value
-    ! ds-reg [] temp0 CMP
+    ! compare
     temp1 temp0 CMPr
-    ! ! move t if true
-    ! [ temp1 temp3 ] dip execute( dst src -- )
+    ! move t if true (f otherwise)
     [ temp2 temp3 temp0 ] dip CSEL
-    ! ! store
-    ! ds-reg [] temp1 MOV
+    ! store
     1 push-down0 ;
-
-! ! Factor 2024 Clinic Code:
-! ! temp3 0 MOV t rc-absolute-cell rel-literal
-! 0 0 temp3 MOVZ t rc-? rel-?
-! ! temp1 \ f type-number MOV
-! 0 \ f type-number temp1 MOVZ
-! ! temp0 ds-reg [] MOV
-! ! ds-reg bootstrap-cell SUB
-! pop0
-!   ! ds-reg [] temp0 CMP
-! temp0 ds-reg [] CMPr 
-! ! [ temp1 temp3 ] dip execute( dst src -- )
-! [ temp1 temp3 ] dip execute( dst src -- )
-! ! ds-reg [] temp1 MOV ;
-! temp1 ds-reg [] MOVZ ;
-
 
 ! Math
 
 ! Overflowing fixnum arithmetic
 : jit-overflow ( insn func -- )
-    ! ds-reg 8 SUB
     jit-save-context
-    ! arg1 ds-reg [] MOV
-    ! arg2 ds-reg 8 [+] MOV
     load-arg1/2
-    ! arg3 arg1 MOV
-    ! [ [ arg3 arg2 ] dip call ] dip
     [ [ arg2 arg1 arg3 ] dip call ] dip
-    ! ds-reg [] arg3 MOV
     push-down-arg3
-    ! [ JNO ]
     [ 8 fixnum+fast VC B.cond ] [
-        ! arg3 vm-reg MOV
         vm-reg arg3 MOVr
         jit-call
     ] jit-conditional ; inline
 
-! ! Factor 2024 Clinic Code:
-! : jit-overflow ( insn func -- )
-!     ! SUB in arm64 takes two registers instead of one (should be SUBi?)
-!     ds-reg ds-reg 8 SUBi
-!     ! not entirely sure what this does but looks like the implementation could be correct already
-!     jit-save-context 
-!     load-arg1/2 ! this loads a pair of registers replacing the x86 MOV
-!     [ [ arg2 arg1 arg3 ] dip call ] dip ! not sure why this is different from x86 version
-!     push-down-arg3 ! replaces another MOV instruction
-!     [ VC B.cond ] [
-!         ! arg3 vm-reg MOV
-!         vm-reg arg3 MOVr
-!         jit-call
-!     ] jit-conditional ; inline
-
-
 : jit-math ( insn -- )
-    ! ! load second input
-    ! temp0 ds-reg [] MOV
-    ! ! pop stack
-    ! ds-reg bootstrap-cell SUB
+    ! load inputs
     load1/0
-    ! ! compute result
-    ! [ ds-reg [] temp0 ] dip execute( dst src -- )
+    ! compute result
     [ temp0 temp1 temp0 ] dip execute( arg2 arg1 dst -- )
+    ! store result
     1 push-down0 ;
 
-! ! Factor 2024 Clinic Code:
-! ! temp0 ds-reg [] MOV
-! ! ds-reg bootstrap-cell SUB
-! pop0
-! ! [ ds-reg [] temp0 ] dip execute( dst src -- ) ;
-! [ ds-reg [] temp0 ] dip execute( dst src -- ) ;
-
-
 : jit-fixnum-/mod ( -- )
-    ! ! load second parameter
-    ! temp1 ds-reg [] MOV
-    ! ! load first parameter
-    ! div-arg ds-reg bootstrap-cell neg [+] MOV
+    ! load parameters
     load1/0
-    ! ! divide
+    ! divide
     temp0 temp1 temp2 SDIV
     temp1 temp0 temp2 temp0 MSUB ;
-
-! ! Factor 2024 Clinic Code:
-! ! temp1 ds-reg [] MOV
-! 0 ds-reg temp1 [] MOVZ
-! ! div-arg ds-reg bootstrap-cell neg [+] MOV
-! 0 ds-reg bootstrap-cell neg [+] div-arg MOVZ
-! ! mod-arg div-arg MOV
-! 0 div-arg mod-arg MOVZ
-! ! mod-arg bootstrap-cell-bits 1 - SAR
-! bootstrap-cell-bits 1 - mod-arg mod-arg ASRi
-! ! temp1 IDIV ;
-! ???
-
 
 ! # All arm.64 subprimitives
 {
@@ -1079,34 +795,6 @@ big-endian off
         [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
     { fixnum* [
         [ MUL ] "overflow_fixnum_multiply" jit-overflow ] }
-    ! { fixnum* [
-    !     0x210 BRK 
-    !     ! ds-reg 8 SUB
-    !     jit-save-context
-    !     ! RCX ds-reg [] MOV
-    !     ! RBX ds-reg 8 [+] MOV
-    !     load1/0
-    !     ! RBX tag-bits get SAR
-    !     temp0 untag
-    !     ! RAX RCX MOV
-    !     ! RBX IMUL
-    !     ! RAX * RBX = RDX:RAX
-    !     temp1 temp0 temp0 MUL
-    !     ! ds-reg [] RAX MOV
-    !     1 push-down0
-    !     ! [ JNO ]
-    !     [ 8 fixnum+fast VC B.cond ] [ 
-    !         ! arg1 RCX MOV
-    !         temp1 arg1 MOVr
-    !         ! arg1 tag-bits get SAR
-    !         temp1 untag
-    !         ! arg2 RBX MOV
-    !         temp0 arg2 MOVr
-    !         ! arg3 vm-reg MOV
-    !         vm-reg arg3 MOVr
-    !         "overflow_fixnum_multiply" jit-call
-    !     ] jit-conditional
-    ! ] }
 
     ! ## Misc
     { fpu-state [
@@ -1122,7 +810,6 @@ big-endian off
 ! ! Factor 2024 Clinic Code:
 ! FPCR arg1 MRS
 ! FPSR XZR MSRr
-
 
     { set-fpu-state [
         ! RSP 2 SUB
@@ -1169,29 +856,11 @@ big-endian off
     ] }
 
     ! ! Factor 2024 Clinic Code:
-    ! ! arg4 ds-reg [] MOV
-    ! ! ds-reg bootstrap-cell SUB
-    ! pop0
-    ! jit-load-context
-    ! ! arg1 ctx-reg context-callstack-bottom-offset [+] MOV
-    ! context-callstack-top-offset ctx-reg arg1 LDRuoff
-    ! ! arg2 arg4 callstack-top-offset [+] LEA
-    ! callstack-top-offset temp0 arg2 ADDi
-    ! ! arg3 arg4 callstack-length-offset [+] MOV
-    ! callstack-length-offset arg4 arg3 LDRuoff ! *
-    ! ! arg3 tag-bits get SHR
-    ! tag-bits get arg3 arg3 LSRi
-    ! ! arg1 arg3 SUB
-    ! arg3 arg1 arg1 SUBr
-    ! ! RSP arg1 MOV
-    ! arg1 stack-reg MOVsp
-    ! ! RSP 32 SUB
-    ! 32 stack-reg stack-reg SUBi
-    ! "factor_memcpy" jit-call
-    ! ! RSP 32 ADD
-    ! 32 stack-reg stack-reg ADDi
-    ! ! 0 RET
-    ! f RET
+    ! ! we think the below two lines
+    ! ! 2 temp0 temp0 SUBi ! callstack-length-offset
+    ! ! 0 temp0 arg3 LDRuoff
+    ! ! may need to be replaced with:
+    ! callstack-length-offset arg4 arg3 LDRuoff
 
 
     ! ## Fixnums
@@ -1202,48 +871,33 @@ big-endian off
     ! ### Bit manipulation
     { fixnum-bitand [ \ ANDr jit-math ] }
     { fixnum-bitnot [
-        ! ! complement
-        ! ds-reg [] NOT
         load0
+        ! complement
         temp0 temp0 MVN
-        ! ! clear tag bits
-        ! ds-reg [] tag-mask get XOR
+        ! clear tag bits
         tag-mask get temp0 temp0 EORi
         store0
     ] }
     { fixnum-bitor [ \ ORRr jit-math ] }
     { fixnum-bitxor [ \ EORr jit-math ] }
     { fixnum-shift-fast [
-        ! ! load shift count
-        ! shift-arg ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! load value
-        ! temp3 ds-reg [] MOV
+        ! load shift count and value
         load1/0
-        ! ! untag shift count
-        ! shift-arg tag-bits get SAR
+        ! untag shift count
         temp0 untag
-        ! ! make a copy
-        ! temp2 temp3 MOV
+        ! make a copy
         temp1 temp2 MOVr
-        ! ! compute positive shift value in temp2
-        ! temp2 CL SHL
+        ! compute positive shift value in temp1
         temp0 temp1 temp1 LSLr
-        ! ! compute negative shift value in temp3
-        ! shift-arg NEG
+        ! compute negative shift value in temp2
         temp0 temp0 NEG
-        ! temp3 CL SAR
         temp0 temp2 temp2 ASRr
-        ! temp3 tag-mask get bitnot AND
         tag-mask get bitnot temp2 temp2 ANDi
-        ! ! if shift count was negative, move temp3 to temp2
-        ! shift-arg 0 CMP
-        ! temp2 temp3 CMOVGE
+        ! if shift count was negative
+        ! choose temp2 (else temp1)
         0 temp0 CMPi
         temp2 temp1 temp0 MI CSEL
-        ! ! push to stack
-        ! ds-reg [] temp2 MOV
+        ! push to stack
         1 push-down0
     ] }
 
@@ -1274,51 +928,33 @@ big-endian off
     ! ### Div/mod
     { fixnum-mod [
         jit-fixnum-/mod
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! push to stack
-        ! ds-reg [] mod-arg MOV
+        ! push to stack
         1 push-down0
     ] }
     { fixnum/i-fast [
         jit-fixnum-/mod
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! tag it
-        ! div-arg tag-bits get SHL
+        ! tag it
         tag-bits get temp2 temp0 LSLi
-        ! ! push to stack
-        ! ds-reg [] div-arg MOV
+        ! push to stack
         1 push-down0
     ] }
     { fixnum/mod-fast [
         jit-fixnum-/mod
-        ! ! tag it
-        ! div-arg tag-bits get SHL
+        ! tag it
         temp2 tag
-        ! ! push to stack
-        ! ds-reg [] mod-arg MOV
-        ! ds-reg bootstrap-cell neg [+] div-arg MOV
+        ! push to stack
         store2/0
     ] }
 
     ! ### Mul
     { fixnum*fast [
-        ! ! load second input
-        ! temp0 ds-reg [] MOV
-        ! ! pop stack
-        ! ds-reg bootstrap-cell SUB
-        ! ! load first input
-        ! temp1 ds-reg [] MOV
+        ! load both inputs
         load1/0
-        ! ! untag second input
-        ! temp0 tag-bits get SAR
+        ! untag second input
         temp0 untag
-        ! ! multiply
-        ! temp0 temp1 IMUL2
+        ! multiply
         temp1 temp0 temp0 MUL
-        ! ! push result
-        ! ds-reg [] temp0 MOV
+        ! push result
         1 push-down0
     ] }
 
@@ -1338,15 +974,6 @@ big-endian off
         ! rs-reg temp0 SUB
         temp0 rs-reg rs-reg SUBr
     ] }
-! ! Factor 2024 Clinic Code:
-! ! temp0 ds-reg [] MOV
-! ! ds-reg bootstrap-cell SUB
-! pop0
-! ! fixnum>slot@
-! tagged>offset0
-! ! rs-reg temp0 SUB
-! temp0 rs-reg rs-reg SUBr
-
 
     { get-local [
         ! ! load local number
@@ -1365,110 +992,64 @@ big-endian off
 
     ! ## Objects
     { slot [
-        ! ! load slot number
-        ! temp0 ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! load object
-        ! temp1 ds-reg [] MOV
+        ! load object and slot number
         load1/0
-        ! ! turn slot number into offset
+        ! turn slot number into offset
         tagged>offset0
-        ! ! mask off tag
-        ! temp1 tag-bits get SHR
-        ! temp1 tag-bits get SHL
+        ! mask off tag
         tag-mask get bitnot temp1 temp1 ANDi
-        ! ! load slot value
-        ! temp0 temp1 temp0 [+] MOV
+        ! load slot value
         temp1 temp0 temp0 LDRr
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         1 push-down0
     ] }
     { string-nth-fast [
-        ! ! load string index from stack
-        ! temp0 ds-reg bootstrap-cell neg [+] MOV
-        ! temp0 tag-bits get SHR
-        ! ! load string from stack
-        ! temp1 ds-reg [] MOV
+        ! load string index and string from stack
         load1/0
         temp1 untag
-        ! ! load character
-        ! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
-        ! temp0 temp0 8-bit-version-of MOVZX
-        ! temp0 tag-bits get SHL
+        ! load character
         string-offset temp0 temp0 ADDi
         temp1 temp0 temp0 LDRBr
         temp0 tag
-        ! ! store character to stack
-        ! ds-reg bootstrap-cell SUB
-        ! ds-reg [] temp0 MOV
+        ! store character to stack
         1 push-down0
     ] }
 
-! ! Factor 2024 Clinic Code:
-! string-nth-fast [
-!       !! load string index from stack
-!       ! temp0 ds-reg bootstrap-cell neg [+] MOV
-! 0 ds-reg bootstrap-cell neg [+] temp0 MOVZ
-!       ! temp0 tag-bits get SHR
-!   tag-bits get temp0 LSRi
-!       !! load string from stack
-!       ! temp1 ds-reg [] MOV
-!   0 ds-reg temp1 [] MOVZ
-!       !! load character
-!       ! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
-!   temp0 temp1 string-offset [++] temp0 8-bit-version MOVZ
-!       ! temp0 temp0 8-bit-version-of MOVZX
-!   temp0 8-bit-version-of UXTB temp0 MOVZ
-!       ! temp0 tag-bits get SHL
-!   tag-bits get temp0 LSLi
-!       !! store character to stack
-!       ! ds-reg bootstrap-cell SUB
-!       ! ds-reg [] temp0 MOV
-!   pop0
-!   ]
-
-
     { tag [
-        ! ! load from stack
-        ! temp0 ds-reg [] MOV
+        ! load from stack
         load0
-        ! ! compute tag
-        ! temp0/32 tag-mask get AND
+        ! compute tag
         tag-mask get temp0 temp0 ANDi
-        ! ! tag the tag
-        ! temp0/32 tag-bits get SHL
+        ! tag the tag
         temp0 tag
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         store0
     ] }
 
-    ! ! ## Shufflers
+    ! ## Shufflers
 
-    ! ! ### Drops
+    ! ### Drops
     { drop [ 1 ndrop ] }
     { 2drop [ 2 ndrop ] }
     { 3drop [ 3 ndrop ] }
     { 4drop [ 4 ndrop ] }
 
-    ! ! ### Dups
+    ! ### Dups
     { dup [ load0 push0 ] }
     { 2dup [ load1/0 push1 push0 ] }
     { 3dup [ load2 load1/0 push2 push1 push0 ] }
     { 4dup [ load3/2 load1/0 push3 push2 push1 push0 ] }
     { dupd [ load1/0 store1 push0 ] }
 
-    ! ! ### Misc shufflers
+    ! ### Misc shufflers
     { over [ load1 push1 ] }
     { pick [ load2 push2 ] }
 
-    ! ! ### Nips
+    ! ### Nips
     { nip [ load0 1 push-down0 ] }
     { 2nip [ load0 2 push-down0 ] }
 
-    ! ! ### Swaps
+    ! ### Swaps
     { -rot [ pop0 load2/1* store0/2 push1 ] }
     { rot [ pop0 load2/1* store1/0 push2 ] }
     { swap [ load1/0 store0/1 ] }
