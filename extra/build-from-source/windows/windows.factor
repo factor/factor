@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: build-from-source combinators.smart continuations
-environment http.client io.directories io.files.temp io.launcher
+environment http.download io.directories io.files.temp io.launcher
 io.pathnames kernel layouts qw sequences windows.shell32 ;
 IN: build-from-source.windows
 
@@ -396,7 +396,7 @@ IN: build-from-source.windows
 ! Probably not needed on Windows 10+
 : install-windows-redistributable ( -- )
     [
-        "https://aka.ms/vs/17/release/vc_redist.x64.exe" download
+        "https://aka.ms/vs/17/release/vc_redist.x64.exe" download drop
         qw{ vc_redist.x64.exe /install /passive /norestart } try-process
     ] with-temp-directory ;
 
