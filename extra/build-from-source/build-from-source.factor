@@ -184,9 +184,6 @@ ERROR: no-output-file path ;
         ] if*
     ] with-directory ; inline
 
-: ?download ( path -- )
-    dup file-name file-exists? [ drop ] [ download drop ] if ; inline
-
 : with-tar-gz ( path quot -- )
     '[
         _ dup "build-from-source considering tar.gz %s" sprintf print
@@ -195,10 +192,10 @@ ERROR: no-output-file path ;
         ] [
             "- building..." write
             [
-                [ ?download ]
-                [ file-name { "tar" "xvfz" } swap suffix try-process ]
-                [ file-name ".tar.gz" ?tail drop ] tri
-                prepend-current-path _ with-directory
+                download-once
+                [ { "tar" "xvfz" } swap suffix try-process ]
+                [ ".tar.gz" ?tail drop ] bi
+                _ with-directory
                 now timestamp>rfc3339
             ] dip utf8 set-file-contents
             "done!" print

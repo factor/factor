@@ -55,7 +55,7 @@ TUPLE: response-error response error ;
 : translate-tts ( text -- file )
     "https://translate.google.com/translate_tts?tl=en" >url
     swap "q" set-query-param [
-        "" ".mp3" unique-file download-to
+        "" ".mp3" unique-file download-as
     ] with-temp-directory ;
 
 ! Example:

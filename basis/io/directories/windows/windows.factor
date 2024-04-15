@@ -21,10 +21,13 @@ M: windows truncate-file
     ] with-disposal ;
 
 M: windows move-file
-    [ normalize-path ] bi@ MoveFile win32-error=0/f ;
+    [ normalize-path ] bi@
+    flags{ MOVEFILE_REPLACE_EXISTING MOVEFILE_COPY_ALLOWED }
+    MoveFileEx win32-error=0/f ;
 
 M: windows move-file-atomically
-    [ normalize-path ] bi@ 0 MoveFileEx win32-error=0/f ;
+    [ normalize-path ] bi@ MOVEFILE_REPLACE_EXISTING
+    MoveFileEx win32-error=0/f ;
 
 ERROR: file-delete-failed path error ;
 

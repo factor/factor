@@ -1,12 +1,13 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
-combinators combinators.short-circuit grouping http.download
-images.loader images.viewer io io.directories json json.http
-kernel math math.combinatorics math.order math.parser
-math.statistics namespaces sequences sequences.deep
-sequences.extras sets sorting sorting.specification splitting
-strings ui.gadgets.panes unicode urls ;
+calendar.parser combinators combinators.short-circuit
+combinators.smart grouping http.download images.loader
+images.viewer io io.directories json json.http kernel math
+math.combinatorics math.order math.parser math.statistics
+namespaces sequences sequences.deep sequences.extras sets
+sorting sorting.specification splitting strings ui.gadgets.panes
+unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -16,6 +17,7 @@ CONSTANT: scryfall-all-json-path "resource:scryfall-all-json"
 CONSTANT: scryfall-rulings-json-path "resource:scryfall-rulings-json"
 CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
+: ?write ( str/f -- ) [ write ] when* ;
 : ?print ( str/f -- ) [ print ] [ nl ] if* ;
 
 : download-scryfall-bulk-json ( -- json )
@@ -26,7 +28,7 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
 : load-scryfall-json ( type path -- uri )
     [ find-scryfall-json "download_uri" of ] dip
-    6 hours download-outdated-to path>json ;
+    10 days download-outdated-as path>json ;
 
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
@@ -50,11 +52,11 @@ MEMO: scryfall-rulings-json ( -- json )
     >url path>> "/" ?head drop "/" "-" replace
     scryfall-images-path "" prepend-as ;
 
-: map-card-faces ( assoc quot -- seq )
-    [ "card_faces" of ] dip map ; inline
+: filter-multi-card-faces ( assoc -- seq )
+    [ "card_faces" of length 1 > ] filter ; inline
 
-: filter-card-faces ( assoc quot -- seq )
-    '[ [ "card_faces" of ] [ ] [ 1array ] ?if _ any? ] filter ; inline
+: multi-card-faces? ( assoc -- seq )
+    "card_faces" of length 1 > ; inline
 
 : card>image-uris ( assoc -- seq )
     [ "image_uris" of ]
@@ -66,7 +68,7 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : download-scryfall-image ( assoc -- path )
     dup scryfall-local-image-path dup delete-when-zero-size
-    [ download-once-to ] [ nip ] if ;
+    [ download-once-as ] [ nip ] if ;
 
 : download-normal-images ( seq -- seq' )
     ensure-scryfall-images-directory
@@ -76,27 +78,21 @@ MEMO: scryfall-rulings-json ( -- json )
     ensure-scryfall-images-directory
     small-images [ download-scryfall-image load-image ] map ;
 
-MEMO: all-cards-by-name ( -- assoc )
-    mtg-oracle-cards
-    [ "name" of ] collect-by
-    [ first ] map-values ;
-
-: find-card-by-name ( seq name -- card ) '[ "name" of _ = ] filter ;
-: cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
-: cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
-: cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
-: cards-by-color-identity ( seq -- assoc ) [ "color_identity" of ] collect-by-multi ;
-: red-color-identity ( seq -- seq' ) cards-by-color-identity "R" of ;
-: blue-color-identity ( seq -- seq' ) cards-by-color-identity "U" of ;
-: green-color-identity ( seq -- seq' ) cards-by-color-identity "G" of ;
-: black-color-identity ( seq -- seq' ) cards-by-color-identity "B" of ;
-: white-color-identity ( seq -- seq' ) cards-by-color-identity "W" of ;
+: collect-cards-by-name ( seq -- assoc ) [ "name" of ] collect-by ;
+: collect-cards-by-cmc ( seq -- assoc ) [ "cmc" of ] collect-by ;
+: collect-cards-by-mana-cost ( seq -- assoc ) [ "mana_cost" of ] collect-by ;
+: collect-cards-by-color-identity ( seq -- assoc ) [ "color_identity" of ] collect-by-multi ;
+: red-color-identity ( seq -- seq' ) collect-cards-by-color-identity "R" of ;
+: blue-color-identity ( seq -- seq' ) collect-cards-by-color-identity "U" of ;
+: green-color-identity ( seq -- seq' ) collect-cards-by-color-identity "G" of ;
+: black-color-identity ( seq -- seq' ) collect-cards-by-color-identity "B" of ;
+: white-color-identity ( seq -- seq' ) collect-cards-by-color-identity "W" of ;
 
 : find-card-by-color-identity-intersect ( cards colors -- cards' )
-    [ cards-by-color-identity ] dip [ of ] with map intersect-all ;
+    [ collect-cards-by-color-identity ] dip [ of ] with map intersect-all ;
 
 : find-any-color-identities ( cards colors -- cards' )
-    [ cards-by-color-identity ] dip [ of ] with map union-all ;
+    [ collect-cards-by-color-identity ] dip [ of ] with map union-all ;
 
 : color-identity-complement ( seq -- seq' ) [ { "B" "G" "R" "U" "W" } ] dip diff ;
 
@@ -194,11 +190,11 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-sultai-exact ( seq -- seq' ) { "B" "G" "U" } find-exact-color-identities ;
 : filter-temur-exact ( seq -- seq' ) { "G" "U" "R" } find-exact-color-identities ;
 
-: filter-non-white ( seq -- seq' ) { "U" "B" "R" "G" } find-any-color-identities ;
-: filter-non-blue ( seq -- seq' ) { "W" "B" "R" "G" } find-any-color-identities ;
-: filter-non-black ( seq -- seq' ) { "W" "U" "R" "G" } find-any-color-identities ;
-: filter-non-red ( seq -- seq' ) { "W" "U" "B" "G" } find-any-color-identities ;
-: filter-non-green ( seq -- seq' ) { "W" "U" "B" "R" } find-any-color-identities ;
+: filter-non-white ( seq -- seq' ) { "U" "B" "R" "G" } find-only-color-identities ;
+: filter-non-blue ( seq -- seq' ) { "W" "B" "R" "G" } find-only-color-identities ;
+: filter-non-black ( seq -- seq' ) { "W" "U" "R" "G" } find-only-color-identities ;
+: filter-non-red ( seq -- seq' ) { "W" "U" "B" "G" } find-only-color-identities ;
+: filter-non-green ( seq -- seq' ) { "W" "U" "B" "R" } find-only-color-identities ;
 
 : filter-legalities ( seq name -- seq' ) '[ "legalities" of _ of "legal" = ] filter ;
 : filter-standard ( seq -- seq' ) "standard" filter-legalities ;
@@ -223,6 +219,11 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-oldschool ( seq -- seq' ) "oldschool" filter-legalities ;
 : filter-premodern ( seq -- seq' ) "premodern" filter-legalities ;
 : filter-predh ( seq -- seq' ) "predh" filter-legalities ;
+
+: spanish-standard-cards ( -- seq )
+    scryfall-all-cards-json
+    filter-standard
+    [ "lang" of "es" = ] filter ;
 
 : filter-red-any ( seq -- seq' ) [ "colors" of "R" swap member? ] filter ;
 : filter-red-only ( seq -- seq' ) [ "colors" of { "R" } = ] filter ;
@@ -251,32 +252,54 @@ MEMO: all-cards-by-name ( -- assoc )
     ] bi@ 2array sift ;
 
 : type-line-of ( assoc -- string ) "type_line" of parse-type-line ;
-: any-type? ( seq name -- ? ) [ type-line-of ] dip >lower '[ first [ >lower ] map _ member-of? ] any? ;
-: any-subtype? ( seq name -- ? ) [ type-line-of ] dip >lower '[ second [ >lower ] map _ member-of? ] any? ;
+
+! cards can have several type lines (one for each face)
+: any-type? ( json name -- ? )
+    [ type-line-of ] dip >lower '[ first [ >lower ] map _ member-of? ] any? ;
+: any-subtype? ( json name -- ? )
+    [ type-line-of ] dip >lower '[ second [ >lower ] map _ member-of? ] any? ;
+
+: type-intersects? ( json types -- ? )
+    [ type-line-of ] dip [ >lower ] map '[ first [ >lower ] map _ intersects? ] any? ;
+: subtype-intersects? ( json subtypes -- ? )
+    [ type-line-of ] dip [ >lower ] map '[ second [ >lower ] map _ intersects? ] any? ;
 
 : filter-type ( seq text -- seq' ) '[ _ any-type? ] filter ;
 : filter-subtype ( seq text -- seq' ) '[ _ any-subtype? ] filter ;
+: filter-type-intersects ( seq text -- seq' ) '[ _ type-intersects? ] filter ;
+: filter-subtype-intersects ( seq text -- seq' ) '[ _ subtype-intersects? ] filter ;
 
 : filter-basic ( seq -- seq' ) [ "Basic" any-type? ] filter ;
-: filter-basic-subtype ( seq text -- seq' ) [ filter-basic ] dip '[ _ any-subtype? ] filter ;
+: filter-basic-subtype ( seq text -- seq' ) [ filter-basic ] dip filter-subtype ;
 : filter-land ( seq -- seq' ) [ "Land" any-type? ] filter ;
-: filter-land-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-land-subtype ( seq text -- seq' ) [ filter-land ] dip filter-subtype ;
 : filter-creature ( seq -- seq' ) [ "Creature" any-type? ] filter ;
-: filter-creature-subtype ( seq text -- seq' ) [ filter-creature ] dip '[ _ any-subtype? ] filter ;
+: filter-creature-subtype ( seq text -- seq' ) [ filter-creature ] dip filter-subtype ;
+: filter-emblem ( seq -- seq' ) [ "Emblem" any-type? ] filter ;
+: filter-emblem-subtype ( seq text -- seq' ) [ filter-emblem ] dip filter-subtype ;
 : filter-enchantment ( seq -- seq' ) [ "Enchantment" any-type? ] filter ;
-: filter-enchantment-subtype ( seq text -- seq' ) [ filter-enchantment ] dip '[ _ any-subtype? ] filter ;
+: filter-enchantment-subtype ( seq text -- seq' ) [ filter-enchantment ] dip filter-subtype ;
+: filter-saga ( seq -- seq' ) "saga" filter-enchantment-subtype ;
 : filter-instant ( seq -- seq' ) [ "Instant" any-type? ] filter ;
-: filter-instant-subtype ( seq text -- seq' ) [ filter-instant ] dip '[ _ any-subtype? ] filter ;
+: filter-instant-subtype ( seq text -- seq' ) [ filter-instant ] dip filter-subtype ;
 : filter-sorcery ( seq -- seq' ) [ "Sorcery" any-type? ] filter ;
-: filter-sorcery-subtype ( seq text -- seq' ) [ filter-sorcery ] dip '[ _ any-subtype? ] filter ;
+: filter-sorcery-subtype ( seq text -- seq' ) [ filter-sorcery ] dip filter-subtype ;
 : filter-planeswalker ( seq -- seq' ) [ "Planeswalker" any-type? ] filter ;
-: filter-planeswalker-subtype ( seq text -- seq' ) [ filter-planeswalker ] dip '[ _ any-subtype? ] filter ;
+: filter-planeswalker-subtype ( seq text -- seq' ) [ filter-planeswalker ] dip filter-subtype ;
 : filter-legendary ( seq -- seq' ) [ "Legendary" any-type? ] filter ;
-: filter-legendary-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-legendary-subtype ( seq text -- seq' ) [ filter-legendary ] dip filter-subtype ;
 : filter-battle ( seq -- seq' ) [ "Battle" any-type? ] filter ;
-: filter-battle-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-battle-subtype ( seq text -- seq' ) [ filter-battle ] dip filter-subtype ;
 : filter-artifact ( seq -- seq' ) [ "Artifact" any-type? ] filter ;
-: filter-artifact-subtype ( seq text -- seq' ) [ filter-land ] dip '[ _ any-subtype? ] filter ;
+: filter-artifact-subtype ( seq text -- seq' ) [ filter-artifact ] dip filter-subtype ;
+
+: filter-mounts ( seq -- seq' ) "mount" filter-subtype ;
+: filter-vehicles ( seq -- seq' ) "vehicle" filter-subtype ;
+: filter-adventure ( seq -- seq' ) "adventure" filter-subtype ;
+: filter-aura ( seq -- seq' ) "aura" filter-subtype ;
+: filter-aura-subtype ( seq text -- seq' ) [ filter-aura ] dip filter-subtype ;
+: filter-equipment ( seq -- seq' ) "Equipment" filter-subtype ;
+: filter-equipment-subtype ( seq text -- seq' ) [ filter-equipment ] dip filter-subtype ;
 
 : filter-common ( seq -- seq' ) '[ "rarity" of "common" = ] filter ;
 : filter-uncommon ( seq -- seq' ) '[ "rarity" of "uncommon" = ] filter ;
@@ -296,13 +319,107 @@ MEMO: all-cards-by-name ( -- assoc )
 : filter-by-text-prop ( seq string prop -- seq' )
     swap '[ _ of _ subseq-of? ] filter ;
 
-: filter-by-oracle-text ( seq string -- seq' ) "oracle_text" filter-by-text-prop ;
-: filter-by-oracle-itext ( seq string -- seq' ) "oracle_text" filter-by-itext-prop ;
+: map-card-faces ( json quot -- seq )
+    '[ [ "card_faces" of ] [ ] [ 1array ] ?if _ map ] map ; inline
+
+: all-card-types ( seq -- seq' )
+    [ "type_line" of ] map-card-faces
+    concat members sort ;
+
+: filter-card-faces ( json quot -- seq )
+    dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] filter ; inline
+
+: filter-card-faces-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] filter-card-faces ;
+
+: filter-card-faces-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] filter-card-faces ;
+
+: filter-by-flavor-text ( seq string -- seq' )
+    "flavor_text" filter-card-faces-prop ;
+
+: filter-by-flavor-itext ( seq string -- seq' )
+    "flavor_text" filter-card-faces-iprop ;
+
+: filter-by-oracle-text ( seq string -- seq' )
+    "oracle_text" filter-card-faces-prop ;
+
+: filter-by-oracle-itext ( seq string -- seq' )
+    "oracle_text" filter-card-faces-iprop ;
 
 : filter-by-name-text ( seq string -- seq' ) "name" filter-by-text-prop ;
 : filter-by-name-itext ( seq string -- seq' ) "name" filter-by-itext-prop ;
 
-: filter-flash ( seq -- seq' ) "Flash" filter-by-oracle-text ;
+: filter-create-treasure ( seq -- seq' ) "create a treasure token" filter-by-oracle-itext ;
+: filter-treasure-token ( seq -- seq' ) "treasure token" filter-by-oracle-itext ;
+: filter-create-blood-token ( seq -- seq' ) "create a blood token" filter-by-oracle-itext ;
+: filter-blood-token ( seq -- seq' ) "blood token" filter-by-oracle-itext ;
+: filter-create-map-token ( seq -- seq' ) "create a map token" filter-by-oracle-itext ;
+: filter-map-token ( seq -- seq' ) "map token" filter-by-oracle-itext ;
+
+: filter-affinity ( seq -- seq' ) "affinity" filter-by-oracle-itext ;
+: filter-backup ( seq -- seq' ) "backup" filter-by-oracle-itext ;
+: filter-blitz ( seq -- seq' ) "blitz" filter-by-oracle-itext ;
+: filter-compleated ( seq -- seq' ) "compleated" filter-by-oracle-itext ;
+: filter-corrupted ( seq -- seq' ) "corrupted" filter-by-oracle-itext ;
+: filter-counter ( seq -- seq' ) "counter" filter-by-oracle-itext ;
+: filter-crew ( seq -- seq' ) "crew" filter-by-oracle-itext ;
+: filter-cycling ( seq -- seq' ) "cycling" filter-by-oracle-itext ;
+: filter-deathtouch ( seq -- seq' ) "deathtouch" filter-by-oracle-itext ;
+: filter-defender ( seq -- seq' ) "defender" filter-by-oracle-itext ;
+: filter-descend ( seq -- seq' ) "descend" filter-by-oracle-itext ;
+: filter-destroy-target ( seq -- seq' ) "destroy target" filter-by-oracle-itext ;
+: filter-discover ( seq -- seq' ) "discover" filter-by-oracle-itext ;
+: filter-disguise ( seq -- seq' ) "disguise" filter-by-oracle-itext ;
+: filter-domain ( seq -- seq' ) "domain" filter-by-oracle-itext ;
+: filter-double-strike ( seq -- seq' ) "double strike" filter-by-oracle-itext ;
+: filter-equip ( seq -- seq' ) "equip" filter-by-oracle-itext ;
+: filter-equip-n ( seq -- seq' ) "equip {" filter-by-oracle-itext ;
+: filter-exile ( seq -- seq' ) "exile" filter-by-oracle-itext ;
+: filter-fights ( seq -- seq' ) "fights" filter-by-oracle-itext ;
+: filter-first-strike ( seq -- seq' ) "first strike" filter-by-oracle-itext ;
+: filter-flash ( seq -- seq' ) "flash" filter-by-oracle-itext ;
+: filter-flying ( seq -- seq' ) "flying" filter-by-oracle-itext ;
+: filter-for-mirrodin ( seq -- seq' ) "for mirrodin!" filter-by-oracle-itext ;
+: filter-graveyard ( seq -- seq' ) "graveyard" filter-by-oracle-itext ;
+: filter-haste ( seq -- seq' ) "haste" filter-by-oracle-itext ;
+: filter-hideaway ( seq -- seq' ) "hideaway" filter-by-oracle-itext ;
+: filter-hexproof ( seq -- seq' ) "hexproof" filter-by-oracle-itext ;
+: filter-indestructible ( seq -- seq' ) "indestructible" filter-by-oracle-itext ;
+: filter-investigate ( seq -- seq' ) "investigate" filter-by-oracle-itext ;
+: filter-lifelink ( seq -- seq' ) "lifelink" filter-by-oracle-itext ;
+: filter-madness ( seq -- seq' ) "madness" filter-by-oracle-itext ;
+: filter-menace ( seq -- seq' ) "menace" filter-by-oracle-itext ;
+: filter-mill ( seq -- seq' ) "mill" filter-by-oracle-itext ;
+: filter-ninjutsu ( seq -- seq' ) "ninjutsu" filter-by-oracle-itext ;
+: filter-proliferate ( seq -- seq' ) "proliferate" filter-by-oracle-itext ;
+: filter-protection ( seq -- seq' ) "protection" filter-by-oracle-itext ;
+: filter-prowess ( seq -- seq' ) "prowess" filter-by-oracle-itext ;
+: filter-reach ( seq -- seq' ) "reach" filter-by-oracle-itext ;
+: filter-read-ahead ( seq -- seq' ) "read ahead" filter-by-oracle-itext ;
+: filter-reconfigure ( seq -- seq' ) "reconfigure" filter-by-oracle-itext ;
+: filter-role ( seq -- seq' ) "role" filter-by-oracle-itext ;
+: filter-sacrifice ( seq -- seq' ) "sacrifice" filter-by-oracle-itext ;
+: filter-scry ( seq -- seq' ) "scry" filter-by-oracle-itext ;
+: filter-shroud ( seq -- seq' ) "shroud" filter-by-oracle-itext ;
+: filter-token ( seq -- seq' ) "token" filter-by-oracle-itext ;
+: filter-toxic ( seq -- seq' ) "toxic" filter-by-oracle-itext ;
+: filter-trample ( seq -- seq' ) "trample" filter-by-oracle-itext ;
+: filter-vehicle ( seq -- seq' ) "vehicle" filter-by-oracle-itext ;
+: filter-vigilance ( seq -- seq' ) "vigilance" filter-by-oracle-itext ;
+: filter-ward ( seq -- seq' ) "ward" filter-by-oracle-itext ;
+
+: filter-day ( seq -- seq' ) "day" filter-by-oracle-itext ;
+: filter-night ( seq -- seq' ) "night" filter-by-oracle-itext ;
+: filter-daybound ( seq -- seq' ) "daybound" filter-by-oracle-itext ;
+: filter-nightbound ( seq -- seq' ) "nightbound" filter-by-oracle-itext ;
+
+: filter-mount ( seq -- seq' ) "mount" filter-by-oracle-itext ;
+: filter-outlaw ( seq -- seq' )
+    { "Assassin" "Mercenary" "Pirate" "Rogue" "Warlock" } filter-subtype-intersects ;
+: filter-plot ( seq -- seq' ) "plot" filter-by-oracle-itext ;
+: filter-saddle ( seq -- seq' ) "saddle" filter-by-oracle-itext ;
+: filter-spree ( seq -- seq' ) "saddle" filter-by-oracle-itext ;
 
 : power>n ( string -- n/f )
     [ "*" = ] [ drop -1 ] [ string>number ] ?if ;
@@ -351,25 +468,24 @@ MEMO: all-cards-by-name ( -- assoc )
 
 : normal-cards. ( seq -- ) [ normal-card. ] each ;
 
-: card-face-summary. ( seq -- )
+! rarity is only on main card `json` (if there are two faces)
+: card-face-summary. ( json seq -- )
     {
-        [ "name" of write bl ]
-        [ "mana_cost" of ?print ]
-        [ "type_line" of ?print ]
-        [ [ "power" of ] [ "toughness" of ] bi 2dup and [ "/" glue print ] [ 2drop ] if ]
-        [ "oracle_text" of ?print ]
-    } cleave nl ;
+        [ nip "name" of write bl ]
+        [ nip "mana_cost" of ?print ]
+        [ nip "type_line" of ?write ]
+        [ drop bl "--" write bl "rarity" of >title ?print ]
+        [ nip [ "power" of ] [ "toughness" of ] bi 2dup and [ "/" glue print ] [ 2drop ] if ]
+        [ nip "oracle_text" of ?print ]
+    } 2cleave nl ;
 
-: card-face-summaries. ( seq -- ) [ card-face-summary. ] each ;
+: card-face-summaries. ( json seq -- ) [ card-face-summary. ] with each ;
 
 : card-summary. ( assoc -- )
-    {
-        [
-            [ "card_faces" of ]
-            [ [ length number>string "Card Faces: " prepend print ] [ card-face-summaries. ] bi ]
-            [ card-face-summary. ] ?if
-        ]
-    } cleave nl nl nl ;
+    dup
+    [ "card_faces" of ]
+    [ [ length number>string "Card Faces: " prepend print ] [ card-face-summaries. ] bi ]
+    [ card-face-summary. ] ?if nl nl nl ;
 
 : card-summaries. ( seq -- ) [ card-summary. ] each ;
 
@@ -414,43 +530,97 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : cards-by-set-abbrev ( -- assoc ) mtg-oracle-cards collect-cards-by-set-abbrev ;
 : cards-by-set-name ( -- assoc ) mtg-oracle-cards collect-cards-by-set-name ;
 
-: mid-cards ( -- seq ) mtg-oracle-cards [ "set" of "mid" = ] filter ;
-: vow-cards ( -- seq ) mtg-oracle-cards [ "set" of "vow" = ] filter ;
-: neo-cards ( -- seq ) mtg-oracle-cards [ "set" of "neo" = ] filter ;
-: snc-cards ( -- seq ) mtg-oracle-cards [ "set" of "snc" = ] filter ;
+: filter-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] filter ;
+: filter-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] filter ;
 
-: dmu-cards ( -- seq ) mtg-oracle-cards [ "set" of "dmu" = ] filter ;
-: bro-cards ( -- seq ) mtg-oracle-cards [ "set" of "bro" = ] filter ;
-: one-cards ( -- seq ) mtg-oracle-cards [ "set" of "one" = ] filter ;
-: mom-cards ( -- seq ) mtg-oracle-cards [ "set" of "mom" = ] filter ;
-: mat-cards ( -- seq ) mtg-oracle-cards [ "set" of "mat" = ] filter ;
+: mid-cards ( -- seq ) mtg-oracle-cards "mid" filter-set ;
+: vow-cards ( -- seq ) mtg-oracle-cards "vow" filter-set ;
+: neo-cards ( -- seq ) mtg-oracle-cards "neo" filter-set ;
+: snc-cards ( -- seq ) mtg-oracle-cards "snc" filter-set ;
+: dmu-cards ( -- seq ) mtg-oracle-cards "dmu" filter-set ;
+: bro-cards ( -- seq ) mtg-oracle-cards "bro" filter-set ;
+: one-cards ( -- seq ) mtg-oracle-cards "one" filter-set ;
+: mom-cards ( -- seq ) mtg-oracle-cards "mom" filter-set ;
+: mat-cards ( -- seq ) mtg-oracle-cards "mat" filter-set ;
+: woe-cards ( -- seq ) mtg-oracle-cards "woe" filter-set ;
+: woe-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "wot" = ] filter-set ;
+: woe-cards-all ( -- seq ) mtg-oracle-cards { "woe" "wot" } filter-set-intersect ;
+: lci-cards ( -- seq ) mtg-oracle-cards "lci" filter-set ;
+: mkm-cards ( -- seq ) mtg-oracle-cards "mkm" filter-set ;
+: otj-cards ( -- seq ) mtg-oracle-cards "otj" filter-set ;
+: otj-cards-bonus ( -- seq ) mtg-oracle-cards "big" filter-set ;
+: otj-cards-all ( -- seq ) mtg-oracle-cards { "otj" "big" } filter-set-intersect ;
 
-: woe-cards ( -- seq ) mtg-oracle-cards [ "set" of "woe" = ] filter ;
-: woe-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "wot" = ] filter ;
-: woe-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "woe" "wot" } member? ] filter ;
-
-: lci-cards ( -- seq ) mtg-oracle-cards [ "set" of "lci" = ] filter ;
-: mkm-cards ( -- seq ) mtg-oracle-cards [ "set" of "mkm" = ] filter ;
-: otj-cards ( -- seq ) mtg-oracle-cards [ "set" of "otj" = ] filter ;
-: otj-cards-bonus ( -- seq ) mtg-oracle-cards [ "set" of "big" = ] filter ;
-: otj-cards-all ( -- seq ) mtg-oracle-cards [ "set" of { "otj" "big" } member? ] filter ;
-
-ERROR: unknown-mtg-card name ;
-: card-by-name ( name -- card )
-    [ all-cards-by-name ] dip ?of [ unknown-mtg-card ] unless ;
-
-: card-by-name. ( name -- )
-    card-by-name normal-card. ;
-
-: sort-cards-by-colors ( seq -- seq' )
+: sort-by-colors ( seq -- seq' )
     {
         { [ "color_identity" of length ] <=> }
         { [ "color_identity" of sort ?first "A" or ] <=> }
         { [ "cmc" of ] <=> }
         { [ "mana_cost" of length ] <=> }
-        { [ "Creature" any-type? -1 1 ? ] <=> }
+        { [ "creature" any-type? -1 1 ? ] <=> }
+        { [ "power" of -1 1 ? ] <=> }
+        { [ "toughness" of -1 1 ? ] <=> }
         { [ "name" of ] <=> }
-    }
-    sort-with-spec ;
+    } sort-with-spec ;
 
-: cards-by-color. ( seq -- ) sort-cards-by-colors normal-cards. ;
+: cards-by-color. ( seq -- ) sort-by-colors normal-cards. ;
+
+CONSTANT: rarity-to-number H{
+    { "common" 0 }
+    { "uncommon" 1 }
+    { "rare" 2 }
+    { "mythic" 3 }
+}
+
+: sort-by-rarity ( seq -- seq' )
+    {
+        { [ "rarity" of rarity-to-number at ] <=> }
+        { [ "color_identity" of length ] <=> }
+        { [ "color_identity" of sort ?first "A" or ] <=> }
+        { [ "cmc" of ] <=> }
+        { [ "mana_cost" of length ] <=> }
+        { [ "name" of ] <=> }
+    } sort-with-spec ;
+
+: cards-by-rarity. ( seq -- ) sort-by-rarity normal-cards. ;
+
+: sort-by-release ( seq -- seq' )
+    {
+        { [ "released_at" of ymd>timestamp ] <=> }
+        { [ "set" of ] <=> }
+    } sort-with-spec ;
+
+: cards-by-release. ( seq -- ) sort-by-release normal-cards. ;
+
+: sort-by-set-colors ( seq -- seq' )
+    {
+        { [ "released_at" of ymd>timestamp ] <=> }
+        { [ "set" of ] <=> }
+        { [ "color_identity" of length ] <=> }
+        { [ "color_identity" of sort ?first "A" or ] <=> }
+        { [ "cmc" of ] <=> }
+        { [ "mana_cost" of length ] <=> }
+        { [ "creature" any-type? -1 1 ? ] <=> }
+        { [ "power" of -1 1 ? ] <=> }
+        { [ "toughness" of -1 1 ? ] <=> }
+        { [ "name" of ] <=> }
+    } sort-with-spec ;
+
+: cards-by-set-colors. ( seq -- ) sort-by-set-colors normal-cards. ;
+
+: cards-by-name ( seq name -- seq' ) filter-by-name-itext sort-by-release ;
+: cards-by-name. ( seq name -- ) cards-by-name [ "name" of ] sort-by normal-cards. ;
+
+: filter-mtg-cheat-sheet ( seq -- seq' )
+    [
+        {
+            [ filter-instant ]
+            [ filter-flash ]
+            [ filter-cycling ]
+            [ filter-disguise ]
+            [ filter-madness ]
+        } cleave
+    ] { } append-outputs-as sort-by-colors ;
+
+: mtg-cheat-sheet. ( seq -- ) filter-mtg-cheat-sheet normal-cards. ;
+: mtg-cheat-sheet-text. ( seq -- ) filter-mtg-cheat-sheet card-summaries. ;

@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays cocoa cocoa.application
 cocoa.classes cocoa.messages cocoa.runtime cocoa.subclassing
-compiler.units kernel locals.backend math.parser sequences ;
+compiler.units kernel locals.backend math.parser quotations
+sequences ;
 IN: cocoa.statusbar
 
 << {
@@ -19,8 +20,18 @@ CONSTANT: NSSquareStatusItemLength -2.0
 : get-system-statusbar ( -- alien )
     NSStatusBar -> systemStatusBar ;
 
-TUPLE: platform-menu name items ;
-TUPLE: platform-menu-item title quot key-equivalent selector target ;
+TUPLE: platform-menu name items menu-alien statusbar-alien ;
+TUPLE: platform-menu-item title { quot callable } key-equivalent selector target ;
+
+: <platform-menu> ( name items -- platform-menu )
+    platform-menu new
+        swap >>items
+        swap >>name ;
+
+: <platform-menu-item> ( title quot -- platform-menu-item )
+    platform-menu-item new
+        swap >>quot
+        swap >>title ;
 
 : menu>dummy-class ( menu -- object )
     [ name>> "NSObject" V{ } ]
@@ -54,17 +65,28 @@ TUPLE: platform-menu-item title quot key-equivalent selector target ;
     ns-menu ns-menu-items [ -> addItem: ] with each
     ns-menu ;
 
-:: show-menu ( menu -- menu-alien statusbar-item-alien )
-    menu menu>alien :> menu-alien
+:: show-menu* ( platform-menu -- menu-alien statusbar-alien )
+    platform-menu menu>alien :> menu-alien
     get-system-statusbar :> system-alien
     system-alien
         NSVariableStatusItemLength -> statusItemWithLength: [ -> retain ] keep :> ns-status-item
-    ns-status-item menu name>> <NSString> -> setTitle:
+    ns-status-item platform-menu name>> <NSString> -> setTitle:
     menu-alien -> setMenu:
     menu-alien ns-status-item ;
+
+: show-statusbar ( platform-menu -- platform-menu )
+    [ show-menu* ] keep
+    [ statusbar-alien<< ] keep
+    [ menu-alien<< ] keep ;
 
 : enable-menu-item ( alien -- ) 1 -> setEnabled: ;
 : disable-menu-item ( alien -- ) 0 -> setEnabled: ;
 
 : hide-statusbar-item ( statusbar-item-alien -- )
     [ get-system-statusbar ] dip -> removeStatusItem: ;
+
+: hide-statusbar* ( platform-menu -- )
+    [ get-system-statusbar ] dip -> removeStatusItem: ;
+
+: hide-statusbar ( platform-menu -- platform-menu )
+    [ statusbar-alien>> hide-statusbar* ] keep ;

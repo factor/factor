@@ -21,11 +21,11 @@ IN: unicode.breaks.tests
 
 : grapheme-break-test ( -- filename )
     "https://downloads.factorcode.org/misc/UCD/15.1.0/auxiliary/GraphemeBreakTest.txt"
-    "GraphemeBreakTest-15.1.0.txt" cache-file download-once-to ;
+    "GraphemeBreakTest-15.1.0.txt" cache-file download-once-as ;
 
 : word-break-test ( -- filename )
     "https://downloads.factorcode.org/misc/UCD/15.1.0/auxiliary/WordBreakTest.txt"
-    "WordBreakTest-15.1.0.txt" cache-file download-once-to ;
+    "WordBreakTest-15.1.0.txt" cache-file download-once-as ;
 
 : parse-test-file ( file-name -- tests )
     utf8 file-lines

@@ -215,8 +215,13 @@ HOOK: delete-directory io-backend ( path -- )
 
 HOOK: move-file io-backend ( from to -- )
 
+: create-parent-directory ( path -- )
+    normalize-path parent-directory make-directories ;
+
 : ?move-file ( from to -- )
-    over file-exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [
+        dup create-parent-directory move-file
+    ] [ 2drop ] if ;
 
 HOOK: move-file-atomically io-backend ( from to -- )
 
