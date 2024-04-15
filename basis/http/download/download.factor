@@ -3,8 +3,8 @@
 USING: accessors calendar checksums combinators.short-circuit
 http.client io io.directories io.encodings.binary io.files
 io.files.info io.files.unique io.pathnames kernel math
-math.order math.parser present sequences shuffle splitting ;
-
+math.order math.parser namespaces present sequences shuffle
+splitting ;
 IN: http.download
 
 : file-too-old-or-not-exists? ( path duration -- ? )
@@ -104,7 +104,7 @@ PRIVATE>
 
 : download-once-into ( url directory -- path ) to-directory download-once-as ;
 
-: download-once ( url -- path ) "resource:" download-once-into ;
+: download-once ( url -- path ) current-directory get download-once-into ;
 
 : download-outdated-as ( url path duration -- path' )
     2dup delete-when-old [ drop download-as ] [ drop nip ] if ;
@@ -113,4 +113,4 @@ PRIVATE>
     [ to-directory ] dip download-outdated-as ;
 
 : download-outdated ( url duration -- path )
-    [ dup download-name "resource:" to-directory nip ] dip download-outdated-as ;
+    [ dup download-name current-directory get to-directory nip ] dip download-outdated-as ;
