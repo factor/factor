@@ -611,6 +611,28 @@ CONSTANT: rarity-to-number H{
 : cards-by-name ( seq name -- seq' ) filter-by-name-itext sort-by-release ;
 : cards-by-name. ( seq name -- ) cards-by-name [ "name" of ] sort-by normal-cards. ;
 
+: parse-cards ( strings -- seq )
+    [
+        [ blank? ] trim
+        " " split1
+        [ string>number ]
+        [ standard-cards swap cards-by-name first ] bi* <array>
+    ] map concat ;
+
+: parse-mtga-deck ( string -- deck sideboard )
+    [ blank? ] trim
+    "Deck" ?head drop
+    string-lines
+    "Sideboard" split1
+    [ parse-cards ] bi@ ;
+
+: sort-by-deck-order ( seq -- seq' )
+    [ "Land" any-type? not ] partition
+    [ sort-by-set-colors ] bi@ append ;
+
+: deck. ( seq -- )
+    sort-by-deck-order normal-cards. ;
+
 : filter-mtg-cheat-sheet ( seq -- seq' )
     [
         {
