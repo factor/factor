@@ -5,9 +5,9 @@ calendar.parser combinators combinators.short-circuit
 combinators.smart grouping http.download images.loader
 images.viewer io io.directories json json.http kernel math
 math.combinatorics math.order math.parser math.statistics
-namespaces sequences sequences.deep sequences.extras sets
-sorting sorting.specification splitting strings ui.gadgets.panes
-unicode urls ;
+namespaces sequences sequences.deep sequences.extras
+sequences.generalizations sets sorting sorting.specification
+splitting splitting.extras strings ui.gadgets.panes unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -253,6 +253,9 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : type-line-of ( assoc -- string ) "type_line" of parse-type-line ;
 
+: types-of ( assoc -- seq ) type-line-of [ first ] map concat ;
+: subtypes-of ( assoc -- seq ) type-line-of [ second ] map concat ;
+
 ! cards can have several type lines (one for each face)
 : any-type? ( json name -- ? )
     [ type-line-of ] dip >lower '[ first [ >lower ] map _ member-of? ] any? ;
@@ -293,6 +296,18 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-artifact ( seq -- seq' ) [ "Artifact" any-type? ] filter ;
 : filter-artifact-subtype ( seq text -- seq' ) [ filter-artifact ] dip filter-subtype ;
 
+: reject-basic ( seq -- seq' ) [ "Basic" any-type? ] reject ;
+: reject-land ( seq -- seq' ) [ "Land" any-type? ] reject ;
+: reject-creature ( seq -- seq' ) [ "Creature" any-type? ] reject ;
+: reject-emblem ( seq -- seq' ) [ "Emblem" any-type? ] reject ;
+: reject-enchantment ( seq -- seq' ) [ "Enchantment" any-type? ] reject ;
+: reject-instant ( seq -- seq' ) [ "Instant" any-type? ] reject ;
+: reject-sorcery ( seq -- seq' ) [ "Sorcery" any-type? ] reject ;
+: reject-planeswalker ( seq -- seq' ) [ "Planeswalker" any-type? ] reject ;
+: reject-legendary ( seq -- seq' ) [ "Legendary" any-type? ] reject ;
+: reject-battle ( seq -- seq' ) [ "Battle" any-type? ] reject ;
+: reject-artifact ( seq -- seq' ) [ "Artifact" any-type? ] reject ;
+
 : filter-mounts ( seq -- seq' ) "mount" filter-subtype ;
 : filter-vehicles ( seq -- seq' ) "vehicle" filter-subtype ;
 : filter-adventure ( seq -- seq' ) "adventure" filter-subtype ;
@@ -326,26 +341,38 @@ MEMO: scryfall-rulings-json ( -- json )
     [ "type_line" of ] map-card-faces
     concat members sort ;
 
-: filter-card-faces ( json quot -- seq )
+: card>faces ( assoc -- seq )
+    [ "card_faces" of ] [ ] [ 1array ] ?if ;
+
+: filter-card-faces-sub-card ( seq quot -- seq )
+    [ [ card>faces ] map concat ] dip filter ; inline
+
+: filter-card-faces-sub-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] filter-card-faces-sub-card ;
+
+: filter-card-faces-sub-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] filter-card-faces-sub-card ;
+
+: filter-card-faces-main-card ( seq quot -- seq )
     dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] filter ; inline
 
-: filter-card-faces-prop ( seq string prop -- seq' )
-    swap '[ _ of _ subseq-of? ] filter-card-faces ;
+: filter-card-faces-main-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] filter-card-faces-main-card ;
 
-: filter-card-faces-iprop ( seq string prop -- seq' )
-    swap >lower '[ _ of >lower _ subseq-of? ] filter-card-faces ;
+: filter-card-faces-main-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] filter-card-faces-main-card ;
 
 : filter-by-flavor-text ( seq string -- seq' )
-    "flavor_text" filter-card-faces-prop ;
+    "flavor_text" filter-card-faces-main-card-prop ;
 
 : filter-by-flavor-itext ( seq string -- seq' )
-    "flavor_text" filter-card-faces-iprop ;
+    "flavor_text" filter-card-faces-main-card-iprop ;
 
 : filter-by-oracle-text ( seq string -- seq' )
-    "oracle_text" filter-card-faces-prop ;
+    "oracle_text" filter-card-faces-main-card-prop ;
 
 : filter-by-oracle-itext ( seq string -- seq' )
-    "oracle_text" filter-card-faces-iprop ;
+    "oracle_text" filter-card-faces-main-card-iprop ;
 
 : filter-by-name-text ( seq string -- seq' ) "name" filter-by-text-prop ;
 : filter-by-name-itext ( seq string -- seq' ) "name" filter-by-itext-prop ;
@@ -414,6 +441,9 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-daybound ( seq -- seq' ) "daybound" filter-by-oracle-itext ;
 : filter-nightbound ( seq -- seq' ) "nightbound" filter-by-oracle-itext ;
 
+: filter-cave ( seq -- seq' ) "cave" filter-land-subtype ;
+: filter-sphere ( seq -- seq' ) "sphere" filter-land-subtype ;
+
 : filter-mount ( seq -- seq' ) "mount" filter-by-oracle-itext ;
 : filter-outlaw ( seq -- seq' )
     { "Assassin" "Mercenary" "Pirate" "Rogue" "Warlock" } filter-subtype-intersects ;
@@ -430,20 +460,20 @@ MEMO: scryfall-rulings-json ( -- json )
 : mtg>= ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ >= ] } 2&& ;
 : mtg=  ( string/n/f n -- seq' ) [ power>n ] dip { [ and ] [ = ] } 2&& ;
 
-: filter-power=* ( seq -- seq' ) [ "power" of "*" = ] filter-card-faces ;
-: filter-toughness=* ( seq -- seq' ) [ "toughness" of "*" = ] filter-card-faces ;
+: filter-power=* ( seq -- seq' ) [ "power" of "*" = ] filter-card-faces-main-card ;
+: filter-toughness=* ( seq -- seq' ) [ "toughness" of "*" = ] filter-card-faces-main-card ;
 
-: filter-power= ( seq n -- seq' ) '[ "power" of _ mtg= ] filter-card-faces ;
-: filter-power< ( seq n -- seq' ) '[ "power" of _ mtg< ] filter-card-faces ;
-: filter-power> ( seq n -- seq' ) '[ "power" of _ mtg> ] filter-card-faces ;
-: filter-power<= ( seq n -- seq' ) '[ "power" of _ mtg<= ] filter-card-faces ;
-: filter-power>= ( seq n -- seq' ) '[ "power" of _ mtg>= ] filter-card-faces ;
+: filter-power= ( seq n -- seq' ) '[ "power" of _ mtg= ] filter-card-faces-main-card ;
+: filter-power< ( seq n -- seq' ) '[ "power" of _ mtg< ] filter-card-faces-main-card ;
+: filter-power> ( seq n -- seq' ) '[ "power" of _ mtg> ] filter-card-faces-main-card ;
+: filter-power<= ( seq n -- seq' ) '[ "power" of _ mtg<= ] filter-card-faces-main-card ;
+: filter-power>= ( seq n -- seq' ) '[ "power" of _ mtg>= ] filter-card-faces-main-card ;
 
-: filter-toughness= ( seq n -- seq' ) '[ "toughness" of _ mtg= ] filter-card-faces ;
-: filter-toughness< ( seq n -- seq' ) '[ "toughness" of _ mtg< ] filter-card-faces ;
-: filter-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] filter-card-faces ;
-: filter-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] filter-card-faces ;
-: filter-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] filter-card-faces ;
+: filter-toughness= ( seq n -- seq' ) '[ "toughness" of _ mtg= ] filter-card-faces-main-card ;
+: filter-toughness< ( seq n -- seq' ) '[ "toughness" of _ mtg< ] filter-card-faces-main-card ;
+: filter-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] filter-card-faces-main-card ;
+: filter-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] filter-card-faces-main-card ;
+: filter-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] filter-card-faces-main-card ;
 
 : map-props ( seq props -- seq' ) '[ _ intersect-keys ] map ;
 
@@ -611,27 +641,59 @@ CONSTANT: rarity-to-number H{
 : cards-by-name ( seq name -- seq' ) filter-by-name-itext sort-by-release ;
 : cards-by-name. ( seq name -- ) cards-by-name [ "name" of ] sort-by normal-cards. ;
 
-: parse-cards ( strings -- seq )
-    [
-        [ blank? ] trim
-        " " split1
-        [ string>number ]
-        [ standard-cards swap cards-by-name first ] bi* <array>
-    ] map concat ;
+: paren-set? ( string -- ? )
+    { [ "(" head? ] [ ")" tail? ] [ length 5 = ] } 1&& ;
 
-: parse-mtga-deck ( string -- deck sideboard )
+: remove-set-and-num ( string -- string' )
+    " " split
+    dup 2 ?lastn
+    [ paren-set? ] [ string>number ] bi* and [
+        2 head*
+    ] when " " join ;
+
+: parse-mtga-card-line ( string -- array )
     [ blank? ] trim
-    "Deck" ?head drop
-    string-lines
-    "Sideboard" split1
-    [ parse-cards ] bi@ ;
+    " " split1
+    [ string>number ]
+    [
+        remove-set-and-num
+        standard-cards swap cards-by-name first
+    ] bi* <array> ;
+
+: parse-standard-cards ( strings -- seq )
+    [ parse-mtga-card-line ] map concat ;
+
+TUPLE: mtga-deck about deck sideboard section ;
+
+: <mtga-deck> ( -- mtga-deck )
+    mtga-deck new "Deck" >>section ;
+
+ERROR: unknown-mtga-deck-section section ;
+: parse-mtga-standard-deck ( string -- mtga-deck )
+    string-lines [ [ blank? ] trim ] map harvest
+    { "About" "Deck" "Sideboard" } split*
+    [ <mtga-deck> ] dip
+    [
+        dup { "About" "Deck" "Sideboard" } intersects? [
+            first >>section
+        ] [
+            over section>> {
+                { "About" [ >>about ] }
+                { "Deck" [ parse-standard-cards >>deck ] }
+                { "Sideboard" [ parse-standard-cards >>sideboard ] }
+                [ unknown-mtga-deck-section ]
+            } case
+        ] if
+    ] each ;
 
 : sort-by-deck-order ( seq -- seq' )
     [ "Land" any-type? not ] partition
     [ sort-by-set-colors ] bi@ append ;
 
-: deck. ( seq -- )
-    sort-by-deck-order normal-cards. ;
+: mtga-deck. ( mtga-deck -- )
+    [ about>> print ]
+    [ deck>> "Deck" print sort-by-deck-order normal-cards. ]
+    [ sideboard>> "Sideboard" print sort-by-deck-order normal-cards. ] tri ;
 
 : filter-mtg-cheat-sheet ( seq -- seq' )
     [
