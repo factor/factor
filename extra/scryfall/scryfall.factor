@@ -2,12 +2,13 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras calendar
 calendar.parser combinators combinators.short-circuit
-combinators.smart grouping http.download images.loader
-images.viewer io io.directories json json.http kernel math
-math.combinatorics math.order math.parser math.statistics
-namespaces sequences sequences.deep sequences.extras
-sequences.generalizations sets sorting sorting.specification
-splitting splitting.extras strings ui.gadgets.panes unicode urls ;
+combinators.smart formatting grouping http.download
+images.loader images.viewer io io.directories json json.http
+kernel math math.combinatorics math.order math.parser
+math.statistics namespaces random sequences sequences.deep
+sequences.extras sequences.generalizations sets sorting
+sorting.specification splitting splitting.extras strings
+ui.gadgets.panes unicode urls ;
 IN: scryfall
 
 CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
@@ -497,6 +498,9 @@ MEMO: scryfall-rulings-json ( -- json )
     card>image-uris download-normal-images images. ;
 
 : normal-cards. ( seq -- ) [ normal-card. ] each ;
+: standard-cards. ( seq -- ) filter-standard normal-cards. ;
+: historic-cards. ( seq -- ) filter-historic normal-cards. ;
+: modern-cards. ( seq -- ) filter-modern normal-cards. ;
 
 ! rarity is only on main card `json` (if there are two faces)
 : card-face-summary. ( json seq -- )
@@ -638,8 +642,15 @@ CONSTANT: rarity-to-number H{
 
 : cards-by-set-colors. ( seq -- ) sort-by-set-colors normal-cards. ;
 
-: cards-by-name ( seq name -- seq' ) filter-by-name-itext sort-by-release ;
-: cards-by-name. ( seq name -- ) cards-by-name [ "name" of ] sort-by normal-cards. ;
+: cards-by-name ( name -- seq' ) [ mtg-oracle-cards ] dip filter-by-name-itext sort-by-release ;
+: card-by-name ( name -- card )
+    [ mtg-oracle-cards ] dip >lower
+    [ '[ "name" of >lower _ = ] filter ?first ]
+    [ '[ "name" of >lower _ head? ] filter ?first ] 2bi or ;
+: cards-by-name. ( name -- ) cards-by-name normal-cards. ;
+: standard-cards-by-name. ( name -- ) cards-by-name standard-cards. ;
+: historic-cards-by-name. ( name -- ) cards-by-name historic-cards. ;
+: modern-cards-by-name. ( name -- ) cards-by-name modern-cards. ;
 
 : paren-set? ( string -- ? )
     { [ "(" head? ] [ ")" tail? ] [ length 5 = ] } 1&& ;
@@ -651,25 +662,31 @@ CONSTANT: rarity-to-number H{
         2 head*
     ] when " " join ;
 
+: assoc>cards ( assoc -- seq )
+    [ card-by-name <array> ] { } assoc>map concat ;
+
 : parse-mtga-card-line ( string -- array )
     [ blank? ] trim
     " " split1
     [ string>number ]
-    [
-        remove-set-and-num
-        standard-cards swap cards-by-name first
-    ] bi* <array> ;
+    [ remove-set-and-num card-by-name ] bi* <array> ;
 
-: parse-standard-cards ( strings -- seq )
+: parse-mtga-cards ( strings -- seq )
     [ parse-mtga-card-line ] map concat ;
 
-TUPLE: mtga-deck about deck sideboard section ;
+TUPLE: mtga-deck name deck sideboard section ;
 
 : <mtga-deck> ( -- mtga-deck )
     mtga-deck new "Deck" >>section ;
 
+: <moxfield-deck> ( name deck sideboard -- deck )
+    mtga-deck new
+        swap >>sideboard
+        swap >>deck
+        swap >>name ;
+
 ERROR: unknown-mtga-deck-section section ;
-: parse-mtga-standard-deck ( string -- mtga-deck )
+: parse-mtga-deck ( string -- mtga-deck )
     string-lines [ [ blank? ] trim ] map harvest
     { "About" "Deck" "Sideboard" } split*
     [ <mtga-deck> ] dip
@@ -678,10 +695,12 @@ ERROR: unknown-mtga-deck-section section ;
             first >>section
         ] [
             over section>> {
-                { "About" [ >>about ] }
-                { "Deck" [ parse-standard-cards >>deck ] }
-                { "Sideboard" [ parse-standard-cards >>sideboard ] }
-                [ unknown-mtga-deck-section ]
+                { "About" [ first "Name " ?head drop [ blank? ] trim >>name ] }
+                { "Deck" [ parse-mtga-cards >>deck ] }
+                { "Sideboard" [ parse-mtga-cards >>sideboard ] }
+                [
+                    unknown-mtga-deck-section
+                ]
             } case
         ] if
     ] each ;
@@ -690,10 +709,26 @@ ERROR: unknown-mtga-deck-section section ;
     [ "Land" any-type? not ] partition
     [ sort-by-set-colors ] bi@ append ;
 
-: mtga-deck. ( mtga-deck -- )
-    [ about>> print ]
-    [ deck>> "Deck" print sort-by-deck-order normal-cards. ]
-    [ sideboard>> "Sideboard" print sort-by-deck-order normal-cards. ] tri ;
+: cards. ( seq -- ) sort-by-deck-order normal-cards. ;
+
+: sideboard. ( seq -- )
+    sideboard>> [ "Sideboard" print sort-by-deck-order normal-cards. ] when* ;
+
+GENERIC: deck. ( obj -- )
+
+M: string deck. parse-mtga-deck deck. ;
+
+M: mtga-deck deck. [ name>> ?print ] [ deck>> cards. ] bi ;
+
+M: sequence deck. cards. ;
+
+GENERIC: deck-and-sideboard. ( mtga-deck -- )
+
+M: string deck-and-sideboard. parse-mtga-deck deck-and-sideboard. ;
+
+M: mtga-deck deck-and-sideboard. [ deck. ] [ sideboard. ] bi ;
+
+M: sequence deck-and-sideboard. deck. ;
 
 : filter-mtg-cheat-sheet ( seq -- seq' )
     [
@@ -708,3 +743,40 @@ ERROR: unknown-mtga-deck-section section ;
 
 : mtg-cheat-sheet. ( seq -- ) filter-mtg-cheat-sheet normal-cards. ;
 : mtg-cheat-sheet-text. ( seq -- ) filter-mtg-cheat-sheet card-summaries. ;
+
+MEMO: get-moxfield-user ( username -- json )
+    "https://api2.moxfield.com/v2/users/%s/decks?pageNumber=1&pageSize=100" sprintf http-get-json nip ;
+
+MEMO: get-moxfield-deck ( public-id -- json )
+    "https://api2.moxfield.com/v3/decks/all/" prepend http-get-json nip ;
+
+: moxfield-board>cards ( board -- seq )
+    "cards" of values [
+        [ "quantity" of ] [ "card" of "name" of ] bi 2array
+    ] map assoc>cards ;
+
+: json>moxfield-deck ( json -- mtga-deck )
+    [ "name" of ]
+    [
+        "boards" of
+        [ "mainboard" of moxfield-board>cards ]
+        [ "sideboard" of moxfield-board>cards ] bi
+    ] bi
+    <moxfield-deck> ;
+
+: moxfield-random-deck-for-username ( username -- json )
+    get-moxfield-user
+    "data" of
+    random "publicId" of get-moxfield-deck
+    json>moxfield-deck ;
+
+: moxfield-latest-deck-for-username ( username -- json )
+    get-moxfield-user
+    "data" of ?first "publicId" of get-moxfield-deck
+    json>moxfield-deck ;
+
+: moxfield-latest-deck-for-username. ( username -- )
+    moxfield-latest-deck-for-username deck. ;
+
+: moxfield-latest-deck-and-sideboard-for-username. ( username -- )
+    moxfield-latest-deck-for-username deck-and-sideboard. ;
