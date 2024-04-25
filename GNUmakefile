@@ -44,7 +44,7 @@ ifdef CONFIG
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
-		CFLAGS += -O3
+		CFLAGS += -O3 -flto -Wl,-s
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
