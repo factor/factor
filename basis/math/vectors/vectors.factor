@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators grouping kernel math
-math.functions math.libm math.order sequences ;
+math.functions math.libm math.order sequences vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors
 
@@ -213,8 +213,11 @@ M: object v?
 : vceiling ( v -- w ) [ ceiling ] map ;
 : vtruncate ( v -- w ) [ truncate ] map ;
 
-: vsupremum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
-: vinfimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
+: vmaximum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
+: vminimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
+
+ALIAS: vsupremum vmaximum deprecated
+ALIAS: vinfimum vminimum deprecated
 
 GENERIC: vdot ( u v -- x )
 M: object vdot [ * ] [ + ] 2map-reduce ; inline
@@ -231,7 +234,7 @@ M: object norm-sq [ absq ] [ + ] map-reduce ; inline
 
 ALIAS: norm l2-norm
 
-: l-infinity-norm ( k -- x ) supremum ; inline
+: l-infinity-norm ( k -- x ) maximum ; inline
 
 : p-norm-default ( k p -- x )
     [ [ [ abs ] dip ^ ] curry map-sum ] keep recip ^ ; inline
@@ -240,7 +243,7 @@ ALIAS: norm l2-norm
     {
         { [ dup 1 = ] [ drop l1-norm ] }
         { [ dup 2 = ] [ drop l2-norm ] }
-        { [ dup fp-infinity? ] [ drop supremum ] }
+        { [ dup fp-infinity? ] [ drop maximum ] }
         [ p-norm-default ]
     } cond ;
 
@@ -298,3 +301,5 @@ PRIVATE>
 
 : angle-between ( v u -- a )
     [ normalize ] bi@ hdot acos ;
+
+{ "math.vectors" "ranges" } "math.vectors.ranges" require-when

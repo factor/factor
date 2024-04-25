@@ -66,7 +66,7 @@ CONSTANT: word-renames {
     { "random-integers" { "randoms" "0.99" } }
     { "count*" { "percent-of" "0.99" } }
     { "more?" { "deref?" "0.99" } }
-    { "plox" { "?transmute" "0.99" } }
+    { "plox" { "?call" "0.99" } }
     { "ensure-non-negative" { "assert-non-negative" "0.99" } }
     { "order" { "dispatch-order" "0.99" } }
     { "TEST:" { "DEFINE-TEST-WORD:" "0.99" } }
@@ -74,6 +74,8 @@ CONSTANT: word-renames {
     { "assoc-all-value?" { "all-values?" "0.100" } }
     { "assoc-any-key?" { "any-key?" "0.100" } }
     { "assoc-any-value?" { "any-value?" "0.100" } }
+    { "?download-to" { "download-once-into" "0.100" } }
+    { "download-to" { "download-into" "0.100" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

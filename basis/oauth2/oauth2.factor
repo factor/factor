@@ -1,6 +1,6 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar combinators http.client io
+USING: accessors assocs calendar combinators http http.client io
 json kernel make math.order sequences unicode urls webbrowser ;
 IN: oauth2
 
@@ -8,7 +8,7 @@ IN: oauth2
     write flush readln [ blank? ] trim [ f ] when-empty ;
 
 : post-json-request ( params token-uri -- assoc )
-    <post-request> dup header>> "application/json" "Accept" rot set-at
+    <post-request> "application/json" "Accept" set-header
     http-request nip json> ;
 
 TUPLE: tokens access refresh expiry ;

@@ -114,3 +114,11 @@ M: windows strerror
         [ strerror_s drop ] keepdd
         utf8 alien>string
     ] with-destructors ;
+
+! These are uncertain:
+CONSTANT: LC_ALL 0
+CONSTANT: LC_COLLATE 1
+CONSTANT: LC_CTYPE 2
+CONSTANT: LC_MONETARY 3
+CONSTANT: LC_NUMERIC 4
+CONSTANT: LC_TIME 5

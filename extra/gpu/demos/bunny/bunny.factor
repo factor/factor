@@ -3,11 +3,11 @@
 USING: accessors alien.c-types arrays classes.struct combinators
 combinators.short-circuit game.loop game.worlds gpu gpu.buffers
 gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures
-gpu.util gpu.util.wasd grouping http.client images images.loader
-io io.encodings.ascii io.files io.files.temp kernel literals
-math.parser math.vectors math.vectors.simd method-chains
-namespaces sequences specialized-arrays specialized-vectors
-threads ui.gadgets.worlds ui.pixel-formats ;
+gpu.util gpu.util.wasd grouping http.client http.download images
+images.loader io io.encodings.ascii io.files io.files.temp
+kernel literals math.parser math.vectors math.vectors.simd
+method-chains namespaces sequences specialized-arrays
+specialized-vectors threads ui.gadgets.worlds ui.pixel-formats ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 SPECIALIZED-VECTOR: uint
@@ -149,7 +149,7 @@ CONSTANT: bunny-model-url
 "https://downloads.factorcode.org/misc/bun_zipper.ply"
 
 : download-bunny ( -- path )
-    bunny-model-url bunny-model-path [ ?download-to ] keep ;
+    bunny-model-url bunny-model-path download-once-as ;
 
 : get-bunny-data ( bunny-state -- )
     download-bunny bunny-data

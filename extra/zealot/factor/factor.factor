@@ -2,13 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bootstrap.image calendar cli.git
 combinators combinators.short-circuit concurrency.combinators
-environment formatting http.client io io.directories
-io.encodings.utf8 io.launcher io.pathnames kernel math.parser
-memory modern.paths namespaces parser.notes prettyprint
-regexp.classes sequences sequences.extras sets splitting system
-system-info threads tools.test tools.test.private vocabs
-vocabs.hierarchy vocabs.hierarchy.private vocabs.loader
-vocabs.metadata zealot ;
+environment formatting http.download io io.directories
+io.launcher io.pathnames kernel math.parser memory modern.paths
+namespaces parser.notes prettyprint regexp.classes sequences
+sequences.extras sets splitting system system-info threads
+tools.test tools.test.private vocabs vocabs.hierarchy
+vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 
 ! XXX: Could check if it's a branch instead with a git command
@@ -16,10 +15,10 @@ IN: zealot.factor
     { [ length 40 = ] [ [ hex-digit? ] all? ] } 1&& ;
 
 : download-boot-checksum-branch ( path branch -- )
-    '[ _ "https://downloads.factorcode.org/images/%s/checksums.txt" sprintf download ] with-directory ;
+    '[ _ "https://downloads.factorcode.org/images/%s/checksums.txt" sprintf download drop ] with-directory ;
 
 : download-boot-checksum-git-checksum ( path checksum -- )
-    '[ _ "https://downloads.factorcode.org/images/build/checksums.txt.%s" sprintf download ] with-directory ;
+    '[ _ "https://downloads.factorcode.org/images/build/checksums.txt.%s" sprintf download drop ] with-directory ;
 
 : download-boot-checksums ( path branch/checksum -- )
     dup git-checksum?
@@ -27,7 +26,7 @@ IN: zealot.factor
     [ download-boot-checksum-branch ] if ;
 
 : download-boot-image ( path url -- )
-    '[ _ my-arch-name "boot.%s.image" sprintf download-to ] with-directory ;
+    '[ _ my-arch-name "boot.%s.image" sprintf download-as drop ] with-directory ;
 
 : arch-git-boot-image-path ( arch git-id -- str )
     "https://downloads.factorcode.org/images/build/boot.%s.image.%s" sprintf ;

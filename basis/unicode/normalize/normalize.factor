@@ -1,19 +1,17 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii combinators
-combinators.short-circuit hints kernel make math
-math.order sbufs sequences sorting.insertion strings
-unicode.data vectors ;
+combinators.short-circuit hints kernel make math math.order
+sbufs sequences sorting.insertion strings unicode.data vectors ;
 IN: unicode.normalize
 
 <PRIVATE
 ! Conjoining Jamo behavior
-
-CONSTANT: hangul-base 0xac00
+CONSTANT: hangul-base 0xAC00
 CONSTANT: hangul-end 0xD7AF
 CONSTANT: initial-base 0x1100
 CONSTANT: medial-base 0x1161
-CONSTANT: final-base 0x11a7
+CONSTANT: final-base 0x11A7
 
 CONSTANT: initial-count 19
 CONSTANT: medial-count 21
@@ -22,14 +20,34 @@ CONSTANT: final-count 28
 : ?between? ( n/f from to -- ? )
     pick [ between? ] [ 3drop f ] if ; inline
 
-: hangul? ( ch -- ? ) hangul-base hangul-end ?between? ; inline
-: jamo? ( ch -- ? ) 0x1100 0x11FF ?between? ; inline
+: hangul? ( ch -- ? )
+    hangul-base hangul-end ?between? ; inline
+
+: jamo? ( ch -- ? )
+    {
+        [ 0x1100 0x11FF ?between? ] ! Hangul Jamo
+        [ 0xA960 0xA97F ?between? ] ! Hangul Jamo Extended-A
+        [ 0xD7B0 0xD7FF ?between? ] ! Hangul Jamo Extended-B
+    } 1|| ; inline
 
 ! These numbers come from UAX 29
 : initial? ( ch -- ? )
-    [ 0x1100 0x1159 ?between? ] [ 0x115F = ] ?unless ; inline
-: medial? ( ch -- ? ) 0x1160 0x11A2 ?between? ; inline
-: final? ( ch -- ? ) 0x11A8 0x11F9 ?between? ; inline
+    {
+        [ 0x1100 0x115F ?between? ]
+        [ 0xA960 0xA97C ?between? ]
+    } 1|| ; inline
+
+: medial? ( ch -- ? )
+    {
+        [ 0x1160 0x11A7 ?between? ]
+        [ 0xD7B0 0xD7C6 ?between? ]
+    } 1|| ; inline
+
+: final? ( ch -- ? )
+    {
+        [ 0x11A8 0x11FF ?between? ]
+        [ 0xD7CB 0xD7FB ?between? ]
+    } 1|| ; inline
 
 : hangul>jamo ( hangul -- jamo-string )
     hangul-base - final-count /mod final-base +

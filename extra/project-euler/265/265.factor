@@ -45,7 +45,7 @@ CONSTANT: N 5
 
 : ?register ( acc seq -- )
     complete rotate-bits
-    dup [ 2 N ^ mod ] map all-unique? [ infimum swap push ] [ 2drop ] if ;
+    dup [ 2 N ^ mod ] map all-unique? [ minimum swap push ] [ 2drop ] if ;
 
 : add-bit ( seen bit -- seen' t/f )
     over last 2 * + 2 N ^ mod

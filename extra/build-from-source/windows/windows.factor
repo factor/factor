@@ -1,11 +1,8 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs build-from-source cli.git
-combinators.short-circuit combinators.smart continuations
-environment github html.parser html.parser.analyzer http.client
-io.directories io.encodings.string io.encodings.utf8
-io.files.temp io.launcher io.pathnames json kernel layouts math
-namespaces qw sequences sorting.human splitting windows.shell32 ;
+USING: build-from-source combinators.smart continuations
+environment http.download io.directories io.files.temp io.launcher
+io.pathnames kernel layouts qw sequences windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
@@ -26,17 +23,6 @@ IN: build-from-source.windows
 : check-cmake ( -- ) { "cmake" "-h" } try-process ;
 : check-msbuild ( -- ) { "msbuild" "-h" } try-process ;
 
-: latest-fftw ( -- path )
-    "https://ftp.fftw.org/pub/fftw/" [
-        http-get nip
-        parse-html find-links concat
-        [ name>> text = ] filter
-        [ text>> ] map
-        [ "fftw-" head? ] filter
-        [ ".tar.gz" tail? ] filter
-        human-sort last
-    ] keep prepend-path ;
-
 : build-fftw-dll ( -- )
     latest-fftw [
         [
@@ -51,10 +37,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-tar-gz ;
 
-: winflexbison-versions ( -- seq )
-    "lexxmark" "winflexbison" "v" list-repository-tags-matching
-    tag-refs [ "v." head? ] reject human-sort ;
-
 : build-winflexbison ( -- )
     "lexxmark" "winflexbison" winflexbison-versions last [
         [
@@ -64,10 +46,6 @@ IN: build-from-source.windows
         "bin/Release/win_bison.exe" "bison.exe" copy-vm-file-as
         "bin/Release/win_flex.exe" "flex.exe" copy-vm-file-as
     ] with-github-worktree-tag ;
-
-: blas-versions ( -- seq )
-    "xianyi" "OpenBLAS" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-blas ( -- )
     "xianyi" "OpenBLAS" blas-versions last [
@@ -83,12 +61,23 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: openssl-versions ( -- seq )
-    "openssl" "openssl" "openssl-" list-repository-tags-matching
-    tag-refs human-sort ;
+: build-capnproto-dll ( -- )
+    "capnproto" "capnproto" capnproto-versions last [
+        [
+            32-bit? [
+                qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                { "msbuild" "Cap'n Proto Root.sln" "/m" "/property:Configuration=Release" "/p:Platform=Win32" } try-process
+            ] [
+                qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
+                { "msbuild" "Cap'n Proto Root.sln" "/m" "/property:Configuration=Release" } try-process
+            ] if
+            ! "raylib/Release/raylib.dll" copy-output-file
+        ] with-build-directory
+    ] with-github-worktree-tag ;
+
 
 : build-openssl-32-dlls ( -- )
-    "openssl" "openssl" openssl-versions last [
+    "openssl" "openssl" openssl-release-versions last [
         check-perl
         "ProgramW6432" os-env program-files or
             "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
@@ -100,7 +89,7 @@ IN: build-from-source.windows
     ] with-github-worktree-tag ;
 
 : build-openssl-64-dlls ( -- )
-    "openssl" "openssl" openssl-versions last [
+    "openssl" "openssl" openssl-release-versions last [
         check-perl
         program-files "NASM/nasm.exe" append-path "nasm.exe" prepend-current-path copy-file
         check-nasm
@@ -112,10 +101,6 @@ IN: build-from-source.windows
 
 : build-openssl-dlls ( -- )
     32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ;
-
-: cairo-versions ( -- version )
-    "https://gitlab.freedesktop.org/api/v4/projects/956/repository/tags"
-    http-get nip utf8 decode json> [ "name" of ] map ;
 
 : build-cairo-dll ( -- )
     "gitlab.freedesktop.org" "cairo" "cairo" cairo-versions first [
@@ -134,15 +119,6 @@ IN: build-from-source.windows
         } delete-output-files
     ] with-gitlab-worktree-tag ;
 
-: latest-libressl ( -- path )
-    "https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/" [
-        http-get nip parse-html find-links concat
-        [ name>> text = ] filter
-        [ text>> ] map
-        [ "libressl-" head? ] filter
-        [ ".tar.gz" tail? ] filter last
-    ] keep prepend ;
-
 : build-libressl-dlls ( -- )
     latest-libressl [
         [
@@ -153,19 +129,11 @@ IN: build-from-source.windows
                 qw{ cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON .. } try-process
                 qw{ msbuild LibreSSL.sln /m /property:Configuration=Release } try-process
             ] if
-            {
-                "crypto/Release/crypto-51.dll"
-                "ssl/Release/ssl-54.dll"
-                "tls/Release/tls-27.dll"
-            } copy-output-files
+            "crypto/Release/crypto.dll" "libressl-crypto.dll" copy-output-file-as
+            "ssl/Release/ssl.dll" "libressl-ssl.dll" copy-output-file-as
+            "tls/Release/tls.dll" "libressl-tls.dll" copy-output-file-as
         ] with-build-directory
     ] with-tar-gz ;
-
-: openal-versions ( -- seq )
-    "kcat" "openal-soft" "" list-repository-tags-matching
-    tag-refs
-    [ [ digit-or-dot? ] all? ] filter
-    human-sort ;
 
 : build-openal-dll ( -- )
     "kcat" "openal-soft" openal-versions last [
@@ -191,10 +159,6 @@ IN: build-from-source.windows
             "Release/OpenAL32.dll" copy-output-file
         ] with-build-directory
     ] with-github-worktree-tag ;
-
-: grpc-versions ( -- seq )
-    "grpc" "grpc" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-grpc-dll ( -- )
     "grpc" "grpc" grpc-versions last [
@@ -229,14 +193,6 @@ IN: build-from-source.windows
         ] with-build-directory-as
     ] with-github-worktree-tag ;
 
-: latest-pcre-tar-gz ( -- path )
-    "https://ftp.exim.org/pub/pcre/" [
-        http-get nip parse-html find-links concat
-        [ name>> text = ] filter [ text>> ] map
-        [ "pcre-" head? ] filter
-        [ ".tar.gz" tail? ] filter last
-    ] keep prepend ;
-
 : build-pcre-dll ( -- )
     latest-pcre-tar-gz [
         [
@@ -251,12 +207,8 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-tar-gz ;
 
-: pcre2-versions ( -- seq )
-    "PCRE2Project" "pcre2" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-pcre2-dll ( -- )
-    "PCRE2Project" "pcre2" pcre2-versions last [
+    "PCRE2Project" "pcre2" pcre2-release-versions last [
         [
             32-bit? [
                 qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DPCRE2_SUPPORT_UNICODE=ON -DPCRE2_SUPPORT_LIBZ=OFF -DPCRE2_SUPPORT_LIBBZ2=OFF -DPCRE2_SUPPORT_LIBEDIT=OFF -DPCRE2_SUPPORT_LIBREADLINE=OFF .. } try-process
@@ -269,15 +221,9 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: postgres-versions ( -- seq )
-    "postgres" "postgres" "REL_" list-repository-tags-matching
-    tag-refs
-    ! [ "_" split1-last nip [ digit? ] all? ] filter ! no RC1 or BETA1
-    human-sort ;
-
 ! choco install -y meson winflexbison3
 : build-postgres-dll ( -- )
-    "postgres" "postgres" postgres-versions last [
+    "postgres" "postgres" postgres-release-versions last [
         "src/tools/msvc/clean.bat" prepend-current-path try-process
         qw{ meson setup build } try-process
         "build" prepend-current-path
@@ -285,13 +231,9 @@ IN: build-from-source.windows
         "build/src/interfaces/libpq/libpq.dll" copy-output-file
     ] with-github-worktree-tag ;
 
-: raylib-versions ( -- seq )
-    "raysan5" "raylib" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 ! choco install -y glfw3
 : build-raylib-dll ( -- )
-    "raysan5" "raylib" raylib-versions last [
+    "raysan5" "raylib" raylib-release-versions last [
         [
             32-bit? [
                 qw{ cmake -A Win32 -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DUSE_EXTERNAL_GLFW=OFF .. } try-process
@@ -304,12 +246,8 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: raygui-versions ( -- seq )
-    "raysan5" "raygui" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 :: build-raygui-dll ( -- )
-    "raysan5" "raygui" raygui-versions last [
+    "raysan5" "raygui" raygui-release-versions last [
         "raysan5" "raylib" raylib-versions last github-tag-disk-checkout-path :> $raylib-dir
         $raylib-dir "src" append-path :> $raylib-src
         $raylib-dir "build/raylib/Release/raylib.lib" append-path :> $raylib-lib
@@ -323,21 +261,11 @@ IN: build-from-source.windows
         "raygui.dll" copy-output-file
     ] with-github-worktree-tag ;
 
-: ripgrep-versions ( -- seq )
-    "BurntSushi" "ripgrep" "" list-repository-tags-matching
-    tag-refs
-    [ [ digit-or-dot? ] all? ] filter
-    human-sort ;
-
 : build-ripgrep ( -- )
     "BurntSushi" "ripgrep" ripgrep-versions last [
-        qw{ cargo build --release } try-process
+        qw{ cargo +nightly build --release --features pcre2,simd-accel } try-process
         "target/release/rg.exe" copy-output-file
     ] with-github-worktree-tag ;
-
-: snappy-versions ( -- seq )
-    "google" "snappy" "" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-snappy-dll ( -- )
     "google" "snappy" snappy-versions last [
@@ -353,20 +281,12 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: sqlite-versions ( -- seq )
-    "sqlite" "sqlite" "version-" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-sqlite-dll ( -- )
     "sqlite" "sqlite" sqlite-versions last [
         qw{ nmake /f Makefile.msc clean } try-process
         qw{ nmake /f Makefile.msc } try-process
         "sqlite3.dll" copy-output-file
     ] with-github-worktree-tag ;
-
-: duckdb-versions ( -- seq )
-    "duckdb" "duckdb" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-duckdb-dll ( -- )
     "duckdb" "duckdb" duckdb-versions last [
@@ -383,10 +303,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: yaml-versions ( -- seq )
-    "yaml" "libyaml" "" list-repository-tags-matching
-    tag-refs [ [ digit-or-dot? ] all? ] filter human-sort ;
-
 : build-yaml-dll ( -- )
     "yaml" "libyaml" yaml-versions last [
         [
@@ -402,10 +318,6 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: zeromq-versions ( -- seq )
-    "zeromq" "libzmq" "" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-zeromq-dll ( -- )
     "zeromq" "libzmq" zeromq-versions last [
         [
@@ -420,20 +332,12 @@ IN: build-from-source.windows
         ] with-build-directory
     ] with-github-worktree-tag ;
 
-: zlib-versions ( -- seq )
-    "madler" "zlib" "v" list-repository-tags-matching
-    tag-refs human-sort ;
-
 : build-zlib-dll ( -- )
     "madler" "zlib" zlib-versions last [
         qw{ nmake /f win32/Makefile.msc clean } try-process
         qw{ nmake /f win32/Makefile.msc } try-process
         "zlib1.dll" copy-output-file
     ] with-github-worktree-tag ;
-
-: lz4-versions ( -- seq )
-    "lz4" "lz4" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-lz4 ( -- )
     "lz4" "lz4" lz4-versions last [
@@ -450,10 +354,6 @@ IN: build-from-source.windows
             ] with-build-directory
         ] with-directory
     ] with-github-worktree-tag ;
-
-: zstd-versions ( -- seq )
-    "facebook" "zstd" "v" list-repository-tags-matching
-    tag-refs human-sort ;
 
 : build-zstd-dll ( -- )
     "facebook" "zstd" zstd-versions last [
@@ -496,7 +396,7 @@ IN: build-from-source.windows
 ! Probably not needed on Windows 10+
 : install-windows-redistributable ( -- )
     [
-        "https://aka.ms/vs/17/release/vc_redist.x64.exe" download
+        "https://aka.ms/vs/17/release/vc_redist.x64.exe" download drop
         qw{ vc_redist.x64.exe /install /passive /norestart } try-process
     ] with-temp-directory ;
 
@@ -522,4 +422,9 @@ IN: build-from-source.windows
     build-fftw-dll
     build-pcre-dll ;
 
-! build-ripgrep build-duckdb
+: build-unused-windows-dlls ( -- )
+    dll-out-directory make-directories
+    build-grpc-dll
+    rustup-update
+    build-ripgrep
+    build-duckdb-dll ;

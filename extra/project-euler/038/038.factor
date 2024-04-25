@@ -50,7 +50,7 @@ IN: project-euler.038
 PRIVATE>
 
 : euler038 ( -- answer )
-    9123 9876 [a..b] [ concat-product ] map [ pandigital? ] filter supremum ;
+    9123 9876 [a..b] [ concat-product ] map [ pandigital? ] filter maximum ;
 
 ! [ euler038 ] 100 ave-time
 ! 11 ms ave run time - 1.5 SD (100 trials)

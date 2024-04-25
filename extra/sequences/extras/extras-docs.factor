@@ -7,7 +7,7 @@ HELP: pad-center
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left and right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
 { $examples { $example "USING: io sequences sequences.extras ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-center print ] each" "-ab--\nquux-" } } ;
 
-HELP: ?supremum
+HELP: ?maximum
 { $values
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
@@ -15,11 +15,11 @@ HELP: ?supremum
 { $description "Outputs the greatest element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
-    "{ 1 f 3 2 } ?supremum ."
+    "{ 1 f 3 2 } ?maximum ."
     "3" }
 } ;
 
-HELP: ?infimum
+HELP: ?minimum
 { $values
     { "seq/f" { $maybe sequence } }
     { "elt/f" { $maybe object } }
@@ -27,11 +27,11 @@ HELP: ?infimum
 { $description "Outputs the least element of " { $snippet "seq" } ", ignoring any " { $link POSTPONE: f } " elements in it. If " { $snippet "seq" } " is empty or " { $link POSTPONE: f } ", returns " { $link POSTPONE: f } "." }
 { $examples
     { $example "USING: prettyprint sequences.extras ;"
-    "{ 1 f 3 2 } ?infimum ."
+    "{ 1 f 3 2 } ?minimum ."
     "1" }
 } ;
 
-{ ?supremum ?infimum } related-words
+{ ?maximum ?minimum } related-words
 
 HELP: 2count
 { $values
@@ -636,7 +636,7 @@ HELP: arg-where
     { "seq" sequence } { "quot" quotation }
     { "indices" object }
 }
-{ $description "Push a sequence of all indices in " { $snippet "seq" } " where " { $snippet "quot" } "applied to the element at each index is true." } ;
+{ $description "Push a sequence of all indices in " { $snippet "seq" } " where " { $snippet "quot" } " applied to the element at each index is true." } ;
 
 HELP: assoc-zip-with
 { $values
@@ -857,12 +857,12 @@ HELP: index-selector-as
     { "selector" object } { "accum" object }
 } ;
 
-HELP: infimum-by*
+HELP: minimum-by*
 { $values
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
 }
-{ $description "A variant of " { $link infimum-by } " that pushes the index of the least element along with the least element." } ;
+{ $description "A variant of " { $link minimum-by } " that pushes the index of the least element along with the least element." } ;
 
 HELP: insert-nth!
 { $values
@@ -1324,11 +1324,12 @@ HELP: span-slices
 }
 { $description "Create a virtual sequence spanning the length covered by " { $snippet "slice1" } " and " { $snippet "slice2" } ". Slices must refer to the same sequence." } ;
 
-HELP: supremum-by*
+HELP: maximum-by*
 { $values
     { "seq" sequence } { "quot" quotation }
     { "i" integer } { "elt" object }
-} ;
+}
+{ $description "A variant of " { $link maximum-by } " that pushes the index of the greated element along with the greatest element." } ;
 
 HELP: tail*-as
 { $values

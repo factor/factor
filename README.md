@@ -126,7 +126,6 @@ Common arguments:
         -run=listener    run terminal listener
         -run=ui.tools    run Factor development UI
     -e=<code>        evaluate <code>
-    -ea=<code>       evaluate <code> with auto-use
     -no-user-init    suppress loading of .factor-rc
     -roots=<paths>   a list of path-delimited extra vocab roots
 
@@ -151,7 +150,7 @@ The Factor source tree is organized as follows:
 
 ## Source History
 
-During Factor's lifetime, sourcecode has lived in many repositories. Unfortunately, the first import in Git did not keep history. History has been partially recreated from what could be salvaged. Due to the nature of Git, it's only possible to add history without disturbing upstream work, by using replace objects. These need to be manually fetched, or need to be explicitly added to your git remote configuration.
+During Factor's lifetime, source code has lived in many repositories. Unfortunately, the first import in Git did not keep history. History has been partially recreated from what could be salvaged. Due to the nature of Git, it's only possible to add history without disturbing upstream work, by using replace objects. These need to be manually fetched, or need to be explicitly added to your git remote configuration.
 
 Use:
 `git fetch origin 'refs/replace/*:refs/replace/*'`

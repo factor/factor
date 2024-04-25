@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: system io.directories alien.strings
-io.pathnames io.backend io.files.windows destructors
+io.pathnames io.backend io.files.windows literals destructors
 kernel accessors calendar windows windows.errors
 windows.kernel32 alien.c-types sequences splitting
 fry continuations classes.struct windows.time ;
@@ -21,10 +21,13 @@ M: windows truncate-file
     ] with-disposal ;
 
 M: windows move-file
-    [ normalize-path ] bi@ MoveFile win32-error=0/f ;
+    [ normalize-path ] bi@
+    flags{ MOVEFILE_REPLACE_EXISTING MOVEFILE_COPY_ALLOWED }
+    MoveFileEx win32-error=0/f ;
 
 M: windows move-file-atomically
-    [ normalize-path ] bi@ 0 MoveFileEx win32-error=0/f ;
+    [ normalize-path ] bi@ MOVEFILE_REPLACE_EXISTING
+    MoveFileEx win32-error=0/f ;
 
 ERROR: file-delete-failed path error ;
 

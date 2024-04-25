@@ -77,7 +77,7 @@ M: div pdf-render
 
 M: div pdf-width
     [ style>> set-style ] keep
-    items>> [ dupd pdf-width ] map nip supremum ;
+    items>> [ dupd pdf-width ] map nip maximum ;
 
 
 <PRIVATE
@@ -108,7 +108,7 @@ M: p pdf-render
 M: p pdf-width
     [ style>> set-style ] keep
     [ font>> ] [ string>> ] bi* split-lines
-    [ dupd text-width ] map nip supremum ;
+    [ dupd text-width ] map nip maximum ;
 
 
 TUPLE: text string style ;
@@ -141,7 +141,7 @@ M: text pdf-render
 M: text pdf-width
     [ style>> set-style ] keep
     [ font>> ] [ string>> ] bi* split-lines
-    [ dupd text-width ] map nip supremum ;
+    [ dupd text-width ] map nip maximum ;
 
 
 TUPLE: hr width ;
@@ -242,7 +242,7 @@ M: table-row pdf-render
     [
         [
             contents>> [ 0 ] [
-                [ [ dupd pdf-width ] [ 0 ] if* ] map supremum
+                [ [ dupd pdf-width ] [ 0 ] if* ] map maximum
             ] if-empty
         ] [ 0 ] if*
     ] map nip ;

@@ -33,14 +33,12 @@ USING: accessors smtp ;
     "At Tracy's." >>body
 send-email
 ----
-USING: io.files io.encodings.utf8 kernel
-sequences splitting ;
+USING: io.encodings.utf8 io.files sequences
+splitting ;
 
 "table.txt" utf8 [
-    file-lines
     [ "|" split ] map flip [ "|" join ] map
-] 2keep
-set-file-lines
+] change-file-lines
 ----
 USING: sequences xml.syntax xml.writer ;
 

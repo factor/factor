@@ -97,7 +97,7 @@ PRIVATE>
     [
         { [ horizontal ] [ vertical ] [ diagonal/ ] [ diagonal\ ] }
         [ call( -- matrix ) 4 max-product , ] each
-    ] { } make supremum ;
+    ] { } make maximum ;
 
 ! [ euler011 ] 100 ave-time
 ! 3 ms ave run time - 0.77 SD (100 trials)

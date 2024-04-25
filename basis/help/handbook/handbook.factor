@@ -54,6 +54,7 @@ $nl
     { { $snippet { $emphasis "foo" } "!" } { "a variant of " { $snippet "foo" } " which mutates one of its arguments" } { { $link append! } } }
     { { $snippet "?" { $emphasis "foo" } } { "conditionally performs " { $snippet { $emphasis "foo" } } } { { $links ?nth } } }
     { { $snippet "<" { $emphasis "foo" } ">" } { "creates a new " { $snippet "foo" } } { { $link <array> } } }
+    { { $snippet ">" { $emphasis "foo" } "<" } { "destroys an object of class " { $snippet "foo" } ", usually unpacking its data" } { { $link >slice< } } }
     { { $snippet ">" { $emphasis "foo" } } { "converts the top of the stack into a " { $snippet "foo" } } { { $link >array } } }
     { { $snippet { $emphasis "foo" } ">" { $emphasis "bar" } } { "converts a " { $snippet "foo" } " into a " { $snippet "bar" } } { { $link number>string } } }
     { { $snippet "new-" { $emphasis "foo" } } { "creates a new " { $snippet "foo" } ", taking some kind of parameter from the stack which determines the type of the object to be created" } { { $link new-sequence } ", " { $link new-lexer } ", " { $link new } } }

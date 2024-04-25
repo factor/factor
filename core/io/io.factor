@@ -14,6 +14,7 @@ GENERIC: stream-read-until ( seps stream -- seq sep/f )
 GENERIC: stream-read-partial-unsafe ( n buf stream -- count )
 GENERIC: stream-readln ( stream -- str/f )
 GENERIC: stream-contents* ( stream -- seq )
+
 : stream-contents ( stream -- seq ) [ stream-contents* ] with-disposal ;
 
 GENERIC: stream-write1 ( elt stream -- )
@@ -49,7 +50,6 @@ SYMBOL: error-stream
 : write1 ( elt -- ) output-stream get stream-write1 ; inline
 : write ( seq -- ) output-stream get stream-write ; inline
 : flush ( -- ) output-stream get stream-flush ; inline
-
 : nl ( -- ) output-stream get stream-nl ; inline
 
 : with-input-stream* ( stream quot -- )
@@ -86,9 +86,9 @@ SYMBOL: error-stream
     swapd '[ _ with-output-stream* ] with-input-stream* ; inline
 
 : with-streams ( input output quot -- )
-    ! We have to dispose of the output stream first, so that
-    ! if both streams point to the same FD, we get to flush the
-    ! buffer before closing the FD.
+    ! We have to dispose of the output stream first, so that if
+    ! both streams point to the same file descriptor, we get to
+    ! flush the buffer before closing the file descriptor.
     swapd '[ _ with-output-stream ] with-input-stream ; inline
 
 : with-input-output+error-streams* ( input output+error quot -- )
@@ -111,40 +111,40 @@ SYMBOL: error-stream
 : stream-exemplar-growable ( stream -- exemplar )
     stream-element-type +byte+ = BV{ } SBUF" " ? ; inline
 
-: (new-sequence-for-stream) ( n stream -- seq )
+: new-sequence-for-stream ( n stream -- seq )
     stream-exemplar new-sequence ; inline
 
 : resize-if-necessary ( wanted-n got-n seq -- seq' )
     2over = [ 2nip ] [ resize nip ] if ; inline
 
-: (read-into-new) ( n stream quot -- seq/f )
+: read-into-new ( n stream quot -- seq/f )
     [ dup ] 2dip
-    [ 2dup (new-sequence-for-stream) swap ] dip keepd
+    [ 2dup new-sequence-for-stream swap ] dip keepd
     over 0 = [ 3drop f ] [ resize-if-necessary ] if ; inline
 
-: (read-into) ( buf stream quot -- buf-slice/f )
+: read-into-buf ( buf stream quot -- buf-slice/f )
     [ dup length over ] 2dip call
     [ head-to-index <slice-unsafe> ] [ zero? not ] bi ; inline
 
 PRIVATE>
 
 : stream-read ( n stream -- seq/f )
-    [ stream-read-unsafe ] (read-into-new) ; inline
+    [ stream-read-unsafe ] read-into-new ; inline
 
 : stream-read-partial ( n stream -- seq/f )
-    [ stream-read-partial-unsafe ] (read-into-new) ; inline
-
-ERROR: invalid-read-buffer buf stream ;
+    [ stream-read-partial-unsafe ] read-into-new ; inline
 
 : stream-read-into ( buf stream -- buf-slice more? )
-    [ stream-read-unsafe { fixnum } declare ] (read-into) ; inline
+    [ stream-read-unsafe { fixnum } declare ] read-into-buf ; inline
 
 : stream-read-partial-into ( buf stream -- buf-slice more? )
-    [ stream-read-partial-unsafe { fixnum } declare ] (read-into) ; inline
+    [ stream-read-partial-unsafe { fixnum } declare ] read-into-buf ; inline
 
-: read ( n -- seq ) input-stream get stream-read ; inline
+: read ( n -- seq )
+    input-stream get stream-read ; inline
 
-: read-partial ( n -- seq ) input-stream get stream-read-partial ; inline
+: read-partial ( n -- seq )
+    input-stream get stream-read-partial ; inline
 
 : read-into ( buf -- buf-slice more? )
     input-stream get stream-read-into ; inline
@@ -159,55 +159,33 @@ ERROR: invalid-read-buffer buf stream ;
     input-stream get swap each-stream-line ; inline
 
 : stream-lines ( stream -- seq )
-    [
-        [ ] collector [ each-stream-line ] dip { } like
-    ] with-disposal ; inline
+    [ [ ] collector [ each-stream-line ] dip { } like ] with-disposal ; inline
 
 : read-lines ( -- seq )
     input-stream get stream-lines ; inline
 
-CONSTANT: each-block-size 65536
+CONSTANT: default-block-size 65536
 
 : (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )
     -rot [
-        [ (new-sequence-for-stream) ] keep
+        [ new-sequence-for-stream ] keep
         [ stream-read-partial-into ] 2curry
     ] dip while drop ; inline
 
 : each-stream-block-slice ( ... stream quot: ( ... block-slice -- ... ) -- ... )
-    each-block-size (each-stream-block-slice) ; inline
+    default-block-size (each-stream-block-slice) ; inline
 
 : (each-stream-block) ( ... stream quot: ( ... block -- ... ) block-size -- ... )
-    -rot [ [ stream-read-partial ] 2curry ] dip while* ; inline
+    -rot [ '[ _ _ stream-read-partial ] ] dip while* ; inline
 
 : each-stream-block ( ... stream quot: ( ... block -- ... ) -- ... )
-    each-block-size (each-stream-block) ; inline
+    default-block-size (each-stream-block) ; inline
 
 : each-block-slice ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block-slice ; inline
 
 : each-block ( ... quot: ( ... block -- ... ) -- ... )
     input-stream get swap each-stream-block ; inline
-
-: (stream-contents-by-length) ( stream len -- seq )
-    dup rot
-    [ (new-sequence-for-stream) ]
-    [ [ stream-read-unsafe ] keepd resize ] bi ; inline
-
-: (stream-contents-by-block) ( stream -- seq )
-    [ [ ] collector [ each-stream-block ] dip { } like ]
-    [ stream-exemplar concat-as ] bi ; inline
-
-: (stream-contents-by-length-or-block) ( stream -- seq )
-    dup stream-length
-    [ (stream-contents-by-length) ]
-    [ (stream-contents-by-block)  ] if* ; inline
-
-: (stream-contents-by-element) ( stream -- seq )
-    [
-        [ [ stream-read1 dup ] curry [ ] ]
-        [ stream-exemplar produce-as nip ] bi
-    ] with-disposal ; inline
 
 : read-contents ( -- seq )
     input-stream get stream-contents ; inline
@@ -222,6 +200,24 @@ CONSTANT: each-block-size 65536
 
 <PRIVATE
 
+: stream-contents-by-length ( stream len -- seq )
+    dup rot
+    [ new-sequence-for-stream ]
+    [ [ stream-read-unsafe ] keepd resize ] bi ; inline
+
+: stream-contents-by-block ( stream -- seq )
+    [ [ ] collector [ each-stream-block ] dip { } like ]
+    [ stream-exemplar concat-as ] bi ; inline
+
+: stream-contents-by-length-or-block ( stream -- seq )
+    dup stream-length
+    [ stream-contents-by-length ]
+    [ stream-contents-by-block ] if* ; inline
+
+: stream-contents-by-element ( stream -- seq )
+    [ [ stream-read1 dup ] curry [ ] ]
+    [ stream-exemplar produce-as nip ] bi ; inline
+
 : read-loop ( buf stream n i -- count )
     2dup = [ 3nip ] [
         pick stream-read1 [
@@ -234,7 +230,7 @@ CONSTANT: each-block-size 65536
     [ [ f ] when-empty f ] unless* ; inline
 
 : read-until-loop ( seps stream -- seq sep/f )
-    [ [ stream-read1 dup [ rot member? not ] [ nip f ] if* ] 2curry [ ] ]
+    [ swap '[ _ stream-read1 dup [ _ member? not ] [ f ] if* ] [ ] ]
     [ stream-exemplar ] bi produce-as swap finalize-read-until ; inline
 
 PRIVATE>
@@ -243,7 +239,7 @@ M: input-stream stream-read-unsafe rot 0 read-loop ; inline
 M: input-stream stream-read-partial-unsafe stream-read-unsafe ; inline
 M: input-stream stream-read-until read-until-loop ; inline
 M: input-stream stream-readln "\n" swap stream-read-until drop ; inline
-M: input-stream stream-contents* (stream-contents-by-length-or-block) ; inline
+M: input-stream stream-contents* stream-contents-by-length-or-block ; inline
 M: input-stream stream-seekable? drop f ; inline
 M: input-stream stream-length drop f ; inline
 

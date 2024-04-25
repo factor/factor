@@ -274,7 +274,7 @@ CONSTANT: lookup-table-at-max 256
     } 1&& ;
 
 : lookup-table-seq ( assoc -- table )
-    [ keys supremum 1 + <iota> ] keep '[ _ at ] { } map-as ;
+    [ keys maximum 1 + <iota> ] keep '[ _ at ] { } map-as ;
 
 : lookup-table-quot ( seq -- newquot )
     lookup-table-seq

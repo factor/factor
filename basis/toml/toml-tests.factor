@@ -1,4 +1,4 @@
-USING: assocs multiline present toml tools.test ;
+USING: assocs calendar multiline present toml tools.test ;
 
 ! Example document
 
@@ -14,7 +14,15 @@ USING: assocs multiline present toml tools.test ;
                     "bio"
                     "GitHub Cofounder & CEO\nLikes tater tots and beer."
                 }
-                { "dob" "1979-05-27T07:32:00Z" }
+                { "dob"
+                    T{ timestamp
+                        { year 1979 }
+                        { month 5 }
+                        { day 27 }
+                        { hour 7 }
+                        { minute 32 }
+                    }
+                }
             }
         }
         {
@@ -131,6 +139,17 @@ hosts = [
 } [
     "[deps]
     temp_targets = { case = 72.0 }" toml>
+] unit-test
+
+{
+    H{ { "foo" H{ { "qux" 456 } { "bar" H{ { "baz" 123 } } } } } }
+} [
+[=[
+[foo.bar]
+baz = 123
+[foo]
+qux = 456
+]=] toml>
 ] unit-test
 
 ! TESTS FROM 1.0.0 SPEC
@@ -340,7 +359,7 @@ bin1 = 0b11010110
         { "flt1" "1.0" }
         { "flt2" "3.1415" }
         { "flt3" "-0.01" }
-        { "flt4" "5.0e+22" }
+        { "flt4" "5e+22" }
         { "flt5" "1000000.0" }
         { "flt6" "-0.02" }
         { "flt7" "6.626e-34" }
@@ -394,19 +413,107 @@ bool2 = false]=] toml>
 
 ! Offset Date-Time
 
-! XXX:
+{
+    H{
+        {
+            "odt4"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { hour 7 }
+                { minute 32 }
+            }
+        }
+        {
+            "odt1"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { hour 7 }
+                { minute 32 }
+            }
+        }
+        {
+            "odt2"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { minute 32 }
+                { gmt-offset T{ duration { hour -7 } } }
+            }
+        }
+        {
+            "odt3"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { minute 32 }
+                { second 999999/1000000 }
+                { gmt-offset T{ duration { hour -7 } } }
+            }
+        }
+    }
+} [
+    [=[
+odt1 = 1979-05-27T07:32:00Z
+odt2 = 1979-05-27T00:32:00-07:00
+odt3 = 1979-05-27T00:32:00.999999-07:00
+odt4 = 1979-05-27 07:32:00Z
+]=] toml>
+] unit-test
 
 ! Local Date-Time
 
-! XXX:
+{
+    H{
+        {
+            "ldt1"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { hour 7 }
+                { minute 32 }
+            }
+        }
+        {
+            "ldt2"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { minute 32 }
+                { second 999999/1000000 }
+            }
+        }
+    }
+} [
+    [=[
+ldt1 = 1979-05-27T07:32:00
+ldt2 = 1979-05-27T00:32:00.999999
+]=] toml>
+] unit-test
 
 ! Local Date
 
-! XXX:
+{ H{ { "ld1" "1979-05-27" } } } [
+    [=[
+ld1 = 1979-05-27
+]=] toml>
+] unit-test
 
 ! Local Time
 
-! XXX:
+{ H{ { "lt2" "00:32:00.999999" } { "lt1" "07:32:00" } } } [
+    [=[
+lt1 = 07:32:00
+lt2 = 00:32:00.999999
+]=] toml>
+] unit-test
 
 ! Array
 
@@ -512,6 +619,8 @@ animal = { type.name = "pug" }]=] toml>
 { H{ { "a" { } } } } [ "a=[]" toml> ] unit-test
 { H{ { "a" { 1 } } } } [ "a=[1]" toml> ] unit-test
 { H{ { "a" { 1 2 3 } } } } [ "a=[1,2,3]" toml> ] unit-test
+{ H{ { "a" { 1 2 3 } } } } [ "a=[,1,,,,2,,3,,]" toml> ] unit-test
+{ H{ { "a" { 1 2 3 } } } } [ "a=[ # this\n,1,, # is\n,,2, #a\n,3,, # comment \n]" toml> ] unit-test
 
 ! unreleased
 

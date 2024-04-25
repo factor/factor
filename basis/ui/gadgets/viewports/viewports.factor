@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.vectors models ui.gadgets ;
+USING: accessors kernel math.vectors models models.product
+models.range sequences ui.gadgets ;
 IN: ui.gadgets.viewports
 
 TUPLE: viewport < gadget { constraint initial: { 1 1 } } ;
@@ -22,7 +23,7 @@ M: viewport focusable-child*
     gadget-child ;
 
 : scroll-position ( scroller -- loc )
-    model>> range-value v>integer ;
+    model>> [ range-value ] product-value v>integer ;
 
 M: viewport model-changed
     nip

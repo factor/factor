@@ -105,7 +105,7 @@ SYMBOL: tetrominoes
     tetrominoes get random ;
 
 : blocks-max ( blocks quot -- max )
-    map supremum 1 + ; inline
+    map maximum 1 + ; inline
 
 : blocks-width ( blocks -- width )
     [ first ] blocks-max ;

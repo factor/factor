@@ -17,7 +17,8 @@ TUPLE: discord-webhook url id token ;
 
 TUPLE: discord-bot-config
     client-id client-secret
-    token application-id guild-id channel-id permissions
+    token application-id guild-id channel-id
+    permissions intents
     user-callback obey-names
     metadata
     discord-bot mailbox connect-thread ;
@@ -65,10 +66,20 @@ TUPLE: discord-bot
     discord-get-request json-request ;
 : discord-post-request ( payload route -- request )
     >discord-url <post-request> add-discord-auth-header ;
+: discord-patch-request ( payload route -- request )
+    >discord-url <patch-request> add-discord-auth-header ;
+: discord-delete-request ( route -- request )
+    >discord-url <delete-request> add-discord-auth-header ;
 : discord-post ( payload route -- json )
     discord-post-request json-request ;
 : discord-post-json ( payload route -- json )
     [ >json ] dip discord-post-request add-json-header json-request ;
+: discord-post-json-no-resp ( payload route -- )
+    [ >json ] dip discord-post-request add-json-header http-request 2drop ;
+: discord-patch-json ( payload route -- json )
+    [ >json ] dip discord-patch-request add-json-header json-request ;
+: discord-delete-json ( route -- json )
+    discord-delete-request add-json-header json-request ;
 
 : bot-guild-join-uri ( discord-bot-config -- uri )
     [ permissions>> ] [ client-id>> ] [ guild-id>> ] tri
@@ -85,6 +96,25 @@ TUPLE: discord-bot
 : get-discord-channel-pins ( channel-id -- json ) "/channels/%s/pins" sprintf discord-get ;
 : get-discord-channel-messages ( channel-id -- json ) "/channels/%s/messages" sprintf discord-get ;
 : get-discord-channel-message ( channel-id message-id -- json ) "/channels/%s/messages/%s" sprintf discord-get ;
+
+: set-discord-application-commands ( json application-id -- json )
+    "/applications/%s/commands" sprintf discord-post-json ;
+: set-discord-application-guild-commands ( json application-id guild-id -- json )
+    "/applications/%s/guilds/%s/commands" sprintf discord-post-json ;
+
+: delete-discord-application-command ( application-id -- json )
+    "/applications/%s/commands" sprintf discord-delete-json ;
+: delete-discord-application-guild-command ( application-id -- json )
+    "/applications/%s/commands" sprintf discord-delete-json ;
+
+: create-interaction-response ( json interaction-id interaction-token -- )
+    "/interactions/%s/%s/callback" sprintf discord-post-json-no-resp ;
+: get-original-interaction-response ( application-id interaction-token -- json )
+    "/webhooks/%s/%s/messages/@original" sprintf discord-get ;
+: edit-interaction-response ( json application-id interaction-token -- json )
+    "/webhooks/%s/%s/messages/@original" sprintf discord-patch-json ;
+
+
 : send-message* ( string channel-id -- json )
     [ "content" associate ] dip "/channels/%s/messages" sprintf discord-post-json ;
 : send-message ( string channel-id -- ) send-message* drop ;
@@ -109,7 +139,11 @@ TUPLE: discord-bot
 : get-discord-bot-gateway ( -- json ) "/gateway/bot" discord-get ;
 
 : gateway-identify-json ( -- json )
-    \ discord-bot get config>> token>> [[ {
+    \ discord-bot get
+    [ config>> ] ?call
+    [ [ token>> ] ?call "0" or  ]
+    [ [ intents>> ] ?call 3276541 or ] bi
+    [[ {
         "op": 2,
         "d": {
             "token": "%s",
@@ -119,7 +153,7 @@ TUPLE: discord-bot
                 "device": "discord.factor"
             },
             "large_threshold": 250,
-            "intents": 3276541
+            "intents": %d
         }
     }]] sprintf json> >json ;
 
@@ -172,6 +206,7 @@ SINGLETONS:
     GUILD_MEMBER_ADD GUILD_MEMBER_REMOVE GUILD_MEMBER_UPDATE GUILD_REMOVE
     GUILD_ROLE_CREATE GUILD_ROLE_DELETE GUILD_ROLE_UPDATE
     GUILD_STICKERS_UPDATE GUILD_UNAVAILABLE GUILD_UPDATE
+    INTERACTION_CREATE
     INVITE_CREATE INVITE_DELETE
     MEMBER_BAN MEMBER_JOIN MEMBER_REMOVE MEMBER_UNBAN MEMBER_UPDATE
     MESSAGE_CREATE MESSAGE_DELETE MESSAGE_EDIT
@@ -274,6 +309,7 @@ M: GUILD_BAN_REMOVE dispatch-message 2drop ;
 M: GUILD_ROLE_CREATE dispatch-message 2drop ;
 M: GUILD_ROLE_UPDATE dispatch-message 2drop ;
 M: GUILD_ROLE_DELETE dispatch-message 2drop ;
+M: INTERACTION_CREATE dispatch-message 2drop ;
 M: INVITE_CREATE dispatch-message 2drop ;
 M: INVITE_DELETE dispatch-message 2drop ;
 M: MEMBER_BAN dispatch-message 2drop ;

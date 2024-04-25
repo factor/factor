@@ -350,13 +350,13 @@ PRIVATE>
 : progressive-index ( seq1 seq2 -- hash seq' )
     [ ] progressive-index-by ; inline
 
-: 0reduce ( seq quot: ( prev elt -- next ) -- result )
+: 0reduce ( seq quot: ( ..a prev elt -- ..a next ) -- result )
     [ 0 ] dip reduce ; inline
 
 : ?unclip ( seq -- rest/f first/f )
     [ f f ] [ unclip ] if-empty ;
 
-: 1reduce ( seq quot: ( prev elt -- next ) -- result )
+: 1reduce ( seq quot: ( ..a prev elt -- ..a next ) -- result )
     [ f ] swap '[ [ ] _ map-reduce ] if-empty ; inline
 
 <PRIVATE
@@ -871,6 +871,8 @@ ERROR: slice-error-of from to seq ;
     [ find drop ] keepd swap
     [ cut ] [ f over like ] if* ; inline
 
+: ?cut ( seq n -- before after ) [ index-or-length head ] [ index-or-length tail ] 2bi ;
+
 : nth* ( n seq -- elt )
     [ length 1 - swap - ] [ nth ] bi ; inline
 
@@ -890,33 +892,42 @@ ERROR: slice-error-of from to seq ;
 
 PRIVATE>
 
-: supremum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+: maximum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ after? ] select-by* ; inline
 
-: infimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
+: minimum-by* ( ... seq quot: ( ... elt -- ... x ) -- ... i elt )
     [ before? ] select-by* ; inline
 
+ALIAS: supremum-by* maximum-by* deprecated
+ALIAS: infimum-by* minimum-by* deprecated
+
 : arg-max ( seq -- n )
-    [ ] supremum-by* drop ;
+    [ ] maximum-by* drop ;
 
 : arg-min ( seq -- n )
-    [ ] infimum-by* drop ;
+    [ ] minimum-by* drop ;
 
-: ?supremum ( seq/f -- elt/f )
+: ?maximum ( seq/f -- elt/f )
     [ f ] [
         [ ] [ 2dup and [ max ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
 
-: ?infimum ( seq/f -- elt/f )
+: ?minimum ( seq/f -- elt/f )
     [ f ] [
         [ ] [ 2dup and [ min ] [ dupd ? ] if ] map-reduce
     ] if-empty ;
 
-: map-infimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+ALIAS: ?supremum ?maximum deprecated
+ALIAS: ?infimum ?minimum deprecated
+
+: map-minimum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
     [ min ] map-reduce ; inline
 
-: map-supremum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
+: map-maximum ( seq quot: ( ... elt -- ... elt' ) -- elt' )
     [ max ] map-reduce ; inline
+
+ALIAS: map-supremum map-maximum deprecated
+ALIAS: map-infimum map-minimum deprecated
 
 : change-last ( seq quot -- )
     [ index-of-last ] [ change-nth ] bi* ; inline
@@ -1022,8 +1033,8 @@ PRIVATE>
 ! https://en.wikipedia.org/wiki/Maximum_subarray_problem
 ! Kadane's algorithm O(n) largest sum in subarray
 : max-subarray-sum ( seq -- sum )
-    [ -1/0. 0 ] dip
-    [ [ + ] keep max [ max ] keep ] each drop ;
+    [ -1/0. ] dip
+    [ [ + ] keep max [ max ] keep ] 0reduce drop ;
 
 TUPLE: step-slice
     { from integer read-only initial: 0 }
@@ -1198,3 +1209,11 @@ INSTANCE: virtual-zip-index immutable-sequence
         2dup _ exchange-unsafe
         [ 1 - ] [ 1 + ] [ 1 + ] tri*
     ] [ pick 0 > ] swap while 3drop ;
+
+: sequence-cartesian-product ( seqs -- seqs' )
+    dup length 1 <= [
+        [ [ 1array ] map ] map concat
+    ] [
+        2 cut [ first2 cartesian-product concat ] dip swap
+        [ [ suffix ] cartesian-map concat ] reduce
+    ] if ;

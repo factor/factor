@@ -17,7 +17,7 @@ CONSTANT: alphabet $[
 ]
 
 : alphabet-inverse ( alphabet -- seq )
-    dup supremum 1 + f <array> [
+    dup maximum 1 + f <array> [
         '[ swap _ set-nth ] each-index
     ] keep ;
 >>

@@ -2,11 +2,11 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii assocs byte-arrays combinators
-combinators.short-circuit concurrency.combinators csv grouping
-http.client images images.viewer io io.directories
-io.encodings.binary io.encodings.utf8 io.files io.launcher
-io.pathnames kernel math math.parser namespaces sequences
-splitting ui.gadgets.panes ;
+concurrency.combinators csv grouping http.download images
+images.viewer io io.directories io.encodings.binary
+io.encodings.utf8 io.files io.launcher io.pathnames kernel math
+math.parser namespaces sequences splitting ui.gadgets.panes ;
+
 IN: machine-learning.data-sets
 
 TUPLE: data-set
@@ -65,18 +65,8 @@ PRIVATE>
         [ >>targets ] [ >>target-names ] bi*
         "linnerud.rst" load-file >>description ;
 
-: download-to-directory ( url directory -- )
-    dup make-directories
-    [
-        dup { [ download-name file-exists? ] [ file-stem file-exists? ] } 1|| [
-            drop
-        ] [
-            download
-        ] if
-    ] with-directory ;
-
 : gzip-decompress-file ( path -- )
-    { "gzip" "-d" } swap suffix run-process drop ;
+    { "gzip" "-d" } swap suffix try-process ;
 
 : mnist-data>array ( bytes -- seq )
     16 tail-slice 28 28 * <groups> [
@@ -98,15 +88,17 @@ PRIVATE>
         output-stream get stream-nl
     ] each ;
 
+CONSTANT: datasets-path "resource:datasets/"
+
 : load-mnist ( -- data-set )
-    "resource:datasets" dup make-directories [
+    datasets-path dup make-directories [
         {
-            "https://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz"
-            "https://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz"
-            "https://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz"
-            "https://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz"
+            "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/train-images-idx3-ubyte.gz"
+            "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/train-labels-idx1-ubyte.gz"
+            "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/t10k-images-idx3-ubyte.gz"
+            "https://github.com/golbin/TensorFlow-MNIST/raw/master/mnist/data/t10k-labels-idx1-ubyte.gz"
         }
-        [ [ "resource:datasets/" download-to-directory ] parallel-each ]
+        [ [ download-once-into ] parallel-each ]
         [ [ dup file-stem file-exists? [ drop ] [ file-name gzip-decompress-file ] if ] each ]
         [ [ file-stem binary file-contents ] map ] tri
         first4 {

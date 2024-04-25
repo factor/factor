@@ -247,6 +247,8 @@ M: windows init-stdio
 : open-write ( path -- win32-file )
     GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 >>ptr ;
 
+: open-secure-write ( path -- win32-file )
+    GENERIC_WRITE CREATE_NEW FILE_ATTRIBUTE_TEMPORARY open-file 0 >>ptr ;
 
 <PRIVATE
 
@@ -279,6 +281,9 @@ M: windows (file-reader)
 
 M: windows (file-writer)
     open-write <output-port> ;
+
+M: windows (file-writer-secure)
+    open-secure-write <output-port> ;
 
 M: windows (file-appender)
     open-append <output-port> ;

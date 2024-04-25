@@ -133,9 +133,7 @@ M: lambda-word word-noise-factor
     vocab-words flatten-generics
     [ word-noise-factor dup 20 < [ drop 0 ] when ] map
     [ 0 ] [
-        [ [ sum ] [ length 5 max ] bi /i ]
-        [ supremum ]
-        bi +
+        [ [ sum ] [ length 5 max ] bi /i ] [ maximum ] bi +
     ] if-empty ;
 
 : noisy-vocabs ( -- alist )

@@ -840,8 +840,11 @@ PRIVATE>
 : append! ( seq1 seq2 -- seq1 ) over push-all ; inline
 
 : last ( seq -- elt )
-    index-of-last
-    over 0 < [ bounds-error ] [ nth-unsafe ] if ; inline
+    index-of-last bounds-check-head nth-unsafe ; inline
+
+: last2 ( seq -- penultimate ultimate )
+    index-of-last [ [ 1 - ] keep ] dip pick 0 <
+    [ nip bounds-error ] [ '[ _ nth-unsafe ] bi@ ] if ; inline
 
 <PRIVATE
 
@@ -1142,15 +1145,20 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-GENERIC: infimum ( seq -- elt )
-M: object infimum [ ] [ min ] map-reduce ;
-M: iota infimum first ;
-M: reversed infimum seq>> infimum ;
+GENERIC: minimum ( seq -- elt )
+M: sequence minimum [ ] [ min ] map-reduce ; inline
+M: iota minimum drop 0 ; inline
+M: reversed minimum seq>> minimum ; inline
+M: repetition minimum elt>> ; inline
 
-GENERIC: supremum ( seq -- elt )
-M: object supremum [ ] [ max ] map-reduce ;
-M: iota supremum last ;
-M: reversed supremum seq>> supremum ;
+GENERIC: maximum ( seq -- elt )
+M: sequence maximum [ ] [ max ] map-reduce ; inline
+M: iota maximum n>> 1 - ; inline
+M: reversed maximum seq>> maximum ; inline
+M: repetition maximum elt>> ; inline
+
+ALIAS: infimum minimum deprecated
+ALIAS: supremum maximum deprecated
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
     [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
@@ -1185,15 +1193,18 @@ M: reversed supremum seq>> supremum ;
 
 PRIVATE>
 
-: supremum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+: maximum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
     [ after? ] select-by ; inline
 
-: infimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
+: minimum-by ( ... seq quot: ( ... elt -- ... x ) -- ... elt )
     [ before? ] select-by ; inline
 
-: shortest ( seqs -- elt ) [ length ] infimum-by ;
+ALIAS: supremum-by maximum-by deprecated
+ALIAS: infimum-by minimum-by deprecated
 
-: longest ( seqs -- elt ) [ length ] supremum-by ;
+: shortest ( seqs -- elt ) [ length ] minimum-by ;
+
+: longest ( seqs -- elt ) [ length ] maximum-by ;
 
 ! We hand-optimize flip to such a degree because type hints
 ! cannot express that an array is an array of arrays yet, and

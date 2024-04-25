@@ -9,7 +9,7 @@ IN: benchmark
 SYMBOL: benchmarks-disabled?
 
 : run-timing-benchmark ( vocab -- time )
-    5 swap '[ gc [ _ run ] benchmark ] replicate infimum ;
+    5 swap '[ gc [ _ run ] benchmark ] replicate minimum ;
 
 : run-profile-benchmark ( vocab -- profile )
     compact-gc '[ _ run ] profile most-recent-profile-data ;

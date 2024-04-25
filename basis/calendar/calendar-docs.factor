@@ -493,6 +493,29 @@ HELP: since-1970
     { "timestamp" timestamp } }
 { $description "Adds the duration to the beginning of Unix time and returns the result as a timestamp." } ;
 
+HELP: sunrise
+{ $values
+    { "timestamp" timestamp }
+    { "latitude" real }
+    { "longitude" real }
+    { "new-timestamp" timestamp } }
+{ $description "Calculates the time of sunrise on the given day at the given location in the given timezone." } ;
+
+HELP: sunset
+{ $values
+    { "timestamp" timestamp }
+    { "latitude" real }
+    { "longitude" real }
+    { "new-timestamp" timestamp } }
+{ $description "Calculates the time of sunset on the given day at the given location in the given timezone." } ;
+
+HELP: solar-noon
+{ $values
+    { "timestamp" timestamp }
+    { "longitude" real }
+    { "new-timestamp" timestamp } }
+{ $description "Calculates solar noon of the given day at the given longitude in the given timezone." } ;
+
 ARTICLE: "calendar" "Calendar"
 "The " { $vocab-link "calendar" } " vocabulary defines two data types and a set of operations on them:"
 { $subsections
@@ -525,6 +548,13 @@ ARTICLE: "calendar" "Calendar"
     "days"
 }
 "Both " { $link timestamp } "s and " { $link duration } "s implement the " { $link "math.order" } "."
+$nl
+"Solar position calculations:"
+{ $subsections
+    sunrise
+    sunset
+    solar-noon
+}
 $nl
 "Metadata about the calendar:"
 { $subsections "calendar-facts" } ;

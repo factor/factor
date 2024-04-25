@@ -505,7 +505,7 @@ HELP: SYMBOLS:
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
 HELP: INITIALIZED-SYMBOL:
-{ $syntax "INITIALIZE-SYMBOL: word [ ... ]"  }
+{ $syntax "INITIALIZED-SYMBOL: word [ ... ]"  }
 { $description "Defines a new symbol " { $snippet "word" } " and sets the value in the global namespace." }
 { $examples
     { $unchecked-example
@@ -922,7 +922,6 @@ HELP: MAIN:
 { $description "Defines the main entry point for the current vocabulary and source file. This word will be executed when this vocabulary is passed to " { $link run } " or the source file is run as a script."
     $nl
     "If a quotation is passed instead of a word, then it will be run as the main entry point, in the same way." 
-    { $warning "Quotation support in " { $snippet "MAIN:" } " is test functionality. Use it with caution." }
 } ;
 
 HELP: <PRIVATE

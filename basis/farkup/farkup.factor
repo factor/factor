@@ -223,7 +223,7 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 GENERIC: (write-farkup) ( farkup -- xml )
 
 : farkup-inside ( farkup name -- xml )
-    <simple-name> swap T{ attrs } swap
+    <simple-name> swap T{ attrs } clone swap
     child>> (write-farkup) 1array <tag> ;
 
 M: heading1 (write-farkup) "h1" farkup-inside ;

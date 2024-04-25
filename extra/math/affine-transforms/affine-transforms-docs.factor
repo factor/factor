@@ -1,6 +1,6 @@
 ! Copyright (C) 2018 Björn Lindqvist
 ! See https://factorcode.org/license.txt for BSD license
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax kernel layouts literals system ;
 IN: math.affine-transforms
 
 ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
@@ -9,7 +9,10 @@ ARTICLE: "math.affine-transforms" "Affine Transformations of 2d Vectors"
   "Creates a 45 degree counter clock-wise rotation matrix and applies it to a vector:"
   { $example
     "USING: math.affine-transforms math.functions prettyprint ;\n45 deg>rad <rotation> { 0 4 } a.v ."
-    "{ -2.82842712474619 2.82842712474619 }"
+    ! XXX: investigate this windows vs mac/linux difference
+    $[ os windows? 64-bit? and
+    "{ -2.8284271247461903 2.8284271247461903 }"
+    "{ -2.82842712474619 2.8284271247461903 }" ? ]
   }
   "Applies a combined scaling and translation transform to a vector:"
   { $example

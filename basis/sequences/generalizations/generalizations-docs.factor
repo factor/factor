@@ -63,6 +63,33 @@ HELP: set-firstn
 { $description "A generalization of " { $link set-first } " "
 "that sets the first " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
 
+HELP: lastn
+{ $values { "seq" sequence } { "n" integer } { "elts..." { $snippet "n" } " elements on the datastack" } }
+{ $description "A generalization of " { $link last } " and " { $link last2 }
+" that pushes the last " { $snippet "n" } " elements of a sequence on the stack." }
+{ $examples
+    "Some core words expressed in terms of " { $link firstn } ":"
+    { $table
+        { { $link last } { $snippet "1 lastn" } }
+        { { $link last2 } { $snippet "2 lastn" } }
+    }
+} ;
+
+HELP: ?lastn
+{ $values { "seq" sequence } { "n" integer } { "elts..." { $snippet "n" } " elements on the datastack" } }
+{ $description "A generalization of " { $link ?last } " that pushes the last " { $snippet "n" } " elements of a sequence on the stack, or " { $link f } " if the sequence is shorter than the requested number of elements." }
+{ $examples
+    "Some core words expressed in terms of " { $link ?firstn } ":"
+    { $table
+        { { $link ?last } { $snippet "1 ?lastn" } }
+    }
+} ;
+
+HELP: set-lastn
+{ $values { "elts..." { $snippet "n" } " elements on the datastack" } { "seq" sequence } { "n" integer } }
+{ $description "A generalization of " { $link set-last }
+" that sets the last " { $snippet "n" } " elements of a sequence from the top " { $snippet "n" } " elements of the stack." } ;
+
 HELP: nappend
 { $values
     { "n" integer }

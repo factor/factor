@@ -25,7 +25,7 @@ background foreground margin bar-width ;
 
 : chd ( chart seq -- chart )
     [ x,y >>data ] [
-        [ infimum 0 min ] [ supremum 0 max ] bi 2array
+        [ minimum 0 min ] [ maximum 0 max ] bi 2array
         x,y >>data-scale
     ] bi ;
 

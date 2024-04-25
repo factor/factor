@@ -53,8 +53,12 @@ DEFER: remove-connection
         drop
     ] if ;
 
+GENERIC: model-value ( model -- value )
+
+M: model model-value value>> ;
+
 : compute-model ( model -- value )
-    [ activate-model ] [ deactivate-model ] [ value>> ] tri ;
+    [ activate-model ] [ deactivate-model ] [ model-value ] tri ;
 
 GENERIC: model-changed ( model observer -- )
 M: object model-changed 2drop ;
@@ -101,19 +105,6 @@ M: model update-model drop ;
 
 : (change-model) ( ..a model quot: ( ..a obj -- ..b newobj ) -- ..b )
     call-change-model value<< ; inline
-
-GENERIC: range-value ( model -- value )
-GENERIC: range-page-value ( model -- value )
-GENERIC: range-min-value ( model -- value )
-GENERIC: range-max-value ( model -- value )
-GENERIC: range-max-value* ( model -- value )
-GENERIC: set-range-value ( value model -- )
-GENERIC: set-range-page-value ( value model -- )
-GENERIC: set-range-min-value ( value model -- )
-GENERIC: set-range-max-value ( value model -- )
-
-: clamp-value ( value range -- newvalue )
-    [ range-min-value ] [ range-max-value* ] bi clamp ;
 
 : change-model* ( ..a model quot: ( ..a obj -- ..b ) -- ..b )
     '[ _ keep ] change-model ; inline

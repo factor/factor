@@ -19,7 +19,7 @@ IN: io.encodings.string
     ] if ; inline
 
 :: encode ( string encoding -- byte-array )
-    encoding binary eq? [ string ] [
+    encoding binary eq? [ string B{ } like ] [
         string aux>> not encoding { ascii utf8 } member-eq? and [
             string string>byte-array-fast
         ] [

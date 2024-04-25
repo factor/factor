@@ -14,7 +14,7 @@ IN: picomath
         { 0.5 0.520499877813 }
         { 2.1 0.997020533344 }
     } [ [ first erf ] [ second - ] bi abs ] map
-    supremum 1e-6 <
+    maximum 1e-6 <
 ] unit-test
 
 { t } [
@@ -25,7 +25,7 @@ IN: picomath
         { $[ 1e-5 1e-8 + ] 0.00001001005010021717 }
         { 0.5              0.6487212707001282 }
     } [ [ first expm1 ] [ second - ] bi abs ] map
-    supremum 1e-6 <
+    maximum 1e-6 <
 ] unit-test
 
 { t } [
@@ -36,7 +36,7 @@ IN: picomath
         { 0.5 0.691462461274 }
         { 2.1 0.982135579437 }
     } [ [ first phi ] [ second - ] bi abs ] map
-    supremum 1e-3 <
+    maximum 1e-3 <
 ] unit-test
 
 : factorial ( n -- n! ) [ 1 ] [ [1..b] 1 [ * ] reduce ] if-zero ;
@@ -44,7 +44,7 @@ IN: picomath
 { t } [
     { 0 1 10 100 1000 10000 } [
         [ factorial log ] [ log-factorial ] bi - abs
-    ] map supremum 1e-6 <
+    ] map maximum 1e-6 <
 ] unit-test
 
 : relative-error ( approx value -- relative-error )
@@ -64,7 +64,7 @@ IN: picomath
         { 12.001 40014424.1571 }
         { 15.2 149037380723.0 }
     } [ [ first gamma ] [ second relative-error ] bi ] map
-    supremum 1e-6 <
+    maximum 1e-6 <
 ] unit-test
 
 { t } [
@@ -79,5 +79,5 @@ IN: picomath
         { 12.0001 17.5025521125 }
         { 27.4 62.5755868211 }
     } [ [ first log-gamma ] [ second relative-error ] bi ] map
-    supremum 1e-10 <
+    maximum 1e-10 <
 ] unit-test

@@ -24,7 +24,7 @@ IN: project-euler.002
 <PRIVATE
 
 : (fib-upto) ( seq n limit -- seq )
-    2dup <= [ [ suffix! dup 2 tail* sum ] dip (fib-upto) ] [ 2drop ] if ;
+    2dup <= [ [ suffix! dup last2 + ] dip (fib-upto) ] [ 2drop ] if ;
 
 PRIVATE>
 

@@ -51,8 +51,7 @@ M: rect contains-point?
     (rect-union) <extent-rect> ;
 
 : rect-containing ( points -- rect )
-    [ vsupremum ] [ vinfimum ] bi
-    [ nip ] [ v- ] 2bi <rect> ;
+    [ vmaximum ] [ vminimum ] bi [ nip ] [ v- ] 2bi <rect> ;
 
 : rect-min ( rect dim -- rect' )
     [ rect-bounds ] dip vmin <rect> ;

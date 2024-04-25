@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs io.encodings.ascii io.files kernel math
-sequences sequences.extras sorting sets ;
+sequences sequences.extras sets sorting system ;
 IN: anagrams
 
 : make-anagram-hash ( strings -- assoc )
@@ -10,7 +10,9 @@ IN: anagrams
     [ members ] assoc-map
     [ length 1 > ] filter-values ;
 
-MEMO: dict-words ( -- seq )
+HOOK: dict-words os ( -- seq )
+
+M: unix dict-words
     "/usr/share/dict/words" ascii file-lines [ >lower ] map ;
 
 MEMO: dict-anagrams ( -- assoc )

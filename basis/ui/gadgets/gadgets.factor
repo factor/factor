@@ -95,7 +95,7 @@ M: gadget contains-point?
 : sum-dims ( seq -- dim )
     [ 0 0 ] dip [ first2 swapd [ + ] 2bi@ ] each 2array ;
 
-: each-child ( gadget quot -- )
+: each-child ( ... gadget quot: ( ... child -- ... ) -- ... )
     [ children>> ] dip each ; inline
 
 ! Selection protocol
@@ -348,10 +348,10 @@ PRIVATE>
 : parents ( gadget -- seq )
     [ parent>> ] follow ;
 
-: each-parent ( gadget quot -- ? )
+: each-parent ( ... gadget quot: ( ... gadget -- ... ? ) -- ... ? )
     [ parents ] dip all? ; inline
 
-: find-parent ( gadget quot -- parent )
+: find-parent ( ... gadget quot: ( ... gadget -- ... ? ) -- ... parent )
     [ parents ] dip find nip ; inline
 
 : screen-loc ( gadget -- loc )

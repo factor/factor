@@ -11,7 +11,7 @@ IN: json.tests
 { t } [ "true" json> ] unit-test
 { json-null } [ "null" json> ] unit-test
 { 0 } [ "0" json> ] unit-test
-{ 0 } [ "-0" json> ] unit-test
+{ -0.0 } [ "-0" json> ] unit-test
 { 102 } [ "102" json> ] unit-test
 { -102 } [ "-102" json> ] unit-test
 { 102 } [ "+102" json> ] unit-test

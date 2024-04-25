@@ -10,8 +10,8 @@ IN: zoneinfo.update
 
 : update-zoneinfo ( -- )
     "eggert" "tz" zoneinfo-versions last [
-        { "make" "leapseconds" } run-process drop
-        { "make" "version" } run-process drop
+        { "make" "leapseconds" } try-process
+        { "make" "version" } try-process
         "vocab:zoneinfo" [
             {
                 "africa"

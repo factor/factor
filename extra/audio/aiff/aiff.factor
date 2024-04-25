@@ -48,7 +48,7 @@ STRUCT: sound-data-chunk
 
 :: read-aiff-chunks ( -- comm ssnd )
     f :> comm! f :> ssnd!
-    [ { [ comm ssnd and not ] [ read-chunk ] } 0&& dup ]
+    [ { [ comm ssnd and not ] [ read-chunk ] } 0&& ]
     [ {
         {
             [ dup COMM-MAGIC common-chunk check-chunk ]
@@ -59,7 +59,7 @@ STRUCT: sound-data-chunk
             [ sound-data-chunk memory>struct ssnd! ]
         }
         [ drop ]
-    } cond ] while drop
+    } cond ] while*
     comm ssnd 2dup and [ invalid-audio-file ] unless ;
 
 : (read-aiff) ( -- audio )

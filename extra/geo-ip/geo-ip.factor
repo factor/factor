@@ -1,20 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators combinators.smart csv
-grouping http.client interval-maps io.encodings.ascii io.files
+grouping http.download interval-maps io.encodings.ascii io.files
 io.files.temp io.launcher io.pathnames ip-parser kernel math
 math.parser sequences splitting strings ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" cache-file ;
 
-CONSTANT: db-url "https://software77.net/geo-ip/?DL=1"
+CONSTANT: db-url "https://raw.githubusercontent.com/webeng/Ip2Country/master/IpToCountry.csv"
 
-: download-db ( -- path )
-    db-path dup file-exists? [
-        db-url over ".gz" append download-to
-        { "gunzip" } over ".gz" append absolute-path suffix try-process
-    ] unless ;
+: download-db ( -- path ) db-url download-once ;
 
 TUPLE: ip-entry from to registry assigned city cntry country ;
 

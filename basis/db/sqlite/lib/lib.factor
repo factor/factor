@@ -59,7 +59,8 @@ ERROR: sqlite-error < db-error n string ;
     sqlite3_bind_int64 sqlite-check-result ;
 
 : sqlite-bind-uint64 ( handle i n -- )
-    sqlite3-bind-uint64 sqlite-check-result ;
+    ! there is no sqlite3_bind_uint64 function
+    sqlite3_bind_int64 sqlite-check-result ;
 
 : sqlite-bind-double ( handle i x -- )
     sqlite3_bind_double sqlite-check-result ;
@@ -149,7 +150,8 @@ ERROR: sqlite-error < db-error n string ;
     2dup sqlite3_column_int64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
 
 : sqlite3-column-uint64 ( handle index -- int/f )
-    2dup sqlite3_column_uint64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
+    ! there is no sqlite3_column_uint64
+    2dup sqlite3_column_int64 dup 0 = [ sqlite3-column-null ] [ 2nip ] if ;
 
 : sqlite3-column-double ( handle index -- int/f )
     2dup sqlite3_column_double dup 0.0 = [ sqlite3-column-null ] [ 2nip ] if ;
@@ -197,3 +199,6 @@ ERROR: sqlite-error < db-error n string ;
 
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
+
+: current-sqlite-filename ( -- path/f )
+    db-connection get [ handle>> f sqlite3_db_filename ] [ f ] if* ;

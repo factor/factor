@@ -287,6 +287,12 @@ IN: calendar
 { 151 } [ 2014 1 10 <date>  2014 8 9 <date>  weekdays-between ] unit-test
 { 151 } [ 2014 1 10 <date>  2014 8 10 <date>  weekdays-between ] unit-test
 
+{ t } [ 2014 1 10 <date> weekday? ] unit-test
+{ f } [ 2014 1 10 <date> weekend? ] unit-test
+
+{ t } [ 2014 1 11 <date> weekend? ] unit-test
+{ f } [ 2014 1 11 <date> weekday? ] unit-test
+
 
 { t } [
     2014 1 1 <date-gmt>
@@ -437,3 +443,22 @@ IN: calendar
         { second 59+999/1000 }
     }
 } [ 2023 4 13 <date-gmt> start-of-week dup end-of-week ] unit-test
+
+{
+    T{ timestamp
+        { year 2024 }
+        { month 2 }
+        { day 15 }
+        { hour 7 }
+    }
+} [ 2024 02 15 <date-gmt> 48.87 2.67 sunrise >gmt ] unit-test
+
+{
+    T{ timestamp
+        { year 2024 }
+        { month 2 }
+        { day 15 }
+        { hour 17 }
+        { minute 7 }
+    }
+} [ 2024 02 15 <date-gmt> 48.87 2.67 sunset >gmt ] unit-test

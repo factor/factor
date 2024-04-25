@@ -66,6 +66,7 @@ call( -- ) ! syntax-quot
     "classes.predicate"
     "compiler.units"
     "continuations.private"
+    "formatting.private"
     "generic.single"
     "generic.single.private"
     "growable"

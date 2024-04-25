@@ -42,20 +42,20 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     [ dup [ 2dup - ] [ f ] if ] dip
     gadget-metrics boa ; inline
 
-: ?supremum ( seq -- n/f )
-    sift [ f ] [ supremum ] if-empty ;
+: ?maximum ( seq -- n/f )
+    sift [ f ] [ maximum ] if-empty ;
 
 : max-ascent ( seq -- n/f )
-    [ ascent>> ] map ?supremum ;
+    [ ascent>> ] map ?maximum ;
 
 : max-cap-height ( seq -- n/f )
-    [ cap-height>> ] map ?supremum ;
+    [ cap-height>> ] map ?maximum ;
 
 : max-descent ( seq -- n/f )
-    [ descent>> ] map ?supremum ;
+    [ descent>> ] map ?maximum ;
 
 : max-graphics-height ( seq -- n )
-    [ ascent>> ] reject [ height>> ] map ?supremum 0 or ;
+    [ ascent>> ] reject [ height>> ] map ?maximum 0 or ;
 
 :: combine-metrics ( graphics-height ascent descent cap-height -- ascent' descent' )
     ascent [

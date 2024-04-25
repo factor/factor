@@ -19,8 +19,8 @@ IN: compression.run-length
     f :> done?!
     [
         ! i j [ number>string ] bi@ " " glue .
-        sp next dup 0 = [
-            sp next dup 0x03 0xff between? [
+        sp consume dup 0 = [
+            sp consume dup 0x03 0xff between? [
                 nip [ sp ] dip dup odd?
                 [ 1 + take-n but-last ] [ take-n ] if
                 [ j matrix i swap nth copy ] [ length j + j! ] bi
@@ -28,11 +28,12 @@ IN: compression.run-length
                 nip {
                     { 0 [ i 1 + i!  0 j! ] }
                     { 1 [ t done?! ] }
-                    { 2 [ sp next j + j!  sp next i + i! ] }
+                    { 2 [ sp consume j + j!
+                          sp consume i + i! ] }
                 } case
             ] if
         ] [
-            [ sp next 8hi-lo 2array <repetition> concat ] [ head ] bi
+            [ sp consume 8hi-lo 2array <repetition> concat ] [ head ] bi
             [ j matrix i swap nth copy ] [ length j + j! ] bi
         ] if
 
@@ -51,8 +52,8 @@ IN: compression.run-length
     f :> done?!
     [
         ! i j [ number>string ] bi@ " " glue .
-        sp next dup 0 = [
-            sp next dup 0x03 0xff between? [
+        sp consume dup 0 = [
+            sp consume dup 0x03 0xff between? [
                 nip [ sp ] dip dup odd?
                 [ 1 + take-n but-last ] [ take-n ] if
                 [ j matrix i swap nth copy ] [ length j + j! ] bi
@@ -60,11 +61,12 @@ IN: compression.run-length
                 nip {
                     { 0 [ i 1 + i!  0 j! ] }
                     { 1 [ t done?! ] }
-                    { 2 [ sp next j + j!  sp next i + i! ] }
+                    { 2 [ sp consume j + j!
+                          sp consume i + i! ] }
                 } case
             ] if
         ] [
-            sp next <array> [ j matrix i swap nth copy ] [ length j + j! ] bi
+            sp consume <array> [ j matrix i swap nth copy ] [ length j + j! ] bi
         ] if
 
         ! j stride >= [ i 1 + i!  0 j! ] when

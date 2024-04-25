@@ -66,6 +66,6 @@ IN: project-euler.066
 
 : euler066 ( -- D )
     1000 [1..b] [ perfect-square? ] reject
-    [ minimal-x ] supremum-by ;
+    [ minimal-x ] maximum-by ;
 
 SOLUTION: euler066

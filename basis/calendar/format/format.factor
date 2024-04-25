@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar calendar.english combinators
 formatting grouping io io.streams.string kernel make math
-math.order math.parser math.parser.private ranges present
-quotations sequences splitting strings words ;
+math.order math.parser present quotations ranges sequences
+splitting strings words ;
 IN: calendar.format
 
 MACRO: formatted ( spec -- quot )
@@ -29,10 +29,7 @@ MACRO: formatted ( spec -- quot )
 
 : ss ( timestamp -- ) second>> >integer write-00 ;
 
-! Should be enough for anyone, allows to not do a fancy
-! algorithm to detect infinite decimals (e.g 1/3)
-: ss.SSSSSS ( timestamp -- )
-    second>> >float "0" 9 6 "f" "C" format-float write ;
+: ss.SSSSSS ( timestamp -- ) second>> "%09.6f" printf ;
 
 : hhmm ( timestamp -- ) [ hh ] [ mm ] bi ;
 
@@ -249,7 +246,6 @@ M: duration elapsed-time
 M: timestamp elapsed-time
     ago elapsed-time ;
 
-! XXX: Anything up to 2 hours is "about an hour"
 : relative-time-offset ( seconds -- string )
     abs {
         { [ dup 1 < ] [ drop "just now" ] }

@@ -17,6 +17,21 @@ IN: sequences.generalizations.tests
 { 1 2 } [ { 1 2 } 2 ?firstn ] unit-test
 { 1 2 } [ { 1 2 3 } 2 ?firstn ] unit-test
 
+[ f 2 lastn ] must-fail
+[ { 1 } 2 lastn ] must-fail
+{ 1 2 } [ { 1 2 } 2 lastn ] unit-test
+{ 2 3 } [ { 1 2 3 } 2 lastn ] unit-test
+
+{ } [ f 0 ?lastn ] unit-test
+{ 1 } [ { 1 } 1 ?lastn ] unit-test
+{ f 1 } [ { 1 } 2 ?lastn ] unit-test
+{ 1 2 } [ { 1 2 } 2 ?lastn ] unit-test
+{ 2 3 } [ { 1 2 3 } 2 ?lastn ] unit-test
+
+{ { f f 1 } } [ 1 { f f f } [ 1 set-lastn ] keep ] unit-test
+{ { f 1 2 } } [ 1 2 { f f f } [ 2 set-lastn ] keep ] unit-test
+{ { 1 2 3 } } [ 1 2 3 { f f f } [ 3 set-lastn ] keep ] unit-test
+
 { [ 1 2 ] } [ 1 2 2 [ ] nsequence ] unit-test
 { { 1 2 3 4 5 } } [ 1 2 3 4 5 { 0 0 0 0 0 } 5 (nsequence) ] unit-test
 

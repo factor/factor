@@ -29,7 +29,7 @@ gl-error-log [ V{ } clone ] initialize
 
 : annotate-gl-functions ( quot -- )
     [
-        [ gl-functions ] dip [ [ dup ] dip curry (annotate) ] curry each
+        [ gl-functions ] dip [ dupd curry (annotate) ] curry each
     ] with-compilation-unit ;
 
 : reset-gl-functions ( -- )

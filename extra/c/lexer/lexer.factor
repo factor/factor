@@ -51,7 +51,7 @@ IN: c.lexer
         } 1||
     ] take-while :> string
     sequence-parser current quote-char = [
-        sequence-parser advance* string
+        sequence-parser advance drop string
     ] [
         start-n sequence-parser n<< f
     ] if ;

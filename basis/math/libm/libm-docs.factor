@@ -5,7 +5,7 @@ ARTICLE: "math.libm" "C standard library math functions"
 "The words in the " { $vocab-link "math.libm" } " vocabulary call C standard library math functions. They are used to implement words in the " { $vocab-link "math.functions" } " vocabulary."
 { $warning
 "These functions are unsafe. The compiler special-cases them to operate on floats only. They can be called directly, however there is little reason to do so, since they only implement real-valued functions, and in some cases place restrictions on the domain:"
-{ $example "USE: math.functions" "2.0 acos ." "C{ 0.0 1.316957896924817 }" }
+{ $example "USE: math.functions" "2.0 acos ." "C{ 0.0 1.3169578969248166 }" }
 { $unchecked-example "USE: math.libm" "2.0 facos ." "0/0." } }
 "Trigonometric functions:"
 { $subsections

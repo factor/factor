@@ -56,6 +56,14 @@ splitting.monotonic strings system tools.test ;
         "file6" link-info drop
     ] unit-test
 
+    { "file7 contents" } [
+        "file8" touch-file
+        "file7 contents" "file7" utf8 set-file-contents
+        "file7" "file8" move-file
+        "file8" utf8 file-contents
+        "file8" delete-file
+    ] unit-test
+
     { } [
         { "Hello world." }
         "test-foo.txt" ascii set-file-lines

@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: assocs http.client kernel make math.order sequences
-splitting urls urls.encoding ;
+USING: assocs http.client http.download kernel math.order
+sequences splitting urls urls.encoding ;
 
 IN: youtube
 
@@ -66,12 +66,12 @@ CONSTANT: video-info-url URL" https://www.youtube.com/get_video_info"
 : downloadable? ( video-info -- ? )
     "use_cipher_signature" of "False" = ;
 
-: download-video ( video-id -- )
+: download-video ( video-id -- path )
     get-video-info [
         downloadable? [ "Video is encrypted." throw ] unless
     ] [
         video-formats [ "type" of "video/mp4" head? ] find nip
         video-download-url
     ] [
-        "title" of sanitize ".mp4" append download-to
+        "title" of sanitize ".mp4" append download-once-as
     ] tri ;

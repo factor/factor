@@ -19,7 +19,7 @@ M: avail transfer-set drop defined assoc-union ;
 : available? ( vn -- ? ) basic-block get avail-in key? ;
 
 : best-vreg ( available-vregs -- vreg )
-    [ f ] [ infimum ] if-empty ;
+    [ f ] [ minimum ] if-empty ;
 
 : >avail-vreg ( vreg -- vreg/f )
     final-iteration? get [

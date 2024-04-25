@@ -34,6 +34,8 @@ CONSTANT: verizon-dns-servers {
 : verizon-host ( domain -- ) [ verizon-dns-servers ] dip dns-host ;
 
 CONSTANT: cloudflare-dns-servers { "1.1.1.1" "1.0.0.1" }
+CONSTANT: cloudflare-dns-servers-no-malware { "1.1.1.2" "1.0.0.2" }
+CONSTANT: cloudflare-dns-servers-no-malware-no-adult { "1.1.1.3" "1.0.0.3" }
 : cloudflare-host ( domain -- ) [ cloudflare-dns-servers ] dip dns-host ;
 
 CONSTANT: quad9-dns-servers { "9.9.9.9" "149.112.112.112" }

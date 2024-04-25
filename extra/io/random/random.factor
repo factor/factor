@@ -1,7 +1,8 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: io kernel math random sequences sequences.private ;
+USING: io io.files kernel math random sequences
+sequences.private ;
 
 IN: io.random
 
@@ -25,3 +26,9 @@ PRIVATE>
             r n < [ line r accum set-nth-unsafe ] when
         ] if
     ] each-numbered-line accum ;
+
+: random-file-line ( path encoding -- line/f )
+    [ random-line ] with-file-reader ; inline
+
+: random-file-lines ( path encoding n -- lines )
+    '[ _ random-lines ] with-file-reader ; inline

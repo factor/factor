@@ -1,8 +1,7 @@
-USING: arrays assocs combinators combinators.short-circuit
-grouping http.client io.encodings.utf8 io.files io.files.temp
-io.streams.null kernel locals math math.parser quotations random
-sequences splitting splitting.extras strings tools.test unicode
-unicode.normalize.private ;
+USING: arrays assocs combinators.short-circuit grouping
+http.download io.encodings.utf8 io.files io.files.temp kernel
+math math.parser sequences splitting splitting.extras strings
+tools.test unicode unicode.normalize.private ;
 IN: unicode.normalize.tests
 
 { "ab\u000323\u000302cd" } [ "ab\u000302" "\u000323cd" string-append ] unit-test
@@ -27,8 +26,8 @@ IN: unicode.normalize.tests
 
 ! Could use simple-flat-file after some cleanup
 : parse-normalization-tests ( -- tests )
-    "https://downloads.factorcode.org/misc/UCD/NormalizationTest.txt"
-    "NormalizationTest.txt" cache-file [ ?download-to ] keep
+    "https://downloads.factorcode.org/misc/UCD/15.1.0/NormalizationTest.txt"
+    "NormalizationTest-15.1.0.txt" cache-file download-once-as
     utf8 file-lines [ "#" head? ] reject
     [ "@" head? ] split*-when
     2 <groups> [ first2 [ first ] dip 2array ] map

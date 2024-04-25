@@ -81,7 +81,7 @@ M: pack pref-dim*
     children>> dup pref-dims measure-metrics drop ; inline
 
 : pack-cap-height ( pack -- n/f )
-    children>> [ cap-height ] map ?supremum ; inline
+    children>> [ cap-height ] map ?maximum ; inline
 
 PRIVATE>
 

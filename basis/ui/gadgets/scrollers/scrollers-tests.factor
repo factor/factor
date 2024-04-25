@@ -25,7 +25,7 @@ ui.gadgets.scrollers.private ;
 ] unit-test
 
 "v" get [
-    [ { 10 20 } ] [ "v" get model>> range-value ] unit-test
+    [ { 10 20 } ] [ "v" get scroll-position ] unit-test
 
     [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
@@ -46,15 +46,15 @@ ui.gadgets.scrollers.private ;
 
     [ ] [ { 0 0 } "s" get set-scroll-position ] unit-test
 
-    [ { 0 0 } ] [ "s" get model>> range-min-value ] unit-test
+    [ { 0 0 } ] [ "s" get model>> [ range-min-value ] product-value ] unit-test
 
-    [ { 100 100 } ] [ "s" get model>> range-max-value ] unit-test
+    [ { 100 100 } ] [ "s" get model>> [ range-max-value ] product-value ] unit-test
 
     [ ] [ { 10 20 } "s" get set-scroll-position ] unit-test
 
-    [ { 10 20 } ] [ "s" get model>> range-value ] unit-test
+    [ { 10 20 } ] [ "s" get model>> [ range-value ] product-value ] unit-test
 
-    [ { 10 20 } ] [ "s" get viewport>> model>> range-value ] unit-test
+    [ { 10 20 } ] [ "s" get viewport>> scroll-position ] unit-test
 
     [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget

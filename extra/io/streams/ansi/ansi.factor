@@ -38,7 +38,7 @@ CONSTANT: colors H{
 
 : color>ansi ( color -- ansi bold? )
     color>rgb '[ _ distance ]
-    colors [ keys swap infimum-by ] [ at ] bi
+    colors [ keys swap minimum-by ] [ at ] bi
     dup 8 >= [ 8 - t ] [ f ] if ;
 
 MEMO: color>foreground ( color -- string )

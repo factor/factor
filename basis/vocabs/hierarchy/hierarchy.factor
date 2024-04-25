@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit fry
 io.directories io.files io.files.info io.pathnames kernel make
 memoize namespaces sequences sets sorting splitting vocabs
-vocabs.loader vocabs.metadata ;
+vocabs.private vocabs.loader vocabs.metadata ;
 IN: vocabs.hierarchy
 
 TUPLE: vocab-prefix name ;
@@ -15,7 +15,11 @@ M: vocab-prefix vocab-name name>> ;
 <PRIVATE
 
 : visible-dir? ( entry -- ? )
-    { [ directory? ] [ name>> "." head? not ] } 1&& ;
+    {
+        [ directory? ]
+        [ name>> "." head? not ]
+        [ name>> valid-vocab-name? ]
+    } 1&& ;
 
 : visible-dirs ( seq -- seq' )
     [ visible-dir? ] filter [ name>> ] sort-by ;

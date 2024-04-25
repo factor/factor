@@ -92,10 +92,9 @@ context* factor_vm::new_context() {
     new_context = new context(datastack_size, retainstack_size, callstack_size);
   } else {
     new_context = unused_contexts.back();
+    new_context->reset();
     unused_contexts.pop_back();
   }
-
-  new_context->reset();
 
   active_contexts.insert(new_context);
 

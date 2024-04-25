@@ -372,6 +372,14 @@
 			<string>comment.parens.factor</string>
 		</dict>
 		<dict>
+			<key>begin</key>
+			<string>\/\*((?=\s))</string>
+			<key>end</key>
+			<string>(^|(?&lt;=\s))\*\/</string>
+			<key>name</key>
+			<string>comment.block.factor</string>
+		</dict>
+		<dict>
 			<key>match</key>
 			<string>\b[^\s]+:\s+[^\s]+(\s|$)</string>
 			<key>name</key>

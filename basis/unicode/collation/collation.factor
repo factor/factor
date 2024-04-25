@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit combinators.smart fry kernel make
-math math.order math.parser namespaces sequences
-simple-flat-file splitting strings unicode.data ;
+combinators.short-circuit combinators.smart kernel make math
+math.order math.parser namespaces sequences simple-flat-file
+splitting strings unicode.data ;
 IN: unicode.collation
 
 <PRIVATE
@@ -209,10 +209,10 @@ fixup-ducet-for-tibetan
     } 1|| ; inline
 
 : nushu-block? ( char -- ? )
-    0x1b170 0x1B2FF between? ; inline
+    0x1B170 0x1B2FF between? ; inline
 
 : khitan-block? ( char -- ? )
-    0x18b00 0x18cff between? ; inline
+    0x18B00 0x18CFF between? ; inline
 
 ! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
@@ -226,6 +226,7 @@ fixup-ducet-for-tibetan
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
         { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
         { [ dup 0x31350 0x323AF between? ] [ drop 0xFB80 ] } ! Extension H
+        { [ dup 0x2EBF0 0x2EE5D between? ] [ drop 0xFB80 ] } ! Extension I
         { [ dup 0x2F800 0x2FA1D between? ] [ drop 0xFB80 ] } ! CJK Compatibility
         { [ dup 0x04E00 0x09FFF between? ] [ drop 0xFB40 ] } ! CJK
         { [ dup 0x0F900 0x0FAD9 between? ] [ drop 0xFB40 ] } ! CJK

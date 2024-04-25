@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes.tuple combinators hints
-kernel kernel.private make math math.functions math.order
-ranges sequences sequences.private sorting strings vectors ;
+kernel kernel.private make math math.functions math.order ranges
+sequences sequences.private sets sorting strings vectors ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -78,7 +78,7 @@ TUPLE: k-permutations length skip k seq ;
     seq length :> n
     n k nPk :> len
     {
-        { [ len k [ zero? ] either? ] [ { } ] }
+        { [ len zero? ] [ { } ] }
         { [ n k = ] [ seq <permutations> ] }
         [ len n factorial over /i k seq k-permutations boa ]
     } cond ;
@@ -300,6 +300,9 @@ PRIVATE>
 
 : all-combinations ( seq k -- seq' )
     [ ] map-combinations ;
+
+: all-unique-combinations ( seq n -- seq' )
+    HS{ } clone [ '[ _ adjoin ] each-combination ] keep members ;
 
 : all-combinations? ( ... seq k quot: ( ... elt -- ... ? ) -- ... ? )
     combinations-quot all? ; inline

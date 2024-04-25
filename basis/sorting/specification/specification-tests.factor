@@ -4,6 +4,7 @@ USING: accessors math.order sorting.specification tools.test
 arrays sequences kernel assocs multiline sorting.functor ;
 IN: sorting.specification.tests
 
+
 TUPLE: sort-test a b c tuple2 ;
 
 TUPLE: tuple2 d ;
@@ -42,6 +43,25 @@ TUPLE: tuple2 d ;
         T{ sort-test f 2 5 3 }
         T{ sort-test f 2 5 2 }
     } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-with-spec
+] unit-test
+
+! Test with quotations too even though it's basically the same
+{
+    {
+        T{ sort-test { a 1 } { b 3 } { c 9 } }
+        T{ sort-test { a 1 } { b 1 } { c 10 } }
+        T{ sort-test { a 1 } { b 1 } { c 11 } }
+        T{ sort-test { a 2 } { b 5 } { c 2 } }
+        T{ sort-test { a 2 } { b 5 } { c 3 } }
+    }
+} [
+    {
+        T{ sort-test f 1 3 9 }
+        T{ sort-test f 1 1 10 }
+        T{ sort-test f 1 1 11 }
+        T{ sort-test f 2 5 3 }
+        T{ sort-test f 2 5 2 }
+    } { { [ a>> ] <=> } { [ b>> ] >=< } { [ c>> ] <=> } } sort-with-spec
 ] unit-test
 
 { { } } [

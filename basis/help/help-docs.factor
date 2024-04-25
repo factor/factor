@@ -1,6 +1,7 @@
 USING: arrays help.crossref help.lint help.markup
 help.stylesheet help.syntax help.topics io kernel math
-prettyprint quotations see sequences strings summary vocabs ;
+prettyprint quotations see sequences strings summary vocabs
+words ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -339,7 +340,7 @@ HELP: $warning
 
 HELP: $link
 { $values { "element" "a markup element of the form " { $snippet "{ topic }" } } }
-{ $description "Prints a link to a help article or word." }
+{ $description "Prints a link to a help article or word. The link to an article should a " { $link string } " otherwise the link must be to a " { $link word } "." }
 { $examples
     { $markup-example { $link "dlists" } }
     { $markup-example { $link + } }

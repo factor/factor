@@ -131,9 +131,6 @@ M: composed add-quot-to-history
 
 M: quotation add-quot-to-history add-to-history ;
 
-: last2 ( seq -- penultimate ultimate )
-    2 tail* first2 ;
-
 : top-two ( #call -- effect value )
     in-d>> last2 [ value-info ] bi@
     literal>> swap ;

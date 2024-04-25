@@ -7,7 +7,7 @@ IN: rosetta-code.multisplit
 : first-subseq ( seq separators -- n separator )
     tuck
     [ [ subseq-index ] dip 2array ] withd map-index sift-keys
-    [ drop f f ] [ [ first ] infimum-by first2 rot nth ] if-empty ;
+    [ drop f f ] [ [ first ] minimum-by first2 rot nth ] if-empty ;
 
 : multisplit ( string separators -- seq )
     '[

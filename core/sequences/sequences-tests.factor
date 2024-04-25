@@ -290,6 +290,17 @@ unit-test
 { f } [ { } ?last ] unit-test
 { 9 } [ 10 <iota> ?last ] unit-test
 
+[ f last ] [ bounds-error? ] must-fail-with
+{ 1 } [ { 1 } last ] unit-test
+{ 2 } [ { 1 2 } last ] unit-test
+{ 3 } [ { 1 2 3 } last ] unit-test
+
+[ f last2 ] [ bounds-error? ] must-fail-with
+[ { 1 } last2 ] [ bounds-error? ] must-fail-with
+{ 1 2 } [ { 1 2 } last2 ] unit-test
+{ 2 3 } [ { 1 2 3 } last2 ] unit-test
+{ 3 4 } [ { 1 2 3 4 } last2 ] unit-test
+
 [ -1/0. 0 remove-nth! ] must-fail
 { "" } [ "" [ CHAR: \s = ] trim ] unit-test
 { "" } [ "" [ CHAR: \s = ] trim-head ] unit-test
@@ -390,14 +401,17 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { 24 } [ { 1 2 } { 3 4 } [ + ] [ * ] 2map-reduce ] unit-test
 { 2 96 } [ 2 { 3 3 3 3 } { 4 4 4 4 } [ [ dup ] 2dip * * ] [ + ] 2map-reduce ] unit-test
 
-{ 4 } [ 5 <iota> [ ] supremum-by ] unit-test
-{ 0 } [ 5 <iota> [ ] infimum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] supremum-by ] unit-test
-{ "bar" } [ { "bar" "baz" "qux" } [ length ] infimum-by ] unit-test
-{ { "foo" } } [ { { "foo" } { "bar" } } [ first ] supremum-by ] unit-test
-{ { "bar" } } [ { { "foo" } { "bar" } } [ first ] infimum-by ] unit-test
-{ -2 1 } [ -2 { 1 2 3 } [ over ^ ] supremum-by ] unit-test
-{ -2 3 } [ -2 { 1 2 3 } [ over ^ ] infimum-by ] unit-test
+{ 4 } [ 5 <iota> maximum ] unit-test
+{ 0 } [ 5 <iota> minimum ] unit-test
+
+{ 4 } [ 5 <iota> [ ] maximum-by ] unit-test
+{ 0 } [ 5 <iota> [ ] minimum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] maximum-by ] unit-test
+{ "bar" } [ { "bar" "baz" "qux" } [ length ] minimum-by ] unit-test
+{ { "foo" } } [ { { "foo" } { "bar" } } [ first ] maximum-by ] unit-test
+{ { "bar" } } [ { { "foo" } { "bar" } } [ first ] minimum-by ] unit-test
+{ -2 1 } [ -2 { 1 2 3 } [ over ^ ] maximum-by ] unit-test
+{ -2 3 } [ -2 { 1 2 3 } [ over ^ ] minimum-by ] unit-test
 
 { { 0 0 255 } } [
     {
@@ -412,7 +426,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
         { 0 255 215 }
         { 135 0 95 }
         { 255 0 175 }
-    } [ { 0 0 255 } distance ] infimum-by
+    } [ { 0 0 255 } distance ] minimum-by
 ] unit-test
 
 [ -1 0 <repetition> ] must-fail

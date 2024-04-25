@@ -12,4 +12,4 @@ USING: arrays sequences sequences.windowed tools.test ;
 [ { 1 2 3 4 5 6 } 3 <windowed-sequence> length ] unit-test
 
 { { 1 1 1 2 3 4 } }
-[ { 1 2 3 4 5 6 } 3 <windowed-sequence> [ infimum ] map ] unit-test
+[ { 1 2 3 4 5 6 } 3 <windowed-sequence> [ minimum ] map ] unit-test

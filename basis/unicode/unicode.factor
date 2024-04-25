@@ -229,4 +229,4 @@ CONSTANT: unicode-unsupported {
     "bidi"
 }
 
-CONSTANT: unicode-version "14.0.0"
+CONSTANT: unicode-version "15.1.0"

@@ -1,9 +1,9 @@
 ! Copyright (C) 2019 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors ascii assocs hashtables io.encodings.utf8
-io.files kernel make math.parser peg peg.parsers regexp
-sequences splitting strings.parser ;
+USING: accessors ascii assocs calendar.parser hashtables
+io.encodings.utf8 io.files kernel make math.parser peg
+peg.parsers regexp sequences splitting strings.parser ;
 
 ! https://github.com/toml-lang/toml/blob/main/toml.abnf
 
@@ -22,11 +22,15 @@ TUPLE: entry key value ;
 : check-no-key ( key assoc -- key assoc )
     2dup at* nip [ over duplicate-key ] when ;
 
+: check-no-value ( key assoc -- table )
+    over '[
+        [ dup hashtable? [ _ duplicate-key ] unless ]
+        [ H{ } clone ] if* dup
+    ] change-at ;
+
 : entries-at ( table keys -- key entries )
     unclip-last -rot [
-        over ?at [ nip ] [
-            H{ } clone [ spin check-no-key set-at ] keep
-        ] if
+        over ?at [ nip ] [ swap check-no-value ] if
     ] each ;
 
 GENERIC: update-toml ( root table entry -- root table' )
@@ -37,9 +41,7 @@ M: entry update-toml
 
 M: table update-toml
     nip dupd [ name>> entries-at ] [ array?>> ] bi
-    H{ } clone [
-        swap [ -rot push-at ] [ -rot check-no-key set-at ] if
-    ] keep ;
+    [ H{ } clone [ -rot push-at ] keep ] [ check-no-value ] if ;
 
 : ws ( -- parser )
     [ " \t" member? ] satisfy repeat0 ;
@@ -186,12 +188,12 @@ M: table update-toml
         decdigit 2 exactly-n ,
         ":" token ,
         decdigit 2 exactly-n ,
-        "." token decdigit repeat1 2seq optional ,
+        "." token decdigit repeat1 2seq optional [ concat ] action ,
     ] seq* [ "" concat-as ] action ;
 
 : timezone-parser ( -- parser )
     "Z" token
-    "-" token
+    "+" token "-" token 2choice
     decdigit 2 exactly-n ":" token
     decdigit 2 exactly-n 4seq [ "" concat-as ] action
     2choice ;
@@ -199,10 +201,10 @@ M: table update-toml
 : datetime-parser ( -- parser )
     [
         date-parser ,
-        "T" token " " token 2choice ,
+        "T" token "t" token " " token 3choice ,
         time-parser ,
         timezone-parser optional ,
-    ] seq* [ "" concat-as ] action ;
+    ] seq* [ "" concat-as rfc3339>timestamp ] action ;
 
 : separator ( -- parser )
     "," token comment optional 2seq ;
@@ -211,15 +213,13 @@ DEFER: value-parser
 
 : array-value-parser ( -- parser )
     ws-comment-newline hide
-    value-parser
+    value-parser optional
     ws-comment-newline hide 3seq [ first ] action ;
 
 : array-parser ( -- parser )
     [
         "[" token hide ,
-        array-value-parser separator list-of optional ,
-        separator optional hide ,
-        ws-comment-newline hide ,
+        array-value-parser separator list-of [ sift ] action ,
         "]" token hide ,
     ] seq* [ first { } like ] action ;
 

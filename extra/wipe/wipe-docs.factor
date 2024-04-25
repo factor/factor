@@ -5,7 +5,7 @@ IN: wipe
 
 HELP: overwrite-with-random-bytes
 { $values { "file-name" "a filename string" } }
-{ $description "Overwite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
+{ $description "Overwrite the " { $snippet "file-name" } " contents with random data. The slack space at the end is not overwritten." } ;
 
 ABOUT: "Wipe"
 
@@ -32,7 +32,7 @@ HELP: wipe-free-space
 
 HELP: with-temp-directory-at
 { $values { "path" "a filename string" } { "quot" quotation } }
-{ $description "Run the " { $snippet "quot" } "ation in a randomly named subdirectory of " { $snippet "path" } ", then delete the subdirectory." } ;
+{ $description "Run the " { $snippet "quot" } "action in a randomly named subdirectory of " { $snippet "path" } ", then delete the subdirectory." } ;
 
 HELP: make-file-empty
 { $values { "file-name" "a filename string" } }

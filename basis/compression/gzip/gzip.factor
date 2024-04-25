@@ -208,7 +208,7 @@ TUPLE: deflate-block
         lit-vec get build-dicts
         dist-dict set
         lit-dict set
-        lit-code-lens supremum 16 < clen-seq supremum 8 < and
+        lit-code-lens maximum 16 < clen-seq maximum 8 < and
         [ drop dynamic-headers clen-bits compressed-lens
         lit-vec get vec-to-codes deflate-block boa ]
         [ halves [ (compress-dynamic) ] bi@ 2array ] if

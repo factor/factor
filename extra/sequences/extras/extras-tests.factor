@@ -190,8 +190,8 @@ strings tools.test ;
 { V{ 0 4 } } [ { 5 3 2 10 5 } [ 5 = ] arg-where ] unit-test
 { { 2 1 0 4 3 } } [ { 5 3 2 10 5 } arg-sort ] unit-test
 
-{ 10 } [ { 4 3 2 1 } [ 10 * ] map-infimum ] unit-test
-{ 40 } [ { 4 3 2 1 } [ 10 * ] map-supremum ] unit-test
+{ 10 } [ { 4 3 2 1 } [ 10 * ] map-minimum ] unit-test
+{ 40 } [ { 4 3 2 1 } [ 10 * ] map-maximum ] unit-test
 
 { t } [ { 1 2 3 4 5 } 1 first= ] unit-test
 { t } [ { 1 2 3 4 5 } 2 second= ] unit-test
@@ -268,19 +268,19 @@ strings tools.test ;
 
 { { 4 0 3 1 2 } } [ { 0 4 1 3 2 } 5 <iota> [ nth* ] curry map ] unit-test
 
-{ 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] infimum-by* ] unit-test
-{ 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] supremum-by* ] unit-test
-{ 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] supremum-by* ] unit-test
-{ f } [ f ?supremum ] unit-test
-{ f } [ { } ?supremum ] unit-test
-{ f } [ { f } ?supremum ] unit-test
-{ 3 } [ { 1 f 3 2 } ?supremum ] unit-test
-{ 3 } [ { 1 3 2 } ?supremum ] unit-test
-{ f } [ f ?infimum ] unit-test
-{ f } [ { } ?infimum ] unit-test
-{ f } [ { f } ?infimum ] unit-test
-{ 1 } [ { 1 f 3 2 } ?infimum ] unit-test
-{ 1 } [ { 1 3 2 } ?infimum ] unit-test
+{ 1 "beef" } [ { "chicken" "beef" "moose" } [ length ] minimum-by* ] unit-test
+{ 0 "chicken" } [ { "chicken" "beef" "moose" } [ length ] maximum-by* ] unit-test
+{ 2 "moose" } [ { "chicken" "beef" "moose" } [ first ] maximum-by* ] unit-test
+{ f } [ f ?maximum ] unit-test
+{ f } [ { } ?maximum ] unit-test
+{ f } [ { f } ?maximum ] unit-test
+{ 3 } [ { 1 f 3 2 } ?maximum ] unit-test
+{ 3 } [ { 1 3 2 } ?maximum ] unit-test
+{ f } [ f ?minimum ] unit-test
+{ f } [ { } ?minimum ] unit-test
+{ f } [ { f } ?minimum ] unit-test
+{ 1 } [ { 1 f 3 2 } ?minimum ] unit-test
+{ 1 } [ { 1 3 2 } ?minimum ] unit-test
 
 { 3/10 } [ 10 <iota> [ 3 < ] percent-of ] unit-test
 
@@ -522,3 +522,23 @@ strings tools.test ;
 
 { "34_01_" } [ 2 0 3 "01_34_" [ exchange-subseq ] keep ] unit-test
 { "cdebaf" } [ 3 0 2 "abcdef" [ exchange-subseq ] keep ] unit-test
+
+{ { } } [ { } sequence-cartesian-product ] unit-test
+{ { } } [ { { } } sequence-cartesian-product ] unit-test
+{ { } } [ { { 1 2 } { } } sequence-cartesian-product ] unit-test
+{ { { 1 } { 2 } } } [ { { 1 2 } } sequence-cartesian-product ] unit-test
+
+{
+    {
+        { 1 3 5 6 { 9 } }
+        { 1 3 5 7 { 9 } }
+        { 1 4 5 6 { 9 } }
+        { 1 4 5 7 { 9 } }
+        { 2 3 5 6 { 9 } }
+        { 2 3 5 7 { 9 } }
+        { 2 4 5 6 { 9 } }
+        { 2 4 5 7 { 9 } }
+    }
+} [
+    { { 1 2 } { 3 4 } { 5 } { 6 7 } { { 9 } } } sequence-cartesian-product
+] unit-test
