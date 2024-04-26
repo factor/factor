@@ -29,7 +29,7 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
 : load-scryfall-json ( type path -- uri )
     [ find-scryfall-json "download_uri" of ] dip
-    10 days download-outdated-as path>json ;
+    30 days download-outdated-as path>json ;
 
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
@@ -764,9 +764,11 @@ MEMO: get-moxfield-deck ( public-id -- json )
     ] bi
     <moxfield-deck> ;
 
+: moxfield-decks-for-username ( username -- json )
+    get-moxfield-user "data" of ;
+
 : moxfield-random-deck-for-username ( username -- json )
-    get-moxfield-user
-    "data" of
+    moxfield-decks-for-username
     random "publicId" of get-moxfield-deck
     json>moxfield-deck ;
 
