@@ -105,7 +105,10 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   set_data_heap(d);
 
   auto uncompress = h->data_size != h->compressed_data_size;
-  auto buf = uncompress ? malloc (h->compressed_data_size) : (void*)data->tenured->start;
+  auto uncompressed_data_size = uncompress ? align_page (h->data_size) : 0;
+  auto temp = uncompress && uncompressed_data_size+h->compressed_data_size > data->tenured->size;
+  auto buf = temp ? malloc (h->compressed_data_size) : (char*)data->tenured->start+uncompressed_data_size;
+  if (!buf) fatal_error ("Out of memory in load_data_heap", 0);
 
   fixnum bytes_read =
       raw_fread(buf, 1, h->compressed_data_size, file);
@@ -124,7 +127,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
     }
   }
 
-  if (uncompress && buf) free (buf);
+  if (temp) free (buf);
 
   data->tenured->initial_free_list(h->data_size);
 }
@@ -135,10 +138,13 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
 
   code = new code_heap(p->code_size);
 
-  auto uncompress = h->code_size != h->compressed_code_size;
-  auto buf = uncompress ? malloc (h->compressed_code_size) : (void*)code->allocator->start;
-
   if (h->code_size != 0) {
+    auto uncompress = h->code_size != h->compressed_code_size;
+    auto uncompressed_code_size = uncompress ? align_page (h->code_size) : 0;
+    auto temp = uncompress && uncompressed_code_size+h->compressed_code_size > code->allocator->size;
+    auto buf = temp ? malloc (h->compressed_code_size) : (char*)code->allocator->start+uncompressed_code_size;
+    if (!buf) fatal_error ("Out of memory in load_code_heap", 0);
+
     size_t bytes_read =
         raw_fread(buf, 1, h->compressed_code_size, file);
     if (bytes_read != h->compressed_code_size) {
@@ -154,9 +160,9 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
         fatal_error ("load_code_heap failed", 0);
       }
     }
-  }
 
-  if (uncompress && buf) free (buf);
+    if (temp) free (buf);
+  }
 
   code->allocator->initial_free_list(h->code_size);
   code->initialize_all_blocks_set();
