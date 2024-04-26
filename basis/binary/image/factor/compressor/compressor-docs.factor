@@ -1,10 +1,11 @@
 ! Copyright (C) 2022-2023 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax strings ;
+FROM: tools.image-analyzer.vm => image-header ;
 IN: binary.image.factor.compressor
 
 ARTICLE: "binary.image.factor.compressor" "Compress Factor image file for loading by the VM"
-"The " { $vocab-link "binary.image.factor.compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their headers." $nl
+"The " { $vocab-link "binary.image.factor.compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their image headers." $nl
 "You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=binary.image.factor.compressor" } ;
 
 HELP: image
