@@ -1,4 +1,4 @@
-! Copyright (C) 2022-2023 nomennescio
+! Copyright (C) 2022-2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
 USING: byte-arrays help.markup help.syntax strings ;
 FROM: tools.image-analyzer.vm => image-header ;
