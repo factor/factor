@@ -292,5 +292,5 @@ SYNTAX: INVERSE: scan-word parse-definition define-inverse ;
 
 SYNTAX: DUAL: scan-word scan-word define-dual ;
 
-MACRO: under ( reversible-quot quot -- quot )
+MACRO: under ( invertible-quot quot -- quot )
     over [undo] '[ @ @ @ ] ;

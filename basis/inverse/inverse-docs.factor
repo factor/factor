@@ -49,7 +49,7 @@ HELP: switch
 { $see-also undo } ;
 
 HELP: under
-{ $values { "invertible-quot" "" } { "quot" "" } }
+{ $values { "invertible-quot" quotation } { "quot" quotation } }
 { $description "Applies " { $snippet "invertible-quot" } ", then " { $snippet "quot" } " and finally the inverse of " { $snippet "invertible-quot" } "." }
 { $examples
     "Round a decimal number to two decimals:"
