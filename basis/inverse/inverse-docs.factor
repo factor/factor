@@ -48,6 +48,18 @@ HELP: switch
 "    } switch ;" }
 { $see-also undo } ;
 
+HELP: under
+{ $values { "invertible-quot" "" } { "quot" "" } }
+{ $description "Applies " { $snippet "invertible-quot" } ", then " { $snippet "quot" } " and finally the inverse of " { $snippet "invertible-quot" } "." }
+{ $examples
+    "Round a decimal number to two decimals:"
+    { $example
+        "USING: inverse math math.functions prettyprint ;"
+        "123.456 [ 100 * ] [ round ] under ."
+        "123.46"
+    }
+} ;
+
 ARTICLE: { "inverse" "intro" } "Invertible quotations"
 "The inverse vocab defines a way to 'undo' quotations, and builds a pattern matching framework on that basis. A quotation can be inverted by reversing it and inverting each word. To define the inverse for particular word, use"
 { $subsections
