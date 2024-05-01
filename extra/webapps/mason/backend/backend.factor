@@ -47,6 +47,27 @@ builder "BUILDERS" {
     { "status" "STATUS" TEXT }
 } define-persistent
 
+TUPLE: run
+run-id timestamp host-name os cpu git-id ;
+
+run "RUNS" {
+    { "run-id" "RUN_ID" INTEGER +db-assigned-id+ }
+    { "timestamp" "TIMESTAMP" TIMESTAMP }
+    { "host-name" "HOST_NAME" TEXT }
+    { "os" "OS" TEXT }
+    { "cpu" "CPU" TEXT }
+    { "git-id" "GIT_ID" TEXT }
+} define-persistent
+
+TUPLE: benchmark
+run-id name duration ;
+
+benchmark "BENCHMARKS" {
+    { "run-id" "RUN_ID" INTEGER +user-assigned-id+ }
+    { "name" "NAME" TEXT +user-assigned-id+ }
+    { "duration" "DURATION" DOUBLE } ! in seconds
+} define-persistent
+
 TUPLE: counter id value ;
 
 counter "COUNTER" {
@@ -88,4 +109,4 @@ counter "COUNTER" {
     mason-db [ with-transaction ] with-db ; inline
 
 : init-mason-db ( -- )
-    { builder counter } ensure-tables ;
+    { builder counter run benchmark } ensure-tables ;
