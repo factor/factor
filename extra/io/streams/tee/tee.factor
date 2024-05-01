@@ -25,6 +25,8 @@ MACRO: tee2 ( read-quot write-quot -- quot )
 
 PRIVATE>
 
+M: tee-stream stream-element-type in>> stream-element-type ;
+
 M: tee-stream stream-read1
     [ stream-read1 ] [ stream-write1 ] tee1 ;
 
