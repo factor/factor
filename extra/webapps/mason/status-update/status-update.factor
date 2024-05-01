@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators db.tuples furnace.actions
+USING: accessors assocs calendar combinators db.tuples furnace.actions
 furnace.redirection html.forms http.server.responses io kernel
-namespaces validators webapps.mason.utils webapps.mason.backend ;
+namespaces sequences validators webapps.mason.utils webapps.mason.backend ;
 IN: webapps.mason.status-update
 
 : find-builder ( host-name os cpu -- builder )
@@ -11,6 +11,25 @@ IN: webapps.mason.status-update
         swap >>os
         swap >>host-name
     [ select-tuple ] [ dup insert-tuple ] ?unless ;
+
+: update-runs ( builder -- run-id )
+  [ run new ] dip
+  { [ host-name>> >>host-name ]
+    [ os>> >>os ]
+    [ cpu>> >>cpu ]
+    [ current-timestamp>> >>timestamp ]
+    [ current-git-id>> >>git-id ] } cleave
+  dup insert-tuple run-id>>
+;
+
+: parse-report ( report -- assoc )
+  drop { { "test1" 1500 } { "test2" 2000 } }
+;
+
+: update-benchmarks ( run-id builder -- )
+  [ benchmark new swap >>run-id ] dip last-report>>
+  parse-report [ first2 [ >>name ] dip >>duration insert-tuple ] with each
+;
 
 : heartbeat ( builder -- )
     now >>heartbeat-timestamp
@@ -39,6 +58,7 @@ IN: webapps.mason.status-update
     +clean+ = [
         dup current-git-id>> >>clean-git-id
         dup current-timestamp>> >>clean-timestamp
+        [ [ update-runs ] [ update-benchmarks ] bi ] keep
     ] when
     dup current-git-id>> >>last-git-id
     dup current-timestamp>> >>last-timestamp
