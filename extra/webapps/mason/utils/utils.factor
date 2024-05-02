@@ -1,13 +1,17 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs db.tuples furnace.actions
-furnace.utilities html.forms kernel mason.config math.parser
-namespaces sequences urls validators webapps.mason.backend
+USING: accessors arrays assocs calendar calendar.format
+db.tuples furnace.actions furnace.utilities html.forms
+io.streams.string kernel mason.config math.parser namespaces
+sequences urls validators webapps.mason.backend
 webapps.mason.version.data xml.syntax ;
 IN: webapps.mason.utils
 
 : link ( url label -- xml )
     [XML <a href=<->><-></a> XML] ;
+
+: timestamp>iso8601Z ( timestamp -- string )
+    [ >utc { YYYY MM DD "T" hhmm ss "Z" } formatted ] with-string-writer ;
 
 : validate-os/cpu ( -- )
     {
@@ -22,14 +26,14 @@ IN: webapps.mason.utils
         { "cpu" [ [ v-one-line ] v-optional ] }
         { "git" [ [ v-one-line ] v-optional ] }
         { "run" [ [ v-one-line ] v-optional ] }
-        { "timestamp" [ [ v-one-line ] v-optional ] }
+        ! { "timestamp" [ [ v-one-line ] v-optional ] } ! parsing of ISO8601 is currently not supported
         { "name" [ [ v-one-line ] v-optional ] }
     } validate-params ;
 
 : selected-runs ( -- runs )
     run new
     "run" value dec> >>run-id
-    "timestamp" value >>timestamp
+    ! "timestamp" value >>timestamp ! parsing of ISO8601 is currently not supported
     "host" value >>host-name
     "os" value >>os
     "cpu" value >>cpu
