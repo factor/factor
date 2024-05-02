@@ -231,6 +231,7 @@ unit-test
 { f f } [ 100 { 1 2 3 } [ 1 = ] find-from ] unit-test
 { f f } [ 100 { 1 2 3 } [ 1 = ] find-last-from ] unit-test
 { f f } [ -1 { 1 2 3 } [ 1 = ] find-from ] unit-test
+{ f f } [ 0 { } [ unreachable ] find-from ] unit-test
 
 { 0 } [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
 
