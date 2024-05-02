@@ -119,22 +119,15 @@ big-endian off
 ! This is used when a word is called at the end of a quotation.
 ! JIT-WORD-CALL is used for other word calls.
 [
-    ! ! pic-tail-reg 5 [RIP+] LEA
     ! why do we store the address after JMP in EBX, where is it
     ! picked up?
     4 pic-tail-reg ADR
-    ! ! 0 JMP f rc-relative rel-word-pic-tail
-    ! 0 Br f rc-relative-arm64-branch rel-word-pic-tail
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
 ! This is used when a word is called. 
 ! JIT-WORD-JUMP is used if the word is the last piece of code in a quotation.
 [
-    ! ! 0 CALL f rc-relative rel-word-pic
-    ! push-link-reg
-    ! 0 BL f rc-relative-arm64-branch rel-word-pic
-    ! pop-link-reg
     absolute-call rel-word-pic
 ] JIT-WORD-CALL jit-define
 
@@ -159,7 +152,6 @@ big-endian off
 
 ! Loads the address of the ctx struct into ctx-reg.
 : jit-load-context ( -- )
-    ! ctx-reg vm-reg vm-context-offset [+] MOV ;
     vm-context-offset vm-reg ctx-reg LDRuoff ;
 
 ! Saves the addresses of the callstack, datastack, and retainstack tops 
@@ -169,22 +161,16 @@ big-endian off
     ! The reason for -8 I think is because we are anticipating a CALL
     ! instruction. After the call instruction, the contexts frame_top
     ! will point to the origin jump address.
-    ! R11 RSP -8 [+] LEA
-    ! ctx-reg context-callstack-top-offset [+] R11 MOV
     stack-reg temp0 MOVsp
     16 temp0 temp0 SUBi
     context-callstack-top-offset ctx-reg temp0 STRuoff
-    ! ctx-reg context-datastack-offset [+] ds-reg MOV
-    ! ctx-reg context-retainstack-offset [+] rs-reg MOV ;
     context-datastack-offset ctx-reg ds-reg STRuoff
     context-retainstack-offset ctx-reg rs-reg STRuoff ;
 
 ! Retrieves the addresses of the datastack and retainstack tops 
 ! from the corresponding fields in the ctx struct.
 ! ctx-reg must already have been loaded.
-: jit-restore-context ( -- )
-    ! ds-reg ctx-reg context-datastack-offset [+] MOV
-    ! rs-reg ctx-reg context-retainstack-offset [+] MOV ;
+: jit-restore-context ( -- ) ;
     context-datastack-offset ctx-reg ds-reg LDRuoff
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
@@ -203,7 +189,6 @@ big-endian off
 
 ! Used to a call a quotation if the quotation is the last piece of code
 : jit-jump-quot ( -- )
-    ! arg1 quot-entry-point-offset [+] JMP ;
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BR ;
 
@@ -216,8 +201,6 @@ big-endian off
 
 ! calls a quotation
 [
-    ! arg1 ds-reg [] MOV
-    ! ds-reg bootstrap-cell SUB
     pop-arg1
 ]
 [ jit-call-quot ]
@@ -305,32 +288,22 @@ big-endian off
     ctx-reg jit-update-tib ;
 
 : jit-pop-context-and-param ( -- )
-    ! arg1 ds-reg [] MOV
-    ! arg1 arg1 alien-offset [+] MOV
-    ! arg2 ds-reg -8 [+] MOV
-    ! ds-reg 16 SUB ;
     pop-arg1
     alien-offset arg1 arg1 ADDi
     0 arg1 arg1 LDRuoff
     pop-arg2 ;
 
 : jit-push-param ( -- )
-    ! ds-reg 8 ADD
-    ! ds-reg [] arg2 MOV ;
     push-arg2 ;
 
 : jit-set-context ( -- )
     jit-pop-context-and-param
     jit-save-context
     arg1 jit-switch-context
-    ! RSP 8 ADD
     16 stack-reg stack-reg ADDi
     jit-push-param ;
 
 : jit-pop-quot-and-param ( -- )
-    ! arg1 ds-reg [] MOV
-    ! arg2 ds-reg -8 [+] MOV
-    ! ds-reg 16 SUB ;
     pop-arg1 pop-arg2 ;
 
 : jit-start-context ( -- )
@@ -1018,30 +991,23 @@ big-endian off
     ! ## Locals
     ! Drops all current locals stored on the retainstack.
     { drop-locals [
-        ! ! load local count
-        ! temp0 ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
+        ! load local count
         pop0
-        ! ! turn local number into offset
+        ! turn local number into offset
         tagged>offset0
-        ! ! decrement retain stack pointer
-        ! rs-reg temp0 SUB
+        ! decrement retain stack pointer
         temp0 rs-reg rs-reg SUBr
     ] }
 
     ! Gets the nth local stored on the retainstack.
     { get-local [
-        ! ! load local number
-        ! temp0 ds-reg [] MOV
+        ! load local number
         load0
-        ! ! turn local number into offset
+        ! turn local number into offset
         tagged>offset0
-        ! ! load local value
-        ! temp0 rs-reg temp0 [+] MOV
+        ! load local value
         temp0 rs-reg temp0 LDRr
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         store0
     ] }
 
