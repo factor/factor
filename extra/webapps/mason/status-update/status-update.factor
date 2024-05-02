@@ -1,8 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs calendar combinators db.tuples furnace.actions
-furnace.redirection html.forms http.server.responses io kernel
-namespaces sequences validators webapps.mason.utils webapps.mason.backend ;
+USING: accessors assocs calendar combinators db.tuples
+furnace.actions furnace.redirection html.forms
+http.server.responses io kernel multiline namespaces parser
+prettyprint sequences splitting validators webapps.mason.backend
+webapps.mason.utils ;
 IN: webapps.mason.status-update
 
 : find-builder ( host-name os cpu -- builder )
@@ -22,12 +24,8 @@ IN: webapps.mason.status-update
   dup insert-tuple run-id>>
 ;
 
-: parse-report ( report -- assoc )
-  drop { { "test1" 1500 } { "test2" 2000 } }
-;
-
-: update-benchmarks ( run-id builder -- )
-  [ benchmark new swap >>run-id ] dip last-report>> parse-report
+: update-benchmarks ( run-id benchmarks -- )
+  [ benchmark new swap >>run-id ] dip
   [ first2 [ >>name ] dip >>duration insert-tuple ] with each
 ;
 
@@ -50,6 +48,11 @@ IN: webapps.mason.status-update
 
 : test ( builder -- ) +test+ status ;
 
+: benchmarks ( builder content -- )
+  [ update-runs ] dip
+  split-lines parse-fresh first update-benchmarks
+;
+
 : report ( builder content status -- )
     [
         >>last-report
@@ -58,7 +61,6 @@ IN: webapps.mason.status-update
     +clean+ = [
         dup current-git-id>> >>clean-git-id
         dup current-timestamp>> >>clean-timestamp
-        [ [ update-runs ] [ update-benchmarks ] bi ] keep
     ] when
     dup current-git-id>> >>last-git-id
     dup current-timestamp>> >>last-timestamp
@@ -82,6 +84,7 @@ IN: webapps.mason.status-update
         { "boot" [ boot ] }
         { "test" [ test ] }
         { "report" [ "report" value "arg" value report ] }
+        { "benchmarks" [ "report" value benchmarks ] }
         { "upload" [ upload ] }
         { "finish" [ finish ] }
         { "release" [ "arg" value release ] }
