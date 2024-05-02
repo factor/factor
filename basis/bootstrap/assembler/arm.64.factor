@@ -88,11 +88,19 @@ big-endian off
 : store1/0 ( -- ) -8 ds-reg temp0 temp1 STPsoff ;
 : store1/2 ( -- ) -16 ds-reg temp2 temp1 STPsoff ;
 
+! add tag bits to integers
 :: tag ( reg -- ) tag-bits get reg reg LSLi ;
+! remove tag bits
 :: untag ( reg -- ) tag-bits get reg reg ASRi ;
+
 : tagged>offset0 ( -- ) 1 temp0 temp0 ASRi ;
 
+! pops an item from the data stack and pushes it 
+! onto the retain stack (used for dip-like operations)
 : >r ( -- ) pop0 pushr ;
+
+! pops an item from the retain stack and pushes it 
+! onto the data stack (used for dip-like operations)
 : r> ( -- ) popr push0 ;
 
 : absolute-jump ( -- word class )
@@ -108,6 +116,8 @@ big-endian off
     3 words Br
     NOP NOP f rc-absolute-cell ; inline
 
+! This is used when a word is called at the end of a quotation.
+! JIT-WORD-CALL is used for other word calls.
 [
     ! ! pic-tail-reg 5 [RIP+] LEA
     ! why do we store the address after JMP in EBX, where is it
@@ -118,6 +128,8 @@ big-endian off
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
+! This is used when a word is called. 
+! JIT-WORD-JUMP is used if the word is the last piece of code in a quotation.
 [
     ! ! 0 CALL f rc-relative rel-word-pic
     ! push-link-reg
@@ -141,12 +153,17 @@ big-endian off
     arg2s arg2 MOVr
     name jit-call ;
 
+! loads the address of the vm struct. 
+! A no-op on ARM (vm-reg always contains this address).
 : jit-load-vm ( -- ) ;
 
+! Loads the address of the ctx struct into ctx-reg.
 : jit-load-context ( -- )
     ! ctx-reg vm-reg vm-context-offset [+] MOV ;
     vm-context-offset vm-reg ctx-reg LDRuoff ;
 
+! Saves the addresses of the callstack, datastack, and retainstack tops 
+! into the corresponding fields in the ctx struct.
 : jit-save-context ( -- )
     jit-load-context
     ! The reason for -8 I think is because we are anticipating a CALL
@@ -162,7 +179,9 @@ big-endian off
     context-datastack-offset ctx-reg ds-reg STRuoff
     context-retainstack-offset ctx-reg rs-reg STRuoff ;
 
-! ctx-reg must already have been loaded
+! Retrieves the addresses of the datastack and retainstack tops 
+! from the corresponding fields in the ctx struct.
+! ctx-reg must already have been loaded.
 : jit-restore-context ( -- )
     ! ds-reg ctx-reg context-datastack-offset [+] MOV
     ! rs-reg ctx-reg context-retainstack-offset [+] MOV ;
@@ -182,17 +201,20 @@ big-endian off
     jit-restore-context
 ] JIT-PRIMITIVE jit-define
 
+! Used to a call a quotation if the quotation is the last piece of code
 : jit-jump-quot ( -- )
     ! arg1 quot-entry-point-offset [+] JMP ;
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BR ;
 
+! Used to call a quotation if the quotation is not the last piece of code
 : jit-call-quot ( -- )
     push-link-reg
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BLR
     pop-link-reg ;
 
+! calls a quotation
 [
     ! arg1 ds-reg [] MOV
     ! ds-reg bootstrap-cell SUB
@@ -355,7 +377,9 @@ big-endian off
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-! C to Factor entry point
+! The main C to Factor entry point. 
+! Sets up and executes the boot quote, 
+! then performs a teardown and returns into C++. 
 [
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
@@ -437,6 +461,7 @@ big-endian off
     f RET
 ] CALLBACK-STUB jit-define
 
+! pushes a literal value to the stack
 [
     ! load literal
     2 words temp0 LDRl
@@ -509,6 +534,7 @@ big-endian off
     16 SP X3 X2 LDPpost
     16 SP X1 X0 LDPpost ;
 
+! if-statement control flow
 [
     ! pop boolean
     pop0
@@ -522,24 +548,28 @@ big-endian off
     absolute-jump rel-word
 ] JIT-IF jit-define
 
+! calls the second item on the stack
 [
     >r
     absolute-call rel-word
     r>
 ] JIT-DIP jit-define
 
+! calls the third item on the stack
 [
     >r >r
     absolute-call rel-word
     r> r>
 ] JIT-2DIP jit-define
 
+! calls the fourth item on the stack
 [
     >r >r >r
     absolute-call rel-word
     r> r> r>
 ] JIT-3DIP jit-define
 
+! executes a word pushed onto the stack with \
 [
     ! ! load from stack
     ! temp0 ds-reg [] MOV
@@ -566,17 +596,20 @@ big-endian off
 ] JIT-EXECUTE jit-define
 
 ! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
+! Performs setup for a quotation
 [
     ! ! make room for LR plus magic number of callback, 16byte align
     stack-frame-size stack-reg stack-reg SUBi
     push-link-reg
 ] JIT-PROLOG jit-define
 
+! Performs teardown for a quotation
 [
     pop-link-reg
     stack-frame-size stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
+! returns to the outer stack frame
 [ f RET ] JIT-RETURN jit-define
 
 ! ! ! Polymorphic inline caches
@@ -701,7 +734,7 @@ big-endian off
     ] jit-conditional
 ] MEGA-LOOKUP jit-define
 
-! Comparisons
+! helper for comparison operations which return a boolean value
 : jit-compare ( cond -- )
     ! load t
     2 words temp3 LDRl
@@ -720,7 +753,7 @@ big-endian off
 
 ! Math
 
-! Overflowing fixnum arithmetic
+! Overflowing fixnum (integer) arithmetic
 : jit-overflow ( insn func -- )
     jit-save-context
     load-arg1/2
@@ -731,6 +764,7 @@ big-endian off
         jit-call
     ] jit-conditional ; inline
 
+! non-overflowing fixnum (integer) arithmetic
 : jit-math ( insn -- )
     ! load inputs
     load1/0
@@ -739,6 +773,8 @@ big-endian off
     ! store result
     1 push-down0 ;
 
+! fixnum (integer) division and modulo operations. 
+! Does not tag or push results.
 : jit-fixnum-/mod ( -- )
     ! load parameters
     load1/0
@@ -758,6 +794,9 @@ big-endian off
     { (start-context-and-delete) [ jit-start-context-and-delete ] }
 
     ! ## Entry points
+    ! called by callback-stub. 
+    ! this contains some C++ setup/teardown, 
+    ! as well as the actual call into the boot quote.
     { c-to-factor [
             arg1 arg2 MOVr
             vm-reg "begin_callback" jit-call-1arg
@@ -789,10 +828,13 @@ big-endian off
     ] }
 
     ! ## Math
+    ! Overflowing fixnum (integer) addition
     { fixnum+ [ 
         [ ADDr ] "overflow_fixnum_add" jit-overflow ] }
+    ! Overflowing fixnum (integer) subtraction
     { fixnum- [ 
         [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
+    ! Overflowing fixnum (integer) multiplication
     { fixnum* [
         [ MUL ] "overflow_fixnum_multiply" jit-overflow ] }
 
@@ -864,12 +906,14 @@ big-endian off
 
 
     ! ## Fixnums
-
-    ! ### Add
+    ! Non-overflowing fixnum (integer) addition
     { fixnum+fast [ \ ADDr jit-math ] }
 
     ! ### Bit manipulation
+    ! fixnum (integer) bitwise AND
     { fixnum-bitand [ \ ANDr jit-math ] }
+    
+    ! fixnum (integer) bitwise NOT
     { fixnum-bitnot [
         load0
         ! complement
@@ -878,8 +922,14 @@ big-endian off
         tag-mask get temp0 temp0 EORi
         store0
     ] }
+    
+    ! fixnum (integer) bitwise OR
     { fixnum-bitor [ \ ORRr jit-math ] }
+    
+    ! fixnum (integer) bitwise XOR
     { fixnum-bitxor [ \ EORr jit-math ] }
+    
+    ! fixnum (integer) bitwise shift (positive = left, negative = right)
     { fixnum-shift-fast [
         ! load shift count and value
         load1/0
@@ -902,6 +952,7 @@ big-endian off
     ] }
 
     ! ### Comparisons
+    ! returns true if both arguments are fixnums, and false otherwise
     { both-fixnums? [
         load1/0
         temp1 temp0 temp0 ORRr
@@ -911,18 +962,26 @@ big-endian off
         temp0 temp1 temp0 EQ CSEL
         1 push-down0
     ] }
+
+    ! fixnum (integer) equality comparison
     { eq? [ EQ jit-compare ] }
+    ! fixnum (integer) greater-than comparison
     { fixnum> [ GT jit-compare ] }
+    ! fixnum (integer) greater-than-or-equal comparison
     { fixnum>= [ GE jit-compare ] }
+    ! fixnum (integer) less-than comparison
     { fixnum< [ LT jit-compare ] }
+    ! fixnum (integer) less-than-or-equal comparison
     { fixnum<= [ LE jit-compare ] }
 
     ! ### Div/mod
+    ! fixnum (integer) modulo
     { fixnum-mod [
         jit-fixnum-/mod
         ! push to stack
         1 push-down0
     ] }
+    ! fixnum (integer) division
     { fixnum/i-fast [
         jit-fixnum-/mod
         ! tag it
@@ -930,6 +989,7 @@ big-endian off
         ! push to stack
         1 push-down0
     ] }
+    ! fixnum (integer) division and modulo
     { fixnum/mod-fast [
         jit-fixnum-/mod
         ! tag it
@@ -939,6 +999,7 @@ big-endian off
     ] }
 
     ! ### Mul
+    ! Non-overflowing fixnum (integer) multiplication
     { fixnum*fast [
         ! load both inputs
         load1/0
@@ -951,9 +1012,11 @@ big-endian off
     ] }
 
     ! ### Sub
+    ! Non-overflowing fixnum (integer) subtraction
     { fixnum-fast [ \ SUBr jit-math ] }
 
     ! ## Locals
+    ! Drops all current locals stored on the retainstack.
     { drop-locals [
         ! ! load local count
         ! temp0 ds-reg [] MOV
@@ -967,6 +1030,7 @@ big-endian off
         temp0 rs-reg rs-reg SUBr
     ] }
 
+    ! Gets the nth local stored on the retainstack.
     { get-local [
         ! ! load local number
         ! temp0 ds-reg [] MOV
@@ -980,9 +1044,13 @@ big-endian off
         ! ds-reg [] temp0 MOV
         store0
     ] }
+
+    ! Turns the top item on the datastack 
+    ! into a local stored on the retainstack.
     { load-local [ >r ] }
 
     ! ## Objects
+    ! Reads the nth slot of a given object. (non-bounds-checking)
     { slot [
         ! load object and slot number
         load1/0
@@ -995,6 +1063,8 @@ big-endian off
         ! push to stack
         1 push-down0
     ] }
+
+    ! nth string element selector (non-bounds-checking)
     { string-nth-fast [
         ! load string index and string from stack
         load1/0
@@ -1007,6 +1077,8 @@ big-endian off
         1 push-down0
     ] }
 
+    ! add tag bits to integers
+    ! (the local word tag just shifts left)
     { tag [
         ! load from stack
         load0
@@ -1021,30 +1093,41 @@ big-endian off
     ! ## Shufflers
 
     ! ### Drops
+    ! drops the top n stack items
     { drop [ 1 ndrop ] }
     { 2drop [ 2 ndrop ] }
     { 3drop [ 3 ndrop ] }
     { 4drop [ 4 ndrop ] }
 
     ! ### Dups
+    ! duplicates the top n stack items in order
     { dup [ load0 push0 ] }
     { 2dup [ load1/0 push1 push0 ] }
     { 3dup [ load2 load1/0 push2 push1 push0 ] }
     { 4dup [ load3/2 load1/0 push3 push2 push1 push0 ] }
+    ! duplicates the second stack item and puts it below the top stack item
     { dupd [ load1/0 store1 push0 ] }
 
     ! ### Misc shufflers
+    ! Duplicates the second stack item and puts it above the top stack item
     { over [ load1 push1 ] }
+    ! Duplicates the the third stack item and puts it above the top stack item
     { pick [ load2 push2 ] }
 
     ! ### Nips
+    ! Drops the second stack item
     { nip [ load0 1 push-down0 ] }
+    ! Drops the second and third stack items
     { 2nip [ load0 2 push-down0 ] }
 
     ! ### Swaps
+    ! Rotates the top three elements of the stack (1st -> 3rd)
     { -rot [ pop0 load2/1* store0/2 push1 ] }
+    ! Rotates the top three elements of the stack (1st -> 2nd)
     { rot [ pop0 load2/1* store1/0 push2 ] }
+    ! Swaps the top two elements of the stack
     { swap [ load1/0 store0/1 ] }
+    ! Swaps the second and third elements of the stack
     { swapd [ load2/1 store1/2 ] }
 
     ! ## Signal handling
