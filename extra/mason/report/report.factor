@@ -144,12 +144,10 @@ IN: mason.report
         dup eval-file 2array
     ] map
     benchmarks-file eval-file
-    union
-;
+    union ;
 
 : successful-benchmarks ( -- )
-  "benchmark-results" utf8 [ benchmark-results . ] with-file-writer
-;
+    "benchmark-results" utf8 [ benchmark-results . ] with-file-writer ;
 
 : build-clean? ( -- ? )
     ${
