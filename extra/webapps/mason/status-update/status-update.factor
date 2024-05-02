@@ -27,8 +27,8 @@ IN: webapps.mason.status-update
 ;
 
 : update-benchmarks ( run-id builder -- )
-  [ benchmark new swap >>run-id ] dip last-report>>
-  parse-report [ first2 [ >>name ] dip >>duration insert-tuple ] with each
+  [ benchmark new swap >>run-id ] dip last-report>> parse-report
+  [ first2 [ >>name ] dip >>duration insert-tuple ] with each
 ;
 
 : heartbeat ( builder -- )
