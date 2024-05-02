@@ -63,6 +63,9 @@ IN: mason.notify
         [ name>> "report" status-notify ] [ email-report ] 2bi
     ] bi ;
 
+: notify-benchmarks ( -- )
+    "benchmark-results" utf8 file-contents f "benchmarks" status-notify ;
+
 : notify-upload ( -- )
     f f "upload" status-notify ;
 
