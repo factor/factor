@@ -147,7 +147,7 @@ IN: mason.report
     union ;
 
 : successful-benchmarks ( -- )
-    "benchmark-results" utf8 [ benchmark-results . ] with-file-writer ;
+    "benchmark-results" utf8 [ benchmark-results ... ] with-file-writer ;
 
 : build-clean? ( -- ? )
     ${
