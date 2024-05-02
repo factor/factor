@@ -65,7 +65,7 @@ run-id name duration ;
 benchmark "BENCHMARKS" {
     { "run-id" "RUN_ID" INTEGER +user-assigned-id+ }
     { "name" "NAME" TEXT +user-assigned-id+ }
-    { "duration" "DURATION" DOUBLE } ! in seconds
+    { "duration" "DURATION_NANOSECONDS" INTEGER }
 } define-persistent
 
 TUPLE: counter id value ;
