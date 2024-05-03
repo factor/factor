@@ -90,3 +90,10 @@ Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa  Su Mo Tu We Th Fr Sa
 { "about a minute ago" } [ 60 relative-time ] unit-test
 { "about a minute ago" } [ 90 relative-time ] unit-test
 { "4 minutes ago" } [ 270 relative-time ] unit-test
+
+{ "1 minute" } [ 60 seconds duration>human-readable ] unit-test
+{ "1 hour" } [ 1 hours duration>human-readable ] unit-test
+{ "3 hours" } [ 3 hours duration>human-readable ] unit-test
+{ "2 minutes and 3 seconds" } [ 123 seconds duration>human-readable ] unit-test
+{ "20 minutes and 34 seconds" } [ 1234 seconds duration>human-readable ] unit-test
+{ "3 hours, 25 minutes and 45 seconds" } [ 12345 seconds duration>human-readable ] unit-test

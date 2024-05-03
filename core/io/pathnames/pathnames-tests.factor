@@ -97,7 +97,8 @@ os windows? [
 
     { "c:/Users" } [ "c:/Users" canonicalize-path ] unit-test
     { "c:/Users" } [ "c:/Users/." canonicalize-path ] unit-test
-    { "c:/Users\\foo\\bar" } [ "c:/Users/foo/bar" canonicalize-path ] unit-test
+    { "c:/Users/foo/bar" } [ "c:/Users/foo/bar" canonicalize-path ] unit-test
+    { "C:/foo/bar" } [ "C:\\foo\\bar" canonicalize-path ] unit-test
 ] [
     { "/" } [ "/" canonicalize-path ] unit-test
     { "/" } [ "/." canonicalize-path ] unit-test
@@ -148,6 +149,7 @@ os windows? [
     { "c:\\" } [ "\\\\?\\c:\\\\\\//Users//\\//merlen//" root-path ] unit-test
     { "d:\\" } [ "\\\\?\\d:\\././././././/../../../" root-path ] unit-test
     { "d:\\" } [ "\\\\?\\d:\\merlen\\dog" root-path ] unit-test
+    { "D:\\" } [ "\\\\?\\D:\\merlen\\dog" root-path ] unit-test
 ] [
     { "/" } [ "/" root-path ] unit-test
     { "/" } [ "//" root-path ] unit-test
