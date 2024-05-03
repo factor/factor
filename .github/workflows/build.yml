@@ -13,7 +13,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load-all
@@ -26,7 +26,7 @@ jobs:
   build-macos:
     runs-on: macos-11
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
     - name: load-all
@@ -39,7 +39,7 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
     - name: build
       shell: cmd
