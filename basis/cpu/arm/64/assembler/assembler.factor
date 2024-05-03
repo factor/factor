@@ -291,7 +291,8 @@ PRIVATE>
 
 : LDUR ( simm9 Rn Rt -- ) 2bw [ swap 9 ?sbits ] 2dip LDUR-encode ;
 
-: LSLi ( uimm6 Rn Rd -- ) 2bw [ tuck [ dup ] 2dip 6 ?ubits ] 2dip LSLi-encode ;
+: LSLi ( uimm6 Rn Rd -- ) 2bw 2bw [ spin 6 ?ubits [ 64 swap - ] [ 63 swap - ] bi ] 
+                                   2dip LSLi-encode ;
 : LSLr ( Rm Rn Rd -- ) 3bw LSLr-encode ;
 
 : LSRi ( uimm6 Rn Rd -- ) 2bw [ tuck [ dup ] 2dip 6 ?ubits ] 2dip LSRi-encode ;
@@ -342,3 +343,5 @@ PRIVATE>
 : SVC ( uimm16 -- ) 16 ?ubits SVC-encode ;
 
 : TSTi ( imm64 Rn -- ) 1bw [ swap encode-bitmask ] dip TSTi-encode ;
+
+: UXTB ( Rn Rd -- ) UXTB-encode ;

@@ -5,6 +5,8 @@ IN: bootstrap.assembler.arm
 
 DEFER: stack-reg
 
+! these are all windows-only functions.
+! NO-OPs appear to be correct on UNIX. 
 : jit-save-tib ( -- ) ;
 : jit-restore-tib ( -- ) ;
 : jit-update-tib ( ctx-reg -- ) drop ;
