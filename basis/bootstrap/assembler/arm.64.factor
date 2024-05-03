@@ -170,7 +170,7 @@ big-endian off
 ! Retrieves the addresses of the datastack and retainstack tops 
 ! from the corresponding fields in the ctx struct.
 ! ctx-reg must already have been loaded.
-: jit-restore-context ( -- ) ;
+: jit-restore-context ( -- )
     context-datastack-offset ctx-reg ds-reg LDRuoff
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
