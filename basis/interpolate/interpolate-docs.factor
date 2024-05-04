@@ -3,7 +3,7 @@ IN: interpolate
 
 HELP: interpolate
 { $values { "str" string } }
-{ $description "String interpolation using named variables and/or stack arguments, writing to the " { $link output-stream } ". Format directives from the " { $vocab-link "formatting" } " vocabulary can be used as well." }
+{ $description "String interpolation using named variables and/or stack arguments, writing to the " { $link output-stream } "." }
 { $notes "Stack arguments are numbered from the top of the stack, or provided anonymously by order of arguments." }
 { $examples
     { $example
@@ -20,11 +20,6 @@ HELP: interpolate
         "USING: interpolate ;"
         "\"Mr.\" \"Anderson\"" "\"Hello, ${} ${}\" interpolate"
         "Hello, Mr. Anderson"
-    }
-    { $example
-        "USING: interpolate ;"
-        "1.2345 \"${:011.5f}\" interpolate"
-        "00001.23450"
     }
 } ;
 
