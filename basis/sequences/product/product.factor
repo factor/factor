@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math sequences
-sequences.private typed ;
+USING: accessors arrays assocs combinators.short-circuit kernel
+math sequences sequences.private ;
 IN: sequences.product
 
 TUPLE: product-sequence
@@ -17,74 +17,79 @@ M: product-sequence length lengths>> product ;
 
 <PRIVATE
 
-TYPED: product-ns ( n lengths: array -- ns )
-    [ /mod ] map nip ;
+: product-ns ( n lengths -- ns )
+    <reversed> [ /mod ] map nip <reversed> ; inline
 
-TYPED: product-nths ( ns: array seqs -- nths )
-    [ nth-unsafe ] { } 2map-as ;
-
-: product@ ( n product-sequence -- ns seqs )
-    [ lengths>> product-ns ] [ nip sequences>> ] 2bi ;
-
-:: (carry-n) ( ns lengths i j -- )
-    i 1 + j = [
-        i ns nth-unsafe i lengths nth-unsafe = [
-            0 i ns set-nth-unsafe
-            ns lengths i 1 +
-            dup ns [ 1 + ] change-nth-unsafe
-            j (carry-n)
-        ] when
-    ] unless ; inline recursive
-
-: carry-ns ( ns lengths -- )
-    0 pick length integer>fixnum-strict (carry-n) ; inline
-
-: product-iter ( ns lengths -- )
-    [ 0 over [ 1 + ] change-nth-unsafe ] dip carry-ns ; inline
-
-: start-product-iter ( sequences -- ns lengths )
-    [ length 0 <array> ] [ [ length ] map ] bi ; inline
-
-: end-product-iter? ( ns lengths -- ? )
-    [ last-unsafe ] same? ; inline
-
-: product-length ( sequences -- length )
-    [ length ] [ * ] map-reduce ; inline
+: product-nths ( ns seqs -- nths )
+    [ nth-unsafe ] { } 2map-as ; inline
 
 PRIVATE>
 
 M: product-sequence nth
-    product@ product-nths ;
+    [ lengths>> product-ns ] [ sequences>> product-nths ] bi ;
+
+<PRIVATE
+
+: product-length ( sequences -- length )
+    [ length ] [ * ] map-reduce integer>fixnum-strict ; inline
+
+:: (product-each) ( ... ns sequences k quot: ( ... seq -- ... ) -- ... )
+    k sequences length 1 - = :> done?
+    k sequences nth-unsafe [
+        k ns set-nth-unsafe
+        ns done? quot [
+            sequences k 1 + quot (product-each)
+        ] if
+    ] each ; inline recursive
+
+PRIVATE>
 
 :: product-each ( ... sequences quot: ( ... seq -- ... ) -- ... )
-    sequences start-product-iter :> ( ns lengths )
-    lengths [ 0 = ] any? [
-        [ ns lengths end-product-iter? ]
-        [ ns sequences product-nths quot call ns lengths product-iter ] until
+    sequences [ empty? ] any? [
+        sequences length f <array>
+        sequences >array 0 quot (product-each)
     ] unless ; inline
 
 :: product-map-as ( ... sequences quot: ( ... seq -- ... value ) exemplar -- ... sequence )
-    0 :> i!
-    sequences product-length exemplar
+    sequences >array :> sequences
+    0 sequences product-length exemplar
     [| result |
-        sequences [ quot call i result set-nth-unsafe i 1 + i! ] product-each
+        sequences
+        [ clone swap quot dip [ result set-nth-unsafe ] [ 1 + ] bi ]
+        product-each
         result
-    ] new-like ; inline
+    ] new-like nip ; inline
 
 : product-map ( ... sequences quot: ( ... seq -- ... value ) -- ... sequence )
     over product-map-as ; inline
 
+: all-products ( sequences -- sequences )
+    [ ] product-map ;
+
 :: product-map>assoc ( ... sequences quot: ( ... seq -- ... key value ) exemplar -- ... assoc )
-    0 :> i!
-    sequences product-length { }
+    0 sequences product-length { }
     [| result |
-        sequences [ quot call 2array i result set-nth-unsafe i 1 + i! ] product-each
+        sequences
+        [ clone swap [ quot call 2array ] dip [ result set-nth-unsafe ] [ 1 + ] bi ]
+        product-each
         result
-    ] new-like exemplar assoc-like ; inline
+    ] new-like exemplar assoc-like nip ; inline
+
+<PRIVATE
+
+:: (product-find) ( ... ns sequences k quot: ( ... seq -- ... ? ) -- ... ? )
+    k sequences length 1 - = :> done?
+    k sequences nth-unsafe [
+        k ns set-nth-unsafe
+        ns done? quot [
+            sequences k 1 + quot (product-find)
+        ] if
+    ] find drop ; inline recursive
+
+PRIVATE>
 
 :: product-find ( ... sequences quot: ( ... seq -- ... ? ) -- ... sequence )
-    sequences start-product-iter :> ( ns lengths )
-    lengths [ 0 = ] any? [ f ] [
-        f [ ns lengths end-product-iter? over or ]
-        [ drop ns sequences product-nths quot keep and ns lengths product-iter ] until
+    sequences { [ empty? ] [ [ empty? ] any? ] } 1|| [ f ] [
+        sequences length f <array>
+        [ sequences >array 0 quot (product-find) ] keep and
     ] if ; inline
