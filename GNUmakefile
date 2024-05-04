@@ -284,6 +284,7 @@ endif
 clean:
 	rm -f vm/*.gch
 	rm -f vm/*.o
+	rm -f factor
 	rm -f factor.dll
 	rm -f factor.lib
 	rm -f factor.dll.lib
