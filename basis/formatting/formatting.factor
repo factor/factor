@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs byte-arrays calendar
 calendar.english calendar.private combinators combinators.smart
-generalizations interpolate.private io io.streams.string kernel
-math math.functions math.parser multiline namespaces peg.ebnf
-present prettyprint quotations sequences
-sequences.generalizations splitting strings unicode ;
+generalizations io io.streams.string kernel math math.functions
+math.parser multiline namespaces peg.ebnf present prettyprint
+quotations sequences sequences.generalizations splitting strings
+unicode ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
@@ -144,12 +144,6 @@ assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _
 
 formats   = (types|fmt-%|lists|assocs|unknown)
 ]=]
-
-SINGLETON: printf-formatter
-printf-formatter formatter set-global
-
-M: printf-formatter format
-    [ [ present ] ] [ format-directive ] if-empty ;
 
 EBNF: parse-printf [=[
 formats   = "%"~ <foreign format-directive formats>

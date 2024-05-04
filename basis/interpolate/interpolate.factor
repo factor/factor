@@ -1,20 +1,13 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-
-USING: accessors arrays assocs combinators generalizations io
-io.streams.string kernel make math math.order math.parser
-multiline namespaces present quotations sequences splitting
-strings strings.parser vocabs.parser ;
-
+USING: accessors arrays assocs combinators formatting
+formatting.private fry generalizations io io.streams.string
+kernel make math math.order math.parser multiline namespaces
+present quotations sequences splitting strings strings.parser
+vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
-
-SYMBOL: formatter
-
-HOOK: format formatter ( directive -- quot )
-
-M: f format drop [ present ] ;
 
 TUPLE: named-var name ;
 
@@ -34,7 +27,9 @@ TUPLE: anon-var ;
                         [ string>number ]
                         [ 1 + stack-var boa ]
                         [ [ anon-var new ] [ named-var boa ] if-empty ] ?if
-                    ] [ format ] bi* 2array ,
+                    ] [
+                        [ [ present ] ] [ format-directive ] if-empty
+                    ] bi* 2array ,
                 ]
                 [ (parse-interpolate) ] bi*
             ] when*
