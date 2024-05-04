@@ -762,6 +762,7 @@ usage() {
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
     $ECHO "  update|latest - git pull, recompile, download a boot image, bootstrap"
+    $ECHO "  clean - run make clean"
     $ECHO "  compile - compile the binary"
     $ECHO "  recompile - recompile the binary"
     $ECHO "  bootstrap - bootstrap with existing boot image"
@@ -805,6 +806,7 @@ case "$1" in
     self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
+    clean) find_build_info; make_clean ;;
     compile) find_build_info; make_factor ;;
     recompile) find_build_info; make_clean; make_factor ;;
     bootstrap) get_config_info; bootstrap ;;
