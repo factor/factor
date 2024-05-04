@@ -158,6 +158,7 @@ PRIVATE>
 
 : search-imap-by-subject ( string -- uids ) [ "SUBJECT" ] dip search-mails ;
 : search-imap-by-body ( string -- uids ) [ "BODY" ] dip search-mails ;
+: search-imap-by-from ( string -- uids ) [ "FROM" ] dip search-mails ;
 
 : fetch-mails ( uids data-spec -- texts )
     [ comma-list ] dip "UID FETCH %s %s" sprintf "" command-response but-last ;
@@ -231,8 +232,10 @@ decoded-body ;
 
 ! High level API
 
-: fetch-rfc822-mails ( uids -- parsed-email )
-    "(RFC822)" fetch-mails [ parse-email ] map ;
+: reject-uid-lines ( seq -- seq' ) [ "(UID" head? ] reject ;
+
+: fetch-rfc822-mails ( uids -- parsed-emails )
+    [ { } ] [ "(RFC822)" fetch-mails reject-uid-lines [ parse-email ] map ] if-empty ;
 
 : with-imap ( host email password quot -- )
     [ <imap4ssl> ] 3dip '[ _ _ login drop @ ] with-stream ; inline
