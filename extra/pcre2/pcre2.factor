@@ -134,7 +134,6 @@ M:: pcre2 findall ( subject obj -- matches )
                 [ throw ]
             } case
         ] [
-            rc name_count 1 + assert=
             match_data pcre2_get_ovector_pointer
             rc assert-positive 2 * PCRE2_SIZE <c-direct-array> :> ovector
 
@@ -212,7 +211,6 @@ M:: pcre2 findall ( subject obj -- matches )
 
                             f
                         ] [
-                            rc name_count 1 + assert=
                             [
                                 f ovector first2 subject subseq 2array ,
                                 name_table [
