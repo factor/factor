@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors continuations documents io io.encodings.utf8
-io.files io.styles kernel math math.order sequences ;
+io.files io.styles kernel math math.order prettyprint.backend
+sequences strings.parser ;
 IN: ui.tools.listener.history
 
 TUPLE: history document elements start index ;
@@ -9,12 +10,12 @@ TUPLE: history document elements start index ;
 CONSTANT: history-file "~/.factor-history"
 
 : read-history ( -- elements )
-    [ history-file utf8 file-lines [ <input> ] V{ } map-as ] [ drop V{ } clone ] recover ;
+    history-file file-exists? [ history-file utf8 file-lines [ unescape-string <input> ] V{ } map-as ] [ V{ } clone ] if ;
 
 : append-history ( history -- )
     history-file file-exists?
     [
-        [ history-file utf8 [ [ elements>> ] [ start>> ] bi [ string>> print ] swap each-from ] with-file-appender ]
+        [ history-file utf8 [ [ elements>> ] [ start>> ] bi [ string>> f f unparse-string print ] swap each-from ] with-file-appender ]
         [ [ index>> ] keep start<< ] bi
     ] [ drop ] if ;
 
