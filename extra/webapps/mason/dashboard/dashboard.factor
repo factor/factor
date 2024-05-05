@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators furnace.actions
 grouping.extras html.forms kernel math.order sequences sorting
-webapps.mason.backend webapps.mason.utils xml.syntax ;
+sorting.specification webapps.mason.backend webapps.mason.utils
+xml.syntax ;
 IN: webapps.mason.downloads
 
 CONSTANT: OFFLINE
@@ -19,7 +20,7 @@ CONSTANT: BROKEN
     } cond ;
 
 : machine-list ( builders -- xml )
-    [ [ [ host-name>> ] [ os>> ] [ cpu>> ] tri 3array ] compare ] sort-with
+    { { host-name>> <=> } { os>> <=> } { cpu>> <=> } } sort-with-spec
     [ host-name>> ] group-by
     [
         first2
