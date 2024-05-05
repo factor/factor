@@ -10,3 +10,13 @@ USING: pcre2 sequences tools.test ;
     "1999-01-12" "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
     findall first
 ] unit-test
+
+{
+    {
+        { { f "h" } }
+        { { f "e" } }
+        { { f "l" } }
+        { { f "l" } }
+        { { f "o" } }
+    }
+} [ "hello" "(.)" findall ] unit-test
