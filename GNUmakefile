@@ -45,6 +45,7 @@ ifdef CONFIG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3
+		CFLAGS += $(CC_OPT)
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
@@ -185,6 +186,7 @@ help:
 	@echo "DEBUG=1  compile VM with debugging information"
 	@echo "REPRODUCIBLE=1  compile VM without timestamp"
 	@echo "SITE_CFLAGS=...  additional optimization flags"
+	@echo "LTO=1  compile VM with Link Time Optimization"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
