@@ -1,3 +1,5 @@
+BUILD_DIR = build
+
 ifdef CONFIG
 	VERSION = 0.100
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
@@ -57,47 +59,47 @@ ifdef CONFIG
 	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
 	DLL_OBJS = $(PLAF_DLL_OBJS) \
-		build/aging_collector.o \
-		build/alien.o \
-		build/arrays.o \
-		build/bignum.o \
-		build/byte_arrays.o \
-		build/callbacks.o \
-		build/callstack.o \
-		build/code_blocks.o \
-		build/code_heap.o \
-		build/compaction.o \
-		build/contexts.o \
-		build/data_heap.o \
-		build/data_heap_checker.o \
-		build/debug.o \
-		build/dispatch.o \
-		build/entry_points.o \
-		build/errors.o \
-		build/factor.o \
-		build/full_collector.o \
-		build/gc.o \
-		build/image.o \
-		build/inline_cache.o \
-		build/instruction_operands.o \
-		build/io.o \
-		build/jit.o \
-		build/math.o \
-		build/mvm.o \
-		build/nursery_collector.o \
-		build/object_start_map.o \
-		build/objects.o \
-		build/primitives.o \
-		build/quotations.o \
-		build/run.o \
-		build/safepoints.o \
-		build/sampling_profiler.o \
-		build/strings.o \
-		build/to_tenured_collector.o \
-		build/tuples.o \
-		build/utilities.o \
-		build/vm.o \
-		build/words.o
+		$(BUILD_DIR)/aging_collector.o \
+		$(BUILD_DIR)/alien.o \
+		$(BUILD_DIR)/arrays.o \
+		$(BUILD_DIR)/bignum.o \
+		$(BUILD_DIR)/byte_arrays.o \
+		$(BUILD_DIR)/callbacks.o \
+		$(BUILD_DIR)/callstack.o \
+		$(BUILD_DIR)/code_blocks.o \
+		$(BUILD_DIR)/code_heap.o \
+		$(BUILD_DIR)/compaction.o \
+		$(BUILD_DIR)/contexts.o \
+		$(BUILD_DIR)/data_heap.o \
+		$(BUILD_DIR)/data_heap_checker.o \
+		$(BUILD_DIR)/debug.o \
+		$(BUILD_DIR)/dispatch.o \
+		$(BUILD_DIR)/entry_points.o \
+		$(BUILD_DIR)/errors.o \
+		$(BUILD_DIR)/factor.o \
+		$(BUILD_DIR)/full_collector.o \
+		$(BUILD_DIR)/gc.o \
+		$(BUILD_DIR)/image.o \
+		$(BUILD_DIR)/inline_cache.o \
+		$(BUILD_DIR)/instruction_operands.o \
+		$(BUILD_DIR)/io.o \
+		$(BUILD_DIR)/jit.o \
+		$(BUILD_DIR)/math.o \
+		$(BUILD_DIR)/mvm.o \
+		$(BUILD_DIR)/nursery_collector.o \
+		$(BUILD_DIR)/object_start_map.o \
+		$(BUILD_DIR)/objects.o \
+		$(BUILD_DIR)/primitives.o \
+		$(BUILD_DIR)/quotations.o \
+		$(BUILD_DIR)/run.o \
+		$(BUILD_DIR)/safepoints.o \
+		$(BUILD_DIR)/sampling_profiler.o \
+		$(BUILD_DIR)/strings.o \
+		$(BUILD_DIR)/to_tenured_collector.o \
+		$(BUILD_DIR)/tuples.o \
+		$(BUILD_DIR)/utilities.o \
+		$(BUILD_DIR)/vm.o \
+		$(BUILD_DIR)/words.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
@@ -157,7 +159,7 @@ ifdef CONFIG
 
 	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
-	TEST_OBJS = build/ffi_test.o
+	TEST_OBJS = $(BUILD_DIR)/ffi_test.o
 endif
 
 default:
@@ -258,28 +260,28 @@ factor-console: $(EXE_OBJS) $(DLL_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
-build:
-	@mkdir -p build
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
 
-$(FFI_TEST_LIBRARY): build/ffi_test.o | build
+$(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 vm/resources.o:
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat vm/factor.rs vm/resources.o
 
-build/ffi_test.o: vm/ffi_test.c | build
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-build/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | build
+$(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-build/%.o: vm/%.cpp build/master.hpp.gch | build
+$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-build/%.o: build/%.S | build
+$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-build/%.o: vm/%.mm build/master.hpp.gch | build
+$(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
@@ -287,7 +289,7 @@ build/%.o: vm/%.mm build/master.hpp.gch | build
 endif
 
 clean:
-	rm -rf build/
+	[ -n "$(BUILD_DIR)" ] && rm -rf $(BUILD_DIR)/
 	rm -f vm/*.gch
 	rm -f vm/*.o
 	rm -f factor
