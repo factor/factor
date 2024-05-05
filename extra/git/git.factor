@@ -47,7 +47,13 @@ ERROR: not-a-git-directory path ;
     current-git-directory find-base-git-directory ;
 
 : make-git-path ( str -- path )
+    current-git-directory prepend-path ;
+
+: make-git-base-path ( str -- path )
     current-git-base-directory prepend-path ;
+
+: get-git-file-contents ( path -- contents )
+    make-git-base-path utf8 file-contents ;
 
 : make-refs-path ( str -- path )
     [ "refs/" make-git-path ] dip append-path ;
@@ -408,10 +414,11 @@ ERROR: no-pack-for sha1 ;
 
 ERROR: expected-ref got ;
 
-: git-hash? ( str -- ? ) sha1? ;
+: git-hash? ( str -- ? ) sha1-string? ;
 
 : parse-ref-line ( string -- string' )
-    "ref: " ?head [ expected-ref ] unless ;
+    "ref: " ?head [ expected-ref ] unless
+    get-git-file-contents ;
 
 : parse-ref ( string -- string' )
     dup git-hash? [ parse-ref-line ] unless ;
