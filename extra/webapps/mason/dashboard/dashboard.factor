@@ -26,12 +26,12 @@ CONSTANT: BROKEN
         first2
         [
             [ os/cpu ] [ current-git-id>> git-link ] [ status>> ] tri
-            [XML <tr><td><-></td><td><-></td><td><-></td></tr> XML]
+            [XML <tr><td></td><td><-></td><td><-></td><td><-></td></tr> XML]
         ] map
-        [XML <li><-><table><-></table></li> XML]
+        [XML <tr><td><-></td></tr><-> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
-    [ [XML <ul><-></ul> XML] ]
+    [ [XML <table><tr><th>Machine</th><th>OS/CPU</th><th>Git</th><th>Status</th></tr><-></table> XML] ]
     if-empty ;
 
 : builder-list ( seq -- xml )
