@@ -26,9 +26,9 @@ CONSTANT: BROKEN
         first2
         [
             [ os/cpu ] [ current-git-id>> git-link ] [ status>> ] tri
-            [XML <li><-> : <-> : <-></li> XML]
+            [XML <tr><td><-></td><td><-></td><td><-></td></tr> XML]
         ] map
-        [XML <li><-><ul><-></ul></li> XML]
+        [XML <li><-><table><-></table></li> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
     [ [XML <ul><-></ul> XML] ]
