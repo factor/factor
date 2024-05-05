@@ -296,8 +296,11 @@ endif
 clean:
 	@echo make clean CONFIG: \`$(CONFIG)\`
 	@echo make clean BUILD_DIR: \`$(BUILD_DIR)\`
-	if [ -n "$(BUILD_DIR)" ] && [ "$(BUILD_DIR)" != "/" ]; then rm -rf $(BUILD_DIR)/; fi
-	rm -rf build
+	if [ -n "$(BUILD_DIR)" ] && [ "$(BUILD_DIR)" != "/" ]; then rm -f $(BUILD_DIR)/*.o; rm -f $(BUILD_DIR)/*.gch; fi
+	rm -f build/*.o
+	rm -f build/*.gch
+	rm -f vm/*.o
+	rm -f vm/*.gch
 	rm -f factor
 	rm -f factor.dll
 	rm -f factor.lib
