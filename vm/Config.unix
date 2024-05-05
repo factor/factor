@@ -8,8 +8,8 @@ DLL_EXTENSION = .a
 SHARED_DLL_EXTENSION = .so
 SHARED_FLAG = -shared
 
-PLAF_DLL_OBJS += vm/os-unix.o
-PLAF_EXE_OBJS += vm/main-unix.o
+PLAF_DLL_OBJS += build/os-unix.o
+PLAF_EXE_OBJS += build/main-unix.o
 PLAF_MASTER_HEADERS += vm/os-unix.hpp vm/atomic-gcc.hpp vm/atomic.hpp
 
 FFI_TEST_CFLAGS = -fPIC

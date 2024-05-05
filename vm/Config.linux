@@ -1,5 +1,5 @@
 include vm/Config.unix
-PLAF_DLL_OBJS += vm/os-genunix.o vm/os-linux.o vm/mvm-unix.o
+PLAF_DLL_OBJS += build/os-genunix.o build/os-linux.o build/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-linux.hpp
 LIBS = -ldl -lm -lrt -lpthread -Wl,--export-dynamic
 

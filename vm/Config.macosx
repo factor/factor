@@ -1,6 +1,6 @@
 include vm/Config.unix
 
-PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
+PLAF_DLL_OBJS += build/os-macosx.o build/mach_signal.o build/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
 
 DLL_EXTENSION = .dylib
