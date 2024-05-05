@@ -3,7 +3,7 @@
 USING: accessors arrays classes.tuple combinators
 combinators.short-circuit kernel literals math math.constants
 math.functions math.intervals math.order math.statistics
-sequences slots.syntax system vocabs vocabs.loader ;
+sequences system vocabs vocabs.loader ;
 FROM: ranges => [a..b) ;
 IN: calendar
 
@@ -353,10 +353,16 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     month>> 3 /mod [ drop 1 + ] unless-zero ; inline
 
 : same-quarter? ( ts1 ts2 -- ? )
-    [ [ year>> ] [ quarter ] bi 2array ] same? ;
+    {
+        [ [ year>> ] same? ]
+        [ [ quarter ] same? ]
+    } 2&& ;
 
 : same-month? ( ts1 ts2 -- ? )
-    [ slots{ year month } ] same? ;
+    {
+        [ [ year>> ] same? ]
+        [ [ month>> ] same? ]
+    } 2&& ;
 
 :: (day-of-year) ( $year $month $day -- n )
     $month cumulative-day-counts nth $day + {
@@ -368,10 +374,17 @@ M: timestamp <=> [ >gmt tuple-slots ] compare ;
     >date< (day-of-year) ;
 
 : same-day? ( ts1 ts2 -- ? )
-    [ slots{ year month day } ] same? ;
+    {
+        [ [ year>> ] same? ]
+        [ [ month>> ] same? ]
+        [ [ day>> ] same? ]
+    } 2&& ;
 
 : same-day-of-year? ( ts1 ts2 -- ? )
-    [ slots{ month day } ] same? ;
+    {
+        [ [ month>> ] same? ]
+        [ [ day>> ] same? ]
+    } 2&& ;
 
 : (day-of-week) ( year month day -- n )
     ! Zeller Congruence
@@ -402,16 +415,26 @@ DEFER: end-of-year
     [ [ year>> ] [ week-number ] bi 2array ] same? ;
 
 : same-hour? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour } ] same? ;
+    [ >gmt ] bi@ {
+        [ [ year>> ] same? ]
+        [ [ month>> ] same? ]
+        [ [ day>> ] same? ]
+        [ [ hour>> ] same? ]
+    } 2&& ;
 
 : same-minute? ( ts1 ts2 -- ? )
-    [ >gmt slots{ year month day hour minute } ] same? ;
+    [ >gmt ] bi@ {
+        [ [ year>> ] same? ]
+        [ [ month>> ] same? ]
+        [ [ day>> ] same? ]
+        [ [ hour>> ] same? ]
+        [ [ minute>> ] same? ]
+    } 2&& ;
 
 : same-second? ( ts1 ts2 -- ? )
-    [ >gmt ] bi@
-    {
+    [ >gmt ] bi@ {
         [ [ second>> floor ] bi@ = ]
-        [ [ slots{ year month day hour minute } ] same? ]
+        [ same-minute? ]
     } 2&& ;
 
 <PRIVATE
