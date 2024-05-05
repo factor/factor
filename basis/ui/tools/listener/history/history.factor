@@ -12,7 +12,11 @@ CONSTANT: history-file "~/.factor-history"
     [ history-file utf8 file-lines [ <input> ] V{ } map-as ] [ drop V{ } clone ] recover ;
 
 : append-history ( history -- )
-    history-file file-exists? [ history-file utf8 [ [ elements>> ] [ start>> ] bi [ string>> print ] swap each-from ] with-file-appender ] [ drop ] if ;
+    history-file file-exists?
+    [
+        [ history-file utf8 [ [ elements>> ] [ start>> ] bi [ string>> print ] swap each-from ] with-file-appender ]
+        [ [ index>> ] keep start<< ] bi
+    ] [ drop ] if ;
 
 : <history> ( document -- history )
     read-history dup length dup history boa ;
