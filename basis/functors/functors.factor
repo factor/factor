@@ -2,11 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser combinators
-effects.parser fry functors.backend generic generic.parser
-interpolate io.streams.string kernel lexer locals.parser
-locals.types macros make namespaces parser quotations sequences
-vocabs.parser words words.symbol ;
-
+effects.parser functors.backend generic generic.parser io
+io.streams.string kernel lexer locals.parser locals.types macros
+make namespaces parser present quotations sequences splitting
+strings vocabs.parser words words.symbol ;
 IN: functors
 
 ! This is a hack
@@ -123,8 +122,28 @@ FUNCTOR-SYNTAX: inline [ last-word make-inline ] append! ;
 
 FUNCTOR-SYNTAX: call-next-method T{ fake-call-next-method } suffix! ;
 
+: (parse-interpolate) ( str -- )
+    [
+        "${" split1-slice [
+            [ >string '[ _ write ] , ] unless-empty
+        ] [
+            [
+                "}" split1-slice
+                [
+                    >string
+                    [ search ] [ [ ] ] [ [ get ] ] ?if
+                    '[ _ @ present write ] ,
+                ]
+                [ (parse-interpolate) ] bi*
+            ] when*
+        ] bi*
+    ] unless-empty ;
+
+: parse-interpolate ( str -- seq )
+    [ (parse-interpolate) ] { } make concat ;
+
 : (INTERPOLATE) ( accum quot -- accum )
-    [ scan-token interpolate-locals-quot ] dip
+    [ scan-token parse-interpolate ] dip
     '[ _ with-string-writer @ ] suffix! ;
 
 PRIVATE>
