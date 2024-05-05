@@ -1,5 +1,5 @@
-USING: arrays assocs calendar cbor kernel literals math
-math.parser ranges tools.test urls ;
+USING: arrays assocs calendar cbor hex-strings kernel literals
+math ranges tools.test urls ;
 
 {
     { 0 "00" }
