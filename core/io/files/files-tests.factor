@@ -301,3 +301,5 @@ CONSTANT: pt-array-1
         [ ascii file-contents ] bi "a" =
     ] with-test-file
 ] unit-test
+
+{ f } [ f file-exists? ] unit-test
