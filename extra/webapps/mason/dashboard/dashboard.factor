@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel furnace.actions html.forms
-sequences sorting xml.syntax webapps.mason.backend
-webapps.mason.utils ;
+USING: accessors combinators furnace.actions grouping.extras
+html.forms kernel sequences sorting webapps.mason.backend
+webapps.mason.utils xml.syntax ;
 IN: webapps.mason.downloads
 
 CONSTANT: OFFLINE
@@ -18,6 +18,21 @@ CONSTANT: BROKEN
         [ drop f ]
     } cond ;
 
+: machine-list ( builders -- xml )
+    [ host-name>> ] sort-by [ host-name>> ] group-by
+    [
+        first2
+        [ os/cpu ] sort-by
+        [
+            os/cpu
+            [XML <li><-></li> XML]
+        ] map
+        [XML <li><-><ul><-></ul></li> XML]
+    ] map
+    [ [XML <p>No machines.</p> XML] ]
+    [ [XML <ul><-></ul> XML] ]
+    if-empty ;
+
 : builder-list ( seq -- xml )
     [ os/cpu ] sort-by
     [
@@ -32,7 +47,8 @@ CONSTANT: BROKEN
     <page-action>
     [
         [
-            all-builders builder-list
-            "builders" set-value
+            all-builders
+            [ machine-list "machines" set-value ]
+            [ builder-list "builders" set-value ] bi
         ] with-mason-db
     ] >>init ;
