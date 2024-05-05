@@ -30,3 +30,6 @@ USING: tools.test math math.bits sequences arrays ;
 
 { 6 } [ 6 make-bits bits>number ] unit-test
 { 6 } [ 6 3 <bits> >array bits>number ] unit-test
+
+{ { 0 } } [ 0 make-binary-bits >array ] unit-test
+{ { 1 0 1 0 1 1 } } [ 0b110101 make-binary-bits >array ] unit-test
