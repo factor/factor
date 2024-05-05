@@ -191,3 +191,6 @@ os windows? [
 ! Would be a core/ path except the path already exists in basis
 { "resource:basis/bootstrap/finish-bootstrap.factor" }
 [ "bootstrap/finish-bootstrap.factor" vocab-path ] unit-test
+
+{ f } [ f normalize-path ] unit-test
+{ f } [ f absolute-path ] unit-test

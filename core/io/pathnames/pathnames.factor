@@ -182,6 +182,8 @@ M: string absolute-path
 M: object normalize-path
     absolute-path ;
 
+M: f absolute-path ;
+
 : root-path* ( path -- path' )
     dup absolute-path? [
         dup [ path-separator? ] find
