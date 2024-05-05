@@ -1,3 +1,3 @@
 include vm/Config.linux
-PLAF_DLL_OBJS += build/cpu-ppc.linux.o
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-ppc.linux.o
 SITE_CFLAGS += -m32
