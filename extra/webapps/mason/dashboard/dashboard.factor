@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators furnace.actions
-grouping.extras html.forms kernel math.order sequences sorting
-sorting.specification webapps.mason.backend webapps.mason.utils
-xml.syntax ;
+grouping.extras html.forms kernel mason.report math.order
+sequences sorting sorting.specification webapps.mason.backend
+webapps.mason.utils xml.syntax ;
 IN: webapps.mason.downloads
 
 CONSTANT: OFFLINE
@@ -25,8 +25,8 @@ CONSTANT: BROKEN
     [
         first2
         [
-            os/cpu
-            [XML <li><-></li> XML]
+            [ os/cpu ] [ current-git-id>> git-link ] [ status>> ] tri
+            [XML <li><-> : <-> : <-></li> XML]
         ] map
         [XML <li><-><ul><-></ul></li> XML]
     ] map
