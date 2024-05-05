@@ -307,7 +307,7 @@ M: listener-operation invoke-command
     ] unless-empty ;
 
 : com-end ( listener -- )
-    input>> interactor-eof ;
+    input>> [ history>> append-history ] [ interactor-eof ] bi ;
 
 : clear-output ( listener -- )
     output>> clear-pane ;
