@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs bootstrap.image checksums checksums.md5
-http.client http.download io.files kernel math.parser splitting
+hex-strings http.client http.download io.files kernel splitting
 urls ;
 IN: bootstrap.image.download
 

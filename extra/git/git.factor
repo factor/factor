@@ -3,12 +3,12 @@
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
 combinators.short-circuit combinators.smart compression.zlib
-constructors endian formatting grouping hashtables ini-file io
-io.directories io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.files.info io.pathnames
-io.streams.byte-array io.streams.peek kernel math math.bitwise
-math.parser namespaces random sequences sequences.extras
-splitting splitting.monotonic strings ;
+constructors endian formatting grouping hashtables hex-strings
+ini-file io io.directories io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.files.info
+io.pathnames io.streams.byte-array io.streams.peek kernel math
+math.bitwise math.parser namespaces random sequences
+sequences.extras splitting splitting.monotonic strings ;
 IN: git
 
 ERROR: byte-expected offset ;
@@ -47,7 +47,7 @@ ERROR: not-a-git-directory path ;
     current-git-directory find-base-git-directory ;
 
 : make-git-path ( str -- path )
-    current-git-directory prepend-path ;
+    current-git-base-directory prepend-path ;
 
 : make-refs-path ( str -- path )
     [ "refs/" make-git-path ] dip append-path ;
@@ -408,10 +408,13 @@ ERROR: no-pack-for sha1 ;
 
 ERROR: expected-ref got ;
 
+: git-hash? ( str -- ? ) sha1? ;
+
 : parse-ref-line ( string -- string' )
-    " " split1 [
-        dup "ref:" = [ drop ] [ expected-ref ] if
-    ] dip ;
+    "ref: " ?head [ expected-ref ] unless ;
+
+: parse-ref ( string -- string' )
+    dup git-hash? [ parse-ref-line ] unless ;
 
 : list-refs-for ( path -- seq )
     "refs/" append-path recursive-directory-files ;
@@ -424,7 +427,7 @@ ERROR: expected-ref got ;
 
 : ref-contents ( str -- line ) make-refs-path git-line ;
 : git-stash-ref-sha1 ( -- contents ) "stash" ref-contents ;
-: git-ref ( ref -- sha1 ) git-line parse-ref-line ;
+: git-ref ( ref -- sha1 ) git-line parse-ref ;
 : git-head-ref ( -- sha1 ) "HEAD" git-ref ;
 : git-log-for-ref ( ref -- log ) git-line git-read-object ;
 : git-head-object ( -- commit ) git-head-ref git-log-for-ref ;

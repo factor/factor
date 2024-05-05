@@ -1,14 +1,11 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs assocs.extras calendar
-calendar.format calendar.parser checksums checksums.hmac
-checksums.sha combinators combinators.short-circuit formatting
-http ini-file io.directories io.encodings.string
-io.encodings.utf8 io.files io.files.info io.launcher
-io.pathnames io.streams.string json kernel math math.order
-math.parser multiline prettyprint qw sequences
-sequences.generalizations sets sorting splitting strings urls
-urls.encoding ;
+USING: accessors arrays ascii assocs calendar calendar.format
+calendar.parser checksums checksums.hmac checksums.sha
+combinators combinators.short-circuit formatting hex-strings
+http ini-file io.directories io.encodings.utf8 io.files
+io.files.info io.pathnames io.streams.string json kernel math
+math.order sequences sets sorting splitting urls urls.encoding ;
 IN: aws
 
 : aws-timestamp-valid? ( str -- duration-valid valid? )

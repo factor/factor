@@ -1,6 +1,6 @@
-USING: arrays checksums checksums.common checksums.sha
-checksums.sha.private io.encodings.binary io.streams.byte-array
-kernel math.parser sequences tools.test random ;
+USING: arrays checksums checksums.sha checksums.sha.private
+hex-strings io.encodings.binary io.streams.byte-array kernel
+random sequences tools.test ;
 IN: checksums.sha.tests
 
 { "a9993e364706816aba3e25717850c26c9cd0d89d" } [ "abc" sha1 checksum-bytes bytes>hex-string ] unit-test
