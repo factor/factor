@@ -141,12 +141,14 @@ set_cc() {
         if test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
+            [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
             return
         fi
 
         if test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
+            [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
             return
         fi
     fi
@@ -154,6 +156,7 @@ set_cc() {
     if test_programs_installed clang clang++ ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
+        [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto"
         return
     fi
 
@@ -161,6 +164,7 @@ set_cc() {
     if test_programs_installed gcc g++ ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
+        [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
         return
     fi
 
@@ -373,6 +377,8 @@ echo_build_info() {
     $ECHO "DOWNLOADER_NAME=$DOWNLOADER_NAME"
     $ECHO "CC=$CC"
     $ECHO "CXX=$CXX"
+    $ECHO "LTO=$LTO"
+    $ECHO "CC_OPT=$CC_OPT"
     $ECHO "MAKE=$MAKE"
 }
 
@@ -528,7 +534,7 @@ make_clean() {
 
 make_factor() {
     $ECHO "Building factor with $NUM_CORES cores"
-    invoke_make "CC=$CC" "CXX=$CXX" "$MAKE_TARGET" "-j$NUM_CORES"
+    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
 }
 
 make_clean_factor() {
