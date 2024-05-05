@@ -31,7 +31,12 @@ CONSTANT: BROKEN
         [XML <tr><td><-></td></tr><-> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
-    [ [XML <table><tr><th>Machine</th><th>OS/CPU</th><th>Git</th><th>Status</th></tr><-></table> XML] ]
+    [ [XML <table><tr>
+           <th align="left">Machine</th>
+           <th align="left">Target</th>
+           <th align="left">Git</th>
+           <th align="left">Status</th>
+           </tr><-></table> XML] ]
     if-empty ;
 
 : builder-list ( seq -- xml )
