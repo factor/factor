@@ -103,6 +103,9 @@ counter "COUNTER" {
 : os/cpu ( builder -- string )
     [ os>> ] [ cpu>> ] bi "/" glue ;
 
+: host/os/cpu ( builder -- string )
+    [ host-name>> ] [ os/cpu ] bi "/" glue ;
+
 : mason-db ( -- db ) "~/mason.db" <sqlite-db> ;
 
 : with-mason-db ( quot -- )

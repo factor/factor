@@ -19,10 +19,9 @@ CONSTANT: BROKEN
     } cond ;
 
 : machine-list ( builders -- xml )
-    [ host-name>> ] sort-by [ host-name>> ] group-by
+    [ host/os/cpu ] sort-by [ host-name>> ] group-by
     [
         first2
-        [ os/cpu ] sort-by
         [
             os/cpu
             [XML <li><-></li> XML]
