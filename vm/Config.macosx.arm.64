@@ -1,5 +1,5 @@
 include vm/Config.macosx
 include vm/Config.arm.64
 
-PLAF_DLL_OBJS += vm/cpu-arm.64.cpp
+PLAF_DLL_OBJS += build/cpu-arm.64.cpp
 PLAF_MASTER_HEADERS += vm/os-macosx-arm64.hpp

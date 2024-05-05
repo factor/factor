@@ -57,47 +57,47 @@ ifdef CONFIG
 	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
 	DLL_OBJS = $(PLAF_DLL_OBJS) \
-		vm/aging_collector.o \
-		vm/alien.o \
-		vm/arrays.o \
-		vm/bignum.o \
-		vm/byte_arrays.o \
-		vm/callbacks.o \
-		vm/callstack.o \
-		vm/code_blocks.o \
-		vm/code_heap.o \
-		vm/compaction.o \
-		vm/contexts.o \
-		vm/data_heap.o \
-		vm/data_heap_checker.o \
-		vm/debug.o \
-		vm/dispatch.o \
-		vm/entry_points.o \
-		vm/errors.o \
-		vm/factor.o \
-		vm/full_collector.o \
-		vm/gc.o \
-		vm/image.o \
-		vm/inline_cache.o \
-		vm/instruction_operands.o \
-		vm/io.o \
-		vm/jit.o \
-		vm/math.o \
-		vm/mvm.o \
-		vm/nursery_collector.o \
-		vm/object_start_map.o \
-		vm/objects.o \
-		vm/primitives.o \
-		vm/quotations.o \
-		vm/run.o \
-		vm/safepoints.o \
-		vm/sampling_profiler.o \
-		vm/strings.o \
-		vm/to_tenured_collector.o \
-		vm/tuples.o \
-		vm/utilities.o \
-		vm/vm.o \
-		vm/words.o
+		build/aging_collector.o \
+		build/alien.o \
+		build/arrays.o \
+		build/bignum.o \
+		build/byte_arrays.o \
+		build/callbacks.o \
+		build/callstack.o \
+		build/code_blocks.o \
+		build/code_heap.o \
+		build/compaction.o \
+		build/contexts.o \
+		build/data_heap.o \
+		build/data_heap_checker.o \
+		build/debug.o \
+		build/dispatch.o \
+		build/entry_points.o \
+		build/errors.o \
+		build/factor.o \
+		build/full_collector.o \
+		build/gc.o \
+		build/image.o \
+		build/inline_cache.o \
+		build/instruction_operands.o \
+		build/io.o \
+		build/jit.o \
+		build/math.o \
+		build/mvm.o \
+		build/nursery_collector.o \
+		build/object_start_map.o \
+		build/objects.o \
+		build/primitives.o \
+		build/quotations.o \
+		build/run.o \
+		build/safepoints.o \
+		build/sampling_profiler.o \
+		build/strings.o \
+		build/to_tenured_collector.o \
+		build/tuples.o \
+		build/utilities.o \
+		build/vm.o \
+		build/words.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
@@ -157,7 +157,7 @@ ifdef CONFIG
 
 	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
-	TEST_OBJS = vm/ffi_test.o
+	TEST_OBJS = build/ffi_test.o
 endif
 
 default:
@@ -258,25 +258,28 @@ factor-console: $(EXE_OBJS) $(DLL_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
-$(FFI_TEST_LIBRARY): vm/ffi_test.o
+build:
+	@mkdir -p build
+
+$(FFI_TEST_LIBRARY): build/ffi_test.o | build
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 vm/resources.o:
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat vm/factor.rs vm/resources.o
 
-vm/ffi_test.o: vm/ffi_test.c
+build/ffi_test.o: vm/ffi_test.c | build
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
+build/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | build
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.cpp vm/master.hpp.gch
+build/%.o: vm/%.cpp build/master.hpp.gch | build
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.S
+build/%.o: build/%.S | build
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.mm vm/master.hpp.gch
+build/%.o: vm/%.mm build/master.hpp.gch | build
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
@@ -284,6 +287,7 @@ vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
 endif
 
 clean:
+	rm -rf build/
 	rm -f vm/*.gch
 	rm -f vm/*.o
 	rm -f factor

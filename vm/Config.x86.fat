@@ -1,3 +1,3 @@
-PLAF_DLL_OBJS += vm/cpu-x86.o
+PLAF_DLL_OBJS += build/cpu-x86.o
 PLAF_MASTER_HEADERS += vm/cpu-x86.hpp
 
