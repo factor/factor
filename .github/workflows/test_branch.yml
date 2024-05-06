@@ -43,9 +43,9 @@ jobs:
       run: build.cmd net-bootstrap
     - name: load-all
       shell: cmd
-      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+      run: 'factor.com -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
     - name: test
       shell: cmd
-      run: 'factor -run=tools.test resource:core'
+      run: 'factor.com -run=tools.test resource:core'
     - name: help-lint
-      run: './factor -run=help.lint resource:core resource:basis resource:extra'
+      run: './factor.com -run=help.lint resource:core resource:basis resource:extra'
