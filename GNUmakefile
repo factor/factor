@@ -1,4 +1,5 @@
-BUILD_DIR = build
+# build-macosx-x86-64 or build
+BUILD_DIR ?= build
 
 ifdef CONFIG
 	VERSION = 0.100
@@ -162,6 +163,8 @@ ifdef CONFIG
 	TEST_OBJS = $(BUILD_DIR)/ffi_test.o
 endif
 
+# if CONFIG is not set, call build.sh and find a CONFIG
+# build.sh will call GNUMakefile again to start the build
 default:
 	$(MAKE) `./build.sh make-target`
 
@@ -194,49 +197,50 @@ help:
 ALL = factor factor-ffi-test factor-lib
 
 freebsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32 BUILD_DIR=build-freebsd-x86-32
 
 freebsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64 BUILD_DIR=build-freebsd-x86-64
 
 macosx-x86-32:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32 BUILD_DIR=build-macosx-x86-32
 
 macosx-x86-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64 BUILD_DIR=build-macosx-x86-64
 
 macosx-x86-fat:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat BUILD_DIR=build-macosx-x86-fat
 
 macosx-arm-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm.64
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm.64 BUILD_DIR=build-macosx-arm-64
 
 linux-arm-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-linux-arm-32
 
 linux-arm-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-linux-arm-64
 
 linux-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-linux-x86-32
 
 linux-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-linux-x86-64
 
 linux-ppc-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32 BUILD_DIR=build-linux-ppc-32
 
 linux-ppc-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-linux-ppc-64
 
 windows-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
-	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32 BUILD_DIR=build-windows-x86-32
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32 BUILD_DIR=build-windows-x86-32
 
 windows-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
-	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64 BUILD_DIR=build-windows-x86-64
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64 BUILD_DIR=build-windows-x86-64
 
+# Actually build Factor
 ifdef CONFIG
 
 macosx.app: factor
@@ -261,6 +265,7 @@ factor-console: $(EXE_OBJS) $(DLL_OBJS)
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
 $(BUILD_DIR):
+	@echo BUILD_DIR: $(BUILD_DIR)
 	@mkdir -p $(BUILD_DIR)
 
 $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
@@ -289,9 +294,10 @@ $(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 endif
 
 clean:
-	[ -n "$(BUILD_DIR)" ] && rm -rf $(BUILD_DIR)/
-	rm -f vm/*.gch
-	rm -f vm/*.o
+	@echo make clean CONFIG: \`$(CONFIG)\`
+	@echo make clean BUILD_DIR: \`$(BUILD_DIR)\`
+	if [ -n "$(BUILD_DIR)" ] && [ "$(BUILD_DIR)" != "/" ]; then rm -rf $(BUILD_DIR)/; fi
+	rm -rf build
 	rm -f factor
 	rm -f factor.dll
 	rm -f factor.lib

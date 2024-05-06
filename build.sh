@@ -529,11 +529,13 @@ invoke_make() {
 }
 
 make_clean() {
-    invoke_make clean
+    echo invoke_make clean BUILD_DIR="build-$MAKE_TARGET"
+    invoke_make clean BUILD_DIR="build-$MAKE_TARGET"
 }
 
 make_factor() {
     $ECHO "Building factor with $NUM_CORES cores"
+    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
     invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
 }
 
