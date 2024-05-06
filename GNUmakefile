@@ -272,7 +272,7 @@ $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
 $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $(BUILD_DIR)/resources.o
+	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
 $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
