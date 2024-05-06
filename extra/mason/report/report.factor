@@ -10,12 +10,10 @@ IN: mason.report
     "https://github.com/factor/factor/commit/" "" prepend-as ; inline
 
 : git-short-link ( id -- short-link )
-    [ git-id>url ] keep 8 head "…" append
-    [XML <a href=<->><-></a> XML] ;
+    [ git-id>url ] keep 8 head "…" append [XML <a href=<->><-></a> XML] ;
 
 : git-link ( id -- link )
-    [ git-id>url ] keep
-    [XML <a href=<->><-></a> XML] ;
+    [ git-id>url ] keep [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )
     target-os get
