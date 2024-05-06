@@ -1,4 +1,4 @@
-USING: base58 math.parser strings tools.test ;
+USING: base58 hex-strings strings tools.test ;
 
 { "" } [ "" >base58 >string ] unit-test
 { "" } [ "" base58> >string ] unit-test
