@@ -141,14 +141,14 @@ set_cc() {
         if test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
-            [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
+            [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
             return
         fi
 
         if test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
-            [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
+            [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
             return
         fi
     fi
@@ -156,7 +156,7 @@ set_cc() {
     if test_programs_installed clang clang++ ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
-        [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto"
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
         return
     fi
 
@@ -164,7 +164,7 @@ set_cc() {
     if test_programs_installed gcc g++ ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
-        [ -z "$CC_OPT" ] && [ "$LTO" -eq "1" ] && CC_OPT="-flto=auto"
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
         return
     fi
 
