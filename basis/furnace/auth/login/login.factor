@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar furnace.actions furnace.asides
 furnace.auth furnace.auth.login.permits furnace.conversations
-furnace.redirection furnace.utilities html.forms http
-http.server.dispatchers kernel logging math.parser namespaces
-sequences urls validators ;
+furnace.redirection furnace.utilities hex-strings html.forms
+http http.server.dispatchers kernel logging math.parser
+namespaces sequences urls validators ;
 IN: furnace.auth.login
 
 SYMBOL: permit-id
