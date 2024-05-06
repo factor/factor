@@ -55,6 +55,9 @@ ERROR: not-a-git-directory path ;
 : get-git-file-contents ( path -- contents )
     make-git-base-path utf8 file-contents ;
 
+: get-git-file-lines ( path -- contents )
+    make-git-base-path utf8 file-lines ;
+
 : make-refs-path ( str -- path )
     [ "refs/" make-git-path ] dip append-path ;
 
@@ -417,8 +420,7 @@ ERROR: expected-ref got ;
 : git-hash? ( str -- ? ) sha1-string? ;
 
 : parse-ref-line ( string -- string' )
-    "ref: " ?head [ expected-ref ] unless
-    get-git-file-contents ;
+    "ref: " ?head [ expected-ref ] unless ;
 
 : parse-ref ( string -- string' )
     dup git-hash? [ parse-ref-line ] unless ;
@@ -436,7 +438,8 @@ ERROR: expected-ref got ;
 : git-stash-ref-sha1 ( -- contents ) "stash" ref-contents ;
 : git-ref ( ref -- sha1 ) git-line parse-ref ;
 : git-head-ref ( -- sha1 ) "HEAD" git-ref ;
-: git-log-for-ref ( ref -- log ) git-line git-read-object ;
+: git-log-for-ref ( ref -- log )
+    dup sha1-string? [ git-line ] unless git-read-object ;
 : git-head-object ( -- commit ) git-head-ref git-log-for-ref ;
 : git-config ( -- config ) "config" make-git-path ;
 
