@@ -197,48 +197,48 @@ help:
 ALL = factor factor-ffi-test factor-lib
 
 freebsd-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32 BUILD_DIR=build-freebsd-x86-32
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
 
 freebsd-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64 BUILD_DIR=build-freebsd-x86-64
+	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
 
 macosx-x86-32:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32 BUILD_DIR=build-macosx-x86-32
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
 
 macosx-x86-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64 BUILD_DIR=build-macosx-x86-64
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64
 
 macosx-x86-fat:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat BUILD_DIR=build-macosx-x86-fat
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
 
 macosx-arm-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm.64 BUILD_DIR=build-macosx-arm-64
+	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm.64
 
 linux-arm-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32 BUILD_DIR=build-linux-arm-32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
 
 linux-arm-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64 BUILD_DIR=build-linux-arm-64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.64
 
 linux-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32 BUILD_DIR=build-linux-x86-32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.32
 
 linux-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64 BUILD_DIR=build-linux-x86-64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.x86.64
 
 linux-ppc-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32 BUILD_DIR=build-linux-ppc-32
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.32
 
 linux-ppc-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64 BUILD_DIR=build-linux-ppc-64
+	$(MAKE) $(ALL) CONFIG=vm/Config.linux.ppc.64
 
 windows-x86-32:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32 BUILD_DIR=build-windows-x86-32
-	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32 BUILD_DIR=build-windows-x86-32
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.32
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.32
 
 windows-x86-64:
-	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64 BUILD_DIR=build-windows-x86-64
-	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64 BUILD_DIR=build-windows-x86-64
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
+	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 
 # Actually build Factor
 ifdef CONFIG
