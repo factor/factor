@@ -1,7 +1,7 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: colors.private grouping kernel lexer math regexp.classes
+USING: colors.private grouping hex-strings kernel lexer math
 sequences splitting ;
 
 IN: colors.flex-hex
