@@ -6,6 +6,10 @@ mason.common mason.config mason.disk math namespaces prettyprint
 sequences sets splitting xml.syntax xml.writer ;
 IN: mason.report
 
+: git-short-link ( id -- short-link )
+    [ "https://github.com/factor/factor/commit/" "" prepend-as ] keep 8 head "…" append
+    [XML <a href=<->><-></a> XML] ;
+
 : git-link ( id -- link )
     [ "https://github.com/factor/factor/commit/" "" prepend-as ] keep
     [XML <a href=<->><-></a> XML] ;
