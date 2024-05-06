@@ -2,8 +2,8 @@ USING: accessors arrays assocs byte-vectors checksums
 checksums.md5 constructors continuations destructors hashtables
 hex-strings io.encodings.binary io.encodings.string
 io.encodings.utf8 io.sockets io.streams.duplex kernel math
-math.parser mongodb.cmd mongodb.msg mongodb.operations
-namespaces sequences splitting strings ;
+math.parser mongodb.cmd mongodb.msg namespaces sequences
+splitting strings ;
 IN: mongodb.connection
 
 : md5-checksum ( string -- digest )
@@ -19,6 +19,8 @@ TUPLE: mdb-connection instance node handle remote local buffer ;
 
 : connection-buffer ( -- buffer )
     mdb-connection get buffer>> 0 >>length ; inline
+
+USE: mongodb.operations
 
 CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
 
