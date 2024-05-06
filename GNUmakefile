@@ -1,4 +1,4 @@
-# build-macosx-x86-64 or build
+# build-<target> or build
 BUILD_DIR ?= build
 
 ifdef CONFIG
@@ -271,8 +271,8 @@ $(BUILD_DIR):
 $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
-vm/resources.o:
-	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat vm/factor.rs vm/resources.o
+$(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $(BUILD_DIR)/resources.o
 
 $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
