@@ -426,7 +426,7 @@ prepare_build_info() {
     find_os
     find_architecture
     find_num_cores
-    LTO=1 # temporarily try out LTO to collect performance data
+    if [[ $OS != macosx ]] ; then LTO=1; fi # temporarily try out LTO to collect performance data (not working on MacOSX)
     set_cc
     find_word_size
     set_current_branch
