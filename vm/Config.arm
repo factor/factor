@@ -1,1 +1,1 @@
-PLAF_MASTER_HEADERS += $(BUILD_DIR)/cpu-arm.hpp
+PLAF_MASTER_HEADERS += vm/cpu-arm.hpp
