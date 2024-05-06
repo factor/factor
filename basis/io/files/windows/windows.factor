@@ -383,8 +383,7 @@ M: windows normalize-path
         normalize-separators
     ] [
         absolute-path
-        normalize-separators
-        prepend-unicode-prefix
+        [ normalize-separators prepend-unicode-prefix ] ?call
     ] if ;
 
 M: windows home
