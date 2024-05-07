@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators furnace.actions
-grouping.extras html.forms kernel mason.report math.order
-sequences sorting sorting.specification webapps.mason.backend
-webapps.mason.utils xml.syntax ;
+USING: accessors arrays calendar.format combinators
+combinators.extras furnace.actions grouping.extras html.forms
+kernel mason.report math.order sequences sorting
+sorting.specification webapps.mason.backend webapps.mason.utils
+xml.syntax ;
 IN: webapps.mason.downloads
 
 CONSTANT: OFFLINE
@@ -44,11 +45,15 @@ CONSTANT: BROKEN
 : builder-list ( seq -- xml )
     [ os/cpu ] sort-by
     [
-        [ report-url ] [ os/cpu ] [ builder-status ] tri
-        [XML <li><a href=<->><-></a> <-></li> XML]
+        [ os/cpu ] [ report-url ] [ current-timestamp>> timestamp>ymdhms ] [ builder-status ] quad
+        [XML <tr><td><-></td><td><a href=<->><-></a></td><td><-></td></tr> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
-    [ [XML <ul><-></ul> XML] ]
+    [ [XML <table><tr>
+           <th align="left">Target</th>
+           <th align="left">Build report</th>
+           <th align="left">Build status</th>
+           </tr><-></table> XML] ]
     if-empty ;
 
 : <dashboard-action> ( -- action )
