@@ -6,3 +6,9 @@ img {
     max-width: 100%;
     height: auto;
 }
+
+table, th, td {
+  border: 1px solid lightgrey;
+  border-collapse: collapse;
+  border-style: dashed;
+}
