@@ -10,8 +10,8 @@ sorting sorting.human sorting.specification splitting system
 unicode ;
 IN: build-from-source
 
-INITIALIZED-SYMBOL: use-gitlab-git-uris [ f ]
-INITIALIZED-SYMBOL: use-github-git-uris [ f ]
+SYMBOL: use-gitlab-git-uris?
+SYMBOL: use-github-git-uris?
 
 INITIALIZED-SYMBOL: build-from-source-directory [ "resource:build-from-source/" ]
 
@@ -90,7 +90,7 @@ ERROR: no-output-file path ;
 : gitlab-https-uri ( base org/user project -- uri ) "https://%s/%s/%s" sprintf ;
 
 : gitlab-uri ( base org/user project -- uri )
-    use-gitlab-git-uris get [ gitlab-git-uri ] [ gitlab-https-uri ] if ;
+    use-gitlab-git-uris? get [ gitlab-git-uri ] [ gitlab-https-uri ] if ;
 
 : sync-gitlab-no-checkout-repository ( base org/user project -- )
     [ 2drop ] [ gitlab-uri ] [ nipd append-path ] 3tri
@@ -118,7 +118,7 @@ ERROR: no-output-file path ;
     [ build-from-source-directory-github prepend-path dup make-directories ] dip with-directory ; inline
 
 : github-uri ( org/user project -- uri )
-    use-github-git-uris get [ github-git-uri ] [ github-https-uri ] if ;
+    use-github-git-uris? get [ github-git-uri ] [ github-https-uri ] if ;
 
 : sync-github-no-checkout-repository ( org/user project -- )
     [ drop ] [ github-uri ] [ nip git-directory-name ] 2tri
