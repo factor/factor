@@ -4,7 +4,7 @@ USING: arrays grouping kernel math namespaces sequences
 splitting strings wrap ;
 IN: wrap.strings
 
-INITIALIZED-SYMBOL: break-long-words? [ f ]
+SYMBOL: break-long-words?
 
 <PRIVATE
 
