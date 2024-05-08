@@ -48,7 +48,7 @@ CONSTANT: BROKEN
           [ last-git-id>> git-short-link ]
           [ report-url ]
           [ last-timestamp>> timestamp>ymdhms ]
-          [ [ last-timestamp>> ] [ start-timestamp>> ] bi time- duration>hms ]
+          [ [ last-timestamp>> ] [ start-timestamp>> ] bi 2dup before? [ nip now swap ] when time- duration>hms ]
           [ builder-status ] } cleave
         [XML <tr><td><-></td><td><-></td><td><a href=<->><-></a></td><td><-></td><td><-></td></tr> XML]
     ] map
