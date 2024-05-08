@@ -36,6 +36,7 @@ ifdef CONFIG
 		$(SITE_CFLAGS)
 
 	CXXFLAGS += -std=c++11
+	CXXFLAGS += $(CXX_OPT)
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
