@@ -32,10 +32,10 @@ CONSTANT: BROKEN
     ] map
     [ [XML <p>No machines.</p> XML] ]
     [ [XML <table><tr>
-           <th align="left">Machine</th>
-           <th align="left">Target</th>
-           <th align="left">Git</th>
-           <th align="left">Status</th>
+           <th>Machine</th>
+           <th>Target</th>
+           <th>Git</th>
+           <th>Status</th>
            </tr>
            <tr><td></td><td></td><td></td><td><i>starting/make-vm/boot/test/upload/finish/idle</i></td></tr>
            <-></table> XML] ]
@@ -54,11 +54,11 @@ CONSTANT: BROKEN
     ] map
     [ [XML <p>No machines.</p> XML] ]
     [ [XML <table><tr>
-           <th align="left">Target</th>
-           <th align="left">Git</th>
-           <th align="left">Build report</th>
-           <th align="left">Build duration</th>
-           <th align="left">Build status</th>
+           <th>Target</th>
+           <th>Git</th>
+           <th>Build report</th>
+           <th>Build duration</th>
+           <th>Build status</th>
            </tr><-></table> XML] ]
     if-empty ;
 
