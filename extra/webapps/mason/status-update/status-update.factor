@@ -38,7 +38,7 @@ IN: webapps.mason.status-update
 
 : idle ( builder -- ) +idle+ status ;
 
-: git-id ( builder id -- ) >>current-git-id +starting+ status ;
+: git-id ( builder id -- ) >>current-git-id now >>start-timestamp +starting+ status ;
 
 : make-vm ( builder -- ) +make-vm+ status ;
 

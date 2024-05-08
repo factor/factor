@@ -18,7 +18,7 @@ CONSTANT: +error+ "status-error"
 CONSTANT: +clean+ "status-clean"
 
 TUPLE: builder
-host-name os cpu heartbeat-timestamp
+host-name os cpu heartbeat-timestamp start-timestamp
 clean-git-id clean-timestamp
 last-release release-git-id
 last-git-id last-timestamp last-report
@@ -30,6 +30,7 @@ builder "BUILDERS" {
     { "os" "OS" TEXT +user-assigned-id+ }
     { "cpu" "CPU" TEXT +user-assigned-id+ }
     { "heartbeat-timestamp" "HEARTBEAT_TIMESTAMP" TIMESTAMP }
+    { "start-timestamp" "START_TIMESTAMP" TIMESTAMP }
 
     { "clean-git-id" "CLEAN_GIT_ID" TEXT }
     { "clean-timestamp" "CLEAN_TIMESTAMP" TIMESTAMP }
