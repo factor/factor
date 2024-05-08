@@ -1,4 +1,4 @@
-USING: checksums.hmac checksums.md5 checksums.sha math.parser
+USING: checksums.hmac checksums.md5 checksums.sha hex-strings
 sequences strings tools.test ;
 
 {

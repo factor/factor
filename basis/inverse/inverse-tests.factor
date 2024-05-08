@@ -97,3 +97,5 @@ TUPLE: funny-tuple ;
 
 { 0 } [ { 1 2 } [ [ 1 + 2 ] { } output>sequence ] undo ] unit-test
 { { 0 1 } } [ 1 2 [ [ [ 1 + ] bi@ ] input<sequence ] undo ] unit-test
+
+{ 123.46 } [ 123.456 [ 100 * ] [ round ] under ] unit-test

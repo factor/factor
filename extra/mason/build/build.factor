@@ -45,7 +45,7 @@ IN: mason.build
         build-child
         [ notify-report ] [
             status-clean eq?
-            [ notify-upload upload-docs release ] when
+            [ notify-benchmarks notify-upload upload-docs release ] when
         ] bi
         notify-finish
         finish-build

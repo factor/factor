@@ -2,11 +2,11 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bootstrap.image calendar cli.git
 combinators combinators.short-circuit concurrency.combinators
-environment formatting http.download io io.directories
-io.launcher io.pathnames kernel math.parser memory modern.paths
-namespaces parser.notes prettyprint regexp.classes sequences
-sequences.extras sets splitting system system-info threads
-tools.test tools.test.private vocabs vocabs.hierarchy
+environment formatting hex-strings http.download io
+io.directories io.launcher io.pathnames kernel math.parser
+memory modern.paths namespaces parser.notes prettyprint
+sequences sequences.extras sets splitting system system-info
+threads tools.test tools.test.private vocabs vocabs.hierarchy
 vocabs.hierarchy.private vocabs.loader vocabs.metadata zealot ;
 IN: zealot.factor
 

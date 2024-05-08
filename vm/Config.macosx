@@ -1,6 +1,6 @@
 include vm/Config.unix
 
-PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o vm/mvm-unix.o
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-macosx.o $(BUILD_DIR)/mach_signal.o $(BUILD_DIR)/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
 
 DLL_EXTENSION = .dylib
@@ -14,7 +14,7 @@ else
 	LIBS = -lm -framework Cocoa -framework AppKit
 endif
 
-LINKER = $(CXX) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) -single_module \
+LINKER = $(CXX) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \

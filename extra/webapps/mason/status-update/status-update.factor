@@ -1,8 +1,10 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors calendar combinators db.tuples furnace.actions
-furnace.redirection html.forms http.server.responses io kernel
-namespaces validators webapps.mason.utils webapps.mason.backend ;
+USING: accessors assocs calendar combinators db.tuples
+furnace.actions furnace.redirection html.forms
+http.server.responses io kernel multiline namespaces parser
+prettyprint sequences splitting validators webapps.mason.backend
+webapps.mason.utils ;
 IN: webapps.mason.status-update
 
 : find-builder ( host-name os cpu -- builder )
@@ -11,6 +13,19 @@ IN: webapps.mason.status-update
         swap >>os
         swap >>host-name
     [ select-tuple ] [ dup insert-tuple ] ?unless ;
+
+: update-runs ( builder -- run-id )
+    [ run new ] dip
+    { [ host-name>> >>host-name ]
+      [ os>> >>os ]
+      [ cpu>> >>cpu ]
+      [ current-timestamp>> >>timestamp ]
+      [ current-git-id>> >>git-id ] } cleave
+    dup insert-tuple run-id>> ;
+
+: update-benchmarks ( run-id benchmarks -- )
+    [ benchmark new swap >>run-id ] dip
+    [ first2 [ >>name ] dip >>duration insert-tuple ] with each ;
 
 : heartbeat ( builder -- )
     now >>heartbeat-timestamp
@@ -23,13 +38,17 @@ IN: webapps.mason.status-update
 
 : idle ( builder -- ) +idle+ status ;
 
-: git-id ( builder id -- ) >>current-git-id +starting+ status ;
+: git-id ( builder id -- ) >>current-git-id now >>start-timestamp +starting+ status ;
 
 : make-vm ( builder -- ) +make-vm+ status ;
 
 : boot ( builder -- ) +boot+ status ;
 
 : test ( builder -- ) +test+ status ;
+
+: benchmarks ( builder content -- )
+    [ update-runs ] dip
+    split-lines parse-fresh first update-benchmarks ;
 
 : report ( builder content status -- )
     [
@@ -62,6 +81,7 @@ IN: webapps.mason.status-update
         { "boot" [ boot ] }
         { "test" [ test ] }
         { "report" [ "report" value "arg" value report ] }
+        { "benchmarks" [ "report" value benchmarks ] }
         { "upload" [ upload ] }
         { "finish" [ finish ] }
         { "release" [ "arg" value release ] }

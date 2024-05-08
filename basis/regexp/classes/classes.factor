@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
-combinators.short-circuit combinators.smart kernel math
-math.order sequences sets unicode unicode.data ;
+combinators.short-circuit combinators.smart hex-strings kernel
+math math.order sequences sets unicode unicode.data ;
 FROM: ascii => ascii? ;
 IN: regexp.classes
 
@@ -80,13 +80,6 @@ M: non-newline-blank-class class-member?
 
 M: control-character-class class-member?
     drop control? ; inline
-
-: hex-digit? ( ch -- ? )
-    {
-        [ CHAR: A CHAR: F between? ]
-        [ CHAR: a CHAR: f between? ]
-        [ CHAR: 0 CHAR: 9 between? ]
-    } 1|| ;
 
 M: hex-digit-class class-member?
     drop hex-digit? ; inline

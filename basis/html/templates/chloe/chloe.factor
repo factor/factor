@@ -46,13 +46,9 @@ CHLOE: write-script
         [XML <script type="text/javascript">/* <-> */</script> XML]
     ] [xml-code] ;
 
-CHLOE: meta
-    [ "name" optional-attr ]
-    [ "content" optional-attr ] bi
-    '[ _ _ add-meta ] [code] ;
+CHLOE: meta attrs>> '[ _ add-meta ] [code] ;
 
-CHLOE: write-meta
-    drop [ get-meta ] [xml-code] ;
+CHLOE: write-meta drop [ get-meta ] [xml-code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;

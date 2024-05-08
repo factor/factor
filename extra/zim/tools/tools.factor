@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors combinators command-line destructors formatting
-io io.directories io.encodings io.encodings.binary io.files
-kernel math math.parser namespaces sequences uuid zim ;
+hex-strings io io.directories io.encodings io.encodings.binary
+io.files kernel math namespaces sequences uuid zim ;
 
 IN: zim.tools
 

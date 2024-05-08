@@ -7,16 +7,16 @@ HELP: product-sequence
 { $class-description "A class of virtual sequences that present the cartesian product of their underlying set of sequences. Product sequences are constructed with the " { $link <product-sequence> } " word." }
 { $examples
 { $example "USING: arrays prettyprint sequences.product ;
-{ { 1 2 3 } { \"a\" \"b\" \"c\" } } <product-sequence> >array .
-" "{
+{ { 1 2 3 } { \"a\" \"b\" \"c\" } } <product-sequence> >array ."
+"{
     { 1 \"a\" }
-    { 2 \"a\" }
-    { 3 \"a\" }
     { 1 \"b\" }
-    { 2 \"b\" }
-    { 3 \"b\" }
     { 1 \"c\" }
+    { 2 \"a\" }
+    { 2 \"b\" }
     { 2 \"c\" }
+    { 3 \"a\" }
+    { 3 \"b\" }
     { 3 \"c\" }
 }" } } ;
 
@@ -28,13 +28,13 @@ HELP: <product-sequence>
 { { 1 2 3 } { \"a\" \"b\" \"c\" } } <product-sequence> >array ."
 "{
     { 1 \"a\" }
-    { 2 \"a\" }
-    { 3 \"a\" }
     { 1 \"b\" }
-    { 2 \"b\" }
-    { 3 \"b\" }
     { 1 \"c\" }
+    { 2 \"a\" }
+    { 2 \"b\" }
     { 2 \"c\" }
+    { 3 \"a\" }
+    { 3 \"b\" }
     { 3 \"c\" }
 }" } } ;
 

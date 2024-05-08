@@ -1,8 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors fry generalizations io io.streams.string kernel
-make math math.order math.parser multiline namespaces present
-sequences splitting strings strings.parser vocabs.parser ;
+USING: accessors arrays assocs combinators formatting
+formatting.private fry generalizations io io.streams.string
+kernel make math math.order math.parser multiline namespaces
+present quotations sequences splitting strings strings.parser
+vocabs.parser ;
 IN: interpolate
 
 <PRIVATE
@@ -16,15 +18,18 @@ TUPLE: anon-var ;
 : (parse-interpolate) ( str -- )
     [
         "${" split1-slice [
-            [ >string , ] unless-empty
+            [ >string [ ] 2array , ] unless-empty
         ] [
             [
                 "}" split1-slice
                 [
-                    >string
-                    [ string>number ]
-                    [ 1 + stack-var boa ]
-                    [ [ anon-var new ] [ named-var boa ] if-empty ] ?if ,
+                    >string ":" split1 [
+                        [ string>number ]
+                        [ 1 + stack-var boa ]
+                        [ [ anon-var new ] [ named-var boa ] if-empty ] ?if
+                    ] [
+                        [ [ present ] ] [ format-directive ] if-empty
+                    ] bi* 2array ,
                 ]
                 [ (parse-interpolate) ] bi*
             ] when*
@@ -33,8 +38,8 @@ TUPLE: anon-var ;
 
 : deanonymize ( seq -- seq' )
     0 over <reversed> [
-        dup anon-var? [
-            drop 1 + dup stack-var boa
+        dup first anon-var? [
+            [ 1 + dup stack-var boa ] dip second 2array
         ] when
     ] map! 2drop ;
 
@@ -43,7 +48,7 @@ TUPLE: anon-var ;
 
 : max-stack-var ( seq -- n/f )
     f [
-        dup stack-var? [ n>> [ or ] keep max ] [ drop ] if
+        first dup stack-var? [ n>> [ or ] keep max ] [ drop ] if
     ] reduce ;
 
 :: (interpolate-quot) ( str quot -- quot' )
@@ -51,16 +56,14 @@ TUPLE: anon-var ;
     args max-stack-var    :> vars
 
     args [
-        dup named-var? [
-            name>> quot call '[ _ @ present write ]
-        ] [
-            dup stack-var? [
-                n>> '[ _ npick present write ]
-            ] [
-                '[ _ write ]
-            ] if
-        ] if
-    ] map concat
+        [
+            {
+                { [ dup named-var? ] [ name>> quot call '[ _ @ ] ] }
+                { [ dup stack-var? ] [ n>> '[ _ npick ] ] }
+                [ 1quotation ]
+            } cond
+        ] dip '[ @ @ write ]
+    ] { } assoc>map concat
 
     vars [
         '[ _ ndrop ] append

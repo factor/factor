@@ -3,12 +3,12 @@
 USING: accessors arrays assocs assocs.extras calendar
 calendar.format checksums checksums.sha combinators
 combinators.short-circuit combinators.smart compression.zlib
-constructors endian formatting grouping hashtables ini-file io
-io.directories io.encodings.binary io.encodings.string
-io.encodings.utf8 io.files io.files.info io.pathnames
-io.streams.byte-array io.streams.peek kernel math math.bitwise
-math.parser namespaces random sequences sequences.extras
-splitting splitting.monotonic strings ;
+constructors endian formatting grouping hashtables hex-strings
+ini-file io io.directories io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files io.files.info
+io.pathnames io.streams.byte-array io.streams.peek kernel math
+math.bitwise math.parser namespaces random sequences
+sequences.extras splitting splitting.monotonic strings ;
 IN: git
 
 ERROR: byte-expected offset ;
@@ -20,8 +20,21 @@ ERROR: separator-expected expected-one-of got ;
 : read-until* ( separators -- data )
     dup read-until [ nip ] [ separator-expected ] if ;
 
-: find-git-directory ( path -- path' )
-    [ ".git" tail? ] find-up-to-root ; inline
+ERROR: unknown-dot-git path ;
+
+: parse-dot-git-file ( path -- path' )
+    dup utf8 file-lines ?first "gitdir: " ?head [
+        nip
+    ] [
+        drop unknown-dot-git
+    ] if ;
+
+: find-git-directory ( path -- path'/f )
+    [ ".git" tail? ] find-up-to-root
+    dup ?file-info regular-file? [ parse-dot-git-file ] when ; inline
+
+: find-base-git-directory ( path -- path'/f )
+    find-git-directory dup ".git" tail? [ find-base-git-directory ] unless ;
 
 ERROR: not-a-git-directory path ;
 
@@ -30,8 +43,20 @@ ERROR: not-a-git-directory path ;
         current-directory get not-a-git-directory
     ] unless* ;
 
+: current-git-base-directory ( -- path )
+    current-git-directory find-base-git-directory ;
+
 : make-git-path ( str -- path )
     current-git-directory prepend-path ;
+
+: make-git-base-path ( str -- path )
+    current-git-base-directory prepend-path ;
+
+: get-git-file-contents ( path -- contents )
+    make-git-base-path utf8 file-contents ;
+
+: get-git-file-lines ( path -- contents )
+    make-git-base-path utf8 file-lines ;
 
 : make-refs-path ( str -- path )
     [ "refs/" make-git-path ] dip append-path ;
@@ -392,22 +417,29 @@ ERROR: no-pack-for sha1 ;
 
 ERROR: expected-ref got ;
 
+: git-hash? ( str -- ? ) sha1-string? ;
+
 : parse-ref-line ( string -- string' )
-    " " split1 [
-        dup "ref:" = [ drop ] [ expected-ref ] if
-    ] dip ;
+    "ref: " ?head [ expected-ref ] unless ;
+
+: parse-ref ( string -- string' )
+    dup git-hash? [ parse-ref-line ] unless ;
+
+: list-refs-for ( path -- seq )
+    "refs/" append-path recursive-directory-files ;
 
 : list-refs ( -- seq )
-    current-git-directory "refs/" append-path recursive-directory-files ;
+    current-git-base-directory list-refs-for ;
 
 : remote-refs-dirs ( -- seq )
     "remotes" make-refs-path directory-files ;
 
 : ref-contents ( str -- line ) make-refs-path git-line ;
 : git-stash-ref-sha1 ( -- contents ) "stash" ref-contents ;
-: git-ref ( ref -- sha1 ) git-line parse-ref-line ;
+: git-ref ( ref -- sha1 ) git-line parse-ref ;
 : git-head-ref ( -- sha1 ) "HEAD" git-ref ;
-: git-log-for-ref ( ref -- log ) git-line git-read-object ;
+: git-log-for-ref ( ref -- log )
+    dup sha1-string? [ git-line ] unless git-read-object ;
 : git-head-object ( -- commit ) git-head-ref git-log-for-ref ;
 : git-config ( -- config ) "config" make-git-path ;
 

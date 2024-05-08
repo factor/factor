@@ -160,7 +160,7 @@ ERROR: sequence-expected obj ;
     dup parent-directory 2dup = [ 2drop f ] [ nip ] if ;
 
 : containing-directory ( path -- path' )
-    dup file-info directory? [ parent-directory ] unless ;
+    dup ?file-info directory? [ parent-directory ] unless ;
 
 : ?qualified-directory-files ( path -- seq )
     [ qualified-directory-files ]

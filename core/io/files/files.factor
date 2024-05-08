@@ -77,7 +77,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ <file-appender> ] dip with-output-stream ; inline
 
 : file-exists? ( path -- ? )
-    normalize-path native-string>alien (file-exists?) ;
+    [ normalize-path native-string>alien (file-exists?) ] ?call ;
 
 ERROR: no-such-file path ;
 

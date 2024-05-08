@@ -1,3 +1,6 @@
+# build-<target> or build
+BUILD_DIR ?= build
+
 ifdef CONFIG
 	VERSION = 0.100
 	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
@@ -44,7 +47,8 @@ ifdef CONFIG
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
-		CFLAGS += -O3 -flto -Wl,-s
+		CFLAGS += -O3
+		CFLAGS += $(CC_OPT)
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
@@ -56,48 +60,48 @@ ifdef CONFIG
 	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
 	DLL_OBJS = $(PLAF_DLL_OBJS) \
-		vm/aging_collector.o \
-		vm/alien.o \
-		vm/arrays.o \
-		vm/bignum.o \
-		vm/byte_arrays.o \
-		vm/callbacks.o \
-		vm/callstack.o \
-		vm/code_blocks.o \
-		vm/code_heap.o \
-		vm/compaction.o \
-		vm/contexts.o \
-		vm/data_heap.o \
-		vm/data_heap_checker.o \
-		vm/debug.o \
-		vm/dispatch.o \
-		vm/entry_points.o \
-		vm/errors.o \
-		vm/factor.o \
-		vm/full_collector.o \
-		vm/gc.o \
-		vm/image.o \
-		vm/inline_cache.o \
-		vm/instruction_operands.o \
-		vm/io.o \
-		vm/jit.o \
-		vm/math.o \
-		vm/mvm.o \
-		vm/nursery_collector.o \
-		vm/object_start_map.o \
-		vm/objects.o \
-		vm/primitives.o \
-		vm/quotations.o \
-		vm/run.o \
-		vm/safepoints.o \
-		vm/sampling_profiler.o \
-		vm/strings.o \
-		vm/to_tenured_collector.o \
-		vm/tuples.o \
-		vm/utilities.o \
-		vm/vm.o \
-		vm/words.o \
-		vm/zstd.o
+		$(BUILD_DIR)/aging_collector.o \
+		$(BUILD_DIR)/alien.o \
+		$(BUILD_DIR)/arrays.o \
+		$(BUILD_DIR)/bignum.o \
+		$(BUILD_DIR)/byte_arrays.o \
+		$(BUILD_DIR)/callbacks.o \
+		$(BUILD_DIR)/callstack.o \
+		$(BUILD_DIR)/code_blocks.o \
+		$(BUILD_DIR)/code_heap.o \
+		$(BUILD_DIR)/compaction.o \
+		$(BUILD_DIR)/contexts.o \
+		$(BUILD_DIR)/data_heap.o \
+		$(BUILD_DIR)/data_heap_checker.o \
+		$(BUILD_DIR)/debug.o \
+		$(BUILD_DIR)/dispatch.o \
+		$(BUILD_DIR)/entry_points.o \
+		$(BUILD_DIR)/errors.o \
+		$(BUILD_DIR)/factor.o \
+		$(BUILD_DIR)/full_collector.o \
+		$(BUILD_DIR)/gc.o \
+		$(BUILD_DIR)/image.o \
+		$(BUILD_DIR)/inline_cache.o \
+		$(BUILD_DIR)/instruction_operands.o \
+		$(BUILD_DIR)/io.o \
+		$(BUILD_DIR)/jit.o \
+		$(BUILD_DIR)/math.o \
+		$(BUILD_DIR)/mvm.o \
+		$(BUILD_DIR)/nursery_collector.o \
+		$(BUILD_DIR)/object_start_map.o \
+		$(BUILD_DIR)/objects.o \
+		$(BUILD_DIR)/primitives.o \
+		$(BUILD_DIR)/quotations.o \
+		$(BUILD_DIR)/run.o \
+		$(BUILD_DIR)/safepoints.o \
+		$(BUILD_DIR)/sampling_profiler.o \
+		$(BUILD_DIR)/strings.o \
+		$(BUILD_DIR)/to_tenured_collector.o \
+		$(BUILD_DIR)/tuples.o \
+		$(BUILD_DIR)/utilities.o \
+		$(BUILD_DIR)/vm.o \
+		$(BUILD_DIR)/words.o \
+		$(BUILD_DIR)/zstd.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
@@ -158,9 +162,11 @@ ifdef CONFIG
 
 	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
-	TEST_OBJS = vm/ffi_test.o
+	TEST_OBJS = $(BUILD_DIR)/ffi_test.o
 endif
 
+# if CONFIG is not set, call build.sh and find a CONFIG
+# build.sh will call GNUMakefile again to start the build
 default:
 	$(MAKE) `./build.sh make-target`
 
@@ -187,6 +193,7 @@ help:
 	@echo "DEBUG=1  compile VM with debugging information"
 	@echo "REPRODUCIBLE=1  compile VM without timestamp"
 	@echo "SITE_CFLAGS=...  additional optimization flags"
+	@echo "LTO=1  compile VM with Link Time Optimization"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
 ALL = factor factor-ffi-test factor-lib
@@ -235,6 +242,7 @@ windows-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
 
+# Actually build Factor
 ifdef CONFIG
 
 macosx.app: factor
@@ -258,28 +266,32 @@ factor-console: $(EXE_OBJS) $(DLL_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
-$(FFI_TEST_LIBRARY): vm/ffi_test.o
+$(BUILD_DIR):
+	@echo BUILD_DIR: $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
+
+$(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
 
-vm/resources.o:
-	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat vm/factor.rs vm/resources.o
+$(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
-vm/ffi_test.o: vm/ffi_test.c
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-vm/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS)
+$(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.cpp vm/master.hpp.gch
+$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-vm/zstd.o: vm/zstd.cpp vm/zstd.c vm/master.hpp.gch
+$(BUILD_DIR)/zstd.o: $(BUILD_DIR)/zstd.cpp $(BUILD_DIR)/zstd.c $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.S
+$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
-%.o: %.mm vm/master.hpp.gch
+$(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
@@ -287,8 +299,14 @@ vm/zstd.o: vm/zstd.cpp vm/zstd.c vm/master.hpp.gch
 endif
 
 clean:
-	rm -f vm/*.gch
+	@echo make clean CONFIG: \`$(CONFIG)\`
+	@echo make clean BUILD_DIR: \`$(BUILD_DIR)\`
+	if [ -n "$(BUILD_DIR)" ] && [ "$(BUILD_DIR)" != "/" ]; then rm -f $(BUILD_DIR)/*.o; rm -f $(BUILD_DIR)/*.gch; fi
+	rm -f build/*.o
+	rm -f build/*.gch
 	rm -f vm/*.o
+	rm -f vm/*.gch
+	rm -f factor
 	rm -f factor.dll
 	rm -f factor.lib
 	rm -f factor.dll.lib

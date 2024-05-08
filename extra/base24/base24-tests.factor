@@ -1,4 +1,4 @@
-USING: base24 endian grouping kernel math.parser sequences
+USING: base24 endian grouping hex-strings kernel sequences
 tools.test ;
 
 IN: base24.tests

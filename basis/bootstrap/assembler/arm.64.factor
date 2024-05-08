@@ -12,6 +12,13 @@ IN: bootstrap.assembler.arm
 
 big-endian off
 
+: context-callstack-top-offset ( -- n ) 0 bootstrap-cells ; inline
+: context-callstack-bottom-offset ( -- n ) 2 bootstrap-cells ; inline
+: context-datastack-offset ( -- n ) 3 bootstrap-cells ; inline
+: context-retainstack-offset ( -- n ) 4 bootstrap-cells ; inline
+: context-callstack-save-offset ( -- n ) 5 bootstrap-cells ; inline
+: context-callstack-seg-offset ( -- n ) 8 bootstrap-cells ; inline
+
 ! X0-X17  volatile     scratch registers
 ! X0-X8                parameter registers
 ! X0                   result register
@@ -77,14 +84,23 @@ big-endian off
 : store1 ( -- ) 0 ds-reg temp1 STRuoff ;
 : store0/1 ( -- ) -8 ds-reg temp1 temp0 STPsoff ;
 : store0/2 ( -- ) -8 ds-reg temp2 temp0 STPsoff ;
+: store2/0 ( -- ) -8 ds-reg temp0 temp2 STPsoff ;
 : store1/0 ( -- ) -8 ds-reg temp0 temp1 STPsoff ;
 : store1/2 ( -- ) -16 ds-reg temp2 temp1 STPsoff ;
 
+! add tag bits to integers
 :: tag ( reg -- ) tag-bits get reg reg LSLi ;
+! remove tag bits
 :: untag ( reg -- ) tag-bits get reg reg ASRi ;
+
 : tagged>offset0 ( -- ) 1 temp0 temp0 ASRi ;
 
+! pops an item from the data stack and pushes it 
+! onto the retain stack (used for dip-like operations)
 : >r ( -- ) pop0 pushr ;
+
+! pops an item from the retain stack and pushes it 
+! onto the data stack (used for dip-like operations)
 : r> ( -- ) popr push0 ;
 
 : absolute-jump ( -- word class )
@@ -100,32 +116,25 @@ big-endian off
     3 words Br
     NOP NOP f rc-absolute-cell ; inline
 
+! This is used when a word is called at the end of a quotation.
+! JIT-WORD-CALL is used for other word calls.
 [
-    ! ! pic-tail-reg 5 [RIP+] LEA
     ! why do we store the address after JMP in EBX, where is it
     ! picked up?
     4 pic-tail-reg ADR
-    ! ! 0 JMP f rc-relative rel-word-pic-tail
-    ! 0 Br f rc-relative-arm64-branch rel-word-pic-tail
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
+! This is used when a word is called. 
+! JIT-WORD-JUMP is used if the word is the last piece of code in a quotation.
 [
-    ! ! 0 CALL f rc-relative rel-word-pic
-    ! push-link-reg
-    ! 0 BL f rc-relative-arm64-branch rel-word-pic
-    ! pop-link-reg
     absolute-call rel-word-pic
 ] JIT-WORD-CALL jit-define
 
 : jit-call ( name -- )
-    ! RAX 0 MOV f rc-absolute-cell rel-dlsym
-    ! RAX CALL ;
     absolute-call rel-dlsym ;
 
 :: jit-call-1arg ( arg1s name -- )
-    ! arg1 arg1s MOVr
-    ! name jit-call ;
     arg1s arg1 MOVr
     name jit-call ;
 
@@ -137,31 +146,31 @@ big-endian off
     arg2s arg2 MOVr
     name jit-call ;
 
+! loads the address of the vm struct. 
+! A no-op on ARM (vm-reg always contains this address).
 : jit-load-vm ( -- ) ;
 
+! Loads the address of the ctx struct into ctx-reg.
 : jit-load-context ( -- )
-    ! ctx-reg vm-reg vm-context-offset [+] MOV ;
     vm-context-offset vm-reg ctx-reg LDRuoff ;
 
+! Saves the addresses of the callstack, datastack, and retainstack tops 
+! into the corresponding fields in the ctx struct.
 : jit-save-context ( -- )
     jit-load-context
     ! The reason for -8 I think is because we are anticipating a CALL
     ! instruction. After the call instruction, the contexts frame_top
     ! will point to the origin jump address.
-    ! R11 RSP -8 [+] LEA
-    ! ctx-reg context-callstack-top-offset [+] R11 MOV
     stack-reg temp0 MOVsp
     16 temp0 temp0 SUBi
     context-callstack-top-offset ctx-reg temp0 STRuoff
-    ! ctx-reg context-datastack-offset [+] ds-reg MOV
-    ! ctx-reg context-retainstack-offset [+] rs-reg MOV ;
     context-datastack-offset ctx-reg ds-reg STRuoff
     context-retainstack-offset ctx-reg rs-reg STRuoff ;
 
-! ctx-reg must already have been loaded
+! Retrieves the addresses of the datastack and retainstack tops 
+! from the corresponding fields in the ctx struct.
+! ctx-reg must already have been loaded.
 : jit-restore-context ( -- )
-    ! ds-reg ctx-reg context-datastack-offset [+] MOV
-    ! rs-reg ctx-reg context-retainstack-offset [+] MOV ;
     context-datastack-offset ctx-reg ds-reg LDRuoff
     context-retainstack-offset ctx-reg rs-reg LDRuoff ;
 
@@ -178,17 +187,34 @@ big-endian off
     jit-restore-context
 ] JIT-PRIMITIVE jit-define
 
+! Used to a call a quotation if the quotation is the last piece of code
 : jit-jump-quot ( -- )
-    ! arg1 quot-entry-point-offset [+] JMP ;
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BR ;
 
+! Used to call a quotation if the quotation is not the last piece of code
 : jit-call-quot ( -- )
-    ! arg1 quot-entry-point-offset [+] CALL ;
     push-link-reg
     quot-entry-point-offset arg1 temp0 LDUR
     temp0 BLR
     pop-link-reg ;
+
+! calls a quotation
+[
+    pop-arg1
+]
+[ jit-call-quot ]
+[ jit-jump-quot ]
+\ (call) define-combinator-primitive
+
+[
+    jit-save-context
+    vm-reg arg2 MOVr
+    "lazy_jit_compile" jit-call
+]
+[ jit-call-quot ]
+[ jit-jump-quot ]
+\ lazy-jit-compile define-combinator-primitive
 
 [
     ! temp2 0 MOV f rc-absolute-cell rel-literal
@@ -198,6 +224,7 @@ big-endian off
     3 words Br
     NOP NOP f rc-absolute-cell rel-literal
 ] PIC-CHECK-TUPLE jit-define
+
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
@@ -261,32 +288,22 @@ big-endian off
     ctx-reg jit-update-tib ;
 
 : jit-pop-context-and-param ( -- )
-    ! arg1 ds-reg [] MOV
-    ! arg1 arg1 alien-offset [+] MOV
-    ! arg2 ds-reg -8 [+] MOV
-    ! ds-reg 16 SUB ;
     pop-arg1
     alien-offset arg1 arg1 ADDi
     0 arg1 arg1 LDRuoff
     pop-arg2 ;
 
 : jit-push-param ( -- )
-    ! ds-reg 8 ADD
-    ! ds-reg [] arg2 MOV ;
     push-arg2 ;
 
 : jit-set-context ( -- )
     jit-pop-context-and-param
     jit-save-context
     arg1 jit-switch-context
-    ! RSP 8 ADD
     16 stack-reg stack-reg ADDi
     jit-push-param ;
 
 : jit-pop-quot-and-param ( -- )
-    ! arg1 ds-reg [] MOV
-    ! arg2 ds-reg -8 [+] MOV
-    ! ds-reg 16 SUB ;
     pop-arg1 pop-arg2 ;
 
 : jit-start-context ( -- )
@@ -327,16 +344,16 @@ big-endian off
     jit-jump-quot ;
 
 [
-    ! 0 [RIP+] EAX MOV rc-relative rel-safepoint
     3 words temp0 LDRl
     0 temp0 W0 STRuoff
     3 words Br
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-! C to Factor entry point
+! The main C to Factor entry point. 
+! Sets up and executes the boot quote, 
+! then performs a teardown and returns into C++. 
 [
-    0xabcd BRK
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
     ! ! On x86-32 fastcall, and x86-64, some arguments are passed
@@ -345,8 +362,7 @@ big-endian off
     ! frame-reg PUSH
     ! frame-reg stack-reg MOV
 
-    ! ! Save all non-volatile registers
-    ! nv-regs [ PUSH ] each
+    ! Save all non-volatile registers
     -16 SP X19 X18 STPpre
     -16 SP X21 X20 STPpre
     -16 SP X23 X22 STPpre
@@ -358,74 +374,52 @@ big-endian off
 
     jit-save-tib
 
-    ! ! Load VM into vm-reg
-    ! vm-reg 0 MOV 0 rc-absolute-cell rel-vm
+    ! Load VM into vm-reg
     2 words vm-reg LDRl
     3 words Br
     NOP NOP 0 rc-absolute-cell rel-vm
 
-    ! ! Save old context
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! nv-reg PUSH
+    ! Save old context
     vm-context-offset vm-reg ctx-reg LDRuoff
     8 SP ctx-reg STRuoff
 
-    ! ! Switch over to the spare context
-    ! nv-reg vm-reg vm-spare-context-offset [+] MOV
-    ! vm-reg vm-context-offset [+] nv-reg MOV
+    ! Switch over to the spare context
     vm-spare-context-offset vm-reg ctx-reg LDRuoff
     vm-context-offset vm-reg ctx-reg STRuoff
 
-    ! ! Save C callstack pointer
-    ! nv-reg context-callstack-save-offset [+] stack-reg MOV
-
+    ! Save C callstack pointer
     stack-reg temp0 MOVsp
     context-callstack-save-offset ctx-reg temp0 STRuoff
-    ! stack-reg X24 MOVsp
-    ! NOP
 
-    ! ! Load Factor stack pointers
-    ! stack-reg nv-reg context-callstack-bottom-offset [+] MOV
+    ! Load Factor stack pointers
     context-callstack-bottom-offset ctx-reg temp0 LDRuoff
     temp0 stack-reg MOVsp
 
     ctx-reg jit-update-tib
     jit-install-seh
 
-    ! rs-reg nv-reg context-retainstack-offset [+] MOV
-    ! ds-reg nv-reg context-datastack-offset [+] MOV
     context-retainstack-offset ctx-reg rs-reg LDRuoff
     context-datastack-offset ctx-reg ds-reg LDRuoff
 
-    ! ! Call into Factor code
-    ! link-reg 0 MOV f rc-absolute-cell rel-word
-    ! link-reg CALL
+    ! Call into Factor code
     3 words temp0 LDRl
     temp0 BLR
     3 words Br
     NOP NOP f rc-absolute-cell rel-word
 
-    ! ! Load C callstack pointer
-    ! nv-reg vm-reg vm-context-offset [+] MOV
-    ! stack-reg nv-reg context-callstack-save-offset [+] MOV
+    ! Load C callstack pointer
     vm-context-offset vm-reg ctx-reg LDRuoff
 
     context-callstack-save-offset ctx-reg temp0 LDRuoff
     temp0 stack-reg MOVsp
-    ! X24 stack-reg MOVsp
-    ! NOP
 
-    ! ! Load old context
-    ! nv-reg POP
-    ! vm-reg vm-context-offset [+] nv-reg MOV
+    ! Load old context
     8 SP ctx-reg LDRuoff
     vm-context-offset vm-reg ctx-reg STRuoff
 
     jit-restore-tib
 
-    ! ! Restore non-volatile registers
-    ! nv-regs <reversed> [ POP ] each
-    ! frame-reg POP
+    ! Restore non-volatile registers
     16 SP X30 LDRpost
     16 SP X29 X28 LDPpost
     16 SP X27 X26 LDPpost
@@ -434,28 +428,19 @@ big-endian off
     16 SP X21 X20 LDPpost
     16 SP X19 X18 LDPpost
 
-    ! ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
-    ! ! need a parameter here.
+    ! Callbacks which return structs, or use stdcall/fastcall/thiscall,
+    ! need a parameter here.
 
-    ! ! See the comment for M\ x86.32 stack-cleanup in cpu.x86.32
-    ! 0xffff RET f rc-absolute-2 rel-untagged
-    4 words temp0 ADR
-    2 temp0 temp0 LDRHuoff
-    temp0 stack-reg stack-reg ADDr
     f RET
-    NOP f rc-absolute-2 rel-untagged
 ] CALLBACK-STUB jit-define
 
+! pushes a literal value to the stack
 [
-    ! ! load literal
-    ! temp0 0 MOV f rc-absolute-cell rel-literal
+    ! load literal
     2 words temp0 LDRl
     3 words Br
     NOP NOP f rc-absolute-cell rel-literal
-    ! ! increment datastack pointer
-    ! ds-reg bootstrap-cell ADD
-    ! ! store literal on datastack
-    ! ds-reg [] temp0 MOV
+    ! store literal on datastack
     push0
 ] JIT-PUSH-LITERAL jit-define
 
@@ -522,56 +507,42 @@ big-endian off
     16 SP X3 X2 LDPpost
     16 SP X1 X0 LDPpost ;
 
+! if-statement control flow
 [
-    ! ! load boolean
-    ! temp0 ds-reg [] MOV
-    ! ! pop boolean
-    ! ds-reg bootstrap-cell SUB
+    ! pop boolean
     pop0
-    ! ! compare boolean with f
-    ! temp0 \ f type-number CMP
+    ! compare boolean with f
     \ f type-number temp0 CMPi
-    ! ! jump to true branch if not equal
-    ! ! 0 JNE f rc-relative rel-word
-    ! 0 NE B.cond f rc-relative-arm64-bcond rel-word
+    ! skip over true branch if equal
     5 words EQ B.cond
+    ! jump to true branch
     absolute-jump rel-word
-    ! ! jump to false branch if equal
-    ! ! 0 JMP f rc-relative rel-word
-    ! 0 Br f rc-relative-arm64-branch rel-word
+    ! jump to false branch
     absolute-jump rel-word
 ] JIT-IF jit-define
 
+! calls the second item on the stack
 [
     >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r>
 ] JIT-DIP jit-define
 
+! calls the third item on the stack
 [
     >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r> r>
 ] JIT-2DIP jit-define
 
+! calls the fourth item on the stack
 [
     >r >r >r
-    ! ! 0 CALL f rc-relative rel-word
-    ! push-link-reg
-    ! 0 Br f rc-relative-arm64-branch rel-word
-    ! pop-link-reg
     absolute-call rel-word
     r> r> r>
 ] JIT-3DIP jit-define
 
+! executes a word pushed onto the stack with \
 [
     ! ! load from stack
     ! temp0 ds-reg [] MOV
@@ -598,19 +569,20 @@ big-endian off
 ] JIT-EXECUTE jit-define
 
 ! https://elixir.bootlin.com/linux/latest/source/arch/arm64/kernel/stacktrace.c#L22
+! Performs setup for a quotation
 [
     ! ! make room for LR plus magic number of callback, 16byte align
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - SUB
     stack-frame-size stack-reg stack-reg SUBi
     push-link-reg
 ] JIT-PROLOG jit-define
 
+! Performs teardown for a quotation
 [
-    ! x64 ! stack-reg stack-frame-size bootstrap-cell - ADD
     pop-link-reg
     stack-frame-size stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
+! returns to the outer stack frame
 [ f RET ] JIT-RETURN jit-define
 
 ! ! ! Polymorphic inline caches
@@ -626,6 +598,13 @@ big-endian off
     2 words Br
     NOP f rc-absolute-1 rel-untagged
 ] PIC-LOAD jit-define
+
+! ! Factor 2024 Clinic Code:
+! ! this arm relocation could actually work
+! ! due to the small bitwidth required  
+! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+! temp2 temp2 UXTB
+! temp2 ds-reg temp1 LDRr
 
 [
     ! temp1/32 tag-mask get AND
@@ -654,6 +633,14 @@ big-endian off
     2 words Br
     NOP f rc-absolute-1 rel-untagged
 ] PIC-CHECK-TAG jit-define
+
+! ! Factor 2024 Clinic Code:
+! ! this arm relocation could actually work
+! ! due to the small bitwidth required  
+! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
+! temp2 temp2 UXTB
+! temp2 temp1 CMPr
+
 
 [
     ! ! 0 JE f rc-relative rel-word
@@ -720,70 +707,51 @@ big-endian off
     ] jit-conditional
 ] MEGA-LOOKUP jit-define
 
-! Comparisons
+! helper for comparison operations which return a boolean value
 : jit-compare ( cond -- )
-    ! ! load t
-    ! temp3 0 MOV t rc-absolute-cell rel-literal
+    ! load t
     2 words temp3 LDRl
     3 words Br
     NOP NOP t rc-absolute-cell rel-literal
-    ! ! load f
-    ! temp1 \ f type-number MOV
+    ! load f
     \ f type-number temp2 MOVwi
-    ! ! load first value
-    ! temp0 ds-reg [] MOV
-    ! ! adjust stack pointer
-    ! ds-reg bootstrap-cell SUB
+    ! load values
     load1/0
-    ! ! compare with second value
-    ! ds-reg [] temp0 CMP
+    ! compare
     temp1 temp0 CMPr
-    ! ! move t if true
-    ! [ temp1 temp3 ] dip execute( dst src -- )
+    ! move t if true (f otherwise)
     [ temp2 temp3 temp0 ] dip CSEL
-    ! ! store
-    ! ds-reg [] temp1 MOV
+    ! store
     1 push-down0 ;
 
 ! Math
 
-! Overflowing fixnum arithmetic
+! Overflowing fixnum (integer) arithmetic
 : jit-overflow ( insn func -- )
-    ! ds-reg 8 SUB
     jit-save-context
-    ! arg1 ds-reg [] MOV
-    ! arg2 ds-reg 8 [+] MOV
     load-arg1/2
-    ! arg3 arg1 MOV
-    ! [ [ arg3 arg2 ] dip call ] dip
     [ [ arg2 arg1 arg3 ] dip call ] dip
-    ! ds-reg [] arg3 MOV
     push-down-arg3
-    ! [ JNO ]
-    [ VC B.cond ] [
-        ! arg3 vm-reg MOV
+    [ 8 fixnum+fast VC B.cond ] [
         vm-reg arg3 MOVr
         jit-call
     ] jit-conditional ; inline
 
+! non-overflowing fixnum (integer) arithmetic
 : jit-math ( insn -- )
-    ! ! load second input
-    ! temp0 ds-reg [] MOV
-    ! ! pop stack
-    ! ds-reg bootstrap-cell SUB
+    ! load inputs
     load1/0
-    ! ! compute result
-    ! [ ds-reg [] temp0 ] dip execute( dst src -- )
+    ! compute result
     [ temp0 temp1 temp0 ] dip execute( arg2 arg1 dst -- )
+    ! store result
     1 push-down0 ;
 
+! fixnum (integer) division and modulo operations. 
+! Does not tag or push results.
 : jit-fixnum-/mod ( -- )
-    ! ! load second parameter
-    ! temp1 ds-reg [] MOV
-    ! ! load first parameter
-    ! div-arg ds-reg bootstrap-cell neg [+] MOV
+    ! load parameters
     load1/0
-    ! ! divide
+    ! divide
     temp0 temp1 temp2 SDIV
     temp1 temp0 temp2 temp0 MSUB ;
 
@@ -799,6 +767,9 @@ big-endian off
     { (start-context-and-delete) [ jit-start-context-and-delete ] }
 
     ! ## Entry points
+    ! called by callback-stub. 
+    ! this contains some C++ setup/teardown, 
+    ! as well as the actual call into the boot quote.
     { c-to-factor [
             arg1 arg2 MOVr
             vm-reg "begin_callback" jit-call-1arg
@@ -830,35 +801,15 @@ big-endian off
     ] }
 
     ! ## Math
-    { fixnum+ [ [ ADDr ] "overflow_fixnum_add" jit-overflow ] }
-    { fixnum- [ [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
+    ! Overflowing fixnum (integer) addition
+    { fixnum+ [ 
+        [ ADDr ] "overflow_fixnum_add" jit-overflow ] }
+    ! Overflowing fixnum (integer) subtraction
+    { fixnum- [ 
+        [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
+    ! Overflowing fixnum (integer) multiplication
     { fixnum* [
-        ! ds-reg 8 SUB
-        jit-save-context
-        ! RCX ds-reg [] MOV
-        ! RBX ds-reg 8 [+] MOV
-        load1/0
-        ! RBX tag-bits get SAR
-        temp0 untag
-        ! RAX RCX MOV
-        ! RBX IMUL
-        ! RAX * RBX = RDX:RAX
-        temp1 temp0 temp0 MUL
-        ! ds-reg [] RAX MOV
-        1 push-down0
-        ! [ JNO ]
-        [ VC B.cond ] [
-            ! arg1 RCX MOV
-            temp1 arg1 MOVr
-            ! arg1 tag-bits get SAR
-            temp1 untag
-            ! arg2 RBX MOV
-            temp0 arg2 MOVr
-            ! arg3 vm-reg MOV
-            vm-reg arg3 MOVr
-            "overflow_fixnum_multiply" jit-call
-        ] jit-conditional
-    ] }
+        [ MUL ] "overflow_fixnum_multiply" jit-overflow ] }
 
     ! ## Misc
     { fpu-state [
@@ -870,6 +821,11 @@ big-endian off
         FPSR XZR MSRr
         FPCR arg1 MRS
     ] }
+
+! ! Factor 2024 Clinic Code:
+! FPCR arg1 MRS
+! FPSR XZR MSRr
+
     { set-fpu-state [
         ! RSP 2 SUB
         ! RSP [] arg1 16-bit-version-of MOV
@@ -914,246 +870,230 @@ big-endian off
         f RET
     ] }
 
-    ! ## Fixnums
+    ! ! Factor 2024 Clinic Code:
+    ! ! we think the below two lines
+    ! ! 2 temp0 temp0 SUBi ! callstack-length-offset
+    ! ! 0 temp0 arg3 LDRuoff
+    ! ! may need to be replaced with:
+    ! callstack-length-offset arg4 arg3 LDRuoff
 
-    ! ### Add
+
+    ! ## Fixnums
+    ! Non-overflowing fixnum (integer) addition
     { fixnum+fast [ \ ADDr jit-math ] }
 
     ! ### Bit manipulation
+    ! fixnum (integer) bitwise AND
     { fixnum-bitand [ \ ANDr jit-math ] }
+    
+    ! fixnum (integer) bitwise NOT
     { fixnum-bitnot [
-        ! ! complement
-        ! ds-reg [] NOT
         load0
+        ! complement
         temp0 temp0 MVN
-        ! ! clear tag bits
-        ! ds-reg [] tag-mask get XOR
+        ! clear tag bits
         tag-mask get temp0 temp0 EORi
         store0
     ] }
+    
+    ! fixnum (integer) bitwise OR
     { fixnum-bitor [ \ ORRr jit-math ] }
+    
+    ! fixnum (integer) bitwise XOR
     { fixnum-bitxor [ \ EORr jit-math ] }
+    
+    ! fixnum (integer) bitwise shift (positive = left, negative = right)
     { fixnum-shift-fast [
-        ! ! load shift count
-        ! shift-arg ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! load value
-        ! temp3 ds-reg [] MOV
+        ! load shift count and value
         load1/0
-        ! ! untag shift count
-        ! shift-arg tag-bits get SAR
+        ! untag shift count
         temp0 untag
-        ! ! make a copy
-        ! temp2 temp3 MOV
+        ! make a copy
         temp1 temp2 MOVr
-        ! ! compute positive shift value in temp2
-        ! temp2 CL SHL
+        ! compute positive shift value in temp1
         temp0 temp1 temp1 LSLr
-        ! ! compute negative shift value in temp3
-        ! shift-arg NEG
+        ! compute negative shift value in temp2
         temp0 temp0 NEG
-        ! temp3 CL SAR
         temp0 temp2 temp2 ASRr
-        ! temp3 tag-mask get bitnot AND
         tag-mask get bitnot temp2 temp2 ANDi
-        ! ! if shift count was negative, move temp3 to temp2
-        ! shift-arg 0 CMP
-        ! temp2 temp3 CMOVGE
-        temp2 temp1 temp0 PL CSEL
-        ! ! push to stack
-        ! ds-reg [] temp2 MOV
+        ! if shift count was negative
+        ! choose temp2 (else temp1)
+        0 temp0 CMPi
+        temp2 temp1 temp0 MI CSEL
+        ! push to stack
         1 push-down0
     ] }
 
     ! ### Comparisons
+    ! returns true if both arguments are fixnums, and false otherwise
     { both-fixnums? [
-        ! temp0 ds-reg [] MOV
-        ! ds-reg bootstrap-cell SUB
         load1/0
-        ! temp0 ds-reg [] OR
         temp1 temp0 temp0 ORRr
-        ! temp0 tag-mask get TEST
         tag-mask get temp0 TSTi
-        ! temp0 \ f type-number MOV
         \ f type-number temp0 MOVwi
-        ! temp1 1 tag-fixnum MOV
         1 tag-fixnum temp1 MOVwi
-        ! temp0 temp1 CMOVE
         temp0 temp1 temp0 EQ CSEL
-        ! ds-reg [] temp0 MOV
         1 push-down0
     ] }
+
+    ! fixnum (integer) equality comparison
     { eq? [ EQ jit-compare ] }
+    ! fixnum (integer) greater-than comparison
     { fixnum> [ GT jit-compare ] }
+    ! fixnum (integer) greater-than-or-equal comparison
     { fixnum>= [ GE jit-compare ] }
+    ! fixnum (integer) less-than comparison
     { fixnum< [ LT jit-compare ] }
+    ! fixnum (integer) less-than-or-equal comparison
     { fixnum<= [ LE jit-compare ] }
 
     ! ### Div/mod
+    ! fixnum (integer) modulo
     { fixnum-mod [
         jit-fixnum-/mod
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! push to stack
-        ! ds-reg [] mod-arg MOV
+        ! push to stack
         1 push-down0
     ] }
+    ! fixnum (integer) division
     { fixnum/i-fast [
         jit-fixnum-/mod
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! tag it
-        ! div-arg tag-bits get SHL
+        ! tag it
         tag-bits get temp2 temp0 LSLi
-        ! ! push to stack
-        ! ds-reg [] div-arg MOV
+        ! push to stack
         1 push-down0
     ] }
+    ! fixnum (integer) division and modulo
     { fixnum/mod-fast [
         jit-fixnum-/mod
-        ! ! tag it
-        ! div-arg tag-bits get SHL
+        ! tag it
         temp2 tag
-        ! ! push to stack
-        ! ds-reg [] mod-arg MOV
-        ! ds-reg bootstrap-cell neg [+] div-arg MOV
-        store0/2
+        ! push to stack
+        store2/0
     ] }
 
     ! ### Mul
+    ! Non-overflowing fixnum (integer) multiplication
     { fixnum*fast [
-        ! ! load second input
-        ! temp0 ds-reg [] MOV
-        ! ! pop stack
-        ! ds-reg bootstrap-cell SUB
-        ! ! load first input
-        ! temp1 ds-reg [] MOV
+        ! load both inputs
         load1/0
-        ! ! untag second input
-        ! temp0 tag-bits get SAR
+        ! untag second input
         temp0 untag
-        ! ! multiply
-        ! temp0 temp1 IMUL2
+        ! multiply
         temp1 temp0 temp0 MUL
-        ! ! push result
-        ! ds-reg [] temp0 MOV
+        ! push result
         1 push-down0
     ] }
 
     ! ### Sub
+    ! Non-overflowing fixnum (integer) subtraction
     { fixnum-fast [ \ SUBr jit-math ] }
 
     ! ## Locals
+    ! Drops all current locals stored on the retainstack.
     { drop-locals [
-        ! ! load local count
-        ! temp0 ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
+        ! load local count
         pop0
-        ! ! turn local number into offset
+        ! turn local number into offset
         tagged>offset0
-        ! ! decrement retain stack pointer
-        ! rs-reg temp0 SUB
+        ! decrement retain stack pointer
         temp0 rs-reg rs-reg SUBr
     ] }
+
+    ! Gets the nth local stored on the retainstack.
     { get-local [
-        ! ! load local number
-        ! temp0 ds-reg [] MOV
+        ! load local number
         load0
-        ! ! turn local number into offset
+        ! turn local number into offset
         tagged>offset0
-        ! ! load local value
-        ! temp0 rs-reg temp0 [+] MOV
+        ! load local value
         temp0 rs-reg temp0 LDRr
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         store0
     ] }
+
+    ! Turns the top item on the datastack 
+    ! into a local stored on the retainstack.
     { load-local [ >r ] }
 
     ! ## Objects
+    ! Reads the nth slot of a given object. (non-bounds-checking)
     { slot [
-        ! ! load slot number
-        ! temp0 ds-reg [] MOV
-        ! ! adjust stack pointer
-        ! ds-reg bootstrap-cell SUB
-        ! ! load object
-        ! temp1 ds-reg [] MOV
+        ! load object and slot number
         load1/0
-        ! ! turn slot number into offset
+        ! turn slot number into offset
         tagged>offset0
-        ! ! mask off tag
-        ! temp1 tag-bits get SHR
-        ! temp1 tag-bits get SHL
+        ! mask off tag
         tag-mask get bitnot temp1 temp1 ANDi
-        ! ! load slot value
-        ! temp0 temp1 temp0 [+] MOV
+        ! load slot value
         temp1 temp0 temp0 LDRr
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         1 push-down0
     ] }
+
+    ! nth string element selector (non-bounds-checking)
     { string-nth-fast [
-        ! ! load string index from stack
-        ! temp0 ds-reg bootstrap-cell neg [+] MOV
-        ! temp0 tag-bits get SHR
-        ! ! load string from stack
-        ! temp1 ds-reg [] MOV
+        ! load string index and string from stack
         load1/0
-        ! ! load character
-        ! temp0 8-bit-version-of temp0 temp1 string-offset [++] MOV
-        ! temp0 temp0 8-bit-version-of MOVZX
-        ! temp0 tag-bits get SHL
+        temp1 untag
+        ! load character
+        string-offset temp0 temp0 ADDi
         temp1 temp0 temp0 LDRBr
         temp0 tag
-        ! ! store character to stack
-        ! ds-reg bootstrap-cell SUB
-        ! ds-reg [] temp0 MOV
+        ! store character to stack
         1 push-down0
     ] }
+
+    ! add tag bits to integers
+    ! (the local word tag just shifts left)
     { tag [
-        ! ! load from stack
-        ! temp0 ds-reg [] MOV
+        ! load from stack
         load0
-        ! ! compute tag
-        ! temp0/32 tag-mask get AND
+        ! compute tag
         tag-mask get temp0 temp0 ANDi
-        ! ! tag the tag
-        ! temp0/32 tag-bits get SHL
+        ! tag the tag
         temp0 tag
-        ! ! push to stack
-        ! ds-reg [] temp0 MOV
+        ! push to stack
         store0
     ] }
 
-    ! ! ## Shufflers
+    ! ## Shufflers
 
-    ! ! ### Drops
+    ! ### Drops
+    ! drops the top n stack items
     { drop [ 1 ndrop ] }
     { 2drop [ 2 ndrop ] }
     { 3drop [ 3 ndrop ] }
     { 4drop [ 4 ndrop ] }
 
-    ! ! ### Dups
+    ! ### Dups
+    ! duplicates the top n stack items in order
     { dup [ load0 push0 ] }
     { 2dup [ load1/0 push1 push0 ] }
     { 3dup [ load2 load1/0 push2 push1 push0 ] }
     { 4dup [ load3/2 load1/0 push3 push2 push1 push0 ] }
+    ! duplicates the second stack item and puts it below the top stack item
     { dupd [ load1/0 store1 push0 ] }
 
-    ! ! ### Misc shufflers
+    ! ### Misc shufflers
+    ! Duplicates the second stack item and puts it above the top stack item
     { over [ load1 push1 ] }
+    ! Duplicates the the third stack item and puts it above the top stack item
     { pick [ load2 push2 ] }
 
-    ! ! ### Nips
+    ! ### Nips
+    ! Drops the second stack item
     { nip [ load0 1 push-down0 ] }
+    ! Drops the second and third stack items
     { 2nip [ load0 2 push-down0 ] }
 
-    ! ! ### Swaps
+    ! ### Swaps
+    ! Rotates the top three elements of the stack (1st -> 3rd)
     { -rot [ pop0 load2/1* store0/2 push1 ] }
+    ! Rotates the top three elements of the stack (1st -> 2nd)
     { rot [ pop0 load2/1* store1/0 push2 ] }
+    ! Swaps the top two elements of the stack
     { swap [ load1/0 store0/1 ] }
+    ! Swaps the second and third elements of the stack
     { swapd [ load2/1 store1/2 ] }
 
     ! ## Signal handling

@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs base64 calendar checksums.hmac
-checksums.sha http http.client kernel make math math.parser
+checksums.sha hex-strings http http.client kernel make math
 namespaces present random sequences sorting strings
 urls.encoding urls.private ;
 IN: oauth1
