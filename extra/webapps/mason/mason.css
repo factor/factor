@@ -12,3 +12,11 @@ table, th, td {
   border-collapse: collapse;
   border-style: dashed;
 }
+
+th,td:last-child {
+    text-align: left;
+}
+
+tr {
+    text-align: right;
+}
