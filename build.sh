@@ -157,7 +157,6 @@ set_cc() {
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
         [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
-        CXX_OPT+=-Wc++17-attribute-extensions
         return
     fi
 
@@ -380,7 +379,6 @@ echo_build_info() {
     $ECHO "CXX=$CXX"
     $ECHO "LTO=$LTO"
     $ECHO "CC_OPT=$CC_OPT"
-    $ECHO "CXX_OPT=$CXX_OPT"
     $ECHO "MAKE=$MAKE"
 }
 
@@ -538,8 +536,8 @@ make_clean() {
 
 make_factor() {
     $ECHO "Building factor with $NUM_CORES cores"
-    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
-    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
+    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
+    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
 }
 
 make_clean_factor() {
