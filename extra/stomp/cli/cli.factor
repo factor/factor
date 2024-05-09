@@ -67,15 +67,13 @@ CONSTANT: COMMANDS {
 ! XXX: when disconnected, exit with a message
 ! XXX: print incoming and outgoing messages nicely
 
-TUPLE: stomp-command-loop < command-loop ;
-
-M: stomp-command-loop run-command-loop
+: start-stomp-client ( -- )
     [
         stomp-host get resolve-host [ ipv4? ] filter random
         stomp-port get with-port utf8 [
             stomp-mailbox [ [ nl . flush ] with-global ] stomp-loop
         ] with-client
-    ] in-thread call-next-method ;
+    ] in-thread ;
 
 : stomp-options ( args -- )
     [
@@ -89,10 +87,9 @@ M: stomp-command-loop run-command-loop
 
 : stomp-main ( -- )
     command-line get stomp-options
-    "Welcome to STOMP!" "STOMP>"
-    stomp-command-loop new-command-loop
+    "Welcome to STOMP!" "STOMP>" <command-loop>
     COMMANDS [ over add-command ] each
-    run-command-loop ;
+    start-stomp-client run-command-loop ;
 
 MAIN: stomp-main
 
