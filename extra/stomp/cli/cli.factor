@@ -14,11 +14,7 @@ INITIALIZED-SYMBOL: stomp-port [ 61613 ]
 CONSTANT: stomp-mailbox $[ <mailbox> ]
 
 : put-frame ( frame -- )
-    [ "put: " write dup . flush ] with-global
     stomp-mailbox mailbox-put ;
-
-: get-frame ( frame -- )
-    [ "\nget: " write . flush ] with-global ;
 
 CONSTANT: COMMANDS {
     T{ command
@@ -77,7 +73,7 @@ M: stomp-command-loop run-command-loop
     [
         stomp-host get resolve-host [ ipv4? ] filter random
         stomp-port get with-port utf8 [
-            stomp-mailbox [ nl get-frame ] stomp-loop
+            stomp-mailbox [ [ nl . flush ] with-global ] stomp-loop
         ] with-client
     ] in-thread call-next-method ;
 
