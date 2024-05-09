@@ -1,0 +1,1 @@
+STOMP (Simple Text Oriented Messaging Protocol) client library
