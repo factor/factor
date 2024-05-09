@@ -4,7 +4,8 @@
 USING: accessors arrays assocs calendar combinators
 concurrency.mailboxes continuations io io.files io.timeouts
 kernel linked-assocs math math.order math.parser mime.types
-namespaces prettyprint sequences splitting threads ;
+namespaces prettyprint sbufs sequences sequences.extras
+splitting threads ;
 
 IN: stomp
 
@@ -24,13 +25,34 @@ INITIALIZED-SYMBOL: stomp-version [ "1.1" ]
         { "1.2" [ "\\" "\\\\" replace "\n" "\\n" replace ":" "\\c" replace "\r" "\\r" replace ] }
     } case ;
 
-! XXX: unescape-header
+: unescape-header ( key value -- key' value' )
+    stomp-version get {
+        { "1.0" [ f ] }
+        { "1.1" [ H{
+            { CHAR: \\ CHAR: \\ }
+            { CHAR: n  CHAR: \n }
+            { CHAR: c  CHAR: :  } } ] }
+        { "1.2" [ H{
+            { CHAR: \\ CHAR: \\ }
+            { CHAR: n  CHAR: \n }
+            { CHAR: c  CHAR: :  }
+            { CHAR: r  CHAR: \r } } ] }
+    } case [
+        [ "\\" split1 ] dip '[
+            [ >sbuf ] dip [
+                unclip-slice _ at* t assert= swap
+                [ suffix! ]
+                [ "\\" split1 [ append! ] dip ] bi*
+            ] until-empty "" like
+        ] unless-empty
+    ] when* ;
 
 : read-command ( -- command )
     readln ;
 
 : read-headers ( -- headers )
-    [ readln dup empty? not ] [ ":" split1 2array ] produce nip ;
+    [ readln dup empty? not ]
+    [ ":" split1 unescape-header 2array ] produce nip ;
 
 : read-body ( content-length/f -- body )
     [ read read1 ] [ B{ 0 } read-until ] if* 0 assert= ;
@@ -186,11 +208,16 @@ SYMBOL: stomp-subscription#
 : heartbeat-interval ( client server -- milliseconds )
     2dup [ 0 <= ] either? [ 2drop 0 ] [ max ] if ;
 
+: adjust-stomp-version ( frame -- frame )
+    dup headers>> "accept-version" of [
+        '[ _ min ] stomp-version change
+    ] when* ;
+
 :: stomp-loop ( mailbox quot: ( frame -- ) -- )
     stomp-heartbeat get parse-heartbeat :> ( cx cy )
 
     10 seconds timeouts ! connect timeout
-    stomp-connect-and-wait
+    stomp-connect-and-wait adjust-stomp-version
     f timeouts ! reset timeout
 
     headers>> "heart-beat" of "0,0" or
