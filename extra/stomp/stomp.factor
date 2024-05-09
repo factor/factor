@@ -24,6 +24,8 @@ INITIALIZED-SYMBOL: stomp-version [ "1.1" ]
         { "1.2" [ "\\" "\\\\" replace "\n" "\\n" replace ":" "\\c" replace "\r" "\\r" replace ] }
     } case ;
 
+! XXX: unescape-header
+
 : read-command ( -- command )
     readln ;
 
@@ -94,7 +96,7 @@ INITIALIZED-SYMBOL: stomp-ack-mode [ "auto" ]
 : write-frame ( frame -- )
     receipt-id stomp-debug
     [ command>> print ]
-    [ headers>> [ ":" swap [ write ] tri@ nl ] assoc-each nl ]
+    [ headers>> [ escape-header ":" swap [ write ] tri@ nl ] assoc-each nl ]
     [ body>> [ write ] when* 0 write1 ] tri flush ;
 
 SYMBOL: stomp-heartbeat
