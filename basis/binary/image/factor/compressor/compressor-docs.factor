@@ -22,6 +22,9 @@ HELP: >compression-header
 { $description "Converts any header into a compression supporting header" }
 ;
 
+HELP: compression-level
+{ $var-description "Compression parameter : 1 (least) .. 22 (most). Default value 12." } ;
+
 HELP: compress
 { $values
     { "byte-array" byte-array }
@@ -46,6 +49,14 @@ HELP: compress-data
 { $description "Compresses data heap" }
 ;
 
+HELP: compress-image
+{ $values
+    { "image" image }
+    { "image'" image }
+}
+{ $description "Compresses data- and code heaps and syncs header" }
+;
+
 HELP: load-factor-image
 { $values
     { "filename" string }
@@ -64,9 +75,10 @@ HELP: save-factor-image
 
 HELP: compress-factor-image
 { $values
-    { "filename" string }
+    { "image-file" string }
+    { "compresse-file" string }
 }
-{ $description "Load, compresses and saves Factor image with \".compressed\" appended to its filename." }
+{ $description "Load, compresses and saves a Factor image" }
 ;
 
 HELP: sync-header
@@ -78,7 +90,7 @@ HELP: sync-header
 ;
 
 HELP: compress-current-image
-{ $description "Load, compresses and saves current Factor image with \".compressed\" appended to its filename." }
+{ $description "Load, compresses and saves current Factor image with \".compressed\" appended to its filename" }
 ;
 
 ABOUT: "binary.image.factor.compressor"
