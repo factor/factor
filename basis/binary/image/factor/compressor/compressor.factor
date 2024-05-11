@@ -50,10 +50,9 @@ SYMBOL: zstd-compression-level
 : compress-code ( image -- image' ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
 
 ! compress factor image
-: compress-factor-image ( filename -- )
-  [ load-factor-image compress-data compress-code sync-header ] keep
-  ".compressed" append save-factor-image
+: compress-factor-image ( image-file compressed-file  -- )
+  [ load-factor-image compress-image compress-data compress-code sync-header ] save-factor-image
 ;
 
-: compress-current-image ( -- ) image-path compress-factor-image ;
+: compress-current-image ( -- ) image-path dup ".compressed" append compress-factor-image ;
 MAIN: compress-current-image
