@@ -42,10 +42,10 @@ TUPLE: image
   ] with-file-writer
 ;
 
-SYMBOL: zstd-compression-level
-12 zstd-compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
+SYMBOL: compression-level
+12 compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
 
-: compress ( byte-array -- compressed ) zstd-compression-level get zstd-compress-level ;
+: compress ( byte-array -- compressed ) compression-level get zstd-compress-level ;
 : compress-data ( image -- image' ) dup header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = [ dup data>> compress >>data ] when ; ! only compress uncompressed data
 : compress-code ( image -- image' ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
 : compress-image ( image -- image' ) compress-data compress-code sync-header ;
