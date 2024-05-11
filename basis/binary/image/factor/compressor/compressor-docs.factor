@@ -76,7 +76,7 @@ HELP: save-factor-image
 HELP: compress-factor-image
 { $values
     { "image-file" string }
-    { "compresse-file" string }
+    { "compressed-file" string }
 }
 { $description "Load, compresses and saves a Factor image" }
 ;
