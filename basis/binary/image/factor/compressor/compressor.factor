@@ -48,10 +48,11 @@ SYMBOL: zstd-compression-level
 : compress ( byte-array -- compressed ) zstd-compression-level get zstd-compress-level ;
 : compress-data ( image -- image' ) dup header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = [ dup data>> compress >>data ] when ; ! only compress uncompressed data
 : compress-code ( image -- image' ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
+: compress-image ( image -- image' ) compress-data compress-code sync-header ;
 
 ! compress factor image
 : compress-factor-image ( image-file compressed-file  -- )
-  [ load-factor-image compress-image compress-data compress-code sync-header ] save-factor-image
+  [ load-factor-image compress-image ] dip save-factor-image
 ;
 
 : compress-current-image ( -- ) image-path dup ".compressed" append compress-factor-image ;
