@@ -2,7 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! can be run as : factor -run=binary.image.factor.compressor
 
-USING: accessors classes.struct byte-arrays compression.zstd io io.encodings.binary io.files kernel kernel.private locals math sequences system tools.image-analyzer tools.image-analyzer.vm vm ;
+USING: accessors byte-arrays classes.struct compression.zstd io
+io.encodings.binary io.files kernel kernel.private locals math
+namespaces sequences system tools.image-analyzer
+tools.image-analyzer.vm vm ;
 IN: binary.image.factor.compressor
 
 TUPLE: image
@@ -39,7 +42,10 @@ TUPLE: image
   ] with-file-writer
 ;
 
-: compress ( byte-array -- compressed ) 12 zstd-compress-level ; ! level 12 seems the right balance between compression factor and compression speed
+SYMBOL: zstd-compression-level
+12 zstd-compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
+
+: compress ( byte-array -- compressed ) zstd-compression-level get zstd-compress-level ;
 : compress-data ( image -- image' ) dup header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = [ dup data>> compress >>data ] when ; ! only compress uncompressed data
 : compress-code ( image -- image' ) dup header>> [ code-size>> ]         [ compressed-code-size>> ] bi = [ dup code>> compress >>code ] when ; ! only compress uncompressed code
 
