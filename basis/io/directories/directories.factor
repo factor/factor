@@ -187,7 +187,7 @@ ERROR: sequence-expected obj ;
     qualified-directory-entries [
         [ name>> dup ] [ directory? ] bi
         [ directory-size ] [ link-size/0 ] if
-    ] { } map>assoc sort-values ;
+    ] map>alist sort-values ;
 
 : find-files-by-extensions ( path extensions -- seq )
     [ >lower ] map

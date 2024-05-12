@@ -12,7 +12,7 @@ ERROR: no-word-error name ;
 : word-restarts ( possibilities -- restarts )
     sort [
         [ vocabulary>> "Use the " " vocabulary" surround ] keep
-    ] { } map>assoc ;
+    ] map>alist ;
 
 : word-restarts-with-defer ( name possibilities -- restarts )
     word-restarts

@@ -104,7 +104,7 @@ M: method smart-usage "method-generic" word-prop smart-usage ;
 M: f smart-usage drop \ f smart-usage ;
 
 : synopsis-alist ( definitions -- alist )
-    [ [ synopsis ] keep ] { } map>assoc ;
+    [ [ synopsis ] keep ] map>alist ;
 
 : definitions. ( alist -- )
     [ write-object nl ] assoc-each ;

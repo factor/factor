@@ -112,7 +112,7 @@ ERROR: register-already-used live-interval ;
     dup interval/sync-point-key unhandled-min-heap get heap-push ;
 
 : reg-class-assoc ( quot -- assoc )
-    [ reg-classes ] dip { } map>assoc ; inline
+    [ reg-classes ] dip map>alist ; inline
 
 : align-spill-area ( align stack-frame -- )
     [ max ] change-spill-area-align drop ;

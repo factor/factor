@@ -303,11 +303,11 @@ M: pathname url-of
     "articles.idx" serialize-index ;
 
 : generate-word-index ( -- )
-    all-words [ dup name>> ] { } map>assoc
+    all-words [ dup name>> ] map>alist
     "words.idx" serialize-index ;
 
 : generate-vocab-index ( -- )
-    all-vocabs-really [ dup vocab-name ] { } map>assoc
+    all-vocabs-really [ dup vocab-name ] map>alist
     "vocabs.idx" serialize-index ;
 
 : generate-indices ( -- )

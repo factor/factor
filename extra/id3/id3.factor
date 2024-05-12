@@ -236,7 +236,7 @@ PRIVATE>
 ERROR: id3-parse-error path error ;
 
 : (mp3-paths>id3s) ( seq -- seq' )
-    [ dup [ mp3>id3 ] [ \ id3-parse-error boa ] recover ] { } map>assoc ;
+    [ dup [ mp3>id3 ] [ \ id3-parse-error boa ] recover ] map>alist ;
 
 : mp3-paths>id3s ( seq -- seq' )
     (mp3-paths>id3s)

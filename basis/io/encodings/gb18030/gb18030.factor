@@ -71,7 +71,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     4byte-array reverse! ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
-    '[ _ [ @ 2array ] _ tri ] { } map>assoc <interval-map> ; inline
+    '[ _ [ @ 2array ] _ tri ] map>alist <interval-map> ; inline
 
 : ranges-u>gb ( ranges -- interval-map )
     [ ufirst>> ] [ ulast>> ] [ ] >interval-map-by ;

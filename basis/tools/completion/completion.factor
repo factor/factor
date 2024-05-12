@@ -77,7 +77,7 @@ PRIVATE>
     ] bi-curry if-empty ;
 
 : named ( seq -- seq' )
-    [ dup name>> ] { } map>assoc ;
+    [ dup name>> ] map>alist ;
 
 : vocabs-matching ( str -- seq )
     all-disk-vocabs-recursive filter-vocabs named completions ;
@@ -89,7 +89,7 @@ PRIVATE>
     ":" split1 [
         vocabs-matching keys [
             [ vocab-words ] [ vocab-name ] bi ":" append
-            [ over name>> append ] curry { } map>assoc
+            [ over name>> append ] curry map>alist
         ] map concat
     ] [ drop f ] if ;
 
@@ -116,7 +116,7 @@ PRIVATE>
             [ name>> dup _ prepend-path ]
             [ directory? [ path-separator append ] when ]
             bi swap
-        ] { } map>assoc
+        ] map>alist
     ] with-directory-entries ;
 
 PRIVATE>

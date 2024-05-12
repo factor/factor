@@ -49,7 +49,7 @@ PRIVATE>
 
 : load-iris ( -- data-set )
     "iris.csv" load-table-csv
-    [ [ unclip-last ] { } map>assoc unzip ] [ 2 tail ] bi*
+    [ [ unclip-last ] map>alist unzip ] [ 2 tail ] bi*
     {
         "sepal length (cm)" "sepal width (cm)"
         "petal length (cm)" "petal width (cm)"
