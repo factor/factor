@@ -82,7 +82,7 @@ operations [ <linked-hash> ] initialize
 
 : operations>commands ( object translator -- pairs )
     [ object-operations ] dip modify-operations
-    [ [ operation-gesture ] keep ] { } map>assoc ;
+    [ [ operation-gesture ] keep ] map>alist ;
 
 : define-operation-map ( class group blurb object translator -- )
     operations>commands define-command-map ;

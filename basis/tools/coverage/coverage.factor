@@ -135,7 +135,7 @@ PRIVATE>
 
 : test-coverage-recursively ( prefix -- assoc )
     loaded-child-vocab-names [ coverage-vocab? ] filter
-    [ dup test-coverage ] { } map>assoc ;
+    [ dup test-coverage ] map>alist ;
 
 : %coverage ( string -- x )
     [ test-coverage values concat length ]

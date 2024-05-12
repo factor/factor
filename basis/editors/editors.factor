@@ -18,7 +18,7 @@ SYMBOL: editor-class
 
 : editor-restarts ( -- alist )
     available-editors
-    [ [ "Load " prepend ] keep ] { } map>assoc ;
+    [ [ "Load " prepend ] keep ] map>alist ;
 
 : set-editor ( string -- )
     "editors." ?head drop

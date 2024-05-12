@@ -35,7 +35,7 @@ visit-time request-rate crawl-delay unknowns ;
     split-lines
     [ [ unicode:blank? ] trim ] map
     [ "#" head? ] reject harvest
-    [ ":" split1 [ [ unicode:blank? ] trim ] bi@ [ >lower ] dip  ] { } map>assoc
+    [ ":" split1 [ [ unicode:blank? ] trim ] bi@ [ >lower ] dip  ] map>alist
     [ first "sitemap" = ] partition [ values ] dip
     [
         {

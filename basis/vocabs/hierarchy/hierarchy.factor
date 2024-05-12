@@ -85,7 +85,7 @@ PRIVATE>
     no-roots no-prefixes members ;
 
 : disk-vocabs-for-prefix ( prefix -- assoc )
-    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs) ] { } map>assoc ]
+    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs) ] map>alist ]
     [ unrooted-disk-vocabs [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 
@@ -93,7 +93,7 @@ PRIVATE>
     "" disk-vocabs-for-prefix ;
 
 : disk-vocabs-recursive-for-prefix ( prefix -- assoc )
-    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs-recursive) ] { } map>assoc ]
+    [ [ vocab-roots get ] dip '[ dup _ (disk-vocabs-recursive) ] map>alist ]
     [ unrooted-disk-vocabs-recursive [ lookup-vocab ] map! f swap 2array ]
     bi suffix ;
 

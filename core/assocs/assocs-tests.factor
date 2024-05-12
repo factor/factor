@@ -151,7 +151,7 @@ unit-test
 {
     { { 1.0 1.0 } { 2.0 2.0 } }
 } [
-    double-array{ 1.0 2.0 } [ dup ] { } map>assoc
+    double-array{ 1.0 2.0 } [ dup ] map>alist
 ] unit-test
 
 { { 3 } } [

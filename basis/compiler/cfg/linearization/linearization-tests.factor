@@ -29,7 +29,7 @@ V{ } 2 test-bb
 ] unit-test
 
 { { 0 1 2 3 4 5 } } [
-    6 <iota> [ V{ } clone over insns>block ] { } map>assoc dup
+    6 <iota> [ V{ } clone over insns>block ] map>alist dup
     {
         { 0 1 } { 0 2 } { 0 5 }
         { 2 3 }

@@ -44,7 +44,7 @@ M: mirror-slot-removal summary
 M: mirror >alist
     [ object-slots ] [ object>> ] bi '[
         [ name>> ] [ offset>> _ swap slot ] bi
-    ] { } map>assoc ;
+    ] map>alist ;
 
 M: mirror keys
     object-slots [ name>> ] map ;

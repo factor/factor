@@ -8,7 +8,7 @@ IN: sorting.extras
     sort-with [ second-unsafe ] map! ; inline
 
 : map-sort ( ... seq quot: ( ... elt -- ... key ) -- ... sortedseq )
-    [ keep ] curry { } map>assoc
+    [ keep ] curry map>alist
     [ { array } declare first-unsafe ] sort-by
     [ { array } declare second-unsafe ] map ; inline
 

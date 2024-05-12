@@ -207,7 +207,7 @@ decoded-body ;
     [
         [ [ blank? ] trim ] map " " join
         ": " split1 swap >lower
-    ] { } map>assoc
+    ] map>alist
     [
         [ pick headers>> push-at ]
         [

@@ -38,7 +38,7 @@ MEMO: ip-db ( -- seq )
     keys ;
 
 MEMO: ip-intervals ( -- interval-map )
-    ip-db [ [ [ from>> ] [ to>> ] bi 2array ] keep ] { } map>assoc
+    ip-db [ [ [ from>> ] [ to>> ] bi 2array ] keep ] map>alist
     filter-overlaps <interval-map> ;
 
 GENERIC: lookup-ip ( ip -- ip-entry )

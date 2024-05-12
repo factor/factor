@@ -36,7 +36,7 @@ M: all holidays drop (holidays) ;
 : holiday-assoc ( timestamp singleton -- assoc )
     (holidays) swap '[
         [ _ clone swap execute( timestamp -- timestamp ) ] keep
-    ] { } map>assoc ;
+    ] map>alist ;
 
 : holiday-name ( singleton word -- string/f )
     "holiday" word-prop at ;

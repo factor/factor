@@ -326,7 +326,7 @@ M: word scaffold-docs scaffold-word-docs ;
 
 : scaffold-vocab ( string -- )
     "Choose a vocabulary root:" vocab-roots get
-    '[ [ "Use " prepend ] keep ] { } map>assoc throw-restarts
+    '[ [ "Use " prepend ] keep ] map>alist throw-restarts
     swap scaffold-vocab-in ;
 
 <PRIVATE

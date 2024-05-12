@@ -23,7 +23,7 @@ IN: cuda.devices
     [ cuDeviceGetProperties cuda-error ] keepd ;
 
 : cuda-devices ( -- assoc )
-    enumerate-cuda-devices [ dup cuda-device-properties ] { } map>assoc ;
+    enumerate-cuda-devices [ dup cuda-device-properties ] map>alist ;
 
 : cuda-device-name ( n -- string )
     [ 256 [ <byte-array> ] keep ] dip

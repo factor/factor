@@ -44,7 +44,7 @@ PRIVATE>
             ] [
                 object
             ] if [ effect>string ] dip
-        ] { } map>assoc
+        ] map>alist
     ] bi@ \ $inputs \ $outputs [ prefix ] bi-curry@ bi* 2array ;
 
 M: word word-help* stack-effect effect-help ;

@@ -9,7 +9,7 @@ CONSTANT: download-url URL" https://downloads.factorcode.org/images/master/"
 
 : download-checksums ( -- alist )
     download-url "checksums.txt" >url derive-url http-get nip
-    split-lines [ " " split1 ] { } map>assoc ;
+    split-lines [ " " split1 ] map>alist ;
 
 : file-checksum ( image -- checksum )
     md5 checksum-file bytes>hex-string ;

@@ -8,7 +8,7 @@ SYMBOL: windows-messages
 
 "windows.messages" vocab-words
 [ name>> "windows-message" head? ] reject
-[ dup execute swap ] { } map>assoc
+[ dup execute swap ] map>alist
 windows-messages set-global
 
 : windows-message-name ( n -- name )
