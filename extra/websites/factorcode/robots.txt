@@ -3,3 +3,6 @@ Disallow: /bg_header.jpg
 
 User-Agent: *
 Disallow: factorcode.factor
+
+User-Agent: *
+Disallow: /gitweb.cgi
