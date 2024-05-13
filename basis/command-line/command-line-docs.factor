@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.pathnames strings system vocabs vocabs.loader ;
+USING: help.markup help.syntax io.pathnames sequences strings system vocabs vocabs.loader ;
 IN: command-line
 
 HELP: run-bootstrap-init
@@ -29,6 +29,11 @@ $nl
 HELP: command-line
 { $var-description "When Factor is run with a script, this variable contains the list of command line arguments which follow the name of the script on the command line. In deployed applications, it contains the full list of command line arguments. In all other cases it is set to " { $link f } "." }
 { $see-also vm-path } ;
+
+HELP: command-line-options
+{ $values { "args" sequence } { "args'" sequence } }
+{ $description "Used to pop off command-line arguments specified by a '" { $snippet "-" } "' (dash) prefix, setting them as string variables with optional values." } ;
+
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;

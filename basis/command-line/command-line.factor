@@ -62,6 +62,11 @@ SYMBOL: command-line
 : param ( param -- )
     "=" split1 [ var-param ] [ bool-param ] if* ;
 
+: command-line-options ( args -- args' )
+    [ dup ?first "-" ?head ] [
+        [ CHAR: - = ] trim-head param rest
+    ] while drop ;
+
 : (parse-command-line) ( args -- )
     [
         unclip "-" ?head [
