@@ -200,9 +200,9 @@ check_library_exists() {
     $ECHO -n "Checking for library $1..."
     $ECHO "int main(){return 0;}" > $GCC_TEST
     if $CC $GCC_TEST -o $GCC_OUT -l "$1" 2>&- ; then
-        $ECHO "not found."
-    else
         $ECHO "found."
+    else
+        $ECHO "not found."
     fi
     rm -f $GCC_TEST
     check_ret rm
