@@ -81,10 +81,16 @@ void factor_vm::init_factor(vm_parameters* p) {
   special_objects[OBJ_ARGS] = false_object;
   special_objects[OBJ_EMBEDDED] = false_object;
 
+#ifdef WINDOWS
+#define VALID_HANDLE(handle,mode) (_fileno (handle)==-2 ? fopen ("nul",mode) : handle)
+#else
+#define VALID_HANDLE(handle,mode) (handle)
+#endif
+
   cell aliens[][2] = {
-    {OBJ_STDIN,           (cell)stdin},
-    {OBJ_STDOUT,          (cell)stdout},
-    {OBJ_STDERR,          (cell)stderr},
+    {OBJ_STDIN,           (cell)(VALID_HANDLE (stdin ,"r"))},
+    {OBJ_STDOUT,          (cell)(VALID_HANDLE (stdout,"w"))},
+    {OBJ_STDERR,          (cell)(VALID_HANDLE (stderr,"w"))},
     {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
     {OBJ_EXECUTABLE,      (cell)safe_strdup(p->executable_path)},
     {OBJ_IMAGE,           (cell)safe_strdup(p->image_path)},
