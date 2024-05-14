@@ -240,7 +240,7 @@ TUPLE: post-data data params content-type content-encoding ;
     split-words harvest [
         "=" split1
         "\"" ?head drop "\"" ?tail drop
-    ] { } map>assoc ;
+    ] map>alist ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1

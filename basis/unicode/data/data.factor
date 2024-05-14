@@ -80,7 +80,7 @@ PRIVATE>
     "vocab:unicode/UnicodeData.txt" load-data-file ;
 
 : (process-data) ( index data -- newdata )
-    [ [ nth ] keep first swap ] with { } map>assoc
+    [ [ nth ] keep first swap ] with map>alist
     [ [ hex> ] dip ] assoc-map ;
 
 : process-data ( index data -- hash )

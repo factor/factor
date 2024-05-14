@@ -9,7 +9,7 @@ tools.memory.private tools.wc unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
-    [ dup file-info size>> ] { } map>assoc ;
+    [ dup file-info size>> ] map>alist ;
 
 : binary-file? ( path -- ? )
     binary [ 1024 read ] with-file-reader [ 0 = ] any? ;

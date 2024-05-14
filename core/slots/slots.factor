@@ -166,7 +166,7 @@ M: anonymous-union initial-value*
         { [ f over instance? ] [ drop f t ] }
         { [ 0 over instance? ] [ drop 0 t ] }
         [
-            members>> sort-classes [ initial-value ] { } map>assoc
+            members>> sort-classes [ initial-value ] map>alist
             ?last [ second t ] [ f f ] if*
         ]
     } cond ;
@@ -180,7 +180,7 @@ M: anonymous-intersection initial-value*
         { [ 0 over instance? ] [ drop 0 t ] }
         [
             [ ]
-            [ participants>> sort-classes [ initial-value ] { } map>assoc ]
+            [ participants>> sort-classes [ initial-value ] map>alist ]
             [ ] tri
 
             [ [ first2 nip ] dip instance? ] curry find swap [

@@ -10,7 +10,7 @@ IN: did-you-mean
 : did-you-mean-restarts ( possibilities -- restarts )
     sort
     [ [ [ vocabulary>> ] [ name>> ] bi "Use %s:%s" sprintf ] keep ]
-    { } map>assoc ;
+    map>alist ;
 
 : did-you-mean-restarts-with-defer ( name possibilities -- restarts )
     did-you-mean-restarts "Defer word in current vocabulary"

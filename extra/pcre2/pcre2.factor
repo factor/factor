@@ -124,7 +124,7 @@ M:: pcre2 findall ( subject obj -- matches )
             re pcre2-name-table
             re pcre2-name-entry-size
             [ rot * memory>byte-array ] [ <groups> ] bi
-            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] { } map>assoc
+            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] map>alist
             sort-keys
         ] if-zero :> name_table
 

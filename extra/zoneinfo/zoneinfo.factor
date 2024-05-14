@@ -130,7 +130,7 @@ MEMO: zoneinfo-array ( -- seq )
     zoneinfo-files concat ;
 
 MEMO: zoneinfo-assoc ( -- assoc )
-    zoneinfo-paths [ dup parse-zoneinfo-file ] { } map>assoc ;
+    zoneinfo-paths [ dup parse-zoneinfo-file ] map>alist ;
 
 : raw-rule-map ( -- assoc )
     zoneinfo-array [ raw-rule? ] filter [ name>> ] collect-by ;

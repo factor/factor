@@ -43,7 +43,7 @@ M: class union-of-builtins?
 
 : predicate-quot ( predicates -- quot )
     unclip swap
-    [ [ dup ] prepend [ drop t ] ] { } map>assoc alist>quot ;
+    [ [ dup ] prepend [ drop t ] ] map>alist alist>quot ;
 
 ! this replicates logic in classes.tuple, keep in sync
 : tuple-union-predicate-quot/1 ( tuple-classes -- quot )

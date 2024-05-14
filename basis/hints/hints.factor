@@ -35,7 +35,7 @@ M: object specializer-declaration class-of ;
     dup [ array? ] all? [ 1array ] unless [
         [ nip make-specializer ]
         [ [ specializer-declaration ] map swap '[ _ declare @ ] ] 2bi
-    ] with { } map>assoc ;
+    ] with map>alist ;
 
 : specialize-quot ( quot specializer -- quot' )
     [ drop ] [ specializer-cases ] 2bi alist>quot ;

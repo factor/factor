@@ -10,7 +10,7 @@ IN: unicode.flags.images.tests
 { { } } [
     os macosx? [
         valid-flag-names alpha-2 keys diff
-        [ dup unicode>flag ] { } map>assoc
+        [ dup unicode>flag ] map>alist
     ] [
         { }
     ] if

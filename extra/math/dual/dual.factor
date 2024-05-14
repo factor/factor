@@ -50,7 +50,7 @@ MACRO: chain-rule ( word -- e )
     [
         [
             stack-effect [ in>> ] [ out>> ] bi append
-            [ dual ] { } map>assoc { $values } prepend
+            [ dual ] map>alist { $values } prepend
         ] [
             [
                 { $description } % "Version of " ,

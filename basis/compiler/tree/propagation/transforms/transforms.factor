@@ -241,7 +241,7 @@ ERROR: bad-partial-eval quot word ;
 ] 1 define-partial-eval
 
 : member-eq-quot ( seq -- newquot )
-    [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
+    [ [ dupd eq? ] curry [ drop t ] ] map>alist
     [ drop f ] suffix [ cond ] curry ;
 
 \ member-eq? [
@@ -252,7 +252,7 @@ ERROR: bad-partial-eval quot word ;
 : member-quot ( seq -- newquot )
     dup length 4 <= [
         [ drop f ] swap
-        [ literalize [ t ] ] { } map>assoc linear-case-quot
+        [ literalize [ t ] ] map>alist linear-case-quot
     ] [
         tester
     ] if ;

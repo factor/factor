@@ -20,7 +20,7 @@ SLOT: interactor
 SLOT: history
 
 : history-list ( interactor -- alist )
-    history>> elements>> [ dup string>> ] { } map>assoc <reversed> ;
+    history>> elements>> [ dup string>> ] map>alist <reversed> ;
 
 : history-completions ( short interactor -- seq )
     history-list over empty? [ nip ] [ members completions ] if ;

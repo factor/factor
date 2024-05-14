@@ -17,7 +17,7 @@ PREDICATE: intersection-class < class
         unclip predicate-def swap [
             predicate-def [ dup ] [ not ] surround
             [ drop f ]
-        ] { } map>assoc alist>quot
+        ] map>alist alist>quot
     ] if-empty ;
 
 : define-intersection-predicate ( class -- )

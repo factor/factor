@@ -18,7 +18,7 @@ M: named-tuple set-at set-slot-named ;
 
 M: named-tuple >alist
     dup class-of all-slots
-    [ [ offset>> slot ] [ name>> ] bi swap ] with { } map>assoc ;
+    [ [ offset>> slot ] [ name>> ] bi swap ] with map>alist ;
 
 INSTANCE: named-tuple assoc
 
