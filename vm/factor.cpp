@@ -82,7 +82,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   special_objects[OBJ_EMBEDDED] = false_object;
 
 #ifdef WINDOWS
-#define VALID_HANDLE(handle,mode) (_fileno (handle)==-2 ? fopen ("nul",mode) : handle)
+#define VALID_HANDLE(handle,mode) (_fileno (handle)!=-2 ? handle : fopen ("nul",(mode)))
 #else
 #define VALID_HANDLE(handle,mode) (handle)
 #endif
