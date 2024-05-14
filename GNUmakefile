@@ -100,7 +100,8 @@ ifdef CONFIG
 		$(BUILD_DIR)/tuples.o \
 		$(BUILD_DIR)/utilities.o \
 		$(BUILD_DIR)/vm.o \
-		$(BUILD_DIR)/words.o
+		$(BUILD_DIR)/words.o \
+		$(BUILD_DIR)/zstd.o
 
 	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
@@ -154,7 +155,8 @@ ifdef CONFIG
 		vm/inline_cache.hpp \
 		vm/mvm.hpp \
 		vm/factor.hpp \
-		vm/utilities.hpp
+		vm/utilities.hpp \
+		vm/zstd.hpp vm/zstd.h
 
 	EXE_OBJS = $(PLAF_EXE_OBJS)
 
@@ -279,6 +281,9 @@ $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 
 $(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/zstd.o: vm/zstd.cpp vm/zstd.c $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<

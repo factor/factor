@@ -103,14 +103,31 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   data_heap *d = new data_heap(&nursery,
                                p->young_size, p->aging_size, p->tenured_size);
   set_data_heap(d);
-  fixnum bytes_read =
-      raw_fread((void*)data->tenured->start, 1, h->data_size, file);
 
-  if ((cell)bytes_read != h->data_size) {
+  auto uncompress = h->data_size != h->compressed_data_size;
+  auto uncompressed_data_size = uncompress ? align_page (h->data_size) : 0;
+  auto temp = uncompress && uncompressed_data_size+h->compressed_data_size > data->tenured->size;
+  auto buf = temp ? malloc (h->compressed_data_size) : (char*)data->tenured->start+uncompressed_data_size;
+  if (!buf) fatal_error ("Out of memory in load_data_heap", 0);
+
+  fixnum bytes_read =
+      raw_fread(buf, 1, h->compressed_data_size, file);
+
+  if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
-    std::cout << h->data_size << " bytes expected\n";
-    fatal_error("load_data_heap failed", 0);
+    std::cout << h->compressed_data_size << " bytes expected\n";
+    fatal_error ("load_data_heap failed", 0);
   }
+
+  if (uncompress) {
+    size_t result = lib::zstd::ZSTD_decompress ((void*)data->tenured->start, h->data_size, buf, h->compressed_data_size);
+    if (lib::zstd::ZSTD_isError (result)) {
+      std::cout << "data heap decompression: " << lib::zstd::ZSTD_getErrorName (result) << '\n';
+      fatal_error ("load_data_heap failed", 0);
+    }
+  }
+
+  if (temp) free (buf);
 
   data->tenured->initial_free_list(h->data_size);
 }
@@ -122,13 +139,29 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
   code = new code_heap(p->code_size);
 
   if (h->code_size != 0) {
+    auto uncompress = h->code_size != h->compressed_code_size;
+    auto uncompressed_code_size = uncompress ? align_page (h->code_size) : 0;
+    auto temp = uncompress && uncompressed_code_size+h->compressed_code_size > code->allocator->size;
+    auto buf = temp ? malloc (h->compressed_code_size) : (char*)code->allocator->start+uncompressed_code_size;
+    if (!buf) fatal_error ("Out of memory in load_code_heap", 0);
+
     size_t bytes_read =
-        raw_fread((void*)code->allocator->start, 1, h->code_size, file);
-    if (bytes_read != h->code_size) {
+        raw_fread(buf, 1, h->compressed_code_size, file);
+    if (bytes_read != h->compressed_code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
-      std::cout << h->code_size << " bytes expected\n";
+      std::cout << h->compressed_code_size << " bytes expected\n";
       fatal_error("load_code_heap failed", 0);
     }
+
+    if (uncompress) {
+      size_t result = lib::zstd::ZSTD_decompress ((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+      if (lib::zstd::ZSTD_isError (result)) {
+        std::cout << "code heap decompression: " << lib::zstd::ZSTD_getErrorName (result) << '\n';
+        fatal_error ("load_code_heap failed", 0);
+      }
+    }
+
+    if (temp) free (buf);
   }
 
   code->allocator->initial_free_list(h->code_size);
@@ -255,7 +288,12 @@ void factor_vm::load_image(vm_parameters* p) {
   if (h.version != image_version)
     fatal_error("Bad image: version number check failed", h.version);
 
-  if (!h.version4_escape) h.data_size=h.escaped_data_size, h.escaped_data_size=0;
+  if (!h.version4_escape) {
+    h.data_size = h.escaped_data_size;
+  } else {
+    h.compressed_data_size = h.data_size;
+    h.compressed_code_size = h.code_size;
+  }
 
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);
