@@ -43,7 +43,7 @@ jobs:
       run: build.cmd net-bootstrap
     - name: load-all
       shell: cmd
-      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'
