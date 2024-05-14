@@ -10,8 +10,8 @@ STRUCT: image-header
     { code-relocation-base cell_t }
     { code-size cell_t }
     { escaped-data-size cell_t }
-    { reserved-2 cell_t }
-    { reserved-3 cell_t }
+    { compressed-data-size cell_t initial: 0 }
+    { compressed-code-size cell_t initial: 0 }
     { reserved-4 cell_t }
     { special-objects cell_t[special-object-count] } ;
 

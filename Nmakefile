@@ -123,7 +123,11 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\tuples.obj \
 	vm\utilities.obj \
 	vm\vm.obj \
-	vm\words.obj
+	vm\words.obj \
+	vm\zstd.obj
+
+vm\zstd.obj: vm\zstd.cpp vm\zstd.hpp vm\zstd.c vm\zstd.h vm\master.hpp
+	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c vm\zstd.cpp
 
 # batch mode has ::
 .cpp.obj::
