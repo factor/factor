@@ -4,9 +4,9 @@ USING: byte-arrays help.markup help.syntax strings ;
 FROM: tools.image-analyzer.vm => image-header ;
 IN: tools.image-compressor
 
-ARTICLE: "binary.image.factor.compressor" "Compress Factor image file for loading by the VM"
-"The " { $vocab-link "binary.image.factor.compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their image headers." $nl
-"You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=binary.image.factor.compressor" } ;
+ARTICLE: "tools.image-compressor" "Compress Factor image file for loading by the VM"
+"The " { $vocab-link "tools.image-compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their image headers." $nl
+"You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=tools.image-compressor" } ;
 
 HELP: image
 { $class-description "In-memory Factor image" } ;
@@ -93,4 +93,4 @@ HELP: compress-current-image
 { $description "Load, compresses and saves current Factor image with \".compressed\" appended to its filename" }
 ;
 
-ABOUT: "binary.image.factor.compressor"
+ABOUT: "tools.image-compressor"
