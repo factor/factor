@@ -226,10 +226,7 @@ M: windows wait-for-fd
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
-M: windows init-stdio
-    console-app?
-    [ init-c-stdio ]
-    [ null-reader null-writer null-writer set-stdio ] if ;
+M: windows init-stdio init-c-stdio ;
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
