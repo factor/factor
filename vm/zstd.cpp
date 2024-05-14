@@ -8,6 +8,12 @@
 
 #include "master.hpp"
 
+// zstd.c is generated from github.com/facebook/zstd.git using
+// $ cd build/single_file_libs
+// $ python combine.py -r ../../lib -o zstd.c zstd-in.c
+
 namespace lib { namespace zstd { extern "C" {
+// update the following line if zstd.c is updated
+// origin : git SHA1: 794ea1b0 tag: v1.5.6
 #include "zstd.c"
 } } }
