@@ -9,8 +9,9 @@
 #include "master.hpp"
 
 // zstd.c is generated from github.com/facebook/zstd.git using
-// $ cd build/single_file_libs
+// $ cd zstd/build/single_file_libs
 // $ python combine.py -r ../../lib -o zstd.c zstd-in.c
+// $ cp zstd.c ../../../factor/vm/zstd.c
 
 namespace lib { namespace zstd { extern "C" {
 // update the following line if zstd.c is updated
