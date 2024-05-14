@@ -555,7 +555,6 @@ $nl
     sunset
     solar-noon
 }
-$nl
 "Metadata about the calendar:"
 { $subsections "calendar-facts" } ;
 
