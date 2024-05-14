@@ -6,7 +6,7 @@ USING: accessors byte-arrays classes.struct compression.zstd io
 io.encodings.binary io.files kernel kernel.private locals math
 namespaces sequences system tools.image-analyzer
 tools.image-analyzer.vm vm ;
-IN: binary.image.factor.compressor
+IN: tools.image-compressor
 
 TUPLE: image
   { header image-header }
