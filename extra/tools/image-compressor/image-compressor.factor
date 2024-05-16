@@ -55,5 +55,5 @@ SYMBOL: compression-level
   [ load-factor-image compress-image ] dip save-factor-image
 ;
 
-: compress-current-image ( -- ) image-path dup ".compressed" append compress-factor-image ;
+: compress-current-image ( -- ) image-path dup compress-factor-image ;
 MAIN: compress-current-image

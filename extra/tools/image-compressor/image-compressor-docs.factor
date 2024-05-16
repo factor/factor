@@ -90,7 +90,7 @@ HELP: sync-header
 ;
 
 HELP: compress-current-image
-{ $description "Load, compresses and saves current Factor image with \".compressed\" appended to its filename" }
+{ $description "Loads, compresses and saves current Factor image" }
 ;
 
 ABOUT: "tools.image-compressor"
