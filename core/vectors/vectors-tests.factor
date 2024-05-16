@@ -96,3 +96,7 @@ namespaces random sequences tools.test vectors ;
 { fixnum } [ 1 >bignum <iota> [ ] V{ } map-as length class-of ] unit-test
 
 { V{ "lulz" } } [ "lulz" 1vector ] unit-test
+
+{ V{ "foo" } } [ "foo" V{ } ?push ] unit-test
+{ V{ 1 "foo" } } [ "foo" V{ 1 } ?push ] unit-test
+{ V{ "foo" } } [ "foo" f ?push ] unit-test
