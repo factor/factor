@@ -318,9 +318,9 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   h.magic = image_magic;
   h.version = image_version;
   h.data_relocation_base = data->tenured->start;
-  h.data_size = data->tenured->occupied_space();
+  h.compressed_data_size = h.escaped_data_size = data->tenured->occupied_space();
   h.code_relocation_base = code->allocator->start;
-  h.code_size = code->allocator->occupied_space();
+  h.compressed_code_size = h.code_size = code->allocator->occupied_space();
 
   for (cell i = 0; i < special_object_count; i++)
     h.special_objects[i] =
@@ -331,8 +331,8 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     return false;
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
     return false;
-  if (h.data_size > 0 &&
-      safe_fwrite((void*)data->tenured->start, h.data_size, 1, file) != 1)
+  if (h.escaped_data_size > 0 &&
+      safe_fwrite((void*)data->tenured->start, h.escaped_data_size, 1, file) != 1)
     return false;
   if (h.code_size > 0 &&
       safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
