@@ -196,3 +196,6 @@ forget-junk
 
 [ os unix? "windows" "unix" ? require ]
 [ error>> unsupported-platform? ] must-fail-with
+
+{ t } [ "kernel" vocab-exists? >boolean ] unit-test
+{ f } [ "foobar" vocab-exists? ] unit-test
