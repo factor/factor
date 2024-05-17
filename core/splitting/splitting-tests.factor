@@ -1,4 +1,5 @@
-USING: ascii kernel math sequences splitting strings tools.test ;
+USING: ascii kernel math sequences splitting strings tools.test
+arrays ;
 
 { "hello" "world ." } [ "hello world ." " " split1 ] unit-test
 { "hello" "world-+." } [ "hello-+world-+." "-+" split1 ] unit-test
@@ -122,4 +123,9 @@ unit-test
 
 { { "" "This" } } [
     "This" { 0 } split-indices
+] unit-test
+
+{ { { } { "c" "d" } { } { "e" } { } } } [
+    { "a" "c" "d" "b" "a" "e" "b" } { "a" "b" }
+    split-slice [ >array ] map
 ] unit-test
