@@ -3,7 +3,7 @@
 
 USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint ;
+peg.ebnf prettyprint sequences ;
 
 IN: brainfuck
 
