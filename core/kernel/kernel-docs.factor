@@ -953,6 +953,10 @@ HELP: compose
     "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
+HELP: compose-all
+{ $values { "seq" sequence } { "quot" quotation } }
+{ $description "Returns a quotation made from " { $link compose } " called on each element of the sequence." } ;
+
 HELP: prepose
 { $values { "quot1" callable } { "quot2" callable } { "composed" composed } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
