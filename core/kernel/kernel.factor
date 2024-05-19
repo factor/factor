@@ -1,5 +1,3 @@
-IN: sequences
-DEFER: reduce ! for compose-all
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USE: slots.private
@@ -259,9 +257,6 @@ DEFER: if
 
 : prepose ( quot1 quot2 -- composed )
     swap compose ; inline
-
-: compose-all ( seq -- quot )
-    [ ] [ compose ] reduce ; inline
 
 ! Curried cleavers
 <PRIVATE

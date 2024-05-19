@@ -216,6 +216,3 @@ IN: kernel.tests
 
 { 10 } [ 5 [ 2 * ] ?call ] unit-test
 { f } [ f [ 2 * ] ?call ] unit-test
-
-{ [ ] } [ { } compose-all ] unit-test
-{ [ 1 + 2 - ] } [ { [ 1 + ] [ 2 - ] } compose-all ] unit-test

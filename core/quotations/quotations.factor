@@ -80,3 +80,6 @@ M: composed virtual@
     ] if ;
 
 INSTANCE: composed virtual-sequence
+
+: compose-all ( seq -- quot )
+    [ ] [ compose ] reduce ; inline

@@ -76,3 +76,7 @@ HELP: literalize
 } ;
 
 { literalize curry <wrapper> POSTPONE: \ POSTPONE: W{ } related-words
+
+HELP: compose-all
+{ $values { "seq" sequence } { "quot" quotation } }
+{ $description "Returns a quotation made from " { $link compose } " called on each element of the sequence." } ;
