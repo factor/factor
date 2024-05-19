@@ -530,8 +530,7 @@ invoke_make() {
 }
 
 make_clean() {
-    echo invoke_make clean BUILD_DIR="build-$MAKE_TARGET"
-    invoke_make clean BUILD_DIR="build-$MAKE_TARGET"
+    invoke_make clean
 }
 
 make_factor() {
