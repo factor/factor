@@ -20,9 +20,6 @@ PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
 : format-float ( n fill width precision format locale -- string )
     [ pad-null ] 4dip [ pad-null ] bi@ (format-float) >string ; inline
 
-: compose-all ( seq -- quot )
-    [ ] [ compose ] reduce ; inline
-
 : fix-sign ( string -- string )
     dup first CHAR: 0 = [
         dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
