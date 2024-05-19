@@ -3,7 +3,7 @@
 
 USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint sequences ;
+peg.ebnf prettyprint ;
 
 IN: brainfuck
 
@@ -42,9 +42,6 @@ TUPLE: brainfuck pointer memory ;
     dup
     [ "ptr=" write pointer>> pprint ]
     [ ",mem=" write memory>> pprint nl ] bi ;
-
-: compose-all ( seq -- quot )
-    [ ] [ compose ] reduce ;
 
 EBNF: parse-brainfuck [=[
 
