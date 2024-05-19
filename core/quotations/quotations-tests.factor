@@ -26,3 +26,6 @@ IN: quotations
     999 0 rot set-nth
     trouble nip call
 ] unit-test
+
+{ [ ] } [ { } compose-all ] unit-test
+{ [ 1 + 2 - ] } [ { [ 1 + ] [ 2 - ] } compose-all ] unit-test
