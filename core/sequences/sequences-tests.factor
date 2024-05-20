@@ -467,3 +467,17 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 { "ollo" }
 [ { CHAR: l CHAR: l } "o" "" 1surround-as ] unit-test
+
+{ V{ 1 } } [ V{ } [ 1 swap push ] keep ] unit-test
+{ V{ 1 2 } } [ V{ 1 } [ 2 swap push ] keep ] unit-test
+
+{ V{ } } [ V{ } dup '[ f [ ] _ push-when ] call ] unit-test
+{ V{ t } } [ V{ } dup '[ t [ ] _ push-when ] call ] unit-test
+
+{ V{ 1 t } V{ 2 } } [
+    V{ 1 } V{ 2 } 2dup '[ t [ ] _ _ push-either ] call
+] unit-test
+
+{ V{ 1 } V{ 2 f } } [
+    V{ 1 } V{ 2 } 2dup '[ f [ ] _ _ push-either ] call
+] unit-test
