@@ -9,3 +9,7 @@ USING: checksums checksums.crc32 kernel tools.test ;
     [ [ swap add-checksum-file get-checksum ] with-checksum-state ]
     [ checksum-file ] 2bi =
 ] unit-test
+
+{ B{ 24 87 42 151 } } [
+    { "a" "b" } crc32 checksum-lines
+] unit-test
