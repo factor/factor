@@ -345,3 +345,23 @@ unit-test
 { H{ { 1 4 } } } [ H{ { 1 2 } } 1 over [ sq ] ?change-at ] unit-test
 { H{ { 1 2 } } } [ H{ { 1 2 } } 2 over [ sq ] ?change-at ] unit-test
 { H{ { 1 3 } } } [ H{ { 1 2 } } 3 1 pick [ drop dup ] ?change-at drop ] unit-test
+
+{ H{ } 4 t } [ H{ { 1 4 } } 1 over delete-at* ] unit-test
+{ H{ { 1 4 } } f f } [ H{ { 1 4 } } 3 over delete-at* ] unit-test
+
+{ H{ } 4 t } [ H{ { 1 4 } } 1 over ?delete-at ] unit-test
+{ H{ { 1 4 } } 3 f } [ H{ { 1 4 } } 3 over ?delete-at ] unit-test
+
+{ t } [ H{ } assoc-empty? ] unit-test
+{ f } [ H{ { 1 2 } } assoc-empty? ] unit-test
+
+{ t } [ H{ { 1 2 } } H{ { 1 2 } } assoc= ] unit-test
+{ f } [ H{ { 1 2 } } { } assoc= ] unit-test
+{ t } [ H{ { 1 2 } } { { 1 2 } } assoc= ] unit-test
+
+{ f f f } [ { } [ "impossible" ] assoc-find ] unit-test
+{ 1 0 t } [ { { 1 0 } { 4 5 } } [ > ] assoc-find ] unit-test
+
+{ { 1 2 } } [ { 1 2 } H{ } substitute ] unit-test
+{ { 5 2 10 } } [ { 1 2 3 } H{ { 1 5 } { 3 10 } } substitute ] unit-test
+{ { 2 3 3 } } [ { 1 2 3 } H{ { 1 2 } { 2 3 } } substitute ] unit-test
