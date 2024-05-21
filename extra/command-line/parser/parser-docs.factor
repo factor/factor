@@ -1,6 +1,6 @@
 
 USING: classes command-line command-line.parser help.markup
-help.syntax ;
+help.syntax math ;
 
 IN: command-line.parser
 
@@ -22,9 +22,15 @@ Some variables control certain aspects of the parsing:
     { { $link default-help? } { "A boolean value controlling if a " { $snippet "--help" } " option is added." } }
     { { $link allow-abbrev? } { "A boolean value controlling if abbreviations are allowed for options." } }
     { { $link program-name } { "An optional program name, or it will be inferred from the script or launched binary name." } }
-    { { $link help-prolog } { "Some text to include in the help display before the options." } }
-    { { $link help-epilog } { "Some text to include in the help display after the options." } }
+    { { $link program-prolog } { "Some text to include in the help display before the options." } }
+    { { $link program-epilog } { "Some text to include in the help display after the options." } }
 }
+
+In the case that you want to pass an option lookalike as a positional argument,
+for example { $snippet "--foo" } then you can pass it after { $snippet "--" }
+to indicate that the remaining arguments should be interpreted as positional
+arguments.
+
 ;
 
 HELP: option
@@ -40,6 +46,7 @@ HELP: option
         { "const" "A constant value to be used if the argument is specified." }
         { "required?" "A flag to indicate this option is required." }
         { "meta" "A meta variable name used to display." }
+        { "#args" { "The number of arguments to parse specified as an " { $link integer } ", " { $snippet "\"*\"" } " (zero or more), " { $snippet  "\"+\"" } " (one or more), or " { $snippet "\"?\"" } " (optionally one) argument." } }
     }
 } ;
 

@@ -26,9 +26,7 @@ IN: command-line.parser.tests
 
 {
     {
-        H{ { "sum" maximum } }
         H{ { "sum" maximum } { "integers" { 1 } } }
-        H{ { "sum" sum } }
         H{ { "sum" sum } { "integers" { 1 2 3 } } }
     }
 } [
@@ -41,11 +39,10 @@ IN: command-line.parser.tests
         T{ option
             { name "integers" }
             { type integer }
+            { #args "+" }
         }
     } {
-        { }
         { "1" }
-        { "--sum" }
         { "--sum" "1" "2" "3" }
     } [ (parse-options) ] with map
 ] unit-test
@@ -149,4 +146,70 @@ IN: command-line.parser.tests
             } [ ] with-options
         ] with-variables
     ] with-string-writer
+] unit-test
+
+{
+    {
+        H{ { "bar" "XX" } { "foo" "YY" } }
+        H{ { "bar" "XX" } { "foo" "c" } }
+        H{ { "bar" "d" } { "foo" "d" } }
+    }
+} [
+    {
+        T{ option { name "--foo" } { #args "?" } { const "c" } { default "d" } }
+        T{ option { name "bar" } { #args "?" } { default "d" } }
+    } {
+        { "XX" "--foo" "YY" }
+        { "XX" "--foo" }
+        { }
+    } [ (parse-options) ] with map
+] unit-test
+
+{
+    H{
+        { "foo" { "x" "y" } }
+        { "bar" { "1" "2" } }
+        { "baz" { "a" "b" } }
+    }
+} [
+    {
+        T{ option { name "--foo" } { #args "*" } }
+        T{ option { name "--bar" } { #args "*" } }
+        T{ option { name "baz" } { #args "*" } }
+    } { "a" "b" "--foo" "x" "y" "--bar" "1" "2" }
+    (parse-options)
+] unit-test
+
+{ H{ { "foo" { "a" "b" } } } } [
+    { T{ option { name "foo" } { #args "+" } } }
+    { "a" "b" } (parse-options)
+] unit-test
+
+[
+    { T{ option { name "foo" } { #args "+" } } }
+    { } (parse-options)
+] [ required-options? ] must-fail-with
+
+[
+    {
+        T{ option { name "-n" } { #args "+" } }
+        T{ option { name "args" } { #args "*" } }
+    } { "-f" } (parse-options)
+] [ unknown-option? ] must-fail-with
+
+{
+    {
+        H{ { "args" { "-f" } } }
+        H{ { "n" { "1" "2" "3" } } }
+        H{ { "n" { "1" } } { "args" { "2" "3" } } }
+    }
+} [
+    {
+        T{ option { name "-n" } { #args "+" } }
+        T{ option { name "args" } { #args "*" } }
+    } {
+        { "--" "-f" }
+        { "-n" "1" "2" "3" }
+        { "-n" "1" "--" "2" "3" }
+    } [ (parse-options) ] with map
 ] unit-test
