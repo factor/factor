@@ -66,8 +66,8 @@ M: unknown-option error.
 ERROR: ambiguous-option < option-error arg options ;
 
 M: ambiguous-option error.
-    "The argument ``" write dup arg>> write
-    "'' resolves to more than one option (" write
+    "The option ``" write dup arg>> write
+    "'' matches more than one (" write
     options>> [ ", " write ] [ option-name write ] interleave
     ")" print ;
 
