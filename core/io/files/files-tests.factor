@@ -303,3 +303,26 @@ CONSTANT: pt-array-1
 ] unit-test
 
 { f } [ f file-exists? ] unit-test
+
+{ } [
+    "should-never-exist" [ drop t ] when-file-exists
+] unit-test
+
+{ t } [
+    [ [ drop t ] when-file-exists ] with-test-file
+] unit-test
+
+{ t } [
+    "should-never-exist" [ drop t ] unless-file-exists
+] unit-test
+
+{ } [
+    [ [ drop t ] unless-file-exists ] with-test-file
+] unit-test
+
+: ife-bool ( path -- bool )
+    [ drop t ] [ drop f ] if-file-exists ;
+
+{ t } [ [ ife-bool ] with-test-file ] unit-test
+
+{ f } [ "should-never-exist" ife-bool ] unit-test
