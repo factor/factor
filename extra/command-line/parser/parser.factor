@@ -36,10 +36,18 @@ TUPLE: option name type help variable default convert validate
         [ variable>> dup string? [ name>> ] unless ]
     } 1|| ;
 
+:: option-#args ( option -- #args )
+    option #args>> [ option const>> 1 xor ] unless* ;
+
 : option-meta ( option -- meta/f )
-    dup const>> [ drop f ] [
-        { [ meta>> ] [ option-name ] } 1|| >upper
-    ] if ;
+    dup option-#args [
+        [ { [ meta>> ] [ option-name ] } 1|| >upper ] dip {
+            { "+" [ dup "%s [%s ...]" sprintf ] }
+            { "*" [ "[%s ...]" sprintf ] }
+            { "?" [ "[%s]" sprintf ] }
+            [ swap <repetition> " " join ]
+        } case
+    ] [ drop f ] if* ;
 
 : option-variable ( option -- variable )
     { [ variable>> ] [ name>> [ CHAR: - = ] trim-head ] } 1|| ;
@@ -137,7 +145,7 @@ M: class argvalid? instance? ;
     [ dupd argvalid? [ option arg invalid-value ] unless ] when* ;
 
 :: option-value ( args option -- args' value )
-    args option #args>> [ option const>> 1 xor ] unless* {
+    args option option-#args {
         { "+" [
             [ option expected-arguments ]
             [ f swap [ option option-convert ] map ]
