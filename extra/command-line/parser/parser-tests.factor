@@ -6,10 +6,8 @@ math.parser namespaces sequences tools.test ;
 IN: command-line.parser.tests
 
 [
-    { } command-line [
-        { T{ option { name "--foo" } { required? t } } }
-        [ drop ] (with-options)
-    ] with-variable
+    { T{ option { name "--foo" } { required? t } } }
+    { } (parse-options)
 ] [ required-options? ] must-fail-with
 
 [
@@ -49,7 +47,7 @@ IN: command-line.parser.tests
         { "1" }
         { "--sum" }
         { "--sum" "1" "2" "3" }
-    } [ command-line [ [ ] (with-options) ] with-variable ] with map
+    } [ (parse-options) ] with map
 ] unit-test
 
 [
@@ -76,7 +74,7 @@ IN: command-line.parser.tests
         { }
         { "--foo" }
         { "--no-foo" }
-    } [ command-line [ [ ] (with-options) ] with-variable ] with map
+    } [ (parse-options) ] with map
 ] unit-test
 
 {
@@ -95,7 +93,7 @@ IN: command-line.parser.tests
     } {
         { }
         { "--port" "4567" }
-    } [ command-line [ [ ] (with-options) ] with-variable ] with map
+    } [ (parse-options) ] with map
 ] unit-test
 
 [
@@ -148,7 +146,7 @@ IN: command-line.parser.tests
                     { const "12" }
                     { required? t }
                 }
-            } [ 2drop ] with-options
+            } [ ] with-options
         ] with-variables
     ] with-string-writer
 ] unit-test

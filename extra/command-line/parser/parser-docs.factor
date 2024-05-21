@@ -9,11 +9,12 @@ The { $vocab-link "command-line.parser" } vocabulary can be used to parse
 { $link command-line } arguments.
 
 A sequence of { $link option } instances is used to control how the arguments
-are parsed. This sequence is typically passed to the following words from a
-command-line program:
+are parsed and is typically passed to the following words from a command-line
+program:
 { $subsections
     with-options
-    (with-options)
+    parse-options
+    (parse-options)
 }
 
 Some variables control certain aspects of the parsing:
