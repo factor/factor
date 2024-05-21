@@ -52,3 +52,6 @@ IN: concurrency.mailboxes.tests
 [
     <mailbox> 1 seconds mailbox-get-timeout
 ] [ timed-out-error? ] must-fail-with
+
+{ t } [ <mailbox> mailbox-empty? ] unit-test
+{ f } [ <mailbox> "foo" over mailbox-put mailbox-empty? ] unit-test
