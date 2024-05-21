@@ -193,11 +193,11 @@ CONSTANT: HELP T{ option
 }
 
 : print-help ( options -- )
-    "Usage:" print print-program-name nl
-    help-prolog get [ nl print nl ] unless-empty
+    "Usage:" print print-program-name
+    help-prolog get [ nl print ] unless-empty
     [ positional? ] partition
-    [ [ "Arguments:" print print-options nl ] unless-empty ]
-    [ [ "Options:" print print-options nl ] unless-empty ] bi*
+    [ [ nl "Arguments:" print print-options ] unless-empty ]
+    [ [ nl "Options:" print print-options ] unless-empty ] bi*
     help-epilog get [ nl print ] unless-empty ;
 
 ERROR: usage-error < option-error options ;
