@@ -104,3 +104,59 @@ IN: command-line.parser.tests
         }
     } { "--port" "food" } (parse-options)
 ] [ invalid-value? ] must-fail-with
+
+{
+    "\
+Usage:
+    program [options] [arguments]
+
+Options:
+    --help                 show this help and exit
+    --host HOST            set the hostname (default: 127.0.0.1)
+    --port PORT            set the port (default: 61613)
+    --username USERNAME    set the username
+    --password PASSWORD    set the password
+    --foo                  (default: 10)
+    --bar                  
+"
+} [
+    [
+        H{
+            { command-line { "--help" } }
+            { program-name "program" }
+        } [
+            {
+                T{ option
+                    { name "host" }
+                    { help "set the hostname" }
+                    { default "127.0.0.1" }
+                }
+                T{ option
+                    { name "port" }
+                    { type integer }
+                    { help "set the port" }
+                    { default 61613 }
+                }
+                T{ option
+                    { name "username" }
+                    { help "set the username" }
+                }
+                T{ option
+                    { name "password" }
+                    { help "set the password" }
+                }
+                T{ option
+                    { name "foo" }
+                    { default 10 }
+                    { const 12.34 }
+                    { required? t }
+                }
+                T{ option
+                    { name "bar" }
+                    { const "12" }
+                    { required? t }
+                }
+            } [ 2drop ] with-options
+        ] with-variables
+    ] with-string-writer
+] unit-test

@@ -16,6 +16,9 @@ INITIALIZED-SYMBOL: default-help? [ t ]
 ! allow unambiguous abbreviations of options
 INITIALIZED-SYMBOL: allow-abbrev? [ t ]
 
+! the optional name of the program, or inferred
+SYMBOL: program-name
+
 ! printed before the help options
 SYMBOL: help-prolog
 
@@ -125,14 +128,15 @@ M: class argvalid? instance? ;
         [ dupd argvalid? [ option arg invalid-value ] unless ] when*
     ] unless* ;
 
-: program-name ( -- name )
+: get-program-name ( -- name )
     {
+        [ program-name get ]
         [ "run" get [ "factor -run=" prepend ] [ f ] if* ]
         [ (command-line) first file-name ]
     } 0|| ;
 
 : print-program-name ( -- )
-    program-name "    " write write " [options] [arguments]" print ;
+    get-program-name "    " write write " [options] [arguments]" print ;
 
 : option-argument ( option -- argument )
     [ option-name "--" prepend ]
@@ -142,7 +146,7 @@ M: class argvalid? instance? ;
     [ bl ] [ option-argument "[" "]" surround write ] interleave ;
 
 : print-short-usage ( options -- )
-    program-name write bl print-arguments nl ;
+    get-program-name write bl print-arguments nl ;
 
 : option-description ( option -- description )
     [ help>> ]
