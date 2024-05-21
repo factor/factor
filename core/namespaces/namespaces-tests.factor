@@ -38,3 +38,29 @@ SYMBOL: toggle-test
 
 { t } [ [ test-initialize get-global ] { at* set-at } inlined? ] unit-test
 { t } [ [ test-initialize set-global ] { at* set-at } inlined? ] unit-test
+
+{ t } [
+    f toggle-test set
+    toggle-test [ not ] change
+    toggle-test get
+] unit-test
+
+SYMBOL: test-counter
+
+{ 1 } [
+    0 test-counter set
+    test-counter inc
+    test-counter get
+] unit-test
+
+{ 0 } [
+    1 test-counter set
+    test-counter dec
+    test-counter get
+] unit-test
+
+{ 5 } [
+    3 test-counter set
+    2 test-counter +@
+    test-counter get
+] unit-test
