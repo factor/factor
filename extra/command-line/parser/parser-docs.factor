@@ -1,5 +1,6 @@
 
-USING: command-line.parser help.markup help.syntax ;
+USING: classes command-line command-line.parser help.markup
+help.syntax ;
 
 IN: command-line.parser
 
@@ -10,10 +11,18 @@ The { $vocab-link "command-line.parser" } vocabulary can be used to parse
 A sequence of { $link option } instances is used to control how the arguments
 are parsed. This sequence is typically passed to the following words from a
 command-line program:
-
 { $subsections
     with-options
     (with-options)
+}
+
+Some variables control certain aspects of the parsing:
+{ $table
+    { { $link default-help? } { "A boolean value controlling if a " { $snippet "--help" } " option is added." } }
+    { { $link allow-abbrev? } { "A boolean value controlling if abbreviations are allowed for options." } }
+    { { $link program-name } { "An optional program name, or it will be inferred from the script or launched binary name." } }
+    { { $link help-prolog } { "Some text to include in the help display before the options." } }
+    { { $link help-epilog } { "Some text to include in the help display after the options." } }
 }
 ;
 
