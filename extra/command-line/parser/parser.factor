@@ -170,7 +170,12 @@ M: class argvalid? instance? ;
 : get-program-name ( -- name )
     {
         [ program-name get ]
-        [ "run" get [ "factor -run=" prepend ] [ f ] if* ]
+        [
+            "run" get [
+                dup "tools.deploy.shaker" =
+                [ drop f ] [ "factor -run=" prepend ] if
+            ] [ f ] if*
+        ]
         [ (command-line) first file-name ]
     } 0|| ;
 
