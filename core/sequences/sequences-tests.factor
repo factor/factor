@@ -161,6 +161,10 @@ IN: sequences.tests
 
 { "xx" } [ "blahxx" 2 tail* ] unit-test
 
+{ "foo" "bar" } [ "foobar" 3 cut* ] unit-test
+{ "foobar" "" } [ "foobar" 0 cut* ] unit-test
+{ "" "foobar" } [ "foobar" dup length cut* ] unit-test
+
 { t } [ "xxfoo" 2 head-slice "xxbar" 2 head-slice = ] unit-test
 { t } [ "xxfoo" 2 head-slice "xxbar" 2 head-slice [ hashcode ] same? ] unit-test
 
