@@ -148,6 +148,13 @@ IN: command-line.parser.tests
     ] with-string-writer
 ] unit-test
 
+{ H{ { "foo" { "a" "b" } } { "bar" "c" } } } [
+    {
+        T{ option { name "--foo" } { #args 2 } }
+        T{ option { name "bar" } { #args 1 } }
+    } { "c" "--foo" "a" "b" } (parse-options)
+] unit-test
+
 {
     {
         H{ { "bar" "XX" } { "foo" "YY" } }
