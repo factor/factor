@@ -20,13 +20,13 @@ INITIALIZED-SYMBOL: allow-abbrev? [ t ]
 SYMBOL: program-name
 
 ! printed before the help options
-SYMBOL: help-prolog
+SYMBOL: program-prolog
 
 ! printed after the help options
-SYMBOL: help-epilog
+SYMBOL: program-epilog
 
 TUPLE: option name type help variable default convert validate
-    const required? meta ;
+    const required? meta #args ;
 
 <PRIVATE
 
@@ -129,25 +129,35 @@ M: quotation argvalid? call( val -- ? ) ;
 
 M: class argvalid? instance? ;
 
+:: option-convert ( arg option -- value )
+    arg [ option expected-arguments ] unless*
+    option { [ convert>> ] [ type>> ] } 1||
+    [ argconvert ] when*
+    option { [ validate>> ] [ type>> ] } 1||
+    [ dupd argvalid? [ option arg invalid-value ] unless ] when* ;
+
 :: option-value ( args option -- args' value )
-    args option const>> [
-        option positional? [
-            f swap [| arg |
-                arg [ option expected-arguments ] unless*
-                option { [ convert>> ] [ type>> ] } 1||
-                [ argconvert ] when*
-                option { [ validate>> ] [ type>> ] } 1||
-                [ dupd argvalid? [ option arg invalid-value ] unless ] when*
-            ] map
-        ] [
-            ?unclip :> arg
-            arg [ option expected-arguments ] unless*
-            option { [ convert>> ] [ type>> ] } 1||
-            [ argconvert ] when*
-            option { [ validate>> ] [ type>> ] } 1||
-            [ dupd argvalid? [ option arg invalid-value ] unless ] when*
-        ] if
-    ] unless* ;
+    args option #args>> [ option const>> 1 xor ] unless* {
+        { "+" [
+            [ option expected-arguments ]
+            [ f swap [ option option-convert ] map ]
+            if-empty ] }
+        { "*" [ f swap [ option option-convert ] map ] }
+        { "?" [ ?unclip [ option option-convert ] [ option const>> ] if* ] }
+        [
+            [
+                2dup 1 - swap bounds-check? [
+                    dup 1 = [
+                        drop unclip option option-convert
+                    ] [
+                        cut swap [ option option-convert ] map
+                    ] if
+                ] [
+                    drop option expected-arguments
+                ] if
+            ] [ option const>> ] if*
+        ]
+    } case ;
 
 : get-program-name ( -- name )
     {
@@ -194,11 +204,11 @@ CONSTANT: HELP T{ option
 
 : print-help ( options -- )
     "Usage:" print print-program-name
-    help-prolog get [ nl print ] unless-empty
+    program-prolog get [ nl print ] unless-empty
     [ positional? ] partition
     [ [ nl "Arguments:" print print-options ] unless-empty ]
     [ [ nl "Options:" print print-options ] unless-empty ] bi*
-    help-epilog get [ nl print ] unless-empty ;
+    program-epilog get [ nl print ] unless-empty ;
 
 ERROR: usage-error < option-error options ;
 
@@ -229,18 +239,29 @@ M: usage-error error. options>> print-help ;
 : parse-positional ( option command-line -- command-line' )
     swap [ option-value ] [ option-variable set ] bi ;
 
-: parse-arguments ( options command-line -- )
-    [ [ optional? ] partition ] dip [
-        dup first "-" head? [
-            overd parse-optional
-        ] [
-            over empty? [
-                unrecognized-arguments
+: (parse-arguments) ( optional positional command-line -- positional' )
+    [
+        pick empty? [ f ] [
+            1 over [ "-" head? ] find-from drop
+            [ cut ] [ f ] if*
+        ] if [
+            pick empty? [ f ] [ dup first "-" head? ] if [
+                overd parse-optional
             ] [
-                [ unclip ] dip parse-positional
+                over empty? [
+                    unrecognized-arguments
+                ] [
+                    [ unclip ] dip parse-positional
+                ] if
             ] if
-        ] if
-    ] until-empty 2drop ;
+        ] dip append
+    ] until-empty nip ;
+
+: parse-arguments ( options command-line -- )
+    [ [ optional? ] partition ] dip { "--" } split1
+    [ (parse-arguments) f swap ] dip (parse-arguments)
+    [ #args>> { "*" "?" } member? ] reject
+    [ required-options ] unless-empty ;
 
 PRIVATE>
 
