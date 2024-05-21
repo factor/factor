@@ -1,9 +1,9 @@
 ! Copyright (C) 2024 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: command-line.parser command-loop concurrency.mailboxes io
-io.encodings.utf8 io.sockets kernel literals math namespaces
-prettyprint random sequences splitting stomp threads unicode ;
+USING: command-line.parser command-loop concurrency.mailboxes
+formatting io io.encodings.utf8 io.sockets kernel literals math
+namespaces prettyprint sequences splitting stomp unicode ;
 
 IN: stomp.cli
 
@@ -66,8 +66,9 @@ CONSTANT: OPTIONS {
     T{ option
         { name "--host" }
         { help "set the hostname" }
+        { type ipv4 }
         { variable stomp-host }
-        { default "127.0.0.1" }
+        { default T{ ipv4 f "127.0.0.1" } }
     }
     T{ option
         { name "--port" }
@@ -88,17 +89,15 @@ CONSTANT: OPTIONS {
     }
 }
 
-! XXX: wait for connected to start before run-command-loop
 ! XXX: when disconnected, exit with a message
 ! XXX: print incoming and outgoing messages nicely
 
 : start-stomp-client ( -- )
-    [
-        stomp-host get resolve-host [ ipv4? ] filter random
-        stomp-port get with-port utf8 [
-            stomp-mailbox [ [ nl . flush ] with-global ] stomp-loop
-        ] with-client
-    ] in-thread ;
+    stomp-host get stomp-port get with-port
+    [ dup "Connecting to %s...\n" printf flush ] with-global
+    utf8 [
+        stomp-mailbox [ [ nl . flush ] with-global ] stomp-loop
+    ] spawn-client ;
 
 : stomp-main ( -- )
     OPTIONS [
