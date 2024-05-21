@@ -3,10 +3,10 @@
 
 USING: accessors arrays assocs classes combinators
 combinators.short-circuit command-line continuations debugger
-formatting io io.pathnames io.sockets kernel lexer math
-math.parser namespaces parser quotations random sequences
-sequences.extras splitting strings strings.tables.private
-tools.completion unicode vocabs.parser ;
+formatting generic.math io io.pathnames io.sockets kernel lexer
+math math.parser namespaces parser prettyprint quotations random
+sequences sequences.extras splitting strings
+strings.tables.private tools.completion unicode vocabs.parser ;
 
 IN: command-line.parser
 
@@ -31,7 +31,10 @@ TUPLE: option name type help variable default convert validate
 <PRIVATE
 
 : option-name ( option -- name )
-    { [ name>> ] [ variable>> dup string? [ name>> ] unless ] } 1|| ;
+    {
+        [ name>> [ CHAR: - = ] trim-head ]
+        [ variable>> dup string? [ name>> ] unless ]
+    } 1|| ;
 
 : option-meta ( option -- meta/f )
     dup const>> [ drop f ] [
@@ -39,7 +42,11 @@ TUPLE: option name type help variable default convert validate
     ] if ;
 
 : option-variable ( option -- variable )
-    { [ variable>> ] [ name>> ] } 1|| ;
+    { [ variable>> ] [ name>> [ CHAR: - = ] trim-head ] } 1|| ;
+
+: optional? ( option -- ? ) name>> "-" head? ;
+
+: positional? ( option -- ? ) optional? not ;
 
 ERROR: option-error ;
 
@@ -76,39 +83,43 @@ M: expected-arguments error.
     "Expected more arguments for option ``" write
     option>> option-name write "''" print ;
 
-GENERIC: argconvert ( str/f converter -- val )
+ERROR: unrecognized-arguments < option-error args ;
 
-M: f argconvert drop ;
+M: unrecognized-arguments error.
+    "Unrecognized arguments: " write
+    args>> [ bl ] [ write ] interleave nl ;
 
-M: class argconvert
-    drop [ 1array <lexer> [ scan-object ] with-lexer ] with-manifest ;
+ERROR: cannot-convert-value < option-error str converter ;
 
-M: quotation argconvert call( str -- val ) ;
+M: cannot-convert-value error.
+    "Unable to convert value ``" write dup str>> write
+    "'' with converter ``" write converter>> pprint "''" print ;
 
-M: boolean argconvert
-    drop {
-        { [ dup >lower { "t" "true" "1" "on" "y" "yes" } member? ] [ drop t ] }
-        { [ dup >lower { "f" "false" "0" "off" "n" "no" } member? ] [ drop f ] }
-        [ throw ]
-    } cond ;
-
-M: number argconvert drop string>number ;
-
-M: hostname argconvert drop hostname boa ;
-
-M: ipv4 argconvert drop resolve-host [ ipv4? ] filter random ;
-
-M: ipv6 argconvert drop resolve-host [ ipv6? ] filter random ;
-
-M: inet argconvert drop ":" split1 string>number <inet> ;
-
-M: inet4 argconvert
-    [ ":" split1 ] dip swap
-    [ call-next-method ] [ string>number with-port ] bi* ;
-
-M: inet6 argconvert
-    [ ":" split1 ] dip swap
-    [ call-next-method ] [ string>number with-port ] bi* ;
+: argconvert ( str/f converter -- val )
+    dup quotation? [ call( str -- val ) ] [
+        {
+            { f [ ] }
+            { object [ [ 1array <lexer> [ scan-object ] with-lexer ] with-manifest ] }
+            { boolean [ {
+                    { [ dup >lower { "t" "true" "1" "on" "y" "yes" } member? ] [ drop t ] }
+                    { [ dup >lower { "f" "false" "0" "off" "n" "no" } member? ] [ drop f ] }
+                    [ throw ]
+                } cond ] }
+            { hostname [ hostname boa ] }
+            { inet [ ":" split1 string>number <inet> ] }
+            { inet4 [ ":" split1 [ ipv4 argconvert ] [ string>number ] bi* <inet4> ] }
+            { inet6 [ ":" split1 [ ipv6 argconvert ] [ string>number ] bi* <inet6> ] }
+            { ipv4 [ resolve-host [ ipv4? ] filter random ] }
+            { ipv6 [ resolve-host [ ipv6? ] filter random ] }
+            [
+                dup math-class? [
+                    drop string>number
+                ] [
+                    cannot-convert-value
+                ] if
+            ]
+        } case
+    ] if ;
 
 GENERIC: argvalid? ( val validater -- ? )
 
@@ -120,12 +131,22 @@ M: class argvalid? instance? ;
 
 :: option-value ( args option -- args' value )
     args option const>> [
-        ?unclip :> arg
-        arg [ option expected-arguments ] unless*
-        option { [ convert>> ] [ type>> ] } 1||
-        [ argconvert ] when*
-        option { [ validate>> ] [ type>> ] } 1||
-        [ dupd argvalid? [ option arg invalid-value ] unless ] when*
+        option positional? [
+            f swap [| arg |
+                arg [ option expected-arguments ] unless*
+                option { [ convert>> ] [ type>> ] } 1||
+                [ argconvert ] when*
+                option { [ validate>> ] [ type>> ] } 1||
+                [ dupd argvalid? [ option arg invalid-value ] unless ] when*
+            ] map
+        ] [
+            ?unclip :> arg
+            arg [ option expected-arguments ] unless*
+            option { [ convert>> ] [ type>> ] } 1||
+            [ argconvert ] when*
+            option { [ validate>> ] [ type>> ] } 1||
+            [ dupd argvalid? [ option arg invalid-value ] unless ] when*
+        ] if
     ] unless* ;
 
 : get-program-name ( -- name )
@@ -139,8 +160,13 @@ M: class argvalid? instance? ;
     get-program-name "    " write write " [options] [arguments]" print ;
 
 : option-argument ( option -- argument )
-    [ option-name "--" prepend ]
-    [ option-meta [ " " glue ] when* ] bi ;
+    [ option-name ]
+    [
+        dup positional? [ drop ] [
+            [ "--" prepend ]
+            [ option-meta [ " " glue ] when* ] bi*
+        ] if
+    ] bi ;
 
 : print-arguments ( options -- )
     [ bl ] [ option-argument "[" "]" surround write ] interleave ;
@@ -160,7 +186,7 @@ M: class argvalid? instance? ;
 SYMBOL: print-help?
 
 CONSTANT: HELP T{ option
-    { name "help" }
+    { name "--help" }
     { help "show this help and exit" }
     { variable print-help? }
     { const t }
@@ -169,7 +195,9 @@ CONSTANT: HELP T{ option
 : print-help ( options -- )
     "Usage:" print print-program-name nl
     help-prolog get [ nl print nl ] unless-empty
-    "Options:" print print-options
+    [ positional? ] partition
+    [ [ "Arguments:" print print-options nl ] unless-empty ]
+    [ [ "Options:" print print-options nl ] unless-empty ] bi*
     help-epilog get [ nl print ] unless-empty ;
 
 ERROR: usage-error < option-error options ;
@@ -178,7 +206,8 @@ M: usage-error error. options>> print-help ;
 
 :: find-option ( arg options -- option )
     allow-abbrev? get [
-        arg options named completions keys dup length {
+        arg options [ dup option-name ] map>alist
+        completions keys dup length {
             { 0 [ arg unknown-option ] }
             { 1 [ first ] }
             [ arg swap ambiguous-option ]
@@ -191,35 +220,50 @@ M: usage-error error. options>> print-help ;
     [ default>> ] filter
     [ [ option-variable ] [ default>> ] bi ] H{ } map>assoc ;
 
+:: parse-optional ( options command-line -- command-line' )
+    command-line unclip [ CHAR: - = ] trim-head
+    "no-" ?head [ options find-option ] dip
+    [ f swap ] [ [ option-value ] keep ] if
+    option-variable set ;
+
+: parse-positional ( option command-line -- command-line' )
+    swap [ option-value ] [ option-variable set ] bi ;
+
+: parse-arguments ( options command-line -- )
+    [ [ optional? ] partition ] dip [
+        dup first "-" head? [
+            overd parse-optional
+        ] [
+            over empty? [
+                unrecognized-arguments
+            ] [
+                [ unclip ] dip parse-positional
+            ] if
+        ] if
+    ] until-empty 2drop ;
+
 PRIVATE>
 
-: (parse-options) ( options command-line -- kwds args )
-    over default-options [
-        [ dup ?first "-" head? ] [
-            unclip [ CHAR: - = ] trim-head
-            "no-" ?head [ pick find-option ] dip
-            [ f swap ] [ [ option-value ] keep ] if
-            option-variable set
-        ] while nip namespace swap
-    ] with-variables ;
+: (parse-options) ( options command-line -- arguments )
+    over default-options [ parse-arguments namespace ] with-variables ;
 
-: parse-options ( options -- kwds args )
+: parse-options ( options -- arguments )
     command-line get (parse-options) ;
 
-:: (with-options) ( ... options quot: ( ... kwds args -- ... ) -- ... )
+:: (with-options) ( ... options quot: ( ... arguments -- ... ) -- ... )
     options
     default-help? get [ HELP prefix ] when
-    dup parse-options :> ( kwds args )
+    dup parse-options :> kwds
 
-    default-help? get [ print-help? kwds at ] [ f ] if
+    default-help? get [ print-help? kwds key? ] [ f ] if
     [ usage-error ] [
         [ required?>> ] filter
         [ option-variable kwds key? ] reject
         [ required-options ] unless-empty
-        kwds args quot call
+        kwds quot call
     ] if ; inline
 
-: with-options ( ... options quot: ( ... kwds args -- ... ) -- ... )
+: with-options ( ... options quot: ( ... arguments -- ... ) -- ... )
     '[ _ _ (with-options) ] [
         dup option-error? [
             dup usage-error? [ "ERROR: " write ] unless
