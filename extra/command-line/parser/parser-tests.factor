@@ -1,9 +1,16 @@
 
-USING: assocs combinators command-line.parser
-command-line.parser.private kernel math math.parser sequences
-tools.test ;
+USING: assocs combinators command-line command-line.parser
+command-line.parser.private kernel math math.parser namespaces
+sequences tools.test ;
 
 IN: command-line.parser.tests
+
+[
+    { } command-line [
+        { T{ option { name "foo" } { required? t } } }
+        [ 2drop ] (with-options)
+    ] with-variable
+] [ required-options? ] must-fail-with
 
 [
     { } { "--foo" } (parse-options)
