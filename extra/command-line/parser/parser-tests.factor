@@ -19,6 +19,21 @@ IN: command-line.parser.tests
     { "--foo" } (parse-options)
 ] [ expected-arguments? ] must-fail-with
 
+{
+    {
+        H{ { "foo" 10 } }
+        H{ { "foo" 12 } }
+        H{ { "foo" f } }
+    }
+} [
+    { T{ option { name "--foo" } { default 10 } { const 12 } } }
+    {
+        { }
+        { "--foo" }
+        { "--no-foo" }
+    } [ (parse-options) ] with map
+] unit-test
+
 { H{ { "username" "test" } } } [
     { T{ option { name "--username" } } }
     { "--user" "test" } (parse-options)
