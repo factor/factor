@@ -1,14 +1,14 @@
 
 USING: assocs combinators command-line command-line.parser
-command-line.parser.private kernel math math.parser namespaces
-sequences tools.test ;
+command-line.parser.private io.streams.string kernel math
+math.parser namespaces sequences tools.test ;
 
 IN: command-line.parser.tests
 
 [
     { } command-line [
-        { T{ option { name "foo" } { required? t } } }
-        [ 2drop ] (with-options)
+        { T{ option { name "--foo" } { required? t } } }
+        [ drop ] (with-options)
     ] with-variable
 ] [ required-options? ] must-fail-with
 
@@ -17,54 +17,58 @@ IN: command-line.parser.tests
 ] [ unknown-option? ] must-fail-with
 
 [
-    { T{ option { name "foo" } } }
+    { T{ option { name "--foo" } } }
     { "--foo" } (parse-options)
 ] [ expected-arguments? ] must-fail-with
 
-{ H{ { "username" "test" } } { } } [
-    { T{ option { name "username" } } }
+{ H{ { "username" "test" } } } [
+    { T{ option { name "--username" } } }
     { "--user" "test" } (parse-options)
 ] unit-test
 
 {
     {
-        { H{ { "sum" maximum } } { } }
-        { H{ { "sum" maximum } } { "1" } }
-        { H{ { "sum" sum } } { } }
-        { H{ { "sum" sum } } { "1" "2" "3" } }
+        H{ { "sum" maximum } }
+        H{ { "sum" maximum } { "integers" { 1 } } }
+        H{ { "sum" sum } }
+        H{ { "sum" sum } { "integers" { 1 2 3 } } }
     }
 } [
     {
         T{ option
-            { name "sum" }
+            { name "--sum" }
             { const sum }
             { default maximum }
+        }
+        T{ option
+            { name "integers" }
+            { type integer }
         }
     } {
         { }
         { "1" }
         { "--sum" }
         { "--sum" "1" "2" "3" }
-    } [ (parse-options) ] with map>alist
+    } [ command-line [ [ ] (with-options) ] with-variable ] with map
 ] unit-test
 
 [
     {
-        T{ option { name "fool" } }
-        T{ option { name "food" } }
+        T{ option { name "--fool" } }
+        T{ option { name "--food" } }
     } { "--foo" } (parse-options)
 ] [ ambiguous-option? ] must-fail-with
 
 {
     {
-        { H{ { "foo" 12 } } { } }
-        { H{ { "foo" 10 } } { } }
-        { H{ { "foo" f } } { } }
+        H{ { "foo" 12 } }
+        H{ { "foo" 10 } }
+        H{ { "foo" f } }
     }
 } [
     {
         T{ option
-            { name "foo" }
+            { name "--foo" }
             { const 10 }
             { default 12 }
         }
@@ -72,18 +76,18 @@ IN: command-line.parser.tests
         { }
         { "--foo" }
         { "--no-foo" }
-    } [ (parse-options) ] with map>alist
+    } [ command-line [ [ ] (with-options) ] with-variable ] with map
 ] unit-test
 
 {
     {
-        { H{ { "port" 1234 } } { } }
-        { H{ { "port" 4567 } } { } }
+        H{ { "port" 1234 } }
+        H{ { "port" 4567 } }
     }
 } [
     {
         T{ option
-            { name "port" }
+            { name "--port" }
             { type integer }
             { convert [ string>number ] }
             { default 1234 }
@@ -91,13 +95,13 @@ IN: command-line.parser.tests
     } {
         { }
         { "--port" "4567" }
-    } [ (parse-options) ] with map>alist
+    } [ command-line [ [ ] (with-options) ] with-variable ] with map
 ] unit-test
 
 [
     {
         T{ option
-            { name "port" }
+            { name "--port" }
             { type integer }
             { convert [ string>number ] }
             { default 1234 }
@@ -106,19 +110,7 @@ IN: command-line.parser.tests
 ] [ invalid-value? ] must-fail-with
 
 {
-    "\
-Usage:
-    program [options] [arguments]
-
-Options:
-    --help                 show this help and exit
-    --host HOST            set the hostname (default: 127.0.0.1)
-    --port PORT            set the port (default: 61613)
-    --username USERNAME    set the username
-    --password PASSWORD    set the password
-    --foo                  (default: 10)
-    --bar                  
-"
+    "Usage:\n    program [options] [arguments]\n\nOptions:\n    --help                 show this help and exit\n    --host HOST            set the hostname (default: 127.0.0.1)\n    --port PORT            set the port (default: 61613)\n    --username USERNAME    set the username\n    --password PASSWORD    set the password\n    --foo                  (default: 10)\n    --bar                  \n\n"
 } [
     [
         H{
@@ -127,32 +119,32 @@ Options:
         } [
             {
                 T{ option
-                    { name "host" }
+                    { name "--host" }
                     { help "set the hostname" }
                     { default "127.0.0.1" }
                 }
                 T{ option
-                    { name "port" }
+                    { name "--port" }
                     { type integer }
                     { help "set the port" }
                     { default 61613 }
                 }
                 T{ option
-                    { name "username" }
+                    { name "--username" }
                     { help "set the username" }
                 }
                 T{ option
-                    { name "password" }
+                    { name "--password" }
                     { help "set the password" }
                 }
                 T{ option
-                    { name "foo" }
+                    { name "--foo" }
                     { default 10 }
                     { const 12.34 }
                     { required? t }
                 }
                 T{ option
-                    { name "bar" }
+                    { name "--bar" }
                     { const "12" }
                     { required? t }
                 }
