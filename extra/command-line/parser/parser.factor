@@ -233,7 +233,7 @@ M: usage-error error. options>> print-help ;
         completions keys dup length {
             { 0 [ arg unknown-option ] }
             { 1 [ first ] }
-            [ arg swap ambiguous-option ]
+            [ drop arg swap ambiguous-option ]
         } case
     ] [
         options [ option-name arg = ] find nip
