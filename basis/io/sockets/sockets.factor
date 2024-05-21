@@ -4,11 +4,11 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors endian fry
-grouping init io.backend io.encodings.ascii
-io.encodings.binary io.pathnames io.ports io.streams.duplex
-kernel locals math math.parser memoize namespaces present
-sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ip-parser ip-parser.private random ;
+grouping init io.backend io.encodings.ascii io.encodings.binary
+io.pathnames io.ports io.streams.duplex ip-parser
+ip-parser.private kernel locals math math.parser memoize
+namespaces present random sequences sequences.private splitting
+strings summary system threads vocabs vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -121,6 +121,8 @@ M: ipv4 make-sockaddr-outgoing
 
 M: ipv4 parse-sockaddr
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
+
+M: ipv4 present host>> ;
 
 TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
 
@@ -325,6 +327,14 @@ SYMBOL: remote-address
             over remote-address set
             <client> local-address set
         ] dip with-stream
+    ] with-scope ; inline
+
+: spawn-client ( remote encoding quot -- )
+    [
+        [
+            over remote-address set
+            <client> local-address set
+        ] dip '[ _ _ with-stream ] in-thread
     ] with-scope ; inline
 
 : <server> ( addrspec encoding -- server )
