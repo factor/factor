@@ -245,26 +245,21 @@ M: usage-error error. options>> print-help ;
 PRIVATE>
 
 : (parse-options) ( options command-line -- arguments )
-    over default-options [ parse-arguments namespace ] with-variables ;
+    over default-options [
+        default-help? get [ [ HELP prefix ] dip ] when
+        dupd parse-arguments
+        default-help? get [ print-help? get [ usage-error ] when ] when
+        [ required?>> ] filter namespace [
+            '[ option-variable _ key? ] reject
+            [ required-options ] unless-empty
+        ] keep
+    ] with-variables ;
 
 : parse-options ( options -- arguments )
     command-line get (parse-options) ;
 
-:: (with-options) ( ... options quot: ( ... arguments -- ... ) -- ... )
-    options
-    default-help? get [ HELP prefix ] when
-    dup parse-options :> kwds
-
-    default-help? get [ print-help? kwds key? ] [ f ] if
-    [ usage-error ] [
-        [ required?>> ] filter
-        [ option-variable kwds key? ] reject
-        [ required-options ] unless-empty
-        kwds quot call
-    ] if ; inline
-
-: with-options ( ... options quot: ( ... arguments -- ... ) -- ... )
-    '[ _ _ (with-options) ] [
+: with-options ( ... options quot: ( ... -- ... ) -- ... )
+    '[ _ parse-options _ with-variables ] [
         dup option-error? [
             dup usage-error? [ "ERROR: " write ] unless
             print-error flush
