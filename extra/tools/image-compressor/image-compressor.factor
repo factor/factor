@@ -86,8 +86,8 @@ PRIVATE>
 SYMBOL: compression-level
 12 compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
 
-: compress ( byte-array -- compressed ) compression-level get zstd-compress-level ;
-: compress* ( byte-array -- compressed ) [ compress ] keep [ [ length ] bi@ < ] 2keep ? ;
+: (compress) ( byte-array -- compressed ) compression-level get zstd-compress-level ;
+: compress ( byte-array -- compressed ) [ (compress) ] keep [ [ length ] bi@ < ] 2keep ? ;
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
 : compress-data ( image -- image' ) dup uncompressed-data? [ dup data>> compress >>data ] when ; ! only compress uncompressed data
