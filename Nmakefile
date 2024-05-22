@@ -76,6 +76,11 @@ CL_FLAGS = $(CL_FLAGS) /Zi /DFACTOR_DEBUG
 CL_FLAGS = $(CL_FLAGS) /DFACTOR_REPRODUCIBLE
 !ENDIF
 
+!IF DEFINED(LTO)
+LINK_FLAGS = $(LINK_FLAGS) /LTCG /MERGE /OPT:ICF=2
+CL_FLAGS = $(CL_FLAGS) /GL /Gw /Gy /Zc:inline
+!ENDIF
+
 ML_FLAGS = /nologo /safeseh
 
 EXE_OBJS = vm\main-windows.obj vm\factor.res

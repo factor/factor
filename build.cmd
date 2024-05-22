@@ -90,7 +90,7 @@ if "%_compile_vm%"=="1" (
     nmake /nologo /f Nmakefile clean
     if errorlevel 1 goto fail
 
-    nmake /nologo /f Nmakefile %_target%
+    nmake /nologo /f Nmakefile LTO=1 %_target%
     if errorlevel 1 goto fail
 )
 
