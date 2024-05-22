@@ -220,7 +220,7 @@ CONSTANT: HELP T{ option
 }
 
 : print-help ( options -- )
-    "Usage:" print print-program-name
+    "Usage:\n    " write dup print-short-usage
     program-prolog get [ nl print ] unless-empty
     [ positional? ] partition
     [ [ nl "Arguments:" print print-options ] unless-empty ]
