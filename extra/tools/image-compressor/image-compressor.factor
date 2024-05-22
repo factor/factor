@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! can be run as : factor -run=binary.image.factor.compressor
 
-USING: accessors byte-arrays classes.struct compression.zstd io
-io.encodings.binary io.files kernel kernel.private locals math
-namespaces sequences system tools.image-analyzer
-tools.image-analyzer.vm vm ;
+USING: accessors byte-arrays classes.struct combinators
+compression.zstd generalizations io io.encodings.binary io.files
+kernel kernel.private locals math namespaces sequences system
+tools.image-analyzer tools.image-analyzer.vm vm ;
 IN: tools.image-compressor
 
 ! support multiple image formats if needed
@@ -34,6 +34,8 @@ STRUCT: image-footer
   read-footer dup valid-footer? [ drop f ] unless ;
 
 TUPLE: image
+  { footer }
+  { leader byte-array }
   { header image-header }
   { data byte-array }
   { code byte-array }
@@ -55,6 +57,7 @@ TUPLE: image
 ! load factor image
 : load-factor-image ( filename -- image )
   binary [
+    read-footer* [ dup image_offset>> read ] [ B{ } clone B{ } clone ] if*
     image-header read-struct check-header >compression-header dup
     [ compressed-data-size>> read [ B{ } clone ] unless* ]
     [ compressed-code-size>> read [ B{ } clone ] unless* ] bi
@@ -64,7 +67,7 @@ TUPLE: image
 ! save factor image
 : save-factor-image ( image filename -- )
   binary [
-   [ header>> ] [ data>> ] [ code>> ] tri [ write ] tri@
+   { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ footer>> ] } cleave [ write ] 5 napply
   ] with-file-writer
 ;
 
