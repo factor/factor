@@ -46,6 +46,10 @@ TUPLE: foo ;
     { "--user" "test" } (parse-options)
 ] unit-test
 
+{ H{ { "username" "test" } } } [
+    { "--username" } { "--user" "test" } (parse-options)
+] unit-test
+
 {
     {
         H{ { "sum" maximum } { "integers" { 1 } } }
