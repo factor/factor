@@ -17,6 +17,22 @@ ERROR: unsupported-image-header ;
 : check-header ( header -- header/* )
   [ [ magic>> image-header-magic = ] [ version>> image-header-version = ] bi and [ unsupported-image-header ] unless ] keep ;
 
+STRUCT: image-footer
+    { magic cell_t }
+    { image_offset cell_t } ! offset from beginning of file
+;
+
+: valid-footer? ( footer -- ? )
+  magic>> image-header-magic = ;
+
+: read-footer ( -- footer )
+  tell-input
+  image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
+  swap seek-absolute seek-input ;
+
+: read-footer* ( -- footer/f )
+  read-footer dup valid-footer? [ drop f ] unless ;
+
 TUPLE: image
   { header image-header }
   { data byte-array }
