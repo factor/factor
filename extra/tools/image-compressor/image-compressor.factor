@@ -30,8 +30,8 @@ TUPLE: image
 : load-factor-image ( filename -- image )
   binary [
     image-header read-struct >compression-header dup
-    [ compressed-data-size>> read ]
-    [ compressed-code-size>> read ] bi
+    [ compressed-data-size>> read [ B{ } clone ] unless* ]
+    [ compressed-code-size>> read [ B{ } clone ] unless* ] bi
   ] with-file-reader image boa
 ;
 
