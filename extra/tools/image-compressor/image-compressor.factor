@@ -25,6 +25,8 @@ STRUCT: image-footer
 : valid-footer? ( footer -- ? )
   magic>> image-header-magic = ;
 
+<PRIVATE
+
 : read-footer ( -- footer )
   tell-input
   image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
@@ -32,6 +34,8 @@ STRUCT: image-footer
 
 : read-footer* ( -- footer/f )
   read-footer dup valid-footer? [ drop f ] unless ;
+
+PRIVATE>
 
 TUPLE: image
   { footer }
