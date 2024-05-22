@@ -69,7 +69,7 @@ PRIVATE>
 ! load factor image
 : load-factor-image ( filename -- image )
   binary [
-    read-footer* [ dup image_offset>> read ] [ B{ } clone B{ } clone ] if*
+    read-footer* [ dup image_offset>> read* ] [ B{ } clone B{ } clone ] if*
     image-header read-struct check-header >compression-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
