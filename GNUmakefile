@@ -48,6 +48,7 @@ ifdef CONFIG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += -O3
+		CFLAGS += -Wl,-s
 		CFLAGS += $(CC_OPT)
 	endif
 
