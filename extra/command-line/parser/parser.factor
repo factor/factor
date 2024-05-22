@@ -261,11 +261,9 @@ M: usage-error error. options>> print-help ;
             pick empty? [ f ] [ dup first "-" head? ] if [
                 overd parse-optional
             ] [
-                over empty? [
-                    unrecognized-arguments
-                ] [
-                    [ unclip ] dip parse-positional
-                ] if
+                [ ?unclip ] dip over
+                [ parse-positional ]
+                [ unrecognized-arguments ] if
             ] if
         ] dip append
     ] until-empty nip ;
@@ -296,6 +294,6 @@ PRIVATE>
     '[ _ parse-options _ with-variables ] [
         dup option-error? [
             dup usage-error? [ "ERROR: " write ] unless
-            print-error flush
+            print-error
         ] [ rethrow ] if
     ] recover ; inline
