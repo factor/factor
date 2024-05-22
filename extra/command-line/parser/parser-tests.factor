@@ -5,6 +5,13 @@ math.parser namespaces sequences tools.test ;
 
 IN: command-line.parser.tests
 
+TUPLE: foo ;
+
+[
+    { T{ option { name "--foo" } { type foo } } }
+    { "--foo" "abcd" } (parse-options)
+] [ cannot-convert-value? ] must-fail-with
+
 [
     { T{ option { name "--foo" } { required? t } } }
     { } (parse-options)

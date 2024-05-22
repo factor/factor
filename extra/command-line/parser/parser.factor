@@ -32,9 +32,8 @@ TUPLE: option name type help variable default convert validate
 
 : option-name ( option -- name )
     {
-        [ name>> [ CHAR: - = ] trim-head ]
-        [ variable>> dup string? [ name>> ] unless ]
-    } 1|| ;
+        [ name>> ] [ variable>> dup string? [ name>> ] unless ]
+    } 1|| [ CHAR: - = ] trim-head ;
 
 :: option-#args ( option -- #args )
     option #args>> [ option const>> 1 xor ] unless* ;
@@ -107,6 +106,7 @@ M: cannot-convert-value error.
     dup quotation? [ call( str -- val ) ] [
         {
             { f [ ] }
+            { string [ ] }
             { object [ [ 1array <lexer> [ scan-object ] with-lexer ] with-manifest ] }
             { boolean [ {
                     { [ dup >lower { "t" "true" "1" "on" "y" "yes" } member? ] [ drop t ] }
