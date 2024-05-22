@@ -7,7 +7,8 @@ IN: tools.image-compressor
 ARTICLE: "tools.image-compressor" "Compress Factor image file for loading by the VM"
 "The " { $vocab-link "tools.image-compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their image headers." $nl
 "You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=tools.image-compressor" } $nl
-"To uncompress a compressed Factor image, you can start Factor with" { $code "factor -i=<compressed image>" } "then " { $link save-image-and-exit }
+"To uncompress a compressed Factor image, you can start Factor with" { $code "factor -i=<compressed image>" } "then " { $link save-image-and-exit } $nl
+"Embedded images in executables such as those created by the " { $vocab-link "tools.deploy" } " tool, can also be directly loaded, compressed, and saved."
 ;
 
 HELP: image
