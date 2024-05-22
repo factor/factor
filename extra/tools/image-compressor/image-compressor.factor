@@ -1,11 +1,14 @@
 ! Copyright (C) 2022-2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
 ! can be run as : factor -run=binary.image.factor.compressor
+! with command-line options, see documentation
 
-USING: accessors byte-arrays classes.struct combinators
-compression.zstd generalizations io io.encodings.binary io.files
-kernel kernel.private locals math namespaces sequences system
-tools.image-analyzer tools.image-analyzer.vm vm ;
+USING: accessors assocs byte-arrays classes.struct combinators
+command-line command-line.parser compression.zstd
+generalizations io io.encodings.binary io.files kernel
+kernel.private locals math math.order math.parser namespaces
+prettyprint sequences system tools.image-analyzer
+tools.image-analyzer.vm vm ;
 IN: tools.image-compressor
 
 ! support multiple image formats if needed
@@ -97,4 +100,19 @@ SYMBOL: compression-level
 ;
 
 : compress-current-image ( -- ) image-path dup compress-factor-image ;
-MAIN: compress-current-image
+
+CONSTANT: command-options
+{
+  T{ option { name "-c" } { type integer } { convert [ dec> ] } { default 12 } { validate [ 1 22 between? ] } { #args 1 } }
+  T{ option { name "files" } { #args "*" } }
+}
+
+: compress-command ( -- )
+  command-options parse-options
+  "c" over at compression-level set-global "files" of
+  [ compress-current-image ] [
+    [ first ] [ ?second [ dup ] unless* ] bi compress-factor-image
+  ] if-empty
+;
+
+MAIN: compress-command
