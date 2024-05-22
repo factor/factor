@@ -30,6 +30,10 @@ TUPLE: option name type help variable default convert validate
 
 <PRIVATE
 
+GENERIC: >option ( obj -- option )
+M: string >option option new swap >>name ;
+M: option >option ;
+
 : option-name ( option -- name )
     {
         [ name>> ] [ variable>> dup string? [ name>> ] unless ]
@@ -277,7 +281,7 @@ M: usage-error error. options>> print-help ;
 PRIVATE>
 
 : (parse-options) ( options command-line -- arguments )
-    over default-options [
+    [ [ >option ] map ] dip over default-options [
         default-help? get [ [ HELP prefix ] dip ] when
         dupd parse-arguments
         default-help? get [ print-help? get [ usage-error ] when ] when
