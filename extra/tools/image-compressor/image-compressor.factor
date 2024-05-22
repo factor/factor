@@ -108,11 +108,12 @@ CONSTANT: command-options
 }
 
 : compress-command ( -- )
-  command-options parse-options
-  "c" over at compression-level set-global "files" of
-  [ compress-current-image ] [
-    [ first ] [ ?second [ dup ] unless* ] bi compress-factor-image
-  ] if-empty
+  command-options [
+    "c" get compression-level set-global "files" get
+    [ compress-current-image ] [
+      [ first ] [ ?second [ dup ] unless* ] bi compress-factor-image
+    ] if-empty
+  ] with-options
 ;
 
 MAIN: compress-command
