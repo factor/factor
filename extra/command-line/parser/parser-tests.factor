@@ -69,6 +69,15 @@ IN: command-line.parser.tests
     } { "--foo" } (parse-options)
 ] [ ambiguous-option? ] must-fail-with
 
+[
+    f allow-abbrev? [
+        {
+            T{ option { name "--foo" } }
+            T{ option { name "--foo" } }
+        } { "--foo" } (parse-options)
+    ] with-variable
+] [ ambiguous-option? ] must-fail-with
+
 {
     {
         H{ { "foo" 12 } }
