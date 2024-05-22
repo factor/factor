@@ -10,3 +10,11 @@ IN: concurrency.promises.tests
     [ ?promise swap push ] in-thread
     50 swap fulfill
 ] unit-test
+
+[ 5 <promise> [ fulfill ] 2keep fulfill ]
+[ promise-already-fulfilled? ] must-fail-with
+
+{ f } [ <promise> promise-fulfilled? ] unit-test 
+{ t } [
+    5 <promise> [ fulfill ] keep promise-fulfilled?
+] unit-test 
