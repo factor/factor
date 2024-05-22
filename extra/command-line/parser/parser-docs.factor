@@ -36,7 +36,7 @@ arguments.
 HELP: option
 { $class-description "An option that can be specified on the command-line. It has the following slots:"
     { $slots
-        { "name" "The name of the argument." }
+        { "name" { "The name of the argument (prefixed by dashes " { $snippet "\"-\"" } " if optional)." } }
         { "type" { "The " { $link class } " type of the argument." } }
         { "help" "Some help text to display." }
         { "variable" "An optional variable used to set a parsed value." }
