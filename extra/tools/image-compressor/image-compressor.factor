@@ -8,6 +8,15 @@ namespaces sequences system tools.image-analyzer
 tools.image-analyzer.vm vm ;
 IN: tools.image-compressor
 
+! support multiple image formats if needed
+CONSTANT: image-header-magic   0x0f0e0d0c
+CONSTANT: image-header-version 4
+
+ERROR: unsupported-image-header ;
+
+: check-header ( header -- header/* )
+  [ [ magic>> image-header-magic = ] [ version>> image-header-version = ] bi and [ unsupported-image-header ] unless ] keep ;
+
 TUPLE: image
   { header image-header }
   { data byte-array }
@@ -29,7 +38,7 @@ TUPLE: image
 ! load factor image
 : load-factor-image ( filename -- image )
   binary [
-    image-header read-struct >compression-header dup
+    image-header read-struct check-header >compression-header dup
     [ compressed-data-size>> read [ B{ } clone ] unless* ]
     [ compressed-code-size>> read [ B{ } clone ] unless* ] bi
   ] with-file-reader image boa
