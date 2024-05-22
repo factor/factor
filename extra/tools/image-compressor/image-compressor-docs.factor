@@ -6,9 +6,18 @@ IN: tools.image-compressor
 
 ARTICLE: "tools.image-compressor" "Compress Factor image file for loading by the VM"
 "The " { $vocab-link "tools.image-compressor" } " vocabulary compresses Factor images such that the VM can load it and decompress it on the fly. Compressed and uncompressed Factor images are both supported by the VM and are only determined by their image headers." $nl
-"You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=tools.image-compressor" } $nl
+"You can also run the compressor on the current Factor image directly from the commandline:"  { $code "factor -run=tools.image-compressor [ -c <level> ] [ <input> [ <output> ] ]" } $nl
+"The following arguments are supported:" $nl
+{ $snippet "-c <level>" } " defines the compression level (1..22, default 12)" $nl
+{ $snippet "<input>" } " if given compress this file, else the current Factor image" $nl
+{ $snippet "<output>" } " if given save result into this file instead of overwriting input file" $nl
 "To uncompress a compressed Factor image, you can start Factor with" { $code "factor -i=<compressed image>" } "then " { $link save-image-and-exit } $nl
 "Embedded images in executables such as those created by the " { $vocab-link "tools.deploy" } " tool, can also be directly loaded, compressed, and saved."
+$examples {
+  { $code "factor -run=tools.image-compressor" }
+  { $code "factor -run=tools.image-compressor -c 1 hello-ui.exe" }
+  { $code "factor -run=tools.image-compressor -c 18 factor.image factor.image.compressed" }
+}
 ;
 
 HELP: image
