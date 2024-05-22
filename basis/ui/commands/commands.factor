@@ -50,7 +50,7 @@ TR: convert-command-name "-" " " ;
 : command-map. ( alist -- )
     [ command-map-row ] { } assoc>map
     { "Shortcut" "Command" "Word" "Notes" }
-    [ \ $strong swap ] { } map>assoc prefix
+    [ \ $strong swap ] map>alist prefix
     $table ;
 
 : $command-map ( element -- )

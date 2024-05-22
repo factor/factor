@@ -1,8 +1,9 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel furnace.actions html.forms
-sequences sorting xml.syntax webapps.mason.backend
-webapps.mason.utils ;
+USING: accessors arrays calendar calendar.format combinators
+furnace.actions grouping.extras html.forms kernel mason.report
+math.order sequences sorting sorting.specification
+webapps.mason.backend webapps.mason.utils xml.syntax ;
 IN: webapps.mason.downloads
 
 CONSTANT: OFFLINE
@@ -18,21 +19,55 @@ CONSTANT: BROKEN
         [ drop f ]
     } cond ;
 
+: machine-list ( builders -- xml )
+    { { host-name>> <=> } { os>> <=> } { cpu>> <=> } } sort-with-spec
+    [ host-name>> ] group-by
+    [
+        first2
+        [
+            [ os/cpu ] [ current-git-id>> git-short-link ] [ status>> ] tri
+            [XML <tr><td></td><td><-></td><td><-></td><td><-></td></tr> XML]
+        ] map
+        [XML <tr><td><i><-></i></td></tr><-> XML]
+    ] map
+    [ [XML <p>No machines.</p> XML] ]
+    [ [XML <table><tr>
+           <th>Machine</th>
+           <th>Target</th>
+           <th>Git</th>
+           <th>Status</th>
+           </tr>
+           <tr><td></td><td></td><td></td><td><i>starting/make-vm/boot/test/upload/finish/idle</i></td></tr>
+           <-></table> XML] ]
+    if-empty ;
+
 : builder-list ( seq -- xml )
     [ os/cpu ] sort-by
     [
-        [ report-url ] [ os/cpu ] [ builder-status ] tri
-        [XML <li><a href=<->><-></a> <-></li> XML]
+        { [ os/cpu ]
+          [ last-git-id>> git-short-link ]
+          [ report-url ]
+          [ last-timestamp>> timestamp>ymdhms ]
+          [ [ last-timestamp>> ] [ start-timestamp>> ] bi 2dup before? [ nip now swap ] when time- duration>hms ]
+          [ builder-status ] } cleave
+        [XML <tr><td><-></td><td><-></td><td><a href=<->><-></a></td><td><-></td><td><-></td></tr> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
-    [ [XML <ul><-></ul> XML] ]
+    [ [XML <table><tr>
+           <th>Target</th>
+           <th>Git</th>
+           <th>Build report</th>
+           <th>Build duration</th>
+           <th>Build status</th>
+           </tr><-></table> XML] ]
     if-empty ;
 
 : <dashboard-action> ( -- action )
     <page-action>
     [
         [
-            all-builders builder-list
-            "builders" set-value
+            all-builders
+            [ machine-list "machines" set-value ]
+            [ builder-list "builders" set-value ] bi
         ] with-mason-db
     ] >>init ;

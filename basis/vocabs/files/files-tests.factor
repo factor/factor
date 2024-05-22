@@ -1,4 +1,3 @@
-IN: vocabs.files.tests
 USING: tools.test vocabs.files vocabs arrays grouping ;
 
 { t } [
@@ -7,3 +6,7 @@ USING: tools.test vocabs.files vocabs arrays grouping ;
     "kernel" <vocab-link> vocab-files
     3array all-equal?
 ] unit-test
+
+{ f } [ "not-a-valid-vocab" vocab-tests-path ] unit-test
+{ "resource:core/kernel/kernel-tests.factor" } [ "kernel" vocab-tests-path ] unit-test
+{ { "resource:core/kernel/kernel-tests.factor" } } [ "kernel" vocab-tests ] unit-test

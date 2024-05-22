@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors ascii assocs combinators continuations debugger
-formatting grouping io kernel math sequences sorting splitting ;
+formatting grouping io io.encodings.utf8 io.files kernel math
+sequences sorting splitting ;
 
 IN: command-loop
 
@@ -53,6 +54,20 @@ GENERIC: run-command-loop ( command-loop -- )
     "abbrevs" swap '[ _ do-abbrevs ]
     "List abbreviated commands" f <command> ;
 
+: ?handle-command ( args command-loop -- )
+    '[
+        [ _ handle-command ]
+        [ "ERROR: " write print-error drop ] recover
+    ] unless-empty ;
+
+: do-run ( args command-loop -- )
+    [ utf8 file-lines ] dip '[ _ handle-command ] each ;
+
+: <run-command> ( command-loop -- command )
+    "run" swap '[ _ do-run ]
+    "Execute commands in a specified file with 'run /path/to/commands'."
+    f <command> ;
+
 PRIVATE>
 
 : new-command-loop ( intro prompt class -- command-loop )
@@ -64,6 +79,8 @@ PRIVATE>
         [ <help-command> ]
         [ add-command ]
         [ <abbrevs-command> ]
+        [ add-command ]
+        [ <run-command> ]
         [ add-command ]
         [ ]
     } cleave ;
@@ -94,12 +111,8 @@ M: command-loop missing-command ( args name command-loop -- )
 
 M: command-loop run-command-loop
     dup intro>> [ print ] when* [
-        dup prompt>> [ write bl flush ] when* readln [
-            [
-                [ over handle-command ]
-                [ "ERROR: " write print-error drop ] recover
-            ] unless-empty t
-        ] [ f ] if*
+        dup prompt>> [ write bl flush ] when* readln
+        [ over ?handle-command t ] [ f ] if*
     ] loop drop ;
 
 : command-loop-main ( -- )

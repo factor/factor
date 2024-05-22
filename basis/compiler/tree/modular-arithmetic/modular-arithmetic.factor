@@ -156,7 +156,7 @@ MEMO: fixnum-coercion ( flags -- nodes )
 
 : modular-value-info ( #call -- alist )
     [ in-d>> ] [ out-d>> ] bi append
-    fixnum <class-info> '[ _ ] { } map>assoc ;
+    fixnum <class-info> '[ _ ] map>alist ;
 
 : optimize-modular-op ( #call -- nodes )
     dup out-d>> first modular-value? [

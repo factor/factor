@@ -1,8 +1,8 @@
 ! Copyright (C) 2012-2014 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: arrays byte-arrays combinators combinators.short-circuit
-endian grouping kernel math math.bitwise math.parser regexp
+USING: byte-arrays combinators combinators.short-circuit endian
+grouping hex-strings kernel math math.bitwise math.parser regexp
 sequences splitting ;
 
 IN: ip-parser

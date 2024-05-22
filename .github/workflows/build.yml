@@ -13,24 +13,24 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load-all
-      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+      run: './factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
   build-macos:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
     - name: load-all
-      run: './factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+      run: './factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
@@ -39,14 +39,14 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
     - name: build
       shell: cmd
       run: build.cmd net-bootstrap
     - name: load-all
       shell: cmd
-      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off load-all save"'
+      run: 'factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'

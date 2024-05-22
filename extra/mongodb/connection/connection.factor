@@ -1,9 +1,9 @@
 USING: accessors arrays assocs byte-vectors checksums
-checksums.md5 constructors continuations destructors fry
-hashtables io.encodings.binary io.encodings.string
-io.encodings.utf8 io.sockets io.streams.duplex kernel locals
-math math.parser mongodb.cmd mongodb.msg strings
-namespaces sequences splitting ;
+checksums.md5 constructors continuations destructors hashtables
+hex-strings io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.streams.duplex kernel math
+math.parser mongodb.cmd mongodb.msg namespaces sequences
+splitting strings ;
 IN: mongodb.connection
 
 : md5-checksum ( string -- digest )

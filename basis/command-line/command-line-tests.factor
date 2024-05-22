@@ -33,3 +33,9 @@ USING: command-line namespaces tools.test ;
 { "a:b:c" } [ { "factor" "-roots=a:b:c" } parse-command-line
     "roots" get-global
 ] unit-test
+
+{ { "arg1" "arg2" } t "12" f } [
+    { "-foo" "-bar=12" "-no-baz" "arg1" "arg2" }
+    command-line-options
+    "foo" get "bar" get "baz" get
+] unit-test

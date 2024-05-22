@@ -141,12 +141,14 @@ set_cc() {
         if test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
+            [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
             return
         fi
 
         if test_programs_installed i686-w64-mingw32-gcc i686-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=i686-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=i686-w64-mingw32-g++
+            [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
             return
         fi
     fi
@@ -154,6 +156,7 @@ set_cc() {
     if test_programs_installed clang clang++ ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
         return
     fi
 
@@ -161,6 +164,7 @@ set_cc() {
     if test_programs_installed gcc g++ ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
         return
     fi
 
@@ -196,9 +200,9 @@ check_library_exists() {
     $ECHO -n "Checking for library $1..."
     $ECHO "int main(){return 0;}" > $GCC_TEST
     if $CC $GCC_TEST -o $GCC_OUT -l "$1" 2>&- ; then
-        $ECHO "not found."
-    else
         $ECHO "found."
+    else
+        $ECHO "not found."
     fi
     rm -f $GCC_TEST
     check_ret rm
@@ -373,6 +377,8 @@ echo_build_info() {
     $ECHO "DOWNLOADER_NAME=$DOWNLOADER_NAME"
     $ECHO "CC=$CC"
     $ECHO "CXX=$CXX"
+    $ECHO "LTO=$LTO"
+    $ECHO "CC_OPT=$CC_OPT"
     $ECHO "MAKE=$MAKE"
 }
 
@@ -420,6 +426,7 @@ prepare_build_info() {
     find_os
     find_architecture
     find_num_cores
+    if [[ $OS != macosx ]] ; then LTO=1; fi # temporarily try out LTO to collect performance data (not working on MacOSX)
     set_cc
     find_word_size
     set_current_branch
@@ -528,7 +535,8 @@ make_clean() {
 
 make_factor() {
     $ECHO "Building factor with $NUM_CORES cores"
-    invoke_make "CC=$CC" "CXX=$CXX" "$MAKE_TARGET" "-j$NUM_CORES"
+    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
+    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
 }
 
 make_clean_factor() {
@@ -762,6 +770,7 @@ usage() {
     $ECHO "  self-update - git pull, recompile, make local boot image, bootstrap"
     $ECHO "  quick-update - git pull, refresh-all, save"
     $ECHO "  update|latest - git pull, recompile, download a boot image, bootstrap"
+    $ECHO "  clean - run make clean"
     $ECHO "  compile - compile the binary"
     $ECHO "  recompile - recompile the binary"
     $ECHO "  bootstrap - bootstrap with existing boot image"
@@ -805,6 +814,7 @@ case "$1" in
     self-update) update; make_boot_image; bootstrap  ;;
     quick-update) update; refresh_image ;;
     update|latest) update; download_and_bootstrap ;;
+    clean) find_build_info; make_clean ;;
     compile) find_build_info; make_factor ;;
     recompile) find_build_info; make_clean; make_factor ;;
     bootstrap) get_config_info; bootstrap ;;

@@ -17,7 +17,8 @@ TUPLE: discord-webhook url id token ;
 
 TUPLE: discord-bot-config
     client-id client-secret
-    token application-id guild-id channel-id permissions
+    token application-id guild-id channel-id
+    permissions intents
     user-callback obey-names
     metadata
     discord-bot mailbox connect-thread ;
@@ -73,6 +74,8 @@ TUPLE: discord-bot
     discord-post-request json-request ;
 : discord-post-json ( payload route -- json )
     [ >json ] dip discord-post-request add-json-header json-request ;
+: discord-post-json-no-resp ( payload route -- )
+    [ >json ] dip discord-post-request add-json-header http-request 2drop ;
 : discord-patch-json ( payload route -- json )
     [ >json ] dip discord-patch-request add-json-header json-request ;
 : discord-delete-json ( route -- json )
@@ -104,13 +107,12 @@ TUPLE: discord-bot
 : delete-discord-application-guild-command ( application-id -- json )
     "/applications/%s/commands" sprintf discord-delete-json ;
 
-: create-interaction-response ( interaction-id interaction-token -- json )
-    [ H{ { "type" 4 } { "data" "pang" } } clone ] 2dip
-    "/webhooks/%s/%s/messages/callback" sprintf discord-post ;
-
+: create-interaction-response ( json interaction-id interaction-token -- )
+    "/interactions/%s/%s/callback" sprintf discord-post-json-no-resp ;
 : get-original-interaction-response ( application-id interaction-token -- json )
     "/webhooks/%s/%s/messages/@original" sprintf discord-get ;
-
+: edit-interaction-response ( json application-id interaction-token -- json )
+    "/webhooks/%s/%s/messages/@original" sprintf discord-patch-json ;
 
 
 : send-message* ( string channel-id -- json )
@@ -137,7 +139,11 @@ TUPLE: discord-bot
 : get-discord-bot-gateway ( -- json ) "/gateway/bot" discord-get ;
 
 : gateway-identify-json ( -- json )
-    \ discord-bot get config>> token>> [[ {
+    \ discord-bot get
+    [ config>> ] ?call
+    [ [ token>> ] ?call "0" or  ]
+    [ [ intents>> ] ?call 3276541 or ] bi
+    [[ {
         "op": 2,
         "d": {
             "token": "%s",
@@ -147,7 +153,7 @@ TUPLE: discord-bot
                 "device": "discord.factor"
             },
             "large_threshold": 250,
-            "intents": 3276541
+            "intents": %d
         }
     }]] sprintf json> >json ;
 

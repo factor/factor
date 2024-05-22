@@ -445,7 +445,7 @@ M: f ($instance) ($link) ;
 
 : $references ( element -- )
     "References" $heading
-    unclip print-element [ \ $link swap ] { } map>assoc $list ;
+    unclip print-element [ \ $link swap ] map>alist $list ;
 
 : $shuffle ( element -- )
     "This is a shuffle word, rearranging the top of the datastack as indicated by the word's stack effect" swap

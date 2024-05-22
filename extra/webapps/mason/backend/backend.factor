@@ -18,7 +18,7 @@ CONSTANT: +error+ "status-error"
 CONSTANT: +clean+ "status-clean"
 
 TUPLE: builder
-host-name os cpu heartbeat-timestamp
+host-name os cpu heartbeat-timestamp start-timestamp
 clean-git-id clean-timestamp
 last-release release-git-id
 last-git-id last-timestamp last-report
@@ -30,6 +30,7 @@ builder "BUILDERS" {
     { "os" "OS" TEXT +user-assigned-id+ }
     { "cpu" "CPU" TEXT +user-assigned-id+ }
     { "heartbeat-timestamp" "HEARTBEAT_TIMESTAMP" TIMESTAMP }
+    { "start-timestamp" "START_TIMESTAMP" TIMESTAMP }
 
     { "clean-git-id" "CLEAN_GIT_ID" TEXT }
     { "clean-timestamp" "CLEAN_TIMESTAMP" TIMESTAMP }
@@ -45,6 +46,27 @@ builder "BUILDERS" {
     ! Can't name it CURRENT_TIMESTAMP because of bug in db library
     { "current-timestamp" "CURR_TIMESTAMP" TIMESTAMP }
     { "status" "STATUS" TEXT }
+} define-persistent
+
+TUPLE: run
+run-id timestamp host-name os cpu git-id ;
+
+run "RUNS" {
+    { "run-id" "RUN_ID" INTEGER +db-assigned-id+ }
+    { "timestamp" "TIMESTAMP" TIMESTAMP }
+    { "host-name" "HOST_NAME" TEXT }
+    { "os" "OS" TEXT }
+    { "cpu" "CPU" TEXT }
+    { "git-id" "GIT_ID" TEXT }
+} define-persistent
+
+TUPLE: benchmark
+run-id name duration ;
+
+benchmark "BENCHMARKS" {
+    { "run-id" "RUN_ID" INTEGER +user-assigned-id+ }
+    { "name" "NAME" TEXT +user-assigned-id+ }
+    { "duration" "DURATION_NANOSECONDS" UNSIGNED-BIG-INTEGER }
 } define-persistent
 
 TUPLE: counter id value ;
@@ -88,4 +110,4 @@ counter "COUNTER" {
     mason-db [ with-transaction ] with-db ; inline
 
 : init-mason-db ( -- )
-    { builder counter } ensure-tables ;
+    { builder counter run benchmark } ensure-tables ;

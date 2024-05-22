@@ -23,9 +23,17 @@ TUPLE: image header heap ;
     pick code-relocation-base>> (adjust-addresses)
     swap data-relocation-base>> (adjust-addresses) ;
 
+ERROR: unsupported-image-format ;
+
+: compressed-data? ( header -- ? ) [ data-heap-size ] [ compressed-data-size>> ] bi [ dup ] when-zero = not ;
+: compressed-code? ( header -- ? ) [ code-size>>    ] [ compressed-code-size>> ] bi [ dup ] when-zero = not ;
+
+: check-uncompressed ( header -- header/* )
+    [ [ compressed-data? ] [ compressed-code? ] bi or [ unsupported-image-format ] when ] keep ;
+
 : load-image ( image-file -- image )
     binary [
-        image-header read-struct dup [
+        image-header read-struct check-uncompressed dup [
             [ data-relocation-base>> ] [ data-heap-size read ] bi
             data-heap>objects
         ]

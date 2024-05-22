@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays checksums io.encodings.binary
-io.files io.streams.byte-array kernel math math.vectors
-sequences ;
+USING: accessors arrays checksums io.encodings.binary io.files
+io.streams.byte-array kernel math math.vectors sequences ;
 IN: checksums.hmac
 
 SLOT: block-size

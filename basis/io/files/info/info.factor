@@ -27,16 +27,16 @@ HOOK: link-info os ( path -- info )
 PRIVATE>
 
 : directory? ( path/info -- ? )
-    >file-info type>> +directory+ = ;
+    [ >file-info type>> +directory+ = ] ?call ;
 
 : regular-file? ( path/info -- ? )
-    >file-info type>> +regular-file+ = ;
+    [ >file-info type>> +regular-file+ = ] ?call ;
 
 : symbolic-link? ( path/info -- ? )
-    >file-info type>> +symbolic-link+ = ;
+    [ >file-info type>> +symbolic-link+ = ] ?call ;
 
 : sparse-file? ( path/info -- ? )
-    >file-info [ size-on-disk>> ] [ size>> ] bi < ;
+    [ >file-info [ size-on-disk>> ] [ size>> ] bi < ] ?call ;
 
 ! File systems
 HOOK: file-systems os ( -- array )

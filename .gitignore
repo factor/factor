@@ -9,6 +9,8 @@
 *.exp
 *.gch*
 *.image
+factor.image.*
+boot.*.image.*
 *.lib
 *.o
 *.obj

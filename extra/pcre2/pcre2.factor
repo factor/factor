@@ -124,7 +124,7 @@ M:: pcre2 findall ( subject obj -- matches )
             re pcre2-name-table
             re pcre2-name-entry-size
             [ rot * memory>byte-array ] [ <groups> ] bi
-            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] { } map>assoc
+            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] map>alist
             sort-keys
         ] if-zero :> name_table
 
@@ -134,7 +134,6 @@ M:: pcre2 findall ( subject obj -- matches )
                 [ throw ]
             } case
         ] [
-            rc name_count 1 + assert=
             match_data pcre2_get_ovector_pointer
             rc assert-positive 2 * PCRE2_SIZE <c-direct-array> :> ovector
 
@@ -212,7 +211,6 @@ M:: pcre2 findall ( subject obj -- matches )
 
                             f
                         ] [
-                            rc name_count 1 + assert=
                             [
                                 f ovector first2 subject subseq 2array ,
                                 name_table [

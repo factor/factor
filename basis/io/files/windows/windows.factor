@@ -226,10 +226,7 @@ M: windows wait-for-fd
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
-M: windows init-stdio
-    console-app?
-    [ init-c-stdio ]
-    [ null-reader null-writer null-writer set-stdio ] if ;
+M: windows init-stdio init-c-stdio ;
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
@@ -247,6 +244,8 @@ M: windows init-stdio
 : open-write ( path -- win32-file )
     GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 >>ptr ;
 
+: open-secure-write ( path -- win32-file )
+    GENERIC_WRITE CREATE_NEW FILE_ATTRIBUTE_TEMPORARY open-file 0 >>ptr ;
 
 <PRIVATE
 
@@ -279,6 +278,9 @@ M: windows (file-reader)
 
 M: windows (file-writer)
     open-write <output-port> ;
+
+M: windows (file-writer-secure)
+    open-secure-write <output-port> ;
 
 M: windows (file-appender)
     open-append <output-port> ;
@@ -378,8 +380,7 @@ M: windows normalize-path
         normalize-separators
     ] [
         absolute-path
-        normalize-separators
-        prepend-unicode-prefix
+        [ normalize-separators prepend-unicode-prefix ] ?call
     ] if ;
 
 M: windows home

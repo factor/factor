@@ -208,21 +208,22 @@ M: integer-literal value value>> ;
 M: object value ;
 
 : arm-bitfield ( seq -- assoc )
-    [ current-vocab name>> ?lookup-word ] map
-    [ dup width ] map>alist
-    dup values [ f = ] any? [ throw ] when ;
+    [ current-vocab name>> ?lookup-word ] map ! looks up the fields associated with the effect labels
+    [ dup width ] map>alist ! creates a list of { field bitwidth } pairs 
+    dup values [ f = ] any? [ throw ] when ; ! if any have no assigned bitwidth, throw.
 
 ERROR: bad-instruction values ;
 
 SYNTAX: ARM-INSTRUCTION:
-    scan-new-word
-    scan-effect
+    scan-new-word ! scans in the name given
+    scan-effect ! scans in the effect given (effect objects hold input and output sequences)
     [
-      in>> arm-bitfield
-      [ keys [ value ] map ]
-      [ values 32 [ - ] accumulate* ] bi zip
-      dup last second 0 = [ bad-instruction ] unless
-      '[ _ bitfield* 4 >le % ]
+      in>> arm-bitfield ! generates a list of { field bitwidth } pairs from the input
+      [ keys [ value ] map ] ! gets the fields back
+      ! for each field, how many bits are left in the instr after it?
+      [ values 32 [ - ] accumulate* ] bi zip ! then combines into another assoc
+      dup last second 0 = [ bad-instruction ] unless ! and there better be 0 bits left after the last field
+      '[ _ bitfield* 4 >le % ] ! this quot is the actual word effect
     ] [ in>> [ string>number ] reject { } <effect> ] bi define-declared ;
 >>
 
@@ -273,7 +274,7 @@ ARM-INSTRUCTION: ANDSi-encode ( bw 11 100100 (N)immrimms Rn Rd -- )
 ARM-INSTRUCTION: ANDSsr-encode ( bw 11 01010 shift2 0 Rm imm6 Rn Rd -- )
 
 ! ASR (immediate): Arithmetic Shift Right (immediate): an alias of SBFM.
-ARM-INSTRUCTION: ASRi-encode ( bw 00 100110 0 immr 011111 Rn Rd -- )
+ARM-INSTRUCTION: ASRi-encode ( bw 00 100110 1 immr 111111 Rn Rd -- )
 
 ! ASR (register): Arithmetic Shift Right (register): an alias of ASRV.
 ARM-INSTRUCTION: ASRr-encode ( bw 0 0 11010110 Rm 0010 10 Rn Rd -- )
@@ -701,7 +702,7 @@ ARM-INSTRUCTION: LDRpre-encode  ( 1 bw 111 0 00 01 0 imm9 11 Rn Rt -- )
 ARM-INSTRUCTION: LDRuoff-encode ( 1 bw 111 0 01 01 imm12 Rn Rt -- )
 
 ! LDR (literal): Load Register (literal).
-ARM-INSTRUCTION: LDRl-encode ( 1 bw 011 0 00 imm19 Rt -- )
+ARM-INSTRUCTION: LDRl-encode ( 0 bw 011 0 00 imm19 Rt -- )
 
 ! LDR (register): Load Register (register).
 ARM-INSTRUCTION: LDRr-encode ( 1 bw 111 0 00 01 1 Rm option3 S 1 0 Rn Rt -- )
@@ -906,7 +907,7 @@ ARM-INSTRUCTION: LDXRB-encode ( 00 001000 0 1 0 11111 0 11111 Rn Rt -- )
 ARM-INSTRUCTION: LDXRH-encode ( 01 001000 0 1 0 11111 0 11111 Rn Rt -- )
 
 ! LSL (immediate): Logical Shift Left (immediate): an alias of UBFM.
-ARM-INSTRUCTION: LSLi-encode ( bw 10 100110 bw immr bw 00000 Rn Rd -- )
+ARM-INSTRUCTION: LSLi-encode ( bw 10 100110 bw immr imms Rn Rd -- )
 
 ! LSL (register): Logical Shift Left (register): an alias of LSLV.
 ARM-INSTRUCTION: LSLr-encode ( bw 0 0 11010110 Rm 0010 00 Rn Rd -- )

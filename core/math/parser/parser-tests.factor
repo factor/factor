@@ -485,10 +485,6 @@ unit-test
 { 1/0. } [ "0x1p300000" string>number ] unit-test
 { 0.0  } [ "0x1p-300000" string>number ] unit-test
 
-{ "deadbeef" } [ B{ 222 173 190 239 } bytes>hex-string ] unit-test
-{ B{ 222 173 190 239 } } [ "deADbeEF" hex-string>bytes ] unit-test
-[ "0" hex-string>bytes ] [ invalid-hex-string-length? ] must-fail-with
-
 { "143.99999999999997" } [ 0x1.1ffffffffffffp7 number>string ] unit-test
 { "144.0" } [ 0x1.2p7 number>string ] unit-test
 { "144.00000000000003" } [ 0x1.2000000000001p7 number>string ] unit-test

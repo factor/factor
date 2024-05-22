@@ -3,7 +3,7 @@
 USING: accessors furnace.actions furnace.auth furnace.db
 furnace.redirection http.server.dispatchers urls
 webapps.mason.backend webapps.mason.grids webapps.mason.package
-webapps.mason.release webapps.mason.report
+webapps.mason.release webapps.mason.report webapps.mason.benchmarks
 webapps.mason.downloads webapps.mason.counter
 webapps.mason.status-update webapps.mason.docs-update
 webapps.mason.dashboard webapps.mason.make-release
@@ -25,6 +25,9 @@ build-engineer? define-capability
     mason-app new-dispatcher
     <build-report-action>
         "report" add-responder
+
+    <benchmark-results-action>
+        "benchmark-results" add-responder
 
     <download-package-action>
         { mason-app "download-package" } >>template

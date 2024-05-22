@@ -185,7 +185,7 @@ ERROR: no-card card deck ;
     n [
         holes deck 5 sample '[
             [ _ append best-holdem-hand drop ] keep
-        ] { } map>assoc minimum second
+        ] map>alist minimum second
     ] replicate histogram ;
 
 : (best-omaha-hand) ( seq -- pair )
@@ -199,7 +199,7 @@ ERROR: no-card card deck ;
     n [
         holes deck 5 sample '[
             [ _ append best-omaha-hand drop ] keep
-        ] { } map>assoc minimum second
+        ] map>alist minimum second
     ] replicate histogram ;
 
 ERROR: bad-suit-symbol ch ;

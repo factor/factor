@@ -7,8 +7,7 @@ splitting ;
 IN: mason.git
 
 : git-id ( -- id )
-    { "git" "show" } process-lines
-    first split-words second ;
+    { "git" "rev-parse" "HEAD" } process-lines first ;
 
 <PRIVATE
 

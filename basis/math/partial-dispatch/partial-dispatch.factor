@@ -106,13 +106,13 @@ M: word integer-op-input-classes
     ] [
         [ integer-op-triples ] 2dip
         [ define-integer-op-words ]
-        [ 2drop [ dup integer-op-word ] { } map>assoc % ]
+        [ 2drop [ dup integer-op-word ] map>alist % ]
         3bi
     ] 3bi ;
 
 : define-math-ops ( op -- )
     { fixnum bignum float }
-    [ [ dup 3array ] [ swap ?lookup-method ] 2bi ] with { } map>assoc
+    [ [ dup 3array ] [ swap ?lookup-method ] 2bi ] with map>alist
     sift-values
     [ def>> ] assoc-map
     [ length 1 = ] filter-values

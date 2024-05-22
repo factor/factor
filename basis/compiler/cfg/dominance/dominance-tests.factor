@@ -74,7 +74,7 @@ V{ } 5 test-bb
 { t } [ 0 5 [a..b] [ get dom-parent 0 get eq? ] all? ] unit-test
 
 : non-det-test ( -- cfg )
-    9 <iota> [ V{ } clone over insns>block ] { } map>assoc dup
+    9 <iota> [ V{ } clone over insns>block ] map>alist dup
     {
         { 0 1 }
         { 1 2 } { 1 7 }

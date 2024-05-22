@@ -20,9 +20,6 @@ PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
 : format-float ( n fill width precision format locale -- string )
     [ pad-null ] 4dip [ pad-null ] bi@ (format-float) >string ; inline
 
-: compose-all ( seq -- quot )
-    [ ] [ compose ] reduce ; inline
-
 : fix-sign ( string -- string )
     dup first CHAR: 0 = [
         dup [ [ CHAR: 0 = not ] [ digit? ] bi and ] find
@@ -95,7 +92,7 @@ PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
     format-fast-decimal?
     [ "f" format-float-fast ] [ format-decimal-simple ] if ;
 
-EBNF: parse-printf [=[
+EBNF: format-directive [=[
 
 zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
@@ -142,12 +139,13 @@ lists     = "[%" types ", %]"    => [[ second '[ _ { } map-as ", " join "{ " " }
 
 assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ [ _ _ bi* ":" glue ] { } assoc>map ", " join "{ " " }" surround ] ]]
 
-formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second ]]
+formats   = (types|fmt-%|lists|assocs|unknown)
+]=]
 
+EBNF: parse-printf [=[
+formats   = "%"~ <foreign format-directive formats>
 plain-text = [^%]+               => [[ >string ]]
-
 text      = (formats|plain-text)*
-
 ]=]
 
 : printf-quot ( format-string -- format-quot n )

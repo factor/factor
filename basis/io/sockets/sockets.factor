@@ -4,11 +4,11 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 byte-arrays classes classes.struct combinators
 combinators.short-circuit continuations destructors endian fry
-grouping init io.backend io.encodings.ascii
-io.encodings.binary io.pathnames io.ports io.streams.duplex
-kernel locals math math.parser memoize namespaces present
-sequences sequences.private splitting strings summary system
-vocabs vocabs.parser ip-parser ip-parser.private random ;
+grouping init io.backend io.encodings.ascii io.encodings.binary
+io.pathnames io.ports io.streams.duplex ip-parser
+ip-parser.private kernel locals math math.parser memoize
+namespaces present random sequences sequences.private splitting
+strings summary system threads vocabs vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -71,7 +71,9 @@ M: local protocol drop 0 ;
 
 SLOT: port
 
-TUPLE: ipv4 { host maybe{ string } read-only } ;
+TUPLE: hostname { host maybe{ string } read-only } ;
+
+TUPLE: ipv4 < hostname ;
 
 <PRIVATE
 
@@ -122,6 +124,8 @@ M: ipv4 make-sockaddr-outgoing
 M: ipv4 parse-sockaddr
     [ addr>> uint <ref> ] dip inet-ntop <ipv4> ;
 
+M: ipv4 present host>> ;
+
 TUPLE: inet4 < ipv4 { port maybe{ integer } read-only } ;
 
 : <inet4> ( host port -- inet4 )
@@ -137,9 +141,7 @@ M: inet4 present
 
 M: inet4 protocol drop 0 ;
 
-TUPLE: ipv6
-{ host maybe{ string } read-only }
-{ scope-id integer read-only } ;
+TUPLE: ipv6 < hostname { scope-id integer read-only } ;
 
 <PRIVATE
 
@@ -327,6 +329,14 @@ SYMBOL: remote-address
         ] dip with-stream
     ] with-scope ; inline
 
+: spawn-client ( remote encoding quot -- )
+    [
+        [
+            over remote-address set
+            <client> local-address set
+        ] dip '[ _ _ with-stream ] in-thread
+    ] with-scope ; inline
+
 : <server> ( addrspec encoding -- server )
     [
         [ (server) ] keep
@@ -387,8 +397,6 @@ STARTUP-HOOK: [ \ ipv6-supported? reset-memoized ]
 GENERIC: resolve-host ( addrspec -- seq )
 
 HOOK: resolve-localhost os ( -- obj )
-
-TUPLE: hostname { host maybe{ string } read-only } ;
 
 TUPLE: inet < hostname port ;
 

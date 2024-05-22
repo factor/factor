@@ -1,7 +1,7 @@
 USING: arrays assocs grouping hash-sets http.client
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.files.temp kernel math math.order math.parser
-sequences sets splitting strings tools.test unicode ;
+http.download io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files io.files.temp kernel math math.order
+math.parser sequences sets splitting strings tools.test unicode ;
 IN: unicode.collation.tests
 
 : test-equality ( str1 str2 -- ? ? ? ? )
@@ -19,7 +19,7 @@ IN: unicode.collation.tests
 
 : collation-test-lines ( -- lines )
     "https://downloads.factorcode.org/misc/UCA/15.1.0/CollationTest_SHIFTED.txt"
-    "CollationTest_SHIFTED_15.1.0.txt" cache-file [ ?download-to ] keep
+    "CollationTest_SHIFTED_15.1.0.txt" cache-file download-once-as
     utf8 file-lines [ "#" head? ] reject harvest ;
 
 : parse-collation-test-shifted ( -- lines )

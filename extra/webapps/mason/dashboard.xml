@@ -3,8 +3,12 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 	<t:title>Mason dashboard</t:title>
     <t:style t:include="resource:extra/webapps/mason/mason.css" />
+    <t:meta http-equiv="refresh" content="30" />
     <div style="padding: 10px;">
 	<h1>Build machines</h1>
+	<t:xml t:name="machines" />
+
+	<h1>Build targets</h1>
 	<t:xml t:name="builders" />
 
 	<h1>Force build now</h1>

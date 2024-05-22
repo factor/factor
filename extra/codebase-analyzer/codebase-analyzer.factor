@@ -9,7 +9,7 @@ tools.memory.private tools.wc unicode ;
 IN: codebase-analyzer
 
 : file-sizes ( paths -- assoc )
-    [ dup file-info size>> ] { } map>assoc ;
+    [ dup file-info size>> ] map>alist ;
 
 : binary-file? ( path -- ? )
     binary [ 1024 read ] with-file-reader [ 0 = ] any? ;
@@ -170,7 +170,10 @@ IN: codebase-analyzer
 : uses-yaml? ( paths -- ? ) [ yaml-file? ] any? ;
 
 : docker-file? ( path -- ? ) >lower file-name { "dockerfile" ".dockerignore" "docker-compose.yaml" } member? ;
-: docker-files ( paths -- paths' ) [ docker-file? ] filter ;
+: docker-files ( paths -- paths' )
+    [ [ docker-file? ] filter ]
+    [ [ >lower "dockerfile" subseq-of? ] filter ] bi
+    append members ;
 : uses-docker? ( paths -- ? ) [ docker-file? ] any? ;
 
 : automake-file? ( path -- ? )
@@ -294,10 +297,13 @@ IN: codebase-analyzer
 
 : analyze-codebase-path ( path -- )
     {
-        [ normalize-path "project at path `%s`" sprintf print nl ]
+        [ normalize-path "project at path `%s`" sprintf print ]
         [ uses-git? [ "uses git" print ] when ]
         [ has-package-json? [ "has a package.json file" print ] when ]
     } cleave ;
+
+: file. ( path -- ) >pathname ... ;
+: files. ( paths -- ) [ file. ] each ;
 
 : analyze-codebase-paths ( paths -- )
     {
@@ -306,32 +312,33 @@ IN: codebase-analyzer
             [ length "%d binary files" sprintf print ]
             [ length "%d text files" sprintf print ] bi*
         ]
-        [ github-files [ sort "has .github files" print ... ] unless-empty ]
-        [ license-files [ sort [ length "has %d license files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ readme-files [ sort "has readme files" print ... ] unless-empty ]
-        [ owners-files [ sort "has owners files" print ... ] unless-empty ]
-        [ codenotify-files [ sort "has codenotify files" print ... ] unless-empty ]
-        [ contributing-files [ sort "has contributing files" print ... ] unless-empty ]
-        [ changelog-files [ sort "has changelog files" print ... ] unless-empty ]
-        [ security-files [ sort "has security files" print ... ] unless-empty ]
-        [ notice-files [ sort "has notice files" print ... ] unless-empty ]
-        [ version-files [ sort "has version files" print ... ] unless-empty ]
+        [ github-files [ sort "has .github files" print files. ] unless-empty ]
+        [ license-files [ sort [ length "has %d license files" sprintf print ] [ files. ] bi ] unless-empty ]
+        [ readme-files [ sort "has readme files" print files. ] unless-empty ]
+        [ owners-files [ sort "has owners files" print files. ] unless-empty ]
+        [ codenotify-files [ sort "has codenotify files" print files. ] unless-empty ]
+        [ contributing-files [ sort "has contributing files" print files. ] unless-empty ]
+        [ changelog-files [ sort "has changelog files" print files. ] unless-empty ]
+        [ security-files [ sort "has security files" print files. ] unless-empty ]
+        [ notice-files [ sort "has notice files" print files. ] unless-empty ]
+        [ version-files [ sort "has version files" print files. ] unless-empty ]
         [
             { [ dot-files ] [ rc-files diff ] [ ignore-files diff ] } cleave
-            [ sort "has dot files" print ... ] unless-empty
+            [ sort "has dot files" print files. ] unless-empty
         ]
-        [ rc-files [ sort [ length "has %d rc files" sprintf print ] [ ... ] bi ] unless-empty ]
-        [ configure-files [ sort "uses configure files" print ... ] unless-empty ]
-        [ automake-files [ sort "uses automake" print ... ] unless-empty ]
-        [ make-files [ sort "uses make" print ... ] unless-empty ]
-        [ nmake-files [ sort "uses nmake" print ... ] unless-empty ]
-        [ cmake-files [ sort "uses cmake" print ... ] unless-empty ]
-        [ gradle-files [ sort "uses gradle" print ... ] unless-empty ]
-        [ cargo-files [ sort "uses rust/cargo" print ... ] unless-empty ]
-        [ julia-project-files [ sort "uses julia Project.toml" print ... ] unless-empty ]
-        [ in-files [ sort "uses 'in' files" print ... ] unless-empty ]
-        [ ignore-files [ sort [ length "has %d ignore files" sprintf print ] [ ... ] bi ] unless-empty nl ]
-        [ [ rust-project-dir? ] filter [ [ "rust projects at " print . ] [ [ analyze-rust-project ] each ] bi ] unless-empty nl ]
+        [ rc-files [ sort [ length "has %d rc files" sprintf print ] [ files. ] bi ] unless-empty ]
+        [ configure-files [ sort "uses configure files" print files. ] unless-empty ]
+        [ automake-files [ sort "uses automake" print files. ] unless-empty ]
+        [ make-files [ sort "uses make" print files. ] unless-empty ]
+        [ nmake-files [ sort "uses nmake" print files. ] unless-empty ]
+        [ cmake-files [ sort "uses cmake" print files. ] unless-empty ]
+        [ docker-files [ sort "uses docker" print files. ] unless-empty ]
+        [ gradle-files [ sort "uses gradle" print files. ] unless-empty ]
+        [ cargo-files [ sort "uses rust/cargo" print files. ] unless-empty ]
+        [ julia-project-files [ sort "uses julia Project.toml" print files. ] unless-empty ]
+        [ in-files [ sort "uses 'in' files" print files. ] unless-empty ]
+        [ ignore-files [ sort [ length "has %d ignore files" sprintf print ] [ files. ] bi ] unless-empty ]
+        [ [ rust-project-dir? ] filter [ [ "rust projects at " print file. ] [ [ analyze-rust-project ] each ] bi ] unless-empty ]
         [
             [ upper-files ] keep
             {
@@ -346,12 +353,12 @@ IN: codebase-analyzer
                 [ notice-files diff ]
                 [ version-files diff ]
             } cleave
-            [ sort [ length "has %d UPPER files (minus github,license,readme,owner,codenotify,contributing,changelog,security,notice,version)" sprintf print ] [ ... ] bi ] unless-empty nl
+            [ sort [ length "has %d UPPER files (minus github,license,readme,owner,codenotify,contributing,changelog,security,notice,version)" sprintf print ] [ files. ] bi ] unless-empty
         ]
-        [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. nl ]
-        [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. nl ]
-        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 index-or-length tail* reverse assoc. nl ]
-        [ "Top 10 file extension counts" print count-by-file-extension 10 index-or-length tail* reverse assoc. nl ]
+        [ "Top 20 largest files" print file-sizes sort-values 20 index-or-length tail* [ normalize-path ] map-keys reverse assoc. ]
+        [ "Top 10 file extension sizes" print sum-sizes-by-extension 10 index-or-length tail* reverse assoc. ]
+        [ "Top 10 text file line counts" print sum-line-counts-by-extension 10 index-or-length tail* reverse assoc. ]
+        [ "Top 10 file extension counts" print count-by-file-extension 10 index-or-length tail* reverse assoc. ]
     } cleave ;
 
 : analyze-codebase ( path -- )

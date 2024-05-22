@@ -5,7 +5,7 @@
 namespace factor {
 
 #define CALLSTACK_BOTTOM(ctx) \
-  (ctx->callstack_seg->end - sizeof(cell) * 5)
+  (ctx->callstack_seg->end - sizeof(cell) * 6)
 
 static const fixnum xt_tail_pic_offset = 4 + 1;
 

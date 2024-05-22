@@ -33,6 +33,7 @@ ARTICLE: "network-connection" "Connection-oriented networking"
 { $subsections
     <client>
     with-client
+    spawn-client
 }
 "The local address of a client socket can be controlled with this word:"
 { $subsections
@@ -164,6 +165,13 @@ HELP: with-client
         "] with-client"
     }
 } ;
+
+HELP: spawn-client
+{ $values { "remote" "an address specifier" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
+{ $description "Opens a network connection before spawning a " { $link thread } " to call the quotation in a new dynamic scope with " { $link input-stream } " and " { $link output-stream } " rebound to the network streams. The local address the socket is connected to is stored in the " { $link local-address } " variable, and the remote address is stored in the " { $link remote-address } " variable." }
+{ $errors "Throws an error if the connection cannot be established." } ;
+
+{ <client> with-client spawn-client } related-words
 
 HELP: <server>
 { $values { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }

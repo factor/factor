@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! Copyright (C) 2015 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays bootstrap.image checksums checksums.openssl io
-io.directories io.encodings.ascii io.encodings.utf8 io.files
-io.files.temp io.files.unique io.launcher io.pathnames kernel
-make math.parser namespaces sequences splitting system unicode ;
+USING: arrays bootstrap.image checksums checksums.openssl
+hex-strings io io.directories io.encodings.ascii
+io.encodings.utf8 io.files io.files.temp io.files.unique
+io.launcher io.pathnames kernel make namespaces sequences
+splitting system unicode ;
 IN: bootstrap.image.upload
 
 SYMBOL: upload-images-destination

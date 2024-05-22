@@ -546,7 +546,7 @@ TYPED:: elf-sections ( elf: Elf32/64_Ehdr -- sections )
         [
             sh_name>> section-names <displaced-alien> ascii alien>string
         ] keep
-    ] { } map>assoc ;
+    ] map>alist ;
 
 TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
     elf ".strtab" elf-section-data-by-name nip >c-ptr :> strings
@@ -558,7 +558,7 @@ TYPED:: elf-symbols ( elf: Elf32/64_Ehdr section-data: uchar-array -- symbols )
         [
             st_name>> strings <displaced-alien> ascii alien>string
         ] keep
-    ] { } map>assoc ;
+    ] map>alist ;
 
 ! High level interface
 TUPLE: elf elf-header ;

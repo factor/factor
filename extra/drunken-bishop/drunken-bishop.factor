@@ -1,9 +1,8 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: byte-arrays combinators endian io kernel math
-math.bitwise math.order math.parser namespaces sequences strings
-;
+USING: byte-arrays combinators endian hex-strings io kernel math
+math.bitwise math.order namespaces sequences strings ;
 
 IN: drunken-bishop
 

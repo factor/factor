@@ -21,12 +21,10 @@ struct image_header {
   cell code_relocation_base;
   // size of code heap
   cell code_size;
-
   union { cell reserved_1; cell escaped_data_size; }; // undefined if data_size <>0, stores size of data heap otherwise
-  cell reserved_2; // undefined if data_size <>0, 0 otherwise
-  cell reserved_3; // undefined if data_size <>0, 0 otherwise
+  union { cell reserved_2; cell compressed_data_size; }; // undefined if data_size <>0, compressed data heap size if smaller than data heap size
+  union { cell reserved_3; cell compressed_code_size; }; // undefined if data_size <>0, compressed code heap size if smaller than code heap size
   cell reserved_4; // undefined if data_size <>0, 0 otherwise
-
   // Initial user environment
   cell special_objects[special_object_count];
 };

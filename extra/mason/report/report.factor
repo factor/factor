@@ -1,14 +1,19 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs combinators.smart debugger formatting
+USING: arrays assocs combinators.smart debugger formatting
 io.encodings.utf8 io.files io.streams.string kernel literals
-mason.common mason.config mason.disk math namespaces sequences
-splitting xml.syntax xml.writer ;
+mason.common mason.config mason.disk math namespaces prettyprint
+sequences sets splitting xml.syntax xml.writer ;
 IN: mason.report
 
+: git-id>url ( id -- github-url )
+    "https://github.com/factor/factor/commit/" "" prepend-as ; inline
+
+: git-short-link ( id -- short-link )
+    [ git-id>url ] keep 8 head "…" append [XML <a href=<->><-></a> XML] ;
+
 : git-link ( id -- link )
-    [ "https://github.com/factor/factor/commit/" "" prepend-as ] keep
-    [XML <a href=<->><-></a> XML] ;
+    [ git-id>url ] keep [XML <a href=<->><-></a> XML] ;
 
 : common-report ( -- xml )
     target-os get
@@ -132,6 +137,23 @@ IN: mason.report
         ] output>array sift
     ] with-report ;
 
+: benchmark-results ( -- assoc )
+    ${
+        boot-time-file
+        load-time-file
+        test-time-file
+        help-lint-time-file
+        benchmark-time-file
+        html-help-time-file
+    } [
+        dup eval-file 2array
+    ] map
+    benchmarks-file eval-file
+    union ;
+
+: successful-benchmarks ( -- )
+    "benchmark-results" utf8 [ benchmark-results ... ] with-file-writer ;
+
 : build-clean? ( -- ? )
     ${
         load-all-vocabs-file
@@ -142,4 +164,4 @@ IN: mason.report
     } [ eval-file empty? ] all? ;
 
 : success ( -- status )
-    successful-report build-clean? status-clean status-dirty ? ;
+    successful-report build-clean? [ successful-benchmarks status-clean ] [ status-dirty ] if ;

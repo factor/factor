@@ -20,9 +20,7 @@ SLOT: interactor
 SLOT: history
 
 : history-list ( interactor -- alist )
-    history>> elements>>
-    [ dup string>> H{ { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
-    <reversed> ;
+    history>> elements>> [ dup string>> ] map>alist <reversed> ;
 
 : history-completions ( short interactor -- seq )
     history-list over empty? [ nip ] [ members completions ] if ;
@@ -59,7 +57,7 @@ M: history-completion completion-quot drop '[ _ history-completions ] ;
 GENERIC: completion-element ( completion-mode -- element )
 
 M: object completion-element drop word-start-elt ;
-M: history-completion completion-element drop one-line-elt ;
+M: history-completion completion-element drop doc-elt ;
 
 GENERIC: completion-banner ( completion-mode -- string )
 

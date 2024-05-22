@@ -49,7 +49,7 @@ CONSTANT: extra-flags { "🏁" "🚩" "🎌" "🏴" "🏳" "🏳️‍🌈" "�
 
 : explain-extra-flags ( -- )
     extra-flags [
-        dup . [ dup char>name ] { } map>assoc .
+        dup . [ dup char>name ] map>alist .
     ] each ;
 
 

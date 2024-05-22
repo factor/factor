@@ -160,7 +160,7 @@ ERROR: sequence-expected obj ;
     dup parent-directory 2dup = [ 2drop f ] [ nip ] if ;
 
 : containing-directory ( path -- path' )
-    dup file-info directory? [ parent-directory ] unless ;
+    dup ?file-info directory? [ parent-directory ] unless ;
 
 : ?qualified-directory-files ( path -- seq )
     [ qualified-directory-files ]
@@ -187,7 +187,7 @@ ERROR: sequence-expected obj ;
     qualified-directory-entries [
         [ name>> dup ] [ directory? ] bi
         [ directory-size ] [ link-size/0 ] if
-    ] { } map>assoc sort-values ;
+    ] map>alist sort-values ;
 
 : find-files-by-extensions ( path extensions -- seq )
     [ >lower ] map
@@ -215,8 +215,13 @@ HOOK: delete-directory io-backend ( path -- )
 
 HOOK: move-file io-backend ( from to -- )
 
+: create-parent-directory ( path -- )
+    normalize-path parent-directory make-directories ;
+
 : ?move-file ( from to -- )
-    over file-exists? [ move-file ] [ 2drop ] if ;
+    over file-exists? [
+        dup create-parent-directory move-file
+    ] [ 2drop ] if ;
 
 HOOK: move-file-atomically io-backend ( from to -- )
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators continuations fry io.backend io.directories
-io.pathnames kernel locals namespaces random.data sequences
-system vocabs ;
+io.files io.pathnames kernel locals namespaces random.data
+sequences system vocabs ;
 IN: io.files.unique
 
 <PRIVATE
@@ -24,6 +24,9 @@ SYMBOL: unique-retries
 
 : random-file-name ( -- string )
     unique-length get random-string ;
+
+: random-file-name* ( prefix suffix -- string )
+    unique-length get random-string glue ;
 
 : retry ( quot: ( -- ? ) n -- )
     <iota> swap [ drop ] prepose attempt-all ; inline
@@ -47,6 +50,9 @@ PRIVATE>
             [ [ delete-file ] each ] [ rethrow ] bi*
         ] recover
     ] unique-retries get retry [ absolute-path ] map ;
+
+: with-unique-file-writer ( ..a prefix suffix encoding quot -- ..b path )
+    [ random-file-name* ] 2dip [ with-file-writer-secure ] keepdd normalize-path ; inline
 
 :: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path

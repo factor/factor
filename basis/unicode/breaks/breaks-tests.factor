@@ -1,6 +1,6 @@
-USING: tools.test unicode sequences math http.client kernel
-splitting unicode.categories io.pathnames io.encodings.utf8
-io.files io.files.temp strings quotations math.parser locals ;
+USING: http.download io.encodings.utf8 io.files io.files.temp
+kernel math.parser quotations sequences splitting strings
+tools.test unicode ;
 IN: unicode.breaks.tests
 
 { "\u001112\u001161\u0011abA\u000300a\r\r\n" }
@@ -21,11 +21,11 @@ IN: unicode.breaks.tests
 
 : grapheme-break-test ( -- filename )
     "https://downloads.factorcode.org/misc/UCD/15.1.0/auxiliary/GraphemeBreakTest.txt"
-    "GraphemeBreakTest-15.1.0.txt" cache-file [ ?download-to ] keep ;
+    "GraphemeBreakTest-15.1.0.txt" cache-file download-once-as ;
 
 : word-break-test ( -- filename )
     "https://downloads.factorcode.org/misc/UCD/15.1.0/auxiliary/WordBreakTest.txt"
-    "WordBreakTest-15.1.0.txt" cache-file [ ?download-to ] keep ;
+    "WordBreakTest-15.1.0.txt" cache-file download-once-as ;
 
 : parse-test-file ( file-name -- tests )
     utf8 file-lines

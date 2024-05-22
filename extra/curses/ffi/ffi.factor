@@ -284,3 +284,5 @@ FUNCTION: int wvline ( WINDOW* win, chtype ch, int n )
 FUNCTION: bool is_term_resized ( int lines, int columns )
 FUNCTION: int resize_term ( int lines, int columns )
 FUNCTION: int resizeterm ( int lines, int columns )
+
+C-GLOBAL: int ESCDELAY

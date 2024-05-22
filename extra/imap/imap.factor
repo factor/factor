@@ -1,9 +1,10 @@
-USING: accessors arrays assocs calendar calendar.english
-calendar.format calendar.parser formatting grouping io io.crlf
-io.encodings.ascii io.encodings.binary io.encodings.string
-io.encodings.utf7 io.encodings.utf8 io.sockets io.sockets.secure
-io.streams.duplex io.streams.string kernel math math.parser
-multiline sequences sequences.extras splitting strings ;
+USING: accessors arrays ascii assocs base64 calendar
+calendar.english calendar.format calendar.parser combinators
+formatting grouping io io.crlf io.encodings.ascii
+io.encodings.binary io.encodings.string io.encodings.utf7
+io.encodings.utf8 io.sockets io.sockets.secure io.streams.duplex
+io.streams.string kernel math math.parser multiline sequences
+sequences.extras splitting splitting.monotonic strings ;
 QUALIFIED: pcre
 IN: imap
 
@@ -155,6 +156,10 @@ PRIVATE>
     [ "UID SEARCH CHARSET UTF-8 %s" sprintf ] dip utf8 encode
     command-response parse-items [ string>number ] map ;
 
+: search-imap-by-subject ( string -- uids ) [ "SUBJECT" ] dip search-mails ;
+: search-imap-by-body ( string -- uids ) [ "BODY" ] dip search-mails ;
+: search-imap-by-from ( string -- uids ) [ "FROM" ] dip search-mails ;
+
 : fetch-mails ( uids data-spec -- texts )
     [ comma-list ] dip "UID FETCH %s %s" sprintf "" command-response but-last ;
 
@@ -175,7 +180,62 @@ PRIVATE>
     "" command-response
     parse-store-mail ;
 
+TUPLE: parsed-email
+date to from subject cc
+return-path
+content-type
+content-transfer-encoding
+headers
+decoded-body ;
+
+: <parsed-email> ( -- obj )
+    parsed-email new
+        V{ } clone >>headers ; inline
+
+: decode-email-body ( parsed-email body -- parsed-email )
+    over content-transfer-encoding>> {
+        { "base64" [ base64> utf8 decode >>decoded-body ] }
+        [
+            ! "unsupported content-transfer-encoding" print
+            drop
+            >>decoded-body
+        ]
+    } case ;
+
+: parse-email-header ( parsed-email strings -- parsed-email )
+    [ nip ?first "\t\s" member? ] monotonic-split
+    [
+        [ [ blank? ] trim ] map " " join
+        ": " split1 swap >lower
+    ] map>alist
+    [
+        [ pick headers>> push-at ]
+        [
+            {
+                { "date" [ >>date ] }
+                { "to" [ >>to ] }
+                { "from" [ >>from ] }
+                { "subject" [ >>subject ] }
+                { "return-path" [ >>return-path ] }
+                { "cc" [ >>to ] }
+                { "content-transfer-encoding" [ >>content-transfer-encoding ] }
+                { "content-type" [ >>content-type ] }
+                [ 2drop ]
+            } case
+        ] 2bi
+    ] assoc-each ;
+
+: parse-email ( string -- parsed-email )
+    [ <parsed-email> ] dip
+    "\r\n\r\n" split1
+    [ string-lines parse-email-header ] dip decode-email-body ;
+
 ! High level API
+
+: reject-uid-lines ( seq -- seq' ) [ "(UID" head? ] reject ;
+
+: fetch-rfc822-mails ( uids -- parsed-emails )
+    [ { } ] [ "(RFC822)" fetch-mails reject-uid-lines [ parse-email ] map ] if-empty ;
 
 : with-imap ( host email password quot -- )
     [ <imap4ssl> ] 3dip '[ _ _ login drop @ ] with-stream ; inline

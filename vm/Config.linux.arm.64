@@ -1,4 +1,4 @@
 include vm/Config.linux
 include vm/Config.arm
-PLAF_DLL_OBJS += vm/cpu-arm.64.o
-PLAF_MASTER_HEADERS += vm/cpu-arm.64.hpp
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-arm.64.o
+PLAF_MASTER_HEADERS += $(BUILD_DIR)/cpu-arm.64.hpp

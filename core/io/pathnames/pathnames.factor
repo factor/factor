@@ -6,6 +6,8 @@ IN: io.pathnames
 
 SYMBOL: current-directory
 
+CONSTANT: cross-platform-path-separator "/"
+
 : path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
 
 : path-separator ( -- string ) os windows? "\\" "/" ? ;
@@ -180,6 +182,8 @@ M: string absolute-path
 M: object normalize-path
     absolute-path ;
 
+M: f absolute-path ;
+
 : root-path* ( path -- path' )
     dup absolute-path? [
         dup [ path-separator? ] find
@@ -217,10 +221,10 @@ M: object relative-path relative-path* ;
     ] keep dup absolute-path? [
         [
             [ ".." = ] trim-head
-            path-separator join
+            cross-platform-path-separator join
         ] dip root-path prepend-path
     ] [
-        drop path-separator join [ "." ] when-empty
+        drop cross-platform-path-separator join [ "." ] when-empty
     ] if ;
 
 HOOK: canonicalize-path io-backend ( path -- path' )

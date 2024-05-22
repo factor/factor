@@ -1,10 +1,9 @@
 ! Copyright (C) 2014 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: alien alien.c-types alien.data alien.destructors
-alien.syntax command-line curl.ffi destructors io
-io.encodings.string io.encodings.utf8 io.streams.c kernel math
-namespaces present sequences ;
+USING: alien.destructors command-line curl.ffi destructors
+http.download io.backend io.streams.c kernel namespaces present
+sequences ;
 
 IN: curl
 
@@ -27,20 +26,23 @@ DESTRUCTOR: fclose
     CURLOPT_URL swap present curl-set-opt ;
 
 : curl-set-file ( CURL path -- )
-    CURLOPT_FILE swap "wb" fopen &fclose curl-set-opt ;
+    CURLOPT_FILE swap normalize-path "wb" fopen &fclose curl-set-opt ;
 
 : curl-perform ( CURL -- )
     curl_easy_perform check-code ;
 
 PRIVATE>
 
-: curl-download-to ( url path -- )
+: curl-download-as ( url path -- )
     [
         curl-init
         [ swap curl-set-file ]
         [ swap curl-set-url ]
         [ curl-perform ] tri
     ] with-destructors ;
+
+: curl-download ( url -- path )
+    dup download-name [ curl-download-as ] keep ;
 
 : curl-main ( -- )
     command-line get [

@@ -3,3 +3,4 @@
 USING: qw tools.test ;
 
 { { "zippity" "doo" "dah" } } [ qw{ zippity doo dah } ] unit-test
+{ { } } [ qw{ } ] unit-test

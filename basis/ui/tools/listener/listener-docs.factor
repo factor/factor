@@ -35,6 +35,8 @@ HELP: wait-for-listener
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener adds input history and word and vocabulary completion. A summary with any outstanding error conditions is displayed before every prompt (see " { $link "ui.tools.error-list" } " for details)."
 $nl
+"If the file " { $snippet "~/.factor-history" } " exists, input history is made persistent by appending history once the graphical listener closes and reading it back in upon (re)starting."
+$nl
 "See " { $link "listener" } " for general information on the listener."
 { $command-map listener-gadget "toolbar" }
 { $command-map interactor "completion" }

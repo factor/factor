@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 Anonymous
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors http.client io io.encodings.ascii io.files
+USING: accessors http.download io io.encodings.ascii io.files
 io.files.temp kernel math math.parser sequences
 splitting urls ;
 IN: rosetta-code.text-processing.max-licenses
@@ -62,10 +62,8 @@ TUPLE: maxlicense max-count current-count times ;
 : process ( max line -- max ) split-line inc-current-count update-time ;
 
 MEMO: mlijobs ( -- lines )
-    "mlijobs.txt" temp-file dup file-exists? [
-        URL" https://rosettacode.org/resources/mlijobs.txt"
-        over download-to
-    ] unless ascii file-lines ;
+    URL" https://raw.githubusercontent.com/def-/nim-unsorted/master/mlijobs.txt"
+    "mlijobs.txt" temp-file download-once-as ascii file-lines ;
 
 PRIVATE>
 

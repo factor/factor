@@ -193,6 +193,8 @@ void factor_vm::bignum_divide(bignum* numerator, bignum* denominator,
                               bignum** quotient, bignum** remainder) {
   if (BIGNUM_ZERO_P(denominator)) {
     divide_by_zero_error();
+    (*quotient) = denominator;
+    (*remainder) = denominator;
     return;
   }
   if (BIGNUM_ZERO_P(numerator)) {

@@ -291,3 +291,6 @@ MACRO: switch ( quot-alist -- quot ) [switch] ;
 SYNTAX: INVERSE: scan-word parse-definition define-inverse ;
 
 SYNTAX: DUAL: scan-word scan-word define-dual ;
+
+MACRO: under ( invertible-quot quot -- quot )
+    over [undo] '[ @ @ @ ] ;

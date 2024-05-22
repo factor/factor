@@ -1,9 +1,9 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras checksums checksums.sha
-combinators formatting hashtables http http.client
+combinators formatting hashtables hex-strings http http.client
 http.client.post-data io io.files io.pathnames json kernel make
-math.parser namespaces namespaces.extras sequences sorting urls ;
+namespaces namespaces.extras sequences sorting urls ;
 IN: backblaze
 
 SYMBOL: backblaze-application-key-id

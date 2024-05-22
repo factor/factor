@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs checksums checksums.md5 classes.tuple
-formatting http.client images.http io.encodings.string
-io.encodings.utf8 json kernel math.parser namespaces sequences
-urls ;
+formatting hex-strings http.client images.http
+io.encodings.string io.encodings.utf8 json kernel namespaces
+sequences urls ;
 
 IN: gravatar
 

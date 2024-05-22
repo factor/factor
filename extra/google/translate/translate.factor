@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: assocs combinators grouping http.client io io.files.temp
-io.files.unique json kernel make sequences urls ;
+USING: assocs combinators grouping http.client http.download io
+io.files.temp io.files.unique json kernel make sequences urls ;
 
 IN: google.translate
 
@@ -55,7 +55,7 @@ TUPLE: response-error response error ;
 : translate-tts ( text -- file )
     "https://translate.google.com/translate_tts?tl=en" >url
     swap "q" set-query-param [
-        "" ".mp3" unique-file [ download-to ] keep
+        "" ".mp3" unique-file download-as
     ] with-temp-directory ;
 
 ! Example:

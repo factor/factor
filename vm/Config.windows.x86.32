@@ -1,4 +1,4 @@
-PLAF_DLL_OBJS += vm/os-windows-x86.32.o
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-windows-x86.32.o
 PLAF_MASTER_HEADERS += vm/os-windows.32.hpp vm/atomic-cl-32.hpp vm/atomic.hpp
 DLL_PATH=http://factorcode.org/dlls/32
 WINDRES=windres -F pe-i386

@@ -43,21 +43,6 @@ HELP: <trace-request>
 { $description "Constructs an HTTP TRACE request for the requested URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
-HELP: download
-{ $values { "url" { $or url string } } }
-{ $description "Downloads the contents of the URL to a file in the " { $link current-directory } " having the same file name." }
-{ $errors "Throws an error if the HTTP request fails." } ;
-
-HELP: download-to
-{ $values { "url" { $or url string } } { "file" "a pathname string" } }
-{ $description "Downloads the contents of the URL to a file with the given pathname." }
-{ $errors "Throws an error if the HTTP request fails." } ;
-
-HELP: ?download-to
-{ $values { "url" { $or url string } } { "file" "a pathname string" } }
-{ $description "Version of " { $link download-to } " that only downloads if " { $snippet "file" } " does not exist." }
-{ $errors "Throws an error if the HTTP request fails." } ;
-
 HELP: http-get
 { $values { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Downloads the contents of a URL." }
@@ -171,12 +156,8 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
     http-get
     http-get*
 }
-"Utilities to retrieve a " { $link url } " and save the contents to a file:"
-{ $subsections
-    download
-    download-to
-    ?download-to
-}
+"To download to a file, see the " { $link "http.download" } " vocabulary."
+
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsections
     <get-request>

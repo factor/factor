@@ -117,23 +117,6 @@ HELP: #
 { $values { "n" real } }
 { $description "Appends the string representation of a real number to the end of the sequence being constructed by " { $link make } "." } ;
 
-HELP: bytes>hex-string
-{ $values { "bytes" sequence } { "hex-string" string } }
-{ $description "Converts a sequence of bytes (integers in the range [0,255]) to a string of hex numbers in the range [00,ff]." }
-{ $examples
-    { $example "USING: math.parser prettyprint ;" "B{ 1 2 3 4 } bytes>hex-string ." "\"01020304\"" }
-}
-{ $notes "Numbers are zero-padded on the left." } ;
-
-HELP: hex-string>bytes
-{ $values { "hex-string" sequence } { "bytes" byte-array } }
-{ $description "Converts a sequence of hex numbers in the range [00,ff] to a sequence of bytes (integers in the range [0,255])." }
-{ $examples
-    { $example "USING: math.parser prettyprint ;" "\"cafebabe\" hex-string>bytes ." "B{ 202 254 186 190 }" }
-} ;
-
-{ bytes>hex-string hex-string>bytes } related-words
-
 HELP: >dec
 { $values
     { "n" integer }
@@ -148,14 +131,6 @@ HELP: dec>
 }
 { $description "Converts a string representing a decimal integer to an integer.
 Returns " { $link f } " if the string cannot be converted." } ;
-
-HELP: invalid-hex-string-length
-{ $values
-    { "n" integer }
-}
-{ $description "Throws an " { $link invalid-hex-string-length } " error." }
-{ $error-description "A hex string must have an even number of characters, as
-bytes are interpreted in pairs." } ;
 
 HELP: invalid-radix
 { $values

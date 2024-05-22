@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs base64 calendar calendar.format
-checksums.hmac checksums.sha combinators.smart formatting http
-http.client json kernel make math.parser namespaces random
+checksums.hmac checksums.sha combinators.smart formatting
+hex-strings http http.client json kernel make namespaces random
 sequences splitting ;
 
 IN: visionect

@@ -73,13 +73,11 @@ SYMBOL: script
 
 SYMBOL: meta
 
-: add-meta ( name content -- )
-    2array meta get push ;
+: add-meta ( attrs -- )
+    >alist meta get push ;
 
 : get-meta ( -- xml )
-    meta get [
-        [XML <meta name=<-> content=<->/> XML]
-    ] { } assoc>map ;
+    meta get [ "meta" swap <contained-tag> ] map ;
 
 : write-meta ( -- )
     get-meta write-xml ;

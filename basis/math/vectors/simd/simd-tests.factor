@@ -311,7 +311,7 @@ simd-classes&reps [
 
 : check-boolean-ops ( class elt-class compare-quot -- seq )
     [
-        [ boolean-ops [ dup vector-words at ] { } map>assoc ] 2dip
+        [ boolean-ops [ dup vector-words at ] map>alist ] 2dip
         '[ first2 vector-word-inputs _ _ check-boolean-op ]
     ] dip check-optimizer ; inline
 

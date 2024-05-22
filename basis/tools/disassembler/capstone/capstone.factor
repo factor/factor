@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data
 alien.destructors alien.libraries alien.strings alien.syntax
-arrays classes.struct combinators destructors kernel layouts
-math math.parser namespaces sequences specialized-arrays
-system tools.disassembler.private tools.memory ;
+arrays classes.struct combinators destructors hex-strings kernel
+math namespaces sequences specialized-arrays system
+tools.disassembler.private tools.memory ;
 IN: tools.disassembler.capstone
 
 << "libcapstone" {

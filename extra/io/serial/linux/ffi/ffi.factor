@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax assocs classes.struct
-io.serial kernel system ;
+USING: alien.c-types alien.syntax classes.struct kernel system ;
 IN: io.serial.linux.ffi
 
 CONSTANT: NCCS 32
@@ -143,38 +142,3 @@ CONSTANT: VDISCARD 13
 CONSTANT: VWERASE 14
 CONSTANT: VLNEXT 15
 CONSTANT: VEOL2 16
-
-M: linux lookup-baud ( n -- n )
-    H{
-        { 0       0o0000000 }
-        { 50      0o0000001 }
-        { 75      0o0000002 }
-        { 110     0o0000003 }
-        { 134     0o0000004 }
-        { 150     0o0000005 }
-        { 200     0o0000006 }
-        { 300     0o0000007 }
-        { 600     0o0000010 }
-        { 1200    0o0000011 }
-        { 1800    0o0000012 }
-        { 2400    0o0000013 }
-        { 4800    0o0000014 }
-        { 9600    0o0000015 }
-        { 19200   0o0000016 }
-        { 38400   0o0000017 }
-        { 57600   0o0010001 }
-        { 115200  0o0010002 }
-        { 230400  0o0010003 }
-        { 460800  0o0010004 }
-        { 500000  0o0010005 }
-        { 576000  0o0010006 }
-        { 921600  0o0010007 }
-        { 1000000 0o0010010 }
-        { 1152000 0o0010011 }
-        { 1500000 0o0010012 }
-        { 2000000 0o0010013 }
-        { 2500000 0o0010014 }
-        { 3000000 0o0010015 }
-        { 3500000 0o0010016 }
-        { 4000000 0o0010017 }
-    } ?at [ invalid-baud ] unless ;
