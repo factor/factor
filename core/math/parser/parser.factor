@@ -380,6 +380,15 @@ DEFER: @neg-digit
 
 PRIVATE>
 
+: base-digits> ( seq radix -- n )
+  [ swap [ * ] dip + ] curry 0 swap reduce ;
+
+: >base-digits ( n radix -- seq )
+  [ /mod ] curry [ dup 0 > ] swap produce nip reverse ;
+
+: digits> ( seq -- n ) 10 base-digits> ;
+: >digits ( n -- seq ) 10 >base-digits ;
+
 : string>number ( str -- n/f )
     10 <number-parse> [ @first-char ] require-next-digit ;
 
