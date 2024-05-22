@@ -27,6 +27,10 @@ STRUCT: image-footer
 
 <PRIVATE
 
+! return empty sequence instead of f
+: read* ( n -- bytes )
+  read [ B{ } clone ] unless* ; inline
+
 : read-footer ( -- footer )
   tell-input
   image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
@@ -58,14 +62,6 @@ TUPLE: image
   dup code>> length over header>> compressed-code-size<<
 ;
 
-<PRIVATE
-
-! return empty sequence instead of f
-: read* ( n -- bytes )
-  read [ B{ } clone ] unless* ; inline
-
-PRIVATE>
-
 ! load factor image
 : load-factor-image ( filename -- image )
   binary [
@@ -83,13 +79,14 @@ PRIVATE>
   ] with-file-writer
 ;
 
+: uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
+: uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
+
 SYMBOL: compression-level
 12 compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
 
 : (compress) ( byte-array -- compressed ) compression-level get zstd-compress-level ;
 : compress ( byte-array -- compressed ) [ (compress) ] keep [ [ length ] bi@ < ] 2keep ? ;
-: uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
-: uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
 : compress-data ( image -- image' ) dup uncompressed-data? [ dup data>> compress >>data ] when ; ! only compress uncompressed data
 : compress-code ( image -- image' ) dup uncompressed-code? [ dup code>> compress >>code ] when ; ! only compress uncompressed code
 : compress-image ( image -- image' ) compress-data compress-code sync-header ;
