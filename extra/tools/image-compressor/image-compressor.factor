@@ -20,7 +20,8 @@ ERROR: unsupported-image-header ;
 TUPLE: image
   { header image-header }
   { data byte-array }
-  { code byte-array } ;
+  { code byte-array }
+;
 
 ! converts to compression compatible header if needed
 : >compression-header ( headerv4 -- headerv4+ )
