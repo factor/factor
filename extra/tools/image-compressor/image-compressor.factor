@@ -85,8 +85,8 @@ TUPLE: image
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
 
-SYMBOL: compression-level
-12 compression-level set-global ! level 12 seems the right balance between compression factor and compression speed
+! level 12 seems the right balance between compression factor and compression speed
+INITIALIZED-SYMBOL: compression-level [ 12 ]
 
 : (compress) ( byte-array -- compressed ) compression-level get zstd-compress-level ;
 : compress ( byte-array -- compressed ) [ (compress) ] keep [ [ length ] bi@ < ] 2keep ? ;
@@ -103,16 +103,16 @@ SYMBOL: compression-level
 
 CONSTANT: command-options
 {
-  T{ option { name "-c" } { type integer } { convert [ dec> ] } { default 12 } { validate [ 1 22 between? ] } { #args 1 } }
-  T{ option { name "files" } { #args "*" } }
+  T{ option { name "-c" } { type integer } { convert [ dec> ] } { default 12 } { validate [ 1 22 between? ] } { #args 1 } { variable compression-level } { help "set the compression level between 1 and 22" } }
+  T{ option { name "input" } { #args "?" } { help "the input factor image path (default: image-path)" } }
+  T{ option { name "output" } { #args "?" } { help "the output factor image path (default: input)" } }
 }
 
 : compress-command ( -- )
   command-options [
-    "c" get compression-level set-global "files" get
-    [ compress-current-image ] [
-      [ first ] [ ?second [ dup ] unless* ] bi compress-factor-image
-    ] if-empty
+      "input" get image-path or
+      "output" get over or
+      compress-factor-image
   ] with-options
 ;
 
