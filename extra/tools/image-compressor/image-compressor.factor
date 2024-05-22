@@ -58,13 +58,21 @@ TUPLE: image
   dup code>> length over header>> compressed-code-size<<
 ;
 
+<PRIVATE
+
+! return empty sequence instead of f
+: read* ( n -- bytes )
+  read [ B{ } clone ] unless* ; inline
+
+PRIVATE>
+
 ! load factor image
 : load-factor-image ( filename -- image )
   binary [
     read-footer* [ dup image_offset>> read ] [ B{ } clone B{ } clone ] if*
     image-header read-struct check-header >compression-header dup
-    [ compressed-data-size>> read [ B{ } clone ] unless* ]
-    [ compressed-code-size>> read [ B{ } clone ] unless* ] bi
+    [ compressed-data-size>> read* ]
+    [ compressed-code-size>> read* ] bi
   ] with-file-reader image boa
 ;
 
