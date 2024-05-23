@@ -44,6 +44,8 @@ jobs:
     - name: build
       shell: cmd
       run: build.cmd net-bootstrap
+    - name: build-report
+      run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
