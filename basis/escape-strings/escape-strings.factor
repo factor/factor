@@ -29,28 +29,24 @@ IN: escape-strings
             { [ dup digit? ] [ [ dup 1 = ] dip '[ [ _ over push ] dip ] [ ] if ] }
             [ 2drop 0 over set-length 0 ]
         } cond
-    ] each 0 > [ >string over adjoin ] [ drop ] if ;
+    ] each 0 > [ [ >string over adjoin ] unless-empty ] [ drop ] if ;
 
-: lowest-missing-number ( string-set -- min )
-    members dup
-    [ length ] histogram-by
-    dup keys length [0..b]
-    [ [ of ] keep over [ 10^ < ] [ nip ] if ] with find nip
-    [ '[ length _ = ] filter sort ] keep ! remove sort here
-    [
-        [ drop "" ] [
-            10^ <iota> [
-                [ swap ?nth dup [ string>number ] when ] keep = not
-            ] with find nip number>string
-        ] if-zero
-    ] keep CHAR: 0 pad-head ;
+: lowest-missing-number ( string-set -- n )
+    members [
+        0
+    ] [
+        [ string>number ] maximum-by string>number 1 +
+    ] if-empty ;
 
 : lowest-missing ( set -- min )
     members dup [ = not ] find-index
     [ nip ] [ drop length ] if ;
 
+: surrounding-brackets ( delim -- open-delim close-delim )
+    [ "[" 1surround ] [ "]" 1surround ] bi ;
+
 : surround-by-brackets ( str delim -- str' )
-    [ "[" 1surround ] [ "]" 1surround ] bi surround ;
+    surrounding-brackets surround ;
 
 : surround-by-equals-brackets ( str n -- str' )
     CHAR: = <repetition> surround-by-brackets ;
@@ -61,8 +57,12 @@ IN: escape-strings
 : escape-strings ( strs -- str )
     [ escape-string ] map concat escape-string ;
 
+: number-escape-string* ( str -- str' n )
+    dup find-number-escapes lowest-missing-number
+    number>string [ surround-by-brackets ] keep ;
+
 : number-escape-string ( str -- str' )
-    dup find-number-escapes lowest-missing-number surround-by-brackets ;
+    number-escape-string* drop ;
 
 : number-escape-strings ( strs -- str )
     [ number-escape-string ] map concat number-escape-string ;
