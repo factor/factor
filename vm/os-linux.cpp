@@ -14,7 +14,7 @@ const char* vm_executable_path() {
     if (size < 0) {
       fatal_error("Cannot read /proc/self/exe", errno);
     } else {
-      if (size < ((size_t) bufsiz)) {
+      if (size < ((ssize_t) bufsiz)) {
         // Buffer was large enough, return string.
         buf[size] = '\0';
         const char* ret = safe_strdup(buf);
