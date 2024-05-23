@@ -366,7 +366,7 @@ M: row-variable-can't-have-type summary
     drop "Stack effect row variables cannot have a declared type" ;
 
 M: bad-escape error.
-    "Bad escape code: \\" write char>> write nl ;
+    "Bad escape code: \\" write char>> print ;
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 

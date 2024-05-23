@@ -59,7 +59,7 @@ SYMBOL: syslog-server
     host-name write " " write ;
 
 : write-syslog ( message level -- )
-    write-priority write-timestamp write-hostname write nl ;
+    write-priority write-timestamp write-hostname print ;
 
 PRIVATE>
 

@@ -118,7 +118,7 @@ HELP: CALLBACK:
         "    [| message payload |"
         "        \"message #\" write"
         "        message number>string write"
-        "        \" received\" write nl"
+        "        \" received\" print"
         "        t"
         "    ] FakeCallback ;"
     }

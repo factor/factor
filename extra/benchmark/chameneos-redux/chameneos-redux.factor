@@ -89,7 +89,7 @@ TUPLE: meeting-place count mailbox ;
         [ [ '[ _ _ try-meet ] in-thread ] with each ]
         [ drop run-meeting-place ]
 
-        [ nip [ [ count>> number>string write bl ] [ self-count>> number>text write nl ] bi ] each ]
+        [ nip [ [ count>> number>string write bl ] [ self-count>> number>text print ] bi ] each ]
         [ nip [ count>> ] map-sum bl number>chameneos-string print ]
     } 2cleave ;
 

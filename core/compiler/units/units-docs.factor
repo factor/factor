@@ -116,7 +116,7 @@ $nl
     "USING: compiler.units io ;"
     "IN: scratchpad"
     ": foo ( -- ) ;"
-    "{ { foo [ \"hello!\" write nl ] } } t t modify-code-heap foo"
+    "{ { foo [ \"hello!\" print ] } } t t modify-code-heap foo"
     "hello!"
   }
 }

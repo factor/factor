@@ -28,7 +28,7 @@ USING: io.crlf tools.test io.streams.string io ;
 { "abcde" } [ "a\nb\r\ncd\r\ne\nfghi" [ 5 read-ignoring-crlf ] with-string-reader ] unit-test
 
 { "Hello\r\nworld.\r\n" } [
-    [ use-crlf-stream "Hello" print "world." write nl ] with-string-writer
+    [ use-crlf-stream "Hello" print "world." print ] with-string-writer
 ] unit-test
 
 { "A\nB\r\nC\n" } [

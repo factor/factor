@@ -27,7 +27,7 @@ HOOK: username os ( -- string )
 : ghz ( x -- ) 1000000000 /f number>string write bl "GHz" write ;
 
 : system-report. ( -- )
-    "CPUs: " write cpus number>string write nl
+    "CPUs: " write cpus number>string print
     "CPU Speed: " write cpu-mhz ghz nl
     "Physical RAM: " write physical-mem megs nl ;
 

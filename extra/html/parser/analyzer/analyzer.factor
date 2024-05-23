@@ -203,7 +203,7 @@ TUPLE: link attributes clickable ;
     link boa ;
 
 : link. ( vector -- )
-    [ "href" attribute write nl ]
+    [ "href" attribute print ]
     [ clickable>> [ bl bl text>> print ] each nl ] bi ;
 
 : find-classes-named ( seq name -- seq' )

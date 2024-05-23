@@ -94,7 +94,7 @@ M: word log-timestamp. drop "multiline" write ;
     {
         [ date>> log-timestamp. bl ]
         [ level>> pprint bl ]
-        [ word-name>> write nl ]
+        [ word-name>> print ]
         [ message>> join-lines print ]
     } cleave ;
 
