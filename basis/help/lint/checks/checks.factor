@@ -32,6 +32,9 @@ SYMBOL: vocab-articles
             "input-port"
             "malloc-ptr"
             "fd"
+            "win32-file"
+            "win32-monitor"
+            "win32-monitor-port"
         } member?
     ] reject ;
 
