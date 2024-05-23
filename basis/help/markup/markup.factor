@@ -198,6 +198,10 @@ M: word link-long-text
 
 : topic-span ( topic quot -- ) [ >topic ] dip ($span) ; inline
 
+! Turns "foo.bar" into { { "foo" } { "foo" "bar" } }
+: vocab-breadcrumbs ( vocab -- vocab-list )
+    "." split { } [ suffix ] accumulate* ;
+
 ERROR: number-of-arguments found required ;
 
 : check-first ( seq -- first )
@@ -245,8 +249,15 @@ PRIVATE>
 : $subsection ( element -- )
     check-first $subsection* ;
 
+: ($vocab-breadcrumb-links) ( vocab -- )
+    vocab-breadcrumbs
+    [ "." write ] [ [ last ] [ "." join ] bi >vocab-link write-link ]
+    interleave ;
+
 : ($vocab-link) ( text vocab -- )
-    >vocab-link write-link ;
+    ! If the link text is just the vocabulary name, split it into
+    ! separate links for each parent vocabulary.
+    2dup = [ drop ($vocab-breadcrumb-links) ] [ >vocab-link write-link ] if ;
 
 : $vocab-subsection ( element -- )
     [
