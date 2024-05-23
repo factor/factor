@@ -485,3 +485,11 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { V{ 1 } V{ 2 f } } [
     V{ 1 } V{ 2 } 2dup '[ f [ ] _ _ push-either ] call
 ] unit-test
+
+{ { 1 } } [ { } 1 suffix ] unit-test
+{ { 1 2 } } [ { 1 } 2 suffix ] unit-test
+
+{ { 1 2 3 } } [ 4 { 1 2 3 } remove-eq ] unit-test
+{ { 1 3 } } [ 2 { 1 2 3 } remove-eq ] unit-test
+
+{ { 1 2 3 } } { { f 1 f 2 f f 3 } sift } unit-test
