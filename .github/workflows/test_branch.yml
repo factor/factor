@@ -44,10 +44,9 @@ jobs:
     - name: build-report
       run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
     - name: bootstrap
-      shell: cmd
       run: |
-           build.cmd update-boot-image
-           build.cmd bootstrap
+           .\build.cmd update-boot-image
+           .\build.cmd bootstrap
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
