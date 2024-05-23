@@ -25,7 +25,7 @@ t eval-res-flag set-global
 
 : send-retort ( error result output -- )
     3array [ fuel-pprint ] without-limits flush nl
-    "<~FUEL~>" write nl flush ;
+    "<~FUEL~>" print flush ;
 
 : begin-eval ( -- )
     push-status ;

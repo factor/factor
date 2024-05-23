@@ -207,8 +207,8 @@ With prefix, you're teletransported to the listener's buffer."
   (interactive "P")
   (let ((buf (process-buffer (fuel-listener--process))))
     (with-current-buffer buf
-      (comint-send-string nil "\"Refreshing loaded vocabs...\" write nl flush")
-      (comint-send-string nil " refresh-all \"Done!\" write nl flush\n"))
+      (comint-send-string nil "\"Refreshing loaded vocabs...\" print flush")
+      (comint-send-string nil " refresh-all \"Done!\" print flush\n"))
     (when arg (pop-to-buffer buf))))
 
 (defun fuel-refresh-and-test-all (&optional arg)
@@ -217,8 +217,8 @@ With prefix, you're teletransporteded to the listener's buffer."
   (interactive "P")
   (let ((buf (process-buffer (fuel-listener--process))))
     (with-current-buffer buf
-      (comint-send-string nil "\"Refreshing loaded vocabs and running tests...\" write nl flush")
-      (comint-send-string nil " refresh-and-test-all \"Done!\" write nl flush\n"))
+      (comint-send-string nil "\"Refreshing loaded vocabs and running tests...\" print flush")
+      (comint-send-string nil " refresh-and-test-all \"Done!\" print flush\n"))
     (when arg (pop-to-buffer buf))))
 
 (defun fuel-test-vocab (&optional arg)

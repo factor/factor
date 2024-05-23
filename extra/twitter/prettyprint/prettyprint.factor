@@ -37,7 +37,7 @@ CONSTANT: tweet-metadata-style
             [ dup "profile_image_url" of load-http-image image. ] with-cell
             [
                 tweet-username-style [
-                    dup "name" of write nl
+                    dup "name" of print
                     dup "screen_name" of write
                 ] with-style
             ] with-cell

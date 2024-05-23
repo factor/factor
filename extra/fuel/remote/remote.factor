@@ -8,7 +8,7 @@ IN: fuel.remote
 
 : print-banner ( -- )
     "Starting server. Connect with 'M-x connect-to-factor' in Emacs"
-    write nl flush ;
+    print flush ;
 
 PRIVATE>
 

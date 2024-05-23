@@ -71,9 +71,9 @@ M: unix send-to-trash ( path -- )
     ] [
         "info" append-path [ make-user-directory ] keep
         to-directory ".trashinfo" append overd utf8 [
-            "[Trash Info]" write nl
-            "Path=" write write nl
+            "[Trash Info]" print
+            "Path=" write print
             "DeletionDate=" write
-            now "%Y-%m-%dT%H:%M:%S" strftime write nl
+            now "%Y-%m-%dT%H:%M:%S" strftime print
         ] with-file-writer
     ] bi move-file ;

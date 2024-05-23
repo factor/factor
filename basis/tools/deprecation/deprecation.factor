@@ -58,7 +58,7 @@ M: deprecated-usages summary
 M: deprecated-usages error.
     "The definition of " write
     dup asset>> pprint
-    " uses these deprecated words:" write nl
+    " uses these deprecated words:" print
     usages>> [ "    " write pprint nl ] each ;
 
 SINGLETON: deprecation-observer
