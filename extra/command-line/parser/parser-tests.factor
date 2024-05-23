@@ -140,7 +140,7 @@ TUPLE: foo ;
 ] [ invalid-value? ] must-fail-with
 
 {
-    "Usage:\n    program [options] [arguments]\n\nOptions:\n    --help                 show this help and exit\n    --host HOST            set the hostname (default: 127.0.0.1)\n    --port PORT            set the port (default: 61613)\n    --username USERNAME    set the username\n    --password PASSWORD    set the password\n    --foo                  (default: 10)\n    --bar                  \n"
+    "Usage:\n    program [--help] [--host HOST] [--port PORT] [--username USERNAME] [--password PASSWORD] [--foo] [--bar]\n\nOptions:\n    --help                 show this help and exit\n    --host HOST            set the hostname (default: 127.0.0.1)\n    --port PORT            set the port (default: 61613)\n    --username USERNAME    set the username\n    --password PASSWORD    set the password\n    --foo                  (default: 10)\n    --bar                  \n"
 } [
     [
         H{
