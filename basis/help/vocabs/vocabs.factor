@@ -246,10 +246,12 @@ C: <vocab-author> vocab-author
 
 : describe-metadata ( vocab -- )
     [
-        [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
-        [ vocab-authors [ "Authors:" swap \ $authors prefix 2array , ] unless-empty ]
-        [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
-        tri
+        {
+            [ "." split1-last [ '[ { "Parents:" { $vocab-link _ } } ] call , ] [ drop ] if ]
+            [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
+            [ vocab-authors [ "Authors:" swap \ $authors prefix 2array , ] unless-empty ]
+            [ vocab-platforms [ "Platforms:" swap \ $links prefix 2array , ] unless-empty ]
+        } cleave
     ] { } make
     [ "Metadata" $heading $table ] unless-empty ;
 
