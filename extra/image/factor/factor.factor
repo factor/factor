@@ -24,7 +24,7 @@ STRUCT: image-header
     { reserved-4 cell_t }
     { special-objects cell_t[special-object-count] } ;
 
-STRUCT: image-footer
+STRUCT: embedded-image-footer
     { magic cell_t }
     { image_offset cell_t } ! offset from beginning of file
 ;
@@ -51,7 +51,7 @@ ERROR: unsupported-image-header ;
 
 : read-footer ( -- footer )
   tell-input
-  image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
+  embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
   swap seek-absolute seek-input ;
 
 : read-footer* ( -- footer/f )
