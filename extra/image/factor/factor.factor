@@ -32,9 +32,10 @@ STRUCT: embedded-image-footer
 TUPLE: image
   { footer }              ! located at the end of a file in case of embedded images
   { leader byte-array }   ! file starts with leader (for embedded images), then
-  { header image-header } ! header
-  { data byte-array }     ! data heap
-  { code byte-array }     ! code heap
+  { header image-header } ! Factor image header
+  { data byte-array }     ! Factor image data heap
+  { code byte-array }     ! Factor image code heap
+  { trailer byte-array }  ! trailing data
 ;
 
 : valid-header? ( header -- ? )
@@ -71,13 +72,13 @@ ERROR: unsupported-image-header ;
 : read-header ( -- header/* )
   image-header read-struct check-header >compression-header ;
 
-: read-footer ( -- footer )
-  tell-input
-  embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
-  swap seek-absolute seek-input ;
+: read-footer ( -- footer-offset footer )
+  tell-input [
+    embedded-image-footer [ struct-size neg seek-end seek-input tell-input ] [ read-struct ] bi
+  ] dip seek-absolute seek-input ;
 
-: read-footer* ( -- footer/f )
-  read-footer dup valid-footer? [ drop f ] unless ;
+: read-footer* ( -- footer-offset footer/f )
+  read-footer dup valid-footer? [ drop embedded-image-footer struct-size + f ] unless ;
 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
@@ -86,12 +87,13 @@ ERROR: unsupported-image-header ;
     read-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
+    6 nrot tell-input - read*
   ] with-file-reader image boa
 ;
 
 ! save factor image or embedded image
 : save-factor-image ( image filename -- )
   binary [
-   { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ footer>> ] } cleave [ write ] 5 napply
+   { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ trailer>> ] [ footer>> ] } cleave [ write ] 6 napply
   ] with-file-writer
 ;
