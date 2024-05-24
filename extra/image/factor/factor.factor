@@ -26,7 +26,7 @@ STRUCT: image-header
 
 STRUCT: embedded-image-footer
     { magic cell_t }
-    { image_offset cell_t } ! offset from beginning of file
+    { image-offset cell_t } ! offset from beginning of file
 ;
 
 TUPLE: image
@@ -82,7 +82,7 @@ ERROR: unsupported-image-header ;
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
   binary [
-    read-footer* [ dup image_offset>> read* ] [ B{ } clone B{ } clone ] if*
+    read-footer* [ dup image-offset>> read* ] [ B{ } clone B{ } clone ] if*
     read-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
