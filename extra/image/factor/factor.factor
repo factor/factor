@@ -8,8 +8,8 @@ IN: image.factor
 ! These structs and constants correspond to vm/image.hpp
 ! support multiple image formats if needed in here
 
-CONSTANT: image-header-magic   0x0f0e0d0c
-CONSTANT: image-header-version 4
+CONSTANT: image-magic   0x0f0e0d0c
+CONSTANT: image-version 4
 
 STRUCT: image-header
     { magic cell_t }
@@ -40,10 +40,10 @@ TUPLE: image
 ERROR: unsupported-image-header ;
 
 : check-header ( header -- header/* )
-  [ [ magic>> image-header-magic = ] [ version>> image-header-version = ] bi and [ unsupported-image-header ] unless ] keep ;
+  [ [ magic>> image-magic = ] [ version>> image-version = ] bi and [ unsupported-image-header ] unless ] keep ;
 
 : valid-footer? ( footer -- ? )
-  magic>> image-header-magic = ;
+  magic>> image-magic = ;
 
 ! return empty sequence instead of f
 : read* ( n -- bytes )
