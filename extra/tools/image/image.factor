@@ -1,8 +1,9 @@
 ! Copyright (C) 2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays classes.struct combinators
-generalizations io io.encodings.binary io.files kernel
-kernel.private math sequences vm ;
+USING: accessors alien.c-types byte-arrays classes
+classes.struct combinators continuations generalizations io
+io.encodings.binary io.files kernel kernel.private math
+sequences ;
 IN: tools.image
 
 ! These structs and constants correspond to vm/image.hpp
@@ -10,6 +11,41 @@ IN: tools.image
 
 CONSTANT: image-magic   0x0f0e0d0c
 CONSTANT: image-version 4
+
+STRUCT: image-header.32
+    { magic u32 }
+    { version u32 }
+    { data-relocation-base u32 }
+    { data-size u32 }
+    { code-relocation-base u32 }
+    { code-size u32 }
+    { escaped-data-size u32 }
+    { compressed-data-size u32 initial: 0 }
+    { compressed-code-size u32 initial: 0 }
+    { reserved-4 u32 }
+    { special-objects u32[special-object-count] } ;
+
+STRUCT: embedded-image-footer.32
+    { trailing u32[2] }    ! trailing bytes
+    { magic u32 }
+    { image-offset u32 } ; ! offset from beginning of file
+
+STRUCT: image-header.64
+    { magic u64 }
+    { version u64 }
+    { data-relocation-base u64 }
+    { data-size u64 }
+    { code-relocation-base u64 }
+    { code-size u64 }
+    { escaped-data-size u64 }
+    { compressed-data-size u64 initial: 0 }
+    { compressed-code-size u64 initial: 0 }
+    { reserved-4 u64 }
+    { special-objects u64[special-object-count] } ;
+
+STRUCT: embedded-image-footer.64
+    { magic u64 }
+    { image-offset u64 } ; ! offset from beginning of file
 
 STRUCT: image-header
     { magic cell_t }
@@ -32,7 +68,7 @@ STRUCT: embedded-image-footer
 TUPLE: image
   { footer }              ! located at the end of a file in case of embedded images
   { leader byte-array }   ! file starts with leader (for embedded images), then
-  { header image-header } ! Factor image header
+  { header }              ! Factor image header
   { data byte-array }     ! Factor image data heap
   { code byte-array }     ! Factor image code heap
   { trailer byte-array }  ! trailing data
