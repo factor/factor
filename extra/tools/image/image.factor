@@ -65,9 +65,9 @@ ERROR: unsupported-image-header ;
   dup code>> length over header>> compressed-code-size<<
 ;
 
-! return empty sequence instead of f
+! always read exactly n bytes. return empty sequence instead of f. beyond EOF read 0.
 : read* ( n -- bytes )
-  read [ B{ } clone ] unless* ; inline
+  dup read [ B{ } clone ] unless* resize-byte-array ; inline
 
 : read-header ( -- header/* )
   image-header read-struct check-header >compression-header ;
