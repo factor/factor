@@ -72,6 +72,9 @@ ERROR: unsupported-image-header ;
 : read* ( n -- bytes )
   dup read [ B{ } clone ] unless* resize-byte-array ; inline
 
+: skip-struct ( struct -- )
+  class-of heap-size seek-relative seek-input ; inline
+
 : read-struct* ( class -- struct )
   [ heap-size read* ] [ memory>struct ] bi ;
 
