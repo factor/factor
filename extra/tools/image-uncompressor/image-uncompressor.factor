@@ -22,6 +22,8 @@ IN: tools.image-uncompressor
 
 : uncompress-current-image ( -- ) image-path dup uncompress-factor-image ;
 
+<PRIVATE
+
 CONSTANT: command-options
 {
   T{ option { name "input" } { #args 1 } { help "the input factor image path" } }
@@ -33,5 +35,7 @@ CONSTANT: command-options
       "input" get "output" get uncompress-factor-image
   ] with-options
 ;
+
+PRIVATE>
 
 MAIN: uncompress-command
