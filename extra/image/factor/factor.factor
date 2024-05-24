@@ -43,18 +43,8 @@ TUPLE: image
 : valid-footer? ( footer -- ? )
   magic>> image-magic = ;
 
-! return empty sequence instead of f
-: read* ( n -- bytes )
-  read [ B{ } clone ] unless* ; inline
-
-: read-footer ( -- footer )
-  tell-input
-  embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
-  swap seek-absolute seek-input ;
 ERROR: unsupported-image-header ;
 
-: read-footer* ( -- footer/f )
-  read-footer dup valid-footer? [ drop f ] unless ;
 : check-header ( header -- header/* )
   [ valid-header? [ unsupported-image-header ] unless ] keep ;
 
@@ -73,6 +63,18 @@ ERROR: unsupported-image-header ;
   dup data>> length over header>> compressed-data-size<<
   dup code>> length over header>> compressed-code-size<<
 ;
+
+! return empty sequence instead of f
+: read* ( n -- bytes )
+  read [ B{ } clone ] unless* ; inline
+
+: read-footer ( -- footer )
+  tell-input
+  embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
+  swap seek-absolute seek-input ;
+
+: read-footer* ( -- footer/f )
+  read-footer dup valid-footer? [ drop f ] unless ;
 
 ! load factor image
 : load-factor-image ( filename -- image )
