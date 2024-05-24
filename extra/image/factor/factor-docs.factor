@@ -112,14 +112,14 @@ HELP: valid-footer?
     { "footer" object }
     { "?" boolean }
 }
-{ $description "" } ;
+{ $description "Is it a valid footer?" } ;
 
 HELP: valid-header?
 { $values
     { "header" object }
     { "?" boolean }
 }
-{ $description "" } ;
+{ $description "Is it a valid header?" } ;
 
 ARTICLE: "image.factor" "image.factor"
 { $vocab-link "image.factor" }
