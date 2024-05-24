@@ -37,13 +37,8 @@ TUPLE: image
   { code byte-array }
 ;
 
-ERROR: unsupported-image-header ;
-
 : valid-header? ( header -- ? )
   [ magic>> image-magic = ] [ version>> image-version = ] bi and ;
-
-: check-header ( header -- header/* )
-  [ valid-header? [ unsupported-image-header ] unless ] keep ;
 
 : valid-footer? ( footer -- ? )
   magic>> image-magic = ;
@@ -56,9 +51,12 @@ ERROR: unsupported-image-header ;
   tell-input
   embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
   swap seek-absolute seek-input ;
+ERROR: unsupported-image-header ;
 
 : read-footer* ( -- footer/f )
   read-footer dup valid-footer? [ drop f ] unless ;
+: check-header ( header -- header/* )
+  [ valid-header? [ unsupported-image-header ] unless ] keep ;
 
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
