@@ -1,6 +1,6 @@
 ! Copyright (C) 2022-2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-! can be run as : factor -run=binary.image.factor.compressor
+! can be run as : factor -run=tools.image-compressor
 ! with command-line options, see documentation
 
 USING: accessors assocs byte-arrays classes.struct combinators
