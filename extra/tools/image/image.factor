@@ -47,23 +47,8 @@ STRUCT: embedded-image-footer.64
     { magic u64 }
     { image-offset u64 } ; ! offset from beginning of file
 
-STRUCT: image-header
-    { magic cell_t }
-    { version cell_t }
-    { data-relocation-base cell_t }
-    { data-size cell_t }
-    { code-relocation-base cell_t }
-    { code-size cell_t }
-    { escaped-data-size cell_t }
-    { compressed-data-size cell_t initial: 0 }
-    { compressed-code-size cell_t initial: 0 }
-    { reserved-4 cell_t }
-    { special-objects cell_t[special-object-count] } ;
-
-STRUCT: embedded-image-footer
-    { magic cell_t }
-    { image-offset cell_t } ! offset from beginning of file
-;
+UNION-STRUCT: image-header { b32 image-header.32 } { b64 image-header.64 } ;
+UNION-STRUCT: embedded-image-footer { b32 embedded-image-footer.32 } { b64 embedded-image-footer.64 } ;
 
 TUPLE: image
   { footer }              ! located at the end of a file in case of embedded images
@@ -82,8 +67,11 @@ TUPLE: image
 
 ERROR: unsupported-image-header ;
 
-: check-header ( header -- header/* )
-  [ valid-header? [ unsupported-image-header ] unless ] keep ;
+: check-image-header ( header -- header.32/header.64/* )
+  dup b32>> dup valid-header? [ nip ] [ drop b64>> dup valid-header? [ unsupported-image-header ] unless ] if ;
+
+: valid-image-footer? ( footer -- footer.32/footer.64/f )
+  dup b32>> dup valid-footer? [ nip ] [ drop b64>> dup valid-footer? [ drop f ] unless ] if ;
 
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
@@ -114,8 +102,8 @@ ERROR: unsupported-image-header ;
 : read-struct* ( class -- struct )
   [ heap-size read* ] [ memory>struct ] bi ;
 
-: read-header ( -- header/* )
-  image-header read-struct* check-header >compression-header ;
+: read-header ( -- header.32/header.64/* )
+  [ image-header read-struct* check-image-header >compression-header ] with-position dup skip-struct ;
 
 : read-footer ( -- footer-offset footer )
   [
@@ -123,7 +111,7 @@ ERROR: unsupported-image-header ;
   ] with-position ;
 
 : read-footer* ( -- footer-offset footer/f )
-  read-footer dup valid-footer? [ drop embedded-image-footer struct-size + f ] unless ;
+  read-footer valid-image-footer? [ ] [ embedded-image-footer struct-size + f ] if* ;
 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
