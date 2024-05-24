@@ -26,6 +26,8 @@ INITIALIZED-SYMBOL: compression-level [ 12 ]
 
 : compress-current-image ( -- ) image-path dup compress-factor-image ;
 
+<PRIVATE
+
 CONSTANT: command-options
 {
   T{ option { name "-c" } { type integer } { convert [ dec> ] } { default 12 } { validate [ 1 22 between? ] } { #args 1 } { variable compression-level } { help "set the compression level between 1 and 22" } }
@@ -40,5 +42,7 @@ CONSTANT: command-options
       compress-factor-image
   ] with-options
 ;
+
+PRIVATE>
 
 MAIN: compress-command
