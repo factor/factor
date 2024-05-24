@@ -30,11 +30,11 @@ STRUCT: embedded-image-footer
 ;
 
 TUPLE: image
-  { footer }
-  { leader byte-array }
-  { header image-header }
-  { data byte-array }
-  { code byte-array }
+  { footer }              ! located at the end of a file in case of embedded images
+  { leader byte-array }   ! file starts with leader (for embedded images), then
+  { header image-header } ! header
+  { data byte-array }     ! data heap
+  { code byte-array }     ! code heap
 ;
 
 : valid-header? ( header -- ? )
@@ -76,7 +76,7 @@ ERROR: unsupported-image-header ;
 : read-footer* ( -- footer/f )
   read-footer dup valid-footer? [ drop f ] unless ;
 
-! load factor image
+! load factor image or embedded image
 : load-factor-image ( filename -- image )
   binary [
     read-footer* [ dup image_offset>> read* ] [ B{ } clone B{ } clone ] if*
@@ -86,7 +86,7 @@ ERROR: unsupported-image-header ;
   ] with-file-reader image boa
 ;
 
-! save factor image
+! save factor image or embedded image
 : save-factor-image ( image filename -- )
   binary [
    { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ footer>> ] } cleave [ write ] 5 napply
