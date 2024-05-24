@@ -65,6 +65,9 @@ ERROR: unsupported-image-header ;
   dup code>> length over header>> compressed-code-size<<
 ;
 
+: with-position ( quot -- )
+  tell-input [ seek-absolute seek-input ] curry finally ; inline
+
 ! always read exactly n bytes. return empty sequence instead of f. beyond EOF read 0.
 : read* ( n -- bytes )
   dup read [ B{ } clone ] unless* resize-byte-array ; inline
@@ -73,9 +76,9 @@ ERROR: unsupported-image-header ;
   image-header read-struct check-header >compression-header ;
 
 : read-footer ( -- footer-offset footer )
-  tell-input [
+  [
     embedded-image-footer [ struct-size neg seek-end seek-input tell-input ] [ read-struct ] bi
-  ] dip seek-absolute seek-input ;
+  ] with-position ;
 
 : read-footer* ( -- footer-offset footer/f )
   read-footer dup valid-footer? [ drop embedded-image-footer struct-size + f ] unless ;
