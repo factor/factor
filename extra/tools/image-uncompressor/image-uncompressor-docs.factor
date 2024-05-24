@@ -1,7 +1,6 @@
 ! Copyright (C) 2022-2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-USING: byte-arrays help.markup help.syntax memory strings ;
-FROM: tools.image-analyzer.vm => image-header ;
+USING: byte-arrays help.markup help.syntax image.factor memory strings ;
 IN: tools.image-uncompressor
 
 ARTICLE: "tools.image-uncompressor" "Uncompress compressed Factor image files"
@@ -14,20 +13,6 @@ $examples {
   { $code "factor -run=tools.image-uncompressor hello-ui.exe" }
   { $code "factor -run=tools.image-uncompressor factor.image factor.image.uncompressed" }
 }
-;
-
-HELP: image
-{ $class-description "In-memory Factor image" } ;
-
-HELP: image-header
-{ $class-description "Factor image header structure" } ;
-
-HELP: >compression-header
-{ $values
-    { "headerv4" image-header }
-    { "headerv4+" image-header }
-}
-{ $description "Converts any header into a compression supporting header" }
 ;
 
 HELP: uncompress
@@ -62,36 +47,12 @@ HELP: uncompress-image
 { $description "Compresses data- and code heaps and syncs header" }
 ;
 
-HELP: load-factor-image
-{ $values
-    { "filename" string }
-    { "image" image }
-}
-{ $description "Load Factor image into memory" }
-;
-
-HELP: save-factor-image
-{ $values
-    { "image" image }
-    { "filename" string }
-}
-{ $description "Save Factor image from memory" }
-;
-
 HELP: uncompress-factor-image
 { $values
     { "compressed-image-file" string }
     { "uncompressed-file" string }
 }
 { $description "Load, compresses and saves a Factor image" }
-;
-
-HELP: sync-header
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Sync header from actual data and code sizes" }
 ;
 
 HELP: uncompress-current-image
