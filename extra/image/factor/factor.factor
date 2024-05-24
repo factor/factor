@@ -39,8 +39,11 @@ TUPLE: image
 
 ERROR: unsupported-image-header ;
 
+: valid-header? ( header -- ? )
+  [ magic>> image-magic = ] [ version>> image-version = ] bi and ;
+
 : check-header ( header -- header/* )
-  [ [ magic>> image-magic = ] [ version>> image-version = ] bi and [ unsupported-image-header ] unless ] keep ;
+  [ valid-header? [ unsupported-image-header ] unless ] keep ;
 
 : valid-footer? ( footer -- ? )
   magic>> image-magic = ;
