@@ -12,6 +12,7 @@ CONSTANT: vocab-renames {
     { "json.writer" { "json" "0.99" } }
     { "math.trig" { "math.functions" "0.100" } }
     { "math.functions.integer-logs" { "math.functions" "0.100" } }
+    { "tools.image-analyzer" { "tools.image.analyzer" "0.100" } }
 }
 
 CONSTANT: word-renames {
