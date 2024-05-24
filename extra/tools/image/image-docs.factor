@@ -1,6 +1,45 @@
 ! Copyright (C) 2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math strings tools.image ;
+USING: classes help.markup help.syntax kernel math quotations
+strings tools.image ;
+
+HELP: embedded-image-footer.32
+{ $class-description "32 bit embedded image footer" } ;
+
+HELP: embedded-image-footer.64
+{ $class-description "64 bit embedded image footer" } ;
+
+HELP: image-header.32
+{ $class-description "32 bit image header" } ;
+
+HELP: image-header.64
+{ $class-description "64 bit image header" } ;
+
+HELP: read-struct*
+{ $values
+    { "class" class }
+    { "struct" object }
+}
+{ $description "read struct, even beyond EOF" } ;
+
+HELP: skip-struct
+{ $values
+    { "struct" object }
+}
+{ $description "skip the size of a struct in the input stream" } ;
+
+HELP: valid-image-footer?
+{ $values
+    { "footer" object }
+    { "footer.32/footer.64/f" object }
+}
+{ $description "returns valid image footer or f" } ;
+
+HELP: with-position
+{ $values
+    { "quot" quotation }
+}
+{ $description "marks position in input-stream and return to it after quotation has finished" } ;
 
 HELP: image
 { $class-description "In-memory Factor image" } ;
@@ -15,7 +54,6 @@ HELP: >compression-header
 }
 { $description "Converts any header into a compression supporting header" }
 ;
-
 
 HELP: load-factor-image
 { $values
@@ -41,10 +79,10 @@ HELP: sync-header
 { $description "Sync header from actual data and code sizes" }
 ;
 
-HELP: check-header
+HELP: check-image-header
 { $values
     { "header" object }
-    { "header/*" object }
+    { "header.32/header.64/*" object }
 }
 { $description "Checks for a valid header, else throws error" } ;
 
@@ -84,7 +122,7 @@ HELP: read-footer*
 
 HELP: read-header
 { $values
-    { "header/*" object }
+    { "header.32/header.64/*" object }
 }
 { $description "Read header" } ;
 
