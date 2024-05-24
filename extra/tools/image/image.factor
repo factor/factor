@@ -72,12 +72,15 @@ ERROR: unsupported-image-header ;
 : read* ( n -- bytes )
   dup read [ B{ } clone ] unless* resize-byte-array ; inline
 
+: read-struct* ( class -- struct )
+  [ heap-size read* ] [ memory>struct ] bi ;
+
 : read-header ( -- header/* )
-  image-header read-struct check-header >compression-header ;
+  image-header read-struct* check-header >compression-header ;
 
 : read-footer ( -- footer-offset footer )
   [
-    embedded-image-footer [ struct-size neg seek-end seek-input tell-input ] [ read-struct ] bi
+    embedded-image-footer [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
   ] with-position ;
 
 : read-footer* ( -- footer-offset footer/f )
