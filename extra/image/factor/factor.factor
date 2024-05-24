@@ -68,6 +68,9 @@ ERROR: unsupported-image-header ;
 : read* ( n -- bytes )
   read [ B{ } clone ] unless* ; inline
 
+: read-header ( -- header/* )
+  image-header read-struct check-header >compression-header ;
+
 : read-footer ( -- footer )
   tell-input
   embedded-image-footer [ struct-size neg seek-end seek-input ] [ read-struct ] bi
@@ -80,7 +83,7 @@ ERROR: unsupported-image-header ;
 : load-factor-image ( filename -- image )
   binary [
     read-footer* [ dup image_offset>> read* ] [ B{ } clone B{ } clone ] if*
-    image-header read-struct check-header >compression-header dup
+    read-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
   ] with-file-reader image boa
