@@ -33,7 +33,7 @@ HELP: >compression-header
 HELP: uncompress
 { $values
     { "byte-array" byte-array }
-    { "compressed" byte-array }
+    { "uncompressed" byte-array }
 }
 { $description "Compresses bytes" }
 ;
