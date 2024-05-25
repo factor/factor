@@ -10,3 +10,5 @@ shell.nix text eol=lf
 .gitattributes text eol=lf
 LICENSE.txt text eol=lf
 misc/vim/*/*/generated.vim linguist-generated
+.cvskeywords binary
+*.image binary
