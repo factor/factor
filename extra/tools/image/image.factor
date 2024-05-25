@@ -80,7 +80,7 @@ ERROR: unsupported-image-header ;
 : >compression-header ( headerv4 -- headerv4+ )
   dup data-size>> zero?
   [ dup data-size>> [ >>escaped-data-size ] [ >>compressed-data-size ] 2bi
-    code-size>> >>compressed-code-size 0 >>data-size
+    code-size>> >>compressed-code-size
   ] unless
 ;
 
