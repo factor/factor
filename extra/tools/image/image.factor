@@ -59,6 +59,8 @@ TUPLE: image
   { trailer byte-array }  ! trailing data
 ;
 
+PREDICATE: compressable-image < image header>> data-size>> zero? ;
+
 : valid-header? ( header -- ? )
   [ magic>> image-magic = ] [ version>> image-version = ] bi and ;
 
