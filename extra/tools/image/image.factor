@@ -122,7 +122,7 @@ ERROR: unsupported-image-header ;
     embedded-image-footer.union [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
   ] with-position ;
 
-: read-footer* ( -- footer-offset footer/f )
+: read-footer* ( -- footer-offset footer.32/footer.64/f )
   read-footer valid-image-footer? [ ] [ embedded-image-footer.union struct-size + f ] if* ;
 
 ! load factor image or embedded image
