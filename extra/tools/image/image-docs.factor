@@ -144,7 +144,7 @@ HELP: read-footer
 
 HELP: read-footer*
 { $values
-    { "footer-offset" object } { "footer/f" object }
+    { "footer-offset" integer } { "footer.32/footer.64/f" embedded-image-footer }
 }
 { $description "Read footer if it exists, return f otherwise" } ;
 
