@@ -47,7 +47,11 @@ CONSTANT: command-options
   T{ option { name "output" } { #args "?" } { help "the output factor image path (default: input)" } }
 }
 
+CONSTANT: command-help
+"Compresses the given Factor image, which can be an .image file or an embedded image inside an executable, such as a deployed application. By default only images created with a Factor version that supports compression are compressed, else an error is generated."
+
 : compress-command ( -- )
+  command-help program-prolog set
   command-options [
       "input" get image-path or
       "output" get over or
