@@ -6,6 +6,14 @@ strings tools.image ;
 HELP: compressable-image
 { $class-description "predicate class to indicate compressable images" } ;
 
+HELP: >compressable
+{ $values
+    { "uncompressable-image" object }
+    { "compressable-image" object }
+}
+{ $description "Converts an uncompressable image to a compressable image." }
+{ $warning "Such an image cannot be loaded by older Factor versions that do not support loading of compressed images. In extreme cases such older Factor versions might not be able to start due to this. Keep backups of important image files before compressing them." } ;
+
 ! HELP: reset-header
 ! { $values
 !     { "header" object }
