@@ -3,6 +3,20 @@
 USING: classes help.markup help.syntax kernel math quotations
 strings tools.image ;
 
+HELP: compressable-image
+{ $class-description "predicate class to indicate compressable images" } ;
+
+HELP: reset-header
+{ $values
+    { "header" object }
+    { "header'" object }
+}
+{ $description "reset header format" } ;
+
+HELP: uncompressable-image
+{ $description "Throws an " { $link uncompressable-image } " error." }
+{ $error-description "in case an illegal operation is performed on an uncompressable image" } ;
+
 HELP: embedded-image-footer.32
 { $class-description "32 bit embedded image footer" } ;
 
