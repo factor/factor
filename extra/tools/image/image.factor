@@ -53,13 +53,15 @@ UNION-STRUCT: embedded-image-footer.union { b32 embedded-image-footer.32 } { b64
 UNION: image-header image-header.32 image-header.64 POSTPONE: f ;                            ! need the f class for initial values
 UNION: embedded-image-footer embedded-image-footer.32 embedded-image-footer.64 POSTPONE: f ;
 
+UNION: bytes byte-array POSTPONE: f ; ! avoids cloning B{ } and uses f as the empty sequence
+
 TUPLE: image
   { footer embedded-image-footer } ! located at the end of a file in case of embedded images
-  { leader byte-array }            ! file starts with leader (for embedded images), then
+  { leader bytes }                 ! file starts with leader (for embedded images), then
   { header image-header }          ! Factor image header
-  { data byte-array }              ! Factor image data heap
-  { code byte-array }              ! Factor image code heap
-  { trailer byte-array }           ! trailing data
+  { data bytes }                   ! Factor image data heap
+  { code bytes }                   ! Factor image code heap
+  { trailer bytes }                ! trailing data
 ;
 
 PREDICATE: compressable-image < image header>> data-size>> zero? ;
