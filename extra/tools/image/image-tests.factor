@@ -50,3 +50,10 @@ CONSTANT: dummy-file "vocab:tools/image/dummy.image"
            [ 0 seek-absolute seek-input ] with-position
            tell-input =
       ] with-file-reader ] unit-test
+
+{ t } [ dummy-file binary [
+           dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi =
+      ] with-file-reader ] unit-test
+{ t } [ dummy-file binary [
+           dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi =
+      ] with-file-reader ] unit-test
