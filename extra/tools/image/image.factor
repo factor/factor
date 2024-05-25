@@ -54,12 +54,12 @@ UNION: image-header image-header.32 image-header.64 POSTPONE: f ;               
 UNION: embedded-image-footer embedded-image-footer.32 embedded-image-footer.64 POSTPONE: f ;
 
 TUPLE: image
-  { footer }              ! located at the end of a file in case of embedded images
-  { leader byte-array }   ! file starts with leader (for embedded images), then
-  { header }              ! Factor image header
-  { data byte-array }     ! Factor image data heap
-  { code byte-array }     ! Factor image code heap
-  { trailer byte-array }  ! trailing data
+  { footer embedded-image-footer } ! located at the end of a file in case of embedded images
+  { leader byte-array }            ! file starts with leader (for embedded images), then
+  { header image-header }          ! Factor image header
+  { data byte-array }              ! Factor image data heap
+  { code byte-array }              ! Factor image code heap
+  { trailer byte-array }           ! trailing data
 ;
 
 PREDICATE: compressable-image < image header>> data-size>> zero? ;
