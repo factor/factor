@@ -117,18 +117,18 @@ ERROR: unsupported-image-header ;
 : read-header ( -- header.32/header.64/* )
   [ image-header.union read-struct* check-image-header >compression-header ] with-position dup skip-struct ;
 
-: read-footer ( -- footer-offset footer )
+: read-union-footer ( -- footer-offset footer )
   [
     embedded-image-footer.union [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
   ] with-position ;
 
-: read-footer* ( -- footer-offset footer.32/footer.64/f )
-  read-footer valid-image-footer? [ ] [ embedded-image-footer.union struct-size + f ] if* ;
+: read-footer ( -- footer-offset footer.32/footer.64/f )
+  read-union-footer valid-image-footer? [ embedded-image-footer.union struct-size + f ] unless* ;
 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
   binary [
-    read-footer* [ dup image-offset>> read* ] [ B{ } clone B{ } clone ] if*
+    read-footer [ dup image-offset>> read* ] [ B{ } clone B{ } clone ] if*
     read-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
@@ -138,7 +138,7 @@ ERROR: unsupported-image-header ;
 
 <PRIVATE
 
-: reset-header ( header -- header' )
+: clean-header ( header -- header' )
   dup data-size>> zero? [ 0 >>escaped-data-size 0 >>compressed-data-size 0 >>compressed-code-size ] unless ;
 
 PRIVATE>
@@ -147,7 +147,7 @@ PRIVATE>
 : save-factor-image ( image filename -- )
    binary [
      { [ leader>> write ]
-       [ header>> clone reset-header write ]
+       [ header>> clone clean-header write ]
        [ data>> write ]
        [ code>> write ]
        [ trailer>> write ]
