@@ -1,6 +1,6 @@
 ! Copyright (C) 2022-2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-USING: byte-arrays help.markup help.syntax tools.image memory strings ;
+USING: byte-arrays help.markup help.syntax kernel tools.image memory strings ;
 IN: tools.image.compressor
 
 ARTICLE: "tools.image.compressor" "Compress Factor image file for loading by the VM"
@@ -19,6 +19,17 @@ $examples {
 }
 ;
 
+HELP: (compress)
+{ $values
+    { "byte-array" byte-array }
+    { "compressed" object }
+}
+{ $description "Compress bytes with current compression level" } ;
+
+HELP: force-compression
+{ $var-description "Enable force compression." }
+{ $warning "This converts uncompressable images using " { $link >compressable } ", see warning there." } ;
+
 HELP: compression-level
 { $var-description "Compression parameter : 1 (least) .. 22 (most). Default value 12." } ;
 
@@ -27,7 +38,7 @@ HELP: compress
     { "byte-array" byte-array }
     { "compressed" byte-array }
 }
-{ $description "Compresses bytes" }
+{ $description "Compresses bytes, keep shortest sequence" }
 ;
 
 ! HELP: compress-code
