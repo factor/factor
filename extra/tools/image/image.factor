@@ -88,13 +88,6 @@ ERROR: unsupported-image-header ;
   ] unless
 ;
 
-<PRIVATE
-
-: reset-header ( header -- header' )
-  dup data-size>> zero? [ 0 >>escaped-data-size 0 >>compressed-data-size 0 >>compressed-code-size ] unless ;
-
-PRIVATE>
-
 : sync-header ( image -- image' )
   dup data>> length over header>> compressed-data-size<<
   dup code>> length over header>> compressed-code-size<<
@@ -137,6 +130,13 @@ PRIVATE>
     6 nrot tell-input - read*
   ] with-file-reader image boa
 ;
+
+<PRIVATE
+
+: reset-header ( header -- header' )
+  dup data-size>> zero? [ 0 >>escaped-data-size 0 >>compressed-data-size 0 >>compressed-code-size ] unless ;
+
+PRIVATE>
 
 ! save factor image or embedded image
 : save-factor-image ( image filename -- )
