@@ -61,6 +61,8 @@ TUPLE: image
 
 PREDICATE: compressable-image < image header>> data-size>> zero? ;
 
+ERROR: uncompressable-image ;
+
 : valid-header? ( header -- ? )
   [ magic>> image-magic = ] [ version>> image-version = ] bi and ;
 
