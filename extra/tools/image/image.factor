@@ -26,7 +26,7 @@ STRUCT: image-header.32
     { special-objects u32[special-object-count] } ;
 
 STRUCT: embedded-image-footer.32
-    { trailing u32[2] }    ! trailing bytes
+    { trailing u8[8] }     ! trailing bytes
     { magic u32 }
     { image-offset u32 } ; ! offset from beginning of file
 

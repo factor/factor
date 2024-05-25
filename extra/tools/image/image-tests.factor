@@ -15,13 +15,16 @@ CONSTANT: dummy-code    $[ "dummy codeABCDEF" B{ } like ]
 CONSTANT: dummy-trailer $[ "dummy tailABCDEF0123456789AB" B{ } like ]
 >>
 
+CONSTANT: dummy-trailer.64 $[ dummy-trailer 24 head ]
+CONSTANT: dummy-trailer.32 $[ dummy-trailer 8 head* ]
+
 CONSTANT: dummy-objects.32 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u32-array> ] tri [ copy ] keep ]
 CONSTANT: dummy-objects.64 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u64-array> ] tri [ copy ] keep ]
 
 CONSTANT: dummy-header.32 S{ image-header.32 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.32 ] }
 CONSTANT: dummy-header.64 S{ image-header.64 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.64 ] }
 
-CONSTANT: dummy-footer.32 S{ embedded-image-footer.32 f u32-array{ 0 0 } $[ image-magic dummy-leader length ] }
+CONSTANT: dummy-footer.32 S{ embedded-image-footer.32 f $[ dummy-trailer 8 tail* 0 8 <u8-array> [ copy ] keep image-magic dummy-leader length ] }
 CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-leader length ] }
 
 { t } [ dummy-header.32 valid-header? ] unit-test
