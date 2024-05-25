@@ -50,6 +50,9 @@ STRUCT: embedded-image-footer.64
 UNION-STRUCT: image-header.union { b32 image-header.32 } { b64 image-header.64 } ;
 UNION-STRUCT: embedded-image-footer.union { b32 embedded-image-footer.32 } { b64 embedded-image-footer.64 } ;
 
+UNION: image-header image-header.32 image-header.64 POSTPONE: f ;                            ! need the f class for initial values
+UNION: embedded-image-footer embedded-image-footer.32 embedded-image-footer.64 POSTPONE: f ;
+
 TUPLE: image
   { footer }              ! located at the end of a file in case of embedded images
   { leader byte-array }   ! file starts with leader (for embedded images), then
