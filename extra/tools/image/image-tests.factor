@@ -38,3 +38,15 @@ CONSTANT: dummy-footer.64 $[ image-magic dummy-leader length embedded-image-foot
 { f } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.64 = ] unit-test
 { t } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.64 = ] unit-test
 { f } [ embedded-image-footer.union <struct> valid-image-footer? ] unit-test
+CONSTANT: dummy-file "vocab:tools/image/dummy.image"
+
+{ t } [ dummy-file binary [
+           tell-input
+           [ 0 seek-end seek-input ] with-position
+           tell-input =
+      ] with-file-reader ] unit-test
+{ t } [ dummy-file binary [
+           0 seek-end seek-input tell-input
+           [ 0 seek-absolute seek-input ] with-position
+           tell-input =
+      ] with-file-reader ] unit-test
