@@ -232,16 +232,18 @@ ERROR: usage-error < option-error options ;
 M: usage-error error. options>> print-help ;
 
 :: find-option ( arg options -- option )
-    allow-abbrev? get [
-        arg options [ dup option-name ] map>alist
-        completions keys
-    ] [
-        options [ option-name arg = ] filter
-    ] if dup length {
-        { 0 [ arg unknown-option ] }
-        { 1 [ first ] }
-        [ drop arg swap ambiguous-option ]
-    } case ;
+    options [ option-name arg = ] find nip [
+        allow-abbrev? get [
+            arg options [ dup option-name ] map>alist
+            completions keys dup length {
+                { 0 [ arg unknown-option ] }
+                { 1 [ first ] }
+                [ drop arg swap ambiguous-option ]
+            } case
+        ] [
+            arg unknown-option
+        ] if
+    ] unless* ;
 
 : default-options ( options -- defaults )
     [ default>> ] filter

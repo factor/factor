@@ -80,14 +80,12 @@ TUPLE: foo ;
     } { "--foo" } (parse-options)
 ] [ ambiguous-option? ] must-fail-with
 
-[
-    f allow-abbrev? [
-        {
-            T{ option { name "--foo" } }
-            T{ option { name "--foo" } }
-        } { "--foo" } (parse-options)
-    ] with-variable
-] [ ambiguous-option? ] must-fail-with
+{ H{ { "c" "1" } } } [
+    {
+        T{ option { name "--force" } }
+        T{ option { name "--c" } }
+    } { "--c" "1" } (parse-options)
+] unit-test
 
 {
     {
