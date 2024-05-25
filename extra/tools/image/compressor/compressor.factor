@@ -41,6 +41,7 @@ INITIALIZED-SYMBOL: force-compression [ f ]
 
 CONSTANT: command-options
 {
+  T{ option { name "-F" } { const t } { variable force-compression } { help "force compress uncompressable image\nWARNING: experts only! Use only for a Factor executable\nthat supports compression" } }
   T{ option { name "-c" } { type integer } { convert [ dec> ] } { default 12 } { validate [ 1 22 between? ] } { #args 1 } { variable compression-level } { help "set the compression level between 1 and 22" } }
   T{ option { name "input" } { #args "?" } { help "the input factor image path (default: image-path)" } }
   T{ option { name "output" } { #args "?" } { help "the output factor image path (default: input)" } }
