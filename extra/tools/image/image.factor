@@ -80,7 +80,7 @@ ERROR: unsupported-image-header ;
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;
 
-! converts to compression compatible header if needed
+! converts to compression compatible header if needed, while preserving variant identity
 : >compression-header ( headerv4 -- headerv4+ )
   dup data-size>> zero?
   [ dup data-size>> [ >>escaped-data-size ] [ >>compressed-data-size ] 2bi
@@ -95,6 +95,9 @@ ERROR: unsupported-image-header ;
   dup data>> length over header>> compressed-data-size<<
   dup code>> length over header>> compressed-code-size<<
 ;
+
+: >compressable ( uncompressable-image -- compressable-image )
+  [ header>> [ >compression-header drop ] [ 0 >>data-size drop ] bi ] keep ;
 
 : with-position ( quot -- )
   tell-input [ seek-absolute seek-input ] curry finally ; inline
