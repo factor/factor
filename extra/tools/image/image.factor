@@ -88,6 +88,9 @@ ERROR: unsupported-image-header ;
   ] unless
 ;
 
+: reset-header ( headerv4+ -- headerv4 )
+  dup [ 0 swap escaped-data-size<< ] [ 0 swap compressed-data-size<< ] [ 0 swap compressed-code-size<< ] tri ;
+
 : sync-header ( image -- image' )
   dup data>> length over header>> compressed-data-size<<
   dup code>> length over header>> compressed-code-size<<
@@ -128,9 +131,17 @@ ERROR: unsupported-image-header ;
   ] with-file-reader image boa
 ;
 
+<PRIVATE
+
+: (save-factor-image) ( leader header data code trailer footer filename -- )
+  binary [ [ write ] 6 napply ] with-file-writer ;
+
+PRIVATE>
+
 ! save factor image or embedded image
-: save-factor-image ( image filename -- )
-  binary [
-   { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ trailer>> ] [ footer>> ] } cleave [ write ] 6 napply
-  ] with-file-writer
-;
+GENERIC#: save-factor-image 1 ( image filename -- )
+M: image save-factor-image
+   [ { [ leader>> ] [ header>> clone reset-header  ] [ data>> ] [ code>> ] [ trailer>> ] [ footer>> ] } cleave ] dip (save-factor-image) ;
+
+M: compressable-image save-factor-image
+   [ { [ leader>> ] [ header>> ] [ data>> ] [ code>> ] [ trailer>> ] [ footer>> ] } cleave ] dip (save-factor-image) ;
