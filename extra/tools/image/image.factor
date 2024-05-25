@@ -76,6 +76,8 @@ M: uncompressable-image error. drop "This image format does not support compress
 
 ERROR: unsupported-image-header ;
 
+M: unsupported-image-header error. drop "Could not detect a valid image header" print ;
+
 : check-image-header ( header -- header.32/header.64/* )
   dup b32>> dup valid-header? [ nip ] [ drop b64>> dup valid-header? [ unsupported-image-header ] unless ] if ;
 
