@@ -32,3 +32,9 @@ CONSTANT: dummy-footer.64 $[ image-magic dummy-leader length embedded-image-foot
 
 [ image-header.union <struct> check-image-header ] must-fail
 [ image-header.union <struct> check-image-header ] [ unsupported-image-header? ] must-fail-with
+
+{ t } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.32 = ] unit-test
+{ f } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.32 = ] unit-test
+{ f } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.64 = ] unit-test
+{ t } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.64 = ] unit-test
+{ f } [ embedded-image-footer.union <struct> valid-image-footer? ] unit-test
