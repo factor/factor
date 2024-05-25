@@ -136,13 +136,13 @@ HELP: read*
 }
 { $description "read n bytes, return empty byte array if n equals 0" } ;
 
-HELP: read-footer
+HELP: read-union-footer
 { $values
     { "footer-offset" integer } { "footer" embedded-image-footer.union }
 }
 { $description "read the footer at given offset from beginning of file. Reads footer from end of file, while returning to current file position. Also returns offset to footer from beginning of file." } ;
 
-HELP: read-footer*
+HELP: read-footer
 { $values
     { "footer-offset" integer } { "footer.32/footer.64/f" embedded-image-footer }
 }
