@@ -14,10 +14,10 @@ CONSTANT: dummy-trailer $[ "dummy tail" B{ } like ]
 CONSTANT: dummy-objects.32 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u32-array> ] tri [ copy ] keep ]
 CONSTANT: dummy-objects.64 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u64-array> ] tri [ copy ] keep ]
 
-CONSTANT: dummy-header.32 $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.32 image-header.32 <struct-boa> ]
-CONSTANT: dummy-header.64 $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.64 image-header.64 <struct-boa> ]
+CONSTANT: dummy-header.32 S{ image-header.32 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.32 ] }
+CONSTANT: dummy-header.64 S{ image-header.64 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.64 ] }
 
-CONSTANT: dummy-footer.32 $[ u32-array{ 0 0 } image-magic dummy-leader length embedded-image-footer.32 <struct-boa> ]
+CONSTANT: dummy-footer.32 S{ embedded-image-footer.32 f u32-array{ 0 0 } $[ image-magic dummy-leader length ] }
 CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-leader length ] }
 
 { t } [ dummy-header.32 valid-header? ] unit-test
