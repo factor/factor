@@ -89,7 +89,7 @@ ERROR: unsupported-image-header ;
 ;
 
 : reset-header ( header -- header' )
-  dup data-size>> zero? [ dup [ 0 swap escaped-data-size<< ] [ 0 swap compressed-data-size<< ] [ 0 swap compressed-code-size<< ] tri ] unless ;
+  dup data-size>> zero? [ 0 >>escaped-data-size 0 >>compressed-data-size 0 >>compressed-code-size ] unless ;
 
 : sync-header ( image -- image' )
   dup data>> length over header>> compressed-data-size<<
