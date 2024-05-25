@@ -18,7 +18,7 @@ CONSTANT: dummy-header.32 $[ image-magic image-version 0 0 0 dummy-code length d
 CONSTANT: dummy-header.64 $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.64 image-header.64 <struct-boa> ]
 
 CONSTANT: dummy-footer.32 $[ u32-array{ 0 0 } image-magic dummy-leader length embedded-image-footer.32 <struct-boa> ]
-CONSTANT: dummy-footer.64 $[ image-magic dummy-leader length embedded-image-footer.64 <struct-boa> ]
+CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $ image-magic $[ dummy-leader length ] }
 
 { t } [ dummy-header.32 valid-header? ] unit-test
 { t } [ dummy-header.64 valid-header? ] unit-test
