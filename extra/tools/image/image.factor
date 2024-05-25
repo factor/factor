@@ -47,8 +47,8 @@ STRUCT: embedded-image-footer.64
     { magic u64 }
     { image-offset u64 } ; ! offset from beginning of file
 
-UNION-STRUCT: image-header { b32 image-header.32 } { b64 image-header.64 } ;
-UNION-STRUCT: embedded-image-footer { b32 embedded-image-footer.32 } { b64 embedded-image-footer.64 } ;
+UNION-STRUCT: image-header.union { b32 image-header.32 } { b64 image-header.64 } ;
+UNION-STRUCT: embedded-image-footer.union { b32 embedded-image-footer.32 } { b64 embedded-image-footer.64 } ;
 
 TUPLE: image
   { footer }              ! located at the end of a file in case of embedded images
@@ -112,15 +112,15 @@ ERROR: unsupported-image-header ;
   [ heap-size read* ] [ memory>struct ] bi ;
 
 : read-header ( -- header.32/header.64/* )
-  [ image-header read-struct* check-image-header >compression-header ] with-position dup skip-struct ;
+  [ image-header.union read-struct* check-image-header >compression-header ] with-position dup skip-struct ;
 
 : read-footer ( -- footer-offset footer )
   [
-    embedded-image-footer [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
+    embedded-image-footer.union [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
   ] with-position ;
 
 : read-footer* ( -- footer-offset footer/f )
-  read-footer valid-image-footer? [ ] [ embedded-image-footer struct-size + f ] if* ;
+  read-footer valid-image-footer? [ ] [ embedded-image-footer.union struct-size + f ] if* ;
 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
