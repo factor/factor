@@ -1,23 +1,23 @@
 ! Copyright (C) 2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
-USING: classes help.markup help.syntax kernel math quotations
-strings tools.image ;
+USING: byte-arrays classes classes.struct help.markup help.syntax kernel math
+quotations strings tools.image ;
 
 HELP: compressable-image
 { $class-description "predicate class to indicate compressable images" } ;
 
 HELP: >compressable
 { $values
-    { "uncompressable-image" object }
-    { "compressable-image" object }
+    { "uncompressable-image" image }
+    { "compressable-image" image }
 }
 { $description "Converts an uncompressable image to a compressable image." }
 { $warning "Such an image cannot be loaded by older Factor versions that do not support loading of compressed images. In extreme cases such older Factor versions might not be able to start due to this. Keep backups of important image files before compressing them." } ;
 
 ! HELP: reset-header
 ! { $values
-!     { "header" object }
-!     { "header'" object }
+!     { "header" image-header }
+!     { "header'" image-header }
 ! }
 ! { $description "reset header format" } ;
 
@@ -46,20 +46,20 @@ HELP: image-header.union
 HELP: read-struct*
 { $values
     { "class" class }
-    { "struct" object }
+    { "struct" struct }
 }
 { $description "read struct, even beyond EOF" } ;
 
 HELP: skip-struct
 { $values
-    { "struct" object }
+    { "struct" struct }
 }
 { $description "skip the size of a struct in the input stream" } ;
 
 HELP: valid-image-footer?
 { $values
-    { "footer" object }
-    { "footer.32/footer.64/f" object }
+    { "footer" embedded-image-footer.union }
+    { "footer.32/footer.64/f" embedded-image-footer }
 }
 { $description "returns valid image footer or f" } ;
 
@@ -109,8 +109,8 @@ HELP: sync-header
 
 HELP: check-image-header
 { $values
-    { "header" object }
-    { "header.32/header.64/*" object }
+    { "header" image-header.union }
+    { "header.32/header.64/*" image-header }
 }
 { $description "Checks for a valid header, else throws error" } ;
 
@@ -119,26 +119,26 @@ HELP: embedded-image-footer
 
 HELP: image-magic
 { $values
-    { "value" object }
+    { "value" integer }
 }
 { $description "Magic value for a valid Factor image" } ;
 
 HELP: image-version
 { $values
-    { "value" object }
+    { "value" integer }
 }
 { $description "Current supported Factor image format version" } ;
 
 HELP: read*
 { $values
     { "n" integer }
-    { "bytes" object }
+    { "bytes" byte-array }
 }
 { $description "read n bytes, return empty byte array if n equals 0" } ;
 
 HELP: read-footer
 { $values
-    { "footer-offset" object } { "footer" object }
+    { "footer-offset" integer } { "footer" embedded-image-footer.union }
 }
 { $description "read the footer at given offset from beginning of file. Reads footer from end of file, while returning to current file position. Also returns offset to footer from beginning of file." } ;
 
@@ -150,20 +150,20 @@ HELP: read-footer*
 
 HELP: read-header
 { $values
-    { "header.32/header.64/*" object }
+    { "header.32/header.64/*" image-header }
 }
 { $description "Read header" } ;
 
 HELP: uncompressed-code?
 { $values
-    { "image" object }
+    { "image" image }
     { "?" boolean }
 }
 { $description "Check if stored code heap is uncompressed" } ;
 
 HELP: uncompressed-data?
 { $values
-    { "image" object }
+    { "image" image }
     { "?" boolean }
 }
 { $description "Check if stored data heap is uncompressed" } ;
@@ -174,14 +174,14 @@ HELP: unsupported-image-header
 
 HELP: valid-footer?
 { $values
-    { "footer" object }
+    { "footer" embedded-image-footer }
     { "?" boolean }
 }
 { $description "Is it a valid footer?" } ;
 
 HELP: valid-header?
 { $values
-    { "header" object }
+    { "header" image-header }
     { "?" boolean }
 }
 { $description "Is it a valid header?" } ;
