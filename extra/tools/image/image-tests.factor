@@ -7,10 +7,12 @@ specialized-arrays.instances.alien.c-types.u64 tools.image
 tools.test ;
 IN: tools.image.tests
 
-CONSTANT: dummy-leader  $[ "dummy head" B{ } like ]
-CONSTANT: dummy-data    $[ "dummy data" B{ } like ]
-CONSTANT: dummy-code    $[ "dummy code" B{ } like ]
-CONSTANT: dummy-trailer $[ "dummy tail" B{ } like ]
+<<
+CONSTANT: dummy-leader  $[ "dummy headABCDEF" B{ } like ]
+CONSTANT: dummy-data    $[ "dummy dataABCDEF0123456789ABCDEF" B{ } like ]
+CONSTANT: dummy-code    $[ "dummy codeABCDEF" B{ } like ]
+CONSTANT: dummy-trailer $[ "dummy tailABCDEF0123456789AB" B{ } like ]
+>>
 
 CONSTANT: dummy-objects.32 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u32-array> ] tri [ copy ] keep ]
 CONSTANT: dummy-objects.64 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u64-array> ] tri [ copy ] keep ]
