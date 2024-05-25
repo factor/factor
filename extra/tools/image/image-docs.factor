@@ -6,12 +6,12 @@ strings tools.image ;
 HELP: compressable-image
 { $class-description "predicate class to indicate compressable images" } ;
 
-HELP: reset-header
-{ $values
-    { "header" object }
-    { "header'" object }
-}
-{ $description "reset header format" } ;
+! HELP: reset-header
+! { $values
+!     { "header" object }
+!     { "header'" object }
+! }
+! { $description "reset header format" } ;
 
 HELP: uncompressable-image
 { $description "Throws an " { $link uncompressable-image } " error." }

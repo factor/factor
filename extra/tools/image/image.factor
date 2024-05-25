@@ -88,8 +88,12 @@ ERROR: unsupported-image-header ;
   ] unless
 ;
 
+<PRIVATE
+
 : reset-header ( header -- header' )
   dup data-size>> zero? [ 0 >>escaped-data-size 0 >>compressed-data-size 0 >>compressed-code-size ] unless ;
+
+PRIVATE>
 
 : sync-header ( image -- image' )
   dup data>> length over header>> compressed-data-size<<
