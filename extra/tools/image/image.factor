@@ -1,9 +1,9 @@
 ! Copyright (C) 2024 nomennescio
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types byte-arrays classes
-classes.struct combinators continuations generalizations io
-io.encodings.binary io.files kernel kernel.private math
-sequences ;
+classes.struct combinators continuations debugger
+generalizations io io.encodings.binary io.files kernel
+kernel.private math sequences ;
 IN: tools.image
 
 ! These structs and constants correspond to vm/image.hpp
@@ -62,6 +62,8 @@ TUPLE: image
 PREDICATE: compressable-image < image header>> data-size>> zero? ;
 
 ERROR: uncompressable-image ;
+
+M: uncompressable-image error. drop "This image format does not support compression" print ;
 
 : valid-header? ( header -- ? )
   [ magic>> image-magic = ] [ version>> image-version = ] bi and ;
