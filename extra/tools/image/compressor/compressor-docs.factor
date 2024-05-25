@@ -30,21 +30,21 @@ HELP: compress
 { $description "Compresses bytes" }
 ;
 
-HELP: compress-code
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses code heap" }
-;
-
-HELP: compress-data
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses data heap" }
-;
+! HELP: compress-code
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses code heap" }
+! ;
+!
+! HELP: compress-data
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses data heap" }
+! ;
 
 HELP: compress-image
 { $values

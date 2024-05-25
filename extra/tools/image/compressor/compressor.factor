@@ -15,9 +15,17 @@ INITIALIZED-SYMBOL: compression-level [ 12 ]
 
 : (compress) ( byte-array -- compressed ) compression-level get zstd-compress-level ;
 : compress ( byte-array -- compressed ) [ (compress) ] keep [ [ length ] bi@ < ] 2keep ? ;
+
+<PRIVATE
+
 : compress-data ( image -- image' ) dup uncompressed-data? [ dup data>> compress >>data ] when ; ! only compress uncompressed data
 : compress-code ( image -- image' ) dup uncompressed-code? [ dup code>> compress >>code ] when ; ! only compress uncompressed code
-: compress-image ( image -- image' ) compress-data compress-code sync-header ;
+
+PRIVATE>
+
+GENERIC: compress-image ( image -- image' )
+M: image compress-image uncompressable-image ;
+M: compressable-image compress-image compress-data compress-code sync-header ;
 
 ! compress factor image
 : compress-factor-image ( image-file compressed-file  -- )
