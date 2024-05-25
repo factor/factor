@@ -37,6 +37,12 @@ HELP: image-header.32
 HELP: image-header.64
 { $class-description "64 bit image header" } ;
 
+HELP: embedded-image-footer.union
+{ $class-description "Overlay of 32 and 64 bit embedded image footer" } ;
+
+HELP: image-header.union
+{ $class-description "Overlay of 32 and 64 bit image header" } ;
+
 HELP: read-struct*
 { $values
     { "class" class }
