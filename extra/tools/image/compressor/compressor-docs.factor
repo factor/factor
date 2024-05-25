@@ -22,7 +22,7 @@ $examples {
 HELP: (compress)
 { $values
     { "byte-array" byte-array }
-    { "compressed" object }
+    { "compressed" byte-array }
 }
 { $description "Compress bytes with current compression level" } ;
 
