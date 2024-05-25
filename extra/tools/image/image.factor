@@ -132,7 +132,7 @@ M: unsupported-image-header error. drop "Could not detect a valid image header" 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )
   binary [
-    read-footer [ dup image-offset>> read* ] [ f B{ } clone ] if*
+    read-footer [ dup image-offset>> read* ] [ f f ] if*
     read-header dup
     [ compressed-data-size>> read* ]
     [ compressed-code-size>> read* ] bi
