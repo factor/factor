@@ -3,7 +3,8 @@
 USING: accessors classes classes.struct io io.encodings.binary
 io.files kernel kernel.private literals sequences
 specialized-arrays.instances.alien.c-types.u32
-specialized-arrays.instances.alien.c-types.u64 tools.image
+specialized-arrays.instances.alien.c-types.u64
+specialized-arrays.instances.alien.c-types.u8 tools.image
 tools.test ;
 IN: tools.image.tests
 
@@ -41,22 +42,24 @@ CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-lea
 { f } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.64 = ] unit-test
 { t } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.64 = ] unit-test
 { f } [ embedded-image-footer.union <struct> valid-image-footer? ] unit-test
-CONSTANT: dummy-file "vocab:tools/image/dummy.image"
 
-{ t } [ dummy-file binary [
+CONSTANT: dummy-file.32 "vocab:tools/image/dummy.32.image"
+CONSTANT: dummy-file.64 "vocab:tools/image/dummy.64.image"
+
+{ t } [ dummy-file.64 binary [
            tell-input
            [ 0 seek-end seek-input ] with-position
            tell-input =
       ] with-file-reader ] unit-test
-{ t } [ dummy-file binary [
+{ t } [ dummy-file.64 binary [
            0 seek-end seek-input tell-input
            [ 0 seek-absolute seek-input ] with-position
            tell-input =
       ] with-file-reader ] unit-test
 
-{ t } [ dummy-file binary [
+{ t } [ dummy-file.64 binary [
            dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi =
       ] with-file-reader ] unit-test
-{ t } [ dummy-file binary [
+{ t } [ dummy-file.64 binary [
            dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi =
       ] with-file-reader ] unit-test
