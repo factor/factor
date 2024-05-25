@@ -27,12 +27,15 @@ GENERIC: compress-image ( image -- image' )
 M: image compress-image uncompressable-image ;
 M: compressable-image compress-image compress-data compress-code sync-header ;
 
+INITIALIZED-SYMBOL: force-compression [ f ]
+
 ! compress factor image
 : compress-factor-image ( image-file compressed-file  -- )
-  [ load-factor-image compress-image ] dip save-factor-image
+  [ load-factor-image force-compression get [ >compressable ] when compress-image ] dip save-factor-image
 ;
 
-: compress-current-image ( -- ) image-path dup compress-factor-image ;
+! try hard to ensure the currently running version of Factor will be able to read the current image
+: compress-current-image ( -- ) image-path dup f force-compression [ compress-factor-image ] with-variable ;
 
 <PRIVATE
 
