@@ -75,4 +75,5 @@ dummy-file.64 32|64 set-global
             [ dummy-trailer.32 skip dummy-footer.32 dup class-of read-struct* = ] with-position
               dummy-trailer.64 skip dummy-footer.64 dup class-of read-struct* =   or
           ] unit-test
+    { t } [ tell-input 0 seek-end seek-input tell-input = ] unit-test
 ] with-dummy ] with-variable ] each
