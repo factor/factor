@@ -1,7 +1,8 @@
 ! Copyright (C) 2024 nomennescio.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors classes classes.struct io io.encodings.binary
-io.files kernel kernel.private literals namespaces sequences
+USING: accessors alien.c-types classes classes.struct io
+io.encodings.binary io.files kernel kernel.private literals math
+namespaces sequences
 specialized-arrays.instances.alien.c-types.u32
 specialized-arrays.instances.alien.c-types.u64
 specialized-arrays.instances.alien.c-types.u8 tools.image
@@ -59,9 +60,10 @@ INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 { t } [ [ dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 { t } [ [ dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 
-! test dummy file integrity first
+! test dummy file integrity first and test some functions along the way
 
 { $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
+    { t } [ read-footer [ class-of heap-size + [ 0 seek-end seek-input tell-input ] with-position = ] [ dummy-footer.32 = ] [ dummy-footer.64 = ] tri or and ] unit-test
     { t } [ dummy-leader dup length read* = ] unit-test
     { t } [ read-header [ dummy-header.32 = ] [ dummy-header.64 = ] bi or ] unit-test
     { t } [ dummy-data dup length read* = ] unit-test
@@ -76,6 +78,10 @@ INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 
 ! tests dependent on dummy files
 
-{ $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
+{ T{ image f $ dummy-footer.32 $ dummy-leader $ dummy-header.32 $ dummy-data $ dummy-code $ dummy-trailer.32 } } [ dummy-file.32 load-factor-image ] unit-test
+{ T{ image f $ dummy-footer.64 $ dummy-leader $ dummy-header.64 $ dummy-data $ dummy-code $ dummy-trailer.64 } } [ dummy-file.64 load-factor-image ] unit-test
 
-] with-dummy ] with-variable ] each
+{ $ dummy-file.32 $ dummy-file.64 } [ 32|64 [
+  { t } [ 32|64 get load-factor-image compressable-image? ] unit-test
+] with-variable ] each
+
