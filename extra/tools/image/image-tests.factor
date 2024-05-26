@@ -10,9 +10,9 @@ IN: tools.image.tests
 
 <<
 CONSTANT: dummy-leader  $[ "dummy headABCDEF" B{ } like ]
-CONSTANT: dummy-data    $[ "dummy dataABCDEF0123456789ABCDEF" B{ } like ]
-CONSTANT: dummy-code    $[ "dummy codeABCDEF" B{ } like ]
-CONSTANT: dummy-trailer $[ "dummy tailABCDEF0123456789AB" B{ } like ]
+CONSTANT: dummy-data    $[ "dummy dataABCDEF" B{ } like ]                 ! is incompressable
+CONSTANT: dummy-code    $[ "dummy code######################" B{ } like ] ! is   compressable
+CONSTANT: dummy-trailer $[ "dummy tailABCDEF01234567" B{ } like ]
 
 CONSTANT: dummy-objects.32 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u32-array> ] tri [ copy ] keep ]
 CONSTANT: dummy-objects.64 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u64-array> ] tri [ copy ] keep ]
