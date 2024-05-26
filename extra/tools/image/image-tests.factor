@@ -61,7 +61,7 @@ dummy-file.64 32|64 set-global
 { t } [ [ dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 { t } [ [ dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 
-! test file integrity
+! test dummy file integrity
 
 : skip ( bytes -- ) length seek-relative seek-input ; inline
 
@@ -70,5 +70,9 @@ dummy-file.64 32|64 set-global
     { t } [ read-header [ dummy-header.32 = ] [ dummy-header.64 = ] bi or ] unit-test
     { t } [ dummy-data dup length read* = ] unit-test
     { t } [ dummy-code dup length read* = ] unit-test
-    { t } [ dummy-trailer dup length read* = ] unit-test
+  [ { t } [ dummy-trailer dup length read* = ] unit-test ] with-position
+    { t } [
+            [ dummy-trailer.32 skip dummy-footer.32 dup class-of read-struct* = ] with-position
+              dummy-trailer.64 skip dummy-footer.64 dup class-of read-struct* =   or
+          ] unit-test
 ] with-dummy ] with-variable ] each
