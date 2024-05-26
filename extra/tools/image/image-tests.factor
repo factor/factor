@@ -1,7 +1,7 @@
 ! Copyright (C) 2024 nomennescio.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.struct io io.encodings.binary
-io.files kernel kernel.private literals sequences
+io.files kernel kernel.private literals namespaces sequences
 specialized-arrays.instances.alien.c-types.u32
 specialized-arrays.instances.alien.c-types.u64
 specialized-arrays.instances.alien.c-types.u8 tools.image
@@ -48,6 +48,12 @@ CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-lea
 
 CONSTANT: dummy-file.32 "vocab:tools/image/dummy.32.image"
 CONSTANT: dummy-file.64 "vocab:tools/image/dummy.64.image"
+
+SYMBOL: 32|64
+
+: with-dummy ( quot -- ) [ 32|64 get binary ] dip with-file-reader ; inline
+
+dummy-file.64 32|64 set-global
 
 { t } [ dummy-file.64 binary [
            tell-input
