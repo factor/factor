@@ -3,17 +3,10 @@
 ! can be run as : factor -run=tools.image-uncompressor
 ! with command-line options, see documentation
 
-USING: accessors assocs byte-arrays classes.struct combinators
-command-line command-line.parser compression.zstd
-generalizations io io.encodings.binary io.files kernel
-kernel.private locals math math.order math.parser namespaces
-sequences system tools.image ;
+USING: byte-arrays command-line.parser help.markup help.syntax
+kernel memory namespaces strings system tools.image
+tools.image.compression tools.image.compression.private ;
 IN: tools.image.uncompressor
-
-: uncompress ( byte-array -- uncompressed ) zstd-uncompress ; inline
-: uncompress-data ( image -- image' ) dup uncompressed-data? [ dup data>> uncompress >>data ] unless ; ! only uncompress compressed data
-: uncompress-code ( image -- image' ) dup uncompressed-code? [ dup code>> uncompress >>code ] unless ; ! only uncompress compressed code
-: uncompress-image ( image -- image' ) uncompress-data uncompress-code sync-header ;
 
 ! uncompress factor image
 : uncompress-factor-image ( compressed-image-file uncompressed-file  -- )
