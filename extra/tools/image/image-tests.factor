@@ -62,6 +62,8 @@ INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 
 ! test dummy file integrity first and test some functions along the way
 
+: skip ( bytes -- ) length seek-relative seek-input ; inline
+
 { $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
     { t } [ read-footer [ class-of heap-size + [ 0 seek-end seek-input tell-input ] with-position = ] [ dummy-footer.32 = ] [ dummy-footer.64 = ] tri or and ] unit-test
     { t } [ dummy-leader dup length read* = ] unit-test
