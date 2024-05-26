@@ -65,10 +65,10 @@ dummy-file.64 32|64 set-global
 
 : skip ( bytes -- ) length seek-relative seek-input ; inline
 
-{ $ dummy-file.32 $ dummy-file.64 } [ 32|64 [
-    { t } [ [ dummy-leader dup length read* = ] with-dummy ] unit-test
-    { t } [ [ dummy-leader skip read-header [ dummy-header.32 = ] [ dummy-header.64 = ] bi or ] with-dummy ] unit-test
-    { t } [ [ dummy-leader skip read-header drop dummy-data dup length read* = ] with-dummy ] unit-test
-    { t } [ [ dummy-leader skip read-header drop dummy-data skip dummy-code dup length read* = ] with-dummy ] unit-test
-    { t } [ [ dummy-leader skip read-header drop dummy-data skip dummy-code skip dummy-trailer dup length read* = ] with-dummy ] unit-test
-] with-variable ] each
+{ $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
+    { t } [ dummy-leader dup length read* = ] unit-test
+    { t } [ read-header [ dummy-header.32 = ] [ dummy-header.64 = ] bi or ] unit-test
+    { t } [ dummy-data dup length read* = ] unit-test
+    { t } [ dummy-code dup length read* = ] unit-test
+    { t } [ dummy-trailer dup length read* = ] unit-test
+] with-dummy ] with-variable ] each
