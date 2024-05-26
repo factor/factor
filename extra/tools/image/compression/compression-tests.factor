@@ -15,7 +15,7 @@ CONSTANT: compressable-bytes B{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
 
 { t } [ incompressable-bytes dup compress = ] unit-test
 { f } [   compressable-bytes dup compress = ] unit-test
-{ f } [ incompressable-bytes [ (compress) ] [ compress ] bi = ] unit-test
-{ t } [   compressable-bytes [ (compress) ] [ compress ] bi = ] unit-test
+{ t } [ incompressable-bytes [ (compress) ] [ compress ] bi = not ] unit-test
+{ f } [   compressable-bytes [ (compress) ] [ compress ] bi = not ] unit-test
 { t } [ incompressable-bytes [ (compress) ] [ compress ] bi [ length ] bi@ > ] unit-test
 { f } [   compressable-bytes [ (compress) ] [ compress ] bi [ length ] bi@ > ] unit-test
