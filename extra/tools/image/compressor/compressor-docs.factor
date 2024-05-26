@@ -19,27 +19,27 @@ $examples {
 }
 ;
 
-HELP: (compress)
-{ $values
-    { "byte-array" byte-array }
-    { "compressed" byte-array }
-}
-{ $description "Compress bytes with current compression level" } ;
+! HELP: (compress)
+! { $values
+!     { "byte-array" byte-array }
+!     { "compressed" byte-array }
+! }
+! { $description "Compress bytes with current compression level" } ;
 
 HELP: force-compression
 { $var-description "Enable force compression." }
 { $warning "This converts uncompressable images using " { $link >compressable } ", see warning there." } ;
 
-HELP: compression-level
-{ $var-description "Compression parameter : 1 (least) .. 22 (most). Default value 12." } ;
+! HELP: compression-level
+! { $var-description "Compression parameter : 1 (least) .. 22 (most). Default value 12." } ;
 
-HELP: compress
-{ $values
-    { "byte-array" byte-array }
-    { "compressed" byte-array }
-}
-{ $description "Compresses bytes, keep shortest sequence" }
-;
+! HELP: compress
+! { $values
+!     { "byte-array" byte-array }
+!     { "compressed" byte-array }
+! }
+! { $description "Compresses bytes, keep shortest sequence" }
+! ;
 
 ! HELP: compress-code
 ! { $values
@@ -48,7 +48,7 @@ HELP: compress
 ! }
 ! { $description "Compresses code heap" }
 ! ;
-!
+
 ! HELP: compress-data
 ! { $values
 !     { "image" image }
@@ -57,13 +57,13 @@ HELP: compress
 ! { $description "Compresses data heap" }
 ! ;
 
-HELP: compress-image
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses data- and code heaps and syncs header" }
-;
+! HELP: compress-image
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses data- and code heaps and syncs header" }
+! ;
 
 HELP: compress-factor-image
 { $values
