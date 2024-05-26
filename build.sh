@@ -133,7 +133,7 @@ set_md5sum() {
 }
 
 set_cc() {
-    # on Cygwin we MUST use the MinGW "cross-compiler", therefore check these first
+    # on Cygwin we MUST use the MinGW "cross-compilers", therefore check these first
     # furthermore, we prefer 64 bit over 32 bit versions if both are available
 
     # we need this condition so we don't find a mingw32 compiler on linux
@@ -151,8 +151,23 @@ set_cc() {
             [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
             return
         fi
+
+        if test_programs_installed x86_64-w64-mingw32-clang x86_64-w64-mingw32-clang++; then
+            [ -z "$CC" ] && CC=x86_64-w64-mingw32-clang
+            [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-clang++
+            # [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
+            return
+        fi
+
+        if test_programs_installed i686-w64-mingw32-clang i686-w64-mingw32-clang++; then
+            [ -z "$CC" ] && CC=i686-w64-mingw32-clang
+            [ -z "$CXX" ] && CXX=i686-w64-mingw32-clang++
+            # [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
+            return
+        fi
     fi
 
+    # clang and clang++ commands will fail to correctly build Factor on Cygwin, need "cross compiler"
     if test_programs_installed clang clang++ ; then
         [ -z "$CC" ] && CC=clang
         [ -z "$CXX" ] && CXX=clang++
@@ -160,7 +175,7 @@ set_cc() {
         return
     fi
 
-    # gcc and g++ will fail to correctly build Factor on Cygwin
+    # gcc and g++ commands will fail to correctly build Factor on Cygwin, need "cross compiler"
     if test_programs_installed gcc g++ ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
