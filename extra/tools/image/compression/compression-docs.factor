@@ -1,6 +1,6 @@
 ! Copyright (C) 2024 nomennescio.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: byte-arrays help.markup help.syntax images ;
+USING: byte-arrays help.markup help.syntax tools.image ;
 IN: tools.image.compression
 
 ARTICLE: "tools.image.compression" "Factor image compression and uncompression"

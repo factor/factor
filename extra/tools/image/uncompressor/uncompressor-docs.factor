@@ -15,37 +15,37 @@ $examples {
 }
 ;
 
-HELP: uncompress
-{ $values
-    { "byte-array" byte-array }
-    { "uncompressed" byte-array }
-}
-{ $description "Compresses bytes" }
-;
-
-HELP: uncompress-code
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses code heap" }
-;
-
-HELP: uncompress-data
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses data heap" }
-;
-
-HELP: uncompress-image
-{ $values
-    { "image" image }
-    { "image'" image }
-}
-{ $description "Compresses data- and code heaps and syncs header" }
-;
+! HELP: uncompress
+! { $values
+!     { "byte-array" byte-array }
+!     { "uncompressed" byte-array }
+! }
+! { $description "Compresses bytes" }
+! ;
+! 
+! HELP: uncompress-code
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses code heap" }
+! ;
+! 
+! HELP: uncompress-data
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses data heap" }
+! ;
+! 
+! HELP: uncompress-image
+! { $values
+!     { "image" image }
+!     { "image'" image }
+! }
+! { $description "Compresses data- and code heaps and syncs header" }
+! ;
 
 HELP: uncompress-factor-image
 { $values
