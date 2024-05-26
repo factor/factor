@@ -49,11 +49,9 @@ CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-lea
 CONSTANT: dummy-file.32 "vocab:tools/image/dummy.32.image"
 CONSTANT: dummy-file.64 "vocab:tools/image/dummy.64.image"
 
-SYMBOL: 32|64
+INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 
 : with-dummy ( quot -- ) [ 32|64 get binary ] dip with-file-reader ; inline
-
-dummy-file.64 32|64 set-global
 
 { t } [ [ tell-input [ 0 seek-end seek-input ] with-position tell-input = ] with-dummy ] unit-test
 { t } [ [ 0 seek-end seek-input tell-input [ 0 seek-absolute seek-input ] with-position tell-input = ] with-dummy ] unit-test
@@ -61,7 +59,7 @@ dummy-file.64 32|64 set-global
 { t } [ [ dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 { t } [ [ dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
 
-! test dummy file integrity
+! test dummy file integrity first
 
 { $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
     { t } [ dummy-leader dup length read* = ] unit-test
@@ -73,5 +71,11 @@ dummy-file.64 32|64 set-global
             [ dummy-trailer.32 skip dummy-footer.32 dup class-of read-struct* = ] with-position
               dummy-trailer.64 skip dummy-footer.64 dup class-of read-struct* =   or
           ] unit-test
-    { t } [ tell-input 0 seek-end seek-input tell-input = ] unit-test
+    { t } [ tell-input 0 seek-end seek-input tell-input = ] unit-test ! all bytes checked here
+] with-dummy ] with-variable ] each
+
+! tests dependent on dummy files
+
+{ $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
+
 ] with-dummy ] with-variable ] each
