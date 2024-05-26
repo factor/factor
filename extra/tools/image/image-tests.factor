@@ -63,8 +63,6 @@ dummy-file.64 32|64 set-global
 
 ! test dummy file integrity
 
-: skip ( bytes -- ) length seek-relative seek-input ; inline
-
 { $ dummy-file.32 $ dummy-file.64 } [ 32|64 [ [
     { t } [ dummy-leader dup length read* = ] unit-test
     { t } [ read-header [ dummy-header.32 = ] [ dummy-header.64 = ] bi or ] unit-test
