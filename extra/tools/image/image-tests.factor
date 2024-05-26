@@ -55,20 +55,8 @@ SYMBOL: 32|64
 
 dummy-file.64 32|64 set-global
 
-{ t } [ [
-           tell-input
-           [ 0 seek-end seek-input ] with-position
-           tell-input =
-      ] with-dummy ] unit-test
-{ t } [ [
-           0 seek-end seek-input tell-input
-           [ 0 seek-absolute seek-input ] with-position
-           tell-input =
-      ] with-dummy ] unit-test
+{ t } [ [ tell-input [ 0 seek-end seek-input ] with-position tell-input = ] with-dummy ] unit-test
+{ t } [ [ 0 seek-end seek-input tell-input [ 0 seek-absolute seek-input ] with-position tell-input = ] with-dummy ] unit-test
 
-{ t } [ [
-           dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi =
-      ] with-dummy ] unit-test
-{ t } [ [
-           dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi =
-      ] with-dummy ] unit-test
+{ t } [ [ dummy-footer.32 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
+{ t } [ [ dummy-header.64 [ skip-struct tell-input ] [ class-of struct-size ] bi = ] with-dummy ] unit-test
