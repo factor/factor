@@ -42,7 +42,7 @@ HELP: cleanup-unique-directory
 
 { unique-directory with-unique-directory cleanup-unique-directory } related-words
 
-HELP: with-unique-file-copy
+HELP: safe-replace-file
 { $values { "original-path" "a pathname string" } { "quot" quotation } }
 { $description "Copies the file from " { $snippet "original-path" } " to a unique file, applies the " { $snippet "quot" } " quotation to it, and then moves the unique file back atomically." } ;
 
