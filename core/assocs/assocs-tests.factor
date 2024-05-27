@@ -365,3 +365,41 @@ unit-test
 { { 1 2 } } [ { 1 2 } H{ } substitute ] unit-test
 { { 5 2 10 } } [ { 1 2 3 } H{ { 1 5 } { 3 10 } } substitute ] unit-test
 { { 2 3 3 } } [ { 1 2 3 } H{ { 1 2 } { 2 3 } } substitute ] unit-test
+
+{ H{ { "foo" 4 } } } [
+   H{ { "foo" 3 } } "foo" over inc-at
+] unit-test
+{ H{ { "foo" 3 } { "bar" 1 } } } [
+   H{ { "foo" 3 }  } "bar" over inc-at
+] unit-test
+
+{ H{ { "foo" 4 } } } [
+   H{ { "foo" 2 } } dup
+   '[ 2 "foo" _ at+ ] call
+] unit-test
+{ H{ { "foo" 3 } { "bar" 5 } } } [
+   H{ { "foo" 3 } } dup
+   '[ 5 "bar" _ at+ ] call
+] unit-test
+
+{ 2 t } [ 5 H{ { 2 5 } } ?value-at ] unit-test
+{ 10 f } [ 10 H{ { 2 5 } } ?value-at ] unit-test
+
+{ H{ { 1 10 } } } [
+    H{ { 1 2 } } 1 10 set-of
+] unit-test
+
+{ H{ { 5 10  } } t } [
+    H{ { 5 1 } } dup
+    '[ 10 5 _  maybe-set-at ] call
+] unit-test
+
+{ H{ { 1 2 } { 5 10 } } t } [
+    H{ { 1 2 } } dup
+    '[ 10 5 _  maybe-set-at ] call
+] unit-test
+
+{ H{ { 1 2 } } f } [
+    H{ { 1 2 } } dup
+    '[ 2 1 _  maybe-set-at ] call
+] unit-test
