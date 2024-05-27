@@ -11,7 +11,7 @@ IN: ui.tools
 
 \ save H{ { +nullary+ t } } define-command
 
-: com-exit ( -- ) 0 exit ;
+: com-exit ( -- ) close-all-windows 0 exit ;
 
 \ com-exit H{ { +nullary+ t } } define-command
 
