@@ -90,7 +90,17 @@ INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 { t } [ dummy-image.32 dup [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file = ] unit-test
 { t } [ dummy-image.64 dup [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file = ] unit-test
 
+: fake-compress-data ( image -- image' ) [ header>> 2 >>compressed-data-size drop ] keep B{ 1 2 } clone >>data ;
+: fake-compress-code ( image -- image' ) [ header>> 1 >>compressed-code-size drop ] keep B{ 1 }   clone >>code ;
+
 { $ dummy-file.32 $ dummy-file.64 } [ 32|64 [
   { t } [ 32|64 get load-factor-image compressable-image? ] unit-test
+  { t } [ 32|64 get load-factor-image uncompressed-data? ] unit-test
+  { f } [ 32|64 get load-factor-image fake-compress-data uncompressed-data? ] unit-test
+  { t } [ 32|64 get load-factor-image uncompressed-code? ] unit-test
+  { f } [ 32|64 get load-factor-image fake-compress-code uncompressed-code? ] unit-test
+  { t } [ 32|64 get load-factor-image 32|64 get load-factor-image sync-header = ] unit-test
+  { t } [ 32|64 get load-factor-image fake-compress-data sync-header [ data>> length ] [ header>> compressed-data-size>> ] bi = ] unit-test
+  { t } [ 32|64 get load-factor-image fake-compress-code sync-header [ code>> length ] [ header>> compressed-code-size>> ] bi = ] unit-test
   { t } [ [ [ drop 32|64 get load-factor-image ] [ save-factor-image ] [ 32|64 get [ binary file-contents ] bi@ = ] tri ] with-test-file ] unit-test
 ] with-variable ] each
