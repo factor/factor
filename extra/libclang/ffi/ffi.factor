@@ -9,7 +9,7 @@ LIBRARY: clang
 
 <<
 : latest-libclang ( -- path/f )
-    "/usr/lib/" qualified-directory-files
+    "/usr/lib/" ?qualified-directory-files
     [ file-name "llvm-" head? ] filter
     human-sort <reversed> ?first ;
 >>
