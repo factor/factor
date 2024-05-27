@@ -90,5 +90,7 @@ STRUCT: EntryNew
     swap "lib" ".so" surround '[ [ arch>> _ = ] [ key>> _ head? ] bi and ] find nip ;
 
 : find-so ( namespec -- so-name/f )
-    [ "/etc/ld.so.cache" binary [ parse ] with-file-reader ] dip
-    cpu search [ key>> ] [ f ] if* ;
+    "/etc/ld.so.cache" [
+        binary [ parse ] with-file-reader swap
+        cpu search [ key>> ] [ f ] if*
+    ] [ 2drop f ] if-file-exists ;
