@@ -105,12 +105,13 @@ INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
   { f } [ clone-factor-image fake-compress-data uncompressed-data? ] unit-test
   { t } [ clone-factor-image uncompressed-code? ] unit-test
   { f } [ clone-factor-image fake-compress-code uncompressed-code? ] unit-test
-  { t } [ clone-factor-image 32|64 get load-factor-image sync-header = ] unit-test
+  { t } [ clone-factor-image clone-factor-image sync-header = ] unit-test
   { t } [ clone-factor-image fake-compress-data sync-header [ data>> length ] [ header>> compressed-data-size>> ] bi = ] unit-test
   { t } [ clone-factor-image fake-compress-code sync-header [ code>> length ] [ header>> compressed-code-size>> ] bi = ] unit-test
-  { t } [ [ [ drop 32|64 get load-factor-image ] [ save-factor-image ] [ 32|64 get [ binary file-contents ] bi@ = ] tri ] with-test-file ] unit-test
+  { t } [ [ [ drop clone-factor-image ] [ save-factor-image ] [ 32|64 get [ binary file-contents ] bi@ = ] tri ] with-test-file ] unit-test
   { t } [ clone-factor-image dup [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file = ] unit-test
   { t } [ clone-factor-image fake-old-header dup [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file [ [ header>> >compression-header drop ] keep ] dip = ] unit-test
   { f } [ clone-factor-image fake-old-header [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file compressable-image? ] unit-test
   { t } [ clone-factor-image fake-old-header [ [ save-factor-image ] [ load-factor-image ] bi ] with-test-file >compressable compressable-image? ] unit-test
+  { t } [ clone-factor-image fake-old-header* dup [ save-factor-image ] with-test-file [ header>> data-size>> ] [ header>> compressed-data-size>> ] bi = ] unit-test
 ] with-variable ] each
