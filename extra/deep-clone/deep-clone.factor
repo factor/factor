@@ -15,7 +15,7 @@ GENERIC: (deep-clone) ( object -- object' )
     cloned get [ (deep-clone) ] cache ;
 
 M: object (deep-clone)
-    clone [
+    (clone) [
         dup class-of all-slots [
             offset>> [ slot (?deep-clone) ] [ set-slot ] 2bi
         ] with each
