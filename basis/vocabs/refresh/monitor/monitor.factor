@@ -3,15 +3,16 @@
 USING: accessors command-line continuations fry init io
 io.backend io.files io.monitors io.pathnames kernel namespaces
 prettyprint sequences splitting threads tr vocabs vocabs.cache
-vocabs.loader vocabs.refresh ;
+vocabs.loader vocabs.private vocabs.refresh ;
 IN: vocabs.refresh.monitor
 
 TR: convert-separators "/\\" ".." ;
 
-: vocab-dir>vocab-name ( path -- vocab )
+: vocab-dir>vocab-name ( path -- vocab/f )
     trim-head-separators
     trim-tail-separators
-    convert-separators ;
+    convert-separators
+    dup valid-vocab-name? [ drop f ] unless ;
 
 : path>vocab-parent-dir ( path -- path' )
     dup ".factor" tail? [ parent-directory ] when ;
@@ -24,7 +25,7 @@ TR: convert-separators "/\\" ".." ;
     [ head? ] with find nip
     ?head drop ;
 
-: path>vocab-name ( path -- vocab-name )
+: path>vocab-name ( path -- vocab-name/f )
     chop-vocab-root path>vocab-parent-dir vocab-dir>vocab-name ;
 
 : monitor-loop ( monitor -- )
@@ -33,8 +34,9 @@ TR: convert-separators "/\\" ".." ;
     [
         next-change path>>
         [
-            path>vocab-name
-            [ changed-vocab ] [ reset-cache ] bi
+            path>vocab-name [
+                [ changed-vocab ] [ reset-cache ] bi
+            ] when*
         ] [
             [
                 [ "monitor-loop warning for path ``" "``:" surround write ]
