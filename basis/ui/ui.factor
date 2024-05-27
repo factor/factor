@@ -208,6 +208,9 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
+: close-all-windows ( -- )
+    worlds get values [ close-window ] each ;
+
 STARTUP-HOOK: [
     f ui-running set-global
     <flag> ui-notify-flag set-global
