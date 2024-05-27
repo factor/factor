@@ -1,7 +1,6 @@
-USING: accessors ldcache system tools.test ;
-IN: ldcache.tests
+USING: accessors ldcache ldcache.private system tools.test ;
 
-: entries ( -- entries )
+{ "libwmf-0.2.so.7" } [
     {
         T{ ldcache-entry
            { elf? t }
@@ -21,8 +20,5 @@ IN: ldcache.tests
              "/usr/lib/x86_64-linux-gnu/libwinpr-utils.so.0.1"
            }
          }
-    } ;
-
-{ "libwmf-0.2.so.7" } [
-    entries "wmf-0.2" x86.64 search key>>
+    } "wmf-0.2" x86.64 search-ldcache key>>
 ] unit-test

@@ -1,9 +1,9 @@
 ! Copyright (C) 2017 Björn Lindqvist.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax strings ;
+USING: help.markup help.syntax ldcache.private strings ;
 IN: ldcache
 
-HELP: search
+HELP: search-ldcache
 { $values
   { "entries" { $sequence ldcache-entry } }
   { "namespec" "library name" }
