@@ -59,8 +59,8 @@ M: model-field model-changed 2dup model*>> =
 : <slider> ( init page min max step -- slider ) <range> horizontal slider:<slider> ;
 
 : image-prep ( -- image )
-    scan-token current-vocab name>> "vocab:" "/icons/" surround ".tiff" surround
-    <image-name> dup cached-image drop ;
+    scan-token current-vocab name>> "vocab:" "/icons/" surround
+    ".tiff" surround <image-name> ;
 
 SYNTAX: IMG-MODEL-BTN: image-prep [ <model-btn> ] curry append! ;
 
