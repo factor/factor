@@ -1,9 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: io.pathnames kernel literals memory namespaces sequences
-system tools.test ui ui.backend ui.commands ui.gestures
-ui.tools.browser ui.tools.button-list ui.tools.common
-ui.tools.error-list ui.tools.listener vocabs.refresh ;
+system tools.test ui ui.backend ui.commands ui.gadgets.private
+ui.gestures ui.tools.browser ui.tools.button-list
+ui.tools.common ui.tools.error-list ui.tools.listener
+vocabs.refresh ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
@@ -11,7 +12,7 @@ IN: ui.tools
 
 \ save H{ { +nullary+ t } } define-command
 
-: com-exit ( -- ) close-all-windows 0 exit ;
+: com-exit ( -- ) close-all-windows notify-queued 0 exit ;
 
 \ com-exit H{ { +nullary+ t } } define-command
 
