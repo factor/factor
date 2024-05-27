@@ -21,5 +21,4 @@ SYMBOL: throw-foo
 [ throw-foo get force ] [ "foo" = ] must-fail-with
 [ throw-foo get force ] [ "foo" = ] must-fail-with
 
-! when the quotation fails, we don't end up saving its result
-{ 2 } [ throw-foo-count get ] unit-test
+{ 1 } [ throw-foo-count get ] unit-test

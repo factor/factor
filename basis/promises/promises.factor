@@ -1,18 +1,26 @@
 ! Copyright (C) 2004, 2006 Chris Double, Matthew Willis.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors effects.parser generalizations kernel
-sequences words ;
+sequences words continuations combinators ;
 IN: promises
 
-TUPLE: promise quot forced? value ;
+SYMBOLS: +unforced+ +error+ +value+ ;
 
-: <promise> ( quot -- promise ) f f promise boa ;
+TUPLE: promise quot status value ;
+
+: <promise> ( quot -- promise ) +unforced+ f promise boa ;
 
 : force ( promise -- value )
-    dup forced?>> [
-        dup quot>> call( -- value ) >>value
-        t >>forced?
-    ] unless value>> ;
+    dup status>> {
+        { +error+ [ value>> throw ] }
+        { +value+ [ value>> ] }
+        { +unforced+ [
+            dup
+            [ quot>> call( -- value ) >>value +value+ >>status value>> ]
+            [ >>value +error+ >>status value>> throw ]
+            recover
+        ] }
+    } case ;
 
 : make-lazy-quot ( quot effect -- quot )
     in>> length '[ _ _ ncurry <promise> ] ;
