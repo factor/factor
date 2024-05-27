@@ -6,6 +6,8 @@ io.encodings.string io.files kernel math math.bitwise sequences
 system ;
 IN: ldcache
 
+<PRIVATE
+
 ! General util
 ERROR: bad-magic got expected ;
 
@@ -73,7 +75,7 @@ STRUCT: EntryNew
     [ key>> make-string ]
     [ value>> make-string ] 2tri ldcache-entry boa ;
 
-: parse ( -- entries )
+: parse-ldcache ( -- entries )
     ! Read the old header and jump past it.
     HeaderOld read-struct
     [
@@ -86,11 +88,16 @@ STRUCT: EntryNew
     [ stringslen>> read ] bi
     swap [ <ldcache-entry> ] with map ;
 
-: search ( entries namespec arch -- entry/f )
+: parse-ldcache-file ( path -- entries )
+    binary [ parse-ldcache ] with-file-reader ;
+
+: search-ldcache ( entries namespec arch -- entry/f )
     swap "lib" ".so" surround '[ [ arch>> _ = ] [ key>> _ head? ] bi and ] find nip ;
+
+PRIVATE>
 
 : find-so ( namespec -- so-name/f )
     "/etc/ld.so.cache" [
-        binary [ parse ] with-file-reader swap
-        cpu search [ key>> ] [ f ] if*
+        parse-ldcache-file swap
+        cpu search-ldcache [ key>> ] [ f ] if*
     ] [ 2drop f ] if-file-exists ;
