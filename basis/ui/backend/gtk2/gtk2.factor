@@ -523,4 +523,4 @@ os { linux freebsd } member? [
 "ui.backend.gtk2.input-methods.editors" require-when
 
 M: gtk2-ui-backend ui-backend-available?
-    "DISPLAY" os-env >boolean ;
+    "DISPLAY" os-env empty? not ;

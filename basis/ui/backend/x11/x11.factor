@@ -360,7 +360,7 @@ M: x11-ui-backend (ungrab-input)
 x11-ui-backend ui-backend set-global
 
 M: x11-ui-backend ui-backend-available?
-    "DISPLAY" os-env >boolean ;
+    "DISPLAY" os-env empty? not ;
 
 M: x11-ui-backend resize-window
     [ dpy get ] 2dip [ handle>> window>> ] [ first2 ] bi* XResizeWindow drop ;
