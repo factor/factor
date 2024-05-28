@@ -129,3 +129,8 @@ ${ 1024 2^ 1 - } [ B{
     255 255 255 255 255 255 255 255 255 255 255 255 255 255 255
     255 255 255 255 255 255 255 255 255 255 255
 } binary [ deserialize-cell ] with-byte-reader ] unit-test
+
+{ H{ { 1 "foo" } } H{ { 1 "boo" } } } [
+    H{ { 1 "foo" } } dup deep-clone
+    CHAR: b 0 pick 1 of set-nth
+] unit-test

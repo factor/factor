@@ -283,3 +283,6 @@ PRIVATE>
 
 : object>bytes ( obj -- bytes )
     binary [ serialize ] with-byte-writer ;
+
+: deep-clone ( obj -- obj' )
+    object>bytes bytes>object ;
