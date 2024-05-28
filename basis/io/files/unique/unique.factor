@@ -56,7 +56,7 @@ PRIVATE>
 
 :: cleanup-unique-file ( ..a prefix suffix quot: ( ..a path -- ..b ) -- ..b )
     prefix suffix unique-file :> path
-    [ path quot call ] [ path delete-file ] finally ; inline
+    [ path quot call ] [ path ?delete-file ] finally ; inline
 
 :: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a paths -- ..b ) -- ..b )
     prefix suffixes unique-files :> paths
