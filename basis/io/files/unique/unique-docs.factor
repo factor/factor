@@ -42,6 +42,10 @@ HELP: cleanup-unique-directory
 
 { unique-directory with-unique-directory cleanup-unique-directory } related-words
 
+HELP: with-unique-file-copy
+{ $values { "original-path" "a pathname string" } { "quot" quotation } }
+{ $description "Copies the file from " { $snippet "original-path" } " to a unique file, applies the " { $snippet "quot" } " quotation to it, and then moves the unique file back atomically." } ;
+
 ARTICLE: "io.files.unique" "Unique files"
 "The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform unique file creation in a high-level and secure way." $nl
 "Creating unique files:"

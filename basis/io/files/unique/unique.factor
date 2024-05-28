@@ -62,6 +62,11 @@ PRIVATE>
     prefix suffixes unique-files :> paths
     [ paths quot call ] [ paths [ delete-file ] each ] finally ; inline
 
+: with-unique-file-copy ( ... original-path quot: ( ... copy-path -- ... ) -- ... )
+    [ "" "" ] dip '[
+        [ copy-file ] [ nip @ ] [ swap move-file-atomically ] 2tri
+    ] cleanup-unique-file ; inline
+
 : unique-directory ( -- path )
     [
         random-file-name
