@@ -60,7 +60,7 @@ PRIVATE>
 
 :: cleanup-unique-files ( ..a prefix suffixes quot: ( ..a paths -- ..b ) -- ..b )
     prefix suffixes unique-files :> paths
-    [ paths quot call ] [ paths [ delete-file ] each ] finally ; inline
+    [ paths quot call ] [ paths [ ?delete-file ] each ] finally ; inline
 
 : safe-replace-file ( ... original-path quot: ( ... copy-path -- ... ) -- ... )
     [ "" "" ] dip '[
