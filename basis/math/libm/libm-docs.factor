@@ -86,3 +86,7 @@ HELP: fpow
 HELP: fsqrt
 { $values { "x" real } { "double" real } }
 { $description "Calls the square root function from the C standard library. User code should call " { $link sqrt } " instead." } ;
+
+HELP: ffma
+{ $values { "x" real } { "y" real } { "z" real } { "double" real } }
+{ $description "Calls the " { $snippet "fma" } " function from the C standard library to compute the 'fused-multiply-add' result of " { $snippet "(x * y) + z" } ". User code should call " { $link fma } " instead." } ;
