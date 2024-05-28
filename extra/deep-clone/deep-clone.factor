@@ -28,6 +28,12 @@ M: array (deep-clone)
         [ set-array-nth ] 2bi
     ] each-integer ;
 
+! no-op for primitive value objects
+M: fixnum (deep-clone) ;
+M: f      (deep-clone) ;
+M: float  (deep-clone) ;
+M: bignum (deep-clone) ;
+
 PRIVATE>
 
 : deep-clone ( object -- object' )
