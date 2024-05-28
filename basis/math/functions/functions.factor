@@ -163,6 +163,8 @@ M: integer frexp
         ] [ 1 + ] bi [ * ] dip
     ] if-zero ; inline
 
+: fma ( x y z -- result ) [ >float ] tri@ ffma ;
+
 DEFER: copysign
 
 GENERIC#: ldexp 1 ( x exp -- y )

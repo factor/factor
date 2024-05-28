@@ -51,6 +51,9 @@ FUNCTION-ALIAS: fpow
 FUNCTION-ALIAS: fsqrt
     double sqrt ( double x )
 
+FUNCTION-ALIAS: ffma
+    double fma ( double x, double y, double z )
+
 FUNCTION: double fmod ( double x, double y )
 
 M: float mod fmod ; inline
