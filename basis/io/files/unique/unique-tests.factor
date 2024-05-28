@@ -67,11 +67,11 @@ tools.test unicode ;
     ] with-temp-directory
 ] unit-test
 
-{ "world" } [
+{ "" "world" } [
     [
         "hello" "foo" utf8 set-file-contents
         "foo" [
-            "world" swap utf8 set-file-contents
+            utf8 [ "world" ] change-file-contents
         ] safe-overwrite-file
         "foo" utf8 file-contents
     ] with-temp-directory
@@ -89,11 +89,11 @@ tools.test unicode ;
     ] with-temp-directory
 ] unit-test
 
-{ "HELLO" } [
+{ "hello" "HELLO" } [
     [
         "hello" "foo" utf8 set-file-contents
         "foo" [
-            utf8 [ >upper ] change-file-contents
+            utf8 [ dup >upper ] change-file-contents
         ] safe-replace-file
         "foo" utf8 file-contents
     ] with-temp-directory
