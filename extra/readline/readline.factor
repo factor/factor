@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.data alien.libraries alien.strings compiler.units
-continuations destructors io.encodings.utf8 kernel libc
-sequences words ;
+continuations destructors io.backend io.encodings.utf8 kernel
+libc sequences words ;
 QUALIFIED: readline.ffi
 IN: readline
 
@@ -34,5 +34,6 @@ IN: readline
     readline.ffi:set-rl_completion_entry_function ;
 
 :: with-history ( path quot -- )
-    path readline.ffi:read_history io-error
-    quot [ path readline.ffi:write_history io-error ] finally ; inline
+    path normalize-path :> history-path
+    history-path readline.ffi:read_history io-error
+    quot [ history-path readline.ffi:write_history io-error ] finally ; inline
