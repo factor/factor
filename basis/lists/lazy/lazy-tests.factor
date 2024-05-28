@@ -50,3 +50,7 @@ lists.lazy math sequences tools.test ;
         lcontents list>array drop
     ] with-disposal
 ] unit-test
+
+{ { 1 4 2 5 3 6 } } [
+  { 1 2 3 } >list { 4 5 6 } >list lmerge list>array
+] unit-test
