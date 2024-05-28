@@ -3,17 +3,16 @@
 ! can be run as : factor -run=tools.image-compressor
 ! with command-line options, see documentation
 
-USING: byte-arrays command-line.parser help.markup help.syntax
-kernel math math.order math.parser memory namespaces strings
-system tools.image tools.image.compression ;
+USING: byte-arrays command-line.parser help.markup help.syntax io.files.unique
+kernel math math.order math.parser memory namespaces strings system
+tools.image tools.image.compression  ;
 IN: tools.image.compressor
 
 INITIALIZED-SYMBOL: force-compression [ f ]
 
 ! compress factor image
 : compress-factor-image ( image-file compressed-file  -- )
-  [ load-factor-image force-compression get [ >compressable ] when compress-image ] dip save-factor-image
-;
+    [ load-factor-image force-compression get [ >compressable ] when compress-image ] dip [ save-factor-image ] with safe-overwrite-file ;
 
 ! try hard to ensure the currently running version of Factor will be able to read the current image
 : compress-current-image ( -- ) image-path dup f force-compression [ compress-factor-image ] with-variable ;

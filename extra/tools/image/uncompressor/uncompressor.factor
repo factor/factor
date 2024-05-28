@@ -3,15 +3,13 @@
 ! can be run as : factor -run=tools.image-uncompressor
 ! with command-line options, see documentation
 
-USING: byte-arrays command-line.parser help.markup help.syntax
-kernel memory namespaces strings system tools.image
-tools.image.compression tools.image.compression.private ;
+USING: byte-arrays command-line.parser help.markup help.syntax io.files.unique
+kernel memory namespaces strings system tools.image tools.image.compression ;
 IN: tools.image.uncompressor
 
 ! uncompress factor image
 : uncompress-factor-image ( compressed-image-file uncompressed-file  -- )
-  [ load-factor-image uncompress-image ] dip save-factor-image
-;
+    [ load-factor-image uncompress-image ] dip [ save-factor-image ] with safe-overwrite-file ;
 
 : uncompress-current-image ( -- ) image-path dup uncompress-factor-image ;
 
