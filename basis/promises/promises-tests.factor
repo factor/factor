@@ -22,3 +22,5 @@ SYMBOL: throw-foo
 [ throw-foo get force ] [ "foo" = ] must-fail-with
 
 { 1 } [ throw-foo-count get ] unit-test
+
+{ 5 } [ 5 <value> force ] unit-test
