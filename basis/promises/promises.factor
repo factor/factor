@@ -10,6 +10,9 @@ TUPLE: promise quot status value ;
 
 : <promise> ( quot -- promise ) +unforced+ f promise boa ;
 
+: <value> ( value -- promise )
+    '[ f +value+ _ promise boa ] call ;
+
 : force ( promise -- value )
     dup status>> {
         { +error+ [ value>> throw ] }
