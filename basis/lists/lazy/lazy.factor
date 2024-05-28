@@ -15,8 +15,7 @@ TUPLE: lazy-cons-state { car promise } { cdr promise } ;
 C: <lazy-cons-state> lazy-cons-state
 
 : lazy-cons ( car cdr -- promise )
-    [ <promise> ] bi@ <lazy-cons-state>
-    [ f t ] dip promise boa ;
+    '[ _ _ <lazy-cons-state> ] <promise> ;
 
 M: lazy-cons-state car car>> force ;
 
