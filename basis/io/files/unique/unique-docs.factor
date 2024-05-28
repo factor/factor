@@ -46,6 +46,10 @@ HELP: safe-replace-file
 { $values { "original-path" "a pathname string" } { "quot" quotation } }
 { $description "Copies the file from " { $snippet "original-path" } " to a unique file, applies the " { $snippet "quot" } " quotation to it, and then moves the unique file back atomically." } ;
 
+HELP: safe-overwrite-file
+{ $values { "original-path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the " { $snippet "quot" } " quotation with a unique file, and then when the quotation finishes, replaces the file at " { $snippet "original-path" } " with the unique file, atomically." } ;
+
 ARTICLE: "io.files.unique" "Unique files"
 "The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform unique file creation in a high-level and secure way." $nl
 "Creating unique files:"
@@ -58,6 +62,12 @@ ARTICLE: "io.files.unique" "Unique files"
     unique-directory
     with-unique-directory
     cleanup-unique-directory
-} ;
+}
+"Safely changing files:"
+{ $subsections
+    safe-replace-file
+    safe-overwrite-file
+}
+;
 
 ABOUT: "io.files.unique"
