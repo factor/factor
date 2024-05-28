@@ -31,4 +31,4 @@ M: array (deep-clone)
 PRIVATE>
 
 : deep-clone ( object -- object' )
-    H{ } clone cloned [ (deep-clone) ] with-variable ;
+    IH{ } clone cloned [ (deep-clone) ] with-variable ;
