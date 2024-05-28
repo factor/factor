@@ -492,4 +492,4 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { { 1 2 3 } } [ 4 { 1 2 3 } remove-eq ] unit-test
 { { 1 3 } } [ 2 { 1 2 3 } remove-eq ] unit-test
 
-{ { 1 2 3 } } { { f 1 f 2 f f 3 } sift } unit-test
+{ { 1 2 3 } } [ { f 1 f 2 f f 3 } sift ] unit-test
