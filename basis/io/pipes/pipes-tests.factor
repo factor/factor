@@ -81,3 +81,15 @@ io.timeouts kernel math namespaces threads tools.test ;
         [ 0 read ] with-input-stream
     ] with-destructors
 ] unit-test
+
+{ "bar" "foo" } [
+    [ 
+      [let
+        utf8 <connected-pair> :> ( x y )
+        x y [ &dispose drop ] bi@
+        "foo\n" x stream-write x stream-flush
+        "bar\n" y stream-write y stream-flush
+        x y [ stream-readln ] bi@
+      ]
+    ] with-destructors
+] unit-test
