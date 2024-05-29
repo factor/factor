@@ -13,6 +13,7 @@ CONSTANT: vocab-renames {
     { "math.trig" { "math.functions" "0.100" } }
     { "math.functions.integer-logs" { "math.functions" "0.100" } }
     { "tools.image-analyzer" { "tools.image.analyzer" "0.100" } }
+    { "promises" { "lazy" "0.100" } }
 }
 
 CONSTANT: word-renames {
