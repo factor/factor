@@ -1,13 +1,13 @@
 ! Copyright (C) 2004 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel lists lists.lazy math promises
+USING: accessors arrays kernel lazy lists lists.lazy math
 sequences sequences.deep strings unicode ;
 IN: parser-combinators
 
 ! Parser combinator protocol
 GENERIC: parse ( input parser -- list )
 
-M: promise parse ( input parser -- list )
+M: lazy parse ( input parser -- list )
     force parse ;
 
 TUPLE: parse-result parsed unparsed ;
@@ -159,7 +159,7 @@ M: and-parser parse ( input parser -- list )
     ! input then parser2 is applied to the rest of
     ! the input strings from the first parser.
     parsers>> unclip swapd parse
-    [ [ and-parser-parse ] reduce ] 2curry <promise> ;
+    [ [ and-parser-parse ] reduce ] 2curry <lazy> ;
 
 TUPLE: or-parser parsers ;
 
