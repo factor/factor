@@ -24,6 +24,12 @@ HOOK: (pipe) io-backend ( -- pipe )
         ] dip <encoder-duplex>
     ] with-destructors ;
 
+:: <connected-pair> ( encoding -- stream stream )
+    encoding <pipe> :> x encoding <pipe> :> y
+    x in>> :> xin y in>> :> yin
+    yin x in<< xin y in<<
+    x y ;
+
 <PRIVATE
 
 : ?reader ( handle/f -- stream )
