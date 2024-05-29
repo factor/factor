@@ -1,5 +1,5 @@
 USING: tools.test math math.functions kernel sequences lists
-promises monads ;
+monads lazy ;
 FROM: monads => do ;
 IN: monads.tests
 
