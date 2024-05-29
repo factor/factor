@@ -98,3 +98,11 @@ tools.test unicode ;
         "foo" utf8 file-contents
     ] with-temp-directory
 ] unit-test
+
+{ "hello" } [
+    [
+        "hello" "foo"
+        [ utf8 set-file-contents ] safe-overwrite-file
+        "foo" utf8 file-contents
+    ] with-temp-directory
+] unit-test

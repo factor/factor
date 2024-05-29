@@ -62,12 +62,12 @@ PRIVATE>
     prefix suffixes unique-files :> paths
     [ paths quot call ] [ paths [ ?delete-file ] each ] finally ; inline
 
-: safe-overwrite-file ( ... original-path quot: ( ... empty-path -- ... ) -- ... )
+: safe-overwrite-file ( ..a original-path quot: ( ..a empty-path -- ..b ) -- ..b )
     [ "" "" ] dip '[
         [ nip @ ] [ swap move-file-atomically ] 2bi
     ] cleanup-unique-file ; inline
 
-: safe-replace-file ( ... original-path quot: ( ... copy-path -- ... ) -- ... )
+: safe-replace-file ( ..a original-path quot: ( ..a copy-path -- ..b ) -- ..b )
     [ "" "" ] dip '[
         [ copy-file ] [ nip @ ] [ swap move-file-atomically ] 2tri
     ] cleanup-unique-file ; inline
