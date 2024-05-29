@@ -17,10 +17,12 @@ TUPLE: lazy quot status value ;
         { +error+ [ value>> throw ] }
         { +value+ [ value>> ] }
         { +unforced+ [
-            dup
-            [ quot>> call( -- value ) >>value +value+ >>status value>> ]
-            [ >>value +error+ >>status value>> throw ]
-            recover
+            [ f ] change-quot swap '[
+                _ call( -- value )
+                [ >>value +value+ swap status<< ] keep
+            ] [
+                [ >>value +error+ swap status<< ] keep throw
+            ] recover
         ] }
     } case ;
 
