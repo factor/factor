@@ -75,10 +75,4 @@ $nl
 
 TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 
-HELP: com-exit
-{ $description "Close all windows and exit the UI tools" } ;
-
-HELP: quit
-{ $description "Easier to remember command for the user to type to quit the UI listener" } ;
-
 ABOUT: "ui-tools"
