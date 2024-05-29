@@ -1,5 +1,5 @@
-IN: promises.tests
-USING: promises math tools.test namespaces kernel ;
+IN: lazy.tests
+USING: lazy math tools.test namespaces kernel ;
 
 LAZY: lazy-test ( a -- b ) 1 + ;
 
@@ -9,14 +9,14 @@ LAZY: lazy-test ( a -- b ) 1 + ;
 SYMBOL: call-count
 SYMBOL: simple-lazy
 
-[ call-count inc 1 ] <promise> simple-lazy set
+[ call-count inc 1 ] <lazy> simple-lazy set
 { 1 } [ simple-lazy get force ] unit-test
 { 1 } [ simple-lazy get force ] unit-test
 
 
 SYMBOL: throw-foo-count
 SYMBOL: throw-foo
-[ throw-foo-count inc "foo" throw ] <promise> throw-foo set
+[ throw-foo-count inc "foo" throw ] <lazy> throw-foo set
 
 [ throw-foo get force ] [ "foo" = ] must-fail-with
 [ throw-foo get force ] [ "foo" = ] must-fail-with

@@ -59,7 +59,7 @@ ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
 } ;
 
 HELP: lazy-cons
-{ $values { "car" { $quotation ( -- elt ) } } { "cdr" { $quotation ( -- cons ) } } { "promise" "the resulting cons object" } }
+{ $values { "car" { $quotation ( -- elt ) } } { "cdr" { $quotation ( -- cons ) } } { "lazy" "the resulting cons object" } }
 { $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." }
 { $see-also cons car cdr nil nil? } ;
 

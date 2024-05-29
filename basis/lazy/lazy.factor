@@ -2,18 +2,17 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors effects.parser generalizations kernel
 sequences words continuations combinators ;
-IN: promises
+IN: lazy
 
 SYMBOLS: +unforced+ +error+ +value+ ;
 
-TUPLE: promise quot status value ;
+TUPLE: lazy quot status value ;
 
-: <promise> ( quot -- promise ) +unforced+ f promise boa ;
+: <lazy> ( quot -- lazy ) +unforced+ f lazy boa ;
 
-: <value> ( value -- promise )
-    '[ f +value+ _ promise boa ] call ;
+: <value> ( value -- lazy ) [ f +value+ ] dip lazy boa ;
 
-: force ( promise -- value )
+: force ( lazy -- value )
     dup status>> {
         { +error+ [ value>> throw ] }
         { +value+ [ value>> ] }
@@ -26,7 +25,7 @@ TUPLE: promise quot status value ;
     } case ;
 
 : make-lazy-quot ( quot effect -- quot )
-    in>> length '[ _ _ ncurry <promise> ] ;
+    in>> length '[ _ _ ncurry <lazy> ] ;
 
 SYNTAX: LAZY:
     (:) [ make-lazy-quot ] keep define-declared ;

@@ -1,21 +1,21 @@
 ! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io kernel lists math
-promises quotations sequences ;
+USING: accessors arrays combinators io kernel lazy lists math
+quotations sequences ;
 IN: lists.lazy
 
-M: promise car force car ;
+M: lazy car force car ;
 
-M: promise cdr force cdr ;
+M: lazy cdr force cdr ;
 
-M: promise nil? force nil? ;
+M: lazy nil? force nil? ;
 
-TUPLE: lazy-cons-state { car promise } { cdr promise } ;
+TUPLE: lazy-cons-state { car lazy } { cdr lazy } ;
 
 C: <lazy-cons-state> lazy-cons-state
 
-: lazy-cons ( car cdr -- promise )
-    [ <promise> ] bi@ <lazy-cons-state> <value> ;
+: lazy-cons ( car cdr -- lazy )
+    [ <lazy> ] bi@ <lazy-cons-state> <value> ;
 
 M: lazy-cons-state car car>> force ;
 
@@ -334,7 +334,7 @@ M: lazy-io nil?
 
 INSTANCE: sequence-cons list
 INSTANCE: memoized-cons list
-INSTANCE: promise list
+INSTANCE: lazy list
 INSTANCE: lazy-io list
 INSTANCE: lazy-concat list
 INSTANCE: lazy-cons-state list
