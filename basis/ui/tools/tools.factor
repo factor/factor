@@ -14,6 +14,8 @@ IN: ui.tools
 
 : com-exit ( -- ) close-all-windows notify-queued 0 exit ;
 
+ALIAS: quit com-exit ! easier to remember command for the user to type to quit the listener
+
 \ com-exit H{ { +nullary+ t } } define-command
 
 tool "tool-switching" f {
