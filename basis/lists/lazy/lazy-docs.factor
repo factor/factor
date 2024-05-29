@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax lists math sequences strings ;
+USING: assocs help.markup help.syntax lists math sequences strings ;
 IN: lists.lazy
 
 ABOUT: "lists.lazy"
@@ -55,6 +55,7 @@ ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
     lcartesian-product*
     lmerge
     ltake
+    lzip
 } ;
 
 HELP: lazy-cons
@@ -85,23 +86,58 @@ HELP: <memoized-cons>
 
 HELP: lmap-lazy
 { $values { "list" "a cons object" } { "quot" { $quotation ( obj -- X ) } } { "result" "resulting cons object" } }
-{ $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-map } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-map } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "1 lfrom [ 2 * ] lmap-lazy 5 swap ltake list>array ."
+        "{ 2 4 6 8 10 }"
+    }
+} ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-take } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-take } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy prettyprint ;"
+        "1 lfrom 5 swap ltake list>array ."
+        "{ 1 2 3 4 5 }"
+    }
+} ;
 
 HELP: lfilter
 { $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
-{ $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-filter } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Perform a similar functionality to that of the " { $link filter } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-filter } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "1 lfrom [ even? ] lfilter 5 swap ltake list>array ."
+        "{ 2 4 6 8 10 }"
+    }
+} ;
 
 HELP: lwhile
 { $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first items in the list as long as " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "1 lfrom [ 5 <= ] lwhile list>array ."
+        "{ 1 2 3 4 5 }"
+    }
+} ;
 
 HELP: luntil
 { $values { "list" "a cons object" } { "quot" { $quotation ( elt -- ? ) } } { "result" "resulting cons object" } }
-{ $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
+{ $description "Outputs a lazy list containing the first items in the list until after " { $snippet "quot" } " evaluates to t. No evaluation of the list elements occurs initially but a " { $link lazy-while } " object is returned with conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "1 lfrom [ 5 >= ] luntil list>array ."
+        "{ 1 2 3 4 5 }"
+    }
+} ;
 
 HELP: lappend-lazy
 { $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list of list2 appended to list1" } }
@@ -113,7 +149,25 @@ HELP: lfrom-by
 
 HELP: lfrom
 { $values { "n" integer } { "result" "a lazy list of integers" } }
-{ $description "Return an infinite lazy list of incrementing integers starting from n." } ;
+{ $description "Return an infinite lazy list of incrementing integers starting from n." }
+{ $examples
+    { $example
+        "USING: lists.lazy prettyprint ;"
+        "10 lfrom ."
+        "T{ lazy-from-by { n 10 } { quot [ 1 + ] } }"
+    }
+} ;
+
+HELP: lzip
+{ $values { "list1" "a cons object" } { "list2" "a cons object" } { "result" "a lazy list" } }
+{ $description "Performs a similar functionality to that of the " { $link zip } " word, but in a lazy manner." }
+{ $examples
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "1 lfrom 10 [ 10 + ] lfrom-by lzip 5 swap ltake list>array ."
+        "{ { 1 10 } { 2 20 } { 3 30 } { 4 40 } { 5 50 } }"
+    }
+} ;
 
 HELP: sequence-tail>list
 { $values { "index" "an integer 0 or greater" } { "seq" sequence } { "list" "a list" } }
@@ -142,14 +196,23 @@ HELP: lcartesian-map*
 { $values { "list" "a list of lists" } { "guards" "a sequence of quotations with stack effect ( elt1 elt2 -- ? )" } { "quot" { $quotation ( elt1 elt2 -- newelt ) } } { "result" "a list" } }
 { $description "Get the cartesian product of the lists in " { $snippet "list" } ", filter it by applying each guard quotation to it and call " { $snippet "quot" } " call with each element from the remaining cartesian product items on the stack, the result of which is returned in the final " { $snippet "list" } "." }
 { $examples
-  { $code "{ 1 2 3 } >list { 4 5 6 } >list 2list { [ drop odd? ] } [ + ] lcartesian-map*" }
+    { $example
+        "USING: kernel lists lists.lazy math prettyprint ;"
+        "{ 1 2 3 } >list { 4 5 6 } >list 2list"
+        "{ [ drop odd? ] } [ + ] lcartesian-map* list>array ."
+        "{ 5 6 7 7 8 9 }"
+    }
 } ;
 
 HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
 { $description "Return the result of merging the two lists in a lazy manner." }
 { $examples
-  { $example "USING: lists lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
+    { $example
+        "USING: lists lists.lazy prettyprint ;"
+        "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ."
+        "{ 1 4 2 5 3 6 }"
+    }
 } ;
 
 HELP: lcontents
@@ -160,4 +223,14 @@ HELP: lcontents
 HELP: llines
 { $values { "stream" "a stream" } { "result" "a list" } }
 { $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." }
-{ $see-also lcontents } ;
+{ $see-also lcontents }
+{ $examples
+    { $example
+        "USING: io io.encodings.utf8 io.files lists lists.lazy namespaces"
+        "prettyprint ;"
+        "\"resource:LICENSE.txt\" utf8 ["
+        "    1 lfrom input-stream get llines lzip cdr car ."
+        "] with-file-reader"
+        "{ 2 \"All rights reserved.\" }"
+    }
+} ;
