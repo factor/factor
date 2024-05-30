@@ -28,6 +28,7 @@ ifdef CONFIG
 
 	include $(CONFIG)
 
+	OPTIMIZATION = -O3
 	CFLAGS += -Wall \
 		-Wextra \
 		-pedantic \
@@ -35,7 +36,6 @@ ifdef CONFIG
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
 		$(SITE_CFLAGS)
-
 	CXXFLAGS += -std=c++11
 
 	# SANITIZER=address ./build.sh compile
@@ -48,9 +48,9 @@ ifdef CONFIG
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
-		CFLAGS += -O3
-		CFLAGS += -Wl,-s
-		CFLAGS += $(CC_OPT)
+		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
+		CXXFLAGS += $(OPTIMIZATION)
+		PCHFLAGS = $(OPTIMIZATION) -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
@@ -261,10 +261,16 @@ factor-lib: $(ENGINE)
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+ifeq ($(DEBUG), 0)
+	strip $(EXECUTABLE)
+endif
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+ifeq ($(DEBUG), 0)
+	strip $(CONSOLE_EXECUTABLE)
+endif
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -282,13 +288,13 @@ $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 $(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c -x c++-header $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CFLAGS) $(CXXFLAGS) $(SITE_CFLAGS) -o $@ $<
 
 $(BUILD_DIR)/zstd.o: vm/zstd.cpp vm/zstd.c $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
