@@ -13,6 +13,10 @@ HELP: <pipe>
 { $description "Opens a new pipe and wraps it in a stream. Data written from the stream can be read back from the same stream instance." }
 { $notes "Pipe streams must be disposed by calling " { $link dispose } " or " { $link with-disposal } " to avoid resource leaks." } ;
 
+HELP: <connected-pair>
+{ $values { "encoding" "an encoding specifier" } { "stream" "a bidirectional stream" } }
+{ $description "Opens two pipes wrapped into a stream. These are connected so that their " { $link input-stream } " redirects to the other pipe." } ;
+
 HELP: run-pipeline
 { $values { "seq" "a sequence of pipeline components" } { "results" "a sequence of pipeline results" } }
 { $description
