@@ -52,3 +52,7 @@ tools.test ;
 ] unit-test
 
 [ 64 2^ >msgpack ] [ cannot-convert? ] must-fail-with
+
+! this failure makes it impossible to reliably detect eof when
+! reading an msgpack object from a stream
+[ "" [ read-msgpack ] with-string-reader ] must-fail
