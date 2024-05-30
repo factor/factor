@@ -28,8 +28,10 @@ SINGLETON: +msgpack-nil+
 
 ERROR: unknown-format n ;
 
-: read-msgpack ( -- obj )
-    read1 {
+<PRIVATE
+
+: (read-msgpack) ( n -- obj )
+    {
         { [ dup 0xc0 = ] [ drop +msgpack-nil+ ] }
         { [ dup 0xc2 = ] [ drop f ] }
         { [ dup 0xc3 = ] [ drop t ] }
@@ -68,6 +70,17 @@ ERROR: unknown-format n ;
         { [ dup 0xc9 = ] [ drop 4 read be> read-ext ] }
         [ unknown-format ]
     } cond ;
+
+PRIVATE>
+
+: read-msgpack ( -- obj )
+    read1 (read-msgpack) ;
+
+: ?read-msgpack ( -- obj/f ? )
+    read1 [ (read-msgpack) t ] [ f f ] if* ;
+
+: read-msgpacks ( -- objs )
+    [ read1 dup ] [ (read-msgpack) ] produce nip ;
 
 ERROR: cannot-convert obj ;
 

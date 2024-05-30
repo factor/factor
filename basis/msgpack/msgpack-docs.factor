@@ -6,6 +6,14 @@ HELP: read-msgpack
 { $values { "obj" object } }
 { $description "Decodes an object that was serialized in the MessagePack format, reading from an " { $link input-stream } "." } ;
 
+HELP: ?read-msgpack
+{ $values { "obj/f" object } { "?" boolean } }
+{ $description "Reads the next byte from an " { $link input-stream } " and if not EOF, decodes an object that was serialized in the MessagePack format." } ;
+
+HELP: read-msgpacks
+{ $values { "objs" sequence } }
+{ $description "Reads an unknown number of objects from the " { $link input-stream } " that were serialized in the MessagePack format." } ;
+
 HELP: write-msgpack
 { $values { "obj" object } }
 { $description "Encodes an object into the MessagePack format, writing to an " { $link output-stream } "." } ;
@@ -22,6 +30,8 @@ ARTICLE: "msgpack" "MessagePack"
 "Decoding support for the MessagePack protocol:"
 { $subsections
     read-msgpack
+    ?read-msgpack
+    read-msgpacks
     msgpack>
 }
 "Encoding support for the MessagePack protocol:"
