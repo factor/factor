@@ -261,16 +261,10 @@ factor-lib: $(ENGINE)
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
-ifeq ($(DEBUG), 0)
-	strip $(EXECUTABLE)
-endif
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
 		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
-ifeq ($(DEBUG), 0)
-	strip $(CONSOLE_EXECUTABLE)
-endif
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
