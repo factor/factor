@@ -1,5 +1,5 @@
-USING: io.streams.string kernel math msgpack sequences
-tools.test ;
+USING: io.encodings.binary io.streams.byte-array
+io.streams.string kernel math msgpack sequences tools.test ;
 
 {
     {
@@ -56,3 +56,9 @@ tools.test ;
 ! this failure makes it impossible to reliably detect eof when
 ! reading an msgpack object from a stream
 [ "" [ read-msgpack ] with-string-reader ] must-fail
+
+{ t } [
+    { "hello" "world" 1234 }
+    dup [ >msgpack ] map concat
+    binary [ read-msgpacks ] with-byte-reader =
+] unit-test
