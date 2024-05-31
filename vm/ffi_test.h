@@ -241,13 +241,13 @@ struct test_struct_66 {
 struct test_struct_68 {
   unsigned long mem1;
   unsigned long mem2;
-  unsigned long mem3;  
+  unsigned long mem3;
 };
 
 struct test_struct_69 {
   float         mem1;
   unsigned long mem2;
-  unsigned long mem3;  
+  unsigned long mem3;
 };
 
 FACTOR_EXPORT unsigned long ffi_test_66(unsigned long a, unsigned long b, unsigned long c,
