@@ -61,11 +61,14 @@ ifdef CONFIG
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
 		CXXFLAGS += $(CXX_OPT) $(OPTIMIZATION)
 		ifeq ($(IS_CLANG), 1)
+			LDFLAGS += -Wl,-x
 			PCHFLAGS = -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
+		else ifeq ($(IS_GCC), 1)
+			LDFLAGS += -Wl,-s
 		else
 			PCHFLAGS =
 		endif
-		LDFLAGS += -Wl,-x
+
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
