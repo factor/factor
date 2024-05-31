@@ -386,7 +386,7 @@ unsigned long ffi_test_69(unsigned long a, unsigned long b, unsigned long c,
     return x;
 }
 
-unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c) { 
+unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c) {
     unsigned long x;
     x = a.mem1 + a.mem2 + a.mem3 + b.mem1 + b.mem2 + b.mem3 + c.mem1 + c.mem2;
     return x;
