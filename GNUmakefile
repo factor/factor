@@ -267,7 +267,7 @@ macosx.app: factor
 	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(CXXFLAGS) $(DLL_OBJS)
 
 factor-lib: $(ENGINE)
 
