@@ -55,7 +55,7 @@ ifdef CONFIG
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
 		CXXFLAGS += $(CXX_OPT) $(OPTIMIZATION)
 		PCHFLAGS = $(OPTIMIZATION) -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
-		LDFLAGS += -Wl,-s
+		LDFLAGS += -Wl,-x
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
@@ -266,11 +266,11 @@ factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CXXFLAGS) $(LDFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CXXFLAGS) $(LDFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
