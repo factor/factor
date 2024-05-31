@@ -2,3 +2,4 @@ include vm/Config.macosx
 include vm/Config.x86.fat
 SITE_COMMON_FLAGS += -arch i386 -arch x86_64
 SITE_COMMON_FLAGS += -mmacosx-version-min=10.9
+SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS)
