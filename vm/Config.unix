@@ -2,20 +2,20 @@ ifneq ($(DEBUG), 0)
 	SITE_CFLAGS += -fomit-frame-pointer
 endif
 
-EXE_SUFFIX =
-DLL_PREFIX = lib
-DLL_EXTENSION = .a
-SHARED_DLL_EXTENSION = .so
-SHARED_FLAG = -shared
+EXE_SUFFIX :=
+DLL_PREFIX := lib
+DLL_EXTENSION := .a
+SHARED_DLL_EXTENSION := .so
+SHARED_FLAG := -shared
 
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-unix.o
 PLAF_EXE_OBJS += $(BUILD_DIR)/main-unix.o
 PLAF_MASTER_HEADERS += vm/os-unix.hpp vm/atomic-gcc.hpp vm/atomic.hpp
 
-FFI_TEST_CFLAGS = -fPIC
+FFI_TEST_CFLAGS := -fPIC
 
 # LINKER = gcc -shared -o
 # LINK_WITH_ENGINE = '-Wl,-rpath,$$ORIGIN' -lfactor
 
-LINKER = $(AR) rcs
-LINK_WITH_ENGINE = -Wl,--whole-archive -lfactor -Wl,-no-whole-archive
+LINKER := $(AR) rcs
+LINK_WITH_ENGINE := -Wl,--whole-archive -lfactor -Wl,-no-whole-archive
