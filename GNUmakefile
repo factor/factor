@@ -36,7 +36,6 @@ ifdef CONFIG
 	COMMON_FLAGS := -Wall \
 		-Wextra \
 		-pedantic \
-		-Wno-unused-command-line-argument \
 		-DFACTOR_VERSION="$(VERSION)" \
 		-DFACTOR_GIT_LABEL="$(GIT_LABEL)"
 
