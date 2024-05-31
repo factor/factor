@@ -21,10 +21,10 @@ ifeq ($(IS_CLANG), 1)
 	LINKER := $(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(SHARED_FLAG) \
 		-fvisibility=hidden \
 		$(LIBS) -o
-	LINKER_FLAGS += $(CXXFLAGS)
+	SITE_COMMON_LINKER_FLAGS += $(CXXFLAGS)
 else
 	LINKER := $(AR) rcs
-	LINKER_FLAGS +=
+	SITE_COMMON_LINKER_FLAGS +=
 endif
 
 LINK_WITH_ENGINE := -Wl,--whole-archive -lfactor -Wl,-no-whole-archive
