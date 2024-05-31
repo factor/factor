@@ -29,6 +29,8 @@ ifdef CONFIG
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOSX_32_SDK ?= MacOSX10.11.sdk
 
+	ARCHITECTURE_FLAG :=
+
 	include $(CONFIG)
 
 	COMMON_FLAGS := -Wall \
@@ -42,7 +44,9 @@ ifdef CONFIG
 	SITE_CXXFLAGS += $(SITE_COMMON_FLAGS)
 	ASFLAGS += $(COMMON_FLAGS)
 	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
-	CXXFLAGS += -std=c++11 $(SITE_CXXFLAGS) $(COMMON_FLAGS)
+	# -fPIC is strictly only needed for linux, macOS does not need it
+	CXXFLAGS += -std=c++11 -fPIC $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
+	LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS)
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
@@ -260,6 +264,31 @@ windows-x86-64:
 # Actually build Factor
 ifdef CONFIG
 
+$(BUILD_DIR):
+	@echo BUILD_DIR: $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(ASFLAGS) -o $@ $<
+
+$(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
+
+$(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
+
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
+
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
@@ -267,7 +296,7 @@ macosx.app: factor
 	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(CXXFLAGS) $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(LINKER_FLAGS) $(DLL_OBJS)
 
 factor-lib: $(ENGINE)
 
@@ -280,31 +309,6 @@ factor-console: $(EXE_OBJS) $(DLL_OBJS)
 		$(CXXFLAGS) $(LDFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
-
-$(BUILD_DIR):
-	@echo BUILD_DIR: $(BUILD_DIR)
-	@mkdir -p $(BUILD_DIR)
-
-$(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o $(FFI_TEST_LIBRARY) $(TEST_OBJS)
-
-$(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
-
-$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
-
-$(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CXXFLAGS) -o $@ $<
-
-$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(ASFLAGS) -o $@ $<
-
-$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
-
-$(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 
