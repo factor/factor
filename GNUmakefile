@@ -49,6 +49,7 @@ ifdef CONFIG
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
+		CFLAGS += -Wl,-s
 		CXXFLAGS += $(OPTIMIZATION)
 		PCHFLAGS = $(OPTIMIZATION) -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
 	endif
