@@ -136,9 +136,18 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 
 void factor_vm::init_signals() {}
 
+DWORD WINAPI ThreadWrapper(LPVOID lpParam) {
+    auto params = static_cast<void**>(lpParam);
+    auto start_routine = reinterpret_cast<void* (*)(void*)>(params[0]);
+    void* args = params[1];
+    start_routine(args);
+    delete[] params; // Clean up the allocated memory
+    return 0;
+}
+
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
-  return (void*)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) start_routine,
-                             args, 0, 0);
+    auto params = new void*[2]{reinterpret_cast<void*>(start_routine), args};
+    return CreateThread(NULL, 0, ThreadWrapper, params, 0, NULL);
 }
 
 uint64_t nano_count() {
