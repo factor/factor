@@ -321,7 +321,7 @@ clean:
 	rm -f build/*.gch
 	rm -f vm/*.o
 	rm -f vm/*.gch
-	rm -f factor
+	rm -f factor factor.com factor.exe
 	rm -f factor.dll
 	rm -f factor.lib
 	rm -f factor.dll.lib
