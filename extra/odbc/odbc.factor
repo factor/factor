@@ -330,17 +330,9 @@ PRIVATE>
 : odbc-free-statement ( statement -- )
     SQL_HANDLE_STMT swap SQLFreeHandle "SQLFreeHandle" check-odbc ;
 
-TUPLE: odbc-env-destructor < alien-destructor disposed ;
-: <odbc-env-destructor> ( env -- tuple ) f odbc-env-destructor boa ; inline
-M: odbc-env-destructor dispose* alien>> odbc-free-env ;
-
-TUPLE: odbc-dbc-destructor < alien-destructor disposed ;
-: <odbc-dbc-destructor> ( env -- tuple ) f odbc-dbc-destructor boa ; inline
-M: odbc-dbc-destructor dispose* alien>> odbc-disconnect ;
-
-TUPLE: odbc-statement-destructor < alien-destructor disposed ;
-: <odbc-statement-destructor> ( env -- tuple ) f odbc-statement-destructor boa ; inline
-M: odbc-statement-destructor dispose* alien>> odbc-free-statement ;
+DESTRUCTOR: odbc-free-env
+DESTRUCTOR: odbc-disconnect
+DESTRUCTOR: odbc-free-statement
 
 : odbc-execute ( statement -- ) [ SQLExecute ] keep check-statement ;
 
@@ -441,13 +433,13 @@ C: <field> field
 
 : odbc-queries ( dsn strings -- results )
     '[
-        odbc-init dup <odbc-env-destructor> &dispose drop
-        swap odbc-connect dup <odbc-dbc-destructor> &dispose drop
+        odbc-init &odbc-free-env
+        swap odbc-connect &odbc-disconnect
         _ [
-            odbc-prepare dup <odbc-statement-destructor> &dispose
-            [ drop odbc-execute ]
-            [ drop odbc-get-all-rows ]
-            [ nip dispose ] 2tri
+            odbc-prepare &odbc-free-statement
+            [ odbc-execute ]
+            [ odbc-get-all-rows ]
+            [ dispose ] tri
         ] with map
     ] with-destructors ;
 
