@@ -193,6 +193,11 @@ set_cc() {
     exit_script 10
 }
 
+set_cc_versions() {
+    CC_VERSION=$($CC --version | head -1)
+    CXX_VERSION=$($CXX --version | head -1)
+}
+
 set_make() {
     case $OS in
         freebsd) MAKE="gmake" ;;
@@ -398,6 +403,8 @@ echo_build_info() {
     $ECHO "DOWNLOADER_NAME=$DOWNLOADER_NAME"
     $ECHO "CC=$CC"
     $ECHO "CXX=$CXX"
+    $ECHO "CC_VERSION=$CC_VERSION"
+    $ECHO "CXX_VERSION=$CXX_VERSION"
     $ECHO "LTO=$LTO"
     $ECHO "CC_OPT=$CC_OPT"
     $ECHO "CXX_OPT=$CXX_OPT"
@@ -450,6 +457,7 @@ prepare_build_info() {
     find_num_cores
     if [[ $OS != macosx ]] ; then LTO=1; fi # temporarily try out LTO to collect performance data (not working on MacOSX)
     set_cc
+    set_cc_versions
     find_word_size
     set_current_branch
     set_factor_binary
