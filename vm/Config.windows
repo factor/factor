@@ -1,6 +1,6 @@
 SITE_CFLAGS += -mwindows
 CFLAGS_CONSOLE += -mconsole
-SHARED_FLAG = -shared
+SHARED_FLAG := -shared
 SHARED_DLL_EXTENSION=.dll
 
 LIBS = -lm
@@ -15,5 +15,5 @@ DLL_SUFFIX=
 DLL_EXTENSION=.dll
 CONSOLE_EXTENSION=.com
 
-LINKER = $(CPP) -shared -o 
+LINKER = $(CXX) -shared -o
 LINK_WITH_ENGINE = -l$(DLL_PREFIX)factor$(DLL_SUFFIX)
