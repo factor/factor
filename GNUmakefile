@@ -45,7 +45,7 @@ ifdef CONFIG
 	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
 	# -fPIC is strictly only needed for linux, macOS does not need it
 	CXXFLAGS += -std=c++11 -fPIC $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
-	LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS)
+	LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS) $(CC_OPT)
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
