@@ -3,22 +3,21 @@ include vm/Config.unix
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-macosx.o $(BUILD_DIR)/mach_signal.o $(BUILD_DIR)/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-macosx.hpp vm/mach_signal.hpp
 
-DLL_EXTENSION = .dylib
-SHARED_DLL_EXTENSION = .dylib
+DLL_EXTENSION := .dylib
+SHARED_DLL_EXTENSION := .dylib
 
-SHARED_FLAG = -dynamiclib
+SHARED_FLAG := -dynamiclib
 
 ifdef X11
-	LIBS = -lm -framework Cocoa -L/opt/local/lib -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
+	LIBS := -lm -framework Cocoa -L/opt/local/lib -Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib
 else
-	LIBS = -lm -framework Cocoa -framework AppKit
+	LIBS := -lm -framework Cocoa -framework AppKit
 endif
 
-LINKER = $(CXX) $(CFLAGS) $(CXXFLAGS) $(SHARED_FLAG) \
+LINKER := $(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(SHARED_FLAG) \
 	-current_version $(VERSION) \
 	-compatibility_version $(VERSION) \
 	-fvisibility=hidden \
 	$(LIBS) -o
 
-LINK_WITH_ENGINE = -lfactor
-
+LINK_WITH_ENGINE := -lfactor

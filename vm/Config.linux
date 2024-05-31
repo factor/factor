@@ -1,12 +1,12 @@
 include vm/Config.unix
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-linux.o $(BUILD_DIR)/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-linux.hpp
-LIBS = -ldl -lm -lrt -lpthread -Wl,--export-dynamic
+LIBS := -ldl -lm -lrt -lpthread -Wl,--export-dynamic
 
 # clang spams warnings if we use -Wl,--no-as-needed with -c
 # -Wl,--no-as-needed is a gcc optimization, not required
 # we want to work with g++ aliased as c++ here, too
-IS_GCC = $(shell $(CXX) --version | grep -o 'Free Software Foundation')
+IS_GCC := $(shell $(CXX) --version | grep -o 'Free Software Foundation')
 
 ifeq ($(IS_GCC),Free Software Foundation)
 	SITE_CFLAGS += -Wl,--no-as-needed

@@ -2,25 +2,25 @@
 BUILD_DIR ?= build
 
 ifdef CONFIG
-	VERSION = 0.100
-	GIT_LABEL = $(shell echo `git describe --all`-`git rev-parse HEAD`)
-	BUNDLE = Factor.app
+	VERSION := 0.100
+	GIT_LABEL := $(shell echo $(shell git describe --all)-$(shell git rev-parse HEAD))
+	BUNDLE := Factor.app
 	DEBUG ?= 0
 	REPRODUCIBLE ?= 0
 
-	SHELL_CC = $(shell printenv CC)
+	SHELL_CC := $(shell printenv CC)
 	ifeq ($(SHELL_CC),)
 		CC := $(shell which clang cc 2>/dev/null | head -n 1)
 	else
-		CC = $(SHELL_CC)
+		CC := $(SHELL_CC)
 	endif
 
 	# gmake's default CXX is g++, we prefer c++
-	SHELL_CXX = $(shell printenv CXX)
+	SHELL_CXX := $(shell printenv CXX)
 	ifeq ($(SHELL_CXX),)
 		CXX := $(shell which clang++ c++ 2>/dev/null | head -n 1)
 	else
-		CXX = $(SHELL_CXX)
+		CXX := $(SHELL_CXX)
 	endif
 
 	XCODE_PATH ?= /Applications/Xcode.app
@@ -28,15 +28,18 @@ ifdef CONFIG
 
 	include $(CONFIG)
 
-	OPTIMIZATION = -O3
-	CFLAGS += -Wall \
+	COMMON_FLAGS := -Wall \
 		-Wextra \
 		-pedantic \
 		-Wno-unused-command-line-argument \
 		-DFACTOR_VERSION="$(VERSION)" \
-		-DFACTOR_GIT_LABEL="$(GIT_LABEL)" \
-		$(SITE_CFLAGS)
-	CXXFLAGS += -std=c++11
+		-DFACTOR_GIT_LABEL="$(GIT_LABEL)"
+
+	SITE_CFLAGS += $(SITE_COMMON_FLAGS)
+	SITE_CXXFLAGS += $(SITE_COMMON_FLAGS)
+	ASFLAGS += $(COMMON_FLAGS)
+	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
+	CXXFLAGS += -std=c++11 $(SITE_CXXFLAGS) $(COMMON_FLAGS)
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
@@ -48,21 +51,22 @@ ifdef CONFIG
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
 	else
+		OPTIMIZATION := -O3
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
-		CFLAGS += -Wl,-s
-		CXXFLAGS += $(OPTIMIZATION)
+		CXXFLAGS += $(CXX_OPT) $(OPTIMIZATION)
 		PCHFLAGS = $(OPTIMIZATION) -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
+		LDFLAGS += -Wl,-s
 	endif
 
 	ifneq ($(REPRODUCIBLE), 0)
 		CFLAGS += -DFACTOR_REPRODUCIBLE
 	endif
 
-	ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
-	EXECUTABLE = factor$(EXE_SUFFIX)$(EXE_EXTENSION)
-	CONSOLE_EXECUTABLE = factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
+	ENGINE := $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
+	EXECUTABLE := factor$(EXE_SUFFIX)$(EXE_EXTENSION)
+	CONSOLE_EXECUTABLE := factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION)
 
-	DLL_OBJS = $(PLAF_DLL_OBJS) \
+	DLL_OBJS := $(PLAF_DLL_OBJS) \
 		$(BUILD_DIR)/aging_collector.o \
 		$(BUILD_DIR)/alien.o \
 		$(BUILD_DIR)/arrays.o \
@@ -106,7 +110,7 @@ ifdef CONFIG
 		$(BUILD_DIR)/words.o \
 		$(BUILD_DIR)/zstd.o
 
-	MASTER_HEADERS = $(PLAF_MASTER_HEADERS) \
+	MASTER_HEADERS := $(PLAF_MASTER_HEADERS) \
 		vm/assert.hpp \
 		vm/debug.hpp \
 		vm/layouts.hpp \
@@ -161,17 +165,17 @@ ifdef CONFIG
 		vm/utilities.hpp \
 		vm/zstd.hpp vm/zstd.h
 
-	EXE_OBJS = $(PLAF_EXE_OBJS)
+	EXE_OBJS := $(PLAF_EXE_OBJS)
 
-	FFI_TEST_LIBRARY = libfactor-ffi-test$(SHARED_DLL_EXTENSION)
+	FFI_TEST_LIBRARY := libfactor-ffi-test$(SHARED_DLL_EXTENSION)
 
-	TEST_OBJS = $(BUILD_DIR)/ffi_test.o
+	TEST_OBJS := $(BUILD_DIR)/ffi_test.o
 endif
 
 # if CONFIG is not set, call build.sh and find a CONFIG
 # build.sh will call GNUMakefile again to start the build
 default:
-	$(MAKE) `./build.sh make-target`
+	$(MAKE) $(shell ./build.sh make-target)
 
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
@@ -195,7 +199,8 @@ help:
 	@echo ""
 	@echo "DEBUG=1  compile VM with debugging information"
 	@echo "REPRODUCIBLE=1  compile VM without timestamp"
-	@echo "SITE_CFLAGS=...  additional optimization flags"
+	@echo "SITE_CFLAGS=...  additional C optimization flags"
+	@echo "SITE_CXXFLAGS=...  additional C++ optimization flags"
 	@echo "LTO=1  compile VM with Link Time Optimization"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
@@ -261,11 +266,11 @@ factor-lib: $(ENGINE)
 
 factor: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CXXFLAGS) -o $(EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-console: $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CFLAGS) $(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
+		$(CXXFLAGS) $(CFLAGS_CONSOLE) -o $(CONSOLE_EXECUTABLE) $(LIBS) $(EXE_OBJS)
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
@@ -283,27 +288,24 @@ $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 $(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CFLAGS) $(CXXFLAGS) $(SITE_CFLAGS) -o $@ $<
-
-$(BUILD_DIR)/zstd.o: vm/zstd.cpp vm/zstd.c $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
-
-$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CXXFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(ASFLAGS) -o $@ $<
+
+$(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CFLAGS) $(CXXFLAGS) -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 .SUFFIXES: .mm
 
 endif
 
 clean:
-	@echo make clean CONFIG: \`$(CONFIG)\`
-	@echo make clean BUILD_DIR: \`$(BUILD_DIR)\`
+	@echo make clean CONFIG: $(CONFIG)
+	@echo make clean BUILD_DIR: $(BUILD_DIR)
 	if [ -n "$(BUILD_DIR)" ] && [ "$(BUILD_DIR)" != "/" ]; then rm -f $(BUILD_DIR)/*.o; rm -f $(BUILD_DIR)/*.gch; fi
 	rm -f build/*.o
 	rm -f build/*.gch
