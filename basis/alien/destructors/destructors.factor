@@ -4,7 +4,7 @@ USING: accessors destructors effects functors generalizations
 kernel parser sequences ;
 IN: alien.destructors
 
-TUPLE: alien-destructor alien ;
+TUPLE: alien-destructor alien disposed ;
 
 <FUNCTOR: define-destructor ( F -- )
 
@@ -19,9 +19,9 @@ WHERE
 TUPLE: F-destructor < alien-destructor ;
 
 : <F-destructor> ( alien -- destructor )
-    F-destructor boa ; inline
+    f F-destructor boa ; inline
 
-M: F-destructor dispose alien>> F N ndrop ;
+M: F-destructor dispose* alien>> F N ndrop ;
 
 : &F ( alien -- alien ) dup <F-destructor> &dispose drop ; inline
 
