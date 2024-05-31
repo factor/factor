@@ -23,6 +23,9 @@ ifdef CONFIG
 		CXX := $(SHELL_CXX)
 	endif
 
+	IS_CLANG = $(shell $(CC) -dM -E - < /dev/null | grep -q '__clang__' && echo 1 || echo 0)
+	IS_GCC = $(shell $(CC) -dM -E - < /dev/null | grep -q '__GNUC__' && echo 1 || echo 0)
+
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOSX_32_SDK ?= MacOSX10.11.sdk
 
@@ -54,7 +57,11 @@ ifdef CONFIG
 		OPTIMIZATION := -O3
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
 		CXXFLAGS += $(CXX_OPT) $(OPTIMIZATION)
-		PCHFLAGS = $(OPTIMIZATION) -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
+		ifeq ($(IS_CLANG), 1)
+			PCHFLAGS = -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
+		else
+			PCHFLAGS =
+		endif
 		LDFLAGS += -Wl,-x
 	endif
 
