@@ -11,13 +11,13 @@ HELP: margin
 { $var-description "The maximum line length, in characters. Lines longer than the margin are wrapped." } ;
 
 HELP: nesting-limit
-{ $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). The default is " { $link f } ", denoting unlimited nesting depth." } ;
+{ $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). A value of " { $link f } " denotes no limit." } ;
 
 HELP: length-limit
-{ $var-description "The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. The default is " { $link f } ", denoting unlimited sequence length." } ;
+{ $var-description "The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. A value of " { $link f } " denotes no limit." } ;
 
 HELP: line-limit
-{ $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
+{ $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". A value of " { $link f } " denotes no limit." } ;
 
 HELP: number-base
 { $var-description "The number base in which the prettyprinter will output numeric literals. A value of " { $snippet "2" } " will print integers and ratios in binary with " { $snippet "0b" } ". A value of " { $snippet "8" } " will print them in octal with " { $snippet "0o" } ". A value of " { $snippet "16" } " will print all integers, ratios, and floating-point values in hexadecimal with " { $snippet "0x" } ". Other values of " { $snippet "number-base" } " will print numbers in decimal, which is the default." } ;
