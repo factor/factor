@@ -46,7 +46,7 @@ SYMBOL: rocksdb-write-options-var
 
 TUPLE: rocksdb-write-options < disposable ptr ;
 CONSTRUCTOR: <rocksdb-write-options> rocksdb-write-options ( ptr -- options ) ;
-M: rocksdb-write-options dispose
+M: rocksdb-write-options dispose*
     ptr>> rocksdb_writeoptions_destroy ;
 
 : make-write-options-sync ( -- write-options )
@@ -69,7 +69,7 @@ SYMBOL: rocksdb-read-options-var
 
 TUPLE: rocksdb-read-options < disposable ptr ;
 CONSTRUCTOR: <rocksdb-read-options> rocksdb-read-options ( ptr -- options ) ;
-M: rocksdb-read-options dispose
+M: rocksdb-read-options dispose*
     ptr>> rocksdb_readoptions_destroy ;
 
 
