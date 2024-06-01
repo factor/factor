@@ -43,12 +43,13 @@ DESTRUCTOR: free-resource
 
 TUPLE: cuda-buffer
     { buffer buffer }
-    { resource pinned-c-ptr } ;
+    { resource pinned-c-ptr }
+    disposed ;
 
 : <cuda-buffer> ( upload usage kind size initial-data flags -- buffer )
-    [ <buffer> dup ] dip buffer>resource cuda-buffer boa ; inline
+    [ <buffer> dup ] dip buffer>resource f cuda-buffer boa ; inline
 
-M: cuda-buffer dispose
+M: cuda-buffer dispose*
     [ [ free-resource ] when* f ] change-resource
     buffer>> dispose ; inline
 
