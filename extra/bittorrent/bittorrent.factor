@@ -375,7 +375,7 @@ DEFER: with-peer
         <byte-vector> >>current-piece
     ;
 
-M: peer dispose
+M: peer dispose*
     dup timer>> stop-timer
     [ dispose f ] change-stream
     f >>local f >>remote drop ;
