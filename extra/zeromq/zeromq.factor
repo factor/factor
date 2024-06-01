@@ -37,14 +37,14 @@ MEMO: zmq-msg-size ( -- x )
 GENERIC#: zmq-setopt 2 ( obj name value -- )
 GENERIC#: zmq-getopt 1 ( obj name -- value )
 
-TUPLE: zmq-message underlying ;
+TUPLE: zmq-message underlying disposed ;
 
 : <zmq-message> ( -- msg )
     <zmq_msg_t>
     [ zmq_msg_init check-zmq-error ]
-    [ zmq-message boa ] bi ;
+    [ f zmq-message boa ] bi ;
 
-M: zmq-message dispose
+M: zmq-message dispose*
     underlying>> zmq_msg_close check-zmq-error ;
 
 : byte-array>zmq-message ( byte-array -- msg )
@@ -57,15 +57,15 @@ M: zmq-message dispose
     underlying>> [ zmq_msg_data ] [ zmq_msg_size ] bi
     [ drop B{ } ] [ memory>byte-array ] if-zero ;
 
-TUPLE: zmq-context underlying ;
+TUPLE: zmq-context underlying disposed ;
 
 ! this uses the "New API" with version 3
 ! previous versions should use zmq_init and zmq_term
 
 : <zmq-context> ( -- context )
-    zmq_ctx_new zmq-context boa ;
+    zmq_ctx_new f zmq-context boa ;
 
-M: zmq-context dispose
+M: zmq-context dispose*
     underlying>> zmq_ctx_destroy check-zmq-error ;
 
 M: zmq-context zmq-setopt
@@ -74,14 +74,14 @@ M: zmq-context zmq-setopt
 M: zmq-context zmq-getopt
     [ underlying>> ] dip zmq_ctx_get ;
 
-TUPLE: zmq-socket underlying ;
+TUPLE: zmq-socket underlying disposed ;
 
 : <zmq-socket> ( context type -- socket )
     [ underlying>> ] dip zmq_socket
     dup [ throw-zmq-error ] unless
-    zmq-socket boa ;
+    f zmq-socket boa ;
 
-M: zmq-socket dispose
+M: zmq-socket dispose*
     underlying>> zmq_close check-zmq-error ;
 
 M: zmq-socket zmq-setopt
