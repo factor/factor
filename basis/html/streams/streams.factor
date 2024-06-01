@@ -9,7 +9,8 @@ GENERIC: url-of ( object -- url )
 
 M: object url-of drop f ;
 
-TUPLE: html-writer data ;
+TUPLE: html-writer < disposable data ;
+
 INSTANCE: html-writer output-stream
 
 <PRIVATE
@@ -87,7 +88,7 @@ MACRO: make-css ( pairs -- str )
 
 TUPLE: html-span-stream < html-sub-stream ;
 
-M: html-span-stream dispose
+M: html-span-stream dispose*
     end-sub-stream format-html-span ;
 
 : border-css, ( border -- )
@@ -126,7 +127,7 @@ M: html-span-stream dispose
 
 TUPLE: html-block-stream < html-sub-stream ;
 
-M: html-block-stream dispose
+M: html-block-stream dispose*
     end-sub-stream format-html-div ;
 
 : border-spacing-css, ( pair -- )
@@ -173,7 +174,7 @@ M: html-writer stream-write-table
         [XML <table style="display: inline-table; border-collapse: collapse;"><-></table> XML]
     ] emit-html ;
 
-M: html-writer dispose drop ;
+M: html-writer dispose* drop ;
 
 : <html-writer> ( -- html-writer )
     html-writer new-html-writer ;
