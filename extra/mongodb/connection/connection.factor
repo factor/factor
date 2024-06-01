@@ -15,7 +15,7 @@ TUPLE: mdb-node master? { address inet } remote ;
 
 CONSTRUCTOR: <mdb-node> mdb-node ( address master? -- mdb-node ) ;
 
-TUPLE: mdb-connection instance node handle remote local buffer ;
+TUPLE: mdb-connection < disposable instance node handle remote local buffer ;
 
 : connection-buffer ( -- buffer )
     mdb-connection get buffer>> 0 >>length ; inline
@@ -157,5 +157,4 @@ ERROR: mongod-connection-error address message ;
 : mdb-close ( mdb-connection -- )
     [ [ dispose ] when* f ] change-handle drop ;
 
-M: mdb-connection dispose
-    mdb-close ;
+M: mdb-connection dispose* mdb-close ;
