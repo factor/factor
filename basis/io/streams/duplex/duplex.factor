@@ -29,7 +29,7 @@ M: duplex-stream dispose
     ! The output stream is closed first, in case both streams
     ! are attached to the same file descriptor, the output
     ! buffer needs to be flushed before we close the fd.
-    [ >duplex-stream< [ &dispose drop ] bi@ ] with-destructors ;
+    >duplex-stream< dispose dispose ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
     [ re-decode ] [ re-encode ] bi-curry bi* <duplex-stream> ;
