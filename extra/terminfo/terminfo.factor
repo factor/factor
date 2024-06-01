@@ -1,11 +1,11 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators formatting endian fry
+USING: accessors assocs combinators endian formatting fry
 grouping hashtables io io.directories io.encodings.binary
-io.files io.files.types io.pathnames kernel math math.parser
-memoize pack sequences sequences.generalizations splitting
-strings system ;
+io.files io.files.info io.files.types io.pathnames kernel math
+math.parser memoize pack sequences sequences.generalizations
+splitting strings system ;
 
 IN: terminfo
 
@@ -90,9 +90,9 @@ M: linux terminfo-relative-path ( name -- path )
 
 : terminfo-names-for-path ( path -- names )
     [
-        [ type>> +directory+ = ] filter
-        [ name>> directory-files ] map concat
-    ] with-directory-entries ;
+        [ directory? ] filter
+        [ directory-files ] map concat
+    ] with-directory-files ;
 
 MEMO: terminfo-names ( -- names )
     TERMINFO-DIRS [ file-exists? ] filter
