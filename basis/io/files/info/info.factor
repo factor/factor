@@ -24,6 +24,9 @@ HOOK: link-info os ( path -- info )
 : >file-info ( path/info -- info )
     dup { [ string? ] [ pathname? ] } 1|| [ file-info ] when ;
 
+: >link-info ( path/info -- info )
+    dup { [ string? ] [ pathname? ] } 1|| [ link-info ] when ;
+
 PRIVATE>
 
 : directory? ( path/info -- ? )
@@ -32,9 +35,14 @@ PRIVATE>
 : regular-file? ( path/info -- ? )
     [ >file-info type>> +regular-file+ = ] ?call ;
 
+! Use link-info here so we don't dereference the link. Otherwise we always
+! return f (or throw).
 : symbolic-link? ( path/info -- ? )
-    [ >file-info type>> +symbolic-link+ = ] ?call ;
+    [ >link-info type>> +symbolic-link+ = ] ?call ;
 
+! TODO: this will return t on compressed filesystems, even if the file is
+! dense, and may incorrectly return f on sparse files stored on filesystems
+! with replication.
 : sparse-file? ( path/info -- ? )
     [ >file-info [ size-on-disk>> ] [ size>> ] bi < ] ?call ;
 

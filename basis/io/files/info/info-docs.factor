@@ -23,7 +23,7 @@ HELP: regular-file?
 
 HELP: symbolic-link?
 { $values { "path/info" { $or "a pathname string" file-info-tuple } } { "?" boolean } }
-{ $description "Tests if " { $snippet "path/info" } " is a symbolic link." } ;
+{ $description "Tests if " { $snippet "path/info" } " is a symbolic link. Unlike other type predicates in this vocabulary, does not dereference links when passed a path, so it is possible for both this and another type predicate to be true for the same path." } ;
 
 HELP: file-systems
 { $values { "array" array } }
@@ -63,27 +63,32 @@ HELP: file-executable?
 { $errors "Throws an error if the file does not exist." } ;
 
 ARTICLE: "io.files.info" "File system metadata"
+"These are words for querying the metadata of filesystems and filesystem objects. " { $link file-info } " and " { $link link-info } " can be used to get detailed information on a file in the manner of stat(2) or lstat(2). Type predicates like " { $link directory? } " can be used on both " { $link file-info-tuple } "s returned by " { $link file-info } " et al, and on paths. In the former case only the tuple itself is inspected; in the latter, the filesystem is queried and links are dereferenced. Note that in the case of symlinks, both " { $link symbolic-link? } ", and the predicate matching the object the link points to, will return true."
+{ $nl f }
 "File metadata:"
 { $subsections
+    file-info-tuple
     file-info
     link-info
     file-exists?
+}
+"File types:"
+{ $subsections
+    "file-types"
     directory?
     regular-file?
     symbolic-link?
-}
-"File types:"
-{ $subsections "file-types" }
-"File system metadata:"
-{ $subsections
-    file-system-info
-    file-systems
 }
 "File permissions:"
 { $subsections
     file-readable?
     file-writable?
     file-executable?
+}
+"File system metadata:"
+{ $subsections
+    file-system-info
+    file-systems
 } ;
 
 ABOUT: "io.files.info"
