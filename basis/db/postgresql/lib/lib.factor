@@ -123,15 +123,6 @@ M: postgresql-result-null summary
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
 
-TUPLE: postgresql-malloc-destructor alien ;
-C: <postgresql-malloc-destructor> postgresql-malloc-destructor
-
-M: postgresql-malloc-destructor dispose
-    alien>> PQfreemem ;
-
-: &postgresql-free ( alien -- alien )
-    dup <postgresql-malloc-destructor> &dispose drop ; inline
-
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength
     dup 0 > [
@@ -143,7 +134,7 @@ M: postgresql-malloc-destructor dispose
                 PQunescapeBytea dup zero? [
                     postgresql-result-error-message throw
                 ] [
-                    &postgresql-free
+                    &PQfreemem
                 ] if
             ] with-out-parameters memory>byte-array
         ] with-destructors
