@@ -1,22 +1,28 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators endian formatting fry
-grouping hashtables io io.directories io.encodings.binary
-io.files io.files.info io.files.types io.pathnames kernel math
-math.parser memoize pack sequences sequences.generalizations
-splitting strings system ;
+USING: accessors assocs combinators endian environment
+formatting fry grouping hashtables io io.directories
+io.encodings.binary io.files io.files.info io.files.types
+io.pathnames kernel make math math.parser memoize pack sequences
+sequences.generalizations splitting strings system ;
 
 IN: terminfo
 
-! Reads compiled terminfo files
-! typically located in any of the directories below.
-CONSTANT: TERMINFO-DIRS {
-    "~/.terminfo"
-    "/etc/terminfo"
-    "/lib/terminfo"
-    "/usr/share/terminfo"
-}
+! Read compiled terminfo files from any of the following directories.
+! This does not quite match the behaviour of curses; in particular,
+! if TERMINFO is set, curses ignores everything else on the list,
+! and we make a best-guess here at the system-wide directories
+! rather than knowing what curses has compiled in.
+: terminfo-dirs ( -- dirlist )
+    [
+        "TERMINFO" os-env [ , ] when*
+        "~/.terminfo" ,
+        "TERMINFO_DIRS" os-env [ ":" split % ] when*
+        "/etc/terminfo" ,
+        "/lib/terminfo" ,
+        "/usr/share/terminfo" ,
+    ] { } make ;
 
 <PRIVATE
 
@@ -85,7 +91,7 @@ M: linux terminfo-relative-path ( name -- path )
     [ first ] keep "%c/%s" sprintf ;
 
 : terminfo-path ( name -- path )
-    terminfo-relative-path TERMINFO-DIRS [ swap append-path ] with map
+    terminfo-relative-path terminfo-dirs [ swap append-path ] with map
     [ file-exists? ] find nip ;
 
 : terminfo-names-for-path ( path -- names )
@@ -95,7 +101,7 @@ M: linux terminfo-relative-path ( name -- path )
     ] with-directory-files ;
 
 MEMO: terminfo-names ( -- names )
-    TERMINFO-DIRS [ file-exists? ] filter
+    terminfo-dirs [ file-exists? ] filter
     [ terminfo-names-for-path ] map concat ;
 
 <PRIVATE
