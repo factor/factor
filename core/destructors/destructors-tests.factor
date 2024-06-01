@@ -6,18 +6,18 @@ TUPLE: dispose-error ;
 
 M: dispose-error dispose 3 throw ;
 
-TUPLE: dispose-dummy disposed? ;
+TUPLE: dispose-dummy disposed ;
 
-M: dispose-dummy dispose t >>disposed? drop ;
+M: dispose-dummy dispose t >>disposed drop ;
 
 T{ dispose-error } "a" set
 T{ dispose-dummy } "b" set
 
-{ f } [ "b" get disposed?>> ] unit-test
+{ f } [ "b" get disposed>> ] unit-test
 
 [ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
 
-{ t } [ "b" get disposed?>> ] unit-test
+{ t } [ "b" get disposed>> ] unit-test
 
 TUPLE: dummy-obj destroyed? ;
 
@@ -75,3 +75,13 @@ silly-disposable new-disposable "s" set
 [ "s" get unregister-disposable ]
 [ disposable>> silly-disposable? ]
 must-fail-with
+
+{ t "disposed" } [
+    t dispose-dummy boa
+    [ t "disposed" ] [ "not disposed" ] if-disposed
+] unit-test
+
+{ T{ dispose-dummy f f } "not disposed" } [
+    f dispose-dummy boa
+    [ t "disposed" ] [ "not disposed" ] if-disposed
+] unit-test
