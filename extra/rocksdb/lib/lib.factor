@@ -14,13 +14,11 @@ IN: rocksdb.lib
 
 TUPLE: rocksdb-handle < disposable ptr ;
 CONSTRUCTOR: <rocksdb-handle> rocksdb-handle ( ptr -- handle ) ;
-M: rocksdb-handle dispose
-    ptr>> rocksdb_close ;
+M: rocksdb-handle dispose* ptr>> rocksdb_close ;
 
 TUPLE: rocksdb-options < disposable ptr ;
 CONSTRUCTOR: <rocksdb-options> rocksdb-options ( ptr -- options ) ;
-M: rocksdb-options dispose
-    ptr>> rocksdb_options_destroy ;
+M: rocksdb-options dispose* ptr>> rocksdb_options_destroy ;
 
 : set-create-if-missing ( options -- options )
     [ 1 rocksdb_options_set_create_if_missing ] keep ;
