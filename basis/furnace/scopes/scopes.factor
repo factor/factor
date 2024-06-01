@@ -28,11 +28,12 @@ scope f
     [ namespace>> swap change-at ] [ scope-changed ] bi ; inline
 
 ! Destructor
-TUPLE: scope-saver scope manager ;
+TUPLE: scope-saver scope manager disposed ;
 
-C: <scope-saver> scope-saver
+: <scope-saver> ( scope manager -- scope-saver )
+    f scope-saver boa ;
 
-M: scope-saver dispose
+M: scope-saver dispose*
     [ manager>> ] [ scope>> ] bi
     dup changed?>> [
         [ swap touch-state ] [ update-tuple ] bi
