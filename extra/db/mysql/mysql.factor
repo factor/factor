@@ -42,8 +42,6 @@ M: mysql-db-connection <simple-statement> ( str in out -- stmt )
 
 M: mysql-db-connection <prepared-statement> <simple-statement> ;
 
-M: mysql-statement dispose drop ;
-
 M: mysql-statement query-results ( stmt -- rs )
     db-connection get handle>> dup pick sql>> mysql_query
     zero? [ mysql_error throw ] unless dup mysql_use_result
@@ -73,7 +71,7 @@ M: mysql-result-set advance-row ( rs -- )
         [ mysql_error throw ] if
     ] if* drop ;
 
-M: mysql-result-set dispose ( d -- )
+M: mysql-result-set dispose*
     [ mysql_free_result f ] change-handle drop ;
 
 M: mysql-result-set more-rows? ( rs -- ? )
