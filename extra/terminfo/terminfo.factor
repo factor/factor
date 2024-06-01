@@ -65,22 +65,7 @@ C: <terminfo-header> terminfo-header
     [ #strings>> read-shorts ] [ string-bytes>> read ] bi
     '[ [ _ string-offset ] [ f ] if* ] map ;
 
-TUPLE: terminfo names booleans numbers strings ;
-
-C: <terminfo> terminfo
-
-: read-terminfo ( -- terminfo )
-    read-header {
-        [ read-names ]
-        [ read-booleans ]
-        [ read-numbers ]
-        [ read-strings ]
-    } cleave <terminfo> ;
-
 PRIVATE>
-
-: file>terminfo ( path -- terminfo )
-    binary [ read-terminfo ] with-file-reader ;
 
 HOOK: terminfo-relative-path os ( name -- path )
 
@@ -253,14 +238,41 @@ CONSTANT: string-names {
     "acs_plus" "memory_lock" "memory_unlock" "box_chars_1"
 }
 
+TUPLE: terminfo names booleans numbers strings ;
+
+C: <terminfo> terminfo
+
 : zip-names ( seq names -- assoc )
     swap 2dup 2length - f <repetition> append zip ;
 
+: as-assoc ( terminfo-arrays -- assoc )
+    [ {
+        [ names>> ".names" ,, ]
+        [ booleans>> boolean-names zip-names %% ]
+        [ numbers>> number-names zip-names %% ]
+        [ strings>> string-names zip-names %% ]
+      } cleave
+    ] H{ } make
+    [ f = not ] filter-values ;
+
+: read-terminfo ( -- terminfo )
+    read-header {
+        [ read-names ]
+        [ read-booleans ]
+        [ read-numbers ]
+        [ read-strings ]
+    } cleave <terminfo> as-assoc ;
+
 PRIVATE>
 
-: term-capabilities ( name -- assoc )
-    terminfo-path file>terminfo {
-        [ booleans>> boolean-names zip-names ]
-        [ numbers>> number-names zip-names ]
-        [ strings>> string-names zip-names ]
-    } cleave 3append >hashtable ;
+: bytes>terminfo ( bytes -- terminfo )
+    binary [ read-terminfo ] with-byte-reader ;
+
+: file>terminfo ( path -- terminfo )
+    binary [ read-terminfo ] with-file-reader ;
+
+: name>terminfo ( name -- terminfo/f )
+    terminfo-path [ file>terminfo ] [ f ] if* ;
+
+: my-terminfo ( -- terminfo/f )
+    "TERM" os-env name>terminfo ;
