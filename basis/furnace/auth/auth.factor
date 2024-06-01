@@ -75,11 +75,12 @@ GENERIC: logged-in-username ( realm -- username )
 : users ( -- provider )
     realm get users>> ;
 
-TUPLE: user-saver user ;
+TUPLE: user-saver user disposed ;
 
-C: <user-saver> user-saver
+: <user-saver> ( user -- user-saver )
+    f user-saver boa ;
 
-M: user-saver dispose
+M: user-saver dispose*
     user>> dup changed?>> [ users update-user ] [ drop ] if ;
 
 : save-user-after ( user -- )
