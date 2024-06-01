@@ -166,7 +166,6 @@ GENERIC#: accept-completion-hook 1 ( item popup -- )
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }
-    { T{ key-down f f " " } [ table>> row-action ] }
 } set-gestures
 
 : show-completion-popup ( interactor mode -- )
