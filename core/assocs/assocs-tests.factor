@@ -403,3 +403,7 @@ unit-test
     H{ { 1 2 } } dup
     '[ 2 1 _  maybe-set-at ] call
 ] unit-test
+
+{ H{ { { 1 2 } 3 } } 3 } [
+    H{ } dup '[ 1 2 _ [ + ] 2cache ] call
+] unit-test
