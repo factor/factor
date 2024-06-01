@@ -9,14 +9,14 @@ IN: ecdsa
 
 <PRIVATE
 
-TUPLE: ec-key handle ;
+TUPLE: ec-key handle disposed ;
 
-M: ec-key dispose
+M: ec-key dispose*
     [ EC_KEY_free f ] change-handle drop ;
 
 : <ec-key> ( curve -- key )
     OBJ_sn2nid dup zero? [ "Unknown curve name" throw ] when
-    EC_KEY_new_by_curve_name dup ssl-error ec-key boa ;
+    EC_KEY_new_by_curve_name dup ssl-error f ec-key boa ;
 
 : ec-key-handle ( -- handle )
     ec-key get [ handle>> ] [ already-disposed ] ?unless ;
