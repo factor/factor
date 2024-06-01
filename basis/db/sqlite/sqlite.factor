@@ -43,11 +43,11 @@ M: sqlite-db-connection <prepared-statement>
         >>handle
     ] unless ;
 
-M: sqlite-statement dispose
+M: sqlite-statement dispose*
     handle>>
     [ [ sqlite3_reset drop ] keep sqlite-finalize ] when* ;
 
-M: sqlite-result-set dispose
+M: sqlite-result-set dispose*
     f >>handle drop ;
 
 : reset-bindings ( statement -- )

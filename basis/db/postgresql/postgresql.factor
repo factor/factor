@@ -91,11 +91,11 @@ M: postgresql-result-set advance-row
 M: postgresql-result-set more-rows?
     [ n>> ] [ max>> ] bi < ;
 
-M: postgresql-statement dispose
+M: postgresql-statement dispose*
     dup handle>> PQclear
     f >>handle drop ;
 
-M: postgresql-result-set dispose
+M: postgresql-result-set dispose*
     [ handle>> PQclear ]
     [
         0 >>n

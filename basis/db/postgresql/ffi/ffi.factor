@@ -280,6 +280,8 @@ FUNCTION: void PQclear ( PGresult* res )
 ! For freeing other alloc'd results, such as PGnotify structs
 FUNCTION: void PQfreemem ( void* ptr )
 
+DESTRUCTOR: PQfreemem
+
 ! Exists for backward compatibility.
 : PQfreeNotify ( ptr -- ) PQfreemem ;
 
