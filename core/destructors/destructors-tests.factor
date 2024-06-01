@@ -1,23 +1,25 @@
 USING: accessors continuations destructors destructors.private
-kernel namespaces sequences tools.test ;
+kernel math namespaces sequences tools.test ;
 IN: destructors.tests
 
 TUPLE: dispose-error ;
 
 M: dispose-error dispose 3 throw ;
 
-TUPLE: dispose-dummy disposed ;
+TUPLE: dispose-dummy disposed n ;
 
-M: dispose-dummy dispose t >>disposed drop ;
+M: dispose-dummy dispose* [ 0 or 1 + ] change-n drop ;
 
 T{ dispose-error } "a" set
 T{ dispose-dummy } "b" set
 
-{ f } [ "b" get disposed>> ] unit-test
+{ f f } [ "b" get [ disposed>> ] [ n>> ] bi ] unit-test
 
 [ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
 
-{ t } [ "b" get disposed>> ] unit-test
+{ t 1 } [ "b" get [ disposed>> ] [ n>> ] bi ] unit-test
+
+{ 1 } [ "b" get [ dispose ] [ dispose ] [ n>> ] tri ] unit-test
 
 TUPLE: dummy-obj destroyed? ;
 
@@ -77,11 +79,11 @@ silly-disposable new-disposable "s" set
 must-fail-with
 
 { t "disposed" } [
-    t dispose-dummy boa
+    t 1 dispose-dummy boa
     [ t "disposed" ] [ "not disposed" ] if-disposed
 ] unit-test
 
 { T{ dispose-dummy f f } "not disposed" } [
-    f dispose-dummy boa
+    f f dispose-dummy boa
     [ t "disposed" ] [ "not disposed" ] if-disposed
 ] unit-test
