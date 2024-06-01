@@ -17,7 +17,7 @@ IN: pdf.streams
 PRIVATE>
 
 
-TUPLE: pdf-writer data ;
+TUPLE: pdf-writer < disposable data ;
 
 : new-pdf-writer ( class -- pdf-writer )
     new V{ } clone >>data ;
@@ -37,7 +37,7 @@ TUPLE: pdf-sub-stream < pdf-writer parent ;
 
 TUPLE: pdf-block-stream < pdf-sub-stream ;
 
-M: pdf-block-stream dispose
+M: pdf-block-stream dispose*
     [ data>> ] [ parent>> ] bi
     [ data>> push-all ] [ stream-nl ] bi ;
 
@@ -73,4 +73,4 @@ M: pdf-writer stream-write-table ! FIXME: needs style?
         [ stream>> data>> <table-cell> ] map <table-row>
     ] map <table> swap data>> push ;
 
-M: pdf-writer dispose drop ;
+M: pdf-writer dispose* drop ;
