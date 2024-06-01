@@ -3,7 +3,7 @@ opengl.gl specialized-arrays ;
 SPECIALIZED-ARRAY: float
 IN: bunny.fixed-pipeline
 
-TUPLE: bunny-fixed-pipeline ;
+TUPLE: bunny-fixed-pipeline < disposable ;
 
 : <bunny-fixed-pipeline> ( gadget -- draw )
     drop
@@ -21,5 +21,5 @@ M: bunny-fixed-pipeline draw-bunny
     0.6 0.5 0.5 1.0 glColor4f
     bunny-geom ;
 
-M: bunny-fixed-pipeline dispose
+M: bunny-fixed-pipeline dispose*
     drop ;

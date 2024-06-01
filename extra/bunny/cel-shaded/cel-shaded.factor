@@ -59,7 +59,7 @@ main()
 
 ;
 
-TUPLE: bunny-cel-shaded program ;
+TUPLE: bunny-cel-shaded program disposed ;
 
 : cel-shading-supported? ( -- ? )
     "2.0" { "GL_ARB_shader_objects" }
@@ -90,5 +90,5 @@ TUPLE: bunny-cel-shaded program ;
 M: bunny-cel-shaded draw-bunny
     program>> (draw-cel-shaded-bunny) ;
 
-M: bunny-cel-shaded dispose
+M: bunny-cel-shaded dispose*
     program>> delete-gl-program ;

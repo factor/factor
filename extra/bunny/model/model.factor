@@ -57,12 +57,12 @@ CONSTANT: model-url
 : draw-triangles ( ns vs is -- )
     GL_TRIANGLES [ [ (draw-triangle) ] 2with each ] do-state ;
 
-TUPLE: bunny-dlist list ;
-TUPLE: bunny-buffers array element-array nv ni ;
+TUPLE: bunny-dlist list disposed ;
+TUPLE: bunny-buffers array element-array nv ni disposed ;
 
 : <bunny-dlist> ( model -- geom )
     GL_COMPILE [ first3 draw-triangles ] make-dlist
-    bunny-dlist boa ;
+    f bunny-dlist boa ;
 
 : <bunny-buffers> ( model -- geom )
     {
@@ -77,7 +77,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
         ]
         [ first length 3 * ]
         [ third length 3 * ]
-    } cleave bunny-buffers boa ;
+    } cleave f bunny-buffers boa ;
 
 GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )
@@ -99,10 +99,10 @@ M: bunny-buffers bunny-geom
         ] all-enabled-client-state
     ] with-array-element-buffers ;
 
-M: bunny-dlist dispose
+M: bunny-dlist dispose*
     list>> delete-dlist ;
 
-M: bunny-buffers dispose
+M: bunny-buffers dispose*
     [ array>> ] [ element-array>> ] bi
     delete-gl-buffer delete-gl-buffer ;
 
