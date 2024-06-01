@@ -1,4 +1,4 @@
-USING: accessors boxes namespaces tools.test ;
+USING: accessors boxes namespaces tools.test kernel ;
 
 { } [ <box> "b" set ] unit-test
 
@@ -21,3 +21,9 @@ USING: accessors boxes namespaces tools.test ;
 { 12 t } [ "b" get ?box ] unit-test
 
 { f } [ "b" get occupied>> ] unit-test
+
+[ <box> check-box ] [ box-empty? ] must-fail-with
+
+{ 5 } [ <box> 5 over >box [ ] if-box? ] unit-test
+
+{ } [ <box> [ "impossible" throw ] if-box? ] unit-test
