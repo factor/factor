@@ -113,6 +113,9 @@ IN: kernel.tests
 { 0 } [ f [ 0 ] unless* ] unit-test
 { t } [ t [ "Hello" ] unless* ] unit-test
 
+{ 1 2 } [ 1 [ drop f ] [ 2 ] ?unless ] unit-test
+{ 3 t } [ 1 [ drop 3 t ] [ 2 ] ?unless ] unit-test
+
 { "2\n" } [ [ 1 2 or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
 { "9\n" } [ [ 3 f or* [ . ] [ sq . ] if ] with-string-writer ] unit-test
 
