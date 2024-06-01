@@ -35,7 +35,7 @@ M: db-connection dispose*
         drop
     ] with-variable ;
 
-TUPLE: result-set sql < disposable in-params out-params handle n max ;
+TUPLE: result-set < disposable sql in-params out-params handle n max ;
 
 M: result-set dispose* drop ;
 
