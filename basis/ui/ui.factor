@@ -216,6 +216,10 @@ STARTUP-HOOK: [
     <flag> ui-notify-flag set-global
 ]
 
+SHUTDOWN-HOOK: [
+    close-all-windows
+]
+
 HOOK: resize-window ui-backend ( world dim -- )
 M: object resize-window 2drop ;
 
