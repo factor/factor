@@ -12,9 +12,7 @@ IN: ui.tools
 
 \ save H{ { +nullary+ t } } define-command
 
-: com-exit ( -- ) close-all-windows notify-queued 0 exit ;
-
-\ com-exit H{ { +nullary+ t } } define-command
+\ quit H{ { +nullary+ t } } define-command
 
 tool "tool-switching" f {
     { T{ key-down f ${ os macosx? M+ A+ ? } "l" } show-listener }
@@ -26,7 +24,7 @@ tool "tool-switching" f {
 tool "common" f {
     { T{ key-down f ${ os macosx? M+ A+ ? } "t" } show-active-buttons-popup }
     { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "q" } com-exit }
+    { T{ key-down f ${ os macosx? M+ C+ ? } "q" } quit }
     { T{ key-down f f "F2" } refresh-all }
     { T{ key-down f { S+ } "F2" } refresh-and-test-all }
     { T{ key-down f f "F3" } show-error-list }
