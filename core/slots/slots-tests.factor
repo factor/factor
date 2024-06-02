@@ -1,5 +1,5 @@
 USING: accessors arrays generic.single kernel math
-math.functions slots tools.test words ;
+math.functions slots tools.test words eval vocabs.parser ;
 IN: slots.tests
 
 TUPLE: r/w-test foo ;
@@ -39,3 +39,13 @@ comme-ca 25.5 "initial-value" set-word-prop
 
 { 0 t }    [ comme-ci initial-value ] unit-test
 { 25.5 t } [ comme-ca initial-value ] unit-test
+
+[
+    "IN: slots.tests TUPLE: foobar { foo myfoobarx } ;"
+    eval( -- ) ]
+[ error>> error>> no-word-error? ] must-fail-with
+
+[
+    "IN: TUPLE: class-bad-initial-value { aslot array initial: 5 } ;"
+    eval ( -- )
+] [ array? ] must-fail-with
