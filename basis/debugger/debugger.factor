@@ -12,6 +12,8 @@ source-files.errors strings strings.parser summary system vocabs
 vocabs.loader vocabs.parser words ;
 IN: debugger
 
+1
+
 GENERIC: error-help ( error -- topic )
 
 M: object error-help drop f ;
