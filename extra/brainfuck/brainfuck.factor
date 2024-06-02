@@ -7,8 +7,6 @@ peg.ebnf prettyprint quotations sequences ;
 
 IN: brainfuck
 
-: broken-word ( -- x ) ;
-
 <PRIVATE
 
 TUPLE: brainfuck pointer memory ;
