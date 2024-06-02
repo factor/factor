@@ -51,7 +51,7 @@ M: zmq-message dispose*
     <zmq_msg_t>
     [ over length zmq_msg_init_size check-zmq-error ]
     [ zmq_msg_data swap dup length memcpy ]
-    [ zmq-message boa ] tri ;
+    [ f zmq-message boa ] tri ;
 
 : zmq-message>byte-array ( msg -- byte-array )
     underlying>> [ zmq_msg_data ] [ zmq_msg_size ] bi
