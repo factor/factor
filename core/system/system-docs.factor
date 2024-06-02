@@ -83,6 +83,9 @@ HELP: exit
 { $values { "n" "an integer exit code" } }
 { $description "Runs all " { $link shutdown-hooks } " and then exits the Factor process. If an error occurs when the shutdown hooks runs, or when the process is about to terminate, the error is ignored and the process exits with status 255." } ;
 
+HELP: quit
+{ $description "Calls " { $link exit } " with a 0 exit code." } ;
+
 HELP: nano-count
 { $values { "ns" integer } }
 { $description "Outputs a monotonically increasing count of nanoseconds elapsed since an arbitrary starting time. The difference of two calls to this word allows timing. This word is unaffected by system clock changes." }
