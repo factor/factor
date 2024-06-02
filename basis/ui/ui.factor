@@ -214,6 +214,7 @@ M: object close-window
 STARTUP-HOOK: [
     f ui-running set-global
     <flag> ui-notify-flag set-global
+    init-ui
 ]
 
 SHUTDOWN-HOOK: [
@@ -230,7 +231,7 @@ M: object resize-window 2drop ;
 : with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [
         t ui-running set-global '[
-            [ init-ui @ ] (with-ui)
+            _ (with-ui)
         ] [
             f ui-running set-global
             ! Give running ui threads a chance to finish.
