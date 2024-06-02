@@ -32,7 +32,7 @@ TUPLE: discord-bot < disposable
     guilds channels ;
 
 : <discord-bot> ( in out config -- discord-bot )
-    discord-bot new
+    discord-bot new-disposable
         swap >>config
         swap >>out
         swap >>in

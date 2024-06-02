@@ -20,7 +20,7 @@ PRIVATE>
 TUPLE: pdf-writer < disposable data ;
 
 : new-pdf-writer ( class -- pdf-writer )
-    new V{ } clone >>data ;
+    new-disposable V{ } clone >>data ;
 
 : <pdf-writer> ( -- pdf-writer )
     pdf-writer new-pdf-writer ;
