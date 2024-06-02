@@ -218,7 +218,7 @@ STARTUP-HOOK: [
 ]
 
 SHUTDOWN-HOOK: [
-    close-all-windows
+    close-all-windows notify-queued
 ]
 
 HOOK: resize-window ui-backend ( world dim -- )
