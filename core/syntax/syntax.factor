@@ -10,7 +10,7 @@ generic.math generic.parser generic.standard hash-sets
 hashtables hashtables.identity init io.pathnames kernel lexer
 locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
-strings strings.parser strings.parser.private vectors
+strings strings.parser strings.parser.private vectors vocabs
 vocabs.loader vocabs.parser words words.alias words.constant
 words.symbol ;
 IN: bootstrap.syntax
@@ -355,4 +355,6 @@ IN: bootstrap.syntax
         dup \ [ = [ drop parse-quotation ] [ 1quotation ] if
         current-vocab name>> [ add-shutdown-hook ] 2curry append!
     ] define-core-syntax
+
+    "VOCAB:" [ scan-token >vocab-link ] define-core-syntax
 ] with-compilation-unit

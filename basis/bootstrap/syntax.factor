@@ -118,6 +118,7 @@ IN: bootstrap.syntax
         "IDENTITY-MEMO::"
         "STARTUP-HOOK:"
         "SHUTDOWN-HOOK:"
+        "VOCAB:"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
