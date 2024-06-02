@@ -134,7 +134,7 @@ PRIVATE>
     {
         "IN:" "USE:" "UNUSE:" "QUALIFIED:"
         "QUALIFIED-WITH:" "FROM:" "EXCLUDE:"
-        "REUSE:"
+        "REUSE:" "VOCAB:"
     } member? ; inline
 
 : complete-single-vocab? ( tokens -- ? )
