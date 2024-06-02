@@ -17,7 +17,7 @@ jobs:
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load-all
-      run: './factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
+      run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
@@ -30,7 +30,7 @@ jobs:
     - name: build
       run: arch -x86_64 ./build.sh net-bootstrap
     - name: load-all
-      run: './factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
+      run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core'
     - name: help-lint
@@ -52,7 +52,7 @@ jobs:
            .\build.cmd bootstrap
     - name: load-all
       shell: cmd
-      run: 'factor -e="USING: memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
+      run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       shell: cmd
       run: 'factor -run=tools.test resource:core'
