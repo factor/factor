@@ -22,7 +22,8 @@ TUPLE: mdb-connection < disposable instance node handle remote local buffer ;
 
 USE: mongodb.operations
 
-CONSTRUCTOR: <mdb-connection> mdb-connection ( instance -- mdb-connection ) ;
+: <mdb-connection> ( instance -- mdb-connection )
+    mdb-connection new-disposable swap >>instance ;
 
 : check-ok ( result -- errmsg ? )
     [ [ "errmsg" ] dip at ]

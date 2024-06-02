@@ -16,7 +16,7 @@ INSTANCE: html-writer output-stream
 <PRIVATE
 
 : new-html-writer ( class -- html-writer )
-    new V{ } clone >>data ; inline
+    new-disposable V{ } clone >>data ; inline
 
 TUPLE: html-sub-stream < html-writer style parent ;
 
@@ -180,4 +180,4 @@ M: html-writer dispose* drop ;
     html-writer new-html-writer ;
 
 : with-html-writer ( quot -- xml )
-    <html-writer> [ swap with-output-stream* ] keep data>> ; inline
+    <html-writer> [ swap with-output-stream ] keep data>> ; inline

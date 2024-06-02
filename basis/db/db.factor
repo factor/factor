@@ -13,7 +13,7 @@ TUPLE: db-connection < disposable
 <PRIVATE
 
 : new-db-connection ( class -- obj )
-    new
+    new-disposable
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
@@ -52,7 +52,7 @@ GENERIC: more-rows? ( result-set -- ? )
     0 >>n drop ;
 
 : new-result-set ( query handle class -- result-set )
-    new
+    new-disposable
         swap >>handle
         [ [ sql>> ] [ in-params>> ] [ out-params>> ] tri ] dip
         swap >>out-params
@@ -66,7 +66,7 @@ TUPLE: prepared-statement < statement ;
 M: statement dispose* drop ;
 
 : new-statement ( sql in out class -- statement )
-    new
+    new-disposable
         swap >>out-params
         swap >>in-params
         swap >>sql ;
