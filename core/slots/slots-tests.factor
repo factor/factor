@@ -42,10 +42,10 @@ comme-ca 25.5 "initial-value" set-word-prop
 
 [
     "IN: slots.tests TUPLE: foobar { foo myfoobarx } ;"
-    eval( -- ) ]
-[ error>> error>> no-word-error? ] must-fail-with
+    parse-string
+] [ error>> error>> no-word-error? ] must-fail-with
 
 [
-    "IN: TUPLE: class-bad-initial-value { aslot array initial: 5 } ;"
-    eval ( -- )
-] [ array? ] must-fail-with
+    "IN: slots.tests TUPLE: foobar { aslot array initial: 5 } ;"
+    parse-string
+] [ error>> bad-initial-value? ] must-fail-with
