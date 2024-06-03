@@ -356,5 +356,5 @@ IN: bootstrap.syntax
         current-vocab name>> [ add-shutdown-hook ] 2curry append!
     ] define-core-syntax
 
-    "VOCAB:" [ scan-token >vocab-link ] define-core-syntax
+    "VOCAB:" [ scan-token >vocab-link suffix! ] define-core-syntax
 ] with-compilation-unit
