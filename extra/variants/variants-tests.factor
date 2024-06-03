@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math tools.test variants slots ;
+USING: eval kernel math tools.test variants slots ;
 IN: variants.tests
 
 VARIANT: list
@@ -39,3 +39,12 @@ VARIANT-MEMBER: list2 cons2: { { first object } { rest list2 } } ;
 
 { 4 }
 [ 5 6 7 8 nil2 <cons2> <cons2> <cons2> <cons2> list2-length ] unit-test
+
+{ t } [ "
+USE: variants
+IN: foo
+VARIANT: tree
+    node: { val }
+    branch: { { left tree } { right tree } }
+    ;
+3 <node> tree?" eval( -- x ) ] unit-test
