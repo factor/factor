@@ -41,11 +41,11 @@ comme-ca 25.5 "initial-value" set-word-prop
 { 25.5 t } [ comme-ca initial-value ] unit-test
 
 [
-    "IN: slots.tests TUPLE: foobar { foo myfoobarx } ;"
-    parse-string
+    "IN: slots.tuple TUPLE: foobar { foo myfoobarx } ;"
+    eval( -- )
 ] [ error>> error>> no-word-error? ] must-fail-with
 
 [
-    "IN: slots.tests TUPLE: foobar { aslot array initial: 5 } ;"
-    parse-string
+    "USING: arrays ; IN: slots.tests TUPLE: foobar { aslot array initial: 5 } ;"
+    eval( -- )
 ] [ error>> bad-initial-value? ] must-fail-with
