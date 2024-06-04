@@ -217,7 +217,7 @@ help:
 	@echo "LTO=1  compile VM with Link Time Optimization"
 	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
 
-ALL = factor factor-ffi-test factor-lib
+ALL = factor-executable factor-ffi-test factor-lib
 
 freebsd-x86-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.32
@@ -294,7 +294,7 @@ $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-macosx.app: factor
+macosx.app: $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
@@ -305,7 +305,7 @@ $(ENGINE): $(DLL_OBJS)
 
 factor-lib: $(ENGINE)
 
-factor: $(EXECUTABLE)
+factor-executable: $(EXECUTABLE)
 
 $(EXECUTABLE): $(EXE_OBJS) $(DLL_OBJS)
 	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
@@ -339,5 +339,5 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor factor-lib factor-console factor-ffi-test tags clean help macosx.app
+.PHONY: factor-executable factor-lib factor-console factor-ffi-test tags clean help macosx.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
