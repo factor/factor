@@ -8,7 +8,6 @@
 
 #if defined (__clang__)||defined (__GNUC__)
 
-// ignore unused function warnings
 #if defined(__clang__)
 #define PRAGMA(pragma) \
     _Pragma(PRAGMA_STR(clang pragma))
@@ -37,7 +36,9 @@ namespace lib { namespace zstd {
 #define ZSTD_STATIC_LINKING_ONLY // enable advanced experimental functions
 // update the following line if zstd.h is updated
 // origin : git SHA1: 794ea1b0 tag: v1.5.6
+BEGIN_PRAGMA (diagnostic ignored "-Wunused-function") // ignore unused function warnings
 #include "zstd.h"
+END_PRAGMA
   } }
   extern size_t ZSTD_decompress (void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
   extern unsigned ZSTD_isError (size_t code);

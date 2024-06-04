@@ -17,7 +17,9 @@ namespace lib { namespace zstd {
   namespace c { extern "C" {
 // update the following line if zstd.c is updated
 // origin : git SHA1: 794ea1b0 tag: v1.5.6
+BEGIN_PRAGMA (diagnostic ignored "-Wunused-function") // ignore unused function warnings
 #include "zstd.c"
+END_PRAGMA
   } }
   size_t ZSTD_decompress (void* dst, size_t dstCapacity, const void* src, size_t compressedSize) { return c::ZSTD_decompress (dst, dstCapacity, src, compressedSize); }
   unsigned ZSTD_isError (size_t code) { return c::ZSTD_isError (code); }
