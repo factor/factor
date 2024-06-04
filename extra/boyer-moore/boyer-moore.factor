@@ -22,8 +22,8 @@ IN: boyer-moore
     [ (partial-suffixes) ] map-index 2nip ; inline
 
 : <good-suffix-table> ( seq -- table )
-    z-values [ partial-suffixes ] [ normal-suffixes ] bi
-    [ [ nip ] when* ] 2map reverse! ; inline
+    z-values [ normal-suffixes ] [ partial-suffixes ] bi
+    [ or ] 2map reverse! ; inline
 
 : insert-bad-char-shift ( table elt len i -- table )
     1 + swap - swap pick 2dup key?
