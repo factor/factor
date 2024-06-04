@@ -64,3 +64,12 @@ SYMBOL: exit
 ! ] "Bad synchronous send" spawn "t" set
 
 ! [ 3 "t" get send-synchronous ] must-fail
+
+[ "foo" self send-synchronous ]
+[ cannot-send-synchronous-to-self? ]
+must-fail-with
+
+{ 6 } [
+    [ [ 1 + ] handle-synchronous ] "add1" spawn
+    5 swap send-synchronous
+] unit-test
