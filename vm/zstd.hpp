@@ -6,11 +6,29 @@
 
 // because we import external code here, which we don't want to alter, we need to handle integration here
 
+#if defined (__clang__)||defined (__GNUC__)
+
 // ignore unused function warnings
 #if defined(__clang__)
-#pragma clang diagnostic ignored "-Wunused-function"
+#define PRAGMA(pragma) \
+    _Pragma(PRAGMA_STR(clang pragma))
 #elif defined (__GNUC__)
-#pragma GCC diagnostic ignored "-Wunused-function"
+#define PRAGMA(pragma) \
+    _Pragma(PRAGMA_STR(GCC pragma))
+#endif
+
+#define PRAGMA_STR(x) #x
+#define BEGIN_PRAGMA(pragma) \
+    PRAGMA(diagnostic push) \
+    PRAGMA(pragma)
+#define END_PRAGMA \
+    PRAGMA(diagnostic pop)
+
+#else
+
+#define BEGIN_PRAGMA(pragma)
+#define END_PRAGMA
+
 #endif
 
 namespace lib { namespace zstd {
