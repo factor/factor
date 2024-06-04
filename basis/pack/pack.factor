@@ -106,13 +106,13 @@ MACRO: pack ( str -- quot )
 : packed-length ( str -- n )
     [ ch>packed-length ] map-sum ;
 
-: pack-native ( seq str -- seq )
+: pack-native ( seq str -- bytes )
     '[ _ _ pack ] with-native-endian ; inline
 
-: pack-be ( seq str -- seq )
+: pack-be ( seq str -- bytes )
     '[ _ _ pack ] with-big-endian ; inline
 
-: pack-le ( seq str -- seq )
+: pack-le ( seq str -- bytes )
     '[ _ _ pack ] with-little-endian ; inline
 
 <PRIVATE
@@ -129,13 +129,13 @@ MACRO: unpack ( str -- quot )
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
     '[ _ cleave>array ] ;
 
-: unpack-native ( seq str -- seq )
+: unpack-native ( bytes str -- seq )
     '[ _ _ unpack ] with-native-endian ; inline
 
-: unpack-be ( seq str -- seq )
+: unpack-be ( bytes str -- seq )
     '[ _ _ unpack ] with-big-endian ; inline
 
-: unpack-le ( seq str -- seq )
+: unpack-le ( bytes str -- seq )
     '[ _ _ unpack ] with-little-endian ; inline
 
 ERROR: packed-read-fail str bytes ;
