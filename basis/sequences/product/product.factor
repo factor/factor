@@ -91,5 +91,5 @@ PRIVATE>
 :: product-find ( ... sequences quot: ( ... seq -- ... ? ) -- ... sequence )
     sequences { [ empty? ] [ [ empty? ] any? ] } 1|| [ f ] [
         sequences length f <array>
-        [ sequences >array 0 quot (product-find) ] keep and
+        [ sequences >array 0 quot (product-find) ] ?and
     ] if ; inline
