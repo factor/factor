@@ -1117,6 +1117,7 @@ CONSTANT: rarity-to-number H{
         { [ "creature" any-type? -1 1 ? ] <=> }
         { [ "power" of -1 1 ? ] <=> }
         { [ "toughness" of -1 1 ? ] <=> }
+        { [ "rarity" of -1 1 ? ] <=> }
         { [ "name" of ] <=> }
     } sort-with-spec ;
 
