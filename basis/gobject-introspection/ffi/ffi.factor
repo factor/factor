@@ -249,8 +249,7 @@ M: array-type field-type>c-type type>c-type ;
 
 : find-existing-boxed-type ( boxed -- type/f )
     c-type>> search [
-        dup [ c-type? ] [ "c-type" word-prop ] bi or
-        [ drop f ] unless
+        dup [ c-type? ] [ "c-type" word-prop ] bi or and*
     ] [ f ] if* ;
 
 : def-boxed-type ( boxed -- )

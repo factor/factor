@@ -79,7 +79,7 @@ CONSTANT: session-id-key "__s"
             dup
             [ client>> remote-host = ]
             [ user-agent>> user-agent = ]
-            bi and [ drop f ] unless
+            bi and and*
         ] when
     ] when ;
 
@@ -107,4 +107,4 @@ M: sessions call-responder*
 SLOT: session
 
 : check-session ( state/f -- state/f )
-    dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
+    dup [ dup session>> session get id>> = and* ] when ;

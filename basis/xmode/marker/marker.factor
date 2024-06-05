@@ -75,7 +75,7 @@ M: rule match-position drop position get ;
     line get position get tail-slice ;
 
 : match-start ( string regexp -- slice/f )
-    first-match dup [ dup from>> 0 = [ drop f ] unless ] when ;
+    first-match dup [ dup from>> 0 = and* ] when ;
 
 GENERIC: text-matches? ( string text -- match-count/f )
 

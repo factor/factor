@@ -157,10 +157,10 @@ $nl
 ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
 "Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
 $nl
-"The following two lines are equivalent:"
-{ $code "[ drop f ] unless" "swap and" }
-"The following two lines are equivalent:"
-{ $code "[ ] [ ] ?if" "swap or" }
+"The following three lines are equivalent:"
+{ $code "[ drop f ] unless" "swap and" "and*" }
+"The following three lines are equivalent:"
+{ $code "?or* [ ] [ ] ?if" "swap or" "or*" }
 "The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
 { $code "[ L ] unless*" "L or" } ;
 

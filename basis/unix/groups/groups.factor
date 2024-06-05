@@ -24,7 +24,7 @@ GENERIC: group-struct ( obj -- group/f )
     [ <byte-array> ] keep f void* <ref> ;
 
 : check-group-struct ( group-struct ptr -- group-struct/f )
-    void* deref [ drop f ] unless ;
+    void* deref and* ;
 
 M: integer group-struct
     (group-struct)

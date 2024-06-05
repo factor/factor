@@ -84,7 +84,7 @@ M: unsupported-image-header error. drop "Could not detect a valid image header" 
   dup b32>> dup valid-header? [ nip ] [ drop b64>> dup valid-header? [ unsupported-image-header ] unless ] if ;
 
 : valid-image-footer? ( footer -- footer.32/footer.64/f )
-  dup b32>> dup valid-footer? [ nip ] [ drop b64>> dup valid-footer? [ drop f ] unless ] if ;
+  dup b32>> dup valid-footer? [ nip ] [ drop b64>> dup valid-footer? and* ] if ;
 
 : uncompressed-data? ( image -- ? ) header>> [ escaped-data-size>> ] [ compressed-data-size>> ] bi = ;
 : uncompressed-code? ( image -- ? ) header>> [ code-size>> ]         [ compressed-code-size>> ] bi = ;

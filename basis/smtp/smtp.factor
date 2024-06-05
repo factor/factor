@@ -201,7 +201,7 @@ ERROR: invalid-header-string string ;
 
 : extract-email ( recepient -- email )
     ! This could be much smarter.
-    " " split1-last swap or "<" ?head drop ">" ?tail drop ;
+    " " split1-last or* "<" ?head drop ">" ?tail drop ;
 
 : email-content-type ( email -- content-type )
     [ content-type>> ] [ encoding>> encoding>name ] bi "; charset=" glue ;

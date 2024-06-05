@@ -73,7 +73,7 @@ M: persistent-vector nth-unsafe
         new-child
     ] [
         [ nip ] 2keep children>> last (ppush-new-tail)
-        or* [ swap new-child ] [ swap node-set-last f ] if
+        ?or* [ swap new-child ] [ swap node-set-last f ] if
     ] if ;
 
 : do-expansion ( pvec root expansion/f -- pvec )

@@ -724,7 +724,7 @@ PRIVATE>
 
 : (map-find-index) ( seq quot find-quot -- result i elt )
     [ [ f ] 2dip [ [ nip ] 2dip call dup ] curry ] dip call
-    [ [ [ drop f ] unless ] keep ] dip ; inline
+    [ [ and* ] keep ] dip ; inline
 
 PRIVATE>
 
@@ -1046,6 +1046,9 @@ ALIAS: map-infimum map-minimum deprecated
     [ 0 ] 3dip
     [ [ length check-length ] keep ] 2dip
     '[ nth-unsafe _ keep swap _ keep swap ] find-pred-loop swapd ; inline
+
+: find-deep ( ... seq quot: ( ... elt -- ... calc ) -- ... calc/f )
+    [ ] find-pred 2drop ; inline
 
 ! https://en.wikipedia.org/wiki/Maximum_subarray_problem
 ! Kadane's algorithm O(n) largest sum in subarray

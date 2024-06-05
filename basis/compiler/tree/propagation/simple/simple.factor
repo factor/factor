@@ -102,7 +102,7 @@ ERROR: invalid-outputs #call infos ;
     [ predicate-output-infos 1array ] 2bi ;
 
 : default-output-value-infos ( #call word -- infos )
-    "default-output-classes" word-prop or*
+    "default-output-classes" word-prop ?or*
     [ class-infos ] [ out-d>> length object-info <repetition> ] if ;
 
 : output-value-infos ( #call word -- infos )

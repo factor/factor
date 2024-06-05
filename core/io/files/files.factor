@@ -106,7 +106,7 @@ PRIVATE>
 
 : init-resource-path ( -- )
     OBJ-ARGS special-object [
-        alien>native-string "-resource-path=" ?head [ drop f ] unless
+        alien>native-string "-resource-path=" ?head and*
     ] map-find drop
     [ image-path parent-directory ] unless* "resource-path" set-global ;
 

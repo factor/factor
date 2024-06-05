@@ -701,7 +701,7 @@ M:: ppc.64 %convert-integer ( dst src c-type -- )
     } case ;
 
 M: ppc.32 %load-memory-imm
-    or* [
+    ?or* [
         pick %trap-null
         {
             { c:char   [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -720,7 +720,7 @@ M: ppc.32 %load-memory-imm
     ] if ;
 
 M: ppc.64 %load-memory-imm
-    or* [
+    ?or* [
         pick %trap-null
         {
             { c:char      [ [ dup ] 2dip LBZ dup EXTSB ] }
@@ -743,7 +743,7 @@ M: ppc.64 %load-memory-imm
 
 M: ppc.32 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    or* [
+    ?or* [
         pick %trap-null
         {
             { c:char   [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -763,7 +763,7 @@ M: ppc.32 %load-memory
 
 M: ppc.64 %load-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    or* [
+    ?or* [
         pick %trap-null
         {
             { c:char      [ [ LBZX ] [ drop dup EXTSB ] 2bi ] }
@@ -785,7 +785,7 @@ M: ppc.64 %load-memory
 
 
 M: ppc.32 %store-memory-imm
-    or* [
+    ?or* [
         {
             { c:char   [ STB ] }
             { c:uchar  [ STB ] }
@@ -803,7 +803,7 @@ M: ppc.32 %store-memory-imm
     ] if ;
 
 M: ppc.64 %store-memory-imm
-    or* [
+    ?or* [
         {
             { c:char      [ STB ] }
             { c:uchar     [ STB ] }
@@ -824,7 +824,7 @@ M: ppc.64 %store-memory-imm
 
 M: ppc.32 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    or* [
+    ?or* [
         {
             { c:char   [ STBX ] }
             { c:uchar  [ STBX ] }
@@ -843,7 +843,7 @@ M: ppc.32 %store-memory
 
 M: ppc.64 %store-memory
     [ [ 0 assert= ] bi@ ] 2dip
-    or* [
+    ?or* [
         {
             { c:char      [ STBX ] }
             { c:uchar     [ STBX ] }
