@@ -290,6 +290,8 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : and* ( obj1 obj2 -- obj1/f ) swap and ; inline
 
+: ?and ( obj quot -- obj/f ) keep and ; inline
+
 : or ( obj1 obj2 -- obj1/obj2 ) dupd ? ; inline
 
 : or* ( obj1 obj2 -- obj2/obj1 ) swap or ; inline
