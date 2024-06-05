@@ -113,7 +113,7 @@ M: realm call-responder*
     [ salt>> encode-password ] [ password>> ] bi = ;
 
 : check-login ( password username -- user/f )
-    users get-user dup [ [ valid-login? ] keep and ] [ 2drop f ] if ;
+    users get-user dup [ [ valid-login? ] ?and ] [ 2drop f ] if ;
 
 : if-secure-realm ( quot -- )
     realm get secure>> [ if-secure ] [ call ] if ; inline
