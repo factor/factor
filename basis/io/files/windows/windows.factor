@@ -317,7 +317,7 @@ SLOT: attributes
         { +offline+ $ FILE_ATTRIBUTE_OFFLINE }
         { +not-content-indexed+ $ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED }
         { +encrypted+ $ FILE_ATTRIBUTE_ENCRYPTED }
-    } [ mask? [ drop f ] unless ] with { } assoc>map sift ;
+    } [ mask? and* ] with { } assoc>map sift ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;

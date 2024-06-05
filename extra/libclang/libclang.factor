@@ -98,7 +98,7 @@ GENERIC: print-deferred ( obj -- )
 
 : ?lookup-type ( type -- obj/f )
     factor-type-name
-    clang-state> c-defs-by-name>> ?at [ drop f ] unless ;
+    clang-state> c-defs-by-name>> ?at and* ;
 
 : lookup-order ( obj -- order/f ) type>> ?lookup-type [ order>> ] ?call -1 or ;
 

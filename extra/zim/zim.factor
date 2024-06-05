@@ -191,7 +191,7 @@ M: integer read-entry-content
 
 :: (find-entry-url) ( url zim -- entry/f )
     zim header>> entry-count>> <iota> [
-        zim read-entry-index url over url>> = [ drop f ] unless
+        zim read-entry-index url over url>> = and*
     ] map-find drop ;
 
 :: (find-entry-url-full) ( namespace url zim -- entry/f )
@@ -201,7 +201,7 @@ M: integer read-entry-content
         dup +eq+ = [ drop url over url>> <=> ] when
     ] search 2drop dup {
         [ ] [ namespace>> namespace = ] [ url>> url = ]
-    } 1&& [ drop f ] unless ;
+    } 1&& and* ;
 
 : find-entry-url ( namespace/f url zim -- entry/f )
     pick [ (find-entry-url-full) ] [ (find-entry-url) nip ] if ;

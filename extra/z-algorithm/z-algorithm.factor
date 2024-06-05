@@ -4,7 +4,7 @@ USING: arrays kernel math ranges sequences sequences.private ;
 IN: z-algorithm
 
 : lcp ( seq1 seq2 -- n )
-    [ min-length dup ] 2keep mismatch-unsafe or* drop ;
+    [ min-length dup ] 2keep mismatch-unsafe or* ;
 
 <PRIVATE
 

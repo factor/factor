@@ -15,7 +15,7 @@ CONSTANT: max-redirects 10
     H{ } clone [ '[ _ push-at ] assoc-each ] keep ;
 
 : process-header ( alist -- assoc )
-    f swap [ [ swap or dup ] dip swap ] assoc-map nip
+    f swap [ [ or* dup ] dip swap ] assoc-map nip
     collect-headers [ "; " join ] assoc-map
     >hashtable ;
 

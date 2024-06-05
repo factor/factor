@@ -36,7 +36,7 @@ TUPLE: line-break ;
     >url protocol>> >boolean ;
 
 : simple-link-title ( string -- string' )
-    dup absolute-url? [ "/" split1-last swap or ] unless ;
+    dup absolute-url? [ "/" split1-last or* ] unless ;
 
 ! _foo*bar_baz*bing works like <i>foo*bar</i>baz<b>bing</b>
 ! I could support overlapping, but there's not a good use case for it.

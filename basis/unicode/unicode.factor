@@ -93,7 +93,7 @@ PRIVATE>
 : first-word ( str -- i )
     [ [ length ] [ first word-break-prop ] bi ] keep
     1 swap dup '[ _ word-break-next ] find-index-from
-    drop nip swap or ;
+    drop nip or* ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;

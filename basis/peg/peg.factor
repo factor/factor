@@ -453,7 +453,7 @@ M: optional-parser parser-quot
 TUPLE: semantic-parser parser quot ;
 
 : check-semantic ( result quot -- result )
-    dupd '[ dup ast>> @ [ drop f ] unless ] when ; inline
+    dupd '[ dup ast>> @ and* ] when ; inline
 
 M: semantic-parser parser-quot
     [ parser>> execute-parser-quot ] [ quot>> ] bi

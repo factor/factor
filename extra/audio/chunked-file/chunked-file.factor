@@ -7,7 +7,7 @@ IN: audio.chunked-file
 ERROR: invalid-audio-file ;
 
 : ensured-read ( count -- output/f )
-    [ read ] keep over length = [ drop f ] unless ;
+    [ read ] keep over length = and* ;
 : ensured-read* ( count -- output )
     ensured-read [ invalid-audio-file ] unless* ;
 

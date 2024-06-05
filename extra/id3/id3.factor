@@ -199,7 +199,7 @@ CONSTANT: id3v1+-length 227
 : parse-genre ( string -- n/f )
     dup "(" ?head-slice drop ")" ?tail-slice drop
     string>number dup number? [
-        genres ?nth swap or
+        genres ?nth or*
     ] [
         drop
     ] if ;

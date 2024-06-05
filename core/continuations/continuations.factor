@@ -59,7 +59,7 @@ C: <continuation> continuation
 PRIVATE>
 
 : ifcc ( capture restore -- )
-    [ dummy-1 current-continuation or* ] 2dip [ dummy-2 ] prepose if ; inline
+    [ dummy-1 current-continuation ?or* ] 2dip [ dummy-2 ] prepose if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
