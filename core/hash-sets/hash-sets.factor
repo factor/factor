@@ -54,7 +54,7 @@ TUPLE: hash-set
 
 : new-key@ ( key hash -- array n ? )
     [ array>> 2dup hash@ 0 f (new-key@) ] keep swap
-    [ over [ hash-deleted- ] [ hash-count+ ] if swap or t ] [ 2drop f ] if ; inline
+    [ over [ hash-deleted- ] [ hash-count+ ] if or* t ] [ 2drop f ] if ; inline
 
 : set-nth-item ( key array n -- )
     2 fixnum+fast set-slot ; inline

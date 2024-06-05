@@ -30,7 +30,7 @@ PRIVATE>
 : find-permutation-bits ( ... bit-count bits quot: ( ... n -- ... ? ) -- ... elt/f )
     [ f f ] 3dip [ 2nip ] prepose [ keep swap ] curry
     permutation-bits-quot [ [ pick not and ] compose ] dip
-    while drop swap and ; inline
+    while drop and* ; inline
 
 : reduce-permutation-bits ( ... bit-count bits identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-permutation-bits ; inline

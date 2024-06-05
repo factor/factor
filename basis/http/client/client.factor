@@ -188,7 +188,7 @@ SYMBOL: redirects
 
 : check-proxy ( request proxy -- request' )
     dup [ (check-proxy) ] [ f ] if*
-    [ drop f ] unless [ clone ] dip >>proxy-url ;
+    and* [ clone ] dip >>proxy-url ;
 
 : get-default-proxy ( request -- default-proxy )
     url>> protocol>> "https" = [

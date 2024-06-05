@@ -42,7 +42,7 @@ PREDICATE: match-var < word "match-var" word-prop ;
     } cond ;
 
 : match ( value1 value2 -- bindings )
-    [ (match) ] H{ } make swap [ drop f ] unless ;
+    [ (match) ] H{ } make and ;
 
 ERROR: no-match-cond ;
 
@@ -55,7 +55,7 @@ MACRO: match-cond ( assoc -- quot )
         first2
         [ [ dupd match ] curry ] dip
         [ with-variables ] curry rot
-        [ [ or* ] 2dip if ] 2curry append
+        [ [ ?or* ] 2dip if ] 2curry append
     ] reduce ;
 
 GENERIC: replace-patterns ( object -- result )
@@ -75,7 +75,7 @@ M: tuple replace-patterns tuple>array replace-patterns >tuple ;
     2dup shorter? [
         2drop f f
     ] [
-        2dup length head over match or*
+        2dup length head over match ?or*
         [ swap ?rest ] [ [ rest ] dip (match-first) ] if
     ] if ;
 

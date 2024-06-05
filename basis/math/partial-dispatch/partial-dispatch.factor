@@ -42,7 +42,7 @@ M: word integer-op-input-classes
         { bitor fixnum-bitor }
         { bitxor fixnum-bitxor }
         { bitnot fixnum-bitnot }
-    } at swap or ;
+    } at or* ;
 
 : bignum-fixnum-op-quot ( big-word -- quot )
     '[ fixnum>bignum _ execute ] ;

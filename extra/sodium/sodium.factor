@@ -77,7 +77,7 @@ ERROR: sodium-malloc-error ;
     ]
     [ crypto_secretbox_noncebytes check-length ]
     [ crypto_secretbox_keybytes check-length ] tri*
-    crypto_secretbox_open_easy 0 = [ drop f ] unless ;
+    crypto_secretbox_open_easy 0 = and* ;
 
 : crypto-box-keypair ( -- public-key secret-key )
     crypto_box_publickeybytes <byte-array>

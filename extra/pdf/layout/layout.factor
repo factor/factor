@@ -156,7 +156,7 @@ M: hr pdf-render
                 overd [ draw-line ] [ inc-x ] 2bi
             ] unless-zero dup 0 > [ over line-break ] when
         ] while
-    ] change-width nip dup width>> 0 > [ drop f ] unless ;
+    ] change-width nip dup width>> 0 > and* ;
 
 M: hr pdf-width
     nip width>> ;
@@ -198,7 +198,7 @@ M: table-cell pdf-render
         [ width>> >>col-width 0 >>x drop ]
         [
             [ [ dupd pdf-render ] map nip ] change-contents
-            dup contents>> [ ] any? [ drop f ] unless
+            dup contents>> [ ] any? and*
         ]
         [
             width>> table-cell-padding +
@@ -228,7 +228,7 @@ M: table-row pdf-render
                     ] map swap max-y >>y drop
                 ] change-cells
 
-                dup cells>> [ ] any? [ drop f ] unless
+                dup cells>> [ ] any? and*
             ]
         ]
         [ drop margin>> 54 >>left drop ]

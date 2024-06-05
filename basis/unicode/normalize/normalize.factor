@@ -89,7 +89,7 @@ CONSTANT: final-count 28
     string [
         >fixnum dup ascii? [ out push ] [
             dup hangul? [ hangul>jamo out push-all ]
-            [ dup quot call or* [ out push-all ] [ out push ] if ] if
+            [ dup quot call ?or* [ out push-all ] [ out push ] if ] if
         ] if
     ] each
     out "" like dup reorder ; inline

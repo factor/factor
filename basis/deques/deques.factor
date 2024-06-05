@@ -21,13 +21,13 @@ ERROR: empty-deque ;
     peek-front* [ drop empty-deque ] unless ; inline
 
 : ?peek-front ( deque -- obj/f )
-    peek-front* [ drop f ] unless ; inline
+    peek-front* and* ; inline
 
 : peek-back ( deque -- obj )
     peek-back* [ drop empty-deque ] unless ; inline
 
 : ?peek-back ( deque -- obj/f )
-    peek-back* [ drop f ] unless ; inline
+    peek-back* and* ; inline
 
 : push-front ( obj deque -- )
     push-front* drop ; inline

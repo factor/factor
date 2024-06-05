@@ -147,7 +147,7 @@ SINGLETON: aes-256-key
     (rcon-nth) [ rotword subword ] dip bitxor ;
 
 M: aes-128-key key-expand-round ( temp i -- temp' )
-    4 /mod 0 = swap and [ (add-rcon) ] when* ;
+    4 /mod 0 = and* [ (add-rcon) ] when* ;
 
 ERROR: aes-192-256-not-implemented ;
 M: aes-256-key key-expand-round ( temp i -- temp' )

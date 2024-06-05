@@ -44,8 +44,7 @@ IN: compiler.tree.combinators
         } 1||
     ] any? ; inline recursive
 
-: select-children ( seq flags -- seq' )
-    [ [ drop f ] unless ] 2map ;
+: select-children ( seq flags -- seq' ) [ and* ] 2map ;
 
 : sift-children ( seq flags -- seq' )
     zip sift-values keys ;
