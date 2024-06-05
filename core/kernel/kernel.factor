@@ -173,11 +173,13 @@ DEFER: if
 
 : ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
 
-: ?transmute ( old quot: ( old -- new/f ) -- new/old new? )
-    keep over [ drop t ] [ nip f ] if ; inline
+: ?or ( obj1 obj2 -- obj1/obj2 first? ) over [ drop t ] [ nip f ] if ; inline
 
-: transmute ( old quot: ( old -- new/f ) -- new/old )
-    ?transmute drop ; inline
+: ?or* ( obj1 obj2 -- obj2/obj1 second? ) swap ?or ; inline
+
+: ?transmute ( old quot: ( old -- new/f ) -- new/old new? ) keep ?or ; inline
+
+: transmute ( old quot: ( old -- new/f ) -- new/old ) ?transmute drop ; inline
 
 ! Default
 
@@ -284,13 +286,15 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
 
-: and ( obj1 obj2 -- ? ) over ? ; inline
+: and ( obj1 obj2 -- obj2/f ) over ? ; inline
 
-: or ( obj1 obj2 -- ? ) dupd ? ; inline
+: and* ( obj1 obj2 -- obj1/f ) swap and ; inline
 
-: or* ( obj1 obj2 -- obj2/obj1 second? ) [ nip t ] [ f ] if* ; inline
+: or ( obj1 obj2 -- obj1/obj2 ) dupd ? ; inline
 
-: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
+: or* ( obj1 obj2 -- obj2/obj1 ) swap or ; inline
+
+: xor ( obj1 obj2 -- obj1/obj2/f ) [ f swap ? ] when* ; inline
 
 : both? ( x y quot -- ? ) bi@ and ; inline
 
