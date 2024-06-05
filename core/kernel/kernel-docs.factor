@@ -191,8 +191,8 @@ HELP: not
 { $notes "This word implements boolean not, so applying it to integers will not yield useful results (all integers have a true value). Bitwise not is the " { $link bitnot } " word." } ;
 
 HELP: and
-{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
-{ $description "If both inputs are true, outputs " { $snippet "obj2" } ". otherwise outputs " { $link f } "." }
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj2/f" "a generalized boolean" } }
+{ $description "If both inputs are true, outputs " { $snippet "obj2" } ". Otherwise outputs " { $link f } "." }
 { $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
@@ -201,9 +201,22 @@ HELP: and
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 and ." "12.0" }
 } ;
 
+HELP: and*
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/f" "a generalized boolean" } }
+{ $description "If both inputs are true, outputs " { $snippet "obj2" } ". Otherwise outputs " { $link f } "." }
+{ $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
+{ $examples
+    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
+    { $example "USING: kernel prettyprint ;" "t f and* ." "f" }
+    { $example "USING: kernel prettyprint ;" "t 7 and* ." "t" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 and* ." "\"hi\"" }
+} ;
+
+{ and and* } related-words
+
 HELP: or
-{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
-{ $description "If both inputs are false, outputs " { $link f } ". otherwise outputs the first of " { $snippet "obj1" } " and " { $snippet "obj2" } " which is true." }
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/obj2" "a generalized boolean" } }
+{ $description "If both inputs are false, outputs " { $link f } ". Otherwise outputs the first of " { $snippet "obj1" } " and " { $snippet "obj2" } " which is true." }
 { $notes "This word implements boolean inclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise inclusive or is the " { $link bitor } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the first true input:"
@@ -212,6 +225,42 @@ HELP: or
 } ;
 
 HELP: or*
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj2/obj1" "a generalized boolean" } }
+{ $description "If both inputs are false, outputs " { $link f } ". Otherwise outputs the first of " { $snippet "obj2" } " and " { $snippet "obj1" } " which is true." }
+{ $notes "This word implements boolean inclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise inclusive or is the " { $link bitor } " word." }
+{ $examples
+    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the first true input:"
+    { $example "USING: kernel prettyprint ;" "t f or* ." "t" }
+    { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or* ." "12.0" }
+} ;
+
+HELP: ?or
+{ $values
+    { "obj1" "a generalized boolean" }
+    { "obj2" "a generalized boolean" }
+    { "obj1/obj2" "a generalized boolean" }
+    { "first?" "boolean" }
+}
+{ $description "A version of " { $link or } " which prefers to return first argument. The output " { $snippet "first?" } " tells you which object was returned." }
+{ $examples
+    "Prefers the second argument:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f 3 ?or 2array ."
+        "{ 3 f }"
+    }
+    "Will also return the first:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "3 f ?or 2array ."
+        "{ 3 t }"
+    }
+    "Can return false:"
+    { $example "USING: arrays kernel prettyprint ;"
+        "f f ?or 2array ."
+        "{ f f }"
+    }
+} ;
+
+HELP: ?or*
 { $values
     { "obj1" "a generalized boolean" }
     { "obj2" "a generalized boolean" }
@@ -222,25 +271,25 @@ HELP: or*
 { $examples
     "Prefers the second argument:"
     { $example "USING: arrays kernel prettyprint ;"
-        "f 3 or* 2array ."
+        "f 3 ?or* 2array ."
         "{ 3 t }"
     }
     "Will also return the first:"
     { $example "USING: arrays kernel prettyprint ;"
-        "3 f or* 2array ."
+        "3 f ?or* 2array ."
         "{ 3 f }"
     }
     "Can return false:"
     { $example "USING: arrays kernel prettyprint ;"
-        "f f or* 2array ."
+        "f f ?or* 2array ."
         "{ f f }"
     }
 } ;
 
-{ or or* } related-words
+{ or or* ?or ?or* } related-words
 
 HELP: xor
-{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
+{ $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/obj2/f" "a generalized boolean" } }
 { $description "If exactly one input is false, outputs the other input. Otherwise outputs " { $link f } "." }
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
@@ -778,7 +827,7 @@ HELP: ?if
 { $values
     { "default" object } { "cond" object } { "true" object } { "false" object }
 }
-{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\nor* [ .. ] [ .. ] if" } }
+{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\n?or* [ .. ] [ .. ] if" } }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, calls " { $snippet "false" } " with the old object." }
 { $examples
     "Look up an existing word or make an error pair:"
