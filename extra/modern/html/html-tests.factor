@@ -264,3 +264,15 @@ IN: modern.html.tests
     "resource:extra/websites/factorcode/index.fhtml" utf8 file-contents
     string>html [ [ dup embedded-language? [ , ] [ drop ] if ] walk-html ] { } make length 0 >
 ] unit-test
+
+
+{ t } [
+    [[ <body> <table id="w460aac37c11b7"></table></body>]] string>html
+    [
+        {
+            [ open-tag? ]
+            [ name>> "table" = ]
+            [ props>> [ first "id" = ] find nip ?second html>display "w460aac37c11b7" head? ]
+        } 1&&
+    ] find-tag-by >boolean
+] unit-test

@@ -156,7 +156,7 @@ C: <dquote> dquote
     ] [
         2over 1 peek-from "[" sequence= [
             "[CDATA[" expect-and-span-insensitive
-            [ "]]" slice-til-string [ >string ] bi@ ] dip-2up <cdata>
+            [ "]]>" slice-til-string [ >string ] bi@ ] dip-2up <cdata>
         ] [
             "DOCTYPE" expect-and-span-insensitive
             [ read-props ] dip-2up
@@ -282,8 +282,24 @@ M: comment write-html
 
 M: string write-html % ;
 
-: html>string ( sequence -- string )
-    [ [ write-html ] each ] "" make ;
+M: sequence write-html [ write-html ] each ;
+
+: html>string ( sequence -- string ) [ write-html ] "" make ;
+
+GENERIC: write-string ( obj -- )
+
+M: string write-string [ blank? ] trim [ % ] unless-empty ;
+
+M: sequence write-string [ write-string "\n" % ] each ;
+
+M: cdata write-string value>> % ;
+
+M: dquote write-string payload>> % ;
+
+M: open-tag write-string children>> write-string ;
+
+: html>display ( sequence -- string )
+    [ write-string ] "" make ;
 
 GENERIC#: walk-html 1 ( seq/tag quot -- )
 
@@ -305,3 +321,68 @@ M: comment walk-html call( obj -- ) ;
             ] [ drop ] if
         ] walk-html
     ] { } make [ payload>> ] map ;
+
+: trim-blanks ( string -- string' ) [ blank? ] trim ;
+
+: remove-whitespace ( seq -- newseq )
+    [
+        {
+            [ string? not ]
+            [ [ blank? ] all? not ]
+        } 1||
+    ] filter ;
+
+: get-children ( obj -- seq/f ) [ children>> ] ?call ;
+: get-children-no-whitespace ( obj -- seq/f ) get-children remove-whitespace ;
+: prefix-name ( name -- name ) ":" split1 and* ;
+: local-name ( name -- name ) ":" split1 ?or* drop ;
+: find-xml-prolog ( seq -- prolog ) [ processing-instruction? ] find nip ;
+: find-xml-body ( seq -- tag ) [ open-tag? ] find nip ;
+: find-tag-named ( seq name -- tag )
+    [ [ open-tag? ] filter ] dip
+    '[ name>> local-name _ = ] find nip ;
+: find-child-tag-named ( seq name -- tag )
+    [ get-children ] dip find-tag-named ;
+: find-tag-named-any ( seq names -- tag )
+    [ [ open-tag? ] filter ] dip
+    '[ name>> _ member? ] find nip ;
+: find-child-tag-named-any ( seq names -- tag )
+    [ get-children ] dip find-tag-named-any ;
+: find-child-tags ( seq names -- tags )
+    [ find-child-tag-named ] with map ;
+: has-prop-named? ( obj name -- ? )
+    [ props>> ] dip '[ first >lower _ = ] find drop >boolean ;
+: get-prop-named ( obj name -- prop/f )
+    [ props>> ] dip '[ first >lower _ = ] find nip ;
+
+: xml-path ( seq path -- tags )
+    [
+        dup string? [ find-child-tag-named ] [ find-child-tags ] if
+    ] each ;
+
+GENERIC#: xml-find-by 1 ( obj quot: ( obj -- ? ) -- tag/f )
+
+M: string xml-find-by 2dup call( obj -- ? ) [ drop ] [ 2drop f ] if ;
+
+! the node can be nested deeply, but `find` would only return the top node
+! instead, return the deeply nested node and ignore the `find` result
+! M: sequence xml-find-by '[ _ xml-find-by ] find-deep ;
+M: sequence xml-find-by '[ _ xml-find-by ] map-find drop ;
+
+M: open-tag xml-find-by
+    2dup call( obj -- ? ) [
+        drop
+    ] [
+        [ get-children ] dip xml-find-by
+    ] if ; inline
+
+M: self-close-tag xml-find-by
+    2dup call( obj -- ? ) [
+        drop
+    ] [
+        [ get-children ] dip xml-find-by
+    ] if ; inline
+
+M: close-tag xml-find-by 2drop f ;
+
+M: doctype xml-find-by 2drop f ;
