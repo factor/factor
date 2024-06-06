@@ -136,7 +136,7 @@ CONSTANT: URL V{ }
     [ PAGE ] [ "-l" = ] bi* print-links ;
 
 : gemini-quit ( -- )
-    "gemini.txt" temp-file ?delete-file 0 exit ;
+    "gemini.txt" temp-file ?delete-file quit ;
 
 : gemini-url ( -- )
     URL ?first [ print ] when* ;

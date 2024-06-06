@@ -134,7 +134,7 @@ CONSTANT: URL V{ }
     [ PAGE ] [ "-l" = ] bi* print-links ;
 
 : gopher-quit ( -- )
-    "gopher.txt" temp-file ?delete-file 0 exit ;
+    "gopher.txt" temp-file ?delete-file quit ;
 
 : gopher-url ( -- )
     URL ?first [ print ] when* ;

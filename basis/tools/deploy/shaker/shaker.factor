@@ -509,7 +509,7 @@ SYMBOL: deploy-vocab
             ] %
         ] if
         strip-io? [ [ flush ] % ] unless
-        [ 0 exit ] %
+        [ quit ] %
     ] [ ] make
     set-startup-quot ;
 

@@ -744,7 +744,7 @@ net_bootstrap_no_pull() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save 0 exit"
+    ./$FACTOR_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save quit"
     check_ret factor
 }
 
