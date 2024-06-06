@@ -10,5 +10,5 @@ IN: db.sqlite.lib.tests
     [
         "test.db" current-directory get prepend-path <sqlite-db>
         [ current-sqlite-filename file-name ] with-db
-    ] with-unique-directory drop
+    ] with-test-directory
 ] unit-test
