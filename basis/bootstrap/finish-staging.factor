@@ -7,5 +7,5 @@ vocabs.loader ;
     (command-line) parse-command-line
     "run" get run
     output-stream get [ stream-flush ] when*
-    0 exit
+    quit
 ] set-startup-quot

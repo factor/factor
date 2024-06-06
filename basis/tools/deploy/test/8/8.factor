@@ -15,7 +15,7 @@ AFTER: my-world end-world drop close-game-input ;
              { title "Test" }
         } open-window
         1 seconds sleep
-        0 exit
+        quit
     ] with-ui ;
 
 MAIN: test-game-input
