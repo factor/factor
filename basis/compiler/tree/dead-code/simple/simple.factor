@@ -78,7 +78,7 @@ M: #introduce remove-dead-code* ( #introduce -- nodes )
     maybe-drop-dead-outputs ;
 
 M: #push remove-dead-code*
-    [ out-d>> first live-value? ] ?and ;
+    [ out-d>> first live-value? ] verify ;
 
 : dead-flushable-call? ( #call -- ? )
     dup flushable-call? [

@@ -154,7 +154,7 @@ M: object apply-object push-literal ;
     ] with-scope ; inline
 
 : ?quotation-effect ( in -- effect/f )
-    dup pair? [ second [ effect? ] ?and ] [ drop f ] if ;
+    dup pair? [ second [ effect? ] verify ] [ drop f ] if ;
 
 :: declare-effect-d ( word effect variables branches n -- )
     meta-d length :> d-length

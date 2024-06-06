@@ -198,7 +198,7 @@ M: table-cell pdf-render
         [ width>> >>col-width 0 >>x drop ]
         [
             [ [ dupd pdf-render ] map nip ] change-contents
-            [ contents>> [ ] any? ] ?and
+            [ contents>> [ ] any? ] verify
         ]
         [
             width>> table-cell-padding +
@@ -228,7 +228,7 @@ M: table-row pdf-render
                     ] map swap max-y >>y drop
                 ] change-cells
 
-                [ cells>> [ ] any? ] ?and
+                [ cells>> [ ] any? ] verify
             ]
         ]
         [ drop margin>> 54 >>left drop ]

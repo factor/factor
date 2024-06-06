@@ -453,7 +453,7 @@ SYMBOL: rom-root
 
 : rom-dir ( -- string )
     rom-root get [
-        "~/roms" [ file-exists? ] ?and
+        "~/roms" [ file-exists? ] verify
     ] unless* ;
 
 : load-rom* ( seq cpu -- )
