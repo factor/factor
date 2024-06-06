@@ -180,6 +180,7 @@ SYMBOL: interactive-vocabs
     "stack-checker"
     "strings"
     "syntax"
+    "system"
     "tools.annotations"
     "tools.crossref"
     "tools.deprecation"
