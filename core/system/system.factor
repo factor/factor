@@ -36,38 +36,6 @@ UNION: unix macosx linux freebsd bsd ;
 
 : vm-compile-time ( -- string ) \ vm-compile-time get-global ;
 
-<PRIVATE
-
-CONSTANT: string>cpu-hash H{
-    { "x86.32" x86.32 }
-    { "x86.64" x86.64 }
-    { "arm.32" arm.32 }
-    { "arm.64" arm.64 }
-    { "ppc.32" ppc.32 }
-    { "ppc.64" ppc.64 }
-}
-
-CONSTANT: string>os-hash H{
-    { "windows" windows }
-    { "macosx" macosx }
-    { "freebsd" freebsd }
-    { "linux" linux }
-}
-
-: string>cpu ( str -- class )
-    string>cpu-hash at ;
-
-: string>os ( str -- class )
-    string>os-hash at ;
-
-PRIVATE>
-
-: image-path ( -- path ) \ image-path get-global ;
-
-: vm-path ( -- path ) \ vm-path get-global ;
-
-: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
-
 : vm-info ( -- str )
     ! formatting vocab not available in this context.
     [
@@ -79,6 +47,34 @@ PRIVATE>
         vm-compile-time % ")\n[" %
         vm-compiler % "] on " % os name>> %
     ] "" make ;
+
+: vm-path ( -- path ) \ vm-path get-global ;
+
+<PRIVATE
+
+: string>cpu ( str -- class )
+    H{
+        { "x86.32" x86.32 }
+        { "x86.64" x86.64 }
+        { "arm.32" arm.32 }
+        { "arm.64" arm.64 }
+        { "ppc.32" ppc.32 }
+        { "ppc.64" ppc.64 }
+    } at ;
+
+: string>os ( str -- class )
+    H{
+        { "windows" windows }
+        { "macosx" macosx }
+        { "freebsd" freebsd }
+        { "linux" linux }
+    } at ;
+
+PRIVATE>
+
+: image-path ( -- path ) \ image-path get-global ;
+
+: embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
 : exit ( n -- * )
     [ do-shutdown-hooks (exit) ] ignore-errors
