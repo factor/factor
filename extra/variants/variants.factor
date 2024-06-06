@@ -9,9 +9,7 @@ IN: variants
 PREDICATE: variant-class < mixin-class "variant?" word-prop ;
 
 M: variant-class initial-value*
-    class-members [ f f ] [
-        first dup singleton-class? [ t ] [ initial-value* ] if
-    ] if-empty ;
+    class-members [ f f ] [ first initial-value* ] if-empty ;
 
 : define-tuple-class-and-boa-word ( class superclass slots -- )
     pick [ define-tuple-class ] dip
