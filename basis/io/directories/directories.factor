@@ -137,7 +137,7 @@ PRIVATE>
 
 : find-file ( path quot: ( ... name -- ... ? ) -- path/f )
     [ bfs? <directory-iterator> ] dip
-    '[ _ keep and ] iterate-directory ; inline
+    '[ _ verify ] iterate-directory ; inline
 
 : find-files ( path quot: ( ... name -- ... ? ) -- paths )
     selector [ each-file ] dip ; inline
