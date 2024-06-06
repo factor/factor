@@ -406,7 +406,7 @@ interactor "completion" f {
         H{ { font-size $ default-font-size } } [
             { $tip-of-the-day } print-element nl
             { $strong "Press " { $snippet "F1" } " at any time for help." } print-element nl
-            version-info print-element
+            vm-info print-element
         ] with-style
     ] with-default-style nl nl ;
 

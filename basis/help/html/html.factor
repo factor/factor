@@ -137,7 +137,7 @@ M: pathname url-of
     XML] ;
 
 : help-footer ( -- xml )
-    version-info "\n" split1 drop
+    vm-info "\n" split1 drop
     [XML
         <footer>
         <p>
