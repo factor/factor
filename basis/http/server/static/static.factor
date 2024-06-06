@@ -159,7 +159,7 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : find-index ( filename -- path )
     file-responder get index-names>>
-    [ append-path [ file-exists? ] ?and ] with map-find
+    [ append-path [ file-exists? ] verify ] with map-find
     drop ;
 
 : serve-directory ( filename -- response )

@@ -11,7 +11,7 @@ TUPLE: just-parser p1 ;
 
 M: just-parser parser-quot
     p1>> execute-parser-quot [
-        [ [ remaining>> empty? ] ?and ] ?call
+        [ [ remaining>> empty? ] verify ] ?call
     ] compose ;
 
 PRIVATE>

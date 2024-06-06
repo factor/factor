@@ -275,35 +275,35 @@ PRIVATE>
         reverse [ key>> before=? ] with find nip
     ] if-empty ;
 
-: first-node ( tree -- node ) root>> dup [ left-extremity ] when ;
+: first-node ( tree -- node ) root>> [ left-extremity ] ?call ;
 
-: last-node ( tree -- node ) root>> dup [ right-extremity ] when ;
+: last-node ( tree -- node ) root>> [ right-extremity ] ?call ;
 
 PRIVATE>
 
-: lower-entry ( key tree -- pair/f ) lower-node dup [ node>entry ] when ;
+: lower-entry ( key tree -- pair/f ) lower-node [ node>entry ] ?call ;
 
-: higher-entry ( key tree -- pair/f ) higher-node dup [ node>entry ] when ;
+: higher-entry ( key tree -- pair/f ) higher-node [ node>entry ] ?call ;
 
-: floor-entry ( key tree -- pair/f ) floor-node dup [ node>entry ] when ;
+: floor-entry ( key tree -- pair/f ) floor-node [ node>entry ] ?call ;
 
-: ceiling-entry ( key tree -- pair/f ) ceiling-node dup [ node>entry ] when ;
+: ceiling-entry ( key tree -- pair/f ) ceiling-node [ node>entry ] ?call ;
 
-: first-entry ( tree -- pair/f ) first-node dup [ node>entry ] when ;
+: first-entry ( tree -- pair/f ) first-node [ node>entry ] ?call ;
 
-: last-entry ( tree -- pair/f ) last-node dup [ node>entry ] when ;
+: last-entry ( tree -- pair/f ) last-node [ node>entry ] ?call ;
 
-: lower-key ( key tree -- key/f ) lower-node dup [ key>> ] when ;
+: lower-key ( key tree -- key/f ) lower-node [ key>> ] ?call ;
 
-: higher-key ( key tree -- key/f ) higher-node dup [ key>> ] when ;
+: higher-key ( key tree -- key/f ) higher-node [ key>> ] ?call ;
 
-: floor-key ( key tree -- key/f ) floor-node dup [ key>> ] when ;
+: floor-key ( key tree -- key/f ) floor-node [ key>> ] ?call ;
 
-: ceiling-key ( key tree -- key/f ) ceiling-node dup [ key>> ] when ;
+: ceiling-key ( key tree -- key/f ) ceiling-node [ key>> ] ?call ;
 
-: first-key ( tree -- key/f ) first-node dup [ key>> ] when ;
+: first-key ( tree -- key/f ) first-node [ key>> ] ?call ;
 
-: last-key ( tree -- key/f ) last-node dup [ key>> ] when ;
+: last-key ( tree -- key/f ) last-node [ key>> ] ?call ;
 
 <PRIVATE
 
