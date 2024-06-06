@@ -28,11 +28,9 @@ UNION: unix macosx linux freebsd bsd ;
 
 : vm-git-label ( -- string ) \ vm-git-label get-global ;
 
-: vm-git-ref ( -- string )
-    vm-git-label "-" split1-last drop ;
+: vm-git-ref ( -- string ) vm-git-label "-" split1-last drop ;
 
-: vm-git-id ( -- string )
-    vm-git-label "-" split1-last nip ;
+: vm-git-id ( -- string ) vm-git-label "-" split1-last nip ;
 
 : vm-compiler ( -- string ) \ vm-compiler get-global ;
 
@@ -70,7 +68,7 @@ PRIVATE>
 
 : embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
-: version-info ( -- str )
+: vm-info ( -- str )
     ! formatting vocab not available in this context.
     [
         "Factor " % vm-version %

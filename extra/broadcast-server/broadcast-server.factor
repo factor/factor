@@ -69,7 +69,7 @@ SINGLETONS: command data ;
         ] loop
     ] in-thread ;
 
-: payload ( -- byte-array )
+: payload ( -- assoc )
     [
         computer-name "computer-name" ,,
         os unparse "os" ,,
@@ -80,7 +80,7 @@ SINGLETONS: command data ;
 
         build "build" ,,
         vm-git-id "git-id" ,,
-        version-info "version-info" ,,
+        vm-info "version-info" ,,
         vm-path "vm-path" ,,
         vm-path file-info size>> "vm-size" ,,
         image-path "image-path" ,,
