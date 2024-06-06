@@ -9,18 +9,18 @@ VARIANT: tree
     ;
 
 { t } [
-    4 0 [ swap
+    4 0 BEND[ swap
         [ <leaf> ]
         [ 1 - swap 2 * [ fork ] [ 1 + fork ] 2bi <branch> ]
         if-zero
-    ] bend( depth val -- tree ) tree? ] unit-test
+    ] tree? ] unit-test
 
 { 120 } [
-    4 0 [ swap
+    4 0 BEND[ swap
         [ <leaf> ]
         [ 1 - swap 2 * [ fork ] [ 1 + fork ] 2bi <branch> ]
         if-zero
-    ] bend( depth val -- tree ) {
+    ] {
         { leaf [ ] }
         { branch [ + ] }
     } fold ] unit-test
