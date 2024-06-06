@@ -1,16 +1,9 @@
 ! Copyright (C) 2024 Keldan Chapman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes classes.algebra classes.tuple
-combinators effects.parser kernel namespaces quotations
-sequences sequences.deep splitting ;
+USING: accessors classes classes.algebra classes.tuple
+hashtables kernel parser quotations sequences stack-checker
+vocabs.parser words ;
 IN: bend
-
-<PRIVATE
-
-: deep-map-postorder ( ... obj quot: ( ... elt -- ... elt' ) -- ... newobj )
-    over branch? [ [ [ deep-map-postorder ] curry map ] keep ] when call ; inline recursive
-
-PRIVATE>
 
 : fold ( ... obj branches -- ... value )
     [
@@ -21,11 +14,7 @@ PRIVATE>
         [ _ fold ] when ] [ ] 2map-as
     ] dip compose call( ... -- ... value ) ; inline recursive
 
-SYMBOL: fork
-
-: bend ( quot effect -- )
-    [
-        dupd \ bend 3array '[ dup sequence? [ { fork } _ replace ] when ] deep-map-postorder
-    ] keep call-effect ; inline
-
-SYNTAX: bend( \ bend parse-call-paren ;
+SYNTAX: BEND[
+    gensym dup
+    dup "fork" associate [ parse-quotation ] with-words
+    dup infer define-declared suffix! ;
