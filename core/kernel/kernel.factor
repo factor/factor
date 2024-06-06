@@ -290,8 +290,6 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : and* ( obj1 obj2 -- obj1/f ) swap and ; inline
 
-: ?and ( obj quot -- obj/f ) keep and ; inline
-
 : or ( obj1 obj2 -- obj1/obj2 ) dupd ? ; inline
 
 : or* ( obj1 obj2 -- obj2/obj1 ) swap or ; inline
@@ -305,6 +303,19 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : most ( x y quot -- z ) 2keep ? ; inline
 
 : negate ( quot -- quot' ) [ not ] compose ; inline
+
+: guard ( ..a x quot: ( ..a -- ..a ) -- ..a x ? ) keep swap ; inline
+
+: verify ( ..a quot: ( ..a -- ..a ) -- ..a ) keep and ; inline
+
+: guard-when ( obj quot: ( ..a obj -- ..a obj/f ) true: ( ..a obj -- ..b ) -- )
+    [ verify dup ] dip when ; inline
+
+: guard-unless ( obj quot: ( ..a obj -- ..a obj/f ) false: ( ..a obj -- ..b ) -- )
+    [ guard ] dip unless ; inline
+
+: guard-if ( obj quot: ( ..a obj -- ..a obj/f ) true: ( ..a obj -- ..b ) false: ( ..a obj -- ..b ) -- )
+    [ guard ] 2dip if ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
