@@ -43,6 +43,17 @@ IN: terminfo.tests
     00 0b 00 0a 00"
     [ hex-digit? ] filter hex-string>bytes ;
 
+! The "EMCA with strikeout" terminfo file, which uses curses 5 extensions.
+: test-terminfo-extended ( -- bytes )
+   "1a 01 2d 00 00 00 00 00  00 00 00 00 65 63 6d 61
+    2b 73 74 72 69 6b 65 6f  75 74 7c 45 43 4d 41 2d
+    34 38 20 73 74 72 69 6b  65 6f 75 74 2f 63 72 6f
+    73 73 65 64 2d 6f 75 74  00 00 00 00 00 00 02 00
+    04 00 15 00 00 00 06 00  00 00 05 00 1b 5b 32 39
+    6d 00 1b 5b 39 6d 00 72  6d 78 78 00 73 6d 78 78
+    00"
+    [ hex-digit? ] filter hex-string>bytes ;
+
 CONSTANT: ADM3-TERMINFO {
     H{
         { ".names" { "adm3a" "lsi adm3a" } }
@@ -82,4 +93,11 @@ ADM3-TERMINFO [
 
 { t } [
     test-terminfo-sysv test-terminfo-32bit [ bytes>terminfo ] bi@ =
+] unit-test
+
+
+{
+  H{ { ".names" { "ecma+strikeout" "ECMA-48 strikeout/crossed-out" } } { "rmxx" "\x1B[29m" } { "smxx" "\x1B[9m" } }
+} [
+  test-terminfo-extended bytes>terminfo
 ] unit-test
