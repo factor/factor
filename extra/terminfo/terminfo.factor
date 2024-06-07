@@ -4,8 +4,9 @@
 USING: accessors assocs combinators endian environment
 formatting fry grouping hashtables io io.directories
 io.encodings.binary io.files io.files.info io.files.types
-io.pathnames kernel make math math.parser memoize pack sequences
-sequences.generalizations splitting strings system ;
+io.pathnames io.streams.byte-array kernel make math math.parser
+memoize pack sequences sequences.generalizations splitting
+strings system ;
 
 IN: terminfo
 
@@ -26,21 +27,26 @@ IN: terminfo
 
 <PRIVATE
 
-CONSTANT: MAGIC 0o432
-
+! The two formats are largely identical; the only difference is that SysV
+! format uses int16_t for the number table and Curses 6.1 format uses
+! int32_t. Note that other numeric values, like the header and indexes
+! into the string table, are int16_t in both formats.
+CONSTANT: SYSV-MAGIC 0o432
+CONSTANT: CURSES6-MAGIC 0o1036
 ERROR: bad-magic ;
 
-: check-magic ( n -- )
-    MAGIC = [ bad-magic ] unless ;
-
-TUPLE: terminfo-header names-bytes boolean-bytes #numbers
-#strings string-bytes ;
+TUPLE: terminfo-header magic names-bytes boolean-bytes
+    #numbers #strings string-bytes ;
 
 C: <terminfo-header> terminfo-header
 
+: check-magic ( header -- )
+    magic>> [ SYSV-MAGIC = ] [ CURSES6-MAGIC = ] bi or
+    [ bad-magic ] unless ;
+
 : read-header ( -- header )
-    12 read "ssssss" unpack-le unclip check-magic
-    5 firstn <terminfo-header> ;
+    12 read "ssssss" unpack-le 6 firstn <terminfo-header>
+    [ check-magic ] keep ;
 
 : read-names ( header -- names )
     names-bytes>> read but-last "|" split [ >string ] map ;
@@ -48,15 +54,22 @@ C: <terminfo-header> terminfo-header
 : read-booleans ( header -- booleans )
     boolean-bytes>> read [ 1 = ] { } map-as ;
 
-: read-shorts ( n -- seq' )
-    2 * read 2 <groups> [ signed-le> dup 0 < [ drop f ] when ] map ;
+: read-ints ( n size -- seq )
+    [ * read ] keep <groups> [ signed-le> dup 0 < [ drop f ] when ] map ;
+
+: read-shorts ( n -- seq ) 2 read-ints ;
+: read-longs ( n -- seq ) 4 read-ints ;
 
 : align-even-bytes ( header -- )
     [ names-bytes>> ] [ boolean-bytes>> ] bi + odd?
     [ read1 drop ] when ;
 
 : read-numbers ( header -- numbers )
-    [ align-even-bytes ] [ #numbers>> read-shorts ] bi ;
+    [ align-even-bytes ] [ #numbers>> ] [ magic>> ] tri
+    {
+        { SYSV-MAGIC [ read-shorts ] }
+        { CURSES6-MAGIC [ read-longs ] }
+    } case ;
 
 : string-offset ( from seq -- str )
     0 2over index-from swap subseq >string ;
