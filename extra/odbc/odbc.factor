@@ -279,7 +279,7 @@ ERROR: odbc-statement-error state native-code message ;
     swap succeeded? [ drop ] [ throw-statement-error ] if ;
 
 : alloc-handle ( type parent -- handle )
-    f void* <ref> [ SQLAllocHandle ] keep swap succeeded? [
+    f void* <ref> [ SQLAllocHandle ] guard succeeded? [
         void* deref
     ] [
         drop f
@@ -339,7 +339,7 @@ DESTRUCTOR: odbc-free-statement
 : odbc-next-row ( statement -- bool ) SQLFetch succeeded? ;
 
 : odbc-number-of-columns ( statement -- number )
-    0 short <ref> [ SQLNumResultCols succeeded? ] keep swap [
+    0 short <ref> [ SQLNumResultCols succeeded? ] guard [
         short deref
     ] [
         drop f

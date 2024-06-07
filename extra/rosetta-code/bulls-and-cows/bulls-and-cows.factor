@@ -84,7 +84,7 @@ TUPLE: bull ;
 
 : main-loop ( x -- )
     "Enter a 4 digit number: " write flush validate-readln num>hash swap
-    [ sum-score swap score-to-answer print flush ] keep swap not
+    [ sum-score swap score-to-answer print flush ] guard not
     [ main-loop ] [ drop win ] if ;
 
 : bulls-and-cows-main ( -- ) new-number drop narr>nhash main-loop ;

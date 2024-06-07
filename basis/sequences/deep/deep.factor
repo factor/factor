@@ -36,7 +36,7 @@ M: object branch? drop f ;
     [ not ] compose deep-filter ; inline
 
 : (deep-find) ( ... obj quot: ( ... elt -- ... ? ) -- ... elt ? )
-    [ call ] 2keep rot [ drop t ] [
+    [ call ] 2guard [ drop t ] [
         over branch? [
             [ f ] 2dip '[ nip _ (deep-find) ] any?
         ] [ 2drop f f ] if

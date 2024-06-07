@@ -36,13 +36,13 @@ IN: windows.processes
 
 : get-process-list ( -- processes )
     [
-        PROCESSENTRY32 <struct> [ dup byte-length >>dwSize Process32FirstW check-snapshot ] 2keep rot [
+        PROCESSENTRY32 <struct> [ dup byte-length >>dwSize Process32FirstW check-snapshot ] 2guard [
             [
                 [
                     PROCESSENTRY32 <struct> [
                         dup byte-length >>dwSize Process32NextW
                         check-snapshot
-                    ] 2keep rot
+                    ] 2guard
                 ] [
                 ] produce
             ] dip prefix 2nip
@@ -54,13 +54,13 @@ IN: windows.processes
 : get-process-modules ( dwPid -- processes )
     [
         MODULEENTRY32W <struct> [
-            dup byte-length >>dwSize Module32FirstW check-snapshot ] 2keep rot [
+            dup byte-length >>dwSize Module32FirstW check-snapshot ] 2guard [
             [
                 [
                     MODULEENTRY32W <struct> [
                         dup byte-length >>dwSize
                         Module32NextW check-snapshot
-                    ] 2keep rot
+                    ] 2guard
                 ] [
                 ] produce
             ] dip prefix 2nip
@@ -72,13 +72,13 @@ IN: windows.processes
 : get-process-threads ( dwPid -- processes )
     [
         THREADENTRY32 <struct> [
-            dup byte-length >>dwSize Thread32First check-snapshot ] 2keep rot [
+            dup byte-length >>dwSize Thread32First check-snapshot ] 2guard [
             [
                 [
                     THREADENTRY32 <struct> [
                         dup byte-length >>dwSize
                         Thread32Next check-snapshot
-                    ] 2keep rot
+                    ] 2guard
                 ] [
                 ] produce
             ] dip prefix 2nip
@@ -93,7 +93,7 @@ IN: windows.processes
     ] dip [ Heap32First check-snapshot ] 3keep 2drop dup clone rot
     [
         [
-            [ Heap32Next check-snapshot ] keep swap
+            [ Heap32Next check-snapshot ] guard
         ] [ dup clone ] produce swap prefix nip
     ] [
         1array nip
@@ -101,12 +101,12 @@ IN: windows.processes
 
 : get-heap-lists ( -- heaplists )
     [
-        HEAPLIST32 <struct> [ dup byte-length >>dwSize Heap32ListFirst check-snapshot ] 2keep rot [
+        HEAPLIST32 <struct> [ dup byte-length >>dwSize Heap32ListFirst check-snapshot ] 2guard [
             ! dup th32HeapID>> get-heap-entries describe
             [
                 [
                     HEAPLIST32 <struct>
-                    [ dup byte-length >>dwSize Heap32ListNext check-snapshot ] 2keep rot
+                    [ dup byte-length >>dwSize Heap32ListNext check-snapshot ] 2guard
                 ] [
                 ] produce
             ] dip prefix 2nip

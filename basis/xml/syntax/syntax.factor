@@ -163,7 +163,7 @@ MACRO: interpolate-xml ( xml -- quot )
 
 : parse-def ( accum delimiter quot -- accum )
     [ parse-multiline-string [ blank? ] trim ] dip call
-    [ extract-variables collect ] keep swap
+    [ extract-variables collect ] guard
     [ number<-> suffix! ] dip
     [ \ interpolate-xml suffix! ] when ; inline
 

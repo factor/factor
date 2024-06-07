@@ -115,7 +115,7 @@ C: <snake-part> snake-part
 
 : snake-will-eat-itself? ( snake-game -- ? )
     [ snake>> ] [ snake-loc>> ] [ snake-dir>> ] tri move-loc
-    [ snake-occupied-locs rest ] keep swap member? ;
+    [ snake-occupied-locs rest ] guard member? ;
 
 : game-over ( snake-game -- )
     t >>game-over? drop ;

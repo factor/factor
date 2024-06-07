@@ -48,11 +48,11 @@ PRIVATE>
 :: (split-harvest) ( ... seq quot: ( ... elt -- ... ? ) slice-quot -- ... pieces )
     seq [ quot call not ] find drop [
         [
-            [ seq quot find-from drop ] keep swap
+            [ seq quot find-from drop ] guard
             [ seq length ] unless* dup
         ] [ f f f ] if*
     ] [
-        [ seq slice-quot call ] keep swap
+        [ seq slice-quot call ] guard
         [ 1 + seq [ quot call not ] find-from drop ] dip
     ] produce 2nip ; inline
 

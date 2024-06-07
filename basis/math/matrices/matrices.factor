@@ -69,7 +69,7 @@ PREDICATE: zero-square-matrix < square-matrix
     [ (nth-from-tail) ] keep nth-unsafe ; inline flushable
 
 : array-nth-end-unsafe ( n seq -- elt )
-    [ (nth-from-tail) ] keep swap 2 fixnum+fast slot ; inline flushable
+    [ (nth-from-tail) ] guard 2 fixnum+fast slot ; inline flushable
 
 : set-nth-end ( elt n seq -- )
     [ (nth-from-tail) ] keep set-nth ; inline

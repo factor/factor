@@ -293,7 +293,7 @@ M: table pdf-render
         [
             [
                 dup rows>> empty? [ t ] [
-                    [ rows>> first dupd pdf-render ] keep swap
+                    [ rows>> first dupd pdf-render ] guard
                 ] if
             ] [ [ rest ] change-rows ] until nip
             dup rows>> [ drop f ] [ drop ] if-empty

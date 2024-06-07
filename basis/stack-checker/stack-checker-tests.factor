@@ -184,7 +184,7 @@ DEFER: blah4
     over [
         2drop
     ] [
-        [ dip ] keep swap bad-combinator
+        [ dip ] guard bad-combinator
     ] if ; inline recursive
 
 [ [ [ 1 ] [ ] bad-combinator ] infer ] must-fail
