@@ -88,7 +88,7 @@ M: vocab-link vocab-root? drop f ;
     [ main-file-string 1array ] dip utf8 set-file-lines ;
 
 : scaffold-main ( vocab-root vocab -- )
-    [ ".factor" vocab-root/vocab/suffix>path ] keep swap scaffolding? [
+    [ ".factor" vocab-root/vocab/suffix>path ] guard scaffolding? [
         set-scaffold-main-file
     ] [
         2drop

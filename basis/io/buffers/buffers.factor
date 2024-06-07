@@ -88,7 +88,7 @@ TYPED: buffer-find ( seps buffer: buffer -- n/f )
 <PRIVATE
 
 : search-buffer-until ( seps buffer -- buffer n/f )
-    [ buffer-find ] keep swap ; inline
+    [ buffer-find ] guard ; inline
 
 : finish-buffer-until ( buffer n -- byte-array sep/f )
     [

@@ -35,7 +35,7 @@ IN: io.files.acls.macosx
 DESTRUCTOR: free-acl
 
 : get-acl-entry ( acl_t n -- acl_entry_t )
-    f acl_entry_t <ref> [ acl_get_entry ] keep swap -1 = [ drop f ] when ;
+    f acl_entry_t <ref> [ acl_get_entry ] guard -1 = [ drop f ] when ;
 
 : first-acl-entry ( acl_t -- acl_entry_t ) ACL_FIRST_ENTRY get-acl-entry ;
 : next-acl-entry ( acl_t -- acl_entry_t ) ACL_NEXT_ENTRY get-acl-entry ;

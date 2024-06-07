@@ -7,7 +7,7 @@ IN: sodium.tests
 { t } [
     "Encrypted message" dup utf8 encode
     crypto-box-nonce 2 [ crypto-box-keypair 2array ] times
-    [ [ first ] [ second ] bi* crypto-box-easy ] 3keep swap
+    [ [ first ] [ second ] bi* crypto-box-easy ] 3guard
     [ first ] [ second ] bi* crypto-box-open-easy utf8 decode =
 ] unit-test
 

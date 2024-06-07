@@ -91,7 +91,7 @@ PRIVATE>
 
 : split-indices ( seq indices -- pieces )
     over length suffix 0 swap [
-        [ pick subseq ] keep swap
+        [ pick subseq ] guard
     ] map 2nip ;
 
 <PRIVATE

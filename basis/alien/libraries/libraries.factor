@@ -78,7 +78,7 @@ M: library dispose dll>> [ dispose ] when* ;
 
 : update-library ( name path abi -- )
     pick lookup-library [
-        [ 2over same-library? not ] keep swap
+        [ 2over same-library? not ] guard
         [ change-dll drop ] [ 4drop ] if
     ] [
         make-library swap libraries get set-at

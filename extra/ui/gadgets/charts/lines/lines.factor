@@ -238,7 +238,7 @@ PRIVATE>
     dup empty? [ nip ] [
         dupd [ first ] dip clip-by-x
         dup empty? [ nip ] [
-            [ second ] dip [ y-in-bounds? ] keep swap
+            [ second ] dip [ y-in-bounds? ] guard
             [ drop { } ] unless
         ] if
     ] if ;

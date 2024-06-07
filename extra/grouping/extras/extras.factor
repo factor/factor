@@ -65,7 +65,7 @@ PRIVATE>
     0 n [| i |
         dup len < [
             dup step + i j < [ 1 + ] when
-            [ seq <slice> ] keep swap
+            [ seq <slice> ] guard
         ] [ f ] if
     ] map-integers nip ;
 

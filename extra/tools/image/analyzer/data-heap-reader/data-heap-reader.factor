@@ -103,4 +103,4 @@ M: tuple read-payload ( rel-base tuple -- payload )
     peek-read-object object-tag tag>class read-struct ;
 
 : read-object ( rel-base -- object )
-    tell-input swap (read-object) [ read-payload ] keep swap heap-node boa ;
+    tell-input swap (read-object) [ read-payload ] guard heap-node boa ;

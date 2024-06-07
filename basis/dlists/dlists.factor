@@ -73,7 +73,7 @@ M: dlist equal?
 
 : (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f )
     over [
-        [ call ] 2keep rot
+        [ call ] 2guard
         [ drop ] [ [ next>> ] dip (dlist-find-node) ] if
     ] [ 2drop f ] if ; inline recursive
 
@@ -183,7 +183,7 @@ M: dlist clear-deque
 
 : dlist-filter ( ... dlist quot: ( ... value -- ... ? ) -- ... dlist' )
     <dlist> [
-        '[ _ keep swap [ _ push-back ] [ drop ] if ] dlist-each
+        '[ _ guard [ _ push-back ] [ drop ] if ] dlist-each
     ] keep ; inline
 
 M: dlist clone

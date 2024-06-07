@@ -84,7 +84,7 @@ M: bad-byte-array-length summary
     drop "Byte array length doesn't divide type width" ;
 
 : cast-array ( byte-array c-type -- array )
-    [ binary-object ] dip [ heap-size /mod 0 = ] keep swap
+    [ binary-object ] dip [ heap-size /mod 0 = ] guard
     [ <c-direct-array> ] [ bad-byte-array-length ] if ; inline
 
 : malloc-array ( n c-type -- array )

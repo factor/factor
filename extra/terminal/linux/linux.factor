@@ -21,7 +21,7 @@ PRIVATE>
 
 M: unix (terminal-size)
     stdout-handle fileno TIOCGWINSZ winsize new
-    [ ioctl ] keep swap 0 < [
+    [ ioctl ] guard 0 < [
         drop 0 0
     ] [
         [ ws_col>> ] [ ws_row>> ] bi

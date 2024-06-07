@@ -70,7 +70,7 @@ PRIVATE>
 SYMBOL: generic-word
 
 : make-math-method-table ( classes quot: ( ... class -- ... quot ) -- alist )
-    [ bootstrap-words ] dip [ keep swap ] curry map>alist ; inline
+    [ bootstrap-words ] dip [ guard ] curry map>alist ; inline
 
 : math-alist>quot ( alist -- quot )
     [ generic-word get object-method ] dip alist>quot ;
