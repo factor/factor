@@ -110,7 +110,7 @@ MACRO: cleave-array ( quots -- quot )
     currier quad@ ; inline
 
 MACRO: smart-plox ( true: ( ... -- x ) -- quot )
-    [ inputs [ 1 - [ and ] n*quot ] keep ] keep swap
+    [ inputs [ 1 - [ and ] n*quot ] keep ] guard
     '[ _ _ [ _ ndrop f ] smart-if ] ;
 
 : throttle ( quot millis -- quot' )
@@ -122,11 +122,17 @@ MACRO: smart-plox ( true: ( ... -- x ) -- quot )
 : swap-when ( x y quot: ( x -- n ) quot: ( n n -- ? ) -- x' y' )
     '[ _ _ 2dup _ bi@ @ [ swap ] when ] call ; inline
 
+: 2false-unless ( obj1 obj2 ? -- f f )
+    [ 2drop f f ] unless ; inline
+
 : 2falsify ( obj1 obj2 -- obj1/f obj2/f )
-    2dup and [ 2drop f f ] unless ; inline
+    2dup and 2false-unless ; inline
+
+: 3false-unless ( obj1 obj2 obj3 ? -- f f f )
+    [ 3drop f f f ] unless ; inline
 
 : 3falsify ( obj1 obj2 obj3 -- obj1/f obj2/f obj3/f )
-    3dup and and [ 3drop f f f ] unless ; inline
+    3dup and and 3false-unless ; inline
 
 MACRO: n-and ( n -- quot )
     1 [-] [ and ] n*quot ;

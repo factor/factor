@@ -100,7 +100,7 @@ M: command-loop find-command ( name command-loop -- command )
 
 M: command-loop handle-command
     swap " " split1 swap >lower
-    [ pick find-command ] keep swap [
+    [ pick find-command ] guard [
         nip quot>> call( args -- ) drop
     ] [
         rot missing-command

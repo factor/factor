@@ -124,7 +124,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 : spill/reloads-for-call-gc ( ##call-gc -- spill-seq )
     [ gc-map>> gc-roots>> ] [ insn#>> ] bi
-    [ spill-intervals ] keep swap spill/reloads ;
+    [ spill-intervals ] guard spill/reloads ;
 
 : emit-##call-gc ( insn -- )
     dup spill/reloads-for-call-gc

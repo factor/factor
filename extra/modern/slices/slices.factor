@@ -27,7 +27,7 @@ IN: modern.slices
     ] if ;
 
 : accept1 ( n string quot: ( ch -- ? ) -- n/n' string ch/f )
-    [ 2dup nth ] dip keep swap [ [ 1 + ] 2dip ] [ drop f ] if ; inline
+    [ 2dup nth ] dip guard [ [ 1 + ] 2dip ] [ drop f ] if ; inline
 
 ERROR: unexpected-end n string ;
 : nth-check-eof ( n string -- nth )

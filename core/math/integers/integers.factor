@@ -141,7 +141,7 @@ M: bignum (log2) bignum-log2 ; inline
 
 : pre-scale ( num den -- epsilon? num' den' scale )
     scale-denonimator [
-        [ scale-numerator ] keep swap
+        [ scale-numerator ] guard
     ] dip swap - ; inline
 
 ! Second step: compute mantissa

@@ -46,7 +46,7 @@ TUPLE: avl-node < node balance ;
             node-link current-side get neg
             over pick-balances rot 0 swap balance<<
         ] keep balance<<
-    ] keep swap >>balance
+    ] guard >>balance
     dup node+link [ rotate ] with-other-side
     over set-node+link rotate ;
 

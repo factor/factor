@@ -69,7 +69,7 @@ M: object model-changed 2drop ;
     [ push ] bi ;
 
 : remove-connection ( observer model -- )
-    [ connections>> remove! ] keep swap
+    [ connections>> remove! ] guard
     empty? [ deactivate-model ] [ drop ] if ;
 
 : with-locked-model ( model quot -- )

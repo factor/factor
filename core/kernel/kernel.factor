@@ -304,9 +304,13 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : negate ( quot -- quot' ) [ not ] compose ; inline
 
-: guard ( ..a x quot: ( ..a -- ..a ) -- ..a x ? ) keep swap ; inline
+: guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b ? ) keep swap ; inline
 
-: verify ( ..a quot: ( ..a -- ..a ) -- ..a ) keep and ; inline
+: 2guard ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b ? ) 2keep rot ; inline
+
+: 3guard ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b ? ) 3keep roll ; inline
+
+: verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
 
 : guard-when ( obj quot: ( ..a obj -- ..a obj/f ) true: ( ..a obj -- ..b ) -- )
     [ verify dup ] dip when ; inline

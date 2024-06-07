@@ -12,7 +12,7 @@ C: <suffixed> suffixed
 M: suffixed length seq>> length 1 + ;
 
 M: suffixed nth-unsafe
-    [ seq>> 2dup bounds-check? ] keep swap
+    [ seq>> 2dup bounds-check? ] guard
     [ drop nth-unsafe ] [ 2nip elt>> ] if ;
 
 INSTANCE: suffixed immutable-sequence

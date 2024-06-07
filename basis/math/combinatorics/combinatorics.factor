@@ -42,7 +42,7 @@ PRIVATE>
 <PRIVATE
 
 : factoradic ( n -- factoradic )
-    0 [ over 0 > ] [ 1 + [ /mod ] keep swap ] produce reverse! 2nip ;
+    0 [ over 0 > ] [ 1 + [ /mod ] guard ] produce reverse! 2nip ;
 
 : bump-indices ( seq n -- )
     '[ dup _ >= [ 1 + ] when ] map! drop ; inline
@@ -133,7 +133,7 @@ PRIVATE>
 <PRIVATE
 
 : cut-point ( seq -- n )
-    [ last-unsafe ] keep [ [ > ] keep swap ] find-last drop nip ; inline
+    [ last-unsafe ] keep [ [ > ] guard ] find-last drop nip ; inline
 
 : greater-from-last ( n seq -- i )
     [ nip ] [ nth-unsafe ] 2bi [ > ] curry find-last drop ; inline
@@ -218,7 +218,7 @@ PRIVATE>
     combinations-with-replacement-quot all? ; inline
 
 : find-combination-with-replacement ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ keep swap ] combinations-with-replacement-quot find drop and* ; inline
+    [ f ] 3dip '[ nip _ guard ] combinations-with-replacement-quot find drop and* ; inline
 
 : reduce-combinations-with-replacement ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination-with-replacement ; inline
@@ -308,7 +308,7 @@ PRIVATE>
     combinations-quot all? ; inline
 
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ keep swap ] combinations-quot find drop and* ; inline
+    [ f ] 3dip '[ nip _ guard ] combinations-quot find drop and* ; inline
 
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination ; inline
@@ -352,7 +352,7 @@ PRIVATE>
     selections-quot all? ; inline
 
 : find-selection ( ... seq n quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ keep swap ] selections-quot find drop and* ; inline
+    [ f ] 3dip '[ nip _ guard ] selections-quot find drop and* ; inline
 
 : reduce-selections ( ... seq n identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-selection ; inline

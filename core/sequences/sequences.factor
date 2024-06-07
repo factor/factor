@@ -641,7 +641,7 @@ PRIVATE>
     over reject-as ; inline
 
 : push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
-    [ keep swap ] 2dip ? push ; inline
+    [ guard ] 2dip ? push ; inline
 
 : 2selector ( quot -- selector accum1 accum2 )
     V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
@@ -987,7 +987,7 @@ PRIVATE>
     2dup shorter? [
         2drop f
     ] [
-        [ length [ head-slice ] keep swap ] keep
+        [ length [ head-slice ] guard ] keep
         mismatch-unsafe not
     ] if ;
 
@@ -995,7 +995,7 @@ PRIVATE>
     2dup shorter? [
         2drop f
     ] [
-        [ length [ tail-slice* ] keep swap ] keep
+        [ length [ tail-slice* ] guard ] keep
         mismatch-unsafe not
     ] if ;
 
@@ -1185,7 +1185,7 @@ ALIAS: supremum maximum deprecated
 
 : select-by ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... elt )
     [
-        [ keep swap ] curry [ [ first ] dip call ] 2keep
+        [ guard ] curry [ [ first ] dip call ] 2keep
         [ curry 2dip pick over ] curry
     ] [
         [ [ 2drop ] [ 2nipd ] if ] compose

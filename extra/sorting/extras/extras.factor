@@ -38,5 +38,5 @@ IN: sorting.extras
 
 MACRO: compare-with ( quots -- <=> )
     [ '[ _ bi@ <=> ] ]
-    [ '[ _ 2keep rot dup +eq+ eq? [ drop @ ] [ 2nip ] if ] ]
+    [ '[ _ 2guard dup +eq+ eq? [ drop @ ] [ 2nip ] if ] ]
     map-reduce ;

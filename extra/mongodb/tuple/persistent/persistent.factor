@@ -22,7 +22,7 @@ DEFER: assoc>tuple
 
 : prepare-assoc>tuple ( assoc -- tuple keylist mirror assoc )
     [ tuple-info tuple-instance dup
-    <mirror> [ keys ] keep ] keep swap ; inline
+    <mirror> [ keys ] keep ] guard ; inline
 
 : make-tuple ( assoc -- tuple )
     prepare-assoc>tuple

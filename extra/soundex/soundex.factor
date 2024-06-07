@@ -12,7 +12,7 @@ TR: soundex-digits
 : remove-duplicates ( seq -- seq' )
     ! Remove _consecutive_ duplicates (unlike prune which removes
     ! all duplicates).
-    f swap [ [ = ] keep swap ] reject nip ;
+    f swap [ [ = ] guard ] reject nip ;
 
 : pad-4 ( seq -- seq' ) "000" append 4 head ;
 

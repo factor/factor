@@ -17,7 +17,7 @@ IN: tools.ps.windows
     [ Process32First win32-error=0/f ] keep ;
 
 : next-process ( handle -- PROCESSENTRY32/f )
-    default-process-entry [ Process32Next ] keep swap
+    default-process-entry [ Process32Next ] guard
     FALSE = [ drop f ] when ;
 
 : open-process-read ( dwProcessId -- HANDLE )

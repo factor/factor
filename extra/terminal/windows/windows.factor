@@ -8,7 +8,7 @@ IN: terminal.windows
 M: windows (terminal-size)
     STD_OUTPUT_HANDLE GetStdHandle
     CONSOLE_SCREEN_BUFFER_INFO new
-    [ GetConsoleScreenBufferInfo ] keep swap zero? [
+    [ GetConsoleScreenBufferInfo ] guard zero? [
         drop 0 0
     ] [
         srWindow>>
