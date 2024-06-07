@@ -5,8 +5,8 @@ USING: accessors assocs combinators endian environment
 formatting fry grouping hashtables io io.directories
 io.encodings.binary io.files io.files.info io.files.types
 io.pathnames io.streams.byte-array kernel make math math.parser
-memoize pack sequences sequences.generalizations splitting
-strings system ;
+memoize namespaces pack sequences sequences.generalizations
+splitting strings system ;
 
 IN: terminfo
 
@@ -74,9 +74,54 @@ C: <terminfo-header> terminfo-header
 : string-offset ( from seq -- str )
     0 2over index-from swap subseq >string ;
 
+: reify-strings ( offsets strbuf -- strings )
+    '[ [ _ string-offset ] [ f ] if* ] map ;
+
 : read-strings ( header -- strings )
     [ #strings>> read-shorts ] [ string-bytes>> read ] bi
-    '[ [ _ string-offset ] [ f ] if* ] map ;
+    reify-strings ;
+
+TUPLE: extinfo-header boolean-bytes #numbers #strings string-bytes ;
+C: <extinfo-header> extinfo-header
+
+: read-extinfo-header ( -- header )
+    10 read "sssss" unpack-le [ first3 ] [ last ] bi <extinfo-header> ;
+
+: next-string ( offset strbuf -- offset )
+    0 -rot index-from 1 + ;
+
+: extinfo-values ( bool-vals int-vals str-indexes strbuf -- vals )
+    reify-strings 3append ;
+
+: find-keybuf ( str-indexes strbuf -- keybuf )
+    [ maximum ] dip tuck next-string tail-slice ;
+
+: extinfo-keys ( key-indexes str-indexes strbuf -- keys )
+    find-keybuf reify-strings ;
+
+:: parse-extinfo ( bool-vals int-vals str-indexes key-indexes strbuf -- extinfo )
+    key-indexes str-indexes strbuf extinfo-keys
+    bool-vals int-vals str-indexes strbuf extinfo-values
+    H{ } zip-as ;
+
+: word-align-input ( -- )
+    tell-input odd? [ read1 drop ] when ;
+
+: field-count ( header -- n )
+    [ boolean-bytes>> ] [ #numbers>> ] [ #strings>> ] tri + + ;
+
+: read-extinfo ( -- extinfo )
+    read-extinfo-header {
+        [ read-booleans ]
+        [ word-align-input #numbers>> read-shorts ]
+        [ #strings>> read-shorts ]
+        [ field-count read-shorts ]
+        [ string-bytes>> read ]
+    } cleave parse-extinfo ;
+
+: read-extinfo-if-present ( -- extinfo )
+    input-stream get [ stream-tell ] [ stream-length ] bi <
+    [ read-extinfo ] [ H{ } ] if ;
 
 PRIVATE>
 
@@ -274,7 +319,8 @@ C: <terminfo> terminfo
         [ read-booleans ]
         [ read-numbers ]
         [ read-strings ]
-    } cleave <terminfo> as-assoc ;
+    } cleave <terminfo> as-assoc
+    read-extinfo-if-present assoc-union ;
 
 PRIVATE>
 
