@@ -111,6 +111,7 @@ C: <extinfo-header> extinfo-header
     [ boolean-bytes>> ] [ #numbers>> ] [ #strings>> ] tri + + ;
 
 : read-extinfo ( -- extinfo )
+    word-align-input
     read-extinfo-header {
         [ read-booleans ]
         [ word-align-input #numbers>> read-shorts ]
@@ -119,8 +120,13 @@ C: <extinfo-header> extinfo-header
         [ string-bytes>> read ]
     } cleave parse-extinfo ;
 
+! If extinfo is present, there will be at least another ten bytes (the size of
+! the extinfo header) left over once we're done reading the main file. We
+! could simply check if there's *any* data left over, but I don't trust that
+! we can rule out the existence of terminfo files with a padding byte at the
+! end to make them even-sized.
 : read-extinfo-if-present ( -- extinfo )
-    input-stream get [ stream-tell ] [ stream-length ] bi <
+    input-stream get [ stream-length ] [ stream-tell ] bi 10 >=
     [ read-extinfo ] [ H{ } ] if ;
 
 PRIVATE>
