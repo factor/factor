@@ -60,12 +60,12 @@ C: <terminfo-header> terminfo-header
 : read-shorts ( n -- seq ) 2 read-ints ;
 : read-longs ( n -- seq ) 4 read-ints ;
 
-: align-even-bytes ( header -- )
-    [ names-bytes>> ] [ boolean-bytes>> ] bi + odd?
-    [ read1 drop ] when ;
+: word-align-input ( -- )
+    tell-input odd? [ read1 drop ] when ;
 
 : read-numbers ( header -- numbers )
-    [ align-even-bytes ] [ #numbers>> ] [ magic>> ] tri
+    word-align-input
+    [ #numbers>> ] [ magic>> ] bi
     {
         { SYSV-MAGIC [ read-shorts ] }
         { CURSES6-MAGIC [ read-longs ] }
@@ -80,12 +80,6 @@ C: <terminfo-header> terminfo-header
 : read-strings ( header -- strings )
     [ #strings>> read-shorts ] [ string-bytes>> read ] bi
     reify-strings ;
-
-TUPLE: extinfo-header boolean-bytes #numbers #strings string-bytes ;
-C: <extinfo-header> extinfo-header
-
-: read-extinfo-header ( -- header )
-    10 read "sssss" unpack-le [ first3 ] [ last ] bi <extinfo-header> ;
 
 : next-string ( offset strbuf -- offset )
     0 -rot index-from 1 + ;
@@ -104,17 +98,20 @@ C: <extinfo-header> extinfo-header
     bool-vals int-vals str-indexes strbuf extinfo-values
     H{ } zip-as ;
 
-: word-align-input ( -- )
-    tell-input odd? [ read1 drop ] when ;
-
 : field-count ( header -- n )
     [ boolean-bytes>> ] [ #numbers>> ] [ #strings>> ] tri + + ;
 
-: read-extinfo ( -- extinfo )
+TUPLE: extinfo-header magic boolean-bytes #numbers #strings string-bytes ;
+C: <extinfo-header> extinfo-header
+
+: read-extinfo-header ( main-header -- extinfo-header )
+    magic>> 10 read "sssss" unpack-le [ first3 ] [ last ] bi <extinfo-header> ;
+
+: read-extinfo ( header -- extinfo )
     word-align-input
     read-extinfo-header {
         [ read-booleans ]
-        [ word-align-input #numbers>> read-shorts ]
+        [ read-numbers ]
         [ #strings>> read-shorts ]
         [ field-count read-shorts ]
         [ string-bytes>> read ]
@@ -125,9 +122,9 @@ C: <extinfo-header> extinfo-header
 ! could simply check if there's *any* data left over, but I don't trust that
 ! we can rule out the existence of terminfo files with a padding byte at the
 ! end to make them even-sized.
-: read-extinfo-if-present ( -- extinfo )
-    input-stream get [ stream-length ] [ stream-tell ] bi 10 >=
-    [ read-extinfo ] [ H{ } ] if ;
+: ?read-extinfo ( header -- extinfo )
+    input-stream get [ stream-length ] [ stream-tell ] bi - 10 >=
+    [ read-extinfo ] [ drop f ] if ;
 
 PRIVATE>
 
@@ -309,14 +306,17 @@ C: <terminfo> terminfo
 : zip-names ( seq names -- assoc )
     swap 2dup 2length - f <repetition> append zip ;
 
-: as-assoc ( terminfo-arrays -- assoc )
+: legacy>assoc ( terminfo-arrays -- assoc )
     [ {
         [ names>> ".names" ,, ]
         [ booleans>> boolean-names zip-names %% ]
         [ numbers>> number-names zip-names %% ]
         [ strings>> string-names zip-names %% ]
       } cleave
-    ] H{ } make
+    ] H{ } make ;
+
+: as-assoc ( terminfo-arrays extinfo -- assoc )
+    [ legacy>assoc ] dip assoc-union
     [ f = not ] filter-values ;
 
 : read-terminfo ( -- terminfo )
@@ -325,8 +325,8 @@ C: <terminfo> terminfo
         [ read-booleans ]
         [ read-numbers ]
         [ read-strings ]
-    } cleave <terminfo> as-assoc
-    read-extinfo-if-present assoc-union ;
+        [ ?read-extinfo ]
+    } cleave [ <terminfo> ] dip as-assoc ;
 
 PRIVATE>
 

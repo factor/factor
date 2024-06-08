@@ -66,3 +66,9 @@ ADM3-TERMINFO [
 } [
   "ecma+strikeout" name>terminfo
 ] terminfo-unit-test
+
+{
+    { t 16777216 }
+} [
+    "kitty-direct" name>terminfo '[ _ at ] { "RGB" "max_colors" } swap map
+] terminfo-unit-test
