@@ -28,13 +28,6 @@ PRIVATE>
 
 CONSTANT: ansi-escape-regexp R/ (\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]/
 
-PRIVATE>
-
-: strip-ansi-escapes ( str -- str' )
-    ansi-escape-regexp "" re-replace ;
-
-<PRIVATE
-
 TUPLE: ansi-format ;
 
 : ansi-escape-length ( str -- n )
@@ -56,3 +49,6 @@ PRIVATE>
 
 : format-ansi-box. ( table -- )
     T{ ansi-format } cell-format [ format-box. ] with-variable ;
+
+: strip-ansi-escapes ( str -- str' )
+    ansi-escape-regexp "" re-replace ;
