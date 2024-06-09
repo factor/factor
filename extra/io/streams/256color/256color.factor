@@ -76,7 +76,7 @@ M:: 256color stream-format ( str style stream -- )
     stream stream>> :> out
     style foreground of [ color>foreground out stream-write t ] [ f ] if*
     style background of [ color>background out stream-write drop t ] when*
-    style font-style of [ font-styles out stream-write drop t ] when*
+    style font-style of [ ansi-font-style out stream-write drop t ] when*
     str out stream-write
     [ "\e[0m" out stream-write ] when ;
 
@@ -86,12 +86,10 @@ M: 256color make-span-stream
 M: 256color make-block-stream
     swap <style-stream> <ignore-close-stream> ;
 
-! FIXME: color codes take up formatting space
-
 M: 256color stream-write-table
     [
         drop
-        [ [ stream>> >string ] map ] map format-table
+        [ [ stream>> >string ] map ] map format-ansi-table
         [ nl ] [ write ] interleave
     ] with-output-stream* ;
 
