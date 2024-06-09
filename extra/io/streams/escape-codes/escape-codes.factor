@@ -1,7 +1,7 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs io.styles kernel math regexp sequences splitting
-strings ;
+USING: assocs io.styles kernel math namespaces regexp sequences
+splitting strings strings.tables ;
 IN: io.streams.escape-codes
 
 <PRIVATE
@@ -35,31 +35,24 @@ PRIVATE>
 
 <PRIVATE
 
+TUPLE: ansi-format ;
+
 : ansi-escape-length ( str -- n )
     [ 0 ] dip ansi-escape-regexp [ drop swap - + ] each-match ;
 
-: ansi-length ( str -- n )
+M: ansi-format cell-length
     [ length ] [ ansi-escape-length ] bi - ;
-
-: ansi-longest ( seq -- elt )
-    [ ansi-length ] maximum-by ;
-
-: ansi-pad-tail ( seq n elt -- padded )
-    [ over ansi-length - ] dip '[ _ <repetition> append ] unless-zero ;
-
-: format-row ( seq -- seq )
-    dup longest length '[ _ "" pad-tail ] map! ;
-
-: format-ansi-column ( seq -- seq )
-    dup ansi-longest ansi-length '[ _ CHAR: \s ansi-pad-tail ] map! ;
-
-: format-ansi-cells ( seq -- seq )
-    [ [ split-lines ] map format-row flip ] map concat flip
-    [ { } ] [
-        [ but-last-slice [ format-ansi-column ] map! drop ] keep
-    ] if-empty ;
 
 PRIVATE>
 
 : format-ansi-table ( table -- seq )
-    format-ansi-cells flip [ join-words ] map! ;
+    T{ ansi-format } cell-format [ format-table ] with-variable ;
+
+: format-ansi-table. ( table -- )
+    T{ ansi-format } cell-format [ format-table. ] with-variable ;
+
+: format-ansi-box ( table -- seq )
+    T{ ansi-format } cell-format [ format-box ] with-variable ;
+
+: format-ansi-box. ( table -- )
+    T{ ansi-format } cell-format [ format-box. ] with-variable ;
