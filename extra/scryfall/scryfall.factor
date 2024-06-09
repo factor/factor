@@ -273,28 +273,40 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-type-intersects ( seq text -- seq' ) '[ _ type-intersects? ] filter ;
 : filter-subtype-intersects ( seq text -- seq' ) '[ _ subtype-intersects? ] filter ;
 
-: filter-basic ( seq -- seq' ) [ "Basic" any-type? ] filter ;
+: basic? ( json -- ? ) "Basic" any-type? ;
+: filter-basic ( seq -- seq' ) [ basic? ] filter ;
 : filter-basic-subtype ( seq text -- seq' ) [ filter-basic ] dip filter-subtype ;
-: filter-land ( seq -- seq' ) [ "Land" any-type? ] filter ;
+: land? ( json -- ? ) "Land" any-type? ;
+: filter-land ( seq -- seq' ) [ land? ] filter ;
 : filter-land-subtype ( seq text -- seq' ) [ filter-land ] dip filter-subtype ;
-: filter-creature ( seq -- seq' ) [ "Creature" any-type? ] filter ;
+: creature? ( json -- ? ) "Creature" any-type? ;
+: filter-creature ( seq -- seq' ) [ creature? ] filter ;
 : filter-creature-subtype ( seq text -- seq' ) [ filter-creature ] dip filter-subtype ;
-: filter-emblem ( seq -- seq' ) [ "Emblem" any-type? ] filter ;
+: emblem? ( json -- ? ) "Emblem" any-type? ;
+: filter-emblem ( seq -- seq' ) [ emblem? ] filter ;
 : filter-emblem-subtype ( seq text -- seq' ) [ filter-emblem ] dip filter-subtype ;
-: filter-enchantment ( seq -- seq' ) [ "Enchantment" any-type? ] filter ;
+: enchantment? ( json -- ? ) "Enchantment" any-type? ;
+: filter-enchantment ( seq -- seq' ) [ enchantment? ] filter ;
 : filter-enchantment-subtype ( seq text -- seq' ) [ filter-enchantment ] dip filter-subtype ;
-: filter-saga ( seq -- seq' ) "saga" filter-enchantment-subtype ;
-: filter-instant ( seq -- seq' ) [ "Instant" any-type? ] filter ;
+: saga? ( json -- ? ) "saga" filter-enchantment-subtype ;
+: filter-saga ( seq -- seq' ) [ saga? ] filter ;
+: instant? ( json -- ? ) "Instant" any-type? ;
+: filter-instant ( seq -- seq' ) [ instant? ] filter ;
 : filter-instant-subtype ( seq text -- seq' ) [ filter-instant ] dip filter-subtype ;
-: filter-sorcery ( seq -- seq' ) [ "Sorcery" any-type? ] filter ;
+: sorcery? ( json -- ? ) "Sorcery" any-type? ;
+: filter-sorcery ( seq -- seq' ) [ sorcery? ] filter ;
 : filter-sorcery-subtype ( seq text -- seq' ) [ filter-sorcery ] dip filter-subtype ;
-: filter-planeswalker ( seq -- seq' ) [ "Planeswalker" any-type? ] filter ;
+: planeswalker? ( json -- ? ) "Planeswalker" any-type? ;
+: filter-planeswalker ( seq -- seq' ) [ planeswalker? ] filter ;
 : filter-planeswalker-subtype ( seq text -- seq' ) [ filter-planeswalker ] dip filter-subtype ;
-: filter-legendary ( seq -- seq' ) [ "Legendary" any-type? ] filter ;
+: legendary? ( json -- ? ) "Legendary" any-type? ;
+: filter-legendary ( seq -- seq' ) [ legendary? ] filter ;
 : filter-legendary-subtype ( seq text -- seq' ) [ filter-legendary ] dip filter-subtype ;
-: filter-battle ( seq -- seq' ) [ "Battle" any-type? ] filter ;
+: battle? ( json -- ? ) "Battle" any-type? ;
+: filter-battle ( seq -- seq' ) [ battle? ] filter ;
 : filter-battle-subtype ( seq text -- seq' ) [ filter-battle ] dip filter-subtype ;
-: filter-artifact ( seq -- seq' ) [ "Artifact" any-type? ] filter ;
+: artifact? ( json -- ? ) "Artifact" any-type? ;
+: filter-artifact ( seq -- seq' ) [ artifact? ] filter ;
 : filter-artifact-subtype ( seq text -- seq' ) [ filter-artifact ] dip filter-subtype ;
 
 : reject-basic ( seq -- seq' ) [ "Basic" any-type? ] reject ;
@@ -308,6 +320,12 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-legendary ( seq -- seq' ) [ "Legendary" any-type? ] reject ;
 : reject-battle ( seq -- seq' ) [ "Battle" any-type? ] reject ;
 : reject-artifact ( seq -- seq' ) [ "Artifact" any-type? ] reject ;
+
+: mount? ( json -- ? ) "mount" any-subtype? ;
+: vehicle? ( json -- ? ) "vehicle" any-subtype? ;
+: adventure? ( json -- ? ) "adventure" any-subtype? ;
+: aura? ( json -- ? ) "aura" any-subtype? ;
+: equipment? ( json -- ? ) "Equipment" any-subtype? ;
 
 : filter-mounts ( seq -- seq' ) "mount" filter-subtype ;
 : filter-vehicles ( seq -- seq' ) "vehicle" filter-subtype ;
