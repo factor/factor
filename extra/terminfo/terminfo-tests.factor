@@ -1,5 +1,6 @@
-USING: assocs hex-strings io.streams.string kernel sequences
-strings terminfo tools.test environment io.backend ;
+USING: assocs environment hex-strings io.backend
+io.streams.string kernel namespaces sequences strings system
+terminfo tools.test ;
 
 IN: terminfo.tests
 
@@ -33,7 +34,7 @@ CONSTANT: ADM3-TERMINFO {
 : terminfo-unit-test ( expected quot -- )
     '[
         "vocab:terminfo/test" normalize-path "TERMINFO"
-        _ with-os-env
+        [ linux \ os _ with-variable ] with-os-env
     ] unit-test ; inline
 
 { t f } [
