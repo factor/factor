@@ -26,9 +26,17 @@ PRIVATE>
 
 <PRIVATE
 
+CONSTANT: ansi-escape-regexp R/ (\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]/
+
+PRIVATE>
+
+: strip-ansi-escapes ( str -- str' )
+    ansi-escape-regexp "" re-replace ;
+
+<PRIVATE
+
 : ansi-escape-length ( str -- n )
-    [ 0 ] dip >string R/ (\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]/
-    [ drop swap - + ] each-match ;
+    [ 0 ] dip ansi-escape-regexp [ drop swap - + ] each-match ;
 
 : ansi-length ( str -- n )
     [ length ] [ ansi-escape-length ] bi - ;
