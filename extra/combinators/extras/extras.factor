@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators combinators.smart
 generalizations graphs.private kernel kernel.private math
-math.order namespaces quotations sequences
+math.order namespaces parser quotations sequences
 sequences.generalizations sequences.private sets shuffle
 stack-checker.transforms system words ;
 IN: combinators.extras
@@ -282,3 +282,7 @@ PRIVATE>
 
 : 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) true: ( ..a obj1 obj2 -- ..b ) -- ..b )
     [ 2check ] dip when ; inline
+
+SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
+
+SYNTAX: ?{ \ } parse-until [ [ ?call ] curry ] map compose-all append! ;

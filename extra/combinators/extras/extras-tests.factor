@@ -215,3 +215,8 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 { t } [ int [ c-type-name? ] [ lookup-c-type ] 1check-when c-type? ] unit-test
 
 { 111 112 113 114 } [ 10 100 [ 1 + + ] [ 2  + + ] [ 3 + + ] [ 4 + + ] 2quad ] unit-test
+
+{ f } [ f ?[ 10 * ] ] unit-test
+{ 20 } [ 2 ?[ 10 * ] ] unit-test
+{ 20 } [ 2 ?{ [ 10 * ] } ] unit-test
+{ f } [ 2 ?{ [ dup even? [ drop f ] when ] [ 10 * ] } ] unit-test
