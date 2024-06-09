@@ -1,12 +1,12 @@
 ! Copyright (C) 2013 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors assocs combinators endian environment
-formatting fry grouping hashtables io io.directories
-io.encodings.binary io.files io.files.info io.files.types
-io.pathnames io.streams.byte-array kernel make math math.parser
-memoize namespaces pack sequences sequences.generalizations
-splitting strings system ;
+USING: accessors assocs combinators combinators.short-circuit
+endian environment formatting fry grouping hashtables io
+io.directories io.encodings.binary io.files io.files.info
+io.files.types io.pathnames io.streams.byte-array kernel make
+math math.parser memoize namespaces pack sequences
+sequences.generalizations splitting strings system ;
 
 IN: terminfo
 
@@ -339,5 +339,38 @@ PRIVATE>
 : name>terminfo ( name -- terminfo/f )
     terminfo-path [ file>terminfo ] [ f ] if* ;
 
-: my-terminfo ( -- terminfo/f )
+MEMO: my-terminfo ( -- terminfo/f )
     "TERM" os-env name>terminfo ;
+
+! We make the simplifying assumption here that terminals that do not support
+! SGR attributes also do not support SGR0, and that all terminals that *do*
+! support SGR support SGR0.
+: tty-supports-attributes? ( -- ? )
+    "exit_attribute_mode" my-terminfo key? ;
+
+: tty-supports-dim? ( -- ? )
+    "enter_dim_mode" my-terminfo key? ;
+
+: tty-supports-rgbcolor? ( -- ? )
+    {
+        [ "COLORTERM" os-env empty? not ]
+        [ "TERM" os-env "-direct" tail? ]
+        [ "RGB" my-terminfo at empty? not ]
+        [ "max_colors" my-terminfo at 0 or 24 2^ >= ]
+    } 0||
+    "NO_COLOR" os-env empty? and ;
+
+: tty-supports-256color? ( -- ? )
+    {
+        [ "TERM" os-env "-256color" tail? ]
+        [ "max_colors" my-terminfo at 0 or 256 >= ]
+    } 0||
+    "NO_COLOR" os-env empty? and ;
+
+: tty-supports-ansicolor? ( -- ? )
+    {
+        [ tty-supports-256color? ]
+        [ "TERM" os-env "-color" tail? ]
+        [ "max_colors" my-terminfo at 0 or 8 >= ]
+    } 0||
+    "NO_COLOR" os-env empty? and ;
