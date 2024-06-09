@@ -161,17 +161,16 @@ M: float random*
 
 <PRIVATE
 
-! XXX: rename to random-unit*
-: (random-unit) ( rnd -- n )
+: random-unit* ( rnd -- n )
     [ 0.0 1.0 ] dip (uniform-random-float) ; inline
 
 PRIVATE>
 
 : random-unit ( -- n )
-    random-generator get (random-unit) ; inline
+    random-generator get random-unit* ; inline
 
 : random-units ( length -- sequence )
-    random-generator get '[ _ (random-unit) ] replicate ;
+    random-generator get '[ _ random-unit* ] replicate ;
 
 <PRIVATE
 
@@ -219,8 +218,8 @@ PRIVATE>
             [ z log >= ]
         } 1|| not
     ] [
-        rnd (random-unit) :> u1
-        rnd (random-unit) :> u2
+        rnd random-unit* :> u1
+        rnd random-unit* :> u2
 
         u1 1. u1 - / log ainv / :> v
         alpha v e^ *            :> x
@@ -241,12 +240,12 @@ PRIVATE>
     0 :> x! 0 :> p! ! initialize locals
     [
         p 1.0 > [
-            rnd (random-unit) x alpha 1 - ^ >
+            rnd random-unit* x alpha 1 - ^ >
         ] [
-            rnd (random-unit) x neg e^ >
+            rnd random-unit* x neg e^ >
         ] if
     ] [
-        rnd (random-unit) b * p!
+        rnd random-unit* b * p!
         p 1.0 <= [
             p 1. alpha / ^
         ] [
@@ -273,7 +272,7 @@ PRIVATE>
     ! University Press, 1993.
     random-generator get :> rnd
     kappa 1e-6 <= [
-        2pi rnd (random-unit) *
+        2pi rnd random-unit* *
     ] [
         4. kappa sq * 1. + sqrt 1. + :> a
         a 2. a * sqrt - 2. kappa * / :> b
@@ -281,17 +280,17 @@ PRIVATE>
 
         0 :> c! 0 :> _f! ! initialize locals
         [
-            rnd (random-unit) {
+            rnd random-unit* {
                 [ 2. c - c * < ] [ 1. c - e^ c * <= ]
             } 1|| not
         ] [
-            rnd (random-unit) pi * cos :> z
+            rnd random-unit* pi * cos :> z
             r z * 1. + r z + /   _f!
             r _f - kappa *       c!
         ] do while
 
         mu 2pi mod _f cos
-        rnd (random-unit) 0.5 > [ + ] [ - ] if
+        rnd random-unit* 0.5 > [ + ] [ - ] if
     ] if ;
 
 <PRIVATE
@@ -340,7 +339,7 @@ PRIVATE>
 ! Box-Muller
 : poisson-random-float ( mean -- n )
     [ -1 0 ] dip [ 2dup < ] random-generator get '[
-        [ 1 + ] 2dip [ _ (random-unit) log neg + ] dip
+        [ 1 + ] 2dip [ _ random-unit* log neg + ] dip
     ] while 2drop ;
 
 :: binomial-random ( n p -- x )
@@ -356,7 +355,7 @@ PRIVATE>
                 ! https://dl.acm.org/doi/pdf/10.1145/42372.42381
                 1.0 p - log :> c
                 0 0 random-generator get '[
-                    _ (random-unit) log c /i 1 + +
+                    _ random-unit* log c /i 1 + +
                     dup n <= dup [ [ 1 + ] 2dip ] when
                 ] loop drop
             ] }
@@ -378,8 +377,8 @@ PRIVATE>
                 m 1 + lgamma n m - 1 + lgamma + :> h
 
                 f [
-                    rnd (random-unit) 0.5 - :> u
-                    rnd (random-unit) :> v
+                    rnd random-unit* 0.5 - :> u
+                    rnd random-unit* :> v
                     0.5 u abs - :> us
                     drop 2.0 a us / * b + u * c + floor >integer dup :> k
                     k 0 n between? [
