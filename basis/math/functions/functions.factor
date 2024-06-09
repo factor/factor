@@ -440,6 +440,12 @@ M: float round-to-even [ (round-to-even?) ] (float-round) ;
 
 M: float round-to-odd [ (round-to-odd?) ] (float-round) ;
 
+: round-to-decimal ( x n -- y )
+    10^ [ * round ] [ / ] bi ;
+
+: round-to-step ( x step -- y )
+    [ [ / round ] [ * ] bi ] unless-zero ;
+
 : floor ( x -- y )
     dup 1 mod
     [ dup 0 < [ - 1 - ] [ - ] if ] unless-zero ; foldable

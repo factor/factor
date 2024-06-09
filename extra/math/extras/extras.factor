@@ -259,12 +259,6 @@ PRIVATE>
 : compression-dissimilarity ( a b -- n )
     compression-lengths + / ;
 
-: round-to-decimal ( x n -- y )
-    10^ [ * round ] [ / ] bi ;
-
-: round-to-step ( x step -- y )
-    [ [ / round ] [ * ] bi ] unless-zero ;
-
 GENERIC: round-away-from-zero ( x -- y )
 
 M: integer round-away-from-zero ; inline
