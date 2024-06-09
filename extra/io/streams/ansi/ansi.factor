@@ -3,10 +3,10 @@
 
 USING: accessors arrays assocs destructors formatting io
 io.streams.escape-codes io.streams.string io.styles kernel math
-math.functions math.vectors namespaces sequences strings
-strings.tables ;
+math.functions math.vectors namespaces sequences strings ;
 
 IN: io.streams.ansi
+
 <PRIVATE
 
 CONSTANT: colors H{
@@ -55,7 +55,7 @@ M:: ansi stream-format ( str style stream -- )
     stream stream>> :> out
     style foreground of [ color>foreground out stream-write t ] [ f ] if*
     style background of [ color>background out stream-write drop t ] when*
-    style font-style of [ font-styles out stream-write drop t ] when*
+    style font-style of [ ansi-font-style out stream-write drop t ] when*
     str out stream-write
     [ "\e[0m" out stream-write ] when ;
 
@@ -65,12 +65,10 @@ M: ansi make-span-stream
 M: ansi make-block-stream
     swap <style-stream> <ignore-close-stream> ;
 
-! FIXME: color codes take up formatting space
-
 M: ansi stream-write-table
     [
         drop
-        [ [ stream>> >string ] map ] map format-table
+        [ [ stream>> >string ] map ] map format-ansi-table
         [ nl ] [ write ] interleave
     ] with-output-stream* ;
 
