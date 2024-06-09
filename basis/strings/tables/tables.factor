@@ -1,7 +1,11 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io kernel make math sequences splitting ;
+USING: io kernel make math math.order sequences splitting ;
 IN: strings.tables
+
+SYMBOL: cell-format
+
+HOOK: cell-length cell-format ( str -- n )
 
 <PRIVATE
 
@@ -9,7 +13,10 @@ IN: strings.tables
     dup longest length '[ _ "" pad-tail ] map! ;
 
 : format-column ( seq -- seq )
-    dup longest length '[ _ CHAR: \s pad-tail ] map! ;
+    dup [ cell-length ] maximum-by cell-length '[
+         _ over cell-length [-]
+         [ CHAR: \s <repetition> append ] unless-zero
+     ] map! ;
 
 : format-cells ( seq -- seq )
     [ [ split-lines ] map format-row flip ] map concat flip
@@ -29,7 +36,7 @@ PRIVATE>
     format-cells [ { } ] [
         dup length 1 - over [ format-column ] change-nth flip [
             [ [ " │ " join "│ " " │" surround ] map ]
-            [ first [ length CHAR: ─ <repetition> ] map ] bi
+            [ first [ cell-length CHAR: ─ <repetition> ] map ] bi
             [ "─┬─" join "┌─" "─┐" surround , ]
             [ "─┼─" join "├─" "─┤" surround '[ _ , ] [ , ] interleave ]
             [ "─┴─" join "└─" "─┘" surround , ] tri
