@@ -4,8 +4,8 @@
 USING: accessors arrays ascii assocs calendar calendar.format
 classes.tuple combinators command-line continuations csv
 formatting grouping http.client io io.encodings.ascii io.files
-io.styles kernel math math.extras math.functions math.parser
-namespaces regexp sequences sorting.human splitting strings urls
+io.styles kernel math math.functions math.parser namespaces
+regexp sequences sorting.human splitting strings urls
 wrap.strings ;
 
 IN: metar
