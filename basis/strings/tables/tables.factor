@@ -7,6 +7,8 @@ SYMBOL: cell-format
 
 HOOK: cell-length cell-format ( str -- n )
 
+M: f cell-length length ;
+
 <PRIVATE
 
 : format-row ( seq -- seq )
