@@ -91,15 +91,6 @@ HELP: round-away-from-zero
     { $example "USING: math.extras prettyprint ;" "-0.5 round-away-from-zero ." "-1.0" } }
 { $see-also ceiling floor } ;
 
-HELP: round-to-decimal
-{ $values { "x" real } { "n" integer } { "y" real } }
-{ $description "Outputs the number closest to " { $snippet "x" } ", rounded to " { $snippet "n" } " decimal places." }
-{ $notes "The result is not necessarily an integer." }
-{ $examples
-    { $example "USING: math.extras prettyprint ;" "1.23456 2 round-to-decimal ." "1.23" }
-    { $example "USING: math.extras prettyprint ;" "12345.6789 -3 round-to-decimal ." "12000.0" }
-} ;
-
 HELP: kahan-sum
 { $values { "seq" sequence } { "n" float } }
 { $description "Calculates the summation of the sequence using the Kahan summation algorithm." } ;

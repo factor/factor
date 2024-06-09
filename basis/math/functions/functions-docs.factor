@@ -46,6 +46,8 @@ ARTICLE: "arithmetic-functions" "Arithmetic functions"
     floor
     truncate
     round
+    round-to-decimal
+    round-to-step
 }
 "Inexact comparison:"
 { $subsections ~ }
@@ -355,6 +357,24 @@ HELP: round-to-odd
 { $examples
     { $example "USING: math.functions prettyprint ;" "0.5 round-to-odd ." "1.0" }
     { $example "USING: math.functions prettyprint ;" "1.5 round-to-odd ." "1.0" }
+} ;
+
+HELP: round-to-decimal
+{ $values { "x" real } { "n" integer } { "y" real } }
+{ $description "Outputs the number closest to " { $snippet "x" } ", rounded to " { $snippet "n" } " decimal places." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "1.23456 2 round-to-decimal ." "1.23" }
+    { $example "USING: math.functions prettyprint ;" "12345.6789 -3 round-to-decimal ." "12000.0" }
+} ;
+
+HELP: round-to-step
+{ $values { "x" real } { "step" real } { "y" real } }
+{ $description "Outputs the number closest to " { $snippet "x" } ", rounded to a multiple of " { $snippet "step" } "." }
+{ $notes "The result is not necessarily an integer." }
+{ $examples
+    { $example "USING: math.functions prettyprint ;" "1.23456 0.25 round-to-step ." "1.25" }
+    { $example "USING: math.functions prettyprint ;" "12345.6789 100 round-to-step ." "12300.0" }
 } ;
 
 HELP: roots
