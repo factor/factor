@@ -30,7 +30,7 @@ ERROR: vocab-root-required root ;
     dup vocab-roots get member? [ vocab-root-required ] unless ;
 
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
-    [ ensure-vocab-root ] [ check-vocab-name ] bi* ;
+    [ ensure-vocab-root ] [ vocab-name check-vocab-name ] bi* ;
 
 : vocab-directory-entries ( root prefix -- vocab-path vocab-name entries )
     ensure-vocab-root/prefix [ vocab-dir append-path ] keep
