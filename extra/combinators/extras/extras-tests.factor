@@ -218,5 +218,3 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 
 { f } [ f ?[ 10 * ] ] unit-test
 { 20 } [ 2 ?[ 10 * ] ] unit-test
-{ 20 } [ 2 ?{ [ 10 * ] } ] unit-test
-{ f } [ 2 ?{ [ dup even? [ drop f ] when ] [ 10 * ] } ] unit-test

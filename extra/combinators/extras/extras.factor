@@ -284,5 +284,3 @@ PRIVATE>
     [ 2check ] dip when ; inline
 
 SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
-
-SYNTAX: ?{ \ } parse-until [ [ ?call ] curry ] map compose-all append! ;
