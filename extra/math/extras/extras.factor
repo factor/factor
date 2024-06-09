@@ -408,6 +408,6 @@ TUPLE: vose
 
 M:: vose random* ( obj rnd -- elt )
     obj n>> rnd random* { fixnum } declare
-    dup obj probs>> nth-unsafe { float } declare rnd (random-unit) >=
+    dup obj probs>> nth-unsafe { float } declare rnd random-unit* >=
     [ obj alias>> nth-unsafe { fixnum } declare ] unless
     obj items>> nth-unsafe ;
