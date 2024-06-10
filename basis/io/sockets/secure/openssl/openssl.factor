@@ -105,7 +105,7 @@ PRIVATE>
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    [ file-exists? ] [ file-expected ] guard-unless ; inline
+    [ file-exists? ] guard [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;
@@ -156,8 +156,8 @@ ERROR: file-expected path ;
         [ handle>> ]
         [
             config>>
-            [ [ ca-file>> ] [ ssl-file-path ] guard-when ]
-            [ [ ca-path>> ] [ ssl-file-path ] guard-when ] bi
+            [ [ ca-file>> ] guard [ ssl-file-path ] when ]
+            [ [ ca-path>> ] guard [ ssl-file-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
