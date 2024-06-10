@@ -260,7 +260,7 @@ HELP: ?or
     }
 } ;
 
-HELP: ?or*
+HELP: or?
 { $values
     { "obj1" "a generalized boolean" }
     { "obj2" "a generalized boolean" }
@@ -271,22 +271,22 @@ HELP: ?or*
 { $examples
     "Prefers the second argument:"
     { $example "USING: arrays kernel prettyprint ;"
-        "f 3 ?or* 2array ."
+        "f 3 or? 2array ."
         "{ 3 t }"
     }
     "Will also return the first:"
     { $example "USING: arrays kernel prettyprint ;"
-        "3 f ?or* 2array ."
+        "3 f or? 2array ."
         "{ 3 f }"
     }
     "Can return false:"
     { $example "USING: arrays kernel prettyprint ;"
-        "f f ?or* 2array ."
+        "f f or? 2array ."
         "{ f f }"
     }
 } ;
 
-{ or or* ?or ?or* } related-words
+{ or or* ?or or? } related-words
 
 HELP: xor
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/obj2/f" "a generalized boolean" } }
@@ -827,7 +827,7 @@ HELP: ?if
 { $values
     { "default" object } { "cond" object } { "true" object } { "false" object }
 }
-{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\n?or* [ .. ] [ .. ] if" } }
+{ $warning "The old " { $snippet "?if" } " word can be refactored:" { $code "[ .. ] [ .. ] ?if\n\nor? [ .. ] [ .. ] if" } }
 { $description "Calls " { $snippet "cond" } " on the " { $snippet "default" } " object and if " { $snippet "cond" } " outputs a new object then the " { $snippet "true" } " quotation is called with that new object. Otherwise, calls " { $snippet "false" } " with the old object." }
 { $examples
     "Look up an existing word or make an error pair:"
