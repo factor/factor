@@ -122,14 +122,19 @@ MACRO: smart-plox ( true: ( ... -- x ) -- quot )
 : swap-when ( x y quot: ( x -- n ) quot: ( n n -- ? ) -- x' y' )
     '[ _ _ 2dup _ bi@ @ [ swap ] when ] call ; inline
 
+: >false ( obj -- f ) drop f ; inline
+: >2false ( obj1 obj2 -- f f ) 2drop f f ; inline
+: >3false ( obj1 obj2 obj3 -- f f f ) 3drop f f f ; inline
+: >4false ( obj1 obj2 obj3 obj4 -- f f f f ) 4drop f f f f ; inline
+
 : 2false-unless ( obj1 obj2 ? -- f f )
-    [ 2drop f f ] unless ; inline
+    [ >2false ] unless ; inline
 
 : 2falsify ( obj1 obj2 -- obj1/f obj2/f )
     2dup and 2false-unless ; inline
 
 : 3false-unless ( obj1 obj2 obj3 ? -- f f f )
-    [ 3drop f f f ] unless ; inline
+    [ >3false ] unless ; inline
 
 : 3falsify ( obj1 obj2 obj3 -- obj1/f obj2/f obj3/f )
     3dup and and 3false-unless ; inline
