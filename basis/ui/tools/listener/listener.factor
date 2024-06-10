@@ -365,7 +365,7 @@ M: object accept-completion-hook 2drop ;
 M: interactor stream-read-quot
     dup interactor-yield dup array? [
         over interactor-finish try-parse
-        ?or* [ stream-read-quot ] unless
+        or? [ stream-read-quot ] unless
     ] [ nip ] if ;
 
 : interactor-operation ( gesture interactor -- ? )

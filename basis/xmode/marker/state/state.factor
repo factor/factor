@@ -38,7 +38,7 @@ escaped?  process-escape?  delegate-end-escaped? ;
     f >>in-rule context set ;
 
 : init-token-marker ( main prev-context line -- )
-    line set ?or* [ f <line-context> ] unless context set
+    line set or? [ f <line-context> ] unless context set
     0 position set
     0 last-offset set
     0 whitespace-end set

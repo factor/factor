@@ -335,7 +335,7 @@ M: comment walk-html call( obj -- ) ;
 : get-children ( obj -- seq/f ) [ children>> ] ?call ;
 : get-children-no-whitespace ( obj -- seq/f ) get-children remove-whitespace ;
 : prefix-name ( name -- name ) ":" split1 and* ;
-: local-name ( name -- name ) ":" split1 ?or* drop ;
+: local-name ( name -- name ) ":" split1 or? drop ;
 : find-xml-prolog ( seq -- prolog ) [ processing-instruction? ] find nip ;
 : find-xml-body ( seq -- tag ) [ open-tag? ] find nip ;
 : find-tag-named ( seq name -- tag )

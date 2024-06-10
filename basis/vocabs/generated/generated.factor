@@ -10,4 +10,4 @@ IN: vocabs.generated
                 [ _ with-current-vocab ] [ ] [ forget-vocab ] cleanup
             ] with-compilation-unit
         ] keep
-    ] [ ?or* ] 2dip if ; inline
+    ] [ or? ] 2dip if ; inline

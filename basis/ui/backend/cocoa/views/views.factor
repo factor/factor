@@ -76,7 +76,7 @@ CONSTANT: key-codes
     }
 
 : key-code ( event -- string ? )
-    dup -> keyCode key-codes at ?or*
+    dup -> keyCode key-codes at or?
     [ t ] [ -> charactersIgnoringModifiers CF>string f ] if ;
 
 : event-modifiers ( event -- modifiers )

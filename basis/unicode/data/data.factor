@@ -88,7 +88,7 @@ PRIVATE>
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
-        2dup of ?or*
+        2dup of or?
         [ (chain-decomposed) ] [ 1array nip ] if
     ] with map concat ;
 

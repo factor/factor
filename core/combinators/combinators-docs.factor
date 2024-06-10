@@ -160,7 +160,7 @@ $nl
 "The following three lines are equivalent:"
 { $code "[ drop f ] unless" "swap and" "and*" }
 "The following three lines are equivalent:"
-{ $code "?or* [ ] [ ] ?if" "swap or" "or*" }
+{ $code "or? [ ] [ ] ?if" "swap or" "or*" }
 "The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
 { $code "[ L ] unless*" "L or" } ;
 

@@ -41,7 +41,7 @@ MACRO: case-probas ( data -- quot )
     [ first2 [ 1quotation ] dip [ swap 2array ] when* ] map 1quotation ;
 
 : expected ( data name -- float )
-    dupd of ?or* [ values sift sum 1 swap - ] unless ;
+    dupd of or? [ values sift sum 1 swap - ] unless ;
 
 : generate ( # case-probas -- seq )
     H{ } clone [

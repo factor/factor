@@ -400,7 +400,7 @@ M: x86 %convert-integer
     [ [ drop 1array ] [ [+] ] 2bi ] 2dip ;
 
 : (%load-memory) ( dst exclude address rep c-type -- )
-    ?or* [
+    or? [
         {
             { c:char   [ 8 %alien-signed-getter ] }
             { c:uchar  [ 8 %alien-unsigned-getter ] }
@@ -418,7 +418,7 @@ M: x86 %load-memory-imm
     (%memory-imm) (%load-memory) ;
 
 : (%store-memory) ( src exclude address rep c-type -- )
-    ?or* [
+    or? [
         {
             { c:char   [ 8 %alien-integer-setter ] }
             { c:uchar  [ 8 %alien-integer-setter ] }
