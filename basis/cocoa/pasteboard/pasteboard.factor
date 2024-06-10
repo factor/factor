@@ -28,7 +28,7 @@ CONSTANT: NSStringPboardType "NSStringPboardType"
 
 : ?pasteboard-string ( pboard error -- str/f )
     over pasteboard-string? [
-        swap pasteboard-string ?or* [ pasteboard-error ] unless
+        swap pasteboard-string or? [ pasteboard-error ] unless
     ] [
         nip pasteboard-error
     ] if ;

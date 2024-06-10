@@ -34,7 +34,7 @@ SYMBOL: auto-use?
 : private? ( word -- ? ) vocabulary>> ".private" tail? ;
 
 : use-first-word? ( words -- ? )
-    [ length 1 = ] [ ?first dup ?or* [ private? not ] when ] bi and
+    [ length 1 = ] [ ?first dup or? [ private? not ] when ] bi and
     auto-use? get and ;
 
 ! True branch is a singleton public word with no name conflicts

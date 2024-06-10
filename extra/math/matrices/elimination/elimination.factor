@@ -21,7 +21,7 @@ SYMBOL: matrix
 : cols ( -- n ) 0 nth-row length ;
 
 : skip ( i seq quot -- n )
-    over [ find-from drop ] dip swap ?or* [ length ] unless ; inline
+    over [ find-from drop ] dip swap or? [ length ] unless ; inline
 
 : first-col ( row# -- n )
     ! First non-zero column

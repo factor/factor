@@ -77,7 +77,7 @@ C: <predicate-engine> predicate-engine
 
 : push-method ( method class atomic assoc -- )
     dupd [
-        ?or* [ H{ } clone <predicate-engine> ] unless
+        or? [ H{ } clone <predicate-engine> ] unless
         [ methods>> set-at ] keep
     ] change-at ;
 

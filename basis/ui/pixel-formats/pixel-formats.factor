@@ -50,7 +50,7 @@ ERROR: invalid-pixel-format-attributes world attributes ;
 TUPLE: pixel-format < disposable world handle ;
 
 : <pixel-format> ( world attributes -- pixel-format )
-    2dup (make-pixel-format) ?or*
+    2dup (make-pixel-format) or?
     [ pixel-format new-disposable swap >>handle swap >>world ]
     [ invalid-pixel-format-attributes ]
     if ;

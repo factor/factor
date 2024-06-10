@@ -175,7 +175,7 @@ DEFER: if
 
 : ?or ( obj1 obj2 -- obj1/obj2 first? ) over [ drop t ] [ nip f ] if ; inline
 
-: ?or* ( obj1 obj2 -- obj2/obj1 second? ) swap ?or ; inline
+: or? ( obj1 obj2 -- obj2/obj1 second? ) swap ?or ; inline
 
 : ?transmute ( old quot: ( old -- new/f ) -- new/old new? ) keep ?or ; inline
 
