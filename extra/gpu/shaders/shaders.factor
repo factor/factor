@@ -536,7 +536,7 @@ TUPLE: feedback-format
     [ too-many-feedback-formats-error ] if ;
 
 : ?shader ( object -- shader/f )
-    [ word? ] [ def>> first shader? ] guard-when ;
+    [ word? ] guard [ def>> first shader? ] when ;
 
 : shaders-and-formats ( words -- shaders vertex-formats feedback-format geom-parameters )
     {
