@@ -44,6 +44,13 @@ SYMBOL: current-git-id
     5 [ { scp local scp-remote } upload-process ] retry
     5 [ { ssh host "-l" username "mv" temp remote } short-running-process ] retry ;
 
+:: symlink-remote ( username host target link-name -- )
+    ssh-command get :> ssh
+    5 [
+        { ssh host "-l" username "ln" "-sf" target link-name }
+        short-running-process
+    ] retry ;
+
 : eval-file ( file -- obj )
     dup utf8 file-lines parse-fresh
     [ "Empty file: " swap append throw ] [ nip first ] if-empty ;
