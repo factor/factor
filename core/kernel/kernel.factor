@@ -312,14 +312,14 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
 
-: guard-when ( obj quot: ( ..a obj -- ..a obj/f ) true: ( ..a obj -- ..b ) -- )
-    [ verify dup ] dip when ; inline
-
-: guard-unless ( obj quot: ( ..a obj -- ..a obj/f ) false: ( ..a obj -- ..b ) -- )
-    [ guard ] dip unless ; inline
-
 : guard-if ( obj quot: ( ..a obj -- ..a obj/f ) true: ( ..a obj -- ..b ) false: ( ..a obj -- ..b ) -- )
     [ guard ] 2dip if ; inline
+
+: 2guard-if ( ..a obj1 obj2 quot: ( ..a obj1 obj2 -- ..b ? ) true: ( ..a obj -- ..b ) false: ( ..a obj -- ..b ) -- )
+    [ 2guard ] 2dip if ; inline
+
+: 3guard-if ( ..a obj1 obj2 obj3 quot: ( ..a obj1 obj2 obj3 -- ..b ? ) true: ( ..a obj -- ..b ) false: ( ..a obj -- ..b ) -- )
+    [ 3guard ] 2dip if ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
