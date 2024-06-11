@@ -218,7 +218,7 @@ STARTUP-HOOK: [
 ]
 
 SHUTDOWN-HOOK: [
-    close-all-windows notify-queued
+    ui-running? [ close-all-windows notify-ui-thread yield ] when
 ]
 
 HOOK: resize-window ui-backend ( world dim -- )
@@ -231,7 +231,7 @@ M: object resize-window 2drop ;
 : with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [
         t ui-running set-global '[
-            [ init-ui @ ] (with-ui)
+            _ (with-ui)
         ] [
             f ui-running set-global
             ! Give running ui threads a chance to finish.
