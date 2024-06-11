@@ -1,1 +1,1 @@
-ANSI color implementation of formatted stream protocol
+Formatted stream protocol for terminals that support ANSI+AIXterm color
