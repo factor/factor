@@ -231,7 +231,7 @@ M: object resize-window 2drop ;
 : with-ui ( quot: ( -- ) -- )
     ui-running? [ call( -- ) ] [
         t ui-running set-global '[
-            _ (with-ui)
+            [ init-ui @ ] (with-ui)
         ] [
             f ui-running set-global
             ! Give running ui threads a chance to finish.
