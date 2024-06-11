@@ -214,7 +214,7 @@ M: object close-window
 STARTUP-HOOK: [
     f ui-running set-global
     <flag> ui-notify-flag set-global
-    ! init-ui
+    init-ui
 ]
 
 SHUTDOWN-HOOK: [
