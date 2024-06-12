@@ -141,7 +141,7 @@ M: bignum (log2) bignum-log2 ; inline
 
 : pre-scale ( num den -- epsilon? num' den' scale )
     scale-denonimator [
-        [ scale-numerator ] 1guard
+        [ scale-numerator ] 1check
     ] dip swap - ; inline
 
 ! Second step: compute mantissa
@@ -205,7 +205,7 @@ M: bignum (log2) bignum-log2 ; inline
     } cond ; inline
 
 : post-scale ( mantissa scale -- n )
-    [ 2/ ] dip ! drop 1guard bit
+    [ 2/ ] dip ! drop 1check bit
     over 53 2^ = [ [ 2/ ] [ 1 + ] bi* ] when
     scale-float ; inline
 

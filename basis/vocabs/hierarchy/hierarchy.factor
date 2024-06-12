@@ -114,7 +114,7 @@ MEMO: all-disk-vocabs-recursive ( -- assoc )
 
 : maybe-include-root/prefix ( root prefix -- vocab-link/f )
     over [
-        [ find-vocab-root = ] 1guard
+        [ find-vocab-root = ] 1check
     ] [
         nip dup find-vocab-root
     ] if [ >vocab-link ] [ drop f ] if ;

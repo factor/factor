@@ -118,7 +118,7 @@ ERROR: unimplemented-opcode opcode message ;
                     { 0xa [ read-payload t ] }
                     [ "fall-through" unimplemented-opcode ]
                 } case
-            ] 1guard
+            ] 1check
         ] [
             f f f
         ] if*

@@ -9,7 +9,7 @@ IN: ryu
 <PRIVATE
 
 : mul-shift ( x mul shift -- y )
-    [ first2 rot [ * ] 1guardd * -64 shift + ] [ 64 - neg ] bi* shift ;
+    [ first2 rot [ * ] 1checkd * -64 shift + ] [ 64 - neg ] bi* shift ;
 
 : mul-shift-all ( mmShift m mul shift -- vm vp vr )
     [ 4 * ] 2dip

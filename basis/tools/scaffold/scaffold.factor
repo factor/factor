@@ -25,10 +25,10 @@ M: vocab vocab-root? drop f ;
 M: vocab-link vocab-root? drop f ;
 
 : ensure-vocab-exists ( string -- string )
-    [ lookup-vocab ] 1guard [ no-vocab ] unless ;
+    [ lookup-vocab ] 1check [ no-vocab ] unless ;
 
 : check-vocab-root ( string -- string )
-    [ vocab-root? ] 1guard [ not-a-vocab-root ] unless ;
+    [ vocab-root? ] 1check [ not-a-vocab-root ] unless ;
 
 : check-vocab-root/name ( vocab-root string -- vocab-root string )
     [ check-vocab-root ] [ check-vocab-name ] bi* ;
@@ -82,7 +82,7 @@ M: vocab-link vocab-root? drop f ;
     [ main-file-string 1array ] dip utf8 set-file-lines ;
 
 : scaffold-main ( vocab-root vocab -- )
-    [ ".factor" vocab-root/vocab/suffix>path ] 1guard
+    [ ".factor" vocab-root/vocab/suffix>path ] 1check
     scaffolding? [
         set-scaffold-main-file
     ] [

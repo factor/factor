@@ -10,7 +10,7 @@ ERROR: llvm-error message ;
     [ utf8 alien>string ] [ LLVMDisposeMessage ] bi llvm-error ;
 
 : llvm-throw-on-error ( quot -- )
-    1guard 0 = [ drop ] [ void* deref llvm-throw ] if ; inline
+    1check 0 = [ drop ] [ void* deref llvm-throw ] if ; inline
 
 : <dispose> ( alien class -- disposable ) new swap >>value ;
 

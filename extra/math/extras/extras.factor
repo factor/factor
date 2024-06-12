@@ -276,7 +276,7 @@ M: real round-away-from-zero
 : max-monotonic-count ( seq quot: ( elt1 elt2 -- ? ) -- n )
     over empty? [ 2drop 0 ] [
         [ 0 swap unclip-slice swap 0 ] dip '[
-            [ swapd @ [ 1 + ] [ max 0 ] if ] 1guard
+            [ swapd @ [ 1 + ] [ max 0 ] if ] 1check
         ] reduce nip max
     ] if ; inline
 
