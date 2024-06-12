@@ -43,7 +43,7 @@ SYNTAX: DECIMAL: parse-decimal suffix! ;
 
 ERROR: decimal-types-expected d1 d2 ;
 
-: guard-decimals ( obj1 obj2 -- D1 D2 )
+: 1guard-decimals ( obj1 obj2 -- D1 D2 )
     2dup [ decimal? ] both? [ decimal-types-expected ] unless ;
 
 M: decimal equal?
@@ -59,22 +59,22 @@ M: decimal equal?
     } 2&& ;
 
 M: decimal before?
-    guard-decimals scale-decimals [ mantissa>> ] bi@ < ;
+    1guard-decimals scale-decimals [ mantissa>> ] bi@ < ;
 
 : D-abs ( D -- D' )
     [ mantissa>> abs ] [ exponent>> ] bi <decimal> ;
 
 : D+ ( D1 D2 -- D3 )
-    guard-decimals scale-mantissas [ + ] dip <decimal> ;
+    1guard-decimals scale-mantissas [ + ] dip <decimal> ;
 
 : D- ( D1 D2 -- D3 )
-    guard-decimals scale-mantissas [ - ] dip <decimal> ;
+    1guard-decimals scale-mantissas [ - ] dip <decimal> ;
 
 : D* ( D1 D2 -- D3 )
-    guard-decimals [ >decimal< ] bi@ swapd + [ * ] dip <decimal> ;
+    1guard-decimals [ >decimal< ] bi@ swapd + [ * ] dip <decimal> ;
 
 :: D/ ( D1 D2 a -- D3 )
-    D1 D2 guard-decimals [ >decimal< ] bi@ :> ( m1 e1 m2 e2 )
+    D1 D2 1guard-decimals [ >decimal< ] bi@ :> ( m1 e1 m2 e2 )
     m1 a 10^ *
     m2 /i
 

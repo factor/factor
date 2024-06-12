@@ -470,7 +470,7 @@ IN: codebase-analyzer
 : uses-repo? ( path -- ? ) ".repo" append-path file-exists? ;
 
 : diff-paths ( paths quot -- paths' )
-    guard [ [ normalize-path ] map ] bi@ diff ; inline
+    1guard [ [ normalize-path ] map ] bi@ diff ; inline
 
 : source-code-file? ( path -- ? )
     {

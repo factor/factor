@@ -526,7 +526,7 @@ TUPLE: myseq { underlying1 byte-array read-only } { underlying2 byte-array read-
 
 { B{ 123 231 } } [ derived-pointer-test-1 ] unit-test
 
-: fib-count2 ( -- x y ) 0 1 [ dup 4000000 <= ] [ [ + ] guard ] while ;
+: fib-count2 ( -- x y ) 0 1 [ dup 4000000 <= ] [ [ + ] 1guard ] while ;
 
 { 3524578 5702887 } [ fib-count2 ] unit-test
 

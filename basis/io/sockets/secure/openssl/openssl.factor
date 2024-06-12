@@ -105,18 +105,18 @@ PRIVATE>
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    [ file-exists? ] guard [ file-expected ] unless ; inline
+    [ file-exists? ] 1guard [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;
 
 : load-certificate-chain ( ctx -- )
-    [ config>> key-file>> ]
+    [ config>> key-file>> ] 1guard
     [
         [ handle>> ] [ config>> key-file>> ssl-file-path ] bi
         SSL_CTX_use_certificate_chain_file
         ssl-error
-    ] [ drop ] guard-if ;
+    ] [ drop ] if ;
 
 : password-callback ( -- alien )
     int { void* int bool void* } cdecl
@@ -133,41 +133,41 @@ ERROR: file-expected path ;
     [ push ] [ drop ] 2bi ;
 
 : set-default-password ( ctx -- )
-    [ config>> password>> ]
+    [ config>> password>> ] 1guard
     [
         [ handle>> password-callback SSL_CTX_set_default_passwd_cb ]
         [
             [ handle>> ] [ default-pasword ] bi
             SSL_CTX_set_default_passwd_cb_userdata
         ] bi
-    ] [ drop ] guard-if ;
+    ] [ drop ] if ;
 
 : use-private-key-file ( ctx -- )
-    [ config>> key-file>> ]
+    [ config>> key-file>> ] 1guard
     [
         [ handle>> ]
         [ config>> key-file>> ssl-file-path ] bi
         SSL_FILETYPE_PEM SSL_CTX_use_PrivateKey_file
         ssl-error
-    ] [ drop ] guard-if ;
+    ] [ drop ] if ;
 
 : load-verify-locations ( ctx -- )
     dup config>> [ ca-file>> ] [ ca-path>> ] bi or [
         [ handle>> ]
         [
             config>>
-            [ [ ca-file>> ] guard [ ssl-file-path ] when ]
-            [ [ ca-path>> ] guard [ ssl-file-path ] when ] bi
+            [ [ ca-file>> ] 1guard [ ssl-file-path ] when ]
+            [ [ ca-path>> ] 1guard [ ssl-file-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
 : set-verify-depth ( ctx -- )
-    [ config>> verify-depth>> ]
+    [ config>> verify-depth>> ] 1guard
     [
         [ handle>> ] [ config>> verify-depth>> ] bi
         SSL_CTX_set_verify_depth
-    ] [ drop ] guard-if ;
+    ] [ drop ] if ;
 
 TUPLE: bio < disposable handle ;
 
@@ -179,12 +179,12 @@ M: bio dispose* handle>> BIO_free ssl-error ;
     normalize-path "r" BIO_new_file dup ssl-error <bio> ;
 
 : load-dh-params ( ctx -- )
-    [ config>> dh-file>> ]
+    [ config>> dh-file>> ] 1guard
     [
         [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
         handle>> f f f PEM_read_bio_DHparams dup ssl-error
         SSL_CTX_set_tmp_dh ssl-error
-    ] [ drop ] guard-if ;
+    ] [ drop ] if ;
 
 ! Attempt to set ecdh. If it fails, ignore...?
 : set-ecdh-params ( ctx -- )

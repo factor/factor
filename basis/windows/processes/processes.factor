@@ -93,7 +93,7 @@ IN: windows.processes
     ] dip [ Heap32First check-snapshot ] 3keep 2drop dup clone rot
     [
         [
-            [ Heap32Next check-snapshot ] guard
+            [ Heap32Next check-snapshot ] 1guard
         ] [ dup clone ] produce swap prefix nip
     ] [
         1array nip

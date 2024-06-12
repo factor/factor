@@ -195,7 +195,7 @@ PRIVATE>
 : take-until ( lexer -- string )
     dup skip-blank [
         dupd [
-            [ [ "\\/" member? ] find-from ] guard [
+            [ [ "\\/" member? ] find-from ] 1guard [
                 CHAR: \ = [ [ 2 + ] dip t ] [ f ] if
             ] [
                 "Unterminated regexp" throw

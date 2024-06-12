@@ -24,11 +24,11 @@ M: string vocab-root? trim-tail-separators vocab-roots get member? ;
 M: vocab vocab-root? drop f ;
 M: vocab-link vocab-root? drop f ;
 
-: ensure-vocab-exists ( vocab -- vocab )
-    dup lookup-vocab [ no-vocab ] unless ;
+: ensure-vocab-exists ( string -- string )
+    [ lookup-vocab ] 1guard [ no-vocab ] unless ;
 
 : check-vocab-root ( string -- string )
-    dup vocab-root? [ not-a-vocab-root ] unless ;
+    [ vocab-root? ] 1guard [ not-a-vocab-root ] unless ;
 
 : check-vocab-root/name ( vocab-root string -- vocab-root string )
     [ check-vocab-root ] [ check-vocab-name ] bi* ;
@@ -56,21 +56,15 @@ M: vocab-link vocab-root? drop f ;
 : vocab/suffix>path ( vocab suffix -- path )
     [ vocab>path dup file-name append-path ] dip append ;
 
-: directory-exists ( path -- )
-    "Not creating a directory, it already exists: " write print ;
-
 : scaffold-directory ( vocab-root vocab -- )
     vocab-root/vocab>path
-    [ directory-exists ] [ make-directories ] if-file-exists ;
-
-: not-scaffolding ( path -- path )
-    "Not creating scaffolding for " write dup <pathname> . ;
-
-: scaffolding ( path -- path )
-    "Creating scaffolding for " write dup <pathname> . ;
+    [ "Not creating a directory, it already exists: " write print ]
+    [ make-directories ] if-file-exists ;
 
 : scaffolding? ( path -- path ? )
-    [ not-scaffolding f ] [ scaffolding t ] if-file-exists ;
+    [ "Not creating scaffolding for " f ]
+    [ "Creating scaffolding for " t ] if-file-exists
+    swap write dup <pathname> . ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
@@ -88,7 +82,8 @@ M: vocab-link vocab-root? drop f ;
     [ main-file-string 1array ] dip utf8 set-file-lines ;
 
 : scaffold-main ( vocab-root vocab -- )
-    [ ".factor" vocab-root/vocab/suffix>path ] guard scaffolding? [
+    [ ".factor" vocab-root/vocab/suffix>path ] 1guard
+    scaffolding? [
         set-scaffold-main-file
     ] [
         2drop

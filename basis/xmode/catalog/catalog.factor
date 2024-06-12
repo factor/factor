@@ -50,7 +50,7 @@ SYMBOL: rule-sets
 
 : get-rule-set ( name -- rule-sets rules )
     dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
-    [ at* [ nip ] [ drop no-such-rule-set ] if ] guard ;
+    [ at* [ nip ] [ drop no-such-rule-set ] if ] 1guard ;
 
 DEFER: finalize-rule-set
 

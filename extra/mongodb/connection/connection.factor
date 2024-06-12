@@ -124,7 +124,7 @@ USE: mongodb.operations
 
 : check-node ( mdb node -- )
     [ <mdb-connection> &dispose ] dip
-    [ [ open-connection ] [ 3drop f ] recover ] guard
+    [ [ open-connection ] [ 3drop f ] recover ] 1guard
     [ [ get-ismaster eval-ismaster-result ] with-connection ] [ drop ] if* ;
 
 : nodelist>table ( seq -- assoc )

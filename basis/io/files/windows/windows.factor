@@ -109,7 +109,7 @@ M: windows init-io
     H{ } clone pending-overlapped set-global ;
 
 : (handle>file-size) ( handle -- n/f )
-    0 ulonglong <ref> [ GetFileSizeEx ] guard
+    0 ulonglong <ref> [ GetFileSizeEx ] 1guard
     [ drop f ] [ drop ulonglong deref ] if-zero ;
 
 ! GetFileSizeEx errors with ERROR_INVALID_FUNCTION if handle is not seekable

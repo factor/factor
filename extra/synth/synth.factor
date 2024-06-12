@@ -16,7 +16,7 @@ MEMO: single-sine-wave ( samples/wave -- seq )
     pick * >integer [ /i ] dip (sine-wave) ;
 
 : >sine-wave-buffer ( freq seconds buffer -- buffer )
-    [ sample-freq>> -rot sine-wave ] guard >>data ;
+    [ sample-freq>> -rot sine-wave ] 1guard >>data ;
 
 : >silent-buffer ( seconds buffer -- buffer )
     [ sample-freq>> * >integer 0 <repetition> ] [ data<< ] [ ] tri ;
