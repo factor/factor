@@ -497,7 +497,7 @@ M: object elements* 2drop ;
 
 M: array elements*
     [ dup first \ $markup-example eq? [ 2drop ] [ [ elements* ] with each ] if ]
-    [ [ first eq? ] 1guard [ , ] [ drop ] if ] 2bi ;
+    [ [ first eq? ] 1check [ , ] [ drop ] if ] 2bi ;
 
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 

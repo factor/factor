@@ -189,7 +189,7 @@ PRIVATE>
     [
         <enumerated> [
             assoc-size 10 + '[
-                _ read-header [ check-opaque ] 1guard
+                _ read-header [ check-opaque ] 1check
             ]
         ] [
             '[

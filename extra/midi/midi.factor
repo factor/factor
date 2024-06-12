@@ -308,7 +308,7 @@ M: sysex-event write-event
 
 : write-status ( prev-status status -- )
     dup 0xf0 < [
-        [ = ] 1guard [ drop ] [ write1 ] if
+        [ = ] 1check [ drop ] [ write1 ] if
     ] [
         nip write1
     ] if ;

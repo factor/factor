@@ -138,7 +138,7 @@ VERTEX-FORMAT: collada-vertex-format
     V{ } V{ } H{ } <indexed-seq> make [ dseq>> ] [ iseq>> ] bi ;
 
 : triangles>model ( sources vertices triangles-tag -- model )
-    [ "input" tags-named collect-sources ] 1guard
+    [ "input" tags-named collect-sources ] 1check
 
     [
         largest-offset+1 swap

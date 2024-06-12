@@ -37,7 +37,7 @@ PRIVATE>
 
 M: macosx (terminal-size)
     stdout-handle fileno TIOCGWINSZ winsize new
-    [ ioctl ] 1guard 0 < [
+    [ ioctl ] 1check 0 < [
         drop 0 0
     ] [
         [ ws_col>> ] [ ws_row>> ] bi

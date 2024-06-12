@@ -167,7 +167,7 @@ ERROR: sequence-expected obj ;
     [ drop ?parent-directory [ ?qualified-directory-files ] [ f ] if* ] recover ;
 
 : (find-up-to-root) ( path quot: ( path -- ? ) -- obj )
-    [ [ ?qualified-directory-files ] dip find swap ] 2guard [
+    [ [ ?qualified-directory-files ] dip find swap ] 2check [
         2drop
     ] [
         [ nip ?parent-directory ] dip over

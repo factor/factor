@@ -288,7 +288,7 @@ MEMO: dct-matrix-blas ( -- m ) dct-matrix >float-blas-matrix ;
     binary [
         [
             { 0xFF } read-until
-            read1 [ 0x00 = and ] 1guard
+            read1 [ 0x00 = and ] 1check
         ]
         [ drop ] produce
         swap >marker {  EOI } assert=

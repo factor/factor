@@ -232,7 +232,7 @@ PRIVATE>
 
 : map-concat ( ... seq quot: ( ... elt -- ... newelt ) -- ... newseq )
     over empty? [ 2drop { } ] [
-        [ [ first ] dip call ] 2guard [
+        [ [ first ] dip call ] 2check [
             >resizable [ '[ @ _ push-all ] 1 each-from ] keep
         ] keep like
     ] if ; inline
@@ -308,7 +308,7 @@ PRIVATE>
 : nth-index ( n obj seq -- i )
     [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
 
-: at+* ( n key assoc -- old new ) [ 0 or [ + ] 1guard dup ] change-at ; inline
+: at+* ( n key assoc -- old new ) [ 0 or [ + ] 1check dup ] change-at ; inline
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
@@ -411,7 +411,7 @@ PRIVATE>
     new-resizable [ [ 1push-map-when ] 3curry ] keep ; inline
 
 : 2push-map-when ( ..a filter-quot: ( ..a -- ..b ? ) map-quot: ( ..a -- ..b obj ) accum -- ..b )
-    [ 2guard ] 2dip '[ [ @ _ push ] [ 2drop ] if ] call ; inline
+    [ 2check ] 2dip '[ [ @ _ push ] [ 2drop ] if ] call ; inline
 
 : 2filter-mapper-for ( filter-quot map-quot length exemplar -- filter-mapper accum )
     new-resizable [ [ 2push-map-when ] 3curry ] keep ; inline
@@ -570,7 +570,7 @@ PRIVATE>
     [ "    " prepend ] with-string-lines ;
 
 : one? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
-    [ find ] 2guard [
+    [ find ] 2check [
         [ 1 + ] 2dip find-from drop not
     ] [ 3drop f ] if ; inline
 
@@ -900,7 +900,7 @@ ERROR: slice-error-of from to seq ;
 
 : select-by* ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... i elt )
     [
-        [ 1guard ] curry [ dip ] curry
+        [ 1check ] curry [ dip ] curry
         [ [ first 0 ] dip call ] 2keep
         [ 2curry 3dip 5 npick pick ] curry
     ] [
@@ -1030,7 +1030,7 @@ ALIAS: map-infimum map-minimum deprecated
 
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
-    [ [ push-when ] 2curry reject! ] 1guard like ; inline
+    [ [ push-when ] 2curry reject! ] 1check like ; inline
 
 : find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
     2pick < [
@@ -1045,7 +1045,7 @@ ALIAS: map-infimum map-minimum deprecated
 : find-pred ( ... seq quot: ( ... elt -- ... calc ) pred: ( ... calc -- ... ? ) -- ... calc/f i/f elt/f )
     [ 0 ] 3dip
     [ [ length check-length ] keep ] 2dip
-    '[ nth-unsafe _ 1guard _ 1guard ] find-pred-loop swapd ; inline
+    '[ nth-unsafe _ 1check _ 1check ] find-pred-loop swapd ; inline
 
 : find-deep ( ... seq quot: ( ... elt -- ... calc ) -- ... calc/f )
     [ ] find-pred 2drop ; inline
@@ -1089,7 +1089,7 @@ INSTANCE: step-slice wrapped-sequence
 
 : 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
     '[
-        _ 1guard _ with each
+        _ 1check _ with each
     ] each ; inline
 
 : 2nested-filter-as* ( seq1 seq-quot quot exemplar -- seq )
@@ -1187,7 +1187,7 @@ INSTANCE: step-slice wrapped-sequence
 
 : map-prior-identity-from-as ( ... identity i seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
     [
-        '[ [ swap @ ] 1guard ] length-operator
+        '[ [ swap @ ] 1check ] length-operator
     ] dip map-integers-from-as nip ; inline
 
 : map-prior-identity-as ( ... identity seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )

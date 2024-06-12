@@ -254,13 +254,13 @@ M: assoc unzip
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
 : zip-with-as ( ... seq quot: ( ... key -- ... value ) exemplar -- ... assoc )
-    [ [ 1guard ] curry ] dip map>assoc ; inline
+    [ [ 1check ] curry ] dip map>assoc ; inline
 
 : zip-with ( ... seq quot: ( ... key -- ... value ) -- ... alist )
     { } zip-with-as ; inline
 
 : collect-by! ( ... assoc seq quot: ( ... obj -- ... key ) -- ... assoc )
-    [ 1guard ] curry rot [
+    [ 1check ] curry rot [
         [ push-at ] curry compose each
     ] keep ; inline
 

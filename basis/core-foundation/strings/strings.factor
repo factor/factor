@@ -85,7 +85,7 @@ FUNCTION: CFStringRef CFCopyTypeIDDescription ( CFTypeID type_id )
     4 * 1 + <byte-vector> [
         underlying>> dup length
         { CFIndex } [ CFStringGetBytes drop ] with-out-parameters
-    ] 1guard >>length utf8 decode ;
+    ] 1check >>length utf8 decode ;
 
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;
