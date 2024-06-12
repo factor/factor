@@ -641,7 +641,7 @@ PRIVATE>
     over reject-as ; inline
 
 : push-either ( ..a elt quot: ( ..a elt -- ..b ? ) accum1 accum2 -- ..b )
-    [ guard ] 2dip ? push ; inline
+    [ 1guard ] 2dip ? push ; inline
 
 : 2selector ( quot -- selector accum1 accum2 )
     V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
@@ -984,18 +984,18 @@ PRIVATE>
 : longer ( seq1 seq2 -- seq ) [ 2length >= ] most ; inline
 
 : head? ( seq begin -- ? )
-    2dup shorter? [
+    [ shorter? ] 2guard [
         2drop f
     ] [
-        [ length [ head-slice ] guard ] keep
+        [ length [ head-slice ] 1guard ] keep
         mismatch-unsafe not
     ] if ;
 
 : tail? ( seq end -- ? )
-    2dup shorter? [
+    [ shorter? ] 2guard [
         2drop f
     ] [
-        [ length [ tail-slice* ] guard ] keep
+        [ length [ tail-slice* ] 1guard ] keep
         mismatch-unsafe not
     ] if ;
 
@@ -1072,7 +1072,7 @@ PRIVATE>
 : subseq? ( subseq seq -- ? ) subseq-start >boolean ; inline deprecated
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
-    2dup mismatch [ 2dup min-length ] unless*
+    [ mismatch ] 2guard [ 2dup min-length ] unless*
     [ tail-slice ] curry bi@ ;
 
 : unclip ( seq -- rest first )
@@ -1185,7 +1185,7 @@ ALIAS: supremum maximum deprecated
 
 : select-by ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... elt )
     [
-        [ guard ] curry [ [ first ] dip call ] 2keep
+        [ 1guard ] curry [ [ first ] dip call ] 2keep
         [ curry 2dip pick over ] curry
     ] [
         [ [ 2drop ] [ 2nipd ] if ] compose

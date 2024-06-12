@@ -197,7 +197,7 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup and-class flatten partition-classes
     dup integers>> length {
         { 0 [ nip make-and-class ] }
-        { 1 [ integers>> first [ '[ _ swap class-member? ] all? ] verify ] }
+        { 1 [ integers>> first [ '[ _ swap class-member? ] all? ] 1verify ] }
         [ 3drop f ]
     } case ;
 

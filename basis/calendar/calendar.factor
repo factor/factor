@@ -620,7 +620,7 @@ M: integer last-day-of-year 12 31 <date> ;
 :: nth-day-this-month ( $timestamp $n $day -- timestamp' )
     $timestamp clone
     $timestamp start-of-month $day day-this-week
-    [ [ month>> ] same? ] guard
+    [ [ month>> ] same? ] 1guard
     [ $n ] [ $n 1 + ] if weeks time+ ;
 
 PRIVATE>

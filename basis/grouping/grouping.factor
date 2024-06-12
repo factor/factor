@@ -77,7 +77,7 @@ PRIVATE>
             [
                 [ first-unsafe ]
                 [ >underlying< [ nth-unsafe ] curry [ 1 + ] 2dip ] bi
-            ] dip '[ @ _ guard ] all-integers-from? nip
+            ] dip '[ @ _ 1guard ] all-integers-from? nip
         ] if
     ] if ; inline
 

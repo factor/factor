@@ -184,7 +184,7 @@ M: vocab-link require name>> require ;
 ! that contain primitives, and loading the public vocabs would
 ! cause circularity issues.
 M: string require
-    [ ".private" ?tail ] guard [ lookup-vocab not ] when [
+    [ ".private" ?tail ] 1guard [ lookup-vocab not ] when [
         [
             dupd ?adjoin
             [ require-hook get call( name -- ) ] [ drop ] if

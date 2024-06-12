@@ -63,7 +63,7 @@ ERROR: cl-error err ;
     [ ascii decode but-last ] 2info ; inline
 
 : info-size_t-array ( handle name quot -- size_t-array )
-    [ [ length size_t heap-size / ] guard size_t <c-direct-array> ] info ; inline
+    [ [ length size_t heap-size / ] 1guard size_t <c-direct-array> ] info ; inline
 
 TUPLE: cl-handle < disposable handle ;
 

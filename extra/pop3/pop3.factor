@@ -102,7 +102,7 @@ PRIVATE>
     [
         [ host>> ] [ port>> ] bi
         <inet> utf8 <client> drop
-    ] guard >>stream
+    ] 1guard >>stream
     {
         [ pop3-account set ]
         [ user>> [ >user ] when* ]

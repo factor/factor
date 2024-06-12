@@ -12,7 +12,7 @@ IN: math.primes.brute-force
 
 : write-factor ( n d -- n' d' )
     2dup divisor? [
-        [ [ count-factor ] guard 2array , ] keep
+        [ [ count-factor ] 1guard 2array , ] keep
         ! If the remainder is a prime number, increase d so that
         ! the caller stops looking for factors.
         over prime? [ drop dup ] when

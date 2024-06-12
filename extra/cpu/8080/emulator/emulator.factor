@@ -734,10 +734,10 @@ SYMBOLS: $1 $2 $3 $4 ;
         { "DEC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ dec-byte ] keep [ $1 ] keep write-byte ] }
         { "INC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ inc-byte ] keep [ $1 ] keep write-byte ] }
         { "JP-NN" [ [ pc>> ] keep [ read-word ] keep pc<< ] }
-        { "JP-F|FF,NN" [ [ $1 ] guard [ [ next-word ] keep [ pc<< ] keep [ cycles>> ] guard 5 + swap cycles<< ] [ [ pc>> 2 + ] keep pc<< ] if ] }
+        { "JP-F|FF,NN" [ [ $1 ] 1guard [ [ next-word ] keep [ pc<< ] keep [ cycles>> ] 1guard 5 + swap cycles<< ] [ [ pc>> 2 + ] keep pc<< ] if ] }
         { "JP-(RR)" [ [ $1 ] keep pc<< ] }
         { "CALL-NN" [ (emulate-CALL) ] }
-        { "CALL-F|FF,NN" [ [ $1 ] guard [ 7 over inc-cycles (emulate-CALL) ] [ [ pc>> 2 + ] keep pc<< ] if ] }
+        { "CALL-F|FF,NN" [ [ $1 ] 1guard [ 7 over inc-cycles (emulate-CALL) ] [ [ pc>> 2 + ] keep pc<< ] if ] }
         { "LD-RR,NN" [ [ next-word ] keep $2 ] }
         { "LD-RR,RR" [ [ $3 ] keep $2 ] }
         { "LD-R,N" [ [ next-byte ] keep $2 ] }
