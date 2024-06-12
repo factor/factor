@@ -10,3 +10,7 @@ LIBS := -ldl -lm -lrt -lpthread -Wl,--export-dynamic
 ifeq ($(IS_GCC),1)
 	SITE_CFLAGS += -Wl,--no-as-needed
 endif
+
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC
