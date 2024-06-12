@@ -47,7 +47,7 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
         0           >>dwObj
         DIPH_DEVICE >>dwHow
         drop
-    ] guard >>dwData ;
+    ] 1guard >>dwData ;
 
 : set-buffer-size ( device size -- )
     DIPROP_BUFFERSIZE swap <buffer-size-diprop>

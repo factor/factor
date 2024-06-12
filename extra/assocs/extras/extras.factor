@@ -12,7 +12,7 @@ IN: assocs.extras
 : of+ ( assoc key n -- assoc ) '[ 0 or _ + ] change-of ; inline
 
 : of+* ( assoc key n -- assoc old new )
-    '[ [ 0 or _ + ] guard dup ] change-of ; inline
+    '[ [ 0 or _ + ] 1guard dup ] change-of ; inline
 
 : delete-of ( assoc key -- assoc ) over delete-at ; inline
 
@@ -111,7 +111,7 @@ IN: assocs.extras
 GENERIC: delete-value-at ( value assoc -- )
 
 M: assoc delete-value-at
-    [ value-at* ] guard [ delete-at ] [ 2drop ] if ;
+    [ value-at* ] 1guard [ delete-at ] [ 2drop ] if ;
 
 ERROR: key-exists value key assoc ;
 : set-once-at ( value key assoc -- )
@@ -244,7 +244,7 @@ PRIVATE>
     [ 0 > ] filter-values ;
 
 : collect-by-multi! ( ... assoc seq quot: ( ... obj -- ... new-keys ) -- ... assoc )
-    [ guard ] curry rot [
+    [ 1guard ] curry rot [
         [ push-at-each ] curry compose each
     ] keep ; inline
 

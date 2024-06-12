@@ -110,7 +110,7 @@ MACRO: cleave-array ( quots -- quot )
     currier quad@ ; inline
 
 MACRO: smart-plox ( true: ( ... -- x ) -- quot )
-    [ inputs [ 1 - [ and ] n*quot ] keep ] guard
+    [ inputs [ 1 - [ and ] n*quot ] keep ] 1guard
     '[ _ _ [ _ ndrop f ] smart-if ] ;
 
 : throttle ( quot millis -- quot' )

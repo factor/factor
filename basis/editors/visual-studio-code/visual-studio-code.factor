@@ -24,7 +24,7 @@ M: visual-studio-code-base find-visual-studio-code-path
                 [ "Code" which ]
                 [ "~/VSCode-linux-x64/Code" ]
                 [ "/usr/share/code/code" ]
-            } [ [ file-exists? ] verify ] map-compose 0|| ] }
+            } [ [ file-exists? ] 1verify ] map-compose 0|| ] }
         { macosx [
             "com.microsoft.VSCode" find-native-bundle
             [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }

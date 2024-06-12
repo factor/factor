@@ -104,7 +104,7 @@ CONSTANT: initial-hit T{ hit f double-4{ 0.0 0.0 0.0 0.0 } 1/0. }
     2dup initial-intersect dup lambda>> 1/0. = [
         3drop 0.0
     ] [
-        [ sray-intersect lambda>> 1/0. = ] guard
+        [ sray-intersect lambda>> 1/0. = ] 1guard
         [ ray-g neg ] [ drop 0.0 ] if
     ] if ; inline no-compile
 

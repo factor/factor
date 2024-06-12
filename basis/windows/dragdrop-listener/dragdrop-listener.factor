@@ -15,7 +15,7 @@ IN: windows.dragdrop-listener
         -1               >>lindex
         TYMED_HGLOBAL    >>tymed
     STGMEDIUM new
-    [ IDataObject::GetData ] guard succeeded? [
+    [ IDataObject::GetData ] 1guard succeeded? [
         dup data>>
         [ rot execute( hdrop -- x ) ] with-global-lock
         swap ReleaseStgMedium

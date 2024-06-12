@@ -121,7 +121,7 @@ ERROR: classoid-expected object ;
     } cond ;
 
 : (parse-until) ( accum end -- accum )
-    [ parse-until-step ] guard [ (parse-until) ] [ drop ] if ;
+    [ parse-until-step ] 1guard [ (parse-until) ] [ drop ] if ;
 
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;

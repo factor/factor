@@ -308,7 +308,7 @@ PRIVATE>
 : nth-index ( n obj seq -- i )
     [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
 
-: at+* ( n key assoc -- old new ) [ 0 or [ + ] guard dup ] change-at ; inline
+: at+* ( n key assoc -- old new ) [ 0 or [ + ] 1guard dup ] change-at ; inline
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
 
@@ -900,7 +900,7 @@ ERROR: slice-error-of from to seq ;
 
 : select-by* ( ... seq quot: ( ... elt -- ... x ) compare: ( obj1 obj2 -- ? ) -- ... i elt )
     [
-        [ guard ] curry [ dip ] curry
+        [ 1guard ] curry [ dip ] curry
         [ [ first 0 ] dip call ] 2keep
         [ 2curry 3dip 5 npick pick ] curry
     ] [
@@ -1030,7 +1030,7 @@ ALIAS: map-infimum map-minimum deprecated
 
 : extract! ( ... seq quot: ( ... elt -- ... ? ) -- ... seq )
     [ dup ] compose over [ length ] keep new-resizable
-    [ [ push-when ] 2curry reject! ] guard like ; inline
+    [ [ push-when ] 2curry reject! ] 1guard like ; inline
 
 : find-pred-loop ( ... i n seq quot: ( ... elt -- ... calc ? ) -- ... calc/f i/f elt/f )
     2pick < [
@@ -1045,7 +1045,7 @@ ALIAS: map-infimum map-minimum deprecated
 : find-pred ( ... seq quot: ( ... elt -- ... calc ) pred: ( ... calc -- ... ? ) -- ... calc/f i/f elt/f )
     [ 0 ] 3dip
     [ [ length check-length ] keep ] 2dip
-    '[ nth-unsafe _ guard _ guard ] find-pred-loop swapd ; inline
+    '[ nth-unsafe _ 1guard _ 1guard ] find-pred-loop swapd ; inline
 
 : find-deep ( ... seq quot: ( ... elt -- ... calc ) -- ... calc/f )
     [ ] find-pred 2drop ; inline
@@ -1089,7 +1089,7 @@ INSTANCE: step-slice wrapped-sequence
 
 : 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
     '[
-        _ guard _ with each
+        _ 1guard _ with each
     ] each ; inline
 
 : 2nested-filter-as* ( seq1 seq-quot quot exemplar -- seq )
@@ -1187,7 +1187,7 @@ INSTANCE: step-slice wrapped-sequence
 
 : map-prior-identity-from-as ( ... identity i seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
     [
-        '[ [ swap @ ] guard ] length-operator
+        '[ [ swap @ ] 1guard ] length-operator
     ] dip map-integers-from-as nip ; inline
 
 : map-prior-identity-as ( ... identity seq quot: ( ... prior elt -- elt' ) exemplar -- seq' )
