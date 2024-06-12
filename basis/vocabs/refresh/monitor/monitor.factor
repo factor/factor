@@ -12,7 +12,7 @@ TR: convert-separators "/\\" ".." ;
     trim-head-separators
     trim-tail-separators
     convert-separators
-    [ valid-vocab-name? ] 1verify ;
+    [ valid-vocab-name? ] 1guard ;
 
 : path>vocab-parent-dir ( path -- path' )
     dup ".factor" tail? [ parent-directory ] when ;

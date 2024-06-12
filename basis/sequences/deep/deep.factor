@@ -27,7 +27,7 @@ M: object branch? drop f ;
     [ selector [ deep-each ] dip ] dip [ like ] when* ; inline recursive
 
 : deep-filter ( ... obj quot: ( ... elt -- ... ? ) -- ... seq )
-    over [ branch? ] 1verify deep-filter-as ; inline
+    over [ branch? ] 1guard deep-filter-as ; inline
 
 : deep-reject-as ( ... obj quot: ( ... elt -- ... ? ) exemplar -- ... seq )
     [ [ not ] compose ] dip deep-filter-as ; inline
@@ -77,4 +77,4 @@ M: object branch? drop f ;
                 [ dup branch? [ % ] [ , ] if ] each
             ] [ , ] if
         ]
-    ] keep [ branch? ] 1verify make ;
+    ] keep [ branch? ] 1guard make ;

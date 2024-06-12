@@ -312,9 +312,9 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : 1verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
 
-: 2verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 2keep rot [ 2drop f f ] unless ; inline
+: 2guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 2keep rot [ 2drop f f ] unless ; inline
 
-: 3verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 3keep roll [ 3drop f f f ] unless ; inline
+: 3guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 3keep roll [ 3drop f f f ] unless ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
