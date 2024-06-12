@@ -296,4 +296,10 @@ PRIVATE>
 : 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) true: ( ..a obj1 obj2 -- ..b ) -- ..b )
     [ 2check ] dip when ; inline
 
+: if? ( quot true false -- )
+    [ 1check ] 2dip [ [ drop ] prepose ] dip if ; inline
+
+: if?? ( quot true false -- )
+    [ 1check ] 2dip [ drop ] prepose if ; inline
+
 SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
