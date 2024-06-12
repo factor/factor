@@ -17,7 +17,7 @@ ARTICLE: "system" "System interface"
 "Getting a monotonically increasing nanosecond count:"
 { $subsections nano-count }
 "Exiting the Factor VM:"
-{ $subsections exit } ;
+{ $subsections exit quit } ;
 
 ARTICLE: "cpu" "Processor detection"
 "Processor detection:"
