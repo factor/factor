@@ -18,7 +18,7 @@ M: biassoc at* from>> at* ; inline
 M: biassoc value-at* to>> at* ; inline
 
 : set-at-once ( value key assoc -- )
-    [ key? ] 2guard [ 3drop ] [ set-at ] if ;
+    [ key? ] 2check [ 3drop ] [ set-at ] if ;
 
 M: biassoc set-at
     [ from>> set-at ] [ swapd to>> set-at-once ] 3bi ;

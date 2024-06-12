@@ -304,11 +304,11 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : negate ( quot -- quot' ) [ not ] compose ; inline
 
-: 1guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b ? ) keep swap ; inline
+: 1check ( ..a x quot: ( ..a x -- ..b ? ) -- ..b ? ) keep swap ; inline
 
-: 2guard ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b ? ) 2keep rot ; inline
+: 2check ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b ? ) 2keep rot ; inline
 
-: 3guard ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b ? ) 3keep roll ; inline
+: 3check ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b ? ) 3keep roll ; inline
 
 : 1verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
 

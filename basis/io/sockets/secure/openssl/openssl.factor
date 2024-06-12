@@ -105,13 +105,13 @@ PRIVATE>
 ERROR: file-expected path ;
 
 : ensure-exists ( path -- path )
-    [ file-exists? ] 1guard [ file-expected ] unless ; inline
+    [ file-exists? ] 1check [ file-expected ] unless ; inline
 
 : ssl-file-path ( path -- path' )
     absolute-path ensure-exists ;
 
 : load-certificate-chain ( ctx -- )
-    [ config>> key-file>> ] 1guard
+    [ config>> key-file>> ] 1check
     [
         [ handle>> ] [ config>> key-file>> ssl-file-path ] bi
         SSL_CTX_use_certificate_chain_file
@@ -133,7 +133,7 @@ ERROR: file-expected path ;
     [ push ] [ drop ] 2bi ;
 
 : set-default-password ( ctx -- )
-    [ config>> password>> ] 1guard
+    [ config>> password>> ] 1check
     [
         [ handle>> password-callback SSL_CTX_set_default_passwd_cb ]
         [
@@ -143,7 +143,7 @@ ERROR: file-expected path ;
     ] [ drop ] if ;
 
 : use-private-key-file ( ctx -- )
-    [ config>> key-file>> ] 1guard
+    [ config>> key-file>> ] 1check
     [
         [ handle>> ]
         [ config>> key-file>> ssl-file-path ] bi
@@ -156,14 +156,14 @@ ERROR: file-expected path ;
         [ handle>> ]
         [
             config>>
-            [ [ ca-file>> ] 1guard [ ssl-file-path ] when ]
-            [ [ ca-path>> ] 1guard [ ssl-file-path ] when ] bi
+            [ [ ca-file>> ] 1check [ ssl-file-path ] when ]
+            [ [ ca-path>> ] 1check [ ssl-file-path ] when ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
 : set-verify-depth ( ctx -- )
-    [ config>> verify-depth>> ] 1guard
+    [ config>> verify-depth>> ] 1check
     [
         [ handle>> ] [ config>> verify-depth>> ] bi
         SSL_CTX_set_verify_depth
@@ -179,7 +179,7 @@ M: bio dispose* handle>> BIO_free ssl-error ;
     normalize-path "r" BIO_new_file dup ssl-error <bio> ;
 
 : load-dh-params ( ctx -- )
-    [ config>> dh-file>> ] 1guard
+    [ config>> dh-file>> ] 1check
     [
         [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
         handle>> f f f PEM_read_bio_DHparams dup ssl-error

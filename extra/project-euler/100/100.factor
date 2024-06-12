@@ -28,7 +28,7 @@ IN: project-euler.100
 : euler100 ( -- answer )
     1 1
     [ dup dup 1 - * 2 * 10 24 ^ <= ]
-    [ [ 6 * swap - 2 - ] 1guard ] while nip ;
+    [ [ 6 * swap - 2 - ] 1check ] while nip ;
 
 ! TODO: solution needs generalization
 

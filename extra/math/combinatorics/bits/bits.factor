@@ -28,7 +28,7 @@ PRIVATE>
     [ ] map-permutation-bits ;
 
 : find-permutation-bits ( ... bit-count bits quot: ( ... n -- ... ? ) -- ... elt/f )
-    [ f f ] 3dip [ 2nip ] prepose [ 1guard ] curry
+    [ f f ] 3dip [ 2nip ] prepose [ 1check ] curry
     permutation-bits-quot [ [ pick not and ] compose ] dip
     while drop and* ; inline
 

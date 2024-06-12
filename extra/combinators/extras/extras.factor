@@ -110,7 +110,7 @@ MACRO: cleave-array ( quots -- quot )
     currier quad@ ; inline
 
 MACRO: smart-plox ( true: ( ... -- x ) -- quot )
-    [ inputs [ 1 - [ and ] n*quot ] keep ] 1guard
+    [ inputs [ 1 - [ and ] n*quot ] keep ] 1check
     '[ _ _ [ _ ndrop f ] smart-if ] ;
 
 : throttle ( quot millis -- quot' )
@@ -282,11 +282,13 @@ PRIVATE>
 : closure-limit ( vertex quot: ( vertex -- edges ) n -- set )
     HS{ } closure-limit-as ; inline
 
-: 1check ( obj quot -- obj ? )
-    over [ call ] dip swap ; inline
+: 3both? ( x y z quot -- ? ) tri@ and and ; inline
 
-: 2check ( obj1 obj2 quot -- obj1 obj2 ? )
-    2over [ call ] 2dip rot ; inline
+: 3either? ( x y z quot -- ? ) tri@ or or ; inline
+
+: check2@ ( ..a x y quot: ( ..a -- ..a ? ) -- ..a ? ) '[ _ both? ] 2keep rot ; inline
+
+: check3@ ( ..a x y z quot: ( ..a x -- ..a ? ) -- ..a ? ) '[ _ 3both? ] 3keep roll ; inline
 
 : 1check-when ( ..a obj cond: ( ..a obj -- ? ) true: ( ..a obj -- ..b ) -- ..b )
     [ 1check ] dip when ; inline

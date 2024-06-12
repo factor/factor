@@ -356,7 +356,7 @@ TUPLE: token-parser symbol ;
 
 : parse-token ( input string -- result )
     ! Parse the string, returning a parse result
-    [ ?head-slice ] 1guard [
+    [ ?head-slice ] 1check [
         <parse-result>
     ] [
         [ seq>> pos get swap ] dip "'" "'" surround 1vector add-error f
