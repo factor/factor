@@ -310,7 +310,7 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : 3check ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b ? ) 3keep roll ; inline
 
-: 1verify ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
+: 1guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
 
 : 2guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 2keep rot [ 2drop f f ] unless ; inline
 
