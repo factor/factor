@@ -304,17 +304,24 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 : negate ( quot -- quot' ) [ not ] compose ; inline
 
-: 1check ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x ? ) keep swap ; inline
+: 1check ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x ? )
+    keep swap ; inline
 
-: 2check ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b x y ? ) 2keep rot ; inline
+: 2check ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b x y ? )
+    2keep rot ; inline
 
-: 3check ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b x y z ? ) 3keep roll ; inline
+: 3check ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b x y z ? )
+    3keep roll ; inline
 
-: 1guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) keep and ; inline
+! `1guard` is `keep and` but the parallelism looks nice
+: 1guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f )
+    1check [ drop f ] unless ; inline
 
-: 2guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 2keep rot [ 2drop f f ] unless ; inline
+: 2guard ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b x/f y/f )
+    2check [ 2drop f f ] unless ; inline
 
-: 3guard ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x/f ) 3keep roll [ 3drop f f f ] unless ; inline
+: 3guard ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b x/f y/f z/f )
+    3check [ 3drop f f f ] unless ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
