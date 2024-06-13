@@ -114,7 +114,7 @@ PRIVATE>
 : stream>assoc ( exemplar -- assoc/f )
     clone [
         state [ bson-object-data-read ] with-variable
-    ] verify ;
+    ] 1guard ;
 
 : path>bson-sequence ( path -- assoc )
     binary [

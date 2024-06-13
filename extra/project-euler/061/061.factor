@@ -69,7 +69,7 @@ IN: project-euler.061
 
 : find-cycle ( polygons chain length -- chain )
     2dup [ length ] dip = [
-        drop nip [ cycle? ] verify
+        drop nip [ cycle? ] 1guard
     ] [
         [ dupd links ] dip '[ _ find-cycle ] with map-find drop
     ] if ;

@@ -7,7 +7,7 @@ IN: hashcash
 ARTICLE: "hashcash" "Hashcash"
 "Hashcash is an anti-spam / denial of service counter-measure tool."
 $nl
-"A hashcash stamp constitutes a proof-of-work which takes a parameterizable amount of work to compute for the sender. The recipient (and indeed anyone as it is publicly auditable) can verify received hashcash stamps efficiently."
+"A hashcash stamp constitutes a proof-of-work which takes a parameterizable amount of work to compute for the sender. The recipient (and indeed anyone as it is publicly auditable) can 1guard received hashcash stamps efficiently."
 $nl
 "E-mail senders attach hashcash stamps with the " { $snippet X-Hashcash } " header. Vendors and authors of anti-spam tools are encouraged to exempt e-mail sent with hashcash from their blacklists and content-based filtering rules."
 $nl
