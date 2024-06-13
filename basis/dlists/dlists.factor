@@ -183,7 +183,7 @@ M: dlist clear-deque
 
 : dlist-filter ( ... dlist quot: ( ... value -- ... ? ) -- ... dlist' )
     <dlist> [
-        '[ _ 1check [ _ push-back ] [ drop ] if ] dlist-each
+        '[ _ [ _ push-back ] [ drop ] 1if ] dlist-each
     ] keep ; inline
 
 M: dlist clone

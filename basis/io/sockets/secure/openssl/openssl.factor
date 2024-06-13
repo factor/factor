@@ -163,11 +163,11 @@ ERROR: file-expected path ;
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
 : set-verify-depth ( ctx -- )
-    [ config>> verify-depth>> ] 1check
+    [ config>> verify-depth>> ]
     [
         [ handle>> ] [ config>> verify-depth>> ] bi
         SSL_CTX_set_verify_depth
-    ] [ drop ] if ;
+    ] [ drop ] 1if ;
 
 TUPLE: bio < disposable handle ;
 
@@ -179,12 +179,12 @@ M: bio dispose* handle>> BIO_free ssl-error ;
     normalize-path "r" BIO_new_file dup ssl-error <bio> ;
 
 : load-dh-params ( ctx -- )
-    [ config>> dh-file>> ] 1check
+    [ config>> dh-file>> ]
     [
         [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
         handle>> f f f PEM_read_bio_DHparams dup ssl-error
         SSL_CTX_set_tmp_dh ssl-error
-    ] [ drop ] if ;
+    ] [ drop ] 1if ;
 
 ! Attempt to set ecdh. If it fails, ignore...?
 : set-ecdh-params ( ctx -- )

@@ -29,11 +29,9 @@ IN: compiler.cfg.linear-scan.ranges
     '[ _ [ intersect-range ] with map-find drop ] map-find drop ;
 
 : shorten-ranges ( n ranges -- )
-    [ empty? ] 1check [
-        dupd add-new-range
-    ] [
-        [ last second 2array ] keep set-last
-    ] if ;
+    [ empty? ]
+    [ dupd add-new-range ]
+    [ [ last second 2array ] keep set-last ] 1if ;
 
 : split-last-range ( before after last n -- before' after' )
     split-range [ [ but-last ] dip suffix ] [ prefix ] bi-curry* bi* ;
