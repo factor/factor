@@ -156,8 +156,8 @@ ERROR: file-expected path ;
         [ handle>> ]
         [
             config>>
-            [ [ ca-file>> ] 1check [ ssl-file-path ] when ]
-            [ [ ca-path>> ] 1check [ ssl-file-path ] when ] bi
+            [ ca-file>> [ ssl-file-path ] ?call ]
+            [ ca-path>> [ ssl-file-path ] ?call ] bi
         ] bi
         SSL_CTX_load_verify_locations
     ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
