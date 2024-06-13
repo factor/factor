@@ -1992,7 +1992,7 @@ $nl
 $nl
 "The justification for this is that the VM should not crash if a resizable sequence is resized during the execution of an iteration combinator."
 $nl
-"Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already 1checked by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
+"Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
 
 ARTICLE: "sequence-protocol" "Sequence protocol"
 "All sequences must be instances of a mixin class:"

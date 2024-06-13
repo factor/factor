@@ -409,7 +409,7 @@ FUNCTION-ALIAS: pcre2_set_parens_nest_limit
     int pcre2_set_parens_nest_limit_8 ( pcre2_compile_context* ccontext, uint32_t value )
 
 FUNCTION-ALIAS: pcre2_set_compile_recursion_guard
-    int pcre2_set_compile_recursion_guard_8 ( pcre2_compile_context* ccontext, void* 1check_function, void* user_data )
+    int pcre2_set_compile_recursion_guard_8 ( pcre2_compile_context* ccontext, void* guard_function, void* user_data )
 
 FUNCTION-ALIAS: pcre2_match_context_create
     pcre2_match_context* pcre2_match_context_create_8 ( pcre2_general_context* gcontext )
