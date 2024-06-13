@@ -163,7 +163,8 @@ M: struct-class writer-quot
     struct-slots slot-named offset>> ; inline
 
 M: struct equal?
-    2dup [ class-of ] same? [
+    [ [ class-of ] same? ] 2check
+    [
         [ struct-slot-values ] same?
     ] [ 2drop f ] if ; inline
 

@@ -146,7 +146,7 @@ PRIVATE>
     [ drop 0 ] [ length ] [ ] tri <slice> ; inline
 
 : slice-order-by-from ( slice1 slice2 -- slice-lt slice-gt )
-    2dup [ from>> ] bi@ > [ swap ] when ; inline
+    [ [ from>> ] bi@ > ] 2check [ swap ] when ; inline
 
 : ordered-slices-range ( slice-lt slice-gt -- to from )
     [ to>> ] [ from>> ] bi* ;

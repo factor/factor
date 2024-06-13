@@ -26,7 +26,10 @@ PRIVATE>
 
 <PRIVATE
 : remove-left ( heap -- value prio newheap )
-    dup [ left>> ] [ right>> ] bi [ pheap-empty? ] both?
+    [
+        [ left>> ] [ right>> ] bi
+        [ pheap-empty? ] both?
+    ] 1check
     [ [ value>> ] [ prio>> ] bi <persistent-heap> ]
     [ >branch< swap remove-left -rot [ <branch> ] 2dip rot ] if ;
 
@@ -55,8 +58,10 @@ M: empty-heap sift-down
     <branch> ;
 
 M: branch sift-down ! both arguments are branches
-    3dup [ prio>> <= ] both-with? [ <branch> ] [
-        2dup [ prio>> ] bi@ <= [ reroot-left ] [ reroot-right ] if
+    [ [ prio>> <= ] both-with? ] 3check
+    [ <branch> ] [
+        [ [ prio>> ] bi@ <= ] 2check
+        [ reroot-left ] [ reroot-right ] if
     ] if ;
 PRIVATE>
 
@@ -81,11 +86,12 @@ M: empty-heap pheap-push
 PRIVATE>
 
 M: branch pheap-push
-    2dup prio>> <= [ push-top ] [ push-in ] if ;
+    [ prio>> <= ] 2check [ push-top ] [ push-in ] if ;
 
 : pheap-pop* ( heap -- newheap )
-    dup pheap-empty? [ empty-pheap ] [
-        dup left>> pheap-empty?
+    [ pheap-empty? ] 1check
+    [ empty-pheap ] [
+        [ left>> pheap-empty? ] 1check
         [ drop <persistent-heap> ]
         [ [ left>> remove-left ] keep right>> swap sift-down ] if
     ] if ;

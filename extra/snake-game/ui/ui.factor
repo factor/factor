@@ -66,12 +66,15 @@ CONSTANT: snake-game-cell-size 20
     nip dir>> [ move-loc ] keep ;
 
 : draw-snake ( loc from-dir snake -- )
-    3dup [
-        [ draw-snake-part ]
-        [ next-snake-loc-from-dir ] 3bi
-    ] each 2drop
-    ! make sure to draw the head again
-    first draw-snake-part ;
+    [
+        [
+            [ draw-snake-part ]
+            [ next-snake-loc-from-dir ] 3bi
+        ] each 2drop
+    ] [
+        ! make sure to draw the head again
+        first draw-snake-part
+    ] 3bi ;
 
 : game-status ( snake-game -- str )
     [ score>> ]
@@ -142,7 +145,8 @@ M: snake-gadget draw-gadget*
     HS{ "ENTER" "RET" "n" "N" } in? ;
 
 M: snake-gadget handle-gesture
-    swap dup key-down? [
+    swap [ key-down? ] 1check
+    [
         sym>> {
             { [ dup quit-key? ] [ drop close-window ] }
             { [ dup pause-key? ] [ drop toggle-game-pause ] }

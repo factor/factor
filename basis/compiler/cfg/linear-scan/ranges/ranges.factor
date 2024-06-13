@@ -3,8 +3,8 @@ IN: compiler.cfg.linear-scan.ranges
 
 ! Range utilities
 : intersect-range ( r1 r2 -- n/f )
-    2dup [ first ] bi@ > [ swap ] when
-    2dup [ second ] [ first ] bi* >=
+    [ [ first ] bi@ > ] 2check [ swap ] when
+    [ [ second ] [ first ] bi* >= ] 2check
     [ nip first ] [ 2drop f ] if ;
 
 : split-range ( range n -- before after )
@@ -18,7 +18,7 @@ IN: compiler.cfg.linear-scan.ranges
     [ drop f ] [ last first 1 - >= ] if-empty ;
 
 : add-range ( from to ranges -- )
-    2dup extend-last? [
+    [ extend-last? ] 2check [
         [ nip last second 2array ] keep set-last
     ] [ add-new-range ] if ;
 
@@ -29,7 +29,9 @@ IN: compiler.cfg.linear-scan.ranges
     '[ _ [ intersect-range ] with map-find drop ] map-find drop ;
 
 : shorten-ranges ( n ranges -- )
-    dup empty? [ dupd add-new-range ] [
+    [ empty? ] 1check [
+        dupd add-new-range
+    ] [
         [ last second 2array ] keep set-last
     ] if ;
 
