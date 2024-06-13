@@ -14,7 +14,7 @@ HELP: encode-test
 { $values
     { "path" "a pathname string" } { "image-class" object }
 }
-{ $description "Runs a unit-test on the image at " { $snippet "path" } " to test the image encoder. The image is decoded, encoded, and then decoded again to verify that the final decoded output matches the original decoded output. Before comparison for equality, the images are normalized in order to accommodate differences in representation between the two potential encoders." }
+{ $description "Runs a unit-test on the image at " { $snippet "path" } " to test the image encoder. The image is decoded, encoded, and then decoded again to 1guard that the final decoded output matches the original decoded output. Before comparison for equality, the images are normalized in order to accommodate differences in representation between the two potential encoders." }
 { $warning "This test assumes that the image decoder is working correctly. If the image fails both the " { $link decode-test } " and the " { $link encode-test } ", then you should first debug the decoder. Once the decoder is working correctly, proceed with testing the encoder." } ;
 
 HELP: images.
@@ -62,7 +62,7 @@ ARTICLE: { "images" "testing" "reference" } "Reference image"
 $nl
 "Reference images are used by " { $link decode-test } " to compare the decoder's output against a saved image that is known to be correct."
 $nl
-"You can create your own reference image after you verify that the image has been correctly decoded:"
+"You can create your own reference image after you 1guard that the image has been correctly decoded:"
 { $subsections
     save-as-reference-image
     save-all-as-reference-images
@@ -81,7 +81,7 @@ $nl
 }
 "Establishing a " { $link { "images" "testing" "reference" } } ":"
 { $subsections save-as-reference-image }
-"You should only create a reference image after you manually verify that your decoder is generating a valid " { $link image } " object and that it renders correctly to the screen. The following words are useful for manual verification:"
+"You should only create a reference image after you manually 1guard that your decoder is generating a valid " { $link image } " object and that it renders correctly to the screen. The following words are useful for manual verification:"
 { $subsections
     image.
     images.

@@ -152,7 +152,7 @@ HELP: samples
 HELP: world-pixel-format-attributes
 { $values { "world" world } { "attributes" sequence } }
 { $description "Returns the set of " { $link "ui.pixel-formats-attributes" } " that " { $snippet "world" } " requests when grafted. This generic can be overridden by subclasses of " { $snippet "world" } "." }
-{ $notes "The pixel format provided by the window system will not necessarily exactly match the requested attributes. To verify required pixel format attributes, override " { $link check-world-pixel-format } "." } ;
+{ $notes "The pixel format provided by the window system will not necessarily exactly match the requested attributes. To 1guard required pixel format attributes, override " { $link check-world-pixel-format } "." } ;
 
 HELP: check-world-pixel-format
 { $values { "world" world } { "pixel-format" pixel-format } }

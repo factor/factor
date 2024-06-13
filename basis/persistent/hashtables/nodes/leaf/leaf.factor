@@ -7,9 +7,9 @@ IN: persistent.hashtables.nodes.leaf
     [ nip ] [ hashcode>> eq? ] 2bi
     [ key>> = ] [ 2drop f ] if ; inline
 
-M: leaf-node (entry-at) [ matching-key? ] verify ;
+M: leaf-node (entry-at) [ matching-key? ] 1guard ;
 
-M: leaf-node (pluck-at) [ matching-key? not ] verify ;
+M: leaf-node (pluck-at) [ matching-key? not ] 1guard ;
 
 M:: leaf-node (new-at) ( shift value key hashcode leaf-node -- node' added-leaf )
     hashcode leaf-node hashcode>> eq? [

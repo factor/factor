@@ -88,7 +88,7 @@ M: irc-message set-irc-command
 : ?define-irc-parameters ( class slot-names -- )
     dup empty? not [
         [ \ irc-parameter-slots create-method-in ] dip
-        [ [ "_" = not ] verify ] map '[ drop _ ] define
+        [ [ "_" = not ] 1guard ] map '[ drop _ ] define
     ] [ 2drop ] if ;
 
 : ?define-irc-trailing ( class slot-name -- )

@@ -26,7 +26,7 @@ IN: help.search
             { \ $snippet [ rest [ element-value ] map join-words ] }
             [ 2drop f ]
         } case
-    ] [ [ string? ] verify ] if ;
+    ] [ [ string? ] 1guard ] if ;
 
 MEMO: article-words ( name -- words )
     article-content [ element-value ] map join-words search-words

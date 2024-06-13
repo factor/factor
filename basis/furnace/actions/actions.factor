@@ -51,7 +51,7 @@ CONSTANT: revalidate-url-key "__u"
 
 : revalidate-url ( -- url/f )
     revalidate-url-key param
-    [ >url ensure-port [ same-host? ] verify ] ?call ;
+    [ >url ensure-port [ same-host? ] 1guard ] ?call ;
 
 : validation-failed ( -- * )
     post-request? "DELETE" method= or
