@@ -297,9 +297,9 @@ PRIVATE>
     [ 2check ] dip when ; inline
 
 : if? ( quot true false -- )
-    [ 1check ] 2dip [ [ drop ] prepose ] dip if ; inline
+    [ [ drop ] prepose ] dip 1if ; inline
 
 : if?? ( quot true false -- )
-    [ 1check ] 2dip [ drop ] prepose if ; inline
+    [ drop ] prepose 1if ; inline
 
 SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
