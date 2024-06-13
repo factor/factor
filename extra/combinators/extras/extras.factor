@@ -286,9 +286,9 @@ PRIVATE>
 
 : 3either? ( x y z quot -- ? ) tri@ or or ; inline
 
-: check2@ ( ..a x y quot: ( ..a -- ..a ? ) -- ..a ? ) '[ _ both? ] 2keep rot ; inline
+: check2@ ( ..a x y quot: ( ..a -- ..a ? ) -- ..a ? ) '[ _ both? ] 2check ; inline
 
-: check3@ ( ..a x y z quot: ( ..a x -- ..a ? ) -- ..a ? ) '[ _ 3both? ] 3keep roll ; inline
+: check3@ ( ..a x y z quot: ( ..a x -- ..a ? ) -- ..a ? ) '[ _ 3both? ] 3check ; inline
 
 : 1check-when ( ..a obj cond: ( ..a obj -- ? ) true: ( ..a obj -- ..b ) -- ..b )
     [ 1check ] dip when ; inline

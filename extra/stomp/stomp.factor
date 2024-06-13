@@ -205,8 +205,7 @@ SYMBOL: stomp-subscription#
 : parse-heartbeat ( heartbeat -- x y )
     "0,0" or "," split1 [ string>number ] bi@ ;
 
-: heartbeat-interval ( client server -- milliseconds )
-    2dup [ 0 <= ] either? [ 2drop 0 ] [ max ] if ;
+: heartbeat-interval ( client server -- milliseconds ) min 0 max ;
 
 : adjust-stomp-version ( frame -- frame )
     dup headers>> "accept-version" of [
