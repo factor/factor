@@ -14,9 +14,8 @@ vocabs words ;
 IN: bootstrap.image
 
 : arch-name ( os cpu -- arch )
-    2dup [ windows? ] [ ppc? ] bi* or [
-      [ drop unix ] dip
-    ] unless
+    [ [ windows? ] [ ppc? ] bi* or ] 2check
+    [ [ drop unix ] dip ] unless
     [ name>> ] bi@ "-" glue ;
 
 : my-arch-name ( -- arch )
@@ -57,7 +56,8 @@ M: bignum (eql?) { bignum bignum } declare = ;
 M: float (eql?) fp-bitwise= ;
 
 M: sequence (eql?)
-    2dup [ length ] same? [ [ eql? ] 2all? ] [ 2drop f ] if ;
+    [ [ length ] same? ] 2check
+    [ [ eql? ] 2all? ] [ 2drop f ] if ;
 
 M: object (eql?) = ;
 

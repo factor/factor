@@ -13,7 +13,7 @@ HOOK: (terminal-size) os ( -- columns lines )
 : terminal-size ( -- dim )
     "COLUMNS" "LINES"
     [ os-env [ string>number ] [ 0 ] if* ] bi@
-    2dup [ 0 <= ] either? [
+    [ [ 0 <= ] either? ] 2check [
         (terminal-size)
         [ over 0 <= [ nip ] [ drop ] if ] bi-curry@ bi*
     ] when 2array ;
