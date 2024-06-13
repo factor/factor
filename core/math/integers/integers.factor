@@ -205,7 +205,7 @@ M: bignum (log2) bignum-log2 ; inline
     } cond ; inline
 
 : post-scale ( mantissa scale -- n )
-    [ 2/ ] dip ! drop 1check bit
+    [ 2/ ] dip ! drop guard bit
     over 53 2^ = [ [ 2/ ] [ 1 + ] bi* ] when
     scale-float ; inline
 
