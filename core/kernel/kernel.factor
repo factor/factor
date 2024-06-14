@@ -323,13 +323,13 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : 3guard ( ..a x y z quot: ( ..a x y z -- ..b ? ) -- ..b x/f y/f z/f )
     3check [ 3drop f f f ] unless ; inline
 
-: 1if ( ..a pred: ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x ? ) true: ( ..b -- ..c ) false: ( ..b -- ..c ) -- ..c )
+: 1if ( ..a pred: ( ..a x quot: ( ..a x -- ..b ? ) -- ..b x ? ) true: ( ..b x -- ..c ) false: ( ..b x -- ..c ) -- ..c )
     [ 1check ] 2dip if ; inline
 
-: 2if ( ..a pred: ( ..a x y -- ..b ? ) true: ( ..b -- ..c ) false: ( ..b -- ..c ) -- ..c )
+: 2if ( ..a pred: ( ..a x y -- ..b x y ? ) true: ( ..b x y -- ..c ) false: ( ..b x y -- ..c ) -- ..c )
     [ 2check ] 2dip if ; inline
 
-: 3if ( ..a pred: ( ..a x y z -- ..b ? ) true: ( ..b -- ..c ) false: ( ..b -- ..c ) -- ..c )
+: 3if ( ..a pred: ( ..a x y z -- ..b x y z ? ) true: ( ..b x y z -- ..c ) false: ( ..b x y z -- ..c ) -- ..c )
     [ 3check ] 2dip if ; inline
 
 ! Loops
