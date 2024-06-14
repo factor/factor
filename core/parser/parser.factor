@@ -111,20 +111,16 @@ ERROR: classoid-expected object ;
     scan-object \ f or
     dup classoid? [ classoid-expected ] unless ;
 
-: parse-until-step ( accum end -- accum ? )
-    ?scan-datum {
-        { [ 2dup eq? ] [ 2drop f ] }
-        { [ dup not ] [ drop throw-unexpected-eof t ] }
-        { [ dup delimiter? ] [ unexpected t ] }
-        { [ dup parsing-word? ] [ nip execute-parsing t ] }
-        [ pick push drop t ]
-    } cond ;
-
-: (parse-until) ( accum end -- accum )
-    [ parse-until-step ] 1check [ (parse-until) ] [ drop ] if ;
-
 : parse-until ( end -- vec )
-    100 <vector> swap (parse-until) ;
+    [ 100 <vector> ] dip [
+        ?scan-datum {
+            { [ 2dup eq? ] [ 2drop f ] }
+            { [ dup not ] [ drop throw-unexpected-eof ] }
+            { [ dup delimiter? ] [ unexpected ] }
+            { [ dup parsing-word? ] [ nip execute-parsing t ] }
+            [ pick push drop t ]
+        } cond
+    ] curry loop ;
 
 SYMBOL: quotation-parser
 
