@@ -290,12 +290,6 @@ PRIVATE>
 
 : check3@ ( ..a x y z quot: ( ..a x -- ..a ? ) -- ..a ? ) '[ _ 3both? ] 3check ; inline
 
-: 1check-when ( ..a obj cond: ( ..a obj -- ? ) true: ( ..a obj -- ..b ) -- ..b )
-    [ 1check ] dip when ; inline
-
-: 2check-when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) true: ( ..a obj1 obj2 -- ..b ) -- ..b )
-    [ 2check ] dip when ; inline
-
 : if? ( quot true false -- )
     [ [ drop ] prepose ] dip 1if ; inline
 
