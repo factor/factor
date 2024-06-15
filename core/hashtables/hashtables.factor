@@ -80,8 +80,8 @@ TUPLE: hashtable
     ] if ; inline recursive
 
 : new-key@ ( key hash -- array n )
-    [ array>> 2dup hash@ 0 f (new-key@) ] 1check
-    [ over [ hash-deleted- ] [ hash-count+ ] if or* ] [ 2drop ] if ; inline
+    [ array>> 2dup hash@ 0 f (new-key@) ]
+    [ over [ hash-deleted- ] [ hash-count+ ] if or* ] [ 2drop ] 1if ; inline
 
 : set-nth-pair ( value key array n -- )
     2 fixnum+fast [ set-slot ] 2keep

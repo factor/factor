@@ -332,6 +332,24 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : 3if ( ..a pred: ( ..a x y z -- ..b x y z ? ) true: ( ..b x y z -- ..c ) false: ( ..b x y z -- ..c ) -- ..c )
     [ 3check ] 2dip if ; inline
 
+: 1when ( ..a obj cond: ( ..a obj -- ? ) true: ( ..a obj -- ..b ) -- ..b )
+    [ 1check ] dip when ; inline
+
+: 1unless ( ..a obj cond: ( ..a obj -- ? ) false: ( ..a obj -- ..b ) -- ..b )
+    [ 1check ] dip unless ; inline
+
+: 2when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) true: ( ..a obj1 obj2 -- ..b ) -- ..b )
+    [ 2check ] dip when ; inline
+
+: 2unless ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ? ) false: ( ..a obj1 obj2 -- ..b ) -- ..b )
+    [ 2check ] dip unless ; inline
+
+: 3when ( ..a obj1 obj2 obj3 cond: ( ..a obj1 obj2 obj3 -- ? ) true: ( ..a obj1 obj2 obj3 -- ..b ) -- ..b )
+    [ 3check ] dip when ; inline
+
+: 3unless ( ..a obj1 obj2 obj3 cond: ( ..a obj1 obj2 obj3 -- ? ) false: ( ..a obj1 obj2 obj3 -- ..b ) -- ..b )
+    [ 3check ] dip unless ; inline
+
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
     [ call ] keep [ loop ] curry when ; inline recursive
