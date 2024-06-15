@@ -64,7 +64,7 @@ M: vocab-link vocab-root? drop f ;
 : scaffolding? ( path -- path ? )
     [ "Not creating scaffolding for " f ]
     [ "Creating scaffolding for " t ] if-file-exists
-    swap write dup <pathname> . ;
+    [ write dup <pathname> . ] dip ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
