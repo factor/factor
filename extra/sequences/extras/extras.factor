@@ -337,17 +337,34 @@ PRIVATE>
 : occurrence-count-by ( seq quot: ( elt -- elt' ) -- hash seq' )
     '[ nip @ over inc-at* drop ] [ H{ } clone ] 2dip { } 0accumulate-as ; inline
 
-: progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq' )
+: bqn-index-by-as ( seq1 seq2 quot exemplar -- seq )
+    [
+        over length 1 + '[ @ swap index _ or ] with
+    ] dip map-as ; inline
+
+: bqn-index-by ( seq1 seq2 quot -- seq )
+    { } bqn-index-by-as ; inline
+
+: bqn-index-as ( seq1 seq2 exemplar -- seq )
+    [ [ ] ] dip bqn-index-by-as ; inline
+
+: bqn-index ( seq1 seq2 -- seq )
+    [ ] bqn-index-by ; inline
+
+: progressive-index-by-as ( seq1 seq2 quot exemplar -- hash seq )
     [
         pick length '[
             tuck [ @ over inc-at* drop ] 2dip swap nth-index _ or
         ] [ H{ } clone ] 3dip with
     ] dip map-as ; inline
 
-: progressive-index-by ( seq1 seq2 quot -- hash seq' )
+: progressive-index-by ( seq1 seq2 quot -- hash seq )
     { } progressive-index-by-as ; inline
 
-: progressive-index ( seq1 seq2 -- hash seq' )
+: progressive-index-as ( seq1 seq2 exemplar -- hash seq )
+    [ [ ] ] dip progressive-index-by-as ; inline
+
+: progressive-index ( seq1 seq2 -- hash seq )
     [ ] progressive-index-by ; inline
 
 : 0reduce ( seq quot: ( ..a prev elt -- ..a next ) -- result )

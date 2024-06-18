@@ -333,6 +333,10 @@ strings tools.test ;
     { 2 7 1 8 1 7 1 8 2 8 4 } [ ] occurrence-count-by
 ] unit-test
 
+{ { 1 4 2 } } [
+    { 0 1 2 3 } { 1 8 2 } bqn-index
+] unit-test
+
 {
     H{
         { 97 1 } { 98 1 } { 99 1 } { 100 1 } { 101 1 } { 102 1 }
