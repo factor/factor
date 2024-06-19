@@ -45,7 +45,7 @@ SYMBOL: github-token
     ] produce nip concat ; inline
 
 ! type is one of { "orgs" "users" }
-: map-github-pages-json ( base-url params param-string -- seq )
+: map-github-pages-json ( base-url params param-string -- jsonlines )
     [ 0 [ dup ] ] 3dip '[
         1 + _ _ pick suffix _ vsprintf append github-get-json
         dup empty? [ 2drop f f ] when
@@ -75,13 +75,13 @@ SYMBOL: github-token
 
 : get-repositories ( org/user -- seq )
     [ github-org-or-user ] [ ] bi
-    "/%s/%s/repos" sprintf map-github-pages-100 ;
+    "/%s/%s/repos" sprintf map-github-pages-100-json ;
 
 : list-repository-languages ( owner repo -- seq )
-    "/repos/%s/%s/languages" sprintf map-github-pages-100 ;
+    "/repos/%s/%s/languages" sprintf github-get-json ;
 
 : list-repository-tags ( owner repo -- seq )
-    "/repos/%s/%s/tags" sprintf map-github-pages-100 ;
+    "/repos/%s/%s/tags" sprintf map-github-pages-100-json ;
 
 : list-repository-tags-all ( owner repo -- seq )
     "/repos/%s/%s/git/refs/tags" sprintf github-get-json ;
@@ -93,7 +93,7 @@ SYMBOL: github-token
     "/repos/%s/%s/git/matching-refs/tags/%s" sprintf github-get-json ;
 
 : list-repository-teams ( owner repo -- seq )
-    "/repos/%s/%s/teams" sprintf github-get-json ;
+    "/repos/%s/%s/teams" sprintf map-github-pages-100-json ;
 
 : list-teams-for-organization ( org -- seq )
     "/orgs/%s/teams" sprintf map-github-pages-100-json ;
@@ -277,9 +277,9 @@ SYMBOL: github-token
 
 ! stargazers
 : list-all-stargazers ( owner repo -- json )
-    "/repos/%s/%s/stargazers" sprintf map-github-pages-100 ;
+    "/repos/%s/%s/stargazers" sprintf map-github-pages-100-json ;
 
-: list-my-starred-projects ( -- json ) "/user/starred" map-github-pages-100 ;
+: list-my-starred-projects ( -- json ) "/user/starred" map-github-pages-100-json ;
 
 : single-repository-starred? ( owner repo -- ? )
     "/user/starred/%s/%s" sprintf github-get-success? ;
