@@ -19,10 +19,11 @@ ERROR: vocab-must-not-exist string ;
 
 <PRIVATE
 
-: vocab-root? ( string -- ? )
-    trim-tail-separators vocab-roots get member? ;
+GENERIC: vocab-root? ( obj -- ? )
+M: string vocab-root? trim-tail-separators vocab-roots get member? ;
+M: vocab vocab-root? drop f ;
 
-: ensure-vocab-exists ( string -- string )
+: ensure-vocab-exists ( vocab -- vocab )
     dup lookup-vocab [ no-vocab ] unless ;
 
 : check-vocab-root ( string -- string )
@@ -39,7 +40,8 @@ ERROR: vocab-must-not-exist string ;
     [ ] [ replace-vocab-separators ] bi* append-path ;
 
 : vocab>path ( vocab -- path )
-    check-vocab [ find-vocab-root ] keep vocab-root/vocab>path ;
+    vocab-name check-vocab
+    [ find-vocab-root ] keep vocab-root/vocab>path ;
 
 : vocab-root/vocab/file>path ( vocab-root vocab file -- path )
     [ vocab-root/vocab>path ] dip append-path ;
@@ -147,6 +149,8 @@ GENERIC: add-using ( object -- )
 M: array add-using [ add-using ] each ;
 
 M: string add-using drop ;
+
+M: vocab add-using drop ;
 
 M: object add-using
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
@@ -285,6 +289,7 @@ M: string scaffold-docs ( vocab -- )
 
 M: sequence scaffold-docs [ scaffold-word-docs nl ] each ;
 M: word scaffold-docs scaffold-word-docs ;
+M: vocab scaffold-docs vocab-name scaffold-docs ;
 
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
@@ -305,6 +310,7 @@ M: word scaffold-docs scaffold-word-docs ;
     root-cache get delete-at ;
 
 : scaffold-vocab-in ( vocab-root string -- )
+    vocab-name
     dup delete-from-root-cache
     {
         [ scaffold-directory ]
@@ -343,11 +349,12 @@ M: word scaffold-docs scaffold-word-docs ;
     [ tests-file-string ] dip utf8 set-file-contents ;
 
 : vocab>test-path ( vocab -- string )
-    "-tests.factor" vocab/suffix>path ;
+    vocab-name "-tests.factor" vocab/suffix>path ;
 
 PRIVATE>
 
 : scaffold-tests ( vocab -- )
+    vocab-name
     ensure-vocab-exists dup vocab>test-path
     scaffolding? [
         set-scaffold-tests-file
