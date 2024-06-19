@@ -116,6 +116,14 @@ cli-git-num-parallel [ cpus 2 * ] initialize
         ] parallel-each
     ] with-ensure-directory ;
 
+: sync-no-checkout-repository-as-parallel ( pairs -- )
+    cli-git-num-parallel get <semaphore> '[
+        _ [
+            first2 dup ... flush
+            sync-no-checkout-repository-as wait-for-success
+        ] with-semaphore
+    ] parallel-each ;
+
 : directory-entries-without-git ( directory -- entries )
     recursive-directory-entries
     [ name>> "/.git/" subseq-of? ] reject ;
