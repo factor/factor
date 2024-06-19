@@ -119,7 +119,7 @@ cli-git-num-parallel [ cpus 2 * ] initialize
 : sync-no-checkout-repository-as-parallel ( pairs -- )
     cli-git-num-parallel get <semaphore> '[
         _ [
-            first2 dup ... flush
+            first2 dup print flush
             sync-no-checkout-repository-as wait-for-success
         ] with-semaphore
     ] parallel-each ;
