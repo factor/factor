@@ -22,6 +22,7 @@ ERROR: vocab-must-not-exist string ;
 GENERIC: vocab-root? ( obj -- ? )
 M: string vocab-root? trim-tail-separators vocab-roots get member? ;
 M: vocab vocab-root? drop f ;
+M: vocab-link vocab-root? drop f ;
 
 : ensure-vocab-exists ( vocab -- vocab )
     dup lookup-vocab [ no-vocab ] unless ;
@@ -151,6 +152,8 @@ M: array add-using [ add-using ] each ;
 M: string add-using drop ;
 
 M: vocab add-using drop ;
+
+M: vocab-link add-using drop ;
 
 M: object add-using
     vocabulary>> using get [ adjoin ] [ drop ] if* ;
@@ -290,6 +293,7 @@ M: string scaffold-docs ( vocab -- )
 M: sequence scaffold-docs [ scaffold-word-docs nl ] each ;
 M: word scaffold-docs scaffold-word-docs ;
 M: vocab scaffold-docs vocab-name scaffold-docs ;
+M: vocab-link scaffold-docs vocab-name scaffold-docs ;
 
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
