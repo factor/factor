@@ -124,8 +124,6 @@ IN: codebase-analyzer
         [ file-stem "RECORD" = ]
         [ file-stem "REQUESTED" = ]
         [ file-stem "WHEEL" = ]
-        [ file-stem "AUTHORS" = ]
-        [ file-stem "AUTHORS" = ]
     } 1|| ;
 : python-packaging-files ( paths -- paths' ) [ python-packaging-file? ] filter ;
 
