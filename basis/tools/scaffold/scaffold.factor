@@ -260,6 +260,7 @@ PRIVATE>
     [ HS{ } clone using ] dip with-variable ; inline
 
 : link-vocab ( vocab -- )
+    vocab-name
     ".private" ?tail drop
     check-vocab
     "Edit documentation: " write
