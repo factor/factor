@@ -339,3 +339,11 @@ SYMBOL: github-token
 : github-mirror-path ( org/user -- path ) "github-factor-pristine" home-path prepend-path ;
 : mirror-github-org ( org/user -- )
     [ github-mirror-path ] [ ] bi sync-github-org-or-user ;
+
+: mirror-starred-repos ( path/f -- )
+    [ list-my-starred-projects ] dip
+    "github-starred" or '[
+        [ "ssh_url" of ]
+        [ "full_name" of _ prepend-path ] bi 2array
+    ] map
+    sync-no-checkout-repository-as-parallel ;
