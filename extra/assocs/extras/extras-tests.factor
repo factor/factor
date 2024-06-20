@@ -344,6 +344,10 @@ sequences tools.test ;
     H{ { 10 1 } } 10 1000 of+
 ] unit-test
 
+{ H{ { 1 10 } } } [
+    H{ { 1 2 } } 1 10 set-of
+] unit-test
+
 { H{ { 1 100 } } f } [
     H{ { 1 100 } } 1 100 maybe-set-of
 ] unit-test

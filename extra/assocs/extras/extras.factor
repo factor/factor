@@ -4,6 +4,9 @@ USING: arrays assocs assocs.private kernel math math.statistics
 sequences sets ;
 IN: assocs.extras
 
+: set-of ( assoc key value -- assoc )
+    swap pick set-at ; inline
+
 : change-of ( ..a assoc key quot: ( ..a value -- ..b newvalue ) -- ..b assoc )
     [ [ of ] dip call ] 2keepd rot set-of ; inline
 
