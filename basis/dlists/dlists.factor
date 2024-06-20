@@ -60,16 +60,16 @@ M: dlist equal?
     [ prev>> ] 1check set-next-when ;
 
 : normalize-front ( dlist -- )
-    [ back>> ] [ f >>front ] 1unless drop ; inline
+    [ back>> ] 1check [ f >>front ] unless drop ; inline
 
 : normalize-back ( dlist -- )
-    [ front>> ] [ f >>back ] 1unless drop ; inline
+    [ front>> ] 1check [ f >>back ] unless drop ; inline
 
 : set-back-to-front ( dlist -- )
-    [ back>> ] [ dup front>> >>back ] 1unless drop ; inline
+    [ back>> ] 1check [ dup front>> >>back ] unless drop ; inline
 
 : set-front-to-back ( dlist -- )
-    [ front>> ] [ dup back>> >>front ] 1unless drop ; inline
+    [ front>> ] 1check [ dup back>> >>front ] unless drop ; inline
 
 : (dlist-find-node) ( ... dlist-node quot: ( ... node -- ... ? ) -- ... node/f )
     over [
