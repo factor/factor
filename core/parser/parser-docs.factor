@@ -191,13 +191,18 @@ HELP: scan-number
 { $errors "Throws an error if the token is not a number or end of file is reached." }
 $parsing-note ;
 
+HELP: (parse-until)
+{ $values { "accum" vector } { "end" word } }
+{ $description "Parses objects from parser input until " { $snippet "end" } " is encountered, adding them to the accumulator." }
+$parsing-note ;
+
 HELP: parse-until
 { $values { "end" word } { "vec" "a new vector" } }
 { $description "Parses objects from parser input until " { $snippet "end" } ". Outputs a new vector with the results." }
 { $examples "This word is used to implement " { $link POSTPONE: ARTICLE: } "." }
 $parsing-note ;
 
-{ parse-tokens each-token map-tokens parse-until } related-words
+{ parse-tokens each-token map-tokens parse-until (parse-until) } related-words
 
 HELP: (parse-lines)
 { $values { "lexer" lexer } { "quot" "a new " { $link quotation } } }
