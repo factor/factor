@@ -33,9 +33,6 @@ M: assoc assoc-like drop ; inline
 : maybe-set-at ( value key assoc -- changed? )
     3dup at* [ = [ 3drop f ] [ set-at t ] if ] [ 2drop set-at t ] if ;
 
-: set-of ( assoc key value -- assoc )
-    swap pick set-at ; inline
-
 <PRIVATE
 
 : assoc-operator ( assoc quot -- alist quot' )
@@ -138,7 +135,6 @@ M: assoc values [ nip ] { } assoc>map ;
 : ?delete-at ( key assoc -- value/key ? )
     [ ?at ] [ delete-at ] 2bi ;
 
-
 : rename-at ( newkey key assoc -- )
     [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
@@ -161,7 +157,7 @@ M: assoc values [ nip ] { } assoc>map ;
     swap [ nip key? ] curry assoc-filter ;
 
 : assoc-union! ( assoc1 assoc2 -- assoc1 )
-    [ set-of ] assoc-each ; inline
+    over '[ swap _ set-at ] assoc-each ; inline
 
 : assoc-union-as ( assoc1 assoc2 exemplar -- union )
     [ [ [ assoc-size ] bi@ + ] dip new-assoc ] 2keepd

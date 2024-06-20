@@ -385,10 +385,6 @@ unit-test
 { 2 t } [ 5 H{ { 2 5 } } ?value-at ] unit-test
 { 10 f } [ 10 H{ { 2 5 } } ?value-at ] unit-test
 
-{ H{ { 1 10 } } } [
-    H{ { 1 2 } } 1 10 set-of
-] unit-test
-
 { H{ { 5 10  } } t } [
     H{ { 5 1 } } dup
     '[ 10 5 _  maybe-set-at ] call
