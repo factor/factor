@@ -234,32 +234,6 @@ HELP: or*
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or* ." "12.0" }
 } ;
 
-HELP: ?or
-{ $values
-    { "obj1" "a generalized boolean" }
-    { "obj2" "a generalized boolean" }
-    { "obj1/obj2" "a generalized boolean" }
-    { "first?" "boolean" }
-}
-{ $description "A version of " { $link or } " which prefers to return first argument. The output " { $snippet "first?" } " tells you which object was returned." }
-{ $examples
-    "Prefers the second argument:"
-    { $example "USING: arrays kernel prettyprint ;"
-        "f 3 ?or 2array ."
-        "{ 3 f }"
-    }
-    "Will also return the first:"
-    { $example "USING: arrays kernel prettyprint ;"
-        "3 f ?or 2array ."
-        "{ 3 t }"
-    }
-    "Can return false:"
-    { $example "USING: arrays kernel prettyprint ;"
-        "f f ?or 2array ."
-        "{ f f }"
-    }
-} ;
-
 HELP: or?
 { $values
     { "obj1" "a generalized boolean" }
@@ -286,7 +260,7 @@ HELP: or?
     }
 } ;
 
-{ or or* ?or or? } related-words
+{ or or* or? } related-words
 
 HELP: xor
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/obj2/f" "a generalized boolean" } }

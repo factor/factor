@@ -173,11 +173,9 @@ DEFER: if
 
 : ?call ( ..a obj/f quot: ( ..a obj -- ..a obj' )  -- ..a obj'/f ) dupd when ; inline
 
-: ?or ( obj1 obj2 -- obj1/obj2 first? ) over [ drop t ] [ nip f ] if ; inline
+: or? ( obj1 obj2 -- obj2/obj1 second? ) [ nip t ] [ f ] if* ; inline
 
-: or? ( obj1 obj2 -- obj2/obj1 second? ) swap ?or ; inline
-
-: ?transmute ( old quot: ( old -- new/f ) -- new/old new? ) keep ?or ; inline
+: ?transmute ( old quot: ( old -- new/f ) -- new/old new? ) keep swap or? ; inline
 
 : transmute ( old quot: ( old -- new/f ) -- new/old ) ?transmute drop ; inline
 
