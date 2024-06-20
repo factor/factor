@@ -79,7 +79,7 @@ IN: assocs.extras
     dup assoc-invert-as ;
 
 : assoc-collect! ( assoc1 assoc2 -- assoc1 )
-    over [ push-at ] with-assoc assoc-each ;
+    over '[ swap _ push-at ] assoc-each ;
 
 : assoc-collect ( assoc1 assoc2 -- newassoc )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep

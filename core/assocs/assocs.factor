@@ -118,9 +118,6 @@ PRIVATE>
 : of ( assoc key -- value/f )
     swap at ; inline
 
-: with-assoc ( assoc quot: ( ..a value key assoc -- ..b ) -- quot: ( ..a key value -- ..b ) )
-    curry [ swap ] prepose ; inline
-
 M: assoc keys [ drop ] { } assoc>map ;
 
 M: assoc values [ nip ] { } assoc>map ;
@@ -132,7 +129,7 @@ M: assoc values [ nip ] { } assoc>map ;
     [ ?at ] [ delete-at ] 2bi ;
 
 : rename-at ( newkey key assoc -- )
-    [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
+    [ delete-at* ] keep '[ swap _ set-at ] [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
     assoc-size 0 = ; inline
@@ -141,7 +138,7 @@ M: assoc values [ nip ] { } assoc>map ;
     index-of-last assoc-stack-from ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
-    [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
+    '[ swap _ at* [ = ] [ 2drop f ] if ] assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
     2dup [ assoc-size ] bi@ = [ assoc-subset? ] [ 2drop f ] if ;
@@ -233,7 +230,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
         [ 2array ] swap 2map-as
     ] [
         [ 2dup min-length ] dip new-assoc
-        [ [ set-at ] with-assoc 2each ] keep
+        [ '[ swap _ set-at ] 2each ] keep
     ] if ; inline
 
 : zip ( keys values -- alist )
