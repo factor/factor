@@ -4,6 +4,8 @@ USING: arrays assocs kernel math.order quotations sequences
 sorting ;
 IN: sorting.specification
 
+<PRIVATE
+
 : execute-comparator ( obj1 obj2 word -- <=>/f )
     execute( obj1 obj2 -- <=> ) dup +eq+ eq? [ drop f ] when ;
 
@@ -12,6 +14,8 @@ IN: sorting.specification
 
 : execute-accessor ( obj1 obj2 word -- obj1' obj2' )
     '[ _ execute( tuple -- value ) ] bi@ ;
+
+PRIVATE>
 
 : compare-with-spec ( obj1 obj2 sort-spec -- <=> )
     ! sort-spec: { { accessor ... comparator } ... }
