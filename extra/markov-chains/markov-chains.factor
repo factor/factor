@@ -10,9 +10,9 @@ IN: markov-chains
     { t } { f } surround 2 clump ;
 
 : push-transitions ( table seq -- table )
-    transitions over [
-        [ drop H{ } clone ] cache inc-at
-    ] with-assoc assoc-each ;
+    transitions over '[
+        swap _ [ drop H{ } clone ] cache inc-at
+    ] assoc-each ;
 
 : transition-table ( seq -- table )
     H{ } clone swap [ push-transitions ] each ;
