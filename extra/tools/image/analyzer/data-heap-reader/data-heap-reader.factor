@@ -1,10 +1,10 @@
-USING: accessors assocs classes.struct io kernel locals math.bitwise
+USING: accessors assocs classes.struct io locals math.bitwise
 namespaces system tools.image.analyzer.utils tools.image.analyzer.vm
 vm vocabs.parser ;
 IN: tools.image.analyzer.data-heap-reader
 FROM: alien.c-types => uchar heap-size ;
 FROM: arrays => 2array ;
-FROM: kernel => ? boa bi dup keep nip swap ;
+FROM: kernel => ? boa bi dup keep nip swap 1check ;
 FROM: layouts => data-alignment ;
 FROM: math => + - * align neg shift ;
 
