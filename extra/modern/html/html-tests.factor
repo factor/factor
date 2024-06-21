@@ -1,7 +1,8 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors io.encodings.utf8 io.files kernel make math
-modern.html multiline sequences tools.test ;
+USING: accessors combinators.short-circuit io.encodings.utf8
+io.files kernel make math modern.html multiline sequences
+tools.test ;
 IN: modern.html.tests
 
 [
