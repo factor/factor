@@ -20,9 +20,10 @@ IN: mediawiki.api.tests
 "mediawiki.api unit-test" contact set-global
 "https://en.wikipedia.org/w/api.php" endpoint set-global
 
-{ t } [ { { "meta" "userinfo" } } query "anon" of ] unit-test
+! XXX: don't hit the network for unit tests
+! { t } [ { { "meta" "userinfo" } } query "anon" of ] unit-test
 
-{ } [ {
-    { "action" "parse" }
-    { "title" "Factor (programming language)" }
-} api-call drop ] unit-test ! test warnings
+! { } [ {
+!     { "action" "parse" }
+!     { "title" "Factor (programming language)" }
+! } api-call drop ] unit-test ! test warnings
