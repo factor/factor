@@ -31,7 +31,7 @@ INSTANCE: NORMAL-LOGIC-VAR LOGIC-VAR
 INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
 
 : logic-var? ( obj -- ? )
-    [ symbol? ] 1check [ get LOGIC-VAR? ] when ; inline
+    dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
 
 SYMBOLS: *trace?* *trace-depth* ;
 
