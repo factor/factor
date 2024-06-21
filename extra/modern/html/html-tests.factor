@@ -1,7 +1,7 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: io.encodings.utf8 io.files kernel make math modern.html
-multiline sequences tools.test ;
+USING: accessors io.encodings.utf8 io.files kernel make math
+modern.html multiline sequences tools.test ;
 IN: modern.html.tests
 
 [
@@ -274,5 +274,5 @@ IN: modern.html.tests
             [ name>> "table" = ]
             [ props>> [ first "id" = ] find nip ?second html>display "w460aac37c11b7" head? ]
         } 1&&
-    ] find-tag-by >boolean
+    ] xml-find-by >boolean
 ] unit-test
