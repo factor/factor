@@ -99,7 +99,7 @@ t botflag set-global
     ] if ;
 
 : retry-after? ( response -- ? )
-    header>> "retry-after" of dup [ dup seconds sleep ] when ;
+    header>> "retry-after" of [ string>number dup seconds sleep ] ?call ;
 
 : nonce-already-used? ( assoc -- ? )
     "error" of
