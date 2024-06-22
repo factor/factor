@@ -40,7 +40,7 @@ IN: ini-file
 : (unescape-string) ( str -- )
     CHAR: \\ over index [
         cut-slice [ % ] dip rest-slice
-        dup empty? [ "Missing escape code" throw ] when
+        [ empty? ] [ "Missing escape code" throw ] 1when
         unclip-slice escape , (unescape-string)
     ] [ % ] if* ;
 
@@ -76,7 +76,7 @@ IN: ini-file
 : should-quote? ( str -- ? )
     {
         [ CHAR: " swap index ]
-        [ last CHAR: \ = ]
+        [ ?last CHAR: \ = ]
     } 1|| ;
 
 : escape-quoted ( str -- str' )
