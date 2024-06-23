@@ -171,6 +171,10 @@ ARTICLE: "conditionals" "Conditional combinators"
 { $subsections if* when* unless* }
 "Another form abstracting a common stack shuffle pattern:"
 { $subsections ?if ?when ?unless }
+"An " { $snippet "if" } " form with three quotations:"
+{ $subsections 1if 2if 3if }
+"Words that test or guard against conditions:"
+{ $subsections 1check 2check 3check 1guard 2guard 3guard }
 "Sometimes instead of branching, you just need to pick one of two values:"
 { $subsections ? }
 "Two combinators which abstract out nested chains of " { $link if } ":"

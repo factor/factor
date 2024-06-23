@@ -34,16 +34,29 @@ HELP: 2dup  $shuffle ;
 HELP: 3dup  $shuffle ;
 HELP: 4dup  $shuffle ;
 HELP: nip   $shuffle ;
+HELP: nipd  $shuffle ;
 HELP: 2nip  $shuffle ;
+HELP: 2nipd $shuffle ;
+HELP: 3nip  $shuffle ;
+HELP: 3nipd $shuffle ;
+HELP: 4nip  $shuffle ;
+HELP: 5nip  $shuffle ;
 HELP: over  $shuffle ;
+HELP: overd $shuffle ;
 HELP: 2over $shuffle ;
 HELP: pick  $shuffle ;
+HELP: pickd $shuffle ;
+HELP: reach $shuffle ;
 HELP: swap  $shuffle ;
+HELP: spin  $shuffle ;
+HELP: 4spin $shuffle ;
 HELP: roll  $shuffle ;
 HELP: -roll $shuffle ;
 HELP: tuck  $shuffle ;
 HELP: rot   $shuffle ;
 HELP: -rot  $shuffle ;
+HELP: rotd  $shuffle ;
+HELP: -rotd $shuffle ;
 HELP: dupd  $shuffle ;
 HELP: swapd $shuffle ;
 
@@ -854,6 +867,149 @@ HELP: ?unless
 
 { ?if ?when ?unless } related-words
 
+HELP: 1if
+{ $values
+    { "x" object } { "pred" object } { "true" object } { "false" object }
+}
+{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 1check } " on " { $snippet "x" } ", preserving it for both the " { $snippet "true" } " and " { $snippet "false" } " branches." }
+{ $examples
+    "Collatz Conjecture calculation:"
+    { $example "USING: kernel math prettyprint ;"
+        "6 [ even? ] [ 2 / ] [ 3 * 1 + ] 1if ."
+        "3"
+    }
+} ;
+
+HELP: 2if
+{ $values
+    { "x" object } { "y" object } { "pred" object } { "true" object } { "false" object }
+}
+{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 2check } " on " { $snippet "x" } " and " { $snippet "y" } ", preserving them for both the " { $snippet "true" } " and " { $snippet "false" } " branches." } ;
+
+HELP: 3if
+{ $values
+    { "x" object } { "y" object } { "z" object } { "pred" object } { "true" object } { "false" object }
+}
+{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 3check } " on " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } ", preserving them for both the " { $snippet "true" } " and " { $snippet "false" } " branches." } ;
+
+{ 1if 2if 3if } related-words
+
+HELP: 1check
+{ $values
+    { "x" object } { "quot" quotation }
+    { "?" boolean }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and keeps " { $snippet "x" } " under the boolean result from the " { $snippet "quot" } "."  }
+{ $examples
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "6 [ even? ] 1check [ . ] bi@"
+        "6\nt"
+    }
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "6 [ odd? ] 1check [ . ] bi@"
+        "6\nf"
+    }
+} ;
+
+HELP: 1guard
+{ $values
+    { "x" object } { "quot" quotation }
+    { "x/f" object }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and either keeps " { $snippet "x" } " or replaces it with " { $snippet "f" } "." }
+{ $examples
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "6 [ even? ] 1guard ."
+        "6"
+    }
+    "False case:"
+    { $example "USING: kernel math prettyprint ;"
+        "5 [ even? ] 1guard ."
+        "f"
+    }
+} ;
+
+HELP: 2check
+{ $values
+    { "x" object } { "y" object } { "quot" quotation }
+    { "?" boolean }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and " { $snippet "x" } " and keeps those two values under the boolean result from the " { $snippet "quot" } "."  }
+{ $examples
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 [ + odd? ] 2check [ . ] tri@"
+        "3\n4\nt"
+    }
+    "False case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 [ + even? ] 2check [ . ] tri@"
+        "3\n4\nf"
+    }
+} ;
+
+HELP: 2guard
+{ $values
+    { "x" object } { "y" object } { "quot" quotation }
+    { "x/f" object } { "y/f" object }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and " { $snippet "y" } " and either keeps " { $snippet "x" } " and " { $snippet "y" } " or replaces them with " { $snippet "f" } "."  }
+{ $examples
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 [ + odd? ] 2guard [ . ] bi@"
+        "3\n4"
+    }
+    "False case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 [ + even? ] 2guard [ . ] bi@"
+        "f\nf"
+    }
+} ;
+
+HELP: 3check
+{ $values
+    { "x" object } { "y" object } { "z" object } { "quot" quotation }
+    { "?" boolean }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " and keeps those three values under the boolean result from the " { $snippet "quot" } "." }
+{ $examples
+    "True case:"
+    { $example "USING: arrays kernel math prettyprint ;"
+        "3 4 5 [ + + even? ] 3check 4array ."
+        "{ 3 4 5 t }"
+    }
+    "False case:"
+    { $example "USING: arrays kernel math prettyprint ;"
+        "3 4 5 [ + + odd? ] 3check 4array ."
+        "{ 3 4 5 f }"
+    }
+} ;
+
+HELP: 3guard
+{ $values
+    { "x" object } { "y" object } { "z" object } { "quot" quotation }
+    { "x/f" object } { "y/f" object } { "z/f" object }
+}
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " and either keeps " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " or replaces them with " { $snippet "f" } "." }
+{ $examples
+    "True case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 5 [ + + even? ] 3guard [ . ] tri@"
+        "3\n4\n5"
+    }
+    "False case:"
+    { $example "USING: kernel math prettyprint ;"
+        "3 4 5 [ + + odd? ] 3guard [ . ] tri@"
+        "f\nf\nf"
+    }
+} ;
+
+{ 1check 1guard 2check 2guard 3check 3guard } related-words
+
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
 { $notes
@@ -1098,8 +1254,13 @@ $nl
     drop
     2drop
     3drop
+    4drop
+    5drop
     nip
     2nip
+    3nip
+    4nip
+    5nip
 }
 "Duplicating stack elements:"
 { $subsections
@@ -1121,8 +1282,16 @@ $nl
 "Permuting stack elements deep in the stack:"
 { $subsections
     swapd
+    overd
     rot
     -rot
+    spin
+    4spin
+    rotd
+    -rotd
+    nipd
+    2nipd
+    3nipd
 } ;
 
 ARTICLE: "equality" "Equality"
