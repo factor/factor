@@ -869,9 +869,9 @@ HELP: ?unless
 
 HELP: 1if
 { $values
-    { "x" object } { "pred" object } { "true" object } { "false" object }
+    { "x" object } { "pred" quotation } { "true" quotation } { "false" quotation }
 }
-{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 1check } " on " { $snippet "x" } ", preserving it for both the " { $snippet "true" } " and " { $snippet "false" } " branches." }
+{ $description "A variant of " { $link if } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 1check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " for the " { $snippet "true" } " or " { $snippet "false" } " branches, one of which is called." }
 { $examples
     "Collatz Conjecture calculation:"
     { $example "USING: kernel math prettyprint ;"
@@ -880,19 +880,55 @@ HELP: 1if
     }
 } ;
 
+HELP: 1when
+{ $values
+    { "x" object } { "pred" quotation } { "true" quotation }
+}
+{ $description "A variant of " { $link when } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 1check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " for both branches. The " { $snippet "true" } " branch is called conditionally." } ;
+
+HELP: 1unless
+{ $values
+    { "x" object } { "pred" quotation } { "false" quotation }
+}
+{ $description "A variant of " { $link when } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 1check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " for both branches. The " { $snippet "false" } " branch is called conditionally." } ;
+
 HELP: 2if
 { $values
-    { "x" object } { "y" object } { "pred" object } { "true" object } { "false" object }
+    { "x" object } { "y" object } { "pred" quotation } { "true" quotation } { "false" quotation }
 }
-{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 2check } " on " { $snippet "x" } " and " { $snippet "y" } ", preserving them for both the " { $snippet "true" } " and " { $snippet "false" } " branches." } ;
+{ $description "A variant of " { $link if } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 2check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " and " { $snippet "y" } " for the " { $snippet "true" } " or " { $snippet "false" } " branches, one of which is called." } ;
+
+HELP: 2when
+{ $values
+    { "x" object } { "y" object } { "pred" quotation } { "true" quotation }
+}
+{ $description "A variant of " { $link when } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 2check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " and " { $snippet "y" } " for both branches. The " { $snippet "true" } " branch is called conditionally." } ;
+
+HELP: 2unless
+{ $values
+    { "x" object } { "y" object } { "pred" quotation } { "false" quotation }
+}
+{ $description "A variant of " { $link unless } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 2check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } " and " { $snippet "y" } " for both branches. The " { $snippet "false" } " branch is called conditionally." } ;
 
 HELP: 3if
 { $values
-    { "x" object } { "y" object } { "z" object } { "pred" object } { "true" object } { "false" object }
+    { "x" object } { "y" object } { "z" object } { "pred" quotation } { "true" quotation } { "false" quotation }
 }
-{ $description "A variant of " { $link if } " that takes a " { $snippet "cond" } " quotation and the usual branching quotations. The first quotation calls " { $link 3check } " on " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } ", preserving them for both the " { $snippet "true" } " and " { $snippet "false" } " branches." } ;
+{ $description "A variant of " { $link if } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 3check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " for the " { $snippet "true" } " or " { $snippet "false" } " branches, one of which is called." } ;
 
-{ 1if 2if 3if } related-words
+HELP: 3when
+{ $values
+    { "x" object } { "y" object } { "z" object } { "pred" quotation } { "true" quotation }
+}
+{ $description "A variant of " { $link when } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 3check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " for both branches. The " { $snippet "true" } " branch is called conditionally." } ;
+
+HELP: 3unless
+{ $values
+    { "x" object } { "y" object } { "z" object } { "pred" quotation } { "false" quotation }
+}
+{ $description "A variant of " { $link unless } " that takes a " { $snippet "pred" } " quotation. Calls " { $link 3check } " on the " { $snippet "pred" } " quotation to return a boolean and preserves " { $snippet "x" } ", " { $snippet "y" } ", and " { $snippet "z" } " for both branches. The " { $snippet "false" } " branch is called conditionally." } ;
+
+{ 1if 1when 1unless 2if 2when 2unless 3if 3when 3unless } related-words
 
 HELP: 1check
 { $values
