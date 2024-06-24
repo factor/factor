@@ -330,23 +330,23 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : 3if ( ..a x y z pred: ( ..a x y z -- ..b x y z ? ) true: ( ..b x y z -- ..c ) false: ( ..b x y z -- ..c ) -- ..c )
     [ 3check ] 2dip if ; inline
 
-: 1when ( ..a obj cond: ( ..a obj -- ..b ? ) true: ( ..b obj -- ..b ) -- ..b )
-    [ drop ] 1if ; inline
+: 1when ( ..a x pred: ( ..a x -- ..b ? ) true: ( ..b x -- ..b ) -- ..b )
+    [ ] 1if ; inline
 
-: 1unless ( ..a obj cond: ( ..a obj -- ..b ? ) false: ( ..b obj -- ..b ) -- ..b )
-    [ drop ] swap 1if ; inline
+: 1unless ( ..a x pred: ( ..a x -- ..b ? ) false: ( ..b x -- ..b ) -- ..b )
+    [ ] swap 1if ; inline
 
-: 2when ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ..b ? ) true: ( ..b obj1 obj2 -- ..b ) -- ..b )
-    [ 2drop ] 2if ; inline
+: 2when ( ..a x y pred: ( ..a x y -- ..b ? ) true: ( ..b x y -- ..b ) -- ..b )
+    [ ] 2if ; inline
 
-: 2unless ( ..a obj1 obj2 cond: ( ..a obj1 obj2 -- ..b ? ) false: ( ..b obj1 obj2 -- ..b ) -- ..b )
-    [ 2drop ] swap 2if ; inline
+: 2unless ( ..a x y pred: ( ..a x y -- ..b ? ) false: ( ..b x y -- ..b ) -- ..b )
+    [ ] swap 2if ; inline
 
-: 3when ( ..a obj1 obj2 obj3 cond: ( ..a obj1 obj2 obj3 -- ..b ? ) true: ( ..b obj1 obj2 obj3 -- ..b ) -- ..b )
-    [ 3drop ] 3if ; inline
+: 3when ( ..a x y z pred: ( ..a x y z -- ..b ? ) true: ( ..b x y z -- ..b ) -- ..b )
+    [ ] 3if ; inline
 
-: 3unless ( ..a obj1 obj2 obj3 cond: ( ..a obj1 obj2 obj3 -- ..b ? ) false: ( ..b obj1 obj2 obj3 -- ..b ) -- ..b )
-    [ 3drop ] swap 3if ; inline
+: 3unless ( ..a x y z pred: ( ..a x y z -- ..b ? ) false: ( ..b x y z -- ..b ) -- ..b )
+    [ ] swap 3if ; inline
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
