@@ -330,22 +330,22 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 : 3if ( ..a x y z pred: ( ..a x y z -- ..b x y z ? ) true: ( ..b x y z -- ..c ) false: ( ..b x y z -- ..c ) -- ..c )
     [ 3check ] 2dip if ; inline
 
-: 1when ( ..a x pred: ( ..a x -- ..b ? ) true: ( ..b x -- ..b ) -- ..b )
+: 1when ( ..a x pred: ( ..a x -- ..b ? ) true: ( ..b x -- ..b x ) -- ..b x )
     [ ] 1if ; inline
 
-: 1unless ( ..a x pred: ( ..a x -- ..b ? ) false: ( ..b x -- ..b ) -- ..b )
+: 1unless ( ..a x pred: ( ..a x -- ..b ? ) false: ( ..b x -- ..b x ) -- ..b x )
     [ ] swap 1if ; inline
 
-: 2when ( ..a x y pred: ( ..a x y -- ..b ? ) true: ( ..b x y -- ..b ) -- ..b )
+: 2when ( ..a x y pred: ( ..a x y -- ..b ? ) true: ( ..b x y -- ..b x y ) -- ..b x y )
     [ ] 2if ; inline
 
-: 2unless ( ..a x y pred: ( ..a x y -- ..b ? ) false: ( ..b x y -- ..b ) -- ..b )
+: 2unless ( ..a x y pred: ( ..a x y -- ..b ? ) false: ( ..b x y -- ..b x y ) -- ..b x y )
     [ ] swap 2if ; inline
 
-: 3when ( ..a x y z pred: ( ..a x y z -- ..b ? ) true: ( ..b x y z -- ..b ) -- ..b )
+: 3when ( ..a x y z pred: ( ..a x y z -- ..b ? ) true: ( ..b x y z -- ..b x y z ) -- ..b x y x )
     [ ] 3if ; inline
 
-: 3unless ( ..a x y z pred: ( ..a x y z -- ..b ? ) false: ( ..b x y z -- ..b ) -- ..b )
+: 3unless ( ..a x y z pred: ( ..a x y z -- ..b ? ) false: ( ..b x y z -- ..c x y z ) -- ..b x y z )
     [ ] swap 3if ; inline
 
 ! Loops
