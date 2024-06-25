@@ -46,7 +46,7 @@ PREDICATE: zero-square-matrix < square-matrix
 : <matrix> ( m n element -- matrix )
     '[ _ _ <array> ] replicate ; inline
 
-: <matrix-by> ( m n quot: ( ... -- elt ) -- matrix )
+: <matrix-by> ( ... m n quot: ( ... -- ... elt ) -- ... matrix )
     '[ _ _ replicate ] replicate ; inline
 
 : <matrix-by-indices> ( ... m n quot: ( ... m' n' -- ... elt ) -- ... matrix )
