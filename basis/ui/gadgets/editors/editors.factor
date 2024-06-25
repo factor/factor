@@ -1,15 +1,14 @@
 ! Copyright (C) 2006, 2011 Slava Pestov
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors combinators
-combinators.short-circuit documents documents.elements fonts fry
-grouping kernel literals locals make math math.functions
-math.order ranges math.rectangles math.vectors models
-models.arrow namespaces opengl opengl.gl sequences sorting
-splitting system timers ui.baseline-alignment ui.clipboards
-ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-prettyprint math.parser
-ui.gestures ui.pens.solid ui.render ui.text ui.theme unicode variables ;
+USING: accessors arrays assocs calendar combinators
+combinators.short-circuit documents documents.elements fonts
+grouping kernel literals make math math.order math.rectangles
+math.vectors models models.arrow namespaces opengl opengl.gl
+ranges sequences sorting splitting system timers
+ui.baseline-alignment ui.clipboards ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.line-support ui.gadgets.menus
+ui.gadgets.scrollers ui.gestures ui.pens.solid ui.render ui.text
+ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
