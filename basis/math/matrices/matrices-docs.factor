@@ -216,7 +216,7 @@ HELP: <matrix>
 } ;
 
 HELP: <matrix-by>
-{ $values { "m" integer } { "n" integer } { "quot" { $quotation ( ... -- elt ) } } { "matrix" matrix } }
+{ $values { "m" integer } { "n" integer } { "quot" { $quotation ( ... -- ... elt ) } } { "matrix" matrix } }
 { $description "Creates a matrix of size " { $snippet "m x n" } " using elements given by " { $snippet "quot" } ", a quotation called to create each element."  }
 { $notes "The following are equivalent:"
   { $code "m n [ 2drop foo ] <matrix-by-indices>" }
