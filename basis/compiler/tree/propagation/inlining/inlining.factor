@@ -4,8 +4,9 @@ USING: accessors arrays assocs classes.algebra combinators
 combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
 compiler.tree.propagation.nodes compiler.tree.recursive generic
-generic.math generic.single generic.standard kernel locals math
-math.partial-dispatch namespaces quotations sequences words ;
+generic.math generic.single generic.standard hash-sets.identity
+kernel locals math math.partial-dispatch namespaces quotations
+sequences sets words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -75,9 +76,11 @@ M: callable splicing-nodes splicing-body ;
 ! Method body inlining
 SYMBOL: history
 
-: already-inlined? ( obj -- ? ) history get member-eq? ;
+: already-inlined? ( obj -- ? )
+    history get in? ;
 
-: add-to-history ( obj -- ) history [ swap suffix ] change ;
+: add-to-history ( obj -- )
+    history get [ IHS{ } clone dup history namespaces:set ] unless* adjoin ;
 
 :: inline-word ( #call word -- ? )
     word already-inlined? [ f ] [
