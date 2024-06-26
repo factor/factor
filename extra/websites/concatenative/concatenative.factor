@@ -130,6 +130,7 @@ M: cgit call-responder*
         "~/gitweb" <gitweb> "gitweb.factorcode.org" add-responder
         "~/cgit" <cgit> "cgit.factorcode.org" add-responder
         "~/re" <static> "re.factorcode.org" add-responder
+        "~/erg" <static> "erg.factorcode.org" add-responder
         "~/blogs" <static> "blogs.factorcode.org" add-responder
         "~/irclogs" <static> t >>allow-listings "irclogs.factorcode.org" add-responder
     main-responder set-global ;
