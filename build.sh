@@ -792,7 +792,7 @@ usage() {
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
-    $ECHO "  deps-macos - install git on MacOSX using port"
+    $ECHO "  deps-macos - install git on macOS using port"
     $ECHO "  info-boot-image - print remote and disk boot image MD5"
     $ECHO "  info-check-factor-refresh-all-locally - check if local sources would cause refresh-all to change the image"
     $ECHO "  self-bootstrap - make local boot image, bootstrap"
