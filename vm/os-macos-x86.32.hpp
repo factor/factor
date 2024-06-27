@@ -2,7 +2,7 @@
 
 namespace factor {
 
-// Fault handler information.  MacOSX version.
+// Fault handler information.  macOS version.
 // Copyright (C) 1993-1999, 2002-2003  Bruno Haible <clisp.org at bruno>
 // Copyright (C) 2003  Paolo Bonzini <gnu.org at bonzini>
 

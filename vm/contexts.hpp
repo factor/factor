@@ -20,7 +20,7 @@ enum context_object {
 // When the callstack fills up (e.g by to deep recursion), a callstack
 // overflow error is triggered. So before continuing executing on it
 // in general_error(), we chop off this many bytes to have some space
-// to work with. Mac OSX 64 bit needs more than 8192. See issue #1419.
+// to work with. macOS 64 bit needs more than 8192. See issue #1419.
 static const cell stack_reserved = 16384;
 
 struct context {
