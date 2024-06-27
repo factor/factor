@@ -27,7 +27,7 @@ ifdef CONFIG
 	IS_GCC = $(shell $(CC) -dM -E - < /dev/null | grep -q '__GNUC__' && echo 1 || echo 0)
 
 	XCODE_PATH ?= /Applications/Xcode.app
-	MACOSX_32_SDK ?= MacOSX10.11.sdk
+	MACOS_32_SDK ?= MacOSX10.11.sdk
 
 	ARCHITECTURE_FLAG :=
 
@@ -201,10 +201,10 @@ help:
 	@echo "linux-arm-64"
 	@echo "freebsd-x86-32"
 	@echo "freebsd-x86-64"
-	@echo "macosx-x86-32"
-	@echo "macosx-x86-64"
-	@echo "macosx-x86-fat"
-	@echo "macosx-arm-64"
+	@echo "macos-x86-32"
+	@echo "macos-x86-64"
+	@echo "macos-x86-fat"
+	@echo "macos-arm-64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
 	@echo ""
@@ -225,17 +225,17 @@ freebsd-x86-32:
 freebsd-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.freebsd.x86.64
 
-macosx-x86-32:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.32
+macos-x86-32:
+	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.x86.32
 
-macosx-x86-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.64
+macos-x86-64:
+	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.x86.64
 
-macosx-x86-fat:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.x86.fat
+macos-x86-fat:
+	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.x86.fat
 
-macosx-arm-64:
-	$(MAKE) $(ALL) macosx.app CONFIG=vm/Config.macosx.arm.64
+macos-arm-64:
+	$(MAKE) $(ALL) macos.app CONFIG=vm/Config.macos.arm.64
 
 linux-arm-32:
 	$(MAKE) $(ALL) CONFIG=vm/Config.linux.arm.32
@@ -294,7 +294,7 @@ $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
-macosx.app: $(EXECUTABLE)
+macos.app: $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/MacOS
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
@@ -343,5 +343,5 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor-executable factor-lib factor-console factor-ffi-test tags clean help macosx.app
-.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macosx-x86-32 macosx-x86-64 macosx-x86-fat macosx-arm64 windows-x86-32 windows-x86-64
+.PHONY: factor-executable factor-lib factor-console factor-ffi-test tags clean help macos.app
+.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64
