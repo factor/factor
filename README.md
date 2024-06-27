@@ -62,7 +62,7 @@ You can download a Factor binary from the grid on [https://factorcode.org](https
 The nightly builds are usually a better experience than the point releases.
 
 * Windows: Double-click `factor.exe`, or run `.\factor.com` in a command prompt
-* Mac OS X: Double-click `Factor.app` or run `open Factor.app` in a Terminal
+* macOS: Double-click `Factor.app` or run `open Factor.app` in a Terminal
 * Unix: Run `./factor` in a shell
 
 ### Learning Factor
