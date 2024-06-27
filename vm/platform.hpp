@@ -15,15 +15,15 @@
   #include "os-unix.hpp"
 
   #ifdef __APPLE__
-    #include "os-macosx.hpp"
+    #include "os-macos.hpp"
     #include "mach_signal.hpp"
 
     #ifdef FACTOR_X86
-      #include "os-macosx-x86.32.hpp"
+      #include "os-macos-x86.32.hpp"
     #elif defined(FACTOR_AMD64)
-      #include "os-macosx-x86.64.hpp"
+      #include "os-macos-x86.64.hpp"
     #elif defined(FACTOR_ARM64)
-      #include "os-macosx-arm64.hpp"
+      #include "os-macos-arm64.hpp"
     #else
       #error "Unsupported Mac OS X flavor"
     #endif
