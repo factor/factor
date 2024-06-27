@@ -33,7 +33,7 @@ ARTICLE: "vocabs.icons" "Vocabulary icons"
 "An icon file representing the vocabulary can be provided for use by " { $link "tools.deploy" } ". If any of the following files exist inside the vocabulary directory, they will be used as icons when the application is deployed."
 { $list
     { { $snippet "icon.ico" } " on Windows and Linux" }
-    { { $snippet "icon.icns" } " on MacOS X" }
+    { { $snippet "icon.icns" } " on macOS" }
     { { $snippet "icon.png" } " on Linux" }
 }
 "The icon file will be embedded in the vocab's image file." ;
