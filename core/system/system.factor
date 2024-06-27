@@ -17,10 +17,10 @@ UNION: ppc ppc.32 ppc.64 ;
 
 : cpu ( -- class ) \ cpu get-global ; foldable
 
-SINGLETONS: windows macosx linux freebsd ;
+SINGLETONS: windows macos linux freebsd ;
 
 UNION: bsd freebsd ;
-UNION: unix macosx linux freebsd bsd ;
+UNION: unix macos linux freebsd bsd ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -65,7 +65,7 @@ UNION: unix macosx linux freebsd bsd ;
 : string>os ( str -- class )
     H{
         { "windows" windows }
-        { "macosx" macosx }
+        { "macos" macos }
         { "freebsd" freebsd }
         { "linux" linux }
     } at ;
