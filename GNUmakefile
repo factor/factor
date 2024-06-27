@@ -215,7 +215,7 @@ help:
 	@echo "SITE_CFLAGS=...  additional C optimization flags"
 	@echo "SITE_CXXFLAGS=...  additional C++ optimization flags"
 	@echo "LTO=1  compile VM with Link Time Optimization"
-	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on Mac OS X)"
+	@echo "X11=1  force link with X11 libraries instead of Cocoa (only on macOS)"
 
 ALL = factor-executable factor-ffi-test factor-lib
 
