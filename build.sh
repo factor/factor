@@ -62,7 +62,7 @@ ensure_program_installed() {
         $ECHO -n "any of [ $* ]"
     fi
     $ECHO " and try again."
-    if [[ $OS == macosx ]] ; then
+    if [[ $OS == macos ]] ; then
         $ECHO "If you have Xcode 4.3 or higher installed, you must install the"
         $ECHO "Command Line Tools from Xcode Preferences > Downloads in order"
         $ECHO "to build Factor."
@@ -284,8 +284,8 @@ find_os() {
         MINGW32*) OS=windows ;;
         MINGW64*) OS=windows ;;
         MSYS_NT*) OS=windows ;;
-        *darwin*) OS=macosx ;;
-        *Darwin*) OS=macosx ;;
+        *darwin*) OS=macos ;;
+        *Darwin*) OS=macos ;;
         *linux*) OS=linux ;;
         *Linux*) OS=linux ;;
         FreeBSD) OS=freebsd ;;
@@ -371,7 +371,7 @@ set_factor_binary() {
 set_factor_library() {
     case $OS in
         windows) FACTOR_LIBRARY=factor.dll ;;
-        macosx) FACTOR_LIBRARY=libfactor.dylib ;;
+        macos) FACTOR_LIBRARY=libfactor.dylib ;;
         *) FACTOR_LIBRARY=libfactor.a ;;
     esac
 }
@@ -444,7 +444,7 @@ parse_build_info() {
 
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
-    if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ $OS == macos && $ARCH == ppc ]] ; then WORD=32; fi
 
     $ECHO "OS=$OS"
     $ECHO "ARCH=$ARCH"
@@ -773,7 +773,7 @@ install_deps_pkg() {
 }
 
 
-install_deps_macosx() {
+install_deps_macos() {
     if test_program_installed git; then
         ensure_program_installed yes
         $ECHO "git not found."
@@ -792,7 +792,7 @@ usage() {
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
-    $ECHO "  deps-macosx - install git on MacOSX using port"
+    $ECHO "  deps-macos - install git on MacOSX using port"
     $ECHO "  info-boot-image - print remote and disk boot image MD5"
     $ECHO "  info-check-factor-refresh-all-locally - check if local sources would cause refresh-all to change the image"
     $ECHO "  self-bootstrap - make local boot image, bootstrap"
@@ -813,7 +813,7 @@ usage() {
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
     $ECHO ""
     $ECHO "Example for overriding the default target:"
-    $ECHO "    $0 update macosx-x86-32"
+    $ECHO "    $0 update macos-x86-32"
 }
 
 MAKE_TARGET=unknown
@@ -833,7 +833,7 @@ case "$1" in
     install) install ;;
     deps-apt) install_deps_apt ;;
     deps-pacman) install_deps_pacman ;;
-    deps-macosx) install_deps_macosx ;;
+    deps-macos) install_deps_macos ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
     info-boot-image) info_boot_image ;;
