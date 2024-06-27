@@ -1,7 +1,7 @@
 namespace factor {
 
 #define VM_C_API extern "C" __attribute__((visibility("default")))
-#define FACTOR_OS_STRING "macosx"
+#define FACTOR_OS_STRING "macos"
 
 void early_init();
 
