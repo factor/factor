@@ -311,7 +311,7 @@ ARTICLE: "embedding" "Embedding Factor into C applications"
 { $table
     { { $strong "OS" } { $strong "Library name" } { $strong "Shared?" } }
     { "Windows XP/Vista" { $snippet "factor.dll" } "Yes" }
-    { "Mac OS X" { $snippet "libfactor.dylib" } "Yes" }
+    { "macOS" { $snippet "libfactor.dylib" } "Yes" }
     { "Other Unix" { $snippet "libfactor.a" } "No" }
 }
 "An image file must be supplied; a minimal image can be built, however the compiler must be included for the embedding API to work (see " { $link "bootstrap-cli-args" } ")."
