@@ -19,7 +19,7 @@ void early_init(void) {
   uname(&u);
   sscanf(u.release, "%d", &n);
   if (n < 9) {
-    std::cout << "Factor requires Mac OS X 10.5 or later.\n";
+    std::cout << "Factor requires macOS 10.5 or later.\n";
     exit(1);
   }
 }

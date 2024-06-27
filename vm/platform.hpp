@@ -25,7 +25,7 @@
     #elif defined(FACTOR_ARM64)
       #include "os-macos-arm64.hpp"
     #else
-      #error "Unsupported Mac OS X flavor"
+      #error "Unsupported macOS flavor"
     #endif
   #else
     #include "os-genunix.hpp"
