@@ -38,7 +38,7 @@ ARTICLE: "os" "Operating system detection"
 "Supported operating systems:"
 { $subsections
     linux
-    macosx
+    macos
     windows
 }
 "Operating system families:"
