@@ -13,7 +13,7 @@ HOOK: find-pulsar os ( -- path )
 M: object find-pulsar
     "pulsar" ?find-in-path ;
 
-M: macosx find-pulsar
+M: macos find-pulsar
     "dev.pulsar-edit.pulsar" find-native-bundle [
         "Contents/MacOS/Pulsar" append-path
     ] [

@@ -20,7 +20,7 @@ HOOK: find-textadept-path os ( -- path )
 
 M: object find-textadept-path f ;
 
-M: macosx find-textadept-path
+M: macos find-textadept-path
     "com.textadept" find-native-bundle [
         "Contents/MacOS/textadept" append-path
     ] [

@@ -15,20 +15,20 @@ IN: ui.tools
 \ quit H{ { +nullary+ t } } define-command
 
 tool "tool-switching" f {
-    { T{ key-down f ${ os macosx? M+ A+ ? } "l" } show-listener }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "L" } listener-window }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "b" } show-browser }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "B" } browser-window }
+    { T{ key-down f ${ os macos? M+ A+ ? } "l" } show-listener }
+    { T{ key-down f ${ os macos? M+ A+ ? } "L" } listener-window }
+    { T{ key-down f ${ os macos? M+ A+ ? } "b" } show-browser }
+    { T{ key-down f ${ os macos? M+ A+ ? } "B" } browser-window }
 } define-command-map
 
 tool "common" f {
-    { T{ key-down f ${ os macosx? M+ A+ ? } "t" } show-active-buttons-popup }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "w" } close-window }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "q" } quit }
+    { T{ key-down f ${ os macos? M+ A+ ? } "t" } show-active-buttons-popup }
+    { T{ key-down f ${ os macos? M+ C+ ? } "w" } close-window }
+    { T{ key-down f ${ os macos? M+ C+ ? } "q" } quit }
     { T{ key-down f f "F2" } refresh-all }
     { T{ key-down f { S+ } "F2" } refresh-and-test-all }
     { T{ key-down f f "F3" } show-error-list }
-} os macosx? {
+} os macos? {
     { T{ key-down f { C+ M+ } "f" } toggle-fullscreen }
 } {
     { T{ key-down f { C+ } "F4" } close-window }

@@ -105,7 +105,7 @@ PREDICATE: compute-shader < gl-shader (compute-shader?) ;
 : gl-program-shaders-length ( program -- shaders-length )
     GL_ATTACHED_SHADERS gl-program-get-int ; inline
 
-! On some macosx-x86-64 graphics drivers, glGetAttachedShaders tries to treat the
+! On some macos-x86-64 graphics drivers, glGetAttachedShaders tries to treat the
 ! shaders parameter as a ulonglong array rather than a GLuint array as documented.
 ! We hack around this by allocating a buffer twice the size and sifting out the zero
 ! values

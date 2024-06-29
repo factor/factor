@@ -3,7 +3,7 @@
 
 USING: arrays io.launcher kernel present system webbrowser ;
 
-IN: webbrowser.macosx
+IN: webbrowser.macos
 
-M: macosx open-item
+M: macos open-item
     present "open" swap 2array run-detached drop ;

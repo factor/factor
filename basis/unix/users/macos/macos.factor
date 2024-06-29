@@ -2,13 +2,13 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: combinators accessors kernel unix.users
 system ;
-IN: unix.users.macosx
+IN: unix.users.macos
 
-TUPLE: macosx-passwd < passwd change class expire fields ;
+TUPLE: macos-passwd < passwd change class expire fields ;
 
-M: macosx new-passwd macosx-passwd new ;
+M: macos new-passwd macos-passwd new ;
 
-M: macosx passwd>new-passwd
+M: macos passwd>new-passwd
     [ call-next-method ] keep
     {
         [ pw_change>> >>change ]

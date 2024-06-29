@@ -5,7 +5,7 @@ IN: alien.remote-control.tests
 : compile-file ( contents -- )
     "test.c" ascii set-file-contents
     { "gcc" "-I../" "-L.." "-lfactor" "test.c" }
-    os macosx? cpu x86.64? and [ "-m64" suffix ] when
+    os macos? cpu x86.64? and [ "-m64" suffix ] when
     try-process ;
 
 : run-test ( -- line )

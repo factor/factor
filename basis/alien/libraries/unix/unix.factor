@@ -10,5 +10,5 @@ M: unix dlerror (dlerror) ;
 M: unix >deployed-library-path
     file-name "$ORIGIN" prepend-path ;
 
-M: macosx >deployed-library-path
+M: macos >deployed-library-path
     file-name "@executable_path/../Frameworks" prepend-path ;

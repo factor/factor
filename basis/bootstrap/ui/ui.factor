@@ -8,7 +8,7 @@ IN: bootstrap.ui
 
 "ui-backend" get [
     {
-        { [ os macosx? ] [ "cocoa" ] }
+        { [ os macos? ] [ "cocoa" ] }
         { [ os windows? ] [ "windows" ] }
         { [ os unix? ] [ "gtk2" ] }
     } cond

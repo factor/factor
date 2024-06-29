@@ -61,7 +61,7 @@ delete-staging-images
 
 { } [ "gpu.demos.bunny" shake-and-bake 7000000 small-enough? ] long-unit-test
 
-os macosx? [
+os macos? [
     [ ] [ "webkit-demo" shake-and-bake 600000 small-enough? ] long-unit-test
 ] when
 
@@ -132,11 +132,11 @@ M: quit-responder call-responder*
     ] curry long-unit-test
 ] each
 
-os windows? os macosx? or [
+os windows? os macos? or [
     [ ] [ "tools.deploy.test.8" shake-and-bake run-temp-image ] long-unit-test
 ] when
 
-os macosx? [
+os macos? [
     [ ] [ "tools.deploy.test.14" shake-and-bake run-temp-image ] long-unit-test
 ] when
 

@@ -4,12 +4,12 @@
 USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs byte-arrays classes.struct continuations fry grouping
 kernel libc literals math sequences splitting strings system
-system-info.macosx tools.ps unix unix.sysctl unix.time
+system-info.macos tools.ps unix unix.sysctl unix.time
 unix.types ;
 
 QUALIFIED-WITH: alien.c-types c
 
-IN: tools.ps.macosx
+IN: tools.ps.macos
 
 <PRIVATE
 
@@ -146,6 +146,6 @@ STRUCT: kinfo_proc
 
 PRIVATE>
 
-M: macosx ps
+M: macos ps
     procs [ kp_proc>> p_pid>> 0 > ] filter
     [ kp_proc>> [ p_pid>> ] [ ps-arg ] bi ] map>alist ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct unix.types ;
-IN: unix.statvfs.macosx
+IN: unix.statvfs.macos
 
 STRUCT: statvfs
     { f_bsize ulong }

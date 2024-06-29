@@ -8,7 +8,7 @@ IN: db.sqlite.ffi
 
 << "sqlite" {
     { [ os windows? ] [ "sqlite3.dll" ] }
-    { [ os macosx? ] [ "libsqlite3.dylib" ] }
+    { [ os macos? ] [ "libsqlite3.dylib" ] }
     { [ os unix? ] [ "libsqlite3.so" ] }
 } cond cdecl add-library >>
 

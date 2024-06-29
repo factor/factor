@@ -13,7 +13,7 @@ LIBRARY: gdk2.gl
 <<
 "gdk2.gl" {
     { [ os windows? ] [ "libgdkglext-win32-1.0-0.dll" cdecl add-library ] }
-    { [ os macosx? ] [ drop ] }
+    { [ os macos? ] [ drop ] }
     { [ os unix? ] [ "libgdkglext-x11-1.0.so" cdecl add-library ] }
 } cond
 >>

@@ -12,7 +12,7 @@ INSTANCE: visual-studio-code-exploration visual-studio-code-base
 M: visual-studio-code-exploration find-visual-studio-code-path
     os {
         { linux [ "code-exploration" which ] }
-        { macosx [
+        { macos [
             "com.microsoft.VSCodeExploration" find-native-bundle
             [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }
         { windows [

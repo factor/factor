@@ -28,7 +28,7 @@ FUNCTION: CFDictionaryRef UTTypeCopyDeclaration ( CFStringRef inUTI )
 
 >>
 
-os macosx? [
+os macos? [
     os-version first 11 < [
         { "png" "tif" "tiff" "gif" "jpg" "jpeg" "bmp" "ico" "webp" }
     ] [

@@ -24,7 +24,7 @@ ERROR: no-vocab-main vocab ;
     swap dup deploy-config make-deploy-image drop ;
 
 {
-    { [ os macosx? ] [ "tools.deploy.macosx" ] }
+    { [ os macos? ] [ "tools.deploy.macos" ] }
     { [ os windows? ] [ "tools.deploy.windows" ] }
     { [ os unix? ] [ "tools.deploy.unix" ] }
 } cond require

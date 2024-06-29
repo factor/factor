@@ -9,7 +9,7 @@ IN: tools.disassembler.capstone
 
 << "libcapstone" {
     { [ os windows? ] [ "libcapstone.dll" ] }
-    { [ os macosx? ] [ "libcapstone.dylib" ] }
+    { [ os macos? ] [ "libcapstone.dylib" ] }
     { [ os unix? ] [ "libcapstone.so" ] }
 } cond cdecl add-library >>
 

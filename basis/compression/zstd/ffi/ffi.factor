@@ -8,7 +8,7 @@ IN: compression.zstd.ffi
 
 << "zstd" {
     { [ os windows? ] [ "zstd-1.dll" ] }
-    { [ os macosx? ] [ "libzstd.dylib" ] }
+    { [ os macos? ] [ "libzstd.dylib" ] }
     { [ os unix? ] [ "libzstd.so" ] }
 } cond cdecl add-library >>
 

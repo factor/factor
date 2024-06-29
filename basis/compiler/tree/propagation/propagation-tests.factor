@@ -882,7 +882,7 @@ MIXIN: empty-mixin
 
 { V{ double-array } } [ [| | double-array{ } ] final-classes ] unit-test
 
-{ V{ t } } [ [ macosx unix? ] final-literals ] unit-test
+{ V{ t } } [ [ macos unix? ] final-literals ] unit-test
 
 { V{ array } } [ [ [ <=> ] sort-with [ <=> ] sort-with ] final-classes ] unit-test
 

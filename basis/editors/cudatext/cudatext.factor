@@ -9,7 +9,7 @@ HOOK: find-cudatext-path os ( -- path )
 
 M: object find-cudatext-path f ;
 
-M: macosx find-cudatext-path
+M: macos find-cudatext-path
     "com.uvviewsoft.cudatext" find-native-bundle [
         "Contents/MacOS/cudatext" append-path
     ] [

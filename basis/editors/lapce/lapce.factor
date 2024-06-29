@@ -9,7 +9,7 @@ HOOK: find-lapce-path os ( -- path )
 
 M: object find-lapce-path f ;
 
-M: macosx find-lapce-path
+M: macos find-lapce-path
     "io.lapce" find-native-bundle [
         "Contents/MacOS/lapce" append-path
     ] [

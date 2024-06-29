@@ -7,7 +7,7 @@ IN: db.postgresql.ffi
 
 << "postgresql" {
     { [ os windows? ] [ "libpq.dll" ] }
-    { [ os macosx? ] [ "libpq.dylib" ] }
+    { [ os macos? ] [ "libpq.dylib" ] }
     { [ os unix? ] [ "libpq.so" ] }
 } cond cdecl add-library >>
 

@@ -320,7 +320,7 @@ GENERIC: gesture>string ( gesture -- string/f )
 
 HOOK: modifiers>string os ( modifiers -- string )
 
-M: macosx modifiers>string
+M: macos modifiers>string
     [
         {
             { M+ [ "\u002318" ] }
@@ -335,7 +335,7 @@ M: object modifiers>string
 
 HOOK: keysym>string os ( keysym -- string )
 
-M: macosx keysym>string >upper ;
+M: macos keysym>string >upper ;
 
 M: object keysym>string dup length 1 = [ >lower ] when ;
 
@@ -379,7 +379,7 @@ M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
 HOOK: action-modifier os ( -- mod )
 
 M: object action-modifier C+ ;
-M: macosx action-modifier M+ ;
+M: macos action-modifier M+ ;
 
 M: action gesture>string
     action-gestures value-at

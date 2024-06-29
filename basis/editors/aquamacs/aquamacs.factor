@@ -14,7 +14,7 @@ HOOK: find-aquamacs-path os ( -- path )
 
 M: object find-aquamacs-path f ;
 
-M: macosx find-aquamacs-path
+M: macos find-aquamacs-path
     "org.gnu.Aquamacs" find-native-bundle [
         "Contents/MacOS/bin/aquamacs" append-path
     ] [

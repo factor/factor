@@ -4,17 +4,17 @@ USING: accessors alien.c-types alien.data alien.strings arrays
 calendar.unix classes.struct combinators grouping
 io.encodings.utf8 io.files io.files.info io.files.info.unix
 io.files.unix libc kernel math sequences specialized-arrays
-system unix unix.getfsstat.macosx unix.statfs.macosx
-unix.statvfs.macosx ;
+system unix unix.getfsstat.macos unix.statfs.macos
+unix.statvfs.macos ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: statfs64
-IN: io.files.info.unix.macosx
+IN: io.files.info.unix.macos
 
-TUPLE: macosx-file-info < unix-file-info birth-time flags gen ;
+TUPLE: macos-file-info < unix-file-info birth-time flags gen ;
 
-M: macosx new-file-info macosx-file-info new ;
+M: macos new-file-info macos-file-info new ;
 
-M: macosx stat>file-info
+M: macos stat>file-info
     [ call-next-method ] keep
     {
         [ st_flags>> >>flags ]
@@ -22,23 +22,23 @@ M: macosx stat>file-info
         [ st_birthtimespec>> timespec>unix-time >>birth-time ]
     } cleave ;
 
-TUPLE: macosx-file-system-info < unix-file-system-info
+TUPLE: macos-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
-M: macosx file-systems
+M: macos file-systems
     f void* <ref> dup 0 getmntinfo64 dup io-error
     [ void* deref ] dip \ statfs64 <c-direct-array>
     [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
 
-M: macosx new-file-system-info macosx-file-system-info new ;
+M: macos new-file-system-info macos-file-system-info new ;
 
-M: macosx file-system-statfs
+M: macos file-system-statfs
     \ statfs64 new [ statfs64-func io-error ] keep ;
 
-M: macosx file-system-statvfs
+M: macos file-system-statvfs
     \ statvfs new [ statvfs-func io-error ] keep ;
 
-M: macosx statfs>file-system-info
+M: macos statfs>file-system-info
     {
         [ f_bsize>> >>block-size ]
         [ f_iosize>> >>io-size ]
@@ -57,7 +57,7 @@ M: macosx statfs>file-system-info
         [ f_mntfromname>> utf8 alien>string >>device-name ]
     } cleave ;
 
-M: macosx statvfs>file-system-info
+M: macos statvfs>file-system-info
     {
         [ f_frsize>> >>preferred-block-size ]
         [ f_favail>> >>files-available ]

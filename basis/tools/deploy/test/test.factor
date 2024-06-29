@@ -29,7 +29,7 @@ ERROR: image-too-big actual-size max-size ;
     2dup <= [ 2drop ] [ image-too-big ] if ;
 
 : deploy-test-command ( -- args )
-    os macosx?
+    os macos?
     "resource:Factor.app/Contents/MacOS/factor" normalize-path vm-path ?
     "-i=" test-image-path append 2array ;
 
