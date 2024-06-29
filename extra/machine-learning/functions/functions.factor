@@ -1,7 +1,7 @@
 ! Copyright (C) 2017 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.order math.vectors
-sequences ;
+USING: kernel math math.constants math.functions math.order
+math.vectors sequences ;
 IN: machine-learning.functions
 
 : relu ( x -- x' ) 0 max ; inline
@@ -14,6 +14,10 @@ IN: machine-learning.functions
 ! https://arxiv.org/pdf/1706.02515.pdf
 : selu ( x a -- x' )
     over 0 < [ [ [ e^ ] dip * ] keep - ] [ drop ] if ; inline
+
+: gelu ( x -- x' )
+    dup dup 3 v^n 0.044715 v*n v+ 2 pi / sqrt v*n
+    [ tanh ] map 1 v+n v* 0.5 v*n ;
 
 : default-leaky-relu ( x -- x' )
     .01 leaky-relu ; inline
