@@ -20,7 +20,7 @@ HELP: handles-gesture?
 { $contract "Returns a true value if " { $snippet "gadget" } " would handle " { $snippet "gesture" } " in its " { $link handle-gesture } " method."
 $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class and returns true if a handler is present for " { $snippet "gesture" } "." }
-{ $notes "This word is used in Factor's MacOS X UI to validate menu items." } ;
+{ $notes "This word is used in Factor's macOS UI to validate menu items." } ;
 
 HELP: parents-handle-gesture?
 { $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" boolean } }
@@ -125,10 +125,10 @@ HELP: C+
 { $description "Control key modifier." } ;
 
 HELP: A+
-{ $description "Alt key modifier. This is the Option key on Mac OS X." } ;
+{ $description "Alt key modifier. This is the Option key on macOS." } ;
 
 HELP: M+
-{ $description "Meta key modifier. This is the Command key on Mac OS X and the Windows key on other Unix and Windows platforms." } ;
+{ $description "Meta key modifier. This is the Command key on macOS and the Windows key on other Unix and Windows platforms." } ;
 
 HELP: S+
 { $description "Shift key modifier." } ;
@@ -245,7 +245,7 @@ HELP: zoom-out-action
 { $class-description "Gesture sent when the user performs a multi-touch two-finger pinch out." } ;
 
 ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
-"On Mac OS X, the modifier keys map as follows:"
+"On macOS, the modifier keys map as follows:"
 { $table
     { { $link S+ } "Shift" }
     { { $link A+ } "Option" }
@@ -261,7 +261,7 @@ ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
 }
 "On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
 $nl
-{ $link "multitouch-gestures" } " are only supported on Mac OS X."
+{ $link "multitouch-gestures" } " are only supported on macOS."
 $nl
 { $link "filedrop-gestures" } " are only supported on Windows." ;
 
@@ -406,7 +406,7 @@ $nl
 { $subsections scroll-direction } ;
 
 ARTICLE: "multitouch-gestures" "Multi-touch gestures"
-"Multi-touch gestures are only supported on Mac OS X with newer MacBook and MacBook Pro models."
+"Multi-touch gestures are only supported on macOS with newer MacBook and MacBook Pro models."
 $nl
 "Three-finger swipe:"
 { $subsections
@@ -472,6 +472,6 @@ ARTICLE: "action-gestures" "Action gestures"
     { { $snippet "T{ key-down f { C+ } \"S\" }" } { $snippet "save-as-action" } }
     { { $snippet "T{ key-down f { C+ } \"w\" }" } { $snippet "close-action" } }
 }
-"Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
+"Action gestures should be used in place of the above keyboard gestures if possible. For example, on macOS, the standard " { $strong "Edit" } " menu items send action gestures." ;
 
 ABOUT: "ui-gestures"

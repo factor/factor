@@ -32,7 +32,7 @@ ABOUT: "deploy-flags"
 HELP: deploy-name
 { $description "Deploy setting. The name of the executable."
 $nl
-"On Mac OS X, this becomes the name of the application bundle, with " { $snippet ".app" } " appended. On Windows, this becomes the name of the directory containing the executable." } ;
+"On macOS, this becomes the name of the application bundle, with " { $snippet ".app" } " appended. On Windows, this becomes the name of the directory containing the executable." } ;
 
 HELP: deploy-word-props?
 { $description "Deploy flag. If set, the deploy tool retains all word properties. Otherwise, it applies various heuristics to strip out un-needed word properties from words in the dictionary."
@@ -87,10 +87,10 @@ $nl
 "Off by default. If your program needs to use " { $link POSTPONE: CHAR: } " with named characters, enable this flag." } ;
 
 HELP: deploy-console?
-{ $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will be attached to a console window. On Mac OS X, this means the application will be deployed as a Unix executable instead of a Mac application bundle. On other Unix platforms, the flag has no effect."
+{ $description "Deploy flag. If set, the deployed executable will be configured as a console application. On Windows, this means the application will be deployed in the console subsystem and will be attached to a console window. On macOS, this means the application will be deployed as a Unix executable instead of a macOS application bundle. On other Unix platforms, the flag has no effect."
 $nl
 "On by default."
-{ $notes "On Mac OS X, if " { $link deploy-ui? } " is set, the application will always be deployed as an application bundle regardless of the " { $snippet "deploy-console?" } " setting. The UI implementation on Mac OS X relies on the application being in a bundle." } } ;
+{ $notes "On macOS, if " { $link deploy-ui? } " is set, the application will always be deployed as an application bundle regardless of the " { $snippet "deploy-console?" } " setting. The UI implementation on macOS relies on the application being in a bundle." } } ;
 
 HELP: deploy-directory
 { $description "Used to specify the directory where the deployed executable will be created." } ;

@@ -10,7 +10,7 @@ ARTICLE: "starting-ui-tools" "Starting the UI tools"
 { $list
     { "On Windows, the tools start when the Factor executable is run." }
     { "On X11, the tools start if the " { $snippet "DISPLAY" } " environment variable is set." }
-    { "On Mac OS X, the tools start if the " { $snippet "Factor.app" } " application bundle is run." }
+    { "On macOS, the tools start if the " { $snippet "Factor.app" } " application bundle is run." }
 }
 "In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal by issuing the following command:"
 { $code "USE: threads" "[ \"ui.tools\" run ] in-thread" } ;
@@ -33,10 +33,10 @@ $nl
 $nl
 "For more about presentation gadgets, see " { $link "ui.gadgets.presentations" } "." ;
 
-ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"
-"On Mac OS X, the Factor UI offers additional features which integrate with this operating system."
+ARTICLE: "ui-cocoa" "Functionality specific to macOS"
+"On macOS, the Factor UI offers additional features which integrate with this operating system."
 $nl
-"First, a standard Mac-style menu bar is provided, which offers the bare minimum of what you would expect from a Mac OS X application."
+"First, a standard macOS-style menu bar is provided, which offers the bare minimum of what you would expect from a macOS application."
 $nl
 "Dropping a source file onto the Factor icon in the dock runs the source file in the listener."
 $nl

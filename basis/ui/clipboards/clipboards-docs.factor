@@ -23,7 +23,7 @@ ARTICLE: "clipboard-protocol" "Clipboard protocol"
     paste-clipboard
     copy-clipboard
 }
-"UI backends can either implement the above two words in the case of an asynchronous clipboard model (for example, X11). If direct access to the clipboard is provided (Windows, Mac OS X), the following two generic words may be implemented instead:"
+"UI backends can either implement the above two words in the case of an asynchronous clipboard model (for example, X11). If direct access to the clipboard is provided (Windows, macOS), the following two generic words may be implemented instead:"
 { $subsections
     clipboard-contents
     set-clipboard-contents

@@ -40,7 +40,7 @@ $nl
 } ;
 
 ARTICLE: "cocoa" "Cocoa bridge"
-"The " { $vocab-link "cocoa" } " vocabulary implements a Factor-Cocoa bridge for Mac OS X (GNUstep is not supported)."
+"The " { $vocab-link "cocoa" } " vocabulary implements a Factor-Cocoa bridge for macOS (GNUstep is not supported)."
 $nl
 "The lowest layer uses the " { $link "alien" } " to define bindings for the various functions in Apple's Objective-C runtime. This is defined in the " { $vocab-link "cocoa.runtime" } " vocabulary."
 $nl
