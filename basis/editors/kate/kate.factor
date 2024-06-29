@@ -13,7 +13,7 @@ M: windows find-kate-path
     { "Kate" } "kate.exe" find-in-applications
     [ "kate.exe" ] unless* ;
 
-M: macosx find-kate-path
+M: macos find-kate-path
     "org.kde.Kate" find-native-bundle [
         "Contents/MacOS/kate" append-path
     ] [

@@ -2,6 +2,6 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: core-foundation.launch-services io.standard-paths
 system ;
-IN: io.standard-paths.macosx
+IN: io.standard-paths.macos
 
-M: macosx find-native-bundle launch-services-path ;
+M: macos find-native-bundle launch-services-path ;

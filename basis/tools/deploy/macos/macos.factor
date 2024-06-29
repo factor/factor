@@ -5,7 +5,7 @@ io.directories io.files io.files.info.unix io.pathnames kernel
 make namespaces sequences system tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor vocabs.loader ;
 QUALIFIED-WITH: tools.deploy.unix unix
-IN: tools.deploy.macosx
+IN: tools.deploy.macos
 
 : bundle-dir ( -- dir )
     running.app?
@@ -83,7 +83,7 @@ IN: tools.deploy.macosx
 : deploy-app-bundle? ( vocab -- ? )
     deploy-config [ deploy-console? get not deploy-ui? get or ] with-variables ;
 
-M: macosx deploy*
+M: macos deploy*
     ! pass off to M: unix deploy* if we're building a console app
     dup deploy-app-bundle? [
         deploy-app-bundle
@@ -91,7 +91,7 @@ M: macosx deploy*
         call-next-method
     ] if ;
 
-M: macosx deploy-path
+M: macos deploy-path
     dup deploy-app-bundle? [
         deploy-directory get [
             dup deploy-config [

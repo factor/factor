@@ -30,4 +30,4 @@ M: unix set-os-envs-pointer environ set-void* ;
 M: unix (set-os-envs)
     utf8 strings>alien malloc-byte-array set-os-envs-pointer ;
 
-os macosx? [ "environment.unix.macosx" require ] when
+os macos? [ "environment.unix.macos" require ] when

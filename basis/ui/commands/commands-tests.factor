@@ -22,7 +22,7 @@ testing "testing" "hey" {
     { T{ key-down f { C+ } "x" } com-test-1 }
 } define-command-map
 
-os macosx? [
+os macos? [
     { "⌘A" } [ T{ key-down f { M+ } "a" } gesture>string ] unit-test
     { "B" } [ T{ key-down f f "b" } gesture>string ] unit-test
 

@@ -3,7 +3,7 @@
 USING: alien.c-types alien.syntax cocoa.plists cocoa.runtime
 cocoa.types core-foundation.strings io.files io.files.temp
 io.pathnames kernel sequences system ;
-IN: io.files.temp.macosx
+IN: io.files.temp.macos
 
 <PRIVATE
 
@@ -31,9 +31,9 @@ CONSTANT: factor-bundle-name "org.factorcode.Factor"
 
 PRIVATE>
 
-M: macosx default-temp-directory
+M: macos default-temp-directory
     NSTemporaryDirectory CF>string factor-bundle-subdir ;
 
-M: macosx default-cache-directory
+M: macos default-cache-directory
     NSCachesDirectory NSUserDomainMask 1 NSSearchPathForDirectoriesInDomains
     plist> first-existing [ call-next-method ] unless* factor-bundle-subdir ;

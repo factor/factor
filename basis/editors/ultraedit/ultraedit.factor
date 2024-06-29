@@ -10,7 +10,7 @@ M: windows find-ultraedit
     { "IDM Computer Solutions" } "uedit32.exe" find-in-applications
     [ "uedit32.exe" ] unless* ;
 
-M: macosx find-ultraedit
+M: macos find-ultraedit
     "com.idmcomp.uex" find-native-bundle [
         "Contents/MacOS/UltraEdit" append-path
     ] [

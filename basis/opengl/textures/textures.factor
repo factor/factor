@@ -14,7 +14,7 @@ SYMBOL: non-power-of-2-textures?
 : check-extensions ( -- )
     ! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
     ! See thread 'Linux font display problem' April 2009 on Factor-talk
-    gl-vendor "ATI Technologies Inc." = not os macosx? or [
+    gl-vendor "ATI Technologies Inc." = not os macos? or [
         "2.0" { "GL_ARB_texture_non_power_of_two" }
         has-gl-version-or-extensions?
         non-power-of-2-textures? set

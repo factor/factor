@@ -4,7 +4,7 @@ sequences system unix.types ;
 IN: iokit
 
 <<
-    os macosx?
+    os macos?
     [ "/System/Library/Frameworks/IOKit.framework" load-framework ]
     when
 >>

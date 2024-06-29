@@ -8,7 +8,7 @@ SINGLETON: brackets
 
 HOOK: brackets-path os ( -- path )
 
-M: macosx brackets-path
+M: macos brackets-path
     "io.brackets.appshell" find-native-bundle [
         "Contents/MacOS/Brackets" append-path
     ] [

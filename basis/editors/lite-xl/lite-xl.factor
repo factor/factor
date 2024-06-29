@@ -10,7 +10,7 @@ HOOK: find-lite-xl-editor-path os ( -- path )
 
 M: unix find-lite-xl-editor-path "xl" ?find-in-path ;
 
-M: macosx find-lite-xl-editor-path { "open" "-a" "Lite XL" } ;
+M: macos find-lite-xl-editor-path { "open" "-a" "Lite XL" } ;
 
 M: windows find-lite-xl-editor-path
     { "lite-xl" } "xl.exe" find-in-applications

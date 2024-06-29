@@ -14,7 +14,7 @@ LIBRARY: gtk2.gl
 <<
 "gtk2.gl" {
     { [ os windows? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
+    { [ os macos? ] [ drop ] }
     { [ os unix? ] [ "libgtkglext-x11-1.0.so" cdecl add-library ] }
 } cond
 >>

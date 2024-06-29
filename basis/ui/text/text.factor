@@ -80,7 +80,7 @@ M: array draw-text
     ] do-matrix ;
 
 {
-    { [ os macosx? ] [ "core-text" ] }
+    { [ os macos? ] [ "core-text" ] }
     { [ os windows? ] [ "uniscribe" ] }
     { [ os unix? ] [ "pango" ] }
 } cond "ui.text." prepend require

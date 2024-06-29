@@ -11,7 +11,7 @@ IN: openssl.libcrypto
           cpu x86.64 = "-x64" "" ?
           "libcrypto-3" ".dll" surround
     ] }
-    { [ os macosx? ] [ "libcrypto.35.dylib" ] }
+    { [ os macos? ] [ "libcrypto.35.dylib" ] }
     { [ os unix? ] [ "libcrypto.so" ] }
 } cond cdecl add-library >>
 

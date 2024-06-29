@@ -23,7 +23,7 @@ IN: compiler.tests.alien
     "resource:" absolute-path
     {
         { [ os windows? ]  [ "libfactor-ffi-test.dll" ] }
-        { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
+        { [ os macos? ] [ "libfactor-ffi-test.dylib" ] }
         { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
     } cond append-path ;
 

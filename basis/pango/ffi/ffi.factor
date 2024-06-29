@@ -11,7 +11,7 @@ LIBRARY: pango
 
 << "pango" {
     { [ os windows? ] [ "libpango-1.0-0.dll" ] }
-    { [ os macosx? ] [ "libpango-1.0.dylib" ] }
+    { [ os macos? ] [ "libpango-1.0.dylib" ] }
     { [ os unix? ] [ "libpango-1.0.so" ] }
 } cond cdecl add-library >>
 

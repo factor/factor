@@ -3,9 +3,9 @@
 USING: accessors arrays combinators core-foundation.fsevents
 destructors io.backend io.monitors kernel math sequences system
 ;
-IN: io.monitors.macosx
+IN: io.monitors.macos
 
-TUPLE: macosx-monitor < monitor handle ;
+TUPLE: macos-monitor < monitor handle ;
 
 : enqueue-notifications ( triples monitor -- )
     '[
@@ -17,13 +17,13 @@ TUPLE: macosx-monitor < monitor handle ;
         } cleave [ { +modify-file+ } ] [ >array ] if-empty _ queue-change
     ] each ;
 
-M:: macosx (monitor) ( path recursive? mailbox -- monitor )
+M:: macos (monitor) ( path recursive? mailbox -- monitor )
     path normalize-path :> path
-    path mailbox macosx-monitor new-monitor
+    path mailbox macos-monitor new-monitor
     dup [ enqueue-notifications ] curry
     path 1array 0 kFSEventStreamCreateFlagFileEvents <event-stream> >>handle ;
 
-M: macosx-monitor dispose*
+M: macos-monitor dispose*
     [ handle>> dispose ] [ call-next-method ] bi ;
 
-macosx set-io-backend
+macos set-io-backend

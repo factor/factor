@@ -20,7 +20,7 @@ USING: simple-tokenizer tools.test ;
 {
     V{
         "Hello world.app/Contents/MacOS/hello-ui"
-        "-i=boot.macosx-ppc.image"
+        "-i=boot.macos-ppc.image"
         "-include= math compiler ui"
         "-deploy-vocab=hello-ui"
         "-output-image=Hello world.app/Contents/Resources/hello-ui.image"
@@ -28,7 +28,7 @@ USING: simple-tokenizer tools.test ;
         "-no-user-init"
     }
 } [
-    "\"Hello world.app/Contents/MacOS/hello-ui\" -i=boot.macosx-ppc.image \"-include= math compiler ui\" -deploy-vocab=hello-ui \"-output-image=Hello world.app/Contents/Resources/hello-ui.image\" -no-stack-traces -no-user-init" tokenize
+    "\"Hello world.app/Contents/MacOS/hello-ui\" -i=boot.macos-ppc.image \"-include= math compiler ui\" -deploy-vocab=hello-ui \"-output-image=Hello world.app/Contents/Resources/hello-ui.image\" -no-stack-traces -no-user-init" tokenize
 ] unit-test
 
 { V{ "ls" "-l" } } [ "ls -l" tokenize ] unit-test

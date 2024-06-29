@@ -10,7 +10,7 @@ LIBRARY: atk
 
 << "atk" {
     { [ os windows? ] [ "libatk-1.0-0.dll" ] }
-    { [ os macosx? ] [ "libatk-1.0.dylib" ] }
+    { [ os macos? ] [ "libatk-1.0.dylib" ] }
     { [ os unix? ] [ "libatk-1.0.so" ] }
 } cond cdecl add-library >>
 

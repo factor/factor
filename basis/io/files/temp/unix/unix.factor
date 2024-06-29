@@ -10,4 +10,4 @@ M: unix default-temp-directory
 M: unix default-cache-directory
     xdg-cache-home "factor" append-path absolute-path ;
 
-os macosx? [ "io.files.temp.macosx" require ] when
+os macos? [ "io.files.temp.macos" require ] when

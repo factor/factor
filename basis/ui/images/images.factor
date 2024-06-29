@@ -46,7 +46,7 @@ PRIVATE>
     cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
 
 {
-    { [ os macosx? ] [ "images.loader.cocoa" require ] }
+    { [ os macos? ] [ "images.loader.cocoa" require ] }
     { [ os windows?  ] [ "images.loader.gdiplus" require ] }
     { [ os { freebsd } member? ] [
         "images.png" require

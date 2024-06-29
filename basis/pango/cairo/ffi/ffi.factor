@@ -11,7 +11,7 @@ LIBRARY: pango.cairo
 
 << "pango.cairo" {
     { [ os windows? ] [ "libpangocairo-1.0-0.dll" ] }
-    { [ os macosx? ] [ "libpangocairo-1.0.dylib" ] }
+    { [ os macos? ] [ "libpangocairo-1.0.dylib" ] }
     { [ os unix? ] [ "libpangocairo-1.0.so" ] }
 } cond cdecl add-library >>
 

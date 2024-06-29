@@ -13,7 +13,7 @@ HOOK: find-atom os ( -- path )
 M: object find-atom
     "atom" ?find-in-path ;
 
-M: macosx find-atom
+M: macos find-atom
     "com.github.Atom" find-native-bundle [
         "Contents/MacOS/Atom" append-path
     ] [
