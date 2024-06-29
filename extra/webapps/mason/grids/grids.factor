@@ -16,7 +16,7 @@ IN: webapps.mason.grids
 CONSTANT: oses
 {
     { "windows" "Windows" }
-    { "macos" "Mac OS" }
+    { "macos" "macOS" }
     { "linux" "Linux" }
 }
 
