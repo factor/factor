@@ -65,8 +65,8 @@ ARTICLE: "io.monitors.platforms" "Monitors on different platforms"
 "Whether the " { $slot "path" } " slot of a " { $link file-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is unspecified, and may even vary on the same platform. User code should not assume either case."
 $nl
 "If the immediate path being monitored was changed, then " { $snippet "path" } " will equal " { $snippet "\"\"" } "; however this condition is not reported on all platforms. See below."
-{ $heading "Mac OS X" }
-"Factor uses " { $snippet "FSEventStream" } "s to implement monitors on Mac OS X. This requires Mac OS X 10.5 or later."
+{ $heading "macOS" }
+"Factor uses " { $snippet "FSEventStream" } "s to implement monitors on macOS. This requires macOS 10.5 or later."
 $nl
 { $snippet "FSEventStream" } "s always monitor directory hierarchies recursively, and the " { $snippet "recursive?" } " parameter to " { $link <monitor> } " has no effect."
 $nl
@@ -86,7 +86,7 @@ $nl
 $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
 $nl
-"Both directories and files may be monitored. Unlike Mac OS X and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
+"Both directories and files may be monitored. Unlike macOS and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
 ;
 
 ARTICLE: "io.monitors" "File system change monitors"

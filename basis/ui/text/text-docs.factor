@@ -56,7 +56,7 @@ HELP: string>image
 { $description "Renders a line of text into an image." } ;
 
 ARTICLE: "text-rendering" "Rendering text"
-"The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X, Uniscribe on Windows and Pango on X11."
+"The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on macOS, Uniscribe on Windows and Pango on X11."
 { $subsections "fonts" }
 "Measuring text:"
 { $subsections
