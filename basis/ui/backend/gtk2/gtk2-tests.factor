@@ -63,7 +63,7 @@ IN: ui.backend.gtk2.tests
     } ;
 
 
-! The Mac build servers doesn't have the gtk libs
+! The macOS build servers don't have the gtk libs
 os linux? [
     ! key-event>gesture
     {

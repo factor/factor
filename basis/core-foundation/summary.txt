@@ -1,1 +1,1 @@
-Binding to Mac OS X CoreFoundation library
+Binding to macOS CoreFoundation library

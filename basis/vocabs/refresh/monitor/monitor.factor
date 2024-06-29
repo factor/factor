@@ -29,7 +29,7 @@ TR: convert-separators "/\\" ".." ;
     chop-vocab-root path>vocab-parent-dir vocab-dir>vocab-name ;
 
 : monitor-loop ( monitor -- )
-    ! On OS X, monitors give us the full path, so we chop it
+    ! On macOS, monitors give us the full path, so we chop it
     ! off if its there.
     [
         next-change path>>

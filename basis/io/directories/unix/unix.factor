@@ -60,7 +60,7 @@ M: unix copy-file
         { $ DT_WHT  +whiteout+ }
     } at* [ drop +unknown+ ] unless ;
 
-! An easy way to return +unknown+ is to mount a .iso on OSX and
+! An easy way to return +unknown+ is to mount a .iso on macOS and
 ! call directory-entries on the mount point.
 
 : next-dirent ( DIR* dirent* -- dirent* ? )

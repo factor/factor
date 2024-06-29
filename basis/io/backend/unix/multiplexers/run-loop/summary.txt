@@ -1,1 +1,1 @@
-Mac OS X CFRunLoop multiplexer
+macOS CFRunLoop multiplexer

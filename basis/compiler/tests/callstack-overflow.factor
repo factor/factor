@@ -66,7 +66,7 @@ os windows? [
         2 head ${ KERNEL-ERROR ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 
-    ! This test crashes with a Memory protection fault on OS X 64-bit
+    ! This test crashes with a Memory protection fault on macOS 64-bit
     ! for some reason. See #1478
     cpu x86.64? os macosx? and [
         ! Load up the stack until there is < 500 bytes of it left. Then
