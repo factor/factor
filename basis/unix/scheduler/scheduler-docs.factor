@@ -4,7 +4,7 @@ USING: alien.c-types help.markup help.syntax kernel system ;
 IN: unix.scheduler
 
 ARTICLE: "unix.scheduler" "Unix Process Scheduling"
-"The " { $vocab-link "unix.scheduler" } "vocabulary provides an interface to the POSIX process scheduler. " { $link macosx } " does not implement POSIX Process Scheduling, but does have other similar low-level APIs exposed by this vocabulary."
+"The " { $vocab-link "unix.scheduler" } "vocabulary provides an interface to the POSIX process scheduler. " { $link macos } " does not implement POSIX Process Scheduling, but does have other similar low-level APIs exposed by this vocabulary."
 $nl "Cross platform constants:"
 { $subsections MOST_IDLE_SCHED_POLICY }
 "Utility words:"
@@ -14,7 +14,7 @@ ABOUT: "unix.scheduler"
 
 HELP: MOST_IDLE_SCHED_POLICY
 { $description
-    "The scheduling policy value which is, or is most like, the " { $snippet "SCHED_IDLE" } " policy on Linux. The value of this word is platform specific, and differs between " { $link linux } ", " { $link macosx } " and " { $link freebsd } "." }
+    "The scheduling policy value which is, or is most like, the " { $snippet "SCHED_IDLE" } " policy on Linux. The value of this word is platform specific, and differs between " { $link linux } ", " { $link macos } " and " { $link freebsd } "." }
     $nl
     { $snippet "sched(7)" } " describes " { $snippet "SCHED_IDLE" } " to be " { $emphasis "intended for running jobs at extremely low priority (lower even than a +19 nice value with the SCHED_OTHER or SCHED_BATCH policies)."
 } ;
