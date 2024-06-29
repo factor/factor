@@ -13,7 +13,7 @@ LIBRARY: gstreamer.net
 <<
 "gstreamer.net" {
     { [ os windows? ] [ drop ] }
-    { [ os macosx? ] [ drop ] }
+    { [ os macos? ] [ drop ] }
     { [ os unix? ] [ "libgstnet-0.10.so" cdecl add-library ] }
 } cond
 >>

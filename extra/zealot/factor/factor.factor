@@ -38,7 +38,7 @@ IN: zealot.factor
     download-boot-image ;
 
 HOOK: compile-factor-command os ( -- array )
-M: macosx compile-factor-command ( -- array )
+M: macos compile-factor-command ( -- array )
     { "arch" "-x86_64" "make" "-j" } cpus number>string suffix ;
 M: unix compile-factor-command ( -- array )
     { "make" "-j" } cpus number>string suffix ;
@@ -63,7 +63,7 @@ M: windows factor-path "./factor.com" ;
     [
         <process>
             factor-path "-i=" my-boot-image-name append "-no-user-init" 3array
-            os macosx = [ { "arch" "-x86_64" } prepend ] when
+            os macos = [ { "arch" "-x86_64" } prepend ] when
                 >>command
             +closed+ >>stdin
             "./bootstrap-log" >>stdout

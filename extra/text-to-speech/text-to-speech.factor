@@ -15,7 +15,7 @@ IN: text-to-speech
 HOOK: speak-text os ( str -- )
 
 {
-    { [ os macosx?  ] [ "text-to-speech.macosx"  ] }
+    { [ os macos?  ] [ "text-to-speech.macos"  ] }
     { [ os linux?   ] [ "text-to-speech.linux"   ] }
     { [ os windows? ] [ "text-to-speech.windows" ] }
 } cond require

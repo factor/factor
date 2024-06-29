@@ -9,7 +9,7 @@ IN: zeromq.ffi
 
 << "zmq" {
     { [ os windows? ] [ "libzmq.dll" ] }
-    { [ os macosx? ] [ "libzmq.dylib" ] }
+    { [ os macos? ] [ "libzmq.dylib" ] }
     { [ os unix? ] [ "libzmq.so" ] }
 } cond cdecl add-library >>
 

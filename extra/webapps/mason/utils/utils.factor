@@ -56,7 +56,7 @@ IN: webapps.mason.utils
 : requirements ( builder -- xml )
     os>> {
         { "windows" "Windows 10, Windows 11, or newer" }
-        { "macosx" "macOS 11 (Big Sur) or newer" }
+        { "macos" "macOS 11 (Big Sur) or newer" }
         { "linux" "Ubuntu Linux 20.04 or newer (other distributions may also work)" }
     } at [XML <ul><li><-></li></ul> XML] ;
 

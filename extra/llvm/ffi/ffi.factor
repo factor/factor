@@ -6,7 +6,7 @@ IN: llvm.ffi
 
 << "llvm" {
     { [ os linux? ] [ "LLVM-3.9" find-so ] }
-    { [ os macosx? ] [ "libLLVM.dylib" ] }
+    { [ os macos? ] [ "libLLVM.dylib" ] }
     [ f ]
 } cond [ cdecl add-library ] [ drop ] if*
 >>

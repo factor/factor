@@ -5,7 +5,7 @@ combinators system tokyo.alien.tcutil tokyo.alien.tctdb ;
 IN: tokyo.alien.tcrdb
 
 << "tokyotyrant" {
-    { [ os macosx? ] [ "libtokyotyrant.dylib" ] }
+    { [ os macos? ] [ "libtokyotyrant.dylib" ] }
     { [ os unix? ] [ "libtokyotyrant.so" ] }
     { [ os windows? ] [ "tokyotyrant.dll" ] }
 } cond cdecl add-library >>

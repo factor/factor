@@ -5,7 +5,7 @@ USING: alien.c-types alien.strings alien.syntax classes.struct
 core-foundation io.backend io.encodings.utf8 io.files.trash
 kernel system ;
 
-IN: io.files.trash.macosx
+IN: io.files.trash.macos
 
 <PRIVATE
 
@@ -59,7 +59,7 @@ FUNCTION: OSStatus FSPathMakeRefWithOptions (
 
 PRIVATE>
 
-M: macosx send-to-trash ( path -- )
+M: macos send-to-trash ( path -- )
     normalize-path
     <fs-ref> f kFSFileOperationDefaultOptions
     FSMoveObjectToTrashSync check-err ;

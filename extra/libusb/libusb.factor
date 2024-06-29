@@ -8,7 +8,7 @@ IN: libusb
 
 << "libusb" {
         { [ os windows? ] [ "libusb-1.0.dll" ] }
-        { [ os macosx? ] [ "libusb-1.0.dylib"  ] }
+        { [ os macos? ] [ "libusb-1.0.dylib"  ] }
         { [ os unix?  ] [ "libusb-1.0.so" ] }
     } cond cdecl add-library >>
 LIBRARY: libusb

@@ -10,7 +10,7 @@ IN: openal
 
 << "openal" {
         { [ os windows? ]  [ "OpenAL32.dll" ] }
-        { [ os macosx? ] [
+        { [ os macos? ] [
             "/System/Library/Frameworks/OpenAL.framework/OpenAL"
         ] }
         { [ os unix?  ]  [ "libopenal.so" ] }

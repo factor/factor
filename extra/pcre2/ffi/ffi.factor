@@ -5,7 +5,7 @@ IN: pcre2.ffi
 
 << "pcre2" {
     { [ os windows? ] [ "pcre2-8.dll" ] }
-    { [ os macosx? ] [ "libpcre2-8.dylib" ] }
+    { [ os macos? ] [ "libpcre2-8.dylib" ] }
     { [ os unix? ] [ "libpcre2-8.so" ] }
 } cond cdecl add-library >>
 

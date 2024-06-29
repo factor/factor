@@ -29,7 +29,7 @@ CONSTANT: cleanup-list {
 
 : useless-files ( -- seq )
     cleanup-list image-names [ boot-image-name ] map append
-    target-os get macosx? [ "Factor.app" suffix ] unless ;
+    target-os get macos? [ "Factor.app" suffix ] unless ;
 
 : tidy ( -- )
     "factor" [

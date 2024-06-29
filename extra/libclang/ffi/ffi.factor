@@ -16,7 +16,7 @@ LIBRARY: clang
 
 << "clang" {
     { [ os windows? ] [ "libclang.dll" ] }
-    { [ os macosx? ] [ "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" ] }
+    { [ os macos? ] [ "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" ] }
     { [ os unix? ] [ latest-libclang "lib/libclang.so" append-path ] }
 } cond cdecl add-library >>
 

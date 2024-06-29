@@ -3,7 +3,7 @@ sequences system tools.test ;
 IN: mason.release.tidy.tests
 
 [ f ] [
-    macosx target-os [
+    macos target-os [
         "Factor.app" useless-files member?
     ] with-variable
 ] unit-test

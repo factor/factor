@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.destructors combinators
-destructors io io.backend io.files io.files.acls.macosx.ffi
+destructors io io.backend io.files io.files.acls.macos.ffi
 kernel libc sequences unix.groups unix.types unix.users ;
 QUALIFIED: io
-IN: io.files.acls.macosx
+IN: io.files.acls.macos
 
 <PRIVATE
 

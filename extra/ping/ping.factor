@@ -45,7 +45,7 @@ HOOK: <ping-port> os ( inet -- port )
 
 M: object <ping-port> <raw> ;
 
-M: macosx <ping-port> <datagram> ;
+M: macos <ping-port> <datagram> ;
 
 : ping ( host -- reply )
     <icmp> resolve-host [ icmp4? ] filter random

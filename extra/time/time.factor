@@ -8,6 +8,6 @@ HOOK: adjust-time-monotonic os ( timestamp -- seconds )
 
 {
     { [ os windows? ] [ "time.windows" ] }
-    { [ os macosx? ] [ "time.macosx" ] }
+    { [ os macos? ] [ "time.macos" ] }
     { [ os unix? ] [ "time.unix" ] }
 } cond require
