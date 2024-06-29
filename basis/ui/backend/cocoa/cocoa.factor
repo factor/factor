@@ -103,7 +103,7 @@ M: cocoa-ui-backend (set-fullscreen)
 M: cocoa-ui-backend (fullscreen?)
     handle>> [ view>> -> isInFullScreenMode zero? not ] [ f ] if* ;
 
-! XXX: Until someone tests OSX with a tiling window manager,
+! XXX: Until someone tests macOS with a tiling window manager,
 ! dialog-window is the same as normal-title-window
 CONSTANT: window-control>styleMask
     H{

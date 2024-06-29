@@ -1,1 +1,1 @@
-BSD and Mac OS X kqueue multiplexer
+BSD and macOS kqueue multiplexer

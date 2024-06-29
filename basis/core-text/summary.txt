@@ -1,1 +1,1 @@
-Binding for Mac OS X Core Text library
+Binding for macOS Core Text library

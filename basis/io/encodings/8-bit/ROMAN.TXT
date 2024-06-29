@@ -79,7 +79,7 @@
 # Notes on Mac OS Roman:
 # ----------------------
 #
-#   This is a legacy Mac OS encoding; in the Mac OS X Carbon and Cocoa
+#   This is a legacy Mac OS encoding; in the macOS Carbon and Cocoa
 #   environments, it is only supported directly in programming
 #   interfaces for QuickDraw Text, the Script Manager, and related
 #   Text Utilities. For other purposes it is supported via transcoding

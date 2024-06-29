@@ -2,7 +2,7 @@ USING: alien.c-types alien.syntax classes.struct unix.time
 unix.types ;
 IN: unix.stat
 
-! Mac OS X
+! macOS
 
 ! stat64 structure
 STRUCT: stat
