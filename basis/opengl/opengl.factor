@@ -43,7 +43,7 @@ TUPLE: gl-error-tuple function code string ;
 : throw-gl-error? ( -- ? )
     os macosx? [
         ! This is kind of terrible, but we are having
-        ! problems on Mac OS X 10.11 where the
+        ! problems on macOS 10.11 where the
         ! default framebuffer seems to be initialized
         ! asynchronously or something, so we should
         ! just log these for now in (gl-error).

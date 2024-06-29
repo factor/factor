@@ -7,7 +7,7 @@ IN: io.backend.unix.multiplexers.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;
 
-! Factor's bit-arrays are an array of bytes, OS X expects
+! Factor's bit-arrays are an array of bytes, macOS expects
 ! FD_SET to be an array of cells, so we have to account for
 ! byte order differences on big endian platforms
 : munge ( i -- i' )

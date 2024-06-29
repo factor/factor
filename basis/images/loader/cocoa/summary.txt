@@ -1,1 +1,1 @@
-Image loading using MacOS X's native Cocoa APIs
+Image loading using macOS's native Cocoa APIs

@@ -1,1 +1,1 @@
-Deploying minimal stand-alone Mac OS X application bundles
+Deploying minimal stand-alone macOS application bundles

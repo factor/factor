@@ -1,1 +1,1 @@
-UI text rendering implementation using Mac OS X Core Text
+UI text rendering implementation using macOS Core Text

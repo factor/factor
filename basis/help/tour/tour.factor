@@ -69,7 +69,7 @@ You can enter more than one number, separated by spaces, like { $snippet "7 3 1"
 You can put additional inputs in a single line, so for instance { $snippet "- *" } will leave the single number { $snippet "15" } on the stack (do you see why?).
 
 You may end up pushing many values to the stack, or end up with an incorrect result. You can then clear the stack with the
-keystroke { $snippet "Alt+Shift+K" } on Linux/Windows or { $snippet "Cmd+Shift+K" } on MacOS.
+keystroke { $snippet "Alt+Shift+K" } on Linux/Windows or { $snippet "Cmd+Shift+K" } on macOS.
 
 The function { $snippet "." } (a period or a dot) prints the item at the top of the stack, while popping it out of the stack, leaving the stack empty.
 

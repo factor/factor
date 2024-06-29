@@ -1,1 +1,1 @@
-Binding to Mac OS X Core Graphics library
+Binding to macOS Core Graphics library

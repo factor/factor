@@ -1,1 +1,1 @@
-*BSD/Mac OS X support
+*BSD/macOS support
