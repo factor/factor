@@ -55,6 +55,7 @@ ifdef CONFIG
 
 	ifneq ($(DEBUG), 0)
 		CFLAGS += -g -DFACTOR_DEBUG
+		CXXFLAGS += -g -DFACTOR_DEBUG
 	else
 		OPTIMIZATION := -O3
 		CFLAGS += $(CC_OPT) $(OPTIMIZATION)
