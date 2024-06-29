@@ -9,7 +9,7 @@ IN: rocksdb.ffi
 
 << "rocksdb" {
     { [ os windows? ] [ "librocksdb.dll" ] }
-    { [ os macosx? ] [ "librocksdb.dylib" ] }
+    { [ os macos? ] [ "librocksdb.dylib" ] }
     { [ os unix? ] [ "librocksdb.so" ] }
 } cond cdecl add-library >>
 

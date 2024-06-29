@@ -5,7 +5,7 @@ alien.libraries classes.struct ;
 IN: freetype
 
 << "freetype" {
-    { [ os macosx? ] [ "libfreetype.6.dylib" cdecl add-library ] }
+    { [ os macos? ] [ "libfreetype.6.dylib" cdecl add-library ] }
     { [ os windows? ] [ "freetype6.dll" cdecl add-library ] }
     [ drop ]
 } cond >>

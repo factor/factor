@@ -6,7 +6,7 @@ IN: curses.ffi
 
 << "curses" {
     { [ os windows? ]  [ "libcurses.dll" ] }
-    { [ os macosx? ] [ "libcurses.dylib" ] }
+    { [ os macos? ] [ "libcurses.dylib" ] }
     { [ os unix?  ]  [ "ncursesw" find-library ] }
 } cond cdecl add-library >>
 

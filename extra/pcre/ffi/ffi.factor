@@ -4,7 +4,7 @@ IN: pcre.ffi
 
 << "pcre" {
     { [ os windows? ] [ "pcre.dll" ] }
-    { [ os macosx? ] [ "libpcre.dylib" ] }
+    { [ os macos? ] [ "libpcre.dylib" ] }
     { [ os unix? ] [ "libpcre.so" ] }
 } cond cdecl add-library >>
 

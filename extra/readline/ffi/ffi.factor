@@ -7,7 +7,7 @@ IN: readline.ffi
 
 << "readline" {
     { [ os windows? ] [ "readline.dll" ] }
-    { [ os macosx? ] [ "libreadline.dylib" ] }
+    { [ os macos? ] [ "libreadline.dylib" ] }
     { [ os unix? ] [ "libreadline.so" ] }
 } cond cdecl add-library >>
 

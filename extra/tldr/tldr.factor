@@ -14,7 +14,7 @@ tldr-language [ "en" ] initialize
 SYMBOL: tldr-platform
 tldr-platform [
     os {
-        { macosx [ "osx" ] }
+        { macos [ "osx" ] }
         { linux [ "linux" ] }
         { windows [ "windows" ] }
     } case

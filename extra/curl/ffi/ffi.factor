@@ -5,7 +5,7 @@ system words ;
 IN: curl.ffi
 
 << "curl" {
-    { [ os macosx? ] [ "libcurl.dylib" ] }
+    { [ os macos? ] [ "libcurl.dylib" ] }
     { [ os unix? ] [ "libcurl.so" ] }
 } cond cdecl add-library >>
 

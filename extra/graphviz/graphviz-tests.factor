@@ -22,7 +22,7 @@ IN: graphviz.tests
 
 ! http://www.graphviz.org/Download_macos.php#comment-474
 : remove-sfdp-in-case-homebrew-is-dumb ( seq -- seq' )
-    os macosx? [ "sfdp" swap remove ] when ;
+    os macos? [ "sfdp" swap remove ] when ;
 
 SYMBOLS: supported-layouts supported-formats ;
 

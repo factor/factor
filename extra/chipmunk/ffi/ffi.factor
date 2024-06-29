@@ -9,7 +9,7 @@ IN: chipmunk.ffi
 <<
 "chipmunk" {
     { [ os windows? ] [ "chipmunk.dll" ] }
-    { [ os macosx? ] [ "libchipmunk.dylib"  ] }
+    { [ os macos? ] [ "libchipmunk.dylib"  ] }
     { [ os unix?  ] [ "libchipmunk.so" ] }
 } cond cdecl add-library
 

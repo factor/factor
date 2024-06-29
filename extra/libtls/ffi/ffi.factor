@@ -5,7 +5,7 @@ IN: libtls.ffi
 
 << "libtls" {
     { [ os windows? ] [ "libtls-10.dll" ] }
-    { [ os macosx? ] [ "libtls.dylib" ] }
+    { [ os macos? ] [ "libtls.dylib" ] }
     { [ os unix? ] [ "libtls.so" ] }
 } cond cdecl add-library >>
 

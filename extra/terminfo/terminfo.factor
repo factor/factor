@@ -130,7 +130,7 @@ PRIVATE>
 
 HOOK: terminfo-relative-path os ( name -- path )
 
-M: macosx terminfo-relative-path ( name -- path )
+M: macos terminfo-relative-path ( name -- path )
     [ first >hex ] keep "%s/%s" sprintf ;
 
 M: linux terminfo-relative-path ( name -- path )

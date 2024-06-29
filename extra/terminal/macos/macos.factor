@@ -6,7 +6,7 @@ kernel math memoize scratchpad system terminal unix unix.ffi ;
 
 QUALIFIED-WITH: alien.c-types c
 
-IN: terminal.macosx
+IN: terminal.macos
 
 <PRIVATE
 
@@ -35,7 +35,7 @@ MEMO: TIOCGWINSZ ( -- x ) CHAR: t 104 winsize heap-size _IOCR ;
 
 PRIVATE>
 
-M: macosx (terminal-size)
+M: macos (terminal-size)
     stdout-handle fileno TIOCGWINSZ winsize new
     [ ioctl ] 1check 0 < [
         drop 0 0

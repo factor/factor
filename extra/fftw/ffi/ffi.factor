@@ -10,7 +10,7 @@ LIBRARY: fftw3
 
 << "fftw3" {
     { [ os windows? ] [ { "fftw3.dll" "libfftw3-3.dll" } find-library-from-list ] }
-    { [ os macosx? ] [ "libfftw3.dylib" ] }
+    { [ os macos? ] [ "libfftw3.dylib" ] }
     { [ os unix? ] [ "libfftw3.so" ] }
 } cond cdecl add-library >>
 

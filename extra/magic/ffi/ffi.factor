@@ -7,7 +7,7 @@ alien.syntax combinators literals system ;
 IN: magic.ffi
 
 << "magic" {
-    { [ os macosx? ] [ "libmagic.dylib" ] }
+    { [ os macos? ] [ "libmagic.dylib" ] }
     { [ os unix? ] [ "libmagic.so" ] }
 } cond cdecl add-library >>
 

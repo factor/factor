@@ -9,7 +9,7 @@ IN: rlgl
 <<
 "raylib" {
     { [ os windows? ] [ "raylib.dll" ] }
-    { [ os macosx? ] [ "libraylib.dylib" ] }
+    { [ os macos? ] [ "libraylib.dylib" ] }
     { [ os unix? ] [ "libraylib.so" ] }
 } cond cdecl add-library
 

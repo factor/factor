@@ -11,7 +11,7 @@ FROM: alien.c-types => float short ;
 IN: odbc
 
 << "odbc" {
-    { [ os macosx? ] [ "libiodbc.dylib" ] }
+    { [ os macos? ] [ "libiodbc.dylib" ] }
     { [ os unix? ] [ "libodbc.so" ] }
     { [ os windows? ] [ "odbc32.dll" ] }
 } cond

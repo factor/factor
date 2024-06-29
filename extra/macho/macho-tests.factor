@@ -43,6 +43,6 @@ cpu ppc? [
 ] unless
 
 ! Throw an exception if the struct is not defined/handled
-os macosx? [
+os macos? [
     { } [ vm-path dylib-exports drop ] unit-test
 ] when

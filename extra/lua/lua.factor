@@ -7,7 +7,7 @@ IN: lua
 
 << "liblua5.1" {
     { [ os windows? ] [ "lua5.1.dll" ] }
-    { [ os macosx? ] [ "liblua5.1.dylib"  ] }
+    { [ os macos? ] [ "liblua5.1.dylib"  ] }
     { [ os unix? ] [ "liblua5.1.so" ] }
 } cond cdecl add-library >>
 
@@ -23,7 +23,7 @@ CONSTANT: LUA_IDSIZE 60
 : LUAL_BUFFERSIZE ( -- x )
     {
         { [ os windows? ] [ 512 ] }
-        { [ os macosx? ] [ 1024 ] }
+        { [ os macos? ] [ 1024 ] }
         { [ os unix? ] [ 8192 ] }
     } cond ;
 

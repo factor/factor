@@ -6,7 +6,7 @@ IN: duckdb.ffi
 
 << "duckdb" {
     { [ os windows? ] [ "duckdb.dll" ] }
-    { [ os macosx? ] [ "libduckdb.dylib" ] }
+    { [ os macos? ] [ "libduckdb.dylib" ] }
     { [ os unix? ] [ "libduckdb.so" ] }
 } cond cdecl add-library >>
 

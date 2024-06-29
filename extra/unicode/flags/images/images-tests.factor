@@ -8,7 +8,7 @@ IN: unicode.flags.images.tests
 
 ! Windows doesn't seem to have these flags yet (!)
 { { } } [
-    os macosx? [
+    os macos? [
         valid-flag-names alpha-2 keys diff
         [ dup unicode>flag ] map>alist
     ] [
