@@ -1,6 +1,7 @@
 USING: accessors eval kernel lexer strings.parser tools.test ;
 
 { "Hello\n\rworld" } [ "Hello\\n\\rworld" unescape-string ] unit-test
+[ "\\]" unescape-string ] [ bad-escape? ] must-fail-with
 
 { "Hello\n\rworld" } [ "Hello\n\rworld" ] unit-test
 { "Hello\n\rworld\n" } [ "Hello\n\rworld
