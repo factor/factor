@@ -459,11 +459,11 @@ editor "editing" f {
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
     { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "BACKSPACE" } delete-previous-character }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "DELETE" } delete-next-word }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "BACKSPACE" } delete-previous-word }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "DELETE" } delete-to-end-of-line }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "BACKSPACE" } delete-to-start-of-line }
-} os macosx? [ {
+    { T{ key-down f ${ os macos? A+ C+ ? } "DELETE" } delete-next-word }
+    { T{ key-down f ${ os macos? A+ C+ ? } "BACKSPACE" } delete-previous-word }
+    { T{ key-down f ${ os macos? M+ A+ ? } "DELETE" } delete-to-end-of-line }
+    { T{ key-down f ${ os macos? M+ A+ ? } "BACKSPACE" } delete-to-start-of-line }
+} os macos? [ {
     { T{ key-down f { C+ } "DELETE" } delete-next-character }
     { T{ key-down f { C+ } "BACKSPACE" } delete-previous-character }
 } append ] when define-command-map
@@ -514,15 +514,15 @@ editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
     { T{ key-down f f "RIGHT" } next-character }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "LEFT" } previous-word }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "RIGHT" } next-word }
+    { T{ key-down f ${ os macos? A+ C+ ? } "LEFT" } previous-word }
+    { T{ key-down f ${ os macos? A+ C+ ? } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
     { T{ key-down f f "END" } end-of-line }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "UP" } start-of-paragraph }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "DOWN" } end-of-paragraph }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "HOME" } start-of-document }
-    { T{ key-down f ${ os macosx? A+ C+ ? } "END" } end-of-document }
-} os macosx? [ {
+    { T{ key-down f ${ os macos? A+ C+ ? } "UP" } start-of-paragraph }
+    { T{ key-down f ${ os macos? A+ C+ ? } "DOWN" } end-of-paragraph }
+    { T{ key-down f ${ os macos? A+ C+ ? } "HOME" } start-of-document }
+    { T{ key-down f ${ os macos? A+ C+ ? } "END" } end-of-document }
+} os macos? [ {
     { T{ key-down f { M+ } "LEFT" } start-of-line }
     { T{ key-down f { M+ } "RIGHT" } end-of-line }
     { T{ key-down f { M+ } "UP" } start-of-paragraph }
@@ -586,15 +586,15 @@ editor "selection" f {
     { T{ key-down f { C+ } "l" } select-line }
     { T{ key-down f { S+ } "LEFT" } select-previous-character }
     { T{ key-down f { S+ } "RIGHT" } select-next-character }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "LEFT" } select-previous-word }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "RIGHT" } select-next-word }
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "LEFT" } select-previous-word }
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
     { T{ key-down f { S+ } "END" } select-end-of-line }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "UP" } select-start-of-paragraph }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "DOWN" } select-end-of-paragraph }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "HOME" } select-start-of-document }
-    { T{ key-down f ${ S+ os macosx? A+ C+ ? } "END" } select-end-of-document }
-} os macosx? [ {
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "UP" } select-start-of-paragraph }
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "DOWN" } select-end-of-paragraph }
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "HOME" } select-start-of-document }
+    { T{ key-down f ${ S+ os macos? A+ C+ ? } "END" } select-end-of-document }
+} os macos? [ {
     { T{ key-down f { S+ M+ } "LEFT" } select-start-of-line }
     { T{ key-down f { S+ M+ } "RIGHT" } select-end-of-line }
     { T{ key-down f { S+ M+ } "UP" } select-start-of-paragraph }

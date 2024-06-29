@@ -10,7 +10,7 @@ LIBRARY: glib
 
 << "glib" {
     { [ os windows? ] [ "glib-2.0-0.dll" ] }
-    { [ os macosx? ] [ "libglib-2.0.dylib" ] }
+    { [ os macos? ] [ "libglib-2.0.dylib" ] }
     { [ os unix? ] [ "libglib-2.0.so" ] }
 } cond cdecl add-library >>
 

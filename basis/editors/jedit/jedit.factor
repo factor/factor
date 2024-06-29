@@ -11,7 +11,7 @@ HOOK: find-jedit-path os ( -- path )
 
 M: object find-jedit-path f ;
 
-M: macosx find-jedit-path
+M: macos find-jedit-path
     "org.gjt.sp.jedit" find-native-bundle [
         "Contents/MacOS/jedit" append-path
     ] [

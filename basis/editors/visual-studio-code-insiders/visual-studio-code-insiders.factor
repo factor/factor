@@ -12,7 +12,7 @@ INSTANCE: visual-studio-code-insiders visual-studio-code-base
 M: visual-studio-code-insiders find-visual-studio-code-path
     os {
         { linux [ "code-insiders" which ] }
-        { macosx [
+        { macos [
             "com.microsoft.VSCodeInsiders" find-native-bundle
             [ "Contents/MacOS/Electron" append-path ] [ f ] if* ] }
         { windows [

@@ -7,7 +7,7 @@ SINGLETON: notepadnext
 
 HOOK: find-notepadnext-path os ( -- path line#? )
 
-M: macosx find-notepadnext-path
+M: macos find-notepadnext-path
     {
         "com.yourcompany.NotepadNext"
         "io.github.dail8859.NotepadNext"

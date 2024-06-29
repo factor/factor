@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct literals
 unix.ffi unix.types ;
-IN: unix.statfs.macosx
+IN: unix.statfs.macos
 
 CONSTANT: MNT_RDONLY  0x00000001
 CONSTANT: MNT_SYNCHRONOUS 0x00000002

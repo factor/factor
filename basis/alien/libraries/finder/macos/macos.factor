@@ -6,7 +6,7 @@ alien.syntax arrays assocs combinators environment io.files
 io.files.info io.pathnames kernel make math.order namespaces
 sequences splitting system system-info ;
 
-IN: alien.libraries.finder.macosx
+IN: alien.libraries.finder.macos
 
 <PRIVATE
 
@@ -137,7 +137,7 @@ PRIVATE>
         ] if* file-name append-path dyld-find
     ] if* ;
 
-M: macosx find-library*
+M: macos find-library*
     [ "lib" ".dylib" surround ]
     [ ".dylib" append ]
     [ ".framework/" over 3append ] tri 3array

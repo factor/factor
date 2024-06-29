@@ -6,7 +6,7 @@ IN: compression.zlib.ffi
 
 << "zlib" {
     { [ os windows? ] [ "zlib1.dll" ] }
-    { [ os macosx? ] [ "libz.dylib" ] }
+    { [ os macos? ] [ "libz.dylib" ] }
     { [ os unix? ] [ "libz.so" ] }
 } cond cdecl add-library >>
 

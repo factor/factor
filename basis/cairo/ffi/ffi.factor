@@ -10,7 +10,7 @@ IN: cairo.ffi
 
 << "cairo" {
     { [ os windows? ] [ "cairo-2.dll" ] }
-    { [ os macosx? ] [ "libcairo.dylib" ] }
+    { [ os macos? ] [ "libcairo.dylib" ] }
     { [ os unix? ] [ "libcairo.so" ] }
 } cond cdecl add-library >>
 

@@ -211,7 +211,7 @@ M: openssl <secure-context>
             [ set-verify-depth ]
             [ load-dh-params ]
             [ set-ecdh-params ]
-            [ os macosx? [ drop ] [ ignore-unexpected-eof ] if ]
+            [ os macos? [ drop ] [ ignore-unexpected-eof ] if ]
             [ ]
         } cleave
     ] with-destructors ;

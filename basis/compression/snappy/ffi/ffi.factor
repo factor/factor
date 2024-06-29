@@ -6,7 +6,7 @@ IN: compression.snappy.ffi
 
 << "snappy" {
     { [ os windows? ] [ "snappy.dll" ] }
-    { [ os macosx? ] [ "libsnappy.dylib" ] }
+    { [ os macos? ] [ "libsnappy.dylib" ] }
     { [ os unix? ] [ "libsnappy.so" ] }
 } cond cdecl add-library >>
 

@@ -41,7 +41,7 @@ TUPLE: gl-error-tuple function code string ;
     glGetError dup 0 = [ drop f ] when ; inline
 
 : throw-gl-error? ( -- ? )
-    os macosx? [
+    os macos? [
         ! This is kind of terrible, but we are having
         ! problems on macOS 10.11 where the
         ! default framebuffer seems to be initialized

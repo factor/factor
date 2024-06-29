@@ -64,7 +64,7 @@ SYMBOL: deploy-image
         { deploy-word-props?        f }
         { deploy-word-defs?         f }
         { deploy-c-types?           f }
-        ! default value for deploy.macosx
+        ! default value for deploy.macos
         { "stop-after-last-window?" t }
     } assoc-union ;
 

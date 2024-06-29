@@ -37,4 +37,4 @@ M: object find-in-standard-login-path*
     { [ os unix? ] [ "io.standard-paths.unix" ] }
 } cond require
 
-os macosx? [ "io.standard-paths.macosx" require ] when
+os macos? [ "io.standard-paths.macos" require ] when

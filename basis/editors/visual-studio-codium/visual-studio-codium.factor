@@ -11,7 +11,7 @@ INSTANCE: visual-studio-codium visual-studio-code-base
 M: visual-studio-codium find-visual-studio-code-path
     os {
         { linux [ "codium" which ] }
-        { macosx [
+        { macos [
             { "com.visualstudio.code.oss" "com.vscodium" }
             [ find-native-bundle ] map-find
             [ "Contents/MacOS/Electron" append-path ] when

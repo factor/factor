@@ -68,7 +68,7 @@ os windows? [
 
     ! This test crashes with a Memory protection fault on macOS 64-bit
     ! for some reason. See #1478
-    cpu x86.64? os macosx? and [
+    cpu x86.64? os macos? and [
         ! Load up the stack until there is < 500 bytes of it left. Then
         ! run a big gc cycle. 500 bytes isn't enough, so a callstack
         ! overflow would occur during the gc which we can't handle. The

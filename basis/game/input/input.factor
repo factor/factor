@@ -108,7 +108,7 @@ SYMBOLS: pressed released ;
 
 {
     { [ os windows? ] [ "game.input.dinput" require ] }
-    { [ os macosx? ] [ "game.input.iokit" require ] }
+    { [ os macos? ] [ "game.input.iokit" require ] }
     { [ os linux? ] [ "game.input.gtk2" require ] }
     [ ]
 } cond

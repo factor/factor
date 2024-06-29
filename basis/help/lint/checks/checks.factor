@@ -27,7 +27,7 @@ SYMBOL: vocab-articles
             "script-string" ! windows.uniscribe
             "linux-monitor" ! github issue #2014, race condition in disposing of child monitors
             "event-stream"
-            "macosx-monitor"
+            "macos-monitor"
             "recursive-monitor"
             "input-port"
             "malloc-ptr"

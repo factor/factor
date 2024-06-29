@@ -1,5 +1,5 @@
-USING: alien.libraries.finder alien.libraries.finder.macosx
-alien.libraries.finder.macosx.private sequences tools.test ;
+USING: alien.libraries.finder alien.libraries.finder.macos
+alien.libraries.finder.macos.private sequences tools.test ;
 
 {
     {

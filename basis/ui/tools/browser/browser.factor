@@ -191,11 +191,11 @@ M: browser-gadget focusable-child* search-field>> ;
 \ glossary H{ { +nullary+ t } } define-command
 
 browser-gadget "toolbar" f {
-    { T{ key-down f ${ os macosx? M+ A+ ? } "LEFT" } com-back }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "RIGHT" } com-forward }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "HOME" } com-home }
+    { T{ key-down f ${ os macos? M+ A+ ? } "LEFT" } com-back }
+    { T{ key-down f ${ os macos? M+ A+ ? } "RIGHT" } com-forward }
+    { T{ key-down f ${ os macos? M+ A+ ? } "HOME" } com-home }
     { T{ key-down f f "F1" } browser-help }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "F1" } glossary }
+    { T{ key-down f ${ os macos? M+ A+ ? } "F1" } glossary }
 } define-command-map
 
 : ?show-help ( link browser -- )
@@ -211,13 +211,13 @@ browser-gadget "toolbar" f {
 : com-next ( browser -- ) [ next-article ] navigate ;
 
 browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
-    { T{ key-down f ${ os macosx? M+ A+ ? } "UP" } com-up }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "p" } com-prev }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "n" } com-next }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "k" } com-show-outgoing-links }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "K" } com-show-incoming-links }
-    { T{ key-down f ${ os macosx? M+ A+ ? } "f" } browser-focus-search }
-} os macosx? [ {
+    { T{ key-down f ${ os macos? M+ A+ ? } "UP" } com-up }
+    { T{ key-down f ${ os macos? M+ A+ ? } "p" } com-prev }
+    { T{ key-down f ${ os macos? M+ A+ ? } "n" } com-next }
+    { T{ key-down f ${ os macos? M+ A+ ? } "k" } com-show-outgoing-links }
+    { T{ key-down f ${ os macos? M+ A+ ? } "K" } com-show-incoming-links }
+    { T{ key-down f ${ os macos? M+ A+ ? } "f" } browser-focus-search }
+} os macos? [ {
     { T{ key-down f { M+ } "[" } com-back }
     { T{ key-down f { M+ } "]" } com-forward }
 } append ] when define-command-map
@@ -255,11 +255,11 @@ browser-gadget "scrolling"
     adjust-help-font-size model>> notify-connections ;
 
 browser-gadget "fonts" f {
-    { T{ key-down f ${ os macosx? M+ C+ ? } "+" } com-font-size-plus }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "=" } com-font-size-plus }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "_" } com-font-size-minus }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "-" } com-font-size-minus }
-    { T{ key-down f ${ os macosx? M+ C+ ? } "0" } com-font-size-normal }
+    { T{ key-down f ${ os macos? M+ C+ ? } "+" } com-font-size-plus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "=" } com-font-size-plus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "_" } com-font-size-minus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
 
 MAIN: browser-window
