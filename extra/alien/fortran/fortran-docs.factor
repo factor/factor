@@ -9,7 +9,7 @@ ARTICLE: "alien.fortran-abis" "Fortran ABIs"
 { $list
     { { $link gfortran-abi } " is used by gfortran, the Fortran compiler included with GCC 4." }
     { { $link f2c-abi } " is used by the F2C Fortran-to-C translator and G77, the Fortran compiler included with GCC 3.x and earlier. It is also used by gfortran when compiling with the -ff2c flag." }
-    { { $link intel-unix-abi } " is used by the Intel Fortran Compiler on Linux and Mac OS X." }
+    { { $link intel-unix-abi } " is used by the Intel Fortran Compiler on Linux and macOS." }
     { { $link intel-windows-abi } " is used by the Intel Fortran Compiler on Windows." }
 }
 "A library's ABI is specified when that library is opened by the " { $link add-fortran-library } " word." ;
