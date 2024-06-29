@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays kernel match namespaces tools.test ;
+USING: arrays kernel match namespaces sequences tools.test ;
 FROM: match => _ ;
 IN: match.tests
 
@@ -58,6 +58,22 @@ C: <foo> foo
     1 2 <foo> \ ?a \ ?b <foo> match [
         ?a ?b
     ] with-variables
+] unit-test
+
+{ { 1 "four" 6 "no match" } } [
+    {
+        T{ foo f 1 2 }
+        T{ foo f 3 4 }
+        T{ foo f 5 6 }
+        "hello"
+    } [
+        {
+            { T{ foo f ?a 2 } [ ?a ] }
+            { T{ foo f _ 4 } [ "four" ] }
+            { T{ foo f ?a ?b } [ ?b ] }
+            [ drop "no match" ]
+        } match-cond
+    ] map
 ] unit-test
 
 { H{ { ?a ?a } } } [
