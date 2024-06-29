@@ -29,3 +29,9 @@ IN: machine-learning.functions
 
 : softmin ( seq -- softmin )
     vneg softmax ; inline
+
+: stable-softmax ( seq -- softmax )
+    dup maximum v-n softmax ; inline
+
+: stable-log-softmax ( seq -- softmax )
+    dup maximum v-n dup [ e^ ] map-sum log v-n ;

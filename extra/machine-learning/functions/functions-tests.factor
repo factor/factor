@@ -57,3 +57,11 @@ USING: tools.test machine-learning.functions ;
         -24.83032903943923
     } .00001
 } [ { 1. 2. 3. 4. 1. 2. 3. } log-softmax ] unit-test-v~
+
+{ { 0.0 1.0 0.0 0.0 } } [
+    { 1.2 2000 -4000 0.0 } stable-softmax
+] unit-test
+
+{ { -1998.8 0.0 -6000.0 -2000.0 } } [
+    { 1.2 2000 -4000 0.0 } stable-log-softmax
+] unit-test
