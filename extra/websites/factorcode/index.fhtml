@@ -42,7 +42,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <li><a href="https://concatenative.org/wiki/view/Concatenative%20language">Learn about concatenative programming</a></li>
 <li><a href="https://concatenative.org/wiki/view/Factor/Examples">See some example programs</a></li>
 <li><a href="https://github.com/factor/factor/issues">Report a bug</a></li>
-<li>Screenshots on <a href="https://factorcode.org/factor-macos.png">Mac OS</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
+<li>Screenshots on <a href="https://factorcode.org/factor-macos.png">macOS</a>, <a href="https://factorcode.org/factor-windows7.png">Windows</a></li>
 </ul>
 
 </div>
