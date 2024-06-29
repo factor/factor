@@ -6,7 +6,7 @@ SYMBOLS: blas-library blas-fortran-abi deploy-blas? ;
 
 blas-library [
     {
-        { [ os macosx?  ] [ "libblas.dylib" ] }
+        { [ os macos?  ] [ "libblas.dylib" ] }
         { [ os windows? ] [ "blas.dll"      ] }
         [ "libblas.so" ]
     } cond
@@ -14,12 +14,12 @@ blas-library [
 
 blas-fortran-abi [
     {
-        { [ os macosx? cpu x86.32? and ] [ intel-unix-abi ] }
-        { [ os macosx? cpu x86.64? and ]
+        { [ os macos? cpu x86.32? and ] [ intel-unix-abi ] }
+        { [ os macos? cpu x86.64? and ]
             [
                 os-version {
                     { [ dup { 10 7 } after=? ] [ f2c-abi ] }
-                    { [ dup { 10 6 } after=? ] [ "The libblas.dylib included in Mac OS X 10.6 is incompatible with Factor. To use the math.blas bindings y
+                    { [ dup { 10 6 } after=? ] [ "The libblas.dylib included in macOS 10.6 is incompatible with Factor. To use the math.blas bindings y
 ou will need to install a third-party BLAS library and configure Factor. See `\"math.blas.config\" about` for more information." <bad-fortran-abi> ] }
                     [ intel-unix-abi ]
                 } cond nip
@@ -33,4 +33,4 @@ ou will need to install a third-party BLAS library and configure Factor. See `\"
     } cond
 ] initialize
 
-deploy-blas? [ os macosx? not ] initialize
+deploy-blas? [ os macos? not ] initialize

@@ -8,7 +8,7 @@ IN: glfw.ffi
 <<
 "glfw" {
     { [ os windows? ] [ "glfw3.dll" ] }
-    { [ os macosx? ] [ "glfw3.dylib" ] }
+    { [ os macos? ] [ "glfw3.dylib" ] }
     { [ os unix? ] [ "libglfw3.so" ] }
 } cond cdecl add-library
 >>

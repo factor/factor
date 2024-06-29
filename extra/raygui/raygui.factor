@@ -11,7 +11,7 @@ IN: raygui
 <<
 "raygui" {
     { [ os windows? ] [ "raygui.dll" ] }
-    { [ os macosx? ] [ "libraygui.dylib" ] }
+    { [ os macos? ] [ "libraygui.dylib" ] }
     { [ os unix? ] [ "libraygui.so" ] }
 } cond cdecl add-library
 

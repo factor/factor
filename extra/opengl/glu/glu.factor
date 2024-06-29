@@ -7,7 +7,7 @@ IN: opengl.glu
 <<
 
 os {
-    { [ dup macosx? ] [ drop ] }
+    { [ dup macos? ] [ drop ] }
     { [ dup windows? ] [ drop ] }
     { [ dup unix? ] [ drop "glu" "libGLU.so.1" cdecl add-library ] }
 } cond

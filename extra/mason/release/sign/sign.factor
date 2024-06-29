@@ -20,14 +20,14 @@ HOOK: cert-path os ( -- path/f )
 
 M: object cert-path f ;
 
-M: macosx cert-path home "config/mac_app.cer" append-path ;
+M: macos cert-path home "config/mac_app.cer" append-path ;
 >>
 
 HOOK: sign-factor-app os ( -- )
 
 M: object sign-factor-app ;
 
-M: macosx sign-factor-app
+M: macos sign-factor-app
     {
         "Factor.app/"
         "libfactor.dylib"
@@ -66,7 +66,7 @@ HOOK: sign-archive os ( path -- )
 
 M: object sign-archive drop ;
 
-M: macosx sign-archive
+M: macos sign-archive
     ! sign the .dmg on macOS as well to avoid Gatekeeper marking
     ! the xattrs as quarantined.
     ! https://github.com/factor/factor/issues/1896

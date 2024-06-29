@@ -7,7 +7,7 @@ IN: sodium.ffi
 
 << "sodium" {
     { [ os windows? ] [ "libsodium.dll" ] }
-    { [ os macosx? ] [ "libsodium.dylib" ] }
+    { [ os macos? ] [ "libsodium.dylib" ] }
     { [ os unix? ] [ "libsodium.so" ] }
 } cond cdecl add-library >>
 

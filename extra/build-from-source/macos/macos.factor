@@ -3,7 +3,7 @@
 USING: accessors assocs build-from-source cli.git formatting io
 io.launcher kernel multiline namespaces prettyprint sequences
 sorting.human ;
-IN: build-from-source.macosx
+IN: build-from-source.macos
 
 ! brew install pkg-config openssl@1.1 xz gdbm tcl-tk
 : build-python3-lib ( -- )

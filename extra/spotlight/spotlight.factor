@@ -9,7 +9,7 @@ IN: spotlight
 ! -----
 ! TO DO:
 ! -need to test sudo-mdutil; intercept auth prompt
-! -handle case-sensitivity properly (OS X)
+! -handle case-sensitivity properly (macOS)
 ! -test composing variant shell command constructions,
 !  i.e., those which do or don't need spaces, parens,
 !  single quotes, etc. (work through examples at end of file)

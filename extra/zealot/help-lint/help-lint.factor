@@ -5,9 +5,9 @@ prettyprint sequences system vocabs ;
 IN: zealot.help-lint
 
 ! FIXME: help-lint sometimes lists monitors and event-streams as leaked.
-! event-stream is macosx-only so hack it into a string
+! event-stream is macos-only so hack it into a string
 CONSTANT: ignored-resources {
-    "linux-monitor" "macosx-monitor" "malloc-ptr"
+    "linux-monitor" "macos-monitor" "malloc-ptr"
     "epoll-mx" "server-port" "openssl-context"
     "cache-assoc" "input-port" "fd" "output-port" "stdin"
     "event-stream"

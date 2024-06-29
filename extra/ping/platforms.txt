@@ -1,2 +1,2 @@
 windows
-macosx
+macos

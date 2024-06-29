@@ -1,7 +1,7 @@
 USING: mason.release.archive system tools.test ;
 
-{ ".dmg" } [ macosx extension ] unit-test
-{ ".dmg" } [ "macosx" extension ] unit-test
+{ ".dmg" } [ macos extension ] unit-test
+{ ".dmg" } [ "macos" extension ] unit-test
 
 { ".zip" } [ windows extension ] unit-test
 { ".zip" } [ "windows" extension ] unit-test

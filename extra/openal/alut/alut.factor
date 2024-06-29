@@ -9,11 +9,11 @@ IN: openal.alut
 
 << "alut" {
         { [ os windows? ]  [ "alut.dll" ] }
-        { [ os macosx? ] [ "libalut.dylib" ] }
+        { [ os macos? ] [ "libalut.dylib" ] }
         { [ os unix?  ]  [ "libalut.so" ] }
     } cond cdecl add-library >>
 
-<< os macosx? [ "alut" deploy-library ] unless >>
+<< os macos? [ "alut" deploy-library ] unless >>
 
 LIBRARY: alut
 
@@ -88,7 +88,7 @@ SYMBOL: init
         throw-alut-error
     ] when ;
 
-os macosx? "openal.alut.macosx" "openal.alut.other" ? require
+os macos? "openal.alut.macos" "openal.alut.other" ? require
 
 : create-buffer-from-wav ( filename -- buffer )
     gen-buffer dup rot load-wav-file

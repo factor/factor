@@ -8,7 +8,7 @@ USING: alien alien.libraries alien.c-types alien.syntax
 IN: compression.bzip3.ffi
 << "bzip3" {
   { [ os windows? ] [ "bzip3.dll" ] }
-  { [ os macosx? ] [ "libbzip3.dylib" ] }
+  { [ os macos? ] [ "libbzip3.dylib" ] }
   { [ os unix? ] [ "libbzip3.so" ] }
 } cond cdecl add-library >>
 

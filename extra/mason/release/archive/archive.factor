@@ -12,7 +12,7 @@ IN: mason.release.archive
     dup word? [ name>> ] when
     {
         { "windows" [ ".zip" ] }
-        { "macosx" [ ".dmg" ] }
+        { "macos" [ ".dmg" ] }
         [ drop ".tar.gz" ]
     } case ;
 
@@ -32,7 +32,7 @@ IN: mason.release.archive
     } short-running-process ;
 
 ! Make the .dmg
-: make-macosx-archive ( archive-name -- )
+: make-macos-archive ( archive-name -- )
     "dmg-root" make-directory
     "factor" "dmg-root" copy-tree-into
     "factor" "dmg-root" make-disk-image
@@ -44,7 +44,7 @@ IN: mason.release.archive
 : make-archive ( archive-name -- )
     target-os get {
         { windows [ make-windows-archive ] }
-        { macosx [ make-macosx-archive ] }
+        { macos [ make-macos-archive ] }
         [ drop make-unix-archive ]
     } case ;
 

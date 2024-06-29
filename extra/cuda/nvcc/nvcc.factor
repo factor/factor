@@ -8,7 +8,7 @@ HOOK: nvcc-path os ( -- path )
 
 M: object nvcc-path "nvcc" ;
 
-M: macosx nvcc-path "/usr/local/cuda/bin/nvcc" ;
+M: macos nvcc-path "/usr/local/cuda/bin/nvcc" ;
 
 : cu>ptx ( path -- path' )
     ".cu" ?tail drop ".ptx" append ;
