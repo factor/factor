@@ -7,7 +7,7 @@ LIBS := -ldl -lm -lrt -lpthread -Wl,--export-dynamic
 # -Wl,--no-as-needed is a gcc optimization, not required
 # we want to work with g++ aliased as c++ here, too
 
-ifeq ($(IS_GCC),1)
+ifeq ($(IS_CLANG),0)
 	SITE_CFLAGS += -Wl,--no-as-needed
 endif
 

@@ -24,7 +24,6 @@ ifdef CONFIG
 	endif
 
 	IS_CLANG = $(shell $(CC) -dM -E - < /dev/null | grep -q '__clang__' && echo 1 || echo 0)
-	IS_GCC = $(shell $(CC) -dM -E - < /dev/null | grep -q '__GNUC__' && echo 1 || echo 0)
 
 	XCODE_PATH ?= /Applications/Xcode.app
 	MACOS_32_SDK ?= MacOSX10.11.sdk
@@ -63,9 +62,8 @@ ifdef CONFIG
 		ifeq ($(IS_CLANG), 1)
 			LDFLAGS += -Wl,-x
 			PCHFLAGS = -Winvalid-pch -include-pch $(BUILD_DIR)/master.hpp.gch
-		else ifeq ($(IS_GCC), 1)
-			LDFLAGS += -Wl,-s
 		else
+			LDFLAGS += -Wl,-s
 			PCHFLAGS =
 		endif
 
