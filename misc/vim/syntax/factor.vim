@@ -266,7 +266,7 @@ syn region  factorFrom              start=/\v<FROM:>/            skip=/\v<!>.*/ 
 syn region  factorIn                start=/\v<IN:>/              skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorInstance          start=/\v<INSTANCE:>/        skip=/\v<!>.*/     end=/\v<\S+%(\_\s+%(!>.*)?)+\S+>/   contains=@factorComment keepend
 syn region  factorIntersection      start=/\v<INTERSECTION:>/    skip=/\v<!>.*/     end=/\v<;>/     contains=@factorComment
-syn region  factorMain              start=/\v<MAIN:>/            skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
+syn match   factorMain              /\v<MAIN:>/                  contains=@factorComment nextgroup=factorWord,factorQuotation
 syn region  factorMixin             start=/\v<MIXIN:>/           skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorPostpone          start=/\v<POSTPONE:>/        skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
 syn region  factorQualified         start=/\v<QUALIFIED:>/       skip=/\v<!>.*/     end=/\v<\S+>/   contains=@factorComment
