@@ -54,6 +54,16 @@ HELP: random
         "heads" }
 } ;
 
+HELP: randoms-as
+{ $values { "length" integer } { "obj" object } { "exemplar" sequence } { "seq" sequence } }
+{ $description "Outputs a sequence of the same type as " { $snippet "exemplar" } " with " { $snippet "length" } " random values generated from " { $snippet "obj" } "." }
+{ $examples
+    { $unchecked-example "USING: prettyprint random ranges ;"
+               "10 CHAR: A CHAR: Z [a..b] \"\" randoms-as ."
+               "\"KEIYFPBAWJ\""
+    }
+} ;
+
 HELP: randoms
 { $values { "length" integer } { "obj" object } { "seq" array } }
 { $description "Outputs an array with " { $snippet "length" } " random values generated from " { $snippet "obj" } "." }
@@ -64,7 +74,7 @@ HELP: randoms
     }
 } ;
 
-{ random* random randoms } related-words
+{ random* random randoms randoms-as } related-words
 
 HELP: random-unit
 { $values { "n" float } }

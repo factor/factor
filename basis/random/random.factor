@@ -71,8 +71,10 @@ GENERIC#: random* 1 ( obj rnd -- elt )
 : random ( obj -- elt )
     random-generator get random* ;
 
-: randoms ( length obj -- seq )
-    random-generator get '[ _ _ random* ] replicate ;
+: randoms-as ( length obj exemplar -- seq )
+    [ random-generator get '[ _ _ random* ] ] dip replicate-as ;
+
+: randoms ( length obj -- seq ) { } randoms-as ;
 
 <PRIVATE
 
