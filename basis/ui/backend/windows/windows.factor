@@ -135,15 +135,14 @@ PRIVATE>
 
 : paste ( -- str )
     [
-        CF_UNICODETEXT IsClipboardFormatAvailable zero? [
+        CF_UNICODETEXT GetClipboardData [
             ! nothing to paste
             ""
         ] [
-            CF_UNICODETEXT GetClipboardData dup win32-error=0/f
             dup GlobalLock dup win32-error=0/f
             [ alien>native-string ]
             [ swap GlobalUnlock win32-error=0/f ] finally
-        ] if
+        ] if-zero
     ] with-clipboard
     crlf>lf ;
 
