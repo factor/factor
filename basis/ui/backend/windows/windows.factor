@@ -131,8 +131,7 @@ PRIVATE>
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f
-    call
-    CloseClipboard win32-error=0/f ; inline
+    [ CloseClipboard win32-error=0/f ] finally ; inline
 
 : paste ( -- str )
     [
