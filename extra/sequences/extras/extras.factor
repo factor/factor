@@ -48,7 +48,7 @@ IN: sequences.extras
             elt1 y seq2 nth-unsafe = [
                 y x table nth-unsafe nth-unsafe 1 + :> len
                 len y 1 + tab1 set-nth-unsafe
-                len n > [ len n! x end! ] when
+                len n > [ len n! x 1 + end! ] when
             ] [ 0 y 1 + tab1 set-nth-unsafe ] if
         ] each
     ] each end n - end seq1 subseq ;
