@@ -205,10 +205,15 @@ PRIVATE>
 : weighted-random ( histogram -- obj )
     unzip cum-sum [ last >float random ] keep bisect-left swap nth ;
 
+: weighted-randoms-as ( length histogram exemplar -- seq )
+    [
+        unzip cum-sum swap
+        [ [ last >float random-generator get ] keep ] dip
+        '[ _ _ random* _ bisect-left _ nth ]
+    ] dip replicate-as ; inline
+
 : weighted-randoms ( length histogram -- seq )
-    unzip cum-sum swap
-    [ [ last >float random-generator get ] keep ] dip
-    '[ _ _ random* _ bisect-left _ nth ] replicate ;
+    { } weighted-randoms-as ;
 
 : unique-indices ( seq -- unique indices )
     [ members ] keep over dup length <iota>

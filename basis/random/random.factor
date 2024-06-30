@@ -72,7 +72,7 @@ GENERIC#: random* 1 ( obj rnd -- elt )
     random-generator get random* ;
 
 : randoms-as ( length obj exemplar -- seq )
-    [ random-generator get '[ _ _ random* ] ] dip replicate-as ;
+    [ random-generator get '[ _ _ random* ] ] dip replicate-as ; inline
 
 : randoms ( length obj -- seq ) { } randoms-as ;
 
