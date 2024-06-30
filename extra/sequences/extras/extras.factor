@@ -41,14 +41,15 @@ IN: sequences.extras
     0 :> n!
     0 :> end!
     len1 1 + [ len2 1 + 0 <array> ] replicate :> table
-    len1 [1..b] [| x |
-        len2 [1..b] [| y |
-            x 1 - seq1 nth-unsafe
-            y 1 - seq2 nth-unsafe = [
-                y 1 - x 1 - table nth-unsafe nth-unsafe 1 + :> len
-                len y x table nth-unsafe set-nth-unsafe
+    len1 [0..b) [| x |
+        x seq1 nth-unsafe :> elt1
+        x 1 + table nth-unsafe :> tab1
+        len2 [0..b) [| y |
+            elt1 y seq2 nth-unsafe = [
+                y x table nth-unsafe nth-unsafe 1 + :> len
+                len y 1 + tab1 set-nth-unsafe
                 len n > [ len n! x end! ] when
-            ] [ 0 y x table nth-unsafe set-nth-unsafe ] if
+            ] [ 0 y 1 + tab1 set-nth-unsafe ] if
         ] each
     ] each end n - end seq1 subseq ;
 
