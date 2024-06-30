@@ -52,8 +52,8 @@ MEMO: bernoulli ( p -- n )
 
 <PRIVATE
 
-: df-check ( df -- )
-    even? [ "odd degrees of freedom" throw ] unless ;
+: check-df ( df -- df )
+    dup even? [ "odd degrees of freedom" throw ] unless ;
 
 : (chi2P) ( chi/2 df/2 -- p )
     [1..b) dupd n/v cum-product swap neg e^ [ v*n sum ] keep + ;
@@ -61,7 +61,7 @@ MEMO: bernoulli ( p -- n )
 PRIVATE>
 
 : chi2P ( chi df -- p )
-    dup df-check [ 2.0 / ] [ 2 /i ] bi* (chi2P) 1.0 min ;
+    check-df [ 2.0 / ] [ 2 /i ] bi* (chi2P) 1.0 min ;
 
 <PRIVATE
 
