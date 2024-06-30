@@ -142,8 +142,8 @@ PRIVATE>
         ] [
             CF_UNICODETEXT GetClipboardData dup win32-error=0/f
             dup GlobalLock dup win32-error=0/f
-            GlobalUnlock win32-error=0/f
-            alien>native-string
+            [ alien>native-string ]
+            [ swap GlobalUnlock win32-error=0/f ] finally
         ] if
     ] with-clipboard
     crlf>lf ;
