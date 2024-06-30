@@ -355,6 +355,14 @@ M: comment walk-html call( obj -- ) ;
 : get-prop-named ( obj name -- prop/f )
     [ props>> ] dip '[ first >lower _ = ] find nip ;
 
+: find-tags ( seq spec -- tags )
+    unclip swap [ find-tag-named ] dip
+    [
+        dup string?
+        [ find-child-tag-named ]
+        [ [ find-child-tag-named ] with map ] if
+    ] each ;
+
 : xml-path ( seq path -- tags )
     [
         dup string? [ find-child-tag-named ] [ find-child-tags ] if
