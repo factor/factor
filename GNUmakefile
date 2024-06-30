@@ -292,7 +292,7 @@ $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
 $(BUILD_DIR)/ffi_test.o: vm/ffi_test.c | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CC) -c $(ASFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
+	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 macos.app: $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/MacOS
