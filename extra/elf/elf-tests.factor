@@ -2,7 +2,6 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays elf kernel sequences system tools.test ;
 
-cpu ppc? [
 {
     {
         ""
@@ -178,4 +177,3 @@ unit-test
     ] with-mapped-elf
 ]
 unit-test
-] unless

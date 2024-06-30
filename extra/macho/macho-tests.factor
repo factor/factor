@@ -30,17 +30,15 @@ STRING: validation-output
     URL" https://downloads.factorcode.org/misc/a2.macho"
     "a2.macho" cache-file download-once-as ;
 
-cpu ppc? [
-    { $ validation-output }
-    [ [ a.macho macho-nm ] with-string-writer ]
-    unit-test
+{ $ validation-output }
+[ [ a.macho macho-nm ] with-string-writer ]
+unit-test
 
-    { t } [
-        a2.macho [
-            >c-ptr fat-binary-members first data>> >c-ptr macho-header 64-bit?
-        ] with-mapped-macho
-    ] unit-test
-] unless
+{ t } [
+    a2.macho [
+        >c-ptr fat-binary-members first data>> >c-ptr macho-header 64-bit?
+    ] with-mapped-macho
+] unit-test
 
 ! Throw an exception if the struct is not defined/handled
 os macos? [

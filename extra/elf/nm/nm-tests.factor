@@ -46,8 +46,6 @@ STRING: validation-output
 
 ;
 
-cpu ppc? [
-    { $ validation-output }
-    [ [ "vocab:elf/a.elf" elf-nm ] with-string-writer ]
-    unit-test
-] unless
+{ $ validation-output }
+[ [ "vocab:elf/a.elf" elf-nm ] with-string-writer ]
+unit-test
