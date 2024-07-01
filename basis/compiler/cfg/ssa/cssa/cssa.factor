@@ -1,9 +1,9 @@
 ! Copyright (C) 2009, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs compiler.cfg compiler.cfg.instructions
-compiler.cfg.predecessors compiler.cfg.registers
-compiler.cfg.rpo compiler.cfg.utilities fry kernel locals make
-namespaces sequences ;
+USING: accessors assocs combinators.short-circuit compiler.cfg
+compiler.cfg.instructions compiler.cfg.predecessors
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
+kernel make namespaces sequences ;
 IN: compiler.cfg.ssa.cssa
 
 SYMBOLS: edge-copies phi-copies ;
@@ -42,7 +42,7 @@ SYMBOLS: edge-copies phi-copies ;
     f \ ##parallel-copy boa ;
 
 : end-of-phis ( insns -- i )
-    [ [ ##phi? not ] find drop ] [ length ] bi or ;
+    { [ [ ##phi? not ] find drop ] [ length ] } 1|| ;
 
 : insert-phi-copies ( bb -- )
     [

@@ -22,7 +22,7 @@ IN: compiler.tree.dead-code.tests
     remove-dead-code
     0 swap [
         dup
-        [ #push? ] [ #introduce? ] bi or
+        { [ #push? ] [ #introduce? ] } 1||
         [ out-d>> length + ] [ drop ] if
     ] each-node ;
 

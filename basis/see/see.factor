@@ -3,13 +3,13 @@
 USING: accessors arrays assocs classes classes.builtin
 classes.error classes.intersection classes.mixin
 classes.predicate classes.singleton classes.tuple classes.union
-combinators definitions effects generic generic.hook
-generic.single generic.standard io io.pathnames
-io.streams.string io.styles kernel make namespaces prettyprint
-prettyprint.backend prettyprint.config prettyprint.custom
-prettyprint.sections sequences sets slots sorting strings
-summary vocabs vocabs.prettyprint words words.alias
-words.constant words.symbol ;
+combinators combinators.short-circuit definitions effects
+generic generic.hook generic.single generic.standard io
+io.pathnames io.streams.string io.styles kernel make namespaces
+prettyprint prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections sequences sets slots
+sorting strings summary vocabs vocabs.prettyprint words
+words.alias words.constant words.symbol ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -186,7 +186,7 @@ M: array pprint-slot-name
         dup read-only>> [
             read-only ,
         ] when
-        dup [ class>> object eq? not ] [ initial>> ] bi or [
+        dup { [ class>> object eq? not ] [ initial>> ] } 1|| [
             initial: ,
             dup initial>> ,
         ] when
@@ -252,7 +252,7 @@ M: error-class see* see-class ;
 
 : seeing-implementors ( class -- seq )
     dup implementors
-    [ [ reader? ] [ writer? ] bi or ] reject
+    [ { [ reader? ] [ writer? ] } 1|| ] reject
     [ lookup-method ] with map
     sort ;
 

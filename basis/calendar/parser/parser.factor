@@ -113,7 +113,7 @@ CONSTANT: rfc822-named-zones H{
     [ read-rfc822 ] with-string-reader ;
 
 : check-day-name ( str -- )
-    [ day-abbreviations3 member? ] [ day-names member? ] bi or
+    { [ day-abbreviations3 member? ] [ day-names member? ] } 1||
     check-timestamp drop ;
 
 : read-cookie-string-1 ( -- timestamp )

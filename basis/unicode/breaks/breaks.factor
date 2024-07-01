@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators interval-maps kernel
-literals math namespaces sequences simple-flat-file
-unicode.categories unicode.data unicode.normalize.private words ;
+USING: accessors arrays combinators combinators.short-circuit
+interval-maps kernel literals math namespaces sequences
+simple-flat-file unicode.categories unicode.data
+unicode.normalize.private words ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -345,10 +346,10 @@ CONSTANT: word-table $[
         { f [ 2drop t ] }
         { check-AHletter-after
           [ dupd walk-up
-            [ wALetter property-not= ] [ wHebrew_Letter property-not= ] 2bi or ] }
+            { [ wALetter property-not= ] [ wHebrew_Letter property-not= ] } 2|| ] }
         { check-AHletter-before
           [ dupd walk-down
-            [ wALetter property-not= ] [ wHebrew_Letter property-not= ] 2bi or ] }
+            { [ wALetter property-not= ] [ wHebrew_Letter property-not= ] } 2||  ] }
         { check-Hebrew-letter-after
           [ dupd walk-up wHebrew_Letter property-not= ] }
         { check-Hebrew-letter-before
