@@ -82,10 +82,10 @@ PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
         {
             [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
             [
-                over ratio?
-                [ [ abs integer-log10 ] dip
-                [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
-                [ 2drop f ] if
+                over ratio? [
+                    [ abs integer-log10 ] dip
+                    { [ drop abs 308 < ] [ + 15 <= ] } 2&&
+                ] [ 2drop f ] if
             ]
         } 2||
         [ [ [ >float ] dip ] when ] keep

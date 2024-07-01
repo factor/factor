@@ -458,7 +458,7 @@ M: invalid-local-address summary
 
 : with-local-address ( addr quot -- )
     [
-        [ ] [ inet4? ] [ inet6? ] tri or
+        dup { [ inet4? ] [ inet6? ] } 1||
         [ bind-local-address ]
         [ invalid-local-address ] if
     ] dip with-variable ; inline

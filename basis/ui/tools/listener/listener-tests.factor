@@ -214,6 +214,6 @@ CONSTANT: text "Hello world.\nThis is a test."
         { "sq" } try-parse
         { "[" } try-parse first lexer-error?
         { "goga" } try-parse
-        [ callable? ] [ length 2 = ] [ first lexer-error? ] tri and and
+        { [ callable? ] [ length 2 = ] [ first lexer-error? ] } 1&&
     ] with-manifest
 ] unit-test

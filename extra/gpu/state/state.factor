@@ -361,8 +361,7 @@ M: multisample-state set-gpu-state*
     ] [ drop GL_MULTISAMPLE glDisable ] if ;
 
 M: stencil-state set-gpu-state*
-    [ ] [ front-mode>> ] [ back-mode>> ] tri or
-    [
+    dup { [ front-mode>> ] [ back-mode>> ] } 1|| [
         GL_STENCIL_TEST glEnable
         [ front-mode>> GL_FRONT swap (set-stencil-mode) ]
         [ back-mode>> GL_BACK swap (set-stencil-mode) ] bi
