@@ -157,7 +157,7 @@ CONSULT: c-type-protocol c-type-name
     lookup-c-type ;
 
 PREDICATE: typedef-word < c-type-word
-    "c-type" word-prop [ c-type-name? ] [ array? ] bi or ;
+    "c-type" word-prop { [ c-type-name? ] [ array? ] } 1|| ;
 
 : typedef ( old new -- )
     {
@@ -215,7 +215,8 @@ CONSTANT: primitive-types
 
 : primitive-pointer-type? ( type -- ? )
     dup c-type-word? [
-        resolve-pointer-typedef [ void? ] [ primitive-types member? ] bi or
+        resolve-pointer-typedef
+        { [ void? ] [ primitive-types member? ] } 1||
     ] [ drop t ] if ;
 
 : (pointer-c-type) ( void* type -- void*' )

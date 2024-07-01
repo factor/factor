@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs fry hashtables kernel locals math
-math.order namespaces sequences vectors ;
+USING: arrays assocs combinators.short-circuit hashtables kernel
+math math.order namespaces sequences vectors ;
 IN: compiler.utilities
 
 : flattener ( seq quot -- seq vector quot' )
@@ -9,7 +9,7 @@ IN: compiler.utilities
         dup
         '[
             @ [
-                dup [ array? ] [ vector? ] bi or
+                dup { [ array? ] [ vector? ] } 1||
                 [ _ push-all ] [ _ push ] if
             ] when*
         ]

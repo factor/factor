@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs byte-arrays calendar
-calendar.english calendar.private combinators combinators.smart
-generalizations io io.streams.string kernel math math.functions
-math.parser multiline namespaces peg.ebnf present prettyprint
-quotations sequences sequences.generalizations splitting strings
-unicode ;
+calendar.english calendar.private combinators
+combinators.short-circuit combinators.smart generalizations io
+io.streams.string kernel math math.functions math.parser
+multiline namespaces peg.ebnf present prettyprint quotations
+sequences sequences.generalizations splitting strings unicode ;
 IN: formatting
 
 ERROR: unknown-format-directive value ;
@@ -79,12 +79,15 @@ PRIMITIVE: (format-float) ( n fill width precision format locale -- byte-array )
 : format-fast-decimal? ( x digits -- x' digits ? )
     over float? [ t ] [
         2dup
-        [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
-        [ over ratio?
-            [ [ abs integer-log10 ] dip
-              [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
-            [ 2drop f ] if
-        ] 2bi or
+        {
+            [ drop dup integer?  [ abs 53 2^ < ] [ drop f ] if ]
+            [
+                over ratio?
+                [ [ abs integer-log10 ] dip
+                [ drop abs 308 < ] [ + 15 <= ] 2bi and ]
+                [ 2drop f ] if
+            ]
+        } 2||
         [ [ [ >float ] dip ] when ] keep
     ] if ; inline
 

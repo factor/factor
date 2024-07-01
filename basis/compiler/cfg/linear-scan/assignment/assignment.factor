@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
-compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
+USING: accessors arrays assocs combinators
+combinators.short-circuit compiler.cfg compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linearization compiler.cfg.liveness
 compiler.cfg.registers compiler.cfg.renaming.functor
@@ -113,7 +114,7 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     '[ _ _ spill-required? ] filter ;
 
 : rep-at-insn ( n interval -- rep )
-    (find-use) [ def-rep>> ] [ use-rep>> ] bi or ;
+    (find-use) { [ def-rep>> ] [ use-rep>> ] } 1|| ;
 
 : spill/reload ( n interval -- {reg,rep,slot} )
     [ rep-at-insn ] keep [ reg>> ] [ vreg>> ] bi

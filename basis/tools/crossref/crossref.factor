@@ -144,7 +144,7 @@ SINGLETON: invalidate-crossref
 M: invalidate-crossref definitions-changed
     ! reset crossref on non-empty definitions or f which
     ! indicates a source-file was parsed, cache otherwise
-    drop [ null? not ] [ not ] bi or
+    drop { [ null? not ] [ not ] } 1||
     [ f crossref set-global ] when ;
 
 STARTUP-HOOK: [ invalidate-crossref add-definition-observer ]
