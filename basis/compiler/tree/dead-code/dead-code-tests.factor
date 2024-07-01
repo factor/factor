@@ -1,13 +1,13 @@
-USING: namespaces assocs sequences compiler.tree.builder
-compiler.tree.dead-code compiler.tree.def-use compiler.tree
-compiler.tree.combinators compiler.tree.propagation
-compiler.tree.cleanup compiler.tree.escape-analysis
-compiler.tree.tuple-unboxing compiler.tree.debugger
-compiler.tree.recursive compiler.tree.normalization
-compiler.tree.checker tools.test kernel math stack-checker.state
-accessors combinators io prettyprint words sequences.deep
-sequences.private arrays classes kernel.private shuffle
-math.private ;
+USING: accessors arrays assocs classes combinators
+combinators.short-circuit compiler.tree compiler.tree.builder
+compiler.tree.checker compiler.tree.cleanup
+compiler.tree.combinators compiler.tree.dead-code
+compiler.tree.debugger compiler.tree.def-use
+compiler.tree.escape-analysis compiler.tree.normalization
+compiler.tree.propagation compiler.tree.recursive
+compiler.tree.tuple-unboxing io kernel kernel.private math
+math.private namespaces prettyprint sequences sequences.deep
+sequences.private shuffle stack-checker.state tools.test words ;
 IN: compiler.tree.dead-code.tests
 
 : count-live-values ( quot -- n )
