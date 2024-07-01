@@ -1,8 +1,8 @@
-USING: accessors arrays calendar concurrency.promises continuations
-documents io kernel lexer listener math namespaces parser quotations
-sequences threads tools.test ui.gadgets.debug ui.gadgets.editors
-ui.gadgets.panes ui.gestures ui.tools.common ui.tools.listener
-vocabs.parser ;
+USING: accessors arrays calendar combinators.short-circuit
+concurrency.promises continuations documents io kernel lexer
+listener math namespaces parser quotations sequences threads
+tools.test ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
+ui.gestures ui.tools.common ui.tools.listener vocabs.parser ;
 IN: ui.tools.listener.tests
 
 [

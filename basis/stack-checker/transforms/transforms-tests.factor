@@ -1,7 +1,8 @@
 IN: stack-checker.transforms.tests
 USING: sequences stack-checker.transforms tools.test math kernel
 quotations stack-checker stack-checker.errors accessors
-combinators words arrays classes classes.tuple macros ;
+combinators combinators.short-circuit words arrays classes
+classes.tuple macros ;
 
 MACRO: compose-n ( n word -- quot' ) <repetition> >quotation ;
 
