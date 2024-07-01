@@ -202,7 +202,7 @@ SYMBOL: redirects
     ] if ;
 
 : misparsed-url? ( url -- url' )
-    [ protocol>> not ] [ host>> not ] [ path>> ] tri and and ;
+    { [ protocol>> not ] [ host>> not ] [ path>> ] } 1&& ;
 
 : request-url ( url -- url' )
     dup >url dup misparsed-url? [

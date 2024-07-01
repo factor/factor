@@ -99,10 +99,11 @@ CATEGORY: spacing Mc ;
             control-class dup ZWJ = [
                 drop
                 str unclip-last-slice drop dup [
-                    [ extend? ]
-                    [ control-class Extend = ]
-                    [ modifier? ]
-                    tri or or not
+                    {
+                        [ extend? ]
+                        [ control-class Extend = ]
+                        [ modifier? ]
+                    } 1|| not
                 ] find-last drop [ swap ?nth ] [ last ] if*
                 extended-pictographic-table interval-key? [
                     (Extended_Pictographic-Extend*-)ZWJ

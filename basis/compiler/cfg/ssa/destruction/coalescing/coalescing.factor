@@ -1,6 +1,7 @@
-USING: accessors arrays assocs compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
+USING: accessors arrays assocs combinators.short-circuit
+compiler.cfg.def-use compiler.cfg.instructions
+compiler.cfg.linearization compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference compiler.utilities
 cpu.architecture fry kernel make namespaces sequences sets
 sorting ;
@@ -72,7 +73,10 @@ M: ##parallel-copy coalesce-later
     values>> % ;
 
 : eliminatable-copy? ( vreg1 vreg2 -- ? )
-    [ rep-of ] bi@ [ [ reg-class-of ] same? ] [ [ rep-size ] same? ] 2bi and ;
+    [ rep-of ] bi@ {
+        [ [ reg-class-of ] same? ]
+        [ [ rep-size ] same? ]
+    } 2&& ;
 
 : coalesce-cfg ( cfg -- )
     cfg>insns-rpo dup init-coalescing

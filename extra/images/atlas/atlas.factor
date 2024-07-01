@@ -50,10 +50,12 @@ ERROR: atlas-image-formats-dont-match images ;
     image-placements ; inline
 
 : atlas-image-format ( image-placements -- component-order component-type upside-down? )
-    [ image>> ] map dup unclip '[ _
-        [ [ component-order>> ] same? ]
-        [ [ component-type>>  ] same? ]
-        [ [ upside-down?>>    ] same? ] 2tri and and
+    [ image>> ] map dup unclip '[
+        _ {
+            [ [ component-order>> ] same? ]
+            [ [ component-type>>  ] same? ]
+            [ [ upside-down?>>    ] same? ]
+        } 2&&
     ] all?
     [ first [ component-order>> ] [ component-type>> ] [ upside-down?>> ] tri ]
     [ atlas-image-formats-dont-match ] if ; inline

@@ -78,7 +78,13 @@ MACRO: curry-folding-test ( quot -- quot )
 
 \ bad-macro [ "OOPS" throw ] 0 define-transform
 
-[ [ bad-macro ] infer ] [ [ transform-expansion-error? ] [ error>> "OOPS" = ] [ word>> \ bad-macro = ] tri and and ] must-fail-with
+[ [ bad-macro ] infer ] [
+    {
+        [ transform-expansion-error? ]
+        [ error>> "OOPS" = ]
+        [ word>> \ bad-macro = ]
+    } 1&&
+] must-fail-with
 
 MACRO: two-params ( a b -- c ) + 1quotation ;
 
