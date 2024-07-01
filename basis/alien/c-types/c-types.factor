@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors arrays classes
-combinators compiler.units cpu.architecture delegate kernel
-layouts math math.order math.parser quotations sequences summary
-system words words.symbol ;
+combinators combinators.short-circuit compiler.units
+cpu.architecture delegate kernel layouts math math.order
+math.parser quotations sequences summary system words
+words.symbol ;
 IN: alien.c-types
 
 SYMBOLS:
@@ -54,8 +55,8 @@ UNION: c-type-name
     c-type-word pointer ;
 
 : resolve-typedef ( name -- c-type )
-    dup void? [ no-c-type ] when
-    dup c-type-name? [ lookup-c-type ] when ;
+    [ void? ] [ no-c-type ] 1when
+    [ c-type-name? ] [ lookup-c-type ] 1when ;
 
 M: word lookup-c-type
     [ "c-type" word-prop resolve-typedef ]

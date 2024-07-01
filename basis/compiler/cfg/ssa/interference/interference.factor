@@ -82,10 +82,9 @@ TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out
 : vregs-interfere? ( vreg1 vreg2 -- ? )
     [ f >>equal-anc-out ] dip
 
-    2dup same-sets? [ equal-anc-out>> ] when
+    [ same-sets? ] [ equal-anc-out>> ] 2when
 
-    2dup same-values?
-    [ update-equal-anc-out f ] [ chain-intersect >boolean ] if ;
+    [ same-values? ] [ update-equal-anc-out f ] [ chain-intersect >boolean ] 2if ;
 
 ! Merging lists of vregs sorted by dominance.
 M: vreg-info <=> ( vreg1 vreg2 -- <=> )
@@ -154,8 +153,8 @@ TUPLE: iterator seq n ;
         2dup equal-anc-in<<
         2array f
     ] [
-        2dup vregs-intersect?
-        [ 2drop f t ] [ 2array f ] if
+        [ vregs-intersect? ]
+        [ 2drop f t ] [ 2array f ] 2if
     ] if ;
 
 PRIVATE>

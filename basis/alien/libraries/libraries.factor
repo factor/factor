@@ -97,7 +97,7 @@ deploy-libraries [ V{ } clone ] initialize
 
 : deploy-library ( name -- )
     dup libraries get key?
-    [ deploy-libraries get 2dup member? [ 2drop ] [ push ] if ]
+    [ deploy-libraries get [ member? ] [ 2drop ] [ push ] 2if ]
     [ "deploy-library failure" no-such-library ] if ;
 
 HOOK: >deployed-library-path os ( path -- path' )
