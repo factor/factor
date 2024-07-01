@@ -45,12 +45,12 @@ SYMBOL: heap-ac
 
 : merge-acs ( vreg into -- )
     [ vreg>ac ] dip
-    2dup eq? [ 2drop ] [
+    [ eq? ] [ 2drop ] [
         [ ac>vregs ] dip
         [ vregs>acs get '[ [ _ ] dip _ set-at ] each ]
         [ ac>vregs push-all ]
         2bi
-    ] if ;
+    ] 2if ;
 
 ! Map vregs -> slot# -> vreg
 SYMBOL: live-slots

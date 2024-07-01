@@ -13,9 +13,10 @@ IN: compiler.cfg.stacks.clearing
     [ gc-map-insn? ] bi or ;
 
 : clearing-insns ( assoc insn -- insns' )
-    [ insn#>> of ] keep 2dup dangerous-insn? [
-        drop state>clears
-    ] [ 2drop { } ] if ;
+    [ insn#>> of ] keep
+    [ dangerous-insn? ]
+    [ drop state>clears ]
+    [ 2drop { } ] 2if ;
 
 : visit-insns ( assoc insns -- insns' )
     [ [ clearing-insns ] keep suffix ] with map V{ } concat-as ;
