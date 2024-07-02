@@ -694,14 +694,14 @@ HELP: cut-when
     { "seq" sequence } { "quot" quotation }
     { "before" object } { "after" object }
 }
-{ $description "Cut the given sequence before the first element of " { $snippet "seq" } " that returns a truthy value when passed into " { $snippet "quot" } "." } ;
+{ $description "Cut the given sequence before the first element of " { $snippet "seq" } " that returns a truthy value when passed into " { $snippet "quot" } ". The element will be the first in the " { $snippet "after" } " sequence. If no elemnts satisfy the predicate, " { $snippet "seq" } " will be empty." } ;
 
 HELP: drop-while
 { $values
     { "seq" sequence } { "quot" quotation }
     { "tail-slice" object }
 }
-{ $description "Remove all values at the beginning of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } ". Return a virtual sequence containing those elements." } ;
+{ $description "Remove all values at the beginning of " { $snippet "seq" } " that return a truthy value when passed into " { $snippet "quot" } ". Return a virtual sequence without those elements." } ;
 
 HELP: each-index-from
 { $values
@@ -721,12 +721,14 @@ HELP: each-prior
 HELP: each-subseq
 { $values
     { "seq" sequence } { "quot" quotation }
-} ;
+}
+{ $description "Call " { $snippet "quot" } " for every subsequence of " { $snippet "seq" } "." } ;
 
 HELP: ensure-same-underlying
 { $values
     { "slice1" slice } { "slice2" slice }
-} ;
+}
+{ $description "Throw an error if the two slices are slices of different sequences." } ;
 
 HELP: even-indices
 { $values
