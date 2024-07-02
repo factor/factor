@@ -214,10 +214,10 @@ CONSTANT: primitive-types
     ] if ;
 
 : primitive-pointer-type? ( type -- ? )
-    dup c-type-word? [
+    [ c-type-word? ] [
         resolve-pointer-typedef
         { [ void? ] [ primitive-types member? ] } 1||
-    ] [ drop t ] if ;
+    ] [ drop t ] 1if ;
 
 : (pointer-c-type) ( void* type -- void*' )
     [ clone ] dip c-type-boxer-quot '[ _ [ f ] if* ] >>boxer-quot ;
@@ -522,8 +522,8 @@ M: double-2-rep rep-component-type drop double ;
     } cond ; foldable
 
 : c-type-clamp ( value c-type -- value' )
-    dup { float double } member-eq?
-    [ drop ] [ c-type-interval clamp ] if ; inline
+    [ { float double } member-eq? ]
+    [ drop ] [ c-type-interval clamp ] 1if ; inline
 
 GENERIC: pointer-string ( pointer -- string/f )
 M: object pointer-string drop f ;

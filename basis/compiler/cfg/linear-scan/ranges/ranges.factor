@@ -1,4 +1,5 @@
-USING: arrays grouping kernel math math.order sequences ;
+USING: arrays combinators.short-circuit grouping kernel math
+math.order sequences ;
 IN: compiler.cfg.linear-scan.ranges
 
 ! Range utilities
@@ -47,8 +48,10 @@ IN: compiler.cfg.linear-scan.ranges
     ] bi ;
 
 : valid-ranges? ( ranges -- ? )
-    [ [ first2 <= ] all? ]
-    [ [ [ second ] [ first ] bi* <= ] monotonic? ] bi and ;
+    {
+        [ [ first2 <= ] all? ]
+        [ [ [ second ] [ first ] bi* <= ] monotonic? ]
+    } 1&& ;
 
 : fix-lower-bound ( n ranges -- ranges' )
     over '[ second _ >= ] filter unclip second swapd 2array prefix ;
