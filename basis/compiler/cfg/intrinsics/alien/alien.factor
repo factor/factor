@@ -28,9 +28,10 @@ IN: compiler.cfg.intrinsics.alien
     [ block #call emit-primitive ] if ; inline
 
 : inline-load-memory? ( infos -- ? )
-    [ first class>> c-ptr class<= ]
-    [ second class>> fixnum class<= ]
-    bi and ;
+    {
+        [ first class>> c-ptr class<= ]
+        [ second class>> fixnum class<= ]
+    } 1&& ;
 
 : prepare-accessor ( base offset info -- base offset )
     class>> swap [ ^^unbox-c-ptr ] dip ^^add 0 ;

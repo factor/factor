@@ -115,7 +115,7 @@ ERROR: unknown-endian-c-type symbol ;
 ERROR: unsupported-endian-type endian slot ;
 
 : slot>endian-slot ( endian slot -- endian-slot )
-    dup array? [
+    [ array? ] [
         first2 [ slot>endian-slot ] dip 2array
     ] [
         {
@@ -132,7 +132,7 @@ ERROR: unsupported-endian-type endian slot ;
             { [ dup pointer? ] [ nip ] }
             [ unsupported-endian-type ]
         } cond
-    ] if ;
+    ] 1if ;
 
 : set-endian-slots ( endian slots -- slot-specs )
     [ [ slot>endian-slot ] change-type ] with map ;
