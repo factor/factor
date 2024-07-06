@@ -110,7 +110,7 @@ TYPED: cpvlerp ( v1: cpVect v2: cpVect s -- v3: cpVect )
     [ cpvmult nip ] 3bi cpvadd ; inline
 
 TYPED: cpvnormalize ( v1: cpVect -- v2: cpVect )
-    dup cpvlength 1.0 swap / cpvmult ; inline
+    dup cpvlength recip cpvmult ; inline
 
 TYPED: cpvnormalize_safe ( v1: cpVect -- v2: cpVect )
     dup [ x>> 0.0 = ] [ y>> 0.0 = ] bi and
