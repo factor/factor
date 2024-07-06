@@ -157,7 +157,7 @@ TUPLE: discord-bot < disposable
         }
     }]] sprintf json> >json ;
 
-: jitter-millis ( heartbeat-millis -- millis ) 0 1 uniform-random-float * >integer ;
+: jitter-millis ( heartbeat-millis -- millis ) random-unit * >integer ;
 
 : send-heartbeat ( seq/f -- )
     json-null or "d" associate H{ { "op" 1 } } assoc-union!
