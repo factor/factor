@@ -206,7 +206,7 @@ GML: vector2 ( x y -- v ) <vec2d> ;
 
 GML: vector3 ( x y z -- v ) <vec3d> ;
 
-GML: random ( -- x ) 0.0 1.0 uniform-random-float ;
+GML: random ( -- x ) random-unit ;
 
 GML: randomseed ( n -- )
     dup 0 < [ drop nano-count 1000000 /i ] when
