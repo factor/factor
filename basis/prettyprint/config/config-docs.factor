@@ -32,6 +32,9 @@ HELP: boa-tuples?
 HELP: c-object-pointers?
 { $var-description "Toggles whether C objects such as structs and direct arrays only print their underlying address. If this flag isn't set, C objects will attempt to print their contents. If a C object points to invalid memory, it will display only its address regardless." } ;
 
+HELP: qualified-names?
+{ $var-description "Toggles whether fully-qualified word names are printed." } ;
+
 HELP: has-limits?
 { $var-description "Used to indicate that prettyprint limits have been set." } ;
 

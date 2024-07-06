@@ -37,8 +37,13 @@ M: anonymous-union word-name*
 M: anonymous-intersection word-name*
     class-name "intersection{ " " }" surround ;
 
+: ?qualified-name ( word -- name )
+    [ name>> ] keep qualified-names? get [
+        vocabulary>> [ ":" rot 3append ] when*
+    ] [ drop ] if ;
+
 M: word word-name*
-    [ name>> "( no name )" or ] [ record-vocab ] bi ;
+    [ ?qualified-name "( no name )" or ] [ record-vocab ] bi ;
 
 : pprint-word ( word -- )
     [ word-name* ] [ word-style ] bi styled-text ;
