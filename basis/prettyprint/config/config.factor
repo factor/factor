@@ -14,6 +14,7 @@ SYMBOL: string-limit?
 SYMBOL: boa-tuples?
 SYMBOL: c-object-pointers?
 SYMBOL: has-limits?
+SYMBOL: qualified-names?
 
 4 tab-size set-global
 64 margin set-global
@@ -22,6 +23,7 @@ SYMBOL: has-limits?
 10 number-base set-global
 t string-limit? set-global
 f has-limits? set-global
+f qualified-names? set-global
 
 : (with-short-limits) ( quot -- )
     H{
