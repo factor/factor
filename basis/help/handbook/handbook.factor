@@ -5,7 +5,8 @@ math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple help.vocabs math.parser
-accessors definitions sets lists help.tour ;
+accessors definitions sets lists help.tour prettyprint
+continuations ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -304,6 +305,25 @@ ARTICLE: "handbook-language-reference" "The language"
 { $subsections "vocabs.loader" }
 "Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;
 
+ARTICLE: "stacks" "Stacks"
+"While the data stack manipulated by user code is the primary stack we often think of (so much so that it is often referred to as just \"the stack\"), Factor's implementation actually makes use of multiple stacks internally."
+{ $heading "Data stack" }
+"The data stack is the primary stack that words interact with by popping inputs and pushing outputs. " { $link "inference" } " acts as a type system for the data stack to ensure words always have the number of inputs and outputs declared in the source." $nl
+{ $link .s } " prints the current data stack."
+{ $heading "Call stack" }
+"The VM manages a call stack with stack frames that follow the call hierarchy from the currently executing word all the way back to program startup. Some words are inlined by the " { $link "compiler" } ", so call stack frames for any such words may be omitted." $nl
+{ $link .c } " prints the current call stack."
+{ $heading "Retain stack" }
+"The retain stack is used internally as a kind of temporary holding stack. Words like " { $link dip } " (which temporarily removes values from the data stack, calls some quotation, and then restores those values back onto the data stack) are implemented by moving the values to the retain stack. " { $link "locals" } " also make use of the retain stack to store their values efficiently." $nl
+"Forth and some other concatenative languages expose a related \"return stack\" to user code. Factor's retain stack plays a similar role, but it is an internal language implementation detail that is not meant to be manipulated by user code." $nl
+{ $link .r } " prints the current retain stack."
+{ $heading "Name stack" }
+"The name stack is used as part of implementing " { $link "namespaces" } ". Each dynamic variable is part of a namespace. Namespace scopes can nest, so the name stack tracks the nesting order which is used when accessing these variables."
+{ $heading "Catch stack" }
+"The catch stack contains a vector of " { $link "continuations" } ", which are used for several abstractions like " { $link "errors" } " and " { $link "threads" } ". For example, exception handling with " { $link recover } " captures a continuation and makes use of the catch stack to restore program state if an error occurs." $nl
+"In some programming language implementations, continuations are quite a complex feature to support. In Factor, continuations are straightforward: they simply capture the state of all of the stacks mentioned here."
+{ $see-also "continuations.private" } ;
+
 ARTICLE: "handbook-system-reference" "The implementation"
 { $heading "Parse time and compile time" }
 { $subsections
@@ -316,6 +336,7 @@ ARTICLE: "handbook-system-reference" "The implementation"
 }
 { $heading "Virtual machine" }
 { $subsections
+    "stacks"
     "images"
     "command-line"
     "rc-files"
