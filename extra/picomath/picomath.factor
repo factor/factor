@@ -424,7 +424,7 @@ PRIVATE>
 :: gamma ( x -- value )
     x 0 <= [ "Invalid input" throw ] when
     x {
-        { [ dup   0.001 < ] [ GAMMA * 1.0 + x * 1.0 swap / ] }
+        { [ dup   0.001 < ] [ GAMMA * 1.0 + x * recip ] }
         { [ dup    12.0 < ] [ (gamma) ] }
         { [ dup 171.624 > ] [ drop 1/0. ] }
         [ log-gamma e^ ]
