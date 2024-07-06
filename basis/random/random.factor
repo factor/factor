@@ -147,24 +147,27 @@ ERROR: too-many-samples seq n ;
 
 <PRIVATE
 
-: (uniform-random-float) ( min max rnd -- n )
+: uniform-random-float* ( min max rnd -- n )
     [ random-32* ] keep random-32* [ >float ] bi@
-    2.0 32 ^ * +
-    [ over - 2.0 -64 ^ * ] dip
-    * + ; inline
+    2.0 32 ^ * + [ over - 2.0 -64 ^ * ] dip * + ; inline
 
 PRIVATE>
 
+TUPLE: uniform-distribution min max ;
+C: <uniform-distribution> uniform-distribution
+M: uniform-distribution random*
+    [ [ min>> ] [ max>> ] bi ] dip uniform-random-float* ;
+
 : uniform-random-float ( min max -- n )
-    random-generator get (uniform-random-float) ; inline
+    <uniform-distribution> random ;
 
 M: float random*
-    [ f ] swap '[ 0.0 _ (uniform-random-float) ] if-zero ; inline
+    [ f ] swap '[ 0.0 _ uniform-random-float* ] if-zero ; inline
 
 <PRIVATE
 
 : random-unit* ( rnd -- n )
-    [ 0.0 1.0 ] dip (uniform-random-float) ; inline
+    [ 0.0 1.0 ] dip uniform-random-float* ; inline
 
 PRIVATE>
 
@@ -174,41 +177,53 @@ PRIVATE>
 : random-units ( length -- sequence )
     random-generator get '[ _ random-unit* ] replicate ;
 
-<PRIVATE
-
-: (cos-random-float) ( -- n )
-    0. 2pi uniform-random-float cos ;
-
-: (log-sqrt-random-float) ( -- n )
-    random-unit log -2. * sqrt ;
-
-PRIVATE>
+TUPLE: normal-distribution mean sigma ;
+C: <normal-distribution> normal-distribution
+M:: normal-distribution random* ( obj rnd -- elt )
+    0.0 2pi rnd uniform-random-float* cos
+    rnd random-unit* log -2.0 * sqrt *
+    obj sigma>> * obj mean>> + ;
 
 : normal-random-float ( mean sigma -- n )
-    (cos-random-float) (log-sqrt-random-float) * * + ;
+    <normal-distribution> random ;
+
+TUPLE: lognormal-distribution < normal-distribution ;
+C: <lognormal-distribution> lognormal-distribution
+M: lognormal-distribution random* call-next-method e^ ;
 
 : lognormal-random-float ( mean sigma -- n )
-    normal-random-float e^ ;
+    <lognormal-distribution> random ;
+
+TUPLE: exponential-distribution lambda ;
+C: <exponential-distribution> exponential-distribution
+M: exponential-distribution random*
+    [ lambda>> ] [ random-unit* log neg ] bi* swap / ;
 
 : exponential-random-float ( lambda -- n )
-    random-unit log neg swap / ;
+    <exponential-distribution> random ;
+
+TUPLE: weibull-distribution alpha beta ;
+C: <weibull-distribution> weibull-distribution
+M:: weibull-distribution random* ( obj rnd -- elt )
+    rnd random-unit* log neg obj alpha>> recip ^ obj beta>> * ;
 
 : weibull-random-float ( alpha beta -- n )
-    [
-        [ random-unit log neg ] dip
-        1. swap / ^
-    ] dip * ;
+    <weibull-distribution> random ;
+
+TUPLE: pareto-distribution k alpha ;
+C: <pareto-distribution> pareto-distribution
+M:: pareto-distribution random* ( obj rnd -- elt )
+    obj k>> rnd random-unit* obj alpha>> recip ^ /f ;
 
 : pareto-random-float ( k alpha -- n )
-    [ random-unit ] dip recip ^ /f ;
+    <pareto-distribution> random ;
 
 <PRIVATE
 
-:: (gamma-random-float>1) ( alpha beta -- n )
+:: (gamma-random-float>1) ( alpha beta rnd -- n )
     ! Uses R.C.H. Cheng, "The generation of Gamma
     ! variables with non-integral shape parameters",
     ! Applied Statistics, (1977), 26, No. 1, p71-74
-    random-generator get :> rnd
     2. alpha * 1 - sqrt  :> ainv
     alpha 4. log -       :> bbb
     alpha ainv +         :> ccc
@@ -231,12 +246,11 @@ PRIVATE>
         x beta *                result!
     ] do while result ;
 
-: (gamma-random-float=1) ( alpha beta -- n )
-    nip random-unit log neg * ;
+: (gamma-random-float=1) ( alpha beta rnd -- n )
+    random-unit* log neg * nip ;
 
-:: (gamma-random-float<1) ( alpha beta -- n )
+:: (gamma-random-float<1) ( alpha beta rnd -- n )
     ! Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
-    random-generator get :> rnd
     alpha e + e / :> b
 
     0 :> x! 0 :> p! ! initialize locals
@@ -257,22 +271,37 @@ PRIVATE>
 
 PRIVATE>
 
-: gamma-random-float ( alpha beta -- n )
-    {
-        { [ over 1 > ] [ (gamma-random-float>1) ] }
-        { [ over 1 = ] [ (gamma-random-float=1) ] }
+TUPLE: gamma-distribution alpha beta ;
+C: <gamma-distribution> gamma-distribution
+M: gamma-distribution random*
+    [ [ alpha>> ] [ beta>> ] bi ] dip {
+        { [ pick 1 > ] [ (gamma-random-float>1) ] }
+        { [ pick 1 = ] [ (gamma-random-float=1) ] }
         [ (gamma-random-float<1) ]
     } cond ;
 
-: beta-random-float ( alpha beta -- n )
-    [ 1. gamma-random-float ] dip over zero?
-    [ 2drop 0 ] [ 1. gamma-random-float dupd + / ] if ;
+: gamma-random-float ( alpha beta -- n )
+    <gamma-distribution> random ;
 
-:: von-mises-random-float ( mu kappa -- n )
+TUPLE: beta-distribution alpha beta ;
+C: <beta-distribution> beta-distribution
+M:: beta-distribution random* ( obj rnd -- elt )
+    obj alpha>> :> alpha
+    obj beta>> :> beta
+    alpha 1.0 <gamma-distribution> rnd random* [ 0 ] [
+        beta 1.0 <gamma-distribution> rnd random* dupd + /
+    ] if-zero ;
+
+: beta-random-float ( alpha beta -- n )
+    <beta-distribution> random ;
+
+TUPLE: von-mises-distribution mu kappa ;
+C: <von-mises-distribution> von-mises-distribution
+M:: von-mises-distribution random* ( obj rnd -- elt )
+    obj kappa>> :> kappa
     ! Based upon an algorithm published in: Fisher, N.I.,
     ! "Statistical Analysis of Circular Data", Cambridge
     ! University Press, 1993.
-    random-generator get :> rnd
     kappa 1e-6 <= [
         2pi rnd random-unit* *
     ] [
@@ -291,111 +320,174 @@ PRIVATE>
             r _f - kappa *       c!
         ] do while
 
-        mu 2pi mod _f cos
+        obj mu>> 2pi mod _f cos
         rnd random-unit* 0.5 > [ + ] [ - ] if
     ] if ;
 
-<PRIVATE
+: von-mises-random-float ( mu kappa -- n )
+    <von-mises-distribution> random ;
 
-:: (triangular-random-float) ( low high mode -- n )
+TUPLE: triangular-distribution low high ;
+C: <triangular-distribution> triangular-distribution
+M:: triangular-distribution random* ( obj rnd -- elt )
+    obj low>> :> low
+    obj high>> :> high
+    low high + 2 /f :> mode
     mode low - high low - / :> c!
-    random-unit :> u!
+    rnd random-unit* :> u!
     high low
     u c > [ 1. u - u! 1. c - c! swap ] when
     [ - u c * sqrt * ] keep + ;
 
-PRIVATE>
-
 : triangular-random-float ( low high -- n )
-    2dup + 2 /f (triangular-random-float) ;
+    <triangular-distribution> random ;
+
+TUPLE: laplace-distribution mean scale ;
+C: <laplace-distribution> laplace-distribution
+M: laplace-distribution random*
+    [ [ mean>> ] [ scale>> ] bi ] [ random-unit* ] bi*
+    dup 0.5 < [ 2 * log ] [ 1 swap - 2 * log neg ] if * + ;
 
 : laplace-random-float ( mean scale -- n )
-    random-unit dup 0.5 <
-    [ 2 * log ] [ 1 swap - 2 * log neg ] if * + ;
+    <laplace-distribution> random ;
+
+TUPLE: cauchy-distribution median scale ;
+C: <cauchy-distribution> cauchy-distribution
+M: cauchy-distribution random*
+    [ [ median>> ] [ scale>> ] bi ] [ random-unit* ] bi*
+    0.5 - pi * tan * + ;
 
 : cauchy-random-float ( median scale -- n )
-    random-unit 0.5 - pi * tan * + ;
+    <cauchy-distribution> random ;
+
+TUPLE: chi-square-distribution dof ;
+C: <chi-square-distribution> chi-square-distribution
+M: chi-square-distribution random*
+    [ 0.5 ] [ dof>> 2 * <gamma-distribution> ] [ random* ] tri* ;
 
 : chi-square-random-float ( dof -- n )
-    [ 0.5 ] dip 2 * gamma-random-float ;
+    <chi-square-distribution> random ;
+
+TUPLE: student-t-distribution dof ;
+C: <student-t-distribution> student-t-distribution
+M:: student-t-distribution random* ( obj rnd -- elt )
+    obj dof>> :> dof
+    0 1 <normal-distribution> rnd random*
+    dof <chi-square-distribution> rnd random*
+    dof / sqrt / ;
 
 : student-t-random-float ( dof -- n )
-    [ 0 1 normal-random-float ] dip
-    [ chi-square-random-float ] [ / ] bi sqrt / ;
+    <student-t-distribution> random ;
+
+TUPLE: inv-gamma-distribution shape scale ;
+C: <inv-gamma-distribution> inv-gamma-distribution
+M: inv-gamma-distribution random*
+    [ [ shape>> ] [ scale>> ] bi recip <gamma-distribution> ]
+    [ random* recip ] bi* ;
 
 : inv-gamma-random-float ( shape scale -- n )
-    recip gamma-random-float recip ;
+    <inv-gamma-distribution> random ;
+
+TUPLE: rayleigh-distribution mode ;
+C: <rayleigh-distribution> rayleigh-distribution
+M: rayleigh-distribution random*
+    [ mode>> ] [ random-unit* log -2 * sqrt ] bi* * ;
 
 : rayleigh-random-float ( mode -- n )
-    random-unit log -2 * sqrt * ;
+    <rayleigh-distribution> random ;
+
+TUPLE: gumbel-distribution loc scale ;
+C: <gumbel-distribution> gumbel-distribution
+M: gumbel-distribution random*
+    [ [ loc>> ] [ scale>> ] bi ] [ random-unit* ] bi*
+    log neg log * - ;
 
 : gumbel-random-float ( loc scale -- n )
-    random-unit log neg log * - ;
+    <gumbel-distribution> random ;
+
+TUPLE: logistic-distribution loc scale ;
+C: <logistic-distribution> logistic-distribution
+M: logistic-distribution random*
+    [ [ loc>> ] [ scale>> ] bi ] [ random-unit* ] bi*
+    dup 1 swap - / log * + ;
 
 : logistic-random-float ( loc scale -- n )
-    random-unit dup 1 swap - / log * + ;
+    <logistic-distribution> random ;
+
+TUPLE: power-distribution alpha ;
+C: <power-distribution> power-distribution
+M: power-distribution random*
+    [ alpha>> ] [ random-unit* log e^ 1 swap - ] bi*
+    swap recip ^ ;
 
 : power-random-float ( alpha -- n )
-    [ random-unit log e^ 1 swap - ] dip recip ^ ;
+    <power-distribution> random ;
 
-! Box-Muller
-: poisson-random-float ( mean -- n )
-    [ -1 0 ] dip [ 2dup < ] random-generator get '[
-        [ 1 + ] 2dip [ _ random-unit* log neg + ] dip
+TUPLE: poisson-distribution mean ;
+C: <poisson-distribution> poisson-distribution
+M:: poisson-distribution random* ( obj rnd -- elt )
+    ! Box-Muller
+    -1 0 obj mean>> [ 2dup < ] [
+        [ 1 + ] 2dip [ rnd random-unit* log neg + ] dip
     ] while 2drop ;
 
-:: binomial-random ( n p -- x )
-    n assert-non-negative drop
-    p 0.0 1.0 between? [
-        {
-            { [ p 0.0 = ] [ 0 ] }
-            { [ p 1.0 = ] [ n ] }
-            { [ n 1 = ] [ random-unit p < 1 0 ? ] }
-            { [ p 0.5 > ] [ n dup 1.0 p - binomial-random - ] }
-            { [ n p * 10.0 < ] [
-                ! BG: Geometric method by Devroye with running time of O(n*p).
-                ! https://dl.acm.org/doi/pdf/10.1145/42372.42381
-                1.0 p - log :> c
-                0 0 random-generator get '[
-                    _ random-unit* log c /i 1 + +
-                    dup n <= dup [ [ 1 + ] 2dip ] when
-                ] loop drop
-            ] }
-            [
-                ! BTRS: Transformed rejection with squeeze method by Wolfgang Hörmann
-                ! https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.47.8407&rep=rep1&type=pdf
-                n p * 10.0 >= p 0.5 <= and t assert=
-                random-generator get :> rnd
+: poisson-random-float ( mean -- n )
+    <poisson-distribution> random ;
 
-                n p * 1.0 p - * sqrt :> spq
-                1.15 2.53 spq * + :> b
-                -0.0873 0.0248 b * + 0.01 p * + :> a
-                n p * 0.5 + :> c
-                0.92 4.2 b / - :> vr
+TUPLE: binomial-distribution n p ;
+C: <binomial-distribution> binomial-distribution
+M:: binomial-distribution random* ( obj rnd -- elt )
+    obj n>> assert-non-negative :> n
+    obj p>> :> p
+    {
+        { [ p 0.0 1.0 between? not ] [ "p must be in the range 0.0 <= p <= 1.0" throw ] }
+        { [ p 0.0 = ] [ 0 ] }
+        { [ p 1.0 = ] [ n ] }
+        { [ n 1 = ] [ rnd random-unit* p < 1 0 ? ] }
+        { [ p 0.5 > ] [ n dup 1.0 p - <binomial-distribution> rnd random* - ] }
+        { [ n p * 10.0 < ] [
+            ! BG: Geometric method by Devroye with running time of O(n*p).
+            ! https://dl.acm.org/doi/pdf/10.1145/42372.42381
+            1.0 p - log :> c
+            0 0 [
+                rnd random-unit* log c /i 1 + +
+                dup n <= dup [ [ 1 + ] 2dip ] when
+            ] loop drop
+        ] }
+        [
+            ! BTRS: Transformed rejection with squeeze method by Wolfgang Hörmann
+            ! https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.47.8407&rep=rep1&type=pdf
+            n p * 10.0 >= p 0.5 <= and t assert=
 
-                2.83 5.1 b / + spq * :> alpha
-                p 1.0 p - / log :> lpq
-                n 1 + p * floor :> m
-                m 1 + lgamma n m - 1 + lgamma + :> h
+            n p * 1.0 p - * sqrt :> spq
+            1.15 2.53 spq * + :> b
+            -0.0873 0.0248 b * + 0.01 p * + :> a
+            n p * 0.5 + :> c
+            0.92 4.2 b / - :> vr
 
-                f [
-                    rnd random-unit* 0.5 - :> u
-                    rnd random-unit* :> v
-                    0.5 u abs - :> us
-                    drop 2.0 a us / * b + u * c + floor >integer dup :> k
-                    k 0 n between? [
-                        { [ us 0.07 >= ] [ v vr <= ] } 0&& [ f ] [
-                            alpha a us sq / b + / v * log
-                            h k 1 + lgamma - n k - 1 +
-                            lgamma - k m - lpq * + >
-                        ] if
-                    ] [ t ] if
-                ] loop
-            ]
-        } cond
-    ] [
-        "p must be in the range 0.0 <= p <= 1.0" throw
-    ] if ;
+            2.83 5.1 b / + spq * :> alpha
+            p 1.0 p - / log :> lpq
+            n 1 + p * floor :> m
+            m 1 + lgamma n m - 1 + lgamma + :> h
+
+            f [
+                rnd random-unit* 0.5 - :> u
+                rnd random-unit* :> v
+                0.5 u abs - :> us
+                drop 2.0 a us / * b + u * c + floor >integer dup :> k
+                k 0 n between? [
+                    { [ us 0.07 >= ] [ v vr <= ] } 0&& [ f ] [
+                        alpha a us sq / b + / v * log
+                        h k 1 + lgamma - n k - 1 +
+                        lgamma - k m - lpq * + >
+                    ] if
+                ] [ t ] if
+            ] loop
+        ]
+    } cond ;
+
+: binomial-random ( n p -- x )
+    <binomial-distribution> random ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
