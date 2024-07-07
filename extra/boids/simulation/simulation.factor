@@ -74,7 +74,7 @@ GENERIC: force ( neighbors boid behavior -- force )
 : random-boids ( count -- boids )
     [
         WIDTH HEIGHT [ random ] bi@ 2array
-        2 [ 0 1 normal-random-float ] replicate
+        2 [ 0 1 normal-random ] replicate
         <boid>
     ] replicate ;
 

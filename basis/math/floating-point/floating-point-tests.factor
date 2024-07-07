@@ -27,4 +27,4 @@ IN: math.floating-point.tests
 
 { 1 12 123 1234 } [ bits>double roundtrip ] each
 
-100 [ -10.0 10.0 uniform-random-float roundtrip ] times
+100 [ -10.0 10.0 uniform-random roundtrip ] times
