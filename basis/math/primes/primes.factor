@@ -79,7 +79,7 @@ PRIVATE>
 : coprime? ( a b -- ? ) simple-gcd 1 = ; foldable
 
 : random-prime ( numbits -- p )
-    [ ] [ 2^ ] [ random-bits* next-prime ] tri
+    [ ] [ 2^ ] [ random-bits-exact next-prime ] tri
     2dup < [ 2drop random-prime ] [ 2nip ] if ;
 
 : estimated-primes ( m -- n )

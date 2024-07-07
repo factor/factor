@@ -63,7 +63,7 @@ PRIVATE>
 : random-bits ( numbits -- n )
     random-generator get (random-bits) ;
 
-: random-bits* ( numbits -- n )
+: random-bits-exact ( numbits -- n )
     1 - [ random-bits ] keep set-bit ;
 
 GENERIC#: random* 1 ( obj rnd -- elt )
