@@ -45,9 +45,7 @@ M: f random-32* no-random-number-generator ;
 : random-bytes ( n -- byte-array )
     random-generator get random-bytes* ;
 
-<PRIVATE
-
-:: (random-bits) ( numbits rnd -- n )
+:: random-bits* ( numbits rnd -- n )
     numbits 32 > [
         rnd random-32* numbits 32 - [ dup 32 > ] [
             [ 32 shift rnd random-32* + ] [ 32 - ] bi*
@@ -56,15 +54,16 @@ M: f random-32* no-random-number-generator ;
         ] unless-zero
     ] [
         rnd random-32* numbits bits
-    ] if ; inline
-
-PRIVATE>
+    ] if ;
 
 : random-bits ( numbits -- n )
-    random-generator get (random-bits) ;
+    random-generator get random-bits* ;
+
+: random-bits-exact* ( numbits rnd -- n )
+    [ 1 - ] dip '[ _ random-bits* ] keep set-bit ;
 
 : random-bits-exact ( numbits -- n )
-    1 - [ random-bits ] keep set-bit ;
+    random-generator get random-bits-exact* ;
 
 GENERIC#: random* 1 ( obj rnd -- elt )
 
