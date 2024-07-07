@@ -23,4 +23,4 @@ PRIVATE>
     dup safe-prime? [ next-safe-prime ] unless ;
 
 : random-safe-prime ( numbits -- p )
-    random-bits* next-safe-prime ;
+    random-bits-exact next-safe-prime ;

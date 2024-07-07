@@ -23,7 +23,7 @@ math.functions sets grouping random.private math.statistics ;
 { f }
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
 
-{ 49 } [ 50 random-bits* log2 ] unit-test
+{ 49 } [ 50 random-bits-exact log2 ] unit-test
 
 [ { 1 2 } 3 sample ] [ too-many-samples?  ] must-fail-with
 

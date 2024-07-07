@@ -102,7 +102,7 @@ HELP: random-bits
 { $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Outputs a random integer " { $snippet "numbits" } " bits in length." } ;
 
-HELP: random-bits*
+HELP: random-bits-exact
 { $values { "numbits" integer } { "n" "a random integer" } }
 { $description "Returns an integer exactly " { $snippet "numbits" } " bits in length, with the topmost bit set to one." } ;
 
@@ -183,7 +183,7 @@ $nl
 "Random numbers with " { $snippet "n" } " bits:"
 { $subsections
     random-bits
-    random-bits*
+    random-bits-exact
 } ;
 
 ABOUT: "random"
