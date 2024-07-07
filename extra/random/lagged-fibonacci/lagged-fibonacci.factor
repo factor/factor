@@ -57,7 +57,7 @@ M:: lagged-fibonacci seed-random ( lagged-fibonacci seed! -- lagged-fibonacci )
         p-r 1 + double <c-array> >>u
         swap seed-random ; inline
 
-GENERIC: random-float* ( tuple -- r )
+GENERIC: random-float* ( rnd -- n )
 
 : random-float ( -- n ) random-generator get random-float* ; inline
 
