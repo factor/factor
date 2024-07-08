@@ -220,7 +220,7 @@ M: weibull-distribution random*
 
 TUPLE: pareto-distribution k alpha ;
 C: <pareto-distribution> pareto-distribution
-M: pareto-distribution random* ( obj rnd -- elt )
+M: pareto-distribution random*
     [ [ k>> ] [ alpha>> ] bi ] dip pareto-random* ;
 
 <PRIVATE
@@ -469,7 +469,6 @@ TUPLE: poisson-distribution mean ;
 C: <poisson-distribution> poisson-distribution
 M: poisson-distribution random*
     [ mean>> ] dip poisson-random* ;
-
 :: binomial-random* ( n p rnd -- elt )
     n assert-non-negative drop {
         { [ p 0.0 1.0 between? not ] [ "p must be in the range 0.0 <= p <= 1.0" throw ] }
@@ -523,8 +522,47 @@ M: poisson-distribution random*
 
 TUPLE: binomial-distribution n p ;
 C: <binomial-distribution> binomial-distribution
-M: binomial-distribution random* ( obj rnd -- elt )
+M: binomial-distribution random*
     [ [ n>> ] [ p>> ] bi ] dip binomial-random* ;
+
+:: zipf-random* ( a rnd -- n )
+    a 1.0 - :> am1 2.0 am1 ^ :> b
+    1.0 rnd random-unit* - :> U
+    rnd random-unit* :> V
+    U am1 recip neg ^ floor :> X
+    1.0 X recip + am1 ^ :> T
+    V X * T 1.0 - * b 1.0 - / T b / <= [
+        X
+    ] [
+        a rnd zipf-random*
+    ] if ;
+
+: zipf-random ( a -- n )
+    random-generator get zipf-random* ;
+
+TUPLE: zipf-distribution a ;
+C: <zipf-distribution> zipf-distribution
+M: zipf-distribution random*
+    [ a>> ] dip zipf-random* ;
+
+:: wald-random* ( mean scale rnd -- n )
+    mean scale 2 * / :> mu_2l
+    0 1 rnd normal-random* sq mean * :> Y
+    mean Y sq 4 scale * Y * + sqrt Y swap - mu_2l * + :> X
+    rnd random-unit* :> U
+    U mean dup X + / <= [
+        X
+    ] [
+        mean sq X /
+    ] if ;
+
+: wald-random ( mean scale -- n )
+    random-generator get wald-random* ;
+
+TUPLE: wald-distribution mean scale ;
+C: <wald-distribution> wald-distribution
+M: wald-distribution random*
+    [ [ mean>> ] [ scale>> ] bi ] dip wald-random* ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
