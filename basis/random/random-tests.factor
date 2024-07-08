@@ -100,3 +100,8 @@ math.functions sets grouping random.private math.statistics ;
     500000 [ 100 0.8 binomial-random ] replicate
     [ mean 80 .1 ~ ] [ std 4 .1 ~ ] bi
 ] unit-test
+
+{ t } [
+    500000 [ 1.23 1.45 wald-random ] replicate
+    mean 1.54 1.23 / .1 ~
+] unit-test
