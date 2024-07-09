@@ -564,6 +564,26 @@ C: <wald-distribution> wald-distribution
 M: wald-distribution random*
     [ [ mean>> ] [ scale>> ] bi ] dip wald-random* ;
 
+:: geometric-random* ( p rnd -- n )
+    p 0.333333333333333333333333 >= [
+        1.0 p - :> q
+        rnd random-unit* :> U
+        1 p p [ U over > ] [
+            [ 1 + ] [ q * ] [ dupd + ] tri*
+        ] while 2drop
+    ] [
+        1.0 rnd random-unit* - log 1.0 p - log / ceiling
+        >integer
+    ] if ;
+
+: geometric-random ( p -- n )
+    random-generator get geometric-random* ;
+
+TUPLE: geometric-distribution p ;
+C: <geometric-distribution> geometric-distribution
+M: geometric-distribution random*
+    [ p>> ] dip geometric-random* ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
