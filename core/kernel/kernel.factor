@@ -87,11 +87,9 @@ DEFER: if
 : if ( ..a ? true: ( ..a -- ..b ) false: ( ..a -- ..b ) -- ..b ) ? call ;
 
 ! Single branch
-: unless ( ..a ? false: ( ..a -- ..a ) -- ..a )
-    swap [ drop ] [ call ] if ; inline
+: unless ( ..a ? false: ( ..a -- ..a ) -- ..a ) [ ] swap if ; inline
 
-: when ( ..a ? true: ( ..a -- ..a ) -- ..a )
-    swap [ call ] [ drop ] if ; inline
+: when ( ..a ? true: ( ..a -- ..a ) -- ..a ) [ ] if ; inline
 
 ! Anaphoric
 : if* ( ..a ? true: ( ..a ? -- ..b ) false: ( ..a -- ..b ) -- ..b )
