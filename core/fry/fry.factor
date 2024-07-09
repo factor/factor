@@ -30,6 +30,9 @@ MIXIN: fried
 PREDICATE: fried-sequence < sequence count-inputs 0 > ;
 INSTANCE: fried-sequence fried
 
+: wrap-non-callable ( obj -- quot )
+    [ callable? ] [ [ call ] curry ] 1unless ; inline
+
 : (ncurry) ( accum n -- accum )
     {
         { 0 [ ] }
@@ -38,9 +41,6 @@ INSTANCE: fried-sequence fried
         { 3 [ \ 3curry suffix! ] }
         [ [ \ 3curry suffix! ] dip 3 - (ncurry) ]
     } case ;
-
-: wrap-non-callable ( obj -- quot )
-    dup callable? [ ] [ [ call ] curry ] if ; inline
 
 : [ncurry] ( n -- quot )
     [ V{ } clone ] dip (ncurry) >quotation ;
