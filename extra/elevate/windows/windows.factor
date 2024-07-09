@@ -22,8 +22,8 @@ M:: windows elevated ( $command $replace? $win-console? $posix-graphical? -- pro
         [ first ] [ rest ] bi " " join f SW_SHOW
         ! call shell function with questionable return pointer handling (should use WaitForSingleObject but it hangs)
         ShellExecuteW alien-address :> $retval
-        $retval 32 <= [ $retval n>win32-error-check ] [ ] if
-        $replace? [ $retval exit ] [ ] if
+        $retval 32 <= [ $retval n>win32-error-check ] when
+        $replace? [ $retval exit ] when
         $retval
     ] if ;
 

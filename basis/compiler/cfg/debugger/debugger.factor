@@ -53,7 +53,7 @@ M: ##phi insn.
 
 M: insn insn. ( insn -- )
     tuple>array unclip-last insn-number. [
-        dup string? [ ] [ unparse ] if
+        dup string? [ unparse ] unless
     ] map join-words print ;
 
 : block-header. ( bb -- )
