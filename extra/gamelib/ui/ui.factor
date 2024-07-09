@@ -36,9 +36,9 @@ TUPLE: board-gadget < gadget dimension bg-color draw-quotes board gests textures
 
 :: draw-background-color ( gadget -- )
     ! if given a background color, draw the background color
-    gadget bg-color>> 
-    [ gadget bg-color>> gl-color { 0 0 } gadget dimension>> gl-fill-rect ] 
-    [ ] if ;
+    gadget bg-color>> [
+        gl-color { 0 0 } gadget dimension>> gl-fill-rect
+    ] when* ;
 
 :: draw-filled-rectangle ( gadget color loc dim -- gadget )
     ! appends instruction to draw a rectangle to current set of instructions in draw-quotes attribute
