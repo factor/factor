@@ -1065,6 +1065,7 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : filter-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] filter ;
 : filter-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] filter ;
 
+! standard
 : mid-cards ( -- seq ) mtg-oracle-cards "mid" filter-set ;
 : vow-cards ( -- seq ) mtg-oracle-cards "vow" filter-set ;
 : neo-cards ( -- seq ) mtg-oracle-cards "neo" filter-set ;
@@ -1082,6 +1083,11 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : otj-cards ( -- seq ) mtg-oracle-cards "otj" filter-set ;
 : otj-cards-bonus ( -- seq ) mtg-oracle-cards "big" filter-set ;
 : otj-cards-all ( -- seq ) mtg-oracle-cards { "otj" "big" } filter-set-intersect ;
+: blb-cards ( -- seq ) mtg-oracle-cards "blb" filter-set ;
+: blb-cards-all ( -- seq ) mtg-oracle-cards { "blb" } filter-set-intersect ;
+
+! modern
+: mh3-cards ( -- seq ) mtg-oracle-cards "mh3" filter-set ;
 
 : sort-by-colors ( seq -- seq' )
     {
