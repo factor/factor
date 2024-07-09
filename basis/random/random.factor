@@ -584,6 +584,29 @@ C: <geometric-distribution> geometric-distribution
 M: geometric-distribution random*
     [ p>> ] dip geometric-random* ;
 
+:: logseries-random* ( p rnd -- n )
+    1.0 p - log :> r
+    f [
+        drop
+        rnd random-unit* :> V
+        V p >= [ 1 ] [
+            rnd random-unit* :> U
+            1.0 r U * e^ - :> q
+            V 0 > V q sq <= and [
+                1 V log q log / + floor >integer
+                [ f ] when-zero
+            ] [ f ] if [ V q >= 1 2 ? ] unless*
+        ] if dup not
+    ] loop ;
+
+: logseries-random ( p -- n )
+    random-generator get logseries-random* ;
+
+TUPLE: logseries-distribution p ;
+C: <logseries-distribution> logseries-distribution
+M: logseries-distribution random*
+    [ p>> ] dip logseries-random* ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
