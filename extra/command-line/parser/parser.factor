@@ -174,6 +174,7 @@ M: class argvalid? instance? ;
 : get-program-name ( -- name )
     {
         [ program-name get ]
+        [ script get [ "factor " prepend ] [ f ] if* ]
         [
             "run" get [
                 dup "tools.deploy.shaker" =
