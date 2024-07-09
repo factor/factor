@@ -201,6 +201,26 @@ TUPLE: foo ;
     ] with-string-writer
 ] unit-test
 
+{
+    "Usage:\n    program [--help] [username] [password]\n\nArguments:\n    username    \n    password    \n\nOptions:\n    --help    show this help and exit\n"
+} [
+    [
+        H{
+            { command-line { "--help" "too" "many" "arguments" } }
+            { program-name "program" }
+        } [
+            {
+                T{ option
+                    { name "username" }
+                }
+                T{ option
+                    { name "password" }
+                }
+            } [ ] with-options
+        ] with-variables
+    ] with-string-writer
+] unit-test
+
 { H{ { "foo" { "a" "b" } } { "bar" "c" } } } [
     {
         T{ option { name "--foo" } { #args 2 } }

@@ -275,23 +275,24 @@ M: usage-error error. options>> print-help ;
         ] dip append
     ] until-empty nip ;
 
-: parse-arguments ( options command-line -- positional  )
-    [ [ optional? ] partition ] dip { "--" } split1
-    [ (parse-arguments) f swap ] dip (parse-arguments) ;
+: parse-arguments ( options command-line -- arguments )
+    [ dup [ optional? ] partition ] dip { "--" } split1
+    [ (parse-arguments) f swap ] dip (parse-arguments)
+    [ #args>> { "*" "?" } member? ] reject
+    [ required-options ] unless-empty
+    [ required?>> ] filter namespace [
+        '[ option-variable _ key? ] reject
+        [ required-options ] unless-empty
+    ] keep ;
 
 PRIVATE>
 
 : (parse-options) ( options command-line -- arguments )
     [ [ >option ] map ] dip over default-options [
         default-help? get [ [ HELP prefix ] dip ] when
-        dupd parse-arguments
-        default-help? get [ print-help? get [ over usage-error ] when ] when
-        [ #args>> { "*" "?" } member? ] reject
-        [ required-options ] unless-empty
-        [ required?>> ] filter namespace [
-            '[ option-variable _ key? ] reject
-            [ required-options ] unless-empty
-        ] keep
+        [ parse-arguments ] pick '[
+            default-help? get [ print-help? get [ _ usage-error ] when ] when
+        ] finally
     ] with-variables ;
 
 : parse-options ( options -- arguments )
