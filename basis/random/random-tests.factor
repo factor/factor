@@ -105,3 +105,13 @@ math.functions sets grouping random.private math.statistics ;
     500000 [ 1.23 1.45 wald-random ] replicate
     mean 1.54 1.23 / .1 ~
 ] unit-test
+
+{ t } [
+    500000 [ 0.1 geometric-random ] replicate
+    [ [ 1 = ] count ] [ length ] bi / 0.1 .01 ~
+] unit-test
+
+{ t } [
+    500000 [ 0.35 geometric-random ] replicate
+    [ [ 1 = ] count ] [ length ] bi / 0.35 .01 ~
+] unit-test
