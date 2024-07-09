@@ -378,7 +378,7 @@ M: cauchy-distribution random*
     [ [ median>> ] [ scale>> ] bi ] dip cauchy-random* ;
 
 :: chi-square-random* ( dof rnd -- n )
-    0.5 dof 2 * rnd gamma-random* ;
+    dof 2.0 / 2.0 rnd gamma-random* ;
 
 : chi-square-random ( dof -- n )
     random-generator get chi-square-random* ;
@@ -606,6 +606,18 @@ TUPLE: logseries-distribution p ;
 C: <logseries-distribution> logseries-distribution
 M: logseries-distribution random*
     [ p>> ] dip logseries-random* ;
+
+:: f-random* ( dof-num dof-den rnd -- n )
+    dof-num rnd chi-square-random* dof-den *
+    dof-den rnd chi-square-random* dof-num * / ;
+
+: f-random ( df-num df-den -- n )
+    random-generator get f-random* ;
+
+TUPLE: f-distribution dof-num dof-den ;
+C: <f-distribution> f-distribution
+M: f-distribution random*
+    [ [ dof-num>> ] [ dof-den>> ] bi ] dip f-random* ;
 
 {
     { [ os windows? ] [ "random.windows" require ] }
