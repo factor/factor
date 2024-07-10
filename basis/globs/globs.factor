@@ -157,3 +157,6 @@ PRIVATE>
     glob-path [
         [ 1array f swap ] when-empty glob%
     ] { } make ;
+
+: rglob ( glob -- files )
+    "**/" prepend glob ;
