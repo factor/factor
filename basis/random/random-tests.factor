@@ -115,3 +115,8 @@ math.functions sets grouping random.private math.statistics ;
     500000 [ 0.35 geometric-random ] replicate
     [ [ 1 = ] count ] [ length ] bi / 0.35 .01 ~
 ] unit-test
+
+{ t } [
+    500000 [ 0.35 bernoulli-random ] replicate
+    mean 0.35 0.01 ~
+] unit-test

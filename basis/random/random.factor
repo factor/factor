@@ -619,6 +619,17 @@ C: <f-distribution> f-distribution
 M: f-distribution random*
     [ [ dof-num>> ] [ dof-den>> ] bi ] dip f-random* ;
 
+: bernoulli-random* ( p rnd -- n )
+    [ 1 ] 2dip binomial-random* ;
+
+: bernoulli-random ( p -- n )
+    random-generator get bernoulli-random* ;
+
+TUPLE: bernoulli-distribution p ;
+C: <bernoulli-distribution> bernoulli-distribution
+M: bernoulli-distribution random*
+    [ p>> ] dip bernoulli-random* ;
+
 {
     { [ os windows? ] [ "random.windows" require ] }
     { [ os unix? ] [ "random.unix" require ] }
