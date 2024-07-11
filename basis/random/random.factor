@@ -469,6 +469,7 @@ TUPLE: poisson-distribution mean ;
 C: <poisson-distribution> poisson-distribution
 M: poisson-distribution random*
     [ mean>> ] dip poisson-random* ;
+
 :: binomial-random* ( n p rnd -- elt )
     n assert-non-negative drop {
         { [ p 0.0 1.0 between? not ] [ "p must be in the range 0.0 <= p <= 1.0" throw ] }
