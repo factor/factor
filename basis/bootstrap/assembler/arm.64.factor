@@ -549,6 +549,7 @@ big-endian off
     ! ! pop stack
     ! ds-reg bootstrap-cell SUB
     pop0
+    word-entry-point-offset temp0 temp0 LDUR
 ] [
     ! temp0 word-entry-point-offset [+] CALL
     push-link-reg
