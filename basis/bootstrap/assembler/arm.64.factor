@@ -95,11 +95,11 @@ big-endian off
 
 : tagged>offset0 ( -- ) 1 temp0 temp0 ASRi ;
 
-! pops an item from the data stack and pushes it 
+! pops an item from the data stack and pushes it
 ! onto the retain stack (used for dip-like operations)
 : >r ( -- ) pop0 pushr ;
 
-! pops an item from the retain stack and pushes it 
+! pops an item from the retain stack and pushes it
 ! onto the data stack (used for dip-like operations)
 : r> ( -- ) popr push0 ;
 
@@ -125,7 +125,7 @@ big-endian off
     absolute-jump rel-word-pic-tail
 ] JIT-WORD-JUMP jit-define
 
-! This is used when a word is called. 
+! This is used when a word is called.
 ! JIT-WORD-JUMP is used if the word is the last piece of code in a quotation.
 [
     absolute-call rel-word-pic
@@ -146,7 +146,7 @@ big-endian off
     arg2s arg2 MOVr
     name jit-call ;
 
-! loads the address of the vm struct. 
+! loads the address of the vm struct.
 ! A no-op on ARM (vm-reg always contains this address).
 : jit-load-vm ( -- ) ;
 
@@ -154,7 +154,7 @@ big-endian off
 : jit-load-context ( -- )
     vm-context-offset vm-reg ctx-reg LDRuoff ;
 
-! Saves the addresses of the callstack, datastack, and retainstack tops 
+! Saves the addresses of the callstack, datastack, and retainstack tops
 ! into the corresponding fields in the ctx struct.
 : jit-save-context ( -- )
     jit-load-context
@@ -167,7 +167,7 @@ big-endian off
     context-datastack-offset ctx-reg ds-reg STRuoff
     context-retainstack-offset ctx-reg rs-reg STRuoff ;
 
-! Retrieves the addresses of the datastack and retainstack tops 
+! Retrieves the addresses of the datastack and retainstack tops
 ! from the corresponding fields in the ctx struct.
 ! ctx-reg must already have been loaded.
 : jit-restore-context ( -- )
@@ -350,9 +350,9 @@ big-endian off
     NOP NOP rc-absolute-cell rel-safepoint
 ] JIT-SAFEPOINT jit-define
 
-! The main C to Factor entry point. 
-! Sets up and executes the boot quote, 
-! then performs a teardown and returns into C++. 
+! The main C to Factor entry point.
+! Sets up and executes the boot quote,
+! then performs a teardown and returns into C++.
 [
     ! ! Optimizing compiler's side of callback accesses
     ! ! arguments that are on the stack via the frame pointer.
@@ -601,7 +601,7 @@ big-endian off
 
 ! ! Factor 2024 Clinic Code:
 ! ! this arm relocation could actually work
-! ! due to the small bitwidth required  
+! ! due to the small bitwidth required
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 ds-reg temp1 LDRr
@@ -636,7 +636,7 @@ big-endian off
 
 ! ! Factor 2024 Clinic Code:
 ! ! this arm relocation could actually work
-! ! due to the small bitwidth required  
+! ! due to the small bitwidth required
 ! 0 0 temp2 MOVZ f rc-absolute-arm64-movz rel-untagged
 ! temp2 temp2 UXTB
 ! temp2 temp1 CMPr
@@ -746,7 +746,7 @@ big-endian off
     ! store result
     1 push-down0 ;
 
-! fixnum (integer) division and modulo operations. 
+! fixnum (integer) division and modulo operations.
 ! Does not tag or push results.
 : jit-fixnum-/mod ( -- )
     ! load parameters
@@ -767,8 +767,8 @@ big-endian off
     { (start-context-and-delete) [ jit-start-context-and-delete ] }
 
     ! ## Entry points
-    ! called by callback-stub. 
-    ! this contains some C++ setup/teardown, 
+    ! called by callback-stub.
+    ! this contains some C++ setup/teardown,
     ! as well as the actual call into the boot quote.
     { c-to-factor [
             arg1 arg2 MOVr
@@ -802,10 +802,10 @@ big-endian off
 
     ! ## Math
     ! Overflowing fixnum (integer) addition
-    { fixnum+ [ 
+    { fixnum+ [
         [ ADDr ] "overflow_fixnum_add" jit-overflow ] }
     ! Overflowing fixnum (integer) subtraction
-    { fixnum- [ 
+    { fixnum- [
         [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
     ! Overflowing fixnum (integer) multiplication
     { fixnum* [
@@ -885,7 +885,7 @@ big-endian off
     ! ### Bit manipulation
     ! fixnum (integer) bitwise AND
     { fixnum-bitand [ \ ANDr jit-math ] }
-    
+
     ! fixnum (integer) bitwise NOT
     { fixnum-bitnot [
         load0
@@ -895,13 +895,13 @@ big-endian off
         tag-mask get temp0 temp0 EORi
         store0
     ] }
-    
+
     ! fixnum (integer) bitwise OR
     { fixnum-bitor [ \ ORRr jit-math ] }
-    
+
     ! fixnum (integer) bitwise XOR
     { fixnum-bitxor [ \ EORr jit-math ] }
-    
+
     ! fixnum (integer) bitwise shift (positive = left, negative = right)
     { fixnum-shift-fast [
         ! load shift count and value
@@ -1011,7 +1011,7 @@ big-endian off
         store0
     ] }
 
-    ! Turns the top item on the datastack 
+    ! Turns the top item on the datastack
     ! into a local stored on the retainstack.
     { load-local [ >r ] }
 
