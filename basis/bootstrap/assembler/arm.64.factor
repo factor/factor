@@ -719,7 +719,7 @@ big-endian off
     ! load values
     load1/0
     ! compare
-    temp1 temp0 CMPr
+    temp0 temp1 CMPr
     ! move t if true (f otherwise)
     [ temp2 temp3 temp0 ] dip CSEL
     ! store
