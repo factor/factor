@@ -43,4 +43,16 @@ END_PRAGMA
   extern size_t ZSTD_decompress (void* dst, size_t dstCapacity, const void* src, size_t compressedSize);
   extern unsigned ZSTD_isError (size_t code);
   extern const char* ZSTD_getErrorName (size_t code);
+
+  struct zstd_lib {
+    void* handle;
+
+    size_t (*decompress)(void* dst, size_t dst_capacity, const void* src,
+                         size_t compressed_size);
+    unsigned (*is_error)(size_t code);
+    const char* (*get_error_name)(size_t code);
+
+    void open();
+    void close();
+  };
 } }

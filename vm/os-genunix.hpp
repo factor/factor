@@ -5,4 +5,7 @@ namespace factor {
 void early_init();
 const char* vm_executable_path();
 const char* default_image_path();
+
+#define ZSTD_LIB "libzstd.so"
+
 }

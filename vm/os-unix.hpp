@@ -49,6 +49,10 @@ inline static THREADHANDLE thread_id() { return pthread_self(); }
 uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
+void* native_dlopen(const char* path);
+void* native_dlsym(void* handle, const char* symbol);
+void native_dlclose(void* handle);
+
 void check_ENOMEM(const char* msg);
 
 static inline void breakpoint() { __builtin_trap(); }
