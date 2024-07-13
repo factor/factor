@@ -1,35 +1,33 @@
 namespace factor {
 
-#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - sizeof(cell) * 6) // omg
+#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - sizeof(cell) * 6)
 
 // void c_to_factor(cell quot);
 // void lazy_jit_compile(cell quot);
 
-// static const fixnum xt_tail_pic_offset = 4 + 1; // or 4 or whatever else...
+// 3 B of LDR=BLR
+static const unsigned int call_opcode = 0x14000003;
+// X9 BR of LDR=BR
+static const unsigned int jmp_opcode = 0xd61f0120;
 
-
-// omg
-inline static unsigned char call_site_opcode(cell return_address) {
-  return *(unsigned char*)(return_address - 5);
+inline static unsigned int call_site_opcode(cell return_address) {
+  return *(unsigned int*)(return_address - 12);
 }
 
-// omg
 inline static void check_call_site(cell return_address) {
   unsigned char opcode = call_site_opcode(return_address);
   FACTOR_ASSERT(opcode == call_opcode || opcode == jmp_opcode);
   (void)opcode; // suppress warning when compiling without assertions
 }
 
-// omg
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(*(int*)(return_address - 4) + return_address);
+  return (void*)(*(cell*)(return_address - sizeof(cell)));
 }
 
-// omg
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(int*)(return_address - 4) = (uint32_t)(target - return_address);
+  *(cell*)(return_address - sizeof(cell)) = target;
 }
 
 inline static bool tail_call_site_p(cell return_address) {
@@ -60,5 +58,13 @@ inline static bool tail_call_site_p(cell return_address) {
 
 //   return r;
 // }
+
+// Must match the stack-frame-size constant in
+// basis/bootstrap/assembler/arm.64.factor
+static const unsigned JIT_FRAME_SIZE = 64;
+
+// Must match the calculation in word jit-signal-handler-prolog in
+// basis/bootstrap/assembler/arm.64.factor
+static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
 
 }

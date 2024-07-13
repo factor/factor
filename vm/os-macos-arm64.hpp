@@ -142,20 +142,4 @@ inline static unsigned int fpu_status(unsigned int status) {
 */
   return r;
 }
-
-// Must match the stack-frame-size constant in bootstrap/assembler/arm.64.factor
-static const unsigned JIT_FRAME_SIZE = 64;
-
-// last byte of X9 BR in absolute-call
-static const unsigned char call_opcode = 0x14;
-// last byte of 12 Br in absolute-jump
-static const unsigned char jmp_opcode = 0xd6;
-
-static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
-
-
-
-
-
-
 }
