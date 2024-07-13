@@ -174,7 +174,7 @@ ifdef CONFIG
 		vm/mvm.hpp \
 		vm/factor.hpp \
 		vm/utilities.hpp \
-		vm/zstd.hpp vm/zstd.h
+		vm/zstd.hpp
 
 	EXE_OBJS := $(PLAF_EXE_OBJS)
 
@@ -270,9 +270,6 @@ $(BUILD_DIR):
 
 $(BUILD_DIR)/master.hpp.gch: vm/master.hpp $(MASTER_HEADERS) | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -x c++-header $(CXXFLAGS) -o $@ $<
-
-$(BUILD_DIR)/zstd.o: vm/zstd.cpp vm/zstd.c $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
-	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
 
 $(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) $(PCHFLAGS) -o $@ $<
