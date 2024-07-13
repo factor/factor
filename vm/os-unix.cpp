@@ -39,6 +39,18 @@ void sleep_nanos(uint64_t nsec) {
     fatal_error("nanosleep failed", 0);
 }
 
+void* native_dlopen(const char* path) {
+  return dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+}
+
+void* native_dlsym(void* handle, const char* symbol) {
+  return dlsym(handle, symbol);
+}
+
+void native_dlclose(void* handle) {
+  dlclose(handle);
+}
+
 void factor_vm::init_ffi() { null_dll = dlopen(NULL, RTLD_LAZY); }
 
 void factor_vm::ffi_dlopen(dll* dll) {

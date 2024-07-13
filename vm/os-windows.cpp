@@ -11,6 +11,18 @@ bool set_memory_locked(cell base, cell size, bool locked) {
   return status != 0;
 }
 
+void* native_dlopen(const char* path) {
+  return LoadLibraryEx((WCHAR*)path, NULL, 0);
+}
+
+void* native_dlsym(void* handle, const char* symbol) {
+  return GetProcAddress((HMODULE)handle, symbol);
+}
+
+void native_dlclose(void* handle) {
+  FreeLibrary((HMODULE)handle);
+}
+
 void factor_vm::init_ffi() {
   hFactorDll = GetModuleHandle(NULL);
   if (!hFactorDll)

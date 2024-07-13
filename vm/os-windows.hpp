@@ -63,6 +63,11 @@ typedef HANDLE THREADHANDLE;
 inline static void early_init() {}
 uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
+
+void* native_dlopen(const char* path);
+void* native_dlsym(void* handle, const char* symbol);
+void native_dlclose(void* handle);
+
 long getpagesize();
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch);
@@ -117,5 +122,7 @@ inline static std::string to_utf8(const std::wstring& str) {
 }
 
 #define AS_UTF8(ptr) to_utf8(ptr)
+
+#define ZSTD_LIB "zstd-1.dll"
 
 }

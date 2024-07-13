@@ -15,4 +15,6 @@ const char* default_image_path();
 #define FUNCTION_CODE_POINTER(ptr) ptr
 #define FUNCTION_TOC_POINTER(ptr) ptr
 
+#define ZSTD_LIB "libzstd.dylib"
+
 }
