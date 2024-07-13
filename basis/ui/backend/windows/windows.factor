@@ -8,10 +8,11 @@ io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
 libc literals make math math.bitwise namespaces sequences sets
 specialized-arrays strings threads ui ui.backend ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.private windows.dwmapi
+ui.gestures ui.pixel-formats ui.private ui.theme
+ui.theme.switching windows.advapi32 windows.dwmapi
 windows.errors windows.gdi32 windows.kernel32 windows.messages
-windows.offscreen windows.ole32 windows.opengl32 windows.shell32
-windows.types windows.user32 ;
+windows.offscreen windows.ole32 windows.opengl32
+windows.registry windows.shell32 windows.types windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -742,10 +743,19 @@ M: windows-ui-backend set-title
     [ >>title ]
     [ [ hWnd>> WM_SETTEXT 0 ] dip alien-address SendMessage drop ] bi ;
 
+: detect-theme ( -- )
+    [
+        HKEY_CURRENT_USER
+        "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize"
+        "AppsUseLightTheme" query-registry first 1 =
+        light-theme dark-theme ? switch-theme-if-default
+    ] ignore-errors ;
+
 M: windows-ui-backend (with-ui)
     [
         init-clipboard
         init-win32-ui
+        detect-theme
         start-ui
         event-loop
     ] [ cleanup-win32-ui ] finally ;
