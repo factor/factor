@@ -165,7 +165,7 @@ M\\ actor advance regs." }
 ARTICLE: "math.vectors.simd.intrinsics" "Low-level SIMD primitives"
 "The words in the " { $vocab-link "math.vectors.simd.intrinsics" } " vocabulary are used to implement SIMD support. These words have three disadvantages compared to the higher-level " { $link "math-vectors" } " words:"
 { $list
-    "They operate on raw byte arrays, with a separate “representation” parameter passed in to determine the type of the operands and result."
+    "They operate on raw byte arrays, with a separate \"representation\" parameter passed in to determine the type of the operands and result."
     "They are unsafe; passing values which are not byte arrays, or byte arrays with the wrong size, will dereference invalid memory and possibly crash Factor."
 }
 "The compiler converts " { $link "math-vectors" } " into SIMD primitives automatically in cases where it is safe; this means that the input types are known to be SIMD vectors, and the CPU supports SIMD."

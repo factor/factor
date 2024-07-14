@@ -149,7 +149,7 @@ $nl
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
-"A complex number is given by two components, a “real” part and “imaginary” part. The components must either be integers, ratios or floats."
+"A complex number is given by two components, a \"real\" part and an \"imaginary\" part. The components must either be integers, ratios or floats."
 { $code
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
@@ -255,7 +255,7 @@ ARTICLE: "syntax-effects" "Stack effect syntax"
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
-"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
+"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are \"live\"."
 $nl
 "Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to a word which may potentially mutate them."
 { $subsections

@@ -309,7 +309,7 @@ M: vocab-tag >link ;
 M: vocab-tag valid-article? drop t ;
 
 M: vocab-tag article-title
-    name>> "Vocabularies tagged “" "”" surround ;
+    name>> "Vocabularies tagged \"" "\"" surround ;
 
 M: vocab-tag article-name name>> ;
 

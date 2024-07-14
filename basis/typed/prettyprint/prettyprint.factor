@@ -13,9 +13,9 @@ M: typed-word declarations. "typed-word" word-prop declarations. ;
 
 M: input-mismatch-error summary
     [
-        "Typed word “" %
+        "Typed word '" %
         dup word>> name>> %
-        "” expected input value of type " %
+        "' expected input value of type " %
         dup expected-type>> unparse %
         " but got " %
         dup value>> class-of name>> %
@@ -24,9 +24,9 @@ M: input-mismatch-error summary
 
 M: output-mismatch-error summary
     [
-        "Typed word “" %
+        "Typed word '" %
         dup word>> name>> %
-        "” expected to output value of type " %
+        "' expected to output value of type " %
         dup expected-type>> name>> %
         " but gave " %
         dup value>> class-of name>> %

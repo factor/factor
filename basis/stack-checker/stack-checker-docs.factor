@@ -54,7 +54,7 @@ $nl
 { $heading "Limitations" }
 "The stack checker cannot guarantee that a literal quotation is still literal if it is passed on the data stack to an inlined recursive combinator such as " { $link each } " or " { $link map } ". For example, the following will not infer:"
 { $example
-  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Cannot apply “call” to a run-time computed value\nmacro call"
+  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Cannot apply 'call' to a run-time computed value\nmacro call"
 }
 "To make this work, use " { $link dip } " to pass the quotation instead:"
 { $example
@@ -74,7 +74,7 @@ $nl
 "Combinators which are recursive require additional care. In addition to being declared " { $link POSTPONE: inline } ", they must be declared " { $link POSTPONE: recursive } ". There are three restrictions that only apply to combinators with this declaration:"
 { $heading "Input quotation declaration" }
 "Input parameters which are quotations must be annotated as such in the stack effect. For example, the following will not infer:"
-{ $unchecked-example ": bad ( quot -- ) [ call ] keep bad ; inline recursive" "[ [ ] bad ] infer." "Cannot apply “call” to a run-time computed value\nmacro call" }
+{ $unchecked-example ": bad ( quot -- ) [ call ] keep bad ; inline recursive" "[ [ ] bad ] infer." "Cannot apply 'call' to a run-time computed value\nmacro call" }
 "The following is correct:"
 { $example ": good ( quot: ( -- ) -- ) [ call ] keep good ; inline recursive" "[ [ ] good ] infer." "( -- )" }
 "The effect of the nested quotation itself is only present for documentation purposes; the mere presence of a nested effect is sufficient to mark that value as a quotation parameter."
@@ -82,14 +82,14 @@ $nl
 "The stack checker does not trace data flow in two instances."
 $nl
 "An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
-{ $unchecked-example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Cannot apply “call” to a run-time computed value\nmacro call" }
+{ $unchecked-example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Cannot apply 'call' to a run-time computed value\nmacro call" }
 "However a small change can be made:"
 { $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( x -- )" }
 "An inline recursive word must have a fixed stack effect in its base case. The following will not infer:"
 { $unchecked-example
     ": foo ( quot ? -- ) [ f foo ] [ call ] if ; inline"
     "[ [ 5 ] t foo ] infer."
-    "The inline recursive word “foo” must be declared recursive\nword foo"
+    "The inline recursive word 'foo' must be declared recursive\nword foo"
 } ;
 
 ARTICLE: "tools.inference" "Stack effect tools"

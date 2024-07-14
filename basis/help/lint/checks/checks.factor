@@ -130,7 +130,7 @@ SYMBOL: vocab-articles
     \ $vocab-link swap elements [
         second
         dup vocab-exists? [ drop ] [
-            "$vocab-link to non-existent vocabulary ``" "''" surround
+            "$vocab-link to non-existent vocabulary '" "'" surround
             simple-lint-error
         ] if
     ] each ;

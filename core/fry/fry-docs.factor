@@ -77,11 +77,11 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
 } ;
 
 ARTICLE: "fry" "Fried quotations"
-"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with “holes” (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
+"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with \"holes\" (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
 "Fried quotations are started by a special parsing word:"
 { $subsections POSTPONE: '[ }
-"There are two types of fry specifiers; the first can hold a value, and the second “splices” a quotation, as if it were inserted without surrounding brackets:"
+"There are two types of fry specifiers; the first can hold a value, and the second \"splices\" a quotation, as if it were inserted without surrounding brackets:"
 { $subsections
     POSTPONE: _
     POSTPONE: @

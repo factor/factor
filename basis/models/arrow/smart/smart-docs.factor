@@ -19,7 +19,7 @@ HELP: <?smart-arrow>
 { $description "Like " { $link <smart-arrow> } ", but with the semantics of " { $link <?arrow> } "." } ;
 
 ARTICLE: "models.arrow.smart" "Smart arrow models"
-"The " { $vocab-link "models.arrow.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called “smart” because they resemble " { $link "combinators.smart" } "."
+"The " { $vocab-link "models.arrow.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called \"smart\" because they resemble " { $link "combinators.smart" } "."
 { $subsections <smart-arrow> } ;
 
 ABOUT: "models.arrow.smart"

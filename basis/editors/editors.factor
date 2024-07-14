@@ -82,9 +82,9 @@ ERROR: invalid-location file line ;
 ERROR: cannot-find-source definition ;
 
 M: cannot-find-source error.
-    "Cannot find source for ``" write
+    "Cannot find source for '" write
     definition>> pprint-short
-    "''" print ;
+    "'" print ;
 
 : edit-file ( path -- )
     0 edit-location ;

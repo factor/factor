@@ -10,7 +10,7 @@ $nl
 { $code "USE: tools.scaffold" }
 "Then, ask the scaffold tool to create a new vocabulary named " { $snippet "palindrome" } ":"
 { $code "\"palindrome\" scaffold-work" }
-"If you look at the output, you will see that a few files were created in your “work” directory, and that the new source file was loaded."
+"If you look at the output, you will see that a few files were created in your \"work\" directory, and that the new source file was loaded."
 $nl
 "The following phrase will print the full path of your work directory:"
 { $code "\"work\" resource-path ." }
@@ -74,7 +74,7 @@ ARTICLE: "first-program-test" "Testing your first program"
 { $code "\"hello\"" }
 "Note that the stack display in the listener now shows this string. Having supplied the input, we call our word:"
 { $code "palindrome?" }
-"The stack display should now have a boolean false - " { $link f } " - which is the word's output. Since “hello” is not a palindrome, this is what we expect. We can get rid of this boolean by calling " { $link drop } ". The stack should be empty after this is done."
+"The stack display should now have a boolean false - " { $link f } " - which is the word's output. Since \"hello\" is not a palindrome, this is what we expect. We can get rid of this boolean by calling " { $link drop } ". The stack should be empty after this is done."
 $nl
 "Now, let's try it with a palindrome; we will push the string and call the word in the same line of code:"
 { $code "\"racecar\" palindrome?" }
@@ -141,7 +141,7 @@ $nl
 { $code "filter" }
 "The stack should now contain the following string: "
 { $snippet "AmanaplanacanalPanama" } ". "
-"This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as “to”:"
+"This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as \"to\":"
 { $code ">lower" }
 "Finally, let's print the top of the stack and discard it:"
 { $code "." }

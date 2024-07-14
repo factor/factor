@@ -42,7 +42,7 @@ M: more-completions article-title
         "All " %
         [ seq>> length # " " % ]
         [ category>> category>name % ]
-        [ " results for “" % search>> % "”" % ] tri
+        [ " results for \"" % search>> % "\"" % ] tri
     ] "" make ;
 
 M: more-completions article-content
@@ -79,7 +79,7 @@ C: <apropos-search> apropos-search
 M: apropos-search valid-article? drop t ;
 
 M: apropos-search article-title
-    text>> "Search results for “" "”" surround ;
+    text>> "Search results for \"" "\"" surround ;
 
 M: apropos-search article-content
     text>> 1array \ $apropos prefix ;

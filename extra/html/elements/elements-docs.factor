@@ -14,7 +14,7 @@ $nl
 { $code "<a =href a> \"Click me\" write </a>" }
 { $code "<a \"http://\" prepend =href a> \"click\" write </a>" }
 { $code "<a [ \"http://\" % % ] \"\" make =href a> \"click\" write </a>" }
-"Tags that have no “closing” equivalent have a trailing " { $snippet "tag/>" } " form:"
+"Tags that have no \"closing\" equivalent have a trailing " { $snippet "tag/>" } " form:"
 { $code "<input \"text\" =type \"name\" =name 20 =size input/>" }
 "For the full list of HTML tags and attributes, consult the word list for the " { $vocab-link "html.elements" } " vocabulary. In addition to HTML tag and attribute words, a few utilities are provided."
 $nl

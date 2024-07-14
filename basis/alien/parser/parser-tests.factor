@@ -48,7 +48,7 @@ IN: alien.parser.tests
 ] unit-test
 
 ! validate-c-type-name
-{ "Cannot define a C type “hello*” that ends with an asterisk (*)" } [
+{ "Cannot define a C type 'hello*' that ends with an asterisk (*)" } [
     [ "hello*" validate-c-type-name ] [ ] recover summary
 ] unit-test
 

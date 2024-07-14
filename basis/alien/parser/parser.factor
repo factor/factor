@@ -57,8 +57,8 @@ ERROR: *-in-c-type-name name ;
 
 M: *-in-c-type-name summary
     name>>
-    "Cannot define a C type “"
-    "” that ends with an asterisk (*)" surround ;
+    "Cannot define a C type '"
+    "' that ends with an asterisk (*)" surround ;
 
 : validate-c-type-name ( name -- name )
     dup "*" tail?

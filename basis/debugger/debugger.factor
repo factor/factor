@@ -293,20 +293,20 @@ M: no-current-vocab-error summary
 
 M: no-word-error summary
     name>>
-    "No word named “"
-    "” found in current vocabulary search path" surround ;
+    "No word named '"
+    "' found in current vocabulary search path" surround ;
 
 M: no-word-error error. summary print ;
 
 M: no-word-in-vocab summary
     [ vocab>> ] [ word>> ] bi
-    [ "No word named “" % % "” found in “" % % "” vocabulary" % ] "" make ;
+    [ "No word named '" % % "' found in '" % % "' vocabulary" % ] "" make ;
 
 M: no-word-in-vocab error. summary print ;
 
 M: ambiguous-use-error summary
     name>>
-    "The name “" "” resolves to more than one word." surround ;
+    "The name '" "' resolves to more than one word." surround ;
 
 M: ambiguous-use-error error. summary print ;
 
@@ -375,7 +375,7 @@ M: not-found-in-roots summary
 
 M: wrong-values summary drop "Quotation's stack effect does not match call site" ;
 
-M: stack-effect-omits-dashes summary drop "Stack effect must contain “--”" ;
+M: stack-effect-omits-dashes summary drop "Stack effect must contain '--'" ;
 
 M: callsite-not-compiled summary
     drop "Caller not compiled with the optimizing compiler" ;

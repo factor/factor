@@ -9,8 +9,8 @@ TUPLE: gml-file-error pathname error ;
 C: <gml-file-error> gml-file-error
 
 M: gml-file-error error.
-    "Error in GML file “" write
-    dup pathname>> write "”:" print nl
+    "Error in GML file \"" write
+    dup pathname>> write "\":" print nl
     error>> error. ;
 
 : gml-stack. ( gml -- )

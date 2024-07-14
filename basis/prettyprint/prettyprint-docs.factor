@@ -224,11 +224,11 @@ HELP: unparse
 
 HELP: pprint-short
 { $values { "obj" object } }
-{ $description "Prettyprints an object to " { $link output-stream } ". This word rebinds printer control variables to enforce “shorter” output. See " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } ". This word rebinds printer control variables to enforce \"shorter\" output. See " { $link "prettyprint-variables" } "." } ;
 
 HELP: short.
 { $values { "obj" object } }
-{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce “shorter” output." } ;
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce \"shorter\" output." } ;
 
 HELP: .b
 { $values { "n" integer } }

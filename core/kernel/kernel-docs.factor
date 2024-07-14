@@ -1331,7 +1331,7 @@ $nl
 } ;
 
 ARTICLE: "equality" "Equality"
-"There are two distinct notions of “sameness” when it comes to objects."
+"There are two distinct notions of \"sameness\" when it comes to objects."
 $nl
 "You can test if two references point to the same object (" { $emphasis "identity comparison" } "). This is rarely used; it is mostly useful with large, mutable objects where the object identity matters but the value is transient:"
 { $subsections eq? }
