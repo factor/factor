@@ -50,7 +50,7 @@ STRUCT: CGRect
 : set-CGRect-h ( h CGRect -- ) size>> h<< ; inline
 
 : <CGRect> ( x y w h -- rect )
-    [ <CGPoint> ] [ <CGSize> ] 2bi* CGRect boa ;
+    [ CGPoint <struct-boa> ] [ CGSize <struct-boa> ] 2bi* CGRect <struct-boa> ;
 
 : CGRect-x-y ( alien -- origin-x origin-y )
     [ CGRect-x ] [ CGRect-y ] bi ;
