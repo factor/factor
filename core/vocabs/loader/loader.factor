@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
 definitions io io.files io.pathnames kernel make namespaces
-parser sequences sets splitting strings vocabs words ;
+parser sequences sets splitting strings vocabs vocabs.private
+words ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -77,7 +78,8 @@ PRIVATE>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    [ lookup-vocab ] [ find-vocab-root ] ?unless ;
+    [ dup valid-vocab-name? [ lookup-vocab ] [ drop f ] if ]
+    [ find-vocab-root ] ?unless ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
