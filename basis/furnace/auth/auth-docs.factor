@@ -156,7 +156,7 @@ ARTICLE: "furnace.auth.users" "User profiles"
 "User profile variables have the same restrictions on their values as session variables; see " { $link "furnace.sessions.serialize" } " for a discussion." ;
 
 ARTICLE: "furnace.auth.example" "Furnace authentication example"
-"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message “You must log in to view your todo list”:"
+"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message \"You must log in to view your todo list\":"
 { $code
     "<protected>
     \"view your todo list\" >>description"

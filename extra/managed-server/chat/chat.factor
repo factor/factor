@@ -40,12 +40,12 @@ CONSTANT: line-beginning "-!- "
     chat-docs get at send-line ;
 
 : username-taken-string ( username -- string )
-    "The username ``" "'' is already in use; try again." surround ;
+    "The username '" "' is already in use; try again." surround ;
 
 : warn-name-changed ( old new -- )
     [
-        [ line-beginning "``" ] 2dip
-        [ "'' is now known as ``" ] dip "''"
+        [ line-beginning "'" ] 2dip
+        [ "' is now known as '" ] dip "'"
     ] "" append-outputs-as send-everyone ;
 
 : handle-nick ( string -- )
@@ -70,7 +70,7 @@ CONSTANT: line-beginning "-!- "
 Displays the documentation for a command."
 "help" add-command
 
-[ drop clients keys [ "``" "''" surround ] map ", " join send-line ]
+[ drop clients keys [ "'" dup surround ] map ", " join send-line ]
 "Syntax: /who
 Shows the list of connected users."
 "who" add-command

@@ -18,10 +18,11 @@ IN: rosetta-code.menu
 ! before asking again for a number. The function should return an
 ! empty string if called with an empty list.
 
-! For test purposes use the four phrases: “fee fie”, “huff and
-! puff”, “mirror mirror” and “tick tock” in a list.
+! For test purposes use the four phrases: "fee fie", "huff and
+! puff", "mirror mirror" and "tick tock" in a list.
 
-! Note: This task is fashioned after the action of the Bash select statement.
+! Note: This task is fashioned after the action of the Bash
+! select statement.
 
 : print-menu ( seq -- )
     [ 1 + swap "%d - %s\n" printf ] each-index

@@ -8,8 +8,8 @@ IN: rosetta-code.balanced-brackets
 
 ! Task:
 
-! Generate a string with N opening brackets (“[”) and N closing
-! brackets (“]”), in some arbitrary order.
+! Generate a string with N opening brackets ("[") and N closing
+! brackets ("]"), in some arbitrary order.
 
 ! Determine whether the generated string is balanced; that is,
 ! whether it consists entirely of pairs of opening/closing

@@ -10,7 +10,7 @@ IN: gobject-introspection
 ERROR: gir-not-found name paths ;
 
 M: gir-not-found summary
-    [ name>> "“" "” file not found on paths:\n" surround ]
+    [ name>> "'" "' file not found on paths:\n" surround ]
     [ paths>> join-lines ] bi
     "\n\nUse the existing path or declare GIR_DIRS environment variable"
     3append ;

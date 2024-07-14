@@ -40,7 +40,7 @@ main-responder set-global"
 }
 "In the above example, visiting any URL other than " { $snippet "/new" } ", " { $snippet "/edit" } ", " { $snippet "/delete" } ", or " { $snippet "/" } " will result in a 404 error."
 { $heading "Another pathname dispatcher" }
-"On the other hand, suppose we wanted to route all unrecognized paths to a “view” action:"
+"On the other hand, suppose we wanted to route all unrecognized paths to a \"view\" action:"
 { $code
     "<dispatcher>
     <new-action> \"new\" add-responder

@@ -27,9 +27,9 @@ SYMBOL: lost-password-from
         over email>> 1array >>to
         [
             "This e-mail was sent by the application server on " % current-host % "\n" %
-            "because somebody, maybe you, clicked on a “recover password” link in the\n" %
-            "login form, and requested a new password for the user named ``" %
-            over username>> % "''.\n" %
+            "because somebody, maybe you, clicked on a \"recover password\" link in the\n" %
+            "login form, and requested a new password for the user named \"" %
+            over username>> % "\".\n" %
             "\n" %
             "If you believe that this request was legitimate, you may click the below link in\n" %
             "your browser to set a new password for your account:\n" %

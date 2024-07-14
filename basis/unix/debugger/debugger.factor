@@ -9,7 +9,7 @@ M: libc-error error.
     dup message>> write " (" write errno>> pprint ")" print ;
 
 M: unix-system-call-error error.
-    "Unix system call “" write dup word>> pprint "” failed:" print
+    "Unix system call '" write dup word>> pprint "' failed:" print
     nl
     dup message>> write " (" write dup errno>> pprint ")" print
     nl

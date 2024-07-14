@@ -416,7 +416,7 @@ interactor "completion" f {
         introduction.
         listener
         nl
-        "The listener has exited. To start it again, click “Restart Listener”." print
+        "The listener has exited. To start it again, click 'Restart Listener'." print
     ] with-input-output+error-streams* ;
 
 : start-listener-thread ( listener -- )

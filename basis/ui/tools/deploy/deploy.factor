@@ -114,7 +114,7 @@ deploy-gadget "toolbar" f {
     [ <deploy-gadget> { 10 10 } <border> white-interior ]
     [
         <world-attributes>
-            swap "Deploying “" "”" surround >>title
+            swap "Deploying '" "'" surround >>title
             [ { dialog-window } append ] change-window-controls
     ] bi
     open-window ;

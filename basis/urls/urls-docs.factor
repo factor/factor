@@ -104,7 +104,7 @@ HELP: query-param
 HELP: set-query-param
 { $values { "url" url } { "value" object } { "key" string } }
 { $description "Sets a query parameter. The value can be any object supported by " { $link present } ", or " { $link f } ", in which case the key is removed." }
-{ $notes "This word always returns the same URL object that was input. This allows for a ``pipeline'' coding style, where several query parameters are set in a row. Since it mutates the input object, you must " { $link clone } " it first if it is literal, as in the below example."
+{ $notes "This word always returns the same URL object that was input. This allows for a \"pipeline\" coding style, where several query parameters are set in a row. Since it mutates the input object, you must " { $link clone } " it first if it is literal, as in the below example."
 }
 { $examples
     { $code

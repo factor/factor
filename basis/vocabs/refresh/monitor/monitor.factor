@@ -39,7 +39,7 @@ TR: convert-separators "/\\" ".." ;
             ] when*
         ] [
             [
-                [ "monitor-loop warning for path ``" "``:" surround write ]
+                [ "monitor-loop warning for path '" "':" surround write ]
                 [ . ] bi* flush
             ] with-global
         ] recover
@@ -54,7 +54,7 @@ TR: convert-separators "/\\" ".." ;
             [ _ (start-vocab-monitor) ]
             [
                 [
-                    _ "fatal error for monitor root ``" "``: " surround write
+                    _ "fatal error for monitor root '" "': " surround write
                     . flush
                 ] with-global
             ] recover

@@ -49,7 +49,7 @@ PRIVATE>
     [
         last-element off
         [
-            "Search results for “" "”" surround
+            "Search results for \"" "\"" surround
             title-style get [ format ] ($block)
         ]
         [

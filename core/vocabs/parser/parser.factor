@@ -112,7 +112,7 @@ ERROR: unbalanced-private-declaration vocab ;
 
 : use-vocab ( vocab -- )
     dup using-vocab? [
-        vocab-name "Already using “" "” vocabulary" surround note.
+        vocab-name "Already using '" "' vocabulary" surround note.
     ] [
         manifest get
         [ [ ?load-vocab ] dip search-vocabs>> push ]

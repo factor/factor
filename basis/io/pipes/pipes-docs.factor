@@ -33,7 +33,7 @@ HELP: run-pipeline
     }
 }
 { $examples
-    "Print the lines of a log file which contain the string “error”, sort them and filter out duplicates, using Unix shell commands only:"
+    "Print the lines of a log file which contain the string \"error\", sort them and filter out duplicates, using Unix shell commands only:"
     { $code "{ \"cat log.txt\" \"grep error\" \"sort\" \"uniq\" } run-pipeline" }
 } ;
 

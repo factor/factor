@@ -14,11 +14,11 @@ IN: classes.tuple.parser
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [
         [
-            "Definition of slot ``" %
+            "Definition of slot '" %
             %
-            "'' in class ``" %
+            "' in class '" %
             name>> %
-            "'' shadows a superclass slot" %
+            "' shadows a superclass slot" %
         ] "" make note.
     ] with each ;
 
