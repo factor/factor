@@ -61,7 +61,7 @@ big-endian off
 : load2/1 ( -- ) -16 ds-reg temp1 temp2 LDPsoff ;
 : load2/1* ( -- ) -8 ds-reg temp1 temp2 LDPsoff ;
 : load3/2 ( -- ) -24 ds-reg temp2 temp3 LDPsoff ;
-: load-arg1/2 ( -- ) -8 ds-reg arg2 arg1 LDPsoff ;
+: load-arg1/2 ( -- ) -8 ds-reg arg2 arg1 LDPpre ;
 
 : ndrop ( n -- ) bootstrap-cells ds-reg dup SUBi ;
 
@@ -78,7 +78,6 @@ big-endian off
 : push-arg2 ( -- ) 8 ds-reg arg2 STRpre ;
 
 : push-down0 ( n -- ) neg bootstrap-cells ds-reg temp0 STRpre ;
-: push-down-arg3 ( -- ) -8 ds-reg arg3 STRpre ;
 
 : store0 ( -- ) 0 ds-reg temp0 STRuoff ;
 : store1 ( -- ) 0 ds-reg temp1 STRuoff ;
@@ -729,11 +728,11 @@ big-endian off
 
 ! Overflowing fixnum (integer) arithmetic
 : jit-overflow ( insn func -- )
-    jit-save-context
     load-arg1/2
-    [ [ arg2 arg1 arg3 ] dip call ] dip
-    push-down-arg3
-    [ 8 fixnum+fast VC B.cond ] [
+    jit-save-context
+    [ [ arg2 arg1 temp0 ] dip call ] dip
+    store0
+    [ 4 + VC B.cond ] [
         vm-reg arg3 MOVr
         jit-call
     ] jit-conditional ; inline
@@ -810,15 +809,16 @@ big-endian off
         [ SUBSr ] "overflow_fixnum_subtract" jit-overflow ] }
     ! Overflowing fixnum (integer) multiplication
     { fixnum* [
-        jit-save-context
         load-arg1/2
+        jit-save-context
         arg1 untag
         arg2 arg1 temp0 MUL
-        1 push-down0
+        store0
         arg2 arg1 temp1 SMULH
         63 temp0 temp0 ASRi
         temp0 temp1 CMPr
-        [ 8 + EQ B.cond ] [
+        [ 4 + EQ B.cond ] [
+            arg2 untag
             vm-reg arg3 MOVr
             "overflow_fixnum_multiply" jit-call
         ] jit-conditional
