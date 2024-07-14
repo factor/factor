@@ -89,7 +89,7 @@ big-endian off
 : store1/2 ( -- ) -16 ds-reg temp2 temp1 STPsoff ;
 
 ! add tag bits to integers
-:: tag ( reg -- ) tag-bits get reg reg LSLi ;
+:: tag* ( reg -- ) tag-bits get reg reg LSLi ;
 ! remove tag bits
 :: untag ( reg -- ) tag-bits get reg reg ASRi ;
 
@@ -659,7 +659,7 @@ big-endian off
     ! temp1/32 tag-mask get AND
     tag-mask get temp1 temp1 ANDi
     ! temp1/32 tag-bits get SHL
-    temp1 tag
+    temp1 tag*
     ! temp1/32 tuple type-number tag-fixnum CMP
     tuple type-number tag-fixnum temp1 CMPi
     ! [ JNE ]
@@ -967,7 +967,7 @@ big-endian off
     { fixnum/mod-fast [
         jit-fixnum-/mod
         ! tag it
-        temp2 tag
+        temp2 tag*
         ! push to stack
         store2/0
     ] }
@@ -1039,7 +1039,7 @@ big-endian off
         ! load character
         string-offset temp0 temp0 ADDi
         temp1 temp0 temp0 LDRBr
-        temp0 tag
+        temp0 tag*
         ! store character to stack
         1 push-down0
     ] }
@@ -1052,7 +1052,7 @@ big-endian off
         ! compute tag
         tag-mask get temp0 temp0 ANDi
         ! tag the tag
-        temp0 tag
+        temp0 tag*
         ! push to stack
         store0
     ] }
