@@ -409,7 +409,7 @@ TYPEDEF: Vector4 Quaternion ! Same as Vector4
 
 ERROR: invalid-vector-length obj exemplar ;
 
-: <Vector2> ( x y -- obj ) Vector2 <struct-boa> ; inline
+C: <Vector2> Vector2
 INSTANCE: Vector2 sequence
 M: Vector2 length drop 2 ; inline
 M: Vector2 nth-unsafe
@@ -426,7 +426,7 @@ M: Vector2 new-sequence
         2drop Vector2 (struct)
     ] [ invalid-vector-length ] if ; inline
 
-: <Vector3> ( x y z -- obj ) Vector3 <struct-boa> ; inline
+C: <Vector3> Vector3
 INSTANCE: Vector3 sequence
 M: Vector3 length drop 3 ; inline
 M: Vector3 nth-unsafe
@@ -447,7 +447,7 @@ M: Vector3 new-sequence
         2drop Vector3 (struct)
     ] [ invalid-vector-length ] if ; inline
 
-: <Vector4> ( x y z w -- obj ) Vector4 <struct-boa> ; inline
+C: <Vector4> Vector4
 INSTANCE: Vector4 sequence
 M: Vector4 length drop 4 ; inline
 M: Vector4 nth-unsafe
