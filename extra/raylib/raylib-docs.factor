@@ -1515,7 +1515,7 @@ HELP: <Vector2>
 { $values 
     x: float 
     y: float 
-    obj: Vector2 }
+    Vector2: Vector2 }
 { $description
     Constructs a new \ Vector2 . } ;
 
@@ -1524,7 +1524,7 @@ HELP: <Vector3>
     x: float 
     y: float 
     z: float 
-    obj: Vector3 }
+    Vector3: Vector3 }
 { $description
     Constructs a new \ Vector3 . } ;
 
@@ -1534,7 +1534,7 @@ HELP: <Vector4>
     y: float 
     z: float 
     w: float 
-    obj: Vector4 }
+    Vector4: Vector4 }
 { $description
     Constructs a new \ Vector4 . } ;
 
