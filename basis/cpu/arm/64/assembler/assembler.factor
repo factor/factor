@@ -210,6 +210,7 @@ PRIVATE>
 
 : ADDi ( uimm12 Rn Rd -- ) 2bw [ swap split-imm ] 2dip ADDi-encode ;
 : ADDr ( Rm Rn Rd -- ) 3bw [ 3 0 ] 2dip ADDer-encode ;
+: ADDSr ( Rm Rn Rd -- ) 3bw [ 3 0 ] 2dip ADDSer-encode ;
 
 : ADDV ( Vn Rd size Q -- ) -roll -rot ADDV-encode ;
 
@@ -291,7 +292,7 @@ PRIVATE>
 
 : LDUR ( simm9 Rn Rt -- ) 2bw [ swap 9 ?sbits ] 2dip LDUR-encode ;
 
-: LSLi ( uimm6 Rn Rd -- ) 2bw 2bw [ spin 6 ?ubits [ 64 swap - ] [ 63 swap - ] bi ] 
+: LSLi ( uimm6 Rn Rd -- ) 2bw 2bw [ spin 6 ?ubits [ 64 swap - ] [ 63 swap - ] bi ]
                                    2dip LSLi-encode ;
 : LSLr ( Rm Rn Rd -- ) 3bw LSLr-encode ;
 
@@ -326,6 +327,8 @@ PRIVATE>
 
 : SDIV ( Rm Rn Rd -- ) 3bw SDIV-encode ;
 
+: SMULH ( Rm Rn Rd -- ) SMULH-encode ;
+
 : STADD ( Rs Rn -- ) 2bw STADD-encode ;
 
 : STPpost ( simm10 Rn Rt2 Rt -- ) (load/store-pair) STPpost-encode ;
@@ -339,6 +342,7 @@ PRIVATE>
 
 : SUBi ( uimm12 Rn Rd -- ) 2bw [ swap split-imm ] 2dip SUBi-encode ;
 : SUBr ( Rm Rn Rd -- ) 3bw [ 3 0 ] 2dip SUBer-encode ;
+: SUBSr ( Rm Rn Rd -- ) 3bw [ 3 0 ] 2dip SUBSer-encode ;
 
 : SVC ( uimm16 -- ) 16 ?ubits SVC-encode ;
 

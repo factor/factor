@@ -804,13 +804,25 @@ big-endian off
     ! ## Math
     ! Overflowing fixnum (integer) addition
     { fixnum+ [
-        [ ADDr ] "overflow_fixnum_add" jit-overflow ] }
+        [ ADDSr ] "overflow_fixnum_add" jit-overflow ] }
     ! Overflowing fixnum (integer) subtraction
     { fixnum- [
-        [ SUBr ] "overflow_fixnum_subtract" jit-overflow ] }
+        [ SUBSr ] "overflow_fixnum_subtract" jit-overflow ] }
     ! Overflowing fixnum (integer) multiplication
     { fixnum* [
-        [ MUL ] "overflow_fixnum_multiply" jit-overflow ] }
+        jit-save-context
+        load-arg1/2
+        arg1 untag
+        arg2 arg1 temp0 MUL
+        1 push-down0
+        arg2 arg1 temp1 SMULH
+        63 temp0 temp0 ASRi
+        temp0 temp1 CMPr
+        [ 8 + EQ B.cond ] [
+            vm-reg arg3 MOVr
+            "overflow_fixnum_multiply" jit-call
+        ] jit-conditional
+    ] }
 
     ! ## Misc
     { fpu-state [
