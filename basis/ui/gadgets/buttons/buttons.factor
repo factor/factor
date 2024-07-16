@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors combinators combinators.short-circuit
-combinators.smart fry kernel locals math.vectors memoize models
-namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.packs ui.theme ui.gadgets.worlds
-ui.gestures ui.pens ui.pens.image ui.pens.solid ui.pens.tile
-ui.theme.images ;
+USING: accessors assocs colors combinators
+combinators.short-circuit combinators.smart fry kernel literals
+locals math math.vectors memoize models namespaces sequences
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens
+ui.pens.image ui.pens.polygon ui.pens.solid ui.pens.tile
+ui.theme ui.theme.images ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -130,6 +131,15 @@ PRIVATE>
         [ append theme-image ] tri-curry@ tri
     ] 2dip <tile-pen> ;
 
+: <drawn-border-button-pen> ( -- pen )
+    dim-color <solid>
+    dim-color <solid>
+    selection-color <solid>
+    roll-button-rollover-border <solid>
+    toolbar-button-pressed-background <solid>
+    <button-pen>
+    ;
+
 : <border-button-pen> ( -- pen )
     "button" transparent button-text-color
     <border-button-state-pen> dup
@@ -143,7 +153,7 @@ PRIVATE>
 : border-button-theme ( gadget -- gadget )
     dup gadget-child border-button-label-theme
     horizontal >>orientation
-    <border-button-pen> >>interior
+    <drawn-border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
     { 10 0 } >>size ; inline
 
@@ -167,6 +177,16 @@ repeat-button H{
 
 <PRIVATE
 
+CONSTANT: checkmark-dim 12
+CONSTANT: checkmark-square { { 0 0 } { 0 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim } { $ checkmark-dim 0 } } 
+: <drawn-checkmark-pen> ( -- pen )
+    roll-button-selected-background checkmark-square <polygon>
+    roll-button-selected-background checkmark-square <polygon>
+    selection-color checkmark-square <polygon>
+    roll-button-rollover-border checkmark-square <polygon>
+    toolbar-button-pressed-background checkmark-square <polygon>
+    <button-pen> ;
+
 : <checkmark-pen> ( -- pen )
     "checkbox" theme-image <image-pen>
     "checkbox" theme-image <image-pen>
@@ -177,7 +197,7 @@ repeat-button H{
 
 : <checkmark> ( -- gadget )
     <gadget>
-    <checkmark-pen> >>interior
+    <drawn-checkmark-pen> >>interior
     dup dup interior>> pen-pref-dim >>dim ;
 
 : toggle-model ( model -- )
@@ -199,6 +219,17 @@ M: checkbox model-changed
 
 <PRIVATE
 
+CONSTANT: checkmark-dim/2 $[ $ checkmark-dim 2 / ]
+CONSTANT: checkmark-rhombus { { 0 $ checkmark-dim/2 } { $ checkmark-dim/2 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim/2 } { $ checkmark-dim/2 0 } } 
+: <drawn-radio-pen> ( -- pen )
+    roll-button-selected-background checkmark-rhombus <polygon>
+    roll-button-selected-background checkmark-rhombus <polygon>
+    selection-color checkmark-rhombus <polygon>
+    roll-button-rollover-border checkmark-rhombus <polygon>
+    toolbar-button-pressed-background checkmark-rhombus <polygon>
+    <button-pen>
+    ;
+
 : <radio-pen> ( -- pen )
     "radio" theme-image <image-pen>
     "radio" theme-image <image-pen>
@@ -209,7 +240,7 @@ M: checkbox model-changed
 
 : <radio-knob> ( -- gadget )
     <gadget>
-    <radio-pen> >>interior
+    <drawn-radio-pen> >>interior checkmark-rhombus max-dims >>dim
     dup dup interior>> pen-pref-dim >>dim ;
 
 TUPLE: radio-control < button value ;
