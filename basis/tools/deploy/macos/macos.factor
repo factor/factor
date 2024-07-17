@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: cocoa.application cocoa.plists combinators io.backend
-io.directories io.files io.files.info.unix io.pathnames kernel
-make namespaces sequences system tools.deploy.backend
-tools.deploy.config tools.deploy.config.editor vocabs.loader ;
+io.directories io.files io.files.info.unix io.launcher
+io.pathnames kernel make namespaces sequences system
+tools.deploy.backend tools.deploy.config
+tools.deploy.config.editor vocabs.loader ;
 QUALIFIED-WITH: tools.deploy.unix unix
 IN: tools.deploy.macos
 
@@ -50,6 +51,13 @@ IN: tools.deploy.macos
     [ swap "Contents/Resources/Icon.icns" append-path copy-file t ]
     [ 2drop f ] if ;
 
+: add-frameworks-rpath ( vm -- )
+    {
+        "install_name_tool"
+        "-add_rpath"
+        "@executable_path/../Frameworks"
+    } swap suffix try-output-process ;
+
 : create-app-dir ( vocab bundle-name -- vm )
     {
         [
@@ -62,7 +70,8 @@ IN: tools.deploy.macos
         [ create-app-plist ]
         [ "Contents/MacOS/" append-path copy-vm ]
     } 2cleave
-    dup 0o755 set-file-permissions ;
+    dup 0o755 set-file-permissions
+    dup add-frameworks-rpath ;
 
 : bundle-name ( -- string )
     deploy-name get ".app" append ;
