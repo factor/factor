@@ -68,7 +68,7 @@ TUPLE: grid-gadget < gadget grid size timer ;
         swap >>grid
         20 >>size
         dup '[ _ [ grid>> next-step ] [ relayout-1 ] bi ]
-        f 1/5 seconds <timer> >>timer ;
+        f 1/10 seconds <timer> >>timer ;
 
 M: grid-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
@@ -87,8 +87,8 @@ M: grid-gadget pref-dim*
         new-rows new-cols make-grid :> new-grid
         rows new-rows min <iota> [| j |
             cols new-cols min <iota> [| i |
-                i j grid nth nth
-                i j new-grid nth set-nth
+                i j grid nth-unsafe nth-unsafe
+                i j new-grid nth-unsafe set-nth-unsafe
             ] each
         ] each
         new-grid gadget grid<<
@@ -97,11 +97,11 @@ M: grid-gadget pref-dim*
 :: draw-cells ( gadget -- )
     COLOR: black gl-color
     gadget size>> :> size
+    { size size } :> dim
     gadget grid>> { array } declare [| row j |
         row { bit-array } declare [| cell i |
             cell [
-                i j [ size * ] bi@ 2array
-                { size size } gl-fill-rect
+                i j [ size * ] bi@ 2array dim gl-fill-rect
             ] when
         ] each-index
     ] each-index ;
@@ -114,10 +114,10 @@ M: grid-gadget pref-dim*
     rows [0..b] [| j |
         j size * :> y
         { 0 y } { w y } gl-line
-        cols [0..b] [| i |
-            i size * :> x
-            { x 0 } { x h } gl-line
-        ] each
+    ] each
+    cols [0..b] [| i |
+        i size * :> x
+        { x 0 } { x h } gl-line
     ] each ;
 
 M: grid-gadget draw-gadget*
@@ -131,8 +131,8 @@ SYMBOL: last-click
     gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
     i 0 cols 1 - between?
     j 0 rows 1 - between? and [
-        i j gadget grid>> nth
-        [ not dup last-click set ] change-nth
+        i j gadget grid>> nth-unsafe
+        [ not dup last-click set ] change-nth-unsafe
     ] when gadget relayout-1 ;
 
 :: on-drag ( gadget -- )
@@ -141,7 +141,8 @@ SYMBOL: last-click
     gadget hand-rel first2 [ size /i ] bi@ :> ( i j )
     i 0 cols 1 - between?
     j 0 rows 1 - between? and [
-        last-click get i j gadget grid>> nth set-nth
+        last-click get i j
+        gadget grid>> nth-unsafe set-nth-unsafe
     ] when gadget relayout-1 ;
 
 : on-scroll ( gadget -- )
