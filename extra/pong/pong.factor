@@ -146,7 +146,7 @@ M:: pong-gadget draw-gadget* ( PONG -- )
     GADGET relayout-1 ;
 
 : com-new-game ( gadget -- )
-    initial-state timer>> start-timer ;
+    initial-state timer>> restart-timer ;
 
 : com-pause ( gadget -- )
     dup game-over?>> [
