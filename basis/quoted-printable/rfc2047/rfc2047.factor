@@ -1,28 +1,36 @@
 ! Copyright (C) 2024 Alex Maestas.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: base64 io.encodings io.encodings.iana io.encodings.strict
+USING: ascii base64 io.encodings.iana io.encodings.strict
 io.encodings.string kernel multiline peg.ebnf quoted-printable
-sequences splitting unicode ;
-QUALIFIED-WITH: io.encodings.ascii a
+sequences splitting ;
 IN: quoted-printable.rfc2047
 ERROR: unrecognized-charset ;
 
 : >strict-ascii ( bytes -- string )
     a:ascii strict decode ;
 
+<PRIVATE
+
+: (internet-name>charset) ( str -- enc )
+    [ >upper ] [ >lower ]
+    [ call name>encoding ] bi-curry@ bi
+    or ;
+
+PRIVATE>
+
 : internet-name>charset ( str -- enc )
-    dup "iso-" head? [ >upper ] when
-    name>encoding [ unrecognized-charset ] unless* ;
+    (internet-name>charset)
+    [ unrecognized-charset ] unless* ;
 
 <PRIVATE
 
 : (replace-underscores) ( bytes -- bytes )
-    "_" " "  ! underscore is space in Q-encoding
-    replace ;
+    "_" " " replace ;
 
 ! guaranteed to either be Q or B by parser
 : (decode-text) ( encoding text -- bytes )
-    swap "Q" = [ (replace-underscores) quoted> ] [ base64> ] if ;
+    swap "Q" =
+    [ (replace-underscores) quoted> ] [ base64> ] if ;
 
 PRIVATE>
 
@@ -32,7 +40,7 @@ EBNF: rfc2047-encoded-word
      separator="?"~
      trailer="?="~
      charset=[^? ]+ => [[ >strict-ascii internet-name>charset ]]
-     encoding= "Q" | "B"
+     encoding= "Q" | "B" | "q" | "b" => [[ >upper ]]
      text=[^? ]* => [[ >strict-ascii ]]
      token=leader charset separator encoding separator text trailer
 ]=]
