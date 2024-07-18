@@ -22,7 +22,7 @@ ERROR: unrecognized-charset ;
 
 ! guaranteed to either be Q or B by parser
 : (decode-text) ( encoding text -- bytes )
-    swap "Q" = [ quoted> (replace-underscores) ] [ base64> ] if ;
+    swap "Q" = [ (replace-underscores) quoted> ] [ base64> ] if ;
 
 PRIVATE>
 
