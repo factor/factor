@@ -3,6 +3,7 @@
 USING: ascii base64 io.encodings.iana io.encodings.strict
 io.encodings.string kernel multiline peg.ebnf quoted-printable
 sequences splitting ;
+QUALIFIED-WITH: io.encodings.ascii a
 IN: quoted-printable.rfc2047
 ERROR: unrecognized-charset ;
 
