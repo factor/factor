@@ -108,10 +108,8 @@ big-endian off
     NOP NOP f rc-absolute-cell ; inline
 
 : absolute-call ( -- word class )
-    5 words temp0 LDRl
-    push-link-reg
+    3 words temp0 LDRl
     temp0 BLR
-    pop-link-reg
     3 words Br
     NOP NOP f rc-absolute-cell ; inline
 
@@ -159,7 +157,6 @@ big-endian off
     ! instruction. After the call instruction, the contexts frame_top
     ! will point to the origin jump address.
     stack-reg temp0 MOVsp
-    16 temp0 temp0 SUBi
     context-callstack-top-offset ctx-reg temp0 STRuoff
     context-datastack-offset ctx-reg ds-reg STRuoff
     context-retainstack-offset ctx-reg rs-reg STRuoff ;
@@ -191,10 +188,8 @@ big-endian off
 
 ! Used to call a quotation if the quotation is not the last piece of code
 : jit-call-quot ( -- )
-    push-link-reg
     quot-entry-point-offset arg1 temp0 LDUR
-    temp0 BLR
-    pop-link-reg ;
+    temp0 BLR ;
 
 ! calls a quotation
 [
@@ -227,7 +222,7 @@ big-endian off
 : jit-load-return-address ( -- )
     ! RBX RSP stack-frame-size bootstrap-cell - [+] MOV ;
     0 stack-reg return-address LDRuoff
-    16 return-address return-address ADDi ;
+    3 words return-address return-address ADDi ;
 
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
@@ -245,9 +240,7 @@ big-endian off
 
 [ jit-load-return-address jit-inline-cache-miss ] [
     ! RAX CALL
-    push-link-reg
     arg1 BLR
-    pop-link-reg
 ] [
     ! RAX JMP
     arg1 BR
@@ -255,9 +248,7 @@ big-endian off
 
 [ jit-inline-cache-miss ] [
     ! RAX CALL
-    push-link-reg
     arg1 BLR
-    pop-link-reg
 ] [
     ! RAX JMP
     arg1 BR
@@ -551,9 +542,7 @@ big-endian off
     word-entry-point-offset temp0 temp0 LDUR
 ] [
     ! temp0 word-entry-point-offset [+] CALL
-    push-link-reg
     temp0 BLR
-    pop-link-reg
 ] [
     ! temp0 word-entry-point-offset [+] JMP
     temp0 BR
@@ -572,14 +561,14 @@ big-endian off
 ! Performs setup for a quotation
 [
     ! ! make room for LR plus magic number of callback, 16byte align
-    stack-frame-size stack-reg stack-reg SUBi
+    stack-frame-size 2 bootstrap-cells - stack-reg stack-reg SUBi
     push-link-reg
 ] JIT-PROLOG jit-define
 
 ! Performs teardown for a quotation
 [
     pop-link-reg
-    stack-frame-size stack-reg stack-reg ADDi
+    stack-frame-size 2 bootstrap-cells - stack-reg stack-reg ADDi
 ] JIT-EPILOG jit-define
 
 ! returns to the outer stack frame
