@@ -34,17 +34,32 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
 
+: reset-mtg-oracle-cards ( -- json )
+    scryfall-oracle-json-path ?delete-file mtg-oracle-cards ;
+
 MEMO: mtg-artwork-cards ( -- json )
     "unique_artwork" scryfall-artwork-json-path load-scryfall-json ;
+
+: reset-mtg-artwork-cards ( -- json )
+    scryfall-artwork-json-path ?delete-file mtg-artwork-cards ;
 
 MEMO: scryfall-default-cards-json ( -- json )
     "default_cards" scryfall-default-json-path load-scryfall-json ;
 
+: reset-mtg-default-cards ( -- json )
+    scryfall-default-json-path ?delete-file scryfall-default-cards-json ;
+
 MEMO: scryfall-all-cards-json ( -- json )
     "all_cards" scryfall-all-json-path load-scryfall-json ;
 
+: reset-mtg-all-cards ( -- json )
+    scryfall-all-json-path ?delete-file scryfall-all-cards-json ;
+
 MEMO: scryfall-rulings-json ( -- json )
     "rulings" scryfall-rulings-json-path load-scryfall-json ;
+
+: reset-mtg-rulings-cards ( -- json )
+    scryfall-rulings-json-path ?delete-file scryfall-rulings-json ;
 
 : ensure-scryfall-images-directory ( -- )
     scryfall-images-path make-directories ;
