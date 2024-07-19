@@ -553,7 +553,7 @@ big-endian off
     ! ds-reg bootstrap-cell SUB
     pop0
     ! temp0 word-entry-point-offset [+] JMP
-    word-entry-point-offset temp0 temp0 ADDi
+    word-entry-point-offset temp0 temp0 LDUR
     temp0 BR
 ] JIT-EXECUTE jit-define
 
@@ -690,7 +690,7 @@ big-endian off
         ! temp0 temp0 bootstrap-cell [+] MOV
         bootstrap-cell temp0 temp0 LDRuoff
         ! temp0 word-entry-point-offset [+] JMP
-        word-entry-point-offset temp0 temp0 ADDi
+        word-entry-point-offset temp0 temp0 LDUR
         temp0 BR
         ! ! fall-through on miss
     ] jit-conditional
