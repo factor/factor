@@ -20,7 +20,7 @@ M: MESSAGE_CREATE discord-chatgpt-bot drop
         "content" of "chatgpt: " ?head [
             [ blank? ] trim
             '{ { "role" "user" } { "content" _ } } >hashtable 1array
-            "gpt-3.5-turbo" <chat-completion>
+            <cheapest-chat-completion>
             [ g... gflush ] [ chat-completions ] bi
             first-chat-completion reply-message
         ] [

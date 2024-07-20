@@ -82,6 +82,9 @@ TUPLE: chat-completion model messages temperature top_p n stream
 : <chat-completion> ( messages model -- chat-completion )
     chat-completion new swap >>model swap >>messages ;
 
+: <cheapest-chat-completion> ( messages -- chat-completion )
+    "gpt-4o-mini" <chat-completion> ;
+
 : chat-completions ( chat-completion -- data )
     openai-input "chat/completions" openai-post ;
 
