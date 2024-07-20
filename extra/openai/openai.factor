@@ -1,9 +1,10 @@
 ! Copyright (C) 2023 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs hashtables http http.client
-io.encodings.string io.encodings.utf8 json json.http kernel
-mirrors namespaces sequences sorting urls ;
+USING: accessors assocs assocs.extras calendar calendar.format
+hashtables http http.client io.encodings.string
+io.encodings.utf8 json json.http kernel mirrors namespaces
+sequences sorting urls ;
 
 IN: openai
 
@@ -40,8 +41,16 @@ SYMBOL: openai-organization
 
 PRIVATE>
 
+: add-human-readable-timestamps ( models -- models )
+    [
+        dup "created" of unix-time>timestamp timestamp>rfc3339
+        "created-string" pick set-at
+    ] map ;
+
 : list-models ( -- models )
-    "models" openai-get "data" of [ "created" of ] sort-by ;
+    "models" openai-get "data" of
+    [ "created" of ] sort-by
+    add-human-readable-timestamps ;
 
 : list-model-names ( -- names )
     list-models [ "id" of ] map ;
