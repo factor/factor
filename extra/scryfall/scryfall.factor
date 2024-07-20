@@ -5,17 +5,17 @@ calendar.parser combinators combinators.short-circuit
 combinators.smart formatting grouping http.download
 images.loader images.viewer io io.directories json json.http
 kernel math math.combinatorics math.order math.parser
-math.statistics namespaces random sequences sequences.deep
-sequences.extras sequences.generalizations sets sorting
-sorting.specification splitting splitting.extras strings
+math.statistics memoize namespaces random sequences
+sequences.deep sequences.extras sequences.generalizations sets
+sorting sorting.specification splitting splitting.extras strings
 ui.gadgets.panes unicode urls ;
 IN: scryfall
 
-CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle-json"
-CONSTANT: scryfall-artwork-json-path "resource:scryfall-artwork-json"
-CONSTANT: scryfall-default-json-path "resource:scryfall-default-json"
-CONSTANT: scryfall-all-json-path "resource:scryfall-all-json"
-CONSTANT: scryfall-rulings-json-path "resource:scryfall-rulings-json"
+CONSTANT: scryfall-oracle-json-path "resource:scryfall-oracle.json"
+CONSTANT: scryfall-artwork-json-path "resource:scryfall-artwork.json"
+CONSTANT: scryfall-default-json-path "resource:scryfall-default.json"
+CONSTANT: scryfall-all-json-path "resource:scryfall-all.json"
+CONSTANT: scryfall-rulings-json-path "resource:scryfall-rulings.json"
 CONSTANT: scryfall-images-path "resource:scryfall-images/"
 
 : ?write ( str/f -- ) [ write ] when* ;
@@ -34,32 +34,37 @@ CONSTANT: scryfall-images-path "resource:scryfall-images/"
 MEMO: mtg-oracle-cards ( -- json )
     "oracle_cards" scryfall-oracle-json-path load-scryfall-json ;
 
-: reset-mtg-oracle-cards ( -- json )
-    scryfall-oracle-json-path ?delete-file mtg-oracle-cards ;
+: redownload-mtg-oracle-cards ( -- json )
+    scryfall-oracle-json-path ?delete-file
+    \ mtg-oracle-cards [ reset-memoized ] [ execute ] bi ;
 
 MEMO: mtg-artwork-cards ( -- json )
     "unique_artwork" scryfall-artwork-json-path load-scryfall-json ;
 
-: reset-mtg-artwork-cards ( -- json )
-    scryfall-artwork-json-path ?delete-file mtg-artwork-cards ;
+: redownload-mtg-artwork-cards ( -- json )
+    scryfall-artwork-json-path ?delete-file
+    \ mtg-artwork-cards [ reset-memoized ] [ execute ] bi ;
 
 MEMO: scryfall-default-cards-json ( -- json )
     "default_cards" scryfall-default-json-path load-scryfall-json ;
 
-: reset-mtg-default-cards ( -- json )
-    scryfall-default-json-path ?delete-file scryfall-default-cards-json ;
+: redownload-mtg-default-cards ( -- json )
+    scryfall-default-json-path ?delete-file
+    \ scryfall-default-cards-json [ reset-memoized ] [ execute ] bi ;
 
 MEMO: scryfall-all-cards-json ( -- json )
     "all_cards" scryfall-all-json-path load-scryfall-json ;
 
-: reset-mtg-all-cards ( -- json )
-    scryfall-all-json-path ?delete-file scryfall-all-cards-json ;
+: redownload-mtg-all-cards ( -- json )
+    scryfall-all-json-path ?delete-file
+    \ scryfall-all-cards-json [ reset-memoized ] [ execute ] bi ;
 
 MEMO: scryfall-rulings-json ( -- json )
     "rulings" scryfall-rulings-json-path load-scryfall-json ;
 
-: reset-mtg-rulings-cards ( -- json )
-    scryfall-rulings-json-path ?delete-file scryfall-rulings-json ;
+: redownload-mtg-rulings-cards ( -- json )
+    scryfall-rulings-json-path ?delete-file
+    \ scryfall-rulings-json [ reset-memoized ] [ execute ] bi ;
 
 : ensure-scryfall-images-directory ( -- )
     scryfall-images-path make-directories ;
