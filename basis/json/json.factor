@@ -1,10 +1,11 @@
 ! Copyright (C) 2006 Chris Double, 2008 Peter Burns, 2009 Philipp Winkler
 
-USING: accessors ascii assocs combinators formatting hashtables
-io io.encodings.utf16.private io.encodings.utf8 io.files
+USING: accessors ascii assocs combinators formatting io
+io.encodings.utf16.private io.encodings.utf8 io.files
 io.streams.string kernel kernel.private linked-assocs make math
 math.order math.parser mirrors namespaces sbufs sequences
-sequences.private strings summary tr words vocabs.loader ;
+sequences.private strings summary tr vectors vocabs.loader words
+;
 
 IN: json
 
@@ -144,21 +145,35 @@ DEFER: (read-json-string)
 : get-json ( objects -- obj )
     dup length 1 = [ first ] [ json-error ] if ;
 
+: check-json-depth ( quot -- )
+    [ 0 json-depth ] dip '[
+        @ json-depth get zero? [ json-error ] unless
+    ] with-variable ; inline
+
 PRIVATE>
 
-: stream-read-json ( stream -- objects )
-    0 json-depth [
+: stream-read-jsons ( stream -- objects )
+    [
         V{ } clone over '[ _ stream-read1 ] [ scan ] while* nip
-        json-depth get zero? [ json-error ] unless
-    ] with-variable ;
+    ] check-json-depth ;
 
-: read-json ( -- objects )
+: read-jsons ( -- objects )
+    input-stream get stream-read-jsons ;
+
+: stream-read-json ( stream -- object )
+    [
+        V{ } clone over '[
+            _ stream-read1 [ scan dup first vector? ] [ f ] if*
+        ] loop nip
+    ] check-json-depth get-json ;
+
+: read-json ( -- object )
     input-stream get stream-read-json ;
 
 GENERIC: json> ( string -- object )
 
 M: string json>
-    [ read-json get-json ] with-string-reader ;
+    [ read-jsons get-json ] with-string-reader ;
 
 SYMBOL: json-allow-fp-special?
 f json-allow-fp-special? set-global
@@ -334,10 +349,10 @@ M: string jsonlines>
     [ write-jsonlines ] with-string-writer ;
 
 : path>json ( path -- json )
-    utf8 [ read-json get-json ] with-file-reader ;
+    utf8 [ read-jsons get-json ] with-file-reader ;
 
 : path>jsons ( path -- jsons )
-    utf8 [ read-json ] with-file-reader ;
+    utf8 [ read-jsons ] with-file-reader ;
 
 : json>path ( json path -- )
     utf8 [ write-json ] with-file-writer ;

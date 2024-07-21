@@ -7,10 +7,14 @@ HELP: json>
 { $notes "The full name of this word could be " { $snippet "json-string>object" } "." } ;
 
 HELP: read-json
+{ $values { "object" "deserialized object" } }
+{ $description "Reads a JSON formatted strings into a Factor object. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
+
+HELP: read-jsons
 { $values { "objects" { $sequence "deserialized objects" } } }
 { $description "Reads JSON formatted strings into a vector of Factor object until the end of the stream is reached. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
 
-{ >json json> read-json write-json } related-words
+{ >json json> read-json read-jsons write-json } related-words
 
 HELP: path>json
 { $values
@@ -60,6 +64,7 @@ $nl
 { $subsections
     json>
     read-json
+    read-jsons
     path>json
     path>jsons
 }

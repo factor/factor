@@ -1,4 +1,4 @@
-USING: hashtables io.encodings.utf8 io.files io.files.unique
+USING: hashtables io io.encodings.utf8 io.files io.files.unique
 io.streams.string json json.private kernel linked-assocs
 literals math namespaces sequences strings tools.test ;
 IN: json.tests
@@ -69,7 +69,10 @@ ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
 
 { V{ LH{ { "a" "b" } } LH{ { "c" "d" } } } }
-[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-json ] with-string-reader ] unit-test
+[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-jsons ] with-string-reader ] unit-test
+
+{ LH{ { "a" "b" } } " {\"c\": \"d\"}" }
+[ "{\"a\": \"b\"} {\"c\": \"d\"}" [ read-json read-contents ] with-string-reader ] unit-test
 
 ! empty objects are allowed as values in objects
 { LH{ { "foo" LH{ } } } } [ "{ \"foo\" : {}}" json> ] unit-test
