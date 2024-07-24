@@ -1104,7 +1104,8 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : otj-cards-bonus ( -- seq ) mtg-oracle-cards "big" filter-set ;
 : otj-cards-all ( -- seq ) mtg-oracle-cards { "otj" "big" } filter-set-intersect ;
 : blb-cards ( -- seq ) mtg-oracle-cards "blb" filter-set ;
-: blb-cards-all ( -- seq ) mtg-oracle-cards { "blb" } filter-set-intersect ;
+: blb-cards-bonus ( -- seq ) mtg-oracle-cards "blc" filter-set ;
+: blb-cards-all ( -- seq ) mtg-oracle-cards { "blb" "blc" } filter-set-intersect ;
 
 ! modern
 : mh3-cards ( -- seq ) mtg-oracle-cards "mh3" filter-set ;
