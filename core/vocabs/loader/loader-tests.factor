@@ -199,3 +199,4 @@ forget-junk
 
 { t } [ "kernel" vocab-exists? >boolean ] unit-test
 { f } [ "foobar" vocab-exists? ] unit-test
+{ f } [ "invalid:/\\ \"" vocab-exists? ] unit-test
