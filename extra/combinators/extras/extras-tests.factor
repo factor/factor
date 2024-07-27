@@ -216,3 +216,30 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 
 { f } [ f ?[ 10 * ] ] unit-test
 { 20 } [ 2 ?[ 10 * ] ] unit-test
+
+
+{ f } [ 1 [ even? ] [ ] [ ] ?1if ] unit-test
+{ f } [ 1 [ even? ] [ ] ?1when ] unit-test
+{ f } [ 1 [ even? ] [ ] ?1unless ] unit-test
+
+{ 1 } [ 1 [ odd? ] [ ] [ ] ?1if ] unit-test
+{ 1 } [ 1 [ odd? ] [ ] ?1when ] unit-test
+{ 1 } [ 1 [ odd? ] [ ] ?1unless ] unit-test
+
+
+{ f f } [ 1 2 [ + even? ] [ ] [ ] ?2if ] unit-test
+{ f f } [ 1 2 [ + even? ] [ ] ?2when ] unit-test
+{ f f } [ 1 2 [ + even? ] [ ] ?2unless ] unit-test
+
+{ 1 2 } [ 1 2 [ + odd? ] [ ] [ ] ?2if ] unit-test
+{ 1 2 } [ 1 2 [ + odd? ] [ ] ?2when ] unit-test
+{ 1 2 } [ 1 2 [ + odd? ] [ ] ?2unless ] unit-test
+
+
+{ 1 2 3 } [ 1 2 3 [ + + even? ] [ ] [ ] ?3if ] unit-test
+{ 1 2 3 } [ 1 2 3 [ + + even? ] [ ] ?3when ] unit-test
+{ 1 2 3 } [ 1 2 3 [ + + even? ] [ ] ?3unless ] unit-test
+
+{ f f f } [ 1 2 3 [ + + odd? ] [ ] [ ] ?3if ] unit-test
+{ f f f } [ 1 2 3 [ + + odd? ] [ ] ?3when ] unit-test
+{ f f f } [ 1 2 3 [ + + odd? ] [ ] ?3unless ] unit-test
