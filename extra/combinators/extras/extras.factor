@@ -298,7 +298,7 @@ PRIVATE>
 
 SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
 
-: ?1guard ( ..a x y z quot: ( ..a x -- ..b ? ) -- ..b x/f ? )
+: ?1guard ( ..a x  quot: ( ..a x -- ..b ? ) -- ..b x/f ? )
     1check [ t ] [ drop f f ] if ; inline
 
 : ?2guard ( ..a x y quot: ( ..a x y -- ..b ? ) -- ..b x/f y/f ? )
