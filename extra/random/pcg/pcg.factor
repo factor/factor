@@ -74,7 +74,7 @@ M: Mwc256XXA64 random-32*
     dup '[ [ f ] [ _ next-u64 d>w/w ] if* ] change-rem drop ;
 
 INSTANCE: Mwc128XXA32 base-random
-INSTANCE: Mwc128XXA64 base-random
+INSTANCE: Mwc256XXA64 base-random
 
 ! USING: random random.pcg ;
 ! gc 0 0 random.pcg:<Mwc256XXA64> [ 10,000,000 [ dup random-32* drop ] times ] time drop
