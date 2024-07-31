@@ -592,7 +592,7 @@ FUNCTION: X509* SSL_get0_peer_certificate ( SSL* ssl )
 FUNCTION: X509* SSL_get1_peer_certificate ( SSL* ssl )
 
 : get-ssl-peer-certificate ( ssl -- x509 )
-    "SSL_get1_peer_certificate" "libssl" library-dll dlsym-raw
+    "SSL_get1_peer_certificate" "libssl" library-dll dlsym
     [ SSL_get1_peer_certificate ] [ SSL_get_peer_certificate ] if ; inline
 
 FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )

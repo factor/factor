@@ -630,7 +630,6 @@ struct factor_vm {
   void* alien_pointer();
   void primitive_dlopen();
   void primitive_dlsym();
-  void primitive_dlsym_raw();
   void primitive_dlclose();
   void primitive_dll_validp();
   char* alien_offset(cell obj);
@@ -691,7 +690,6 @@ struct factor_vm {
   void init_ffi();
   void ffi_dlopen(dll* dll);
   cell ffi_dlsym(dll* dll, symbol_char* symbol);
-  cell ffi_dlsym_raw(dll* dll, symbol_char* symbol);
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);
   void init_signals();

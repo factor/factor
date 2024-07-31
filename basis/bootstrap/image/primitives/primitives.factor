@@ -142,10 +142,6 @@ CONSTANT: all-primitives {
         {
             { "(dlopen)" ( path -- dll ) "dlopen" { byte-array } { dll } f }
             { "(dlsym)" ( name dll -- alien ) "dlsym" { byte-array object } { c-ptr } f }
-            {
-                "(dlsym-raw)" ( name dll -- alien ) "dlsym_raw"
-                { byte-array object } { c-ptr } f
-            }
             { "dlclose" ( dll -- ) "dlclose" { dll } { } f }
             { "dll-valid?" ( dll -- ? ) "dll_validp" { object } { object } f }
         }

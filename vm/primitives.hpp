@@ -18,7 +18,7 @@ namespace factor {
       _(datastack_for) _(die) _(disable_ctrl_break) _(disable_gc_events)       \
       _(dispatch_stats)                                                        \
       _(displaced_alien) _(dlclose) _(dll_validp) _(dlopen) _(dlsym)           \
-      _(dlsym_raw) _(double_bits) _(enable_ctrl_break) _(enable_gc_events)     \
+      _(double_bits) _(enable_ctrl_break) _(enable_gc_events)                  \
       _(existsp) _(exit)                                                       \
       _(fclose) _(fflush) _(fgetc) _(fixnum_divint) _(fixnum_divmod)           \
       _(fixnum_shift) _(fixnum_to_bignum) _(fixnum_to_float) _(float_add)      \
