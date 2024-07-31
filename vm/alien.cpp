@@ -125,26 +125,6 @@ void factor_vm::primitive_dlsym() {
     ctx->replace(allot_alien(ffi_dlsym(NULL, sym)));
 }
 
-// look up a symbol in a native library
-// Allocates memory
-void factor_vm::primitive_dlsym_raw() {
-  data_root<object> library(ctx->pop(), this);
-  data_root<byte_array> name(ctx->peek(), this);
-  check_tagged(name);
-
-  symbol_char* sym = name->data<symbol_char>();
-
-  if (to_boolean(library.value())) {
-    dll* d = untag_check<dll>(library.value());
-
-    if (d->handle == NULL)
-      ctx->replace(false_object);
-    else
-      ctx->replace(allot_alien(ffi_dlsym_raw(d, sym)));
-  } else
-    ctx->replace(allot_alien(ffi_dlsym_raw(NULL, sym)));
-}
-
 // close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());

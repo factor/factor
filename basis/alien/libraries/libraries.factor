@@ -9,13 +9,10 @@ PRIMITIVE: dll-valid? ( dll -- ? )
 PRIMITIVE: (dlopen) ( path -- dll )
 PRIMITIVE: (dlsym) ( name dll -- alien )
 PRIMITIVE: dlclose ( dll -- )
-PRIMITIVE: (dlsym-raw) ( name dll -- alien )
 
 : dlopen ( path -- dll ) native-string>alien (dlopen) ;
 
 : dlsym ( name dll -- alien ) [ string>symbol ] dip (dlsym) ;
-
-: dlsym-raw ( name dll -- alien ) [ string>symbol ] dip (dlsym-raw) ;
 
 HOOK: dlerror os ( -- message/f )
 
@@ -88,8 +85,7 @@ M: library dispose dll>> [ dispose ] when* ;
     lookup-library [ abi>> ] [ cdecl ] if* ;
 
 : address-of ( name library -- value )
-    2dup library-dll dlsym-raw
-    [ 2nip ] [ no-such-symbol ] if* ;
+    2dup library-dll dlsym [ 2nip ] [ no-such-symbol ] if* ;
 
 SYMBOL: deploy-libraries
 

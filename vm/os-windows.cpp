@@ -38,10 +38,6 @@ cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
                               symbol);
 }
 
-cell factor_vm::ffi_dlsym_raw(dll* dll, symbol_char* symbol) {
-  return ffi_dlsym(dll, symbol);
-}
-
 void factor_vm::ffi_dlclose(dll* dll) {
   FreeLibrary((HMODULE) dll->handle);
   dll->handle = NULL;

@@ -149,7 +149,7 @@ cell factor_vm::compute_dlsym_address(array* parameters,
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
   symbol_char* name = alien_offset(symbol);
-  cell sym = ffi_dlsym_raw(d, name);
+  cell sym = ffi_dlsym(d, name);
   sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
   return sym ? sym : undef;
 }

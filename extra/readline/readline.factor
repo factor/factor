@@ -22,7 +22,7 @@ IN: readline
     current-line readline.ffi:rl_point head ;
 
 : has-readline? ( -- ? )
-    "readline" dup library-dll dlsym-raw >boolean ;
+    "readline" dup library-dll dlsym >boolean ;
 
 : set-completion ( quot -- )
     [
