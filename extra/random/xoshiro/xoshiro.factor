@@ -68,3 +68,5 @@ STRUCT: xoshiro-256-star-star { s0 ulonglong } { s1 ulonglong } { s2 ulonglong }
 
 M: xoshiro-256-star-star random-32*
     next-256 ;
+
+INSTANCE: xoshiro-256-star-star base-random

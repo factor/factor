@@ -12,6 +12,8 @@ IN: random.mersenne-twister
 
 TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 
+INSTANCE: mersenne-twister base-random
+
 CONSTANT: n 624
 CONSTANT: m 397
 CONSTANT: a uint-array{ 0 0x9908b0df }

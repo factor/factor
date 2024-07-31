@@ -15,3 +15,5 @@ M: c-random random-32* drop rand ;
 
 : with-c-random ( quot -- )
     [ c-random ] dip with-random ; inline
+
+INSTANCE: c-random base-random

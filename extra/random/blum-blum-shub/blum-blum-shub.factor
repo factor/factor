@@ -27,3 +27,5 @@ PRIVATE>
 M: blum-blum-shub random-32*
     0 32 rot
     [ next-bbs-bit swap 1 shift bitor ] curry times ;
+
+INSTANCE: blum-blum-shub base-random

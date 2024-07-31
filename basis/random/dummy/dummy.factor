@@ -9,3 +9,5 @@ M: random-dummy seed-random
 
 M: random-dummy random-32*
     [ dup 1 + ] change-i drop ;
+
+INSTANCE: random-dummy base-random

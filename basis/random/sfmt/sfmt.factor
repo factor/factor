@@ -27,6 +27,8 @@ TUPLE: sfmt
     { uint-array uint-array }
     { uint-4-array uint-4-array } ;
 
+INSTANCE: sfmt base-random
+
 : endian-shuffle ( v -- w )
     little-endian? [
         uchar-16{ 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12 } vshuffle

@@ -11,3 +11,5 @@ M: rdrand random-32* drop rdrand32 ;
 
 : with-rdrand ( quot -- )
     [ rdrand ] dip with-random ; inline
+
+INSTANCE: rdrand base-random

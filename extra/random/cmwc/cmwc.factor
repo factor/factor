@@ -52,6 +52,8 @@ M:: cmwc random-32* ( cmwc -- n )
 
     cmwc swap '[ r>> _ w- dup ] [ i>> ] [ Q>> ] tri set-nth-unsafe ;
 
+INSTANCE: cmwc base-random
+
 : cmwc-4096 ( -- cmwc )
     4096
     [ 18782 4294967295 362436 <cmwc> ]
