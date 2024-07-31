@@ -15,6 +15,8 @@ M: unix-random dispose reader>> dispose ;
 M: unix-random random-bytes*
     reader>> stream-read ;
 
+INSTANCE: unix-random base-random
+
 HINTS: M\ unix-random random-bytes* { fixnum unix-random } ;
 
 STARTUP-HOOK: [

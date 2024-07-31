@@ -49,6 +49,8 @@ M: windows-crypto-context random-bytes*
     handle>> swap dup <byte-array>
     [ CryptGenRandom win32-error=0/f ] keep ;
 
+INSTANCE: windows-crypto-context base-random
+
 ! Some Windows installations still don't work, so just set
 ! system and secure rngs to f
 : try-crypto-providers ( seq -- windows-crypto-context/f )

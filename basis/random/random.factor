@@ -18,7 +18,18 @@ GENERIC#: seed-random 1 ( rnd seed -- rnd )
 GENERIC: random-32* ( rnd -- n )
 GENERIC: random-bytes* ( n rnd -- byte-array )
 
-M: object random-bytes*
+ERROR: not-a-random-generator ;
+
+M: not-a-random-generator summary
+    drop "Object is not a random number generator" ;
+
+M: object random-bytes* not-a-random-generator ;
+
+M: object random-32* not-a-random-generator ;
+
+MIXIN: base-random
+
+M: base-random random-bytes*
     [ integer>fixnum-strict [ (byte-array) ] keep ] dip
     [ over 4 >= ] [
         [ 4 - ] dip
@@ -27,13 +38,13 @@ M: object random-bytes*
         random-32* c:int <ref> swap head 0 pick copy-unsafe
     ] if ;
 
-M: object random-32*
+M: base-random random-32*
     4 swap random-bytes* c:uint deref ;
 
 ERROR: no-random-number-generator ;
 
 M: no-random-number-generator summary
-    drop "Random number generator is not defined." ;
+    drop "Random number generator is not defined" ;
 
 M: f random-bytes* no-random-number-generator ;
 
