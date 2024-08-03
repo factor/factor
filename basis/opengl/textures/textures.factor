@@ -403,7 +403,7 @@ TUPLE: multi-texture < disposable grid display-list loc ;
         dup grid>> make-textured-grid-display-list >>display-list
     ] with-destructors ;
 
-MEMO: normalize-by-first-texture-max-dim ( multi-texture -- norms )
+: normalize-by-first-texture-max-dim ( multi-texture -- norms )
   [ first first dim>> maximum ] [ swap '[ [ dim>> _ v/n ] map ] map ] bi ;
 
 : first-row-xs ( dims -- xs ) first flip first ;
