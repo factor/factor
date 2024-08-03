@@ -1,4 +1,3 @@
-IN: contributors.tests
-USING: contributors tools.test ;
+USING: assocs contributors tools.test ;
 
-{ } [ contributors ] unit-test
+{ f } [ contributors assoc-empty? ] unit-test
