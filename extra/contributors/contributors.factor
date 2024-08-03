@@ -9,9 +9,10 @@ IN: contributors
         "git log --no-merges --pretty=format:%aN" process-lines
     ] with-directory ;
 
-: contributors ( -- )
-    changelog histogram
-    inv-sort-values
-    simple-table. ;
+: contributors ( -- assoc )
+    changelog histogram inv-sort-values ;
 
-MAIN: contributors
+: contributors. ( -- )
+    contributors simple-table. ;
+
+MAIN: contributors.
