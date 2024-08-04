@@ -1,6 +1,6 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: checksums.sha crypto.jwt tools.test ;
+USING: base64 checksums.sha crypto.jwt tools.test strings ;
 IN: crypto.jwt.tests
 
 { "eyJhIjoiYmNkIn0" }
