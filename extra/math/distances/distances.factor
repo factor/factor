@@ -18,8 +18,19 @@ IN: math.distances
 : manhattan-distance ( a b -- n )
     1 minkowski-distance ;
 
-: chebyshev-distance ( a b -- n ) ! also chessboard-distance
+ALIAS: taxicab-distance manhattan-distance
+
+: squared-euclidian-distance ( a b -- n )
+    [ - abs sq ] 2map-sum ;
+
+: normalized-squared-euclidian-distance ( a b -- n )
+    [ dup mean v-n ] bi@
+    [ v- norm-sq ] [ [ norm-sq ] bi@ + ] 2bi / 2 / ;
+
+: chebyshev-distance ( a b -- n )
     v- vabs maximum ;
+
+ALIAS: chessboard-distance chebyshev-distance
 
 : cosine-distance ( a b -- n )
     cosine-similarity 1 swap - ;
