@@ -1,1 +1,1 @@
-Base85 encoding/decoding
+Base85 encoding/decoding (ASCII85, ADOBE85, Z85)
