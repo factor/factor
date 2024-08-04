@@ -3,6 +3,12 @@
 USING: checksums.sha crypto.jwt tools.test ;
 IN: crypto.jwt.tests
 
+{ "eyJhIjoiYmNkIn0" }
+[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt >string ] unit-test
+
+{ "{\"a\":\"bcd\"}" }
+[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt urlsafe-base64> >string ] unit-test
+
 { t } [
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.he0ErCNloe4J7Id0Ry2SEDg09lKkZkfsRiGsdX_vgEg"
     "" check-signature
@@ -22,4 +28,3 @@ IN: crypto.jwt.tests
     }
     "" sha-256 sign-jwt
 ] unit-test
-

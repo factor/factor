@@ -48,12 +48,6 @@ kernel sequences splitting strings tools.test ;
 { "01a-b_cd" } [ "\xd3V\xbeo\xf7\x1d" >urlsafe-base64 "" like ] unit-test
 { "\xd3V\xbeo\xf7\x1d" } [ "01a-b_cd" urlsafe-base64> "" like ] unit-test
 
-{ "eyJhIjoiYmNkIn0" }
-[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt >string ] unit-test
-
-{ "{\"a\":\"bcd\"}" }
-[ "{\"a\":\"bcd\"}" >urlsafe-base64-jwt urlsafe-base64> >string ] unit-test
-
 { "" } [ "" >base64 >string ] unit-test
 { "Zg==" } [ "f" >base64 >string ] unit-test
 { "Zm8=" } [ "fo" >base64 >string ] unit-test
