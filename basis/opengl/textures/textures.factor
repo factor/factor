@@ -404,27 +404,31 @@ TUPLE: multi-texture < disposable grid display-list loc ;
     ] with-destructors ;
 
 : normalize-by-first-texture-max-dim ( multi-texture -- norms )
-  [ first first dim>> maximum ] [ swap '[ [ dim>> _ v/n ] map ] map ] bi ;
+    [ first first dim>> maximum ]
+    [ swap '[ [ dim>> _ v/n ] map ] map ] bi ;
 
 : first-row-xs ( dims -- xs ) first flip first ;
-: first-col-ys ( dims -- ys ) flip first flip second ; 
+
+: first-col-ys ( dims -- ys ) flip first flip second ;
+
 : normalize-scaling-dims ( scaling-dim norms -- scaled-dim )
-  [ first-row-xs sum ] [ first-col-ys sum ] bi 2array v/ ;
+    [ first-row-xs sum ] [ first-col-ys sum ] bi 2array v/ ;
+
 : accumulate-divisions-to-grid ( scaled-dims -- x )
-  [ first-row-xs ] [ first-col-ys ] bi
-  [ 0 [ + ] accumulate nip ] bi@
-  cartesian-product flip ;
+    [ first-row-xs ] [ first-col-ys ] bi
+    [ 0 [ + ] accumulate nip ] bi@ cartesian-product flip ;
 
 : per-texture-scalings-in-grid ( norms scaled-dim -- scaled-dims ) 
-  '[ [ _ v* ] map! ] map! ;
+    '[ [ _ v* ] map! ] map! ;
+
 : shift-loc-offsets ( textures scaled-dims -- )
-  accumulate-divisions-to-grid [ [ >>loc drop ] 2each ] 2each  ;
+    accumulate-divisions-to-grid [ [ >>loc drop ] 2each ] 2each  ;
 
 M: multi-texture draw-scaled-texture
-  grid>>
-  [ normalize-by-first-texture-max-dim [ normalize-scaling-dims ] keep ]
-  [ spin per-texture-scalings-in-grid [ shift-loc-offsets ] keep ]
-  [ [ [ draw-scaled-texture ] 2each ] 2each ] tri ;
+    grid>>
+    [ normalize-by-first-texture-max-dim [ normalize-scaling-dims ] keep ]
+    [ spin per-texture-scalings-in-grid [ shift-loc-offsets ] keep ]
+    [ [ [ draw-scaled-texture ] 2each ] 2each ] tri ;
 
 M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
 
