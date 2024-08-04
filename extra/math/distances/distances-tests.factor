@@ -1,9 +1,14 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: kernel math.distances math.functions tools.test ;
+USING: kernel literals math.distances math.functions tools.test
+;
 
 { 1 } [ "hello" "jello" hamming-distance ] unit-test
+
+${ 3 sqrt } [ { 1 1 1 } { 2 2 2 } euclidian-distance ] unit-test
+{ 14 } [ { 1 2 3 } { 2 4 6 } squared-euclidian-distance ] unit-test
+{ 1/4 } [ { 1 2 3 } { 3 5 10 } normalized-squared-euclidian-distance ] unit-test
 
 { 0.0 } [ { 1 2 3 } dup cosine-distance ] unit-test
 { t } [ { 1 2 3 } { 4 5 6 } cosine-distance 0.02536815380292379 1e-10 ~ ] unit-test
