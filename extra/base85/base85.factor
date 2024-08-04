@@ -144,11 +144,11 @@ PRIVATE>
     0 [ [ 85 * ] [ 33 - ] bi* + ] reduce 4 >be ; inline
 
 : (decode-ascii85) ( stream -- )
-    "\n\r" over read1-ignoring {
+   " \t\n\r\v" over read1-ignoring {
         { CHAR: z [ B{ 0 0 0 0 } write (decode-ascii85) ] }
         { f [ drop ] }
         [
-            [ 4 "\n\r" pick read-ignoring ]
+            [ 4 " \t\n\r\v" pick read-ignoring ]
             [ prefix ] bi* dup length  {
                 { 0 [ 2drop ] }
                 { 5 [ decode5' write (decode-ascii85) ] }
