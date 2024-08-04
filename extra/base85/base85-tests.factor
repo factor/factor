@@ -19,3 +19,4 @@ USING: base85 byte-arrays kernel sequences strings tools.test ;
 { t } [ 256 <iota> >byte-array dup >adobe85 adobe85> = ] unit-test
 { "<~BOu!rD]j7BEbo7~>" } [ "hello world" >adobe85 >string ] unit-test
 { "hello world" } [ "<~BOu!rD]j7BEbo7~>" adobe85> >string ] unit-test
+{ "hello world" } [ "BOu!rD]j7BEbo7~>" adobe85> >string ] unit-test

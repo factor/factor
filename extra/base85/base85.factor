@@ -177,4 +177,4 @@ PRIVATE>
     >ascii85 "<~" "~>" surround ;
 
 : adobe85> ( adobe85 -- seq )
-    "<~" ?head t assert= "~>" ?tail t assert= ascii85> ;
+    "<~" ?head drop "~>" ?tail t assert= ascii85> ;
