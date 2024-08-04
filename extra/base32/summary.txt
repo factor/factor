@@ -1,1 +1,1 @@
-Base 32 encoding/decoding (RFC 3548)
+Base 32 encoding/decoding (RFC 3548, RFC 4648, Crockford)
