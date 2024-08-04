@@ -12,6 +12,9 @@ IN: crypto.jwt
     [ urlsafe-base64> >string json> ]
     [ ] tri* ;
 
+: >urlsafe-base64-jwt ( seq -- base64 )
+    >urlsafe-base64 [ CHAR: = = ] trim-tail ;
+
 : hmac-signature ( encoded secret/f method/f -- signature )
     [ "" or ] [ sha-256 or ] bi*
     hmac-bytes >urlsafe-base64-jwt >string ;
