@@ -121,14 +121,14 @@ CONSTANT: ascii85-alphabet $[
         5 [ 85 /mod ch>ascii85 ] B{ } replicate-as reverse! nip
     ] if-zero ; inline
 
-: (encode-ascii85) ( stream column -- )
-    4 pick stream-read dup length {
-        { 0 [ 3drop ] }
-        { 4 [ encode4' write-lines (encode-ascii85) ] }
+: (encode-ascii85) ( stream -- )
+    4 over stream-read dup length {
+        { 0 [ 2drop ] }
+        { 4 [ encode4' write (encode-ascii85) ] }
         [
             drop
             [ 4 0 pad-tail encode4' ]
-            [ length 4 swap - head-slice* write-lines ] bi
+            [ length 4 swap - head-slice* write ] bi
             (encode-ascii85)
         ]
     } case ;
@@ -136,7 +136,7 @@ CONSTANT: ascii85-alphabet $[
 PRIVATE>
 
 : encode-ascii85 ( -- )
-    input-stream get f (encode-ascii85) ;
+    input-stream get (encode-ascii85) ;
 
 <PRIVATE
 
