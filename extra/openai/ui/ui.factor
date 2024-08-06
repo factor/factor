@@ -38,7 +38,7 @@ INITIALIZED-SYMBOL: OPENAI-KEY-PATH [ "~/.config/configstore/openai-key" ]
 
 : openai-test ( -- )
     init-api-key
-    cheapest-model
+    cheapest-openai-model
     "what is the factor programming language"
     <completion> 100 >>max_tokens create-completion
     "choices" of first "text" of print ;
@@ -46,8 +46,9 @@ INITIALIZED-SYMBOL: OPENAI-KEY-PATH [ "~/.config/configstore/openai-key" ]
 
 : >q ( question -- )
     init-api-key
-    cheapest-model
-    swap <completion> 1000 >>max_tokens create-completion
+    cheapest-openai-model
+    swap <completion> 1000 >>max_tokens
+    create-completion
     "choices" of first "text" of
     listener-gadget get-tool-dim first 
     wrap-string print ; 
@@ -57,8 +58,8 @@ TUPLE: gpt-gadget < track ask response ;
 : com-send ( window -- )
     completion new
     1000 >>max_tokens
-    cheapest-model >>model
-    over ask>> editor-string  >>prompt
+    cheapest-openai-model >>model
+    over ask>> editor-string >>prompt
     create-completion
     "choices" of first "text" of
     over dim>> first wrap-result
