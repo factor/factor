@@ -15,7 +15,8 @@ SYMBOL: openai-api-key
 
 SYMBOL: openai-organization
 
-CONSTANT: cheapest-model "gpt-4o-mini"
+CONSTANT: cheapest-openai-model "gpt-4o-mini"
+CONSTANT: best-openai-model "gpt-4o-2024-08-06"
 
 <PRIVATE
 
@@ -85,7 +86,7 @@ TUPLE: chat-completion model messages temperature top_p n stream
     chat-completion new swap >>model swap >>messages ;
 
 : <cheapest-chat-completion> ( messages -- chat-completion )
-    cheapest-model <chat-completion> ;
+    cheapest-openai-model <chat-completion> ;
 
 : chat-completions ( chat-completion -- data )
     openai-input "chat/completions" openai-post ;
