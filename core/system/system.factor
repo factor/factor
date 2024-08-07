@@ -66,7 +66,6 @@ UNION: unix macos linux freebsd bsd ;
     H{
         { "windows" windows }
         { "macos" macos }
-        { "macosx" macos } ! For compatibility with VMs using the old name
         { "freebsd" freebsd }
         { "linux" linux }
     } at ;
