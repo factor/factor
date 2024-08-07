@@ -3,14 +3,14 @@ IN: base16
 
 HELP: >base16
 { $values { "seq" sequence } { "base16" sequence } }
-{ $description "Encode into Base 16 encoding." } ;
+{ $description "Encode into Base16 encoding." } ;
 
 HELP: base16>
 { $values { "base16" sequence } { "seq" sequence } }
-{ $description "Decode from Base 16 encoding." } ;
+{ $description "Decode from Base16 encoding." } ;
 
-ARTICLE: "base16" "Base 16 conversions"
-"The " { $vocab-link "base16" } " vocabulary supports encoding and decoding of the Base 16 format:"
+ARTICLE: "base16" "Base16 conversions"
+"The " { $vocab-link "base16" } " vocabulary supports encoding and decoding of the Base16 format:"
 $nl
 { $subsections
     >base16
