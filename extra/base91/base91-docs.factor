@@ -3,14 +3,14 @@ IN: base91
 
 HELP: >base91
 { $values { "seq" sequence } { "base91" sequence } }
-{ $description "Encode into Base 16 encoding." } ;
+{ $description "Encode into Base91 encoding." } ;
 
 HELP: base91>
 { $values { "base91" sequence } { "seq" sequence } }
-{ $description "Decode from Base 16 encoding." } ;
+{ $description "Decode from Base91 encoding." } ;
 
-ARTICLE: "base91" "Base 91 conversions"
-"The " { $vocab-link "base91" } " vocabulary supports encoding and decoding of the Base 91 format:"
+ARTICLE: "base91" "Base91 conversions"
+"The " { $vocab-link "base91" } " vocabulary supports encoding and decoding of the Base91 format:"
 $nl
 { $subsections
     >base91

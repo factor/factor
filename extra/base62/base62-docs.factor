@@ -3,14 +3,14 @@ IN: base62
 
 HELP: >base62
 { $values { "seq" sequence } { "base62" sequence } }
-{ $description "Encode into Base 16 encoding." } ;
+{ $description "Encode into Base62 encoding." } ;
 
 HELP: base62>
 { $values { "base62" sequence } { "seq" sequence } }
-{ $description "Decode from Base 16 encoding." } ;
+{ $description "Decode from Base62 encoding." } ;
 
-ARTICLE: "base62" "Base 62 conversions"
-"The " { $vocab-link "base62" } " vocabulary supports encoding and decoding of the Base 62 format:"
+ARTICLE: "base62" "Base62 conversions"
+"The " { $vocab-link "base62" } " vocabulary supports encoding and decoding of the Base62 format:"
 $nl
 { $subsections
     >base62
