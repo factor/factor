@@ -1890,15 +1890,9 @@ HELP: push-either
 
 HELP: sequence-hashcode
 { $values
-    { "n" integer } { "seq" sequence }
+    { "depth" integer } { "seq" sequence }
     { "x" integer } }
-{ $description "Iterates over a sequence, computes a hashcode with " { $link hashcode* } " for each element, and combines them using " { $link sequence-hashcode-step } "." } ;
-
-HELP: sequence-hashcode-step
-{ $values
-    { "oldhash" integer } { "newpart" integer }
-    { "newhash" integer } }
-{ $description "An implementation word that computes a running hashcode of a sequence using some bit-twiddling. The resulting hashcode is always a fixnum." } ;
+{ $description "Iterates over a sequence, computes a hashcode with " { $link hashcode* } " for each element, and combines them." } ;
 
 HELP: index-or-length
 { $values
