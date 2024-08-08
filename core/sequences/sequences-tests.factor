@@ -334,7 +334,7 @@ TUPLE: bogus-hashcode ;
 
 M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
-{ 0 } [ { T{ bogus-hashcode } } hashcode ] unit-test
+{ 0x31e9d070e63 } [ { T{ bogus-hashcode } } hashcode ] unit-test
 
 { { 2 4 6 } { 1 3 5 7 } } [ { 1 2 3 4 5 6 7 } [ even? ] partition ] unit-test
 
