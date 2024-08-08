@@ -117,7 +117,7 @@ CONSTANT: events-mask
     move-hand fire-motion t ;
 
 : on-leave ( win event user-data -- ? )
-    3drop forget-rollover t ;
+    3drop t ;
 
 :: on-button-press ( win event user-data -- ? )
     win window :> world

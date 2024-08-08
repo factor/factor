@@ -1,7 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data kernel opengl
-opengl.gl sequences specialized-arrays ui.gadgets ui.pens ;
+USING: accessors alien.c-types alien.data grouping kernel opengl
+opengl.gl sequences specialized-arrays
+specialized-arrays.instances.alien.c-types.float ui.gadgets
+ui.pens ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.polygon
 
@@ -11,6 +13,8 @@ interior-vertices
 interior-count
 boundary-vertices
 boundary-count ;
+
+M: polygon pen-pref-dim boundary-vertices>> 2 <groups> max-dims nip ;
 
 : close-path ( points -- points' )
     dup first suffix ;
