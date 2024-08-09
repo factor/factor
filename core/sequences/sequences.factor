@@ -774,7 +774,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 PRIVATE>
 
-: sequence-hashcode ( n seq -- x )
+: sequence-hashcode ( depth seq -- x )
     [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
