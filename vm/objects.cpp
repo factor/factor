@@ -28,14 +28,10 @@ void factor_vm::primitive_identity_hashcode() {
 
 void factor_vm::primitive_compute_identity_hashcode() {
   object* obj = untag<object>(ctx->pop());
-  cell y = object_counter;
-#ifdef FACTOR_64
-  y ^= (y<<13); y ^= (y>>17); y ^= (y<<5);
-#else
-  y ^= (y<<13); y ^= (y>>7); y ^= (y<<17);
-#endif
-  object_counter = y;
-  obj->set_hashcode(y >> TAG_BITS);
+  object_counter++;
+  if (object_counter == 0)
+    object_counter++;
+  obj->set_hashcode((cell)obj ^ object_counter);
 }
 
 void factor_vm::primitive_set_slot() {
