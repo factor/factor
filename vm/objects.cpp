@@ -35,7 +35,7 @@ void factor_vm::primitive_compute_identity_hashcode() {
   y ^= (y<<13); y ^= (y>>7); y ^= (y<<17);
 #endif
   object_counter = y;
-  obj->set_hashcode(y);
+  obj->set_hashcode(y >> TAG_BITS);
 }
 
 void factor_vm::primitive_set_slot() {
