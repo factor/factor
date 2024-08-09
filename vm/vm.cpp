@@ -35,6 +35,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
       sampler_thread(NULL)
 #endif
 {
+  srandom(time(NULL));
+  object_counter = (cell)random();
   primitive_reset_dispatch_stats();
 }
 
