@@ -2,6 +2,10 @@
 
 namespace factor {
 
+uint32_t rand32() {
+  return (uint32_t)((rand() & 0x7fff) << 17) + ((rand() & 0x7fff) << 2) + (rand() & 0x3);
+}
+
 factor_vm::factor_vm(THREADHANDLE thread)
     : ctx(NULL),
       nursery(0, 0),
@@ -36,12 +40,10 @@ factor_vm::factor_vm(THREADHANDLE thread)
 #endif
 {
   srand((unsigned int)time(NULL));
-  uint32_t r1 = (((uint16_t)rand() << 17) + ((uint16_t)rand() << 2) + ((uint16_t)rand()>>13));
-  object_counter = (cell)r1;
+  object_counter = rand32();
 #ifdef FACTOR_64
   object_counter <<= 32;
-  uint32_t r2 = (((uint16_t)rand() << 17) + ((uint16_t)rand() << 2) + ((uint16_t)rand()>>13));
-  object_counter += r2;
+  object_counter += rand32();
 #endif
   primitive_reset_dispatch_stats();
 }
