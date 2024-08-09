@@ -36,7 +36,11 @@ factor_vm::factor_vm(THREADHANDLE thread)
 #endif
 {
   srandom(time(NULL));
+#ifdef FACTOR_64
+  object_counter = ((cell)random()<<32) + random();
+#else
   object_counter = (cell)random();
+#endif
   primitive_reset_dispatch_stats();
 }
 
