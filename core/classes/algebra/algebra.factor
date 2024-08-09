@@ -193,6 +193,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
                 { [ over empty-union? ] [ 2drop t ] }
                 { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
                 { [ over anonymous-union? ] [ left-anonymous-union<= ] }
+                { [ over anonymous-predicate? ] [ [ class>> ] dip class<= ] }
                 { [ over nontrivial-anonymous-intersection? ] [ left-anonymous-intersection<= ] }
                 { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
                 { [ dup class-members ] [ right-union<= ] }
