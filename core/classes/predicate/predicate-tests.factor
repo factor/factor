@@ -12,6 +12,13 @@ PREDICATE: positive < integer 0 > ;
 { f } [ negative negative class< ] unit-test
 { f } [ positive negative class< ] unit-test
 
+{ t } [ predicate{ integer [ 0 < ] } integer class< ] unit-test
+{ t } [ predicate{ integer [ 0 > ] } integer class< ] unit-test
+{ f } [ integer predicate{ integer [ 0 < ] } class< ] unit-test
+{ f } [ integer predicate{ integer [ 0 > ] } class< ] unit-test
+{ f } [ predicate{ integer [ 0 < ] } predicate{ integer [ 0 < ] } class< ] unit-test
+{ f } [ predicate{ integer [ 0 > ] } predicate{ integer [ 0 < ] } class< ] unit-test
+
 GENERIC: abs ( n -- n )
 M: integer abs ;
 M: negative abs -1 * ;
