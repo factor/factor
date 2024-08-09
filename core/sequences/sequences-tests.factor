@@ -1,6 +1,7 @@
-USING: arrays assocs byte-arrays generic.single kernel make math
-math.functions math.order math.parser math.vectors sbufs
-sequences sequences.private strings tools.test vectors ;
+USING: arrays assocs byte-arrays generic.single kernel layouts
+literals make math math.functions math.order math.parser
+math.vectors sbufs sequences sequences.private strings
+tools.test vectors ;
 IN: sequences.tests
 
 { "empty" } [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
@@ -334,7 +335,7 @@ TUPLE: bogus-hashcode ;
 
 M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
-{ 0x31e9d070e63 } [ { T{ bogus-hashcode } } hashcode ] unit-test
+${ 64-bit? 0x31e9d070e63 -0x2f8f19d ? } [ { T{ bogus-hashcode } } hashcode ] unit-test
 
 { { 2 4 6 } { 1 3 5 7 } } [ { 1 2 3 4 5 6 7 } [ even? ] partition ] unit-test
 
