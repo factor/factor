@@ -35,7 +35,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
       sampler_thread(NULL)
 #endif
 {
-  srand(time(NULL));
+  srand((unsigned int)time(NULL));
   uint32_t r1 = (((uint16_t)rand() << 17) + ((uint16_t)rand() << 2) + ((uint16_t)rand()>>13));
   object_counter = (cell)r1;
 #ifdef FACTOR_64
