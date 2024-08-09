@@ -7,12 +7,6 @@ img {
     height: auto;
 }
 
-table, th, td {
-  border: 1px solid lightgrey;
-  border-collapse: collapse;
-  border-style: dashed;
-}
-
 th,td:last-child {
     text-align: left;
 }
