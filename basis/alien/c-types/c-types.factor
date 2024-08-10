@@ -323,65 +323,59 @@ M: pointer lookup-c-type
         [ >float ] >>unboxer-quot
     \ double typedef
 
+    <c-type>
+        fixnum >>class
+        fixnum >>boxed-class
+        [ alien-signed-4 ] >>getter
+        [ set-alien-signed-4 ] >>setter
+        4 >>size
+        t >>signed
+        4 >>align
+        4 >>align-first
+        "from_signed_4" >>boxer
+        "to_signed_4" >>unboxer
+        [ >fixnum ] >>unboxer-quot
+    \ int typedef
+
+    <c-type>
+        fixnum >>class
+        fixnum >>boxed-class
+        [ alien-unsigned-4 ] >>getter
+        [ set-alien-unsigned-4 ] >>setter
+        4 >>size
+        4 >>align
+        4 >>align-first
+        "from_unsigned_4" >>boxer
+        "to_unsigned_4" >>unboxer
+        [ >fixnum ] >>unboxer-quot
+    \ uint typedef
+
+    cell 8 = [ <c-type> ] [ <long-long-type> ] if
+        integer >>class
+        integer >>boxed-class
+        [ alien-signed-8 ] >>getter
+        [ set-alien-signed-8 ] >>setter
+        8 >>size
+        t >>signed
+        8-byte-alignment
+        "from_signed_8" >>boxer
+        "to_signed_8" >>unboxer
+        [ >integer ] >>unboxer-quot
+    \ longlong typedef
+
+    cell 8 = [ <c-type> ] [ <long-long-type> ] if
+        integer >>class
+        integer >>boxed-class
+        [ alien-unsigned-8 ] >>getter
+        [ set-alien-unsigned-8 ] >>setter
+        8 >>size
+        8-byte-alignment
+        "from_unsigned_8" >>boxer
+        "to_unsigned_8" >>unboxer
+        [ >integer ] >>unboxer-quot
+    \ ulonglong typedef
+
     cell 8 = [
-        ! 64bit-vm int
-        <c-type>
-            fixnum >>class
-            fixnum >>boxed-class
-            [ alien-signed-4 ] >>getter
-            [ set-alien-signed-4 ] >>setter
-            4 >>size
-            t >>signed
-            4 >>align
-            4 >>align-first
-            "from_signed_4" >>boxer
-            "to_signed_4" >>unboxer
-            [ >fixnum ] >>unboxer-quot
-        \ int typedef
-
-        ! 64bit-vm uint
-        <c-type>
-            fixnum >>class
-            fixnum >>boxed-class
-            [ alien-unsigned-4 ] >>getter
-            [ set-alien-unsigned-4 ] >>setter
-            4 >>size
-            4 >>align
-            4 >>align-first
-            "from_unsigned_4" >>boxer
-            "to_unsigned_4" >>unboxer
-            [ >fixnum ] >>unboxer-quot
-        \ uint typedef
-
-        ! 64bit-vm longlong
-        <c-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-signed-cell ] >>getter
-            [ set-alien-signed-cell ] >>setter
-            8 >>size
-            t >>signed
-            8 >>align
-            8 >>align-first
-            "from_signed_cell" >>boxer
-            "to_signed_8" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ longlong typedef
-
-        ! 64bit-vm ulonglong
-        <c-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-unsigned-cell ] >>getter
-            [ set-alien-unsigned-cell ] >>setter
-            8 >>size
-            8 >>align
-            8 >>align-first
-            "from_unsigned_cell" >>boxer
-            "to_cell" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ ulonglong typedef
-
         os windows? [
             \ int lookup-c-type \ long typedef
             \ uint lookup-c-type \ ulong typedef
@@ -399,62 +393,6 @@ M: pointer lookup-c-type
         \ longlong lookup-c-type \ isize typedef
         \ ulonglong lookup-c-type \ usize typedef
     ] [
-        ! 32bit-vm int
-        <c-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-signed-cell ] >>getter
-            [ set-alien-signed-cell ] >>setter
-            4 >>size
-            t >>signed
-            4 >>align
-            4 >>align-first
-            "from_signed_cell" >>boxer
-            "to_fixnum" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ int typedef
-
-        ! 32bit-vm uint
-        <c-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-unsigned-cell ] >>getter
-            [ set-alien-unsigned-cell ] >>setter
-            4 >>size
-            4 >>align
-            4 >>align-first
-            "from_unsigned_cell" >>boxer
-            "to_cell" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ uint typedef
-
-        ! 32bit-vm longlong
-        <long-long-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-signed-8 ] >>getter
-            [ set-alien-signed-8 ] >>setter
-            8 >>size
-            t >>signed
-            8-byte-alignment
-            "from_signed_8" >>boxer
-            "to_signed_8" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ longlong typedef
-
-        ! 32bit-vm ulonglong
-        <long-long-type>
-            integer >>class
-            integer >>boxed-class
-            [ alien-unsigned-8 ] >>getter
-            [ set-alien-unsigned-8 ] >>setter
-            8 >>size
-            8-byte-alignment
-            "from_unsigned_8" >>boxer
-            "to_unsigned_8" >>unboxer
-            [ >integer ] >>unboxer-quot
-        \ ulonglong typedef
-
         \ int lookup-c-type \ long typedef
         \ uint lookup-c-type \ ulong typedef
 
