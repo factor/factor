@@ -75,10 +75,12 @@ M: c-type unbox
             { "to_unsigned_1" [ drop ] }
             { "to_signed_2" [ drop ] }
             { "to_unsigned_2" [ drop ] }
-            { "to_signed_4" [ drop ] }
-            { "to_unsigned_4" [ drop ] }
             { "alien_offset" [ drop ^^unbox-any-c-ptr ] }
-            [ swap ^^unbox ]
+            [
+                dup { "to_signed_4" "to_unsigned_4" } member?
+                [ cell 8 = not ] [ t ] if
+                [ swap ^^unbox ] [ 2drop ] if
+            ]
         } case 1array
     ]
     [ drop f f 3array 1array ] 2bi record-reg-reps ;
