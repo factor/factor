@@ -182,8 +182,6 @@ ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
     alien-unsigned-2
     alien-signed-4
     alien-unsigned-4
-    alien-signed-cell
-    alien-unsigned-cell
     alien-signed-8
     alien-unsigned-8
     alien-float
@@ -197,8 +195,6 @@ ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
     set-alien-unsigned-2
     set-alien-signed-4
     set-alien-unsigned-4
-    set-alien-signed-cell
-    set-alien-unsigned-cell
     set-alien-signed-8
     set-alien-unsigned-8
     set-alien-float
