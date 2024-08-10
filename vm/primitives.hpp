@@ -41,8 +41,6 @@ namespace factor {
       _(wrapper)
 
 #define EACH_ALIEN_PRIMITIVE(_)                               \
-      _(signed_cell, fixnum, from_signed_cell, to_fixnum)     \
-      _(unsigned_cell, cell, from_unsigned_cell, to_cell)     \
       _(signed_8, int64_t, from_signed_8, to_signed_8)        \
       _(unsigned_8, uint64_t, from_unsigned_8, to_unsigned_8) \
       _(signed_4, int32_t, from_signed_cell, to_fixnum)       \

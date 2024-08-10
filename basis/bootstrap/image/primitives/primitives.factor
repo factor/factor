@@ -60,10 +60,6 @@ CONSTANT: all-primitives {
                 { c-ptr integer } { integer } make-flushable
             }
             {
-                "alien-signed-cell" ( c-ptr n -- value ) "alien_signed_cell"
-                { c-ptr integer } { integer } make-flushable
-            }
-            {
                 "alien-unsigned-1" ( c-ptr n -- value ) "alien_unsigned_1"
                 { c-ptr integer } { fixnum } make-flushable
             }
@@ -77,10 +73,6 @@ CONSTANT: all-primitives {
             }
             {
                 "alien-unsigned-8" ( c-ptr n -- value ) "alien_unsigned_8"
-                { c-ptr integer } { integer } make-flushable
-            }
-            {
-                "alien-unsigned-cell" ( c-ptr n -- value ) "alien_unsigned_cell"
                 { c-ptr integer } { integer } make-flushable
             }
             {
@@ -112,10 +104,6 @@ CONSTANT: all-primitives {
                 { integer c-ptr integer } { } f
             }
             {
-                "set-alien-signed-cell" ( value c-ptr n -- ) "set_alien_signed_cell"
-                { integer c-ptr integer } { } f
-            }
-            {
                 "set-alien-unsigned-1" ( value c-ptr n -- ) "set_alien_unsigned_1"
                 { integer c-ptr integer } { } f
             }
@@ -129,10 +117,6 @@ CONSTANT: all-primitives {
             }
             {
                 "set-alien-unsigned-8" ( value c-ptr n -- ) "set_alien_unsigned_8"
-                { integer c-ptr integer } { } f
-            }
-            {
-                "set-alien-unsigned-cell" ( value c-ptr n -- ) "set_alien_unsigned_cell"
                 { integer c-ptr integer } { } f
             }
         }
