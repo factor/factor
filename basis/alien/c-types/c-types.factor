@@ -324,8 +324,8 @@ M: pointer lookup-c-type
     \ double typedef
 
     <c-type>
-        cell 8 = fixnum integer ? >>class
-        cell 8 = fixnum integer ? >>boxed-class
+        fixnum >>class
+        fixnum >>boxed-class
         [ alien-signed-4 ] >>getter
         [ set-alien-signed-4 ] >>setter
         4 >>size
@@ -334,12 +334,12 @@ M: pointer lookup-c-type
         4 >>align-first
         "from_signed_4" >>boxer
         "to_signed_4" >>unboxer
-        cell 8 = [ >fixnum ] [ >integer ] ? >>unboxer-quot
+        [ >fixnum ] >>unboxer-quot
     \ int typedef
 
     <c-type>
-        cell 8 = fixnum integer ? >>class
-        cell 8 = fixnum integer ? >>boxed-class
+        fixnum >>class
+        fixnum >>boxed-class
         [ alien-unsigned-4 ] >>getter
         [ set-alien-unsigned-4 ] >>setter
         4 >>size
@@ -347,7 +347,7 @@ M: pointer lookup-c-type
         4 >>align-first
         "from_unsigned_4" >>boxer
         "to_unsigned_4" >>unboxer
-        cell 8 = [ >fixnum ] [ >integer ] ? >>unboxer-quot
+        [ >fixnum ] >>unboxer-quot
     \ uint typedef
 
     cell 8 = [ <c-type> ] [ <long-long-type> ] if
