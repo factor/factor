@@ -329,8 +329,6 @@ TUPLE: some-tuple x ;
 { 1 } [ B{ 0 0 0 0 } [ 0 alien-unsigned-4 1 + ] compile-call ] unit-test
 { 1 } [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-8 1 + ] compile-call ] unit-test
 { 1 } [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-8 1 + ] compile-call ] unit-test
-{ 1 } [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-cell 1 + ] compile-call ] unit-test
-{ 1 } [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-cell 1 + ] compile-call ] unit-test
 
 : deep-find-test ( seq -- ? ) [ 5 = ] deep-find ;
 

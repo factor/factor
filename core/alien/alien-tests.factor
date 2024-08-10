@@ -42,19 +42,10 @@ IN: alien.tests
     "dump" get 0 alien-signed-8
 ] unit-test
 
-cell 8 = [
-    [ 0x123412341234 ] [
-      8 <byte-array>
-      0x123412341234 over 0 set-alien-signed-8
-      0 alien-signed-8
-    ] unit-test
-
-    [ 0x123412341234 ] [
-      8 <byte-array>
-      0x123412341234 over 0 set-alien-signed-cell
-      0 alien-signed-cell
-    ] unit-test
-] when
+[ 0x123412341234 ] [
+    0x123412341234 "dump" get 0 set-alien-signed-8
+    "dump" get 0 alien-signed-8
+] unit-test
 
 { "ALIEN: 1234" } [ 0x1234 <alien> unparse ] unit-test
 
