@@ -119,7 +119,7 @@ cpu x86.32?
         T{ ##unbox
            { dst 4 }
            { src 3 }
-           { unboxer "to_fixnum" }
+           { unboxer "to_cell" }
            { rep int-rep }
         }
     }

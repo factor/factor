@@ -42,7 +42,7 @@ cpu x86.32?
         T{ ##unbox
            { dst 1 }
            { src 20 }
-           { unboxer "to_fixnum" }
+           { unboxer "to_cell" }
            { rep int-rep }
          }
     }
@@ -130,7 +130,7 @@ cpu x86.32?
         T{ ##unbox
            { dst 1 }
            { src 77 }
-           { unboxer "to_fixnum" }
+           { unboxer "to_cell" }
            { rep int-rep }
         }
     }
