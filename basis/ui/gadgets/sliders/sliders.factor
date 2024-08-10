@@ -257,7 +257,7 @@ TUPLE: drawn-slider-pen < slider-pen ;
 : <labelled-up-button> ( orientation -- button ) -1 "<" "^" <slide-label-button> ;
 : <labelled-down-button> ( orientation -- button ) 1 ">" "v" <slide-label-button> ;
 
-CONSTANT: scroll-arrow-dim 6
+CONSTANT: scroll-arrow-dim 10
 CONSTANT: scroll-arrow-dim/2 $[ $ scroll-arrow-dim 2 / ]
 CONSTANT: up-triangle-points { { 0 $ scroll-arrow-dim } { $ scroll-arrow-dim/2 0 } { $ scroll-arrow-dim $ scroll-arrow-dim } }
 CONSTANT: left-triangle-points { { 0 $ scroll-arrow-dim/2 } { $ scroll-arrow-dim  0 } { $ scroll-arrow-dim $ scroll-arrow-dim } }
@@ -273,8 +273,7 @@ CONSTANT: right-triangle-points { { 0 $ scroll-arrow-dim } { $ scroll-arrow-dim 
 
 M: drawn-slider-pen pen-pref-dim 2drop { 2 2 } ;
 : slider-required-width ( slider -- min-dim )
-    ! drop ${ scroll-arrow-dim scroll-arrow-dim } ;
-    children>> [ button? ] filter first pref-dim* ;
+    children>> [ button? ] filter first pref-dim ;
 M: drawn-slider pref-dim*
     [ dup slider-enabled? [ t >>visible? slider-required-width ] [ f >>visible? drop { 0 0 } ] if ]
     [ drop { 100 100 } ]
@@ -294,33 +293,21 @@ M: drawn-slider pref-dim*
             [ <drawn-down-button> f track-add ]
         } cleave ;
 
-: scale-polygon ( button scale -- )
-    '[ [ _ * ] map! drop ] [ gadget-child interior>> [ interior-vertices>> ] [ boundary-vertices>> ] bi ] dip bi@ ;
-: reset-polygon-dims ( button -- )
-    dup gadget-child [ interior>> boundary-vertices>> 2 <groups> max-dims [ >>dim drop ] keep ] keep dim<< ;
-: wider-slider ( drawn-slider -- )
-    children>> [ button? ] filter [ [ 2 scale-polygon ] [ reset-polygon-dims ] [ relayout ] tri ] each ;
-: thinner-slider ( drawn-slider -- )
-    children>> [ button? ] filter [ [ 1/2 scale-polygon ] [ reset-polygon-dims ] [ relayout ] tri ] each ;
+: <tile-image-slider> ( range orientation -- slider )
+    slider new-track
+        swap >>model
+        16 >>line
+        dup orientation>> {
+            [ <slider-pen> >>interior ]
+            [ <thumb> >>thumb ]
+            [ <elevator> >>elevator ]
+            [ drop dup add-thumb-to-elevator 1 track-add ]
+            [ <up-button> f track-add ]
+            [ <down-button> f track-add ]
+            [ drop <gadget> { 1 1 } >>dim f track-add ]
+        } cleave ;
 
-! why does mouse-leave trigger on a button-up condition?
-drawn-slider "expand" f {
-  { mouse-enter wider-slider }
-  { mouse-leave thinner-slider }
-} define-command-map
 PRIVATE>
 
 : <slider> ( range orientation -- slider )
     <drawn-slider> ;
-    ! slider new-track
-    !     swap >>model
-    !     16 >>line
-    !     dup orientation>> {
-    !         [ <slider-pen> >>interior ]
-    !         [ <thumb> >>thumb ]
-    !         [ <elevator> >>elevator ]
-    !         [ drop dup add-thumb-to-elevator 1 track-add ]
-    !         [ <up-button> f track-add ]
-    !         [ <down-button> f track-add ]
-    !         [ drop <gadget> { 1 1 } >>dim f track-add ]
-    !     } cleave ;
