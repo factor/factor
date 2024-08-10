@@ -410,7 +410,7 @@ M: pointer lookup-c-type
             4 >>align
             4 >>align-first
             "from_signed_cell" >>boxer
-            "to_fixnum" >>unboxer
+            "to_cell" >>unboxer
             [ >integer ] >>unboxer-quot
         \ int typedef
 
