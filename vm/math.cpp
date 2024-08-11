@@ -332,7 +332,7 @@ void factor_vm::primitive_bits_double() {
       case FIXNUM_TYPE:                                 \
         return (type)untag_fixnum(tagged);              \
       case BIGNUM_TYPE:                                 \
-        return converter(untag<bignum>(tagged));        \
+        return (type)converter(untag<bignum>(tagged));        \
       default:                                          \
         type_error(FIXNUM_TYPE, tagged);                \
         return 0; /* can't happen */                    \
