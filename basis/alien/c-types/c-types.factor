@@ -174,7 +174,7 @@ TUPLE: long-long-type < c-type ;
     pick void? [ drop nip call ] [ nip call ] if ; inline
 
 SYMBOLS:
-    ptrdiff_t intptr_t uintptr_t size_t
+    ptrdiff_t intptr_t uintptr_t size_t ssize_t
     c-string int8_t uint8_t int16_t uint16_t
     int32_t uint32_t int64_t uint64_t ;
 
@@ -392,8 +392,9 @@ M: pointer lookup-c-type
 
         \ longlong lookup-c-type \ ptrdiff_t typedef
         \ longlong lookup-c-type \ intptr_t typedef
-
         \ ulonglong lookup-c-type \ uintptr_t typedef
+
+        \ longlong lookup-c-type \ ssize_t typedef
         \ ulonglong lookup-c-type \ size_t typedef
 
         \ longlong lookup-c-type \ isize typedef
@@ -460,8 +461,9 @@ M: pointer lookup-c-type
 
         \ int lookup-c-type \ ptrdiff_t typedef
         \ int lookup-c-type \ intptr_t typedef
-
         \ uint lookup-c-type \ uintptr_t typedef
+
+        \ int lookup-c-type \ ssize_t typedef
         \ uint lookup-c-type \ size_t typedef
 
         \ int lookup-c-type \ isize typedef
