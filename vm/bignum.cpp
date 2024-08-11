@@ -423,10 +423,12 @@ FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
 
 BIGNUM_TO_FOO(cell, cell, fixnum, cell)
 BIGNUM_TO_FOO(fixnum, fixnum, fixnum, cell)
-BIGNUM_TO_FOO(int32, int32_t, int32_t, uint64_t)
-BIGNUM_TO_FOO(uint32, uint32_t, int32_t, uint64_t)
 BIGNUM_TO_FOO(int64, int64_t, int64_t, uint64_t)
 BIGNUM_TO_FOO(uint64, uint64_t, int64_t, uint64_t)
+#ifndef FACTOR_64
+BIGNUM_TO_FOO(int32, int32_t, int32_t, uint32_t)
+BIGNUM_TO_FOO(uint32, uint32_t, int32_t, uint32_t)
+#endif
 
 bool bignum_fits_fixnum_p(bignum* bn) {
   fixnum len = BIGNUM_LENGTH(bn);

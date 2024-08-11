@@ -45,7 +45,9 @@ cell bignum_to_cell(bignum* bn);
 fixnum bignum_to_fixnum(bignum* bn);
 int64_t bignum_to_int64(bignum* bn);
 uint64_t bignum_to_uint64(bignum* bn);
+#ifndef FACTOR_64
 int32_t bignum_to_int32(bignum* bn);
 uint32_t bignum_to_uint32(bignum* bn);
+#endif
 
 }
