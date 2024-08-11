@@ -142,10 +142,18 @@ M: c-type box
         { "from_unsigned_1" [ drop c:uchar ^^convert-integer ] }
         { "from_signed_2" [ drop c:short ^^convert-integer ] }
         { "from_unsigned_2" [ drop c:ushort ^^convert-integer ] }
-        { "from_signed_4" [ drop c:int ^^convert-integer ] }
-        { "from_unsigned_4" [ drop c:uint ^^convert-integer ] }
         { "allot_alien" [ drop ^^box-alien ] }
-        [ swap <gc-map> ^^box ]
+        [
+            cell 8 = [
+                {
+                    { [ dup "from_signed_4" = ] [ c:int ] }
+                    { [ dup "from_unsigned_4" = ] [ c:uint ] }
+                    [ f ]
+                } cond
+            ] [ f ] if
+            [ 2nip ^^convert-integer ]
+            [ swap <gc-map> ^^box ] if*
+        ]
     } case ;
 
 M: long-long-type box
