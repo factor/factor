@@ -357,8 +357,8 @@ M: pointer lookup-c-type
         <c-type>
             integer >>class
             integer >>boxed-class
-            [ alien-signed-cell ] >>getter
-            [ set-alien-signed-cell ] >>setter
+            [ alien-signed-8 ] >>getter
+            [ set-alien-signed-8 ] >>setter
             8 >>size
             t >>signed
             8 >>align
@@ -372,8 +372,8 @@ M: pointer lookup-c-type
         <c-type>
             integer >>class
             integer >>boxed-class
-            [ alien-unsigned-cell ] >>getter
-            [ set-alien-unsigned-cell ] >>setter
+            [ alien-unsigned-8 ] >>getter
+            [ set-alien-unsigned-8 ] >>setter
             8 >>size
             8 >>align
             8 >>align-first
@@ -403,8 +403,8 @@ M: pointer lookup-c-type
         <c-type>
             integer >>class
             integer >>boxed-class
-            [ alien-signed-cell ] >>getter
-            [ set-alien-signed-cell ] >>setter
+            [ alien-signed-4 ] >>getter
+            [ set-alien-signed-4 ] >>setter
             4 >>size
             t >>signed
             4 >>align
@@ -418,8 +418,8 @@ M: pointer lookup-c-type
         <c-type>
             integer >>class
             integer >>boxed-class
-            [ alien-unsigned-cell ] >>getter
-            [ set-alien-unsigned-cell ] >>setter
+            [ alien-unsigned-4 ] >>getter
+            [ set-alien-unsigned-4 ] >>setter
             4 >>size
             4 >>align
             4 >>align-first
