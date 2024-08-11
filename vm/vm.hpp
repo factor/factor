@@ -446,8 +446,8 @@ struct factor_vm {
   void primitive_fixnum_divmod();
   bignum* fixnum_to_bignum(fixnum);
   bignum* cell_to_bignum(cell);
-  bignum* long_long_to_bignum(int64_t n);
-  bignum* ulong_long_to_bignum(uint64_t n);
+  bignum* int64_to_bignum(int64_t n);
+  bignum* uint64_to_bignum(uint64_t n);
 #ifndef FACTOR_64
   bignum* int32_to_bignum(int32_t n);
   bignum* uint32_to_bignum(uint32_t n);

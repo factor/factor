@@ -345,8 +345,8 @@ void factor_vm::primitive_bits_double() {
 CELL_TO_FOO(to_fixnum, fixnum, bignum_to_fixnum)
 CELL_TO_FOO(to_fixnum_strict, fixnum, bignum_to_fixnum_strict)
 CELL_TO_FOO(to_cell, cell, bignum_to_cell)
-CELL_TO_FOO(to_signed_8, int64_t, bignum_to_long_long)
-CELL_TO_FOO(to_unsigned_8, uint64_t, bignum_to_ulong_long)
+CELL_TO_FOO(to_signed_8, int64_t, bignum_to_int64)
+CELL_TO_FOO(to_unsigned_8, uint64_t, bignum_to_uint64)
 CELL_TO_FOO(to_signed_4, int32_t, bignum_to_int32)
 CELL_TO_FOO(to_unsigned_4, uint32_t, bignum_to_uint32)
 
@@ -363,7 +363,7 @@ VM_C_API cell from_unsigned_cell(cell integer, factor_vm* parent) {
 // Allocates memory
 cell factor_vm::from_signed_8(int64_t n) {
   if (n < fixnum_min || n > fixnum_max)
-    return tag<bignum>(long_long_to_bignum(n));
+    return tag<bignum>(int64_to_bignum(n));
   else
     return tag_fixnum((fixnum)n);
 }
@@ -375,7 +375,7 @@ VM_C_API cell from_signed_8(int64_t n, factor_vm* parent) {
 // Allocates memory
 cell factor_vm::from_unsigned_8(uint64_t n) {
   if (n > (uint64_t)fixnum_max)
-    return tag<bignum>(ulong_long_to_bignum(n));
+    return tag<bignum>(uint64_to_bignum(n));
   else
     return tag_fixnum((fixnum)n);
 }
