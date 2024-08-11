@@ -61,9 +61,13 @@ VM_C_API cell from_signed_cell(fixnum integer, factor_vm* vm);
 VM_C_API cell from_unsigned_cell(cell integer, factor_vm* vm);
 VM_C_API cell from_signed_8(int64_t n, factor_vm* vm);
 VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* vm);
+VM_C_API cell from_signed_4(int32_t n, factor_vm* vm);
+VM_C_API cell from_unsigned_4(uint32_t n, factor_vm* vm);
 
 VM_C_API int64_t to_signed_8(cell obj, factor_vm* parent);
 VM_C_API uint64_t to_unsigned_8(cell obj, factor_vm* parent);
+VM_C_API int32_t to_signed_4(cell obj, factor_vm* parent);
+VM_C_API uint32_t to_unsigned_4(cell obj, factor_vm* parent);
 
 VM_C_API fixnum to_fixnum(cell tagged, factor_vm* vm);
 VM_C_API cell to_cell(cell tagged, factor_vm* vm);
