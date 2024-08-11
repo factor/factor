@@ -18,7 +18,6 @@ TYPEDEF: __int64_t  off_t
 TYPEDEF: __int64_t  blkcnt_t
 TYPEDEF: __int64_t  ino64_t
 TYPEDEF: __int32_t  blksize_t
-TYPEDEF: long       ssize_t
 TYPEDEF: __int32_t  pid_t
 TYPEDEF: long       time_t
 TYPEDEF: uint mach_port_t

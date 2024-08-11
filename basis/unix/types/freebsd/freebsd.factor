@@ -17,7 +17,6 @@ TYPEDEF: __int64_t  blkcnt_t
 TYPEDEF: __int64_t  ino64_t
 TYPEDEF: __int32_t  blksize_t
 TYPEDEF: __uint32_t fflags_t
-TYPEDEF: long       ssize_t
 TYPEDEF: int        pid_t
 TYPEDEF: long       time_t
 TYPEDEF: __uint64_t fsblkcnt_t
