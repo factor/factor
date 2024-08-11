@@ -398,6 +398,10 @@ FOO_TO_BIGNUM_SIGNED(fixnum, fixnum, cell)
 FOO_TO_BIGNUM_UNSIGNED(cell, cell, cell)
 FOO_TO_BIGNUM_SIGNED(long_long, int64_t, uint64_t)
 FOO_TO_BIGNUM_UNSIGNED(ulong_long, uint64_t, uint64_t)
+#ifndef FACTOR_64
+FOO_TO_BIGNUM_SIGNED(int32, int32_t, uint32_t)
+FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
+#endif
 
 // cannot allocate memory
 // bignum_to_cell, fixnum_to_cell, long_long_to_cell, ulong_long_to_cell
@@ -418,6 +422,8 @@ FOO_TO_BIGNUM_UNSIGNED(ulong_long, uint64_t, uint64_t)
 
 BIGNUM_TO_FOO(cell, cell, fixnum, cell)
 BIGNUM_TO_FOO(fixnum, fixnum, fixnum, cell)
+BIGNUM_TO_FOO(int32, int32_t, int32_t, uint64_t)
+BIGNUM_TO_FOO(uint32, uint32_t, int32_t, uint64_t)
 BIGNUM_TO_FOO(long_long, int64_t, int64_t, uint64_t)
 BIGNUM_TO_FOO(ulong_long, uint64_t, int64_t, uint64_t)
 

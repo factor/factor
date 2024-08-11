@@ -448,6 +448,10 @@ struct factor_vm {
   bignum* cell_to_bignum(cell);
   bignum* long_long_to_bignum(int64_t n);
   bignum* ulong_long_to_bignum(uint64_t n);
+#ifndef FACTOR_64
+  bignum* int32_to_bignum(int32_t n);
+  bignum* uint32_to_bignum(uint32_t n);
+#endif
   inline fixnum sign_mask(fixnum x);
   inline fixnum branchless_max(fixnum x, fixnum y);
   inline fixnum branchless_abs(fixnum x);
@@ -494,8 +498,12 @@ struct factor_vm {
   cell to_cell(cell tagged);
   cell from_signed_8(int64_t n);
   int64_t to_signed_8(cell obj);
+  cell from_signed_4(int32_t n);
+  int32_t to_signed_4(cell obj);
   cell from_unsigned_8(uint64_t n);
   uint64_t to_unsigned_8(cell obj);
+  cell from_unsigned_4(uint32_t n);
+  uint32_t to_unsigned_4(cell obj);
   float to_float(cell value);
   double to_double(cell value);
   inline void overflow_fixnum_add(fixnum x, fixnum y);
