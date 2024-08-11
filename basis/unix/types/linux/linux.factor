@@ -28,7 +28,6 @@ TYPEDEF: __slongword_type off_t
 TYPEDEF: off_t            __off_t
 TYPEDEF: __slongword_type blksize_t
 TYPEDEF: __slongword_type blkcnt_t
-TYPEDEF: __sword_type     ssize_t
 TYPEDEF: __s32_type       pid_t
 TYPEDEF: __slongword_type time_t
 TYPEDEF: __slongword_type __time_t
