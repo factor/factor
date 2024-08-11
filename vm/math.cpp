@@ -391,12 +391,14 @@ VM_C_API cell from_unsigned_8(uint64_t n, factor_vm* parent) {
 
 // Allocates memory
 cell factor_vm::from_signed_4(int32_t n) {
-#ifndef FACTOR_64
+#ifdef FACTOR_64
+  return tag_fixnum((fixnum)n);
+#else
   if (n < fixnum_min || n > fixnum_max)
     return tag<bignum>(int32_to_bignum(n));
   else
-#endif
     return tag_fixnum((fixnum)n);
+#endif
 }
 
 VM_C_API cell from_signed_4(int32_t n, factor_vm* parent) {
@@ -405,12 +407,14 @@ VM_C_API cell from_signed_4(int32_t n, factor_vm* parent) {
 
 // Allocates memory
 cell factor_vm::from_unsigned_4(uint32_t n) {
-#ifndef FACTOR_64
+#ifdef FACTOR_64
+  return tag_fixnum((fixnum)n);
+#else
   if (n > (uint32_t)fixnum_max)
     return tag<bignum>(uint32_to_bignum(n));
   else
-#endif
     return tag_fixnum((fixnum)n);
+#endif
 }
 
 VM_C_API cell from_unsigned_4(uint32_t n, factor_vm* parent) {
