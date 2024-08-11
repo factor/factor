@@ -363,7 +363,7 @@ M: pointer lookup-c-type
             t >>signed
             8 >>align
             8 >>align-first
-            "from_signed_cell" >>boxer
+            "from_signed_8" >>boxer
             "to_signed_8" >>unboxer
             [ >integer ] >>unboxer-quot
         \ longlong typedef
@@ -377,8 +377,8 @@ M: pointer lookup-c-type
             8 >>size
             8 >>align
             8 >>align-first
-            "from_unsigned_cell" >>boxer
-            "to_cell" >>unboxer
+            "from_unsigned_8" >>boxer
+            "to_unsigned_8" >>unboxer
             [ >integer ] >>unboxer-quot
         \ ulonglong typedef
 
@@ -409,7 +409,7 @@ M: pointer lookup-c-type
             t >>signed
             4 >>align
             4 >>align-first
-            "from_signed_cell" >>boxer
+            "from_signed_4" >>boxer
             "to_signed_4" >>unboxer
             [ >integer ] >>unboxer-quot
         \ int typedef
@@ -423,8 +423,8 @@ M: pointer lookup-c-type
             4 >>size
             4 >>align
             4 >>align-first
-            "from_unsigned_cell" >>boxer
-            "to_cell" >>unboxer
+            "from_unsigned_4" >>boxer
+            "to_unsigned_4" >>unboxer
             [ >integer ] >>unboxer-quot
         \ uint typedef
 
