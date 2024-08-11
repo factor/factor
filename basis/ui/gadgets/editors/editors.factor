@@ -479,8 +479,14 @@ editor "clipboard" f {
     { copy-action com-copy }
     { paste-action com-paste }
     { T{ button-up } com-copy-selection }
-    { T{ button-up f f 2 } paste-selection }
-} define-command-map
+}
+! No physical mouse middle clicks on macOS (chrome, safari, vscode 8/11/24)
+! https://github.com/factor/factor/issues/3066
+os macos? [
+    ! Middle click to paste (Windows, Linux, ..)
+    { { T{ button-up f f 2 } paste-selection } } append
+] unless
+define-command-map
 
 : previous-character ( editor -- )
     dup gadget-selection? [
