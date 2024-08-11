@@ -180,10 +180,10 @@ repeat-button H{
 CONSTANT: checkmark-dim 12
 CONSTANT: checkmark-square { { 0 0 } { 0 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim } { $ checkmark-dim 0 } } 
 : <drawn-checkmark-pen> ( -- pen )
-    roll-button-selected-background checkmark-square <polygon>
-    roll-button-selected-background checkmark-square <polygon>
-    selection-color checkmark-square <polygon>
     roll-button-rollover-border checkmark-square <polygon>
+    roll-button-rollover-border checkmark-square <polygon>
+    dim-color checkmark-square <polygon>
+    errors-color checkmark-square <polygon>
     toolbar-button-pressed-background checkmark-square <polygon>
     <button-pen> ;
 
@@ -222,10 +222,10 @@ M: checkbox model-changed
 CONSTANT: checkmark-dim/2 $[ $ checkmark-dim 2 / ]
 CONSTANT: checkmark-rhombus { { 0 $ checkmark-dim/2 } { $ checkmark-dim/2 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim/2 } { $ checkmark-dim/2 0 } } 
 : <drawn-radio-pen> ( -- pen )
-    roll-button-selected-background checkmark-rhombus <polygon>
-    roll-button-selected-background checkmark-rhombus <polygon>
-    selection-color checkmark-rhombus <polygon>
     roll-button-rollover-border checkmark-rhombus <polygon>
+    roll-button-rollover-border checkmark-rhombus <polygon>
+    dim-color checkmark-rhombus <polygon>
+    errors-color checkmark-rhombus <polygon>
     toolbar-button-pressed-background checkmark-rhombus <polygon>
     <button-pen>
     ;
