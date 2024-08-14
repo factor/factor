@@ -216,7 +216,7 @@ HELP: and
 
 HELP: and*
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "obj1/f" "a generalized boolean" } }
-{ $description "If both inputs are true, outputs " { $snippet "obj2" } ". Otherwise outputs " { $link f } "." }
+{ $description "If both inputs are true, outputs " { $snippet "obj1" } ". Otherwise outputs " { $link f } "." }
 { $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
 { $examples
     "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
