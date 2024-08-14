@@ -5,7 +5,7 @@ IN: sequences.windowed
 
 HELP: <windowed-sequence>
 { $values
-    { "sequence" sequence } { "n" sequence }
+    { "sequence" sequence } { "n" integer }
     { "windowed-sequence" windowed-sequence }
 }
 { $description "Create a new windowed sequence of window size " { $snippet "n" } " over " { $snippet "sequence" } "." } ;
@@ -19,8 +19,8 @@ HELP: in-bound
 
 HELP: in-bounds
 { $values
-    { "a" sequence } { "b" sequence } { "sequence" sequence }
-    { "a'" sequence } { "b'" sequence }
+    { "a" integer } { "b" integer } { "sequence" sequence }
+    { "a'" integer } { "b'" integer }
 }
 { $description "Clamps two integers from 0 to the sequence length. While not in bounds for calling " { $link nth } ", these integers are in bounds for calling " { $link <slice> } "." } ;
 
