@@ -24,7 +24,7 @@ CONSTANT: best-openai-model "gpt-4o-2024-08-06"
     [ openai-api-base get ] dip "/" glue >url ;
 
 : openai-request ( request -- data )
-    openai-api-key get "Bearer " prepend "Authorization" set-header
+    openai-api-key get set-bearer-auth
     openai-organization get [ "OpenAI-Organization" set-header ] when*
     http-request nip utf8 decode json> ;
 

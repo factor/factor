@@ -144,6 +144,11 @@ TUPLE: request
 : delete-header ( request/response key -- request/response )
     over header>> delete-at ;
 
+: bearer-auth ( token -- string ) "Bearer " prepend ;
+
+: set-bearer-auth ( request token -- request )
+    bearer-auth "Authorization" set-header ;
+
 : basic-auth ( username password -- str )
     ":" glue >base64 "Basic " "" prepend-as ;
 

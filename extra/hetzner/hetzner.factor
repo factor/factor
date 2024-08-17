@@ -19,7 +19,7 @@ ERROR: hetzner-access-token-required symbol ;
     ] unless* ;
 
 : set-hetzner-auth-header ( request -- request )
-    "Bearer " get-hetzner-token append "Authorization" set-header ;
+    get-hetzner-token set-bearer-auth ;
 
 : hetzner-get ( route -- json )
     hetzner-api-v1 prepend <get-request>
