@@ -85,9 +85,5 @@ TUPLE: oauth2
     dupd refresh>> refresh-params swap token-uri>> post-json-request
     assoc>tokens ;
 
-! Using the token to access secured resources.
-: add-token ( request url -- )
-    "Bearer " prepend "Authorization" rot header>> set-at ;
-
 : oauth-http-get ( url access-token -- response data )
-    [ <get-request> dup ] dip add-token http-request ;
+    [ <get-request> ] dip set-bearer-auth http-request ;
