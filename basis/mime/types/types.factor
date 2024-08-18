@@ -42,8 +42,14 @@ MEMO: mime-types ( -- assoc )
     nonstandard-mime-types assoc-union
     removed-mime-types assoc-union ;
 
+MEMO: mime-extensions ( -- assoc )
+    mime-db >hashtable ;
+
 : mime-type ( filename -- mime-type )
     file-extension mime-types at "application/octet-stream" or ;
 
 : mime-type-encoding ( mime-type -- encoding )
     "text/" head? utf8 binary ? ;
+
+: mime-type>extension ( mime-type -- extension )
+    mime-extensions at ;
