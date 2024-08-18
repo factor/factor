@@ -245,7 +245,7 @@ TUPLE: drawn-slider-pen < slider-pen ;
         t >>root? ;
 
 : <slide-label-button-pen> ( -- pen )
-    toolbar-background <solid> dup
+    content-background <solid> dup
     toolbar-button-pressed-background <solid> dup dup
     <button-pen> ;
 

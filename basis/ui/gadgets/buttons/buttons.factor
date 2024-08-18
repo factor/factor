@@ -132,8 +132,8 @@ PRIVATE>
     ] 2dip <tile-pen> ;
 
 : <drawn-border-button-pen> ( -- pen )
-    dim-color <solid>
-    dim-color <solid>
+    content-background <solid>
+    toolbar-background <solid>
     selection-color <solid>
     roll-button-rollover-border <solid>
     toolbar-button-pressed-background <solid>
