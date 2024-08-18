@@ -166,6 +166,12 @@ FUNCTION: int mvwgetch ( WINDOW* win, int y, int x )
 FUNCTION: int ungetch ( int ch )
 FUNCTION: int has_key ( int ch )
 
+FUNCTION: int get_wch ( c-string wc )
+FUNCTION: int wget_wch ( WINDOW* win, c-string wc )
+FUNCTION: int mvget_wch ( int y, int x, c-string wc )
+FUNCTION: int mvwget_wch ( WINDOW* win, int y, int x, c-string wc )
+FUNCTION: int unget_wch ( wchar_t wc )
+
 FUNCTION: int getstr ( c-string str )
 FUNCTION: int getnstr ( c-string str, int n )
 FUNCTION: int wgetstr ( WINDOW* win, c-string str )
@@ -222,6 +228,21 @@ FUNCTION: int wdelch ( WINDOW* win )
 FUNCTION: int mvdelch ( int y, int x )
 FUNCTION: int mvwdelch ( WINDOW* win, int y, int x )
 
+FUNCTION: int ins_wch ( wchar_t ch )
+FUNCTION: int wins_wch ( WINDOW* win, wchar_t ch )
+FUNCTION: int mvins_wch ( int y, int x, wchar_t ch )
+FUNCTION: int mvwins_wch ( WINDOW* win, int y, int x, wchar_t ch )
+FUNCTION: int del_wch ( )
+FUNCTION: int wdel_wch ( WINDOW* win )
+FUNCTION: int mvdel_wch ( int y, int x )
+FUNCTION: int mvwdel_wch ( WINDOW* win, int y, int x )
+
+FUNCTION: int ins_wstr ( c-string str )
+FUNCTION: int wins_wstr ( WINDOW* win, c-string str )
+FUNCTION: int mvins_wstr ( int y, int x, c-string str )
+FUNCTION: int mvwins_wstr ( WINDOW* win, int y, int x, c-string str )
+
+
 FUNCTION: int deleteln ( )
 FUNCTION: int wdeleteln ( WINDOW* win )
 FUNCTION: int insdelln ( int n )
@@ -238,6 +259,20 @@ FUNCTION: int mvaddnstr ( int y, int x, c-string str, int n )
 FUNCTION: int mvwaddstr ( WINDOW* win, int y, int x, c-string str )
 FUNCTION: int mvwaddnstr ( WINDOW* win, int y, int x, c-string str, int n )
 
+FUNCTION: int addwch ( wchar_t ch )
+FUNCTION: int waddwch ( WINDOW* win, wchar_t ch )
+FUNCTION: int mvaddwch ( int y, int x, wchar_t ch )
+FUNCTION: int mvwaddwch ( WINDOW* win, int y, int x, wchar_t ch )
+
+FUNCTION: int addwstr ( c-string str )
+FUNCTION: int addnwstr ( c-string str, int n )
+FUNCTION: int waddwstr ( WINDOW* win, c-string str )
+FUNCTION: int waddnwstr ( WINDOW* win, c-string str, int n )
+FUNCTION: int mvaddwstr ( int y, int x, c-string str )
+FUNCTION: int mvaddnwstr ( int y, int x, c-string str, int n )
+FUNCTION: int mvwaddwstr ( WINDOW* win, int y, int x, c-string str )
+FUNCTION: int mvwaddnwstr ( WINDOW* win, int y, int x, c-string str, int n )
+
 FUNCTION: int waddch ( WINDOW* win, chtype ch )
 
 FUNCTION: int start_color ( )
@@ -247,6 +282,11 @@ FUNCTION: bool has_colors ( )
 FUNCTION: bool can_change_color ( )
 FUNCTION: int color_content ( short color, short* r, short* g, short* b )
 FUNCTION: int pair_content ( short pair, short* f, short* b )
+
+FUNCTION: int assume_default_colors ( int fg, int bg )
+FUNCTION: int use_default_colors ( )
+FUNCTION: int extended_color_content ( short color, short* r, short* g, short* b )
+FUNCTION: int extended_pair_content ( short pair, short* fg, short* bg )
 
 C-GLOBAL: int COLORS
 C-GLOBAL: int COLOR_PAIRS
