@@ -101,7 +101,7 @@ M: range-observer model-changed
 
 :: set-population ( n boids-gadget -- )
     boids-gadget [
-        dup length n - dup 0 >
+        dup length n >integer - dup 0 >
         [ head* ]
         [ neg random-boids append ] if
     ] change-boids drop ;
