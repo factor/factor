@@ -216,17 +216,18 @@ TUPLE: checkbox < button ;
 
 M: checkbox model-changed
     swap value>> >>selected? relayout-1 ;
-
 <PRIVATE
 
+CONSTANT: circle-points 12
 CONSTANT: checkmark-dim/2 $[ $ checkmark-dim 2 / ]
 CONSTANT: checkmark-rhombus { { 0 $ checkmark-dim/2 } { $ checkmark-dim/2 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim/2 } { $ checkmark-dim/2 0 } } 
+CONSTANT: checkmark-circle $[ $ circle-points $ checkmark-dim polygon-circle ]
 : <drawn-radio-pen> ( -- pen )
-    roll-button-rollover-border checkmark-rhombus <polygon>
-    roll-button-rollover-border checkmark-rhombus <polygon>
-    dim-color checkmark-rhombus <polygon>
-    errors-color checkmark-rhombus <polygon>
-    toolbar-button-pressed-background checkmark-rhombus <polygon>
+    roll-button-rollover-border checkmark-circle <polygon>
+    roll-button-rollover-border checkmark-circle <polygon>
+    dim-color checkmark-circle <polygon>
+    errors-color checkmark-circle <polygon>
+    toolbar-button-pressed-background checkmark-circle <polygon>
     <button-pen>
     ;
 
