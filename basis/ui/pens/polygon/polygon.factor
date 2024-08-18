@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data grouping kernel opengl
-opengl.gl sequences specialized-arrays
+USING: accessors alien.c-types alien.data arrays grouping kernel
+math math.constants math.functions opengl opengl.gl sequences
+specialized-arrays
 specialized-arrays.instances.alien.c-types.float ui.gadgets
 ui.pens ;
-SPECIALIZED-ARRAY: float
+FROM: alien.c-types => float ;
 IN: ui.pens.polygon
 
 ! Polygon pen
@@ -40,3 +41,9 @@ M: polygon draw-interior
 : <polygon-gadget> ( color points -- gadget )
     [ <polygon> ] [ max-dims ] bi
     [ <gadget> ] 2dip [ >>interior ] [ >>dim ] bi* ;
+
+: polygon-circle ( n diameter -- seq )
+    [ [ 1 + <iota> ] [ '[ 2 pi * * _ / [ sin ] [ cos ] bi 2array ] map ] bi ]
+    [ 2 / '[ [ _ [ * ] [ + ] bi round ] map ] map ] bi* ;
+
+
