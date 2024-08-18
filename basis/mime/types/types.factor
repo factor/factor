@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs io.encodings.ascii io.encodings.binary
+USING: assocs hashtables io.encodings.ascii io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel make sequences
 splitting ;
 IN: mime.types
