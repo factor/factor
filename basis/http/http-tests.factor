@@ -180,6 +180,36 @@ ${ read-response-test-1' } [
     dup parse-set-cookie first unparse-set-cookie =
 ] unit-test
 
+! Test `priority` and `samesite` cookie attributes
+{
+    {
+        T{ cookie
+            { name "__Secure-3PSIDCC" }
+            { value
+                "AKEyXzVzit6DPX4hTh2K1BGVcH0nEbGhHeomHuFtM9XxKZ8nN61hx0n3"
+            }
+            { path "/" }
+            { domain ".google.com" }
+            { expires
+                T{ timestamp
+                    { year 2025 }
+                    { month 8 }
+                    { day 21 }
+                    { hour 2 }
+                    { minute 20 }
+                    { second 50 }
+                }
+            }
+            { http-only t }
+            { secure t }
+            { priority "high" }
+            { samesite "none" }
+        }
+    }
+} [
+    "__Secure-3PSIDCC=AKEyXzVzit6DPX4hTh2K1BGVcH0nEbGhHeomHuFtM9XxKZ8nN61hx0n3; expires=Thu, 21-Aug-2025 02:20:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; priority=high; SameSite=none" parse-set-cookie
+] unit-test
+
 {
     {
         T{ cookie
