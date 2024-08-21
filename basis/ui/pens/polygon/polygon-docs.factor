@@ -1,4 +1,4 @@
-USING: colors help.markup help.syntax ui.pens ;
+USING: colors help.markup help.syntax math ui.pens ;
 IN: ui.pens.polygon
 
 HELP: polygon
@@ -12,3 +12,10 @@ HELP: polygon
 HELP: <polygon>
 { $values { "color" color } { "points" "a sequence of points" } { "polygon" polygon } }
 { $description "Creates a new instance of " { $link polygon } "." } ;
+
+HELP: polygon-circle
+{ $values { "n" { $sequence integer } } { "diameter" { $sequence real } } } 
+{ $description "Approximates the vertices of a circle for a polygon with " { $snippet n } " amount of points." }
+{ $code "USING: sequences math.vectors ui.gadgets.grids ui.gadgets.panes ui.theme ;
+         9 <iota> 3 v+n [ 20 polygon-circle details-color swap <polygon-gadget> ] map
+         1array <grid> gadget." } ;
