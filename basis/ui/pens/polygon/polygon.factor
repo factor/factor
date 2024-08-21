@@ -42,8 +42,8 @@ M: polygon draw-interior
     [ <polygon> ] [ max-dims ] bi
     [ <gadget> ] 2dip [ >>interior ] [ >>dim ] bi* ;
 
-: polygon-circle ( n diameter -- seq )
-    [ [ 1 + <iota> ] [ '[ 2 pi * * _ / [ sin ] [ cos ] bi 2array ] map ] bi ]
-    [ 2 / '[ [ _ [ * ] [ + ] bi round ] map ] map ] bi* ;
+:: polygon-circle ( n diameter -- seq )
+    n 1 + <iota> [ 2 pi * * n / [ sin ] [ cos ] bi 2array ] map
+    diameter 2 / '[ [ _ [ * ] [ + ] bi round >fixnum ] map ] map ;
 
 
