@@ -210,6 +210,14 @@ ${ read-response-test-1' } [
     "__Secure-3PSIDCC=AKEyXzVzit6DPX4hTh2K1BGVcH0nEbGhHeomHuFtM9XxKZ8nN61hx0n3; expires=Thu, 21-Aug-2025 02:20:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; priority=high; SameSite=none" parse-set-cookie
 ] unit-test
 
+! Test cookie round trip
+{ t } [
+    "__Secure-3PSIDCC=AKEyXzVzit6DPX4hTh2K1BGVcH0nEbGhHeomHuFtM9XxKZ8nN61hx0n3; expires=Thu, 21-Aug-2025 02:20:50 GMT; path=/; domain=.google.com; Secure; HttpOnly; priority=high; SameSite=none"
+    dup parse-set-cookie first unparse-set-cookie
+    [ parse-set-cookie ] bi@ =
+] unit-test
+
+
 {
     {
         T{ cookie
