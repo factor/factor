@@ -69,7 +69,7 @@ HELP: download-outdated-into
 
 HELP: download-to-temporary-file
 { $values
-    { "url" url }
+    { "obj" object }
     { "path" "a pathname string" }
 }
 { $description "Downloads a url to a unique temporary file in " { $link current-directory } " named " { $snippet "temp.XXXXXXXXXreal-file-name.ext.temp" } "." } ;
