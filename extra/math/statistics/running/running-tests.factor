@@ -1,5 +1,6 @@
-USING: accessors kernel math.functions math.statistics
-math.statistics.running random sequences tools.test ;
+USING: accessors combinators.smart kernel math.functions
+math.statistics math.statistics.running random sequences
+tools.test ;
 
 {
     { t t t t t t t t t }
