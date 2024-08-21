@@ -36,7 +36,8 @@ CONSTANT: max-redirects 10
         [ header-value>string check-header-string write crlf ] bi*
     ] assoc-each crlf ;
 
-TUPLE: cookie name value version comment path domain expires max-age http-only secure ;
+TUPLE: cookie name value version comment path domain expires max-age http-only secure
+priority samesite sameparty hostprefix domainprefix ;
 
 : <cookie> ( value name -- cookie )
     cookie new
@@ -57,6 +58,11 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
                 { "path" [ >>path ] }
                 { "httponly" [ drop t >>http-only ] }
                 { "secure" [ drop t >>secure ] }
+                { "priority" [ >>priority ] }
+                { "samesite" [ >>samesite ] }
+                { "sameparty" [ >>sameparty ] }
+                { "hostprefix" [ >>hostprefix ] }
+                { "domainprefix" [ >>domainprefix ] }
                 [ drop rot <cookie> dup , ]
             } case nip
         ] assoc-each
