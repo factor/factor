@@ -128,6 +128,11 @@ priority samesite sameparty hostprefix domainprefix ;
         "max-age" over max-age>> unparse-cookie-value
         "httponly" over http-only>> unparse-cookie-value
         "secure" over secure>> unparse-cookie-value
+        "priority" over priority>> unparse-cookie-value
+        "samesite" over samesite>> unparse-cookie-value
+        "sameparty" over sameparty>> unparse-cookie-value
+        "hostprefix" over hostprefix>> unparse-cookie-value
+        "domainprefix" over domainprefix>> unparse-cookie-value
         drop
     ] { } make "; " join ;
 
