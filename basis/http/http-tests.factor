@@ -1,5 +1,5 @@
-USING: accessors combinators.short-circuit continuations db
-db.sqlite db.tuples destructors furnace furnace.actions
+USING: accessors calendar combinators.short-circuit
+continuations db db.sqlite destructors furnace.actions
 furnace.alloy furnace.auth furnace.auth.login
 furnace.conversations furnace.db furnace.redirection
 furnace.sessions html.components html.forms http http.client
@@ -8,9 +8,9 @@ http.server.dispatchers http.server.redirection
 http.server.requests http.server.responses http.server.static io
 io.crlf io.directories io.encodings.ascii io.encodings.binary
 io.encodings.utf8 io.files io.files.temp io.servers io.sockets
-io.streams.string kernel literals locals make multiline
-namespaces random sequences splitting threads tools.test urls
-validators xml xml.data xml.traversal ;
+io.streams.string kernel literals make multiline namespaces
+random sequences splitting tools.test urls validators xml
+xml.data xml.traversal ;
 IN: http.tests
 
 { "text/plain" "UTF-8" } [ "text/plain" parse-content-type ] unit-test
