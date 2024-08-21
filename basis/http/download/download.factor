@@ -1,10 +1,10 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar checksums combinators.short-circuit
-http.client io io.directories io.encodings.binary io.files
+http http.client io io.directories io.encodings.binary io.files
 io.files.info io.files.unique io.pathnames kernel math
-math.order math.parser namespaces present sequences shuffle
-splitting ;
+math.order math.parser mime.types namespaces present sequences
+shuffle splitting strings urls ;
 IN: http.download
 
 : file-too-old-or-not-exists? ( path duration -- ? )
@@ -76,17 +76,30 @@ IN: http.download
 : next-download-name ( url -- name )
     download-name find-next-incremented-name ;
 
-: http-write-request ( url -- )
-    <get-request> [ write ] with-http-request drop ;
+: http-write-request ( url -- headers )
+    <get-request> [ write ] with-http-request ;
 
 : download-temporary-name ( url -- prefix suffix )
     [ "temp." ".temp" ] dip download-name prepend ;
 
 PRIVATE>
 
-: download-to-temporary-file ( url -- path )
+GENERIC: download-to-temporary-file ( obj -- path )
+
+M: string download-to-temporary-file
+    >url download-to-temporary-file ;
+
+M: request download-to-temporary-file
+    url>> download-to-temporary-file ;
+
+M: url download-to-temporary-file
     [ download-temporary-name binary ] keep
-    '[ _ http-write-request ] with-unique-file-writer ;
+    '[ _ http-write-request ] with-unique-file-writer
+    swap [ dup ".temp" ?tail drop ]
+    [
+        content-type>> mime-type>extension "temp" or "." glue
+        find-next-incremented-name
+    ] bi* [ move-file ] keep ;
 
 : download-as ( url path -- path )
     [ download-to-temporary-file ] dip [ ?move-file ] keep ;
