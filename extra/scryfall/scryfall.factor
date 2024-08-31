@@ -509,10 +509,28 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-rare ( seq -- seq' ) '[ "rarity" of "rare" = ] reject ;
 : reject-mythic ( seq -- seq' ) '[ "rarity" of "mythic" = ] reject ;
 
-: standard-cards ( -- seq' ) mtg-oracle-cards filter-standard ;
-: historic-cards ( -- seq' ) mtg-oracle-cards filter-historic ;
+: paupercommander-cards ( -- seq' ) mtg-oracle-cards filter-paupercommander ;
+: penny-cards ( -- seq' ) mtg-oracle-cards filter-penny ;
+: standardbrawl-cards ( -- seq' ) mtg-oracle-cards filter-standardbrawl ;
+: brawl-cards ( -- seq' ) mtg-oracle-cards filter-brawl ;
+: oathbreaker-cards ( -- seq' ) mtg-oracle-cards filter-oathbreaker ;
+: alchemy-cards ( -- seq' ) mtg-oracle-cards filter-alchemy ;
 : explorer-cards ( -- seq' ) mtg-oracle-cards filter-explorer ;
+: duel-cards ( -- seq' ) mtg-oracle-cards filter-duel ;
+: timeless-cards ( -- seq' ) mtg-oracle-cards filter-timeless ;
+: future-cards ( -- seq' ) mtg-oracle-cards filter-future ;
+: gladiator-cards ( -- seq' ) mtg-oracle-cards filter-gladiator ;
+: historic-cards ( -- seq' ) mtg-oracle-cards filter-historic ;
+: standard-cards ( -- seq' ) mtg-oracle-cards filter-standard ;
+: pioneer-cards ( -- seq' ) mtg-oracle-cards filter-pioneer ;
+: premodern-cards ( -- seq' ) mtg-oracle-cards filter-premodern ;
+: oldschool-cards ( -- seq' ) mtg-oracle-cards filter-oldschool ;
 : modern-cards ( -- seq' ) mtg-oracle-cards filter-modern ;
+: legacy-cards ( -- seq' ) mtg-oracle-cards filter-legacy ;
+: commander-cards ( -- seq' ) mtg-oracle-cards filter-commander ;
+: predh-cards ( -- seq' ) mtg-oracle-cards filter-predh ;
+: pauper-cards ( -- seq' ) mtg-oracle-cards filter-pauper ;
+: vintage-cards ( -- seq' ) mtg-oracle-cards filter-vintage ;
 
 : sort-by-cmc ( assoc -- assoc' ) [ "cmc" of ] sort-by ;
 : histogram-by-cmc ( assoc -- assoc' ) [ "cmc" of ] histogram-by sort-keys ;
