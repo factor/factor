@@ -76,6 +76,9 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-multi-card-faces ( assoc -- seq )
     [ "card_faces" of length 1 > ] filter ; inline
 
+: reject-multi-card-faces ( assoc -- seq )
+    [ "card_faces" of length 1 > ] reject ; inline
+
 : multi-card-faces? ( assoc -- seq )
     "card_faces" of length 1 > ; inline
 
@@ -128,7 +131,7 @@ MEMO: scryfall-rulings-json ( -- json )
     [
         "{}" split harvest
         [ "/" split ] map
-        casting-cost-combinations
+        sequence-cartesian-product
     ] map ;
 
 : remove-color-identities ( cards colors -- cards' )
@@ -241,6 +244,105 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-premodern ( seq -- seq' ) "premodern" filter-legalities ;
 : filter-predh ( seq -- seq' ) "predh" filter-legalities ;
 
+: reject-color-identity-length= ( seq n -- seq' ) '[ "color_identity" of length _ = ] reject ;
+: reject-color-identity-length<= ( seq n -- seq' ) '[ "color_identity" of length _ <= ] reject ;
+
+: reject-azorius-any ( seq -- seq' ) { "W" "U" } find-any-color-identities ;
+: reject-dimir-any ( seq -- seq' ) { "U" "B" } find-any-color-identities ;
+: reject-orzhov-any ( seq -- seq' ) { "W" "B" } find-any-color-identities ;
+: reject-boros-any ( seq -- seq' ) { "R" "W" } find-any-color-identities ;
+: reject-selesnya-any ( seq -- seq' ) { "G" "W" } find-any-color-identities ;
+: reject-simic-any ( seq -- seq' ) { "G" "U" } find-any-color-identities ;
+: reject-izzet-any ( seq -- seq' ) { "R" "U" } find-any-color-identities ;
+: reject-golgari-any ( seq -- seq' ) { "B" "G" } find-any-color-identities ;
+: reject-rakdos-any ( seq -- seq' ) { "B" "R" } find-any-color-identities ;
+: reject-gruul-any ( seq -- seq' ) { "G" "R" } find-any-color-identities ;
+
+: reject-azorius-only ( seq -- seq' ) { "W" "U" } find-only-color-identities ;
+: reject-dimir-only ( seq -- seq' ) { "U" "B" } find-only-color-identities ;
+: reject-orzhov-only ( seq -- seq' ) { "W" "B" } find-only-color-identities ;
+: reject-boros-only ( seq -- seq' ) { "R" "W" } find-only-color-identities ;
+: reject-selesnya-only ( seq -- seq' ) { "G" "W" } find-only-color-identities ;
+: reject-simic-only ( seq -- seq' ) { "G" "U" } find-only-color-identities ;
+: reject-izzet-only ( seq -- seq' ) { "R" "U" } find-only-color-identities ;
+: reject-golgari-only ( seq -- seq' ) { "B" "G" } find-only-color-identities ;
+: reject-rakdos-only ( seq -- seq' ) { "B" "R" } find-only-color-identities ;
+: reject-gruul-only ( seq -- seq' ) { "G" "R" } find-only-color-identities ;
+
+: reject-azorius-exact ( seq -- seq' ) { "W" "U" } find-exact-color-identities ;
+: reject-dimir-exact ( seq -- seq' ) { "U" "B" } find-exact-color-identities ;
+: reject-orzhov-exact ( seq -- seq' ) { "W" "B" } find-exact-color-identities ;
+: reject-boros-exact ( seq -- seq' ) { "R" "W" } find-exact-color-identities ;
+: reject-selesnya-exact ( seq -- seq' ) { "G" "W" } find-exact-color-identities ;
+: reject-simic-exact ( seq -- seq' ) { "G" "U" } find-exact-color-identities ;
+: reject-izzet-exact ( seq -- seq' ) { "R" "U" } find-exact-color-identities ;
+: reject-golgari-exact ( seq -- seq' ) { "B" "G" } find-exact-color-identities ;
+: reject-rakdos-exact ( seq -- seq' ) { "B" "R" } find-exact-color-identities ;
+: reject-gruul-exact ( seq -- seq' ) { "G" "R" } find-exact-color-identities ;
+
+: reject-bant-any ( seq -- seq' ) { "G" "W" "U" } find-any-color-identities ;
+: reject-esper-any ( seq -- seq' ) { "W" "U" "B" } find-any-color-identities ;
+: reject-grixis-any ( seq -- seq' ) { "U" "B" "R" } find-any-color-identities ;
+: reject-jund-any ( seq -- seq' ) { "B" "R" "G" } find-any-color-identities ;
+: reject-naya-any ( seq -- seq' ) { "R" "G" "W" } find-any-color-identities ;
+: reject-abzan-any ( seq -- seq' ) { "W" "B" "G" } find-any-color-identities ;
+: reject-jeskai-any ( seq -- seq' ) { "U" "R" "W" } find-any-color-identities ;
+: reject-mardu-any ( seq -- seq' ) { "R" "W" "B" } find-any-color-identities ;
+: reject-sultai-any ( seq -- seq' ) { "B" "G" "U" } find-any-color-identities ;
+: reject-temur-any ( seq -- seq' ) { "G" "U" "R" } find-any-color-identities ;
+
+: reject-bant-only ( seq -- seq' ) { "G" "W" "U" } find-only-color-identities ;
+: reject-esper-only ( seq -- seq' ) { "W" "U" "B" } find-only-color-identities ;
+: reject-grixis-only ( seq -- seq' ) { "U" "B" "R" } find-only-color-identities ;
+: reject-jund-only ( seq -- seq' ) { "B" "R" "G" } find-only-color-identities ;
+: reject-naya-only ( seq -- seq' ) { "R" "G" "W" } find-only-color-identities ;
+: reject-abzan-only ( seq -- seq' ) { "W" "B" "G" } find-only-color-identities ;
+: reject-jeskai-only ( seq -- seq' ) { "U" "R" "W" } find-only-color-identities ;
+: reject-mardu-only ( seq -- seq' ) { "R" "W" "B" } find-only-color-identities ;
+: reject-sultai-only ( seq -- seq' ) { "B" "G" "U" } find-only-color-identities ;
+: reject-temur-only ( seq -- seq' ) { "G" "U" "R" } find-only-color-identities ;
+
+: reject-bant-exact ( seq -- seq' ) { "G" "W" "U" } find-exact-color-identities ;
+: reject-esper-exact ( seq -- seq' ) { "W" "U" "B" } find-exact-color-identities ;
+: reject-grixis-exact ( seq -- seq' ) { "U" "B" "R" } find-exact-color-identities ;
+: reject-jund-exact ( seq -- seq' ) { "B" "R" "G" } find-exact-color-identities ;
+: reject-naya-exact ( seq -- seq' ) { "R" "G" "W" } find-exact-color-identities ;
+: reject-abzan-exact ( seq -- seq' ) { "W" "B" "G" } find-exact-color-identities ;
+: reject-jeskai-exact ( seq -- seq' ) { "U" "R" "W" } find-exact-color-identities ;
+: reject-mardu-exact ( seq -- seq' ) { "R" "W" "B" } find-exact-color-identities ;
+: reject-sultai-exact ( seq -- seq' ) { "B" "G" "U" } find-exact-color-identities ;
+: reject-temur-exact ( seq -- seq' ) { "G" "U" "R" } find-exact-color-identities ;
+
+: reject-non-white ( seq -- seq' ) { "U" "B" "R" "G" } find-only-color-identities ;
+: reject-non-blue ( seq -- seq' ) { "W" "B" "R" "G" } find-only-color-identities ;
+: reject-non-black ( seq -- seq' ) { "W" "U" "R" "G" } find-only-color-identities ;
+: reject-non-red ( seq -- seq' ) { "W" "U" "B" "G" } find-only-color-identities ;
+: reject-non-green ( seq -- seq' ) { "W" "U" "B" "R" } find-only-color-identities ;
+
+: reject-legalities ( seq name -- seq' ) '[ "legalities" of _ of "legal" = ] reject ;
+: reject-standard ( seq -- seq' ) "standard" reject-legalities ;
+: reject-future ( seq -- seq' ) "future" reject-legalities ;
+: reject-historic ( seq -- seq' ) "historic" reject-legalities ;
+: reject-timeless ( seq -- seq' ) "timeless" reject-legalities ;
+: reject-gladiator ( seq -- seq' ) "gladiator" reject-legalities ;
+: reject-pioneer ( seq -- seq' ) "pioneer" reject-legalities ;
+: reject-explorer ( seq -- seq' ) "explorer" reject-legalities ;
+: reject-modern ( seq -- seq' ) "modern" reject-legalities ;
+: reject-legacy ( seq -- seq' ) "legacy" reject-legalities ;
+: reject-pauper ( seq -- seq' ) "pauper" reject-legalities ;
+: reject-vintage ( seq -- seq' ) "vintage" reject-legalities ;
+: reject-penny ( seq -- seq' ) "penny" reject-legalities ;
+: reject-commander ( seq -- seq' ) "commander" reject-legalities ;
+: reject-oathbreaker ( seq -- seq' ) "oathbreaker" reject-legalities ;
+: reject-standardbrawl ( seq -- seq' ) "standardbrawl" reject-legalities ;
+: reject-brawl ( seq -- seq' ) "brawl" reject-legalities ;
+: reject-alchemy ( seq -- seq' ) "alchemy" reject-legalities ;
+: reject-paupercommander ( seq -- seq' ) "paupercommander" reject-legalities ;
+: reject-duel ( seq -- seq' ) "duel" reject-legalities ;
+: reject-oldschool ( seq -- seq' ) "oldschool" reject-legalities ;
+: reject-premodern ( seq -- seq' ) "premodern" reject-legalities ;
+: reject-predh ( seq -- seq' ) "predh" reject-legalities ;
+
 : spanish-standard-cards ( -- seq )
     scryfall-all-cards-json
     filter-standard
@@ -262,6 +364,23 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-cmc<= ( seq n -- seq' ) >float '[ "cmc" of _ <= ] filter ;
 : filter-cmc> ( seq n -- seq' ) >float '[ "cmc" of _ > ] filter ;
 : filter-cmc>= ( seq n -- seq' ) >float '[ "cmc" of _ >= ] filter ;
+
+: reject-red-any ( seq -- seq' ) [ "colors" of "R" swap member? ] reject ;
+: reject-red-only ( seq -- seq' ) [ "colors" of { "R" } = ] reject ;
+: reject-blue-any ( seq -- seq' ) [ "colors" of "U" swap member? ] reject ;
+: reject-blue-only ( seq -- seq' ) [ "colors" of { "U" } = ] reject ;
+: reject-green-any ( seq -- seq' ) [ "colors" of "G" swap member? ] reject ;
+: reject-green-only ( seq -- seq' ) [ "colors" of { "G" } = ] reject ;
+: reject-black-any ( seq -- seq' ) [ "colors" of "B" swap member? ] reject ;
+: reject-black-only ( seq -- seq' ) [ "colors" of { "B" } = ] reject ;
+: reject-white-any ( seq -- seq' ) [ "colors" of "W" swap member? ] reject ;
+: reject-white-only ( seq -- seq' ) [ "colors" of { "W" } = ] reject ;
+: reject-multi-color ( seq -- seq' ) [ "colors" of length 1 > ] reject ;
+: reject-cmc= ( seq n -- seq' ) >float '[ "cmc" of _ = ] reject ;
+: reject-cmc< ( seq n -- seq' ) >float '[ "cmc" of _ < ] reject ;
+: reject-cmc<= ( seq n -- seq' ) >float '[ "cmc" of _ <= ] reject ;
+: reject-cmc> ( seq n -- seq' ) >float '[ "cmc" of _ > ] reject ;
+: reject-cmc>= ( seq n -- seq' ) >float '[ "cmc" of _ >= ] reject ;
 
 : parse-type-line ( string -- pairs )
     " // " split1
@@ -292,6 +411,11 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-subtype ( seq text -- seq' ) '[ _ any-subtype? ] filter ;
 : filter-type-intersects ( seq text -- seq' ) '[ _ type-intersects? ] filter ;
 : filter-subtype-intersects ( seq text -- seq' ) '[ _ subtype-intersects? ] filter ;
+
+: reject-type ( seq text -- seq' ) '[ _ any-type? ] reject ;
+: reject-subtype ( seq text -- seq' ) '[ _ any-subtype? ] reject ;
+: reject-type-intersects ( seq text -- seq' ) '[ _ type-intersects? ] reject ;
+: reject-subtype-intersects ( seq text -- seq' ) '[ _ subtype-intersects? ] reject ;
 
 : basic? ( json -- ? ) "Basic" any-type? ;
 : filter-basic ( seq -- seq' ) [ basic? ] filter ;
@@ -329,17 +453,29 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-artifact ( seq -- seq' ) [ artifact? ] filter ;
 : filter-artifact-subtype ( seq text -- seq' ) [ filter-artifact ] dip filter-subtype ;
 
-: reject-basic ( seq -- seq' ) [ "Basic" any-type? ] reject ;
-: reject-land ( seq -- seq' ) [ "Land" any-type? ] reject ;
-: reject-creature ( seq -- seq' ) [ "Creature" any-type? ] reject ;
-: reject-emblem ( seq -- seq' ) [ "Emblem" any-type? ] reject ;
-: reject-enchantment ( seq -- seq' ) [ "Enchantment" any-type? ] reject ;
-: reject-instant ( seq -- seq' ) [ "Instant" any-type? ] reject ;
-: reject-sorcery ( seq -- seq' ) [ "Sorcery" any-type? ] reject ;
-: reject-planeswalker ( seq -- seq' ) [ "Planeswalker" any-type? ] reject ;
-: reject-legendary ( seq -- seq' ) [ "Legendary" any-type? ] reject ;
-: reject-battle ( seq -- seq' ) [ "Battle" any-type? ] reject ;
-: reject-artifact ( seq -- seq' ) [ "Artifact" any-type? ] reject ;
+: reject-basic ( seq -- seq' ) [ basic? ] reject ;
+: reject-basic-subtype ( seq text -- seq' ) [ reject-basic ] dip reject-subtype ;
+: reject-land ( seq -- seq' ) [ land? ] reject ;
+: reject-land-subtype ( seq text -- seq' ) [ reject-land ] dip reject-subtype ;
+: reject-creature ( seq -- seq' ) [ creature? ] reject ;
+: reject-creature-subtype ( seq text -- seq' ) [ reject-creature ] dip reject-subtype ;
+: reject-emblem ( seq -- seq' ) [ emblem? ] reject ;
+: reject-emblem-subtype ( seq text -- seq' ) [ reject-emblem ] dip reject-subtype ;
+: reject-enchantment ( seq -- seq' ) [ enchantment? ] reject ;
+: reject-enchantment-subtype ( seq text -- seq' ) [ reject-enchantment ] dip reject-subtype ;
+: reject-saga ( seq -- seq' ) [ saga? ] reject ;
+: reject-instant ( seq -- seq' ) [ instant? ] reject ;
+: reject-instant-subtype ( seq text -- seq' ) [ reject-instant ] dip reject-subtype ;
+: reject-sorcery ( seq -- seq' ) [ sorcery? ] reject ;
+: reject-sorcery-subtype ( seq text -- seq' ) [ reject-sorcery ] dip reject-subtype ;
+: reject-planeswalker ( seq -- seq' ) [ planeswalker? ] reject ;
+: reject-planeswalker-subtype ( seq text -- seq' ) [ reject-planeswalker ] dip reject-subtype ;
+: reject-legendary ( seq -- seq' ) [ legendary? ] reject ;
+: reject-legendary-subtype ( seq text -- seq' ) [ reject-legendary ] dip reject-subtype ;
+: reject-battle ( seq -- seq' ) [ battle? ] reject ;
+: reject-battle-subtype ( seq text -- seq' ) [ reject-battle ] dip reject-subtype ;
+: reject-artifact ( seq -- seq' ) [ artifact? ] reject ;
+: reject-artifact-subtype ( seq text -- seq' ) [ reject-artifact ] dip reject-subtype ;
 
 : mount? ( json -- ? ) "mount" any-subtype? ;
 : vehicle? ( json -- ? ) "vehicle" any-subtype? ;
@@ -355,13 +491,27 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-equipment ( seq -- seq' ) "Equipment" filter-subtype ;
 : filter-equipment-subtype ( seq text -- seq' ) [ filter-equipment ] dip filter-subtype ;
 
+: reject-mounts ( seq -- seq' ) "mount" reject-subtype ;
+: reject-vehicles ( seq -- seq' ) "vehicle" reject-subtype ;
+: reject-adventure ( seq -- seq' ) "adventure" reject-subtype ;
+: reject-aura ( seq -- seq' ) "aura" reject-subtype ;
+: reject-aura-subtype ( seq text -- seq' ) [ reject-aura ] dip reject-subtype ;
+: reject-equipment ( seq -- seq' ) "Equipment" reject-subtype ;
+: reject-equipment-subtype ( seq text -- seq' ) [ reject-equipment ] dip reject-subtype ;
+
 : filter-common ( seq -- seq' ) '[ "rarity" of "common" = ] filter ;
 : filter-uncommon ( seq -- seq' ) '[ "rarity" of "uncommon" = ] filter ;
 : filter-rare ( seq -- seq' ) '[ "rarity" of "rare" = ] filter ;
 : filter-mythic ( seq -- seq' ) '[ "rarity" of "mythic" = ] filter ;
 
+: reject-common ( seq -- seq' ) '[ "rarity" of "common" = ] reject ;
+: reject-uncommon ( seq -- seq' ) '[ "rarity" of "uncommon" = ] reject ;
+: reject-rare ( seq -- seq' ) '[ "rarity" of "rare" = ] reject ;
+: reject-mythic ( seq -- seq' ) '[ "rarity" of "mythic" = ] reject ;
+
 : standard-cards ( -- seq' ) mtg-oracle-cards filter-standard ;
 : historic-cards ( -- seq' ) mtg-oracle-cards filter-historic ;
+: explorer-cards ( -- seq' ) mtg-oracle-cards filter-explorer ;
 : modern-cards ( -- seq' ) mtg-oracle-cards filter-modern ;
 
 : sort-by-cmc ( assoc -- assoc' ) [ "cmc" of ] sort-by ;
@@ -372,6 +522,12 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : filter-by-text-prop ( seq string prop -- seq' )
     swap '[ _ of _ subseq-of? ] filter ;
+
+: reject-by-itext-prop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] reject ;
+
+: reject-by-text-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] reject ;
 
 : map-card-faces ( json quot -- seq )
     '[ [ "card_faces" of ] [ ] [ 1array ] ?if _ map ] map ; inline
@@ -974,6 +1130,15 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-will-of-the-council-keyword ( seq -- seq' ) "will-of-the-council" filter-by-keyword ;
 : filter-wither-keyword ( seq -- seq' ) "wither" filter-by-keyword ;
 
+: discard-this? ( json -- ? )
+    1array "Discard this" filter-by-oracle-itext empty? not ;
+
+: discard-name? ( json -- ? )
+    [ 1array ] [ "name" of "Discard " prepend ] bi filter-by-oracle-itext empty? not ;
+
+: filter-discard-effect ( seq -- seq' )
+    [ { [ discard-this? ] [ discard-name? ] } 1|| ] filter ;
+
 : power>n ( string -- n/f )
     [ "*" = ] [ drop -1 ] [ string>number ] ?if ;
 
@@ -997,6 +1162,612 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] filter-card-faces-main-card ;
 : filter-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] filter-card-faces-main-card ;
 : filter-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] filter-card-faces-main-card ;
+
+: reject-card-faces-sub-card ( seq quot -- seq )
+    [ [ card>faces ] map concat ] dip reject ; inline
+
+: reject-card-faces-sub-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] reject-card-faces-sub-card ;
+
+: reject-card-faces-sub-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-sub-card ;
+
+: reject-card-faces-main-card ( seq quot -- seq )
+    dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] reject ; inline
+
+: reject-card-faces-main-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] reject-card-faces-main-card ;
+
+: reject-card-faces-main-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-main-card ;
+
+: reject-card-faces-main-card-iprop-member ( seq string prop -- seq' )
+    swap >lower '[ _ of [ >lower ] map _ member-of? ] reject-card-faces-main-card ;
+
+: reject-by-flavor-text ( seq string -- seq' )
+    "flavor_text" reject-card-faces-main-card-prop ;
+
+: reject-by-flavor-itext ( seq string -- seq' )
+    "flavor_text" reject-card-faces-main-card-iprop ;
+
+: reject-by-oracle-text ( seq string -- seq' )
+    "oracle_text" reject-card-faces-main-card-prop ;
+
+: reject-by-oracle-itext ( seq string -- seq' )
+    "oracle_text" reject-card-faces-main-card-iprop ;
+
+: reject-by-keyword ( seq string -- seq' )
+    "keywords" reject-card-faces-main-card-iprop-member ;
+
+: reject-by-name-text ( seq string -- seq' ) "name" reject-by-text-prop ;
+: reject-by-name-itext ( seq string -- seq' ) "name" reject-by-itext-prop ;
+
+: reject-create-treasure ( seq -- seq' ) "create a treasure token" reject-by-oracle-itext ;
+: reject-treasure-token ( seq -- seq' ) "treasure token" reject-by-oracle-itext ;
+: reject-create-blood-token ( seq -- seq' ) "create a blood token" reject-by-oracle-itext ;
+: reject-blood-token ( seq -- seq' ) "blood token" reject-by-oracle-itext ;
+: reject-create-map-token ( seq -- seq' ) "create a map token" reject-by-oracle-itext ;
+: reject-map-token ( seq -- seq' ) "map token" reject-by-oracle-itext ;
+
+: reject-adamant-text ( seq -- seq' ) "adamant" reject-by-oracle-itext ;
+: reject-adapt-text ( seq -- seq' ) "adapt" reject-by-oracle-itext ;
+: reject-addendum-text ( seq -- seq' ) "addendum" reject-by-oracle-itext ;
+: reject-affinity-text ( seq -- seq' ) "affinity" reject-by-oracle-itext ;
+: reject-afflict-text ( seq -- seq' ) "afflict" reject-by-oracle-itext ;
+: reject-afterlife-text ( seq -- seq' ) "afterlife" reject-by-oracle-itext ;
+: reject-aftermath-text ( seq -- seq' ) "aftermath" reject-by-oracle-itext ;
+: reject-alliance-text ( seq -- seq' ) "alliance" reject-by-oracle-itext ;
+: reject-amass-text ( seq -- seq' ) "amass" reject-by-oracle-itext ;
+: reject-amplify-text ( seq -- seq' ) "amplify" reject-by-oracle-itext ;
+: reject-annihilator-text ( seq -- seq' ) "annihilator" reject-by-oracle-itext ;
+: reject-ascend-text ( seq -- seq' ) "ascend" reject-by-oracle-itext ;
+: reject-assemble-text ( seq -- seq' ) "assemble" reject-by-oracle-itext ;
+: reject-assist-text ( seq -- seq' ) "assist" reject-by-oracle-itext ;
+: reject-augment-text ( seq -- seq' ) "augment" reject-by-oracle-itext ;
+: reject-awaken-text ( seq -- seq' ) "awaken" reject-by-oracle-itext ;
+: reject-backup-text ( seq -- seq' ) "backup" reject-by-oracle-itext ;
+: reject-banding-text ( seq -- seq' ) "banding" reject-by-oracle-itext ;
+: reject-bargain-text ( seq -- seq' ) "bargain" reject-by-oracle-itext ;
+: reject-basic-landcycling-text ( seq -- seq' ) "basic landcycling" reject-by-oracle-itext ;
+: reject-battalion-text ( seq -- seq' ) "battalion" reject-by-oracle-itext ;
+: reject-battle-cry-text ( seq -- seq' ) "battle cry" reject-by-oracle-itext ;
+: reject-bestow-text ( seq -- seq' ) "bestow" reject-by-oracle-itext ;
+: reject-blitz-text ( seq -- seq' ) "blitz" reject-by-oracle-itext ;
+: reject-bloodrush-text ( seq -- seq' ) "bloodrush" reject-by-oracle-itext ;
+: reject-bloodthirst-text ( seq -- seq' ) "bloodthirst" reject-by-oracle-itext ;
+: reject-boast-text ( seq -- seq' ) "boast" reject-by-oracle-itext ;
+: reject-bolster-text ( seq -- seq' ) "bolster" reject-by-oracle-itext ;
+: reject-bushido-text ( seq -- seq' ) "bushido" reject-by-oracle-itext ;
+: reject-buyback-text ( seq -- seq' ) "buyback" reject-by-oracle-itext ;
+: reject-cascade-text ( seq -- seq' ) "cascade" reject-by-oracle-itext ;
+: reject-casualty-text ( seq -- seq' ) "casualty" reject-by-oracle-itext ;
+: reject-celebration-text ( seq -- seq' ) "celebration" reject-by-oracle-itext ;
+: reject-champion-text ( seq -- seq' ) "champion" reject-by-oracle-itext ;
+: reject-changeling-text ( seq -- seq' ) "changeling" reject-by-oracle-itext ;
+: reject-channel-text ( seq -- seq' ) "channel" reject-by-oracle-itext ;
+: reject-choose-a-background-text ( seq -- seq' ) "choose a background" reject-by-oracle-itext ;
+: reject-chroma-text ( seq -- seq' ) "chroma" reject-by-oracle-itext ;
+: reject-cipher-text ( seq -- seq' ) "cipher" reject-by-oracle-itext ;
+: reject-clash-text ( seq -- seq' ) "clash" reject-by-oracle-itext ;
+: reject-cleave-text ( seq -- seq' ) "cleave" reject-by-oracle-itext ;
+: reject-cloak-text ( seq -- seq' ) "cloak" reject-by-oracle-itext ;
+: reject-cohort-text ( seq -- seq' ) "cohort" reject-by-oracle-itext ;
+: reject-collect-evidence-text ( seq -- seq' ) "collect evidence" reject-by-oracle-itext ;
+: reject-companion-text ( seq -- seq' ) "companion" reject-by-oracle-itext ;
+: reject-compleated-text ( seq -- seq' ) "compleated" reject-by-oracle-itext ;
+: reject-conjure-text ( seq -- seq' ) "conjure" reject-by-oracle-itext ;
+: reject-connive-text ( seq -- seq' ) "connive" reject-by-oracle-itext ;
+: reject-conspire-text ( seq -- seq' ) "conspire" reject-by-oracle-itext ;
+: reject-constellation-text ( seq -- seq' ) "constellation" reject-by-oracle-itext ;
+: reject-converge-text ( seq -- seq' ) "converge" reject-by-oracle-itext ;
+: reject-convert-text ( seq -- seq' ) "convert" reject-by-oracle-itext ;
+: reject-convoke-text ( seq -- seq' ) "convoke" reject-by-oracle-itext ;
+: reject-corrupted-text ( seq -- seq' ) "corrupted" reject-by-oracle-itext ;
+: reject-council's-dilemma-text ( seq -- seq' ) "council's dilemma" reject-by-oracle-itext ;
+: reject-coven-text ( seq -- seq' ) "coven" reject-by-oracle-itext ;
+: reject-craft-text ( seq -- seq' ) "craft" reject-by-oracle-itext ;
+: reject-crew-text ( seq -- seq' ) "crew" reject-by-oracle-itext ;
+: reject-cumulative-upkeep-text ( seq -- seq' ) "cumulative upkeep" reject-by-oracle-itext ;
+: reject-cycling-text ( seq -- seq' ) "cycling" reject-by-oracle-itext ;
+: reject-dash-text ( seq -- seq' ) "dash" reject-by-oracle-itext ;
+: reject-daybound-text ( seq -- seq' ) "daybound" reject-by-oracle-itext ;
+: reject-deathtouch-text ( seq -- seq' ) "deathtouch" reject-by-oracle-itext ;
+: reject-defender-text ( seq -- seq' ) "defender" reject-by-oracle-itext ;
+: reject-delirium-text ( seq -- seq' ) "delirium" reject-by-oracle-itext ;
+: reject-delve-text ( seq -- seq' ) "delve" reject-by-oracle-itext ;
+: reject-descend-text ( seq -- seq' ) "descend" reject-by-oracle-itext ;
+: reject-detain-text ( seq -- seq' ) "detain" reject-by-oracle-itext ;
+: reject-dethrone-text ( seq -- seq' ) "dethrone" reject-by-oracle-itext ;
+: reject-devoid-text ( seq -- seq' ) "devoid" reject-by-oracle-itext ;
+: reject-devour-text ( seq -- seq' ) "devour" reject-by-oracle-itext ;
+: reject-discover-text ( seq -- seq' ) "discover" reject-by-oracle-itext ;
+: reject-disguise-text ( seq -- seq' ) "disguise" reject-by-oracle-itext ;
+: reject-disturb-text ( seq -- seq' ) "disturb" reject-by-oracle-itext ;
+: reject-doctor's-companion-text ( seq -- seq' ) "doctor's companion" reject-by-oracle-itext ;
+: reject-domain-text ( seq -- seq' ) "domain" reject-by-oracle-itext ;
+: reject-double-strike-text ( seq -- seq' ) "double strike" reject-by-oracle-itext ;
+: reject-dredge-text ( seq -- seq' ) "dredge" reject-by-oracle-itext ;
+: reject-echo-text ( seq -- seq' ) "echo" reject-by-oracle-itext ;
+: reject-embalm-text ( seq -- seq' ) "embalm" reject-by-oracle-itext ;
+: reject-emerge-text ( seq -- seq' ) "emerge" reject-by-oracle-itext ;
+: reject-eminence-text ( seq -- seq' ) "eminence" reject-by-oracle-itext ;
+: reject-enchant-text ( seq -- seq' ) "enchant" reject-by-oracle-itext ;
+: reject-encore-text ( seq -- seq' ) "encore" reject-by-oracle-itext ;
+: reject-enlist-text ( seq -- seq' ) "enlist" reject-by-oracle-itext ;
+: reject-enrage-text ( seq -- seq' ) "enrage" reject-by-oracle-itext ;
+: reject-entwine-text ( seq -- seq' ) "entwine" reject-by-oracle-itext ;
+: reject-equip-text ( seq -- seq' ) "equip" reject-by-oracle-itext ;
+: reject-escalate-text ( seq -- seq' ) "escalate" reject-by-oracle-itext ;
+: reject-escape-text ( seq -- seq' ) "escape" reject-by-oracle-itext ;
+: reject-eternalize-text ( seq -- seq' ) "eternalize" reject-by-oracle-itext ;
+: reject-evoke-text ( seq -- seq' ) "evoke" reject-by-oracle-itext ;
+: reject-evolve-text ( seq -- seq' ) "evolve" reject-by-oracle-itext ;
+: reject-exalted-text ( seq -- seq' ) "exalted" reject-by-oracle-itext ;
+: reject-exert-text ( seq -- seq' ) "exert" reject-by-oracle-itext ;
+: reject-exploit-text ( seq -- seq' ) "exploit" reject-by-oracle-itext ;
+: reject-explore-text ( seq -- seq' ) "explore" reject-by-oracle-itext ;
+: reject-extort-text ( seq -- seq' ) "extort" reject-by-oracle-itext ;
+: reject-fabricate-text ( seq -- seq' ) "fabricate" reject-by-oracle-itext ;
+: reject-fading-text ( seq -- seq' ) "fading" reject-by-oracle-itext ;
+: reject-fateful-hour-text ( seq -- seq' ) "fateful hour" reject-by-oracle-itext ;
+: reject-fathomless-descent-text ( seq -- seq' ) "fathomless descent" reject-by-oracle-itext ;
+: reject-fear-text ( seq -- seq' ) "fear" reject-by-oracle-itext ;
+: reject-ferocious-text ( seq -- seq' ) "ferocious" reject-by-oracle-itext ;
+: reject-fight-text ( seq -- seq' ) "fight" reject-by-oracle-itext ;
+: reject-first-strike-text ( seq -- seq' ) "first strike" reject-by-oracle-itext ;
+: reject-flanking-text ( seq -- seq' ) "flanking" reject-by-oracle-itext ;
+: reject-flash-text ( seq -- seq' ) "flash" reject-by-oracle-itext ;
+: reject-flashback-text ( seq -- seq' ) "flashback" reject-by-oracle-itext ;
+: reject-flying-text ( seq -- seq' ) "flying" reject-by-oracle-itext ;
+: reject-food-text ( seq -- seq' ) "food" reject-by-oracle-itext ;
+: reject-for-mirrodin!-text ( seq -- seq' ) "for mirrodin!" reject-by-oracle-itext ;
+: reject-forecast-text ( seq -- seq' ) "forecast" reject-by-oracle-itext ;
+: reject-forestcycling-text ( seq -- seq' ) "forestcycling" reject-by-oracle-itext ;
+: reject-forestwalk-text ( seq -- seq' ) "forestwalk" reject-by-oracle-itext ;
+: reject-foretell-text ( seq -- seq' ) "foretell" reject-by-oracle-itext ;
+: reject-formidable-text ( seq -- seq' ) "formidable" reject-by-oracle-itext ;
+: reject-friends-forever-text ( seq -- seq' ) "friends forever" reject-by-oracle-itext ;
+: reject-fuse-text ( seq -- seq' ) "fuse" reject-by-oracle-itext ;
+: reject-goad-text ( seq -- seq' ) "goad" reject-by-oracle-itext ;
+: reject-graft-text ( seq -- seq' ) "graft" reject-by-oracle-itext ;
+: reject-haste-text ( seq -- seq' ) "haste" reject-by-oracle-itext ;
+: reject-haunt-text ( seq -- seq' ) "haunt" reject-by-oracle-itext ;
+: reject-hellbent-text ( seq -- seq' ) "hellbent" reject-by-oracle-itext ;
+: reject-hero's-reward-text ( seq -- seq' ) "hero's reward" reject-by-oracle-itext ;
+: reject-heroic-text ( seq -- seq' ) "heroic" reject-by-oracle-itext ;
+: reject-hexproof-text ( seq -- seq' ) "hexproof" reject-by-oracle-itext ;
+: reject-hexproof-from-text ( seq -- seq' ) "hexproof from" reject-by-oracle-itext ;
+: reject-hidden-agenda-text ( seq -- seq' ) "hidden agenda" reject-by-oracle-itext ;
+: reject-hideaway-text ( seq -- seq' ) "hideaway" reject-by-oracle-itext ;
+: reject-horsemanship-text ( seq -- seq' ) "horsemanship" reject-by-oracle-itext ;
+: reject-imprint-text ( seq -- seq' ) "imprint" reject-by-oracle-itext ;
+: reject-improvise-text ( seq -- seq' ) "improvise" reject-by-oracle-itext ;
+: reject-incubate-text ( seq -- seq' ) "incubate" reject-by-oracle-itext ;
+: reject-indestructible-text ( seq -- seq' ) "indestructible" reject-by-oracle-itext ;
+: reject-infect-text ( seq -- seq' ) "infect" reject-by-oracle-itext ;
+: reject-ingest-text ( seq -- seq' ) "ingest" reject-by-oracle-itext ;
+: reject-inspired-text ( seq -- seq' ) "inspired" reject-by-oracle-itext ;
+: reject-intensity-text ( seq -- seq' ) "intensity" reject-by-oracle-itext ;
+: reject-intimidate-text ( seq -- seq' ) "intimidate" reject-by-oracle-itext ;
+: reject-investigate-text ( seq -- seq' ) "investigate" reject-by-oracle-itext ;
+: reject-islandcycling-text ( seq -- seq' ) "islandcycling" reject-by-oracle-itext ;
+: reject-islandwalk-text ( seq -- seq' ) "islandwalk" reject-by-oracle-itext ;
+: reject-jump-start-text ( seq -- seq' ) "jump-start" reject-by-oracle-itext ;
+: reject-kicker-text ( seq -- seq' ) "kicker" reject-by-oracle-itext ;
+: reject-kinship-text ( seq -- seq' ) "kinship" reject-by-oracle-itext ;
+: reject-landcycling-text ( seq -- seq' ) "landcycling" reject-by-oracle-itext ;
+: reject-landfall-text ( seq -- seq' ) "landfall" reject-by-oracle-itext ;
+: reject-landwalk-text ( seq -- seq' ) "landwalk" reject-by-oracle-itext ;
+: reject-learn-text ( seq -- seq' ) "learn" reject-by-oracle-itext ;
+: reject-level-up-text ( seq -- seq' ) "level up" reject-by-oracle-itext ;
+: reject-lieutenant-text ( seq -- seq' ) "lieutenant" reject-by-oracle-itext ;
+: reject-lifelink-text ( seq -- seq' ) "lifelink" reject-by-oracle-itext ;
+: reject-living-metal-text ( seq -- seq' ) "living metal" reject-by-oracle-itext ;
+: reject-living-weapon-text ( seq -- seq' ) "living weapon" reject-by-oracle-itext ;
+: reject-madness-text ( seq -- seq' ) "madness" reject-by-oracle-itext ;
+: reject-magecraft-text ( seq -- seq' ) "magecraft" reject-by-oracle-itext ;
+: reject-manifest-text ( seq -- seq' ) "manifest" reject-by-oracle-itext ;
+: reject-megamorph-text ( seq -- seq' ) "megamorph" reject-by-oracle-itext ;
+: reject-meld-text ( seq -- seq' ) "meld" reject-by-oracle-itext ;
+: reject-melee-text ( seq -- seq' ) "melee" reject-by-oracle-itext ;
+: reject-menace-text ( seq -- seq' ) "menace" reject-by-oracle-itext ;
+: reject-mentor-text ( seq -- seq' ) "mentor" reject-by-oracle-itext ;
+: reject-metalcraft-text ( seq -- seq' ) "metalcraft" reject-by-oracle-itext ;
+: reject-mill-text ( seq -- seq' ) "mill" reject-by-oracle-itext ;
+: reject-miracle-text ( seq -- seq' ) "miracle" reject-by-oracle-itext ;
+: reject-modular-text ( seq -- seq' ) "modular" reject-by-oracle-itext ;
+: reject-monstrosity-text ( seq -- seq' ) "monstrosity" reject-by-oracle-itext ;
+: reject-morbid-text ( seq -- seq' ) "morbid" reject-by-oracle-itext ;
+: reject-more-than-meets-the-eye-text ( seq -- seq' ) "more than meets the eye" reject-by-oracle-itext ;
+: reject-morph-text ( seq -- seq' ) "morph" reject-by-oracle-itext ;
+: reject-mountaincycling-text ( seq -- seq' ) "mountaincycling" reject-by-oracle-itext ;
+: reject-mountainwalk-text ( seq -- seq' ) "mountainwalk" reject-by-oracle-itext ;
+: reject-multikicker-text ( seq -- seq' ) "multikicker" reject-by-oracle-itext ;
+: reject-mutate-text ( seq -- seq' ) "mutate" reject-by-oracle-itext ;
+: reject-myriad-text ( seq -- seq' ) "myriad" reject-by-oracle-itext ;
+: reject-nightbound-text ( seq -- seq' ) "nightbound" reject-by-oracle-itext ;
+: reject-ninjutsu-text ( seq -- seq' ) "ninjutsu" reject-by-oracle-itext ;
+: reject-offering-text ( seq -- seq' ) "offering" reject-by-oracle-itext ;
+: reject-offspring-text ( seq -- seq' ) "offspring" reject-by-oracle-itext ;
+: reject-open-an-attraction-text ( seq -- seq' ) "open an attraction" reject-by-oracle-itext ;
+: reject-outlast-text ( seq -- seq' ) "outlast" reject-by-oracle-itext ;
+: reject-overload-text ( seq -- seq' ) "overload" reject-by-oracle-itext ;
+: reject-pack-tactics-text ( seq -- seq' ) "pack tactics" reject-by-oracle-itext ;
+: reject-paradox-text ( seq -- seq' ) "paradox" reject-by-oracle-itext ;
+: reject-parley-text ( seq -- seq' ) "parley" reject-by-oracle-itext ;
+: reject-partner-text ( seq -- seq' ) "partner" reject-by-oracle-itext ;
+: reject-partner-with-text ( seq -- seq' ) "partner with" reject-by-oracle-itext ;
+: reject-persist-text ( seq -- seq' ) "persist" reject-by-oracle-itext ;
+: reject-phasing-text ( seq -- seq' ) "phasing" reject-by-oracle-itext ;
+: reject-plainscycling-text ( seq -- seq' ) "plainscycling" reject-by-oracle-itext ;
+: reject-plot-text ( seq -- seq' ) "plot" reject-by-oracle-itext ;
+: reject-populate-text ( seq -- seq' ) "populate" reject-by-oracle-itext ;
+: reject-proliferate-text ( seq -- seq' ) "proliferate" reject-by-oracle-itext ;
+: reject-protection-text ( seq -- seq' ) "protection" reject-by-oracle-itext ;
+: reject-prototype-text ( seq -- seq' ) "prototype" reject-by-oracle-itext ;
+: reject-provoke-text ( seq -- seq' ) "provoke" reject-by-oracle-itext ;
+: reject-prowess-text ( seq -- seq' ) "prowess" reject-by-oracle-itext ;
+: reject-prowl-text ( seq -- seq' ) "prowl" reject-by-oracle-itext ;
+: reject-radiance-text ( seq -- seq' ) "radiance" reject-by-oracle-itext ;
+: reject-raid-text ( seq -- seq' ) "raid" reject-by-oracle-itext ;
+: reject-rally-text ( seq -- seq' ) "rally" reject-by-oracle-itext ;
+: reject-rampage-text ( seq -- seq' ) "rampage" reject-by-oracle-itext ;
+: reject-ravenous-text ( seq -- seq' ) "ravenous" reject-by-oracle-itext ;
+: reject-reach-text ( seq -- seq' ) "reach" reject-by-oracle-itext ;
+: reject-read-ahead-text ( seq -- seq' ) "read ahead" reject-by-oracle-itext ;
+: reject-rebound-text ( seq -- seq' ) "rebound" reject-by-oracle-itext ;
+: reject-reconfigure-text ( seq -- seq' ) "reconfigure" reject-by-oracle-itext ;
+: reject-recover-text ( seq -- seq' ) "recover" reject-by-oracle-itext ;
+: reject-reinforce-text ( seq -- seq' ) "reinforce" reject-by-oracle-itext ;
+: reject-renown-text ( seq -- seq' ) "renown" reject-by-oracle-itext ;
+: reject-replicate-text ( seq -- seq' ) "replicate" reject-by-oracle-itext ;
+: reject-retrace-text ( seq -- seq' ) "retrace" reject-by-oracle-itext ;
+: reject-revolt-text ( seq -- seq' ) "revolt" reject-by-oracle-itext ;
+: reject-riot-text ( seq -- seq' ) "riot" reject-by-oracle-itext ;
+: reject-role-token-text ( seq -- seq' ) "role token" reject-by-oracle-itext ;
+: reject-saddle-text ( seq -- seq' ) "saddle" reject-by-oracle-itext ;
+: reject-scavenge-text ( seq -- seq' ) "scavenge" reject-by-oracle-itext ;
+: reject-scry-text ( seq -- seq' ) "scry" reject-by-oracle-itext ;
+: reject-seek-text ( seq -- seq' ) "seek" reject-by-oracle-itext ;
+: reject-shadow-text ( seq -- seq' ) "shadow" reject-by-oracle-itext ;
+: reject-shroud-text ( seq -- seq' ) "shroud" reject-by-oracle-itext ;
+: reject-skulk-text ( seq -- seq' ) "skulk" reject-by-oracle-itext ;
+: reject-soulbond-text ( seq -- seq' ) "soulbond" reject-by-oracle-itext ;
+: reject-soulshift-text ( seq -- seq' ) "soulshift" reject-by-oracle-itext ;
+: reject-specialize-text ( seq -- seq' ) "specialize" reject-by-oracle-itext ;
+: reject-spectacle-text ( seq -- seq' ) "spectacle" reject-by-oracle-itext ;
+: reject-spell-mastery-text ( seq -- seq' ) "spell mastery" reject-by-oracle-itext ;
+: reject-splice-text ( seq -- seq' ) "splice" reject-by-oracle-itext ;
+: reject-split-second-text ( seq -- seq' ) "split second" reject-by-oracle-itext ;
+: reject-spree-text ( seq -- seq' ) "spree" reject-by-oracle-itext ;
+: reject-squad-text ( seq -- seq' ) "squad" reject-by-oracle-itext ;
+: reject-storm-text ( seq -- seq' ) "storm" reject-by-oracle-itext ;
+: reject-strive-text ( seq -- seq' ) "strive" reject-by-oracle-itext ;
+: reject-sunburst-text ( seq -- seq' ) "sunburst" reject-by-oracle-itext ;
+: reject-support-text ( seq -- seq' ) "support" reject-by-oracle-itext ;
+: reject-surge-text ( seq -- seq' ) "surge" reject-by-oracle-itext ;
+: reject-surveil-text ( seq -- seq' ) "surveil" reject-by-oracle-itext ;
+: reject-suspect-text ( seq -- seq' ) "suspect" reject-by-oracle-itext ;
+: reject-suspend-text ( seq -- seq' ) "suspend" reject-by-oracle-itext ;
+: reject-swampcycling-text ( seq -- seq' ) "swampcycling" reject-by-oracle-itext ;
+: reject-swampwalk-text ( seq -- seq' ) "swampwalk" reject-by-oracle-itext ;
+: reject-threshold-text ( seq -- seq' ) "threshold" reject-by-oracle-itext ;
+: reject-time-travel-text ( seq -- seq' ) "time travel" reject-by-oracle-itext ;
+: reject-totem-armor-text ( seq -- seq' ) "totem armor" reject-by-oracle-itext ;
+: reject-toxic-text ( seq -- seq' ) "toxic" reject-by-oracle-itext ;
+: reject-training-text ( seq -- seq' ) "training" reject-by-oracle-itext ;
+: reject-trample-text ( seq -- seq' ) "trample" reject-by-oracle-itext ;
+: reject-transform-text ( seq -- seq' ) "transform" reject-by-oracle-itext ;
+: reject-transmute-text ( seq -- seq' ) "transmute" reject-by-oracle-itext ;
+: reject-treasure-text ( seq -- seq' ) "treasure" reject-by-oracle-itext ;
+: reject-tribute-text ( seq -- seq' ) "tribute" reject-by-oracle-itext ;
+: reject-typecycling-text ( seq -- seq' ) "typecycling" reject-by-oracle-itext ;
+: reject-undergrowth-text ( seq -- seq' ) "undergrowth" reject-by-oracle-itext ;
+: reject-undying-text ( seq -- seq' ) "undying" reject-by-oracle-itext ;
+: reject-unearth-text ( seq -- seq' ) "unearth" reject-by-oracle-itext ;
+: reject-unleash-text ( seq -- seq' ) "unleash" reject-by-oracle-itext ;
+: reject-vanishing-text ( seq -- seq' ) "vanishing" reject-by-oracle-itext ;
+: reject-venture-into-the-dungeon-text ( seq -- seq' ) "venture into the dungeon" reject-by-oracle-itext ;
+: reject-vigilance-text ( seq -- seq' ) "vigilance" reject-by-oracle-itext ;
+: reject-ward-text ( seq -- seq' ) "ward" reject-by-oracle-itext ;
+: reject-will-of-the-council-text ( seq -- seq' ) "will of the council" reject-by-oracle-itext ;
+: reject-wither-text ( seq -- seq' ) "wither" reject-by-oracle-itext ;
+
+: reject-day ( seq -- seq' ) "day" reject-by-oracle-itext ;
+: reject-night ( seq -- seq' ) "night" reject-by-oracle-itext ;
+: reject-daybound ( seq -- seq' ) "daybound" reject-by-oracle-itext ;
+: reject-nightbound ( seq -- seq' ) "nightbound" reject-by-oracle-itext ;
+
+: reject-cave ( seq -- seq' ) "cave" reject-land-subtype ;
+: reject-sphere ( seq -- seq' ) "sphere" reject-land-subtype ;
+
+: reject-mount ( seq -- seq' ) "mount" reject-by-oracle-itext ;
+: reject-outlaw ( seq -- seq' )
+    { "Assassin" "Mercenary" "Pirate" "Rogue" "Warlock" } reject-subtype-intersects ;
+: reject-plot ( seq -- seq' ) "plot" reject-by-oracle-itext ;
+: reject-saddle ( seq -- seq' ) "saddle" reject-by-oracle-itext ;
+: reject-spree ( seq -- seq' ) "saddle" reject-by-oracle-itext ;
+
+: reject-adamant-keyword ( seq -- seq' ) "adamant" reject-by-keyword ;
+: reject-adapt-keyword ( seq -- seq' ) "adapt" reject-by-keyword ;
+: reject-addendum-keyword ( seq -- seq' ) "addendum" reject-by-keyword ;
+: reject-affinity-keyword ( seq -- seq' ) "affinity" reject-by-keyword ;
+: reject-afflict-keyword ( seq -- seq' ) "afflict" reject-by-keyword ;
+: reject-afterlife-keyword ( seq -- seq' ) "afterlife" reject-by-keyword ;
+: reject-aftermath-keyword ( seq -- seq' ) "aftermath" reject-by-keyword ;
+: reject-alliance-keyword ( seq -- seq' ) "alliance" reject-by-keyword ;
+: reject-amass-keyword ( seq -- seq' ) "amass" reject-by-keyword ;
+: reject-amplify-keyword ( seq -- seq' ) "amplify" reject-by-keyword ;
+: reject-annihilator-keyword ( seq -- seq' ) "annihilator" reject-by-keyword ;
+: reject-ascend-keyword ( seq -- seq' ) "ascend" reject-by-keyword ;
+: reject-assemble-keyword ( seq -- seq' ) "assemble" reject-by-keyword ;
+: reject-assist-keyword ( seq -- seq' ) "assist" reject-by-keyword ;
+: reject-augment-keyword ( seq -- seq' ) "augment" reject-by-keyword ;
+: reject-awaken-keyword ( seq -- seq' ) "awaken" reject-by-keyword ;
+: reject-backup-keyword ( seq -- seq' ) "backup" reject-by-keyword ;
+: reject-banding-keyword ( seq -- seq' ) "banding" reject-by-keyword ;
+: reject-bargain-keyword ( seq -- seq' ) "bargain" reject-by-keyword ;
+: reject-basic-landcycling-keyword ( seq -- seq' ) "basic-landcycling" reject-by-keyword ;
+: reject-battalion-keyword ( seq -- seq' ) "battalion" reject-by-keyword ;
+: reject-battle-cry-keyword ( seq -- seq' ) "battle-cry" reject-by-keyword ;
+: reject-bestow-keyword ( seq -- seq' ) "bestow" reject-by-keyword ;
+: reject-blitz-keyword ( seq -- seq' ) "blitz" reject-by-keyword ;
+: reject-bloodrush-keyword ( seq -- seq' ) "bloodrush" reject-by-keyword ;
+: reject-bloodthirst-keyword ( seq -- seq' ) "bloodthirst" reject-by-keyword ;
+: reject-boast-keyword ( seq -- seq' ) "boast" reject-by-keyword ;
+: reject-bolster-keyword ( seq -- seq' ) "bolster" reject-by-keyword ;
+: reject-bushido-keyword ( seq -- seq' ) "bushido" reject-by-keyword ;
+: reject-buyback-keyword ( seq -- seq' ) "buyback" reject-by-keyword ;
+: reject-cascade-keyword ( seq -- seq' ) "cascade" reject-by-keyword ;
+: reject-casualty-keyword ( seq -- seq' ) "casualty" reject-by-keyword ;
+: reject-celebration-keyword ( seq -- seq' ) "celebration" reject-by-keyword ;
+: reject-champion-keyword ( seq -- seq' ) "champion" reject-by-keyword ;
+: reject-changeling-keyword ( seq -- seq' ) "changeling" reject-by-keyword ;
+: reject-channel-keyword ( seq -- seq' ) "channel" reject-by-keyword ;
+: reject-choose-a-background-keyword ( seq -- seq' ) "choose-a-background" reject-by-keyword ;
+: reject-chroma-keyword ( seq -- seq' ) "chroma" reject-by-keyword ;
+: reject-cipher-keyword ( seq -- seq' ) "cipher" reject-by-keyword ;
+: reject-clash-keyword ( seq -- seq' ) "clash" reject-by-keyword ;
+: reject-cleave-keyword ( seq -- seq' ) "cleave" reject-by-keyword ;
+: reject-cloak-keyword ( seq -- seq' ) "cloak" reject-by-keyword ;
+: reject-cohort-keyword ( seq -- seq' ) "cohort" reject-by-keyword ;
+: reject-collect-evidence-keyword ( seq -- seq' ) "collect-evidence" reject-by-keyword ;
+: reject-companion-keyword ( seq -- seq' ) "companion" reject-by-keyword ;
+: reject-compleated-keyword ( seq -- seq' ) "compleated" reject-by-keyword ;
+: reject-conjure-keyword ( seq -- seq' ) "conjure" reject-by-keyword ;
+: reject-connive-keyword ( seq -- seq' ) "connive" reject-by-keyword ;
+: reject-conspire-keyword ( seq -- seq' ) "conspire" reject-by-keyword ;
+: reject-constellation-keyword ( seq -- seq' ) "constellation" reject-by-keyword ;
+: reject-converge-keyword ( seq -- seq' ) "converge" reject-by-keyword ;
+: reject-convert-keyword ( seq -- seq' ) "convert" reject-by-keyword ;
+: reject-convoke-keyword ( seq -- seq' ) "convoke" reject-by-keyword ;
+: reject-corrupted-keyword ( seq -- seq' ) "corrupted" reject-by-keyword ;
+: reject-council's-dilemma-keyword ( seq -- seq' ) "council's-dilemma" reject-by-keyword ;
+: reject-coven-keyword ( seq -- seq' ) "coven" reject-by-keyword ;
+: reject-craft-keyword ( seq -- seq' ) "craft" reject-by-keyword ;
+: reject-crew-keyword ( seq -- seq' ) "crew" reject-by-keyword ;
+: reject-cumulative-upkeep-keyword ( seq -- seq' ) "cumulative-upkeep" reject-by-keyword ;
+: reject-cycling-keyword ( seq -- seq' ) "cycling" reject-by-keyword ;
+: reject-dash-keyword ( seq -- seq' ) "dash" reject-by-keyword ;
+: reject-daybound-keyword ( seq -- seq' ) "daybound" reject-by-keyword ;
+: reject-deathtouch-keyword ( seq -- seq' ) "deathtouch" reject-by-keyword ;
+: reject-defender-keyword ( seq -- seq' ) "defender" reject-by-keyword ;
+: reject-delirium-keyword ( seq -- seq' ) "delirium" reject-by-keyword ;
+: reject-delve-keyword ( seq -- seq' ) "delve" reject-by-keyword ;
+: reject-descend-keyword ( seq -- seq' ) "descend" reject-by-keyword ;
+: reject-detain-keyword ( seq -- seq' ) "detain" reject-by-keyword ;
+: reject-dethrone-keyword ( seq -- seq' ) "dethrone" reject-by-keyword ;
+: reject-devoid-keyword ( seq -- seq' ) "devoid" reject-by-keyword ;
+: reject-devour-keyword ( seq -- seq' ) "devour" reject-by-keyword ;
+: reject-discover-keyword ( seq -- seq' ) "discover" reject-by-keyword ;
+: reject-disguise-keyword ( seq -- seq' ) "disguise" reject-by-keyword ;
+: reject-disturb-keyword ( seq -- seq' ) "disturb" reject-by-keyword ;
+: reject-doctor's-companion-keyword ( seq -- seq' ) "doctor's-companion" reject-by-keyword ;
+: reject-domain-keyword ( seq -- seq' ) "domain" reject-by-keyword ;
+: reject-double-strike-keyword ( seq -- seq' ) "double-strike" reject-by-keyword ;
+: reject-dredge-keyword ( seq -- seq' ) "dredge" reject-by-keyword ;
+: reject-echo-keyword ( seq -- seq' ) "echo" reject-by-keyword ;
+: reject-embalm-keyword ( seq -- seq' ) "embalm" reject-by-keyword ;
+: reject-emerge-keyword ( seq -- seq' ) "emerge" reject-by-keyword ;
+: reject-eminence-keyword ( seq -- seq' ) "eminence" reject-by-keyword ;
+: reject-enchant-keyword ( seq -- seq' ) "enchant" reject-by-keyword ;
+: reject-encore-keyword ( seq -- seq' ) "encore" reject-by-keyword ;
+: reject-enlist-keyword ( seq -- seq' ) "enlist" reject-by-keyword ;
+: reject-enrage-keyword ( seq -- seq' ) "enrage" reject-by-keyword ;
+: reject-entwine-keyword ( seq -- seq' ) "entwine" reject-by-keyword ;
+: reject-equip-keyword ( seq -- seq' ) "equip" reject-by-keyword ;
+: reject-escalate-keyword ( seq -- seq' ) "escalate" reject-by-keyword ;
+: reject-escape-keyword ( seq -- seq' ) "escape" reject-by-keyword ;
+: reject-eternalize-keyword ( seq -- seq' ) "eternalize" reject-by-keyword ;
+: reject-evoke-keyword ( seq -- seq' ) "evoke" reject-by-keyword ;
+: reject-evolve-keyword ( seq -- seq' ) "evolve" reject-by-keyword ;
+: reject-exalted-keyword ( seq -- seq' ) "exalted" reject-by-keyword ;
+: reject-exert-keyword ( seq -- seq' ) "exert" reject-by-keyword ;
+: reject-exploit-keyword ( seq -- seq' ) "exploit" reject-by-keyword ;
+: reject-explore-keyword ( seq -- seq' ) "explore" reject-by-keyword ;
+: reject-extort-keyword ( seq -- seq' ) "extort" reject-by-keyword ;
+: reject-fabricate-keyword ( seq -- seq' ) "fabricate" reject-by-keyword ;
+: reject-fading-keyword ( seq -- seq' ) "fading" reject-by-keyword ;
+: reject-fateful-hour-keyword ( seq -- seq' ) "fateful-hour" reject-by-keyword ;
+: reject-fathomless-descent-keyword ( seq -- seq' ) "fathomless-descent" reject-by-keyword ;
+: reject-fear-keyword ( seq -- seq' ) "fear" reject-by-keyword ;
+: reject-ferocious-keyword ( seq -- seq' ) "ferocious" reject-by-keyword ;
+: reject-fight-keyword ( seq -- seq' ) "fight" reject-by-keyword ;
+: reject-first-strike-keyword ( seq -- seq' ) "first-strike" reject-by-keyword ;
+: reject-flanking-keyword ( seq -- seq' ) "flanking" reject-by-keyword ;
+: reject-flash-keyword ( seq -- seq' ) "flash" reject-by-keyword ;
+: reject-flashback-keyword ( seq -- seq' ) "flashback" reject-by-keyword ;
+: reject-flying-keyword ( seq -- seq' ) "flying" reject-by-keyword ;
+: reject-food-keyword ( seq -- seq' ) "food" reject-by-keyword ;
+: reject-forage-keyword ( seq -- seq' ) "forage" reject-by-keyword ;
+: reject-for-mirrodin!-keyword ( seq -- seq' ) "for-mirrodin!" reject-by-keyword ;
+: reject-forecast-keyword ( seq -- seq' ) "forecast" reject-by-keyword ;
+: reject-forestcycling-keyword ( seq -- seq' ) "forestcycling" reject-by-keyword ;
+: reject-forestwalk-keyword ( seq -- seq' ) "forestwalk" reject-by-keyword ;
+: reject-foretell-keyword ( seq -- seq' ) "foretell" reject-by-keyword ;
+: reject-formidable-keyword ( seq -- seq' ) "formidable" reject-by-keyword ;
+: reject-friends-forever-keyword ( seq -- seq' ) "friends-forever" reject-by-keyword ;
+: reject-fuse-keyword ( seq -- seq' ) "fuse" reject-by-keyword ;
+: reject-gift-keyword ( seq -- seq' ) "gift" reject-by-keyword ;
+: reject-goad-keyword ( seq -- seq' ) "goad" reject-by-keyword ;
+: reject-graft-keyword ( seq -- seq' ) "graft" reject-by-keyword ;
+: reject-haste-keyword ( seq -- seq' ) "haste" reject-by-keyword ;
+: reject-haunt-keyword ( seq -- seq' ) "haunt" reject-by-keyword ;
+: reject-hellbent-keyword ( seq -- seq' ) "hellbent" reject-by-keyword ;
+: reject-hero's-reward-keyword ( seq -- seq' ) "hero's-reward" reject-by-keyword ;
+: reject-heroic-keyword ( seq -- seq' ) "heroic" reject-by-keyword ;
+: reject-hexproof-keyword ( seq -- seq' ) "hexproof" reject-by-keyword ;
+: reject-hexproof-from-keyword ( seq -- seq' ) "hexproof-from" reject-by-keyword ;
+: reject-hidden-agenda-keyword ( seq -- seq' ) "hidden-agenda" reject-by-keyword ;
+: reject-hideaway-keyword ( seq -- seq' ) "hideaway" reject-by-keyword ;
+: reject-horsemanship-keyword ( seq -- seq' ) "horsemanship" reject-by-keyword ;
+: reject-imprint-keyword ( seq -- seq' ) "imprint" reject-by-keyword ;
+: reject-improvise-keyword ( seq -- seq' ) "improvise" reject-by-keyword ;
+: reject-incubate-keyword ( seq -- seq' ) "incubate" reject-by-keyword ;
+: reject-indestructible-keyword ( seq -- seq' ) "indestructible" reject-by-keyword ;
+: reject-infect-keyword ( seq -- seq' ) "infect" reject-by-keyword ;
+: reject-ingest-keyword ( seq -- seq' ) "ingest" reject-by-keyword ;
+: reject-inspired-keyword ( seq -- seq' ) "inspired" reject-by-keyword ;
+: reject-intensity-keyword ( seq -- seq' ) "intensity" reject-by-keyword ;
+: reject-intimidate-keyword ( seq -- seq' ) "intimidate" reject-by-keyword ;
+: reject-investigate-keyword ( seq -- seq' ) "investigate" reject-by-keyword ;
+: reject-islandcycling-keyword ( seq -- seq' ) "islandcycling" reject-by-keyword ;
+: reject-islandwalk-keyword ( seq -- seq' ) "islandwalk" reject-by-keyword ;
+: reject-jump-start-keyword ( seq -- seq' ) "jump-start" reject-by-keyword ;
+: reject-kicker-keyword ( seq -- seq' ) "kicker" reject-by-keyword ;
+: reject-kinship-keyword ( seq -- seq' ) "kinship" reject-by-keyword ;
+: reject-landcycling-keyword ( seq -- seq' ) "landcycling" reject-by-keyword ;
+: reject-landfall-keyword ( seq -- seq' ) "landfall" reject-by-keyword ;
+: reject-landwalk-keyword ( seq -- seq' ) "landwalk" reject-by-keyword ;
+: reject-learn-keyword ( seq -- seq' ) "learn" reject-by-keyword ;
+: reject-level-up-keyword ( seq -- seq' ) "level-up" reject-by-keyword ;
+: reject-lieutenant-keyword ( seq -- seq' ) "lieutenant" reject-by-keyword ;
+: reject-lifelink-keyword ( seq -- seq' ) "lifelink" reject-by-keyword ;
+: reject-living-metal-keyword ( seq -- seq' ) "living-metal" reject-by-keyword ;
+: reject-living-weapon-keyword ( seq -- seq' ) "living-weapon" reject-by-keyword ;
+: reject-madness-keyword ( seq -- seq' ) "madness" reject-by-keyword ;
+: reject-magecraft-keyword ( seq -- seq' ) "magecraft" reject-by-keyword ;
+: reject-manifest-keyword ( seq -- seq' ) "manifest" reject-by-keyword ;
+: reject-megamorph-keyword ( seq -- seq' ) "megamorph" reject-by-keyword ;
+: reject-meld-keyword ( seq -- seq' ) "meld" reject-by-keyword ;
+: reject-melee-keyword ( seq -- seq' ) "melee" reject-by-keyword ;
+: reject-menace-keyword ( seq -- seq' ) "menace" reject-by-keyword ;
+: reject-mentor-keyword ( seq -- seq' ) "mentor" reject-by-keyword ;
+: reject-metalcraft-keyword ( seq -- seq' ) "metalcraft" reject-by-keyword ;
+: reject-mill-keyword ( seq -- seq' ) "mill" reject-by-keyword ;
+: reject-miracle-keyword ( seq -- seq' ) "miracle" reject-by-keyword ;
+: reject-modular-keyword ( seq -- seq' ) "modular" reject-by-keyword ;
+: reject-monstrosity-keyword ( seq -- seq' ) "monstrosity" reject-by-keyword ;
+: reject-morbid-keyword ( seq -- seq' ) "morbid" reject-by-keyword ;
+: reject-more-than-meets-the-eye-keyword ( seq -- seq' ) "more-than-meets-the-eye" reject-by-keyword ;
+: reject-morph-keyword ( seq -- seq' ) "morph" reject-by-keyword ;
+: reject-mountaincycling-keyword ( seq -- seq' ) "mountaincycling" reject-by-keyword ;
+: reject-mountainwalk-keyword ( seq -- seq' ) "mountainwalk" reject-by-keyword ;
+: reject-multikicker-keyword ( seq -- seq' ) "multikicker" reject-by-keyword ;
+: reject-mutate-keyword ( seq -- seq' ) "mutate" reject-by-keyword ;
+: reject-myriad-keyword ( seq -- seq' ) "myriad" reject-by-keyword ;
+: reject-nightbound-keyword ( seq -- seq' ) "nightbound" reject-by-keyword ;
+: reject-ninjutsu-keyword ( seq -- seq' ) "ninjutsu" reject-by-keyword ;
+: reject-offering-keyword ( seq -- seq' ) "offering" reject-by-keyword ;
+: reject-open-an-attraction-keyword ( seq -- seq' ) "open-an-attraction" reject-by-keyword ;
+: reject-outlast-keyword ( seq -- seq' ) "outlast" reject-by-keyword ;
+: reject-overload-keyword ( seq -- seq' ) "overload" reject-by-keyword ;
+: reject-pack-tactics-keyword ( seq -- seq' ) "pack-tactics" reject-by-keyword ;
+: reject-paradox-keyword ( seq -- seq' ) "paradox" reject-by-keyword ;
+: reject-parley-keyword ( seq -- seq' ) "parley" reject-by-keyword ;
+: reject-partner-keyword ( seq -- seq' ) "partner" reject-by-keyword ;
+: reject-partner-with-keyword ( seq -- seq' ) "partner-with" reject-by-keyword ;
+: reject-persist-keyword ( seq -- seq' ) "persist" reject-by-keyword ;
+: reject-phasing-keyword ( seq -- seq' ) "phasing" reject-by-keyword ;
+: reject-plainscycling-keyword ( seq -- seq' ) "plainscycling" reject-by-keyword ;
+: reject-plot-keyword ( seq -- seq' ) "plot" reject-by-keyword ;
+: reject-populate-keyword ( seq -- seq' ) "populate" reject-by-keyword ;
+: reject-proliferate-keyword ( seq -- seq' ) "proliferate" reject-by-keyword ;
+: reject-protection-keyword ( seq -- seq' ) "protection" reject-by-keyword ;
+: reject-prototype-keyword ( seq -- seq' ) "prototype" reject-by-keyword ;
+: reject-provoke-keyword ( seq -- seq' ) "provoke" reject-by-keyword ;
+: reject-prowess-keyword ( seq -- seq' ) "prowess" reject-by-keyword ;
+: reject-prowl-keyword ( seq -- seq' ) "prowl" reject-by-keyword ;
+: reject-radiance-keyword ( seq -- seq' ) "radiance" reject-by-keyword ;
+: reject-raid-keyword ( seq -- seq' ) "raid" reject-by-keyword ;
+: reject-rally-keyword ( seq -- seq' ) "rally" reject-by-keyword ;
+: reject-rampage-keyword ( seq -- seq' ) "rampage" reject-by-keyword ;
+: reject-ravenous-keyword ( seq -- seq' ) "ravenous" reject-by-keyword ;
+: reject-reach-keyword ( seq -- seq' ) "reach" reject-by-keyword ;
+: reject-read-ahead-keyword ( seq -- seq' ) "read-ahead" reject-by-keyword ;
+: reject-rebound-keyword ( seq -- seq' ) "rebound" reject-by-keyword ;
+: reject-reconfigure-keyword ( seq -- seq' ) "reconfigure" reject-by-keyword ;
+: reject-recover-keyword ( seq -- seq' ) "recover" reject-by-keyword ;
+: reject-reinforce-keyword ( seq -- seq' ) "reinforce" reject-by-keyword ;
+: reject-renown-keyword ( seq -- seq' ) "renown" reject-by-keyword ;
+: reject-replicate-keyword ( seq -- seq' ) "replicate" reject-by-keyword ;
+: reject-retrace-keyword ( seq -- seq' ) "retrace" reject-by-keyword ;
+: reject-revolt-keyword ( seq -- seq' ) "revolt" reject-by-keyword ;
+: reject-riot-keyword ( seq -- seq' ) "riot" reject-by-keyword ;
+: reject-role-token-keyword ( seq -- seq' ) "role-token" reject-by-keyword ;
+: reject-saddle-keyword ( seq -- seq' ) "saddle" reject-by-keyword ;
+: reject-scavenge-keyword ( seq -- seq' ) "scavenge" reject-by-keyword ;
+: reject-scry-keyword ( seq -- seq' ) "scry" reject-by-keyword ;
+: reject-seek-keyword ( seq -- seq' ) "seek" reject-by-keyword ;
+: reject-shadow-keyword ( seq -- seq' ) "shadow" reject-by-keyword ;
+: reject-shroud-keyword ( seq -- seq' ) "shroud" reject-by-keyword ;
+: reject-skulk-keyword ( seq -- seq' ) "skulk" reject-by-keyword ;
+: reject-soulbond-keyword ( seq -- seq' ) "soulbond" reject-by-keyword ;
+: reject-soulshift-keyword ( seq -- seq' ) "soulshift" reject-by-keyword ;
+: reject-specialize-keyword ( seq -- seq' ) "specialize" reject-by-keyword ;
+: reject-spectacle-keyword ( seq -- seq' ) "spectacle" reject-by-keyword ;
+: reject-spell-mastery-keyword ( seq -- seq' ) "spell-mastery" reject-by-keyword ;
+: reject-splice-keyword ( seq -- seq' ) "splice" reject-by-keyword ;
+: reject-split-second-keyword ( seq -- seq' ) "split-second" reject-by-keyword ;
+: reject-spree-keyword ( seq -- seq' ) "spree" reject-by-keyword ;
+: reject-squad-keyword ( seq -- seq' ) "squad" reject-by-keyword ;
+: reject-storm-keyword ( seq -- seq' ) "storm" reject-by-keyword ;
+: reject-strive-keyword ( seq -- seq' ) "strive" reject-by-keyword ;
+: reject-sunburst-keyword ( seq -- seq' ) "sunburst" reject-by-keyword ;
+: reject-support-keyword ( seq -- seq' ) "support" reject-by-keyword ;
+: reject-surge-keyword ( seq -- seq' ) "surge" reject-by-keyword ;
+: reject-surveil-keyword ( seq -- seq' ) "surveil" reject-by-keyword ;
+: reject-suspect-keyword ( seq -- seq' ) "suspect" reject-by-keyword ;
+: reject-suspend-keyword ( seq -- seq' ) "suspend" reject-by-keyword ;
+: reject-swampcycling-keyword ( seq -- seq' ) "swampcycling" reject-by-keyword ;
+: reject-swampwalk-keyword ( seq -- seq' ) "swampwalk" reject-by-keyword ;
+: reject-threshold-keyword ( seq -- seq' ) "threshold" reject-by-keyword ;
+: reject-time-travel-keyword ( seq -- seq' ) "time-travel" reject-by-keyword ;
+: reject-totem-armor-keyword ( seq -- seq' ) "totem-armor" reject-by-keyword ;
+: reject-toxic-keyword ( seq -- seq' ) "toxic" reject-by-keyword ;
+: reject-training-keyword ( seq -- seq' ) "training" reject-by-keyword ;
+: reject-trample-keyword ( seq -- seq' ) "trample" reject-by-keyword ;
+: reject-transform-keyword ( seq -- seq' ) "transform" reject-by-keyword ;
+: reject-transmute-keyword ( seq -- seq' ) "transmute" reject-by-keyword ;
+: reject-treasure-keyword ( seq -- seq' ) "treasure" reject-by-keyword ;
+: reject-tribute-keyword ( seq -- seq' ) "tribute" reject-by-keyword ;
+: reject-typecycling-keyword ( seq -- seq' ) "typecycling" reject-by-keyword ;
+: reject-undergrowth-keyword ( seq -- seq' ) "undergrowth" reject-by-keyword ;
+: reject-undying-keyword ( seq -- seq' ) "undying" reject-by-keyword ;
+: reject-unearth-keyword ( seq -- seq' ) "unearth" reject-by-keyword ;
+: reject-unleash-keyword ( seq -- seq' ) "unleash" reject-by-keyword ;
+: reject-valiant-keyword ( seq -- seq' ) "valiant" reject-by-keyword ;
+: reject-vanishing-keyword ( seq -- seq' ) "vanishing" reject-by-keyword ;
+: reject-venture-into-the-dungeon-keyword ( seq -- seq' ) "venture-into-the-dungeon" reject-by-keyword ;
+: reject-vigilance-keyword ( seq -- seq' ) "vigilance" reject-by-keyword ;
+: reject-ward-keyword ( seq -- seq' ) "ward" reject-by-keyword ;
+: reject-will-of-the-council-keyword ( seq -- seq' ) "will-of-the-council" reject-by-keyword ;
+: reject-wither-keyword ( seq -- seq' ) "wither" reject-by-keyword ;
+
+: reject-power=* ( seq -- seq' ) [ "power" of "*" = ] reject-card-faces-main-card ;
+: reject-toughness=* ( seq -- seq' ) [ "toughness" of "*" = ] reject-card-faces-main-card ;
+
+: reject-power= ( seq n -- seq' ) '[ "power" of _ mtg= ] reject-card-faces-main-card ;
+: reject-power< ( seq n -- seq' ) '[ "power" of _ mtg< ] reject-card-faces-main-card ;
+: reject-power> ( seq n -- seq' ) '[ "power" of _ mtg> ] reject-card-faces-main-card ;
+: reject-power<= ( seq n -- seq' ) '[ "power" of _ mtg<= ] reject-card-faces-main-card ;
+: reject-power>= ( seq n -- seq' ) '[ "power" of _ mtg>= ] reject-card-faces-main-card ;
+
+: reject-toughness= ( seq n -- seq' ) '[ "toughness" of _ mtg= ] reject-card-faces-main-card ;
+: reject-toughness< ( seq n -- seq' ) '[ "toughness" of _ mtg< ] reject-card-faces-main-card ;
+: reject-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] reject-card-faces-main-card ;
+: reject-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] reject-card-faces-main-card ;
+: reject-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] reject-card-faces-main-card ;
 
 : map-props ( seq props -- seq' ) '[ _ intersect-keys ] map ;
 
@@ -1068,6 +1839,7 @@ MEMO: mtg-sets-by-name ( -- assoc )
     [ [ "set_name" of ] [ "set" of ] bi ] H{ } map>assoc ;
 
 : filter-mtg-set ( seq abbrev -- seq ) '[ "set" of _ = ] filter ;
+: reject-mtg-set ( seq abbrev -- seq ) '[ "set" of _ = ] filter ;
 
 : unique-set-names ( seq -- seq' ) [ "set_name" of ] map members ;
 : unique-set-abbrevs ( seq -- seq' ) [ "set" of ] map members ;
@@ -1088,6 +1860,9 @@ MEMO: mtg-sets-by-name ( -- assoc )
 
 : filter-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] filter ;
 : filter-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] filter ;
+
+: reject-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] reject ;
+: reject-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] reject ;
 
 ! standard
 : mid-cards ( -- seq ) mtg-oracle-cards "mid" filter-set ;
@@ -1268,6 +2043,10 @@ M: sequence deck-and-sideboard. deck. ;
             [ filter-cycling-keyword ]
             [ filter-disguise-keyword ]
             [ filter-madness-keyword ]
+            [ filter-ninjutsu-keyword ]
+            [ filter-channel-keyword ]
+            [ filter-retrace-keyword ]
+            [ filter-discard-effect ]
         } cleave
     ] { } append-outputs-as sort-by-colors ;
 
