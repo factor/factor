@@ -1,15 +1,12 @@
 ! Copyright (C) 2016 Björn Lindqvist.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar combinators http http.client io
-json kernel make math.order sequences unicode urls webbrowser ;
+json.http kernel make math.order sequences unicode urls
+webbrowser ;
 IN: oauth2
 
 : console-prompt ( query -- str/f )
     write flush readln [ blank? ] trim [ f ] when-empty ;
-
-: post-json-request ( params token-uri -- assoc )
-    <post-request> "application/json" "Accept" set-header
-    http-request nip json> ;
 
 TUPLE: tokens access refresh expiry ;
 
@@ -77,12 +74,12 @@ TUPLE: oauth2
     dup oauth2>auth-uri open-url
     "Enter verification code: " console-prompt
     [
-        dupd tokens-params swap token-uri>> post-json-request
+        dupd tokens-params swap token-uri>> http-post-json nip
         assoc>tokens
     ] [ drop f ] if* ;
 
 : refresh-flow ( oauth2 tokens -- tokens' )
-    dupd refresh>> refresh-params swap token-uri>> post-json-request
+    dupd refresh>> refresh-params swap token-uri>> http-post-json nip
     assoc>tokens ;
 
 : oauth-http-get ( url access-token -- response data )
