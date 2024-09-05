@@ -34,8 +34,9 @@ ENUM: dns-type
 { CSYNC 62 } { ZONEMD 63 } { SVCB 64 } { HTTPS 65 }
 { SPF 99 } { UINFO 100 } { UID 101 } { GID 102 } { UNSPEC 103 }
 { NID 104 } { L32 105 } { L64 106 } { LP 107 } { EUI48 108 } { EUI64 109 }
-{ TKEY 249 } { TSIG 250 } { IXFR 251 } { AXFR 252 } { MAILB 253 } { MAILA 254 }
-{ DNS* 255 } { URI 256 } { CAA 257 } { AVC 258 } { DOA 259 } { AMTRELAY 260 }
+{ NXNAME 128 } { TKEY 249 } { TSIG 250 } { IXFR 251 } { AXFR 252 } { MAILB 253 }
+{ MAILA 254 } { DNS* 255 } { URI 256 } { CAA 257 } { AVC 258 } { DOA 259 }
+{ AMTRELAY 260 } { RESINFO 261 } { WALLET 262 } { CLA 263 }
 { TA 32768 } { DLV 32769 } ;
 
 ENUM: dns-class { IN 1 } { CS 2 } { CH 3 } { HS 4 } ;
