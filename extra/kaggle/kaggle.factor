@@ -289,5 +289,4 @@ ENUM: kaggle-categories
     "https://www.kaggle.com/account/login?phase=emailSignIn&returnUrl=%2Fwork" "referer" set-header
     swap >>cookies
     swap [ swap set-header ] assoc-each
-    "1a567385c6b3c7697e12a04f7f0dcbaeccab6013" "x-kaggle-build-version" set-header
     json-request ;
