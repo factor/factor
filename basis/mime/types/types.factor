@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables io.encodings.ascii io.encodings.binary
-io.encodings.utf8 io.files io.pathnames kernel make sequences
-splitting ;
+USING: assocs combinators.short-circuit hashtables
+io.encodings.ascii io.encodings.binary io.encodings.utf8
+io.files io.pathnames kernel make sequences splitting ;
 IN: mime.types
 
 MEMO: mime-db ( -- seq )
@@ -49,7 +49,10 @@ MEMO: mime-extensions ( -- assoc )
     file-extension mime-types at "application/octet-stream" or ;
 
 : mime-type-encoding ( mime-type -- encoding )
-    "text/" head? utf8 binary ? ;
+    {
+        [ "text/" head? ]
+        [ "application/json" = ]
+    } 1|| utf8 binary ? ;
 
 : mime-type>extension ( mime-type -- extension )
     mime-extensions at ;
