@@ -22,7 +22,7 @@ tools.test zoneinfo ;
         { name "Pacific/Kiritimati" }
         { gmt-offset "14:00" }
         { rules/save "-" }
-        { format "+14" }
+        { format "%z" }
         { until { } }
     }
 } [
