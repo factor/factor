@@ -55,7 +55,7 @@ CONSTANT: alphabet $[
     output-stream get stream-write-lines ; inline
 
 :: (encode-base64) ( input output column -- )
-    4 <byte-array> :> data
+    4 (byte-array) :> data
     column [ input stream-read1 dup ] [
         input stream-read1
         input stream-read1
@@ -94,7 +94,7 @@ PRIVATE>
     } spread ; inline
 
 :: (decode-base64) ( input output -- )
-    3 <byte-array> :> data
+    3 (byte-array) :> data
     [ B{ CHAR: \n CHAR: \r } input read1-ignoring ] [
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
         B{ CHAR: \n CHAR: \r } input read1-ignoring CHAR: = or
