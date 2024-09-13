@@ -2,7 +2,7 @@ USING: accessors sequences kernel opengl gamelib.ui colors math
 math.vectors ui.gadgets.tracks ui.gestures ui.gadgets
 gamelib.board assocs calendar timers ;
 
-IN: multiple-board-demo
+IN: gamelib.demos.multiple-board-demo
 
 : board-init ( -- board )
     10 10 make-board 
