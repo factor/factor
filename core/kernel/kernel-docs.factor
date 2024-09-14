@@ -942,7 +942,7 @@ HELP: 1check
         "6 [ even? ] 1check [ . ] bi@"
         "6\nt"
     }
-    "True case:"
+    "False case:"
     { $example "USING: kernel math prettyprint ;"
         "6 [ odd? ] 1check [ . ] bi@"
         "6\nf"
