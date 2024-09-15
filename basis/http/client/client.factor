@@ -284,6 +284,21 @@ SYMBOL: request-socket
 : http-request ( request -- response data )
     http-request* [ check-response ] dip ;
 
+: <rest-request-with-body> ( body url method -- request )
+    <request>
+        swap >>method
+        swap request-url >>url
+        swap >>post-data ;
+
+: <rest-request> ( url method -- request )
+    [ f ] 2dip <rest-request-with-body> ;
+
+: rest-request-with-body ( body url method -- response data )
+    <rest-request-with-body> http-request ;
+
+: rest-request ( url method -- response data )
+    [ f ] 2dip rest-request-with-body ;
+
 : <get-request> ( url -- request )
     "GET" <client-request> ;
 
@@ -307,10 +322,10 @@ SYMBOL: request-socket
     "PUT" <client-request>
         swap >>post-data ;
 
-: http-put ( post-data url -- response data )
+: http-put ( put-data url -- response data )
     <put-request> http-request ;
 
-: http-put* ( post-data url -- response data )
+: http-put* ( put-data url -- response data )
     <put-request> http-request* ;
 
 : <delete-request> ( url -- request )

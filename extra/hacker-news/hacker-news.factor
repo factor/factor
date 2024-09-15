@@ -3,7 +3,7 @@
 
 USING: accessors assocs calendar calendar.format
 calendar.holidays.us colors combinators concurrency.combinators
-formatting graphs hashtables io io.styles json.http kernel make
+formatting graphs hashtables io io.styles http.json kernel make
 math sequences sets ui ui.theme urls ;
 
 IN: hacker-news

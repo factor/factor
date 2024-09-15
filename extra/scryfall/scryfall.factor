@@ -3,7 +3,7 @@
 USING: accessors arrays assocs assocs.extras calendar
 calendar.parser combinators combinators.short-circuit
 combinators.smart formatting grouping http.download
-images.loader images.viewer io io.directories json json.http
+images.loader images.viewer io io.directories json http.json
 kernel math math.combinatorics math.order math.parser
 math.statistics memoize namespaces random sequences
 sequences.deep sequences.extras sequences.generalizations sets

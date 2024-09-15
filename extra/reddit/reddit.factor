@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs calendar calendar.format colors
-combinators formatting http.client io io.styles json kernel make
-math sequences urls ;
+combinators formatting http.client http.json io io.styles json
+kernel make math sequences urls ;
 
 IN: reddit
 
@@ -12,7 +12,7 @@ IN: reddit
 TUPLE: page url data before after ;
 
 : json-page ( url -- page )
-    >url dup http-get nip json> "data" of {
+    >url dup http-get-json nip "data" of {
         [ "children" of ]
         [ "before" of [ f ] when-json-null ]
         [ "after" of [ f ] when-json-null ]
@@ -22,8 +22,7 @@ TUPLE: page url data before after ;
     "https://api.reddit.com/user/%s" sprintf json-page ;
 
 : get-user-info ( username -- user )
-    "https://api.reddit.com/user/%s/about" sprintf
-    http-get nip json> ;
+    "https://api.reddit.com/user/%s/about" sprintf http-get-json nip ;
 
 : get-url-info ( url -- page )
     "https://api.reddit.com/api/info?url=%s" sprintf json-page ;

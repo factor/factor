@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar calendar.format cli.git
 combinators combinators.short-circuit continuations formatting
 github html.parser html.parser.analyzer http.client
-http.download io io.directories io.encodings.string
+http.download http.json io io.directories io.encodings.string
 io.encodings.utf8 io.files io.launcher io.pathnames json kernel
 layouts math namespaces qw semver sequences sequences.extras
 sorting sorting.human sorting.specification splitting system
@@ -277,7 +277,7 @@ ERROR: no-output-file path ;
 
 : cairo-versions ( -- version )
     "https://gitlab.freedesktop.org/api/v4/projects/956/repository/tags"
-    http-get nip utf8 decode json> [ "name" of ] map ;
+    http-get-json nip [ "name" of ] map ;
 
 : blas-versions ( -- seq )
     "xianyi" "OpenBLAS" "v" list-repository-tags-matching
