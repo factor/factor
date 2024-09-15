@@ -49,7 +49,8 @@ TUPLE: discord-bot < disposable
 : add-json-header ( request -- request )
     "application/json" "Content-Type" set-header ;
 
-: json-request ( request -- json ) http-request nip utf8 decode json> ;
+: json-request-headers ( request -- headers json ) http-request utf8 decode json> ;
+: json-request ( request -- json ) json-request-headers nip ;
 : gwrite ( string -- ) [ write ] with-global ;
 : gprint ( string -- ) [ print ] with-global ;
 : gprint-flush ( string -- ) [ print flush ] with-global ;

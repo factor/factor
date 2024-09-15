@@ -8,7 +8,7 @@ IN: npm
 
 MEMO: get-npm-json ( name -- json )
     "https://registry.npmjs.org/" prepend
-    [ http-get nip utf8 decode json> ] [ 2drop H{ } clone ] recover ;
+    [ http-get-json nip ] [ 2drop H{ } clone ] recover ;
 
 ! "@babel/core-7.12": "npm:@babel/core@7.12.9"
 : dep-names8 ( deps -- dep-names )

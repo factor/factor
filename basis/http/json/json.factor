@@ -42,3 +42,10 @@ IN: http.json
 : http-patch-json ( assoc/json-string url -- response json )
     [ <json-post-data> ] dip "PATCH" <json-request>
       swap >>post-data http-request-json ;
+
+: rest-request-json ( url method -- response json )
+    <json-request> http-request-json ;
+
+: rest-request-json-with-body ( body url method -- response json )
+    [ <json-post-data> ] 2dip
+    <json-request> swap >>post-data http-request-json ;

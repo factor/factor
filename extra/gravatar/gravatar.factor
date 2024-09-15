@@ -17,7 +17,7 @@ profileBackground profileUrl requestHash thumbnailUrl urls ;
 
 : gravatar-info ( email -- info )
     gravatar-id "https://gravatar.com/%s.json" sprintf
-    http-get nip utf8 decode json> "entry" of first info from-slots ;
+    http-get-json nip "entry" of first info from-slots ;
 
 ! optional .jpg
 SYMBOL: gravatar-image-extension?

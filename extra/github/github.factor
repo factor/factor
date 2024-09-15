@@ -3,7 +3,7 @@
 USING: accessors arrays assocs assocs.extras calendar.parser
 cli.git combinators combinators.extras combinators.short-circuit
 continuations formatting hashtables http.client io.pathnames
-json json.http kernel math math.order namespaces.extras
+json http.json kernel math math.order namespaces.extras
 sequences sorting urls ;
 IN: github
 

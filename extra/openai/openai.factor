@@ -3,7 +3,7 @@
 
 USING: accessors assocs assocs.extras calendar calendar.format
 hashtables http http.client io.encodings.string
-io.encodings.utf8 json json.http kernel mirrors namespaces
+io.encodings.utf8 json http.json kernel mirrors namespaces
 sequences sorting urls ;
 
 IN: openai
