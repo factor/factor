@@ -1222,6 +1222,12 @@ HELP: until
 { $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
 
+HELP: until*
+{ $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
+{ $description "Calls " { $snippet "body" } " until " { $snippet "pred" }
+  " returns " { $link t } ". The return value of " { $snippet "pred" } " is "
+  "kept on the stack." } ;
+
 HELP: do
 { $values { "pred" { $quotation ( ..a -- ..b ? ) } } { "body" { $quotation ( ..b -- ..a ) } } }
 { $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
