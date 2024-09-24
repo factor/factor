@@ -76,7 +76,7 @@ HELP: lastn
 } ;
 
 HELP: ?lastn
-{ $values { "n" integer } }
+{ $values { "seq" sequence } { "n" integer } { "elts..." { $snippet "n" } " elements on the datastack" } }
 { $description "A generalization of " { $link ?last } " that pushes the last " { $snippet "n" } " elements of a sequence on the stack, or " { $link f } " if the sequence is shorter than the requested number of elements." }
 { $examples
     "Some core words expressed in terms of " { $link ?lastn } ":"
