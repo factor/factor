@@ -609,7 +609,7 @@ big-endian off
     tuple type-number temp1 CMPi
     ! [ JNE ]
     ! [ temp1 temp0 tuple-class-offset [+] MOV ]
-    [ NE B.cond ] [
+    [ 4 + NE B.cond ] [
         tuple-class-offset temp0 temp1 LDUR
     ] jit-conditional
 ] PIC-TUPLE jit-define
@@ -652,7 +652,7 @@ big-endian off
     tuple type-number tag-fixnum temp1 CMPi
     ! [ JNE ]
     ! [ temp1 temp0 tuple-class-offset [+] MOV ]
-    [ NE B.cond ] [
+    [ 4 + NE B.cond ] [
         tuple-class-offset temp0 temp1 LDUR
     ] jit-conditional
     ! ! cache = ...
@@ -677,7 +677,7 @@ big-endian off
     0 temp0 temp2 LDRuoff
     temp1 temp2 CMPr
     ! [ JNE ]
-    [ NE B.cond ] [
+    [ 4 + NE B.cond ] [
         ! ! megamorphic_cache_hits++
         ! temp1 0 MOV rc-absolute-cell rel-megamorphic-cache-hits
         2 words temp1 LDRl
