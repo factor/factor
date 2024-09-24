@@ -25,5 +25,8 @@ M: padded-tail nth-unsafe
     [ underlying>> ] keep 2over bounds-check?
     [ drop nth-unsafe ] [ 2nip elt>> ] if ;
 
+M: padded-head like underlying>> like ;
+M: padded-tail like underlying>> like ;
+
 INSTANCE: padded immutable-sequence
 
