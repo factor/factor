@@ -17,6 +17,9 @@ IN: sequences.generalizations.tests
 { 1 2 } [ { 1 2 } 2 ?firstn ] unit-test
 { 1 2 } [ { 1 2 3 } 2 ?firstn ] unit-test
 
+{ CHAR: A CHAR: B f f f } [ "AB" 5 ?firstn ] unit-test
+{ f f f CHAR: A CHAR: B } [ "AB" 5 ?lastn ] unit-test
+
 [ f 2 lastn ] must-fail
 [ { 1 } 2 lastn ] must-fail
 { 1 2 } [ { 1 2 } 2 lastn ] unit-test

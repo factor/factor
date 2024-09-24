@@ -36,13 +36,22 @@ MACRO: set-firstn ( n -- quot )
     ] if-zero ;
 
 MACRO: ?firstn ( n -- quot )
-    dup '[ _ f pad-tail _ firstn-unsafe ] ;
+    dup '[
+        _ over length [-]
+        [ f <repetition> ] [ _ over - swap ] bi
+        [ firstn-unsafe ] bi-curry@ bi*
+    ] ;
 
 : lastn ( seq n -- elts... )
     [ tail-slice* ] [ firstn-unsafe ] bi ; inline
 
-: ?lastn ( seq n -- elts... )
-    [ f pad-head ] [ lastn ] bi ; inline
+MACRO: ?lastn ( n -- quot )
+    dup '[
+        _ over length [-]
+        [ f <repetition> swap ]
+        [ _ over - swapd [ tail-slice* ] keep ] bi
+        [ firstn-unsafe ] 2bi@
+    ] ;
 
 : set-lastn ( elts... seq n -- )
     [ tail-slice* ] [ set-firstn-unsafe ] bi ; inline
