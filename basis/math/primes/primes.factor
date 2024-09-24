@@ -20,11 +20,13 @@ IN: math.primes
 PRIVATE>
 
 : prime? ( n -- ? )
-    {
-        { [ dup 7 < ] [ { 2 3 5 } member? ] }
-        { [ dup simple? ] [ drop f ] }
-        [ (prime?) ]
-    } cond ; foldable
+    dup integer? [
+        {
+            { [ dup 7 < ] [ { 2 3 5 } member? ] }
+            { [ dup simple? ] [ drop f ] }
+            [ (prime?) ]
+        } cond
+    ] [ drop f ] if ; foldable
 
 : next-prime ( n -- p )
     dup 2 < [
