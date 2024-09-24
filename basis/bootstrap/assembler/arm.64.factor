@@ -869,6 +869,7 @@ big-endian off
         32 stack-reg stack-reg ADDi
         ! ! Return with new callstack
         ! 0 RET
+        pop-link-reg
         f RET
     ] }
 
