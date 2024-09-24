@@ -13,6 +13,9 @@ sequences tools.test ;
 { 1000 } [ 1000 nprimes length ] unit-test
 { 1000 } [ 1000 nprimes last primes-upto length ] unit-test
 
+{ f } [ "ABC" prime? ] unit-test
+{ f } [ { } prime? ] unit-test
+
 { { 4999963 4999999 5000011 5000077 5000081 } }
 [ 4999962 5000082 primes-between >array ] unit-test
 
