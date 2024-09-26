@@ -590,6 +590,64 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-by-oracle-itext ( seq string -- seq' )
     "oracle_text" filter-card-faces-main-card-iprop ;
 
+: reject-card-faces-sub-card ( seq quot -- seq )
+    [ [ card>faces ] map concat ] dip reject ; inline
+
+: reject-card-faces-sub-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] reject-card-faces-sub-card ;
+
+: reject-card-faces-sub-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-sub-card ;
+
+: reject-card-faces-main-card ( seq quot -- seq )
+    dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] reject ; inline
+
+: reject-card-faces-main-card-prop ( seq string prop -- seq' )
+    swap '[ _ of _ subseq-of? ] reject-card-faces-main-card ;
+
+: reject-card-faces-main-card-iprop ( seq string prop -- seq' )
+    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-main-card ;
+
+: reject-card-faces-main-card-iprop-member ( seq string prop -- seq' )
+    swap >lower '[ _ of [ >lower ] map _ member-of? ] reject-card-faces-main-card ;
+
+: reject-by-flavor-text ( seq string -- seq' )
+    "flavor_text" reject-card-faces-main-card-prop ;
+
+: reject-by-flavor-itext ( seq string -- seq' )
+    "flavor_text" reject-card-faces-main-card-iprop ;
+
+: reject-by-oracle-text ( seq string -- seq' )
+    "oracle_text" reject-card-faces-main-card-prop ;
+
+: reject-by-oracle-itext ( seq string -- seq' )
+    "oracle_text" reject-card-faces-main-card-iprop ;
+
+: reject-by-keyword ( seq string -- seq' )
+    "keywords" reject-card-faces-main-card-iprop-member ;
+
+: reject-by-name-text ( seq string -- seq' ) "name" reject-by-text-prop ;
+: reject-by-name-itext ( seq string -- seq' ) "name" reject-by-itext-prop ;
+
+: collect-keywords ( seq -- seq' )
+    [ "keywords" of ] map concat members sort ;
+
+: filter-any-keywords ( seq -- seq' ) [ "keywords" of f like ] filter ;
+: reject-any-keywords ( seq -- seq' ) [ "keywords" of f like ] reject ;
+
+: filter-any-tapped-ability ( seq -- seq' ) "{T}" filter-by-oracle-itext ;
+: reject-any-tapped-ability ( seq -- seq' ) "{T}" reject-by-oracle-itext ;
+
+: filter-any-activated-ability ( seq -- seq' )
+    [ "oracle_text" of "" like string-lines [ "{" head? ] any? ] filter ;
+: reject-any-activated-ability ( seq -- seq' )
+    [ "oracle_text" of "" like string-lines [ "{" head? ] any? ] reject ;
+
+: filter-sorcery-ability ( seq -- seq' )
+    "activate only as a sorcery" filter-by-oracle-itext ;
+: reject-sorcery-ability ( seq -- seq' )
+    "activate only as a sorcery" reject-by-oracle-itext ;
+
 : filter-by-keyword ( seq string -- seq' )
     "keywords" filter-card-faces-main-card-iprop-member ;
 
@@ -682,6 +740,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-double-strike-text ( seq -- seq' ) "double strike" filter-by-oracle-itext ;
 : filter-dredge-text ( seq -- seq' ) "dredge" filter-by-oracle-itext ;
 : filter-echo-text ( seq -- seq' ) "echo" filter-by-oracle-itext ;
+: filter-eerie-text ( seq -- seq' ) "eerie" filter-by-oracle-itext ;
 : filter-embalm-text ( seq -- seq' ) "embalm" filter-by-oracle-itext ;
 : filter-emerge-text ( seq -- seq' ) "emerge" filter-by-oracle-itext ;
 : filter-eminence-text ( seq -- seq' ) "eminence" filter-by-oracle-itext ;
@@ -734,6 +793,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-hidden-agenda-text ( seq -- seq' ) "hidden agenda" filter-by-oracle-itext ;
 : filter-hideaway-text ( seq -- seq' ) "hideaway" filter-by-oracle-itext ;
 : filter-horsemanship-text ( seq -- seq' ) "horsemanship" filter-by-oracle-itext ;
+: filter-impending-text ( seq -- seq' ) "impending" filter-by-oracle-itext ;
 : filter-imprint-text ( seq -- seq' ) "imprint" filter-by-oracle-itext ;
 : filter-improvise-text ( seq -- seq' ) "improvise" filter-by-oracle-itext ;
 : filter-incubate-text ( seq -- seq' ) "incubate" filter-by-oracle-itext ;
@@ -761,6 +821,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-madness-text ( seq -- seq' ) "madness" filter-by-oracle-itext ;
 : filter-magecraft-text ( seq -- seq' ) "magecraft" filter-by-oracle-itext ;
 : filter-manifest-text ( seq -- seq' ) "manifest" filter-by-oracle-itext ;
+: filter-manifest-dread-text ( seq -- seq' ) "manifest dread" filter-by-oracle-itext ;
 : filter-megamorph-text ( seq -- seq' ) "megamorph" filter-by-oracle-itext ;
 : filter-meld-text ( seq -- seq' ) "meld" filter-by-oracle-itext ;
 : filter-melee-text ( seq -- seq' ) "melee" filter-by-oracle-itext ;
@@ -841,6 +902,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-support-text ( seq -- seq' ) "support" filter-by-oracle-itext ;
 : filter-surge-text ( seq -- seq' ) "surge" filter-by-oracle-itext ;
 : filter-surveil-text ( seq -- seq' ) "surveil" filter-by-oracle-itext ;
+: filter-survival-text ( seq -- seq' ) "survival" filter-by-oracle-itext ;
 : filter-suspect-text ( seq -- seq' ) "suspect" filter-by-oracle-itext ;
 : filter-suspend-text ( seq -- seq' ) "suspend" filter-by-oracle-itext ;
 : filter-swampcycling-text ( seq -- seq' ) "swampcycling" filter-by-oracle-itext ;
@@ -961,6 +1023,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-double-strike-keyword ( seq -- seq' ) "double-strike" filter-by-keyword ;
 : filter-dredge-keyword ( seq -- seq' ) "dredge" filter-by-keyword ;
 : filter-echo-keyword ( seq -- seq' ) "echo" filter-by-keyword ;
+: filter-eerie-keyword ( seq -- seq' ) "eerie" filter-by-keyword ;
 : filter-embalm-keyword ( seq -- seq' ) "embalm" filter-by-keyword ;
 : filter-emerge-keyword ( seq -- seq' ) "emerge" filter-by-keyword ;
 : filter-eminence-keyword ( seq -- seq' ) "eminence" filter-by-keyword ;
@@ -1015,6 +1078,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-hidden-agenda-keyword ( seq -- seq' ) "hidden-agenda" filter-by-keyword ;
 : filter-hideaway-keyword ( seq -- seq' ) "hideaway" filter-by-keyword ;
 : filter-horsemanship-keyword ( seq -- seq' ) "horsemanship" filter-by-keyword ;
+: filter-impending-keyword ( seq -- seq' ) "impending" filter-by-keyword ;
 : filter-imprint-keyword ( seq -- seq' ) "imprint" filter-by-keyword ;
 : filter-improvise-keyword ( seq -- seq' ) "improvise" filter-by-keyword ;
 : filter-incubate-keyword ( seq -- seq' ) "incubate" filter-by-keyword ;
@@ -1042,6 +1106,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-madness-keyword ( seq -- seq' ) "madness" filter-by-keyword ;
 : filter-magecraft-keyword ( seq -- seq' ) "magecraft" filter-by-keyword ;
 : filter-manifest-keyword ( seq -- seq' ) "manifest" filter-by-keyword ;
+: filter-manifest-dread-keyword ( seq -- seq' ) "manifest dread" filter-by-keyword ;
 : filter-megamorph-keyword ( seq -- seq' ) "megamorph" filter-by-keyword ;
 : filter-meld-keyword ( seq -- seq' ) "meld" filter-by-keyword ;
 : filter-melee-keyword ( seq -- seq' ) "melee" filter-by-keyword ;
@@ -1121,6 +1186,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-support-keyword ( seq -- seq' ) "support" filter-by-keyword ;
 : filter-surge-keyword ( seq -- seq' ) "surge" filter-by-keyword ;
 : filter-surveil-keyword ( seq -- seq' ) "surveil" filter-by-keyword ;
+: filter-survival-keyword ( seq -- seq' ) "survival" filter-by-keyword ;
 : filter-suspect-keyword ( seq -- seq' ) "suspect" filter-by-keyword ;
 : filter-suspend-keyword ( seq -- seq' ) "suspend" filter-by-keyword ;
 : filter-swampcycling-keyword ( seq -- seq' ) "swampcycling" filter-by-keyword ;
@@ -1180,45 +1246,6 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-toughness> ( seq n -- seq' ) '[ "toughness" of _ mtg> ] filter-card-faces-main-card ;
 : filter-toughness<= ( seq n -- seq' ) '[ "toughness" of _ mtg<= ] filter-card-faces-main-card ;
 : filter-toughness>= ( seq n -- seq' ) '[ "toughness" of _ mtg>= ] filter-card-faces-main-card ;
-
-: reject-card-faces-sub-card ( seq quot -- seq )
-    [ [ card>faces ] map concat ] dip reject ; inline
-
-: reject-card-faces-sub-card-prop ( seq string prop -- seq' )
-    swap '[ _ of _ subseq-of? ] reject-card-faces-sub-card ;
-
-: reject-card-faces-sub-card-iprop ( seq string prop -- seq' )
-    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-sub-card ;
-
-: reject-card-faces-main-card ( seq quot -- seq )
-    dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] reject ; inline
-
-: reject-card-faces-main-card-prop ( seq string prop -- seq' )
-    swap '[ _ of _ subseq-of? ] reject-card-faces-main-card ;
-
-: reject-card-faces-main-card-iprop ( seq string prop -- seq' )
-    swap >lower '[ _ of >lower _ subseq-of? ] reject-card-faces-main-card ;
-
-: reject-card-faces-main-card-iprop-member ( seq string prop -- seq' )
-    swap >lower '[ _ of [ >lower ] map _ member-of? ] reject-card-faces-main-card ;
-
-: reject-by-flavor-text ( seq string -- seq' )
-    "flavor_text" reject-card-faces-main-card-prop ;
-
-: reject-by-flavor-itext ( seq string -- seq' )
-    "flavor_text" reject-card-faces-main-card-iprop ;
-
-: reject-by-oracle-text ( seq string -- seq' )
-    "oracle_text" reject-card-faces-main-card-prop ;
-
-: reject-by-oracle-itext ( seq string -- seq' )
-    "oracle_text" reject-card-faces-main-card-iprop ;
-
-: reject-by-keyword ( seq string -- seq' )
-    "keywords" reject-card-faces-main-card-iprop-member ;
-
-: reject-by-name-text ( seq string -- seq' ) "name" reject-by-text-prop ;
-: reject-by-name-itext ( seq string -- seq' ) "name" reject-by-itext-prop ;
 
 : reject-create-treasure ( seq -- seq' ) "create a treasure token" reject-by-oracle-itext ;
 : reject-treasure-token ( seq -- seq' ) "treasure token" reject-by-oracle-itext ;
@@ -1306,6 +1333,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-double-strike-text ( seq -- seq' ) "double strike" reject-by-oracle-itext ;
 : reject-dredge-text ( seq -- seq' ) "dredge" reject-by-oracle-itext ;
 : reject-echo-text ( seq -- seq' ) "echo" reject-by-oracle-itext ;
+: reject-eerie-text ( seq -- seq' ) "eerie" reject-by-oracle-itext ;
 : reject-embalm-text ( seq -- seq' ) "embalm" reject-by-oracle-itext ;
 : reject-emerge-text ( seq -- seq' ) "emerge" reject-by-oracle-itext ;
 : reject-eminence-text ( seq -- seq' ) "eminence" reject-by-oracle-itext ;
@@ -1358,6 +1386,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-hidden-agenda-text ( seq -- seq' ) "hidden agenda" reject-by-oracle-itext ;
 : reject-hideaway-text ( seq -- seq' ) "hideaway" reject-by-oracle-itext ;
 : reject-horsemanship-text ( seq -- seq' ) "horsemanship" reject-by-oracle-itext ;
+: reject-impending-text ( seq -- seq' ) "impending" reject-by-oracle-itext ;
 : reject-imprint-text ( seq -- seq' ) "imprint" reject-by-oracle-itext ;
 : reject-improvise-text ( seq -- seq' ) "improvise" reject-by-oracle-itext ;
 : reject-incubate-text ( seq -- seq' ) "incubate" reject-by-oracle-itext ;
@@ -1385,6 +1414,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-madness-text ( seq -- seq' ) "madness" reject-by-oracle-itext ;
 : reject-magecraft-text ( seq -- seq' ) "magecraft" reject-by-oracle-itext ;
 : reject-manifest-text ( seq -- seq' ) "manifest" reject-by-oracle-itext ;
+: reject-manifest-dread-text ( seq -- seq' ) "manifest dread" reject-by-oracle-itext ;
 : reject-megamorph-text ( seq -- seq' ) "megamorph" reject-by-oracle-itext ;
 : reject-meld-text ( seq -- seq' ) "meld" reject-by-oracle-itext ;
 : reject-melee-text ( seq -- seq' ) "melee" reject-by-oracle-itext ;
@@ -1465,6 +1495,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-support-text ( seq -- seq' ) "support" reject-by-oracle-itext ;
 : reject-surge-text ( seq -- seq' ) "surge" reject-by-oracle-itext ;
 : reject-surveil-text ( seq -- seq' ) "surveil" reject-by-oracle-itext ;
+: reject-survival-text ( seq -- seq' ) "survival" reject-by-oracle-itext ;
 : reject-suspect-text ( seq -- seq' ) "suspect" reject-by-oracle-itext ;
 : reject-suspend-text ( seq -- seq' ) "suspend" reject-by-oracle-itext ;
 : reject-swampcycling-text ( seq -- seq' ) "swampcycling" reject-by-oracle-itext ;
@@ -1585,6 +1616,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-double-strike-keyword ( seq -- seq' ) "double-strike" reject-by-keyword ;
 : reject-dredge-keyword ( seq -- seq' ) "dredge" reject-by-keyword ;
 : reject-echo-keyword ( seq -- seq' ) "echo" reject-by-keyword ;
+: reject-eerie-keyword ( seq -- seq' ) "eerie" reject-by-keyword ;
 : reject-embalm-keyword ( seq -- seq' ) "embalm" reject-by-keyword ;
 : reject-emerge-keyword ( seq -- seq' ) "emerge" reject-by-keyword ;
 : reject-eminence-keyword ( seq -- seq' ) "eminence" reject-by-keyword ;
@@ -1639,6 +1671,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-hidden-agenda-keyword ( seq -- seq' ) "hidden-agenda" reject-by-keyword ;
 : reject-hideaway-keyword ( seq -- seq' ) "hideaway" reject-by-keyword ;
 : reject-horsemanship-keyword ( seq -- seq' ) "horsemanship" reject-by-keyword ;
+: reject-impending-keyword ( seq -- seq' ) "impending" reject-by-keyword ;
 : reject-imprint-keyword ( seq -- seq' ) "imprint" reject-by-keyword ;
 : reject-improvise-keyword ( seq -- seq' ) "improvise" reject-by-keyword ;
 : reject-incubate-keyword ( seq -- seq' ) "incubate" reject-by-keyword ;
@@ -1666,6 +1699,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-madness-keyword ( seq -- seq' ) "madness" reject-by-keyword ;
 : reject-magecraft-keyword ( seq -- seq' ) "magecraft" reject-by-keyword ;
 : reject-manifest-keyword ( seq -- seq' ) "manifest" reject-by-keyword ;
+: reject-manifest-dread-keyword ( seq -- seq' ) "manifest dread" reject-by-keyword ;
 : reject-megamorph-keyword ( seq -- seq' ) "megamorph" reject-by-keyword ;
 : reject-meld-keyword ( seq -- seq' ) "meld" reject-by-keyword ;
 : reject-melee-keyword ( seq -- seq' ) "melee" reject-by-keyword ;
@@ -1745,6 +1779,7 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-support-keyword ( seq -- seq' ) "support" reject-by-keyword ;
 : reject-surge-keyword ( seq -- seq' ) "surge" reject-by-keyword ;
 : reject-surveil-keyword ( seq -- seq' ) "surveil" reject-by-keyword ;
+: reject-survival-keyword ( seq -- seq' ) "survival" reject-by-keyword ;
 : reject-suspect-keyword ( seq -- seq' ) "suspect" reject-by-keyword ;
 : reject-suspend-keyword ( seq -- seq' ) "suspend" reject-by-keyword ;
 : reject-swampcycling-keyword ( seq -- seq' ) "swampcycling" reject-by-keyword ;
@@ -1879,6 +1914,9 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : filter-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] filter ;
 : filter-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] filter ;
 
+: released-after ( seq date -- seq' )
+    '[ "released_at" of ymd>timestamp _ after? ] filter ;
+
 : reject-set ( seq abbrev -- seq ) >lower '[ "set" of _ = ] reject ;
 : reject-set-intersect ( seq abbrevs -- seq ) [ >lower ] map '[ "set" of _ member? ] reject ;
 
@@ -1903,6 +1941,7 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : blb-cards ( -- seq ) mtg-oracle-cards "blb" filter-set ;
 : blb-cards-bonus ( -- seq ) mtg-oracle-cards "blc" filter-set ;
 : blb-cards-all ( -- seq ) mtg-oracle-cards { "blb" "blc" } filter-set-intersect ;
+: dsk-cards ( -- seq ) mtg-oracle-cards "dsk" filter-set ;
 
 ! modern
 : mh3-cards ( -- seq ) mtg-oracle-cards "mh3" filter-set ;
