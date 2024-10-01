@@ -28,7 +28,7 @@ lists.lazy math sequences tools.test ;
 ] unit-test
 
 { { 1 2 4 8 16 } } [
-  5 1 [ 2 * ] lfrom-by ltake list>array
+  1 [ 2 * ] lfrom-by 5 ltake list>array
 ] unit-test
 
 [ [ ] lmap ] must-infer
