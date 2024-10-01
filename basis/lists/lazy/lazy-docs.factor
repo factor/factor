@@ -90,18 +90,18 @@ HELP: lmap-lazy
 { $examples
     { $example
         "USING: kernel lists lists.lazy math prettyprint ;"
-        "1 lfrom [ 2 * ] lmap-lazy 5 swap ltake list>array ."
+        "1 lfrom [ 2 * ] lmap-lazy 5 ltake list>array ."
         "{ 2 4 6 8 10 }"
     }
 } ;
 
 HELP: ltake
-{ $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
+{ $values { "list" "a cons object" } { "n" "a non negative integer" } { "result" "resulting cons object" } }
 { $description "Outputs a lazy list containing the first n items in the list. This is done a lazy manner. No evaluation of the list elements occurs initially but a " { $link lazy-take } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." }
 { $examples
     { $example
         "USING: kernel lists lists.lazy prettyprint ;"
-        "1 lfrom 5 swap ltake list>array ."
+        "1 lfrom 5 ltake list>array ."
         "{ 1 2 3 4 5 }"
     }
 } ;
@@ -112,7 +112,7 @@ HELP: lfilter
 { $examples
     { $example
         "USING: kernel lists lists.lazy math prettyprint ;"
-        "1 lfrom [ even? ] lfilter 5 swap ltake list>array ."
+        "1 lfrom [ even? ] lfilter 5 ltake list>array ."
         "{ 2 4 6 8 10 }"
     }
 } ;
@@ -164,7 +164,7 @@ HELP: lzip
 { $examples
     { $example
         "USING: kernel lists lists.lazy math prettyprint ;"
-        "1 lfrom 10 [ 10 + ] lfrom-by lzip 5 swap ltake list>array ."
+        "1 lfrom 10 [ 10 + ] lfrom-by lzip 5 ltake list>array ."
         "{ { 1 10 } { 2 20 } { 3 30 } { 4 40 } { 5 50 } }"
     }
 } ;

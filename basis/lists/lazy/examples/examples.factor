@@ -12,4 +12,4 @@ IN: lists.lazy.examples
 : powers-of-2 ( -- list ) 1 [ 2 * ] lfrom-by ;
 : ones ( -- list ) 1 [ ] lfrom-by ;
 : squares ( -- list ) naturals [ dup * ] lmap-lazy ;
-: first-five-squares ( -- list ) 5 squares ltake list>array ;
+: first-five-squares ( -- list ) squares 5 ltake list>array ;
