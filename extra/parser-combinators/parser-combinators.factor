@@ -273,7 +273,7 @@ LAZY: only-first ( parser -- parser )
 M: only-first-parser parse ( input parser -- list )
     ! Transform a parser into a parser that only yields
     ! the first possibility.
-    p1>> parse 1 swap ltake ;
+    p1>> parse 1 ltake ;
 
 LAZY: <!*> ( parser -- parser )
     ! Like <*> but only return one possible result
