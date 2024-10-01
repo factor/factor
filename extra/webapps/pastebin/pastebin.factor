@@ -176,7 +176,7 @@ M: annotation entity-url
             paste-mode-names "modes" set-value
         ] >>init
 
-        { pastebin "new-paste" } >>template
+        { pastebin "new-paste2" } >>template
 
         [
             paste-mode-names "modes" set-value
@@ -256,7 +256,7 @@ M: annotation entity-url
         <paste-action> "paste" add-responder
         <raw-paste-action> "paste.txt" add-responder
         <paste-feed-action> "paste.atom" add-responder
-        <new-paste-action> "new-paste" add-responder
+        <new-paste-action> "new-paste2" add-responder
         <delete-paste-action> "delete-paste" add-responder
         <new-annotation-action> "new-annotation" add-responder
         <raw-annotation-action> "annotation.txt" add-responder

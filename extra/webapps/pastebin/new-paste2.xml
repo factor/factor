@@ -4,7 +4,7 @@
 
 	<t:title>New Paste</t:title>
 
-	<t:form t:action="$pastebin/new-paste">
+	<t:form t:action="$pastebin/new-paste2">
 
 		<table>
 			<tr><th class="field-label">Summary: </th><td><t:field t:name="summary" /></td></tr>
