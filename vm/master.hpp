@@ -63,7 +63,7 @@
 
 // Detect target CPU type
 #if defined(__arm__)
-#define FACTOR_ARM
+#define FACTOR_ARM32
 #elif defined(__aarch64__)
 #define FACTOR_ARM64
 #define FACTOR_64

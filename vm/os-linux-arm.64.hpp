@@ -14,11 +14,6 @@ static const fixnum xt_tail_pic_offset = 4 + 1;
 #define UAP_PROGRAM_COUNTER(ucontext) \
   (((ucontext_t*)ucontext)->uc_mcontext.pc)
 
-// #define CODE_TO_FUNCTION_POINTER(code) (void)0
-// #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
-// #define FUNCTION_CODE_POINTER(ptr) ptr
-// #define FUNCTION_TOC_POINTER(ptr) ptr
-
 inline static unsigned int uap_fpu_status(void* uap) {
   // ucontext_t* ucontext = (ucontext_t*)uap;
   // return ucontext->uc_mcontext.fpregs->swd |
@@ -48,20 +43,16 @@ inline static unsigned int fpu_status(unsigned int status) {
 
   return r;
 }
+
   // FP_TRAP_INVALID_OPERATION = 1 << 0,
   // FP_TRAP_OVERFLOW = 1 << 1,
   // FP_TRAP_UNDERFLOW = 1 << 2,
   // FP_TRAP_ZERO_DIVIDE = 1 << 3,
   // FP_TRAP_INEXACT = 1 << 4,
 
-
-// #define UAP_STACK_POINTER(ucontext) \
-//   (((ucontext_t*)ucontext)->uc_mcontext.regs[15])
-// #define UAP_PROGRAM_COUNTER(ucontext) \
-//   (((ucontext_t*)ucontext)->uc_mcontext.regs[16])
-
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0
 #define FUNCTION_CODE_POINTER(ptr) ptr
 #define FUNCTION_TOC_POINTER(ptr) ptr
+
 }

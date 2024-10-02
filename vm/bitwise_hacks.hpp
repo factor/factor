@@ -17,7 +17,7 @@ inline cell log2(cell x) {
   asm("bsr %1, %0;" : "=r"(n) : "r"(x));
 #endif
 
-#elif defined(FACTOR_ARM)
+#elif defined(FACTOR_ARM32)
 #if defined(_MSC_VER)
   _BitScanReverse((unsigned long*)&n, x);
 #else
