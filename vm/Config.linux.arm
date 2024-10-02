@@ -1,4 +1,3 @@
 include vm/Config.linux
-include vm/Config.arm
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-linux-arm.o
 PLAF_MASTER_HEADERS += vm/os-linux-arm.hpp
