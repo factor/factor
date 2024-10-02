@@ -597,7 +597,7 @@ big-endian off
 
 [
     ! temp1/32 tag-mask get AND
-    tag-mask get temp1 temp1 ANDi
+    tag-mask get temp1 temp1 ANDSi
 ] PIC-TAG jit-define
 
 [

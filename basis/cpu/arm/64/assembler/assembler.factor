@@ -220,6 +220,8 @@ PRIVATE>
 : ANDi ( imm64 Rn Rd -- ) 2bw [ swap encode-bitmask ] 2dip ANDi-encode ;
 : ANDr ( Rm Rn Rd -- ) 3bw [ 0 0 -rot ] 2dip ANDsr-encode ;
 
+: ANDSi ( imm64 Rn Rd -- ) 2bw [ swap encode-bitmask ] 2dip ANDSi-encode ;
+
 : ASRi ( uimm6 Rn Rd -- ) 2bw [ swap 6 ?ubits ] 2dip ASRi-encode ;
 : ASRr ( Rm Rn Rd -- ) 3bw ASRr-encode ;
 
