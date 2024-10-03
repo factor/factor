@@ -5,7 +5,7 @@ USING: accessors arrays ascii assocs assocs.extras calendar
 calendar.english calendar.format calendar.parser
 calendar.private circular combinators combinators.short-circuit
 io kernel literals math math.order math.parser prettyprint
-random ranges sequences sets sorting splitting ;
+random ranges sequences sets sorting splitting strings ;
 
 IN: crontab
 
@@ -157,8 +157,17 @@ PRIVATE>
 : next-times ( cronentry n -- timestamps )
     now next-times-after ;
 
+GENERIC: parse-crontab ( input -- entries )
+
+M: object parse-crontab
+    [ [ blank? not ] find nip { f CHAR: # } member? ] reject
+    [ parse-cronentry ] map ;
+
+M: string parse-crontab
+    split-lines parse-crontab ;
+
 : read-crontab ( -- entries )
-    read-lines harvest [ parse-cronentry ] map ;
+    read-lines parse-crontab ;
 
 : group-crons ( cronstrings from-timestamp until-timestamp -- entries )
     '[ _ _ next-times-from-until [ timestamp>unix-time ] map ] zip-with
