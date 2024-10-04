@@ -73,7 +73,8 @@ CONSTANT: aliases H{
 PRIVATE>
 
 : parse-cronentry ( entry -- cronentry )
-    " " split1 [ aliases ?at drop ] dip " " glue
+    [ blank? ] trim-head " " split1
+    [ aliases ?at drop ] dip " " glue
     " " split1 " " split1 " " split1 " " split1 " " split1 {
         [ [ string>number ] T{ range f 0 60 1 } parse-value ]
         [ [ string>number ] T{ range f 0 24 1 } parse-value ]
