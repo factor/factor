@@ -234,8 +234,9 @@ M: slider pref-dim*
 TUPLE: drawn-slider < slider ;
 TUPLE: drawn-slider-pen < slider-pen ;
 
+CONSTANT: slider-highlight-color $ dim-color
 : build-drawn-thumb ( thumb -- thumb )
-    <gadget> line-color <solid> >>interior 1/2 track-add ;
+    <gadget> slider-highlight-color <solid> >>interior 1/2 track-add ;
 
 : <drawn-thumb> ( orientation -- thumb )
     thumb new-track
@@ -263,10 +264,11 @@ CONSTANT: up-triangle-points { { 0 $ scroll-arrow-dim } { $ scroll-arrow-dim/2 0
 CONSTANT: left-triangle-points { { 0 $ scroll-arrow-dim/2 } { $ scroll-arrow-dim  0 } { $ scroll-arrow-dim $ scroll-arrow-dim } }
 CONSTANT: down-triangle-points { { 0 0  } { $ scroll-arrow-dim/2 $ scroll-arrow-dim } { $ scroll-arrow-dim 0 } }
 CONSTANT: right-triangle-points { { 0 $ scroll-arrow-dim } { $ scroll-arrow-dim $ scroll-arrow-dim/2 } { 0 0 } }
+
 : <drawn-up-button> ( orientation -- button )
-    -1 left-triangle-points up-triangle-points [ line-color swap <polygon-gadget> ] bi@ <slide-label-button> ;
+    -1 left-triangle-points up-triangle-points [ slider-highlight-color swap <polygon-gadget> ] bi@ <slide-label-button> ;
 : <drawn-down-button> ( orientation -- button )
-    1 right-triangle-points down-triangle-points [ line-color swap <polygon-gadget> ] bi@ <slide-label-button> ;
+    1 right-triangle-points down-triangle-points [ slider-highlight-color swap <polygon-gadget> ] bi@ <slide-label-button> ;
 
 : <drawn-slider-pen> ( -- pen )
     content-background <solid> dim-color <solid> drawn-slider-pen boa ;
@@ -288,9 +290,11 @@ M: drawn-slider pref-dim*
             [ <drawn-thumb> >>thumb ]
             [ <elevator> >>elevator ]
             [ drop dup add-thumb-to-elevator 1 track-add ]
+            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
             [ <drawn-up-button> f track-add ]
-            [ drop <gadget> { 1 1 } >>dim f track-add ]
+            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
             [ <drawn-down-button> f track-add ]
+            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
         } cleave ;
 
 : <tile-image-slider> ( range orientation -- slider )
