@@ -66,12 +66,12 @@ HELP: http-post*
 { http-post http-post* } related-words
 
 HELP: http-put
-{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "put-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-put*
-{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "put-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request, but does not check the HTTP response code for success." } ;
 
 { http-put http-put* } related-words
