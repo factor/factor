@@ -590,6 +590,39 @@ MEMO: scryfall-rulings-json ( -- json )
 : filter-by-oracle-itext ( seq string -- seq' )
     "oracle_text" filter-card-faces-main-card-iprop ;
 
+: partition-card-faces-sub-card ( seq quot -- true-seq false-seq )
+    [ [ card>faces ] map concat ] dip partition ; inline
+
+: partition-card-faces-sub-card-prop ( seq string prop -- true-seq false-seq )
+    swap '[ _ of _ subseq-of? ] partition-card-faces-sub-card ;
+
+: partition-card-faces-sub-card-iprop ( seq string prop -- true-seq false-seq )
+    swap >lower '[ _ of >lower _ subseq-of? ] partition-card-faces-sub-card ;
+
+: partition-card-faces-main-card ( seq quot -- seq )
+    dup '[ [ "card_faces" of ] [ _ any? ] _ ?if ] partition ; inline
+
+: partition-card-faces-main-card-prop ( seq string prop -- true-seq false-seq )
+    swap '[ _ of _ subseq-of? ] partition-card-faces-main-card ;
+
+: partition-card-faces-main-card-iprop ( seq string prop -- true-seq false-seq )
+    swap >lower '[ _ of >lower _ subseq-of? ] partition-card-faces-main-card ;
+
+: partition-card-faces-main-card-iprop-member ( seq string prop -- true-seq false-seq )
+    swap >lower '[ _ of [ >lower ] map _ member-of? ] partition-card-faces-main-card ;
+
+: partition-by-flavor-text ( seq string -- true-seq false-seq )
+    "flavor_text" partition-card-faces-main-card-prop ;
+
+: partition-by-flavor-itext ( seq string -- true-seq false-seq )
+    "flavor_text" partition-card-faces-main-card-iprop ;
+
+: partition-by-oracle-text ( seq string -- true-seq false-seq )
+    "oracle_text" partition-card-faces-main-card-prop ;
+
+: partition-by-oracle-itext ( seq string -- true-seq false-seq )
+    "oracle_text" partition-card-faces-main-card-iprop ;
+
 : reject-card-faces-sub-card ( seq quot -- seq )
     [ [ card>faces ] map concat ] dip reject ; inline
 
@@ -650,6 +683,9 @@ MEMO: scryfall-rulings-json ( -- json )
 
 : filter-by-keyword ( seq string -- seq' )
     "keywords" filter-card-faces-main-card-iprop-member ;
+
+: partition-by-keyword ( seq string -- true-seq false-sec )
+    "keywords" partition-card-faces-main-card-iprop-member ;
 
 : filter-by-name-text ( seq string -- seq' ) "name" filter-by-text-prop ;
 : filter-by-name-itext ( seq string -- seq' ) "name" filter-by-itext-prop ;
@@ -2105,7 +2141,9 @@ M: sequence deck-and-sideboard. deck. ;
             [ filter-retrace-keyword ]
             [ filter-discard-effect ]
         } cleave
-    ] { } append-outputs-as sort-by-colors ;
+    ] { } append-outputs-as members
+    "cycling" partition-by-keyword
+    [ sort-by-colors ] bi@ swap append ;
 
 : mtg-cheat-sheet. ( seq -- ) filter-mtg-cheat-sheet normal-cards. ;
 : mtg-cheat-sheet-text. ( seq -- ) filter-mtg-cheat-sheet card-summaries. ;
