@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs assocs.extras checksums checksums.sha
 combinators formatting hashtables hex-strings http http.client
-http.client.post-data io io.files io.pathnames json kernel make
-namespaces namespaces.extras sequences sorting urls ;
+http.json http.client.post-data io io.files io.pathnames json
+kernel make namespaces namespaces.extras sequences sorting urls ;
 IN: backblaze
 
 SYMBOL: backblaze-application-key-id

@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs http http.client json kernel sequences ;
+USING: assocs http http.client http.json json kernel sequences ;
 IN: solr
 
 : solr-request ( url -- json )

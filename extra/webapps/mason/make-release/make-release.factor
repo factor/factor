@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors furnace.actions html.forms
+USING: accessors furnace.actions html.forms http.json
 http.server.responses validators webapps.mason.backend
 webapps.mason.version ;
 IN: webapps.mason.make-release
