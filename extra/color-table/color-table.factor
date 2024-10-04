@@ -48,4 +48,4 @@ M: color-renderer row-value
         10 >>max-rows drop ;
 
 MAIN-WINDOW: color-table-demo { { title "Colors" } { pref-dim { 500 300 } } }
-    <color-table> <scroller> >>gadgets ;
+    <color-table> >>gadgets ;
