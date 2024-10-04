@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: ascii assocs checksums checksums.md5 classes.tuple
-formatting hex-strings http.client images.http
+formatting hex-strings http.client http.json images.http
 io.encodings.string io.encodings.utf8 json kernel namespaces
 sequences urls ;
 

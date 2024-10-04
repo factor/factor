@@ -1,7 +1,7 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs concurrency.combinators continuations
-github hashtables http.client io.encodings.string
+github hashtables http.client http.json io.encodings.string
 io.encodings.utf8 json kernel math.order semver sequences
 sorting.specification splitting strings ;
 IN: npm
