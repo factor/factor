@@ -1,4 +1,0 @@
-".source.factor":
-  editor:
-    commentStart: "! "
-    increaseIndentPattern: "^:"
