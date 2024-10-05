@@ -160,7 +160,8 @@ PRIVATE>
 PRIVATE>
 
 : <border-button> ( label quot: ( button -- ) -- button )
-    <button> border-button-theme ;
+    <button> border-button-theme { 1 1 } <filled-border>
+    toolbar-button-pressed-background <solid> >>interior ;
 
 TUPLE: repeat-button < button ;
 
