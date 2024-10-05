@@ -315,14 +315,20 @@ DEFER: find-nth-last-from
     reach 0 < [
         [ neg 1 - ] 3dip [ 1 - ] 2dip find-nth-last-from
     ] [
-        [ 0 ] 4dip '[ @ [ [ 1 + ] dip 2dup > ] [ f ] if ] find-from 2nipd
+        [ 0 ] 4dip '[
+            _ 2swap [ call ] 2dip rot
+            [ [ 1 + ] dip 2dup > ] [ f ] if
+        ] find-from 2nipd
     ] if ; inline recursive
 
 : find-nth-last-from ( nth from seq quot: ( obj -- ? ) -- i/f obj/f )
     reach 0 < [
         [ neg 1 - ] 3dip [ 1 + ] 2dip find-nth-from
     ] [
-        [ 0 ] 4dip '[ @ [ [ 1 + ] dip 2dup > ] [ f ] if ] find-last-from 2nipd
+        [ 0 ] 4dip '[
+            _ 2swap [ call ] 2dip rot
+            [ [ 1 + ] dip 2dup > ] [ f ] if
+        ] find-last-from 2nipd
     ] if ; inline recursive
 
 : find-nth ( nth seq quot: ( obj -- ? ) -- i/f obj/f )
