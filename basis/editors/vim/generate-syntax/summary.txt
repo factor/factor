@@ -1,1 +1,0 @@
-Generate updated VIM syntax highlighting files
