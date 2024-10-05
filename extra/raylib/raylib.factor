@@ -844,8 +844,8 @@ FUNCTION-ALIAS: set-random-seed void SetRandomSeed ( uint seed )                
 FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string fileName )                ! Takes a screenshot of current screen (filename extension defines format)
 FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )                      ! Setup init configuration flags (view FLAGS)
 
-! FUNCTION: void TraceLog ( int logLevel, c-string text, ... )                           ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
-FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( int logLevel )               ! Set the current threshold (minimum) log level
+FUNCTION-ALIAS: trace-log void TraceLog ( TraceLogLevel logLevel, c-string text )                  ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( TraceLogLevel logLevel )               ! Set the current threshold (minimum) log level
 FUNCTION-ALIAS: mem-alloc void* MemAlloc ( uint size )                                    ! Internal memory allocator
 FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, uint size )                     ! Internal memory reallocator
 FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                                      ! Internal memory free
