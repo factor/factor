@@ -309,6 +309,28 @@ PRIVATE>
 : nth-index ( n obj seq -- i )
     [ = dup [ drop 1 - dup 0 < ] when ] with find drop nip ;
 
+DEFER: find-nth-last-from
+
+: find-nth-from ( nth from seq quot: ( obj -- ? ) -- i/f obj/f )
+    reach 0 < [
+        [ neg 1 - ] 3dip [ 1 - ] 2dip find-nth-last-from
+    ] [
+        [ 0 ] 4dip '[ @ [ [ 1 + ] dip 2dup > ] [ f ] if ] find-from 2nipd
+    ] if ; inline recursive
+
+: find-nth-last-from ( nth from seq quot: ( obj -- ? ) -- i/f obj/f )
+    reach 0 < [
+        [ neg 1 - ] 3dip [ 1 + ] 2dip find-nth-from
+    ] [
+        [ 0 ] 4dip '[ @ [ [ 1 + ] dip 2dup > ] [ f ] if ] find-last-from 2nipd
+    ] if ; inline recursive
+
+: find-nth ( nth seq quot: ( obj -- ? ) -- i/f obj/f )
+    [ 0 ] 2dip find-nth-from ; inline
+
+: find-nth-last ( nth seq quot: ( obj -- ? ) -- i/f obj/f )
+    [ [ length 1 - ] keep ] dip find-nth-last-from ; inline
+
 : at+* ( n key assoc -- old new ) [ 0 or [ + ] 1check dup ] change-at ; inline
 
 : inc-at* ( key assoc -- old new ) [ 1 ] 2dip at+* ; inline
