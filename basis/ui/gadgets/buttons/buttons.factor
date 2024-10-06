@@ -140,14 +140,13 @@ PRIVATE>
     dup gadget-child border-button-label-theme
     horizontal >>orientation
     <border-button-pen> >>interior
-    dup dup interior>> pen-pref-dim >>min-dim
-    { 10 0 } >>size ; inline
+    { 10 2 } >>size ; inline
 
 PRIVATE>
 
 : <border-button> ( label quot: ( button -- ) -- button )
-    <button> border-button-theme { 1 1 } <filled-border>
-    toolbar-button-pressed-background <solid> >>interior ;
+    <button> border-button-theme
+    field-border-color <solid> >>boundary ;
 
 TUPLE: repeat-button < button ;
 
