@@ -5,8 +5,7 @@ combinators.short-circuit combinators.smart fry kernel literals
 locals math math.vectors memoize models namespaces sequences
 ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.labels
 ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens
-ui.pens.image ui.pens.polygon ui.pens.solid ui.pens.tile
-ui.theme ui.theme.images ;
+ui.pens.polygon ui.pens.solid ui.theme ;
 FROM: models => change-model ;
 IN: ui.gadgets.buttons
 
@@ -125,13 +124,7 @@ PRIVATE>
 
 <PRIVATE
 
-: <border-button-state-pen> ( prefix background foreground -- pen )
-    [
-        "-left" "-middle" "-right"
-        [ append theme-image ] tri-curry@ tri
-    ] 2dip <tile-pen> ;
-
-: <drawn-border-button-pen> ( -- pen )
+: <border-button-pen> ( -- pen )
     content-background <solid>
     toolbar-background <solid>
     selection-color <solid>
@@ -140,20 +133,13 @@ PRIVATE>
     <button-pen>
     ;
 
-: <border-button-pen> ( -- pen )
-    "button" transparent button-text-color
-    <border-button-state-pen> dup
-    "button-clicked" transparent button-clicked-text-color
-    <border-button-state-pen> dup dup
-    <button-pen> ;
-
 : border-button-label-theme ( gadget -- )
     dup label? [ [ clone t >>bold? ] change-font ] when drop ;
 
 : border-button-theme ( gadget -- gadget )
     dup gadget-child border-button-label-theme
     horizontal >>orientation
-    <drawn-border-button-pen> >>interior
+    <border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
     { 10 0 } >>size ; inline
 
@@ -180,7 +166,7 @@ repeat-button H{
 
 CONSTANT: checkmark-dim 12
 CONSTANT: checkmark-square { { 0 0 } { 0 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim } { $ checkmark-dim 0 } } 
-: <drawn-checkmark-pen> ( -- pen )
+: <checkmark-pen> ( -- pen )
     roll-button-rollover-border checkmark-square <polygon>
     roll-button-rollover-border checkmark-square <polygon>
     dim-color checkmark-square <polygon>
@@ -188,17 +174,9 @@ CONSTANT: checkmark-square { { 0 0 } { 0 $ checkmark-dim } { $ checkmark-dim $ c
     toolbar-button-pressed-background checkmark-square <polygon>
     <button-pen> ;
 
-: <checkmark-pen> ( -- pen )
-    "checkbox" theme-image <image-pen>
-    "checkbox" theme-image <image-pen>
-    "checkbox-clicked" theme-image <image-pen>
-    "checkbox-set" theme-image <image-pen>
-    "checkbox-set-clicked" theme-image <image-pen>
-    <button-pen> ;
-
 : <checkmark> ( -- gadget )
     <gadget>
-    <drawn-checkmark-pen> >>interior
+    <checkmark-pen> >>interior
     dup dup interior>> pen-pref-dim >>dim ;
 
 : toggle-model ( model -- )
@@ -223,7 +201,7 @@ CONSTANT: circle-points 12
 CONSTANT: checkmark-dim/2 $[ $ checkmark-dim 2 / ]
 CONSTANT: checkmark-rhombus { { 0 $ checkmark-dim/2 } { $ checkmark-dim/2 $ checkmark-dim } { $ checkmark-dim $ checkmark-dim/2 } { $ checkmark-dim/2 0 } } 
 CONSTANT: checkmark-circle $[ $ circle-points $ checkmark-dim polygon-circle ]
-: <drawn-radio-pen> ( -- pen )
+: <radio-pen> ( -- pen )
     roll-button-rollover-border checkmark-circle <polygon>
     roll-button-rollover-border checkmark-circle <polygon>
     dim-color checkmark-circle <polygon>
@@ -232,17 +210,9 @@ CONSTANT: checkmark-circle $[ $ circle-points $ checkmark-dim polygon-circle ]
     <button-pen>
     ;
 
-: <radio-pen> ( -- pen )
-    "radio" theme-image <image-pen>
-    "radio" theme-image <image-pen>
-    "radio-clicked" theme-image <image-pen>
-    "radio-set" theme-image <image-pen>
-    "radio-set-clicked" theme-image <image-pen>
-    <button-pen> ;
-
 : <radio-knob> ( -- gadget )
     <gadget>
-    <drawn-radio-pen> >>interior checkmark-rhombus max-dims >>dim
+    <radio-pen> >>interior checkmark-circle max-dims >>dim
     dup dup interior>> pen-pref-dim >>dim ;
 
 TUPLE: radio-control < button value ;
