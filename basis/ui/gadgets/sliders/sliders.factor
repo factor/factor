@@ -143,9 +143,8 @@ M: slider-pen draw-interior
 M: slider-pen draw-boundary
     dupd current-pen draw-boundary ;
 
-CONSTANT: slider-highlight-color $ dim-color
 : build-thumb ( thumb -- thumb )
-    <gadget> slider-highlight-color <solid> >>interior 1/2 track-add ;
+    <gadget> line-color <solid> >>interior 1/2 track-add ;
 
 : <thumb> ( orientation -- thumb )
     thumb new-track
@@ -173,12 +172,12 @@ CONSTANT: down-triangle-points { { 0 0  } { $ scroll-arrow-dim/2 $ scroll-arrow-
 CONSTANT: right-triangle-points { { 0 $ scroll-arrow-dim } { $ scroll-arrow-dim $ scroll-arrow-dim/2 } { 0 0 } }
 
 : <up-button> ( orientation -- button )
-    -1 left-triangle-points up-triangle-points [ slider-highlight-color swap <polygon-gadget> ] bi@ <slide-button> ;
+    -1 left-triangle-points up-triangle-points [ line-color swap <polygon-gadget> ] bi@ <slide-button> ;
 : <down-button> ( orientation -- button )
-    1 right-triangle-points down-triangle-points [ slider-highlight-color swap <polygon-gadget> ] bi@ <slide-button> ;
+    1 right-triangle-points down-triangle-points [ line-color swap <polygon-gadget> ] bi@ <slide-button> ;
 
 : <slider-pen> ( -- pen )
-    content-background <solid> slider-highlight-color <solid> slider-pen boa ;
+    content-background <solid> line-color <solid> slider-pen boa ;
 
 M: slider-pen pen-pref-dim 2drop { 2 2 } ;
 : slider-required-width ( slider -- min-dim )
@@ -199,10 +198,8 @@ PRIVATE>
             [ <thumb> >>thumb ]
             [ <elevator> >>elevator ]
             [ drop dup add-thumb-to-elevator 1 track-add ]
-            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
             [ <up-button> f track-add ]
-            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
+            [ drop <gadget> { 1 1 } >>dim f track-add ]
             [ <down-button> f track-add ]
-            [ drop <gadget> { 1 1 } >>dim slider-highlight-color <solid> >>interior f track-add ]
         } cleave ;
 
