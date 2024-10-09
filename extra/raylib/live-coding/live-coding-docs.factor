@@ -25,14 +25,9 @@ HELP: with-live-coding
     { "main-quot" "main entry point into the program" }
 }
 { $description "Sets up environment and runs the game in another thread. Can be convenient to define a word that does this for you." }
-{ $examples
-    { $example [[ USING: raylib.live-coding ;
-
+{ $code [[
 : dev ( -- )
-    [ main ] with-live-coding ; ]]
-    ""
-    }
-} ;
+    [ main ] with-live-coding ; ]] } ;
 
 ARTICLE: "raylib.live-coding" "Raylib Live Coding"
 { $vocab-link "raylib.live-coding" } $nl
