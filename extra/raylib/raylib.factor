@@ -22,10 +22,10 @@ FROM: alien.c-types => float ;
 LIBRARY: raylib
 
 ! Last updated 1/23/2023
-CONSTANT: RAYLIB_VERSION_MAJOR 4
-CONSTANT: RAYLIB_VERSION_MINOR 5
+CONSTANT: RAYLIB_VERSION_MAJOR 5
+CONSTANT: RAYLIB_VERSION_MINOR 0
 CONSTANT: RAYLIB_VERSION_PATCH 0
-CONSTANT: RAYLIB_VERSION  "4.5"
+CONSTANT: RAYLIB_VERSION  "5.0"
 
 ! Enumerations ---------------------------------------------------------
 
@@ -43,6 +43,7 @@ ENUM: ConfigFlags
     { FLAG_WINDOW_ALWAYS_RUN  0x00000100 }   ! Set to allow windows running while minimized
     { FLAG_WINDOW_TRANSPARENT 0x00000010 }   ! Set to allow transparent framebuffer
     { FLAG_WINDOW_HIGHDPI     0x00002000 }   ! Set to support HighDPI
+    { FLAG_BORDERLESS_WINDOWED_MODE 0x00008000 } ! Set to run program in borderless windowed mode
     { FLAG_MSAA_4X_HINT       0x00000020 }   ! Set to try enabling MSAA 4X
     { FLAG_INTERLACED_HINT    0x00010000 } ; ! Set to try enabling interlaced video format (for V3D)
 
@@ -299,6 +300,9 @@ ENUM: PixelFormat
     PIXELFORMAT_UNCOMPRESSED_R32             ! 32 bpp (1 channel - float)
     PIXELFORMAT_UNCOMPRESSED_R32G32B32       ! 32*3 bpp (3 channels - float)
     PIXELFORMAT_UNCOMPRESSED_R32G32B32A32    ! 32*4 bpp (4 channels - float)
+    PIXELFORMAT_UNCOMPRESSED_R16,            ! 16 bpp (1 channel - half float)
+    PIXELFORMAT_UNCOMPRESSED_R16G16B16,      ! 16*3 bpp (3 channels - half float)
+    PIXELFORMAT_UNCOMPRESSED_R16G16B16A16,   ! 16*4 bpp (4 channels - half float)
     PIXELFORMAT_COMPRESSED_DXT1_RGB          ! 4 bpp (no alpha)
     PIXELFORMAT_COMPRESSED_DXT1_RGBA         ! 4 bpp (1 bit alpha)
     PIXELFORMAT_COMPRESSED_DXT3_RGBA         ! 8 bpp
@@ -617,10 +621,11 @@ ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
 ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: ModelAnimation
-    { boneCount int }
-    { frameCount int }
-    { _bones BoneInfo* }
-    { framePoses Transform** } ;
+    { boneCount int }            ! Number of bones
+    { frameCount int }           ! Number of animation frames
+    { _bones BoneInfo* }         ! Bones information (skeleton)
+    { framePoses Transform** }   ! Poses array by frame
+    { name char[32] } ;          ! Animation name
 
 ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
 
@@ -688,7 +693,18 @@ STRUCT: VrStereoConfig
 STRUCT: FilePathList
     { capacity uint }                 ! Filepaths max entries
     { count uint }                    ! Filepaths entries count
-    { _paths c-string* } ;             ! Filepaths entries
+    { _paths c-string* } ;            ! Filepaths entries
+
+STRUCT: AutomationEvent
+    { frame     uint   }              ! Event frame
+    { type      uint   }              ! Event type (AutomationEventType)
+    { params    int[4] } ;            ! Event parameters (if required)
+
+STRUCT: AutomationEventList
+    { capacity  uint             }    ! Events max entries (MAX_AUTOMATION_EVENTS)
+    { count     uint             }    ! Events entries count
+    { events    AutomationEvent* } ;  ! Pointer to events entries
+
 
 ARRAY-SLOT: FilePathList c-string _paths [ count>> ] paths
 
@@ -726,7 +742,7 @@ CONSTANT: RAYWHITE   S{ Color f 245  245  245  255  } ! My own White (raylib log
 
 ! Window-related functions
 FUNCTION-ALIAS: init-window void InitWindow ( int width, int height, c-string title )    ! Initialize window and OpenGL context
-FUNCTION-ALIAS: window-should-close bool WindowShouldClose ( )                           ! Check if KEY_ESCAPE pressed or Close icon pressed
+FUNCTION-ALIAS: window-should-close bool WindowShouldClose ( )                           ! Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
 FUNCTION-ALIAS: close-window void CloseWindow ( )                                        ! Close window and unload OpenGL context
 FUNCTION-ALIAS: is-window-ready bool IsWindowReady ( )                                   ! Check if window has been initialized successfully
 FUNCTION-ALIAS: is-window-fullscreen bool IsWindowFullscreen ( )                         ! Check if window is currently fullscreen
@@ -739,16 +755,19 @@ FUNCTION-ALIAS: is-window-state bool IsWindowState ( uint flag )                
 FUNCTION-ALIAS: set-window-state void SetWindowState ( uint flags )                      ! Set window configuration state using flags
 FUNCTION-ALIAS: clear-window-state void ClearWindowState ( uint flags )                  ! Clear window configuration state flags
 FUNCTION-ALIAS: toggle-fullscreen void ToggleFullscreen ( )                              ! Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)
+FUNCTION-ALIAS: toggle-bordeless-windowed void ToggleBorderlessWindowed ( )
 FUNCTION-ALIAS: maximize-window void MaximizeWindow ( )                                  ! Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: minimize-window void MinimizeWindow ( )                                  ! Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: restore-window void RestoreWindow ( )                                    ! Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-icon void SetWindowIcon ( Image image )                       ! Set icon for window (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-icons void SetWindowIcons ( Image* images, int count )
-FUNCTION-ALIAS: set-window-title void SetWindowTitle ( c-string title )                  ! Set title for window (only PLATFORM_DESKTOP)
+FUNCTION-ALIAS: set-window-title void SetWindowTitle ( c-string title )                  ! Set title for window (only PLATFORM_DESKTOP and PLATFORM_WEB)
 FUNCTION-ALIAS: set-window-position void SetWindowPosition ( int x, int y )              ! Set window position on screen (only PLATFORM_DESKTOP)
-FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )                 ! Set monitor for the current window (fullscreen mode)
+FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )                 ! Set monitor for the current window
 FUNCTION-ALIAS: set-window-min-size void SetWindowMinSize ( int width, int height )      ! Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+FUNCTION-ALIAS: set-window-max-size void SetWindowMaxSize ( int width, int height )      ! Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
 FUNCTION-ALIAS: set-window-size void SetWindowSize ( int width, int height )             ! Set window dimensions
+FUNCTION-ALIAS: set-window-focused void SetWindowFocused ( )                             ! window focused (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-opacity void SetWindowOpacity ( float opacity )               ! Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: get-window-handle void* GetWindowHandle ( )                              ! Get native window handle
 FUNCTION-ALIAS: get-screen-width int GetScreenWidth ( )                                  ! Get current screen width
@@ -765,7 +784,7 @@ FUNCTION-ALIAS: get-monitor-physical-height int GetMonitorPhysicalHeight ( int m
 FUNCTION-ALIAS: get-monitor-refresh-rate int GetMonitorRefreshRate ( int monitor )       ! Get specified monitor refresh rate
 FUNCTION-ALIAS: get-window-position Vector2 GetWindowPosition ( )                        ! Get window position XY on monitor
 FUNCTION-ALIAS: get-window-scale-dpi Vector2 GetWindowScaleDPI ( )                       ! Get window scale DPI factor
-FUNCTION-ALIAS: get-monitor-name c-string GetMonitorName ( int monitor )                 ! Get the human-readable, UTF-8 encoded name of the primary monitor
+FUNCTION-ALIAS: get-monitor-name c-string GetMonitorName ( int monitor )                 ! Get the human-readable, UTF-8 encoded name of the specified monitor
 FUNCTION-ALIAS: set-clipboard-text void SetClipboardText ( c-string text )               ! Set clipboard text content
 FUNCTION-ALIAS: get-clipboard-text c-string GetClipboardText ( )                         ! Get clipboard text content
 FUNCTION-ALIAS: enable-event-waiting void EnableEventWaiting ( )                         ! Enable waiting for events on EndDrawing(), no automatic event polling
@@ -839,10 +858,14 @@ FUNCTION-ALIAS: get-frame-time float GetFrameTime ( )                           
 FUNCTION-ALIAS: get-time double GetTime ( )                                              ! Get elapsed time in seconds since InitWindow()
 
 ! Misc. functions
-FUNCTION-ALIAS: get-random-value int GetRandomValue ( int min, int max )                 ! Get a random value between min and max (both included)
-FUNCTION-ALIAS: set-random-seed void SetRandomSeed ( uint seed )                         ! Set the seed for the random number generator
+FUNCTION-ALIAS: get-random-value int GetRandomValue ( int min, int max )                        ! Get a random value between min and max (both included)
+FUNCTION-ALIAS: set-random-seed void SetRandomSeed ( uint seed )                                ! Set the seed for the random number generator
+FUNCTION-ALIAS: load-random-sequence int* LoadRandomSequence ( uint count, int min, int max )   ! Load random values sequence, no values repeated
+FUNCTION-ALIAS: unload-random-sequence void UnloadRandomSequence ( int* sequence )              ! Unload random values sequence
+
 FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string fileName )                ! Takes a screenshot of current screen (filename extension defines format)
 FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )                      ! Setup init configuration flags (view FLAGS)
+FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
 
 FUNCTION-ALIAS: trace-log void TraceLog ( TraceLogLevel logLevel, c-string text )                  ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( TraceLogLevel logLevel )               ! Set the current threshold (minimum) log level
@@ -850,21 +873,19 @@ FUNCTION-ALIAS: mem-alloc void* MemAlloc ( uint size )                          
 FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, uint size )                     ! Internal memory reallocator
 FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                                      ! Internal memory free
 
-FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
-
-! Set custom callbacks
+! Callbacks to hook some internal functions
 ! WARNING: Callbacks setup is intended for advance users
-! FUNCTION: void SetTraceLogCallback ( TraceLogCallback callback )          ! Set custom trace log
-! FUNCTION: void SetLoadFileDataCallback ( LoadFileDataCallback callback )  ! Set custom file binary data loader
-! FUNCTION: void SetSaveFileDataCallback ( SaveFileDataCallback callback )  ! Set custom file binary data saver
-! FUNCTION: void SetLoadFileTextCallback ( LoadFileTextCallback callback )  ! Set custom file text data loader
-! FUNCTION: void SetSaveFileTextCallback ( SaveFileTextCallback callback )  ! Set custom file text data saver
+CALLBACK: void TraceLogCallback ( int logLevel, c-string text )                      ! Logging: Redirect trace log messages
+CALLBACK: uchar* LoadFileDataCallback ( c-string fileName, uint* dataSize )          ! FileIO: Load binary data
+CALLBACK: bool SaveFileDataCallback ( c-string fileName, void* data, int dataSize )  ! FileIO: Save binary data
+CALLBACK: char* LoadFileTextCallback ( c-string fileName )                            ! FileIO: Load text data
+CALLBACK: bool SaveFileTextCallback ( c-string fileName, c-string text )             ! FileIO: Save text data
 
 ! Files management functions
-FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, uint* bytesRead )           ! Load file data as byte array (read)
+FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, int* bytesRead )           ! Load file data as byte array (read)
 FUNCTION-ALIAS: unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData()
-FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, uint bytesToWrite ) ! Save data to file from byte array (write), returns true on success
-FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, uint size, c-string fileName ) ! Export data to code (.h), returns true on success
+FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, int bytesToWrite ) ! Save data to file from byte array (write), returns true on success
+FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, int size, c-string fileName ) ! Export data to code (.h), returns true on success
 FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a '\0' terminated string
 FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be '\0 terminated, returns true on success
@@ -895,12 +916,23 @@ FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int com
 FUNCTION-ALIAS: encode-data-base64 c-string EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength ) ! Encode data to Base64 string
 FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                   ! Decode Base64 string data
 
+! Automation events functionality
+FUNCTION-ALIAS: load-automation-event-list AutomationEventList LoadAutomationEventList ( c-string fileName )  ! Load automation events list from file
+FUNCTION-ALIAS: unload-automation-event-list void UnloadAutomationEventList ( AutomationEventList* list )     ! Unload automation events list
+FUNCTION-ALIAS: export-automation-event-list bool ExportAutomationEventList ( AutomationEventList list, c-string fileName )  ! Export automation events list as text file
+FUNCTION-ALIAS: set-automation-event-list void SetAutomationEventList ( AutomationEventList* list )           ! Set automation event list to record to
+FUNCTION-ALIAS: set-automation-event-base-frame void SetAutomationEventBaseFrame ( int frame )                ! Set automation event internal base frame to start recording
+FUNCTION-ALIAS: start-automation-event-recording void StartAutomationEventRecording ( )                       ! Start recording automation events
+FUNCTION-ALIAS: stop-automation-event-recording void StopAutomationEventRecording ( )                         ! Stop recording automation events
+FUNCTION-ALIAS: play-automation-event void PlayAutomationEvent ( AutomationEvent event )                      ! Play a recorded automation event
+
 ! ------------------------------------------------------------------------------------
 ! Input Handling Functions (Module: core)
 ! ------------------------------------------------------------------------------------
 
 ! Input-related functions: keyboard
 FUNCTION-ALIAS: is-key-pressed bool IsKeyPressed ( KeyboardKey key )                     ! Check if a key has been pressed once
+FUNCTION-ALIAS: is-key-pressed-repeat bool IsKeyPressedRepeat ( int key )                ! Check if a key has been pressed again (Only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: is-key-down bool IsKeyDown ( KeyboardKey key )                           ! Check if a key is being pressed
 FUNCTION-ALIAS: is-key-released bool IsKeyReleased ( KeyboardKey key )                   ! Check if a key has been released once
 FUNCTION-ALIAS: is-key-up bool IsKeyUp ( KeyboardKey key )                               ! Check if a key is NOT being pressed
@@ -947,7 +979,7 @@ FUNCTION-ALIAS: get-touch-point-count int GetTouchPointCount ( )                
 ! Gestures and Touch Handling Functions (Module: rgestures)
 ! ------------------------------------------------------------------------------------
 FUNCTION-ALIAS: set-gestures-enabled void SetGesturesEnabled ( uint flags )              ! Enable a set of gestures using flags
-FUNCTION-ALIAS: is-gesture-detected bool IsGestureDetected ( Gestures gesture )          ! Check if a gesture have been detected
+FUNCTION-ALIAS: is-gesture-detected bool IsGestureDetected ( uint gesture )              ! Check if a gesture have been detected
 FUNCTION-ALIAS: get-gesture-detected int GetGestureDetected ( )                          ! Get latest detected gesture
 FUNCTION-ALIAS: get-gesture-hold-duration float GetGestureHoldDuration ( )               ! Get gesture hold time in milliseconds
 FUNCTION-ALIAS: get-gesture-drag-vector Vector2 GetGestureDragVector ( )                 ! Get gesture drag vector
@@ -976,16 +1008,15 @@ FUNCTION-ALIAS: draw-pixel-v void DrawPixelV ( Vector2 position, Color color )  
 FUNCTION-ALIAS: draw-line void DrawLine ( int startPosX, int startPosY, int endPosX, int endPosY, Color color )                  ! Draw a line
 FUNCTION-ALIAS: draw-line-v void DrawLineV ( Vector2 startPos, Vector2 endPos, Color color )                                     ! Draw a line (Vector version)
 FUNCTION-ALIAS: draw-line-ex void DrawLineEx ( Vector2 startPos, Vector2 endPos, float thick, Color color )                      ! Draw a line defining thickness
-FUNCTION-ALIAS: draw-line-bezier void DrawLineBezier ( Vector2 startPos, Vector2 endPos, float thick, Color color )              ! Draw a line using cubic-bezier curves in-out
-FUNCTION-ALIAS: draw-line-bezier-quad void DrawLineBezierQuad ( Vector2 startPos, Vector2 endPos, Vector2 controlPos, float thick, Color color )  ! Draw line using quadratic bezier curves with a control point
-FUNCTION-ALIAS: draw-line-bezier-cubic void DrawLineBezierCubic ( Vector2 startPos, Vector2 endPos, Vector2 startControlPos, Vector2 endControlPos, float thick, Color color )  ! Draw line using cubic bezier curves with 2 control points
 FUNCTION-ALIAS: draw-line-strip void DrawLineStrip ( Vector2* points, int pointCount, Color color )                              ! Draw lines sequence
+FUNCTION-ALIAS: draw-line-bezier void DrawLineBezier ( Vector2 startPos, Vector2 endPos, float thick, Color color )              ! Draw a line using cubic-bezier curves in-out
 FUNCTION-ALIAS: draw-circle void DrawCircle ( int centerX, int centerY, float radius, Color color )                              ! Draw a color-filled circle
 FUNCTION-ALIAS: draw-circle-sector void DrawCircleSector ( Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color )       ! Draw a piece of a circle
 FUNCTION-ALIAS: draw-circle-sector-lines void DrawCircleSectorLines ( Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color )  ! Draw circle sector outline
 FUNCTION-ALIAS: draw-circle-gradient void DrawCircleGradient ( int centerX, int centerY, float radius, Color color1, Color color2 )        ! Draw a gradient-filled circle
 FUNCTION-ALIAS: draw-circle-v void DrawCircleV ( Vector2 center, float radius, Color color )                                     ! Draw a color-filled circle (Vector version)
 FUNCTION-ALIAS: draw-circle-lines void DrawCircleLines ( int centerX, int centerY, float radius, Color color )                   ! Draw circle outline
+FUNCTION-ALIAS: draw-circle-lines-v void DrawCircleLinesV ( Vector2 center, float radius, Color color )                          ! Draw circle outline (Vector version)
 FUNCTION-ALIAS: draw-ellipse void DrawEllipse ( int centerX, int centerY, float radiusH, float radiusV, Color color )            ! Draw ellipse
 FUNCTION-ALIAS: draw-ellipse-lines void DrawEllipseLines ( int centerX, int centerY, float radiusH, float radiusV, Color color ) ! Draw ellipse outline
 FUNCTION-ALIAS: draw-ring void DrawRing ( Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color )  ! Draw ring
@@ -1009,6 +1040,25 @@ FUNCTION-ALIAS: draw-poly void DrawPoly ( Vector2 center, int sides, float radiu
 FUNCTION-ALIAS: draw-poly-lines void DrawPolyLines ( Vector2 center, int sides, float radius, float rotation, Color color )      ! Draw a polygon outline of n sides
 FUNCTION-ALIAS: draw-poly-lines-ex void DrawPolyLinesEx ( Vector2 center, int sides, float radius, float rotation, float lineThick, Color color )  ! Draw a polygon outline of n sides with extended parameters
 
+! Shapes Module - Splines Drawing Functions
+FUNCTION-ALIAS: draw-spline-linear void DrawSplineLinear ( Vector2* points, int pointCount, float thick, Color color )         ! Draw spline: Linear, minimum 2 points
+FUNCTION-ALIAS: draw-spline-basis void DrawSplineBasis ( Vector2* points, int pointCount, float thick, Color color )           ! Draw spline: B-Spline, minimum 4 points
+FUNCTION-ALIAS: draw-spline-catmull-rom void DrawSplineCatmullRom ( Vector2* points, int pointCount, float thick, Color color ) ! Draw spline: Catmull-Rom, minimum 4 points
+FUNCTION-ALIAS: draw-spline-bezier-quadratic void DrawSplineBezierQuadratic ( Vector2* points, int pointCount, float thick, Color color )  ! Draw spline: Quadratic Bezier, minimum 3 points
+FUNCTION-ALIAS: draw-spline-bezier-cubic void DrawSplineBezierCubic ( Vector2* points, int pointCount, float thick, Color color )  ! Draw spline: Cubic Bezier, minimum 4 points
+FUNCTION-ALIAS: draw-spline-segment-linear void DrawSplineSegmentLinear ( Vector2 p1, Vector2 p2, float thick, Color color )  ! Draw spline segment: Linear, 2 points
+FUNCTION-ALIAS: draw-spline-segment-basis void DrawSplineSegmentBasis ( Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color )  ! Draw spline segment: B-Spline, 4 points
+FUNCTION-ALIAS: draw-spline-segment-catmull-rom void DrawSplineSegmentCatmullRom ( Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float thick, Color color )  ! Draw spline segment: Catmull-Rom, 4 points
+FUNCTION-ALIAS: draw-spline-segment-bezier-quadratic void DrawSplineSegmentBezierQuadratic ( Vector2 p1, Vector2 c2, Vector2 p3, float thick, Color color )  ! Draw spline segment: Quadratic Bezier, 2 points, 1 control point
+FUNCTION-ALIAS: draw-spline-segment-bezier-cubic void DrawSplineSegmentBezierCubic ( Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float thick, Color color )  ! Draw spline segment: Cubic Bezier, 2 points, 2 control points
+
+! Spline segment point evaluation functions, for a given t [0.0f .. 1.0f]
+FUNCTION-ALIAS: get-spline-point-linear Vector2 GetSplinePointLinear ( Vector2 startPos, Vector2 endPos, float t )                          ! Get spline point: Linear
+FUNCTION-ALIAS: get-spline-point-basis Vector2 GetSplinePointBasis ( Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t )              ! Get spline point: B-Spline
+FUNCTION-ALIAS: get-spline-point-catmull-rom Vector2 GetSplinePointCatmullRom ( Vector2 p1, Vector2 p2, Vector2 p3, Vector2 p4, float t )   ! Get spline point: Catmull-Rom
+FUNCTION-ALIAS: get-spline-point-bezier-quad Vector2 GetSplinePointBezierQuad ( Vector2 p1, Vector2 c2, Vector2 p3, float t )               ! Get spline point: Quadratic Bezier
+FUNCTION-ALIAS: get-spline-point-bezier-cubic Vector2 GetSplinePointBezierCubic ( Vector2 p1, Vector2 c2, Vector2 c3, Vector2 p4, float t ) ! Get spline point: Cubic Bezier
+
 ! Basic shapes collision detection functions
 FUNCTION-ALIAS: check-collision-recs bool CheckCollisionRecs ( Rectangle rec1, Rectangle rec2 )                                  ! Check collision between two rectangles
 FUNCTION-ALIAS: check-collision-circles bool CheckCollisionCircles ( Vector2 center1, float radius1, Vector2 center2, float radius2 ) ! Check collision between two circles
@@ -1029,6 +1079,7 @@ FUNCTION-ALIAS: get-collision-rec Rectangle GetCollisionRec ( Rectangle rec1, Re
 ! NOTE: This functions do not require GPU access
 FUNCTION-ALIAS: load-image Image LoadImage ( c-string fileName )                                                                 ! Load image from file into CPU memory (RAM)
 FUNCTION-ALIAS: load-image-raw Image LoadImageRaw ( c-string fileName, int width, int height, int format, int headerSize )       ! Load image from RAW file data
+FUNCTION-ALIAS: load-image-svg Image LoadImageSvg ( c-string fileNameOrString, int width, int height )  ! Load image from SVG file data or string with specified size
 FUNCTION-ALIAS: load-image-anim Image LoadImageAnim ( c-string fileName, int* frames )                                           ! Load image sequence from file (frames appended to image.data)
 FUNCTION-ALIAS: load-image-from-memory Image LoadImageFromMemory ( c-string fileType, c-string fileData, int dataSize )          ! Load image from memory buffer, fileType refers to extension: i.e. '.png'
 FUNCTION-ALIAS: load-image-from-texture Image LoadImageFromTexture ( Texture2D texture )                                         ! Load image from GPU texture data
@@ -1039,15 +1090,15 @@ FUNCTION-ALIAS: export-image bool ExportImage ( Image image, c-string fileName )
 FUNCTION-ALIAS: export-image-as-code bool ExportImageAsCode ( Image image, c-string fileName )                                   ! Export image as code file defining an array of bytes, returns true on success
 
 ! Image generation functions
-FUNCTION-ALIAS: gen-image-color Image GenImageColor ( int width, int height, Color color )                                       ! Generate image: plain color
-FUNCTION-ALIAS: gen-image-gradient-v Image GenImageGradientV ( int width, int height, Color top, Color bottom )                  ! Generate image: vertical gradient
-FUNCTION-ALIAS: gen-image-gradient-h Image GenImageGradientH ( int width, int height, Color left, Color right )                  ! Generate image: horizontal gradient
+FUNCTION-ALIAS: gen-image-color Image GenImageColor ( int width, int height, Color color )                                                ! Generate image: plain color
+FUNCTION-ALIAS: gen-image-gradient-linear Image GenImageGradientLinear ( int width, int height, int direction, Color start, Color end )   ! Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient
 FUNCTION-ALIAS: gen-image-gradient-radial Image GenImageGradientRadial ( int width, int height, float density, Color inner, Color outer ) ! Generate image: radial gradient
-FUNCTION-ALIAS: gen-image-checked Image GenImageChecked ( int width, int height, int checksX, int checksY, Color col1, Color col2 ) ! Generate image: checked
-FUNCTION-ALIAS: gen-image-white-noise Image GenImageWhiteNoise ( int width, int height, float factor )                           ! Generate image: white noise
-FUNCTION-ALIAS: gen-image-perlin-noise Image GenImagePerlinNoise ( int width, int height, int offsetX, int offsetY, float scale ) ! Generate image: perlin noise
-FUNCTION-ALIAS: gen-image-cellular Image GenImageCellular ( int width, int height, int tileSize )                                ! Generate image: cellular algorithm, bigger tileSize means bigger cells
-FUNCTION-ALIAS: gen-image-text Image GenImageText ( int width, int height, c-string text )                                       ! Generate image: text
+FUNCTION-ALIAS: gen-image-gradient-square Image GenImageGradientSquare ( int width, int height, float density, Color inner, Color outer ) ! Generate image: square gradient
+FUNCTION-ALIAS: gen-image-checked Image GenImageChecked ( int width, int height, int checksX, int checksY, Color col1, Color col2 )       ! Generate image: checked
+FUNCTION-ALIAS: gen-image-white-noise Image GenImageWhiteNoise ( int width, int height, float factor )                                    ! Generate image: white noise
+FUNCTION-ALIAS: gen-image-perlin-noise Image GenImagePerlinNoise ( int width, int height, int offsetX, int offsetY, float scale )         ! Generate image: perlin noise
+FUNCTION-ALIAS: gen-image-cellular Image GenImageCellular ( int width, int height, int tileSize )                                         ! Generate image: cellular algorithm, bigger tileSize means bigger cells
+FUNCTION-ALIAS: gen-image-text Image GenImageText ( int width, int height, c-string text )                                                ! Generate image: grayscale image from text data
 
 ! Image manipulation functions
 FUNCTION-ALIAS: image-copy Image ImageCopy ( Image image )                                                                       ! Create an image duplicate (useful for transformations)
@@ -1069,6 +1120,7 @@ FUNCTION-ALIAS: image-mipmaps void ImageMipmaps ( Image* image )                
 FUNCTION-ALIAS: image-dither void ImageDither ( Image* image, int rBpp, int gBpp, int bBpp, int aBpp )                           ! Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
 FUNCTION-ALIAS: image-flip-vertical void ImageFlipVertical ( Image* image )                                                      ! Flip image vertically
 FUNCTION-ALIAS: image-flip-horizontal void ImageFlipHorizontal ( Image* image )                                                  ! Flip image horizontally
+FUNCTION-ALIAS: image-rotate void ImageRotate ( Image* image, int degrees )  ! Rotate image by input angle in degrees (-359 to 359)
 FUNCTION-ALIAS: image-rotate-cw void ImageRotateCW ( Image* image )                                                              ! Rotate image clockwise 90deg
 FUNCTION-ALIAS: image-rotate-ccw void ImageRotateCCW ( Image* image )                                                            ! Rotate image counter-clockwise 90deg
 FUNCTION-ALIAS: image-color-tint void ImageColorTint ( Image* image, Color color )                                               ! Modify image color: tint
@@ -1157,7 +1209,7 @@ FUNCTION-ALIAS: load-font-ex Font LoadFontEx ( c-string fileName, int fontSize, 
 FUNCTION-ALIAS: load-font-from-image Font LoadFontFromImage ( Image image, Color key, int firstChar )                ! Load font from Image (XNA style)
 FUNCTION-ALIAS: load-font-from-memory Font LoadFontFromMemory ( c-string fileType, c-string fileData, int dataSize, int fontSize, int* fontChars, int glyphCount )  ! Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 FUNCTION-ALIAS: is-font-ready bool IsFontReady ( Font font )                                                         ! Check if a font is ready
-FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* fontChars, int glyphCount, FontType type )  ! Load font data for further use
+FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* fontChars, int codepointCount, FontType type )  ! Load font data for further use
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
 FUNCTION-ALIAS: unload-font void UnloadFont ( Font font )                                                            ! Unload Font from GPU memory (VRAM)
@@ -1169,9 +1221,10 @@ FUNCTION-ALIAS: draw-text void DrawText ( c-string text, int posX, int posY, int
 FUNCTION-ALIAS: draw-text-ex void DrawTextEx ( Font font, c-string text, Vector2 position, float fontSize, float spacing, Color tint )  ! Draw text using font and additional parameters
 FUNCTION-ALIAS: draw-text-pro void DrawTextPro ( Font font, c-string text, Vector2 position, Vector2 origin, float rotation, float fontSize, float spacing, Color tint )  ! Draw text using Font and pro parameters (rotation)
 FUNCTION-ALIAS: draw-text-codepoint void DrawTextCodepoint ( Font font, int codepoint, Vector2 position, float fontSize, Color tint )  ! Draw one character (codepoint)
-FUNCTION-ALIAS: draw-text-codepoints void DrawTextCodepoints ( Font font, int* codepoint, int count, Vector2 position, float fontSize, float spacing,  Color tint )  ! Draw multiple character (codepoint)
+FUNCTION-ALIAS: draw-text-codepoints void DrawTextCodepoints ( Font font, int* codepoints, int codepointCount, Vector2 position, float fontSize, float spacing,  Color tint )  ! Draw multiple character (codepoint)
 
 ! Text font info functions
+FUNCTION-ALIAS: set-text-line-spacing void SetTextLineSpacing ( int spacing )                                        ! Set vertical line spacing when drawing with line-breaks
 FUNCTION-ALIAS: measure-text int MeasureText ( c-string text, int fontSize )                                         ! Measure string width for default font
 FUNCTION-ALIAS: measure-text-ex Vector2 MeasureTextEx ( Font font, c-string text, float fontSize, float spacing )    ! Measure string size for Font
 FUNCTION-ALIAS: get-glyph-index int GetGlyphIndex ( Font font, int codepoint )                                       ! Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
@@ -1194,7 +1247,7 @@ FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int*
 FUNCTION-ALIAS: text-copy int TextCopy ( c-string  dst, c-string src )                                ! Copy one string to another, returns bytes copied
 FUNCTION-ALIAS: text-is-equal bool TextIsEqual ( c-string text1, c-string text2 )                     ! Check if two text string are equal
 FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for '\0' ending
-! FUNCTION: c-string TextFormat ( c-string text, ... )                                                  ! Text formatting with variables (sprintf() style)
+FUNCTION-ALIAS: text-format c-string TextFormat ( c-string text )                                                  ! Text formatting with variables (sprintf() style)
 FUNCTION-ALIAS: text-subtext c-string TextSubtext ( c-string text, int position, int length )         ! Get a piece of a text string
 FUNCTION-ALIAS: text-replace c-string TextReplace ( c-string  text, c-string replace, c-string by )   ! Replace text string (WARNING: memory must be freed!)
 FUNCTION-ALIAS: text-insert c-string TextInsert ( c-string text, c-string insert, int position )      ! Insert text in a position (WARNING: memory must be freed!)
@@ -1287,10 +1340,10 @@ FUNCTION-ALIAS: set-material-texture void SetMaterialTexture ( Material* materia
 FUNCTION-ALIAS: set-model-mesh-material void SetModelMeshMaterial ( Model* model, int meshId, int materialId ) ! Set material for a mesh
 
 ! Model animations loading/unloading functions
-FUNCTION-ALIAS: load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, uint* animCount ) ! Load model animations from file
+FUNCTION-ALIAS: load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, int* animCount ) ! Load model animations from file
 FUNCTION-ALIAS: update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, int frame ) ! Update model animation pose
 FUNCTION-ALIAS: unload-model-animation void UnloadModelAnimation ( ModelAnimation anim )                         ! Unload animation data
-FUNCTION-ALIAS: unload-model-animations void UnloadModelAnimations ( ModelAnimation* animations, uint count )    ! Unload animation array data
+FUNCTION-ALIAS: unload-model-animations void UnloadModelAnimations ( ModelAnimation* animations, int count )    ! Unload animation array data
 FUNCTION-ALIAS: is-model-animation-valid bool IsModelAnimationValid ( Model model, ModelAnimation anim )         ! Check model animation skeleton match
 
 ! Collision detection functions
@@ -1348,6 +1401,7 @@ FUNCTION-ALIAS: init-audio-device void InitAudioDevice ( )                      
 FUNCTION-ALIAS: close-audio-device void CloseAudioDevice ( )                                    ! Close the audio device and context
 FUNCTION-ALIAS: is-audio-device-ready bool IsAudioDeviceReady ( )                               ! Check if audio device has been initialized successfully
 FUNCTION-ALIAS: set-master-volume void SetMasterVolume ( float volume )                         ! Set master volume (listener)
+FUNCTION-ALIAS: get-master-volume float GetMasterVolume ( )                                     ! Get master volume (listener)
 
 ! Wave/Sound loading/unloading functions
 FUNCTION-ALIAS: load-wave Wave LoadWave ( c-string fileName )                                   ! Load wave data from file
@@ -1355,6 +1409,8 @@ FUNCTION-ALIAS: load-wave-from-memory Wave LoadWaveFromMemory ( c-string fileTyp
 FUNCTION-ALIAS: is-wave-ready bool IsWaveReady ( Wave wave )                                    ! Checks if wave data is ready
 FUNCTION-ALIAS: load-sound Sound LoadSound ( c-string fileName )                                ! Load sound from file
 FUNCTION-ALIAS: load-sound-from-wave Sound LoadSoundFromWave ( Wave wave )                      ! Load sound from wave data
+FUNCTION-ALIAS: load-sound-alias Sound LoadSoundAlias ( Sound source )                          ! Create a new sound that shares the same sample data as the source sound, does not own the sound data
+FUNCTION-ALIAS: unload-sound-alias void UnloadSoundAlias ( Sound alias )                        ! Unload a sound alias (does not deallocate sample data)
 FUNCTION-ALIAS: is-sound-ready bool IsSoundReady ( Sound sound )                                ! Checks if a sound is ready
 FUNCTION-ALIAS: update-sound void UpdateSound ( Sound sound, void* data, int sampleCount )      ! Update sound buffer with new data
 FUNCTION-ALIAS: unload-wave void UnloadWave ( Wave wave )                                       ! Unload wave data
@@ -1412,10 +1468,10 @@ FUNCTION-ALIAS: set-audio-stream-pan void SetAudioStreamPan ( AudioStream stream
 FUNCTION-ALIAS: set-audio-stream-buffer-size-default void SetAudioStreamBufferSizeDefault ( int size )            ! Default size for new audio streams
 FUNCTION-ALIAS: set-audio-stream-callback void SetAudioStreamCallback ( AudioStream stream, AudioCallback callback ) ! Audio thread callback to request new data
 
-FUNCTION-ALIAS: attach-audio-stream-processor void AttachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream
+FUNCTION-ALIAS: attach-audio-stream-processor void AttachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Attach audio stream processor to stream, receives the samples as <float>s
 FUNCTION-ALIAS: detach-audio-stream-processor void DetachAudioStreamProcessor ( AudioStream stream, AudioCallback processor ) ! Detach audio stream processor from stream
 
-FUNCTION-ALIAS: attach-audio-mixed-processor void AttachAudioMixedProcessor ( AudioCallback processor ) ! Attach audio stream processor to the entire audio pipeline
+FUNCTION-ALIAS: attach-audio-mixed-processor void AttachAudioMixedProcessor ( AudioCallback processor ) ! Attach audio stream processor to the entire audio pipeline, receives the samples as <float>s
 FUNCTION-ALIAS: detach-audio-mixed-processor void DetachAudioMixedProcessor ( AudioCallback processor ) ! Detach audio stream processor from the entire audio pipeline
 
 ! Destructors
