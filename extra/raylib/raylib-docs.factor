@@ -4505,8 +4505,8 @@ HELP: load-font-data
     fileData: c-string
     dataSize: int
     fontSize: int
-    fontChars: { "a " { $link pointer } " to a " { $link int } }
-    glyphCount: int
+    codepoints: { "a " { $link pointer } " to a " { $link int } }
+    codepointCount: int
     type: FontType
     GlyphInfo*: { "a " { $link pointer } " to " { $link GlyphInfo } } }
 { $description
@@ -4601,8 +4601,8 @@ HELP: draw-text-codepoint
 HELP: draw-text-codepoints
 { $values
     font: Font
-    codepoint: { "a " { $link pointer } " to a " { $link int } }
-    count: int
+    codepoints: { "a " { $link pointer } " to a " { $link int } }
+    codepointCount: int
     position: Vector2
     fontSize: float
     spacing: float
