@@ -219,7 +219,7 @@ HELP: and*
 { $description "If both inputs are true, outputs " { $snippet "obj1" } ". Otherwise outputs " { $link f } "." }
 { $notes "This word implements boolean and, so applying it to integers will not yield useful results (all integers have a true value). Bitwise and is the " { $link bitand } " word." }
 { $examples
-    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the second is output:"
+    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that if both inputs are true, the first is output:"
     { $example "USING: kernel prettyprint ;" "t f and* ." "f" }
     { $example "USING: kernel prettyprint ;" "t 7 and* ." "t" }
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 and* ." "\"hi\"" }
@@ -242,7 +242,7 @@ HELP: or*
 { $description "If both inputs are false, outputs " { $link f } ". Otherwise outputs the first of " { $snippet "obj2" } " and " { $snippet "obj1" } " which is true." }
 { $notes "This word implements boolean inclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise inclusive or is the " { $link bitor } " word." }
 { $examples
-    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the first true input:"
+    "Usually only the boolean value of the result is used, however you can also explicitly rely on the behavior that the result will be the last true input:"
     { $example "USING: kernel prettyprint ;" "t f or* ." "t" }
     { $example "USING: kernel prettyprint ;" "\"hi\" 12.0 or* ." "12.0" }
 } ;
