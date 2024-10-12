@@ -3250,27 +3250,6 @@ HELP: draw-line-bezier
 { $description
     "Draw a line using cubic-bezier curves in-out" } ;
 
-HELP: draw-line-bezier-quad
-{ $values
-    startPos: Vector2
-    endPos: Vector2
-    controlPos: Vector2
-    thick: float
-    color: Color }
-{ $description
-    "Draw line using quadratic bezier curves with a control point" } ;
-
-HELP: draw-line-bezier-cubic
-{ $values
-    startPos: Vector2
-    endPos: Vector2
-    startControlPos: Vector2
-    endControlPos: Vector2
-    thick: float
-    color: Color }
-{ $description
-    "Draw line using cubic bezier curves with 2 control points" } ;
-
 HELP: draw-line-strip
 { $values
     points: { "a " { $link pointer } " to a " { $link Vector2 } }
@@ -3731,26 +3710,6 @@ HELP: gen-image-color
     Image: Image }
 { $description
     "Generate image: plain color" } ;
-
-HELP: gen-image-gradient-v
-{ $values
-    width: int
-    height: int
-    top: Color
-    bottom: Color
-    Image: Image }
-{ $description
-    "Generate image: vertical gradient" } ;
-
-HELP: gen-image-gradient-h
-{ $values
-    width: int
-    height: int
-    left: Color
-    right: Color
-    Image: Image }
-{ $description
-    "Generate image: horizontal gradient" } ;
 
 HELP: gen-image-gradient-radial
 { $values
