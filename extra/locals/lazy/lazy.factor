@@ -9,10 +9,8 @@ IN: locals.lazy
 <PRIVATE
 
 TUPLE: lazy token ;
-C: <lazy> lazy
 
-: define-temp-syntax ( quot -- word )
-    [ gensym dup ] dip define-syntax ;
+C: <lazy> lazy
 
 : make-lazy-vars ( names -- words )
     [
