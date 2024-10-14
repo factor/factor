@@ -140,6 +140,11 @@ HELP: FLAG_WINDOW_HIGHDPI
     Setting this flag will enable HighDPI support.
     { $see-also ConfigFlags } } ;
 
+HELP: FLAG_BORDERLESS_WINDOWED_MODE
+{ $class-description
+    Setting this flag to run program in borderless windowed mode.
+    { $see-also ConfigFlags } } ;
+
 HELP: FLAG_MSAA_4X_HINT
 { $class-description
     Setting this flag will attempt to enable MSAA 4x.
@@ -1010,6 +1015,24 @@ HELP: PIXELFORMAT_UNCOMPRESSED_R32G32B32A32
 
     { $see-also PixelFormat } } ;
 
+HELP: PIXELFORMAT_UNCOMPRESSED_R16
+{ $class-description
+    16 bits per pixel (1 channel - half float).
+
+    { $see-also PixelFormat } } ;
+
+HELP: PIXELFORMAT_UNCOMPRESSED_R16G16B16
+{ $class-description
+    16*3 bits per pixel (3 channels - half float).
+
+    { $see-also PixelFormat } } ;
+
+HELP: PIXELFORMAT_UNCOMPRESSED_R16G16B16A16
+{ $class-description
+    16*4 bits per pixel (4 channels - half float).
+
+    { $see-also PixelFormat } } ;
+
 HELP: PIXELFORMAT_COMPRESSED_DXT1_RGB
 { $class-description
     4 bits per pixel (no alpha).
@@ -1784,10 +1807,28 @@ HELP: ModelAnimation
 { $heading Fields }
 { $table
     { "boneCount"  { $link int                             }  "Number of bones."              }
-    { "frameCount" { $link int                             }  "Numbero f animation frames."   }
+    { "frameCount" { $link int                             }  "Number of animation frames."   }
     { "_bones"     { { $link BoneInfo  } { $snippet "**" } }  "Bones information (skeleton)." }
-    { "framePoses" { { $link Transform } { $snippet "**" } }  "Poses array by frame"          } } ;
+    { "framePoses" { { $link Transform } { $snippet "**" } }  "Poses array by frame"          }
+    { "name"       { { $link char } { $snippet "[32]" }    }  "Animation name"                } } ;
 
+HELP: AutomationEvent
+{ $class-description 
+    Represents information about an automation event. }
+{ $heading Fields }
+{ $table
+    { "frame"  { $link uint                             }  "Event frame."                     }
+    { "type"   { $link uint                             }  "Event type (AutomationEventType)" }
+    { "params" { { $link int } { $snippet "[4]" }       }  "Event parameters (if required)"   } } ;
+
+HELP: AutomationEventList
+{ $class-description 
+    Represents information about an automation event. }
+{ $heading Fields }
+{ $table
+    { "capacity" { $link uint                                 }  "Events max entries (MAX_AUTOMATION_EVENTS)" }
+    { "count"    { $link uint                                 }  "Events entries count"                       }
+    { "events"   { { $link AutomationEvent } { $snippet "*" } }  "Pointer to events entries."                 } } ;
 
 HELP: Ray
 { $class-description
@@ -1886,7 +1927,7 @@ HELP: VrStereoConfig
     { "rightScreenCenter" { { $link float }  { $snippet [2] } "VR right screen center"            } }  
     { "scale"             { { $link float }  { $snippet [2] } "VR distortion scale"               } }              
     { "scaleIn"           { { $link float }  { $snippet [2] } "VR distortion scale in"            } }
-} ;           
+} ;
 
 HELP: FilePathList
 { $class-description
@@ -1949,7 +1990,7 @@ HELP: window-should-close
 { $values
     bool: bool }
 { $description
-    "Check if KEY_ESCAPE pressed or Close icon pressed" } ;
+    "Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)" } ;
 
 HELP: close-window
 { $description
@@ -2021,6 +2062,10 @@ HELP: toggle-fullscreen
 { $description
     "Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)" } ;
 
+HELP: toggle-borderless-windowed
+{ $description
+    "Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)" } ;
+
 HELP: maximize-window
 { $description
     "Set window state: maximized, if resizable (only PLATFORM_DESKTOP)" } ;
@@ -2048,7 +2093,7 @@ HELP: set-window-title
 { $values
     title: c-string }
 { $description
-    "Set title for window (only PLATFORM_DESKTOP)" } ;
+    "Set title for window (only PLATFORM_DESKTOP and PLATFORM_WEB)" } ;
 
 HELP: set-window-position
 { $values
@@ -2061,7 +2106,7 @@ HELP: set-window-monitor
 { $values
     monitor: int }
 { $description
-    "Set monitor for the current window (fullscreen mode)" } ;
+    "Set monitor for the current window" } ;
 
 HELP: set-window-min-size
 { $values
@@ -2069,6 +2114,13 @@ HELP: set-window-min-size
     height: int }
 { $description
     "Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)" } ;
+
+HELP: set-window-max-size
+{ $values
+    width: int
+    height: int }
+{ $description
+    "Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)" } ;
 
 HELP: set-window-size
 { $values
@@ -2082,6 +2134,12 @@ HELP: set-window-opacity
     opacity: float }
 { $description
     "Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)" } ;
+
+HELP: set-window-focused
+{ $values
+    opacity: float }
+{ $description
+    "Set window focused (only PLATFORM_DESKTOP)" } ;
 
 HELP: get-window-handle
 { $values
@@ -2184,7 +2242,7 @@ HELP: get-monitor-name
     monitor: int
     c-string: c-string }
 { $description
-    "Get the human-readable, UTF-8 encoded name of the primary monitor" } ;
+    "Get the human-readable, UTF-8 encoded name of the specified monitor" } ;
 
 HELP: set-clipboard-text
 { $values
@@ -2589,6 +2647,21 @@ HELP: set-random-seed
 { $description
     "Set the seed for the random number generator" } ;
 
+HELP: load-random-sequence
+{ $values
+    count: uint
+    min: int
+    max: int
+    int*: { "a " { $link pointer } " to a " { $link int } } }
+{ $description
+    "Load random values sequence, no values repeated" } ;
+
+HELP: unload-random-sequence
+{ $values
+    sequence: { "a " { $link pointer } " to a " { $link int } } }
+{ $description
+    "Unload random values sequence" } ;
+
 HELP: take-screenshot
 { $values
     fileName: c-string }
@@ -2600,6 +2673,8 @@ HELP: set-config-flags
     flags: uint }
 { $description
     "Setup init configuration flags (view FLAGS)" } ;
+
+
 
 HELP: set-trace-log-level
 { $values
@@ -2640,7 +2715,7 @@ HELP: open-url
 HELP: load-file-data
 { $values
     fileName: c-string
-    bytesRead: { "a " { $link pointer } " to a " { $link uint } }
+    bytesRead: { "a " { $link pointer } " to a " { $link int } }
     c-string: c-string }
 { $description
     "Load file data as byte array (read)" } ;
@@ -2655,7 +2730,7 @@ HELP: save-file-data
 { $values
     fileName: c-string
     data: void*
-    bytesToWrite: uint
+    bytesToWrite: int
     bool: bool }
 { $description
     "Save data to file from byte array (write), returns true on success" } ;
@@ -2663,7 +2738,7 @@ HELP: save-file-data
 HELP: export-data-as-code
 { $values
     data: { "a " { $link pointer } " to a " { $link uchar } }
-    size: uint
+    size: int
     fileName: c-string
     bool: bool }
 { $description
@@ -2864,6 +2939,59 @@ HELP: decode-data-base64
 { $description
     "Decode Base64 string data" } ;
 
+! Automation events functionality
+HELP: load-automation-event-list
+{ $values
+    file-name: c-string
+    AutomationEventList: AutomationEventList
+}
+{ $description
+    "Load automation events list from file" } ;
+
+HELP: unload-automation-event-list
+{ $values
+    list: { "a " { $link pointer } " to a " { $link AutomationEventList } }
+}
+{ $description
+    "Unload automation events list" } ;
+
+HELP: export-automation-event-list
+{ $values
+    list: { "a " { $link pointer } " to a " { $link AutomationEventList } }
+    file-name: c-string
+    bool: bool
+}
+{ $description
+    "Export automation events list as text file" } ;
+
+HELP: set-automation-event-list
+{ $values
+    list: { "a " { $link pointer } " to a " { $link AutomationEventList } }
+}
+{ $description
+    "Set automation event list to record to" } ;
+
+HELP: set-automation-event-base-frame
+{ $values
+    frame: int
+}
+{ $description
+    "Set automation event internal base frame to start recording" } ;
+
+HELP: start-automation-event-recording
+{ $description
+    "Start recording automation events" } ;
+
+HELP: stop-automation-event-recording
+{ $description
+    "Stop recording automation events" } ;
+
+HELP: play-automation-event
+{ $values
+    event: AutomationEvent
+}
+{ $description
+    "Play a recorded automation event" } ;
 
 ! Input-related functions: keyboard
 HELP: is-key-pressed
@@ -2872,6 +3000,13 @@ HELP: is-key-pressed
     bool: bool }
 { $description
     "Check if a key has been pressed once" } ;
+
+HELP: is-key-pressed-repeat
+{ $values
+    key: KeyboardKey
+    bool: bool }
+{ $description
+    "Check if a key has been pressed again (Only PLATFORM_DESKTOP)" } ;
 
 HELP: is-key-down
 { $values
@@ -3127,7 +3262,7 @@ HELP: set-gestures-enabled
 
 HELP: is-gesture-detected
 { $values
-    gesture: Gestures
+    gesture: uint
     bool: bool }
 { $description
     "Check if a gesture have been detected" } ;
@@ -3315,6 +3450,14 @@ HELP: draw-circle-lines
     color: Color }
 { $description
     "Draw circle outline" } ;
+
+HELP: draw-circle-lines-v
+{ $values
+    center: Vector2
+    radius: float
+    color: Color }
+{ $description
+    "Draw circle outline (Vector version)" } ;
 
 HELP: draw-ellipse
 { $values
@@ -3528,6 +3671,165 @@ HELP: draw-poly-lines-ex
 { $description
     "Draw a polygon outline of n sides with extended parameters" } ;
 
+! Shapes Module - Splines Drawing Functions
+HELP: draw-spline-linear
+{ $values
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw spline: Linear, minimum 2 points" } ;
+
+HELP: draw-spline-basis
+{ $values
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw spline: B-Spline, minimum 4 points" } ;
+
+HELP: draw-spline-catmull-rom
+{ $values
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw spline: Catmull-Rom, minimum 4 points" } ;
+
+HELP: draw-spline-bezier-quadratic
+{ $values
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw spline: Quadratic Bezier, minimum 3 points" } ;
+
+HELP: draw-spline-bezier-cubic
+{ $values
+    points: { "a " { $link pointer } " to a " { $link Vector2 } }
+    pointCount: int
+    thick: float
+    color: Color }
+{ $description
+    "Draw spline: Cubic Bezier, minimum 4 points" } ;
+
+HELP: draw-spline-segment-linear
+{ $values
+    p1: Vector2
+    p2: Vector2
+    thick: float
+    color: Color
+}
+{ $description
+    "Draw spline segment: Linear, 2 points" } ;
+
+HELP: draw-spline-segment-basis
+{ $values
+    p1: Vector2
+    p2: Vector2
+    p3: Vector2
+    p4: Vector2
+    thick: float
+    color: Color
+}
+{ $description
+    "Draw spline segment: B-Spline, 4 points" } ;
+
+HELP: draw-spline-segment-catmull-rom
+{ $values
+    p1: Vector2
+    p2: Vector2
+    p3: Vector2
+    p4: Vector2
+    thick: float
+    color: Color
+}
+{ $description
+    "Draw spline segment: Catmull-Rom, 4 points" } ;
+
+HELP: draw-spline-segment-bezier-quadratic
+{ $values
+    p1: Vector2
+    c2: Vector2
+    p3: Vector2
+    thick: float
+    color: Color
+}
+{ $description
+    "Draw spline segment: Quadratic Bezier, 2 points, 1 control point" } ;
+
+HELP: draw-spline-segment-bezier-cubic
+{ $values
+    p1: Vector2
+    c2: Vector2
+    c3: Vector2
+    p4: Vector2
+    thick: float
+    color: Color
+}
+{ $description
+    "Draw spline segment: Cubic Bezier, 2 points, 2 control points" } ;
+
+! Spline segment point evaluation functions, for a given t [0.0f .. 1.0f]
+HELP: get-spline-point-linear
+{ $values
+    startPos: Vector2
+    endPos: Vector2
+    t: float
+}
+{ $description
+    "Get spline point: Linear" } ;
+
+HELP: get-spline-point-basis
+{ $values
+    p1: Vector2
+    p2: Vector2
+    p3: Vector2
+    p4: Vector2
+    t: float
+    Vector2: Vector2
+}
+{ $description
+    "Get spline point: B-Spline" } ;
+
+HELP: get-spline-point-catmull-rom
+{ $values
+    p1: Vector2
+    p2: Vector2
+    p3: Vector2
+    p4: Vector2
+    t: float
+    Vector2: Vector2
+}
+{ $description
+    "Get spline point: Catmull-Rom" } ;
+
+HELP: get-spline-point-bezier-quad
+{ $values
+    p1: Vector2
+    c2: Vector2
+    p3: Vector2
+    t: float
+    Vector2: Vector2
+}
+{ $description
+    "Get spline point: Quadratic Bezier" } ;
+
+HELP: get-spline-point-bezier-cubic
+{ $values
+    p1: Vector2
+    c2: Vector2
+    c3: Vector2
+    p4: Vector2
+    t: float
+    Vector2: Vector2
+}
+{ $description
+    "Get spline point: Cubic Bezier" } ;
 
 ! Basic shapes collision detection functions
 HELP: check-collision-recs
@@ -3641,6 +3943,15 @@ HELP: load-image-raw
 { $description
     "Load image from RAW file data." } ;
 
+HELP: load-image-svg
+{ $values
+    fileNameOrString: c-string
+    width: int
+    height: int
+    Image: Image }
+{ $description
+    "Load image from SVG file data or string with specified size" } ;
+
 HELP: load-image-anim
 { $values
     fileName: c-string
@@ -3711,6 +4022,17 @@ HELP: gen-image-color
 { $description
     "Generate image: plain color" } ;
 
+HELP: gen-image-gradient-linear
+{ $values
+    width: int
+    height: int
+    direction: int
+    start: Color
+    end: Color
+    Image: Image }
+{ $description
+    "Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient" } ;
+
 HELP: gen-image-gradient-radial
 { $values
     width: int
@@ -3721,6 +4043,17 @@ HELP: gen-image-gradient-radial
     Image: Image }
 { $description
     "Generate image: radial gradient" } ;
+
+HELP: gen-image-gradient-square
+{ $values
+    width: int
+    height: int
+    density: float
+    inner: Color
+    outer: Color
+    Image: Image }
+{ $description
+    "Generate image: square gradient" } ;
 
 HELP: gen-image-checked
 { $values
@@ -3919,6 +4252,13 @@ HELP: image-flip-horizontal
     image: { "a " { $link pointer } " to a " { $link Image } } }
 { $description
     "Flip image horizontally" } ;
+
+HELP: image-rotate
+{ $values
+    image: { "a " { $link pointer } " to a " { $link Image } }
+    degrees: int }
+{ $description
+    "Rotate image by input angle in degrees (-359 to 359)" } ;
 
 HELP: image-rotate-cw
 { $values
@@ -4612,6 +4952,13 @@ HELP: draw-text-codepoints
 
 
 ! Text font info functions
+HELP: set-text-line-spacing
+{ $values
+    spacing: int
+}
+{ $description
+    "Set vertical line spacing when drawing with line breaks" } ;
+
 HELP: measure-text
 { $values
     text: c-string
@@ -4748,6 +5095,13 @@ HELP: text-length
     uint: uint }
 { $description
     "Get text length, checks for '\0' ending" } ;
+
+HELP: text-format
+{ $values
+    text: c-string
+    c-string: c-string }
+{ $description
+    "Text formatting with variables (sprintf() style)" } ;
 
 HELP: text-subtext
 { $values
@@ -5373,7 +5727,7 @@ HELP: set-model-mesh-material
 HELP: load-model-animations
 { $values
     fileName: c-string
-    animCount: { "a " { $link pointer } " to a " { $link uint } }
+    animCount: { "a " { $link pointer } " to a " { $link int } }
     ModelAnimation*: { "a " { $link pointer } " to a " { $link ModelAnimation } } }
 { $description
     "Load model animations from file" } ;
@@ -5395,7 +5749,7 @@ HELP: unload-model-animation
 HELP: unload-model-animations
 { $values
     animations: { "a " { $link pointer } " to a "  { $link ModelAnimation } }
-    count: uint }
+    count: int }
 { $description
     "Unload animation array data" } ;
 
@@ -5530,6 +5884,12 @@ HELP: set-master-volume
 { $description
     "Set master volume (listener)" } ;
 
+HELP: get-master-volume
+{ $values
+    float: float }
+{ $description
+    "Get master volume (listener)" } ;
+
 ! Wave/Sound loading/unloading functions
 HELP: load-wave
 { $values
@@ -5567,6 +5927,19 @@ HELP: load-sound-from-wave
     Sound: Sound }
 { $description
     "Load sound from wave data " } ;
+
+HELP: load-sound-alias
+{ $values
+    source: Sound
+    Sound: Sound }
+{ $description
+    "Create a new sound that shares the same sample data as the source sound, does not own the sound data" } ;
+
+HELP: unload-sound-alias
+{ $values
+    alias: Sound }
+{ $description
+    "Unload a sound alias (does not deallocate sample data)" } ;
 
 HELP: is-sound-ready
 { $values
@@ -5920,7 +6293,7 @@ HELP: attach-audio-stream-processor
         stream: AudioStream
         processor: AudioCallback }
 { $description
-    "Attach audio stream processor to stream" } ;
+    "Attach audio stream processor to stream, receives the samples as <float>s" } ;
 
 HELP: detach-audio-stream-processor
     { $values
@@ -5934,7 +6307,7 @@ HELP: attach-audio-mixed-processor
 { $values
     processor: AudioCallback }
 { $description
-    "Attach audio stream processor to the entire audio pipeline" } ;
+    "Attach audio stream processor to the entire audio pipeline, receives the samples as <float>s" } ;
 
 HELP: detach-audio-mixed-processor
 { $values

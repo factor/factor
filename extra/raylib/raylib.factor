@@ -300,9 +300,9 @@ ENUM: PixelFormat
     PIXELFORMAT_UNCOMPRESSED_R32             ! 32 bpp (1 channel - float)
     PIXELFORMAT_UNCOMPRESSED_R32G32B32       ! 32*3 bpp (3 channels - float)
     PIXELFORMAT_UNCOMPRESSED_R32G32B32A32    ! 32*4 bpp (4 channels - float)
-    PIXELFORMAT_UNCOMPRESSED_R16,            ! 16 bpp (1 channel - half float)
-    PIXELFORMAT_UNCOMPRESSED_R16G16B16,      ! 16*3 bpp (3 channels - half float)
-    PIXELFORMAT_UNCOMPRESSED_R16G16B16A16,   ! 16*4 bpp (4 channels - half float)
+    PIXELFORMAT_UNCOMPRESSED_R16             ! 16 bpp (1 channel - half float)
+    PIXELFORMAT_UNCOMPRESSED_R16G16B16       ! 16*3 bpp (3 channels - half float)
+    PIXELFORMAT_UNCOMPRESSED_R16G16B16A16    ! 16*4 bpp (4 channels - half float)
     PIXELFORMAT_COMPRESSED_DXT1_RGB          ! 4 bpp (no alpha)
     PIXELFORMAT_COMPRESSED_DXT1_RGBA         ! 4 bpp (1 bit alpha)
     PIXELFORMAT_COMPRESSED_DXT3_RGBA         ! 8 bpp
@@ -755,7 +755,7 @@ FUNCTION-ALIAS: is-window-state bool IsWindowState ( uint flag )                
 FUNCTION-ALIAS: set-window-state void SetWindowState ( uint flags )                      ! Set window configuration state using flags
 FUNCTION-ALIAS: clear-window-state void ClearWindowState ( uint flags )                  ! Clear window configuration state flags
 FUNCTION-ALIAS: toggle-fullscreen void ToggleFullscreen ( )                              ! Toggle window state: fullscreen/windowed (only PLATFORM_DESKTOP)
-FUNCTION-ALIAS: toggle-bordeless-windowed void ToggleBorderlessWindowed ( )
+FUNCTION-ALIAS: toggle-borderless-windowed void ToggleBorderlessWindowed ( )
 FUNCTION-ALIAS: maximize-window void MaximizeWindow ( )                                  ! Set window state: maximized, if resizable (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: minimize-window void MinimizeWindow ( )                                  ! Set window state: minimized, if resizable (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: restore-window void RestoreWindow ( )                                    ! Set window state: not minimized/maximized (only PLATFORM_DESKTOP)
@@ -767,7 +767,7 @@ FUNCTION-ALIAS: set-window-monitor void SetWindowMonitor ( int monitor )        
 FUNCTION-ALIAS: set-window-min-size void SetWindowMinSize ( int width, int height )      ! Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
 FUNCTION-ALIAS: set-window-max-size void SetWindowMaxSize ( int width, int height )      ! Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
 FUNCTION-ALIAS: set-window-size void SetWindowSize ( int width, int height )             ! Set window dimensions
-FUNCTION-ALIAS: set-window-focused void SetWindowFocused ( )                             ! window focused (only PLATFORM_DESKTOP)
+FUNCTION-ALIAS: set-window-focused void SetWindowFocused ( )                             ! Set window focused (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: set-window-opacity void SetWindowOpacity ( float opacity )               ! Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)
 FUNCTION-ALIAS: get-window-handle void* GetWindowHandle ( )                              ! Get native window handle
 FUNCTION-ALIAS: get-screen-width int GetScreenWidth ( )                                  ! Get current screen width
