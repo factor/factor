@@ -2136,8 +2136,6 @@ HELP: set-window-opacity
     "Set window opacity [0.0f..1.0f] (only PLATFORM_DESKTOP)" } ;
 
 HELP: set-window-focused
-{ $values
-    opacity: float }
 { $description
     "Set window focused (only PLATFORM_DESKTOP)" } ;
 
@@ -2942,7 +2940,7 @@ HELP: decode-data-base64
 ! Automation events functionality
 HELP: load-automation-event-list
 { $values
-    file-name: c-string
+    fileName: c-string
     AutomationEventList: AutomationEventList
 }
 { $description
@@ -2958,7 +2956,7 @@ HELP: unload-automation-event-list
 HELP: export-automation-event-list
 { $values
     list: { "a " { $link pointer } " to a " { $link AutomationEventList } }
-    file-name: c-string
+    fileName: c-string
     bool: bool
 }
 { $description
@@ -3780,6 +3778,7 @@ HELP: get-spline-point-linear
     startPos: Vector2
     endPos: Vector2
     t: float
+    Vector2: Vector2
 }
 { $description
     "Get spline point: Linear" } ;
