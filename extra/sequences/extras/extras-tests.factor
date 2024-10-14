@@ -470,6 +470,13 @@ strings tools.test ;
 { 3 } [ 1 CHAR: a "abba" nth-index ] unit-test
 { f } [ 2 CHAR: a "abba" nth-index ] unit-test
 
+{ 1 5 } [ 1 { 3 5 7 9 11 } [ odd? ] find-nth ] unit-test
+{ 3 9 } [ 3 { 3 5 7 9 11 } [ odd? ] find-nth ] unit-test
+{ 4 11 } [ 3 1 { 3 5 7 9 11 } [ odd? ] find-nth-from ] unit-test
+{ 3 9 } [ 1 { 3 5 7 9 11 } [ odd? ] find-nth-last ] unit-test
+{ 1 5 } [ 3 { 3 5 7 9 11 } [ odd? ] find-nth-last ] unit-test
+{ 1 5 } [ 1 2 { 3 5 7 9 11 } [ odd? ] find-nth-last-from ] unit-test
+
 { f f  } [ -2 2 { 11 12 13 14 15 } [ odd? ] find-nth-from ] unit-test
 { 0 11 } [ -1 2 { 11 12 13 14 15 } [ odd? ] find-nth-from ] unit-test
 { 2 13 } [  0 2 { 11 12 13 14 15 } [ odd? ] find-nth-from ] unit-test
