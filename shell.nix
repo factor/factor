@@ -17,7 +17,7 @@ let
     zlib
   ] ++ (if stdenv.isDarwin then [] else [
     gtk2-x11
-    gdk_pixbuf
+    gdk-pixbuf
     gnome2.gtkglext
   ]);
   runtimeLibPath = "/run/opengl-driver/lib:" + lib.makeLibraryPath runtimeLibs;
