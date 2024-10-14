@@ -23,6 +23,7 @@ $nl
     <uninterned-word>
     gensym
     define-temp
+    define-temp-syntax
 } ;
 
 ARTICLE: "colon-definition" "Colon definitions"
@@ -38,6 +39,7 @@ $nl
     define
     define-declared
     define-inline
+    define-syntax
 }
 "Word definitions must declare their stack effect. See " { $link "effects" } "."
 $nl
@@ -395,6 +397,20 @@ HELP: define-temp
     "The following phrases are equivalent:"
     { $code "[ 2 2 + . ] call" }
     { $code "[ 2 2 + . ] ( -- ) define-temp execute" }
+    "This word must be called from inside " { $link with-compilation-unit } "."
+} ;
+
+HELP: define-syntax
+{ $values { "word" word } { "quot" quotation } }
+{ $description "Defines a parsing word." }
+{ $notes
+    "This word must be called from inside " { $link with-compilation-unit } "."
+} ;
+
+HELP: define-temp-syntax
+{ $values { "quot" quotation } { "word" word } }
+{ $description "Creates an uninterned parsing word that will call " { $snippet "quot" } " when executed." }
+{ $notes
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 

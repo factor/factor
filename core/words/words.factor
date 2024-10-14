@@ -236,6 +236,9 @@ M: parsing-word definer drop \ SYNTAX: \ ; ;
 : define-syntax ( word quot -- )
     [ drop ] [ define ] 2bi t "parsing" set-word-prop ;
 
+: define-temp-syntax ( quot -- word )
+    [ gensym dup ] dip define-syntax ;
+
 : delimiter? ( obj -- ? ) "delimiter" word-prop? ;
 
 : deprecated? ( obj -- ? ) "deprecated" word-prop? ;
