@@ -13,11 +13,7 @@ TUPLE: lazy token ;
 C: <lazy> lazy
 
 : make-lazy-vars ( names -- words )
-    [
-        [
-            dup '[ _ <lazy> suffix! ] define-temp-syntax
-        ] H{ } map>assoc
-    ] with-compilation-unit ;
+    [ dup '[ _ <lazy> suffix! ] define-temp-syntax ] H{ } map>assoc ;
 
 : replace-lazy-vars ( quot -- quot' )
     [ dup lazy? [ token>> parse-word ] when ] deep-map ;
@@ -25,6 +21,7 @@ C: <lazy> lazy
 PRIVATE>
 
 SYNTAX: EMIT:
-    scan-new-word scan-effect in>> make-lazy-vars
+    scan-new-word scan-effect in>>
+    [ make-lazy-vars ] with-compilation-unit
     [ parse-definition ] with-words
     '[ _ replace-lazy-vars append! ] define-syntax ;
