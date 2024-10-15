@@ -1,6 +1,5 @@
-USING: arrays assocs cocoa.plists combinators.short-circuit
-editors io.pathnames io.standard-paths kernel make math.order
-math.parser namespaces sequences splitting system ;
+USING: arrays combinators.short-circuit editors io.pathnames
+io.standard-paths kernel namespaces system vocabs ;
 IN: editors.focus
 
 SINGLETON: focus
@@ -20,18 +19,10 @@ M: linux focus-path
         [ "~/.local/bin/focus-linux" absolute-path ]
     } 0|| ;
 
-MEMO: supports-open-to-line? ( -- ? )
-    "dev.focus-editor" find-native-bundle [
-        "Contents/Info.plist" append-path read-plist
-        "CFBundleVersion" of "." split [ string>number ] map
-        { 0 3 7 } after?
-    ] [ f ] if* ;
+HOOK: focus-command os ( file line -- command )
 
-M: focus editor-command
-    os macos? [
-        supports-open-to-line?
-        [ number>string ":" glue ] [ drop ] if
-        [ "open" , "-a" , "Focus" , , ] { } make
-    ] [
-        focus-path nip swap 2array
-    ] if ;
+M: object focus-command focus-path nip swap 2array ;
+
+M: focus editor-command focus-command ;
+
+os macos? [ "editors.focus.macos" require ] when
