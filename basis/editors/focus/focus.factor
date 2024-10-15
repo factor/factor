@@ -1,11 +1,24 @@
-USING: assocs cocoa.plists editors io.pathnames
-io.standard-paths kernel make math.order math.parser sequences
-splitting ;
+USING: arrays assocs cocoa.plists combinators.short-circuit
+editors io.pathnames io.standard-paths kernel make math.order
+math.parser namespaces sequences splitting system ;
 IN: editors.focus
 
 SINGLETON: focus
 
-! XXX: support Windows and Linux also?
+HOOK: focus-path os ( -- path )
+
+M: windows focus-path
+    {
+        [ \ focus-path get ]
+        [ "focus.exe" ]
+    } 0|| ;
+
+M: linux focus-path
+    {
+        [ \ focus-path get ]
+        [ "focus-linux" find-in-path ]
+        [ "~/.local/bin/focus-linux" absolute-path ]
+    } 0|| ;
 
 MEMO: supports-open-to-line? ( -- ? )
     "dev.focus-editor" find-native-bundle [
@@ -15,6 +28,10 @@ MEMO: supports-open-to-line? ( -- ? )
     ] [ f ] if* ;
 
 M: focus editor-command
-    supports-open-to-line?
-    [ number>string ":" glue ] [ drop ] if
-    [ "open" , "-a" , "Focus" , , ] { } make throw ;
+    os macos? [
+        supports-open-to-line?
+        [ number>string ":" glue ] [ drop ] if
+        [ "open" , "-a" , "Focus" , , ] { } make
+    ] [
+        focus-path nip swap 2array
+    ] if ;
