@@ -12,9 +12,21 @@ qw{ a man a plan a canal panama } ."
 "{ \"a\" \"man\" \"a\" \"plan\" \"a\" \"canal\" \"panama\" }" }
 } ;
 
+HELP: qw:
+{ $syntax "qw: lorem" }
+{ $description "Parses the next token as a string." }
+{ $examples
+{ $example "USING: prettyprint qw ;
+qw: foo ."
+"\"foo\"" }
+} ;
+
 ARTICLE: "qw" "Quoted words"
 "The " { $vocab-link "qw" } " vocabulary offers a shorthand syntax for arrays of single-word string literals." $nl
 "Construct an array of strings:"
-{ $subsections POSTPONE: qw{ } ;
+{ $subsections POSTPONE: qw{ }
+"Parse a token as a string:"
+{ $subsections POSTPONE: qw: }
+;
 
 ABOUT: "qw"
