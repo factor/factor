@@ -55,18 +55,18 @@ PRIVATE>
         corner-point-count unit-rounded-corners
         [ 0 <column> <reversed> r v*n x v+n ]
         [ 1 <column> <reversed> r v*n y v+n ] bi alternate %
-    ] float-array{ } make
-    ;
+    ] float-array{ } make ;
 
 M: rounded draw-boundary
-    [ (rounded) ] [ boundary-vertices>> gl-vertex-pointer ] [ [ GL_LINE_STRIP 0 ] dip boundary-vertices>> length 2 / glDrawArrays ] tri ;
+    [ (rounded) GL_LINE_STRIP 0 ] [ boundary-vertices>> ] bi
+    [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi ;
 
 M: rounded draw-interior
-    [ (rounded) ] [ interior-vertices>> gl-vertex-pointer ] [ [ GL_POLYGON 0 ] dip interior-vertices>> length 2 / glDrawArrays ] tri ;
+    [ (rounded) GL_POLYGON 0 ] [ interior-vertices>> ] bi
+    [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi ;
 
 M: rounded recompute-pen
     swap over [ dim>> ] [ radius>> ] bi*
-    [ [ { 0 0 } ] 2dip (rounded-rect-vertices) close-path >>interior-vertices drop ]
-    [ [ { 0 0 } swap boundary-shift ] dip (rounded-rect-vertices) >>boundary-vertices drop ]
-    bi-curry 2bi
-    ;
+    [ [ { 0 0 } ] 2dip (rounded-rect-vertices) close-path >>interior-vertices ]
+    [ [ { 0 0 } swap boundary-shift ] dip (rounded-rect-vertices) >>boundary-vertices ]
+    2bi drop ;
