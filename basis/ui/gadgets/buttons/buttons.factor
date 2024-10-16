@@ -126,7 +126,7 @@ PRIVATE>
 
 : <border-button-pen> ( -- pen )
     content-background <solid>
-    toolbar-background <solid>
+    field-border-color <solid>
     selection-color <solid>
     roll-button-rollover-border <solid>
     toolbar-button-pressed-background <solid>
