@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators fry grouping kernel literals
 math math.order math.vectors models models.range sequences
-ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.icons
-ui.gadgets.tracks ui.gestures ui.pens ui.pens.polygon
-ui.pens.solid ui.theme ;
+ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens
+ui.pens.polygon ui.pens.rounded ui.pens.solid ui.theme ;
 IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;
@@ -144,7 +144,13 @@ M: slider-pen draw-boundary
     dupd current-pen draw-boundary ;
 
 : build-thumb ( thumb -- thumb )
-    <gadget> line-color <solid> >>interior 1/2 track-add ;
+    dup orientation>> <reversed> <track>
+    dup orientation>> <reversed> <track>
+    3 [ <gadget> { 1 1 } >>dim content-background <solid> >>interior ] replicate
+    [ f track-add <gadget> { 1 1 } >>dim f track-add ] each
+    1/2 track-add
+    0 >>fill 1/2 >>align
+    { 1 1 } <filled-border> line-color min-thumb-dim <rounded> >>interior 1/2 track-add ;
 
 : <thumb> ( orientation -- thumb )
     thumb new-track
@@ -155,7 +161,7 @@ M: slider-pen draw-boundary
 
 : <slide-button-pen> ( -- pen )
     content-background <solid> dup
-    toolbar-button-pressed-background <solid> dup dup
+    toolbar-button-pressed-background min-thumb-dim <rounded> dup dup
     <button-pen> ;
 
 : <slide-button> ( orientation amount left right -- button )
