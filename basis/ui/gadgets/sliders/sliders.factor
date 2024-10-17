@@ -161,7 +161,7 @@ M: slider-pen draw-boundary
 
 : <slide-button-pen> ( -- pen )
     content-background <solid> dup
-    toolbar-button-pressed-background min-thumb-dim <rounded> dup dup
+    toolbar-button-pressed-background <solid> dup dup
     <button-pen> ;
 
 : <slide-button> ( orientation amount left right -- button )
