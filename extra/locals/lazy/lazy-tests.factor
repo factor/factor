@@ -20,6 +20,14 @@ EMIT: nested ( a -- b ) a sq :> b b ;
 { 9 } [ 3 do-nested ] unit-test
 
 <<
+EMIT: binding ( a -- b ) a sq :> b! b 10 * b! b ;
+>>
+
+:: do-binding ( a -- b ) binding ;
+
+{ 90 } [ 3 do-binding ] unit-test
+
+<<
 EMIT: mutable ( a! b -- c ) a sq a! a b * ;
 >>
 
