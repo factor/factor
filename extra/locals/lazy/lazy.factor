@@ -17,7 +17,9 @@ C: <lazy> lazy
 
 : make-lazy-vars ( names -- words )
     [
-        [ dup '[ _ <lazy> suffix! ] define-temp-syntax ] H{ } map>assoc
+        all-lazy-names [
+            dup '[ _ <lazy> suffix! ] define-temp-syntax
+        ] H{ } map>assoc
     ] with-compilation-unit ;
 
 TUPLE: lazy-bind tokens ;
@@ -43,15 +45,13 @@ SYNTAX: lazy-:>
 PRIVATE>
 
 SYNTAX: EMIT:
-    scan-new-word scan-effect in>> all-lazy-names
-    make-lazy-vars \ lazy-:> ":>" pick set-at
-    [ parse-definition ] with-words
+    scan-new-word scan-effect in>> make-lazy-vars
+    \ lazy-:> ":>" pick set-at [ parse-definition ] with-words
     '[ _ replace-lazy-vars append! ] define-syntax ;
 
 SYNTAX: EMIT*:
     scan-new-word scan-effect [
-        in>> all-lazy-names make-lazy-vars
-        \ lazy-:> ":>" pick set-at
+        in>> make-lazy-vars \ lazy-:> ":>" pick set-at
         [ parse-definition ] with-words
     ] [
         [ in>> [ <lazy> ] [ ] map-as ]
