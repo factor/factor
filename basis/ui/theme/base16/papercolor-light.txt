@@ -1,0 +1,16 @@
+238 238 238  base00
+175   0   0  base01
+  0 135   0  base02
+ 95 135   0  base03
+  0 135 175  base04
+ 68  68  68  base05
+  0  95 135  base06
+135 135 135  base07
+188 188 188  base08
+215   0   0  base09
+215   0 135  base0A
+135   0 175  base0B
+215  95   0  base0C
+215  95   0  base0D
+  0  95 175  base0E
+  0  95 135  base0F
