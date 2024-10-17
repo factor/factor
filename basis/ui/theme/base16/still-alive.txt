@@ -1,0 +1,16 @@
+240 240 240  base00
+240 216  72  base01
+255 240  24  base02
+240  24  24  base03
+240   0   0  base04
+216   0   0  base05
+ 72 144   0  base06
+ 48 168  96  base07
+ 72 120  48  base08
+ 24  48  72  base09
+ 66  99 149  base0A
+ 92  92 106  base0B
+ 44  60  87  base0C
+  0  24 120  base0D
+144   0   0  base0E
+ 20  12  13  base0F

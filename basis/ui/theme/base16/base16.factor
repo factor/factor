@@ -8,7 +8,7 @@ SYMBOL: base16-theme-name
 base16-theme-name [ "greenscreen" ] initialize
 
 MEMO: base16colors ( name -- assoc )
-    "vocab:ui/theme/base16/base16-" swap ".txt" 3append
+    "vocab:ui/theme/base16/" ".txt" surround
     utf8 file-lines parse-colors ;
 
 : named-base16 ( name -- color )
