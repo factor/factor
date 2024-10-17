@@ -145,12 +145,12 @@ M: slider-pen draw-boundary
 
 : build-thumb ( thumb -- thumb )
     dup orientation>> <reversed> <track>
-    dup orientation>> <reversed> <track>
+    dup orientation>> <reversed> <track> { 1 1 } >>gap
     3 [ <gadget> { 1 1 } >>dim content-background <solid> >>interior ] replicate
-    [ f track-add <gadget> { 1 1 } >>dim f track-add ] each
+    [ f track-add <gadget> { 1 1 } >>dim f track-add ] each { 2 2 } <filled-border>
     1/2 track-add
-    0 >>fill 1/2 >>align
-    { 1 1 } <filled-border> line-color min-thumb-dim <rounded> >>interior 1/2 track-add ;
+    0 >>fill 1/2 >>align line-color min-thumb-dim <rounded> >>interior 1/2 track-add
+    { 1 1 } <filled-border> ;
 
 : <thumb> ( orientation -- thumb )
     thumb new-track
