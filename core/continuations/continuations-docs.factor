@@ -102,9 +102,7 @@ $nl
     continue
     continue-with
 }
-"Resumed continuations can have at most one value passed to them, so passed data must be packed in a single object. In practice this is not a strong limitation.
-Additionallty, the words for working with continuations without data are in fact just shortcuts for convenience as they actually do pass an empty value and automatically drop it when resuming."
-$nl
+"Resumed continuations can have at most one value passed to them, so passed data must be packed in a single object. In practice this is not a strong limitation. Additionallty, the words for working with continuations without data are in fact just shortcuts for convenience as they actually do pass an empty value and automatically drop it when resuming."
 "Reified continuations can be resumed at any time: before or after the capture quotation has returned. And reified continuations can be resumed any number of times: zero, one or arbitrarily many times."
 $nl
 "In the simplest cases, the reified continuation doesn't escape the initial capture quotation execution. This sufficient for example to implement the non-local exceptional behavior handling of errors where the happy path doesn't resume the continuation at all, but any error immediately resumes the continuation with this error passed in, effectively jumping to were it will be handled from point of execution in the capture quotation. Another example is the short-circuiting nature of early returns (including returns from nested calls in the capture quotation)."
@@ -116,7 +114,6 @@ $nl
 }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsections "continuations.private" }
-
 "Continuations reach their peak expressive power when resumed multiple many times, and for this to be possible it must be after the capture quotation has initially returned."
 "Since resuming a reified continuation after the initial capture quotation returned can only work as long as the program is still running, the rest of the program must be designed accordingly. For example the rest of the program can be some kind of long-running process and resuming the continuation works in a way like restarting this process. Or the rest of the program knows that it must wait for resumes and so acts in a way like receiving commands from the initial capture quotation. Or the rest of the program itself resumes the continuation, behaving like non-deterministic backtracking system that can explore a search space by returning to an earlier execution point, restarting the computation with different branching decisions (a pattern known as " { $emphasis "amb" } ")."
 ;
