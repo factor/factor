@@ -33,7 +33,7 @@ ARTICLE: "errors-anti-examples" "Common error handling pitfalls"
 $nl
 "In most other cases, " { $link cleanup } " should be used instead to handle an error and rethrow it automatically."
 { $heading "Anti-pattern #3: Dropping and rethrowing" }
-"Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error message, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
+"Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error data and execution context, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
 { $heading "Anti-pattern #4: Logging and rethrowing" }
 "If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information." ;
 
@@ -84,27 +84,42 @@ ARTICLE: "continuations.private" "Continuation implementation details"
 } ;
 
 ARTICLE: "continuations" "Continuations"
-"At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation."
+"At any point in the execution of a program, the " { $emphasis "current continuation" } " represents the future of the computation of this execution context."
 $nl
 "Words for working with continuations are found in the " { $vocab-link "continuations" } " vocabulary; implementation details are in " { $vocab-link "continuations.private" } "."
 $nl
-"Continuations can be reified with the following two words:"
+"The general form to reify a continuation and handle resumes is:"
+{ $subsections
+    ifcc
+}
+"When resumes don't need special handling, continuations can be more simply reified with the following two words, depending on whether the future of the computation expects data or not:"
 { $subsections
     callcc0
     callcc1
 }
-"Another two words resume continuations:"
+"The two following respective words resume these reified continuations:"
 { $subsections
     continue
     continue-with
 }
-"Continuations as control-flow:"
+"Resumed continuations can have at most one value passed to them, so passed data must be packed in a single object. In practice this is not a strong limitation.
+Additionallty, the words for working with continuations without data are in fact just shortcuts for convenience as they actually do pass an empty value and automatically drop it when resuming."
+$nl
+"Reified continuations can be resumed at any time: before or after the capture quotation has returned. And reified continuations can be resumed any number of times: zero, one or arbitrarily many times."
+$nl
+"In the simplest cases, the reified continuation doesn't escape the initial capture quotation execution. This sufficient for example to implement the non-local exceptional behavior handling of errors where the happy path doesn't resume the continuation at all, but any error immediately resumes the continuation with this error passed in, effectively jumping to were it will be handled from point of execution in the capture quotation. Another example is the short-circuiting nature of early returns (including returns from nested calls in the capture quotation)."
+$nl
+"And so as a higher abstraction, continuations can also be used as control-flow:"
 { $subsections
     attempt-all
     with-return
 }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
-{ $subsections "continuations.private" } ;
+{ $subsections "continuations.private" }
+
+"Continuations reach their peak expressive power when resumed multiple many times, and for this to be possible it must be after the capture quotation has initially returned."
+"Since resuming a reified continuation after the initial capture quotation returned can only work as long as the program is still running, the rest of the program must be designed accordingly. For example the rest of the program can be some kind of long-running process and resuming the continuation works in a way like restarting this process. Or the rest of the program knows that it must wait for resumes and so acts in a way like receiving commands from the initial capture quotation. Or the rest of the program itself resumes the continuation, behaving like non-deterministic backtracking system that can explore a search space by returning to an earlier execution point, restarting the computation with different branching decisions (a pattern known as " { $emphasis "amb" } ")."
+;
 
 ABOUT: "continuations"
 
@@ -118,40 +133,41 @@ HELP: get-catchstack
 
 HELP: current-continuation
 { $values { "continuation" continuation } }
-{ $description "Creates a continuation object from the current execution context." } ;
+{ $description "Reifies the current execution context representing the future of the computation into a continuation object." } ;
 
 HELP: set-catchstack
 { $values { "catchstack" "a vector of continuations" } }
 { $description "Replaces the catchstack with a copy of the given vector." } ;
 
 HELP: continuation
-{ $class-description "Reifies the current continuation from the point immediately after which the caller returns." } ;
+{ $class-description "The class of reified continuation objects." } ;
 
 HELP: >continuation<
 { $values { "continuation" continuation } { "data" vector } { "call" vector } { "retain" vector } { "name" vector } { "catch" vector } }
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc
-{ $values { "capture" { $quotation ( continuation -- ) } } { "restore" quotation } }
-{ $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and " { $snippet "restore" } " is called." } ;
+{ $values { "capture" { $quotation ( continuation -- initial ) } } { "restore" { $quotation ( obj -- obj' ) } } { "obj" "an object provided when resuming the continuation or initial" } }
+{ $description "Reifies a continuation from the point immediately after which this word would return, and passes it to " { $snippet "capture" } ". Every time the continuation is resumed using " { $link continue-with } " and a new " { $snippet "obj" } " , " { $snippet "restore" } " is called first with " { $snippet "obj" } " on the stack, and then execution continues. If " { $snippet "capture" } " returns, execution continues with " { $snippet "initial" } " on the stack." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
 HELP: callcc0
 { $values { "quot" { $quotation ( continuation -- ) } } }
-{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue } " word resumes the continuation." } ;
+{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which this word would return. Every time the continuation is resumed, execution continues. The " { $link continue } " word is usually used to resume the continuation because any new value is actually just dropped. If " { $snippet "quot" } " returns, execution also continues." } ;
 
 HELP: callcc1
-{ $values { "quot" { $quotation ( continuation -- ) } } { "obj" "an object provided when resuming the continuation" } }
-{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
+{ $values { "quot" { $quotation ( continuation -- initial ) } } { "obj" "an object provided when resuming the continuation or initial" } }
+{ $description "Applies the quotation to the current continuation, which is reified from the point immediately after which this word would return. Every time the continuation is resumed using " { $link continue-with } " and a new " { $snippet "obj" } ", execution continues with " { $snippet "obj" } " on the stack. If " { $snippet "quot" } " returns, execution continues with " { $snippet "initial" } " on the stack." } ;
 
 HELP: continue
 { $values { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc0 } "." } ;
+{ $description "Resumes a continuation usually reified by " { $link callcc0 } "." }
+{ $notes "This actually resumes the continuation with " { $snippet "f" } "placed on the data stack." } ;
 
 HELP: continue-with
-{ $values { "obj" "an object to pass to the continuation's execution context" } { "continuation" continuation } }
-{ $description "Resumes a continuation reified by " { $link callcc1 } ". The object will be placed on the data stack when the continuation resumes." } ;
+{ $values { "obj" "an object to pass to the resumed continuation's execution context" } { "continuation" continuation } }
+{ $description "Resumes a continuation usually reified by " { $link callcc1 } ". The object " { $snippet "obj" } " will be placed on the data stack when the continuation resumes." } ;
 
 HELP: error
 { $description "Global variable holding most recently thrown error." }
@@ -167,7 +183,7 @@ HELP: restarts
 
 HELP: throw
 { $values { "error" object } }
-{ $description "Saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
+{ $description "Reifies and saves the current continuation in the " { $link error-continuation } " global variable and throws an error. Execution does not continue at the point after the " { $link throw } " call. Rather, the innermost catch block is invoked, and execution continues at that point." } ;
 
 { cleanup recover finally } related-words
 
@@ -236,7 +252,7 @@ HELP: throw-continue
 
 HELP: compute-restarts
 { $values { "error" object } { "seq" sequence } }
-{ $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object restarts execution immediately after the corresponding call to " { $link condition } "."
+{ $description "Outputs a sequence of triples, where each triple consists of a human-readable string, an object, and a continuation. Resuming a continuation with the corresponding object continues execution immediately after the corresponding call to " { $link condition } "."
 $nl
 "This word recursively travels up the delegation chain to collate restarts from nested and wrapped conditions." } ;
 
@@ -271,12 +287,12 @@ HELP: attempt-all
 } ;
 
 HELP: return
-{ $description "Returns early from a quotation by reifying the continuation captured by " { $link with-return } " ; execution is resumed starting immediately after " { $link with-return } "." } ;
+{ $description "Returns early from a quotation by resuming the continuation reified by " { $link with-return } " ; execution is continued starting immediately after " { $link with-return } "." } ;
 
 HELP: with-return
 { $values
-    { "quot" quotation } }
-{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediately after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
+    { "quot" { $quotation ( obj -- obj' ) } } }
+{ $description "Reifies a continuation from the point immediately after which this word would return and allows calling the " { $link return } " in " { $snippet "quot" } " to easily resume the continuation and continue execution. If " { $link return } " is not called and " { $snippet "quot" } " returns, then execution continues (as if this word were simply " { $link call } ")." }
 { $examples
     "Only \"Hi\" will print:"
     { $example
