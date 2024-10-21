@@ -89,6 +89,17 @@ HELP: find-path
   " using the A* algorithm."
 } ;
 
+HELP: find-path*
+{ $values
+  { "start" "a node" }
+  { "quot" { $quotation ( node -- ? ) } }
+  { "astar" astar }
+  { "path/f" "an optimal path starting from " { $snippet "start" } ", or f if no such path exists" }
+}
+{ $description "Find a path starting from " { $snippet "start" } " using the A* algorithm. The end "
+  "of the path has been found when " { $snippet "quot" } " returns a true value."
+} ;
+
 HELP: considered
 { $values
   { "astar" astar }
