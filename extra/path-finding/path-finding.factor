@@ -55,6 +55,13 @@ TUPLE: (astar) astar goal origin in-open-set open-set ;
         [ get-first ] keep 2dup goal>> = [ build-path ] [ [ handle ] [ (find-path) ] bi ] if
     ] if ;
 
+: (find-path*) ( astar -- path/f )
+    dup open-set>> heap-empty? [
+        drop f
+    ] [
+        [ get-first ] keep 2dup goal>> call( node -- ? ) [ build-path ] [ [ handle ] [ (find-path*) ] bi ] if
+    ] if ;
+
 : (init) ( from to astar -- )
     swap >>goal
     H{ } clone over astar>> g<<
@@ -83,6 +90,9 @@ PRIVATE>
 
 : find-path ( start target astar -- path/f )
     (astar) new [ astar<< ] keep [ (init) ] [ (find-path) ] bi ;
+
+: find-path* ( start quot astar -- path/f )
+    (astar) new [ astar<< ] keep [ (init) ] [ (find-path*) ] bi ;
 
 : <astar> ( neighbors cost heuristic -- astar )
     astar-simple new swap >>heuristic swap >>cost swap >>neighbors ;
