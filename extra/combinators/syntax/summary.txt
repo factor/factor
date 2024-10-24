@@ -1,0 +1,1 @@
+Syntactic sugar for common combinators
