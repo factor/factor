@@ -10,7 +10,7 @@
         <a href="https://factorcode.org"><img src="https://factorcode.org/favicon.ico" width="24" height="24" /></a>
 
         <t:a t:href="$pastebin">Pastes</t:a>
-        <t:a t:href="$pastebin/new-paste2">New Paste</t:a>
+        <t:a t:href="$pastebin/new-paste">New Paste</t:a>
 
         <t:if t:code="furnace.auth:logged-in?">
 
