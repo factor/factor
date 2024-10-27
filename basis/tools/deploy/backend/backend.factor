@@ -60,7 +60,7 @@ ERROR: can't-deploy-library-file library ;
     ] with-directory-files ;
 
 : input-image-name ( profile -- name )
-    but-last [ my-boot-image-name ] [ staging-image-name ] if-empty ;
+    but-last [ my-boot-image-name resource-path ] [ staging-image-name ] if-empty ;
 
 : run-factor ( vm-path flags -- )
     swap prefix dup . run-with-output ; inline
