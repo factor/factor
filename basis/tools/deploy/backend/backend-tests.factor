@@ -1,5 +1,5 @@
-USING: bootstrap.image kernel pcre sequences tools.deploy.backend
-tools.test ;
+USING: bootstrap.image io.pathnames kernel pcre sequences
+tools.deploy.backend tools.test ;
 IN: tools.deploy.backend.tests
 
 : complete-match? ( str regexp -- ? )
@@ -22,7 +22,7 @@ IN: tools.deploy.backend.tests
 
 ! input-image-name
 { t } [
-    { "foo" } input-image-name my-boot-image-name =
+    { "foo" } input-image-name file-name my-boot-image-name =
 ] unit-test
 
 ! staging-command-line
