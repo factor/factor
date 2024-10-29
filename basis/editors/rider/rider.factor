@@ -1,7 +1,7 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: editors io.pathnames io.standard-paths kernel make
-math.parser namespaces sequences ;
+math.parser namespaces sequences system ;
 IN: editors.rider
 
 SINGLETON: rider
@@ -19,7 +19,7 @@ M: macos find-rider-path
 
 M: windows find-rider-path
     { "Jetbrains" } "rider64.exe" find-in-applications
-    [ "rider64.exe" ] unless* t ;
+    [ "rider64.exe" ] unless* ;
 
 : rider-path  ( -- path )
     \ rider-path get [
