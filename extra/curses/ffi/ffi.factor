@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries alien.libraries.finder
-alien.syntax classes.struct combinators kernel math system unix.types ;
+alien.syntax classes.struct combinators kernel literals math system unix.types ;
 IN: curses.ffi
 
-<< "curses" {
-    { [ os windows? ]  [ "libcurses.dll" ] }
-    { [ os macos? ] [ "libcurses.dylib" ] }
-    { [ os unix?  ]  [ "ncursesw" find-library ] }
-} cond cdecl add-library >>
+C-LIBRARY: curses cdecl {
+    { windows "libcurses.dll" }
+    { macos "libcurses.dylib" }
+    { unix $[ "ncursesw" find-library ] }
+}
 
 C-TYPE: SCREEN
 TYPEDEF: void* va_list

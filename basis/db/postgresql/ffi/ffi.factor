@@ -5,11 +5,11 @@ USING: alien alien.c-types alien.destructors alien.libraries
 alien.syntax combinators system ;
 IN: db.postgresql.ffi
 
-<< "postgresql" {
-    { [ os windows? ] [ "libpq.dll" ] }
-    { [ os macos? ] [ "libpq.dylib" ] }
-    { [ os unix? ] [ "libpq.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: postgresql cdecl {
+    { windows "libpq.dll" }
+    { macos "libpq.dylib" }
+    { unix "libpq.so" }
+}
 
 ! ConnSatusType
 CONSTANT: CONNECTION_OK                     0x0

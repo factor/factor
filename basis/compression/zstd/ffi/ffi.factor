@@ -6,11 +6,11 @@ alien.syntax classes.struct combinators system ;
 
 IN: compression.zstd.ffi
 
-<< "zstd" {
-    { [ os windows? ] [ "zstd-1.dll" ] }
-    { [ os macos? ] [ "libzstd.dylib" ] }
-    { [ os unix? ] [ "libzstd.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: zstd cdecl {
+    { windows "zstd-1.dll" }
+    { macos "libzstd.dylib" }
+    { unix "libzstd.so" }
+}
 
 LIBRARY: zstd
 

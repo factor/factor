@@ -8,11 +8,11 @@ IN: cairo.ffi
 
 ! Adapted from cairo.h, version 1.8.10
 
-<< "cairo" {
-    { [ os windows? ] [ "cairo-2.dll" ] }
-    { [ os macos? ] [ "libcairo.dylib" ] }
-    { [ os unix? ] [ "libcairo.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: cairo cdecl {
+    { windows "cairo-2.dll" }
+    { macos "libcairo.dylib" }
+    { unix "libcairo.so" }
+}
 
 LIBRARY: cairo
 

@@ -9,11 +9,11 @@ IN: pango.cairo.ffi
 
 LIBRARY: pango.cairo
 
-<< "pango.cairo" {
-    { [ os windows? ] [ "libpangocairo-1.0-0.dll" ] }
-    { [ os macos? ] [ "libpangocairo-1.0.dylib" ] }
-    { [ os unix? ] [ "libpangocairo-1.0.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: pango.cairo cdecl {
+    { windows "libpangocairo-1.0-0.dll" }
+    { macos "libpangocairo-1.0.dylib" }
+    { unix "libpangocairo-1.0.so" }
+}
 
 FOREIGN-RECORD-TYPE: cairo.Context cairo_t
 FOREIGN-RECORD-TYPE: cairo.ScaledFont cairo_scaled_font_t

@@ -6,11 +6,11 @@ USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
 IN: db.sqlite.ffi
 
-<< "sqlite" {
-    { [ os windows? ] [ "sqlite3.dll" ] }
-    { [ os macos? ] [ "libsqlite3.dylib" ] }
-    { [ os unix? ] [ "libsqlite3.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: sqlite cdecl {
+    { windows "sqlite3.dll" }
+    { macos "libsqlite3.dylib" }
+    { unix "libsqlite3.so" }
+}
 
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0  ! Successful result

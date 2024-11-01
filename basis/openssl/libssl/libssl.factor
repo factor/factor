@@ -7,14 +7,11 @@ combinators kernel literals namespaces openssl.libcrypto
 sequences system words ;
 IN: openssl.libssl
 
-<< "libssl" {
-    { [ os windows? ] [
-          cpu x86.64 = "-x64" "" ?
-          "libssl-3" ".dll" surround
-    ] }
-    { [ os macos? ] [ "libssl.35.dylib" ] }
-    { [ os unix? ] [ "libssl.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: libssl cdecl {
+    { windows $[ cpu x86.64 = "-x64" "" ? "libssl-3" ".dll" surround ] }
+    { macos "libssl.35.dylib" }
+    { unix "libssl.so" }
+}
 
 CONSTANT: X509_FILETYPE_PEM       1
 CONSTANT: X509_FILETYPE_ASN1      2
