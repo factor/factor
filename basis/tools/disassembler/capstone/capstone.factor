@@ -7,7 +7,7 @@ math namespaces sequences specialized-arrays system
 tools.disassembler.private tools.memory ;
 IN: tools.disassembler.capstone
 
-C-LIBRARY: libcapstone cdecl {
+C-LIBRARY: libcapstone {
     { windows "libcapstone.dll" }
     { macos "libcapstone.dylib" }
     { unix "libcapstone.so" }

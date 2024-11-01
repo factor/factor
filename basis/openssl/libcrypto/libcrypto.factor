@@ -6,7 +6,7 @@ sequences system ;
 
 IN: openssl.libcrypto
 
-C-LIBRARY: libcrypto cdecl {
+C-LIBRARY: libcrypto {
     { windows $[ cpu x86.64 = "-x64" "" ? "libcrypto-3" ".dll" surround ] }
     { macos "libcrypto.35.dylib" }
     { unix "libcrypto.so" }

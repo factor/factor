@@ -8,7 +8,7 @@ IN: gio.ffi
 
 LIBRARY: gio
 
-C-LIBRARY: gio cdecl {
+C-LIBRARY: gio {
     { windows "libgio-2.0-0.dll" }
     { macos "libgio-2.0.dylib" }
     { unix "libgio-2.0.so" }

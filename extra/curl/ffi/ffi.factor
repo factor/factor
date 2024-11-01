@@ -4,7 +4,7 @@ system words ;
 
 IN: curl.ffi
 
-C-LIBRARY: curl cdecl {
+C-LIBRARY: curl {
     { macos "libcurl.dylib" }
     { unix "libcurl.so" }
 }

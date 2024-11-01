@@ -11,7 +11,7 @@ USE: glib.ffi
 
 LIBRARY: gobject
 
-C-LIBRARY: gobject cdecl {
+C-LIBRARY: gobject {
     { windows "gobject-2.0-0.dll" }
     { macos "libgobject-2.0.dylib" }
     { unix "libgobject-2.0.so" }

@@ -8,7 +8,7 @@ IN: glib.ffi
 
 LIBRARY: glib
 
-C-LIBRARY: glib cdecl {
+C-LIBRARY: glib {
     { windows "glib-2.0-0.dll" }
     { macos "libglib-2.0.dylib" }
     { unix "libglib-2.0.so" }

@@ -8,7 +8,7 @@ IN: fftw.ffi
 
 LIBRARY: fftw3
 
-C-LIBRARY: fftw3 cdecl {
+C-LIBRARY: fftw3 {
     { windows $[ { "fftw3.dll" "libfftw3-3.dll" } find-library-from-list ] }
     { macos "libfftw3.dylib" }
     { unix "libfftw3.so" }

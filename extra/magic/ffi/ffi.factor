@@ -6,7 +6,7 @@ alien.syntax combinators literals system ;
 
 IN: magic.ffi
 
-C-LIBRARY: magic cdecl {
+C-LIBRARY: magic {
     { macos "libmagic.dylib" }
     { unix "libmagic.so" }
 }

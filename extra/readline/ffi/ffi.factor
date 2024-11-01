@@ -5,7 +5,7 @@ alien.syntax classes.struct combinators kernel libc math
 namespaces system unix.types ;
 IN: readline.ffi
 
-C-LIBRARY: readline cdecl {
+C-LIBRARY: readline {
     { windows "readline.dll" }
     { macos "libreadline.dylib" }
     { unix "libreadline.so" }

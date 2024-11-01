@@ -6,7 +6,7 @@ alien.syntax classes.struct combinators system ;
 
 IN: compression.zstd.ffi
 
-C-LIBRARY: zstd cdecl {
+C-LIBRARY: zstd {
     { windows "zstd-1.dll" }
     { macos "libzstd.dylib" }
     { unix "libzstd.so" }

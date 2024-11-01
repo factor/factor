@@ -10,7 +10,7 @@ IN: gdk2.pixbuf.ffi
 
 LIBRARY: gdk.pixbuf
 
-C-LIBRARY: gdk.pixbuf cdecl {
+C-LIBRARY: gdk.pixbuf {
     { windows "libgdk_pixbuf-2.0-0.dll" }
     { macos "libgdk_pixbuf-2.0.dylib" }
     { unix "libgdk_pixbuf-2.0.so" }

@@ -9,7 +9,7 @@ IN: pango.ffi
 
 LIBRARY: pango
 
-C-LIBRARY: pango cdecl {
+C-LIBRARY: pango {
     { windows "libpango-1.0-0.dll" }
     { macos "libpango-1.0.dylib" }
     { unix "libpango-1.0.so" }

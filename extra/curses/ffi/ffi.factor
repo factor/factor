@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.libraries alien.libraries.finder
 alien.syntax classes.struct combinators kernel literals math system unix.types ;
 IN: curses.ffi
 
-C-LIBRARY: curses cdecl {
+C-LIBRARY: curses {
     { windows "libcurses.dll" }
     { macos "libcurses.dylib" }
     { unix $[ "ncursesw" find-library ] }

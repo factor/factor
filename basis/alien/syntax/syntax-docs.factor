@@ -27,9 +27,9 @@ HELP: LIBRARY:
 { $notes "Logical library names are defined with the " { $link add-library } " word." } ;
 
 HELP: C-LIBRARY:
-{ $syntax "C-LIBRARY: name abi paths" }
-{ $values { "name" "a logical library name" } { "abi" { "one of " { $link cdecl } " or " { $link stdcall } } } { "paths" { "an alist of {os,path} pairs" } } }
-{ $description "Adds the appropriate library path for the current " { $link os } "." } ;
+{ $syntax "C-LIBRARY: name paths" }
+{ $values { "name" "a logical library name" } { "paths" { "an alist of {os,path} pairs" } } }
+{ $description "Adds the appropriate library path for the current " { $link os } " using " { $link cdecl } " calling convention." } ;
 
 HELP: FUNCTION:
 { $syntax "FUNCTION: return name ( parameters )" }

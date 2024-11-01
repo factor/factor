@@ -8,7 +8,7 @@ IN: cairo.ffi
 
 ! Adapted from cairo.h, version 1.8.10
 
-C-LIBRARY: cairo cdecl {
+C-LIBRARY: cairo {
     { windows "cairo-2.dll" }
     { macos "libcairo.dylib" }
     { unix "libcairo.so" }

@@ -3,7 +3,7 @@ alien.syntax combinators system unix.types ;
 
 IN: libtls.ffi
 
-C-LIBRARY: libtls cdecl {
+C-LIBRARY: libtls {
     { windows "libtls-10.dll" }
     { macos "libtls.dylib" }
     { unix "libtls.so" }

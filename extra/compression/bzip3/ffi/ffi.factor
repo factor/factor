@@ -7,7 +7,7 @@ USING: alien alien.libraries alien.c-types alien.syntax
        classes.struct combinators system words ;
 IN: compression.bzip3.ffi
 
-C-LIBRARY: bzip3 cdecl {
+C-LIBRARY: bzip3 {
     { windows "bzip3.dll" }
     { macos "libbzip3.dylib" }
     { unix "libbzip3.so" }

@@ -3,7 +3,7 @@ alien.syntax combinators system ;
 
 IN: pcre2.ffi
 
-C-LIBRARY: pcre2 cdecl {
+C-LIBRARY: pcre2 {
     { windows "pcre2-8.dll" }
     { macos "libpcre2-8.dylib" }
     { unix "libpcre2-8.so" }

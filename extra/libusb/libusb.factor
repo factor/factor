@@ -6,7 +6,7 @@ kernel locals math sequences specialized-arrays
 system unix.time unix.types ;
 IN: libusb
 
-C-LIBRARY: libusb cdecl {
+C-LIBRARY: libusb {
     { windows "libusb-1.0.dll" }
     { macos "libusb-1.0.dylib" }
     { unix "libusb-1.0.so" }
