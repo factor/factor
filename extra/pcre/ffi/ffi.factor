@@ -2,7 +2,7 @@ USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
 IN: pcre.ffi
 
-C-LIBRARY: pcre cdecl {
+C-LIBRARY: pcre {
     { windows "pcre.dll" }
     { macos "libpcre.dylib" }
     { unix "libpcre.so" }

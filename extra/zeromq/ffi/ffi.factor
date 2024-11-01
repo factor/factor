@@ -7,7 +7,7 @@ combinators kernel literals math system ;
 
 IN: zeromq.ffi
 
-C-LIBRARY: zmq cdecl {
+C-LIBRARY: zmq {
     { windows "libzmq.dll" }
     { macos "libzmq.dylib" }
     { unix "libzmq.so" }

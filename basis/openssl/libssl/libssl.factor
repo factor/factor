@@ -7,7 +7,7 @@ combinators kernel literals namespaces openssl.libcrypto
 sequences system words ;
 IN: openssl.libssl
 
-C-LIBRARY: libssl cdecl {
+C-LIBRARY: libssl {
     { windows $[ cpu x86.64 = "-x64" "" ? "libssl-3" ".dll" surround ] }
     { macos "libssl.35.dylib" }
     { unix "libssl.so" }

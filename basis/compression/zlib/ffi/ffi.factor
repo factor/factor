@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
 IN: compression.zlib.ffi
 
-C-LIBRARY: zlib cdecl {
+C-LIBRARY: zlib {
     { windows "zlib1.dll" }
     { macos "libz.dylib" }
     { unix "libz.so" }

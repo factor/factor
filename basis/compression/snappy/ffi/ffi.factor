@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.libraries alien.syntax
 combinators system ;
 IN: compression.snappy.ffi
 
-C-LIBRARY: snappy cdecl {
+C-LIBRARY: snappy {
     { windows "snappy.dll" }
     { macos "libsnappy.dylib" }
     { unix "libsnappy.so" }

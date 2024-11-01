@@ -9,7 +9,7 @@ IN: pango.cairo.ffi
 
 LIBRARY: pango.cairo
 
-C-LIBRARY: pango.cairo cdecl {
+C-LIBRARY: pango.cairo {
     { windows "libpangocairo-1.0-0.dll" }
     { macos "libpangocairo-1.0.dylib" }
     { unix "libpangocairo-1.0.so" }

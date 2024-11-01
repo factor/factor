@@ -6,7 +6,7 @@ USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
 IN: db.sqlite.ffi
 
-C-LIBRARY: sqlite cdecl {
+C-LIBRARY: sqlite {
     { windows "sqlite3.dll" }
     { macos "libsqlite3.dylib" }
     { unix "libsqlite3.so" }

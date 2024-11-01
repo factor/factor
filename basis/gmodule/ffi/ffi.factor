@@ -8,7 +8,7 @@ IN: gmodule.ffi
 
 LIBRARY: gmodule
 
-C-LIBRARY: gmodule cdecl {
+C-LIBRARY: gmodule {
     { windows "gmodule-2.0-0.dll" }
     { macos "libgmodule-2.0.dylib" }
     { unix "libgmodule-2.0.so" }

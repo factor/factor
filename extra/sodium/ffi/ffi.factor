@@ -5,7 +5,7 @@ classes.struct combinators literals math.order
 sodium.ffi.const sodium.ffi.const.size_max system ;
 IN: sodium.ffi
 
-C-LIBRARY: sodium cdecl {
+C-LIBRARY: sodium {
     { windows "libsodium.dll" }
     { macos "libsodium.dylib" }
     { unix "libsodium.so" }

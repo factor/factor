@@ -8,7 +8,7 @@ IN: atk.ffi
 
 LIBRARY: atk
 
-C-LIBRARY: atk cdecl {
+C-LIBRARY: atk {
     { windows "libatk-1.0-0.dll" }
     { macos "libatk-1.0.dylib" }
     { unix "libatk-1.0.so" }

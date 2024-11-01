@@ -44,10 +44,10 @@ SYNTAX: pointer:
 SYNTAX: INITIALIZE-ALIEN:
     scan-word parse-definition '[ _ _ initialize-alien ] append! ;
 
-ERROR: library-not-found name abi os ;
+ERROR: library-not-found name os ;
 
 SYNTAX: C-LIBRARY:
-    scan-token scan-object scan-object
-    os '[ drop _ swap instance? ] assoc-find
+    scan-token scan-object os
+    '[ drop _ swap instance? ] assoc-find
     [ nip ] [ 2drop os library-not-found ] if
-    swap add-library ;
+    cdecl add-library ;
