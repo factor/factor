@@ -47,7 +47,7 @@ SYNTAX: INITIALIZE-ALIEN:
 ERROR: library-not-found name abi os ;
 
 SYNTAX: C-LIBRARY:
-    scan-token scan-object os scan-object
-    [ drop instance? ] with assoc-find
+    scan-token scan-object scan-object
+    os '[ drop _ swap instance? ] assoc-find
     [ nip ] [ 2drop os library-not-found ] if
     swap add-library ;
