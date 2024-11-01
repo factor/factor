@@ -9,11 +9,11 @@ IN: pango.ffi
 
 LIBRARY: pango
 
-<< "pango" {
-    { [ os windows? ] [ "libpango-1.0-0.dll" ] }
-    { [ os macos? ] [ "libpango-1.0.dylib" ] }
-    { [ os unix? ] [ "libpango-1.0.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: pango cdecl {
+    { windows "libpango-1.0-0.dll" }
+    { macos "libpango-1.0.dylib" }
+    { unix "libpango-1.0.so" }
+}
 
 IMPLEMENT-STRUCTS: PangoRectangle ;
 

@@ -8,10 +8,10 @@ IN: gmodule.ffi
 
 LIBRARY: gmodule
 
-<< "gmodule" {
-    { [ os windows? ] [ "gmodule-2.0-0.dll" ] }
-    { [ os macos? ] [ "libgmodule-2.0.dylib" ] }
-    { [ os unix? ] [ "libgmodule-2.0.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: gmodule cdecl {
+    { windows "gmodule-2.0-0.dll" }
+    { macos "libgmodule-2.0.dylib" }
+    { unix "libgmodule-2.0.so" }
+}
 
 GIR: vocab:gir/GModule-2.0.gir

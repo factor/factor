@@ -3,11 +3,11 @@ alien.syntax combinators system unix.types ;
 
 IN: libtls.ffi
 
-<< "libtls" {
-    { [ os windows? ] [ "libtls-10.dll" ] }
-    { [ os macos? ] [ "libtls.dylib" ] }
-    { [ os unix? ] [ "libtls.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: libtls cdecl {
+    { windows "libtls-10.dll" }
+    { macos "libtls.dylib" }
+    { unix "libtls.so" }
+}
 
 C-TYPE: tls_config
 C-TYPE: tls_ctx

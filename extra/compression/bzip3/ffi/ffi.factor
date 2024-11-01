@@ -6,11 +6,12 @@
 USING: alien alien.libraries alien.c-types alien.syntax
        classes.struct combinators system words ;
 IN: compression.bzip3.ffi
-<< "bzip3" {
-  { [ os windows? ] [ "bzip3.dll" ] }
-  { [ os macos? ] [ "libbzip3.dylib" ] }
-  { [ os unix? ] [ "libbzip3.so" ] }
-} cond cdecl add-library >>
+
+C-LIBRARY: bzip3 cdecl {
+    { windows "bzip3.dll" }
+    { macos "libbzip3.dylib" }
+    { unix "libbzip3.so" }
+}
 
 LIBRARY: bzip3
 

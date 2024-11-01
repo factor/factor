@@ -8,10 +8,10 @@ IN: atk.ffi
 
 LIBRARY: atk
 
-<< "atk" {
-    { [ os windows? ] [ "libatk-1.0-0.dll" ] }
-    { [ os macos? ] [ "libatk-1.0.dylib" ] }
-    { [ os unix? ] [ "libatk-1.0.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: atk cdecl {
+    { windows "libatk-1.0-0.dll" }
+    { macos "libatk-1.0.dylib" }
+    { unix "libatk-1.0.so" }
+}
 
 GIR: vocab:gir/Atk-1.0.gir

@@ -6,11 +6,12 @@ kernel locals math sequences specialized-arrays
 system unix.time unix.types ;
 IN: libusb
 
-<< "libusb" {
-        { [ os windows? ] [ "libusb-1.0.dll" ] }
-        { [ os macos? ] [ "libusb-1.0.dylib"  ] }
-        { [ os unix?  ] [ "libusb-1.0.so" ] }
-    } cond cdecl add-library >>
+C-LIBRARY: libusb cdecl {
+    { windows "libusb-1.0.dll" }
+    { macos "libusb-1.0.dylib" }
+    { unix "libusb-1.0.so" }
+}
+
 LIBRARY: libusb
 
 : libusb_cpu_to_le16 ( x -- y )

@@ -7,11 +7,11 @@ math namespaces sequences specialized-arrays system
 tools.disassembler.private tools.memory ;
 IN: tools.disassembler.capstone
 
-<< "libcapstone" {
-    { [ os windows? ] [ "libcapstone.dll" ] }
-    { [ os macos? ] [ "libcapstone.dylib" ] }
-    { [ os unix? ] [ "libcapstone.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: libcapstone cdecl {
+    { windows "libcapstone.dll" }
+    { macos "libcapstone.dylib" }
+    { unix "libcapstone.so" }
+}
 
 LIBRARY: libcapstone
 

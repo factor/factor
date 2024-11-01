@@ -5,11 +5,11 @@ alien.syntax classes.struct combinators kernel libc math
 namespaces system unix.types ;
 IN: readline.ffi
 
-<< "readline" {
-    { [ os windows? ] [ "readline.dll" ] }
-    { [ os macos? ] [ "libreadline.dylib" ] }
-    { [ os unix? ] [ "libreadline.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: readline cdecl {
+    { windows "readline.dll" }
+    { macos "libreadline.dylib" }
+    { unix "libreadline.so" }
+}
 
 LIBRARY: readline
 

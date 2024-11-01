@@ -11,11 +11,11 @@ USE: glib.ffi
 
 LIBRARY: gobject
 
-<< "gobject" {
-    { [ os windows? ] [ "gobject-2.0-0.dll" ] }
-    { [ os macos? ] [ "libgobject-2.0.dylib" ] }
-    { [ os unix? ] [ "libgobject-2.0.so" ] }
-} cond cdecl add-library >>
+C-LIBRARY: gobject cdecl {
+    { windows "gobject-2.0-0.dll" }
+    { macos "libgobject-2.0.dylib" }
+    { unix "libgobject-2.0.so" }
+}
 
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
