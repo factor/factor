@@ -1,6 +1,7 @@
+USING: alien alien.c-types alien.enums alien.libraries assocs
+classes.struct help.markup help.syntax see system ;
+
 IN: alien.syntax
-USING: alien alien.c-types alien.enums alien.libraries classes.struct assocs
-help.markup help.syntax see ;
 
 HELP: DLL"
 { $syntax "DLL\" path\"" }
@@ -24,6 +25,11 @@ HELP: LIBRARY:
 { $values { "name" "a logical library name" } }
 { $description "Sets the logical library for consequent " { $link POSTPONE: FUNCTION: } ", " { $link POSTPONE: C-GLOBAL: } " and " { $link POSTPONE: CALLBACK: } " definitions, as well as " { $link POSTPONE: &: } " forms." }
 { $notes "Logical library names are defined with the " { $link add-library } " word." } ;
+
+HELP: C-LIBRARY:
+{ $syntax "C-LIBRARY: name abi paths" }
+{ $values { "name" "a logical library name" } { "abi" { "one of " { $link cdecl } " or " { $link stdcall } } } { "paths" { "an alist of {os,path} pairs" } } }
+{ $description "Adds the appropriate library path for the current " { $link os } "." } ;
 
 HELP: FUNCTION:
 { $syntax "FUNCTION: return name ( parameters )" }
