@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2010 Slava Pestov, Alex Chapman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.enums alien.libraries
-alien.parser kernel lexer namespaces parser sequences
-strings.parser vocabs words ;
+alien.parser assocs classes kernel lexer namespaces parser
+sequences strings.parser system vocabs words ;
 << "alien.arrays" require >> ! needed for bootstrap
 IN: alien.syntax
 
@@ -43,3 +43,11 @@ SYNTAX: pointer:
 
 SYNTAX: INITIALIZE-ALIEN:
     scan-word parse-definition '[ _ _ initialize-alien ] append! ;
+
+ERROR: library-not-found name abi os ;
+
+SYNTAX: C-LIBRARY:
+    scan-token scan-object os scan-object
+    [ drop instance? ] with assoc-find
+    [ nip ] [ 2drop os library-not-found ] if
+    swap add-library ;
