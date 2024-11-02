@@ -129,13 +129,33 @@ M: ratio number>text
     >fraction [ number>text ] bi@ " divided by " glue ;
 
 M: float number>text
-    number>string "." split1 [
-        "-" ?head
-        [ string>number number>text ]
-        [ [ "negative " prepend ] when ] bi*
-    ] [
-        [ CHAR: 0 - small-numbers ] { } map-as join-words
-    ] bi* " point " glue ;
+    {
+        { 1/0. [ "infinity" ] }
+        { -1/0. [ "negative infinity" ] }
+        [
+            dup fp-nan? [ drop "not a number" ] [
+                number>string "-" ?head swap
+                "e-" split1 [
+                    [ CHAR: . swap remove ] dip
+                    string>number 1 - CHAR: 0 <repetition>
+                    prepend "0" swap
+                ] [
+                    "e+" split1 [
+                        [ "." split1 [ append ] [ length ] bi ] dip
+                        string>number swap - CHAR: 0 <repetition> append
+                        "0"
+                    ] [
+                        "." split1
+                    ] if*
+                ] if*
+
+                [ string>number number>text ] dip
+                [ CHAR: 0 - small-numbers ] { } map-as
+                join-words " point " glue swap
+                [ "negative " prepend ] when
+            ] if
+        ]
+    } case ;
 
 M: complex number>text
     >rect [ number>text ] [

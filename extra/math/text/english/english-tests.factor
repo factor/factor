@@ -41,3 +41,18 @@ sequences tools.test ;
 
 { "th" } [ 13.5 ordinal-suffix ] unit-test
 { "th" } [ 9+1/3 ordinal-suffix ] unit-test
+
+{ "zero point zero zero zero zero zero zero zero zero zero zero zero zero zero zero one two three four five" }
+[ 1.2345e-15 number>text ] unit-test
+{ "negative zero point zero zero zero zero zero zero zero zero zero zero zero zero zero zero one two three four five" }
+[ -1.2345e-15 number>text ] unit-test
+
+{ "one hundred and twenty-three quintillion, four hundred and fifty quadrillion point zero" }
+[ 1.2345e20 number>text ] unit-test
+{ "negative one hundred and twenty-three quintillion, four hundred and fifty quadrillion point zero" }
+[ -1.2345e20 number>text ] unit-test
+
+{ "ten duotrigintillion point zero" } [ 1e100 number>text ] unit-test
+
+{ "infinity" } [ 1/0. number>text ] unit-test
+{ "negative infinity" } [ -1/0. number>text ] unit-test
