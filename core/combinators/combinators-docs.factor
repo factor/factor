@@ -305,7 +305,7 @@ HELP: 3cleave
 
 HELP: spread
 { $values { "objs..." "objects" } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }
-{ $description "Applies each quotation to the object in turn." }
+{ $description "Applies each quotation to the objects in turn." }
 { $examples
     "The " { $link bi* } " combinator takes two values and two quotations; the " { $link tri* } " combinator takes three values and three quotations. The " { $link spread } " combinator takes " { $snippet "n" } " values and " { $snippet "n" } " quotations, where " { $snippet "n" } " is the length of the input sequence, and is essentially equivalent to a nested series of " { $link dip } "s:"
     { $code
