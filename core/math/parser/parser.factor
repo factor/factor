@@ -263,15 +263,9 @@ DEFER: @neg-digit
     { fixnum number-parse integer fixnum } declare
     digit-in-radix [ add-digit [ @denom-digit-or-punc ] next-digit ] [ @abort ] if ;
 
-: @denom-first-digit ( i number-parse n char -- n/f )
-    {
-        { CHAR: . [ >float [ @abort ] next-digit ] }
-        [ @denom-digit ]
-    } case ; inline
-
 : ->denominator ( i number-parse n -- n/f )
     { fixnum number-parse integer } declare
-    @split [ @denom-first-digit ] require-next-digit ?make-ratio ;
+    @split [ @denom-digit ] require-next-digit ?make-ratio ;
 
 : @num-digit-or-punc ( i number-parse n char -- n/f )
     [ [ @num-digit ] require-next-digit ] [
