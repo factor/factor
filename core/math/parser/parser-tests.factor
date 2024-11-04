@@ -2,63 +2,28 @@ USING: kernel layouts literals math math.parser
 math.parser.private sequences strings tools.test ;
 IN: math.parser.tests
 
-{ f }
-[ f string>number ]
-unit-test
-
-{ f }
-[ ";" string>number ]
-unit-test
-
-{ f }
-[ "<>" string>number ]
-unit-test
-
-{ f }
-[ "^" string>number ]
-unit-test
-
-{ f }
-[ "789:;<=>?@" string>number ]
-unit-test
-
-{ f }
-[ "12345abcdef" string>number ]
-unit-test
-
-{ 12 }
-[ "+12" string>number ]
-unit-test
-
-{ -12 }
-[ "-12" string>number ]
-unit-test
-
-{ f }
-[ "-+12" string>number ]
-unit-test
-
-{ f }
-[ "+-12" string>number ]
-unit-test
-
-{ f }
-[ "--12" string>number ]
-unit-test
-
-{ f }
-[ "-" string>number ]
-unit-test
-
-{ f }
-[ "e" string>number ]
-unit-test
+{ f } [ f string>number ] unit-test
+{ f } [ ";" string>number ] unit-test
+{ f } [ "<>" string>number ] unit-test
+{ f } [ "^" string>number ] unit-test
+{ f } [ "789:;<=>?@" string>number ] unit-test
+{ f } [ "12345abcdef" string>number ] unit-test
+{ 12 } [ "+12" string>number ] unit-test
+{ -12 } [ "-12" string>number ] unit-test
+{ f } [ "-+12" string>number ] unit-test
+{ f } [ "+-12" string>number ] unit-test
+{ f } [ "--12" string>number ] unit-test
+{ f } [ "-" string>number ] unit-test
+{ f } [ "e" string>number ] unit-test
 
 { f } [ "1/0" string>number ] unit-test
 { f } [ "-1/0" string>number ] unit-test
 { 1/2 } [ "1/2" string>number ] unit-test
 { -1/2 } [ "-1/2" string>number ] unit-test
 { 2 } [ "4/2" string>number ] unit-test
+{ 3 } [ "1+4/2" string>number ] unit-test
+{ f } [ "2/0.3" string>number ] unit-test
+{ f } [ "0.3/2" string>number ] unit-test
 { f } [ "1/-2" string>number ] unit-test
 { f } [ "1/2/3" string>number ] unit-test
 { 1+1/2 } [ "1+1/2" string>number ] unit-test
@@ -72,7 +37,6 @@ unit-test
 { f } [ "1+1/2+2" string>number ] unit-test
 
 { 100000 } [ "100,000" string>number ] unit-test
-
 { 100000.0 } [ "100,000.0" string>number ] unit-test
 
 { f } [ "," string>number ] unit-test
@@ -82,8 +46,16 @@ unit-test
 { f } [ ",2" string>number ] unit-test
 { f } [ "-,2" string>number ] unit-test
 
+{ 2.0 } [ "4/2." string>number ] unit-test
+{ 2.0 } [ "1+2/2." string>number ] unit-test
+{ -2.0 } [ "-1-2/2." string>number ] unit-test
+{ f } [ "4/2.0" string>number ] unit-test
+{ f } [ "4./2" string>number ] unit-test
 { 2.0 } [ "2." string>number ] unit-test
 { 2.0 } [ "+2." string>number ] unit-test
+{ 0.25 } [ "1/4." string>number ] unit-test
+{ f } [ "1/4.0" string>number ] unit-test
+{ f } [ "1./4" string>number ] unit-test
 { 0.25 } [ ".25" string>number ] unit-test
 { -2.0 } [ "-2." string>number ] unit-test
 { -0.25 } [ "-.25" string>number ] unit-test
@@ -120,71 +92,28 @@ unit-test
 
 { -100.0 } [ "-1.e2" string>number ] unit-test
 
-{ "0.01" }
-[ "1.0e-2" string>number number>string ]
-unit-test
-
+{ "0.01" } [ "1.0e-2" string>number number>string ] unit-test
 { 0.01 } [ "1.0e-2" string>number ] unit-test
 
-{ "-0.01" }
-[ "-1.0e-2" string>number number>string ]
-unit-test
-
+{ "-0.01" } [ "-1.0e-2" string>number number>string ] unit-test
 { -0.01 } [ "-1.0e-2" string>number ] unit-test
-
-{ "-0.01" }
-[ "-1.e-2" string>number number>string ]
-unit-test
+{ "-0.01" } [ "-1.e-2" string>number number>string ] unit-test
 
 { -1.0e-12 } [ "-1.0e-12" string>number ] unit-test
+{ "-0.000000000001" } [ "-1.0e-12" string>number number>string ] unit-test
 
-{ "-0.000000000001" }
-[ "-1.0e-12" string>number number>string ]
-unit-test
+{ f } [ "-1e-2e4" string>number ] unit-test
+{ "3.14" } [ "3.14" string>number number>string ] unit-test
 
-{ f }
-[ "-1e-2e4" string>number ]
-unit-test
-
-{ "3.14" }
-[ "3.14" string>number number>string ]
-unit-test
-
-{ f }
-[ "." string>number ]
-unit-test
-
-{ f }
-[ ".e" string>number ]
-unit-test
-
-{ "101.0" }
-[ "1.01e2" string>number number>string ]
-unit-test
-
-{ "-101.0" }
-[ "-1.01e2" string>number number>string ]
-unit-test
-
-{ "1.01" }
-[ "101.0e-2" string>number number>string ]
-unit-test
-
-{ "-1.01" }
-[ "-101.0e-2" string>number number>string ]
-unit-test
-
-{ f }
-[ "1e1/2" string>number ]
-unit-test
-
-{ f }
-[ "1e1.2" string>number ]
-unit-test
-
-{ f }
-[ "e/2" string>number ]
-unit-test
+{ f } [ "." string>number ] unit-test
+{ f } [ ".e" string>number ] unit-test
+{ "101.0" } [ "1.01e2" string>number number>string ] unit-test
+{ "-101.0" } [ "-1.01e2" string>number number>string ] unit-test
+{ "1.01" } [ "101.0e-2" string>number number>string ] unit-test
+{ "-1.01" } [ "-101.0e-2" string>number number>string ] unit-test
+{ f } [ "1e1/2" string>number ] unit-test
+{ f } [ "1e1.2" string>number ] unit-test
+{ f } [ "e/2" string>number ] unit-test
 
 { f } [ "12" bin> ] unit-test
 { f } [ "fdsf" bin> ] unit-test
@@ -206,7 +135,6 @@ unit-test
 
 { f } [  "0/0." string>number fp-sign ] unit-test
 { t } [ "-0/0." string>number fp-sign ] unit-test
-
 
 { "1/0." } [ 1/0. number>string ] unit-test
 { 1/0. } [ "1/0." string>number ] unit-test
@@ -474,9 +402,8 @@ unit-test
 { 0x1.fffffffffffffp1023 } [ "0x1.fffffffffffff7ffffffffffffffffp1023" string>number ] unit-test
 { 1.79769313486231571e+308 } [ "1.797693134862315807e+308" string>number ] unit-test
 
-! works with ratios
-{ 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 ! XXX: disable for right now, see #1362 or #1408
+! { 0.25 } [ "1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 ! { 1.25 } [ "1+1/4" 3000 [ CHAR: 0 ] "" replicate-as append "e-3000" append string>number ] unit-test
 
 ! #1356 #1231
