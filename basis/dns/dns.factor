@@ -1,12 +1,11 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums alien.syntax arrays ascii calendar
-combinators combinators.smart constructors continuations endian
-grouping io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.sockets io.sockets.private
-io.streams.byte-array io.timeouts kernel make math math.bitwise
-math.parser namespaces random sequences slots.syntax splitting
-system vectors vocabs ;
+combinators combinators.smart continuations endian grouping io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.sockets io.sockets.private io.streams.byte-array io.timeouts
+kernel make math math.bitwise math.parser namespaces random
+sequences slots.syntax splitting system vectors vocabs ;
 FROM: io.encodings.ascii => ascii ;
 IN: dns
 
@@ -69,8 +68,9 @@ ERROR: domain-name-contains-empty-label domain ;
     "." ?tail drop ;
 
 TUPLE: query name type class ;
-CONSTRUCTOR: <query> query ( name type class -- obj )
-    [ check-domain-name >dotted ] change-name ;
+
+: <query> ( name type class -- query )
+    [ check-domain-name >dotted ] 2dip query boa ;
 
 TUPLE: rr name type class ttl rdata ;
 
@@ -83,24 +83,25 @@ TUPLE: soa mname rname serial refresh retry expire minimum ;
 TUPLE: srv priority weight port target ;
 
 TUPLE: a name ;
-CONSTRUCTOR: <a> a ( name -- obj ) ;
+C: <a> a
 
 TUPLE: aaaa name ;
-CONSTRUCTOR: <aaaa> aaaa ( name -- obj ) ;
+C: <aaaa> aaaa
 
 TUPLE: cname name ;
-CONSTRUCTOR: <cname> cname ( name -- obj ) ;
+C: <cname> cname
 
 TUPLE: ptr name ;
-CONSTRUCTOR: <ptr> ptr ( name -- obj ) ;
+C: <ptr> ptr
 
 TUPLE: ns name ;
-CONSTRUCTOR: <ns> ns ( name -- obj ) ;
+C: <ns> ns
 
 TUPLE: message id qr opcode aa tc rd ra z rcode
 query answer-section authority-section additional-section ;
 
-CONSTRUCTOR: <message> message ( query -- obj )
+: <message> ( query -- obj )
+    message new
     16 2^ random >>id
     0 >>qr
     QUERY >>opcode
@@ -110,7 +111,7 @@ CONSTRUCTOR: <message> message ( query -- obj )
     0 >>ra
     0 >>z
     NO-ERROR >>rcode
-    [ dup sequence? [ 1array ] unless ] change-query
+    swap dup sequence? [ 1array ] unless >>query
     { } >>answer-section
     { } >>authority-section
     { } >>additional-section ;
