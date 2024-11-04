@@ -55,11 +55,8 @@ TUPLE: number-parse
 : (add-digit) ( number-parse n digit -- number-parse n' )
     [ dup radix>> ] [ * ] [ + ] tri* ; inline
 
-: add-digit ( i number-parse n digit quot -- n/f )
-    [ (add-digit) [ ?inc-magnitude ] keep ] dip next-digit ; inline
-
-: add-exponent-digit ( i number-parse n digit quot -- n/f )
-    [ (add-digit) ] dip next-digit ; inline
+: add-digit ( number-parse n digit -- number-parse n' )
+    (add-digit) [ ?inc-magnitude ] keep ; inline
 
 : digit-in-radix ( number-parse n char -- number-parse n digit ? )
     digit> pick radix>> over > ; inline
@@ -94,10 +91,8 @@ TUPLE: float-parse
     integer>fixnum-strict
     dup 0 >= [ pow-until ] [ [ recip ] [ neg ] bi* pow-until ] if ; inline
 
-: add-mantissa-digit ( float-parse i number-parse n digit quot -- float-parse' n/f )
-    [ (add-digit)
-        dup [ inc-point-?dec-magnitude ] curry 3dip
-    ] dip next-digit ; inline
+: add-mantissa ( float-parse i number-parse n digit -- float-parse' i number-parse n' )
+    (add-digit) dup [ inc-point-?dec-magnitude ] curry 3dip ; inline
 
 ! IEE754 doubles are in the range ]10^309,10^-324[,
 ! or expressed in base 2, ]2^1024, 2^-1074].
@@ -185,11 +180,8 @@ CONSTANT: min-magnitude-2 -1074
         double>bits 63 2^ bitnot bitand bits>double
     ] when ; inline
 
-: add-ratio? ( n/f -- ? )
-    dup real? [ dup >integer number= not ] [ drop f ] if ;
-
 : ?add-ratio ( m n/f -- m+n/f )
-    dup add-ratio? [ + ] [ 2drop f ] if ; inline
+    dup real? [ + ] [ 2drop f ] if ; inline
 
 : @abort ( i number-parse n x -- f )
     4drop f ; inline
@@ -218,7 +210,7 @@ DEFER: @neg-digit
 
 : @exponent-digit ( float-parse i number-parse n char -- float-parse n/f )
     { float-parse fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @exponent-digit-or-punc ] add-exponent-digit ] [ @abort ] if ;
+    digit-in-radix [ (add-digit) [ @exponent-digit-or-punc ] next-digit ] [ @abort ] if ;
 
 : @exponent-first-char ( float-parse i number-parse n char -- float-parse n/f )
     {
@@ -249,7 +241,7 @@ DEFER: @neg-digit
     { float-parse fixnum number-parse integer fixnum } declare
     [
         digit-in-radix
-        [ [ @mantissa-digit-or-punc ] add-mantissa-digit ]
+        [ add-mantissa [ @mantissa-digit-or-punc ] next-digit ]
         [ @abort ] if
     ] or-mantissa->exponent ;
 
@@ -262,18 +254,18 @@ DEFER: @neg-digit
 : @denom-digit-or-punc ( i number-parse n char -- n/f )
     [ [ @denom-digit ] require-next-digit ] [
         {
-            { CHAR: . [ ->mantissa ] }
-            [ [ @denom-digit ] or-exponent ]
+            { CHAR: . [ >float [ @abort ] next-digit ] }
+            [ @denom-digit ]
         } case
     ] if-skip ; inline
 
 : @denom-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @denom-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ add-digit [ @denom-digit-or-punc ] next-digit ] [ @abort ] if ;
 
 : @denom-first-digit ( i number-parse n char -- n/f )
     {
-        { CHAR: . [ ->mantissa ] }
+        { CHAR: . [ >float [ @abort ] next-digit ] }
         [ @denom-digit ]
     } case ; inline
 
@@ -291,7 +283,7 @@ DEFER: @neg-digit
 
 : @num-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @num-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ add-digit [ @num-digit-or-punc ] require-next-digit ] [ @abort ] if ;
 
 : ->numerator ( i number-parse n -- n/f )
     { fixnum number-parse integer } declare
@@ -309,7 +301,7 @@ DEFER: @neg-digit
 
 : @pos-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @pos-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ add-digit [ @pos-digit-or-punc ] next-digit ] [ @abort ] if ;
 
 : ->radix ( i number-parse n quot radix -- i number-parse n quot )
     [ >>radix ] curry 2dip ; inline
@@ -343,7 +335,7 @@ DEFER: @neg-digit
 
 : @neg-digit ( i number-parse n char -- n/f )
     { fixnum number-parse integer fixnum } declare
-    digit-in-radix [ [ @neg-digit-or-punc ] add-digit ] [ @abort ] if ;
+    digit-in-radix [ add-digit [ @neg-digit-or-punc ] next-digit ] [ @abort ] if ;
 
 : @neg-first-digit ( i number-parse n char -- n/f )
     {
@@ -381,10 +373,10 @@ DEFER: @neg-digit
 PRIVATE>
 
 : base-digits> ( seq radix -- n )
-  [ swap [ * ] dip + ] curry 0 swap reduce ;
+    '[ _ swap [ * ] dip + ] 0 swap reduce ;
 
 : >base-digits ( n radix -- seq )
-  [ /mod ] curry [ dup 0 > ] swap produce nip reverse ;
+    '[ _ /mod ] [ dup 0 > ] swap produce nip reverse ;
 
 : digits> ( seq -- n ) 10 base-digits> ;
 : >digits ( n -- seq ) 10 >base-digits ;
