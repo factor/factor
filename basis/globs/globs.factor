@@ -39,7 +39,8 @@ Element = "**" => [[ wild-path-separator <zero-or-more> ]]
         | "{" AlternationBody:b "}" => [[ b <or> ]]
         | Character
 
-Concatenation = Element* => [[ <sequence> ]]
+Concatenation = "!"~ Element* => [[ <sequence> <not> ]]
+              | Element* => [[ <sequence> ]]
 
 End = !(.)
 
@@ -51,7 +52,7 @@ Main = Concatenation End
     [ >case-fold ] bi@ <glob> matches? ;
 
 : glob-pattern? ( string -- ? )
-    [ "\\*?[{" member? ] any? ;
+    [ "!\\*?[{" member? ] any? ;
 
 <PRIVATE
 
