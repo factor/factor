@@ -60,6 +60,7 @@ IN: math.parser.tests
 { -2.0 } [ "-2." string>number ] unit-test
 { -0.25 } [ "-.25" string>number ] unit-test
 { f }  [ "-." string>number ] unit-test
+{ f }  [ "1/." string>number ] unit-test
 
 { 255 } [ "ff" hex> ] unit-test
 
