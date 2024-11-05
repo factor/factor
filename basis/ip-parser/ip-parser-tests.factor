@@ -39,3 +39,6 @@ USING: ip-parser kernel sequences tools.test ;
 { "1::" } [ 0x10000000000000000000000000000 ipv6-ntoa ] unit-test
 { 0x10002000000000000000000030004 } [ "1:2::3:4" ipv6-aton ] unit-test
 { "1:2::3:4" } [ 0x10002000000000000000000030004 ipv6-ntoa ] unit-test
+
+{ { 65152 0 0 0 29762 6399 65122 31588 } }
+[ "fe80::7442:18ff:fe62:7b64%en0" parse-ipv6 ] unit-test

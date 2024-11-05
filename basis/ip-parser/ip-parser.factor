@@ -78,6 +78,7 @@ ERROR: more-than-8-components ;
 PRIVATE>
 
 : parse-ipv6 ( string -- seq )
+    "%" split1 drop ! XXX: parse the zone-id
     "::" split1 [ [ f ] [ split-ipv6 ] if-empty ] bi@ pad-ipv6 ;
 
 : ipv6-ntoa ( integer -- ip )
