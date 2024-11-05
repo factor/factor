@@ -705,8 +705,12 @@ HELP: drop-while
 
 HELP: each-index-from
 { $values
-    { "seq" sequence } { "quot" quotation } { "i" integer }
-} ;
+    { "seq" sequence } { "quot" { $quotation ( ... elt index -- ... ) } } { "i" "a starting index" } }
+{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack, from a starting index." }
+{ $examples { $example "USING: arrays sequences.extras prettyprint ;"
+"{ 10 20 30 } [ 2array . ] 1 each-index-from"
+"{ 20 1 }\n{ 30 2 }"
+} } ;
 
 HELP: each-integer-with-previous
 { $values
