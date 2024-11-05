@@ -94,20 +94,8 @@ ARTICLE: "syntax-floats" "Float syntax"
     "0.3333333333333333"
 }
 { $example
-    "1/0.5 ."
-    "2.0"
-}
-{ $example
-    "1/2.5 ."
-    "0.4"
-}
-{ $example
     "1+1/2. ."
     "1.5"
-}
-{ $example
-    "1+1/2.5 ."
-    "1.4"
 }
 "The special float values have their own syntax:"
 { $table
