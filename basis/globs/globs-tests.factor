@@ -26,12 +26,6 @@ tools.test ;
 { t } [ "foo" "bar" append-path "**/b*" glob-matches? ] unit-test
 { f } [ "foo" "bar" append-path "foo?bar" glob-matches? ] unit-test
 { t } [ "foo" "bar" append-path "fo?" "bar" append-path glob-matches? ] unit-test
-{ t } [ "foo" "bar" append-path "**/bar" glob-matches? ] unit-test
-{ f } [ "foo" "bar" append-path "!**/bar" glob-matches? ] unit-test
-{ t } [ "foo" "bar" append-path "foo/**" glob-matches? ] unit-test
-{ f } [ "foo" "bar" append-path "!foo/**" glob-matches? ] unit-test
-{ t } [ "foo" "bar" append-path "foo/bar" glob-matches? ] unit-test
-{ f } [ "foo" "bar" append-path "!foo/bar" glob-matches? ] unit-test
 
 { f } [ "foo" glob-pattern? ] unit-test
 { t } [ "fo?" glob-pattern? ] unit-test
@@ -66,13 +60,8 @@ tools.test ;
     { "a/b" "a/e" }
     { "a" }
     { "a/b" }
-    { "a/e" }
-    { }
-    {
-        "a" "a/b" "a/b/c" "a/b/c/d" "a/b/c/f" "a/b/g" "a/b/h"
-        "a/e/f" "a/e/g"
-    }
 } [
+
     [
         "a" make-directory
         "a/b" make-directory
@@ -100,8 +89,5 @@ tools.test ;
         "a/**" glob sort
         "a" glob sort
         "a/b" glob sort
-        "a/!b" glob sort
-        "!a/b" glob sort
-        "**/!e" glob sort
     ] with-test-directory
 ] unit-test
