@@ -137,7 +137,7 @@ ${ cell } [
 ] unit-test
 
 ! interval/sync-point-key
-{ { 33 1/0.0 1/0.0 } } [
+{ { 33 1/0. 1/0. } } [
     T{ sync-point { n 33 } } interval/sync-point-key
 ] unit-test
 
