@@ -62,6 +62,12 @@ HELP: derive-url
         "URL\" master-cleanser\" derive-url ."
         "URL\" http://www.truecasey.com/drinks/master-cleanser\""
     }
+    { $example
+        "USING: prettyprint urls ;"
+        "\"https://factorcode.org\""
+        "\"index.html\" derive-url ."
+        "URL\" https://factorcode.org/index.html\""
+    }
 } ;
 
 HELP: ensure-port
