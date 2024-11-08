@@ -289,8 +289,8 @@ HELP: both?
 } ;
 
 HELP: either?
-{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" boolean } }
-{ $description "Tests if the quotation yields a true value when applied to either " { $snippet "x" } " or " { $snippet "y" } "." }
+{ $values { "x" object } { "y" object } { "quot" { $quotation ( ... obj -- ... ? ) } } { "?" "a generalized boolean" } }
+{ $description "Applies the quotation to both " { $snippet "x" } " and " { $snippet "y" } ", and then returns the first result that is not " { $link f } "." }
 { $examples
     { $example "USING: kernel math prettyprint ;" "3 6 [ odd? ] either? ." "t" }
     { $example "USING: kernel math prettyprint ;" "5 7 [ even? ] either? ." "f" }
