@@ -56,6 +56,18 @@ $nl
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;
 
+ARTICLE: "ui-listener-style" "UI listener styling"
+"The graphical listener can be styled in a few ways:"
+$nl
+"1. Using the " { $vocab-link "ui.theme" } " vocabulary to control the theme colors."
+$nl
+"2. Setting the " { $link interactor-font } " to control the font used for rendering, as well as the " { $link listener-word-style } " which styles triggered commands and " { $link listener-input-style } " which styles the previous input lines."
+$nl
+"3. Using " { $link set-listener-font } " to change the font of the open listener (applied to subsequent output lines)."
+$nl
+"Typically these settings all affect new listener sessions, or output. If you want them to be saved, you can add them to your " { $snippet "~/.factor-rc" } " configuration file."
+;
+
 TIP: "You can read documentation by pressing " { $snippet "F1" } "." ;
 
 TIP: "The listener tool remembers previous lines of input. Press " { $command interactor "completion" recall-previous } " and " { $command interactor "completion" recall-next } " to cycle through them." ;
