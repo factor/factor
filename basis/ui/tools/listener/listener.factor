@@ -67,8 +67,12 @@ M: vocab-word-completion (word-at-caret)
     [ '[ _ word-at-caret ] ] bi
     <arrow> ;
 
+SYMBOL: interactor-font
+monospace-font interactor-font set-global
+
 : <interactor> ( -- gadget )
     interactor new-editor
+        interactor-font get >>font
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
