@@ -10,11 +10,11 @@ HELP: bech32>
 { $description "Decode from Bech32 encoding." } ;
 
 HELP: >bech32m
-{ $values { "hrp" object } { "data" sequence } { "bech32" sequence } }
+{ $values { "hrp" object } { "data" sequence } { "bech32m" sequence } }
 { $description "Encode into Bech32m encoding." } ;
 
 HELP: bech32m>
-{ $values { "bech32" sequence } { "hrp" object } { "data" sequence } }
+{ $values { "bech32m" sequence } { "hrp" object } { "data" sequence } }
 { $description "Decode from Bech32m encoding." } ;
 
 ARTICLE: "bech32" "Bech32 conversions"
