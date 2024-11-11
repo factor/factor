@@ -70,5 +70,5 @@ PRIVATE>
 : >bech32m ( hrp data -- bech32m )
     0x2bc830a3 bech32-encode ;
 
-: bech32m> ( bech32 -- hrp data )
+: bech32m> ( bech32m -- hrp data )
     0x2bc830a3 bech32-decode ;
