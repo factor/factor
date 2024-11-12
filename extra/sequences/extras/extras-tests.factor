@@ -261,6 +261,10 @@ strings tools.test ;
 { "cdef" } [ 2 f "abcdef" subseq* ] unit-test
 { "cd" } [ -4 -2 "abcdef" subseq* ] unit-test
 
+{ { } } [ "abcabc" "abcd" subseq-indices ] unit-test
+{ { 0 3 } } [ "abcabc" "abc" subseq-indices ] unit-test
+{ { 0 3 } } [ "abcabcabc" "abcabc" subseq-indices ] unit-test
+
 { "foo" "" } [ "foo" [ ascii:blank? ] cut-when ] unit-test
 { "foo" " " } [ "foo " [ ascii:blank? ] cut-when ] unit-test
 { "" " foo" } [ " foo" [ ascii:blank? ] cut-when ] unit-test
