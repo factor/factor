@@ -1978,6 +1978,7 @@ MEMO: mtg-sets-by-name ( -- assoc )
 : blb-cards-bonus ( -- seq ) mtg-oracle-cards "blc" filter-set ;
 : blb-cards-all ( -- seq ) mtg-oracle-cards { "blb" "blc" } filter-set-intersect ;
 : dsk-cards ( -- seq ) mtg-oracle-cards "dsk" filter-set ;
+: fdn-cards ( -- seq ) mtg-oracle-cards "fdn" filter-set ;
 
 ! modern
 : mh3-cards ( -- seq ) mtg-oracle-cards "mh3" filter-set ;
