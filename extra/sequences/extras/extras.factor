@@ -24,6 +24,11 @@ IN: sequences.extras
         dup _ (a..b] [ rot [ subseq _ call ] keep ] with each
     ] each drop ; inline
 
+: subseq-indices ( seq subseq -- indices )
+    [ 0 ] 2dip '[
+        _ _ subseq-index-from [ [ 1 + ] keep ] [ f f ] if* dup
+    ] [ ] produce 2nip ;
+
 : map-like ( seq exemplar -- seq' )
     '[ _ like ] map ; inline
 
