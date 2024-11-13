@@ -4,10 +4,10 @@ USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
 destructors dlists hash-sets.identity kernel lexer make math
-math.functions namespaces parser sequences sets slots.private
-strings threads ui.backend ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.render vectors vocabs.parser
-words ;
+math.functions math.order namespaces parser sequences sets
+slots.private strings threads ui.backend ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures ui.render
+vectors vocabs.parser words ;
 IN: ui
 
 <PRIVATE
@@ -204,7 +204,7 @@ PRIVATE>
     gadget seen ?adjoin [
         "font" gadget ?offset-of-slot [
             gadget swap
-            [ slot clone [ delta + ] change-size ]
+            [ slot clone [ delta + 1 max ] change-size ]
             [ set-slot ] 2bi
             gadget relayout
         ] when*
