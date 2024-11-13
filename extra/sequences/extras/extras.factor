@@ -744,9 +744,9 @@ PRIVATE>
     [ 1 ] 2dip '[ swap _ dip * ] each ; inline
 
 : insert-nth! ( elt n seq -- )
-    [ length ] keep ensure swap pick (a..b]
-    over '[ [ 1 + ] keep _ move-unsafe ] each
-    set-nth-unsafe ;
+    dupd [ length [ swap - 1 + ] keep ] keep ensure [
+        '[ _ swap - dup 1 - _ move-unsafe ] each-integer
+    ] keep set-nth-unsafe ;
 
 : set-nths ( value indices seq -- )
     swapd '[ _ swap _ set-nth ] each ; inline
