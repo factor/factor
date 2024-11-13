@@ -10,6 +10,11 @@
     height: auto;
 }
 
+.page video {
+    max-width: 100%;
+    height: auto;
+}
+
 .posts {
     max-width: 755px;
     margin-right: 215px;
