@@ -36,6 +36,20 @@ tool "common" f {
     { T{ key-down f f "F11" } toggle-fullscreen }
 } ? prepend define-command-map
 
+<PRIVATE
+
+: com-font-size-plus ( gadget -- ) 2 adjust-font-size ;
+: com-font-size-minus ( gadget -- ) -2 adjust-font-size ;
+
+PRIVATE>
+
+tool "fonts" f {
+    { T{ key-down f ${ os macos? M+ C+ ? } "+" } com-font-size-plus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "=" } com-font-size-plus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "_" } com-font-size-minus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "-" } com-font-size-minus }
+} define-command-map
+
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global
     "resource:" absolute-path current-directory set-global
