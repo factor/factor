@@ -513,9 +513,8 @@ M: listener-gadget ungraft*
     interactor
         [ clone [ delta + ] change-size ] change-font
         f >>line-height
-    font>> size>> font-size output style>> set-at ;
-
-PRIVATE>
+    font>> size>> font-size output style>> set-at
+    listener delta adjust-font-size ;
 
 : com-font-size-plus ( listener -- )
     2 adjust-listener-font-size ;
@@ -524,8 +523,9 @@ PRIVATE>
     -2 adjust-listener-font-size ;
 
 : com-font-size-normal ( listener -- )
-    default-font-size over input>> font>> size>> -
-    adjust-listener-font-size ;
+    default-font-size over input>> font>> size>> - adjust-listener-font-size ;
+
+PRIVATE>
 
 listener-gadget "fonts" f {
     { T{ key-down f ${ os macos? M+ C+ ? } "+" } com-font-size-plus }
