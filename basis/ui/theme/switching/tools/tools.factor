@@ -1,5 +1,5 @@
-USING: assocs fonts help.stylesheet help.tips io.styles kernel
-listener memoize namespaces prettyprint.private
+USING: accessors assocs fonts help.stylesheet help.tips
+io.styles kernel listener memoize namespaces prettyprint.private
 prettyprint.stylesheet sequences ui.gadgets.panes.private
 ui.theme ui.theme.switching ui.tools.listener vectors
 vocabs.prettyprint words ;
@@ -57,6 +57,7 @@ IN: ui.theme.switching.tools
     ! ui.tools.listener
     listener-input-style text-color foreground update-style
     listener-word-style text-color foreground update-style
+    interactor-font get-global text-color >>foreground content-background >>background drop
 
     ! listener
     prompt-style prompt-background-color background update-style
