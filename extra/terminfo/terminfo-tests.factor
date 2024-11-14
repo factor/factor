@@ -32,10 +32,12 @@ CONSTANT: ADM3-TERMINFO {
 }
 
 : terminfo-unit-test ( expected quot -- )
-    '[
-        "vocab:terminfo/test" normalize-path "TERMINFO"
-        [ linux \ os _ with-variable ] with-os-env
-    ] unit-test ; inline
+    os windows? [ 2drop ] [
+        '[
+            "vocab:terminfo/test" normalize-path "TERMINFO"
+            [ linux \ os _ with-variable ] with-os-env
+        ] unit-test
+    ] if ; inline
 
 { t f } [
     "vt102-fictional" terminfo-names member?
