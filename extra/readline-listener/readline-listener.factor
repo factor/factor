@@ -3,7 +3,8 @@
 
 USING: accessors assocs colors combinators editors io kernel
 listener readline sequences sets splitting threads
-tools.completion unicode.data vocabs vocabs.hierarchy ;
+tools.completion ui.tools.listener.history unicode.data
+vocabs vocabs.hierarchy ;
 
 IN: readline-listener
 
@@ -77,7 +78,9 @@ PRIVATE>
         swap get-completions ?nth
         [ clear-completions f ] unless*
     ] set-completion
-    readline-reader new [ listener-main ] with-input-stream* ;
+    history-file [
+      readline-reader new [ listener-main ] with-input-stream*
+    ] with-history ;
 
 : ?readline-listener ( -- )
     has-readline? [ readline-listener ] [ listener ] if ;

@@ -9,7 +9,7 @@ HELP: readline-listener
 ARTICLE: "readline-listener" "Readline listener"
 { $vocab-link "readline-listener" }
 $nl
-"By default, the terminal listener does not provide any command history or completion. This vocabulary uses libreadline to provide a listener with history, word completion and more convenient editing facilities."
+"By default, the terminal listener does not provide any command history or completion. This vocabulary uses libreadline to provide a listener with history, word completion and more convenient editing facilities. History is stored in the file named by $FACTOR_HISTORY, or ~/.factor-history if that isn't set."
 $nl
 { $code "\"readline-listener\" run" }
 ;
