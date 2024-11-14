@@ -16,14 +16,16 @@ IN: terminfo
 ! and we make a best-guess here at the system-wide directories
 ! rather than knowing what curses has compiled in.
 : terminfo-dirs ( -- dirlist )
-    [
-        "TERMINFO" os-env [ , ] when*
-        "~/.terminfo" ,
-        "TERMINFO_DIRS" os-env [ ":" split % ] when*
-        "/etc/terminfo" ,
-        "/lib/terminfo" ,
-        "/usr/share/terminfo" ,
-    ] { } make ;
+    os windows? [ { } ] [
+        [
+            "TERMINFO" os-env [ , ] when*
+            "~/.terminfo" ,
+            "TERMINFO_DIRS" os-env [ ":" split % ] when*
+            "/etc/terminfo" ,
+            "/lib/terminfo" ,
+            "/usr/share/terminfo" ,
+        ] { } make
+    ] if ;
 
 <PRIVATE
 
@@ -130,10 +132,12 @@ PRIVATE>
 
 HOOK: terminfo-relative-path os ( name -- path )
 
-M: macos terminfo-relative-path ( name -- path )
+M: windows terminfo-relative-path drop f ;
+
+M: macos terminfo-relative-path
     [ first >hex ] keep "%s/%s" sprintf ;
 
-M: linux terminfo-relative-path ( name -- path )
+M: linux terminfo-relative-path
     [ first ] keep "%c/%s" sprintf ;
 
 : terminfo-path ( name -- path )
