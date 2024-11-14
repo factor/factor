@@ -132,13 +132,11 @@ PRIVATE>
 
 HOOK: terminfo-relative-path os ( name -- path )
 
-M: windows terminfo-relative-path drop f ;
+M: object terminfo-relative-path
+    [ first ] keep "%c/%s" sprintf ;
 
 M: macos terminfo-relative-path
     [ first >hex ] keep "%s/%s" sprintf ;
-
-M: linux terminfo-relative-path
-    [ first ] keep "%c/%s" sprintf ;
 
 : terminfo-path ( name -- path )
     terminfo-relative-path terminfo-dirs [ swap append-path ] with map
