@@ -16,16 +16,16 @@ IN: terminfo
 ! and we make a best-guess here at the system-wide directories
 ! rather than knowing what curses has compiled in.
 : terminfo-dirs ( -- dirlist )
-    os windows? [ { } ] [
-        [
-            "TERMINFO" os-env [ , ] when*
-            "~/.terminfo" ,
-            "TERMINFO_DIRS" os-env [ ":" split % ] when*
+    [
+        "TERMINFO" os-env [ , ] when*
+        "~/.terminfo" ,
+        "TERMINFO_DIRS" os-env [ ":" split % ] when*
+        os windows? [
             "/etc/terminfo" ,
             "/lib/terminfo" ,
             "/usr/share/terminfo" ,
-        ] { } make
-    ] if ;
+        ] unless
+    ] { } make ;
 
 <PRIVATE
 
