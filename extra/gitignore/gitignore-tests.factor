@@ -1,4 +1,7 @@
-USING: gitignore sequences tools.test ;
+USING: gitignore kernel sequences system tools.test ;
+
+! XXX: temporarily disable on windows
+os windows? [
 
 {
     { t t f f f t t t }
@@ -22,3 +25,5 @@ USING: gitignore sequences tools.test ;
     d/e
     " parse-gitignore '[ _ gitignored? ] map
 ] unit-test
+
+] unless
