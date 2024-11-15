@@ -1,39 +1,29 @@
 ! Copyright (C) 2011 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
+
 USING: accessors assocs colors combinators editors io
-io.streams.256color io.streams.ansi io.streams.string kernel
-listener readline sequences sets splitting terminfo threads
+io.streams.256color io.streams.ansi kernel listener
+readline sequences sets splitting threads terminfo
 tools.completion ui.theme ui.theme.switching
-ui.tools.listener.history unicode.data vocabs vocabs.hierarchy ;
+ui.tools.listener.history unicode.data vocabs
+vocabs.hierarchy ;
+
 IN: readline-listener
 
 <PRIVATE
 
 SYMBOL: completions
 
-SYMBOLS: +256color+ +ansi+ ;
-
-TUPLE: readline-reader { prompt initial: f } { mode initial: f } ;
-
-: <readline-reader> ( mode -- reader )
-    readline-reader new swap >>mode ;
-
-: with-readline-reader ( reader quot -- )
-    over mode>> {
-        { +256color+ [ '[ _ with-256color ] with-input-stream* ] }
-        { +ansi+ [ '[ _ with-ansi ] with-input-stream* ] }
-        { f [ with-input-stream* ] }
-    } case ; inline
-
+TUPLE: readline-reader { prompt initial: f } ;
 INSTANCE: readline-reader input-stream
 
 M: readline-reader stream-readln
-    flush [ readline f ] change-prompt drop ;
+    flush
+    [ dup [ " " append ] when readline f ] change-prompt
+    drop ;
 
 M: readline-reader prompt.
-    over [
-        [ [ call-next-method ] with-readline-reader ] with-string-writer
-    ] keep prompt<< ;
+    >>prompt drop ;
 
 : clear-completions ( -- )
     f completions tset ;
@@ -92,12 +82,12 @@ PRIVATE>
     ] set-completion
     history-file [
         dark-theme switch-theme-if-default
+        [ readline-reader new [ listener-main ] with-input-stream* ]
         {
-            { [ tty-supports-256color? ] [ +256color+ ] }
-            { [ tty-supports-ansicolor? ] [ +ansi+ ] }
-            [ f ]
+            { [ tty-supports-256color? ] [ with-256color ] }
+            { [ tty-supports-ansicolor? ] [ with-ansi ] }
+            [ call ]
         } cond
-        <readline-reader> [ listener-main ] with-readline-reader
     ] with-history ;
 
 : ?readline-listener ( -- )
