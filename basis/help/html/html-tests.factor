@@ -28,6 +28,8 @@ math ;
 
 { t } [ all-vocabs-really [ vocab-spec? ] all? ] unit-test
 
-{ t } [ all-vocabs-really [ vocab-name "sequences.private" = ] any? ] unit-test
+{ t } [ all-vocabs-really [ vocab-name "sequences" = ] any? ] unit-test
+
+{ f } [ all-vocabs-really [ vocab-name "sequences.private" = ] any? ] unit-test
 
 { f } [ all-vocabs-really [ vocab-name "scratchpad" = ] any? ] unit-test
