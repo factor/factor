@@ -115,6 +115,9 @@ H{
     { font-style bold }
 } listener-word-style set-global
 
+SYMBOL: listener-output-style
+H{ } listener-output-style set-global
+
 M: input (print-input)
     dup presented associate [
         string>> listener-input-style get-global format
@@ -204,7 +207,7 @@ TUPLE: listener-gadget < tool error-summary output scroller input ;
 listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> <pane-stream> H{ } clone <style-stream> ] bi ;
+    [ input>> ] [ output>> <pane-stream> listener-output-style get <style-stream> ] bi ;
 
 : init-input/output ( listener -- listener )
     <interactor>
