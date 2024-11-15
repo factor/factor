@@ -516,13 +516,11 @@ M: listener-gadget ungraft*
 <PRIVATE
 
 :: adjust-listener-font-size ( listener delta -- )
+    listener delta adjust-font-size
     listener input>> :> interactor
     interactor output>> :> output
-    interactor
-        [ clone [ delta + ] change-size ] change-font
-        f >>line-height
-    font>> size>> font-size output style>> set-at
-    listener delta adjust-font-size ;
+    interactor f >>line-height font>> size>>
+    font-size output style>> set-at ;
 
 : com-font-size-plus ( listener -- )
     2 adjust-listener-font-size ;
