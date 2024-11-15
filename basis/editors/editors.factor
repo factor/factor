@@ -14,7 +14,8 @@ SYMBOL: editor-class
 : available-editors ( -- seq )
     "editors" disk-child-vocab-names
     { "editors.ui" "editors.private" } diff
-    [ vocab-platforms supported-platform? ] filter ;
+    [ vocab-platforms supported-platform? ] filter
+    [ "editors." ?head drop ] map ;
 
 : editor-restarts ( -- alist )
     available-editors
