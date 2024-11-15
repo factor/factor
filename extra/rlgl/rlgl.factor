@@ -390,7 +390,7 @@ FUNCTION-ALIAS: rl-clear-screen-buffers void rlClearScreenBuffers ( )           
 FUNCTION-ALIAS: rl-check-errors void rlCheckErrors ( )                                                                                                                   ! Check and log OpenGL error codes
 FUNCTION-ALIAS: rl-set-blend-mode void rlSetBlendMode ( int mode )                                                                                                       ! Set blending mode
 FUNCTION-ALIAS: rl-set-blend-factors void rlSetBlendFactors ( int glSrcFactor, int glDstFactor, int glEquation )                                                         ! Set blending mode factor and equation ( using OpenGL factors )
-FUNCTION-ALIAS: rl-set-blend-factors-seperate void rlSetBlendFactorsSeparate ( int glSrcRGB, int glDstRGB, int glSrcAlpha, int glDstAlpha, int glEqRGB, int glEqAlpha )  ! Set blending mode factors and equations separately ( using OpenGL factors )
+FUNCTION-ALIAS: rl-set-blend-factors-separate void rlSetBlendFactorsSeparate ( int glSrcRGB, int glDstRGB, int glSrcAlpha, int glDstAlpha, int glEqRGB, int glEqAlpha )  ! Set blending mode factors and equations separately ( using OpenGL factors )
 
 ! ------------------------------------------------------------------------------------
 ! Functions Declaration - rlgl functionality
