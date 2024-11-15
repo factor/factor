@@ -29,5 +29,3 @@ t default-theme? set-global
 : wombat-mode ( -- ) wombat-theme switch-theme ;
 
 : base16-mode ( -- ) base16-theme switch-theme ;
-
-{ "ui.theme.switching" "ui.tools" } "ui.theme.switching.tools" require-when
