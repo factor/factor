@@ -8,7 +8,7 @@ HELP: &[
 
 HELP: *[
     { $syntax "*[ A | B | C ]"  } 
-    { $description { "Applies quotations (separated by " { $link \ | } ") to sucessive values on the stack, applying the first quotation to the first value, the second to the second value, and so on" } }
+    { $description { "Applies quotations (separated by " { $link \ | } ") to successive values on the stack, applying the first quotation to the first value, the second to the second value, and so on" } }
     { $see-also \ spread \ bi* } ;
 
 HELP: @[
@@ -23,7 +23,7 @@ HELP: n&[
 
 HELP: n*[
     { $syntax "N n*[ A | B | C ]" }
-    { $description "Applies quotations (separated by " { $link \ | } ") to sucessive N sized groups on the stack, applying the first quotation to the first N values, the second to the second N values, and so on" }
+    { $description "Applies quotations (separated by " { $link \ | } ") to successive N sized groups on the stack, applying the first quotation to the first N values, the second to the second N values, and so on" }
     { $see-also POSTPONE: *[ \ nspread \ bi* } ;
 
 HELP: n@[
