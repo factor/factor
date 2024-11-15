@@ -38,12 +38,11 @@ MEMO: vocab-file-lines ( vocab name -- lines/f )
     "summary.txt" vocab-file-path ;
 
 : vocab-summary ( vocab -- summary )
-    "summary.txt" vocab-file-lines [ first ] [ f ] if* ;
+    "summary.txt" vocab-file-lines ?first ;
 
 : vocab-in-root-summary ( vocab -- string )
     [ vocab-summary ] [
-        vocab-name dup
-        ".private" ?tail drop find-vocab-root
+        vocab-name ".private" ?tail drop dup find-vocab-root
         [ "`" "'" surround " in " glue ] when*
     ] bi over [ ", " glue ] [ nip ] if ;
 

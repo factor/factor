@@ -92,15 +92,8 @@ M: cannot-find-source error.
 
 DEFER: edit
 
-<PRIVATE
-
-: public-vocab-name ( vocab-spec -- name )
-    vocab-name ".private" ?tail drop ;
-
-PRIVATE>
-
 : edit-vocab ( vocab -- )
-    public-vocab-name >vocab-link edit ;
+    >vocab-link edit ;
 
 GENERIC: edit ( object -- )
 
@@ -135,7 +128,7 @@ M: string edit edit-vocab ;
 GENERIC: edit-docs ( object -- )
 
 M: object edit-docs
-    public-vocab-name vocab-docs-path 1 edit-location ;
+    vocab-docs-path 1 edit-location ;
 
 M: word edit-docs
     dup "help-loc" word-prop
@@ -146,18 +139,18 @@ M: word edit-docs
 GENERIC: edit-tests ( object -- )
 
 M: object edit-tests
-    public-vocab-name vocab-tests-path 1 edit-location ;
+    vocab-tests-path 1 edit-location ;
 
 M: word edit-tests vocabulary>> edit-tests ;
 
 : edit-platforms ( vocab -- )
-    public-vocab-name vocab-platforms-path 1 edit-location ;
+    vocab-platforms-path 1 edit-location ;
 
 : edit-authors ( vocab -- )
-    public-vocab-name vocab-authors-path 1 edit-location ;
+    vocab-authors-path 1 edit-location ;
 
 : edit-tags ( vocab -- )
-    public-vocab-name vocab-tags-path 1 edit-location ;
+    vocab-tags-path 1 edit-location ;
 
 : edit-summary ( vocab -- )
-    public-vocab-name vocab-summary-path 1 edit-location ;
+    vocab-summary-path 1 edit-location ;

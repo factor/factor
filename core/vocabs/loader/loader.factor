@@ -62,20 +62,20 @@ M: string vocab-path
 PRIVATE>
 
 : vocab-dir ( vocab -- dir )
-    vocab-name H{ { CHAR: . CHAR: / } } substitute ;
+    vocab-name ".private" ?tail drop
+    H{ { CHAR: . CHAR: / } } substitute ;
 
 : append-vocab-dir ( vocab str/f -- path )
-    [ vocab-name "." split ] dip
+    [ vocab-name ".private" ?tail drop "." split ] dip
     [ [ dup last ] dip append suffix ] when*
     "/" join ;
 
 : find-vocab-root ( vocab -- path/f )
-    vocab-name dup ".private" tail? [ drop f ] [
-        root-cache get 2dup at [ 2nip ] [
-            over ".factor" append-vocab-dir find-root-for
-            [ [ -rot set-at ] [ 2drop ] if* ] keep
-        ] if*
-    ] if ;
+    vocab-name dup ".private" tail? drop
+    root-cache get 2dup at [ 2nip ] [
+        over ".factor" append-vocab-dir find-root-for
+        [ [ -rot set-at ] [ 2drop ] if* ] keep
+    ] if* ;
 
 : vocab-exists? ( name -- ? )
     [ valid-vocab-name? ]
@@ -86,11 +86,9 @@ PRIVATE>
     swap find-vocab-root [ prepend-path ] [ drop f ] if* ;
 
 : vocab-source-path ( vocab -- path/f )
-    vocab-name ".private" ?tail drop
     dup ".factor" append-vocab-dir vocab-append-path ;
 
 : vocab-docs-path ( vocab -- path/f )
-    vocab-name ".private" ?tail drop
     dup "-docs.factor" append-vocab-dir vocab-append-path ;
 
 SYMBOL: load-help?
