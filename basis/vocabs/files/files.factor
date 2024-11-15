@@ -16,7 +16,6 @@ IN: vocabs.files
     ] [ f ] if* ;
 
 : vocab-tests ( vocab -- paths )
-    vocab-name ".private" ?tail drop
     [
         [ vocab-tests-path file-exists?, ]
         [ vocab-tests-dir % ] bi
