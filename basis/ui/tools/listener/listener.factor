@@ -67,12 +67,22 @@ M: vocab-word-completion (word-at-caret)
     [ '[ _ word-at-caret ] ] bi
     <arrow> ;
 
-SYMBOL: interactor-font
-monospace-font interactor-font set-global
+SYMBOL: interactor-style
+H{ } interactor-style set-global
+
+: interactor-font ( -- font )
+    monospace-font interactor-style get {
+        [ font-style of [ { bold bold-italic } member? [ t >>bold? ] when ] when* ]
+        [ font-style of [ { italic bold-italic } member? [ t >>italic? ] when ] when* ]
+        [ font-name of [ >>name ] when* ]
+        [ font-size of [ >>size ] when* ]
+        [ text-color of [ >>foreground ] when* ]
+        [ background of [ >>background ] when* ]
+    } cleave ;
 
 : <interactor> ( -- gadget )
     interactor new-editor
-        interactor-font get >>font
+        interactor-font >>font
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
@@ -97,14 +107,12 @@ GENERIC: (print-input) ( object -- )
 SYMBOL: listener-input-style
 H{
     { font-style bold }
-    { foreground $ text-color }
 } listener-input-style set-global
 
 SYMBOL: listener-word-style
 H{
     { font-name "sans-serif" }
     { font-style bold }
-    { foreground $ text-color }
 } listener-word-style set-global
 
 M: input (print-input)
