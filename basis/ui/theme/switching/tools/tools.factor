@@ -5,7 +5,7 @@ ui.theme ui.theme.switching ui.tools.listener vectors
 vocabs.loader vocabs.prettyprint words ;
 IN: ui.theme.switching.tools
 
-: update-tools-font-size ( size -- )
+: set-tools-font-size ( size -- )
     \ default-font-size set-global
     \ specified-font reset-memoized
     "help.stylesheet" reload ;
