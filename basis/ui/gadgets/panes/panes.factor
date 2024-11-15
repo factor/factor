@@ -2,12 +2,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators destructors
 documents.private fonts io io.styles kernel math math.rectangles
-math.vectors models models.range namespaces sequences sets
-sorting splitting strings ui.baseline-alignment ui.clipboards
-ui.gadgets ui.gadgets.borders ui.gadgets.grid-lines
-ui.gadgets.grids ui.gadgets.icons ui.gadgets.incremental
-ui.gadgets.labels ui.gadgets.menus ui.gadgets.packs
-ui.gadgets.paragraphs ui.gadgets.presentations
+math.vectors memoize models models.range namespaces sequences
+sets sorting splitting strings ui.baseline-alignment
+ui.clipboards ui.gadgets ui.gadgets.borders
+ui.gadgets.grid-lines ui.gadgets.grids ui.gadgets.icons
+ui.gadgets.incremental ui.gadgets.labels ui.gadgets.menus
+ui.gadgets.packs ui.gadgets.paragraphs ui.gadgets.presentations
 ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.images ui.pens.solid ui.render ui.theme
 ui.traverse unicode ;
@@ -474,3 +474,5 @@ pane H{
 GENERIC: content-gadget ( object -- gadget/f )
 
 M: object content-gadget drop f ;
+
+STARTUP-HOOK: [ \ specified-font reset-memoized ]
