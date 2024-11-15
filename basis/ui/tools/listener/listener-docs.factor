@@ -61,7 +61,7 @@ ARTICLE: "ui-listener-style" "UI listener styling"
 $nl
 "1. Using the " { $vocab-link "ui.theme" } " vocabulary to control the theme colors."
 $nl
-"2. Setting attributes in " { $link interactor-style } " which styles the code editor, " { $link listener-word-style } " which styles triggered commands, and " { $link listener-input-style } " which styles the previous input lines."
+"2. Setting attributes in " { $link interactor-style } " which styles the code editor, " { $link listener-word-style } " which styles triggered commands, " { $link listener-input-style } " which styles the previous input lines, and " { $link listener-output-style } " which styles rendered output."
 $nl
 "3. Using " { $link set-listener-font } " to change the font of the open listener (applied to subsequent output lines)."
 $nl
