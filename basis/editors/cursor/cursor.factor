@@ -33,11 +33,8 @@ ERROR: can't-find-cursor ;
     [
         cursor-invocation
         [ , ] [ can't-find-cursor ] if*
-        "-g" , "-r" ,
-        ! no command-line support yet
-        ! see https://github.com/getcursor/cursor/issues/1858
-        ! number>string ":" glue ,
-        drop ,
+        "--goto" , number>string ":" glue ,
+        "-r" ,
     ] { } make ;
 
 M: cursor editor-command
