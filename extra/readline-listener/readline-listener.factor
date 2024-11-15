@@ -52,7 +52,7 @@ M: readline-reader prompt.
     named-colors prefixed ;
 
 : prefixed-editors ( prefix -- editors )
-    available-editors [ "editors." ?head drop ] map prefixed ;
+    available-editors prefixed ;
 
 : prefixed-chars ( prefix -- chars )
     name-map keys prefixed ;
