@@ -1301,8 +1301,8 @@ HELP: BLEND_CUSTOM
 
 HELP: BLEND_CUSTOM_SEPARATE
 { $class-description
-    Blend mode for using custom rgb/alpha seperate src/dst
-    factors. This is intended for use with { $snippet rl-set-blend-factors-seperate }
+    Blend mode for using custom rgb/alpha separate src/dst
+    factors. This is intended for use with { $snippet rl-set-blend-factors-separate }
     from { $vocab-link "rlgl" } .
     { $see-also BlendMode } } ;
 
