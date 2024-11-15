@@ -25,4 +25,4 @@ combobox H{
 : <combobox> ( options -- combobox )
     [ first [ combobox new-label ] [ disp-string <basic> ] bi >>model ] keep
     <basic> combo-table new-table white-interior [ 1array ] >>quot >>table 
-    default-font-foreground-color get <solid> >>boundary ;
+    default-font-foreground <solid> >>boundary ;

@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel colors ;
+USING: help.markup help.syntax kernel colors strings ;
 IN: fonts
 
 HELP: <font>
-{ $values { "font" font } }
-{ $description "Creates a new font." } ;
+{ $values { "name" string } { "font" font } }
+{ $description "Creates a new font with the given " { $snippet "name" } " and " { $link default-font-size } ", " { $link default-font-foreground } ", and " { $link default-font-background } "." } ;
 
 HELP: font
 { $class-description "The class of fonts." } ;

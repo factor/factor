@@ -3,24 +3,32 @@
 USING: accessors colors combinators kernel math namespaces ;
 IN: fonts
 
-CONSTANT: default-serif-font-name "serif"
-CONSTANT: default-sans-serif-font-name "sans-serif"
-CONSTANT: default-monospace-font-name "monospace"
+: default-serif-font-name ( -- name )
+    \ default-serif-font-name get "serif" or ;
 
-CONSTANT: default-font-size 12
+: default-sans-serif-font-name ( -- name )
+    \ default-sans-serif-font-name get "sans-serif" or ;
 
-SYMBOL: default-font-foreground-color
-COLOR: black default-font-foreground-color set-global
+: default-monospace-font-name ( -- name )
+    \ default-monospace-font-name get "monospace" or ;
 
-SYMBOL: default-font-background-color
-COLOR: white default-font-background-color set-global
+: default-font-size ( -- size )
+    \ default-font-size get 12 or ;
+
+: default-font-foreground ( -- color )
+    \ default-font-foreground get COLOR: black or ;
+
+: default-font-background ( -- color )
+    \ default-font-background get COLOR: white or ;
 
 TUPLE: font name size bold? italic? foreground background ;
 
-: <font> ( -- font )
+: <font> ( name -- font )
     font new
-        default-font-foreground-color get >>foreground
-        default-font-background-color get >>background ; inline
+        swap >>name
+        default-font-size >>size
+        default-font-foreground >>foreground
+        default-font-background >>background ; inline
 
 : font-with-foreground ( font color -- font' )
     [ clone ] dip >>foreground ; inline
@@ -49,19 +57,13 @@ TUPLE: font name size bold? italic? foreground background ;
     ] when* ;
 
 : serif-font ( -- font )
-    <font>
-        default-serif-font-name >>name
-        default-font-size >>size ;
+    default-serif-font-name <font> ;
 
 : sans-serif-font ( -- font )
-    <font>
-        default-sans-serif-font-name >>name
-        default-font-size >>size ;
+    default-sans-serif-font-name <font> ;
 
 : monospace-font ( -- font )
-    <font>
-        default-monospace-font-name >>name
-        default-font-size >>size ;
+    default-monospace-font-name <font> ;
 
 : strip-font-colors ( font -- font' )
     clone f >>background f >>foreground ;

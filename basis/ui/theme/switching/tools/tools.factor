@@ -7,8 +7,8 @@ IN: ui.theme.switching.tools
 
 : update-tools-style ( -- )
     ! fonts
-    text-color default-font-foreground-color set-global
-    content-background default-font-background-color set-global
+    text-color \ default-font-foreground set-global
+    content-background \ default-font-background set-global
 
     ! help.stylesheet
     default-style text-color foreground update-style
