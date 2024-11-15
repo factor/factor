@@ -4,7 +4,7 @@ USING: io.pathnames kernel literals memory namespaces sequences
 system tools.test ui ui.backend ui.commands ui.gadgets.private
 ui.gestures ui.tools.browser ui.tools.button-list
 ui.tools.common ui.tools.error-list ui.tools.listener
-vocabs.refresh ;
+vocabs.loader vocabs.refresh ;
 IN: ui.tools
 
 \ refresh-all H{ { +nullary+ t } { +listener+ t } } define-command
@@ -49,6 +49,8 @@ tool "fonts" f {
     { T{ key-down f ${ os macos? M+ C+ ? } "_" } com-font-size-minus }
     { T{ key-down f ${ os macos? M+ C+ ? } "-" } com-font-size-minus }
 } define-command-map
+
+{ "ui.theme.switching" "ui.tools" } "ui.tools.theme" require-when
 
 : ui-tools-main ( -- )
     f ui-stop-after-last-window? set-global

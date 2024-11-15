@@ -3,7 +3,7 @@ listener memoize namespaces prettyprint.private
 prettyprint.stylesheet sequences ui.gadgets.panes.private
 ui.theme ui.theme.switching ui.tools.listener vectors
 vocabs.loader vocabs.prettyprint words ;
-IN: ui.theme.switching.tools
+IN: ui.tools.theme
 
 : set-tools-font-size ( size -- )
     \ default-font-size set-global
