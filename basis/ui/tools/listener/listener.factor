@@ -204,7 +204,7 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < tool error-summary output scroller input ;
 
-listener-gadget default-font-size  { 50 58 } n*v set-tool-dim
+listener-gadget default-font-size { 50 58 } n*v set-tool-dim
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> listener-output-style get <style-stream> ] bi ;
@@ -416,7 +416,7 @@ interactor "completion" f {
 
 : introduction. ( -- )
     [
-        H{ { font-size $ default-font-size } } [
+        default-font-size font-size associate [
             { $tip-of-the-day } print-element nl
             { $strong "Press " { $snippet "F1" } " at any time for help." } print-element nl
             vm-info print-element
