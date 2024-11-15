@@ -76,7 +76,7 @@ H{ } interactor-style set-global
         [ font-style of [ { italic bold-italic } member? [ t >>italic? ] when ] when* ]
         [ font-name of [ >>name ] when* ]
         [ font-size of [ >>size ] when* ]
-        [ text-color of [ >>foreground ] when* ]
+        [ foreground of [ >>foreground ] when* ]
         [ background of [ >>background ] when* ]
     } cleave ;
 
