@@ -34,7 +34,7 @@ Options:
     -fep                enter fep mode immediately
     -no-signals         turn off OS signal handling
     -roots=<paths>      '" write os windows? ";" ":" ? write "'-separated list of extra vocab root directories
-    -q                  quiet; do not print version banner when starting the listener
+    -q                  quiet mode; do not print version banner on startup
 
 Enter
     \"command-line\" help
