@@ -8,9 +8,11 @@ IN: tools.deploy.unix
 
 CONSTANT: extension ".out"
 
+: ?extension ( path -- path.out )
+    os macos? [ extension append ] unless ;
+
 : create-app-dir ( vocab bundle-name -- vm-path )
-    [ os macos? [ extension append ] unless ] dip
-    copy-vm dup 0o755 set-file-permissions ;
+    [ ?extension ] dip copy-vm dup 0o755 set-file-permissions ;
 
 M: unix deploy*
     deploy-name get
@@ -26,7 +28,7 @@ M: unix deploy-path
     deploy-directory get [
         dup deploy-config [
             deploy-name get
-            swap extension append append-path
+            swap ?extension append-path
             normalize-path
         ] with-variables
     ] with-directory ;
