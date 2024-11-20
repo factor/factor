@@ -16,6 +16,8 @@ HOOK: (set-os-envs) os ( seq -- )
 
 HOOK: set-os-envs-pointer os ( malloc -- )
 
+: os-env? ( key -- ? ) os-env empty? not ;
+
 : change-os-env ( key quot -- )
     [ [ os-env ] keep ] dip dip set-os-env ; inline
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax io.streams.string
+USING: assocs help.markup help.syntax io.streams.string kernel
 libc sequences strings ;
 IN: environment
 
@@ -28,6 +28,10 @@ HELP: os-env
         "jane"
     }
 } ;
+
+HELP: os-env?
+{ $values { "key" string } { "?" boolean } }
+{ $description "Returns " { $link t } " if the environment variable is set to a non-empty value." } ;
 
 HELP: change-os-env
 { $values { "key" string } { "quot" { $quotation ( old -- new ) } } }
