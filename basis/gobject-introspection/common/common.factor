@@ -10,3 +10,9 @@ implement-structs [ V{ } ] initialize
 
 : implement-struct? ( c-type -- ? )
     implement-structs get-global member? ;
+
+SYMBOL: skip-definitions
+skip-definitions [ V{ } ] initialize
+
+: skip-definition? ( name -- ? )
+    skip-definitions get-global member? ;

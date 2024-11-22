@@ -17,13 +17,16 @@ IN: gobject-introspection.loader
 : xml>varargs-type ( xml -- type )
     drop varargs-type new ;
 
+DEFER: xml>type
+
 : xml>array-type ( xml -- type )
     [ array-type new ] dip {
         [ "name" attr >>name ]
         [ "zero-terminated" attr "0" = not >>zero-terminated? ]
         [ "length" attr string>number >>length ]
         [ "fixed-size" attr string>number >>fixed-size ]
-        [ "type" tag-named xml>simple-type >>element-type ]
+        [ "type" tag-named [ xml>type >>element-type ] when* ]
+        [ "array" tag-named [ xml>array-type >>element-type ] when* ]
     } cleave ;
 
 : xml>inner-callback-type ( xml -- type )
@@ -116,7 +119,7 @@ CONSTANT: type-tags
     } cleave ;
 
 : load-functions ( xml tag-name -- functions )
-    tags-named [ xml>function ] map ;
+    tags-named [ "moved-to" attr ] reject [ xml>function ] map ;
 
 : xml>field ( xml -- field )
     [ field new ] dip {
@@ -197,29 +200,32 @@ CONSTANT: type-tags
     [ boxed new ] dip
         load-type ;
 
-: fix-conts ( namespace -- )
-    [ symbol-prefixes>> first >upper "_" append ] [ consts>> ] bi
+: fix-consts ( namespace -- )
+    [ identifier-prefixes>> first >upper "_" append ] [ consts>> ] bi
     [ [ name>> append ] keep c-identifier<< ] with each ;
 
 : postprocess-namespace ( namespace -- )
-    fix-conts ;
+    fix-consts ;
+
+: reject-skipped ( seq -- newseq )
+    [ name>> skip-definition? ] reject ;
 
 : xml>namespace ( xml -- namespace )
     [ namespace new ] dip {
         [ "name" attr >>name ]
         [ "identifier-prefixes" attr "," split >>identifier-prefixes ]
         [ "symbol-prefixes" attr "," split >>symbol-prefixes ]
-        [ "alias" tags-named [ xml>alias ] map >>aliases ]
-        [ "constant" tags-named [ xml>const ] map >>consts ]
-        [ "enumeration" tags-named [ xml>enum ] map >>enums ]
-        [ "bitfield" tags-named [ xml>enum ] map >>bitfields ]
-        [ "record" tags-named [ xml>record ] map >>records ]
-        [ "union" tags-named [ xml>union ] map >>unions ]
-        [ "boxed" tags-named [ xml>boxed ] map >>boxeds ]
-        [ "callback" tags-named [ xml>callback ] map >>callbacks ]
-        [ "class" tags-named [ xml>class ] map >>classes ]
-        [ "interface" tags-named [ xml>interface ] map >>interfaces ]
-        [ "function" load-functions >>functions ]
+        [ "alias" tags-named [ xml>alias ] map reject-skipped >>aliases ]
+        [ "constant" tags-named [ xml>const ] map reject-skipped >>consts ]
+        [ "enumeration" tags-named [ xml>enum ] map reject-skipped >>enums ]
+        [ "bitfield" tags-named [ xml>enum ] map reject-skipped >>bitfields ]
+        [ "record" tags-named [ xml>record ] map reject-skipped >>records ]
+        [ "union" tags-named [ xml>union ] map reject-skipped >>unions ]
+        [ "boxed" tags-named [ xml>boxed ] map reject-skipped >>boxeds ]
+        [ "callback" tags-named [ xml>callback ] map reject-skipped >>callbacks ]
+        [ "class" tags-named [ xml>class ] map reject-skipped >>classes ]
+        [ "interface" tags-named [ xml>interface ] map reject-skipped >>interfaces ]
+        [ "function" load-functions reject-skipped >>functions ]
     } cleave [ postprocess-namespace ] keep ;
 
 : xml>repository ( xml -- repository )
