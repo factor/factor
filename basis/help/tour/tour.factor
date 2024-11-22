@@ -109,10 +109,9 @@ there are no semantics to the { $snippet "[" } , the { $snippet ".." }  and the 
 since it is just a token like { $snippet "foo" }  or { $snippet "bar" } ).
 
 The range we want starts with { $snippet "1" } , so we can use the simpler word { $link [1..b] }  that assumes the 
-range starts at { $snippet "1" }  and only expects the value at the top of the range to be on the stack. If you write { 
-$link [1..b] }  in the listener, Factor will prompt you with a choice, because the word { $link [1..b] }  is 
-not imported by default. Factor is able to suggest you import the { $vocab-link "ranges" }  vocabulary, so choose that 
-option and proceed.
+range starts at { $snippet "1" }  and only expects the value at the top of the range to be on the stack. If you get a
+{ $snippet "Data stack underflow" } error, it means you forgot to put a number on the stack first to be the upper
+bound { $snippet "b" } .
 
 You should now have on your stack a rather opaque structure which looks like
 
