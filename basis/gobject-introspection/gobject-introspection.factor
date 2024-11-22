@@ -48,7 +48,8 @@ M: gir-not-found summary
         [ namespace>> name>> current-namespace-name set-global ]
         [ def-ffi-repository ]
     } cleave
-    V{ } clone implement-structs set-global ;
+    V{ } clone implement-structs set-global
+    V{ } clone skip-definitions set-global ;
 
 PRIVATE>
 
@@ -57,6 +58,10 @@ SYNTAX: GIR: scan-token define-gir-vocab ;
 SYNTAX: IMPLEMENT-STRUCTS:
     ";" parse-tokens
     implement-structs [ swap append! ] change-global ;
+
+SYNTAX: SKIP-DEFINITIONS:
+    ";" parse-tokens
+    skip-definitions [ swap append! ] change-global ;
 
 SYNTAX: FOREIGN-ATOMIC-TYPE:
     scan-token scan-object swap register-atomic-type ;
