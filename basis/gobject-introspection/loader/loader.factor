@@ -61,6 +61,7 @@ CONSTANT: type-tags
     [ const new ] dip {
         [ "name" attr >>name ]
         [ "value" attr >>value ]
+        [ "type" attr [ >>c-type ] when* ]
         [ child-type-tag xml>type >>type ]
     } cleave ;
 
@@ -200,9 +201,16 @@ CONSTANT: type-tags
     [ boxed new ] dip
         load-type ;
 
+: fix-const ( symbol-prefix const -- )
+    {
+        { [ dup c-identifier>> ] [ 2drop ] }
+        { [ dup c-type>> ] [ nip [ c-type>> ] keep c-identifier<< ] }
+        [ [ name>> append ] keep c-identifier<< ]
+    } cond ;
+
 : fix-consts ( namespace -- )
-    [ identifier-prefixes>> first >upper "_" append ] [ consts>> ] bi
-    [ [ name>> append ] keep c-identifier<< ] with each ;
+    [ symbol-prefixes>> first >upper "_" append ] [ consts>> ] bi
+    [ fix-const ] with each ;
 
 : postprocess-namespace ( namespace -- )
     fix-consts ;
