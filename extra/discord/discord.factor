@@ -3,7 +3,7 @@
 USING: accessors alien.syntax arrays assocs byte-arrays calendar
 combinators combinators.short-circuit concurrency.mailboxes
 continuations destructors formatting hashtables help http
-http.client http.websockets io io.encodings.string
+http.client http.json http.websockets io io.encodings.string
 io.encodings.utf8 io.sockets io.streams.string json kernel
 literals math multiline namespaces prettyprint
 prettyprint.sections random sequences sets splitting strings
@@ -21,7 +21,7 @@ TUPLE: discord-bot-config
     permissions intents
     user-callback obey-names
     metadata
-    { reconnect-time initial: $[ 2 minutes ] }
+    { reconnect-time initial: $[ 2 seconds ] }
     discord-bot mailbox connect-thread ;
 
 TUPLE: discord-bot < disposable
@@ -50,8 +50,7 @@ TUPLE: discord-bot < disposable
 : add-json-header ( request -- request )
     "application/json" "Content-Type" set-header ;
 
-: json-request-headers ( request -- headers json ) http-request utf8 decode json> ;
-: json-request ( request -- json ) json-request-headers nip ;
+: json-request ( request -- json ) http-request-json nip ;
 : gwrite ( string -- ) [ write ] with-global ;
 : gprint ( string -- ) [ print ] with-global ;
 : gprint-flush ( string -- ) [ print flush ] with-global ;
@@ -426,7 +425,6 @@ M: TYPING_START dispatch-message drop
 : stopping-discord-bot ( -- )
     discord-bot get t >>stop? drop ;
 
-DEFER: discord-reconnect
 : handle-discord-websocket ( obj opcode -- )
     "opcode: " gwrite dup g. over dup byte-array? [ utf8 decode json> ] when g... gflush
     {
