@@ -4,10 +4,10 @@ USING: accessors alien.syntax arrays assocs byte-arrays calendar
 combinators combinators.short-circuit concurrency.mailboxes
 continuations destructors formatting hashtables help http
 http.client http.websockets io io.encodings.string
-io.encodings.utf8 io.sockets io.streams.string json kernel math
-multiline namespaces prettyprint prettyprint.sections random
-sequences sets splitting strings threads tools.hexdump unicode
-vocabs words ;
+io.encodings.utf8 io.sockets io.streams.string json kernel
+literals math multiline namespaces prettyprint
+prettyprint.sections random sequences sets splitting strings
+threads tools.hexdump unicode vocabs words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -21,6 +21,7 @@ TUPLE: discord-bot-config
     permissions intents
     user-callback obey-names
     metadata
+    { reconnect-time initial: $[ 2 minutes ] }
     discord-bot mailbox connect-thread ;
 
 TUPLE: discord-bot < disposable
@@ -31,12 +32,12 @@ TUPLE: discord-bot < disposable
     application user session_id resume_gateway_url
     guilds channels ;
 
-: <discord-bot> ( in out config -- discord-bot )
+: <discord-bot> ( config -- discord-bot )
     discord-bot new-disposable
         swap >>config
-        swap >>out
-        swap >>in
-        t >>send-heartbeat?
+        ! swap >>out
+        ! swap >>in
+        f >>send-heartbeat?
         t >>reconnect?
         f >>stop?
         V{ } clone >>messages
@@ -140,7 +141,7 @@ TUPLE: discord-bot < disposable
 : get-discord-bot-gateway ( -- json ) "/gateway/bot" discord-get ;
 
 : gateway-identify-json ( -- json )
-    \ discord-bot get
+    discord-bot get
     [ config>> ] ?call
     [ [ token>> ] ?call "0" or  ]
     [ [ intents>> ] ?call 3276541 or ] bi
@@ -453,17 +454,18 @@ DEFER: discord-reconnect
 
 : discord-reconnect ( -- )
     "reconnect" gprint-flush
+    discord-bot-config get [ <discord-bot> ] keep discord-bot<<
     discord-bot-gateway <get-request>
     add-discord-auth-header
     [ drop ] do-http-request
     dup response? [
         throw
     ] [
-        [ in>> stream>> ] [ out>> stream>> ] bi \ discord-bot-config get
-        <discord-bot>
-        [ discord-bot-config get discord-bot<< ] keep
+        [ in>> stream>> ] [ out>> stream>> ] bi
+        discord-bot-config get discord-bot>>
+        [ out<< ] [ in<< ] [ t >>send-heartbeat? ] tri
         dup '[
-            _ \ discord-bot [
+            _ discord-bot [
                 discord-bot get [ in>> ] [ out>> ] bi
                 [
                     [ handle-discord-websocket discord-bot-config get discord-bot>> stop?>> not ] read-websocket-loop
@@ -471,7 +473,7 @@ DEFER: discord-reconnect
             ] with-variable
         ] "Discord Bot" <thread>
         [ discord-bot-config get mailbox>> "disconnected" swap mailbox-put ]
-        >>exit-handler (spawn) >>bot-thread discord-bot-config get discord-bot<<
+        >>exit-handler dup (spawn) >>bot-thread discord-bot-config get discord-bot<<
     ] if ;
 
 M: discord-bot dispose*
@@ -489,7 +491,7 @@ M: discord-bot-config dispose
 
 : discord-connect ( config -- )
     <mailbox> >>mailbox
-    \ discord-bot-config [
+    discord-bot-config [
         [
             [
                 "connecting" gprint-flush
@@ -499,8 +501,8 @@ M: discord-bot-config dispose
                     ! wait here for signal to maybe reconnect
                     mailbox>> mailbox-get
                 ] [ addrinfo-error? ] ignore-error
-                2 minutes sleep
-                discord-bot-config get discord-bot>>
+                discord-bot-config get
+                [ reconnect-time>> sleep ] [ discord-bot>> ] bi
                 [ reconnect?>> ] [ stop?>> not ] bi and
             ] loop
         ] "Discord bot connect loop" spawn discord-bot-config get connect-thread<<
