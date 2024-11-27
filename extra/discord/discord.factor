@@ -4,10 +4,10 @@ USING: accessors alien.syntax arrays assocs byte-arrays calendar
 combinators combinators.short-circuit concurrency.mailboxes
 continuations destructors formatting hashtables help http
 http.client http.websockets io io.encodings.string
-io.encodings.utf8 io.streams.string json kernel math multiline
-namespaces prettyprint prettyprint.sections random sequences
-sets splitting strings threads tools.hexdump unicode vocabs
-words ;
+io.encodings.utf8 io.sockets io.streams.string json kernel math
+multiline namespaces prettyprint prettyprint.sections random
+sequences sets splitting strings threads tools.hexdump unicode
+vocabs words ;
 IN: discord
 
 CONSTANT: discord-api-url "https://discord.com/api/v10"
@@ -452,7 +452,7 @@ DEFER: discord-reconnect
     } case ;
 
 : discord-reconnect ( -- )
-    "reconnect" g.
+    "reconnect" gprint-flush
     discord-bot-gateway <get-request>
     add-discord-auth-header
     [ drop ] do-http-request
@@ -469,8 +469,9 @@ DEFER: discord-reconnect
                     [ handle-discord-websocket discord-bot-config get discord-bot>> stop?>> not ] read-websocket-loop
                 ] with-streams
             ] with-variable
-            discord-bot-config get mailbox>> "disconnected" swap mailbox-put
-        ] "Discord Bot" spawn >>bot-thread discord-bot-config get discord-bot<<
+        ] "Discord Bot" <thread>
+        [ discord-bot-config get mailbox>> "disconnected" swap mailbox-put ]
+        >>exit-handler (spawn) >>bot-thread discord-bot-config get discord-bot<<
     ] if ;
 
 M: discord-bot dispose*
@@ -491,11 +492,15 @@ M: discord-bot-config dispose
     \ discord-bot-config [
         [
             [
-                "connecting" g.
-                discord-reconnect
-                discord-bot-config get
-                ! wait here for signal to maybe reconnect
-                [ mailbox>> mailbox-get ] [ discord-bot>> ] bi
+                "connecting" gprint-flush
+                [
+                    discord-reconnect
+                    discord-bot-config get
+                    ! wait here for signal to maybe reconnect
+                    mailbox>> mailbox-get
+                ] [ addrinfo-error? ] ignore-error
+                2 minutes sleep
+                discord-bot-config get discord-bot>>
                 [ reconnect?>> ] [ stop?>> not ] bi and
             ] loop
         ] "Discord bot connect loop" spawn discord-bot-config get connect-thread<<
