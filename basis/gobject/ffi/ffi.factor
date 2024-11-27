@@ -19,15 +19,7 @@ C-LIBRARY: gobject {
 
 IMPLEMENT-STRUCTS: GValue GParamSpecVariant ;
 
-SKIP-DEFINITIONS:
-    TYPE_FLAG_RESERVED_ID_BIT
-    GIOCondition
-    G_IO_IN
-    G_IO_OUT
-    G_IO_PRI
-    G_IO_ERR
-    G_IO_HUP
-    G_IO_NVAL ;
+SKIP-DEFINITIONS: TYPE_FLAG_RESERVED_ID_BIT IOCondition ;
 
 GIR: vocab:gir/GObject-2.0.gir
 
