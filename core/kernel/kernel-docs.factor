@@ -973,7 +973,7 @@ HELP: 2check
     { "x" object } { "y" object } { "quot" quotation }
     { "?" boolean }
 }
-{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and " { $snippet "x" } " and keeps those two values under the boolean result from the " { $snippet "quot" } "."  }
+{ $description "Calls " { $snippet "quot" } " on " { $snippet "x" } " and " { $snippet "y" } " and keeps those two values under the boolean result from the " { $snippet "quot" } "."  }
 { $examples
     "True case:"
     { $example "USING: kernel math prettyprint ;"
