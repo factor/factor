@@ -293,9 +293,9 @@ HELP: %store-memory-imm
 HELP: %test-imm-branch
 { $values
   { "label" "branch destination" }
-  { "cc" "comparison symbol" }
   { "src1" "register" }
   { "src2" "immediate" }
+  { "cc" "comparison symbol" }
 } { $description "Emits a TEST instruction with a register and an immediate, followed by a branch." } ;
 
 HELP: %unbox
