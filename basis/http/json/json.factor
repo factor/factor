@@ -16,6 +16,9 @@ IN: http.json
 : http-request-json ( request -- response json )
     http-request json> ;
 
+: http-json ( request -- json )
+    http-request-json nip ;
+
 : http-get-json ( url -- response json )
     "GET" <json-request> http-request-json ;
 

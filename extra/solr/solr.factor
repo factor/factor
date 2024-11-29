@@ -11,7 +11,7 @@ IN: solr
             { "Accept" "text/plain" }
         } set-headers
     ] unless
-    http-request-json nip ;
+    http-json ;
 
 : solr-docs ( url -- json )
     solr-request "response" of "docs" of ;

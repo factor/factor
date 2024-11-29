@@ -26,7 +26,7 @@ SYMBOL: b2-authorized-account
 : b2-authorize-account ( -- json )
     "https://api.backblazeb2.com/b2api/v3/b2_authorize_account" <get-request>
     b2-add-basic-auth-header
-    http-request-json nip ;
+    http-json ;
 
 : with-b2 ( quot -- )
     [ b2-authorize-account b2-authorized-account ] dip with-variable ; inline
@@ -48,14 +48,14 @@ SYMBOL: b2-authorized-account
     [ [ authorized-account-id "accountId" set-query-param ] when ] bi*
     <get-request>
     b2-add-auth-header
-    http-request-json nip ;
+    http-json ;
 
 : b2-get-request-with-params ( params path -- json )
     authorized-account-api-url prepend >url
     swap set-query-params
     <get-request>
     b2-add-auth-header
-    http-request-json nip ;
+    http-json ;
 
 : b2-get-request-with-account-id ( path -- json ) t b2-get-request* ;
 : b2-get-request ( path -- json ) f b2-get-request* ;
@@ -64,7 +64,7 @@ SYMBOL: b2-authorized-account
     swap [ [ b2-add-account-id ] when >json ] dip
     authorized-account-api-url prepend <post-request>
     b2-add-auth-header
-    http-request-json nip ;
+    http-json ;
 
 : b2-post-request-with-account-id ( assoc path -- json ) t b2-post-request* ;
 : b2-post-request ( assoc path -- json ) f b2-post-request* ;
@@ -148,7 +148,7 @@ ERROR: bucket-does-not-exist bucket-name ;
     [ "uploadUrl" of >url >>url ]
     [ "authorizationToken" of "Authorization" set-header ] bi
     dup header>> "Connection" delete-of drop
-    http-request-json nip ;
+    http-json ;
 
 ! "resource:LICENSE.txt" utf8 prepare-b2-binary-file "bucket-name" b2-upload-file
 : b2-upload-file ( post-data headers bucket-name -- json ) [ b2-upload-file* ] with-b2 ;
