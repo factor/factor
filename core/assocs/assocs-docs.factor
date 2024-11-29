@@ -140,8 +140,6 @@ ARTICLE: "assocs-conversions" "Associative mapping conversions"
 ARTICLE: "assocs-combinators" "Associative mapping combinators"
 "The following combinators can be used on any associative mapping."
 $nl
-"The " { $link assoc-find } " combinator is part of the " { $link "assocs-protocol" } " and must be implemented once for each class of assoc. All other combinators are implemented in terms of this combinator."
-$nl
 "The standard functional programming idioms:"
 { $subsections
     assoc-each
