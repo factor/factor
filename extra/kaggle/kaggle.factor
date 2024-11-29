@@ -1,8 +1,8 @@
 ! Copyright (C) 2024 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.syntax assocs discord formatting
-hashtables http http.client http.download io.directories
-io.pathnames json kernel math sequences urls ;
+USING: accessors alien.syntax assocs formatting hashtables http
+http.client http.download http.json io.directories io.pathnames
+json kernel math sequences urls ;
 IN: kaggle
 
 ! Generate kaggle.json at: https://www.kaggle.com/settings
@@ -30,13 +30,13 @@ CONSTANT: kaggle-api-internal "https://www.kaggle.com/api/i"
     kaggle-api-internal prepend >url ;
 
 : kaggle-get-json ( path -- json )
-    >kaggle-url <get-request> kaggle-basic-auth json-request ;
+    >kaggle-url <get-request> kaggle-basic-auth http-json ;
 
 : kaggle-post-json ( post-data path -- json )
-    >kaggle-url <post-request> kaggle-basic-auth json-request ;
+    >kaggle-url <post-request> kaggle-basic-auth http-json ;
 
 : kaggle-post-json-internal ( post-data path -- json )
-    >kaggle-internal-url <post-request> json-request ;
+    >kaggle-internal-url <post-request> http-json ;
 
 : kaggle-download ( path -- path )
     >kaggle-url <get-request> kaggle-basic-auth download-to-temporary-file ;
@@ -289,4 +289,4 @@ ENUM: kaggle-categories
     "https://www.kaggle.com/account/login?phase=emailSignIn&returnUrl=%2Fwork" "referer" set-header
     swap >>cookies
     swap [ swap set-header ] assoc-each
-    json-request ;
+    http-json ;
