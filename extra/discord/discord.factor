@@ -50,7 +50,6 @@ TUPLE: discord-bot < disposable
 : add-json-header ( request -- request )
     "application/json" "Content-Type" set-header ;
 
-: json-request ( request -- json ) http-request-json nip ;
 : gwrite ( string -- ) [ write ] with-global ;
 : gprint ( string -- ) [ print ] with-global ;
 : gprint-flush ( string -- ) [ print flush ] with-global ;
@@ -64,7 +63,7 @@ TUPLE: discord-bot < disposable
 : discord-get-request ( route -- request )
     >discord-url <get-request> add-discord-auth-header ;
 : discord-get ( route -- json )
-    discord-get-request json-request ;
+    discord-get-request http-json ;
 : discord-post-request ( payload route -- request )
     >discord-url <post-request> add-discord-auth-header ;
 : discord-patch-request ( payload route -- request )
@@ -72,15 +71,15 @@ TUPLE: discord-bot < disposable
 : discord-delete-request ( route -- request )
     >discord-url <delete-request> add-discord-auth-header ;
 : discord-post ( payload route -- json )
-    discord-post-request json-request ;
+    discord-post-request http-json ;
 : discord-post-json ( payload route -- json )
-    [ >json ] dip discord-post-request add-json-header json-request ;
+    [ >json ] dip discord-post-request add-json-header http-json ;
 : discord-post-json-no-resp ( payload route -- )
     [ >json ] dip discord-post-request add-json-header http-request 2drop ;
 : discord-patch-json ( payload route -- json )
-    [ >json ] dip discord-patch-request add-json-header json-request ;
+    [ >json ] dip discord-patch-request add-json-header http-json ;
 : discord-delete-json ( route -- json )
-    discord-delete-request add-json-header json-request ;
+    discord-delete-request add-json-header http-json ;
 
 : bot-guild-join-uri ( discord-bot-config -- uri )
     [ permissions>> ] [ client-id>> ] [ guild-id>> ] tri
