@@ -3,7 +3,7 @@
 USING: assocs assocs.extras calendar combinators.short-circuit
 crypto.jwt formatting http http.client http.json kernel
 linked-assocs math.order namespaces namespaces.extras
-prettyprint sequences urls.encoding ;
+prettyprint sequences urls urls.encoding ;
 IN: bluesky
 
 SYMBOL: bluesky-identifier
@@ -73,12 +73,17 @@ DEFER: bluesky-get-session
         "includePins" "true" set-of
         "limit" 100 set-of ;
 
+! actor: required
 ! filter: posts_with_replies, posts_no_replies, posts_with_media, posts_and_author_threads
 ! default: posts_with_replies
 ! includePins: true, false
 : bluesky-get-feed ( linked-assoc -- feed )
-    assoc>query
-    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed?%s" sprintf bluesky-get-json ;
+    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed?%s" >url
+        swap set-query-params bluesky-get-json ;
+
+: bluesky-get-feed-default ( actor -- feed )
+    [ bluesky-get-feed-default-assoc ] dip
+    "actor" pick set-at bluesky-get-feed ;
 
 : bluesky-get-feed-all ( linked-assoc -- feed )
     "" "cursor" pick ?set-once-at 2drop
