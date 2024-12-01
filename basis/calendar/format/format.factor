@@ -243,6 +243,19 @@ M: timestamp present timestamp>string ;
         ] if
     ] if-empty ;
 
+: human-readable>duration ( string -- duration )
+    " " split "and" swap remove
+    [ "," ?tail drop "s" ?tail drop ] map
+    2 <groups> [
+        first2 [ string>number ] dip {
+            { "year" [ years ] }
+            { "day" [ days ] }
+            { "hour" [ hours ] }
+            { "minute" [ minutes ] }
+            { "second" [ seconds ] }
+        } case
+    ] [ duration+ ] map-reduce ;
+
 GENERIC: elapsed-time ( seconds -- string )
 
 M: integer elapsed-time
@@ -269,6 +282,8 @@ M: duration elapsed-time
 M: timestamp elapsed-time
     ago elapsed-time ;
 
+ALIAS: duration>human-elapsed elapsed-time
+
 : parse-elapsed-time ( string -- duration )
     " " split [
         unclip-last [ string>number ] dip {
@@ -280,6 +295,8 @@ M: timestamp elapsed-time
             { CHAR: y [ years ] }
         } case
     ] [ duration+ ] map-reduce ;
+
+ALIAS: human-elapsed>duration parse-elapsed-time
 
 : relative-time-offset ( seconds -- string )
     abs {
@@ -309,3 +326,5 @@ M: duration relative-time
 
 M: timestamp relative-time
     ago relative-time ;
+
+ALIAS: duration>human-relative relative-time
