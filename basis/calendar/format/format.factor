@@ -269,6 +269,18 @@ M: duration elapsed-time
 M: timestamp elapsed-time
     ago elapsed-time ;
 
+: parse-elapsed-time ( string -- duration )
+    " " split [
+        unclip-last [ string>number ] dip {
+            { CHAR: s [ seconds ] }
+            { CHAR: m [ minutes ] }
+            { CHAR: h [ hours ] }
+            { CHAR: d [ days ] }
+            { CHAR: w [ weeks ] }
+            { CHAR: y [ years ] }
+        } case
+    ] [ duration+ ] map-reduce ;
+
 : relative-time-offset ( seconds -- string )
     abs {
         { [ dup 1 < ] [ drop "just now" ] }
