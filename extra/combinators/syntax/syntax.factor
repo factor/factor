@@ -2,7 +2,7 @@ USING: kernel parser sequences vectors words lexer quotations
 combinators generalizations  ;
 IN: combinators.syntax
 
-: | ( -- ) ; delimiter
+DEFER: | delimiter
 
 <PRIVATE
 ! unlike normal parse-until, this also pushes the thing that matched the predicate into the accumulator as well 
