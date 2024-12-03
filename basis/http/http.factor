@@ -147,6 +147,7 @@ TUPLE: request
     redirects ;
 
 ! These are for backwards compatibility
+SLOT: post-data
 M: request post-data>> data>> ;
 M: request post-data<< data<< ;
 
