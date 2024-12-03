@@ -8,6 +8,7 @@ $nl
 { $subsections
     watch
     watch-vars
+    POSTPONE: <WATCH
 }
 "Timing words:"
 { $subsections
@@ -33,6 +34,10 @@ HELP: watch
 { $description "Annotates a word definition to print the data stack on entry and exit." } ;
 
 { watch watch-vars reset } related-words
+
+HELP: <WATCH
+{ $syntax "<WATCH ... WATCH>" }
+{ $description "Allows wrapping a block of code and record stack values entering and exiting the block of code." } ;
 
 HELP: reset
 { $values
