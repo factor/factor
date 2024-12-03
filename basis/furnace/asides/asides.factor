@@ -6,8 +6,7 @@ furnace.utilities hashtables html.templates.chloe.syntax http
 http.server kernel logging math.parser namespaces urls ;
 IN: furnace.asides
 
-TUPLE: aside < server-state
-session method url post-data ;
+TUPLE: aside < server-state session method url post-data ;
 
 : <aside> ( id -- aside )
     aside new-server-state ;
@@ -56,16 +55,16 @@ M: asides call-responder*
         swap >>url
         session get id>> >>session
         request get method>> >>method
-        request get post-data>> >>post-data
+        request get data>> >>post-data
     [ touch-aside ] [ insert-tuple ] [ set-aside ] tri ;
 
 : end-aside-post ( aside -- response )
     request [
         clone
-            over post-data>> >>post-data
+            over post-data>> >>data
             over url>> >>url
     ] change
-    [ [ post-data>> params>> params set ] [ url>> url set ] bi ]
+    [ [ data>> params>> params set ] [ url>> url set ] bi ]
     [ url>> path>> split-path asides get responder>> call-responder ] bi ;
 
 \ end-aside-post DEBUG add-input-logging

@@ -22,7 +22,7 @@ IN: chrome-tools
             { [ dup "curl" = ] [ drop trim-squotes >url '[ _ >>url ] ] }
             { [ dup "-H" = ] [ drop parse-key-value dup "if-modified-since" = [ 2drop f ] [ '[ _ _ set-header ] ] if ] }
             { [ dup "--compressed" = ] [ 2drop f ] }
-            { [ dup "--data-raw" = ] [ drop trim-squotes '[ _ >>post-data ] ] }
+            { [ dup "--data-raw" = ] [ drop trim-squotes '[ _ >>data ] ] }
             [ 2drop f ]
         } cond
     ] map [ ] concat-as curry call( -- request ) ;
@@ -53,7 +53,7 @@ IN: chrome-tools
                     ] if
                 ] { } assoc>map [ ] concat-as
             ] }
-            { "body" [ '[ _ dup json-null = [ drop ] [ >>post-data ] if ] ] }
+            { "body" [ '[ _ dup json-null = [ drop ] [ >>data ] if ] ] }
             [ 2drop f ]
         } case
     ] { } assoc>map [ ] concat-as curry call( -- request ) ;

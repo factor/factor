@@ -49,7 +49,7 @@ blah
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
-        { post-data T{ post-data { data "blah" } { content-type "application/octet-stream" } } }
+        { data T{ post-data { data "blah" } { content-type "application/octet-stream" } } }
         { cookies V{ } }
         { redirects 10 }
     }
@@ -465,7 +465,7 @@ test-db <db-persistence> [
     "a" add-responder
     <action>
         [
-            request get post-data>> data>> "data" =
+            request get data>> data>> "data" =
             [ "OK" "text/plain" <content> ] [ "OOPS" throw ] if
         ] >>submit
     "b" add-responder [

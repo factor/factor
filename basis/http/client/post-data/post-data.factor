@@ -52,7 +52,7 @@ M: object (write-post-data)
     <measured-stream> ;
 
 : normalize-post-data ( request -- request )
-    dup post-data>> [
+    dup data>> [
         dup params>> [
             assoc>query ascii encode >>data
         ] when*
@@ -85,8 +85,7 @@ M: object >post-data
         swap >>data ;
 
 : unparse-post-data ( request -- request )
-    [ >post-data ] change-post-data
-    normalize-post-data ;
+    [ >post-data ] change-data normalize-post-data ;
 
 : write-post-data ( request -- request )
-    dup post-data>> [ data>> (write-post-data) ] when* ;
+    dup data>> [ data>> (write-post-data) ] when* ;

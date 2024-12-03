@@ -49,7 +49,7 @@ IN: bitcoin.client
 : bitcoin-request ( method params -- request )
     payload bitcoin-url <post-request>
     basic-auth "Authorization" set-header
-    dup post-data>> data>> length "Content-Length" set-header
+    dup data>> data>> length "Content-Length" set-header
     http-request nip >string json> "result" of ;
 
 PRIVATE>

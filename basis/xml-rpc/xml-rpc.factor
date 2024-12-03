@@ -176,8 +176,7 @@ TAG: array xml>item
     xml>string utf8 encode "text/xml" <post-data> swap >>data ;
 
 : rpc-post-request ( xml url -- request )
-    [ send-rpc xml-post-data ] [ "POST" <client-request> ] bi*
-    swap >>post-data ;
+    [ send-rpc xml-post-data ] [ <post-request> ] bi* ;
 
 PRIVATE>
 

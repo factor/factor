@@ -9,7 +9,7 @@ IN: http.json
 : <json-request> ( url method -- request )
     <client-request> accept-json ;
 
-: <json-post-data> ( assoc/json-string -- post-data )
+: <json-data> ( assoc/json-string -- post-data )
     dup string? [ >json ] unless utf8 encode
     "application/json" <post-data> swap >>data ;
 
@@ -22,13 +22,11 @@ IN: http.json
 : http-get-json ( url -- response json )
     "GET" <json-request> http-request-json ;
 
-: http-put-json ( post-data url -- response json )
-    [ <json-post-data> ] dip "PUT" <json-request> swap
-    >>post-data http-request-json ;
+: http-put-json ( assoc/json-string url -- response json )
+    [ <json-data> ] dip "PUT" <json-request> swap >>data http-request-json ;
 
-: http-post-json ( post-data url -- response json )
-    [ <json-post-data> ] dip "POST" <json-request> swap
-    >>post-data http-request-json ;
+: http-post-json ( assoc/json-string url -- response json )
+    [ <json-data> ] dip "POST" <json-request> swap >>data http-request-json ;
 
 : http-head-json ( url -- response json )
     "HEAD" <json-request> http-request-json ;
@@ -43,12 +41,10 @@ IN: http.json
     "TRACE" <json-request> http-request-json ;
 
 : http-patch-json ( assoc/json-string url -- response json )
-    [ <json-post-data> ] dip "PATCH" <json-request>
-      swap >>post-data http-request-json ;
+    [ <json-data> ] dip "PATCH" <json-request> swap >>data http-request-json ;
 
 : rest-request-json ( url method -- response json )
     <json-request> http-request-json ;
 
 : rest-request-json-with-body ( body url method -- response json )
-    [ <json-post-data> ] 2dip
-    <json-request> swap >>post-data http-request-json ;
+    [ <json-data> ] 2dip <json-request> swap >>data http-request-json ;

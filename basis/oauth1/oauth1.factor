@@ -156,7 +156,7 @@ TUPLE: oauth-request-params < token-params access-token ;
     params
     [
         access-token>> key>> "oauth_token" ,,
-        request post-data>> %%
+        request data>> %%
     ] make-token-params
     sign-params ;
 

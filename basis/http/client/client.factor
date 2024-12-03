@@ -74,7 +74,7 @@ ERROR: download-failed response ;
     over url>> host>> [ set-host-header ] when
     over url>> "Authorization" ?set-basic-auth
     over proxy-url>> "Proxy-Authorization" ?set-basic-auth
-    over post-data>> [ set-post-data-headers ] when*
+    over data>> [ set-post-data-headers ] when*
     over cookies>> [ set-cookie-header ] unless-empty
     write-header ;
 
@@ -123,7 +123,7 @@ SYMBOL: redirects
     redirects get request get redirects>> < [
         request get clone
         response "location" header redirect-url
-        response code>> 307 = [ "GET" >>method f >>post-data ] unless
+        response code>> 307 = [ "GET" >>method f >>data ] unless
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -288,7 +288,7 @@ SYMBOL: request-socket
     <request>
         swap >>method
         swap request-url >>url
-        swap >>post-data ;
+        swap >>data ;
 
 : <rest-request> ( url method -- request )
     [ f ] 2dip <rest-request-with-body> ;
@@ -308,24 +308,22 @@ SYMBOL: request-socket
 : http-get* ( url -- response data )
     <get-request> http-request* ;
 
-: <post-request> ( post-data url -- request )
-    "POST" <client-request>
-        swap >>post-data ;
+: <post-request> ( data url -- request )
+    "POST" <client-request> swap >>data ;
 
-: http-post ( post-data url -- response data )
+: http-post ( data url -- response data )
     <post-request> http-request ;
 
-: http-post* ( post-data url -- response data )
+: http-post* ( data url -- response data )
     <post-request> http-request* ;
 
-: <put-request> ( post-data url -- request )
-    "PUT" <client-request>
-        swap >>post-data ;
+: <put-request> ( data url -- request )
+    "PUT" <client-request> swap >>data ;
 
-: http-put ( put-data url -- response data )
+: http-put ( data url -- response data )
     <put-request> http-request ;
 
-: http-put* ( put-data url -- response data )
+: http-put* ( data url -- response data )
     <put-request> http-request* ;
 
 : <delete-request> ( url -- request )
@@ -355,9 +353,8 @@ SYMBOL: request-socket
 : http-options* ( url -- response data )
     <options-request> http-request* ;
 
-: <patch-request> ( patch-data url -- request )
-    "PATCH" <client-request>
-        swap >>post-data ;
+: <patch-request> ( data url -- request )
+    "PATCH" <client-request> swap >>data ;
 
 : http-patch ( patch-data url -- response data )
     <patch-request> http-request ;

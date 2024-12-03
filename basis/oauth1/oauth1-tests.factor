@@ -19,7 +19,7 @@ strings namespaces urls ;
         12345 >>timestamp
         54321 >>nonce
     <request-token-request>
-    post-data>>
+    data>>
     "oauth_signature" of
     >string
 ] unit-test
