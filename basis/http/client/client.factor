@@ -277,11 +277,11 @@ SYMBOL: request-socket
 : with-http-request ( request quot: ( chunk -- ) -- response/stream )
     do-http-request check-response ; inline
 
-: http-request* ( request -- response data )
+: http-request* ( request -- response content )
     BV{ } clone [ '[ _ push-all ] do-http-request ] keep
     B{ } like over content-encoding>> decode [ >>body ] keep ;
 
-: http-request ( request -- response data )
+: http-request ( request -- response content )
     http-request* [ check-response ] dip ;
 
 : <rest-request-with-body> ( body url method -- request )
@@ -293,82 +293,82 @@ SYMBOL: request-socket
 : <rest-request> ( url method -- request )
     [ f ] 2dip <rest-request-with-body> ;
 
-: rest-request-with-body ( body url method -- response data )
+: rest-request-with-body ( body url method -- response content )
     <rest-request-with-body> http-request ;
 
-: rest-request ( url method -- response data )
+: rest-request ( url method -- response content )
     [ f ] 2dip rest-request-with-body ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;
 
-: http-get ( url -- response data )
+: http-get ( url -- response content )
     <get-request> http-request ;
 
-: http-get* ( url -- response data )
+: http-get* ( url -- response content )
     <get-request> http-request* ;
 
 : <post-request> ( data url -- request )
     "POST" <client-request> swap >>data ;
 
-: http-post ( data url -- response data )
+: http-post ( data url -- response content )
     <post-request> http-request ;
 
-: http-post* ( data url -- response data )
+: http-post* ( data url -- response content )
     <post-request> http-request* ;
 
 : <put-request> ( data url -- request )
     "PUT" <client-request> swap >>data ;
 
-: http-put ( data url -- response data )
+: http-put ( data url -- response content )
     <put-request> http-request ;
 
-: http-put* ( data url -- response data )
+: http-put* ( data url -- response content )
     <put-request> http-request* ;
 
 : <delete-request> ( url -- request )
     "DELETE" <client-request> ;
 
-: http-delete ( url -- response data )
+: http-delete ( url -- response content )
     <delete-request> http-request ;
 
-: http-delete* ( url -- response data )
+: http-delete* ( url -- response content )
     <delete-request> http-request* ;
 
 : <head-request> ( url -- request )
     "HEAD" <client-request> ;
 
-: http-head ( url -- response data )
+: http-head ( url -- response content )
     <head-request> http-request ;
 
-: http-head* ( url -- response data )
+: http-head* ( url -- response content )
     <head-request> http-request* ;
 
 : <options-request> ( url -- request )
     "OPTIONS" <client-request> ;
 
-: http-options ( url -- response data )
+: http-options ( url -- response content )
     <options-request> http-request ;
 
-: http-options* ( url -- response data )
+: http-options* ( url -- response content )
     <options-request> http-request* ;
 
 : <patch-request> ( data url -- request )
     "PATCH" <client-request> swap >>data ;
 
-: http-patch ( patch-data url -- response data )
+: http-patch ( data url -- response content )
     <patch-request> http-request ;
 
-: http-patch* ( patch-data url -- response data )
+: http-patch* ( data url -- response content )
     <patch-request> http-request* ;
 
 : <trace-request> ( url -- request )
     "TRACE" <client-request> ;
 
-: http-trace ( url -- response data )
+: http-trace ( url -- response content )
     <trace-request> http-request ;
 
-: http-trace* ( url -- response data )
+: http-trace* ( url -- response content )
     <trace-request> http-request* ;
 
 { "http.client" "debugger" } "http.client.debugger" require-when
