@@ -123,7 +123,7 @@ PRIVATE>
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
 
-DEFER: <WATCH
+DEFER: WATCH>
 
 SYNTAX: <WATCH
     \ WATCH> parse-until >quotation dup (watch) append! ;
