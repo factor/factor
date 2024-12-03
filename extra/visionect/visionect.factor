@@ -41,15 +41,15 @@ SYMBOL: visionect-api-secret
 : visionect-get ( path -- data )
     visionect-url <get-request> visionect-request ;
 
-: visionect-put ( post-data path -- data )
+: visionect-put ( data path -- data )
     visionect-url <put-request> visionect-request ;
 
 : visionect-delete ( path -- data )
     visionect-url <delete-request> visionect-request ;
 
-: visionect-post ( post-data path -- data )
+: visionect-post ( data path -- data )
     visionect-url <post-request>
-    dup post-data>> dup post-data?
+    dup data>> dup post-data?
     [ content-type>> "Content-Type" set-header ] [ drop ] if
     visionect-request ;
 

@@ -145,9 +145,9 @@ LOG: httpd-header NOTICE
         { "HEAD" [ url>> query>> ] }
         { "OPTIONS" [ url>> query>> ] }
         { "DELETE" [ url>> query>> ] }
-        { "POST" [ post-data>> params>> ] }
-        { "PATCH" [ post-data>> params>> ] }
-        { "PUT" [ post-data>> params>> ] }
+        { "POST" [ data>> params>> ] }
+        { "PATCH" [ data>> params>> ] }
+        { "PUT" [ data>> params>> ] }
         [ 2drop H{ } clone ]
     } case ;
 

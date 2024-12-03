@@ -14,23 +14,23 @@ IN: http.server.requests.tests
 ! POST requests
 { "foo=bar" "7" } [
     "foo=bar" "localhost" <post-request> request>string string>request
-    [ post-data>> data>> ] [ header>> "content-length" of ] bi
+    [ data>> data>> ] [ header>> "content-length" of ] bi
 ] unit-test
 
 { f "0" } [
     "" "localhost" <post-request> request>string string>request
-    [ post-data>> data>> ] [ header>> "content-length" of ] bi
+    [ data>> data>> ] [ header>> "content-length" of ] bi
 ] unit-test
 
 ! Incorrect content-length works fine
 { LH{ { "foo" "bar" } } } [
     { { "foo" "bar" } } "localhost" <post-request> request>string
-    "7" "190" replace string>request post-data>> params>>
+    "7" "190" replace string>request data>> params>>
 ] unit-test
 
 { LH{ { "name" "John Smith" } } } [
     { { "name" "John Smith" } } "localhost" <post-request> request>string
-    string>request post-data>> params>>
+    string>request data>> params>>
 ] unit-test
 
 ! multipart/form-data
@@ -59,7 +59,7 @@ hello
     }
 } [
     test-multipart/form-data lf>crlf string>request
-    post-data>> params>> "text" of [ filename>> ] [ headers>> ] bi
+    data>> params>> "text" of [ filename>> ] [ headers>> ] bi
 ] unit-test
 
 ! Error handling

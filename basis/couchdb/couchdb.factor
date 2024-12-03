@@ -42,14 +42,14 @@ PREDICATE: file-exists-error < couchdb-error
 : couch-get ( url -- assoc )
     <get-request> couch-request ;
 
-: <json-post-data> ( assoc -- post-data )
+: <json-data> ( assoc -- post-data )
     >json utf8 encode "application/json" <post-data> swap >>data ;
 
 : couch-put ( assoc url -- assoc' )
-    [ <json-post-data> ] dip <put-request> couch-request ;
+    [ <json-data> ] dip <put-request> couch-request ;
 
 : couch-post ( assoc url -- assoc' )
-    [ <json-post-data> ] dip <post-request> couch-request ;
+    [ <json-data> ] dip <post-request> couch-request ;
 
 : couch-delete ( url -- assoc )
     <delete-request> couch-request ;

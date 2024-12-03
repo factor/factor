@@ -29,11 +29,11 @@ SYMBOL: github-token
 : github-get* ( url -- response data ) >github-url http-get* ;
 : github-get-success? ( url -- ? ) github-get* drop code>> 204 = ;
 : github-get-json ( url -- json ) >github-url http-get-json nip ;
-: github-post ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-post-json nip ;
-: github-put ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-put-json nip ;
+: github-post ( data url -- json ) [ ?>json ] [ >github-url ] bi* http-post-json nip ;
+: github-put ( data url -- json ) [ ?>json ] [ >github-url ] bi* http-put-json nip ;
 : github-put-success? ( url -- json ) f swap >github-url http-put* drop code>> 204 = ;
-: github-put-payload-success? ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-put* drop code>> 204 = ;
-: github-patch ( post-data url -- json ) [ ?>json ] [ >github-url ] bi* http-patch-json nip ;
+: github-put-payload-success? ( data url -- json ) [ ?>json ] [ >github-url ] bi* http-put* drop code>> 204 = ;
+: github-patch ( data url -- json ) [ ?>json ] [ >github-url ] bi* http-patch-json nip ;
 : github-delete ( url -- json ) >github-url http-delete-json nip ;
 : github-delete* ( url -- ) >github-url http-delete* 2drop ;
 

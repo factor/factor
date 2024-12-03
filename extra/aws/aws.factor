@@ -100,10 +100,10 @@ TUPLE: aws-creds access-key-id secret-access-key session-token ;
         url>> "DescribeKeyPairs" "Action" set-query-param
     drop
 
-    request post-data>> sha-256 checksum-bytes bytes>hex-string :> body-hex-hash
+    request data>> sha-256 checksum-bytes bytes>hex-string :> body-hex-hash
 
     request
-        dup post-data>> [
+        dup data>> [
             body-hex-hash "x-amz-content-sha256" set-header
             ! content-type "Content-Type" set-header
         ] when

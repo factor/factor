@@ -66,10 +66,10 @@ upload-limit [ 200,000,000 ] initialize
         [ drop nip read >>data ]
     } case ;
 
-: read-post-data ( request -- request )
-    dup method>> "POST" = [
+: read-request-data ( request -- request )
+    dup method>> { "POST" "PUT" "PATCH" } member? [
         dup dup "content-type" header
-        ";" split1 drop parse-content >>post-data
+        ";" split1 drop parse-content >>data
     ] when ;
 
 : extract-host ( request -- request )
@@ -84,6 +84,6 @@ upload-limit [ 200,000,000 ] initialize
     <request>
     read-request-line
     read-request-header
-    read-post-data
+    read-request-data
     extract-host
     extract-cookies ;

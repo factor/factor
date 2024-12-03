@@ -37,8 +37,8 @@ CONSTANT: best-openai-model "gpt-4o-2024-08-06"
     openai-url "DELETE" <json-request> openai-request ;
 
 : openai-post ( post-data path -- data )
-    [ <json-post-data> ] [ openai-url ] bi*
-    "POST" <json-request> swap >>post-data openai-request ;
+    [ <json-data> ] [ openai-url ] bi*
+    "POST" <json-request> swap >>data openai-request ;
 
 : openai-input ( obj -- assoc )
     ! assume all false values are default values and reject

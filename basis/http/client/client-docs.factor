@@ -19,7 +19,7 @@ HELP: <get-request>
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
 HELP: <post-request>
-{ $values { "post-data" object } { "url" { $or url string } } { "request" request } }
+{ $values { "data" object } { "url" { $or url string } } { "request" request } }
 { $description "Constructs an HTTP POST request for submitting post data to the URL." }
 { $notes "The request can be passed on to " { $link http-request } ", possibly after cookies and headers are set." } ;
 
@@ -55,23 +55,23 @@ HELP: http-get*
 { http-get http-get* } related-words
 
 HELP: http-post
-{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-post*
-{ $values { "post-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP POST request, but does not check the HTTP response code for success." } ;
 
 { http-post http-post* } related-words
 
 HELP: http-put
-{ $values { "put-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-put*
-{ $values { "put-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PUT request, but does not check the HTTP response code for success." } ;
 
 { http-put http-put* } related-words
@@ -110,12 +110,12 @@ HELP: http-options*
 { http-options http-options* } related-words
 
 HELP: http-patch
-{ $values { "patch-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PATCH request." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: http-patch*
-{ $values { "patch-data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
+{ $values { "data" object } { "url" { $or url string } } { "response" response } { "data" sequence } }
 { $description "Submits an HTTP PATCH request, but does not check the HTTP response code for success." } ;
 
 { http-patch http-patch* } related-words
@@ -170,7 +170,7 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 } ;
 
 ARTICLE: "http.client.post-data" "HTTP client post data"
-"HTTP POST and PUT request words take a post data parameter, which can be one of the following:"
+"HTTP POST, PUT, and PATCH request words take a " { $snippet "data" } " parameter, which can be one of the following:"
 { $list
     { "a " { $link byte-array } ": the data is sent the server without further encoding" }
     { "a " { $link string } ": the data is encoded and then sent as a series of bytes" }
