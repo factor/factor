@@ -29,7 +29,7 @@ TUPLE: layout < disposable font string selection layout metrics ink-rect logical
 
 SYMBOL: dpi
 
-72 dpi set-global
+96 dpi set-global
 
 : set-layout-font ( font layout -- )
     swap cache-font-description pango_layout_set_font_description ;
