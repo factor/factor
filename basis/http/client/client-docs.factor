@@ -209,6 +209,13 @@ ARTICLE: "http.client.head" "HEAD requests with the HTTP client"
     <head-request>
 } ;
 
+ARTICLE: "http.client.patch" "PATCH requests with the HTTP client"
+"Basic usage involves passing post data and a " { $link url } ", and getting a " { $link response } " and data back:"
+{ $subsections http-patch http-patch* }
+"Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
+{ $subsections <patch-request> }
+"Both words take a post data parameter; see " { $link "http.client.post-data" } "." ;
+
 ARTICLE: "http.client.delete" "DELETE requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"
 { $subsections http-delete http-delete* }
@@ -261,7 +268,7 @@ $nl
     "http.client.post"
     "http.client.put"
 }
-"Submission data for POST and PUT requests:"
+"Submission data for POST, PUT, and PATCH requests:"
 { $subsections "http.client.post-data" }
 "Other HTTP methods are also supported:"
 { $subsections
@@ -269,6 +276,7 @@ $nl
     "http.client.delete"
     "http.client.options"
     "http.client.trace"
+    "http.client.patch"
 }
 "More esoteric use-cases, for example HTTP methods other than the above, are accommodated by constructing an empty request object with " { $link <request> } " and filling everything in by hand."
 { $subsections
