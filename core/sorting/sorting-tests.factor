@@ -18,10 +18,7 @@ unit-test
 
 [ { 1 2 } [ 2drop 1 ] sort-with ] must-not-fail
 { { 1 2 3 4 5 6 } } [ { 5 2 6 1 4 3 } [ <=> ] sort-with ] unit-test
-{ 3 { 1 2 3 4 5 6 } } [
-    3 { 5 2 6 1 4 3 }
-    [ pick dup 3 assert= '[ _ / ] bi@ <=> ] sort-with
-] unit-test
+{ 3 { 1 2 3 4 5 6 } } [ 3 { 5 2 6 1 4 3 } [ pick 3 assert= <=> ] sort-with ] unit-test
 
 ! Is it a stable sort?
 { t } [ { { 1 "a" } { 1 "b" } { 1 "c" } } dup sort-keys = ] unit-test
