@@ -24,16 +24,16 @@ $nl
 ABOUT: "sequences-sorting"
 
 HELP: sort-with
-{ $values { "seq" sequence } { "quot" { $quotation ( obj1 obj2 -- <=> ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... obj1 obj2 -- ... <=> ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " into a new array using a stable sort." }
 { $notes "The algorithm used is the merge sort." } ;
 
 HELP: sort-by
-{ $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence." } ;
 
 HELP: inv-sort-by
-{ $values { "seq" sequence } { "quot" { $quotation ( elt -- key ) } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" sequence } { "quot" { $quotation ( ... elt -- ... key ) } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements of " { $snippet "seq" } " by applying " { $link compare } " with " { $snippet "quot" } " to each pair of elements in the sequence and inverting the results." } ;
 
 HELP: sort-keys
