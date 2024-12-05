@@ -168,19 +168,16 @@ PRIVATE>
     ] each ;
 
 : lower-median-index ( seq -- n )
-    [ midpoint@ ]
-    [ length odd? [ 1 - ] unless ] bi ;
+    [ midpoint ] [ length odd? [ 1 - ] unless ] bi ;
 
 : lower-median ( seq -- elt )
     [ ] [ lower-median-index ] bi kth-smallest ;
 
 : upper-median ( seq -- elt )
-    dup midpoint@ kth-smallest ;
+    dup midpoint kth-smallest ;
 
 : medians ( seq -- lower upper )
-    [ ]
-    [ [ lower-median-index ] [ midpoint@ ] bi 2array ]
-    bi kth-smallests first2 ;
+    dup [ lower-median-index ] [ midpoint ] bi 2array kth-smallests first2 ;
 
 : median ( seq -- x )
     dup length odd? [ lower-median ] [ medians + 2 / ] if ;
