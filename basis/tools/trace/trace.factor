@@ -9,7 +9,7 @@ IN: tools.trace
 <PRIVATE
 
 : callstack-depth ( callstack -- n )
-    callstack>array midpoint@ ;
+    callstack>array midpoint ;
 
 SYMBOL: end
 

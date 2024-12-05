@@ -906,11 +906,11 @@ PRIVATE>
     [ exchange-unsafe ]
     3tri ;
 
-: midpoint@ ( seq -- n ) length 2/ ; inline
+: midpoint ( seq -- n ) length 2/ ; inline
 
 : reverse! ( seq -- seq )
     [
-        [ midpoint@ ] [ length ] [ ] tri
+        [ midpoint ] [ length ] [ ] tri
         [ [ over - 1 - ] dip exchange-unsafe ] 2curry
         each-integer
     ] keep ;
@@ -1006,7 +1006,7 @@ PRIVATE>
     swap cut-slice [ swap suffix ] dip append ;
 
 : halves ( seq -- first-slice second-slice )
-    dup midpoint@ cut-slice ; inline
+    dup midpoint cut-slice ; inline
 
 <PRIVATE
 
