@@ -7,7 +7,7 @@ TUPLE: snipped < sequence-view
 { from integer read-only }
 { length integer read-only } ;
 
-: <snipped> ( from to seq -- snipped )
+:: <snipped> ( from to seq -- snipped )
     seq dup length :> n
     from to [ 0 n clamp ] bi@
     over - snipped boa ;
