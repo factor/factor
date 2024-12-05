@@ -46,13 +46,13 @@ TUPLE: merge-state
 : r-next ( merge -- )
     [ r-elt ] [ [ 1 + ] change-from2 accum>> ] bi push-unsafe ; inline
 
-: decide? ( merge quot: ( elt1 elt2 -- <=> ) -- ? )
+: decide? ( ... merge quot: ( ... elt1 elt2 -- ... <=> ) -- ... ? )
     [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
-: (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
+: (merge) ( ... merge quot: ( ... elt1 elt2 -- ... <=> ) -- ... )
     over r-done? [ drop dump-l ] [
         over l-done? [ drop dump-r ] [
-            2dup decide?
+            [ decide? ] 2keep rot
             [ over r-next ] [ over l-next ] if
             (merge)
         ] if
@@ -108,7 +108,7 @@ TUPLE: merge-state
 
 : sort-loop ( merge quot -- )
     [ 2 over seq>> length [ over > ] curry ] dip
-    [ [ 1 shift 2dup ] dip sort-pass ] curry
+    [ [ 1 shift ] dip [ sort-pass ] curry 2keep ] curry
     while 2drop ; inline
 
 : each-pair ( seq quot -- )
@@ -120,7 +120,7 @@ TUPLE: merge-state
         [ drop nip nth-unsafe ] dip push-unsafe
     ] [
         [
-            [ [ nth-unsafe ] curry bi@ 2dup ] dip call +gt+ eq?
+            [ [ nth-unsafe ] curry bi@ ] dip 2keep rot +gt+ eq?
             [ swap ] when
         ] dip [ push-unsafe ] curry bi@
     ] if ; inline
@@ -131,21 +131,21 @@ TUPLE: merge-state
 
 PRIVATE>
 
-: sort-with ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
+: sort-with ( ... seq quot: ( ... obj1 obj2 -- ... <=> ) -- ... sortedseq )
     [ <merge> ] dip
     [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ; inline
 
-: inv-sort-with ( seq quot: ( obj1 obj2 -- <=> ) -- sortedseq )
+: inv-sort-with ( ... seq quot: ( ... obj1 obj2 -- ... <=> ) -- ... sortedseq )
     '[ @ invert-comparison ] sort-with ; inline
 
 : sort ( seq -- sortedseq ) [ <=> ] sort-with ;
 
 : inv-sort ( seq -- sortedseq ) [ >=< ] sort-with ;
 
-: sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+: sort-by ( ... seq quot: ( ... elt -- ... key ) -- ... sortedseq )
     [ compare ] curry sort-with ; inline
 
-: inv-sort-by ( seq quot: ( elt -- key ) -- sortedseq )
+: inv-sort-by ( ... seq quot: ( ... elt -- ... key ) -- ... sortedseq )
     [ compare invert-comparison ] curry sort-with ; inline
 
 ALIAS: natural-sort sort ! temporary, deprecated
