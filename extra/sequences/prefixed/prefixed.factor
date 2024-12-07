@@ -4,8 +4,8 @@ USING: accessors kernel math math.order sequences sequences.private ;
 IN: sequences.prefixed
 
 TUPLE: prefixed
-{ elt object read-only }
-{ seq sequence read-only } ;
+{ seq sequence read-only }
+{ elt object read-only } ;
 
 C: <prefixed> prefixed
 
