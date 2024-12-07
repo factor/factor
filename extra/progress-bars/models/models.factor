@@ -1,8 +1,8 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar fonts io io.files io.files.info kernel
-math models models.arrow namespaces progress-bars threads
-ui.gadgets.labels ui.gadgets.panes ;
+math models models.arrow namespaces progress-bars sequences
+threads ui.gadgets.labels ui.gadgets.panes ;
 IN: progress-bars.models
 
 SYMBOL: progress-bar
@@ -40,4 +40,19 @@ SYMBOL: file-size
     ] with-progress-bar ; inline
 
 : with-progress-display ( quot -- )
-    '[ \ progress-bar get 50 <progress-display> gadget. @ ] with-progress-bar ; inline
+    [ \ progress-bar get 50 <progress-display> gadget. call ] with-progress-bar ; inline
+
+: map-with-progress-bar ( seq quot -- seq' )
+    [ dup length 1 - ] dip '[
+        [ _ / set-progress-bar @ ] map-index
+    ] with-progress-display ; inline
+
+: each-with-progress-bar ( seq quot -- )
+    [ dup length 1 - ] dip '[
+        [ _ / set-progress-bar @ ] each-index
+    ] with-progress-display ; inline
+
+: reduce-with-progress-bar ( seq identity quot -- )
+    [ over length 1 - ] dip '[
+        [ _ / set-progress-bar @ ] reduce-index
+    ] with-progress-display ; inline
