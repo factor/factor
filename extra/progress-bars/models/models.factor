@@ -38,3 +38,6 @@ SYMBOL: file-size
         [ update-file-progress drop ] compose
         with-file-reader
     ] with-progress-bar ; inline
+
+: with-progress-display ( quot -- )
+    '[ \ progress-bar get 50 <progress-display> gadget. @ ] with-progress-bar ; inline
