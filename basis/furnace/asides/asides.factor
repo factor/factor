@@ -6,7 +6,7 @@ furnace.utilities hashtables html.templates.chloe.syntax http
 http.server kernel logging math.parser namespaces urls ;
 IN: furnace.asides
 
-TUPLE: aside < server-state session method url post-data ;
+TUPLE: aside < server-state session method url data ;
 
 : <aside> ( id -- aside )
     aside new-server-state ;
@@ -15,7 +15,7 @@ aside "ASIDES" {
     { "session" "SESSION" BIG-INTEGER +not-null+ }
     { "method" "METHOD" { VARCHAR 10 } }
     { "url" "URL" URL }
-    { "post-data" "POST_DATA" FACTOR-BLOB }
+    { "data" "POST_DATA" FACTOR-BLOB }
 } define-persistent
 
 CONSTANT: aside-id-key "__a"
