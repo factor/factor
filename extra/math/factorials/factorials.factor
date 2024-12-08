@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: combinators combinators.short-circuit inverse kernel
-math math.functions math.primes ranges sequences ;
+math math.constants math.functions math.primes ranges sequences ;
 
 IN: math.factorials
 
@@ -123,3 +123,8 @@ PRIVATE>
     1 1 [ 2over > ] [ 1 + [ * ] keep ] while [ = ] dip and ;
 
 \ factorial [ reverse-factorial ] define-inverse
+
+: subfactorial ( n -- ? )
+    [ 1 ] [ factorial 1 + e /i ] if-zero ;
+
+ALIAS: !n subfactorial

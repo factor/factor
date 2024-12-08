@@ -80,3 +80,27 @@ USING: kernel math.factorials math.functions ranges sequences tools.test ;
 { 3 } [ 6 reverse-factorial ] unit-test
 { 1 } [ 1 reverse-factorial ] unit-test
 { f } [ 18 reverse-factorial ] unit-test
+
+{
+    {
+        1
+        0
+        1
+        2
+        9
+        44
+        265
+        1854
+        14833
+        133496
+        1334961
+        14684570
+        176214841
+        2290792932
+        32071101049
+        481066515734
+        7697064251745
+        130850092279664
+        2355301661033953
+    }
+} [ 19 <iota> [ subfactorial ] map ] unit-test
