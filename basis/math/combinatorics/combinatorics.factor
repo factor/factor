@@ -351,7 +351,7 @@ PRIVATE>
     selections-quot all? ; inline
 
 : find-selection ( ... seq n quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ 1check ] selections-quot find drop and* ; inline
+    '[ _ keep and ] selections-quot map-find drop ; inline
 
 : reduce-selections ( ... seq n identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-selection ; inline
