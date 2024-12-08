@@ -15,7 +15,7 @@ aside "ASIDES" {
     { "session" "SESSION" BIG-INTEGER +not-null+ }
     { "method" "METHOD" { VARCHAR 10 } }
     { "url" "URL" URL }
-    { "data" "POST_DATA" FACTOR-BLOB }
+    { "data" "DATA" FACTOR-BLOB }
 } define-persistent
 
 CONSTANT: aside-id-key "__a"
