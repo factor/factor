@@ -410,3 +410,6 @@ M:: vose random* ( obj rnd -- elt )
     dup obj probs>> nth-unsafe { float } declare rnd random-unit* >=
     [ obj alias>> nth-unsafe { fixnum } declare ] unless
     obj items>> nth-unsafe ;
+
+:: all-removals ( n seq -- seqs )
+    seq length <iota> n over '[ _ swap diff seq nths ] map-combinations ;
