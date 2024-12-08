@@ -217,7 +217,7 @@ PRIVATE>
     combinations-with-replacement-quot all? ; inline
 
 : find-combination-with-replacement ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ 1check ] combinations-with-replacement-quot find drop and* ; inline
+    '[ _ keep and ] combinations-with-replacement-quot map-find drop ; inline
 
 : reduce-combinations-with-replacement ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination-with-replacement ; inline
@@ -307,7 +307,7 @@ PRIVATE>
     combinations-quot all? ; inline
 
 : find-combination ( ... seq k quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ f ] 3dip '[ nip _ 1check ] combinations-quot find drop and* ; inline
+    '[ _ keep and ] combinations-quot map-find drop ; inline
 
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination ; inline
