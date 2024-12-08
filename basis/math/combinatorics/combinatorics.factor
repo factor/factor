@@ -96,7 +96,7 @@ DEFER: next-permutation
 
 <PRIVATE
 
-: <permutation-iota> ( seq -- <iota> )
+: <permutation-iota> ( seq -- iota )
     length factorial <iota> ; inline
 
 : permutations-quot ( seq quot -- seq quot' )
@@ -121,8 +121,7 @@ PRIVATE>
     permutations-quot all? ; inline
 
 : find-permutation ( ... seq quot: ( ... elt -- ... ? ) -- ... elt/f )
-    [ permutations-quot find drop ]
-    [ drop over [ permutation ] [ 2drop f ] if ] 2bi ; inline
+    '[ _ keep and ] permutations-quot map-find drop ; inline
 
 : reduce-permutations ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each-permutation ; inline
