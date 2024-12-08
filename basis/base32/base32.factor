@@ -207,8 +207,7 @@ CONSTANT: zbase32-alphabet $[ "ybndrfg8ejkmcpqxot1uwisza345h769" >byte-array ]
     ] with B{ } map-as ; inline
 
 : zencode-pad ( seq n -- byte-array )
-    [ 5 0 pad-tail zencode5 ] [ B{ 0 2 4 5 7 } nth ] bi* head-slice
-    8 CHAR: = pad-tail ; inline
+    [ 5 0 pad-tail zencode5 ] [ B{ 0 2 4 5 7 } nth ] bi* head ;
 
 : (encode-zbase32) ( stream column -- )
     5 pick stream-read dup length {
