@@ -90,6 +90,8 @@ USING: base32 byte-arrays kernel sequences strings tools.test ;
 { 0 } [ "0" base32-crockford> ] unit-test
 { 0 } [ "00" base32-crockford-checksum> ] unit-test
 
+{ t } [ 256 <iota> >byte-array dup >zbase32 zbase32> = ] unit-test
+
 { "" } [ "" >zbase32 >string ] unit-test
 { "ca" } [ "f" >zbase32 >string ] unit-test
 { "c3zo" } [ "fo" >zbase32 >string ] unit-test
