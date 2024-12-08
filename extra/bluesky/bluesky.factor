@@ -78,7 +78,7 @@ DEFER: bluesky-get-session
 ! default: posts_with_replies
 ! includePins: true, false
 : bluesky-get-feed ( linked-assoc -- feed )
-    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed?%s" >url
+    "https://bsky.social/xrpc/app.bsky.feed.getAuthorFeed" >url
         swap set-query-params bluesky-get-json ;
 
 : bluesky-get-feed-default ( actor -- feed )
