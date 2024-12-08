@@ -26,6 +26,15 @@ HELP: >base32-crockford
 { $values { "n" integer } { "base32" sequence } }
 { $description "Encode from Douglas Crockford's Base32 encoding." } ;
 
+HELP: >zbase32
+{ $values { "seq" sequence } { "zbase32" sequence } }
+{ $description "Encode into the \"human-oriented\" Base32 encoding." } ;
+
+HELP: zbase32>
+{ $values { "zbase32" sequence } { "seq" sequence } }
+{ $description "Decode from the \"human-oriented\" Base32 encoding." } ;
+
+
 ARTICLE: "base32" "Base32 conversions"
 "The " { $vocab-link "base32" } " vocabulary supports encoding and decoding of various Base32 encoding formats, including:"
 $nl
@@ -45,6 +54,11 @@ $nl
     base32-crockford>
     >base32-crockford-checksum
     base32-crockford-checksum>
+}
+"Human-oriented Base32 encoding:"
+{ $subsections
+    >zbase32
+    zbase32>
 } ;
 
 ABOUT: "base32"
