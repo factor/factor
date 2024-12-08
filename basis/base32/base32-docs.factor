@@ -34,7 +34,6 @@ HELP: zbase32>
 { $values { "zbase32" sequence } { "seq" sequence } }
 { $description "Decode from the \"human-oriented\" Base32 encoding." } ;
 
-
 ARTICLE: "base32" "Base32 conversions"
 "The " { $vocab-link "base32" } " vocabulary supports encoding and decoding of various Base32 encoding formats, including:"
 $nl
@@ -55,7 +54,7 @@ $nl
     >base32-crockford-checksum
     base32-crockford-checksum>
 }
-"Human-oriented Base32 encoding:"
+"Human-oriented Base32 encoding, described in " { $url "http://philzimmermann.com/docs/human-oriented-base-32-encoding.txt" } ":"
 { $subsections
     >zbase32
     zbase32>
