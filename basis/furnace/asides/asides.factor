@@ -55,7 +55,7 @@ M: asides call-responder*
         swap >>url
         session get id>> >>session
         request get method>> >>method
-        request get data>> data
+        request get data>> >>data
     [ touch-aside ] [ insert-tuple ] [ set-aside ] tri ;
 
 : end-aside-post ( aside -- response )
