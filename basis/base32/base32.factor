@@ -58,11 +58,9 @@ PRIVATE>
     [ write ] [ B{ 0 4 0 3 2 0 1 } nth head-slice write ] if-zero ; inline
 
 : (decode-base32) ( stream -- )
-    8 "\n\r" pick read-ignoring dup length {
-        { 0 [ 2drop ] }
-        { 8 [ decode8 (decode-base32) ] }
-        [ drop 8 CHAR: = pad-tail decode8 (decode-base32) ]
-    } case ;
+    8 "\n\r" pick read-ignoring [ drop ] [
+        8 CHAR: = pad-tail decode8 (decode-base32)
+    ] if-empty ;
 
 PRIVATE>
 
@@ -129,11 +127,9 @@ PRIVATE>
     [ write ] [ B{ 0 4 0 3 2 0 1 } nth head-slice write ] if-zero ; inline
 
 : (decode-base32hex) ( stream -- )
-    8 "\n\r" pick read-ignoring dup length {
-        { 0 [ 2drop ] }
-        { 8 [ decode8hex (decode-base32hex) ] }
-        [ drop 8 CHAR: = pad-tail decode8hex (decode-base32hex) ]
-    } case ;
+    8 "\n\r" pick read-ignoring [ drop ] [
+        8 CHAR: = pad-tail decode8hex (decode-base32hex)
+    ] if-empty ;
 
 PRIVATE>
 
@@ -232,11 +228,9 @@ PRIVATE>
     [ write ] [ B{ 0 4 0 3 2 0 1 } nth head-slice write ] if-zero ; inline
 
 : (decode-zbase32) ( stream -- )
-    8 "\n\r" pick read-ignoring dup length {
-        { 0 [ 2drop ] }
-        { 8 [ zdecode8 (decode-zbase32) ] }
-        [ drop 8 CHAR: = pad-tail zdecode8 (decode-zbase32) ]
-    } case ;
+    8 "\n\r" pick read-ignoring [ drop ] [
+        8 CHAR: = pad-tail zdecode8 (decode-zbase32)
+    ] if-empty ;
 
 PRIVATE>
 
