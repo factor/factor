@@ -28,8 +28,7 @@ CONSTANT: alphabet $[
     [ length 2 < [ drop 2byte-array ] [ 3byte-array ] if ] bi ; inline
 
 : (encode-base45) ( stream -- )
-    2 over stream-read dup length zero?
-    [ 2drop ] [ encode2 write (encode-base45) ] if ;
+    2 over stream-read [ drop ] [ encode2 write (encode-base45) ] if-empty ;
 
 PRIVATE>
 
@@ -43,8 +42,8 @@ PRIVATE>
     [ length 3 < [ write1 ] [ 256 /mod [ write1 ] bi@ ] if ] bi ; inline
 
 : (decode-base45) ( stream -- )
-    3 "\n\r" pick read-ignoring dup length zero?
-    [ 2drop ] [ decode3 (decode-base45) ] if ;
+    3 "\n\r" pick read-ignoring
+    [ drop ] [ decode3 (decode-base45) ] if-empty ;
 
 PRIVATE>
 
