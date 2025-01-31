@@ -4,7 +4,8 @@ USING: sequences tools.test ;
 IN: discord.chatgpt-bot
 
 ! "What's the best mix of dogs that is not recognized by the AKC?"
-! '{ { "role" "user" } { "content" _ } } >hashtable <chat-completion> chat-completions
+! 'H{ { "role" "user" } { "content" _ } } 1array "DeepSeek-R1-Distill-Qwen-7B-GGUF" <chat-completion>
+! [ chat-completions ] with-lmstudio
 CONSTANT: chatgpt-response H{
     { "id" "chatcmpl-75jBVGPgxxmuTOLvGVprcuSW3Vol6" }
     {
