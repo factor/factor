@@ -1,13 +1,13 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: base91 combinators command-line escape-strings io.backend
-io.directories io.encodings.binary io.encodings.utf8 io.files
-io.files.info io.pathnames kernel math namespaces sequences
-splitting ;
+USING: base91 combinators combinators.short-circuit command-line
+escape-strings io.backend io.directories io.encodings.binary
+io.encodings.utf8 io.files io.files.info io.pathnames kernel
+math namespaces prettyprint sequences splitting unicode ;
 IN: tools.directory-to-file
 
 : file-is-text? ( path -- ? )
-    binary file-contents [ 127 < ] all? ;
+    utf8 file-contents [ { [ printable? ] [ blank? ] } 1|| ] all? ;
 
 : directory-repr ( path -- obj )
     escape-simplest
@@ -40,7 +40,8 @@ IN: tools.directory-to-file
 
 : directory-to-file ( path -- )
     [ directory-to-string ] keep canonicalize-path ".modern" append
-    utf8 set-file-contents ;
+    [ utf8 set-file-contents ]
+    [  >pathname . ] bi ;
 
 : directory-to-file-main ( -- )
     command-line get dup length 1 = [ "oops" throw ] unless first
