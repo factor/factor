@@ -424,6 +424,9 @@ PRIVATE>
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; inline
 : ??nth-of ( seq n -- elt/f ? ) swap ??nth ; inline
 
+: deep-nth ( index-seq nested-seq -- elt ) [ nth-of ] reduce ;
+: deep-nth-of ( nested-seq index-seq -- elt ) [ nth-of ] each ;
+
 : reduce-of ( seq quot: ( prev elt -- next ) identity -- result )
     swap reduce ; inline
 
