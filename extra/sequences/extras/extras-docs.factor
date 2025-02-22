@@ -1084,7 +1084,7 @@ Note that this usage of \"deep\" is different from those in " { $vocab-link "seq
   }
   "An " { $snippet index-seq } " with one element is the same as calling " { $link nth } " with that element:"
   { $example
-    "USING: sequences.extras prettyprint ;"
+    "USING: kernel sequences sequences.extras prettyprint ;"
     "{ 1 } \"abc\" deep-nth"
     "1 \"abc\" nth = ."
     "t"
@@ -1115,7 +1115,7 @@ Note that this usage of \"deep\" is different from those in " { $vocab-link "seq
   }
   "An " { $snippet index-seq } " with one element is the same as calling " { $link nth-of } " with that element:"
   { $example
-    "USING: sequences.extras prettyprint ;"
+    "USING: kernel sequences.extras prettyprint ;"
     "\"abc\" { 1 } deep-nth-of"
     "\"abc\" 1 nth-of = ."
     "t"
