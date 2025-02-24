@@ -146,17 +146,17 @@ HELP: >continuation<
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc
-{ $values { "capture" { $quotation ( continuation -- initial ) } } { "restore" { $quotation ( obj -- obj' ) } } { "obj" "an object provided when resuming the continuation or initial" } }
+{ $values { "capture" { $quotation ( ..a continuation -- ..b initial ) } } { "restore" { $quotation ( ..a obj -- ..b obj' ) } } { "obj" "an object provided when resuming the continuation or initial" } }
 { $description "Reifies a continuation from the point immediately after which this word would return, and passes it to " { $snippet "capture" } ". Every time the continuation is resumed using " { $link continue-with } " and a new " { $snippet "obj" } " , " { $snippet "restore" } " is called first with " { $snippet "obj" } " on the stack, and then execution continues. If " { $snippet "capture" } " returns, execution continues with " { $snippet "initial" } " on the stack." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
 HELP: callcc0
-{ $values { "quot" { $quotation ( continuation -- ) } } }
+{ $values { "quot" { $quotation ( ... continuation -- ... ) } } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which this word would return. Every time the continuation is resumed, execution continues. The " { $link continue } " word is usually used to resume the continuation because any new value is actually just dropped. If " { $snippet "quot" } " returns, execution also continues." } ;
 
 HELP: callcc1
-{ $values { "quot" { $quotation ( continuation -- initial ) } } { "obj" "an object provided when resuming the continuation or initial" } }
+{ $values { "quot" { $quotation ( ... continuation -- ... initial ) } } { "obj" "an object provided when resuming the continuation or initial" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which this word would return. Every time the continuation is resumed using " { $link continue-with } " and a new " { $snippet "obj" } ", execution continues with " { $snippet "obj" } " on the stack. If " { $snippet "quot" } " returns, execution continues with " { $snippet "initial" } " on the stack." } ;
 
 HELP: continue
@@ -187,7 +187,7 @@ HELP: throw
 { cleanup recover finally } related-words
 
 HELP: cleanup
-{ $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } { "cleanup-error" { $quotation ( ..b -- ..b ) } } }
+{ $values { "try" { $quotation ( ..a -- ..a ) } } { "cleanup-always" { $quotation ( ..a -- ..b ) } } { "cleanup-error" { $quotation ( ..b error -- ..b ) } } }
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: finally
@@ -199,11 +199,11 @@ HELP: recover
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-error
-{ $values { "quot" quotation } { "check" quotation } }
+{ $values { "quot" { $quotation ( ... -- ... ) } } { "check" ( ... error -- ... ? ) } }
 { $description "Calls the quotation. If an exception is thrown which is matched by the 'check' quotation it is ignored. Otherwise the error is rethrown." } ;
 
 HELP: ignore-error/f
-{ $values { "quot" quotation } { "check" quotation } { "x/f" { $maybe object } } }
+{ $values { "quot" { $quotation ( ... -- ... x ) } } { "check" ( ... error -- ... ? ) } { "x/f" { $maybe object } } }
 { $description "Like " { $link ignore-error } ", but if a matched exception is thrown " { $link f } " is put on the stack." } ;
 
 HELP: ignore-errors
@@ -290,7 +290,7 @@ HELP: return
 
 HELP: with-return
 { $values
-    { "quot" { $quotation ( obj -- obj' ) } } }
+    { "quot" { $quotation ( ... -- ... ) } } }
 { $description "Reifies a continuation from the point immediately after which this word would return and allows calling the " { $link return } " in " { $snippet "quot" } " to easily resume the continuation and continue execution. If " { $link return } " is not called and " { $snippet "quot" } " returns, then execution continues (as if this word were simply " { $link call } ")." }
 { $examples
     "Only \"Hi\" will print:"
