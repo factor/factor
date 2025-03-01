@@ -371,7 +371,7 @@ ARTICLE: "mouse-gestures" "Mouse gestures"
     button-up
 }
 "When a mouse button is pressed or released, two gestures are sent. The first gesture indicates the specific button number, and if this gesture is not handled, the second has a button number set to " { $link f } ":"
-{ $code "T{ button-down f 1 }" "T{ button-down f f }" }
+{ $code "T{ button-down f f 1 }" "T{ button-down f f f }" }
 "Because tuple literals fill unspecified slots with " { $link f } ", the last gesture can be written as " { $snippet "T{ button-down }" } "."
 $nl
 "Gestures to indicate mouse motion, depending on whenever a button is held down or not:"
