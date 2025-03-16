@@ -296,7 +296,7 @@ HELP: divisor?
 
 HELP: mod-inv
 { $values { "x" integer } { "n" integer } { "y" integer } }
-{ $description "Outputs an integer " { $snippet "y" } " such that " { $snippet "x*y = 1 (mod n)" } "." }
+{ $description "Outputs a positive integer " { $snippet "y" } " such that " { $snippet "x*y = 1 (mod n)" } "." }
 { $errors "Throws an error if " { $snippet "x" } " is not invertible modulo " { $snippet "n" } "." }
 { $examples
     { $example "USING: math.functions prettyprint ;" "173 1119 mod-inv ." "815" }
