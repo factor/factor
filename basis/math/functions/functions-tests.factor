@@ -1,5 +1,6 @@
-USING: kernel literals math math.constants math.functions math.libm
-math.order ranges math.private sequences tools.test math.floats.env ;
+USING: accessors kernel literals math math.constants
+math.floats.env math.functions math.functions.private math.libm
+math.order ranges sequences tools.test ;
 
 IN: math.functions.tests
 
@@ -165,8 +166,16 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { 78572682077 } [ 234829342 342389423843 mod-inv ] unit-test
 
 [ 2 10 mod-inv ] must-fail
+[ 10 2 mod-inv ] [ [ non-trivial-divisor? ] [ n>> 2 = ] bi and ] must-fail-with
 
 { t } [ 15 37 137 ^mod 15 37 ^ 137 mod = ] unit-test
+
+{ -2 } [ 17 19 >minimum-mod ] unit-test
+{ 17 } [ -2 19 >positive-mod ] unit-test
+
+{ -2 } [ 10 7 [ mod-inv ] keep >minimum-mod ] unit-test
+{ 4 } [ 10 13 [ mod-inv ] keep >minimum-mod ] unit-test
+{ -14 } [ 10 47 [ mod-inv ] keep >minimum-mod ] unit-test
 
 { t } [ 0 0 ^ fp-nan? ] unit-test
 { 1 } [ 10 0 ^ ] unit-test
