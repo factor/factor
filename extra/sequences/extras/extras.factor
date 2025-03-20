@@ -532,6 +532,9 @@ PRIVATE>
 : 2map-sum ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... n ) -- ... n )
     [ 0 ] 3dip [ dip + ] curry [ rot ] prepose 2each ; inline
 
+: 2none? ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... ? )
+    2any? not ; inline
+
 : 2count ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... n )
     [ 1 0 ? ] compose 2map-sum ; inline
 
