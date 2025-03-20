@@ -144,7 +144,8 @@ PRIVATE>
     rdap-url get [ "https://root.rdap.org/" ] unless* ;
 
 : rdap-search ( pattern path key -- results )
-    swapd [ rdap-search-url ] [ derive-url ] [ set-query-param ] tri* rdap-get nip ;
+    swapd [ rdap-search-url ] 3dip [ derive-url ] 2dip
+    set-query-param rdap-get nip ;
 
 PRIVATE>
 
