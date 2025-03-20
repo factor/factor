@@ -133,9 +133,13 @@ PRIVATE>
     URL" https://root.rdap.org/domains" clone
     swap "name" set-query-param rdap-get nip ;
 
-: search-domains-by-ip ( ip -- results )
+: search-domains-by-nameserver ( pattern -- results )
     URL" https://root.rdap.org/domains" clone
-    swap "ip" set-query-param rdap-get nip ;
+    swap "nsLdhName" set-query-param rdap-get nip ;
+
+: search-domains-by-nameserver-ip ( ip -- results )
+    URL" https://root.rdap.org/domains" clone
+    swap "nsIp" set-query-param rdap-get nip ;
 
 : search-nameservers-by-name ( pattern -- results )
     URL" https://root.rdap.org/nameservers" clone
