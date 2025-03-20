@@ -23,6 +23,9 @@ USING: ip-parser kernel sequences tools.test ;
 { "74.125.226.4" } [ 1249763844 ipv4-ntoa ] unit-test
 { 1249763844 } [ "74.125.226.4" ipv4-aton ] unit-test
 
+{ t } [ "1.1.1.1" "1.0.0.0/8" ipv4-contains? ] unit-test
+{ f } [ "10.0.0.1" "1.0.0.0/8" ipv4-contains? ] unit-test
+
 { { 0 0 0 0 0 0 0 1 } } [ "::1" parse-ipv6 ] unit-test
 
 { t } [
@@ -42,3 +45,6 @@ USING: ip-parser kernel sequences tools.test ;
 
 { { 65152 0 0 0 29762 6399 65122 31588 } }
 [ "fe80::7442:18ff:fe62:7b64%en0" parse-ipv6 ] unit-test
+
+{ t } [ "2001:4200::1" "2001:4200::/23" ipv6-contains? ] unit-test
+{ f } [ "2001:5200::1" "2001:4200::/23" ipv6-contains? ] unit-test

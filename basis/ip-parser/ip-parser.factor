@@ -1,9 +1,10 @@
 ! Copyright (C) 2012-2014 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: byte-arrays combinators combinators.short-circuit endian
-grouping hex-strings kernel math math.bitwise math.parser regexp
-sequences splitting ;
+USING: accessors byte-arrays combinators
+combinators.short-circuit endian grouping hex-strings kernel
+math math.bitwise math.parser regexp sequences splitting strings
+;
 
 IN: ip-parser
 
@@ -88,3 +89,27 @@ PRIVATE>
 
 : ipv6-aton ( ip -- integer )
     parse-ipv6 0 [ [ 16 shift ] [ + ] bi* ] reduce ;
+
+TUPLE: ipv4-network base bits ;
+
+GENERIC: >ipv4-network ( object -- ipv4-network )
+M: ipv4-network >ipv4-network ;
+M: string >ipv4-network
+    "/" split1 [ ipv4-aton ] [ string>number ] bi* ipv4-network boa ;
+
+: ipv4-contains? ( ipv4 ipv4-network -- ? )
+    [ dup string? [ ipv4-aton ] when ] dip
+    >ipv4-network [ base>> ] [ bits>> ] bi
+    [ on-bits ] [ 32 swap - shift ] bi swapd mask = ;
+
+TUPLE: ipv6-network base bits ;
+
+GENERIC: >ipv6-network ( object -- ipv6-network )
+M: ipv6-network >ipv6-network ;
+M: string >ipv6-network
+    "/" split1 [ ipv6-aton ] [ string>number ] bi* ipv6-network boa ;
+
+: ipv6-contains? ( ipv6 ipv6-network -- ? )
+    [ dup string? [ ipv6-aton ] when ] dip
+    >ipv6-network [ base>> ] [ bits>> ] bi
+    [ on-bits ] [ 128 swap - shift ] bi swapd mask = ;
