@@ -38,21 +38,19 @@ CONSTANT: bootstrap-files { "asn" "dns" "ipv4" "ipv6" "object-tags" }
     "dns" bootstrap-get parse-services ;
 
 : ipv4-bootstrap ( -- services )
-    "ipv4" bootstrap-get parse-services [
-        [ "/" split1 [ ipv4-aton ] [ string>number ] bi* 2array ] dip
-    ] assoc-map ;
+    "ipv4" bootstrap-get parse-services
+    [ [ >ipv4-network ] dip ] assoc-map ;
 
 : ipv6-bootstrap ( -- services )
-    "ipv6" bootstrap-get parse-services [
-        [ "/" split1 [ ipv6-aton ] [ string>number ] bi* 2array ] dip
-    ] assoc-map ;
+    "ipv6" bootstrap-get parse-services
+    [ [ >ipv6-network ] dip ] assoc-map ;
 
 : object-bootstrap ( -- services )
     "object-tags" bootstrap-get "services" of ;
 
 : asn-endpoints ( asn -- urls )
-    asn-bootstrap >alist [ first first2 between? ] with find nip
-    dup [ second ] when ;
+    asn-bootstrap
+    [ drop swap first2 between? ] with assoc-find drop nip ;
 
 : split-domain ( domain -- domains )
     "." split dup length <iota> [ tail "." join ] with map ;
@@ -61,20 +59,12 @@ CONSTANT: bootstrap-files { "asn" "dns" "ipv4" "ipv6" "object-tags" }
     split-domain [ dns-bootstrap at ] map-find drop ;
 
 : ipv4-endpoints ( ipv4 -- urls )
-    ipv4-aton ipv4-bootstrap >alist [
-        first first2 [ on-bits ] [ 32 swap - shift ] bi swapd mask =
-    ] with find nip dup [ second ] when ;
+    ipv4-aton ipv4-bootstrap
+    [ drop swap ipv4-contains? ] with assoc-find drop nip ;
 
 : ipv6-endpoints ( ipv4 -- urls )
-    ipv6-aton ipv6-bootstrap >alist [
-        first first2 [ on-bits ] [ 128 swap - shift ] bi swapd mask =
-    ] with find nip dup [ second ] when ;
-
-CONSTANT: rdap-fallbacks {
-    "https://rdap.arin.net/registry/"
-    "https://rdap.db.ripe.net/"
-    "https://rdap.apnic.net/"
-}
+    ipv6-aton ipv6-bootstrap
+    [ drop swap ipv6-contains? ] with assoc-find drop nip ;
 
 CONSTANT: rir-endpoints H{
     { "afnic" "https://rdap.nic.fr/" }
