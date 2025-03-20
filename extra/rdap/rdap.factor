@@ -140,17 +140,14 @@ PRIVATE>
 GENERIC: print-rdap-nested ( padding key value -- )
 
 M: linked-assoc print-rdap-nested
-    [ over write write ":" print ] dip [
-        [ dup "  " append ] 2dip print-rdap-nested
-    ] assoc-each drop ;
+    [ over write write ":" print "  " append ] dip
+    [ swapd print-rdap-nested ] with assoc-each ;
 
 M: array print-rdap-nested
     [ print-rdap-nested ] 2with each ;
 
 M: object print-rdap-nested
-    present [ 2drop ] [
-        [ [ write ] bi@ ": " write ] dip print
-    ] if-empty ;
+    present [ 2drop ] [ [ ": " [ write ] tri@ ] dip print ] if-empty ;
 
 PRIVATE>
 
