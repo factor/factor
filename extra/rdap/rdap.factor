@@ -107,6 +107,9 @@ PRIVATE>
 : lookup-entity ( entity -- results )
     [ entity-endpoint ] [ "entity/%s" sprintf derive-url rdap-get nip ] bi ;
 
+: lookup-nameserver ( nameserver -- results )
+    [ domain-endpoints random ] [ "nameserver/%s" sprintf derive-url rdap-get nip ] bi ;
+
 <PRIVATE
 
 GENERIC: print-rdap-nested ( padding key value -- )
@@ -125,3 +128,27 @@ PRIVATE>
 
 : print-rdap ( results -- )
     [ "" -rot print-rdap-nested ] assoc-each ;
+
+: search-domains-by-name ( pattern -- results )
+    URL" https://root.rdap.org/domains" clone
+    swap "name" set-query-param rdap-get nip ;
+
+: search-domains-by-ip ( ip -- results )
+    URL" https://root.rdap.org/domains" clone
+    swap "ip" set-query-param rdap-get nip ;
+
+: search-nameservers-by-name ( pattern -- results )
+    URL" https://root.rdap.org/nameservers" clone
+    swap "name" set-query-param rdap-get nip ;
+
+: search-nameservers-by-ip ( ip -- results )
+    URL" https://root.rdap.org/nameservers" clone
+    swap "ip" set-query-param rdap-get nip ;
+
+: search-entities-by-name ( pattern -- results )
+    URL" https://root.rdap.org/entities" clone
+    swap "fn" set-query-param rdap-get nip ;
+
+: search-entities-by-handle ( pattern -- results )
+    URL" https://root.rdap.org/entities" clone
+    swap "handle" set-query-param rdap-get nip ;
