@@ -1,12 +1,11 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs calendar combinators formatting http
-http.client http.download io io.directories io.encodings.string
-io.encodings.utf8 io.files.temp io.pathnames ip-parser json
-kernel linked-assocs make math math.bitwise math.order
-math.parser namespaces present random ranges sequences splitting
-strings urls ;
+USING: arrays assocs calendar formatting http http.client
+http.download io io.directories io.encodings.string
+io.encodings.utf8 io.files.temp ip-parser json kernel
+linked-assocs math.order math.parser namespaces present random
+sequences splitting strings urls ;
 
 IN: rdap
 
