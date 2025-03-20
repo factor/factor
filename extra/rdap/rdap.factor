@@ -26,79 +26,61 @@ CONSTANT: bootstrap-files { "asn" "dns" "ipv4" "ipv6" "object-tags" }
     bootstrap-url cache-directory bootstrap-cache get
     download-outdated-into path>json ;
 
-: parse-services ( data -- services )
-    [ "services" of [ swap [ ,, ] with each ] assoc-each ] LH{ } make ;
+: parse-services ( data quot: ( key -- key' ) -- services )
+    [ "services" of ] dip '[ [ _ map ] dip ] assoc-map ; inline
+
+: parse-range ( key -- {a,b} )
+    "-" split1 over or [ string>number ] bi@ 2array ;
 
 : asn-bootstrap ( -- services )
-    "asn" bootstrap-get parse-services [
-        [ "-" split1 over or [ string>number ] bi@ 2array ] dip
-    ] assoc-map ;
+    "asn" bootstrap-get [ parse-range ] parse-services ;
 
 : dns-bootstrap ( -- services )
-    "dns" bootstrap-get parse-services ;
+    "dns" bootstrap-get "services" of ;
 
 : ipv4-bootstrap ( -- services )
-    "ipv4" bootstrap-get parse-services
-    [ [ >ipv4-network ] dip ] assoc-map ;
+    "ipv4" bootstrap-get [ >ipv4-network ] parse-services ;
 
 : ipv6-bootstrap ( -- services )
-    "ipv6" bootstrap-get parse-services
-    [ [ >ipv6-network ] dip ] assoc-map ;
+    "ipv6" bootstrap-get [ >ipv6-network ] parse-services ;
 
 : object-bootstrap ( -- services )
-    "object-tags" bootstrap-get "services" of ;
+    "object-tags" bootstrap-get "services" of [ rest ] map ;
+
+: search-services ( services quot: ( key -- ? ) -- urls )
+    '[ drop _ any? ] assoc-find drop nip ; inline
 
 : asn-endpoints ( asn -- urls )
-    asn-bootstrap
-    [ drop swap first2 between? ] with assoc-find drop nip ;
+    asn-bootstrap [ first2 between? ] with search-services ;
 
 : split-domain ( domain -- domains )
     "." split dup length <iota> [ tail "." join ] with map ;
 
 : domain-endpoints ( domain -- urls )
-    split-domain [ dns-bootstrap at ] map-find drop ;
+    split-domain dns-bootstrap [ swap member? ] with search-services ;
 
 : ipv4-endpoints ( ipv4 -- urls )
-    ipv4-aton ipv4-bootstrap
-    [ drop swap ipv4-contains? ] with assoc-find drop nip ;
+    ipv4-aton ipv4-bootstrap [ ipv4-contains? ] with search-services ;
 
 : ipv6-endpoints ( ipv4 -- urls )
-    ipv6-aton ipv6-bootstrap
-    [ drop swap ipv6-contains? ] with assoc-find drop nip ;
+    ipv6-aton ipv6-bootstrap [ ipv6-contains? ] with search-services ;
 
 CONSTANT: rir-endpoints H{
-    { "afnic" "https://rdap.nic.fr/" }
-    { "afrinic" "https://rdap.afrinic.net/rdap/" }
-    { "arin" "https://rdap.arin.net/registry/" }
-    { "apnic" "https://rdap.apnic.net/" }
-    { "jpnic" "https://jpnic.rdap.apnic.net/" }
-    { "idnic" "https://idnic.rdap.apnic.net/" }
-    { "krnic" "https://krnic.rdap.apnic.net/" }
-    { "lacnic" "https://rdap.lacnic.net/rdap/" }
-    { "registro.br" "https://rdap.registro.br/" }
-    { "ripe" "https://rdap.db.ripe.net/" }
-    { "twnic" "https://twnic.rdap.apnic.net/" }
-}
-
-CONSTANT: rir-entity-prefixes H{
-    { "AFNIC" "afnic" }
-    { "AFRINIC" "afrinic" }
-    { "ARIN" "arin" }
-    { "AP" "apnic" }
-    { "JPNIC" "jpnic" }
-    { "KR" "krnic" }
-    { "ID" "idnic" }
-    { "LACNIC" "lacnic" }
-    { "BR" "registro.br" } ! registro.br currently does not use entity prefixes
-    { "RIPE" "ripe" }
-    { "TW" "twnic" }
-
+    { { "AFNIC" } "https://rdap.nic.fr/" }
+    { { "AFRINIC" } "https://rdap.afrinic.net/rdap/" }
+    { { "ARIN" } "https://rdap.arin.net/registry/" }
+    { { "AP" } "https://rdap.apnic.net/" }
+    { { "JP" } "https://jpnic.rdap.apnic.net/" }
+    { { "ID" } "https://idnic.rdap.apnic.net/" }
+    { { "KR" } "https://krnic.rdap.apnic.net/" }
+    { { "LACNIC" } "https://rdap.lacnic.net/rdap/" }
+    { { "BR" } "https://rdap.registro.br/" }
+    { { "RIPE" } "https://rdap.db.ripe.net/" }
+    { { "TW" } "https://twnic.rdap.apnic.net/" }
 }
 
 : entity-endpoint ( entity -- url )
-    rir-entity-prefixes >alist [
-        first [ head? ] [ tail? ] bi-curry bi or
-    ] with find nip dup [ second ] when rir-endpoints at ;
+    rir-endpoints [ [ head? ] [ tail? ] bi-curry bi or ] with search-services ;
 
 : accept-rdap ( request -- request )
     "application/rdap+json" "Accept" set-header ;
