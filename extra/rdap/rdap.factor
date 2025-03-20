@@ -91,24 +91,35 @@ CONSTANT: rir-endpoints H{
 
 PRIVATE>
 
+SYMBOL: rdap-url
+
+: with-rdap ( url quot -- )
+    rdap-url swap with-variable ; inline
+
 : lookup-asn ( asn -- results )
     dup string? [ "AS" ?head drop string>number ] when
-    [ asn-endpoints random ] [ "autnum/%d" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ asn-endpoints random ] if* ]
+    [ "autnum/%d" sprintf derive-url rdap-get nip ] bi ;
 
 : lookup-domain ( domain -- results )
-    [ domain-endpoints random ] [ "domain/%s" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ domain-endpoints random ] if* ]
+    [ "domain/%s" sprintf derive-url rdap-get nip ] bi ;
 
 : lookup-ipv4 ( ipv4 -- results )
-    [ ipv4-endpoints random ] [ "ip/%s" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ ipv4-endpoints random ] if* ]
+    [ "ip/%s" sprintf derive-url rdap-get nip ] bi ;
 
 : lookup-ipv6 ( ipv6 -- results )
-    [ ipv6-endpoints random ] [ "ip/%s" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ ipv6-endpoints random ] if* ]
+    [ "ip/%s" sprintf derive-url rdap-get nip ] bi ;
 
 : lookup-entity ( entity -- results )
-    [ entity-endpoint ] [ "entity/%s" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ entity-endpoint ] if* ]
+    [ "entity/%s" sprintf derive-url rdap-get nip ] bi ;
 
 : lookup-nameserver ( nameserver -- results )
-    [ domain-endpoints random ] [ "nameserver/%s" sprintf derive-url rdap-get nip ] bi ;
+    [ rdap-url get [ nip ] [ domain-endpoints random ] if* ]
+    [ "nameserver/%s" sprintf derive-url rdap-get nip ] bi ;
 
 <PRIVATE
 
@@ -129,30 +140,37 @@ PRIVATE>
 : print-rdap ( results -- )
     [ "" -rot print-rdap-nested ] assoc-each ;
 
+<PRIVATE
+
+: rdap-search-url ( -- url )
+    rdap-url get [ "https://root.rdap.org/" ] unless* ;
+
+PRIVATE>
+
 : search-domains-by-name ( pattern -- results )
-    URL" https://root.rdap.org/domains" clone
+    rdap-search-url "domains" derive-url
     swap "name" set-query-param rdap-get nip ;
 
 : search-domains-by-nameserver ( pattern -- results )
-    URL" https://root.rdap.org/domains" clone
+    rdap-search-url "domains" derive-url
     swap "nsLdhName" set-query-param rdap-get nip ;
 
 : search-domains-by-nameserver-ip ( ip -- results )
-    URL" https://root.rdap.org/domains" clone
+    rdap-search-url "domains" derive-url
     swap "nsIp" set-query-param rdap-get nip ;
 
 : search-nameservers-by-name ( pattern -- results )
-    URL" https://root.rdap.org/nameservers" clone
+    rdap-search-url "nameservers" derive-url
     swap "name" set-query-param rdap-get nip ;
 
 : search-nameservers-by-ip ( ip -- results )
-    URL" https://root.rdap.org/nameservers" clone
+    rdap-search-url "nameservers" derive-url
     swap "ip" set-query-param rdap-get nip ;
 
 : search-entities-by-name ( pattern -- results )
-    URL" https://root.rdap.org/entities" clone
+    rdap-search-url "entities" derive-url
     swap "fn" set-query-param rdap-get nip ;
 
 : search-entities-by-handle ( pattern -- results )
-    URL" https://root.rdap.org/entities" clone
+    rdap-search-url "entities" derive-url
     swap "handle" set-query-param rdap-get nip ;
