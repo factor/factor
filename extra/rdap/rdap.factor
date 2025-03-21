@@ -94,11 +94,9 @@ CONSTANT: rir-endpoints H{
     dup string? [ utf8 decode ] unless json> ;
 
 : rdap-lookup ( param endpoint-quot path-quot -- results )
-    [ '[ rdap-url get [ nip ] _ if* ] ] dip
-    '[ @ derive-url rdap-get nip ] bi ; inline
+    [ '[ rdap-url get [ nip ] _ if* ] ] dip '[ @ derive-url rdap-get nip ] bi ; inline
 
 PRIVATE>
-
 
 : lookup-asn ( asn -- results )
     dup string? [ "AS" ?head drop string>number ] when
