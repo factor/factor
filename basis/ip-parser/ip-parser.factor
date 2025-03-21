@@ -3,8 +3,8 @@
 
 USING: accessors byte-arrays combinators
 combinators.short-circuit endian grouping hex-strings kernel
-math math.bitwise math.parser regexp sequences splitting strings
-;
+math math.bitwise math.parser present regexp sequences splitting
+strings ;
 
 IN: ip-parser
 
@@ -92,6 +92,9 @@ PRIVATE>
 
 TUPLE: ipv4-network base bits ;
 
+M: ipv4-network present
+    [ base>> ipv4-ntoa ] [ bits>> number>string ] bi "/" glue ;
+
 GENERIC: >ipv4-network ( object -- ipv4-network )
 M: ipv4-network >ipv4-network ;
 M: string >ipv4-network
@@ -103,6 +106,9 @@ M: string >ipv4-network
     [ on-bits ] [ 32 swap - shift ] bi swapd mask = ;
 
 TUPLE: ipv6-network base bits ;
+
+M: ipv6-network present
+    [ base>> ipv6-ntoa ] [ bits>> number>string ] bi "/" glue ;
 
 GENERIC: >ipv6-network ( object -- ipv6-network )
 M: ipv6-network >ipv6-network ;

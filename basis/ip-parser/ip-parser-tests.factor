@@ -1,5 +1,5 @@
 
-USING: ip-parser kernel sequences tools.test ;
+USING: ip-parser kernel present sequences tools.test ;
 
 { "0.0.0.1" } [ "1" normalize-ipv4 ] unit-test
 { "1.0.0.2" } [ "1.2" normalize-ipv4 ] unit-test
@@ -25,6 +25,7 @@ USING: ip-parser kernel sequences tools.test ;
 
 { t } [ "1.1.1.1" "1.0.0.0/8" ipv4-contains? ] unit-test
 { f } [ "10.0.0.1" "1.0.0.0/8" ipv4-contains? ] unit-test
+{ "1.0.0.0/8" } [ "1.0.0.0/8" >ipv4-network present ] unit-test
 
 { { 0 0 0 0 0 0 0 1 } } [ "::1" parse-ipv6 ] unit-test
 
@@ -48,3 +49,4 @@ USING: ip-parser kernel sequences tools.test ;
 
 { t } [ "2001:4200::1" "2001:4200::/23" ipv6-contains? ] unit-test
 { f } [ "2001:5200::1" "2001:4200::/23" ipv6-contains? ] unit-test
+{ "2001:4200::/23" } [ "2001:4200::/23" >ipv6-network present ] unit-test
