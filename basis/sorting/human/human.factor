@@ -46,8 +46,17 @@ M: alphanum <=>
         <=>
     ] if ;
 
-<< "human" [ find-numbers [ <alphanum> ] map ] define-sorting >>
-<< "humani" [ find-numbers [ <alphanum-insensitive> ] map ] define-sorting >>
+<PRIVATE
+<< "(human)" [ find-numbers [ <alphanum> ] map ] define-sorting >>
+<< "(humani)" [ find-numbers [ <alphanum-insensitive> ] map ] define-sorting >>
+PRIVATE>
+
+: human<=> ( obj1 obj2 -- <=> )
+    2dup (human)<=> dup +eq+ eq? [ drop <=> ] [ 2nip ] if ;
+
+: humani<=> ( obj1 obj2 -- <=> )
+    2dup (humani)<=> dup +eq+ eq? [ drop <=> ] [ 2nip ] if ;
 
 : human-sort ( seq -- seq' ) [ human<=> ] sort-with ;
+
 : humani-sort ( seq -- seq' ) [ humani<=> ] sort-with ;
