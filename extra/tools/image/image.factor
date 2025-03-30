@@ -25,7 +25,7 @@ STRUCT: image-header.32
     { reserved-4 u32 }
     { special-objects u32[special-object-count] } ;
 
-STRUCT: embedded-image-footer.32
+STRUCT: image-footer.32
     { trailing u8[8] }     ! trailing bytes
     { magic u32 }
     { image-offset u32 } ; ! offset from beginning of file
@@ -43,25 +43,23 @@ STRUCT: image-header.64
     { reserved-4 u64 }
     { special-objects u64[special-object-count] } ;
 
-STRUCT: embedded-image-footer.64
+STRUCT: image-footer.64
     { magic u64 }
     { image-offset u64 } ; ! offset from beginning of file
 
 UNION-STRUCT: image-header.union { b32 image-header.32 } { b64 image-header.64 } ;
-UNION-STRUCT: embedded-image-footer.union { b32 embedded-image-footer.32 } { b64 embedded-image-footer.64 } ;
+UNION-STRUCT: image-footer.union { b32 image-footer.32 } { b64 image-footer.64 } ;
 
-UNION: image-header image-header.32 image-header.64 POSTPONE: f ;                            ! need the f class for initial values
-UNION: embedded-image-footer embedded-image-footer.32 embedded-image-footer.64 POSTPONE: f ;
-
-UNION: bytes byte-array POSTPONE: f ; ! avoids cloning B{ } and uses f as the empty sequence
+UNION: image-header image-header.32 image-header.64 ;
+UNION: image-footer image-footer.32 image-footer.64 POSTPONE: f ;
 
 TUPLE: image
-  { footer embedded-image-footer } ! located at the end of a file in case of embedded images
-  { leader bytes }                 ! file starts with leader (for embedded images), then
-  { header image-header }          ! Factor image header
-  { data bytes }                   ! Factor image data heap
-  { code bytes }                   ! Factor image code heap
-  { trailer bytes }                ! trailing data
+  { footer maybe{ image-footer } } ! located at the end of a file in case of embedded images
+  { leader maybe{ byte-array } }   ! file starts with leader (for embedded images), then
+  { header maybe{ image-header } } ! Factor image header
+  { data maybe{ byte-array } }     ! Factor image data heap
+  { code maybe{ byte-array } }     ! Factor image code heap
+  { trailer maybe{ byte-array } }  ! trailing data
 ;
 
 PREDICATE: compressable-image < image header>> data-size>> zero? ;
@@ -123,11 +121,11 @@ M: unsupported-image-header error. drop "Could not detect a valid image header" 
 
 : read-union-footer ( -- footer-offset footer )
   [
-    embedded-image-footer.union [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
+    image-footer.union [ struct-size neg seek-end seek-input tell-input ] [ read-struct* ] bi
   ] with-position ;
 
 : read-footer ( -- footer-offset footer.32/footer.64/f )
-  read-union-footer valid-image-footer? [ embedded-image-footer.union struct-size + f ] unless* ;
+  read-union-footer valid-image-footer? [ image-footer.union struct-size + f ] unless* ;
 
 ! load factor image or embedded image
 : load-factor-image ( filename -- image )

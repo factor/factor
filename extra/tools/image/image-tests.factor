@@ -22,11 +22,11 @@ CONSTANT: dummy-objects.64 $[ special-object-count [ <iota> ] [ drop 0 ] [ <u64-
 CONSTANT: dummy-header.32 S{ image-header.32 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.32 ] }
 CONSTANT: dummy-header.64 S{ image-header.64 f $[ image-magic image-version 0 0 0 dummy-code length dummy-data length dup pick 0 dummy-objects.64 ] }
 
-! account for overlap in embedded-image-footer.union
+! account for overlap in image-footer.union
 CONSTANT: dummy-trailer.64 $[ dummy-trailer ]
 CONSTANT: dummy-trailer.32 $[ dummy-trailer 8 head* ]
-CONSTANT: dummy-footer.32 S{ embedded-image-footer.32 f $[ dummy-trailer 8 tail* 0 8 <u8-array> [ copy ] keep image-magic dummy-leader length ] }
-CONSTANT: dummy-footer.64 S{ embedded-image-footer.64 f $[ image-magic dummy-leader length ] }
+CONSTANT: dummy-footer.32 S{ image-footer.32 f $[ dummy-trailer 8 tail* 0 8 <u8-array> [ copy ] keep image-magic dummy-leader length ] }
+CONSTANT: dummy-footer.64 S{ image-footer.64 f $[ image-magic dummy-leader length ] }
 
 CONSTANT: dummy-image.32 T{ image f $ dummy-footer.32 $ dummy-leader $ dummy-header.32 $ dummy-data $ dummy-code $ dummy-trailer.32 }
 CONSTANT: dummy-image.64 T{ image f $ dummy-footer.64 $ dummy-leader $ dummy-header.64 $ dummy-data $ dummy-code $ dummy-trailer.64 }
@@ -47,11 +47,11 @@ CONSTANT: dummy-file.64 "vocab:tools/image/dummy.64.image"
 [ image-header.union <struct> check-image-header ] must-fail
 [ image-header.union <struct> check-image-header ] [ unsupported-image-header? ] must-fail-with
 
-{ t } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.32 = ] unit-test
-{ f } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.32 = ] unit-test
-{ f } [ embedded-image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.64 = ] unit-test
-{ t } [ embedded-image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.64 = ] unit-test
-{ f } [ embedded-image-footer.union <struct> valid-image-footer? ] unit-test
+{ t } [ image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.32 = ] unit-test
+{ f } [ image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.32 = ] unit-test
+{ f } [ image-footer.union <struct> dummy-footer.32 >>b32 valid-image-footer? dummy-footer.64 = ] unit-test
+{ t } [ image-footer.union <struct> dummy-footer.64 >>b64 valid-image-footer? dummy-footer.64 = ] unit-test
+{ f } [ image-footer.union <struct> valid-image-footer? ] unit-test
 
 INITIALIZED-SYMBOL: 32|64 [ dummy-file.64 ]
 

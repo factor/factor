@@ -25,10 +25,10 @@ HELP: uncompressable-image
 { $description "Throws an " { $link uncompressable-image } " error." }
 { $error-description "in case an illegal operation is performed on an uncompressable image" } ;
 
-HELP: embedded-image-footer.32
+HELP: image-footer.32
 { $class-description "32 bit embedded image footer" } ;
 
-HELP: embedded-image-footer.64
+HELP: image-footer.64
 { $class-description "64 bit embedded image footer" } ;
 
 HELP: image-header.32
@@ -37,7 +37,7 @@ HELP: image-header.32
 HELP: image-header.64
 { $class-description "64 bit image header" } ;
 
-HELP: embedded-image-footer.union
+HELP: image-footer.union
 { $class-description "Overlay of 32 and 64 bit embedded image footer" } ;
 
 HELP: image-header.union
@@ -58,8 +58,8 @@ HELP: skip-struct
 
 HELP: valid-image-footer?
 { $values
-    { "footer" embedded-image-footer.union }
-    { "footer.32/footer.64/f" embedded-image-footer }
+    { "footer" image-footer.union }
+    { "footer.32/footer.64/f" image-footer }
 }
 { $description "returns valid image footer or f" } ;
 
@@ -114,7 +114,7 @@ HELP: check-image-header
 }
 { $description "Checks for a valid header, else throws error" } ;
 
-HELP: embedded-image-footer
+HELP: image-footer
 { $class-description "Embedded footer at end of file indicates this is an embedded image" } ;
 
 HELP: image-magic
@@ -138,13 +138,13 @@ HELP: read*
 
 HELP: read-union-footer
 { $values
-    { "footer-offset" integer } { "footer" embedded-image-footer.union }
+    { "footer-offset" integer } { "footer" image-footer.union }
 }
 { $description "read the footer at given offset from beginning of file. Reads footer from end of file, while returning to current file position. Also returns offset to footer from beginning of file." } ;
 
 HELP: read-footer
 { $values
-    { "footer-offset" integer } { "footer.32/footer.64/f" embedded-image-footer }
+    { "footer-offset" integer } { "footer.32/footer.64/f" image-footer }
 }
 { $description "Read footer if it exists, return f otherwise" } ;
 
@@ -174,7 +174,7 @@ HELP: unsupported-image-header
 
 HELP: valid-footer?
 { $values
-    { "footer" embedded-image-footer }
+    { "footer" image-footer }
     { "?" boolean }
 }
 { $description "Is it a valid footer?" } ;
