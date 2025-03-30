@@ -1,4 +1,4 @@
-USING: sorting.human tools.test sorting ;
+USING: math.order sorting sorting.human tools.test ;
 
 { { "x1y" "x2" "x10y" } }
 [ { "x1y" "x10y" "x2" } [ human<=> ] sort-with ] unit-test
@@ -18,3 +18,7 @@ USING: sorting.human tools.test sorting ;
 
 { { "abc" "Abc" "def" "gh" } }
 [ { "abc" "Abc" "def" "gh" } [ humani<=> ] sort-with ] unit-test
+
+{ +lt+ } [ "a01b" "a1b" human<=> ] unit-test
+{ +gt+ } [ "a1b" "a01b" human<=> ] unit-test
+{ +eq+ } [ "a1b" "a1b" human<=> ] unit-test
