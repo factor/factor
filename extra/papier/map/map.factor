@@ -19,10 +19,8 @@ CONSTANT: papier-map-version 3
 : check-papier-version ( hash -- hash )
     "papier" over at dup papier-map-version = [ drop ] [ bad-papier-version ] if ;
 
-UNION: ?string string POSTPONE: f ;
-
 TUPLE: slab
-    { name ?string }
+    { name maybe{ string } }
     images
     { frame fixnum }
     { center float-4 }
