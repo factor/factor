@@ -28,7 +28,7 @@ $nl
   { "Define an " { $link editor-command } " method to construct a command that opens your editor" }
   { "Define an " { $link editor-detached? } " method that denotes whether your editor should be run in "
     "detached mode. This should return " { $link t } " for editors that run in a separate terminal." }
-  { "Define an " { $link editor-is-child? } " method that tells Factor whether it should be eun as "
+  { "Define an " { $link editor-is-child? } " method that tells Factor whether it should be run as "
     "a child process." }
 }
 $nl
