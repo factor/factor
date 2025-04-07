@@ -4,6 +4,14 @@ USING: accessors assocs combinators kernel make math
 parser persistent.assocs persistent.hashtables.nodes
 prettyprint.custom ;
 
+! Use these explicitly because they define needed methods which are not loaded
+! otherwise
+USE: persistent.hashtables.nodes.empty
+USE: persistent.hashtables.nodes.leaf
+USE: persistent.hashtables.nodes.full
+USE: persistent.hashtables.nodes.bitmap
+USE: persistent.hashtables.nodes.collision
+
 IN: persistent.hashtables
 
 TUPLE: persistent-hash
