@@ -1,6 +1,6 @@
 ! Copyright (C)2023 Raghu Ranganathan.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs help.markup help.syntax kernel ;
+USING: accessors assocs help.markup help.syntax kernel ;
 IN: hashtables.wrapped
 
 HELP: wrap-key
@@ -24,6 +24,8 @@ $nl
  { { $link wrap-key } " which is effectively a constructor for wrapping keys." }
  { { $link equal? } " to check for equality of keys." }
 }
+$nl
+"The key wrapper must implement " { $link underlying>> } " to retrieve the original key."
 
 "Other relevant generics are " { $link clone } " and " { $link new-assoc } "."
 $nl
