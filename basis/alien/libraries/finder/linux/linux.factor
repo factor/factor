@@ -41,11 +41,11 @@ CONSTANT: mach-map {
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
 
 : find-ldconfig ( name -- path/f )
-    "lib" prepend load-ldconfig-cache
+    load-ldconfig-cache
     [ ldconfig-matches? ] with find nip ?last ;
 
 :: find-ld ( name -- path/f )
-    "lib" name append <process>
+    name <process>
         [
             "ld" , "-t" ,
             "LD_LIBRARY_PATH" os-env ":" split [ "-L" , , ] each
