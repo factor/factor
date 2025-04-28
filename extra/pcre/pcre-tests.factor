@@ -151,11 +151,5 @@ version 8.36 <= [
     "Words, words, word." { "\\W+" "[,. ]" } [ split ] with map
 ] unit-test
 
-! Bigger tests
-{ t } [
-    "https://factorcode.org/" http-get nip
-    "href=\"(?P<link>[^\"]+)\"" findall [ "link" of ] map sequence?
-] unit-test
-
 ! Test that the regexp syntax works.
 { t } [ "1234abcd" regexp:R/ ^\d+\w+$/ matches? ] unit-test
