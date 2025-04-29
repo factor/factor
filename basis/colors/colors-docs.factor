@@ -97,6 +97,8 @@ $nl
     { "RYB colors" "colors.ryb" }
     { "YIQ colors" "colors.yiq" }
     { "YUV colors" "colors.yuv" }
+    { "OKLAB colors" "colors.oklab" }
+    { "OKLCH colors" "colors.oklch" }
 } ;
 
 ABOUT: "colors"
