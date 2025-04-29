@@ -45,7 +45,7 @@ M: xyza >xyza ; inline
 
 <PRIVATE
 
-: invert-rgb-compand ( v -- v' )
+: invert-srgb-compand ( v -- v' )
     dup 0.04045 <= [ 12.92 / ] [ 0.055 + 1.055 / 2.4 ^ ] if ;
 
 PRIVATE>
@@ -54,7 +54,7 @@ M: rgba >xyza
     [
         [let
             [ red>> ] [ green>> ] [ blue>> ] tri
-            [ invert-rgb-compand ] tri@ :> ( r g b )
+            [ invert-srgb-compand ] tri@ :> ( r g b )
             r 0.4124564 * g 0.3575761 * b 0.1804375 * + +
             r 0.2126729 * g 0.7151522 * b 0.0721750 * + +
             r 0.0193339 * g 0.1191920 * b 0.9503041 * + +
