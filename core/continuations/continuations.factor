@@ -58,12 +58,12 @@ C: <continuation> continuation
 
 PRIVATE>
 
-: ifcc ( capture restore -- obj )
+: ifcc ( ..a capture: ( ..a continuation -- ..b initial ) restore: ( ..a obj -- ..b obj' ) -- ..b obj'' )
     [ dummy-1 current-continuation or? ] 2dip [ dummy-2 ] prepose if ; inline
 
-: callcc0 ( quot -- ) [ drop ] ifcc ; inline
+: callcc0 ( ... quot: ( ... continuation -- ... ) -- ... ) [ drop ] ifcc ; inline
 
-: callcc1 ( quot -- obj ) [ ] ifcc ; inline
+: callcc1 ( ... quot: ( ... continuation -- ... initial ) -- ... obj ) [ ] ifcc ; inline
 
 <PRIVATE
 
@@ -100,7 +100,7 @@ PRIVATE>
 
 SYMBOL: return-continuation
 
-: with-return ( quot -- )
+: with-return ( ... quot: ( ... -- ... ) -- ... )
     [ return-continuation ] dip [ with-variable ] 2curry callcc0 ; inline
 
 : return ( -- * )
@@ -152,16 +152,16 @@ callback-error-hook [ [ die rethrow ] ] initialize
 : ignore-errors ( ... quot: ( ... -- ... ) -- ... )
     [ drop ] recover ; inline
 
-: ignore-error ( ... quot: ( ... -- ... ) check: ( error -- ? ) -- ... )
+: ignore-error ( ... quot: ( ... -- ... ) check: ( ... error -- ... ? ) -- ... )
     '[ dup @ [ drop ] [ rethrow ] if ] recover ; inline
 
-: ignore-error/f ( ... quot: ( ... -- ... x ) check: ( error -- ? ) -- ... x/f )
+: ignore-error/f ( ... quot: ( ... -- ... x ) check: ( ... error -- ... ? ) -- ... x/f )
     '[ dup @ [ drop f ] [ rethrow ] if ] recover ; inline
 
-: cleanup ( try cleanup-always cleanup-error -- )
+: cleanup ( ..a try: ( ..a -- ..a ) cleanup-always: ( ..a -- ..b ) cleanup-error: ( ..b error -- ..b ) -- ..c )
     [ '[ [ @ @ ] dip rethrow ] recover ] [ drop ] 2bi call ; inline
 
-: finally ( try cleanup-always -- )
+: finally ( ..a try: ( ..a -- ..a ) cleanup-always: ( ..a -- ..b ) -- ..b )
     [ ] cleanup ; inline
 
 ERROR: attempt-all-error ;
