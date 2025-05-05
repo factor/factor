@@ -1,8 +1,7 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays assocs combinators.extras io.files
-kernel math math.parser modern.slices parser ranges sequences
-splitting tools.test ;
+USING: arrays assocs combinators.extras io.files kernel math
+modern.slices parser ranges sequences splitting tools.test ;
 IN: combinators.extras.tests
 
 
@@ -243,6 +242,3 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 { f f f } [ 1 2 3 [ + + odd? ] [ ] [ ] ?3if ] unit-test
 { f f f } [ 1 2 3 [ + + odd? ] [ ] ?3when ] unit-test
 { f f f } [ 1 2 3 [ + + odd? ] [ ] ?3unless ] unit-test
-
-{ { t 5 } } [ { t "asdf" 5 } [ string>number ] filter-errors ] unit-test
-{ { "asdf" } } [ { t "asdf" 5 } [ string>number ] reject-errors ] unit-test
