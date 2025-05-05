@@ -334,14 +334,17 @@ SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
 : ?3unless ( ..a x y z pred: ( ..a x quot: ( ..a x y z -- ..b ? ) -- ..b x ? ) false: ( ..b x y z -- ..c ) -- ..c )
     [ ] swap ?3if ; inline
 
+: throws? ( quot -- ? )
+    [ '[ _ drop-outputs f ] ] [ '[ drop _ drop-inputs t ] ] bi recover ; inline
+
 : filter-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    [ '[ [ @ drop f ] [ 2drop t ] recover ] ] dip filter-as ; inline
+    [ '[ _ throws? ] ] dip filter-as ; inline
 
 : filter-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over filter-errors-as ; inline
 
 : reject-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    [ '[ [ @ drop f ] [ 2drop t ] recover ] ] dip reject-as ; inline
+    [ '[ _ throws? ] ] dip reject-as ; inline
 
 : reject-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over reject-errors-as ; inline
