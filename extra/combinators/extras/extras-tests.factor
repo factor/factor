@@ -1,8 +1,8 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types arrays assocs combinators.extras io.files
-kernel math modern.slices parser ranges sequences splitting
-tools.test ;
+kernel math math.parser modern.slices parser ranges sequences
+splitting tools.test ;
 IN: combinators.extras.tests
 
 
