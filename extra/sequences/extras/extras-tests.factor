@@ -1,6 +1,6 @@
 USING: accessors arrays ascii grouping io io.streams.string
-kernel make math prettyprint ranges sequences sequences.extras
-strings tools.test ;
+kernel make math math.parser prettyprint ranges sequences
+sequences.extras strings tools.test ;
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -606,3 +606,6 @@ strings tools.test ;
 } [
     { { 1 2 } { 3 4 } { 5 } { 6 7 } { { 9 } } } sequence-cartesian-product
 ] unit-test
+
+{ { t 5 } } [ { t "asdf" 5 } [ string>number ] filter-errors ] unit-test
+{ { "asdf" } } [ { t "asdf" 5 } [ string>number ] reject-errors ] unit-test

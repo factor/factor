@@ -1,7 +1,7 @@
 USING: accessors arrays assocs assocs.extras combinators
-generalizations grouping growable hash-sets heaps kernel math
-math.order ranges sequences sequences.private sets shuffle
-sorting splitting vectors ;
+combinators.smart continuations generalizations grouping
+growable hash-sets heaps kernel math math.order ranges sequences
+sequences.private sets shuffle sorting splitting vectors ;
 IN: sequences.extras
 
 : find-all ( ... seq quot: ( ... elt -- ... ? ) -- ... elts )
@@ -1277,3 +1277,18 @@ INSTANCE: virtual-zip-index immutable-sequence
         2 cut [ first2 cartesian-product concat ] dip swap
         [ [ suffix ] cartesian-map concat ] reduce
     ] if ;
+
+: throws? ( quot -- ? )
+    [ '[ _ drop-outputs f ] ] [ '[ drop _ drop-inputs t ] ] bi recover ; inline
+
+: filter-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    [ '[ _ throws? ] ] dip filter-as ; inline
+
+: filter-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    over filter-errors-as ; inline
+
+: reject-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    [ '[ _ throws? ] ] dip reject-as ; inline
+
+: reject-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
+    over reject-errors-as ; inline
