@@ -1,6 +1,6 @@
 ! Copyright (C) 2013 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators combinators.smart continuations
+USING: arrays assocs combinators combinators.smart
 generalizations graphs.private kernel kernel.private math
 math.order namespaces parser quotations sequences
 sequences.generalizations sequences.private sets shuffle
@@ -333,18 +333,3 @@ SYNTAX: ?[ parse-quotation [ ?call ] curry append! ;
 
 : ?3unless ( ..a x y z pred: ( ..a x quot: ( ..a x y z -- ..b ? ) -- ..b x ? ) false: ( ..b x y z -- ..c ) -- ..c )
     [ ] swap ?3if ; inline
-
-: throws? ( quot -- ? )
-    [ '[ _ drop-outputs f ] ] [ '[ drop _ drop-inputs t ] ] bi recover ; inline
-
-: filter-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    [ '[ _ throws? ] ] dip filter-as ; inline
-
-: filter-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    over filter-errors-as ; inline
-
-: reject-errors-as ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    [ '[ _ throws? ] ] dip reject-as ; inline
-
-: reject-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
-    over reject-errors-as ; inline
