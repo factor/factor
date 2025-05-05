@@ -243,3 +243,6 @@ SYNTAX: ..< dup pop scan-object [a..b) suffix! ;
 { f f f } [ 1 2 3 [ + + odd? ] [ ] [ ] ?3if ] unit-test
 { f f f } [ 1 2 3 [ + + odd? ] [ ] ?3when ] unit-test
 { f f f } [ 1 2 3 [ + + odd? ] [ ] ?3unless ] unit-test
+
+{ { t 5 } } [ { t "asdf" 5 } [ string>number ] filter-errors ] unit-test
+{ { "asdf" } } [ { t "asdf" 5 } [ string>number ] reject-errors ] unit-test
