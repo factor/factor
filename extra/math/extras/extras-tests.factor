@@ -135,3 +135,4 @@ tools.test ;
 { { } } [ 5 { 1 2 3 4 } all-removals ] unit-test
 
 { { 0 1 3 6 2 7 13 20 12 21 } } [ 10 recaman ] unit-test
+{ 1057164 } [ 1,000,000 nth-recaman ] unit-test

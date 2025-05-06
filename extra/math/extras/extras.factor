@@ -420,5 +420,8 @@ M:: vose random* ( obj rnd -- elt )
     [ drop prev n + ] unless t over seen set-nth ;
 PRIVATE>
 
-: recaman ( N -- seq )
-    [ <bit-vector> 0 ] keep pick '[ _ next-recaman dup ] map-integers 2nip ;
+:: recaman ( N -- seq )
+    0 N dup <bit-vector> '[ _ next-recaman dup ] map-integers nip ;
+
+:: nth-recaman ( N -- elt )
+    0 N dup <bit-vector> '[ _ next-recaman ] each-integer ;
