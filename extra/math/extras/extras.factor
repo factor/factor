@@ -23,8 +23,7 @@ DEFER: stirling
 PRIVATE>
 
 MEMO: stirling ( n k -- x )
-    2dup { [ = ] [ nip 1 = ] } 2||
-    [ 2drop 1 ] [ (stirling) ] if ;
+    2dup { [ = ] [ nip 1 = ] } 2|| [ 2drop 1 ] [ (stirling) ] if ;
 
 :: ramanujan ( x -- y )
     pi sqrt x e / x ^ * x 8 * 4 + x * 1 + x * 1/30 + 1/6 ^ * ;
@@ -416,7 +415,7 @@ M:: vose random* ( obj rnd -- elt )
 
 <PRIVATE
 :: next-recaman ( prev n seen -- next )
-    prev n - dup { [ 0 > ] [ seen ?nth not ] } 1&&
+    prev n - dup { [ 0 > ] [ seen nth not ] } 1&&
     [ drop prev n + ] unless t over seen set-nth ;
 PRIVATE>
 
