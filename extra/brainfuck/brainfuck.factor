@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs command-line io io.encodings.binary
-io.files io.streams.string kernel lexer math multiline
-namespaces parser peg.ebnf prettyprint quotations sequences
-words ;
+USING: accessors ascii assocs combinators command-line io
+io.encodings.binary io.files io.streams.string kernel lexer math
+multiline namespaces parser peg.ebnf prettyprint quotations
+sequences words ;
 
 IN: brainfuck
 
@@ -74,6 +74,34 @@ MACRO: run-brainfuck ( code -- quot )
 SYNTAX: BRAINFUCK:
     scan-new-word ";" parse-tokens concat
     '[ _ run-brainfuck ] ( -- ) define-declared ;
+
+<PRIVATE
+
+: end-loop ( str i -- str j/f )
+    CHAR: ] swap pick index-from dup [ 1 + ] when ;
+
+: start-loop ( str i -- str j/f )
+    1 - CHAR: [ swap pick last-index-from dup [ 1 + ] when ;
+
+: interpret-brainfuck-at ( str i brainfuck -- str next/f brainfuck )
+    2over swap ?nth [ 1 + ] 2dip {
+        { CHAR: > [ 1 (>) ] }
+        { CHAR: < [ 1 (<) ] }
+        { CHAR: + [ 1 (+) ] }
+        { CHAR: - [ 1 (-) ] }
+        { CHAR: . [ (.) ] }
+        { CHAR: , [ (,) ] }
+        { CHAR: # [ (#) ] }
+        { CHAR: [ [ get-memory zero? [ [ end-loop ] dip ] when ] }
+        { CHAR: ] [ get-memory zero? [ [ start-loop ] dip ] unless ] }
+        { f [ [ drop f ] dip ] }
+        [ blank? [ "Invalid input" throw ] unless ]
+    } case ;
+
+PRIVATE>
+
+: interpret-brainfuck ( str -- )
+    0 <brainfuck> [ interpret-brainfuck-at over ] loop 3drop ;
 
 <PRIVATE
 
