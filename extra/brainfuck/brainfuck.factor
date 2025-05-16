@@ -3,7 +3,7 @@
 
 USING: accessors assocs command-line io io.encodings.binary
 io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint quotations sequences ;
+parser peg.ebnf prettyprint quotations sequences words ;
 
 IN: brainfuck
 
@@ -69,6 +69,10 @@ MACRO: run-brainfuck ( code -- quot )
 
 : get-brainfuck ( code -- result )
     [ run-brainfuck ] with-string-writer ; inline
+
+SYNTAX: BRAINFUCK:
+    scan-new-word scan-object parse-brainfuck
+    '[ <brainfuck> @ drop flush ] ( -- ) define-declared ;
 
 <PRIVATE
 
