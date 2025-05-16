@@ -83,7 +83,7 @@ SYNTAX: BRAINFUCK:
 : start-loop ( str i -- str j/f )
     1 - CHAR: [ swap pick last-index-from dup [ 1 + ] when ;
 
-: interpret-brainfuck-at ( str i brainfuck -- str next/f brainfuck )
+: interpret-brainfuck-from ( str i brainfuck -- str next/f brainfuck )
     2over swap ?nth [ 1 + ] 2dip {
         { CHAR: > [ 1 (>) ] }
         { CHAR: < [ 1 (<) ] }
@@ -101,7 +101,7 @@ SYNTAX: BRAINFUCK:
 PRIVATE>
 
 : interpret-brainfuck ( str -- )
-    0 <brainfuck> [ interpret-brainfuck-at over ] loop 3drop ;
+    0 <brainfuck> [ interpret-brainfuck-from over ] loop 3drop ;
 
 <PRIVATE
 
