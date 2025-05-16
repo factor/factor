@@ -2,8 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors assocs command-line io io.encodings.binary
-io.files io.streams.string kernel math multiline namespaces
-parser peg.ebnf prettyprint quotations sequences words ;
+io.files io.streams.string kernel lexer math multiline
+namespaces parser peg.ebnf prettyprint quotations sequences
+words ;
 
 IN: brainfuck
 
@@ -71,8 +72,8 @@ MACRO: run-brainfuck ( code -- quot )
     [ run-brainfuck ] with-string-writer ; inline
 
 SYNTAX: BRAINFUCK:
-    scan-new-word scan-object parse-brainfuck
-    '[ <brainfuck> @ drop flush ] ( -- ) define-declared ;
+    scan-new-word ";" parse-tokens concat
+    '[ _ run-brainfuck ] ( -- ) define-declared ;
 
 <PRIVATE
 
