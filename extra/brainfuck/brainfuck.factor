@@ -78,10 +78,22 @@ SYNTAX: BRAINFUCK:
 <PRIVATE
 
 : end-loop ( str i -- str j/f )
-    CHAR: ] swap pick index-from dup [ 1 + ] when ;
+    0 swap pick [
+        {
+            { CHAR: [ [ 1 + f ] }
+            { CHAR: ] [ 1 - dup zero? ] }
+            [ drop f ]
+        } case
+    ] find-from drop nip dup [ 1 + ] when ;
 
 : start-loop ( str i -- str j/f )
-    1 - CHAR: [ swap pick last-index-from dup [ 1 + ] when ;
+    0 swap 1 - pick [
+        {
+            { CHAR: [ [ 1 - dup zero? ] }
+            { CHAR: ] [ 1 + f ] }
+            [ drop f ]
+        } case
+    ] find-last-from drop nip dup [ 1 + ] when ;
 
 : interpret-brainfuck-from ( str i brainfuck -- str next/f brainfuck )
     2over swap ?nth [ 1 + ] 2dip {
