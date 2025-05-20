@@ -5,11 +5,8 @@ quotations sequences sequences.padded sequences.private ;
 FROM: memoize.private => [nsequence] [firstn] ;
 IN: sequences.generalizations
 
-MACRO: (nsequence) ( n -- quot )
-    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map concat ;
-
 MACRO: nsequence ( n exemplar -- quot )
-    [ [nsequence] ] keep '[ @ _ like ] ;
+    [nsequence] ;
 
 MACRO: narray ( n -- quot )
     '[ _ { } nsequence ] ;
@@ -19,21 +16,16 @@ MACRO: firstn-unsafe ( n -- quot )
 
 MACRO: firstn ( n -- quot )
     [ [ drop ] ] [
-        [ 1 - swap bounds-check 2drop ]
-        [ firstn-unsafe ]
-        bi-curry '[ _ _ bi ]
+        [ 1 - ] keep '[ _ swap bounds-check nip _ firstn-unsafe ]
     ] if-zero ;
 
 MACRO: set-firstn-unsafe ( n -- quot )
-    [ 1 + ]
-    [ <iota> [ '[ _ rot [ set-nth-unsafe ] keep ] ] map ] bi
-    '[ _ -nrot _ spread drop ] ;
+    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map
+    [ ] concat-as '[ @ drop ] ;
 
 MACRO: set-firstn ( n -- quot )
     [ [ drop ] ] [
-        [ 1 - swap bounds-check 2drop ]
-        [ set-firstn-unsafe ]
-        bi-curry '[ _ _ bi ]
+        [ 1 - ] keep '[ _ swap bounds-check nip _ set-firstn-unsafe ]
     ] if-zero ;
 
 MACRO: ?firstn ( n -- quot )

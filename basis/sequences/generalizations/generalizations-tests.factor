@@ -36,7 +36,6 @@ IN: sequences.generalizations.tests
 { { 1 2 3 } } [ 1 2 3 { f f f } [ 3 set-lastn ] keep ] unit-test
 
 { [ 1 2 ] } [ 1 2 2 [ ] nsequence ] unit-test
-{ { 1 2 3 4 5 } } [ 1 2 3 4 5 { 0 0 0 0 0 } 5 (nsequence) ] unit-test
 
 { { 1 2 3 4 } } [ { 1 } { 2 } { 3 } { 4 } 4 nappend ] unit-test
 { V{ 1 2 3 4 } } [ { 1 } { 2 } { 3 } { 4 } 4 V{ } nappend-as ] unit-test
