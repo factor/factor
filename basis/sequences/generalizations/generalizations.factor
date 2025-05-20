@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators generalizations kernel math math.order
-memoize.private quotations sequences sequences.padded
-sequences.private ;
+quotations sequences sequences.padded sequences.private ;
+FROM: memoize.private => [nsequence] [firstn] ;
 IN: sequences.generalizations
 
 MACRO: (nsequence) ( n -- quot )
