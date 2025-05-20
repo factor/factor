@@ -319,8 +319,33 @@ struct factor_vm {
   // the write barrier must be called any time we are potentially storing a
   // pointer from an older generation to a younger one
   inline void write_barrier(cell* slot_ptr) {
-    *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
-    *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+    // Use atomic store operations to ensure thread safety
+    // We use atomic operations with memory barriers to ensure visibility across threads
+    uint8_t* card_ptr = (uint8_t*)(cards_offset + ((cell)slot_ptr >> card_bits));
+    uint8_t* deck_ptr = (uint8_t*)(decks_offset + ((cell)slot_ptr >> deck_bits));
+    
+    // We use a binary OR operation to ensure we don't lose any card marks
+    // that might be concurrently set by other threads
+    uint8_t old_card_val, new_card_val;
+    do {
+      old_card_val = *card_ptr;
+      new_card_val = old_card_val | card_mark_mask;
+      
+      // If already fully marked, skip the CAS operation
+      if (old_card_val == new_card_val) break;
+      
+    } while (!__sync_bool_compare_and_swap(card_ptr, old_card_val, new_card_val));
+    
+    // Same for deck
+    uint8_t old_deck_val, new_deck_val;
+    do {
+      old_deck_val = *deck_ptr;
+      new_deck_val = old_deck_val | card_mark_mask;
+      
+      // If already fully marked, skip the CAS operation
+      if (old_deck_val == new_deck_val) break;
+      
+    } while (!__sync_bool_compare_and_swap(deck_ptr, old_deck_val, new_deck_val));
   }
 
   inline void write_barrier(object* obj, cell size) {

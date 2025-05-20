@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include <mutex>  // Add include for mutex
 
 namespace factor {
 
@@ -25,12 +26,32 @@ code_heap::~code_heap() {
   seg = NULL;
 }
 
+// For thread safety, we need synchronization in the code heap write barrier
+// because multiple threads could be inserting to the points_to_* sets
+
+// Add mutexes to protect access to the shared sets
+std::mutex points_to_nursery_mutex;
+std::mutex points_to_aging_mutex;
+std::mutex all_blocks_mutex; // For protecting all_blocks set
+
 void code_heap::write_barrier(code_block* compiled) {
-  points_to_nursery.insert(compiled);
-  points_to_aging.insert(compiled);
+  // Use mutex locks to protect concurrent access to the sets
+  {
+    std::lock_guard<std::mutex> lock(points_to_nursery_mutex);
+    points_to_nursery.insert(compiled);
+  }
+  
+  {
+    std::lock_guard<std::mutex> lock(points_to_aging_mutex);
+    points_to_aging.insert(compiled);
+  }
 }
 
 void code_heap::clear_remembered_set() {
+  // Acquire locks for both sets to ensure thread safety during clearing
+  std::lock_guard<std::mutex> lock_nursery(points_to_nursery_mutex);
+  std::lock_guard<std::mutex> lock_aging(points_to_aging_mutex);
+  
   points_to_nursery.clear();
   points_to_aging.clear();
 }
@@ -41,9 +62,25 @@ bool code_heap::uninitialized_p(code_block* compiled) {
 
 void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
-  points_to_nursery.erase(compiled);
-  points_to_aging.erase(compiled);
-  all_blocks.erase((cell)compiled);
+  
+  // Acquire locks to safely modify the sets
+  {
+    std::lock_guard<std::mutex> lock_nursery(points_to_nursery_mutex);
+    points_to_nursery.erase(compiled);
+  }
+  
+  {
+    std::lock_guard<std::mutex> lock_aging(points_to_aging_mutex);
+    points_to_aging.erase(compiled);
+  }
+  
+  // Protect access to all_blocks with a mutex
+  {
+    std::lock_guard<std::mutex> lock_blocks(all_blocks_mutex);
+    all_blocks.erase((cell)compiled);
+  }
+  
+  // Free the memory
   allocator->free(compiled);
 }
 

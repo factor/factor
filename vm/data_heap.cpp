@@ -64,12 +64,16 @@ template <typename Generation> void data_heap::clear_cards(Generation* gen) {
   cell first_card = addr_to_card(gen->start - start);
   cell last_card = addr_to_card(gen->end - start);
   memset(&cards[first_card], 0, last_card - first_card);
+  // Ensure visibility of the cleared cards to other threads
+  atomic::fence();
 }
 
 template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   cell first_deck = addr_to_deck(gen->start - start);
   cell last_deck = addr_to_deck(gen->end - start);
   memset(&decks[first_deck], 0, last_deck - first_deck);
+  // Ensure visibility of the cleared decks to other threads
+  atomic::fence();
 }
 
 void data_heap::reset_nursery() {
@@ -97,8 +101,12 @@ bool data_heap::low_memory_p() {
 }
 
 void data_heap::mark_all_cards() {
+  // This function should be called during stop-the-world GC phases
+  // or when the heap is being initialized, so it doesn't need CAS operations.
+  // However, we need to ensure memory visibility with a fence after the operation.
   memset(cards, 0xff, cards_end - cards);
   memset(decks, 0xff, decks_end - decks);
+  atomic::fence();  // Ensure visibility of the changes to other threads
 }
 
 void factor_vm::set_data_heap(data_heap* data_) {
