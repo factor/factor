@@ -42,6 +42,12 @@ gc_state::~gc_state() {
 }
 
 void factor_vm::start_gc_again() {
+  // First check if current_gc is NULL to prevent segfault
+  if (!current_gc) {
+    critical_error("in start_gc_again, current_gc is NULL", 0);
+    return;
+  }
+  
   if (current_gc->op == COLLECT_NURSERY_OP) {
     // Nursery collection can fail if aging does not have enough
     // free space to fit all live objects from nursery.
@@ -59,8 +65,16 @@ void factor_vm::start_gc_again() {
 }
 
 void factor_vm::set_current_gc_op(gc_op op) {
+  // Check if current_gc is NULL
+  if (!current_gc) {
+    critical_error("in set_current_gc_op, current_gc is NULL", 0);
+    return;
+  }
+  
   current_gc->op = op;
-  if (gc_events)
+  
+  // Check both gc_events and current_gc->event before accessing
+  if (gc_events && current_gc->event)
     current_gc->event->op = op;
 }
 
@@ -75,7 +89,14 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
   current_gc = new gc_state(op, this);
-  if (ctx)
+  
+  // Check if allocation succeeded
+  if (!current_gc) {
+    critical_error("in gc, failed to allocate gc_state", 0);
+    return;
+  }
+  
+  if (ctx && ctx->callstack_seg)
     ctx->callstack_seg->set_border_locked(false);
   atomic::store(&current_gc_p, true);
 
@@ -130,16 +151,23 @@ void factor_vm::gc(gc_op op, cell requested_size) {
     }
   }
 
-  if (gc_events) {
+  // Check both gc_events and current_gc before accessing
+  if (gc_events && current_gc && current_gc->event) {
     current_gc->event->ended_gc(this);
     gc_events->push_back(*current_gc->event);
   }
 
   atomic::store(&current_gc_p, false);
-  if (ctx)
+  
+  // Check ctx and callstack_seg before accessing
+  if (ctx && ctx->callstack_seg)
     ctx->callstack_seg->set_border_locked(true);
-  delete current_gc;
-  current_gc = NULL;
+    
+  // Delete current_gc if it exists
+  if (current_gc) {
+    delete current_gc;
+    current_gc = NULL;
+  }
 
   // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
@@ -158,7 +186,19 @@ void factor_vm::primitive_compact_gc() {
 }
 
 void factor_vm::primitive_enable_gc_events() {
+  // Clean up any existing gc_events to avoid memory leak
+  if (gc_events) {
+    delete gc_events;
+    gc_events = NULL;
+  }
+  
+  // Allocate new gc_events vector
   gc_events = new std::vector<gc_event>();
+  
+  // Check if allocation succeeded
+  if (!gc_events) {
+    critical_error("in primitive_enable_gc_events, failed to allocate gc_events", 0);
+  }
 }
 
 // Allocates memory (byte_array_from_value, result.add)

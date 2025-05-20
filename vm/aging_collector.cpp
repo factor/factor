@@ -37,6 +37,13 @@ struct to_aging_copier : no_fixup {
 };
 
 void factor_vm::collect_aging() {
+  // Check that necessary data structures exist
+  if (!data || !data->nursery || !data->aging || !data->aging_semispace || 
+      !data->tenured || !code || !current_gc) {
+    critical_error("in collect_aging, NULL data structure", 0);
+    return;
+  }
+
   // Promote objects referenced from tenured space to tenured space, copy
   // everything else to the aging semi-space, and reset the nursery pointer.
   {
@@ -46,11 +53,14 @@ void factor_vm::collect_aging() {
     slot_visitor<from_tenured_refs_copier>
         visitor(this, from_tenured_refs_copier(data->tenured, &mark_stack));
 
-    gc_event* event = current_gc->event;
+    // Safe access to event through current_gc
+    gc_event* event = current_gc ? current_gc->event : NULL;
 
     if (event)
       event->reset_timer();
+      
     visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
+    
     if (event) {
       event->ended_phase(PHASE_CARD_SCAN);
       event->cards_scanned += visitor.cards_scanned;
@@ -59,21 +69,35 @@ void factor_vm::collect_aging() {
 
     if (event)
       event->reset_timer();
-    visitor.visit_code_heap_roots(&code->points_to_aging);
-    if (event) {
-      event->ended_phase(PHASE_CODE_SCAN);
-      event->code_blocks_scanned += code->points_to_aging.size();
+      
+    // Make sure code exists before accessing
+    if (code) {
+      visitor.visit_code_heap_roots(&code->points_to_aging);
+      
+      if (event) {
+        event->ended_phase(PHASE_CODE_SCAN);
+        event->code_blocks_scanned += code->points_to_aging.size();
+      }
     }
+    
     visitor.visit_mark_stack(&mark_stack);
   }
+  
   {
     // If collection fails here, do a to_tenured collection.
-    current_gc->op = COLLECT_AGING_OP;
+    if (current_gc) {  // Safety check
+      current_gc->op = COLLECT_AGING_OP;
+    }
 
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();
 
     aging_space *aging = data->aging;
+    if (!aging) {  // Safety check
+      critical_error("in collect_aging, aging space is NULL", 0);
+      return;
+    }
+    
     slot_visitor<to_aging_copier>
         visitor(this, to_aging_copier(aging, data->tenured));
 
@@ -83,7 +107,11 @@ void factor_vm::collect_aging() {
     visitor.cheneys_algorithm(aging, scan);
 
     data->reset_nursery();
-    code->clear_remembered_set();
+    
+    // Check code exists before clearing
+    if (code) {
+      code->clear_remembered_set();
+    }
   }
 }
 
