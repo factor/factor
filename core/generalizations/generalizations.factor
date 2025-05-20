@@ -2,7 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel kernel.private math ranges
-memoize.private sequences ;
+sequences ;
 IN: generalizations
 
 ! These words can be inline combinators when the word does no math
@@ -11,7 +11,8 @@ IN: generalizations
 ! be done at compile-time.
 <<
 
-ALIAS: n*quot (n*quot)
+: n*quot ( n quot -- quotquot )
+    <repetition> [ ] concat-as ;
 
 MACRO: call-n ( n -- quot )
     [ call ] <repetition> '[ _ cleave ] ;
