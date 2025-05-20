@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators generalizations kernel math math.order
 quotations sequences sequences.padded sequences.private ;
-FROM: memoize.private => [nsequence] [firstn] ;
+FROM: memoize.private => [nsequence] [firstn] [set-firstn] ;
 IN: sequences.generalizations
 
 MACRO: nsequence ( n exemplar -- quot )
@@ -20,8 +20,7 @@ MACRO: firstn ( n -- quot )
     ] if-zero ;
 
 MACRO: set-firstn-unsafe ( n -- quot )
-    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map
-    [ ] concat-as '[ @ drop ] ;
+    [set-firstn] '[ @ drop ] ;
 
 MACRO: set-firstn ( n -- quot )
     [ [ drop ] ] [
