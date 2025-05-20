@@ -59,6 +59,16 @@ factor_vm::~factor_vm() {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;
   }
+  // Clean up gc_events to avoid memory leaks
+  if (gc_events) {
+    delete gc_events;
+    gc_events = NULL;
+  }
+  // Clean up current_gc if it exists (defensive)
+  if (current_gc) {
+    delete current_gc;
+    current_gc = NULL;
+  }
   FACTOR_FOR_EACH(function_descriptors) {
     delete[] * iter;
   }

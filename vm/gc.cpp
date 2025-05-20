@@ -165,21 +165,30 @@ void factor_vm::primitive_enable_gc_events() {
 // XXX: Remember that growable_array has a data_root already
 void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
-    growable_array result(this);
-
-    std::vector<gc_event>* gc_events = this->gc_events;
+    // Use a local variable for exception safety
+    std::vector<gc_event>* events_ptr = this->gc_events;
     this->gc_events = NULL;
-
-    FACTOR_FOR_EACH(*gc_events) {
-      gc_event event = *iter;
-      byte_array* obj = byte_array_from_value(&event);
-      result.add(tag<byte_array>(obj));
+    
+    try {
+      growable_array result(this);
+      
+      FACTOR_FOR_EACH(*events_ptr) {
+        gc_event event = *iter;
+        byte_array* obj = byte_array_from_value(&event);
+        result.add(tag<byte_array>(obj));
+      }
+      
+      result.trim();
+      ctx->push(result.elements.value());
     }
-
-    result.trim();
-    ctx->push(result.elements.value());
-
-    delete this->gc_events;
+    catch (...) {
+      // Clean up even if an exception occurs
+      delete events_ptr;
+      throw; // Re-throw the exception
+    }
+    
+    // Delete the pointer if no exception occurred
+    delete events_ptr;
   } else
     ctx->push(false_object);
 }
