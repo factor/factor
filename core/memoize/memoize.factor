@@ -9,13 +9,14 @@ IN: memoize
 ! We can't use narray and firstn from generalizations because
 ! they're macros, and macros use memoize!
 
+: [set-firstn] ( length -- quot )
+    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map [ ] concat-as ;
+
 : [nsequence] ( length exemplar -- quot )
-    over <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map
-    [ ] concat-as over '[ _ _ new-sequence @ _ like ] ;
+    over [set-firstn] over '[ _ _ new-sequence @ _ like ] ;
 
 : [firstn] ( length -- quot )
-    <iota> [ '[ [ _ swap nth-unsafe ] keep ] ] map
-    [ ] concat-as '[ @ drop ] ;
+    <iota> [ '[ [ _ swap nth-unsafe ] keep ] ] map [ ] concat-as '[ @ drop ] ;
 
 : packer ( seq -- quot )
     length dup 4 <=
