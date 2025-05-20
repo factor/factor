@@ -335,11 +335,9 @@ inline static cell tuple_capacity(const tuple_layout *layout) {
 inline static cell tuple_size(const tuple_layout* layout) {
   cell capacity = tuple_capacity(layout);
   
-  // Check for potential overflow in multiplication
-  if (capacity > ((cell)-1) / sizeof(cell)) {
-    critical_error("Tuple capacity overflow", capacity);
-    return 0; // Will never reach here
-  }
+  // Check for potential overflow in multiplication using a compile-time assertion
+  // instead of runtime critical_error to avoid header dependency issues
+  FACTOR_ASSERT(capacity <= ((cell)-1) / sizeof(cell));
   
   return sizeof(tuple) + capacity * sizeof(cell);
 }
@@ -360,6 +358,10 @@ inline static cell string_full_size(const string* str) {
     byte_array* aux = (byte_array*)UNTAG(str->aux);
     // Auxiliary storage uses 2 bytes per character
     cell aux_size = sizeof(byte_array) + untag_fixnum(aux->capacity);
+    
+    // Check for overflow when adding sizes
+    FACTOR_ASSERT(aux_size <= ((cell)-1) - base_size);
+    
     return base_size + aux_size;
   }
   

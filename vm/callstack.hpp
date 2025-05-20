@@ -2,10 +2,8 @@ namespace factor {
 
 inline static cell callstack_object_size(cell size) {
   // Check for potential overflow in large callstacks
-  if (size > ((cell)-1) - sizeof(callstack)) {
-    critical_error("Callstack size overflow", size);
-    return 0; // Will never reach here
-  }
+  // Using assertion instead of critical_error to avoid header dependency issues
+  FACTOR_ASSERT(size <= ((cell)-1) - sizeof(callstack));
   
   return sizeof(callstack) + size;
 }
