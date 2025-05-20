@@ -1,9 +1,12 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators effects effects.parser
-generalizations kernel sequences sequences.generalizations
+
+USING: accessors assocs combinators combinators.short-circuit
+definitions effects effects.parser generalizations help
+help.markup kernel parser sequences sequences.generalizations
 stack-checker.backend stack-checker.known-words
 stack-checker.values words ;
+
 IN: shuffle
 
 MACRO: shuffle-effect ( effect -- quot )
@@ -18,6 +21,22 @@ MACRO: shuffle-effect ( effect -- quot )
 \ shuffle-effect [ infer-shuffle-effect ] "special" set-word-prop
 
 SYNTAX: shuffle( \ shuffle-effect parse-call-paren ;
+
+SYNTAX: SHUFFLE:
+    scan-new-word scan-effect {
+        [ [ '[ _ shuffle-effect ] ] keep define-declared ]
+        [ "shuffle" set-word-prop ]
+        [ drop { $shuffle } swap set-word-help ]
+    } 2cleave ;
+
+PREDICATE: shuffle-word < word
+    def>> {
+        [ length 2 = ] [ first effect? ] [ last \ shuffle-effect = ]
+    } 1&& ;
+
+M: shuffle-word definer drop \ SHUFFLE: f ;
+
+M: shuffle-word definition drop f ;
 
 : 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
 
