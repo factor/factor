@@ -6,6 +6,12 @@ template <typename Array> cell array_capacity(const Array* array) {
 }
 
 template <typename Array> cell array_size(cell capacity) {
+  // Check for potential overflow in multiplication
+  if (capacity > ((cell)-1) / Array::element_size) {
+    critical_error("Array capacity overflow", capacity);
+    return 0; // Will never reach here
+  }
+  
   return sizeof(Array) + capacity * Array::element_size;
 }
 

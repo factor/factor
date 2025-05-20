@@ -333,13 +333,37 @@ inline static cell tuple_capacity(const tuple_layout *layout) {
 }
 
 inline static cell tuple_size(const tuple_layout* layout) {
-  return sizeof(tuple) + tuple_capacity(layout) * sizeof(cell);
+  cell capacity = tuple_capacity(layout);
+  
+  // Check for potential overflow in multiplication
+  if (capacity > ((cell)-1) / sizeof(cell)) {
+    critical_error("Tuple capacity overflow", capacity);
+    return 0; // Will never reach here
+  }
+  
+  return sizeof(tuple) + capacity * sizeof(cell);
 }
 
 inline static cell string_capacity(const string* str) {
   return untag_fixnum(str->length);
 }
 
+// Basic string size (without accounting for auxiliary storage)
 inline static cell string_size(cell size) { return sizeof(string) + size; }
+
+// Full string size including auxiliary storage if present
+inline static cell string_full_size(const string* str) {
+  cell base_size = string_size(string_capacity(str));
+  
+  // Account for auxiliary storage if present
+  if (str->aux != false_object) {
+    byte_array* aux = (byte_array*)UNTAG(str->aux);
+    // Auxiliary storage uses 2 bytes per character
+    cell aux_size = sizeof(byte_array) + untag_fixnum(aux->capacity);
+    return base_size + aux_size;
+  }
+  
+  return base_size;
+}
 
 }

@@ -11,7 +11,7 @@ cell object::base_size(Fixup fixup) const {
     case BYTE_ARRAY_TYPE:
       return array_size((byte_array*)this);
     case STRING_TYPE:
-      return string_size(string_capacity((string*)this));
+      return string_full_size((string*)this);
     case TUPLE_TYPE: {
       tuple_layout* layout = (tuple_layout*)fixup.translate_data(
           untag<object>(((tuple*)this)->layout));
