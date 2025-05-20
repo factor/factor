@@ -1221,13 +1221,6 @@ HELP: CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE
 
     { $see-also CubemapLayout } } ;
 
-HELP: CUBEMAP_LAYOUT_PANORAMA
-{ $class-description
-    A cubemap who's layout is defined by a panoramic image (equirectangular map).
-
-    { $see-also CubemapLayout } } ;
-
-
 ! font type enum
 HELP: FontType
 { $var-description
@@ -2465,7 +2458,7 @@ HELP: load-shader-from-memory
     { $warning
         "Shader functionality is not available on OpenGL 1.1" } } ;
 
-HELP: is-shader-ready
+HELP: is-shader-valid
 { $values
     shader: Shader
     bool: boolean }
@@ -2547,13 +2540,13 @@ HELP: unload-shader
 
 
 ! Screen-space-related functions
-HELP: get-mouse-ray
+HELP: get-screen-to-world-ray
 { $values
-    mousePosition: Vector2
+    position: Vector2
     camera: Camera
     Ray: Ray }
 { $description
-    "Get a ray trace from mouse position" } ;
+    "Get a ray trace from screen position" } ;
 
 HELP: get-camera-matrix
 { $values
@@ -3427,8 +3420,8 @@ HELP: draw-circle-gradient
     centerX: int
     centerY: int
     radius: float
-    color1: Color
-    color2: Color }
+    inner: Color
+    outer: Color }
 { $description
     "Draw a gradient-filled circle" } ;
 
@@ -3541,8 +3534,8 @@ HELP: draw-rectangle-gradient-v
     posY: int
     width: int
     height: int
-    color1: Color
-    color2: Color }
+    top: Color
+    bottom: Color }
 { $description
     "Draw a vertical-gradient-filled rectangle" } ;
 
@@ -3552,18 +3545,18 @@ HELP: draw-rectangle-gradient-h
     posY: int
     width: int
     height: int
-    color1: Color
-    color2: Color }
+    left: Color
+    right: Color }
 { $description
     "Draw a horizontal-gradient-filled rectangle" } ;
 
 HELP: draw-rectangle-gradient-ex
 { $values
     rec: Rectangle
-    col1: Color
-    col2: Color
-    col3: Color
-    col4: Color }
+    topLeft: Color
+    bottomLeft: Color
+    topRight: Color
+    bottomRight: Color }
 { $description
     "Draw a gradient-filled rectangle with custom vertex colors" } ;
 
@@ -3599,7 +3592,6 @@ HELP: draw-rectangle-rounded-lines
     rec: Rectangle
     roundness: float
     segments: int
-    lineThick: float
     color: Color }
 { $description
     "Draw rectangle with rounded edges outline" } ;
@@ -3942,15 +3934,6 @@ HELP: load-image-raw
 { $description
     "Load image from RAW file data." } ;
 
-HELP: load-image-svg
-{ $values
-    fileNameOrString: c-string
-    width: int
-    height: int
-    Image: Image }
-{ $description
-    "Load image from SVG file data or string with specified size" } ;
-
 HELP: load-image-anim
 { $values
     fileName: c-string
@@ -3981,7 +3964,7 @@ HELP: load-image-from-screen
 { $description
     "Load image from screen buffer and (screenshot)" } ;
 
-HELP: is-image-ready
+HELP: is-image-valid
 { $values
     image: Image
     bool: bool }
@@ -4544,7 +4527,7 @@ HELP: load-render-texture
 { $description
     "Load texture for rendering (framebuffer)" } ;
 
-HELP: is-texture-ready
+HELP: is-texture-valid
 { $values
     texture: Texture2D
     bool: bool }
@@ -4557,7 +4540,7 @@ HELP: unload-texture
 { $description
     "Unload texture from GPU memory (VRAM)" } ;
 
-HELP: is-render-texture-ready
+HELP: is-render-texture-valid
 { $values
     target: RenderTexture2D }
 { $description
@@ -4832,7 +4815,7 @@ HELP: load-font-from-memory
 { $description
     "Load font from memory buffer, fileType refers to extension: i.e. '.ttf'" } ;
 
-HELP: is-font-ready
+HELP: is-font-valid
 { $values
     font: Font
     bool: bool }
@@ -5408,7 +5391,7 @@ HELP: load-model-from-mesh
 { $description
     "Load model from generated mesh (default material)" } ;
 
-HELP: is-model-ready
+HELP: is-model-valid
 { $values
     model: Model
     bool: bool }
@@ -5482,7 +5465,7 @@ HELP: draw-billboard
     camera: Camera
     texture: Texture2D
     position: Vector3
-    size: float
+    scale: float
     tint: Color }
 { $description
     "Draw a billboard texture" } ;
@@ -5692,7 +5675,7 @@ HELP: load-material-default
 { $description
     "Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)" } ;
 
-HELP: is-material-ready
+HELP: is-material-valid
 { $values
     material: Material
     bool: bool }
@@ -5906,7 +5889,7 @@ HELP: load-wave-from-memory
 { $description
     Load wave from memory buffer, fileType refers to extension: i.e. '.wav' } ;
 
-HELP: is-wave-ready
+HELP: is-wave-valid
 { $values
     wave: Wave
     bool: bool }
@@ -5940,7 +5923,7 @@ HELP: unload-sound-alias
 { $description
     "Unload a sound alias (does not deallocate sample data)" } ;
 
-HELP: is-sound-ready
+HELP: is-sound-valid
 { $values
     sound: Sound
     bool: bool }
@@ -6047,8 +6030,8 @@ HELP: wave-copy
 HELP: wave-crop
 { $values
     wave: { "a " { $link pointer } " to a " { $link Wave } }
-    initSample: int
-    finalSample: int  }
+    initFrame: int
+    finalFrame: int  }
 { $description
     Crop a wave to defined samples range } ;
 
@@ -6091,7 +6074,7 @@ HELP: load-music-stream-from-memory
 { $description
     Load music stream from data } ;
 
-HELP: is-music-ready
+HELP: is-music-valid
 { $values
     music: Music
     bool: bool }
@@ -6193,7 +6176,7 @@ HELP: load-audio-stream
 { $description
     "Load audio stream (to stream raw audio pcm data)" } ;
 
-HELP: is-audio-stream-ready
+HELP: is-audio-stream-valid
 { $values
     stream: AudioStream
     bool: bool }
