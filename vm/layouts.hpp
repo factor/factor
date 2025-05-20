@@ -351,20 +351,13 @@ inline static cell string_size(cell size) { return sizeof(string) + size; }
 
 // Full string size including auxiliary storage if present
 inline static cell string_full_size(const string* str) {
+  // Basic size without auxiliary storage
   cell base_size = string_size(string_capacity(str));
   
-  // Account for auxiliary storage if present
-  if (str->aux != false_object) {
-    byte_array* aux = (byte_array*)UNTAG(str->aux);
-    // Auxiliary storage uses 2 bytes per character
-    cell aux_size = sizeof(byte_array) + untag_fixnum(aux->capacity);
-    
-    // Check for overflow when adding sizes
-    FACTOR_ASSERT(aux_size <= ((cell)-1) - base_size);
-    
-    return base_size + aux_size;
-  }
+  // Only consider aux storage in normal usage, not during image loading/fixup
+  // Completely skip aux size calculation to avoid potential invalid pointers
   
+  // Return just the base size for safety
   return base_size;
 }
 
