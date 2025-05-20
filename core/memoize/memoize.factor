@@ -11,7 +11,7 @@ IN: memoize
 
 : [nsequence] ( length exemplar -- quot )
     over <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map
-    [ ] concat-as '[ _ _ new-sequence @ ] ;
+    [ ] concat-as over '[ _ _ new-sequence @ _ like ] ;
 
 : [firstn] ( length -- quot )
     <iota> [ '[ [ _ swap nth-unsafe ] keep ] ] map
