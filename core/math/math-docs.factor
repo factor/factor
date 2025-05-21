@@ -275,7 +275,7 @@ HELP: 2/
 { $notes "This word is not equivalent to " { $snippet "2 /" } " or " { $snippet "2 /i" } "; the name is historic and originates from the Forth programming language." } ;
 
 HELP: 2^
-{ $values { "n" "a positive integer" } { "2^n" "a positive integer" } }
+{ $values { "n" "a non-negative integer" } { "2^n" "a positive integer" } }
 { $description "Computes two to the power of " { $snippet "n" } ". This word will only give correct results if " { $snippet "n" } " is greater than zero; for the general case, use " { $snippet "2 swap ^" } "." } ;
 
 HELP: zero?
