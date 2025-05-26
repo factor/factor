@@ -29,11 +29,11 @@ CONSTANT: base85-alphabet $[
 : (encode-base85) ( stream column -- )
     4 pick stream-read dup length {
         { 0 [ 3drop ] }
-        { 4 [ encode4 write-lines (encode-base85) ] }
+        { 4 [ encode4 wrap-lines (encode-base85) ] }
         [
             drop
             [ 4 0 pad-tail encode4 ]
-            [ length 4 swap - head-slice* write-lines ] bi
+            [ length 4 swap - head-slice* wrap-lines ] bi
             (encode-base85)
         ]
     } case ;
@@ -127,11 +127,11 @@ CONSTANT: ascii85-alphabet $[
 : (encode-ascii85) ( stream column -- )
     4 pick stream-read dup length {
         { 0 [ 3drop ] }
-        { 4 [ encode4' write-lines (encode-ascii85) ] }
+        { 4 [ encode4' wrap-lines (encode-ascii85) ] }
         [
             drop
             [ 4 0 pad-tail encode4' ]
-            [ length 4 swap - head-slice* write-lines ] bi
+            [ length 4 swap - head-slice* wrap-lines ] bi
             (encode-ascii85)
         ]
     } case ;

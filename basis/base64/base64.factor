@@ -36,7 +36,7 @@ CONSTANT: alphabet $[
         [ [ -6 shift bitor ch>base64 ] [ 6 bits ch>base64 ] bi ]
     } spread ; inline
 
-:: (stream-write-lines) ( column data stream -- column' )
+:: (stream-wrap-lines) ( column data stream -- column' )
     column data over 71 > [
         [
             stream stream-write1 1 + dup 76 = [
@@ -48,11 +48,11 @@ CONSTANT: alphabet $[
         stream stream-write 4 +
     ] if ; inline
 
-: stream-write-lines ( column data stream -- column' )
-    pick [ (stream-write-lines) ] [ stream-write ] if ; inline
+: stream-wrap-lines ( column data stream -- column' )
+    pick [ (stream-wrap-lines) ] [ stream-write ] if ; inline
 
-: write-lines ( column data -- column' )
-    output-stream get stream-write-lines ; inline
+: wrap-lines ( column data -- column' )
+    output-stream get stream-wrap-lines ; inline
 
 :: (encode-base64) ( input output column -- )
     4 (byte-array) :> data
@@ -63,7 +63,7 @@ CONSTANT: alphabet $[
             { 0 [ ] }
             { 1 [ drop CHAR: = ] }
             { 2 [ 2drop CHAR: = CHAR: = ] }
-        } case data (4sequence) output stream-write-lines
+        } case data (4sequence) output stream-wrap-lines
     ] while 2drop ; inline
 
 PRIVATE>
