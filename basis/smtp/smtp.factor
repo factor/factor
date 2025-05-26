@@ -118,7 +118,7 @@ ERROR: smtp-error response ;
 
 M: smtp-error error.
     "SMTP error (" write dup class-of pprint ")" print
-    response>> messages>> [ print ] each ;
+    response>> messages>> write-lines ;
 
 ERROR: smtp-server-busy < smtp-error ;
 ERROR: smtp-syntax-error < smtp-error ;

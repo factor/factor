@@ -164,6 +164,9 @@ PRIVATE>
 : read-lines ( -- seq )
     input-stream get stream-lines ; inline
 
+: write-lines ( seq -- )
+    output-stream get '[ _ stream-print ] each ; inline
+
 CONSTANT: default-block-size 65536
 
 : (each-stream-block-slice) ( ... stream quot: ( ... block-slice -- ... ) block-size -- ... )

@@ -89,7 +89,7 @@ M: gopher-link >url
     utf8 decode split-lines { "." } split1 drop ;
 
 : gopher-text. ( object -- )
-    gopher-text [ print ] each ;
+    gopher-text write-lines ;
 
 : gopher-gif. ( object -- )
     "gif" (image-class) load-image* image. ;

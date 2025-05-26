@@ -570,7 +570,7 @@ DEFER: cursor-visitor
             [ members [ length ] inv-sort-by ] assoc-map
         ] change-out-forms-by-name
         out-forms>>
-        sort-keys values [ print ] each
+        sort-keys values write-lines
     ] bi ;
 
 : parse-include ( path -- libclang-state )
