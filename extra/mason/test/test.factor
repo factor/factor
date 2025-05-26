@@ -90,8 +90,7 @@ IN: mason.test
 
 : outdated-boot-image. ( modified-sources modified-docs -- )
     "Boot image is out of date. Changed vocabs:" print
-    union [ print ] each
-    flush ;
+    union write-lines flush ;
 
 : check-boot-image ( -- ? )
     outdated-core-vocabs [ outdated-boot-image. t ] [ 2drop f ] if ;

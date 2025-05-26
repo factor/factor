@@ -32,7 +32,7 @@ PRIVATE>
     format-cells flip [ join-words ] map! ;
 
 : format-table. ( table -- )
-    format-table [ print ] each ;
+    format-table write-lines ;
 
 : format-box ( table -- seq )
     format-cells [ { } ] [
@@ -46,4 +46,4 @@ PRIVATE>
     ] if-empty ;
 
 : format-box. ( table -- )
-    format-box [ print ] each ;
+    format-box write-lines ;

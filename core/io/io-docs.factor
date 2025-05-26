@@ -301,6 +301,10 @@ HELP: read-lines
 { $values { "seq" { $sequence string } } }
 { $description "Reads lines of text until from the " { $link input-stream } " until it is exhausted, collecting them in a sequence of strings." } ;
 
+HELP: write-lines
+{ $values { "seq" { $sequence string } } }
+{ $description "Print lines of text to the " { $link output-stream } " until the sequence is exhausted." } ;
+
 HELP: each-line
 { $values { "quot" { $quotation ( ... line -- ... ) } } }
 { $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
