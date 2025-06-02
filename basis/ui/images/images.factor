@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache combinators images images.loader
-kernel math namespaces opengl opengl.textures sequences
-splitting system ui.gadgets.worlds vocabs ;
+USING: accessors assocs cache images images.loader kernel math
+namespaces opengl opengl.textures sequences splitting
+ui.gadgets.worlds ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -44,13 +44,3 @@ PRIVATE>
 
 : image-dim ( image -- dim )
     cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
-
-{
-    { [ os macos? ] [ "images.loader.cocoa" require ] }
-    { [ os windows?  ] [ "images.loader.gdiplus" require ] }
-    { [ os { freebsd } member? ] [
-        "images.png" require
-        "images.tiff" require
-    ] }
-    [ "images.loader.gtk" require ]
-} cond
