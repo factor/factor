@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: ascii assocs byte-arrays destructors fry
+USING: ascii assocs byte-arrays combinators destructors
 io.encodings.binary io.files io.pathnames io.streams.byte-array
-kernel namespaces strings ;
+kernel namespaces strings system vocabs ;
 IN: images.loader
 
 ERROR: unknown-image-extension extension ;
@@ -55,3 +55,10 @@ GENERIC: image>stream ( image extension class -- )
 : save-graphic-image ( image path -- )
     dup file-extension dup (image-class) rot
     binary [ image>stream ] with-file-writer ;
+
+{
+    { [ os macos? ] [ "images.loader.cocoa" require ] }
+    { [ os windows? ] [ "images.loader.gdiplus" require ] }
+    { [ os freebsd? ] [ "images.png" require "images.tiff" require ] }
+    [ "images.loader.gtk" require ]
+} cond
