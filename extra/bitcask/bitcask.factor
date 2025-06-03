@@ -68,10 +68,9 @@ TUPLE: bitcask path index ;
 
 M:: bitcask delete-at ( key bitcask -- )
     key bitcask index>> key? [
-        key bitcask index>> delete-at
         bitcask path>> binary [
-            tell-output key bitcask index>> set-at
             key write-tombstone
+            key bitcask index>> delete-at
         ] with-file-appender
     ] when ;
 
@@ -89,21 +88,27 @@ M:: bitcask set-at ( value key bitcask -- )
         key bitcask index>> set-at
     ] with-file-appender ;
 
-M: bitcask assoc-size
-    index>> assoc-size ;
+M: bitcask assoc-size index>> assoc-size ;
 
-M:: bitcask >alist ( bitcask -- alist )
-    bitcask path>> binary [
-        bitcask index>> [
+M: bitcask >alist
+    dup path>> binary [
+        index>> [
             seek-absolute seek-input read-entry t assert=
         ] { } assoc-map-as
     ] with-file-reader ;
 
-M:: bitcask clear-assoc ( bitcask -- )
-    bitcask path>> binary [
-        bitcask index>>
-        dup keys [ write-tombstone ] each
-        clear-assoc
+M: bitcask keys index>> keys ;
+
+M: bitcask values
+    dup path>> binary [
+        index>> values [
+            seek-absolute seek-input read-entry t assert=
+        ] map
+    ] with-file-reader ;
+
+M: bitcask clear-assoc
+    dup path>> binary [
+        index>> dup keys [ write-tombstone ] each clear-assoc
     ] with-file-appender ;
 
 INSTANCE: bitcask assoc
