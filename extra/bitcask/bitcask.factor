@@ -22,7 +22,7 @@ IN: bitcask
         drop f f
     ] [
         [ seek-relative seek-input ]
-        [ read [ bytes>object t ] [ f f ] if* ] bi*
+        [ read bytes>object t ] bi*
     ] if-zero ;
 
 : read-index ( -- index )
