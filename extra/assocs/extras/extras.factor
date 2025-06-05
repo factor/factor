@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license
 USING: arrays assocs assocs.private kernel math math.statistics
-sequences sets ;
+sequences sequences.generalizations sets ;
 IN: assocs.extras
 
 : set-of ( assoc key value -- assoc )
@@ -308,3 +308,9 @@ PRIVATE>
 
 : assoc-interleave ( ... assoc between quot: ( ... key value -- ... ) -- ... )
     [ >alist ] 2dip [ first2 ] prepose interleave ; inline
+
+MACRO: nzip ( n -- quot )
+    dup '[ [ _ narray ] { } _ nmap-as ] ;
+
+MACRO: nunzip ( n -- quot )
+    '[ flip _ firstn ] ;
