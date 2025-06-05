@@ -36,7 +36,7 @@ cell factor_vm::capture_callstack(context* ctx) {
   fixnum size = std::max((cell)0, bottom - top);
 
   callstack* stack = allot_callstack(size);
-  memcpy(stack->top(), (void *)top, size);
+  memcpy((void*)stack->top(), (void *)top, size);
   return tag<callstack>(stack);
 }
 
@@ -77,15 +77,15 @@ void factor_vm::primitive_callstack_to_array() {
 // Used by the single stepper.
 void factor_vm::primitive_innermost_stack_frame_executing() {
   callstack* stack = untag_check<callstack>(ctx->peek());
-  void* frame = stack->top();
-  cell addr = *(cell*)frame;
+  cell frame = stack->top();
+  cell addr = *(cell*)(frame + FRAME_RETURN_ADDRESS);
   ctx->replace(code->code_block_for_address(addr)->owner_quot());
 }
 
 void factor_vm::primitive_innermost_stack_frame_scan() {
   callstack* stack = untag_check<callstack>(ctx->peek());
-  void* frame = stack->top();
-  cell addr = *(cell*)frame;
+  cell frame = stack->top();
+  cell addr = *(cell*)(frame + FRAME_RETURN_ADDRESS);
   ctx->replace(code->code_block_for_address(addr)->scan(this, addr));
 }
 
@@ -99,8 +99,8 @@ void factor_vm::primitive_set_innermost_stack_frame_quotation() {
 
   jit_compile_quotation(quot.value(), true);
 
-  void* inner = stack->top();
-  cell addr = *(cell*)inner;
+  cell inner = stack->top();
+  cell addr = *(cell*)(inner + FRAME_RETURN_ADDRESS);
   code_block* block = code->code_block_for_address(addr);
   cell offset = block->offset(addr);
   *(cell*)inner = quot->entry_point + offset;

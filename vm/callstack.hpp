@@ -17,7 +17,7 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 
   while (frame_offset < frame_length) {
     cell frame_top = stack->frame_top_at(frame_offset);
-    cell addr = *(cell*)frame_top;
+    cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
     cell fixed_addr = Fixup::translated_code_block_map
                           ? (cell)fixup.translate_code((code_block*)addr)
                           : addr;
@@ -52,22 +52,30 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
   FACTOR_ASSERT(!Fixup::translated_code_block_map || top == bottom);
 
   while (top < bottom) {
-    cell addr = *(cell*)top;
+    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);
 
     // Only the address is valid, if the code heap has been compacted,
     // owner might not point to a real code block.
     code_block* owner = code->code_block_for_address(addr);
     code_block* fixed_owner = fixup.translate_code(owner);
-
+#ifdef FACTOR_ARM64
+    (void)fixed_owner;
+    cell size = *(cell*)top - top;
+#else
     cell delta = addr - (cell)owner - sizeof(code_block);
     cell natural_frame_size = fixed_owner->stack_frame_size();
     cell size = LEAF_FRAME_SIZE;
     if (natural_frame_size > 0 && delta > 0)
       size = natural_frame_size;
+#endif
 
     iterator(top, size, owner, addr);
+#ifdef FACTOR_ARM64
+    top = *(cell*)top;
+#else
     top += size;
+#endif
   }
   FACTOR_ASSERT(top == bottom);
 }

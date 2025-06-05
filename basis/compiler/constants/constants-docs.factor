@@ -11,18 +11,6 @@ HELP: rc-absolute
 HELP: rc-absolute-cell
 { $description "Indicates that the relocation is a cell-sized absolute address to an object in the VM." } ;
 
-HELP: rc-relative-arm64-branch
-{ $description "Relative address stored, divided by four, in bits 25:0 of an ARM64 instruction." } ;
-
-HELP: rc-relative-arm64-bcond
-{ $description "Relative address stored, divided by four, in bits 23:5 of an ARM64 instruction." } ;
-
-HELP: rc-absolute-arm64-movz
-{ $description "Absolute address stored in bits 20:5 of an ARM64 instruction." } ;
-
-HELP: rc-relative-cell
-{ $description "Indicates that the relocation is a cell-sized relative address to an object in the VM." } ;
-
 
 HELP: rt-cards-offset
 { $description "Relocation offset type for the cards table." }
@@ -91,18 +79,13 @@ $nl
 { $subsections
     rc-absolute-cell
     rc-absolute
-    rc-relative
-    rc-absolute-ppc-2/2
-    rc-absolute-ppc-2
-    rc-relative-ppc-2-pc
-    rc-relative-ppc-3-pc
     rc-absolute-2
     rc-absolute-1
-    rc-absolute-ppc-2/2/2/2
-    rc-relative-arm64-branch
-    rc-relative-arm64-bcond
-    rc-absolute-arm64-movz
-    rc-relative-cell
+    rc-relative
+    rc-relative-arm-b
+    rc-relative-arm-b.cond/ldr
+    rc-absolute-arm-ldur
+    rc-absolute-arm-cmp
 }
 "Relocation types:"
 { $subsections
