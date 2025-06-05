@@ -107,8 +107,11 @@ GENERIC: slots>tuple ( seq class -- tuple )
 M: tuple-class slots>tuple
     check-slots pad-slots make-tuple ;
 
+: tuple>slots ( tuple -- seq class )
+    [ tuple-slots ] [ class-of ] bi ;
+
 : tuple>array ( tuple -- array )
-    [ tuple-slots ] [ class-of prefix ] bi ;
+    tuple>slots prefix ;
 
 : >tuple ( seq -- tuple )
     unclip slots>tuple ;
