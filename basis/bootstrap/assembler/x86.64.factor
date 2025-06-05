@@ -113,13 +113,13 @@ IN: bootstrap.assembler.x86
 
 ! Inline cache miss entry points
 : jit-load-return-address ( -- )
-    RBX RSP stack-frame-size bootstrap-cell - [+] MOV ;
+    pic-tail-reg RSP stack-frame-size bootstrap-cell - [+] MOV ;
 
 ! These are always in tail position with an existing stack
 ! frame, and the stack. The frame setup takes this into account.
 : jit-inline-cache-miss ( -- )
     jit-save-context
-    arg1 RBX MOV
+    arg1 pic-tail-reg MOV
     arg2 vm-reg MOV
     RAX 0 MOV rc-absolute-cell rel-inline-cache-miss
     RAX CALL
@@ -127,13 +127,13 @@ IN: bootstrap.assembler.x86
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
-[ RAX CALL ]
-[ RAX JMP ]
+[ return-reg CALL ]
+[ return-reg JMP ]
 \ inline-cache-miss define-combinator-primitive
 
 [ jit-inline-cache-miss ]
-[ RAX CALL ]
-[ RAX JMP ]
+[ return-reg CALL ]
+[ return-reg JMP ]
 \ inline-cache-miss-tail define-combinator-primitive
 
 ! Overflowing fixnum arithmetic
@@ -300,7 +300,7 @@ IN: bootstrap.assembler.x86
         RSP 2 SUB
         RSP [] FNSTCW
         FNINIT
-        AX RSP [] MOV
+        return-reg 16-bit-version-of RSP [] MOV
         RSP 2 ADD
     ] }
     { set-fpu-state [

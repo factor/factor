@@ -17,6 +17,7 @@ IN: bootstrap.assembler.x86
 : temp2 ( -- reg ) EBX ;
 : temp3 ( -- reg ) EDX ;
 : pic-tail-reg ( -- reg ) EDX ;
+: return-reg ( -- reg ) EAX ;
 : stack-reg ( -- reg ) ESP ;
 : frame-reg ( -- reg ) EBP ;
 : vm-reg ( -- reg ) EBX ;
@@ -130,13 +131,13 @@ IN: bootstrap.assembler.x86
     jit-restore-context ;
 
 [ jit-load-return-address jit-inline-cache-miss ]
-[ EAX CALL ]
-[ EAX JMP ]
+[ return-reg CALL ]
+[ return-reg JMP ]
 \ inline-cache-miss define-combinator-primitive
 
 [ jit-inline-cache-miss ]
-[ EAX CALL ]
-[ EAX JMP ]
+[ return-reg CALL ]
+[ return-reg JMP ]
 \ inline-cache-miss-tail define-combinator-primitive
 
 ! Overflowing fixnum arithmetic
@@ -222,7 +223,7 @@ IN: bootstrap.assembler.x86
     ! Make the new context active
     jit-load-vm
     jit-save-context
-    EAX jit-switch-context
+    return-reg jit-switch-context
 
     jit-push-param
 
@@ -338,7 +339,7 @@ IN: bootstrap.assembler.x86
         ESP 2 SUB
         ESP [] FNSTCW
         FNINIT
-        AX ESP [] MOV
+        return-reg 16-bit-version-of ESP [] MOV
         ESP 2 ADD
     ] }
     { set-fpu-state [

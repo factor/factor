@@ -314,9 +314,9 @@ struct callstack : public object {
     return (cell)(this + 1) + offset;
   }
 
-  void* top() const { return (void*)(this + 1); }
-  void* bottom() const {
-    return (void*)((cell)(this + 1) + untag_fixnum(length));
+  cell top() const { return (cell)(this + 1); }
+  cell bottom() const {
+    return (cell)(this + 1) + untag_fixnum(length);
   }
 };
 
