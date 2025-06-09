@@ -20,6 +20,7 @@ FUNCTION: OSErr Gestalt ( OSType selector, SInt32* response )
 : system-version-bugfix ( -- n ) "sys3" be> gestalt ;
 
 CONSTANT: system-code-names H{
+    { { 26 0 } "Tahoe" }
     { { 15 0 } "Sequoia" }
     { { 14 0 } "Sonoma" }
     { { 13 0 } "Ventura" }
