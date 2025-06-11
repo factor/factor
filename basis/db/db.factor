@@ -108,14 +108,14 @@ M: object execute-statement*
 : sql-row-typed ( result-set -- seq )
     dup #columns [ row-column-typed ] with map-integers ;
 
-: query-each ( result-set quot: ( row -- ) -- )
+: query-each ( ... result-set quot: ( ... result-set -- ... ) -- ... )
     over more-rows? [
         [ call ] 2keep over advance-row query-each
     ] [
         2drop
     ] if ; inline recursive
 
-: query-map ( result-set quot: ( row -- row' ) -- seq )
+: query-map ( result-set quot: ( result-set -- elt ) -- seq )
     collector [ query-each ] dip { } like ; inline
 
 : with-db ( db quot -- )

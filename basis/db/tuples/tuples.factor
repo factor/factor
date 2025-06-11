@@ -32,7 +32,7 @@ GENERIC: eval-generator ( singleton -- object )
         '[ slot-name>> _ set-slot-named ] 2each
     ] keep ;
 
-: query-tuples-each ( exemplar-tuple statement quot: ( tuple -- ) -- )
+: query-tuples-each ( ... exemplar-tuple statement quot: ( ... tuple -- ... ) -- ... )
     [ [ out-params>> ] keep query-results ] dip '[
         [ sql-row-typed swap resulting-tuple @ ] 2with query-each
     ] with-disposal ; inline
@@ -63,7 +63,7 @@ GENERIC: eval-generator ( singleton -- object )
     [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
-: do-each-tuple ( exemplar-tuple statement quot: ( tuple -- ) -- tuples )
+: do-each-tuple ( ... exemplar-tuple statement quot: ( ... tuple -- ... ) -- ... tuples )
     '[ [ bind-tuple ] [ _ query-tuples-each ] 2bi ] with-disposal
     ; inline
 
