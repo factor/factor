@@ -11,7 +11,7 @@ lengthen ;
 
 PROTOCOL: assoc-protocol
 at* assoc-size >alist set-at assoc-clone-like
-delete-at clear-assoc new-assoc assoc-like ;
+delete-at clear-assoc new-assoc assoc-like keys values ;
 
 PROTOCOL: deque-protocol
 push-front* push-back* peek-front* peek-back* pop-front*
