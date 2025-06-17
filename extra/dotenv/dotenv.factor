@@ -30,24 +30,17 @@ IN: dotenv
 
     2seq [ first2 swap prefix "" like ] action ;
 
-: escaped-char ( ch -- parser )
-    [ "\\" token hide ] dip '[ _ = ] satisfy 2seq [ first ] action ;
-
 : single-quote ( -- parser )
-    CHAR: ' escaped-char [ CHAR: ' = not ] satisfy 2choice repeat0
-    "'" dup surrounded-by ;
+    "\\" token hide [ "\\'" member? ] satisfy 2seq [ first ] action
+    [ CHAR: ' = not ] satisfy 2choice repeat0 "'" dup surrounded-by ;
 
 : backtick ( -- parser )
-    CHAR: ` escaped-char [ CHAR: ` = not ] satisfy 2choice repeat0
-    "`" dup surrounded-by ;
-
-: escaped ( -- parser )
-    "\\" token hide [ "\"\\befnrt" member-eq? ] satisfy 2seq
-    [ first escape ] action ;
+    "\\" token hide [ "\\`" member? ] satisfy 2seq [ first ] action
+    [ CHAR: ` = not ] satisfy 2choice repeat0 "`" dup surrounded-by ;
 
 : double-quote ( -- parser )
-    escaped [ CHAR: " = not ] satisfy 2choice repeat0
-    "\"" dup surrounded-by ;
+    "\\" token hide [ "\"\\befnrt" member-eq? ] satisfy 2seq [ first escape ] action
+    [ CHAR: " = not ] satisfy 2choice repeat0 "\"" dup surrounded-by ;
 
 : literal ( -- parser )
     [ " \t" member? not ] satisfy repeat1 ;
