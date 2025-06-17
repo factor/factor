@@ -30,23 +30,23 @@ IN: dotenv
 
     2seq [ first2 swap prefix "" like ] action ;
 
-: escaped-char ( char -- parser )
+: escaped-char ( ch -- parser )
     [ "\\" token hide ] dip '[ _ = ] satisfy 2seq [ first ] action ;
 
 : single-quote ( -- parser )
-    CHAR: ' escaped-char  [ "'" member? not ] satisfy 2choice
-    repeat0 "'" dup surrounded-by ;
+    CHAR: ' escaped-char [ CHAR: ' = not ] satisfy 2choice repeat0
+    "'" dup surrounded-by ;
 
 : backtick ( -- parser )
-    CHAR: ` escaped-char [ "`" member? not ] satisfy 2choice
-    repeat0 "`" dup surrounded-by ;
+    CHAR: ` escaped-char [ CHAR: ` = not ] satisfy 2choice repeat0
+    "`" dup surrounded-by ;
 
 : escaped ( -- parser )
     "\\" token hide [ "\"\\befnrt" member-eq? ] satisfy 2seq
     [ first escape ] action ;
 
 : double-quote ( -- parser )
-    escaped [ "\"" member? not ] satisfy 2choice repeat0
+    escaped [ CHAR: " = not ] satisfy 2choice repeat0
     "\"" dup surrounded-by ;
 
 : literal ( -- parser )
@@ -84,7 +84,7 @@ IN: dotenv
         "=" token hide ,
         ws hide ,
         value-parser ,
-    ] seq* [ first2 swap B set-os-env ignore ] action ;
+    ] seq* [ first2 swap set-os-env ignore ] action ;
 
 PEG: parse-dotenv ( string -- ast )
     ws hide key-value-parser ws hide comment optional hide 4seq
@@ -93,12 +93,15 @@ PEG: parse-dotenv ( string -- ast )
 
 PRIVATE>
 
-: find-dotenv ( -- path/f )
+: find-dotenv-file ( -- path/f )
     f current-directory get absolute-path [
         nip
         [ ".env" append-path dup file-exists? [ drop f ] unless ]
         [ ?parent-directory ] bi over [ f ] [ dup ] if
     ] loop drop ;
 
+: load-dotenv-file ( path -- )
+    utf8 file-contents parse-dotenv drop ;
+
 : load-dotenv ( -- )
-    find-dotenv [ utf8 file-contents parse-dotenv drop ] when* ;
+    find-dotenv-file [ load-dotenv-file ] when* ;
