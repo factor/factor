@@ -39,7 +39,7 @@ IN: dotenv
     [ CHAR: ` = not ] satisfy 2choice repeat0 "`" dup surrounded-by ;
 
 : double-quote ( -- parser )
-    "\\" token hide [ "\"\\befnrt" member-eq? ] satisfy 2seq [ first escape ] action
+    "\\" token hide [ "\"\\befnrt" member? ] satisfy 2seq [ first escape ] action
     [ CHAR: " = not ] satisfy 2choice repeat0 "\"" dup surrounded-by ;
 
 : literal ( -- parser )
