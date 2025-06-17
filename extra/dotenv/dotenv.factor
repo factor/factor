@@ -43,7 +43,7 @@ IN: dotenv
     [ CHAR: " = not ] satisfy 2choice repeat0 "\"" dup surrounded-by ;
 
 : literal ( -- parser )
-    [ " \t" member? not ] satisfy repeat1 ;
+    [ " \t" member? not ] satisfy repeat0 ;
 
 : interpolate-value ( string -- string' )
     R/ \$\([^)]+\)|\$\{[^\}:-]+(:?-[^\}]*)?\}|\$[^(^{].+/ [
