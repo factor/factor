@@ -43,7 +43,7 @@ IN: dotenv
     [ CHAR: " = not ] satisfy 2choice repeat0 "\"" dup surrounded-by ;
 
 : literal ( -- parser )
-    [ " \t" member? not ] satisfy repeat0 ;
+    [ " \t\r\n" member? not ] satisfy repeat0 ;
 
 : interpolate-value ( string -- string' )
     R/ \$\([^)]+\)|\$\{[^\}:-]+(:?-[^\}]*)?\}|\$[^(^{].+/ [
@@ -80,9 +80,9 @@ IN: dotenv
     ] seq* [ first2 swap set-os-env ignore ] action ;
 
 PEG: parse-dotenv ( string -- ast )
-    ws hide key-value-parser ws hide comment optional hide 4seq
-    ws hide comment optional hide 2seq
-    2choice newline list-of hide ;
+    ws hide key-value-parser optional
+    ws hide comment optional hide 4seq
+    newline list-of hide ;
 
 PRIVATE>
 
