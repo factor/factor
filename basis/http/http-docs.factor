@@ -16,7 +16,7 @@ $nl
     { "proxy-url" { "The proxy " { $link url } " to use, or " { $link f } " for no proxy. If not " { $link f } ", the url will additionally be " { $link derive-url } "'d from the " { $link "http.proxy-variables" } ". The proxy is used if the result has at least the " { $slot "host" } " slot set." } }
     { "version" { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
     { "header" { "An assoc of HTTP header values. See " { $link "http.headers" } } }
-    { "post-data" { "See " { $link "http.post-data" } } }
+    { "data" { "See " { $link "http.post-data" } } }
     { "cookies" { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
     { "redirects" { "Number of redirects to attempt before throwing an error. Default is " { $snippet "max-redirects" } "." } }
 } } ;
