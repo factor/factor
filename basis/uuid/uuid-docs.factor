@@ -32,14 +32,18 @@ HELP: uuid5
 
 ARTICLE: "uuid" "UUID (Universally Unique Identifier)"
 "The " { $vocab-link "uuid" } " vocabulary is used to generate UUIDs. "
-"The below words can be used to generate version 1, 3, 4, and 5 UUIDs as specified in RFC 4122."
+"The below words can be used to generate version 1, 3, 4, and 5 UUIDs as specified in " { $url "https://datatracker.ietf.org/doc/html/rfc4122" "RFC 4122" } " and version 6, 7, and 8 UUIDs as specified in " { $url "https://datatracker.ietf.org/doc/html/rfc9562" "RFC 9562" } "."
 $nl
 "If all you want is a unique ID, you should probably call " { $link uuid1 } " or " { $link uuid4 } "."
+$nl
 { $subsections
     uuid1
     uuid3
     uuid4
     uuid5
+    uuid6
+    uuid7
+    uuid8
 }
 ;
 
