@@ -1,9 +1,9 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: bit-arrays combinators.short-circuit kernel math
+USING: bit-arrays combinators.short-circuit grouping kernel math
 math.functions math.order math.statistics math.vectors sequences
-sequences.extras ;
+sequences.extras sets ;
 
 IN: math.similarity
 
@@ -70,3 +70,6 @@ PRIVATE>
     a b min-length 4 min :> len
     a b [ len head-slice ] bi@ [ = ] 2count :> #common-prefix
     1 jaro - #common-prefix 0.1 * * jaro + ;
+
+: trigram-similarity ( a b -- n )
+    [ 3 clump ] bi@ [ intersect ] [ union ] 2bi [ length ] bi@ / ;
