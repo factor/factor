@@ -43,3 +43,9 @@ ALIAS: chessboard-distance chebyshev-distance
 
 : correlation-distance ( a b -- n )
     [ demean ] bi@ cosine-distance ;
+
+: jaro-distance ( a b -- n )
+    jaro-similarity 1.0 swap - ;
+
+: jaro-winkler-distance ( a b -- n )
+    jaro-winkler-similarity 1.0 swap - ;

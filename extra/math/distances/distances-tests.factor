@@ -21,3 +21,7 @@ ${ 3 sqrt } [ { 1 1 1 } { 2 2 2 } euclidian-distance ] unit-test
 { t } [ { 1 2 3 } dup correlation-distance 0.0 1e-10 ~ ] unit-test
 { t } [ { 1 2 3 } { 1 2 1 } correlation-distance 1.0 1e-10 ~ ] unit-test
 { t } [ { 1 2 3 } { 3 2 1 } correlation-distance 2.0 1e-10 ~ ] unit-test
+
+{ 0.09166666666666667 } [ "seperate" "separate" jaro-winkler-distance ] unit-test
+{ 0.04222222222222227 } [ "goverment" "government" jaro-winkler-distance ] unit-test
+{ 0.08153846153846156 } [ "accomodate" "accommodation" jaro-winkler-distance ] unit-test
