@@ -34,19 +34,15 @@ PRIVATE>
     a b 2dup [ length ] bi@ 2dup < [ [ swap ] 2bi@ ] when :> ( str1 str2 len1 len2 )
     len1 len2 max 2/ 1 [-] :> delta
     len2 <bit-array> :> flags
-    V{ } clone :> matches
 
     str1 [| ch1 idx1 |
         idx1 delta [-] idx1 delta + len2 min [| idx2 |
             {
                 [ idx2 flags nth not ]
                 [ idx1 str1 nth idx2 str2 nth = ]
-            } 0&& dup [
-                t idx2 flags set-nth
-                ch1 matches push
-            ] when
-        ] find-integer-from drop
-    ] each-index
+            } 0&& dup [ t idx2 flags set-nth ] when
+        ] find-integer-from
+    ] filter-index :> matches
 
     matches length :> #matches
     #matches dup zero? [
