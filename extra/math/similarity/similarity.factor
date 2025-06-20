@@ -3,7 +3,7 @@
 
 USING: bit-arrays combinators.short-circuit grouping kernel math
 math.functions math.order math.statistics math.vectors sequences
-sequences.extras sets ;
+sequences.extras sequences.private sets ;
 
 IN: math.similarity
 
@@ -35,31 +35,28 @@ PRIVATE>
     len1 len2 max 2/ 1 [-] :> delta
     len2 <bit-array> :> flags
 
-    str1 [| ch1 idx1 |
-        idx1 delta [-] idx1 delta + len2 min [| idx2 |
-            {
-                [ idx2 flags nth not ]
-                [ idx1 str1 nth idx2 str2 nth = ]
-            } 0&& dup [ t idx2 flags set-nth ] when
+    str1 [| ch i |
+        i delta [-] i delta + len2 min [| j |
+            { [ j flags nth-unsafe not ] [ ch j str2 nth-unsafe = ] } 0&&
+            dup [ t j flags set-nth-unsafe ] when
         ] find-integer-from
     ] filter-index :> matches
 
-    matches length :> #matches
-    #matches dup zero? [
-        drop
+    matches [ 0 ] [
+        length :> #matches
         0 :> #transpositions!
-        0 :> idx1!
-        str2 [| ch2 idx2 |
-            idx2 flags nth [
-                ch2 idx1 matches nth = [
+        0 :> i!
+        str2 [| ch j |
+            j flags nth-unsafe [
+                ch i matches nth-unsafe = [
                     #transpositions 1 + #transpositions!
-                ] unless idx1 1 + idx1!
+                ] unless i 1 + i!
             ] when
         ] each-index
 
         #matches len1 /f #matches len2 /f +
         #matches #transpositions 2/ - #matches /f + 3 /
-    ] unless ;
+    ] if-empty ;
 
 :: jaro-winkler-similarity ( a b -- n )
     a b jaro-similarity :> jaro
