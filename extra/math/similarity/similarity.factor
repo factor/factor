@@ -36,7 +36,10 @@ PRIVATE>
     len2 <bit-array> :> flags
 
     str1 [| ch i |
-        i delta [-] i delta + len2 min [| j |
+        i delta [-]            :> from
+        i delta + 1 + len2 min :> to
+
+        from to [ integer>fixnum-strict ] bi@ [| j |
             { [ j flags nth-unsafe not ] [ ch j str2 nth-unsafe = ] } 0&&
             dup [ t j flags set-nth-unsafe ] when
         ] find-integer-from
@@ -44,15 +47,11 @@ PRIVATE>
 
     matches [ 0 ] [
         length :> #matches
-        0 :> #transpositions!
+
         0 :> i!
-        str2 [| ch j |
-            j flags nth-unsafe [
-                ch i matches nth-unsafe = [
-                    #transpositions 1 + #transpositions!
-                ] unless i 1 + i!
-            ] when
-        ] each-index
+        str2 flags [
+            [ i matches nth-unsafe = not i 1 + i! ] [ drop f ] if
+        ] 2count :> #transpositions
 
         #matches len1 /f #matches len2 /f +
         #matches #transpositions 2/ - #matches /f + 3 /
