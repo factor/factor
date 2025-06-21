@@ -2,10 +2,11 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays assocs bit-arrays byte-arrays calendar
-colors combinators kernel kernel.private math
-math.order ranges namespaces opengl random sequences
+colors combinators io kernel kernel.private make math math.order
+math.private namespaces opengl random sequences
 sequences.private timers ui ui.commands ui.gadgets
-ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words ;
+ui.gadgets.toolbar ui.gadgets.tracks ui.gestures ui.render words
+;
 
 IN: game-of-life
 
@@ -21,27 +22,28 @@ IN: game-of-life
         bit-array boa
     ] map! drop ;
 
+: grid. ( grid -- )
+    [ [ CHAR: # CHAR: . ? ] "" map-as ] map write-lines ;
+
+:: adjacent-indices ( n max -- n-1 n n+1 )
+    n [ max ] when-zero 1 fixnum-fast
+    n
+    n 1 fixnum+fast dup max = [ drop 0 ] when ; inline
+
 :: count-neighbors ( grid -- counts )
     grid grid-dim { fixnum fixnum } declare :> ( rows cols )
-    rows 1 - { fixnum } declare :> max-rows
-    cols 1 - { fixnum } declare :> max-cols
     rows [ cols <byte-array> ] replicate :> neighbors
     grid { array } declare [| row j |
-        j 0 eq? [ max-rows ] [ j 1 - ] if
-        j
-        j max-rows eq? [ 0 ] [ j 1 + ] if
+        j rows adjacent-indices
         [ neighbors nth-unsafe { byte-array } declare ] tri@ :>
         ( above same below )
 
         row { bit-array } declare [| cell i |
             cell [
-                i 0 eq? [ max-cols ] [ i 1 - ] if
-                i
-                i max-cols eq? [ 0 ] [ i 1 + ] if
-
-                [ [ above [ 1 + ] change-nth-unsafe ] tri@ ]
-                [ nip [ same [ 1 + ] change-nth-unsafe ] bi@ ]
-                [ [ below [ 1 + ] change-nth-unsafe ] tri@ ]
+                i cols adjacent-indices
+                [ [ above [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
+                [ nip [ same [ 1 fixnum+fast ] change-nth-unsafe ] bi@ ]
+                [ [ below [ 1 fixnum+fast ] change-nth-unsafe ] tri@ ]
                 3tri
             ] when
         ] each-index
@@ -74,7 +76,10 @@ M: grid-gadget ungraft*
     [ timer>> stop-timer ] [ call-next-method ] bi ;
 
 M: grid-gadget pref-dim*
-    [ grid>> grid-dim swap ] [ size>> '[ _ * ] bi@ 1 + 2array ] bi ;
+    [ grid>> grid-dim swap ] [ size>> '[ _ * ] bi@ 2array ] bi ;
+
+M: grid-gadget gadget-text*
+    grid>> [ CHAR: \n , ] [ [ CHAR: # CHAR: . ? ] "" map-as % ] interleave ;
 
 :: update-grid ( gadget -- )
     gadget dim>> first2 :> ( w h )
@@ -82,15 +87,14 @@ M: grid-gadget pref-dim*
     h w [ size /i ] bi@ :> ( new-rows new-cols )
     gadget grid>> :> grid
     grid grid-dim :> ( rows cols )
-    rows new-rows = not
-    cols new-cols = not or [
+    rows new-rows = not cols new-cols = not or [
         new-rows new-cols make-grid :> new-grid
-        rows new-rows min <iota> [| j |
-            cols new-cols min <iota> [| i |
+        rows new-rows min [| j |
+            cols new-cols min [| i |
                 i j grid nth-unsafe nth-unsafe
                 i j new-grid nth-unsafe set-nth-unsafe
-            ] each
-        ] each
+            ] each-integer
+        ] each-integer
         new-grid gadget grid<<
     ] when ;
 
@@ -111,14 +115,14 @@ M: grid-gadget pref-dim*
     gadget grid>> grid-dim :> ( rows cols )
     COLOR: gray gl-color
     cols rows [ size * ] bi@ :> ( w h )
-    rows [0..b] [| j |
+    rows 1 + [| j |
         j size * :> y
         { 0 y } { w y } gl-line
-    ] each
-    cols [0..b] [| i |
+    ] each-integer
+    cols 1 + [| i |
         i size * :> x
         { x 0 } { x h } gl-line
-    ] each ;
+    ] each-integer ;
 
 M: grid-gadget draw-gadget*
     [ update-grid ] [ draw-cells ] [ draw-lines ] tri ;
@@ -143,7 +147,8 @@ SYMBOL: last-click
     j 0 rows 1 - between? and [
         last-click get i j
         gadget grid>> nth-unsafe set-nth-unsafe
-    ] when gadget relayout-1 ;
+        gadget relayout-1
+    ] when ;
 
 : on-scroll ( gadget -- )
     [
@@ -174,7 +179,7 @@ SYMBOL: last-click
 :: com-glider ( gadget -- )
     gadget grid>> :> grid
     { { 2 1 } { 3 2 } { 1 3 } { 2 3 } { 3 3 } }
-    [ first2 grid nth t -rot set-nth ] each
+    [ grid nth t -rot set-nth ] assoc-each
     gadget relayout-1 ;
 
 grid-gadget "toolbar" f {
