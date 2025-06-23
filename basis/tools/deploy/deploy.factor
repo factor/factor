@@ -123,8 +123,8 @@ ERROR: no-vocab-main vocab ;
             { help "The vocabulary or vocabularies to be deployed" }
             { variable "vocabs-to-deploy" }
         }
-    }
-    parse-options [ "vocabs-to-deploy" get [ [ require ] [ deploy ] bi ] each ] with-variables
-    f program-epilog set-global ;
+    } [
+        "vocabs-to-deploy" get [ [ require ] [ deploy ] bi ] each
+    ] with-options f program-epilog set-global ;
 
 MAIN: deploy-main
