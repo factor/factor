@@ -30,6 +30,7 @@ ERROR: no-vocab-main vocab ;
 } cond require
 
 : deploy-main ( -- )
+    "All boolean options below can be inverted by prefixing no- to the option name. for example, --console becomes --no-console" program-epilog set-global
     {
         T{ option
             { name "--console" }
@@ -74,6 +75,7 @@ ERROR: no-vocab-main vocab ;
         T{ option
             { name "--reflection" }
             { required? f }
+            { meta "LEVEL" }
             { #args 1 }
             { type integer }
             { validate [ [ 6 <= ] [ 0 > ] bi and ] }
@@ -107,6 +109,7 @@ ERROR: no-vocab-main vocab ;
         T{ option
             { name "--io" }
             { required? f }
+            { meta "LEVEL" }
             { #args 1 }
             { type integer }
             { validate [ [ 3 <= ] [ 0 > ] bi and ] }
@@ -121,6 +124,7 @@ ERROR: no-vocab-main vocab ;
             { variable "vocabs-to-deploy" }
         }
     }
-    parse-options [ "vocabs-to-deploy" get [ [ require ] [ deploy ] bi ] each ] with-variables ;
+    parse-options [ "vocabs-to-deploy" get [ [ require ] [ deploy ] bi ] each ] with-variables
+    f program-epilog set-global ;
 
 MAIN: deploy-main
