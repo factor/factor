@@ -9,7 +9,7 @@ io.encodings io namespaces sequences splitting ;
         [
             input-stream [ utf8 <decoder> ] change
             output-stream [ utf8 <encoder> ] change
-            input-stream get stream-lines reverse [ print ] each f
+            input-stream get stream-lines reverse write-lines f
         ]
         "grep ."
     } run-pipeline

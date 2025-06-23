@@ -3,6 +3,8 @@ namespace factor {
 #define CALLSTACK_BOTTOM(ctx) \
   (ctx->callstack_seg->end - sizeof(cell) * 5)
 
+static const unsigned FRAME_RETURN_ADDRESS = 0;
+
 inline static void flush_icache(cell start, cell len) { (void)start; (void)len; }
 
 // In the instruction sequence:

@@ -46,17 +46,12 @@ CONSTANT: deck-bits 18
 CONSTANT: rc-absolute-cell 0
 CONSTANT: rc-absolute 1
 CONSTANT: rc-relative 2
-CONSTANT: rc-absolute-ppc-2/2 3
-CONSTANT: rc-absolute-ppc-2 4
-CONSTANT: rc-relative-ppc-2-pc 5
-CONSTANT: rc-relative-ppc-3-pc 6
+CONSTANT: rc-relative-arm-b 3
+CONSTANT: rc-relative-arm-b.cond/ldr 4
+CONSTANT: rc-absolute-arm-ldur 5
+CONSTANT: rc-absolute-arm-cmp 6
 CONSTANT: rc-absolute-2 10
 CONSTANT: rc-absolute-1 11
-CONSTANT: rc-absolute-ppc-2/2/2/2 12
-CONSTANT: rc-relative-arm64-branch 13
-CONSTANT: rc-relative-arm64-bcond 14
-CONSTANT: rc-absolute-arm64-movz 15
-CONSTANT: rc-relative-cell 16
 
 CONSTANT: rt-dlsym 0
 CONSTANT: rt-entry-point 1
@@ -76,9 +71,10 @@ CONSTANT: rt-safepoint 15
 
 : rc-absolute? ( n -- ? )
     ${
-        $ rc-absolute-ppc-2/2
         $ rc-absolute-cell
         $ rc-absolute
+        $ rc-absolute-arm-ldur
+        $ rc-absolute-arm-cmp
         $ rc-absolute-2
         $ rc-absolute-1
     } member? ;

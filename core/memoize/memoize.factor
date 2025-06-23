@@ -6,20 +6,17 @@ IN: memoize
 
 <PRIVATE
 
-! We can't use n*quot, narray and firstn from generalizations because
+! We can't use narray and firstn from generalizations because
 ! they're macros, and macros use memoize!
-: (n*quot) ( n quot -- quotquot )
-    <repetition> [ ] concat-as ;
+
+: [set-firstn] ( length -- quot )
+    <iota> reverse [ '[ [ _ swap set-nth-unsafe ] keep ] ] map [ ] concat-as ;
 
 : [nsequence] ( length exemplar -- quot )
-    [ [ [ 1 - ] keep ] dip '[ _ _ _ new-sequence ] ]
-    [ drop [ [ set-nth-unsafe ] 2keep [ 1 - ] dip ] (n*quot) ] 2bi
-    [ nip ] 3append ;
+    over [set-firstn] over '[ _ _ new-sequence @ _ like ] ;
 
 : [firstn] ( length -- quot )
-    [ 0 swap ] swap
-    [ [ nth-unsafe ] 2keep [ 1 + ] dip ] (n*quot)
-    [ 2drop ] 3append ;
+    <iota> [ '[ [ _ swap nth-unsafe ] keep ] ] map [ ] concat-as '[ @ drop ] ;
 
 : packer ( seq -- quot )
     length dup 4 <=

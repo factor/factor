@@ -126,5 +126,5 @@ ERROR: unimplemented-opcode opcode message ;
         drop f f f
     ] recover ;
 
-: read-websocket-loop ( quot: ( obj opcode -- loop? ) -- )
+: read-websocket-loop ( ... quot: ( ... obj opcode -- ... loop? ) -- ... )
     '[ read-websocket _ dip and ] loop ; inline

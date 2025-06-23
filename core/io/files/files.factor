@@ -62,7 +62,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ <file-writer-secure> ] dip with-output-stream ; inline
 
 : set-file-lines ( seq path encoding -- )
-    [ [ print ] each ] with-file-writer ;
+    [ write-lines ] with-file-writer ;
 
 : change-file-lines ( ..a path encoding quot: ( ..a seq -- ..b seq' ) -- ..b )
     '[ file-lines @ ] [ set-file-lines ] 2bi ; inline

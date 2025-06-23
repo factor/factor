@@ -49,8 +49,7 @@ IN: spotlight
     mdfind [ dup <pathname> write-object nl ] each ;
 
 : mdls ( path -- )
-    absolute-path "mdls" swap 2array process-lines
-    [ print ] each ;
+    absolute-path "mdls" swap 2array process-lines write-lines ;
 
 : mdutil ( flags on|off volume -- seq )
     [ "mdfind" swap "-" prepend "-i" ] 2dip 5 narray

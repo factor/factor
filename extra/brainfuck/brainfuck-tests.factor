@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: brainfuck io.streams.string kernel literals math
+USING: ascii brainfuck io.streams.string kernel literals math
 math.parser ranges sequences splitting tools.test ;
 
 [ "+" run-brainfuck ] must-infer
@@ -90,4 +90,18 @@ ${ 100 [0..b] [ dup * number>string ] map join-lines "\n" append }
     +               +
     +++++           +++++.
     " get-brainfuck
+] unit-test
+
+! Quine
+
+{ t } [
+    "
+    -->+++>+>+>+>+++++>++>++>->+++>++>+>>>>>>>>>>>>>>>>->++++>>>>->+++>+++>+++>+++>+
+    ++>+++>+>+>>>->->>++++>+>>>>->>++++>+>+>>->->++>++>++>++++>+>++>->++>++++>+>+>++
+    >++>->->++>++>++++>+>+>>>>>->>->>++++>++>++>++++>>>>>->>>>>+++>->++++>->->->+++>
+    >>+>+>+++>+>++++>>+++>->>>>>->>>++++>++>++>+>+++>->++++>>->->+++>+>+++>+>++++>>>
+    +++>->++++>>->->++>++++>++>++++>>++[-[->>+[>]++[<]<]>>+[>]<--[++>++++>]+[<]<<++]
+    >>>[>]++++>++++[--[+>+>++++<<[-->>--<<[->-<[--->>+<<[+>+++<[+>>++<<]]]]]]>+++[>+
+    ++++++++++++++<-]>--.<<<]
+    " [ blank? ] reject dup [ run-brainfuck ] with-string-writer =
 ] unit-test

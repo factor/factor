@@ -44,7 +44,11 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 
 void callback_heap::update(code_block* stub) {
   word* w = untag<word>(stub->owner);
+#ifdef FACTOR_ARM64
+  store_callback_operand(stub, 6, w->entry_point);
+#else
   store_callback_operand(stub, 1, w->entry_point);
+#endif
   stub->flush_icache();
 }
 
@@ -73,7 +77,15 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
+#ifdef FACTOR_ARM64
+  store_callback_operand(stub, 1, parent->code->safepoint_page);
+  store_callback_operand(stub, 2, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
+  store_callback_operand(stub, 3, (cell)&factor::inline_cache_miss);
+  store_callback_operand(stub, 4, parent->cards_offset);
+  store_callback_operand(stub, 5, parent->decks_offset);
+#else
   store_callback_operand(stub, 2, (cell)parent);
+#endif
 
   // On x86, the RET instruction takes an argument which depends on
   // the callback's calling convention

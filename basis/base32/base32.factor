@@ -38,8 +38,8 @@ CONSTANT: base32-alphabet $[ "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" >byte-array ]
 : (encode-base32) ( stream column -- )
     5 pick stream-read dup length {
         { 0 [ 3drop ] }
-        { 5 [ encode5 write-lines (encode-base32) ] }
-        [ encode-pad write-lines (encode-base32) ]
+        { 5 [ encode5 wrap-lines (encode-base32) ] }
+        [ encode-pad wrap-lines (encode-base32) ]
     } case ;
 
 PRIVATE>
@@ -107,8 +107,8 @@ CONSTANT: base32hex-alphabet $[ "0123456789ABCDEFGHIJKLMNOPQRSTUV" >byte-array ]
 : (encode-base32hex) ( stream column -- )
     5 pick stream-read dup length {
         { 0 [ 3drop ] }
-        { 5 [ encode5hex write-lines (encode-base32hex) ] }
-        [ encode-padhex write-lines (encode-base32hex) ]
+        { 5 [ encode5hex wrap-lines (encode-base32hex) ] }
+        [ encode-padhex wrap-lines (encode-base32hex) ]
     } case ;
 
 PRIVATE>
@@ -208,8 +208,8 @@ CONSTANT: zbase32-alphabet $[ "ybndrfg8ejkmcpqxot1uwisza345h769" >byte-array ]
 : (encode-zbase32) ( stream column -- )
     5 pick stream-read dup length {
         { 0 [ 3drop ] }
-        { 5 [ zencode5 write-lines (encode-zbase32) ] }
-        [ zencode-pad write-lines (encode-zbase32) ]
+        { 5 [ zencode5 wrap-lines (encode-zbase32) ] }
+        [ zencode-pad wrap-lines (encode-zbase32) ]
     } case ;
 
 PRIVATE>

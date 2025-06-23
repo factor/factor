@@ -109,6 +109,9 @@ SYMBOL: special-objects
     [ extra-offset set false-quot call ] B{ } make
     [ length test-quot call ] [ % ] bi ; inline
 
+: jit-conditional* ( test-quot false-quot -- )
+    [ '[ 4 + @ ] ] dip jit-conditional ; inline
+
 : make-jit ( quot -- parameters literals code )
     [
         0 extra-offset set

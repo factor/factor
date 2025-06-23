@@ -348,7 +348,7 @@ ARTICLE: "io.launcher.examples" "Launcher examples"
     "    <process>"
     "        swap >>stderr"
     "        \"report\" >>command"
-    "    ascii <process-reader> stream-lines sort reverse [ print ] each"
+    "    ascii <process-reader> stream-lines sort reverse write-lines"
     "] with-disposal"
 } ;
 

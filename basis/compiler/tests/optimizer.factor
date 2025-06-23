@@ -4,7 +4,7 @@ sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable memory namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer sequences.deep
-compiler.test definitions generic.single shuffle math.order
+compiler.test definitions generic.single math.order
 compiler.cfg.debugger classes.struct alien.syntax alien.data
 alien.c-types splitting ;
 IN: compiler.tests.optimizer

@@ -1,9 +1,10 @@
 ! Copyright (C) 2009 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors assocs command-line io io.encodings.binary
-io.files io.streams.string kernel math multiline namespaces
-peg.ebnf prettyprint quotations sequences ;
+USING: accessors ascii assocs combinators command-line io
+io.encodings.binary io.files io.streams.string kernel lexer math
+multiline namespaces parser peg.ebnf prettyprint quotations
+sequences words ;
 
 IN: brainfuck
 
@@ -69,6 +70,50 @@ MACRO: run-brainfuck ( code -- quot )
 
 : get-brainfuck ( code -- result )
     [ run-brainfuck ] with-string-writer ; inline
+
+SYNTAX: BRAINFUCK:
+    scan-new-word ";" parse-tokens concat
+    '[ _ run-brainfuck ] ( -- ) define-declared ;
+
+<PRIVATE
+
+: end-loop ( str i -- str j/f )
+    0 swap pick [
+        {
+            { CHAR: [ [ 1 + f ] }
+            { CHAR: ] [ 1 - dup zero? ] }
+            [ drop f ]
+        } case
+    ] find-from drop nip dup [ 1 + ] when ;
+
+: start-loop ( str i -- str j/f )
+    0 swap 1 - pick [
+        {
+            { CHAR: [ [ 1 - dup zero? ] }
+            { CHAR: ] [ 1 + f ] }
+            [ drop f ]
+        } case
+    ] find-last-from drop nip dup [ 1 + ] when ;
+
+: interpret-brainfuck-from ( str i brainfuck -- str next/f brainfuck )
+    2over swap ?nth [ 1 + ] 2dip {
+        { CHAR: > [ 1 (>) ] }
+        { CHAR: < [ 1 (<) ] }
+        { CHAR: + [ 1 (+) ] }
+        { CHAR: - [ 1 (-) ] }
+        { CHAR: . [ (.) ] }
+        { CHAR: , [ (,) ] }
+        { CHAR: # [ (#) ] }
+        { CHAR: [ [ get-memory zero? [ [ end-loop ] dip ] when ] }
+        { CHAR: ] [ get-memory zero? [ [ start-loop ] dip ] unless ] }
+        { f [ [ drop f ] dip ] }
+        [ blank? [ "Invalid input" throw ] unless ]
+    } case ;
+
+PRIVATE>
+
+: interpret-brainfuck ( str -- )
+    0 <brainfuck> [ interpret-brainfuck-from over ] loop 3drop ;
 
 <PRIVATE
 

@@ -42,44 +42,24 @@ enum relocation_class {
   RC_ABSOLUTE,
   // relative address in a 4 byte location
   RC_RELATIVE,
-  // absolute address in a PowerPC LIS/ORI sequence
-  RC_ABSOLUTE_PPC_2_2,
-  // absolute address in a PowerPC LWZ instruction
-  RC_ABSOLUTE_PPC_2,
-  // relative address in a PowerPC LWZ/STW/BC instruction
-  RC_RELATIVE_PPC_2_PC,
-  // relative address in a PowerPC B/BL instruction
-  RC_RELATIVE_PPC_3_PC,
-  // relative address in an ARM32 B/BL instruction
-  RC_RELATIVE_ARM_3,
-  // pointer to address in an ARM32 LDR/STR instruction
-  RC_INDIRECT_ARM,
-  // pointer to address in an ARM32 LDR/STR instruction offset by 8 bytes
-  RC_INDIRECT_ARM_PC,
+  // Relative address in an ARM B/BL instruction
+  RC_RELATIVE_ARM_B,
+  // Relative address in an ARM B.cond or LDR (literal) instruction
+  RC_RELATIVE_ARM_B_COND_LDR,
+  // absolute offset in an ARM LDUR instruction
+  RC_ABSOLUTE_ARM_LDUR,
+  // absolute value in an ARM CMP instruction
+  RC_ABSOLUTE_ARM_CMP,
   // absolute address in a 2 byte location
-  RC_ABSOLUTE_2,
+  RC_ABSOLUTE_2 = 10,
   // absolute address in a 1 byte location
-  RC_ABSOLUTE_1,
-  // absolute address in a PowerPC LIS/ORI/SLDI/ORIS/ORI sequence
-  RC_ABSOLUTE_PPC_2_2_2_2,
-  // Relative address stored, divided by four, in bits 25:0 of an ARM64 instruction
-  RC_RELATIVE_ARM64_BRANCH,
-  // Relative address stored, divided by four, in bits 23:5 of an ARM64 instruction
-  RC_RELATIVE_ARM64_BCOND,
-  // Absolute address stored in bits 20:5 of an ARM64 instruction
-  RC_ABSOLUTE_ARM64_MOVZ,
-  // relative address in a pointer-width location
-  RC_RELATIVE_CELL,
+  RC_ABSOLUTE_1
 };
 
-static const cell rel_absolute_ppc_2_mask = 0x0000ffff;
-static const cell rel_relative_ppc_2_mask = 0x0000fffc;
-static const cell rel_relative_ppc_3_mask = 0x03fffffc;
-static const cell rel_indirect_arm_mask = 0x00000fff;
-static const cell rel_relative_arm_3_mask = 0x00ffffff;
-static const cell rel_relative_arm64_branch_mask = 0x03ffffff;
-static const cell rel_relative_arm64_bcond_mask = 0x00ffffe0;
-static const cell rel_absolute_arm64_movz_mask = 0x001fffe0;
+static const cell rel_arm_b_mask = 0x03ffffff;
+static const cell rel_arm_b_cond_ldr_mask = 0x00ffffe0;
+static const cell rel_arm_ldur_mask = 0x001ff000;
+static const cell rel_arm_cmp_mask = 0x003ffc00;
 
 // code relocation table consists of a table of entries for each fixup
 struct relocation_entry {
@@ -138,15 +118,11 @@ struct instruction_operand {
   instruction_operand(relocation_entry rel, code_block* compiled,
                       cell index);
 
-  fixnum load_value_2_2();
-  fixnum load_value_2_2_2_2();
-  fixnum load_value_masked(cell mask, cell preshift, cell bits, cell postshift);
+  fixnum load_value_masked(cell msb, cell lsb, cell scaling);
   fixnum load_value(cell relative_to);
   code_block* load_code_block();
 
-  void store_value_2_2(fixnum value);
-  void store_value_2_2_2_2(fixnum value);
-  void store_value_masked(fixnum value, cell mask, cell shift1, cell shift2);
+  void store_value_masked(fixnum value, cell mask, cell lsb, cell scaling);
   void store_value(fixnum value);
 };
 

@@ -7,7 +7,8 @@ compiler.tree.escape-analysis compiler.tree.normalization
 compiler.tree.propagation compiler.tree.recursive
 compiler.tree.tuple-unboxing io kernel kernel.private math
 math.private namespaces prettyprint sequences sequences.deep
-sequences.private shuffle stack-checker.state tools.test words ;
+sequences.private stack-checker.state tools.test words ;
+
 IN: compiler.tree.dead-code.tests
 
 : count-live-values ( quot -- n )

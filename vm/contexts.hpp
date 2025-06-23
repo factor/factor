@@ -1,9 +1,3 @@
-#ifdef FACTOR_ARM64
-#define ARM64_ALIGN alignas(16)
-#else
-#define ARM64_ALIGN
-#endif
-
 namespace factor {
 
 // Context object count and identifiers must be kept in sync with:
@@ -29,7 +23,7 @@ struct context {
 
   // Factor callstack pointers
   cell callstack_top;
-  ARM64_ALIGN cell callstack_bottom;
+  cell callstack_bottom;
 
   // current datastack top pointer
   cell datastack;
