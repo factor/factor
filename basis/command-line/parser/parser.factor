@@ -5,8 +5,8 @@ USING: accessors arrays assocs classes combinators
 combinators.short-circuit command-line continuations debugger
 formatting generic.math io io.pathnames io.sockets kernel lexer
 math math.parser namespaces parser prettyprint quotations random
-sequences sequences.extras splitting strings
-strings.tables.private tools.completion unicode vocabs.parser ;
+sequences splitting strings strings.tables.private
+tools.completion unicode vocabs.parser ;
 
 IN: command-line.parser
 
@@ -155,7 +155,10 @@ M: class argvalid? instance? ;
             [ f swap [ option option-convert ] map ]
             if-empty ] }
         { "*" [ f swap [ option option-convert ] map ] }
-        { "?" [ ?unclip [ option option-convert ] [ option const>> ] if* ] }
+        { "?" [
+            dup empty?
+            [ option const>> ]
+            [ unclip option option-convert ] if ] }
         [
             [
                 2dup 1 - swap bounds-check? [
@@ -260,7 +263,7 @@ M: usage-error error. options>> print-help ;
     swap [ option-value ] [ option-variable set ] bi ;
 
 : (parse-arguments) ( optional positional command-line -- positional' )
-    [
+    [ dup empty? ] [
         pick empty? [ f ] [
             1 over [ "-" head? ] find-from drop
             [ cut ] [ f ] if*
@@ -268,12 +271,14 @@ M: usage-error error. options>> print-help ;
             pick empty? [ f ] [ dup first "-" head? ] if [
                 overd parse-optional
             ] [
-                [ ?unclip ] dip over
-                [ parse-positional ]
-                [ unrecognized-arguments ] if
+                over empty? [
+                    unrecognized-arguments
+                ] [
+                    [ unclip ] dip parse-positional
+                ] if
             ] if
         ] dip append
-    ] until-empty nip ;
+    ] until drop nip ;
 
 : parse-arguments ( options command-line -- arguments )
     [ dup [ optional? ] partition ] dip { "--" } split1
