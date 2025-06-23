@@ -44,7 +44,7 @@ ERROR: no-vocab-main vocab ;
             { name "--ui" }
             { required? f }
             { #args 0 }
-            { help "If specified, enables the the inclusion of the ui framework" }
+            { help "If specified, enables the inclusion of the ui framework" }
             { const t }
             { variable deploy-ui? }
         }
@@ -52,7 +52,7 @@ ERROR: no-vocab-main vocab ;
             { name "--unicode" }
             { required? f }
             { #args 0 }
-            { help "If specified, enables the the inclusion of full support for CHAR: " }
+            { help "If specified, enables the inclusion of full support for CHAR: " }
             { const t }
             { variable deploy-unicode? }
         }
