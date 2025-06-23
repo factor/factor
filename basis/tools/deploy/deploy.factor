@@ -30,7 +30,7 @@ ERROR: no-vocab-main vocab ;
 } cond require
 
 : deploy-main ( -- )
-    "All boolean options below can be inverted by prefixing no- to the option name. for example, --console becomes --no-console" program-epilog set-global
+    "All boolean options above can be inverted by prefixing no- to the option name. for example, --console becomes --no-console" program-epilog set-global
     {
         T{ option
             { name "--console" }
