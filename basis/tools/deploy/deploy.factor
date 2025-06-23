@@ -117,7 +117,7 @@ ERROR: no-vocab-main vocab ;
             { variable deploy-io }
         }
         T{ option 
-            { name "" }
+            { name "vocabs" }
             { required? t }
             { #args "+" }
             { help "The vocabulary or vocabularies to be deployed" }
