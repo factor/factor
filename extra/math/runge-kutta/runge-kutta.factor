@@ -1,5 +1,6 @@
-USING: kernel accessors combinators sequences sequences.generalizations
-arrays math math.vectors ;
+USING: accessors arrays combinators combinators.extras kernel
+math math.functions math.vectors sequences sequences.extras
+sequences.generalizations ;
 IN: math.runge-kutta
 
 CONSTANT: absolute-epsilon 0.0000001
