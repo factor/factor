@@ -1,4 +1,4 @@
-USING: accessors arrays kernel math math.matrices
+USING: accessors arrays kernel math math.functions math.matrices
 math.runge-kutta sequences ui.gadgets ui.gadgets.charts
 ui.gadgets.charts.lines ui.gadgets.panes ui.theme ;
 IN: math.runge-kutta.examples
