@@ -15,13 +15,14 @@ IN: math.runge-kutta.examples
 : <lorenz> ( -- delta dx..n/dt x..nt t-limit )
     0.01 { [ lorenz-dx/dt ] [ lorenz-dy/dt ] [ lorenz-dz/dt ] } { 2.0 1.0 1.0 0.0 } 150 ;
 
+: add-lines-from-3d-data ( chart data -- chart )
+    [ line new link-color >>color swap { 0 3 } cols-except >>data add-gadget ]
+    [ line new string-color >>color swap { 1 3 } cols-except >>data add-gadget ] bi ;
 
-! : lorenz. ( -- )
-!     chart new { { -20 20 } { -20 20 } } >>axes
-!     line new link-color >>color
-!              <lorenz> <runge-kutta> { 0 3 } cols-except >>data
-!     add-gadget
-!     gadget. ; 
+: lorenz. ( -- )
+    chart new { { -25 25 } { 0 45 } } >>axes
+    <lorenz> <runge-kutta> add-lines-from-3d-data
+    gadget. ; 
 
 
 :: rf-dx/dt ( x..nt gamma -- dx )
@@ -42,12 +43,10 @@ IN: math.runge-kutta.examples
     { -1 0 0.5 0 } 1000 ;
 
 
-! : rabinovich-fabrikant. ( -- )
-!     chart new { { -2 2 } { -2 2 } } >>axes
-!     line new link-color >>color
-!              0.1 0.14 <rabinovich-fabrikant> <runge-kutta> { 0 3 } cols-except >>data
-!              add-gadget
-!     gadget. ;
+: rabinovich-fabrikant. ( -- )
+    chart new { { -2 2 } { -2 2 } } >>axes
+    0.1 0.14 <rabinovich-fabrikant> <runge-kutta> add-lines-from-3d-data
+    gadget. ;
 
 CONSTANT: cyclically-symmetric-b 0.208186 ! >1 is stable, =1 is pitchfork bifurcation, <1 weird stuff
 
@@ -65,10 +64,8 @@ CONSTANT: cyclically-symmetric-b 0.208186 ! >1 is stable, =1 is pitchfork bifurc
     { [ cyclically-symmetric-dx/dt ] [ cyclically-symmetric-dy/dt ] [ cyclically-symmetric-dz/dt ] }
     { 2.0 1.0 1.0 0.0 } 1000 ;
 
-! : cyclically-symmetric. ( -- )
-!     chart new { { -4 4 } { -4 4 } } >>axes
-!     line new link-color >>color
-!              <cyclically-symmetric> <runge-kutta> { 0 3 } cols-except >>data
-!              add-gadget
-!     gadget. ;
+: cyclically-symmetric. ( -- )
+    chart new { { -2 4 } { -2 4 } } >>axes
+    <cyclically-symmetric> <runge-kutta> add-lines-from-3d-data
+    gadget. ;
 

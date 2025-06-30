@@ -53,27 +53,26 @@ CONSTANT: n-1-order-coefficients { 25/216 0 1408/2565 2197/4104 -1/5 0 }
 ! executes the differential equations for each of the stages of approximation
 :: runge-kutta-stages ( dt dx..n/dt x..nt -- k-seq )
     butcher-tableau V{ { } } [
-      [ dt x..nt runge-kutta-stage-n dx..n/dt cleave-array dt v*n ]
+      [ dt x..nt runge-kutta-stage-n dx..n/dt [ call( x -- x ) ] with map dt v*n ]
       [ drop swap suffix ] 2bi
-    ] accumulate* last rest ; inline
+    ] accumulate* last rest ;
 : step-change-and-error ( dt dx..nt/dt x..nt -- dx..dn error )
-    '[ _ _ runge-kutta-stages ] [ [ rk over ] [ higher-order-error ] bi* ] bi ; inline
+    '[ _ _ runge-kutta-stages ] [ [ rk over ] [ higher-order-error ] bi* ] bi ;
 
 ! repeatedly approximates with adadptig stepsize until within tolerence
 : (runge-kutta) ( dt dx..n/dt x..nt -- dx..dn' dt' )
     '[
         dup _ _ step-change-and-error
         [ adapt-stepsize ] [ retry-with-adapted-stepsize? ] 2bi
-        dup [ nip ] when ! only leave dx..t on stack if leaving loop
-    ] loop ; inline
+    ] [ drop ] while ;
 : runge-kutta-step ( dx..n' dt' x..nt -- x..nt+1 )
     [ suffix ] [ v+ ] bi* ;
 : runge-kutta ( dt dx..n/dt x..nt -- dt' x..nt' )
-    [ (runge-kutta) ] [ overd runge-kutta-step ] bi ; inline
+    [ (runge-kutta) ] [ overd runge-kutta-step ] bi ;
 
 : time-limit-predicate ( t-limit -- quot: ( x..nt -- ? ) )
     '[ dup last _ <= ] ; inline
 
 : <runge-kutta> ( initial-delta dxn..n/dt initial-x..nt t-limit -- seq )
-    time-limit-predicate [ [ runge-kutta ] [ 3drop f ] if ] compose with follow ; inline
+    time-limit-predicate [ [ runge-kutta ] [ 2drop f ] if ] compose with follow nip ; 
 
