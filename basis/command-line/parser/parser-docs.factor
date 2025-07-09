@@ -14,7 +14,6 @@ program:
 { $subsections
     with-options
     parse-options
-    (parse-options)
 }
 
 Some variables control certain aspects of the parsing:
@@ -30,6 +29,8 @@ In the case that you want to pass an option lookalike as a positional argument,
 for example { $snippet "--foo" } then you can pass it after { $snippet "--" }
 to indicate that the remaining arguments should be interpreted as positional
 arguments.
+
+Sub-commands are supported using the { $link with-commands } word.
 
 ;
 
@@ -49,5 +50,9 @@ HELP: option
         { "#args" { "The number of arguments to parse specified as an " { $link integer } ", " { $snippet "\"*\"" } " (zero or more), " { $snippet  "\"+\"" } " (one or more), or " { $snippet "\"?\"" } " (optionally one) argument." } }
     }
 } ;
+
+{ parse-options (parse-options) } related-words
+{ with-options (with-options) } related-words
+{ with-commands (with-commands) } related-words
 
 ABOUT: "command-line.parser"
