@@ -8,6 +8,7 @@ ARTICLE: "math-constants" "Constants"
     euler
     phi
     pi
+    2pi
     epsilon
     single-epsilon
 } ;
@@ -36,8 +37,8 @@ HELP: 2pi
 
 HELP: epsilon
 { $values { "epsilon" number } }
-{ $description "The smallest double-precision floating point value you can add to 1 without underflow" } ;
+{ $description "The smallest double-precision floating point value you can add to 1 without underflow." } ;
 
 HELP: single-epsilon
 { $values { "epsilon" number } }
-{ $description "The smallest single-precision floating point value you can add to 1 without underflow" } ;
+{ $description "The smallest single-precision floating point value you can add to 1 without underflow." } ;
