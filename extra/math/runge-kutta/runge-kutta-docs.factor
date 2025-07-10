@@ -1,9 +1,9 @@
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax kernel math sequences ;
 IN: math.runge-kutta 
 
-HELP: <runge-kutta-4>
-{ $values { "dxn..n/dt" object } { "delta" object } { "initial-state" object } { "t-limit" object } { "seq" object } }
-{ $description "Simple runge-kutta implementation for generating 4th-order approximated solutions for a set of first order differential equations" }
+HELP: <runge-kutta>
+{ $values { "initial-delta" number } { "dxn..n/dt" sequence } { "initial-x..nt" sequence } { "t-limit" number } { "seq" sequence } }
+{ $description "Simple runge-kutta implementation for generating approximated solutions for a set of first order differential equations" }
 { $examples
     "A lorenz attractor is a popular system to model with this: "
     { $code "USING: math.runge-kutta math.runge-kutta.examples ;" "lorenz." }
