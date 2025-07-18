@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: calendar calendar.holidays ;
+USING: calendar calendar.holidays calendar.holidays.world ;
 IN: calendar.holidays.canada
 
 SINGLETONS: canada canadian-federal ;
