@@ -4,7 +4,7 @@ USING: accessors assocs calendar hashtables kernel
 parser sequences vocabs words ;
 IN: calendar.holidays
 
-SINGLETONS: all world commonwealth-of-nations ;
+SINGLETON: all
 
 SYNTAX: HOLIDAY:
     scan-new-word
