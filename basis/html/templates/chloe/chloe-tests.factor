@@ -212,3 +212,8 @@ TUPLE: person first-name last-name ;
         [ "test18" test-template call-template ] run-template
     ] with-variable
 ] unit-test
+
+
+{ "<style>&<>></style><script>&<>></script>" } [
+    [ "test19" test-template call-template ] run-template
+] unit-test
