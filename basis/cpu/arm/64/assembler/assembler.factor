@@ -743,7 +743,7 @@ M: integer LDRSW 2 0 load-register-literal ;
 
 : load/store-pair ( Rt Rt2 offset L -- )
     [
-        [ 2encode-width* ] dip >offset<
+        [ 2encode-width* ] dip >offset< dup 0 = [ drop 2 ] when
         [ reach reach + 1 + ?>> 7 check-signed-immediate ] dip
     ] dip {
         { 0b101 27 }
@@ -849,9 +849,16 @@ ERROR: unknown-c-type c-type ;
 M: offset STR* 0 load/store-register* ;
 M: offset LDR* 1 load/store-register* ;
 
+: >S ( amount size -- S )
+    {
+        { [ 2dup = ] [ 2drop 1 ] }
+        { [ over 0 = ] [ 2drop 0 ] }
+        [ scaling-error ]
+    } cond ;
 
 : (load/store-register-register) ( Rt operand size VR opc1 L -- )
-    [ >offset< [ >operand< ] dip ] 4dip {
+    [ >offset< [ >operand< ] dip ] 4dip
+    [ tuck [ >S ] 2dip ] 3dip {
         { 0b111 27 }
         { 0b1 21 }
         { n>> 0 }
@@ -1303,6 +1310,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
 
 : simd-across-lanes ( Rd Rn size U opcode -- )
     {
+        { 0b1 30 }
         { 0b01110 24 }
         { 0b11000 17 }
         { 0b10 10 }
