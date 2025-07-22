@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors ascii assocs combinators html.forms
-html.templates html.templates.chloe.syntax io io.streams.string
-kernel make namespaces present sequences splitting strings
-xml.data xml.entities xml.writer ;
+USING: accessors ascii assocs combinators combinators.extras
+html.forms html.templates html.templates.chloe.syntax io
+io.streams.string kernel make namespaces present sequences
+splitting strings xml.data xml.entities xml.writer ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
@@ -79,6 +79,17 @@ SYMBOL: string-context?
 
 ERROR: tag-not-allowed-here ;
 
+: compile-raw-text-tag ( tag -- )
+  t string-context?
+  [
+    [ compile-start-tag ]
+    [ compile-children ]
+    [ compile-end-tag ] tri
+  ] with-variable ;
+
+! https://html.spec.whatwg.org/multipage/syntax.html#elements-2
+CONSTANT: raw-text-tags { "script" "style" }
+
 CONSTANT: self-closing-tags {
         "area"
         "base"
@@ -99,14 +110,23 @@ CONSTANT: self-closing-tags {
     string-context? get [ tag-not-allowed-here ] when ;
 
 : (compile-tag) ( tag -- )
-    dup name>string >lower self-closing-tags
-    member? [
-        compile-self-closing-tag
-    ] [
-        [ compile-start-tag ]
-        [ compile-children ]
-        [ compile-end-tag ] tri
-    ] if ;
+    dup name>string >lower
+    {
+        {
+            [ self-closing-tags member? ]
+            [ compile-self-closing-tag ]
+        }
+        {
+            [ raw-text-tags member? ]
+            [ compile-raw-text-tag ]
+        }
+        [
+            drop
+            [ compile-start-tag ]
+            [ compile-children ]
+            [ compile-end-tag ] tri
+        ]
+    } cond-case ;
 
 : compile-tag ( tag -- )
     check-tag
