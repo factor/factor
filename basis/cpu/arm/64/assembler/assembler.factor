@@ -5,7 +5,7 @@ combinators.short-circuit compiler.codegen.labels
 compiler.constants cpu.architecture endian generalizations
 grouping kernel make math math.bits math.bitwise math.order
 math.parser parser prettyprint.custom prettyprint.sections
-sequences sequences.generalizations shuffle words.constant ;
+sequences sequences.generalizations words.constant ;
 FROM: math.bitwise => bits ;
 FROM: alien.c-types => float ;
 IN: cpu.arm.64.assembler
@@ -360,7 +360,7 @@ M: register NEG  0 <LSL> NEG ;
 M: register NEGS 0 <LSL> NEGS ;
 
 : add/sub-register ( Rd Rn Rm -- Rd Rn operand )
-    0 2pick [ stack-register? ] either? [ <LSL*> ] [ <LSL> ] if ;
+    0 reach reach [ stack-register? ] either? [ <LSL*> ] [ <LSL> ] if ;
 
 M: register ADD  add/sub-register ADD  ;
 M: register ADDS add/sub-register ADDS ;
@@ -744,7 +744,7 @@ M: integer LDRSW 2 0 load-register-literal ;
 : load/store-pair ( Rt Rt2 offset L -- )
     [
         [ 2encode-width* ] dip >offset<
-        [ 2pick + 1 + ?>> 7 check-signed-immediate ] dip
+        [ reach reach + 1 + ?>> 7 check-signed-immediate ] dip
     ] dip {
         { 0b101 27 }
         { R/ZR 0 }
