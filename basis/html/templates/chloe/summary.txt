@@ -1,1 +1,1 @@
-XHTML templating engine with extensible compiler and separation of concerns
+HTML templating engine with extensible compiler and separation of concerns

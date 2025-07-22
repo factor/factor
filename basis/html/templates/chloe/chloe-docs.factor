@@ -112,7 +112,7 @@ ARTICLE: "html.templates.chloe.tags.control" "Control-flow Chloe tags"
 ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
 "The following tags are only available if the " { $vocab-link "furnace.chloe-tags" } " vocabulary is loaded."
 { $table
-    { { $snippet "t:a" } { "Renders a link; extends the standard XHTML " { $snippet "a" } " tag by providing some integration with other web framework features. The following attributes are supported:"
+    { { $snippet "t:a" } { "Renders a link; extends the standard HTML " { $snippet "a" } " tag by providing some integration with other web framework features. The following attributes are supported:"
         { $list
             { { $snippet "href" } " - a URL. If it begins with " { $snippet "$" } ", then it is interpreted as a responder-relative path." }
             { { $snippet "rest" } " - a value to add at the end of the URL." }
@@ -139,7 +139,7 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
     } }
     { { $snippet "t:base" } { "Outputs an HTML " { $snippet "<base>" } " tag. The attributes are interpreted in the same manner as the attributes of " { $snippet "t:a" } "." } }
     { { $snippet "t:form" } {
-        "Renders a form; extends the standard XHTML " { $snippet "form" } " tag by providing some integration with other web framework features, for example by adding hidden fields for authentication credentials and session management allowing those features to work with form submission transparently. The following attributes are supported:"
+        "Renders a form; extends the standard HTML " { $snippet "form" } " tag by providing some integration with other web framework features, for example by adding hidden fields for authentication credentials and session management allowing those features to work with form submission transparently. The following attributes are supported:"
         { $list
             { { $snippet "t:method" } " - just like the " { $snippet "method" } " attribute of an HTML " { $snippet "form" } " tag, this can equal " { $snippet "get" } " or " { $snippet "post" } ". Unlike the HTML tag, the default is " { $snippet "post" } "." }
             { { $snippet "t:action" } " - a URL. If it begins with " { $snippet "$" } ", then it is interpreted as a responder-relative path." }
@@ -166,9 +166,9 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
 } ;
 
 ARTICLE: "html.templates.chloe.tags" "Standard Chloe tags"
-"A Chloe template is an XML file with a mix of standard XHTML and Chloe tags."
+"A Chloe template is an XML file with a mix of standard HTML and Chloe tags."
 $nl
-"XHTML tags are rendered verbatim, except attribute values which begin with " { $snippet "@" } " are replaced with the corresponding " { $link "html.forms.values" } "."
+"HTML tags are rendered verbatim, except attribute values which begin with " { $snippet "@" } " are replaced with the corresponding " { $link "html.forms.values" } "."
 $nl
 "Chloe tags are defined in the " { $snippet "http://factorcode.org/chloe/1.0" } " namespace; by convention, it is bound with a prefix of " { $snippet "t" } ". The top-level tag must always be the " { $snippet "t:chloe" } " tag. A typical Chloe template looks like so:"
 { $code
@@ -292,7 +292,7 @@ ARTICLE: "html.templates.chloe.extend.components" "Extending Chloe with custom c
 } ;
 
 ARTICLE: "html.templates.chloe" "Chloe templates"
-"The " { $vocab-link "html.templates.chloe" } " vocabulary implements an XHTML templating engine. Unlike " { $vocab-link "html.templates.fhtml" } ", Chloe templates are always well-formed XML, and no Factor code can be embedded in them, enforcing proper separation of concerns. Chloe templates can be edited using standard XML editing tools; they are less flexible than FHTML, but often simpler as a result."
+"The " { $vocab-link "html.templates.chloe" } " vocabulary implements an HTML templating engine. Unlike " { $vocab-link "html.templates.fhtml" } ", Chloe templates are always well-formed XML, and no Factor code can be embedded in them, enforcing proper separation of concerns. Chloe templates can be edited using standard XML editing tools; they are less flexible than FHTML, but often simpler as a result."
 { $subsections
     <chloe>
     reset-cache
