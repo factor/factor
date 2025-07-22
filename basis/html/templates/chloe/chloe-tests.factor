@@ -195,7 +195,7 @@ TUPLE: person first-name last-name ;
     ] with-scope
 ] [ error>> tag-not-allowed-here? ] must-fail-with
 
-{ "This is     <style type=\"text/css\"> * { font-family: monospace; } </style>" } [
+{ "<style type=\"text/css\"> * { font-family: monospace; } </style>" } [
     V{ } clone style [
         [ "test16" test-template call-template ] run-template
     ] with-variable
