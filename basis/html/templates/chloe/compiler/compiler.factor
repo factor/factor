@@ -136,6 +136,7 @@ ERROR: unknown-chloe-tag tag ;
         { [ dup [ tag? ] [ xml? ] bi or ] [ compile-tag ] }
         { [ dup string? ] [ compile-string ] }
         { [ dup comment? ] [ drop ] }
+        { [ dup cdata? ] [ text>> [write] ] }
         [ compile-misc ]
     } cond ;
 
