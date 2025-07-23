@@ -126,6 +126,9 @@ PRIVATE>
 : reduce-permutations ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each-permutation ; inline
 
+: count-permutations ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
+    0 swap [ [ 1 + ] when ] compose reduce-permutations ; inline
+
 : inverse-permutation ( seq -- permutation )
     <enumerated> sort-values keys ;
 
@@ -222,6 +225,9 @@ PRIVATE>
 : reduce-combinations-with-replacement ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination-with-replacement ; inline
 
+: count-combinations-with-replacement ( ... seq k quot: ( ... elt -- ... ? ) -- ... n )
+    0 swap [ [ 1 + ] when ] compose reduce-combinations-with-replacement ; inline
+
 <PRIVATE
 
 ! "Algorithm 515: Generation of a Vector from the Lexicographical Index"
@@ -312,6 +318,9 @@ PRIVATE>
 : reduce-combinations ( ... seq k identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-combination ; inline
 
+: count-combinations ( ... seq k quot: ( ... elt -- ... ? ) -- ... n )
+    0 swap [ [ 1 + ] when ] compose reduce-combinations ; inline
+
 : all-subsets ( seq -- subsets )
     dup length [0..b] [ all-combinations ] with map concat ;
 
@@ -355,3 +364,6 @@ PRIVATE>
 
 : reduce-selections ( ... seq n identity quot: ( ... prev elt -- ... next ) -- ... result )
     -rotd each-selection ; inline
+
+: count-selections ( ... seq n quot: ( ... elt -- ... ? ) -- ... n )
+    0 swap [ [ 1 + ] when ] compose reduce-selections ; inline
