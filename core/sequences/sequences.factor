@@ -949,8 +949,8 @@ PRIVATE>
     over empty? [ nip concat-as ] [
         [
             2dup joined-length over new-resizable [
-                [ '[ _ _ push-all ] ]
-                [ nip '[ _ push-all ] ] 2bi
+                [ [ push-all ] 2curry ]
+                [ nip [ push-all ] curry ] 2bi
                 interleave
             ] keep
         ] dip like
@@ -1158,16 +1158,16 @@ ALIAS: infimum minimum deprecated
 ALIAS: supremum maximum deprecated
 
 : map-sum ( ... seq quot: ( ... elt -- ... n ) -- ... n )
-    0 swap '[ swap _ dip + ] reduce ; inline
+    [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
 : count ( ... seq quot: ( ... elt -- ... ? ) -- ... n )
-    0 swap '[ @ [ 1 + ] when ] reduce ; inline
+    [ 1 0 ? ] compose map-sum ; inline
 
 : cartesian-each ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ) -- ... )
-    '[ _ _ with each ] each ; inline
+    [ with each ] 2curry each ; inline
 
 : cartesian-map ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... newelt ) -- ... newseq )
-    '[ _ _ with { } map-as ] { } map-as ; inline
+    [ with { } map-as ] 2curry { } map-as ; inline
 
 : cartesian-product-as ( seq1 seq2 exemplar -- newseq )
     [ 2sequence ] curry cartesian-map ; inline
@@ -1176,7 +1176,7 @@ ALIAS: supremum maximum deprecated
     dup cartesian-product-as ; inline
 
 : cartesian-find ( ... seq1 seq2 quot: ( ... elt1 elt2 -- ... ? ) -- ... elt1 elt2 )
-    [ f ] 3dip '[ nip _ _ with find swap ] find nip swap ; inline
+    [ f ] 3dip [ with find swap ] 2curry [ nip ] prepose find nip swap ; inline
 
 <PRIVATE
 
