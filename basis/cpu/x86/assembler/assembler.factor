@@ -209,7 +209,7 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 <PRIVATE
 
 : zero-extendable? ( imm -- ? )
-    1 32 2^ 1 - between? ;
+    0 32 2^ 1 - between? ;
 
 : maybe-zero-extend ( reg imm -- reg' imm )
     dup zero-extendable? [ [ 32-bit-version-of ] dip ] when ;
@@ -418,9 +418,9 @@ PRIVATE>
 
 : IMUL3 ( dst src imm -- )
     dup fits-in-byte? [
-        [ swap 0x6a 2-operand ] dip 1,
+        [ swap 0x6b 2-operand ] dip 1,
     ] [
-        [ swap 0x68 2-operand ] dip 4,
+        [ swap 0x69 2-operand ] dip 4,
     ] if ;
 
 : MOVSX ( dst src -- )
@@ -574,7 +574,7 @@ PRIVATE>
 
 : FXTRACT ( -- ) { 0xD9 0xF4 } % ;
 : FYL2X ( -- ) { 0xD9 0xF1 } % ;
-: FYL2XP1 ( -- ) { 0xD9 0xF1 } % ;
+: FYL2XP1 ( -- ) { 0xD9 0xF9 } % ;
 
 ! SSE multimedia instructions
 
@@ -927,7 +927,7 @@ PRIVATE>
 : ADDSUBPS   ( dest src -- ) 0xd0 0xf2 2-operand-rm-sse ;
 : PADDQ      ( dest src -- ) 0xd4 0x66 2-operand-rm-sse ;
 : PMULLW     ( dest src -- ) 0xd5 0x66 2-operand-rm-sse ;
-: PMOVMSKB   ( dest src -- ) 0xd7 0x66 2-operand-rm-sse ;
+: PMOVMSKB   ( dest src -- ) 0xd7 0x66 2-operand-int/sse ;
 : PSUBUSB    ( dest src -- ) 0xd8 0x66 2-operand-rm-sse ;
 : PSUBUSW    ( dest src -- ) 0xd9 0x66 2-operand-rm-sse ;
 : PMINUB     ( dest src -- ) 0xda 0x66 2-operand-rm-sse ;
