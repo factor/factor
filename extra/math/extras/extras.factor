@@ -424,3 +424,11 @@ PRIVATE>
 
 :: nth-recaman ( N -- elt )
     0 N dup <bit-vector> '[ _ next-recaman ] each-integer ;
+
+MEMO: tribonacci ( n -- r )
+    {
+        { 0 [ 0 ] }
+        { 1 [ 1 ] }
+        { 2 [ 1 ] }
+        [ 3 2 1 [ - tribonacci ] tri-curry@ tri + + ]
+    } case ;
