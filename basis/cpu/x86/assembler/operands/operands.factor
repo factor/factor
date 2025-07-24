@@ -18,6 +18,16 @@ REGISTERS: 128
 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
 XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
 
+REGISTERS: 256
+YMM0 YMM1 YMM2 YMM3 YMM4 YMM5 YMM6 YMM7
+YMM8 YMM9 YMM10 YMM11 YMM12 YMM13 YMM14 YMM15 ;
+
+REGISTERS: 512
+ZMM0 ZMM1 ZMM2 ZMM3 ZMM4 ZMM5 ZMM6 ZMM7
+ZMM8 ZMM9 ZMM10 ZMM11 ZMM12 ZMM13 ZMM14 ZMM15
+ZMM16 ZMM17 ZMM18 ZMM19 ZMM20 ZMM21 ZMM22 ZMM23
+ZMM24 ZMM25 ZMM26 ZMM27 ZMM28 ZMM29 ZMM30 ZMM31 ;
+
 REGISTERS: 80 ST0 ST1 ST2 ST3 ST4 ST5 ST6 ST7 ;
 
 : shuffle-down ( STn -- STn+1 )
@@ -42,6 +52,12 @@ PREDICATE: register-64 < register
 
 PREDICATE: register-128 < register
     "register-size" word-prop 128 = ;
+
+PREDICATE: register-256 < register
+    "register-size" word-prop 256 = ;
+
+PREDICATE: register-512 < register
+    "register-size" word-prop 512 = ;
 
 GENERIC: extended? ( op -- ? )
 
@@ -156,6 +172,8 @@ C: <byte> byte
     ] with map set-extra-props ;
 
 : precalc-all-register-versions ( -- )
-    registers get values concat [ precalc-register-versions ] each ;
+    registers get values concat
+    [ "register-size" word-prop 64 > ] reject
+    [ precalc-register-versions ] each ;
 
 precalc-all-register-versions

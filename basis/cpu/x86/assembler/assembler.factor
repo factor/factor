@@ -576,9 +576,108 @@ PRIVATE>
 : FYL2X ( -- ) { 0xD9 0xF1 } % ;
 : FYL2XP1 ( -- ) { 0xD9 0xF9 } % ;
 
+! Additional x87 FPU instructions
+: FCOM ( src -- ) 0xD8 2 x87-st0-op ;
+: FCOMP ( src -- ) 0xD8 3 x87-st0-op ;
+: FCOMPP ( -- ) { 0xDE 0xD9 } % ;
+: FUCOM ( src -- ) 0xDD 4 x87-st0-op ;
+: FUCOMP ( src -- ) 0xDD 5 x87-st0-op ;
+: FUCOMPP ( -- ) { 0xDA 0xE9 } % ;
+: FCOMIP ( src -- ) 0xDF 6 x87-st0-op ;
+: FUCOMIP ( src -- ) 0xDF 5 x87-st0-op ;
+: FTST ( -- ) { 0xD9 0xE4 } % ;
+: FPTAN ( -- ) { 0xD9 0xF2 } % ;
+: FINIT ( -- ) { 0x9B 0xDB 0xE3 } % ;
+: FCLEX ( -- ) { 0x9B 0xDB 0xE2 } % ;
+: FSTSW ( -- ) { 0x9B 0xDF 0xE0 } % ;  ! Store FPU status to AX
+: FNSTSW_AX ( -- ) { 0xDF 0xE0 } % ;    ! Store FPU status to AX (no wait)
+: FSTCW ( mem -- ) { 0b111 f 0xD9 } 1-operand ;
+: FSTENV ( mem -- ) { 0b110 f 0xD9 } 1-operand ;
+: FLDENV ( mem -- ) { 0b100 f 0xD9 } 1-operand ;
+: FSAVE ( mem -- ) { 0b110 f 0xDD } 1-operand ;
+: FRSTOR ( mem -- ) { 0b100 f 0xDD } 1-operand ;
+: FADDP ( dst src -- ) 0xDE 0 x87-m-st0/n-op ;
+: FMULP ( dst src -- ) 0xDE 1 x87-m-st0/n-op ;
+: FSUBP ( dst src -- ) 0xDE 4 x87-m-st0/n-op ;
+: FSUBRP ( dst src -- ) 0xDE 5 x87-m-st0/n-op ;
+: FDIVP ( dst src -- ) 0xDE 6 x87-m-st0/n-op ;
+: FDIVRP ( dst src -- ) 0xDE 7 x87-m-st0/n-op ;
+: FIADD ( src -- ) { 0b000 f 0xDA } 1-operand ;  ! 32-bit integer add
+: FIMUL ( src -- ) { 0b001 f 0xDA } 1-operand ;  ! 32-bit integer multiply
+: FISUB ( src -- ) { 0b100 f 0xDA } 1-operand ;  ! 32-bit integer subtract
+: FISUBR ( src -- ) { 0b101 f 0xDA } 1-operand ; ! 32-bit integer subtract reverse
+: FIDIV ( src -- ) { 0b110 f 0xDA } 1-operand ;  ! 32-bit integer divide
+: FIDIVR ( src -- ) { 0b111 f 0xDA } 1-operand ; ! 32-bit integer divide reverse
+
 ! SSE multimedia instructions
 
 <PRIVATE
+
+! VEX prefix encoding support
+: vex-r ( reg -- r ) "register" word-prop 7 > not 1 0 ? ;
+: vex-x ( rm -- x )
+    dup indirect? [ index>> vex-r ] [ drop 1 ] if ;
+: vex-b ( rm -- b )
+    dup indirect? [ base>> ] [ ] if vex-r ;
+: vex-w ( rex.w -- w ) 1 0 ? ;
+: vex-vvvv ( src -- vvvv )
+    dup register? [ "register" word-prop 15 swap - 15 bitand ] [ drop 0xf ] if ;
+: vex-l ( reg -- l )
+    dup register-256? [ drop 1 ] [
+        dup register-512? [ drop 2 ] [ drop 0 ] if
+    ] if ;
+: vex-pp ( prefix -- pp )
+    {
+        { 0x66 [ 0b01 ] }
+        { 0xf3 [ 0b10 ] }
+        { 0xf2 [ 0b11 ] }
+        [ drop 0b00 ]
+    } case ;
+
+:: vex-2byte-prefix ( dst src prefix rex.w -- )
+    ! 2-byte VEX for instructions that don't need extended features
+    0xc5 ,
+    dst vex-r 7 shift
+    src vex-vvvv 3 shift bitor
+    dst vex-l 2 shift bitor
+    prefix vex-pp bitor , ;
+
+:: vex-3byte-prefix ( dst rm src prefix rex.w map -- )
+    ! 3-byte VEX for full functionality
+    0xc4 ,
+    dst vex-r 7 shift
+    rm vex-x 6 shift bitor
+    rm vex-b 5 shift bitor
+    map bitor ,
+    rex.w vex-w 7 shift
+    src vex-vvvv 3 shift bitor
+    dst vex-l 2 shift bitor
+    prefix vex-pp bitor , ;
+
+! In VEX encoding:
+!   - dst determines the vector length (VEX.L bit)
+!   - src (the VEX.vvvv field) could theoretically be a ZMM register too
+!   - rm (second source) could also be a ZMM register
+
+!   However, there's a fundamental issue: VEX cannot encode 512-bit operations at all. VEX.L is only 1 bit:
+!   - L=0: 128-bit (XMM)
+!   - L=1: 256-bit (YMM)
+:: needs-vex3? ( dst rm src rex.w map -- ? )
+    ! Check if we need 3-byte VEX instead of 2-byte
+    {
+        [ map 1 = not ]
+        [ rm vex-b 0 = ]
+        [ rm vex-x 0 = ]
+        [ rex.w ]
+        [ dst register-512? ]
+        [ src register-512? ]
+        [ rm register-512? ]
+    } 0|| ;
+
+:: vex-prefix ( dst rm src prefix rex.w map -- )
+    dst rm src rex.w map needs-vex3?
+    [ dst rm src prefix rex.w map vex-3byte-prefix ]
+    [ dst src prefix rex.w vex-2byte-prefix ] if ;
 
 : direction-bit-sse ( dst src op1 -- dst' src' op1' )
     pick register-128? [ swapd 0b1 bitor ] unless ;
@@ -620,6 +719,27 @@ PRIVATE>
     [ , ] when*
     [ f 0x0f ] dip 2array 3array
     swapd 1-operand , ;
+
+! VEX instruction encoding helpers
+:: (vex-2-operand) ( dst src1 src2 op map prefix rex.w -- )
+    dst src2 src1 prefix rex.w map vex-prefix
+    op ,
+    dst src2 addressing ;
+
+:: 2-operand-vex ( dst src op map prefix -- )
+    dst f src op map prefix f (vex-2-operand) ;
+
+:: 3-operand-vex ( dst src1 src2 op map prefix -- )
+    dst src1 src2 op map prefix f (vex-2-operand) ;
+
+:: 2-operand-vex-rm ( dst src op map prefix -- )
+    dst dst src op map prefix f (vex-2-operand) ;
+
+:: 3-operand-vex-rm ( dst src1 src2 op map prefix -- )
+    dst src1 src2 op map prefix f (vex-2-operand) ;
+
+:: 3-operand-vex-imm ( dst src1 src2 imm op map prefix -- )
+    dst src1 src2 op map prefix f (vex-2-operand) imm , ;
 
 PRIVATE>
 
@@ -927,7 +1047,7 @@ PRIVATE>
 : ADDSUBPS   ( dest src -- ) 0xd0 0xf2 2-operand-rm-sse ;
 : PADDQ      ( dest src -- ) 0xd4 0x66 2-operand-rm-sse ;
 : PMULLW     ( dest src -- ) 0xd5 0x66 2-operand-rm-sse ;
-: PMOVMSKB   ( dest src -- ) 0xd7 0x66 2-operand-int/sse ;
+: PMOVMSKB   ( dest src -- ) 0xd7 0x66 2-operand-rm-sse ;
 : PSUBUSB    ( dest src -- ) 0xd8 0x66 2-operand-rm-sse ;
 : PSUBUSW    ( dest src -- ) 0xd9 0x66 2-operand-rm-sse ;
 : PMINUB     ( dest src -- ) 0xda 0x66 2-operand-rm-sse ;
@@ -966,6 +1086,78 @@ PRIVATE>
 : PADDB      ( dest src -- ) 0xfc 0x66 2-operand-rm-sse ;
 : PADDW      ( dest src -- ) 0xfd 0x66 2-operand-rm-sse ;
 : PADDD      ( dest src -- ) 0xfe 0x66 2-operand-rm-sse ;
+
+! Additional missing SSE/SSE2 instructions
+: MOVNTQ     ( dest src -- ) 0xe7 f 2-operand-mr-sse ;      ! MMX non-temporal store
+: MASKMOVQ   ( dest src -- ) 0xf7 f 2-operand-rm-sse ;      ! MMX masked move
+
+! SSE3 missing instructions
+: MONITOR    ( -- ) 0x0f , 0x01 , 0xc8 , ;  ! EAX/ECX/EDX are implicit
+: MWAIT      ( -- ) 0x0f , 0x01 , 0xc9 , ;  ! EAX/ECX are implicit
+
+! Additional shuffle and pack instructions
+: PSHUFW     ( dest src imm -- ) 4shuffler 0x70 f 3-operand-rm-sse ;  ! MMX shuffle
+
+! AES-NI instructions
+: AESENC     ( dest src -- ) { 0x38 0xdc } 0x66 2-operand-rm-sse ;
+: AESENCLAST ( dest src -- ) { 0x38 0xdd } 0x66 2-operand-rm-sse ;
+: AESDEC     ( dest src -- ) { 0x38 0xde } 0x66 2-operand-rm-sse ;
+: AESDECLAST ( dest src -- ) { 0x38 0xdf } 0x66 2-operand-rm-sse ;
+: AESIMC     ( dest src -- ) { 0x38 0xdb } 0x66 2-operand-rm-sse ;
+: AESKEYGENASSIST ( dest src imm -- ) { 0x3a 0xdf } 0x66 3-operand-rm-sse ;
+
+! PCLMULQDQ instruction
+: PCLMULQDQ  ( dest src imm -- ) { 0x3a 0x44 } 0x66 3-operand-rm-sse ;
+
+! SHA instructions
+: SHA1RNDS4  ( dest src imm -- ) { 0x3a 0xcc } f 3-operand-rm-sse ;
+: SHA1NEXTE  ( dest src -- ) { 0x38 0xc8 } f 2-operand-rm-sse ;
+: SHA1MSG1   ( dest src -- ) { 0x38 0xc9 } f 2-operand-rm-sse ;
+: SHA1MSG2   ( dest src -- ) { 0x38 0xca } f 2-operand-rm-sse ;
+: SHA256RNDS2 ( dest src -- ) { 0x38 0xcb } f 2-operand-rm-sse ;
+: SHA256MSG1 ( dest src -- ) { 0x38 0xcc } f 2-operand-rm-sse ;
+: SHA256MSG2 ( dest src -- ) { 0x38 0xcd } f 2-operand-rm-sse ;
+
+! RDSEED instruction
+: RDSEED ( dst -- ) { 0b111 t { 0x0f 0xc7 } } 1-operand ;
+
+! AVX instructions (VEX-encoded)
+: VMOVUPS ( dst src -- ) 0x10 1 f 2-operand-vex ;
+: VMOVUPD ( dst src -- ) 0x10 1 0x66 2-operand-vex ;
+: VMOVAPS ( dst src -- ) 0x28 1 f 2-operand-vex ;
+: VMOVAPD ( dst src -- ) 0x28 1 0x66 2-operand-vex ;
+: VMOVDQA ( dst src -- ) 0x6f 1 0x66 2-operand-vex ;
+: VMOVDQU ( dst src -- ) 0x6f 1 0xf3 2-operand-vex ;
+
+! 3-operand AVX arithmetic
+: VADDPS ( dst src1 src2 -- ) 0x58 1 f 3-operand-vex ;
+: VADDPD ( dst src1 src2 -- ) 0x58 1 0x66 3-operand-vex ;
+: VSUBPS ( dst src1 src2 -- ) 0x5c 1 f 3-operand-vex ;
+: VSUBPD ( dst src1 src2 -- ) 0x5c 1 0x66 3-operand-vex ;
+: VMULPS ( dst src1 src2 -- ) 0x59 1 f 3-operand-vex ;
+: VMULPD ( dst src1 src2 -- ) 0x59 1 0x66 3-operand-vex ;
+: VDIVPS ( dst src1 src2 -- ) 0x5e 1 f 3-operand-vex ;
+: VDIVPD ( dst src1 src2 -- ) 0x5e 1 0x66 3-operand-vex ;
+
+! AVX logical operations
+: VXORPS ( dst src1 src2 -- ) 0x57 1 f 3-operand-vex ;
+: VXORPD ( dst src1 src2 -- ) 0x57 1 0x66 3-operand-vex ;
+: VANDPS ( dst src1 src2 -- ) 0x54 1 f 3-operand-vex ;
+: VANDPD ( dst src1 src2 -- ) 0x54 1 0x66 3-operand-vex ;
+: VORPS ( dst src1 src2 -- ) 0x56 1 f 3-operand-vex ;
+: VORPD ( dst src1 src2 -- ) 0x56 1 0x66 3-operand-vex ;
+: VANDNPS ( dst src1 src2 -- ) 0x55 1 f 3-operand-vex ;
+: VANDNPD ( dst src1 src2 -- ) 0x55 1 0x66 3-operand-vex ;
+
+! AVX comparisons
+: VMAXPS ( dst src1 src2 -- ) 0x5f 1 f 3-operand-vex ;
+: VMAXPD ( dst src1 src2 -- ) 0x5f 1 0x66 3-operand-vex ;
+: VMINPS ( dst src1 src2 -- ) 0x5d 1 f 3-operand-vex ;
+: VMINPD ( dst src1 src2 -- ) 0x5d 1 0x66 3-operand-vex ;
+
+! AVX shuffles
+: VSHUFPS ( dst src1 src2 imm -- ) 0xc6 1 f 3-operand-vex-imm ;
+: VSHUFPD ( dst src1 src2 imm -- ) 0xc6 1 0x66 3-operand-vex-imm ;
 
 ! x86-64 branch prediction hints
 
