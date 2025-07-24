@@ -82,12 +82,11 @@ PRIVATE>
 
 PRIVATE>
 
-: heap-stats ( -- counts sizes )
-    [ ] instances H{ } clone H{ } clone
-    [ '[ _ _ heap-stat-step ] each ] 2keep ;
+: heap-stats-of ( instances -- counts sizes )
+    H{ } clone H{ } clone [ '[ _ _ heap-stat-step ] each ] 2keep ;
 
-: heap-stats. ( -- )
-    heap-stats dup keys sort standard-table-style [
+: heap-stats-of. ( instances -- )
+    heap-stats-of dup keys sort standard-table-style [
         [ { "Class" "Bytes" "Instances" } [ write-cell ] each ] with-row
         [
             [
@@ -97,6 +96,12 @@ PRIVATE>
             ] with-row
         ] each 2drop
     ] tabular-output nl ;
+
+: heap-stats ( -- counts sizes )
+    all-instances heap-stats-of ;
+
+: heap-stats. ( -- )
+    all-instances heap-stats-of. ;
 
 : collect-gc-events ( quot -- gc-events )
     enable-gc-events
