@@ -209,7 +209,7 @@ M: operand POP { 0b000 f 0x8f } 1-operand ;
 <PRIVATE
 
 : zero-extendable? ( imm -- ? )
-    0 32 2^ 1 - between? ;
+    1 32 2^ 1 - between? ;
 
 : maybe-zero-extend ( reg imm -- reg' imm )
     dup zero-extendable? [ [ 32-bit-version-of ] dip ] when ;
