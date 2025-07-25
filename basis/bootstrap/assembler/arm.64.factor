@@ -349,7 +349,7 @@ big-endian off
 
 [
     ! class = ...
-    type obj tag-bits get UBFIZ
+    type obj tag-bits get dup UBFIZ
     type tuple type-number tag-fixnum CMP
     [ BNE ] [
         type obj tuple-class-offset [+] LDR
@@ -593,7 +593,7 @@ big-endian off
 
     { drop-locals [
         ds-0 DS -8 [post] LDR
-        RS dup ds-0 tag-bits get 3 - ASR SUB
+        RS dup ds-0 tag-bits get 3 - <ASR> SUB
     ] }
     { get-local [
         ds-0 DS [] LDR
@@ -612,7 +612,7 @@ big-endian off
     ] }
     { string-nth-fast [
         ds-1 ds-0 DS -8 [pre] LDP
-        ds-0 dup tag-bits get ASR
+        ds-0 dup tag-bits get <ASR>
         ds-1 dup tag-mask get bitnot AND
         ds-0 ds-1 ds-0 ADD
         ds-0 dup string-offset [+] LDRB
@@ -621,7 +621,7 @@ big-endian off
     ] }
     { tag [
         ds-0 DS [] LDR
-        ds-0 dup tag-bits get UBFIZ
+        ds-0 dup tag-bits get dup UBFIZ
         ds-0 DS [] STR
     ] }
 
