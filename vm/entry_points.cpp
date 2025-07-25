@@ -3,6 +3,15 @@
 namespace factor {
 
 void factor_vm::c_to_factor(cell quot) {
+#ifdef FACTOR_DEBUG
+  static bool first_call = true;
+  if (first_call) {
+    first_call = false;
+    std::cerr << "ENTERING FACTOR CODE for the first time!" << std::endl;
+    std::cerr << "  quot=" << std::hex << quot << std::dec << std::endl;
+    std::cerr << "  Code heap has " << code->all_blocks.size() << " blocks" << std::endl;
+  }
+#endif
   // First time this is called, wrap the c-to-factor sub-primitive inside
   // of a callback stub, which saves and restores non-volatile registers
   // per platform ABI conventions, so that the Factor compiler can treat

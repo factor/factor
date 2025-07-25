@@ -196,7 +196,14 @@ struct startup_fixup {
   }
 
   code_block* translate_code(const code_block* compiled) {
+#ifdef FACTOR_DEBUG
+    std::cerr << "DEBUG: translate_code called with compiled=" << std::hex << compiled << std::dec << std::endl;
+    code_block* result = fixup_code((code_block*)compiled);
+    std::cerr << "  result=" << std::hex << result << std::dec << " (offset=" << std::hex << code_offset << std::dec << ")" << std::endl;
+    return result;
+#else
     return fixup_code((code_block*)compiled);
+#endif
   }
 
   cell size(const object* obj) {
@@ -209,6 +216,15 @@ struct startup_fixup {
 };
 
 void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
+#ifdef FACTOR_DEBUG
+  std::cerr << "Fixup heaps:" << std::endl;
+  std::cerr << "  data_offset: " << std::hex << data_offset << std::dec << std::endl;
+  std::cerr << "  code_offset: " << std::hex << code_offset << std::dec << std::endl;
+  std::cerr << "  data heap range: " << std::hex << data->tenured->start 
+            << " - " << data->tenured->end << std::dec << std::endl;
+  std::cerr << "  code heap range: " << std::hex << code->allocator->start 
+            << " - " << code->allocator->end << std::dec << std::endl;
+#endif
   startup_fixup fixup(data_offset, code_offset);
   slot_visitor<startup_fixup> visitor(this, fixup);
   visitor.visit_all_roots();
@@ -240,6 +256,19 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
 
   auto updater = [&](code_block* compiled, cell size) {
     (void)size;
+#ifdef FACTOR_DEBUG
+    if (!compiled) {
+      std::cerr << "ERROR: null code block in fixup_heaps" << std::endl;
+      critical_error("null code block in fixup", 0);
+    }
+    if (compiled->size() == 0) {
+      std::cerr << "ERROR: zero-size code block" << std::endl;
+      critical_error("zero-size code block", 0);
+    }
+    if (compiled->size() > 1024 * 1024) {  // 1MB
+      std::cerr << "WARNING: suspiciously large code block size: " << compiled->size() << std::endl;
+    }
+#endif
     visitor.visit_code_block_objects(compiled);
     cell rel_base = compiled->entry_point() - fixup.code_offset;
     visitor.visit_instruction_operands(compiled, rel_base);
@@ -294,12 +323,48 @@ void factor_vm::load_image(vm_parameters* p) {
   if (h.version != image_version)
     fatal_error("Bad image: version number check failed", h.version);
 
-  if (!h.version4_escape) {
+#ifdef FACTOR_DEBUG
+  std::cerr << "Image header:" << std::endl;
+  std::cerr << "  magic: " << std::hex << h.magic << std::dec << std::endl;
+  std::cerr << "  version: " << h.version << std::endl;
+  std::cerr << "  data_relocation_base: " << std::hex << h.data_relocation_base << std::dec << std::endl;
+  std::cerr << "  code_relocation_base: " << std::hex << h.code_relocation_base << std::dec << std::endl;
+  std::cerr << "  data_size: " << h.data_size << std::endl;
+  std::cerr << "  code_size: " << h.code_size << std::endl;
+#endif
+
+  if (h.data_size == 0) {
+    // version4_escape case - real sizes are in escaped fields
     h.data_size = h.escaped_data_size;
   } else {
+    // Normal case - save sizes to compressed fields
     h.compressed_data_size = h.data_size;
     h.compressed_code_size = h.code_size;
   }
+
+#ifdef FACTOR_DEBUG
+  std::cerr << "After version4_escape processing:" << std::endl;
+  std::cerr << "  version4_escape: " << h.version4_escape << std::endl;
+  std::cerr << "  data_size: " << h.data_size << std::endl;
+  std::cerr << "  code_size: " << h.code_size << std::endl;
+  std::cerr << "  escaped_data_size: " << h.escaped_data_size << std::endl;
+  std::cerr << "  compressed_data_size: " << h.compressed_data_size << std::endl;
+  std::cerr << "  compressed_code_size: " << h.compressed_code_size << std::endl;
+  
+  // Sanity checks on image sizes
+  if (h.data_size > 1024 * 1024 * 1024) { // 1GB
+    std::cerr << "WARNING: data_size seems too large: " << h.data_size << std::endl;
+  }
+  if (h.code_size > 512 * 1024 * 1024) { // 512MB
+    std::cerr << "WARNING: code_size seems too large: " << h.code_size << std::endl;
+  }
+  if (h.data_size == 0 && h.code_size == 0) {
+    fatal_error("Bad image: both heaps have zero size", 0);
+  }
+  if (h.code_size == 0) {
+    std::cerr << "WARNING: boot image has no code section (code_size=0) - this may be expected for bootstrap" << std::endl;
+  }
+#endif
 
   load_data_heap(file, &h, p);
   load_code_heap(file, &h, p);

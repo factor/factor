@@ -247,6 +247,16 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
 	  (void)size;
+#ifdef FACTOR_DEBUG
+    if (!owner) {
+      std::cerr << "WARNING: null owner in call_frame_slot_visitor - skipping frame" << std::endl;
+      return;
+    }
+    if (addr < (cell)owner) {
+      std::cerr << "ERROR: addr " << std::hex << addr << " < owner " << owner << std::dec << std::endl;
+      critical_error("invalid addr in call_frame_slot_visitor", 0);
+    }
+#endif
     cell return_address = owner->offset(addr);
 
     code_block* compiled =
@@ -254,6 +264,14 @@ template <typename Fixup> struct call_frame_slot_visitor {
                                          : visitor->fixup.translate_code(owner);
     gc_info* info = compiled->block_gc_info();
 
+#ifdef FACTOR_DEBUG
+    if (return_address >= compiled->size()) {
+      std::cerr << "ERROR: return_address " << return_address 
+                << " >= compiled->size() " << compiled->size() << std::endl;
+      std::cerr << "owner=" << owner << " addr=" << std::hex << addr << std::dec << std::endl;
+      std::cerr << "compiled=" << compiled << std::endl;
+    }
+#endif
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
     if (callsite == (cell)-1)

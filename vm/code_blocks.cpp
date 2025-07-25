@@ -165,8 +165,14 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
       return (cell)&dispatch_stats.megamorphic_cache_hits;
-    case RT_VM:
-      return (cell)this + untag_fixnum(array_nth(parameters, index));
+    case RT_VM: {
+      cell value = array_nth(parameters, index);
+      // Special case for ARM64: false (1) means offset 0
+      if (value == 1) {
+        return (cell)this;
+      }
+      return (cell)this + untag_fixnum(value);
+    }
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:

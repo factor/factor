@@ -61,6 +61,7 @@ gc
 
         layout-of
     } compile-unoptimized
+    "omg1" write flush
 
     "." write flush
 
@@ -68,24 +69,28 @@ gc
         bitand bitor bitxor bitnot
     } compile-unoptimized
 
+    "omg2" write flush
     "." write flush
 
     {
         + * 2/ < <= > >= shift
     } compile-unoptimized
 
+    "omg3" write flush
     "." write flush
 
     {
         new-sequence nth push pop last flip
     } compile-unoptimized
 
+    "omg4" write flush
     "." write flush
 
     {
         hashcode* = equal? assoc-stack assoc-stack-from get set
     } compile-unoptimized
 
+    "omg5" write flush
     "." write flush
 
     {
@@ -94,6 +99,7 @@ gc
         like clone-like
     } compile-unoptimized
 
+    "omg6" write flush
     "." write flush
 
     {
@@ -101,6 +107,7 @@ gc
         word-prop set-word-prop 1array 2array 3array ?nth
     } compile-unoptimized
 
+    "omg7" write flush
     "." write flush
 
     os windows? [
@@ -118,13 +125,16 @@ gc
         malloc calloc free memcpy
     } compile-unoptimized
 
+    "omg8" write flush
     "." write flush
 
     loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
 
+    "omg9" write flush
     " done" print flush
 
     "alien.syntax" require
     "io.streams.byte-array.fast" require
 
+    "omg10" write flush
 ] unless

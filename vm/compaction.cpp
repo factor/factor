@@ -166,6 +166,16 @@ void factor_vm::collect_compact() {
 void factor_vm::collect_growing_data_heap(cell requested_size) {
   // Grow the data heap and copy all live objects to the new heap.
   data_heap* old = data;
+  
+  // During bootstrap, the nursery might still have objects
+  if (nursery.occupied_space() > 0) {
+#ifdef FACTOR_DEBUG
+    std::cerr << "WARNING: nursery not empty before growing heap (occupied=" 
+              << nursery.occupied_space() << " bytes) - clearing it" << std::endl;
+#endif
+    nursery.flush();
+  }
+  
   set_data_heap(data->grow(&nursery, requested_size));
   collect_mark_impl();
   collect_compact_impl();

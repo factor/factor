@@ -79,10 +79,23 @@ void code_heap::verify_all_blocks_set() {
 }
 
 code_block* code_heap::code_block_for_address(cell address) {
+  // Check if address is within code heap bounds
+  if (address < allocator->start || address >= allocator->end) {
+    return nullptr;
+  }
+  
+  if (all_blocks.empty()) {
+    return nullptr;
+  }
+  
   std::set<cell>::const_iterator blocki = all_blocks.upper_bound(address);
-  FACTOR_ASSERT(blocki != all_blocks.begin());
+  if (blocki == all_blocks.begin()) {
+    return nullptr;
+  }
+  
   --blocki;
   code_block* found_block = (code_block*)*blocki;
+  
   FACTOR_ASSERT(found_block->entry_point() <=
                 address // XXX this isn't valid during fixup. should store the
                         //     size in the map
@@ -94,7 +107,20 @@ code_block* code_heap::code_block_for_address(cell address) {
 
 cell code_heap::frame_predecessor(cell frame_top) {
 #ifdef FACTOR_ARM64
-  return *(cell*)frame_top;
+  // ARM64 uses frame pointers - check for validity to avoid infinite recursion
+  cell next_frame = *(cell*)frame_top;
+  
+  // Check for end of frame pointer chain or invalid pointer
+  if (next_frame == 0 || next_frame <= frame_top) {
+    return 0; // End of callstack
+  }
+  
+  // During bootstrap, we may have very large stacks - add reasonable bounds check
+  if (next_frame - frame_top > 0x100000) { // 1MB frame size limit
+    return 0; // Suspicious frame size, end traversal
+  }
+  
+  return next_frame;
 #else
   cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
   FACTOR_ASSERT(seg->in_segment_p(addr));

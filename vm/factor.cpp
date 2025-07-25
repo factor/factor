@@ -6,6 +6,14 @@ namespace factor {
 // Allocates memory
 void factor_vm::prepare_boot_image() {
   std::cout << "*** Stage 2 early init... " << std::flush;
+  
+#ifdef FACTOR_DEBUG
+  std::cout << std::endl << "Code heap state before compiling:" << std::endl;
+  std::cout << "  Code heap range: " << std::hex << code->allocator->start 
+            << " - " << code->allocator->end << std::dec << std::endl;
+  std::cout << "  Code heap size: " << code->allocator->size << " bytes" << std::endl;
+  std::cout << "  Number of code blocks: " << code->all_blocks.size() << std::endl;
+#endif
 
   // Compile all words.
   data_root<array> words(instances(WORD_TYPE), this);

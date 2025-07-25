@@ -89,7 +89,20 @@ struct code_block {
     }
   }
 
-  cell offset(cell addr) const { return addr - entry_point(); }
+  cell offset(cell addr) const {
+#ifdef FACTOR_DEBUG
+    if (addr < entry_point()) {
+      std::cerr << "ERROR: address " << std::hex << addr 
+                << " is before entry_point " << entry_point() << std::dec << std::endl;
+    }
+    cell result = addr - entry_point();
+    if (result > size()) {
+      std::cerr << "ERROR: offset " << result << " exceeds code block size " << size() << std::endl;
+      std::cerr << "  addr=" << std::hex << addr << " entry_point=" << entry_point() << std::dec << std::endl;
+    }
+#endif
+    return addr - entry_point(); 
+  }
 
   cell address_for_offset(cell offset) const {
     return entry_point() + offset;

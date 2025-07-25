@@ -31,7 +31,7 @@ TUPLE: stack-register < general-register ;
 TUPLE: vector-register < register ;
 32 <iota> [
     [ [ "V" % # ] "" make create-word-in ]
-    [ 64 vector-register boa define-constant ] bi
+    [ 128 vector-register boa define-constant ] bi
 ] each
 
 TUPLE: fp-register < register ;
@@ -420,7 +420,7 @@ MACRO: encode ( bitspec -- quot ) '[ _ bitfield* 4 >le % ] ;
     } encode ;
 
 : ADR  ( Xd imm -- )        0 (ADR) ;
-: ADRP ( Xd imm -- ) 12 ?>> 1 (ADR) ;
+: ADRP ( Xd imm -- ) 12 align -12 shift 1 (ADR) ;
 
 
 : unsigned-immediate? ( n bits -- ? ) dupd bits = ;
@@ -553,22 +553,22 @@ ERROR: immediate-error n ;
 :: UBFIZ ( Rd Rn lsb width -- )
     Rn encode-width 5 + :> max-width
     lsb max-width check-unsigned-immediate drop
-    width dup 1 max-width 2^ lsb - between? [ immediate-error ] unless drop
+    lsb width + max-width 2^ <= [ immediate-error ] unless
     Rd Rn lsb neg max-width bits width 1 - UBFM ;
 
 M:: integer LSL ( Rd Rn shift -- )
     Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
+    shift max-width 1 - check-unsigned-immediate drop
     Rd Rn shift bitnot max-width bits [ 1 + ] keep UBFM ;
 
 M:: integer LSR ( Rd Rn shift -- )
     Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
+    shift max-width 1 - check-unsigned-immediate drop
     Rd Rn shift max-width on-bits UBFM ;
 
 M:: integer ASR ( Rd Rn shift -- )
     Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
+    shift max-width 1 - check-unsigned-immediate drop
     Rd Rn shift max-width on-bits SBFM ;
 
 

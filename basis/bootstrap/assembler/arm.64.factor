@@ -199,7 +199,7 @@ big-endian off
     X10 X11 SP 16 [post] LDP
     X8 X9 SP 16 [post] LDP
     X6 X7 SP 16 [post] LDP
-    X4 X6 SP 16 [post] LDP
+    X4 X5 SP 16 [post] LDP
     X2 X3 SP 16 [post] LDP
     X0 X1 SP 16 [post] LDP ;
 
@@ -349,7 +349,7 @@ big-endian off
 
 [
     ! class = ...
-    type obj tag-bits get dup UBFIZ
+    type obj tag-bits get UBFIZ
     type tuple type-number tag-fixnum CMP
     [ BNE ] [
         type obj tuple-class-offset [+] LDR
@@ -476,7 +476,9 @@ big-endian off
     { fixnum*fast [
         ds-1 ds-0 DS -8 [pre] LDP
         ds-0 dup tag-bits get ASR
-        ds-0 dup ds-1 MUL
+        ds-1 dup tag-bits get ASR
+        ds-0 ds-1 ds-0 MUL
+        ds-0 dup tag-bits get LSL
         ds-0 DS [] STR
     ] }
 
@@ -504,13 +506,14 @@ big-endian off
         arg1 arg2 DS -8 [pre] LDP
         jit-save-context
         arg1 dup tag-bits get ASR
+        arg2 dup tag-bits get ASR
         ds-0 arg1 arg2 MUL
+        ds-0 dup tag-bits get LSL
         ds-0 DS [] STR
         ds-0 dup 63 ASR
         temp arg1 arg2 SMULH
         ds-0 temp CMP
         [ BEQ ] [
-            arg2 dup tag-bits get ASR
             arg3 VM MOV
             "overflow_fixnum_multiply" LDR=BLR rel-dlsym
         ] jit-conditional*
@@ -575,12 +578,14 @@ big-endian off
     { fixnum-shift-fast [
         ds-1 ds-0 DS -8 [pre] LDP
         ds-0 dup tag-bits get ASR
+        ds-1 dup tag-bits get ASR
         ! compute positive shift value in temp1
         temp1 ds-1 ds-0 LSL
+        temp1 dup tag-bits get LSL
         ! compute negative shift value in temp2
         ds-0 dup NEGS
         temp2 ds-1 ds-0 ASR
-        temp2 dup tag-mask get bitnot AND
+        temp2 dup tag-bits get LSL
         ! if shift count was positive, choose temp1
         ds-0 temp1 temp2 MI CSEL
         ds-0 DS [] STR
@@ -588,7 +593,7 @@ big-endian off
 
     { drop-locals [
         ds-0 DS -8 [post] LDR
-        RS dup ds-0 tag-bits get 3 - <ASR> SUB
+        RS dup ds-0 tag-bits get 3 - ASR SUB
     ] }
     { get-local [
         ds-0 DS [] LDR
@@ -607,14 +612,16 @@ big-endian off
     ] }
     { string-nth-fast [
         ds-1 ds-0 DS -8 [pre] LDP
-        ds-0 dup ds-1 tag-bits get <ASR> ADD
+        ds-0 dup tag-bits get ASR
+        ds-1 dup tag-mask get bitnot AND
+        ds-0 ds-1 ds-0 ADD
         ds-0 dup string-offset [+] LDRB
         ds-0 dup tag-bits get LSL
         ds-0 DS [] STR
     ] }
     { tag [
         ds-0 DS [] LDR
-        ds-0 dup tag-bits get dup UBFIZ
+        ds-0 dup tag-bits get UBFIZ
         ds-0 DS [] STR
     ] }
 

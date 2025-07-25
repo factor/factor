@@ -441,6 +441,13 @@ void factor_vm::factorbug() {
 
   cout << "Starting low level debugger..." << endl;
 
+  // Print stacks and exit immediately for debugging
+  print_datastack(cout);
+  print_retainstack(cout);
+  print_callstack(cout);
+  cout << "Exiting after stack dump..." << endl;
+  exit(1);
+
   // Even though we've stopped the VM, the stdin_loop thread (see os-*.cpp)
   // that pumps the console is still running concurrently. We lock a mutex so
   // the thread will take a break and give us exclusive access to stdin.

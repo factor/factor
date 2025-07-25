@@ -51,6 +51,24 @@ void factor_vm::start_gc_again() {
     // all the live objects from the other aging semispace and the
     // nursery.
     current_gc->op = COLLECT_TO_TENURED_OP;
+  /*
+  // COMMENTED OUT - Experimental GC patch that may cause issues
+  } else if (current_gc->op == COLLECT_TO_TENURED_OP) {
+    // To-tenured collection can fail if tenured space is full.
+    // Try a full collection.
+    current_gc->op = COLLECT_FULL_OP;
+  } else if (current_gc->op == COLLECT_FULL_OP) {
+    // Full collection can fail if there's high fragmentation.
+    // Try compaction.
+    current_gc->op = COLLECT_COMPACT_OP;
+  } else if (current_gc->op == COLLECT_COMPACT_OP) {
+    // Compaction can fail if there's still not enough space.
+    // Grow the heap.
+    current_gc->op = COLLECT_GROWING_DATA_HEAP_OP;
+  } else if (current_gc->op == COLLECT_GROWING_DATA_HEAP_OP) {
+    // Growing the heap failed - this is fatal
+    fatal_error("Out of memory: failed to grow data heap", 0);
+  */
   } else {
     // Nothing else should fail mid-collection due to insufficient
     // space in the target generation.
