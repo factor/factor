@@ -11,7 +11,7 @@ strings typed vectors words ;
 
 IN: bson
 
-DEFER: stream>assoc
+DEFER: read-bson-assoc
 
 ERROR: unknown-bson-type type msg ;
 
@@ -92,7 +92,7 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Regexp      [ bson-regexp-read ] }
         { T_Timestamp   [ read-timestamp ] }
         { T_Code        [ read-int32 read-sized-string ] }
-        { T_ScopedCode  [ read-int32 drop read-cstring H{ } clone stream>assoc <mongo-scoped-code> ] }
+        { T_ScopedCode  [ read-int32 drop read-cstring H{ } read-bson-assoc <mongo-scoped-code> ] }
         { T_NULL        [ f ] }
         [ "type unknown" unknown-bson-type ]
     } case ; inline recursive
@@ -111,15 +111,22 @@ TYPED: (element-read) ( type: integer -- cont?: boolean )
 
 PRIVATE>
 
-: stream>assoc ( exemplar -- assoc/f )
+: read-bson-assoc ( exemplar -- assoc/f )
     clone [
         state [ bson-object-data-read ] with-variable
     ] 1guard ;
 
-: path>bson-sequence ( path -- assoc )
-    binary [
-        [ H{ } stream>assoc ] loop>array
-    ] with-file-reader ;
+: bson> ( bytes -- assoc )
+    binary [ LH{ } read-bson-assoc ] with-byte-reader ;
+
+: read-bson-sequence ( exemplar -- seq )
+    '[ _ read-bson-assoc ] loop>array ;
+
+: path>bson-sequence ( path -- seq )
+    binary [ LH{ } read-bson-sequence ] with-file-reader ;
+
+: bson-sequence> ( bytes -- seq )
+    binary [ LH{ } read-bson-sequence ] with-byte-reader ;
 
 <PRIVATE
 
@@ -266,13 +273,10 @@ TYPED: write-pair ( name: string obj -- )
 
 PRIVATE>
 
-TYPED: assoc>bv ( assoc: hashtables -- byte-vector: byte-vector )
-    [ BV{ } clone dup ] dip '[ _ write-assoc ] with-output-stream* ; inline
+: >bson ( assoc -- bytes )
+    binary [ write-assoc ] with-byte-writer ;
 
-TYPED: assoc>stream ( assoc: hashtables -- )
-    write-assoc ; inline
-
-TYPED: mdb-special-value? ( value -- ?: boolean )
+: mdb-special-value? ( value -- ? )
     {
         [ timestamp? ]
         [ quotation? ]
