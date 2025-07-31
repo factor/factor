@@ -174,11 +174,10 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
 : serialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    '[ trial-size [ _ call( i -- doc ) assoc>bv drop ] each-integer ] ;
+    '[ trial-size [ _ call( i -- doc ) >bson drop ] each-integer ] ;
 
 : deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    [ 0 ] dip call( i -- doc ) assoc>bv
-    '[ trial-size [  _ binary [ H{ } stream>assoc drop ] with-byte-reader ] times ] ;
+    [ 0 ] dip call( i -- doc ) >bson '[ trial-size [  _ bson> ] times ] ;
 
 : check-for-key ( assoc key -- )
     CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ;
