@@ -1,11 +1,11 @@
 ! Copyright (C) 2013 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs byte-arrays combinators endian grouping
-hashtables io io.encodings io.encodings.binary
-io.encodings.string io.encodings.utf8 io.streams.byte-array
-io.streams.string kernel math math.bitwise math.order namespaces
-sequences strings ;
+USING: arrays assocs byte-arrays combinators endian grouping io
+io.encodings io.encodings.binary io.encodings.string
+io.encodings.utf8 io.streams.byte-array io.streams.string kernel
+linked-assocs math math.bitwise math.order namespaces sequences
+strings ;
 
 IN: msgpack
 
@@ -17,7 +17,7 @@ DEFER: read-msgpack
     [ read-msgpack ] replicate ;
 
 : read-map ( n -- obj )
-    2 * read-array 2 group >hashtable ;
+    2 * read-array 2 group >linked-hash ;
 
 : read-ext ( n -- obj )
     read be> [ 1 read signed-be> ] dip read 2array ;
