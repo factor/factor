@@ -1,5 +1,6 @@
 USING: io.encodings.binary io.streams.byte-array
-io.streams.string kernel math msgpack sequences tools.test ;
+io.streams.string kernel linked-assocs math msgpack sequences
+tools.test ;
 
 {
     {

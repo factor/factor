@@ -1,7 +1,7 @@
-USING: kernel msgpack msgpack.rpc msgpack.rpc.private sequences
-tools.test accessors assocs namespaces io.streams.string
-io.pipes io.encodings.binary io.streams.duplex io.streams.null
-concurrency.mailboxes strings destructors ;
+USING: accessors assocs concurrency.mailboxes destructors
+io.encodings.binary io.pipes io.streams.duplex io.streams.null
+io.streams.string kernel linked-assocs msgpack msgpack.rpc
+msgpack.rpc.private sequences strings tools.test ;
 
 IN: msgpack.rpc.tests
 
@@ -49,8 +49,8 @@ IN: msgpack.rpc.tests
 
 { } [
     { [ "test" { 1 2 3 } <notification> ]
-      [ 123 H{ { 1 2 } } <response-ok> ]
-      [ 2 H{ { 1 2 } } <response-error> ]
+      [ 123 LH{ { 1 2 } } <response-ok> ]
+      [ 2 LH{ { 1 2 } } <response-error> ]
       [ 1 "foobar" "baz" <request> ]
     }
     [ call roundtrip-test ] each
