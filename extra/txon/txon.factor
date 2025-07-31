@@ -1,9 +1,9 @@
 ! Copyright (C) 2011 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: assocs combinators combinators.short-circuit formatting
-grouping hashtables io kernel make math math.parser sequences
-splitting strings unicode ;
+USING: arrays assocs combinators combinators.short-circuit
+formatting grouping hashtables io kernel linked-assocs make math
+math.parser sequences splitting strings unicode ;
 
 IN: txon
 
@@ -38,7 +38,7 @@ DEFER: name/values
     ] [ f swap ] if* ;
 
 : (name=value) ( string -- remain term )
-    parse-name [ parse-value ] dip associate ;
+    parse-name [ parse-value ] dip swap 2array ;
 
 : name=value ( string -- remain term )
     [ unicode:blank? ] trim
@@ -46,7 +46,7 @@ DEFER: name/values
 
 : name/values ( string -- remain terms )
     [ dup { [ empty? not ] [ first CHAR: ` = not ] } 1&& ]
-    [ name=value ] produce assoc-union-all ;
+    [ name=value ] produce >linked-hash ;
 
 : parse-txon ( string -- objects )
     [ dup empty? not ] [ name=value ] produce nip ;
@@ -54,7 +54,11 @@ DEFER: name/values
 PRIVATE>
 
 : txon> ( string -- object )
-    parse-txon dup length 1 = [ first ] when ;
+    parse-txon dup [ pair? ] all? [
+        >linked-hash
+    ] [
+        dup length 1 = [ first ] when
+    ] if ;
 
 <PRIVATE
 
@@ -69,9 +73,9 @@ M: sequence >txon
     [ >txon ] map join-lines ;
 
 M: assoc >txon
-    >alist [
-        first2 [ encode-value ] [ >txon ] bi* "%s:`%s`" sprintf
-    ] map join-lines ;
+    [
+        [ encode-value ] [ >txon ] bi* "%s:`%s`" sprintf
+    ] { } assoc>map join-lines ;
 
 M: string >txon
     encode-value ;

@@ -14,38 +14,38 @@ USING: tools.test txon ;
 
 { "foo" } [ "   foo   " txon> ] unit-test
 
-{ H{ { "foo" "" } } }
+{ LH{ { "foo" "" } } }
 [ "foo:``" txon> ] unit-test
 
-{ H{ { "foo" " " } } }
+{ LH{ { "foo" " " } } }
 [ "foo:` `" txon> ] unit-test
 
-{ H{ { "name" "value" } } }
+{ LH{ { "name" "value" } } }
 [ "name:`value`" txon> ] unit-test
 
-{ H{ { "name" "value" } } }
+{ LH{ { "name" "value" } } }
 [ "  name:`value`  " txon> ] unit-test
 
-{ H{ { "foo`bar" "value" } } }
+{ LH{ { "foo`bar" "value" } } }
 [ "foo\\`bar:`value`" txon> ] unit-test
 
-{ H{ { "foo" "bar`baz" } } }
+{ LH{ { "foo" "bar`baz" } } }
 [ "foo:`bar\\`baz`" txon> ] unit-test
 
-{ { H{ { "name1" "value1" } } H{ { "name2" "value2" } } } }
+{ LH{ { "name1" "value1" } { "name2" "value2" } } }
 [ "name1:`value1`name2:`value2`" txon> ] unit-test
 
-{ H{ { "name1" H{ { "name2" "nested value" } } } } }
+{ LH{ { "name1" LH{ { "name2" "nested value" } } } } }
 [ "name1:`  name2:`nested value` `" txon> ] unit-test
 
 { "name1:`name2:`nested value``" }
 [
-    H{ { "name1" H{ { "name2" "nested value" } } } } >txon
+    LH{ { "name1" LH{ { "name2" "nested value" } } } } >txon
 ] unit-test
 
 {
-    H{
-        { "name1" H{ { "name2" "value2" } { "name3" "value3" } } }
+    LH{
+        { "name1" LH{ { "name2" "value2" } { "name3" "value3" } } }
     }
 } [
     "
@@ -57,8 +57,8 @@ USING: tools.test txon ;
 ] unit-test
 
 {
-    H{
-        { "name1" H{ { "name2" H{ { "name3" "value3" } } } } }
+    LH{
+        { "name1" LH{ { "name2" LH{ { "name3" "value3" } } } } }
     }
 } [
     "
@@ -70,4 +70,4 @@ USING: tools.test txon ;
     " txon>
 ] unit-test
 
-{ H{ { "a" { "1" "2" "3" } } } } [ "a:`1\n2\n3`" txon> ] unit-test
+{ LH{ { "a" { "1" "2" "3" } } } } [ "a:`1\n2\n3`" txon> ] unit-test
