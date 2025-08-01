@@ -1,5 +1,5 @@
-USING: assocs calendar linked-assocs multiline present toml
-tools.test ;
+USING: assocs calendar kernel linked-assocs multiline present
+toml tools.test ;
 
 ! Example document
 
@@ -635,3 +635,13 @@ animal = { type.name = "pug" }]=] toml>
 ! Seconds in Date-Time and Time values are now optional.
 ! Allow non-English scripts in unquoted (bare) keys
 ! Clarify newline normalization in multi-line literal strings.
+
+
+{ t } [
+    LH{
+        { "name" "Factor" }
+        { "age" 22 }
+        { "list" { 4 8 15 16 23 42 } }
+        { "map" { LH{ { "one" 1 } { "two" 2 } } } }
+    } [ >toml toml> ] keep =
+] unit-test
