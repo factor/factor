@@ -1,4 +1,4 @@
-USING: tools.test txon ;
+USING: linked-assocs tools.test txon ;
 
 { "ABC" } [ "ABC" >txon ] unit-test
 
