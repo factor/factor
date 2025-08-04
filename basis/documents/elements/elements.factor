@@ -11,10 +11,10 @@ GENERIC: next-elt ( loc document elt -- newloc )
     [ prev-elt ] [ next-elt ] 3bi ;
 
 : elt-string ( loc document elt -- string )
-    [ prev/next-elt ] [ drop ] 2bi doc-range ;
+    [ prev/next-elt ] keepd doc-range ;
 
 : set-elt-string ( string loc document elt -- )
-    [ prev/next-elt ] [ drop ] 2bi set-doc-range ;
+    [ prev/next-elt ] keepd set-doc-range ;
 
 SINGLETON: char-elt
 

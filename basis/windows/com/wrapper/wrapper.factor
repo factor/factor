@@ -125,7 +125,7 @@ unless
 : (malloc-wrapped-object) ( wrapper -- wrapped-object )
     vtbls>> length void* heap-size *
     [ ulong heap-size + malloc ] keep
-    [ [ 1 ] 2dip set-alien-unsigned-4 ] [ drop ] 2bi ;
+    [ [ 1 ] 2dip set-alien-unsigned-4 ] keepd ;
 
 : (callbacks>vtbl) ( callbacks -- vtbl )
     [ execute( -- callback ) ] void*-array{ } map-as malloc-byte-array ;
