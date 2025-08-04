@@ -111,8 +111,7 @@ M: editor ungraft*
     [ model>> validate-loc ] [ mark>> ] bi set-model ;
 
 : change-caret ( editor quot: ( loc document -- newloc ) -- )
-    [ [ [ editor-caret ] [ model>> ] bi ] dip call ] [ drop ] 2bi
-    set-caret ; inline
+    [ [ [ editor-caret ] [ model>> ] bi ] dip call ] keepd set-caret ; inline
 
 : mark>caret ( editor -- )
     [ editor-caret ] [ mark>> ] bi set-model ;
@@ -288,8 +287,8 @@ M: editor cap-height font>> font-metrics cap-height>> ;
 <PRIVATE
 
 : contents-changed ( model editor -- )
-    [ [ nip caret>> ] [ drop ] 2bi '[ _ validate-loc ] (change-model) ]
-    [ [ nip mark>> ] [ drop ] 2bi '[ _ validate-loc ] (change-model) ]
+    [ caret>> swap '[ _ validate-loc ] (change-model) ]
+    [ mark>> swap '[ _ validate-loc ] (change-model) ]
     [ nip relayout ] 2tri ;
 
 : caret/mark-changed ( editor -- )
@@ -412,8 +411,7 @@ M: editor gadget-text* editor-string % ;
     [ mark>> set-model ] [ caret>> set-model ] bi-curry bi* ;
 
 : select-elt ( editor elt -- )
-    [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
-    editor-select ;
+    [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] keepd editor-select ;
 
 : start-of-document ( editor -- ) doc-elt editor-prev ;
 
@@ -681,15 +679,13 @@ PRIVATE>
     swap [ drop 1 - 0 2array ] [ line-end ] 2bi ;
 
 : join-with-prev ( document line -- )
-    [ prev-line-and-this ] [ drop ] 2bi
-    [ join-lines ] change-doc-range ;
+    [ prev-line-and-this ] keepd [ join-lines ] change-doc-range ;
 
 : this-line-and-next ( document line -- start end )
     swap [ drop 0 2array ] [ [ 1 + ] dip line-end ] 2bi ;
 
 : join-with-next ( document line -- )
-    [ this-line-and-next ] [ drop ] 2bi
-    [ join-lines ] change-doc-range ;
+    [ this-line-and-next ] keepd [ join-lines ] change-doc-range ;
 
 PRIVATE>
 

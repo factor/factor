@@ -82,8 +82,7 @@ M: A resize
     [
         [ \ T heap-size * ] [ underlying>> ] bi*
         resize-byte-array
-    ] [ drop ] 2bi
-    <direct-A> ; inline
+    ] keepd <direct-A> ; inline
 
 M: A element-size drop \ T heap-size ; inline
 

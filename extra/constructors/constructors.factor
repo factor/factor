@@ -48,8 +48,8 @@ ERROR: unknown-constructor-parameters class effect unknown ;
 
 SYNTAX: CONSTRUCTOR:
     parse-constructor
-    [ [ constructor-boa-quot ] dip compose ]
-    [ drop ] 2bi define-declared ;
+    [ [ constructor-boa-quot ] dip compose ] keepd
+    define-declared ;
 
 : scan-rest-input-effect ( -- effect )
     ")" parse-effect-tokens nip

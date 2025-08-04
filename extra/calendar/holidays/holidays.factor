@@ -29,7 +29,7 @@ PRIVATE>
 M: all holidays drop (holidays) ;
 
 : holiday? ( timestamp/n singleton -- ? )
-    [ holidays ] [ drop ] 2bi '[ _ same-day? ] any? ;
+    [ holidays ] keepd '[ _ same-day? ] any? ;
 
 : holiday-assoc ( timestamp singleton -- assoc )
     (holidays) swap '[
@@ -41,7 +41,6 @@ M: all holidays drop (holidays) ;
 
 : holiday-names ( timestamp/n singleton -- seq )
     [
-        [ clone ] dip
-        [ drop ] [ holiday-assoc ] 2bi swap
+        [ clone ] dip [ holiday-assoc ] keepd
         '[ _ same-day? ] filter-keys values
     ] keep '[ _ swap "holiday" word-prop at ] map ;

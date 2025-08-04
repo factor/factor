@@ -1133,7 +1133,7 @@ PRIVATE>
     [ trim-head-slice ] [ trim-tail-slice ] bi ; inline
 
 : trim ( ... seq quot: ( ... elt -- ... ? ) -- ... newseq )
-    [ trim-slice ] [ drop ] 2bi like ; inline
+    [ trim-slice ] keepd like ; inline
 
 GENERIC: sum ( seq -- n )
 M: object sum 0 [ + ] binary-reduce ; inline
