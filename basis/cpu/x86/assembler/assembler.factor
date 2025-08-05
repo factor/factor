@@ -480,6 +480,8 @@ PRIVATE>
 : FNSTSW ( operand -- ) { 0b111 f 0xdd } 1-operand ;
 : FLDCW ( operand -- ) { 0b101 f 0xd9 } 1-operand ;
 
+: FWAIT ( -- ) 0x9b , ;
+
 : FNCLEX ( -- ) 0xdb , 0xe2 , ;
 : FNINIT ( -- ) 0xdb , 0xe3 , ;
 

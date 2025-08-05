@@ -14,6 +14,9 @@ M: x86.64 set-sse-env
 
 M: x86.64 get-x87-env
     void { void* } cdecl [
+        ! FWAIT ensures all pending FP operations complete
+        ! before we read the status word
+        FWAIT
         param-reg-0 [] FNSTSW
         param-reg-0 2 [+] FNSTCW
     ] alien-assembly ;
