@@ -90,8 +90,7 @@ PRIVATE>
 
 : polyval ( x p -- p[x] )
     ! Horner scheme
-    [ nip <reversed> unclip-slice swap ]
-    [ drop ] 2bi
+    [ nip <reversed> unclip-slice swap ] keepd
     '[ [ _ * ] dip + ] each ;
 
 MACRO: polyval* ( p -- quot )

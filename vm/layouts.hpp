@@ -209,7 +209,7 @@ struct code_block;
 // Assembly code makes assumptions about the layout of this struct:
 //   basis/bootstrap/images/images.factor
 //   basis/compiler/constants/constants.factor
-//   core/bootstrap/primitives.factor
+//   basis/bootstrap/primitives.factor
 
 struct word : public object {
   static const cell type_number = WORD_TYPE;

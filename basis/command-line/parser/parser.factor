@@ -303,10 +303,42 @@ PRIVATE>
 : parse-options ( options -- arguments )
     command-line get (parse-options) ;
 
-: with-options ( ... options quot: ( ... -- ... ) -- ... )
-    '[ _ parse-options _ with-variables ] [
+: (with-options) ( ... options command-line quot: ( ... -- ... ) -- ... )
+    '[ _ _ (parse-options) _ with-variables ] [
         dup option-error? [
             dup usage-error? [ "ERROR: " write ] unless
             print-error
         ] [ rethrow ] if
     ] recover ; inline
+
+: with-options ( ... options quot: ( ... -- ... ) -- ... )
+    [ command-line get ] dip (with-options) ; inline
+
+<PRIVATE
+
+SYMBOL: command
+
+: <command-option> ( commands -- option )
+    option new
+        "command" >>name
+        swap keys "," join "{" "}" surround >>help
+        command >>variable ;
+
+PRIVATE>
+
+:: (with-commands) ( ... commands command-line quot: ( ... -- ... ) -- ... )
+    command-line [
+        commands <command-option> :> command-option
+        command-option 1array swap unclip 1array swap '[
+            command get commands ?at [
+                get-program-name command get  " " glue program-name [
+                    _ quot (with-options)
+                ] with-variable
+            ] [
+                command-option swap invalid-value
+            ] if
+        ] (with-options)
+    ] unless-empty ; inline
+
+: with-commands ( ... commands quot: ( ... -- ... ) -- ... )
+    [ command-line get ] dip (with-commands) ; inline

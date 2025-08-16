@@ -772,6 +772,11 @@ install_deps_pkg() {
     sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
 }
 
+install_deps_apk() {
+    sudo apk add --no-cache bash git make gcc g++ libc-dev pango-dev libx11-dev gtk+2.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
+    check_ret sudo
+}
+
 
 install_deps_macos() {
     if test_program_installed git; then
@@ -792,6 +797,7 @@ usage() {
     $ECHO "  deps-pacman - install required packages for Factor on Linux using pacman"
     $ECHO "  deps-dnf - install required packages for Factor on Linux using dnf"
     $ECHO "  deps-pkg - install required packages for Factor on FreeBSD using pkg"
+    $ECHO "  deps-apk - install required packages for Factor on Alpine Linux using apk"
     $ECHO "  deps-macos - install git on macOS using port"
     $ECHO "  info-boot-image - print remote and disk boot image MD5"
     $ECHO "  info-check-factor-refresh-all-locally - check if local sources would cause refresh-all to change the image"
@@ -836,6 +842,7 @@ case "$1" in
     deps-macos) install_deps_macos ;;
     deps-dnf) install_deps_dnf ;;
     deps-pkg) install_deps_pkg ;;
+    deps-apk) install_deps_apk ;;
     info-boot-image) info_boot_image ;;
     info-check-factor-refresh-all-locally) info_check_factor_refresh_all_locally ;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;

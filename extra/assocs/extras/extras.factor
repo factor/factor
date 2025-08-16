@@ -82,7 +82,7 @@ IN: assocs.extras
     over '[ swap _ push-at ] assoc-each ;
 
 : assoc-collect ( assoc1 assoc2 -- newassoc )
-    [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
+    [ [ [ assoc-size ] bi@ + ] keepd new-assoc ] 2keep
     [ assoc-collect! ] bi@ ;
 
 ! iterate over assoc2, replace conflicting values

@@ -306,7 +306,7 @@ M: table model-changed
     row-rect [ { 0 1 } v* ] change-dim ;
 
 : scroll-to-row ( table n -- )
-    [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ drop ] if* ;
+    [ [ thin-row-rect ] keepd scroll>rect ] [ drop ] if* ;
 
 : (select-row) ( table n -- )
     [ scroll-to-row ]

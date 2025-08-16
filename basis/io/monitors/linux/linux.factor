@@ -36,7 +36,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
     inotify-fd -rot inotify_add_watch dup io-error dup check-existing ;
 
 : add-watch ( path mask mailbox -- monitor )
-    [ [ absolute-path ] dip [ (add-watch) ] [ drop ] 2bi ] dip
+    [ [ absolute-path ] dip [ (add-watch) ] keepd ] dip
     <linux-monitor> [ ] [ ] [ wd>> ] tri watches get set-at ;
 
 : check-inotify ( -- )

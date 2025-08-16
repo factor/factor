@@ -195,13 +195,13 @@ TUPLE: person first-name last-name ;
     ] with-scope
 ] [ error>> tag-not-allowed-here? ] must-fail-with
 
-{ "This is     <style type=\"text/css\"> * { font-family: monospace; } </style>" } [
+{ "<style type=\"text/css\">* { font-family: monospace; }</style>" } [
     V{ } clone style [
         [ "test16" test-template call-template ] run-template
     ] with-variable
 ] unit-test
 
-{ "<script type=\"text/javascript\">/* <![CDATA[*/function testAlerts() {    window.alert(\"Hello, world!\");}/*]]> */</script>" } [
+{ "<script type=\"text/javascript\">function testAlerts() {    window.alert(\"Hello, world!\");}</script>" } [
     V{ } clone script [
         [ "test17" test-template call-template ] run-template
     ] with-variable
@@ -210,5 +210,15 @@ TUPLE: person first-name last-name ;
 { "<meta name=\"author\" content=\"John Doe\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" } [
     V{ } clone meta [
         [ "test18" test-template call-template ] run-template
+    ] with-variable
+] unit-test
+
+{ "<style>&amp;&lt;&gt;&gt;</style><script>&amp;&lt;&gt;&gt;</script>" } [
+    [ "test19" test-template call-template ] run-template
+] unit-test
+
+{ "<script type=\"text/javascript\">if (1 < 2) { alert(\"pwned!\"); }</script>" } [
+    V{ } clone script [
+        [ "test20" test-template call-template ] run-template
     ] with-variable
 ] unit-test

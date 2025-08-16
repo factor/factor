@@ -159,7 +159,7 @@ callback-error-hook [ [ die rethrow ] ] initialize
     '[ dup @ [ drop f ] [ rethrow ] if ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
-    [ '[ [ @ @ ] dip rethrow ] recover ] [ drop ] 2bi call ; inline
+    [ '[ [ @ @ ] dip rethrow ] recover ] keepd call ; inline
 
 : finally ( try cleanup-always -- )
     [ ] cleanup ; inline

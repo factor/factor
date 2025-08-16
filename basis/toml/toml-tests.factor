@@ -1,13 +1,14 @@
-USING: assocs calendar multiline present toml tools.test ;
+USING: assocs calendar kernel linked-assocs multiline present
+toml tools.test ;
 
 ! Example document
 
 {
-    H{
+    LH{
         { "title" "TOML Example" }
         {
             "owner"
-            H{
+            LH{
                 { "name" "Tom Preston-Werner" }
                 { "organization" "GitHub" }
                 {
@@ -27,7 +28,7 @@ USING: assocs calendar multiline present toml tools.test ;
         }
         {
             "database"
-            H{
+            LH{
                 { "server" "192.168.1.1" }
                 { "ports" { 8001 8001 8002 } }
                 { "connection_max" 5000 }
@@ -36,17 +37,17 @@ USING: assocs calendar multiline present toml tools.test ;
         }
         {
             "servers"
-            H{
+            LH{
                 {
                     "alpha"
-                    H{
+                    LH{
                         { "ip" "10.0.0.1" }
                         { "dc" "eqdc10" }
                     }
                 }
                 {
                     "beta"
-                    H{
+                    LH{
                         { "ip" "10.0.0.2" }
                         { "dc" "eqdc10" }
                         { "country" "中国" }
@@ -56,7 +57,7 @@ USING: assocs calendar multiline present toml tools.test ;
         }
         {
             "clients"
-            H{
+            LH{
                 { "data" { { "gamma" "delta" } { 1 2 } } }
                 { "hosts" { "alpha" "omega" } }
             }
@@ -64,11 +65,11 @@ USING: assocs calendar multiline present toml tools.test ;
         {
             "products"
             V{
-                H{
+                LH{
                     { "name" "Hammer" }
                     { "sku" 738594937 }
                 }
-                H{
+                LH{
                     { "name" "Nail" }
                     { "sku" 284758393 }
                     { "color" "gray" }
@@ -131,9 +132,9 @@ hosts = [
 ] unit-test
 
 {
-    H{
-        { "deps" H{
-            { "temp_targets" H{ { "case" 72.0 } } } }
+    LH{
+        { "deps" LH{
+            { "temp_targets" LH{ { "case" 72.0 } } } }
         }
     }
 } [
@@ -142,7 +143,7 @@ hosts = [
 ] unit-test
 
 {
-    H{ { "foo" H{ { "qux" 456 } { "bar" H{ { "baz" 123 } } } } } }
+    LH{ { "foo" LH{ { "bar" LH{ { "baz" 123 } } } { "qux" 456 } } } }
 } [
 [=[
 [foo.bar]
@@ -156,7 +157,7 @@ qux = 456
 
 ! Comments
 {
-    H{ { "key" "value" } { "another" "# This is not a comment" } }
+    LH{ { "key" "value" } { "another" "# This is not a comment" } }
 } [
     [=[ # This is a full-line comment
 key = "value"  # This is a comment at the end of a line
@@ -174,12 +175,12 @@ another = "# This is not a comment"]=] toml>
 ! Keys
 
 {
-    H{
+    LH{
+        { "127.0.0.1" "value" }
         { "character encoding" "value" }
-        { "quoted \"value\"" "value" }
         { "ʎǝʞ" "value" }
         { "key2" "value" }
-        { "127.0.0.1" "value" }
+        { "quoted \"value\"" "value" }
     }
 } [
     [=[
@@ -192,14 +193,14 @@ another = "# This is not a comment"]=] toml>
 ] unit-test
 
 [ [=[ = "no key name"  # INVALID]=] toml> ] must-fail
-{ H{ { "" "blank" } } } [ [=[ "" = "blank"     # VALID but discouraged]=] toml> ] unit-test
-{ H{ { "" "blank" } } } [ [=[ '' = "blank"     # VALID but discouraged]=] toml> ] unit-test
+{ LH{ { "" "blank" } } } [ [=[ "" = "blank"     # VALID but discouraged]=] toml> ] unit-test
+{ LH{ { "" "blank" } } } [ [=[ '' = "blank"     # VALID but discouraged]=] toml> ] unit-test
 
 {
-    H{
-        { "physical" H{ { "color" "orange" } { "shape" "round" } } }
+    LH{
         { "name" "Orange" }
-        { "site" H{ { "google.com" t } } }
+        { "physical" LH{ { "color" "orange" } { "shape" "round" } } }
+        { "site" LH{ { "google.com" t } } }
     }
 } [
     [=[
@@ -211,8 +212,8 @@ site."google.com" = true
 ] unit-test
 
 {
-    H{
-        { "fruit" H{
+    LH{
+        { "fruit" LH{
                 { "name" "banana" }
                 { "color" "yellow" }
                 { "flavor" "banana" }
@@ -241,14 +242,14 @@ fruit.apple = 1
 # You can't turn an integer into a table.
 fruit.apple.smooth = true]=] toml> ] must-fail
 
-{ H{ { "3" H{ { "14159" "pi" } } } } } [
+{ LH{ { "3" LH{ { "14159" "pi" } } } } } [
     [=[ 3.14159 = "pi" ]=] toml>
 ] unit-test
 
 ! Strings
 
 {
-    H{
+    LH{
         {
             "str"
             "I'm a string. \"You can quote me\". Name\tJosé\nLocation\tSF."
@@ -259,14 +260,14 @@ fruit.apple.smooth = true]=] toml> ] must-fail
     toml>
 ] unit-test
 
-{ H{ { "str1" "Roses are red\nViolets are blue" } } } [
+{ LH{ { "str1" "Roses are red\nViolets are blue" } } } [
     [=[ str1 = """
 Roses are red
 Violets are blue"""]=] toml>
 ] unit-test
 
 {
-    H{
+    LH{
         { "str1" "The quick brown fox jumps over the lazy dog." }
         { "str2" "The quick brown fox jumps over the lazy dog." }
         { "str3" "The quick brown fox jumps over the lazy dog." }
@@ -292,11 +293,11 @@ str3 = """\
 ] unit-test
 
 {
-    H{
-        { "regex" "<\\i\\c*\\s*>" }
-        { "quoted" "Tom \"Dubs\" Preston-Werner" }
-        { "winpath2" "\\\\ServerX\\admin$\\system32\\" }
+    LH{
         { "winpath" "C:\\Users\\nodejs\\templates" }
+        { "winpath2" "\\\\ServerX\\admin$\\system32\\" }
+        { "quoted" "Tom \"Dubs\" Preston-Werner" }
+        { "regex" "<\\i\\c*\\s*>" }
     }
 } [
     [=[ # What you see is what you get.
@@ -309,7 +310,7 @@ regex    = '<\i\c*\s*>' ]=] toml>
 ! Integer
 
 {
-    H{
+    LH{
         { "int1" 99 }
         { "int2" 42 }
         { "int3" 0 }
@@ -355,7 +356,7 @@ bin1 = 0b11010110
 ! Floats
 
 {
-    H{
+    LH{
         { "flt1" "1.0" }
         { "flt2" "3.1415" }
         { "flt3" "-0.01" }
@@ -365,10 +366,10 @@ bin1 = 0b11010110
         { "flt7" "6.626e-34" }
         { "flt8" "224617.445991228" }
         { "sf1" "1/0." }
-        { "sf3" "-1/0." }
         { "sf2" "1/0." }
-        { "sf5" "0/0." }
+        { "sf3" "-1/0." }
         { "sf4" "0/0." }
+        { "sf5" "0/0." }
         { "sf6" "0/0." }
     }
 } [
@@ -406,7 +407,7 @@ sf6 = -nan # valid, actual encoding is implementation-specific
 
 ! Booleans
 
-{ H{ { "bool1" t } { "bool2" f } } } [
+{ LH{ { "bool1" t } { "bool2" f } } } [
     [=[ bool1 = true
 bool2 = false]=] toml>
 ] unit-test
@@ -414,17 +415,7 @@ bool2 = false]=] toml>
 ! Offset Date-Time
 
 {
-    H{
-        {
-            "odt4"
-            T{ timestamp
-                { year 1979 }
-                { month 5 }
-                { day 27 }
-                { hour 7 }
-                { minute 32 }
-            }
-        }
+    LH{
         {
             "odt1"
             T{ timestamp
@@ -456,6 +447,16 @@ bool2 = false]=] toml>
                 { gmt-offset T{ duration { hour -7 } } }
             }
         }
+        {
+            "odt4"
+            T{ timestamp
+                { year 1979 }
+                { month 5 }
+                { day 27 }
+                { hour 7 }
+                { minute 32 }
+            }
+        }
     }
 } [
     [=[
@@ -469,7 +470,7 @@ odt4 = 1979-05-27 07:32:00Z
 ! Local Date-Time
 
 {
-    H{
+    LH{
         {
             "ldt1"
             T{ timestamp
@@ -500,7 +501,7 @@ ldt2 = 1979-05-27T00:32:00.999999
 
 ! Local Date
 
-{ H{ { "ld1" "1979-05-27" } } } [
+{ LH{ { "ld1" "1979-05-27" } } } [
     [=[
 ld1 = 1979-05-27
 ]=] toml>
@@ -508,7 +509,7 @@ ld1 = 1979-05-27
 
 ! Local Time
 
-{ H{ { "lt2" "00:32:00.999999" } { "lt1" "07:32:00" } } } [
+{ LH{ { "lt1" "07:32:00" } { "lt2" "00:32:00.999999" } } } [
     [=[
 lt1 = 07:32:00
 lt2 = 00:32:00.999999
@@ -518,7 +519,7 @@ lt2 = 00:32:00.999999
 ! Array
 
 {
-    H{
+    LH{
         { "integers" { 1 2 3 } }
         { "colors" { "red" "yellow" "green" } }
         { "nested_arrays_of_ints" { { 1 2 } { 3 4 5 } } }
@@ -529,7 +530,7 @@ lt2 = 00:32:00.999999
             "contributors"
             {
                 "Foo Bar <foo@example.com>"
-                H{
+                LH{
                     { "name" "Baz Qux" }
                     { "email" "bazqux@example.com" }
                     { "url" "https://example.com/bazqux" }
@@ -555,7 +556,7 @@ contributors = [
 ] unit-test
 
 {
-    H{
+    LH{
         { "integers2" { 1 2 3 } }
         { "integers3" { 1 2 } }
     }
@@ -573,7 +574,7 @@ integers3 = [
 ! Table
 
 {
-    H{ { "j" H{ { "ʞ" H{ { "l" H{ { "key1" t } } } } } } } }
+    LH{ { "j" LH{ { "ʞ" LH{ { "l" LH{ { "key1" t } } } } } } } }
 } [
     [=[
 [ j . "ʞ" . 'l' ]
@@ -584,13 +585,13 @@ key1 = true
 ! Inline Table
 
 {
-    H{
+    LH{
         {
             "name"
-            H{ { "first" "Tom" } { "last" "Preston-Werner" } }
+            LH{ { "first" "Tom" } { "last" "Preston-Werner" } }
         }
-        { "point" H{ { "x" 1 } { "y" 2 } } }
-        { "animal" H{ { "type" H{ { "name" "pug" } } } } }
+        { "point" LH{ { "x" 1 } { "y" 2 } } }
+        { "animal" LH{ { "type" LH{ { "name" "pug" } } } } }
     }
 } [
     [=[
@@ -602,11 +603,11 @@ animal = { type.name = "pug" }]=] toml>
 ! Array of Tables
 
 {
-    H{
+    LH{
         { "points" {
-                H{ { "x" 1 } { "y" 2 } { "z" 3 } }
-                H{ { "x" 7 } { "y" 8 } { "z" 9 } }
-                H{ { "x" 2 } { "y" 4 } { "z" 8 } }
+                LH{ { "x" 1 } { "y" 2 } { "z" 3 } }
+                LH{ { "x" 7 } { "y" 8 } { "z" 9 } }
+                LH{ { "x" 2 } { "y" 4 } { "z" 8 } }
             }
         }
     }
@@ -616,11 +617,11 @@ animal = { type.name = "pug" }]=] toml>
            { x = 2, y = 4, z = 8 } ] ]=] toml>
 ] unit-test
 
-{ H{ { "a" { } } } } [ "a=[]" toml> ] unit-test
-{ H{ { "a" { 1 } } } } [ "a=[1]" toml> ] unit-test
-{ H{ { "a" { 1 2 3 } } } } [ "a=[1,2,3]" toml> ] unit-test
-{ H{ { "a" { 1 2 3 } } } } [ "a=[,1,,,,2,,3,,]" toml> ] unit-test
-{ H{ { "a" { 1 2 3 } } } } [ "a=[ # this\n,1,, # is\n,,2, #a\n,3,, # comment \n]" toml> ] unit-test
+{ LH{ { "a" { } } } } [ "a=[]" toml> ] unit-test
+{ LH{ { "a" { 1 } } } } [ "a=[1]" toml> ] unit-test
+{ LH{ { "a" { 1 2 3 } } } } [ "a=[1,2,3]" toml> ] unit-test
+{ LH{ { "a" { 1 2 3 } } } } [ "a=[,1,,,,2,,3,,]" toml> ] unit-test
+{ LH{ { "a" { 1 2 3 } } } } [ "a=[ # this\n,1,, # is\n,,2, #a\n,3,, # comment \n]" toml> ] unit-test
 
 ! unreleased
 
@@ -634,3 +635,13 @@ animal = { type.name = "pug" }]=] toml>
 ! Seconds in Date-Time and Time values are now optional.
 ! Allow non-English scripts in unquoted (bare) keys
 ! Clarify newline normalization in multi-line literal strings.
+
+
+{ t } [
+    LH{
+        { "name" "Factor" }
+        { "age" 22 }
+        { "list" { 4 8 15 16 23 42 } }
+        { "map" { LH{ { "one" 1 } { "two" 2 } } } }
+    } [ >toml toml> ] keep =
+] unit-test
