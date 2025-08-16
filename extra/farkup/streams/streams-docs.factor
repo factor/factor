@@ -16,11 +16,11 @@ HELP: with-farkup-writer
     { $example
         "USING: io io.styles farkup.streams prettyprint ;"
         "[ \"Hello\" { { font-style bold } } format nl ] with-farkup-writer ."
-        "\"**Hello**\\n\\n\""
+        "\"*Hello*\\n\\n\""
     }
 } ;
 
-ARTICLE: "farkup.streams" "farkup streams"
+ARTICLE: "farkup.streams" "Farkup streams"
 "The " { $vocab-link "farkup.streams" } " vocabulary provides a stream which implements " { $link "io.styles" } " by constructing Farkup markup in the form of " { $link string } " types."
 { $subsections
     farkup-writer
