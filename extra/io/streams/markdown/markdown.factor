@@ -5,7 +5,7 @@ USING: accessors assocs combinators destructors formatting
 html.streams io io.styles kernel math sequences splitting
 strings ;
 
-IN: markdown.streams
+IN: io.streams.markdown
 
 TUPLE: markdown-writer < disposable data ;
 
