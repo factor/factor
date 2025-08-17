@@ -180,7 +180,7 @@ $nl
 } ;
 
 ARTICLE: "io.styles" "Formatted output"
-"The " { $vocab-link "io.styles" } " vocabulary defines a protocol for formatted output. This is used by the prettyprinter, help system, and various developer tools. Implementations include " { $vocab-link "ui.gadgets.panes" } ", " { $vocab-link "html.streams" } ", and " { $vocab-link "io.streams.plain" } "."
+"The " { $vocab-link "io.styles" } " vocabulary defines a protocol for formatted output. This is used by the prettyprinter, help system, and various developer tools. Implementations include " { $vocab-link "ui.gadgets.panes" } ", " { $vocab-link "io.streams.html" } ", and " { $vocab-link "io.streams.plain" } "."
 { $subsections
     "formatted-stream-protocol"
     "formatted-stdout"

@@ -1,7 +1,7 @@
 <%
 
-USING: accessors html.elements html.streams http.client io io.encodings.utf8
-io.files kernel multiline namespaces random sequences splitting
+USING: accessors html.elements http.client io io.encodings.utf8 io.files
+io.streams.html kernel multiline namespaces random sequences splitting
 webapps.mason.backend webapps.mason.downloads webapps.mason.grids
 webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 
