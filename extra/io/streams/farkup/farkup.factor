@@ -5,7 +5,7 @@ USING: accessors assocs combinators destructors formatting
 html.streams io io.styles kernel math sequences splitting
 strings ;
 
-IN: farkup.streams
+IN: io.streams.farkup
 
 TUPLE: farkup-writer < disposable data ;
 
