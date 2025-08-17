@@ -1,7 +1,7 @@
 USING: combinators command-line.parser io io.encodings.utf8
 io.files io.streams.256color io.streams.ansi io.streams.html
-kernel namespaces pdf.layout pdf.streams prettyprint sequences
-unicode xml.writer xmode.catalog xmode.highlight ;
+io.streams.pdf kernel namespaces pdf.layout prettyprint
+sequences unicode xml.writer xmode.catalog xmode.highlight ;
 
 IN: tools.highlight
 
