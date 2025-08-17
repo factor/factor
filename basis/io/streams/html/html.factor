@@ -3,7 +3,7 @@
 USING: accessors assocs colors combinators destructors html io
 io.styles kernel make math math.functions math.parser sequences
 strings xml.syntax ;
-IN: html.streams
+IN: io.streams.html
 
 GENERIC: url-of ( object -- url )
 
