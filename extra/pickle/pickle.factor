@@ -1,11 +1,12 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs byte-arrays combinators decimals endian
-grouping hashtables io io.encodings.binary io.encodings.string
-io.encodings.utf8 io.streams.byte-array io.streams.string kernel
-math math.order math.parser namespaces sbufs sequences sets
-splitting strings vectors ;
+USING: alien.c-types alien.data arrays assocs byte-arrays
+calendar combinators decimals endian grouping hashtables io
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.streams.byte-array io.streams.string kernel math math.order
+math.parser namespaces sbufs sequences sequences.generalizations
+sets splitting strings vectors ;
 
 IN: pickle
 
@@ -77,8 +78,8 @@ SYMBOLS: +marker+ +no-return+ ;
 
 : construct-array ( args -- obj )
     unclip {
-        { CHAR: c [ char ] }
-        { CHAR: u [ char ] }
+        { CHAR: c [ alien.c-types:char ] }
+        { CHAR: u [ alien.c-types:char ] }
         { CHAR: b [ int8_t ] }
         { CHAR: B [ uint8_t ] }
         { CHAR: h [ int16_t ] }
@@ -114,7 +115,7 @@ SYMBOLS: +marker+ +no-return+ ;
 
 : construct-datetime ( args -- obj )
     ! XXX: support timezones
-    7 firstn 1,000,000 / instant <timestamp> ;
+    7 firstn 1,000,000 / + instant <timestamp> ;
 
 : construct-time ( args -- obj )
     [ 0 0 0 ] dip first4 1,000,000 / + instant <timestamp> ;
@@ -134,7 +135,6 @@ CONSTANT: constructors H{
     { "datetime.date" construct-date }
     { "datetime.datetime" construct-datetime }
     { "datetime.time" construct-time }
-    { "datetime.tzinfo" construct-tzinfo }
 }
 
 : construct ( args typename -- obj )
@@ -228,7 +228,7 @@ CONSTANT: constructors H{
 : load-newobj-ex ( -- )
     stack pop assoc-empty? t assert= ! kwargs not yet supported
     stack pop stack pop construct stack push ;
-: load-stack-global ( -- ) stack pop stack pop swap global boa stack push ;
+: load-stack-global ( -- ) stack pop stack pop swap construct stack push ;
 : load-bytearray8 ( -- ) load-binbytes8 ; ! bytes vs bytearray python types?
 : load-readonly-buffer ( -- ) ; ! readonly vs read/write buffers?
 : load-next-buffer ( -- ) unsupported-feature ;
@@ -242,6 +242,7 @@ CONSTANT: constructors H{
         { CHAR: 1 [ load-pop-mark ] }
         { CHAR: 2 [ load-dup ] }
         { CHAR: F [ load-float ] }
+        { CHAR: G [ load-binfloat ] }
         { CHAR: I [ load-int ] }
         { CHAR: J [ load-binint ] }
         { CHAR: K [ load-binint1 ] }
@@ -260,7 +261,6 @@ CONSTANT: constructors H{
         { CHAR: b [ load-build ] }
         { CHAR: c [ load-global ] }
         { CHAR: d [ load-dict ] }
-        { CHAR: } [ load-empty-dict ] }
         { CHAR: e [ load-appends ] }
         { CHAR: g [ load-get ] }
         { CHAR: h [ load-binget ] }
@@ -274,9 +274,9 @@ CONSTANT: constructors H{
         { CHAR: r [ load-long-binput ] }
         { CHAR: s [ load-setitem ] }
         { CHAR: t [ load-tuple ] }
-        { CHAR: ) [ load-empty-tuple ] }
         { CHAR: u [ load-setitems ] }
-        { CHAR: G [ load-binfloat ] }
+        { CHAR: } [ load-empty-dict ] }
+        { CHAR: ) [ load-empty-tuple ] }
 
         ! Protocol 2
         { 0x80 [ load-proto ] }
