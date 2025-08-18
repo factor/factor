@@ -4,9 +4,9 @@
 USING: alien.c-types alien.data arrays assocs byte-arrays
 calendar combinators decimals endian grouping hashtables io
 io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array io.streams.string kernel math math.order
-math.parser namespaces sbufs sequences sequences.generalizations
-sets splitting strings vectors ;
+io.files io.streams.byte-array io.streams.string kernel math
+math.order math.parser namespaces sbufs sequences
+sequences.generalizations sets splitting strings vectors ;
 
 IN: pickle
 
@@ -316,19 +316,22 @@ CONSTANT: constructors H{
         [ invalid-opcode ]
     } case ;
 
-: (unpickle) ( -- obj )
+: unpickle ( -- obj )
     f [ drop read1 unpickle-dispatch dup +no-return+ = ] loop ;
 
 PRIVATE>
 
-: unpickle ( -- obj )
+: read-pickle ( -- obj )
     H{ } clone
         V{ } clone \ stack pick set-at
         H{ } clone \ memo pick set-at
-    [ (unpickle) ] with-variables ;
+    [ unpickle ] with-variables ;
 
 GENERIC: pickle> ( string -- obj )
 
-M: string pickle> [ unpickle ] with-string-reader ;
+M: string pickle> [ read-pickle ] with-string-reader ;
 
-M: byte-array pickle> binary [ unpickle ] with-byte-reader ;
+M: byte-array pickle> binary [ read-pickle ] with-byte-reader ;
+
+: file>pickle ( path -- obj )
+    binary [ read-pickle ] with-file-reader ;
