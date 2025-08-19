@@ -1,6 +1,7 @@
-USING: accessors arrays ascii grouping io io.streams.string
-kernel make math math.parser prettyprint ranges sequences
-sequences.extras strings tools.test ;
+USING: accessors arrays ascii combinators.short-circuit grouping
+io io.streams.string kernel make math math.order math.parser
+prettyprint ranges sequences sequences.extras strings tools.test
+;
 
 { V{ { 0 104 } { 2 108 } { 3 108 } } } [ "hello" [ even? ] find-all ] unit-test
 
@@ -609,3 +610,14 @@ sequences.extras strings tools.test ;
 
 { { t 5 } } [ { t "asdf" 5 } [ string>number ] filter-errors ] unit-test
 { { "asdf" } } [ { t "asdf" 5 } [ string>number ] reject-errors ] unit-test
+
+{ t } [ { } [ ] all-same? ] unit-test
+{ f } [ { 1 } [ drop f ] all-same? ] unit-test
+{ f } [ { 1 2 } [ drop f ] all-same? ] unit-test
+{ t } [ { 1 } [ ] all-same? ] unit-test
+{ t } [ { 1 1 } [ ] all-same? ] unit-test
+{ f } [ { 1 2 } [ ] all-same? ] unit-test
+{ 3 } [
+    { { 1 3 } { -1 -3 } { 0 1 } { -1 1 } { 10 } { } }
+    [ [ { [ abs 1 3 between? ] [ sgn ] } 1&& ] all-same? ] count
+] unit-test
