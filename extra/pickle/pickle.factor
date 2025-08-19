@@ -1,12 +1,13 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: alien.c-types alien.data arrays assocs byte-arrays
-calendar combinators decimals endian grouping hashtables io
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.files io.streams.byte-array io.streams.string kernel math
-math.order math.parser namespaces sbufs sequences
-sequences.generalizations sets splitting strings vectors ;
+USING: alien.c-types alien.data alien.endian arrays assocs
+byte-arrays calendar combinators decimals endian grouping
+hashtables io io.encodings.binary io.encodings.string
+io.encodings.utf16 io.encodings.utf32 io.encodings.utf8 io.files
+io.streams.byte-array io.streams.string kernel math math.order
+math.parser namespaces sbufs sequences sequences.generalizations
+sets splitting strings vectors ;
 
 IN: pickle
 
@@ -76,21 +77,95 @@ SYMBOLS: +marker+ +no-return+ ;
 
 : memo ( -- memo ) \ memo get ;
 
-: construct-array ( args -- obj )
-    unclip {
-        { CHAR: c [ alien.c-types:char ] }
-        { CHAR: u [ alien.c-types:char ] }
-        { CHAR: b [ int8_t ] }
-        { CHAR: B [ uint8_t ] }
-        { CHAR: h [ int16_t ] }
-        { CHAR: H [ uint16_t ] }
-        { CHAR: i [ int32_t ] }
-        { CHAR: I [ uint32_t ] }
-        { CHAR: l [ int64_t ] }
-        { CHAR: L [ uint64_t ] }
-        { CHAR: f [ alien.c-types:float ] }
-        { CHAR: d [ alien.c-types:double ] }
+DEFER: construct
+
+:: construct-array-extra ( typecode machinecode data -- obj )
+    machinecode 0 < [ machinecode throw ] when
+    data typecode {
+        { "c" [
+            machinecode {
+                { 18 [ utf16le decode ] }
+                { 19 [ utf16be decode ] }
+                { 20 [ utf32le decode ] }
+                { 21 [ utf32be decode ] }
+            } case ] }
+        { "u" [
+            machinecode {
+                { 18 [ utf16le decode ] }
+                { 19 [ utf16be decode ] }
+                { 20 [ utf32le decode ] }
+                { 21 [ utf32be decode ] }
+            } case ] }
+        { "b" [ machinecode 1 assert= int8_t cast-array ] }
+        { "B" [ machinecode 0 assert= uint8_t cast-array ] }
+        { "h" [
+            machinecode {
+                { 4 [ le16 ] }
+                { 5 [ be16 ] }
+            } case cast-array ] }
+        { "H" [
+            machinecode {
+                { 2 [ ule16 ] }
+                { 3 [ ube16 ] }
+            } case cast-array ] }
+        { "i" [
+            machinecode {
+                { 8 [ le32 ] }
+                { 9 [ be32 ] }
+            } case cast-array ] }
+        { "I" [
+            machinecode {
+                { 6 [ ule32 ] }
+                { 7 [ ube32 ] }
+            } case cast-array ] }
+        { "l" [
+            machinecode {
+                { 8 [ le32 ] }
+                { 9 [ be32 ] }
+                { 12 [ le64 ] }
+                { 13 [ be64 ] }
+            } case cast-array ] }
+        { "L" [
+            machinecode {
+                { 6 [ ule32 ] }
+                { 7 [ ube32 ] }
+                { 10 [ ule64 ] }
+                { 11 [ ube64 ] }
+            } case cast-array ] }
+        { "f" [
+            machinecode {
+                { 14 [ unsupported-feature ] }
+                { 15 [ alien.c-types:float ] }
+            } case cast-array ] }
+        { "d" [
+            machinecode {
+                { 16 [ unsupported-feature ] }
+                { 17 [ alien.c-types:double ] }
+            } case cast-array ] }
+    } case ;
+
+: construct-array-simple ( typecode data -- obj )
+    swap {
+        { "c" [ alien.c-types:char ] }
+        { "u" [ alien.c-types:char ] }
+        { "b" [ int8_t ] }
+        { "B" [ uint8_t ] }
+        { "h" [ int16_t ] }
+        { "H" [ uint16_t ] }
+        { "i" [ int32_t ] }
+        { "I" [ uint32_t ] }
+        { "l" [ int64_t ] }
+        { "L" [ uint64_t ] }
+        { "f" [ alien.c-types:float ] }
+        { "d" [ alien.c-types:double ] }
     } case >c-array ;
+
+: construct-array ( args -- obj )
+    dup length {
+        { 4 [ unclip construct ] }
+        { 3 [ first3 construct-array-extra ] }
+        { 2 [ first2 construct-array-simple ] }
+    } case ;
 
 : construct-bytes ( args -- obj )
     dup length {
@@ -126,6 +201,7 @@ CONSTANT: constructors H{
     { "__builtin__.complex" construct-complex }
     { "__builtin__.set" construct-set }
     { "array.array" construct-array }
+    { "array._array_reconstructor" construct-array }
     { "builtins.bytearray" construct-bytes }
     { "builtins.complex" construct-complex }
     { "builtins.set" construct-set }
@@ -228,7 +304,7 @@ CONSTANT: constructors H{
 : load-newobj-ex ( -- )
     stack pop assoc-empty? t assert= ! kwargs not yet supported
     stack pop stack pop construct stack push ;
-: load-stack-global ( -- ) stack pop stack pop swap construct stack push ;
+: load-stack-global ( -- ) stack pop stack pop swap "." glue stack push ;
 : load-bytearray8 ( -- ) load-binbytes8 ; ! bytes vs bytearray python types?
 : load-readonly-buffer ( -- ) ; ! readonly vs read/write buffers?
 : load-next-buffer ( -- ) unsupported-feature ;
