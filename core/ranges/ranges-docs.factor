@@ -17,6 +17,8 @@ $nl
     [1..b]
     [0..b)
 }
+"Creating ranges with syntax:"
+{ $subsections POSTPONE: ..< POSTPONE: ..= }
 "Creating general ranges:"
 { $subsections <range> }
 "Ranges are most frequently used with sequence combinators as a means of iterating over integers. For example,"
