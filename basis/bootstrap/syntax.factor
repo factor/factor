@@ -119,6 +119,7 @@ IN: bootstrap.syntax
         "STARTUP-HOOK:"
         "SHUTDOWN-HOOK:"
         "VOCAB:"
+        "ENUMERATION:"
     } [ "syntax" create-word drop ] each
 
     "t" "syntax" lookup-word define-symbol
