@@ -81,67 +81,37 @@ DEFER: construct
 
 :: construct-array-extra ( typecode machinecode data -- obj )
     machinecode 0 < [ machinecode throw ] when
-    data typecode {
-        { "c" [
-            machinecode {
-                { 18 [ utf16le decode ] }
-                { 19 [ utf16be decode ] }
-                { 20 [ utf32le decode ] }
-                { 21 [ utf32be decode ] }
-            } case ] }
-        { "u" [
-            machinecode {
-                { 18 [ utf16le decode ] }
-                { 19 [ utf16be decode ] }
-                { 20 [ utf32le decode ] }
-                { 21 [ utf32be decode ] }
-            } case ] }
-        { "b" [ machinecode 1 assert= int8_t cast-array ] }
-        { "B" [ machinecode 0 assert= uint8_t cast-array ] }
-        { "h" [
-            machinecode {
-                { 4 [ le16 ] }
-                { 5 [ be16 ] }
-            } case cast-array ] }
-        { "H" [
-            machinecode {
-                { 2 [ ule16 ] }
-                { 3 [ ube16 ] }
-            } case cast-array ] }
-        { "i" [
-            machinecode {
-                { 8 [ le32 ] }
-                { 9 [ be32 ] }
-            } case cast-array ] }
-        { "I" [
-            machinecode {
-                { 6 [ ule32 ] }
-                { 7 [ ube32 ] }
-            } case cast-array ] }
-        { "l" [
-            machinecode {
-                { 8 [ le32 ] }
-                { 9 [ be32 ] }
-                { 12 [ le64 ] }
-                { 13 [ be64 ] }
-            } case cast-array ] }
-        { "L" [
-            machinecode {
-                { 6 [ ule32 ] }
-                { 7 [ ube32 ] }
-                { 10 [ ule64 ] }
-                { 11 [ ube64 ] }
-            } case cast-array ] }
-        { "f" [
-            machinecode {
-                { 14 [ unsupported-feature ] }
-                { 15 [ alien.c-types:float ] }
-            } case cast-array ] }
-        { "d" [
-            machinecode {
-                { 16 [ unsupported-feature ] }
-                { 17 [ alien.c-types:double ] }
-            } case cast-array ] }
+    data { typecode machinecode } {
+        { { "c" 18 } [ utf16le decode ] }
+        { { "c" 19 } [ utf16be decode ] }
+        { { "c" 20 } [ utf32le decode ] }
+        { { "c" 21 } [ utf32be decode ] }
+        { { "u" 18 } [ utf16le decode ] }
+        { { "u" 19 } [ utf16be decode ] }
+        { { "u" 20 } [ utf32le decode ] }
+        { { "u" 21 } [ utf32be decode ] }
+        { { "b" 1 } [ int8_t cast-array ] }
+        { { "B" 0 } [ uint8_t cast-array ] }
+        { { "h" 4 } [ le16 cast-array ] }
+        { { "h" 5 } [ be16 cast-array ] }
+        { { "H" 2 } [ ule16 cast-array ] }
+        { { "H" 3 } [ ube16 cast-array ] }
+        { { "i" 8 } [ le32 cast-array ] }
+        { { "i" 9 } [ be32 cast-array ] }
+        { { "I" 6 } [ ule32 cast-array ] }
+        { { "I" 7 } [ ube32 cast-array ] }
+        { { "l" 8 } [ le32 cast-array ] }
+        { { "l" 9 } [ be32 cast-array ] }
+        { { "l" 12 } [ le64 cast-array ] }
+        { { "l" 13 } [ be64 cast-array ] }
+        { { "L" 6 } [ ule32 cast-array ] }
+        { { "L" 7 } [ ube32 cast-array ] }
+        { { "L" 10 } [ ule64 cast-array ] }
+        { { "L" 11 } [ ube64 cast-array ] }
+        { { "f" 14 } [ unsupported-feature ] }
+        { { "f" 15 } [ alien.c-types:float cast-array ] }
+        { { "d" 16 } [ unsupported-feature ] }
+        { { "d" 17 } [ alien.c-types:double cast-array ] }
     } case ;
 
 : construct-array-simple ( typecode data -- obj )
