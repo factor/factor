@@ -108,9 +108,11 @@ DEFER: construct
         { { "L" 7 } [ ube32 cast-array ] }
         { { "L" 10 } [ ule64 cast-array ] }
         { { "L" 11 } [ ube64 cast-array ] }
-        { { "f" 14 } [ unsupported-feature ] }
+        ! XXX: handle float le/be
+        { { "f" 14 } [ alien.c-types:float cast-array ] }
         { { "f" 15 } [ alien.c-types:float cast-array ] }
-        { { "d" 16 } [ unsupported-feature ] }
+        ! XXX: handle double le/be
+        { { "d" 16 } [ alien.c-types:double cast-array ] }
         { { "d" 17 } [ alien.c-types:double cast-array ] }
     } case ;
 
