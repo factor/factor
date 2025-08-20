@@ -20,9 +20,9 @@ ARTICLE: "enumeration-element-syntax" "Enumeration element syntax"
 "Enumeration elements are typically specified by their name, as in"
 { $code "ENUMERATION: example first-elt second-elt ;" }
 "but they can also be specified using an array. The second element of this array is the value assigned to the enum element, and is used as the counter that subsiquent elements increment from"
-{ $example "USE: prettyprint" "ENUMERATION: example first-elt { second-elt 10 } third-elt ;\nexample.first-elt example.second-elt example.third-elt .s" "0\n10\n11" }
+{ $example "USING: prettyprint classes.enumeration ;" "ENUMERATION: example first-elt { second-elt 10 } third-elt ;\nexample.first-elt . example.second-elt . example.third-elt ." "0\n10\n11" }
 "The third element of the array, if present, must be a quotation. It defines how subsiquent increments are handled. By default, incrementation means that 1 is added to the counter to get the value of the next element. This quotation changes that definition."
-{ $example "USE: prettyprint math" "ENUMERATION: example first-elt second-elt { third-elt 3 [ 2 * ] } fourth-elt fifth-elt ;\nexample.third-elt example.fourth-elt example.fifth-elt .s" "3\n6\n12" }
+{ $example "USING: prettyprint math classes.enumeration ;" "ENUMERATION: example first-elt second-elt { third-elt 3 [ 2 * ] } fourth-elt fifth-elt ;\nexample.third-elt . example.fourth-elt . example.fifth-elt ." "3\n6\n12" }
 "Despite their name, enumeration values do not just have to be numbers, although if these values don't support math operations, you'll need to define a custom incrementation quotation and starting value."
 {
         $example 
@@ -39,7 +39,7 @@ HELP: ENUMERATION:
     "Defines a new enumeration class. Elements may be specified using " { $link "enumeration-element-syntax" } " or just by name" 
 } 
 { $examples 
-    { $example "IN: enumeration-demo" "USING: prettyprint classes.enumeration ;\nENUMERATION: example-enum example-elt1 example-elt2 ;\n example-enum.example-elt2 ." "2" }
+    { $example "IN: enumeration-demo" "USING: prettyprint classes.enumeration ;\nENUMERATION: example-enum example-elt1 example-elt2 ;\n example-enum.example-elt2 ." "1" }
     { $example "IN: enumeration-demo" "USING: prettyprint classes.enumeration ;\nENUMERATION: example-enum2 example-elt1 { example-elt2 5 } example-elt3 ;\n example-enum2.example-elt3 ." "6" }
     {
         $example 
