@@ -516,6 +516,23 @@ HELP: SINGLETON:
     { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint\nSINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
 
+HELP: ENUMERATION:
+{ $syntax "ENUMERATION: name elements ... ;" }
+{ $description 
+    "Defines a new enumeration class. Elements may be specified using " { $link "enumeration-element-syntax" } " or just by name" 
+} 
+{ $examples 
+    { $example "IN: enumeration-demo" "USE: prettyprint\n<< ENUMERATION: example-enum example-elt1 example-elt2 ; >>\n example-enum.example-elt2 ." "2" }
+    { $example "IN: enumeration-demo" "USE: prettyprint\n<< ENUMERATION: example-enum2 example-elt1 { example-elt2 5 } example-elt3 ; >>\n example-enum2.example-elt3 ." "6" }
+    {
+        $example 
+        "IN: enumeration-demo" 
+        "USING: prettyprint strings sequences ;\n<< ENUMERATION: example-enum3 < string { example-elt1 \"a\" [ CHAR: a suffix ] } example-elt2 ; >>\n example-enum3.example-elt2 ."
+        "\"aa\""
+    }
+} 
+{ $see-also "enums" } ;
+
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
 { $values { "words" { $sequence "new words to define" } } }
