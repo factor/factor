@@ -16,23 +16,23 @@ $nl
 "To make an assoc into an alist:"
 { $subsections >alist } ;
 
-ARTICLE: "enums" "Enumerations"
-"An enumeration provides a view of a sequence as an assoc mapping integer indices to elements:"
+ARTICLE: "enumerateds" "Enumerated sequences"
+"An enumerated sequence provides a view of a sequence as an assoc mapping integer indices to elements:"
 { $subsections
     enumerated
     <enumerated>
 }
-"Inverting a permutation using enumerations:"
+"Inverting a permutation using enumerated sequences:"
 { $example "IN: scratchpad" ": invert ( perm -- perm' )" "    <enumerated> sort-values keys ;" "{ 2 0 4 1 3 } invert ." "{ 1 3 0 4 2 }" } ;
 
 HELP: enumerated
 { $class-description "An associative structure which wraps a sequence and maps integers to the corresponding elements of the sequence."
 $nl
-"Enumerations are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
+"Enumerated sequences are mutable; note that deleting a key calls " { $link remove-nth! } ", which results in all subsequent elements being shifted down." } ;
 
 HELP: <enumerated>
 { $values { "seq" sequence } { "enumerated" enumerated } }
-{ $description "Creates a new enumeration." } ;
+{ $description "Creates a new enumerated sequence." } ;
 
 ARTICLE: "assocs-protocol" "Associative mapping protocol"
 "All associative mappings must be instances of a mixin class:"
