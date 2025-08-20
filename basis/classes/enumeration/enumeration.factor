@@ -1,4 +1,4 @@
-USING: classes words kernel math sequences make combinators parser assocs classes.private lexer accessors arrays splitting strings words.constant compiler.units ;
+USING: classes words kernel math sequences make combinators parser assocs classes.private lexer accessors arrays splitting strings words.constant compiler.units classes.parser ;
 IN: classes.enumeration
 
 PREDICATE: enumeration-class < class
@@ -64,7 +64,7 @@ ERROR: incorrect-type-in-enum-value expected-type value word ;
         scan-word-name
         {
             { ";" [ f ";" unexpected ] }
-            { "<" [ scan-word [ dup 0 [ 1 + ] parse-enum-elts ] dip ] } ! TODO: add type checking to parse-enum-elts
+            { "<" [ scan-word [ dup 0 [ 1 + ] parse-enum-elts ] dip ] }
             [ [ dup dup ] dip 0 [ 1 + ] parse-enum-elt parse-enum-elts fixnum ]
         } case
     ] { } make (define-enum-class) ;
@@ -106,3 +106,5 @@ PRIVATE>
         ] 
         [ drop enum-elt-root-name 1array ] if*
      ] { } assoc>map ;
+
+SYNTAX: ENUMERATION: scan-new-class parse-enum ;
