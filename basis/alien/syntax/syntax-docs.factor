@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.enums alien.libraries assocs
-classes.struct help.markup help.syntax see system ;
+classes.struct classes.enumeration help.markup help.syntax see system ;
 
 IN: alien.syntax
 
