@@ -1292,3 +1292,9 @@ INSTANCE: virtual-zip-index immutable-sequence
 
 : reject-errors ( ... seq quot: ( ... elt -- ... ? ) -- ... subseq )
     over reject-errors-as ; inline
+
+:: all-same? ( seq quot: ( elt -- obj/f ) -- ? )
+    seq [ t ] [
+        unclip-slice quot call
+        [ '[ quot call _ = ] all? ] [ drop f ] if*
+    ] if-empty ; inline

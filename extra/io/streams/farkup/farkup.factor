@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs combinators destructors formatting
-html.streams io io.styles kernel math sequences splitting
+io io.styles io.streams.html kernel math sequences splitting
 strings ;
 
-IN: farkup.streams
+IN: io.streams.farkup
 
 TUPLE: farkup-writer < disposable data ;
 

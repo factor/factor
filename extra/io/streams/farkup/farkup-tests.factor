@@ -1,5 +1,5 @@
 USING: colors help.markup inspector io io.styles
-farkup.streams tools.test ;
+io.streams.farkup tools.test ;
 
 [ [ ] with-farkup-writer ] must-infer
 

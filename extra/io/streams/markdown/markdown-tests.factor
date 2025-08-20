@@ -1,5 +1,5 @@
 USING: colors help.markup inspector io io.styles
-markdown.streams tools.test ;
+io.streams.markdown tools.test ;
 
 [ [ ] with-markdown-writer ] must-infer
 
