@@ -157,7 +157,7 @@ ARTICLE: "collections" "Collections"
 { $subsections
     "hashtables"
     "alists"
-    "enums"
+    "enumerateds"
 }
 { $heading "Double-ended queues" }
 { $subsections "deques" }

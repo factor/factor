@@ -4,10 +4,10 @@ IN: classes.enumeration
 PREDICATE: enumeration-class < class
     "metaclass" word-prop enumeration-class eq? ;
 
-PREDICATE: enumeration-member-word < word "enum-elt-value" word-prop ;
+PREDICATE: enumeration-member-word < word "enum-elt-value" word-prop [ t ] [ f ] if ;
 
 : define-enum-class ( class superclass member-assoc -- ) 
-    dup -rotd [ values index ] curry 
+    dup -rotd [ values index [ t ] [ f ] if ] curry 
     {
         [ drop f f enumeration-class define-class ] 
         [ nip "predicate-definition" set-word-prop ]
