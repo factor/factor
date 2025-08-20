@@ -9,7 +9,7 @@ io.pathnames io.streams.string io.styles kernel make namespaces
 prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections sequences sets slots
 sorting strings summary vocabs vocabs.prettyprint words
-words.alias words.constant words.symbol ;
+words.alias words.constant words.symbol classes.enumeration math ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -222,6 +222,23 @@ M: builtin-class see-class*
     [ pprint-word ]
     [ <block "slots" word-prop [ pprint-slot ] each pprint-; block> ] bi
     block> ;
+
+TUPLE: string-wrapper str ;
+M: string-wrapper pprint* str>> text ;
+
+M: enumeration-class see-class*
+    <colon \ ENUMERATION: pprint-word
+    {
+        [ pprint-word ]
+        [ superclass-of dup fixnum eq? [ drop ] [ "<" text pprint-word ] if ]
+        [ 
+            <block 
+                enum-member-list 
+                [ dup length 1 = [ first text ] [ unclip string-wrapper boa prefix pprint-object ] if ] each 
+            block> pprint-; 
+        ]
+    } cleave
+    block> ; 
 
 : see-class ( class -- )
     dup class? [
