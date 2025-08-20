@@ -12,7 +12,7 @@ locals.errors locals.parser macros math memoize namespaces
 parser quotations sbufs sequences slots source-files splitting
 strings strings.parser strings.parser.private vectors vocabs
 vocabs.loader vocabs.parser words words.alias words.constant
-words.symbol classes.enumeration.private ;
+words.symbol ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -212,10 +212,6 @@ IN: bootstrap.syntax
 
     "TUPLE:" [
         parse-tuple-definition define-tuple-class
-    ] define-core-syntax
-
-    "ENUMERATION:" [
-        scan-new-class parse-enum 
     ] define-core-syntax
 
     "final" [
