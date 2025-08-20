@@ -1,4 +1,4 @@
-USING: tools.test sequences strings classes.enumeration combinators see kernel io.streams.string compiler.units parser math ;
+USING: tools.test sequences strings classes.enumeration combinators see kernel io.streams.string compiler.units parser math eval ;
 IN: classes.enumeration.tests
 
 ENUMERATION: test-enum < string { val-1 "a" [ CHAR: a suffix ] } val-2 val-3 ;
@@ -40,3 +40,5 @@ define-foo
 { "foo2.foo" } [ 0 { { foo2.foo [ "foo2.foo" ] } { foo2.bar [ "foo2.bar" ] } { foo2.baz [ "foo2.baz" ] } [ drop "not in foo" ] } case ] unit-test
 
 { "not in foo2" } [ 2 { { foo2.foo [ "foo2.foo" ] } { foo2.bar [ "foo2.bar" ] } { foo2.baz [ "foo2.baz" ] } [ drop "not in foo2" ] } case ] unit-test
+
+[ "ENUMERATION: foo3 foo { bar \"a\" [ CHAR: a suffix ] } ; " parse-string ] must-fail
