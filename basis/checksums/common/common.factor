@@ -43,7 +43,9 @@ M:: block-checksum-state add-checksum-bytes ( state data -- state )
         ] dip
     ] if-empty dup length block-size mod cut-slice* [
         block-size <groups> [
-            state [ block-size + ] change-bytes-read checksum-block
+            bytes push-all
+            bytes state [ block-size + ] change-bytes-read checksum-block
+            bytes delete-all
         ] each
     ] [
         [ bytes push-all ]
