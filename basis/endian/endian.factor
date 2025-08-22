@@ -136,47 +136,29 @@ PRIVATE>
 
 : slow-signed-be> ( seq -- x ) [ be> ] [ signed> ] bi ;
 
-: 1signed-be> ( seq -- x )
-    [ int8_t deref big-endian 1 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
+: n-signed-be> ( seq c-ptr n -- x )
+    '[ _ deref big-endian _ t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ; inline
 
-: 2signed-be> ( seq -- x )
-    [ int16_t deref big-endian 2 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 4signed-be> ( seq -- x )
-    [ int32_t deref big-endian 4 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 8signed-be> ( seq -- x )
-    [ int64_t deref big-endian 8 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 1signed-le> ( seq -- x )
-    [ int8_t deref little-endian 1 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 2signed-le> ( seq -- x )
-    [ int16_t deref little-endian 2 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 4signed-le> ( seq -- x )
-    [ int32_t deref little-endian 4 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
-
-: 8signed-le> ( seq -- x )
-    [ int64_t deref little-endian 8 t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ;
+: n-signed-le> ( seq c-ptr n -- x )
+    '[ _ deref little-endian _ t ?byte-reverse ] [ slow-signed-le> ] if-c-ptr ; inline
 
 PRIVATE>
 
 : signed-be> ( seq -- x )
     dup length {
-        { 1 [ 1signed-be> ] }
-        { 2 [ 2signed-be> ] }
-        { 4 [ 4signed-be> ] }
-        { 8 [ 8signed-be> ] }
+        { 1 [ int8_t 1 n-signed-be> ] }
+        { 2 [ int16_t 2 n-signed-be> ] }
+        { 4 [ int32_t 4 n-signed-be> ] }
+        { 8 [ int64_t 8 n-signed-be> ] }
         [ drop slow-signed-be> ]
     } case ;
 
 : signed-le> ( seq -- x )
     dup length {
-        { 1 [ 1signed-le> ] }
-        { 2 [ 2signed-le> ] }
-        { 4 [ 4signed-le> ] }
-        { 8 [ 8signed-le> ] }
+        { 1 [ int8_t 1 n-signed-le> ] }
+        { 2 [ int16_t 2 n-signed-le> ] }
+        { 4 [ int32_t 4 n-signed-le> ] }
+        { 8 [ int64_t 8 n-signed-le> ] }
         [ drop slow-signed-le> ]
     } case ;
 
