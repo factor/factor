@@ -72,9 +72,11 @@ ERROR: index-out-of-bounds index gap-buffer ;
         index-out-of-bounds
     ] if ;
 
+M: gb virtual-exemplar seq>> ; inline
+
 M: gb virtual@ ( n gb -- n seq ) [ position>index ] keep seq>> ;
 
-INSTANCE: gb wrapped-sequence
+INSTANCE: gb virtual-sequence
 
 ! ------------- moving the gap -------------------------------
 

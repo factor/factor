@@ -1099,7 +1099,7 @@ ALIAS: map-infimum map-minimum deprecated
 TUPLE: step-slice
     { from integer read-only initial: 0 }
     { to integer read-only initial: 0 }
-    { seq read-only }
+    { seq sequence read-only }
     { step integer read-only } ;
 
 :: <step-slice> ( from/f to/f step seq -- step-slice )
@@ -1117,6 +1117,8 @@ TUPLE: step-slice
     seq dup slice? [ collapse-slice ] when
     step step-slice boa ;
 
+M: slice virtual-exemplar seq>> ; inline
+
 M: step-slice virtual@
     [ step>> * ] [ from>> + ] [ seq>> ] tri ; inline
 
@@ -1125,7 +1127,7 @@ M: step-slice length
     dup 0 < [ [ neg 0 max ] dip neg ] when /mod
     zero? [ 1 + ] unless ; inline
 
-INSTANCE: step-slice wrapped-sequence
+INSTANCE: step-slice virtual-sequence
 
 : 2nested-each* ( seq1 seq-quot: ( n -- seq ) quot: ( a b -- ) -- )
     '[
