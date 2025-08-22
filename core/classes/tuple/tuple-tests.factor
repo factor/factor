@@ -626,7 +626,7 @@ must-fail-with
 
 
 { } [
-     "IN: sequences TUPLE: reversed < sequence-view ;" eval( -- )
+     "IN: sequences TUPLE: reversed < wrapped-sequence ;" eval( -- )
 ] unit-test
 
 

@@ -3,7 +3,7 @@
 USING: accessors kernel math sequences ;
 IN: sequences.rotated
 
-TUPLE: rotated < sequence-view
+TUPLE: rotated < wrapped-sequence
 { n integer read-only } ;
 
 C: <rotated> rotated

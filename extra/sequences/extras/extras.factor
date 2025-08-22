@@ -636,7 +636,7 @@ PRIVATE>
 : 2map-index ( ... seq1 seq2 quot: ( ... elt1 elt2 index -- ... newelt ) -- ... newseq )
     pick [ 2sequence-index-iterator ] dip map-integers-as ; inline
 
-TUPLE: evens < sequence-view ;
+TUPLE: evens < wrapped-sequence ;
 
 C: <evens> evens
 
@@ -644,7 +644,7 @@ M: evens length seq>> length 1 + 2/ ; inline
 
 M: evens virtual@ [ 2 * ] [ seq>> ] bi* ; inline
 
-TUPLE: odds < sequence-view ;
+TUPLE: odds < wrapped-sequence ;
 
 C: <odds> odds
 

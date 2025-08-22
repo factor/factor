@@ -3,7 +3,7 @@
 USING: accessors sequences ;
 IN: sequences.frozen
 
-TUPLE: frozen < sequence-view ;
+TUPLE: frozen < wrapped-sequence ;
 
 C: <frozen> frozen
 

@@ -37,7 +37,7 @@ PRIVATE>
 M: cycles minimum dup full-cycle? [ circular>> minimum ] [ call-next-method ] if ; inline
 M: cycles maximum dup full-cycle? [ circular>> maximum ] [ call-next-method ] if ; inline
 
-TUPLE: element-repeats < sequence-view
+TUPLE: element-repeats < wrapped-sequence
 { times integer read-only } ;
 
 C: <element-repeats> element-repeats
