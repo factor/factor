@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays byte-arrays byte-vectors checksums endian
-grouping kernel make math math.order sequences ;
+USING: accessors byte-arrays checksums endian grouping kernel
+math math.order sequences ;
 
 IN: checksums.common
 
