@@ -68,13 +68,6 @@ HELP: be64
 HELP: be8
 { $var-description "Signed bit-endian 8-bit." } ;
 
-HELP: byte-reverse
-{ $values
-    { "n" integer } { "signed?" boolean }
-    { "quot" quotation }
-}
-{ $description "Reverses the " { $snippet "n" } " bytes in an integer with bitwise operations. The second parameter only works for 1, 2, 4, or 8 byte signed numbers." } ;
-
 HELP: le16
 { $var-description "Signed little-endian 16-bit." } ;
 
@@ -113,10 +106,6 @@ HELP: ule8
 
 ARTICLE: "alien.endian" "Alien endian-aware types"
 "The " { $vocab-link "alien.endian" } " vocabulary defines c-types that are endian-aware for use in structs. These types will cause the bytes in a byte-array to be interpreted as little or big-endian transparently when reading or writing. There are both signed and unsigned types defined; signed is the default while unsigned are prefixed with a " { $snippet "u" } ". The intended use-case is for network protocols in network-byte-order (big-endian)." $nl
-"Byte-reversal of integers:"
-{ $subsections
-    byte-reverse
-}
 "The big-endian c-types are:"
 { $subsections
     be8

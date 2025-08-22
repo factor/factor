@@ -1,36 +1,11 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data arrays
+USING: accessors alien.accessors alien.c-types arrays
 classes.struct.private combinators compiler.units endian
-generalizations kernel math math.bitwise namespaces sequences
+endian.private kernel math math.bitwise namespaces sequences
 slots words ;
 QUALIFIED-WITH: alien.c-types c
 IN: alien.endian
-
-ERROR: invalid-signed-conversion n ;
-
-: convert-signed-quot ( n -- quot )
-    {
-        { 1 [ [ char <ref> char deref ] ] }
-        { 2 [ [ c:short <ref> c:short deref ] ] }
-        { 4 [ [ int <ref> int deref ] ] }
-        { 8 [ [ longlong <ref> longlong deref ] ] }
-        [ invalid-signed-conversion ]
-    } case ; inline
-
-MACRO: byte-reverse ( n signed? -- quot )
-    [
-        drop
-        [
-            dup <iota> [
-                [ 1 + - -8 * ] [ nip 8 * ] 2bi
-                '[ _ shift 0xff bitand _ shift ]
-            ] with map
-        ] [ 1 - [ bitor ] n*quot ] bi
-    ] [
-        [ convert-signed-quot ] [ drop [ ] ] if
-    ] 2bi
-    '[ _ cleave @ @ ] ;
 
 SYMBOLS: le8 be8 ule8 ube8
 ule16 ule32 ule64 ube16 ube32 ube64
