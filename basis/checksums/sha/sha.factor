@@ -26,8 +26,7 @@ INSTANCE: sha-256 sha
 TUPLE: sha1-state < block-checksum-state
 { K uint-array }
 { H uint-array }
-{ W uint-array }
-{ word-size fixnum } ;
+{ W uint-array } ;
 
 CONSTANT: initial-H-sha1
     uint-array{
@@ -49,8 +48,7 @@ CONSTANT: K-sha1
 
 TUPLE: sha2-state < block-checksum-state
 { K uint-array }
-{ H uint-array }
-{ word-size fixnum } ;
+{ H uint-array } ;
 
 TUPLE: sha2-short < sha2-state ;
 
@@ -160,22 +158,19 @@ ALIAS: K-512 K-384
     sha1-state new-checksum-state
         64 >>block-size
         K-sha1 >>K
-        initial-H-sha1 >>H
-        4 >>word-size ;
+        initial-H-sha1 >>H ;
 
 : <sha-224-state> ( -- sha2-state )
     sha-224-state new-checksum-state
         64 >>block-size
         K-256 >>K
-        initial-H-224 >>H
-        4 >>word-size ;
+        initial-H-224 >>H ;
 
 : <sha-256-state> ( -- sha2-state )
     sha-256-state new-checksum-state
         64 >>block-size
         K-256 >>K
-        initial-H-256 >>H
-        4 >>word-size ;
+        initial-H-256 >>H ;
 
 M: sha1 initialize-checksum-state drop <sha1-state> ;
 
@@ -303,7 +298,7 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
     T1 T2 w+ a H set-nth-unsafe ; inline
 
 : prepare-message-schedule ( seq sha2 -- w-seq )
-    [ word-size>> <groups> ] [ block-size>> <uint-array> ] bi
+    [ 4 <groups> ] [ block-size>> <uint-array> ] bi*
     [ '[ [ be> ] dip _ set-nth-unsafe ] each-index ]
     [ 16 over length [a..b) over '[ _ prepare-M-256 ] each ] bi ; inline
 
@@ -317,31 +312,33 @@ GENERIC: pad-initial-bytes ( string sha2 -- padded-string )
 
 M: sha2-short checksum-block
     [ prepare-message-schedule ]
-    [ [ block-size>> ] [ H>> clone ] [ ] tri process-chunk ] bi ;
+    [ [ block-size>> ] [ H>> clone ] [ process-chunk ] tri ] bi ;
 
-: sequence>byte-array ( seq n -- bytes )
-    '[ _ >be ] { } map-as B{ } concat-as ; inline
+: uint-array>byte-array ( seq -- bytes )
+    [ underlying>> ] [ length ] bi [
+        4 *
+        [ dup 3 + pick exchange-unsafe ]
+        [ 1 + dup 1 + pick exchange-unsafe ] bi
+    ] each-integer ; inline
 
 : sha1>checksum ( sha2 -- bytes )
-    H>> 4 sequence>byte-array ; inline
+    H>> uint-array>byte-array ; inline
 
 : sha-224>checksum ( sha2 -- bytes )
-    H>> 7 head 4 sequence>byte-array ; inline
+    H>> 7 head uint-array>byte-array ; inline
 
 : sha-256>checksum ( sha2 -- bytes )
-    H>> 4 sequence>byte-array ; inline
+    H>> uint-array>byte-array ; inline
 
-: pad-last-short-block ( state -- )
+: checksum-last-block ( state -- )
     [ bytes>> t ] [ bytes-read>> pad-last-block ] [ ] tri
-    [ checksum-block ] curry each ; inline
+    '[ _ checksum-block ] each ; inline
 
 M: sha-224-state get-checksum
-    clone
-    [ pad-last-short-block ] [ sha-224>checksum ] bi ;
+    clone [ checksum-last-block ] [ sha-224>checksum ] bi ;
 
 M: sha-256-state get-checksum
-    clone
-    [ pad-last-short-block ] [ sha-256>checksum ] bi ;
+    clone [ checksum-last-block ] [ sha-256>checksum ] bi ;
 
 : sha1-W ( t seq -- )
     { uint-array } declare
@@ -402,7 +399,6 @@ M:: sha1-state checksum-block ( bytes state -- )
     state [ H>> clone ] [ W>> ] [ K>> ] tri state process-sha1-chunk ;
 
 M: sha1-state get-checksum
-    clone
-    [ pad-last-short-block ] [ sha-256>checksum ] bi ;
+    clone [ checksum-last-block ] [ sha-256>checksum ] bi ;
 
 PRIVATE>
