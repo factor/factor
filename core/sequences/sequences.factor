@@ -438,6 +438,9 @@ PRIVATE>
 : sequence-operator ( seq quot -- i n quot' )
     [ >underlying< [ nth-unsafe ] curry ] dip compose ; inline
 
+: sequence-operator-from ( i seq quot -- i' n quot' )
+    [ >underlying< [ + ] 2dip [ nth-unsafe ] curry ] dip compose ; inline
+
 : length-iterator ( seq -- n quot' )
     length-sequence [ nth-unsafe ] curry ; inline
 
@@ -478,12 +481,6 @@ PRIVATE>
 : 3length-operator ( seq1 seq2 seq3 quot -- n quot' )
     [ 3length-iterator ] dip compose ; inline
 
-: element/index ( i/f seq -- elt/f i/f )
-    '[ [ _ nth ] [ f ] if* ] keep ; inline
-
-: index/element ( i/f seq -- i/f elt/f )
-    dupd '[ _ nth ] [ f ] if* ; inline
-
 : (accumulate) ( seq identity quot -- identity seq quot' )
     swapd [ keepd ] curry ; inline
 
@@ -496,7 +493,7 @@ PRIVATE>
     sequence-operator each-integer-from ; inline
 
 : each-from ( ... seq quot: ( ... x -- ... ) i -- ... )
-    -rot length-operator each-integer-from ; inline
+    -rot sequence-operator-from each-integer-from ; inline
 
 : reduce ( ... seq identity quot: ( ... prev elt -- ... next ) -- ... result )
     swapd each ; inline
@@ -578,30 +575,30 @@ PRIVATE>
 : bounds-check-call ( n seq quot -- obj1 obj2 )
     [ drop bounds-check? ] 3check [ call ] [ 3drop f f ] if ; inline
 
-: do-find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
-    [ length-operator find-integer-from ] keepd ; inline
-
-: find-last-from-unsafe ( ... n seq quot: ( ... elt -- ... ? ) -- ... i/f seq )
-    [ length-operator nip find-last-integer ] keepd ; inline
+: ?nth-unsafe ( i/f seq -- i/f elt/f )
+    dupd '[ _ nth-unsafe ] [ f ] if* ; inline
 
 PRIVATE>
 
 : find-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ do-find-from index/element ] bounds-check-call ; inline
+    '[
+        [ _ length-operator find-integer-from ] keep ?nth-unsafe
+    ] bounds-check-call ; inline
 
 : find ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    [ 0 ] 2dip do-find-from index/element ; inline
+    [ 0 ] 2dip find-from ; inline
 
 : find-last-from ( ... n seq quot: ( ... elt -- ... ? ) -- ... i elt )
-    '[ _ find-last-from-unsafe index/element ] bounds-check-call ; inline
+    '[
+        [ _ length-operator nip find-last-integer ] keep ?nth-unsafe
+    ] bounds-check-call ; inline
 
 : find-last ( ... seq quot: ( ... elt -- ... ? ) -- ... i elt )
     [ index-of-last ] dip find-last-from ; inline
 
 : find-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     '[
-        _ [ sequence-index-operator find-integer-from ] keepd
-        index/element
+        [ _ sequence-index-operator find-integer-from ] keep ?nth-unsafe
     ] bounds-check-call ; inline
 
 : find-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
