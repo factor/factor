@@ -772,25 +772,22 @@ PRIVATE>
     [ find-index ] (map-find-index) ; inline
 
 : find-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    '[ _ do-find-from element/index ] bounds-check-call ; inline
+    find-from swap ; inline
 
 : find* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    [ 0 ] 2dip do-find-from element/index ; inline
+    find swap ; inline
 
 : find-last-from* ( ... n seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    '[ _ find-last-from-unsafe element/index ] bounds-check-call ; inline
+    find-last-from swap ; inline
 
 : find-last* ( ... seq quot: ( ... elt -- ... ? ) -- ... elt i/f )
-    [ index-of-last ] dip find-last-from* ; inline
+    find-last swap ; inline
 
 : find-index-from* ( ... n seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
-    '[
-        _ [ sequence-index-operator find-integer-from ] keepd
-        element/index
-    ] bounds-check-call ; inline
+    find-index-from swap ; inline
 
 : find-index* ( ... seq quot: ( ... elt i -- ... ? ) -- ... elt i/f )
-    [ 0 ] 2dip find-index-from* ; inline
+    find-index swap ; inline
 
 : filter-length ( seq n -- seq' ) '[ length _ = ] filter ;
 
@@ -1006,7 +1003,7 @@ ALIAS: map-infimum map-minimum deprecated
 : find-last-index-from ( ... n seq quot: ( ... elt i -- ... ? ) -- ... i elt )
     '[
         _ [ sequence-index-operator-last find-last-integer ] keepd
-        index/element
+        ?nth-unsafe
     ] bounds-check-call ; inline
 
 : find-last-index ( ... seq quot: ( ... elt i -- ... ? ) -- ... i elt )
