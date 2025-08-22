@@ -209,18 +209,14 @@ M: virtual-sequence new-sequence virtual-exemplar new-sequence ; inline
 
 INSTANCE: virtual-sequence sequence
 
-! all wrapped-sequence instances need to define a slot `seq` that is a sequence
-MIXIN: wrapped-sequence
+TUPLE: wrapped-sequence { seq sequence read-only } ;
 M: wrapped-sequence virtual-exemplar seq>> ; inline
 M: wrapped-sequence virtual@ seq>> ; inline
 M: wrapped-sequence length seq>> length ; inline
 INSTANCE: wrapped-sequence virtual-sequence
 
-TUPLE: sequence-view { seq sequence read-only } ;
-INSTANCE: sequence-view wrapped-sequence
-
 ! A reversal of an underlying sequence.
-TUPLE: reversed < sequence-view ;
+TUPLE: reversed < wrapped-sequence ;
 
 C: <reversed> reversed
 
@@ -230,7 +226,7 @@ M: reversed virtual@ seq>> [ length swap - 1 - ] keep ; inline
 TUPLE: slice
     { from integer read-only }
     { to integer read-only }
-    { seq read-only } ;
+    { seq sequence read-only } ;
 
 : >slice< ( slice -- from to seq )
     [ from>> ] [ to>> ] [ seq>> ] tri ; inline
@@ -255,9 +251,13 @@ PRIVATE>
 : <slice> ( from to seq -- slice )
     check-slice <slice-unsafe> ; inline
 
+M: slice virtual-exemplar seq>> ; inline
+
 M: slice virtual@ [ from>> + ] [ seq>> ] bi ; inline
 
 M: slice length [ to>> ] [ from>> ] bi - ; inline
+
+INSTANCE: slice virtual-sequence
 
 : head-slice ( seq n -- slice ) head-to-index <slice> ; inline
 
@@ -270,8 +270,6 @@ M: slice length [ to>> ] [ from>> ] bi - ; inline
 : tail-slice* ( seq n -- slice ) from-tail tail-slice ; inline
 
 : but-last-slice ( seq -- slice ) 1 head-slice* ; inline
-
-INSTANCE: slice wrapped-sequence
 
 ! One element repeated many times
 TUPLE: repetition
