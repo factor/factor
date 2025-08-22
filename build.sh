@@ -289,6 +289,7 @@ find_os() {
         *linux*) OS=linux ;;
         *Linux*) OS=linux ;;
         FreeBSD) OS=freebsd ;;
+        DragonFly) OS=freebsd ;;
         Haiku) OS=haiku ;;
     esac
 }
@@ -861,4 +862,3 @@ case "$1" in
     update-script) update_script ;;
     *) usage ;;
 esac
-
