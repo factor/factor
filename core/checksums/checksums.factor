@@ -33,7 +33,7 @@ M: checksum-state clone
     [ clone ] change-bytes ;
 
 : new-checksum-state ( class -- checksum-state )
-    new-disposable BV{ } clone >>bytes ;
+    new-disposable BV{ } clone >>bytes ; inline
 
 GENERIC: initialize-checksum-state ( checksum -- checksum-state )
 GENERIC#: add-checksum-bytes 1 ( checksum-state data -- checksum-state )
