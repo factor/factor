@@ -68,12 +68,6 @@ MACRO: reassemble-be ( n -- quot ) be-range reassemble-bytes ;
 MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 >>
 
-:: n-be> ( seq n -- x )
-    seq n firstn-unsafe n reassemble-be ; inline
-
-:: n-le> ( seq n -- x )
-    seq n firstn-unsafe n reassemble-le ; inline
-
 : if-c-ptr ( seq c-ptr-quot not-c-ptr-quot -- )
     [
         dup { [ byte-array? ] [ byte-vector? ] } 1|| [ t ] [
@@ -83,47 +77,33 @@ MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
         ] if
     ] 2dip [ '[ >c-ptr @ ] ] dip if ; inline
 
-: 1be> ( seq -- x )
-    [ uint8_t deref big-endian 1 f ?byte-reverse ] [ 1 n-be> ] if-c-ptr ;
+:: n-be> ( seq c-ptr n -- x )
+    seq
+    [ c-ptr deref big-endian n f ?byte-reverse ]
+    [ n firstn-unsafe n reassemble-be ] if-c-ptr ; inline
 
-: 2be> ( seq -- x )
-    [ uint16_t deref big-endian 2 f ?byte-reverse ] [ 2 n-be> ] if-c-ptr ;
-
-: 4be> ( seq -- x )
-    [ uint32_t deref big-endian 4 f ?byte-reverse ] [ 4 n-be> ] if-c-ptr ;
-
-: 8be> ( seq -- x )
-    [ uint64_t deref big-endian 8 f ?byte-reverse ] [ 8 n-be> ] if-c-ptr ;
-
-: 1le> ( seq -- x )
-    [ uint8_t deref little-endian 1 f ?byte-reverse ] [ 1 n-be> ] if-c-ptr ;
-
-: 2le> ( seq -- x )
-    [ uint16_t deref little-endian 2 f ?byte-reverse ] [ 2 n-be> ] if-c-ptr ;
-
-: 4le> ( seq -- x )
-    [ uint32_t deref little-endian 4 f ?byte-reverse ] [ 4 n-be> ] if-c-ptr ;
-
-: 8le> ( seq -- x )
-    [ uint64_t deref little-endian 8 f ?byte-reverse ] [ 8 n-be> ] if-c-ptr ;
+:: n-le> ( seq c-ptr n -- x )
+    seq
+    [ c-ptr deref little-endian n f ?byte-reverse ]
+    [ n firstn-unsafe n reassemble-le ] if-c-ptr ; inline
 
 PRIVATE>
 
 : be> ( seq -- x )
     dup length {
-        { 1 [ 1be> ] }
-        { 2 [ 2be> ] }
-        { 4 [ 4be> ] }
-        { 8 [ 8be> ] }
+        { 1 [ uint8_t 1 n-be> ] }
+        { 2 [ uint16_t 2 n-be> ] }
+        { 4 [ uint32_t 4 n-be> ] }
+        { 8 [ uint64_t 8 n-be> ] }
         [ drop slow-be> ]
     } case ;
 
 : le> ( seq -- x )
     dup length {
-        { 1 [ 1le> ] }
-        { 2 [ 2le> ] }
-        { 4 [ 4le> ] }
-        { 8 [ 8le> ] }
+        { 1 [ uint8_t 1 n-le> ] }
+        { 2 [ uint16_t 2 n-le> ] }
+        { 4 [ uint32_t 4 n-le> ] }
+        { 8 [ uint64_t 8 n-le> ] }
         [ drop slow-le> ]
     } case ;
 
