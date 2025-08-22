@@ -2,3 +2,7 @@ include vm/Config.unix
 PLAF_DLL_OBJS += $(BUILD_DIR)/os-genunix.o $(BUILD_DIR)/os-freebsd.o $(BUILD_DIR)/mvm-unix.o
 PLAF_MASTER_HEADERS += vm/os-genunix.hpp vm/os-freebsd.hpp
 LIBS := -L/usr/local/lib -lm $(X11_UI_LIBS) -pthread -lc -Wl,--export-dynamic -lthr -lpango-1.0 -lpangocairo-1.0 -lcairo -lglib-2.0 -lgobject-2.0 -lgtk-x11-2.0 -lgdk-x11-2.0 -lgdk_pixbuf-2.0 -lgtkglext-x11-1.0 -latk-1.0 -lgio-2.0 -lgdkglext-x11-1.0 -lGL
+
+FFI_TEST_CFLAGS := -fPIC
+CFLAGS += -fPIC
+CXXFLAGS += -fPIC
