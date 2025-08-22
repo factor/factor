@@ -257,8 +257,8 @@ CONSTANT: constructors H{
 : load-ext2 ( -- ) unsupported-feature ;
 : load-ext4 ( -- ) unsupported-feature ;
 : load-tuple1 ( -- ) stack pop 1array stack push ;
-: load-tuple2 ( -- ) stack pop [ stack pop ] dip 2array stack push ;
-: load-tuple3 ( -- ) stack pop [ stack pop [ stack pop ] dip ] dip 3array stack push ;
+: load-tuple2 ( -- ) stack pop stack pop swap 2array stack push ;
+: load-tuple3 ( -- ) stack pop stack pop stack pop swap rot 3array stack push ;
 : load-true ( -- ) t stack push ;
 : load-false ( -- ) f stack push ;
 : load-long1 ( -- ) read1 read signed-le> stack push ;
