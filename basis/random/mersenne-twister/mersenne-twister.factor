@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! mersenne twister based on
 ! https://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
-USING: accessors alien.c-types alien.data fry init kernel math
-math.bitwise math.private namespaces random sequences
-sequences.private specialized-arrays system ;
+USING: accessors alien.c-types kernel math math.bitwise
+math.private namespaces random sequences sequences.private
+specialized-arrays system ;
 SPECIALIZED-ARRAY: uint
 IN: random.mersenne-twister
 
@@ -20,13 +20,13 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
 
 : mt-step ( k+m k+1 k seq -- )
     [
-        [ nth-unsafe ] curry tri@
+        '[ _ nth-unsafe ] tri@
         [ 31 bits ] [ 31 mask-bit ] bi* bitor
         [ 2/ ] [ 1 bitand a nth ] bi bitxor bitxor
     ] 2keep set-nth-unsafe ; inline
 
 : mt-steps ( k+m k+1 k n seq -- )
-    [ mt-step ] curry [ 3keep [ 1 + ] tri@ ] curry times 3drop ; inline
+    '[ [ _ mt-step ] 3keep [ 1 + ] tri@ ] times 3drop ; inline
 
 : mt-generate ( mt -- )
     [
@@ -37,17 +37,13 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
         tri
     ] [ 0 >>i drop ] bi ; inline
 
-: init-mt-formula ( i seq -- f(seq[i]) )
-    dupd nth dup -30 shift bitxor 1812433253 * + 1 w+ ; inline
-
-: init-mt-rest ( seq -- )
-    n 1 - swap '[
-        _ [ init-mt-formula ] [ [ 1 + ] dip set-nth ] 2bi
-    ] each-integer ; inline
+: init-mt-formula ( prev-i prev-elt -- next-elt )
+    dup -30 shift bitxor 1812433253 * + 1 w+ ; inline
 
 : init-mt-seq ( seed -- seq )
-    32 bits n uint <c-array>
-    [ set-first ] [ init-mt-rest ] [ ] tri ; inline
+    32 bits n [
+        [ 1 - swap init-mt-formula ] unless-zero dup
+    ] uint-array{ } map-integers-as nip ; inline
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor
@@ -61,12 +57,10 @@ CONSTANT: a uint-array{ 0 0x9908b0df }
 PRIVATE>
 
 : <mersenne-twister> ( seed -- obj )
-    init-mt-seq 0 mersenne-twister boa
-    dup mt-generate ;
+    init-mt-seq 0 mersenne-twister boa dup mt-generate ;
 
 M: mersenne-twister seed-random
-    init-mt-seq >>seq
-    dup mt-generate ;
+    init-mt-seq >>seq dup mt-generate ;
 
 M: mersenne-twister random-32*
     [ next-index ]
