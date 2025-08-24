@@ -621,3 +621,6 @@ prettyprint ranges sequences sequences.extras strings tools.test
     { { 1 3 } { -1 -3 } { 0 1 } { -1 1 } { 10 } { } }
     [ [ { [ abs 1 3 between? ] [ sgn ] } 1&& ] all-same? ] count
 ] unit-test
+
+{ { 1 0 1 1 2 } } [ { 1 1 2 3 5 } adjacent-differences ] unit-test
+{ { 1 1 2 3 5 } } [ { 1 0 1 1 2 } partial-sums ] unit-test

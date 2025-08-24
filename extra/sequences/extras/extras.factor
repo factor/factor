@@ -1297,3 +1297,11 @@ INSTANCE: virtual-zip-index immutable-sequence
         unclip-slice quot call
         [ '[ quot call _ = ] all? ] [ drop f ] if*
     ] if-empty ; inline
+
+: adjacent-differences ( seq -- seq' )
+    f swap [
+        over [ [ swap - ] keep swap ] [ nip dup ] if
+    ] map nip ;
+
+: partial-sums ( seq -- seq' )
+    0 swap [ + dup ] map nip ;
