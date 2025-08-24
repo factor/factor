@@ -227,18 +227,17 @@ TUPLE: string-wrapper str ;
 M: string-wrapper pprint* str>> text ;
 
 M: enumeration-class see-class*
-    <colon \ ENUMERATION: pprint-word
-    {
+    <colon \ ENUMERATION: pprint-word {
         [ pprint-word ]
         [ superclass-of dup fixnum eq? [ drop ] [ "<" text pprint-word ] if ]
-        [ 
-            <block 
-                enum-member-list 
-                [ dup length 1 = [ first text ] [ unclip string-wrapper boa prefix pprint-object ] if ] each 
-            block> pprint-; 
+        [
+            <block
+                enum-member-list [
+                    dup length 1 = [ first text ] [ unclip string-wrapper boa prefix pprint-object ] if
+                ] each
+            block> pprint-;
         ]
-    } cleave
-    block> ; 
+    } cleave block> ;
 
 : see-class ( class -- )
     dup class? [
