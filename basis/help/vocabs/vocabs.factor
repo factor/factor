@@ -6,7 +6,7 @@ classes.singleton classes.tuple classes.union combinators
 effects generic help help.markup help.stylesheet help.topics io
 io.pathnames io.styles kernel macros make namespaces sequences
 sorting splitting summary vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata words words.symbol classes.enumeration prettyprint io.streams.string ;
+vocabs.loader vocabs.metadata words words.symbol ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -112,18 +112,6 @@ C: <vocab-author> vocab-author
         $table
     ] unless-empty ;
 
-: describe-enumeration-classes ( classes -- )
-    [
-        "Enumeration classes" $subheading
-        [
-            [ <$pretty-link> ]
-            [ superclass-of <$pretty-link> ]
-            bi 2array
-        ] map
-        { { $strong "Class" } { $strong "Superclass" } } prefix
-        $table
-    ] unless-empty ;
-
 : (describe-classes) ( classes heading -- )
     '[
         _ $subheading
@@ -152,7 +140,6 @@ C: <vocab-author> vocab-author
     [ predicate-class? ] partition
     [ mixin-class? ] partition
     [ union-class? ] partition
-    [ enumeration-class? ] partition
     [ intersection-class? ] filter
     {
         [ describe-builtin-classes ]
@@ -161,7 +148,6 @@ C: <vocab-author> vocab-author
         [ describe-predicate-classes ]
         [ describe-mixin-classes ]
         [ describe-union-classes ]
-        [ describe-enumeration-classes ]
         [ describe-intersection-classes ]
     } spread ;
 
@@ -178,18 +164,6 @@ C: <vocab-author> vocab-author
             bi 2array
         ] map
         { { $strong "Word" } { $strong "Syntax" } } prefix
-        $table
-    ] unless-empty ;
-
-: describe-enum-member ( words -- )
-    [
-        "Enumeration member words" $subheading
-        [
-            [ <$pretty-link> ]
-            [ "enum-elt-value" word-prop [ pprint-short ] with-string-writer <$snippet> ]
-            bi 2array
-        ] map
-        { { $strong "Word" } { $strong "Value" } } prefix
         $table
     ] unless-empty ;
 
@@ -239,7 +213,6 @@ C: <vocab-author> vocab-author
             [ parsing-word? ] partition
             [ generic? ] partition
             [ macro? ] partition
-            [ enumeration-member-word? ] partition
             [ symbol? ] partition
             [ primitive? ] partition
             [ predicate? ] partition swap
@@ -247,7 +220,6 @@ C: <vocab-author> vocab-author
                 [ describe-parsing ]
                 [ describe-generics ]
                 [ describe-macros ]
-                [ describe-enum-member ]
                 [ describe-symbols ]
                 [ describe-primitives ]
                 [ describe-compounds ]
