@@ -3,7 +3,9 @@
 
 USING: accessors arrays assocs classes classes.parser
 classes.private combinators compiler.units kernel lexer make
-math parser sequences splitting words words.constant ;
+math parser prettyprint.backend prettyprint.custom
+prettyprint.sections see see.private sequences splitting
+vocabs.prettyprint words words.constant ;
 
 IN: classes.enumeration
 
@@ -115,3 +117,23 @@ PRIVATE>
      ] { } assoc>map ;
 
 SYNTAX: ENUMERATION: scan-new-class parse-enum ;
+
+<PRIVATE
+
+TUPLE: string-wrapper str ;
+M: string-wrapper pprint* str>> text ;
+
+M: enumeration-class see-class*
+    <colon \ ENUMERATION: pprint-word {
+        [ pprint-word ]
+        [ superclass-of dup fixnum eq? [ drop ] [ "<" text pprint-word ] if ]
+        [
+            <block
+                enum-member-list [
+                    dup length 1 = [ first text ] [ unclip string-wrapper boa prefix pprint-object ] if
+                ] each
+            block> pprint-;
+        ]
+    } cleave block> ;
+
+PRIVATE>

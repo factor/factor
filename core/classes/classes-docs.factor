@@ -57,7 +57,6 @@ $nl
     "mixins"
     "predicates"
     "singletons"
-    "enums"
 }
 { $link "tuples" } " are documented in their own section."
 $nl
