@@ -1299,9 +1299,7 @@ INSTANCE: virtual-zip-index immutable-sequence
     ] if-empty ; inline
 
 : adjacent-differences ( seq -- seq' )
-    f swap [
-        over [ [ swap - ] keep swap ] [ nip dup ] if
-    ] map nip ;
+    f swap [ over [ [ swap - ] keep swap ] [ nip dup ] if ] map nip ;
 
 : partial-sums ( seq -- seq' )
     0 swap [ + dup ] map nip ;
