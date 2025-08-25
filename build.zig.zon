@@ -1,0 +1,7 @@
+.{
+    .name = .factor,
+    .version = "0.101.0",
+    .minimum_zig_version = "0.15.1",
+    .paths = .{""},
+    .fingerprint = 0xed38ec00cf62a92c,
+}
