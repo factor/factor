@@ -16,7 +16,7 @@ void* native_dlopen(const char* path) {
 }
 
 void* native_dlsym(void* handle, const char* symbol) {
-  return GetProcAddress((HMODULE)handle, symbol);
+  return (void*)GetProcAddress((HMODULE)handle, symbol);
 }
 
 void native_dlclose(void* handle) {
