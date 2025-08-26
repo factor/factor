@@ -34,6 +34,7 @@ Factor.app/Contents/_CodeSignature
 a.out
 checksums.txt
 factor.com
+factor.exe.manifest
 factor.image.fresh
 xcuserdata
 bin
