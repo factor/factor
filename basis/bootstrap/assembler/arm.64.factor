@@ -6,6 +6,7 @@ compiler.constants compiler.units cpu.arm.64.assembler
 generic.single.private kernel kernel.private layouts
 locals.backend math math.private namespaces slots.private
 strings.private threads.private vocabs ;
+FROM: cpu.arm.64.assembler => B ;
 IN: bootstrap.assembler.arm
 
 big-endian off
@@ -152,7 +153,7 @@ big-endian off
 {
     { unwind-native-frames [
         SP arg2 MOV
-        VM LDR= rel-vm
+        0 VM (LDR=) rel-vm
         CTX VM vm-context-offset [+] LDR
         jit-restore-context
         XZR VM vm-fault-flag-offset [+] STR
@@ -199,7 +200,7 @@ big-endian off
     X10 X11 SP 16 [post] LDP
     X8 X9 SP 16 [post] LDP
     X6 X7 SP 16 [post] LDP
-    X4 X6 SP 16 [post] LDP
+    X4 X5 SP 16 [post] LDP
     X2 X3 SP 16 [post] LDP
     X0 X1 SP 16 [post] LDP ;
 
@@ -223,7 +224,9 @@ big-endian off
         RET
     ] }
 } define-sub-primitives
+
 ! C to Factor entry point
+
 [
     ! Save all non-volatile registers
     X18 X19 SP -16 [pre] STP
@@ -237,7 +240,7 @@ big-endian off
 
     jit-save-teb
 
-    VM LDR= rel-vm
+    0 VM (LDR=) rel-vm
     SAFEPOINT (LDR=) rel-safepoint
     MEGA-HITS (LDR=) rel-megamorphic-cache-hits
     CACHE-MISS (LDR=) rel-inline-cache-miss
@@ -259,6 +262,7 @@ big-endian off
     ! Load Factor stack pointers
     temp CTX context-callstack-bottom-offset [+] LDR
     SP temp MOV
+    FP SP MOV
 
     jit-update-teb
 
@@ -377,6 +381,7 @@ big-endian off
 ] MEGA-LOOKUP jit-define
 
 ! Contexts
+
 : jit-switch-context ( -- )
     ! Push a bogus return address so the GC can track this frame back
     ! to the owner
@@ -688,24 +693,20 @@ big-endian off
 
     { set-callstack [
         ds-0 DS -8 [post] LDR
-        ! Get ctx->callstack_bottom
         arg1 CTX context-callstack-bottom-offset [+] LDR
-        ! Get top of callstack object -- 'src' for memcpy
         arg2 ds-0 callstack-top-offset ADD
-        ! Get callstack length, in bytes --- 'len' for memcpy
         arg3 ds-0 callstack-length-offset [+] LDR
         arg3 dup tag-bits get LSR
-        ! Compute new stack pointer -- 'dst' for memcpy
         arg1 dup arg3 SUB
-        ! Install new stack pointer
         SP arg1 MOV
-        ! Call memcpy; arguments are now in the correct registers
-        ! Create register shadow area for Win64
-        SP dup 32 SUB
         "factor_memcpy" LDR=BLR rel-dlsym
-        ! Tear down register shadow area
-        SP dup 32 ADD
-        ! Return with new callstack
+        top SP MOV
+        *top top [] LDR
+        *top 5 insns CBZ
+        *top dup top ADD
+        *top top [] STR
+        top *top MOV
+        -5 insns B
         FP LR SP stack-frame-size [post] LDP
         RET
     ] }

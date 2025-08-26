@@ -37,6 +37,18 @@ cell factor_vm::capture_callstack(context* ctx) {
 
   callstack* stack = allot_callstack(size);
   memcpy((void*)stack->top(), (void *)top, size);
+#ifdef FACTOR_ARM64
+  // Convert absolute frame pointers to relative offsets. This allows
+  // moving the callstack through memory. They will be converted back
+  // in set-callstack.
+  cell dst = stack->top();
+  while (top < bottom) {
+    *(cell*)dst = *(cell*)top - top;
+    FACTOR_ASSERT(*(cell*)top > top);
+    top = *(cell*)top;
+    dst += *(cell*)dst;
+  }
+#endif
   return tag<callstack>(stack);
 }
 
@@ -99,8 +111,8 @@ void factor_vm::primitive_set_innermost_stack_frame_quotation() {
 
   jit_compile_quotation(quot.value(), true);
 
-  cell inner = stack->top();
-  cell addr = *(cell*)(inner + FRAME_RETURN_ADDRESS);
+  cell inner = stack->top() + FRAME_RETURN_ADDRESS;
+  cell addr = *(cell*)inner;
   code_block* block = code->code_block_for_address(addr);
   cell offset = block->offset(addr);
   *(cell*)inner = quot->entry_point + offset;
