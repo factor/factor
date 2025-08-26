@@ -39,6 +39,10 @@ MEMO:: (cache-font) ( name size bold? italic? -- HFONT )
     { [ name>> ] [ size>> ] [ bold?>> ] [ italic?>> ] } cleave
     (cache-font) ;
 
+: cache-font@2x ( font -- HFONT )
+    { [ name>> ] [ size>> 2 * ] [ bold?>> ] [ italic?>> ] } cleave
+    (cache-font) ;
+
 STARTUP-HOOK: [
     \ (cache-font) reset-memoized
     \ windows-fonts reset-memoized
