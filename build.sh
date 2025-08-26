@@ -174,6 +174,11 @@ set_cc() {
 
     # Check for musl build - accept any non-empty value except explicit "0" or "false"
     if [[ -n "$MUSL" ]] && [[ "$MUSL" != "0" ]] && [[ "${MUSL,,}" != "false" ]]; then
+        # MUSL builds are not supported on Windows and macOS
+        if [[ "$OS" == "windows" ]] || [[ "$OS" == "macos" ]]; then
+            $ECHO "Error: MUSL=1 is not supported on $OS (only on Linux and BSD systems)"
+            exit_script 16
+        fi
         $ECHO "Building with static C/C++ runtime (musl-style)..."
         # For musl builds, statically link the C/C++ runtime but keep dlopen working
         # Full static linking breaks dlopen which Factor needs for FFI
