@@ -4,7 +4,7 @@ USING: accessors alien.accessors alien.c-types alien.strings arrays
 assocs classes.struct combinators continuations destructors
 environment gdk2.ffi gdk2.gl.ffi gdk2.pixbuf.ffi glib.ffi
 gobject.ffi gtk2.ffi gtk2.gl.ffi io.encodings.binary
-io.encodings.utf8 io.files io.pathnames kernel libc literals locals math
+io.encodings.utf8 io.files io.pathnames kernel libc literals locals math math.order
 math.bitwise math.parser math.vectors namespaces opengl sequences strings system threads ui
 ui.backend ui.backend.gtk2.input-methods ui.backend.gtk2.io ui.backend.x11.keys
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
