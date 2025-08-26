@@ -11,6 +11,7 @@ ECHO="echo"
 OS=
 ARCH=
 WORD=
+MUSL=${MUSL:=""}
 GIT_PROTOCOL=${GIT_PROTOCOL:="https"}
 GIT_URL=${GIT_URL:=$GIT_PROTOCOL"://github.com/factor/factor.git"}
 
@@ -169,6 +170,17 @@ set_cc() {
             # [ -z "$CXX_OPT" ] && [ "$LTO" == "1" ] && CXX_OPT="-flto"
             return
         fi
+    fi
+
+    # Check for musl build - accept any non-empty value except explicit "0" or "false"
+    if [[ -n "$MUSL" ]] && [[ "$MUSL" != "0" ]] && [[ "${MUSL,,}" != "false" ]]; then
+        $ECHO "Building with static C/C++ runtime (musl-style)..."
+        # For musl builds, statically link the C/C++ runtime but keep dlopen working
+        # Full static linking breaks dlopen which Factor needs for FFI
+        [ -z "$LDFLAGS" ] && LDFLAGS="-static-libgcc -static-libstdc++"
+        # Don't override CFLAGS/CXXFLAGS, append to them
+        SITE_CFLAGS="$SITE_CFLAGS -fno-stack-protector"
+        SITE_CXXFLAGS="$SITE_CXXFLAGS -fno-stack-protector"
     fi
 
     # clang and clang++ commands will fail to correctly build Factor on Cygwin, need "cross compiler"
@@ -407,6 +419,7 @@ echo_build_info() {
     $ECHO "CC_VERSION=$CC_VERSION"
     $ECHO "CXX_VERSION=$CXX_VERSION"
     $ECHO "LTO=$LTO"
+    $ECHO "MUSL=$MUSL"
     $ECHO "CC_OPT=$CC_OPT"
     $ECHO "CXX_OPT=$CXX_OPT"
     $ECHO "MAKE=$MAKE"
@@ -565,8 +578,8 @@ make_clean() {
 
 make_factor() {
     $ECHO "Building factor with $NUM_CORES cores"
-    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
-    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "$MAKE_TARGET" "-j$NUM_CORES"
+    $ECHO invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "SITE_CFLAGS=$SITE_CFLAGS" "SITE_CXXFLAGS=$SITE_CXXFLAGS" "LDFLAGS=$LDFLAGS" "$MAKE_TARGET" "-j$NUM_CORES"
+    invoke_make "CC=$CC" "CXX=$CXX" "CC_OPT=$CC_OPT" "CXX_OPT=$CXX_OPT" "SITE_CFLAGS=$SITE_CFLAGS" "SITE_CXXFLAGS=$SITE_CXXFLAGS" "LDFLAGS=$LDFLAGS" "$MAKE_TARGET" "-j$NUM_CORES"
 }
 
 make_clean_factor() {
@@ -774,7 +787,7 @@ install_deps_pkg() {
 }
 
 install_deps_apk() {
-    sudo apk add --no-cache bash git make gcc g++ libc-dev pango-dev libx11-dev gtk+2.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
+    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev libx11-dev gtk+2.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
     check_ret sudo
 }
 
@@ -818,6 +831,9 @@ usage() {
     $ECHO ""
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
+    $ECHO ""
+    $ECHO "To build with musl libc (static linking), invoke as:"
+    $ECHO "env MUSL=1 $0 <command>"
     $ECHO ""
     $ECHO "Example for overriding the default target:"
     $ECHO "    $0 update macos-x86-32"

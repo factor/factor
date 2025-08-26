@@ -43,7 +43,7 @@ ifdef CONFIG
 	ASFLAGS += $(COMMON_FLAGS)
 	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
 	CXXFLAGS += -std=c++11 $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
-	LINKER_FLAGS += $(SITE_COMMON_LINKER_FLAGS) $(CC_OPT)
+	LINKER_FLAGS += $(SITE_COMMON_LINKER_FLAGS) $(CC_OPT) $(LDFLAGS)
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
@@ -296,7 +296,11 @@ macos.app: $(EXECUTABLE)
 	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
 
 $(ENGINE): $(DLL_OBJS)
+ifeq ($(IS_CLANG), 1)
 	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(LINKER_FLAGS) $(DLL_OBJS)
+else
+	$(TOOLCHAIN_PREFIX)$(LINKER) $(ENGINE) $(DLL_OBJS)
+endif
 
 factor-lib: $(ENGINE)
 
