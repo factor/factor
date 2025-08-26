@@ -7,6 +7,21 @@ IN: ui.text
 
 <PRIVATE
 
+: scale-dim ( dim -- dim' )
+    gl-scale-factor get-global [ [ gl-unscale ] map ] when ; inline
+
+: scale-metrics ( metrics -- metrics' )
+    gl-scale-factor get-global [
+        clone
+            [ gl-unscale ] change-width
+            [ gl-unscale ] change-ascent
+            [ gl-unscale ] change-descent
+            [ gl-unscale ] change-height
+            [ gl-unscale ] change-leading
+            [ gl-unscale ] change-cap-height
+            [ gl-unscale ] change-x-height
+    ] when ; inline
+
 SYMBOL: font-renderer
 
 : world-text-handle ( world -- handle )
