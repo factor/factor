@@ -28,8 +28,6 @@ STRUCT: cairo_rectangle_int_t
 C-TYPE: cairo_region_t
 ! workaround>
 
-C-TYPE: GdkScreen
-
 FOREIGN-RECORD-TYPE: cairo.RectangleInt cairo_rectangle_int_t
 FOREIGN-RECORD-TYPE: cairo.Region cairo_region_t
 FOREIGN-RECORD-TYPE: cairo.FontOptions cairo_font_options_t
