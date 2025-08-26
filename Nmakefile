@@ -166,7 +166,7 @@ factor.exe.manifest: factor.exe
 	copy factor.exe.manifest.in factor.exe.manifest
 	mt -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
 
-all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
+all: factor.com factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
 
 !ENDIF
 
