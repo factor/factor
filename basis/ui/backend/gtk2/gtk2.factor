@@ -5,7 +5,7 @@ assocs classes.struct combinators continuations destructors
 environment gdk2.ffi gdk2.gl.ffi gdk2.pixbuf.ffi glib.ffi
 gobject.ffi gtk2.ffi gtk2.gl.ffi io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel libc literals locals math
-math.bitwise math.vectors namespaces sequences strings system threads ui
+math.bitwise math.parser math.vectors namespaces opengl sequences strings system threads ui
 ui.backend ui.backend.gtk2.input-methods ui.backend.gtk2.io ui.backend.x11.keys
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
 ui.gadgets.worlds ui.gestures ui.pixel-formats
@@ -52,6 +52,17 @@ M: gtk2-clipboard set-clipboard-contents
         utf8 string>alien gdk_atom_intern_static_string
         gtk_clipboard_get <gtk2-clipboard> swap set-global
     ] 2bi@ ;
+
+: detect-scale-factor ( -- n )
+    "GDK_SCALE" os-env [
+        string>number
+    ] [
+        gdk_screen_get_default gdk_screen_get_resolution 96.0 /
+    ] if* 1.0 max ;
+
+: init-scale-factor ( -- )
+    detect-scale-factor
+    [ 1.0 > ] keep f ? gl-scale-factor set-global ;
 
 ! Timer
 
@@ -224,8 +235,8 @@ icon-data [ default-icon-data ] initialize
 : on-configure ( window event user-data -- ? )
     drop swap dup gtk_widget_get_toplevel [ = ] keep window dup active?>> [
         swap [ swap GdkEventConfigure memory>struct ] dip
-        [ event-loc >>window-loc drop ]
-        [ event-dim >>dim relayout-1 ] if
+        [ event-loc [ gl-unscale >fixnum ] map >>window-loc drop ]
+        [ event-dim [ gl-unscale >fixnum ] map >>dim relayout-1 ] if
     ] [ 3drop ] if f ;
 
 : on-map ( win event user-data -- ? )
@@ -416,6 +427,8 @@ M: window-handle flush-gl-context
     ] [ first2 gtk_window_move ] if ;
 
 M:: gtk2-ui-backend (open-window) ( world -- )
+    gl-scale-factor get-global [ init-scale-factor ] unless
+
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
     gtk_drawing_area_new :> drawable
     win drawable gtk_container_add
@@ -426,7 +439,7 @@ M:: gtk2-ui-backend (open-window) ( world -- )
     world win register-window
 
     win world [ window-loc>> auto-position ]
-    [ dim>> first2 gtk_window_set_default_size ] 2bi
+    [ dim>> first2 [ gl-scale >fixnum ] bi@ gtk_window_set_default_size ] 2bi
 
     win "factor" "Factor" [ utf8 string>alien ] bi@
     gtk_window_set_wmclass
@@ -453,7 +466,7 @@ M: gtk2-ui-backend (close-window)
     event-loop? [ gtk_main_quit ] unless ;
 
 M: gtk2-ui-backend resize-window
-    [ handle>> window>> ] [ first2 ] bi* gtk_window_resize ;
+    [ handle>> window>> ] [ first2 [ gl-scale >fixnum ] bi@ ] bi* gtk_window_resize ;
 
 M: gtk2-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
@@ -507,6 +520,7 @@ M: gtk2-ui-backend (with-ui)
     f f gtk_gl_init
     load-icon
     init-clipboard
+    init-scale-factor
     start-ui
     [
         [ [ gtk_main ] with-timer ] with-event-loop
