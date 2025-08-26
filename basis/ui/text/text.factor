@@ -13,13 +13,13 @@ IN: ui.text
 : scale-metrics ( metrics -- metrics' )
     gl-scale-factor get-global [
         clone
-            [ gl-unscale ] change-width
-            [ gl-unscale ] change-ascent
-            [ gl-unscale ] change-descent
-            [ gl-unscale ] change-height
-            [ gl-unscale ] change-leading
-            [ gl-unscale ] change-cap-height
-            [ gl-unscale ] change-x-height
+            [ dup [ gl-unscale ] when ] change-width
+            [ dup [ gl-unscale ] when ] change-ascent
+            [ dup [ gl-unscale ] when ] change-descent
+            [ dup [ gl-unscale ] when ] change-height
+            [ dup [ gl-unscale ] when ] change-leading
+            [ dup [ gl-unscale ] when ] change-cap-height
+            [ dup [ gl-unscale ] when ] change-x-height
     ] when ; inline
 
 SYMBOL: font-renderer

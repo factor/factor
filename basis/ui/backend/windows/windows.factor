@@ -3,12 +3,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays ascii assocs assocs.extras byte-arrays calendar classes
-classes.struct colors combinators continuations io io.crlf
+classes.struct colors combinators continuations environment io io.crlf
 io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
-libc literals make math math.bitwise namespaces sequences sets
-specialized-arrays strings threads ui ui.backend ui.clipboards
-ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.private ui.theme
+libc literals make math math.bitwise math.order math.parser namespaces opengl
+sequences sets specialized-arrays strings threads ui ui.backend
+ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
+ui.gadgets.worlds ui.gestures ui.pixel-formats ui.private ui.theme
 ui.theme.switching windows.advapi32 windows.dwmapi
 windows.errors windows.gdi32 windows.kernel32 windows.messages
 windows.offscreen windows.ole32 windows.opengl32
@@ -170,6 +170,15 @@ M: pasteboard set-clipboard-contents drop copy ;
     <pasteboard> clipboard set-global
     <clipboard> selection set-global ;
 
+DEFER: get-default-device-caps
+
+: detect-scale-factor ( -- n )
+    get-default-device-caps [ 96 /f ] bi@ min ;
+
+: init-scale-factor ( -- )
+    detect-scale-factor
+    [ 1.0 > ] keep f ? gl-scale-factor set-global ;
+
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 CONSTANT: window-control>style
@@ -228,12 +237,12 @@ CONSTANT: window-control>ex-style
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
-    [ lo-word ] keep hi-word 2array
+    >lo-hi [ gl-unscale >fixnum ] map
     dup { 0 0 } = [ 2drop ] [ swap window [ dim<< ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
-    [ lo-word ] keep hi-word 2array
+    >lo-hi [ gl-unscale >fixnum ] map
     swap window [ window-loc<< ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
@@ -450,7 +459,7 @@ SYMBOL: nc-buttons
 
 :: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     uMsg mouse-event>gesture
-    lParam >lo-hi
+    lParam >lo-hi [ gl-unscale >fixnum ] map
     hWnd window ;
 
 : set-capture ( hwnd -- )
@@ -498,7 +507,7 @@ SYMBOL: nc-buttons
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
     TrackMouseEvent win32-error=0/f
-    >lo-hi swap window move-hand fire-motion ;
+    >lo-hi [ gl-unscale >fixnum ] map swap window move-hand fire-motion ;
 
 : (handle-mousewheel) ( direction hWnd -- )
     hand-loc get-global swap window send-scroll ; inline
@@ -655,8 +664,11 @@ M: windows-ui-backend do-events
 : get-default-device-caps ( -- x y )
     f get-device-caps ;
 
+: map-rect ( rect quot -- rect' )
+    [ '[ _ map ] change-loc ] [ '[ _ map ] change-dim ] bi ; inline
+
 :: create-window ( rect style ex-style -- hwnd )
-    rect style ex-style make-adjusted-RECT
+    rect [ gl-scale >fixnum ] map-rect style ex-style make-adjusted-RECT
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
@@ -703,6 +715,7 @@ M: windows-ui-backend do-events
     [ disable-close-button ] [ drop ] if ;
 
 M: windows-ui-backend (open-window)
+    gl-scale-factor get-global [ init-scale-factor ] unless
     [
         dup
         [ ] [ world>style ] [ world>ex-style ] tri create-window
@@ -754,6 +767,7 @@ M: windows-ui-backend set-title
 M: windows-ui-backend (with-ui)
     [
         init-clipboard
+        init-scale-factor
         init-win32-ui
         detect-theme
         start-ui
@@ -859,7 +873,8 @@ M: windows-ui-backend (fullscreen?)
 
 M:: windows-ui-backend resize-window ( world dim -- )
     world handle>> hWnd>>
-    world window-loc>> dim <RECT> dup
+    world window-loc>> [ gl-scale >fixnum ] map
+    dim [ gl-scale >fixnum ] map <RECT> dup
     world world>style
     world world>ex-style
     adjust-RECT get-RECT-dimensions FALSE
