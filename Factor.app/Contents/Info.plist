@@ -22,7 +22,7 @@
 	<key>CFBundleExecutable</key>
 	<string>factor</string>
 	<key>CFBundleIconFile</key>
-	<string>Factor.icns</string>
+	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.factorcode.Factor</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -84,7 +84,7 @@
             <key>UTTypeDescription</key>
             <string>Factor Code</string>
             <key>UTTypeIconFile</key>
-	        <string>Factor.icns</string>
+	        <string>icon.icns</string>
             <key>UTTypeConformsTo</key>
             <array>
                 <string>public.source</string>
