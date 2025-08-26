@@ -105,5 +105,3 @@ STRUCT: GdkEventScroll
     { x_root gdouble }
     { y_root gdouble } ;
 
-FUNCTION: GdkScreen* gdk_screen_get_default ( )
-FUNCTION: gdouble gdk_screen_get_resolution ( GdkScreen* screen )
