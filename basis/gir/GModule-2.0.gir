@@ -2,108 +2,1031 @@
 <!-- This file was automatically generated from C sources - DO NOT EDIT!
 To affect the contents of this file, edit the original C definitions,
 and/or use gtk-doc annotations.  -->
-<repository version="1.2"
-            xmlns="http://www.gtk.org/introspection/core/1.0"
-            xmlns:c="http://www.gtk.org/introspection/c/1.0"
-            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+<repository xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0" version="1.2">
   <include name="GLib" version="2.0"/>
   <package name="gmodule-2.0"/>
   <c:include name="gmodule.h"/>
-  <namespace name="GModule"
-             version="2.0"
-             shared-library="libgmodule-2.0.so.0"
-             c:identifier-prefixes="G"
-             c:symbol-prefixes="g">
-    <record name="Module" c:type="GModule" disguised="1">
+  <namespace name="GModule" version="2.0" shared-library="libgmodule-2.0.so.0" c:identifier-prefixes="G" c:symbol-prefixes="gmodule,g">
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_26_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_26_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_28_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_28_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_30_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_30_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_32_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_32_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_34_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_34_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_36_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_36_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_38_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_38_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_40_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_40_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_42_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_42_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_44_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_44_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_46_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_46_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_48_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_48_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_50_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_50_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_52_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_52_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_54_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_54_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_56_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_56_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_58_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_58_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_60_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_60_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_62_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_62_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_64_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_64_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_66_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_66_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_68_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_68_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_70_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_70_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_72_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_72_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_74_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_74_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_76_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_76_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_78_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_78_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_80_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_80_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_ENUMERATOR_IN_2_82_FOR" c:identifier="GMODULE_DEPRECATED_ENUMERATOR_IN_2_82_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_FOR" c:identifier="GMODULE_DEPRECATED_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_26_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_26_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_28_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_28_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_30_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_30_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_32_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_32_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_34_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_34_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_36_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_36_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_38_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_38_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_40_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_40_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_42_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_42_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_44_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_44_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_46_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_46_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_48_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_48_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_50_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_50_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_52_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_52_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_54_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_54_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_56_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_56_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_58_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_58_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_60_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_60_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_62_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_62_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_64_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_64_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_66_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_66_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_68_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_68_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_70_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_70_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_72_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_72_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_74_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_74_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_76_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_76_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_78_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_78_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_80_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_80_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_IN_2_82_FOR" c:identifier="GMODULE_DEPRECATED_IN_2_82_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_26_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_26_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_28_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_28_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_30_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_30_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_32_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_32_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_34_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_34_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_36_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_36_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_38_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_38_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_40_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_40_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_42_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_42_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_44_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_44_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_46_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_46_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_48_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_48_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_50_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_50_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_52_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_52_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_54_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_54_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_56_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_56_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_58_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_58_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_60_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_60_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_62_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_62_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_64_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_64_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_66_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_66_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_68_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_68_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_70_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_70_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_72_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_72_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_74_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_74_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_76_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_76_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_78_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_78_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_80_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_80_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_MACRO_IN_2_82_FOR" c:identifier="GMODULE_DEPRECATED_MACRO_IN_2_82_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_26_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_26_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_28_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_28_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_30_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_30_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_32_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_32_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_34_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_34_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_36_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_36_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_38_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_38_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_40_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_40_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_42_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_42_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_44_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_44_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_46_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_46_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_48_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_48_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_50_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_50_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_52_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_52_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_54_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_54_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_56_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_56_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_58_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_58_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_60_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_60_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_62_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_62_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_64_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_64_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_66_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_66_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_68_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_68_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_70_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_70_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_72_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_72_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_74_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_74_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_76_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_76_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_78_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_78_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_80_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_80_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DEPRECATED_TYPE_IN_2_82_FOR" c:identifier="GMODULE_DEPRECATED_TYPE_IN_2_82_FOR" introspectable="0">
+      <parameters>
+        <parameter name="f">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <constant name="MODULE_IMPL_AR" value="7" c:type="G_MODULE_IMPL_AR">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="MODULE_IMPL_DL" value="1" c:type="G_MODULE_IMPL_DL">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="MODULE_IMPL_NONE" value="0" c:type="G_MODULE_IMPL_NONE">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="MODULE_IMPL_WIN32" value="3" c:type="G_MODULE_IMPL_WIN32">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <record name="Module" c:type="GModule" disguised="1" opaque="1">
+      <doc xml:space="preserve">The #GModule struct is an opaque data structure to represent a
+[dynamically-loaded module][glib-Dynamic-Loading-of-Modules].
+It should only be accessed via the following functions.</doc>
       <method name="close" c:identifier="g_module_close">
+        <doc xml:space="preserve">Closes a module.</doc>
         <return-value transfer-ownership="none">
-          <type name="gboolean" c:type="gboolean"/>
-        </return-value>
-      </method>
-      <method name="make_resident" c:identifier="g_module_make_resident">
-        <return-value transfer-ownership="none">
-          <type name="none" c:type="void"/>
-        </return-value>
-      </method>
-      <method name="name" c:identifier="g_module_name">
-        <return-value transfer-ownership="none">
-          <type name="utf8" c:type="gchar*"/>
-        </return-value>
-      </method>
-      <method name="symbol" c:identifier="g_module_symbol">
-        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">%TRUE on success</doc>
           <type name="gboolean" c:type="gboolean"/>
         </return-value>
         <parameters>
+          <instance-parameter name="module" transfer-ownership="none">
+            <doc xml:space="preserve">a #GModule to close</doc>
+            <type name="Module" c:type="GModule*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="make_resident" c:identifier="g_module_make_resident">
+        <doc xml:space="preserve">Ensures that a module will never be unloaded.
+Any future g_module_close() calls on the module will be ignored.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="module" transfer-ownership="none">
+            <doc xml:space="preserve">a #GModule to make permanently resident</doc>
+            <type name="Module" c:type="GModule*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="name" c:identifier="g_module_name">
+        <doc xml:space="preserve">Returns the filename that the module was opened with.
+
+If @module refers to the application itself, "main" is returned.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">the filename of the module</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="module" transfer-ownership="none">
+            <doc xml:space="preserve">a #GModule</doc>
+            <type name="Module" c:type="GModule*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="symbol" c:identifier="g_module_symbol">
+        <doc xml:space="preserve">Gets a symbol pointer from a module, such as one exported
+by %G_MODULE_EXPORT. Note that a valid symbol can be %NULL.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">%TRUE on success</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="module" transfer-ownership="none">
+            <doc xml:space="preserve">a #GModule</doc>
+            <type name="Module" c:type="GModule*"/>
+          </instance-parameter>
           <parameter name="symbol_name" transfer-ownership="none">
-            <type name="utf8" c:type="gchar*"/>
+            <doc xml:space="preserve">the name of the symbol to find</doc>
+            <type name="utf8" c:type="const gchar*"/>
           </parameter>
-          <parameter name="symbol" transfer-ownership="none">
+          <parameter name="symbol" direction="out" caller-allocates="0" transfer-ownership="full" nullable="1">
+            <doc xml:space="preserve">returns the pointer to the symbol value</doc>
             <type name="gpointer" c:type="gpointer*"/>
           </parameter>
         </parameters>
       </method>
+      <function name="build_path" c:identifier="g_module_build_path" deprecated="1" deprecated-version="2.76">
+        <doc xml:space="preserve">A portable way to build the filename of a module. The platform-specific
+prefix and suffix are added to the filename, if needed, and the result
+is added to the directory, using the correct separator character.
+
+The directory should specify the directory where the module can be found.
+It can be %NULL or an empty string to indicate that the module is in a
+standard platform-specific directory, though this is not recommended
+since the wrong module may be found.
+
+For example, calling g_module_build_path() on a Linux system with a
+@directory of `/lib` and a @module_name of "mylibrary" will return
+`/lib/libmylibrary.so`. On a Windows system, using `\Windows` as the
+directory it will return `\Windows\mylibrary.dll`.</doc>
+        <doc-deprecated xml:space="preserve">Use g_module_open() instead with @module_name as the
+basename of the file_name argument. See %G_MODULE_SUFFIX for why.</doc-deprecated>
+        <return-value transfer-ownership="full">
+          <doc xml:space="preserve">the complete path of the module, including the standard library
+    prefix and suffix. This should be freed when no longer needed</doc>
+          <type name="utf8" c:type="gchar*"/>
+        </return-value>
+        <parameters>
+          <parameter name="directory" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">the directory where the module is. This can be
+    %NULL or the empty string to indicate that the standard platform-specific
+    directories will be used, though that is not recommended</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="module_name" transfer-ownership="none">
+            <doc xml:space="preserve">the name of the module</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="error" c:identifier="g_module_error">
+        <doc xml:space="preserve">Gets a string describing the last module error.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">a string describing the last module error</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </return-value>
+      </function>
+      <function name="error_quark" c:identifier="g_module_error_quark">
+        <return-value transfer-ownership="none">
+          <type name="GLib.Quark" c:type="GQuark"/>
+        </return-value>
+      </function>
+      <function name="open" c:identifier="g_module_open" introspectable="0">
+        <doc xml:space="preserve">A thin wrapper function around g_module_open_full()</doc>
+        <return-value>
+          <doc xml:space="preserve">a #GModule on success, or %NULL on failure</doc>
+          <type name="Module" c:type="GModule*"/>
+        </return-value>
+        <parameters>
+          <parameter name="file_name" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">the name or path to the file containing the module,
+    or %NULL to obtain a #GModule representing the main program itself</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="flags" transfer-ownership="none">
+            <doc xml:space="preserve">the flags used for opening the module. This can be the
+    logical OR of any of the #GModuleFlags.</doc>
+            <type name="ModuleFlags" c:type="GModuleFlags"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="open_full" c:identifier="g_module_open_full" version="2.70" introspectable="0" throws="1">
+        <doc xml:space="preserve">Opens a module. If the module has already been opened, its reference count
+is incremented. If not, the module is searched using @file_name.
+
+Since 2.76, the search order/behavior is as follows:
+
+1. If @file_name exists as a regular file, it is used as-is; else
+2. If @file_name doesn't have the correct suffix and/or prefix for the
+   platform, then possible suffixes and prefixes will be added to the
+   basename till a file is found and whatever is found will be used; else
+3. If @file_name doesn't have the ".la"-suffix, ".la" is appended. Either
+   way, if a matching .la file exists (and is a libtool archive) the
+   libtool archive is parsed to find the actual file name, and that is
+   used.
+
+If, at the end of all this, we have a file path that we can access on disk,
+it is opened as a module. If not, @file_name is attempted to be opened as a
+module verbatim in the hopes that the system implementation will somehow be
+able to access it. If that is not possible, %NULL is returned.
+
+Note that this behaviour was different prior to 2.76, but there is some
+overlap in functionality. If backwards compatibility is an issue, kindly
+consult earlier #GModule documentation for the prior search order/behavior
+of @file_name.</doc>
+        <return-value>
+          <doc xml:space="preserve">a #GModule on success, or %NULL on failure</doc>
+          <type name="Module" c:type="GModule*"/>
+        </return-value>
+        <parameters>
+          <parameter name="file_name" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">the name or path to the file containing the module,
+    or %NULL to obtain a #GModule representing the main program itself</doc>
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="flags" transfer-ownership="none">
+            <doc xml:space="preserve">the flags used for opening the module. This can be the
+    logical OR of any of the #GModuleFlags</doc>
+            <type name="ModuleFlags" c:type="GModuleFlags"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="supported" c:identifier="g_module_supported">
+        <doc xml:space="preserve">Checks if modules are supported on the current platform.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">%TRUE if modules are supported</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+      </function>
     </record>
     <callback name="ModuleCheckInit" c:type="GModuleCheckInit">
+      <doc xml:space="preserve">Specifies the type of the module initialization function.
+If a module contains a function named g_module_check_init() it is called
+automatically when the module is loaded. It is passed the #GModule structure
+and should return %NULL on success or a string describing the initialization
+error.</doc>
       <return-value transfer-ownership="none">
-        <type name="utf8" c:type="gchar*"/>
+        <doc xml:space="preserve">%NULL on success, or a string describing the initialization error</doc>
+        <type name="utf8" c:type="const gchar*"/>
       </return-value>
       <parameters>
         <parameter name="module" transfer-ownership="none">
+          <doc xml:space="preserve">the #GModule corresponding to the module which has just been loaded</doc>
           <type name="Module" c:type="GModule*"/>
         </parameter>
       </parameters>
     </callback>
+    <enumeration name="ModuleError" version="2.70" c:type="GModuleError" glib:error-domain="g-module-error-quark">
+      <doc xml:space="preserve">Errors returned by g_module_open_full().</doc>
+      <member name="failed" value="0" c:identifier="G_MODULE_ERROR_FAILED">
+        <doc xml:space="preserve">there was an error loading or opening a module file</doc>
+      </member>
+      <member name="check_failed" value="1" c:identifier="G_MODULE_ERROR_CHECK_FAILED">
+        <doc xml:space="preserve">a module returned an error from its `g_module_check_init()` function</doc>
+      </member>
+    </enumeration>
     <bitfield name="ModuleFlags" c:type="GModuleFlags">
-      <member name="lazy" value="1" c:identifier="G_MODULE_BIND_LAZY"/>
-      <member name="local" value="2" c:identifier="G_MODULE_BIND_LOCAL"/>
-      <member name="mask" value="3" c:identifier="G_MODULE_BIND_MASK"/>
+      <doc xml:space="preserve">Flags passed to g_module_open().
+Note that these flags are not supported on all platforms.</doc>
+      <member name="lazy" value="1" c:identifier="G_MODULE_BIND_LAZY">
+        <doc xml:space="preserve">specifies that symbols are only resolved when
+    needed. The default action is to bind all symbols when the module
+    is loaded.</doc>
+      </member>
+      <member name="local" value="2" c:identifier="G_MODULE_BIND_LOCAL">
+        <doc xml:space="preserve">specifies that symbols in the module should
+    not be added to the global name space. The default action on most
+    platforms is to place symbols in the module in the global name space,
+    which may cause conflicts with existing symbols.</doc>
+      </member>
+      <member name="mask" value="3" c:identifier="G_MODULE_BIND_MASK">
+        <doc xml:space="preserve">mask for all flags.</doc>
+      </member>
     </bitfield>
     <callback name="ModuleUnload" c:type="GModuleUnload">
+      <doc xml:space="preserve">Specifies the type of the module function called when it is unloaded.
+If a module contains a function named g_module_unload() it is called
+automatically when the module is unloaded.
+It is passed the #GModule structure.</doc>
       <return-value transfer-ownership="none">
         <type name="none" c:type="void"/>
       </return-value>
       <parameters>
         <parameter name="module" transfer-ownership="none">
+          <doc xml:space="preserve">the #GModule about to be unloaded</doc>
           <type name="Module" c:type="GModule*"/>
         </parameter>
       </parameters>
     </callback>
-    <function name="module_build_path" c:identifier="g_module_build_path">
+    <function-macro name="UNAVAILABLE" c:identifier="GMODULE_UNAVAILABLE" introspectable="0">
+      <parameters>
+        <parameter name="maj">
+        </parameter>
+        <parameter name="min">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="UNAVAILABLE_STATIC_INLINE" c:identifier="GMODULE_UNAVAILABLE_STATIC_INLINE" introspectable="0">
+      <parameters>
+        <parameter name="maj">
+        </parameter>
+        <parameter name="min">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function name="module_build_path" c:identifier="g_module_build_path" moved-to="Module.build_path" deprecated="1" deprecated-version="2.76">
+      <doc xml:space="preserve">A portable way to build the filename of a module. The platform-specific
+prefix and suffix are added to the filename, if needed, and the result
+is added to the directory, using the correct separator character.
+
+The directory should specify the directory where the module can be found.
+It can be %NULL or an empty string to indicate that the module is in a
+standard platform-specific directory, though this is not recommended
+since the wrong module may be found.
+
+For example, calling g_module_build_path() on a Linux system with a
+@directory of `/lib` and a @module_name of "mylibrary" will return
+`/lib/libmylibrary.so`. On a Windows system, using `\Windows` as the
+directory it will return `\Windows\mylibrary.dll`.</doc>
+      <doc-deprecated xml:space="preserve">Use g_module_open() instead with @module_name as the
+basename of the file_name argument. See %G_MODULE_SUFFIX for why.</doc-deprecated>
       <return-value transfer-ownership="full">
+        <doc xml:space="preserve">the complete path of the module, including the standard library
+    prefix and suffix. This should be freed when no longer needed</doc>
         <type name="utf8" c:type="gchar*"/>
       </return-value>
       <parameters>
-        <parameter name="directory" transfer-ownership="none">
-          <type name="utf8" c:type="gchar*"/>
+        <parameter name="directory" transfer-ownership="none" nullable="1" allow-none="1">
+          <doc xml:space="preserve">the directory where the module is. This can be
+    %NULL or the empty string to indicate that the standard platform-specific
+    directories will be used, though that is not recommended</doc>
+          <type name="utf8" c:type="const gchar*"/>
         </parameter>
         <parameter name="module_name" transfer-ownership="none">
-          <type name="utf8" c:type="gchar*"/>
+          <doc xml:space="preserve">the name of the module</doc>
+          <type name="utf8" c:type="const gchar*"/>
         </parameter>
       </parameters>
     </function>
-    <function name="module_error" c:identifier="g_module_error">
+    <function name="module_error" c:identifier="g_module_error" moved-to="Module.error">
+      <doc xml:space="preserve">Gets a string describing the last module error.</doc>
       <return-value transfer-ownership="none">
-        <type name="utf8" c:type="gchar*"/>
+        <doc xml:space="preserve">a string describing the last module error</doc>
+        <type name="utf8" c:type="const gchar*"/>
       </return-value>
     </function>
-    <function name="module_open"
-              c:identifier="g_module_open"
-              introspectable="0">
-      <return-value>
-        <type name="Module" c:type="GModule*"/>
-      </return-value>
-      <parameters>
-        <parameter name="file_name" transfer-ownership="none">
-          <type name="utf8" c:type="gchar*"/>
-        </parameter>
-        <parameter name="flags" transfer-ownership="none">
-          <type name="ModuleFlags" c:type="GModuleFlags"/>
-        </parameter>
-      </parameters>
-    </function>
-    <function name="module_supported" c:identifier="g_module_supported">
+    <function name="module_error_quark" c:identifier="g_module_error_quark" moved-to="Module.error_quark">
       <return-value transfer-ownership="none">
+        <type name="GLib.Quark" c:type="GQuark"/>
+      </return-value>
+    </function>
+    <function name="module_supported" c:identifier="g_module_supported" moved-to="Module.supported">
+      <doc xml:space="preserve">Checks if modules are supported on the current platform.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve">%TRUE if modules are supported</doc>
         <type name="gboolean" c:type="gboolean"/>
       </return-value>
     </function>

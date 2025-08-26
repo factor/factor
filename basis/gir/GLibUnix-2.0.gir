@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0" version="1.2">
+  <include name="GLib" version="2.0"/>
+  <package name="glib-2.0"/>
+  <c:include name="glib-unix.h"/>
+  <c:include name="glib.h"/>
+  <namespace name="GLibUnix" version="2.0" shared-library="libgobject-2.0.so.0,libglib-2.0.so.0" c:identifier-prefixes="GUnix,G" c:symbol-prefixes="glib,g_unix,g">
+    <callback name="FDSourceFunc" c:type="GUnixFDSourceFunc">
+      <doc xml:space="preserve">The type of functions to be called when a UNIX fd watch source
+triggers.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve">%FALSE if the source should be removed</doc>
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="fd" transfer-ownership="none">
+          <doc xml:space="preserve">the fd that triggered the event</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="condition" transfer-ownership="none">
+          <doc xml:space="preserve">the IO conditions reported on @fd</doc>
+          <type name="GLib.IOCondition" c:type="GIOCondition"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" nullable="1" allow-none="1" closure="2">
+          <doc xml:space="preserve">user data passed to g_unix_fd_add()</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <record name="Pipe" c:type="GUnixPipe" version="2.80">
+      <doc xml:space="preserve">A Unix pipe. The advantage of this type over `int[2]` is that it can
+be closed automatically when it goes out of scope, using `g_auto(GUnixPipe)`,
+on compilers that support that feature.</doc>
+      <field name="fds" writable="1">
+        <doc xml:space="preserve">A pair of file descriptors, each negative if closed or not yet opened.
+ The file descriptor with index %G_UNIX_PIPE_END_READ is readable.
+ The file descriptor with index %G_UNIX_PIPE_END_WRITE is writable.</doc>
+        <array zero-terminated="0" fixed-size="2">
+          <type name="gint" c:type="int"/>
+        </array>
+      </field>
+    </record>
+    <enumeration name="PipeEnd" version="2.80" c:type="GUnixPipeEnd">
+      <doc xml:space="preserve">Mnemonic constants for the ends of a Unix pipe.</doc>
+      <member name="read" value="0" c:identifier="G_UNIX_PIPE_END_READ">
+        <doc xml:space="preserve">The readable file descriptor 0</doc>
+      </member>
+      <member name="write" value="1" c:identifier="G_UNIX_PIPE_END_WRITE">
+        <doc xml:space="preserve">The writable file descriptor 1</doc>
+      </member>
+    </enumeration>
+    <function name="closefrom" c:identifier="g_closefrom">
+      <return-value transfer-ownership="none">
+        <type name="gint" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="lowfd" transfer-ownership="none">
+          <type name="gint" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="error_quark" c:identifier="g_unix_error_quark">
+      <return-value transfer-ownership="none">
+        <type name="GLib.Quark" c:type="GQuark"/>
+      </return-value>
+    </function>
+    <function name="fd_add" c:identifier="g_unix_fd_add" introspectable="0">
+      <return-value transfer-ownership="none">
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="fd" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="condition" transfer-ownership="none">
+          <type name="GLib.IOCondition" c:type="GIOCondition"/>
+        </parameter>
+        <parameter name="function" transfer-ownership="none" closure="3">
+          <type name="GLib.UnixFDSourceFunc" c:type="GUnixFDSourceFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" nullable="1" allow-none="1">
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fd_add_full" c:identifier="g_unix_fd_add_full">
+      <return-value transfer-ownership="none">
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="priority" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="fd" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="condition" transfer-ownership="none">
+          <type name="GLib.IOCondition" c:type="GIOCondition"/>
+        </parameter>
+        <parameter name="function" transfer-ownership="none" scope="notified" closure="4" destroy="5">
+          <type name="GLib.UnixFDSourceFunc" c:type="GUnixFDSourceFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" nullable="1" allow-none="1">
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="notify" transfer-ownership="none" scope="async">
+          <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fd_source_new" c:identifier="g_unix_fd_source_new">
+      <return-value transfer-ownership="full">
+        <type name="GLib.Source" c:type="GSource*"/>
+      </return-value>
+      <parameters>
+        <parameter name="fd" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="condition" transfer-ownership="none">
+          <type name="GLib.IOCondition" c:type="GIOCondition"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="fdwalk_set_cloexec" c:identifier="g_fdwalk_set_cloexec">
+      <return-value transfer-ownership="none">
+        <type name="gint" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="lowfd" transfer-ownership="none">
+          <type name="gint" c:type="int"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="get_passwd_entry" c:identifier="g_unix_get_passwd_entry" throws="1">
+      <return-value transfer-ownership="none" nullable="1">
+        <type name="gpointer" c:type="passwd*"/>
+      </return-value>
+      <parameters>
+        <parameter name="user_name" transfer-ownership="none">
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="open_pipe" c:identifier="g_unix_open_pipe" throws="1">
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="fds" transfer-ownership="none">
+          <type name="gint" c:type="gint*"/>
+        </parameter>
+        <parameter name="flags" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="set_fd_nonblocking" c:identifier="g_unix_set_fd_nonblocking" throws="1">
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="fd" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="nonblock" transfer-ownership="none">
+          <type name="gboolean" c:type="gboolean"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="signal_add" c:identifier="g_unix_signal_add" introspectable="0">
+      <return-value transfer-ownership="none">
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="signum" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="handler" transfer-ownership="none" closure="2">
+          <type name="GLib.SourceFunc" c:type="GSourceFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" nullable="1" allow-none="1">
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="signal_add_full" c:identifier="g_unix_signal_add_full">
+      <return-value transfer-ownership="none">
+        <type name="guint" c:type="guint"/>
+      </return-value>
+      <parameters>
+        <parameter name="priority" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="signum" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="handler" transfer-ownership="none" scope="notified" closure="3" destroy="4">
+          <type name="GLib.SourceFunc" c:type="GSourceFunc"/>
+        </parameter>
+        <parameter name="user_data" transfer-ownership="none" nullable="1" allow-none="1">
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+        <parameter name="notify" transfer-ownership="none" scope="async">
+          <type name="GLib.DestroyNotify" c:type="GDestroyNotify"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="signal_source_new" c:identifier="g_unix_signal_source_new">
+      <return-value transfer-ownership="full">
+        <type name="GLib.Source" c:type="GSource*"/>
+      </return-value>
+      <parameters>
+        <parameter name="signum" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

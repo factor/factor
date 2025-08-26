@@ -1,0 +1,559 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" xmlns:glib="http://www.gtk.org/introspection/glib/1.0" version="1.2">
+  <include name="Gdk" version="4.0"/>
+  <include name="win32" version="1.0"/>
+  <package name="gtk4-win32"/>
+  <c:include name="gdk/win32/gdkwin32.h"/>
+  <namespace name="GdkWin32" version="4.0" shared-library="libgtk-4-1.dll" c:identifier-prefixes="Gdk" c:symbol-prefixes="gdk">
+    <function-macro name="IS_WIN32_DISPLAY" c:identifier="GDK_IS_WIN32_DISPLAY" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_DISPLAY_CLASS" c:identifier="GDK_IS_WIN32_DISPLAY_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_DISPLAY_MANAGER" c:identifier="GDK_IS_WIN32_DISPLAY_MANAGER" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_DISPLAY_MANAGER_CLASS" c:identifier="GDK_IS_WIN32_DISPLAY_MANAGER_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_DRAG" c:identifier="GDK_IS_WIN32_DRAG" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_DRAG_CLASS" c:identifier="GDK_IS_WIN32_DRAG_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_HCURSOR" c:identifier="GDK_IS_WIN32_HCURSOR" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_HCURSOR_CLASS" c:identifier="GDK_IS_WIN32_HCURSOR_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_MONITOR" c:identifier="GDK_IS_WIN32_MONITOR" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_SCREEN" c:identifier="GDK_IS_WIN32_SCREEN" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_SCREEN_CLASS" c:identifier="GDK_IS_WIN32_SCREEN_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_SURFACE" c:identifier="GDK_IS_WIN32_SURFACE" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IS_WIN32_SURFACE_CLASS" c:identifier="GDK_IS_WIN32_SURFACE_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="SURFACE_HWND" c:identifier="GDK_SURFACE_HWND" introspectable="0">
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY" c:identifier="GDK_WIN32_DISPLAY" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY_CLASS" c:identifier="GDK_WIN32_DISPLAY_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY_GET_CLASS" c:identifier="GDK_WIN32_DISPLAY_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY_MANAGER" c:identifier="GDK_WIN32_DISPLAY_MANAGER" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY_MANAGER_CLASS" c:identifier="GDK_WIN32_DISPLAY_MANAGER_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DISPLAY_MANAGER_GET_CLASS" c:identifier="GDK_WIN32_DISPLAY_MANAGER_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DRAG" c:identifier="GDK_WIN32_DRAG" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DRAG_CLASS" c:identifier="GDK_WIN32_DRAG_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_DRAG_GET_CLASS" c:identifier="GDK_WIN32_DRAG_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_GL_CONTEXT" c:identifier="GDK_WIN32_GL_CONTEXT" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_HCURSOR" c:identifier="GDK_WIN32_HCURSOR" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_HCURSOR_CLASS" c:identifier="GDK_WIN32_HCURSOR_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_HCURSOR_GET_CLASS" c:identifier="GDK_WIN32_HCURSOR_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_IS_GL_CONTEXT" c:identifier="GDK_WIN32_IS_GL_CONTEXT" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_MONITOR" c:identifier="GDK_WIN32_MONITOR" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SCREEN" c:identifier="GDK_WIN32_SCREEN" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SCREEN_CLASS" c:identifier="GDK_WIN32_SCREEN_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SCREEN_GET_CLASS" c:identifier="GDK_WIN32_SCREEN_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SURFACE" c:identifier="GDK_WIN32_SURFACE" introspectable="0">
+      <parameters>
+        <parameter name="object">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SURFACE_CLASS" c:identifier="GDK_WIN32_SURFACE_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="klass">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WIN32_SURFACE_GET_CLASS" c:identifier="GDK_WIN32_SURFACE_GET_CLASS" introspectable="0">
+      <parameters>
+        <parameter name="obj">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <class name="Win32Display" c:symbol-prefix="win32_display" c:type="GdkWin32Display" parent="Gdk.Display" glib:type-name="GdkWin32Display" glib:get-type="gdk_win32_display_get_type" glib:type-struct="Win32DisplayClass">
+      <function name="get_primary_monitor" c:identifier="gdk_win32_display_get_primary_monitor" introspectable="0">
+        <return-value>
+          <type name="Gdk.Monitor" c:type="GdkMonitor*"/>
+        </return-value>
+        <parameters>
+          <parameter name="display" transfer-ownership="none">
+            <type name="Gdk.Display" c:type="GdkDisplay*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="get_wgl_version" c:identifier="gdk_win32_display_get_wgl_version">
+        <doc xml:space="preserve">Retrieves the version of the WGL implementation.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">%TRUE if WGL is available</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkDisplay`</doc>
+            <type name="Gdk.Display" c:type="GdkDisplay*"/>
+          </parameter>
+          <parameter name="major" direction="out" caller-allocates="0" transfer-ownership="full">
+            <doc xml:space="preserve">return location for the WGL major version</doc>
+            <type name="gint" c:type="int*"/>
+          </parameter>
+          <parameter name="minor" direction="out" caller-allocates="0" transfer-ownership="full">
+            <doc xml:space="preserve">return location for the WGL minor version</doc>
+            <type name="gint" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="add_filter" c:identifier="gdk_win32_display_add_filter">
+        <doc xml:space="preserve">Adds an event filter to @window, allowing you to intercept messages
+before they reach GDK. This is a low-level operation and makes it
+easy to break GDK and/or GTK, so you have to know what you're
+doing.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkWin32Display`</doc>
+            <type name="Win32Display" c:type="GdkWin32Display*"/>
+          </instance-parameter>
+          <parameter name="function" transfer-ownership="none" scope="notified" closure="1">
+            <doc xml:space="preserve">filter callback</doc>
+            <type name="Win32MessageFilterFunc" c:type="GdkWin32MessageFilterFunc"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">data to pass to filter callback</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_egl_display" c:identifier="gdk_win32_display_get_egl_display" version="4.4">
+        <doc xml:space="preserve">Retrieves the EGL display connection object for the given GDK display.</doc>
+        <return-value transfer-ownership="none" nullable="1">
+          <doc xml:space="preserve">the EGL display</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a Win32 display</doc>
+            <type name="Win32Display" c:type="GdkDisplay*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="get_win32hcursor" c:identifier="gdk_win32_display_get_win32hcursor" introspectable="0">
+        <doc xml:space="preserve">Returns the Win32 HCURSOR wrapper object belonging to a `GdkCursor`,
+potentially creating the cursor object.
+
+Be aware that the returned cursor may not be unique to @cursor.
+It may for example be shared with its fallback cursor.</doc>
+        <return-value>
+          <doc xml:space="preserve">a GdkWin32HCursor</doc>
+          <type name="Win32HCursor" c:type="GdkWin32HCursor*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkDisplay`</doc>
+            <type name="Win32Display" c:type="GdkWin32Display*"/>
+          </instance-parameter>
+          <parameter name="cursor" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkCursor`</doc>
+            <type name="Gdk.Cursor" c:type="GdkCursor*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="remove_filter" c:identifier="gdk_win32_display_remove_filter">
+        <doc xml:space="preserve">Remove a filter previously added with gdk_win32_display_add_filter().</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">A `GdkWin32Display`</doc>
+            <type name="Win32Display" c:type="GdkWin32Display*"/>
+          </instance-parameter>
+          <parameter name="function" transfer-ownership="none" scope="notified" closure="1">
+            <doc xml:space="preserve">previously-added filter function</doc>
+            <type name="Win32MessageFilterFunc" c:type="GdkWin32MessageFilterFunc"/>
+          </parameter>
+          <parameter name="data" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">user data for previously-added filter function</doc>
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="set_cursor_theme" c:identifier="gdk_win32_display_set_cursor_theme">
+        <doc xml:space="preserve">Sets the cursor theme from which the images for cursor
+should be taken.
+
+If the windowing system supports it, existing cursors created
+with [ctor@Gdk.Cursor.new_from_name] are updated to reflect the theme
+change. Custom cursors constructed with [ctor@Gdk.Cursor.new_from_texture]
+will have to be handled by the application (GTK applications can
+learn about cursor theme changes by listening for change notification
+for the corresponding `GtkSetting`).</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkDisplay`</doc>
+            <type name="Win32Display" c:type="GdkDisplay*"/>
+          </instance-parameter>
+          <parameter name="name" transfer-ownership="none" nullable="1" allow-none="1">
+            <doc xml:space="preserve">the name of the cursor theme to use, or %NULL
+  to unset a previously set value</doc>
+            <type name="utf8" c:type="const char*"/>
+          </parameter>
+          <parameter name="size" transfer-ownership="none">
+            <doc xml:space="preserve">the cursor size to use, or 0 to keep the previous size</doc>
+            <type name="gint" c:type="int"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <record name="Win32DisplayClass" c:type="GdkWin32DisplayClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32Display"/>
+    <class name="Win32DisplayManager" c:symbol-prefix="win32_display_manager" c:type="GdkWin32DisplayManager" parent="Gdk.DisplayManager" glib:type-name="GdkWin32DisplayManager" glib:get-type="gdk_win32_display_manager_get_type" glib:type-struct="Win32DisplayManagerClass"/>
+    <record name="Win32DisplayManagerClass" c:type="GdkWin32DisplayManagerClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32DisplayManager"/>
+    <class name="Win32Drag" c:symbol-prefix="win32_drag" c:type="GdkWin32Drag" parent="Gdk.Drag" glib:type-name="GdkWin32Drag" glib:get-type="gdk_win32_drag_get_type" glib:type-struct="Win32DragClass"/>
+    <record name="Win32DragClass" c:type="GdkWin32DragClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32Drag"/>
+    <class name="Win32GLContext" c:symbol-prefix="win32_gl_context" c:type="GdkWin32GLContext" parent="Gdk.GLContext" abstract="1" glib:type-name="GdkWin32GLContext" glib:get-type="gdk_win32_gl_context_get_type" glib:type-struct="Win32GLContextClass"/>
+    <record name="Win32GLContextClass" c:type="GdkWin32GLContextClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32GLContext"/>
+    <class name="Win32HCursor" c:symbol-prefix="win32_hcursor" c:type="GdkWin32HCursor" parent="GObject.Object" glib:type-name="GdkWin32HCursor" glib:get-type="gdk_win32_hcursor_get_type" glib:type-struct="Win32HCursorClass">
+      <constructor name="new" c:identifier="gdk_win32_hcursor_new">
+        <return-value transfer-ownership="full">
+          <type name="Win32HCursor" c:type="GdkWin32HCursor*"/>
+        </return-value>
+        <parameters>
+          <parameter name="display" transfer-ownership="none">
+            <type name="Win32Display" c:type="GdkWin32Display*"/>
+          </parameter>
+          <parameter name="handle" transfer-ownership="none">
+            <type name="win32.HCURSOR" c:type="gssize"/>
+          </parameter>
+          <parameter name="destroyable" transfer-ownership="none">
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </constructor>
+      <property name="destroyable" writable="1" construct-only="1" transfer-ownership="none" default-value="TRUE">
+        <type name="gboolean" c:type="gboolean"/>
+      </property>
+      <property name="display" writable="1" construct-only="1" transfer-ownership="none">
+        <type name="Gdk.Display"/>
+      </property>
+      <property name="handle" writable="1" construct-only="1" transfer-ownership="none">
+        <type name="gpointer" c:type="gpointer"/>
+      </property>
+    </class>
+    <record name="Win32HCursorClass" c:type="GdkWin32HCursorClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32HCursor"/>
+    <callback name="Win32MessageFilterFunc" c:type="GdkWin32MessageFilterFunc">
+      <doc xml:space="preserve">Specifies the type of function used to filter Windows messages before they are
+processed by GDK Win32 backend.
+
+The @return_value must be set, if this function returns
+`GDK_WIN32_MESSAGE_FILTER_REMOVE`, otherwise it is ignored.
+
+The event translation and message filtering are orthogonal -
+if a filter wants a GDK event queued, it should do that itself.</doc>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve">a `GdkWin32MessageFilterReturn` value.</doc>
+        <type name="Win32MessageFilterReturn" c:type="GdkWin32MessageFilterReturn"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <type name="Win32Display" c:type="GdkWin32Display*"/>
+        </parameter>
+        <parameter name="message" transfer-ownership="none">
+          <type name="win32.MSG" c:type="gpointer"/>
+        </parameter>
+        <parameter name="return_value" transfer-ownership="none">
+          <doc xml:space="preserve">a location to store the return value for the message</doc>
+          <type name="gint" c:type="int*"/>
+        </parameter>
+        <parameter name="data" transfer-ownership="none" nullable="1" allow-none="1" closure="3">
+          <doc xml:space="preserve">user data set when the filter was installed.</doc>
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <enumeration name="Win32MessageFilterReturn" c:type="GdkWin32MessageFilterReturn">
+      <doc xml:space="preserve">Specifies the result of applying a `GdkWin32MessageFilterFunc` to a Windows message.</doc>
+      <member name="continue" value="0" c:identifier="GDK_WIN32_MESSAGE_FILTER_CONTINUE">
+        <doc xml:space="preserve">event not handled, continue processing.</doc>
+      </member>
+      <member name="remove" value="1" c:identifier="GDK_WIN32_MESSAGE_FILTER_REMOVE">
+        <doc xml:space="preserve">event handled, terminate processing.</doc>
+      </member>
+    </enumeration>
+    <class name="Win32Monitor" c:symbol-prefix="win32_monitor" c:type="GdkWin32Monitor" parent="Gdk.Monitor" glib:type-name="GdkWin32Monitor" glib:get-type="gdk_win32_monitor_get_type" glib:type-struct="Win32MonitorClass">
+      <function name="get_workarea" c:identifier="gdk_win32_monitor_get_workarea">
+        <doc xml:space="preserve">Retrieves the size and position of the &#x201C;work area&#x201D; on a monitor
+within the display coordinate space.
+
+The returned geometry is in &#x201D;application pixels&#x201D;, not in &#x201D;device pixels&#x201D;
+(see [method@Gdk.Monitor.get_scale_factor]).</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <parameter name="monitor" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkMonitor`</doc>
+            <type name="Gdk.Monitor" c:type="GdkMonitor*"/>
+          </parameter>
+          <parameter name="workarea" direction="out" caller-allocates="1" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkRectangle` to be filled with the monitor workarea</doc>
+            <type name="Gdk.Rectangle" c:type="GdkRectangle*"/>
+          </parameter>
+        </parameters>
+      </function>
+    </class>
+    <record name="Win32MonitorClass" c:type="GdkWin32MonitorClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32Monitor"/>
+    <class name="Win32Screen" c:symbol-prefix="win32_screen" c:type="GdkWin32Screen" parent="GObject.Object" glib:type-name="GdkWin32Screen" glib:get-type="gdk_win32_screen_get_type" glib:type-struct="Win32ScreenClass"/>
+    <record name="Win32ScreenClass" c:type="GdkWin32ScreenClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32Screen"/>
+    <class name="Win32Surface" c:symbol-prefix="win32_surface" c:type="GdkWin32Surface" parent="Gdk.Surface" glib:type-name="GdkWin32Surface" glib:get-type="gdk_win32_surface_get_type" glib:type-struct="Win32SurfaceClass">
+      <function name="get_impl_hwnd" c:identifier="gdk_win32_surface_get_impl_hwnd" deprecated="1" deprecated-version="4.8">
+        <doc-deprecated xml:space="preserve">Use gdk_win32_surface_get_handle() instead.</doc-deprecated>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">the associated @surface HWND handle.</doc>
+          <type name="win32.HWND" c:type="gssize"/>
+        </return-value>
+        <parameters>
+          <parameter name="surface" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkSurface`</doc>
+            <type name="Gdk.Surface" c:type="GdkSurface*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="is_win32" c:identifier="gdk_win32_surface_is_win32" deprecated="1" deprecated-version="4.8">
+        <doc-deprecated xml:space="preserve">Use `GDK_IS_WIN32_SURFACE` instead.</doc-deprecated>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">%TRUE if the @surface is a win32 implemented surface.</doc>
+          <type name="gboolean" c:type="gboolean"/>
+        </return-value>
+        <parameters>
+          <parameter name="surface" transfer-ownership="none">
+            <doc xml:space="preserve">a `GdkSurface`</doc>
+            <type name="Gdk.Surface" c:type="GdkSurface*"/>
+          </parameter>
+        </parameters>
+      </function>
+      <function name="lookup_for_display" c:identifier="gdk_win32_surface_lookup_for_display" introspectable="0">
+        <return-value nullable="1">
+          <doc xml:space="preserve">the %GdkSurface associated with the given @anid, or %NULL.</doc>
+          <type name="Gdk.Surface" c:type="GdkSurface*"/>
+        </return-value>
+        <parameters>
+          <parameter name="display" transfer-ownership="none">
+            <doc xml:space="preserve">a %GdkDisplay</doc>
+            <type name="Gdk.Display" c:type="GdkDisplay*"/>
+          </parameter>
+          <parameter name="anid" transfer-ownership="none">
+            <doc xml:space="preserve">a HWND window handle</doc>
+            <type name="win32.HWND" c:type="gssize"/>
+          </parameter>
+        </parameters>
+      </function>
+      <method name="get_handle" c:identifier="gdk_win32_surface_get_handle">
+        <doc xml:space="preserve">Returns the HWND handle belonging to @surface.</doc>
+        <return-value transfer-ownership="none">
+          <doc xml:space="preserve">the associated HWND handle.</doc>
+          <type name="win32.HWND" c:type="gssize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="surface" transfer-ownership="none">
+            <doc xml:space="preserve">a native `GdkSurface`.</doc>
+            <type name="Win32Surface" c:type="GdkSurface*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="set_urgency_hint" c:identifier="gdk_win32_surface_set_urgency_hint">
+        <doc xml:space="preserve">Flashes the specified @surface.</doc>
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="surface" transfer-ownership="none">
+            <doc xml:space="preserve">a native `GdkSurface`.</doc>
+            <type name="Win32Surface" c:type="GdkSurface*"/>
+          </instance-parameter>
+          <parameter name="urgent" transfer-ownership="none">
+            <doc xml:space="preserve">if %TRUE, flashes both the window and the taskbar button
+         continuously.</doc>
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <record name="Win32SurfaceClass" c:type="GdkWin32SurfaceClass" disguised="1" opaque="1" glib:is-gtype-struct-for="Win32Surface"/>
+    <record name="_Win32HCursorFake" c:type="_GdkWin32HCursorFake">
+      <field name="parent_instance" writable="1">
+        <type name="GObject.Object" c:type="GObject"/>
+      </field>
+      <field name="readonly_handle" writable="1">
+        <type name="win32.HCURSOR" c:type="HCURSOR"/>
+      </field>
+    </record>
+    <function name="win32_handle_table_lookup" c:identifier="gdk_win32_handle_table_lookup">
+      <return-value transfer-ownership="none" nullable="1">
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="handle" transfer-ownership="none">
+          <type name="win32.HWND" c:type="gssize"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function-macro name="win32_hcursor_get_handle_fast" c:identifier="gdk_win32_hcursor_get_handle_fast" introspectable="0">
+      <parameters>
+        <parameter name="x">
+        </parameter>
+      </parameters>
+    </function-macro>
+  </namespace>
+</repository>

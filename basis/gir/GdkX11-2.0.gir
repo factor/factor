@@ -1,0 +1,1577 @@
+<?xml version="1.0"?>
+<!-- This file was automatically generated from C sources - DO NOT EDIT!
+To affect the contents of this file, edit the original C definitions,
+and/or use gtk-doc annotations.  -->
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="Gdk" version="2.0"/>
+  <include name="GdkPixbuf" version="2.0"/>
+  <include name="Gio" version="2.0"/>
+  <include name="Pango" version="1.0"/>
+  <include name="xlib" version="2.0"/>
+  <package name="gdk-x11-2.0"/>
+  <namespace name="GdkX11"
+             version="2.0"
+             shared-library="libgdk-x11-2.0.so.0"
+             c:identifier-prefixes="Gdk"
+             c:symbol-prefixes="gdk">
+    <function-macro name="COLORMAP_XCOLORMAP"
+                    c:identifier="GDK_COLORMAP_XCOLORMAP"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="72"/>
+      <parameters>
+        <parameter name="cmap">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="COLORMAP_XDISPLAY"
+                    c:identifier="GDK_COLORMAP_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="71"/>
+      <parameters>
+        <parameter name="cmap">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="CURSOR_XCURSOR"
+                    c:identifier="GDK_CURSOR_XCURSOR"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="74"/>
+      <parameters>
+        <parameter name="cursor">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="CURSOR_XDISPLAY"
+                    c:identifier="GDK_CURSOR_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="73"/>
+      <parameters>
+        <parameter name="cursor">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DISPLAY_XDISPLAY"
+                    c:identifier="GDK_DISPLAY_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="87"/>
+      <parameters>
+        <parameter name="display">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DRAWABLE_XDISPLAY"
+                    c:identifier="GDK_DRAWABLE_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="93"/>
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="DRAWABLE_XID"
+                    c:identifier="GDK_DRAWABLE_XID"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="94"/>
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="FONT_XDISPLAY"
+                    c:identifier="GDK_FONT_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="216"/>
+      <parameters>
+        <parameter name="font">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="FONT_XFONT"
+                    c:identifier="GDK_FONT_XFONT"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="205"/>
+      <parameters>
+        <parameter name="font">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="GC_GET_XGC"
+                    c:identifier="GDK_GC_GET_XGC"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="101"/>
+      <parameters>
+        <parameter name="gc">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="GC_XDISPLAY"
+                    c:identifier="GDK_GC_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="95"/>
+      <parameters>
+        <parameter name="gc">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="GC_XGC" c:identifier="GDK_GC_XGC" introspectable="0">
+      <source-position filename="gdkx.h" line="96"/>
+      <parameters>
+        <parameter name="gc">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IMAGE_XDISPLAY"
+                    c:identifier="GDK_IMAGE_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="75"/>
+      <parameters>
+        <parameter name="image">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="IMAGE_XIMAGE"
+                    c:identifier="GDK_IMAGE_XIMAGE"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="76"/>
+      <parameters>
+        <parameter name="image">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="PIXMAP_XDISPLAY"
+                    c:identifier="GDK_PIXMAP_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="91"/>
+      <parameters>
+        <parameter name="pix">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="PIXMAP_XID"
+                    c:identifier="GDK_PIXMAP_XID"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="92"/>
+      <parameters>
+        <parameter name="pix">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="SCREEN_XDISPLAY"
+                    c:identifier="GDK_SCREEN_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="97"/>
+      <parameters>
+        <parameter name="screen">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="SCREEN_XNUMBER"
+                    c:identifier="GDK_SCREEN_XNUMBER"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="99"/>
+      <parameters>
+        <parameter name="screen">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="SCREEN_XSCREEN"
+                    c:identifier="GDK_SCREEN_XSCREEN"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="98"/>
+      <parameters>
+        <parameter name="screen">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="VISUAL_XVISUAL"
+                    c:identifier="GDK_VISUAL_XVISUAL"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="100"/>
+      <parameters>
+        <parameter name="vis">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WINDOW_XDISPLAY"
+                    c:identifier="GDK_WINDOW_XDISPLAY"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="89"/>
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WINDOW_XID"
+                    c:identifier="GDK_WINDOW_XID"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="90"/>
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="WINDOW_XWINDOW"
+                    c:identifier="GDK_WINDOW_XWINDOW"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="114"/>
+      <parameters>
+        <parameter name="win">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="font_lookup"
+                    c:identifier="gdk_font_lookup"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="220"/>
+      <parameters>
+        <parameter name="xid">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function-macro name="font_lookup_for_display"
+                    c:identifier="gdk_font_lookup_for_display"
+                    introspectable="0">
+      <source-position filename="gdkx.h" line="207"/>
+      <parameters>
+        <parameter name="display">
+        </parameter>
+        <parameter name="xid">
+        </parameter>
+      </parameters>
+    </function-macro>
+    <function name="net_wm_supports" c:identifier="gdk_net_wm_supports">
+      <source-position filename="gdkx.h" line="171"/>
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="property" transfer-ownership="none">
+          <type name="Gdk.Atom" c:type="GdkAtom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_atom_to_xatom" c:identifier="gdk_x11_atom_to_xatom">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="264">Converts from a #GdkAtom to the X atom for the default GDK display
+with the same string value.</doc>
+      <source-position filename="gdkx.h" line="190"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="271">the X atom corresponding to @atom.</doc>
+        <type name="xlib.Atom" c:type="Atom"/>
+      </return-value>
+      <parameters>
+        <parameter name="atom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="266">A #GdkAtom</doc>
+          <type name="Gdk.Atom" c:type="GdkAtom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_atom_to_xatom_for_display"
+              c:identifier="gdk_x11_atom_to_xatom_for_display"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="173">Converts from a #GdkAtom to the X atom for a #GdkDisplay
+with the same string value. The special value %GDK_NONE
+is converted to %None.</doc>
+      <source-position filename="gdkx.h" line="181"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="182">the X atom corresponding to @atom, or %None</doc>
+        <type name="xlib.Atom" c:type="Atom"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="175">A #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="atom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="176">A #GdkAtom, or %GDK_NONE</doc>
+          <type name="Gdk.Atom" c:type="GdkAtom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_colormap_foreign_new"
+              c:identifier="gdk_x11_colormap_foreign_new"
+              version="2.2"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkcolor-x11.c"
+           line="1249">If xcolormap refers to a colormap previously known to GTK+,
+returns a new reference to the existing #GdkColormap object,
+otherwise creates a new GdkColormap object and returns that</doc>
+      <source-position filename="gdkx.h" line="141"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkcolor-x11.c"
+             line="1258">the #GdkColormap object for @xcolormap.
+  Free with g_object_unref(). Note that for colormap created
+  with gdk_x11_colormap_foreign_new(), unref'ing the last
+  reference to the object will only free the #GdkColoramp
+  object and not call XFreeColormap()</doc>
+        <type name="Gdk.Colormap" c:type="GdkColormap*"/>
+      </return-value>
+      <parameters>
+        <parameter name="visual" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcolor-x11.c"
+               line="1251">a #GdkVisual</doc>
+          <type name="Gdk.Visual" c:type="GdkVisual*"/>
+        </parameter>
+        <parameter name="xcolormap" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcolor-x11.c"
+               line="1252">The XID of a colormap with visual @visual</doc>
+          <type name="xlib.Colormap" c:type="Colormap"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_colormap_get_xcolormap"
+              c:identifier="gdk_x11_colormap_get_xcolormap">
+      <doc xml:space="preserve"
+           filename="gdkcolor-x11.c"
+           line="1468">Returns the X colormap belonging to a #GdkColormap.</doc>
+      <source-position filename="gdkx.h" line="48"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkcolor-x11.c"
+             line="1474">an Xlib &lt;type&gt;Colormap&lt;/type&gt;.</doc>
+        <type name="xlib.Colormap" c:type="Colormap"/>
+      </return-value>
+      <parameters>
+        <parameter name="colormap" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcolor-x11.c"
+               line="1470">a #GdkColormap.</doc>
+          <type name="Gdk.Colormap" c:type="GdkColormap*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_colormap_get_xdisplay"
+              c:identifier="gdk_x11_colormap_get_xdisplay"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkcolor-x11.c"
+           line="1448">Returns the display of a #GdkColormap.</doc>
+      <source-position filename="gdkx.h" line="47"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkcolor-x11.c"
+             line="1454">an Xlib &lt;type&gt;Display*&lt;/type&gt;.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="colormap" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcolor-x11.c"
+               line="1450">a #GdkColormap.</doc>
+          <type name="Gdk.Colormap" c:type="GdkColormap*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_cursor_get_xcursor"
+              c:identifier="gdk_x11_cursor_get_xcursor">
+      <doc xml:space="preserve"
+           filename="gdkcursor-x11.c"
+           line="444">Returns the X cursor belonging to a #GdkCursor.</doc>
+      <source-position filename="gdkx.h" line="50"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkcursor-x11.c"
+             line="450">an Xlib &lt;type&gt;Cursor&lt;/type&gt;.</doc>
+        <type name="xlib.Cursor" c:type="Cursor"/>
+      </return-value>
+      <parameters>
+        <parameter name="cursor" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcursor-x11.c"
+               line="446">a #GdkCursor.</doc>
+          <type name="Gdk.Cursor" c:type="GdkCursor*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_cursor_get_xdisplay"
+              c:identifier="gdk_x11_cursor_get_xdisplay"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkcursor-x11.c"
+           line="428">Returns the display of a #GdkCursor.</doc>
+      <source-position filename="gdkx.h" line="49"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkcursor-x11.c"
+             line="434">an Xlib &lt;type&gt;Display*&lt;/type&gt;.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="cursor" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcursor-x11.c"
+               line="430">a #GdkCursor.</doc>
+          <type name="Gdk.Cursor" c:type="GdkCursor*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_broadcast_startup_message"
+              c:identifier="gdk_x11_display_broadcast_startup_message"
+              version="2.12"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="1121">Sends a startup notification message of type @message_type to
+@display.
+
+This is a convenience function for use by code that implements the
+freedesktop startup notification specification. Applications should
+not normally need to call it directly. See the &lt;ulink
+url="http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt"&gt;Startup
+Notification Protocol specification&lt;/ulink&gt; for
+definitions of the message types and keys that can be used.</doc>
+      <source-position filename="gdkx.h" line="157"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="1123">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="message_type" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="1124">startup notification message type ("new", "change",
+or "remove")</doc>
+          <type name="utf8" c:type="const char*"/>
+        </parameter>
+        <parameter name="..." transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="1126">a list of key/value pairs (as strings), terminated by a
+%NULL key. (A %NULL value for a key will cause that key to be
+skipped in the output.)</doc>
+          <varargs/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_get_startup_notification_id"
+              c:identifier="gdk_x11_display_get_startup_notification_id"
+              version="2.12">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="1449">Gets the startup notification ID for a display.</doc>
+      <source-position filename="gdkx.h" line="151"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkdisplay-x11.c"
+             line="1455">the startup notification ID for @display</doc>
+        <type name="utf8" c:type="const gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="1451">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_get_user_time"
+              c:identifier="gdk_x11_display_get_user_time"
+              version="2.8">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="1395">Returns the timestamp of the last user interaction on
+@display. The timestamp is taken from events caused
+by user interaction such as key presses or pointer
+movements. See gdk_x11_window_set_user_time().</doc>
+      <source-position filename="gdkx.h" line="149"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkdisplay-x11.c"
+             line="1404">the timestamp of the last user interaction</doc>
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="1397">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_get_xdisplay"
+              c:identifier="gdk_x11_display_get_xdisplay"
+              version="2.2"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="952">Returns the X display of a #GdkDisplay.</doc>
+      <source-position filename="gdkx.h" line="51"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkdisplay-x11.c"
+             line="955">an X display.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="954">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_grab"
+              c:identifier="gdk_x11_display_grab"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="775">Call XGrabServer() on @display.
+To ungrab the display again, use gdk_x11_display_ungrab().
+
+gdk_x11_display_grab()/gdk_x11_display_ungrab() calls can be nested.</doc>
+      <source-position filename="gdkx.h" line="196"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="777">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_set_cursor_theme"
+              c:identifier="gdk_x11_display_set_cursor_theme"
+              version="2.8">
+      <doc xml:space="preserve"
+           filename="gdkcursor-x11.c"
+           line="612">Sets the cursor theme from which the images for cursor
+should be taken.
+
+If the windowing system supports it, existing cursors created
+with gdk_cursor_new(), gdk_cursor_new_for_display() and
+gdk_cursor_new_for_name() are updated to reflect the theme
+change. Custom cursors constructed with gdk_cursor_new_from_pixmap()
+or gdk_cursor_new_from_pixbuf() will have to be handled
+by the application (GTK+ applications can learn about
+cursor theme changes by listening for change notification
+for the corresponding #GtkSetting).</doc>
+      <source-position filename="gdkx.h" line="153"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcursor-x11.c"
+               line="614">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="theme" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcursor-x11.c"
+               line="615">the name of the cursor theme to use, or %NULL to unset
+        a previously set value</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+        <parameter name="size" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkcursor-x11.c"
+               line="617">the cursor size to use, or 0 to keep the previous size</doc>
+          <type name="gint" c:type="const gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_string_to_compound_text"
+              c:identifier="gdk_x11_display_string_to_compound_text">
+      <source-position filename="gdkx.h" line="239"/>
+      <return-value transfer-ownership="none">
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="str" transfer-ownership="none">
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+        <parameter name="encoding" transfer-ownership="none">
+          <type name="Gdk.Atom" c:type="GdkAtom*"/>
+        </parameter>
+        <parameter name="format" transfer-ownership="none">
+          <type name="gint" c:type="gint*"/>
+        </parameter>
+        <parameter name="ctext" transfer-ownership="none">
+          <type name="guint8" c:type="guchar**"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <type name="gint" c:type="gint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_text_property_to_text_list"
+              c:identifier="gdk_x11_display_text_property_to_text_list">
+      <source-position filename="gdkx.h" line="232"/>
+      <return-value transfer-ownership="none">
+        <type name="gint" c:type="gint"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="encoding" transfer-ownership="none">
+          <type name="Gdk.Atom" c:type="GdkAtom"/>
+        </parameter>
+        <parameter name="format" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="text" transfer-ownership="none">
+          <type name="guint8" c:type="const guchar*"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="list" transfer-ownership="none">
+          <type name="utf8" c:type="gchar***"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_ungrab"
+              c:identifier="gdk_x11_display_ungrab"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="800">Ungrab @display after it has been grabbed with
+gdk_x11_display_grab().</doc>
+      <source-position filename="gdkx.h" line="197"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="802">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_display_utf8_to_compound_text"
+              c:identifier="gdk_x11_display_utf8_to_compound_text">
+      <source-position filename="gdkx.h" line="245"/>
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="str" transfer-ownership="none">
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+        <parameter name="encoding" transfer-ownership="none">
+          <type name="Gdk.Atom" c:type="GdkAtom*"/>
+        </parameter>
+        <parameter name="format" transfer-ownership="none">
+          <type name="gint" c:type="gint*"/>
+        </parameter>
+        <parameter name="ctext" transfer-ownership="none">
+          <type name="guint8" c:type="guchar**"/>
+        </parameter>
+        <parameter name="length" transfer-ownership="none">
+          <type name="gint" c:type="gint*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_drawable_get_xdisplay"
+              c:identifier="gdk_x11_drawable_get_xdisplay"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkdrawable-x11.c"
+           line="894">Returns the display of a #GdkDrawable.</doc>
+      <source-position filename="gdkx.h" line="41"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkdrawable-x11.c"
+             line="900">an Xlib &lt;type&gt;Display*&lt;/type&gt;.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="drawable" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdrawable-x11.c"
+               line="896">a #GdkDrawable.</doc>
+          <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_drawable_get_xid"
+              c:identifier="gdk_x11_drawable_get_xid">
+      <doc xml:space="preserve"
+           filename="gdkdrawable-x11.c"
+           line="911">Returns the X resource (window or pixmap) belonging to a #GdkDrawable.</doc>
+      <source-position filename="gdkx.h" line="42"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkdrawable-x11.c"
+             line="917">the ID of @drawable's X resource.</doc>
+        <type name="xlib.XID" c:type="XID"/>
+      </return-value>
+      <parameters>
+        <parameter name="drawable" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdrawable-x11.c"
+               line="913">a #GdkDrawable.</doc>
+          <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_font_get_name" c:identifier="gdk_x11_font_get_name">
+      <source-position filename="gdkx.h" line="214"/>
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="const char*"/>
+      </return-value>
+      <parameters>
+        <parameter name="font" transfer-ownership="none">
+          <type name="Gdk.Font" c:type="GdkFont*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_font_get_xdisplay"
+              c:identifier="gdk_x11_font_get_xdisplay"
+              introspectable="0">
+      <source-position filename="gdkx.h" line="213"/>
+      <return-value>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="font" transfer-ownership="none">
+          <type name="Gdk.Font" c:type="GdkFont*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_font_get_xfont" c:identifier="gdk_x11_font_get_xfont">
+      <source-position filename="gdkx.h" line="204"/>
+      <return-value transfer-ownership="none" nullable="1">
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="font" transfer-ownership="none">
+          <type name="Gdk.Font" c:type="GdkFont*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_free_compound_text"
+              c:identifier="gdk_x11_free_compound_text">
+      <source-position filename="gdkx.h" line="251"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="ctext" transfer-ownership="none">
+          <type name="guint8" c:type="guchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_free_text_list" c:identifier="gdk_x11_free_text_list">
+      <source-position filename="gdkx.h" line="238"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="list" transfer-ownership="none">
+          <type name="utf8" c:type="gchar**"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_gc_get_xdisplay"
+              c:identifier="gdk_x11_gc_get_xdisplay"
+              introspectable="0"
+              deprecated="1"
+              deprecated-version="2.22">
+      <doc xml:space="preserve"
+           filename="gdkgc-x11.c"
+           line="669">Returns the display of a #GdkGC.</doc>
+      <doc-deprecated xml:space="preserve">#GdkGC has been replaced by #cairo_t.</doc-deprecated>
+      <source-position filename="gdkx.h" line="54"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkgc-x11.c"
+             line="675">an Xlib &lt;type&gt;Display*&lt;/type&gt;.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="gc" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkgc-x11.c"
+               line="671">a #GdkGC.</doc>
+          <type name="Gdk.GC" c:type="GdkGC*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_gc_get_xgc"
+              c:identifier="gdk_x11_gc_get_xgc"
+              introspectable="0"
+              deprecated="1"
+              deprecated-version="2.22">
+      <doc xml:space="preserve"
+           filename="gdkgc-x11.c"
+           line="687">Returns the X GC of a #GdkGC.</doc>
+      <doc-deprecated xml:space="preserve">#GdkGC has been replaced by #cairo_t.</doc-deprecated>
+      <source-position filename="gdkx.h" line="55"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkgc-x11.c"
+             line="693">an Xlib &lt;type&gt;GC&lt;/type&gt;.</doc>
+        <type c:type="GC"/>
+      </return-value>
+      <parameters>
+        <parameter name="gc" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkgc-x11.c"
+               line="689">a #GdkGC.</doc>
+          <type name="Gdk.GC" c:type="GdkGC*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_get_default_root_xwindow"
+              c:identifier="gdk_x11_get_default_root_xwindow">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="728">Gets the root window of the default screen
+(see gdk_x11_get_default_screen()).</doc>
+      <source-position filename="gdkx.h" line="66"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkmain-x11.c"
+             line="734">an Xlib &lt;type&gt;Window&lt;/type&gt;.</doc>
+        <type name="xlib.Window" c:type="Window"/>
+      </return-value>
+    </function>
+    <function name="x11_get_default_screen"
+              c:identifier="gdk_x11_get_default_screen">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="713">Gets the default GTK+ screen number.</doc>
+      <source-position filename="gdkx.h" line="68"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkmain-x11.c"
+             line="718">returns the screen number specified by
+  the --display command line option or the DISPLAY environment
+  variable when gdk_init() calls XOpenDisplay().</doc>
+        <type name="gint" c:type="gint"/>
+      </return-value>
+    </function>
+    <function name="x11_get_default_xdisplay"
+              c:identifier="gdk_x11_get_default_xdisplay"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="742">Gets the default GTK+ display.</doc>
+      <source-position filename="gdkx.h" line="67"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkmain-x11.c"
+             line="747">the Xlib &lt;type&gt;Display*&lt;/type&gt; for the display
+specified in the &lt;option&gt;--display&lt;/option&gt; command line option
+or the &lt;envar&gt;DISPLAY&lt;/envar&gt; environment variable.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+    </function>
+    <function name="x11_get_server_time"
+              c:identifier="gdk_x11_get_server_time">
+      <source-position filename="gdkx.h" line="148"/>
+      <return-value transfer-ownership="none">
+        <type name="guint32" c:type="guint32"/>
+      </return-value>
+      <parameters>
+        <parameter name="window" transfer-ownership="none">
+          <type name="Gdk.Window" c:type="GdkWindow*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_get_xatom_by_name"
+              c:identifier="gdk_x11_get_xatom_by_name">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="467">Returns the X atom for GDK's default display corresponding to @atom_name.
+This function caches the result, so if called repeatedly it is much
+faster than XInternAtom(), which is a round trip to the server each time.</doc>
+      <source-position filename="gdkx.h" line="192"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="475">a X atom for GDK's default display.</doc>
+        <type name="xlib.Atom" c:type="Atom"/>
+      </return-value>
+      <parameters>
+        <parameter name="atom_name" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="469">a string</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_get_xatom_by_name_for_display"
+              c:identifier="gdk_x11_get_xatom_by_name_for_display"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="445">Returns the X atom for a #GdkDisplay corresponding to @atom_name.
+This function caches the result, so if called repeatedly it is much
+faster than XInternAtom(), which is a round trip to the server each time.</doc>
+      <source-position filename="gdkx.h" line="185"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="454">a X atom for a #GdkDisplay</doc>
+        <type name="xlib.Atom" c:type="Atom"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="447">a #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="atom_name" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="448">a string</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_get_xatom_name" c:identifier="gdk_x11_get_xatom_name">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="508">Returns the name of an X atom for GDK's default display. This
+function is meant mainly for debugging, so for convenience, unlike
+&lt;function&gt;XAtomName()&lt;/function&gt; and gdk_atom_name(), the result
+doesn't need to be freed. Also, this function will never return %NULL,
+even if @xatom is invalid.</doc>
+      <source-position filename="gdkx.h" line="193"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="518">name of the X atom; this string is owned by GTK+,
+  so it shouldn't be modifed or freed.</doc>
+        <type name="utf8" c:type="const gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="xatom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="510">an X atom for GDK's default display</doc>
+          <type name="xlib.Atom" c:type="Atom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_get_xatom_name_for_display"
+              c:identifier="gdk_x11_get_xatom_name_for_display"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="484">Returns the name of an X atom for its display. This
+function is meant mainly for debugging, so for convenience, unlike
+XAtomName() and gdk_atom_name(), the result doesn't need to
+be freed.</doc>
+      <source-position filename="gdkx.h" line="187"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="494">name of the X atom; this string is owned by GDK,
+  so it shouldn't be modifed or freed.</doc>
+        <type name="utf8" c:type="const gchar*"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="486">the #GdkDisplay where @xatom is defined</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="xatom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="487">an X atom</doc>
+          <type name="xlib.Atom" c:type="Atom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_grab_server" c:identifier="gdk_x11_grab_server">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="687">Call gdk_x11_display_grab() on the default display.
+To ungrab the server again, use gdk_x11_ungrab_server().
+
+gdk_x11_grab_server()/gdk_x11_ungrab_server() calls can be nested.</doc>
+      <source-position filename="gdkx.h" line="173"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+    <function name="x11_image_get_xdisplay"
+              c:identifier="gdk_x11_image_get_xdisplay"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkimage-x11.c"
+           line="748">Returns the display of a #GdkImage.</doc>
+      <source-position filename="gdkx.h" line="45"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkimage-x11.c"
+             line="754">an Xlib &lt;type&gt;Display*&lt;/type&gt;.</doc>
+        <type name="xlib.Display" c:type="Display*"/>
+      </return-value>
+      <parameters>
+        <parameter name="image" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkimage-x11.c"
+               line="750">a #GdkImage.</doc>
+          <type name="Gdk.Image" c:type="GdkImage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_image_get_ximage"
+              c:identifier="gdk_x11_image_get_ximage"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkimage-x11.c"
+           line="768">Returns the X image belonging to a #GdkImage.</doc>
+      <source-position filename="gdkx.h" line="46"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkimage-x11.c"
+             line="774">an &lt;type&gt;XImage*&lt;/type&gt;.</doc>
+        <type name="xlib.XImage" c:type="XImage*"/>
+      </return-value>
+      <parameters>
+        <parameter name="image" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkimage-x11.c"
+               line="770">a #GdkImage.</doc>
+          <type name="Gdk.Image" c:type="GdkImage*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_lookup_xdisplay"
+              c:identifier="gdk_x11_lookup_xdisplay"
+              version="2.2"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkdisplay-x11.c"
+           line="901">Find the #GdkDisplay corresponding to @display, if any exists.</doc>
+      <source-position filename="gdkx.h" line="177"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkdisplay-x11.c"
+             line="907">the #GdkDisplay, if found, otherwise %NULL.</doc>
+        <type name="Gdk.Display" c:type="GdkDisplay*"/>
+      </return-value>
+      <parameters>
+        <parameter name="xdisplay" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkdisplay-x11.c"
+               line="903">a pointer to an X Display</doc>
+          <type name="xlib.Display" c:type="Display*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_pixmap_get_drawable_impl"
+              c:identifier="gdk_x11_pixmap_get_drawable_impl"
+              introspectable="0">
+      <source-position filename="gdkx.h" line="44"/>
+      <return-value>
+        <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+      </return-value>
+      <parameters>
+        <parameter name="pixmap" transfer-ownership="none">
+          <type name="Gdk.Pixmap" c:type="GdkPixmap*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_register_standard_event_type"
+              c:identifier="gdk_x11_register_standard_event_type">
+      <source-position filename="gdkx.h" line="198"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="event_base" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+        <parameter name="n_events" transfer-ownership="none">
+          <type name="gint" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_get_monitor_output"
+              c:identifier="gdk_x11_screen_get_monitor_output"
+              version="2.14">
+      <doc xml:space="preserve"
+           filename="gdkscreen-x11.c"
+           line="457">Gets the XID of the specified output/monitor.
+If the X server does not support version 1.2 of the RANDR
+extension, 0 is returned.</doc>
+      <source-position filename="gdkx.h" line="165"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkscreen-x11.c"
+             line="466">the XID of the monitor</doc>
+        <type name="xlib.XID" c:type="XID"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkscreen-x11.c"
+               line="459">a #GdkScreen</doc>
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+        <parameter name="monitor_num" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkscreen-x11.c"
+               line="460">number of the monitor, between 0 and gdk_screen_get_n_monitors (screen)</doc>
+          <type name="gint" c:type="gint"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_get_screen_number"
+              c:identifier="gdk_x11_screen_get_screen_number"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkscreen-x11.c"
+           line="594">Returns the index of a #GdkScreen.</doc>
+      <source-position filename="gdkx.h" line="58"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkscreen-x11.c"
+             line="597">the position of @screen among the screens of
+  its display.</doc>
+        <type name="gint" c:type="int"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkscreen-x11.c"
+               line="596">a #GdkScreen.</doc>
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_get_window_manager_name"
+              c:identifier="gdk_x11_screen_get_window_manager_name">
+      <source-position filename="gdkx.h" line="63"/>
+      <return-value transfer-ownership="none">
+        <type name="utf8" c:type="const char*"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_get_xscreen"
+              c:identifier="gdk_x11_screen_get_xscreen"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkscreen-x11.c"
+           line="579">Returns the screen of a #GdkScreen.</doc>
+      <source-position filename="gdkx.h" line="57"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkscreen-x11.c"
+             line="582">an Xlib &lt;type&gt;Screen*&lt;/type&gt;</doc>
+        <type name="xlib.Screen" c:type="Screen*"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkscreen-x11.c"
+               line="581">a #GdkScreen.</doc>
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_lookup_visual"
+              c:identifier="gdk_x11_screen_lookup_visual"
+              version="2.2">
+      <doc xml:space="preserve"
+           filename="gdkvisual-x11.c"
+           line="547">Looks up the #GdkVisual for a particular screen and X Visual ID.</doc>
+      <source-position filename="gdkx.h" line="128"/>
+      <return-value transfer-ownership="none">
+        <doc xml:space="preserve"
+             filename="gdkvisual-x11.c"
+             line="554">the #GdkVisual (owned by the screen
+  object), or %NULL if the visual ID wasn't found.</doc>
+        <type name="Gdk.Visual" c:type="GdkVisual*"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkvisual-x11.c"
+               line="549">a #GdkScreen.</doc>
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+        <parameter name="xvisualid" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkvisual-x11.c"
+               line="550">an X Visual ID.</doc>
+          <type name="xlib.VisualID" c:type="VisualID"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_screen_supports_net_wm_hint"
+              c:identifier="gdk_x11_screen_supports_net_wm_hint">
+      <source-position filename="gdkx.h" line="162"/>
+      <return-value transfer-ownership="none">
+        <type name="gboolean" c:type="gboolean"/>
+      </return-value>
+      <parameters>
+        <parameter name="screen" transfer-ownership="none">
+          <type name="Gdk.Screen" c:type="GdkScreen*"/>
+        </parameter>
+        <parameter name="property" transfer-ownership="none">
+          <type name="Gdk.Atom" c:type="GdkAtom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_set_sm_client_id"
+              c:identifier="gdk_x11_set_sm_client_id"
+              version="2.24">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="398">Sets the &lt;literal&gt;SM_CLIENT_ID&lt;/literal&gt; property on the application's leader window so that
+the window manager can save the application's state using the X11R6 ICCCM
+session management protocol.
+
+See the X Session Management Library documentation for more information on
+session management and the Inter-Client Communication Conventions Manual</doc>
+      <source-position filename="gdkx.h" line="225"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="sm_client_id" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkmain-x11.c"
+               line="400">the client id assigned by the session manager when the
+   connection was opened, or %NULL to remove the property.</doc>
+          <type name="utf8" c:type="const gchar*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_ungrab_server" c:identifier="gdk_x11_ungrab_server">
+      <doc xml:space="preserve"
+           filename="gdkmain-x11.c"
+           line="701">Ungrab the default display after it has been grabbed with
+gdk_x11_grab_server().</doc>
+      <source-position filename="gdkx.h" line="174"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+    </function>
+    <function name="x11_visual_get_xvisual"
+              c:identifier="gdk_x11_visual_get_xvisual"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkvisual-x11.c"
+           line="644">Returns the X visual belonging to a #GdkVisual.</doc>
+      <source-position filename="gdkx.h" line="52"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkvisual-x11.c"
+             line="650">an Xlib &lt;type&gt;Visual*&lt;/type&gt;.</doc>
+        <type name="xlib.Visual" c:type="Visual*"/>
+      </return-value>
+      <parameters>
+        <parameter name="visual" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkvisual-x11.c"
+               line="646">a #GdkVisual.</doc>
+          <type name="Gdk.Visual" c:type="GdkVisual*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_window_foreign_new_for_display"
+              c:identifier="gdk_x11_window_foreign_new_for_display"
+              version="2.24"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkwindow-x11.c"
+           line="886">Wraps a native window in a #GdkWindow.
+
+This may fail if the window has been destroyed. If the window
+was already known to GDK, a new reference to the existing
+#GdkWindow is returned.</doc>
+      <source-position filename="gdkx.h" line="227"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkwindow-x11.c"
+             line="897">a #GdkWindow wrapper for the native window or
+  %NULL if the window has been destroyed. The wrapper will be
+  newly created, if one doesn't exist already.</doc>
+        <type name="Gdk.Window" c:type="GdkWindow*"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="888">the #GdkDisplay where the window handle comes from.</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="window" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="889">an XLib &lt;type&gt;Window&lt;/type&gt;</doc>
+          <type name="xlib.Window" c:type="Window"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_window_get_drawable_impl"
+              c:identifier="gdk_x11_window_get_drawable_impl"
+              introspectable="0">
+      <source-position filename="gdkx.h" line="43"/>
+      <return-value>
+        <type name="Gdk.Drawable" c:type="GdkDrawable*"/>
+      </return-value>
+      <parameters>
+        <parameter name="window" transfer-ownership="none">
+          <type name="Gdk.Window" c:type="GdkWindow*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_window_lookup_for_display"
+              c:identifier="gdk_x11_window_lookup_for_display"
+              version="2.24"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkwindow-x11.c"
+           line="1010">Looks up the #GdkWindow that wraps the given native window handle.</doc>
+      <source-position filename="gdkx.h" line="229"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkwindow-x11.c"
+             line="1017">the #GdkWindow wrapper for the native window,
+   or %NULL if there is none.</doc>
+        <type name="Gdk.Window" c:type="GdkWindow*"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="1012">the #GdkDisplay corresponding to the window handle</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="window" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="1013">an XLib &lt;type&gt;Window&lt;/type&gt;</doc>
+          <type name="xlib.Window" c:type="Window"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_window_move_to_current_desktop"
+              c:identifier="gdk_x11_window_move_to_current_desktop"
+              version="2.8">
+      <doc xml:space="preserve"
+           filename="gdkwindow-x11.c"
+           line="1799">Moves the window to the correct workspace when running under a
+window manager that supports multiple workspaces, as described
+in the &lt;ulink url="http://www.freedesktop.org/Standards/wm-spec"&gt;Extended
+Window Manager Hints&lt;/ulink&gt;.  Will not do anything if the
+window is already on all workspaces.</doc>
+      <source-position filename="gdkx.h" line="61"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="window" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="1801">a #GdkWindow</doc>
+          <type name="Gdk.Window" c:type="GdkWindow*"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_window_set_user_time"
+              c:identifier="gdk_x11_window_set_user_time"
+              version="2.6">
+      <doc xml:space="preserve"
+           filename="gdkwindow-x11.c"
+           line="3696">The application can use this call to update the _NET_WM_USER_TIME
+property on a toplevel window.  This property stores an Xserver
+time which represents the time of the last user input event
+received for this window.  This property may be used by the window
+manager to alter the focus, stacking, and/or placement behavior of
+windows when they are mapped depending on whether the new window
+was created by a user action or is a "pop-up" window activated by a
+timer or some other event.
+
+Note that this property is automatically updated by GDK, so this
+function should only be used by applications which handle input
+events bypassing GDK.</doc>
+      <source-position filename="gdkx.h" line="59"/>
+      <return-value transfer-ownership="none">
+        <type name="none" c:type="void"/>
+      </return-value>
+      <parameters>
+        <parameter name="window" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="3698">A toplevel #GdkWindow</doc>
+          <type name="Gdk.Window" c:type="GdkWindow*"/>
+        </parameter>
+        <parameter name="timestamp" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkwindow-x11.c"
+               line="3699">An XServer timestamp to which the property should be set</doc>
+          <type name="guint32" c:type="guint32"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_xatom_to_atom"
+              c:identifier="gdk_x11_xatom_to_atom"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="339">Convert from an X atom for the default display to the corresponding
+#GdkAtom.</doc>
+      <source-position filename="gdkx.h" line="191"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="346">the corresponding G#dkAtom.</doc>
+        <type name="Gdk.Atom" c:type="GdkAtom"/>
+      </return-value>
+      <parameters>
+        <parameter name="xatom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="341">an X atom for the default GDK display</doc>
+          <type name="xlib.Atom" c:type="Atom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="x11_xatom_to_atom_for_display"
+              c:identifier="gdk_x11_xatom_to_atom_for_display"
+              version="2.2"
+              introspectable="0">
+      <doc xml:space="preserve"
+           filename="gdkproperty-x11.c"
+           line="279">Convert from an X atom for a #GdkDisplay to the corresponding
+#GdkAtom.</doc>
+      <source-position filename="gdkx.h" line="183"/>
+      <return-value>
+        <doc xml:space="preserve"
+             filename="gdkproperty-x11.c"
+             line="287">the corresponding #GdkAtom.</doc>
+        <type name="Gdk.Atom" c:type="GdkAtom"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="281">A #GdkDisplay</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="xatom" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkproperty-x11.c"
+               line="282">an X atom</doc>
+          <type name="xlib.Atom" c:type="Atom"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="xid_table_lookup"
+              c:identifier="gdk_xid_table_lookup"
+              deprecated="1"
+              deprecated-version="2.24">
+      <doc xml:space="preserve"
+           filename="gdkxid.c"
+           line="115">Returns the Gdk object associated with the given X id for the default
+display.</doc>
+      <doc-deprecated xml:space="preserve">This function will be removed in GTK+ 3.0. GTK+
+    only stores windows in its X id table nowadays, so use
+    gdk_x11_window_lookup_for_display() instead.</doc-deprecated>
+      <source-position filename="gdkx.h" line="170"/>
+      <return-value transfer-ownership="none" nullable="1">
+        <doc xml:space="preserve"
+             filename="gdkxid.c"
+             line="122">the associated Gdk object, which may be a #GdkPixmap,
+    a #GdkWindow or a #GdkFont or %NULL if no object is associated
+    with the X id.</doc>
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="xid" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkxid.c"
+               line="117">an X id.</doc>
+          <type name="xlib.XID" c:type="XID"/>
+        </parameter>
+      </parameters>
+    </function>
+    <function name="xid_table_lookup_for_display"
+              c:identifier="gdk_xid_table_lookup_for_display"
+              version="2.2"
+              deprecated="1"
+              deprecated-version="2.24">
+      <doc xml:space="preserve"
+           filename="gdkxid.c"
+           line="80">Returns the GDK object associated with the given X id.</doc>
+      <doc-deprecated xml:space="preserve">This function will be removed in GTK+ 3.0. GTK+
+    only stores windows in its X id table nowadays, so use
+    gdk_x11_window_lookup_for_display() instead.</doc-deprecated>
+      <source-position filename="gdkx.h" line="145"/>
+      <return-value transfer-ownership="none" nullable="1">
+        <doc xml:space="preserve"
+             filename="gdkxid.c"
+             line="87">the associated Gdk object, which may be a #GdkPixmap,
+    a #GdkWindow or a #GdkFont or %NULL if no object is associated
+    with the X id.</doc>
+        <type name="gpointer" c:type="gpointer"/>
+      </return-value>
+      <parameters>
+        <parameter name="display" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkxid.c"
+               line="82">the #GdkDisplay.</doc>
+          <type name="Gdk.Display" c:type="GdkDisplay*"/>
+        </parameter>
+        <parameter name="xid" transfer-ownership="none">
+          <doc xml:space="preserve"
+               filename="gdkxid.c"
+               line="83">an X id.</doc>
+          <type name="xlib.XID" c:type="XID"/>
+        </parameter>
+      </parameters>
+    </function>
+  </namespace>
+</repository>

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<repository xmlns="http://www.gtk.org/introspection/core/1.0" xmlns:c="http://www.gtk.org/introspection/c/1.0" version="1.2">
+  <namespace name="xfixes" version="4.0" c:identifier-prefixes="X" c:symbol-prefixes="X">
+    <record name="XserverRegion" c:type="XserverRegion"/>
+  </namespace>
+</repository>
