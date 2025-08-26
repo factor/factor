@@ -109,10 +109,10 @@ CONSTANT: events-mask
     }
 
 : event-loc ( event -- loc )
-    [ x>> ] [ y>> ] bi [ >fixnum ] bi@ 2array ;
+    [ x>> ] [ y>> ] bi [ gl-unscale >fixnum ] bi@ 2array ;
 
 : event-dim ( event -- dim )
-    [ width>> ] [ height>> ] bi 2array ;
+    [ width>> ] [ height>> ] bi [ gl-unscale >fixnum ] bi@ 2array ;
 
 : scroll-direction ( event -- pair )
     direction>> {
@@ -235,8 +235,8 @@ icon-data [ default-icon-data ] initialize
 : on-configure ( window event user-data -- ? )
     drop swap dup gtk_widget_get_toplevel [ = ] keep window dup active?>> [
         swap [ swap GdkEventConfigure memory>struct ] dip
-        [ event-loc [ gl-unscale >fixnum ] map >>window-loc drop ]
-        [ event-dim [ gl-unscale >fixnum ] map >>dim relayout-1 ] if
+        [ event-loc >>window-loc drop ]
+        [ event-dim >>dim relayout-1 ] if
     ] [ 3drop ] if f ;
 
 : on-map ( win event user-data -- ? )
