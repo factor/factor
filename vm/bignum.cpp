@@ -1783,7 +1783,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   scan_c = BIGNUM_START_PTR(c);
   while (scan_a < a_end)
     (*scan_c++) = (*scan_a++);
-  a = c;
+  swap(a, c);  // Use swap instead of assignment
   size_b = BIGNUM_LENGTH(b);
   data_root<bignum> d(allot_bignum(size_b, 0), this);
   scan_b = BIGNUM_START_PTR(b);
@@ -1791,7 +1791,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   scan_d = BIGNUM_START_PTR(d);
   while (scan_b < b_end)
     (*scan_d++) = (*scan_b++);
-  b = d;
+  swap(b, d);  // Use swap instead of assignment
 
   // Initial reduction: make sure that 0 <= b <= a.
   if (bignum_compare(a.untagged(), b.untagged()) == BIGNUM_COMPARISON_LESS) {
