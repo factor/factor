@@ -4,13 +4,13 @@ namespace factor {
 
 bool factor_vm::fatal_erroring_p;
 
-static inline void fa_diddly_atal_error() {
+[[noreturn]] static inline void fa_diddly_atal_error() {
   printf("fatal_error in fatal_error!\n");
   breakpoint();
   ::_exit(86);
 }
 
-void fatal_error(const char* msg, cell tagged) {
+[[noreturn]] void fatal_error(const char* msg, cell tagged) {
   if (factor_vm::fatal_erroring_p)
     fa_diddly_atal_error();
 
