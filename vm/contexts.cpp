@@ -149,7 +149,7 @@ context* factor_vm::new_context() {
 
 // Allocates memory
 void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
+  ctx->context_objects[OBJ_CONTEXT] = allot_alien(reinterpret_cast<cell>(ctx));
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -248,7 +248,7 @@ void factor_vm::primitive_context_object_for() {
 
 // Allocates memory
 cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
-  fixnum depth = (fixnum)(top - bottom + sizeof(cell));
+  fixnum depth = static_cast<fixnum>(top - bottom + sizeof(cell));
 
   if (depth < 0) {
     general_error(error, false_object, false_object);
@@ -256,12 +256,12 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   
   // Sanity check - stacks shouldn't be enormous
   const cell MAX_STACK_SIZE = 1024 * 1024 * 16; // 16MB max
-  if ((cell)depth > MAX_STACK_SIZE) {
+  if (static_cast<cell>(depth) > MAX_STACK_SIZE) {
     general_error(error, false_object, false_object);
   }
   
   array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
-  memcpy(a + 1, (void*)bottom, depth);
+  memcpy(a + 1, reinterpret_cast<void*>(bottom), depth);
   return tag<array>(a);
 }
 
@@ -300,11 +300,11 @@ static cell array_to_stack(array* array, cell bottom, segment* stack_seg) {
   cell depth = array_capacity(array) * sizeof(cell);
   
   // Check if the array will fit in the stack segment
-  if (depth > (cell)(stack_seg->end - bottom)) {
+  if (depth > static_cast<cell>(stack_seg->end - bottom)) {
     fatal_error("Stack overflow: array too large for stack segment", depth);
   }
   
-  memcpy((void*)bottom, array + 1, depth);
+  memcpy(reinterpret_cast<void*>(bottom), array + 1, depth);
   return bottom + depth - sizeof(cell);
 }
 
@@ -362,8 +362,8 @@ void factor_vm::primitive_load_locals() {
     general_error(ERROR_RETAINSTACK_OVERFLOW, false_object, false_object);
   }
   
-  memcpy((cell*)(ctx->retainstack + sizeof(cell)),
-         (cell*)(ctx->datastack - sizeof(cell) * (count - 1)),
+  memcpy(reinterpret_cast<cell*>(ctx->retainstack + sizeof(cell)),
+         reinterpret_cast<cell*>(ctx->datastack - sizeof(cell) * (count - 1)),
          bytes_to_copy);
   ctx->datastack -= bytes_to_copy;
   ctx->retainstack += bytes_to_copy;

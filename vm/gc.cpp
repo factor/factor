@@ -17,13 +17,13 @@ gc_event::gc_event(gc_op op, factor_vm* parent)
 void gc_event::reset_timer() { temp_time = nano_count(); }
 
 void gc_event::ended_phase(gc_phase phase) {
-  times[phase] = (cell)(nano_count() - temp_time);
+  times[phase] = static_cast<cell>(nano_count() - temp_time);
 }
 
 void gc_event::ended_gc(factor_vm* parent) {
   data_heap_after = parent->data_room();
   code_heap_after = parent->code->allocator->as_allocator_room();
-  total_time = (cell)(nano_count() - start_time);
+  total_time = static_cast<cell>(nano_count() - start_time);
 }
 
 gc_state::gc_state(gc_op op, factor_vm* parent) : op(op) {
