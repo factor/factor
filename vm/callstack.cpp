@@ -17,11 +17,11 @@ callstack* factor_vm::allot_callstack(cell size) {
 // will have popped a necessary frame... however this word is only
 // called by continuation implementation, and user code shouldn't
 // be calling it at all, so we leave it as it is for now.
-cell factor_vm::second_from_top_stack_frame(context* ctx) {
-  cell frame_top = ctx->callstack_top;
+cell factor_vm::second_from_top_stack_frame(context* ctx_) {
+  cell frame_top = ctx_->callstack_top;
   for (cell i = 0; i < 2; ++i) {
     cell pred = code->frame_predecessor(frame_top);
-    if (pred >= ctx->callstack_bottom)
+    if (pred >= ctx_->callstack_bottom)
       return frame_top;
     frame_top = pred;
   }
@@ -29,9 +29,9 @@ cell factor_vm::second_from_top_stack_frame(context* ctx) {
 }
 
 // Allocates memory (allot_callstack)
-cell factor_vm::capture_callstack(context* ctx) {
-  cell top = second_from_top_stack_frame(ctx);
-  cell bottom = ctx->callstack_bottom;
+cell factor_vm::capture_callstack(context* ctx_) {
+  cell top = second_from_top_stack_frame(ctx_);
+  cell bottom = ctx_->callstack_bottom;
 
   fixnum size = std::max((cell)0, bottom - top);
 
@@ -54,7 +54,8 @@ cell factor_vm::capture_callstack(context* ctx) {
 
 // Allocates memory (capture_callstack)
 void factor_vm::primitive_callstack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
+  void* ptr = pinned_alien_offset(ctx->peek());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   ctx->replace(capture_callstack(other_ctx));
 }
 

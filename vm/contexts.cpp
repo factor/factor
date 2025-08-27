@@ -185,7 +185,8 @@ void factor_vm::primitive_set_context_object() {
 }
 
 void factor_vm::primitive_context_object_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->pop());
+  void* ptr = pinned_alien_offset(ctx->pop());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   fixnum n = untag_fixnum(ctx->peek());
   ctx->replace(other_ctx->context_objects[n]);
 }
@@ -212,7 +213,8 @@ cell factor_vm::datastack_to_array(context* ctx) {
 // Allocates memory
 void factor_vm::primitive_datastack_for() {
   data_root<alien> alien_ctx(ctx->pop(), this);
-  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  void* ptr = pinned_alien_offset(alien_ctx.value());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   cell array = datastack_to_array(other_ctx);
   ctx->push(array);
 }
@@ -226,7 +228,8 @@ cell factor_vm::retainstack_to_array(context* ctx) {
 
 // Allocates memory
 void factor_vm::primitive_retainstack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
+  void* ptr = pinned_alien_offset(ctx->peek());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
