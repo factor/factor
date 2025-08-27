@@ -95,7 +95,7 @@ M: array draw-text
     ] do-matrix ;
 
 {
-    { [ os macos? ] [ "core-text" ] }
-    { [ os windows? ] [ "uniscribe" ] }
-    { [ os unix? ] [ "pango" ] }
-} cond "ui.text." prepend require
+    { [ os macos? ] [ "ui.text.core-text" ] }
+    { [ os windows? ] [ "ui.text.uniscribe" ] }
+    { [ os unix? ] [ "ui.text.pango" ] }
+} cond require

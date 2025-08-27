@@ -7,9 +7,11 @@ IN: bootstrap.ui
 "bootstrap.threads" require
 
 "ui-backend" get [
+    "ui.backend." prepend
+] [
     {
-        { [ os macos? ] [ "cocoa" ] }
-        { [ os windows? ] [ "windows" ] }
-        { [ os unix? ] [ "gtk2" ] }
+        { [ os macos? ] [ "ui.backend.cocoa" ] }
+        { [ os windows? ] [ "ui.backend.windows" ] }
+        { [ os unix? ] [ "ui.backend.gtk2" ] }
     } cond
-] unless* "ui.backend." prepend require
+] if* require
