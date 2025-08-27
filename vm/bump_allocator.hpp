@@ -7,11 +7,11 @@ struct bump_allocator {
   cell end;
   cell size;
 
-  bump_allocator(cell size, cell start)
-      : here(start), start(start), end(start + size), size(size) {}
+  bump_allocator(cell sz, cell st)
+      : here(st), start(st), end(st + sz), size(sz) {}
 
   bool contains_p(object* obj) {
-    return (cell)obj >= start && (cell)obj < end;
+    return reinterpret_cast<cell>(obj) >= start && reinterpret_cast<cell>(obj) < end;
   }
 
   object* allot(cell data_size) {

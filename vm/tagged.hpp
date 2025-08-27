@@ -29,7 +29,7 @@ template <typename Type> struct tagged {
     return reinterpret_cast<Type*>(UNTAG(value_));
   }
 
-  explicit tagged(cell tagged) : value_(tagged) {}
+  explicit tagged(cell tag_val) : value_(tag_val) {}
   explicit tagged(Type* untagged) : value_(factor::tag(untagged)) {}
 
   void set_value(const cell ptr) {
