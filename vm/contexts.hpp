@@ -68,13 +68,13 @@ struct context {
   cell peek() { 
     FACTOR_ASSERT(datastack >= datastack_seg->start);
     FACTOR_ASSERT(datastack < datastack_seg->end);
-    return *(cell*)datastack; 
+    return *reinterpret_cast<cell*>(datastack); 
   }
 
   void replace(cell tagged) { 
     FACTOR_ASSERT(datastack >= datastack_seg->start);
     FACTOR_ASSERT(datastack < datastack_seg->end);
-    *(cell*)datastack = tagged; 
+    *reinterpret_cast<cell*>(datastack) = tagged; 
   }
 
   cell pop() {
