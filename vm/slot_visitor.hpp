@@ -5,16 +5,16 @@ template <typename Fixup>
 cell object::base_size(Fixup fixup) const {
   switch (type()) {
     case ARRAY_TYPE:
-      return array_size((array*)this);
+      return array_size(reinterpret_cast<array*>(const_cast<object*>(this)));
     case BIGNUM_TYPE:
-      return array_size((bignum*)this);
+      return array_size(reinterpret_cast<bignum*>(const_cast<object*>(this)));
     case BYTE_ARRAY_TYPE:
-      return array_size((byte_array*)this);
+      return array_size(reinterpret_cast<byte_array*>(const_cast<object*>(this)));
     case STRING_TYPE:
-      return string_size(string_capacity((string*)this));
+      return string_size(string_capacity(reinterpret_cast<string*>(const_cast<object*>(this))));
     case TUPLE_TYPE: {
-      tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-          untag<object>(((tuple*)this)->layout));
+      tuple_layout* layout = reinterpret_cast<tuple_layout*>(fixup.translate_data(
+          untag<object>((reinterpret_cast<tuple*>(const_cast<object*>(this)))->layout)));
       return tuple_size(layout);
     }
     case QUOTATION_TYPE:
@@ -30,11 +30,11 @@ cell object::base_size(Fixup fixup) const {
     case WRAPPER_TYPE:
       return sizeof(wrapper);
     case CALLSTACK_TYPE: {
-      cell callstack_length = untag_fixnum(((callstack*)this)->length);
+      cell callstack_length = untag_fixnum((reinterpret_cast<callstack*>(const_cast<object*>(this)))->length);
       return callstack_object_size(callstack_length);
     }
     default:
-      critical_error("Invalid header in base_size", (cell)this);
+      critical_error("Invalid header in base_size", reinterpret_cast<cell>(this));
       return 0;
   }
 }
@@ -43,7 +43,7 @@ cell object::base_size(Fixup fixup) const {
 template <typename Fixup>
 cell object::size(Fixup fixup) const {
   if (free_p())
-    return ((free_heap_block*)this)->size();
+    return (reinterpret_cast<const free_heap_block*>(this))->size();
   return align(base_size(fixup), data_alignment);
 }
 
@@ -60,10 +60,10 @@ inline cell object::slot_count(Fixup fixup) const {
   cell t = type();
   if (t == ARRAY_TYPE) {
     // capacity + n slots
-    return 1 + array_capacity((array*)this);
+    return 1 + array_capacity(reinterpret_cast<array*>(const_cast<object*>(this)));
   } else if (t == TUPLE_TYPE) {
-    tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-        untag<object>(((tuple*)this)->layout));
+    tuple_layout* layout = reinterpret_cast<tuple_layout*>(fixup.translate_data(
+        untag<object>((reinterpret_cast<tuple*>(const_cast<object*>(this)))->layout)));
     // layout + n slots
     return 1 + tuple_capacity(layout);
   } else {
@@ -80,7 +80,7 @@ inline cell object::slot_count(Fixup fixup) const {
       case WORD_TYPE: return 8;
       case DLL_TYPE: return 1;
       default:
-        critical_error("Invalid header in slot_count", (cell)this);
+        critical_error("Invalid header in slot_count", reinterpret_cast<cell>(this));
         return 0; // can't happen
     }
   }
@@ -187,9 +187,9 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
   if (obj->type() == CALLSTACK_TYPE)
-    visit_callstack_object((callstack*)obj);
+    visit_callstack_object(reinterpret_cast<callstack*>(obj));
   else {
-    cell* start = (cell*)obj + 1;
+    cell* start = reinterpret_cast<cell*>(obj) + 1;
     cell* end = start + obj->slot_count(fixup);
     visit_object_array(start, end);
   }
@@ -197,7 +197,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
-  visit_object_array((cell*)region->start, top + 1);
+  visit_object_array(reinterpret_cast<cell*>(region->start), top + 1);
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
@@ -256,21 +256,21 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
-    if (callsite == (cell)-1)
+    if (callsite == static_cast<cell>(-1))
       return;
 
 #ifdef DEBUG_GC_MAPS
     FACTOR_PRINT("call frame code block " << compiled << " with offset "
                  << return_address);
 #endif
-    cell* stack_pointer = (cell*)(frame_top + FRAME_RETURN_ADDRESS);
+    cell* stack_pointer = reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
     uint8_t* bitmap = info->gc_info_bitmap();
 
     // Subtract old value of base pointer from every derived pointer.
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1) {
+      if (base_pointer != static_cast<uint32_t>(-1)) {
 #ifdef DEBUG_GC_MAPS
         FACTOR_PRINT("visiting derived root " << spill_slot
                      << " with base pointer " << base_pointer);
@@ -295,7 +295,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1)
+      if (base_pointer != static_cast<uint32_t>(-1))
         stack_pointer[spill_slot] += stack_pointer[base_pointer];
     }
   }
@@ -321,8 +321,8 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
   cell rs_ptr = ctx->retainstack;
   segment* ds_seg = ctx->datastack_seg.get();
   segment* rs_seg = ctx->retainstack_seg.get();
-  visit_stack_elements(ds_seg, (cell*)ds_ptr);
-  visit_stack_elements(rs_seg, (cell*)rs_ptr);
+  visit_stack_elements(ds_seg, reinterpret_cast<cell*>(ds_ptr));
+  visit_stack_elements(rs_seg, reinterpret_cast<cell*>(rs_ptr));
   visit_object_array(ctx->context_objects,
                      ctx->context_objects + context_object_count);
 
