@@ -1,12 +1,25 @@
 namespace factor {
 
-struct from_tenured_refs_copier : no_fixup {
+struct alignas(16) from_tenured_refs_copier : no_fixup {
   tenured_space* tenured;
   std::vector<cell> *mark_stack;
 
+  from_tenured_refs_copier() : tenured(nullptr), mark_stack(nullptr) { }
+  
   from_tenured_refs_copier(tenured_space* tenured,
                            std::vector<cell> *mark_stack)
       : tenured(tenured), mark_stack(mark_stack) { }
+  
+  from_tenured_refs_copier(const from_tenured_refs_copier& other)
+      : tenured(other.tenured), mark_stack(other.mark_stack) { }
+  
+  from_tenured_refs_copier& operator=(const from_tenured_refs_copier& other) {
+    if (this != &other) {
+      tenured = other.tenured;
+      mark_stack = other.mark_stack;
+    }
+    return *this;
+  }
 
   object* fixup_data(object* obj) {
     if (tenured->contains_p(obj)) {
