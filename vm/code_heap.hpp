@@ -41,6 +41,15 @@ struct code_heap {
 
   explicit code_heap(cell size);
   ~code_heap();
+  
+  // Disable copy operations to prevent double-delete
+  code_heap(const code_heap&) = delete;
+  code_heap& operator=(const code_heap&) = delete;
+  
+  // Move operations could be implemented if needed
+  code_heap(code_heap&&) = delete;
+  code_heap& operator=(code_heap&&) = delete;
+  
   void write_barrier(code_block* compiled);
   void clear_remembered_set();
   bool uninitialized_p(code_block* compiled);

@@ -26,6 +26,15 @@ struct data_heap {
             cell aging_size,
             cell tenured_size);
   ~data_heap();
+  
+  // Disable copy operations to prevent double-delete
+  data_heap(const data_heap&) = delete;
+  data_heap& operator=(const data_heap&) = delete;
+  
+  // Move operations could be implemented if needed
+  data_heap(data_heap&&) = delete;
+  data_heap& operator=(data_heap&&) = delete;
+  
   data_heap* grow(bump_allocator* vm_nursery, cell requested_size);
   template <typename Generation> void clear_cards(Generation* gen);
   template <typename Generation> void clear_decks(Generation* gen);
