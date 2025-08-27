@@ -28,17 +28,14 @@ void gc_event::ended_gc(factor_vm* parent) {
 
 gc_state::gc_state(gc_op op, factor_vm* parent) : op(op) {
   if (parent->gc_events) {
-    event = new gc_event(op, parent);
+    event = std::make_unique<gc_event>(op, parent);
     start_time = nano_count();
-  } else
-    event = NULL;
+  }
+  // unique_ptr automatically initializes to nullptr
 }
 
 gc_state::~gc_state() {
-  if (event) {
-    delete event;
-    event = NULL;
-  }
+  // unique_ptr automatically handles deletion
 }
 
 void factor_vm::start_gc_again() {
@@ -74,7 +71,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   // are promoted before any unreachable tenured objects are freed.
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
-  current_gc = new gc_state(op, this);
+  current_gc = std::make_unique<gc_state>(op, this);
   if (ctx)
     ctx->callstack_seg->set_border_locked(false);
   atomic::store(&current_gc_p, true);
@@ -138,8 +135,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   atomic::store(&current_gc_p, false);
   if (ctx)
     ctx->callstack_seg->set_border_locked(true);
-  delete current_gc;
-  current_gc = NULL;
+  current_gc.reset();
 
   // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
@@ -158,7 +154,7 @@ void factor_vm::primitive_compact_gc() {
 }
 
 void factor_vm::primitive_enable_gc_events() {
-  gc_events = new std::vector<gc_event>();
+  gc_events = std::make_unique<std::vector<gc_event>>();
 }
 
 // Allocates memory (byte_array_from_value, result.add)
@@ -167,11 +163,10 @@ void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);
 
-    std::vector<gc_event>* saved_gc_events = this->gc_events;
-    this->gc_events = NULL;
+    auto saved_gc_events = std::move(this->gc_events);
+    this->gc_events.reset();
 
-    FACTOR_FOR_EACH(*saved_gc_events) {
-      gc_event event = *iter;
+    for (const auto& event : *saved_gc_events) {
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));
     }
@@ -179,7 +174,7 @@ void factor_vm::primitive_disable_gc_events() {
     result.trim();
     ctx->push(result.elements.value());
 
-    delete saved_gc_events;
+    // unique_ptr automatically handles deletion
   } else
     ctx->push(false_object);
 }

@@ -7,28 +7,25 @@ struct mark_bits {
   cell size;
   cell start;
   cell bits_size;
-  cell* marked;
-  cell* forwarding;
+  std::unique_ptr<cell[]> marked;
+  std::unique_ptr<cell[]> forwarding;
 
-  void clear_mark_bits() { memset(marked, 0, bits_size * sizeof(cell)); }
+  void clear_mark_bits() { memset(marked.get(), 0, bits_size * sizeof(cell)); }
 
-  void clear_forwarding() { memset(forwarding, 0, bits_size * sizeof(cell)); }
+  void clear_forwarding() { memset(forwarding.get(), 0, bits_size * sizeof(cell)); }
 
   mark_bits(cell size, cell start)
       : size(size),
         start(start),
         bits_size(size / data_alignment / mark_bits_granularity),
-        marked(new cell[bits_size]),
-        forwarding(new cell[bits_size]) {
+        marked(std::make_unique<cell[]>(bits_size)),
+        forwarding(std::make_unique<cell[]>(bits_size)) {
     clear_mark_bits();
     clear_forwarding();
   }
 
   ~mark_bits() {
-    delete[] marked;
-    marked = NULL;
-    delete[] forwarding;
-    forwarding = NULL;
+    // unique_ptr automatically handles deletion
   }
 
   // Disable copy operations to prevent double-delete
@@ -82,10 +79,10 @@ struct mark_bits {
     }
   }
 
-  bool marked_p(const cell address) { return bitmap_elt(marked, address); }
+  bool marked_p(const cell address) { return bitmap_elt(marked.get(), address); }
 
   void set_marked_p(const cell address, const cell dsize) {
-    set_bitmap_range(marked, address, dsize);
+    set_bitmap_range(marked.get(), address, dsize);
   }
 
   // The eventual destination of a block after compaction is just the number
@@ -93,8 +90,8 @@ struct mark_bits {
   void compute_forwarding() {
     cell accum = 0;
     for (cell index = 0; index < bits_size; index++) {
-      forwarding[index] = accum;
-      accum += popcount(marked[index]);
+      forwarding.get()[index] = accum;
+      accum += popcount(marked.get()[index]);
     }
   }
 
@@ -105,11 +102,11 @@ struct mark_bits {
     std::pair<cell, cell> position = bitmap_deref(original);
     cell offset = original & (data_alignment - 1);
 
-    cell approx_popcount = forwarding[position.first];
+    cell approx_popcount = forwarding.get()[position.first];
     cell mask = ((cell)1 << position.second) - 1;
 
     cell new_line_number =
-        approx_popcount + popcount(marked[position.first] & mask);
+        approx_popcount + popcount(marked.get()[position.first] & mask);
     cell new_block = line_block(new_line_number) + offset;
     FACTOR_ASSERT(new_block <= original);
     return new_block;
@@ -120,7 +117,7 @@ struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = ((fixnum)marked[index] >> bit_index);
+      cell mask = ((fixnum)marked.get()[index] >> bit_index);
       if (~mask) {
         // Found an unmarked block on this page. Stop, it's hammer time
         cell clear_bit = rightmost_clear_bit(mask);
@@ -140,7 +137,7 @@ struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = (marked[index] >> bit_index);
+      cell mask = (marked.get()[index] >> bit_index);
       if (mask) {
         // Found an marked block on this page. Stop, it's hammer time
         cell set_bit = rightmost_set_bit(mask);

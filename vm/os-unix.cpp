@@ -119,10 +119,12 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 segment::~segment() {
-  int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
-  if (retval)
-    fatal_error("Segment deallocation failed", 0);
+  if (start != 0) {
+    int pagesize = getpagesize();
+    int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
+    if (retval)
+      fatal_error("Segment deallocation failed", 0);
+  }
 }
 
 void factor_vm::start_sampling_profiler_timer() {
@@ -278,7 +280,7 @@ static void init_signal_pipe(factor_vm* vm) {
 void factor_vm::unix_init_signals() {
   init_signal_pipe(this);
 
-  signal_callstack_seg = new segment(callstack_size, false);
+  signal_callstack_seg = std::make_unique<segment>(callstack_size, false);
 
   stack_t signal_callstack;
   signal_callstack.ss_sp = (char*)signal_callstack_seg->start;

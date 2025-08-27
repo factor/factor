@@ -1,3 +1,5 @@
+#include <memory>
+
 namespace factor {
 
 typedef void (*c_to_factor_func_type)(cell quot);
@@ -56,13 +58,13 @@ struct factor_vm {
   int callback_id;
 
   // List of callback function descriptors for PPC
-  std::list<void**> function_descriptors;
+  std::list<std::unique_ptr<void*[]>> function_descriptors;
 
   // Pooling unused contexts to make context allocation cheaper
-  std::list<context*> unused_contexts;
+  std::list<std::shared_ptr<context>> unused_contexts;
 
   // Active contexts, for tracing by the GC
-  std::set<context*> active_contexts;
+  std::set<std::shared_ptr<context>> active_contexts;
 
   // External entry points
   c_to_factor_func_type c_to_factor_func;
@@ -90,16 +92,16 @@ struct factor_vm {
   bool gc_off;
 
   // Data heap
-  data_heap* data;
+  std::unique_ptr<data_heap> data;
 
   // Code heap
-  code_heap* code;
+  std::unique_ptr<code_heap> code;
 
   // Pinned callback stubs
-  callback_heap* callbacks;
+  std::unique_ptr<callback_heap> callbacks;
 
   // Only set if we're performing a GC
-  gc_state* current_gc;
+  std::unique_ptr<gc_state> current_gc;
   volatile bool current_gc_p;
 
   // Set if we're in the jit
@@ -109,7 +111,7 @@ struct factor_vm {
   std::vector<cell> mark_stack;
 
   // If not NULL, we push GC events here
-  std::vector<gc_event>* gc_events;
+  std::unique_ptr<std::vector<gc_event>> gc_events;
 
   // If a runtime function needs to call another function which potentially
   // allocates memory, it must wrap any references to the data and code
@@ -138,7 +140,7 @@ struct factor_vm {
   uint64_t last_nano_count;
 
   // Stack for signal handlers, only used on Unix
-  segment* signal_callstack_seg;
+  std::unique_ptr<segment> signal_callstack_seg;
 
   // Are we already handling a fault? Used to catch double memory faults
   static bool fatal_erroring_p;
@@ -274,7 +276,7 @@ struct factor_vm {
   bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
-  void set_data_heap(data_heap* data_);
+  void set_data_heap(std::unique_ptr<data_heap> data_);
   void primitive_size();
   data_heap_room data_room();
   void primitive_data_room();
@@ -298,8 +300,8 @@ struct factor_vm {
     FACTOR_ASSERT(data->nursery->occupied_space() == 0);
 
     gc_off = true;
-    each_object(data->tenured, iterator);
-    each_object(data->aging, iterator);
+    each_object(data->tenured.get(), iterator);
+    each_object(data->aging.get(), iterator);
     gc_off = false;
   }
 
@@ -390,6 +392,7 @@ struct factor_vm {
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
+  void primitive_debug_print();
   void primitive_enable_ctrl_break();
   void primitive_disable_ctrl_break();
 

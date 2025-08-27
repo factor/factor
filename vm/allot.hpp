@@ -41,15 +41,15 @@ inline code_block* factor_vm::allot_code_block(cell size,
 inline object* factor_vm::allot_large_object(cell type, cell size) {
   // If tenured space does not have enough room, collect and compact
   cell required_free = size + data->high_water_mark();
-  if (!data->tenured->can_allot_p(required_free)) {
+  if (!data->tenured.get()->can_allot_p(required_free)) {
     primitive_compact_gc();
 
     // If it still won't fit, grow the heap
-    if (!data->tenured->can_allot_p(required_free)) {
+    if (!data->tenured.get()->can_allot_p(required_free)) {
       gc(COLLECT_GROWING_DATA_HEAP_OP, size);
     }
   }
-  object* obj = data->tenured->allot(size);
+  object* obj = data->tenured.get()->allot(size);
 
   // Allows initialization code to store old->new pointers
   // without hitting the write barrier in the common case of

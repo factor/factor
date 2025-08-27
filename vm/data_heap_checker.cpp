@@ -14,9 +14,9 @@ enum generation {
 inline generation generation_of(factor_vm* parent, object* obj) {
   if (parent->data->nursery->contains_p(obj))
     return NURSERY_GENERATION;
-  else if (parent->data->aging->contains_p(obj))
+  else if (parent->data->aging.get()->contains_p(obj))
     return AGING_GENERATION;
-  else if (parent->data->tenured->contains_p(obj))
+  else if (parent->data->tenured.get()->contains_p(obj))
     return TENURED_GENERATION;
   else {
     critical_error("Bad object", (cell)obj);
