@@ -107,7 +107,18 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   auto uncompress = h->data_size != h->compressed_data_size;
   auto uncompressed_data_size = uncompress ? align_page(h->data_size) : 0;
   auto temp = uncompress && uncompressed_data_size+h->compressed_data_size > data->tenured.get()->size;
-  auto buf = temp ? malloc(h->compressed_data_size) : (char*)data->tenured.get()->start+uncompressed_data_size;
+  
+  // Use unique_ptr with custom deleter for automatic cleanup
+  std::unique_ptr<char, decltype(&free)> temp_buffer(nullptr, &free);
+  char* buf = nullptr;
+  
+  if (temp) {
+    temp_buffer.reset(static_cast<char*>(malloc(h->compressed_data_size)));
+    buf = temp_buffer.get();
+  } else {
+    buf = reinterpret_cast<char*>(data->tenured.get()->start) + uncompressed_data_size;
+  }
+  
   if (!buf) fatal_error("Out of memory in load_data_heap", 0);
 
   fixnum bytes_read =
@@ -130,7 +141,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
     zstd.close();
   }
 
-  if (temp) free(buf);
+  // temp_buffer automatically frees memory via unique_ptr destructor
 
   data->tenured.get()->initial_free_list(h->data_size);
 }
@@ -145,7 +156,18 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     auto uncompress = h->code_size != h->compressed_code_size;
     auto uncompressed_code_size = uncompress ? align_page(h->code_size) : 0;
     auto temp = uncompress && uncompressed_code_size+h->compressed_code_size > code->allocator->size;
-    auto buf = temp ? malloc(h->compressed_code_size) : (char*)code->allocator->start+uncompressed_code_size;
+    
+    // Use unique_ptr with custom deleter for automatic cleanup
+    std::unique_ptr<char, decltype(&free)> temp_buffer(nullptr, &free);
+    char* buf = nullptr;
+    
+    if (temp) {
+      temp_buffer.reset(static_cast<char*>(malloc(h->compressed_code_size)));
+      buf = temp_buffer.get();
+    } else {
+      buf = reinterpret_cast<char*>(code->allocator->start) + uncompressed_code_size;
+    }
+    
     if (!buf) fatal_error("Out of memory in load_code_heap", 0);
 
     size_t bytes_read =
@@ -167,7 +189,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
       zstd.close();
     }
 
-    if (temp) free(buf);
+    // temp_buffer automatically frees memory via unique_ptr destructor
   }
 
   code->allocator->initial_free_list(h->code_size);

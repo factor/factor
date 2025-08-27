@@ -52,10 +52,8 @@ void code_heap::set_safepoint_guard(bool locked) {
 
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
-    std::set<cell>::iterator erase_from =
-      all_blocks.lower_bound(reinterpret_cast<cell>(block));
-    std::set<cell>::iterator erase_to =
-      all_blocks.lower_bound(reinterpret_cast<cell>(block) + size);
+    auto erase_from = all_blocks.lower_bound(reinterpret_cast<cell>(block));
+    auto erase_to = all_blocks.lower_bound(reinterpret_cast<cell>(block) + size);
     all_blocks.erase(erase_from, erase_to);
   };
   allocator->sweep(clear_free_blocks_from_all_blocks);
@@ -74,10 +72,10 @@ void code_heap::verify_all_blocks_set() {
 }
 
 code_block* code_heap::code_block_for_address(cell address) {
-  std::set<cell>::const_iterator blocki = all_blocks.upper_bound(address);
+  auto blocki = all_blocks.upper_bound(address);
   FACTOR_ASSERT(blocki != all_blocks.begin());
   --blocki;
-  code_block* found_block = (code_block*)*blocki;
+  auto* found_block = reinterpret_cast<code_block*>(*blocki);
   FACTOR_ASSERT(found_block->entry_point() <=
                 address // XXX this isn't valid during fixup. should store the
                         //     size in the map

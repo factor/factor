@@ -3,11 +3,11 @@ namespace factor {
 typedef intptr_t fixnum;
 typedef uintptr_t cell;
 
-inline static cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
+constexpr cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
-inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
+constexpr cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
-static const cell data_alignment = 16;
+constexpr cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
 #define LEAF_FRAME_SIZE 16
@@ -41,8 +41,8 @@ enum type_tags {
   TYPE_COUNT
 };
 
-static inline const char* type_name(cell type) {
-  static const char* const type_names[]={
+constexpr const char* type_name(cell type) {
+  constexpr const char* const type_names[]={
     "fixnum",
     "f",
     "array",
