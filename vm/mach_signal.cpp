@@ -15,7 +15,7 @@
 namespace factor {
 
 // The exception port on which our thread listens.
-mach_port_t our_exception_port;
+static mach_port_t our_exception_port;
 
 // The following sources were used as a *reference* for this exception handling
 // code:

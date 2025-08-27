@@ -222,7 +222,7 @@ void factor_vm::primitive_format_float() {
   std::ostringstream localized_stream;
   try {
     localized_stream.imbue(std::locale(locale));
-  } catch (const runtime_error&) {
+  } catch (const std::runtime_error&) {
     byte_array* array = allot_byte_array(0);
     ctx->replace(tag<byte_array>(array));
     return;
