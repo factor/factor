@@ -53,9 +53,9 @@ void code_heap::set_safepoint_guard(bool locked) {
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
     std::set<cell>::iterator erase_from =
-      all_blocks.lower_bound((cell)block);
+      all_blocks.lower_bound(reinterpret_cast<cell>(block));
     std::set<cell>::iterator erase_to =
-      all_blocks.lower_bound((cell)block + size);
+      all_blocks.lower_bound(reinterpret_cast<cell>(block) + size);
     all_blocks.erase(erase_from, erase_to);
   };
   allocator->sweep(clear_free_blocks_from_all_blocks);
@@ -68,7 +68,7 @@ void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
     (void)block;
     (void)size;
-    FACTOR_ASSERT(all_blocks.find((cell)block) != all_blocks.end());
+    FACTOR_ASSERT(all_blocks.find(reinterpret_cast<cell>(block)) != all_blocks.end());
   };
   allocator->iterate(all_blocks_set_verifier, no_fixup());
 }
@@ -104,7 +104,7 @@ void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
     (void)size;
-    all_blocks.insert((cell)block);
+    all_blocks.insert(reinterpret_cast<cell>(block));
   };
   allocator->iterate(all_blocks_set_inserter, no_fixup());
 #ifdef FACTOR_DEBUG
