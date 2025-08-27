@@ -9,23 +9,22 @@ struct startargs {
   vm_char** argv;
 };
 
-// arg must be new'ed because we're going to delete it!
+// arg ownership is transferred to the thread
 void* start_standalone_factor_thread(void* arg) {
   factor_vm* newvm = new_factor_vm();
-  startargs* args = (startargs*)arg;
+  std::unique_ptr<startargs> args((startargs*)arg);
   int argc = args->argc;
   vm_char** argv = args->argv;
-  delete args;
   newvm->start_standalone_factor(argc, argv);
   return 0;
 }
 
 VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc,
                                                             vm_char** argv) {
-  startargs* args = new startargs;
+  auto args = std::make_unique<startargs>();
   args->argc = argc;
   args->argv = argv;
-  return start_thread(start_standalone_factor_thread, args);
+  return start_thread(start_standalone_factor_thread, args.release());
 }
 
 }
