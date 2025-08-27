@@ -287,7 +287,7 @@ struct factor_vm {
   inline void each_object(Generation* gen, Iterator& iterator) {
     cell obj = gen->first_object();
     while (obj) {
-      iterator((object*)obj);
+      iterator(reinterpret_cast<object*>(obj));
       obj = gen->next_object_after(obj);
     }
   }
