@@ -86,10 +86,6 @@ footer {
     input[type=text] {
         width: 100px;
     }
-
-    nav img {
-        display: none;
-    }
 }
 
 @media screen and (max-width: 600px) {
