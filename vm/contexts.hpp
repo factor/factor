@@ -45,6 +45,14 @@ struct context {
   context(cell ds_size, cell rs_size, cell cs_size);
   ~context();
 
+  // Disable copy operations to prevent double-delete of segments
+  context(const context&) = delete;
+  context& operator=(const context&) = delete;
+  
+  // Move operations could be implemented if needed
+  context(context&&) = delete;
+  context& operator=(context&&) = delete;
+
   void reset_datastack();
   void reset_retainstack();
   void reset_callstack();

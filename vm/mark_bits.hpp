@@ -31,6 +31,14 @@ struct mark_bits {
     forwarding = NULL;
   }
 
+  // Disable copy operations to prevent double-delete
+  mark_bits(const mark_bits&) = delete;
+  mark_bits& operator=(const mark_bits&) = delete;
+  
+  // Move operations could be implemented if needed
+  mark_bits(mark_bits&&) = delete;
+  mark_bits& operator=(mark_bits&&) = delete;
+
   cell block_line(cell address) {
     return (address - start) / data_alignment;
   }
