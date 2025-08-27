@@ -316,14 +316,8 @@ struct callstack : public object {
 
   cell top() const { return reinterpret_cast<cell>(this + 1); }
   cell bottom() const {
-    // TODO: CRITICAL - Sign conversion issue here. untag_fixnum returns signed,
-    // but we're adding to unsigned. The old C-style cast preserves behavior
-    // but modern C++ casts would need explicit sign handling.
-    // Safe fix would be: 
-    //   fixnum len = untag_fixnum(length);
-    //   return reinterpret_cast<cell>(this + 1) + static_cast<cell>(len);
-    // But this needs testing to ensure no behavioral change
-    return (cell)(this + 1) + untag_fixnum(length);
+    fixnum len = untag_fixnum(length);
+    return reinterpret_cast<cell>(this + 1) + static_cast<cell>(len);
   }
 };
 
@@ -336,8 +330,8 @@ struct tuple : public object {
 };
 
 inline static cell tuple_capacity(const tuple_layout *layout) {
-  // TODO: Sign conversion - untag_fixnum returns signed, need unsigned
-  return static_cast<cell>(untag_fixnum(layout->size));
+  fixnum size = untag_fixnum(layout->size);
+  return static_cast<cell>(size);
 }
 
 inline static cell tuple_size(const tuple_layout* layout) {
@@ -345,8 +339,8 @@ inline static cell tuple_size(const tuple_layout* layout) {
 }
 
 inline static cell string_capacity(const string* str) {
-  // TODO: Sign conversion - untag_fixnum returns signed, need unsigned
-  return static_cast<cell>(untag_fixnum(str->length));
+  fixnum len = untag_fixnum(str->length);
+  return static_cast<cell>(len);
 }
 
 inline static cell string_size(cell size) { return sizeof(string) + size; }
