@@ -7,13 +7,13 @@ template <typename Type> struct data_root : public tagged<Type> {
     parent->data_roots.push_back(&this->value_);
   }
 
-  data_root(cell value, factor_vm* parent)
-      : tagged<Type>(value), parent(parent) {
+  data_root(cell value, factor_vm* parent_)
+      : tagged<Type>(value), parent(parent_) {
     push();
   }
 
-  data_root(Type* value, factor_vm* parent)
-      : tagged<Type>(value), parent(parent) {
+  data_root(Type* value, factor_vm* parent_)
+      : tagged<Type>(value), parent(parent_) {
     FACTOR_ASSERT(value);
     push();
   }
@@ -21,6 +21,14 @@ template <typename Type> struct data_root : public tagged<Type> {
   ~data_root() {
     parent->data_roots.pop_back();
   }
+
+  // Disable copy operations to prevent double-free
+  data_root(const data_root&) = delete;
+  data_root& operator=(const data_root&) = delete;
+  
+  // Move operations could be implemented if needed
+  data_root(data_root&&) = delete;
+  data_root& operator=(data_root&&) = delete;
 
   friend void swap(data_root<Type>& a, data_root<Type>& b) {
     cell tmp = a.value_;
