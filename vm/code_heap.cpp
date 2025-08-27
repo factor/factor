@@ -5,13 +5,11 @@ namespace factor {
 code_heap::code_heap(cell size) {
   if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
-  seg = new segment(align_page(size), true);
-  if (!seg)
-    fatal_error("Out of memory in code_heap constructor", size);
+  seg = std::make_unique<segment>(align_page(size), true);
 
   cell start = seg->start + getpagesize() + seh_area_size;
 
-  allocator = new free_list_allocator<code_block>(seg->end - start, start);
+  allocator = std::make_unique<free_list_allocator<code_block>>(seg->end - start, start);
 
   // See os-windows-x86.64.cpp for seh_area usage
   safepoint_page = seg->start;
@@ -19,10 +17,7 @@ code_heap::code_heap(cell size) {
 }
 
 code_heap::~code_heap() {
-  delete allocator;
-  allocator = NULL;
-  delete seg;
-  seg = NULL;
+  // unique_ptr automatically handles deletion
 }
 
 void code_heap::write_barrier(code_block* compiled) {
@@ -175,8 +170,8 @@ void factor_vm::primitive_modify_code_heap() {
     update_code_heap_words(reset_inline_caches);
   else {
     // Fast path for compilation units that only define new words.
-    FACTOR_FOR_EACH(code->uninitialized_blocks) {
-      initialize_code_block(iter->first, iter->second);
+    for (const auto& entry : code->uninitialized_blocks) {
+      initialize_code_block(entry.first, entry.second);
     }
     code->uninitialized_blocks.clear();
   }
