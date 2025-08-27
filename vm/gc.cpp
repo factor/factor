@@ -167,10 +167,10 @@ void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);
 
-    std::vector<gc_event>* gc_events = this->gc_events;
+    std::vector<gc_event>* saved_gc_events = this->gc_events;
     this->gc_events = NULL;
 
-    FACTOR_FOR_EACH(*gc_events) {
+    FACTOR_FOR_EACH(*saved_gc_events) {
       gc_event event = *iter;
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));
@@ -179,7 +179,7 @@ void factor_vm::primitive_disable_gc_events() {
     result.trim();
     ctx->push(result.elements.value());
 
-    delete this->gc_events;
+    delete saved_gc_events;
   } else
     ctx->push(false_object);
 }
