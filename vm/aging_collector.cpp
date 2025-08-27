@@ -87,8 +87,8 @@ void factor_vm::collect_aging() {
     data->reset_aging();
 
     aging_space *aging = data->aging.get();
-    slot_visitor<to_aging_copier>
-        visitor(this, to_aging_copier(aging, data->tenured.get()));
+    to_aging_copier copier(aging, data->tenured.get());
+    slot_visitor<to_aging_copier> visitor(this, copier);
 
     cell scan = aging->start + aging->occupied_space();
 

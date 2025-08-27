@@ -164,11 +164,14 @@ void factor_vm::collect_compact() {
 
 void factor_vm::collect_growing_data_heap(cell requested_size) {
   // Grow the data heap and copy all live objects to the new heap.
-  auto new_data = data->grow(&nursery, requested_size);
+  // IMPORTANT: Keep the old heap alive during collection!
+  auto old_data = std::move(data);
+  auto new_data = old_data->grow(&nursery, requested_size);
   set_data_heap(std::move(new_data));
   collect_mark_impl();
   collect_compact_impl();
   code->flush_icache();
+  // old_data automatically deleted when it goes out of scope
 }
 
 }

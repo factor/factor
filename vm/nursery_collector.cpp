@@ -37,8 +37,8 @@ struct nursery_copier : no_fixup {
 void factor_vm::collect_nursery() {
   // Copy live objects from the nursery (as determined by the root set and
   // marked cards in aging and tenured) to aging space.
-  slot_visitor<nursery_copier>
-      visitor(this, nursery_copier(data->nursery, data->aging.get()));
+  nursery_copier copier(data->nursery, data->aging.get());
+  slot_visitor<nursery_copier> visitor(this, copier);
 
   cell scan = data->aging.get()->start + data->aging.get()->occupied_space();
 
