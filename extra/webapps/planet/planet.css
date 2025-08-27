@@ -70,4 +70,8 @@ pre, code {
     pre, code {
         color: #bdc1c6;
     }
+
+    nav img {
+        filter: invert(80%);
+    }
 }
