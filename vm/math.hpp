@@ -14,9 +14,9 @@ inline cell factor_vm::from_signed_cell(fixnum x) {
 
 // Allocates memory
 inline cell factor_vm::from_unsigned_cell(cell x) {
-  if (x > (cell)fixnum_max)
+  if (x > static_cast<cell>(fixnum_max))
     return tag<bignum>(cell_to_bignum(x));
-  return tag_fixnum(x);
+  return tag_fixnum(static_cast<fixnum>(x));
 }
 
 // Allocates memory
@@ -50,8 +50,8 @@ inline double factor_vm::fixnum_to_float(cell tagged) {
 inline cell factor_vm::unbox_array_size() {
   cell obj = ctx->pop();
   fixnum n = to_fixnum_strict(obj);
-  if (n >= 0 && n < (fixnum)array_size_max) {
-    return n;
+  if (n >= 0 && n < static_cast<fixnum>(array_size_max)) {
+    return static_cast<cell>(n);
   }
   general_error(ERROR_ARRAY_SIZE, obj, tag_fixnum(array_size_max));
   return 0; // can't happen
