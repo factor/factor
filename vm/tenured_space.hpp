@@ -3,8 +3,8 @@ namespace factor {
 struct tenured_space : free_list_allocator<object> {
   object_start_map starts;
 
-  tenured_space(cell size, cell start)
-      : free_list_allocator<object>(size, start), starts(size, start) {}
+  tenured_space(cell size_, cell start_)
+      : free_list_allocator<object>(size_, start_), starts(size_, start_) {}
 
   object* allot(cell dsize) {
     object* obj = free_list_allocator<object>::allot(dsize);

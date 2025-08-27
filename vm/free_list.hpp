@@ -49,20 +49,20 @@ template <typename Block> struct free_list_allocator {
   mark_bits state;
 
   // Initializing & freeing
-  free_list_allocator(cell size, cell start);
+  free_list_allocator(cell size_, cell start_);
   void initial_free_list(cell occupied);
   void clear_free_list();
   void add_to_free_list(free_heap_block* block);
   void free(Block* block);
 
   // Allocating
-  free_heap_block* find_free_block(cell size);
-  free_heap_block* split_free_block(free_heap_block* block, cell size);
-  Block* allot(cell size);
+  free_heap_block* find_free_block(cell requested_size);
+  free_heap_block* split_free_block(free_heap_block* block, cell requested_size);
+  Block* allot(cell requested_size);
 
   // Data
   bool contains_p(Block* block);
-  bool can_allot_p(cell size);
+  bool can_allot_p(cell requested_size);
   cell occupied_space();
   cell largest_free_block();
   allocator_room as_allocator_room();
@@ -87,13 +87,13 @@ void free_list_allocator<Block>::clear_free_list() {
 
 template <typename Block>
 void free_list_allocator<Block>::add_to_free_list(free_heap_block* block) {
-  cell size = block->size();
+  cell block_size = block->size();
 
   free_block_count++;
-  free_space += size;
+  free_space += block_size;
 
-  if (size < free_list_count * data_alignment)
-    small_blocks[size / data_alignment].push_back(block);
+  if (block_size < free_list_count * data_alignment)
+    small_blocks[block_size / data_alignment].push_back(block);
   else
     large_blocks.insert(block);
 }
@@ -109,11 +109,11 @@ void free_list_allocator<Block>::initial_free_list(cell occupied) {
 }
 
 template <typename Block>
-free_list_allocator<Block>::free_list_allocator(cell size, cell start)
-    : start(start),
-      end(start + size),
-      size(size),
-      state(mark_bits(size, start)) {
+free_list_allocator<Block>::free_list_allocator(cell size_, cell start_)
+    : start(start_),
+      end(start_ + size_),
+      size(size_),
+      state(mark_bits(size_, start_)) {
   initial_free_list(0);
 }
 
@@ -123,19 +123,19 @@ bool free_list_allocator<Block>::contains_p(Block* block) {
 }
 
 template <typename Block>
-bool free_list_allocator<Block>::can_allot_p(cell size) {
-  return largest_free_block() >= std::max(size, allocation_page_size);
+bool free_list_allocator<Block>::can_allot_p(cell requested_size) {
+  return largest_free_block() >= std::max(requested_size, allocation_page_size);
 }
 
 template <typename Block>
 free_heap_block* free_list_allocator<Block>::split_free_block(
     free_heap_block* block,
-    cell size) {
-  if (block->size() != size) {
+    cell requested_size) {
+  if (block->size() != requested_size) {
     // split the block in two
-    free_heap_block* split = (free_heap_block*)((cell)block + size);
-    split->make_free(block->size() - size);
-    block->make_free(size);
+    free_heap_block* split = (free_heap_block*)((cell)block + requested_size);
+    split->make_free(block->size() - requested_size);
+    block->make_free(requested_size);
     add_to_free_list(split);
   }
 
@@ -143,14 +143,14 @@ free_heap_block* free_list_allocator<Block>::split_free_block(
 }
 
 template <typename Block>
-free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
+free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size) {
   // Check small free lists
-  cell bucket = size / data_alignment;
+  cell bucket = requested_size / data_alignment;
   if (bucket < free_list_count) {
     std::vector<free_heap_block*>& blocks = small_blocks[bucket];
     if (blocks.size() == 0) {
-      // Round up to a multiple of 'size'
-      cell large_block_size = ((allocation_page_size + size - 1) / size) * size;
+      // Round up to a multiple of 'requested_size'
+      cell large_block_size = ((allocation_page_size + requested_size - 1) / requested_size) * requested_size;
 
       // Allocate a block this big
       free_heap_block* large_block = find_free_block(large_block_size);
@@ -160,10 +160,10 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
       large_block = split_free_block(large_block, large_block_size);
 
       // Split it up into pieces and add each piece back to the free list
-      for (cell offset = 0; offset < large_block_size; offset += size) {
+      for (cell offset = 0; offset < large_block_size; offset += requested_size) {
         free_heap_block* small_block = large_block;
-        large_block = (free_heap_block*)((cell)large_block + size);
-        small_block->make_free(size);
+        large_block = (free_heap_block*)((cell)large_block + requested_size);
+        small_block->make_free(requested_size);
         add_to_free_list(small_block);
       }
     }
@@ -178,7 +178,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
   } else {
     // Check large free list
     free_heap_block key;
-    key.make_free(size);
+    key.make_free(requested_size);
     auto iter = large_blocks.lower_bound(&key);
     auto end = large_blocks.end();
 
@@ -198,12 +198,12 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell size) {
 
 
 template <typename Block>
-Block* free_list_allocator<Block>::allot(cell size) {
-  size = align(size, data_alignment);
+Block* free_list_allocator<Block>::allot(cell requested_size) {
+  cell aligned_size = align(requested_size, data_alignment);
 
-  free_heap_block* block = find_free_block(size);
+  free_heap_block* block = find_free_block(aligned_size);
   if (block) {
-    block = split_free_block(block, size);
+    block = split_free_block(block, aligned_size);
     return (Block*)block;
   }
   return NULL;
@@ -240,30 +240,30 @@ template <typename Iterator>
 void free_list_allocator<Block>::sweep(Iterator& iter) {
   clear_free_list();
 
-  cell start = this->start;
-  cell end = this->end;
+  cell current = this->start;
+  cell heap_end = this->end;
 
-  while (start != end) {
+  while (current != heap_end) {
     // find next unmarked block
-    start = state.next_unmarked_block_after(start);
+    current = state.next_unmarked_block_after(current);
 
-    if (start != end) {
+    if (current != heap_end) {
       // find size
-      cell size = state.unmarked_block_size(start);
-      FACTOR_ASSERT(size > 0);
+      cell block_size = state.unmarked_block_size(current);
+      FACTOR_ASSERT(block_size > 0);
 
-      free_heap_block* free_block = (free_heap_block*)start;
-      free_block->make_free(size);
+      free_heap_block* free_block = (free_heap_block*)current;
+      free_block->make_free(block_size);
       add_to_free_list(free_block);
-      iter((Block*)start, size);
+      iter((Block*)current, block_size);
 
-      start = start + size;
+      current = current + block_size;
     }
   }
 }
 
 template <typename Block> void free_list_allocator<Block>::sweep() {
-  auto null_sweep = [](Block* free_block, cell size) { (void)free_block; (void)size; };
+  auto null_sweep = [](Block* free_block, cell block_size) { (void)free_block; (void)block_size; };
   sweep(null_sweep);
 }
 
@@ -274,16 +274,16 @@ template <typename Iterator, typename Fixup>
 void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
                                          const Block** finger) {
   cell dest_addr = start;
-  auto compact_block_func = [&](Block* block, cell size) {
+  auto compact_block_func = [&](Block* block, cell block_size) {
     cell block_addr = (cell)block;
     if (!state.marked_p(block_addr))
       return;
-    *finger = (Block*)(block_addr + size);
+    *finger = (Block*)(block_addr + block_size);
     if (dest_addr != (cell)block) {
-      memmove((Block*)dest_addr, block, size);
+      memmove((Block*)dest_addr, block, block_size);
     }
-    iter(block, (Block*)dest_addr, size);
-    dest_addr += size;
+    iter(block, (Block*)dest_addr, block_size);
+    dest_addr += block_size;
   };
   iterate(compact_block_func, fixup);
 
@@ -300,10 +300,10 @@ void free_list_allocator<Block>::iterate(Iterator& iter, Fixup fixup) {
   cell scan = this->start;
   while (scan != this->end) {
     Block* block = (Block*)scan;
-    cell size = fixup.size(block);
+    cell block_size = fixup.size(block);
     if (!block->free_p())
-      iter(block, size);
-    scan += size;
+      iter(block, block_size);
+    scan += block_size;
   }
 }
 
