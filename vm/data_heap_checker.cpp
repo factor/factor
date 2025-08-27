@@ -19,7 +19,7 @@ inline generation generation_of(factor_vm* parent, object* obj) {
   else if (parent->data->tenured.get()->contains_p(obj))
     return TENURED_GENERATION;
   else {
-    critical_error("Bad object", (cell)obj);
+    critical_error("Bad object", reinterpret_cast<cell>(obj));
     return (generation)-1;
   }
 }
@@ -33,7 +33,7 @@ struct slot_checker {
       : parent(parent_), obj(obj_), gen(gen_) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, cell mask) {
-    cell object_card_pointer = parent->cards_offset + ((cell)obj >> card_bits);
+    cell object_card_pointer = parent->cards_offset + (reinterpret_cast<cell>(obj) >> card_bits);
     cell slot_card_pointer =
         parent->cards_offset + ((cell)slot_ptr >> card_bits);
     char slot_card_value = *(char*)slot_card_pointer;

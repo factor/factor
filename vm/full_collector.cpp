@@ -14,9 +14,9 @@ struct full_collection_copier : no_fixup {
 
   object* fixup_data(object* obj) {
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p((cell)obj)) {
-        tenured->state.set_marked_p((cell)obj, obj->size());
-        mark_stack->push_back((cell)obj);
+      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
+        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
+        mark_stack->push_back(reinterpret_cast<cell>(obj));
       }
       return obj;
     }
@@ -28,9 +28,9 @@ struct full_collection_copier : no_fixup {
     }
 
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p((cell)obj)) {
-        tenured->state.set_marked_p((cell)obj, obj->size());
-        mark_stack->push_back((cell)obj);
+      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
+        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
+        mark_stack->push_back(reinterpret_cast<cell>(obj));
       }
       return obj;
     }
@@ -48,9 +48,9 @@ struct full_collection_copier : no_fixup {
   }
 
   code_block* fixup_code(code_block* compiled) {
-    if (!code->allocator->state.marked_p((cell)compiled)) {
-      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
-      mark_stack->push_back((cell)compiled + 1);
+    if (!code->allocator->state.marked_p(reinterpret_cast<cell>(compiled))) {
+      code->allocator->state.set_marked_p(reinterpret_cast<cell>(compiled), compiled->size());
+      mark_stack->push_back(reinterpret_cast<cell>(compiled) + 1);
     }
     return compiled;
   }

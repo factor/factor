@@ -38,7 +38,7 @@ void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
   points_to_nursery.erase(compiled);
   points_to_aging.erase(compiled);
-  all_blocks.erase((cell)compiled);
+  all_blocks.erase(reinterpret_cast<cell>(compiled));
   allocator->free(compiled);
 }
 

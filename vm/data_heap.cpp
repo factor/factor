@@ -142,8 +142,8 @@ void data_heap::mark_all_cards() {
 
 void factor_vm::set_data_heap(std::unique_ptr<data_heap> data_) {
   data = std::move(data_);
-  cards_offset = (cell)data->cards.get() - addr_to_card(data->start);
-  decks_offset = (cell)data->decks.get() - addr_to_deck(data->start);
+  cards_offset = reinterpret_cast<cell>(data->cards.get()) - addr_to_card(data->start);
+  decks_offset = reinterpret_cast<cell>(data->decks.get()) - addr_to_deck(data->start);
 }
 
 data_heap_room factor_vm::data_room() {
