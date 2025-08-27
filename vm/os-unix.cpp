@@ -399,7 +399,6 @@ bool safe_read(int fd, void* data, ssize_t size) {
       return safe_read(fd, data, size);
     else {
       fatal_error("error reading fd", errno);
-      return false;
     }
   } else
     return (bytes == size);
