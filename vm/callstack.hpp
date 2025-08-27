@@ -23,9 +23,9 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
       frame_offset += next_frame;
       break;
     }
-    cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
+    cell addr = *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
     cell fixed_addr = Fixup::translated_code_block_map
-                          ? (cell)fixup.translate_code((code_block*)addr)
+                          ? reinterpret_cast<cell>(fixup.translate_code(reinterpret_cast<code_block*>(addr)))
                           : addr;
     code_block* owner = code->code_block_for_address(fixed_addr);
 
@@ -37,9 +37,9 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 #else
   while (frame_offset < frame_length) {
     cell frame_top = stack->frame_top_at(frame_offset);
-    cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
+    cell addr = *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
     cell fixed_addr = Fixup::translated_code_block_map
-                          ? (cell)fixup.translate_code((code_block*)addr)
+                          ? reinterpret_cast<cell>(fixup.translate_code(reinterpret_cast<code_block*>(addr)))
                           : addr;
     code_block* owner = code->code_block_for_address(fixed_addr);
 
@@ -79,12 +79,12 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
       top = next_frame;
       break;
     }
-    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
+    cell addr = *reinterpret_cast<cell*>(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);
 
     code_block* owner = code->code_block_for_address(addr);
     code_block* fixed_owner = fixup.translate_code(owner);
-    cell delta = addr - (cell)owner - sizeof(code_block);
+    cell delta = addr - reinterpret_cast<cell>(owner) - sizeof(code_block);
     cell natural_frame_size = fixed_owner->stack_frame_size();
     cell size = LEAF_FRAME_SIZE;
     if (natural_frame_size > 0 && delta > 0)
@@ -95,14 +95,14 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
   }
 #else
   while (top < bottom) {
-    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
+    cell addr = *reinterpret_cast<cell*>(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);
 
     // Only the address is valid, if the code heap has been compacted,
     // owner might not point to a real code block.
     code_block* owner = code->code_block_for_address(addr);
     code_block* fixed_owner = fixup.translate_code(owner);
-    cell delta = addr - (cell)owner - sizeof(code_block);
+    cell delta = addr - reinterpret_cast<cell>(owner) - sizeof(code_block);
     cell natural_frame_size = fixed_owner->stack_frame_size();
     cell size = LEAF_FRAME_SIZE;
     if (natural_frame_size > 0 && delta > 0)

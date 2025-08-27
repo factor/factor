@@ -319,16 +319,16 @@ struct factor_vm {
   // the write barrier must be called any time we are potentially storing a
   // pointer from an older generation to a younger one
   inline void write_barrier(cell* slot_ptr) {
-    *(unsigned char*)(cards_offset + ((cell)slot_ptr >> card_bits)) = card_mark_mask;
-    *(unsigned char*)(decks_offset + ((cell)slot_ptr >> deck_bits)) = card_mark_mask;
+    *reinterpret_cast<unsigned char*>(cards_offset + (reinterpret_cast<cell>(slot_ptr) >> card_bits)) = card_mark_mask;
+    *reinterpret_cast<unsigned char*>(decks_offset + (reinterpret_cast<cell>(slot_ptr) >> deck_bits)) = card_mark_mask;
   }
 
   inline void write_barrier(object* obj, cell size) {
-    cell start = (cell)obj & (~card_size + 1);
-    cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
+    cell start = reinterpret_cast<cell>(obj) & (~card_size + 1);
+    cell end = (reinterpret_cast<cell>(obj) + size + card_size - 1) & (~card_size + 1);
 
     for (cell offset = start; offset < end; offset += card_size)
-      write_barrier((cell*)offset);
+      write_barrier(reinterpret_cast<cell*>(offset));
   }
 
   // data heap checker
@@ -358,7 +358,7 @@ struct factor_vm {
 
   // Allocates memory
   template <typename Type> Type* allot(cell size) {
-    return (Type*)allot_object(Type::type_number, size);
+    return reinterpret_cast<Type*>(allot_object(Type::type_number, size));
   }
 
   // generic arrays
