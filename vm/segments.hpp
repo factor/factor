@@ -14,6 +14,14 @@ struct segment {
   segment(cell size, bool executable_p);
   ~segment();
 
+  // Disable copy operations to prevent double-munmap
+  segment(const segment&) = delete;
+  segment& operator=(const segment&) = delete;
+  
+  // Move operations could be implemented if needed
+  segment(segment&&) = delete;
+  segment& operator=(segment&&) = delete;
+
   bool underflow_p(cell addr) {
     return addr >= (start - getpagesize()) && addr < start;
   }
