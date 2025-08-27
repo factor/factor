@@ -69,15 +69,15 @@ struct relocation_entry {
 
   relocation_entry(relocation_type rel_type, relocation_class rel_class,
                    cell offset) {
-    value = (uint32_t)((rel_type << 28) | (rel_class << 24) | offset);
+    value = static_cast<uint32_t>((rel_type << 28) | (rel_class << 24) | offset);
   }
 
   relocation_type type() {
-    return (relocation_type)((value & 0xf0000000) >> 28);
+    return static_cast<relocation_type>((value & 0xf0000000) >> 28);
   }
 
   relocation_class klass() {
-    return (relocation_class)((value & 0x0f000000) >> 24);
+    return static_cast<relocation_class>((value & 0x0f000000) >> 24);
   }
 
   cell offset() { return (value & 0x00ffffff); }

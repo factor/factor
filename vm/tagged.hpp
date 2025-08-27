@@ -26,7 +26,7 @@ template <typename Type> struct tagged {
 
   Type* untagged() const {
     FACTOR_ASSERT(type_p());
-    return (Type*)(UNTAG(value_));
+    return reinterpret_cast<Type*>(UNTAG(value_));
   }
 
   explicit tagged(cell tagged) : value_(tagged) {}
