@@ -17,7 +17,7 @@ struct bump_allocator {
   object* allot(cell data_size) {
     cell h = here;
     here = h + align(data_size, data_alignment);
-    return (object*)h;
+    return reinterpret_cast<object*>(h);
   }
 
   cell occupied_space() { return here - start; }

@@ -14,9 +14,9 @@ struct mark_bits {
 
   void clear_forwarding() { memset(forwarding.get(), 0, bits_size * sizeof(cell)); }
 
-  mark_bits(cell size, cell start)
-      : size(size),
-        start(start),
+  mark_bits(cell sz, cell st)
+      : size(sz),
+        start(st),
         bits_size(size / data_alignment / mark_bits_granularity),
         marked(std::make_unique<cell[]>(bits_size)),
         forwarding(std::make_unique<cell[]>(bits_size)) {
@@ -53,15 +53,15 @@ struct mark_bits {
 
   bool bitmap_elt(cell* bits, const cell address) {
     std::pair<cell, cell> position = bitmap_deref(address);
-    return (bits[position.first] & ((cell)1 << position.second)) != 0;
+    return (bits[position.first] & (static_cast<cell>(1) << position.second)) != 0;
   }
 
   void set_bitmap_range(cell* bits, const cell address, const cell data_size) {
     std::pair<cell, cell> bitmap_start = bitmap_deref(address);
     std::pair<cell, cell> end = bitmap_deref(address + data_size);
 
-    cell start_mask = ((cell)1 << bitmap_start.second) - 1;
-    cell end_mask = ((cell)1 << end.second) - 1;
+    cell start_mask = (static_cast<cell>(1) << bitmap_start.second) - 1;
+    cell end_mask = (static_cast<cell>(1) << end.second) - 1;
 
     if (bitmap_start.first == end.first)
       bits[bitmap_start.first] |= start_mask ^ end_mask;
@@ -70,7 +70,7 @@ struct mark_bits {
       bits[bitmap_start.first] |= ~start_mask;
 
       for (cell index = bitmap_start.first + 1; index < end.first; index++)
-        bits[index] = (cell)-1;
+        bits[index] = static_cast<cell>(-1);
 
       if (end_mask != 0) {
         FACTOR_ASSERT(end.first < bits_size);
@@ -103,7 +103,7 @@ struct mark_bits {
     cell offset = original & (data_alignment - 1);
 
     cell approx_popcount = forwarding.get()[position.first];
-    cell mask = ((cell)1 << position.second) - 1;
+    cell mask = (static_cast<cell>(1) << position.second) - 1;
 
     cell new_line_number =
         approx_popcount + popcount(marked.get()[position.first] & mask);
@@ -117,7 +117,7 @@ struct mark_bits {
     cell bit_index = position.second;
 
     for (cell index = position.first; index < bits_size; index++) {
-      cell mask = ((fixnum)marked.get()[index] >> bit_index);
+      cell mask = (static_cast<fixnum>(marked.get()[index]) >> bit_index);
       if (~mask) {
         // Found an unmarked block on this page. Stop, it's hammer time
         cell clear_bit = rightmost_clear_bit(mask);
