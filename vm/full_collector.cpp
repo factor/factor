@@ -61,8 +61,8 @@ void factor_vm::collect_mark_impl() {
   if (event)
     event->reset_timer();
 
-  slot_visitor<full_collection_copier>
-      visitor(this, full_collection_copier(data->tenured.get(), code.get(), &mark_stack));
+  full_collection_copier copier(data->tenured.get(), code.get(), &mark_stack);
+  slot_visitor<full_collection_copier> visitor(this, copier);
 
   mark_stack.clear();
 

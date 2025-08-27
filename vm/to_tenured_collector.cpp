@@ -5,8 +5,8 @@ namespace factor {
 void factor_vm::collect_to_tenured() {
   // Copy live objects from aging space to tenured space.
   mark_stack.clear();
-  slot_visitor<from_tenured_refs_copier>
-      visitor(this, from_tenured_refs_copier(data->tenured.get(), &mark_stack));
+  from_tenured_refs_copier copier(data->tenured.get(), &mark_stack);
+  slot_visitor<from_tenured_refs_copier> visitor(this, copier);
 
   visitor.visit_all_roots();
   gc_event* event = current_gc->event.get();
