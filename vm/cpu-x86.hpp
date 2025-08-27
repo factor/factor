@@ -34,8 +34,8 @@ inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
   int32_t offset;
   memcpy(&offset, reinterpret_cast<void*>(return_address - 4), sizeof(int32_t));
-  // TODO: Sign conversion - offset is signed int32_t, return_address is unsigned cell
-  // This arithmetic is intentional and correct for relative addressing
+  // Sign extension is intentional: offset is a signed relative displacement
+  // that needs to be added to the unsigned return_address for x86 addressing
   return reinterpret_cast<void*>(static_cast<cell>(offset) + return_address);
 }
 
