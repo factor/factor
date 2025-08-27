@@ -144,7 +144,7 @@ cell factor_vm::compute_dlsym_address(array* parameters,
 
   cell undef = reinterpret_cast<cell>(factor::undefined_symbol);
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
-  if (d != NULL && !d->handle)
+  if (d != nullptr && !d->handle)
     return undef;
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);

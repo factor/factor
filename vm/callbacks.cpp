@@ -104,7 +104,7 @@ void factor_vm::primitive_callback() {
 
 void factor_vm::primitive_free_callback() {
   void* entry_point = alien_offset(ctx->pop());
-  code_block* stub = (code_block*)entry_point - 1;
+  code_block* stub = reinterpret_cast<code_block*>(entry_point) - 1;
   callbacks->allocator->free(stub);
 }
 

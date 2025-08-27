@@ -10,14 +10,14 @@ struct compaction_fixup {
   const object** data_finger;
   const code_block** code_finger;
 
-  compaction_fixup(mark_bits* data_forwarding_map,
-                   mark_bits* code_forwarding_map,
-                   const object** data_finger,
-                   const code_block** code_finger)
-      : data_forwarding_map(data_forwarding_map),
-        code_forwarding_map(code_forwarding_map),
-        data_finger(data_finger),
-        code_finger(code_finger) {}
+  compaction_fixup(mark_bits* data_forwarding_map_param,
+                   mark_bits* code_forwarding_map_param,
+                   const object** data_finger_param,
+                   const code_block** code_finger_param)
+      : data_forwarding_map(data_forwarding_map_param),
+        code_forwarding_map(code_forwarding_map_param),
+        data_finger(data_finger_param),
+        code_finger(code_finger_param) {}
 
   object* fixup_data(object* obj) {
     return reinterpret_cast<object*>(data_forwarding_map->forward_block(reinterpret_cast<cell>(obj)));
@@ -35,8 +35,8 @@ struct compaction_fixup {
 
   code_block* translate_code(const code_block* compiled) {
     if (compiled < *code_finger)
-      return fixup_code((code_block*)compiled);
-    return (code_block*)compiled;
+      return fixup_code(reinterpret_cast<code_block*>(const_cast<code_block*>(compiled)));
+    return const_cast<code_block*>(compiled);
   }
 
   cell size(object* obj) {
@@ -92,8 +92,8 @@ void factor_vm::collect_compact_impl() {
   data_forwarding_map->compute_forwarding();
   code_forwarding_map->compute_forwarding();
 
-  const object* data_finger = (object*)tenured->start;
-  const code_block* code_finger = (code_block*)code->allocator->start;
+  const object* data_finger = reinterpret_cast<object*>(tenured->start);
+  const code_block* code_finger = reinterpret_cast<code_block*>(code->allocator->start);
 
   {
     compaction_fixup fixup(data_forwarding_map, code_forwarding_map,

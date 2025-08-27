@@ -97,7 +97,7 @@ fixnum instruction_operand::load_value(cell relative_to) {
 }
 
 code_block* instruction_operand::load_code_block() {
-  return ((code_block*)load_value(pointer) - 1);
+  return (reinterpret_cast<code_block*>(load_value(pointer)) - 1);
 }
 
 // Store a value into a bitfield of an ARM/RISC-V instruction

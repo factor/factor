@@ -204,7 +204,7 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   (void) siginfo;
   factor_vm* vm = current_vm_p();
   bool foreign_thread = false;
-  if (vm == NULL) {
+  if (vm == nullptr) {
     foreign_thread = true;
     vm = thread_vms.begin()->second;
   }
