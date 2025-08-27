@@ -42,6 +42,10 @@ table tr:hover {
 
 @media (prefers-color-scheme: dark) {
 
+    nav img {
+        filter: invert(80%);
+    }
+
     table tr:hover {
         background-color: #373e48;
     }
