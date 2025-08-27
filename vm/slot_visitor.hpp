@@ -391,6 +391,8 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
       parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
       break;
     }
+    default:
+      break;
   }
 }
 
