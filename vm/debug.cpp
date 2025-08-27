@@ -66,7 +66,7 @@ void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) 
   cell length = array->capacity;
   cell i;
   bool trimmed;
-  unsigned char* data = array->data<unsigned char>();
+  unsigned char* data_ptr = array->data<unsigned char>();
 
   if (length > 16 && !full_output) {
     trimmed = true;
@@ -75,7 +75,7 @@ void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) 
     trimmed = false;
 
   for (i = 0; i < length; i++) {
-    out << " " << (unsigned) data[i];
+    out << " " << (unsigned) data_ptr[i];
   }
 
   if (trimmed)
@@ -201,8 +201,8 @@ struct stack_frame_printer {
   factor_vm* parent;
   ostream& out;
 
-  explicit stack_frame_printer(factor_vm* parent, ostream& out)
-      : parent(parent), out(out) {}
+  explicit stack_frame_printer(factor_vm* parent_, ostream& out_)
+      : parent(parent_), out(out_) {}
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     out << endl;
     out << "frame: " << (void*)frame_top << " size " << size << endl;
@@ -241,7 +241,7 @@ void factor_vm::print_callstack_object(ostream& out, callstack* obj) {
 struct padded_address {
   cell value;
 
-  explicit padded_address(cell value) : value(value) {}
+  explicit padded_address(cell value_) : value(value_) {}
 };
 
 ostream& operator<<(ostream& out, const padded_address& value) {

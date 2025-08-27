@@ -119,7 +119,7 @@ void factor_vm::primitive_dlsym() {
   if (to_boolean(library.value())) {
     dll* d = untag_check<dll>(library.value());
 
-    if (d->handle == NULL)
+    if (d->handle == nullptr)
       ctx->replace(false_object);
     else
       ctx->replace(allot_alien(ffi_dlsym(d, sym)));
@@ -130,14 +130,14 @@ void factor_vm::primitive_dlsym() {
 // close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());
-  if (d->handle != NULL)
+  if (d->handle != nullptr)
     ffi_dlclose(d);
 }
 
 void factor_vm::primitive_dll_validp() {
   cell library = ctx->peek();
   if (to_boolean(library))
-    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != NULL));
+    ctx->replace(tag_boolean(untag_check<dll>(library)->handle != nullptr));
   else
     ctx->replace(special_objects[OBJ_CANONICAL_TRUE]);
 }

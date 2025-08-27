@@ -56,7 +56,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   p->executable_path = vm_executable_path();
 
-  if (p->image_path == NULL) {
+  if (p->image_path == nullptr) {
     if (embedded_image_p()) {
       p->embedded_image = true;
       p->image_path = safe_strdup(p->executable_path);

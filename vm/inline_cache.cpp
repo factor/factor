@@ -5,7 +5,7 @@ namespace factor {
 void factor_vm::deallocate_inline_cache(cell return_address) {
   // Find the call target.
   void* old_entry_point = get_call_target(return_address);
-  code_block* old_block = (code_block*)old_entry_point - 1;
+  code_block* old_block = reinterpret_cast<code_block*>(old_entry_point) - 1;
 
   // Free the old PIC since we know its unreachable
   if (old_block->pic_p())

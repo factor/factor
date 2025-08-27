@@ -136,30 +136,30 @@ void factor_vm::primitive_modify_code_heap() {
     data_root<array> pair(array_nth(alist.untagged(), i), this);
 
     data_root<word> word(array_nth(pair.untagged(), 0), this);
-    data_root<object> data(array_nth(pair.untagged(), 1), this);
+    data_root<object> data_obj(array_nth(pair.untagged(), 1), this);
 
-    switch (data.type()) {
+    switch (data_obj.type()) {
       case QUOTATION_TYPE:
       case TUPLE_TYPE: // for curry/compose, see issue #2763
-        jit_compile_word(word.value(), data.value(), false);
+        jit_compile_word(word.value(), data_obj.value(), false);
         break;
       case ARRAY_TYPE: {
-        array* compiled_data = data.as<array>().untagged();
+        array* compiled_data = data_obj.as<array>().untagged();
         cell parameters = array_nth(compiled_data, 0);
         cell literals = array_nth(compiled_data, 1);
         cell relocation = array_nth(compiled_data, 2);
         cell labels = array_nth(compiled_data, 3);
-        cell code = array_nth(compiled_data, 4);
+        cell code_cell = array_nth(compiled_data, 4);
         cell frame_size = untag_fixnum(array_nth(compiled_data, 5));
 
         code_block* compiled =
-            add_code_block(CODE_BLOCK_OPTIMIZED, code, labels, word.value(),
+            add_code_block(CODE_BLOCK_OPTIMIZED, code_cell, labels, word.value(),
                            relocation, parameters, literals, frame_size);
 
         word->entry_point = compiled->entry_point();
       } break;
       default:
-        critical_error("Expected a quotation or an array", data.value());
+        critical_error("Expected a quotation or an array", data_obj.value());
         break;
     }
   }
