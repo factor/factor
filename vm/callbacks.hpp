@@ -28,7 +28,7 @@ struct callback_heap {
   std::unique_ptr<free_list_allocator<code_block>> allocator;
   factor_vm* parent;
 
-  callback_heap(cell size, factor_vm* parent);
+  callback_heap(cell size, factor_vm* parent_vm);
   ~callback_heap();
 
   // Disable copy operations to prevent double-delete

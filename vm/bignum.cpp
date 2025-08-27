@@ -491,7 +491,7 @@ bignum* factor_vm::double_to_bignum(double x) {
     bignum_digit_type digit;
     int odd_bits = (exponent % BIGNUM_DIGIT_LENGTH);
     if (odd_bits > 0)
-      DTB_WRITE_DIGIT((fixnum)1 << odd_bits);
+      DTB_WRITE_DIGIT(static_cast<fixnum>(1) << odd_bits);
     while (start < scan) {
       if (significand == 0) {
         while (start < scan)
@@ -1088,7 +1088,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
   bignum_digit_type digit;
   bignum_digit_type carry = 0;
   int shift_left = (BIGNUM_DIGIT_LENGTH - shift_right);
-  bignum_digit_type mask = (((fixnum)1 << shift_right) - 1);
+  bignum_digit_type mask = ((static_cast<fixnum>(1) << shift_right) - 1);
   while (start < scan) {
     digit = (*--scan);
     (*scan) = ((digit >> shift_right) | carry);
@@ -1736,7 +1736,7 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
     return 0;
   bignum_digit_type digit = (BIGNUM_REF(bn, index));
   int p = shift % BIGNUM_DIGIT_LENGTH;
-  bignum_digit_type mask = ((fixnum)1) << p;
+  bignum_digit_type mask = static_cast<fixnum>(1) << p;
   return (digit & mask) ? 1 : 0;
 }
 
