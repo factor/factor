@@ -133,7 +133,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (uncompress) {
     lib::zstd::zstd_lib zstd;
     zstd.open();
-    size_t result = zstd.decompress((void*)data->tenured.get()->start, h->data_size, buf, h->compressed_data_size);
+    size_t result = zstd.decompress(reinterpret_cast<void*>(data->tenured.get()->start), h->data_size, buf, h->compressed_data_size);
     if (zstd.is_error(result)) {
       std::cout << "data heap decompression: " << zstd.get_error_name(result) << '\n';
       fatal_error("load_data_heap failed", 0);
@@ -181,7 +181,7 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     if (uncompress) {
       lib::zstd::zstd_lib zstd;
       zstd.open();
-      size_t result = zstd.decompress((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+      size_t result = zstd.decompress(reinterpret_cast<void*>(code->allocator->start), h->code_size, buf, h->compressed_code_size);
       if (zstd.is_error(result)) {
         std::cout << "code heap decompression: " << zstd.get_error_name(result) << '\n';
         fatal_error("load_code_heap failed", 0);
@@ -360,10 +360,10 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
     return false;
   if (h.escaped_data_size > 0 &&
-      safe_fwrite((void*)data->tenured.get()->start, h.escaped_data_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(data->tenured.get()->start), h.escaped_data_size, 1, file) != 1)
     return false;
   if (h.code_size > 0 &&
-      safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(code->allocator->start), h.code_size, 1, file) != 1)
     return false;
   if (raw_fclose(file) == -1)
     return false;

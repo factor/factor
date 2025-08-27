@@ -22,7 +22,7 @@ struct code_block {
   }
 
   void set_type(code_block_type type) {
-    header = ((header & ~0x7) | (static_cast<cell>(type) << 1));
+    header = ((header & ~static_cast<cell>(0x7)) | (static_cast<cell>(type) << 1));
   }
 
   bool pic_p() const { return type() == CODE_BLOCK_PIC; }

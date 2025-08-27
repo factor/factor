@@ -27,8 +27,8 @@ void sleep_nanos(uint64_t nsec) {
   timespec ts;
   timespec ts_rem;
   int ret;
-  ts.tv_sec = nsec / 1000000000;
-  ts.tv_nsec = nsec % 1000000000;
+  ts.tv_sec = static_cast<__time_t>(nsec / 1000000000);
+  ts.tv_nsec = static_cast<__syscall_slong_t>(nsec % 1000000000);
   ret = nanosleep(&ts, &ts_rem);
   while (ret == -1 && errno == EINTR) {
     memcpy(&ts, &ts_rem, sizeof(ts));
@@ -121,7 +121,7 @@ segment::segment(cell size_, bool executable_p) {
 segment::~segment() {
   if (start != 0) {
     int pagesize = getpagesize();
-    int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
+    int retval = munmap(reinterpret_cast<void*>(start - static_cast<cell>(pagesize)), 2 * static_cast<cell>(pagesize) + size);
     if (retval)
       fatal_error("Segment deallocation failed", 0);
   }
@@ -129,7 +129,7 @@ segment::~segment() {
 
 void factor_vm::start_sampling_profiler_timer() {
   struct itimerval timer;
-  memset((void*)&timer, 0, sizeof(struct itimerval));
+  memset(&timer, 0, sizeof(struct itimerval));
   timer.it_value.tv_usec = 1000000 / samples_per_second;
   timer.it_interval.tv_usec = 1000000 / samples_per_second;
   setitimer(ITIMER_REAL, &timer, NULL);
@@ -137,7 +137,7 @@ void factor_vm::start_sampling_profiler_timer() {
 
 void factor_vm::end_sampling_profiler_timer() {
   struct itimerval timer;
-  memset((void*)&timer, 0, sizeof(struct itimerval));
+  memset(&timer, 0, sizeof(struct itimerval));
   setitimer(ITIMER_REAL, &timer, NULL);
 }
 

@@ -3,16 +3,16 @@ namespace factor {
 typedef intptr_t fixnum;
 typedef uintptr_t cell;
 
-constexpr cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
+[[nodiscard]] constexpr cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
-constexpr cell alignment_for(cell a, cell b) { return align(a, b) - a; }
+[[nodiscard]] constexpr cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 constexpr cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
 #define LEAF_FRAME_SIZE 16
 
-#define WORD_SIZE (signed)(sizeof(cell) * 8)
+#define WORD_SIZE static_cast<signed>(sizeof(cell) * 8)
 
 #define TAG_MASK 15
 #define TAG_BITS 4
@@ -82,19 +82,19 @@ enum {
 };
 
 // What Factor calls 'f'
-static const cell false_object = F_TYPE;
+constexpr cell false_object = F_TYPE;
 
-inline static bool immediate_p(cell obj) {
+[[nodiscard]] constexpr bool immediate_p(cell obj) {
   // We assume that fixnums have tag 0 and false_object has tag 1
   return TAG(obj) <= F_TYPE;
 }
 
-inline static fixnum untag_fixnum(cell tagged) {
+[[nodiscard]] inline fixnum untag_fixnum(cell tagged) {
   FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
   return static_cast<fixnum>(tagged) >> TAG_BITS;
 }
 
-inline static cell tag_fixnum(fixnum untagged) {
+[[nodiscard]] constexpr cell tag_fixnum(fixnum untagged) {
   return (static_cast<cell>(untagged) << TAG_BITS) | FIXNUM_TYPE;
 }
 
@@ -125,21 +125,21 @@ struct object {
 
   // Only valid for objects in tenured space; must cast to free_heap_block
   // to do anything with it if its free
-  bool free_p() const { return (header & 1) == 1; }
+  [[nodiscard]] bool free_p() const { return (header & 1) == 1; }
 
-  cell type() const { return (header >> 2) & TAG_MASK; }
+  [[nodiscard]] cell type() const { return (header >> 2) & TAG_MASK; }
 
   void initialize(cell type) { header = type << 2; }
 
-  cell hashcode() const { return (header >> 6); }
+  [[nodiscard]] cell hashcode() const { return (header >> 6); }
 
   void set_hashcode(cell hashcode) {
     header = (header & 0x3f) | (hashcode << 6);
   }
 
-  bool forwarding_pointer_p() const { return (header & 2) == 2; }
+  [[nodiscard]] bool forwarding_pointer_p() const { return (header & 2) == 2; }
 
-  object* forwarding_pointer() const { return reinterpret_cast<object*>(UNTAG(header)); }
+  [[nodiscard]] object* forwarding_pointer() const { return reinterpret_cast<object*>(UNTAG(header)); }
 
   void forward_to(object* pointer) { header = (reinterpret_cast<cell>(pointer) | 2); }
 };
