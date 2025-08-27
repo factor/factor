@@ -18,9 +18,22 @@ struct segment {
   segment(const segment&) = delete;
   segment& operator=(const segment&) = delete;
   
-  // Move operations could be implemented if needed
-  segment(segment&&) = delete;
-  segment& operator=(segment&&) = delete;
+  // Enable move operations
+  segment(segment&& other) noexcept : start(other.start), size(other.size), end(other.end) {
+    other.start = 0;
+    other.size = 0;
+    other.end = 0;
+  }
+  
+  segment& operator=(segment&& other) noexcept {
+    if (this != &other) {
+      // Swap with other, then other will clean up our old resources
+      std::swap(start, other.start);
+      std::swap(size, other.size);
+      std::swap(end, other.end);
+    }
+    return *this;
+  }
 
   bool underflow_p(cell addr) {
     return addr >= (start - getpagesize()) && addr < start;
