@@ -418,6 +418,6 @@ void factor_vm::end_sampling_profiler_timer() {
   sampler_thread = NULL;
 }
 
-void abort() { ::abort(); }
+[[noreturn]] void abort() { ::abort(); }
 
 }

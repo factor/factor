@@ -513,7 +513,7 @@ void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
 }
 
-void abort() {
+[[noreturn]] void abort() {
   sig_t ret;
   do {
     ret = signal(SIGABRT, SIG_DFL);
