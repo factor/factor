@@ -154,7 +154,15 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
   fixnum index = untag_fixnum(ctx->pop());
   data_root<array> methods(ctx->pop(), this);
   data_root<word> generic_word(ctx->pop(), this);
-  data_root<object> object(((cell*)ctx->datastack)[-index], this);
+  
+  // Bounds check for stack access
+  cell* stack_ptr = (cell*)ctx->datastack;
+  cell* stack_base = (cell*)ctx->datastack_seg->start;
+  if (index < 0 || stack_ptr - index < stack_base) {
+    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
+  }
+  
+  data_root<object> object(stack_ptr[-index], this);
 
   cell pic_size = array_capacity(cache_entries.untagged()) / 2;
 
