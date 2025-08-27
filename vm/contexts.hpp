@@ -34,9 +34,9 @@ struct context {
   // C callstack pointer
   cell callstack_save;
 
-  segment* datastack_seg;
-  segment* retainstack_seg;
-  segment* callstack_seg;
+  std::unique_ptr<segment> datastack_seg;
+  std::unique_ptr<segment> retainstack_seg;
+  std::unique_ptr<segment> callstack_seg;
 
   // context-specific special objects, accessed by context-object and
   // set-context-object primitives
@@ -49,9 +49,12 @@ struct context {
   context(const context&) = delete;
   context& operator=(const context&) = delete;
   
-  // Move operations could be implemented if needed
-  context(context&&) = delete;
-  context& operator=(context&&) = delete;
+  // Enable move operations
+  context(context&& other) noexcept;
+  context& operator=(context&& other) noexcept;
+  
+  // Swap operation for efficiency
+  void swap(context& other) noexcept;
 
   void reset_datastack();
   void reset_retainstack();
@@ -62,9 +65,17 @@ struct context {
   void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
   vm_error_type address_to_error(cell addr);
 
-  cell peek() { return *(cell*)datastack; }
+  cell peek() { 
+    FACTOR_ASSERT(datastack >= datastack_seg->start);
+    FACTOR_ASSERT(datastack < datastack_seg->end);
+    return *(cell*)datastack; 
+  }
 
-  void replace(cell tagged) { *(cell*)datastack = tagged; }
+  void replace(cell tagged) { 
+    FACTOR_ASSERT(datastack >= datastack_seg->start);
+    FACTOR_ASSERT(datastack < datastack_seg->end);
+    *(cell*)datastack = tagged; 
+  }
 
   cell pop() {
     cell value = peek();

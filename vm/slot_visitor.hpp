@@ -123,11 +123,11 @@ template <typename Fixup> struct slot_visitor {
   cell cards_scanned;
   cell decks_scanned;
 
-  slot_visitor<Fixup>(factor_vm* parent, Fixup fixup)
+  slot_visitor<Fixup>(factor_vm* parent, const Fixup& fixup_param)
   : parent(parent),
-    fixup(fixup),
+    fixup(fixup_param),
     cards_scanned(0),
-    decks_scanned(0) {}
+    decks_scanned(0) { }
 
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
@@ -201,8 +201,8 @@ void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
-  FACTOR_FOR_EACH(parent->data_roots) {
-    visit_handle(*iter);
+  for (auto* root : parent->data_roots) {
+    visit_handle(root);
   }
 
   auto callback_slot_visitor = [&](code_block* stub, cell size) {
@@ -211,19 +211,19 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   };
   parent->callbacks->allocator->iterate(callback_slot_visitor, no_fixup());
 
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
-    iter->second = visit_pointer(iter->second);
+  for (auto& entry : parent->code->uninitialized_blocks) {
+    entry.second = visit_pointer(entry.second);
   }
 
-  FACTOR_FOR_EACH(parent->samples) {
-    visit_handle(&iter->thread);
+  for (auto& sample : parent->samples) {
+    visit_handle(&sample.thread);
   }
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
 
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    visit_context(*iter);
+  for (const auto& ctx_ptr : parent->active_contexts) {
+    visit_context(ctx_ptr.get());
   }
 }
 
@@ -319,8 +319,8 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
 
   cell ds_ptr = ctx->datastack;
   cell rs_ptr = ctx->retainstack;
-  segment* ds_seg = ctx->datastack_seg;
-  segment* rs_seg = ctx->retainstack_seg;
+  segment* ds_seg = ctx->datastack_seg.get();
+  segment* rs_seg = ctx->retainstack_seg.get();
   visit_stack_elements(ds_seg, (cell*)ds_ptr);
   visit_stack_elements(rs_seg, (cell*)rs_ptr);
   visit_object_array(ctx->context_objects,
@@ -399,17 +399,17 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context_code_blocks() {
   call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    parent->iterate_callstack(*iter, call_frame_visitor, fixup);
+  for (const auto& ctx_ptr : parent->active_contexts) {
+    parent->iterate_callstack(ctx_ptr.get(), call_frame_visitor, fixup);
   }
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_uninitialized_code_blocks() {
   std::map<code_block*, cell> new_uninitialized_blocks;
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
+  for (const auto& entry : parent->code->uninitialized_blocks) {
     new_uninitialized_blocks.insert(
-        std::make_pair(fixup.fixup_code(iter->first), iter->second));
+        std::make_pair(fixup.fixup_code(entry.first), entry.second));
   }
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
@@ -545,8 +545,8 @@ template <typename Fixup>
 template <typename SourceGeneration>
 void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
                                       card mask, card unmask) {
-  card_deck* decks = parent->data->decks;
-  card_deck* cards = parent->data->cards;
+  card_deck* decks = parent->data->decks.get();
+  card_deck* cards = parent->data->cards.get();
   cell heap_base = parent->data->start;
 
   cell first_deck = (gen->start - heap_base) / deck_size;
@@ -580,8 +580,7 @@ void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_heap_roots(std::set<code_block*>* remembered_set) {
-  FACTOR_FOR_EACH(*remembered_set) {
-    code_block* compiled = *iter;
+  for (auto* compiled : *remembered_set) {
     visit_code_block_objects(compiled);
     visit_embedded_literals(compiled);
     compiled->flush_icache();
