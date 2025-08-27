@@ -10,10 +10,10 @@ bool return_takes_param_p() {
 #endif
 }
 
-callback_heap::callback_heap(cell size, factor_vm* parent) {
+callback_heap::callback_heap(cell size, factor_vm* parent_vm) {
   seg = std::make_unique<segment>(size, true);
   allocator = std::make_unique<free_list_allocator<code_block>>(size, seg->start);
-  this->parent = parent;
+  this->parent = parent_vm;
 
 }
 

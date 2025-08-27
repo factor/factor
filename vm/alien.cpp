@@ -84,12 +84,14 @@ void* factor_vm::alien_pointer() {
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
-    parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
+    type value;                                                         \
+    memcpy(&value, parent->alien_pointer(), sizeof(type));              \
+    parent->ctx->push(parent->from(value));                             \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
-    type* ptr = (type*)parent->alien_pointer();                         \
+    void* ptr = parent->alien_pointer();                                \
     type value = (type)parent->to(parent->ctx->pop());                  \
-    *ptr = value;                                                       \
+    memcpy(ptr, &value, sizeof(type));                                  \
   }
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)

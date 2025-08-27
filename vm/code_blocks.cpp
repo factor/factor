@@ -215,8 +215,8 @@ struct initial_code_block_visitor {
   cell literals;
   cell literal_index;
 
-  initial_code_block_visitor(factor_vm* parent, cell literals)
-      : parent(parent), literals(literals), literal_index(0) {}
+  initial_code_block_visitor(factor_vm* parent_vm, cell literals_array)
+      : parent(parent_vm), literals(literals_array), literal_index(0) {}
 
   cell next_literal() {
     return array_nth(untag<array>(literals), literal_index++);
