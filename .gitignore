@@ -40,3 +40,5 @@ xcuserdata
 bin
 git-id
 tags
+.zig-cache
+zig-out
