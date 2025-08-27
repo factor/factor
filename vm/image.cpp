@@ -210,7 +210,7 @@ struct startup_fixup {
   }
 
   code_block* fixup_code(code_block* obj) {
-    return (code_block*)(reinterpret_cast<cell>(obj) + code_offset);
+    return reinterpret_cast<code_block*>(reinterpret_cast<cell>(obj) + code_offset);
   }
 
   object* translate_data(const object* obj) {
@@ -218,7 +218,7 @@ struct startup_fixup {
   }
 
   code_block* translate_code(const code_block* compiled) {
-    return fixup_code((code_block*)compiled);
+    return fixup_code(const_cast<code_block*>(compiled));
   }
 
   cell size(const object* obj) {

@@ -482,7 +482,7 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
       case RT_ENTRY_POINT_PIC_TAIL:
       case RT_HERE: {
         cell offset = TAG(old_value);
-        code_block* compiled = (code_block*)UNTAG(old_value);
+        code_block* compiled = reinterpret_cast<code_block*>(UNTAG(old_value));
         op.store_value(RETAG(fixup.fixup_code(compiled), offset));
         break;
       }
