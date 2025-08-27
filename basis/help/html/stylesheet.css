@@ -112,10 +112,6 @@ footer {
         border-bottom: 1px solid #666;
     }
 
-    nav img {
-        filter: invert(80%);
-    }
-
     footer {
         border-top: 1px dashed #666;
         color: #999;
