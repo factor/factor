@@ -42,7 +42,9 @@ ifdef CONFIG
 	SITE_CXXFLAGS += $(SITE_COMMON_FLAGS)
 	ASFLAGS += $(COMMON_FLAGS)
 	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
-	CXXFLAGS += -std=c++23 $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
+	# Try C++26, fall back to C++23 if not supported
+	CXX_STD := $(shell echo 'int main(){}' | $(CXX) -std=c++26 -x c++ - -o /dev/null 2>/dev/null && echo c++26 || echo c++23)
+	CXXFLAGS += -std=$(CXX_STD) $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
 	LINKER_FLAGS += $(SITE_COMMON_LINKER_FLAGS) $(CC_OPT) $(LDFLAGS)
 
 	# WARNINGS=1 ./build.sh compile - enable all reasonable warnings
