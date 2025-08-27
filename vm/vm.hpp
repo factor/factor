@@ -1,5 +1,3 @@
-using namespace std;
-
 namespace factor {
 
 typedef void (*c_to_factor_func_type)(cell quot);
@@ -368,27 +366,27 @@ struct factor_vm {
   template <typename Array> Array* reallot_array(Array* array_, cell capacity);
 
   // debug
-  void print_chars(ostream& out, string* str);
-  void print_word(ostream& out, word* word, cell nesting);
-  void print_factor_string(ostream& out, string* str);
-  void print_array(ostream& out, array* array, cell nesting);
-  void print_byte_array(ostream& out, byte_array* array, cell nesting);
-  void print_tuple(ostream& out, tuple* tuple, cell nesting);
-  void print_alien(ostream& out, alien* alien, cell nesting);
-  void print_nested_obj(ostream& out, cell obj, fixnum nesting);
-  void print_obj(ostream& out, cell obj);
-  void print_objects(ostream& out, cell* start, cell* end);
-  void print_datastack(ostream& out);
-  void print_retainstack(ostream& out);
-  void print_callstack(ostream& out);
-  void print_callstack_object(ostream& out, callstack* obj);
-  void dump_cell(ostream& out, cell x);
-  void dump_memory(ostream& out, cell from, cell to);
-  void dump_memory_layout(ostream& out);
-  void dump_objects(ostream& out, cell type);
-  void dump_edges(ostream& out);
-  void find_data_references(ostream& out, cell look_for_);
-  void dump_code_heap(ostream& out);
+  void print_chars(std::ostream& out, string* str);
+  void print_word(std::ostream& out, word* word, cell nesting);
+  void print_factor_string(std::ostream& out, string* str);
+  void print_array(std::ostream& out, array* array, cell nesting);
+  void print_byte_array(std::ostream& out, byte_array* array, cell nesting);
+  void print_tuple(std::ostream& out, tuple* tuple, cell nesting);
+  void print_alien(std::ostream& out, alien* alien, cell nesting);
+  void print_nested_obj(std::ostream& out, cell obj, fixnum nesting);
+  void print_obj(std::ostream& out, cell obj);
+  void print_objects(std::ostream& out, cell* start, cell* end);
+  void print_datastack(std::ostream& out);
+  void print_retainstack(std::ostream& out);
+  void print_callstack(std::ostream& out);
+  void print_callstack_object(std::ostream& out, callstack* obj);
+  void dump_cell(std::ostream& out, cell x);
+  void dump_memory(std::ostream& out, cell from, cell to);
+  void dump_memory_layout(std::ostream& out);
+  void dump_objects(std::ostream& out, cell type);
+  void dump_edges(std::ostream& out);
+  void find_data_references(std::ostream& out, cell look_for_);
+  void dump_code_heap(std::ostream& out);
   void factorbug_usage(bool advanced_p);
   void factorbug();
   void primitive_die();
@@ -606,8 +604,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* ctx_);
+  cell capture_callstack(context* ctx_);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();

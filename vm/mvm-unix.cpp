@@ -2,7 +2,7 @@
 
 namespace factor {
 
-pthread_key_t current_vm_tls_key;
+static pthread_key_t current_vm_tls_key;
 
 void init_mvm() {
   if (pthread_key_create(&current_vm_tls_key, NULL) != 0)

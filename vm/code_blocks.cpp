@@ -194,7 +194,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
 
   cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
   if (ext_addr == (cell)-1) {
-    ostringstream ss;
+    std::ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
     cell arg;
