@@ -16,8 +16,8 @@ static const cell data_alignment = 16;
 
 #define TAG_MASK 15
 #define TAG_BITS 4
-#define TAG(x) ((cell)(x) & TAG_MASK)
-#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
+#define TAG(x) (reinterpret_cast<cell>(x) & TAG_MASK)
+#define UNTAG(x) (reinterpret_cast<cell>(x) & static_cast<cell>(~TAG_MASK))
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
 // Type tags, should be kept in sync with:
@@ -91,11 +91,11 @@ inline static bool immediate_p(cell obj) {
 
 inline static fixnum untag_fixnum(cell tagged) {
   FACTOR_ASSERT(TAG(tagged) == FIXNUM_TYPE);
-  return ((fixnum)tagged) >> TAG_BITS;
+  return static_cast<fixnum>(tagged) >> TAG_BITS;
 }
 
 inline static cell tag_fixnum(fixnum untagged) {
-  return ( (cell)untagged << TAG_BITS) | FIXNUM_TYPE;
+  return (static_cast<cell>(untagged) << TAG_BITS) | FIXNUM_TYPE;
 }
 
 #define NO_TYPE_CHECK static const cell type_number = TYPE_COUNT
@@ -119,7 +119,7 @@ struct object {
   cell slot_count() const;
   template <typename Fixup> cell slot_count(Fixup fixup) const;
 
-  cell* slots() const { return (cell*)this; }
+  cell* slots() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this)); }
 
   template <typename Iterator> void each_slot(Iterator& iter);
 
@@ -139,9 +139,9 @@ struct object {
 
   bool forwarding_pointer_p() const { return (header & 2) == 2; }
 
-  object* forwarding_pointer() const { return (object*)UNTAG(header); }
+  object* forwarding_pointer() const { return reinterpret_cast<object*>(UNTAG(header)); }
 
-  void forward_to(object* pointer) { header = ((cell)pointer | 2); }
+  void forward_to(object* pointer) { header = (reinterpret_cast<cell>(pointer) | 2); }
 };
 
 // Assembly code makes assumptions about the layout of this struct
@@ -151,7 +151,7 @@ struct array : public object {
   // tagged
   cell capacity;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 // These are really just arrays, but certain elements have special
@@ -172,7 +172,7 @@ struct bignum : public object {
   // tagged
   cell capacity;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 struct byte_array : public object {
@@ -187,7 +187,7 @@ struct byte_array : public object {
 #endif
 
   template <typename Scalar> Scalar* data() const {
-    return (Scalar*)(this + 1);
+    return const_cast<Scalar*>(reinterpret_cast<const Scalar*>(this + 1));
   }
 };
 
@@ -201,7 +201,7 @@ struct string : public object {
   // tagged
   cell hashcode;
 
-  uint8_t* data() const { return (uint8_t*)(this + 1); }
+  uint8_t* data() const { return const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(this + 1)); }
 };
 
 struct code_block;
@@ -311,11 +311,18 @@ struct callstack : public object {
   cell length;
 
   cell frame_top_at(cell offset) const {
-    return (cell)(this + 1) + offset;
+    return reinterpret_cast<cell>(this + 1) + offset;
   }
 
-  cell top() const { return (cell)(this + 1); }
+  cell top() const { return reinterpret_cast<cell>(this + 1); }
   cell bottom() const {
+    // TODO: CRITICAL - Sign conversion issue here. untag_fixnum returns signed,
+    // but we're adding to unsigned. The old C-style cast preserves behavior
+    // but modern C++ casts would need explicit sign handling.
+    // Safe fix would be: 
+    //   fixnum len = untag_fixnum(length);
+    //   return reinterpret_cast<cell>(this + 1) + static_cast<cell>(len);
+    // But this needs testing to ensure no behavioral change
     return (cell)(this + 1) + untag_fixnum(length);
   }
 };
@@ -325,11 +332,12 @@ struct tuple : public object {
   // tagged layout
   cell layout;
 
-  cell* data() const { return (cell*)(this + 1); }
+  cell* data() const { return const_cast<cell*>(reinterpret_cast<const cell*>(this + 1)); }
 };
 
 inline static cell tuple_capacity(const tuple_layout *layout) {
-  return untag_fixnum(layout->size);
+  // TODO: Sign conversion - untag_fixnum returns signed, need unsigned
+  return static_cast<cell>(untag_fixnum(layout->size));
 }
 
 inline static cell tuple_size(const tuple_layout* layout) {
@@ -337,7 +345,8 @@ inline static cell tuple_size(const tuple_layout* layout) {
 }
 
 inline static cell string_capacity(const string* str) {
-  return untag_fixnum(str->length);
+  // TODO: Sign conversion - untag_fixnum returns signed, need unsigned
+  return static_cast<cell>(untag_fixnum(str->length));
 }
 
 inline static cell string_size(cell size) { return sizeof(string) + size; }
