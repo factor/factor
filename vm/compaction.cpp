@@ -59,8 +59,7 @@ void factor_vm::update_code_roots_for_compaction() {
 
   mark_bits* state = &code->allocator->state;
 
-  FACTOR_FOR_EACH(code_roots) {
-    code_root* root = *iter;
+  for (auto* root : code_roots) {
     cell block = root->value & (~data_alignment + 1);
 
     // Offset of return address within 16-byte allocation line
@@ -76,7 +75,7 @@ void factor_vm::update_code_roots_for_compaction() {
 
 // Compact data and code heaps
 void factor_vm::collect_compact_impl() {
-  gc_event* event = current_gc->event;
+  gc_event* event = current_gc->event.get();
 
 #ifdef FACTOR_DEBUG
   code->verify_all_blocks_set();
@@ -85,7 +84,7 @@ void factor_vm::collect_compact_impl() {
   if (event)
     event->reset_timer();
 
-  tenured_space* tenured = data->tenured;
+  tenured_space* tenured = data->tenured.get();
   mark_bits* data_forwarding_map = &tenured->state;
   mark_bits* code_forwarding_map = &code->allocator->state;
 
@@ -104,7 +103,7 @@ void factor_vm::collect_compact_impl() {
     forwarder.visit_uninitialized_code_blocks();
 
     // Object start offsets get recomputed by the object_compaction_updater
-    data->tenured->starts.clear_object_start_offsets();
+    data->tenured.get()->starts.clear_object_start_offsets();
 
     // Slide everything in tenured space up, and update data and code heap
     // pointers inside objects.
@@ -165,12 +164,11 @@ void factor_vm::collect_compact() {
 
 void factor_vm::collect_growing_data_heap(cell requested_size) {
   // Grow the data heap and copy all live objects to the new heap.
-  data_heap* old = data;
-  set_data_heap(data->grow(&nursery, requested_size));
+  auto new_data = data->grow(&nursery, requested_size);
+  set_data_heap(std::move(new_data));
   collect_mark_impl();
   collect_compact_impl();
   code->flush_icache();
-  delete old;
 }
 
 }

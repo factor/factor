@@ -14,18 +14,14 @@ factor_vm::factor_vm(THREADHANDLE thread)
       signal_pipe_output(0),
       current_sample(0, 0, 0, 0, 0),
       gc_off(false),
-      data(NULL), code(NULL), callbacks(NULL),
-      current_gc(NULL),
       current_gc_p(false),
       current_jit_count(0),
-      gc_events(NULL),
       fep_p(false),
       fep_help_was_shown(false),
       fep_disabled(false),
       full_output(false),
       object_counter(0),
       last_nano_count(0),
-      signal_callstack_seg(NULL),
       safepoint_fep_p(false),
       stop_on_ctrl_break(false)
 #if defined(WINDOWS)
@@ -43,25 +39,14 @@ factor_vm::~factor_vm() {
   free(alien_offset(special_objects[OBJ_IMAGE]));
   close_console();
   FACTOR_ASSERT(!ctx);
-  FACTOR_FOR_EACH(unused_contexts) {
-    delete *iter;
-  }
-  FACTOR_FOR_EACH(active_contexts) {
-    delete *iter;
-  }
-  if (callbacks)
-    delete callbacks;
-  if (data)
-    delete data;
-  if (code)
-    delete code;
-  if (signal_callstack_seg) {
-    delete signal_callstack_seg;
-    signal_callstack_seg = NULL;
-  }
-  FACTOR_FOR_EACH(function_descriptors) {
-    delete[] * iter;
-  }
+  
+  // Both unused_contexts and active_contexts now use shared_ptr, 
+  // so they clean up automatically
+  unused_contexts.clear();
+  active_contexts.clear();
+  
+  // function_descriptors now uses unique_ptr, so they clean up automatically
+  function_descriptors.clear();
 }
 
 }

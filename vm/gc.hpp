@@ -45,7 +45,7 @@ struct gc_event {
 struct gc_state {
   gc_op op;
   uint64_t start_time;
-  gc_event* event;
+  std::unique_ptr<gc_event> event;
 
   gc_state(gc_op op, factor_vm* parent);
   ~gc_state();

@@ -11,19 +11,14 @@ bool return_takes_param_p() {
 }
 
 callback_heap::callback_heap(cell size, factor_vm* parent) {
-  seg = new segment(size, true);
-  if (!seg)
-    fatal_error("Out of memory in callback_heap constructor", size);
-  allocator = new free_list_allocator<code_block>(size, seg->start);
+  seg = std::make_unique<segment>(size, true);
+  allocator = std::make_unique<free_list_allocator<code_block>>(size, seg->start);
   this->parent = parent;
 
 }
 
 callback_heap::~callback_heap() {
-  delete allocator;
-  allocator = NULL;
-  delete seg;
-  seg = NULL;
+  // unique_ptr automatically handles deletion
 }
 
 instruction_operand callback_heap::callback_operand(code_block* stub,

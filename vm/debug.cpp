@@ -280,16 +280,16 @@ void dump_generation(ostream& out, const char* name, Generation* gen) {
 
 void factor_vm::dump_memory_layout(ostream& out) {
   dump_generation(out, "Nursery", data->nursery);
-  dump_generation(out, "Aging", data->aging);
-  dump_generation(out, "Tenured", data->tenured);
-  dump_memory_range(out, "Cards", 10, (cell)data->cards, (cell)data->cards_end);
+  dump_generation(out, "Aging", data->aging.get());
+  dump_generation(out, "Tenured", data->tenured.get());
+  dump_memory_range(out, "Cards", 10, (cell)data->cards.get(), (cell)data->cards_end);
 
   out << endl << "Contexts:" << endl << endl;
-  FACTOR_FOR_EACH(active_contexts) {
-    context* the_ctx = *iter;
-    segment* ds = the_ctx->datastack_seg;
-    segment* rs = the_ctx->retainstack_seg;
-    segment* cs = the_ctx->callstack_seg;
+  for (const auto& ctx_ptr : active_contexts) {
+    context* the_ctx = ctx_ptr.get();
+    segment* ds = the_ctx->datastack_seg.get();
+    segment* rs = the_ctx->retainstack_seg.get();
+    segment* cs = the_ctx->callstack_seg.get();
     if (the_ctx == ctx) {
       out << "  Active:" << endl;
     }
@@ -555,6 +555,11 @@ void factor_vm::factorbug() {
 
 void factor_vm::primitive_die() {
   critical_error("The die word was called by the library.", 0);
+}
+
+void factor_vm::primitive_debug_print() {
+  data_root<string> str(ctx->pop(), this);
+  std::cerr << "[DEBUG] " << std::string((char*)str->data(), string_capacity(str.untagged())) << std::endl;
 }
 
 }
