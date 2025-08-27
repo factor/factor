@@ -49,7 +49,7 @@ void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
     fatal_error("Invalid clear size in fill_stack_seg", clear_size);
   }
   
-  memset_cell((void*)clear_start, pattern, clear_size);
+  memset_cell(reinterpret_cast<void*>(clear_start), pattern, clear_size);
 #else
   (void)top_ptr;
   (void)seg;
