@@ -206,11 +206,11 @@ struct startup_fixup {
       : data_offset(data_offset), code_offset(code_offset) {}
 
   object* fixup_data(object* obj) {
-    return (object*)((cell)obj + data_offset);
+    return (object*)(reinterpret_cast<cell>(obj) + data_offset);
   }
 
   code_block* fixup_code(code_block* obj) {
-    return (code_block*)((cell)obj + code_offset);
+    return (code_block*)(reinterpret_cast<cell>(obj) + code_offset);
   }
 
   object* translate_data(const object* obj) {

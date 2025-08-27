@@ -48,7 +48,7 @@ struct compaction_fixup {
   cell size(code_block* compiled) {
     if (code_forwarding_map->marked_p(reinterpret_cast<cell>(compiled)))
       return compiled->size(*this);
-    return code_forwarding_map->unmarked_block_size((cell)compiled);
+    return code_forwarding_map->unmarked_block_size(reinterpret_cast<cell>(compiled));
   }
 };
 

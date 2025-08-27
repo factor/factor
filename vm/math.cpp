@@ -33,8 +33,8 @@ void factor_vm::primitive_fixnum_divint() {
 
 // does not allocate, even though from_signed_cell can allocate
 void factor_vm::primitive_fixnum_divmod() {
-  cell* s0 = (cell*)(ctx->datastack);
-  cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
+  cell* s0 = reinterpret_cast<cell*>(ctx->datastack);
+  cell* s1 = reinterpret_cast<cell*>(ctx->datastack - sizeof(cell));
   fixnum y = untag_fixnum(*s0);
   fixnum x = untag_fixnum(*s1);
   if (y == -1 && x == fixnum_min) {
@@ -129,8 +129,8 @@ void factor_vm::primitive_bignum_divint() {
 
 // Allocates memory
 void factor_vm::primitive_bignum_divmod() {
-  cell* s0 = (cell*)(ctx->datastack);
-  cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
+  cell* s0 = reinterpret_cast<cell*>(ctx->datastack);
+  cell* s1 = reinterpret_cast<cell*>(ctx->datastack - sizeof(cell));
   bignum* y = untag<bignum>(*s0);
   bignum* x = untag<bignum>(*s1);
   bignum* q, *r;

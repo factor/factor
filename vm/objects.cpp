@@ -31,7 +31,7 @@ void factor_vm::primitive_compute_identity_hashcode() {
   object_counter++;
   if (object_counter == 0)
     object_counter++;
-  obj->set_hashcode((cell)obj ^ object_counter);
+  obj->set_hashcode(reinterpret_cast<cell>(obj) ^ object_counter);
 }
 
 void factor_vm::primitive_set_slot() {

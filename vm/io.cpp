@@ -157,7 +157,7 @@ void factor_vm::primitive_fopen() {
   byte_array *path = untag_check<byte_array>(ctx->pop());
 
   FILE* file = safe_fopen((char*)(path + 1), (char*)(mode + 1));
-  ctx->push(allot_alien((cell)file));
+  ctx->push(allot_alien(reinterpret_cast<cell>(file)));
 }
 
 FILE* factor_vm::pop_file_handle() {
