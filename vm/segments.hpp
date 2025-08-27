@@ -1,6 +1,6 @@
 namespace factor {
 
-inline cell align_page(cell a) { return align(a, getpagesize()); }
+inline cell align_page(cell a) { return align(a, static_cast<cell>(getpagesize())); }
 
 bool set_memory_locked(cell base, cell size, bool locked);
 
@@ -36,11 +36,11 @@ struct segment {
   }
 
   bool underflow_p(cell addr) {
-    return addr >= (start - getpagesize()) && addr < start;
+    return addr >= (start - static_cast<cell>(getpagesize())) && addr < start;
   }
 
   bool overflow_p(cell addr) {
-    return addr >= end && addr < (end + getpagesize());
+    return addr >= end && addr < (end + static_cast<cell>(getpagesize()));
   }
 
   bool in_segment_p(cell addr) {
@@ -49,13 +49,13 @@ struct segment {
 
   void set_border_locked(bool locked) {
     int pagesize = getpagesize();
-    cell lo = start - pagesize;
-    if (!set_memory_locked(lo, pagesize, locked)) {
+    cell lo = start - static_cast<cell>(pagesize);
+    if (!set_memory_locked(lo, static_cast<cell>(pagesize), locked)) {
       fatal_error("Cannot (un)protect low guard page", lo);
     }
 
     cell hi = end;
-    if (!set_memory_locked(hi, pagesize, locked)) {
+    if (!set_memory_locked(hi, static_cast<cell>(pagesize), locked)) {
       fatal_error("Cannot (un)protect high guard page", hi);
     }
   }

@@ -15,8 +15,8 @@ inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    uint16_t* start = (uint16_t*)dst;
-    uint16_t* end = (uint16_t*)((cell)dst + size);
+    uint16_t* start = static_cast<uint16_t*>(dst);
+    uint16_t* end = reinterpret_cast<uint16_t*>(reinterpret_cast<cell>(dst) + size);
     while (start < end) {
       *start = pattern;
       start++;
@@ -36,8 +36,8 @@ inline static void memset_cell(void* dst, cell pattern, size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    cell* start = (cell*)dst;
-    cell* end = (cell*)((cell)dst + size);
+    cell* start = static_cast<cell*>(dst);
+    cell* end = reinterpret_cast<cell*>(reinterpret_cast<cell>(dst) + size);
     while (start < end) {
       *start = pattern;
       start++;
