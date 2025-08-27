@@ -48,7 +48,7 @@ fixnum instruction_operand::load_value_masked(cell msb, cell lsb,
   
   // Use memcpy to avoid alignment issues
   int32_t value;
-  memcpy(&value, (void*)(pointer - sizeof(uint32_t)), sizeof(int32_t));
+  memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(uint32_t)), sizeof(int32_t));
 
   return value << (31 - msb) >> (31 - msb + lsb) << scaling;
 }
@@ -58,19 +58,19 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_ABSOLUTE_CELL: {
       FACTOR_ASSERT(pointer >= compiled->entry_point() + sizeof(cell));
       cell value;
-      memcpy(&value, (void*)(pointer - sizeof(cell)), sizeof(cell));
+      memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(cell)), sizeof(cell));
       return value;
     }
     case RC_ABSOLUTE: {
       FACTOR_ASSERT(pointer >= compiled->entry_point() + sizeof(uint32_t));
       uint32_t value;
-      memcpy(&value, (void*)(pointer - sizeof(uint32_t)), sizeof(uint32_t));
+      memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(uint32_t)), sizeof(uint32_t));
       return value;
     }
     case RC_ABSOLUTE_2: {
       FACTOR_ASSERT(pointer >= compiled->entry_point() + sizeof(uint16_t));
       uint16_t value;
-      memcpy(&value, (void*)(pointer - sizeof(uint16_t)), sizeof(uint16_t));
+      memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(uint16_t)), sizeof(uint16_t));
       return value;
     }
     case RC_ABSOLUTE_1:
@@ -79,7 +79,7 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_RELATIVE: {
       FACTOR_ASSERT(pointer >= compiled->entry_point() + sizeof(uint32_t));
       int32_t value;
-      memcpy(&value, (void*)(pointer - sizeof(uint32_t)), sizeof(int32_t));
+      memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(uint32_t)), sizeof(int32_t));
       return value + relative_to;
     }
     case RC_RELATIVE_ARM_B:
@@ -107,9 +107,9 @@ void instruction_operand::store_value_masked(fixnum value, cell mask,
   
   // Use memcpy to avoid alignment issues
   uint32_t current;
-  memcpy(&current, (void*)(pointer - sizeof(uint32_t)), sizeof(uint32_t));
+  memcpy(&current, reinterpret_cast<void*>(pointer - sizeof(uint32_t)), sizeof(uint32_t));
   current = (uint32_t)((current & ~mask) | (value >> scaling << lsb & mask));
-  memcpy((void*)(pointer - sizeof(uint32_t)), &current, sizeof(uint32_t));
+  memcpy(reinterpret_cast<void*>(pointer - sizeof(uint32_t)), &current, sizeof(uint32_t));
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
@@ -119,7 +119,7 @@ void instruction_operand::store_value(fixnum absolute_value) {
     case RC_ABSOLUTE_CELL: {
       FACTOR_ASSERT(pointer >= compiled->entry_point() + sizeof(cell));
       cell value = absolute_value;
-      memcpy((void*)(pointer - sizeof(cell)), &value, sizeof(cell));
+      memcpy(reinterpret_cast<void*>(pointer - sizeof(cell)), &value, sizeof(cell));
       break;
     }
     case RC_ABSOLUTE: {

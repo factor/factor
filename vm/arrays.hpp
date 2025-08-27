@@ -1,12 +1,12 @@
 namespace factor {
 
-inline cell array_nth(array* array, cell slot) {
+inline cell array_nth(const array* array, const cell slot) {
   FACTOR_ASSERT(slot < array_capacity(array));
   FACTOR_ASSERT(array->type() == ARRAY_TYPE);
   return array->data()[slot];
 }
 
-inline void factor_vm::set_array_nth(array* array, cell slot, cell value) {
+inline void factor_vm::set_array_nth(array* array, const cell slot, const cell value) {
   FACTOR_ASSERT(slot < array_capacity(array));
   FACTOR_ASSERT(array->type() == ARRAY_TYPE);
   cell* slot_ptr = &array->data()[slot];

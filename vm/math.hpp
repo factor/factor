@@ -1,9 +1,9 @@
 namespace factor {
 
-static const fixnum fixnum_max =
-    (((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)) - 1);
-static const fixnum fixnum_min = (-((fixnum)1 << (WORD_SIZE - TAG_BITS - 1)));
-static const fixnum array_size_max = ((cell)1 << (WORD_SIZE - TAG_BITS - 2));
+constexpr fixnum fixnum_max =
+    ((static_cast<fixnum>(1) << (WORD_SIZE - TAG_BITS - 1)) - 1);
+constexpr fixnum fixnum_min = (-(static_cast<fixnum>(1) << (WORD_SIZE - TAG_BITS - 1)));
+constexpr fixnum array_size_max = (static_cast<cell>(1) << (WORD_SIZE - TAG_BITS - 2));
 
 // Allocates memory
 inline cell factor_vm::from_signed_cell(fixnum x) {
@@ -40,11 +40,11 @@ inline double factor_vm::untag_float_check(cell tagged) {
 }
 
 inline fixnum factor_vm::float_to_fixnum(cell tagged) {
-  return (fixnum)untag_float(tagged);
+  return static_cast<fixnum>(untag_float(tagged));
 }
 
 inline double factor_vm::fixnum_to_float(cell tagged) {
-  return (double)untag_fixnum(tagged);
+  return static_cast<double>(untag_fixnum(tagged));
 }
 
 inline cell factor_vm::unbox_array_size() {

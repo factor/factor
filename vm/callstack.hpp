@@ -63,11 +63,11 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
 // Iterates the callstack from innermost to outermost
 // callframe. Allocates memory
 template <typename Iterator, typename Fixup>
-void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
+void factor_vm::iterate_callstack(context* ctx_param, Iterator& iterator,
                                   Fixup& fixup) {
 
-  cell top = ctx->callstack_top;
-  cell bottom = ctx->callstack_bottom;
+  cell top = ctx_param->callstack_top;
+  cell bottom = ctx_param->callstack_bottom;
   // When we are translating the code block maps, all callstacks must
   // be empty.
   FACTOR_ASSERT(!Fixup::translated_code_block_map || top == bottom);
@@ -117,9 +117,9 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
 
 // Allocates memory
 template <typename Iterator>
-inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator) {
+inline void factor_vm::iterate_callstack(context* ctx_param, Iterator& iterator) {
   no_fixup none;
-  iterate_callstack(ctx, iterator, none);
+  iterate_callstack(ctx_param, iterator, none);
 }
 
 }

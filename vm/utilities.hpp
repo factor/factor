@@ -7,7 +7,7 @@ namespace factor {
        iter != _end;                                            \
        iter++)
 
-inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
+inline void memset_2(void* dst, const uint16_t pattern, const size_t size) {
 #ifdef __APPLE__
   cell cell_pattern = (pattern | (pattern << 16));
   memset_pattern4(dst, &cell_pattern, size);
@@ -25,7 +25,7 @@ inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
 #endif
 }
 
-inline static void memset_cell(void* dst, cell pattern, size_t size) {
+inline void memset_cell(void* dst, const cell pattern, const size_t size) {
 #ifdef __APPLE__
 #ifdef FACTOR_64
   memset_pattern8(dst, &pattern, size);

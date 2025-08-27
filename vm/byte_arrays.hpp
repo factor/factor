@@ -19,9 +19,9 @@ struct growable_byte_array {
 // Allocates memory
 template <typename Type>
 byte_array* factor_vm::byte_array_from_value(Type* value) {
-  byte_array* data = allot_uninitialized_array<byte_array>(sizeof(Type));
-  memcpy(data->data<char>(), value, sizeof(Type));
-  return data;
+  byte_array* array = allot_uninitialized_array<byte_array>(sizeof(Type));
+  memcpy(array->data<char>(), value, sizeof(Type));
+  return array;
 }
 
 }

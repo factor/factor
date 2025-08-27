@@ -9,7 +9,7 @@ struct free_heap_block {
   bool free_p() const { return (header & 1) == 1; }
 
   cell size() const {
-    cell size = header & ~7;
+    cell size = header & ~static_cast<cell>(7);
     FACTOR_ASSERT(size > 0);
     return size;
   }
@@ -180,9 +180,9 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
     free_heap_block key;
     key.make_free(requested_size);
     auto iter = large_blocks.lower_bound(&key);
-    auto end = large_blocks.end();
+    auto end_iter = large_blocks.end();
 
-    if (iter != end) {
+    if (iter != end_iter) {
       free_heap_block* block = *iter;
       large_blocks.erase(iter);
 

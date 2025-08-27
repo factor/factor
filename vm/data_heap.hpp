@@ -44,10 +44,10 @@ struct data_heap {
   void reset_nursery();
   void reset_aging();
   void reset_tenured();
-  bool high_fragmentation_p();
-  bool low_memory_p();
+  [[nodiscard]] bool high_fragmentation_p();
+  [[nodiscard]] bool low_memory_p();
   void mark_all_cards();
-  cell high_water_mark() { return nursery->size + aging->size; }
+  [[nodiscard]] cell high_water_mark() const { return nursery->size + aging->size; }
 };
 
 struct data_heap_room {
