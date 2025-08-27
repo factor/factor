@@ -31,6 +31,14 @@ struct callback_heap {
   callback_heap(cell size, factor_vm* parent);
   ~callback_heap();
 
+  // Disable copy operations to prevent double-delete
+  callback_heap(const callback_heap&) = delete;
+  callback_heap& operator=(const callback_heap&) = delete;
+  
+  // Move operations could be implemented if needed
+  callback_heap(callback_heap&&) = delete;
+  callback_heap& operator=(callback_heap&&) = delete;
+
   instruction_operand callback_operand(code_block* stub, cell index);
   void store_callback_operand(code_block* stub, cell index, cell value);
   void update(code_block* stub);
