@@ -115,7 +115,9 @@ MEMO: (cache-font-metrics) ( name size traits -- metrics )
     compute-height ;
 
 : cache-font-metrics ( font -- metrics )
-    [ name>> ] [ size>> ] [ font-traits ] tri (cache-font-metrics) ;
+    [ name>> ]
+    [ size>> gl-scale-factor get-global [ * ] when* ]
+    [ font-traits ] tri (cache-font-metrics) ;
 
 STARTUP-HOOK: [
     \ (cache-font) reset-memoized
