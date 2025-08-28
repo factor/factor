@@ -4,18 +4,18 @@ namespace factor {
 
 HMODULE hFactorDll;
 
-bool set_memory_locked(cell base, cell size, bool locked) {
+[[nodiscard]] bool set_memory_locked(cell base, cell size, bool locked) {
   int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
   DWORD ignore;
   int status = VirtualProtect(reinterpret_cast<char*>(base), size, prot, &ignore);
   return status != 0;
 }
 
-void* native_dlopen(const char* path) {
+[[nodiscard]] void* native_dlopen(const char* path) {
   return LoadLibraryExA(path, nullptr, 0);
 }
 
-void* native_dlsym(void* handle, const char* symbol) {
+[[nodiscard]] void* native_dlsym(void* handle, const char* symbol) {
   return reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(handle), symbol));
 }
 
@@ -43,7 +43,7 @@ void factor_vm::ffi_dlclose(dll* dll) {
   dll->handle = nullptr;
 }
 
-BOOL factor_vm::windows_stat(vm_char* path) {
+[[nodiscard]] BOOL factor_vm::windows_stat(vm_char* path) {
   BY_HANDLE_FILE_INFORMATION bhfi;
   HANDLE h = CreateFileW(path, FILE_READ_ATTRIBUTES, 0, nullptr,
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
@@ -63,7 +63,7 @@ BOOL factor_vm::windows_stat(vm_char* path) {
 }
 
 // You must free() this yourself.
-const vm_char* factor_vm::default_image_path() {
+[[nodiscard]] const vm_char* factor_vm::default_image_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   vm_char* ptr;
   vm_char temp_path[MAX_UNICODE_PATH];
@@ -84,7 +84,7 @@ const vm_char* factor_vm::default_image_path() {
 }
 
 // You must free() this yourself.
-const vm_char* factor_vm::vm_executable_path() {
+[[nodiscard]] const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
   if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
@@ -119,7 +119,7 @@ segment::~segment() {
     fatal_error("Segment deallocation failed", 0);
 }
 
-long getpagesize() {
+[[nodiscard]] long getpagesize() {
   static long g_pagesize = 0;
   if (!g_pagesize) {
     SYSTEM_INFO system_info;
@@ -129,7 +129,7 @@ long getpagesize() {
   return g_pagesize;
 }
 
-bool move_file(const vm_char* path1, const vm_char* path2) {
+[[nodiscard]] bool move_file(const vm_char* path1, const vm_char* path2) {
   // MoveFileEx returns FALSE on fail.
   BOOL val = MoveFileEx((path1), (path2), MOVEFILE_REPLACE_EXISTING);
   if (val == FALSE) {
@@ -144,12 +144,12 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 
 void factor_vm::init_signals() {}
 
-THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
+[[nodiscard]] THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
   return reinterpret_cast<void*>(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(start_routine),
                              args, 0, 0));
 }
 
-uint64_t nano_count() {
+[[nodiscard]] uint64_t nano_count() {
   static double scale_factor;
 
   static uint32_t hi = 0;
@@ -297,7 +297,7 @@ void handle_ctrl_c() {
   SetConsoleCtrlHandler(factor::ctrl_handler, TRUE);
 }
 
-const int ctrl_break_sleep = 10; /* msec */
+constexpr int ctrl_break_sleep = 10; /* msec */
 
 static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
   bool ctrl_break_handled = false;
@@ -347,7 +347,7 @@ void unlock_console() {}
 
 void close_console() {}
 
-cell get_thread_pc(THREADHANDLE th) {
+[[nodiscard]] cell get_thread_pc(THREADHANDLE th) {
   DWORD suscount = SuspendThread(th);
   FACTOR_ASSERT(suscount == 0);
 

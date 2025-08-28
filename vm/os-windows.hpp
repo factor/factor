@@ -61,17 +61,17 @@ typedef HANDLE THREADHANDLE;
 #define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_s(buf, buflen, errnum)
 
 inline static void early_init() {}
-uint64_t nano_count();
+[[nodiscard]] uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
-void* native_dlopen(const char* path);
-void* native_dlsym(void* handle, const char* symbol);
+[[nodiscard]] void* native_dlopen(const char* path);
+[[nodiscard]] void* native_dlsym(void* handle, const char* symbol);
 void native_dlclose(void* handle);
 
-long getpagesize();
+[[nodiscard]] long getpagesize();
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch);
-THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
+[[nodiscard]] THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
 
 inline static THREADHANDLE thread_id() {
   DWORD id = GetCurrentThreadId();
