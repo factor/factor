@@ -64,31 +64,33 @@ void factor_vm::ffi_dlclose(dll* dll) {
 
 // You must free() this yourself.
 [[nodiscard]] const vm_char* factor_vm::default_image_path() {
-  vm_char full_path[MAX_UNICODE_PATH];
+  // Use heap allocation instead of stack to avoid C6262 warning (131KB stack usage)
+  auto full_path = std::make_unique<vm_char[]>(MAX_UNICODE_PATH);
   vm_char* ptr;
-  vm_char temp_path[MAX_UNICODE_PATH];
+  auto temp_path = std::make_unique<vm_char[]>(MAX_UNICODE_PATH);
 
-  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
+  if (!GetModuleFileName(nullptr, full_path.get(), MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
 
-  if ((ptr = wcsrchr(full_path, '.')))
+  if ((ptr = wcsrchr(full_path.get(), '.')))
     *ptr = 0;
 
-  wcsncpy(temp_path, full_path, MAX_UNICODE_PATH - 1);
-  size_t full_path_len = wcslen(full_path);
-  if (full_path_len < MAX_UNICODE_PATH - 1)
-    wcsncat(temp_path, L".image", MAX_UNICODE_PATH - full_path_len - 1);
-  temp_path[MAX_UNICODE_PATH - 1] = 0;
+  // Fix C6053 warning: ensure null termination
+  wcsncpy_s(temp_path.get(), MAX_UNICODE_PATH, full_path.get(), _TRUNCATE);
+  size_t full_path_len = wcslen(full_path.get());
+  if (full_path_len < MAX_UNICODE_PATH - 7) // Reserve space for ".image" + null terminator
+    wcscat_s(temp_path.get(), MAX_UNICODE_PATH, L".image");
 
-  return safe_strdup(temp_path);
+  return safe_strdup(temp_path.get());
 }
 
 // You must free() this yourself.
 [[nodiscard]] const vm_char* factor_vm::vm_executable_path() {
-  vm_char full_path[MAX_UNICODE_PATH];
-  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
+  // Use heap allocation instead of stack to avoid C6262 warning (65KB stack usage)
+  auto full_path = std::make_unique<vm_char[]>(MAX_UNICODE_PATH);
+  if (!GetModuleFileName(nullptr, full_path.get(), MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
-  return safe_strdup(full_path);
+  return safe_strdup(full_path.get());
 }
 
 void factor_vm::primitive_existsp() {
@@ -101,14 +103,14 @@ segment::segment(cell size_, bool executable_p) {
 
   char* mem;
   cell alloc_size = getpagesize() * 2 + size;
-  if ((mem = (char*)VirtualAlloc(
+  if ((mem = static_cast<char*>(VirtualAlloc(
            nullptr, alloc_size, MEM_COMMIT,
-           executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
-      0) {
+           executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE))) ==
+      nullptr) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
-  start = (cell)mem + getpagesize();
+  start = reinterpret_cast<cell>(mem) + getpagesize();
   end = start + size;
 
   set_border_locked(true);
@@ -184,10 +186,10 @@ void factor_vm::init_signals() {}
 #endif
   lo = count.LowPart;
 
-  return (uint64_t)((((uint64_t)hi << 32) | (uint64_t)lo) * scale_factor);
+  return static_cast<uint64_t>(((static_cast<uint64_t>(hi) << 32) | static_cast<uint64_t>(lo)) * scale_factor);
 }
 
-void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
+void sleep_nanos(uint64_t nsec) { Sleep(static_cast<DWORD>(nsec / 1000000)); }
 
 #ifndef EXCEPTION_DISPOSITION
 typedef enum _EXCEPTION_DISPOSITION {
@@ -206,7 +208,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
     case EXCEPTION_ACCESS_VIOLATION:
       set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell)factor::memory_signal_handler_impl);
+                              reinterpret_cast<cell>(factor::memory_signal_handler_impl));
       break;
 
     case STATUS_FLOAT_DENORMAL_OPERAND:
@@ -228,12 +230,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #endif
       MXCSR(c) &= 0xffffffc0;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell)factor::fp_signal_handler_impl);
+                              reinterpret_cast<cell>(factor::fp_signal_handler_impl));
       break;
     default:
       signal_number = e->ExceptionCode;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              (cell)factor::synchronous_signal_handler_impl);
+                              reinterpret_cast<cell>(factor::synchronous_signal_handler_impl));
       break;
   }
   return ExceptionContinueExecution;
@@ -324,8 +326,15 @@ void factor_vm::primitive_disable_ctrl_break() {
   if (ctrl_break_thread != nullptr) {
     DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
                                             2 * ctrl_break_sleep);
-    if (wait_result != WAIT_OBJECT_0)
-      TerminateThread(ctrl_break_thread, 0);
+    // Avoid TerminateThread (C6258) - give thread more time to exit gracefully
+    if (wait_result != WAIT_OBJECT_0) {
+      // Try waiting a bit longer before giving up
+      wait_result = WaitForSingleObject(ctrl_break_thread, 1000);
+      if (wait_result != WAIT_OBJECT_0) {
+        // As last resort, terminate the thread (unavoidable in this context)
+        TerminateThread(ctrl_break_thread, 0);
+      }
+    }
     CloseHandle(ctrl_break_thread);
     ctrl_break_thread = nullptr;
   }
@@ -337,7 +346,12 @@ void factor_vm::primitive_enable_ctrl_break() {
     DisableProcessWindowsGhosting();
     ctrl_break_thread = CreateThread(nullptr, 0, factor::ctrl_break_thread_proc,
                                      static_cast<LPVOID>(this), 0, nullptr);
-    SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
+    // Fix C6387 warning: check for null before calling SetThreadPriority
+    if (ctrl_break_thread != nullptr) {
+      SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
+    } else {
+      fatal_error("CreateThread failed for ctrl_break_thread", GetLastError());
+    }
   }
 }
 
@@ -411,9 +425,16 @@ void factor_vm::start_sampling_profiler_timer() {
 void factor_vm::end_sampling_profiler_timer() {
   atomic::store(&sampling_profiler_p, false);
   DWORD wait_result =
-      WaitForSingleObject(sampler_thread, 3000 * (DWORD) samples_per_second);
-  if (wait_result != WAIT_OBJECT_0)
-    TerminateThread(sampler_thread, 0);
+      WaitForSingleObject(sampler_thread, 3000 * static_cast<DWORD>(samples_per_second));
+  // Avoid TerminateThread (C6258) - give thread more time to exit gracefully
+  if (wait_result != WAIT_OBJECT_0) {
+    // Try waiting a bit longer before giving up
+    wait_result = WaitForSingleObject(sampler_thread, 2000);
+    if (wait_result != WAIT_OBJECT_0) {
+      // As last resort, terminate the thread (unavoidable in this context)
+      TerminateThread(sampler_thread, 0);
+    }
+  }
   CloseHandle(sampler_thread);
   sampler_thread = nullptr;
 }
