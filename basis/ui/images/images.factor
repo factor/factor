@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache images images.loader kernel math
-namespaces opengl opengl.textures sequences splitting
-ui.gadgets.worlds ;
+USING: accessors assocs cache formatting images images.loader
+kernel math namespaces opengl opengl.textures sequences
+splitting ui.gadgets.worlds ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -18,9 +18,9 @@ PRIVATE>
 GENERIC: cached-image ( image -- image )
 
 M: image-name cached-image
-    path>> gl-scale-factor get-global [ 1.0 > ] [ f ] if* [
-        "." split1-last "@2x." glue
-    ] when (cached-image) ;
+    path>> gl-scale-factor get-global [
+        [ "." split1-last ] [ "@%dx." sprintf glue ] bi*
+    ] when* (cached-image) ;
 
 M: image cached-image ;
 
