@@ -16,8 +16,12 @@ constexpr cell data_alignment = 16;
 
 #define TAG_MASK 15
 #define TAG_BITS 4
-#define TAG(x) (reinterpret_cast<cell>(x) & TAG_MASK)
-#define UNTAG(x) (reinterpret_cast<cell>(x) & static_cast<cell>(~TAG_MASK))
+
+// Use C-style casts in macros for compatibility
+// These macros are used in performance-critical paths and need to work
+// with both pointers and integers in constant expressions
+#define TAG(x) ((cell)(x) & TAG_MASK)
+#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
 #define RETAG(x, tag) (UNTAG(x) | (tag))
 
 // Type tags, should be kept in sync with:
@@ -84,7 +88,7 @@ enum {
 // What Factor calls 'f'
 constexpr cell false_object = F_TYPE;
 
-[[nodiscard]] constexpr bool immediate_p(cell obj) {
+[[nodiscard]] inline bool immediate_p(cell obj) {
   // We assume that fixnums have tag 0 and false_object has tag 1
   return TAG(obj) <= F_TYPE;
 }

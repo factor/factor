@@ -180,7 +180,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
-      return -1;
+      return static_cast<cell>(-1); // Explicitly cast to cell (unsigned)
   }
 }
 

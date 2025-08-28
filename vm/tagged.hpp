@@ -1,12 +1,6 @@
 namespace factor {
 
-// C++20 concept for Factor objects
-template<typename T>
-concept FactorObject = requires(T t) {
-  { T::type_number } -> std::convertible_to<cell>;
-};
-
-template <FactorObject Type> cell tag(Type* value) {
+template <typename Type> cell tag(Type* value) {
   return RETAG(value, Type::type_number);
 }
 

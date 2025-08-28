@@ -50,7 +50,12 @@ fixnum instruction_operand::load_value_masked(cell msb, cell lsb,
   int32_t value;
   memcpy(&value, reinterpret_cast<void*>(pointer - sizeof(uint32_t)), sizeof(int32_t));
 
-  return value << (31 - msb) >> (31 - msb + lsb) << scaling;
+  // Extract bits from msb to lsb using sign extension
+  int32_t shift_left = static_cast<int32_t>(31 - msb);
+  int32_t shift_right = static_cast<int32_t>(31 - msb + lsb);
+  int32_t result = (value << shift_left) >> shift_right;
+  // Apply scaling as int64_t to prevent overflow
+  return static_cast<fixnum>(static_cast<int64_t>(result) << scaling);
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {

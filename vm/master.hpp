@@ -34,6 +34,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
