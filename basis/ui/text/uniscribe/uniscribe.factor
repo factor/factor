@@ -18,7 +18,7 @@ M: uniscribe-renderer string>image
 
 M: uniscribe-renderer x>offset
     [ 2drop 0 ] [
-        [ gl-scale ] dip cached-script-string x>line-offset 0 = [ 1 + ] unless
+        [ gl-scale ] 2dip cached-script-string x>line-offset 0 = [ 1 + ] unless
     ] if-empty ;
 
 M: uniscribe-renderer offset>x
