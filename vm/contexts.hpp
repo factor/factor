@@ -17,6 +17,9 @@ enum context_object {
 // to work with. macOS 64 bit needs more than 8192. See issue #1419.
 static const cell stack_reserved = 16384;
 
+// Maximum number of unused contexts to keep in the pool for reuse
+static const size_t max_unused_contexts = 10;
+
 struct context {
 
   // First 5 fields accessed directly by compiler. See basis/vm/vm.factor

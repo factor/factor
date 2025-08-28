@@ -40,10 +40,15 @@ factor_vm::~factor_vm() {
   close_console();
   FACTOR_ASSERT(!ctx);
   
-  // Both unused_contexts and active_contexts now use shared_ptr, 
-  // so they clean up automatically
-  unused_contexts.clear();
-  active_contexts.clear();
+  // Clean up unused contexts
+  for (auto* context : unused_contexts) {
+    delete context;
+  }
+  
+  // Clean up active contexts
+  for (auto* context : active_contexts) {
+    delete context;
+  }
   
   // function_descriptors now uses unique_ptr, so they clean up automatically
   function_descriptors.clear();

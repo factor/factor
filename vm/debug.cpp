@@ -285,8 +285,7 @@ void factor_vm::dump_memory_layout(ostream& out) {
   dump_memory_range(out, "Cards", 10, (cell)data->cards.get(), (cell)data->cards_end);
 
   out << endl << "Contexts:" << endl << endl;
-  for (const auto& ctx_ptr : active_contexts) {
-    context* the_ctx = ctx_ptr.get();
+  for (context* the_ctx : active_contexts) {
     segment* ds = the_ctx->datastack_seg.get();
     segment* rs = the_ctx->retainstack_seg.get();
     segment* cs = the_ctx->callstack_seg.get();

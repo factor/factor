@@ -132,19 +132,19 @@ void context::swap(context& other) noexcept {
 }
 
 context* factor_vm::new_context() {
-  std::shared_ptr<context> ctx_ptr;
+  context* new_context;
 
   if (unused_contexts.empty()) {
-    ctx_ptr = std::make_shared<context>(datastack_size, retainstack_size, callstack_size);
+    new_context = new context(datastack_size, retainstack_size, callstack_size);
   } else {
-    ctx_ptr = std::move(unused_contexts.back());
+    new_context = unused_contexts.back();
     unused_contexts.pop_back();
-    ctx_ptr->reset();
+    new_context->reset();
   }
 
-  active_contexts.insert(ctx_ptr);
+  active_contexts.insert(new_context);
 
-  return ctx_ptr.get();
+  return new_context;
 }
 
 // Allocates memory
@@ -160,22 +160,13 @@ VM_C_API context* new_context(factor_vm* parent) {
 }
 
 void factor_vm::delete_context() {
-  // Find the shared_ptr for this context
-  std::shared_ptr<context> ctx_ptr;
-  for (auto it = active_contexts.begin(); it != active_contexts.end(); ++it) {
-    if (it->get() == ctx) {
-      ctx_ptr = *it;
-      active_contexts.erase(it);
-      break;
-    }
-  }
-  
-  if (ctx_ptr) {
-    unused_contexts.push_back(std::move(ctx_ptr));
-    
-    while (unused_contexts.size() > 10) {
-      unused_contexts.pop_front();
-    }
+  active_contexts.erase(ctx);
+  unused_contexts.push_back(ctx);
+
+  while (unused_contexts.size() > max_unused_contexts) {
+    context* stale_context = unused_contexts.front();
+    unused_contexts.pop_front();
+    delete stale_context;
   }
 }
 

@@ -61,10 +61,10 @@ struct factor_vm {
   std::list<std::unique_ptr<void*[]>> function_descriptors;
 
   // Pooling unused contexts to make context allocation cheaper
-  std::list<std::shared_ptr<context>> unused_contexts;
+  std::list<context*> unused_contexts;
 
   // Active contexts, for tracing by the GC
-  std::set<std::shared_ptr<context>> active_contexts;
+  std::set<context*> active_contexts;
 
   // External entry points
   c_to_factor_func_type c_to_factor_func;

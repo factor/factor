@@ -222,8 +222,8 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
 
-  for (const auto& ctx_ptr : parent->active_contexts) {
-    visit_context(ctx_ptr.get());
+  for (context* ctx : parent->active_contexts) {
+    visit_context(ctx);
   }
 }
 
@@ -399,8 +399,8 @@ void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context_code_blocks() {
   call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
-  for (const auto& ctx_ptr : parent->active_contexts) {
-    parent->iterate_callstack(ctx_ptr.get(), call_frame_visitor, fixup);
+  for (context* ctx : parent->active_contexts) {
+    parent->iterate_callstack(ctx, call_frame_visitor, fixup);
   }
 }
 
