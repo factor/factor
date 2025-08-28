@@ -84,7 +84,7 @@ enum {
 // What Factor calls 'f'
 constexpr cell false_object = F_TYPE;
 
-[[nodiscard]] constexpr bool immediate_p(cell obj) {
+[[nodiscard]] inline bool immediate_p(cell obj) {
   // We assume that fixnums have tag 0 and false_object has tag 1
   return TAG(obj) <= F_TYPE;
 }
