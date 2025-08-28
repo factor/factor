@@ -162,11 +162,15 @@ factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 # is applied. To avoid this, we delete the .manifest file on clean
 # and copy it from a reference file on compilation and mt.exe.
 #
+factor.com.manifest: factor.com
+	copy factor.exe.manifest.in factor.exe.manifest
+	mt -manifest factor.exe.manifest -outputresource:"factor.com;#1"
+
 factor.exe.manifest: factor.exe
 	copy factor.exe.manifest.in factor.exe.manifest
 	mt -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
 
-all: factor.com factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
+all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
 
 !ENDIF
 
