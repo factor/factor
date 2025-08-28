@@ -29,6 +29,9 @@ TYPEDEF: double gdouble
 TYPEDEF: size_t gsize
 TYPEDEF: long gssize
 
+TYPEDEF: intptr_t gintptr
+TYPEDEF: uintptr_t guintptr
+
 TYPEDEF: gulong GType
 TYPEDEF: void* gpointer
 TYPEDEF: guint32 gunichar
@@ -67,11 +70,21 @@ gdouble "gdouble" register-standard-type
 gsize "gsize" register-standard-type
 gssize "gssize" register-standard-type
 
+gintptr "gintptr" register-standard-type
+guintptr "guintptr" register-standard-type
+
 GType "GType" register-standard-type
 gpointer "gpointer" register-standard-type
+gpointer "gconstpointer" register-standard-type
 gunichar "gunichar" register-standard-type
 va_list "va_list" register-standard-type
 
 gboolean "gboolean" register-standard-type
 pointer: gchar "utf8" register-standard-type
 longdouble "long double" register-standard-type
+
+void* "none" register-standard-type
+int "time_t" register-standard-type
+int "pid_t" register-standard-type
+uint "uid_t" register-standard-type
+pointer: char "filename" register-standard-type
