@@ -7,46 +7,46 @@ HMODULE hFactorDll;
 bool set_memory_locked(cell base, cell size, bool locked) {
   int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
   DWORD ignore;
-  int status = VirtualProtect((char*)base, size, prot, &ignore);
+  int status = VirtualProtect(reinterpret_cast<char*>(base), size, prot, &ignore);
   return status != 0;
 }
 
 void* native_dlopen(const char* path) {
-  return LoadLibraryEx((WCHAR*)path, NULL, 0);
+  return LoadLibraryExA(path, nullptr, 0);
 }
 
 void* native_dlsym(void* handle, const char* symbol) {
-  return (void*)GetProcAddress((HMODULE)handle, symbol);
+  return reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(handle), symbol));
 }
 
 void native_dlclose(void* handle) {
-  FreeLibrary((HMODULE)handle);
+  FreeLibrary(static_cast<HMODULE>(handle));
 }
 
 void factor_vm::init_ffi() {
-  hFactorDll = GetModuleHandle(NULL);
+  hFactorDll = GetModuleHandle(nullptr);
   if (!hFactorDll)
     fatal_error("GetModuleHandle() failed", 0);
 }
 
 void factor_vm::ffi_dlopen(dll* dll) {
-  dll->handle = LoadLibraryEx((WCHAR*)alien_offset(dll->path), NULL, 0);
+  dll->handle = LoadLibraryEx(reinterpret_cast<WCHAR*>(alien_offset(dll->path)), nullptr, 0);
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (cell)GetProcAddress(dll ? (HMODULE) dll->handle : hFactorDll,
-                              symbol);
+  return reinterpret_cast<cell>(GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll,
+                              symbol));
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
-  FreeLibrary((HMODULE) dll->handle);
-  dll->handle = NULL;
+  FreeLibrary(static_cast<HMODULE>(dll->handle));
+  dll->handle = nullptr;
 }
 
 BOOL factor_vm::windows_stat(vm_char* path) {
   BY_HANDLE_FILE_INFORMATION bhfi;
-  HANDLE h = CreateFileW(path, FILE_READ_ATTRIBUTES, 0, NULL,
-                         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+  HANDLE h = CreateFileW(path, FILE_READ_ATTRIBUTES, 0, nullptr,
+                         OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
 
   if (h == INVALID_HANDLE_VALUE) {
     // FindFirstFile is the only call that can stat c:\pagefile.sys
@@ -68,7 +68,7 @@ const vm_char* factor_vm::default_image_path() {
   vm_char* ptr;
   vm_char temp_path[MAX_UNICODE_PATH];
 
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
 
   if ((ptr = wcsrchr(full_path, '.')))
@@ -86,7 +86,7 @@ const vm_char* factor_vm::default_image_path() {
 // You must free() this yourself.
 const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+  if (!GetModuleFileName(nullptr, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
   return safe_strdup(full_path);
 }
@@ -102,7 +102,7 @@ segment::segment(cell size_, bool executable_p) {
   char* mem;
   cell alloc_size = getpagesize() * 2 + size;
   if ((mem = (char*)VirtualAlloc(
-           NULL, alloc_size, MEM_COMMIT,
+           nullptr, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
       0) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
@@ -115,7 +115,7 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 segment::~segment() {
-  if (!VirtualFree((void*)(start - getpagesize()), 0, MEM_RELEASE))
+  if (!VirtualFree(reinterpret_cast<void*>(start - getpagesize()), 0, MEM_RELEASE))
     fatal_error("Segment deallocation failed", 0);
 }
 
@@ -145,8 +145,8 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 void factor_vm::init_signals() {}
 
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
-  return (void*)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) start_routine,
-                             args, 0, 0);
+  return reinterpret_cast<void*>(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(start_routine),
+                             args, 0, 0));
 }
 
 uint64_t nano_count() {
@@ -168,8 +168,8 @@ uint64_t nano_count() {
 
   if (scale_factor == 0.0) {
     LARGE_INTEGER frequency;
-    BOOL ret = QueryPerformanceFrequency(&frequency);
-    if (ret == 0)
+    BOOL freq_ret = QueryPerformanceFrequency(&frequency);
+    if (freq_ret == 0)
       fatal_error("QueryPerformanceFrequency", 0);
     scale_factor = (1000000000.0 / frequency.QuadPart);
   }
@@ -308,7 +308,7 @@ static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
     } else if (!ctrl_break_handled) {
       /* Check if the VM thread has the same Id as the thread Id of the
          currently active window. Note that thread Id is not a handle. */
-      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+      DWORD fg_thd_id = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
       if ((fg_thd_id == vm->thread_id) && !vm->fep_p) {
         vm->enqueue_fep();
         ctrl_break_handled = true;
@@ -327,7 +327,7 @@ void factor_vm::primitive_disable_ctrl_break() {
     if (wait_result != WAIT_OBJECT_0)
       TerminateThread(ctrl_break_thread, 0);
     CloseHandle(ctrl_break_thread);
-    ctrl_break_thread = NULL;
+    ctrl_break_thread = nullptr;
   }
 }
 
@@ -335,8 +335,8 @@ void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
   if (ctrl_break_thread == nullptr) {
     DisableProcessWindowsGhosting();
-    ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
-                                     static_cast<LPVOID>(this), 0, NULL);
+    ctrl_break_thread = CreateThread(nullptr, 0, factor::ctrl_break_thread_proc,
+                                     static_cast<LPVOID>(this), 0, nullptr);
     SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
   }
 }
@@ -352,7 +352,7 @@ cell get_thread_pc(THREADHANDLE th) {
   FACTOR_ASSERT(suscount == 0);
 
   CONTEXT context;
-  memset((void*)&context, 0, sizeof(CONTEXT));
+  memset(&context, 0, sizeof(CONTEXT));
   context.ContextFlags = CONTEXT_CONTROL;
   BOOL context_ok = GetThreadContext(th, &context);
   FACTOR_ASSERT(context_ok);
@@ -381,17 +381,17 @@ void factor_vm::sampler_thread_loop() {
     ok = QueryPerformanceCounter(&new_counter);
     FACTOR_ASSERT(ok);
     new_counter.QuadPart *= samples_per_second;
-    cell samples = 0;
+    cell sample_count = 0;
     while (new_counter.QuadPart - counter.QuadPart >
            units_per_second.QuadPart) {
-      ++samples;
+      ++sample_count;
       counter.QuadPart += units_per_second.QuadPart;
     }
-    if (samples == 0)
+    if (sample_count == 0)
       continue;
 
     cell pc = get_thread_pc(thread);
-    enqueue_samples(samples, pc, false);
+    enqueue_samples(sample_count, pc, false);
   }
 
   (void)ok; // use all variables
@@ -404,8 +404,8 @@ static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm) {
 }
 
 void factor_vm::start_sampling_profiler_timer() {
-  sampler_thread = CreateThread(NULL, 0, &sampler_thread_entry,
-                                static_cast<LPVOID>(this), 0, NULL);
+  sampler_thread = CreateThread(nullptr, 0, &sampler_thread_entry,
+                                static_cast<LPVOID>(this), 0, nullptr);
 }
 
 void factor_vm::end_sampling_profiler_timer() {
@@ -415,7 +415,7 @@ void factor_vm::end_sampling_profiler_timer() {
   if (wait_result != WAIT_OBJECT_0)
     TerminateThread(sampler_thread, 0);
   CloseHandle(sampler_thread);
-  sampler_thread = NULL;
+  sampler_thread = nullptr;
 }
 
 [[noreturn]] void abort() { ::abort(); }

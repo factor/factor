@@ -17,7 +17,7 @@ void register_vm_with_thread(factor_vm* vm) {
 }
 
 factor_vm* current_vm_p() {
-  return (factor_vm*)TlsGetValue(current_vm_tls_key);
+  return static_cast<factor_vm*>(TlsGetValue(current_vm_tls_key));
 }
 
 }

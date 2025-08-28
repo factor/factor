@@ -1760,8 +1760,8 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
     if (d.untagged() == BIGNUM_OUT_OF_BAND) {
       return d.untagged();
     }
-    ac = bc;
-    bc = d;
+    swap(ac, bc);
+    swap(bc, d);
   }
   return ac.untagged();
 }
