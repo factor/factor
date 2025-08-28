@@ -27,8 +27,8 @@ void sleep_nanos(uint64_t nsec) {
   timespec ts;
   timespec ts_rem;
   int ret;
-  ts.tv_sec = static_cast<__time_t>(nsec / 1000000000);
-  ts.tv_nsec = static_cast<__syscall_slong_t>(nsec % 1000000000);
+  ts.tv_sec = static_cast<time_t>(nsec / 1000000000);
+  ts.tv_nsec = static_cast<long>(nsec % 1000000000);
   ret = nanosleep(&ts, &ts_rem);
   while (ret == -1 && errno == EINTR) {
     memcpy(&ts, &ts_rem, sizeof(ts));
