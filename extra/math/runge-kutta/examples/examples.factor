@@ -13,7 +13,7 @@ IN: math.runge-kutta.examples
     first3 [ * ] dip 2.666 * - ;
 
 : <lorenz> ( -- delta dx..n/dt x..nt t-limit )
-    0.01 { [ lorenz-dx/dt ] [ lorenz-dy/dt ] [ lorenz-dz/dt ] } { 2.0 1.0 1.0 0.0 } 150 ;
+    0.01 { [ lorenz-dx/dt ] [ lorenz-dy/dt ] [ lorenz-dz/dt ] } { 2.0 1.0 1.0 0.0 } 50 ;
 
 : add-lines-from-3d-data ( chart data -- chart )
     [ line new link-color >>color swap { 0 3 } cols-except >>data add-gadget ]
@@ -40,7 +40,7 @@ IN: math.runge-kutta.examples
 :: <rabinovich-fabrikant> ( gamma alpha -- delta dx..n/dt x..nt t-limit )
     0.01
     { [ gamma rf-dx/dt ] [ gamma rf-dy/dt ] [ alpha rf-dz/dt ] }
-    { -1 0 0.5 0 } 1000 ;
+    { -1 0 0.5 0 } 300 ;
 
 
 : rabinovich-fabrikant. ( -- )
@@ -62,7 +62,7 @@ CONSTANT: cyclically-symmetric-b 0.208186 ! >1 is stable, =1 is pitchfork bifurc
 : <cyclically-symmetric> ( -- delta dx..n/dt x..nt t-limit )
     0.01
     { [ cyclically-symmetric-dx/dt ] [ cyclically-symmetric-dy/dt ] [ cyclically-symmetric-dz/dt ] }
-    { 2.0 1.0 1.0 0.0 } 1000 ;
+    { 2.0 1.0 1.0 0.0 } 200 ;
 
 : cyclically-symmetric. ( -- )
     chart new { { -2 4 } { -2 4 } } >>axes
