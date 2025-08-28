@@ -62,6 +62,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
     parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
                           false_object,
                           false_object);
+    return nullptr; // Critical: prevent NULL dereference
   }
   stub->header = bump & ~7;
   stub->owner = owner;
