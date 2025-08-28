@@ -33,7 +33,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   // generate a small trampoline that jumps to the real
   // exception handler.
 
-  seh_data* seh_area = (seh_data*)code->seh_area;
+  seh_data* seh_area = reinterpret_cast<seh_data*>(code->seh_area);
   cell base = code->seg->start;
 
   // Should look at generating this with the Factor assembler
