@@ -25,11 +25,11 @@ M: uniscribe-renderer offset>x
     [ 2drop 0 ] [ cached-script-string line-offset>x gl-unscale ] if-empty ;
 
 M: uniscribe-renderer font-metrics
-    " " cached-script-string metrics>> scale-metrics clone f >>width ;
+    " " cached-script-string metrics>> clone scale-metrics f >>width ;
 
 M: uniscribe-renderer line-metrics
-    [ " " line-metrics clone 0 >>width ]
-    [ cached-script-string metrics>> scale-metrics 50 >>width 10 >>cap-height 10 >>x-height ]
+    [ " " line-metrics 0 >>width ]
+    [ cached-script-string metrics>> clone scale-metrics 50 >>width 10 >>cap-height 10 >>x-height ]
     if-empty ;
 
 uniscribe-renderer font-renderer set-global

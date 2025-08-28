@@ -3,8 +3,8 @@
 USING: accessors alien.c-types alien.data alien.strings arrays assocs
 cache cairo cairo.ffi classes.struct combinators destructors fonts fry
 gobject.ffi init io.encodings.utf8 kernel math math.rectangles
-math.vectors memoize namespaces pango.cairo.ffi pango.ffi sequences
-ui.text ui.text.private ;
+math.vectors memoize namespaces opengl pango.cairo.ffi pango.ffi
+sequences ui.text ui.text.private ;
 IN: ui.text.pango
 
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
@@ -22,8 +22,12 @@ MEMO:: (cache-font-description) ( name size bold? italic? -- description )
     ] with-destructors ;
 
 : cache-font-description ( font -- description )
-    { [ name>> ] [ size>> ] [ bold?>> ] [ italic?>> ] } cleave
-    (cache-font-description) ;
+    {
+        [ name>> ]
+        [ size>> gl-scale-factor get-global [ * ] when* ]
+        [ bold?>> ]
+        [ italic?>> ]
+    } cleave (cache-font-description) ;
 
 TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
 
@@ -182,30 +186,31 @@ SINGLETON: pango-renderer
 
 M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
-    [ cached-layout logical-rect>> dim>> v>integer ] if-empty ;
+    [ cached-layout logical-rect>> dim>> scale-dim v>integer ] if-empty ;
 
 M: pango-renderer flush-layout-cache
     cached-layouts get-global purge-cache ;
 
 M: pango-renderer string>image
-    cached-layout [ layout>image ] [ text-position vneg ] bi ;
+    cached-layout [ layout>image ] [ text-position scale-dim vneg ] bi ;
 
 M: pango-renderer x>offset
-    cached-layout swap x>line-offset ;
+    [ gl-scale ] 2dip cached-layout swap x>line-offset ;
 
 M: pango-renderer offset>x
-    cached-layout swap line-offset>x ;
+    cached-layout swap line-offset>x gl-unscale ;
 
 M: pango-renderer font-metrics
-    " " cached-layout metrics>> clone f >>width ;
+    " " cached-layout metrics>> clone scale-metrics f >>width ;
 
 M: pango-renderer line-metrics
-    [ " " line-metrics clone 0 >>width ]
-    [ cached-layout metrics>> ]
+    [ " " line-metrics 0 >>width ]
+    [ cached-layout metrics>> clone scale-metrics ]
     if-empty ;
 
 STARTUP-HOOK: [
     \ (cache-font-description) reset-memoized
+    \ missing-font-metrics reset-memoized
     <cache-assoc> cached-layouts set-global
 ]
 

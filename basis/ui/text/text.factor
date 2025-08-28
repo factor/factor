@@ -10,16 +10,15 @@ IN: ui.text
 : scale-dim ( dim -- dim' )
     gl-scale-factor get-global [ [ gl-unscale ] map ] when ; inline
 
-: scale-metrics ( metrics -- metrics' )
+: scale-metrics ( metrics -- metrics )
     gl-scale-factor get-global [
-        clone
-            [ dup [ gl-unscale ] when ] change-width
-            [ dup [ gl-unscale ] when ] change-ascent
-            [ dup [ gl-unscale ] when ] change-descent
-            [ dup [ gl-unscale ] when ] change-height
-            [ dup [ gl-unscale ] when ] change-leading
-            [ dup [ gl-unscale ] when ] change-cap-height
-            [ dup [ gl-unscale ] when ] change-x-height
+        [ dup [ gl-unscale ] when ] change-width
+        [ dup [ gl-unscale ] when ] change-ascent
+        [ dup [ gl-unscale ] when ] change-descent
+        [ dup [ gl-unscale ] when ] change-height
+        [ dup [ gl-unscale ] when ] change-leading
+        [ dup [ gl-unscale ] when ] change-cap-height
+        [ dup [ gl-unscale ] when ] change-x-height
     ] when ; inline
 
 SYMBOL: font-renderer

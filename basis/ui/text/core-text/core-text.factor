@@ -34,11 +34,11 @@ M:: core-text-renderer offset>x ( n font string -- x )
     CTLineGetOffsetForStringIndex gl-unscale ;
 
 M: core-text-renderer font-metrics
-    cache-font-metrics ;
+    cache-font-metrics clone scale-metrics ;
 
 M: core-text-renderer line-metrics
-    [ " " line-metrics clone 0 >>width ]
-    [ cached-line metrics>> scale-metrics ]
+    [ " " line-metrics 0 >>width ]
+    [ cached-line metrics>> clone scale-metrics ]
     if-empty ;
 
 core-text-renderer font-renderer set-global
