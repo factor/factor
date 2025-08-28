@@ -1,4 +1,5 @@
 #include "master.hpp"
+#include <array>
 
 namespace factor {
 
@@ -22,7 +23,7 @@ struct UNWIND_INFO {
 struct seh_data {
   UNWIND_INFO unwind_info;
   RUNTIME_FUNCTION func;
-  UBYTE handler[32];
+  std::array<UBYTE, 32> handler;
 };
 
 void factor_vm::c_to_factor_toplevel(cell quot) {
@@ -66,7 +67,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   unwind_info->CountOfCodes = 0;
   unwind_info->FrameRegister = 0;
   unwind_info->FrameOffset = 0;
-  unwind_info->ExceptionHandler = (DWORD)((cell)&seh_area->handler[0] - base);
+  unwind_info->ExceptionHandler = (DWORD)((cell)seh_area->handler.data() - base);
   unwind_info->ExceptionData[0] = 0;
 
   RUNTIME_FUNCTION* func = &seh_area->func;
