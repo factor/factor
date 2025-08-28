@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.syntax assocs combinators
 core-foundation core-foundation.dictionaries
 core-foundation.strings core-graphics.types destructors fonts
-init kernel math memoize unix.types ;
+init kernel math memoize namespaces opengl unix.types ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef
@@ -99,10 +99,9 @@ MEMO:: (cache-font) ( name size traits -- open-font )
     ] with-destructors ;
 
 : cache-font ( font -- open-font )
-    [ name>> ] [ size>> ] [ font-traits ] tri (cache-font) ;
-
-: cache-font@2x ( font -- open-font )
-    [ name>> ] [ size>> 2 * ] [ font-traits ] tri (cache-font) ;
+    [ name>> ]
+    [ size>> gl-scale-factor get-global [ * ] when* ]
+    [ font-traits ] tri (cache-font) ;
 
 MEMO: (cache-font-metrics) ( name size traits -- metrics )
     [ metrics new ] 3dip

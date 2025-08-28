@@ -314,7 +314,7 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
     ] do-enabled ; inline
 
 : texture-dim ( texture -- dim )
-    [ dim>> ] [ image>> ] bi 2x?>> [ [ 2.0 / ] map ] when ;
+    dim>> gl-scale-factor get-global [ v/n ] when* ;
 
 : (draw-textured-rect) ( dim texture -- )
     [ loc>> ]
@@ -373,6 +373,9 @@ M: single-texture draw-scaled-texture
     ] if ;
 
 TUPLE: multi-texture < disposable grid display-list loc ;
+
+: image-dim ( image -- dim )
+    dim>> gl-scale-factor get-global [ '[ _ /i ] map ] when* ;
 
 : image-locs ( image-grid -- loc-grid )
     [ first [ image-dim first ] map ]

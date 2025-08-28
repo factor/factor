@@ -29,7 +29,6 @@ PRIVATE>
 
 :: screenshot ( window -- bitmap )
     <image>
-        gl-scale-factor get-global [ 2.0 = >>2x? ] when*
         window gl-screenshot >>bitmap
         window dim>> [ gl-scale >fixnum ] map >>dim
         ubyte-components >>component-type

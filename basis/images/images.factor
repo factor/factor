@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math sequences ;
+USING: accessors combinators kernel math namespaces opengl
+sequences ;
 IN: images
 
 SINGLETONS:
@@ -65,12 +66,9 @@ UNION: alpha-channel-precedes-colors ABGR ARGB XBGR XRGB ;
 TUPLE: image
     dim component-order component-type
     upside-down? premultiplied-alpha?
-    bitmap 2x? ;
+    bitmap ;
 
 : <image> ( -- image ) image new ; inline
-
-: image-dim ( image -- dim )
-    [ dim>> ] [ 2x?>> ] bi [ [ 2.0 / ] map ] when ;
 
 : has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 

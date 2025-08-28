@@ -11,8 +11,7 @@ C: <image-name> image-name
 
 <PRIVATE
 
-MEMO: cached-image-path ( path -- image )
-    [ load-image ] [ "@2x" subseq-of? >>2x? ] bi ;
+MEMO: (cached-image) ( path -- image ) load-image ;
 
 PRIVATE>
 
@@ -21,7 +20,7 @@ GENERIC: cached-image ( image -- image )
 M: image-name cached-image
     path>> gl-scale-factor get-global [ 1.0 > ] [ f ] if* [
         "." split1-last "@2x." glue
-    ] when cached-image-path ;
+    ] when (cached-image) ;
 
 M: image cached-image ;
 
@@ -43,4 +42,4 @@ PRIVATE>
     rendered-image draw-scaled-texture ;
 
 : image-dim ( image -- dim )
-    cached-image [ dim>> ] [ 2x?>> [ [ 2 / ] map ] when ] bi ;
+    cached-image dim>> gl-scale-factor get-global [ '[ _ /i ] map ] when* ;

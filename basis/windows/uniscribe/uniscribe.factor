@@ -115,17 +115,14 @@ PRIVATE>
         if drop
     image RGBA >>component-order ;
 
-: load-2x? ( -- ? )
-    gl-scale-factor get-global [ 1.0 > ] [ f ] if* ;
-
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
-    size dc [ ssa size script-string draw-script-string ] make-bitmap-image load-2x? >>2x?
+    size dc [ ssa size script-string draw-script-string ] make-bitmap-image
     script-string font>> [ foreground>> ] [ background>> ] bi
     >rgba alpha>> 1 number= [ drop ] [ color-to-alpha ] if ;
 
 : set-dc-font ( dc font -- )
-    load-2x? [ cache-font@2x ] [ cache-font ] if SelectObject win32-error=0/f ;
+    cache-font SelectObject win32-error=0/f ;
 
 : ssa-size ( ssa -- dim )
     ScriptString_pSize
