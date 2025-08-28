@@ -1,6 +1,6 @@
 USING: assocs memoize locals kernel accessors init fonts math
 combinators opengl system-info.windows windows.errors
-windows.types windows.gdi32 ;
+windows.types windows.gdi32 namespaces ;
 IN: windows.fonts
 
 MEMO: windows-fonts ( -- fonts )
