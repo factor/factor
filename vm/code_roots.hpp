@@ -16,9 +16,14 @@ struct code_root {
 
   ~code_root() {
     auto& roots = parent->code_roots;
+    // Find and swap with the last element, then pop_back
+    // This avoids the expensive erase from middle of vector
     auto iter = std::find(roots.begin(), roots.end(), this);
     if (iter != roots.end()) {
-      roots.erase(iter);
+      if (iter != roots.end() - 1) {
+        std::swap(*iter, roots.back());
+      }
+      roots.pop_back();
     }
   }
 
