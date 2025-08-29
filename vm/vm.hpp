@@ -1,5 +1,6 @@
 #include <memory>
 #include <list>
+#include <atomic>
 
 namespace factor {
 
@@ -144,7 +145,7 @@ struct factor_vm {
   std::unique_ptr<segment> signal_callstack_seg;
 
   // Are we already handling a fault? Used to catch double memory faults
-  static bool fatal_erroring_p;
+  static std::atomic<bool> fatal_erroring_p;
 
   // Two fep_p variants, one might be redundant.
   volatile bool safepoint_fep_p;

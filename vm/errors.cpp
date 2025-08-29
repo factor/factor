@@ -1,8 +1,11 @@
 #include "master.hpp"
+#include <iomanip>
+#include <sstream>
 
 namespace factor {
 
-bool factor_vm::fatal_erroring_p;
+// Thread-safe error state using atomic
+std::atomic<bool> factor_vm::fatal_erroring_p{false};
 
 [[noreturn]] static inline void fa_diddly_atal_error() {
   printf("fatal_error in fatal_error!\n");
@@ -10,28 +13,76 @@ bool factor_vm::fatal_erroring_p;
   ::_exit(86);
 }
 
-[[noreturn]] void fatal_error(const char* msg, cell tagged) {
-  if (factor_vm::fatal_erroring_p)
-    fa_diddly_atal_error();
-
-  factor_vm::fatal_erroring_p = true;
-
-  std::cout << "fatal_error: " << msg;
-  std::cout << ": " << (void*)tagged;
-  std::cout << std::endl << std::endl;
-  factor_vm* vm = current_vm();
-  if (vm->data) {
-    vm->dump_memory_layout(std::cout);
-  }
-  abort();
+// Helper function to format error location
+static std::string format_location(const ErrorLocation& loc) {
+  std::ostringstream oss;
+  oss << loc.file << ":" << loc.line 
+      << " in " << loc.function;
+  return oss.str();
 }
 
+// Helper function to format error message with context
+static void print_error_context(const ErrorContext& ctx, std::ostream& out) {
+  const char* severity_str = (ctx.severity == ErrorSeverity::FATAL) ? "FATAL" : "CRITICAL";
+  
+  out << "\n[" << severity_str << " ERROR]\n";
+  out << "Location: " << format_location(ctx.location) << "\n";
+  out << "Message: " << ctx.message << "\n";
+  if (ctx.value != 0) {
+    out << "Value: 0x" << std::hex << ctx.value << std::dec;
+    out << " (" << reinterpret_cast<void*>(ctx.value) << ")\n";
+  }
+  out << std::endl;
+}
+
+// Central error reporting function
+void report_error(const ErrorContext& ctx) {
+  if (ctx.severity == ErrorSeverity::FATAL) {
+    if (factor_vm::fatal_erroring_p.exchange(true)) {
+      fa_diddly_atal_error();
+    }
+  }
+  
+  print_error_context(ctx, std::cout);
+  
+  factor_vm* vm = current_vm();
+  if (ctx.severity == ErrorSeverity::FATAL && vm && vm->data) {
+    vm->dump_memory_layout(std::cout);
+  }
+  
+  if (ctx.severity == ErrorSeverity::CRITICAL) {
+    std::cout << "You have triggered a bug in Factor. Please report.\n";
+    if (vm) {
+      vm->factorbug();
+    }
+  } else {
+    abort();
+  }
+}
+
+// Modern fatal_error implementation
+[[noreturn]] void fatal_error_impl(const char* msg, cell tagged,
+                                   const ErrorLocation& loc) {
+  ErrorContext ctx(msg, tagged, ErrorSeverity::FATAL, loc);
+  report_error(ctx);
+  abort(); // Should never reach here, but keeps [[noreturn]] happy
+}
+
+// Legacy fatal_error for backward compatibility
+[[noreturn]] void fatal_error(const char* msg, cell tagged) {
+  fatal_error_impl(msg, tagged, ErrorLocation());
+}
+
+// Modern critical_error implementation
+void critical_error_impl(const char* msg, cell tagged,
+                        const ErrorLocation& loc) {
+  ErrorContext ctx(msg, tagged, ErrorSeverity::CRITICAL, loc);
+  report_error(ctx);
+}
+
+// Legacy critical_error for backward compatibility
 void critical_error(const char* msg, cell tagged) {
-  std::cout << "You have triggered a bug in Factor. Please report.\n";
-  std::cout << "critical_error: " << msg;
-  std::cout << ": " << std::hex << tagged << std::dec;
-  std::cout << std::endl;
-  current_vm()->factorbug();
+  critical_error_impl(msg, tagged, ErrorLocation());
 }
 
 // Allocates memory
