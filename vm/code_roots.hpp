@@ -1,5 +1,3 @@
-#include <algorithm>
-
 namespace factor {
 
 struct code_root {
@@ -15,16 +13,7 @@ struct code_root {
   }
 
   ~code_root() {
-    auto& roots = parent->code_roots;
-    // Find and swap with the last element, then pop_back
-    // This avoids the expensive erase from middle of vector
-    auto iter = std::find(roots.begin(), roots.end(), this);
-    if (iter != roots.end()) {
-      if (iter != roots.end() - 1) {
-        std::swap(*iter, roots.back());
-      }
-      roots.pop_back();
-    }
+    parent->code_roots.remove(this);
   }
 
   // Disable copy operations to prevent double-free

@@ -1,4 +1,5 @@
 #include <memory>
+#include <list>
 
 namespace factor {
 
@@ -119,7 +120,7 @@ struct factor_vm {
   // themselves here. See data_roots.hpp and code_roots.hpp
 
   std::vector<cell*> data_roots;
-  std::vector<code_root*> code_roots;
+  std::list<code_root*> code_roots;
 
   // Debugger
   bool fep_p;
