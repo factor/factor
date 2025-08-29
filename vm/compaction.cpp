@@ -95,42 +95,40 @@ void factor_vm::collect_compact_impl() {
   const object* data_finger = reinterpret_cast<object*>(tenured->start);
   const code_block* code_finger = reinterpret_cast<code_block*>(code->allocator->start);
 
-  {
-    compaction_fixup fixup(data_forwarding_map, code_forwarding_map,
-                           &data_finger, &code_finger);
-    slot_visitor<compaction_fixup> forwarder(this, fixup);
+  compaction_fixup fixup(data_forwarding_map, code_forwarding_map,
+                         &data_finger, &code_finger);
+  slot_visitor<compaction_fixup> forwarder(this, fixup);
 
-    forwarder.visit_uninitialized_code_blocks();
+  forwarder.visit_uninitialized_code_blocks();
 
-    // Object start offsets get recomputed by the object_compaction_updater
-    data->tenured.get()->starts.clear_object_start_offsets();
+  // Object start offsets get recomputed by the object_compaction_updater
+  data->tenured.get()->starts.clear_object_start_offsets();
 
-    // Slide everything in tenured space up, and update data and code heap
-    // pointers inside objects.
-    auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
-      (void)old_addr;
-      (void)size;
-      forwarder.visit_slots(new_addr);
-      forwarder.visit_object_code_block(new_addr);
-      tenured->starts.record_object_start_offset(new_addr);
-    };
-    tenured->compact(compact_object_func, fixup, &data_finger);
+  // Slide everything in tenured space up, and update data and code heap
+  // pointers inside objects.
+  auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
+    (void)old_addr;
+    (void)size;
+    forwarder.visit_slots(new_addr);
+    forwarder.visit_object_code_block(new_addr);
+    tenured->starts.record_object_start_offset(new_addr);
+  };
+  tenured->compact(compact_object_func, fixup, &data_finger);
 
-    // Slide everything in the code heap up, and update data and code heap
-    // pointers inside code blocks.
-    auto compact_code_func = [&](code_block* old_addr,
-                                 code_block* new_addr,
-                                 cell size) {
-      (void)size;
-      forwarder.visit_code_block_objects(new_addr);
-      cell old_entry_point = old_addr->entry_point();
-      forwarder.visit_instruction_operands(new_addr, old_entry_point);
-    };
-    code->allocator->compact(compact_code_func, fixup, &code_finger);
+  // Slide everything in the code heap up, and update data and code heap
+  // pointers inside code blocks.
+  auto compact_code_func = [&](code_block* old_addr,
+                               code_block* new_addr,
+                               cell size) {
+    (void)size;
+    forwarder.visit_code_block_objects(new_addr);
+    cell old_entry_point = old_addr->entry_point();
+    forwarder.visit_instruction_operands(new_addr, old_entry_point);
+  };
+  code->allocator->compact(compact_code_func, fixup, &code_finger);
 
-    forwarder.visit_all_roots();
-    forwarder.visit_context_code_blocks();
-  }
+  forwarder.visit_all_roots();
+  forwarder.visit_context_code_blocks();
 
   update_code_roots_for_compaction();
 

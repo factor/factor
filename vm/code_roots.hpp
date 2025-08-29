@@ -1,3 +1,5 @@
+#include <algorithm>
+
 namespace factor {
 
 struct code_root {
@@ -13,8 +15,11 @@ struct code_root {
   }
 
   ~code_root() {
-    FACTOR_ASSERT(parent->code_roots.back() == this);
-    parent->code_roots.pop_back();
+    auto& roots = parent->code_roots;
+    auto iter = std::find(roots.begin(), roots.end(), this);
+    if (iter != roots.end()) {
+      roots.erase(iter);
+    }
   }
 
   // Disable copy operations to prevent double-free
