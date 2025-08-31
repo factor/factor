@@ -137,13 +137,13 @@ PRIVATE>
 : paste ( -- str )
     [
         CF_UNICODETEXT GetClipboardData [
-            ! nothing to paste
-            ""
-        ] [
             dup GlobalLock dup win32-error=0/f
             [ alien>native-string ]
             [ swap GlobalUnlock win32-error=0/f ] finally
-        ] if-zero
+        ] [
+            ! nothing to paste
+            ""
+        ] if*
     ] with-clipboard
     crlf>lf ;
 
