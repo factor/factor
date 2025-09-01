@@ -1492,7 +1492,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
     end = scan1 + BIGNUM_LENGTH(arg1);
 
     while (scan1 < end) {
-      *scanr = *scanr | (*scan1 & BIGNUM_DIGIT_MASK) << bit_offset;
+      *scanr = *scanr | (static_cast<bignum_digit_type>((static_cast<cell>(*scan1 & BIGNUM_DIGIT_MASK)) << bit_offset));
       *scanr = *scanr & BIGNUM_DIGIT_MASK;
       scanr++;
       *scanr = *scan1++ >> (BIGNUM_DIGIT_LENGTH - bit_offset);
