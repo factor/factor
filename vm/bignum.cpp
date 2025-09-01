@@ -1071,7 +1071,7 @@ void factor_vm::bignum_destructive_normalization(bignum* source, bignum* target,
   bignum_digit_type mask = ((static_cast<cell>(1) << shift_right) - 1);
   while (scan_source < end_source) {
     digit = (*scan_source++);
-    (*scan_target++) = (((digit & mask) << shift_left) | carry);
+    (*scan_target++) = ((static_cast<cell>((digit & mask)) << shift_left) | carry);
     carry = (digit >> shift_right);
   }
   if (scan_target < end_target)
@@ -1092,7 +1092,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
   while (start < scan) {
     digit = (*--scan);
     (*scan) = ((digit >> shift_right) | carry);
-    carry = ((digit & mask) << shift_left);
+    carry = (static_cast<cell>((digit & mask)) << shift_left);
   }
   BIGNUM_ASSERT(carry == 0);
   return;
@@ -1514,7 +1514,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
 
     while (scanr < end) {
       *scanr = (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset;
-      *scanr = (*scanr | *scan1 << (BIGNUM_DIGIT_LENGTH - bit_offset)) &
+      *scanr = (*scanr | (static_cast<bignum_digit_type>((static_cast<cell>(*scan1)) << (BIGNUM_DIGIT_LENGTH - bit_offset)))) &
                BIGNUM_DIGIT_MASK;
       scanr++;
     }
@@ -1736,7 +1736,7 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
     return 0;
   bignum_digit_type digit = (BIGNUM_REF(bn, index));
   int p = shift % BIGNUM_DIGIT_LENGTH;
-  bignum_digit_type mask = static_cast<fixnum>(1) << p;
+  bignum_digit_type mask = static_cast<bignum_digit_type>(static_cast<cell>(1) << p);
   return (digit & mask) ? 1 : 0;
 }
 
@@ -1804,11 +1804,11 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
 
   while (size_a > 1) {
     nbits = log2(BIGNUM_REF(a, size_a - 1));
-    x = ((BIGNUM_REF(a, size_a - 1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
+    x = ((static_cast<cell>(BIGNUM_REF(a, size_a - 1)) << (BIGNUM_DIGIT_LENGTH - nbits)) |
          (BIGNUM_REF(a, size_a - 2) >> nbits));
     y = ((size_b >= size_a - 1 ? BIGNUM_REF(b, size_a - 2) >> nbits : 0) |
          (size_b >= size_a
-              ? BIGNUM_REF(b, size_a - 1) << (BIGNUM_DIGIT_LENGTH - nbits)
+              ? static_cast<cell>(BIGNUM_REF(b, size_a - 1)) << (BIGNUM_DIGIT_LENGTH - nbits)
               : 0));
 
     // inner loop of Lehmer's algorithm;
