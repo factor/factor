@@ -2,19 +2,38 @@
 
 namespace factor {
 
-bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
-  int val;
-  #ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wformat-nonliteral"
-  #endif
-  if (SSCANF(str, arg, &val) > 0) {
-  #ifdef __clang__
-  #pragma clang diagnostic pop
-  #endif
-    *value = val;
-    return true;
+bool factor_arg(const vm_char* str, const vm_char* arg_pattern, cell* value) {
+  // Convert arg_pattern to find the prefix (everything before %d)
+  std::string pattern(arg_pattern);
+  size_t percent_pos = pattern.find("%d");
+  if (percent_pos == std::string::npos) {
+    return false;
   }
+  
+  std::string prefix = pattern.substr(0, percent_pos);
+  std::string input(str);
+  
+  // Check if input starts with the prefix
+  if (input.find(prefix) != 0) {
+    return false;
+  }
+  
+  // Extract the number part
+  std::string num_str = input.substr(prefix.length());
+  
+  // Parse using C++20 string to number conversion
+  try {
+    size_t pos;
+    int val = std::stoi(num_str, &pos);
+    // Check that we consumed the entire string
+    if (pos == num_str.length()) {
+      *value = val;
+      return true;
+    }
+  } catch (const std::exception&) {
+    // Parsing failed
+  }
+  
   return false;
 }
 

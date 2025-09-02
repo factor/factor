@@ -10,15 +10,7 @@ std::atomic<bool> factor_vm::fatal_erroring_p{false};
 [[noreturn]] static inline void fa_diddly_atal_error() {
   printf("fatal_error in fatal_error!\n");
   breakpoint();
-  // _exit is marked noreturn but clang still warns about unreachable code
-  #ifdef __clang__
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wunreachable-code"
-  #endif
-  ::_exit(86);
-  #ifdef __clang__
-  #pragma clang diagnostic pop
-  #endif
+  // breakpoint() is [[noreturn]] and calls __builtin_trap(), so we never reach here
 }
 
 // Helper function to format error location
