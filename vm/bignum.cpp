@@ -419,8 +419,11 @@ FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
       bignum_digit_type* scan = (start + (BIGNUM_LENGTH(bn)));             \
       while (start < scan)                                                 \
         accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));  \
-      return ((BIGNUM_NEGATIVE_P(bn)) ? ((type)(-(stype) accumulator))     \
-                                      : accumulator);                      \
+      if (BIGNUM_NEGATIVE_P(bn)) {                                         \
+        return (type)(~accumulator + 1);                                   \
+      } else {                                                             \
+        return (type)accumulator;                                          \
+      }                                                                    \
     }                                                                      \
   }
 
