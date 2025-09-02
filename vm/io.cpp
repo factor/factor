@@ -162,12 +162,12 @@ void factor_vm::primitive_fopen() {
 
 FILE* factor_vm::pop_file_handle() {
   void* ptr = alien_offset(ctx->pop());
-  return static_cast<FILE*>(__builtin_assume_aligned(ptr, alignof(FILE)));
+  return static_cast<FILE*>(ptr);
 }
 
 FILE* factor_vm::peek_file_handle() {
   void* ptr = alien_offset(ctx->peek());
-  return static_cast<FILE*>(__builtin_assume_aligned(ptr, alignof(FILE)));
+  return static_cast<FILE*>(ptr);
 }
 
 void factor_vm::primitive_fgetc() {
