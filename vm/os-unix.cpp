@@ -357,18 +357,18 @@ void factor_vm::unix_init_signals() {
 
 // The read end of the size pipe can be set to non-blocking.
 extern "C" {
-static int stdin_read;
-static int stdin_write;
+int stdin_read;
+int stdin_write;
 
-static int control_read;
-static int control_write;
+int control_read;
+int control_write;
 
-static int size_read;
-static int size_write;
+int size_read;
+int size_write;
 
-static bool stdin_thread_initialized_p = false;
-static THREADHANDLE stdin_thread;
-static pthread_mutex_t stdin_mutex;
+bool stdin_thread_initialized_p = false;
+THREADHANDLE stdin_thread;
+pthread_mutex_t stdin_mutex;
 }
 
 void safe_close(int fd) {
