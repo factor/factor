@@ -462,12 +462,12 @@ fixnum factor_vm::bignum_to_fixnum_strict(bignum* bn) {
 }
 
 #define DTB_WRITE_DIGIT(factor)                \
-  {                                            \
+  do {                                         \
     significand *= (factor);                   \
     digit = ((bignum_digit_type) significand); \
     (*--scan) = digit;                         \
     significand -= ((double)digit);            \
-  }
+  } while (0)
 
 #define inf std::numeric_limits<double>::infinity()
 
@@ -621,6 +621,9 @@ bignum* factor_vm::bignum_subtract_unsigned(bignum* x_, bignum* y_) {
       break;
     case BIGNUM_COMPARISON_GREATER:
       negative_p = 0;
+      break;
+    default:
+      FACTOR_ASSERT(false);
       break;
   }
   {
@@ -1103,7 +1106,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
 // assumed that the numerator, denominator are normalized.
 
 #define BDD_STEP(qn, j)                                          \
-  {                                                              \
+  do {                                                           \
     uj = (u[j]);                                                 \
     if (uj != v1) {                                              \
       uj_uj1 = (HD_CONS(uj, (u[j + 1])));                        \
@@ -1120,7 +1123,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
         break;                                                   \
     }                                                            \
     qn = (bignum_digit_divide_subtract(v1, v2, guess, (&u[j]))); \
-  }
+  } while (0)
 
 bignum_digit_type factor_vm::bignum_digit_divide(
     bignum_digit_type uh, bignum_digit_type ul, bignum_digit_type v,
@@ -1159,7 +1162,7 @@ bignum_digit_type factor_vm::bignum_digit_divide(
 #undef BDD_STEP
 
 #define BDDS_MULSUB(vn, un, carry_in)    \
-  {                                      \
+  do {                                   \
     product = ((vn * guess) + carry_in); \
     diff = (un - (HD_LOW(product)));     \
     if (diff < 0) {                      \
@@ -1169,10 +1172,10 @@ bignum_digit_type factor_vm::bignum_digit_divide(
       un = diff;                         \
       carry = (HD_HIGH(product));        \
     }                                    \
-  }
+  } while (0)
 
 #define BDDS_ADD(vn, un, carry_in)    \
-  {                                   \
+  do {                                \
     sum = (vn + un + carry_in);       \
     if (sum < BIGNUM_RADIX_ROOT) {    \
       un = sum;                       \
@@ -1181,7 +1184,7 @@ bignum_digit_type factor_vm::bignum_digit_divide(
       un = (sum - BIGNUM_RADIX_ROOT); \
       carry = 1;                      \
     }                                 \
-  }
+  } while (0)
 
 bignum_digit_type factor_vm::bignum_digit_divide_subtract(
     bignum_digit_type v1, bignum_digit_type v2, bignum_digit_type guess,

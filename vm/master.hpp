@@ -101,6 +101,7 @@ namespace factor { struct factor_vm; }
 #include "assert.hpp"
 #include "debug.hpp"
 #include "layouts.hpp"
+#include "conversions.hpp"
 #include "platform.hpp"
 #include "utilities.hpp"
 #include "primitives.hpp"

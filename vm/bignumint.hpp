@@ -98,10 +98,10 @@ typedef int64_t bignum_twodigit_type;
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 
 #define BIGNUM_ASSERT(expression) \
-  {                               \
+  do {                            \
     if (!(expression))            \
       BIGNUM_EXCEPTION();         \
-  }
+  } while (0)
 
 #endif // not BIGNUM_DISABLE_ASSERTION_CHECKS
 
