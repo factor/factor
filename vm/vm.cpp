@@ -3,12 +3,12 @@
 namespace factor {
 
 factor_vm::factor_vm(THREADHANDLE thread)
-    : ctx(NULL),
+    : ctx(nullptr),
       nursery(0, 0),
       faulting_p(false),
       thread(thread),
       callback_id(0),
-      c_to_factor_func(NULL),
+      c_to_factor_func(nullptr),
       sampling_profiler_p(false),
       signal_pipe_input(0),
       signal_pipe_output(0),
@@ -27,8 +27,8 @@ factor_vm::factor_vm(THREADHANDLE thread)
 #if defined(WINDOWS)
       ,
       thread_id(GetCurrentThreadId()),
-      ctrl_break_thread(NULL),
-      sampler_thread(NULL)
+      ctrl_break_thread(nullptr),
+      sampler_thread(nullptr)
 #endif
 {
   primitive_reset_dispatch_stats();

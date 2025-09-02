@@ -18,7 +18,7 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_read = 0;
 
   do {
-    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+    size_t ret = fread((void*)((char*)ptr + items_read * size), size,
                        nitems - items_read, stream);
     if (ret == 0) {
       if (feof(stream)) {
@@ -99,7 +99,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
   size_t ret = 0;
 
   do {
-    ret = fwrite((void*)((int*)ptr + items_written * size), size,
+    ret = fwrite((void*)((char*)ptr + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
       io_error_if_not_EINTR();

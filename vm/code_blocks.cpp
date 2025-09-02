@@ -140,7 +140,7 @@ cell factor_vm::compute_dlsym_address(array* parameters,
                                       bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
-  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
+  dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
 
   cell undef = reinterpret_cast<cell>(factor::undefined_symbol);
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
@@ -188,7 +188,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
-      : NULL;
+      : nullptr;
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 

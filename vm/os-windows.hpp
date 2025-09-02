@@ -78,7 +78,7 @@ inline static THREADHANDLE thread_id() {
   HANDLE threadHandle = OpenThread(
       THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE,
       id);
-  FACTOR_ASSERT(threadHandle != NULL);
+  FACTOR_ASSERT(threadHandle != nullptr);
   return threadHandle;
 }
 
@@ -97,10 +97,10 @@ inline static std::string to_utf8(const wchar_t* buffer, int len) {
     0,
     buffer,
     len,
-    NULL,
+    nullptr,
     0,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
   if (nChars == 0) return "";
 
   std::string newbuffer;
@@ -112,8 +112,8 @@ inline static std::string to_utf8(const wchar_t* buffer, int len) {
     len,
     const_cast<char*>(newbuffer.c_str()),
     nChars,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
   return newbuffer;
 }
 

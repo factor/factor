@@ -51,7 +51,7 @@ void report_error(const ErrorContext& ctx) {
   }
   
   if (ctx.severity == ErrorSeverity::CRITICAL) {
-    std::cout << "You have triggered a bug in Factor. Please report.\n";
+    std::cout << "You have triggered a bug in Factor. Please report.\n" << std::flush;
     if (vm) {
       vm->factorbug();
     }
@@ -134,6 +134,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     std::cout << "arg 2: ";
     print_obj(std::cout, arg2.value());
     std::cout << std::endl;
+    std::cout.flush();
     factorbug();
     abort();
   }

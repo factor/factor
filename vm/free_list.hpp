@@ -155,7 +155,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
       // Allocate a block this big
       free_heap_block* large_block = find_free_block(large_block_size);
       if (!large_block)
-        return NULL;
+        return nullptr;
 
       large_block = split_free_block(large_block, large_block_size);
 
@@ -192,7 +192,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
       return block;
     }
 
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -206,7 +206,7 @@ Block* free_list_allocator<Block>::allot(cell requested_size) {
     block = split_free_block(block, aligned_size);
     return reinterpret_cast<Block*>(block);
   }
-  return NULL;
+  return nullptr;
 }
 
 template <typename Block>

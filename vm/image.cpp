@@ -13,8 +13,8 @@ bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
 
 vm_parameters::vm_parameters() {
   embedded_image = false;
-  image_path = NULL;
-  executable_path = NULL;
+  image_path = nullptr;
+  executable_path = nullptr;
 
   datastack_size = 32 * sizeof(cell);
   retainstack_size = 32 * sizeof(cell);
@@ -426,7 +426,7 @@ bool factor_vm::embedded_image_p() {
   }
   embedded_image_footer footer;
   bool embedded_p = read_embedded_image_footer(file, &footer);
-  fclose(file);
+  raw_fclose(file);
   free((vm_char *)vm_path);
   return embedded_p;
 }

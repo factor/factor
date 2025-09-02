@@ -15,10 +15,10 @@ char* factor_vm::pinned_alien_offset(cell obj) {
       return (char*)ptr->address;
     }
     case F_TYPE:
-      return NULL;
+      return nullptr;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; // can't happen
+      return nullptr; // can't happen
   }
 }
 
@@ -124,7 +124,7 @@ void factor_vm::primitive_dlsym() {
     else
       ctx->replace(allot_alien(ffi_dlsym(d, sym)));
   } else
-    ctx->replace(allot_alien(ffi_dlsym(NULL, sym)));
+    ctx->replace(allot_alien(ffi_dlsym(nullptr, sym)));
 }
 
 // close a native library handle
@@ -150,10 +150,10 @@ char* factor_vm::alien_offset(cell obj) {
     case ALIEN_TYPE:
       return (char*)untag<alien>(obj)->address;
     case F_TYPE:
-      return NULL;
+      return nullptr;
     default:
       type_error(ALIEN_TYPE, obj);
-      return NULL; // can't happen
+      return nullptr; // can't happen
   }
 }
 

@@ -71,7 +71,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   retainstack_size = p->retainstack_size;
   callstack_size = p->callstack_size;
 
-  ctx = NULL;
+  ctx = nullptr;
   spare_ctx = new_context();
 
   callbacks = std::make_unique<callback_heap>(p->callback_size, this);
