@@ -4,14 +4,19 @@ namespace factor {
 
 bool factor_arg(const vm_char* str, const vm_char* arg_pattern, cell* value) {
   // Convert arg_pattern to find the prefix (everything before %d)
+#ifdef WINDOWS
+  std::string pattern = to_utf8(arg_pattern);
+  std::string input = to_utf8(str);
+#else
   std::string pattern(arg_pattern);
+  std::string input(str);
+#endif
   size_t percent_pos = pattern.find("%d");
   if (percent_pos == std::string::npos) {
     return false;
   }
   
   std::string prefix = pattern.substr(0, percent_pos);
-  std::string input(str);
   
   // Check if input starts with the prefix
   if (input.find(prefix) != 0) {
