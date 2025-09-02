@@ -67,3 +67,7 @@ SYNTAX: n*[ \ nspread parse-ncleave-like ;
 
 SYNTAX: napply[ parse-mnapply ;
 SYNTAX: n@[ parse-mnapply ;
+
+SYNTAX: &&[ parse-quotation '[ dup [ drop @ ] when ] append! ;
+
+SYNTAX: ||[ parse-quotation '[ dup [ drop @ ] unless ] append! ;
