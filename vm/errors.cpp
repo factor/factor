@@ -11,10 +11,14 @@ std::atomic<bool> factor_vm::fatal_erroring_p{false};
   printf("fatal_error in fatal_error!\n");
   breakpoint();
   // _exit is marked noreturn but clang still warns about unreachable code
+  #ifdef __clang__
   #pragma clang diagnostic push
   #pragma clang diagnostic ignored "-Wunreachable-code"
+  #endif
   ::_exit(86);
+  #ifdef __clang__
   #pragma clang diagnostic pop
+  #endif
 }
 
 // Helper function to format error location

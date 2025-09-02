@@ -17,11 +17,18 @@ constexpr cell data_alignment = 16;
 #define TAG_MASK 15
 #define TAG_BITS 4
 
-// Use static_cast for better type safety in C++20
 // These macros are used in performance-critical paths
+#ifdef _MSC_VER
+// MSVC needs simpler casts to work correctly
+#define TAG(x) ((cell)(x) & TAG_MASK)
+#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
+#define RETAG(x, tag) (UNTAG(x) | (tag))
+#else
+// Use static_cast for better type safety in C++20 on clang/gcc
 #define TAG(x) (static_cast<cell>(reinterpret_cast<uintptr_t>(x)) & static_cast<cell>(TAG_MASK))
 #define UNTAG(x) (static_cast<cell>(reinterpret_cast<uintptr_t>(x)) & ~static_cast<cell>(TAG_MASK))
 #define RETAG(x, tag) (UNTAG(x) | static_cast<cell>(tag))
+#endif
 
 // Type tags, should be kept in sync with:
 //   basis/bootstrap/layouts.factor
