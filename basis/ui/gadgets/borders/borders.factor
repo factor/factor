@@ -20,7 +20,7 @@ TUPLE: border < aligned-gadget
     <border> { 1 1 } >>fill ;
 
 : border-pref-dim ( border child-dim -- pref-dim )
-    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax [ gl-round ] map ;
+    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax [ gl-round >fixnum ] map ;
 
 M: border pref-dim*
     dup gadget-child pref-dim border-pref-dim ;
