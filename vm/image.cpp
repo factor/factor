@@ -315,8 +315,8 @@ char *threadsafe_strerror(int errnum) {
 // This function also initializes the data and code heaps
 void factor_vm::load_image(vm_parameters* p) {
 
-  FILE* file = OPEN_READ(p->image_path);
-  if (file == nullptr) {
+  unique_file file = make_unique_file(OPEN_READ(p->image_path));
+  if (!file) {
     std::cout << "Cannot open image file: " << AS_UTF8(p->image_path) << std::endl;
     char *msg = threadsafe_strerror(errno);
     std::cout << "strerror: " << msg << std::endl;
@@ -325,15 +325,15 @@ void factor_vm::load_image(vm_parameters* p) {
   }
   if (p->embedded_image) {
     embedded_image_footer footer;
-    if (!read_embedded_image_footer(file, &footer)) {
+    if (!read_embedded_image_footer(file.get(), &footer)) {
       std::cout << "No embedded image" << std::endl;
       exit(1);
     }
-    safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
+    safe_fseek(file.get(), (off_t)footer.image_offset, SEEK_SET);
   }
 
   image_header h;
-  if (raw_fread(&h, sizeof(image_header), 1, file) != 1)
+  if (raw_fread(&h, sizeof(image_header), 1, file.get()) != 1)
     fatal_error("Cannot read image header", 0);
 
   if (h.magic != image_magic)
@@ -349,10 +349,8 @@ void factor_vm::load_image(vm_parameters* p) {
     h.compressed_code_size = h.code_size;
   }
 
-  load_data_heap(file, &h, p);
-  load_code_heap(file, &h, p);
-
-  raw_fclose(file);
+  load_data_heap(file.get(), &h, p);
+  load_code_heap(file.get(), &h, p);
 
   // Certain special objects in the image are known to the runtime
   memcpy(special_objects, h.special_objects, sizeof(special_objects));
@@ -380,19 +378,19 @@ bool factor_vm::save_image(const vm_char* saving_filename,
     h.special_objects[i] =
         (save_special_p(i) ? special_objects[i] : false_object);
 
-  FILE* file = OPEN_WRITE(saving_filename);
-  if (file == nullptr)
+  unique_file file = make_unique_file(OPEN_WRITE(saving_filename));
+  if (!file)
     return false;
-  if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
+  if (safe_fwrite(&h, sizeof(image_header), 1, file.get()) != 1)
     return false;
   if (h.escaped_data_size > 0 &&
-      safe_fwrite(reinterpret_cast<void*>(data->tenured.get()->start), h.escaped_data_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(data->tenured.get()->start), h.escaped_data_size, 1, file.get()) != 1)
     return false;
   if (h.code_size > 0 &&
-      safe_fwrite(reinterpret_cast<void*>(code->allocator->start), h.code_size, 1, file) != 1)
+      safe_fwrite(reinterpret_cast<void*>(code->allocator->start), h.code_size, 1, file.get()) != 1)
     return false;
-  if (raw_fclose(file) == -1)
-    return false;
+  // Ensure file is closed before moving
+  file.reset();
   if (!move_file(saving_filename, filename))
     return false;
   return true;
@@ -445,14 +443,13 @@ void factor_vm::primitive_save_image() {
 
 bool factor_vm::embedded_image_p() {
   const vm_char* vm_path = vm_executable_path();
-  FILE* file = OPEN_READ(vm_path);
+  unique_file file = make_unique_file(OPEN_READ(vm_path));
   if (!file) {
     free((vm_char *)vm_path);
     return false;
   }
   embedded_image_footer footer;
-  bool embedded_p = read_embedded_image_footer(file, &footer);
-  raw_fclose(file);
+  bool embedded_p = read_embedded_image_footer(file.get(), &footer);
   free((vm_char *)vm_path);
   return embedded_p;
 }

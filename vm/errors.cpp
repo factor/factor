@@ -8,9 +8,8 @@ namespace factor {
 std::atomic<bool> factor_vm::fatal_erroring_p{false};
 
 [[noreturn]] static inline void fa_diddly_atal_error() {
-  printf("fatal_error in fatal_error!\n");
+  std::cerr << "fatal_error in fatal_error!" << std::endl;
   breakpoint();
-  // breakpoint() is [[noreturn]] and calls __builtin_trap(), so we never reach here
 }
 
 // Helper function to format error location

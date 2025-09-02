@@ -9,22 +9,19 @@ void factor_vm::init_signals() { unix_init_signals(); }
 
 void early_init() {}
 
-#define SUFFIX ".image"
-#define SUFFIX_LEN 6
+#include <string>
 
 // You must free() the result yourself.
 const char* default_image_path() {
-  const char* path = vm_executable_path();
-
-  if (!path)
+  const char* exe = vm_executable_path();
+  if (!exe)
     return strdup("factor.image");
 
-  size_t len = strlen(path);
-  char* new_path = (char *)malloc(len + SUFFIX_LEN + 1);
-  memcpy(new_path, path, len);
-  memcpy(new_path + len, SUFFIX, SUFFIX_LEN + 1);
-  free(const_cast<char*>(path));
-  return new_path;
+  std::string base(exe);
+  free(const_cast<char*>(exe));
+
+  std::string with_suffix = base + ".image";
+  return strdup(with_suffix.c_str());
 }
 
 uint64_t nano_count() {

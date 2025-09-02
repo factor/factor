@@ -17,7 +17,12 @@ void early_init(void) {
   struct utsname u;
   int n;
   uname(&u);
-  sscanf(u.release, "%d", &n);
+  {
+    // Parse major Darwin version without locale pitfalls
+    char* endp = nullptr;
+    long val = std::strtol(u.release, &endp, 10);
+    n = (val > 0 && endp != u.release) ? static_cast<int>(val) : 0;
+  }
   if (n < 9) {
     std::cout << "Factor requires macOS 10.5 or later.\n";
     exit(1);
