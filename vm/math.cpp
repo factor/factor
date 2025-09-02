@@ -2,11 +2,37 @@
 #include <sstream>
 #include <iomanip>
 #include <stdexcept>
+#include <cfenv>
 
 namespace factor {
 
 void factor_vm::primitive_bignum_to_fixnum() {
   ctx->replace(tag_fixnum(bignum_to_fixnum(untag<bignum>(ctx->peek()))));
+}
+
+// Check pending FP exceptions against a mask of traps; raise ERROR_FP_TRAP if any match
+void factor_vm::primitive_check_fp_exceptions() {
+  // Mask layout uses FP_TRAP_* bits as in vm/layouts.hpp
+  cell mask = to_cell(ctx->pop());
+
+  // Query current exception flags via fenv
+  int raised = fetestexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW | FE_INEXACT);
+
+  unsigned int status = 0;
+  if (raised & FE_INVALID)    status |= FP_TRAP_INVALID_OPERATION;
+  if (raised & FE_DIVBYZERO)  status |= FP_TRAP_ZERO_DIVIDE;
+  if (raised & FE_OVERFLOW)   status |= FP_TRAP_OVERFLOW;
+  if (raised & FE_UNDERFLOW)  status |= FP_TRAP_UNDERFLOW;
+  if (raised & FE_INEXACT)    status |= FP_TRAP_INEXACT;
+
+  // Clear flags so we don't loop on stale exceptions
+  feclearexcept(FE_ALL_EXCEPT);
+
+  if (status & static_cast<unsigned int>(mask)) {
+    signal_fpu_status = status;
+    // Route to the same handler used by signal paths
+    fp_signal_handler_impl();
+  }
 }
 
 void factor_vm::primitive_bignum_to_fixnum_strict() {

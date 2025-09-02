@@ -361,6 +361,10 @@ CONSTANT: all-primitives {
                 { object fixnum } { } f
             }
             {
+                "check-fp-exceptions" ( mask -- ) "check_fp_exceptions"
+                { fixnum } { } f
+            }
+            {
                 "special-object" ( n -- obj ) "special_object"
                 { fixnum } { object } make-flushable
             }

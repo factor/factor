@@ -492,6 +492,7 @@ struct factor_vm {
   void primitive_float_lesseq();
   void primitive_float_greater();
   void primitive_float_greatereq();
+  void primitive_check_fp_exceptions();
   void primitive_float_bits();
   void primitive_bits_float();
   void primitive_double_bits();
