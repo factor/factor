@@ -81,17 +81,41 @@ void* factor_vm::alien_pointer() {
   return alien_offset(ctx->pop()) + offset;
 }
 
+// Helper functions for unaligned memory access that handle null pointers
+template<typename T>
+static inline T unaligned_read(const void* ptr) {
+  if (!ptr) {
+    // This will segfault, preserving Factor's expected behavior
+    volatile T* null_ptr = nullptr;
+    return *null_ptr;
+  }
+  T value;
+  memcpy(&value, ptr, sizeof(T));
+  return value;
+}
+
+template<typename T>
+static inline void unaligned_write(void* ptr, T value) {
+  if (!ptr) {
+    // This will segfault, preserving Factor's expected behavior
+    volatile T* null_ptr = nullptr;
+    *null_ptr = value;
+    return;
+  }
+  memcpy(ptr, &value, sizeof(T));
+}
+
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
-    type value;                                                         \
-    memcpy(&value, parent->alien_pointer(), sizeof(type));              \
+    void* ptr = parent->alien_pointer();                                \
+    type value = unaligned_read<type>(ptr);                             \
     parent->ctx->push(parent->from(value));                             \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
     void* ptr = parent->alien_pointer();                                \
     type value = (type)parent->to(parent->ctx->pop());                  \
-    memcpy(ptr, &value, sizeof(type));                                  \
+    unaligned_write(ptr, value);                                        \
   }
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)
