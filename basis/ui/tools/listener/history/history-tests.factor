@@ -5,7 +5,7 @@ USING: accessors documents io.styles kernel namespaces
 sequences tools.test ui.tools.listener.history ;
 
 { } [ <document> "d" set ] unit-test
-{ } [ "d" get <history> "h" set ] unit-test
+{ } [ "d" get <empty-history> "h" set ] unit-test
 
 { } [ "1" "d" get set-doc-string ] unit-test
 { T{ input f "1" } } [ "h" get history-add ] unit-test
@@ -54,7 +54,7 @@ sequences tools.test ui.tools.listener.history ;
 { "22" } [ "d" get doc-string ] unit-test
 
 { } [ <document> "d" set ] unit-test
-{ } [ "d" get <history> "h" set ] unit-test
+{ } [ "d" get <empty-history> "h" set ] unit-test
 
 { } [ "aaa" "d" get set-doc-string ] unit-test
 { T{ input f "aaa" } } [ "h" get history-add ] unit-test
@@ -66,7 +66,7 @@ sequences tools.test ui.tools.listener.history ;
 { } [ "h" get history-recall-previous ] unit-test
 
 { 1 } [
-    "abc" <document> [ set-doc-string ] [ <history> ] bi
+    "abc" <document> [ set-doc-string ] [ <empty-history> ] bi
     [ history-add drop ]
     [ history-add drop ]
     [ elements>> length ] tri
