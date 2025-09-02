@@ -13,6 +13,7 @@ webapps.mason.utils webapps.mason.version.data xml.writer xmode.highlight ;
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png"/>
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png"/>
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"/>
