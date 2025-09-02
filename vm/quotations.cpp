@@ -124,12 +124,12 @@ void quotation_jit::emit_epilog(bool needed) {
 void quotation_jit::emit_quotation(cell quot_) {
   data_root<quotation> quot(quot_, parent);
 
-  array* elements = untag<array>(quot->array);
+  array* quot_elements = untag<array>(quot->array);
 
   // If the quotation consists of a single word, compile a direct call
   // to the word.
-  if (trivial_quotation_p(elements))
-    literal(array_nth(elements, 0));
+  if (trivial_quotation_p(quot_elements))
+    literal(array_nth(quot_elements, 0));
   else {
     if (compiling)
       parent->jit_compile_quotation(quot.value(), relocate);

@@ -179,9 +179,9 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
     inline_cache_jit jit(generic_word.value(), this);
     jit.emit_inline_cache(index, generic_word.value(), methods.value(),
                           new_cache_entries.value(), tail_call_site);
-    code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
-    initialize_code_block(code);
-    xt = code->entry_point();
+    code_block* pic_code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
+    initialize_code_block(pic_code);
+    xt = pic_code->entry_point();
   }
 
   // Install the new stub.

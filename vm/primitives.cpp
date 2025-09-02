@@ -7,6 +7,11 @@ namespace factor {
     parent->primitive_##name();                        \
   }
 
+// Suppress warning for primitive_exit since it's correctly marked noreturn
+// in the implementation but the macro-generated wrapper can't be
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
 EACH_PRIMITIVE(PRIMITIVE)
+#pragma clang diagnostic pop
 
 }

@@ -28,6 +28,9 @@ instruction_operand::instruction_operand(relocation_entry rel,
     case RC_ABSOLUTE_1:
       min_offset = sizeof(uint8_t);
       break;
+    default:
+      FACTOR_ASSERT(false);
+      break;
   }
   
   if (rel.offset() < min_offset) {

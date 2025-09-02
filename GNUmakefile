@@ -79,7 +79,8 @@ ifdef CONFIG
 				-Wno-implicit-float-conversion -Wno-shorten-64-to-32 \
 				-Wno-old-style-cast -Wno-zero-as-null-pointer-constant \
 				-Wno-suggest-override -Wno-suggest-destructor-override \
-				-Wno-c++17-compat-mangling -Wno-comma -Wno-conditional-uninitialized
+				-Wno-c++17-compat-mangling -Wno-comma -Wno-conditional-uninitialized \
+				-Wno-unsafe-buffer-usage -Wno-date-time
 			CXX_WARNING_FLAGS :=
 		endif
 

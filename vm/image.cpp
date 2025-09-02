@@ -4,7 +4,10 @@ namespace factor {
 
 bool factor_arg(const vm_char* str, const vm_char* arg, cell* value) {
   int val;
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wformat-nonliteral"
   if (SSCANF(str, arg, &val) > 0) {
+  #pragma clang diagnostic pop
     *value = val;
     return true;
   }

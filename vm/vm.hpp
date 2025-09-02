@@ -174,7 +174,7 @@ struct factor_vm {
   void primitive_load_locals();
 
   // run
-  void primitive_exit();
+  [[noreturn]] void primitive_exit();
   void primitive_nano_count();
   void primitive_sleep();
   void primitive_set_slot();

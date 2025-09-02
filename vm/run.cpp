@@ -2,7 +2,7 @@
 
 namespace factor {
 
-void factor_vm::primitive_exit() { 
+[[noreturn]] void factor_vm::primitive_exit() { 
   // Clean up the allocated strings before exiting
   free(alien_offset(special_objects[OBJ_EXECUTABLE]));
   free(alien_offset(special_objects[OBJ_IMAGE]));
