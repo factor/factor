@@ -31,7 +31,7 @@ void factor_vm::primitive_compute_identity_hashcode() {
   object_counter++;
   if (object_counter == 0)
     object_counter++;
-  obj->set_hashcode((cell)obj ^ object_counter);
+  obj->set_hashcode(reinterpret_cast<cell>(obj) ^ object_counter);
 }
 
 void factor_vm::primitive_set_slot() {
@@ -70,7 +70,7 @@ struct slot_become_fixup : no_fixup {
       : become_map(become_map) {}
 
   object* fixup_data(object* old) {
-    std::map<object*, object*>::const_iterator iter = become_map->find(old);
+    auto iter = become_map->find(old);
     if (iter != become_map->end())
       return iter->second;
     return old;

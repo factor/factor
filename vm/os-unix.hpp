@@ -55,7 +55,21 @@ void native_dlclose(void* handle);
 
 void check_ENOMEM(const char* msg);
 
-static inline void breakpoint() { __builtin_trap(); }
+[[noreturn]] static inline void breakpoint() { __builtin_trap(); }
 
 #define AS_UTF8(ptr) ptr
+
+// Console I/O thread variables
+extern "C" {
+extern int stdin_read;
+extern int stdin_write;
+extern int control_read;
+extern int control_write;
+extern int size_read;
+extern int size_write;
+extern bool stdin_thread_initialized_p;
+extern THREADHANDLE stdin_thread;
+extern pthread_mutex_t stdin_mutex;
+}
+
 }

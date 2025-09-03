@@ -5,16 +5,16 @@ template <typename Fixup>
 cell object::base_size(Fixup fixup) const {
   switch (type()) {
     case ARRAY_TYPE:
-      return array_size((array*)this);
+      return array_size(reinterpret_cast<array*>(const_cast<object*>(this)));
     case BIGNUM_TYPE:
-      return array_size((bignum*)this);
+      return array_size(reinterpret_cast<bignum*>(const_cast<object*>(this)));
     case BYTE_ARRAY_TYPE:
-      return array_size((byte_array*)this);
+      return array_size(reinterpret_cast<byte_array*>(const_cast<object*>(this)));
     case STRING_TYPE:
-      return string_size(string_capacity((string*)this));
+      return string_size(string_capacity(reinterpret_cast<string*>(const_cast<object*>(this))));
     case TUPLE_TYPE: {
-      tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-          untag<object>(((tuple*)this)->layout));
+      tuple_layout* layout = reinterpret_cast<tuple_layout*>(fixup.translate_data(
+          untag<object>((reinterpret_cast<tuple*>(const_cast<object*>(this)))->layout)));
       return tuple_size(layout);
     }
     case QUOTATION_TYPE:
@@ -30,11 +30,11 @@ cell object::base_size(Fixup fixup) const {
     case WRAPPER_TYPE:
       return sizeof(wrapper);
     case CALLSTACK_TYPE: {
-      cell callstack_length = untag_fixnum(((callstack*)this)->length);
-      return callstack_object_size(callstack_length);
+      fixnum callstack_length = untag_fixnum((reinterpret_cast<callstack*>(const_cast<object*>(this)))->length);
+      return callstack_object_size(static_cast<cell>(callstack_length));
     }
     default:
-      critical_error("Invalid header in base_size", (cell)this);
+      critical_error("Invalid header in base_size", reinterpret_cast<cell>(this));
       return 0;
   }
 }
@@ -43,7 +43,7 @@ cell object::base_size(Fixup fixup) const {
 template <typename Fixup>
 cell object::size(Fixup fixup) const {
   if (free_p())
-    return ((free_heap_block*)this)->size();
+    return (reinterpret_cast<const free_heap_block*>(this))->size();
   return align(base_size(fixup), data_alignment);
 }
 
@@ -60,10 +60,10 @@ inline cell object::slot_count(Fixup fixup) const {
   cell t = type();
   if (t == ARRAY_TYPE) {
     // capacity + n slots
-    return 1 + array_capacity((array*)this);
+    return 1 + array_capacity(reinterpret_cast<array*>(const_cast<object*>(this)));
   } else if (t == TUPLE_TYPE) {
-    tuple_layout* layout = (tuple_layout*)fixup.translate_data(
-        untag<object>(((tuple*)this)->layout));
+    tuple_layout* layout = reinterpret_cast<tuple_layout*>(fixup.translate_data(
+        untag<object>((reinterpret_cast<tuple*>(const_cast<object*>(this)))->layout)));
     // layout + n slots
     return 1 + tuple_capacity(layout);
   } else {
@@ -80,7 +80,7 @@ inline cell object::slot_count(Fixup fixup) const {
       case WORD_TYPE: return 8;
       case DLL_TYPE: return 1;
       default:
-        critical_error("Invalid header in slot_count", (cell)this);
+        critical_error("Invalid header in slot_count", reinterpret_cast<cell>(this));
         return 0; // can't happen
     }
   }
@@ -117,17 +117,21 @@ inline cell object::slot_count() const {
 //  - visit_context_code_blocks()
 //  - visit_callback_code_blocks()
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4324)
+#endif
 template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
   Fixup fixup;
   cell cards_scanned;
   cell decks_scanned;
 
-  slot_visitor<Fixup>(factor_vm* parent, Fixup fixup)
-  : parent(parent),
-    fixup(fixup),
+  slot_visitor(factor_vm* parent_vm, const Fixup& fixup_param)
+  : parent(parent_vm),
+    fixup(fixup_param),
     cards_scanned(0),
-    decks_scanned(0) {}
+    decks_scanned(0) { }
 
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
@@ -166,6 +170,9 @@ template <typename Fixup> struct slot_visitor {
   // Visits data pointers in code blocks.
   void visit_code_block_objects(code_block* compiled);
 };
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 template <typename Fixup>
 cell slot_visitor<Fixup>::visit_pointer(cell pointer) {
@@ -174,7 +181,7 @@ cell slot_visitor<Fixup>::visit_pointer(cell pointer) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_handle(cell* handle) {
-  if (!immediate_p(*handle)) {
+  if (!immediate_p(*handle)) [[likely]] {
     *handle = visit_pointer(*handle);
   }
 }
@@ -186,10 +193,10 @@ void slot_visitor<Fixup>::visit_object_array(cell* start, cell* end) {
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
-  if (obj->type() == CALLSTACK_TYPE)
-    visit_callstack_object((callstack*)obj);
+  if (obj->type() == CALLSTACK_TYPE) [[unlikely]]
+    visit_callstack_object(reinterpret_cast<callstack*>(obj));
   else {
-    cell* start = (cell*)obj + 1;
+    cell* start = reinterpret_cast<cell*>(obj) + 1;
     cell* end = start + obj->slot_count(fixup);
     visit_object_array(start, end);
   }
@@ -197,12 +204,12 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_slots(object* obj) {
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_stack_elements(segment* region, cell* top) {
-  visit_object_array((cell*)region->start, top + 1);
+  visit_object_array(reinterpret_cast<cell*>(region->start), top + 1);
 }
 
 template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
-  FACTOR_FOR_EACH(parent->data_roots) {
-    visit_handle(*iter);
+  for (auto* root : parent->data_roots) {
+    visit_handle(root);
   }
 
   auto callback_slot_visitor = [&](code_block* stub, cell size) {
@@ -211,19 +218,19 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   };
   parent->callbacks->allocator->iterate(callback_slot_visitor, no_fixup());
 
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
-    iter->second = visit_pointer(iter->second);
+  for (auto& entry : parent->code->uninitialized_blocks) {
+    entry.second = visit_pointer(entry.second);
   }
 
-  FACTOR_FOR_EACH(parent->samples) {
-    visit_handle(&iter->thread);
+  for (auto& sample : parent->samples) {
+    visit_handle(&sample.thread);
   }
 
   visit_object_array(parent->special_objects,
                      parent->special_objects + special_object_count);
 
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    visit_context(*iter);
+  for (context* ctx : parent->active_contexts) {
+    visit_context(ctx);
   }
 }
 
@@ -236,8 +243,8 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
 template <typename Fixup> struct call_frame_slot_visitor {
   slot_visitor<Fixup>* visitor;
 
-  call_frame_slot_visitor(slot_visitor<Fixup>* visitor)
-      : visitor(visitor) {}
+  call_frame_slot_visitor(slot_visitor<Fixup>* visitor_param)
+      : visitor(visitor_param) {}
 
   // frame top -> [return address]
   //              [spill area]
@@ -256,21 +263,21 @@ template <typename Fixup> struct call_frame_slot_visitor {
 
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
-    if (callsite == (cell)-1)
+    if (callsite == static_cast<cell>(-1))
       return;
 
 #ifdef DEBUG_GC_MAPS
     FACTOR_PRINT("call frame code block " << compiled << " with offset "
                  << return_address);
 #endif
-    cell* stack_pointer = (cell*)(frame_top + FRAME_RETURN_ADDRESS);
+    cell* stack_pointer = reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
     uint8_t* bitmap = info->gc_info_bitmap();
 
     // Subtract old value of base pointer from every derived pointer.
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1) {
+      if (base_pointer != static_cast<uint32_t>(-1)) {
 #ifdef DEBUG_GC_MAPS
         FACTOR_PRINT("visiting derived root " << spill_slot
                      << " with base pointer " << base_pointer);
@@ -295,7 +302,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1)
+      if (base_pointer != static_cast<uint32_t>(-1))
         stack_pointer[spill_slot] += stack_pointer[base_pointer];
     }
   }
@@ -319,10 +326,10 @@ void slot_visitor<Fixup>::visit_context(context* ctx) {
 
   cell ds_ptr = ctx->datastack;
   cell rs_ptr = ctx->retainstack;
-  segment* ds_seg = ctx->datastack_seg;
-  segment* rs_seg = ctx->retainstack_seg;
-  visit_stack_elements(ds_seg, (cell*)ds_ptr);
-  visit_stack_elements(rs_seg, (cell*)rs_ptr);
+  segment* ds_seg = ctx->datastack_seg.get();
+  segment* rs_seg = ctx->retainstack_seg.get();
+  visit_stack_elements(ds_seg, reinterpret_cast<cell*>(ds_ptr));
+  visit_stack_elements(rs_seg, reinterpret_cast<cell*>(rs_ptr));
   visit_object_array(ctx->context_objects,
                      ctx->context_objects + context_object_count);
 
@@ -358,7 +365,7 @@ void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
 template <typename Fixup> struct call_frame_code_block_visitor {
   Fixup fixup;
 
-  call_frame_code_block_visitor(Fixup fixup) : fixup(fixup) {}
+  call_frame_code_block_visitor(Fixup fixup_param) : fixup(fixup_param) {}
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     (void)size;
@@ -366,7 +373,7 @@ template <typename Fixup> struct call_frame_code_block_visitor {
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
     cell fixed_addr = compiled->address_for_offset(owner->offset(addr));
 
-    *(cell*)(frame_top + FRAME_RETURN_ADDRESS) = fixed_addr;
+    *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS) = fixed_addr;
   }
 };
 
@@ -374,40 +381,42 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_object_code_block(object* obj) {
   switch (obj->type()) {
     case WORD_TYPE: {
-      word* w = (word*)obj;
+      word* w = static_cast<word*>(obj);
       if (w->entry_point)
         w->entry_point = fixup.fixup_code(w->code())->entry_point();
       break;
     }
     case QUOTATION_TYPE: {
-      quotation* q = (quotation*)obj;
+      quotation* q = static_cast<quotation*>(obj);
       if (q->entry_point)
         q->entry_point = fixup.fixup_code(q->code())->entry_point();
       break;
     }
     case CALLSTACK_TYPE: {
-      callstack* stack = (callstack*)obj;
+      callstack* stack = static_cast<callstack*>(obj);
       call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
       parent->iterate_callstack_object(stack, call_frame_visitor, fixup);
       break;
     }
+    default:
+      break;
   }
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_context_code_blocks() {
   call_frame_code_block_visitor<Fixup> call_frame_visitor(fixup);
-  FACTOR_FOR_EACH(parent->active_contexts) {
-    parent->iterate_callstack(*iter, call_frame_visitor, fixup);
+  for (context* ctx : parent->active_contexts) {
+    parent->iterate_callstack(ctx, call_frame_visitor, fixup);
   }
 }
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_uninitialized_code_blocks() {
   std::map<code_block*, cell> new_uninitialized_blocks;
-  FACTOR_FOR_EACH(parent->code->uninitialized_blocks) {
+  for (const auto& entry : parent->code->uninitialized_blocks) {
     new_uninitialized_blocks.insert(
-        std::make_pair(fixup.fixup_code(iter->first), iter->second));
+        std::make_pair(fixup.fixup_code(entry.first), entry.second));
   }
   parent->code->uninitialized_blocks = new_uninitialized_blocks;
 }
@@ -432,7 +441,7 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_object(object *ptr) {
   visit_slots(ptr);
   if (ptr->type() == ALIEN_TYPE)
-    ((alien*)ptr)->update_address();
+    static_cast<alien*>(ptr)->update_address();
 }
 
 // Pops items from the mark stack and visits them until the stack is
@@ -445,12 +454,12 @@ void slot_visitor<Fixup>::visit_mark_stack(std::vector<cell>* mark_stack) {
     mark_stack->pop_back();
 
     if (ptr & 1) {
-      code_block* compiled = (code_block*)(ptr - 1);
+      code_block* compiled = reinterpret_cast<code_block*>(ptr - 1);
       visit_code_block_objects(compiled);
       visit_embedded_literals(compiled);
       visit_embedded_code_pointers(compiled);
     } else {
-      object* obj = (object*)ptr;
+      object* obj = reinterpret_cast<object*>(ptr);
       visit_object(obj);
       visit_object_code_block(obj);
     }
@@ -480,7 +489,7 @@ void slot_visitor<Fixup>::visit_instruction_operands(code_block* block,
       case RT_ENTRY_POINT_PIC_TAIL:
       case RT_HERE: {
         cell offset = TAG(old_value);
-        code_block* compiled = (code_block*)UNTAG(old_value);
+        code_block* compiled = reinterpret_cast<code_block*>(UNTAG(old_value));
         op.store_value(RETAG(fixup.fixup_code(compiled), offset));
         break;
       }
@@ -500,11 +509,11 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_partial_objects(cell start,
                                                 cell card_start,
                                                 cell card_end) {
-  cell *scan_start = (cell*)start + 1;
-  cell *scan_end = scan_start + ((object*)start)->slot_count();
+  cell *scan_start = reinterpret_cast<cell*>(start) + 1;
+  cell *scan_end = scan_start + reinterpret_cast<object*>(start)->slot_count();
 
-  scan_start = std::max(scan_start, (cell*)card_start);
-  scan_end = std::min(scan_end, (cell*)card_end);
+  scan_start = std::max(scan_start, reinterpret_cast<cell*>(card_start));
+  scan_end = std::min(scan_end, reinterpret_cast<cell*>(card_end));
 
   visit_object_array(scan_start, scan_end);
 }
@@ -518,7 +527,7 @@ cell slot_visitor<Fixup>::visit_card(SourceGeneration* gen,
   cell end_addr = start_addr + card_size;
 
   // Forward to the next object whose address is in the card.
-  if (!start || (start + ((object*)start)->size()) < start_addr) {
+  if (!start || (start + reinterpret_cast<object*>(start)->size()) < start_addr) {
     // Optimization because finding the objects in a memory range is
     // expensive. It helps a lot when tracing consecutive cards.
     cell gen_start_card = (gen->start - heap_base) / card_size;
@@ -528,7 +537,7 @@ cell slot_visitor<Fixup>::visit_card(SourceGeneration* gen,
 
   while (start && start < end_addr) {
     visit_partial_objects(start, start_addr, end_addr);
-    if ((start + ((object*)start)->size()) >= end_addr) {
+    if ((start + reinterpret_cast<object*>(start)->size()) >= end_addr) {
       // The object can overlap the card boundary, then the
       // remainder of it will be handled in the next card
       // tracing if that card is marked.
@@ -543,8 +552,8 @@ template <typename Fixup>
 template <typename SourceGeneration>
 void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
                                       card mask, card unmask) {
-  card_deck* decks = parent->data->decks;
-  card_deck* cards = parent->data->cards;
+  card_deck* decks = parent->data->decks.get();
+  card_deck* cards = parent->data->cards.get();
   cell heap_base = parent->data->start;
 
   cell first_deck = (gen->start - heap_base) / deck_size;
@@ -578,8 +587,7 @@ void slot_visitor<Fixup>::visit_cards(SourceGeneration* gen,
 
 template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_heap_roots(std::set<code_block*>* remembered_set) {
-  FACTOR_FOR_EACH(*remembered_set) {
-    code_block* compiled = *iter;
+  for (auto* compiled : *remembered_set) {
     visit_code_block_objects(compiled);
     visit_embedded_literals(compiled);
     compiled->flush_icache();
@@ -590,7 +598,7 @@ template <typename Fixup>
 template <typename TargetGeneration>
 void slot_visitor<Fixup>::cheneys_algorithm(TargetGeneration* gen, cell scan) {
   while (scan && scan < gen->here) {
-    visit_object((object*)scan);
+    visit_object(reinterpret_cast<object*>(scan));
     scan = gen->next_object_after(scan);
   }
 }

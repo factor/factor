@@ -61,24 +61,24 @@ typedef HANDLE THREADHANDLE;
 #define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_s(buf, buflen, errnum)
 
 inline static void early_init() {}
-uint64_t nano_count();
+[[nodiscard]] uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
-void* native_dlopen(const char* path);
-void* native_dlsym(void* handle, const char* symbol);
+[[nodiscard]] void* native_dlopen(const char* path);
+[[nodiscard]] void* native_dlsym(void* handle, const char* symbol);
 void native_dlclose(void* handle);
 
-long getpagesize();
+[[nodiscard]] long getpagesize();
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch);
-THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
+[[nodiscard]] THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
 
 inline static THREADHANDLE thread_id() {
   DWORD id = GetCurrentThreadId();
   HANDLE threadHandle = OpenThread(
       THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE,
       id);
-  FACTOR_ASSERT(threadHandle != NULL);
+  FACTOR_ASSERT(threadHandle != nullptr);
   return threadHandle;
 }
 
@@ -92,33 +92,33 @@ inline static void breakpoint() { DebugBreak(); }
 extern HANDLE boot_thread;
 
 inline static std::string to_utf8(const wchar_t* buffer, int len) {
-  int nChars = ::WideCharToMultiByte(
+  const int nChars = ::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
     len,
-    NULL,
+    nullptr,
     0,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
   if (nChars == 0) return "";
 
   std::string newbuffer;
-  newbuffer.resize(nChars) ;
-  ::WideCharToMultiByte(
+  newbuffer.resize(nChars);
+  (void)::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
     len,
-    const_cast<char*>(newbuffer.c_str()),
+    newbuffer.data(),
     nChars,
-    NULL,
-    NULL);
+    nullptr,
+    nullptr);
   return newbuffer;
 }
 
 inline static std::string to_utf8(const std::wstring& str) {
-  return to_utf8(str.c_str(), (int)str.size());
+  return to_utf8(str.c_str(), static_cast<int>(str.size()));
 }
 
 #define AS_UTF8(ptr) to_utf8(ptr)

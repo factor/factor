@@ -8,20 +8,20 @@ context::context(cell ds_size, cell rs_size, cell cs_size)
       datastack(0),
       retainstack(0),
       callstack_save(0),
-      datastack_seg(new segment(ds_size, false)),
-      retainstack_seg(new segment(rs_size, false)),
-      callstack_seg(new segment(cs_size, false)) {
+      datastack_seg(std::make_unique<segment>(ds_size, false)),
+      retainstack_seg(std::make_unique<segment>(rs_size, false)),
+      callstack_seg(std::make_unique<segment>(cs_size, false)) {
   reset();
 }
 
 void context::reset_datastack() {
   datastack = datastack_seg->start - sizeof(cell);
-  fill_stack_seg(datastack, datastack_seg, 0x11111111);
+  fill_stack_seg(datastack, datastack_seg.get(), 0x11111111);
 }
 
 void context::reset_retainstack() {
   retainstack = retainstack_seg->start - sizeof(cell);
-  fill_stack_seg(retainstack, retainstack_seg, 0x22222222);
+  fill_stack_seg(retainstack, retainstack_seg.get(), 0x22222222);
 }
 
 void context::reset_callstack() {
@@ -36,8 +36,20 @@ void context::reset_context_objects() {
 void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
 #ifdef FACTOR_DEBUG
   cell clear_start = top_ptr + sizeof(cell);
+  
+  // Ensure we don't go past the end or have a negative size
+  if (clear_start >= seg->end) {
+    return; // Nothing to clear
+  }
+  
   cell clear_size = seg->end - clear_start;
-  memset_cell((void*)clear_start, pattern, clear_size);
+  
+  // Additional sanity check
+  if (clear_size > seg->size) {
+    fatal_error("Invalid clear size in fill_stack_seg", clear_size);
+  }
+  
+  memset_cell(reinterpret_cast<void*>(clear_start), pattern, clear_size);
 #else
   (void)top_ptr;
   (void)seg;
@@ -80,9 +92,43 @@ void context::fix_stacks() {
 }
 
 context::~context() {
-  delete datastack_seg;
-  delete retainstack_seg;
-  delete callstack_seg;
+  // unique_ptr automatically handles deletion
+}
+
+context::context(context&& other) noexcept
+    : callstack_top(other.callstack_top),
+      callstack_bottom(other.callstack_bottom),
+      datastack(other.datastack),
+      retainstack(other.retainstack),
+      datastack_seg(std::move(other.datastack_seg)),
+      retainstack_seg(std::move(other.retainstack_seg)),
+      callstack_seg(std::move(other.callstack_seg)),
+      context_objects() {
+  std::move(std::begin(other.context_objects), std::end(other.context_objects),
+            std::begin(context_objects));
+  other.datastack = 0;
+  other.retainstack = 0;
+  other.callstack_top = 0;
+  other.callstack_bottom = 0;
+}
+
+context& context::operator=(context&& other) noexcept {
+  if (this != &other) {
+    swap(other);
+  }
+  return *this;
+}
+
+void context::swap(context& other) noexcept {
+  using std::swap;
+  swap(datastack, other.datastack);
+  swap(retainstack, other.retainstack);
+  swap(callstack_top, other.callstack_top);
+  swap(callstack_bottom, other.callstack_bottom);
+  swap(datastack_seg, other.datastack_seg);
+  swap(retainstack_seg, other.retainstack_seg);
+  swap(callstack_seg, other.callstack_seg);
+  swap(context_objects, other.context_objects);
 }
 
 context* factor_vm::new_context() {
@@ -92,8 +138,8 @@ context* factor_vm::new_context() {
     new_context = new context(datastack_size, retainstack_size, callstack_size);
   } else {
     new_context = unused_contexts.back();
-    new_context->reset();
     unused_contexts.pop_back();
+    new_context->reset();
   }
 
   active_contexts.insert(new_context);
@@ -102,8 +148,8 @@ context* factor_vm::new_context() {
 }
 
 // Allocates memory
-void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
+void factor_vm::init_context(context* ctx_) {
+  ctx_->context_objects[OBJ_CONTEXT] = allot_alien(reinterpret_cast<cell>(ctx_));
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -114,10 +160,10 @@ VM_C_API context* new_context(factor_vm* parent) {
 }
 
 void factor_vm::delete_context() {
-  unused_contexts.push_back(ctx);
   active_contexts.erase(ctx);
+  unused_contexts.push_back(ctx);
 
-  while (unused_contexts.size() > 10) {
+  while (unused_contexts.size() > max_unused_contexts) {
     context* stale_context = unused_contexts.front();
     unused_contexts.pop_front();
     delete stale_context;
@@ -185,66 +231,82 @@ void factor_vm::primitive_set_context_object() {
 }
 
 void factor_vm::primitive_context_object_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->pop());
+  void* ptr = pinned_alien_offset(ctx->pop());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   fixnum n = untag_fixnum(ctx->peek());
   ctx->replace(other_ctx->context_objects[n]);
 }
 
 // Allocates memory
 cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
-  fixnum depth = (fixnum)(top - bottom + sizeof(cell));
+  fixnum depth = static_cast<fixnum>(top - bottom + sizeof(cell));
 
   if (depth < 0) {
     general_error(error, false_object, false_object);
   }
+  
+  // Sanity check - stacks shouldn't be enormous
+  const cell MAX_STACK_SIZE = 1024 * 1024 * 16; // 16MB max
+  if (static_cast<cell>(depth) > MAX_STACK_SIZE) {
+    general_error(error, false_object, false_object);
+  }
+  
   array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
-  memcpy(a + 1, (void*)bottom, depth);
+  memcpy(a + 1, reinterpret_cast<void*>(bottom), depth);
   return tag<array>(a);
 }
 
 // Allocates memory
-cell factor_vm::datastack_to_array(context* ctx) {
-  return stack_to_array(ctx->datastack_seg->start,
-                        ctx->datastack,
+cell factor_vm::datastack_to_array(context* ctx_) {
+  return stack_to_array(ctx_->datastack_seg->start,
+                        ctx_->datastack,
                         ERROR_DATASTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_datastack_for() {
   data_root<alien> alien_ctx(ctx->pop(), this);
-  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  void* ptr = pinned_alien_offset(alien_ctx.value());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   cell array = datastack_to_array(other_ctx);
   ctx->push(array);
 }
 
 // Allocates memory
-cell factor_vm::retainstack_to_array(context* ctx) {
-  return stack_to_array(ctx->retainstack_seg->start,
-                        ctx->retainstack,
+cell factor_vm::retainstack_to_array(context* ctx_) {
+  return stack_to_array(ctx_->retainstack_seg->start,
+                        ctx_->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_retainstack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
+  void* ptr = pinned_alien_offset(ctx->peek());
+  context* other_ctx = static_cast<context*>(__builtin_assume_aligned(ptr, alignof(context)));
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
 // returns pointer to top of stack
-static cell array_to_stack(array* array, cell bottom) {
+static cell array_to_stack(array* array, cell bottom, segment* stack_seg) {
   cell depth = array_capacity(array) * sizeof(cell);
-  memcpy((void*)bottom, array + 1, depth);
+  
+  // Check if the array will fit in the stack segment
+  if (depth > static_cast<cell>(stack_seg->end - bottom)) {
+    fatal_error("Stack overflow: array too large for stack segment", depth);
+  }
+  
+  memcpy(reinterpret_cast<void*>(bottom), array + 1, depth);
   return bottom + depth - sizeof(cell);
 }
 
 void factor_vm::primitive_set_datastack() {
   array* arr = untag_check<array>(ctx->pop());
-  ctx->datastack = array_to_stack(arr, ctx->datastack_seg->start);
+  ctx->datastack = array_to_stack(arr, ctx->datastack_seg->start, ctx->datastack_seg.get());
 }
 
 void factor_vm::primitive_set_retainstack() {
   array* arr = untag_check<array>(ctx->pop());
-  ctx->retainstack = array_to_stack(arr, ctx->retainstack_seg->start);
+  ctx->retainstack = array_to_stack(arr, ctx->retainstack_seg->start, ctx->retainstack_seg.get());
 }
 
 // Used to implement call(
@@ -273,11 +335,29 @@ void factor_vm::primitive_check_datastack() {
 
 void factor_vm::primitive_load_locals() {
   fixnum count = untag_fixnum(ctx->pop());
-  memcpy((cell*)(ctx->retainstack + sizeof(cell)),
-         (cell*)(ctx->datastack - sizeof(cell) * (count - 1)),
-         sizeof(cell) * count);
-  ctx->datastack -= sizeof(cell) * count;
-  ctx->retainstack += sizeof(cell) * count;
+  
+  // Bounds checking
+  if (count < 0) {
+    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
+  }
+  
+  cell bytes_to_copy = sizeof(cell) * count;
+  
+  // Check if we have enough data on the datastack
+  if (ctx->datastack - bytes_to_copy + sizeof(cell) < ctx->datastack_seg->start) {
+    general_error(ERROR_DATASTACK_UNDERFLOW, false_object, false_object);
+  }
+  
+  // Check if we have enough room on the retainstack
+  if (ctx->retainstack + bytes_to_copy > ctx->retainstack_seg->end - stack_reserved) {
+    general_error(ERROR_RETAINSTACK_OVERFLOW, false_object, false_object);
+  }
+  
+  memcpy(reinterpret_cast<cell*>(ctx->retainstack + sizeof(cell)),
+         reinterpret_cast<cell*>(ctx->datastack - sizeof(cell) * (count - 1)),
+         bytes_to_copy);
+  ctx->datastack -= bytes_to_copy;
+  ctx->retainstack += bytes_to_copy;
 }
 
 }

@@ -56,15 +56,15 @@ typedef int64_t bignum_twodigit_type;
 #endif
 
 // BIGNUM_TO_POINTER casts a bignum object to a digit array pointer.
-#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum->data()))
+#define BIGNUM_TO_POINTER(bignum) (reinterpret_cast<bignum_digit_type*>(bignum->data()))
 
 // BIGNUM_EXCEPTION is invoked to handle assertion violations.
 #define BIGNUM_EXCEPTION abort
 
 #define BIGNUM_DIGIT_LENGTH (((sizeof(bignum_digit_type)) * CHAR_BIT) - 2)
 #define BIGNUM_HALF_DIGIT_LENGTH (BIGNUM_DIGIT_LENGTH / 2)
-#define BIGNUM_RADIX (bignum_digit_type)(((cell)1) << BIGNUM_DIGIT_LENGTH)
-#define BIGNUM_RADIX_ROOT (((bignum_digit_type) 1) << BIGNUM_HALF_DIGIT_LENGTH)
+#define BIGNUM_RADIX static_cast<bignum_digit_type>((static_cast<cell>(1)) << BIGNUM_DIGIT_LENGTH)
+#define BIGNUM_RADIX_ROOT (static_cast<bignum_digit_type>(1) << BIGNUM_HALF_DIGIT_LENGTH)
 #define BIGNUM_DIGIT_MASK (BIGNUM_RADIX - 1)
 #define BIGNUM_HALF_DIGIT_MASK (BIGNUM_RADIX_ROOT - 1)
 
@@ -98,10 +98,10 @@ typedef int64_t bignum_twodigit_type;
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 
 #define BIGNUM_ASSERT(expression) \
-  {                               \
+  do {                            \
     if (!(expression))            \
       BIGNUM_EXCEPTION();         \
-  }
+  } while (0)
 
 #endif // not BIGNUM_DISABLE_ASSERTION_CHECKS
 

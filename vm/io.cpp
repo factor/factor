@@ -18,7 +18,7 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_read = 0;
 
   do {
-    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+    size_t ret = fread((void*)((char*)ptr + items_read * size), size,
                        nitems - items_read, stream);
     if (ret == 0) {
       if (feof(stream)) {
@@ -53,7 +53,7 @@ FILE* factor_vm::safe_fopen(char* filename, const char* mode) {
   FILE* file;
   for (;;) {
     file = fopen(filename, mode);
-    if (file == NULL)
+    if (file == nullptr)
       io_error_if_not_EINTR();
     else
       break;
@@ -99,7 +99,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
   size_t ret = 0;
 
   do {
-    ret = fwrite((void*)((int*)ptr + items_written * size), size,
+    ret = fwrite((void*)((char*)ptr + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
       io_error_if_not_EINTR();
@@ -157,15 +157,17 @@ void factor_vm::primitive_fopen() {
   byte_array *path = untag_check<byte_array>(ctx->pop());
 
   FILE* file = safe_fopen((char*)(path + 1), (char*)(mode + 1));
-  ctx->push(allot_alien((cell)file));
+  ctx->push(allot_alien(reinterpret_cast<cell>(file)));
 }
 
 FILE* factor_vm::pop_file_handle() {
-  return (FILE*)alien_offset(ctx->pop());
+  void* ptr = alien_offset(ctx->pop());
+  return static_cast<FILE*>(ptr);
 }
 
 FILE* factor_vm::peek_file_handle() {
-  return (FILE*)alien_offset(ctx->peek());
+  void* ptr = alien_offset(ctx->peek());
+  return static_cast<FILE*>(ptr);
 }
 
 void factor_vm::primitive_fgetc() {

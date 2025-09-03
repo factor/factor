@@ -8,7 +8,7 @@ const cell seh_area_size = 0;
 
 struct code_heap {
   // The actual memory area
-  segment* seg;
+  std::unique_ptr<segment> seg;
 
   // Memory area reserved for safepoint guard page
   cell safepoint_page;
@@ -17,7 +17,7 @@ struct code_heap {
   char* seh_area;
 
   // Memory allocator
-  free_list_allocator<code_block>* allocator;
+  std::unique_ptr<free_list_allocator<code_block>> allocator;
 
   // For fast lookup of blocks from addresses.
   std::set<cell> all_blocks;
@@ -41,6 +41,15 @@ struct code_heap {
 
   explicit code_heap(cell size);
   ~code_heap();
+  
+  // Disable copy operations to prevent double-delete
+  code_heap(const code_heap&) = delete;
+  code_heap& operator=(const code_heap&) = delete;
+  
+  // Move operations could be implemented if needed
+  code_heap(code_heap&&) = delete;
+  code_heap& operator=(code_heap&&) = delete;
+  
   void write_barrier(code_block* compiled);
   void clear_remembered_set();
   bool uninitialized_p(code_block* compiled);

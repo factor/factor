@@ -24,12 +24,20 @@ namespace factor {
 // from the callback heap in the previous session when the image was saved.
 
 struct callback_heap {
-  segment* seg;
-  free_list_allocator<code_block>* allocator;
+  std::unique_ptr<segment> seg;
+  std::unique_ptr<free_list_allocator<code_block>> allocator;
   factor_vm* parent;
 
-  callback_heap(cell size, factor_vm* parent);
+  callback_heap(cell size, factor_vm* parent_vm);
   ~callback_heap();
+
+  // Disable copy operations to prevent double-delete
+  callback_heap(const callback_heap&) = delete;
+  callback_heap& operator=(const callback_heap&) = delete;
+  
+  // Move operations could be implemented if needed
+  callback_heap(callback_heap&&) = delete;
+  callback_heap& operator=(callback_heap&&) = delete;
 
   instruction_operand callback_operand(code_block* stub, cell index);
   void store_callback_operand(code_block* stub, cell index, cell value);

@@ -45,11 +45,19 @@ struct gc_event {
 struct gc_state {
   gc_op op;
   uint64_t start_time;
-  gc_event* event;
+  std::unique_ptr<gc_event> event;
 
   gc_state(gc_op op, factor_vm* parent);
   ~gc_state();
   void start_again(gc_op op_, factor_vm* parent);
+  
+  // Disable copy operations to prevent double-delete
+  gc_state(const gc_state&) = delete;
+  gc_state& operator=(const gc_state&) = delete;
+  
+  // Move operations could be implemented if needed
+  gc_state(gc_state&&) = delete;
+  gc_state& operator=(gc_state&&) = delete;
 };
 
 }

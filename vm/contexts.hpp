@@ -17,6 +17,9 @@ enum context_object {
 // to work with. macOS 64 bit needs more than 8192. See issue #1419.
 static const cell stack_reserved = 16384;
 
+// Maximum number of unused contexts to keep in the pool for reuse
+static const size_t max_unused_contexts = 10;
+
 struct context {
 
   // First 5 fields accessed directly by compiler. See basis/vm/vm.factor
@@ -34,9 +37,9 @@ struct context {
   // C callstack pointer
   cell callstack_save;
 
-  segment* datastack_seg;
-  segment* retainstack_seg;
-  segment* callstack_seg;
+  std::unique_ptr<segment> datastack_seg;
+  std::unique_ptr<segment> retainstack_seg;
+  std::unique_ptr<segment> callstack_seg;
 
   // context-specific special objects, accessed by context-object and
   // set-context-object primitives
@@ -44,6 +47,17 @@ struct context {
 
   context(cell ds_size, cell rs_size, cell cs_size);
   ~context();
+
+  // Disable copy operations to prevent double-delete of segments
+  context(const context&) = delete;
+  context& operator=(const context&) = delete;
+  
+  // Enable move operations
+  context(context&& other) noexcept;
+  context& operator=(context&& other) noexcept;
+  
+  // Swap operation for efficiency
+  void swap(context& other) noexcept;
 
   void reset_datastack();
   void reset_retainstack();
@@ -54,9 +68,17 @@ struct context {
   void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
   vm_error_type address_to_error(cell addr);
 
-  cell peek() { return *(cell*)datastack; }
+  cell peek() { 
+    FACTOR_ASSERT(datastack >= datastack_seg->start);
+    FACTOR_ASSERT(datastack < datastack_seg->end);
+    return *reinterpret_cast<cell*>(datastack); 
+  }
 
-  void replace(cell tagged) { *(cell*)datastack = tagged; }
+  void replace(cell tagged) { 
+    FACTOR_ASSERT(datastack >= datastack_seg->start);
+    FACTOR_ASSERT(datastack < datastack_seg->end);
+    *reinterpret_cast<cell*>(datastack) = tagged; 
+  }
 
   cell pop() {
     cell value = peek();
