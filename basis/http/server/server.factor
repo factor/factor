@@ -134,8 +134,7 @@ LOG: httpd-header NOTICE
 
 : log-request ( request -- )
     [ [ method>> ] [ url>> ] bi 2array httpd-hit ]
-    [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
-    bi ;
+    [ { "user-agent" } [ log-header ] with each ] bi ;
 
 : split-path ( string -- path )
     "/" split harvest ;
