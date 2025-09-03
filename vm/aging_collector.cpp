@@ -2,7 +2,13 @@
 
 namespace factor {
 
+// On x86-64, we want 16-byte alignment for SSE/AVX operations
+// On x86-32, we don't need this strict alignment
+#ifdef FACTOR_64
 struct alignas(16) to_aging_copier : no_fixup {
+#else
+struct to_aging_copier : no_fixup {
+#endif
   aging_space* aging;
   tenured_space* tenured;
 
