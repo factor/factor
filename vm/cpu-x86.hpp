@@ -53,7 +53,6 @@ inline static bool tail_call_site_p(cell return_address) {
       return false;
     default:
       abort();
-      return false;
   }
 }
 

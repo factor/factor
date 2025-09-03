@@ -5,9 +5,9 @@ namespace factor {
 HMODULE hFactorDll;
 
 [[nodiscard]] bool set_memory_locked(cell base, cell size, bool locked) {
-  int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
+  const DWORD prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
   DWORD ignore;
-  int status = VirtualProtect(reinterpret_cast<char*>(base), size, prot, &ignore);
+  const BOOL status = VirtualProtect(reinterpret_cast<void*>(base), static_cast<SIZE_T>(size), prot, &ignore);
   return status != 0;
 }
 
@@ -72,8 +72,8 @@ void factor_vm::ffi_dlclose(dll* dll) {
   if (!GetModuleFileName(nullptr, full_path.get(), MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
 
-  if ((ptr = wcsrchr(full_path.get(), '.')))
-    *ptr = 0;
+  if ((ptr = wcsrchr(full_path.get(), L'.')))
+    *ptr = L'\0';
 
   // Fix C6053 warning: ensure null termination
   wcsncpy_s(temp_path.get(), MAX_UNICODE_PATH, full_path.get(), _TRUNCATE);
@@ -147,8 +147,7 @@ segment::~segment() {
 void factor_vm::init_signals() {}
 
 [[nodiscard]] THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
-  return reinterpret_cast<void*>(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(start_routine),
-                             args, 0, 0));
+  return CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(start_routine), args, 0, nullptr);
 }
 
 [[nodiscard]] uint64_t nano_count() {
@@ -332,6 +331,9 @@ void factor_vm::primitive_disable_ctrl_break() {
       wait_result = WaitForSingleObject(ctrl_break_thread, 1000);
       if (wait_result != WAIT_OBJECT_0) {
         // As last resort, terminate the thread (unavoidable in this context)
+#if defined(_MSC_VER)
+#pragma warning(suppress:6258)
+#endif
         TerminateThread(ctrl_break_thread, 0);
       }
     }
@@ -432,6 +434,9 @@ void factor_vm::end_sampling_profiler_timer() {
     wait_result = WaitForSingleObject(sampler_thread, 2000);
     if (wait_result != WAIT_OBJECT_0) {
       // As last resort, terminate the thread (unavoidable in this context)
+#if defined(_MSC_VER)
+#pragma warning(suppress:6258)
+#endif
       TerminateThread(sampler_thread, 0);
     }
   }

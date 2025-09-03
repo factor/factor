@@ -3,9 +3,9 @@
 namespace factor {
 
 bool set_memory_locked(cell base, cell size, bool locked) {
-  int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
-  int status = mprotect(reinterpret_cast<char*>(base), size, prot);
-  return status != -1;
+  const int prot = locked ? PROT_NONE : PROT_READ | PROT_WRITE;
+  const int status = mprotect(reinterpret_cast<void*>(base), static_cast<size_t>(size), prot);
+  return status == 0;
 }
 
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {

@@ -3,7 +3,7 @@
 
 namespace factor {
 
-typedef unsigned char UBYTE;
+using UBYTE = unsigned char;
 
 #ifndef UNW_FLAG_EHANDLER
 const UBYTE UNW_FLAG_EHANDLER = 0x1;
@@ -67,13 +67,13 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   unwind_info->CountOfCodes = 0;
   unwind_info->FrameRegister = 0;
   unwind_info->FrameOffset = 0;
-  unwind_info->ExceptionHandler = (DWORD)((cell)seh_area->handler.data() - base);
+  unwind_info->ExceptionHandler = static_cast<DWORD>(reinterpret_cast<cell>(seh_area->handler.data()) - base);
   unwind_info->ExceptionData[0] = 0;
 
   RUNTIME_FUNCTION* func = &seh_area->func;
   func->BeginAddress = 0;
-  func->EndAddress = (DWORD)(code->seg->end - base);
-  func->UnwindData = (DWORD)((cell)&seh_area->unwind_info - base);
+  func->EndAddress = static_cast<DWORD>(code->seg->end - base);
+  func->UnwindData = static_cast<DWORD>(reinterpret_cast<cell>(&seh_area->unwind_info) - base);
 
   if (!RtlAddFunctionTable(func, 1, base))
     fatal_error("RtlAddFunctionTable() failed", 0);

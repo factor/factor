@@ -117,6 +117,10 @@ inline cell object::slot_count() const {
 //  - visit_context_code_blocks()
 //  - visit_callback_code_blocks()
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4324)
+#endif
 template <typename Fixup> struct slot_visitor {
   factor_vm* parent;
   Fixup fixup;
@@ -166,6 +170,9 @@ template <typename Fixup> struct slot_visitor {
   // Visits data pointers in code blocks.
   void visit_code_block_objects(code_block* compiled);
 };
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 template <typename Fixup>
 cell slot_visitor<Fixup>::visit_pointer(cell pointer) {

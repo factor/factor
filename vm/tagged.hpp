@@ -14,9 +14,11 @@ template <typename Type> struct tagged {
   cell type() const { return TAG(value_); }
 
   bool type_p() const {
-    if (Type::type_number == TYPE_COUNT)
+    if constexpr (Type::type_number == TYPE_COUNT) {
       return true;
-    return type() == Type::type_number;
+    } else {
+      return type() == Type::type_number;
+    }
   }
 
   cell value() const {
@@ -43,10 +45,10 @@ template <typename Type> struct tagged {
   Type* operator->() const { return untagged(); }
   cell* operator&() const { return &value(); }
 
-  bool operator==(const tagged<Type>& x) { return value_ == x.value_; }
-  bool operator!=(const tagged<Type>& x) { return value_ != x.value_; }
+  bool operator==(const tagged<Type>& x) const { return value_ == x.value_; }
+  bool operator!=(const tagged<Type>& x) const { return value_ != x.value_; }
 
-  template <typename NewType> tagged<NewType> as() {
+  template <typename NewType> tagged<NewType> as() const {
     return tagged<NewType>(value_);
   }
 };

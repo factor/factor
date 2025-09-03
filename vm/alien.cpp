@@ -86,8 +86,16 @@ template<typename T>
 static inline T unaligned_read(const void* ptr) {
   if (!ptr) {
     // This will segfault, preserving Factor's expected behavior
+    #if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:6011)
+    #endif
     volatile T* null_ptr = nullptr;
-    return *null_ptr;
+    T crash = *null_ptr;
+    #if defined(_MSC_VER)
+    #pragma warning(pop)
+    #endif
+    return crash;
   }
   T value;
   memcpy(&value, ptr, sizeof(T));
@@ -98,8 +106,15 @@ template<typename T>
 static inline void unaligned_write(void* ptr, T value) {
   if (!ptr) {
     // This will segfault, preserving Factor's expected behavior
+    #if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable:6011)
+    #endif
     volatile T* null_ptr = nullptr;
     *null_ptr = value;
+    #if defined(_MSC_VER)
+    #pragma warning(pop)
+    #endif
     return;
   }
   memcpy(ptr, &value, sizeof(T));

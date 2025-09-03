@@ -92,7 +92,7 @@ inline static void breakpoint() { DebugBreak(); }
 extern HANDLE boot_thread;
 
 inline static std::string to_utf8(const wchar_t* buffer, int len) {
-  int nChars = ::WideCharToMultiByte(
+  const int nChars = ::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
@@ -104,13 +104,13 @@ inline static std::string to_utf8(const wchar_t* buffer, int len) {
   if (nChars == 0) return "";
 
   std::string newbuffer;
-  newbuffer.resize(nChars) ;
-  ::WideCharToMultiByte(
+  newbuffer.resize(nChars);
+  (void)::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
     len,
-    const_cast<char*>(newbuffer.c_str()),
+    newbuffer.data(),
     nChars,
     nullptr,
     nullptr);
@@ -118,7 +118,7 @@ inline static std::string to_utf8(const wchar_t* buffer, int len) {
 }
 
 inline static std::string to_utf8(const std::wstring& str) {
-  return to_utf8(str.c_str(), (int)str.size());
+  return to_utf8(str.c_str(), static_cast<int>(str.size()));
 }
 
 #define AS_UTF8(ptr) to_utf8(ptr)
