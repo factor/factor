@@ -122,7 +122,6 @@ struct factor_vm {
 
   std::vector<cell*> data_roots;
   std::list<code_root*> code_roots;
-
   // Debugger
   bool fep_p;
   bool fep_help_was_shown;

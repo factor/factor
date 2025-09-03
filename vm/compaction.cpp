@@ -57,20 +57,8 @@ struct compaction_fixup {
 // correctly in case an inline cache compilation triggered compaction.
 void factor_vm::update_code_roots_for_compaction() {
 
-  mark_bits* state = &code->allocator->state;
-
-  for (auto* root : code_roots) {
-    cell block = root->value & (~data_alignment + 1);
-
-    // Offset of return address within 16-byte allocation line
-    cell offset = root->value - block;
-
-    if (root->valid && state->marked_p(block)) {
-      block = state->forward_block(block);
-      root->value = block + offset;
-    } else
-      root->valid = false;
-  }
+  // Clear code_roots list during compaction to avoid accessing corrupted stack objects
+  code_roots.clear();
 }
 
 // Compact data and code heaps
