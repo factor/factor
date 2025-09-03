@@ -96,12 +96,9 @@ void factor_vm::collect_sweep_impl() {
   // marked, so that if a block makes a tail call to a generic word,
   // and the PIC compiler triggers a GC, and the caller block gets GCd
   // as a result, the PIC code won't try to overwrite the call site
-  mark_bits* state = &code->allocator->state;
-  for (auto* root : code_roots) {
-    cell block = root->value & (~data_alignment - 1);
-    if (root->valid && !state->marked_p(block))
-      root->valid = false;
-  }
+  
+  // Clear code_roots list during GC to avoid accessing corrupted stack objects
+  code_roots.clear();
 
   if (event)
     event->reset_timer();
