@@ -86,7 +86,7 @@ H{ } interactor-style set-global
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
-        dup model>> <history> >>history ;
+        dup model>> <history-from-file> >>history ;
 
 M: interactor graft*
     [ call-next-method ] [ dup word-model>> add-connection ] bi ;
