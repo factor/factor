@@ -42,51 +42,8 @@ ifdef CONFIG
 	SITE_CXXFLAGS += $(SITE_COMMON_FLAGS)
 	ASFLAGS += $(COMMON_FLAGS)
 	CFLAGS += $(SITE_CFLAGS) $(COMMON_FLAGS)
-	# Use C++20 standard
-	CXX_STD := c++20
-	CXXFLAGS += -std=$(CXX_STD) $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
+	CXXFLAGS += -std=c++11 $(SITE_CXXFLAGS) $(COMMON_FLAGS) $(ARCHITECTURE_FLAG)
 	LINKER_FLAGS += $(SITE_COMMON_LINKER_FLAGS) $(CC_OPT) $(LDFLAGS)
-
-	# WARNINGS=1 ./build.sh compile - enable all reasonable warnings
-	ifdef WARNINGS
-		WARNING_FLAGS := -Wcast-align -Wcast-qual -Wwrite-strings \
-			-Wconversion -Wsign-conversion -Wformat=2 -Wformat-security \
-			-Wnull-dereference -Wstack-protector -Wtrampolines -Walloca \
-			-Wvla -Warray-bounds=2 -Wimplicit-fallthrough=3 \
-			-Wshift-overflow=2 -Wstringop-overflow=4 -Wlogical-op \
-			-Wduplicated-cond -Wduplicated-branches -Wformat-signedness \
-			-Wshadow -Wstrict-overflow=4 -Wundef -Wstrict-prototypes \
-			-Wswitch-default -Wswitch-enum -Wstack-usage=8192 \
-			-Wcast-function-type -Wdouble-promotion
-
-		# C++ specific warnings
-		CXX_WARNING_FLAGS := -Woverloaded-virtual -Wsign-promo \
-			-Wstrict-null-sentinel -Wnoexcept -Wold-style-cast \
-			-Wzero-as-null-pointer-constant -Wextra-semi -Wuseless-cast
-
-		ifeq ($(IS_CLANG), 1)
-			# For Clang, use -Weverything and disable specific warnings that are too noisy
-			WARNING_FLAGS := -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic \
-				-Wno-padded -Wno-global-constructors -Wno-exit-time-destructors \
-				-Wno-weak-vtables -Wno-poison-system-directories \
-				-Wno-missing-prototypes -Wno-reserved-macro-identifier \
-				-Wno-reserved-identifier -Wno-documentation -Wno-documentation-unknown-command \
-				-Wno-float-equal -Wno-unused-macros -Wno-switch-enum \
-				-Wno-covered-switch-default -Wno-cast-qual -Wno-unused-parameter \
-				-Wno-disabled-macro-expansion -Wno-c++20-compat \
-				-Wno-sign-conversion -Wno-implicit-int-float-conversion \
-				-Wno-double-promotion -Wno-shadow-field-in-constructor \
-				-Wno-implicit-float-conversion -Wno-shorten-64-to-32 \
-				-Wno-old-style-cast -Wno-zero-as-null-pointer-constant \
-				-Wno-suggest-override -Wno-suggest-destructor-override \
-				-Wno-c++17-compat-mangling -Wno-comma -Wno-conditional-uninitialized \
-				-Wno-unsafe-buffer-usage -Wno-date-time
-			CXX_WARNING_FLAGS :=
-		endif
-
-		CFLAGS += $(WARNING_FLAGS)
-		CXXFLAGS += $(WARNING_FLAGS) $(CXX_WARNING_FLAGS)
-	endif
 
 	# SANITIZER=address ./build.sh compile
 	# address,thread,undefined,leak
@@ -253,7 +210,6 @@ help:
 	@echo ""
 	@echo "DEBUG=1  compile VM with debugging information"
 	@echo "REPRODUCIBLE=1  compile VM without timestamp"
-	@echo "WARNINGS=1  compile VM with comprehensive warning flags"
 	@echo "SITE_CFLAGS=...  additional C optimization flags"
 	@echo "SITE_CXXFLAGS=...  additional C++ optimization flags"
 	@echo "LTO=1  compile VM with Link Time Optimization"

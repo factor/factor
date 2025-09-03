@@ -6,7 +6,7 @@ factor_vm* current_vm_p();
 
 inline factor_vm* current_vm() {
   factor_vm* vm = current_vm_p();
-  FACTOR_ASSERT(vm != nullptr);
+  FACTOR_ASSERT(vm != NULL);
   return vm;
 }
 

@@ -14,12 +14,12 @@ enum generation {
 inline generation generation_of(factor_vm* parent, object* obj) {
   if (parent->data->nursery->contains_p(obj))
     return NURSERY_GENERATION;
-  else if (parent->data->aging.get()->contains_p(obj))
+  else if (parent->data->aging->contains_p(obj))
     return AGING_GENERATION;
-  else if (parent->data->tenured.get()->contains_p(obj))
+  else if (parent->data->tenured->contains_p(obj))
     return TENURED_GENERATION;
   else {
-    critical_error("Bad object", reinterpret_cast<cell>(obj));
+    critical_error("Bad object", (cell)obj);
     return (generation)-1;
   }
 }
@@ -29,11 +29,11 @@ struct slot_checker {
   object* obj;
   generation gen;
 
-  slot_checker(factor_vm* parent_, object* obj_, generation gen_)
-      : parent(parent_), obj(obj_), gen(gen_) {}
+  slot_checker(factor_vm* parent, object* obj, generation gen)
+      : parent(parent), obj(obj), gen(gen) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, cell mask) {
-    cell object_card_pointer = parent->cards_offset + (reinterpret_cast<cell>(obj) >> card_bits);
+    cell object_card_pointer = parent->cards_offset + ((cell)obj >> card_bits);
     cell slot_card_pointer =
         parent->cards_offset + ((cell)slot_ptr >> card_bits);
     char slot_card_value = *(char*)slot_card_pointer;

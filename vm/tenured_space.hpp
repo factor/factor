@@ -3,8 +3,8 @@ namespace factor {
 struct tenured_space : free_list_allocator<object> {
   object_start_map starts;
 
-  tenured_space(cell size_, cell start_)
-      : free_list_allocator<object>(size_, start_), starts(size_, start_) {}
+  tenured_space(cell size, cell start)
+      : free_list_allocator<object>(size, start), starts(size, start) {}
 
   object* allot(cell dsize) {
     object* obj = free_list_allocator<object>::allot(dsize);
@@ -12,13 +12,13 @@ struct tenured_space : free_list_allocator<object> {
       starts.record_object_start_offset(obj);
       return obj;
     }
-    return nullptr;
+    return NULL;
   }
 
   cell next_allocated_object_after(cell scan) {
-    while (scan != this->end && (reinterpret_cast<object*>(scan))->free_p()) {
-      free_heap_block* free_block = reinterpret_cast<free_heap_block*>(scan);
-      scan = reinterpret_cast<cell>(free_block) + free_block->size();
+    while (scan != this->end && ((object*)scan)->free_p()) {
+      free_heap_block* free_block = (free_heap_block*)scan;
+      scan = (cell)free_block + free_block->size();
     }
     return scan == this->end ? 0 : scan;
   }
@@ -28,7 +28,7 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell next_object_after(cell scan) {
-    cell data_size = (reinterpret_cast<object*>(scan))->size();
+    cell data_size = ((object*)scan)->size();
     return next_allocated_object_after(scan + data_size);
   }
 

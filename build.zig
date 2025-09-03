@@ -202,7 +202,7 @@ const c_flags: []const []const u8 = &.{
 };
 
 const cpp_flags: []const []const u8 = &.{
-    "-std=c++20",
+    "-std=c++11",
 };
 
 const common_flags = c_flags ++ cpp_flags;

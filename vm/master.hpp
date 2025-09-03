@@ -26,7 +26,6 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include <memory>
 #include <set>
 #include <vector>
 #include <iostream>
@@ -34,7 +33,6 @@
 #include <limits>
 #include <sstream>
 #include <string>
-#include <type_traits>
 
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
@@ -101,7 +99,6 @@ namespace factor { struct factor_vm; }
 #include "assert.hpp"
 #include "debug.hpp"
 #include "layouts.hpp"
-#include "conversions.hpp"
 #include "platform.hpp"
 #include "utilities.hpp"
 #include "primitives.hpp"

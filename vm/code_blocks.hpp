@@ -18,11 +18,11 @@ struct code_block {
   bool free_p() const { return (header & 1) == 1; }
 
   code_block_type type() const {
-    return static_cast<code_block_type>((header >> 1) & 0x3);
+    return (code_block_type)((header >> 1) & 0x3);
   }
 
   void set_type(code_block_type type) {
-    header = ((header & ~static_cast<cell>(0x7)) | (static_cast<cell>(type) << 1));
+    header = ((header & ~0x7) | (type << 1));
   }
 
   bool pic_p() const { return type() == CODE_BLOCK_PIC; }
@@ -30,7 +30,7 @@ struct code_block {
   cell size() const {
     cell size;
     if (free_p())
-      size = header & ~static_cast<cell>(7);
+      size = header & ~7;
     else
       size = header & 0xFFFFF8;
     FACTOR_ASSERT(size > 0);
@@ -64,16 +64,14 @@ struct code_block {
 
   template <typename Fixup> cell size(Fixup fixup) const { (void)fixup; return size(); }
 
-  cell entry_point() const { return reinterpret_cast<cell>(this + 1); }
+  cell entry_point() const { return (cell)(this + 1); }
 
   // GC info is stored at the end of the block
   gc_info* block_gc_info() const {
-    const void* ptr = reinterpret_cast<const uint8_t*>(this) + size() - sizeof(gc_info);
-    // Ensure proper alignment for gc_info
-    return static_cast<gc_info*>(__builtin_assume_aligned(const_cast<void*>(ptr), alignof(gc_info)));
+    return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
   }
 
-  void flush_icache() { factor::flush_icache(reinterpret_cast<cell>(this), size()); }
+  void flush_icache() { factor::flush_icache((cell)this, size()); }
 
   template <typename Iterator> void each_instruction_operand(Iterator& iter) {
     if (!to_boolean(relocation))
@@ -105,12 +103,12 @@ VM_C_API void undefined_symbol(void);
 
 inline code_block* word::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return reinterpret_cast<code_block*>(entry_point) - 1;
+  return (code_block*)entry_point - 1;
 }
 
 inline code_block* quotation::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return reinterpret_cast<code_block*>(entry_point) - 1;
+  return (code_block*)entry_point - 1;
 }
 
 }

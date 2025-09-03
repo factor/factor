@@ -10,15 +10,20 @@ bool return_takes_param_p() {
 #endif
 }
 
-callback_heap::callback_heap(cell size, factor_vm* parent_vm) {
-  seg = std::make_unique<segment>(size, true);
-  allocator = std::make_unique<free_list_allocator<code_block>>(size, seg->start);
-  this->parent = parent_vm;
+callback_heap::callback_heap(cell size, factor_vm* parent) {
+  seg = new segment(size, true);
+  if (!seg)
+    fatal_error("Out of memory in callback_heap constructor", size);
+  allocator = new free_list_allocator<code_block>(size, seg->start);
+  this->parent = parent;
 
 }
 
 callback_heap::~callback_heap() {
-  // unique_ptr automatically handles deletion
+  delete allocator;
+  allocator = NULL;
+  delete seg;
+  seg = NULL;
 }
 
 instruction_operand callback_heap::callback_operand(code_block* stub,
@@ -62,25 +67,24 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
     parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
                           false_object,
                           false_object);
-    return nullptr; // Critical: prevent NULL dereference
   }
   stub->header = bump & ~7;
   stub->owner = owner;
   stub->parameters = false_object;
   stub->relocation = false_object;
 
-  memcpy(reinterpret_cast<void*>(stub->entry_point()), insns->data<void>(), size);
+  memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
   // Store VM pointer in two relocations.
-  store_callback_operand(stub, 0, reinterpret_cast<cell>(parent));
+  store_callback_operand(stub, 0, (cell)parent);
 #ifdef FACTOR_ARM64
   store_callback_operand(stub, 1, parent->code->safepoint_page);
-  store_callback_operand(stub, 2, reinterpret_cast<cell>(&parent->dispatch_stats.megamorphic_cache_hits));
-  store_callback_operand(stub, 3, reinterpret_cast<cell>(&factor::inline_cache_miss));
+  store_callback_operand(stub, 2, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
+  store_callback_operand(stub, 3, (cell)&factor::inline_cache_miss);
   store_callback_operand(stub, 4, parent->cards_offset);
   store_callback_operand(stub, 5, parent->decks_offset);
 #else
-  store_callback_operand(stub, 2, reinterpret_cast<cell>(parent));
+  store_callback_operand(stub, 2, (cell)parent);
 #endif
 
   // On x86, the RET instruction takes an argument which depends on
@@ -105,7 +109,7 @@ void factor_vm::primitive_callback() {
 
 void factor_vm::primitive_free_callback() {
   void* entry_point = alien_offset(ctx->pop());
-  code_block* stub = reinterpret_cast<code_block*>(entry_point) - 1;
+  code_block* stub = (code_block*)entry_point - 1;
   callbacks->allocator->free(stub);
 }
 

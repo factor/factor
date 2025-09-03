@@ -1,4 +1,4 @@
-namespace factor { [[noreturn]] void abort(); }
+namespace factor { void abort(); }
 
 #ifdef FACTOR_DEBUG
 #define FACTOR_ASSERT(condition)                                               \

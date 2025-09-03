@@ -1,6 +1,6 @@
 namespace factor {
 
-[[noreturn]] void abort();
-[[noreturn]] void exit(int status);
+void abort();
+void exit(int status);
 
 }

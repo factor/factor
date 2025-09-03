@@ -14,7 +14,7 @@ namespace factor {
       _(callstack_bounds) _(callstack_for) _(callstack_to_array)               \
       _(check_datastack) _(clone) _(code_blocks) _(code_room)                  \
       _(compact_gc) _(compute_identity_hashcode) _(context_object)             \
-      _(context_object_for) _(current_callback) _(data_room) _(debug_print)    \
+      _(context_object_for) _(current_callback) _(data_room)                   \
       _(datastack_for) _(die) _(disable_ctrl_break) _(disable_gc_events)       \
       _(dispatch_stats)                                                        \
       _(displaced_alien) _(dlclose) _(dll_validp) _(dlopen) _(dlsym)           \

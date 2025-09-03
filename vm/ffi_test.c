@@ -94,10 +94,7 @@ long long ffi_test_21(long x, long y) { return (long long) x * (long long) y; }
 long ffi_test_22(long x, long long y, long long z) { return (long)(x + y / z); }
 
 float ffi_test_23(float x[3], float y[3]) {
-  float x_vals[3], y_vals[3];
-  memcpy(x_vals, x, sizeof(float) * 3);
-  memcpy(y_vals, y, sizeof(float) * 3);
-  return x_vals[0] * y_vals[0] + x_vals[1] * y_vals[1] + x_vals[2] * y_vals[2];
+  return x[0] * y[0] + x[1] * y[1] + x[2] * y[2];
 }
 
 struct test_struct_1 ffi_test_24(void) {
@@ -340,10 +337,9 @@ struct ulonglong_pair ffi_test_63(void) {
 
 int ffi_test_64(int n, ...) {
     va_list ap;
-    int sum = 0;
-    int i;
     va_start(ap, n);
-    for (i = 0; i < n; i++) {
+    int sum = 0;
+    for (int i = 0; i < n; i++) {
         sum += va_arg(ap, int);
     }
     va_end(ap);
@@ -352,10 +348,9 @@ int ffi_test_64(int n, ...) {
 
 double ffi_test_65(int n, ...) {
     va_list ap;
-    double sum = 0.0;
-    int i;
     va_start(ap, n);
-    for (i = 0; i < n; i++) {
+    double sum = 0.0;
+    for (int i = 0; i < n; i++) {
         sum += va_arg(ap, double);
     }
     va_end(ap);

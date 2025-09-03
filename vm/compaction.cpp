@@ -10,21 +10,21 @@ struct compaction_fixup {
   const object** data_finger;
   const code_block** code_finger;
 
-  compaction_fixup(mark_bits* data_forwarding_map_param,
-                   mark_bits* code_forwarding_map_param,
-                   const object** data_finger_param,
-                   const code_block** code_finger_param)
-      : data_forwarding_map(data_forwarding_map_param),
-        code_forwarding_map(code_forwarding_map_param),
-        data_finger(data_finger_param),
-        code_finger(code_finger_param) {}
+  compaction_fixup(mark_bits* data_forwarding_map,
+                   mark_bits* code_forwarding_map,
+                   const object** data_finger,
+                   const code_block** code_finger)
+      : data_forwarding_map(data_forwarding_map),
+        code_forwarding_map(code_forwarding_map),
+        data_finger(data_finger),
+        code_finger(code_finger) {}
 
   object* fixup_data(object* obj) {
-    return reinterpret_cast<object*>(data_forwarding_map->forward_block(reinterpret_cast<cell>(obj)));
+    return (object*)data_forwarding_map->forward_block((cell)obj);
   }
 
   code_block* fixup_code(code_block* compiled) {
-    return reinterpret_cast<code_block*>(code_forwarding_map->forward_block(reinterpret_cast<cell>(compiled)));
+    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
   }
 
   object* translate_data(const object* obj) {
@@ -35,20 +35,20 @@ struct compaction_fixup {
 
   code_block* translate_code(const code_block* compiled) {
     if (compiled < *code_finger)
-      return fixup_code(reinterpret_cast<code_block*>(const_cast<code_block*>(compiled)));
-    return const_cast<code_block*>(compiled);
+      return fixup_code((code_block*)compiled);
+    return (code_block*)compiled;
   }
 
   cell size(object* obj) {
-    if (data_forwarding_map->marked_p(reinterpret_cast<cell>(obj)))
+    if (data_forwarding_map->marked_p((cell)obj))
       return obj->size(*this);
-    return data_forwarding_map->unmarked_block_size(reinterpret_cast<cell>(obj));
+    return data_forwarding_map->unmarked_block_size((cell)obj);
   }
 
   cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p(reinterpret_cast<cell>(compiled)))
+    if (code_forwarding_map->marked_p((cell)compiled))
       return compiled->size(*this);
-    return code_forwarding_map->unmarked_block_size(reinterpret_cast<cell>(compiled));
+    return code_forwarding_map->unmarked_block_size((cell)compiled);
   }
 };
 
@@ -59,7 +59,8 @@ void factor_vm::update_code_roots_for_compaction() {
 
   mark_bits* state = &code->allocator->state;
 
-  for (auto* root : code_roots) {
+  FACTOR_FOR_EACH(code_roots) {
+    code_root* root = *iter;
     cell block = root->value & (~data_alignment + 1);
 
     // Offset of return address within 16-byte allocation line
@@ -75,7 +76,7 @@ void factor_vm::update_code_roots_for_compaction() {
 
 // Compact data and code heaps
 void factor_vm::collect_compact_impl() {
-  gc_event* event = current_gc->event.get();
+  gc_event* event = current_gc->event;
 
 #ifdef FACTOR_DEBUG
   code->verify_all_blocks_set();
@@ -84,7 +85,7 @@ void factor_vm::collect_compact_impl() {
   if (event)
     event->reset_timer();
 
-  tenured_space* tenured = data->tenured.get();
+  tenured_space* tenured = data->tenured;
   mark_bits* data_forwarding_map = &tenured->state;
   mark_bits* code_forwarding_map = &code->allocator->state;
 
@@ -92,43 +93,45 @@ void factor_vm::collect_compact_impl() {
   data_forwarding_map->compute_forwarding();
   code_forwarding_map->compute_forwarding();
 
-  const object* data_finger = reinterpret_cast<object*>(tenured->start);
-  const code_block* code_finger = reinterpret_cast<code_block*>(code->allocator->start);
+  const object* data_finger = (object*)tenured->start;
+  const code_block* code_finger = (code_block*)code->allocator->start;
 
-  compaction_fixup fixup(data_forwarding_map, code_forwarding_map,
-                         &data_finger, &code_finger);
-  slot_visitor<compaction_fixup> forwarder(this, fixup);
+  {
+    compaction_fixup fixup(data_forwarding_map, code_forwarding_map,
+                           &data_finger, &code_finger);
+    slot_visitor<compaction_fixup> forwarder(this, fixup);
 
-  forwarder.visit_uninitialized_code_blocks();
+    forwarder.visit_uninitialized_code_blocks();
 
-  // Object start offsets get recomputed by the object_compaction_updater
-  data->tenured.get()->starts.clear_object_start_offsets();
+    // Object start offsets get recomputed by the object_compaction_updater
+    data->tenured->starts.clear_object_start_offsets();
 
-  // Slide everything in tenured space up, and update data and code heap
-  // pointers inside objects.
-  auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
-    (void)old_addr;
-    (void)size;
-    forwarder.visit_slots(new_addr);
-    forwarder.visit_object_code_block(new_addr);
-    tenured->starts.record_object_start_offset(new_addr);
-  };
-  tenured->compact(compact_object_func, fixup, &data_finger);
+    // Slide everything in tenured space up, and update data and code heap
+    // pointers inside objects.
+    auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
+      (void)old_addr;
+      (void)size;
+      forwarder.visit_slots(new_addr);
+      forwarder.visit_object_code_block(new_addr);
+      tenured->starts.record_object_start_offset(new_addr);
+    };
+    tenured->compact(compact_object_func, fixup, &data_finger);
 
-  // Slide everything in the code heap up, and update data and code heap
-  // pointers inside code blocks.
-  auto compact_code_func = [&](code_block* old_addr,
-                               code_block* new_addr,
-                               cell size) {
-    (void)size;
-    forwarder.visit_code_block_objects(new_addr);
-    cell old_entry_point = old_addr->entry_point();
-    forwarder.visit_instruction_operands(new_addr, old_entry_point);
-  };
-  code->allocator->compact(compact_code_func, fixup, &code_finger);
+    // Slide everything in the code heap up, and update data and code heap
+    // pointers inside code blocks.
+    auto compact_code_func = [&](code_block* old_addr,
+                                 code_block* new_addr,
+                                 cell size) {
+      (void)size;
+      forwarder.visit_code_block_objects(new_addr);
+      cell old_entry_point = old_addr->entry_point();
+      forwarder.visit_instruction_operands(new_addr, old_entry_point);
+    };
+    code->allocator->compact(compact_code_func, fixup, &code_finger);
 
-  forwarder.visit_all_roots();
-  forwarder.visit_context_code_blocks();
+    forwarder.visit_all_roots();
+    forwarder.visit_context_code_blocks();
+  }
 
   update_code_roots_for_compaction();
 
@@ -162,14 +165,12 @@ void factor_vm::collect_compact() {
 
 void factor_vm::collect_growing_data_heap(cell requested_size) {
   // Grow the data heap and copy all live objects to the new heap.
-  // IMPORTANT: Keep the old heap alive during collection!
-  auto old_data = std::move(data);
-  auto new_data = old_data->grow(&nursery, requested_size);
-  set_data_heap(std::move(new_data));
+  data_heap* old = data;
+  set_data_heap(data->grow(&nursery, requested_size));
   collect_mark_impl();
   collect_compact_impl();
   code->flush_icache();
-  // old_data automatically deleted when it goes out of scope
+  delete old;
 }
 
 }

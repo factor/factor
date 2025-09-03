@@ -14,9 +14,8 @@ namespace factor {
   code = fill_function_descriptor(desc, code)
 
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code)     \
-  auto desc = std::make_unique<void*[]>(3);             \
-  code = fill_function_descriptor(desc.get(), code);    \
-  vm->function_descriptors.push_back(std::move(desc))
+  code = fill_function_descriptor(new void* [3], code); \
+  vm->function_descriptors.push_back((void**)code)
 
 #define FUNCTION_CODE_POINTER(ptr) (function_descriptor_field((void*)ptr, 0))
 

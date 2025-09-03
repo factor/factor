@@ -65,19 +65,19 @@ static const cell rel_arm_cmp_mask = 0x003ffc00;
 struct relocation_entry {
   uint32_t value;
 
-  explicit relocation_entry(uint32_t val) : value(val) {}
+  explicit relocation_entry(uint32_t value) : value(value) {}
 
   relocation_entry(relocation_type rel_type, relocation_class rel_class,
                    cell offset) {
-    value = static_cast<uint32_t>((rel_type << 28) | (rel_class << 24) | offset);
+    value = (uint32_t)((rel_type << 28) | (rel_class << 24) | offset);
   }
 
   relocation_type type() {
-    return static_cast<relocation_type>((value & 0xf0000000) >> 28);
+    return (relocation_type)((value & 0xf0000000) >> 28);
   }
 
   relocation_class klass() {
-    return static_cast<relocation_class>((value & 0x0f000000) >> 24);
+    return (relocation_class)((value & 0x0f000000) >> 24);
   }
 
   cell offset() { return (value & 0x00ffffff); }
@@ -102,9 +102,6 @@ struct relocation_entry {
       case RT_INLINE_CACHE_MISS:
       case RT_SAFEPOINT:
         return 0;
-      case RT_UNUSED:
-        critical_error("RT_UNUSED in number_of_parameters()", type());
-        return -1; // Should not be used
       default:
         critical_error("Bad rel type in number_of_parameters()", type());
         return -1; // Can't happen

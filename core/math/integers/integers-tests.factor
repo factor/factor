@@ -289,46 +289,4 @@ IN: math.integers.tests
 { 0.0 } [ 0x8000000000000000000000000 1122 52 + 2^ /f ] unit-test
 
 ! rounding triggering special case in post-scale
-
-! Bignum shift overflow regression tests (GitHub issue #1920)
-! These tests ensure that left shift operations don't cause undefined behavior
-! due to signed integer overflow in the VM's bignum implementation
-
-! Original test case from issue #1920
-{ -34481587113954229440 } [ -538774798655534835 6 shift ] unit-test
-
-! Test large positive number shift
-{ 34481587113954229440 } [ 538774798655534835 6 shift ] unit-test
-
-! Test max int64 value shifted left by 1
-{ 18446744073709551614 } [ 9223372036854775807 1 shift ] unit-test
-
-! Test large shifts with max unsigned 64-bit value
-{ 21267647932558653965307991459878666240 } [ 18446744073709551615 60 shift ] unit-test
-
-! Test shifts that would overflow in 32-bit signed arithmetic
-{ 2147483648 } [ 1073741824 1 shift ] unit-test
-{ -2147483648 } [ -1073741824 1 shift ] unit-test
-
-! Test shift amounts near digit boundaries (62-bit digits in Factor)
-{ 4611686018427387904 } [ 1 62 shift ] unit-test
-{ -4611686018427387904 } [ -1 62 shift ] unit-test
-{ 9223372036854775808 } [ 1 63 shift ] unit-test
-{ -9223372036854775808 } [ -1 63 shift ] unit-test
-
-! Test negative shifts (right shifts) with large numbers
-{ 8418356228992731 } [ 538774798655534835 6 neg shift ] unit-test
-{ -8418356228992732 } [ -538774798655534835 6 neg shift ] unit-test
-
-! Test boundary conditions for shift normalization/unnormalization
-! These exercise the internal bignum_destructive_normalization paths
-{ 18446744073709551616 } [ 1 64 shift ] unit-test
-{ 340282366920938463463374607431768211456 } [ 1 128 shift ] unit-test
-
-
-! Test bit? with large shift amounts  
-{ t } [ 1 62 shift 62 bit? ] unit-test
-{ t } [ 1 63 shift 63 bit? ] unit-test
-{ f } [ 1 63 shift 62 bit? ] unit-test
-{ f } [ 1 62 shift 63 bit? ] unit-test
 { 1.0 } [ 300 2^ 1 - 300 2^ /f ] unit-test

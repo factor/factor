@@ -28,49 +28,8 @@ enum vm_error_type {
   ERROR_CALLBACK_SPACE_OVERFLOW
 };
 
-// Legacy error functions (kept for compatibility)
-[[noreturn]] void fatal_error(const char* msg, cell tagged);
+void fatal_error(const char* msg, cell tagged);
 void critical_error(const char* msg, cell tagged);
-
-// Modern error handling with improved diagnostics
-enum class ErrorSeverity {
-  CRITICAL,  // Bug that should be reported but execution can continue
-  FATAL      // Unrecoverable error that requires abort
-};
-
-struct ErrorLocation {
-  const char* file;
-  int line;
-  const char* function;
-  
-  ErrorLocation(const char* f = __builtin_FILE(), 
-                int l = __builtin_LINE(),
-                const char* fn = __builtin_FUNCTION())
-    : file(f), line(l), function(fn) {}
-};
-
-struct ErrorContext {
-  const char* message;
-  cell value;
-  ErrorLocation location;
-  ErrorSeverity severity;
-  
-  ErrorContext(const char* msg, cell val = 0, 
-               ErrorSeverity sev = ErrorSeverity::FATAL,
-               const ErrorLocation& loc = ErrorLocation())
-    : message(msg), value(val), location(loc), severity(sev) {}
-};
-
-// Modern error handling functions
-void report_error(const ErrorContext& ctx);
-
-// Macros for capturing source location
-#define FATAL_ERROR(msg, val) fatal_error_impl(msg, val, ErrorLocation(__FILE__, __LINE__, __FUNCTION__))
-#define CRITICAL_ERROR(msg, val) critical_error_impl(msg, val, ErrorLocation(__FILE__, __LINE__, __FUNCTION__))
-
-// Implementation functions (use macros above instead)
-[[noreturn]] void fatal_error_impl(const char* msg, cell tagged, const ErrorLocation& loc);
-void critical_error_impl(const char* msg, cell tagged, const ErrorLocation& loc);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();
 void synchronous_signal_handler_impl();

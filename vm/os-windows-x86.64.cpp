@@ -1,9 +1,8 @@
 #include "master.hpp"
-#include <array>
 
 namespace factor {
 
-using UBYTE = unsigned char;
+typedef unsigned char UBYTE;
 
 #ifndef UNW_FLAG_EHANDLER
 const UBYTE UNW_FLAG_EHANDLER = 0x1;
@@ -23,7 +22,7 @@ struct UNWIND_INFO {
 struct seh_data {
   UNWIND_INFO unwind_info;
   RUNTIME_FUNCTION func;
-  std::array<UBYTE, 32> handler;
+  UBYTE handler[32];
 };
 
 void factor_vm::c_to_factor_toplevel(cell quot) {
@@ -34,7 +33,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   // generate a small trampoline that jumps to the real
   // exception handler.
 
-  seh_data* seh_area = reinterpret_cast<seh_data*>(code->seh_area);
+  seh_data* seh_area = (seh_data*)code->seh_area;
   cell base = code->seg->start;
 
   // Should look at generating this with the Factor assembler
@@ -67,13 +66,13 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   unwind_info->CountOfCodes = 0;
   unwind_info->FrameRegister = 0;
   unwind_info->FrameOffset = 0;
-  unwind_info->ExceptionHandler = static_cast<DWORD>(reinterpret_cast<cell>(seh_area->handler.data()) - base);
+  unwind_info->ExceptionHandler = (DWORD)((cell)&seh_area->handler[0] - base);
   unwind_info->ExceptionData[0] = 0;
 
   RUNTIME_FUNCTION* func = &seh_area->func;
   func->BeginAddress = 0;
-  func->EndAddress = static_cast<DWORD>(code->seg->end - base);
-  func->UnwindData = static_cast<DWORD>(reinterpret_cast<cell>(&seh_area->unwind_info) - base);
+  func->EndAddress = (DWORD)(code->seg->end - base);
+  func->UnwindData = (DWORD)((cell)&seh_area->unwind_info - base);
 
   if (!RtlAddFunctionTable(func, 1, base))
     fatal_error("RtlAddFunctionTable() failed", 0);

@@ -60,7 +60,7 @@ void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
     index = SIGNAL_HANDLER_WORD;
   } else if (offset == 16 - sizeof(cell)) {
     // Make a fake frame for the leaf procedure
-    FACTOR_ASSERT(code->code_block_for_address(*pc) != nullptr);
+    FACTOR_ASSERT(code->code_block_for_address(*pc) != NULL);
     delta = LEAF_FRAME_SIZE;
     index = LEAF_SIGNAL_HANDLER_WORD;
   } else {

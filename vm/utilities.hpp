@@ -7,7 +7,7 @@ namespace factor {
        iter != _end;                                            \
        iter++)
 
-inline void memset_2(void* dst, const uint16_t pattern, const size_t size) {
+inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
 #ifdef __APPLE__
   cell cell_pattern = (pattern | (pattern << 16));
   memset_pattern4(dst, &cell_pattern, size);
@@ -15,8 +15,8 @@ inline void memset_2(void* dst, const uint16_t pattern, const size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    uint16_t* start = static_cast<uint16_t*>(dst);
-    uint16_t* end = reinterpret_cast<uint16_t*>(reinterpret_cast<cell>(dst) + size);
+    uint16_t* start = (uint16_t*)dst;
+    uint16_t* end = (uint16_t*)((cell)dst + size);
     while (start < end) {
       *start = pattern;
       start++;
@@ -25,7 +25,7 @@ inline void memset_2(void* dst, const uint16_t pattern, const size_t size) {
 #endif
 }
 
-inline void memset_cell(void* dst, const cell pattern, const size_t size) {
+inline static void memset_cell(void* dst, cell pattern, size_t size) {
 #ifdef __APPLE__
 #ifdef FACTOR_64
   memset_pattern8(dst, &pattern, size);
@@ -36,8 +36,8 @@ inline void memset_cell(void* dst, const cell pattern, const size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    cell* start = static_cast<cell*>(dst);
-    cell* end = reinterpret_cast<cell*>(reinterpret_cast<cell>(dst) + size);
+    cell* start = (cell*)dst;
+    cell* end = (cell*)((cell)dst + size);
     while (start < end) {
       *start = pattern;
       start++;

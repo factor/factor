@@ -18,17 +18,17 @@ struct profiling_sample {
   // Number of samples taken during code execution in non-Factor threads
   fixnum foreign_thread_sample_count;
 
-  profiling_sample(fixnum sample_count_, fixnum gc_sample_count_,
-                   fixnum jit_sample_count_, fixnum foreign_sample_count_,
-                   fixnum foreign_thread_sample_count_)
+  profiling_sample(fixnum sample_count, fixnum gc_sample_count,
+                   fixnum jit_sample_count, fixnum foreign_sample_count,
+                   fixnum foreign_thread_sample_count)
       : thread(0),
         callstack_begin(0),
         callstack_end(0),
-        sample_count(sample_count_),
-        gc_sample_count(gc_sample_count_),
-        jit_sample_count(jit_sample_count_),
-        foreign_sample_count(foreign_sample_count_),
-        foreign_thread_sample_count(foreign_thread_sample_count_) {}
+        sample_count(sample_count),
+        gc_sample_count(gc_sample_count),
+        jit_sample_count(jit_sample_count),
+        foreign_sample_count(foreign_sample_count),
+        foreign_thread_sample_count(foreign_thread_sample_count) {}
 
   profiling_sample record_counts() volatile;
   void clear_counts() volatile;

@@ -140,11 +140,11 @@ cell factor_vm::compute_dlsym_address(array* parameters,
                                       bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
-  dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
+  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
 
-  cell undef = reinterpret_cast<cell>(factor::undefined_symbol);
+  cell undef = (cell)factor::undefined_symbol;
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
-  if (d != nullptr && !d->handle)
+  if (d != NULL && !d->handle)
     return undef;
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
@@ -164,9 +164,9 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      return reinterpret_cast<cell>(&dispatch_stats.megamorphic_cache_hits);
+      return (cell)&dispatch_stats.megamorphic_cache_hits;
     case RT_VM:
-      return reinterpret_cast<cell>(this) + untag_fixnum(array_nth(parameters, index));
+      return (cell)this + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -176,11 +176,11 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
-      return reinterpret_cast<cell>(&factor::inline_cache_miss);
+      return (cell)&factor::inline_cache_miss;
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
-      return static_cast<cell>(-1); // Explicitly cast to cell (unsigned)
+      return -1;
   }
 }
 
@@ -188,13 +188,13 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
-      : nullptr;
+      : NULL;
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 
   cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
-  if (ext_addr == static_cast<cell>(-1)) {
-    std::ostringstream ss;
+  if (ext_addr == (cell)-1) {
+    ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
     cell arg;
@@ -215,8 +215,8 @@ struct initial_code_block_visitor {
   cell literals;
   cell literal_index;
 
-  initial_code_block_visitor(factor_vm* parent_vm, cell literals_array)
-      : parent(parent_vm), literals(literals_array), literal_index(0) {}
+  initial_code_block_visitor(factor_vm* parent, cell literals)
+      : parent(parent), literals(literals), literal_index(0) {}
 
   cell next_literal() {
     return array_nth(untag<array>(literals), literal_index++);
@@ -290,14 +290,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> code_data(code_, this);
+  data_root<byte_array> code(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(code_data.untagged());
+  cell code_length = array_capacity(code.untagged());
   code_block* compiled = allot_code_block(code_length, type);
 
   compiled->owner = owner.value();
@@ -316,7 +316,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  memcpy(compiled + 1, code_data.untagged() + 1, code_length);
+  memcpy(compiled + 1, code.untagged() + 1, code_length);
 
   // fixup labels
   if (to_boolean(labels.value()))
@@ -330,7 +330,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   // compiler at the beginning of bootstrap
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
-  this->code->all_blocks.insert(reinterpret_cast<cell>(compiled));
+  this->code->all_blocks.insert((cell)compiled);
 
   return compiled;
 }

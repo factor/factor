@@ -76,10 +76,8 @@ if not errorlevel 1 (
     ) else goto nocl
 )
 
-if exist temp (
-    echo Deleting staging images from temp/...
-    del temp\staging.*.image 2>nul
-)
+echo Deleting staging images from temp/...
+del temp\staging.*.image
 
 if "%_git_pull%"=="1" (
     echo Updating working copy from %GIT_BRANCH%...

@@ -6,8 +6,8 @@ namespace factor {
 void* fill_function_descriptor(void* ptr, void* code) {
   void** descriptor = (void**)ptr;
   descriptor[0] = code;
-  descriptor[1] = nullptr;
-  descriptor[2] = nullptr;
+  descriptor[1] = NULL;
+  descriptor[2] = NULL;
   return descriptor;
 }
 
