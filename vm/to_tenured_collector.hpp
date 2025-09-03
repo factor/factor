@@ -1,12 +1,6 @@
 namespace factor {
 
-// On x86-64, we want 16-byte alignment for SSE/AVX operations
-// On x86-32, we don't need this strict alignment
-#ifdef FACTOR_64
 struct alignas(16) from_tenured_refs_copier : no_fixup {
-#else
-struct from_tenured_refs_copier : no_fixup {
-#endif
   tenured_space* tenured;
   std::vector<cell> *mark_stack;
 
