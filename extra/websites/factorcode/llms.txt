@@ -1,0 +1,172 @@
+# Factor
+
+> Factor is a concatenative, stack-based programming language with high-level features including dynamic types, extensible syntax, macros, and garbage collection.
+
+Factor is a fully compiled language for performance while supporting interactive development. It includes an extensive standard library, supports multiple platforms, and can deploy stand-alone applications. The entire codebase is available under a BSD license.
+
+Key characteristics:
+- Stack-based concatenative programming paradigm
+- Dynamic typing with optional static type annotations
+- Extensible syntax and powerful macro system
+- Interactive development environment with REPL
+- Optimizing compiler for high performance
+- Cross-platform support (Windows, macOS, Linux)
+- Rich standard library organized in vocabularies
+
+## Core Concepts
+
+**Stack-based execution**: Values are pushed onto a stack from left to right. Operations consume values from the stack and push results back.
+
+**Basic syntax**:
+- `!` starts a comment
+- `.` pops and prints the top stack value
+- `.s` displays the stack without modifying it
+- `\` pushes a word's identifier instead of executing it
+
+**Stack manipulation words**:
+- `dup` duplicates the top item
+- `drop` removes the top item
+- `swap` exchanges top two items
+- `over` copies second item to top
+- `nip` removes second item
+- `pick` copies third item to top
+
+**Defining words**:
+```factor
+: word-name ( input -- output ) definition ;
+```
+The `( input -- output )` is the stack effect, showing what the word consumes and produces.
+
+**Quotations** are code blocks as values:
+```factor
+[ 2 + ]           ! Push quotation onto stack
+4 swap call .     ! Execute it: prints 6
+```
+
+**Combinators** (higher-order words):
+- `dip` - pop value, run quotation, restore value
+- `keep` - copy value, run quotation, push copy
+- `bi` - apply two quotations to one value
+- `each` - apply quotation to list items
+- `map` - transform list with quotation
+- `filter` - keep items where quotation returns true
+
+**Vocabularies** (libraries/modules):
+```factor
+USING: io math sequences ;   ! Import vocabularies
+```
+
+**Truthiness**: Everything is true except `f`. Conditionals include `when`, `unless`, `if`.
+
+## Getting Started
+
+**Quick Install**: Download Factor from [https://factorcode.org](https://factorcode.org) (nightly builds recommended over point releases).
+
+**Running Factor**:
+- Windows: Double-click `factor.exe` or run `.\factor.com` in command prompt
+- macOS: Double-click `Factor.app` or run `open Factor.app` in Terminal  
+- Unix/Linux: Run `./factor` in shell
+
+**Interactive Mode (Listener)**:
+Once Factor starts, you're in the interactive listener (Factor's REPL) where you can type code directly:
+```factor
+"Hello, world" print
+5 square .              ! Prints: 25
+{ 1 2 3 } [ 2 * ] map . ! Prints: { 2 4 6 }
+```
+
+**Running Scripts**:
+Save code in a `.factor` file and run:
+```bash
+./factor script.factor
+```
+Or use shebang `#!/path/to/factor` at the top of executable scripts.
+
+**Creating Your First Vocabulary**:
+1. Use the `work/` directory for personal projects (you can add more vocab roots with `-roots` flag or in `~/.factor-roots`)
+2. Create a vocabulary with scaffolding tools:
+```factor
+"myproject" scaffold-work
+"myproject" edit
+"myproject" run
+```
+
+**Configuration**:
+- `~/.factor-roots` - Add additional vocabulary root directories (one per line)
+- `~/.factor-rc` - Factor code that runs at startup
+
+**Built-in Help**:
+```factor
+"first-program" help    ! Tutorial
+"tour" help             ! Guided tour
+\ word-name help        ! Help for specific word
+"demos" run             ! Interactive demos
+```
+
+## Code Examples
+
+Basic examples demonstrating Factor's syntax and capabilities:
+
+```factor
+! Hello World
+"Hello world" print
+
+! Working with sequences
+{ 4 8 15 16 23 42 } [ 2 * ] map .
+
+! Sum of numbers from 1 to 1000
+1000 [1..b] sum .
+
+! Happy Birthday song
+4 <iota> [
+    "Happy Birthday " write
+    2 = "dear NAME" "to You" ? print
+] each
+
+! FizzBuzz
+100 [1..b] [| i |
+    {
+        { [ i 15 divisor? ] [ "FizzBuzz" ] }
+        { [ i  3 divisor? ] [ "Fizz" ] }
+        { [ i  5 divisor? ] [ "Buzz" ] }
+        [ i number>string ]
+    } cond print
+] each
+
+! Object-oriented programming with generic methods
+TUPLE: circle radius ;
+TUPLE: rectangle width height ;
+
+GENERIC: area ( shape -- area )
+M: circle area radius>> sq pi * ;
+M: rectangle area [ width>> ] [ height>> ] bi * ;
+
+rectangle new 10 >>width 20 >>height area .
+```
+
+## Documentation
+
+- [Factor Tutorial](https://docs.factorcode.org/content/article-first-program.html): Introduction to Factor programming
+- [Guided Tour](https://docs.factorcode.org/content/article-tour.html): Comprehensive overview of Factor features
+- [Vocabulary Index](https://docs.factorcode.org/content/article-vocab-index.html): Complete reference for all Factor libraries
+- [Language Features](https://concatenative.org/wiki/view/Factor/Features/The%20language): Detailed explanation of Factor's language design
+- [Interactive Development](https://concatenative.org/wiki/view/Factor/Interactive%20development): Guide to Factor's development workflow
+- [Optimizing Compiler](https://concatenative.org/wiki/view/Factor/Optimizing%20compiler): Understanding Factor's compilation process
+
+## Building and Installation
+
+- [Building Factor](https://concatenative.org/wiki/view/Factor/Building%20Factor): Step-by-step build instructions
+- [System Requirements](https://concatenative.org/wiki/view/Factor/Requirements): Platform requirements and dependencies
+- [Deployment Guide](https://concatenative.org/wiki/view/Factor/Deployment): Creating standalone Factor applications
+
+## Community Resources
+
+- [Factor Community](https://www.concatenative.org/wiki/view/Factor/Community): Links to Discord, mailing lists, and forums
+- [Concatenative Wiki](https://concatenative.org): Wiki for concatenative programming languages
+- [Factor Mailing List](https://concatenative.org/wiki/view/Factor/Mailing%20list): Discussion and announcements
+
+## Optional
+
+- [Contributing Guidelines](https://github.com/factor/factor/blob/master/CONTRIBUTING.md): How to contribute to Factor development
+- [Factor Homepage](https://factorcode.org): Official Factor website with downloads and news
+- [Learning Factor](https://concatenative.org/wiki/view/Factor/Learning): Additional learning resources and tips
