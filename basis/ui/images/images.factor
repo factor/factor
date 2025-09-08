@@ -19,7 +19,9 @@ GENERIC: cached-image ( image -- image )
 
 M: image-name cached-image
     path>> gl-scale-factor get-global [
-        [ "." split1-last ] [ "@%dx." sprintf glue ] bi*
+        dup 2.0 < [ drop ] [
+            [ "." split1-last ] [ "@%dx." sprintf glue ] bi*
+        ] if
     ] when* (cached-image) ;
 
 M: image cached-image ;
