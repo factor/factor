@@ -1,15 +1,16 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.strings arrays
-assocs classes.struct combinators continuations destructors
-environment gdk2.ffi gdk2.gl.ffi gdk2.pixbuf.ffi glib.ffi
-gobject.ffi gtk2.ffi gtk2.gl.ffi io.encodings.binary
-io.encodings.utf8 io.files io.pathnames kernel libc literals locals math math.order
-math.bitwise math.parser math.vectors namespaces opengl sequences strings system threads ui
-ui.backend ui.backend.gtk2.input-methods ui.backend.gtk2.io ui.backend.x11.keys
-ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.pixel-formats
-ui.private vocabs.loader ;
+USING: accessors alien.accessors alien.c-types alien.strings
+arrays assocs classes.struct combinators continuations
+destructors environment gdk2.ffi gdk2.gl.ffi gdk2.pixbuf.ffi
+glib.ffi gobject.ffi gtk2.ffi gtk2.gl.ffi io.encodings.binary
+io.encodings.utf8 io.files io.pathnames kernel libc literals
+locals math math.order math.bitwise math.functions math.parser
+math.vectors namespaces opengl sequences strings system threads
+ui ui.backend ui.backend.gtk2.input-methods ui.backend.gtk2.io
+ui.backend.x11.keys ui.clipboards ui.event-loop ui.gadgets
+ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui.pixel-formats ui.private vocabs.loader ;
 IN: ui.backend.gtk2
 
 SINGLETON: gtk2-ui-backend
@@ -57,7 +58,7 @@ M: gtk2-clipboard set-clipboard-contents
     "GDK_SCALE" os-env [
         string>number
     ] [
-        gdk_screen_get_default gdk_screen_get_resolution 96.0 /
+        gdk_screen_get_default gdk_screen_get_resolution 96.0 / round
     ] if* 1.0 max ;
 
 : init-scale-factor ( -- )
