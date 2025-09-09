@@ -48,6 +48,7 @@ tool "fonts" f {
     { T{ key-down f ${ os macos? M+ C+ ? } "=" } com-font-size-plus }
     { T{ key-down f ${ os macos? M+ C+ ? } "_" } com-font-size-minus }
     { T{ key-down f ${ os macos? M+ C+ ? } "-" } com-font-size-minus }
+    { T{ key-down f ${ os macos? M+ C+ ? } "0" } com-font-size-normal }
 } define-command-map
 
 { "ui.theme.switching" "ui.tools" } "ui.tools.theme" require-when
