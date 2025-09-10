@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes fonts kernel make math.functions
-models namespaces sequences splitting strings
+models namespaces opengl sequences splitting strings
 ui.baseline-alignment ui.gadgets ui.gadgets.tracks ui.render
 ui.text ;
 IN: ui.gadgets.labels
@@ -45,7 +45,7 @@ M: label string<<
     [ font>> ] [ text>> ] bi ; inline
 
 M: label pref-dim*
-    >label< text-dim first2 ceiling 2array ;
+    >label< text-dim first2 gl-ceiling 2array ;
 
 <PRIVATE
 

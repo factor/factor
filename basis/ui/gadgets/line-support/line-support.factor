@@ -34,7 +34,7 @@ M: line-gadget line-leading
 GENERIC: line-height* ( gadget -- n )
 
 M: line-gadget line-height*
-    font>> font-metrics height>> ceiling >integer ;
+    font>> font-metrics height>> gl-ceiling >integer ;
 
 GENERIC: line-height ( gadget -- n )
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel locals math math.functions
-math.order sequences ui.gadgets ;
+math.order opengl sequences ui.gadgets ;
 IN: ui.baseline-alignment
 
 SYMBOL: +baseline+
@@ -61,8 +61,8 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     ascent [
         cap-height 0 or 2 / :> mid-line
         graphics-height 2 /
-        [ ascent mid-line - max mid-line + floor >integer ]
-        [ descent mid-line + max mid-line - ceiling >integer ] bi
+        [ ascent mid-line - max mid-line + gl-floor >integer ]
+        [ descent mid-line + max mid-line - gl-ceiling >integer ] bi
     ] [ f f ] if ;
 
 : (measure-metrics) ( children sizes -- graphics-height ascent descent cap-height )
