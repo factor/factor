@@ -204,8 +204,14 @@ fixup-ducet-for-tibetan
 
 : tangut-block? ( char -- ? )
     {
-        [ 0x17000 0x18AFF between? ] ! Tangut and Tangut Components
-        [ 0x18D00 0x18D8F between? ] ! Tangut Supplement
+        [ 0x17000 0x187FF between? ]
+        [ 0x18D00 0x18D7F between? ]
+    } 1|| ; inline
+
+: tangut-components-block? ( char -- ? )
+    {
+        [ 0x18800 0x18AFF between? ]
+        [ 0x18D80 0x18DFF between? ]
     } 1|| ; inline
 
 : nushu-block? ( char -- ? )
@@ -221,12 +227,14 @@ fixup-ducet-for-tibetan
         { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
         { [ dup 0x20000 0x2A6DF between? ] [ drop 0xFB80 ] } ! Extension B
         { [ dup 0x2A700 0x2B739 between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x2A73A 0x2B73F between? ] [ drop 0xFB80 ] } ! Extension C
         { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
-        { [ dup 0x2B820 0x2CEA1 between? ] [ drop 0xFB80 ] } ! Extension E
+        { [ dup 0x2B820 0x2CEAD between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
         { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
         { [ dup 0x31350 0x323AF between? ] [ drop 0xFB80 ] } ! Extension H
         { [ dup 0x2EBF0 0x2EE5D between? ] [ drop 0xFB80 ] } ! Extension I
+        { [ dup 0x323B0 0x33479 between? ] [ drop 0xFB80 ] } ! Extension J
         { [ dup 0x2F800 0x2FA1D between? ] [ drop 0xFB80 ] } ! CJK Compatibility
         { [ dup 0x04E00 0x09FFF between? ] [ drop 0xFB40 ] } ! CJK
         { [ dup 0x0F900 0x0FAD9 between? ] [ drop 0xFB40 ] } ! CJK
@@ -239,14 +247,20 @@ fixup-ducet-for-tibetan
 : tangut-BBBB ( char -- weight-levels )
     0x17000 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
-: nushu-AAAA ( char -- weight-levels )
+: tangut-components-AAAA ( char -- weight-levels )
     drop 0xfb01 0x0020 0x0002 <weight-levels> ; inline
+
+: tangut-components-BBBB ( char -- weight-levels )
+    0x18800 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: nushu-AAAA ( char -- weight-levels )
+    drop 0xfb02 0x0020 0x0002 <weight-levels> ; inline
 
 : nushu-BBBB ( char -- weight-levels )
     0x1B170 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
 : khitan-AAAA ( char -- weight-levels )
-    drop 0xfb02 0x0020 0x0002 <weight-levels> ; inline
+    drop 0xfb03 0x0020 0x0002 <weight-levels> ; inline
 
 : khitan-BBBB ( char -- weight-levels )
     0x18b00 - 0x8000 bitor 0 0 <weight-levels> ; inline
@@ -261,6 +275,7 @@ fixup-ducet-for-tibetan
     first
     {
         { [ dup tangut-block? ] [ [ tangut-AAAA ] [ tangut-BBBB ] bi 2array ] }
+        { [ dup tangut-components-block? ] [ [ tangut-components-AAAA ] [ tangut-components-BBBB ] bi 2array ] }
         { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
         { [ dup khitan-block? ] [ [ khitan-AAAA ] [ khitan-BBBB ] bi 2array ] }
         [ [ AAAA ] [ BBBB ] bi 2array ]
