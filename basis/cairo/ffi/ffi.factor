@@ -87,6 +87,10 @@ cairo_write_func_t ( void* closure, uchar* data, uint length )
 CALLBACK: cairo_status_t
 cairo_read_func_t ( void* closure, uchar* data, uint length )
 
+! added to cairo version 1.10
+STRUCT: cairo_rectangle_int_t
+    { x int } { y int } { width int } { height int } ;
+
 ! Functions for manipulating state objects
 
 FUNCTION: cairo_t*
@@ -1036,6 +1040,11 @@ cairo_matrix_transform_distance ( cairo_matrix_t* matrix, double* dx, double* dy
 
 FUNCTION: void
 cairo_matrix_transform_point ( cairo_matrix_t* matrix, double* x, double* y )
+
+! Region functions
+
+! added to cairo version 1.10
+C-TYPE: cairo_region_t
 
 ! Functions to be used while debugging (not intended for use in production code)
 FUNCTION: void
