@@ -7,6 +7,17 @@ inline static cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
 inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
+template <typename Ptr>
+inline cell cell_from_ptr(Ptr ptr) {
+  static_assert(std::is_pointer_v<Ptr>, "pointer required");
+  return reinterpret_cast<cell>(ptr);
+}
+
+template <typename T>
+inline T* ptr_from_cell(cell value) {
+  return reinterpret_cast<T*>(value);
+}
+
 static const cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
@@ -343,3 +354,4 @@ inline static cell string_capacity(const string* str) {
 inline static cell string_size(cell size) { return sizeof(string) + size; }
 
 }
+

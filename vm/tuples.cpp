@@ -23,9 +23,9 @@ void factor_vm::primitive_tuple_boa() {
   t->layout = layout.value();
 
   cell size = untag_fixnum(layout.untagged()->size) * sizeof(cell);
-  memcpy(t->data(), (cell*)(ctx->datastack - size + sizeof(cell)), size);
+  cell src_addr = ctx->datastack - size + sizeof(cell);
+    memcpy(t->data(), ptr_from_cell<void>(src_addr), size);
   ctx->datastack -= size;
-
   ctx->push(t.value());
 }
 

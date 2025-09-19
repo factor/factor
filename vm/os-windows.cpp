@@ -34,7 +34,7 @@ void factor_vm::ffi_dlopen(dll* dll) {
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return reinterpret_cast<cell>(GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll,
+  return cell_from_ptr(GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll,
                               symbol));
 }
 
@@ -112,7 +112,7 @@ segment::segment(cell size_, bool executable_p) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
-  start = reinterpret_cast<cell>(mem) + guard_size;
+  start = cell_from_ptr(mem) + guard_size;
   end = start + size;
 
   set_border_locked(true);
@@ -212,7 +212,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
     case EXCEPTION_ACCESS_VIOLATION:
       set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              reinterpret_cast<cell>(factor::memory_signal_handler_impl));
+                              cell_from_ptr(factor::memory_signal_handler_impl));
       break;
 
     case STATUS_FLOAT_DENORMAL_OPERAND:
@@ -234,12 +234,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #endif
       MXCSR(c) &= 0xffffffc0;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              reinterpret_cast<cell>(factor::fp_signal_handler_impl));
+                              cell_from_ptr(factor::fp_signal_handler_impl));
       break;
     default:
       signal_number = e->ExceptionCode;
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
-                              reinterpret_cast<cell>(factor::synchronous_signal_handler_impl));
+                              cell_from_ptr(factor::synchronous_signal_handler_impl));
       break;
   }
   return ExceptionContinueExecution;

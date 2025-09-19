@@ -73,7 +73,7 @@ void factor_vm::primitive_displaced_alien() {
 // Allocates memory (from_unsigned_cell can allocate)
 void factor_vm::primitive_alien_address() {
   ctx->replace(from_unsigned_cell(
-      reinterpret_cast<cell>(pinned_alien_offset(ctx->peek()))));
+      cell_from_ptr(pinned_alien_offset(ctx->peek()))));
 }
 
 // pop ( alien n ) from datastack, return alien's address plus n

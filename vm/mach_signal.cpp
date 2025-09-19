@@ -37,12 +37,12 @@ void factor_vm::call_fault_handler(exception_type_t exception,
 
   if (exception == EXC_BAD_ACCESS) {
     set_memory_protection_error(MACH_EXC_STATE_FAULT(exc_state),
-                                (cell)MACH_PROGRAM_COUNTER(thread_state));
-    handler = (cell)factor::memory_signal_handler_impl;
+                                cell_from_ptr((void*)MACH_PROGRAM_COUNTER(thread_state)));
+    handler = cell_from_ptr(factor::memory_signal_handler_impl);
   } else if (exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV) {
     signal_fpu_status = fpu_status(mach_fpu_status(float_state));
     mach_clear_fpu_status(float_state);
-    handler = (cell)factor::fp_signal_handler_impl;
+    handler = cell_from_ptr(factor::fp_signal_handler_impl);
   } else {
     switch (exception) {
       case EXC_ARITHMETIC:
@@ -56,14 +56,14 @@ void factor_vm::call_fault_handler(exception_type_t exception,
         break;
     }
 
-    handler = (cell)factor::synchronous_signal_handler_impl;
+    handler = cell_from_ptr(factor::synchronous_signal_handler_impl);
   }
 
   FACTOR_ASSERT(handler != 0);
 
   dispatch_signal_handler((cell*)&MACH_STACK_POINTER(thread_state),
                           (cell*)&MACH_PROGRAM_COUNTER(thread_state),
-                          (cell)handler);
+                          cell_from_ptr(reinterpret_cast<void*>(handler)));
 }
 
 static void call_fault_handler(mach_port_t thread, exception_type_t exception,

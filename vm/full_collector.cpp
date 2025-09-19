@@ -14,9 +14,9 @@ struct full_collection_copier : no_fixup {
 
   object* fixup_data(object* obj) {
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p((cell)obj)) {
-        tenured->state.set_marked_p((cell)obj, obj->size());
-        mark_stack->push_back((cell)obj);
+      if (!tenured->state.marked_p(cell_from_ptr(obj))) {
+        tenured->state.set_marked_p(cell_from_ptr(obj), obj->size());
+        mark_stack->push_back(cell_from_ptr(obj));
       }
       return obj;
     }
@@ -28,9 +28,9 @@ struct full_collection_copier : no_fixup {
     }
 
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p((cell)obj)) {
-        tenured->state.set_marked_p((cell)obj, obj->size());
-        mark_stack->push_back((cell)obj);
+      if (!tenured->state.marked_p(cell_from_ptr(obj))) {
+        tenured->state.set_marked_p(cell_from_ptr(obj), obj->size());
+        mark_stack->push_back(cell_from_ptr(obj));
       }
       return obj;
     }
@@ -42,15 +42,15 @@ struct full_collection_copier : no_fixup {
     memcpy(newpointer, obj, size);
     obj->forward_to(newpointer);
 
-    tenured->state.set_marked_p((cell)newpointer, newpointer->size());
-    mark_stack->push_back((cell)newpointer);
+    tenured->state.set_marked_p(cell_from_ptr(newpointer), newpointer->size());
+    mark_stack->push_back(cell_from_ptr(newpointer));
     return newpointer;
   }
 
   code_block* fixup_code(code_block* compiled) {
-    if (!code->allocator->state.marked_p((cell)compiled)) {
-      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
-      mark_stack->push_back((cell)compiled + 1);
+    if (!code->allocator->state.marked_p(cell_from_ptr(compiled))) {
+      code->allocator->state.set_marked_p(cell_from_ptr(compiled), compiled->size());
+      mark_stack->push_back(cell_from_ptr(compiled) + 1);
     }
     return compiled;
   }

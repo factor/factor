@@ -58,7 +58,7 @@ void factor_vm::ffi_dlopen(dll* dll) {
 }
 
 cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return (cell)dlsym(dll ? dll->handle : null_dll, symbol);
+  return cell_from_ptr(dlsym(dll ? dll->handle : null_dll, symbol));
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
@@ -99,14 +99,14 @@ segment::segment(cell size_, bool executable_p) {
   int flags = MAP_ANON | MAP_PRIVATE;
 #endif
 
-  cell guard_size = (cell)segment_guard_pages * pagesize;
+  cell guard_size = static_cast<cell>(segment_guard_pages) * pagesize;
   cell alloc_size = 2 * guard_size + size;
   char* array = (char*)mmap(nullptr, alloc_size, prot, flags, -1, 0);
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
 
-  start = (cell)(array + guard_size);
+  start = cell_from_ptr(array + guard_size);
   end = start + size;
 
 #if defined(__APPLE__) && defined(FACTOR_ARM64)
@@ -121,7 +121,7 @@ segment::segment(cell size_, bool executable_p) {
 
 segment::~segment() {
   int pagesize = getpagesize();
-  cell guard_size = (cell)segment_guard_pages * getpagesize();
+  cell guard_size = static_cast<cell>(segment_guard_pages) * getpagesize();
   int retval = munmap((void*)(start - guard_size), 2 * guard_size + size);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
@@ -142,15 +142,13 @@ void factor_vm::end_sampling_profiler_timer() {
 }
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
-  dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
-                          (cell*)&UAP_PROGRAM_COUNTER(uap),
-                          (cell)FUNCTION_CODE_POINTER(handler));
+  dispatch_signal_handler(reinterpret_cast<cell*>(&UAP_STACK_POINTER(uap)), reinterpret_cast<cell*>(&UAP_PROGRAM_COUNTER(uap)), cell_from_ptr(FUNCTION_CODE_POINTER(handler)));
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   (void) signal;
-  cell fault_addr = (cell)siginfo->si_addr;
-  cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
+  cell fault_addr = cell_from_ptr(siginfo->si_addr);
+  cell fault_pc = cell_from_ptr((void*)UAP_PROGRAM_COUNTER(uap));
   factor_vm* vm = current_vm();
   vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
@@ -209,7 +207,7 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
     vm = thread_vms.begin()->second;
   }
   if (atomic::load(&vm->sampling_profiler_p))
-    vm->enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
+        vm->enqueue_samples(1, cell_from_ptr((void*)UAP_PROGRAM_COUNTER(uap)), foreign_thread);
   else if (!foreign_thread)
     enqueue_signal(vm, signal);
 }

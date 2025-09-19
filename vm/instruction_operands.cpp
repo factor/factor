@@ -75,7 +75,7 @@ void instruction_operand::store_value(fixnum absolute_value) {
 
   switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
-      write_unaligned<cell>(pointer - sizeof(cell), (cell)absolute_value);
+            write_unaligned<cell>(pointer - sizeof(cell), static_cast<cell>(absolute_value));
       break;
     case RC_ABSOLUTE:
       write_unaligned<uint32_t>(pointer - sizeof(uint32_t), (uint32_t)absolute_value);

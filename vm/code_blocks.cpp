@@ -142,7 +142,7 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   cell library = array_nth(parameters, index + 1);
   dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
 
-  cell undef = (cell)factor::undefined_symbol;
+  cell undef = cell_from_ptr(factor::undefined_symbol);
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
   if (d != nullptr && !d->handle)
     return undef;
@@ -164,9 +164,9 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      return (cell)&dispatch_stats.megamorphic_cache_hits;
+      return cell_from_ptr(&dispatch_stats.megamorphic_cache_hits);
     case RT_VM:
-      return (cell)this + untag_fixnum(array_nth(parameters, index));
+      return cell_from_ptr(this) + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -176,7 +176,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
-      return (cell)&factor::inline_cache_miss;
+      return cell_from_ptr(&factor::inline_cache_miss);
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
