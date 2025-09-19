@@ -19,7 +19,7 @@ struct gc_info {
   cell total_bitmap_bytes() { return ((total_bitmap_size() + 7) / 8); }
 
   uint32_t* return_addresses() {
-    return (uint32_t*)this - return_address_count;
+    return reinterpret_cast<uint32_t*>(this) - return_address_count;
   }
 
   uint32_t* base_pointer_map() {
@@ -27,7 +27,7 @@ struct gc_info {
   }
 
   uint8_t* gc_info_bitmap() {
-    return (uint8_t*)base_pointer_map() - total_bitmap_bytes();
+    return reinterpret_cast<uint8_t*>(base_pointer_map()) - total_bitmap_bytes();
   }
 
 

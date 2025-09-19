@@ -19,6 +19,6 @@ namespace lib { namespace zstd {
 
   void zstd_lib::close() {
     factor::native_dlclose(handle);
-    handle = NULL;
+    handle = nullptr;
   }
 } }

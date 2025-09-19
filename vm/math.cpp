@@ -33,8 +33,8 @@ void factor_vm::primitive_fixnum_divint() {
 
 // does not allocate, even though from_signed_cell can allocate
 void factor_vm::primitive_fixnum_divmod() {
-  cell* s0 = (cell*)(ctx->datastack);
-  cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
+  cell* s0 = ptr_from_cell<cell>(ctx->datastack);
+  cell* s1 = ptr_from_cell<cell>(ctx->datastack - sizeof(cell));
   fixnum y = untag_fixnum(*s0);
   fixnum x = untag_fixnum(*s1);
   if (y == -1 && x == fixnum_min) {
@@ -94,9 +94,13 @@ void factor_vm::primitive_float_to_bignum() {
   ctx->replace(tag<bignum>(float_to_bignum(ctx->peek())));
 }
 
-#define POP_BIGNUMS(x, y)                \
-  bignum* y = untag<bignum>(ctx->pop()); \
-  bignum* x = untag<bignum>(ctx->peek());
+#define POP_BIGNUMS(x, y)                                             \
+  bignum* y;                                                         \
+  bignum* x;                                                         \
+  do {                                                               \
+    y = untag<bignum>(ctx->pop());                                   \
+    x = untag<bignum>(ctx->peek());                                  \
+  } while (0)
 
 void factor_vm::primitive_bignum_eq() {
   POP_BIGNUMS(x, y);
@@ -129,8 +133,8 @@ void factor_vm::primitive_bignum_divint() {
 
 // Allocates memory
 void factor_vm::primitive_bignum_divmod() {
-  cell* s0 = (cell*)(ctx->datastack);
-  cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
+  cell* s0 = ptr_from_cell<cell>(ctx->datastack);
+  cell* s1 = ptr_from_cell<cell>(ctx->datastack - sizeof(cell));
   bignum* y = untag<bignum>(*s0);
   bignum* x = untag<bignum>(*s1);
   bignum* q, *r;
@@ -230,6 +234,7 @@ void factor_vm::primitive_format_float() {
   switch (format[0]) {
     case 'f': localized_stream << std::fixed; break;
     case 'e': localized_stream << std::scientific; break;
+    default: break;
   }
   if (isupper(format[0])) {
     localized_stream << std::uppercase;
@@ -248,13 +253,17 @@ void factor_vm::primitive_format_float() {
   const char* cstr = tmp.c_str();
   size_t size = tmp.length();
   byte_array* array = allot_byte_array(size);
-  memcpy(array->data<char>(), cstr, size);
+  std::copy_n(cstr, size, array->data<char>());
   ctx->replace(tag<byte_array>(array));
 }
 
-#define POP_FLOATS(x, y)              \
-  double y = untag_float(ctx->pop()); \
-  double x = untag_float(ctx->peek());
+#define POP_FLOATS(x, y)                                                \
+  double y;                                                            \
+  double x;                                                            \
+  do {                                                                 \
+    y = untag_float(ctx->pop());                                       \
+    x = untag_float(ctx->peek());                                      \
+  } while (0)
 
 void factor_vm::primitive_float_eq() {
   POP_FLOATS(x, y);

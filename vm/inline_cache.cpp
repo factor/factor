@@ -5,7 +5,7 @@ namespace factor {
 void factor_vm::deallocate_inline_cache(cell return_address) {
   // Find the call target.
   void* old_entry_point = get_call_target(return_address);
-  code_block* old_block = (code_block*)old_entry_point - 1;
+  code_block* old_block = reinterpret_cast<code_block*>(old_entry_point) - 1;
 
   // Free the old PIC since we know its unreachable
   if (old_block->pic_p())
@@ -15,12 +15,11 @@ void factor_vm::deallocate_inline_cache(cell return_address) {
 // Figure out what kind of type check the PIC needs based on the methods
 // it contains
 static cell determine_inline_cache_type(array* cache_entries) {
-  for (cell i = 0; i < array_capacity(cache_entries); i += 2) {
-    // Is it a tuple layout?
-    if (TAG(array_nth(cache_entries, i)) == ARRAY_TYPE) {
+  std::span<const cell> entries(cache_entries->data(),
+                                static_cast<size_t>(array_capacity(cache_entries)));
+  for (auto it = entries.begin(); it != entries.end(); it += 2)
+    if (TAG(*it) == ARRAY_TYPE)
       return PIC_TUPLE;
-    }
-  }
   return PIC_TAG;
 }
 
@@ -80,11 +79,14 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
 
   // Generate machine code to check, in turn, if the class is one of the cached
   // entries.
-  for (cell i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
-    cell klass = array_nth(cache_entries.untagged(), i);
-    cell method = array_nth(cache_entries.untagged(), i + 1);
-
-    emit_check_and_jump(ic_type, i, klass, method);
+  std::span<const cell> entries(cache_entries.untagged()->data(),
+                                static_cast<size_t>(array_capacity(cache_entries.untagged())));
+  cell entry_offset = 0;
+  for (auto it = entries.begin(); it != entries.end(); it += 2) {
+    cell klass = *it;
+    cell method = *(it + 1);
+    emit_check_and_jump(ic_type, entry_offset, klass, method);
+    entry_offset += 2;
   }
 
   // If none of the above conditionals tested true, then execution "falls
@@ -154,7 +156,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
   fixnum index = untag_fixnum(ctx->pop());
   data_root<array> methods(ctx->pop(), this);
   data_root<word> generic_word(ctx->pop(), this);
-  data_root<object> object(((cell*)ctx->datastack)[-index], this);
+  data_root<object> object(reinterpret_cast<cell*>(ctx->datastack)[-index], this);
 
   cell pic_size = array_capacity(cache_entries.untagged()) / 2;
 
@@ -171,9 +173,9 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
     inline_cache_jit jit(generic_word.value(), this);
     jit.emit_inline_cache(index, generic_word.value(), methods.value(),
                           new_cache_entries.value(), tail_call_site);
-    code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
-    initialize_code_block(code);
-    xt = code->entry_point();
+    code_block* pic_block = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
+    initialize_code_block(pic_block);
+    xt = pic_block->entry_point();
   }
 
   // Install the new stub.
@@ -187,7 +189,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
 #ifdef PIC_DEBUG
     FACTOR_PRINT("Updated " << (tail_call_site ? "tail" : "non-tail")
                  << " call site 0x" << std::hex << return_address.value << std::dec
-                 << " with 0x" << std::hex << (cell)xt << std::dec);
+                 << " with 0x" << std::hex << cell_from_ptr(xt) << std::dec);
     print_callstack();
 #endif
   }

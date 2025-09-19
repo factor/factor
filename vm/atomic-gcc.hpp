@@ -1,4 +1,9 @@
 #define FACTOR_FORCE_INLINE __attribute__((always_inline)) inline
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Watomic-implicit-seq-cst"
+#endif
 namespace factor {
 namespace atomic {
 __attribute__((always_inline)) inline static bool cas(volatile cell* ptr,
@@ -35,5 +40,9 @@ __attribute__((always_inline)) inline static void fence() {
 }
 }
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #include "atomic.hpp"

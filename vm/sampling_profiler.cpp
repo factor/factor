@@ -155,12 +155,12 @@ void factor_vm::primitive_get_samples() {
 
     set_array_nth(sample.untagged(), 5, from_iter->thread);
 
-    cell callstack_size =
+    cell callstack_length =
         from_iter->callstack_end - from_iter->callstack_begin;
-    data_root<array> callstack(allot_array(callstack_size, false_object),
+    data_root<array> callstack(allot_array(callstack_length, false_object),
                                this);
 
-    for (cell i = 0; i < callstack_size; i++) {
+    for (cell i = 0; i < callstack_length; i++) {
       cell block_owner = growarr_nth(callstacks.untagged(),
                                      from_iter->callstack_begin + i);
       set_array_nth(callstack.untagged(), i, block_owner);
