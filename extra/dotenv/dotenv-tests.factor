@@ -36,7 +36,7 @@ USING: dotenv dotenv.private environment kernel peg tools.test ;
     "HOST" os-env
 ] unit-test
 
-! default, it not set
+! default, if not set
 
 { "localhost" } [
     "HOST" unset-os-env
