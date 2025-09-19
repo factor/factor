@@ -7,6 +7,13 @@ namespace factor {
     parent->primitive_##name();                        \
   }
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#endif
 EACH_PRIMITIVE(PRIMITIVE)
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 }

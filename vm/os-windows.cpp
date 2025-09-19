@@ -100,7 +100,9 @@ segment::segment(cell size_, bool executable_p) {
   size = size_;
 
   char* mem;
-  cell alloc_size = getpagesize() * 2 + size;
+  long pagesize = getpagesize();
+  cell guard_size = (cell)segment_guard_pages * pagesize;
+  cell alloc_size = guard_size * 2 + size;
   if ((mem = (char*)VirtualAlloc(
            NULL, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
@@ -108,14 +110,16 @@ segment::segment(cell size_, bool executable_p) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
-  start = (cell)mem + getpagesize();
+  start = (cell)mem + guard_size;
   end = start + size;
 
   set_border_locked(true);
 }
 
 segment::~segment() {
-  if (!VirtualFree((void*)(start - getpagesize()), 0, MEM_RELEASE))
+  long pagesize = getpagesize();
+  cell guard_size = (cell)segment_guard_pages * pagesize;
+  if (!VirtualFree((void*)(start - guard_size), 0, MEM_RELEASE))
     fatal_error("Segment deallocation failed", 0);
 }
 

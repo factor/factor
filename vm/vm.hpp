@@ -1,4 +1,11 @@
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif
 using namespace std;
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace factor {
 
@@ -172,7 +179,7 @@ struct factor_vm {
   void primitive_load_locals();
 
   // run
-  void primitive_exit();
+  [[noreturn]] void primitive_exit();
   void primitive_nano_count();
   void primitive_sleep();
   void primitive_set_slot();
@@ -606,8 +613,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* target_ctx);
+  cell capture_callstack(context* target_ctx);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
@@ -679,7 +686,7 @@ struct factor_vm {
 
   // safepoints
   void handle_safepoint(cell pc);
-  void enqueue_samples(cell samples, cell pc, bool foreign_thread_p);
+  void enqueue_samples(cell sample_count, cell pc, bool foreign_thread_p);
   void enqueue_fep();
 
   // factor

@@ -2,6 +2,14 @@
 
 namespace factor {
 
+namespace {
+
+inline FILE* file_from_alien_pointer(char* raw_pointer) {
+  return static_cast<FILE*>(static_cast<void*>(raw_pointer));
+}
+
+}
+
 // Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 
 // Note the ugly loop logic in almost every function; we have to handle EINTR
@@ -161,11 +169,11 @@ void factor_vm::primitive_fopen() {
 }
 
 FILE* factor_vm::pop_file_handle() {
-  return (FILE*)alien_offset(ctx->pop());
+  return file_from_alien_pointer(alien_offset(ctx->pop()));
 }
 
 FILE* factor_vm::peek_file_handle() {
-  return (FILE*)alien_offset(ctx->peek());
+  return file_from_alien_pointer(alien_offset(ctx->peek()));
 }
 
 void factor_vm::primitive_fgetc() {

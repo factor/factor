@@ -290,14 +290,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> code(code_, this);
+  data_root<byte_array> machine_code(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(code.untagged());
+  cell code_length = array_capacity(machine_code.untagged());
   code_block* compiled = allot_code_block(code_length, type);
 
   compiled->owner = owner.value();
@@ -316,7 +316,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  memcpy(compiled + 1, code.untagged() + 1, code_length);
+  memcpy(compiled + 1, machine_code.untagged() + 1, code_length);
 
   // fixup labels
   if (to_boolean(labels.value()))

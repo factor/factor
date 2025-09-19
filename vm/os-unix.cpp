@@ -99,13 +99,14 @@ segment::segment(cell size_, bool executable_p) {
   int flags = MAP_ANON | MAP_PRIVATE;
 #endif
 
-  cell alloc_size = 2 * pagesize + size;
+  cell guard_size = (cell)segment_guard_pages * pagesize;
+  cell alloc_size = 2 * guard_size + size;
   char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
 
-  start = (cell)(array + pagesize);
+  start = (cell)(array + guard_size);
   end = start + size;
 
 #if defined(__APPLE__) && defined(FACTOR_ARM64)
@@ -120,7 +121,8 @@ segment::segment(cell size_, bool executable_p) {
 
 segment::~segment() {
   int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
+  cell guard_size = (cell)segment_guard_pages * getpagesize();
+  int retval = munmap((void*)(start - guard_size), 2 * guard_size + size);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
 }
@@ -355,6 +357,21 @@ void factor_vm::unix_init_signals() {
 
 // The read end of the size pipe can be set to non-blocking.
 extern "C" {
+extern int stdin_read;
+extern int stdin_write;
+
+extern int control_read;
+extern int control_write;
+
+extern int size_read;
+extern int size_write;
+
+extern bool stdin_thread_initialized_p;
+extern THREADHANDLE stdin_thread;
+extern pthread_mutex_t stdin_mutex;
+}
+
+extern "C" {
 int stdin_read;
 int stdin_write;
 
@@ -394,15 +411,13 @@ void safe_write_nonblock(int fd, void* data, ssize_t size) {
 
 bool safe_read(int fd, void* data, ssize_t size) {
   ssize_t bytes = read(fd, data, size);
-  if (bytes < 0) {
-    if (errno == EINTR)
-      return safe_read(fd, data, size);
-    else {
-      fatal_error("error reading fd", errno);
-      return false;
-    }
-  } else
-    return (bytes == size);
+  if (bytes >= 0)
+    return bytes == size;
+
+  if (errno == EINTR)
+    return safe_read(fd, data, size);
+
+  fatal_error("error reading fd", errno);
 }
 
 void* stdin_loop(void* arg) {
@@ -513,7 +528,7 @@ void factor_vm::primitive_enable_ctrl_break() {
   stop_on_ctrl_break = true;
 }
 
-void abort() {
+[[noreturn]] void abort() {
   sig_t ret;
   do {
     ret = signal(SIGABRT, SIG_DFL);
