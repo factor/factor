@@ -25,12 +25,12 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(*(cell*)(return_address - sizeof(cell)));
+  return reinterpret_cast<void*>(*reinterpret_cast<cell*>(return_address - sizeof(cell)));
 }
 
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(cell*)(return_address - sizeof(cell)) = target;
+  *reinterpret_cast<cell*>(return_address - sizeof(cell)) = target;
 }
 
 inline static bool tail_call_site_p(cell return_address) {

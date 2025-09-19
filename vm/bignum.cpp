@@ -239,6 +239,9 @@ void factor_vm::bignum_divide(bignum* numerator, bignum* denominator,
             r_negative_p);
         break;
       }
+      default:
+        FACTOR_ASSERT(false);
+        break;
     }
   }
 }
@@ -270,13 +273,13 @@ bignum* factor_vm::bignum_quotient(bignum* numerator, bignum* denominator) {
             return (bignum_maybe_new_sign(numerator, q_negative_p));
           if (digit < BIGNUM_RADIX_ROOT)
             bignum_divide_unsigned_small_denominator(
-                numerator, digit, (&quotient), ((bignum**)0), q_negative_p, 0);
+                numerator, digit, (&quotient), static_cast<bignum**>(nullptr), q_negative_p, 0);
           else
             bignum_divide_unsigned_medium_denominator(
-                numerator, digit, (&quotient), ((bignum**)0), q_negative_p, 0);
+                numerator, digit, (&quotient), static_cast<bignum**>(nullptr), q_negative_p, 0);
         } else
           bignum_divide_unsigned_large_denominator(
-              numerator, denominator, (&quotient), ((bignum**)0), q_negative_p,
+              numerator, denominator, (&quotient), static_cast<bignum**>(nullptr), q_negative_p,
               0);
         return (quotient);
       }
@@ -309,11 +312,11 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
           return (bignum_remainder_unsigned_small_denominator(
               numerator, digit, (BIGNUM_NEGATIVE_P(numerator))));
         bignum_divide_unsigned_medium_denominator(
-            numerator, digit, ((bignum**)0), (&remainder), 0,
+            numerator, digit, static_cast<bignum**>(nullptr), (&remainder), 0,
             (BIGNUM_NEGATIVE_P(numerator)));
       } else
         bignum_divide_unsigned_large_denominator(
-            numerator, denominator, ((bignum**)0), (&remainder), 0,
+            numerator, denominator, static_cast<bignum**>(nullptr), (&remainder), 0,
             (BIGNUM_NEGATIVE_P(numerator)));
       return (remainder);
     }
@@ -416,8 +419,11 @@ FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
       bignum_digit_type* scan = (start + (BIGNUM_LENGTH(bn)));             \
       while (start < scan)                                                 \
         accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));  \
-      return ((BIGNUM_NEGATIVE_P(bn)) ? ((type)(-(stype) accumulator))     \
-                                      : accumulator);                      \
+      if (BIGNUM_NEGATIVE_P(bn)) {                                         \
+        return (type)(~accumulator + 1);                                   \
+      } else {                                                             \
+        return (type)accumulator;                                          \
+      }                                                                    \
     }                                                                      \
   }
 
@@ -459,12 +465,12 @@ fixnum factor_vm::bignum_to_fixnum_strict(bignum* bn) {
 }
 
 #define DTB_WRITE_DIGIT(factor)                \
-  {                                            \
+  do {                                         \
     significand *= (factor);                   \
     digit = ((bignum_digit_type) significand); \
     (*--scan) = digit;                         \
     significand -= ((double)digit);            \
-  }
+  } while (0)
 
 #define inf std::numeric_limits<double>::infinity()
 
@@ -488,7 +494,7 @@ bignum* factor_vm::double_to_bignum(double x) {
     bignum_digit_type digit;
     int odd_bits = (exponent % BIGNUM_DIGIT_LENGTH);
     if (odd_bits > 0)
-      DTB_WRITE_DIGIT((fixnum)1 << odd_bits);
+      DTB_WRITE_DIGIT(static_cast<fixnum>(1) << odd_bits);
     while (start < scan) {
       if (significand == 0) {
         while (start < scan)
@@ -618,6 +624,9 @@ bignum* factor_vm::bignum_subtract_unsigned(bignum* x_, bignum* y_) {
       break;
     case BIGNUM_COMPARISON_GREATER:
       negative_p = 0;
+      break;
+    default:
+      FACTOR_ASSERT(false);
       break;
   }
   {
@@ -821,7 +830,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
     }
   }
 
-  if (quotient != NULL) {
+  if (quotient != nullptr) {
     bignum *q_ = allot_bignum(length_n - length_d, q_negative_p);
     data_root<bignum> q(q_, this);
 
@@ -838,7 +847,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
                                        shift);
       bignum_destructive_normalization(denominator.untagged(), v, shift);
       bignum_divide_unsigned_normalized(u.untagged(), v, q.untagged());
-      if (remainder != NULL)
+      if (remainder != nullptr)
         bignum_destructive_unnormalization(u.untagged(), shift);
     }
 
@@ -851,7 +860,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
         (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
         bignum_divide_unsigned_normalized(u.untagged(),
                                           denominator.untagged(),
-                                          NULL);
+                                          nullptr);
       } else {
         bignum* v = allot_bignum(length_d, 0);
         bignum_destructive_normalization(numerator.untagged(),
@@ -860,14 +869,14 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
         bignum_destructive_normalization(denominator.untagged(),
                                          v,
                                          shift);
-        bignum_divide_unsigned_normalized(u.untagged(), v, NULL);
-        if (remainder != NULL)
+        bignum_divide_unsigned_normalized(u.untagged(), v, nullptr);
+        if (remainder != nullptr)
           bignum_destructive_unnormalization(u.untagged(), shift);
       }
   }
 
   u.set_untagged(bignum_trim(u.untagged()));
-  if (remainder != NULL)
+  if (remainder != nullptr)
     *remainder = u.untagged();
 }
 
@@ -881,7 +890,7 @@ void factor_vm::bignum_divide_unsigned_normalized(bignum* u, bignum* v,
   bignum_digit_type* u_scan_start = (u_scan - v_length);
   bignum_digit_type* v_start = (BIGNUM_START_PTR(v));
   bignum_digit_type* v_end = (v_start + v_length);
-  bignum_digit_type* q_scan = NULL;
+  bignum_digit_type* q_scan = nullptr;
   bignum_digit_type v1 = (v_end[-1]);
   bignum_digit_type v2 = (v_end[-2]);
   bignum_digit_type ph; // high half of double-digit product
@@ -1043,14 +1052,14 @@ void factor_vm::bignum_divide_unsigned_medium_denominator(
 
     q.set_untagged(bignum_trim(q.untagged()));
 
-    if (remainder != ((bignum**)0)) {
+    if (remainder != static_cast<bignum**>(nullptr)) {
       if (shift != 0)
         r >>= shift;
 
       (*remainder) = (bignum_digit_to_bignum(r, r_negative_p));
     }
 
-    if (quotient != ((bignum**)0))
+    if (quotient != static_cast<bignum**>(nullptr))
       (*quotient) = q.untagged();
   }
   return;
@@ -1065,10 +1074,10 @@ void factor_vm::bignum_destructive_normalization(bignum* source, bignum* target,
   bignum_digit_type* end_source = (scan_source + (BIGNUM_LENGTH(source)));
   bignum_digit_type* end_target = (scan_target + (BIGNUM_LENGTH(target)));
   int shift_right = (BIGNUM_DIGIT_LENGTH - shift_left);
-  bignum_digit_type mask = (((cell)1 << shift_right) - 1);
+  bignum_digit_type mask = ((static_cast<cell>(1) << shift_right) - 1);
   while (scan_source < end_source) {
     digit = (*scan_source++);
-    (*scan_target++) = (((digit & mask) << shift_left) | carry);
+    (*scan_target++) = ((static_cast<cell>((digit & mask)) << shift_left) | carry);
     carry = (digit >> shift_right);
   }
   if (scan_target < end_target)
@@ -1085,11 +1094,11 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
   bignum_digit_type digit;
   bignum_digit_type carry = 0;
   int shift_left = (BIGNUM_DIGIT_LENGTH - shift_right);
-  bignum_digit_type mask = (((fixnum)1 << shift_right) - 1);
+  bignum_digit_type mask = ((static_cast<fixnum>(1) << shift_right) - 1);
   while (start < scan) {
     digit = (*--scan);
     (*scan) = ((digit >> shift_right) | carry);
-    carry = ((digit & mask) << shift_left);
+    carry = (static_cast<cell>((digit & mask)) << shift_left);
   }
   BIGNUM_ASSERT(carry == 0);
   return;
@@ -1100,7 +1109,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
 // assumed that the numerator, denominator are normalized.
 
 #define BDD_STEP(qn, j)                                          \
-  {                                                              \
+  do {                                                           \
     uj = (u[j]);                                                 \
     if (uj != v1) {                                              \
       uj_uj1 = (HD_CONS(uj, (u[j + 1])));                        \
@@ -1117,7 +1126,7 @@ void factor_vm::bignum_destructive_unnormalization(bignum* bn,
         break;                                                   \
     }                                                            \
     qn = (bignum_digit_divide_subtract(v1, v2, guess, (&u[j]))); \
-  }
+  } while (0)
 
 bignum_digit_type factor_vm::bignum_digit_divide(
     bignum_digit_type uh, bignum_digit_type ul, bignum_digit_type v,
@@ -1156,7 +1165,7 @@ bignum_digit_type factor_vm::bignum_digit_divide(
 #undef BDD_STEP
 
 #define BDDS_MULSUB(vn, un, carry_in)    \
-  {                                      \
+  do {                                   \
     product = ((vn * guess) + carry_in); \
     diff = (un - (HD_LOW(product)));     \
     if (diff < 0) {                      \
@@ -1166,10 +1175,10 @@ bignum_digit_type factor_vm::bignum_digit_divide(
       un = diff;                         \
       carry = (HD_HIGH(product));        \
     }                                    \
-  }
+  } while (0)
 
 #define BDDS_ADD(vn, un, carry_in)    \
-  {                                   \
+  do {                                \
     sum = (vn + un + carry_in);       \
     if (sum < BIGNUM_RADIX_ROOT) {    \
       un = sum;                       \
@@ -1178,7 +1187,7 @@ bignum_digit_type factor_vm::bignum_digit_divide(
       un = (sum - BIGNUM_RADIX_ROOT); \
       carry = 1;                      \
     }                                 \
-  }
+  } while (0)
 
 bignum_digit_type factor_vm::bignum_digit_divide_subtract(
     bignum_digit_type v1, bignum_digit_type v2, bignum_digit_type guess,
@@ -1226,7 +1235,7 @@ void factor_vm::bignum_divide_unsigned_small_denominator(
 
   q.set_untagged(bignum_trim(q.untagged()));
 
-  if (remainder != ((bignum**)0))
+  if (remainder != static_cast<bignum**>(nullptr))
     (*remainder) = bignum_digit_to_bignum(r, r_negative_p);
 
   (*quotient) = q.untagged();
@@ -1467,7 +1476,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
 
   data_root<bignum> arg1(arg1_, this);
 
-  bignum* result = NULL;
+  bignum* result = nullptr;
   bignum_digit_type* scan1;
   bignum_digit_type* scanr;
   bignum_digit_type* end;
@@ -1489,7 +1498,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
     end = scan1 + BIGNUM_LENGTH(arg1);
 
     while (scan1 < end) {
-      *scanr = *scanr | (*scan1 & BIGNUM_DIGIT_MASK) << bit_offset;
+      *scanr = *scanr | (static_cast<bignum_digit_type>((static_cast<cell>(*scan1 & BIGNUM_DIGIT_MASK)) << bit_offset));
       *scanr = *scanr & BIGNUM_DIGIT_MASK;
       scanr++;
       *scanr = *scan1++ >> (BIGNUM_DIGIT_LENGTH - bit_offset);
@@ -1511,7 +1520,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
 
     while (scanr < end) {
       *scanr = (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset;
-      *scanr = (*scanr | *scan1 << (BIGNUM_DIGIT_LENGTH - bit_offset)) &
+      *scanr = (*scanr | (static_cast<bignum_digit_type>((static_cast<cell>(*scan1)) << (BIGNUM_DIGIT_LENGTH - bit_offset)))) &
                BIGNUM_DIGIT_MASK;
       scanr++;
     }
@@ -1733,7 +1742,7 @@ int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
     return 0;
   bignum_digit_type digit = (BIGNUM_REF(bn, index));
   int p = shift % BIGNUM_DIGIT_LENGTH;
-  bignum_digit_type mask = ((fixnum)1) << p;
+  bignum_digit_type mask = static_cast<bignum_digit_type>(static_cast<cell>(1) << p);
   return (digit & mask) ? 1 : 0;
 }
 
@@ -1757,8 +1766,8 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
     if (d.untagged() == BIGNUM_OUT_OF_BAND) {
       return d.untagged();
     }
-    ac = bc;
-    bc = d;
+    swap(ac, bc);
+    swap(bc, d);
   }
   return ac.untagged();
 }
@@ -1783,7 +1792,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   scan_c = BIGNUM_START_PTR(c);
   while (scan_a < a_end)
     (*scan_c++) = (*scan_a++);
-  a = c;
+  swap(a, c);  // Use swap instead of assignment
   size_b = BIGNUM_LENGTH(b);
   data_root<bignum> d(allot_bignum(size_b, 0), this);
   scan_b = BIGNUM_START_PTR(b);
@@ -1791,7 +1800,7 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
   scan_d = BIGNUM_START_PTR(d);
   while (scan_b < b_end)
     (*scan_d++) = (*scan_b++);
-  b = d;
+  swap(b, d);  // Use swap instead of assignment
 
   // Initial reduction: make sure that 0 <= b <= a.
   if (bignum_compare(a.untagged(), b.untagged()) == BIGNUM_COMPARISON_LESS) {
@@ -1801,11 +1810,11 @@ bignum* factor_vm::bignum_gcd(bignum* a_, bignum* b_) {
 
   while (size_a > 1) {
     nbits = log2(BIGNUM_REF(a, size_a - 1));
-    x = ((BIGNUM_REF(a, size_a - 1) << (BIGNUM_DIGIT_LENGTH - nbits)) |
+    x = ((static_cast<cell>(BIGNUM_REF(a, size_a - 1)) << (BIGNUM_DIGIT_LENGTH - nbits)) |
          (BIGNUM_REF(a, size_a - 2) >> nbits));
     y = ((size_b >= size_a - 1 ? BIGNUM_REF(b, size_a - 2) >> nbits : 0) |
          (size_b >= size_a
-              ? BIGNUM_REF(b, size_a - 1) << (BIGNUM_DIGIT_LENGTH - nbits)
+              ? static_cast<cell>(BIGNUM_REF(b, size_a - 1)) << (BIGNUM_DIGIT_LENGTH - nbits)
               : 0));
 
     // inner loop of Lehmer's algorithm;

@@ -19,7 +19,7 @@ inline generation generation_of(factor_vm* parent, object* obj) {
   else if (parent->data->tenured->contains_p(obj))
     return TENURED_GENERATION;
   else {
-    critical_error("Bad object", (cell)obj);
+    critical_error("Bad object", cell_from_ptr(obj));
     return (generation)-1;
   }
 }
@@ -33,25 +33,19 @@ struct slot_checker {
       : parent(parent), obj(obj), gen(gen) {}
 
   void check_write_barrier(cell* slot_ptr, generation target, cell mask) {
-    cell object_card_pointer = parent->cards_offset + ((cell)obj >> card_bits);
-    cell slot_card_pointer =
-        parent->cards_offset + ((cell)slot_ptr >> card_bits);
-    char slot_card_value = *(char*)slot_card_pointer;
+    cell object_card_pointer = parent->cards_offset + (cell_from_ptr(obj) >> card_bits);
+    cell slot_card_pointer = parent->cards_offset + (cell_from_ptr(slot_ptr) >> card_bits);
+    char slot_card_value = *ptr_from_cell<char>(slot_card_pointer);
     if ((slot_card_value & mask) != mask) {
       std::cout << "card not marked" << std::endl;
       std::cout << "source generation: " << gen << std::endl;
       std::cout << "target generation: " << target << std::endl;
-      std::cout << "object: 0x" << std::hex << (cell)
-          obj << std::dec << std::endl;
+      std::cout << "object: 0x" << std::hex << cell_from_ptr(obj) << std::dec << std::endl;
       std::cout << "object type: " << obj->type() << std::endl;
-      std::cout << "slot pointer: 0x" << std::hex << (cell)
-          slot_ptr << std::dec << std::endl;
-      std::cout << "slot value: 0x" << std::hex << *slot_ptr << std::dec
-                << std::endl;
-      std::cout << "card of object: 0x" << std::hex << object_card_pointer
-                << std::dec << std::endl;
-      std::cout << "card of slot: 0x" << std::hex << slot_card_pointer
-                << std::dec << std::endl;
+      std::cout << "slot pointer: 0x" << std::hex << cell_from_ptr(slot_ptr) << std::dec << std::endl;
+      std::cout << "slot value: 0x" << std::hex << *slot_ptr << std::dec << std::endl;
+      std::cout << "card of object: 0x" << std::hex << object_card_pointer << std::dec << std::endl;
+      std::cout << "card of slot: 0x" << std::hex << slot_card_pointer << std::dec << std::endl;
       std::cout << std::endl;
       parent->factorbug();
     }

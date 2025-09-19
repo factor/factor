@@ -22,11 +22,26 @@
 #include <wchar.h>
 #include <stdint.h>
 
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define FACTOR_WITH_ADDRESS_SANITIZER 1
+#endif
+#endif
+#if defined(__SANITIZE_ADDRESS__)
+#define FACTOR_WITH_ADDRESS_SANITIZER 1
+#endif
+
 // C++ headers
 #include <algorithm>
+#include <array>
+#include <bit>
+#include <memory>
 #include <list>
 #include <map>
+#include <ranges>
 #include <set>
+#include <span>
+#include <type_traits>
 #include <vector>
 #include <iostream>
 #include <iomanip>
