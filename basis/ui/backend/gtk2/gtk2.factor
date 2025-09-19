@@ -56,10 +56,10 @@ M: gtk2-clipboard set-clipboard-contents
 
 : detect-scale-factor ( -- n )
     "GDK_SCALE" os-env [
-        string>number
-    ] [
         gdk_screen_get_default gdk_screen_get_resolution 96.0 / round
-    ] if* 1.0 max ;
+    ] [
+        string>number
+    ] if-empty 1.0 max ;
 
 : init-scale-factor ( -- )
     detect-scale-factor
