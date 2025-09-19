@@ -129,7 +129,7 @@ M: table layout*
     [ update-cached-widths ] [ update-filled-column ] bi ;
 
 : row-rect ( table row -- rect )
-    [ [ line-height ] dip * 0 swap 2array ]
+    [ [ line-height ] dip * gl-round 0 swap 2array ]
     [ drop [ dim>> first ] [ line-height ] bi 2array ] 2bi <rect> ;
 
 : row-bounds ( table row -- loc dim )
