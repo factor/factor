@@ -56,7 +56,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   p->executable_path = vm_executable_path();
 
-  if (p->image_path == NULL) {
+  if (p->image_path == nullptr) {
     if (embedded_image_p()) {
       p->embedded_image = true;
       p->image_path = safe_strdup(p->executable_path);
@@ -71,10 +71,10 @@ void factor_vm::init_factor(vm_parameters* p) {
   retainstack_size = p->retainstack_size;
   callstack_size = p->callstack_size;
 
-  ctx = NULL;
+  ctx = nullptr;
   spare_ctx = new_context();
 
-  callbacks = new callback_heap(p->callback_size, this);
+  callbacks = std::make_unique<callback_heap>(p->callback_size, this);
   load_image(p);
   max_pic_size = (int)p->max_pic_size;
   special_objects[OBJ_CELL_SIZE] = tag_fixnum(sizeof(cell));
@@ -89,19 +89,19 @@ void factor_vm::init_factor(vm_parameters* p) {
 #endif
 
   cell aliens[][2] = {
-    {OBJ_STDIN,           (cell)(VALID_HANDLE (stdin ,"r"))},
-    {OBJ_STDOUT,          (cell)(VALID_HANDLE (stdout,"w"))},
-    {OBJ_STDERR,          (cell)(VALID_HANDLE (stderr,"w"))},
-    {OBJ_CPU,             (cell)FACTOR_CPU_STRING},
-    {OBJ_EXECUTABLE,      (cell)safe_strdup(p->executable_path)},
-    {OBJ_IMAGE,           (cell)safe_strdup(p->image_path)},
-    {OBJ_OS,              (cell)FACTOR_OS_STRING},
-    {OBJ_VM_COMPILE_TIME, (cell)FACTOR_COMPILE_TIME},
-    {OBJ_VM_COMPILER,     (cell)FACTOR_COMPILER_VERSION},
-    {OBJ_VM_GIT_LABEL,    (cell)FACTOR_STRINGIZE(FACTOR_GIT_LABEL)},
-    {OBJ_VM_VERSION,      (cell)FACTOR_STRINGIZE(FACTOR_VERSION)},
+    {OBJ_STDIN,           cell_from_ptr(VALID_HANDLE(stdin,"r"))},
+    {OBJ_STDOUT,          cell_from_ptr(VALID_HANDLE(stdout,"w"))},
+    {OBJ_STDERR,          cell_from_ptr(VALID_HANDLE(stderr,"w"))},
+    {OBJ_CPU,             cell_from_ptr(FACTOR_CPU_STRING)},
+    {OBJ_EXECUTABLE,      cell_from_ptr(safe_strdup(p->executable_path))},
+    {OBJ_IMAGE,           cell_from_ptr(safe_strdup(p->image_path))},
+    {OBJ_OS,              cell_from_ptr(FACTOR_OS_STRING)},
+    {OBJ_VM_COMPILE_TIME, cell_from_ptr(FACTOR_COMPILE_TIME)},
+    {OBJ_VM_COMPILER,     cell_from_ptr(FACTOR_COMPILER_VERSION)},
+    {OBJ_VM_GIT_LABEL,    cell_from_ptr(FACTOR_STRINGIZE(FACTOR_GIT_LABEL))},
+    {OBJ_VM_VERSION,      cell_from_ptr(FACTOR_STRINGIZE(FACTOR_VERSION))},
 #if defined(WINDOWS)
-    {WIN_EXCEPTION_HANDLER, (cell)&factor::exception_handler}
+    {WIN_EXCEPTION_HANDLER, cell_from_ptr(&factor::exception_handler)}
 #endif
   };
   int n_items = sizeof(aliens) / sizeof(cell[2]);
@@ -121,7 +121,6 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   if (p->console)
     open_console();
-
 }
 
 // Allocates memory
@@ -129,7 +128,7 @@ void factor_vm::pass_args_to_factor(int argc, vm_char** argv) {
   growable_array args(this);
 
   for (fixnum i = 0; i < argc; i++)
-    args.add(allot_alien(false_object, (cell)argv[i]));
+    args.add(allot_alien(false_object, cell_from_ptr(argv[i])));
 
   args.trim();
   special_objects[OBJ_ARGS] = args.elements.value();
@@ -142,7 +141,7 @@ void factor_vm::stop_factor() {
 char* factor_vm::factor_eval_string(char* string) {
   void* func = alien_offset(special_objects[OBJ_EVAL_CALLBACK]);
   CODE_TO_FUNCTION_POINTER(func);
-  return ((char * (*)(char*)) func)(string);
+  return reinterpret_cast<char * (*)(char*)>(func)(string);
 }
 
 void factor_vm::factor_eval_free(char* result) { free(result); }

@@ -20,35 +20,35 @@ struct compaction_fixup {
         code_finger(code_finger) {}
 
   object* fixup_data(object* obj) {
-    return (object*)data_forwarding_map->forward_block((cell)obj);
+    return reinterpret_cast<object*>(data_forwarding_map->forward_block(cell_from_ptr(obj)));
   }
 
   code_block* fixup_code(code_block* compiled) {
-    return (code_block*)code_forwarding_map->forward_block((cell)compiled);
+    return reinterpret_cast<code_block*>(code_forwarding_map->forward_block(cell_from_ptr(compiled)));
   }
 
   object* translate_data(const object* obj) {
     if (obj < *data_finger)
-      return fixup_data((object*)obj);
-    return (object*)obj;
+      return fixup_data(const_cast<object*>(obj));
+    return const_cast<object*>(obj);
   }
 
   code_block* translate_code(const code_block* compiled) {
     if (compiled < *code_finger)
-      return fixup_code((code_block*)compiled);
-    return (code_block*)compiled;
+      return fixup_code(const_cast<code_block*>(compiled));
+    return const_cast<code_block*>(compiled);
   }
 
   cell size(object* obj) {
-    if (data_forwarding_map->marked_p((cell)obj))
+    if (data_forwarding_map->marked_p(cell_from_ptr(obj)))
       return obj->size(*this);
-    return data_forwarding_map->unmarked_block_size((cell)obj);
+    return data_forwarding_map->unmarked_block_size(cell_from_ptr(obj));
   }
 
   cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p((cell)compiled))
+    if (code_forwarding_map->marked_p(cell_from_ptr(compiled)))
       return compiled->size(*this);
-    return code_forwarding_map->unmarked_block_size((cell)compiled);
+    return code_forwarding_map->unmarked_block_size(cell_from_ptr(compiled));
   }
 };
 
@@ -59,8 +59,7 @@ void factor_vm::update_code_roots_for_compaction() {
 
   mark_bits* state = &code->allocator->state;
 
-  FACTOR_FOR_EACH(code_roots) {
-    code_root* root = *iter;
+  for (code_root* root : code_roots) {
     cell block = root->value & (~data_alignment + 1);
 
     // Offset of return address within 16-byte allocation line
@@ -76,7 +75,7 @@ void factor_vm::update_code_roots_for_compaction() {
 
 // Compact data and code heaps
 void factor_vm::collect_compact_impl() {
-  gc_event* event = current_gc->event;
+  gc_event* event = current_gc->event.get();
 
 #ifdef FACTOR_DEBUG
   code->verify_all_blocks_set();
@@ -85,7 +84,7 @@ void factor_vm::collect_compact_impl() {
   if (event)
     event->reset_timer();
 
-  tenured_space* tenured = data->tenured;
+  tenured_space* tenured = data->tenured.get();
   mark_bits* data_forwarding_map = &tenured->state;
   mark_bits* code_forwarding_map = &code->allocator->state;
 
@@ -93,8 +92,8 @@ void factor_vm::collect_compact_impl() {
   data_forwarding_map->compute_forwarding();
   code_forwarding_map->compute_forwarding();
 
-  const object* data_finger = (object*)tenured->start;
-  const code_block* code_finger = (code_block*)code->allocator->start;
+  const object* data_finger = reinterpret_cast<object*>(tenured->start);
+  const code_block* code_finger = reinterpret_cast<code_block*>(code->allocator->start);
 
   {
     compaction_fixup fixup(data_forwarding_map, code_forwarding_map,

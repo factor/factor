@@ -25,8 +25,8 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc, cell handler, 
 void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
 
   signal_handler_addr = handler;
-  *(cell*)(*sp - 16) = *sp;
-  *(cell*)(*sp - 8) = *pc;
+  *reinterpret_cast<cell*>(*sp - 16) = *sp;
+  *reinterpret_cast<cell*>(*sp - 8) = *pc;
   *sp -= 16;
   *pc = untag<word>(special_objects[SIGNAL_HANDLER_WORD])->entry_point;
 }

@@ -68,7 +68,9 @@ struct code_block {
 
   // GC info is stored at the end of the block
   gc_info* block_gc_info() const {
-    return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
+    cell info_addr = cell_from_ptr(this) + size() - sizeof(gc_info);
+    FACTOR_ASSERT((info_addr & (alignof(gc_info) - 1)) == 0);
+    return reinterpret_cast<gc_info*>(info_addr);
   }
 
   void flush_icache() { factor::flush_icache((cell)this, size()); }
@@ -103,12 +105,12 @@ VM_C_API void undefined_symbol(void);
 
 inline code_block* word::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return (code_block*)entry_point - 1;
+  return reinterpret_cast<code_block*>(entry_point) - 1;
 }
 
 inline code_block* quotation::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return (code_block*)entry_point - 1;
+  return reinterpret_cast<code_block*>(entry_point) - 1;
 }
 
 }

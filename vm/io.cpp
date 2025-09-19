@@ -2,6 +2,14 @@
 
 namespace factor {
 
+namespace {
+
+inline FILE* file_from_alien_pointer(char* raw_pointer) {
+  return static_cast<FILE*>(static_cast<void*>(raw_pointer));
+}
+
+}
+
 // Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 
 // Note the ugly loop logic in almost every function; we have to handle EINTR
@@ -18,7 +26,7 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_read = 0;
 
   do {
-    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+    size_t ret = fread(reinterpret_cast<void*>(reinterpret_cast<char*>(ptr) + items_read * size), size,
                        nitems - items_read, stream);
     if (ret == 0) {
       if (feof(stream)) {
@@ -53,7 +61,7 @@ FILE* factor_vm::safe_fopen(char* filename, const char* mode) {
   FILE* file;
   for (;;) {
     file = fopen(filename, mode);
-    if (file == NULL)
+    if (file == nullptr)
       io_error_if_not_EINTR();
     else
       break;
@@ -99,7 +107,7 @@ size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
   size_t ret = 0;
 
   do {
-    ret = fwrite((void*)((int*)ptr + items_written * size), size,
+    ret = fwrite(reinterpret_cast<void*>(reinterpret_cast<char*>(ptr) + items_written * size), size,
                  nitems - items_written, stream);
     if (ret == 0)
       io_error_if_not_EINTR();
@@ -156,16 +164,16 @@ void factor_vm::primitive_fopen() {
   byte_array *mode = untag_check<byte_array>(ctx->pop());
   byte_array *path = untag_check<byte_array>(ctx->pop());
 
-  FILE* file = safe_fopen((char*)(path + 1), (char*)(mode + 1));
-  ctx->push(allot_alien((cell)file));
+  FILE* file = safe_fopen(reinterpret_cast<char*>(path + 1), reinterpret_cast<char*>(mode + 1));
+  ctx->push(allot_alien(cell_from_ptr(file)));
 }
 
 FILE* factor_vm::pop_file_handle() {
-  return (FILE*)alien_offset(ctx->pop());
+  return file_from_alien_pointer(alien_offset(ctx->pop()));
 }
 
 FILE* factor_vm::peek_file_handle() {
-  return (FILE*)alien_offset(ctx->peek());
+  return file_from_alien_pointer(alien_offset(ctx->peek()));
 }
 
 void factor_vm::primitive_fgetc() {
@@ -182,7 +190,7 @@ void factor_vm::primitive_fgetc() {
 // Allocates memory (from_unsigned_cell())
 void factor_vm::primitive_fread() {
   FILE* file = pop_file_handle();
-  void* buf = (void*)alien_offset(ctx->pop());
+  void* buf = reinterpret_cast<void*>(alien_offset(ctx->pop()));
   cell size = unbox_array_size();
 
   if (size == 0) {

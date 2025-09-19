@@ -7,10 +7,10 @@ struct no_fixup {
 
   code_block* fixup_code(code_block* compiled) { return compiled; }
 
-  object* translate_data(const object* obj) { return fixup_data((object*)obj); }
+  object* translate_data(const object* obj) { return fixup_data(const_cast<object*>(obj)); }
 
   code_block* translate_code(const code_block* compiled) {
-    return fixup_code((code_block*)compiled);
+    return fixup_code(const_cast<code_block*>(compiled));
   }
 
   cell size(object* obj) { return obj->size(); }

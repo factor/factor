@@ -1,4 +1,11 @@
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif
 using namespace std;
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace factor {
 
@@ -95,10 +102,10 @@ struct factor_vm {
   data_heap* data;
 
   // Code heap
-  code_heap* code;
+  std::unique_ptr<code_heap> code;
 
   // Pinned callback stubs
-  callback_heap* callbacks;
+  std::unique_ptr<callback_heap> callbacks;
 
   // Only set if we're performing a GC
   gc_state* current_gc;
@@ -110,7 +117,7 @@ struct factor_vm {
   // Mark stack used for mark & sweep GC
   std::vector<cell> mark_stack;
 
-  // If not NULL, we push GC events here
+  // If not nullptr, we push GC events here
   std::vector<gc_event>* gc_events;
 
   // If a runtime function needs to call another function which potentially
@@ -172,7 +179,7 @@ struct factor_vm {
   void primitive_load_locals();
 
   // run
-  void primitive_exit();
+  [[noreturn]] void primitive_exit();
   void primitive_nano_count();
   void primitive_sleep();
   void primitive_set_slot();
@@ -287,7 +294,7 @@ struct factor_vm {
   inline void each_object(Generation* gen, Iterator& iterator) {
     cell obj = gen->first_object();
     while (obj) {
-      iterator((object*)obj);
+      iterator(reinterpret_cast<object*>(obj));
       obj = gen->next_object_after(obj);
     }
   }
@@ -300,8 +307,8 @@ struct factor_vm {
     FACTOR_ASSERT(data->nursery->occupied_space() == 0);
 
     gc_off = true;
-    each_object(data->tenured, iterator);
-    each_object(data->aging, iterator);
+    each_object(data->tenured.get(), iterator);
+    each_object(data->aging.get(), iterator);
     gc_off = false;
   }
 
@@ -328,7 +335,7 @@ struct factor_vm {
     cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
 
     for (cell offset = start; offset < end; offset += card_size)
-      write_barrier((cell*)offset);
+      write_barrier(reinterpret_cast<cell*>(offset));
   }
 
   // data heap checker
@@ -606,8 +613,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* target_ctx);
+  cell capture_callstack(context* target_ctx);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
@@ -679,7 +686,7 @@ struct factor_vm {
 
   // safepoints
   void handle_safepoint(cell pc);
-  void enqueue_samples(cell samples, cell pc, bool foreign_thread_p);
+  void enqueue_samples(cell sample_count, cell pc, bool foreign_thread_p);
   void enqueue_fep();
 
   // factor

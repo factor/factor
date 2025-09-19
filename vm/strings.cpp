@@ -80,7 +80,7 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
 
     data_root<string> new_str(allot_string_internal(capacity), this);
 
-    memcpy(new_str->data(), str->data(), to_copy);
+    std::copy_n(str->data(), to_copy, new_str->data());
 
     if (to_boolean(str->aux)) {
       byte_array* new_aux = allot_uninitialized_array<byte_array>(capacity * 2);
@@ -88,8 +88,7 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
       write_barrier(&new_str->aux);
 
       byte_array* aux = untag<byte_array>(str->aux);
-      memcpy(new_aux->data<uint16_t>(), aux->data<uint16_t>(),
-             to_copy * sizeof(uint16_t));
+      std::copy_n(aux->data<uint16_t>(), to_copy, new_aux->data<uint16_t>());
     }
 
     fill_string(new_str.untagged(), to_copy, capacity, '\0');

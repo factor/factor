@@ -31,7 +31,7 @@ void factor_vm::primitive_compute_identity_hashcode() {
   object_counter++;
   if (object_counter == 0)
     object_counter++;
-  obj->set_hashcode((cell)obj ^ object_counter);
+  obj->set_hashcode(cell_from_ptr(obj) ^ object_counter);
 }
 
 void factor_vm::primitive_set_slot() {
@@ -53,7 +53,7 @@ void factor_vm::primitive_clone() {
     return;
   cell size = object_size(obj.value());
   object* new_obj = allot_object(obj.type(), size);
-  memcpy(new_obj, obj.untagged(), size);
+  copy_object(new_obj, obj.untagged(), size);
   new_obj->set_hashcode(0);
   ctx->replace(tag_dynamic(new_obj));
 }

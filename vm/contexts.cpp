@@ -1,6 +1,15 @@
 #include "master.hpp"
+#include <cstring>
 
 namespace factor {
+
+namespace {
+
+inline context* context_from_alien_pointer(char* raw_pointer) {
+  return static_cast<context*>(static_cast<void*>(raw_pointer));
+}
+
+}
 
 context::context(cell ds_size, cell rs_size, cell cs_size)
     : callstack_top(0),
@@ -8,9 +17,9 @@ context::context(cell ds_size, cell rs_size, cell cs_size)
       datastack(0),
       retainstack(0),
       callstack_save(0),
-      datastack_seg(new segment(ds_size, false)),
-      retainstack_seg(new segment(rs_size, false)),
-      callstack_seg(new segment(cs_size, false)) {
+      datastack_seg(std::make_unique<segment>(ds_size, false)),
+      retainstack_seg(std::make_unique<segment>(rs_size, false)),
+      callstack_seg(std::make_unique<segment>(cs_size, false)) {
   reset();
 }
 
@@ -29,15 +38,15 @@ void context::reset_callstack() {
 }
 
 void context::reset_context_objects() {
-  memset_cell(context_objects, false_object,
+  memset_cell(context_objects.data(), false_object,
               context_object_count * sizeof(cell));
 }
 
-void context::fill_stack_seg(cell top_ptr, segment* seg, cell pattern) {
+void context::fill_stack_seg(cell top_ptr, const std::unique_ptr<segment>& seg, cell pattern) {
 #ifdef FACTOR_DEBUG
   cell clear_start = top_ptr + sizeof(cell);
   cell clear_size = seg->end - clear_start;
-  memset_cell((void*)clear_start, pattern, clear_size);
+  memset_cell(reinterpret_cast<void*>(clear_start), pattern, clear_size);
 #else
   (void)top_ptr;
   (void)seg;
@@ -79,11 +88,7 @@ void context::fix_stacks() {
     reset_retainstack();
 }
 
-context::~context() {
-  delete datastack_seg;
-  delete retainstack_seg;
-  delete callstack_seg;
-}
+context::~context() = default;
 
 context* factor_vm::new_context() {
   context* new_context;
@@ -102,8 +107,8 @@ context* factor_vm::new_context() {
 }
 
 // Allocates memory
-void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
+void factor_vm::init_context(context* target_ctx) {
+  target_ctx->context_objects[OBJ_CONTEXT] = allot_alien(cell_from_ptr(target_ctx));
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -135,13 +140,13 @@ VM_C_API void reset_context(factor_vm* parent) {
   // the top two datastack items to be preserved after the context has
   // been resetted.
 
-  context* ctx = parent->ctx;
-  cell arg1 = ctx->pop();
-  cell arg2 = ctx->pop();
-  ctx->reset();
-  ctx->push(arg2);
-  ctx->push(arg1);
-  parent->init_context(ctx);
+  context* current_ctx = parent->ctx;
+  cell arg1 = current_ctx->pop();
+  cell arg2 = current_ctx->pop();
+  current_ctx->reset();
+  current_ctx->push(arg2);
+  current_ctx->push(arg1);
+  parent->init_context(current_ctx);
 }
 
 // Allocates memory
@@ -185,7 +190,7 @@ void factor_vm::primitive_set_context_object() {
 }
 
 void factor_vm::primitive_context_object_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->pop());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(ctx->pop()));
   fixnum n = untag_fixnum(ctx->peek());
   ctx->replace(other_ctx->context_objects[n]);
 }
@@ -198,42 +203,45 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
     general_error(error, false_object, false_object);
   }
   array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
-  memcpy(a + 1, (void*)bottom, depth);
+  const auto count = static_cast<size_t>(depth / sizeof(cell));
+  auto* source = reinterpret_cast<const cell*>(bottom);
+  copy_array(a->data(), source, count);
   return tag<array>(a);
 }
 
 // Allocates memory
-cell factor_vm::datastack_to_array(context* ctx) {
-  return stack_to_array(ctx->datastack_seg->start,
-                        ctx->datastack,
+cell factor_vm::datastack_to_array(context* target_ctx) {
+  return stack_to_array(target_ctx->datastack_seg->start,
+                        target_ctx->datastack,
                         ERROR_DATASTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_datastack_for() {
   data_root<alien> alien_ctx(ctx->pop(), this);
-  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(alien_ctx.value()));
   cell array = datastack_to_array(other_ctx);
   ctx->push(array);
 }
 
 // Allocates memory
-cell factor_vm::retainstack_to_array(context* ctx) {
-  return stack_to_array(ctx->retainstack_seg->start,
-                        ctx->retainstack,
+cell factor_vm::retainstack_to_array(context* target_ctx) {
+  return stack_to_array(target_ctx->retainstack_seg->start,
+                        target_ctx->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_retainstack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(ctx->peek()));
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
 // returns pointer to top of stack
 static cell array_to_stack(array* array, cell bottom) {
   cell depth = array_capacity(array) * sizeof(cell);
-  memcpy((void*)bottom, array + 1, depth);
+  auto* dest = reinterpret_cast<cell*>(bottom);
+  copy_array(dest, array->data(), static_cast<size_t>(array_capacity(array)));
   return bottom + depth - sizeof(cell);
 }
 
@@ -260,22 +268,22 @@ void factor_vm::primitive_check_datastack() {
   if (current_height - height != saved_height)
     ctx->push(false_object);
   else {
-    cell* ds_bot = (cell*)ctx->datastack_seg->start;
-    for (fixnum i = 0; i < saved_height - in; i++) {
-      if (ds_bot[i] != array_nth(saved_datastack, i)) {
-        ctx->push(false_object);
-        return;
-      }
-    }
-    ctx->push(special_objects[OBJ_CANONICAL_TRUE]);
+    auto compare_count = saved_height - in;
+    const cell* stack_begin = reinterpret_cast<cell*>(ctx->datastack_seg->start);
+    const cell* stack_end = stack_begin + compare_count;
+    const cell* saved_begin = saved_datastack->data();
+    if (std::equal(stack_begin, stack_end, saved_begin))
+      ctx->push(special_objects[OBJ_CANONICAL_TRUE]);
+    else
+      ctx->push(false_object);
   }
 }
 
 void factor_vm::primitive_load_locals() {
   fixnum count = untag_fixnum(ctx->pop());
-  memcpy((cell*)(ctx->retainstack + sizeof(cell)),
-         (cell*)(ctx->datastack - sizeof(cell) * (count - 1)),
-         sizeof(cell) * count);
+  auto* dest = reinterpret_cast<cell*>(ctx->retainstack + sizeof(cell));
+  auto* src = reinterpret_cast<cell*>(ctx->datastack - sizeof(cell) * (count - 1));
+  std::copy_n(src, static_cast<size_t>(count), dest);
   ctx->datastack -= sizeof(cell) * count;
   ctx->retainstack += sizeof(cell) * count;
 }

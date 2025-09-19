@@ -337,8 +337,9 @@ struct ulonglong_pair ffi_test_63(void) {
 
 int ffi_test_64(int n, ...) {
     va_list ap;
-    va_start(ap, n);
     int sum = 0;
+
+    va_start(ap, n);
     for (int i = 0; i < n; i++) {
         sum += va_arg(ap, int);
     }
@@ -348,8 +349,9 @@ int ffi_test_64(int n, ...) {
 
 double ffi_test_65(int n, ...) {
     va_list ap;
-    va_start(ap, n);
     double sum = 0.0;
+
+    va_start(ap, n);
     for (int i = 0; i < n; i++) {
         sum += va_arg(ap, double);
     }

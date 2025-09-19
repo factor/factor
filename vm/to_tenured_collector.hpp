@@ -28,7 +28,7 @@ struct from_tenured_refs_copier : no_fixup {
     if (!newpointer)
       throw must_start_gc_again();
 
-    memcpy(newpointer, obj, size);
+    copy_object(newpointer, obj, size);
     obj->forward_to(newpointer);
 
     mark_stack->push_back((cell)newpointer);

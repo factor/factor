@@ -140,11 +140,11 @@ cell factor_vm::compute_dlsym_address(array* parameters,
                                       bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
-  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
+  dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
 
-  cell undef = (cell)factor::undefined_symbol;
+  cell undef = cell_from_ptr(factor::undefined_symbol);
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
-  if (d != NULL && !d->handle)
+  if (d != nullptr && !d->handle)
     return undef;
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
@@ -164,9 +164,9 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      return (cell)&dispatch_stats.megamorphic_cache_hits;
+      return cell_from_ptr(&dispatch_stats.megamorphic_cache_hits);
     case RT_VM:
-      return (cell)this + untag_fixnum(array_nth(parameters, index));
+      return cell_from_ptr(this) + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -176,7 +176,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
-      return (cell)&factor::inline_cache_miss;
+      return cell_from_ptr(&factor::inline_cache_miss);
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
@@ -188,7 +188,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
-      : NULL;
+      : nullptr;
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 
@@ -290,14 +290,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> code(code_, this);
+  data_root<byte_array> machine_code(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(code.untagged());
+  cell code_length = array_capacity(machine_code.untagged());
   code_block* compiled = allot_code_block(code_length, type);
 
   compiled->owner = owner.value();
@@ -316,7 +316,8 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  memcpy(compiled + 1, code.untagged() + 1, code_length);
+  std::copy_n(machine_code.untagged()->data<uint8_t>(), code_length,
+              reinterpret_cast<uint8_t*>(compiled + 1));
 
   // fixup labels
   if (to_boolean(labels.value()))
@@ -330,7 +331,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   // compiler at the beginning of bootstrap
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
-  this->code->all_blocks.insert((cell)compiled);
+  this->code->all_blocks.insert(cell_from_ptr(compiled));
 
   return compiled;
 }
@@ -339,7 +340,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 // image load. It finds the symbol and library, and throws an error.
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
-  cell return_address = *(cell*)frame;
+  cell return_address = *reinterpret_cast<cell*>(frame);
   code_block* compiled = code->code_block_for_address(return_address);
 
   // Find the RT_DLSYM relocation nearest to the given return address.

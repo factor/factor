@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <ranges>
+
 namespace factor {
 
 const int mark_bits_granularity = sizeof(cell) * 8;
@@ -26,9 +29,9 @@ struct mark_bits {
 
   ~mark_bits() {
     delete[] marked;
-    marked = NULL;
+    marked = nullptr;
     delete[] forwarding;
-    forwarding = NULL;
+    forwarding = nullptr;
   }
 
   cell block_line(cell address) {
@@ -64,8 +67,7 @@ struct mark_bits {
       FACTOR_ASSERT(bitmap_start.first < bits_size);
       bits[bitmap_start.first] |= ~start_mask;
 
-      for (cell index = bitmap_start.first + 1; index < end.first; index++)
-        bits[index] = (cell)-1;
+      std::fill(bits + bitmap_start.first + 1, bits + end.first, (cell)-1);
 
       if (end_mask != 0) {
         FACTOR_ASSERT(end.first < bits_size);
@@ -84,10 +86,10 @@ struct mark_bits {
   // of marked blocks before it. Live blocks must be marked on entry.
   void compute_forwarding() {
     cell accum = 0;
-    for (cell index = 0; index < bits_size; index++) {
+    std::ranges::for_each(std::views::iota(cell{0}, bits_size), [&](cell index) {
       forwarding[index] = accum;
       accum += popcount(marked[index]);
-    }
+    });
   }
 
   // We have the popcount for every mark_bits_granularity entries; look
