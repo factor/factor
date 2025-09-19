@@ -121,15 +121,6 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   if (p->console)
     open_console();
-
-  // Release copies of command-line paths now that the image is loaded.
-  // They would normally be freed in vm_parameters::~vm_parameters(), but
-  // callers like primitive_exit() terminate the process before that
-  // destructor runs, which makes sanitizers report leaks.
-  free((vm_char*)p->image_path);
-  p->image_path = nullptr;
-  free((vm_char*)p->executable_path);
-  p->executable_path = nullptr;
 }
 
 // Allocates memory

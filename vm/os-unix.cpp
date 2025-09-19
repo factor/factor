@@ -120,7 +120,6 @@ segment::segment(cell size_, bool executable_p) {
 }
 
 segment::~segment() {
-  int pagesize = getpagesize();
   cell guard_size = static_cast<cell>(segment_guard_pages) * getpagesize();
   int retval = munmap((void*)(start - guard_size), 2 * guard_size + size);
   if (retval)
