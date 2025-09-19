@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators kernel math math.order
-math.vectors sequences ui.baseline-alignment
+math.vectors opengl sequences ui.baseline-alignment
 ui.baseline-alignment.private ui.gadgets ;
 IN: ui.gadgets.packs
 
@@ -16,7 +16,7 @@ TUPLE: pack < aligned-gadget
     swap [ dim>> ] [ fill>> ] bi '[ _ over v- _ v*n v+ ] map ;
 
 : orient ( seq1 seq2 gadget -- seq )
-    orientation>> '[ _ set-axis ] 2map ;
+    orientation>> '[ _ set-axis [ gl-round ] map ] 2map ;
 
 : packed-dims ( gadget sizes -- seq )
     [ (packed-dims) ] [ nip ] [ drop ] 2tri orient ;
