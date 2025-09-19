@@ -282,7 +282,7 @@ void factor_vm::dump_memory_layout(ostream& out) {
   dump_generation(out, "Nursery", data->nursery);
   dump_generation(out, "Aging", data->aging);
   dump_generation(out, "Tenured", data->tenured);
-  dump_memory_range(out, "Cards", 10, (cell)data->cards, (cell)data->cards_end);
+  dump_memory_range(out, "Cards", 10, cell_from_ptr(data->cards), cell_from_ptr(data->cards_end));
 
   out << endl << "Contexts:" << endl << endl;
   FACTOR_FOR_EACH(active_contexts) {
@@ -303,8 +303,8 @@ void factor_vm::dump_memory_layout(ostream& out) {
 void factor_vm::dump_objects(ostream& out, cell type) {
   primitive_full_gc();
   auto object_dumper = [&](object* obj) {
-     if (type == TYPE_COUNT || obj->type() == type) {
-      out << padded_address((cell)obj) << " ";
+    if (type == TYPE_COUNT || obj->type() == type) {
+      out << padded_address(cell_from_ptr(obj)) << " ";
       print_nested_obj(out, tag_dynamic(obj), 2);
       out << endl;
     }
@@ -316,7 +316,7 @@ void factor_vm::find_data_references(ostream& out, cell look_for) {
   primitive_full_gc();
   auto find_data_ref_func = [&](object* obj, cell* slot) {
     if (look_for == *slot) {
-      out << padded_address((cell)obj) << " ";
+      out << padded_address(cell_from_ptr(obj)) << " ";
       print_nested_obj(out, tag_dynamic(obj), 2);
       out << endl;
     }
@@ -352,12 +352,12 @@ struct code_block_printer {
       reloc_size += object_size(scan->relocation);
       parameter_size += object_size(scan->parameters);
 
-      if (parent->code->allocator->state.marked_p((cell)scan))
+      if (parent->code->allocator->state.marked_p(cell_from_ptr(scan)))
         status = "marked";
       else
         status = "allocated";
 
-      out << hex << (cell)scan << dec << " ";
+      out << hex << cell_from_ptr(scan) << dec << " ";
       out << hex << size << dec << " ";
       out << status << " ";
       out << "stack frame " << scan->stack_frame_size();
@@ -510,7 +510,7 @@ void factor_vm::factorbug() {
       print_callstack(cout);
     else if (cmd == "e") {
       for (cell i = 0; i < special_object_count; i++)
-        dump_cell(cout, (cell)&special_objects[i]);
+        dump_cell(cout, cell_from_ptr(&special_objects[i]));
     } else if (cmd == "g")
       dump_memory_layout(cout);
     else if (cmd == "c") {
