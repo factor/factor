@@ -2,6 +2,22 @@
 
 namespace factor {
 
+namespace {
+
+template <typename T>
+T read_unaligned(cell address) {
+  T value;
+  memcpy(&value, reinterpret_cast<void*>(address), sizeof(T));
+  return value;
+}
+
+template <typename T>
+void write_unaligned(cell address, T value) {
+  memcpy(reinterpret_cast<void*>(address), &value, sizeof(T));
+}
+
+}  // namespace
+
 instruction_operand::instruction_operand(relocation_entry rel,
                                          code_block* compiled, cell index)
     : rel(rel),
@@ -12,23 +28,22 @@ instruction_operand::instruction_operand(relocation_entry rel,
 // Load a value from a bitfield of an ARM/RISC-V instruction
 fixnum instruction_operand::load_value_masked(cell msb, cell lsb,
                                               cell scaling) {
-  int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
-
-  return *ptr << (31 - msb) >> (31 - msb + lsb) << scaling;
+  int32_t value = read_unaligned<int32_t>(pointer - sizeof(uint32_t));
+  return value << (31 - msb) >> (31 - msb + lsb) << scaling;
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
   switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
-      return *(cell*)(pointer - sizeof(cell));
+      return read_unaligned<cell>(pointer - sizeof(cell));
     case RC_ABSOLUTE:
-      return *(uint32_t*)(pointer - sizeof(uint32_t));
+      return read_unaligned<uint32_t>(pointer - sizeof(uint32_t));
     case RC_ABSOLUTE_2:
-      return *(uint16_t*)(pointer - sizeof(uint16_t));
+      return read_unaligned<uint16_t>(pointer - sizeof(uint16_t));
     case RC_ABSOLUTE_1:
-      return *(uint8_t*)(pointer - sizeof(uint8_t));
+      return read_unaligned<uint8_t>(pointer - sizeof(uint8_t));
     case RC_RELATIVE:
-      return *(int32_t*)(pointer - sizeof(uint32_t)) + relative_to;
+      return read_unaligned<int32_t>(pointer - sizeof(uint32_t)) + relative_to;
     case RC_RELATIVE_ARM_B:
       return load_value_masked(25, 0, 2) + relative_to - 4;
     case RC_RELATIVE_ARM_B_COND_LDR:
@@ -44,14 +59,15 @@ fixnum instruction_operand::load_value(cell relative_to) {
 }
 
 code_block* instruction_operand::load_code_block() {
-  return ((code_block*)load_value(pointer) - 1);
+  return reinterpret_cast<code_block*>(load_value(pointer)) - 1;
 }
 
 // Store a value into a bitfield of an ARM/RISC-V instruction
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell lsb, cell scaling) {
-  uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
-  *ptr = (uint32_t)((*ptr & ~mask) | (value >> scaling << lsb & mask));
+  uint32_t current = read_unaligned<uint32_t>(pointer - sizeof(uint32_t));
+  current = (uint32_t)((current & ~mask) | (value >> scaling << lsb & mask));
+  write_unaligned<uint32_t>(pointer - sizeof(uint32_t), current);
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
@@ -59,19 +75,19 @@ void instruction_operand::store_value(fixnum absolute_value) {
 
   switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
-      *(cell*)(pointer - sizeof(cell)) = absolute_value;
+      write_unaligned<cell>(pointer - sizeof(cell), (cell)absolute_value);
       break;
     case RC_ABSOLUTE:
-      *(uint32_t*)(pointer - sizeof(uint32_t)) = (uint32_t)absolute_value;
+      write_unaligned<uint32_t>(pointer - sizeof(uint32_t), (uint32_t)absolute_value);
       break;
     case RC_ABSOLUTE_2:
-      *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t)absolute_value;
+      write_unaligned<uint16_t>(pointer - sizeof(uint16_t), (uint16_t)absolute_value);
       break;
     case RC_ABSOLUTE_1:
-      *(uint8_t*)(pointer - sizeof(uint8_t)) = (uint8_t)absolute_value;
+      write_unaligned<uint8_t>(pointer - sizeof(uint8_t), (uint8_t)absolute_value);
       break;
     case RC_RELATIVE:
-      *(int32_t*)(pointer - sizeof(int32_t)) = (int32_t)relative_value;
+      write_unaligned<int32_t>(pointer - sizeof(int32_t), (int32_t)relative_value);
       break;
     case RC_RELATIVE_ARM_B:
       FACTOR_ASSERT(relative_value + 4 < 0x8000000);
@@ -102,3 +118,4 @@ void instruction_operand::store_value(fixnum absolute_value) {
 }
 
 }
+

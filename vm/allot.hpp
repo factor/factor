@@ -9,7 +9,7 @@ inline code_block* factor_vm::allot_code_block(cell size,
   cell block_size = size + sizeof(code_block);
   code_block* block = code->allocator->allot(block_size);
 
-  if (block == NULL) {
+  if (block == nullptr) {
     // If allocation failed, do a full GC and compact the code heap.
     // A full GC that occurs as a result of the data heap filling up does not
     // trigger a compaction. This setup ensures that most GCs do not compact
@@ -19,7 +19,7 @@ inline code_block* factor_vm::allot_code_block(cell size,
     block = code->allocator->allot(block_size);
 
     // Insufficient room even after code GC, give up
-    if (block == NULL) {
+    if (block == nullptr) {
       std::cout << "Code heap used:               " << code->allocator->occupied_space() << "\n";
       std::cout << "Code heap free:               " << code->allocator->free_space << "\n";
       std::cout << "Code heap free_block_count:   " << code->allocator->free_block_count << "\n";

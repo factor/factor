@@ -68,7 +68,9 @@ struct code_block {
 
   // GC info is stored at the end of the block
   gc_info* block_gc_info() const {
-    return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
+    cell info_addr = reinterpret_cast<cell>(this) + size() - sizeof(gc_info);
+    FACTOR_ASSERT((info_addr & (alignof(gc_info) - 1)) == 0);
+    return reinterpret_cast<gc_info*>(info_addr);
   }
 
   void flush_icache() { factor::flush_icache((cell)this, size()); }

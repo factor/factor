@@ -15,7 +15,15 @@ enum context_object {
 // overflow error is triggered. So before continuing executing on it
 // in general_error(), we chop off this many bytes to have some space
 // to work with. macOS 64 bit needs more than 8192. See issue #1419.
+#if defined(FACTOR_WITH_ADDRESS_SANITIZER)
+// AddressSanitizer adds large red zones around stack frames which
+// effectively shrink the usable callstack size. Increase the reserved
+// slack so GC and error handlers have room to run when the stack is
+// close to exhaustion during sanitizer builds.
+static const cell stack_reserved = 1048576;
+#else
 static const cell stack_reserved = 16384;
+#endif
 
 struct context {
 

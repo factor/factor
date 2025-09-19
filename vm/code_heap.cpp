@@ -20,9 +20,9 @@ code_heap::code_heap(cell size) {
 
 code_heap::~code_heap() {
   delete allocator;
-  allocator = NULL;
+  allocator = nullptr;
   delete seg;
-  seg = NULL;
+  seg = nullptr;
 }
 
 void code_heap::write_barrier(code_block* compiled) {
@@ -143,30 +143,30 @@ void factor_vm::primitive_modify_code_heap() {
     data_root<array> pair(array_nth(alist.untagged(), i), this);
 
     data_root<word> word(array_nth(pair.untagged(), 0), this);
-    data_root<object> data(array_nth(pair.untagged(), 1), this);
+    data_root<object> compiled_object(array_nth(pair.untagged(), 1), this);
 
-    switch (data.type()) {
+    switch (compiled_object.type()) {
       case QUOTATION_TYPE:
       case TUPLE_TYPE: // for curry/compose, see issue #2763
-        jit_compile_word(word.value(), data.value(), false);
+        jit_compile_word(word.value(), compiled_object.value(), false);
         break;
       case ARRAY_TYPE: {
-        array* compiled_data = data.as<array>().untagged();
+        array* compiled_data = compiled_object.as<array>().untagged();
         cell parameters = array_nth(compiled_data, 0);
         cell literals = array_nth(compiled_data, 1);
         cell relocation = array_nth(compiled_data, 2);
         cell labels = array_nth(compiled_data, 3);
-        cell code = array_nth(compiled_data, 4);
+        cell machine_code = array_nth(compiled_data, 4);
         cell frame_size = untag_fixnum(array_nth(compiled_data, 5));
 
         code_block* compiled =
-            add_code_block(CODE_BLOCK_OPTIMIZED, code, labels, word.value(),
+            add_code_block(CODE_BLOCK_OPTIMIZED, machine_code, labels, word.value(),
                            relocation, parameters, literals, frame_size);
 
         word->entry_point = compiled->entry_point();
       } break;
       default:
-        critical_error("Expected a quotation or an array", data.value());
+        critical_error("Expected a quotation or an array", compiled_object.value());
         break;
     }
   }

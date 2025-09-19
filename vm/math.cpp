@@ -94,9 +94,13 @@ void factor_vm::primitive_float_to_bignum() {
   ctx->replace(tag<bignum>(float_to_bignum(ctx->peek())));
 }
 
-#define POP_BIGNUMS(x, y)                \
-  bignum* y = untag<bignum>(ctx->pop()); \
-  bignum* x = untag<bignum>(ctx->peek());
+#define POP_BIGNUMS(x, y)                                             \
+  bignum* y;                                                         \
+  bignum* x;                                                         \
+  do {                                                               \
+    y = untag<bignum>(ctx->pop());                                   \
+    x = untag<bignum>(ctx->peek());                                  \
+  } while (0)
 
 void factor_vm::primitive_bignum_eq() {
   POP_BIGNUMS(x, y);
@@ -230,6 +234,7 @@ void factor_vm::primitive_format_float() {
   switch (format[0]) {
     case 'f': localized_stream << std::fixed; break;
     case 'e': localized_stream << std::scientific; break;
+    default: break;
   }
   if (isupper(format[0])) {
     localized_stream << std::uppercase;
@@ -252,9 +257,13 @@ void factor_vm::primitive_format_float() {
   ctx->replace(tag<byte_array>(array));
 }
 
-#define POP_FLOATS(x, y)              \
-  double y = untag_float(ctx->pop()); \
-  double x = untag_float(ctx->peek());
+#define POP_FLOATS(x, y)                                                \
+  double y;                                                            \
+  double x;                                                            \
+  do {                                                                 \
+    y = untag_float(ctx->pop());                                       \
+    x = untag_float(ctx->peek());                                      \
+  } while (0)
 
 void factor_vm::primitive_float_eq() {
   POP_FLOATS(x, y);

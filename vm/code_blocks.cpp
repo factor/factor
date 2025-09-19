@@ -140,11 +140,11 @@ cell factor_vm::compute_dlsym_address(array* parameters,
                                       bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
-  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
+  dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
 
   cell undef = (cell)factor::undefined_symbol;
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
-  if (d != NULL && !d->handle)
+  if (d != nullptr && !d->handle)
     return undef;
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
@@ -188,7 +188,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
-      : NULL;
+      : nullptr;
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 
@@ -290,14 +290,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> code(code_, this);
+  data_root<byte_array> machine_code(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(code.untagged());
+  cell code_length = array_capacity(machine_code.untagged());
   code_block* compiled = allot_code_block(code_length, type);
 
   compiled->owner = owner.value();
@@ -316,7 +316,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  memcpy(compiled + 1, code.untagged() + 1, code_length);
+  memcpy(compiled + 1, machine_code.untagged() + 1, code_length);
 
   // fixup labels
   if (to_boolean(labels.value()))

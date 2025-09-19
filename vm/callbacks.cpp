@@ -21,9 +21,9 @@ callback_heap::callback_heap(cell size, factor_vm* parent) {
 
 callback_heap::~callback_heap() {
   delete allocator;
-  allocator = NULL;
+  allocator = nullptr;
   delete seg;
-  seg = NULL;
+  seg = nullptr;
 }
 
 instruction_operand callback_heap::callback_operand(code_block* stub,
@@ -67,6 +67,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
     parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
                           false_object,
                           false_object);
+    return nullptr;
   }
   stub->header = bump & ~7;
   stub->owner = owner;

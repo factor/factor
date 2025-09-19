@@ -56,7 +56,7 @@ void factor_vm::init_factor(vm_parameters* p) {
 
   p->executable_path = vm_executable_path();
 
-  if (p->image_path == NULL) {
+  if (p->image_path == nullptr) {
     if (embedded_image_p()) {
       p->embedded_image = true;
       p->image_path = safe_strdup(p->executable_path);
@@ -71,7 +71,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   retainstack_size = p->retainstack_size;
   callstack_size = p->callstack_size;
 
-  ctx = NULL;
+  ctx = nullptr;
   spare_ctx = new_context();
 
   callbacks = new callback_heap(p->callback_size, this);
@@ -122,6 +122,14 @@ void factor_vm::init_factor(vm_parameters* p) {
   if (p->console)
     open_console();
 
+  // Release copies of command-line paths now that the image is loaded.
+  // They would normally be freed in vm_parameters::~vm_parameters(), but
+  // callers like primitive_exit() terminate the process before that
+  // destructor runs, which makes sanitizers report leaks.
+  free((vm_char*)p->image_path);
+  p->image_path = nullptr;
+  free((vm_char*)p->executable_path);
+  p->executable_path = nullptr;
 }
 
 // Allocates memory

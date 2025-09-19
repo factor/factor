@@ -66,7 +66,7 @@ void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) 
   cell length = array->capacity;
   cell i;
   bool trimmed;
-  unsigned char* data = array->data<unsigned char>();
+  unsigned char* bytes = array->data<unsigned char>();
 
   if (length > 16 && !full_output) {
     trimmed = true;
@@ -75,7 +75,7 @@ void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) 
     trimmed = false;
 
   for (i = 0; i < length; i++) {
-    out << " " << (unsigned) data[i];
+    out << " " << static_cast<unsigned>(bytes[i]);
   }
 
   if (trimmed)
@@ -464,7 +464,7 @@ void factor_vm::factorbug() {
         // If we exit with an EOF immediately, then
         // dump stacks. This is useful for builder and
         // other cases where Factor is run with stdin
-        // redirected to /dev/null
+        // redirected to /dev/nullptr
         fep_disabled = true;
 
         print_datastack(cout);

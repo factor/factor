@@ -1,6 +1,15 @@
 #include "master.hpp"
+#include <cstring>
 
 namespace factor {
+
+namespace {
+
+inline context* context_from_alien_pointer(char* raw_pointer) {
+  return static_cast<context*>(static_cast<void*>(raw_pointer));
+}
+
+}
 
 context::context(cell ds_size, cell rs_size, cell cs_size)
     : callstack_top(0),
@@ -102,8 +111,8 @@ context* factor_vm::new_context() {
 }
 
 // Allocates memory
-void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
+void factor_vm::init_context(context* target_ctx) {
+  target_ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)target_ctx);
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -135,13 +144,13 @@ VM_C_API void reset_context(factor_vm* parent) {
   // the top two datastack items to be preserved after the context has
   // been resetted.
 
-  context* ctx = parent->ctx;
-  cell arg1 = ctx->pop();
-  cell arg2 = ctx->pop();
-  ctx->reset();
-  ctx->push(arg2);
-  ctx->push(arg1);
-  parent->init_context(ctx);
+  context* current_ctx = parent->ctx;
+  cell arg1 = current_ctx->pop();
+  cell arg2 = current_ctx->pop();
+  current_ctx->reset();
+  current_ctx->push(arg2);
+  current_ctx->push(arg1);
+  parent->init_context(current_ctx);
 }
 
 // Allocates memory
@@ -185,7 +194,7 @@ void factor_vm::primitive_set_context_object() {
 }
 
 void factor_vm::primitive_context_object_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->pop());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(ctx->pop()));
   fixnum n = untag_fixnum(ctx->peek());
   ctx->replace(other_ctx->context_objects[n]);
 }
@@ -203,30 +212,30 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
 }
 
 // Allocates memory
-cell factor_vm::datastack_to_array(context* ctx) {
-  return stack_to_array(ctx->datastack_seg->start,
-                        ctx->datastack,
+cell factor_vm::datastack_to_array(context* target_ctx) {
+  return stack_to_array(target_ctx->datastack_seg->start,
+                        target_ctx->datastack,
                         ERROR_DATASTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_datastack_for() {
   data_root<alien> alien_ctx(ctx->pop(), this);
-  context* other_ctx = (context*)pinned_alien_offset(alien_ctx.value());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(alien_ctx.value()));
   cell array = datastack_to_array(other_ctx);
   ctx->push(array);
 }
 
 // Allocates memory
-cell factor_vm::retainstack_to_array(context* ctx) {
-  return stack_to_array(ctx->retainstack_seg->start,
-                        ctx->retainstack,
+cell factor_vm::retainstack_to_array(context* target_ctx) {
+  return stack_to_array(target_ctx->retainstack_seg->start,
+                        target_ctx->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
 }
 
 // Allocates memory
 void factor_vm::primitive_retainstack_for() {
-  context* other_ctx = (context*)pinned_alien_offset(ctx->peek());
+  context* other_ctx = context_from_alien_pointer(pinned_alien_offset(ctx->peek()));
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
