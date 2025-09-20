@@ -163,9 +163,9 @@ void factor_vm::primitive_dlsym() {
     if (d->handle == nullptr)
       ctx->replace(false_object);
     else
-      ctx->replace(allot_alien(ffi_dlsym(d, sym)));
+      ctx->replace(allot_alien(ffi_dlsym(d, sym).value_or(0)));
   } else
-    ctx->replace(allot_alien(ffi_dlsym(nullptr, sym)));
+    ctx->replace(allot_alien(ffi_dlsym(nullptr, sym).value_or(0)));
 }
 
 // close a native library handle

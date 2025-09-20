@@ -149,16 +149,14 @@ cell factor_vm::compute_dlsym_address(array* parameters,
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
   symbol_char* name = alien_offset(symbol);
-  cell sym = ffi_dlsym(d, name);
-  sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
+  auto sym_opt = ffi_dlsym(d, name);
+  if (!sym_opt.has_value())
+    return undef;
+  cell sym = toc ? FUNCTION_TOC_POINTER(sym_opt.value()) : FUNCTION_CODE_POINTER(sym_opt.value());
   return sym ? sym : undef;
 }
 
-// Sentinel value for invalid external address - uses max value since valid
-// addresses won't be at the very top of address space
-static constexpr cell INVALID_EXTERNAL_ADDRESS = std::numeric_limits<cell>::max();
-
-cell factor_vm::lookup_external_address(relocation_type rel_type,
+std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
                                         code_block *compiled,
                                         array* parameters,
                                         cell index) {
@@ -184,7 +182,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
-      return INVALID_EXTERNAL_ADDRESS;
+      return std::nullopt;
   }
 }
 
@@ -196,8 +194,8 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 
-  cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
-  if (ext_addr == INVALID_EXTERNAL_ADDRESS) {
+  auto ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
+  if (!ext_addr.has_value()) {
     ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
@@ -211,7 +209,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
     }
     critical_error(ss.str().c_str(), arg);
   }
-  return ext_addr;
+  return ext_addr.value();
 }
 
 struct initial_code_block_visitor {

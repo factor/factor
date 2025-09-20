@@ -33,9 +33,9 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = LoadLibraryEx(reinterpret_cast<WCHAR*>(alien_offset(dll->path)), nullptr, 0);
 }
 
-cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return cell_from_ptr(GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll,
-                              symbol));
+std::optional<cell> factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+  void* addr = GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll, symbol);
+  return addr ? std::optional<cell>(cell_from_ptr(addr)) : std::nullopt;
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
