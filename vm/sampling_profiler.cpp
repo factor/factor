@@ -133,7 +133,7 @@ void factor_vm::primitive_get_samples() {
   }
   data_root<array> samples_array(allot_array(samples.size(), false_object),
                                  this);
-  std::vector<profiling_sample>::const_iterator from_iter = samples.begin();
+  auto from_iter = samples.begin();
   cell to_i = 0;
 
   cell callstacks_cell = special_objects[OBJ_SAMPLE_CALLSTACKS];

@@ -5,7 +5,7 @@ namespace factor {
 
 // Context object count and identifiers must be kept in sync with:
 //   core/kernel/kernel.factor
-static const cell context_object_count = 4;
+static constexpr cell context_object_count = 4;
 
 enum context_object {
   OBJ_NAMESTACK,
@@ -23,9 +23,9 @@ enum context_object {
 // effectively shrink the usable callstack size. Increase the reserved
 // slack so GC and error handlers have room to run when the stack is
 // close to exhaustion during sanitizer builds.
-static const cell stack_reserved = 1048576;
+static constexpr cell stack_reserved = 1048576;
 #else
-static const cell stack_reserved = 16384;
+static constexpr cell stack_reserved = 16384;
 #endif
 
 struct context {

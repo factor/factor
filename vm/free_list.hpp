@@ -191,7 +191,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
     auto iter = large_blocks.lower_bound(requested_size);
 
     if (iter != large_blocks.end()) {
-      free_heap_block* block = iter->second;
+      auto [block_size, block] = *iter;
       large_blocks.erase(iter);
 
       free_block_count--;

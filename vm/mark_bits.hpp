@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <ranges>
+#include <memory>
 
 namespace factor {
 
@@ -10,29 +11,24 @@ struct mark_bits {
   cell size;
   cell start;
   cell bits_size;
-  cell* marked;
-  cell* forwarding;
+  std::unique_ptr<cell[]> marked;
+  std::unique_ptr<cell[]> forwarding;
 
-  void clear_mark_bits() { memset(marked, 0, bits_size * sizeof(cell)); }
+  void clear_mark_bits() { memset(marked.get(), 0, bits_size * sizeof(cell)); }
 
-  void clear_forwarding() { memset(forwarding, 0, bits_size * sizeof(cell)); }
+  void clear_forwarding() { memset(forwarding.get(), 0, bits_size * sizeof(cell)); }
 
   mark_bits(cell size, cell start)
       : size(size),
         start(start),
         bits_size(size / data_alignment / mark_bits_granularity),
-        marked(new cell[bits_size]),
-        forwarding(new cell[bits_size]) {
+        marked(std::make_unique<cell[]>(bits_size)),
+        forwarding(std::make_unique<cell[]>(bits_size)) {
     clear_mark_bits();
     clear_forwarding();
   }
 
-  ~mark_bits() {
-    delete[] marked;
-    marked = nullptr;
-    delete[] forwarding;
-    forwarding = nullptr;
-  }
+  ~mark_bits() = default;
 
   cell block_line(cell address) {
     return (address - start) / data_alignment;
@@ -50,36 +46,36 @@ struct mark_bits {
   }
 
   bool bitmap_elt(cell* bits, const cell address) {
-    std::pair<cell, cell> position = bitmap_deref(address);
-    return (bits[position.first] & ((cell)1 << position.second)) != 0;
+    auto [word_index, word_shift] = bitmap_deref(address);
+    return (bits[word_index] & ((cell)1 << word_shift)) != 0;
   }
 
   void set_bitmap_range(cell* bits, const cell address, const cell data_size) {
-    std::pair<cell, cell> bitmap_start = bitmap_deref(address);
-    std::pair<cell, cell> end = bitmap_deref(address + data_size);
+    auto [start_word, start_shift] = bitmap_deref(address);
+    auto [end_word, end_shift] = bitmap_deref(address + data_size);
 
-    cell start_mask = ((cell)1 << bitmap_start.second) - 1;
-    cell end_mask = ((cell)1 << end.second) - 1;
+    cell start_mask = ((cell)1 << start_shift) - 1;
+    cell end_mask = ((cell)1 << end_shift) - 1;
 
-    if (bitmap_start.first == end.first)
-      bits[bitmap_start.first] |= start_mask ^ end_mask;
+    if (start_word == end_word)
+      bits[start_word] |= start_mask ^ end_mask;
     else {
-      FACTOR_ASSERT(bitmap_start.first < bits_size);
-      bits[bitmap_start.first] |= ~start_mask;
+      FACTOR_ASSERT(start_word < bits_size);
+      bits[start_word] |= ~start_mask;
 
-      std::fill(bits + bitmap_start.first + 1, bits + end.first, (cell)-1);
+      std::fill(bits + start_word + 1, bits + end_word, (cell)-1);
 
       if (end_mask != 0) {
-        FACTOR_ASSERT(end.first < bits_size);
-        bits[end.first] |= end_mask;
+        FACTOR_ASSERT(end_word < bits_size);
+        bits[end_word] |= end_mask;
       }
     }
   }
 
-  bool marked_p(const cell address) { return bitmap_elt(marked, address); }
+  bool marked_p(const cell address) { return bitmap_elt(marked.get(), address); }
 
   void set_marked_p(const cell address, const cell dsize) {
-    set_bitmap_range(marked, address, dsize);
+    set_bitmap_range(marked.get(), address, dsize);
   }
 
   // The eventual destination of a block after compaction is just the number

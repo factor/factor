@@ -1,11 +1,11 @@
 namespace factor {
 
-typedef intptr_t fixnum;
-typedef uintptr_t cell;
+using fixnum = intptr_t;
+using cell = uintptr_t;
 
-inline static cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
+constexpr inline cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
-inline static cell alignment_for(cell a, cell b) { return align(a, b) - a; }
+constexpr inline cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
 template <typename Ptr>
 inline cell cell_from_ptr(Ptr ptr) {

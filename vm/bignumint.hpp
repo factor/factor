@@ -44,14 +44,14 @@ namespace factor {
 // definition is `CHAR_BIT', which is defined in the Ansi C header
 // file "limits.h".
 
-typedef fixnum bignum_digit_type;
-typedef fixnum bignum_length_type;
+using bignum_digit_type = fixnum;
+using bignum_length_type = fixnum;
 
 #ifndef _WIN64
 #ifdef FACTOR_64
-typedef __int128_t bignum_twodigit_type;
+using bignum_twodigit_type = __int128_t;
 #else
-typedef int64_t bignum_twodigit_type;
+using bignum_twodigit_type = int64_t;
 #endif
 #endif
 

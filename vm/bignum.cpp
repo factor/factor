@@ -52,7 +52,7 @@ namespace factor {
 
 // Exports
 
-int factor_vm::bignum_equal_p(bignum* x, bignum* y) {
+int factor_vm::bignum_equal_p(const bignum* x, const bignum* y) {
   return ((BIGNUM_ZERO_P(x))
               ? (BIGNUM_ZERO_P(y))
               : ((!(BIGNUM_ZERO_P(y))) &&
@@ -61,7 +61,7 @@ int factor_vm::bignum_equal_p(bignum* x, bignum* y) {
                  (bignum_equal_p_unsigned(x, y))));
 }
 
-enum bignum_comparison factor_vm::bignum_compare(bignum* x, bignum* y) {
+enum bignum_comparison factor_vm::bignum_compare(const bignum* x, const bignum* y) {
   return ((BIGNUM_ZERO_P(x)) ? ((BIGNUM_ZERO_P(y)) ? BIGNUM_COMPARISON_EQUAL
                                                    : (BIGNUM_NEGATIVE_P(y))
                                     ? BIGNUM_COMPARISON_GREATER
@@ -511,7 +511,7 @@ bignum* factor_vm::double_to_bignum(double x) {
 
 // Comparisons
 
-int factor_vm::bignum_equal_p_unsigned(bignum* x, bignum* y) {
+int factor_vm::bignum_equal_p_unsigned(const bignum* x, const bignum* y) {
   bignum_length_type length = (BIGNUM_LENGTH(x));
   if (length != (BIGNUM_LENGTH(y)))
     return (0);
@@ -526,14 +526,17 @@ int factor_vm::bignum_equal_p_unsigned(bignum* x, bignum* y) {
   }
 }
 
-enum bignum_comparison factor_vm::bignum_compare_unsigned(bignum* x,
-                                                          bignum* y) {
+enum bignum_comparison factor_vm::bignum_compare_unsigned(const bignum* x,
+                                                          const bignum* y) {
   bignum_length_type x_length = (BIGNUM_LENGTH(x));
   bignum_length_type y_length = (BIGNUM_LENGTH(y));
-  if (x_length < y_length)
-    return BIGNUM_COMPARISON_LESS;
-  if (x_length > y_length)
-    return BIGNUM_COMPARISON_GREATER;
+
+  // First compare lengths
+  if (auto cmp = x_length <=> y_length; cmp != 0) {
+    return cmp < 0 ? BIGNUM_COMPARISON_LESS : BIGNUM_COMPARISON_GREATER;
+  }
+
+  // Lengths are equal, compare digits from most significant
   {
     bignum_digit_type* start_x = (BIGNUM_START_PTR(x));
     bignum_digit_type* scan_x = (start_x + x_length);
@@ -541,10 +544,9 @@ enum bignum_comparison factor_vm::bignum_compare_unsigned(bignum* x,
     while (start_x < scan_x) {
       bignum_digit_type digit_x = (*--scan_x);
       bignum_digit_type digit_y = (*--scan_y);
-      if (digit_x < digit_y)
-        return BIGNUM_COMPARISON_LESS;
-      if (digit_x > digit_y)
-        return BIGNUM_COMPARISON_GREATER;
+      if (auto cmp = digit_x <=> digit_y; cmp != 0) {
+        return cmp < 0 ? BIGNUM_COMPARISON_LESS : BIGNUM_COMPARISON_GREATER;
+      }
     }
   }
   return BIGNUM_COMPARISON_EQUAL;

@@ -203,7 +203,8 @@ void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   bool foreign_thread = false;
   if (vm == nullptr) {
     foreign_thread = true;
-    vm = thread_vms.begin()->second;
+    auto [thread, vm_ptr] = *thread_vms.begin();
+    vm = vm_ptr;
   }
   if (atomic::load(&vm->sampling_profiler_p))
         vm->enqueue_samples(1, cell_from_ptr(reinterpret_cast<void*>(UAP_PROGRAM_COUNTER(uap))), foreign_thread);

@@ -508,8 +508,8 @@ void factor_vm::factorbug() {
     else if (cmd == ".c")
       print_callstack(cout);
     else if (cmd == "e") {
-      for (cell i = 0; i < special_object_count; i++)
-        dump_cell(cout, cell_from_ptr(&special_objects[i]));
+      for (auto& obj : std::span(special_objects, special_object_count))
+        dump_cell(cout, cell_from_ptr(&obj));
     } else if (cmd == "g")
       dump_memory_layout(cout);
     else if (cmd == "c") {

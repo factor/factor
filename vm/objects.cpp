@@ -70,9 +70,10 @@ struct slot_become_fixup : no_fixup {
       : become_map(become_map) {}
 
   object* fixup_data(object* old) {
-    std::map<object*, object*>::const_iterator iter = become_map->find(old);
-    if (iter != become_map->end())
-      return iter->second;
+    if (auto iter = become_map->find(old); iter != become_map->end()) {
+      auto [from, to] = *iter;
+      return to;
+    }
     return old;
   }
 };

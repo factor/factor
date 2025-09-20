@@ -281,7 +281,7 @@ static BOOL WINAPI ctrl_handler(DWORD dwCtrlType) {
       // grab the first VM we can get. This will not be a good idea when we
       // actually support native threads.
       FACTOR_ASSERT(thread_vms.size() == 1);
-      factor_vm* vm = thread_vms.begin()->second;
+      auto [thread, vm] = *thread_vms.begin();
       vm->enqueue_fep();
 
       // Before leaving the ctrl_handler, try and wake up the main thread.
