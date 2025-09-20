@@ -2,6 +2,16 @@
 #include <array>
 #include <bit>
 
+// Ensure Windows headers are included for x64 exception handling
+#ifdef WINDOWS
+#include <windows.h>
+#include <winnt.h>
+
+// RUNTIME_FUNCTION is defined as _IMAGE_RUNTIME_FUNCTION_ENTRY in winnt.h
+// The RtlAddFunctionTable and RtlDeleteFunctionTable functions are already
+// declared in winnt.h when building for x64
+#endif
+
 namespace factor {
 
 using UBYTE = unsigned char;
