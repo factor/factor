@@ -568,7 +568,7 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
-  cell lookup_external_address(relocation_type rel_type,
+  std::optional<cell> lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
                                cell index);
@@ -704,7 +704,7 @@ struct factor_vm {
   void primitive_existsp();
   void init_ffi();
   void ffi_dlopen(dll* dll);
-  cell ffi_dlsym(dll* dll, symbol_char* symbol);
+  std::optional<cell> ffi_dlsym(dll* dll, symbol_char* symbol);
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);
   void init_signals();
