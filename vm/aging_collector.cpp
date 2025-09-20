@@ -24,7 +24,7 @@ struct to_aging_copier : no_fixup {
       return obj;
     }
 
-    cell size = obj->size();
+    const cell size = obj->size();
     object* newpointer = aging->allot(size);
     if (!newpointer) [[unlikely]]
       throw must_start_gc_again();
@@ -79,7 +79,7 @@ void factor_vm::collect_aging() {
     slot_visitor<to_aging_copier>
         visitor(this, to_aging_copier(aging, data->tenured.get()));
 
-    cell scan = aging->start + aging->occupied_space();
+    const cell scan = aging->start + aging->occupied_space();
 
     visitor.visit_all_roots();
     visitor.cheneys_algorithm(aging, scan);

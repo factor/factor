@@ -262,9 +262,9 @@ void factor_vm::initialize_code_block(code_block* compiled, cell literals) {
 }
 
 void factor_vm::initialize_code_block(code_block* compiled) {
-  std::map<code_block*, cell>::iterator iter =
-      code->uninitialized_blocks.find(compiled);
-  initialize_code_block(compiled, iter->second);
+  auto iter = code->uninitialized_blocks.find(compiled);
+  auto [block, literals] = *iter;
+  initialize_code_block(block, literals);
   code->uninitialized_blocks.erase(iter);
 }
 

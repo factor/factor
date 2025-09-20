@@ -3,9 +3,9 @@
 namespace factor {
 
 #if defined(WINDOWS) && defined(FACTOR_64)
-const cell seh_area_size = 1024;
+constexpr cell seh_area_size = 1024;
 #else
-const cell seh_area_size = 0;
+constexpr cell seh_area_size = 0;
 #endif
 
 struct code_heap {

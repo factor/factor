@@ -53,8 +53,8 @@ cell factor_vm::allot_alien(cell address) {
 // make an alien pointing at an offset of another alien
 // Allocates memory
 void factor_vm::primitive_displaced_alien() {
-  cell alien = ctx->pop();
-  cell displacement = to_cell(ctx->pop());
+  const cell alien = ctx->pop();
+  const cell displacement = to_cell(ctx->pop());
 
   switch (TAG(alien)) {
     case BYTE_ARRAY_TYPE:

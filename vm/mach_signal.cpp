@@ -74,13 +74,12 @@ static void call_fault_handler(mach_port_t thread, exception_type_t exception,
   // Look up the VM instance involved
   THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
   FACTOR_ASSERT(thread_id);
-  std::map<THREADHANDLE, factor_vm*>::const_iterator vm =
-      thread_vms.find(thread_id);
-
   // Handle the exception
-  if (vm != thread_vms.end())
-    vm->second->call_fault_handler(exception, code, exc_state, thread_state,
-                                   float_state);
+  if (auto vm = thread_vms.find(thread_id); vm != thread_vms.end()) {
+    auto [thread, vm_ptr] = *vm;
+    vm_ptr->call_fault_handler(exception, code, exc_state, thread_state,
+                               float_state);
+  }
 }
 
 // Handle an exception by invoking the user's fault handler and/or forwarding
