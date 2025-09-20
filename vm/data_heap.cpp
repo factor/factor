@@ -54,13 +54,13 @@ data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
 template <typename Generation> void data_heap::clear_cards(Generation* gen) {
   cell first_card = addr_to_card(gen->start - start);
   cell last_card = addr_to_card(gen->end - start);
-  std::fill(cards.begin() + first_card, cards.begin() + last_card, 0);
+  std::fill(cards.begin() + first_card, cards.begin() + last_card, static_cast<card>(0));
 }
 
 template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   cell first_deck = addr_to_deck(gen->start - start);
   cell last_deck = addr_to_deck(gen->end - start);
-  std::fill(decks.begin() + first_deck, decks.begin() + last_deck, 0);
+  std::fill(decks.begin() + first_deck, decks.begin() + last_deck, static_cast<card_deck>(0));
 }
 
 void data_heap::reset_nursery() {
@@ -88,8 +88,8 @@ bool data_heap::low_memory_p() {
 }
 
 void data_heap::mark_all_cards() {
-  std::fill(cards.begin(), cards.end(), 0xff);
-  std::fill(decks.begin(), decks.end(), 0xff);
+  std::fill(cards.begin(), cards.end(), static_cast<card>(0xff));
+  std::fill(decks.begin(), decks.end(), static_cast<card_deck>(0xff));
 }
 
 void factor_vm::set_data_heap(data_heap* data_) {

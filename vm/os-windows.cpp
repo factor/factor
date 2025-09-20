@@ -6,8 +6,8 @@ HMODULE hFactorDll;
 
 [[nodiscard]] bool set_memory_locked(cell base, cell size, bool locked) {
   const DWORD prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
-  DWORD ignore;
-  const BOOL status = VirtualProtect(reinterpret_cast<void*>(base), static_cast<SIZE_T>(size), prot, &ignore);
+  DWORD old_prot;
+  const BOOL status = VirtualProtect(reinterpret_cast<void*>(base), static_cast<SIZE_T>(size), prot, &old_prot);
   return status != 0;
 }
 
