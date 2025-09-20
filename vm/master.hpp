@@ -38,6 +38,7 @@
 #include <memory>
 #include <list>
 #include <map>
+#include <optional>
 #include <ranges>
 #include <set>
 #include <span>

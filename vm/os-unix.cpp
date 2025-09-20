@@ -56,8 +56,9 @@ void factor_vm::ffi_dlopen(dll* dll) {
   dll->handle = dlopen(alien_offset(dll->path), RTLD_LAZY | RTLD_GLOBAL);
 }
 
-cell factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
-  return cell_from_ptr(dlsym(dll ? dll->handle : null_dll, symbol));
+std::optional<cell> factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
+  void* addr = dlsym(dll ? dll->handle : null_dll, symbol);
+  return addr ? std::optional<cell>(cell_from_ptr(addr)) : std::nullopt;
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
