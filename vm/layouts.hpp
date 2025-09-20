@@ -1,3 +1,5 @@
+#include <type_traits>
+
 namespace factor {
 
 using fixnum = intptr_t;
@@ -21,15 +23,31 @@ inline T* ptr_from_cell(cell value) {
 static const cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
-#define LEAF_FRAME_SIZE 16
+constexpr cell LEAF_FRAME_SIZE = 16;
 
-#define WORD_SIZE (signed)(sizeof(cell) * 8)
+constexpr signed WORD_SIZE = sizeof(cell) * 8;
 
-#define TAG_MASK 15
-#define TAG_BITS 4
-#define TAG(x) ((cell)(x) & TAG_MASK)
-#define UNTAG(x) ((cell)(x) & ~TAG_MASK)
-#define RETAG(x, tag) (UNTAG(x) | (tag))
+constexpr cell TAG_MASK = 15;
+constexpr cell TAG_BITS = 4;
+
+template<typename T>
+inline cell TAG(T x) {
+  if constexpr (std::is_pointer_v<T>)
+    return reinterpret_cast<cell>(x) & TAG_MASK;
+  else
+    return static_cast<cell>(x) & TAG_MASK;
+}
+
+template<typename T>
+inline cell UNTAG(T x) {
+  if constexpr (std::is_pointer_v<T>)
+    return reinterpret_cast<cell>(x) & ~TAG_MASK;
+  else
+    return static_cast<cell>(x) & ~TAG_MASK;
+}
+
+template<typename T>
+inline cell RETAG(T x, cell tag) { return UNTAG(x) | tag; }
 
 // Type tags, should be kept in sync with:
 //   basis/bootstrap/layouts.factor

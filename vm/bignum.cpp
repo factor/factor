@@ -115,16 +115,16 @@ bignum *factor_vm::bignum_square(bignum* x_)
 {
     data_root<bignum> x(x_, this);
 
-    bignum_length_type length = (BIGNUM_LENGTH (x));
+    bignum_length_type length = (BIGNUM_LENGTH(x));
     bignum * z = (allot_bignum_zeroed ((length + length), 0));
 
     bignum_digit_type * scan_z = BIGNUM_START_PTR (z);
-    bignum_digit_type * scan_x = BIGNUM_START_PTR (x);
+    bignum_digit_type * scan_x = BIGNUM_START_PTR(x);
     bignum_digit_type * end_x = scan_x + length;
 
     for (int i = 0; i < length; ++i) {
         bignum_twodigit_type carry;
-        bignum_twodigit_type f = BIGNUM_REF (x, i);
+        bignum_twodigit_type f = BIGNUM_REF(x, i);
         bignum_digit_type *pz = scan_z + (i << 1);
         bignum_digit_type *px = scan_x + i + 1;
 
@@ -516,9 +516,9 @@ int factor_vm::bignum_equal_p_unsigned(const bignum* x, const bignum* y) {
   if (length != (BIGNUM_LENGTH(y)))
     return (0);
   else {
-    bignum_digit_type* scan_x = (BIGNUM_START_PTR(x));
-    bignum_digit_type* scan_y = (BIGNUM_START_PTR(y));
-    bignum_digit_type* end_x = (scan_x + length);
+    const bignum_digit_type* scan_x = (BIGNUM_START_PTR(x));
+    const bignum_digit_type* scan_y = (BIGNUM_START_PTR(y));
+    const bignum_digit_type* end_x = (scan_x + length);
     while (scan_x < end_x)
       if ((*scan_x++) != (*scan_y++))
         return (0);
@@ -538,9 +538,9 @@ enum bignum_comparison factor_vm::bignum_compare_unsigned(const bignum* x,
 
   // Lengths are equal, compare digits from most significant
   {
-    bignum_digit_type* start_x = (BIGNUM_START_PTR(x));
-    bignum_digit_type* scan_x = (start_x + x_length);
-    bignum_digit_type* scan_y = ((BIGNUM_START_PTR(y)) + y_length);
+    const bignum_digit_type* start_x = (BIGNUM_START_PTR(x));
+    const bignum_digit_type* scan_x = (start_x + x_length);
+    const bignum_digit_type* scan_y = ((BIGNUM_START_PTR(y)) + y_length);
     while (start_x < scan_x) {
       bignum_digit_type digit_x = (*--scan_x);
       bignum_digit_type digit_y = (*--scan_y);
@@ -825,7 +825,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
   int shift = 0;
   BIGNUM_ASSERT(length_d > 1);
   {
-    bignum_digit_type v1 = BIGNUM_REF(denominator.untagged(), length_d - 1);
+    bignum_digit_type v1 = BIGNUM_REF(denominator, length_d - 1);
     while (v1 < (BIGNUM_RADIX / 2)) {
       v1 <<= 1;
       shift += 1;
@@ -838,7 +838,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
 
     if (shift == 0) {
       bignum_destructive_copy(numerator.untagged(), u.untagged());
-      (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
+      (BIGNUM_REF(u, (length_n - 1))) = 0;
       bignum_divide_unsigned_normalized(u.untagged(),
                                         denominator.untagged(),
                                         q.untagged());
@@ -859,7 +859,7 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
 
     if (shift == 0) {
         bignum_destructive_copy(numerator.untagged(), u.untagged());
-        (BIGNUM_REF(u.untagged(), (length_n - 1))) = 0;
+        (BIGNUM_REF(u, (length_n - 1))) = 0;
         bignum_divide_unsigned_normalized(u.untagged(),
                                           denominator.untagged(),
                                           nullptr);
@@ -1437,38 +1437,40 @@ bignum* factor_vm::bignum_arithmetic_shift(bignum* arg1, fixnum n) {
     return bignum_magnitude_ash(arg1, n);
 }
 
-#define AND_OP 0
-#define IOR_OP 1
-#define XOR_OP 2
+enum class BitwiseOp {
+  AND = 0,
+  IOR = 1,
+  XOR = 2
+};
 
 // Allocates memory
 bignum* factor_vm::bignum_bitwise_and(bignum* arg1, bignum* arg2) {
   return ((BIGNUM_NEGATIVE_P(arg1)) ? (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_negneg_bitwise_op(AND_OP, arg1, arg2)
-              : bignum_posneg_bitwise_op(AND_OP, arg2, arg1)
+              ? bignum_negneg_bitwise_op(BitwiseOp::AND, arg1, arg2)
+              : bignum_posneg_bitwise_op(BitwiseOp::AND, arg2, arg1)
               : (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_posneg_bitwise_op(AND_OP, arg1, arg2)
-              : bignum_pospos_bitwise_op(AND_OP, arg1, arg2));
+              ? bignum_posneg_bitwise_op(BitwiseOp::AND, arg1, arg2)
+              : bignum_pospos_bitwise_op(BitwiseOp::AND, arg1, arg2));
 }
 
 // Allocates memory
 bignum* factor_vm::bignum_bitwise_ior(bignum* arg1, bignum* arg2) {
   return ((BIGNUM_NEGATIVE_P(arg1)) ? (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_negneg_bitwise_op(IOR_OP, arg1, arg2)
-              : bignum_posneg_bitwise_op(IOR_OP, arg2, arg1)
+              ? bignum_negneg_bitwise_op(BitwiseOp::IOR, arg1, arg2)
+              : bignum_posneg_bitwise_op(BitwiseOp::IOR, arg2, arg1)
               : (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_posneg_bitwise_op(IOR_OP, arg1, arg2)
-              : bignum_pospos_bitwise_op(IOR_OP, arg1, arg2));
+              ? bignum_posneg_bitwise_op(BitwiseOp::IOR, arg1, arg2)
+              : bignum_pospos_bitwise_op(BitwiseOp::IOR, arg1, arg2));
 }
 
 // Allocates memory
 bignum* factor_vm::bignum_bitwise_xor(bignum* arg1, bignum* arg2) {
   return ((BIGNUM_NEGATIVE_P(arg1)) ? (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_negneg_bitwise_op(XOR_OP, arg1, arg2)
-              : bignum_posneg_bitwise_op(XOR_OP, arg2, arg1)
+              ? bignum_negneg_bitwise_op(BitwiseOp::XOR, arg1, arg2)
+              : bignum_posneg_bitwise_op(BitwiseOp::XOR, arg2, arg1)
               : (BIGNUM_NEGATIVE_P(arg2))
-              ? bignum_posneg_bitwise_op(XOR_OP, arg1, arg2)
-              : bignum_pospos_bitwise_op(XOR_OP, arg1, arg2));
+              ? bignum_posneg_bitwise_op(BitwiseOp::XOR, arg1, arg2)
+              : bignum_pospos_bitwise_op(BitwiseOp::XOR, arg1, arg2));
 }
 
 // Allocates memory
@@ -1535,7 +1537,7 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
 }
 
 // Allocates memory
-bignum* factor_vm::bignum_pospos_bitwise_op(int op, bignum* arg1_,
+bignum* factor_vm::bignum_pospos_bitwise_op(BitwiseOp op, bignum* arg1_,
                                             bignum* arg2_) {
   data_root<bignum> arg1(arg1_, this);
   data_root<bignum> arg2(arg2_, this);
@@ -1563,14 +1565,14 @@ bignum* factor_vm::bignum_pospos_bitwise_op(int op, bignum* arg1_,
     digit1 = (scan1 < end1) ? *scan1++ : 0;
     digit2 = (scan2 < end2) ? *scan2++ : 0;
     *scanr++ =
-        (op == AND_OP) ? digit1 & digit2 : (op == IOR_OP) ? digit1 | digit2
+        (op == BitwiseOp::AND) ? digit1 & digit2 : (op == BitwiseOp::IOR) ? digit1 | digit2
                                                           : digit1 ^ digit2;
   }
   return bignum_trim(result);
 }
 
 // Allocates memory
-bignum* factor_vm::bignum_posneg_bitwise_op(int op, bignum* arg1_,
+bignum* factor_vm::bignum_posneg_bitwise_op(BitwiseOp op, bignum* arg1_,
                                             bignum* arg2_) {
   data_root<bignum> arg1(arg1_, this);
   data_root<bignum> arg2(arg2_, this);
@@ -1581,7 +1583,7 @@ bignum* factor_vm::bignum_posneg_bitwise_op(int op, bignum* arg1_,
   bignum_digit_type* scan2, *end2, digit2, carry2;
   bignum_digit_type* scanr, *endr;
 
-  char neg_p = op == IOR_OP || op == XOR_OP;
+  char neg_p = op == BitwiseOp::IOR || op == BitwiseOp::XOR;
 
   max_length =
       (BIGNUM_LENGTH(arg1) > BIGNUM_LENGTH(arg2) + 1) ? BIGNUM_LENGTH(arg1)
@@ -1610,7 +1612,7 @@ bignum* factor_vm::bignum_posneg_bitwise_op(int op, bignum* arg1_,
     }
 
     *scanr++ =
-        (op == AND_OP) ? digit1 & digit2 : (op == IOR_OP) ? digit1 | digit2
+        (op == BitwiseOp::AND) ? digit1 & digit2 : (op == BitwiseOp::IOR) ? digit1 | digit2
                                                           : digit1 ^ digit2;
   }
 
@@ -1621,7 +1623,7 @@ bignum* factor_vm::bignum_posneg_bitwise_op(int op, bignum* arg1_,
 }
 
 // Allocates memory
-bignum* factor_vm::bignum_negneg_bitwise_op(int op, bignum* arg1_,
+bignum* factor_vm::bignum_negneg_bitwise_op(BitwiseOp op, bignum* arg1_,
                                             bignum* arg2_) {
   data_root<bignum> arg1(arg1_, this);
   data_root<bignum> arg2(arg2_, this);
@@ -1632,7 +1634,7 @@ bignum* factor_vm::bignum_negneg_bitwise_op(int op, bignum* arg1_,
   bignum_digit_type* scan2, *end2, digit2, carry2;
   bignum_digit_type* scanr, *endr;
 
-  char neg_p = op == AND_OP || op == IOR_OP;
+  char neg_p = op == BitwiseOp::AND || op == BitwiseOp::IOR;
 
   max_length =
       (BIGNUM_LENGTH(arg1) > BIGNUM_LENGTH(arg2)) ? BIGNUM_LENGTH(arg1) + 1
@@ -1669,7 +1671,7 @@ bignum* factor_vm::bignum_negneg_bitwise_op(int op, bignum* arg1_,
     }
 
     *scanr++ =
-        (op == AND_OP) ? digit1 & digit2 : (op == IOR_OP) ? digit1 | digit2
+        (op == BitwiseOp::AND) ? digit1 & digit2 : (op == BitwiseOp::IOR) ? digit1 | digit2
                                                           : digit1 ^ digit2;
   }
 

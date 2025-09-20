@@ -56,7 +56,13 @@ using bignum_twodigit_type = int64_t;
 #endif
 
 // BIGNUM_TO_POINTER casts a bignum object to a digit array pointer.
-#define BIGNUM_TO_POINTER(bignum) (reinterpret_cast<bignum_digit_type*>(bignum->data()))
+inline bignum_digit_type* BIGNUM_TO_POINTER(bignum* bn) {
+  return reinterpret_cast<bignum_digit_type*>(bn->data());
+}
+
+inline const bignum_digit_type* BIGNUM_TO_POINTER(const bignum* bn) {
+  return reinterpret_cast<const bignum_digit_type*>(const_cast<bignum*>(bn)->data());
+}
 
 // BIGNUM_EXCEPTION is invoked to handle assertion violations.
 #define BIGNUM_EXCEPTION abort
@@ -68,16 +74,33 @@ using bignum_twodigit_type = int64_t;
 #define BIGNUM_DIGIT_MASK (BIGNUM_RADIX - 1)
 #define BIGNUM_HALF_DIGIT_MASK (BIGNUM_RADIX_ROOT - 1)
 
-#define BIGNUM_START_PTR(bignum) ((BIGNUM_TO_POINTER(bignum)) + 1)
+inline bignum_digit_type* BIGNUM_START_PTR(bignum* bignum) {
+  return BIGNUM_TO_POINTER(bignum) + 1;
+}
 
-#define BIGNUM_LENGTH(bignum) (untag_fixnum((bignum)->capacity) - 1)
+inline const bignum_digit_type* BIGNUM_START_PTR(const bignum* bn) {
+  return BIGNUM_TO_POINTER(const_cast<bignum*>(bn)) + 1;
+}
 
-#define BIGNUM_NEGATIVE_P(bignum) (bignum->data()[0] != 0)
-#define BIGNUM_SET_NEGATIVE_P(bignum, neg) (bignum->data()[0] = neg)
+inline bignum_length_type BIGNUM_LENGTH(const bignum* bignum) {
+  return untag_fixnum(bignum->capacity) - 1;
+}
 
-#define BIGNUM_ZERO_P(bignum) ((BIGNUM_LENGTH(bignum)) == 0)
+inline bool BIGNUM_NEGATIVE_P(const bignum* bignum) {
+  return bignum->data()[0] != 0;
+}
 
-#define BIGNUM_REF(bignum, index) (*((BIGNUM_START_PTR(bignum)) + (index)))
+inline void BIGNUM_SET_NEGATIVE_P(bignum* bignum, bool neg) {
+  bignum->data()[0] = neg;
+}
+
+inline bool BIGNUM_ZERO_P(const bignum* bignum) {
+  return BIGNUM_LENGTH(bignum) == 0;
+}
+
+inline bignum_digit_type& BIGNUM_REF(bignum* bignum, bignum_length_type index) {
+  return *(BIGNUM_START_PTR(bignum) + index);
+}
 
 // These definitions are here to facilitate caching of the constants
 // 0, 1, and -1.
@@ -85,9 +108,17 @@ using bignum_twodigit_type = int64_t;
 #define BIGNUM_ONE(neg_p) untag<bignum>(        \
             special_objects[neg_p ? OBJ_BIGNUM_NEG_ONE : OBJ_BIGNUM_POS_ONE])
 
-#define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
-#define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)
-#define HD_CONS(high, low) (((high) << BIGNUM_HALF_DIGIT_LENGTH) | (low))
+inline constexpr bignum_digit_type HD_LOW(bignum_digit_type digit) {
+  return digit & BIGNUM_HALF_DIGIT_MASK;
+}
+
+inline constexpr bignum_digit_type HD_HIGH(bignum_digit_type digit) {
+  return digit >> BIGNUM_HALF_DIGIT_LENGTH;
+}
+
+inline constexpr bignum_digit_type HD_CONS(bignum_digit_type high, bignum_digit_type low) {
+  return (high << BIGNUM_HALF_DIGIT_LENGTH) | low;
+}
 
 #define BIGNUM_BITS_TO_DIGITS(n) \
   (((n) + (BIGNUM_DIGIT_LENGTH - 1)) / BIGNUM_DIGIT_LENGTH)
