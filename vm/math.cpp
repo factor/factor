@@ -73,7 +73,7 @@ void factor_vm::primitive_fixnum_shift() {
     y = branchless_max(y, -WORD_SIZE + 1);
     ctx->replace(tag_fixnum(x >> -y));
     return;
-  } else if (y < WORD_SIZE - TAG_BITS) {
+  } else if (y < static_cast<fixnum>(WORD_SIZE - TAG_BITS)) {
     fixnum mask = -((fixnum)1 << (WORD_SIZE - 1 - TAG_BITS - y));
     if (!(branchless_abs(x) & mask)) {
       ctx->replace(tag_fixnum(x << y));
