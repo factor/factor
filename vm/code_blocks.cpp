@@ -154,6 +154,10 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   return sym ? sym : undef;
 }
 
+// Sentinel value for invalid external address - uses max value since valid
+// addresses won't be at the very top of address space
+static constexpr cell INVALID_EXTERNAL_ADDRESS = std::numeric_limits<cell>::max();
+
 cell factor_vm::lookup_external_address(relocation_type rel_type,
                                         code_block *compiled,
                                         array* parameters,
@@ -180,7 +184,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
-      return -1;
+      return INVALID_EXTERNAL_ADDRESS;
   }
 }
 
@@ -193,7 +197,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   relocation_type rel_type = op.rel.type();
 
   cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
-  if (ext_addr == (cell)-1) {
+  if (ext_addr == INVALID_EXTERNAL_ADDRESS) {
     ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
