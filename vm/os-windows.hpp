@@ -18,17 +18,17 @@
 #endif
 
 // Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970
-#define EPOCH_OFFSET 0x019db1ded53e8000LL
+constexpr int64_t EPOCH_OFFSET = 0x019db1ded53e8000LL;
 
 namespace factor {
 
-typedef wchar_t vm_char;
-typedef char symbol_char;
-typedef HANDLE THREADHANDLE;
+using vm_char = wchar_t;
+using symbol_char = char;
+using THREADHANDLE = HANDLE;
 
 #define STRING_LITERAL(string) L##string
 
-#define MAX_UNICODE_PATH 32768
+constexpr size_t MAX_UNICODE_PATH = 32768;
 #define VM_C_API extern "C" __declspec(dllexport)
 #define SSCANF swscanf
 #define STRCMP wcscmp

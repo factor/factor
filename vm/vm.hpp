@@ -16,6 +16,7 @@ using set_fpu_state_func_type = void (*)(cell state);
 
 struct growable_array;
 struct code_root;
+enum class BitwiseOp;
 
 struct factor_vm {
   //
@@ -273,9 +274,9 @@ struct factor_vm {
   bignum* bignum_bitwise_ior(bignum* arg1, bignum* arg2);
   bignum* bignum_bitwise_xor(bignum* arg1, bignum* arg2);
   bignum* bignum_magnitude_ash(bignum* arg1_, fixnum n);
-  bignum* bignum_pospos_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
-  bignum* bignum_posneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
-  bignum* bignum_negneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_pospos_bitwise_op(BitwiseOp op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_posneg_bitwise_op(BitwiseOp op, bignum* arg1_, bignum* arg2_);
+  bignum* bignum_negneg_bitwise_op(BitwiseOp op, bignum* arg1_, bignum* arg2_);
   void bignum_negate_magnitude(bignum* arg);
   bignum* bignum_integer_length(bignum* x_);
   int bignum_logbitp(int shift, bignum* arg);
