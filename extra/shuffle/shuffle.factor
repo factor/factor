@@ -3,9 +3,9 @@
 
 USING: accessors assocs combinators combinators.short-circuit
 definitions effects effects.parser generalizations help
-help.markup kernel parser sequences sequences.generalizations
-stack-checker.backend stack-checker.known-words
-stack-checker.values words ;
+help.markup kernel math parser sequences
+sequences.generalizations stack-checker.backend
+stack-checker.known-words stack-checker.values words ;
 
 IN: shuffle
 
@@ -57,3 +57,45 @@ M: shuffle-word definition drop f ;
 : nipdd ( w x y z -- x y z ) roll drop ; inline
 
 : spind ( w x y z -- y x w z ) [ spin ] dip ; inline
+
+MACRO: nrotated ( nrots depth dip -- quot )
+    [ '[ [ _ nrot ] ] replicate [ ] concat-as ] dip '[ _ _ ndip ] ;
+
+MACRO: -nrotated ( -nrots depth dip -- quot )
+    [ '[ [ _ -nrot ] ] replicate [ ] concat-as ] dip '[ _ _ ndip ] ;
+
+MACRO: nrotate-heightd ( n height dip -- quot )
+    [ '[ [ _ nrot ] ] replicate concat ] dip '[ _ _ ndip ] ;
+
+MACRO: -nrotate-heightd ( n height dip -- quot )
+    [
+        '[ [ _ -nrot ] ] replicate concat
+    ] dip '[ _ _ ndip ] ;
+
+: ndupd ( n dip -- ) '[ [ _ ndup ] _ ndip ] call ; inline
+
+MACRO: ntuckd ( ntuck ndip -- quot )
+    [ 1 + ] dip '[ [ dup _ -nrot ] _ ndip ] ;
+
+MACRO: noverd ( n depth dip -- quot' )
+    [ + ] [ 2drop ] [ [ + ] dip ] 3tri
+    '[ _ _ ndupd _ _ _ nrotated ] ;
+
+MACRO: mntuckd ( ndup depth ndip -- quot )
+    { [ nip ] [ 2drop ] [ drop + ] [ 2nip ] } 3cleave
+    '[ _ _ ndupd _ _ _ -nrotated ] ;
+
+DEFER: -nrotd
+MACRO: nrotd ( n d -- quot )
+    over 0 < [
+        [ neg ] dip '[ _ _ -nrotd ]
+    ] [
+        [ 1 - [ ] [ '[ _ dip swap ] ] swapd times ] dip '[ _ _ ndip ]
+    ] if ;
+
+MACRO: -nrotd ( n d -- quot )
+    over 0 < [
+        [ neg ] dip '[ _ _ nrotd ]
+    ] [
+        [ 1 - [ ] [ '[ swap _ dip ] ] swapd times ] dip '[ _ _ ndip ]
+    ] if ;
