@@ -258,17 +258,6 @@ HELP: nweave
   }
 } ;
 
-HELP: nreverse
-{ $values { "n" integer } }
-{ $description "Reverses the order of the top " { $snippet "n" } " stack elements." }
-{ $examples
-  { $example
-    "USING: arrays generalizations prettyprint ;"
-    "10 20 30 40 4 nreverse 4array ."
-    "{ 40 30 20 10 }"
-  }
-} ;
-
 HELP: n*quot
 { $values
     { "n" integer } { "quot" quotation }
@@ -293,7 +282,6 @@ ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
     ndrop
     mnswap
     nweave
-    nreverse
 } ;
 
 ARTICLE: "combinator-generalizations" "Generalized combinators"
