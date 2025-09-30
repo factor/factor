@@ -61,3 +61,10 @@ USING: kernel sequences.generalizations shuffle tools.test ;
 { 1 3 4 2 5 } [ 1 2 3 4 5  -3 1 -nrotd ] unit-test
 { 2 3 1 4 5 } [ 1 2 3 4 5  3 2 nrotd ] unit-test
 { 2 3 1 4 5 } [ 1 2 3 4 5  -3 2 -nrotd ] unit-test
+
+{ } [ 0 nreverse ] unit-test
+{ 1 } [ 1 1 nreverse ] unit-test
+{ 2 1 } [ 1 2 2 nreverse ] unit-test
+{ 3 2 1 } [ 1 2 3 3 nreverse ] unit-test
+{ 4 3 2 1 } [ 1 2 3 4 4 nreverse ] unit-test
+{ 5 4 3 2 1 } [ 1 2 3 4 5 5 nreverse ] unit-test

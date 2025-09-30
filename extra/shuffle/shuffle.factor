@@ -3,7 +3,7 @@
 
 USING: accessors assocs combinators combinators.short-circuit
 definitions effects effects.parser generalizations help
-help.markup kernel math parser sequences
+help.markup kernel math parser ranges sequences
 sequences.generalizations stack-checker.backend
 stack-checker.known-words stack-checker.values words ;
 
@@ -99,3 +99,6 @@ MACRO: -nrotd ( n d -- quot )
     ] [
         [ 1 - [ ] [ '[ swap _ dip ] ] swapd times ] dip '[ _ _ ndip ]
     ] if ;
+
+MACRO: nreverse ( n -- quot )
+    0 [a..b) [ '[ _ -nrot ] ] map [ ] concat-as ;
