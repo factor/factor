@@ -91,13 +91,13 @@ test-2 "TEST2" {
             test-2 ensure-table
         ] with-db
     ] [
-        <db-pool> [
+        [
             [
                 10 <iota> [
                     10 [
                         test-1-tuple insert-tuple yield
                     ] times
                 ] parallel-each
-            ] with-pooled-db
-        ] with-disposal
+            ] with-db-pooled-connection
+        ] with-db-pool
     ] bi ;

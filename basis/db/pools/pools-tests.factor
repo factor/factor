@@ -4,7 +4,7 @@ io.directories namespaces accessors kernel math destructors ;
 
 { 1 0 } [ [ ] with-db-pool ] must-infer-as
 
-{ 1 0 } [ [ ] with-pooled-db ] must-infer-as
+{ 1 0 } [ [ ] with-db-pooled-connection ] must-infer-as
 
 ! Test behavior after image save/load
 USE: db.sqlite
@@ -15,6 +15,6 @@ USE: db.sqlite
 
 { } [ "pool" get expired>> t >>expired drop ] unit-test
 
-{ } [ 1000 [ "pool" get [ ] with-pooled-db ] times ] unit-test
+{ } [ 1000 [ "pool" get [ ] with-db-pooled-connection ] times ] unit-test
 
 { } [ "pool" get dispose ] unit-test
