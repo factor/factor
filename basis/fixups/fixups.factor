@@ -82,6 +82,7 @@ CONSTANT: word-renames {
     { "download-to" { "download-into" "0.100" } }
     { "version-info" { "vm-info" "0.100" } }
     { "random-bits*" { "random-bits-exact" "0.100" } }
+    { "with-pooled-db" { "with-db-pooled-connection" "0.101" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )
