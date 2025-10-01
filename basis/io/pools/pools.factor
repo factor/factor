@@ -38,12 +38,9 @@ GENERIC: make-connection ( pool -- conn )
     [ dup connections>> empty? ] [ dup new-connection ] while
     connections>> pop ;
 
-: (with-pooled-connection) ( conn pool quot -- )
-    [ nip call ] [ drop return-connection ] 3bi ; inline
-
-: with-pooled-connection ( pool quot -- )
-    [ [ acquire-connection ] keep ] dip
-    [ (with-pooled-connection) ] [ ] [ 2drop dispose ] cleanup ; inline
+:: with-pooled-connection ( ... pool quot: ( ... conn -- ... ) -- ... )
+    pool acquire-connection :> conn
+    [ conn quot call ] [ conn pool return-connection ] finally ; inline
 
 M: return-connection-state dispose
     [ conn>> ] [ pool>> ] bi return-connection ;
