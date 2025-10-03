@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.combinators db db.pools
 db.postgresql db.queries db.sqlite db.tuples db.types
-destructors io.files.temp kernel math math.parser namespaces
-random sequences system threads tools.test ;
+destructors io.files.temp io.pools kernel math math.parser
+namespaces random sequences system threads tools.test ;
 IN: db.tester
 
 : postgresql-test-db-name ( -- string )
@@ -92,7 +92,7 @@ test-2 "TEST2" {
         ] with-db
     ] [
         [
-            [
+            pool get [
                 10 <iota> [
                     10 [
                         test-1-tuple insert-tuple yield
