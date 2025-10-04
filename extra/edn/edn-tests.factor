@@ -1,7 +1,7 @@
-USING: edn kernel multiline tools.test ;
+USING: edn kernel linked-assocs multiline sequences tools.test ;
 
 {
-    V{
+    {
         null
         t
         f
@@ -31,14 +31,14 @@ USING: edn kernel multiline tools.test ;
             T{ keyword { name "gelato" } }
             1
             2
-            -2
+            T{ symbol { name "-2" } }
         }
-        H{
-            { T{ keyword { name "butter" } } 1 }
-            { T{ keyword { name "lemon-juice" } } 3.5 }
+        LH{
             { T{ keyword { name "eggs" } } 2 }
+            { T{ keyword { name "lemon-juice" } } 3.5 }
+            { T{ keyword { name "butter" } } 1 }
         }
-        H{
+        LH{
             { V{ 1 2 3 4 } "tell the people what she wore" }
             { V{ 5 6 7 8 } "the more you see the more you hate" }
         }
@@ -51,13 +51,14 @@ USING: edn kernel multiline tools.test ;
         T{ tagged
             { name "MyYelpClone/MenuItem" }
             { value
-                H{
+                LH{
                     { T{ keyword { name "name" } } "eggs-benedict" }
                     { T{ keyword { name "rating" } } 10 }
                 }
             }
         }
     }
+    t ! round-trip
 } [
     [=[
 ; Comments start with a semicolon.
@@ -125,5 +126,5 @@ github/fork   ; you can't eat with this
 ; EDN can be extended by tagging elements with # symbols.
 
 #MyYelpClone/MenuItem {:name "eggs-benedict" :rating 10}
-]=] edn>
+]=] edn> dup >edn edn> first dupd =
 ] unit-test

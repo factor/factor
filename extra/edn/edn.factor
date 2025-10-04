@@ -1,10 +1,10 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii assocs combinators hash-sets
-hashtables io io.streams.string kernel make math math.parser peg
-peg.parsers sequences sets splitting strings strings.parser
-vectors words ;
+USING: accessors ascii assocs classes.tuple combinators
+hash-sets io io.streams.string kernel linked-assocs make math
+math.parser namespaces sequences sets splitting strings
+strings.parser vectors words ;
 
 IN: edn
 
@@ -14,172 +14,153 @@ TUPLE: symbol name ;
 
 TUPLE: tagged name value ;
 
+ERROR: edn-error ;
+
+DEFER: stream-read-edn
+
 <PRIVATE
 
-: spaces ( -- parser )
-    [ blank? ] satisfy repeat1 ;
+SYMBOL: edn-separator
 
-: newline ( -- parser )
-    "\n" token "\r\n" token 2choice ;
+SYMBOL: edn-eof
 
-: comments ( -- parser )
-    ";" token [ CHAR: \n = not ] satisfy repeat0 newline optional 3seq ;
+: edn-expect ( token stream -- )
+    [ dup length ] [ stream-read ] bi* = [ edn-error ] unless ; inline
 
-: spaces-or-comments ( -- parser )
-    spaces comments 2choice repeat1 ;
+: edn-check-eof ( object/edn-eof -- object )
+    dup edn-eof = [ edn-error ] when ; inline
 
-: nil-parser ( -- parser )
-    "nil" token [ drop null ] action ;
+: edn-number ( token -- n )
+    dup string>number [ nip ] [ edn-error ] if* ;
 
-: boolean-parser ( -- parser )
-    "true" token [ drop t ] action
-    "false" token [ drop f ] action
-    2choice ;
+: stream-read-edn1 ( stream -- elt )
+    edn-separator [ f ] change [ nip ] [ stream-read1 ] if* ;
 
-: escaped ( -- parser )
-    "\\" token hide [ "\"\\befnrt" member-eq? ] satisfy 2seq
-    [ first escape ] action ;
+: stream-read-token ( stream -- token )
+    "\s\t\r\n,)]}" swap stream-read-until edn-separator namespaces:set ;
 
-: string-parser ( -- parser )
-    escaped [ CHAR: \" = not ] satisfy 2choice repeat0
-    "\"" dup surrounded-by [ >string ] action ;
+: stream-read-edn-keyword ( stream -- keyword )
+    stream-read-token keyword boa ;
 
-: char-parser ( -- parser )
-    "\\" token hide [ blank? not ] satisfy repeat1 [
-        >string {
-            { "newline" [ CHAR: \n ] }
-            { "return" [ CHAR: \r ] }
-            { "space" [ CHAR: \s ] }
-            { "tab" [ CHAR: \t ] }
-            [ "u" ?head [ hex> ] [ first ] if ]
-        } case
-    ] action 2seq [ first ] action ;
+: stream-read-edn-char ( stream -- char )
+    stream-read-token {
+        { "newline" [ CHAR: \n ] }
+        { "return" [ CHAR: \r ] }
+        { "space" [ CHAR: \s ] }
+        { "tab" [ CHAR: \t ] }
+        [ "u" ?head [ hex> ] [ first ] if ]
+    } case ;
 
-: keyword-parser ( -- parser )
-    ":" token hide
-    [ blank? not ] satisfy repeat1 [ >string ] action
-    2seq [ first keyword boa ] action ;
-
-: symbol-parser ( -- parser )
-    [ [ digit? not ] [ [ alpha? ] [ ".*+!-_?$%&=<>" member? ] bi or ] bi and ] satisfy
-    [ [ alpha? ] [ ".*+!-_?$%&=<>" member? ] bi or ] satisfy repeat0 2seq
-    [ first2 swap prefix >string ] action
-    "/" token list-of [ "/" join symbol boa ] action ;
-
-: sign ( -- parser )
-    "+" token "-" token 2choice ;
-
-: decdigit ( -- parser )
-    CHAR: 0 CHAR: 9 range ;
-
-: int-parser ( -- parser )
-    sign optional decdigit repeat1 "N" token hide optional 3seq
-    [ "" concat-as string>number ] action ;
-
-: exponent ( -- parser )
-    "e" token "E" token 2choice sign optional
-    decdigit repeat1 3seq [ "" concat-as ] action ;
-
-: float-parser ( -- parser )
-    [ sign optional , decdigit repeat1 , exponent , ] seq*
-    [ sign optional , decdigit repeat1 , "." token , decdigit repeat1 , exponent optional , ] seq*
-    2choice [ "" concat-as string>number ] action ;
-
-DEFER: value-parser
-
-: discard-parser ( -- parser )
-    "#_" token spaces-or-comments optional value-parser 3seq ;
-
-: ?value-parser ( -- parser )
-    discard-parser hide comments hide value-parser 3choice ;
-
-: values-parser ( -- parser )
-    [
-        spaces-or-comments optional hide ,
-        ?value-parser ,
-        spaces-or-comments hide ?value-parser 2seq repeat0
-        [ concat ] action ,
-        spaces-or-comments optional hide ,
-    ] seq* [ dup length 1 > [ first2 swap prefix ] [ ?first ] if ] action ;
-
-: list-parser ( -- parser )
-    [
-        "(" token hide , spaces-or-comments optional hide ,
-        values-parser optional ,
-        spaces-or-comments optional hide , ")" token hide ,
-    ] seq* [ ?first >array ] action ;
-
-: vector-parser ( -- parser )
-    [
-        "[" token hide , spaces-or-comments optional hide ,
-        values-parser optional ,
-        spaces-or-comments optional hide , "]" token hide ,
-    ] seq* [ ?first >vector ] action ;
-
-: pair-parser ( -- parser )
-    value-parser spaces-or-comments hide value-parser 3seq ;
-
-: pairs-parser ( -- parser )
-    pair-parser
-    [ [ CHAR: , = ] [ blank? ] bi or ] satisfy repeat1 hide
-    pair-parser 2seq
-    [ first ] action repeat0 2seq
-    [ first2 swap prefix ] action ;
-
-: map-parser ( -- parser )
-    [
-        "{" token hide , spaces-or-comments optional hide ,
-        pairs-parser optional ,
-        spaces-or-comments optional hide , "}" token hide ,
-    ] seq* [ ?first >hashtable ] action ;
-
-: set-parser ( -- parser )
-    [
-        "#{" token hide , spaces-or-comments optional hide ,
-        values-parser optional ,
-        spaces-or-comments optional hide , "}" token hide ,
-    ] seq* [ ?first >hash-set ] action ;
-
-: tagged-parser ( -- parser )
-    [
-        "#" token hide ,
-        [ blank? not ] satisfy repeat1 [ >string ] action ,
-        spaces-or-comments hide ,
-        value-parser ,
-    ] seq* [ first2 tagged boa ] action ;
-
-: value-parser ( -- parser )
+: stream-read-edn-string ( stream -- string )
     [
         [
-            nil-parser ,
-            boolean-parser ,
-            string-parser ,
-            keyword-parser ,
-            string-parser ,
-            char-parser ,
-            list-parser ,
-            vector-parser ,
-            map-parser ,
-            set-parser ,
-            tagged-parser ,
-            float-parser ,
-            int-parser ,
-            symbol-parser ,
-        ] choice*
-    ] delay ;
+            "\\\"" over stream-read-until [ % ] dip {
+                { CHAR: \\ [ dup stream-read1 escape , t ] }
+                { CHAR: \" [ f ] }
+                { f [ edn-error ] }
+            } case
+        ] loop
+    ] "" make nip ;
 
-! XXX: #inst "rfc-3339-format"
-! XXX: #uuid "f81d4fae-7dec-11d0-a765-00a0c91e6bf6"
+DEFER: stream-read-edn-object
+
+: stream-read-edn-unsafe ( stream -- object/edn-eof )
+    dup stream-read-edn1 stream-read-edn-object ;
+
+:: stream-read-edn-sequence ( stream end exemplar -- seq )
+    [
+        stream [
+            dup stream-read-edn1 {
+                { f [ edn-error ] }
+                { end [ f ] }
+                [ dupd stream-read-edn-object edn-check-eof , t ]
+            } case
+        ] loop
+    ] exemplar make nip ; inline
+
+: stream-read-edn-list ( stream -- vector )
+    CHAR: ) { } stream-read-edn-sequence ;
+
+: stream-read-edn-vector ( stream -- vector )
+    CHAR: ] V{ } stream-read-edn-sequence ;
+
+: stream-read-edn-set ( stream -- set )
+    CHAR: } { } stream-read-edn-sequence >hash-set ;
+
+: stream-read-edn-map ( stream -- vector )
+    [
+        [
+            dup stream-read-edn1 {
+                { f [ B edn-error ] }
+                { CHAR: , [ t ] }
+                { CHAR: } [ f ] }
+                [
+                    dupd stream-read-edn-object edn-check-eof
+                    [ dup stream-read-edn ] dip ,, t
+                ]
+            } case
+        ] loop
+    ] LH{ } make nip ;
+
+: stream-read-edn-ident ( stream -- object )
+    dup stream-read-edn1 {
+        { f [ edn-error ] }
+        { CHAR: _ [ dup stream-read-edn drop stream-read-edn ] }
+        { CHAR: { [ stream-read-edn-set ] }
+        [
+            [ [ stream-read-token ] [ stream-read-edn ] bi ] dip
+            swap [ prefix ] dip tagged boa
+        ]
+    } case ;
+
+: stream-read-edn-object ( stream elt -- object/f )
+    {
+        { f [ drop edn-eof ] }
+        { CHAR: : [ stream-read-edn-keyword ] }
+        { CHAR: # [ stream-read-edn-ident ] }
+        { CHAR: { [ stream-read-edn-map ] }
+        { CHAR: ( [ stream-read-edn-list ] }
+        { CHAR: [ [ stream-read-edn-vector ] }
+        { CHAR: ; [ [ stream-readln drop ] [ stream-read-edn-unsafe ] bi ] }
+        { CHAR: \\ [ stream-read-edn-char ] }
+        { CHAR: \" [ stream-read-edn-string ] }
+        { CHAR: \s [ stream-read-edn-unsafe ] }
+        { CHAR: \t [ stream-read-edn-unsafe ] }
+        { CHAR: \r [ stream-read-edn-unsafe ] }
+        { CHAR: \n [ stream-read-edn-unsafe ] }
+        { CHAR: n [ "il" swap edn-expect null ] }
+        { CHAR: t [ "rue" swap edn-expect t ] }
+        { CHAR: f [ "alse" swap edn-expect f ] }
+        [
+            [ stream-read-token ] dip
+            [ prefix ] [ digit? ] bi
+            [ edn-number ] [ symbol boa ] if
+        ]
+    } case ;
 
 PRIVATE>
 
-: edn> ( string -- object )
-    values-parser parse-fully ;
+: stream-read-edn ( stream -- object )
+    stream-read-edn-unsafe edn-check-eof ;
+
+: read-edn ( -- object )
+    input-stream get stream-read-edn ;
+
+: stream-read-edns ( stream -- objects )
+    '[ _ stream-read-edn-unsafe dup edn-eof = not ] [ ] produce nip ;
+
+: read-edns ( -- objects )
+    input-stream get stream-read-edns ;
+
+: edn> ( string -- objects )
+    [ read-edns ] with-string-reader ;
 
 GENERIC: write-edn ( object -- )
 
+M: object write-edn edn-error ;
+
 M: word write-edn
-    dup null eq? [ drop "null" write ] [ call-next-method ] if ;
+    dup null eq? [ drop "nil" write ] [ name>> write ] if ;
 
 M: t write-edn drop "true" write ;
 
@@ -191,26 +172,32 @@ M: number write-edn >float number>string write ;
 
 M: string write-edn CHAR: \" write1 write CHAR: \" write1 ;
 
+M: sequence write-edn
+    "(" write [ bl ] [ write-edn ] interleave ")" write ;
+
 M: assoc write-edn
     "{" write >alist
     [ ", " write ]
     [ first2 [ write-edn CHAR: \s write1 ] [ write-edn ] bi* ] interleave
     "}" write ;
 
-M: set write-edn
+M: sets:set write-edn
     "#{" write members [ bl ] [ write-edn ] interleave "}" write ;
 
 M: vector write-edn
     "[" write [ bl ] [ write-edn ] interleave "]" write ;
 
-M: sequence write-edn
-    "(" write [ bl ] [ write-edn ] interleave ")" write ;
-
 M: keyword write-edn CHAR: : write1 name>> write ;
 
 M: symbol write-edn name>> write ;
 
-M: tagged write-edn [ name>> write-edn bl ] [ value>> write-edn ] bi ;
+M: tagged write-edn
+    [ CHAR: # write1 name>> write bl ] [ value>> write-edn ] bi ;
+
+M: tuple write-edn
+    tuple>slots
+    [ [ vocabulary>> ] [ name>> ] bi "/" glue CHAR: # write1 write bl ]
+    [ all-slots [ name>> ] map swap LH{ } zip-as write-edn ] bi ;
 
 : write-edns ( objects -- )
     [ nl ] [ write-edn ] interleave ;
