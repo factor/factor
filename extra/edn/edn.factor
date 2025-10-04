@@ -1,9 +1,9 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: arrays combinators hash-sets hashtables kernel make math
-math.parser peg peg.parsers sequences splitting strings
-strings.parser unicode vectors ;
+USING: accessors arrays assocs combinators hash-sets hashtables
+kernel make math math.parser peg peg.parsers sequences sets
+splitting strings strings.parser unicode vectors words ;
 
 IN: edn
 
@@ -174,3 +174,18 @@ PRIVATE>
 
 : edn> ( string -- object )
     values-parser parse-fully ;
+
+GENERIC: >edn ( object -- string )
+
+M: word >edn dup null eq? [ drop "null" ] [ call-next-method ] if ;
+M: t >edn drop "true" ;
+M: f >edn drop "false" ;
+M: integer >edn number>string ;
+M: number >edn >float number>string ;
+M: string >edn "\"" dup surround ;
+M: assoc >edn [ [ >edn ] bi@ " " glue ] { } assoc>map ", " join "{" "}" surround ;
+M: set >edn members [ >edn ] map " " join "#{" "}" surround ;
+M: sequence >edn [ >edn ] map " " join "(" ")" surround ;
+M: keyword >edn name>> ":" prepend ;
+M: symbol >edn name>> ;
+M: tagged >edn [ name>> ] [ value>> >edn ] bi " " glue ;
