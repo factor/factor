@@ -185,6 +185,7 @@ M: number >edn >float number>string ;
 M: string >edn "\"" dup surround ;
 M: assoc >edn [ [ >edn ] bi@ " " glue ] { } assoc>map ", " join "{" "}" surround ;
 M: set >edn members [ >edn ] map " " join "#{" "}" surround ;
+M: vector >edn [ >edn ] map " " join "[" "]" surround ;
 M: sequence >edn [ >edn ] map " " join "(" ")" surround ;
 M: keyword >edn name>> ":" prepend ;
 M: symbol >edn name>> ;
