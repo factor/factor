@@ -31,7 +31,7 @@ USING: edn kernel multiline tools.test ;
             T{ keyword { name "gelato" } }
             1
             2
-            T{ symbol { name "-2" } }
+            -2
         }
         H{
             { T{ keyword { name "butter" } } 1 }

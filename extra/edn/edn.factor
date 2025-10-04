@@ -1,9 +1,10 @@
 ! Copyright (C) 2025 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays assocs combinators hash-sets hashtables
-kernel make math math.parser peg peg.parsers sequences sets
-splitting strings strings.parser unicode vectors words ;
+USING: accessors arrays ascii assocs combinators hash-sets
+hashtables io io.streams.string kernel make math math.parser peg
+peg.parsers sequences sets splitting strings strings.parser
+vectors words ;
 
 IN: edn
 
@@ -154,16 +155,16 @@ DEFER: value-parser
             boolean-parser ,
             string-parser ,
             keyword-parser ,
-            symbol-parser ,
             string-parser ,
             char-parser ,
-            float-parser ,
-            int-parser ,
             list-parser ,
             vector-parser ,
             map-parser ,
             set-parser ,
             tagged-parser ,
+            float-parser ,
+            int-parser ,
+            symbol-parser ,
         ] choice*
     ] delay ;
 
@@ -175,18 +176,44 @@ PRIVATE>
 : edn> ( string -- object )
     values-parser parse-fully ;
 
-GENERIC: >edn ( object -- string )
+GENERIC: write-edn ( object -- )
 
-M: word >edn dup null eq? [ drop "null" ] [ call-next-method ] if ;
-M: t >edn drop "true" ;
-M: f >edn drop "false" ;
-M: integer >edn number>string ;
-M: number >edn >float number>string ;
-M: string >edn "\"" dup surround ;
-M: assoc >edn [ [ >edn ] bi@ " " glue ] { } assoc>map ", " join "{" "}" surround ;
-M: set >edn members [ >edn ] map " " join "#{" "}" surround ;
-M: vector >edn [ >edn ] map " " join "[" "]" surround ;
-M: sequence >edn [ >edn ] map " " join "(" ")" surround ;
-M: keyword >edn name>> ":" prepend ;
-M: symbol >edn name>> ;
-M: tagged >edn [ name>> ] [ value>> >edn ] bi " " glue ;
+M: word write-edn
+    dup null eq? [ drop "null" write ] [ call-next-method ] if ;
+
+M: t write-edn drop "true" write ;
+
+M: f write-edn drop "false" write ;
+
+M: integer write-edn number>string write ;
+
+M: number write-edn >float number>string write ;
+
+M: string write-edn CHAR: \" write1 write CHAR: \" write1 ;
+
+M: assoc write-edn
+    "{" write >alist
+    [ ", " write ]
+    [ first2 [ write-edn CHAR: \s write1 ] [ write-edn ] bi* ] interleave
+    "}" write ;
+
+M: set write-edn
+    "#{" write members [ bl ] [ write-edn ] interleave "}" write ;
+
+M: vector write-edn
+    "[" write [ bl ] [ write-edn ] interleave "]" write ;
+
+M: sequence write-edn
+    "(" write [ bl ] [ write-edn ] interleave ")" write ;
+
+M: keyword write-edn CHAR: : write1 name>> write ;
+
+M: symbol write-edn name>> write ;
+
+M: tagged write-edn [ name>> write-edn bl ] [ value>> write-edn ] bi ;
+
+: write-edns ( objects -- )
+    [ nl ] [ write-edn ] interleave ;
+
+: >edn ( object -- string )
+    [ write-edn ] with-string-writer ;
