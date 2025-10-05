@@ -31,7 +31,7 @@ USING: edn kernel linked-assocs multiline sequences tools.test ;
             T{ keyword { name "gelato" } }
             1
             2
-            T{ symbol { name "-2" } }
+            -2
         }
         LH{
             { T{ keyword { name "eggs" } } 2 }

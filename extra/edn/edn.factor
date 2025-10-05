@@ -133,7 +133,7 @@ DEFER: stream-read-edn-object
         { CHAR: f [ "alse" swap edn-expect f ] }
         [
             [ stream-read-token ] dip
-            [ prefix ] [ digit? ] bi
+            [ prefix ] [ [ digit? ] [ "+-" member? ] bi or ] bi
             [ edn-number ] [ symbol boa ] if
         ]
     } case ;
@@ -197,7 +197,7 @@ M: tagged write-edn
 M: tuple write-edn
     tuple>slots
     [ [ vocabulary>> ] [ name>> ] bi "/" glue CHAR: # write1 write bl ]
-    [ all-slots [ name>> ] map swap LH{ } zip-as write-edn ] bi ;
+    [ all-slots [ name>> keyword boa ] map swap LH{ } zip-as write-edn ] bi ;
 
 : write-edns ( objects -- )
     [ nl ] [ write-edn ] interleave ;
