@@ -612,12 +612,14 @@ prettyprint ranges sequences sequences.extras strings tools.test
 { { "asdf" } } [ { t "asdf" 5 } [ string>number ] reject-errors ] unit-test
 
 { t } [ { } [ ] all-same? ] unit-test
-{ f } [ { 1 } [ drop f ] all-same? ] unit-test
-{ f } [ { 1 2 } [ drop f ] all-same? ] unit-test
+{ t } [ { 1 } [ drop f ] all-same? ] unit-test
+{ t } [ { 1 2 } [ drop f ] all-same? ] unit-test
 { t } [ { 1 } [ ] all-same? ] unit-test
 { t } [ { 1 1 } [ ] all-same? ] unit-test
 { f } [ { 1 2 } [ ] all-same? ] unit-test
-{ 3 } [
+{ t } [ { 1 3 5 7 } [ odd? ] all-same? ] unit-test
+{ t } [ { 1 3 5 7 } [ even? ] all-same? ] unit-test
+{ 4 } [
     { { 1 3 } { -1 -3 } { 0 1 } { -1 1 } { 10 } { } }
     [ [ { [ abs 1 3 between? ] [ sgn ] } 1&& ] all-same? ] count
 ] unit-test

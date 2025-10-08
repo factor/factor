@@ -1295,7 +1295,13 @@ INSTANCE: virtual-zip-index immutable-sequence
 :: all-same? ( seq quot: ( elt -- obj/f ) -- ? )
     seq [ t ] [
         unclip-slice quot call
-        [ '[ quot call _ = ] all? ] [ drop f ] if*
+        '[ quot call _ = ] all?
+    ] if-empty ; inline
+
+:: all-same-eq? ( seq quot: ( elt -- obj/f ) -- ? )
+    seq [ t ] [
+        unclip-slice quot call
+        '[ quot call _ = ] all-eq?
     ] if-empty ; inline
 
 : adjacent-differences ( seq -- seq' )
