@@ -17,6 +17,8 @@ PRIMITIVE: fwrite ( data length alien -- )
 
 TUPLE: c-stream < disposable handle ;
 
+! XXX: M: c-stream stream-seekable?
+
 : new-c-stream ( handle class -- c-stream )
     new-disposable swap >>handle ; inline
 
