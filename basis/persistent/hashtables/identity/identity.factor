@@ -38,7 +38,8 @@ SYNTAX: IPH{ \ } [ >id-persistent-hash ] parse-literal ;
 
 M: id-persistent-hash pprint-delims drop \ IPH{ \ } ;
 M: id-persistent-hash >pprint-sequence >alist ;
-M: id-persistent-hash pprint* pprint-object ;
+M: id-persistent-hash pprint*
+    [ pprint-object ] with-extra-nesting-level ;
 
 ! XXX duplicate code from persistent.hashtables
 : id-passociate ( value key -- iphash )

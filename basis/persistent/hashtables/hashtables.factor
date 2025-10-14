@@ -58,7 +58,8 @@ SYNTAX: PH{ \ } [ >persistent-hash ] parse-literal ;
 
 M: persistent-hash pprint-delims drop \ PH{ \ } ;
 M: persistent-hash >pprint-sequence >alist ;
-M: persistent-hash pprint* pprint-object ;
+M: persistent-hash pprint*
+    [ pprint-object ] with-extra-nesting-level ;
 
 : passociate ( value key -- phash )
     T{ persistent-hash } new-at ; inline
