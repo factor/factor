@@ -131,6 +131,8 @@ M: unix io-multiplex
 ! threading support at the language level.
 TUPLE: stdin < disposable control size data ;
 
+M: stdin fd>> data>> fd>> ;
+
 M: stdin dispose*
     [
         [ control>> &dispose drop ]
