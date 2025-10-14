@@ -84,6 +84,8 @@ void* factor_vm::alien_pointer() {
 
 // Helper functions for unaligned memory access that keep the previous crash
 // behaviour for nullptr pointers while satisfying sanitizers.
+// Use slow byte-by-byte copy only when sanitizers are enabled for correctness;
+// in release builds use fast direct memory access for performance.
 template<typename T>
 static inline T unaligned_read(const void* ptr) {
   if (!ptr) {
@@ -98,10 +100,16 @@ static inline T unaligned_read(const void* ptr) {
 #endif
     return crash;
   }
+#if defined(FACTOR_WITH_ADDRESS_SANITIZER) || defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_UNDEFINED__)
+  // Slow path for sanitizers: byte-by-byte copy to avoid unaligned access warnings
   const auto* bytes = reinterpret_cast<const std::byte*>(ptr);
   std::array<std::byte, sizeof(T)> buffer{};
   std::copy_n(bytes, buffer.size(), buffer.data());
   return std::bit_cast<T>(buffer);
+#else
+  // Fast path for release builds: direct memory access
+  return *reinterpret_cast<const T*>(ptr);
+#endif
 }
 
 template<typename T>
@@ -118,8 +126,14 @@ static inline void unaligned_write(void* ptr, T value) {
 #endif
     return;
   }
+#if defined(FACTOR_WITH_ADDRESS_SANITIZER) || defined(__SANITIZE_ADDRESS__) || defined(__SANITIZE_UNDEFINED__)
+  // Slow path for sanitizers: byte-by-byte copy to avoid unaligned access warnings
   auto bytes = std::bit_cast<std::array<std::byte, sizeof(T)>>(value);
   std::copy_n(bytes.data(), bytes.size(), reinterpret_cast<std::byte*>(ptr));
+#else
+  // Fast path for release builds: direct memory access
+  *reinterpret_cast<T*>(ptr) = value;
+#endif
 }
 
 // define words to read/write values at an alien address
