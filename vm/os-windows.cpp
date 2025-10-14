@@ -12,7 +12,19 @@ HMODULE hFactorDll;
 }
 
 [[nodiscard]] void* native_dlopen(const char* path) {
-  return LoadLibraryExA(path, nullptr, 0);
+  // Convert UTF-8 path to wide char for Unicode support
+  int size_needed = MultiByteToWideChar(CP_UTF8, 0, path, -1, nullptr, 0);
+  if (size_needed == 0) {
+    return nullptr;
+  }
+
+  auto wide_path = std::make_unique<wchar_t[]>(size_needed);
+  int result = MultiByteToWideChar(CP_UTF8, 0, path, -1, wide_path.get(), size_needed);
+  if (result == 0) {
+    return nullptr;
+  }
+
+  return LoadLibraryExW(wide_path.get(), nullptr, 0);
 }
 
 [[nodiscard]] void* native_dlsym(void* handle, const char* symbol) {
