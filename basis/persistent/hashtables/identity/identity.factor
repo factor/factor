@@ -1,5 +1,7 @@
-USING: accessors assocs combinators kernel math parser persistent.assocs
-persistent.hashtables persistent.hashtables.nodes prettyprint.custom ;
+USING: accessors assocs combinators kernel math parser
+persistent.assocs persistent.hashtables
+persistent.hashtables.nodes prettyprint.backend
+prettyprint.custom ;
 
 IN: persistent.hashtables.identity
 
