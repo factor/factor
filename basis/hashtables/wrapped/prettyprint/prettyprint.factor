@@ -7,5 +7,4 @@ prettyprint.config prettyprint.custom ;
 M: wrapped-hashtable >pprint-sequence >alist ;
 
 M: wrapped-hashtable pprint*
-    nesting-limit inc
-    [ pprint-object ] [ nesting-limit dec ] finally ;
+    [ pprint-object ] with-extra-nesting-limit ;
