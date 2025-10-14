@@ -62,7 +62,7 @@ GENERIC: replace-patterns ( object -- result )
 M: object replace-patterns ;
 M: match-var replace-patterns get ;
 M: sequence replace-patterns [ replace-patterns ] map ;
-M: tuple replace-patterns tuple>array replace-patterns >tuple ;
+M: tuple replace-patterns pack-tuple replace-patterns unpack-tuple ;
 
 : match-replace ( object pattern1 pattern2 -- result )
     [ match [ "Pattern does not match" throw ] unless* ] dip swap

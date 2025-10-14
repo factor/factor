@@ -13,7 +13,7 @@ ARTICLE: "slot-class-declaration" "Slot class declarations"
     { "The " { $link new } " word fills in slots with their initial values; the (per-class) initial values are required to satisfy the class predicate." }
     { "The " { $link boa } " word ensures that the values on the stack satisfy the class predicate." }
     { { $link "mirrors" } " ensure that the value passed to " { $link set-at } " satisfies the class predicate." }
-    { "The " { $link slots>tuple } " and " { $link >tuple } " words ensure that the values in the sequence satisfy the correct class predicates." }
+    { "The " { $link slots>tuple } " and " { $link unpack-tuple } " words ensure that the values in the sequence satisfy the correct class predicates." }
     { { $link "tuple-redefinition" } " fills in new slots with initial values and ensures that changes to existing declarations result in incompatible values being replaced with the initial value of their respective slots." }
 }
 { $subsections "slot-class-coercion" }
@@ -198,8 +198,8 @@ $nl
 ARTICLE: "tuple-introspection" "Tuple introspection"
 "In addition to the slot reader and writer words which " { $link POSTPONE: TUPLE: } " defines for every tuple class, it is possible to construct and take apart entire tuples in a generic way."
 { $subsections
-    >tuple
-    tuple>array
+    pack-tuple
+    unpack-tuple
     tuple-slots
     slots>tuple
 }
@@ -383,10 +383,7 @@ HELP: tuple-slots
 { $values { "tuple" tuple } { "seq" sequence } }
 { $description "Pushes a sequence of tuple slot values, not including the tuple class word." } ;
 
-{ tuple-slots tuple>array } related-words
-
-HELP: define-tuple-slots
-{ $values { "class" tuple-class } }
+HELP: define-tuple-slots { $values { "class" tuple-class } }
 { $description "Defines slot accessor and mutator words for the tuple." }
 $low-level-note ;
 
@@ -398,7 +395,7 @@ HELP: define-tuple-class
 
 { tuple-class define-tuple-class POSTPONE: TUPLE: } related-words
 
-HELP: >tuple
+HELP: unpack-tuple
 { $values { "seq" sequence } { "tuple" tuple } }
 { $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word and the remainder the declared slots."
 $nl
@@ -411,9 +408,11 @@ $nl
     }
 } ;
 
-HELP: tuple>array
+HELP: pack-tuple
 { $values { "tuple" tuple } { "array" array } }
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
+
+{ tuple-slots slots>tuple pack-tuple unpack-tuple } related-words
 
 HELP: initial-values
 { $values { "class" class } { "seq" sequence } }

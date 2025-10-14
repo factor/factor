@@ -110,10 +110,10 @@ M: tuple-class slots>tuple
 : tuple>slots ( tuple -- seq class )
     [ tuple-slots ] [ class-of ] bi ;
 
-: tuple>array ( tuple -- array )
+: pack-tuple ( tuple -- array )
     tuple>slots prefix ;
 
-: >tuple ( seq -- tuple )
+: unpack-tuple ( seq -- tuple )
     unclip slots>tuple ;
 
 ERROR: bad-superclass class ;

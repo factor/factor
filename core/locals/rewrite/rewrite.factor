@@ -42,7 +42,7 @@ M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
 
 M: hashtable rewrite-literal? >alist rewrite-literal? ;
 
-M: tuple rewrite-literal? tuple>array rewrite-literal? ;
+M: tuple rewrite-literal? pack-tuple rewrite-literal? ;
 
 M: object rewrite-literal? drop f ;
 

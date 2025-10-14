@@ -39,7 +39,7 @@ M: sequence fuel-pprint "(" ")" fuel-pprint-sequence ; inline
 
 M: quotation fuel-pprint "[" "]" fuel-pprint-sequence ; inline
 
-M: tuple fuel-pprint tuple>array fuel-pprint ; inline
+M: tuple fuel-pprint pack-tuple fuel-pprint ; inline
 
 M: continuation fuel-pprint drop ":continuation" write ; inline
 
