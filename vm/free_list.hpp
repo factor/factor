@@ -42,7 +42,7 @@ template <typename Block> struct free_list_allocator {
 
   // Stores the free blocks
   std::array<std::vector<free_heap_block*>, free_list_count> small_blocks;
-  std::multimap<cell, free_heap_block*> large_blocks;
+  std::multiset<free_heap_block*, block_size_compare> large_blocks;
   cell free_block_count;
   cell free_space;
 
@@ -101,7 +101,7 @@ void free_list_allocator<Block>::add_to_free_list(free_heap_block* block) {
   if (block_size < free_list_count * data_alignment)
     small_blocks[block_size / data_alignment].push_back(block);
   else
-    large_blocks.emplace(block_size, block);
+    large_blocks.insert(block);
 }
 
 template <typename Block>
@@ -188,10 +188,12 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
     return block;
   } else {
     // Check large free list
-    auto iter = large_blocks.lower_bound(requested_size);
+    free_heap_block key;
+    key.make_free(requested_size);
+    auto iter = large_blocks.lower_bound(&key);
 
     if (iter != large_blocks.end()) {
-      auto [block_size, block] = *iter;
+      free_heap_block* block = *iter;
       large_blocks.erase(iter);
 
       free_block_count--;
@@ -232,7 +234,7 @@ cell free_list_allocator<Block>::occupied_space() {
 template <typename Block>
 cell free_list_allocator<Block>::largest_free_block() {
   if (!large_blocks.empty()) {
-    return large_blocks.rbegin()->first;
+    return (*large_blocks.rbegin())->size();
   } else {
     for (auto& blocks : small_blocks | std::views::reverse) {
       if (!blocks.empty())
