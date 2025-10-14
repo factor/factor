@@ -1,11 +1,30 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search classes classes.struct
-combinators combinators.smart continuations fry grouping hashtables
-hints io io.styles kernel layouts literals math math.order math.parser
+USING: accessors arrays assocs binary-search classes
+classes.struct classes.tuple combinators combinators.smart
+continuations grouping hash-sets.identity hashtables hints io
+io.styles kernel layouts literals math math.order math.parser
 math.statistics memory namespaces prettyprint sequences
-sequences.generalizations sorting vm ;
+sequences.generalizations slots.private sorting vm ;
+FROM: sets => ?adjoin ;
+FROM: sequences.private => nth-unsafe ;
 IN: tools.memory
+
+
+<PRIVATE
+
+SYMBOL: visited
+
+: total-size+ ( m object -- n )
+    dup visited get ?adjoin [
+        [ size + ]
+        [ dup class-of all-slots [ offset>> slot total-size+ ] with each ] bi
+    ] [ drop ] if ;
+
+PRIVATE>
+
+: total-size ( object -- n )
+    IHS{ } clone visited [ 0 swap total-size+ ] with-variable ;
 
 <PRIVATE
 PRIMITIVE: (callback-room) ( -- allocator-room )
@@ -247,8 +266,6 @@ HINTS: (lookup-return-address) code-blocks ;
 PRIVATE>
 
 M: code-blocks length blocks>> length ; inline
-
-FROM: sequences.private => nth-unsafe ;
 
 M: code-blocks nth-unsafe
     [ cache>> ] [ blocks>> ] bi

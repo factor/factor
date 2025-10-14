@@ -21,3 +21,5 @@ tools.memory tools.memory.private tools.test tools.time vm ;
     [ CODE-BLOCK-OPTIMIZED of 0 > ]
     [ CODE-BLOCK-PIC of 0 > ] tri
 ] unit-test
+
+{ 80 } [ "hello \u{snowman}" total-size ] unit-test
