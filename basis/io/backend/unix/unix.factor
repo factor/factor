@@ -59,7 +59,7 @@ M: unix seek-handle
     [ fd>> swap ] dip [ lseek ] unix-system-call drop ;
 
 M: unix can-seek-handle?
-    fd>> SEEK_CUR 0 lseek -1 = not ;
+    fd>> 0 SEEK_CUR lseek -1 = not ;
 
 M: unix handle-length
     fd>> \ stat new [ fstat -1 = not ] keep
