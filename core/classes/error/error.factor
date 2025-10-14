@@ -1,7 +1,7 @@
 ! Copyright (C) 2015 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: classes.private classes.tuple classes.tuple.private
-combinators kernel words ;
+USING: classes classes.private classes.tuple
+classes.tuple.private combinators kernel words ;
 IN: classes.error
 
 PREDICATE: error-class < tuple-class
@@ -23,3 +23,5 @@ M: error-class reset-class
             tri define-declared
         ]
     } 3cleave ;
+
+PREDICATE: error-tuple < tuple class-of error-class? ;
