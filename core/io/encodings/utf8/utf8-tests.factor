@@ -1,5 +1,5 @@
-USING: arrays io.encodings.string io.encodings.utf8 kernel
-sequences strings tools.test ;
+USING: arrays io io.encodings.string io.encodings.utf8
+io.streams.byte-array kernel sequences strings tools.test ;
 IN: io.encodings.utf8.tests
 
 : decode-utf8-w/stream ( array -- newarray )
@@ -41,3 +41,8 @@ IN: io.encodings.utf8.tests
 { { CHAR: replacement-character } } [ { 0b11110,100 0b10,010000 0b10,000000 0b10,000000 } decode-utf8-w/stream ] unit-test
 { { 0x10000 } } [ { 0b11110,000 0b10,010000 0b10,000000 0b10,000000 } decode-utf8-w/stream ] unit-test
 { { 0x10FFFF } } [ { 0b11110,100 0b10,001111 0b10,111111 0b10,111111 } decode-utf8-w/stream ] unit-test
+
+! test BOM skipping
+{ "abc" } [
+    B{ 0xef 0xbb 0xbf 0x61 0x62 0x63 } utf8 [ readln ] with-byte-reader
+] unit-test

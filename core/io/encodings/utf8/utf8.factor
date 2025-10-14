@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators combinators.short-circuit io
-io.encodings io.encodings.private kernel math math.order
-sequences strings ;
+USING: accessors combinators io io.encodings
+io.encodings.private kernel math math.order sequences strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -89,11 +88,13 @@ M: utf8 encode-char
 ! present on some files because of Microsoft conventions...
 :: ?skip-bom ( stream -- )
     stream stream-seekable? [
-        stream stream-tell {
-            [ stream stream-read1 0xef = ]
-            [ stream stream-read1 0xbb = ]
-            [ stream stream-read1 0xbf = ]
-        } 0&& [ drop ] [ seek-absolute stream stream-seek ] if
+        stream stream-tell
+        stream stream-read1 0xef = [
+            stream stream-read1 0xbb = [
+                stream stream-read1 0xbf =
+            ] [ f ] if
+        ] [ f ] if
+        [ drop ] [ seek-absolute stream stream-seek ] if
     ] when ;
 
 M: utf8 <decoder> over ?skip-bom call-next-method ;
