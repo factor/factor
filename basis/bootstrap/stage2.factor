@@ -38,7 +38,7 @@ SYMBOL: bootstrap-time
 
 : print-report ( -- )
     "Core bootstrap completed in " write core-bootstrap-time get print-time
-    "Total bootstrap completed in " write bootstrap-time get print-time
+    "User bootstrap completed in " write bootstrap-time get print-time
 
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
