@@ -36,7 +36,8 @@ SYNTAX: eval( \ eval parse-call-paren ;
 : (eval-with-stack>string) ( str -- output )
     [
         parser-quiet? on
-        [ (eval-with-stack) ] [ nip print-error ] recover
+        [ [ (eval-with-stack) ] with-error>output ]
+        [ nip print-error ] recover
     ] with-string-writer ;
 
 : eval-with-stack>string ( str -- output )
