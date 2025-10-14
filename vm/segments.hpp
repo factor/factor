@@ -1,9 +1,19 @@
 namespace factor {
 
+// Guard pages protect against buffer overflows in segments.
+// With ASAN, more guard pages provide better debugging, but on 32-bit
+// systems we must balance this against limited address space (4GB total).
 #if defined(FACTOR_WITH_ADDRESS_SANITIZER)
-static const int segment_guard_pages = 16;
+  #if defined(FACTOR_64)
+    // 64-bit with ASAN: plenty of address space, use large guards
+    static const int segment_guard_pages = 16;
+  #else
+    // 32-bit with ASAN: limited address space, use moderate guards
+    static const int segment_guard_pages = 4;
+  #endif
 #else
-static const int segment_guard_pages = 1;
+  // No ASAN: minimal overhead
+  static const int segment_guard_pages = 1;
 #endif
 
 inline cell align_page(cell a) { return align(a, getpagesize()); }
