@@ -2,7 +2,7 @@
 
 USING: accessors assocs combinators kernel make math
 parser persistent.assocs persistent.hashtables.nodes
-prettyprint.custom ;
+prettyprint.backend prettyprint.custom ;
 
 ! Use these explicitly because they define needed methods which are not loaded
 ! otherwise
