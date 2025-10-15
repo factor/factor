@@ -12,8 +12,8 @@ array* factor_vm::allot_array(cell capacity, cell fill_) {
 
 // Allocates memory
 void factor_vm::primitive_array() {
-  cell fill = ctx->pop();
-  cell capacity = unbox_array_size();
+  const cell fill = ctx->pop();
+  const cell capacity = unbox_array_size();
   array* new_array = allot_array(capacity, fill);
   ctx->push(tag<array>(new_array));
 }
@@ -36,31 +36,30 @@ cell factor_vm::allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_) {
 void factor_vm::primitive_resize_array() {
   data_root<array> a(ctx->pop(), this);
   check_tagged(a);
-  cell capacity = unbox_array_size();
+  const cell capacity = unbox_array_size();
   ctx->push(tag<array>(reallot_array(a.untagged(), capacity)));
 }
 
 // Allocates memory
 cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
 
-  cell element_count = elements.size();
-  cell orig_size = data_roots.size();
+  const cell element_count = elements.size();
+  const cell orig_size = data_roots.size();
   data_roots.reserve(orig_size + element_count);
 
-  for (cell n = 0; n < element_count; n++) {
-    data_roots.push_back(&elements[n]);
-  }
+  for (cell& element : elements)
+    data_roots.push_back(&element);
 
   tagged<array> objects(allot_uninitialized_array<array>(element_count));
-  memcpy(objects->data(), &elements[0], element_count * sizeof(cell));
+  std::copy(elements.begin(), elements.end(), objects->data());
   data_roots.resize(orig_size);
   return objects.value();
 }
 
 // Allocates memory
-void growable_array::reallot_array(cell count) {
+void growable_array::reallot_array(cell new_capacity) {
   array *a_old = elements.untagged();
-  array *a_new = elements.parent->reallot_array(a_old, count);
+  array *a_new = elements.parent->reallot_array(a_old, new_capacity);
   elements.set_untagged(a_new);
 }
 
@@ -83,9 +82,10 @@ void growable_array::append(array* elts_) {
     reallot_array(2 * (count + capacity));
   }
 
-  for (cell index = 0; index < capacity; index++)
-    parent->set_array_nth(elements.untagged(), count++,
-                          array_nth(elts.untagged(), index));
+  const std::span<const cell> source(elts.untagged()->data(),
+                                     static_cast<size_t>(capacity));
+  for (cell value : source)
+    parent->set_array_nth(elements.untagged(), count++, value);
 }
 
 // Allocates memory

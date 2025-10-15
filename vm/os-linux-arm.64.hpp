@@ -8,9 +8,9 @@ namespace factor {
   (ctx->callstack_seg->end - sizeof(cell) * 6)
 
 #define UAP_STACK_POINTER(ucontext) \
-  (((ucontext_t*)ucontext)->uc_mcontext.sp)
+  (static_cast<ucontext_t*>(ucontext)->uc_mcontext.sp)
 #define UAP_PROGRAM_COUNTER(ucontext) \
-  (((ucontext_t*)ucontext)->uc_mcontext.pc)
+  (static_cast<ucontext_t*>(ucontext)->uc_mcontext.pc)
 
 inline static unsigned int uap_fpu_status(void* uap) {
   (void)uap;

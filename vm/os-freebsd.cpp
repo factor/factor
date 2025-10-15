@@ -23,20 +23,20 @@ const char *vm_executable_path()
     mib[1] = KERN_PROC;
     mib[2] = KERN_PROC_PATHNAME;
     mib[3] = -1;
-    if (sysctl(mib, 4, &path, &len, NULL, 0) != 0)
-      return NULL;
+    if (sysctl(mib, 4, &path, &len, nullptr, 0) != 0)
+      return nullptr;
   }
   else
   {
     int size;
     size = readlink("/proc/curproc/file", path, sizeof(path) - 1);
     if (size < 0)
-      return NULL;
+      return nullptr;
     path[size] = '\0';
   }
 
   if(strcmp(path, "unknown") == 0)
-    return NULL;
+    return nullptr;
 
   return safe_strdup(path);
 }

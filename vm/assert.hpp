@@ -1,4 +1,7 @@
-namespace factor { void abort(); }
+#include <source_location>
+#include <cstdio>
+
+namespace factor { [[noreturn]] void abort(); }
 
 #ifdef FACTOR_DEBUG
 #define FACTOR_ASSERT(condition)                                               \
