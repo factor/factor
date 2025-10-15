@@ -5,7 +5,6 @@ set +e
 
 # Case insensitive string comparison
 shopt -s nocaseglob
-#shopt -s nocasematch
 
 ECHO="echo"
 OS=
@@ -242,14 +241,14 @@ check_library_exists() {
     GCC_OUT=factor-library-test.out
     $ECHO -n "Checking for library $1..."
     $ECHO "int main(){return 0;}" > $GCC_TEST
-    if $CC $GCC_TEST -o $GCC_OUT -l "$1" 2>&- ; then
+    if $CC "$GCC_TEST" -o "$GCC_OUT" -l "$1" 2>&- ; then
         $ECHO "found."
     else
         $ECHO "not found."
     fi
-    rm -f $GCC_TEST
+    rm -f "$GCC_TEST"
     check_ret rm
-    rm -f $GCC_OUT
+    rm -f "$GCC_OUT"
     check_ret rm
 }
 
@@ -343,30 +342,30 @@ find_num_cores() {
     uname_s=$(uname -s)
     check_ret uname
     case $uname_s in
-        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32*) NUM_CORES=$NUMBER_OF_PROCESSORS ;;
-        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN || nproc) ;;
-        *darwin* | *Darwin* | freebsd) NUM_CORES=$(sysctl -n hw.ncpu) ;;
+        CYGWIN_NT-5.2-WOW64 | *CYGWIN_NT* | *CYGWIN* | MINGW32* | MINGW64* | MSYS_NT*) NUM_CORES=${NUMBER_OF_PROCESSORS:-1} ;;
+        *linux* | *Linux*) NUM_CORES=$(getconf _NPROCESSORS_ONLN 2>/dev/null || nproc 2>/dev/null || echo 1) ;;
+        *darwin* | *Darwin* | freebsd | FreeBSD) NUM_CORES=$(sysctl -n hw.ncpu 2>/dev/null || echo 1) ;;
     esac
 }
 
 find_word_size() {
     if [[ -n $WORD ]] ; then return; fi
     $ECHO "Finding WORD..."
-    WORD=$(getconf LONG_BIT || find_word_size_cpp || find_word_size_c)
+    WORD=$(getconf LONG_BIT 2>/dev/null || find_word_size_cpp || find_word_size_c)
 }
 
 find_word_size_cpp() {
     SIXTY_FOUR='defined(__aarch64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(__PPC64__) || defined(__64BIT__)'
-    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_MIX86)'
+    THIRTY_TWO='defined(i386) || defined(__i386) || defined(__i386__) || defined(_M_IX86)'
     $CC -E -xc <(echo -e "#if ${SIXTY_FOUR}\n64\n#elif ${THIRTY_TWO}\n32\n#endif") | tail -1
 }
 
 find_word_size_c() {
     C_WORD="factor-word-size"
     TEST_PROGRAM="int main(){ return (long)(8*sizeof(void*)); }"
-    echo "$TEST_PROGRAM" | $CC -o $C_WORD -xc -
+    echo "$TEST_PROGRAM" | $CC -o "$C_WORD" -xc -
     check_ret "$CC"
-    ./$C_WORD
+    ./"$C_WORD"
     WORD_OUT=$?
     case $WORD_OUT in
         32) ;;
@@ -375,7 +374,7 @@ find_word_size_c() {
             echo "Word size should be 32/64, got '$WORD_OUT'"
             exit_script 15 ;;
     esac
-    rm -f $C_WORD
+    rm -f "$C_WORD"
     echo "$WORD_OUT"
 }
 
@@ -543,7 +542,7 @@ git_fetch() {
 }
 
 cd_factor() {
-    cd "factor" || exit 12
+    cd "factor"
     check_ret cd
 }
 
@@ -574,7 +573,7 @@ invoke_make() {
     else
         "$MAKE" "$@"
     fi
-    check_ret $MAKE
+    check_ret "$MAKE"
 }
 
 make_clean() {
@@ -634,7 +633,8 @@ set_current_branch() {
         CURRENT_BRANCH="${CI_BRANCH}"
     else
         CURRENT_BRANCH_FULL=$(current_git_branch)
-        CURRENT_BRANCH=$($ECHO "$CURRENT_BRANCH_FULL" | sed 's=heads/==;s=remotes/==')
+        CURRENT_BRANCH=${CURRENT_BRANCH_FULL#heads/}
+        CURRENT_BRANCH=${CURRENT_BRANCH#remotes/}
     fi
 }
 
@@ -647,7 +647,7 @@ update_boot_image() {
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url "$CHECKSUM_URL"
         local factorcode_md5
-        factorcode_md5=$(grep "$BOOT_IMAGE" checksums.txt | cut -f2 -d' ')
+        factorcode_md5=$(grep "^$BOOT_IMAGE" checksums.txt | cut -f2 -d' ')
         set_md5sum
         local disk_md5
         disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
@@ -702,7 +702,7 @@ info_boot_image() {
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url "$CHECKSUM_URL"
         local factorcode_md5
-        factorcode_md5=$(grep "$BOOT_IMAGE" checksums.txt | cut -f2 -d' ')
+        factorcode_md5=$(grep "^$BOOT_IMAGE" checksums.txt | cut -f2 -d' ')
         set_md5sum
         local disk_md5
         disk_md5=$($MD5SUM "$BOOT_IMAGE" | cut -f1 -d' ')
@@ -728,7 +728,7 @@ info_check_factor_refresh_all_locally() {
 }
 
 bootstrap() {
-    ./$FACTOR_BINARY -i="$BOOT_IMAGE"
+    "./$FACTOR_BINARY" -i="$BOOT_IMAGE"
     check_ret "./$FACTOR_BINARY bootstrap failed"
     copy_fresh_image
 }
@@ -763,12 +763,12 @@ net_bootstrap_no_pull() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save quit"
+    "./$FACTOR_BINARY" -e="USING: vocabs.loader vocabs.refresh system memory ; refresh-all save quit"
     check_ret factor
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
+    "./$FACTOR_BINARY" -run="bootstrap.image" "$MAKE_IMAGE_TARGET"
     check_ret factor
 }
 
@@ -798,8 +798,7 @@ install_deps_apk() {
 
 
 install_deps_macos() {
-    if test_program_installed git; then
-        ensure_program_installed yes
+    if ! test_program_installed git; then
         $ECHO "git not found."
         $ECHO "This script requires either git-core or port."
         $ECHO "If it fails, install git-core or port and try again."
