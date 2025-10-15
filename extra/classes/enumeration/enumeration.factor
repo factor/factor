@@ -139,6 +139,7 @@ M: enumeration-class see-class*
 
 M: enumeration-member-word see*
     [
+        dup seeing-word
         <colon \ ENUMERATION: pprint-word {
             [ "parent-enum" word-prop pprint-word ]
             [ "parent-enum" word-prop superclass-of dup fixnum eq? [ drop ] [ "<" text pprint-word ] if ]
