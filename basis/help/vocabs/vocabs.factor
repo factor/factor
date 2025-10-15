@@ -138,6 +138,18 @@ C: <vocab-author> vocab-author
 : describe-intersection-classes ( classes -- )
     "Intersection classes" (describe-classes) ;
 
+: describe-other-classes ( classes -- )
+    [
+        "Other classes" $subheading
+        [
+            [ <$pretty-link> ]
+            [ "metaclass" word-prop <$pretty-link> ]
+            bi 2array
+        ] map
+        { { $strong "Class" } { $strong "Class type" } } prefix
+        $table
+    ] unless-empty ;
+
 : describe-classes ( classes -- )
     [ builtin-class? ] partition
     [ tuple-class? ] partition
@@ -145,7 +157,7 @@ C: <vocab-author> vocab-author
     [ predicate-class? ] partition
     [ mixin-class? ] partition
     [ union-class? ] partition
-    [ intersection-class? ] filter
+    [ intersection-class? ] partition
     {
         [ describe-builtin-classes ]
         [ describe-tuple-classes ]
@@ -154,6 +166,7 @@ C: <vocab-author> vocab-author
         [ describe-mixin-classes ]
         [ describe-union-classes ]
         [ describe-intersection-classes ]
+        [ describe-other-classes ]
     } spread ;
 
 : word-syntax ( word -- string/f )
