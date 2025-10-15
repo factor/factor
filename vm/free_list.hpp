@@ -88,7 +88,7 @@ void free_list_allocator<Block>::clear_free_list() {
 template <typename Block>
 void free_list_allocator<Block>::add_to_free_list(free_heap_block* block) {
 #ifdef FACTOR_DEBUG
-  cell addr = cell_from_ptr(block);
+  cell addr = reinterpret_cast<cell>(block);
   FACTOR_ASSERT(addr >= start);
   FACTOR_ASSERT(addr + block->size() <= end);
   FACTOR_ASSERT(block->free_p());
@@ -109,7 +109,7 @@ void free_list_allocator<Block>::initial_free_list(cell occupied) {
   clear_free_list();
   if (occupied != end - start) {
     free_heap_block* last_block = reinterpret_cast<free_heap_block*>(start + occupied);
-    last_block->make_free(end - cell_from_ptr(last_block));
+    last_block->make_free(end - reinterpret_cast<cell>(last_block));
     add_to_free_list(last_block);
   }
 }
@@ -125,7 +125,7 @@ free_list_allocator<Block>::free_list_allocator(cell size_, cell start_)
 
 template <typename Block>
 bool free_list_allocator<Block>::contains_p(Block* block) {
-  return (cell_from_ptr(block) - start) < size;
+  return (reinterpret_cast<cell>(block) - start) < size;
 }
 
 template <typename Block>
@@ -140,7 +140,7 @@ free_heap_block* free_list_allocator<Block>::split_free_block(
   if (block->size() != requested_size) {
     // split the block in two
     free_heap_block* split = reinterpret_cast<free_heap_block*>(
-        cell_from_ptr(block) + requested_size);
+        reinterpret_cast<cell>(block) + requested_size);
     split->make_free(block->size() - requested_size);
     block->make_free(requested_size);
     add_to_free_list(split);
@@ -173,7 +173,7 @@ free_heap_block* free_list_allocator<Block>::find_free_block(cell requested_size
       for (cell offset = 0; offset < large_block_size; offset += requested_size) {
         free_heap_block* small_block = large_block;
         large_block = reinterpret_cast<free_heap_block*>(
-            cell_from_ptr(large_block) + requested_size);
+            reinterpret_cast<cell>(large_block) + requested_size);
         small_block->make_free(requested_size);
         add_to_free_list(small_block);
       }
@@ -287,11 +287,11 @@ void free_list_allocator<Block>::compact(Iterator& iter, Fixup fixup,
                                          const Block** finger) {
   cell dest_addr = start;
   auto compact_block_func = [&](Block* block, cell block_size) {
-    cell block_addr = cell_from_ptr(block);
+    cell block_addr = reinterpret_cast<cell>(block);
     if (!state.marked_p(block_addr))
       return;
     *finger = reinterpret_cast<Block*>(block_addr + block_size);
-    if (dest_addr != cell_from_ptr(block)) {
+    if (dest_addr != reinterpret_cast<cell>(block)) {
       memmove(reinterpret_cast<Block*>(dest_addr), block, block_size);
     }
     iter(block, reinterpret_cast<Block*>(dest_addr), block_size);

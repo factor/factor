@@ -189,7 +189,7 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
 #ifdef PIC_DEBUG
     FACTOR_PRINT("Updated " << (tail_call_site ? "tail" : "non-tail")
                  << " call site 0x" << std::hex << return_address.value << std::dec
-                 << " with 0x" << std::hex << cell_from_ptr(xt) << std::dec);
+                 << " with 0x" << std::hex << reinterpret_cast<cell>(xt) << std::dec);
     print_callstack();
 #endif
   }

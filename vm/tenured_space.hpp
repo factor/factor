@@ -17,9 +17,9 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell next_allocated_object_after(cell scan) {
-    while (scan != this->end && ptr_from_cell<object>(scan)->free_p()) {
-      free_heap_block* free_block = ptr_from_cell<free_heap_block>(scan);
-      scan = cell_from_ptr(free_block) + free_block->size();
+    while (scan != this->end && reinterpret_cast<object*>(scan)->free_p()) {
+      free_heap_block* free_block = reinterpret_cast<free_heap_block*>(scan);
+      scan = reinterpret_cast<cell>(free_block) + free_block->size();
     }
     return scan == this->end ? 0 : scan;
   }
@@ -29,7 +29,7 @@ struct tenured_space : free_list_allocator<object> {
   }
 
   cell next_object_after(cell scan) {
-    cell data_size = ptr_from_cell<object>(scan)->size();
+    cell data_size = reinterpret_cast<object*>(scan)->size();
     return next_allocated_object_after(scan + data_size);
   }
 

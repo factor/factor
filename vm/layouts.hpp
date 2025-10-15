@@ -9,17 +9,6 @@ constexpr inline cell align(cell a, cell b) { return (a + (b - 1)) & ~(b - 1); }
 
 constexpr inline cell alignment_for(cell a, cell b) { return align(a, b) - a; }
 
-template <typename Ptr>
-inline cell cell_from_ptr(Ptr ptr) {
-  static_assert(std::is_pointer_v<Ptr>, "pointer required");
-  return reinterpret_cast<cell>(ptr);
-}
-
-template <typename T>
-inline T* ptr_from_cell(cell value) {
-  return reinterpret_cast<T*>(value);
-}
-
 static const cell data_alignment = 16;
 
 // Must match leaf-stack-frame-size in basis/bootstrap/layouts.factor
@@ -169,11 +158,11 @@ struct object {
 
   bool forwarding_pointer_p() const { return (header & 2) == 2; }
   object* forwarding_pointer() const {
-    return ptr_from_cell<object>(UNTAG(header));
+    return reinterpret_cast<object*>(UNTAG(header));
   }
 
   void forward_to(object* pointer) {
-    header = (cell_from_ptr(pointer) | 2);
+    header = (reinterpret_cast<cell>(pointer) | 2);
   }
 };
 
@@ -348,12 +337,12 @@ struct callstack : public object {
   cell length;
 
   cell frame_top_at(cell offset) const {
-    return cell_from_ptr(this + 1) + offset;
+    return reinterpret_cast<cell>(this + 1) + offset;
   }
 
-    cell top() const { return cell_from_ptr(this + 1); }
+    cell top() const { return reinterpret_cast<cell>(this + 1); }
   cell bottom() const {
-    return cell_from_ptr(this + 1) + untag_fixnum(length);
+    return reinterpret_cast<cell>(this + 1) + untag_fixnum(length);
   }
 };
 

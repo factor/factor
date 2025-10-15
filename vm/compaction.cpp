@@ -20,11 +20,11 @@ struct compaction_fixup {
         code_finger(code_finger) {}
 
   object* fixup_data(object* obj) {
-    return reinterpret_cast<object*>(data_forwarding_map->forward_block(cell_from_ptr(obj)));
+    return reinterpret_cast<object*>(data_forwarding_map->forward_block(reinterpret_cast<cell>(obj)));
   }
 
   code_block* fixup_code(code_block* compiled) {
-    return reinterpret_cast<code_block*>(code_forwarding_map->forward_block(cell_from_ptr(compiled)));
+    return reinterpret_cast<code_block*>(code_forwarding_map->forward_block(reinterpret_cast<cell>(compiled)));
   }
 
   object* translate_data(const object* obj) {
@@ -40,15 +40,15 @@ struct compaction_fixup {
   }
 
   cell size(object* obj) {
-    if (data_forwarding_map->marked_p(cell_from_ptr(obj)))
+    if (data_forwarding_map->marked_p(reinterpret_cast<cell>(obj)))
       return obj->size(*this);
-    return data_forwarding_map->unmarked_block_size(cell_from_ptr(obj));
+    return data_forwarding_map->unmarked_block_size(reinterpret_cast<cell>(obj));
   }
 
   cell size(code_block* compiled) {
-    if (code_forwarding_map->marked_p(cell_from_ptr(compiled)))
+    if (code_forwarding_map->marked_p(reinterpret_cast<cell>(compiled)))
       return compiled->size(*this);
-    return code_forwarding_map->unmarked_block_size(cell_from_ptr(compiled));
+    return code_forwarding_map->unmarked_block_size(reinterpret_cast<cell>(compiled));
   }
 };
 

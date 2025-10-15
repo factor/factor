@@ -29,7 +29,7 @@ struct to_aging_copier : no_fixup {
     if (!newpointer) [[unlikely]]
       throw must_start_gc_again();
 
-    copy_object(newpointer, obj, size);
+    memcpy(newpointer, obj, size);
     obj->forward_to(newpointer);
 
     return newpointer;
@@ -66,7 +66,7 @@ void factor_vm::collect_aging() {
       event->code_blocks_scanned += code->points_to_aging.size();
     }
     visitor.visit_mark_stack(&mark_stack);
-    mark_stack.clear();
+    FACTOR_ASSERT(mark_stack.empty());
   }
   {
     // If collection fails here, do a to_tenured collection.

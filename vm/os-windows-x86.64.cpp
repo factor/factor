@@ -68,7 +68,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   seh_area->handler[12] = 0xe0;
 
   // Store address of exception handler in the operand of the 'mov'
-  cell handler = cell_from_ptr(&factor::exception_handler);
+  cell handler = reinterpret_cast<cell>(&factor::exception_handler);
   auto handler_bytes = std::bit_cast<std::array<UBYTE, sizeof(cell)>>(handler);
   std::copy(handler_bytes.begin(), handler_bytes.end(),
             seh_area->handler.begin() + 2);
@@ -80,13 +80,13 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   unwind_info->CountOfCodes = 0;
   unwind_info->FrameRegister = 0;
   unwind_info->FrameOffset = 0;
-  unwind_info->ExceptionHandler = static_cast<DWORD>(cell_from_ptr(seh_area->handler.data()) - base);
+  unwind_info->ExceptionHandler = static_cast<DWORD>(reinterpret_cast<cell>(seh_area->handler.data()) - base);
   unwind_info->ExceptionData[0] = 0;
 
   RUNTIME_FUNCTION* func = &seh_area->func;
   func->BeginAddress = 0;
   func->EndAddress = static_cast<DWORD>(code->seg->end - base);
-  func->UnwindData = static_cast<DWORD>(cell_from_ptr(&seh_area->unwind_info) - base);
+  func->UnwindData = static_cast<DWORD>(reinterpret_cast<cell>(&seh_area->unwind_info) - base);
 
   if (!RtlAddFunctionTable(func, 1, base))
     fatal_error("RtlAddFunctionTable() failed", 0);

@@ -28,7 +28,7 @@ void factor_vm::collect_to_tenured() {
     event->code_blocks_scanned += code->points_to_aging.size();
   }
   visitor.visit_mark_stack(&mark_stack);
-  mark_stack.clear();
+  FACTOR_ASSERT(mark_stack.empty());
 
   data->reset_nursery();
   data->reset_aging();

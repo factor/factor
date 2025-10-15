@@ -69,18 +69,18 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   stub->relocation = false_object;
 
   std::copy_n(insns->data<uint8_t>(), size,
-              static_cast<uint8_t*>(ptr_from_cell<void>(stub->entry_point())));
+              static_cast<uint8_t*>(reinterpret_cast<void*>(stub->entry_point())));
 
   // Store VM pointer in two relocations.
-  store_callback_operand(stub, 0, cell_from_ptr(parent));
+  store_callback_operand(stub, 0, reinterpret_cast<cell>(parent));
 #ifdef FACTOR_ARM64
   store_callback_operand(stub, 1, parent->code->safepoint_page);
-  store_callback_operand(stub, 2, cell_from_ptr(&parent->dispatch_stats.megamorphic_cache_hits));
-  store_callback_operand(stub, 3, cell_from_ptr(&factor::inline_cache_miss));
+  store_callback_operand(stub, 2, reinterpret_cast<cell>(&parent->dispatch_stats.megamorphic_cache_hits));
+  store_callback_operand(stub, 3, reinterpret_cast<cell>(&factor::inline_cache_miss));
   store_callback_operand(stub, 4, parent->cards_offset);
   store_callback_operand(stub, 5, parent->decks_offset);
 #else
-  store_callback_operand(stub, 2, cell_from_ptr(parent));
+  store_callback_operand(stub, 2, reinterpret_cast<cell>(parent));
 #endif
 
   // On x86, the RET instruction takes an argument which depends on

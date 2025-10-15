@@ -151,7 +151,6 @@ namespace factor { struct factor_vm; }
 #include "vm.hpp"
 #include "allot.hpp"
 #include "data_roots.hpp"
-#include "bignum_data_root.hpp"
 #include "code_roots.hpp"
 #include "generic_arrays.hpp"
 #include "callstack.hpp"

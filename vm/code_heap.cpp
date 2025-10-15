@@ -15,7 +15,7 @@ code_heap::code_heap(cell size) {
 
   // See os-windows-x86.64.cpp for seh_area usage
   safepoint_page = seg->start;
-  seh_area = ptr_from_cell<char>(seg->start) + getpagesize();
+  seh_area = reinterpret_cast<char*>(seg->start) + getpagesize();
 }
 
 code_heap::~code_heap() = default;
@@ -38,7 +38,7 @@ void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
   points_to_nursery.erase(compiled);
   points_to_aging.erase(compiled);
-  all_blocks.erase(cell_from_ptr(compiled));
+  all_blocks.erase(reinterpret_cast<cell>(compiled));
   allocator->free(compiled);
 }
 
@@ -52,8 +52,8 @@ void code_heap::set_safepoint_guard(bool locked) {
 
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
-    auto erase_from = all_blocks.lower_bound(cell_from_ptr(block));
-    auto erase_to = all_blocks.lower_bound(cell_from_ptr(block) + size);
+    auto erase_from = all_blocks.lower_bound(reinterpret_cast<cell>(block));
+    auto erase_to = all_blocks.lower_bound(reinterpret_cast<cell>(block) + size);
     all_blocks.erase(erase_from, erase_to);
   };
   allocator->sweep(clear_free_blocks_from_all_blocks);
@@ -66,7 +66,7 @@ void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
     (void)block;
     (void)size;
-    FACTOR_ASSERT(all_blocks.find(cell_from_ptr(block)) != all_blocks.end());
+    FACTOR_ASSERT(all_blocks.find(reinterpret_cast<cell>(block)) != all_blocks.end());
   };
   allocator->iterate(all_blocks_set_verifier, no_fixup());
 }
@@ -75,7 +75,7 @@ code_block* code_heap::code_block_for_address(cell address) {
   auto blocki = all_blocks.upper_bound(address);
   FACTOR_ASSERT(blocki != all_blocks.begin());
   --blocki;
-  code_block* found_block = ptr_from_cell<code_block>(*blocki);
+  code_block* found_block = reinterpret_cast<code_block*>(*blocki);
   FACTOR_ASSERT(found_block->entry_point() <=
                 address // XXX this isn't valid during fixup. should store the
                         //     size in the map
@@ -102,7 +102,7 @@ void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
     (void)size;
-    all_blocks.insert(cell_from_ptr(block));
+    all_blocks.insert(reinterpret_cast<cell>(block));
   };
   allocator->iterate(all_blocks_set_inserter, no_fixup());
 #ifdef FACTOR_DEBUG
