@@ -671,7 +671,7 @@ get_boot_image() {
 
 get_url() {
     if [[ -z $DOWNLOADER_NAME ]] ; then
-        set_downloader_name
+        set_downloader
     fi
     download_with_downloader "$1"
 }
