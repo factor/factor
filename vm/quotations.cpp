@@ -338,7 +338,7 @@ void factor_vm::primitive_quotation_code() {
   data_root<quotation> quot(ctx->pop(), this);
 
   ctx->push(from_unsigned_cell(quot->entry_point));
-  ctx->push(from_unsigned_cell(cell_from_ptr(quot->code()) + quot->code()->size()));
+  ctx->push(from_unsigned_cell(reinterpret_cast<cell>(quot->code()) + quot->code()->size()));
 }
 
 // Allocates memory

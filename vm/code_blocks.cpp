@@ -142,7 +142,7 @@ cell factor_vm::compute_dlsym_address(array* parameters,
   cell library = array_nth(parameters, index + 1);
   dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
 
-  cell undef = cell_from_ptr(factor::undefined_symbol);
+  cell undef = reinterpret_cast<cell>(factor::undefined_symbol);
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
   if (d != nullptr && !d->handle)
     return undef;
@@ -166,9 +166,9 @@ std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      return cell_from_ptr(&dispatch_stats.megamorphic_cache_hits);
+      return reinterpret_cast<cell>(&dispatch_stats.megamorphic_cache_hits);
     case RT_VM:
-      return cell_from_ptr(this) + untag_fixnum(array_nth(parameters, index));
+      return reinterpret_cast<cell>(this) + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -178,7 +178,7 @@ std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
       return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
-      return cell_from_ptr(&factor::inline_cache_miss);
+      return reinterpret_cast<cell>(&factor::inline_cache_miss);
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
@@ -333,7 +333,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   // compiler at the beginning of bootstrap
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
-  this->code->all_blocks.insert(cell_from_ptr(compiled));
+  this->code->all_blocks.insert(reinterpret_cast<cell>(compiled));
 
   return compiled;
 }

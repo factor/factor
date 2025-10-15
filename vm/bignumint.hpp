@@ -56,13 +56,7 @@ using bignum_twodigit_type = int64_t;
 #endif
 
 // BIGNUM_TO_POINTER casts a bignum object to a digit array pointer.
-inline bignum_digit_type* BIGNUM_TO_POINTER(bignum* bn) {
-  return reinterpret_cast<bignum_digit_type*>(bn->data());
-}
-
-inline const bignum_digit_type* BIGNUM_TO_POINTER(const bignum* bn) {
-  return reinterpret_cast<const bignum_digit_type*>(const_cast<bignum*>(bn)->data());
-}
+#define BIGNUM_TO_POINTER(bignum) ((bignum_digit_type*)(bignum->data()))
 
 // BIGNUM_EXCEPTION is invoked to handle assertion violations.
 #define BIGNUM_EXCEPTION abort
@@ -74,33 +68,16 @@ inline const bignum_digit_type* BIGNUM_TO_POINTER(const bignum* bn) {
 #define BIGNUM_DIGIT_MASK (BIGNUM_RADIX - 1)
 #define BIGNUM_HALF_DIGIT_MASK (BIGNUM_RADIX_ROOT - 1)
 
-inline bignum_digit_type* BIGNUM_START_PTR(bignum* bignum) {
-  return BIGNUM_TO_POINTER(bignum) + 1;
-}
+#define BIGNUM_START_PTR(bignum) ((BIGNUM_TO_POINTER(bignum)) + 1)
 
-inline const bignum_digit_type* BIGNUM_START_PTR(const bignum* bn) {
-  return BIGNUM_TO_POINTER(const_cast<bignum*>(bn)) + 1;
-}
+#define BIGNUM_LENGTH(bignum) (untag_fixnum((bignum)->capacity) - 1)
 
-inline bignum_length_type BIGNUM_LENGTH(const bignum* bignum) {
-  return untag_fixnum(bignum->capacity) - 1;
-}
+#define BIGNUM_NEGATIVE_P(bignum) (bignum->data()[0] != 0)
+#define BIGNUM_SET_NEGATIVE_P(bignum, neg) (bignum->data()[0] = neg)
 
-inline bool BIGNUM_NEGATIVE_P(const bignum* bignum) {
-  return bignum->data()[0] != 0;
-}
+#define BIGNUM_ZERO_P(bignum) ((BIGNUM_LENGTH(bignum)) == 0)
 
-inline void BIGNUM_SET_NEGATIVE_P(bignum* bignum, bool neg) {
-  bignum->data()[0] = neg;
-}
-
-inline bool BIGNUM_ZERO_P(const bignum* bignum) {
-  return BIGNUM_LENGTH(bignum) == 0;
-}
-
-inline bignum_digit_type& BIGNUM_REF(bignum* bignum, bignum_length_type index) {
-  return *(BIGNUM_START_PTR(bignum) + index);
-}
+#define BIGNUM_REF(bignum, index) (*((BIGNUM_START_PTR(bignum)) + (index)))
 
 // These definitions are here to facilitate caching of the constants
 // 0, 1, and -1.

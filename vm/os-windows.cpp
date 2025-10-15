@@ -47,7 +47,7 @@ void factor_vm::ffi_dlopen(dll* dll) {
 
 std::optional<cell> factor_vm::ffi_dlsym(dll* dll, symbol_char* symbol) {
   void* addr = GetProcAddress(dll ? static_cast<HMODULE>(dll->handle) : hFactorDll, symbol);
-  return addr ? std::optional<cell>(cell_from_ptr(addr)) : std::nullopt;
+  return addr ? std::optional<cell>(reinterpret_cast<cell>(addr)) : std::nullopt;
 }
 
 void factor_vm::ffi_dlclose(dll* dll) {
@@ -124,7 +124,7 @@ segment::segment(cell size_, bool executable_p) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
-  start = cell_from_ptr(mem) + guard_size;
+  start = reinterpret_cast<cell>(mem) + guard_size;
   end = start + size;
 
   set_border_locked(true);
@@ -224,7 +224,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
     case EXCEPTION_ACCESS_VIOLATION:
       set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler(reinterpret_cast<cell*>(&c->ESP), reinterpret_cast<cell*>(&c->EIP),
-                              cell_from_ptr(factor::memory_signal_handler_impl));
+                              reinterpret_cast<cell>(factor::memory_signal_handler_impl));
       break;
 
     case STATUS_FLOAT_DENORMAL_OPERAND:
@@ -246,12 +246,12 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #endif
       MXCSR(c) &= 0xffffffc0;
       dispatch_signal_handler(reinterpret_cast<cell*>(&c->ESP), reinterpret_cast<cell*>(&c->EIP),
-                              cell_from_ptr(factor::fp_signal_handler_impl));
+                              reinterpret_cast<cell>(factor::fp_signal_handler_impl));
       break;
     default:
       signal_number = e->ExceptionCode;
       dispatch_signal_handler(reinterpret_cast<cell*>(&c->ESP), reinterpret_cast<cell*>(&c->EIP),
-                              cell_from_ptr(factor::synchronous_signal_handler_impl));
+                              reinterpret_cast<cell>(factor::synchronous_signal_handler_impl));
       break;
   }
   return ExceptionContinueExecution;

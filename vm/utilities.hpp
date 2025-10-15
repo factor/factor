@@ -51,17 +51,4 @@ vm_char* safe_strdup(const vm_char* str);
 cell read_cell_hex();
 VM_C_API void* factor_memcpy(void* dst, void* src, size_t len);
 
-// Safe object copying for GC operations
-template<typename T>
-inline void copy_object(T* dst, const T* src, size_t size) {
-  static_assert(std::is_trivially_copyable_v<T>, "Object must be trivially copyable");
-  std::memcpy(dst, src, size);
-}
-
-// Typed array copy
-template<typename T>
-inline void copy_array(T* dst, const T* src, size_t count) {
-  std::copy_n(src, count, dst);
-}
-
 }

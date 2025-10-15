@@ -14,9 +14,9 @@ struct full_collection_copier : no_fixup {
 
   object* fixup_data(object* obj) {
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p(cell_from_ptr(obj))) {
-        tenured->state.set_marked_p(cell_from_ptr(obj), obj->size());
-        mark_stack->push_back(cell_from_ptr(obj));
+      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
+        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
+        mark_stack->push_back(reinterpret_cast<cell>(obj));
       }
       return obj;
     }
@@ -28,9 +28,9 @@ struct full_collection_copier : no_fixup {
     }
 
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p(cell_from_ptr(obj))) {
-        tenured->state.set_marked_p(cell_from_ptr(obj), obj->size());
-        mark_stack->push_back(cell_from_ptr(obj));
+      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
+        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
+        mark_stack->push_back(reinterpret_cast<cell>(obj));
       }
       return obj;
     }
@@ -39,18 +39,18 @@ struct full_collection_copier : no_fixup {
     object* newpointer = tenured->allot(size);
     if (!newpointer)
       throw must_start_gc_again();
-    copy_object(newpointer, obj, size);
+    memcpy(newpointer, obj, size);
     obj->forward_to(newpointer);
 
-    tenured->state.set_marked_p(cell_from_ptr(newpointer), newpointer->size());
-    mark_stack->push_back(cell_from_ptr(newpointer));
+    tenured->state.set_marked_p(reinterpret_cast<cell>(newpointer), newpointer->size());
+    mark_stack->push_back(reinterpret_cast<cell>(newpointer));
     return newpointer;
   }
 
   code_block* fixup_code(code_block* compiled) {
-    if (!code->allocator->state.marked_p(cell_from_ptr(compiled))) {
-      code->allocator->state.set_marked_p(cell_from_ptr(compiled), compiled->size());
-      mark_stack->push_back(cell_from_ptr(compiled) + 1);
+    if (!code->allocator->state.marked_p(reinterpret_cast<cell>(compiled))) {
+      code->allocator->state.set_marked_p(reinterpret_cast<cell>(compiled), compiled->size());
+      mark_stack->push_back(reinterpret_cast<cell>(compiled) + 1);
     }
     return compiled;
   }
@@ -74,6 +74,7 @@ void factor_vm::collect_mark_impl() {
   visitor.visit_uninitialized_code_blocks();
 
   visitor.visit_mark_stack(&mark_stack);
+  FACTOR_ASSERT(mark_stack.empty());
 
   data->reset_tenured();
   data->reset_aging();

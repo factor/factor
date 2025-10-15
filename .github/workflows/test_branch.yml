@@ -14,14 +14,9 @@ jobs:
     - name: Install clang 18
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget software-properties-common gnupg lsb-release
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 18
+        sudo apt-get install -y clang-18
         sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
         sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
-        sudo update-alternatives --set clang /usr/bin/clang-18
-        sudo update-alternatives --set clang++ /usr/bin/clang++-18
         clang --version
     - name: bootstrap
       run: ./build.sh net-bootstrap

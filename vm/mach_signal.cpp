@@ -15,7 +15,7 @@
 namespace factor {
 
 // The exception port on which our thread listens.
-mach_port_t our_exception_port;
+static mach_port_t our_exception_port;
 
 // The following sources were used as a *reference* for this exception handling
 // code:
@@ -29,7 +29,7 @@ mach_port_t our_exception_port;
 // executing, the call frame of the current C primitive (if any) is rewound, and
 // the appropriate Factor error is thrown from the top-most Factor frame.
 void factor_vm::call_fault_handler(exception_type_t exception,
-                                   exception_data_type_t code,
+                                   exception_data_type_t exception_code,
                                    MACH_EXC_STATE_TYPE* exc_state,
                                    MACH_THREAD_STATE_TYPE* thread_state,
                                    MACH_FLOAT_STATE_TYPE* float_state) {
@@ -37,12 +37,12 @@ void factor_vm::call_fault_handler(exception_type_t exception,
 
   if (exception == EXC_BAD_ACCESS) {
     set_memory_protection_error(MACH_EXC_STATE_FAULT(exc_state),
-                                cell_from_ptr(reinterpret_cast<void*>(MACH_PROGRAM_COUNTER(thread_state))));
-    handler = cell_from_ptr(factor::memory_signal_handler_impl);
-  } else if (exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV) {
+                                reinterpret_cast<cell>(reinterpret_cast<void*>(MACH_PROGRAM_COUNTER(thread_state))));
+    handler = reinterpret_cast<cell>(factor::memory_signal_handler_impl);
+  } else if (exception == EXC_ARITHMETIC && exception_code != MACH_EXC_INTEGER_DIV) {
     signal_fpu_status = fpu_status(mach_fpu_status(float_state));
     mach_clear_fpu_status(float_state);
-    handler = cell_from_ptr(factor::fp_signal_handler_impl);
+    handler = reinterpret_cast<cell>(factor::fp_signal_handler_impl);
   } else {
     switch (exception) {
       case EXC_ARITHMETIC:
@@ -56,18 +56,18 @@ void factor_vm::call_fault_handler(exception_type_t exception,
         break;
     }
 
-    handler = cell_from_ptr(factor::synchronous_signal_handler_impl);
+    handler = reinterpret_cast<cell>(factor::synchronous_signal_handler_impl);
   }
 
   FACTOR_ASSERT(handler != 0);
 
   dispatch_signal_handler(reinterpret_cast<cell*>(&MACH_STACK_POINTER(thread_state)),
                           reinterpret_cast<cell*>(&MACH_PROGRAM_COUNTER(thread_state)),
-                          cell_from_ptr(reinterpret_cast<void*>(handler)));
+                          reinterpret_cast<cell>(reinterpret_cast<void*>(handler)));
 }
 
 static void call_fault_handler(mach_port_t thread, exception_type_t exception,
-                               exception_data_type_t code,
+                               exception_data_type_t exception_code,
                                MACH_EXC_STATE_TYPE* exc_state,
                                MACH_THREAD_STATE_TYPE* thread_state,
                                MACH_FLOAT_STATE_TYPE* float_state) {
@@ -76,8 +76,9 @@ static void call_fault_handler(mach_port_t thread, exception_type_t exception,
   FACTOR_ASSERT(thread_id);
   // Handle the exception
   if (auto vm = thread_vms.find(thread_id); vm != thread_vms.end()) {
-    auto [thread, vm_ptr] = *vm;
-    vm_ptr->call_fault_handler(exception, code, exc_state, thread_state,
+    auto [thread_handle, vm_ptr] = *vm;
+    (void)thread_handle;
+    vm_ptr->call_fault_handler(exception, exception_code, exc_state, thread_state,
                                float_state);
   }
 }
@@ -185,7 +186,6 @@ static void* mach_exception_thread(void* arg) {
       abort();
     }
   }
-  return nullptr;  // quiet warning
 }
 
 // Initialize the Mach exception handler thread.

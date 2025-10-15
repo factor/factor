@@ -65,8 +65,8 @@ cell factor_vm::capture_callstack(context* target_ctx) {
 
 // Allocates memory (capture_callstack)
 void factor_vm::primitive_callstack_for() {
-  char* raw_ctx = pinned_alien_offset(ctx->peek());
-  context* other_ctx = static_cast<context*>(static_cast<void*>(raw_ctx));
+  context* other_ctx = static_cast<context*>(
+      static_cast<void*>(pinned_alien_offset(ctx->peek())));
   ctx->replace(capture_callstack(other_ctx));
 }
 

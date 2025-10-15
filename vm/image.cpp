@@ -193,11 +193,11 @@ struct startup_fixup {
       : data_offset(data_offset), code_offset(code_offset) {}
 
   object* fixup_data(object* obj) {
-        return ptr_from_cell<object>(cell_from_ptr(obj) + data_offset);
+        return reinterpret_cast<object*>(reinterpret_cast<cell>(obj) + data_offset);
   }
 
   code_block* fixup_code(code_block* obj) {
-        return ptr_from_cell<code_block>(cell_from_ptr(obj) + code_offset);
+        return reinterpret_cast<code_block*>(reinterpret_cast<cell>(obj) + code_offset);
   }
 
   object* translate_data(const object* obj) {

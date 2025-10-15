@@ -108,7 +108,7 @@ context* factor_vm::new_context() {
 
 // Allocates memory
 void factor_vm::init_context(context* target_ctx) {
-  target_ctx->context_objects[OBJ_CONTEXT] = allot_alien(cell_from_ptr(target_ctx));
+  target_ctx->context_objects[OBJ_CONTEXT] = allot_alien(reinterpret_cast<cell>(target_ctx));
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -205,7 +205,7 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
   array* a = allot_uninitialized_array<array>(depth / sizeof(cell));
   const auto count = static_cast<size_t>(depth / sizeof(cell));
   auto* source = reinterpret_cast<const cell*>(bottom);
-  copy_array(a->data(), source, count);
+  std::copy_n(source, count, a->data());
   return tag<array>(a);
 }
 
@@ -241,7 +241,7 @@ void factor_vm::primitive_retainstack_for() {
 static cell array_to_stack(array* array, cell bottom) {
   cell depth = array_capacity(array) * sizeof(cell);
   auto* dest = reinterpret_cast<cell*>(bottom);
-  copy_array(dest, array->data(), static_cast<size_t>(array_capacity(array)));
+  std::copy_n(array->data(), static_cast<size_t>(array_capacity(array)), dest);
   return bottom + depth - sizeof(cell);
 }
 

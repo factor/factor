@@ -62,7 +62,7 @@ void factor_vm::primitive_word_code() {
   check_tagged(w);
 
   ctx->push(from_unsigned_cell(w->entry_point));
-  ctx->push(from_unsigned_cell(cell_from_ptr(w->code()) + w->code()->size()));
+  ctx->push(from_unsigned_cell(reinterpret_cast<cell>(w->code()) + w->code()->size()));
 }
 
 void factor_vm::primitive_word_optimized_p() {
