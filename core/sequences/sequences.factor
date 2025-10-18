@@ -14,6 +14,7 @@ GENERIC: new-sequence ( len seq -- newseq ) flushable
 GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
+GENERIC: (bounds-check?) ( n seq -- ? ) flushable
 
 : lengthd ( seq obj -- n obj ) [ length ] dip ; inline
 
@@ -61,10 +62,13 @@ M: sequence shorten [ length < ] 2check [ set-length ] [ 2drop ] if ; inline
 
 ERROR: bounds-error index seq ;
 
+M: sequence (bounds-check?)
+    dupd length < [ 0 >= ] [ drop f ] if ; inline
+
 GENERIC#: bounds-check? 1 ( n seq -- ? )
 
 M: integer bounds-check?
-    dupd length < [ 0 >= ] [ drop f ] if ; inline
+    (bounds-check?) ; inline
 
 : bounds-check ( n seq -- n seq )
     [ bounds-check? ] 2check [ bounds-error ] unless ; inline
@@ -237,9 +241,8 @@ TUPLE: slice
 ERROR: slice-error from to seq ;
 
 : check-slice ( from to seq -- from to seq )
-    pick 0 < [ slice-error ] when
-    2dup length > [ slice-error ] when
-    2over > [ slice-error ] when ; inline
+    -rot [ [ bounds-check? ] bi@ ] 3keep [ > swapd and ] 2keep
+    rot rotd [ slice-error ] unless ; inline
 
 <PRIVATE
 
