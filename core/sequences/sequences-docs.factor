@@ -246,6 +246,11 @@ HELP: push
 { $errors "Throws an error if " { $snippet "seq" } " is not resizable, or if the type of " { $snippet "elt" } " is not permitted in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
+HELP: (bounds-check?)
+{ $values { "n" object } { "seq" sequence } { "?" boolean } }
+{ $contract "Tests if the index is within the bounds of the sequence. This word may be implemented by sequence protocol members, but user code should use " { $link bounds-check? } }
+;
+
 HELP: bounds-check?
 { $values { "n" integer } { "seq" sequence } { "?" boolean } }
 { $description "Tests if the index is within the bounds of the sequence." }
@@ -2005,6 +2010,8 @@ $nl
 { $subsections set-length lengthen }
 "An optional generic word for creating sequences of the same class as a given sequence:"
 { $subsections like }
+"An optional generic word for testing if an index is part of a sequence:"
+{ $subsections (bounds-check?) }
 "Optional generic words for optimization purposes:"
 { $subsections new-sequence new-resizable }
 { $see-also "sequences-unsafe" } ;
