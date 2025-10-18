@@ -240,9 +240,23 @@ TUPLE: slice
 
 ERROR: slice-error from to seq ;
 
+<PRIVATE
+
+: at-or-within-bounds? ( n seq -- ? )
+   dup length 0 =
+   [ drop 0 = ]
+   [
+       [ [ 1 - ] dip bounds-check? ]
+       [ bounds-check? ] 2bi or
+   ] if ; inline
+
+PRIVATE>
+
 : check-slice ( from to seq -- from to seq )
-    -rot [ [ bounds-check? ] bi@ ] 3keep [ > swapd and ] 2keep
-    rot rotd [ slice-error ] unless ; inline
+    2dup      at-or-within-bounds? [ slice-error ] unless
+    pick over at-or-within-bounds? [ slice-error ] unless
+    2over <=                       [ slice-error ] unless
+    ; inline
 
 <PRIVATE
 
