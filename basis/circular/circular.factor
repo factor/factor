@@ -17,7 +17,7 @@ TUPLE: circular < wrapped-sequence { start integer } ;
 PRIVATE>
 
 M: circular virtual@ circular-wrap seq>> ; inline
-M: circular (bounds-check?) 2drop t ; inline
+M: circular bounds-check? 2drop t ; inline
 M: circular minimum seq>> minimum ; inline
 M: circular maximum seq>> maximum ; inline
 

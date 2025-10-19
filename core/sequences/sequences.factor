@@ -14,7 +14,7 @@ GENERIC: new-sequence ( len seq -- newseq ) flushable
 GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
-GENERIC: (bounds-check?) ( n seq -- ? ) flushable
+GENERIC: bounds-check? ( n seq -- ? ) flushable
 
 : lengthd ( seq obj -- n obj ) [ length ] dip ; inline
 
@@ -62,13 +62,10 @@ M: sequence shorten [ length < ] 2check [ set-length ] [ 2drop ] if ; inline
 
 ERROR: bounds-error index seq ;
 
-M: sequence (bounds-check?)
-    dupd length < [ 0 >= ] [ drop f ] if ; inline
+ERROR: integer-length-expected obj ;
 
-GENERIC#: bounds-check? 1 ( n seq -- ? )
-
-M: integer bounds-check?
-    (bounds-check?) ; inline
+M: sequence bounds-check?
+    over integer? [ dupd length < [ 0 >= ] [ drop f ] if ] [ drop integer-length-expected ] if ; inline
 
 : bounds-check ( n seq -- n seq )
     [ bounds-check? ] 2check [ bounds-error ] unless ; inline
@@ -302,8 +299,6 @@ M: repetition nth-unsafe nip elt>> ; inline
 INSTANCE: repetition immutable-sequence
 
 <PRIVATE
-
-ERROR: integer-length-expected obj ;
 
 ! The check-length call forces partial dispatch
 : check-length ( n -- n )

@@ -96,7 +96,7 @@ M: circular-slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: circular-slice length [ to>> ] [ from>> ] bi - ; inline
 
-M: circular-slice (bounds-check?) 2drop f ; inline
+M: circular-slice bounds-check? 2drop f ; inline
 
 M: circular-slice virtual@
     [ from>> + ] [ seq>> ] bi [ length rem ] keep ; inline
