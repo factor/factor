@@ -152,17 +152,6 @@ CONSTANT: bom-le B{ 0xff 0xfe }
 
 CONSTANT: bom-be B{ 0xfe 0xff }
 
-:: ?skip-bom ( stream bom -- )
-    stream stream-seekable? [
-        stream stream-tell
-        2 stream stream-read-partial bom sequence=
-        [ drop ] [ seek-absolute stream stream-seek ] if
-    ] when ; inline
-
-M: utf16le <decoder> over bom-le ?skip-bom call-next-method ;
-
-M: utf16be <decoder> over bom-be ?skip-bom call-next-method ;
-
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [
         bom-be sequence= [ utf16be ] [ missing-bom ] if
