@@ -43,6 +43,11 @@ IN: io.encodings.utf8.tests
 { { 0x10FFFF } } [ { 0b11110,100 0b10,001111 0b10,111111 0b10,111111 } decode-utf8-w/stream ] unit-test
 
 ! test BOM skipping
+
 { "abc" } [
-    B{ 0xef 0xbb 0xbf 0x61 0x62 0x63 } utf8 [ readln ] with-byte-reader
+    B{ 0xef 0xbb 0xbf 0x61 0x62 0x63 } utf8-bom [ readln ] with-byte-reader
+] unit-test
+
+{ "abc" } [
+    B{ 0x61 0x62 0x63 } utf8-bom [ readln ] with-byte-reader
 ] unit-test

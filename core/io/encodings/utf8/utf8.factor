@@ -84,21 +84,6 @@ M: utf8 decode-until (decode-until) ;
 M: utf8 encode-char
     drop char>utf8 ;
 
-! UTF-8 BOM is not recommended and isn't really a BOM but is
-! present on some files because of Microsoft conventions...
-:: ?skip-bom ( stream -- )
-    stream stream-seekable? [
-        stream stream-tell
-        stream stream-read1 0xef = [
-            stream stream-read1 0xbb = [
-                stream stream-read1 0xbf =
-            ] [ f ] if
-        ] [ f ] if
-        [ drop ] [ seek-absolute stream stream-seek ] if
-    ] when ;
-
-M: utf8 <decoder> over ?skip-bom call-next-method ;
-
 GENERIC#: encode-string-utf8 1 ( string stream -- )
 
 M: object encode-string-utf8
@@ -131,3 +116,17 @@ PRIVATE>
 
 : >utf8-index ( n string -- n' )
     code-point-offsets nth ;
+
+TUPLE: utf8-bom bom? ;
+
+: utf8-bom ( -- utf8-bom ) f \ utf8-bom boa ;
+
+M:: utf8-bom decode-char ( stream encoding -- char/f )
+    stream utf8 decode-char encoding bom?>> [
+        t encoding bom?<< dup 0xfeff = [
+            drop stream utf8 decode-char
+        ] when
+    ] unless ;
+
+M: utf8-bom <encoder>
+    drop B{ 0xef 0xbb 0xbf } over stream-write utf8 <encoder> ;
