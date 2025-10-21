@@ -36,6 +36,7 @@ PRIVATE>
         { [ dup B{ 0xFE 0xFF } head? ] [ drop utf16be ] }
         { [ dup B{ 0xFF 0xFE } head? ] [ drop utf16le ] }
         { [ dup B{ 0xEF 0xBB 0xBF } head? ] [ drop utf8 ] }
+        { [ dup B{ 0x2B 0x2F 0x76 } head? ] [ drop utf7 ] }
         { [ dup $[ "<?xml" >byte-array ] head? ] [ detect-xml-prolog ] }
         { [ 0 over member? ] [ drop binary ] }
         { [ dup empty? ] [ drop utf8 ] }
