@@ -12,8 +12,14 @@ TUPLE: cycles
 : <cycles> ( seq length -- cycles )
     [ <circular> ] dip cycles boa ;
 
+: <cycles-from> ( seq length start -- new-seq )
+    [ <cycles> ] dip over circular>> change-circular-start ;
+
 : cycle ( seq length -- new-seq )
     dupd <cycles> swap like ;
+
+: cycle-from ( seq length start -- new-seq )
+    [ dup ] 2dip <cycles-from> swap like ;
 
 : repeat ( seq times -- new-seq )
     over length * cycle ;
