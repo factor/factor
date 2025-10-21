@@ -21,45 +21,48 @@ PRIVATE>
 
 : 1token ( ch -- parser ) 1string token ;
 
-: (list-of) ( items separator repeat1? -- parser )
-    [ over 2seq ] dip [ repeat1 ] [ repeat0 ] if
-    [ concat ] action 2seq
-    [ unclip 1vector swap first append ] action ;
+<PRIVATE
+
+TUPLE: list-parser item separator repeat1? ;
+
+M: list-parser parser-quot
+    [ item>> execute-parser-quot ]
+    [ separator>> execute-parser-quot over ]
+    [ repeat1?>> ] tri
+    '[
+        input-slice V{ } clone <parse-result>
+        _ parse-seq-element [
+            [ @ _ [ f ] if ] swap repeat-loop
+            _ [ dup ast>> length 2 < [ drop f ] when ] when
+        ] [ f ] if*
+    ] ;
+
+PRIVATE>
 
 : list-of ( items separator -- parser )
-    hide f (list-of) ;
+    hide f list-parser boa wrap-peg ;
 
 : list-of-many ( items separator -- parser )
-    hide t (list-of) ;
+    hide t list-parser boa wrap-peg ;
 
 CONSTANT: epsilon $[ V{ } token ]
 
 CONSTANT: any-char $[ [ drop t ] satisfy ]
 
-<PRIVATE
-
-: flatten-vectors ( pair -- vector )
-    first2 append! ;
-
-PRIVATE>
-
 : exactly-n ( parser n -- parser' )
     swap <repetition> seq ;
 
 : at-most-n ( parser n -- parser' )
-    [
-        drop epsilon
-    ] [
+    [ drop epsilon ] [
         [ exactly-n ] [ 1 - at-most-n ] 2bi 2choice
     ] if-zero ;
 
 : at-least-n ( parser n -- parser' )
-    dupd exactly-n swap repeat0 2seq
-    [ flatten-vectors ] action ;
+    dupd exactly-n swap repeat0 2seq [ first2 append! ] action ;
 
 : from-m-to-n ( parser m n -- parser' )
     [ [ exactly-n ] 2keep ] dip swap - at-most-n 2seq
-    [ flatten-vectors ] action ;
+    [ first2 append! ] action ;
 
 : pack ( begin body end -- parser )
     [ hide ] [ ] [ hide ] tri* 3seq [ first ] action ;
@@ -104,5 +107,5 @@ PRIVATE>
         (range-pattern) dup length 1 =
         [ first '[ _ = ] ] [ '[ _ member? ] ] if
     ] [
-        [ [ not ] compose ] when satisfy
+        [ negate ] when satisfy
     ] bi* ;
