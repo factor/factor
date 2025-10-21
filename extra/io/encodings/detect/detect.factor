@@ -3,8 +3,8 @@
 USING: byte-arrays combinators continuations io io.encodings
 io.encodings.ascii io.encodings.binary io.encodings.iana
 io.encodings.latin1 io.encodings.string io.encodings.utf16
-io.encodings.utf32 io.encodings.utf8 io.files kernel literals
-math namespaces sequences strings ;
+io.encodings.utf32 io.encodings.utf7 io.encodings.utf8 io.files
+kernel literals math namespaces sequences strings ;
 IN: io.encodings.detect
 
 SYMBOL: default-encoding
