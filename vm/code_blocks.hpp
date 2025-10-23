@@ -15,9 +15,9 @@ struct code_block {
   cell parameters; // tagged pointer to array or f
   cell relocation; // tagged pointer to byte-array or f
 
-  bool free_p() const { return (header & 1) == 1; }
+  [[nodiscard]] bool free_p() const { return (header & 1) == 1; }
 
-  code_block_type type() const {
+  [[nodiscard]] code_block_type type() const {
     return (code_block_type)((header >> 1) & 0x3);
   }
 
@@ -25,9 +25,9 @@ struct code_block {
     header = ((header & ~0x7) | (type << 1));
   }
 
-  bool pic_p() const { return type() == CODE_BLOCK_PIC; }
+  [[nodiscard]] bool pic_p() const { return type() == CODE_BLOCK_PIC; }
 
-  cell size() const {
+  [[nodiscard]] cell size() const {
     cell size;
     if (free_p())
       size = header & ~7;
@@ -37,7 +37,7 @@ struct code_block {
     return size;
   }
 
-  cell stack_frame_size() const {
+  [[nodiscard]] cell stack_frame_size() const {
     if (free_p())
       return 0;
     return (header >> 20) & 0xFF0;
@@ -64,11 +64,13 @@ struct code_block {
 
   template <typename Fixup> cell size(Fixup fixup) const { (void)fixup; return size(); }
 
-  cell entry_point() const { return (cell)(this + 1); }
+  [[nodiscard]] cell entry_point() const { return (cell)(this + 1); }
 
   // GC info is stored at the end of the block
   gc_info* block_gc_info() const {
-    return (gc_info*)((uint8_t*)this + size() - sizeof(gc_info));
+    cell info_addr = reinterpret_cast<cell>(this) + size() - sizeof(gc_info);
+    FACTOR_ASSERT((info_addr & (alignof(gc_info) - 1)) == 0);
+    return reinterpret_cast<gc_info*>(info_addr);
   }
 
   void flush_icache() { factor::flush_icache((cell)this, size()); }
@@ -103,12 +105,12 @@ VM_C_API void undefined_symbol(void);
 
 inline code_block* word::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return (code_block*)entry_point - 1;
+  return reinterpret_cast<code_block*>(entry_point) - 1;
 }
 
 inline code_block* quotation::code() const {
   FACTOR_ASSERT(entry_point != 0);
-  return (code_block*)entry_point - 1;
+  return reinterpret_cast<code_block*>(entry_point) - 1;
 }
 
 }

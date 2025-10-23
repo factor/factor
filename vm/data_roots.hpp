@@ -22,6 +22,14 @@ template <typename Type> struct data_root : public tagged<Type> {
     parent->data_roots.pop_back();
   }
 
+  data_root(const data_root&) = delete;
+
+  data_root& operator=(const data_root& other) {
+    // Just update the value, the GC root registration stays the same
+    this->value_ = other.value_;
+    return *this;
+  }
+
   friend void swap(data_root<Type>& a, data_root<Type>& b) {
     cell tmp = a.value_;
     a.value_ = b.value_;

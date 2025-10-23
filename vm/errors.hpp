@@ -3,7 +3,7 @@ namespace factor {
 // Runtime errors must be kept in sync with:
 //   basis/debugger/debugger.factor
 //   core/kernel/kernel.factor
-#define KERNEL_ERROR 0xfac7
+constexpr cell KERNEL_ERROR = 0xfac7;
 
 enum vm_error_type {
   ERROR_EXPIRED = 0,
@@ -28,7 +28,7 @@ enum vm_error_type {
   ERROR_CALLBACK_SPACE_OVERFLOW
 };
 
-void fatal_error(const char* msg, cell tagged);
+[[noreturn]] void fatal_error(const char* msg, cell tagged);
 void critical_error(const char* msg, cell tagged);
 void memory_signal_handler_impl();
 void fp_signal_handler_impl();

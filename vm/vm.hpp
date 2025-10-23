@@ -1,11 +1,18 @@
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wheader-hygiene"
+#endif
 using namespace std;
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 namespace factor {
 
-typedef void (*c_to_factor_func_type)(cell quot);
-typedef void (*unwind_native_frames_func_type)(cell quot, cell to);
-typedef cell (*get_fpu_state_func_type)();
-typedef void (*set_fpu_state_func_type)(cell state);
+using c_to_factor_func_type = void (*)(cell quot);
+using unwind_native_frames_func_type = void (*)(cell quot, cell to);
+using get_fpu_state_func_type = cell (*)();
+using set_fpu_state_func_type = void (*)(cell state);
 
 struct growable_array;
 struct code_root;
@@ -95,10 +102,10 @@ struct factor_vm {
   data_heap* data;
 
   // Code heap
-  code_heap* code;
+  std::unique_ptr<code_heap> code;
 
   // Pinned callback stubs
-  callback_heap* callbacks;
+  std::unique_ptr<callback_heap> callbacks;
 
   // Only set if we're performing a GC
   gc_state* current_gc;
@@ -110,7 +117,7 @@ struct factor_vm {
   // Mark stack used for mark & sweep GC
   std::vector<cell> mark_stack;
 
-  // If not NULL, we push GC events here
+  // If not nullptr, we push GC events here
   std::vector<gc_event>* gc_events;
 
   // If a runtime function needs to call another function which potentially
@@ -155,16 +162,16 @@ struct factor_vm {
   context* new_context();
   void init_context(context* ctx);
   void delete_context();
-  cell begin_callback(cell quot);
+  [[nodiscard]] cell begin_callback(cell quot);
   void end_callback();
   void primitive_current_callback();
   void primitive_context_object();
   void primitive_context_object_for();
   void primitive_set_context_object();
-  cell stack_to_array(cell bottom, cell top, vm_error_type error);
-  cell datastack_to_array(context* ctx);
+  [[nodiscard]] cell stack_to_array(cell bottom, cell top, vm_error_type error);
+  [[nodiscard]] cell datastack_to_array(context* ctx);
   void primitive_datastack_for();
-  cell retainstack_to_array(context* ctx);
+  [[nodiscard]] cell retainstack_to_array(context* ctx);
   void primitive_retainstack_for();
   void primitive_set_datastack();
   void primitive_set_retainstack();
@@ -172,7 +179,7 @@ struct factor_vm {
   void primitive_load_locals();
 
   // run
-  void primitive_exit();
+  [[noreturn]] void primitive_exit();
   void primitive_nano_count();
   void primitive_sleep();
   void primitive_set_slot();
@@ -192,7 +199,7 @@ struct factor_vm {
   void set_profiling(fixnum rate);
   void primitive_set_profiling();
   void primitive_get_samples();
-  array* allot_growarr();
+  [[nodiscard]] array* allot_growarr();
   void growarr_add(array *growarr_, cell value);
 
   // errors
@@ -202,8 +209,8 @@ struct factor_vm {
   void divide_by_zero_error();
 
   // bignum
-  int bignum_equal_p(bignum* x, bignum* y);
-  enum bignum_comparison bignum_compare(bignum* x, bignum* y);
+  int bignum_equal_p(const bignum* x, const bignum* y);
+  enum bignum_comparison bignum_compare(const bignum* x, const bignum* y);
   bignum* bignum_add(bignum* x, bignum* y);
   bignum* bignum_subtract(bignum* x, bignum* y);
   bignum* bignum_square(bignum* x_);
@@ -214,8 +221,8 @@ struct factor_vm {
   bignum* bignum_remainder(bignum* numerator, bignum* denominator);
   fixnum bignum_to_fixnum_strict(bignum* bn);
   bignum* double_to_bignum(double x);
-  int bignum_equal_p_unsigned(bignum* x, bignum* y);
-  enum bignum_comparison bignum_compare_unsigned(bignum* x, bignum* y);
+  int bignum_equal_p_unsigned(const bignum* x, const bignum* y);
+  enum bignum_comparison bignum_compare_unsigned(const bignum* x, const bignum* y);
   bignum* bignum_add_unsigned(bignum* x_, bignum* y_, int negative_p);
   bignum* bignum_subtract_unsigned(bignum* x_, bignum* y_);
   bignum* bignum_multiply_unsigned(bignum* x_, bignum* y_, int negative_p);
@@ -253,8 +260,8 @@ struct factor_vm {
                                                       bignum_digit_type d,
                                                       int negative_p);
   bignum* bignum_digit_to_bignum(bignum_digit_type digit, int negative_p);
-  bignum* allot_bignum(bignum_length_type length, int negative_p);
-  bignum* allot_bignum_zeroed(bignum_length_type length, int negative_p);
+  [[nodiscard]] bignum* allot_bignum(bignum_length_type length, int negative_p);
+  [[nodiscard]] bignum* allot_bignum_zeroed(bignum_length_type length, int negative_p);
   bignum* bignum_shorten_length(bignum* bn, bignum_length_type length);
   bignum* bignum_trim(bignum* bn);
   bignum* bignum_new_sign(bignum* x_, int negative_p);
@@ -287,7 +294,7 @@ struct factor_vm {
   inline void each_object(Generation* gen, Iterator& iterator) {
     cell obj = gen->first_object();
     while (obj) {
-      iterator((object*)obj);
+      iterator(reinterpret_cast<object*>(obj));
       obj = gen->next_object_after(obj);
     }
   }
@@ -300,8 +307,8 @@ struct factor_vm {
     FACTOR_ASSERT(data->nursery->occupied_space() == 0);
 
     gc_off = true;
-    each_object(data->tenured, iterator);
-    each_object(data->aging, iterator);
+    each_object(data->tenured.get(), iterator);
+    each_object(data->aging.get(), iterator);
     gc_off = false;
   }
 
@@ -328,7 +335,7 @@ struct factor_vm {
     cell end = ((cell)obj + size + card_size - 1) & (~card_size + 1);
 
     for (cell offset = start; offset < end; offset += card_size)
-      write_barrier((cell*)offset);
+      write_barrier(reinterpret_cast<cell*>(offset));
   }
 
   // data heap checker
@@ -364,7 +371,7 @@ struct factor_vm {
   // generic arrays
   template <typename Array> Array* allot_uninitialized_array(cell capacity);
   template <typename Array>
-  bool reallot_array_in_place_p(Array* array, cell capacity);
+  [[nodiscard]] bool reallot_array_in_place_p(Array* array, cell capacity);
   template <typename Array> Array* reallot_array(Array* array_, cell capacity);
 
   // debug
@@ -397,16 +404,16 @@ struct factor_vm {
 
   // arrays
   inline void set_array_nth(array* array, cell slot, cell value);
-  array* allot_array(cell capacity, cell fill_);
+  [[nodiscard]] array* allot_array(cell capacity, cell fill_);
   void primitive_array();
   cell allot_array_4(cell v1_, cell v2_, cell v3_, cell v4_);
   void primitive_resize_array();
-  cell std_vector_to_array(std::vector<cell>& elements);
+  [[nodiscard]] cell std_vector_to_array(std::vector<cell>& elements);
 
   // strings
-  string* allot_string_internal(cell capacity);
+  [[nodiscard]] string* allot_string_internal(cell capacity);
   void fill_string(string* str_, cell start, cell capacity, cell fill);
-  string* allot_string(cell capacity, cell fill);
+  [[nodiscard]] string* allot_string(cell capacity, cell fill);
   void primitive_string();
   bool reallot_string_in_place_p(string* str, cell capacity);
   string* reallot_string(string* str_, cell capacity);
@@ -419,7 +426,7 @@ struct factor_vm {
   }
 
   // byte arrays
-  byte_array* allot_byte_array(cell size);
+  [[nodiscard]] byte_array* allot_byte_array(cell size);
   void primitive_byte_array();
   void primitive_uninitialized_byte_array();
   void primitive_resize_byte_array();
@@ -431,7 +438,7 @@ struct factor_vm {
   void primitive_tuple_boa();
 
   // words
-  word* allot_word(cell name_, cell vocab_, cell hashcode_);
+  [[nodiscard]] word* allot_word(cell name_, cell vocab_, cell hashcode_);
   void primitive_word();
   void primitive_word_code();
   void primitive_word_optimized_p();
@@ -561,7 +568,7 @@ struct factor_vm {
   void update_word_references(code_block* compiled, bool reset_inline_caches);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
-  cell lookup_external_address(relocation_type rel_type,
+  std::optional<cell> lookup_external_address(relocation_type rel_type,
                                code_block* compiled,
                                array* parameters,
                                cell index);
@@ -606,8 +613,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* target_ctx);
+  cell capture_callstack(context* target_ctx);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
@@ -651,7 +658,7 @@ struct factor_vm {
   void jit_compile_quotation(cell quot_, bool relocating);
   fixnum quot_code_offset_to_scan(cell quot_, cell offset);
   cell lazy_jit_compile(cell quot);
-  bool quotation_compiled_p(quotation* quot);
+  [[nodiscard]] bool quotation_compiled_p(quotation* quot);
   void primitive_quotation_compiled_p();
 
   // dispatch
@@ -679,7 +686,7 @@ struct factor_vm {
 
   // safepoints
   void handle_safepoint(cell pc);
-  void enqueue_samples(cell samples, cell pc, bool foreign_thread_p);
+  void enqueue_samples(cell sample_count, cell pc, bool foreign_thread_p);
   void enqueue_fep();
 
   // factor
@@ -697,7 +704,7 @@ struct factor_vm {
   void primitive_existsp();
   void init_ffi();
   void ffi_dlopen(dll* dll);
-  cell ffi_dlsym(dll* dll, symbol_char* symbol);
+  std::optional<cell> ffi_dlsym(dll* dll, symbol_char* symbol);
   void ffi_dlclose(dll* dll);
   void c_to_factor_toplevel(cell quot);
   void init_signals();
