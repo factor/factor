@@ -1,6 +1,3 @@
-#include <source_location>
-#include <cstdio>
-
 namespace factor { [[noreturn]] void abort(); }
 
 #ifdef FACTOR_DEBUG
