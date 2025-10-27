@@ -1,5 +1,6 @@
-USING: arrays assocs kernel math memory namespaces parser sequences
-tools.memory tools.memory.private tools.test tools.time vm ;
+USING: arrays assocs kernel layouts literals math memory
+namespaces parser sequences tools.memory tools.memory.private
+tools.test tools.time vm ;
 
 { } [ room. ] unit-test
 { } [ heap-stats. ] unit-test
@@ -22,4 +23,4 @@ tools.memory tools.memory.private tools.test tools.time vm ;
     [ CODE-BLOCK-PIC of 0 > ] tri
 ] unit-test
 
-{ 80 } [ "hello \u{snowman}" total-size ] unit-test
+${ 64-bit? 80 64 ? } [ "hello \u{snowman}" total-size ] unit-test
