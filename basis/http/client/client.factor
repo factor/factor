@@ -220,8 +220,8 @@ SYMBOL: redirects
         [ response? ]
         [ code>> 101 = ]
         [ message>> >lower "switching protocols" = ]
-        [ header>> "connection" of "upgrade" = ]
-        [ header>> "upgrade" of "websocket" = ]
+        [ header>> "connection" of >lower "upgrade" = ]
+        [ header>> "upgrade" of >lower "websocket" = ]
     } 1&& ;
 
 PRIVATE>
