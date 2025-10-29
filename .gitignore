@@ -34,8 +34,11 @@ Factor.app/Contents/_CodeSignature
 a.out
 checksums.txt
 factor.com
+factor.exe.manifest
 factor.image.fresh
 xcuserdata
 bin
 git-id
 tags
+.zig-cache
+zig-out

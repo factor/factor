@@ -14,6 +14,8 @@ CONSTANT: vocab-renames {
     { "math.functions.integer-logs" { "math.functions" "0.100" } }
     { "tools.image-analyzer" { "tools.image.analyzer" "0.100" } }
     { "promises" { "lazy" "0.100" } }
+    { "html.streams" { "io.streams.html" "0.101" } }
+    { "pdf.streams" { "io.streams.pdf" "0.101" } }
 }
 
 CONSTANT: word-renames {
@@ -80,6 +82,7 @@ CONSTANT: word-renames {
     { "download-to" { "download-into" "0.100" } }
     { "version-info" { "vm-info" "0.100" } }
     { "random-bits*" { "random-bits-exact" "0.100" } }
+    { "with-pooled-db" { "with-db-pooled-connection" "0.101" } }
 }
 
 : compute-assoc-fixups ( continuation name assoc -- seq )

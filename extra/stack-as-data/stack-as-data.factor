@@ -1,6 +1,6 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators generalizations kernel math sequences ;
+USING: combinators generalizations kernel math sequences shuffle ;
 IN: stack-as-data
 
 MACRO: stack-nth ( n -- quot )

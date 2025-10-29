@@ -32,10 +32,9 @@ TUPLE: list < pack index presenter color hook ;
     hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    [ call( elt -- obj ) ] [ drop ] 2bi
-    [ >label monospace-font >>font ] dip
-    <presentation>
-    swap >>hook ; inline
+    [
+        call( elt -- obj ) >label monospace-font >>font
+    ] keepd <presentation> swap >>hook ; inline
 
 : <list-items> ( list -- seq )
     [ list-presentation-hook ]

@@ -1,12 +1,13 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
-classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple classes.union combinators
-effects generic help help.markup help.stylesheet help.topics io
-io.pathnames io.styles kernel macros make namespaces sequences
-sorting splitting summary vocabs vocabs.files vocabs.hierarchy
-vocabs.loader vocabs.metadata words words.symbol ;
+classes.error classes.intersection classes.mixin
+classes.predicate classes.singleton classes.tuple classes.union
+combinators effects generic help help.markup help.stylesheet
+help.topics io io.pathnames io.styles kernel macros make
+namespaces sequences sorting splitting summary vocabs
+vocabs.files vocabs.hierarchy vocabs.loader vocabs.metadata
+words words.symbol ;
 IN: help.vocabs
 
 : about ( vocab -- )
@@ -87,10 +88,9 @@ C: <vocab-author> vocab-author
         ] ($block)
     ] unless-empty ;
 
-: describe-tuple-classes ( classes -- )
-    [
-        "Tuple classes" $subheading
-        [
+: (describe-tuple-classes) ( classes heading -- )
+    '[
+        _ $subheading [
             [ <$pretty-link> ]
             [ superclass-of <$pretty-link> ]
             [ "slots" word-prop [ name>> ] map join-words <$snippet> ]
@@ -99,6 +99,11 @@ C: <vocab-author> vocab-author
         { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix
         $table
     ] unless-empty ;
+
+: describe-tuple-classes ( classes -- )
+    [ error-class? ] partition
+    [ "Error classes" (describe-tuple-classes) ]
+    [ "Tuple classes" (describe-tuple-classes) ] bi* ;
 
 : describe-predicate-classes ( classes -- )
     [
@@ -133,6 +138,18 @@ C: <vocab-author> vocab-author
 : describe-intersection-classes ( classes -- )
     "Intersection classes" (describe-classes) ;
 
+: describe-other-classes ( classes -- )
+    [
+        "Other classes" $subheading
+        [
+            [ <$pretty-link> ]
+            [ "metaclass" word-prop <$pretty-link> ]
+            bi 2array
+        ] map
+        { { $strong "Class" } { $strong "Class type" } } prefix
+        $table
+    ] unless-empty ;
+
 : describe-classes ( classes -- )
     [ builtin-class? ] partition
     [ tuple-class? ] partition
@@ -140,7 +157,7 @@ C: <vocab-author> vocab-author
     [ predicate-class? ] partition
     [ mixin-class? ] partition
     [ union-class? ] partition
-    [ intersection-class? ] filter
+    [ intersection-class? ] partition
     {
         [ describe-builtin-classes ]
         [ describe-tuple-classes ]
@@ -149,6 +166,7 @@ C: <vocab-author> vocab-author
         [ describe-mixin-classes ]
         [ describe-union-classes ]
         [ describe-intersection-classes ]
+        [ describe-other-classes ]
     } spread ;
 
 : word-syntax ( word -- string/f )

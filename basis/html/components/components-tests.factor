@@ -1,7 +1,6 @@
-USING: tools.test kernel io.streams.string
-io.streams.null accessors inspector html.streams
-html.components html.forms namespaces
-xml.writer xml.syntax ;
+USING: tools.test kernel io.streams.string io.streams.html
+io.streams.null accessors inspector html.components html.forms
+namespaces xml.writer xml.syntax ;
 FROM: html.components => inspector ;
 IN: html.components.tests
 

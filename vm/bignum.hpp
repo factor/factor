@@ -32,7 +32,7 @@ namespace factor {
 // promotional, or sales literature without prior written consent from
 // MIT in each case.
 
-#define BIGNUM_OUT_OF_BAND ((bignum*)0)
+#define BIGNUM_OUT_OF_BAND (static_cast<bignum*>(0))
 
 enum bignum_comparison {
   BIGNUM_COMPARISON_EQUAL = 0,

@@ -14,16 +14,6 @@ HELP: 1token
     { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse ." "\"a\"" }
 } { $see-also string-parser } ;
 
-HELP: (list-of)
-{ $values
-    { "items" sequence }
-    { "separator" "a parser" }
-    { "repeat1?" boolean }
-    { "parser" "a parser" }
-} { $description
-    "Returns a parser that returns a list of items separated by the separator parser. Does not hide the separators."
-} { $see-also list-of list-of-many } ;
-
 HELP: list-of
 { $values
     { "items" sequence }

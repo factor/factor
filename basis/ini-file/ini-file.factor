@@ -1,9 +1,10 @@
-! Copyright (C) 2010 John Benediktsson
-! See https://factorcode.org/license.txt for BSD license
-
+! Copyright (C) 2010 John Benediktsson See
+! https://factorcode.org/license.txt for BSD license
+!
 USING: arrays assocs combinators.short-circuit formatting
-hashtables io io.streams.string kernel make math namespaces
-quoting sequences splitting strings strings.parser ;
+hashtables io io.encodings.utf8 io.files io.streams.string
+kernel linked-assocs make math namespaces quoting sequences
+splitting strings strings.parser ;
 
 IN: ini-file
 
@@ -117,7 +118,7 @@ SYMBOL: option
     section get [ second swapd set-at ] [ 2array , ] if* ;
 
 : [section] ( line -- )
-    unwrap cleanup-string H{ } clone 2array section set ;
+    unwrap cleanup-string LH{ } clone 2array section set ;
 
 : name=value ( line -- )
     option [
@@ -142,7 +143,13 @@ PRIVATE>
 : read-ini ( -- assoc )
     section off option off
     [ [ parse-line ] each-line section, ] { } make
-    >hashtable ;
+    >linked-hash ;
+
+: string>ini ( str -- assoc )
+    [ read-ini ] with-string-reader ;
+
+: file>ini ( path -- assoc )
+    utf8 [ read-ini ] with-file-reader ;
 
 : write-ini ( assoc -- )
     [
@@ -155,8 +162,8 @@ PRIVATE>
         ] if
     ] assoc-each ;
 
-: string>ini ( str -- assoc )
-    [ read-ini ] with-string-reader ;
-
 : ini>string ( assoc -- str )
     [ write-ini ] with-string-writer ;
+
+: ini>file ( assoc path -- )
+    utf8 [ write-ini ] with-file-writer ;

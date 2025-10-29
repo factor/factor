@@ -52,7 +52,7 @@ M: ##phi insn.
     dup integer? [ "%4d " printf ] [ drop "     " printf ] if ;
 
 M: insn insn. ( insn -- )
-    tuple>array unclip-last insn-number. [
+    pack-tuple unclip-last insn-number. [
         dup string? [ unparse ] unless
     ] map join-words print ;
 

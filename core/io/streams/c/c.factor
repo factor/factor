@@ -11,11 +11,13 @@ PRIMITIVE: fflush ( alien -- )
 PRIMITIVE: fgetc ( alien -- byte/f )
 PRIMITIVE: fputc ( byte alien -- )
 PRIMITIVE: fread-unsafe ( n buf alien -- count )
-PRIMITIVE: fseek ( alien offset whence -- )
+PRIMITIVE: fseek ( offset whence alien -- )
 PRIMITIVE: ftell ( alien -- n )
 PRIMITIVE: fwrite ( data length alien -- )
 
 TUPLE: c-stream < disposable handle ;
+
+! XXX: M: c-stream stream-seekable?
 
 : new-c-stream ( handle class -- c-stream )
     new-disposable swap >>handle ; inline

@@ -29,11 +29,13 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-: com-unparse ( obj -- ) [ unparse listener-input ] without-limits ;
+: com-unparse ( obj -- )
+    [ unparse ] without-limits listener-input ;
 
 [ drop t ] \ com-unparse H{ } define-operation
 
-: com-copy-object ( obj -- ) [ unparse clipboard get set-clipboard-contents ] without-limits ;
+: com-copy-object ( obj -- )
+    [ unparse ] without-limits clipboard get set-clipboard-contents ;
 
 [ drop t ] \ com-copy-object H{ } define-operation
 

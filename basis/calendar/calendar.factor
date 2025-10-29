@@ -683,6 +683,15 @@ M: timestamp december clone 12 >>month ;
 ALIAS: first-day-of-week sunday
 ALIAS: last-day-of-week saturday
 
+: year< ( timestamp quot -- timestamp' )
+    over clone [ call dup ] dip after=? [ -1 years time+ ] when ; inline
+: year<= ( timestamp quot -- timestamp' )
+    over clone [ call dup ] dip after? [ -1 years time+ ] when ; inline
+: year> ( timestamp quot -- timestamp' )
+    over clone [ call dup ] dip before=? [ 1 years time+ ] when ; inline
+: year>= ( timestamp quot -- timestamp' )
+    over clone [ call dup ] dip before? [ 1 years time+ ] when ; inline
+
 : day< ( timestamp quot -- timestamp' )
     over clone [ call dup ] dip after=? [ -7 days time+ ] when ; inline
 : day<= ( timestamp quot -- timestamp' )

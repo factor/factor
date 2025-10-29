@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Doug Coleman, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: classes classes.algebra.private classes.predicate
-classes.predicate.private kernel sequences slots words ;
+classes.predicate.private definitions kernel sequences slots
+words ;
 IN: classes.singleton
 
 <PRIVATE
@@ -27,3 +28,5 @@ M: singleton-class predicate-quot
     singleton-predicate-quot ;
 
 M: singleton-class initial-value* t ;
+
+M: singleton-class definer drop \ SINGLETON: f ;

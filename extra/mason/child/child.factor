@@ -15,10 +15,8 @@ HOOK: compile-factor-command os ( -- array )
 M: unix compile-factor-command ( -- array )
     gnu-make-cmd ;
 
-! Windows has separate 32/64 bit shells, so assuming the cell bits here is fine
-! because it won't find the right toolchain otherwise.
 M: windows compile-factor-command ( -- array )
-    { "nmake" "/f" "NMakefile" } cell-bits 64 = "x86-64-vista" "x86-32-vista" ? suffix ;
+    { "nmake" "/f" "NMakefile" } ;
 
 HOOK: factor-path os ( -- path )
 M: unix factor-path "./factor" ;

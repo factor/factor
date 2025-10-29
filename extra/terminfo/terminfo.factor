@@ -342,7 +342,7 @@ PRIVATE>
     terminfo-path [ file>terminfo ] [ f ] if* ;
 
 MEMO: my-terminfo ( -- terminfo/f )
-    "TERM" os-env name>terminfo ;
+    "TERM" os-env dup [ name>terminfo ] when ;
 
 ! We make the simplifying assumption here that terminals that do not support
 ! SGR attributes also do not support SGR0, and that all terminals that *do*

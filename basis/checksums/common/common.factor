@@ -1,18 +1,18 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays byte-vectors checksums endian
-grouping kernel make math sequences ;
+
+USING: accessors byte-arrays checksums endian grouping kernel
+math math.order sequences ;
+
 IN: checksums.common
 
 : calculate-pad-length ( length -- length' )
     [ 56 < 55 119 ? ] keep - ;
 
 : pad-last-block ( bytes big-endian? length -- blocks )
-    [
-        [ % ] 2dip 0x80 ,
-        [ 0x3f bitand calculate-pad-length <byte-array> % ]
-        [ 3 shift 8 rot [ >be ] [ >le ] if % ] bi
-    ] B{ } make 64 group ;
+    [ 0x80 suffix! ] 2dip
+    [ 0x3f bitand calculate-pad-length <byte-array> nip append! ]
+    [ 3 shift 8 rot [ >be ] [ >le ] if append! ] 2bi 64 <groups> ;
 
 MIXIN: block-checksum
 
@@ -27,22 +27,30 @@ GENERIC: checksum-block ( bytes checksum-state -- )
 ! Update the bytes-read before calculating checksum in case
 ! checksum uses this in the calculation.
 M:: block-checksum-state add-checksum-bytes ( state data -- state )
+    state bytes>> :> bytes
     state block-size>> :> block-size
-    state bytes>> length :> initial-len
-    initial-len data length + block-size /mod :> ( n extra )
-    data state bytes>> [ push-all ] keep :> all-bytes
-    all-bytes block-size <groups>
-    extra zero? [ f ] [ unclip-last-slice ] if :> ( blocks remain )
-
-    state [ initial-len - ] change-bytes-read drop
-
-    blocks [
-        state [ block-size + ] change-bytes-read
-        checksum-block
-    ] each
-
-    state [ extra + ] change-bytes-read
-    remain [ >byte-vector ] [ BV{ } clone ] if* >>bytes ;
+    bytes [ data ] [
+        length :> initial-len
+        block-size initial-len - :> needed
+        needed 0 > t assert=
+        data dup length needed min cut-slice [
+            state over length '[ _ + ] change-bytes-read drop
+            bytes push-all
+            bytes length block-size = [
+                bytes state checksum-block
+                bytes delete-all
+            ] when
+        ] dip
+    ] if-empty dup length block-size mod cut-slice* [
+        block-size <groups> [
+            bytes push-all
+            bytes state [ block-size + ] change-bytes-read checksum-block
+            bytes delete-all
+        ] each
+    ] [
+        [ bytes push-all ]
+        [ state swap length '[ _ + ] change-bytes-read ] bi
+    ] bi* ;
 
 M: block-checksum checksum-bytes
     [ swap add-checksum-bytes get-checksum ] with-checksum-state ;

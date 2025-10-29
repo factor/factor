@@ -12,8 +12,14 @@ TUPLE: cycles
 : <cycles> ( seq length -- cycles )
     [ <circular> ] dip cycles boa ;
 
+: <cycles-from> ( seq length start -- new-seq )
+    [ <cycles> ] dip over circular>> change-circular-start ;
+
 : cycle ( seq length -- new-seq )
     dupd <cycles> swap like ;
+
+: cycle-from ( seq length start -- new-seq )
+    [ dup ] 2dip <cycles-from> swap like ;
 
 : repeat ( seq times -- new-seq )
     over length * cycle ;
@@ -37,7 +43,7 @@ PRIVATE>
 M: cycles minimum dup full-cycle? [ circular>> minimum ] [ call-next-method ] if ; inline
 M: cycles maximum dup full-cycle? [ circular>> maximum ] [ call-next-method ] if ; inline
 
-TUPLE: element-repeats < sequence-view
+TUPLE: element-repeats < wrapped-sequence
 { times integer read-only } ;
 
 C: <element-repeats> element-repeats

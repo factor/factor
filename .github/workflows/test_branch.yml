@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v4
     - name: bootstrap
@@ -21,7 +21,7 @@ jobs:
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
   build-macos:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
     - name: build
@@ -34,7 +34,7 @@ jobs:
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1

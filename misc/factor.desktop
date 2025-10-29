@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Factor
+Version=1.0
+Type=Application
+Comment=A practical stack language
+GenericName=Programming Language
+Exec=factor
+Icon=factor
+Terminal=false
+Categories=Development;IDE;
+StartupWMClass=Factor
+MimeType=text/x-factor;

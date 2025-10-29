@@ -43,7 +43,7 @@ M: macos compile-factor-command ( -- array )
 M: unix compile-factor-command ( -- array )
     { "make" "-j" } cpus number>string suffix ;
 M: windows compile-factor-command ( -- array )
-    { "nmake" "/f" "NMakefile" "x86-64" } ;
+    { "nmake" "/f" "NMakefile" } ;
 
 HOOK: factor-path os ( -- path )
 M: unix factor-path "./factor" ;

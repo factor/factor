@@ -5,7 +5,7 @@ combinators.short-circuit compiler.codegen.labels
 compiler.constants cpu.architecture endian generalizations
 grouping kernel make math math.bits math.bitwise math.order
 math.parser parser prettyprint.custom prettyprint.sections
-sequences sequences.generalizations shuffle words.constant ;
+sequences sequences.generalizations words.constant ;
 FROM: math.bitwise => bits ;
 FROM: alien.c-types => float ;
 IN: cpu.arm.64.assembler
@@ -13,22 +13,28 @@ IN: cpu.arm.64.assembler
 : insns ( n -- n ) 4 * ; inline
 
 <<
+<PRIVATE
 PREDICATE: register-number < integer [ 5 bits ] keep = ;
 PREDICATE: register-width < integer power-of-2? ;
+PRIVATE>
 TUPLE: register
     { n register-number initial: 0 }
     { width register-width initial: 64 } ;
 
+<PRIVATE
 TUPLE: general-register < register ;
+PRIVATE>
 31 <iota> [
     [ [ "X" % # ] "" make create-word-in ]
     [ 64 general-register boa define-constant ] bi
 ] each
 
+<PRIVATE
 TUPLE: zero-register < general-register ;
 TUPLE: stack-register < general-register ;
 
 TUPLE: vector-register < register ;
+PRIVATE>
 32 <iota> [
     [ [ "V" % # ] "" make create-word-in ]
     [ 64 vector-register boa define-constant ] bi
@@ -38,6 +44,7 @@ TUPLE: fp-register < register ;
 >>
 
 
+<PRIVATE
 : general-prefix ( reg -- str ) width>> { { 32 "W" } { 64 "X" } } at ;
 M: general-register pprint* [ [ general-prefix % ] [ n>> # ] bi ] "" make text ;
 
@@ -59,6 +66,7 @@ M: vector-register pprint* [ "V" % n>> # ] "" make text ;
 
 : fp-prefix ( reg -- str ) width>> { { 8 "B" } { 16 "H" } { 32 "S" } { 64 "D" } { 128 "Q" } } at ;
 M: fp-register pprint* [ [ fp-prefix % ] [ n>> # ] bi ] "" make text ;
+PRIVATE>
 
 
 ALIAS: RETURN       X0
@@ -84,6 +92,8 @@ ALIAS: remainder    X15
 ALIAS: obj          X14
 ALIAS: type         X15
 ALIAS: cache        X14
+ALIAS: top          X11
+ALIAS: *top         X12
 
 ALIAS: IP0          X16 ! intra-procedure-call register
 ALIAS: IP1          X17 ! intra-procedure-call register
@@ -108,6 +118,7 @@ CONSTANT: SP  T{ stack-register f 31 64 }
 ALIAS: fp-temp      V31
 
 
+<PRIVATE
 ERROR: register-width-error reg ;
 : check-32-bit ( reg -- reg ) dup width>> 32 = [ register-width-error ] unless ;
 : check-64-bit ( reg -- reg ) dup width>> 64 = [ register-width-error ] unless ;
@@ -267,10 +278,18 @@ M: operand encode-width register>> encode-width ;
 TUPLE: extended-register < operand ;
 C: <extended-register> extended-register
 
+ERROR: immediate-error n ;
+: check-amount ( uimm3 -- uimm3 )
+    dup 0 4 between? [ immediate-error ] unless ;
+
 : check-Wm ( Wm uimm3 -- Wm uimm3 )
-    [ check-32-bit check-general-register check-zero-register ] dip ;
+    [ check-32-bit check-general-register check-zero-register ]
+    [ check-amount ] bi* ;
+
 : check-Xm ( Xm uimm3 -- Wm uimm3 )
-    [ check-64-bit check-general-register check-zero-register ] dip ;
+    [ check-64-bit check-general-register check-zero-register ]
+    [ check-amount ] bi* ;
+PRIVATE>
 
 : <UXTB> ( Rm uimm3 -- er ) check-Wm 0 <extended-register> ;
 : <UXTH> ( Rm uimm3 -- er ) check-Wm 1 <extended-register> ;
@@ -282,10 +301,12 @@ C: <extended-register> extended-register
 : <SXTX> ( Rm uimm3 -- er ) check-Xm 7 <extended-register> ;
 : <LSL*> ( Rm uimm3 -- er ) over encode-width 2 + <extended-register> ;
 
+<PRIVATE
 TUPLE: shifted-register < operand ;
 : <shifted-register> ( Rm amount type -- sr )
     [ over encode-width 5 + check-unsigned-immediate ] dip
     shifted-register boa ;
+PRIVATE>
 
 : <LSL> ( Rm uimm5/6 -- sr ) 0 <shifted-register> ;
 : <LSR> ( Rm uimm5/6 -- sr ) 1 <shifted-register> ;
@@ -294,8 +315,10 @@ TUPLE: shifted-register < operand ;
 
 
 TUPLE: offset register offset type ;
+<PRIVATE
 C: <offset> offset
 : >offset< ( index/offset -- register offset type ) [ register>> ] [ offset>> ] [ type>> ] tri ;
+PRIVATE>
 
 : [post] ( Xn imm -- offset ) 1 <offset> ;
 : [pre]  ( Xn imm -- offset ) 3 <offset> ;
@@ -307,7 +330,9 @@ M: register [+] 0 <LSL*> [+] ;
 
 : [] ( Xn -- address ) 0 [+] ;
 
+<PRIVATE
 PREDICATE: register-offset < offset type>> 2 = ;
+PRIVATE>
 
 
 CONSTANT: EQ  0 ! equal
@@ -359,8 +384,10 @@ M: shifted-register NEGS insert-zero-register* SUBS ;
 M: register NEG  0 <LSL> NEG ;
 M: register NEGS 0 <LSL> NEGS ;
 
+<PRIVATE
 : add/sub-register ( Rd Rn Rm -- Rd Rn operand )
-    0 2pick [ stack-register? ] either? [ <LSL*> ] [ <LSL> ] if ;
+    0 reach reach [ stack-register? ] either? [ <LSL*> ] [ <LSL> ] if ;
+PRIVATE>
 
 M: register ADD  add/sub-register ADD  ;
 M: register ADDS add/sub-register ADDS ;
@@ -404,6 +431,7 @@ GENERIC#: LDR* 1 ( Rt operand c-type -- )
 GENERIC: MOV ( Rd operand -- )
 
 
+<PRIVATE
 MACRO: encode ( bitspec -- quot ) '[ _ bitfield* 4 >le % ] ;
 
 
@@ -418,12 +446,14 @@ MACRO: encode ( bitspec -- quot ) '[ _ bitfield* 4 >le % ] ;
         5
         31
     } encode ;
+PRIVATE>
 
 : ADR  ( Xd imm -- )        0 (ADR) ;
 : ADRP ( Xd imm -- ) 12 ?>> 1 (ADR) ;
 
 
 : unsigned-immediate? ( n bits -- ? ) dupd bits = ;
+<PRIVATE
 
 PREDICATE: unshifted-add/sub-immediate < integer
     12 unsigned-immediate? ;
@@ -446,6 +476,7 @@ M: shifted-add/sub-immediate split-add/sub-immediate -12 shift 1 swap ;
         29
     } encode ;
 
+PRIVATE>
 UNION: add/sub-immediate unshifted-add/sub-immediate shifted-add/sub-immediate ;
 
 M: add/sub-immediate ADD  [ check-stack-register ] 2dip 0 add/sub-imm ;
@@ -454,6 +485,7 @@ M: add/sub-immediate SUB  [ check-stack-register ] 2dip 2 add/sub-imm ;
 M: add/sub-immediate SUBS [ check-zero-register  ] 2dip 3 add/sub-imm ;
 
 
+<PRIVATE
 : repeating-element ( imm-bits imm-width -- element-bits element-width )
     [ 2dup 2/ <groups> all-equal? ] [ 2/ ] while [ head ] keep ;
 
@@ -475,8 +507,10 @@ M: add/sub-immediate SUBS [ check-zero-register  ] 2dip 3 add/sub-imm ;
     { [ bits-all-equal? not ] [ repeating-element? ] } 2&& ;
 
 PREDICATE: logical-32-bit-immediate < integer 32 (logical-immediate?) ;
+PRIVATE>
 PREDICATE: logical-64-bit-immediate < integer 64 (logical-immediate?) ;
 
+<PRIVATE
 UNION: logical-immediate
     logical-32-bit-immediate logical-64-bit-immediate ;
 
@@ -509,6 +543,7 @@ ERROR: element-error element element-width transitions ;
         16
         29
     } encode ;
+PRIVATE>
 
 M: logical-immediate AND  [ check-stack-register ] 2dip 0 logical-imm ;
 M: logical-immediate ORR  [ check-stack-register ] 2dip 1 logical-imm ;
@@ -516,6 +551,7 @@ M: logical-immediate EOR  [ check-stack-register ] 2dip 2 logical-imm ;
 M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
 
 
+<PRIVATE
 : move-wide-imm ( Rd imm16 hw opc -- )
     [ 1encode-width ] 3dip [ pick 1 + check-unsigned-immediate ] dip {
         { 0b100101 23 }
@@ -525,6 +561,7 @@ M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
         21
         29
     } encode ;
+PRIVATE>
 
 : MOVN ( Rd imm16 hw -- ) 0 move-wide-imm ;
 : MOVZ ( Rd imm16 hw -- ) 2 move-wide-imm ;
@@ -533,6 +570,7 @@ M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
 M: integer MOV 0 MOVZ ;
 
 
+<PRIVATE
 : bitfield ( Rd Rn immr imms opc -- )
     [ 2encode-width dup ] 3dip {
         { 0b100110 23 }
@@ -544,60 +582,57 @@ M: integer MOV 0 MOVZ ;
         10
         29
     } encode ;
+PRIVATE>
 
 : SBFM ( Rd Rn immr imms -- ) 0 bitfield ;
 :  BFM ( Rd Rn immr imms -- ) 1 bitfield ;
 : UBFM ( Rd Rn immr imms -- ) 2 bitfield ;
 
-ERROR: immediate-error n ;
-:: UBFIZ ( Rd Rn lsb width -- )
-    Rn encode-width 5 + :> max-width
-    lsb max-width check-unsigned-immediate drop
-    width dup 1 max-width 2^ lsb - between? [ immediate-error ] unless drop
-    Rd Rn lsb neg max-width bits width 1 - UBFM ;
+<PRIVATE
+: ?max-width ( Rn n -- Rn n max-width )
+    over encode-width 5 + [ check-unsigned-immediate ] keep ;
+PRIVATE>
 
-M:: integer LSL ( Rd Rn shift -- )
-    Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
-    Rd Rn shift bitnot max-width bits [ 1 + ] keep UBFM ;
+: UBFIZ ( Rd Rn lsb width -- )
+    [ ?max-width ] dip 3dup spin [ 1 ] [ 2^ ] [ - ] tri* between?
+    [ immediate-error ] unless [ neg ] [ bits ] [ 1 - ] tri* UBFM ;
 
-M:: integer LSR ( Rd Rn shift -- )
-    Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
-    Rd Rn shift max-width on-bits UBFM ;
+M: integer LSL ( Rd Rn shift -- )
+    ?max-width [ bitnot ] [ bits ] bi* [ 1 + ] keep UBFM ;
 
-M:: integer ASR ( Rd Rn shift -- )
-    Rn encode-width 5 + :> max-width
-    shift max-width check-unsigned-immediate drop
-    Rd Rn shift max-width on-bits SBFM ;
+M: integer LSR ( Rd Rn shift -- ) ?max-width on-bits UBFM ;
+M: integer ASR ( Rd Rn shift -- ) ?max-width on-bits SBFM ;
 
 
-: conditional-branch ( imm19 cond op -- )
+<PRIVATE
+: conditional-branch ( imm21 cond op -- )
     [ 2 ?>> 19 check-signed-immediate ] 2dip {
         { 0b0101010 25 }
         5
         0
         4
     } encode ;
+PRIVATE>
 
-GENERIC#: B.cond 1 ( label/imm19 cond -- )
+GENERIC#: B.cond 1 ( label/imm21 cond -- )
 M: integer B.cond 0 conditional-branch ;
 M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
 
-: BEQ ( imm19 -- ) EQ B.cond ;
-: BNE ( imm19 -- ) NE B.cond ;
-: BHS ( imm19 -- ) HS B.cond ;
-: BLO ( imm19 -- ) LO B.cond ;
-: BVS ( imm19 -- ) VS B.cond ;
-: BVC ( imm19 -- ) VC B.cond ;
-: BHI ( imm19 -- ) HI B.cond ;
-: BLS ( imm19 -- ) LS B.cond ;
-: BGE ( imm19 -- ) GE B.cond ;
-: BLT ( imm19 -- ) LT B.cond ;
-: BGT ( imm19 -- ) GT B.cond ;
-: BLE ( imm19 -- ) LE B.cond ;
+: BEQ ( imm21 -- ) EQ B.cond ;
+: BNE ( imm21 -- ) NE B.cond ;
+: BHS ( imm21 -- ) HS B.cond ;
+: BLO ( imm21 -- ) LO B.cond ;
+: BVS ( imm21 -- ) VS B.cond ;
+: BVC ( imm21 -- ) VC B.cond ;
+: BHI ( imm21 -- ) HI B.cond ;
+: BLS ( imm21 -- ) LS B.cond ;
+: BGE ( imm21 -- ) GE B.cond ;
+: BLT ( imm21 -- ) LT B.cond ;
+: BGT ( imm21 -- ) GT B.cond ;
+: BLE ( imm21 -- ) LE B.cond ;
 
 
+<PRIVATE
 : exception ( imm16 opc op2 LL -- )
     [ 16 check-unsigned-immediate ] 3dip {
         { 0b11010100 24 }
@@ -606,10 +641,12 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
         2
         0
     } encode ;
+PRIVATE>
 
 : BRK ( imm16 -- ) 1 0 0 exception ;
 
 
+<PRIVATE
 : hint ( CRm op2 -- )
     {
         { 0b11010101000000110010 12 }
@@ -617,10 +654,12 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
         8
         5
     } encode ;
+PRIVATE>
 
 : NOP ( -- ) 0 0 hint ;
 
 
+<PRIVATE
 : system-register-move ( Rt o0:op1:CRn:CRm:op2 L -- )
     {
         { 0b1101010100 22 }
@@ -628,11 +667,13 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
         5
         21
     } encode ;
+PRIVATE>
 
 : MSR ( o0:op1:CRn:CRm:op2 Rt -- ) swap 0 system-register-move ;
 : MRS ( Rt o0:op1:CRn:CRm:op2 -- ) 1 system-register-move ;
 
 
+<PRIVATE
 : unconditional-branch-reg ( Rn opc -- )
     {
         { 0b1101011 25 }
@@ -640,23 +681,28 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
         { X/ZR 5 }
         21
     } encode ;
+PRIVATE>
 
 : BR    ( Xn -- ) 0 unconditional-branch-reg ;
 : BLR   ( Xn -- ) 1 unconditional-branch-reg ;
+<PRIVATE
 : (RET) ( Xn -- ) 2 unconditional-branch-reg ;
+PRIVATE>
 
 : RET ( -- ) LR (RET) ;
 
 
-: unconditional-branch-imm ( imm26 op -- )
+<PRIVATE
+: unconditional-branch-imm ( imm28 op -- )
     [ 2 ?>> 26 check-signed-immediate ] dip {
         { 0b00101 26 }
         0
         31
     } encode ;
+PRIVATE>
 
-GENERIC: B  ( label/imm19 -- )
-GENERIC: BL ( label/imm19 -- )
+GENERIC: B  ( label/imm28 -- )
+GENERIC: BL ( label/imm28 -- )
 
 M: integer B  0 unconditional-branch-imm ;
 M: integer BL 1 unconditional-branch-imm ;
@@ -694,6 +740,7 @@ M: label BL 0 BL rc-relative-arm-b label-fixup ;
 : LDR=BR ( -- word class ) f (LDR=BR) ;
 
 
+<PRIVATE
 : compare-and-branch ( Rt imm19 op -- )
     [ 1encode-width ] 2dip [ 2 ?>> 19 check-signed-immediate ] dip {
         { 0b011010 25 }
@@ -702,6 +749,7 @@ M: label BL 0 BL rc-relative-arm-b label-fixup ;
         5
         24
     } encode ;
+PRIVATE>
 
 GENERIC: CBZ  ( Rt label/imm19 -- )
 GENERIC: CBNZ ( Rt label/imm19 -- )
@@ -713,6 +761,7 @@ M: label CBZ  [ 0 CBZ  ] dip rc-relative-arm-b.cond/ldr label-fixup ;
 M: label CBNZ [ 0 CBNZ ] dip rc-relative-arm-b.cond/ldr label-fixup ;
 
 
+<PRIVATE
 : test-and-branch ( Rt imm6 imm14 op -- )
     [ [ -5 shift ] [ 5 bits ] bi ] 2dip
     [ 2 ?>> 14 check-signed-immediate ] dip {
@@ -723,11 +772,13 @@ M: label CBNZ [ 0 CBNZ ] dip rc-relative-arm-b.cond/ldr label-fixup ;
         5
         24
     } encode ;
+PRIVATE>
 
 : TBZ  ( Rt imm6 imm14 -- ) 0 test-and-branch ;
 : TBNZ ( Rt imm6 imm14 -- ) 1 test-and-branch ;
 
 
+<PRIVATE
 : load-register-literal ( Rt imm19 opc VR -- )
     [ 2 ?>> 19 check-signed-immediate ] 2dip {
         { 0b011 27 }
@@ -736,15 +787,17 @@ M: label CBNZ [ 0 CBNZ ] dip rc-relative-arm-b.cond/ldr label-fixup ;
         30
         26
     } encode ;
+PRIVATE>
 
 M: integer LDR over [ encode-width ] [ encode-type ] bi load-register-literal ;
 M: integer LDRSW 2 0 load-register-literal ;
 
 
+<PRIVATE
 : load/store-pair ( Rt Rt2 offset L -- )
     [
-        [ 2encode-width* ] dip >offset<
-        [ 2pick + 1 + ?>> 7 check-signed-immediate ] dip
+        [ 2encode-width* ] dip >offset< dup 0 = [ drop 2 ] when
+        [ reach reach + 1 + ?>> 7 check-signed-immediate ] dip
     ] dip {
         { 0b101 27 }
         { R/ZR 0 }
@@ -756,11 +809,13 @@ M: integer LDRSW 2 0 load-register-literal ;
         23
         22
     } encode ;
+PRIVATE>
 
 : STP ( Rt Rt2 offset -- ) 0 load/store-pair ;
 : LDP ( Rt Rt2 offset -- ) 1 load/store-pair ;
 
 
+<PRIVATE
 : load/store-register-unsigned-offset ( Rt size VR opc1 Rn offset L -- )
     {
         { 0b111 27 }
@@ -786,10 +841,12 @@ M: integer LDRSW 2 0 load-register-literal ;
         10
         22
     } encode ;
+PRIVATE>
 
 : LDUR ( Rt operand -- )
     [ dup encode-width** drop ] [ >offset< ] bi* 1 ((load/store-register)) ;
 
+<PRIVATE
 :: (load/store-register) ( Rt operand size VR opc1 sh L -- )
     operand >offset< :> ( Rn offset type )
     offset sh neg shift :> scaled-offset
@@ -804,6 +861,7 @@ M: integer LDRSW 2 0 load-register-literal ;
         Rt size VR opc1 Rn offset type L
         ((load/store-register))
     ] if ;
+PRIVATE>
 
 M: offset STRB 0 0 0 0 0 (load/store-register) ;
 M: offset LDRB 0 0 0 0 1 (load/store-register) ;
@@ -815,12 +873,15 @@ M: offset LDRSB 0 0 1 0 0 (load/store-register) ;
 M: offset LDRSH 1 0 1 1 0 (load/store-register) ;
 M: offset LDRSW 2 0 1 2 0 (load/store-register) ;
 
+<PRIVATE
 : load/store-register ( Rt operand L -- )
     [ over encode-width** ] dip (load/store-register) ;
+PRIVATE>
 
 M: offset STR 0 load/store-register ;
 M: offset LDR 1 load/store-register ;
 
+<PRIVATE
 ERROR: unknown-c-type c-type ;
 : encode-c-type ( c-type L -- size VR opc1 sh L )
     [ {
@@ -845,13 +906,22 @@ ERROR: unknown-c-type c-type ;
 
 : load/store-register* ( Rt operand c-type L -- )
     encode-c-type (load/store-register) ;
+PRIVATE>
 
 M: offset STR* 0 load/store-register* ;
 M: offset LDR* 1 load/store-register* ;
 
+<PRIVATE
+: >S ( amount size -- S )
+    {
+        { [ 2dup = ] [ 2drop 1 ] }
+        { [ over 0 = ] [ 2drop 0 ] }
+        [ scaling-error ]
+    } cond ;
 
 : (load/store-register-register) ( Rt operand size VR opc1 L -- )
-    [ >offset< [ >operand< ] dip ] 4dip {
+    [ >offset< [ >operand< ] dip ] 4dip
+    [ tuck [ >S ] 2dip ] 3dip {
         { 0b111 27 }
         { 0b1 21 }
         { n>> 0 }
@@ -865,6 +935,7 @@ M: offset LDR* 1 load/store-register* ;
         23
         22
     } encode ;
+PRIVATE>
 
 M: register-offset STRB 0 0 0 0 (load/store-register-register) ;
 M: register-offset LDRB 0 0 0 1 (load/store-register-register) ;
@@ -876,19 +947,24 @@ M: register-offset LDRSB 0 0 1 0 (load/store-register-register) ;
 M: register-offset LDRSH 1 0 1 0 (load/store-register-register) ;
 M: register-offset LDRSW 2 0 1 0 (load/store-register-register) ;
 
+<PRIVATE
 : load/store-register-register ( Rt operand L -- )
     [ over encode-width** drop ] dip (load/store-register-register) ;
+PRIVATE>
 
 M: register-offset STR 0 load/store-register-register ;
 M: register-offset LDR 1 load/store-register-register ;
 
+<PRIVATE
 : load/store-register-register* ( Rt operand c-type L -- )
     encode-c-type nip (load/store-register-register) ;
+PRIVATE>
 
 M: register-offset STR* 0 load/store-register-register* ;
 M: register-offset LDR* 1 load/store-register-register* ;
 
 
+<PRIVATE
 : data-processing-2-sources ( Rd Rn Rm opcode -- )
     [ 3encode-width ] dip {
         { 0b11010110 21 }
@@ -898,13 +974,16 @@ M: register-offset LDR* 1 load/store-register-register* ;
         31
         10
     } encode ;
+PRIVATE>
 
 : UDIV ( Rd Rn Rm -- ) 0b000010 data-processing-2-sources ;
 : SDIV ( Rd Rn Rm -- ) 0b000011 data-processing-2-sources ;
+<PRIVATE
 : LSLV ( Rd Rn Rm -- ) 0b001000 data-processing-2-sources ;
 : LSRV ( Rd Rn Rm -- ) 0b001001 data-processing-2-sources ;
 : ASRV ( Rd Rn Rm -- ) 0b001010 data-processing-2-sources ;
 : RORV ( Rd Rn Rm -- ) 0b001011 data-processing-2-sources ;
+PRIVATE>
 
 M: register LSL LSLV ;
 M: register LSR LSRV ;
@@ -912,6 +991,7 @@ M: register ASR ASRV ;
 M: register ROR RORV ;
 
 
+<PRIVATE
 : data-processing-1-source ( Rd Rn opcode -- )
     [ 2encode-width ] dip {
         { 0b1011010110 21 }
@@ -920,11 +1000,13 @@ M: register ROR RORV ;
         31
         10
     } encode ;
+PRIVATE>
 
 : CLZ ( Rd Rn -- ) 0b000100 data-processing-1-source ;
 : CLS ( Rd Rn -- ) 0b000101 data-processing-1-source ;
 
 
+<PRIVATE
 : logical-shifted-register ( Rd Rn operand opc N -- )
     [ >operand< [ 3encode-width ] 2dip ] 2dip {
         { 0b01010 24 }
@@ -937,6 +1019,7 @@ M: register ROR RORV ;
         29
         21
     } encode ;
+PRIVATE>
 
 M: shifted-register AND  0 0 logical-shifted-register ;
 M: shifted-register BIC  0 1 logical-shifted-register ;
@@ -963,6 +1046,7 @@ M: register MOV ( Rd register -- )
 : MVN ( Rd operand -- ) insert-zero-register* ORN ;
 
 
+<PRIVATE
 : add/sub-shifted-register ( Rd Rn operand op -- )
     [ >operand< ] dip [ 3encode-width ] 3dip {
         { 0b01011 24 }
@@ -974,6 +1058,7 @@ M: register MOV ( Rd register -- )
         10
         29
     } encode ;
+PRIVATE>
 
 M: shifted-register ADD  0 add/sub-shifted-register ;
 M: shifted-register ADDS 1 add/sub-shifted-register ;
@@ -981,6 +1066,7 @@ M: shifted-register SUB  2 add/sub-shifted-register ;
 M: shifted-register SUBS 3 add/sub-shifted-register ;
 
 
+<PRIVATE
 : add/sub-extended-register ( Rd Rn operand op -- )
     [ >operand< ] dip [ 3encode-width ] 3dip {
         { 0b01011001 21 }
@@ -992,6 +1078,7 @@ M: shifted-register SUBS 3 add/sub-shifted-register ;
         10
         29
     } encode ;
+PRIVATE>
 
 M: extended-register ADD  0 add/sub-extended-register ;
 M: extended-register ADDS 1 add/sub-extended-register ;
@@ -999,6 +1086,7 @@ M: extended-register SUB  2 add/sub-extended-register ;
 M: extended-register SUBS 3 add/sub-extended-register ;
 
 
+<PRIVATE
 : conditional-select ( Rd Rn Rm cond op op2 -- )
     [ 3encode-width ] 3dip {
         { 0b11010100 21 }
@@ -1010,6 +1098,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         30
         10
     } encode ;
+PRIVATE>
 
 : CSEL  ( Rd Rn Rm cond -- ) 0 0 conditional-select ;
 : CSINC ( Rd Rn Rm cond -- ) 0 1 conditional-select ;
@@ -1017,6 +1106,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
 : CSNEG ( Rd Rn Rm cond -- ) 1 1 conditional-select ;
 
 
+<PRIVATE
 : data-processing-3-sources ( Rd Rn Rm Ra op -- )
     [ 4encode-width ] dip {
         { 0b11011 24 }
@@ -1027,12 +1117,14 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         31
         15
     } encode ;
+PRIVATE>
 
 : MADD ( Rd Rn Rm Ra -- ) 0 data-processing-3-sources ;
 : MSUB ( Rd Rn Rm Ra -- ) 1 data-processing-3-sources ;
 
 : MUL ( Rd Rn Rm -- ) dup >zero-register MADD ;
 
+<PRIVATE
 : data-processing-3-sources* ( Xd Xn Xm op -- )
     {
         { 0b1 31 }
@@ -1043,6 +1135,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         { X/ZR 16 }
         21
     } encode ;
+PRIVATE>
 
 : SMULH ( Xd Xn Xm -- ) 2 data-processing-3-sources* ;
 : UMULH ( Xd Xn Xm -- ) 6 data-processing-3-sources* ;
@@ -1054,8 +1147,8 @@ M: extended-register SUBS 3 add/sub-extended-register ;
     [ 1 0 ? ] bi {
         { 0b11110 24 }
         { 0b1 21 }
-        { R 0 }
-        { R 5 }
+        { n>> 0 }
+        { n>> 5 }
         31
         22
         16
@@ -1066,8 +1159,8 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         { 0b11110 24 }
         { 0b1 21 }
         { 0b10000 10 }
-        { R 0 }
-        { R 5 }
+        { n>> 0 }
+        { n>> 5 }
         22
     } encode ;
 
@@ -1098,6 +1191,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         31
     } encode ;
 
+<PRIVATE
 : fp-data-processing-1-source ( Rd Rn ftype opc op -- )
     {
         { 0b11110 24 }
@@ -1109,12 +1203,14 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         15
         17
     } encode ;
+PRIVATE>
 
 : FSQRTs ( Rd Rn -- ) 2encode-width*** 3 0 fp-data-processing-1-source ;
 
 : FCVT ( Rd Rn -- ) 2dup [ encode-width*** ] bi@ swap 1 fp-data-processing-1-source ;
 
 
+<PRIVATE
 : fp-compare ( Rn Rm opcode -- )
     [ 2encode-width*** ] dip {
         { 0b11110 24 }
@@ -1125,11 +1221,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         22
         4
     } encode ;
+PRIVATE>
 
 : FCMP  ( Rn Rm -- ) 0 fp-compare ;
 : FCMPE ( Rn Rm -- ) 1 fp-compare ;
 
 
+<PRIVATE
 : fp-data-processing-2-sources ( Rd Rn Rm opcode -- )
     [ 3encode-width*** ] dip {
         { 0b11110 24 }
@@ -1141,6 +1239,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         22
         12
     } encode ;
+PRIVATE>
 
 : FMULs ( Rd Rn Rm -- ) 0 fp-data-processing-2-sources ;
 : FDIVs ( Rd Rn Rm -- ) 1 fp-data-processing-2-sources ;
@@ -1150,6 +1249,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
 : FMINs ( Rd Rn Rm -- ) 5 fp-data-processing-2-sources ;
 
 
+<PRIVATE
 : simd-scalar-2-misc ( Rd Rn size0 U size1 opcode -- )
     {
         { 0b01 30 }
@@ -1163,11 +1263,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         23
         12
     } encode ;
+PRIVATE>
 
 : FCVTZSvi ( Rd Rn spec* -- ) 0 1 0b11011 simd-scalar-2-misc ;
 : SCVTFvi  ( Rd Rn spec  -- ) 0 0 0b11101 simd-scalar-2-misc ;
 
 
+<PRIVATE
 : simd-table-lookup ( Rd Rn Rm op2 len op -- )
     {
         { 0b1001110 24 }
@@ -1178,11 +1280,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         13
         12
     } encode ;
+PRIVATE>
 
 : TBL ( Rd Rn Rm -- ) 0 0 0 simd-table-lookup ;
 : TBX ( Rd Rn Rm -- ) 0 0 1 simd-table-lookup ;
 
 
+<PRIVATE
 : simd-permute ( Rd Rn Rm size opcode -- )
     {
         { 0b1 30 }
@@ -1194,11 +1298,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         22
         12
     } encode ;
+PRIVATE>
 
 : TRN1 ( Rd Rn Rm spec -- ) 0b010 simd-permute ;
 : TRN2 ( Rd Rn Rm spec -- ) 0b110 simd-permute ;
 
 
+<PRIVATE
 : simd-extract ( Rd Rn Rm imm4 op2 -- )
     {
         { 0b1 30 }
@@ -1209,10 +1315,12 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         11
         22
     } encode ;
+PRIVATE>
 
 : EXT ( Rd Rn Rm imm4 -- ) 0 simd-extract ;
 
 
+<PRIVATE
 : simd-copy ( Rd Rn imm5 imm4 op -- )
     {
         { 0b1 30 }
@@ -1224,6 +1332,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         11
         29
     } encode ;
+PRIVATE>
 
 : INSgen ( Rd Rn imm rep -- )
     scalar-rep-of rep-size log2 [ 5 swap - check-unsigned-immediate ] keep
@@ -1235,6 +1344,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
     [ [ shift ] [ 2^ bitor ] bi ] [ 1 - log2 shift ] bi-curry bi*
     1 simd-copy ;
 
+<PRIVATE
 : simd-copy* ( Rd Rn imm5 rep imm4 op -- )
     [
         [ 1encode-width ] 3dip
@@ -1250,11 +1360,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         11
         29
     } encode ;
+PRIVATE>
 
 : SMOV ( Rd Rn imm rep -- ) 0b0101 0 simd-copy* ;
 : UMOV ( Rd Rn imm rep -- ) 0b0111 0 simd-copy* ;
 
 
+<PRIVATE
 : simd-3-ext ( Rd Rn Rm size U opcode -- )
     {
         { 0b1 30 }
@@ -1268,11 +1380,13 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         29
         11
     } encode ;
+PRIVATE>
 
 : SDOT ( Rd Rn Rm size -- ) 0 2 simd-3-ext ;
 : UDOT ( Rd Rn Rm size -- ) 1 2 simd-3-ext ;
 
 
+<PRIVATE
 : simd-2-misc ( Rd Rn size0 U size1 opcode Q -- )
     {
         { 0b01110 24 }
@@ -1286,6 +1400,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         12
         30
     } encode ;
+PRIVATE>
 
 : CNTv    ( Rd Rn -- )    0 0 0 0b00101 1 simd-2-misc ;
 : ABSv    ( Rd Rn size -- ) 0 0 0b01011 1 simd-2-misc ;
@@ -1301,8 +1416,10 @@ M: extended-register SUBS 3 add/sub-extended-register ;
 : FSQRTv  ( Rd Rn size -- ) 1 1 0b11111 1 simd-2-misc ;
 
 
+<PRIVATE
 : simd-across-lanes ( Rd Rn size U opcode -- )
     {
+        { 0b1 30 }
         { 0b01110 24 }
         { 0b11000 17 }
         { 0b10 10 }
@@ -1312,10 +1429,12 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         29
         12
     } encode ;
+PRIVATE>
 
 : ADDV ( Rd Rn size -- ) 0 0b11011 simd-across-lanes ;
 
 
+<PRIVATE
 : simd-3-same ( Rd Rn Rm size0 U size1 opcode -- )
     {
         { 0b1 30 }
@@ -1330,6 +1449,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         23
         11
     } encode ;
+PRIVATE>
 
 : SHADD ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
 : SQADD ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
@@ -1369,6 +1489,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
 : ORRv  ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
 
 
+<PRIVATE
 : simd-shift-by-imm ( Rd Rn imm rep U opcode Q -- )
     [ scalar-rep-of rep-size 3 shift bitor ] 3dip {
         { 0b011110 23 }
@@ -1380,6 +1501,7 @@ M: extended-register SUBS 3 add/sub-extended-register ;
         11
         30
     } encode ;
+PRIVATE>
 
 : SSHR  ( Rd Rn imm rep -- ) 0 0b00000 1 simd-shift-by-imm ;
 : SHL   ( Rd Rn imm rep -- ) 0 0b01010 1 simd-shift-by-imm ;

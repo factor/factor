@@ -116,3 +116,17 @@ PRIVATE>
 
 : >utf8-index ( n string -- n' )
     code-point-offsets nth ;
+
+TUPLE: utf8-bom bom? ;
+
+: utf8-bom ( -- utf8-bom ) f \ utf8-bom boa ;
+
+M:: utf8-bom decode-char ( stream encoding -- char/f )
+    stream utf8 decode-char encoding bom?>> [
+        t encoding bom?<< dup 0xfeff = [
+            drop stream utf8 decode-char
+        ] when
+    ] unless ;
+
+M: utf8-bom <encoder>
+    drop B{ 0xef 0xbb 0xbf } over stream-write utf8 <encoder> ;

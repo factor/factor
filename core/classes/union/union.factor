@@ -122,3 +122,5 @@ M: union-class normalize-class
 
 M: union-class (flatten-class)
     class-members <anonymous-union> (flatten-class) ;
+
+M: union-class definer drop \ UNION: \ ; ;

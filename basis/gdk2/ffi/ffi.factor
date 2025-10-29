@@ -102,3 +102,4 @@ STRUCT: GdkEventScroll
     { device GdkDevice* }
     { x_root gdouble }
     { y_root gdouble } ;
+

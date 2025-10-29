@@ -144,7 +144,7 @@ M: decoder stream-read-unsafe
 
 M: decoder stream-contents* stream-contents-by-element ; inline
 
-: line-ends/eof ( stream str -- str ) f like swap cr- ; inline
+: line-ends/eof ( stream str -- str/f ) f like swap cr- ; inline
 
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
@@ -153,7 +153,7 @@ M: decoder stream-contents* stream-contents-by-element ; inline
         over cr- [ stream-readln ] [ nip ] if-empty
     ] [ nip ] if ; inline
 
-: handle-readln ( stream str ch -- str )
+: handle-readln ( stream str ch -- str/f )
     {
         { f [ line-ends/eof ] }
         { CHAR: \r [ line-ends\r ] }

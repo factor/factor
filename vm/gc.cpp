@@ -28,16 +28,8 @@ void gc_event::ended_gc(factor_vm* parent) {
 
 gc_state::gc_state(gc_op op, factor_vm* parent) : op(op) {
   if (parent->gc_events) {
-    event = new gc_event(op, parent);
+    event = std::make_unique<gc_event>(op, parent);
     start_time = nano_count();
-  } else
-    event = NULL;
-}
-
-gc_state::~gc_state() {
-  if (event) {
-    delete event;
-    event = NULL;
   }
 }
 
@@ -60,7 +52,7 @@ void factor_vm::start_gc_again() {
 
 void factor_vm::set_current_gc_op(gc_op op) {
   current_gc->op = op;
-  if (gc_events)
+  if (gc_events && current_gc->event)
     current_gc->event->op = op;
 }
 
@@ -83,7 +75,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   // out of space in the target generation.
   for (;;) {
     try {
-      if (gc_events)
+      if (gc_events && current_gc->event)
         current_gc->event->op = current_gc->op;
 
       switch (current_gc->op) {
@@ -139,7 +131,7 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   if (ctx)
     ctx->callstack_seg->set_border_locked(true);
   delete current_gc;
-  current_gc = NULL;
+  current_gc = nullptr;
 
   // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
@@ -167,11 +159,11 @@ void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);
 
-    std::vector<gc_event>* gc_events = this->gc_events;
-    this->gc_events = NULL;
+    std::vector<gc_event>* collected_events = this->gc_events;
+    this->gc_events = nullptr;
 
-    FACTOR_FOR_EACH(*gc_events) {
-      gc_event event = *iter;
+    for (const auto& collected_event : *collected_events) {
+      gc_event event = collected_event;
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));
     }
@@ -179,7 +171,7 @@ void factor_vm::primitive_disable_gc_events() {
     result.trim();
     ctx->push(result.elements.value());
 
-    delete this->gc_events;
+    delete collected_events;
   } else
     ctx->push(false_object);
 }

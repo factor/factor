@@ -5,7 +5,7 @@ USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
 fonts images init io.encodings.string io.encodings.utf16 kernel
 literals locals math math.bitwise math.functions namespaces
-sequences specialized-arrays windows.errors windows.fonts
+opengl sequences specialized-arrays windows.errors windows.fonts
 windows.gdi32 windows.offscreen windows.ole32 windows.types
 windows.usp10 ;
 
@@ -117,8 +117,7 @@ PRIVATE>
 
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
-    size dc
-    [ ssa size script-string draw-script-string ] make-bitmap-image
+    size dc [ ssa size script-string draw-script-string ] make-bitmap-image
     script-string font>> [ foreground>> ] [ background>> ] bi
     >rgba alpha>> 1 number= [ drop ] [ color-to-alpha ] if ;
 

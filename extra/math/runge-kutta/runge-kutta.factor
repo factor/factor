@@ -1,65 +1,72 @@
-USING: kernel accessors combinators sequences sequences.generalizations
-arrays math math.vectors ;
+USING: accessors arrays combinators combinators.extras kernel
+literals math math.functions math.vectors sequences
+sequences.extras sequences.generalizations
+specialized-arrays.instances.alien.c-types.float typed vectors ;
 IN: math.runge-kutta
 
-: runge-kutta-2-transform ( rk1 tx..n delta -- tx..n' delta )
-    [ swap [ [ v*n ] keep prefix 1/2 v*n ] dip v+ 2 v*n ] keep ;
+CONSTANT: absolute-epsilon 0.00001
+CONSTANT: relative-tolerance 0.0001
 
-: runge-kutta-3-transform ( rk2 tx..n delta -- tx..n' delta )
-    runge-kutta-2-transform ;
+CONSTANT: butcher-tableau
+    ! rk4(5) fehlberg method
+    $[ { $[ float-array{ 0 } ]
+      $[ float-array{ 2/9 2/9 } ]
+      $[ float-array{ 1/3 1/12 1/4 } ]
+      $[ float-array{ 3/4 69/128 -243/128 135/64 } ]
+      $[ float-array{ 1 -17/12 27/4 -27/5 16/15 } ]
+      $[ float-array{ 5/6 65/432 -5/16 13/16 4/27 5/144 } ] } [ >array ] map ]
+CONSTANT: n-order-coefficients $[ float-array{ 1/150 0 -3/100 16/75 1/20 -6/25 } ]
+CONSTANT: n-1-order-coefficients $[ float-array{ 47/450 0 12/25 32/225 1/30 6/25 } ]
 
-: runge-kutta-4-transform ( rk3 tx..n delta -- tx..n' delta )
-    [ swapd [ v*n ] keep prefix v+ ] keep ;
 
-: (runge-kutta) ( delta tx..n dx..n/dt -- rk )
-    swapd dup length>> [ cleave ] dip narray swap v*n
-    ; inline
+: rk-order ( -- n ) butcher-tableau length 2 - ;
 
-: runge-kutta-differentials ( dx..n/dt -- seq )
-    '[ _ (runge-kutta) ] ;
+: coefficients-and-k-values-product ( k-seq butcher-row -- k*B_i )
+    [ [ * ] with map ] 2map flip [ sum ] map ;
+: (approximation-increment) ( k-seq butcher-row dt -- k*B_i A*h )
+    [ unclip ]
+    ! acc Bs A dt
+    [ [ swap rest coefficients-and-k-values-product ] [ * ] 2bi* ] bi* ;
+: approximation-increment ( k*B_i A*h x..nt -- x..nt' )
+    [ but-last swap [ v+ ] unless-empty ] [ last + ] bi-curry bi* suffix ; 
+TYPED: runge-kutta-stage-n ( accumulation: vector butcher-row: array dt: float x..nt: array -- x..nt': array )
+    [ (approximation-increment) ] [ approximation-increment ] bi* ;
+: retry-with-adapted-stepsize? ( n epsilon -- ? ) > ;
+: (adapt-stepsize) ( n epsilon -- n' ) swap /f 1 rk-order 1 + /f ^ 0.9 * ;
+: adapt-stepsize ( dt dx..dn error epsilon -- dt' ) 
+    (adapt-stepsize) nip * ;
+: (rk) ( k-seq coefficients -- rkn )
+    [ flip ] [ '[ _ [ * ] 2map-sum ] map ] bi* ;
+: rk ( k-seq -- rkn-1 rkn )
+    [ n-1-order-coefficients (rk) ] [ n-order-coefficients (rk) ] bi ;
+: higher-order-error ( rkn rkn-1 stepsize -- e )
+    spin v- vabs maximum * ;
 
-: runge-kutta-transforms ( tx..n delta dx..n/dt -- seq )
-    spin
-    [ { [ ]
-      [ runge-kutta-2-transform ]
-      [ runge-kutta-3-transform ]
-      [ runge-kutta-4-transform ] } ] dip
-    '[ _ runge-kutta-differentials compose ] map
-    [ 2curry ] 2with map ;
+! executes the differential equations for each of the stages of approximation
+TYPED:: runge-kutta-stages ( dt: float dx..n/dt: array x..nt: array -- k-seq: vector )
+    butcher-tableau vector new 1vector [
+      [ dt x..nt runge-kutta-stage-n dx..n/dt [ call( x -- x ) ] with map dt v*n ]
+      [ drop swap suffix ] 2bi
+    ] accumulate* last rest ;
+: step-change-and-error ( dt dx..nt/dt x..nt -- dx..dn error )
+    '[ _ _ runge-kutta-stages ] [ [ rk over ] [ higher-order-error ] bi* ] bi ;
+: epsilon ( dx..dn -- epsilon )
+    l2-norm relative-tolerance * absolute-epsilon + ;
 
-: increment-time ( delta tx..n -- t+dtx..n )
-    [ swap [ 0 ] 2dip '[ _ + ] change-nth ] keep ; inline
+! repeatedly approximates with adadptig stepsize until within tolerence
+: (runge-kutta) ( dt dx..n/dt x..nt -- dx..dn' dt' )
+    '[
+        dup _ _ step-change-and-error over epsilon
+        [ adapt-stepsize ] [ retry-with-adapted-stepsize? ] 3bi
+    ] [ drop ] while ;
+: runge-kutta-step ( dx..n' dt' x..nt -- x..nt+1 )
+    [ suffix ] [ v+ ] bi* ;
+: runge-kutta ( dt dx..n/dt x..nt -- dt' x..nt' )
+    [ (runge-kutta) ] [ overd runge-kutta-step ] bi ;
 
-: increment-state-by-approximation ( rk4 t+dtx..n -- t+dtx'..n' )
-    swap 0 prefix v+ ;
+: time-limit-predicate ( t-limit -- quot: ( x..nt -- ? ) )
+    '[ dup last _ <= ] ; inline
 
-: (runge-kutta-4) ( dx..n/dt delta tx..n -- tx..n' )
-    [
-        ! set up the set of 4 equations
-        ! NOTE differential functions and timestep are curried
-        runge-kutta-transforms [ [ dup ] compose ] map
+: <runge-kutta> ( initial-delta dxn..n/dt initial-x..nt t-limit -- seq )
+    time-limit-predicate [ [ runge-kutta ] [ 2drop f ] if ] compose with follow nip ; 
 
-        ! using concat instead causes slow down by an order of magnitude
-        [ ] [ compose ] reduce
-
-        ! this will always produce 4 outputs with a duplication of the last result
-        ! NOTE the dup is kept in the transform so that function
-        ! can be used in higher-order estimation
-        call( -- rk1 rk2 rk3 rk4 rk4 ) drop 4array 
-
-        ! make array of zeroes of appropriate length to reduce into
-        dup first length>> 0 <array>
-
-        ! reduce the results to the estimated change for the timestep
-        [ v+ ] reduce
-        1/6 v*n
-    ] 2keep
-    increment-time
-    increment-state-by-approximation
-    ;
-
-: time-limit-predicate ( t-limit -- quot: ( tx..n -- ? ) )
-    '[ dup first _ <= ] ; inline
-
-: <runge-kutta-4> ( dxn..n/dt delta initial-state t-limit -- seq )
-    time-limit-predicate [ [ (runge-kutta-4) ] [ 3drop f ] if ] compose 2with follow ; inline

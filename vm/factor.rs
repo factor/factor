@@ -1,4 +1,4 @@
-APPICON ICON "misc/icons/Factor.ico"
+APPICON ICON "misc/icons/icon.ico"
 
 1 VERSIONINFO
   FILEVERSION 0,1,0,0
@@ -10,8 +10,8 @@ APPICON ICON "misc/icons/Factor.ico"
       BLOCK "040904E4" {
         VALUE "FileDescription", "Factor GUI Listener"
         VALUE "ProductName", "The Factor Programming Language"
-        VALUE "ProductVersion", "0.100"
-        VALUE "LegalCopyright", "Copyright ©2003-2024 Slava Pestov, et al."
+        VALUE "ProductVersion", "0.101"
+        VALUE "LegalCopyright", "Copyright ©2003-2025 Slava Pestov, et al."
         VALUE "OriginalFilename", "factor.exe"
       }
     }

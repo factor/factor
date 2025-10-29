@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs classes.predicate fry generic help.topics
-io.pathnames kernel lexer macros namespaces parser sequences
-vocabs words words.constant words.symbol ;
+USING: accessors assocs classes.predicate fry generic
+help.topics io.pathnames kernel lexer macros namespaces parser
+sequences vocabs words words.constant words.symbol ;
 IN: definitions.icons
 
 GENERIC: definition-icon ( definition -- path )
@@ -40,4 +40,8 @@ ICON: word-link word-help-article
 ICON: topic help-article
 ICON: runnable-vocab runnable-vocab
 ICON: vocab open-vocab
-ICON: vocab-link unopen-vocab
+
+M: vocab-link definition-icon
+    name>> lookup-vocab
+    "open-vocab" "unopen-vocab" ?
+    definition-icon-path ;

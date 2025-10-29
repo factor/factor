@@ -4,7 +4,7 @@ USING: sequences kernel accessors ;
 IN: columns
 
 ! A column of a matrix
-TUPLE: column < sequence-view col ;
+TUPLE: column < wrapped-sequence col ;
 
 C: <column> column
 

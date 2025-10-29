@@ -1,3 +1,7 @@
 include vm/Config.macos
 PLAF_DLL_OBJS += vm/cpu-arm.64.cpp
 PLAF_MASTER_HEADERS += vm/os-macos-arm.64.hpp
+# ARM Macs require at least macOS 11.0
+CFLAGS += -mmacos-version-min=11.0 -target arm64-apple-darwin
+CXXFLAGS += -mmacos-version-min=11.0 -target arm64-apple-darwin
+SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) -mmacos-version-min=11.0 -target arm64-apple-darwin

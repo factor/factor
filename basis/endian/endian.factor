@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.data byte-arrays combinators
-combinators.smart grouping hints kernel math math.bitwise
-ranges namespaces sequences sequences.generalizations ;
+USING: accessors alien alien.c-types alien.data byte-arrays
+byte-vectors combinators combinators.short-circuit
+combinators.smart generalizations grouping hints kernel math
+math.bitwise namespaces ranges sequences
+sequences.generalizations ;
 IN: endian
 
 SINGLETONS: big-endian little-endian ;
@@ -21,6 +23,35 @@ ERROR: bad-length bytes n ;
 : check-length ( seq n -- seq n )
     2dup [ length ] dip > [ bad-length ] when ; inline
 
+ERROR: invalid-signed-conversion n ;
+
+<<
+: convert-signed-quot ( n -- quot )
+    {
+        { 1 [ [ int8_t <ref> int8_t deref ] ] }
+        { 2 [ [ int16_t <ref> int16_t deref ] ] }
+        { 4 [ [ int32_t <ref> int32_t deref ] ] }
+        { 8 [ [ int64_t <ref> int64_t deref ] ] }
+        [ invalid-signed-conversion ]
+    } case ; inline
+>>
+
+MACRO: byte-reverse ( n signed? -- quot )
+    [
+        drop
+        [
+            dup <iota> [
+                [ 1 + - -8 * ] [ nip 8 * ] 2bi
+                '[ _ shift 0xff bitand _ shift ]
+            ] with map
+        ] [ 1 - [ bitor ] n*quot ] bi
+    ] [
+        [ convert-signed-quot ] [ drop [ ] ] if
+    ] 2bi '[ _ cleave @ @ ] ;
+
+: ?byte-reverse ( endian n signed? -- )
+    [ compute-native-endianness = ] 2dip '[ _ _ byte-reverse ] unless ; inline
+
 <<
 : be-range ( n -- range )
     1 - 8 * 0 -8 <range> ; inline
@@ -37,59 +68,42 @@ MACRO: reassemble-be ( n -- quot ) be-range reassemble-bytes ;
 MACRO: reassemble-le ( n -- quot ) le-range reassemble-bytes ;
 >>
 
-:: n-be> ( seq n -- x )
-    seq n check-length drop n firstn-unsafe n reassemble-be ; inline
-
-:: n-le> ( seq n -- x )
-    seq n check-length drop n firstn-unsafe n reassemble-le ; inline
-
-: if-endian ( endian bytes-quot seq-quot -- )
+: if-c-ptr ( seq c-ptr-quot not-c-ptr-quot -- )
     [
-        compute-native-endianness =
-        [ dup byte-array? ] [ f ] if
-    ] 2dip if ; inline
+        dup { [ byte-array? ] [ byte-vector? ] } 1|| [ t ] [
+            dup { [ slice? ] [ seq>> ] } 1&& [
+                { [ byte-array? ] [ byte-vector? ] } 1||
+            ] [ f ] if*
+        ] if
+    ] 2dip [ '[ >c-ptr @ ] ] dip if ; inline
 
-: 1be> ( seq -- x )
-    big-endian [ uint8_t deref ] [ 1 n-be> ] if-endian ;
+:: n-be> ( seq c-ptr n -- x )
+    seq
+    [ c-ptr deref big-endian n f ?byte-reverse ]
+    [ n firstn-unsafe n reassemble-be ] if-c-ptr ; inline
 
-: 2be> ( seq -- x )
-    big-endian [ uint16_t deref ] [ 2 n-be> ] if-endian ;
-
-: 4be> ( seq -- x )
-    big-endian [ uint32_t deref ] [ 4 n-be> ] if-endian ;
-
-: 8be> ( seq -- x )
-    big-endian [ uint64_t deref ] [ 8 n-be> ] if-endian ;
-
-: 1le> ( seq -- x )
-    little-endian [ uint8_t deref ] [ 1 n-le> ] if-endian ;
-
-: 2le> ( seq -- x )
-    little-endian [ uint16_t deref ] [ 2 n-le> ] if-endian ;
-
-: 4le> ( seq -- x )
-    little-endian [ uint32_t deref ] [ 4 n-le> ] if-endian ;
-
-: 8le> ( seq -- x )
-    little-endian [ uint64_t deref ] [ 8 n-le> ] if-endian ;
+:: n-le> ( seq c-ptr n -- x )
+    seq
+    [ c-ptr deref little-endian n f ?byte-reverse ]
+    [ n firstn-unsafe n reassemble-le ] if-c-ptr ; inline
 
 PRIVATE>
 
 : be> ( seq -- x )
     dup length {
-        { 1 [ 1be> ] }
-        { 2 [ 2be> ] }
-        { 4 [ 4be> ] }
-        { 8 [ 8be> ] }
+        { 1 [ uint8_t 1 n-be> ] }
+        { 2 [ uint16_t 2 n-be> ] }
+        { 4 [ uint32_t 4 n-be> ] }
+        { 8 [ uint64_t 8 n-be> ] }
         [ drop slow-be> ]
     } case ;
 
 : le> ( seq -- x )
     dup length {
-        { 1 [ 1le> ] }
-        { 2 [ 2le> ] }
-        { 4 [ 4le> ] }
-        { 8 [ 8le> ] }
+        { 1 [ uint8_t 1 n-le> ] }
+        { 2 [ uint16_t 2 n-le> ] }
+        { 4 [ uint32_t 4 n-le> ] }
+        { 8 [ uint64_t 8 n-le> ] }
         [ drop slow-le> ]
     } case ;
 
@@ -102,29 +116,31 @@ PRIVATE>
 
 : slow-signed-be> ( seq -- x ) [ be> ] [ signed> ] bi ;
 
+: n-signed-be> ( seq c-ptr n -- x )
+    '[ _ deref big-endian _ t ?byte-reverse ] [ slow-signed-be> ] if-c-ptr ; inline
+
+: n-signed-le> ( seq c-ptr n -- x )
+    '[ _ deref little-endian _ t ?byte-reverse ] [ slow-signed-le> ] if-c-ptr ; inline
+
 PRIVATE>
 
 : signed-be> ( seq -- x )
-    big-endian [
-        dup length {
-            { 1 [ int8_t deref ] }
-            { 2 [ int16_t deref ] }
-            { 4 [ int32_t deref ] }
-            { 8 [ int64_t deref ] }
-            [ drop slow-signed-be> ]
-        } case
-    ] [ slow-signed-be> ] if-endian ;
+    dup length {
+        { 1 [ int8_t 1 n-signed-be> ] }
+        { 2 [ int16_t 2 n-signed-be> ] }
+        { 4 [ int32_t 4 n-signed-be> ] }
+        { 8 [ int64_t 8 n-signed-be> ] }
+        [ drop slow-signed-be> ]
+    } case ;
 
 : signed-le> ( seq -- x )
-    little-endian [
-        dup length {
-            { 1 [ int8_t deref ] }
-            { 2 [ int16_t deref ] }
-            { 4 [ int32_t deref ] }
-            { 8 [ int64_t deref ] }
-            [ drop slow-signed-le> ]
-        } case
-    ] [ slow-signed-le> ] if-endian ;
+    dup length {
+        { 1 [ int8_t 1 n-signed-le> ] }
+        { 2 [ int16_t 2 n-signed-le> ] }
+        { 4 [ int32_t 4 n-signed-le> ] }
+        { 8 [ int64_t 8 n-signed-le> ] }
+        [ drop slow-signed-le> ]
+    } case ;
 
 : nth-byte ( x n -- b ) -8 * shift 0xff bitand ; inline
 
@@ -133,31 +149,29 @@ PRIVATE>
 : map-bytes ( x seq -- byte-array )
     [ nth-byte ] with B{ } map-as ; inline
 
-: >slow-be ( x n -- byte-array ) <iota> <reversed> map-bytes ;
+: >slow-be ( x n -- byte-array )
+    integer>fixnum-strict <iota> <reversed> map-bytes ;
 
-: >slow-le ( x n -- byte-array ) <iota> map-bytes ;
+: >slow-le ( x n -- byte-array )
+    integer>fixnum-strict <iota> map-bytes ;
 
 PRIVATE>
 
-: >le ( x n -- byte-array )
-    compute-native-endianness little-endian = [
-        {
-            { 2 [ int16_t <ref> ] }
-            { 4 [ int32_t <ref> ] }
-            { 8 [ int64_t <ref> ] }
-            [ >slow-le ]
-        } case
-    ] [ >slow-le ] if ;
-
 : >be ( x n -- byte-array )
-    compute-native-endianness big-endian = [
-        {
-            { 2 [ int16_t <ref> ] }
-            { 4 [ int32_t <ref> ] }
-            { 8 [ int64_t <ref> ] }
-            [ >slow-be ]
-        } case
-    ] [ >slow-be ] if ;
+    {
+        { 2 [ big-endian 2 f ?byte-reverse int16_t <ref> ] }
+        { 4 [ big-endian 4 f ?byte-reverse int32_t <ref> ] }
+        { 8 [ big-endian 8 f ?byte-reverse int64_t <ref> ] }
+        [ >slow-be ]
+    } case ;
+
+: >le ( x n -- byte-array )
+    {
+        { 2 [ little-endian 2 f ?byte-reverse int16_t <ref> ] }
+        { 4 [ little-endian 4 f ?byte-reverse int32_t <ref> ] }
+        { 8 [ little-endian 8 f ?byte-reverse int64_t <ref> ] }
+        [ >slow-le ]
+    } case ;
 
 SYMBOL: native-endianness
 native-endianness [ compute-native-endianness ] initialize

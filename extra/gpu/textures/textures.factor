@@ -308,7 +308,7 @@ TYPED: read-compressed-texture ( tdt: texture-data-target level: integer -- byte
     [ texture-dim ]
     [ drop texture-object [ component-order>> ] [ component-type>> ] bi f f ]
     [ read-texture ] 2tri
-    f image boa ; inline
+    image boa ; inline
 
 <PRIVATE
 : bind-texture ( texture -- gl-target )

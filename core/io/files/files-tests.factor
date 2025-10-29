@@ -3,7 +3,7 @@ compiler.units continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private
-io.pathnames kernel locals make math sequences
+io.pathnames kernel locals make math namespaces sequences
 specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 IN: io.files.tests
@@ -326,3 +326,9 @@ CONSTANT: pt-array-1
 { t } [ [ ife-bool ] with-test-file ] unit-test
 
 { f } [ "should-never-exist" ife-bool ] unit-test
+
+{ 0 t 0 } [
+    "resource:LICENSE.txt" binary [
+        tell-input input-stream get stream-seekable? tell-input
+    ] with-file-reader
+] unit-test

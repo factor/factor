@@ -3,7 +3,7 @@
 USING: accessors kernel math math.order sequences ;
 IN: sequences.snipped
 
-TUPLE: snipped < sequence-view
+TUPLE: snipped < wrapped-sequence
 { from integer read-only }
 { length integer read-only } ;
 

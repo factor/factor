@@ -1,5 +1,6 @@
 include vm/Config.macos
 include vm/Config.x86.64
 PLAF_MASTER_HEADERS += vm/os-macos-x86.64.hpp
-SITE_COMMON_FLAGS += -mmacos-version-min=11.0 -target x86_64-apple-darwin
-SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS)
+CXXFLAGS += -mmacos-version-min=14.0 -target x86_64-apple-darwin
+CFLAGS += -mmacos-version-min=14.0 -target x86_64-apple-darwin
+SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) -mmacos-version-min=14.0 -target x86_64-apple-darwin

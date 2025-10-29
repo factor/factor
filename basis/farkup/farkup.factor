@@ -281,8 +281,8 @@ M: string (write-farkup) ;
 
 M: array (write-farkup) [ (write-farkup) ] map ;
 
-: farkup>xml ( string -- xml )
-    parse-farkup (write-farkup) ;
+: farkup>xml ( string/f -- xml )
+    dup [ parse-farkup (write-farkup) ] when ;
 
 : write-farkup ( string -- )
     farkup>xml write-xml ;

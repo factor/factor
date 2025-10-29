@@ -1,3 +1,5 @@
+#include <memory>
+
 namespace factor {
 
 // The callback heap is used to store the machine code that alien-callbacks
@@ -24,8 +26,8 @@ namespace factor {
 // from the callback heap in the previous session when the image was saved.
 
 struct callback_heap {
-  segment* seg;
-  free_list_allocator<code_block>* allocator;
+  std::unique_ptr<segment> seg;
+  std::unique_ptr<free_list_allocator<code_block>> allocator;
   factor_vm* parent;
 
   callback_heap(cell size, factor_vm* parent);

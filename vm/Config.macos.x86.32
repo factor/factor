@@ -4,7 +4,6 @@ include vm/Config.x86.32
 PLAF_MASTER_HEADERS += vm/os-macos-x86.32.hpp
 
 # The last SDK to support x86 is 10.13
-CFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOS_32_SDK)
-CXXFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOS_32_SDK)
-SITE_COMMON_FLAGS += -mmacos-version-min=10.9
-SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) $(SITE_COMMON_FLAGS)
+CFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOS_32_SDK) -mmacos-version-min=10.9
+CXXFLAGS += --sysroot=$(XCODE_PATH)/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/$(MACOS_32_SDK) -mmacos-version-min=10.9
+SITE_COMMON_LINKER_FLAGS += $(ARCHITECTURE_FLAG) -mmacos-version-min=10.9

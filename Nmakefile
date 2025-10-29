@@ -28,43 +28,48 @@ GIT_BRANCH = \
 
 GIT_LABEL = $(GIT_DESCRIBE)-$(GIT_ID)
 
-!IF DEFINED(PLATFORM)
+# Auto-detect platform from vcvarsall.bat environment
+# VSCMD_ARG_TGT_ARCH is set by newer VS versions, Platform by older ones
+!IF DEFINED(VSCMD_ARG_TGT_ARCH)
+DETECTED_ARCH = $(VSCMD_ARG_TGT_ARCH)
+!ELSEIF DEFINED(Platform)
+DETECTED_ARCH = $(Platform)
+!ELSE
+# Default to x64 if no environment is set
+DETECTED_ARCH = x64
+!ENDIF
 
 LINK_FLAGS = /nologo shell32.lib user32.lib
-CL_FLAGS = /nologo /O2 /WX /W3 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
-CL_FLAGS_VISTA = /D_WIN32_WINNT=0x0600
+CL_FLAGS = /nologo /O2 /W4 /std:c++20 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
 
-!IF "$(PLATFORM)" == "x86-32"
+# Check if targeting Vista or higher (can be set via WINVER=VISTA environment variable)
+!IF DEFINED(WINVER)
+!IF "$(WINVER)" == "VISTA" || "$(WINVER)" == "vista"
+CL_FLAGS = $(CL_FLAGS) /D_WIN32_WINNT=0x0600
+VISTA_BUILD = 1
+!ENDIF
+!ENDIF
+
+!IF "$(DETECTED_ARCH)" == "x86" || "$(DETECTED_ARCH)" == "Win32"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+!IF DEFINED(VISTA_BUILD)
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
+!ELSE
 SUBSYSTEM_COM_FLAGS = console,"5.01"
 SUBSYSTEM_EXE_FLAGS = windows,"5.01"
-
-!ELSEIF "$(PLATFORM)" == "x86-32-vista"
-LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
-CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
-PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
+!ENDIF
+!ELSE
+# Default to x64 for x64, AMD64, or any unknown value
+PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+!IF DEFINED(VISTA_BUILD)
 SUBSYSTEM_COM_FLAGS = console
 SUBSYSTEM_EXE_FLAGS = windows
-
-!ELSEIF "$(PLATFORM)" == "x86-64"
-PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
+!ELSE
 SUBSYSTEM_COM_FLAGS = console,"5.02"
 SUBSYSTEM_EXE_FLAGS = windows,"5.02"
-
-
-!ELSEIF "$(PLATFORM)" == "x86-64-vista"
-CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
-PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
-SUBSYSTEM_COM_FLAGS = console
-SUBSYSTEM_EXE_FLAGS = windows
-
-!ELSE
-CL_FLAGS = $(CL_FLAGS) $(CL_FLAGS_VISTA)
-PLAF_DLL_OBJS = vm\os-windows-x86.64.obj vm\cpu-x86.obj
-SUBSYSTEM_COM_FLAGS = console
-SUBSYSTEM_EXE_FLAGS = windows
-
+!ENDIF
 !ENDIF
 
 !IF DEFINED(DEBUG)
@@ -131,6 +136,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\words.obj \
 	vm\zstd.obj
 
+# Default target must be first
+all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
+	@echo Building Factor for $(DETECTED_ARCH) architecture...
+
 # batch mode has ::
 .cpp.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
@@ -162,34 +171,13 @@ factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 # is applied. To avoid this, we delete the .manifest file on clean
 # and copy it from a reference file on compilation and mt.exe.
 #
+factor.com.manifest: factor.com
+	copy factor.exe.manifest.in factor.exe.manifest
+	mt -manifest factor.exe.manifest -outputresource:"factor.com;#1"
+
 factor.exe.manifest: factor.exe
 	copy factor.exe.manifest.in factor.exe.manifest
 	mt -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
-
-all: factor.com factor.exe factor.dll.lib libfactor-ffi-test.dll
-
-!ENDIF
-
-default:
-	@echo Usage: nmake /f Nmakefile platform
-	@echo Where platform is one of:
-	@echo x86-32
-	@echo x86-64
-	@echo x86-32-vista
-	@echo x86-64-vista
-	@exit 1
-
-x86-32:
-	nmake /nologo PLATFORM=x86-32 /f Nmakefile all
-
-x86-64:
-	nmake /nologo PLATFORM=x86-64 /f Nmakefile all
-
-x86-32-vista:
-	nmake /nologo PLATFORM=x86-32-vista /f Nmakefile all
-
-x86-64-vista:
-	nmake /nologo PLATFORM=x86-64-vista /f Nmakefile all
 
 clean:
 	del vm\*.obj
@@ -206,6 +194,6 @@ clean:
 	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
 	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
-.PHONY: all default x86-32 x86-64 x86-32-vista x86-64-vista clean factor.exe.manifest
+.PHONY: all clean factor.exe.manifest
 
 .SUFFIXES: .rs

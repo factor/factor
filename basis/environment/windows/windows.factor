@@ -1,19 +1,17 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.strings fry io.encodings.utf16 kernel
-splitting windows windows.kernel32 windows.types system
-environment alien.data sequences windows.errors
-io.streams.memory io.encodings io specialized-arrays ;
+USING: alien.data alien.strings combinators.short-circuit
+environment io io.encodings io.encodings.utf16 io.streams.memory
+kernel sequences specialized-arrays system windows windows.errors
+windows.kernel32 windows.types ;
 SPECIALIZED-ARRAY: TCHAR
 IN: environment.windows
 
 M: windows os-env
     MAX_UNICODE_PATH TCHAR <c-array>
-    [ dup length GetEnvironmentVariable ] keep over 0 = [
-        2drop f
-    ] [
-        nip alien>native-string
-    ] if ;
+    [ dup length GetEnvironmentVariable ] keep
+    { [ over 0 = ] [ GetLastError ERROR_ENVVAR_NOT_FOUND = ] } 0&&
+    [ 2drop f ] [ nip alien>native-string ] if ;
 
 M: windows set-os-env
     swap SetEnvironmentVariable win32-error=0/f ;

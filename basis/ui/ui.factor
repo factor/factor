@@ -4,8 +4,8 @@ USING: accessors arrays assocs boxes classes.tuple
 classes.tuple.parser combinators combinators.short-circuit
 concurrency.flags concurrency.promises continuations deques
 destructors dlists hash-sets.identity kernel lexer make math
-math.functions math.order namespaces parser sequences sets
-slots.private strings threads ui.backend ui.gadgets
+math.functions math.order namespaces opengl parser sequences
+sets slots.private strings threads ui.backend ui.gadgets
 ui.gadgets.private ui.gadgets.worlds ui.gestures ui.render
 vectors vocabs.parser words ;
 IN: ui
@@ -181,7 +181,7 @@ SYMBOL: ui-thread
 PRIVATE>
 
 : open-world-window ( world -- )
-    dup pref-dim [ ceiling ] map >>dim dup relayout graft ;
+    dup pref-dim [ gl-ceiling ] map >>dim dup relayout graft ;
 
 : open-window* ( gadget title/attributes -- window )
     ?attributes <world> [ open-world-window ] keep ;

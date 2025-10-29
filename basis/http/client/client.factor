@@ -132,8 +132,7 @@ SYMBOL: redirects
 
 : read-chunked ( quot: ( chunk -- ) -- )
     read-chunk-size [ drop ] [
-        read [ swap call ] [ drop ] 2bi
-        read-crlf B{ } assert= read-chunked
+        read [ swap call ] keepd read-crlf B{ } assert= read-chunked
     ] if-zero ; inline recursive
 
 : read-response-body ( quot: ( chunk -- ) response -- )

@@ -1,6 +1,7 @@
 # Factor
 
 ![Build](https://github.com/factor/factor/actions/workflows/build.yml/badge.svg)
+[![Release](https://img.shields.io/github/v/release/factor/factor?label=Release)](https://github.com/factor/factor/releases)
 
 Factor is a [concatenative](https://www.concatenative.org), stack-based
 programming language with [high-level
@@ -45,7 +46,7 @@ https://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
-* Windows: `nmake /f Nmakefile x86-64` and then `factor.com -i=boot.windows-x86.64.image`
+* Windows: `nmake /f Nmakefile` and then `factor.com -i=boot.windows-x86.64.image`
 
 Now you should have a complete Factor system ready to run.
 

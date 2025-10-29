@@ -1,11 +1,30 @@
 ! Copyright (C) 2005, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs binary-search classes classes.struct
-combinators combinators.smart continuations fry grouping hashtables
-hints io io.styles kernel layouts literals math math.order math.parser
+USING: accessors arrays assocs binary-search classes
+classes.struct classes.tuple combinators combinators.smart
+continuations grouping hash-sets.identity hashtables hints io
+io.styles kernel layouts literals math math.order math.parser
 math.statistics memory namespaces prettyprint sequences
-sequences.generalizations sorting vm ;
+sequences.generalizations slots.private sorting vm ;
+FROM: sets => ?adjoin ;
+FROM: sequences.private => nth-unsafe ;
 IN: tools.memory
+
+
+<PRIVATE
+
+SYMBOL: visited
+
+: total-size+ ( m object -- n )
+    dup visited get ?adjoin [
+        [ size + ]
+        [ dup class-of all-slots [ offset>> slot total-size+ ] with each ] bi
+    ] [ drop ] if ;
+
+PRIVATE>
+
+: total-size ( object -- n )
+    IHS{ } clone visited [ 0 swap total-size+ ] with-variable ;
 
 <PRIVATE
 PRIMITIVE: (callback-room) ( -- allocator-room )
@@ -82,12 +101,11 @@ PRIVATE>
 
 PRIVATE>
 
-: heap-stats ( -- counts sizes )
-    [ ] instances H{ } clone H{ } clone
-    [ '[ _ _ heap-stat-step ] each ] 2keep ;
+: heap-stats-of ( instances -- counts sizes )
+    H{ } clone H{ } clone [ '[ _ _ heap-stat-step ] each ] 2keep ;
 
-: heap-stats. ( -- )
-    heap-stats dup keys sort standard-table-style [
+: heap-stats-of. ( instances -- )
+    heap-stats-of dup keys sort standard-table-style [
         [ { "Class" "Bytes" "Instances" } [ write-cell ] each ] with-row
         [
             [
@@ -97,6 +115,12 @@ PRIVATE>
             ] with-row
         ] each 2drop
     ] tabular-output nl ;
+
+: heap-stats ( -- counts sizes )
+    all-instances heap-stats-of ;
+
+: heap-stats. ( -- )
+    all-instances heap-stats-of. ;
 
 : collect-gc-events ( quot -- gc-events )
     enable-gc-events
@@ -242,8 +266,6 @@ HINTS: (lookup-return-address) code-blocks ;
 PRIVATE>
 
 M: code-blocks length blocks>> length ; inline
-
-FROM: sequences.private => nth-unsafe ;
 
 M: code-blocks nth-unsafe
     [ cache>> ] [ blocks>> ] bi

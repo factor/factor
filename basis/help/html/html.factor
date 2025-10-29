@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs colors
 combinators.short-circuit debugger formatting help help.home
-help.topics help.vocabs html html.streams io.directories
-io.encodings.ascii io.encodings.binary io.encodings.utf8
-io.files io.files.temp io.pathnames kernel make math math.parser
+help.topics help.vocabs html io.directories io.encodings.ascii
+io.encodings.binary io.encodings.utf8 io.files io.files.temp
+io.pathnames io.streams.html kernel make math math.parser
 namespaces regexp sequences sequences.deep serialize sets
 sorting splitting strings system tools.completion vocabs
 vocabs.hierarchy words xml.data xml.syntax xml.traversal

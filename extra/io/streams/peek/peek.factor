@@ -1,8 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien combinators combinators.short-circuit
-destructors io io.ports io.private kernel locals math namespaces
-sequences vectors ;
+USING: accessors alien combinators.short-circuit destructors io
+io.ports io.private kernel math namespaces sequences vectors ;
 IN: io.streams.peek
 
 TUPLE: peek-stream stream peeked ;
@@ -11,19 +10,10 @@ INSTANCE: peek-stream output-stream
 
 M: peek-stream dispose stream>> dispose ;
 
-: stream-new-resizable ( n stream -- exemplar )
-    stream-exemplar new-resizable ; inline
-
-: stream-like ( sequence stream -- sequence' )
-    stream-exemplar like ; inline
-
-: stream-clone-resizable ( sequence stream -- sequence' )
-    stream-exemplar-growable clone-like ; inline
-
 : <peek-stream> ( stream -- stream )
     peek-stream new
         swap >>stream
-        64 over stream-new-resizable >>peeked ; inline
+        64 over stream-exemplar new-resizable >>peeked ; inline
 
 M: peek-stream stream-element-type
     stream>> stream-element-type ;
@@ -63,8 +53,8 @@ M:: peek-stream stream-read-unsafe ( n buf stream -- count )
     [ drop ] [ over [ push peek-stream-read-until ] [ drop ] if ] if ;
 
 M: peek-stream stream-read-until
-    swap 64 pick stream-new-resizable
-    peek-stream-read-until [ nip swap stream-like ] dip ;
+    swap 64 pick stream-exemplar new-resizable
+    peek-stream-read-until [ nip swap stream-exemplar like ] dip ;
 
 M: peek-stream stream-write stream>> stream-write ;
 M: peek-stream stream-write1 stream>> stream-write1 ;
@@ -75,7 +65,7 @@ M: peek-stream stream-seek stream>> stream-seek ;
 : stream-peek1 ( stream -- elt )
     dup peeked>> [
         dup stream>> stream-read1 [
-            [ 1vector over stream-clone-resizable >>peeked drop ] keep
+            [ 1vector over stream-exemplar-growable clone-like >>peeked drop ] keep
         ] [
             drop f
         ] if*

@@ -1,5 +1,6 @@
 USING: io.encodings.binary io.streams.byte-array
-io.streams.string kernel math msgpack sequences tools.test ;
+io.streams.string kernel linked-assocs math msgpack sequences
+tools.test ;
 
 {
     {
@@ -14,7 +15,7 @@ io.streams.string kernel math msgpack sequences tools.test ;
         1.23434536
         "hello"
         { 1 1234 123456789 }
-        H{ { 1 "hello" } { 2 "goodbye" } }
+        LH{ { 1 "hello" } { 2 "goodbye" } }
     }
 } [
 
@@ -47,7 +48,7 @@ io.streams.string kernel math msgpack sequences tools.test ;
         1.23434536
         "hello"
         { 1 1234 123456789 }
-        H{ { 1 "hello" } { 2 "goodbye" } }
+        LH{ { 1 "hello" } { 2 "goodbye" } }
     } [ dup >msgpack msgpack> = ] all?
 ] unit-test
 

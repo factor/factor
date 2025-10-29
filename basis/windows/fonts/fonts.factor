@@ -1,6 +1,6 @@
 USING: assocs memoize locals kernel accessors init fonts math
-combinators system-info.windows windows.errors windows.types
-windows.gdi32 ;
+combinators opengl system-info.windows windows.errors
+windows.types windows.gdi32 namespaces ;
 IN: windows.fonts
 
 MEMO: windows-fonts ( -- fonts )
@@ -36,8 +36,12 @@ MEMO:: (cache-font) ( name size bold? italic? -- HFONT )
     dup win32-error=0/f ;
 
 : cache-font ( font -- HFONT )
-    { [ name>> ] [ size>> ] [ bold?>> ] [ italic?>> ] } cleave
-    (cache-font) ;
+    {
+        [ name>> ]
+        [ size>> gl-scale-factor get-global [ * ] when* ]
+        [ bold?>> ]
+        [ italic?>> ]
+    } cleave (cache-font) ;
 
 STARTUP-HOOK: [
     \ (cache-font) reset-memoized

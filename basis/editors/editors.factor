@@ -109,15 +109,17 @@ M: string edit edit-vocab ;
 : :edit ( -- )
     error get edit-error ;
 
+: ?edit ( object -- )
+    [ edit ] [
+        dup cannot-find-source? [
+            drop "Cannot find source for " write .
+        ] [ rethrow ] if
+    ] recover ;
+
 : edit-each ( seq -- )
-    [
+    "RETURN moves on to the next usage, C+d stops." print [
         [ "Editing " write . ]
-        [
-            "RETURN moves on to the next usage, C+d stops." print
-            flush
-            edit
-            readln
-        ] bi
+        [ flush ?edit readln ] bi
     ] all? drop ;
 
 : fix ( word -- )

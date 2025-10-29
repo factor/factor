@@ -7,6 +7,20 @@ IN: ui.text
 
 <PRIVATE
 
+: scale-dim ( dim -- dim' )
+    gl-scale-factor get-global [ [ gl-unscale ] map ] when ; inline
+
+: scale-metrics ( metrics -- metrics )
+    gl-scale-factor get-global [
+        [ dup [ gl-unscale ] when ] change-width
+        [ dup [ gl-unscale ] when ] change-ascent
+        [ dup [ gl-unscale ] when ] change-descent
+        [ dup [ gl-unscale ] when ] change-height
+        [ dup [ gl-unscale ] when ] change-leading
+        [ dup [ gl-unscale ] when ] change-cap-height
+        [ dup [ gl-unscale ] when ] change-x-height
+    ] when ; inline
+
 SYMBOL: font-renderer
 
 : world-text-handle ( world -- handle )
@@ -80,7 +94,7 @@ M: array draw-text
     ] do-matrix ;
 
 {
-    { [ os macos? ] [ "core-text" ] }
-    { [ os windows? ] [ "uniscribe" ] }
-    { [ os unix? ] [ "pango" ] }
-} cond "ui.text." prepend require
+    { [ os macos? ] [ "ui.text.core-text" ] }
+    { [ os windows? ] [ "ui.text.uniscribe" ] }
+    { [ os unix? ] [ "ui.text.pango" ] }
+} cond require

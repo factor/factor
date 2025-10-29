@@ -531,16 +531,16 @@ TUPLE: another-forget-accessors-test ;
 [ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval( -- ) ] must-fail
 
 ! Insufficient type checking
-[ \ vocab tuple>array drop ] must-fail
+[ \ vocab pack-tuple ] [ not-an-instance? ] must-fail-with
 
 ! Check type declarations
 TUPLE: declared-types { n fixnum } { m string } ;
 
 { T{ declared-types f 0 "hi" } }
-[ { declared-types 0 "hi" } >tuple ]
+[ { declared-types 0 "hi" } unpack-tuple ]
 unit-test
 
-[ { declared-types "hi" 0 } >tuple ]
+[ { declared-types "hi" 0 } unpack-tuple ]
 [ T{ bad-slot-value f "hi" fixnum } = ]
 must-fail-with
 
@@ -626,7 +626,7 @@ must-fail-with
 
 
 { } [
-     "IN: sequences TUPLE: reversed < sequence-view ;" eval( -- )
+     "IN: sequences TUPLE: reversed < wrapped-sequence ;" eval( -- )
 ] unit-test
 
 
