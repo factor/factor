@@ -342,8 +342,6 @@ M: array-type field-type>c-type type>c-type ;
 
 : def-namespace ( namespace -- )
     {
-        [ consts>> def-consts ]
-
         [ enums>> defer-enums ]
         [ bitfields>> defer-bitfields ]
         [ records>> defer-records ]
@@ -354,7 +352,6 @@ M: array-type field-type>c-type type>c-type ;
         [ classes>> defer-classes ]
 
         [ aliases>> def-aliases ]
-
         [ enums>> def-enums ]
         [ bitfields>> def-bitfields ]
         [ records>> def-records ]
@@ -364,6 +361,7 @@ M: array-type field-type>c-type type>c-type ;
         [ interfaces>> def-interfaces ]
         [ classes>> def-classes ]
 
+        [ consts>> def-consts ]
         [ functions>> def-functions ]
     } cleave ;
 
