@@ -1486,8 +1486,8 @@ This tutorial will:
 
 { $list 
   "Guide you through the basics of Factor so you can appreciate its simplicity and power."
-  "Assume you are an experienced programmer familiar with a functional language"
-  "Assume you understand concepts like folding, higher-order functions, and currying"
+  "Show you that Factor can be mastered with a bit of practice."
+  "Assume some familiarity with programming."
 }
 
 Even though Factor is a niche language, it is mature and has a comprehensive standard library covering tasks from JSON 
