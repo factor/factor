@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: io io.files kernel math random sequences
+USING: io io.files kernel math namespaces random sequences
 sequences.private ;
 
 IN: io.random
@@ -14,15 +14,18 @@ IN: io.random
 PRIVATE>
 
 : random-line ( -- line/f )
-    f [ random zero? [ nip ] [ drop ] if ] each-numbered-line ;
+    f random-generator get '[
+        _ random* zero? [ nip ] [ drop ] if
+    ] each-numbered-line ;
 
 :: random-lines ( n -- lines )
     V{ } clone :> accum
+    random-generator get :> rnd
     [| line line# |
         line# n <= [
             line accum push
         ] [
-            line# random :> r
+            line# rnd random* :> r
             r n < [ line r accum set-nth-unsafe ] when
         ] if
     ] each-numbered-line accum ;
