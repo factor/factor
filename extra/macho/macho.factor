@@ -992,7 +992,13 @@ TYPED: 64-bit? ( macho: mach_header_32/64 -- ? )
         { LC_MAIN [ entry_point_command ] }
         { LC_DATA_IN_CODE [ data_in_code_entry ] }
         { LC_SOURCE_VERSION [ source_version_command ] }
+        { LC_CODE_SIGNATURE [ linkedit_data_command ] }
+        { LC_SEGMENT_SPLIT_INFO [ linkedit_data_command ] }
+        { LC_FUNCTION_STARTS [ linkedit_data_command ] }
+        { LC_DATA_IN_CODE [ linkedit_data_command ] }
         { LC_DYLIB_CODE_SIGN_DRS [ linkedit_data_command ] }
+        { LC_DYLD_EXPORTS_TRIE [ linkedit_data_command ] }
+        { LC_DYLD_CHAINED_FIXUPS [ linkedit_data_command ] }
         { LC_BUILD_VERSION [ build_version_command ] }
     } case ;
 
