@@ -4,7 +4,7 @@ USING: accessors calendar checksums combinators.short-circuit
 http http.client io io.directories io.encodings.binary io.files
 io.files.info io.files.unique io.pathnames kernel math
 math.order math.parser mime.types namespaces present sequences
-shuffle splitting strings urls ;
+splitting strings urls ;
 IN: http.download
 
 : file-too-old-or-not-exists? ( path duration -- ? )
@@ -19,7 +19,7 @@ IN: http.download
     [ checksum-file ] dip = ;
 
 : delete-when-checksum-mismatches ( path checksum-type bytes -- deleted? )
-    dupdd file-matches-checksum? [ drop f ] [ ?delete-file t ] if ;
+    [ dup ] 2dip file-matches-checksum? [ drop f ] [ ?delete-file t ] if ;
 
 : file-size= ( path n -- ? ) [ ?file-info [ size>> ] ?call ] dip = ;
 
