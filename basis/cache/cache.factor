@@ -26,6 +26,9 @@ M: cache-assoc set-at
     [ <cache-entry> ] 2dip
     assoc>> set-at ;
 
+M: cache-assoc delete-at
+    assoc>> delete-at* drop [ dispose ] when* ;
+
 M: cache-assoc clear-assoc
     assoc>> [ values dispose-each ] [ clear-assoc ] bi ;
 
