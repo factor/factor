@@ -21,3 +21,9 @@ PRIVATE>
 : robohash2 ( str -- image ) "set2" (robohash) ;
 
 : robohash3 ( str -- image ) "set3" (robohash) ;
+
+: robohash4 ( str -- image ) "set4" (robohash) ;
+
+: robohash5 ( str -- image ) "set5" (robohash) ;
+
+: robohash6 ( str -- image ) "set6" (robohash) ;
