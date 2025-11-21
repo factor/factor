@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 John Benediktsson, Doug Coleman
 ! See https://factorcode.org/license.txt for BSD license
-USING: arrays assocs assocs.private kernel math math.statistics
-sequences sequences.generalizations sets ;
+USING: arrays assocs assocs.private combinators.smart kernel
+math math.statistics sequences sequences.generalizations sets ;
 IN: assocs.extras
 
 : set-of ( assoc key value -- assoc )
@@ -314,3 +314,24 @@ MACRO: nzip ( n -- quot )
 
 MACRO: nunzip ( n -- quot )
     '[ flip _ firstn ] ;
+
+<PRIVATE
+
+: unpacking ( n -- quot )
+    dup 1 > [ '[ _ firstn ] ] [ drop [ ] ] if ;
+
+: packing ( n -- quot )
+    dup 1 > [ '[ _ narray ] ] [ drop [ ] ] if ;
+
+: unzipping ( n -- quot )
+    dup 1 > [ '[ _ nunzip ] ] [ drop [ ] ] if ;
+
+PRIVATE>
+
+MACRO: map-zip ( quot -- quot' )
+    [ inputs/outputs [ unpacking ] [ packing ] bi* ] keep swap
+    '[ [ @ @ @ ] map ] ;
+
+MACRO: map-unzip ( quot -- quot' )
+    [ inputs/outputs dup [ unpacking ] [ packing ] [ unzipping ] tri* ] keep -rot
+    '[ [ @ @ @ ] map @ ] ;
