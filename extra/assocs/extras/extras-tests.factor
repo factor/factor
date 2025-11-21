@@ -368,6 +368,8 @@ sequences tools.test ;
     { { 1 4 7 } { 2 5 8 } { 3 6 9 } } 3 nunzip
 ] unit-test
 
+{ { 1 2 3 } } [ { 1 2 3 } [ ] map-zip ] unit-test
+
 {
     {
         { 1 10 100 }
@@ -380,6 +382,8 @@ sequences tools.test ;
 ] unit-test
 
 { { 3 7 } } [ { { 1 2 } { 3 4 } } [ + ] map-zip ] unit-test
+
+{ { 1 2 3 } } [ { 1 2 3 } [ ] map-unzip ] unit-test
 
 {
     { 3 7 }
