@@ -212,7 +212,7 @@ GENERIC: +second ( timestamp x -- timestamp )
 : adjust-leap-year ( timestamp -- timestamp )
     dup
     { [ day>> 29 = ] [ month>> 2 = ] [ leap-year? not ] } 1&&
-    [ 3 >>month 1 >>day ] when ;
+    [ 28 >>day ] when ;
 
 M: integer +year
     [ + ] curry change-year adjust-leap-year ;
