@@ -27,7 +27,8 @@ ARTICLE: "applicative" "Applicative Functors"
                      "T{ Right { value 7 } }" 
    }
    { $curious "\"Lifted partially applied function\" actually means \"A datastructure of incomplete quotations\":"
-      { $example "{ 1 4 7 } [ 3array ] fmap ." 
+      { $example "USING: arrays monadics ;"
+                 "{ 1 4 7 } [ 3array ] fmap ." 
                  "{ [ 1 3array ] [ 4 3array ] [ 7 3array ] }" }
    "Unlike in e.g. Haskell, " { $link <$> } " is not a direct alias of " { $link fmap } ", as Factor's stack based nature means that using fmap directly for applicative style code would result in inputs being reversed." } ;
 
@@ -35,34 +36,34 @@ ARTICLE: "monad" "Monads"
    "Monads are datastructures for which there exists a notion of sequential operation, composed by the " { $link and-then } "/" { $link >>= } combinator:
    { $code "( M-x quot: ( x -- M-y ) -- M-y )" }
    $nl "For the " { $link Maybe } " and " { $link Either } " types this encompasses the concept of validation, or short circuiting: "
-   { $example "USING: strings monadics quotations prettyprint ;"
+   { $unchecked-example "USING: strings monadics quotations prettyprint unicode ;"
    ": trivial-password-validator ( string -- Maybe-string )"
    "    just [  [ lower? not ] guard-maybe ] >>=  "
    "         [  [ upper? not ] guard-maybe ] >>= ;"
-   "\"hello\" check-password "
+   "\"hello\" trivial-password-validator ."
    "Nothing" 
    } 
    $nl "In a " { $link sequence } " context, the quotation permutes over each element: "
    ! TODO: Surely there has to be a more useful example...
    { $example "USING: ranges math monadics quotations prettyprint ; "
-   "{ 1 2 3 4 } [ [ 0 ] dip (a..b] ] >>= "
-   "V{ 1 1 2 1 2 3 1 2 3 4 } "
+   "{ 1 2 3 4 } [ [ 0 ] dip (a..b] ] >>= ."
+   "V{ 1 1 2 1 2 3 1 2 3 4 }"
    } ;
 
 
 ARTICLE: "monad-implementation" "Monadic Implementation Quirks"
   "Implementations of " { $link fmap } ", " { $link reify } ", and " { $link and-then } " are all built around the " { $link lazy-call } " combinator. This combinator emulates the behavior of lazily evaluated languages like Haskell by currying input over a quotation until it's type signature matches " { $snippet "( -- x )" } " . As such, any input functions to these functions must eventually resolve to a single output."
-   { $example "USING: math.quadratic monadics quotations prettyprint ; "
-     "  ! Unevaluated ( -- x x ) quotation will remain thunked. "
+   { $example "USING: arrays math.quadratic monadics quotations prettyprint ; "
+     "! Unevaluated ( -- x x ) quotation will remain thunked. "
      "[ quadratic ] 1 just <$> 0 just <*> -1 just <*> . "
-     "T{ Just { value [ -1 0 1 3 nreverse quadratic ] } } "
+     "T{ Just { value [ -1 0 1 3 nreverse quadratic ] } }"
     }
 
 "This is easy to fix using a word like " { $link 2array } "."
-   { $example 
-     "  ! Computes result into Maybe value as expected. "
+   { $example "USING: arrays math.quadratic monadics quotations prettyprint ; "
+     "! Computes result into Maybe value as expected. "
      "[ quadratic 2array ] 1 just <$> 0 just <*> -1 just <*> . "
-     "T{ Just { value { value { 1.0 -1.0 } } } } "
+     "T{ Just { value { 1.0 -1.0 } } }"
    }
    ;
 
@@ -85,26 +86,26 @@ ABOUT: "monadics"
 
 HELP: Maybe 
    { $description "A Maybe either holds " { $snippet "Just" } " a value or is Nothing. Operations done on Nothing will return Nothing:"
-      { $example "5 just [ 1 + ] fmap ." "T{ Just f 6 }" }
-      { $example "[ + ] 5 just <$> Nothing <*> ." "Nothing" }
+      { $example "USING: math monadics prettyprint ;" "5 just [ 1 + ] fmap ." "T{ Just { value 6 } }" }
+      { $example "USING: math monadics prettyprint ;" "[ + ] 5 just <$> Nothing <*> ." "Nothing" }
    "Just values are constructed with the " { $link just } " word, or turned from a generalized boolean by " { $link >maybe } ". "
    $nl "Not to be confused with the all-lowercase " { $link maybe } "."
    } ;
 
 HELP: Either
    { $description "An Either value holds either a \"correct\" " { $snippet "Right" } " value or a " { $snippet "Left" } " value, usually signifying an error of some kind. Any action over a Left value preserves the Left value instead."
-      { $example "[ + ] 5 right <$> \"Bad Input\" left <*> . " "T{ Left f \"Bad Input\" }" }
+      { $example "USING: math monadics prettyprint ;" "[ + ] 5 right <$> \"Bad Input\" left <*> . " "T{ Left { value \"Bad Input\" } }" }
    { $see-also ?either validate }
    } ;
 
-HELP: ?either 
+HELP: ?either
    { $values  { "x" "an object" } { "left" "a fallback value" } { "pred" "a quotation of type " { $snippet "( x -- bool )" } }
               { "Either-x" "an " { $link Either } }
    }
    { $description "Calls " { $snippet "pred" } " on " { $snippet "x" } " and either raises the original value to a " { $snippet "Right" } " or replaces it with the fallback value as a " { $snippet "Left" } "." }
    { $examples
-      { $example "90125 \"Not a number.\" [ number? ] ?either ." "T{ Right f 90125 }" }
-      { $example "\"Hello!\" \"Not a number.\" [ number? ] ?either ." "T{ Left f \"Not a number.\" }" }
+      { $example "USING: math monadics prettyprint ;" "90125 \"Not a number.\" [ number? ] ?either ." "T{ Right { value 90125 } }" }
+      { $example "USING: math monadics prettyprint ;" "\"Hello!\" \"Not a number.\" [ number? ] ?either ." "T{ Left { value \"Not a number.\" } }" }
    }
    ;
 HELP: validate
@@ -113,7 +114,7 @@ HELP: validate
    }
    { $description "Applies each predicate to " { $snippet "x" } " in turn. If the result of any is " { $link f } ", " { $snippet "x" } " is replaced with " { $snippet "Left error-value" } " according to the predicate which it failed, otherwise, raises " { $snippet "x" } " to a " { $snippet "Right" } " value." }
    { $examples
-      { $example "USING: math sets monadics prettyprinter ;"
+      { $unchecked-example "USING: kernel math monadics sequences sets prettyprint ;"
    ": trivial-validate-username ( string -- Either-string )"
    "    { { \"Name is too long.\""
    "      [ length 32 < ] }"
@@ -121,6 +122,6 @@ HELP: validate
    "      [ \"(){}<>\\\"\" intersect { } = ] }"
    "    } validate ;"
    "\"EvilUsername\\\"\" trivial-validate-username . "
-   "T{ Left f \"Forbidden Characters\" }"
+   "T{ Left { value \"Forbidden Characters.\" } }"
       }
    } ;
