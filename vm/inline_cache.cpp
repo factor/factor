@@ -79,14 +79,11 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
 
   // Generate machine code to check, in turn, if the class is one of the cached
   // entries.
-  std::span<const cell> entries(cache_entries.untagged()->data(),
-                                static_cast<size_t>(array_capacity(cache_entries.untagged())));
-  cell entry_offset = 0;
-  for (auto it = entries.begin(); it != entries.end(); it += 2) {
-    cell klass = *it;
-    cell method = *(it + 1);
-    emit_check_and_jump(ic_type, entry_offset, klass, method);
-    entry_offset += 2;
+  for (cell i = 0; i < array_capacity(cache_entries.untagged()); i += 2) {
+    cell klass = array_nth(cache_entries.untagged(), i);
+    cell method = array_nth(cache_entries.untagged(), i + 1);
+
+    emit_check_and_jump(ic_type, i, klass, method);
   }
 
   // If none of the above conditionals tested true, then execution "falls
