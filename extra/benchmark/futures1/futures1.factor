@@ -1,9 +1,9 @@
 USING: concurrency.futures kernel sequences ;
-IN: benchmark.futures
+IN: benchmark.futures1
 
-: futures-benchmark ( -- )
+: futures1-benchmark ( -- )
     250,000 <iota>
     [ [ '[ _ ] future ] map [ ?future ] map-sum ]
     [ sum ] bi assert= ;
 
-MAIN: futures-benchmark
+MAIN: futures1-benchmark
