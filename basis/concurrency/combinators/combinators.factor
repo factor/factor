@@ -7,25 +7,19 @@ IN: concurrency.combinators
 
 <PRIVATE
 
-: (parallel-each) ( n quot -- )
+: parallel ( n quot -- )
     [ <count-down> ] dip keep await ; inline
 
 PRIVATE>
 
 : parallel-each ( seq quot: ( elt -- ) -- )
-    over length [
-        '[ _ curry _ spawn-stage ] each
-    ] (parallel-each) ; inline
+    over length [ '[ _ curry _ spawn-stage ] each ] parallel ; inline
 
 : parallel-each-index ( seq quot: ( elt index -- ) -- )
-    over length [
-        '[ _ 2curry _ spawn-stage ] each-index
-    ] (parallel-each) ; inline
+    over length [ '[ _ 2curry _ spawn-stage ] each-index ] parallel ; inline
 
 : 2parallel-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
-    2over min-length [
-        '[ _ 2curry _ spawn-stage ] 2each
-    ] (parallel-each) ; inline
+    2over min-length [ '[ _ 2curry _ spawn-stage ] 2each ] parallel ; inline
 
 : parallel-product-each ( seq quot: ( elt -- ) -- )
     [ <product-sequence> ] dip parallel-each ;
@@ -44,15 +38,6 @@ PRIVATE>
 
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     over parallel-map-as ; inline
-
-<PRIVATE
-
-: [future] ( quot -- quot' ) '[ _ curry future ] ; inline
-
-PRIVATE>
-
-: parallel-map-timeout ( seq quot: ( elt -- newelt ) timeout -- newseq )
-    [ [future] map ] dip '[ _ ?future-timeout ] map ; inline
 
 : parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
     [
@@ -75,6 +60,8 @@ PRIVATE>
     [ 2array ] dip [ first2-unsafe ] prepose parallel-product-map ;
 
 <PRIVATE
+
+: [future] ( quot -- quot' ) '[ _ curry future ] ; inline
 
 : (parallel-spread) ( n -- spread-array )
     [ ?future ] <repetition> ; inline
