@@ -21,12 +21,6 @@ CONSTANT: christmas-green COLOR: #376627
     hacker-news-ids swap index-or-length head
     [ hacker-news-id>json-url http-get-json ] parallel-map ;
 
-: hacker-news-items-timeout ( n endpoint timeout -- seq )
-    [
-        hacker-news-ids swap index-or-length head
-        [ hacker-news-id>json-url http-get-json ]
-    ] dip parallel-map-timeout ;
-
 : hacker-news-top-stories ( n -- seq )
     "topstories" hacker-news-items ;
 
