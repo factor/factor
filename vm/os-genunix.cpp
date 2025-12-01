@@ -20,9 +20,9 @@ const char* default_image_path() {
     return strdup("factor.image");
 
   size_t len = strlen(path);
-  char* new_path = static_cast<char*>(malloc(len + SUFFIX_LEN + 1));
-  std::copy_n(path, len, new_path);
-  std::copy_n(SUFFIX, SUFFIX_LEN + 1, new_path + len);
+  char* new_path = (char *)malloc(len + SUFFIX_LEN + 1);
+  memcpy(new_path, path, len);
+  memcpy(new_path + len, SUFFIX, SUFFIX_LEN + 1);
   free(const_cast<char*>(path));
   return new_path;
 }

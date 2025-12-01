@@ -1,7 +1,3 @@
-#include <algorithm>
-#include <ranges>
-#include <memory>
-
 namespace factor {
 
 const int mark_bits_granularity = sizeof(cell) * 8;
@@ -11,24 +7,29 @@ struct mark_bits {
   cell size;
   cell start;
   cell bits_size;
-  std::unique_ptr<cell[]> marked;
-  std::unique_ptr<cell[]> forwarding;
+  cell* marked;
+  cell* forwarding;
 
-  void clear_mark_bits() { memset(marked.get(), 0, bits_size * sizeof(cell)); }
+  void clear_mark_bits() { memset(marked, 0, bits_size * sizeof(cell)); }
 
-  void clear_forwarding() { memset(forwarding.get(), 0, bits_size * sizeof(cell)); }
+  void clear_forwarding() { memset(forwarding, 0, bits_size * sizeof(cell)); }
 
   mark_bits(cell size, cell start)
       : size(size),
         start(start),
         bits_size(size / data_alignment / mark_bits_granularity),
-        marked(std::make_unique<cell[]>(bits_size)),
-        forwarding(std::make_unique<cell[]>(bits_size)) {
+        marked(new cell[bits_size]),
+        forwarding(new cell[bits_size]) {
     clear_mark_bits();
     clear_forwarding();
   }
 
-  ~mark_bits() = default;
+  ~mark_bits() {
+    delete[] marked;
+    marked = NULL;
+    delete[] forwarding;
+    forwarding = NULL;
+  }
 
   cell block_line(cell address) {
     return (address - start) / data_alignment;
@@ -46,46 +47,47 @@ struct mark_bits {
   }
 
   bool bitmap_elt(cell* bits, const cell address) {
-    auto [word_index, word_shift] = bitmap_deref(address);
-    return (bits[word_index] & ((cell)1 << word_shift)) != 0;
+    std::pair<cell, cell> position = bitmap_deref(address);
+    return (bits[position.first] & ((cell)1 << position.second)) != 0;
   }
 
   void set_bitmap_range(cell* bits, const cell address, const cell data_size) {
-    auto [start_word, start_shift] = bitmap_deref(address);
-    auto [end_word, end_shift] = bitmap_deref(address + data_size);
+    std::pair<cell, cell> bitmap_start = bitmap_deref(address);
+    std::pair<cell, cell> end = bitmap_deref(address + data_size);
 
-    cell start_mask = ((cell)1 << start_shift) - 1;
-    cell end_mask = ((cell)1 << end_shift) - 1;
+    cell start_mask = ((cell)1 << bitmap_start.second) - 1;
+    cell end_mask = ((cell)1 << end.second) - 1;
 
-    if (start_word == end_word)
-      bits[start_word] |= start_mask ^ end_mask;
+    if (bitmap_start.first == end.first)
+      bits[bitmap_start.first] |= start_mask ^ end_mask;
     else {
-      FACTOR_ASSERT(start_word < bits_size);
-      bits[start_word] |= ~start_mask;
+      FACTOR_ASSERT(bitmap_start.first < bits_size);
+      bits[bitmap_start.first] |= ~start_mask;
 
-      std::fill(bits + start_word + 1, bits + end_word, (cell)-1);
+      for (cell index = bitmap_start.first + 1; index < end.first; index++)
+        bits[index] = (cell)-1;
 
       if (end_mask != 0) {
-        FACTOR_ASSERT(end_word < bits_size);
-        bits[end_word] |= end_mask;
+        FACTOR_ASSERT(end.first < bits_size);
+        bits[end.first] |= end_mask;
       }
     }
   }
 
-  bool marked_p(const cell address) { return bitmap_elt(marked.get(), address); }
+  bool marked_p(const cell address) { return bitmap_elt(marked, address); }
 
   void set_marked_p(const cell address, const cell dsize) {
-    set_bitmap_range(marked.get(), address, dsize);
+    set_bitmap_range(marked, address, dsize);
   }
 
   // The eventual destination of a block after compaction is just the number
   // of marked blocks before it. Live blocks must be marked on entry.
   void compute_forwarding() {
     cell accum = 0;
-    std::ranges::for_each(std::views::iota(cell{0}, bits_size), [&](cell index) {
+    for (cell index = 0; index < bits_size; index++) {
       forwarding[index] = accum;
       accum += popcount(marked[index]);
-    });
+    }
   }
 
   // We have the popcount for every mark_bits_granularity entries; look

@@ -30,8 +30,8 @@ struct _fpstate {
 #define X86_FXSR_MAGIC 0x0000
 
 inline static unsigned int uap_fpu_status(void* uap) {
-  ucontext_t* ucontext = static_cast<ucontext_t*>(uap);
-  struct _fpstate* fpregs = reinterpret_cast<struct _fpstate*>(ucontext->uc_mcontext.fpregs);
+  ucontext_t* ucontext = (ucontext_t*)uap;
+  struct _fpstate* fpregs = (struct _fpstate*)ucontext->uc_mcontext.fpregs;
   if (fpregs->magic == X86_FXSR_MAGIC)
     return fpregs->sw | fpregs->mxcsr;
   else
@@ -39,17 +39,17 @@ inline static unsigned int uap_fpu_status(void* uap) {
 }
 
 inline static void uap_clear_fpu_status(void* uap) {
-  ucontext_t* ucontext = static_cast<ucontext_t*>(uap);
-  struct _fpstate* fpregs = reinterpret_cast<struct _fpstate*>(ucontext->uc_mcontext.fpregs);
+  ucontext_t* ucontext = (ucontext_t*)uap;
+  struct _fpstate* fpregs = (struct _fpstate*)ucontext->uc_mcontext.fpregs;
   fpregs->sw = 0;
   if (fpregs->magic == X86_FXSR_MAGIC)
     fpregs->mxcsr &= 0xffffffc0;
 }
 
 #define UAP_STACK_POINTER(ucontext) \
-  (static_cast<ucontext_t*>(ucontext)->uc_mcontext.gregs[7])
+  (((ucontext_t*)ucontext)->uc_mcontext.gregs[7])
 #define UAP_PROGRAM_COUNTER(ucontext) \
-  (static_cast<ucontext_t*>(ucontext)->uc_mcontext.gregs[14])
+  (((ucontext_t*)ucontext)->uc_mcontext.gregs[14])
 
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0

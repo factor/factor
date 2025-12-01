@@ -27,7 +27,7 @@ static const cell deck_bits = card_bits + 10;
 static const cell deck_size = 1 << deck_bits;
 static const cell cards_per_deck = 1 << 10;
 
-constexpr inline cell addr_to_card(cell a) { return a >> card_bits; }
+inline cell addr_to_card(cell a) { return a >> card_bits; }
 
-constexpr inline cell addr_to_deck(cell a) { return a >> deck_bits; }
+inline cell addr_to_deck(cell a) { return a >> deck_bits; }
 }

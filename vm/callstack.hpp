@@ -18,14 +18,14 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 #ifdef FACTOR_ARM64
   while (frame_offset < frame_length) {
     cell frame_top = stack->frame_top_at(frame_offset);
-    fixnum next_frame = *reinterpret_cast<cell*>(frame_top);
+    fixnum next_frame = *(cell*)frame_top;
     if (frame_offset + next_frame >= frame_length) {
       frame_offset += next_frame;
       break;
     }
-    cell addr = *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
+    cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
     cell fixed_addr = Fixup::translated_code_block_map
-                          ? reinterpret_cast<cell>(fixup.translate_code(reinterpret_cast<code_block*>(addr)))
+                          ? (cell)fixup.translate_code((code_block*)addr)
                           : addr;
     code_block* owner = code->code_block_for_address(fixed_addr);
 
@@ -37,9 +37,9 @@ inline void factor_vm::iterate_callstack_object(callstack* stack_,
 #else
   while (frame_offset < frame_length) {
     cell frame_top = stack->frame_top_at(frame_offset);
-    cell addr = *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
+    cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
     cell fixed_addr = Fixup::translated_code_block_map
-                          ? reinterpret_cast<cell>(fixup.translate_code(reinterpret_cast<code_block*>(addr)))
+                          ? (cell)fixup.translate_code((code_block*)addr)
                           : addr;
     code_block* owner = code->code_block_for_address(fixed_addr);
 
@@ -63,23 +63,23 @@ inline void factor_vm::iterate_callstack_object(callstack* stack,
 // Iterates the callstack from innermost to outermost
 // callframe. Allocates memory
 template <typename Iterator, typename Fixup>
-void factor_vm::iterate_callstack(context* target_ctx, Iterator& iterator,
+void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
                                   Fixup& fixup) {
 
-  cell top = target_ctx->callstack_top;
-  cell bottom = target_ctx->callstack_bottom;
+  cell top = ctx->callstack_top;
+  cell bottom = ctx->callstack_bottom;
   // When we are translating the code block maps, all callstacks must
   // be empty.
   FACTOR_ASSERT(!Fixup::translated_code_block_map || top == bottom);
 
 #ifdef FACTOR_ARM64
   while (top < bottom) {
-    cell next_frame = *reinterpret_cast<cell*>(top);
-    if (*reinterpret_cast<cell*>(next_frame) == 0) {
+    cell next_frame = *(cell*)top;
+    if (*(cell*)next_frame == 0) {
       top = next_frame;
       break;
     }
-    cell addr = *reinterpret_cast<cell*>(top + FRAME_RETURN_ADDRESS);
+    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);
 
     code_block* owner = code->code_block_for_address(addr);
@@ -95,7 +95,7 @@ void factor_vm::iterate_callstack(context* target_ctx, Iterator& iterator,
   }
 #else
   while (top < bottom) {
-    cell addr = *reinterpret_cast<cell*>(top + FRAME_RETURN_ADDRESS);
+    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
     FACTOR_ASSERT(addr != 0);
 
     // Only the address is valid, if the code heap has been compacted,
@@ -117,9 +117,9 @@ void factor_vm::iterate_callstack(context* target_ctx, Iterator& iterator,
 
 // Allocates memory
 template <typename Iterator>
-inline void factor_vm::iterate_callstack(context* target_ctx, Iterator& iterator) {
+inline void factor_vm::iterate_callstack(context* ctx, Iterator& iterator) {
   no_fixup none;
-  iterate_callstack(target_ctx, iterator, none);
+  iterate_callstack(ctx, iterator, none);
 }
 
 }

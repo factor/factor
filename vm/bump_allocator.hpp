@@ -17,7 +17,7 @@ struct bump_allocator {
   object* allot(cell data_size) {
     cell h = here;
     here = h + align(data_size, data_alignment);
-    return reinterpret_cast<object*>(h);
+    return (object*)h;
   }
 
   cell occupied_space() { return here - start; }
@@ -30,7 +30,7 @@ struct bump_allocator {
     // In case of bugs, there may be bogus references pointing to the
     // memory space after the gc has run. Filling it with a pattern
     // makes accesses to such shadow data fail hard.
-    memset_cell(reinterpret_cast<void*>(start), 0xbaadbaad, size);
+    memset_cell((void*)start, 0xbaadbaad, size);
 #endif
   }
 };

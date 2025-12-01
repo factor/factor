@@ -1,8 +1,4 @@
-#include <memory>
-#include <vector>
-
 namespace factor {
-
 
 struct data_heap {
   cell start;
@@ -11,19 +7,19 @@ struct data_heap {
   cell aging_size;
   cell tenured_size;
 
-  std::unique_ptr<segment> seg;
+  segment* seg;
 
   // Borrowed reference to a factor_vm::nursery
   bump_allocator* nursery;
-  std::unique_ptr<aging_space> aging;
-  std::unique_ptr<aging_space> aging_semispace;
-  std::unique_ptr<tenured_space> tenured;
+  aging_space* aging;
+  aging_space* aging_semispace;
+  tenured_space* tenured;
 
-  std::vector<card> cards;
-  card* cards_end;  // Keep for compatibility
+  card* cards;
+  card* cards_end;
 
-  std::vector<card_deck> decks;
-  card_deck* decks_end;  // Keep for compatibility
+  card_deck* decks;
+  card_deck* decks_end;
 
   data_heap(bump_allocator* vm_nursery,
             cell young_size,

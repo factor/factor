@@ -1,6 +1,3 @@
-#include <algorithm>
-#include <span>
-
 namespace factor {
 
 struct growable_byte_array {
@@ -11,9 +8,9 @@ struct growable_byte_array {
   growable_byte_array(factor_vm* parent, cell capacity = 40)
       : count(0), elements(parent->allot_byte_array(capacity), parent) {}
 
-  void reallot_array(cell new_capacity);
+  void reallot_array(cell count);
   void grow_bytes(cell len);
-  void append_bytes(std::span<const uint8_t> data);
+  void append_bytes(void* elts, cell len);
   void append_byte_array(cell elts);
 
   void trim();
@@ -22,9 +19,9 @@ struct growable_byte_array {
 // Allocates memory
 template <typename Type>
 byte_array* factor_vm::byte_array_from_value(Type* value) {
-  byte_array* array_data = allot_uninitialized_array<byte_array>(sizeof(Type));
-  std::copy_n(reinterpret_cast<const char*>(value), sizeof(Type), array_data->data<char>());
-  return array_data;
+  byte_array* data = allot_uninitialized_array<byte_array>(sizeof(Type));
+  memcpy(data->data<char>(), value, sizeof(Type));
+  return data;
 }
 
 }

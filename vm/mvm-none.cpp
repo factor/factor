@@ -4,7 +4,7 @@ namespace factor {
 
 factor_vm* global_vm;
 
-void init_mvm() { global_vm = nullptr; }
+void init_mvm() { global_vm = NULL; }
 
 void register_vm_with_thread(factor_vm* vm) {
   FACTOR_ASSERT(!global_vm);

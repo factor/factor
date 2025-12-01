@@ -21,7 +21,7 @@ static const unsigned char call_opcode = 0xe8;
 static const unsigned char jmp_opcode = 0xe9;
 
 inline static unsigned char call_site_opcode(cell return_address) {
-  return *reinterpret_cast<unsigned char*>(return_address - 5);
+  return *(unsigned char*)(return_address - 5);
 }
 
 inline static void check_call_site(cell return_address) {
@@ -32,18 +32,12 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  std::array<std::byte, sizeof(int32_t)> buffer{};
-  std::copy_n(reinterpret_cast<const std::byte*>(return_address - 4), buffer.size(), buffer.data());
-  int32_t offset = std::bit_cast<int32_t>(buffer);
-  return reinterpret_cast<void*>(static_cast<cell>(offset) + return_address);
+  return (void*)(*(int*)(return_address - 4) + return_address);
 }
 
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  int32_t offset = static_cast<int32_t>(target - return_address);
-  auto bytes = std::bit_cast<std::array<std::byte, sizeof(int32_t)>>(offset);
-  std::copy_n(bytes.data(), bytes.size(),
-              reinterpret_cast<std::byte*>(return_address - 4));
+  *(int*)(return_address - 4) = (uint32_t)(target - return_address);
 }
 
 inline static bool tail_call_site_p(cell return_address) {
@@ -54,11 +48,7 @@ inline static bool tail_call_site_p(cell return_address) {
       return false;
     default:
       abort();
-#if defined(_MSC_VER)
-      __assume(false);
-#else
-      __builtin_unreachable();
-#endif
+      return false;
   }
 }
 

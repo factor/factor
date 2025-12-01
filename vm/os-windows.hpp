@@ -18,17 +18,17 @@
 #endif
 
 // Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970
-constexpr int64_t EPOCH_OFFSET = 0x019db1ded53e8000LL;
+#define EPOCH_OFFSET 0x019db1ded53e8000LL
 
 namespace factor {
 
-using vm_char = wchar_t;
-using symbol_char = char;
-using THREADHANDLE = HANDLE;
+typedef wchar_t vm_char;
+typedef char symbol_char;
+typedef HANDLE THREADHANDLE;
 
 #define STRING_LITERAL(string) L##string
 
-constexpr size_t MAX_UNICODE_PATH = 32768;
+#define MAX_UNICODE_PATH 32768
 #define VM_C_API extern "C" __declspec(dllexport)
 #define SSCANF swscanf
 #define STRCMP wcscmp
@@ -61,24 +61,24 @@ constexpr size_t MAX_UNICODE_PATH = 32768;
 #define THREADSAFE_STRERROR(errnum, buf, buflen) strerror_s(buf, buflen, errnum)
 
 inline static void early_init() {}
-[[nodiscard]] uint64_t nano_count();
+uint64_t nano_count();
 void sleep_nanos(uint64_t nsec);
 
-[[nodiscard]] void* native_dlopen(const char* path);
-[[nodiscard]] void* native_dlsym(void* handle, const char* symbol);
+void* native_dlopen(const char* path);
+void* native_dlsym(void* handle, const char* symbol);
 void native_dlclose(void* handle);
 
-[[nodiscard]] long getpagesize();
+long getpagesize();
 VM_C_API LONG exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                 void* dispatch);
-[[nodiscard]] THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
+THREADHANDLE start_thread(void* (*start_routine)(void*), void* args);
 
 inline static THREADHANDLE thread_id() {
   DWORD id = GetCurrentThreadId();
   HANDLE threadHandle = OpenThread(
       THREAD_GET_CONTEXT | THREAD_SET_CONTEXT | THREAD_SUSPEND_RESUME, FALSE,
       id);
-  FACTOR_ASSERT(threadHandle != nullptr);
+  FACTOR_ASSERT(threadHandle != NULL);
   return threadHandle;
 }
 
@@ -92,34 +92,33 @@ inline static void breakpoint() { DebugBreak(); }
 extern HANDLE boot_thread;
 
 inline static std::string to_utf8(const wchar_t* buffer, int len) {
-  const int nChars = ::WideCharToMultiByte(
+  int nChars = ::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
     len,
-    nullptr,
+    NULL,
     0,
-    nullptr,
-    nullptr);
+    NULL,
+    NULL);
   if (nChars == 0) return "";
 
   std::string newbuffer;
-  newbuffer.resize(nChars);
-  char* buffer_ptr = &newbuffer[0];
-  (void)::WideCharToMultiByte(
+  newbuffer.resize(nChars) ;
+  ::WideCharToMultiByte(
     CP_UTF8,
     0,
     buffer,
     len,
-    buffer_ptr,
+    const_cast<char*>(newbuffer.c_str()),
     nChars,
-    nullptr,
-    nullptr);
+    NULL,
+    NULL);
   return newbuffer;
 }
 
 inline static std::string to_utf8(const std::wstring& str) {
-  return to_utf8(str.c_str(), static_cast<int>(str.size()));
+  return to_utf8(str.c_str(), (int)str.size());
 }
 
 #define AS_UTF8(ptr) to_utf8(ptr)

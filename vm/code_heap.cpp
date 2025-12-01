@@ -5,20 +5,25 @@ namespace factor {
 code_heap::code_heap(cell size) {
   if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
-  seg = std::make_unique<segment>(align_page(size), true);
+  seg = new segment(align_page(size), true);
   if (!seg)
     fatal_error("Out of memory in code_heap constructor", size);
 
   cell start = seg->start + getpagesize() + seh_area_size;
 
-  allocator = std::make_unique<free_list_allocator<code_block>>(seg->end - start, start);
+  allocator = new free_list_allocator<code_block>(seg->end - start, start);
 
   // See os-windows-x86.64.cpp for seh_area usage
   safepoint_page = seg->start;
-  seh_area = reinterpret_cast<char*>(seg->start) + getpagesize();
+  seh_area = (char*)seg->start + getpagesize();
 }
 
-code_heap::~code_heap() = default;
+code_heap::~code_heap() {
+  delete allocator;
+  allocator = NULL;
+  delete seg;
+  seg = NULL;
+}
 
 void code_heap::write_barrier(code_block* compiled) {
   points_to_nursery.insert(compiled);
@@ -38,7 +43,7 @@ void code_heap::free(code_block* compiled) {
   FACTOR_ASSERT(!uninitialized_p(compiled));
   points_to_nursery.erase(compiled);
   points_to_aging.erase(compiled);
-  all_blocks.erase(reinterpret_cast<cell>(compiled));
+  all_blocks.erase((cell)compiled);
   allocator->free(compiled);
 }
 
@@ -52,8 +57,10 @@ void code_heap::set_safepoint_guard(bool locked) {
 
 void code_heap::sweep() {
   auto clear_free_blocks_from_all_blocks = [&](code_block* block, cell size) {
-    auto erase_from = all_blocks.lower_bound(reinterpret_cast<cell>(block));
-    auto erase_to = all_blocks.lower_bound(reinterpret_cast<cell>(block) + size);
+    std::set<cell>::iterator erase_from =
+      all_blocks.lower_bound((cell)block);
+    std::set<cell>::iterator erase_to =
+      all_blocks.lower_bound((cell)block + size);
     all_blocks.erase(erase_from, erase_to);
   };
   allocator->sweep(clear_free_blocks_from_all_blocks);
@@ -66,16 +73,16 @@ void code_heap::verify_all_blocks_set() {
   auto all_blocks_set_verifier = [&](code_block* block, cell size) {
     (void)block;
     (void)size;
-    FACTOR_ASSERT(all_blocks.find(reinterpret_cast<cell>(block)) != all_blocks.end());
+    FACTOR_ASSERT(all_blocks.find((cell)block) != all_blocks.end());
   };
   allocator->iterate(all_blocks_set_verifier, no_fixup());
 }
 
 code_block* code_heap::code_block_for_address(cell address) {
-  auto blocki = all_blocks.upper_bound(address);
+  std::set<cell>::const_iterator blocki = all_blocks.upper_bound(address);
   FACTOR_ASSERT(blocki != all_blocks.begin());
   --blocki;
-  code_block* found_block = reinterpret_cast<code_block*>(*blocki);
+  code_block* found_block = (code_block*)*blocki;
   FACTOR_ASSERT(found_block->entry_point() <=
                 address // XXX this isn't valid during fixup. should store the
                         //     size in the map
@@ -87,9 +94,9 @@ code_block* code_heap::code_block_for_address(cell address) {
 
 cell code_heap::frame_predecessor(cell frame_top) {
 #ifdef FACTOR_ARM64
-  return *reinterpret_cast<cell*>(frame_top);
+  return *(cell*)frame_top;
 #else
-  cell addr = *reinterpret_cast<cell*>(frame_top + FRAME_RETURN_ADDRESS);
+  cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
   FACTOR_ASSERT(seg->in_segment_p(addr));
   code_block* owner = code_block_for_address(addr);
   cell frame_size = owner->stack_frame_size_for_address(addr);
@@ -102,7 +109,7 @@ void code_heap::initialize_all_blocks_set() {
   all_blocks.clear();
   auto all_blocks_set_inserter = [&](code_block* block, cell size) {
     (void)size;
-    all_blocks.insert(reinterpret_cast<cell>(block));
+    all_blocks.insert((cell)block);
   };
   allocator->iterate(all_blocks_set_inserter, no_fixup());
 #ifdef FACTOR_DEBUG
@@ -136,30 +143,30 @@ void factor_vm::primitive_modify_code_heap() {
     data_root<array> pair(array_nth(alist.untagged(), i), this);
 
     data_root<word> word(array_nth(pair.untagged(), 0), this);
-    data_root<object> compiled_object(array_nth(pair.untagged(), 1), this);
+    data_root<object> data(array_nth(pair.untagged(), 1), this);
 
-    switch (compiled_object.type()) {
+    switch (data.type()) {
       case QUOTATION_TYPE:
       case TUPLE_TYPE: // for curry/compose, see issue #2763
-        jit_compile_word(word.value(), compiled_object.value(), false);
+        jit_compile_word(word.value(), data.value(), false);
         break;
       case ARRAY_TYPE: {
-        array* compiled_data = compiled_object.as<array>().untagged();
+        array* compiled_data = data.as<array>().untagged();
         cell parameters = array_nth(compiled_data, 0);
         cell literals = array_nth(compiled_data, 1);
         cell relocation = array_nth(compiled_data, 2);
         cell labels = array_nth(compiled_data, 3);
-        cell machine_code = array_nth(compiled_data, 4);
+        cell code = array_nth(compiled_data, 4);
         cell frame_size = untag_fixnum(array_nth(compiled_data, 5));
 
         code_block* compiled =
-            add_code_block(CODE_BLOCK_OPTIMIZED, machine_code, labels, word.value(),
+            add_code_block(CODE_BLOCK_OPTIMIZED, code, labels, word.value(),
                            relocation, parameters, literals, frame_size);
 
         word->entry_point = compiled->entry_point();
       } break;
       default:
-        critical_error("Expected a quotation or an array", compiled_object.value());
+        critical_error("Expected a quotation or an array", data.value());
         break;
     }
   }
@@ -168,8 +175,8 @@ void factor_vm::primitive_modify_code_heap() {
     update_code_heap_words(reset_inline_caches);
   else {
     // Fast path for compilation units that only define new words.
-    for (auto& [compiled, state] : code->uninitialized_blocks) {
-      initialize_code_block(compiled, state);
+    FACTOR_FOR_EACH(code->uninitialized_blocks) {
+      initialize_code_block(iter->first, iter->second);
     }
     code->uninitialized_blocks.clear();
   }

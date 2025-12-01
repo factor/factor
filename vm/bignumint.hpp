@@ -44,14 +44,14 @@ namespace factor {
 // definition is `CHAR_BIT', which is defined in the Ansi C header
 // file "limits.h".
 
-using bignum_digit_type = fixnum;
-using bignum_length_type = fixnum;
+typedef fixnum bignum_digit_type;
+typedef fixnum bignum_length_type;
 
 #ifndef _WIN64
 #ifdef FACTOR_64
-using bignum_twodigit_type = __int128_t;
+typedef __int128_t bignum_twodigit_type;
 #else
-using bignum_twodigit_type = int64_t;
+typedef int64_t bignum_twodigit_type;
 #endif
 #endif
 
@@ -85,17 +85,9 @@ using bignum_twodigit_type = int64_t;
 #define BIGNUM_ONE(neg_p) untag<bignum>(        \
             special_objects[neg_p ? OBJ_BIGNUM_NEG_ONE : OBJ_BIGNUM_POS_ONE])
 
-inline constexpr bignum_digit_type HD_LOW(bignum_digit_type digit) {
-  return digit & BIGNUM_HALF_DIGIT_MASK;
-}
-
-inline constexpr bignum_digit_type HD_HIGH(bignum_digit_type digit) {
-  return digit >> BIGNUM_HALF_DIGIT_LENGTH;
-}
-
-inline constexpr bignum_digit_type HD_CONS(bignum_digit_type high, bignum_digit_type low) {
-  return (high << BIGNUM_HALF_DIGIT_LENGTH) | low;
-}
+#define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
+#define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)
+#define HD_CONS(high, low) (((high) << BIGNUM_HALF_DIGIT_LENGTH) | (low))
 
 #define BIGNUM_BITS_TO_DIGITS(n) \
   (((n) + (BIGNUM_DIGIT_LENGTH - 1)) / BIGNUM_DIGIT_LENGTH)
@@ -105,11 +97,11 @@ inline constexpr bignum_digit_type HD_CONS(bignum_digit_type high, bignum_digit_
 
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 
-#define BIGNUM_ASSERT(expression)              \
-  do {                                         \
-    if (!(expression))                        \
-      BIGNUM_EXCEPTION();                     \
-  } while (false)
+#define BIGNUM_ASSERT(expression) \
+  {                               \
+    if (!(expression))            \
+      BIGNUM_EXCEPTION();         \
+  }
 
 #endif // not BIGNUM_DISABLE_ASSERTION_CHECKS
 

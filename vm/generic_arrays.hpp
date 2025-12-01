@@ -1,6 +1,3 @@
-#include <algorithm>
-#include <cstddef>
-
 namespace factor {
 
 template <typename Array> cell array_capacity(const Array* array) {
@@ -48,13 +45,9 @@ Array* factor_vm::reallot_array(Array* array_, cell capacity) {
 
   Array* new_array = allot_uninitialized_array<Array>(capacity);
 
-  auto* src = reinterpret_cast<const std::byte*>(array.untagged() + 1);
-  auto* dst = reinterpret_cast<std::byte*>(new_array + 1);
-  auto bytes = static_cast<size_t>(to_copy * Array::element_size);
-  std::copy_n(src, bytes, dst);
-  std::fill(dst + bytes,
-            dst + static_cast<size_t>(capacity * Array::element_size),
-            std::byte{0});
+  memcpy(new_array + 1, array.untagged() + 1, to_copy * Array::element_size);
+  memset((char*)(new_array + 1) + to_copy * Array::element_size, 0,
+         (capacity - to_copy) * Array::element_size);
 
   return new_array;
 }

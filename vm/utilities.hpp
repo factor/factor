@@ -1,9 +1,11 @@
-#include <algorithm>
-#include <bit>
-#include <cstring>
-#include <type_traits>
-
 namespace factor {
+
+// Poor mans range-based for loops.
+#define FACTOR_FOR_EACH(iterable)                               \
+  for (auto iter = (iterable).begin(),    \
+           _end = (iterable).end();                             \
+       iter != _end;                                            \
+       iter++)
 
 inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
 #ifdef __APPLE__
@@ -13,11 +15,11 @@ inline static void memset_2(void* dst, uint16_t pattern, size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    uint16_t* start = static_cast<uint16_t*>(dst);
-    uint16_t* end = reinterpret_cast<uint16_t*>(reinterpret_cast<cell>(dst) + size);
+    uint16_t* start = (uint16_t*)dst;
+    uint16_t* end = (uint16_t*)((cell)dst + size);
     while (start < end) {
       *start = pattern;
-      ++start;
+      start++;
     }
   }
 #endif
@@ -34,11 +36,11 @@ inline static void memset_cell(void* dst, cell pattern, size_t size) {
   if (pattern == 0)
     memset(dst, 0, size);
   else {
-    cell* start = static_cast<cell*>(dst);
-    cell* end = reinterpret_cast<cell*>(reinterpret_cast<cell>(dst) + size);
+    cell* start = (cell*)dst;
+    cell* end = (cell*)((cell)dst + size);
     while (start < end) {
       *start = pattern;
-      ++start;
+      start++;
     }
   }
 #endif

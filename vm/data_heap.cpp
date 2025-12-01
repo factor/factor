@@ -16,22 +16,24 @@ data_heap::data_heap(bump_allocator* vm_nursery,
   tenured_size = tenured_size_;
 
   cell total_size = young_size + 2 * aging_size + tenured_size + deck_size;
-  seg = std::make_unique<segment>(total_size, false);
+  seg = new segment(total_size, false);
 
   cell cards_size = total_size / card_size;
-  cards.resize(cards_size, 0);
-  cards_end = cards.data() + cards_size;
+  cards = new card[cards_size];
+  cards_end = cards + cards_size;
+  memset(cards, 0, cards_size);
 
   cell decks_size = total_size / deck_size;
-  decks.resize(decks_size, 0);
-  decks_end = decks.data() + decks_size;
+  decks = new card_deck[decks_size];
+  decks_end = decks + decks_size;
+  memset(decks, 0, decks_size);
 
   start = align(seg->start, deck_size);
 
-  tenured = std::make_unique<tenured_space>(tenured_size, start);
+  tenured = new tenured_space(tenured_size, start);
 
-  aging = std::make_unique<aging_space>(aging_size, tenured->end);
-  aging_semispace = std::make_unique<aging_space>(aging_size, aging->end);
+  aging = new aging_space(aging_size, tenured->end);
+  aging_semispace = new aging_space(aging_size, aging->end);
 
   // Initialize vm nursery
   vm_nursery->here = aging_semispace->end;
@@ -43,7 +45,14 @@ data_heap::data_heap(bump_allocator* vm_nursery,
   FACTOR_ASSERT(seg->end - nursery->end <= deck_size);
 }
 
-data_heap::~data_heap() = default;
+data_heap::~data_heap() {
+  delete seg;
+  delete aging;
+  delete aging_semispace;
+  delete tenured;
+  delete[] cards;
+  delete[] decks;
+}
 
 data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
   FACTOR_ASSERT(vm_nursery->occupied_space() == 0);
@@ -54,13 +63,13 @@ data_heap* data_heap::grow(bump_allocator* vm_nursery, cell requested_bytes) {
 template <typename Generation> void data_heap::clear_cards(Generation* gen) {
   cell first_card = addr_to_card(gen->start - start);
   cell last_card = addr_to_card(gen->end - start);
-  std::fill(cards.begin() + first_card, cards.begin() + last_card, static_cast<card>(0));
+  memset(&cards[first_card], 0, last_card - first_card);
 }
 
 template <typename Generation> void data_heap::clear_decks(Generation* gen) {
   cell first_deck = addr_to_deck(gen->start - start);
   cell last_deck = addr_to_deck(gen->end - start);
-  std::fill(decks.begin() + first_deck, decks.begin() + last_deck, static_cast<card_deck>(0));
+  memset(&decks[first_deck], 0, last_deck - first_deck);
 }
 
 void data_heap::reset_nursery() {
@@ -69,14 +78,14 @@ void data_heap::reset_nursery() {
 
 void data_heap::reset_aging() {
   aging->flush();
-  clear_cards(aging.get());
-  clear_decks(aging.get());
+  clear_cards(aging);
+  clear_decks(aging);
   aging->starts.clear_object_start_offsets();
 }
 
 void data_heap::reset_tenured() {
-  clear_cards(tenured.get());
-  clear_decks(tenured.get());
+  clear_cards(tenured);
+  clear_decks(tenured);
 }
 
 bool data_heap::high_fragmentation_p() {
@@ -88,14 +97,14 @@ bool data_heap::low_memory_p() {
 }
 
 void data_heap::mark_all_cards() {
-  std::fill(cards.begin(), cards.end(), static_cast<card>(0xff));
-  std::fill(decks.begin(), decks.end(), static_cast<card_deck>(0xff));
+  memset(cards, 0xff, cards_end - cards);
+  memset(decks, 0xff, decks_end - decks);
 }
 
 void factor_vm::set_data_heap(data_heap* data_) {
   data = data_;
-  cards_offset = reinterpret_cast<cell>(data->cards.data()) - addr_to_card(data->start);
-  decks_offset = reinterpret_cast<cell>(data->decks.data()) - addr_to_deck(data->start);
+  cards_offset = (cell)data->cards - addr_to_card(data->start);
+  decks_offset = (cell)data->decks - addr_to_deck(data->start);
 }
 
 data_heap_room factor_vm::data_room() {
@@ -112,8 +121,8 @@ data_heap_room factor_vm::data_room() {
   room.tenured_total_free = data->tenured->free_space;
   room.tenured_contiguous_free = data->tenured->largest_free_block();
   room.tenured_free_block_count = data->tenured->free_block_count;
-  room.cards = data->cards.size();
-  room.decks = data->decks.size();
+  room.cards = data->cards_end - data->cards;
+  room.decks = data->decks_end - data->decks;
   room.mark_stack = mark_stack.capacity() * sizeof(cell);
 
   return room;

@@ -10,7 +10,7 @@ struct to_aging_copier : no_fixup {
       : aging(aging), tenured(tenured) { }
 
   object* fixup_data(object* obj) {
-    if (aging->contains_p(obj) || tenured->contains_p(obj)) [[likely]] {
+    if (aging->contains_p(obj) || tenured->contains_p(obj)) {
       return obj;
     }
 
@@ -20,13 +20,13 @@ struct to_aging_copier : no_fixup {
       obj = dest;
     }
 
-    if (aging->contains_p(obj) || tenured->contains_p(obj)) [[likely]] {
+    if (aging->contains_p(obj) || tenured->contains_p(obj)) {
       return obj;
     }
 
-    const cell size = obj->size();
+    cell size = obj->size();
     object* newpointer = aging->allot(size);
-    if (!newpointer) [[unlikely]]
+    if (!newpointer)
       throw must_start_gc_again();
 
     memcpy(newpointer, obj, size);
@@ -43,15 +43,14 @@ void factor_vm::collect_aging() {
     // Change the op so that if we fail here, an assertion will be raised.
     current_gc->op = COLLECT_TO_TENURED_OP;
 
-    mark_stack.clear();
-    from_tenured_refs_copier tenured_copier(data->tenured.get(), &mark_stack);
-    slot_visitor<from_tenured_refs_copier> visitor(this, tenured_copier);
+    slot_visitor<from_tenured_refs_copier>
+        visitor(this, from_tenured_refs_copier(data->tenured, &mark_stack));
 
-    gc_event* event = current_gc->event.get();
+    gc_event* event = current_gc->event;
 
     if (event)
       event->reset_timer();
-    visitor.visit_cards(data->tenured.get(), card_points_to_aging, 0xff);
+    visitor.visit_cards(data->tenured, card_points_to_aging, 0xff);
     if (event) {
       event->ended_phase(PHASE_CARD_SCAN);
       event->cards_scanned += visitor.cards_scanned;
@@ -66,7 +65,6 @@ void factor_vm::collect_aging() {
       event->code_blocks_scanned += code->points_to_aging.size();
     }
     visitor.visit_mark_stack(&mark_stack);
-    FACTOR_ASSERT(mark_stack.empty());
   }
   {
     // If collection fails here, do a to_tenured collection.
@@ -75,11 +73,11 @@ void factor_vm::collect_aging() {
     std::swap(data->aging, data->aging_semispace);
     data->reset_aging();
 
-    aging_space *aging = data->aging.get();
+    aging_space *aging = data->aging;
     slot_visitor<to_aging_copier>
-        visitor(this, to_aging_copier(aging, data->tenured.get()));
+        visitor(this, to_aging_copier(aging, data->tenured));
 
-    const cell scan = aging->start + aging->occupied_space();
+    cell scan = aging->start + aging->occupied_space();
 
     visitor.visit_all_roots();
     visitor.cheneys_algorithm(aging, scan);

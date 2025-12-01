@@ -40,7 +40,7 @@ void jit::emit_relocation(cell relocation_template_) {
     relocation_entry entry = relocations[i];
     relocation_entry new_entry(entry.type(), entry.klass(),
                                entry.offset() + code.count);
-    relocation.append_bytes(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(&new_entry), sizeof(relocation_entry)));
+    relocation.append_bytes(&new_entry, sizeof(relocation_entry));
   }
 }
 
@@ -118,7 +118,7 @@ code_block* jit::to_code_block(code_block_type type, cell frame_size) {
   // Emit dummy GC info
   code.grow_bytes(alignment_for(code.count + 4, data_alignment));
   uint32_t dummy_gc_info = 0;
-  code.append_bytes(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(&dummy_gc_info), sizeof(uint32_t)));
+  code.append_bytes(&dummy_gc_info, sizeof(uint32_t));
 
   code.trim();
   relocation.trim();

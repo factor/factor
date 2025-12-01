@@ -31,8 +31,8 @@ namespace factor {
 #define MACH_STACK_POINTER(thr_state) (thr_state)->__esp
 #define MACH_PROGRAM_COUNTER(thr_state) (thr_state)->__eip
 
-#define UAP_SS(ucontext) &(static_cast<ucontext_t*>(ucontext)->uc_mcontext->__ss)
-#define UAP_FS(ucontext) &(static_cast<ucontext_t*>(ucontext)->uc_mcontext->__fs)
+#define UAP_SS(ucontext) &(((ucontext_t*)(ucontext))->uc_mcontext->__ss)
+#define UAP_FS(ucontext) &(((ucontext_t*)(ucontext))->uc_mcontext->__fs)
 
 #define MXCSR(float_state) (float_state)->__fpu_mxcsr
 #define X87SW(float_state) (float_state)->__fpu_fsw
@@ -41,8 +41,8 @@ namespace factor {
 #define MACH_STACK_POINTER(thr_state) (thr_state)->esp
 #define MACH_PROGRAM_COUNTER(thr_state) (thr_state)->eip
 
-#define UAP_SS(ucontext) &(static_cast<ucontext_t*>(ucontext)->uc_mcontext->ss)
-#define UAP_FS(ucontext) &(static_cast<ucontext_t*>(ucontext)->uc_mcontext->fs)
+#define UAP_SS(ucontext) &(((ucontext_t*)(ucontext))->uc_mcontext->ss)
+#define UAP_FS(ucontext) &(((ucontext_t*)(ucontext))->uc_mcontext->fs)
 
 #define MXCSR(float_state) (float_state)->fpu_mxcsr
 #define X87SW(float_state) (float_state)->fpu_fsw
@@ -51,8 +51,8 @@ namespace factor {
 #define UAP_PROGRAM_COUNTER(ucontext) MACH_PROGRAM_COUNTER(UAP_SS(ucontext))
 
 inline static unsigned int mach_fpu_status(i386_float_state_t* float_state) {
-  unsigned short x87sw = 0;
-  std::memcpy(&x87sw, &X87SW(float_state), sizeof(x87sw));
+  unsigned short x87sw;
+  memcpy(&x87sw, &X87SW(float_state), sizeof(x87sw));
   return MXCSR(float_state) | x87sw;
 }
 

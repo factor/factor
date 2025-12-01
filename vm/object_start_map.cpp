@@ -27,12 +27,10 @@ cell object_start_map::find_object_containing_card(cell card_index) {
 
 // we need to remember the first object allocated in the card
 void object_start_map::record_object_start_offset(object* obj) {
-  cell obj_addr = reinterpret_cast<cell>(obj);
-  cell idx = addr_to_card(obj_addr - start);
-  card obj_start = static_cast<card>(obj_addr & addr_card_mask);
+  cell idx = addr_to_card((cell)obj - start);
+  card obj_start = ((cell)obj & addr_card_mask);
   object_start_offsets[idx] = std::min(object_start_offsets[idx], obj_start);
 }
-
 
 void object_start_map::clear_object_start_offsets() {
   memset(object_start_offsets, card_starts_inside_object, addr_to_card(size));

@@ -140,23 +140,21 @@ cell factor_vm::compute_dlsym_address(array* parameters,
                                       bool toc) {
   cell symbol = array_nth(parameters, index);
   cell library = array_nth(parameters, index + 1);
-  dll* d = to_boolean(library) ? untag<dll>(library) : nullptr;
+  dll* d = to_boolean(library) ? untag<dll>(library) : NULL;
 
-  cell undef = reinterpret_cast<cell>(factor::undefined_symbol);
+  cell undef = (cell)factor::undefined_symbol;
   undef = toc ? FUNCTION_TOC_POINTER(undef) : FUNCTION_CODE_POINTER(undef);
-  if (d != nullptr && !d->handle)
+  if (d != NULL && !d->handle)
     return undef;
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
   symbol_char* name = alien_offset(symbol);
-  auto sym_opt = ffi_dlsym(d, name);
-  if (!sym_opt.has_value())
-    return undef;
-  cell sym = toc ? FUNCTION_TOC_POINTER(sym_opt.value()) : FUNCTION_CODE_POINTER(sym_opt.value());
+  cell sym = ffi_dlsym(d, name);
+  sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
   return sym ? sym : undef;
 }
 
-std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
+cell factor_vm::lookup_external_address(relocation_type rel_type,
                                         code_block *compiled,
                                         array* parameters,
                                         cell index) {
@@ -166,9 +164,9 @@ std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
     case RT_THIS:
       return compiled->entry_point();
     case RT_MEGAMORPHIC_CACHE_HITS:
-      return reinterpret_cast<cell>(&dispatch_stats.megamorphic_cache_hits);
+      return (cell)&dispatch_stats.megamorphic_cache_hits;
     case RT_VM:
-      return reinterpret_cast<cell>(this) + untag_fixnum(array_nth(parameters, index));
+      return (cell)this + untag_fixnum(array_nth(parameters, index));
     case RT_CARDS_OFFSET:
       return cards_offset;
     case RT_DECKS_OFFSET:
@@ -178,11 +176,11 @@ std::optional<cell> factor_vm::lookup_external_address(relocation_type rel_type,
       return compute_dlsym_address(parameters, index, true);
 #endif
     case RT_INLINE_CACHE_MISS:
-      return reinterpret_cast<cell>(&factor::inline_cache_miss);
+      return (cell)&factor::inline_cache_miss;
     case RT_SAFEPOINT:
       return code->safepoint_page;
     default:
-      return std::nullopt;
+      return -1;
   }
 }
 
@@ -190,12 +188,12 @@ cell factor_vm::compute_external_address(instruction_operand op) {
   code_block* compiled = op.compiled;
   array* parameters = to_boolean(compiled->parameters)
       ? untag<array>(compiled->parameters)
-      : nullptr;
+      : NULL;
   cell idx = op.index;
   relocation_type rel_type = op.rel.type();
 
-  auto ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
-  if (!ext_addr.has_value()) {
+  cell ext_addr = lookup_external_address(rel_type, compiled, parameters, idx);
+  if (ext_addr == (cell)-1) {
     ostringstream ss;
     print_obj(ss, compiled->owner);
     ss << ": ";
@@ -209,7 +207,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
     }
     critical_error(ss.str().c_str(), arg);
   }
-  return ext_addr.value();
+  return ext_addr;
 }
 
 struct initial_code_block_visitor {
@@ -262,9 +260,9 @@ void factor_vm::initialize_code_block(code_block* compiled, cell literals) {
 }
 
 void factor_vm::initialize_code_block(code_block* compiled) {
-  auto iter = code->uninitialized_blocks.find(compiled);
-  auto [block, literals] = *iter;
-  initialize_code_block(block, literals);
+  std::map<code_block*, cell>::iterator iter =
+      code->uninitialized_blocks.find(compiled);
+  initialize_code_block(compiled, iter->second);
   code->uninitialized_blocks.erase(iter);
 }
 
@@ -292,14 +290,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> machine_code(code_, this);
+  data_root<byte_array> code(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(machine_code.untagged());
+  cell code_length = array_capacity(code.untagged());
   code_block* compiled = allot_code_block(code_length, type);
 
   compiled->owner = owner.value();
@@ -318,8 +316,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  std::copy_n(machine_code.untagged()->data<uint8_t>(), code_length,
-              reinterpret_cast<uint8_t*>(compiled + 1));
+  memcpy(compiled + 1, code.untagged() + 1, code_length);
 
   // fixup labels
   if (to_boolean(labels.value()))
@@ -333,7 +330,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   // compiler at the beginning of bootstrap
   this->code->uninitialized_blocks.insert(
       std::make_pair(compiled, literals.value()));
-  this->code->all_blocks.insert(reinterpret_cast<cell>(compiled));
+  this->code->all_blocks.insert((cell)compiled);
 
   return compiled;
 }
@@ -342,7 +339,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 // image load. It finds the symbol and library, and throws an error.
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
-  cell return_address = *reinterpret_cast<cell*>(frame);
+  cell return_address = *(cell*)frame;
   code_block* compiled = code->code_block_for_address(return_address);
 
   // Find the RT_DLSYM relocation nearest to the given return address.

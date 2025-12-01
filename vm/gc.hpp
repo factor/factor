@@ -1,6 +1,3 @@
-#include <memory>
-#include <array>
-
 namespace factor {
 
 struct must_start_gc_again {
@@ -36,7 +33,7 @@ struct gc_event {
   cell code_blocks_scanned;
   uint64_t start_time;
   cell total_time;
-  std::array<cell, 6> times;
+  cell times[6];
   uint64_t temp_time;
 
   gc_event(gc_op op, factor_vm* parent);
@@ -48,9 +45,10 @@ struct gc_event {
 struct gc_state {
   gc_op op;
   uint64_t start_time;
-  std::unique_ptr<gc_event> event;
+  gc_event* event;
 
   gc_state(gc_op op, factor_vm* parent);
+  ~gc_state();
   void start_again(gc_op op_, factor_vm* parent);
 };
 

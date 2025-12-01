@@ -20,12 +20,12 @@ static cell search_lookup_hash(cell table, cell klass, cell hashcode) {
 }
 
 static cell nth_superclass(tuple_layout* layout, fixnum echelon) {
-  cell* ptr = reinterpret_cast<cell*>(layout + 1);
+  cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2];
 }
 
 static cell nth_hashcode(tuple_layout* layout, fixnum echelon) {
-  cell* ptr = reinterpret_cast<cell*>(layout + 1);
+  cell* ptr = (cell*)(layout + 1);
   return ptr[echelon * 2 + 1];
 }
 
@@ -101,7 +101,7 @@ void factor_vm::primitive_mega_cache_miss() {
   fixnum index = untag_fixnum(ctx->pop());
   cell methods = ctx->pop();
 
-  cell object = reinterpret_cast<cell*>(ctx->datastack)[-index];
+  cell object = ((cell*)ctx->datastack)[-index];
   cell klass = object_class(object);
   cell method = lookup_method(object, methods);
 

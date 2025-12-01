@@ -8,7 +8,7 @@ void early_init();
 const char* vm_executable_path();
 const char* default_image_path();
 
-#define UAP_STACK_POINTER(ucontext) (static_cast<ucontext_t*>(ucontext)->uc_stack.ss_sp)
+#define UAP_STACK_POINTER(ucontext) (((ucontext_t*)ucontext)->uc_stack.ss_sp)
 
 #define CODE_TO_FUNCTION_POINTER(code) (void)0
 #define CODE_TO_FUNCTION_POINTER_CALLBACK(vm, code) (void)0

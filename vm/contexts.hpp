@@ -1,11 +1,8 @@
-#include <array>
-#include <memory>
-
 namespace factor {
 
 // Context object count and identifiers must be kept in sync with:
 //   core/kernel/kernel.factor
-static constexpr cell context_object_count = 4;
+static const cell context_object_count = 4;
 
 enum context_object {
   OBJ_NAMESTACK,
@@ -18,15 +15,7 @@ enum context_object {
 // overflow error is triggered. So before continuing executing on it
 // in general_error(), we chop off this many bytes to have some space
 // to work with. macOS 64 bit needs more than 8192. See issue #1419.
-#if defined(FACTOR_WITH_ADDRESS_SANITIZER)
-// AddressSanitizer adds large red zones around stack frames which
-// effectively shrink the usable callstack size. Increase the reserved
-// slack so GC and error handlers have room to run when the stack is
-// close to exhaustion during sanitizer builds.
-static constexpr cell stack_reserved = 1048576;
-#else
-static constexpr cell stack_reserved = 16384;
-#endif
+static const cell stack_reserved = 16384;
 
 struct context {
 
@@ -45,13 +34,13 @@ struct context {
   // C callstack pointer
   cell callstack_save;
 
-  std::unique_ptr<segment> datastack_seg;
-  std::unique_ptr<segment> retainstack_seg;
-  std::unique_ptr<segment> callstack_seg;
+  segment* datastack_seg;
+  segment* retainstack_seg;
+  segment* callstack_seg;
 
   // context-specific special objects, accessed by context-object and
   // set-context-object primitives
-  std::array<cell, context_object_count> context_objects;
+  cell context_objects[context_object_count];
 
   context(cell ds_size, cell rs_size, cell cs_size);
   ~context();
@@ -62,12 +51,12 @@ struct context {
   void reset_context_objects();
   void reset();
   void fix_stacks();
-  void fill_stack_seg(cell top_ptr, const std::unique_ptr<segment>& seg, cell pattern);
+  void fill_stack_seg(cell top_ptr, segment* seg, cell pattern);
   vm_error_type address_to_error(cell addr);
 
-  cell peek() { return *reinterpret_cast<cell*>(datastack); }
+  cell peek() { return *(cell*)datastack; }
 
-  void replace(cell tagged) { *reinterpret_cast<cell*>(datastack) = tagged; }
+  void replace(cell tagged) { *(cell*)datastack = tagged; }
 
   cell pop() {
     cell value = peek();

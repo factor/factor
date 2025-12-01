@@ -9,23 +9,23 @@ void factor_vm::enqueue_fep() {
   code->set_safepoint_guard(true);
 }
 
-void factor_vm::enqueue_samples(cell sample_count,
+void factor_vm::enqueue_samples(cell samples,
                                 cell pc,
                                 bool foreign_thread_p) {
 
   if (!atomic::load(&sampling_profiler_p))
     return;
-  atomic::fetch_add(&current_sample.sample_count, sample_count);
+  atomic::fetch_add(&current_sample.sample_count, samples);
 
   if (foreign_thread_p)
-    atomic::fetch_add(&current_sample.foreign_thread_sample_count, sample_count);
+    atomic::fetch_add(&current_sample.foreign_thread_sample_count, samples);
   else {
     if (atomic::load(&current_gc_p))
-      atomic::fetch_add(&current_sample.gc_sample_count, sample_count);
+      atomic::fetch_add(&current_sample.gc_sample_count, samples);
     if (atomic::load(&current_jit_count) > 0)
-      atomic::fetch_add(&current_sample.jit_sample_count, sample_count);
+      atomic::fetch_add(&current_sample.jit_sample_count, samples);
     if (!code->seg->in_segment_p(pc))
-      atomic::fetch_add(&current_sample.foreign_sample_count, sample_count);
+      atomic::fetch_add(&current_sample.foreign_sample_count, samples);
   }
   code->set_safepoint_guard(true);
 }

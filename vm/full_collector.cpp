@@ -14,9 +14,9 @@ struct full_collection_copier : no_fixup {
 
   object* fixup_data(object* obj) {
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
-        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
-        mark_stack->push_back(reinterpret_cast<cell>(obj));
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
       }
       return obj;
     }
@@ -28,9 +28,9 @@ struct full_collection_copier : no_fixup {
     }
 
     if (tenured->contains_p(obj)) {
-      if (!tenured->state.marked_p(reinterpret_cast<cell>(obj))) {
-        tenured->state.set_marked_p(reinterpret_cast<cell>(obj), obj->size());
-        mark_stack->push_back(reinterpret_cast<cell>(obj));
+      if (!tenured->state.marked_p((cell)obj)) {
+        tenured->state.set_marked_p((cell)obj, obj->size());
+        mark_stack->push_back((cell)obj);
       }
       return obj;
     }
@@ -42,27 +42,27 @@ struct full_collection_copier : no_fixup {
     memcpy(newpointer, obj, size);
     obj->forward_to(newpointer);
 
-    tenured->state.set_marked_p(reinterpret_cast<cell>(newpointer), newpointer->size());
-    mark_stack->push_back(reinterpret_cast<cell>(newpointer));
+    tenured->state.set_marked_p((cell)newpointer, newpointer->size());
+    mark_stack->push_back((cell)newpointer);
     return newpointer;
   }
 
   code_block* fixup_code(code_block* compiled) {
-    if (!code->allocator->state.marked_p(reinterpret_cast<cell>(compiled))) {
-      code->allocator->state.set_marked_p(reinterpret_cast<cell>(compiled), compiled->size());
-      mark_stack->push_back(reinterpret_cast<cell>(compiled) + 1);
+    if (!code->allocator->state.marked_p((cell)compiled)) {
+      code->allocator->state.set_marked_p((cell)compiled, compiled->size());
+      mark_stack->push_back((cell)compiled + 1);
     }
     return compiled;
   }
 };
 
 void factor_vm::collect_mark_impl() {
-  gc_event* event = current_gc->event.get();
+  gc_event* event = current_gc->event;
   if (event)
     event->reset_timer();
 
   slot_visitor<full_collection_copier>
-      visitor(this, full_collection_copier(data->tenured.get(), code.get(), &mark_stack));
+      visitor(this, full_collection_copier(data->tenured, code, &mark_stack));
 
   mark_stack.clear();
 
@@ -74,7 +74,6 @@ void factor_vm::collect_mark_impl() {
   visitor.visit_uninitialized_code_blocks();
 
   visitor.visit_mark_stack(&mark_stack);
-  FACTOR_ASSERT(mark_stack.empty());
 
   data->reset_tenured();
   data->reset_aging();
@@ -86,7 +85,7 @@ void factor_vm::collect_mark_impl() {
 }
 
 void factor_vm::collect_sweep_impl() {
-  gc_event* event = current_gc->event.get();
+  gc_event* event = current_gc->event;
   if (event)
     event->reset_timer();
   data->tenured->sweep();
@@ -98,7 +97,8 @@ void factor_vm::collect_sweep_impl() {
   // and the PIC compiler triggers a GC, and the caller block gets GCd
   // as a result, the PIC code won't try to overwrite the call site
   mark_bits* state = &code->allocator->state;
-  for (code_root* root : code_roots) {
+  FACTOR_FOR_EACH(code_roots) {
+    code_root* root = *iter;
     cell block = root->value & (~data_alignment - 1);
     if (root->valid && !state->marked_p(block))
       root->valid = false;

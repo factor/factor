@@ -1,5 +1,4 @@
 #include "master.hpp"
-#include <algorithm>
 
 namespace factor {
 
@@ -31,9 +30,9 @@ void factor_vm::primitive_resize_byte_array() {
 }
 
 // Allocates memory
-void growable_byte_array::reallot_array(cell new_capacity) {
+void growable_byte_array::reallot_array(cell count) {
   byte_array *ba_old = elements.untagged();
-  byte_array *ba_new = elements.parent->reallot_array(ba_old, new_capacity);
+  byte_array *ba_new = elements.parent->reallot_array(ba_old, count);
   elements.set_untagged(ba_new);
 }
 
@@ -46,10 +45,10 @@ void growable_byte_array::grow_bytes(cell len) {
 }
 
 // Allocates memory
-void growable_byte_array::append_bytes(std::span<const uint8_t> data) {
+void growable_byte_array::append_bytes(void* elts, cell len) {
   cell old_count = count;
-  grow_bytes(data.size());
-  std::copy(data.begin(), data.end(), &elements->data<uint8_t>()[old_count]);
+  grow_bytes(len);
+  memcpy(&elements->data<uint8_t>()[old_count], elts, len);
 }
 
 // Allocates memory
@@ -62,7 +61,7 @@ void growable_byte_array::append_byte_array(cell byte_array_) {
     reallot_array(2 * new_size);
   }
 
-  std::copy_n(byte_array->data<uint8_t>(), len, &elements->data<uint8_t>()[count]);
+  memcpy(&elements->data<uint8_t>()[count], byte_array->data<uint8_t>(), len);
 
   count += len;
 }

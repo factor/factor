@@ -133,7 +133,7 @@ void factor_vm::primitive_get_samples() {
   }
   data_root<array> samples_array(allot_array(samples.size(), false_object),
                                  this);
-  auto from_iter = samples.begin();
+  std::vector<profiling_sample>::const_iterator from_iter = samples.begin();
   cell to_i = 0;
 
   cell callstacks_cell = special_objects[OBJ_SAMPLE_CALLSTACKS];
@@ -155,12 +155,12 @@ void factor_vm::primitive_get_samples() {
 
     set_array_nth(sample.untagged(), 5, from_iter->thread);
 
-    cell callstack_length =
+    cell callstack_size =
         from_iter->callstack_end - from_iter->callstack_begin;
-    data_root<array> callstack(allot_array(callstack_length, false_object),
+    data_root<array> callstack(allot_array(callstack_size, false_object),
                                this);
 
-    for (cell i = 0; i < callstack_length; i++) {
+    for (cell i = 0; i < callstack_size; i++) {
       cell block_owner = growarr_nth(callstacks.untagged(),
                                      from_iter->callstack_begin + i);
       set_array_nth(callstack.untagged(), i, block_owner);

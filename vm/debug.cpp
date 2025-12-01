@@ -31,6 +31,7 @@ void factor_vm::print_factor_string(ostream& out, string* str) {
 
 void factor_vm::print_array(ostream& out, array* array, cell nesting) {
   cell length = array_capacity(array);
+  cell i;
   bool trimmed;
 
   if (length > 10 && !full_output) {
@@ -39,10 +40,9 @@ void factor_vm::print_array(ostream& out, array* array, cell nesting) {
   } else
     trimmed = false;
 
-  const std::span<const cell> elements(array->data(), static_cast<size_t>(length));
-  for (cell value : elements) {
+  for (i = 0; i < length; i++) {
     out << " ";
-    print_nested_obj(out, value, nesting);
+    print_nested_obj(out, array_nth(array, i), nesting);
   }
 
   if (trimmed)
@@ -57,15 +57,16 @@ void factor_vm::print_alien(ostream& out, alien* alien, cell nesting) {
     print_nested_obj(out, alien->base, nesting);
     out << ">";
   } else {
-    out << "#<alien " << reinterpret_cast<void*>(alien->address) << ">";
+    out << "#<alien " << (void*)alien->address << ">";
   }
 }
 
 void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) {
   (void)nesting;
   cell length = array->capacity;
+  cell i;
   bool trimmed;
-  unsigned char* bytes = array->data<unsigned char>();
+  unsigned char* data = array->data<unsigned char>();
 
   if (length > 16 && !full_output) {
     trimmed = true;
@@ -73,9 +74,9 @@ void factor_vm::print_byte_array(ostream& out, byte_array* array, cell nesting) 
   } else
     trimmed = false;
 
-  const std::span<const unsigned char> view(bytes, static_cast<size_t>(length));
-  for (unsigned char byte : view)
-    out << " " << static_cast<unsigned>(byte);
+  for (i = 0; i < length; i++) {
+    out << " " << (unsigned) data[i];
+  }
 
   if (trimmed)
     out << "...";
@@ -95,10 +96,9 @@ void factor_vm::print_tuple(ostream& out, tuple* tuple, cell nesting) {
   } else
     trimmed = false;
 
-  const std::span<const cell> fields(tuple->data(), static_cast<size_t>(length));
-  for (cell value : fields) {
+  for (cell i = 0; i < length; i++) {
     out << " ";
-    print_nested_obj(out, value, nesting);
+    print_nested_obj(out, tuple->data()[i], nesting);
   }
 
   if (trimmed)
@@ -160,7 +160,7 @@ void factor_vm::print_nested_obj(ostream& out, cell obj, fixnum nesting) {
       break;
     default:
       out << "#<" << type_name(TAG(obj)) << " @ ";
-      out << reinterpret_cast<void*>(obj) << ">";
+      out << (void*)obj << ">";
       break;
   }
   out << flush;
@@ -171,7 +171,7 @@ void factor_vm::print_obj(ostream& out, cell obj) {
 }
 
 void factor_vm::print_objects(ostream& out, cell* start, cell* end) {
-  for (; start <= end; ++start) {
+  for (; start <= end; start++) {
     print_obj(out, *start);
     cout << endl;
   }
@@ -181,8 +181,8 @@ void factor_vm::print_datastack(ostream& out) {
   out << "==== DATA STACK:" << endl;
   if (ctx)
     print_objects(out,
-                  reinterpret_cast<cell*>(ctx->datastack_seg->start),
-                  reinterpret_cast<cell*>(ctx->datastack));
+                  (cell*)ctx->datastack_seg->start,
+                  (cell*)ctx->datastack);
   else
     out << "*** Context not initialized" << endl;
 }
@@ -191,8 +191,8 @@ void factor_vm::print_retainstack(ostream& out) {
   out << "==== RETAIN STACK:" << endl;
   if (ctx)
     print_objects(out,
-                  reinterpret_cast<cell*>(ctx->retainstack_seg->start),
-                  reinterpret_cast<cell*>(ctx->retainstack));
+                  (cell*)ctx->retainstack_seg->start,
+                  (cell*)ctx->retainstack);
   else
     out << "*** Context not initialized" << endl;
 }
@@ -205,7 +205,7 @@ struct stack_frame_printer {
       : parent(parent), out(out) {}
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     out << endl;
-    out << "frame: " << reinterpret_cast<void*>(frame_top) << " size " << size << endl;
+    out << "frame: " << (void*)frame_top << " size " << size << endl;
     out << "executing: ";
     parent->print_obj(out, owner->owner);
     out << endl;
@@ -254,7 +254,7 @@ ostream& operator<<(ostream& out, const padded_address& value) {
 
 void factor_vm::dump_cell(ostream& out, cell x) {
   out << padded_address(x) << ": ";
-  x = *reinterpret_cast<cell*>(x);
+  x = *(cell*)x;
   out << padded_address(x) << " tag " << TAG(x) << endl;
 }
 
@@ -269,7 +269,7 @@ void dump_memory_range(ostream& out, const char* name, cell name_w,
                        cell start, cell end) {
   out << setw(static_cast<int>(name_w)) << left << name << ": ";
 
-  out << "[" << reinterpret_cast<void*>(start) << " -> " << reinterpret_cast<void*>(end) << "] ";
+  out << "[" << (void*)start << " -> " << (void*)end << "] ";
   out << setw(10) << right << (end - start) << " bytes" << endl;
 }
 
@@ -280,15 +280,16 @@ void dump_generation(ostream& out, const char* name, Generation* gen) {
 
 void factor_vm::dump_memory_layout(ostream& out) {
   dump_generation(out, "Nursery", data->nursery);
-  dump_generation(out, "Aging", data->aging.get());
-  dump_generation(out, "Tenured", data->tenured.get());
-  dump_memory_range(out, "Cards", 10, reinterpret_cast<cell>(data->cards.data()), reinterpret_cast<cell>(data->cards_end));
+  dump_generation(out, "Aging", data->aging);
+  dump_generation(out, "Tenured", data->tenured);
+  dump_memory_range(out, "Cards", 10, (cell)data->cards, (cell)data->cards_end);
 
   out << endl << "Contexts:" << endl << endl;
-  for (context* the_ctx : active_contexts) {
-    segment* ds = the_ctx->datastack_seg.get();
-    segment* rs = the_ctx->retainstack_seg.get();
-    segment* cs = the_ctx->callstack_seg.get();
+  FACTOR_FOR_EACH(active_contexts) {
+    context* the_ctx = *iter;
+    segment* ds = the_ctx->datastack_seg;
+    segment* rs = the_ctx->retainstack_seg;
+    segment* cs = the_ctx->callstack_seg;
     if (the_ctx == ctx) {
       out << "  Active:" << endl;
     }
@@ -302,8 +303,8 @@ void factor_vm::dump_memory_layout(ostream& out) {
 void factor_vm::dump_objects(ostream& out, cell type) {
   primitive_full_gc();
   auto object_dumper = [&](object* obj) {
-    if (type == TYPE_COUNT || obj->type() == type) {
-      out << padded_address(reinterpret_cast<cell>(obj)) << " ";
+     if (type == TYPE_COUNT || obj->type() == type) {
+      out << padded_address((cell)obj) << " ";
       print_nested_obj(out, tag_dynamic(obj), 2);
       out << endl;
     }
@@ -315,7 +316,7 @@ void factor_vm::find_data_references(ostream& out, cell look_for) {
   primitive_full_gc();
   auto find_data_ref_func = [&](object* obj, cell* slot) {
     if (look_for == *slot) {
-      out << padded_address(reinterpret_cast<cell>(obj)) << " ";
+      out << padded_address((cell)obj) << " ";
       print_nested_obj(out, tag_dynamic(obj), 2);
       out << endl;
     }
@@ -327,9 +328,9 @@ void factor_vm::dump_edges(ostream& out) {
   primitive_full_gc();
   auto dump_edges_func = [&](object* obj, cell* scan) {
     if (TAG(*scan) > F_TYPE) {
-      out << reinterpret_cast<void*>(tag_dynamic(obj));
+      out << (void*)tag_dynamic(obj);
       out << " ==> ";
-      out << reinterpret_cast<void*>(*scan) << endl;
+      out << (void*)*scan << endl;
     }
   };
   each_object_each_slot(dump_edges_func);
@@ -351,12 +352,12 @@ struct code_block_printer {
       reloc_size += object_size(scan->relocation);
       parameter_size += object_size(scan->parameters);
 
-      if (parent->code->allocator->state.marked_p(reinterpret_cast<cell>(scan)))
+      if (parent->code->allocator->state.marked_p((cell)scan))
         status = "marked";
       else
         status = "allocated";
 
-      out << hex << reinterpret_cast<cell>(scan) << dec << " ";
+      out << hex << (cell)scan << dec << " ";
       out << hex << size << dec << " ";
       out << status << " ";
       out << "stack frame " << scan->stack_frame_size();
@@ -463,7 +464,7 @@ void factor_vm::factorbug() {
         // If we exit with an EOF immediately, then
         // dump stacks. This is useful for builder and
         // other cases where Factor is run with stdin
-        // redirected to /dev/nullptr
+        // redirected to /dev/null
         fep_disabled = true;
 
         print_datastack(cout);
@@ -508,8 +509,8 @@ void factor_vm::factorbug() {
     else if (cmd == ".c")
       print_callstack(cout);
     else if (cmd == "e") {
-      for (auto& obj : std::span(special_objects, special_object_count))
-        dump_cell(cout, reinterpret_cast<cell>(&obj));
+      for (cell i = 0; i < special_object_count; i++)
+        dump_cell(cout, (cell)&special_objects[i]);
     } else if (cmd == "g")
       dump_memory_layout(cout);
     else if (cmd == "c") {

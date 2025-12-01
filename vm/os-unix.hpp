@@ -55,7 +55,7 @@ void native_dlclose(void* handle);
 
 void check_ENOMEM(const char* msg);
 
-[[noreturn]] static inline void breakpoint() { __builtin_trap(); }
+static inline void breakpoint() { __builtin_trap(); }
 
 #define AS_UTF8(ptr) ptr
 }

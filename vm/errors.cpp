@@ -4,27 +4,20 @@ namespace factor {
 
 bool factor_vm::fatal_erroring_p;
 
-[[noreturn]] static inline void fa_diddly_atal_error() {
+static inline void fa_diddly_atal_error() {
   printf("fatal_error in fatal_error!\n");
   breakpoint();
-#if defined(_WIN32)
   ::_exit(86);
-#elif defined(__GNUC__) || defined(__clang__)
-  __builtin_unreachable();
-#else
-  for (;;)
-    ;
-#endif
 }
 
-[[noreturn]] void fatal_error(const char* msg, cell tagged) {
+void fatal_error(const char* msg, cell tagged) {
   if (factor_vm::fatal_erroring_p)
     fa_diddly_atal_error();
 
   factor_vm::fatal_erroring_p = true;
 
   std::cout << "fatal_error: " << msg;
-  std::cout << ": " << reinterpret_cast<void*>(tagged);
+  std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
   factor_vm* vm = current_vm();
   if (vm->data) {

@@ -1,16 +1,14 @@
-#include <memory>
-
 namespace factor {
 
 #if defined(WINDOWS) && defined(FACTOR_64)
-constexpr cell seh_area_size = 1024;
+const cell seh_area_size = 1024;
 #else
-constexpr cell seh_area_size = 0;
+const cell seh_area_size = 0;
 #endif
 
 struct code_heap {
   // The actual memory area
-  std::unique_ptr<segment> seg;
+  segment* seg;
 
   // Memory area reserved for safepoint guard page
   cell safepoint_page;
@@ -19,7 +17,7 @@ struct code_heap {
   char* seh_area;
 
   // Memory allocator
-  std::unique_ptr<free_list_allocator<code_block>> allocator;
+  free_list_allocator<code_block>* allocator;
 
   // For fast lookup of blocks from addresses.
   std::set<cell> all_blocks;
