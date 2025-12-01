@@ -40,12 +40,7 @@ PRIVATE>
     over parallel-map-as ; inline
 
 : parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
-    [
-        over assoc-size <count-down> [
-            [ '[ @ 2array ] collector ] dip swap
-            [ '[ _ 2curry _ spawn-stage ] assoc-each ] dip
-        ] keep await
-    ] dip assoc-like ; inline
+    [ >alist ] [ '[ first2 @ 2array ] parallel-map ] [ assoc-like ] tri* ; inline
 
 : parallel-assoc-map ( assoc quot: ( key value -- newkey newvalue ) -- newassoc )
     over parallel-assoc-map-as ;
