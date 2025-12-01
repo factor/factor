@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Chris Double, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors concurrency.conditions continuations deques
-destructors dlists kernel sequences threads vocabs.loader ;
+destructors dlists kernel sequences threads typed vocabs.loader ;
 IN: concurrency.mailboxes
 
 TUPLE: mailbox { threads dlist } { data dlist } ;
@@ -11,7 +11,7 @@ TUPLE: mailbox { threads dlist } { data dlist } ;
         <dlist> >>threads
         <dlist> >>data ; inline
 
-: mailbox-empty? ( mailbox -- bool )
+TYPED: mailbox-empty? ( mailbox: mailbox -- bool )
     data>> deque-empty? ; inline
 
 GENERIC: mailbox-put ( obj mailbox -- )
@@ -29,19 +29,16 @@ M: mailbox mailbox-put
         mailbox timeout pred block-unless-pred
     ] unless ; inline recursive
 
-: block-if-empty ( mailbox timeout -- mailbox )
-    over mailbox-empty? [
-        2dup wait-for-mailbox block-if-empty
-    ] [
-        drop
-    ] if ; inline recursive
+TYPED:: block-if-empty ( mailbox: mailbox timeout -- mailbox )
+    mailbox data>> '[ _ deque-empty? ]
+    mailbox threads>> '[ _ timeout "mailbox" wait ] while
+    mailbox ;
 
-: mailbox-peek ( mailbox -- obj )
+TYPED: mailbox-peek ( mailbox: mailbox -- obj )
     data>> peek-back ;
 
-GENERIC#: mailbox-get-timeout 1 ( mailbox timeout -- obj )
-
-M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
+TYPED: mailbox-get-timeout ( mailbox: mailbox timeout -- obj )
+    block-if-empty data>> pop-back ;
 
 : mailbox-get ( mailbox -- obj )
     f mailbox-get-timeout ; inline
@@ -71,22 +68,4 @@ M: mailbox mailbox-get-timeout block-if-empty data>> pop-back ;
 : wait-for-close ( mailbox -- )
     f wait-for-close-timeout ;
 
-TUPLE: linked-error error thread ;
-
-C: <linked-error> linked-error
-
-: ?linked ( message -- message )
-    dup linked-error? [ rethrow ] when ;
-
-TUPLE: linked-thread < thread supervisor ;
-
-M: linked-thread error-in-thread
-    [ <linked-error> ] [ supervisor>> ] bi mailbox-put stop ;
-
-: <linked-thread> ( quot name mailbox -- thread' )
-    [ linked-thread new-thread ] dip >>supervisor ;
-
-: spawn-linked-to ( quot name mailbox -- thread )
-    <linked-thread> [ (spawn) ] keep ;
-
-{ "concurrency.mailboxes" "debugger" } "concurrency.mailboxes.debugger" require-when
+M: mailbox send-linked-error mailbox-put ;

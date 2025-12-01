@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes concurrency.promises
-kernel math ;
+USING: accessors concurrency.promises kernel math threads ;
 IN: concurrency.count-downs
 
 ! https://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/CountDownLatch.html
@@ -34,4 +33,4 @@ ERROR: count-down-already-done ;
 : spawn-stage ( quot count-down -- )
     [ '[ @ _ count-down ] ] keep
     "Count down stage"
-    swap promise>> mailbox>> spawn-linked-to drop ;
+    swap promise>> spawn-linked-to drop ;

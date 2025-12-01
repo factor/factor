@@ -1,27 +1,35 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors concurrency.mailboxes kernel ;
+USING: accessors boxes concurrency.conditions continuations
+dlists kernel threads typed vocabs.loader ;
 IN: concurrency.promises
 
-TUPLE: promise mailbox ;
+TUPLE: promise { box box } { threads dlist } ;
 
 : <promise> ( -- promise )
-    <mailbox> promise boa ;
+    <box> <dlist> promise boa ;
 
-: promise-fulfilled? ( promise -- ? )
-    mailbox>> mailbox-empty? not ;
+TYPED: promise-fulfilled? ( promise: promise -- ? )
+    box>> occupied>> ;
 
 ERROR: promise-already-fulfilled promise ;
 
-: fulfill ( value promise -- )
-    dup promise-fulfilled? [
+TYPED: fulfill ( value promise: promise -- )
+    [ box>> ] keep over occupied>> [
         promise-already-fulfilled
     ] [
-        mailbox>> mailbox-put
+        [ >box ] [ threads>> notify-all ] bi* yield
     ] if ;
 
-: ?promise-timeout ( promise timeout -- result )
-    [ mailbox>> ] dip block-if-empty mailbox-peek ;
+TYPED:: block-if-empty ( promise: promise timeout -- promise )
+    promise box>> '[ _ occupied>> ]
+    promise threads>> '[ _ timeout "promise" wait ] until
+    promise ;
+
+TYPED: ?promise-timeout ( promise: promise timeout -- result )
+    block-if-empty box>> check-box value>> ;
 
 : ?promise ( promise -- result )
     f ?promise-timeout ;
+
+M: promise send-linked-error fulfill ;
