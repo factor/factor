@@ -56,6 +56,7 @@ CONSTANT: alpha-2 H{
     { "CN" "China" }
     { "CO" "Colombia" }
     { "CP" "Clipperton Island" }
+    { "CQ" "Sark" }
     { "CR" "Costa Rica" }
     { "CS" "Czechoslovakia" }
     { "CU" "Cuba" }
@@ -329,6 +330,7 @@ CONSTANT: alpha-3 H{
     { "COM" "Comoros" }
     { "CPV" "Cabo Verde" }
     { "CRI" "Costa Rica" }
+    { "CRQ" "Sark" }
     { "CUB" "Cuba" }
     { "CUW" "Curaçao" }
     { "CXR" "Christmas Island" }
