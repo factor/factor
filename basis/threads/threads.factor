@@ -262,4 +262,24 @@ M: real sleep
 
 PRIVATE>
 
+TUPLE: linked-error error thread ;
+
+C: <linked-error> linked-error
+
+: ?linked ( message -- message )
+    dup linked-error? [ rethrow ] when ;
+
+GENERIC: send-linked-error ( linked-error object -- )
+
+TUPLE: linked-thread < thread supervisor ;
+
+M: linked-thread error-in-thread
+    [ <linked-error> ] [ supervisor>> ] bi send-linked-error stop ;
+
+: <linked-thread> ( quot name object -- thread )
+    [ linked-thread new-thread ] dip >>supervisor ;
+
+: spawn-linked-to ( quot name object -- thread )
+    <linked-thread> [ (spawn) ] keep ;
+
 STARTUP-HOOK: init-threads

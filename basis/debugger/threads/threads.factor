@@ -12,6 +12,9 @@ IN: debugger.threads
         ", " % dup quot>> unparse-short % ")" %
     ] "" make swap write-object ":" print ;
 
+M: linked-error error.
+    [ thread>> error-in-thread. ] [ error>> error. ] bi ;
+
 ! ( error thread -- * )
 [
     dup initial-thread get-global eq? [
