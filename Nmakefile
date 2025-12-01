@@ -40,7 +40,7 @@ DETECTED_ARCH = x64
 !ENDIF
 
 LINK_FLAGS = /nologo shell32.lib user32.lib
-CL_FLAGS = /nologo /O2 /W4 /std:c++20 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
+CL_FLAGS = /nologo /O2 /W4 /std:c++17 /D_CRT_SECURE_NO_WARNINGS /DFACTOR_VERSION=$(VERSION) /DFACTOR_GIT_LABEL=$(GIT_LABEL)
 
 # Check if targeting Vista or higher (can be set via WINVER=VISTA environment variable)
 !IF DEFINED(WINVER)
