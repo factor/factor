@@ -27,6 +27,6 @@ ARTICLE: "concurrency.count-downs" "Count-down latches"
     await
     await-timeout
 }
-"The vocabulary was modelled after a similar feature in Java's " { $snippet "java.util.concurrent" } " library." ;
+"The vocabulary was modeled after a similar feature in Java's " { $snippet "java.util.concurrent" } " library." ;
 
 ABOUT: "concurrency.count-downs"

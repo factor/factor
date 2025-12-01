@@ -5,7 +5,7 @@ IN: concurrency.futures
 
 : future ( quot -- future )
     <promise> [
-        [ '[ @ _ fulfill ] "Future" ] keep
+        [ '[ init-namestack @ _ fulfill ] "Future" ] keep
         spawn-linked-to drop
     ] keep ; inline
 
