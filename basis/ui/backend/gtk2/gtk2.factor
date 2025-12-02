@@ -183,7 +183,7 @@ CONSTANT: events-mask
 : on-focus-out ( win event user-data -- ? )
     2drop window unfocus-world f ;
 
-CONSTANT: default-icon-path "resource:misc/icons/Factor_128x128.png"
+CONSTANT: default-icon-path "resource:misc/icons/icon_128x128.png"
 
 : default-icon-data ( -- byte-array/f )
     [

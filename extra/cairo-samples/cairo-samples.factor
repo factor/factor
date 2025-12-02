@@ -54,7 +54,7 @@ M: clip-gadget render-cairo* ( gadget -- )
 
 TUPLE: clip-image-gadget < cairo-gadget ;
 M:: clip-image-gadget render-cairo* ( gadget -- )
-    "resource:misc/icons/Factor_128x128.png"
+    "resource:misc/icons/icon_128x128.png"
     normalize-path cairo_image_surface_create_from_png :> png
     png cairo_image_surface_get_width :> w
     png cairo_image_surface_get_height :> h
