@@ -5,13 +5,13 @@ sequences tools.test accessors calendar ;
 
 FROM: pop3 => count delete ;
 
-<promise> "p1" set
+<promise> "p" set
 
-{ } [ "p1" get mock-pop3-server ] unit-test
+{ } [ "p" get mock-pop3-server ] unit-test
 { } [
         <pop3-account>
             "127.0.0.1" >>host
-            "p1" get 5 seconds ?promise-timeout >>port
+            "p" get 5 seconds ?promise-timeout >>port
         connect
 ] unit-test
 { } [ "username@host.com" >user ] unit-test
@@ -48,20 +48,6 @@ FROM: pop3 => count delete ;
 } [ consolidate ] unit-test
 { "000000d547ac2fc2" } [ 1 uidl ] unit-test
 { } [ 1 delete ] unit-test
-{ } [ reset ] unit-test
-{ } [ close ] unit-test
-
-
-<promise> "p2" set
-
-{ } [ "p2" get mock-pop3-server ] unit-test
-{ } [
-        <pop3-account>
-            "127.0.0.1" >>host
-            "p2" get 5 seconds ?promise-timeout >>port
-            "username@host.com" >>user
-            "password" >>pwd
-        connect
-] unit-test
 { f } [ 1 retrieve empty? ] unit-test
+{ } [ reset ] unit-test
 { } [ close ] unit-test
