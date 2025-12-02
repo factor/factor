@@ -257,7 +257,7 @@ This is the body of the second test.
                 ] with-stream
             ] with-disposal
         ] with-test-context
-    ] in-thread ;
+    ] "POP3" spawn drop ;
 
 : start-pop3-server ( -- )
     <promise> [ mock-pop3-server ] keep ?promise

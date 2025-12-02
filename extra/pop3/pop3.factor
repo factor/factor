@@ -32,9 +32,7 @@ TUPLE: raw-source top headers content ;
 : raw ( -- raw-source ) raw-source get ;
 
 : set-read-timeout ( -- )
-    stream [
-        account timeout>> timeouts
-    ] with-stream* ;
+    account timeout>> stream set-timeout ;
 
 : get-ok ( -- )
     stream [
