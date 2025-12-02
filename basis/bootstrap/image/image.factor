@@ -31,7 +31,7 @@ CONSTANT: image-names
     {
         "windows-x86.32" "unix-x86.32"
         "windows-x86.64" "unix-x86.64"
-        "windows-arm.64" "unix-arm.64"
+        ! "windows-arm.64" "unix-arm.64"
     }
 
 <PRIVATE
