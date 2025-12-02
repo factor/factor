@@ -207,13 +207,11 @@ M: timestamp present timestamp>string ;
     [
         {
             [
-                duration>years >integer
+                duration>days >integer 365 /mod swap
                 [
                     [ number>string ]
                     [ 1 > " years" " year" ? append , ] bi
                 ] unless-zero
-            ] [
-                duration>days >integer 365 mod
                 [
                     [ number>string ]
                     [ 1 > " days" " day" ? append , ] bi
