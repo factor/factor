@@ -4,7 +4,7 @@ USING: math sequences kernel base58 ;
 IN: benchmark.base58
 
 : base58-benchmark ( -- )
-    65535 <iota> [ 255 bitand ] "" map-as
+    4096 <iota> [ 255 bitand ] "" map-as
     20 [ >base58 base58> ] times
     drop ;
 
