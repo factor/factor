@@ -21,7 +21,7 @@ H{ } clone \ pool [
 
         sent-messages get
         super-sent-messages get
-        [ keys [ objc-methods get at dup ] H{ } map>assoc ] bi@
+        [ members [ objc-methods get at dup ] H{ } map>assoc ] bi@
         super-message-senders [ assoc-intersect pool-keys ] change
         message-senders [ assoc-intersect pool-keys ] change
 
