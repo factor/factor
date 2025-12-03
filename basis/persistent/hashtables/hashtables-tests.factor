@@ -80,12 +80,8 @@ M: hash-0-b hashcode* 2drop 0 ;
     "ph" get "F" "E" rot new-at "A" swap pluck-at >hashtable
 ] unit-test
 
-: random-string ( -- str )
-    1000000 random ;
-    ! [ CHAR: a CHAR: z [a..b] random ] "" replicate-as ;
-
 : random-assocs ( n -- hash phash )
-    [ random-string ] replicate
+    1,000,000 <iota> swap sample
     [ H{ } clone [ '[ swap _ set-at ] each-index ] keep ]
     [ PH{ } clone swap [| ph elt i | i elt ph new-at ] each-index ]
     bi ;
