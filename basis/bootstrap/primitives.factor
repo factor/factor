@@ -1,12 +1,13 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs bootstrap.image.primitives
-bootstrap.image.private classes classes.builtin classes.intersection
-classes.predicate classes.private classes.singleton classes.tuple
-classes.tuple.private classes.union combinators compiler.units io
-kernel kernel.private layouts make math math.private namespaces parser
-quotations sequences slots source-files splitting vocabs vocabs.loader
-words ;
+bootstrap.image.private classes classes.builtin
+classes.intersection classes.predicate classes.private
+classes.singleton classes.tuple classes.tuple.private
+classes.union combinators compiler.units io kernel
+kernel.private layouts make math math.private memoize namespaces
+parser quotations sequences slots source-files splitting vocabs
+vocabs.loader vocabs.metadata words ;
 IN: bootstrap.primitives
 
 "* Creating primitives and basic runtime structures..." print flush
@@ -330,3 +331,5 @@ all-primitives create-primitives
 "build" "kernel" create-word build 1 + [ ] curry ( -- n ) define-declared
 
 ] with-compilation-unit
+
+\ vocab-file-lines reset-memoized ! fix memory leak
