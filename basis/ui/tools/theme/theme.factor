@@ -53,8 +53,9 @@ IN: ui.tools.theme
     [ text-color background rot set-at ] bi
 
     ! vocabs.prettyprint
-    manifest-style code-background-color page-color update-style
-    manifest-style code-border-color border-color update-style
+    manifest-style
+    [ code-background-color page-color rot set-at ]
+    [ code-border-color border-color rot set-at ] bi
 
     ! ui.gadgets.panes
     \ specified-font reset-memoized
