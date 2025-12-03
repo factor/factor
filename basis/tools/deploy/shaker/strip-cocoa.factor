@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov
 ! See https://factorcode.org/license.txt for BSD license.
-USING: cocoa cocoa.messages cocoa.application cocoa.nibs assocs
-namespaces kernel kernel.private words compiler.units sequences
-init vocabs memoize accessors ;
+USING: accessors assocs cocoa cocoa.messages compiler.units
+kernel memoize namespaces sequences sets ;
 IN: tools.deploy.shaker.cocoa
 
 : pool ( obj -- obj' ) \ pool get [ ] cache ;
@@ -16,8 +15,9 @@ IN: tools.deploy.shaker.cocoa
 H{ } clone \ pool [
     [
         ! Only keeps those methods that we actually call
-        sent-messages get super-sent-messages get assoc-union
-        objc-methods [ assoc-intersect pool-values ] change
+        objc-methods
+        sent-messages get super-sent-messages get union
+        '[ [ _ in? ] filter-keys pool-values ] change
 
         sent-messages get
         super-sent-messages get
