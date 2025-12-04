@@ -55,7 +55,7 @@ SYMBOL: current-git-id
     dup utf8 file-lines parse-fresh
     [ "Empty file: " swap append throw ] [ nip first ] if-empty ;
 
-: to-file ( object file -- ) utf8 [ [ . ] without-limits ] with-file-writer ;
+: to-file ( object file -- ) utf8 [ ... ] with-file-writer ;
 
 : datestamp ( timestamp -- string )
     [
