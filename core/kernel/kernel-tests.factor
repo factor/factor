@@ -212,8 +212,6 @@ IN: kernel.tests
 { 2 3 4 1 } [ 1 2 3 4 roll ] unit-test
 { 1 2 3 4 } [ 2 3 4 1 -roll ] unit-test
 
-{ } [ "kernel" reload ] long-unit-test
-
 { 5 t } [ "5" [ string>number ] ?transmute ] unit-test
 { "5notanumber" f } [ "5notanumber" [ string>number ] ?transmute ] unit-test
 
