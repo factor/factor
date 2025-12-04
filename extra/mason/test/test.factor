@@ -73,7 +73,7 @@ IN: mason.test
     do-step ;
 
 : do-benchmarks ( -- )
-    { } { } ! run-timing-benchmarks
+    run-timing-benchmarks
     [ benchmarks-file to-file ] [
         [ keys benchmark-error-vocabs-file to-file ]
         [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
