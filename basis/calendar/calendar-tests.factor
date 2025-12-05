@@ -91,9 +91,9 @@ IN: calendar
 { t } [ 2006 1 1 0 0 0 instant <timestamp> -24 months time+
         2004 1 1 0 0 0 instant <timestamp> = ] unit-test
 { t } [ 2004 2 29 0 0 0 instant <timestamp> 12 months time+
-        2005 3 1 0 0 0 instant <timestamp> = ] unit-test
+        2005 2 28 0 0 0 instant <timestamp> = ] unit-test
 { t } [ 2004 2 29 0 0 0 instant <timestamp> -12 months time+
-        2003 3 1 0 0 0 instant <timestamp> = ] unit-test
+        2003 2 28 0 0 0 instant <timestamp> = ] unit-test
 
 { t } [ 2006 1 1 0 0 0 instant <timestamp> 0 years time+
         2006 1 1 0 0 0 instant <timestamp> = ] unit-test
