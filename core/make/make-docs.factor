@@ -89,3 +89,11 @@ HELP: ,,
 HELP: %%
 { $values { "assoc" assoc } }
 { $description "Adds all entries from " { $snippet "assoc" } " to the assoc being constructed by " { $link make } "." } ;
+
+HELP: ,+
+{ $values { "n" object } { "key" object } }
+{ $description "Increments the key/value pair in the assoc being constructed by " { $link make } "." } ;
+
+HELP: ,%
+{ $values { "elt" object } { "key" object } }
+{ $description "Adds an element to the key/value pair in the assoc being constructed by " { $link make } "." } ;

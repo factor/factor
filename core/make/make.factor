@@ -33,3 +33,5 @@ PRIVATE>
 : %% ( assoc -- ) building get swap assoc-union! drop ;
 
 : ,+ ( n key -- ) building get at+ ;
+
+: ,% ( elt key -- ) building get push-at ;
