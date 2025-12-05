@@ -20,6 +20,13 @@ math.combinatorics.private tools.test sequences sets ;
 { 2598960 } [ 52 5 nCk ] unit-test
 { 2598960 } [ 52 47 nCk ] unit-test
 
+! Mirror identity: nCk(n, k) = nCk(n, n-k)
+{ t } [ 49 12 nCk 49 37 nCk = ] unit-test
+{ t } [ 20 5 nCk 20 15 nCk = ] unit-test
+
+! Pascal's triangle identity: nCk(n, k) = nCk(n-1, k-1) + nCk(n-1, k)
+{ t } [ 49 12 nCk 48 11 nCk 48 12 nCk + = ] unit-test
+{ t } [ 10 4 nCk 9 3 nCk 9 4 nCk + = ] unit-test
 
 { { } } [ 0 factoradic ] unit-test
 { { 1 0 } } [ 1 factoradic ] unit-test
