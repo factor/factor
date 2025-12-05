@@ -17,7 +17,7 @@ M: windows set-os-env
     swap SetEnvironmentVariable win32-error=0/f ;
 
 M: windows unset-os-env
-    0 SetLastError f SetEnvironmentVariable 0 = [
+    f SetEnvironmentVariable 0 = [
         GetLastError ERROR_ENVVAR_NOT_FOUND =
         [ win32-error ] unless
     ] when ;
