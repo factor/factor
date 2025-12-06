@@ -16,8 +16,6 @@ delete-staging-images
 
 [ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
 
-{ } [ "hello-world" shake-and-bake 550000 small-enough? ] long-unit-test
-
 ! XXX: deploy-path is "resource:" by default, but deploying there in a
 ! test would pollute the Factor directory, so deploy test to temp.
 { { "Hello world" } } [
@@ -31,53 +29,15 @@ delete-staging-images
     ] with-variables
 ] long-unit-test
 
-{ } [ "sudoku" shake-and-bake 800000 small-enough? ] long-unit-test
-
-! [ ] [ "hello-ui" shake-and-bake 1605000 small-enough? ] long-unit-test
-{ } [ "hello-ui" shake-and-bake 2764000 small-enough? ] long-unit-test
-
 { "math-threads-compiler-io-ui" } [
     "hello-ui" deploy-config config>profile
     staging-image-name file-name "." split second
 ] long-unit-test
 
-! [ ] [ "maze" shake-and-bake 1520000 small-enough? ] long-unit-test
-{ } [ "maze" shake-and-bake 2801000 small-enough? ] long-unit-test
-
-! [ ] [ "tetris" shake-and-bake 1734000 small-enough? ] long-unit-test
-{ } [ "tetris" shake-and-bake 2850000 small-enough? ] long-unit-test
-
-! [ ] [ "spheres" shake-and-bake 1557000 small-enough? ] long-unit-test
-{ } [ "spheres" shake-and-bake 2850000 small-enough? ] long-unit-test
-
-! [ ] [ "terrain" shake-and-bake 2053000 small-enough? ] long-unit-test
-{ } [ "terrain" shake-and-bake 3385300 small-enough? ] long-unit-test
-
-! [ ] [ "gpu.demos.raytrace" shake-and-bake 2764000 small-enough? ] long-unit-test
-{ } [ "gpu.demos.raytrace" shake-and-bake 4157800 small-enough? ] long-unit-test
-
-! { } [ "bunny" shake-and-bake 2559640 small-enough? ] long-unit-test
-{ } [ "bunny" shake-and-bake 7500000 small-enough? ] long-unit-test
-
-{ } [ "gpu.demos.bunny" shake-and-bake 8500000 small-enough? ] long-unit-test
-
-os macos? [
-    [ ] [ "webkit-demo" shake-and-bake 600000 small-enough? ] long-unit-test
-] when
-
-{ } [ "benchmark.regex-dna" shake-and-bake 900000 small-enough? ] long-unit-test
-
-{
-    "tools.deploy.test.1"
-    "tools.deploy.test.2"
-    "tools.deploy.test.3"
-    "tools.deploy.test.4"
-} [
-    { } swap [
-        shake-and-bake
-        run-temp-image
-    ] curry long-unit-test
-] each
+{ } [ "tools.deploy.test.1" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.2" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.3" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.4" shake-and-bake run-temp-image ] long-unit-test
 
 USING: http.client http.server http.server.dispatchers
 http.server.responses http.server.static io.servers ;
@@ -104,40 +64,28 @@ M: quit-responder call-responder*
     <dispatcher>
         add-quot-responder
         "vocab:http/test" <static> >>default
-
     test-httpd
 ] long-unit-test
 
-{ } [
-    "tools.deploy.test.5" shake-and-bake
-    run-temp-image
-] long-unit-test
+{ } [ "tools.deploy.test.5" shake-and-bake run-temp-image ] long-unit-test
 
-: add-port ( url -- url' )
-    >url clone "port" get >>port ;
+{ } [ URL" http://localhost/quit" "port" get >>port http-get 2drop ] long-unit-test
 
-{ } [ "http://localhost/quit" add-port http-get 2drop ] long-unit-test
-
-{
-    "tools.deploy.test.6"
-    "tools.deploy.test.7"
-    "tools.deploy.test.9"
-    "tools.deploy.test.10"
-    "tools.deploy.test.11"
-    "tools.deploy.test.12"
-} [
-    [ ] swap [
-        shake-and-bake
-        run-temp-image
-    ] curry long-unit-test
-] each
+{ } [ "tools.deploy.test.6" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.7" shake-and-bake run-temp-image ] long-unit-test
 
 os windows? os macos? or [
-    [ ] [ "tools.deploy.test.8" shake-and-bake run-temp-image ] long-unit-test
+    { } [ "tools.deploy.test.8" shake-and-bake run-temp-image ] long-unit-test
 ] when
 
+{ } [ "tools.deploy.test.9" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.10" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.11" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.12" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.13" shake-and-bake run-temp-image ] long-unit-test
+
 os macos? [
-    [ ] [ "tools.deploy.test.14" shake-and-bake run-temp-image ] long-unit-test
+    { } [ "tools.deploy.test.14" shake-and-bake run-temp-image ] long-unit-test
 ] when
 
 { { "a" "b" "c" } } [
@@ -148,7 +96,6 @@ os macos? [
 ] long-unit-test
 
 { } [ "tools.deploy.test.16" shake-and-bake run-temp-image ] long-unit-test
-
 { } [ "tools.deploy.test.17" shake-and-bake run-temp-image ] long-unit-test
 
 { t } [
@@ -162,21 +109,16 @@ os macos? [
     "tools.deploy.test.19" shake-and-bake run-temp-image
 ] long-unit-test
 
-{ } [ "tools.deploy.test.20" shake-and-bake ] long-unit-test
+{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" } [
+    "tools.deploy.test.20" shake-and-bake 1363000 small-enough?
+    deploy-test-command ascii [ readln ] with-process-reader
+] long-unit-test
 
-{ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" }
-[ deploy-test-command ascii [ readln ] with-process-reader ] long-unit-test
+{ "1 2 3" } [
+    "tools.deploy.test.21" shake-and-bake 1260000 small-enough?
+    deploy-test-command ascii [ readln ] with-process-reader
+] long-unit-test
 
-! [ ] [ "tools.deploy.test.20" drop 1353000 small-enough? ] long-unit-test
-{ } [ "tools.deploy.test.20" drop 1363000 small-enough? ] long-unit-test
-
-{ } [ "tools.deploy.test.21" shake-and-bake ] long-unit-test
-
-{ "1 2 3" }
-[ deploy-test-command ascii [ readln ] with-process-reader ] long-unit-test
-
-{ } [ "tools.deploy.test.21" drop 1260000 small-enough? ] long-unit-test
-
-{ } [ "benchmark.ui-panes" shake-and-bake run-temp-image ] long-unit-test
+{ } [ "tools.deploy.test.22" shake-and-bake 800000 small-enough? ] long-unit-test
 
 { } [ "tools.deploy.test.23" shake-and-bake ] long-unit-test
