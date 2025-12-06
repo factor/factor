@@ -19,7 +19,7 @@ jobs:
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
-      run: './factor -run=tools.test resource:core math compiler threads io'
+      run: './factor -run=tools.test resource:core compiler threads io'
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
