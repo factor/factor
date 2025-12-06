@@ -1,4 +1,4 @@
-USING: bootstrap.image io.pathnames kernel pcre sequences
+USING: bootstrap.image io.pathnames kernel pcre2 sequences
 tools.deploy.backend tools.test ;
 IN: tools.deploy.backend.tests
 
