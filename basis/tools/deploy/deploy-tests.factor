@@ -1,9 +1,11 @@
-USING: bootstrap.image tools.test system io io.encodings.ascii
-io.pathnames io.files io.files.info io.files.temp kernel
-tools.deploy.config tools.deploy.config.editor literals
-tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations layouts accessors urls math.parser
-io.directories splitting tools.deploy tools.deploy.test vocabs ;
+USING: accessors arrays http.client http.server
+http.server.dispatchers http.server.responses http.server.static
+io io.directories io.encodings.ascii io.files io.files.temp
+io.launcher io.pathnames io.servers kernel literals math.parser
+namespaces sequences splitting system tools.deploy
+tools.deploy.backend tools.deploy.config
+tools.deploy.config.editor tools.deploy.test tools.test urls
+vocabs ;
 
 IN: tools.deploy.tests
 
@@ -39,16 +41,10 @@ delete-staging-images
 { } [ "tools.deploy.test.3" shake-and-bake run-temp-image ] long-unit-test
 { } [ "tools.deploy.test.4" shake-and-bake run-temp-image ] long-unit-test
 
-USING: http.client http.server http.server.dispatchers
-http.server.responses http.server.static io.servers ;
-
 SINGLETON: quit-responder
 
 M: quit-responder call-responder*
     2drop stop-this-server "Goodbye" <html-content> ;
-
-: add-quot-responder ( responder -- responder )
-    quit-responder "quit" add-responder ;
 
 : test-httpd ( responder -- )
     main-responder [
@@ -62,7 +58,7 @@ M: quit-responder call-responder*
 
 { } [
     <dispatcher>
-        add-quot-responder
+        quit-responder "quit" add-responder
         "vocab:http/test" <static> >>default
     test-httpd
 ] long-unit-test
