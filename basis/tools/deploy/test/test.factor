@@ -1,7 +1,7 @@
 USING: accessors arrays bootstrap.image io.backend
-io.directories io.files.info io.files.temp io.launcher kernel
-layouts math sequences system tools.deploy.backend
-tools.deploy.config.editor ;
+io.directories io.files.info io.files.temp io.launcher
+io.pathnames kernel layouts math sequences system
+tools.deploy.backend tools.deploy.config.editor ;
 IN: tools.deploy.test
 
 : test-image ( -- str )
@@ -29,9 +29,7 @@ ERROR: image-too-big actual-size max-size ;
     2dup <= [ 2drop ] [ image-too-big ] if ;
 
 : deploy-test-command ( -- args )
-    os macos?
-    "resource:Factor.app/Contents/MacOS/factor" normalize-path vm-path ?
-    "-i=" test-image-path append 2array ;
+    vm-path resolve-symlinks normalize-path "-i=" test-image-path append 2array ;
 
 : run-temp-image ( -- )
     deploy-test-command try-output-process ;
