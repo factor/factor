@@ -18,17 +18,18 @@ delete-staging-images
 
 [ "no such vocab, fool!" deploy ] [ bad-vocab-name? ] must-fail-with
 
-! XXX: deploy-path is "resource:" by default, but deploying there in a
-! test would pollute the Factor directory, so deploy test to temp.
 { { "Hello world" } } [
-    H{
-        { open-directory-after-deploy? f }
-        { deploy-directory $[ temp-directory ] }
-    } [
-        "hello-world" deploy
-        "hello-world" deploy-path 1array
-        ascii [ read-lines ] with-process-reader
-    ] with-variables
+    [
+        ! deploy-path is "resource:" by default, so we use a
+        ! temp directory to cleanup the deploy resources later
+        H{ } clone
+        current-directory get deploy-directory pick set-at
+        f open-directory-after-deploy? pick set-at [
+            "hello-world" deploy
+            "hello-world" deploy-path 1array
+            ascii [ read-lines ] with-process-reader
+        ] with-variables
+    ] with-test-directory
 ] long-unit-test
 
 { "math-threads-compiler-io-ui" } [
