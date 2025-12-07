@@ -1,4 +1,4 @@
-USING: accessors arrays http.client http.server
+USING: accessors arrays assocs http.client http.server
 http.server.dispatchers http.server.responses http.server.static
 io io.directories io.encodings.ascii io.files io.files.temp
 io.launcher io.pathnames io.servers kernel literals math.parser
