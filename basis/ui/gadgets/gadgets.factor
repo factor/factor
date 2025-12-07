@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays binary-search combinators
 concurrency.flags deques kernel make math math.order
-math.rectangles math.vectors models namespaces sequences threads
-vectors vocabs.loader ;
+math.rectangles math.vectors models namespaces opengl sequences
+threads vectors vocabs.loader ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -25,6 +25,10 @@ TUPLE: gadget < rect
     interior
     boundary
     model ;
+
+! XXX: is this a better approach?
+! M: gadget loc>> call-next-method [ gl-round ] map ;
+! M: gadget dim>> call-next-method [ gl-ceiling ] map ;
 
 M: gadget equal? 2drop f ;
 
@@ -48,6 +52,7 @@ M: gadget hashcode* nip identity-hashcode ;
         2drop { 0 0 }
     ] [
         [ [ parent>> ] dip relative-loc ] [ drop loc>> ] 2bi v+
+        [ gl-round ] map
     ] if ;
 
 GENERIC: user-input* ( str gadget -- ? )
@@ -190,7 +195,7 @@ GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
     [ pref-dim>> ] [
-        [ pref-dim* ] [ ] [ layout-state>> ] tri
+        [ pref-dim* [ gl-ceiling ] map ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
     ] ?unless ;
 
@@ -355,14 +360,14 @@ PRIVATE>
     [ parents ] dip find nip ; inline
 
 : screen-loc ( gadget -- loc )
-    parents { 0 0 } [ loc>> v+ ] reduce ;
+    parents { 0 0 } [ loc>> v+ ] reduce [ gl-round ] map ;
 
 <PRIVATE
 
 : (screen-rect) ( gadget -- loc ext )
     dup parent>> [
         [ rect-extent ] dip (screen-rect)
-        [ [ nip ] [ v+ ] 2bi ] dip [ v+ ] [ vmin ] 2bi*
+        [ [ nip ] [ v+ ] 2bi ] dip [ v+ [ gl-round ] map ] [ vmin ] 2bi*
     ] [
         rect-extent
     ] if* ;

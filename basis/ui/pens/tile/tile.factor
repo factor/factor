@@ -32,7 +32,7 @@ M: tile-pen pen-pref-dim
     2tri ;
 
 : render-tile ( tile x width gadget -- )
-    [ orientation>> '[ _ v* ] dip ] keep
+    [ orientation>> '[ _ v* [ gl-round ] map ] dip ] keep
    '[
         _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
         swap draw-scaled-image

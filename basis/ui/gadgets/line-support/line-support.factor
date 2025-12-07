@@ -47,7 +47,7 @@ M: line-gadget line-height
 
 : y>line ( y gadget -- n ) line-height /i ;
 
-: line>y ( n gadget -- y ) line-height * >integer ;
+: line>y ( n gadget -- y ) line-height * gl-round ;
 
 : validate-line ( m gadget -- n )
     control-value [ drop f ] [ length 1 - min 0 max ] if-empty ;
@@ -80,7 +80,7 @@ GENERIC: draw-line ( line index gadget -- )
         [ line-height ]
         [ ]
     } cleave '[
-        0 over _ * >integer 2array
+        0 over _ * gl-round 2array
         [ _ draw-line ] with-translation
     ] each-slice-index ;
 

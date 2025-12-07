@@ -75,7 +75,7 @@ M: f draw-cell 2drop ;
 : single-line ( str -- str' )
     dup [ "\r\n" member? ] any? [ split-lines join-words ] when ;
 
-M: string cell-dim single-line text-dim first2 ceiling 0 ;
+M: string cell-dim single-line text-dim first2 gl-ceiling 0 ;
 M: string draw-cell single-line draw-text ;
 
 CONSTANT: image-padding 2
@@ -84,7 +84,7 @@ M: image-name cell-dim nip image-dim first2 image-padding ;
 M: image-name draw-cell nip draw-image ;
 
 : column-offsets ( widths gap -- x xs )
-    [ 0 ] dip '[ _ + + ] accumulate ;
+    [ 0 ] dip '[ _ + + gl-ceiling ] accumulate ;
 
 : column-title-font ( font -- font' )
     column-title-background font-with-background t >>bold? ;
@@ -171,10 +171,10 @@ M: table layout*
     cell-width width swap - align *
     cell-padding 2 / 1 align - * +
     cell-height \ line-height get swap - 2 /
-    [ gl-ceiling ] bi@ 2array ;
+    [ gl-round ] bi@ 2array ;
 
 : translate-column ( width gap -- )
-    + 0 2array gl-translate ;
+    + gl-round 0 2array gl-translate ;
 
 : draw-column ( font column width align gap -- )
     [

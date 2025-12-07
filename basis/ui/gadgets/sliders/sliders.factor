@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators fry grouping kernel literals
-math math.order math.vectors models models.range sequences
-ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.icons ui.gadgets.tracks ui.gestures ui.pens
-ui.pens.polygon ui.pens.rounded ui.pens.solid ui.theme ;
+math math.order math.vectors models models.range opengl
+sequences ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.icons ui.gadgets.tracks
+ui.gestures ui.pens ui.pens.polygon ui.pens.rounded
+ui.pens.solid ui.theme ;
 IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;
@@ -71,7 +72,7 @@ TUPLE: thumb < track ;
     find-slider {
         [ orientation>> drag-loc vdot ]
         [ screen>slider ]
-        [ saved>> + ]
+        [ saved>> + gl-round ]
         [ model>> set-range-value ]
     } cleave ;
 
@@ -110,11 +111,11 @@ elevator H{
     [ slider>screen elevator-padding + ] tri ;
 
 : layout-thumb-loc ( thumb slider -- )
-    [ thumb-loc ] [ orientation>> ] bi n*v vfloor >>loc drop ;
+    [ thumb-loc ] [ orientation>> ] bi n*v [ gl-floor ] map >>loc drop ;
 
 : layout-thumb-dim ( thumb slider -- )
     [ dim>> ] [ thumb-dim ] [ orientation>> ] tri [ n*v ] keep set-axis
-    vceiling >>dim drop ;
+    [ gl-ceiling ] map >>dim drop ;
 
 : slider-enabled? ( slider -- ? )
     visible-portion 1 = not ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math.vectors models models.product
-models.range sequences ui.gadgets ;
+models.range opengl sequences ui.gadgets ;
 IN: ui.gadgets.viewports
 
 TUPLE: viewport < gadget { constraint initial: { 1 1 } } ;
@@ -32,7 +32,7 @@ M: viewport model-changed
         [ gadget-child ]
         [ scroll-position vneg ]
         [ constraint>> ]
-        tri v* >>loc drop
+        tri v* [ gl-round ] map >>loc drop
     ] bi ;
 
 : visible-dim ( gadget -- dim )
