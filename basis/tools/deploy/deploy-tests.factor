@@ -116,6 +116,6 @@ os macos? [
     deploy-test-command ascii [ readln ] with-process-reader
 ] long-unit-test
 
-{ } [ "tools.deploy.test.22" shake-and-bake 800000 small-enough? ] long-unit-test
+{ } [ "tools.deploy.test.22" shake-and-bake 1100000 small-enough? ] long-unit-test
 
 { } [ "tools.deploy.test.23" shake-and-bake ] long-unit-test
