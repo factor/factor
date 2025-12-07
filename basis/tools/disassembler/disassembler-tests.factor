@@ -1,6 +1,8 @@
-IN: tools.disassembler.tests
-USING: kernel fry vocabs tools.disassembler tools.test sequences ;
+USING: kernel fry vocabs tools.disassembler tools.test sequences
+system ;
 
-"math" vocab-words [
-    [ { } ] dip '[ _ disassemble ] unit-test
-] each
+os windows? cpu x86.32? and [
+    "math" vocab-words [
+        [ { } ] dip '[ _ disassemble ] unit-test
+    ] each
+] unless
