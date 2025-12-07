@@ -113,3 +113,41 @@ USING: math.text.english morse sequences ;
 { 4 8 15 16 23 42 } [
     number>text play-as-morse
 ] each
+----
+USING: calendar io ;
+
+now
+[ "The date is " write timestamp>ymd print ]
+[ "The time is " write timestamp>hms print ] bi
+----
+USING: emojify tools.test ;
+
+{ "I ❤️ Factor! 👍!" } [
+    "I :heart: Factor! :+1:!" emojify
+] unit-test
+----
+USING: accessors sequences ;
+
+TUPLE: person name age ;
+
+{
+    T{ person f "Jim" 30 }
+    T{ person f "Sally" 27 }
+    T{ person f "Rebecca" 32 }
+    T{ person f "James" 28 }
+    T{ person f "Benjamin" 22 }
+} [ age>> ] maximum-by
+----
+USING: accessors io io.encodings.binary
+io.encodings.string io.encodings.utf8
+io.servers kernel namespaces ;
+
+binary <threaded-server>
+    1234 >>insecure
+    "echo.server" >>name
+    [
+        [ 1024 read-partial ]
+        [ write flush ] while*
+    ] >>handler
+
+start-server wait-for-server
