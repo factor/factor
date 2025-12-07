@@ -109,7 +109,7 @@ PRIVATE>
 M: line-gadget pref-viewport-dim
     [ pref-viewport-dim>> ]
     [
-        [ pref-viewport-dim* ] [ ] [ layout-state>> ] tri
+        [ pref-viewport-dim* [ gl-ceiling ] map ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-viewport-dim<< ] if
     ] ?unless ;
 
