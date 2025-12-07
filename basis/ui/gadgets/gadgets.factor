@@ -195,7 +195,7 @@ GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
     [ pref-dim>> ] [
-        [ pref-dim* [ gl-ceiling ] map ] [ ] [ layout-state>> ] tri
+        [ pref-dim* ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
     ] ?unless ;
 
