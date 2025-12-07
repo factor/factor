@@ -61,8 +61,8 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     ascent [
         cap-height 0 or 2 / :> mid-line
         graphics-height 2 /
-        [ ascent mid-line - max mid-line + gl-floor >integer ]
-        [ descent mid-line + max mid-line - gl-ceiling >integer ] bi
+        [ ascent mid-line - max mid-line + gl-floor ]
+        [ descent mid-line + max mid-line - gl-ceiling ] bi
     ] [ f f ] if ;
 
 : (measure-metrics) ( children sizes -- graphics-height ascent descent cap-height )

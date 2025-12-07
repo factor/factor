@@ -44,4 +44,4 @@ PRIVATE>
     rendered-image draw-scaled-texture ;
 
 : image-dim ( image -- dim )
-    cached-image dim>> gl-scale-factor get-global [ '[ _ /i ] map ] when* ;
+    cached-image dim>> [ gl-unscale ] map ;

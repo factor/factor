@@ -110,10 +110,10 @@ CONSTANT: events-mask
     }
 
 : event-loc ( event -- loc )
-    [ x>> ] [ y>> ] bi [ gl-unscale >fixnum ] bi@ 2array ;
+    [ x>> ] [ y>> ] bi [ gl-unscale ] bi@ 2array ;
 
 : event-dim ( event -- dim )
-    [ width>> ] [ height>> ] bi [ gl-unscale >fixnum ] bi@ 2array ;
+    [ width>> ] [ height>> ] bi [ gl-unscale ] bi@ 2array ;
 
 : scroll-direction ( event -- pair )
     direction>> {

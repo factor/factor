@@ -129,7 +129,7 @@ M: table layout*
     [ update-cached-widths ] [ update-filled-column ] bi ;
 
 : row-rect ( table row -- rect )
-    [ [ line-height ] dip * gl-round 0 swap 2array ]
+    [ [ line-height ] dip * gl-ceiling 0 swap 2array ]
     [ drop [ dim>> first ] [ line-height ] bi 2array ] 2bi <rect> ;
 
 : row-bounds ( table row -- loc dim )
@@ -171,7 +171,7 @@ M: table layout*
     cell-width width swap - align *
     cell-padding 2 / 1 align - * +
     cell-height \ line-height get swap - 2 /
-    [ >integer ] bi@ 2array ;
+    [ gl-ceiling ] bi@ 2array ;
 
 : translate-column ( width gap -- )
     + 0 2array gl-translate ;

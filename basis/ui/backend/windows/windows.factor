@@ -236,13 +236,11 @@ CONSTANT: window-control>ex-style
     3drop window t >>active? relayout-1 yield ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    2nip
-    >lo-hi [ gl-unscale >fixnum ] map
+    2nip >lo-hi [ gl-unscale ] map
     dup { 0 0 } = [ 2drop ] [ swap window [ dim<< ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
-    2nip
-    >lo-hi [ gl-unscale >fixnum ] map
+    2nip >lo-hi [ gl-unscale ] map
     swap window [ window-loc<< ] [ drop ] if* ;
 
 CONSTANT: wm-keydown-codes
@@ -459,7 +457,7 @@ SYMBOL: nc-buttons
 
 :: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
     uMsg mouse-event>gesture
-    lParam >lo-hi [ gl-unscale >fixnum ] map
+    lParam >lo-hi [ gl-unscale ] map
     hWnd window ;
 
 : set-capture ( hwnd -- )
@@ -507,7 +505,7 @@ SYMBOL: nc-buttons
         TME_LEAVE >>dwFlags
         0 >>dwHoverTime
     TrackMouseEvent win32-error=0/f
-    >lo-hi [ gl-unscale >fixnum ] map swap window move-hand fire-motion ;
+    >lo-hi [ gl-unscale ] map swap window move-hand fire-motion ;
 
 : (handle-mousewheel) ( direction hWnd -- )
     hand-loc get-global swap window send-scroll ; inline
@@ -668,7 +666,7 @@ M: windows-ui-backend do-events
     [ '[ _ map ] change-loc ] [ '[ _ map ] change-dim ] bi ; inline
 
 :: create-window ( rect style ex-style -- hwnd )
-    rect [ gl-scale >fixnum ] map-rect style ex-style make-adjusted-RECT
+    rect [ gl-scale ] map-rect style ex-style make-adjusted-RECT
     [ get-window-class f ] dip
     [
         [ ex-style ] 2dip
@@ -873,8 +871,8 @@ M: windows-ui-backend (fullscreen?)
 
 M:: windows-ui-backend resize-window ( world dim -- )
     world handle>> hWnd>>
-    world window-loc>> [ gl-scale >fixnum ] map
-    dim [ gl-scale >fixnum ] map <RECT> dup
+    world window-loc>> [ gl-scale ] map
+    dim [ gl-scale ] map <RECT> dup
     world world>style
     world world>ex-style
     adjust-RECT get-RECT-dimensions FALSE

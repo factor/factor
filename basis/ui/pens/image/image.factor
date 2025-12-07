@@ -11,7 +11,7 @@ TUPLE: image-pen image fill? ;
 M: image-pen draw-interior
     [ dim>> ] [ [ image>> ] [ fill?>> ] bi ] bi*
     [ draw-scaled-image ] [
-        [ image-dim [ - 2 /i ] 2map ] keep
+        [ image-dim [ - 2 / ] 2map ] keep
         '[ _ draw-image ] with-translation
     ] if ;
 

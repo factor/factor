@@ -22,7 +22,7 @@ TUPLE: pack < aligned-gadget
     [ (packed-dims) ] [ nip ] [ drop ] 2tri orient ;
 
 : gap-locs ( sizes gap -- seq )
-    [ { 0 0 } ] dip '[ v+ _ v+ ] accumulate nip ;
+    [ { 0 0 } ] dip '[ v+ _ v+ [ gl-round ] map ] accumulate nip ;
 
 : numerically-aligned-locs ( sizes pack -- seq )
     [ align>> ] [ dim>> ] bi rot [ v- [ * ] with map ] 2with map ;
