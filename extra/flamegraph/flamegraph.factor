@@ -3,7 +3,7 @@
 
 USING: accessors arrays assocs io io.encodings.utf8 io.files
 io.files.temp io.launcher io.pathnames kernel math math.parser
-prettyprint sequences tools.profiler.sampling ;
+prettyprint sequences tools.profiler.sampling webbrowser ;
 
 IN: flamegraph
 
@@ -29,5 +29,4 @@ PRIVATE>
     [ utf8 [ write-flamegraph ] with-file-writer ]
     [ "vocab:flamegraph/flamegraph.pl" absolute-path swap 2array process-contents ] bi
     "output.svg" temp-file
-    [ utf8 set-file-contents ]
-    [ { "open" "-a" "Safari" } swap suffix try-process ] bi ;
+    [ utf8 set-file-contents ] [ open-url ] bi ;
