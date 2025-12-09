@@ -32,7 +32,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleVersion</key>
-	<string>0.101</string>
+	<string>0.102</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2003-2025 Factor developers</string>
 	<key>NSServices</key>

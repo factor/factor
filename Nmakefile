@@ -1,4 +1,4 @@
-VERSION = 0.101
+VERSION = 0.102
 
 # Crazy hack to do shell commands
 # We do it in Nmakefile because that way we don't have to invoke build through build.cmd

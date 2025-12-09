@@ -2,7 +2,7 @@
 BUILD_DIR ?= build
 
 ifdef CONFIG
-	VERSION := 0.101
+	VERSION := 0.102
 	GIT_LABEL := $(shell echo $(shell git describe --all)-$(shell git rev-parse HEAD))
 	BUNDLE := Factor.app
 	DEBUG ?= 0
