@@ -1,11 +1,12 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.enums alien.syntax arrays ascii calendar
-combinators combinators.smart continuations endian grouping io
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.sockets io.sockets.private io.streams.byte-array io.timeouts
-kernel make math math.bitwise math.parser namespaces random
-sequences slots.syntax splitting system vectors vocabs ;
+combinators combinators.smart continuations endian formatting
+grouping io io.encodings.binary io.encodings.string
+io.encodings.utf8 io.sockets io.sockets.private
+io.streams.byte-array io.timeouts kernel make math math.bitwise
+math.functions math.parser namespaces random sequences
+slots.syntax splitting system vectors vocabs ;
 FROM: io.encodings.ascii => ascii ;
 IN: dns
 
@@ -81,6 +82,8 @@ TUPLE: mx preference exchange ;
 TUPLE: soa mname rname serial refresh retry expire minimum ;
 
 TUPLE: srv priority weight port target ;
+
+TUPLE: loc size horizontal vertical lat lon alt ;
 
 TUPLE: a name ;
 C: <a> a
@@ -225,10 +228,20 @@ CONSTANT: ipv6-arpa-suffix ".ip6.arpa"
 
 : parse-srv ( -- srv )
     srv new
-    2 read be> >>priority
-    2 read be> >>weight
-    2 read be> >>port
-    parse-name >>target ;
+        2 read be> >>priority
+        2 read be> >>weight
+        2 read be> >>port
+        parse-name >>target ;
+
+: parse-loc ( -- loc )
+    loc new
+        read1 0 assert=
+        read1 [ -4 shift ] [ 4 bits ] bi 10^ * >>size
+        read1 [ -4 shift ] [ 4 bits ] bi 10^ * >>horizontal
+        read1 [ -4 shift ] [ 4 bits ] bi 10^ * >>vertical
+        4 read be> 31 2^ - 3600000 / >>lat
+        4 read be> 31 2^ - 3600000 / >>lon
+        4 read be> 10000000 - >>alt ;
 
 ERROR: invalid-hinfo-record length ;
 
@@ -251,6 +264,7 @@ M: NS parse-rdata 2drop parse-name <ns> ;
 M: PTR parse-rdata 2drop parse-name <ptr> ;
 M: SOA parse-rdata 2drop parse-soa ;
 M: SRV parse-rdata 2drop parse-srv ;
+M: LOC parse-rdata 2drop parse-loc ;
 
 : parse-rr ( -- rr )
     rr new
@@ -406,6 +420,18 @@ M: TXT rdata>byte-array
 
 : TXT. ( name -- )
     dns-TXT-query TXT-message>strings [ [ write ] each nl ] each ;
+
+: LOC. ( name -- )
+    dns-LOC-query answer-section>> [
+        rdata>> {
+            [ lat>> [ abs 1 /mod 60 * 1 /mod 60 * ] [ neg? "S" "N" ? ] bi ]
+            [ lon>> [ abs 1 /mod 60 * 1 /mod 60 * ] [ neg? "W" "E" ? ] bi ]
+            [ alt>> 100 / ]
+            [ size>> 100 /i ]
+            [ horizontal>> 100 /i ]
+            [ vertical>> 100 /i ]
+        } cleave "%d %d %.3f %s %d %d %.3f %s %.2fm %dm %dm %dm\n" printf
+    ] each ;
 
 : reverse-lookup ( reversed-ip -- message )
     PTR IN dns-query ;
