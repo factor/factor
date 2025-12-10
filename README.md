@@ -65,6 +65,37 @@ The nightly builds are usually a better experience than the point releases.
 * macOS: Double-click `Factor.app` or run `open Factor.app` in a Terminal
 * Unix: Run `./factor` in a shell
 
+#### Linux: Debian 13 and newer Ubuntu (25.10+)
+
+On Debian 13 “Trixie” and newer Ubuntu releases (25.10 “Questing Quokka”
+and the 26.04 “Resolute Raccoon” development branch), the `gtkglext`
+library is no longer shipped in the official repositories. Factor's GUI
+depends on this library, so a fresh install cannot start the GUI on these
+systems.
+
+As a Debian temporary workaround you can manually install the legacy Debian
+package and add two symbolic links:
+
+```bash
+wget -c http://http.us.debian.org/debian/pool/main/g/gtkglext/libgtkglext1_1.2.0-11_amd64.deb
+sudo apt install ./libgtkglext1_1.2.0-11_amd64.deb
+
+sudo ln -s /usr/lib/x86_64-linux-gnu/libgtkglext-x11-1.0.so.0 \
+           /usr/lib/x86_64-linux-gnu/libgtkglext-x11-1.0.so
+
+sudo ln -s /usr/lib/x86_64-linux-gnu/libgdkglext-x11-1.0.so.0 \
+           /usr/lib/x86_64-linux-gnu/libgdkglext-x11-1.0.so
+```
+
+This workaround has been tested in clean containers for:
+
+* Debian 13
+* Ubuntu 25.10
+* Ubuntu 26.04 (development branch)
+
+On Debian 12, Ubuntu 22.04, 24.04 and 25.04 libgtkglext1 is still available in the
+repositories and no workaround is required.
+
 ### Learning Factor
 
 A [tutorial](https://docs.factorcode.org/content/article-first-program.html)
