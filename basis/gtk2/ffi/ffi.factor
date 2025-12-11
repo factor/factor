@@ -23,7 +23,7 @@ LIBRARY: gtk2
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
 
-GIR: vocab:gir/Gtk-3.0.gir
+GIR: vocab:gir/Gtk-2.0.gir
 
 DESTRUCTOR: gtk_widget_destroy
 
