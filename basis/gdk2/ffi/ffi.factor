@@ -36,7 +36,7 @@ FOREIGN-RECORD-TYPE: cairo.Pattern cairo_pattern_t
 FOREIGN-RECORD-TYPE: cairo.Context cairo_t
 FOREIGN-ENUM-TYPE: cairo.Content cairo_content_t
 
-GIR: vocab:gir/Gdk-3.0.gir
+GIR: vocab:gir/Gdk-2.0.gir
 
 DESTRUCTOR: gdk_cursor_unref
 
