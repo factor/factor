@@ -2,14 +2,13 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.strings
 arrays assocs classes.struct combinators continuations
-destructors environment gdk3.ffi gdk-pixbuf.ffi
-glib glib.ffi gobject gobject.ffi gtk3.ffi io.encodings.binary
+destructors environment gdk3.ffi gdk-pixbuf.ffi glib.backend
+glib.ffi gobject gobject.ffi gtk3.ffi io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel libc literals
 locals math math.order math.bitwise math.functions math.parser
 math.vectors namespaces opengl sequences strings system threads
-ui ui.backend
-ui.backend.x11.keys ui.clipboards ui.event-loop ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.gestures
+ui ui.backend ui.backend.x11.keys ui.clipboards ui.event-loop
+ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
 ui.pixel-formats ui.private vocabs.loader ;
 IN: ui.backend.gtk3
 
