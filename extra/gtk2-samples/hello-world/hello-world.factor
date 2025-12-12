@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.strings gobject.ffi gtk2.ffi io.encodings.utf8
 kernel ;
-IN: gtk-samples.hello-world
+IN: gtk2-samples.hello-world
 
 : on-button-clicked ( button label-user-data -- )
     nip "Hello! :)" utf8 string>alien gtk_label_set_text ;
