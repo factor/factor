@@ -31,7 +31,7 @@ reset-gl-function-number-counter
     gl-function-context 2array dup +gl-function-pointers+ get-global at
     [ 2nip ] [
         [
-            [ gl-function-address ] map [ ] find nip
+            [ gl-function-address ] map-find drop
             dup [ "OpenGL function not available" throw ] unless
             dup
         ] dip

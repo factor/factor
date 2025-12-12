@@ -17,6 +17,10 @@ C-LIBRARY: pango {
 
 IMPLEMENT-STRUCTS: PangoRectangle ;
 
+FOREIGN-RECORD-TYPE: FT_Bitmap void*
+FOREIGN-RECORD-TYPE: FT_Face void*
+FOREIGN-RECORD-TYPE: FT_Library void*
+
 GIR: vocab:gir/Pango-1.0.gir
 
 DESTRUCTOR: pango_font_description_free

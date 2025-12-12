@@ -1,4 +1,4 @@
-USING: accessors arrays continuations gdk2.pixbuf.ffi glib.ffi
+USING: accessors arrays continuations gdk-pixbuf.ffi glib.ffi
 gobject.ffi images.loader images.loader.gtk images.loader.gtk.private
 io io.encodings.binary io.files kernel tools.test destructors ;
 IN: images.loader.gtk.tests

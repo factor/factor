@@ -5,7 +5,7 @@ IN: gtk4.ffi
 
 <<
 "gdk4.ffi" require
-"gsk.ffi" require
+"gsk4.ffi" require
 >>
 
 LIBRARY: gtk4

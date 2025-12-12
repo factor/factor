@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs combinators gdk2.pixbuf.ffi glib.ffi gobject.ffi
+assocs combinators gdk-pixbuf.ffi glib.ffi gobject.ffi
 grouping images images.loader io kernel math sequences specialized-arrays
 system unicode ;
 IN: images.loader.gtk

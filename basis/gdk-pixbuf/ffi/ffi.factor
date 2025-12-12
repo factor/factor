@@ -4,11 +4,11 @@ USING: alien alien.c-types alien.data alien.libraries
 alien.syntax combinators gio.ffi glib.ffi gobject-introspection
 gobject-introspection.standard-types kernel libc sequences
 system vocabs ;
-IN: gdk2.pixbuf.ffi
+IN: gdk-pixbuf.ffi
 
 << "gio.ffi" require >>
 
-LIBRARY: gdk.pixbuf
+LIBRARY: gdk-pixbuf
 
 C-LIBRARY: gdk.pixbuf {
     { windows "libgdk_pixbuf-2.0-0.dll" }

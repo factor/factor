@@ -12988,7 +12988,8 @@ macros.</doc>
       </field>
       <field name="data" writable="1">
         <array zero-terminated="0" fixed-size="2">
-          <type name="_Value__data__union"/>
+          <type name="gpointer" c:type="gpointer"/>
+          <!-- <type name="_Value__data__union"/> -->
         </array>
       </field>
       <method name="copy" c:identifier="g_value_copy">
@@ -14581,6 +14582,7 @@ function.</doc>
         </parameters>
       </method>
     </record>
+    <!--
     <union name="_Value__data__union">
       <field name="v_int" writable="1">
         <type name="gint" c:type="gint"/>
@@ -14610,6 +14612,7 @@ function.</doc>
         <type name="gpointer" c:type="gpointer"/>
       </field>
     </union>
+    -->
     <function-macro name="assert_finalize_object" c:identifier="g_assert_finalize_object" version="2.62" introspectable="0">
       <doc xml:space="preserve">Assert that @object is non-%NULL, then release one reference to it with
 g_object_unref() and assert that it has been finalized (i.e. that there

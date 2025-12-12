@@ -8,7 +8,8 @@ IN: gdk2.ffi
 
 <<
 "pango.ffi" require
-"gdk2.pixbuf.ffi" require
+"cairo.gobject.ffi" require
+"gdk-pixbuf.ffi" require
 >>
 
 LIBRARY: gdk2
@@ -20,21 +21,6 @@ LIBRARY: gdk2
     { [ os unix? ] [ "libgdk-x11-2.0.so" cdecl add-library ] }
 } cond
 >>
-
-! <workaround these types are from cairo 1.10
-STRUCT: cairo_rectangle_int_t
-    { x int } { y int } { width int } { height int } ;
-
-C-TYPE: cairo_region_t
-! workaround>
-
-FOREIGN-RECORD-TYPE: cairo.RectangleInt cairo_rectangle_int_t
-FOREIGN-RECORD-TYPE: cairo.Region cairo_region_t
-FOREIGN-RECORD-TYPE: cairo.FontOptions cairo_font_options_t
-FOREIGN-RECORD-TYPE: cairo.Surface cairo_surface_t
-FOREIGN-RECORD-TYPE: cairo.Pattern cairo_pattern_t
-FOREIGN-RECORD-TYPE: cairo.Context cairo_t
-FOREIGN-ENUM-TYPE: cairo.Content cairo_content_t
 
 GIR: vocab:gir/Gdk-2.0.gir
 

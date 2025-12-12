@@ -6,6 +6,7 @@ FOREIGN-ATOMIC-TYPE: cairo.ScaledFont cairo_scaled_font_t
 FOREIGN-ENUM-TYPE: cairo.Content cairo_content_t
 FOREIGN-ENUM-TYPE: cairo.FontType cairo_font_type_t
 FOREIGN-RECORD-TYPE: cairo.Context cairo_t
+FOREIGN-RECORD-TYPE: cairo.Format cairo_format_t
 FOREIGN-RECORD-TYPE: cairo.FontOptions cairo_font_options_t
 FOREIGN-RECORD-TYPE: cairo.Path cairo_path_t
 FOREIGN-RECORD-TYPE: cairo.Pattern cairo_pattern_t
