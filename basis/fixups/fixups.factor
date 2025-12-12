@@ -16,6 +16,7 @@ CONSTANT: vocab-renames {
     { "promises" { "lazy" "0.100" } }
     { "html.streams" { "io.streams.html" "0.101" } }
     { "pdf.streams" { "io.streams.pdf" "0.101" } }
+    { "gdk2.pixbuf" { "gdk-pixbuf" "0.102" } }
 }
 
 CONSTANT: word-renames {
