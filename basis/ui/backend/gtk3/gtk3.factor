@@ -233,6 +233,10 @@ CONSTANT: window-controls>func-flags
         GDK_FUNC_MOVE bitor gdk_window_set_functions
     ] 2tri ;
 
+M: gtk3-ui-backend (make-pixel-format) 2drop f ;
+
+M: gtk3-ui-backend (free-pixel-format) drop ;
+
 M: window-handle select-gl-context
     drop ;
 
