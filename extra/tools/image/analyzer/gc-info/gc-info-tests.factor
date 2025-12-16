@@ -142,7 +142,7 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 
 ! #1436
 { t } [
-    \ gtk-samples.opengl:opengl-main
+    \ gtk2-samples.opengl:opengl-main
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
