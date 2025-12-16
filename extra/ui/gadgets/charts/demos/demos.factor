@@ -32,6 +32,8 @@ PRIVATE>
 
 : chart-demo ( -- ) 40 (chart-demo) ;
 
-MAIN: chart-demo
+MAIN: [
+    [ chart-demo ] with-ui
+]
 
 ! chart new line new COLOR: blue >>color { { 0 100 } { 100 0 } { 100 50 } { 150 50 } { 200 100 } } >>data add-gadget "Chart" open-window
