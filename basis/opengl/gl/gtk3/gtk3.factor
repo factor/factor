@@ -1,7 +1,7 @@
 ! Copyright (C) 2025 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.accessors alien.libraries alien.syntax gdk3.ffi
-sequences system ;
+kernel sequences system ;
 IN: opengl.gl.gtk3
 
 : gl-function-context ( -- context )
