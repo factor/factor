@@ -3,12 +3,12 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays boids.simulation calendar classes colors
-kernel literals math math.functions models
-models.range opengl opengl.demo-support opengl.gl sequences
+kernel literals math math.functions math.vectors models
+models.range namespaces opengl opengl.demo-support opengl.gl sequences
 threads ui ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.frames ui.gadgets.grids
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.render ui.theme ui.tools.common ;
+ui.gadgets.sliders ui.render ui.render.gl3 ui.theme ui.tools.common ;
 
 QUALIFIED-WITH: models.range mr
 IN: boids
@@ -38,7 +38,43 @@ M: boids-gadget ungraft*
 : vec>deg ( vec -- deg )
     first2 rect> arg rad>deg ; inline
 
-: draw-boid ( boid -- )
+: vec>rad ( vec -- rad )
+    first2 rect> arg ; inline
+
+! Rotate a 2D point by angle (in radians)
+:: rotate-point ( pt angle -- pt' )
+    pt first :> x
+    pt second :> y
+    angle cos :> c
+    angle sin :> s
+    x c * y s * -
+    x s * y c * +
+    2array ;
+
+! Triangle vertices for a boid (pointing right)
+CONSTANT: boid-triangle { { -6.0 4.0 } { -6.0 -4.0 } { 8.0 0.0 } }
+
+:: draw-boid-gl3 ( boid -- )
+    boid pos>> first2 :> ( px py )
+    boid vel>> vec>rad :> angle
+    angle cos :> c
+    angle sin :> s
+    ! Triangle vertices (projection handles scaling)
+    ! vertex 1: (-6, 4)
+    -6.0 c * 4.0 s * - px + :> x1
+    -6.0 s * 4.0 c * + py + :> y1
+    ! vertex 2: (-6, -4)
+    -6.0 c * -4.0 s * - px + :> x2
+    -6.0 s * -4.0 c * + py + :> y2
+    ! vertex 3: (8, 0)
+    8.0 c * px + :> x3
+    8.0 s * py + :> y3
+    { { x1 y1 } { x2 y2 } { x3 y3 } }
+    make-position-vertices
+    upload-vertices
+    GL_TRIANGLES 0 3 glDrawArrays ;
+
+: draw-boid-legacy ( boid -- )
     dup pos>> [
         vel>> vec>deg 0 0 1 glRotated
         GL_TRIANGLES [
@@ -48,8 +84,11 @@ M: boids-gadget ungraft*
         ] do-state
     ] with-translation ;
 
+: draw-boid ( boid -- )
+    gl3-mode? get-global [ draw-boid-gl3 ] [ draw-boid-legacy ] if ;
+
 : draw-boids ( boids -- )
-    details-color >rgba-components drop 0.5 glColor4f
+    details-color >rgba-components drop 0.5 <rgba> gl-color
     [ draw-boid ] each ;
 
 M: boids-gadget draw-gadget* ( boids-gadget -- )

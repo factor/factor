@@ -1,8 +1,9 @@
-USING: accessors arrays columns combinators.smart kernel make
-math math.constants math.functions math.order math.vectors
-opengl opengl.gl sequences
+USING: accessors arrays colors columns combinators.smart kernel
+locals make math math.constants math.functions math.order
+math.vectors namespaces opengl opengl.gl sequences
 specialized-arrays.instances.alien.c-types.float ui.pens
-ui.pens.caching ui.pens.polygon ui.pens.solid ;
+ui.pens.caching ui.pens.polygon ui.pens.solid ui.render
+ui.render.gl3 ;
 IN: ui.pens.rounded
 
 TUPLE: rounded < solid radius ;
@@ -20,6 +21,21 @@ CONSTANT: corner-point-count 8
     [ <iota> ] [ '[ pi * _ 2 * / [ sin ] [ cos ] bi [ 1 swap - ] bi@ 2array ] map ] bi ;
 
 : (rounded) ( gadget pen -- ) [ compute-pen ] keep color>> gl-color ;
+
+:: flat-xy-to-gl3-vertices ( flat-array color -- gl3-array )
+    ! Convert flat x,y array to GL3 format: x y r g b a
+    color >rgba-components :> ( r g b a )
+    flat-array length 2/ :> vertex-count
+    vertex-count 6 * <float-array> :> arr
+    vertex-count <iota> [| i |
+        i 2 * flat-array nth                i 6 * 0 + arr set-nth  ! x
+        i 2 * 1 + flat-array nth            i 6 * 1 + arr set-nth  ! y
+        r                                   i 6 * 2 + arr set-nth  ! r
+        g                                   i 6 * 3 + arr set-nth  ! g
+        b                                   i 6 * 4 + arr set-nth  ! b
+        a                                   i 6 * 5 + arr set-nth  ! a
+    ] each
+    arr ;
 
 PRIVATE>
 
@@ -58,12 +74,29 @@ PRIVATE>
     ] float-array{ } make ;
 
 M: rounded draw-boundary
-    [ (rounded) GL_LINE_STRIP 0 ] [ boundary-vertices>> ] bi
-    [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi ;
+    gl3-mode? get-global [
+        ! GL3 path: convert flat x,y vertices to x,y,r,g,b,a format
+        [ (rounded) ] keep
+        [ boundary-vertices>> ] [ color>> ] bi flat-xy-to-gl3-vertices
+        [ upload-vertices ] [ length 6 /i GL_LINE_STRIP 0 rot ] bi glDrawArrays
+    ] [
+        ! Legacy GL path
+        [ (rounded) GL_LINE_STRIP 0 ] [ boundary-vertices>> ] bi
+        [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi
+    ] if ;
 
 M: rounded draw-interior
-    [ (rounded) GL_POLYGON 0 ] [ interior-vertices>> ] bi
-    [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi ;
+    gl3-mode? get-global [
+        ! GL3 path: convert flat x,y vertices to x,y,r,g,b,a format
+        ! Use GL_TRIANGLE_FAN instead of GL_POLYGON (removed in GL3)
+        [ (rounded) ] keep
+        [ interior-vertices>> ] [ color>> ] bi flat-xy-to-gl3-vertices
+        [ upload-vertices ] [ length 6 /i GL_TRIANGLE_FAN 0 rot ] bi glDrawArrays
+    ] [
+        ! Legacy GL path
+        [ (rounded) GL_POLYGON 0 ] [ interior-vertices>> ] bi
+        [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi
+    ] if ;
 
 M: rounded recompute-pen
     swap over [ dim>> ] [ radius>> ] bi*

@@ -5,6 +5,9 @@ math.vectors namespaces opengl opengl.capabilities opengl.gl
 opengl.textures sequences sets ui.gadgets ui.pens ;
 IN: ui.render
 
+! GL3 mode flag - set to t for GL3 core profile contexts
+SYMBOL: gl3-mode?
+
 SYMBOL: clip
 
 SYMBOL: viewport-translation
@@ -29,19 +32,29 @@ SYMBOL: viewport-translation
 
 SLOT: background-color
 
-: gl-init ( -- )
-    check-extensions "1.0" require-gl-version
+! --- GL3 Mode Hooks ---
+SYMBOL: gl-init-hook
+SYMBOL: gl-draw-init-hook
+
+: gl-init-legacy ( -- )
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_VERTEX_ARRAY glEnableClientState
     GL_PACK_ALIGNMENT 1 glPixelStorei
     GL_UNPACK_ALIGNMENT 1 glPixelStorei ;
 
-: gl-draw-init ( world -- )
+: gl-init ( -- )
+    gl-init-hook get-global [ call( -- ) ] [ gl-init-legacy ] if* ;
+
+: gl-draw-init-legacy ( world -- )
     GL_SCISSOR_TEST glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     init-matrices
     [ init-clip ] [ background-color>> gl-clear ] bi ;
+
+: gl-draw-init ( world -- )
+    gl-draw-init-hook get-global
+    [ call( world -- ) ] [ gl-draw-init-legacy ] if* ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
@@ -91,8 +104,8 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
     dup interior>> [ draw-interior ] [ drop ] if* ;
 
 : draw-background ( gadget -- )
-    origin get [
-        [
+    origin get swap '[
+        _ [
             dup selected-gadgets get in?
             [ draw-selection-background ]
             [ draw-standard-background ] if
@@ -101,7 +114,7 @@ M: gadget gadget-foreground dup interior>> pen-foreground ;
 
 : draw-border ( object -- )
     dup boundary>> [
-        origin get [ draw-boundary ] with-translation
+        origin get -rot '[ _ _ draw-boundary ] with-translation
     ] [ drop ] if* ;
 
 PRIVATE>

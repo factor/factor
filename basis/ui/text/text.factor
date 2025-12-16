@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cache combinators fonts kernel
-math math.order namespaces opengl opengl.gl opengl.textures
-sequences strings system ui.gadgets.worlds vocabs ;
+locals math math.order namespaces opengl opengl.gl opengl.textures
+sequences strings system ui.gadgets.worlds ui.render ui.render.gl3
+vocabs ;
 IN: ui.text
 
 <PRIVATE
@@ -70,11 +71,22 @@ HOOK: string>image font-renderer ( font string -- image loc )
 : string-empty? ( obj -- ? )
     dup selection? [ string>> ] when empty? ;
 
+:: draw-string-gl3 ( font string -- )
+    font string string>image :> ( image loc )
+    image dim>> scale-dim :> dim
+    image make-texture-gl3 :> tex-id
+    loc dim tex-id image upside-down?>> gl3-draw-texture
+    tex-id delete-texture ;
+
 : draw-string ( font string -- )
     dup string-empty? [ 2drop ] [
-        world get world-text-handle
-        [ string>image <texture> ] 2cache
-        draw-texture
+        gl3-mode? get-global [
+            draw-string-gl3
+        ] [
+            world get world-text-handle
+            [ string>image <texture> ] 2cache
+            draw-texture
+        ] if
     ] if ;
 
 PRIVATE>
@@ -86,12 +98,12 @@ M: string draw-text draw-string ;
 M: selection draw-text draw-string ;
 
 M: array draw-text
-    [
-        [
+    '[
+        _ _ [
             [ draw-string ]
-            [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi
+            [ string-height 0.0 swap 2array gl-translate ] 2bi
         ] with each
-    ] do-matrix ;
+    ] with-matrix ;
 
 {
     { [ os macos? ] [ "ui.text.core-text" ] }

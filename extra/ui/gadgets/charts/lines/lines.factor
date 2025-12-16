@@ -230,8 +230,7 @@ PRIVATE>
 : draw-line ( seq -- )
     dup [ but-last-slice ] over length odd? [ dip ] [ call ] if
     rest-slice append
-    [ (line-vertices) gl-vertex-pointer GL_LINES 0 ] keep
-    length glDrawArrays ;
+    [ (line-vertices) ] keep length gl-draw-lines ;
 
 ! bounds: { { xmin xmax } { ymin ymax } }
 : clip-data ( bounds data -- data' )

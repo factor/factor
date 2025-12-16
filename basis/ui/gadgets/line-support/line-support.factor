@@ -78,8 +78,8 @@ GENERIC: draw-line ( line index gadget -- )
         [ line-height ]
         [ ]
     } cleave '[
-        0 over _ * gl-round 2array
-        [ _ draw-line ] with-translation
+        0 over _ * gl-round 2array -rot
+        [ _ draw-line ] 2curry with-translation
     ] each-slice-index ;
 
 <PRIVATE

@@ -1,6 +1,7 @@
 USING: alien.c-types alien.data arrays colors grouping kernel
-math math.vectors namespaces opengl opengl.demo-support
-opengl.gl opengl.glu sequences sequences.generalizations ;
+math math.constants math.vectors namespaces opengl opengl.demo-support
+opengl.gl opengl.glu sequences sequences.generalizations ui.render
+ui.render.gl3 ;
 IN: processing.shapes
 
 SYMBOL: fill-color
@@ -21,9 +22,24 @@ COLOR: white fill-color set-global
 
 : gl-vertices-2d ( vertices -- ) [ gl-vertex-2d ] each ;
 
+! GL3-compatible point drawing
+: draw-point-gl3 ( point -- )
+    stroke-color get gl-color
+    gl3-point* ;
+
+: draw-points-gl3 ( points -- )
+    stroke-color get gl-color
+    gl3-points* ;
+
+: draw-point-legacy ( point -- )
+    stroke-mode GL_POINTS [ gl-vertex-2d ] do-state ;
+
 : draw-point* ( x y    -- ) stroke-mode GL_POINTS [ glVertex2d     ] do-state ;
-: draw-point  ( point  -- ) stroke-mode GL_POINTS [ gl-vertex-2d   ] do-state ;
-: draw-points ( points -- ) stroke-mode GL_POINTS [ gl-vertices-2d ] do-state ;
+: draw-point  ( point  -- )
+    gl3-mode? get-global [ draw-point-gl3 ] [ draw-point-legacy ] if ;
+: draw-points ( points -- )
+    gl3-mode? get-global [ draw-points-gl3 ]
+    [ stroke-mode GL_POINTS [ gl-vertices-2d ] do-state ] if ;
 
 : draw-line** ( x y x y -- )
     stroke-mode GL_LINES [ glVertex2d glVertex2d ] do-state ;
@@ -78,9 +94,23 @@ COLOR: white fill-color set-global
 : gl-get-line-width ( -- width )
     GL_LINE_WIDTH 0 double <ref> tuck glGetDoublev double deref ;
 
-: draw-ellipse ( center dim -- )
+! GL3-compatible ellipse/circle drawing
+CONSTANT: circle-segments 20
+
+:: draw-ellipse-gl3 ( center dim -- )
+    ! Draw filled ellipse
+    fill-color get gl-color
+    center dim first 2 / circle-segments gl3-fill-circle*
+    ! Draw outline
+    stroke-color get gl-color
+    center dim first 2 / gl-get-line-width - circle-segments gl3-circle* ;
+
+: draw-ellipse-legacy ( center dim -- )
     GL_FRONT_AND_BACK GL_FILL glPolygonMode
     [ stroke-color get gl-color                                 gl-ellipse ]
     [ fill-color get gl-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
+
+: draw-ellipse ( center dim -- )
+    gl3-mode? get-global [ draw-ellipse-gl3 ] [ draw-ellipse-legacy ] if ;
 
 : draw-circle ( center size -- ) dup 2array draw-ellipse ;

@@ -1,15 +1,17 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors alien.c-types alien.strings
-arrays assocs classes.struct combinators continuations
-destructors environment gdk3.ffi gdk-pixbuf.ffi glib.backend
-glib.ffi gobject gobject.ffi gtk3.ffi io.encodings.binary
+arrays assocs cairo.ffi classes.struct combinators continuations
+destructors environment gdk-pixbuf.ffi gdk3.ffi glib.backend
+glib.ffi gobject gobject.ffi gtk3.ffi io io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel libc literals
-locals math math.order math.bitwise math.functions math.parser
-math.vectors namespaces opengl sequences strings system threads
-ui ui.backend ui.backend.x11.keys ui.clipboards ui.event-loop
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-ui.pixel-formats ui.private vocabs.loader ;
+locals math math.bitwise math.functions math.order math.parser
+math.vectors memoize namespaces opengl opengl.gl prettyprint
+sequences strings system threads ui ui.backend
+ui.backend.gtk3.input-methods ui.backend.x11.keys ui.clipboards
+ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.pixel-formats ui.private ui.render ui.render.gl3
+ui.text.pango vocabs.loader ;
 IN: ui.backend.gtk3
 
 SINGLETON: gtk3-ui-backend
@@ -47,23 +49,19 @@ M: gtk3-clipboard set-clipboard-contents
         gtk_clipboard_get <gtk3-clipboard> swap set-global
     ] 2bi@ ;
 
-: detect-scale-factor ( -- n )
-    "GDK_SCALE" os-env [
-        gdk_screen_get_default gdk_screen_get_resolution 96.0 / round
-    ] [
-        string>number
-    ] if-empty 1.0 max ;
-
-: init-scale-factor ( -- )
-    detect-scale-factor
-    [ 1.0 > ] keep f ? gl-scale-factor set-global ;
+: update-scale-factor ( widget -- )
+    gtk_widget_get_scale_factor >float
+    [ 1.0 > ] keep f ? gl-scale-factor set-global
+    \ (cache-font-description) reset-memoized
+    \ missing-font-metrics reset-memoized
+    cached-layouts get-global clear-assoc
+    ;
 
 ! User input
 
 CONSTANT: events-mask
     flags{
         GDK_POINTER_MOTION_MASK
-        GDK_POINTER_MOTION_HINT_MASK
         GDK_ENTER_NOTIFY_MASK
         GDK_LEAVE_NOTIFY_MASK
         GDK_BUTTON_PRESS_MASK
@@ -74,10 +72,10 @@ CONSTANT: events-mask
     }
 
 : event-loc ( event -- loc )
-    [ x>> ] [ y>> ] bi [ gl-unscale ] bi@ 2array ;
+    [ x>> ] [ y>> ] bi 2array ;
 
 : event-dim ( event -- dim )
-    [ width>> ] [ height>> ] bi [ gl-unscale ] bi@ 2array ;
+    [ width>> ] [ height>> ] bi 2array ;
 
 : scroll-direction ( event -- pair )
     direction>> {
@@ -87,33 +85,65 @@ CONSTANT: events-mask
         { $ GDK_SCROLL_RIGHT { 1 0 } }
     } at ;
 
-: on-motion ( win event user-data -- ? )
+: on-motion ( drawable event user-data -- ? )
     drop swap
-    [ event-loc ] dip window
+    [ event-loc ] dip gtk_widget_get_toplevel window
     move-hand fire-motion t ;
 
-: on-leave ( win event user-data -- ? )
+: on-leave ( drawable event user-data -- ? )
     3drop forget-rollover t ;
 
-: on-button-press ( win event user-data -- ? )
-    3drop t ;
+:: on-button-press ( drawable event user-data -- ? )
+    drawable gtk_widget_get_toplevel window :> world
+    event type>> GDK_BUTTON_PRESS = [
+        event button>> {
+            { 8 [ ] }
+            { 9 [ ] }
+            [
+                event event-modifiers swap <button-down>
+                event event-loc
+                world
+                send-button-down
+            ]
+        } case
+    ] when t ;
 
-: on-button-release ( win event user-data -- ? )
-    3drop t ;
+:: on-button-release ( drawable event user-data -- ? )
+    drawable gtk_widget_get_toplevel window :> world
+    event type>> GDK_BUTTON_RELEASE = [
+        event button>> {
+            { 8 [ world left-action send-action ] }
+            { 9 [ world right-action send-action ] }
+            [
+                event event-modifiers swap <button-up>
+                event event-loc
+                world
+                send-button-up
+            ]
+        } case
+    ] when t ;
 
-: on-scroll ( win event user-data -- ? )
+: on-scroll ( drawable event user-data -- ? )
     drop swap [
         [ scroll-direction ] [ event-loc ] bi
-    ] dip window send-scroll t ;
+    ] dip gtk_widget_get_toplevel window send-scroll t ;
 
-: on-key-press/release ( win event user-data -- ? )
-    3drop t ;
+: key-sym ( keyval -- string/f action? )
+    code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
 
-: on-focus-in ( win event user-data -- ? )
-    2drop window focus-world f ;
+: key-event>gesture ( event -- key-gesture )
+    [ event-modifiers ] [ keyval>> key-sym ] [
+        type>> GDK_KEY_PRESS = [ <key-down> ] [ <key-up> ] if
+    ] tri ;
 
-: on-focus-out ( win event user-data -- ? )
-    2drop window unfocus-world f ;
+: on-key-press/release ( drawable event user-data -- ? )
+    drop swap [ key-event>gesture ] [ gtk_widget_get_toplevel window ] bi* propagate-key-gesture f ;
+
+: on-focus-in ( drawable event user-data -- ? )
+    2drop gtk_widget_get_toplevel window focus-world f ;
+
+: on-focus-out ( drawable event user-data -- ? )
+    2drop gtk_widget_get_toplevel window unfocus-world f ;
 
 CONSTANT: default-icon-path "resource:misc/icons/icon_128x128.png"
 
@@ -160,6 +190,27 @@ icon-data [ default-icon-data ] initialize
     win "focus-out-event" [ on-focus-out yield ]
     GtkWidget:focus-out-event connect-signal ;
 
+! Render callback for GtkGLArea
+
+: get-drawable-dim ( glarea -- dim )
+    ! GTK3 allocated width/height are already in CSS pixels (logical units)
+    ! so no gl-unscale needed here
+    [ gtk_widget_get_allocated_width ]
+    [ gtk_widget_get_allocated_height ] bi 2array ;
+
+: on-render ( glarea context user-data -- ? )
+    2drop dup get-drawable-dim
+    swap gtk_widget_get_toplevel window
+    swap >>dim
+    dup draw-world? [
+        draw-world
+    ] [ drop ] if
+    f ;
+
+: connect-render-signal ( drawable -- )
+    "render" [ on-render yield ]
+    GtkGLArea:render connect-signal ;
+
 ! Window state events
 
 : on-configure ( window event user-data -- ? )
@@ -185,6 +236,71 @@ icon-data [ default-icon-data ] initialize
     GtkWidget:delete-event connect-signal
     win "map-event" [ on-map yield ]
     GtkWidget:map-event connect-signal ;
+
+! Input methods
+
+: on-retrieve-surrounding ( im-context win -- ? )
+    window [ world-focus dup support-input-methods? ] [ f f ] if* [
+        cursor-surrounding [ utf8 string>alien -1 ] dip
+        gtk_im_context_set_surrounding t
+    ] [ 2drop f ] if ;
+
+: on-delete-surrounding ( im-context offset n win -- ? )
+    window world-focus dup support-input-methods?
+    [ delete-cursor-surrounding t ] [ 3drop f ] if nip ;
+
+: on-commit ( im-context str win -- )
+    [ drop ] [ utf8 alien>string ] [ window ] tri* user-input ;
+
+: gadget-cursor-location ( gadget -- rectangle )
+    [ screen-loc ] [ cursor-loc&dim ] bi [ v+ ] dip
+    [ first2 [ >fixnum ] bi@ ] bi@
+    cairo_rectangle_int_t boa ;
+
+: update-cursor-location ( im-context gadget -- )
+    gadget-cursor-location gtk_im_context_set_cursor_location ;
+
+! has to be called before the window signal handler
+:: im-on-key-event ( win event im-context -- ? )
+    win window world-focus :> gadget
+    gadget support-input-methods? [
+        im-context gadget update-cursor-location
+        im-context event gtk_im_context_filter_keypress
+    ] [ im-context gtk_im_context_reset f ] if ;
+
+: im-on-focus-in ( win event im-context -- ? )
+    2nip
+    [ gtk_im_context_focus_in ] [ gtk_im_context_reset ] bi f ;
+
+: im-on-focus-out ( win event im-context -- ? )
+    2nip
+    [ gtk_im_context_focus_out ] [ gtk_im_context_reset ] bi f ;
+
+: im-on-destroy ( win im-context -- )
+    nip [ f gtk_im_context_set_client_window ]
+    [ drop ] bi ;
+
+:: configure-im ( win im -- )
+    im win gtk_widget_get_window gtk_im_context_set_client_window
+    im f gtk_im_context_set_use_preedit
+
+    im "commit" [ on-commit yield ]
+    GtkIMContext:commit win connect-signal-with-data
+    im "retrieve-surrounding" [ on-retrieve-surrounding yield ]
+    GtkIMContext:retrieve-surrounding win connect-signal-with-data
+    im "delete-surrounding" [ on-delete-surrounding yield ]
+    GtkIMContext:delete-surrounding win connect-signal-with-data
+
+    win "key-press-event" [ im-on-key-event yield ]
+    GtkWidget:key-press-event im connect-signal-with-data
+    win "key-release-event" [ im-on-key-event yield ]
+    GtkWidget:key-release-event im connect-signal-with-data
+    win "focus-in-event" [ im-on-focus-in yield ]
+    GtkWidget:focus-in-event im connect-signal-with-data
+    win "focus-out-event" [ im-on-focus-out yield ]
+    GtkWidget:focus-out-event im connect-signal-with-data
+    win "destroy" [ im-on-destroy yield ]
+    GtkWidget:destroy im connect-signal-with-data ;
 
 ! Window controls
 
@@ -236,11 +352,46 @@ M: gtk3-ui-backend (make-pixel-format) 2drop f ;
 
 M: gtk3-ui-backend (free-pixel-format) drop ;
 
+! GL3 initialization state
+SYMBOL: gl3-initialized?
+
+: gl3-full-draw-init ( world -- )
+    ! Set up clip and viewport (GL3 version - no glOrtho)
+    dup gl3-init-clip
+    ! Set up GL state and projection in logical pixels
+    ! (viewport handles device pixel scaling)
+    [ dim>> ] [ background-color>> ] bi gl3-draw-init ;
+
+: setup-gl3-hooks ( -- )
+    [ gl3-init ] gl-init-hook set-global
+    [ gl3-full-draw-init ] gl-draw-init-hook set-global
+    [ gl3-color ] gl-color-hook set-global
+    [ gl3-fill-rect* ] gl-fill-rect-hook set-global
+    [ gl3-rect* ] gl-rect-hook set-global
+    [ gl3-line* ] gl-line-hook set-global
+    [ first2 gl3-translate ] gl-translate-hook set-global
+    [ with-gl3-translation ] with-translation-hook set-global
+    [ gl3-scale ] gl-scale-2d-hook set-global
+    [ gl3-rectf ] gl-rectf-hook set-global
+    [ with-gl3-matrix ] with-matrix-hook set-global
+    [ gl3-draw-lines* ] gl-draw-lines-hook set-global
+    t gl3-mode? set-global ;
+
+: ensure-gl3-initialized ( -- )
+    gl3-initialized? get-global [
+        setup-gl3-hooks
+        t gl3-initialized? set-global
+    ] unless ;
+
 M: window-handle select-gl-context
-    drop ;
+    drawable>>
+    [ gtk_gl_area_make_current ]
+    [ gtk_gl_area_get_error f assert= ]
+    [ gtk_gl_area_attach_buffers ] tri
+    ensure-gl3-initialized ;
 
 M: window-handle flush-gl-context
-    drop ;
+    drawable>> gtk_gl_area_queue_render ;
 
 ! Window
 
@@ -252,10 +403,13 @@ M: window-handle flush-gl-context
     ] [ first2 gtk_window_move ] if ;
 
 M:: gtk3-ui-backend (open-window) ( world -- )
-    gl-scale-factor get-global [ init-scale-factor ] unless
-
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
     gtk_gl_area_new :> drawable
+    drawable f gtk_gl_area_set_auto_render
+    drawable 1 gtk_widget_set_hexpand
+    drawable 1 gtk_widget_set_vexpand
+    drawable GTK_ALIGN_FILL gtk_widget_set_halign
+    drawable GTK_ALIGN_FILL gtk_widget_set_valign
     win drawable gtk_container_add
     gtk_im_multicontext_new :> im
 
@@ -263,21 +417,30 @@ M:: gtk3-ui-backend (open-window) ( world -- )
 
     world win register-window
 
-    win world [ window-loc>> auto-position ]
-    [ dim>> first2 [ gl-scale >fixnum ] bi@ gtk_window_set_default_size ] 2bi
+    world dim>> first2 [ >fixnum ] bi@ :> ( w h )
+    win w h gtk_window_set_default_size
+    win world window-loc>> auto-position
 
     win "factor" "Factor" [ utf8 string>alien ] bi@
     gtk_window_set_wmclass
 
     ! This must be done before realize due to #776.
-    win events-mask gtk_widget_add_events
+    ! Add events to drawable (GtkGLArea), not window, so coordinates are correct
+    drawable events-mask gtk_widget_add_events
+    drawable 1 gtk_widget_set_can_focus
 
     win gtk_widget_realize
 
+    ! Update scale factor from actual widget after realize
+    win update-scale-factor
+
     ! And this must be done after and in this order due to #1307
-    win connect-user-input-signals
+    ! Connect mouse/input events to drawable so coordinates are drawable-relative
+    drawable connect-user-input-signals
     win connect-win-state-signals
+    win im configure-im
     world handle>> connect-configure-signal
+    drawable connect-render-signal
 
     win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
@@ -287,7 +450,7 @@ M: gtk3-ui-backend (close-window)
     event-loop? [ gtk_main_quit ] unless ;
 
 M: gtk3-ui-backend resize-window
-    [ handle>> window>> ] [ first2 [ gl-scale >fixnum ] bi@ ] bi* gtk_window_resize ;
+    [ handle>> window>> ] [ first2 [ >fixnum ] bi@ ] bi* gtk_window_resize ;
 
 M: gtk3-ui-backend set-title
     swap [ handle>> window>> ] [ utf8 string>alien ] bi*
@@ -340,7 +503,6 @@ M: gtk3-ui-backend (with-ui)
     f f gtk_init_check [ "Unable to initialize GTK" throw ] unless
     load-icon
     init-clipboard
-    init-scale-factor
     start-ui
     [
         [ [ gtk_main ] with-timer ] with-io
@@ -355,3 +517,6 @@ os { linux freebsd } member? [
 
 M: gtk3-ui-backend ui-backend-available?
     "DISPLAY" os-env empty? not ;
+
+{ "ui.backend.gtk3" "ui.gadgets.editors" }
+"ui.backend.gtk3.input-methods.editors" require-when

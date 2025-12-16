@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays colors combinators kernel math opengl
-opengl.gl sequences tetris.game tetris.piece ;
+USING: accessors arrays colors combinators kernel math namespaces
+opengl opengl.gl sequences tetris.game tetris.piece ;
 
 IN: tetris.gl
 
@@ -32,7 +32,7 @@ IN: tetris.gl
     rows>> [ swap draw-row ] each-index ;
 
 : scale-board ( width height board -- )
-    [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
+    [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* gl-scale-2d ;
 
 : set-background-color ( tetris -- )
     dup running?>> [
@@ -40,12 +40,13 @@ IN: tetris.gl
     ] [ drop COLOR: black ] if gl-color ;
 
 : draw-background ( board -- )
-    [ 0 0 ] dip [ width>> ] [ height>> ] bi glRectf ;
+    [ 0 0 ] dip [ width>> ] [ height>> ] bi gl-rectf ;
 
 : draw-tetris ( width height tetris -- )
-    ! width and height are in pixels
-    [
-        {
+    ! width and height are in logical pixels
+    ! Projection handles scaling to device pixels
+    '[
+        _ _ _ {
             [ board>> scale-board ]
             [ set-background-color ]
             [ board>> draw-background ]
@@ -53,4 +54,4 @@ IN: tetris.gl
             [ next-piece draw-next-piece ]
             [ current-piece draw-piece ]
         } cleave
-    ] do-matrix ;
+    ] with-matrix ;

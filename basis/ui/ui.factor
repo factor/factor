@@ -162,7 +162,7 @@ SYMBOL: ui-thread
         ui-notify-flag get lower-flag
         [ update-ui ] [
             [ ui-error update-ui ] [
-                stop-event-loop nip rethrow
+                stop-event-loop rethrow
             ] recover
         ] recover
     ] while ;

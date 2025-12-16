@@ -179,8 +179,8 @@ M: table layout*
 : draw-column ( font column width align gap -- )
     [
         over [
-            [ 2dup ] 2dip column-loc
-            [ draw-cell ] with-translation
+            [ 2dup ] 2dip column-loc -rot
+            [ draw-cell ] 2curry with-translation
         ] dip
     ] dip translate-column ;
 
