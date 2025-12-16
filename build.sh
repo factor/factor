@@ -260,13 +260,11 @@ check_X11_libraries() {
 
 check_gtk_libraries() {
     check_library_exists gobject-2.0
-    check_library_exists gtk-x11-2.0
-    check_library_exists gdk-x11-2.0
+    check_library_exists gdk-3.0
+    check_library_exists gtk-3.0
     check_library_exists gdk_pixbuf-2.0
-    check_library_exists gtkglext-x11-1.0
     check_library_exists atk-1.0
     check_library_exists gio-2.0
-    check_library_exists gdkglext-x11-1.0
     check_library_exists pango-1.0
 }
 
