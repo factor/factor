@@ -626,503 +626,497 @@ CONSTANT: GL_CLIENT_ALL_ATTRIB_BITS         0xFFFFFFFF
 
 LIBRARY: gl
 
-<<
-os linux? [
-    "gl" "libGL.so.1" cdecl add-library
-] when
->>
-
 ! Miscellaneous
 
-FUNCTION: void glClearIndex ( GLfloat c )
-FUNCTION: void glClearColor ( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha )
-FUNCTION: void glClear ( GLbitfield mask )
-FUNCTION: void glIndexMask ( GLuint mask )
-FUNCTION: void glColorMask ( GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha )
-FUNCTION: void glAlphaFunc ( GLenum func, GLclampf ref )
-FUNCTION: void glBlendFunc ( GLenum sfactor, GLenum dfactor )
-FUNCTION: void glLogicOp ( GLenum opcode )
-FUNCTION: void glCullFace ( GLenum mode )
-FUNCTION: void glFrontFace ( GLenum mode )
-FUNCTION: void glPointSize ( GLfloat size )
-FUNCTION: void glLineWidth ( GLfloat width )
-FUNCTION: void glLineStipple ( GLint factor, GLushort pattern )
-FUNCTION: void glPolygonMode ( GLenum face, GLenum mode )
-FUNCTION: void glPolygonOffset ( GLfloat factor, GLfloat units )
-FUNCTION: void glPolygonStipple ( GLubyte* mask )
-FUNCTION: void glGetPolygonStipple ( GLubyte* mask )
-FUNCTION: void glEdgeFlag ( GLboolean flag )
-FUNCTION: void glEdgeFlagv ( GLboolean* flag )
-FUNCTION: void glScissor ( GLint x, GLint y, GLsizei width, GLsizei height )
-FUNCTION: void glClipPlane ( GLenum plane, GLdouble* equation )
-FUNCTION: void glGetClipPlane ( GLenum plane, GLdouble* equation )
-FUNCTION: void glDrawBuffer ( GLenum mode )
-FUNCTION: void glReadBuffer ( GLenum mode )
-FUNCTION: void glEnable ( GLenum cap )
-FUNCTION: void glDisable ( GLenum cap )
-FUNCTION: GLboolean glIsEnabled ( GLenum cap )
+GL-FUNCTION: void glClearIndex { } ( GLfloat c )
+GL-FUNCTION: void glClearColor { } ( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha )
+GL-FUNCTION: void glClear { } ( GLbitfield mask )
+GL-FUNCTION: void glIndexMask { } ( GLuint mask )
+GL-FUNCTION: void glColorMask { } ( GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha )
+GL-FUNCTION: void glAlphaFunc { } ( GLenum func, GLclampf ref )
+GL-FUNCTION: void glBlendFunc { } ( GLenum sfactor, GLenum dfactor )
+GL-FUNCTION: void glLogicOp { } ( GLenum opcode )
+GL-FUNCTION: void glCullFace { } ( GLenum mode )
+GL-FUNCTION: void glFrontFace { } ( GLenum mode )
+GL-FUNCTION: void glPointSize { } ( GLfloat size )
+GL-FUNCTION: void glLineWidth { } ( GLfloat width )
+GL-FUNCTION: void glLineStipple { } ( GLint factor, GLushort pattern )
+GL-FUNCTION: void glPolygonMode { } ( GLenum face, GLenum mode )
+GL-FUNCTION: void glPolygonOffset { } ( GLfloat factor, GLfloat units )
+GL-FUNCTION: void glPolygonStipple { } ( GLubyte* mask )
+GL-FUNCTION: void glGetPolygonStipple { } ( GLubyte* mask )
+GL-FUNCTION: void glEdgeFlag { } ( GLboolean flag )
+GL-FUNCTION: void glEdgeFlagv { } ( GLboolean* flag )
+GL-FUNCTION: void glScissor { } ( GLint x, GLint y, GLsizei width, GLsizei height )
+GL-FUNCTION: void glClipPlane { } ( GLenum plane, GLdouble* equation )
+GL-FUNCTION: void glGetClipPlane { } ( GLenum plane, GLdouble* equation )
+GL-FUNCTION: void glDrawBuffer { } ( GLenum mode )
+GL-FUNCTION: void glReadBuffer { } ( GLenum mode )
+GL-FUNCTION: void glEnable { } ( GLenum cap )
+GL-FUNCTION: void glDisable { } ( GLenum cap )
+GL-FUNCTION: GLboolean glIsEnabled { } ( GLenum cap )
 
-FUNCTION: void glEnableClientState ( GLenum cap )
-FUNCTION: void glDisableClientState ( GLenum cap )
-FUNCTION: void glGetBooleanv ( GLenum pname, GLboolean* params )
-FUNCTION: void glGetDoublev ( GLenum pname, GLdouble* params )
-FUNCTION: void glGetFloatv ( GLenum pname, GLfloat* params )
-FUNCTION: void glGetIntegerv ( GLenum pname, GLint* params )
+GL-FUNCTION: void glEnableClientState { } ( GLenum cap )
+GL-FUNCTION: void glDisableClientState { } ( GLenum cap )
+GL-FUNCTION: void glGetBooleanv { } ( GLenum pname, GLboolean* params )
+GL-FUNCTION: void glGetDoublev { } ( GLenum pname, GLdouble* params )
+GL-FUNCTION: void glGetFloatv { } ( GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetIntegerv { } ( GLenum pname, GLint* params )
 
-FUNCTION: void glPushAttrib ( GLbitfield mask )
-FUNCTION: void glPopAttrib ( )
+GL-FUNCTION: void glPushAttrib { } ( GLbitfield mask )
+GL-FUNCTION: void glPopAttrib { } ( )
 
-FUNCTION: void glPushClientAttrib ( GLbitfield mask )
-FUNCTION: void glPopClientAttrib ( )
+GL-FUNCTION: void glPushClientAttrib { } ( GLbitfield mask )
+GL-FUNCTION: void glPopClientAttrib { } ( )
 
-FUNCTION: GLint glRenderMode ( GLenum mode )
-FUNCTION: GLenum glGetError ( )
-FUNCTION: GLstring glGetString ( GLenum name )
-FUNCTION: void glFinish ( )
-FUNCTION: void glFlush ( )
-FUNCTION: void glHint ( GLenum target, GLenum mode )
+GL-FUNCTION: GLint glRenderMode { } ( GLenum mode )
+GL-FUNCTION: GLenum glGetError { } ( )
+GL-FUNCTION: GLstring glGetString { } ( GLenum name )
+GL-FUNCTION: void glFinish { } ( )
+GL-FUNCTION: void glFlush { } ( )
+GL-FUNCTION: void glHint { } ( GLenum target, GLenum mode )
 
-FUNCTION: void glClearDepth ( GLclampd depth )
-FUNCTION: void glDepthFunc ( GLenum func )
-FUNCTION: void glDepthMask ( GLboolean flag )
-FUNCTION: void glDepthRange ( GLclampd near_val, GLclampd far_val )
+GL-FUNCTION: void glClearDepth { } ( GLclampd depth )
+GL-FUNCTION: void glDepthFunc { } ( GLenum func )
+GL-FUNCTION: void glDepthMask { } ( GLboolean flag )
+GL-FUNCTION: void glDepthRange { } ( GLclampd near_val, GLclampd far_val )
 
-FUNCTION: void glClearAccum ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha )
-FUNCTION: void glAccum ( GLenum op, GLfloat value )
+GL-FUNCTION: void glClearAccum { } ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha )
+GL-FUNCTION: void glAccum { } ( GLenum op, GLfloat value )
 
-FUNCTION: void glMatrixMode ( GLenum mode )
-FUNCTION: void glOrtho ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
+GL-FUNCTION: void glMatrixMode { } ( GLenum mode )
+GL-FUNCTION: void glOrtho { } ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
                          GLdouble near_val, GLdouble far_val )
-FUNCTION: void glFrustum ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
+GL-FUNCTION: void glFrustum { } ( GLdouble left, GLdouble right, GLdouble bottom, GLdouble top,
                            GLdouble near_val, GLdouble far_val )
-FUNCTION: void glViewport ( GLint x, GLint y, GLsizei width, GLsizei height )
-FUNCTION: void glPushMatrix ( )
-FUNCTION: void glPopMatrix ( )
-FUNCTION: void glLoadIdentity ( )
-FUNCTION: void glLoadMatrixd ( GLdouble* m )
-FUNCTION: void glLoadMatrixf ( GLfloat* m )
-FUNCTION: void glMultMatrixd ( GLdouble* m )
-FUNCTION: void glMultMatrixf ( GLfloat* m )
-FUNCTION: void glRotated ( GLdouble angle, GLdouble x, GLdouble y, GLdouble z )
-FUNCTION: void glRotatef ( GLfloat angle, GLfloat x, GLfloat y, GLfloat z )
-FUNCTION: void glScaled ( GLdouble x, GLdouble y, GLdouble z )
-FUNCTION: void glScalef ( GLfloat x, GLfloat y, GLfloat z )
-FUNCTION: void glTranslated ( GLdouble x, GLdouble y, GLdouble z )
-FUNCTION: void glTranslatef ( GLfloat x, GLfloat y, GLfloat z )
+GL-FUNCTION: void glViewport { } ( GLint x, GLint y, GLsizei width, GLsizei height )
+GL-FUNCTION: void glPushMatrix { } ( )
+GL-FUNCTION: void glPopMatrix { } ( )
+GL-FUNCTION: void glLoadIdentity { } ( )
+GL-FUNCTION: void glLoadMatrixd { } ( GLdouble* m )
+GL-FUNCTION: void glLoadMatrixf { } ( GLfloat* m )
+GL-FUNCTION: void glMultMatrixd { } ( GLdouble* m )
+GL-FUNCTION: void glMultMatrixf { } ( GLfloat* m )
+GL-FUNCTION: void glRotated { } ( GLdouble angle, GLdouble x, GLdouble y, GLdouble z )
+GL-FUNCTION: void glRotatef { } ( GLfloat angle, GLfloat x, GLfloat y, GLfloat z )
+GL-FUNCTION: void glScaled { } ( GLdouble x, GLdouble y, GLdouble z )
+GL-FUNCTION: void glScalef { } ( GLfloat x, GLfloat y, GLfloat z )
+GL-FUNCTION: void glTranslated { } ( GLdouble x, GLdouble y, GLdouble z )
+GL-FUNCTION: void glTranslatef { } ( GLfloat x, GLfloat y, GLfloat z )
 
 
-FUNCTION: GLboolean glIsList ( GLuint list )
-FUNCTION: void glDeleteLists ( GLuint list, GLsizei range )
-FUNCTION: GLuint glGenLists ( GLsizei range )
-FUNCTION: void glNewList ( GLuint list, GLenum mode )
-FUNCTION: void glEndList ( )
-FUNCTION: void glCallList ( GLuint list )
-FUNCTION: void glCallLists ( GLsizei n, GLenum type, GLvoid* lists )
-FUNCTION: void glListBase ( GLuint base )
+GL-FUNCTION: GLboolean glIsList { } ( GLuint list )
+GL-FUNCTION: void glDeleteLists { } ( GLuint list, GLsizei range )
+GL-FUNCTION: GLuint glGenLists { } ( GLsizei range )
+GL-FUNCTION: void glNewList { } ( GLuint list, GLenum mode )
+GL-FUNCTION: void glEndList { } ( )
+GL-FUNCTION: void glCallList { } ( GLuint list )
+GL-FUNCTION: void glCallLists { } ( GLsizei n, GLenum type, GLvoid* lists )
+GL-FUNCTION: void glListBase { } ( GLuint base )
 
-FUNCTION: void glBegin ( GLenum mode )
-FUNCTION: void glEnd ( )
+GL-FUNCTION: void glBegin { } ( GLenum mode )
+GL-FUNCTION: void glEnd { } ( )
 
-FUNCTION: void glVertex2d ( GLdouble x, GLdouble y )
-FUNCTION: void glVertex2f ( GLfloat x, GLfloat y )
-FUNCTION: void glVertex2i ( GLint x, GLint y )
-FUNCTION: void glVertex2s ( GLshort x, GLshort y )
+GL-FUNCTION: void glVertex2d { } ( GLdouble x, GLdouble y )
+GL-FUNCTION: void glVertex2f { } ( GLfloat x, GLfloat y )
+GL-FUNCTION: void glVertex2i { } ( GLint x, GLint y )
+GL-FUNCTION: void glVertex2s { } ( GLshort x, GLshort y )
 
-FUNCTION: void glVertex3d ( GLdouble x, GLdouble y, GLdouble z )
-FUNCTION: void glVertex3f ( GLfloat x, GLfloat y, GLfloat z )
-FUNCTION: void glVertex3i ( GLint x, GLint y, GLint z )
-FUNCTION: void glVertex3s ( GLshort x, GLshort y, GLshort z )
+GL-FUNCTION: void glVertex3d { } ( GLdouble x, GLdouble y, GLdouble z )
+GL-FUNCTION: void glVertex3f { } ( GLfloat x, GLfloat y, GLfloat z )
+GL-FUNCTION: void glVertex3i { } ( GLint x, GLint y, GLint z )
+GL-FUNCTION: void glVertex3s { } ( GLshort x, GLshort y, GLshort z )
 
-FUNCTION: void glVertex4d ( GLdouble x, GLdouble y, GLdouble z, GLdouble w )
-FUNCTION: void glVertex4f ( GLfloat x, GLfloat y, GLfloat z, GLfloat w )
-FUNCTION: void glVertex4i ( GLint x, GLint y, GLint z, GLint w )
-FUNCTION: void glVertex4s ( GLshort x, GLshort y, GLshort z, GLshort w )
+GL-FUNCTION: void glVertex4d { } ( GLdouble x, GLdouble y, GLdouble z, GLdouble w )
+GL-FUNCTION: void glVertex4f { } ( GLfloat x, GLfloat y, GLfloat z, GLfloat w )
+GL-FUNCTION: void glVertex4i { } ( GLint x, GLint y, GLint z, GLint w )
+GL-FUNCTION: void glVertex4s { } ( GLshort x, GLshort y, GLshort z, GLshort w )
 
-FUNCTION: void glVertex2dv ( GLdouble* v )
-FUNCTION: void glVertex2fv ( GLfloat* v )
-FUNCTION: void glVertex2iv ( GLint* v )
-FUNCTION: void glVertex2sv ( GLshort* v )
+GL-FUNCTION: void glVertex2dv { } ( GLdouble* v )
+GL-FUNCTION: void glVertex2fv { } ( GLfloat* v )
+GL-FUNCTION: void glVertex2iv { } ( GLint* v )
+GL-FUNCTION: void glVertex2sv { } ( GLshort* v )
 
-FUNCTION: void glVertex3dv ( GLdouble* v )
-FUNCTION: void glVertex3fv ( GLfloat* v )
-FUNCTION: void glVertex3iv ( GLint* v )
-FUNCTION: void glVertex3sv ( GLshort* v )
+GL-FUNCTION: void glVertex3dv { } ( GLdouble* v )
+GL-FUNCTION: void glVertex3fv { } ( GLfloat* v )
+GL-FUNCTION: void glVertex3iv { } ( GLint* v )
+GL-FUNCTION: void glVertex3sv { } ( GLshort* v )
 
-FUNCTION: void glVertex4dv ( GLdouble* v )
-FUNCTION: void glVertex4fv ( GLfloat* v )
-FUNCTION: void glVertex4iv ( GLint* v )
-FUNCTION: void glVertex4sv ( GLshort* v )
+GL-FUNCTION: void glVertex4dv { } ( GLdouble* v )
+GL-FUNCTION: void glVertex4fv { } ( GLfloat* v )
+GL-FUNCTION: void glVertex4iv { } ( GLint* v )
+GL-FUNCTION: void glVertex4sv { } ( GLshort* v )
 
-FUNCTION: void glNormal3b ( GLbyte nx, GLbyte ny, GLbyte nz )
-FUNCTION: void glNormal3d ( GLdouble nx, GLdouble ny, GLdouble nz )
-FUNCTION: void glNormal3f ( GLfloat nx, GLfloat ny, GLfloat nz )
-FUNCTION: void glNormal3i ( GLint nx, GLint ny, GLint nz )
-FUNCTION: void glNormal3s ( GLshort nx, GLshort ny, GLshort nz )
+GL-FUNCTION: void glNormal3b { } ( GLbyte nx, GLbyte ny, GLbyte nz )
+GL-FUNCTION: void glNormal3d { } ( GLdouble nx, GLdouble ny, GLdouble nz )
+GL-FUNCTION: void glNormal3f { } ( GLfloat nx, GLfloat ny, GLfloat nz )
+GL-FUNCTION: void glNormal3i { } ( GLint nx, GLint ny, GLint nz )
+GL-FUNCTION: void glNormal3s { } ( GLshort nx, GLshort ny, GLshort nz )
 
-FUNCTION: void glNormal3bv ( GLbyte* v )
-FUNCTION: void glNormal3dv ( GLdouble* v )
-FUNCTION: void glNormal3fv ( GLfloat* v )
-FUNCTION: void glNormal3iv ( GLint* v )
-FUNCTION: void glNormal3sv ( GLshort* v )
+GL-FUNCTION: void glNormal3bv { } ( GLbyte* v )
+GL-FUNCTION: void glNormal3dv { } ( GLdouble* v )
+GL-FUNCTION: void glNormal3fv { } ( GLfloat* v )
+GL-FUNCTION: void glNormal3iv { } ( GLint* v )
+GL-FUNCTION: void glNormal3sv { } ( GLshort* v )
 
-FUNCTION: void glIndexd ( GLdouble c )
-FUNCTION: void glIndexf ( GLfloat c )
-FUNCTION: void glIndexi ( GLint c )
-FUNCTION: void glIndexs ( GLshort c )
-FUNCTION: void glIndexub ( GLubyte c )
+GL-FUNCTION: void glIndexd { } ( GLdouble c )
+GL-FUNCTION: void glIndexf { } ( GLfloat c )
+GL-FUNCTION: void glIndexi { } ( GLint c )
+GL-FUNCTION: void glIndexs { } ( GLshort c )
+GL-FUNCTION: void glIndexub { } ( GLubyte c )
 
-FUNCTION: void glIndexdv ( GLdouble* c )
-FUNCTION: void glIndexfv ( GLfloat* c )
-FUNCTION: void glIndexiv ( GLint* c )
-FUNCTION: void glIndexsv ( GLshort* c )
-FUNCTION: void glIndexubv ( GLubyte* c )
+GL-FUNCTION: void glIndexdv { } ( GLdouble* c )
+GL-FUNCTION: void glIndexfv { } ( GLfloat* c )
+GL-FUNCTION: void glIndexiv { } ( GLint* c )
+GL-FUNCTION: void glIndexsv { } ( GLshort* c )
+GL-FUNCTION: void glIndexubv { } ( GLubyte* c )
 
-FUNCTION: void glColor3b ( GLbyte red, GLbyte green, GLbyte blue )
-FUNCTION: void glColor3d ( GLdouble red, GLdouble green, GLdouble blue )
-FUNCTION: void glColor3f ( GLfloat red, GLfloat green, GLfloat blue )
-FUNCTION: void glColor3i ( GLint red, GLint green, GLint blue )
-FUNCTION: void glColor3s ( GLshort red, GLshort green, GLshort blue )
-FUNCTION: void glColor3ub ( GLubyte red, GLubyte green, GLubyte blue )
-FUNCTION: void glColor3ui ( GLuint red, GLuint green, GLuint blue )
-FUNCTION: void glColor3us ( GLushort red, GLushort green, GLushort blue )
+GL-FUNCTION: void glColor3b { } ( GLbyte red, GLbyte green, GLbyte blue )
+GL-FUNCTION: void glColor3d { } ( GLdouble red, GLdouble green, GLdouble blue )
+GL-FUNCTION: void glColor3f { } ( GLfloat red, GLfloat green, GLfloat blue )
+GL-FUNCTION: void glColor3i { } ( GLint red, GLint green, GLint blue )
+GL-FUNCTION: void glColor3s { } ( GLshort red, GLshort green, GLshort blue )
+GL-FUNCTION: void glColor3ub { } ( GLubyte red, GLubyte green, GLubyte blue )
+GL-FUNCTION: void glColor3ui { } ( GLuint red, GLuint green, GLuint blue )
+GL-FUNCTION: void glColor3us { } ( GLushort red, GLushort green, GLushort blue )
 
-FUNCTION: void glColor4b ( GLbyte red, GLbyte green, GLbyte blue, GLbyte alpha )
-FUNCTION: void glColor4d ( GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha )
-FUNCTION: void glColor4f ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha )
-FUNCTION: void glColor4i ( GLint red, GLint green, GLint blue, GLint alpha )
-FUNCTION: void glColor4s ( GLshort red, GLshort green, GLshort blue, GLshort alpha )
-FUNCTION: void glColor4ub ( GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha )
-FUNCTION: void glColor4ui ( GLuint red, GLuint green, GLuint blue, GLuint alpha )
-FUNCTION: void glColor4us ( GLushort red, GLushort green, GLushort blue, GLushort alpha )
+GL-FUNCTION: void glColor4b { } ( GLbyte red, GLbyte green, GLbyte blue, GLbyte alpha )
+GL-FUNCTION: void glColor4d { } ( GLdouble red, GLdouble green, GLdouble blue, GLdouble alpha )
+GL-FUNCTION: void glColor4f { } ( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha )
+GL-FUNCTION: void glColor4i { } ( GLint red, GLint green, GLint blue, GLint alpha )
+GL-FUNCTION: void glColor4s { } ( GLshort red, GLshort green, GLshort blue, GLshort alpha )
+GL-FUNCTION: void glColor4ub { } ( GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha )
+GL-FUNCTION: void glColor4ui { } ( GLuint red, GLuint green, GLuint blue, GLuint alpha )
+GL-FUNCTION: void glColor4us { } ( GLushort red, GLushort green, GLushort blue, GLushort alpha )
 
-FUNCTION: void glColor3bv ( GLbyte* v )
-FUNCTION: void glColor3dv ( GLdouble* v )
-FUNCTION: void glColor3fv ( GLfloat* v )
-FUNCTION: void glColor3iv ( GLint* v )
-FUNCTION: void glColor3sv ( GLshort* v )
-FUNCTION: void glColor3ubv ( GLubyte* v )
-FUNCTION: void glColor3uiv ( GLuint* v )
-FUNCTION: void glColor3usv ( GLushort* v )
+GL-FUNCTION: void glColor3bv { } ( GLbyte* v )
+GL-FUNCTION: void glColor3dv { } ( GLdouble* v )
+GL-FUNCTION: void glColor3fv { } ( GLfloat* v )
+GL-FUNCTION: void glColor3iv { } ( GLint* v )
+GL-FUNCTION: void glColor3sv { } ( GLshort* v )
+GL-FUNCTION: void glColor3ubv { } ( GLubyte* v )
+GL-FUNCTION: void glColor3uiv { } ( GLuint* v )
+GL-FUNCTION: void glColor3usv { } ( GLushort* v )
 
-FUNCTION: void glColor4bv ( GLbyte* v )
-FUNCTION: void glColor4dv ( GLdouble* v )
-FUNCTION: void glColor4fv ( GLfloat* v )
-FUNCTION: void glColor4iv ( GLint* v )
-FUNCTION: void glColor4sv ( GLshort* v )
-FUNCTION: void glColor4ubv ( GLubyte* v )
-FUNCTION: void glColor4uiv ( GLuint* v )
-FUNCTION: void glColor4usv ( GLushort* v )
-
-
-FUNCTION: void glTexCoord1d ( GLdouble s )
-FUNCTION: void glTexCoord1f ( GLfloat s )
-FUNCTION: void glTexCoord1i ( GLint s )
-FUNCTION: void glTexCoord1s ( GLshort s )
-
-FUNCTION: void glTexCoord2d ( GLdouble s, GLdouble t )
-FUNCTION: void glTexCoord2f ( GLfloat s, GLfloat t )
-FUNCTION: void glTexCoord2i ( GLint s, GLint t )
-FUNCTION: void glTexCoord2s ( GLshort s, GLshort t )
-
-FUNCTION: void glTexCoord3d ( GLdouble s, GLdouble t, GLdouble r )
-FUNCTION: void glTexCoord3f ( GLfloat s, GLfloat t, GLfloat r )
-FUNCTION: void glTexCoord3i ( GLint s, GLint t, GLint r )
-FUNCTION: void glTexCoord3s ( GLshort s, GLshort t, GLshort r )
-
-FUNCTION: void glTexCoord4d ( GLdouble s, GLdouble t, GLdouble r, GLdouble q )
-FUNCTION: void glTexCoord4f ( GLfloat s, GLfloat t, GLfloat r, GLfloat q )
-FUNCTION: void glTexCoord4i ( GLint s, GLint t, GLint r, GLint q )
-FUNCTION: void glTexCoord4s ( GLshort s, GLshort t, GLshort r, GLshort q )
-
-FUNCTION: void glTexCoord1dv ( GLdouble* v )
-FUNCTION: void glTexCoord1fv ( GLfloat* v )
-FUNCTION: void glTexCoord1iv ( GLint* v )
-FUNCTION: void glTexCoord1sv ( GLshort* v )
-
-FUNCTION: void glTexCoord2dv ( GLdouble* v )
-FUNCTION: void glTexCoord2fv ( GLfloat* v )
-FUNCTION: void glTexCoord2iv ( GLint* v )
-FUNCTION: void glTexCoord2sv ( GLshort* v )
-
-FUNCTION: void glTexCoord3dv ( GLdouble* v )
-FUNCTION: void glTexCoord3fv ( GLfloat* v )
-FUNCTION: void glTexCoord3iv ( GLint* v )
-FUNCTION: void glTexCoord3sv ( GLshort* v )
-
-FUNCTION: void glTexCoord4dv ( GLdouble* v )
-FUNCTION: void glTexCoord4fv ( GLfloat* v )
-FUNCTION: void glTexCoord4iv ( GLint* v )
-FUNCTION: void glTexCoord4sv ( GLshort* v )
-
-FUNCTION: void glRasterPos2d ( GLdouble x, GLdouble y )
-FUNCTION: void glRasterPos2f ( GLfloat x, GLfloat y )
-FUNCTION: void glRasterPos2i ( GLint x, GLint y )
-FUNCTION: void glRasterPos2s ( GLshort x, GLshort y )
-
-FUNCTION: void glRasterPos3d ( GLdouble x, GLdouble y, GLdouble z )
-FUNCTION: void glRasterPos3f ( GLfloat x, GLfloat y, GLfloat z )
-FUNCTION: void glRasterPos3i ( GLint x, GLint y, GLint z )
-FUNCTION: void glRasterPos3s ( GLshort x, GLshort y, GLshort z )
-
-FUNCTION: void glRasterPos4d ( GLdouble x, GLdouble y, GLdouble z, GLdouble w )
-FUNCTION: void glRasterPos4f ( GLfloat x, GLfloat y, GLfloat z, GLfloat w )
-FUNCTION: void glRasterPos4i ( GLint x, GLint y, GLint z, GLint w )
-FUNCTION: void glRasterPos4s ( GLshort x, GLshort y, GLshort z, GLshort w )
-
-FUNCTION: void glRasterPos2dv ( GLdouble* v )
-FUNCTION: void glRasterPos2fv ( GLfloat* v )
-FUNCTION: void glRasterPos2iv ( GLint* v )
-FUNCTION: void glRasterPos2sv ( GLshort* v )
-
-FUNCTION: void glRasterPos3dv ( GLdouble* v )
-FUNCTION: void glRasterPos3fv ( GLfloat* v )
-FUNCTION: void glRasterPos3iv ( GLint* v )
-FUNCTION: void glRasterPos3sv ( GLshort* v )
-
-FUNCTION: void glRasterPos4dv ( GLdouble* v )
-FUNCTION: void glRasterPos4fv ( GLfloat* v )
-FUNCTION: void glRasterPos4iv ( GLint* v )
-FUNCTION: void glRasterPos4sv ( GLshort* v )
+GL-FUNCTION: void glColor4bv { } ( GLbyte* v )
+GL-FUNCTION: void glColor4dv { } ( GLdouble* v )
+GL-FUNCTION: void glColor4fv { } ( GLfloat* v )
+GL-FUNCTION: void glColor4iv { } ( GLint* v )
+GL-FUNCTION: void glColor4sv { } ( GLshort* v )
+GL-FUNCTION: void glColor4ubv { } ( GLubyte* v )
+GL-FUNCTION: void glColor4uiv { } ( GLuint* v )
+GL-FUNCTION: void glColor4usv { } ( GLushort* v )
 
 
-FUNCTION: void glRectd ( GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2 )
-FUNCTION: void glRectf ( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
-FUNCTION: void glRecti ( GLint x1, GLint y1, GLint x2, GLint y2 )
-FUNCTION: void glRects ( GLshort x1, GLshort y1, GLshort x2, GLshort y2 )
+GL-FUNCTION: void glTexCoord1d { } ( GLdouble s )
+GL-FUNCTION: void glTexCoord1f { } ( GLfloat s )
+GL-FUNCTION: void glTexCoord1i { } ( GLint s )
+GL-FUNCTION: void glTexCoord1s { } ( GLshort s )
 
-FUNCTION: void glRectdv ( GLdouble* v1, GLdouble* v2 )
-FUNCTION: void glRectfv ( GLfloat* v1, GLfloat* v2 )
-FUNCTION: void glRectiv ( GLint* v1, GLint* v2 )
-FUNCTION: void glRectsv ( GLshort* v1, GLshort* v2 )
+GL-FUNCTION: void glTexCoord2d { } ( GLdouble s, GLdouble t )
+GL-FUNCTION: void glTexCoord2f { } ( GLfloat s, GLfloat t )
+GL-FUNCTION: void glTexCoord2i { } ( GLint s, GLint t )
+GL-FUNCTION: void glTexCoord2s { } ( GLshort s, GLshort t )
+
+GL-FUNCTION: void glTexCoord3d { } ( GLdouble s, GLdouble t, GLdouble r )
+GL-FUNCTION: void glTexCoord3f { } ( GLfloat s, GLfloat t, GLfloat r )
+GL-FUNCTION: void glTexCoord3i { } ( GLint s, GLint t, GLint r )
+GL-FUNCTION: void glTexCoord3s { } ( GLshort s, GLshort t, GLshort r )
+
+GL-FUNCTION: void glTexCoord4d { } ( GLdouble s, GLdouble t, GLdouble r, GLdouble q )
+GL-FUNCTION: void glTexCoord4f { } ( GLfloat s, GLfloat t, GLfloat r, GLfloat q )
+GL-FUNCTION: void glTexCoord4i { } ( GLint s, GLint t, GLint r, GLint q )
+GL-FUNCTION: void glTexCoord4s { } ( GLshort s, GLshort t, GLshort r, GLshort q )
+
+GL-FUNCTION: void glTexCoord1dv { } ( GLdouble* v )
+GL-FUNCTION: void glTexCoord1fv { } ( GLfloat* v )
+GL-FUNCTION: void glTexCoord1iv { } ( GLint* v )
+GL-FUNCTION: void glTexCoord1sv { } ( GLshort* v )
+
+GL-FUNCTION: void glTexCoord2dv { } ( GLdouble* v )
+GL-FUNCTION: void glTexCoord2fv { } ( GLfloat* v )
+GL-FUNCTION: void glTexCoord2iv { } ( GLint* v )
+GL-FUNCTION: void glTexCoord2sv { } ( GLshort* v )
+
+GL-FUNCTION: void glTexCoord3dv { } ( GLdouble* v )
+GL-FUNCTION: void glTexCoord3fv { } ( GLfloat* v )
+GL-FUNCTION: void glTexCoord3iv { } ( GLint* v )
+GL-FUNCTION: void glTexCoord3sv { } ( GLshort* v )
+
+GL-FUNCTION: void glTexCoord4dv { } ( GLdouble* v )
+GL-FUNCTION: void glTexCoord4fv { } ( GLfloat* v )
+GL-FUNCTION: void glTexCoord4iv { } ( GLint* v )
+GL-FUNCTION: void glTexCoord4sv { } ( GLshort* v )
+
+GL-FUNCTION: void glRasterPos2d { } ( GLdouble x, GLdouble y )
+GL-FUNCTION: void glRasterPos2f { } ( GLfloat x, GLfloat y )
+GL-FUNCTION: void glRasterPos2i { } ( GLint x, GLint y )
+GL-FUNCTION: void glRasterPos2s { } ( GLshort x, GLshort y )
+
+GL-FUNCTION: void glRasterPos3d { } ( GLdouble x, GLdouble y, GLdouble z )
+GL-FUNCTION: void glRasterPos3f { } ( GLfloat x, GLfloat y, GLfloat z )
+GL-FUNCTION: void glRasterPos3i { } ( GLint x, GLint y, GLint z )
+GL-FUNCTION: void glRasterPos3s { } ( GLshort x, GLshort y, GLshort z )
+
+GL-FUNCTION: void glRasterPos4d { } ( GLdouble x, GLdouble y, GLdouble z, GLdouble w )
+GL-FUNCTION: void glRasterPos4f { } ( GLfloat x, GLfloat y, GLfloat z, GLfloat w )
+GL-FUNCTION: void glRasterPos4i { } ( GLint x, GLint y, GLint z, GLint w )
+GL-FUNCTION: void glRasterPos4s { } ( GLshort x, GLshort y, GLshort z, GLshort w )
+
+GL-FUNCTION: void glRasterPos2dv { } ( GLdouble* v )
+GL-FUNCTION: void glRasterPos2fv { } ( GLfloat* v )
+GL-FUNCTION: void glRasterPos2iv { } ( GLint* v )
+GL-FUNCTION: void glRasterPos2sv { } ( GLshort* v )
+
+GL-FUNCTION: void glRasterPos3dv { } ( GLdouble* v )
+GL-FUNCTION: void glRasterPos3fv { } ( GLfloat* v )
+GL-FUNCTION: void glRasterPos3iv { } ( GLint* v )
+GL-FUNCTION: void glRasterPos3sv { } ( GLshort* v )
+
+GL-FUNCTION: void glRasterPos4dv { } ( GLdouble* v )
+GL-FUNCTION: void glRasterPos4fv { } ( GLfloat* v )
+GL-FUNCTION: void glRasterPos4iv { } ( GLint* v )
+GL-FUNCTION: void glRasterPos4sv { } ( GLshort* v )
+
+
+GL-FUNCTION: void glRectd { } ( GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2 )
+GL-FUNCTION: void glRectf { } ( GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2 )
+GL-FUNCTION: void glRecti { } ( GLint x1, GLint y1, GLint x2, GLint y2 )
+GL-FUNCTION: void glRects { } ( GLshort x1, GLshort y1, GLshort x2, GLshort y2 )
+
+GL-FUNCTION: void glRectdv { } ( GLdouble* v1, GLdouble* v2 )
+GL-FUNCTION: void glRectfv { } ( GLfloat* v1, GLfloat* v2 )
+GL-FUNCTION: void glRectiv { } ( GLint* v1, GLint* v2 )
+GL-FUNCTION: void glRectsv { } ( GLshort* v1, GLshort* v2 )
 
 
 ! Vertex Arrays (1.1)
 
-FUNCTION: void glVertexPointer ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
-FUNCTION: void glNormalPointer ( GLenum type, GLsizei stride, GLvoid* ptr )
-FUNCTION: void glColorPointer ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
-FUNCTION: void glIndexPointer ( GLenum type, GLsizei stride, GLvoid* ptr )
-FUNCTION: void glTexCoordPointer ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
-FUNCTION: void glEdgeFlagPointer ( GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glVertexPointer { } ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glNormalPointer { } ( GLenum type, GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glColorPointer { } ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glIndexPointer { } ( GLenum type, GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glTexCoordPointer { } ( GLint size, GLenum type, GLsizei stride, GLvoid* ptr )
+GL-FUNCTION: void glEdgeFlagPointer { } ( GLsizei stride, GLvoid* ptr )
 
 ! [09:39] (slava) NULL <void*>
 ! [09:39] (slava) then keep that object
 ! [09:39] (slava) when you want to get the value stored there,* void*
 ! [09:39] (slava) which returns an alien
-FUNCTION: void glGetPointerv ( GLenum pname, GLvoid** params )
+GL-FUNCTION: void glGetPointerv { } ( GLenum pname, GLvoid** params )
 
-FUNCTION: void glArrayElement ( GLint i )
-FUNCTION: void glDrawArrays ( GLenum mode, GLint first, GLsizei count )
-FUNCTION: void glDrawElements ( GLenum mode, GLsizei count, GLenum type, GLvoid* indices )
-FUNCTION: void glInterleavedArrays ( GLenum format, GLsizei stride, GLvoid* pointer )
+GL-FUNCTION: void glArrayElement { } ( GLint i )
+GL-FUNCTION: void glDrawArrays { } ( GLenum mode, GLint first, GLsizei count )
+GL-FUNCTION: void glDrawElements { } ( GLenum mode, GLsizei count, GLenum type, GLvoid* indices )
+GL-FUNCTION: void glInterleavedArrays { } ( GLenum format, GLsizei stride, GLvoid* pointer )
 
 ! Lighting
 
-FUNCTION: void glShadeModel ( GLenum mode )
+GL-FUNCTION: void glShadeModel { } ( GLenum mode )
 
-FUNCTION: void glLightf ( GLenum light, GLenum pname, GLfloat param )
-FUNCTION: void glLighti ( GLenum light, GLenum pname, GLint param )
-FUNCTION: void glLightfv ( GLenum light, GLenum pname, GLfloat* params )
-FUNCTION: void glLightiv ( GLenum light, GLenum pname, GLint* params )
-FUNCTION: void glGetLightfv ( GLenum light, GLenum pname, GLfloat* params )
-FUNCTION: void glGetLightiv ( GLenum light, GLenum pname, GLint* params )
+GL-FUNCTION: void glLightf { } ( GLenum light, GLenum pname, GLfloat param )
+GL-FUNCTION: void glLighti { } ( GLenum light, GLenum pname, GLint param )
+GL-FUNCTION: void glLightfv { } ( GLenum light, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glLightiv { } ( GLenum light, GLenum pname, GLint* params )
+GL-FUNCTION: void glGetLightfv { } ( GLenum light, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetLightiv { } ( GLenum light, GLenum pname, GLint* params )
 
-FUNCTION: void glLightModelf ( GLenum pname, GLfloat param )
-FUNCTION: void glLightModeli ( GLenum pname, GLint param )
-FUNCTION: void glLightModelfv ( GLenum pname, GLfloat* params )
-FUNCTION: void glLightModeliv ( GLenum pname, GLint* params )
+GL-FUNCTION: void glLightModelf { } ( GLenum pname, GLfloat param )
+GL-FUNCTION: void glLightModeli { } ( GLenum pname, GLint param )
+GL-FUNCTION: void glLightModelfv { } ( GLenum pname, GLfloat* params )
+GL-FUNCTION: void glLightModeliv { } ( GLenum pname, GLint* params )
 
-FUNCTION: void glMaterialf ( GLenum face, GLenum pname, GLfloat param )
-FUNCTION: void glMateriali ( GLenum face, GLenum pname, GLint param )
-FUNCTION: void glMaterialfv ( GLenum face, GLenum pname, GLfloat* params )
-FUNCTION: void glMaterialiv ( GLenum face, GLenum pname, GLint* params )
+GL-FUNCTION: void glMaterialf { } ( GLenum face, GLenum pname, GLfloat param )
+GL-FUNCTION: void glMateriali { } ( GLenum face, GLenum pname, GLint param )
+GL-FUNCTION: void glMaterialfv { } ( GLenum face, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glMaterialiv { } ( GLenum face, GLenum pname, GLint* params )
 
-FUNCTION: void glGetMaterialfv ( GLenum face, GLenum pname, GLfloat* params )
-FUNCTION: void glGetMaterialiv ( GLenum face, GLenum pname, GLint* params )
+GL-FUNCTION: void glGetMaterialfv { } ( GLenum face, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetMaterialiv { } ( GLenum face, GLenum pname, GLint* params )
 
-FUNCTION: void glColorMaterial ( GLenum face, GLenum mode )
+GL-FUNCTION: void glColorMaterial { } ( GLenum face, GLenum mode )
 
 
 ! Raster functions
 
-FUNCTION: void glPixelZoom ( GLfloat xfactor, GLfloat yfactor )
+GL-FUNCTION: void glPixelZoom { } ( GLfloat xfactor, GLfloat yfactor )
 
-FUNCTION: void glPixelStoref ( GLenum pname, GLfloat param )
-FUNCTION: void glPixelStorei ( GLenum pname, GLint param )
+GL-FUNCTION: void glPixelStoref { } ( GLenum pname, GLfloat param )
+GL-FUNCTION: void glPixelStorei { } ( GLenum pname, GLint param )
 
-FUNCTION: void glPixelTransferf ( GLenum pname, GLfloat param )
-FUNCTION: void glPixelTransferi ( GLenum pname, GLint param )
+GL-FUNCTION: void glPixelTransferf { } ( GLenum pname, GLfloat param )
+GL-FUNCTION: void glPixelTransferi { } ( GLenum pname, GLint param )
 
-FUNCTION: void glPixelMapfv ( GLenum map, GLsizei mapsize, GLfloat* values )
-FUNCTION: void glPixelMapuiv ( GLenum map, GLsizei mapsize, GLuint* values )
-FUNCTION: void glPixelMapusv ( GLenum map, GLsizei mapsize, GLushort* values )
+GL-FUNCTION: void glPixelMapfv { } ( GLenum map, GLsizei mapsize, GLfloat* values )
+GL-FUNCTION: void glPixelMapuiv { } ( GLenum map, GLsizei mapsize, GLuint* values )
+GL-FUNCTION: void glPixelMapusv { } ( GLenum map, GLsizei mapsize, GLushort* values )
 
-FUNCTION: void glGetPixelMapfv ( GLenum map, GLfloat* values )
-FUNCTION: void glGetPixelMapuiv ( GLenum map, GLuint* values )
-FUNCTION: void glGetPixelMapusv ( GLenum map, GLushort* values )
+GL-FUNCTION: void glGetPixelMapfv { } ( GLenum map, GLfloat* values )
+GL-FUNCTION: void glGetPixelMapuiv { } ( GLenum map, GLuint* values )
+GL-FUNCTION: void glGetPixelMapusv { } ( GLenum map, GLushort* values )
 
-FUNCTION: void glBitmap ( GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig,
+GL-FUNCTION: void glBitmap { } ( GLsizei width, GLsizei height, GLfloat xorig, GLfloat yorig,
                           GLfloat xmove, GLfloat ymove, GLubyte* bitmap )
 
-FUNCTION: void glReadPixels ( GLint x, GLint y, GLsizei width, GLsizei height,
+GL-FUNCTION: void glReadPixels { } ( GLint x, GLint y, GLsizei width, GLsizei height,
                               GLenum format, GLenum type, GLvoid* pixels )
 
-FUNCTION: void glDrawPixels ( GLsizei width, GLsizei height, GLenum format,
+GL-FUNCTION: void glDrawPixels { } ( GLsizei width, GLsizei height, GLenum format,
                               GLenum type, GLvoid* pixels )
-FUNCTION: void glCopyPixels ( GLint x, GLint y, GLsizei width, GLsizei height, GLenum type )
+GL-FUNCTION: void glCopyPixels { } ( GLint x, GLint y, GLsizei width, GLsizei height, GLenum type )
 
 ! Stenciling
-FUNCTION: void glStencilFunc ( GLenum func, GLint ref, GLuint mask )
-FUNCTION: void glStencilMask ( GLuint mask )
-FUNCTION: void glStencilOp ( GLenum fail, GLenum zfail, GLenum zpass )
-FUNCTION: void glClearStencil ( GLint s )
+GL-FUNCTION: void glStencilFunc { } ( GLenum func, GLint ref, GLuint mask )
+GL-FUNCTION: void glStencilMask { } ( GLuint mask )
+GL-FUNCTION: void glStencilOp { } ( GLenum fail, GLenum zfail, GLenum zpass )
+GL-FUNCTION: void glClearStencil { } ( GLint s )
 
 
 ! Texture mapping
 
-FUNCTION: void glTexGend ( GLenum coord, GLenum pname, GLdouble param )
-FUNCTION: void glTexGenf ( GLenum coord, GLenum pname, GLfloat param )
-FUNCTION: void glTexGeni ( GLenum coord, GLenum pname, GLint param )
+GL-FUNCTION: void glTexGend { } ( GLenum coord, GLenum pname, GLdouble param )
+GL-FUNCTION: void glTexGenf { } ( GLenum coord, GLenum pname, GLfloat param )
+GL-FUNCTION: void glTexGeni { } ( GLenum coord, GLenum pname, GLint param )
 
-FUNCTION: void glTexGendv ( GLenum coord, GLenum pname, GLdouble* params )
-FUNCTION: void glTexGenfv ( GLenum coord, GLenum pname, GLfloat* params )
-FUNCTION: void glTexGeniv ( GLenum coord, GLenum pname, GLint* params )
+GL-FUNCTION: void glTexGendv { } ( GLenum coord, GLenum pname, GLdouble* params )
+GL-FUNCTION: void glTexGenfv { } ( GLenum coord, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glTexGeniv { } ( GLenum coord, GLenum pname, GLint* params )
 
-FUNCTION: void glGetTexGendv ( GLenum coord, GLenum pname, GLdouble* params )
-FUNCTION: void glGetTexGenfv ( GLenum coord, GLenum pname, GLfloat* params )
-FUNCTION: void glGetTexGeniv ( GLenum coord, GLenum pname, GLint* params )
+GL-FUNCTION: void glGetTexGendv { } ( GLenum coord, GLenum pname, GLdouble* params )
+GL-FUNCTION: void glGetTexGenfv { } ( GLenum coord, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetTexGeniv { } ( GLenum coord, GLenum pname, GLint* params )
 
-FUNCTION: void glTexEnvf ( GLenum target, GLenum pname, GLfloat param )
-FUNCTION: void glTexEnvi ( GLenum target, GLenum pname, GLint param )
-FUNCTION: void glTexEnvfv ( GLenum target, GLenum pname, GLfloat* params )
-FUNCTION: void glTexEnviv ( GLenum target, GLenum pname, GLint* params )
+GL-FUNCTION: void glTexEnvf { } ( GLenum target, GLenum pname, GLfloat param )
+GL-FUNCTION: void glTexEnvi { } ( GLenum target, GLenum pname, GLint param )
+GL-FUNCTION: void glTexEnvfv { } ( GLenum target, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glTexEnviv { } ( GLenum target, GLenum pname, GLint* params )
 
-FUNCTION: void glGetTexEnvfv ( GLenum target, GLenum pname, GLfloat* params )
-FUNCTION: void glGetTexEnviv ( GLenum target, GLenum pname, GLint* params )
+GL-FUNCTION: void glGetTexEnvfv { } ( GLenum target, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetTexEnviv { } ( GLenum target, GLenum pname, GLint* params )
 
-FUNCTION: void glTexParameterf ( GLenum target, GLenum pname, GLfloat param )
-FUNCTION: void glTexParameteri ( GLenum target, GLenum pname, GLint param )
+GL-FUNCTION: void glTexParameterf { } ( GLenum target, GLenum pname, GLfloat param )
+GL-FUNCTION: void glTexParameteri { } ( GLenum target, GLenum pname, GLint param )
 
-FUNCTION: void glTexParameterfv ( GLenum target, GLenum pname, GLfloat* params )
-FUNCTION: void glTexParameteriv ( GLenum target, GLenum pname, GLint* params )
+GL-FUNCTION: void glTexParameterfv { } ( GLenum target, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glTexParameteriv { } ( GLenum target, GLenum pname, GLint* params )
 
-FUNCTION: void glGetTexParameterfv ( GLenum target, GLenum pname, GLfloat* params )
-FUNCTION: void glGetTexParameteriv ( GLenum target, GLenum pname, GLint* params )
+GL-FUNCTION: void glGetTexParameterfv { } ( GLenum target, GLenum pname, GLfloat* params )
+GL-FUNCTION: void glGetTexParameteriv { } ( GLenum target, GLenum pname, GLint* params )
 
-FUNCTION: void glGetTexLevelParameterfv ( GLenum target, GLint level,
+GL-FUNCTION: void glGetTexLevelParameterfv { } ( GLenum target, GLint level,
                                           GLenum pname, GLfloat* params )
-FUNCTION: void glGetTexLevelParameteriv ( GLenum target, GLint level,
+GL-FUNCTION: void glGetTexLevelParameteriv { } ( GLenum target, GLint level,
                                           GLenum pname, GLint* params )
 
-FUNCTION: void glTexImage1D ( GLenum target, GLint level, GLint internalFormat, GLsizei width,
+GL-FUNCTION: void glTexImage1D { } ( GLenum target, GLint level, GLint internalFormat, GLsizei width,
                               GLint border, GLenum format, GLenum type, GLvoid* pixels )
 
-FUNCTION: void glTexImage2D ( GLenum target, GLint level, GLint internalFormat,
+GL-FUNCTION: void glTexImage2D { } ( GLenum target, GLint level, GLint internalFormat,
                               GLsizei width, GLsizei height, GLint border,
                               GLenum format, GLenum type, GLvoid* pixels )
 
-FUNCTION: void glGetTexImage ( GLenum target, GLint level, GLenum format,
+GL-FUNCTION: void glGetTexImage { } ( GLenum target, GLint level, GLenum format,
                                GLenum type, GLvoid* pixels )
 
 
 ! 1.1 functions
 
-FUNCTION: void glGenTextures ( GLsizei n, GLuint* textures )
+GL-FUNCTION: void glGenTextures { } ( GLsizei n, GLuint* textures )
 
-FUNCTION: void glDeleteTextures ( GLsizei n, GLuint* textures )
+GL-FUNCTION: void glDeleteTextures { } ( GLsizei n, GLuint* textures )
 
-FUNCTION: void glBindTexture ( GLenum target, GLuint texture )
+GL-FUNCTION: void glBindTexture { } ( GLenum target, GLuint texture )
 
-FUNCTION: void glPrioritizeTextures ( GLsizei n, GLuint* textures, GLclampf* priorities )
+GL-FUNCTION: void glPrioritizeTextures { } ( GLsizei n, GLuint* textures, GLclampf* priorities )
 
-FUNCTION: GLboolean glAreTexturesResident ( GLsizei n, GLuint* textures, GLboolean* residences )
+GL-FUNCTION: GLboolean glAreTexturesResident { } ( GLsizei n, GLuint* textures, GLboolean* residences )
 
-FUNCTION: GLboolean glIsTexture ( GLuint texture )
+GL-FUNCTION: GLboolean glIsTexture { } ( GLuint texture )
 
-FUNCTION: void glTexSubImage1D ( GLenum target, GLint level, GLint xoffset, GLsizei width,
+GL-FUNCTION: void glTexSubImage1D { } ( GLenum target, GLint level, GLint xoffset, GLsizei width,
                                  GLenum format, GLenum type, GLvoid* pixels )
 
-FUNCTION: void glTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
+GL-FUNCTION: void glTexSubImage2D { } ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
                                  GLsizei width, GLsizei height, GLenum format,
                                  GLenum type, GLvoid* pixels )
 
-FUNCTION: void glCopyTexImage1D ( GLenum target, GLint level, GLenum internalformat,
+GL-FUNCTION: void glCopyTexImage1D { } ( GLenum target, GLint level, GLenum internalformat,
                                   GLint x, GLint y, GLsizei width, GLint border )
 
-FUNCTION: void glCopyTexImage2D ( GLenum target, GLint level, GLenum internalformat,
+GL-FUNCTION: void glCopyTexImage2D { } ( GLenum target, GLint level, GLenum internalformat,
                                   GLint x, GLint y,
                                   GLsizei width, GLsizei height, GLint border )
 
-FUNCTION: void glCopyTexSubImage1D ( GLenum target, GLint level, GLint xoffset,
+GL-FUNCTION: void glCopyTexSubImage1D { } ( GLenum target, GLint level, GLint xoffset,
                                      GLint x, GLint y, GLsizei width )
 
-FUNCTION: void glCopyTexSubImage2D ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
+GL-FUNCTION: void glCopyTexSubImage2D { } ( GLenum target, GLint level, GLint xoffset, GLint yoffset,
                                      GLint x, GLint y, GLsizei width, GLsizei height )
 
 
 ! Evaluators
 
-FUNCTION: void glMap1d ( GLenum target, GLdouble u1, GLdouble u2,
+GL-FUNCTION: void glMap1d { } ( GLenum target, GLdouble u1, GLdouble u2,
                          GLint stride, GLint order, GLdouble* points )
-FUNCTION: void glMap1f ( GLenum target, GLfloat u1, GLfloat u2,
+GL-FUNCTION: void glMap1f { } ( GLenum target, GLfloat u1, GLfloat u2,
                          GLint stride, GLint order, GLfloat* points )
 
-FUNCTION: void glMap2d ( GLenum target, GLdouble u1, GLdouble u2, GLint ustride, GLint uorder,
+GL-FUNCTION: void glMap2d { } ( GLenum target, GLdouble u1, GLdouble u2, GLint ustride, GLint uorder,
                          GLdouble v1, GLdouble v2, GLint vstride, GLint vorder,
                          GLdouble* points )
-FUNCTION: void glMap2f ( GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
+GL-FUNCTION: void glMap2f { } ( GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
                          GLfloat v1, GLfloat v2, GLint vstride, GLint vorder,
                          GLfloat* points )
 
-FUNCTION: void glGetMapdv ( GLenum target, GLenum query, GLdouble* v )
-FUNCTION: void glGetMapfv ( GLenum target, GLenum query, GLfloat* v )
-FUNCTION: void glGetMapiv ( GLenum target, GLenum query, GLint* v )
+GL-FUNCTION: void glGetMapdv { } ( GLenum target, GLenum query, GLdouble* v )
+GL-FUNCTION: void glGetMapfv { } ( GLenum target, GLenum query, GLfloat* v )
+GL-FUNCTION: void glGetMapiv { } ( GLenum target, GLenum query, GLint* v )
 
-FUNCTION: void glEvalCoord1d ( GLdouble u )
-FUNCTION: void glEvalCoord1f ( GLfloat u )
+GL-FUNCTION: void glEvalCoord1d { } ( GLdouble u )
+GL-FUNCTION: void glEvalCoord1f { } ( GLfloat u )
 
-FUNCTION: void glEvalCoord1dv ( GLdouble* u )
-FUNCTION: void glEvalCoord1fv ( GLfloat* u )
+GL-FUNCTION: void glEvalCoord1dv { } ( GLdouble* u )
+GL-FUNCTION: void glEvalCoord1fv { } ( GLfloat* u )
 
-FUNCTION: void glEvalCoord2d ( GLdouble u, GLdouble v )
-FUNCTION: void glEvalCoord2f ( GLfloat u, GLfloat v )
+GL-FUNCTION: void glEvalCoord2d { } ( GLdouble u, GLdouble v )
+GL-FUNCTION: void glEvalCoord2f { } ( GLfloat u, GLfloat v )
 
-FUNCTION: void glEvalCoord2dv ( GLdouble* u )
-FUNCTION: void glEvalCoord2fv ( GLfloat* u )
+GL-FUNCTION: void glEvalCoord2dv { } ( GLdouble* u )
+GL-FUNCTION: void glEvalCoord2fv { } ( GLfloat* u )
 
-FUNCTION: void glMapGrid1d ( GLint un, GLdouble u1, GLdouble u2 )
-FUNCTION: void glMapGrid1f ( GLint un, GLfloat u1, GLfloat u2 )
+GL-FUNCTION: void glMapGrid1d { } ( GLint un, GLdouble u1, GLdouble u2 )
+GL-FUNCTION: void glMapGrid1f { } ( GLint un, GLfloat u1, GLfloat u2 )
 
-FUNCTION: void glMapGrid2d ( GLint un, GLdouble u1, GLdouble u2,
+GL-FUNCTION: void glMapGrid2d { } ( GLint un, GLdouble u1, GLdouble u2,
                              GLint vn, GLdouble v1, GLdouble v2 )
-FUNCTION: void glMapGrid2f ( GLint un, GLfloat u1, GLfloat u2,
+GL-FUNCTION: void glMapGrid2f { } ( GLint un, GLfloat u1, GLfloat u2,
                              GLint vn, GLfloat v1, GLfloat v2 )
 
-FUNCTION: void glEvalPoint1 ( GLint i )
-FUNCTION: void glEvalPoint2 ( GLint i, GLint j )
+GL-FUNCTION: void glEvalPoint1 { } ( GLint i )
+GL-FUNCTION: void glEvalPoint2 { } ( GLint i, GLint j )
 
-FUNCTION: void glEvalMesh1 ( GLenum mode, GLint i1, GLint i2 )
-FUNCTION: void glEvalMesh2 ( GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2 )
+GL-FUNCTION: void glEvalMesh1 { } ( GLenum mode, GLint i1, GLint i2 )
+GL-FUNCTION: void glEvalMesh2 { } ( GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2 )
 
 
 ! Fog
 
-FUNCTION: void glFogf ( GLenum pname, GLfloat param )
-FUNCTION: void glFogi ( GLenum pname, GLint param )
-FUNCTION: void glFogfv ( GLenum pname, GLfloat* params )
-FUNCTION: void glFogiv ( GLenum pname, GLint* params )
+GL-FUNCTION: void glFogf { } ( GLenum pname, GLfloat param )
+GL-FUNCTION: void glFogi { } ( GLenum pname, GLint param )
+GL-FUNCTION: void glFogfv { } ( GLenum pname, GLfloat* params )
+GL-FUNCTION: void glFogiv { } ( GLenum pname, GLint* params )
 
 
 ! Selection and Feedback
 
-FUNCTION: void glFeedbackBuffer ( GLsizei size, GLenum type, GLfloat* buffer )
+GL-FUNCTION: void glFeedbackBuffer { } ( GLsizei size, GLenum type, GLfloat* buffer )
 
-FUNCTION: void glPassThrough ( GLfloat token )
-FUNCTION: void glSelectBuffer ( GLsizei size, GLuint* buffer )
-FUNCTION: void glInitNames ( )
-FUNCTION: void glLoadName ( GLuint name )
-FUNCTION: void glPushName ( GLuint name )
-FUNCTION: void glPopName ( )
+GL-FUNCTION: void glPassThrough { } ( GLfloat token )
+GL-FUNCTION: void glSelectBuffer { } ( GLsizei size, GLuint* buffer )
+GL-FUNCTION: void glInitNames { } ( )
+GL-FUNCTION: void glLoadName { } ( GLuint name )
+GL-FUNCTION: void glPushName { } ( GLuint name )
+GL-FUNCTION: void glPopName { } ( )
 
 << reset-gl-function-number-counter >>
 
