@@ -33,7 +33,7 @@ M: tile-pen pen-pref-dim
     2tri ;
 
 :: render-tile-gl3 ( tile x width gadget -- )
-    x gadget orientation>> '[ _ v* [ gl-round ] map ] dip :> loc
+    x gadget orientation>> v* [ gl-round ] map :> loc
     width gadget [ dim>> swap ] [ orientation>> ] bi set-axis :> dim
     tile cached-image :> img
     img make-texture-gl3 :> tex-id
@@ -46,9 +46,9 @@ M: tile-pen pen-pref-dim
         render-tile-gl3
     ] [
         ! Legacy GL path
-        [ orientation>> '[ _ v* [ gl-round ] map ] dip ] keep
+        [ orientation>> '[ _ v* [ gl-round ] map swap ] dip ] keep
        '[
-            _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
+            _ _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
             swap draw-scaled-image
        ] with-translation
     ] if ;

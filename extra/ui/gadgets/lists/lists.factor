@@ -54,8 +54,8 @@ M: list model-changed
     dup index>> swap children>> ?nth ;
 
 M: list draw-gadget*
-    origin get [
-        dup color>> gl-color
+    origin get swap '[
+        _ dup color>> gl-color
         selected-rect [
             rect-bounds gl-fill-rect
         ] when*

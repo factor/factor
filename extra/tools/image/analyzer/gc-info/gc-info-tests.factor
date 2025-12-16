@@ -9,7 +9,7 @@ IN: tools.image.analyzer.gc-info.tests
 QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
-QUALIFIED: gtk-samples.opengl
+QUALIFIED: gtk2-samples.opengl
 QUALIFIED: opencl
 
 : normal? ( word -- ? )
