@@ -771,26 +771,26 @@ make_boot_image() {
 }
 
 install_deps_apt() {
-    sudo apt install --yes libc6-dev libpango1.0-dev libx11-dev xorg-dev libgtk2.0-dev gtk2-engines-pixbuf libgtkglext1-dev wget git git-doc rlwrap clang make screen tmux libssl-dev
+    sudo apt install --yes libpango1.0-dev libgtk3.0-dev wget git rlwrap libssl-dev
     check_ret sudo
 }
 
 install_deps_pacman() {
-    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc gtk2 gtk3 gtkglext gtk-engines gdk-pixbuf2 libx11 screen tmux
+    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc gtk3 gdk-pixbuf2
     check_ret sudo
 }
 
 install_deps_dnf() {
-    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils libX11-devel pango-devel gtk3-devel gdk-pixbuf2-devel gtkglext-devel tmux rlwrap wget
+    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils pango-devel gtk3-devel gdk-pixbuf2-devel tmux rlwrap wget
     check_ret sudo
 }
 
 install_deps_pkg() {
-    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake x11-toolkits/gtk30 x11-toolkits/gtkglext pango cairo vim
+    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake pango cairo vim
 }
 
 install_deps_apk() {
-    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev libx11-dev gtk+2.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
+    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev gtk+3.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
     check_ret sudo
 }
 
