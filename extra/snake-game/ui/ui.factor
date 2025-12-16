@@ -28,7 +28,7 @@ CONSTANT: snake-game-cell-size 20
     game-textures get at ;
 
 : draw-sprite* ( key screen-loc -- )
-    [ lookup-texture draw-texture ] with-translation ;
+    swap '[ _ lookup-texture draw-texture ] with-translation ;
 
 : draw-sprite ( grid-loc key -- )
     swap game-loc>screen-loc draw-sprite* ;

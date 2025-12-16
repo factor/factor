@@ -75,8 +75,8 @@ CONSTANT: boid-triangle { { -6.0 4.0 } { -6.0 -4.0 } { 8.0 0.0 } }
     GL_TRIANGLES 0 3 glDrawArrays ;
 
 : draw-boid-legacy ( boid -- )
-    dup pos>> [
-        vel>> vec>deg 0 0 1 glRotated
+    [ pos>> ] keep '[
+        _ vel>> vec>deg 0 0 1 glRotated
         GL_TRIANGLES [
             -6.0  4.0 glVertex2f
             -6.0 -4.0 glVertex2f

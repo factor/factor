@@ -198,8 +198,8 @@ M: grid-gadget pref-dim*
 
 :: draw-mines ( n gadget -- )
     gadget cells>> won? 0 n ? "%03d" sprintf [
-        26 * 3 + 6 2array [
-            digit-image-path gadget draw-cached-texture
+        26 * 3 + 6 2array swap '[
+            _ digit-image-path gadget draw-cached-texture
         ] with-translation
     ] each-index ;
 
@@ -215,8 +215,8 @@ M: grid-gadget pref-dim*
 :: draw-timer ( n gadget -- )
     gadget pref-dim first :> width
     n 999 min "%03d" sprintf [
-        3 swap - 26 * width swap - 3 - 6 2array [
-            digit-image-path gadget draw-cached-texture
+        3 swap - 26 * width swap - 3 - 6 2array swap '[
+            _ digit-image-path gadget draw-cached-texture
         ] with-translation
     ] each-index ;
 

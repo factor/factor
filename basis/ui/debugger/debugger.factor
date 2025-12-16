@@ -5,6 +5,7 @@ kernel namespaces prettyprint ui ui.gadgets.worlds ;
 IN: ui.debugger
 
 : error-alert ( error -- )
+    [ dup error. ] with-global
     [ "Error" ] dip [ print-error ] with-string-writer
     system-alert ;
 

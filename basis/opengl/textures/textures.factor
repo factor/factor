@@ -1,10 +1,10 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs colors combinators
-destructors images images.tessellation kernel literals math
+destructors images images.tessellation kernel literals locals math
 math.statistics math.vectors namespaces opengl
 opengl.capabilities opengl.gl sequences specialized-arrays
-system ;
+system ui.render ui.render.gl3 ;
 FROM: alien.c-types => int float ;
 SPECIALIZED-ARRAY: float
 IN: opengl.textures
@@ -263,7 +263,12 @@ M: float-11-11-10-components (component-type>type)
 
 SLOT: display-list
 
-: draw-texture ( texture -- ) display-list>> [ glCallList ] when* ;
+GENERIC: draw-texture-gl3 ( texture -- )
+
+: draw-texture ( texture -- )
+    gl3-mode? get-global
+    [ draw-texture-gl3 ]
+    [ display-list>> [ glCallList ] when* ] if ;
 
 GENERIC: draw-scaled-texture ( dim texture -- )
 
@@ -358,18 +363,34 @@ TUPLE: single-texture < disposable image dim loc texture-coords texture display-
         swap >>loc
         swap [ >>image ] [ dim>> >>dim ] bi
     dup image>> dim>> product 0 = [
-        dup texture-coords >>texture-coords
-        dup image>> make-texture >>texture
-        dup make-texture-display-list >>display-list
+        gl3-mode? get-global [
+            dup image>> make-texture-gl3 >>texture
+        ] [
+            dup texture-coords >>texture-coords
+            dup image>> make-texture >>texture
+            dup make-texture-display-list >>display-list
+        ] if
     ] unless ;
 
 M: single-texture dispose*
     [ texture>> [ delete-texture ] when* ]
     [ display-list>> [ delete-dlist ] when* ] bi ;
 
+M:: single-texture draw-texture-gl3 ( texture -- )
+    texture loc>>
+    texture dim>>
+    texture texture>>
+    texture image>> upside-down?>>
+    gl3-draw-texture ;
+
+:: draw-scaled-texture-gl3 ( dim texture -- )
+    texture loc>> dim texture texture>> texture image>> upside-down?>> gl3-draw-texture ;
+
 M: single-texture draw-scaled-texture
     2dup dim>> = [ nip draw-texture ] [
-        dup texture>> [ draw-textured-rect ] [ 2drop ] if
+        gl3-mode? get-global
+        [ draw-scaled-texture-gl3 ]
+        [ dup texture>> [ draw-textured-rect ] [ 2drop ] if ] if
     ] if ;
 
 TUPLE: multi-texture < disposable grid display-list loc ;
@@ -403,7 +424,11 @@ TUPLE: multi-texture < disposable grid display-list loc ;
     [
         [ multi-texture new-disposable ] 2dip
         [ nip >>loc ] [ <texture-grid> >>grid ] 2bi
-        dup grid>> make-textured-grid-display-list >>display-list
+        gl3-mode? get-global [
+            ! Skip display list creation in GL3 mode
+        ] [
+            dup grid>> make-textured-grid-display-list >>display-list
+        ] if
     ] with-destructors ;
 
 : normalize-by-first-texture-max-dim ( multi-texture -- norms )
@@ -434,6 +459,9 @@ M: multi-texture draw-scaled-texture
     [ [ [ draw-scaled-texture ] 2each ] 2each ] tri ;
 
 M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
+
+M: multi-texture draw-texture-gl3
+    grid>> [ [ draw-texture-gl3 ] each ] each ;
 
 CONSTANT: max-texture-size { 512 512 }
 
