@@ -50,7 +50,7 @@ M: gtk3-clipboard set-clipboard-contents
     ] 2bi@ ;
 
 : update-scale-factor ( widget -- )
-    gtk_widget_get_scale_factor >float
+    gtk_widget_get_window gdk_window_get_scale_factor >float
     [ 1.0 > ] keep f ? gl-scale-factor set-global
     \ (cache-font-description) reset-memoized
     \ missing-font-metrics reset-memoized
@@ -192,16 +192,8 @@ icon-data [ default-icon-data ] initialize
 
 ! Render callback for GtkGLArea
 
-: get-drawable-dim ( glarea -- dim )
-    ! GTK3 allocated width/height are already in CSS pixels (logical units)
-    ! so no gl-unscale needed here
-    [ gtk_widget_get_allocated_width ]
-    [ gtk_widget_get_allocated_height ] bi 2array ;
-
 : on-render ( glarea context user-data -- ? )
-    2drop dup get-drawable-dim
-    swap gtk_widget_get_toplevel window
-    swap >>dim
+    2drop gtk_widget_get_toplevel window
     dup draw-world? [
         draw-world
     ] [ drop ] if
@@ -210,6 +202,16 @@ icon-data [ default-icon-data ] initialize
 : connect-render-signal ( drawable -- )
     "render" [ on-render yield ]
     GtkGLArea:render connect-signal ;
+
+: on-resize ( glarea width height user-data -- )
+    drop [ gl-unscale ] bi@ 2array swap gtk_widget_get_toplevel window
+    dup active?>> [
+        swap >>dim relayout
+    ] [ 2drop ] if ;
+
+: connect-resize-signal ( drawable -- )
+    "resize" [ on-resize yield ]
+    GtkGLArea:resize connect-signal ;
 
 ! Window state events
 
@@ -433,6 +435,7 @@ M:: gtk3-ui-backend (open-window) ( world -- )
     win im configure-im
     world handle>> connect-configure-signal
     drawable connect-render-signal
+    drawable connect-resize-signal
 
     win world window-controls>> configure-window-controls
     win gtk_widget_show_all ;
