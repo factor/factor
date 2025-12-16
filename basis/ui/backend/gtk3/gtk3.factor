@@ -352,29 +352,12 @@ M: gtk3-ui-backend (make-pixel-format) 2drop f ;
 
 M: gtk3-ui-backend (free-pixel-format) drop ;
 
-! GL3 initialization state
-SYMBOL: gl3-initialized?
-
 : gl3-full-draw-init ( world -- )
     ! Set up clip and viewport (GL3 version - no glOrtho)
     dup gl3-init-clip
     ! Set up GL state and projection in logical pixels
     ! (viewport handles device pixel scaling)
     [ dim>> ] [ background-color>> ] bi gl3-draw-init ;
-
-:: draw-single-texture-gl3 ( texture -- )
-    texture loc>>
-    texture dim>>
-    texture texture>>
-    texture image>> upside-down?>>
-    gl3-draw-texture ;
-
-GENERIC: draw-texture-gl3 ( texture -- )
-
-M: single-texture draw-texture-gl3 draw-single-texture-gl3 ;
-
-M: multi-texture draw-texture-gl3
-    grid>> [ [ draw-texture-gl3 ] each ] each ;
 
 : setup-gl3-hooks ( -- )
     [ gl3-init ] gl-init-hook set-global
@@ -393,18 +376,11 @@ M: multi-texture draw-texture-gl3
     [ draw-texture-gl3 ] draw-texture-hook set-global
     t gl3-mode? set-global ;
 
-: ensure-gl3-initialized ( -- )
-    gl3-initialized? get-global [
-        setup-gl3-hooks
-        t gl3-initialized? set-global
-    ] unless ;
-
 M: window-handle select-gl-context
     drawable>>
     [ gtk_gl_area_make_current ]
     [ gtk_gl_area_get_error f assert= ]
-    [ gtk_gl_area_attach_buffers ] tri
-    ensure-gl3-initialized ;
+    [ gtk_gl_area_attach_buffers ] tri ;
 
 M: window-handle flush-gl-context
     drawable>> gtk_gl_area_queue_render ;
@@ -517,6 +493,7 @@ M:: gtk3-ui-backend system-alert ( caption text -- )
 
 M: gtk3-ui-backend (with-ui)
     f f gtk_init_check [ "Unable to initialize GTK" throw ] unless
+    setup-gl3-hooks
     load-icon
     init-clipboard
     start-ui

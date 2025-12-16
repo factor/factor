@@ -814,3 +814,17 @@ SYMBOL: gl3-render-state
         } cleave
     ] when*
     f gl3-render-state set-global ;
+
+:: draw-single-texture-gl3 ( texture -- )
+    texture loc>>
+    texture dim>>
+    texture texture>>
+    texture image>> upside-down?>>
+    gl3-draw-texture ;
+
+GENERIC: draw-texture-gl3 ( texture -- )
+
+M: single-texture draw-texture-gl3 draw-single-texture-gl3 ;
+
+M: multi-texture draw-texture-gl3
+    grid>> [ [ draw-texture-gl3 ] each ] each ;
