@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.data arrays grouping kernel
 math math.constants math.functions namespaces opengl opengl.gl
 sequences specialized-arrays
 specialized-arrays.instances.alien.c-types.float ui.gadgets
-ui.pens ui.render ui.render.gl3 ;
+ui.pens ui.render ;
 FROM: alien.c-types => float ;
 IN: ui.pens.polygon
 

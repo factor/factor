@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors combinators images kernel locals math.vectors
 namespaces opengl opengl.textures sequences ui.images ui.pens
-ui.render ui.render.gl3 ;
+ui.render ;
 IN: ui.pens.tile
 
 ! Tile pen

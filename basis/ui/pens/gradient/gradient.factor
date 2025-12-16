@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays colors combinators kernel
 locals math math.vectors namespaces opengl opengl.gl sequences
-specialized-arrays ui.pens ui.pens.caching ui.render ui.render.gl3 ;
+specialized-arrays ui.pens ui.pens.caching ui.render ;
 FROM: alien.c-types => float ;
 SPECIALIZED-ARRAY: float
 IN: ui.pens.gradient

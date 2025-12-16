@@ -6,11 +6,11 @@ destructors environment gdk-pixbuf.ffi gdk3.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk3.ffi io io.encodings.binary
 io.encodings.utf8 io.files io.pathnames kernel libc literals
 locals math math.bitwise math.functions math.order math.parser
-math.vectors memoize namespaces opengl opengl.gl prettyprint
-sequences strings system threads ui ui.backend
+math.vectors memoize namespaces opengl opengl.gl opengl.textures
+prettyprint sequences strings system threads ui ui.backend
 ui.backend.gtk3.input-methods ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gestures ui.pixel-formats ui.private ui.render ui.render.gl3
+ui.gestures ui.pixel-formats ui.private ui.render
 ui.text.pango vocabs.loader ;
 IN: ui.backend.gtk3
 
@@ -362,6 +362,20 @@ SYMBOL: gl3-initialized?
     ! (viewport handles device pixel scaling)
     [ dim>> ] [ background-color>> ] bi gl3-draw-init ;
 
+:: draw-single-texture-gl3 ( texture -- )
+    texture loc>>
+    texture dim>>
+    texture texture>>
+    texture image>> upside-down?>>
+    gl3-draw-texture ;
+
+GENERIC: draw-texture-gl3 ( texture -- )
+
+M: single-texture draw-texture-gl3 draw-single-texture-gl3 ;
+
+M: multi-texture draw-texture-gl3
+    grid>> [ [ draw-texture-gl3 ] each ] each ;
+
 : setup-gl3-hooks ( -- )
     [ gl3-init ] gl-init-hook set-global
     [ gl3-full-draw-init ] gl-draw-init-hook set-global
@@ -375,6 +389,8 @@ SYMBOL: gl3-initialized?
     [ gl3-rectf ] gl-rectf-hook set-global
     [ with-gl3-matrix ] with-matrix-hook set-global
     [ gl3-draw-lines* ] gl-draw-lines-hook set-global
+    [ make-texture-gl3 ] make-texture-hook set-global
+    [ draw-texture-gl3 ] draw-texture-hook set-global
     t gl3-mode? set-global ;
 
 : ensure-gl3-initialized ( -- )

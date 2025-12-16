@@ -15,6 +15,7 @@ SYMBOL: gl-scale-factor
 
 ! --- GL3 Mode Hooks ---
 ! These hooks allow GL3 backends to override rendering behavior
+SYMBOL: gl3-mode?
 SYMBOL: gl-color-hook
 SYMBOL: gl-fill-rect-hook
 SYMBOL: gl-rect-hook

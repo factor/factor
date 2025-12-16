@@ -2,8 +2,7 @@ USING: accessors arrays colors columns combinators.smart kernel
 locals make math math.constants math.functions math.order
 math.vectors namespaces opengl opengl.gl sequences
 specialized-arrays.instances.alien.c-types.float ui.pens
-ui.pens.caching ui.pens.polygon ui.pens.solid ui.render
-ui.render.gl3 ;
+ui.pens.caching ui.pens.polygon ui.pens.solid ui.render ;
 IN: ui.pens.rounded
 
 TUPLE: rounded < solid radius ;

@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache formatting images images.loader
 kernel math namespaces opengl opengl.textures sequences
-splitting ui.gadgets.worlds ui.render ui.render.gl3 ;
+splitting ui.gadgets.worlds ui.render ;
 IN: ui.images
 
 TUPLE: image-name path ;

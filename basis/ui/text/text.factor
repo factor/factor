@@ -2,8 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cache combinators fonts kernel
 locals math math.order namespaces opengl opengl.gl opengl.textures
-sequences strings system ui.gadgets.worlds ui.render ui.render.gl3
-vocabs ;
+sequences strings system ui.gadgets.worlds ui.render vocabs ;
 IN: ui.text
 
 <PRIVATE
