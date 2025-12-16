@@ -13,7 +13,22 @@ IN: opengl
 
 SYMBOL: gl-scale-factor
 
-: gl-color ( color -- ) >rgba-components glColor4d ; inline
+! --- GL3 Mode Hooks ---
+! These hooks allow GL3 backends to override rendering behavior
+SYMBOL: gl-color-hook
+SYMBOL: gl-fill-rect-hook
+SYMBOL: gl-rect-hook
+SYMBOL: gl-line-hook
+SYMBOL: gl-translate-hook
+SYMBOL: with-translation-hook
+SYMBOL: gl-scale-2d-hook
+SYMBOL: gl-rectf-hook
+SYMBOL: with-matrix-hook
+SYMBOL: gl-draw-lines-hook
+
+: gl-color ( color -- )
+    gl-color-hook get-global
+    [ call( color -- ) ] [ >rgba-components glColor4d ] if* ; inline
 
 : gl-clear-color ( color -- ) >rgba-components glClearColor ;
 
@@ -94,6 +109,10 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 : do-matrix ( quot -- )
     glPushMatrix call glPopMatrix ; inline
 
+: with-matrix ( quot -- )
+    with-matrix-hook get-global
+    [ call( quot -- ) ] [ do-matrix ] if* ; inline
+
 : gl-material ( face pname params -- )
     float-array{ } like glMaterialfv ;
 
@@ -112,8 +131,12 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 : line-vertices ( a b -- )
     (line-vertices) gl-vertex-pointer ;
 
-: gl-line ( a b -- )
+: gl-line-legacy ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
+
+: gl-line ( a b -- )
+    gl-line-hook get-global
+    [ call( a b -- ) ] [ gl-line-legacy ] if* ;
 
 :: (rect-vertices) ( loc dim -- vertices )
     ! We use GL_LINE_STRIP with a duplicated first vertex
@@ -135,8 +158,12 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 : (gl-rect) ( -- )
     GL_LINE_STRIP 0 5 glDrawArrays ;
 
-: gl-rect ( loc dim -- )
+: gl-rect-legacy ( loc dim -- )
     rect-vertices (gl-rect) ;
+
+: gl-rect ( loc dim -- )
+    gl-rect-hook get-global
+    [ call( loc dim -- ) ] [ gl-rect-legacy ] if* ;
 
 :: (fill-rect-vertices) ( loc dim -- vertices )
     loc first2 :> ( x y )
@@ -154,8 +181,12 @@ MACRO: all-enabled-client-state ( seq quot -- quot )
 : (gl-fill-rect) ( -- )
     GL_QUADS 0 4 glDrawArrays ;
 
-: gl-fill-rect ( loc dim -- )
+: gl-fill-rect-legacy ( loc dim -- )
     fill-rect-vertices (gl-fill-rect) ;
+
+: gl-fill-rect ( loc dim -- )
+    gl-fill-rect-hook get-global
+    [ call( loc dim -- ) ] [ gl-fill-rect-legacy ] if* ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -221,12 +252,39 @@ MACRO: set-draw-buffers ( buffers -- quot )
 : make-dlist ( type quot -- id )
     [ gen-dlist ] 2dip '[ _ glNewList @ glEndList ] keep ; inline
 
-: gl-translate ( point -- ) first2 0.0 glTranslated ;
+: gl-translate-legacy ( point -- ) first2 0.0 glTranslated ;
+
+: gl-translate ( point -- )
+    gl-translate-hook get-global
+    [ call( point -- ) ] [ gl-translate-legacy ] if* ;
 
 : delete-dlist ( id -- ) 1 glDeleteLists ;
 
-: with-translation ( loc quot -- )
+: with-translation-legacy ( loc quot -- )
     [ [ gl-translate ] dip call ] do-matrix ; inline
+
+: with-translation ( loc quot -- )
+    with-translation-hook get-global
+    [ call( loc quot -- ) ] [ with-translation-legacy ] if* ; inline
+
+: gl-scale-2d-legacy ( sx sy -- ) 1.0 glScalef ;
+
+: gl-scale-2d ( sx sy -- )
+    gl-scale-2d-hook get-global
+    [ call( sx sy -- ) ] [ gl-scale-2d-legacy ] if* ; inline
+
+: gl-rectf-legacy ( x1 y1 x2 y2 -- ) glRectf ;
+
+: gl-rectf ( x1 y1 x2 y2 -- )
+    gl-rectf-hook get-global
+    [ call( x1 y1 x2 y2 -- ) ] [ gl-rectf-legacy ] if* ; inline
+
+: gl-draw-lines-legacy ( vertices n -- )
+    [ gl-vertex-pointer GL_LINES 0 ] dip glDrawArrays ;
+
+: gl-draw-lines ( vertices n -- )
+    gl-draw-lines-hook get-global
+    [ call( vertices n -- ) ] [ gl-draw-lines-legacy ] if* ; inline
 
 : gl-scale ( m -- n )
     gl-scale-factor get-global [ * ] when* ; inline
