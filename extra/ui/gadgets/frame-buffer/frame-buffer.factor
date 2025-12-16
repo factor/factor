@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.data grouping kernel
 math math.vectors namespaces opengl opengl.gl sequences
-specialized-arrays ui.gadgets ui.render ui.render.gl3 ;
+specialized-arrays ui.gadgets ui.render ;
 SPECIALIZED-ARRAY: uint
 IN: ui.gadgets.frame-buffer
 

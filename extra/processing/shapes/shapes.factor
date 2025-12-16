@@ -1,7 +1,7 @@
 USING: alien.c-types alien.data arrays colors grouping kernel
-math math.constants math.vectors namespaces opengl opengl.demo-support
-opengl.gl opengl.glu sequences sequences.generalizations ui.render
-ui.render.gl3 ;
+math math.constants math.vectors namespaces opengl
+opengl.demo-support opengl.gl opengl.glu sequences
+sequences.generalizations ui.render ;
 IN: processing.shapes
 
 SYMBOL: fill-color
