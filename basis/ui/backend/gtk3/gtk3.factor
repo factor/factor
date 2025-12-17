@@ -76,13 +76,16 @@ CONSTANT: events-mask
 ! hack for some window managers that have scale-factor set to
 ! 1x but the window still reports logical dimensions scaled
 ! vs. device pixel dimensions
-SYMBOL: ui-scale-factor
+SYMBOL: event-scale-factor
+
+: event-scale ( w h -- w' h' )
+    event-scale-factor get-global [ '[ _ * ] bi@ ] when* ;
 
 : event-loc ( event -- loc )
-    [ x>> ] [ y>> ] bi ui-scale-factor get-global [ [ * ] curry bi@ ] when* 2array ;
+    [ x>> ] [ y>> ] bi event-scale 2array ;
 
 : event-dim ( event -- dim )
-    [ width>> ] [ height>> ] bi ui-scale-factor get-global [ [ * ] curry bi@ ] when* 2array ;
+    [ width>> ] [ height>> ] bi event-scale 2array ;
 
 : scroll-direction ( event -- pair )
     dup direction>> {
@@ -200,14 +203,13 @@ icon-data [ default-icon-data ] initialize
 
 ! Render callback for GtkGLArea
 
-: calc-ui-scale-factor ( glarea world -- )
-    dim>> first
-    [ gtk_widget_get_allocated_width ] dip /
-    dup 1 number= [ drop f ] when ui-scale-factor set-global ;
+: calc-event-scale-factor ( glarea world -- )
+    dim>> first [ gtk_widget_get_allocated_width ] dip /
+    dup 1 number= [ drop f ] when event-scale-factor set-global ;
 
 : on-render ( glarea context user-data -- ? )
     2drop dup gtk_widget_get_toplevel window
-    2dup calc-ui-scale-factor
+    2dup calc-event-scale-factor
     nip dup draw-world? [
         draw-world
     ] [ drop ] if
