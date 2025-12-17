@@ -77,12 +77,10 @@ CONSTANT: events-mask
 SYMBOL: ui-scale-factor
 
 : event-loc ( event -- loc )
-    [ x>> ] [ y>> ] bi 2array
-    ui-scale-factor get-global [ [ / ] curry map ] when* ;
+    [ x>> ] [ y>> ] bi ui-scale-factor get-global [ [ * ] curry bi@ ] when* 2array ;
 
 : event-dim ( event -- dim )
-    [ width>> ] [ height>> ] bi 2array
-    ui-scale-factor get-global [ [ / ] curry map ] when* ;
+    [ width>> ] [ height>> ] bi ui-scale-factor get-global [ [ * ] curry bi@ ] when* 2array ;
 
 : scroll-direction ( event -- pair )
     direction>> {
