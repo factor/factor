@@ -79,7 +79,7 @@ CONSTANT: events-mask
 SYMBOL: event-scale-factor
 
 : event-scale ( w h -- w' h' )
-    event-scale-factor get-global [ '[ _ * ] bi@ ] when* ;
+    event-scale-factor get-global [ '[ _ / ] bi@ ] when* ;
 
 : event-loc ( event -- loc )
     [ x>> ] [ y>> ] bi event-scale 2array ;
