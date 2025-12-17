@@ -658,6 +658,7 @@ PRIVATE>
 
 : <FactorView> ( dim pixel-format -- view )
     [ FactorView ] 2dip <GLView>
+    [ 1 -> setWantsBestResolutionOpenGLSurface: ] keep
     [ -> backingScaleFactor set-scale-factor ] keep
     [ sync-refresh-to-screen ] keep ;
 

@@ -7,7 +7,7 @@ combinators core-foundation.run-loop core-foundation.strings
 core-graphics core-graphics.types io.thread kernel literals math
 math.bitwise math.rectangles namespaces sequences threads ui
 ui.backend ui.backend.cocoa.views ui.clipboards
-ui.gadgets.worlds ui.pixel-formats ui.private ui.theme
+ui.gadgets.worlds ui.pixel-formats ui.private ui.render ui.theme
 ui.theme.switching ;
 IN: ui.backend.cocoa
 
@@ -17,12 +17,17 @@ C: <window-handle> window-handle
 
 SINGLETON: cocoa-ui-backend
 
+CONSTANT: perm-attribs {
+    $ NSOpenGLPFAOpenGLProfile
+    $ NSOpenGLProfileVersion3_2Core
+}
+
 CONSTANT: attrib-table H{
     { double-buffered { $ NSOpenGLPFADoubleBuffer } }
     { stereo { $ NSOpenGLPFAStereo } }
     { offscreen { $ NSOpenGLPFAOffScreen } }
     { fullscreen { $ NSOpenGLPFAFullScreen } }
-    { windowed { $ NSOpenGLPFAWindow } }
+    { windowed { } }
     { accelerated { $ NSOpenGLPFAAccelerated } }
     { software-rendered {
           $ NSOpenGLPFARendererID
@@ -44,7 +49,7 @@ CONSTANT: attrib-table H{
 }
 
 M: cocoa-ui-backend (make-pixel-format)
-    nip { } attrib-table pixel-format-attributes>int-array
+    nip perm-attribs attrib-table pixel-format-attributes>int-array
     NSOpenGLPixelFormat -> alloc swap -> initWithAttributes: ;
 
 M: cocoa-ui-backend (free-pixel-format)
@@ -221,6 +226,7 @@ cocoa-startup-hook [
 
 M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
+        setup-gl3-hooks
         init-clipboard
         cocoa-startup-hook get call( -- )
         current-theme
