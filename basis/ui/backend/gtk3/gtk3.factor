@@ -69,6 +69,8 @@ CONSTANT: events-mask
         GDK_KEY_PRESS_MASK
         GDK_KEY_RELEASE_MASK
         GDK_FOCUS_CHANGE_MASK
+        GDK_SCROLL_MASK
+        GDK_SMOOTH_SCROLL_MASK
     }
 
 ! hack for some window managers that have scale-factor set to
@@ -83,12 +85,13 @@ SYMBOL: ui-scale-factor
     [ width>> ] [ height>> ] bi ui-scale-factor get-global [ [ * ] curry bi@ ] when* 2array ;
 
 : scroll-direction ( event -- pair )
-    direction>> {
+    dup direction>> {
         { $ GDK_SCROLL_UP { 0 -1 } }
         { $ GDK_SCROLL_DOWN { 0 1 } }
         { $ GDK_SCROLL_LEFT { -1 0 } }
         { $ GDK_SCROLL_RIGHT { 1 0 } }
-    } at ;
+        { $ GDK_SCROLL_SMOOTH f }
+    } at [ nip ] [ [ delta_x>> ] [ delta_y>> ] bi 2array ] if* ;
 
 : on-motion ( drawable event user-data -- ? )
     drop swap
