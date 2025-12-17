@@ -4,8 +4,8 @@ USING: accessors alien.c-types alien.data alien.syntax arrays
 assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
-fonts io.encodings.string io.encodings.utf16 kernel make
-math math.functions math.vectors namespaces opengl sequences
+fonts io.encodings.string io.encodings.utf16 kernel make math
+math.functions math.order math.vectors namespaces sequences
 strings ;
 IN: core-text
 
@@ -76,7 +76,7 @@ render-loc render-dim render-ext ;
 
 : metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    ceiling >integer 2array ;
+    [ ceiling ] bi@ 2array ;
 
 : fill-background ( context font dim -- )
     [ background>> >rgba-components CGContextSetRGBFillColor ]
@@ -108,8 +108,8 @@ render-loc render-dim render-ext ;
     first2 [ neg ] bi@ CGContextSetTextPosition ;
 
 :: line-loc ( metrics loc dim -- loc )
-    loc first
-    metrics ascent>> dim second loc second + - 1 - 2array ;
+    loc first round >integer
+    metrics ascent>> dim second loc second + - round >integer 1 - 2array ;
 
 :: <line> ( font string -- line )
     [
@@ -123,6 +123,10 @@ render-loc render-dim render-ext ;
         line >>line
     ] with-destructors ;
 
+! Core Graphics has a max surface size limit.
+! Clamp to avoid errors on very long lines.
+CONSTANT: max-layout-dim 16383
+
 :: render ( line -- line image )
     line line>> :> ctline
     line string>> :> string
@@ -135,7 +139,8 @@ render-loc render-dim render-ext ;
         rect size>> CGSize>dim :> (dim)
 
         (loc) vfloor :> loc
-        (dim) vceiling :> dim
+        (loc) loc v- :> frac
+        (dim) frac [ + ceiling max-layout-dim min ] 2map :> dim
         dim [ >integer 1 + ] map :> ext
 
         loc line render-loc<<
