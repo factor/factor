@@ -24,17 +24,6 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     [ >rgba-components 4array dup 2array ] map concat concat
     float >c-array ;
 
-M: gradient recompute-pen
-    [ nip ] [ [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi* ] 2bi
-    [ gradient-vertices >>last-vertices ]
-    [ gradient-colors >>last-colors ]
-    bi drop ;
-
-: draw-gradient ( colors -- )
-    GL_COLOR_ARRAY [
-        [ GL_QUAD_STRIP 0 ] dip length 2 * glDrawArrays
-    ] do-enabled-client-state ;
-
 :: quad-strip-to-triangles ( vertices colors -- float-array )
     ! vertices is a flat array of x,y coordinates (4 floats per color stripe: 2 vertices * 2 coords)
     ! colors is a flat array of r,g,b,a components (8 floats per color: 4 components * 2 vertices)
@@ -120,27 +109,34 @@ M: gradient recompute-pen
 
     result ;
 
-: draw-gradient-gl3 ( vertices colors num-colors -- )
-    drop quad-strip-to-triangles
-    ! Tell shader to use per-vertex colors instead of uniform color
-    use-vertex-colors
-    [ upload-vertices ] [ length 6 / GL_TRIANGLES 0 rot glDrawArrays ] bi ;
+M: gradient recompute-pen
+    [ nip ] [ [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi* ] 2bi
+    [ gradient-vertices >>last-vertices ]
+    [ gradient-colors >>last-colors ]
+    bi gl3-mode? get-global [
+        dup [ last-vertices>> ] [ last-colors>> ] bi
+        quad-strip-to-triangles >>last-vertices
+    ] when drop ;
+
+: draw-gradient ( colors -- )
+    GL_COLOR_ARRAY [
+        [ GL_QUAD_STRIP 0 ] dip length 2 * glDrawArrays
+    ] do-enabled-client-state ;
 
 PRIVATE>
 
 M: gradient draw-interior
+    {
+        [ compute-pen ]
+        [ last-vertices>> ]
+        [ last-colors>> ]
+        [ colors>> ]
+    } cleave
     gl3-mode? get-global [
-        {
-            [ compute-pen ]
-            [ [ last-vertices>> ] [ last-colors>> ] [ colors>> length ] tri draw-gradient-gl3 ]
-        } cleave
+        2drop use-vertex-colors [ upload-vertices ] [ length 6 /i ] bi
+        GL_TRIANGLES 0 rot glDrawArrays
     ] [
-        {
-            [ compute-pen ]
-            [ last-vertices>> gl-vertex-pointer ]
-            [ last-colors>> gl-color-pointer ]
-            [ colors>> draw-gradient ]
-        } cleave
+        [ gl-vertex-pointer ] [ gl-color-pointer ] [ draw-gradient ] tri*
     ] if ;
 
 M: gradient pen-background 2drop transparent ;

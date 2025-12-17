@@ -73,32 +73,26 @@ PRIVATE>
     ] float-array{ } make ;
 
 M: rounded draw-boundary
+    [ (rounded) ] [ boundary-vertices>> ] bi
     gl3-mode? get-global [
-        ! GL3 path: convert flat x,y vertices to x,y,r,g,b,a format
-        [ (rounded) ] keep
-        [ boundary-vertices>> ] [ color>> ] bi flat-xy-to-gl3-vertices
-        [ upload-vertices ] [ length 6 /i GL_LINE_STRIP 0 rot ] bi glDrawArrays
+        [ upload-vertices ] [ length 6 /i ] bi GL_LINE_STRIP 0 rot glDrawArrays
     ] [
-        ! Legacy GL path
-        [ (rounded) GL_LINE_STRIP 0 ] [ boundary-vertices>> ] bi
-        [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi
+        [ gl-vertex-pointer ] [ length 2/ ] bi GL_LINE_STRIP 0 rot glDrawArrays
     ] if ;
 
 M: rounded draw-interior
+    [ (rounded) ] [ interior-vertices>> ] bi
     gl3-mode? get-global [
-        ! GL3 path: convert flat x,y vertices to x,y,r,g,b,a format
-        ! Use GL_TRIANGLE_FAN instead of GL_POLYGON (removed in GL3)
-        [ (rounded) ] keep
-        [ interior-vertices>> ] [ color>> ] bi flat-xy-to-gl3-vertices
-        [ upload-vertices ] [ length 6 /i GL_TRIANGLE_FAN 0 rot ] bi glDrawArrays
+        [ upload-vertices ] [ length 6 /i ] bi GL_TRIANGLE_FAN 0 rot glDrawArrays
     ] [
-        ! Legacy GL path
-        [ (rounded) GL_POLYGON 0 ] [ interior-vertices>> ] bi
-        [ gl-vertex-pointer ] [ length 2/ glDrawArrays ] bi
+        [ gl-vertex-pointer ] [ length 2/ ] bi GL_POLYGON 0 rot glDrawArrays
     ] if ;
 
 M: rounded recompute-pen
     swap over [ dim>> ] [ radius>> ] bi*
     [ [ { 0 0 } ] 2dip (rounded-rect-vertices) close-path >>interior-vertices ]
     [ [ { 0 0 } swap boundary-shift ] dip (rounded-rect-vertices) >>boundary-vertices ]
-    2bi drop ;
+    2bi gl3-mode? get-global [
+        dup color>> '[ _ flat-xy-to-gl3-vertices ]
+        [ change-interior-vertices ] [ change-boundary-vertices ] bi
+    ] when drop ;

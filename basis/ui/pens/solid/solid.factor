@@ -9,10 +9,14 @@ TUPLE: solid < caching-pen color interior-vertices boundary-vertices ;
 : <solid> ( color -- solid ) solid new swap >>color ;
 
 M: solid recompute-pen
-    swap dim>>
-    [ [ { 0 0 } ] dip (fill-rect-vertices) >>interior-vertices ]
-    [ [ { 0 0 } ] dip (rect-vertices) >>boundary-vertices ]
-    bi drop ;
+    swap dim>> { 0 0 } swap
+    gl3-mode? get-global [
+        [ (gl3-fill-rect*-vertices) >>interior-vertices ]
+        [ (gl3-rect*-vertices) >>boundary-vertices ] 2bi
+    ] [
+        [ (fill-rect-vertices) >>interior-vertices ]
+        [ (rect-vertices) >>boundary-vertices ] 2bi
+    ] if drop ;
 
 <PRIVATE
 
@@ -22,19 +26,19 @@ M: solid recompute-pen
 PRIVATE>
 
 M: solid draw-interior
+    [ (solid) ] [ interior-vertices>> ] bi
     gl3-mode? get-global [
-        [ (solid) ] [ drop dim>> { 0 0 } swap gl-fill-rect ] 2bi
+        upload-vertices (gl3-fill-rect)
     ] [
-        [ (solid) ] [ interior-vertices>> gl-vertex-pointer ] bi
-        (gl-fill-rect)
+        gl-vertex-pointer (gl-fill-rect)
     ] if ;
 
 M: solid draw-boundary
+    [ (solid) ] [ boundary-vertices>> ] bi
     gl3-mode? get-global [
-        [ (solid) ] [ drop dim>> { 0 0 } swap gl-rect ] 2bi
+        upload-vertices (gl3-rect)
     ] [
-        [ (solid) ] [ boundary-vertices>> gl-vertex-pointer ] bi
-        (gl-rect)
+        gl-vertex-pointer (gl-rect)
     ] if ;
 
 M: solid pen-background
