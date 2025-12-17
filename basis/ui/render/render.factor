@@ -828,3 +828,27 @@ M: single-texture draw-texture-gl3 draw-single-texture-gl3 ;
 
 M: multi-texture draw-texture-gl3
     grid>> [ [ draw-texture-gl3 ] each ] each ;
+
+: gl3-full-draw-init ( world -- )
+    ! Set up clip and viewport (GL3 version - no glOrtho)
+    dup gl3-init-clip
+    ! Set up GL state and projection in logical pixels
+    ! (viewport handles device pixel scaling)
+    [ dim>> ] [ background-color>> ] bi gl3-draw-init ;
+
+: setup-gl3-hooks ( -- )
+    [ gl3-init ] gl-init-hook set-global
+    [ gl3-full-draw-init ] gl-draw-init-hook set-global
+    [ gl3-color ] gl-color-hook set-global
+    [ gl3-fill-rect* ] gl-fill-rect-hook set-global
+    [ gl3-rect* ] gl-rect-hook set-global
+    [ gl3-line* ] gl-line-hook set-global
+    [ first2 gl3-translate ] gl-translate-hook set-global
+    [ with-gl3-translation ] with-translation-hook set-global
+    [ gl3-scale ] gl-scale-2d-hook set-global
+    [ gl3-rectf ] gl-rectf-hook set-global
+    [ with-gl3-matrix ] with-matrix-hook set-global
+    [ gl3-draw-lines* ] gl-draw-lines-hook set-global
+    [ make-texture-gl3 ] make-texture-hook set-global
+    [ draw-texture-gl3 ] draw-texture-hook set-global
+    t gl3-mode? set-global ;
