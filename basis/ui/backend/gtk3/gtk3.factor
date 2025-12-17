@@ -204,16 +204,13 @@ icon-data [ default-icon-data ] initialize
 ! Render callback for GtkGLArea
 
 : calc-event-scale-factor ( glarea world -- )
-    dim>> first [ gtk_widget_get_allocated_width ] dip /
-    dup 1 number= [ drop f ] when event-scale-factor set-global ;
+    event-scale-factor get-global [
+        dim>> first [ gtk_widget_get_allocated_width ] dip /
+        event-scale-factor set-global
+    ] [ 2drop ] if ;
 
 : on-render ( glarea context user-data -- ? )
-    2drop dup gtk_widget_get_toplevel window
-    2dup calc-event-scale-factor
-    nip dup draw-world? [
-        draw-world
-    ] [ drop ] if
-    f ;
+    2drop dup gtk_widget_get_toplevel window calc-event-scale-factor f ;
 
 : connect-render-signal ( drawable -- )
     "render" [ on-render yield ]
@@ -221,9 +218,7 @@ icon-data [ default-icon-data ] initialize
 
 : on-resize ( glarea width height user-data -- )
     drop [ gl-unscale ] bi@ 2array swap gtk_widget_get_toplevel window
-    dup active?>> [
-        swap >>dim relayout
-    ] [ 2drop ] if ;
+    dup active?>> [ swap >>dim relayout ] [ 2drop ] if ;
 
 : connect-resize-signal ( drawable -- )
     "resize" [ on-resize yield ]
