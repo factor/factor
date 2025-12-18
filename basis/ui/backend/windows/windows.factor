@@ -691,8 +691,35 @@ M: windows-ui-backend do-events
 : get-dc ( world -- )
     handle>> dup hWnd>> GetDC dup win32-error=0/f >>hDC drop ;
 
+<<
+CONSTANT: WGL_CONTEXT_MAJOR_VERSION_ARB           0x2091
+CONSTANT: WGL_CONTEXT_MINOR_VERSION_ARB           0x2092
+CONSTANT: WGL_CONTEXT_LAYER_PLANE_ARB             0x2093
+CONSTANT: WGL_CONTEXT_FLAGS_ARB                   0x2094
+CONSTANT: WGL_CONTEXT_PROFILE_MASK_ARB            0x9126
+
+CONSTANT: WGL_CONTEXT_DEBUG_BIT_ARB               0x0001
+CONSTANT: WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB  0x0002
+
+CONSTANT: WGL_CONTEXT_CORE_PROFILE_BIT_ARB        0x00000001
+CONSTANT: WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB 0x00000002
+
+CONSTANT: ERROR_INVALID_VERSION_ARB               0x2095
+CONSTANT: ERROR_INVALID_PROFILE_ARB               0x2096
+>>
+
+CONSTANT: gl3-attribs int-array{
+    $ WGL_CONTEXT_MAJOR_VERSION_ARB 3
+    $ WGL_CONTEXT_MINOR_VERSION_ARB 2
+    $ WGL_CONTEXT_PROFILE_MASK_ARB $ WGL_CONTEXT_CORE_PROFILE_BIT_ARB
+    0
+}
+
 : get-rc ( world -- )
-    handle>> dup hDC>> dup wglCreateContext dup win32-error=0/f
+    handle>> dup hDC>>
+    ! dup f gl3-attribs wglCreateContextAttribsARB
+    dup wglCreateContext
+    dup win32-error=0/f
     [ wglMakeCurrent win32-error=0/f ] keep >>hRC drop ;
 
 : set-pixel-format ( pixel-format hdc -- )
