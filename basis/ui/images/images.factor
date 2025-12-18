@@ -37,28 +37,11 @@ PRIVATE>
     world get image-texture-cache
     [ cached-image { 0 0 } <texture> ] cache ;
 
-! GL3 image drawing (creates texture, draws, deletes)
-:: draw-image-gl3 ( image -- )
-    image cached-image :> img
-    img make-texture-gl3 :> tex-id
-    { 0 0 } img dim>> [ gl-unscale ] map tex-id img upside-down?>> gl3-draw-texture
-    tex-id delete-texture ;
-
-:: draw-scaled-image-gl3 ( dim image -- )
-    image cached-image :> img
-    img make-texture-gl3 :> tex-id
-    { 0 0 } dim tex-id img upside-down?>> gl3-draw-texture
-    tex-id delete-texture ;
-
 : draw-image ( image -- )
-    gl3-mode? get-global
-    [ draw-image-gl3 ]
-    [ rendered-image draw-texture ] if ;
+    rendered-image draw-texture ;
 
 : draw-scaled-image ( dim image -- )
-    gl3-mode? get-global
-    [ draw-scaled-image-gl3 ]
-    [ rendered-image draw-scaled-texture ] if ;
+    rendered-image draw-scaled-texture ;
 
 : image-dim ( image -- dim )
     cached-image dim>> [ gl-unscale ] map ;

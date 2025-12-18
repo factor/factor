@@ -827,7 +827,7 @@ SYMBOL: gl3-render-state
 
 :: draw-single-texture-gl3 ( texture -- )
     texture loc>>
-    texture dim>>
+    texture dim>> [ gl-unscale ] map
     texture texture>>
     texture image>> upside-down?>>
     gl3-draw-texture ;
