@@ -66,16 +66,20 @@ The nightly builds are usually a better experience than the point releases.
 * macOS: Double-click `Factor.app` or run `open Factor.app` in a Terminal
 * Unix: Run `./factor` in a shell
 
-#### Linux: Debian 13 and newer Ubuntu (25.10+)
+#### Linux GUI requirements
 
-On Debian 13 “Trixie” and newer Ubuntu releases (25.10 “Questing Quokka”
-and the 26.04 “Resolute Raccoon” development branch), the `gtkglext`
-library is no longer shipped in the official repositories. Factor's GUI
-depends on this library, so a fresh install cannot start the GUI on these
-systems.
+##### Stable release (GTK2 + gtkglext)
 
-As a Debian temporary workaround you can manually install the legacy Debian
-package and add two symbolic links:
+The current stable version of Factor uses GTK2 and `gtkglext`.  
+On Debian 13 “Trixie” and newer Ubuntu releases (25.10 “Questing Quokka” and the 26.04 “Resolute Raccoon” development branch), the `gtkglext` library is no longer available in the official repositories.
+
+Factor's GUI depends on this library, so a fresh install cannot start the GUI on these systems.
+
+---
+
+###### Debian workaround:
+
+You can manually install the legacy Debian package and add symbolic links:
 
 ```bash
 wget -c http://http.us.debian.org/debian/pool/main/g/gtkglext/libgtkglext1_1.2.0-11_amd64.deb
@@ -91,11 +95,68 @@ sudo ln -s /usr/lib/x86_64-linux-gnu/libgdkglext-x11-1.0.so.0 \
 This workaround has been tested in clean containers for:
 
 * Debian 13
+
+---
+
+###### Ubuntu workaround:
+
+You can install the `libgtkglext1` `.deb` package from a previous Ubuntu release (e.g. 25.04 “Plucky Pangolin”)
+and manually add symbolic links expected by Factor:
+
+```bash
+# Install .deb from Ubuntu 25.04:
+wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gtkglext/libgtkglext1_1.2.0-11_amd64.deb
+sudo apt install ./libgtkglext1_1.2.0-11_amd64.deb
+
+# Add missing symlinks manually:
+cd /usr/lib/x86_64-linux-gnu
+sudo ln -s libgtkglext-x11-1.0.so.0.0.0 libgtkglext-x11-1.0.so
+sudo ln -s libgdkglext-x11-1.0.so.0.0.0 libgdkglext-x11-1.0.so
+```
+
+This workaround has been tested in clean containers for:
+
 * Ubuntu 25.10
 * Ubuntu 26.04 (development branch)
 
-On Debian 12, Ubuntu 22.04, 24.04 and 25.04 libgtkglext1 is still available in the
-repositories and no workaround is required.
+---
+
+On Debian 12, Ubuntu 22.04, 24.04 and 25.04 `libgtkglext1` is still available in the repositories and no workaround is required.
+
+##### Development branch (GTK3)
+
+The development branch of Factor has switched from GTK2 to GTK3 for the GUI backend. If you're building or running a binary from the development branch, make sure the GTK3 development library is installed.
+
+If this library is missing, you may see the following error when launching Factor from a terminal:
+
+```
+DlError: libgtk-3.so: cannot open shared object file: No such file or directory
+```
+
+To fix this, install the required package:
+
+* Debian/Ubuntu:
+
+  ```bash
+  sudo apt install libgtk-3-dev
+  ```
+* Fedora:
+
+  ```bash
+  sudo dnf install gtk3-devel
+  ```
+* Arch:
+
+  ```bash
+  sudo pacman -S gtk3
+  ```
+
+If the library is installed but still not found, make sure it is in your `LD_LIBRARY_PATH`, or run `sudo ldconfig`.
+
+```bash
+# Example:
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+```
 
 ### Learning Factor
 
