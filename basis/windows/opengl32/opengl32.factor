@@ -52,6 +52,7 @@ LIBRARY: gl
 ! FUNCTION: HGDIOBJ SelectObject ( HDC hDC, HGDIOBJ hgdiobj ) ;
 
 FUNCTION: HGLRC wglCreateContext ( HDC hDC )
+FUNCTION: HGLRC wglCreateContextAttribsARB ( HDC hDC, HGLRC hShareContext, int* attribList )
 FUNCTION: BOOL wglDeleteContext ( HGLRC hRC )
 FUNCTION: BOOL wglMakeCurrent ( HDC hDC, HGLRC hglrc )
 
