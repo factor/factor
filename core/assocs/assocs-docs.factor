@@ -610,11 +610,11 @@ HELP: zip-as
 
 HELP: zip-index
 { $values
-    { "values" sequence }
+    { "keys" sequence }
     { "alist" "an array of key/value pairs" }
 }
 { $examples
-    "Zip a sequnce with its indices:"
+    "Zip a sequence with its indices:"
     { $example "USING: assocs prettyprint ;"
         "{ 100 200 300 } zip-index ."
         "{ { 100 0 } { 200 1 } { 300 2 } }"
@@ -624,11 +624,11 @@ HELP: zip-index
 
 HELP: zip-index-as
 { $values
-    { "values" sequence } { "exemplar" sequence }
+    { "keys" sequence } { "exemplar" sequence }
     { "assoc" assoc }
 }
 { $examples
-    "Zip a sequnce with its indices as a vector:"
+    "Zip a sequence with its indices as a vector:"
     { $example "USING: assocs prettyprint ;"
         "{ 100 200 300 } V{ } zip-index-as ."
         "V{ { 100 0 } { 200 1 } { 300 2 } }"

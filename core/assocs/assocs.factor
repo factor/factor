@@ -234,10 +234,10 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : zip ( keys values -- alist )
     { } zip-as ; inline
 
-: zip-index-as ( values exemplar -- assoc )
+: zip-index-as ( keys exemplar -- assoc )
     [ dup length <iota> ] dip zip-as ; inline
 
-: zip-index ( values -- alist )
+: zip-index ( keys -- alist )
     { } zip-index-as ; inline
 
 M: assoc unzip
