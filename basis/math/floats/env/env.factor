@@ -156,5 +156,6 @@ PRIVATE>
 {
     { [ cpu x86? ] [ "math.floats.env.x86" require ] }
     { [ cpu ppc? ] [ "math.floats.env.ppc" require ] }
+    { [ cpu arm.64? ] [ "math.floats.env.arm.64" require ] }
     [ "CPU architecture unsupported by math.floats.env" throw ]
 } cond

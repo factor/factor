@@ -25,7 +25,8 @@ enum relocation_type {
   RT_CARDS_OFFSET,
   // value of vm->decks_offset
   RT_DECKS_OFFSET,
-  RT_UNUSED,
+  // address of trampoline function
+  RT_TRAMPOLINE,
   // arg is a literal table index, holding a pair (symbol/dll)
   RT_DLSYM_TOC,
   // address of inline_cache_miss function. This is a separate
@@ -99,6 +100,7 @@ struct relocation_entry {
       case RT_MEGAMORPHIC_CACHE_HITS:
       case RT_CARDS_OFFSET:
       case RT_DECKS_OFFSET:
+      case RT_TRAMPOLINE:
       case RT_INLINE_CACHE_MISS:
       case RT_SAFEPOINT:
         return 0;

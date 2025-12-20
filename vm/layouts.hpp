@@ -124,7 +124,7 @@ struct object {
   template <typename Iterator> void each_slot(Iterator& iter);
 
   // Only valid for objects in tenured space; must cast to free_heap_block
-  // to do anything with it if its free
+  // to do anything with it if it's free
   bool free_p() const { return (header & 1) == 1; }
 
   cell type() const { return (header >> 2) & TAG_MASK; }

@@ -602,4 +602,6 @@ HOOK: %callback-outputs cpu ( reg-inputs -- )
 
 HOOK: stack-cleanup cpu ( stack-size return abi -- n )
 
+M: object stack-cleanup 3drop 0 ;
+
 HOOK: enable-cpu-features cpu ( -- )

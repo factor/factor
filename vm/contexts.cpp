@@ -108,8 +108,10 @@ void factor_vm::init_context(context* ctx) {
 
 // Allocates memory (init_context(), but not parent->new_context()
 VM_C_API context* new_context(factor_vm* parent) {
+  JIT_WRITABLE
   context* new_context = parent->new_context();
   parent->init_context(new_context);
+  JIT_EXECUTABLE
   return new_context;
 }
 
@@ -131,6 +133,8 @@ VM_C_API void delete_context(factor_vm* parent) {
 // Allocates memory (init_context())
 VM_C_API void reset_context(factor_vm* parent) {
 
+  JIT_WRITABLE
+
   // The function is used by (start-context-and-delete) which expects
   // the top two datastack items to be preserved after the context has
   // been resetted.
@@ -142,6 +146,8 @@ VM_C_API void reset_context(factor_vm* parent) {
   ctx->push(arg2);
   ctx->push(arg1);
   parent->init_context(ctx);
+
+  JIT_EXECUTABLE
 }
 
 // Allocates memory

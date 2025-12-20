@@ -206,7 +206,7 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_all_roots() {
   }
 
   auto callback_slot_visitor = [&](code_block* stub, cell size) {
-	  (void)size;
+    (void)size;
     visit_handle(&stub->owner);
   };
   parent->callbacks->allocator->iterate(callback_slot_visitor, no_fixup());
@@ -246,13 +246,21 @@ template <typename Fixup> struct call_frame_slot_visitor {
   //              [size]
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
-	  (void)size;
+    (void)size;
     cell return_address = owner->offset(addr);
 
     code_block* compiled =
         Fixup::translated_code_block_map ? owner
                                          : visitor->fixup.translate_code(owner);
     gc_info* info = compiled->block_gc_info();
+
+#ifdef FACTOR_ARM64
+    if (*(cell*)frame_top < frame_top) {
+      frame_top += *(cell*)frame_top;
+    } else {
+      frame_top = *(cell*)frame_top;
+    }
+#endif
 
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
@@ -362,7 +370,7 @@ template <typename Fixup> struct call_frame_code_block_visitor {
 
   void operator()(cell frame_top, cell size, code_block* owner, cell addr) {
     (void)size;
-	  code_block* compiled =
+    code_block* compiled =
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
     cell fixed_addr = compiled->address_for_offset(owner->offset(addr));
 

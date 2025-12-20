@@ -1,4 +1,4 @@
-USING: compiler.cfg.instructions cpu.x86 help.markup help.syntax layouts math ;
+USING: compiler.cfg.instructions help.markup help.syntax layouts math ;
 IN: compiler.cfg.stack-frame
 
 HELP: stack-frame
@@ -7,7 +7,7 @@ HELP: stack-frame
     "Parameter space: space for parameters to FFI functions "
     "Allocation area: space for local allocations."
     "Spill area: space for register spills."
-    { "Reserved stack space: only applicable on Windows x86.64. See " { $link reserved-stack-space } "." }
+    { "Reserved stack space: only applicable on Windows x86.64. See " { $snippet "reserved-stack-space" } "." }
     { "One final " { $link cell } " of padding." }
   }
   "The stack frame is also aligned to a 16 byte boundary. It has the following slots:"
@@ -21,8 +21,8 @@ HELP: stack-frame
     { "spill-area-size" { "Number of bytes requires for all spill slots." } }
     { "spill-area-align" { "This slot is always at least " { $link cell } " bytes." } }
   }
-}
-{ $see-also align-stack } ;
+  "See also " { $snippet "align-stack" } " of the " { $vocab-link "cpu.x86" } " vocabulary."
+} ;
 
 HELP: (stack-frame-size)
 { $values { "stack-frame" stack-frame } { "n" integer } }

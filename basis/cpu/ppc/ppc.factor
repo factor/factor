@@ -495,9 +495,6 @@ M: ppc %callback-outputs
     "end_callback" f f %c-invoke
     [ first3 store-reg-param ] each ;
 
-M: ppc stack-cleanup
-    3drop 0 ;
-
 M: ppc fused-unboxing? f ;
 
 M: ppc %alien-global

@@ -64,6 +64,8 @@ ERROR: unknown-cpuinfo-line string ;
         ] }
         { "apicid" [ string>number >>apicid ] }
         { "bogomips" [ string>number >>bogomips ] }
+        { "BogoMIPS" [ string>number >>bogomips ] }
+        { "bugs" [ >>bugs ] }
         { "cache size" [
             split-words first [ CHAR: \s = ] trim
             string>number 1024 * >>cache-size
@@ -73,11 +75,17 @@ ERROR: unknown-cpuinfo-line string ;
         { "coma_bug" [ "yes" = >>coma-bug? ] }
         { "core id" [ string>number >>core-id ] }
         { "cpu MHz" [ string>number >>cpu-mhz ] }
+        { "CPU architecture" [ drop ] }
         { "cpu cores" [ string>number >>cpu-cores ] }
         { "cpu family" [ string>number >>cpu-family ] }
+        { "CPU implementer" [ drop ] }
+        { "CPU revision" [ drop ] }
+        { "CPU part" [ drop ] }
+        { "CPU variant" [ drop ] }
         { "cpuid level" [ string>number >>cpuid-level ] }
         { "f00f_bug" [ "yes" = >>f00f-bug? ] }
         { "fdiv_bug" [ "yes" = >>fdiv-bug? ] }
+        { "Features" [ split-words harvest >>flags ] }
         { "flags" [ split-words harvest >>flags ] }
         { "fpu" [ "yes" = >>fpu? ] }
         { "fpu_exception" [ "yes" = >>fpu-exception? ] }
@@ -91,11 +99,10 @@ ERROR: unknown-cpuinfo-line string ;
         { "processor" [ string>number >>processor ] }
         { "siblings" [ string>number >>siblings ] }
         { "stepping" [ string>number >>stepping ] }
-        { "vendor_id" [ >>vendor-id ] }
-        { "wp" [ "yes" = >>wp? ] }
         { "TLB size" [ >>tlb-size ] }
-        { "bugs" [ >>bugs ] }
+        { "vendor_id" [ >>vendor-id ] }
         { "vmx flags" [ >>vmx-flags ] }
+        { "wp" [ "yes" = >>wp? ] }
         [ unknown-cpuinfo-line ]
     } case ;
 

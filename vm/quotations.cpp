@@ -305,8 +305,7 @@ code_block* factor_vm::jit_compile_quotation(cell owner_, cell quot_,
 void factor_vm::jit_compile_quotation(cell quot_, bool relocating) {
   data_root<quotation> quot(quot_, this);
   if (!quotation_compiled_p(quot.untagged())) {
-    code_block* compiled =
-        jit_compile_quotation(quot.value(), quot.value(), relocating);
+    code_block* compiled = jit_compile_quotation(quot.value(), quot.value(), relocating);
     quot.untagged()->entry_point = compiled->entry_point();
   }
 }
@@ -356,6 +355,7 @@ fixnum factor_vm::quot_code_offset_to_scan(cell quot_, cell offset) {
 
 // Allocates memory
 cell factor_vm::lazy_jit_compile(cell quot_) {
+  JIT_WRITABLE
   data_root<quotation> quot(quot_, this);
 
   FACTOR_ASSERT(!quotation_compiled_p(quot.untagged()));
@@ -363,6 +363,7 @@ cell factor_vm::lazy_jit_compile(cell quot_) {
   code_block* compiled =
       jit_compile_quotation(quot.value(), quot.value(), true);
   quot.untagged()->entry_point = compiled->entry_point();
+  JIT_EXECUTABLE
 
   return quot.value();
 }

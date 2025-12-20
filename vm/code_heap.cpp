@@ -5,17 +5,25 @@ namespace factor {
 code_heap::code_heap(cell size) {
   if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
+#ifdef FACTOR_ARM64
+  if (size > 0x8000000)
+    fatal_error("Heap too large", size);
+#endif
   seg = new segment(align_page(size), true);
   if (!seg)
     fatal_error("Out of memory in code_heap constructor", size);
 
-  cell start = seg->start + getpagesize() + seh_area_size;
+  safepoint_seg = new segment(align_page(getpagesize()), false);
+  if (!safepoint_seg)
+    fatal_error("Out of memory in code_heap constructor", size);
+
+  cell start = seg->start + seh_area_size;
 
   allocator = new free_list_allocator<code_block>(seg->end - start, start);
 
   // See os-windows-x86.64.cpp for seh_area usage
-  safepoint_page = seg->start;
-  seh_area = (char*)seg->start + getpagesize();
+  safepoint_page = safepoint_seg->start;
+  seh_area = (char*)seg->start;
 }
 
 code_heap::~code_heap() {
@@ -96,7 +104,7 @@ cell code_heap::frame_predecessor(cell frame_top) {
 #ifdef FACTOR_ARM64
   return *(cell*)frame_top;
 #else
-  cell addr = *(cell*)(frame_top + FRAME_RETURN_ADDRESS);
+  cell addr = *(cell*)frame_top;
   FACTOR_ASSERT(seg->in_segment_p(addr));
   code_block* owner = code_block_for_address(addr);
   cell frame_size = owner->stack_frame_size_for_address(addr);

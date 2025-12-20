@@ -75,5 +75,6 @@ VM_C_API void delete_context(factor_vm* parent);
 VM_C_API void reset_context(factor_vm* parent);
 VM_C_API cell begin_callback(factor_vm* parent, cell quot);
 VM_C_API void end_callback(factor_vm* parent);
+VM_C_API void trampoline();
 
 }

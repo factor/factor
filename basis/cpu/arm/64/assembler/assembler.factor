@@ -1,121 +1,16 @@
 ! Copyright (C) 2024 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs combinators
+USING: accessors alien.c-types arrays combinators
 combinators.short-circuit compiler.codegen.labels
-compiler.constants cpu.architecture endian generalizations
-grouping kernel make math math.bits math.bitwise math.order
-math.parser parser prettyprint.custom prettyprint.sections
-sequences sequences.generalizations words.constant ;
+compiler.codegen.relocation compiler.constants cpu.architecture
+cpu.arm.64.assembler.registers endian generalizations grouping
+kernel make math math.bits math.bitwise math.order sequences
+sequences.generalizations ;
 FROM: math.bitwise => bits ;
 FROM: alien.c-types => float ;
 IN: cpu.arm.64.assembler
 
 : insns ( n -- n ) 4 * ; inline
-
-<<
-<PRIVATE
-PREDICATE: register-number < integer [ 5 bits ] keep = ;
-PREDICATE: register-width < integer power-of-2? ;
-PRIVATE>
-TUPLE: register
-    { n register-number initial: 0 }
-    { width register-width initial: 64 } ;
-
-<PRIVATE
-TUPLE: general-register < register ;
-PRIVATE>
-31 <iota> [
-    [ [ "X" % # ] "" make create-word-in ]
-    [ 64 general-register boa define-constant ] bi
-] each
-
-<PRIVATE
-TUPLE: zero-register < general-register ;
-TUPLE: stack-register < general-register ;
-
-TUPLE: vector-register < register ;
-PRIVATE>
-32 <iota> [
-    [ [ "V" % # ] "" make create-word-in ]
-    [ 64 vector-register boa define-constant ] bi
-] each
-
-TUPLE: fp-register < register ;
->>
-
-
-<PRIVATE
-: general-prefix ( reg -- str ) width>> { { 32 "W" } { 64 "X" } } at ;
-M: general-register pprint* [ [ general-prefix % ] [ n>> # ] bi ] "" make text ;
-
-M: zero-register pprint*
-    width>> {
-        { 32 [ "WZR" ] }
-        { 64 [ "XZR" ] }
-        [ [ "ZR" % # ] "" make ]
-    } case text ;
-
-M: stack-register pprint*
-    width>> {
-        { 32 [ "WSP" ] }
-        { 64 [ "SP" ] }
-        [ [ "SP" % # ] "" make ]
-    } case text ;
-
-M: vector-register pprint* [ "V" % n>> # ] "" make text ;
-
-: fp-prefix ( reg -- str ) width>> { { 8 "B" } { 16 "H" } { 32 "S" } { 64 "D" } { 128 "Q" } } at ;
-M: fp-register pprint* [ [ fp-prefix % ] [ n>> # ] bi ] "" make text ;
-PRIVATE>
-
-
-ALIAS: RETURN       X0
-ALIAS: arg1         X0
-ALIAS: arg2         X1
-ALIAS: arg3         X2
-ALIAS: arg4         X3
-ALIAS: arg5         X4
-ALIAS: arg6         X5
-ALIAS: arg7         X6
-ALIAS: arg8         X7
-ALIAS: XR           X8
-
-ALIAS: temp         X9
-ALIAS: ds-0         X10
-ALIAS: ds-1         X11
-ALIAS: ds-2         X12
-ALIAS: ds-3         X13
-ALIAS: temp1        X14
-ALIAS: temp2        X15
-ALIAS: quotient     X14
-ALIAS: remainder    X15
-ALIAS: obj          X14
-ALIAS: type         X15
-ALIAS: cache        X14
-ALIAS: top          X11
-ALIAS: *top         X12
-
-ALIAS: IP0          X16 ! intra-procedure-call register
-ALIAS: IP1          X17 ! intra-procedure-call register
-ALIAS: PR           X18 ! platform register
-
-ALIAS: VM           X19
-ALIAS: CTX          X20
-ALIAS: DS           X21
-ALIAS: RS           X22
-ALIAS: PIC-TAIL     X23
-ALIAS: SAFEPOINT    X24
-ALIAS: MEGA-HITS    X25
-ALIAS: CACHE-MISS   X26
-ALIAS: CARDS-OFFSET X27
-ALIAS: DECKS-OFFSET X28
-
-ALIAS: FP           X29
-ALIAS: LR           X30
-CONSTANT: XZR T{ zero-register  f 31 64 }
-CONSTANT: SP  T{ stack-register f 31 64 }
-
-ALIAS: fp-temp      V31
 
 
 <PRIVATE
@@ -138,25 +33,38 @@ ERROR: register-type-error reg ;
 : W    ( Wn -- n ) check-32-bit check-general-register                      n>> ;
 : X    ( Xn -- n ) check-64-bit check-general-register                      n>> ;
 : R/ZR ( Rn -- n )              check-general-register check-zero-register  n>> ;
-: W/ZR ( Wn -- n ) check-32-bit check-general-register check-zero-register  n>> ;
 : X/ZR ( Xn -- n ) check-64-bit check-general-register check-zero-register  n>> ;
 : R/SP ( Rn -- n )              check-general-register check-stack-register n>> ;
-: W/SP ( Wn -- n ) check-32-bit check-general-register check-stack-register n>> ;
 : X/SP ( Xn -- n ) check-64-bit check-general-register check-stack-register n>> ;
+: F    ( Rn -- n )              check-fp-register                           n>> ;
 : V    ( Vn -- n )              check-vector-register                       n>> ;
+:  /ZR ( Rn -- n )                                     check-zero-register  n>> ;
 
 : >zero-register ( reg -- new-reg ) width>> 31 swap zero-register boa ;
 : insert-zero-register ( Rn operand -- ZR Rn operand ) [ [ >zero-register ] keep ] dip ;
 : insert-zero-register* ( Rd operand -- Rd ZR operand ) [ dup >zero-register ] dip ;
+PRIVATE>
+
+: >W ( Xn -- Wn ) n>>  32 general-register boa ;
+: >X ( Wn -- Xn ) n>>  64 general-register boa ;
+
+: >B ( Vn -- Bn ) n>>   8 fp-register boa ;
+: >H ( Vn -- Sn ) n>>  16 fp-register boa ;
+: >S ( Vn -- Sn ) n>>  32 fp-register boa ;
+: >D ( Vn -- Dn ) n>>  64 fp-register boa ;
+: >Q ( Vn -- Qn ) n>> 128 fp-register boa ;
+
+: >V ( Fn -- Vn ) n>> 128 vector-register boa ;
 
 
+<PRIVATE
 GENERIC: encode-type ( reg -- n )
 
 M: general-register encode-type drop 0 ;
 M:      fp-register encode-type drop 1 ;
 
 
-GENERIC: encode-width ( reg -- sf/opc ) ! LDRl
+GENERIC: encode-width ( reg -- sf/opc )
 
 M: general-register encode-width
     width>> {
@@ -172,8 +80,6 @@ M: fp-register encode-width
         { 128 [ 2 ] }
         [ register-width-error ]
     } case ;
-
-M: vector-register encode-width drop 1 ;
 
 ERROR: register-width-mismatch registers ;
 <<
@@ -208,8 +114,6 @@ M: fp-register encode-width*
         [ register-width-error ]
     } case ;
 
-M: vector-register encode-width* drop 1 1 ;
-
 ERROR: register-mismatch Rt Rt2 ;
 : 2encode-width* ( Rt Rt2 -- Rt Rt2 opc VR )
     [ dup encode-width* ] bi@
@@ -235,8 +139,6 @@ M: fp-register encode-width**
         [ register-width-error ]
     } case ;
 
-M: vector-register encode-width** drop 3 1 0 3 ;
-
 
 GENERIC: encode-width*** ( reg -- ftype )
 
@@ -247,8 +149,6 @@ M: fp-register encode-width***
         { 64 [ 1 ] }
         [ register-width-error ]
     } case ;
-
-M: vector-register encode-width*** drop 1 ;
 
 MACRO: (nencode-width***) ( n -- quot ) [ encode-width*** ] check-registers ;
 : 1encode-width*** ( R -- R ftype ) dup encode-width*** ;
@@ -366,9 +266,6 @@ CONSTANT: LE 13 ! less or equal
 CONSTANT: AL 14 ! always
 CONSTANT: NV 15 ! always (“never”)
 
-CONSTANT: NZCV 0b1101101000010000
-CONSTANT: FPSR 0b1101101000100001
-
 
 GENERIC: ADD  ( Rd Rn operand -- )
 GENERIC: ADDS ( Rd Rn operand -- )
@@ -461,7 +358,7 @@ PREDICATE: unshifted-add/sub-immediate < integer
 PREDICATE: shifted-add/sub-immediate < integer
     { [ 0 = not ] [ 12 bits zero? ] [ -12 shift 12 unsigned-immediate? ] } 1&& ;
 
-GENERIC: split-add/sub-immediate ( imm -- sh imm12 )
+GENERIC: split-add/sub-immediate ( imm -- sh uimm12 )
 M: unshifted-add/sub-immediate split-add/sub-immediate 0 swap ;
 M: shifted-add/sub-immediate split-add/sub-immediate -12 shift 1 swap ;
 
@@ -552,7 +449,7 @@ M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
 
 
 <PRIVATE
-: move-wide-imm ( Rd imm16 hw opc -- )
+: move-wide-imm ( Rd uimm16 hw opc -- )
     [ 1encode-width ] 3dip [ pick 1 + check-unsigned-immediate ] dip {
         { 0b100101 23 }
         { R/ZR 0 }
@@ -563,9 +460,9 @@ M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
     } encode ;
 PRIVATE>
 
-: MOVN ( Rd imm16 hw -- ) 0 move-wide-imm ;
-: MOVZ ( Rd imm16 hw -- ) 2 move-wide-imm ;
-: MOVK ( Rd imm16 hw -- ) 3 move-wide-imm ;
+: MOVN ( Rd uimm16 hw -- ) 0 move-wide-imm ;
+: MOVZ ( Rd uimm16 hw -- ) 2 move-wide-imm ;
+: MOVK ( Rd uimm16 hw -- ) 3 move-wide-imm ;
 
 M: integer MOV 0 MOVZ ;
 
@@ -588,21 +485,28 @@ PRIVATE>
 :  BFM ( Rd Rn immr imms -- ) 1 bitfield ;
 : UBFM ( Rd Rn immr imms -- ) 2 bitfield ;
 
+: SBFX ( Rd Rn lsb width -- ) over + 1 - SBFM ;
+: UBFX ( Rd Rn lsb width -- ) over + 1 - UBFM ;
+
 <PRIVATE
 : ?max-width ( Rn n -- Rn n max-width )
     over encode-width 5 + [ check-unsigned-immediate ] keep ;
 PRIVATE>
 
-: UBFIZ ( Rd Rn lsb width -- )
-    [ ?max-width ] dip 3dup spin [ 1 ] [ 2^ ] [ - ] tri* between?
-    [ immediate-error ] unless [ neg ] [ bits ] [ 1 - ] tri* UBFM ;
+M: integer ASR ( Rd Rn shift -- ) ?max-width on-bits SBFM ;
+M: integer LSR ( Rd Rn shift -- ) ?max-width on-bits UBFM ;
 
 M: integer LSL ( Rd Rn shift -- )
     ?max-width [ bitnot ] [ bits ] bi* [ 1 + ] keep UBFM ;
 
-M: integer LSR ( Rd Rn shift -- ) ?max-width on-bits UBFM ;
-M: integer ASR ( Rd Rn shift -- ) ?max-width on-bits SBFM ;
+<PRIVATE
+: (BFIZ) ( Rn lsb width -- Rn immr imms )
+    [ ?max-width ] dip 3dup spin [ 1 ] [ 2^ ] [ - ] tri* between?
+    [ immediate-error ] unless [ neg ] [ bits ] [ 1 - ] tri* ;
+PRIVATE>
 
+: UBFIZ ( Rd Rn lsb width -- ) (BFIZ) UBFM ;
+: SBFIZ ( Rd Rn lsb width -- ) (BFIZ) SBFM ;
 
 <PRIVATE
 : conditional-branch ( imm21 cond op -- )
@@ -633,7 +537,7 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
 
 
 <PRIVATE
-: exception ( imm16 opc op2 LL -- )
+: exception ( uimm16 opc op2 LL -- )
     [ 16 check-unsigned-immediate ] 3dip {
         { 0b11010100 24 }
         5
@@ -643,7 +547,7 @@ M: label B.cond [ 0 ] dip B.cond rc-relative-arm-b.cond/ldr label-fixup ;
     } encode ;
 PRIVATE>
 
-: BRK ( imm16 -- ) 1 0 0 exception ;
+: BRK ( uimm16 -- ) 1 0 0 exception ;
 
 
 <PRIVATE
@@ -729,7 +633,16 @@ M: label BL 0 BL rc-relative-arm-b label-fixup ;
     3 insns B
     8 0 <array> % rc-absolute-cell ;
 
-: LDR=BLR ( -- word class ) f (LDR=BLR) ;
+: LDR=BLR ( -- dll class ) f (LDR=BLR) ;
+
+! literal load, save context and call
+: (LDR=BLR*) ( word dll -- )
+    temp 3 insns LDR
+    TRAMPOLINE BLR
+    3 insns B
+    8 0 <array> % rc-absolute-cell rel-dlsym ;
+
+: LDR=BLR* ( word -- ) f (LDR=BLR*) ;
 
 ! literal load and jump
 : (LDR=BR) ( -- class )
@@ -782,7 +695,7 @@ PRIVATE>
 : load-register-literal ( Rt imm19 opc VR -- )
     [ 2 ?>> 19 check-signed-immediate ] 2dip {
         { 0b011 27 }
-        { R/ZR 0 }
+        { /ZR 0 }
         5
         30
         26
@@ -899,10 +812,10 @@ ERROR: unknown-c-type c-type ;
         { float-rep  [ 2 1 0 2 ] }
         { double     [ 3 1 0 3 ] }
         { double-rep [ 3 1 0 3 ] }
-        { vector-rep [ 4 1 0 4 ] }
-        [ unknown-c-type ]
+        [ dup vector-rep? [ drop 4 1 0 4 ] [ unknown-c-type ] if ]
     } case ] dip
-    dup 0 = [ [ drop 0 ] 2dip ] when ;
+    dup 0 = [ [ drop 0 ] 2dip ] when
+    pick 1 = [ drop 0 ] when ;
 
 : load/store-register* ( Rt operand c-type L -- )
     encode-c-type (load/store-register) ;
@@ -912,16 +825,16 @@ M: offset STR* 0 load/store-register* ;
 M: offset LDR* 1 load/store-register* ;
 
 <PRIVATE
-: >S ( amount size -- S )
+: amount/size>S ( amount size -- S )
     {
-        { [ 2dup = ] [ 2drop 1 ] }
         { [ over 0 = ] [ 2drop 0 ] }
+        { [ 2dup = ] [ 2drop 1 ] }
         [ scaling-error ]
     } cond ;
 
 : (load/store-register-register) ( Rt operand size VR opc1 L -- )
     [ >offset< [ >operand< ] dip ] 4dip
-    [ tuck [ >S ] 2dip ] 3dip {
+    [ tuck [ amount/size>S ] 2dip ] 3dip {
         { 0b111 27 }
         { 0b1 21 }
         { n>> 0 }
@@ -1159,8 +1072,8 @@ PRIVATE>
         { 0b11110 24 }
         { 0b1 21 }
         { 0b10000 10 }
-        { n>> 0 }
-        { n>> 5 }
+        { F 0 }
+        { F 5 }
         22
     } encode ;
 
@@ -1175,7 +1088,7 @@ PRIVATE>
         { 0b000 16 }
         { R 0 }
         31
-        { n>> 5 }
+        { F 5 }
         22
     } encode ;
 
@@ -1185,7 +1098,7 @@ PRIVATE>
         { 0b1 21 }
         { 0b00 19 }
         { 0b010 16 }
-        { n>> 0 }
+        { F 0 }
         22
         { R 5 }
         31
@@ -1197,8 +1110,8 @@ PRIVATE>
         { 0b11110 24 }
         { 0b1 21 }
         { 0b10000 10 }
-        { n>> 0 }
-        { n>> 5 }
+        { F 0 }
+        { F 5 }
         22
         15
         17
@@ -1216,8 +1129,8 @@ PRIVATE>
         { 0b11110 24 }
         { 0b1 21 }
         { 0b1000 10 }
-        { n>> 5 }
-        { n>> 16 }
+        { F 5 }
+        { F 16 }
         22
         4
     } encode ;
@@ -1227,15 +1140,28 @@ PRIVATE>
 : FCMPE ( Rn Rm -- ) 1 fp-compare ;
 
 
+: FCSEL ( Rd Rn Rm cond -- )
+    [ 3encode-width ] dip {
+        { 0b11110 24 }
+        { 0b1 21 }
+        { 0b11 10 }
+        { F 0 }
+        { F 5 }
+        { F 16 }
+        22
+        12
+    } encode ;
+
+
 <PRIVATE
 : fp-data-processing-2-sources ( Rd Rn Rm opcode -- )
     [ 3encode-width*** ] dip {
         { 0b11110 24 }
         { 0b1 21 }
         { 0b10 10 }
-        { n>> 0 }
-        { n>> 5 }
-        { n>> 16 }
+        { F 0 }
+        { F 5 }
+        { F 16 }
         22
         12
     } encode ;
@@ -1265,6 +1191,7 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
+: CMLT     ( Vd Vn -- )     0 0 0 0b01010 simd-scalar-2-misc ;
 : FCVTZSvi ( Rd Rn spec* -- ) 0 1 0b11011 simd-scalar-2-misc ;
 : SCVTFvi  ( Rd Rn spec  -- ) 0 0 0b11101 simd-scalar-2-misc ;
 
@@ -1300,12 +1227,16 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
+: UZP1 ( Rd Rn Rm spec -- ) 0b001 simd-permute ;
 : TRN1 ( Rd Rn Rm spec -- ) 0b010 simd-permute ;
+: ZIP1 ( Rd Rn Rm spec -- ) 0b011 simd-permute ;
+: UZP2 ( Rd Rn Rm spec -- ) 0b101 simd-permute ;
 : TRN2 ( Rd Rn Rm spec -- ) 0b110 simd-permute ;
+: ZIP2 ( Rd Rn Rm spec -- ) 0b111 simd-permute ;
 
 
 <PRIVATE
-: simd-extract ( Rd Rn Rm imm4 op2 -- )
+: simd-extract ( Rd Rn Rm uimm4 op2 -- )
     {
         { 0b1 30 }
         { 0b101110 24 }
@@ -1317,17 +1248,17 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: EXT ( Rd Rn Rm imm4 -- ) 0 simd-extract ;
+: EXT ( Rd Rn Rm uimm4 -- ) 0 simd-extract ;
 
 
 <PRIVATE
-: simd-copy ( Rd Rn imm5 imm4 op -- )
+: simd-copy ( Rd Rn uimm5 uimm4 op -- )
     {
         { 0b1 30 }
         { 0b01110000 21 }
         { 0b1 10 }
         { V 0 }
-        { V 5 }
+        { n>> 5 }
         16
         11
         29
@@ -1345,7 +1276,7 @@ PRIVATE>
     1 simd-copy ;
 
 <PRIVATE
-: simd-copy* ( Rd Rn imm5 rep imm4 op -- )
+: simd-copy* ( Rd Rn uimm5 rep uimm4 op -- )
     [
         [ 1encode-width ] 3dip
         scalar-rep-of rep-size log2 [ 5 swap - check-unsigned-immediate ] keep
@@ -1413,6 +1344,7 @@ PRIVATE>
 : SQXTUN  ( Rd Rn size -- ) 1 0 0b10010 0 simd-2-misc ;
 : SQXTUN2 ( Rd Rn size -- ) 1 0 0b10010 1 simd-2-misc ;
 : SHLL    ( Rd Rn size -- ) 1 0 0b10011 0 simd-2-misc ;
+: SHLL2   ( Rd Rn size -- ) 1 0 0b10011 1 simd-2-misc ;
 : FSQRTv  ( Rd Rn size -- ) 1 1 0b11111 1 simd-2-misc ;
 
 
@@ -1435,6 +1367,31 @@ PRIVATE>
 
 
 <PRIVATE
+: simd-3-different ( Rd Rn Rm size U opcode Q -- )
+    {
+        { 0b01110 24 }
+        { 0b1 21 }
+        { V 0 }
+        { V 5 }
+        { V 16 }
+        22
+        29
+        12
+        30
+    } encode ;
+PRIVATE>
+
+: SMLAL  ( Rd Rn Rm size -- ) 0 0b1000 0 simd-3-different ;
+: SMLAL2 ( Rd Rn Rm size -- ) 0 0b1000 1 simd-3-different ;
+: SMULL  ( Rd Rn Rm size -- ) 0 0b1100 0 simd-3-different ;
+: SMULL2 ( Rd Rn Rm size -- ) 0 0b1100 1 simd-3-different ;
+: UMLAL  ( Rd Rn Rm size -- ) 1 0b1000 0 simd-3-different ;
+: UMLAL2 ( Rd Rn Rm size -- ) 1 0b1000 1 simd-3-different ;
+: UMULL  ( Rd Rn Rm size -- ) 1 0b1100 0 simd-3-different ;
+: UMULL2 ( Rd Rn Rm size -- ) 1 0b1100 1 simd-3-different ;
+
+
+<PRIVATE
 : simd-3-same ( Rd Rn Rm size0 U size1 opcode -- )
     {
         { 0b1 30 }
@@ -1451,42 +1408,48 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SHADD ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
-: SQADD ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
-: ANDv  ( Rd Rn Rm -- )    0 0 0 0b00011 simd-3-same ;
-: SQSUB ( Rd Rn Rm size -- ) 0 0 0b00101 simd-3-same ;
-: CMGT  ( Rd Rn Rm size -- ) 0 0 0b00110 simd-3-same ;
-: CMGE  ( Rd Rn Rm size -- ) 0 0 0b00111 simd-3-same ;
-: SSHL  ( Rd Rn Rm size -- ) 0 0 0b01000 simd-3-same ;
-: SMAXv ( Rd Rn Rm size -- ) 0 0 0b01100 simd-3-same ;
-: SMINv ( Rd Rn Rm size -- ) 0 0 0b01101 simd-3-same ;
-: SABD  ( Rd Rn Rm size -- ) 0 0 0b01110 simd-3-same ;
-: ADDv  ( Rd Rn Rm size -- ) 0 0 0b10000 simd-3-same ;
-: MULv  ( Rd Rn Rm size -- ) 0 0 0b10011 simd-3-same ;
-: ADDPv ( Rd Rn Rm size -- ) 0 0 0b10111 simd-3-same ;
-: FADDv ( Rd Rn Rm size -- ) 0 0 0b11010 simd-3-same ;
-: FCMEQ ( Rd Rn Rm size -- ) 0 0 0b11100 simd-3-same ;
-: FMAXv ( Rd Rn Rm size -- ) 0 0 0b11110 simd-3-same ;
-: FSUBv ( Rd Rn Rm size -- ) 0 1 0b11010 simd-3-same ;
-: FMINv ( Rd Rn Rm size -- ) 0 1 0b11110 simd-3-same ;
-: UHADD ( Rd Rn Rm size -- ) 1 0 0b00000 simd-3-same ;
-: UQADD ( Rd Rn Rm size -- ) 1 0 0b00001 simd-3-same ;
-: EORv  ( Rd Rn Rm -- )    0 1 0 0b00011 simd-3-same ;
-: UQSUB ( Rd Rn Rm size -- ) 1 0 0b00101 simd-3-same ;
-: CMHI  ( Rd Rn Rm size -- ) 1 0 0b00110 simd-3-same ;
-: CMHS  ( Rd Rn Rm size -- ) 1 0 0b00111 simd-3-same ;
-: USHL  ( Rd Rn Rm size -- ) 1 0 0b01000 simd-3-same ;
-: UMAXv ( Rd Rn Rm size -- ) 1 0 0b01100 simd-3-same ;
-: UMINv ( Rd Rn Rm size -- ) 1 0 0b01101 simd-3-same ;
-: UABD  ( Rd Rn Rm size -- ) 1 0 0b01110 simd-3-same ;
-: SUBv  ( Rd Rn Rm size -- ) 1 0 0b10000 simd-3-same ;
-: CMEQ  ( Rd Rn Rm size -- ) 1 0 0b10001 simd-3-same ;
-: FMULv ( Rd Rn Rm size -- ) 1 0 0b11011 simd-3-same ;
-: FCMGE ( Rd Rn Rm size -- ) 1 0 0b11100 simd-3-same ;
-: FDIVv ( Rd Rn Rm size -- ) 1 0 0b11111 simd-3-same ;
-: FCMGT ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
-: BICv  ( Rd Rn Rm -- )    1 0 0 0b00011 simd-3-same ;
-: ORRv  ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
+: SHADD  ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
+: SQADD  ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
+: SRHADD ( Rd Rn Rm size -- ) 0 0 0b00010 simd-3-same ;
+: ANDv   ( Rd Rn Rm -- )    0 0 0 0b00011 simd-3-same ;
+: SQSUB  ( Rd Rn Rm size -- ) 0 0 0b00101 simd-3-same ;
+: CMGT   ( Rd Rn Rm size -- ) 0 0 0b00110 simd-3-same ;
+: CMGE   ( Rd Rn Rm size -- ) 0 0 0b00111 simd-3-same ;
+: SSHL   ( Rd Rn Rm size -- ) 0 0 0b01000 simd-3-same ;
+: SMAXv  ( Rd Rn Rm size -- ) 0 0 0b01100 simd-3-same ;
+: SMINv  ( Rd Rn Rm size -- ) 0 0 0b01101 simd-3-same ;
+: SABD   ( Rd Rn Rm size -- ) 0 0 0b01110 simd-3-same ;
+: ADDv   ( Rd Rn Rm size -- ) 0 0 0b10000 simd-3-same ;
+: MLAv   ( Rd Rn Rm size -- ) 0 0 0b10010 simd-3-same ;
+: MULv   ( Rd Rn Rm size -- ) 0 0 0b10011 simd-3-same ;
+: ADDPv  ( Rd Rn Rm size -- ) 0 0 0b10111 simd-3-same ;
+: FMLAv  ( Rd Rn Rm size -- ) 0 0 0b11001 simd-3-same ;
+: FADDv  ( Rd Rn Rm size -- ) 0 0 0b11010 simd-3-same ;
+: FCMEQ  ( Rd Rn Rm size -- ) 0 0 0b11100 simd-3-same ;
+: FMAXv  ( Rd Rn Rm size -- ) 0 0 0b11110 simd-3-same ;
+: FSUBv  ( Rd Rn Rm size -- ) 0 1 0b11010 simd-3-same ;
+: FMINv  ( Rd Rn Rm size -- ) 0 1 0b11110 simd-3-same ;
+: UHADD  ( Rd Rn Rm size -- ) 1 0 0b00000 simd-3-same ;
+: UQADD  ( Rd Rn Rm size -- ) 1 0 0b00001 simd-3-same ;
+: URHADD ( Rd Rn Rm size -- ) 1 0 0b00010 simd-3-same ;
+: EORv   ( Rd Rn Rm -- )    0 1 0 0b00011 simd-3-same ;
+: UQSUB  ( Rd Rn Rm size -- ) 1 0 0b00101 simd-3-same ;
+: CMHI   ( Rd Rn Rm size -- ) 1 0 0b00110 simd-3-same ;
+: CMHS   ( Rd Rn Rm size -- ) 1 0 0b00111 simd-3-same ;
+: USHL   ( Rd Rn Rm size -- ) 1 0 0b01000 simd-3-same ;
+: UMAXv  ( Rd Rn Rm size -- ) 1 0 0b01100 simd-3-same ;
+: UMINv  ( Rd Rn Rm size -- ) 1 0 0b01101 simd-3-same ;
+: UABD   ( Rd Rn Rm size -- ) 1 0 0b01110 simd-3-same ;
+: SUBv   ( Rd Rn Rm size -- ) 1 0 0b10000 simd-3-same ;
+: CMEQ   ( Rd Rn Rm size -- ) 1 0 0b10001 simd-3-same ;
+: FMULv  ( Rd Rn Rm size -- ) 1 0 0b11011 simd-3-same ;
+: FCMGE  ( Rd Rn Rm size -- ) 1 0 0b11100 simd-3-same ;
+: FDIVv  ( Rd Rn Rm size -- ) 1 0 0b11111 simd-3-same ;
+: FCMGT  ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
+: BICv   ( Rd Rn Rm -- )    1 0 0 0b00011 simd-3-same ;
+: ORRv   ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
+
+: MOVv ( Rd Rn -- ) dup ORRv ;
 
 
 <PRIVATE
@@ -1506,6 +1469,8 @@ PRIVATE>
 : SSHR  ( Rd Rn imm rep -- ) 0 0b00000 1 simd-shift-by-imm ;
 : SHL   ( Rd Rn imm rep -- ) 0 0b01010 1 simd-shift-by-imm ;
 : SSHLL ( Rd Rn imm rep -- ) 0 0b10100 1 simd-shift-by-imm ;
+: SHRN  ( Rd Rn imm rep -- ) 1 0b10000 0 simd-shift-by-imm ;
+: SHRN2 ( Rd Rn imm rep -- ) 1 0b10000 1 simd-shift-by-imm ;
 : USHR  ( Rd Rn imm rep -- ) 1 0b00000 1 simd-shift-by-imm ;
 
-: SXTL ( Rd Rn rep -- ) 0 swap SSHLL ;
+: SXTL ( Rd Rn rep -- ) [ 0 ] dip SSHLL ;

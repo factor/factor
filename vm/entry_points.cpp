@@ -14,6 +14,7 @@ void factor_vm::c_to_factor(cell quot) {
     CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
     c_to_factor_func = (c_to_factor_func_type) func;
   }
+  JIT_EXECUTABLE
   c_to_factor_func(quot);
 }
 

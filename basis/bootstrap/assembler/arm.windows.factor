@@ -11,14 +11,13 @@ IN: bootstrap.assembler.arm
     temp2 PR teb-stack-limit-offset [+] LDR
     temp1 temp2 SP -16 [pre] STP ;
 
+: jit-update-teb ( -- )
+    temp CTX context-callstack-seg-offset [+] LDR
+    temp2 temp segment-end-offset [+] LDR
+    temp1 temp segment-start-offset [+] LDR
+    temp1 temp2 temp teb-stack-base-offset [+] STP ;
+
 : jit-restore-teb ( -- )
     temp1 temp2 SP 16 [post] LDP
     temp1 PR teb-stack-base-offset [+] STR
-    temp2 PR teb-stack-limit-offset [+] STR ;
-
-: jit-update-teb ( -- )
-    temp CTX context-callstack-seg-offset [+] LDR
-    temp1 temp segment-end-offset [+] LDR
-    temp1 PR teb-stack-base-offset [+] STR
-    temp2 temp segment-start-offset [+] LDR
     temp2 PR teb-stack-limit-offset [+] STR ;

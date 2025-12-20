@@ -32,16 +32,15 @@ CONSTANT: deck-bits 18
 
 ! Offsets in vm struct. Should be kept in sync with:
 !   vm/vm.hpp
-: vm-context-offset ( -- n )
-    0 bootstrap-cells ; inline
-: vm-spare-context-offset ( -- n )
-    1 bootstrap-cells ; inline
-: vm-signal-handler-addr-offset ( -- n )
-    8 bootstrap-cells ; inline
-: vm-fault-flag-offset ( -- n )
-    9 bootstrap-cells ; inline
-: vm-special-object-offset ( n -- offset )
-    bootstrap-cells 10 bootstrap-cells + ;
+: vm-context-offset ( -- n ) 0 bootstrap-cells ; inline
+: vm-spare-context-offset ( -- n ) 1 bootstrap-cells ; inline
+: vm-nursery-here-offset ( -- n ) 2 bootstrap-cells ; inline
+: vm-nursery-end-offset ( -- n ) 4 bootstrap-cells ; inline
+: vm-cards-offset-offset ( -- n ) 6 bootstrap-cells ; inline
+: vm-decks-offset-offset ( -- n ) 7 bootstrap-cells ; inline
+: vm-signal-handler-addr-offset ( -- n ) 8 bootstrap-cells ; inline
+: vm-fault-flag-offset ( -- n ) 9 bootstrap-cells ; inline
+: vm-special-object-offset ( n -- offset ) bootstrap-cells 10 bootstrap-cells + ;
 
 CONSTANT: rc-absolute-cell 0
 CONSTANT: rc-absolute 1
@@ -65,6 +64,7 @@ CONSTANT: rt-megamorphic-cache-hits 8
 CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
+CONSTANT: rt-trampoline 12
 CONSTANT: rt-dlsym-toc 13
 CONSTANT: rt-inline-cache-miss 14
 CONSTANT: rt-safepoint 15

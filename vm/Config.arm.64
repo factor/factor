@@ -1,0 +1,2 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/cpu-arm.64.o $(BUILD_DIR)/cpu-arm.64-trampoline.o
+PLAF_MASTER_HEADERS += vm/cpu-arm.64.hpp

@@ -1,6 +1,6 @@
-USING: alien assocs byte-arrays classes compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame cpu.x86.assembler
-cpu.x86.assembler.operands help.markup help.syntax kernel layouts
+USING: alien assocs byte-arrays classes
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stack-frame help.markup help.syntax kernel layouts
 literals math multiline sequences strings system vm words ;
 IN: cpu.architecture
 
@@ -98,7 +98,7 @@ HELP: %allot
 }
 { $description "Emits machine code for allocating memory." }
 { $examples
-  "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $link RAX } ":"
+  "In this example 40 bytes is allocated and a tagged pointer to the memory is put in " { $snippet RAX } ":"
   { $unchecked-example $[ ex-%allot ] }
 } ;
 
@@ -108,7 +108,7 @@ HELP: %and-imm
   { "src1" "first source register" }
   { "src2" "second source register" }
 }
-{ $description "Emits an " { $link AND } " instruction between a register and an immediate." } ;
+{ $description "Emits an " { $snippet AND } " instruction between a register and an immediate." } ;
 
 HELP: %box
 { $values
@@ -183,12 +183,12 @@ HELP: %load-double
 { $values
   { "reg" "destination register symbol" }
   { "val" float }
-} { $description "Loads a literal floating point value into a register. On x86, this corresponds to the " { $link MOVSD } " instruction." }
+} { $description "Loads a literal floating point value into a register. On x86, this corresponds to the " { $snippet MOVSD } " instruction." }
 { $see-also ##load-double } ;
 
 HELP: %load-immediate
 { $values { "reg" "a register symbol" } { "val" "a value" } }
-{ $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $link XOR } " instruction is emitted instead of " { $link MOV } " because the former is shorter." }
+{ $description "Emits code for loading an immediate value into a register. On " { $link x86 } ", if val is 0, then an " { $snippet XOR } " instruction is emitted instead of " { $snippet MOV } " because the former is shorter." }
 { $see-also ##load-tagged } ;
 
 HELP: %load-memory-imm
@@ -347,7 +347,7 @@ HELP: float-regs
 
 HELP: fused-unboxing?
 { $values { "?" boolean } }
-{ $description "Whether this architecture support " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
+{ $description "Whether this architecture supports " { $link %load-float } ", " { $link %load-double } ", and " { $link %load-vector } "." } ;
 
 HELP: enable-cpu-features
 { $description "This word is run when compiling the compiler during bootstrap and enables optional features that the processor is found to support." } ;
@@ -432,7 +432,7 @@ HELP: stack-frame-size
 
 HELP: test-instruction?
 { $values { "?" boolean } }
-{ $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $link CMP } " instructions to less expensive " { $link TEST } "s." } ;
+{ $description "Does the current architecture have a test instruction? Used on x86 to rewrite some " { $snippet CMP } " instructions to less expensive " { $snippet TEST } "s." } ;
 
 HELP: vm-stack-space
 { $values { "n" number } }

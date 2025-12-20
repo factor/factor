@@ -321,7 +321,7 @@ $(BUILD_DIR)/%.o: vm/%.cpp $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: vm/%.mm $(BUILD_DIR)/master.hpp.gch | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-$(BUILD_DIR)/%.o: $(BUILD_DIR)/%.S | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: vm/%.S | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(ASFLAGS) -o $@ $<
 
 $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
@@ -351,16 +351,14 @@ factor-lib: $(ENGINE)
 factor-executable: $(EXECUTABLE)
 
 $(EXECUTABLE): $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CXXFLAGS) $(LDFLAGS) -o $@ $(LIBS) $(EXE_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) $(CXXFLAGS) $(LDFLAGS) -o $@ $(LIBS) $(EXE_OBJS)
 
 factor-console: $(CONSOLE_EXECUTABLE)
 
 ifneq ($(CONSOLE_EXECUTABLE),$(EXECUTABLE))
 
 $(CONSOLE_EXECUTABLE): $(EXE_OBJS) $(DLL_OBJS)
-	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) \
-		$(CXXFLAGS) $(LDFLAGS) $(CFLAGS_CONSOLE) -o $@ $(LIBS) $(EXE_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) -L. $(DLL_OBJS) $(CXXFLAGS) $(LDFLAGS) $(CFLAGS_CONSOLE) -o $@ $(LIBS) $(EXE_OBJS)
 
 endif
 

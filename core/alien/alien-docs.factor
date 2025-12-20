@@ -1,5 +1,5 @@
 USING: alien.accessors alien.c-types alien.libraries
-alien.strings alien.syntax byte-arrays cpu.x86 eval help.markup
+alien.strings alien.syntax byte-arrays eval help.markup
 help.syntax io io.backend io.encodings.utf16 io.encodings.utf8
 kernel math quotations sequences system ;
 IN: alien
@@ -135,13 +135,13 @@ HELP: alien-assembly
 { $description
     "Invokes arbitrary machine code, generated at compile-time by the quotation. Input parameters are taken from the data stack, and the return value is pushed on the data stack after the function returns. A return type of " { $link void } " indicates that no value is to be expected."
     $nl
-    "The quotation passed to this word must preserve the " { $link ds-reg } " and " { $link rs-reg } " registers. Note that this is not a " { $snippet "call" } " in the assembly sense, so there is no return address on the stack."
+    "The quotation passed to this word must preserve the registers used for the data stack (" { $snippet "ds-reg" } " on x86/" { $snippet "DS" } " on ARM) and the return stack (" { $snippet "rs-reg" } " on x86/" { $snippet "RS" } " on ARM). Note that this is not a " { $snippet "call" } " in the assembly sense, so there is no return address on the stack."
     $nl
     "It's important to mind the ABI. For instance, on x86.32, parameters are passed on the stack in " { $snippet "ESP" } ", while on x86.64 arguments are passed in " { $snippet "RDI" } ", " { $snippet "RSI" } ", " { $snippet "RDX" } ", and " { $snippet "RCX" } ", and then on the stack. On Windows 64, integers and pointers are passed in " { $snippet "RCX" } ", " { $snippet "RDX" } ", " { $snippet "R8" } ", and " { $snippet "R9" } "."
     $nl
     "There are Factor words for the input parameters, such as " { $snippet "param-reg-0" } " and " { $snippet "param-reg-1" } "."
     $nl
-    "For output parameters, use " { $link return-reg } "."
+    "For output parameters, use the."
     $nl
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }

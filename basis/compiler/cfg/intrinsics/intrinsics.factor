@@ -5,7 +5,7 @@ compiler.cfg.intrinsics.alien compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.misc compiler.cfg.intrinsics.slots
 compiler.cfg.intrinsics.strings compiler.cfg.stacks
-cpu.architecture kernel words ;
+cpu.architecture kernel system words ;
 QUALIFIED: alien
 QUALIFIED: alien.accessors
 QUALIFIED: alien.c-types
@@ -58,8 +58,6 @@ ERROR: inline-intrinsics-not-supported word quot ;
     { slots.private:set-slot [ emit-set-slot ] }
     { strings.private:string-nth-fast [ drop emit-string-nth-fast ] }
     { strings.private:set-string-nth-fast [ drop emit-set-string-nth-fast ] }
-    { classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
-    { arrays:<array> [ emit-<array> ] }
     { byte-arrays:<byte-array> [ emit-<byte-array> ] }
     { byte-arrays:(byte-array) [ emit-(byte-array) ] }
     { kernel:<wrapper> [ emit-simple-allot ] }
@@ -77,6 +75,11 @@ ERROR: inline-intrinsics-not-supported word quot ;
     { alien.accessors:alien-cell [ emit-alien-cell ] }
     { alien.accessors:set-alien-cell [ emit-set-alien-cell ] }
 } enable-intrinsics
+
+cpu arm.64? [ {
+    { classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
+    { arrays:<array> [ emit-<array> ] }
+} enable-intrinsics ] unless
 
 : enable-alien-4-intrinsics ( -- )
     {
