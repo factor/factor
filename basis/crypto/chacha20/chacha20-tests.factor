@@ -7,9 +7,6 @@ IN: crypto.chacha20.tests
 
 ! RFC 8439 Section 2.1.1 - Quarter Round Test Vector
 ! https://www.rfc-editor.org/rfc/rfc8439#section-2.1.1
-!
-! Input:  a=0x11111111 b=0x01020304 c=0x9b8d6f43 d=0x01234567
-! Output: a=0xea2a92f4 b=0xcb1cf8ce c=0x4581472e d=0x5881c4bb
 
 { { 0xea2a92f4 0xcb1cf8ce 0x4581472e 0x5881c4bb } }
 [ 0x11111111 0x01020304 0x9b8d6f43 0x01234567 quarter-round 4array ]
