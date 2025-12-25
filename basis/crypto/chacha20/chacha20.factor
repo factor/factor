@@ -22,7 +22,7 @@
 ! Use chacha20-crypt-bytes with raw byte keys (32 bytes) and nonces (12 bytes).
 
 USING: arrays byte-arrays endian grouping kernel locals math
-math.bitwise math.order sequences strings ;
+math.bitwise sequences strings ;
 IN: crypto.chacha20
 
 <PRIVATE
@@ -107,14 +107,6 @@ IN: crypto.chacha20
 : chacha20-block-state ( key nonce counter -- final-state )
     chacha20-init dup clone chacha20-block swap chacha20-finalize ;
 
-!
-! Multi-block Support
-!
-
-! Split sequence into chunks of n (last chunk may be smaller)
-: split-blocks ( seq n -- chunks )
-    [ dup length 0 > ] swap [ over length min cut swap ] curry produce nip ;
-
 PRIVATE>
 
 !
@@ -124,7 +116,7 @@ PRIVATE>
 ! Encrypt or decrypt data of any length
 ! XOR is symmetric so same function works for both
 :: chacha20-crypt ( data key nonce counter -- result )
-    data 64 split-blocks
+    data 64 group
     [| block i |
         key nonce counter i + chacha20-block-state state>keystream
         block length head
