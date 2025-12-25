@@ -1,0 +1,1 @@
+ChaCha20 stream cipher (RFC 8439).
