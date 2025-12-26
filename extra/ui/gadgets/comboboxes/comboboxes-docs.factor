@@ -1,4 +1,4 @@
-! Copyright (C) 2023 Your name.
+! Copyright (C) 2023 Raghu Ranganathan.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences strings ui.gadgets.tables 
 models ;

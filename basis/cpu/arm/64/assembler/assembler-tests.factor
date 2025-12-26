@@ -1,7 +1,7 @@
 ! Copyright (C) 2024 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays cpu.arm.64.assembler endian kernel make tools.test
-;
+USING: arrays cpu.arm.64.assembler
+cpu.arm.64.assembler.registers endian kernel make tools.test ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64.assembler.tests
 
@@ -12,7 +12,7 @@ IN: cpu.arm.64.assembler.tests
 0xce01098b [ cache dup temp ADD ] test-insn
 0x4a118b8b [ ds-0 dup ds-1 4 <ASR> ADD ] test-insn
 0x0a0001ab [ ds-0 arg1 arg2 ADDS ] test-insn
-0xffbb314e [ fp-temp dup 0 ADDV ] test-insn
+0xdebb314e [ fp-temp dup 0 ADDV ] test-insn
 0x6bed7c92 [ ds-1 dup -16 AND ] test-insn
 0x6a010a8a [ ds-0 ds-1 ds-0 AND ] test-insn
 0xcf0d40f2 [ type obj 15 ANDS ] test-insn
@@ -28,7 +28,7 @@ IN: cpu.arm.64.assembler.tests
 0x5f0109eb [ ds-0 temp CMP ] test-insn
 0x3f1d00f1 [ temp 7 CMP ] test-insn
 0x3ffd8aeb [ temp ds-0 63 <ASR> CMP ] test-insn
-0xff5b204e [ fp-temp dup CNTv ] test-insn
+0xde5b204e [ fp-temp dup CNTv ] test-insn
 0xca418f9a [ ds-0 temp1 temp2 MI CSEL ] test-insn
 0x4aed7cd2 [ ds-0 dup -16 EOR ] test-insn
 0x6a010aca [ ds-0 ds-1 ds-0 EOR ] test-insn
@@ -37,7 +37,7 @@ IN: cpu.arm.64.assembler.tests
 0xfd7bc1a8 [ FP LR SP 16 [post] LDP ] test-insn
 0x800640f9 [ arg1 CTX 8 [+] LDR ] test-insn
 0xa0865ff8 [ arg1 DS -8 [post] LDR ] test-insn
-0x290340f9 [ temp MEGA-HITS [] LDR ] test-insn
+0x690340f9 [ temp MEGA-HITS [] LDR ] test-insn
 0x207961f8 [ X0 temp X1 3 <LSL*> [+] LDR ] test-insn
 0x49000058 [ temp 2 insns LDR ] test-insn
 0x4a554039 [ ds-0 dup 21 [+] LDRB ] test-insn

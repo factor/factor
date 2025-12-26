@@ -55,7 +55,7 @@ M: epoll-mx remove-output-callbacks
     epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )
-    [ data>> fd>> dup 0 = [ drop size-read-fd ] when ] dip
+    [ data>> fd>> ] dip
     [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
     [ input-available ] [ output-available ] 2tri ;
 

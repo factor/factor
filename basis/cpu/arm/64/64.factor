@@ -212,6 +212,11 @@ M: arm.64 %copy
         ] [ drop LDR ] }
         { [
             3dup
+            [ [ register? ] both? ]
+            [ double-rep? ] bi* and
+        ] [ drop [ >D ] bi@ FMOV ] }
+        { [
+            3dup
             [ offset? ]
             [ register? ]
             [ double-rep? ] tri* and and
@@ -222,6 +227,11 @@ M: arm.64 %copy
             [ offset? ]
             [ double-rep? ] tri* and and
         ] [ drop [ >D ] dip LDR ] }
+        { [
+            3dup
+            [ [ register? ] both? ]
+            [ float-rep? ] bi* and
+        ] [ drop [ >S ] bi@ FMOV ] }
         { [
             3dup
             [ offset? ]
@@ -312,13 +322,14 @@ M:: arm.64 %gather-int-vector-4 ( DST SRC1 SRC2 SRC3 SRC4 rep -- )
 M: arm.64 %select-vector UMOV ;
 M: arm.64 %shuffle-vector drop TBL ;
 
-M: arm.64 %shuffle-vector-imm ( DST SRC shuffle rep -- )
-    4drop not-implemented ;
+M: arm.64 %shuffle-vector-imm
+    [ fp-temp ] [ >byte-array ] [ ] tri* %load-vector
+    fp-temp TBL ;
 
 M: arm.64 %shuffle-vector-halves-imm ( DST SRC1 SRC2 shuffle rep -- )
     5drop not-implemented ;
 
-: >spec ( rep -- size )
+: >size ( rep -- size )
     {
         { char-16-rep 0 }
         { uchar-16-rep 0 }
@@ -333,25 +344,25 @@ M: arm.64 %shuffle-vector-halves-imm ( DST SRC1 SRC2 shuffle rep -- )
     } at ;
 
 M: arm.64 %tail>head-vector drop dupd 8 EXT ;
-M: arm.64 %merge-vector-head >spec TRN1 ;
-M: arm.64 %merge-vector-tail >spec TRN2 ;
-M: arm.64 %float-pack-vector >spec FCVTN ;
-M: arm.64 %signed-pack-vector >spec [ nip SQXTN ] 4keep nipd SQXTN2 ;
-M: arm.64 %unsigned-pack-vector >spec [ nip SQXTUN ] 4keep nipd SQXTUN2 ;
-M: arm.64 %unpack-vector-head SXTL ;
-M: arm.64 %unpack-vector-tail SHLL ;
-M: arm.64 %integer>float-vector >spec SCVTFvi ;
-M: arm.64 %float>integer-vector >spec 2/ FCVTZSvi ;
+M: arm.64 %merge-vector-head >size TRN1 ;
+M: arm.64 %merge-vector-tail >size TRN2 ;
+M: arm.64 %float-pack-vector >size FCVTN ;
+M: arm.64 %signed-pack-vector >size [ nip SQXTN ] 4keep nipd SQXTN2 ;
+M: arm.64 %unsigned-pack-vector >size [ nip SQXTUN ] 4keep nipd SQXTUN2 ;
+M: arm.64 %unpack-vector-head >size SXTL ;
+M: arm.64 %unpack-vector-tail >size SHLL ;
+M: arm.64 %integer>float-vector >size SCVTFvi ;
+M: arm.64 %float>integer-vector >size 2/ FCVTZSvi ;
 
 : integer/float ( Rd Rn Rm rep int-op fp-op -- )
-    [ [ >spec ] [ scalar-rep? ] bi ] 2dip if ; inline
+    [ [ >size ] [ scalar-rep? ] bi ] 2dip if ; inline
 
 : signed/unsigned/float ( Rd Rn Rm rep s-op u-op f-op -- )
     {
         { [ reach signed-int-vector-rep? ] [ 2drop ] }
         { [ reach unsigned-int-vector-rep? ] [ drop nip ] }
         { [ reach float-vector-rep? ] [ 2nip ] }
-    } cond [ >spec ] dip call( Rd Rn Rm rep -- ) ; inline
+    } cond [ >size ] dip call( Rd Rn Rm size -- ) ; inline
 
 M: arm.64 %compare-vector
     {
@@ -361,19 +372,20 @@ M: arm.64 %compare-vector
     } case ;
 
 :: %move-int-vector-mask ( DST SRC -- )
-    DST SRC CMLT
-    fp-temp >Q 2 insns LDR
+    fp-temp SRC CMLT
+    fp-temp2 >Q 2 insns LDR
     5 insns B
     {
         0x01 0x02 0x04 0x08 0x10 0x20 0x40 0x80
         0x01 0x02 0x04 0x08 0x10 0x20 0x40 0x80
     } %
-    DST dup fp-temp ANDv
-    fp-temp DST 0 SHLL
-    DST dup 0 SHLL2
+    fp-temp dup fp-temp2 ANDv
+    fp-temp2 fp-temp 0 SHLL
+    fp-temp dup 0 SHLL2
+    fp-temp2 dup 0 ADDV
     fp-temp dup 0 ADDV
-    DST dup 0 ADDV
-    DST dup fp-temp 0 ZIP1 ;
+    fp-temp dup fp-temp2 0 ZIP1
+    DST fp-temp >S FMOV ;
 
 M: arm.64 %move-vector-mask
     {
@@ -389,7 +401,7 @@ M: arm.64 %test-vector-branch ( label SRC TEMP rep vcc -- )
     5drop not-implemented ;
 
 : signed/unsigned ( Rd Rn Rm rep u-op s-op -- )
-    [ [ >spec ] [ signed-int-vector-rep? ] bi ] 2dip if ; inline
+    [ [ >size ] [ signed-int-vector-rep? ] bi ] 2dip if ; inline
 
 M: arm.64 %add-vector [ ADDv ] [ FADDv ] integer/float ;
 M: arm.64 %saturated-add-vector [ SQADD ] [ UQADD ] signed/unsigned ;
@@ -402,19 +414,19 @@ M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
     DST SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
     fp-temp SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
     rep scalar-rep-of rep-size 2 shift :> imm
-    DST DST imm rep SHRN
-    DST fp-temp imm rep SHRN2 ;
+    DST DST imm rep >size SHRN
+    DST fp-temp imm rep >size SHRN2 ;
 
 M: arm.64 %mul-horizontal-add-vector [ MLAv ] [ FMLAv ] integer/float ;
 M: arm.64 %saturated-mul-vector 4drop not-implemented ;
-M: arm.64 %div-vector >spec FDIVv ;
+M: arm.64 %div-vector >size FDIVv ;
 M: arm.64 %min-vector [ SMINv ] [ UMINv ] [ FMINv ] signed/unsigned/float ;
 M: arm.64 %max-vector [ SMAXv ] [ UMAXv ] [ FMAXv ] signed/unsigned/float ;
 M: arm.64 %avg-vector [ SHADD ] [ UHADD ] signed/unsigned ;
 M: arm.64 %dot-vector [ SDOT ] [ UDOT ] signed/unsigned ;
-M: arm.64 %sad-vector [ [ SABD ] [ UABD ] signed/unsigned ] 4keep 2nip dupd >spec ADDV ;
-M: arm.64 %sqrt-vector >spec FSQRTv ;
-M: arm.64 %horizontal-add-vector >spec ADDPv ;
+M: arm.64 %sad-vector [ [ SABD ] [ UABD ] signed/unsigned ] 4keep 2nip dupd >size ADDV ;
+M: arm.64 %sqrt-vector >size FSQRTv ;
+M: arm.64 %horizontal-add-vector >size ADDPv ;
 M: arm.64 %horizontal-sub-vector 4drop not-implemented ;
 M: arm.64 %abs-vector [ ABSv ] [ FABSv ] integer/float ;
 M: arm.64 %and-vector drop ANDv ;
@@ -423,8 +435,8 @@ M: arm.64 %or-vector drop ORRv ;
 M: arm.64 %xor-vector drop EORv ;
 M: arm.64 %not-vector drop MVNv ;
 M: arm.64 %shl-vector [ SSHL ] [ USHL ] signed/unsigned ;
-M: arm.64 %shr-vector [ 2nipd dupd >spec NEGv ] 4keep %shl-vector ;
-M: arm.64 %shl-vector-imm >spec SHL ;
+M: arm.64 %shr-vector [ 2nipd dupd >size NEGv ] 4keep %shl-vector ;
+M: arm.64 %shl-vector-imm >size SHL ;
 M: arm.64 %shr-vector-imm [ SSHR ] [ USHR ] signed/unsigned ;
 M: arm.64 %horizontal-shl-vector-imm 4drop not-implemented ;
 M: arm.64 %horizontal-shr-vector-imm 4drop not-implemented ;
@@ -458,11 +470,11 @@ M: arm.64 %gather-vector-2-reps { double-2-rep longlong-2-rep ulonglong-2-rep } 
 M: arm.64 %gather-int-vector-2-reps { longlong-2-rep ulonglong-2-rep } ;
 M: arm.64 %gather-vector-4-reps { float-4-rep int-4-rep uint-4-rep } ;
 M: arm.64 %gather-int-vector-4-reps { int-4-rep uint-4-rep } ;
-M: arm.64 %select-vector-reps f ;
-M: arm.64 %alien-vector-reps f ;
+M: arm.64 %select-vector-reps int-vector-reps ;
+M: arm.64 %alien-vector-reps vector-reps ;
 M: arm.64 %shuffle-vector-reps { char-16-rep uchar-16-rep } ;
-M: arm.64 %shuffle-vector-imm-reps vector-reps ;
-M: arm.64 %shuffle-vector-halves-imm-reps vector-reps ;
+M: arm.64 %shuffle-vector-imm-reps { char-16-rep uchar-16-rep } ;
+M: arm.64 %shuffle-vector-halves-imm-reps f ;
 M: arm.64 %merge-vector-reps vector-reps ;
 M: arm.64 %float-pack-vector-reps { double-2-rep } ;
 M: arm.64 %signed-pack-vector-reps int-vector-reps ;

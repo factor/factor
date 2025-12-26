@@ -1,20 +1,26 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
+USING: alien.c-types alien.syntax arrays classes.struct
+classes.parser combinators kernel math system ;
 IN: unix.linux.epoll
-USING: alien.c-types alien.syntax classes.struct math
-unix.types ;
 
 FUNCTION: int epoll_create ( int size )
 
+<<
 UNION-STRUCT: epoll-data
     { ptr void*    }
     { fd  int      }
     { u32 uint32_t }
     { u64 uint64_t } ;
 
-PACKED-STRUCT: epoll-event
-    { events uint32_t   }
-    { data   epoll-data } ;
+"epoll-event" create-class-in
+    "events" uint32_t
+    "data" epoll-data [ f <struct-slot-spec> ] 2bi@ 2array
+{
+    { [ cpu x86? ] [ define-packed-struct-class ] }
+    { [ cpu arm.64? ] [ define-struct-class ] }
+} cond
+>>
 
 FUNCTION: int epoll_ctl ( int epfd, int op, int fd, epoll-event* event )
 

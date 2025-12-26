@@ -1453,8 +1453,8 @@ PRIVATE>
 
 
 <PRIVATE
-: simd-shift-by-imm ( Rd Rn imm rep U opcode Q -- )
-    [ scalar-rep-of rep-size 3 shift bitor ] 3dip {
+: simd-shift-by-imm ( Rd Rn imm size U opcode Q -- )
+    [ 3 + 2^ bitor ] 3dip {
         { 0b011110 23 }
         { 0b1 10 }
         { V 0 }
@@ -1466,11 +1466,11 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SSHR  ( Rd Rn imm rep -- ) 0 0b00000 1 simd-shift-by-imm ;
-: SHL   ( Rd Rn imm rep -- ) 0 0b01010 1 simd-shift-by-imm ;
-: SSHLL ( Rd Rn imm rep -- ) 0 0b10100 1 simd-shift-by-imm ;
-: SHRN  ( Rd Rn imm rep -- ) 1 0b10000 0 simd-shift-by-imm ;
-: SHRN2 ( Rd Rn imm rep -- ) 1 0b10000 1 simd-shift-by-imm ;
-: USHR  ( Rd Rn imm rep -- ) 1 0b00000 1 simd-shift-by-imm ;
+: SSHR  ( Rd Rn imm size -- ) 0 0b00000 1 simd-shift-by-imm ;
+: SHL   ( Rd Rn imm size -- ) 0 0b01010 1 simd-shift-by-imm ;
+: SSHLL ( Rd Rn imm size -- ) 0 0b10100 1 simd-shift-by-imm ;
+: SHRN  ( Rd Rn imm size -- ) 1 0b10000 0 simd-shift-by-imm ;
+: SHRN2 ( Rd Rn imm size -- ) 1 0b10000 1 simd-shift-by-imm ;
+: USHR  ( Rd Rn imm size -- ) 1 0b00000 1 simd-shift-by-imm ;
 
-: SXTL ( Rd Rn rep -- ) [ 0 ] dip SSHLL ;
+: SXTL ( Rd Rn size -- ) [ 0 ] dip SSHLL ;

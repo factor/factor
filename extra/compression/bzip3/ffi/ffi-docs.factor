@@ -1,4 +1,4 @@
-! Copyright (C) 2022 Your name.
+! Copyright (C) 2022 Raghu Ranganathan.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: classes.struct help.markup help.syntax kernel math compression.bzip3 ;
 IN: compression.bzip3.ffi
