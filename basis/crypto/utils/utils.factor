@@ -29,7 +29,7 @@ IN: crypto.utils
 ! Flag MUST be 0 or 1. Other values produce undefined results.
 ! This avoids branching by using arithmetic masking.
 :: constant-time-select ( flag a b -- a/b )
-    0 flag - :> mask
+    flag neg :> mask
     a mask bitand
     b mask bitnot bitand
     bitor ;
