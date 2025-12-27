@@ -112,6 +112,9 @@ download_with_downloader() {
 }
 
 set_downloader() {
+    if [ -n "$DOWNLOADER_NAME" ]; then
+        return
+    fi
     if test_program_installed wget; then
         DOWNLOADER_NAME=wget
         return
