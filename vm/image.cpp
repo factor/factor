@@ -110,8 +110,7 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
   auto buf = temp ? malloc(h->compressed_data_size) : (char*)data->tenured->start+uncompressed_data_size;
   if (!buf) fatal_error("Out of memory in load_data_heap", 0);
 
-  fixnum bytes_read =
-      raw_fread(buf, 1, h->compressed_data_size, file);
+  fixnum bytes_read = raw_fread(buf, 1, h->compressed_data_size, file);
 
   if ((cell)bytes_read != h->compressed_data_size) {
     std::cout << "truncated image: " << bytes_read << " bytes read, ";
@@ -144,12 +143,18 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
   if (h->code_size != 0) {
     auto uncompress = h->code_size != h->compressed_code_size;
     auto uncompressed_code_size = uncompress ? align_page(h->code_size) : 0;
+
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+    auto temp = true;
+#else
     auto temp = uncompress && uncompressed_code_size+h->compressed_code_size > code->allocator->size;
+#endif
+
     auto buf = temp ? malloc(h->compressed_code_size) : (char*)code->allocator->start+uncompressed_code_size;
     if (!buf) fatal_error("Out of memory in load_code_heap", 0);
 
-    size_t bytes_read =
-        raw_fread(buf, 1, h->compressed_code_size, file);
+    size_t bytes_read = raw_fread(buf, 1, h->compressed_code_size, file);
+
     if (bytes_read != h->compressed_code_size) {
       std::cout << "truncated image: " << bytes_read << " bytes read, ";
       std::cout << h->compressed_code_size << " bytes expected\n";
@@ -159,15 +164,26 @@ void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
     if (uncompress) {
       lib::zstd::zstd_lib zstd;
       zstd.open();
-      size_t result = zstd.decompress((void*)code->allocator->start, h->code_size, buf, h->compressed_code_size);
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+      auto buf2 = malloc(uncompressed_code_size);
+#else
+      auto buf2 = (void*)code->allocator->start;
+#endif
+      size_t result = zstd.decompress(buf2, h->code_size, buf, h->compressed_code_size);
       if (zstd.is_error(result)) {
         std::cout << "code heap decompression: " << zstd.get_error_name(result) << '\n';
         fatal_error("load_code_heap failed", 0);
       }
       zstd.close();
+      if (temp) free(buf);
+      buf = buf2;
     }
 
-    if (temp) free(buf);
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+    memcpy((void*)(code->allocator->start), buf, h->code_size);
+    free(buf);
+#endif
+
   }
 
   code->allocator->initial_free_list(h->code_size);
