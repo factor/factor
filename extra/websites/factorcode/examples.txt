@@ -151,3 +151,14 @@ binary <threaded-server>
     ] >>handler
 
 start-server wait-for-server
+----
+"+ + * 😃 - /" dup 0 [
+    {
+        { CHAR: + [ 1 + ] }
+        { CHAR: - [ 1 - ] }
+        { CHAR: * [ 2 * ] }
+        { CHAR: / [ 2 /i ] }
+        { CHAR: 😃 [ sq ] }
+        [ drop ]
+    } case
+] reduce "The program '%s' returns %d\n" sprintf
