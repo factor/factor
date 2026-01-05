@@ -39,7 +39,7 @@ FUNCTION-ALIAS: ftanh
 FUNCTION-ALIAS: fexp
     double exp ( double x )
 
-FUNCTION-ALIAS: fexp-1
+FUNCTION-ALIAS: fexp1-
     double expm1 ( double x )
 
 FUNCTION-ALIAS: flog
