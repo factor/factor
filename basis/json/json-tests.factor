@@ -144,28 +144,28 @@ TUPLE: person first-name age ;
 [ LH{ { "1" 2 } { "3" 4 } } >json ] unit-test
 
 { "{\"1\":2,\"3\":4}" }
-[ LH{ { 1 2 } { 3 4 } } >json ] unit-test
+[ t json-coerce-keys? [ LH{ { 1 2 } { 3 4 } } >json ] with-variable ] unit-test
 
 { "{\"\":4}" }
 [ LH{ { "" 2 } { "" 4 } } >json ] unit-test
 
 { "{\"false\":2,\"true\":4,\"\":5}" }
-[ LH{ { f 2 } { t 4 } { "" 5 } } >json ] unit-test
+[ t json-coerce-keys? [ LH{ { f 2 } { t 4 } { "" 5 } } >json ] with-variable ] unit-test
 
 { "{\"3.1\":3}" }
-[ LH{ { 3.1 3 } } >json ] unit-test
+[ t json-coerce-keys? [ LH{ { 3.1 3 } } >json ] with-variable ] unit-test
 
 { "{\"null\":1}" }
-[ LH{ { json-null 1 } } >json ] unit-test
+[ t json-coerce-keys? [ LH{ { json-null 1 } } >json ] with-variable ] unit-test
 
 { "{\"Infinity\":1}" }
-[ t json-allow-fp-special? [ LH{ { 1/0. 1 } } >json ] with-variable ] unit-test
+[ H{ { json-allow-fp-special? t } { json-coerce-keys? t } } [ LH{ { 1/0. 1 } } >json ] with-variables ] unit-test
 
 { "{\"-Infinity\":1}" }
-[ t json-allow-fp-special? [ LH{ { -1/0. 1 } } >json ] with-variable ] unit-test
+[ H{ { json-allow-fp-special? t } { json-coerce-keys? t } } [ LH{ { -1/0. 1 } } >json ] with-variables ] unit-test
 
 { "{\"NaN\":1}" }
-[ t json-allow-fp-special? [ LH{ { NAN: 333 1 } } >json ] with-variable ] unit-test
+[ H{ { json-allow-fp-special? t } { json-coerce-keys? t } } [ LH{ { NAN: 333 1 } } >json ] with-variables ] unit-test
 
 {
     "\"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007\\b\\t\\n\\u000b\\f\\r\\u000e\\u000f\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017\\u0018\\u0019\\u001a\\u001b\\u001c\\u001d\\u001e\\u001f\""

@@ -179,10 +179,10 @@ SYMBOL: json-allow-fp-special?
 f json-allow-fp-special? set-global
 
 SYMBOL: json-friendly-keys?
-t json-friendly-keys? set-global
+f json-friendly-keys? set-global
 
 SYMBOL: json-coerce-keys?
-t json-coerce-keys? set-global
+f json-coerce-keys? set-global
 
 SYMBOL: json-escape-slashes?
 f json-escape-slashes? set-global
