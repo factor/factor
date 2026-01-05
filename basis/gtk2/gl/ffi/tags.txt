@@ -1,3 +1,1 @@
-ui
-gnome
 not loaded
