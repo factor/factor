@@ -28,10 +28,8 @@ M: vocab-prefix vocab-name name>> ;
         [ name>> valid-vocab-name? ]
     } 1&& ;
 
-: visible-dirs ( path -- paths )
-    [
-        [ visible-dir? ] filter [ name>> ] map sort
-    ] with-directory-entries ;
+: visible-dirs ( entries -- entries )
+    [ visible-dir? ] filter [ name>> ] sort-by ;
 
 ERROR: vocab-root-required root ;
 
@@ -41,12 +39,13 @@ ERROR: vocab-root-required root ;
 : ensure-vocab-root/prefix ( root prefix -- root prefix )
     [ ensure-vocab-root ] [ vocab-name check-vocab-name ] bi* ;
 
-: vocab-directory-paths ( root prefix -- vocab-path vocab-name paths )
+: vocab-directory-entries ( root prefix -- vocab-path vocab-name entries )
     ensure-vocab-root/prefix [ vocab-dir append-path ] keep
-    over dup file-exists? [ visible-dirs ] [ drop { } ] if ;
+    over dup file-exists? [ directory-entries ] [ drop { } ] if ;
 
 : (disk-vocabs) ( root prefix -- seq )
-    vocab-directory-paths [
+    vocab-directory-entries [
+        name>>
         [ dup ".factor" append append-path append-path ]
         [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
         swap file-exists? [ >vocab-link ] [ <vocab-prefix> ] if
@@ -54,19 +53,20 @@ ERROR: vocab-root-required root ;
 
 DEFER: add-vocab%
 
-: add-vocab-children% ( vocab-path vocab-name paths -- )
-    [
+: add-vocab-children% ( vocab-path vocab-name entries -- )
+    visible-dirs [
+        name>>
         [ append-path ]
         [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
-        over visible-dirs add-vocab%
+        over directory-entries add-vocab%
     ] 2with each ;
 
 : add-vocab% ( vocab-path vocab-name entries -- )
-    3dup rot file-name ".factor" append swap member?
+    3dup rot file-name ".factor" append '[ name>> _ = ] any?
     [ >vocab-link ] [ <vocab-prefix> ] if , add-vocab-children% ;
 
 : (disk-vocabs-recursive) ( root prefix -- seq )
-    vocab-directory-paths [ add-vocab-children% ] { } make ;
+    vocab-directory-entries [ add-vocab-children% ] { } make ;
 
 : no-rooted ( seq -- seq' ) [ find-vocab-root ] reject ;
 
