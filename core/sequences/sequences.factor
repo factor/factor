@@ -14,6 +14,7 @@ GENERIC: new-sequence ( len seq -- newseq ) flushable
 GENERIC: new-resizable ( len seq -- newseq ) flushable
 GENERIC: like ( seq exemplar -- newseq ) flushable
 GENERIC: clone-like ( seq exemplar -- newseq ) flushable
+GENERIC: bounds-check? ( n seq -- ? ) flushable
 
 : lengthd ( seq obj -- n obj ) [ length ] dip ; inline
 
@@ -61,10 +62,10 @@ M: sequence shorten [ length < ] 2check [ set-length ] [ 2drop ] if ; inline
 
 ERROR: bounds-error index seq ;
 
-GENERIC#: bounds-check? 1 ( n seq -- ? )
+ERROR: integer-length-expected obj ;
 
-M: integer bounds-check?
-    dupd length < [ 0 >= ] [ drop f ] if ; inline
+M: sequence bounds-check?
+    over integer? [ dupd length < [ 0 >= ] [ drop f ] if ] [ drop integer-length-expected ] if ; inline
 
 : bounds-check ( n seq -- n seq )
     [ bounds-check? ] 2check [ bounds-error ] unless ; inline
@@ -236,10 +237,23 @@ TUPLE: slice
 
 ERROR: slice-error from to seq ;
 
+<PRIVATE
+
+: at-or-within-bounds? ( n seq -- ? )
+   dup length 0 =
+   [ drop 0 = ]
+   [
+       [ [ 1 - ] dip bounds-check? ]
+       [ bounds-check? ] 2bi or
+   ] if ; inline
+
+PRIVATE>
+
 : check-slice ( from to seq -- from to seq )
-    pick 0 < [ slice-error ] when
-    2dup length > [ slice-error ] when
-    2over > [ slice-error ] when ; inline
+    2dup      at-or-within-bounds? [ slice-error ] unless
+    pick over at-or-within-bounds? [ slice-error ] unless
+    2over <=                       [ slice-error ] unless
+    ; inline
 
 <PRIVATE
 
@@ -285,8 +299,6 @@ M: repetition nth-unsafe nip elt>> ; inline
 INSTANCE: repetition immutable-sequence
 
 <PRIVATE
-
-ERROR: integer-length-expected obj ;
 
 ! The check-length call forces partial dispatch
 : check-length ( n -- n )
