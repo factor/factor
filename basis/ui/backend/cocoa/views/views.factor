@@ -9,10 +9,10 @@ core-foundation.strings core-graphics core-graphics.types
 core-text debugger io.encodings.string io.encodings.utf16
 io.encodings.utf8 kernel literals math math.order math.parser
 math.rectangles math.vectors namespaces opengl sequences
-splitting threads ui.backend.cocoa.input-methods ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.line-support
-ui.gadgets.private ui.gadgets.worlds ui.gestures ui.private
-ui.theme ui.theme.switching words ;
+splitting system threads ui.backend.cocoa.input-methods
+ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.line-support ui.gadgets.private ui.gadgets.worlds
+ui.gestures ui.private ui.theme ui.theme.switching words ;
 
 IN: ui.backend.cocoa.views
 
@@ -227,7 +227,7 @@ IMPORT: NSAttributedString
         cp-loc cp-loc len + dup cp-loc!
         2array thickness 2array
         suffix underlines!
-    ] while 
+    ] while
     underlines length 1 = [
         underlines first first 2 2array 1array  ! thickness: 2
     ] [ underlines ] if ;
@@ -236,7 +236,7 @@ IMPORT: NSAttributedString
     replacementRange location>> NSNotFound = [
         gadget editor-caret first
         dup gadget editor-line
-        [ 
+        [
             replacementRange location>>
             >codepoint-index
             2array gadget set-caret
@@ -268,7 +268,7 @@ IMPORT: NSAttributedString
     dup gadget preedit-selected-end<<
     dup gadget set-caret gadget set-mark
     gadget preedit-start>> gadget preedit-end>> = [
-        gadget remove-preedit-info 
+        gadget remove-preedit-info
     ] when ;
 
 : set-scale-factor ( n -- )
@@ -468,7 +468,7 @@ PRIVATE>
         self window :> window
         window [
             "" clone :> str!
-            text NSString -> class -> isKindOfClass: 0 = not [
+            text NSString -> class -> isKindOfClass: c-bool> [
                 text CF>string str!
             ] [
                 text -> string CF>string str!
@@ -479,7 +479,7 @@ PRIVATE>
                     replacementRange location>> NSNotFound = [
                         gadget editor-caret first
                         dup gadget editor-line
-                        [ 
+                        [
                             replacementRange location>> >codepoint-index
                             2array gadget set-caret
                         ] [
@@ -496,7 +496,7 @@ PRIVATE>
                     ] [
                         str window user-input
                     ] if
-                ] [ 
+                ] [
                     str window user-input
                 ] if
             ] when
@@ -552,7 +552,7 @@ PRIVATE>
                     ] if
                 ] [ 0 0 ] if
             ] [ 0 0 ] if
-        ] [ 0 0 ] if 
+        ] [ 0 0 ] if
         <NSRange>
     ] ;
 
@@ -564,7 +564,7 @@ PRIVATE>
             gadget [
                 { } clone :> underlines!
                 "" clone :> str!
-                text NSString -> class -> isKindOfClass: 0 = not [
+                text NSString -> class -> isKindOfClass: c-bool> [
                     text CF>string str!
                 ] [
                     text -> string CF>string str!
@@ -622,7 +622,7 @@ PRIVATE>
                     gadget editor-caret first gadget editor-line :> str
                     str aRange location>> >codepoint-index :> start-pos
                     gadget editor-caret first start-pos 2array gadget loc>x
-                    gadget caret-loc second gadget caret-dim second + 
+                    gadget caret-loc second gadget caret-dim second +
                     2array                     ! character pos
                     gadget screen-loc v+       ! + gadget pos
                     { 1 -1 } v*

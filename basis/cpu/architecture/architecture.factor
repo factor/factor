@@ -578,12 +578,12 @@ HOOK: %box-long-long cpu ( dst src1 src2 func gc-map -- )
 
 HOOK: %save-context cpu ( temp1 temp2 -- )
 
-HOOK: %c-invoke cpu ( symbols dll gc-map -- )
+HOOK: %c-invoke cpu ( symbol dll gc-map -- )
 
 HOOK: %alien-invoke cpu ( varargs? reg-inputs stack-inputs
                           reg-outputs dead-outputs
                           cleanup stack-size
-                          symbols dll gc-map -- )
+                          symbol dll gc-map -- )
 
 HOOK: %alien-indirect cpu ( src
                             varargs? reg-inputs stack-inputs

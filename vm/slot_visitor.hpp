@@ -254,14 +254,6 @@ template <typename Fixup> struct call_frame_slot_visitor {
                                          : visitor->fixup.translate_code(owner);
     gc_info* info = compiled->block_gc_info();
 
-#ifdef FACTOR_ARM64
-    if (*(cell*)frame_top < frame_top) {
-      frame_top += *(cell*)frame_top;
-    } else {
-      frame_top = *(cell*)frame_top;
-    }
-#endif
-
     FACTOR_ASSERT(return_address < compiled->size());
     cell callsite = info->return_address_index(return_address);
     if (callsite == (cell)-1)

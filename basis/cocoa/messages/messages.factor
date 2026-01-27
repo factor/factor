@@ -5,7 +5,7 @@ arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators continuations core-graphics.types destructors
 generalizations io io.encodings.utf8 kernel layouts libc make math
 math.parser namespaces sequences sets specialized-arrays
-splitting stack-checker strings words ;
+splitting stack-checker strings system words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
 
@@ -21,7 +21,7 @@ SPECIALIZED-ARRAY: void*
 
 : sender-stub ( signature function -- word )
     [ [ sender-stub-name f <word> dup ] keep ] dip
-    over first large-struct? [ "_stret" append ] when
+    over first large-struct? cpu arm.64? not and [ "_stret" append ] when
     make-sender dup infer define-declared ;
 
 SYMBOL: message-senders
@@ -119,7 +119,7 @@ H{
     { "S" c:ushort }
     { "f" c:float }
     { "d" c:double }
-    { "B" c:bool }
+    { "B" c:char }
     { "v" c:void }
     { "*" c:void* }
     { "?" unknown_type }

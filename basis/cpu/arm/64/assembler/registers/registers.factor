@@ -66,53 +66,59 @@ PRIVATE>
 "V" 128 vector-register define-fp/simd-registers
 >>
 
-ALIAS: PR  X18
-ALIAS: FP  X29
-ALIAS: LR  X30
+ALIAS: RETURN      X0
+ALIAS: arg1        X0
+ALIAS: arg2        X1
+ALIAS: arg3        X2
+ALIAS: arg4        X3
+ALIAS: arg5        X4
+ALIAS: arg6        X5
+ALIAS: arg7        X6
+ALIAS: arg8        X7
+ALIAS: XR          X8
+
+ALIAS: temp        X9
+ALIAS: ds-0        X10
+ALIAS: ds-1        X11
+ALIAS: ds-2        X12
+ALIAS: ds-3        X13
+ALIAS: temp1       X14
+ALIAS: temp2       X15
+ALIAS: quotient    X14
+ALIAS: remainder   X15
+ALIAS: obj         X14
+ALIAS: type        X15
+ALIAS: cache       X14
+ALIAS: top         X11
+ALIAS: *top        X12
+
+ALIAS: IP0         X16
+ALIAS: IP1         X17
+
+ALIAS: PR          X18
+
+ALIAS: VM          X19
+ALIAS: CTX         X20
+ALIAS: DS          X21
+ALIAS: RS          X22
+ALIAS: PIC-TAIL    X23
+ALIAS: SAFEPOINT   X24
+ALIAS: TRAMPOLINE  X25
+ALIAS: TRAMPOLINE2 X26
+ALIAS: CACHE-MISS  X27
+ALIAS: MEGA-HITS   X28
+
+ALIAS: FP          X29
+ALIAS: LR          X30
 
 CONSTANT: WZR T{ zero-register  f 31 32 }
 CONSTANT: XZR T{ zero-register  f 31 64 }
 CONSTANT: WSP T{ stack-register f 31 32 }
 CONSTANT: SP  T{ stack-register f 31 64 }
 
+ALIAS: fp-temp     V30
+ALIAS: fp-temp2    V31
+
 CONSTANT: NZCV 0b1101101000010000
 CONSTANT: FPCR 0b1101101000100000
 CONSTANT: FPSR 0b1101101000100001
-
-ALIAS: RETURN     X0
-ALIAS: arg1       X0
-ALIAS: arg2       X1
-ALIAS: arg3       X2
-ALIAS: arg4       X3
-ALIAS: arg5       X4
-ALIAS: arg6       X5
-ALIAS: arg7       X6
-ALIAS: arg8       X7
-
-ALIAS: temp       X9
-ALIAS: ds-0       X10
-ALIAS: ds-1       X11
-ALIAS: ds-2       X12
-ALIAS: ds-3       X13
-ALIAS: temp1      X14
-ALIAS: temp2      X15
-ALIAS: quotient   X14
-ALIAS: remainder  X15
-ALIAS: obj        X14
-ALIAS: type       X15
-ALIAS: cache      X14
-ALIAS: top        X11
-ALIAS: *top       X12
-
-ALIAS: VM         X19
-ALIAS: CTX        X20
-ALIAS: DS         X21
-ALIAS: RS         X22
-ALIAS: PIC-TAIL   X23
-ALIAS: SAFEPOINT  X24
-ALIAS: TRAMPOLINE X25
-ALIAS: CACHE-MISS X26
-ALIAS: MEGA-HITS  X27
-
-ALIAS: fp-temp    V30
-ALIAS: fp-temp2   V31

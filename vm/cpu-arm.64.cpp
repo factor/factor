@@ -3,19 +3,16 @@
 namespace factor {
 
 void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc, cell handler, cell limit) {
-
   cell frame_top = ctx->callstack_top;
   cell seg_start = ctx->callstack_seg->start;
 
   if (frame_top < seg_start) {
-    code_block *block = code->code_block_for_address(*pc);
-    cell frame_size = block->stack_frame_size_for_address(*pc);
-    frame_top += frame_size;
+    frame_top = *(cell*)frame_top;
   }
 
   FACTOR_ASSERT(seg_start <= frame_top);
   while (frame_top < ctx->callstack_bottom && frame_top < limit) {
-    frame_top = code->frame_predecessor(frame_top);
+    frame_top = *(cell*)frame_top;
   }
   ctx->callstack_top = frame_top;
   *sp = frame_top;
@@ -23,7 +20,6 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc, cell handler, 
 }
 
 void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
-
   signal_handler_addr = handler;
   *(cell*)(*sp - 16) = *sp;
   *(cell*)(*sp - 8) = *pc;
@@ -32,7 +28,6 @@ void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
 }
 
 void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
-
   bool in_code_seg = code->seg->in_segment_p(*pc);
   cell cs_limit = ctx->callstack_seg->start + stack_reserved;
   signal_resumable = in_code_seg && *sp >= cs_limit;

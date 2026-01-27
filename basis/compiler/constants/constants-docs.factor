@@ -97,7 +97,8 @@ $nl
     rt-vm
     rt-cards-offset
     rt-decks-offset
-    rt-dlsym-toc
+    rt-trampoline
+    rt-trampoline2
     rt-inline-cache-miss
     rt-safepoint
 } ;

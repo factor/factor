@@ -182,6 +182,8 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
 #ifdef FACTOR_ARM64
     case RT_TRAMPOLINE:
       return (cell)&factor::trampoline;
+    case RT_TRAMPOLINE2:
+      return (cell)&factor::trampoline2;
 #endif
     default:
       return -1;
@@ -202,7 +204,7 @@ cell factor_vm::compute_external_address(instruction_operand op) {
     print_obj(ss, compiled->owner);
     ss << ": ";
     cell arg;
-    if (rel_type == RT_DLSYM || rel_type == RT_DLSYM_TOC) {
+    if (rel_type == RT_DLSYM) {
       ss << "Bad symbol specifier in compute_external_address";
       arg = array_nth(parameters, idx);
     } else {

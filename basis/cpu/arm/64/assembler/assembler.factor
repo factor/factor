@@ -637,12 +637,18 @@ M: label BL 0 BL rc-relative-arm-b label-fixup ;
 
 ! literal load, save context and call
 : (LDR=BLR*) ( word dll -- )
-    temp 3 insns LDR
+    IP0 3 insns LDR
     TRAMPOLINE BLR
     3 insns B
     8 0 <array> % rc-absolute-cell rel-dlsym ;
 
 : LDR=BLR* ( word -- ) f (LDR=BLR*) ;
+
+: (LDR=BLR**) ( word dll -- )
+    IP0 3 insns LDR
+    TRAMPOLINE2 BLR
+    3 insns B
+    8 0 <array> % rc-absolute-cell rel-dlsym ;
 
 ! literal load and jump
 : (LDR=BR) ( -- class )

@@ -65,7 +65,7 @@ CONSTANT: rt-vm 9
 CONSTANT: rt-cards-offset 10
 CONSTANT: rt-decks-offset 11
 CONSTANT: rt-trampoline 12
-CONSTANT: rt-dlsym-toc 13
+CONSTANT: rt-trampoline2 13
 CONSTANT: rt-inline-cache-miss 14
 CONSTANT: rt-safepoint 15
 

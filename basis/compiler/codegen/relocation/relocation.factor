@@ -52,9 +52,6 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 : rel-dlsym ( name dll class -- )
     [ add-dlsym-parameters ] dip rt-dlsym add-relocation ;
 
-: rel-dlsym-toc ( name dll class -- )
-    [ add-dlsym-parameters ] dip rt-dlsym-toc add-relocation ;
-
 : rel-word ( word class -- )
     [ add-literal ] dip rt-entry-point add-relocation ;
 
@@ -96,6 +93,9 @@ MEMO: cached-string>symbol ( symbol -- obj ) string>symbol ;
 
 : rel-trampoline ( class -- )
     rt-trampoline add-relocation ;
+
+: rel-trampoline2 ( class -- )
+    rt-trampoline2 add-relocation ;
 
 : init-relocation ( -- )
     V{ } clone parameter-table set

@@ -1,9 +1,9 @@
-USING: alien byte-arrays byte-vectors compiler.constants cpu.architecture
-help.markup help.syntax make vectors ;
+USING: alien byte-vectors compiler.constants cpu.architecture
+help.markup help.syntax make strings vectors ;
 IN: compiler.codegen.relocation
 
 HELP: add-dlsym-parameters
-{ $values { "symbol" byte-array } { "dll" dll } }
+{ $values { "symbol" string } { "dll" dll } }
 { $description "Adds a pair of parameters for a reference to an external C function to the " { $link parameter-table } ". 'symbol' is the name of the function and 'dll' is the shared library which contains it." } ;
 
 HELP: add-relocation

@@ -171,7 +171,7 @@ $nl
 
 HELP: spawn
 { $values { "quot" quotation } { "name" string } { "thread" thread } }
-{ $description "Spawns a new thread. The thread begins executing the given quotation; the name is for debugging purposes. The new thread begins running immediately and the current thread is added to the end of the run queue."
+{ $description "Spawns a new thread that will execute the quotation given; the name is for debugging purposes. The new thread is added to the end of the run queue."
 $nl
 "The new thread begins with an empty data stack, an empty retain stack, and an empty catch stack. The name stack is inherited from the parent thread but may be cleared with " { $link init-namestack } "." }
 { $notes
@@ -179,7 +179,7 @@ $nl
 }
 { $examples
     "A simple thread that adds two numbers:"
-    { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn" }
+    { $code "1 2 [ + . ] 2curry \"Addition thread\" spawn drop yield" }
     "A thread that counts to 10:"
     ! Don't use $example below: it won't pass help-lint.
     { $code
@@ -204,7 +204,7 @@ HELP: spawn-server
 { $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
 { $examples
     "A thread that runs forever:"
-    { $code "[ do-foo-bar t ] \"Foo bar server\" spawn-server" }
+    { $code "[ do-foo-bar t ] \"Foo bar server\" spawn-server drop yield" }
 } ;
 
 HELP: init-threads

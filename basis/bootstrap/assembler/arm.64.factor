@@ -102,6 +102,7 @@ big-endian off
     X30 CTX SP -16 [pre] STP
     SAFEPOINT (LDR=) rel-safepoint
     TRAMPOLINE (LDR=) rel-trampoline
+    TRAMPOLINE2 (LDR=) rel-trampoline2
     CACHE-MISS (LDR=) rel-inline-cache-miss
     MEGA-HITS (LDR=) rel-megamorphic-cache-hits
     CTX VM vm-spare-context-offset [+] LDR
@@ -209,9 +210,9 @@ big-endian off
 
 [
     DS RS CTX context-datastack-offset [+] STP
-    arg1 SP 8 [+] LDR
+    arg1 FP 8 [+] LDR
     arg2 VM MOV
-    temp CACHE-MISS MOV
+    IP0 CACHE-MISS MOV
     TRAMPOLINE BLR
     DS RS CTX context-datastack-offset [+] LDP
 ]
@@ -223,54 +224,13 @@ big-endian off
     DS RS CTX context-datastack-offset [+] STP
     arg1 PIC-TAIL MOV
     arg2 VM MOV
-    temp CACHE-MISS MOV
+    IP0 CACHE-MISS MOV
     TRAMPOLINE BLR
     DS RS CTX context-datastack-offset [+] LDP
 ]
 [ RETURN BLR ]
 [ RETURN BR ]
 \ inline-cache-miss-tail define-combinator-primitive
-
-: (signal-handler) ( -- )
-    X0  X1  SP -16 [pre] STP
-    X2  X3  SP -16 [pre] STP
-    X4  X5  SP -16 [pre] STP
-    X6  X7  SP -16 [pre] STP
-    X8  X9  SP -16 [pre] STP
-    X10 X11 SP -16 [pre] STP
-    X12 X13 SP -16 [pre] STP
-    X14 X15 SP -16 [pre] STP
-    X16 X17 SP -16 [pre] STP
-    X18 X19 SP -16 [pre] STP
-    X20 X21 SP -16 [pre] STP
-    X22 X23 SP -16 [pre] STP
-    X24 X25 SP -16 [pre] STP
-    X26 X27 SP -16 [pre] STP
-    X28 X29 SP -16 [pre] STP
-    X0 NZCV MRS
-    X30 X0  SP -16 [pre] STP
-    DS RS CTX context-datastack-offset [+] STP
-    temp VM vm-signal-handler-addr-offset [+] LDR
-    temp BLR
-    X30 X0  SP 16 [post] LDP
-    NZCV X0 MSR
-    X28 X29 SP 16 [post] LDP
-    X26 X27 SP 16 [post] LDP
-    X24 X25 SP 16 [post] LDP
-    X22 X23 SP 16 [post] LDP
-    X20 X21 SP 16 [post] LDP
-    X18 X19 SP 16 [post] LDP
-    X16 X17 SP 16 [post] LDP
-    X14 X15 SP 16 [post] LDP
-    X12 X13 SP 16 [post] LDP
-    X10 X11 SP 16 [post] LDP
-    X8  X9  SP 16 [post] LDP
-    X6  X7  SP 16 [post] LDP
-    X4  X5  SP 16 [post] LDP
-    X2  X3  SP 16 [post] LDP
-    X0  X1  SP 16 [post] LDP
-    FP LR SP 16 [post] LDP
-    RET ;
 
 : jit-compare ( cond -- )
     t temp1 (LDR=) rel-literal
@@ -298,6 +258,7 @@ big-endian off
         DS RS CTX context-datastack-offset [+] LDP
         SAFEPOINT (LDR=) rel-safepoint
         TRAMPOLINE (LDR=) rel-trampoline
+        TRAMPOLINE2 (LDR=) rel-trampoline2
         CACHE-MISS (LDR=) rel-inline-cache-miss
         MEGA-HITS (LDR=) rel-megamorphic-cache-hits
         XZR VM vm-fault-flag-offset [+] STR
@@ -306,8 +267,47 @@ big-endian off
     ] }
     { fpu-state [ FPSR XZR MSR ] }
     { set-fpu-state [ ] }
-    { signal-handler [ (signal-handler) ] }
-    { leaf-signal-handler [ (signal-handler) ] }
+    { signal-handler [
+        X0  X1   SP -16 [pre] STP
+        X2  X3   SP -16 [pre] STP
+        X4  X5   SP -16 [pre] STP
+        X6  X7   SP -16 [pre] STP
+        X8  X9   SP -16 [pre] STP
+        X10 X11  SP -16 [pre] STP
+        X12 X13  SP -16 [pre] STP
+        X14 X15  SP -16 [pre] STP
+        X16 X17  SP -16 [pre] STP
+        X18 X19  SP -16 [pre] STP
+        X20 X21  SP -16 [pre] STP
+        X22 X23  SP -16 [pre] STP
+        X24 X25  SP -16 [pre] STP
+        X26 X27  SP -16 [pre] STP
+        X28 X29  SP -16 [pre] STP
+        temp NZCV MRS
+        X30 temp SP -16 [pre] STP
+        DS RS CTX context-datastack-offset [+] STP
+        IP0 VM vm-signal-handler-addr-offset [+] LDR
+        TRAMPOLINE BLR
+        X30 temp SP 16 [post] LDP
+        NZCV temp MSR
+        X28 X29  SP 16 [post] LDP
+        X26 X27  SP 16 [post] LDP
+        X24 X25  SP 16 [post] LDP
+        X22 X23  SP 16 [post] LDP
+        X20 X21  SP 16 [post] LDP
+        X18 X19  SP 16 [post] LDP
+        X16 X17  SP 16 [post] LDP
+        X14 X15  SP 16 [post] LDP
+        X12 X13  SP 16 [post] LDP
+        X10 X11  SP 16 [post] LDP
+        X8  X9   SP 16 [post] LDP
+        X6  X7   SP 16 [post] LDP
+        X4  X5   SP 16 [post] LDP
+        X2  X3   SP 16 [post] LDP
+        X0  X1   SP 16 [post] LDP
+        FP  LR   SP 16 [post] LDP
+        RET
+    ] }
 
     { drop [ DS dup 8 SUB ] }
     { 2drop [ DS dup 16 SUB ] }
@@ -394,8 +394,7 @@ big-endian off
         *top top [] STR
         top *top MOV
         -5 insns B
-        FP LR SP [] LDP
-        SP FP MOV
+        FP LR SP 16 [post] LDP
         RET
     ] }
     { tag [
@@ -559,8 +558,8 @@ big-endian off
         jit-update-teb
         CTX VM vm-context-offset [+] STR
         temp CTX context-callstack-top-offset [+] LDR
-        FP temp [] LDR
-        SP FP MOV
+        SP temp MOV
+        FP SP 16 [post] LDR
         DS RS CTX context-datastack-offset [+] LDP
         ds-1 DS 8 [pre] STR
     ] }
@@ -574,8 +573,8 @@ big-endian off
         jit-update-teb
         CTX VM vm-context-offset [+] STR
         temp CTX context-callstack-top-offset [+] LDR
-        FP temp [] LDR
-        SP FP MOV
+        SP temp MOV
+        FP SP 16 [post] LDR
         DS RS CTX context-datastack-offset [+] LDP
         ds-1 DS 8 [pre] STR
     ] }

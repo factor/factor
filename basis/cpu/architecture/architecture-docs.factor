@@ -1,7 +1,7 @@
-USING: alien assocs byte-arrays classes
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stack-frame help.markup help.syntax kernel layouts
-literals math multiline sequences strings system vm words ;
+USING: alien assocs classes compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stack-frame help.markup
+help.syntax kernel layouts literals math multiline sequences
+strings system vm words ;
 IN: cpu.architecture
 
 <<
@@ -82,7 +82,7 @@ HELP: %alien-invoke
   { "dead-outputs" sequence }
   { "cleanup" integer }
   { "stack-size" integer }
-  { "symbols" string }
+  { "symbol" string }
   { "dll" { $maybe dll } }
   { "gc-map" gc-map }
 }
@@ -135,7 +135,7 @@ HELP: %call
 { $description "Emits code for calling a Factor word." } ;
 
 HELP: %c-invoke
-{ $values { "symbols" byte-array } { "dll" dll } { "gc-map" gc-map } }
+{ $values { "symbol" string } { "dll" dll } { "gc-map" gc-map } }
 { $description "Emits code for calling an FFI function." } ;
 
 HELP: %check-nursery-branch

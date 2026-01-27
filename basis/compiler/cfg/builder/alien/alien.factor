@@ -6,7 +6,8 @@ compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
 compiler.tree cpu.architecture kernel layouts make math namespaces
-sequences sequences.generalizations words ;
+sequences sequences.generalizations stack-checker.alien system
+words ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs ( abi quot -- reg-values stack-values )
@@ -42,14 +43,28 @@ IN: compiler.cfg.builder.alien
         ] keep
     ] [ drop f ] if ;
 
+: (handle-macos-arm64-varargs) ( params -- )
+    function>> "fcntl" = os macos? cpu arm.64? and and
+    [ int-regs [ 2 tail* ] change ] when ;
+
+: handle-macos-arm64-varargs ( params -- )
+    dup alien-invoke-params?
+    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
+
 : (caller-parameters) ( vregs reps -- )
     [ first3 next-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
-    [ abi>> ] [ parameters>> ] [ return>> ] tri
+    {
+        [ abi>> ]
+        [ parameters>> ]
+        [ return>> ]
+        [ ]
+    } cleave
     '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
+        _ handle-macos-arm64-varargs
         (caller-parameters)
     ] with-param-regs ;
 
@@ -84,6 +99,9 @@ IN: compiler.cfg.builder.alien
         base-type box-return ds-push
     ] if-void ;
 
+: ?insert-trampoline ( stack-size -- stack-size' )
+    cpu arm.64? [ dup 0 = [ 16 align 16 + ] unless ] when ;
+
 : params>alien-insn-params ( params --
                              varargs? reg-inputs stack-inputs
                              reg-outputs dead-outputs
@@ -92,7 +110,7 @@ IN: compiler.cfg.builder.alien
         [ varargs?>> ]
         [ caller-parameters ]
         [ prepare-caller-return { } ]
-        [ stack-params get [ caller-stack-cleanup ] keep ]
+        [ stack-params get ?insert-trampoline [ caller-stack-cleanup ] keep ]
     } cleave ;
 
 M: #alien-invoke emit-node

@@ -21,18 +21,18 @@ M: arm.64 machine-registers
     {
         { int-regs ${
             X0  X1  X2  X3  X4  X5  X6  X7  X8
-            X10 X11 X12 X13 X14 X15
+            X10 X11 X12 X13 X14 X15 X16 X17
         } }
         { float-regs ${
             V0  V1  V2  V3  V4  V5  V6  V7
             V16 V17 V18 V19 V20 V21 V22 V23
-            V24 V25 V26 V27 V28 V29 V30
+            V24 V25 V26 V27 V28 V29
         } }
     } ;
 
 M: arm.64 frame-reg FP ;
 
-M: arm.64 gc-root-offset n>> spill-offset 2 cells + cell /i ;
+M: arm.64 gc-root-offset n>> spill-offset cell /i ;
 
 : imm>halfwords ( uimm64 -- assoc )
     4 <iota> [
@@ -114,7 +114,7 @@ M: arm.64 %inc
     [ ds-loc? DS RS ? dup ] [ n>> cells ] bi
     dup 0 > [ ADD ] [ neg SUB ] if ;
 
-M: arm.64 stack-frame-size (stack-frame-size) 2 cells + 16 align ;
+M: arm.64 stack-frame-size (stack-frame-size) 16 + 16 align ;
 
 M: arm.64 %call 0 BL rc-relative-arm-b rel-word-pic ;
 
@@ -182,7 +182,7 @@ M:: arm.64 %bit-count ( DST SRC -- )
     fp-temp dup 0 ADDV
     DST fp-temp >D FMOV ;
 
-: stack@ ( n -- operand ) [ SP ] dip 2 cells + [+] ;
+: stack@ ( n -- operand ) [ SP ] dip [+] ;
 
 : spill@ ( n -- operand ) spill-offset stack@ ;
 
@@ -665,21 +665,13 @@ M:: arm.64 %check-nursery-branch ( label size cc TEMP1 TEMP2 -- )
 M: arm.64 %call-gc \ minor-gc %call gc-map-here ;
 
 M: arm.64 %prologue
-    neg dup 10 >signed over = [
-        [ FP LR SP ] dip [pre] STP
-    ] [
-        [ SP dup ] dip neg SUB
-        FP LR SP [] STP
-    ] if
-    FP SP MOV ;
+    FP LR SP -16 [pre] STP
+    FP SP MOV
+    16 - [ [ SP dup ] dip SUB ] unless-zero ;
 
 M: arm.64 %epilogue
-    dup 10 >signed over = [
-        [ FP LR SP ] dip [post] LDP
-    ] [
-        FP LR SP [] LDP
-        [ SP dup ] dip ADD
-    ] if ;
+    16 - [ [ SP dup ] dip ADD ] unless-zero
+    FP LR SP 16 [post] LDP ;
 
 M: arm.64 %safepoint SAFEPOINT dup [] STR ;
 
@@ -810,7 +802,7 @@ M:: arm.64 %unbox ( DST SRC func rep -- )
     DST rep %load-return ;
 
 M:: arm.64 %local-allot ( DST size align offset -- )
-    DST SP offset local-allot-offset 2 cells + ADD ;
+    DST SP offset local-allot-offset ADD ;
 
 M:: arm.64 %box ( DST SRC func rep gc-map -- )
     rep reg-class-of f param-regs at first SRC rep %copy
@@ -823,7 +815,12 @@ M:: arm.64 %save-context ( TEMP1 TEMP2 -- )
 
 M: arm.64 %c-invoke [ (LDR=BLR*) ] dip gc-map-here ;
 
-M: arm.64 %alien-invoke '[ _ _ _ %c-invoke ] %alien-assembly ;
+M: arm.64 %alien-invoke
+    reach [ '[ _ _ _ %c-invoke ] ] [ -roll '[
+        IP1 SP _ 16 - ADD
+        _ _ (LDR=BLR**)
+        _ gc-map-here
+    ] ] if-zero %alien-assembly ;
 
 : ?spill-slot* ( obj -- obj )
     dup spill-slot? [
@@ -832,32 +829,46 @@ M: arm.64 %alien-invoke '[ _ _ _ %c-invoke ] %alien-assembly ;
     ] when ;
 
 M: arm.64 %alien-indirect
-    [ 8 nrot ] dip '[
-        temp _ ?spill-slot* MOV
+    [ 8 nrot ] dip pick [ '[
+        IP0 _ ?spill-slot* MOV
         TRAMPOLINE BLR
         _ gc-map-here
-    ] %alien-assembly ;
-
-:: %store-stack-param ( vreg rep n -- )
-    rep return-reg vreg rep %copy
-    n stack@ rep return-reg rep %copy ;
+    ] ] [ -rot '[
+        IP1 SP _ 16 - ADD
+        IP0 _ ?spill-slot* MOV
+        TRAMPOLINE2 BLR
+        _ gc-map-here
+    ] ] if-zero %alien-assembly ;
 
 : %store-reg-param ( vreg rep reg -- ) -rot %copy ;
 
-M:: arm.64 %alien-assembly ( varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size quot -- )
-    stack-inputs [ first3 %store-stack-param ] each
-    reg-inputs [ first3 %store-reg-param ] each
-    quot call( -- )
-    reg-outputs [ first3 %load-reg-param ] each ;
+: temp-regs ( -- alist )
+    {
+        { int-regs ${ temp } }
+        { float-regs ${ fp-temp } }
+    } ;
 
-: next-stack@ ( n -- operand ) [ temp ] dip 2 cells + [+] ;
+: temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
+
+:: %store-stack-param ( vreg rep n -- )
+    rep temp-reg vreg rep %copy
+    n stack@ rep temp-reg rep %copy ;
+
+M: arm.64 %alien-assembly
+    3nip swap {
+        [ [ first3 %store-reg-param ] each ]
+        [ [ first3 %store-stack-param ] each ]
+        [ call( -- ) ]
+        [ [ first3 %load-reg-param ] each ]
+    } spread drop ;
+
+: next-stack@ ( n -- operand ) [ FP ] dip 16 + [+] ;
 
 :: %load-stack-param ( vreg rep n -- )
-    rep return-reg n next-stack@ rep %copy
-    vreg rep return-reg rep %copy ;
+    rep temp-reg n next-stack@ rep %copy
+    vreg rep temp-reg rep %copy ;
 
 M: arm.64 %callback-inputs
-    temp FP [] LDR
     [ [ first3 %load-reg-param ] each ]
     [ [ first3 %load-stack-param ] each ] bi*
     arg1 VM MOV

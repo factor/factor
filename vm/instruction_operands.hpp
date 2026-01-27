@@ -27,8 +27,8 @@ enum relocation_type {
   RT_DECKS_OFFSET,
   // address of trampoline function
   RT_TRAMPOLINE,
-  // arg is a literal table index, holding a pair (symbol/dll)
-  RT_DLSYM_TOC,
+  // address of trampoline2 function
+  RT_TRAMPOLINE2,
   // address of inline_cache_miss function. This is a separate
   // relocation to reduce compile time and size for PICs.
   RT_INLINE_CACHE_MISS,
@@ -88,7 +88,6 @@ struct relocation_entry {
       case RT_VM:
         return 1;
       case RT_DLSYM:
-      case RT_DLSYM_TOC:
         return 2;
       case RT_ENTRY_POINT:
       case RT_ENTRY_POINT_PIC:
@@ -101,6 +100,7 @@ struct relocation_entry {
       case RT_CARDS_OFFSET:
       case RT_DECKS_OFFSET:
       case RT_TRAMPOLINE:
+      case RT_TRAMPOLINE2:
       case RT_INLINE_CACHE_MISS:
       case RT_SAFEPOINT:
         return 0;

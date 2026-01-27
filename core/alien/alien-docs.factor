@@ -139,9 +139,9 @@ HELP: alien-assembly
     $nl
     "It's important to mind the ABI. For instance, on x86.32, parameters are passed on the stack in " { $snippet "ESP" } ", while on x86.64 arguments are passed in " { $snippet "RDI" } ", " { $snippet "RSI" } ", " { $snippet "RDX" } ", and " { $snippet "RCX" } ", and then on the stack. On Windows 64, integers and pointers are passed in " { $snippet "RCX" } ", " { $snippet "RDX" } ", " { $snippet "R8" } ", and " { $snippet "R9" } "."
     $nl
-    "There are Factor words for the input parameters, such as " { $snippet "param-reg-0" } " and " { $snippet "param-reg-1" } "."
+    "There are Factor words for the input parameters, such as " { $snippet "param-reg-0" } " and " { $snippet "param-reg-1" } " on x86 or " { $snippet "arg1" } " and " { $snippet "arg2" } " on ARM."
     $nl
-    "For output parameters, use the."
+    "For output parameters, use " { $snippet "return-reg" } " on x86 and " { $snippet "RETURN" } " on ARM."
     $nl
 }
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
