@@ -44,7 +44,7 @@ ERROR: vocab-root-required root ;
     over dup file-exists? [ directory-entries ] [ drop { } ] if ;
 
 : (disk-vocabs) ( root prefix -- seq )
-    vocab-directory-entries [
+    vocab-directory-entries visible-dirs [
         name>>
         [ dup ".factor" append append-path append-path ]
         [ over empty? [ nip ] [ "." glue ] if ] bi-curry bi*
