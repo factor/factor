@@ -252,7 +252,8 @@ big-endian off
     ] }
     { unwind-native-frames [
         SP arg2 MOV
-        FP SP MOV
+        FP SP [] LDR
+        LR SP 8 [+] LDR
         0 VM (LDR=) rel-vm
         CTX VM vm-context-offset [+] LDR
         DS RS CTX context-datastack-offset [+] LDP

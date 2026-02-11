@@ -68,6 +68,11 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     // called.
     data_roots.clear();
 
+    // Primitive wrappers enter C++ with JIT pages writable. If we transfer
+    // control out of a primitive via unwind_native_frames, we must restore
+    // execute mode first or the jump into Factor code faults on macOS arm64.
+    JIT_EXECUTABLE
+
     // The unwind-native-frames subprimitive will clear faulting_p
     // if it was successfully reached.
     unwind_native_frames(special_objects[ERROR_HANDLER_QUOT],
