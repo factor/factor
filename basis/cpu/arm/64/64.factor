@@ -426,8 +426,14 @@ M: arm.64 %shl-vector [ SSHL ] [ USHL ] signed/unsigned ;
 M: arm.64 %shr-vector [ 2nipd dupd >shape NEGv ] 4keep %shl-vector ;
 M: arm.64 %shl-vector-imm >shape SHL ;
 M: arm.64 %shr-vector-imm [ SSHR ] [ USHR ] signed/unsigned ;
-M: arm.64 %horizontal-shl-vector-imm 4drop not-implemented ;
-M: arm.64 %horizontal-shr-vector-imm 4drop not-implemented ;
+
+M:: arm.64 %horizontal-shl-vector-imm ( DST SRC1 src2 rep -- )
+    fp-temp dup dup 16B EORv
+    DST fp-temp SRC1 16 src2 - 16B EXT ;
+
+M:: arm.64 %horizontal-shr-vector-imm ( DST SRC1 src2 rep -- )
+    fp-temp dup dup 16B EORv
+    DST SRC1 fp-temp src2 16B EXT ;
 
 M: arm.64 %integer>scalar drop [ >D ] dip FMOV ;
 M: arm.64 %scalar>integer drop >D FMOV ;
@@ -510,8 +516,8 @@ M: arm.64 %shl-vector-reps int-vector-reps ;
 M: arm.64 %shr-vector-reps int-vector-reps ;
 M: arm.64 %shl-vector-imm-reps int-vector-reps ;
 M: arm.64 %shr-vector-imm-reps int-vector-reps ;
-M: arm.64 %horizontal-shl-vector-imm-reps f ;
-M: arm.64 %horizontal-shr-vector-imm-reps f ;
+M: arm.64 %horizontal-shl-vector-imm-reps vector-reps ;
+M: arm.64 %horizontal-shr-vector-imm-reps vector-reps ;
 
 M: arm.64 %unbox-alien alien-offset [+] LDR ;
 
