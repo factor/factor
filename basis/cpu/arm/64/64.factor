@@ -137,9 +137,44 @@ M: arm.64 %set-slot 2drop [+] STR ;
 M: arm.64 %set-slot-imm slot-offset extend-offset STR ;
 
 M: arm.64 %add ADDS ;
-M: arm.64 %add-imm ADDS ;
+
+M:: arm.64 %add-imm ( DST SRC1 src2 -- )
+    src2 0 >= [
+        src2 add/sub-immediate? [
+            DST SRC1 src2 ADDS
+        ] [
+            temp src2 MOV
+            DST SRC1 temp ADDS
+        ] if
+    ] [
+        src2 neg :> imm
+        imm add/sub-immediate? [
+            DST SRC1 imm SUBS
+        ] [
+            temp imm MOV
+            DST SRC1 temp SUBS
+        ] if
+    ] if ;
+
 M: arm.64 %sub SUBS ;
-M: arm.64 %sub-imm SUBS ;
+
+M:: arm.64 %sub-imm ( DST SRC1 src2 -- )
+    src2 0 >= [
+        src2 add/sub-immediate? [
+            DST SRC1 src2 SUBS
+        ] [
+            temp src2 MOV
+            DST SRC1 temp SUBS
+        ] if
+    ] [
+        src2 neg :> imm
+        imm add/sub-immediate? [
+            DST SRC1 imm ADDS
+        ] [
+            temp imm MOV
+            DST SRC1 temp ADDS
+        ] if
+    ] if ;
 M: arm.64 %mul MUL ;
 
 M:: arm.64 %mul-imm ( DST SRC1 src2 -- )
