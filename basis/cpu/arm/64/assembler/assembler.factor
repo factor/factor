@@ -144,7 +144,6 @@ GENERIC: encode-width*** ( reg -- ftype )
 
 M: fp-register encode-width***
     width>> {
-        { 16 [ 3 ] }
         { 32 [ 0 ] }
         { 64 [ 1 ] }
         [ register-width-error ]
@@ -233,6 +232,43 @@ M: register [+] 0 <LSL*> [+] ;
 <PRIVATE
 PREDICATE: register-offset < offset type>> 2 = ;
 PRIVATE>
+
+
+TUPLE: vector-element register index size ;
+C: <vector-element> vector-element
+<PRIVATE
+: >vector-element< ( element -- register index size )
+    [ register>> ] [ index>> ] [ size>> ] tri ;
+PRIVATE>
+
+: B[] ( Vn i -- element ) 0 <vector-element> ;
+: H[] ( Vn i -- element ) 1 <vector-element> ;
+: S[] ( Vn i -- element ) 2 <vector-element> ;
+: D[] ( Vn i -- element ) 3 <vector-element> ;
+
+
+TUPLE: vector-shape size Q ;
+C: <vector-shape> vector-shape
+<PRIVATE
+: sz>> ( shape -- sz ) size>> 1 bitand ;
+
+ERROR: operand-error shape ;
+: check-vector-shape ( shape -- shape )
+    dup vector-shape? [ operand-error ] unless ;
+
+: Q    ( shape -- Q )    check-vector-shape Q>>    ;
+: size ( shape -- size ) check-vector-shape size>> ;
+: sz   ( shape -- sz )   check-vector-shape sz>>   ;
+PRIVATE>
+
+:  8B ( -- shape ) 0 0 <vector-shape> ;
+: 16B ( -- shape ) 0 1 <vector-shape> ;
+:  4H ( -- shape ) 1 0 <vector-shape> ;
+:  8H ( -- shape ) 1 1 <vector-shape> ;
+:  2S ( -- shape ) 2 0 <vector-shape> ;
+:  4S ( -- shape ) 2 1 <vector-shape> ;
+:  1D ( -- shape ) 3 0 <vector-shape> ;
+:  2D ( -- shape ) 3 1 <vector-shape> ;
 
 
 CONSTANT: EQ  0 ! equal
@@ -818,10 +854,11 @@ ERROR: unknown-c-type c-type ;
         { float-rep  [ 2 1 0 2 ] }
         { double     [ 3 1 0 3 ] }
         { double-rep [ 3 1 0 3 ] }
-        [ dup vector-rep? [ drop 4 1 0 4 ] [ unknown-c-type ] if ]
-    } case ] dip
-    dup 0 = [ [ drop 0 ] 2dip ] when
-    pick 1 = [ drop 0 ] when ;
+        [ dup vector-rep? [ drop 0 1 1 4 ] [ unknown-c-type ] if ]
+    } case ] dip reach reach [ 1 = ] both? [
+        dup 0 = [ [ drop 0 ] 2dip ] when
+        pick 1 = [ drop 0 ] when
+    ] unless ;
 
 : load/store-register* ( Rt operand c-type L -- )
     encode-c-type (load/store-register) ;
@@ -1062,8 +1099,8 @@ PRIVATE>
 
 : FMOVgen ( Rd Rn -- )
     2dup dup general-register?
-    [ [ swap ] when [ encode-width ] [ encode-width*** ] bi* ]
-    [ 1 0 ? ] bi {
+    [ [ swap ] when [ encode-width ] [ encode-width*** ] bi* [ min ] keep ]
+    [ 7 6 ? ] bi {
         { 0b11110 24 }
         { 0b1 21 }
         { n>> 0 }
@@ -1173,34 +1210,14 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: FMULs ( Rd Rn Rm -- ) 0 fp-data-processing-2-sources ;
-: FDIVs ( Rd Rn Rm -- ) 1 fp-data-processing-2-sources ;
-: FADDs ( Rd Rn Rm -- ) 2 fp-data-processing-2-sources ;
-: FSUBs ( Rd Rn Rm -- ) 3 fp-data-processing-2-sources ;
-: FMAXs ( Rd Rn Rm -- ) 4 fp-data-processing-2-sources ;
-: FMINs ( Rd Rn Rm -- ) 5 fp-data-processing-2-sources ;
-
-
-<PRIVATE
-: simd-scalar-2-misc ( Rd Rn size0 U size1 opcode -- )
-    {
-        { 0b01 30 }
-        { 0b11110 24 }
-        { 0b10000 17 }
-        { 0b10 10 }
-        { V 0 }
-        { V 5 }
-        22
-        19
-        23
-        12
-    } encode ;
-PRIVATE>
-
-: CMLT     ( Vd Vn -- )     0 0 0 0b01010 simd-scalar-2-misc ;
-: FCVTZSvi ( Rd Rn spec* -- ) 0 1 0b11011 simd-scalar-2-misc ;
-: SCVTFvi  ( Rd Rn spec  -- ) 0 0 0b11101 simd-scalar-2-misc ;
-
+: FMULs   ( Rd Rn Rm -- ) 0 fp-data-processing-2-sources ;
+: FDIVs   ( Rd Rn Rm -- ) 1 fp-data-processing-2-sources ;
+: FADDs   ( Rd Rn Rm -- ) 2 fp-data-processing-2-sources ;
+: FSUBs   ( Rd Rn Rm -- ) 3 fp-data-processing-2-sources ;
+: FMAXs   ( Rd Rn Rm -- ) 4 fp-data-processing-2-sources ;
+: FMINs   ( Rd Rn Rm -- ) 5 fp-data-processing-2-sources ;
+: FMAXNMs ( Rd Rn Rm -- ) 6 fp-data-processing-2-sources ;
+: FMINNMs ( Rd Rn Rm -- ) 7 fp-data-processing-2-sources ;
 
 <PRIVATE
 : simd-table-lookup ( Rd Rn Rm op2 len op -- )
@@ -1220,118 +1237,120 @@ PRIVATE>
 
 
 <PRIVATE
-: simd-permute ( Rd Rn Rm size opcode -- )
-    {
+: simd-permute ( Rd Rn Rm shape opcode -- )
+    dupd {
         { 0b1 30 }
         { 0b001110 24 }
         { 0b10 10 }
         { V 0 }
         { V 5 }
         { V 16 }
-        22
+        { Q 30 }
+        { size 22 }
         12
     } encode ;
 PRIVATE>
 
-: UZP1 ( Rd Rn Rm spec -- ) 0b001 simd-permute ;
-: TRN1 ( Rd Rn Rm spec -- ) 0b010 simd-permute ;
-: ZIP1 ( Rd Rn Rm spec -- ) 0b011 simd-permute ;
-: UZP2 ( Rd Rn Rm spec -- ) 0b101 simd-permute ;
-: TRN2 ( Rd Rn Rm spec -- ) 0b110 simd-permute ;
-: ZIP2 ( Rd Rn Rm spec -- ) 0b111 simd-permute ;
+: UZP1 ( Rd Rn Rm shape -- ) 0b001 simd-permute ;
+: TRN1 ( Rd Rn Rm shape -- ) 0b010 simd-permute ;
+: ZIP1 ( Rd Rn Rm shape -- ) 0b011 simd-permute ;
+: UZP2 ( Rd Rn Rm shape -- ) 0b101 simd-permute ;
+: TRN2 ( Rd Rn Rm shape -- ) 0b110 simd-permute ;
+: ZIP2 ( Rd Rn Rm shape -- ) 0b111 simd-permute ;
 
 
 <PRIVATE
-: simd-extract ( Rd Rn Rm uimm4 op2 -- )
+: simd-extract ( Rd Rn Rm uimm4 shape op2 -- )
     {
-        { 0b1 30 }
         { 0b101110 24 }
         { V 0 }
         { V 5 }
         { V 16 }
         11
+        { Q 30 }
         22
     } encode ;
 PRIVATE>
 
-: EXT ( Rd Rn Rm uimm4 -- ) 0 simd-extract ;
+: EXT ( Rd Rn Rm uimm4 shape -- ) 0 simd-extract ;
 
 
 <PRIVATE
-: simd-copy ( Rd Rn uimm5 uimm4 op -- )
+: simd-copy ( Rd Rn imm5 Q imm4 op -- )
     {
-        { 0b1 30 }
         { 0b01110000 21 }
         { 0b1 10 }
-        { V 0 }
+        { n>> 0 }
         { n>> 5 }
         16
-        11
-        29
-    } encode ;
-PRIVATE>
-
-: INSgen ( Rd Rn imm rep -- )
-    scalar-rep-of rep-size log2 [ 5 swap - check-unsigned-immediate ] keep
-    [ shift ] [ 2^ bitor ] bi 0b0011 0 simd-copy ;
-
-: INSelt ( Rd Rn immd immn rep -- )
-    scalar-rep-of rep-size log2
-    [ 5 swap - '[ _ check-unsigned-immediate ] bi@ ] keep
-    [ [ shift ] [ 2^ bitor ] bi ] [ 1 - log2 shift ] bi-curry bi*
-    1 simd-copy ;
-
-<PRIVATE
-: simd-copy* ( Rd Rn uimm5 rep uimm4 op -- )
-    [
-        [ 1encode-width ] 3dip
-        scalar-rep-of rep-size log2 [ 5 swap - check-unsigned-immediate ] keep
-        [ shift ] [ 2^ bitor ] bi
-    ] 2dip {
-        { 0b01110000 21 }
-        { 0b1 10 }
-        { R 0 }
         30
-        { V 5 }
-        16
         11
         29
     } encode ;
 PRIVATE>
 
-: SMOV ( Rd Rn imm rep -- ) 0b0101 0 simd-copy* ;
-: UMOV ( Rd Rn imm rep -- ) 0b0111 0 simd-copy* ;
+GENERIC: INS ( dst src -- )
+
+M: general-register INS
+    [ >vector-element< ] dip -rot [ 1 + shift ] [ 2^ bitor ] bi 1 0b0011 0 simd-copy ;
+
+ERROR: element-size-mismatch size1 size2 ;
+M: vector-element INS
+    [ >vector-element< ] bi@ [ -rot ] 2dip pick over = [ element-size-mismatch ] unless
+    [ [ 1 + shift ] [ 2^ bitor ] bi 1 ] [ shift ] 2bi* 1 simd-copy ;
+
+GENERIC#: DUP 1 ( Rd Rn/element shape -- )
+
+M: vector-element DUP
+    [ >vector-element< [ 1 + shift ] [ 2^ bitor ] bi ] [ Q>> ] bi* 0 0 simd-copy ;
+
+M: general-register DUP [ size>> 2^ ] [ Q>> ] bi 1 0 simd-copy ;
+
+: SMOV ( Rd element -- )
+    >vector-element< [ 1 + shift ] [ 2^ bitor ] bi pick encode-width 0b0101 0 simd-copy ;
+
+: UMOV ( Rd element -- )
+    >vector-element< [ 1 + shift ] [ 2^ bitor ] [ 1 + -2 shift ] tri 0b0111 0 simd-copy ;
 
 
 <PRIVATE
-: simd-3-ext ( Rd Rn Rm size U opcode -- )
-    {
-        { 0b1 30 }
-        { 0b01110 24 }
-        { 0b1 15 }
-        { 0b1 10 }
-        { V 0 }
-        { V 5 }
-        { V 16 }
-        22
-        29
-        11
-    } encode ;
-PRIVATE>
-
-: SDOT ( Rd Rn Rm size -- ) 0 2 simd-3-ext ;
-: UDOT ( Rd Rn Rm size -- ) 1 2 simd-3-ext ;
-
-
-<PRIVATE
-: simd-2-misc ( Rd Rn size0 U size1 opcode Q -- )
+: simd-2-misc ( Rd Rn shape U opcode Q -- )
     {
         { 0b01110 24 }
         { 0b10000 17 }
         { 0b10 10 }
         { V 0 }
         { V 5 }
-        22
+        { size 22 }
+        29
+        12
+        30
+    } encode ;
+PRIVATE>
+
+: CNTv    ( Rd Rn shape -- ) 0 0b00101 1 simd-2-misc ;
+: ABSv    ( Rd Rn shape -- ) 0 0b01011 1 simd-2-misc ;
+: CMLT    ( Rd Rn shape -- ) 0 0b01010 1 simd-2-misc ;
+: SQXTN   ( Rd Rn shape -- ) 0 0b10100 0 simd-2-misc ;
+: SQXTN2  ( Rd Rn shape -- ) 0 0b10100 1 simd-2-misc ;
+: MVNv    ( Rd Rn shape -- ) 1 0b00101 1 simd-2-misc ;
+: NEGv    ( Rd Rn shape -- ) 1 0b01011 1 simd-2-misc ;
+: SQXTUN  ( Rd Rn shape -- ) 1 0b10010 0 simd-2-misc ;
+: SQXTUN2 ( Rd Rn shape -- ) 1 0b10010 1 simd-2-misc ;
+: SHLL    ( Rd Rn shape -- ) 1 0b10011 0 simd-2-misc ;
+: SHLL2   ( Rd Rn shape -- ) 1 0b10011 1 simd-2-misc ;
+: UQXTN   ( Rd Rn shape -- ) 1 0b10100 0 simd-2-misc ;
+: UQXTN2  ( Rd Rn shape -- ) 1 0b10100 1 simd-2-misc ;
+
+<PRIVATE
+: simd-2-misc* ( Rd Rn shape U size1 opcode Q -- )
+    {
+        { 0b01110 24 }
+        { 0b10000 17 }
+        { 0b10 10 }
+        { V 0 }
+        { V 5 }
+        { sz 22 }
         29
         23
         12
@@ -1339,19 +1358,14 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: CNTv    ( Rd Rn -- )    0 0 0 0b00101 1 simd-2-misc ;
-: ABSv    ( Rd Rn size -- ) 0 0 0b01011 1 simd-2-misc ;
-: SQXTN   ( Rd Rn size -- ) 0 0 0b10100 0 simd-2-misc ;
-: SQXTN2  ( Rd Rn size -- ) 0 0 0b10100 1 simd-2-misc ;
-: FCVTN   ( Rd Rn size -- ) 0 0 0b10110 1 simd-2-misc ;
-: FABSv   ( Rd Rn size -- ) 0 1 0b01111 1 simd-2-misc ;
-: MVNv    ( Rd Rn -- )    0 1 0 0b00101 1 simd-2-misc ;
-: NEGv    ( Rd Rn size -- ) 1 0 0b01011 1 simd-2-misc ;
-: SQXTUN  ( Rd Rn size -- ) 1 0 0b10010 0 simd-2-misc ;
-: SQXTUN2 ( Rd Rn size -- ) 1 0 0b10010 1 simd-2-misc ;
-: SHLL    ( Rd Rn size -- ) 1 0 0b10011 0 simd-2-misc ;
-: SHLL2   ( Rd Rn size -- ) 1 0 0b10011 1 simd-2-misc ;
-: FSQRTv  ( Rd Rn size -- ) 1 1 0b11111 1 simd-2-misc ;
+: FCVTN    ( Rd Rn shape -- ) 0 0 0b10110 0 simd-2-misc* ;
+: FCVTL    ( Rd Rn shape -- ) 0 0 0b10111 0 simd-2-misc* ;
+: FCVTL2   ( Rd Rn shape -- ) 0 0 0b10111 1 simd-2-misc* ;
+: SCVTFvi  ( Rd Rn shape -- ) 0 0 0b11101 1 simd-2-misc* ;
+: FABSv    ( Rd Rn shape -- ) 0 1 0b01111 1 simd-2-misc* ;
+: UCVTFvi  ( Rd Rn shape -- ) 1 0 0b11101 1 simd-2-misc* ;
+: FCVTZSvi ( Rd Rn shape -- ) 0 1 0b11011 1 simd-2-misc* ;
+: FSQRTv   ( Rd Rn shape -- ) 1 1 0b11111 1 simd-2-misc* ;
 
 
 <PRIVATE
@@ -1363,13 +1377,13 @@ PRIVATE>
         { 0b10 10 }
         { V 0 }
         { V 5 }
-        22
+        { size 22 }
         29
         12
     } encode ;
 PRIVATE>
 
-: ADDV ( Rd Rn size -- ) 0 0b11011 simd-across-lanes ;
+: ADDV ( Rd Rn shape -- ) 0 0b11011 simd-across-lanes ;
 
 
 <PRIVATE
@@ -1380,25 +1394,21 @@ PRIVATE>
         { V 0 }
         { V 5 }
         { V 16 }
-        22
+        { size 22 }
         29
         12
         30
     } encode ;
 PRIVATE>
 
-: SMLAL  ( Rd Rn Rm size -- ) 0 0b1000 0 simd-3-different ;
-: SMLAL2 ( Rd Rn Rm size -- ) 0 0b1000 1 simd-3-different ;
-: SMULL  ( Rd Rn Rm size -- ) 0 0b1100 0 simd-3-different ;
-: SMULL2 ( Rd Rn Rm size -- ) 0 0b1100 1 simd-3-different ;
-: UMLAL  ( Rd Rn Rm size -- ) 1 0b1000 0 simd-3-different ;
-: UMLAL2 ( Rd Rn Rm size -- ) 1 0b1000 1 simd-3-different ;
-: UMULL  ( Rd Rn Rm size -- ) 1 0b1100 0 simd-3-different ;
-: UMULL2 ( Rd Rn Rm size -- ) 1 0b1100 1 simd-3-different ;
+: SMULL  ( Rd Rn Rm shape -- ) 0 0b1100 0 simd-3-different ;
+: SMULL2 ( Rd Rn Rm shape -- ) 0 0b1100 1 simd-3-different ;
+: UMULL  ( Rd Rn Rm shape -- ) 1 0b1100 0 simd-3-different ;
+: UMULL2 ( Rd Rn Rm shape -- ) 1 0b1100 1 simd-3-different ;
 
 
 <PRIVATE
-: simd-3-same ( Rd Rn Rm size0 U size1 opcode -- )
+: simd-3-same ( Rd Rn Rm shape U opcode -- )
     {
         { 0b1 30 }
         { 0b01110 24 }
@@ -1407,76 +1417,123 @@ PRIVATE>
         { V 0 }
         { V 5 }
         { V 16 }
-        22
+        { size 22 }
+        29
+        11
+    } encode ;
+PRIVATE>
+
+: SQADD  ( Rd Rn Rm shape -- ) 0 0b00001 simd-3-same ;
+: SRHADD ( Rd Rn Rm shape -- ) 0 0b00010 simd-3-same ;
+: SQSUB  ( Rd Rn Rm shape -- ) 0 0b00101 simd-3-same ;
+: CMGT   ( Rd Rn Rm shape -- ) 0 0b00110 simd-3-same ;
+: CMGE   ( Rd Rn Rm shape -- ) 0 0b00111 simd-3-same ;
+: SSHL   ( Rd Rn Rm shape -- ) 0 0b01000 simd-3-same ;
+: SMAX   ( Rd Rn Rm shape -- ) 0 0b01100 simd-3-same ;
+: SMIN   ( Rd Rn Rm shape -- ) 0 0b01101 simd-3-same ;
+: SABD   ( Rd Rn Rm shape -- ) 0 0b01110 simd-3-same ;
+: ADDv   ( Rd Rn Rm shape -- ) 0 0b10000 simd-3-same ;
+: MLAv   ( Rd Rn Rm shape -- ) 0 0b10010 simd-3-same ;
+: MULv   ( Rd Rn Rm shape -- ) 0 0b10011 simd-3-same ;
+: ADDP   ( Rd Rn Rm shape -- ) 0 0b10111 simd-3-same ;
+: URHADD ( Rd Rn Rm shape -- ) 1 0b00010 simd-3-same ;
+: UQADD  ( Rd Rn Rm shape -- ) 1 0b00001 simd-3-same ;
+: UQSUB  ( Rd Rn Rm shape -- ) 1 0b00101 simd-3-same ;
+: CMHI   ( Rd Rn Rm shape -- ) 1 0b00110 simd-3-same ;
+: CMHS   ( Rd Rn Rm shape -- ) 1 0b00111 simd-3-same ;
+: USHL   ( Rd Rn Rm shape -- ) 1 0b01000 simd-3-same ;
+: UMAX   ( Rd Rn Rm shape -- ) 1 0b01100 simd-3-same ;
+: UMIN   ( Rd Rn Rm shape -- ) 1 0b01101 simd-3-same ;
+: UABD   ( Rd Rn Rm shape -- ) 1 0b01110 simd-3-same ;
+: SUBv   ( Rd Rn Rm shape -- ) 1 0b10000 simd-3-same ;
+: CMEQ   ( Rd Rn Rm shape -- ) 1 0b10001 simd-3-same ;
+
+<PRIVATE
+: simd-3-same* ( Rd Rn Rm shape U size1 opcode -- )
+    {
+        { 0b1 30 }
+        { 0b01110 24 }
+        { 0b1 21 }
+        { 0b1 10 }
+        { V 0 }
+        { V 5 }
+        { V 16 }
+        { sz 22 }
         29
         23
         11
     } encode ;
 PRIVATE>
 
-: SHADD  ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
-: SQADD  ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
-: SRHADD ( Rd Rn Rm size -- ) 0 0 0b00010 simd-3-same ;
-: ANDv   ( Rd Rn Rm -- )    0 0 0 0b00011 simd-3-same ;
-: SQSUB  ( Rd Rn Rm size -- ) 0 0 0b00101 simd-3-same ;
-: CMGT   ( Rd Rn Rm size -- ) 0 0 0b00110 simd-3-same ;
-: CMGE   ( Rd Rn Rm size -- ) 0 0 0b00111 simd-3-same ;
-: SSHL   ( Rd Rn Rm size -- ) 0 0 0b01000 simd-3-same ;
-: SMAXv  ( Rd Rn Rm size -- ) 0 0 0b01100 simd-3-same ;
-: SMINv  ( Rd Rn Rm size -- ) 0 0 0b01101 simd-3-same ;
-: SABD   ( Rd Rn Rm size -- ) 0 0 0b01110 simd-3-same ;
-: ADDv   ( Rd Rn Rm size -- ) 0 0 0b10000 simd-3-same ;
-: MLAv   ( Rd Rn Rm size -- ) 0 0 0b10010 simd-3-same ;
-: MULv   ( Rd Rn Rm size -- ) 0 0 0b10011 simd-3-same ;
-: ADDPv  ( Rd Rn Rm size -- ) 0 0 0b10111 simd-3-same ;
-: FMLAv  ( Rd Rn Rm size -- ) 0 0 0b11001 simd-3-same ;
-: FADDv  ( Rd Rn Rm size -- ) 0 0 0b11010 simd-3-same ;
-: FCMEQ  ( Rd Rn Rm size -- ) 0 0 0b11100 simd-3-same ;
-: FMAXv  ( Rd Rn Rm size -- ) 0 0 0b11110 simd-3-same ;
-: FSUBv  ( Rd Rn Rm size -- ) 0 1 0b11010 simd-3-same ;
-: FMINv  ( Rd Rn Rm size -- ) 0 1 0b11110 simd-3-same ;
-: UHADD  ( Rd Rn Rm size -- ) 1 0 0b00000 simd-3-same ;
-: UQADD  ( Rd Rn Rm size -- ) 1 0 0b00001 simd-3-same ;
-: URHADD ( Rd Rn Rm size -- ) 1 0 0b00010 simd-3-same ;
-: EORv   ( Rd Rn Rm -- )    0 1 0 0b00011 simd-3-same ;
-: UQSUB  ( Rd Rn Rm size -- ) 1 0 0b00101 simd-3-same ;
-: CMHI   ( Rd Rn Rm size -- ) 1 0 0b00110 simd-3-same ;
-: CMHS   ( Rd Rn Rm size -- ) 1 0 0b00111 simd-3-same ;
-: USHL   ( Rd Rn Rm size -- ) 1 0 0b01000 simd-3-same ;
-: UMAXv  ( Rd Rn Rm size -- ) 1 0 0b01100 simd-3-same ;
-: UMINv  ( Rd Rn Rm size -- ) 1 0 0b01101 simd-3-same ;
-: UABD   ( Rd Rn Rm size -- ) 1 0 0b01110 simd-3-same ;
-: SUBv   ( Rd Rn Rm size -- ) 1 0 0b10000 simd-3-same ;
-: CMEQ   ( Rd Rn Rm size -- ) 1 0 0b10001 simd-3-same ;
-: FMULv  ( Rd Rn Rm size -- ) 1 0 0b11011 simd-3-same ;
-: FCMGE  ( Rd Rn Rm size -- ) 1 0 0b11100 simd-3-same ;
-: FDIVv  ( Rd Rn Rm size -- ) 1 0 0b11111 simd-3-same ;
-: FCMGT  ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
-: BICv   ( Rd Rn Rm -- )    1 0 0 0b00011 simd-3-same ;
-: ORRv   ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
+: FMAXNMv ( Rd Rn Rm shape -- ) 0 0 0b11000 simd-3-same* ;
+: FMLAv   ( Rd Rn Rm shape -- ) 0 0 0b11001 simd-3-same* ;
+: FADDv   ( Rd Rn Rm shape -- ) 0 0 0b11010 simd-3-same* ;
+: FCMEQ   ( Rd Rn Rm shape -- ) 0 0 0b11100 simd-3-same* ;
+: FMINNMv ( Rd Rn Rm shape -- ) 0 1 0b11000 simd-3-same* ;
+: FSUBv   ( Rd Rn Rm shape -- ) 0 1 0b11010 simd-3-same* ;
+: FADDP   ( Rd Rn Rm shape -- ) 1 0 0b11010 simd-3-same* ;
+: FMULv   ( Rd Rn Rm shape -- ) 1 0 0b11011 simd-3-same* ;
+: FCMGE   ( Rd Rn Rm shape -- ) 1 0 0b11100 simd-3-same* ;
+: FDIVv   ( Rd Rn Rm shape -- ) 1 0 0b11111 simd-3-same* ;
+: FCMGT   ( Rd Rn Rm shape -- ) 1 1 0b11100 simd-3-same* ;
 
-: MOVv ( Rd Rn -- ) dup ORRv ;
+<PRIVATE
+: simd-3-same** ( Rd Rn Rm shape U size -- )
+    {
+        { 0b01110 24 }
+        { 0b1 21 }
+        { 0b00011 11 }
+        { 0b1 10 }
+        { V 0 }
+        { V 5 }
+        { V 16 }
+        { Q 30 }
+        29
+        22
+    } encode ;
+PRIVATE>
+
+: ANDv ( Rd Rn Rm shape -- ) 0 0 simd-3-same** ;
+: BICv ( Rd Rn Rm shape -- ) 0 1 simd-3-same** ;
+: ORRv ( Rd Rn Rm shape -- ) 0 2 simd-3-same** ;
+: ORNv ( Rd Rn Rm shape -- ) 0 3 simd-3-same** ;
+: EORv ( Rd Rn Rm shape -- ) 1 0 simd-3-same** ;
+
+: MOVv ( Rd Rn shape -- ) dupd ORRv ;
 
 
 <PRIVATE
-: simd-shift-by-imm ( Rd Rn imm size U opcode Q -- )
-    [ 3 + 2^ bitor ] 3dip {
+: (simd-shift-by-imm) ( Rd Rn immhimmb Q U opcode -- )
+    {
         { 0b011110 23 }
         { 0b1 10 }
         { V 0 }
         { V 5 }
         16
+        30
         29
         11
-        30
     } encode ;
+
+: simd-shift-by-imm ( Rd Rn imm shape Q U opcode -- )
+    [ size>> 3 + 2^ bitor ] 3dip (simd-shift-by-imm) ;
+
+: simd-shift-by-imm* ( Rd Rn imm shape Q U opcode -- )
+    [ size>> 3 + 2^ [ swap - ] [ bitor ] bi ] 3dip
+    (simd-shift-by-imm) ;
 PRIVATE>
 
-: SSHR  ( Rd Rn imm size -- ) 0 0b00000 1 simd-shift-by-imm ;
-: SHL   ( Rd Rn imm size -- ) 0 0b01010 1 simd-shift-by-imm ;
-: SSHLL ( Rd Rn imm size -- ) 0 0b10100 1 simd-shift-by-imm ;
-: SHRN  ( Rd Rn imm size -- ) 1 0b10000 0 simd-shift-by-imm ;
-: SHRN2 ( Rd Rn imm size -- ) 1 0b10000 1 simd-shift-by-imm ;
-: USHR  ( Rd Rn imm size -- ) 1 0b00000 1 simd-shift-by-imm ;
+: SSHR   ( Rd Rn imm shape -- ) dup Q>> 0 0b00000 simd-shift-by-imm* ;
+: SHL    ( Rd Rn imm shape -- ) dup Q>> 0 0b01010 simd-shift-by-imm  ;
+: SSHLL  ( Rd Rn imm shape -- )       0 0 0b10100 simd-shift-by-imm  ;
+: SSHLL2 ( Rd Rn imm shape -- )       1 0 0b10100 simd-shift-by-imm  ;
+: SHRN   ( Rd Rn imm shape -- )       0 0 0b10000 simd-shift-by-imm* ;
+: SHRN2  ( Rd Rn imm shape -- )       1 0 0b10000 simd-shift-by-imm* ;
+: USHR   ( Rd Rn imm shape -- ) dup Q>> 1 0b00000 simd-shift-by-imm* ;
+: USHLL  ( Rd Rn imm shape -- )       0 1 0b10100 simd-shift-by-imm  ;
+: USHLL2 ( Rd Rn imm shape -- )       1 1 0b10100 simd-shift-by-imm  ;
 
-: SXTL ( Rd Rn size -- ) [ 0 ] dip SSHLL ;
+: SXTL  ( Rd Rn shape -- ) [ 0 ] dip SSHLL ;
+: SXTL2 ( Rd Rn shape -- ) [ 0 ] dip SSHLL2 ;
+: UXTL  ( Rd Rn shape -- ) [ 0 ] dip USHLL ;
+: UXTL2 ( Rd Rn shape -- ) [ 0 ] dip USHLL2 ;
