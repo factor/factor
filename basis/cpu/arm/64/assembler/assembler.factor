@@ -1197,9 +1197,10 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: CMLT     ( Vd Vn -- )     0 0 0 0b01010 simd-scalar-2-misc ;
-: FCVTZSvi ( Rd Rn spec* -- ) 0 1 0b11011 simd-scalar-2-misc ;
-: SCVTFvi  ( Rd Rn spec  -- ) 0 0 0b11101 simd-scalar-2-misc ;
+: CMLT     ( Vd Vn -- )  0 0 0 0b01010 simd-scalar-2-misc ;
+: FCVTZSvi ( Rd Rn sz -- ) 0 1 0b11011 simd-scalar-2-misc ;
+: SCVTFvi  ( Rd Rn sz -- ) 0 0 0b11101 simd-scalar-2-misc ;
+: UCVTFvi  ( Rd Rn sz -- ) 1 0 0b11101 simd-scalar-2-misc ;
 
 
 <PRIVATE
@@ -1233,12 +1234,12 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: UZP1 ( Rd Rn Rm spec -- ) 0b001 simd-permute ;
-: TRN1 ( Rd Rn Rm spec -- ) 0b010 simd-permute ;
-: ZIP1 ( Rd Rn Rm spec -- ) 0b011 simd-permute ;
-: UZP2 ( Rd Rn Rm spec -- ) 0b101 simd-permute ;
-: TRN2 ( Rd Rn Rm spec -- ) 0b110 simd-permute ;
-: ZIP2 ( Rd Rn Rm spec -- ) 0b111 simd-permute ;
+: UZP1 ( Rd Rn Rm size -- ) 0b001 simd-permute ;
+: TRN1 ( Rd Rn Rm size -- ) 0b010 simd-permute ;
+: ZIP1 ( Rd Rn Rm size -- ) 0b011 simd-permute ;
+: UZP2 ( Rd Rn Rm size -- ) 0b101 simd-permute ;
+: TRN2 ( Rd Rn Rm size -- ) 0b110 simd-permute ;
+: ZIP2 ( Rd Rn Rm size -- ) 0b111 simd-permute ;
 
 
 <PRIVATE
@@ -1387,12 +1388,8 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SMLAL  ( Rd Rn Rm size -- ) 0 0b1000 0 simd-3-different ;
-: SMLAL2 ( Rd Rn Rm size -- ) 0 0b1000 1 simd-3-different ;
 : SMULL  ( Rd Rn Rm size -- ) 0 0b1100 0 simd-3-different ;
 : SMULL2 ( Rd Rn Rm size -- ) 0 0b1100 1 simd-3-different ;
-: UMLAL  ( Rd Rn Rm size -- ) 1 0b1000 0 simd-3-different ;
-: UMLAL2 ( Rd Rn Rm size -- ) 1 0b1000 1 simd-3-different ;
 : UMULL  ( Rd Rn Rm size -- ) 1 0b1100 0 simd-3-different ;
 : UMULL2 ( Rd Rn Rm size -- ) 1 0b1100 1 simd-3-different ;
 
@@ -1414,47 +1411,63 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SHADD  ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
-: SQADD  ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
-: SRHADD ( Rd Rn Rm size -- ) 0 0 0b00010 simd-3-same ;
-: ANDv   ( Rd Rn Rm -- )    0 0 0 0b00011 simd-3-same ;
-: SQSUB  ( Rd Rn Rm size -- ) 0 0 0b00101 simd-3-same ;
-: CMGT   ( Rd Rn Rm size -- ) 0 0 0b00110 simd-3-same ;
-: CMGE   ( Rd Rn Rm size -- ) 0 0 0b00111 simd-3-same ;
-: SSHL   ( Rd Rn Rm size -- ) 0 0 0b01000 simd-3-same ;
-: SMAXv  ( Rd Rn Rm size -- ) 0 0 0b01100 simd-3-same ;
-: SMINv  ( Rd Rn Rm size -- ) 0 0 0b01101 simd-3-same ;
-: SABD   ( Rd Rn Rm size -- ) 0 0 0b01110 simd-3-same ;
-: ADDv   ( Rd Rn Rm size -- ) 0 0 0b10000 simd-3-same ;
-: MLAv   ( Rd Rn Rm size -- ) 0 0 0b10010 simd-3-same ;
-: MULv   ( Rd Rn Rm size -- ) 0 0 0b10011 simd-3-same ;
-: ADDPv  ( Rd Rn Rm size -- ) 0 0 0b10111 simd-3-same ;
-: FMLAv  ( Rd Rn Rm size -- ) 0 0 0b11001 simd-3-same ;
-: FADDv  ( Rd Rn Rm size -- ) 0 0 0b11010 simd-3-same ;
-: FCMEQ  ( Rd Rn Rm size -- ) 0 0 0b11100 simd-3-same ;
-: FMAXv  ( Rd Rn Rm size -- ) 0 0 0b11110 simd-3-same ;
-: FSUBv  ( Rd Rn Rm size -- ) 0 1 0b11010 simd-3-same ;
-: FMINv  ( Rd Rn Rm size -- ) 0 1 0b11110 simd-3-same ;
-: UHADD  ( Rd Rn Rm size -- ) 1 0 0b00000 simd-3-same ;
-: UQADD  ( Rd Rn Rm size -- ) 1 0 0b00001 simd-3-same ;
-: URHADD ( Rd Rn Rm size -- ) 1 0 0b00010 simd-3-same ;
-: EORv   ( Rd Rn Rm -- )    0 1 0 0b00011 simd-3-same ;
-: UQSUB  ( Rd Rn Rm size -- ) 1 0 0b00101 simd-3-same ;
-: CMHI   ( Rd Rn Rm size -- ) 1 0 0b00110 simd-3-same ;
-: CMHS   ( Rd Rn Rm size -- ) 1 0 0b00111 simd-3-same ;
-: USHL   ( Rd Rn Rm size -- ) 1 0 0b01000 simd-3-same ;
-: UMAXv  ( Rd Rn Rm size -- ) 1 0 0b01100 simd-3-same ;
-: UMINv  ( Rd Rn Rm size -- ) 1 0 0b01101 simd-3-same ;
-: UABD   ( Rd Rn Rm size -- ) 1 0 0b01110 simd-3-same ;
-: SUBv   ( Rd Rn Rm size -- ) 1 0 0b10000 simd-3-same ;
-: CMEQ   ( Rd Rn Rm size -- ) 1 0 0b10001 simd-3-same ;
-: FMULv  ( Rd Rn Rm size -- ) 1 0 0b11011 simd-3-same ;
-: FCMGE  ( Rd Rn Rm size -- ) 1 0 0b11100 simd-3-same ;
-: FDIVv  ( Rd Rn Rm size -- ) 1 0 0b11111 simd-3-same ;
-: FCMGT  ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
-: BICv   ( Rd Rn Rm -- )    1 0 0 0b00011 simd-3-same ;
-: ORRv   ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
-: ORNv   ( Rd Rn Rm -- )    3 0 0 0b00011 simd-3-same ;
+: SHADD ( Rd Rn Rm size -- ) 0 0 0b00000 simd-3-same ;
+: SQADD ( Rd Rn Rm size -- ) 0 0 0b00001 simd-3-same ;
+: SQSUB ( Rd Rn Rm size -- ) 0 0 0b00101 simd-3-same ;
+: CMGT  ( Rd Rn Rm size -- ) 0 0 0b00110 simd-3-same ;
+: CMGE  ( Rd Rn Rm size -- ) 0 0 0b00111 simd-3-same ;
+: SSHL  ( Rd Rn Rm size -- ) 0 0 0b01000 simd-3-same ;
+: SMAXv ( Rd Rn Rm size -- ) 0 0 0b01100 simd-3-same ;
+: SMINv ( Rd Rn Rm size -- ) 0 0 0b01101 simd-3-same ;
+: SABD  ( Rd Rn Rm size -- ) 0 0 0b01110 simd-3-same ;
+: ADDv  ( Rd Rn Rm size -- ) 0 0 0b10000 simd-3-same ;
+: MLAv  ( Rd Rn Rm size -- ) 0 0 0b10010 simd-3-same ;
+: MULv  ( Rd Rn Rm size -- ) 0 0 0b10011 simd-3-same ;
+: ADDP  ( Rd Rn Rm size -- ) 0 0 0b10111 simd-3-same ;
+: FMLAv ( Rd Rn Rm size -- ) 0 0 0b11001 simd-3-same ;
+: FADDv ( Rd Rn Rm size -- ) 0 0 0b11010 simd-3-same ;
+: FCMEQ ( Rd Rn Rm size -- ) 0 0 0b11100 simd-3-same ;
+: FMAXv ( Rd Rn Rm size -- ) 0 0 0b11110 simd-3-same ;
+: FSUBv ( Rd Rn Rm size -- ) 0 1 0b11010 simd-3-same ;
+: FMINv ( Rd Rn Rm size -- ) 0 1 0b11110 simd-3-same ;
+: UHADD ( Rd Rn Rm size -- ) 1 0 0b00000 simd-3-same ;
+: UQADD ( Rd Rn Rm size -- ) 1 0 0b00001 simd-3-same ;
+: UQSUB ( Rd Rn Rm size -- ) 1 0 0b00101 simd-3-same ;
+: CMHI  ( Rd Rn Rm size -- ) 1 0 0b00110 simd-3-same ;
+: CMHS  ( Rd Rn Rm size -- ) 1 0 0b00111 simd-3-same ;
+: USHL  ( Rd Rn Rm size -- ) 1 0 0b01000 simd-3-same ;
+: UMAXv ( Rd Rn Rm size -- ) 1 0 0b01100 simd-3-same ;
+: UMINv ( Rd Rn Rm size -- ) 1 0 0b01101 simd-3-same ;
+: UABD  ( Rd Rn Rm size -- ) 1 0 0b01110 simd-3-same ;
+: SUBv  ( Rd Rn Rm size -- ) 1 0 0b10000 simd-3-same ;
+: CMEQ  ( Rd Rn Rm size -- ) 1 0 0b10001 simd-3-same ;
+: FADDP ( Rd Rn Rm size -- ) 1 0 0b11010 simd-3-same ;
+: FMULv ( Rd Rn Rm size -- ) 1 0 0b11011 simd-3-same ;
+: FCMGE ( Rd Rn Rm size -- ) 1 0 0b11100 simd-3-same ;
+: FDIVv ( Rd Rn Rm size -- ) 1 0 0b11111 simd-3-same ;
+: FCMGT ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
+
+<PRIVATE
+: simd-3-same* ( Rd Rn Rm U size -- )
+    {
+        { 0b1 30 }
+        { 0b01110 24 }
+        { 0b1 21 }
+        { 0b00011 11 }
+        { 0b1 10 }
+        { V 0 }
+        { V 5 }
+        { V 16 }
+        29
+        22
+    } encode ;
+PRIVATE>
+
+: ANDv ( Rd Rn Rm -- ) 0 0 simd-3-same* ;
+: BICv ( Rd Rn Rm -- ) 0 1 simd-3-same* ;
+: ORRv ( Rd Rn Rm -- ) 0 2 simd-3-same* ;
+: ORNv ( Rd Rn Rm -- ) 0 3 simd-3-same* ;
+: EORv ( Rd Rn Rm -- ) 1 0 simd-3-same* ;
 
 : MOVv ( Rd Rn -- ) dup ORRv ;
 
@@ -1473,11 +1486,13 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SSHR  ( Rd Rn imm size -- ) 0 0b00000 1 simd-shift-by-imm ;
-: SHL   ( Rd Rn imm size -- ) 0 0b01010 1 simd-shift-by-imm ;
-: SSHLL ( Rd Rn imm size -- ) 0 0b10100 1 simd-shift-by-imm ;
-: SHRN  ( Rd Rn imm size -- ) 1 0b10000 0 simd-shift-by-imm ;
-: SHRN2 ( Rd Rn imm size -- ) 1 0b10000 1 simd-shift-by-imm ;
-: USHR  ( Rd Rn imm size -- ) 1 0b00000 1 simd-shift-by-imm ;
+: SSHR   ( Rd Rn imm size -- ) 0 0b00000 1 simd-shift-by-imm ;
+: SHL    ( Rd Rn imm size -- ) 0 0b01010 1 simd-shift-by-imm ;
+: SSHLL  ( Rd Rn imm size -- ) 0 0b10100 0 simd-shift-by-imm ;
+: SSHLL2 ( Rd Rn imm size -- ) 0 0b10100 1 simd-shift-by-imm ;
+: SHRN   ( Rd Rn imm size -- ) 1 0b10000 0 simd-shift-by-imm ;
+: SHRN2  ( Rd Rn imm size -- ) 1 0b10000 1 simd-shift-by-imm ;
+: USHR   ( Rd Rn imm size -- ) 1 0b00000 1 simd-shift-by-imm ;
 
-: SXTL ( Rd Rn size -- ) [ 0 ] dip SSHLL ;
+: SXTL  ( Rd Rn size -- ) [ 0 ] dip SSHLL ;
+: SXTL2 ( Rd Rn size -- ) [ 0 ] dip SSHLL2 ;
