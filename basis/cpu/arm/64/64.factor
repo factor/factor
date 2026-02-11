@@ -413,7 +413,7 @@ M: arm.64 %mul-vector [ MULv ] [ FMULv ] integer/float ;
 M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
     DST SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
     fp-temp SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
-    rep scalar-rep-of rep-size 2 shift :> imm
+    rep scalar-rep-of rep-size 3 shift :> imm
     DST DST imm rep >size SHRN
     DST fp-temp imm rep >size SHRN2 ;
 
