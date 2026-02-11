@@ -35,8 +35,13 @@ IN: compiler.cfg.builder.alien
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
+: hidden-struct-return? ( c-type -- ? )
+    dup large-struct?
+    [ return-struct-in-registers? not ]
+    [ drop f ] if ;
+
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
-    dup large-struct? [
+    dup hidden-struct-return? [
         heap-size cell f ^^local-allot [
             '[ _ prefix ]
             [ int-rep struct-return-on-stack? f 3array prefix ] bi*
@@ -144,7 +149,7 @@ M: #alien-assembly emit-node
     [ next-vreg dup ] 3dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
-    large-struct?
+    hidden-struct-return?
     [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )

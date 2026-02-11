@@ -1,7 +1,7 @@
 ! Copyright (C) 2025 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data assocs
-byte-arrays classes.algebra combinators compiler.cfg
+USING: accessors alien alien.c-types alien.data arrays assocs
+byte-arrays classes.algebra classes.struct combinators compiler.cfg
 compiler.cfg.comparisons compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.registers
 compiler.cfg.stack-frame compiler.codegen.gc-maps
@@ -9,7 +9,7 @@ compiler.codegen.labels compiler.codegen.relocation
 compiler.constants cpu.architecture cpu.arm.64.assembler
 cpu.arm.64.assembler.registers generalizations kernel layouts
 literals make math math.bitwise memory namespaces sequences
-system ;
+system compiler.cfg.builder.alien.boxing ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
@@ -776,7 +776,7 @@ M: arm.64 %reload swap %copy ;
 M: arm.64 return-regs
     {
         { int-regs ${ X0 X1 } }
-        { float-regs ${ V0 } }
+        { float-regs ${ V0 V1 V2 V3 } }
     } ;
 
 M: arm.64 param-regs
@@ -785,8 +785,43 @@ M: arm.64 param-regs
         { float-regs ${ V0 V1 V2 V3 V4 V5 V6 V7 } }
     } ;
 
-M: arm.64 return-struct-in-registers? heap-size 16 <= ;
-M: arm.64 value-struct? heap-size 16 <= ;
+: arm64-float-hfa-rep? ( rep -- ? )
+    { float-rep double-rep } member? ;
+
+: arm64-homogeneous-reps? ( reps -- ? )
+    dup empty? [ drop f ] [ dup first [ = ] curry all? ] if ;
+
+:: arm64-float-hfa-reps ( c-type -- reps/f )
+    c-type lookup-c-type :> type
+    type struct-c-type? [
+        type fields>> [ type>> arm64-float-hfa-reps ] map :> reps
+        reps [ f eq? ] any? [
+            f
+        ] [
+            reps concat :> flat
+            flat length 4 <= flat arm64-homogeneous-reps? and
+            [ flat ] [ f ] if
+        ] if
+    ] [
+        type c-type-rep dup arm64-float-hfa-rep?
+        [ 1array ] [ drop f ] if
+    ] if ;
+
+M: arm.64 flatten-struct-type
+    dup arm64-float-hfa-reps dup [
+        [ f f 3array ] map record-reg-reps nip
+    ] [
+        drop dup heap-size cell align cell /i { int-rep f f } <array> record-reg-reps
+        over heap-size 16 <=
+        [ nip ]
+        [ nip unrecord-reg-reps [ first t f 3array ] map ]
+        if
+    ] if ;
+
+M: arm.64 return-struct-in-registers?
+    [ heap-size 16 <= ] [ arm64-float-hfa-reps >boolean ] bi or ;
+
+M: arm.64 value-struct? drop t ;
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
