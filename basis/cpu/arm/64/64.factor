@@ -297,7 +297,7 @@ M: arm.64 %integer>float [ >D ] dip SCVTFsi ;
 M: arm.64 %float>integer >D FCVTZSsi ;
 
 M: arm.64 %zero-vector drop dup dup EORv ;
-M: arm.64 %fill-vector drop dup dup BICv ;
+M: arm.64 %fill-vector drop dup dup ORNv ;
 
 M:: arm.64 %gather-vector-2 ( DST SRC1 SRC2 rep -- )
     DST SRC1 0 0 rep INSelt

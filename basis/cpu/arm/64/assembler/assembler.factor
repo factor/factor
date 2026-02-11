@@ -1454,6 +1454,7 @@ PRIVATE>
 : FCMGT  ( Rd Rn Rm size -- ) 1 1 0b11100 simd-3-same ;
 : BICv   ( Rd Rn Rm -- )    1 0 0 0b00011 simd-3-same ;
 : ORRv   ( Rd Rn Rm -- )    2 0 0 0b00011 simd-3-same ;
+: ORNv   ( Rd Rn Rm -- )    3 0 0 0b00011 simd-3-same ;
 
 : MOVv ( Rd Rn -- ) dup ORRv ;
 
