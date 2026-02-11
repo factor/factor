@@ -367,8 +367,8 @@ M: arm.64 %float>integer-vector >size 2/ FCVTZSvi ;
 M: arm.64 %compare-vector
     {
         { cc=  [ [ CMEQ ] [ FCMEQ ] integer/float ] }
-        { cc>  [ [ CMHI ] [ CMGT ] [ FCMGT ] signed/unsigned/float ] }
-        { cc>= [ [ CMHS ] [ CMGE ] [ FCMGE ] signed/unsigned/float ] }
+        { cc>  [ [ CMGT ] [ CMHI ] [ FCMGT ] signed/unsigned/float ] }
+        { cc>= [ [ CMGE ] [ CMHS ] [ FCMGE ] signed/unsigned/float ] }
     } case ;
 
 :: %move-int-vector-mask ( DST SRC -- )
