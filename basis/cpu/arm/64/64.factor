@@ -309,9 +309,9 @@ M:: arm.64 %gather-int-vector-2 ( DST SRC1 SRC2 rep -- )
 
 M:: arm.64 %gather-vector-4 ( DST SRC1 SRC2 SRC3 SRC4 rep -- )
     DST SRC1 0 0 rep INSelt
-    DST SRC1 1 0 rep INSelt
-    DST SRC1 2 0 rep INSelt
-    DST SRC1 3 0 rep INSelt ;
+    DST SRC2 1 0 rep INSelt
+    DST SRC3 2 0 rep INSelt
+    DST SRC4 3 0 rep INSelt ;
 
 M:: arm.64 %gather-int-vector-4 ( DST SRC1 SRC2 SRC3 SRC4 rep -- )
     DST SRC1 0 rep INSgen
