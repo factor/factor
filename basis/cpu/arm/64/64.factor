@@ -825,6 +825,7 @@ M: arm.64 value-struct? drop t ;
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
+M: arm.64 float-right-align-on-stack? f ;
 M: arm.64 struct-return-on-stack? f ;
 
 : return-reg ( rep -- reg ) reg-class-of return-regs at first ;
