@@ -1,6 +1,6 @@
-USING: alien.c-types cocoa cocoa.classes cocoa.subclassing
-cocoa.types compiler.test core-graphics.types kernel math memory
-namespaces tools.test ;
+USING: alien.c-types cocoa cocoa.classes cocoa.runtime
+cocoa.subclassing cocoa.types compiler.test core-graphics.types
+kernel math memory namespaces tools.test ;
 IN: cocoa.tests
 
 <CLASS: Foo < NSObject
@@ -52,3 +52,23 @@ IN: cocoa.tests
         swap -> release
     ] compile-call
 ] unit-test
+
+<CLASS: Baz < NSObject
+    METHOD: id passRect: NSRect rect andObject: id object [
+        gc rect "z" set
+        object
+    ] ;
+;CLASS>
+
+{ t } [
+    Baz [
+        -> alloc -> init dup
+        9.0 10.0 11.0 12.0 <CGRect> Baz -> passRect:andObject:
+        Baz = swap -> release
+    ] compile-call
+] unit-test
+
+{ 9.0 } [ "z" get CGRect-x ] unit-test
+{ 10.0 } [ "z" get CGRect-y ] unit-test
+{ 11.0 } [ "z" get CGRect-w ] unit-test
+{ 12.0 } [ "z" get CGRect-h ] unit-test
