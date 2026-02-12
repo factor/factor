@@ -58,7 +58,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     primitive_compact_gc();
 #endif
 
-    // Now its safe to allocate and GC
+    // Now it's safe to allocate and GC
     cell error_object =
         allot_array_4(tag_fixnum(KERNEL_ERROR), tag_fixnum(error),
                       arg1.value(), arg2.value());
