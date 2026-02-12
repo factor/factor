@@ -15,8 +15,8 @@ IN: cpu.arm.64
 
 <<
 cpu arm.64? [
-    int lookup-c-type int-rep >>rep drop
-    uint lookup-c-type int-rep >>rep drop
+    int lookup-c-type c-int-rep >>rep drop
+    uint lookup-c-type c-uint-rep >>rep drop
 ] when
 >>
 
