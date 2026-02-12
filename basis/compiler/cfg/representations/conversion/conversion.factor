@@ -17,6 +17,12 @@ M: int-rep rep>tagged ( dst src rep -- )
 M: int-rep tagged>rep ( dst src rep -- )
     drop tag-bits get ##sar-imm, ;
 
+M: uint-rep rep>tagged ( dst src rep -- )
+    drop tag-bits get ##shl-imm, ;
+
+M: uint-rep tagged>rep ( dst src rep -- )
+    drop tag-bits get ##sar-imm, ;
+
 M: c-int-rep rep>tagged ( dst src rep -- )
     drop tag-bits get ##shl-imm, ;
 
@@ -75,6 +81,12 @@ M: int-rep rep>int ( dst src rep -- )
 M: int-rep int>rep ( dst src rep -- )
     ##copy, ;
 
+M: uint-rep rep>int ( dst src rep -- )
+    ##copy, ;
+
+M: uint-rep int>rep ( dst src rep -- )
+    ##copy, ;
+
 M: c-int-rep rep>int ( dst src rep -- )
     drop c:int ##convert-integer, ;
 
@@ -99,11 +111,11 @@ M: scalar-rep int>rep ( dst src rep -- )
         { [ dup tagged-rep? ] [ drop tagged>rep ] }
         { [ over tagged-rep? ] [ nip rep>tagged ] }
         {
-            [ dup { int-rep c-int-rep c-uint-rep } member? ]
+            [ dup { int-rep uint-rep c-int-rep c-uint-rep } member? ]
             [ drop int>rep ]
         }
         {
-            [ over { int-rep c-int-rep c-uint-rep } member? ]
+            [ over { int-rep uint-rep c-int-rep c-uint-rep } member? ]
             [ nip rep>int ]
         }
         [

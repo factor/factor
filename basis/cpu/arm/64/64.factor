@@ -281,7 +281,7 @@ M:: arm.64 %bit-count ( DST SRC -- )
 : ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
 
 UNION: integer-32-rep c-int-rep c-uint-rep ;
-UNION: integer-64-rep int-rep tagged-rep ;
+UNION: integer-64-rep int-rep uint-rep tagged-rep ;
 UNION: integer-rep integer-32-rep integer-64-rep ;
 
 M: arm.64 %copy

@@ -45,6 +45,7 @@ GENERIC: next-reg-param ( odd-register? rep -- reg )
     2tri int-regs get pop ;
 
 M: int-rep next-reg-param next-int-reg-param ;
+M: uint-rep next-reg-param next-int-reg-param ;
 M: c-int-rep next-reg-param next-int-reg-param ;
 M: c-uint-rep next-reg-param next-int-reg-param ;
 

@@ -14,9 +14,9 @@ SINGLETON: any-rep
 
 ! Integer registers can contain data with one of these representations.
 ! tagged-rep: tagged pointer or fixnum
-! int-rep: machine word integer
+! int-rep/uint-rep: machine word signed/unsigned integer
 ! c-int-rep/c-uint-rep: 32-bit C int/uint values
-SINGLETONS: tagged-rep int-rep c-int-rep c-uint-rep ;
+SINGLETONS: tagged-rep int-rep uint-rep c-int-rep c-uint-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
@@ -106,6 +106,7 @@ UNION: representation
     any-rep
     tagged-rep
     int-rep
+    uint-rep
     c-int-rep
     c-uint-rep
     float-rep
@@ -157,6 +158,7 @@ GENERIC: reg-class-of ( rep -- reg-class )
 
 M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
+M: uint-rep reg-class-of drop int-regs ;
 M: c-int-rep reg-class-of drop int-regs ;
 M: c-uint-rep reg-class-of drop int-regs ;
 M: float-rep reg-class-of drop float-regs ;
@@ -171,6 +173,7 @@ GENERIC: rep-size ( rep -- n ) foldable
 
 M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
+M: uint-rep rep-size drop cell ;
 M: c-int-rep rep-size drop 4 ;
 M: c-uint-rep rep-size drop 4 ;
 M: float-rep rep-size drop 4 ;

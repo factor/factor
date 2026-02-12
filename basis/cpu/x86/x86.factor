@@ -168,6 +168,7 @@ GENERIC: copy-register* ( dst src rep -- )
 GENERIC: copy-memory* ( dst src rep -- )
 
 M: int-rep copy-register* drop MOV ;
+M: uint-rep copy-register* drop MOV ;
 M: tagged-rep copy-register* drop MOV ;
 
 M: object copy-memory* copy-register* ;
