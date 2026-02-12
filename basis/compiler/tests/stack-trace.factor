@@ -1,5 +1,5 @@
-USING: accessors combinators continuations grouping io.backend
-io.encodings.utf8 io.files kernel math namespaces parser
+USING: accessors combinators continuations eval grouping io.backend
+kernel math namespaces parser
 sequences tools.test ;
 IN: compiler.tests.stack-trace
 
@@ -39,8 +39,6 @@ IN: compiler.tests.stack-trace
 
 ! #1265: Used to crash factor if compiled in debug mode.
 [
-    [
-        "USING: continuations io.backend ; [ normalize-path ] ignore-errors f"
-        swap [ utf8 set-file-contents ] keep run-file
-    ] with-test-file
+    "USING: continuations io.backend ; [ normalize-path ] ignore-errors f"
+    eval( -- )
 ] [ wrong-values? ] must-fail-with
