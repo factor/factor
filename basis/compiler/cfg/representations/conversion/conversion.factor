@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays combinators compiler.cfg.instructions
 compiler.cfg.registers compiler.constants cpu.architecture
-kernel layouts math namespaces ;
+kernel layouts math namespaces sequences ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.representations.conversion
 
 ERROR: bad-conversion dst src dst-rep src-rep ;
@@ -14,6 +15,18 @@ M: int-rep rep>tagged ( dst src rep -- )
     drop tag-bits get ##shl-imm, ;
 
 M: int-rep tagged>rep ( dst src rep -- )
+    drop tag-bits get ##sar-imm, ;
+
+M: c-int-rep rep>tagged ( dst src rep -- )
+    drop tag-bits get ##shl-imm, ;
+
+M: c-int-rep tagged>rep ( dst src rep -- )
+    drop tag-bits get ##sar-imm, ;
+
+M: c-uint-rep rep>tagged ( dst src rep -- )
+    drop tag-bits get ##shl-imm, ;
+
+M: c-uint-rep tagged>rep ( dst src rep -- )
     drop tag-bits get ##sar-imm, ;
 
 M:: float-rep rep>tagged ( dst src rep -- )
@@ -56,6 +69,24 @@ M:: scalar-rep tagged>rep ( dst src rep -- )
 GENERIC: rep>int ( dst src rep -- )
 GENERIC: int>rep ( dst src rep -- )
 
+M: int-rep rep>int ( dst src rep -- )
+    ##copy, ;
+
+M: int-rep int>rep ( dst src rep -- )
+    ##copy, ;
+
+M: c-int-rep rep>int ( dst src rep -- )
+    drop c:int ##convert-integer, ;
+
+M: c-int-rep int>rep ( dst src rep -- )
+    drop c:int ##convert-integer, ;
+
+M: c-uint-rep rep>int ( dst src rep -- )
+    drop c:uint ##convert-integer, ;
+
+M: c-uint-rep int>rep ( dst src rep -- )
+    drop c:uint ##convert-integer, ;
+
 M: scalar-rep rep>int ( dst src rep -- )
     ##scalar>integer, ;
 
@@ -67,8 +98,14 @@ M: scalar-rep int>rep ( dst src rep -- )
         { [ 2dup eq? ] [ drop ##copy, ] }
         { [ dup tagged-rep? ] [ drop tagged>rep ] }
         { [ over tagged-rep? ] [ nip rep>tagged ] }
-        { [ dup int-rep? ] [ drop int>rep ] }
-        { [ over int-rep? ] [ nip rep>int ] }
+        {
+            [ dup { int-rep c-int-rep c-uint-rep } member? ]
+            [ drop int>rep ]
+        }
+        {
+            [ over { int-rep c-int-rep c-uint-rep } member? ]
+            [ nip rep>int ]
+        }
         [
             2dup 2array {
                 { { double-rep float-rep } [ 2drop ##single>double-float, ] }

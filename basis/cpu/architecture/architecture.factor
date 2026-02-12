@@ -12,10 +12,11 @@ IN: cpu.architecture
 ! get eliminated later
 SINGLETON: any-rep
 
-! Integer registers can contain data with one of these three representations
+! Integer registers can contain data with one of these representations.
 ! tagged-rep: tagged pointer or fixnum
-! int-rep: untagged fixnum, not a pointer
-SINGLETONS: tagged-rep int-rep ;
+! int-rep: machine word integer
+! c-int-rep/c-uint-rep: 32-bit C int/uint values
+SINGLETONS: tagged-rep int-rep c-int-rep c-uint-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
@@ -105,6 +106,8 @@ UNION: representation
     any-rep
     tagged-rep
     int-rep
+    c-int-rep
+    c-uint-rep
     float-rep
     double-rep
     vector-rep
@@ -154,6 +157,8 @@ GENERIC: reg-class-of ( rep -- reg-class )
 
 M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
+M: c-int-rep reg-class-of drop int-regs ;
+M: c-uint-rep reg-class-of drop int-regs ;
 M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
 
@@ -166,6 +171,8 @@ GENERIC: rep-size ( rep -- n ) foldable
 
 M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
+M: c-int-rep rep-size drop 4 ;
+M: c-uint-rep rep-size drop 4 ;
 M: float-rep rep-size drop 4 ;
 M: double-rep rep-size drop 8 ;
 M: vector-rep rep-size drop 16 ;
