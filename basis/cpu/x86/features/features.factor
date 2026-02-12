@@ -1,16 +1,15 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.data arrays assocs combinators
-compiler.codegen.labels cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands init kernel math math.order
+compiler.codegen.labels compiler.constants cpu.architecture cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.assembler.private init kernel math math.order
 math.parser memoize namespaces sequences
-specialized-arrays system math.bitwise combinators.smart ;
+specialized-arrays specialized-arrays.instances.alien.c-types.uint
+system math.bitwise combinators.smart ;
 SPECIALIZED-ARRAY: uint
 IN: cpu.x86.features
 
 <PRIVATE
-
-: return-reg ( -- reg ) int-regs return-regs at first ;
 
 : (sse-version) ( -- n )
     int { } cdecl [
@@ -22,53 +21,53 @@ IN: cpu.x86.features
         "sse-1" define-label
         "end" define-label
 
-        return-reg 1 MOV
+        EAX 1 MOV
 
         CPUID
 
         ECX 20 BT
-        "sse-42" get JB
+        "sse-42" get 0 JB rc-relative label-fixup
 
         ECX 19 BT
-        "sse-41" get JB
+        "sse-41" get 0 JB rc-relative label-fixup
 
         ECX  9 BT
-        "ssse-3" get JB
+        "ssse-3" get 0 JB rc-relative label-fixup
 
         ECX  0 BT
-        "sse-3" get JB
+        "sse-3" get 0 JB rc-relative label-fixup
 
         EDX 26 BT
-        "sse-2" get JB
+        "sse-2" get 0 JB rc-relative label-fixup
 
         EDX 25 BT
-        "sse-1" get JB
+        "sse-1" get 0 JB rc-relative label-fixup
 
-        return-reg 0 MOV
-        "end" get JMP
+        EAX 0 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "sse-42" resolve-label
-        return-reg 42 MOV
-        "end" get JMP
+        EAX 42 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "sse-41" resolve-label
-        return-reg 41 MOV
-        "end" get JMP
+        EAX 41 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "ssse-3" resolve-label
-        return-reg 33 MOV
-        "end" get JMP
+        EAX 33 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "sse-3" resolve-label
-        return-reg 30 MOV
-        "end" get JMP
+        EAX 30 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "sse-2" resolve-label
-        return-reg 20 MOV
-        "end" get JMP
+        EAX 20 MOV
+        "end" get 0 JMP rc-relative label-fixup
 
         "sse-1" resolve-label
-        return-reg 10 MOV
+        EAX 10 MOV
 
         "end" resolve-label
     ] alien-assembly ;
@@ -122,11 +121,11 @@ HOOK: (cpuid) cpu ( rax rcx regs -- )
 
 : popcnt? ( -- ? )
     bool { } cdecl [
-        return-reg 1 MOV
+        EAX 1 MOV
         CPUID
-        return-reg dup XOR
+        EAX dup XOR
         ECX 23 BT
-        return-reg SETB
+        AL SETB
     ] alien-assembly ;
 
 : tscdeadline? ( -- ? ) 1 cpuid third 24 bit? ;

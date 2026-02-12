@@ -22,6 +22,7 @@ M: label JUMPcc [ 0 ] dip JUMPcc rc-relative label-fixup ;
 HOOK: stack-reg cpu ( -- reg )
 
 HOOK: reserved-stack-space cpu ( -- n )
+M: object reserved-stack-space 0 ;
 
 HOOK: pic-tail-reg cpu ( -- reg )
 
