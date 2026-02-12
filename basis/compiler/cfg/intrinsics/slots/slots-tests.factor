@@ -1,7 +1,8 @@
 USING: accessors arrays compiler.cfg compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.intrinsics.slots compiler.test
 compiler.tree compiler.tree.propagation.info kernel layouts literals
-make math math.intervals sequences slots.private tools.test ;
+make math math.intervals sequences slots.private tools.test
+cpu.architecture ;
 IN: compiler.cfg.intrinsics.slots.tests
 
 : call-node-1 ( -- node )
@@ -116,7 +117,7 @@ IN: compiler.cfg.intrinsics.slots.tests
     predecessors>> first instructions>>
 ] cfg-unit-test
 
-{
+${ complex-addressing?
     V{
         T{ ##set-slot
            { src 1 }
@@ -134,6 +135,25 @@ IN: compiler.cfg.intrinsics.slots.tests
            { temp2 5 }
         }
     }
+    V{
+        T{ ##shl-imm { dst 4 } { src1 3 } { src2 $[ cell 4 = 2 3 ? ] } }
+        T{ ##sub-imm { dst 5 } { src1 4 } { src2 2 } }
+        T{ ##set-slot
+           { src 1 }
+           { obj 2 }
+           { slot 5 }
+           { scale 0 }
+           { tag 0 }
+        }
+        T{ ##write-barrier
+           { src 2 }
+           { slot 5 }
+           { scale 0 }
+           { tag 0 }
+           { temp1 6 }
+           { temp2 7 }
+        }
+    } ?
 } [
     call-node-2 [ emit-set-slot ] V{ } make
 ] cfg-unit-test

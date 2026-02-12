@@ -829,12 +829,18 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-{
+${ 10 tag-fixnum immediate-bitwise?
     V{
         T{ ##peek f 0 D: 0 }
         T{ ##peek f 1 D: 1 }
         T{ ##test-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
     }
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##sar-imm f 1 0 $[ tag-bits get ] }
+        T{ ##test-imm-branch f 1 10 cc= }
+    } ?
 } [
     V{
         T{ ##peek f 0 D: 0 }
