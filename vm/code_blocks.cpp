@@ -344,19 +344,36 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 // image load. It finds the symbol and library, and throws an error.
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
-  cell return_address = *(cell*)frame;
+  cell return_address = *(cell*)(frame + FRAME_RETURN_ADDRESS);
   code_block* compiled = code->code_block_for_address(return_address);
 
   // Find the RT_DLSYM relocation nearest to the given return address.
   cell symbol = false_object;
   cell library = false_object;
+  cell best_before = 0;
+  bool have_before = false;
+  cell best_after = 0;
+  bool have_after = false;
 
   auto find_symbol_at_address_visitor = [&](instruction_operand op) {
-    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address) {
+    if (op.rel.type() == RT_DLSYM) {
       array* parameters = untag<array>(compiled->parameters);
       cell index = op.index;
-      symbol = array_nth(parameters, index);
-      library = array_nth(parameters, index + 1);
+      if (op.pointer <= return_address) {
+        if (!have_before || op.pointer > best_before) {
+          have_before = true;
+          best_before = op.pointer;
+          symbol = array_nth(parameters, index);
+          library = array_nth(parameters, index + 1);
+        }
+      } else if (!have_before) {
+        if (!have_after || op.pointer < best_after) {
+          have_after = true;
+          best_after = op.pointer;
+          symbol = array_nth(parameters, index);
+          library = array_nth(parameters, index + 1);
+        }
+      }
     }
   };
   compiled->each_instruction_operand(find_symbol_at_address_visitor);
