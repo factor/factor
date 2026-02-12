@@ -1,13 +1,12 @@
-USING: accessors io io.encodings.ascii io.files io.files.temp
-io.launcher kernel make sequences system tools.test ;
+USING: accessors io io.encodings.ascii io.launcher kernel make
+namespaces sequences system tools.test ;
 IN: compiler.tests.callback-error
 
-: callback-error-script ( -- path )
-    "callback-error-script" temp-file ;
+SYMBOL: callback-error-source
 
 : run-vm-with-script ( -- lines )
     <process>
-        [ vm-path , callback-error-script , ] { } make >>command
+        [ vm-path , callback-error-source get "-e=" prepend , ] { } make >>command
         +closed+ >>stdin
         +stdout+ >>stderr
     ascii <process-reader> stream-lines ;
@@ -23,7 +22,7 @@ IN: compiler.tests.callback-error
         void { } cdecl alien-indirect ;
 
     callback-death callback-invoke"
-    callback-error-script ascii set-file-contents
+    callback-error-source set-global
 ] unit-test
 
 ! Callback error from initial thread
@@ -41,7 +40,7 @@ IN: compiler.tests.callback-error
 
     [ callback-death callback-invoke ] in-thread
     stop"
-    callback-error-script ascii set-file-contents
+    callback-error-source set-global
 ] unit-test
 
 ! Callback error from another thread
