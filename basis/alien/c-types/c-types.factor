@@ -336,6 +336,7 @@ M: pointer lookup-c-type
             4 >>align-first
             "from_signed_4" >>boxer
             "to_signed_4" >>unboxer
+            cpu arm.64? [ c-int-rep >>rep ] when
             [ >fixnum ] >>unboxer-quot
         \ int typedef
 
@@ -350,6 +351,7 @@ M: pointer lookup-c-type
             4 >>align-first
             "from_unsigned_4" >>boxer
             "to_unsigned_4" >>unboxer
+            cpu arm.64? [ c-uint-rep >>rep ] when
             [ >fixnum ] >>unboxer-quot
         \ uint typedef
 

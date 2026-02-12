@@ -13,13 +13,6 @@ sequences system compiler.cfg.builder.alien.boxing ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
-<<
-cpu arm.64? [
-    int lookup-c-type c-int-rep >>rep drop
-    uint lookup-c-type c-uint-rep >>rep drop
-] when
->>
-
 ERROR: not-implemented ;
 
 ERROR: %copy-not-implemented dst src rep ;
