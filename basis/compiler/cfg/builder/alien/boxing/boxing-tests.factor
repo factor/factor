@@ -10,9 +10,13 @@ STRUCT: some-struct
     { f4 int } ;
 
 ! flatten-c-type
+cpu arm.64?
+{
+    { { c-int-rep f f } }
+}
 {
     { { int-rep f f } }
-} [
+} ? [
     int base-type flatten-c-type
 ] unit-test
 
@@ -46,9 +50,9 @@ cpu x86.32?
            { rep int-rep }
          }
     }
-} {
+} ${
     { 20 }
-    { { int-rep f f } }
+    cpu arm.64? { { c-int-rep f f } } { { int-rep f f } } ?
     { }
 } ? [
     reset-vreg-counter [ 20 int base-type unbox ] { } make
@@ -134,8 +138,8 @@ cpu x86.32?
            { rep int-rep }
         }
     }
-} {
-    { 77 } { { int-rep f f } } { }
+} ${
+    { 77 } cpu arm.64? { { c-int-rep f f } } { { int-rep f f } } ? { }
 } ? [
     [ 77 int base-type unbox-parameter ] { } make
 ] cfg-unit-test

@@ -104,12 +104,16 @@ ${
     cpu x86.32? [
         { { 1 c-int-rep EAX } }
     ] [
-        cpu arm.64? { { 1 c-int-rep X0 } } { { 1 c-int-rep RAX } } ?
+        cpu arm.64?
+        [ 1 c-int-rep X0 3array 1array ]
+        [ { { 1 c-int-rep RAX } } ] if
     ] if
     cpu x86.32? [
         { { 2 double-rep ST0 } }
     ] [
-        cpu arm.64? { { 2 double-rep V0 } } { { 2 double-rep XMM0 } } ?
+        cpu arm.64?
+        [ 2 double-rep V0 3array 1array ]
+        [ { { 2 double-rep XMM0 } } ] if
     ] if
 } [
     T{ alien-invoke-params { return int } } prepare-caller-return
