@@ -483,6 +483,8 @@ M: logical-immediate ORR  [ check-stack-register ] 2dip 1 logical-imm ;
 M: logical-immediate EOR  [ check-stack-register ] 2dip 2 logical-imm ;
 M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
 
+: MOVbi ( Rd imm -- ) insert-zero-register* ORR ;
+
 
 <PRIVATE
 : move-wide-imm ( Rd uimm16 hw opc -- )

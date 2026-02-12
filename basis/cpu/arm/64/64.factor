@@ -53,10 +53,14 @@ M: arm.64 gc-root-offset n>> spill-offset 16 + 8 /i ;
         [ first2 MOVK ] with each
     ] if-empty ;
 
-M: arm.64 %load-immediate
+: (%load-immediate) ( DST src -- )
     imm>halfwords
     dup keys [ [ 0 = ] count ] [ [ 0xffff = ] count ] bi >=
     [ %load-immediate-movz ] [ %load-immediate-movn ] if ;
+
+M: arm.64 %load-immediate
+    dup logical-64-bit-immediate?
+    [ MOVbi ] [ (%load-immediate) ] if ;
 
 M: arm.64 %load-reference
     [ swap (LDR=) rel-literal ] [ \ f type-number MOV ] if* ;
