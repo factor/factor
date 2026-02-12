@@ -4,8 +4,9 @@ compiler.cfg.builder.alien.params compiler.cfg.builder.blocks
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
 compiler.errors compiler.test compiler.tree.builder
 compiler.tree.optimizer cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands kernel literals make namespaces sequences
-stack-checker.alien system tools.test words ;
+cpu.x86.assembler.operands cpu.arm.64.assembler.registers kernel
+literals make namespaces sequences stack-checker.alien system
+tools.test words ;
 IN: compiler.cfg.builder.alien.tests
 
 : dummy-assembly ( -- ass )
@@ -100,8 +101,16 @@ cpu x86.64? [
 
 ! prepare-caller-return
 ${
-    cpu x86.32? { { 1 int-rep EAX } } { { 1 int-rep RAX } } ?
-    cpu x86.32? { { 2 double-rep ST0 } } { { 2 double-rep XMM0 } } ?
+    cpu x86.32? [
+        { { 1 c-int-rep EAX } }
+    ] [
+        cpu arm.64? { { 1 c-int-rep X0 } } { { 1 c-int-rep RAX } } ?
+    ] if
+    cpu x86.32? [
+        { { 2 double-rep ST0 } }
+    ] [
+        cpu arm.64? { { 2 double-rep V0 } } { { 2 double-rep XMM0 } } ?
+    ] if
 } [
     T{ alien-invoke-params { return int } } prepare-caller-return
     T{ alien-invoke-params { return double } } prepare-caller-return
@@ -113,7 +122,7 @@ ${
 cpu x86.32?
 {
     { 2 4 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f } { c-int-rep f f } }
     V{
         T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
         T{ ##unbox
@@ -126,7 +135,7 @@ cpu x86.32?
 }
 {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f } { c-int-rep f f } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
 } ? [
     [ { c-string int } unbox-parameters ] V{ } make

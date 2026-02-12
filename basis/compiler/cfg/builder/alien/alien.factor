@@ -6,14 +6,15 @@ compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
 compiler.tree cpu.architecture kernel layouts make math namespaces
-sequences sequences.generalizations stack-checker.alien system
-words ;
+sequences sequences.generalizations stack-checker.alien system words
+cpu.arm.64.assembler.registers math.order ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs ( abi quot -- reg-values stack-values )
     '[
         param-regs init-regs
         0 stack-params set
+        f struct-return-area set
         V{ } clone reg-values set
         V{ } clone stack-values set
         0 int-reg-reps set
@@ -40,21 +41,56 @@ IN: compiler.cfg.builder.alien
     [ return-struct-in-registers? not ]
     [ drop f ] if ;
 
-: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
-    dup hidden-struct-return? [
-        heap-size cell f ^^local-allot [
-            '[ _ prefix ]
-            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
-        ] keep
+:: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
+    return hidden-struct-return? [
+        return heap-size cell f ^^local-allot :> area
+        cpu arm.64? [
+            vregs reps area
+        ] [
+            area vregs prefix
+            int-rep struct-return-on-stack? f 3array reps prefix
+            area
+        ] if
+    ] [
+        vregs reps f
+    ] if ;
+
+: macos-arm64-varargs-fixed-params ( params -- n/f )
+    dup alien-invoke-params? os macos? and cpu arm.64? and [
+        function>> H{
+            { "fcntl" 2 }
+            { "ffi_test_64" 1 }
+            { "ffi_test_65" 1 }
+        } at
     ] [ drop f ] if ;
 
-: (handle-macos-arm64-varargs) ( params -- )
-    function>> "fcntl" = os macos? cpu arm.64? and and
-    [ int-regs [ 2 tail* ] change ] when ;
+: fixed-value-count ( parameters fixed-params -- fixed-values )
+    over length min head
+    [ base-type flatten-parameter-type length ] map-sum ;
 
-: handle-macos-arm64-varargs ( params -- )
-    dup alien-invoke-params?
-    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
+: macos-arm64-vararg-stack-rep ( rep -- rep' )
+    {
+        { c-int-rep [ int-rep ] }
+        { c-uint-rep [ int-rep ] }
+        { float-rep [ double-rep ] }
+        [ ]
+    } case ;
+
+: next-vararg-parameter ( vreg rep -- )
+    macos-arm64-vararg-stack-rep t f next-parameter ;
+
+:: (caller-parameters-varargs) ( vregs reps fixed-values -- )
+    vregs fixed-values head reps fixed-values head
+    [ first3 next-parameter ] 2each
+    vregs fixed-values tail reps fixed-values tail
+    [ first next-vararg-parameter ] 2each ;
+
+: add-arm64-hidden-struct-return-input ( -- )
+    cpu arm.64? [
+        struct-return-area get [
+            int-rep X8 3array reg-values get push
+        ] when*
+    ] when ;
 
 : (caller-parameters) ( vregs reps -- )
     [ first3 next-parameter ] 2each ;
@@ -64,13 +100,18 @@ IN: compiler.cfg.builder.alien
         [ abi>> ]
         [ parameters>> ]
         [ return>> ]
-        [ ]
+        [ macos-arm64-varargs-fixed-params ]
+        [ parameters>> ]
     } cleave
     '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
-        _ handle-macos-arm64-varargs
-        (caller-parameters)
+        add-arm64-hidden-struct-return-input
+        _ dup [
+            _ swap fixed-value-count (caller-parameters-varargs)
+        ] [
+            drop (caller-parameters)
+        ] if
     ] with-param-regs ;
 
 : prepare-caller-return ( params -- reg-outputs )
@@ -149,8 +190,11 @@ M: #alien-assembly emit-node
     [ next-vreg dup ] 3dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
-    hidden-struct-return?
-    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
+    hidden-struct-return? [
+        cpu arm.64?
+        [ next-vreg ]
+        [ int-rep struct-return-on-stack? f callee-parameter ] if
+    ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
@@ -164,6 +208,7 @@ M: #alien-assembly emit-node
     [ abi>> ] [ return>> ] [ parameters>> ] tri
     '[
         _ prepare-struct-callee struct-return-area set
+        add-arm64-hidden-struct-return-input
         _ [ base-type ] map (callee-parameters)
     ] with-param-regs ;
 

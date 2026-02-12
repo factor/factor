@@ -31,7 +31,7 @@ M: float-rep alloc-stack-param
 
 GENERIC: next-reg-param ( odd-register? rep -- reg )
 
-M: int-rep next-reg-param
+: next-int-reg-param ( odd-register? rep -- reg )
     [ nip ?dummy-stack-params ]
     [ nip ?dummy-fp-params ]
     [ drop [
@@ -39,6 +39,10 @@ M: int-rep next-reg-param
         [ int-regs get pop* ] when
     ] when ]
     2tri int-regs get pop ;
+
+M: int-rep next-reg-param next-int-reg-param ;
+M: c-int-rep next-reg-param next-int-reg-param ;
+M: c-uint-rep next-reg-param next-int-reg-param ;
 
 M: object next-reg-param
     nip [ ?dummy-stack-params ] [ ?dummy-int-params ] bi
