@@ -8,10 +8,17 @@ compiler.cfg.stack-frame compiler.codegen.gc-maps
 compiler.codegen.labels compiler.codegen.relocation
 compiler.constants cpu.architecture cpu.arm.64.assembler
 cpu.arm.64.assembler.registers generalizations kernel layouts
-literals make math math.bitwise memory namespaces sequences
-system compiler.cfg.builder.alien.boxing ;
+literals make math math.bitwise math.order memory namespaces
+sequences system compiler.cfg.builder.alien.boxing ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
+
+<<
+cpu arm.64? [
+    int lookup-c-type int-rep >>rep drop
+    uint lookup-c-type int-rep >>rep drop
+] when
+>>
 
 ERROR: not-implemented ;
 
@@ -78,11 +85,13 @@ M: arm.64 %load-vector
     [ >Q 0 LDR ]
     [ rc-relative-arm-b.cond/ldr rel-binary-literal ] bi* ;
 
-: extend-offset ( reg imm -- operand )
-    dup 9 >signed over = [
-        [ temp ] dip MOV
-        temp
-    ] unless [+] ;
+:: extend-offset ( reg imm -- operand )
+    imm 9 >signed imm = [
+        reg imm [+]
+    ] [
+        temp imm %load-immediate
+        reg temp [+]
+    ] if ;
 
 : loc>operand ( loc -- operand )
     [ ds-loc? DS RS ? ] [ n>> cells neg extend-offset ] bi ;
@@ -98,7 +107,7 @@ M: arm.64 %replace-imm
         ] }
         { [ over fixnum? ] [
             [
-                [ temp ] dip tag-fixnum MOV
+                [ temp ] dip tag-fixnum %load-immediate
                 temp
             ] dip
         ] }
@@ -143,7 +152,7 @@ M:: arm.64 %add-imm ( DST SRC1 src2 -- )
         src2 add/sub-immediate? [
             DST SRC1 src2 ADDS
         ] [
-            temp src2 MOV
+            temp src2 %load-immediate
             DST SRC1 temp ADDS
         ] if
     ] [
@@ -151,7 +160,7 @@ M:: arm.64 %add-imm ( DST SRC1 src2 -- )
         imm add/sub-immediate? [
             DST SRC1 imm SUBS
         ] [
-            temp imm MOV
+            temp imm %load-immediate
             DST SRC1 temp SUBS
         ] if
     ] if ;
@@ -163,7 +172,7 @@ M:: arm.64 %sub-imm ( DST SRC1 src2 -- )
         src2 add/sub-immediate? [
             DST SRC1 src2 SUBS
         ] [
-            temp src2 MOV
+            temp src2 %load-immediate
             DST SRC1 temp SUBS
         ] if
     ] [
@@ -171,23 +180,40 @@ M:: arm.64 %sub-imm ( DST SRC1 src2 -- )
         imm add/sub-immediate? [
             DST SRC1 imm ADDS
         ] [
-            temp imm MOV
+            temp imm %load-immediate
             DST SRC1 temp ADDS
         ] if
     ] if ;
 M: arm.64 %mul MUL ;
 
 M:: arm.64 %mul-imm ( DST SRC1 src2 -- )
-    temp XZR MOV
-    temp dup src2 ADD
+    temp src2 %load-immediate
     DST SRC1 temp MUL ;
 
 M: arm.64 %and AND ;
-M: arm.64 %and-imm AND ;
+M:: arm.64 %and-imm ( DST SRC1 src2 -- )
+    src2 logical-64-bit-immediate? [
+        DST SRC1 src2 AND
+    ] [
+        temp src2 %load-immediate
+        DST SRC1 temp AND
+    ] if ;
 M: arm.64 %or ORR ;
-M: arm.64 %or-imm ORR ;
+M:: arm.64 %or-imm ( DST SRC1 src2 -- )
+    src2 logical-64-bit-immediate? [
+        DST SRC1 src2 ORR
+    ] [
+        temp src2 %load-immediate
+        DST SRC1 temp ORR
+    ] if ;
 M: arm.64 %xor EOR ;
-M: arm.64 %xor-imm EOR ;
+M:: arm.64 %xor-imm ( DST SRC1 src2 -- )
+    src2 logical-64-bit-immediate? [
+        DST SRC1 src2 EOR
+    ] [
+        temp src2 %load-immediate
+        DST SRC1 temp EOR
+    ] if ;
 M: arm.64 %shl LSL ;
 M: arm.64 %shl-imm LSL ;
 M: arm.64 %shr LSR ;
@@ -212,10 +238,41 @@ M:: arm.64 %log2 ( DST SRC -- )
     DST DST MVN ;
 
 M:: arm.64 %bit-count ( DST SRC -- )
-    fp-temp >D SRC FMOV
-    fp-temp dup CNTv
-    fp-temp dup 0 ADDV
-    DST fp-temp >D FMOV ;
+    ! SWAR popcount on 64-bit integers using only scalar ops.
+    DST SRC MOV
+
+    temp DST 1 LSR
+    temp1 0x5555 0 MOVZ
+    temp1 0x5555 1 MOVK
+    temp1 0x5555 2 MOVK
+    temp1 0x5555 3 MOVK
+    temp temp temp1 AND
+    DST DST temp SUBS
+
+    temp1 0x3333 0 MOVZ
+    temp1 0x3333 1 MOVK
+    temp1 0x3333 2 MOVK
+    temp1 0x3333 3 MOVK
+    temp2 DST temp1 AND
+    temp DST 2 LSR
+    temp temp temp1 AND
+    DST temp2 temp ADDS
+
+    temp DST 4 LSR
+    DST DST temp ADDS
+    temp1 0x0f0f 0 MOVZ
+    temp1 0x0f0f 1 MOVK
+    temp1 0x0f0f 2 MOVK
+    temp1 0x0f0f 3 MOVK
+    DST DST temp1 AND
+
+    temp DST 8 LSR
+    DST DST temp ADDS
+    temp DST 16 LSR
+    DST DST temp ADDS
+    temp DST 32 LSR
+    DST DST temp ADDS
+    DST DST 0x7f AND ;
 
 : stack@ ( n -- operand ) [ SP ] dip [+] ;
 
@@ -223,7 +280,9 @@ M:: arm.64 %bit-count ( DST SRC -- )
 
 : ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
 
-UNION: integer-rep int-rep tagged-rep ;
+UNION: integer-32-rep c-int-rep c-uint-rep ;
+UNION: integer-64-rep int-rep tagged-rep ;
+UNION: integer-rep integer-32-rep integer-64-rep ;
 
 M: arm.64 %copy
     [ [ ?spill-slot ] bi@ ] dip {
@@ -231,19 +290,36 @@ M: arm.64 %copy
         { [
             3dup
             [ [ register? ] both? ]
-            [ integer-rep? ] bi* and
+            [ integer-32-rep? ] bi* and
+        ] [ drop [ >W ] bi@ MOV ] }
+        { [
+            3dup
+            [ offset? ]
+            [ register? ]
+            [ integer-32-rep? ] tri* and and
+        ] [ drop >W swap STR ] }
+        { [
+            3dup
+            [ register? ]
+            [ offset? ]
+            [ integer-32-rep? ] tri* and and
+        ] [ drop [ >W ] dip LDR ] }
+        { [
+            3dup
+            [ [ register? ] both? ]
+            [ integer-64-rep? ] bi* and
         ] [ drop MOV ] }
         { [
             3dup
             [ offset? ]
             [ register? ]
-            [ integer-rep? ] tri* and and
+            [ integer-64-rep? ] tri* and and
         ] [ drop swap STR ] }
         { [
             3dup
             [ register? ]
             [ offset? ]
-            [ integer-rep? ] tri* and and
+            [ integer-64-rep? ] tri* and and
         ] [ drop LDR ] }
         { [
             3dup
@@ -299,14 +375,57 @@ M: arm.64 %copy
         [ %copy-not-implemented ]
     } cond ;
 
-: fixnum-overflow ( label DST SRC1 SRC2 cc quot -- )
-    dip {
+: overflow-branch ( label cc -- )
+    {
         { cc-o [ BVS ] }
         { cc/o [ BVC ] }
     } case ; inline
 
-M: arm.64 %fixnum-add [ ADDS ] fixnum-overflow ;
-M: arm.64 %fixnum-sub [ SUBS ] fixnum-overflow ;
+M:: arm.64 %fixnum-add ( label DST SRC1 SRC2 cc -- )
+    SRC2 integer? [
+        SRC2 0 >= [
+            SRC2 add/sub-immediate? [
+                DST SRC1 SRC2 ADDS
+            ] [
+                temp SRC2 %load-immediate
+                DST SRC1 temp ADDS
+            ] if
+        ] [
+            SRC2 neg :> imm
+            imm add/sub-immediate? [
+                DST SRC1 imm SUBS
+            ] [
+                temp imm %load-immediate
+                DST SRC1 temp SUBS
+            ] if
+        ] if
+    ] [
+        DST SRC1 SRC2 ADDS
+    ] if
+    label cc overflow-branch ;
+
+M:: arm.64 %fixnum-sub ( label DST SRC1 SRC2 cc -- )
+    SRC2 integer? [
+        SRC2 0 >= [
+            SRC2 add/sub-immediate? [
+                DST SRC1 SRC2 SUBS
+            ] [
+                temp SRC2 %load-immediate
+                DST SRC1 temp SUBS
+            ] if
+        ] [
+            SRC2 neg :> imm
+            imm add/sub-immediate? [
+                DST SRC1 imm ADDS
+            ] [
+                temp imm %load-immediate
+                DST SRC1 temp ADDS
+            ] if
+        ] if
+    ] [
+        DST SRC1 SRC2 SUBS
+    ] if
+    label cc overflow-branch ;
 
 M:: arm.64 %fixnum-mul ( label DST SRC1 SRC2 cc -- )
     temp SRC1 SRC2 SMULH
@@ -736,7 +855,14 @@ M: arm.64 %compare [ CMP ] [ cc>cond ] [ %boolean ] tri* ;
 : (%compare-imm) ( SRC1 src2 -- ) [ tag-fixnum ] [ \ f type-number ] if* CMP ;
 
 M: arm.64 %compare-imm [ (%compare-imm) ] [ cc>cond ] [ %boolean ] tri* ;
-M: arm.64 %compare-integer-imm %compare ;
+M:: arm.64 %compare-integer-imm ( DST src1 src2 cc TEMP -- )
+    src2 add/sub-immediate? [
+        src1 src2 CMP
+    ] [
+        TEMP src2 %load-immediate
+        src1 TEMP CMP
+    ] if
+    DST cc cc>cond TEMP %boolean ;
 
 :: %csel-float<> ( DST TEMP -- )
     DST TEMP (%boolean)
@@ -772,7 +898,14 @@ M: arm.64 %compare-float-ordered [ [ >D ] bi@ FCMPE ] 2dip (%compare-float) ;
 M: arm.64 %compare-float-unordered [ [ >D ] bi@ FCMP ] 2dip (%compare-float) ;
 M: arm.64 %compare-branch [ CMP ] dip cc>cond B.cond ;
 M: arm.64 %compare-imm-branch [ (%compare-imm) ] dip cc>cond B.cond ;
-M: arm.64 %compare-integer-imm-branch %compare-branch ;
+M:: arm.64 %compare-integer-imm-branch ( label src1 src2 cc -- )
+    src2 add/sub-immediate? [
+        src1 src2 CMP
+    ] [
+        temp src2 %load-immediate
+        src1 temp CMP
+    ] if
+    label cc cc>cond B.cond ;
 
 : %branch-float<> ( label -- )
     3 insns BEQ
@@ -856,7 +989,9 @@ M: arm.64 flatten-struct-type
 M: arm.64 return-struct-in-registers?
     [ heap-size 16 <= ] [ arm64-float-hfa-reps >boolean ] bi or ;
 
-M: arm.64 value-struct? drop t ;
+M: arm.64 value-struct?
+    dup arm64-float-hfa-reps >boolean
+    [ drop t ] [ heap-size 16 <= ] if ;
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
@@ -880,7 +1015,7 @@ M:: arm.64 %local-allot ( DST size align offset -- )
 
 M:: arm.64 %box ( DST SRC func rep gc-map -- )
     rep reg-class-of f param-regs at first SRC rep %copy
-    rep int-rep? arg2 arg1 ? VM MOV
+    rep reg-class-of int-regs = arg2 arg1 ? VM MOV
     func f gc-map %c-invoke
     DST int-rep %load-return ;
 
@@ -960,16 +1095,17 @@ M: arm.64 enable-cpu-features
     enable-fsqrt
     enable-float-min/max
     enable-min/max
-    enable-log2
-    enable-bit-count ; ! could include enable-bit-test
+    enable-log2 ; ! enable-bit-count is disabled until arm64 %bit-count is fixed
 
 M: arm.64 complex-addressing? f ; ! could be t
 M: arm.64 integer-float-needs-stack-frame? f ;
 M: arm.64 test-instruction? f ; ! could be t
 M: arm.64 fused-unboxing? t ;
 
-M: arm.64 immediate-arithmetic? add/sub-immediate? ;
-M: arm.64 immediate-bitwise? logical-64-bit-immediate? ;
+M: arm.64 immediate-arithmetic?
+    -0x80000000 0x7fffffff between? ;
+M: arm.64 immediate-bitwise?
+    -0x80000000 0x7fffffff between? ;
 M: arm.64 immediate-comparand? add/sub-immediate? ;
 M: arm.64 immediate-store?
     {
