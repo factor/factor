@@ -34,7 +34,11 @@ HELP: model-activated
 { $values { "model" model } }
 { $contract "Called after a model has been activated." } ;
 
-{ model-activated activate-model deactivate-model } related-words
+HELP: model-deactivated
+{ $values { "model" model } }
+{ $contract "Called when a model's reference count drops to zero, before dependencies are deactivated. Override this generic to perform cleanup when the last observer disconnects." } ;
+
+{ model-activated model-deactivated activate-model deactivate-model } related-words
 
 HELP: activate-model
 { $values { "model" model } }
@@ -127,8 +131,8 @@ $nl
 ARTICLE: "models-impl" "Implementing models"
 "New types of models can be defined, for example see " { $vocab-link "models.arrow" } "."
 $nl
-"Models can execute hooks when activated:"
-{ $subsections model-activated }
+"Models can execute hooks when activated or deactivated:"
+{ $subsections model-activated model-deactivated }
 "To avoid recursive updating and do proper notifications, you should set the model values via:"
 { $subsections set-model }
 "Models are notified when their values are changed:"

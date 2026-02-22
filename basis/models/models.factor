@@ -28,6 +28,10 @@ GENERIC: model-activated ( model -- )
 
 M: model model-activated drop ;
 
+GENERIC: model-deactivated ( model -- )
+
+M: model model-deactivated drop ;
+
 : ref-model ( model -- n )
     [ 1 + dup ] change-ref drop ;
 
@@ -47,6 +51,7 @@ DEFER: remove-connection
 
 : deactivate-model ( model -- )
     dup unref-model zero? [
+        dup model-deactivated
         dup dependencies>>
         [ dup deactivate-model remove-connection ] with each
     ] [
