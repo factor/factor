@@ -1,208 +1,119 @@
 const std = @import("std");
-const zon = @import("build.zig.zon");
 
-pub fn build(b: *std.Build) void {
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
-
-    const reproducible = b.option(
-        bool,
-        "reproducible",
-        "make a reproducible build",
-    ) orelse false;
-
-    const sanitizer = b.option(enum {
-        undefined,
-        thread,
-        none,
-    }, "sanitizer", "enable a sanitizer") orelse .none;
-
-    const mod = b.addModule("factor", .{
-        .target = target,
-        .optimize = optimize,
-        .link_libc = true,
-        .link_libcpp = true,
-        .sanitize_c = if (sanitizer == .undefined) .full else .off,
-        .sanitize_thread = sanitizer == .thread,
-    });
-
-    mod.addIncludePath(b.path("vm/"));
-
-    mod.addCMacro("FACTOR_VERSION", zon.version);
-    mod.addCMacro("FACTOR_GIT_LABEL", "TODO");
-
-    if (optimize == .Debug) {
-        mod.addCMacro("FACTOR_DEBUG", "");
-    }
-
-    if (reproducible) {
-        mod.addCMacro("FACTOR_REPRODUCIBLE", "");
-    }
-
-    mod.addCSourceFiles(.{
-        .root = b.path("vm"),
-        .files = &.{
-            "ffi_test.c",
-        },
-        .flags = c_flags ++ &[_][]const u8{"-std=c99"},
-    });
-    mod.addCSourceFiles(.{
-        .root = b.path("vm"),
-        .files = &.{
-            "aging_collector.cpp",
-            "alien.cpp",
-            "arrays.cpp",
-            "bignum.cpp",
-            "byte_arrays.cpp",
-            "callbacks.cpp",
-            "callstack.cpp",
-            "code_blocks.cpp",
-            "code_heap.cpp",
-            "compaction.cpp",
-            "contexts.cpp",
-            "data_heap.cpp",
-            "data_heap_checker.cpp",
-            "debug.cpp",
-            "dispatch.cpp",
-            "entry_points.cpp",
-            "errors.cpp",
-            "factor.cpp",
-            "full_collector.cpp",
-            "gc.cpp",
-            "image.cpp",
-            "inline_cache.cpp",
-            "instruction_operands.cpp",
-            "io.cpp",
-            "jit.cpp",
-            "math.cpp",
-            "mvm.cpp",
-            "nursery_collector.cpp",
-            "object_start_map.cpp",
-            "objects.cpp",
-            "primitives.cpp",
-            "quotations.cpp",
-            "run.cpp",
-            "safepoints.cpp",
-            "sampling_profiler.cpp",
-            "strings.cpp",
-            "to_tenured_collector.cpp",
-            "tuples.cpp",
-            "utilities.cpp",
-            "vm.cpp",
-            "words.cpp",
-            "zstd.cpp",
-        },
-        .flags = common_flags,
-    });
-
-    switch (target.result.os.tag) {
-        .freebsd, .dragonfly => {
-            mod.addCSourceFiles(.{
-                .root = b.path("vm/"),
-                .files = &.{
-                    "os-genunix.cpp",
-                    "os-freebsd.cpp",
-                    "mvm-unix.cpp",
-                    "os-unix.cpp",
-                    "main-unix.cpp",
-                },
-                .flags = common_flags,
-            });
-        },
-        .linux => {
-            mod.addCSourceFiles(.{
-                .root = b.path("vm/"),
-                .files = &.{
-                    "os-genunix.cpp",
-                    "os-linux.cpp",
-                    "mvm-unix.cpp",
-                    "os-unix.cpp",
-                    "main-unix.cpp",
-                },
-                .flags = common_flags,
-            });
-        },
-        .macos => {
-            mod.linkFramework("Cocoa", .{});
-            mod.linkFramework("AppKit", .{});
-            mod.addCSourceFiles(.{
-                .root = b.path("vm/"),
-                .files = &.{
-                    "os-macos.mm",
-                    "mach_signal.cpp",
-                    "mvm-unix.cpp",
-                    "os-unix.cpp",
-                    "main-unix.cpp",
-                },
-                .flags = common_flags,
-            });
-        },
-        .windows => {
-            switch (target.result.cpu.arch) {
-                .x86_64 => {
-                    mod.addCSourceFiles(.{
-                        .root = b.path("vm/"),
-                        .files = &.{
-                            "os-windows.cpp",
-                            "os-windows-x86.64.cpp",
-                            "mvm-windows.cpp",
-                            "main-windows.cpp",
-                        },
-                        .flags = common_flags,
-                    });
-                },
-                .x86 => {
-                    mod.addCSourceFiles(.{
-                        .root = b.path("vm/"),
-                        .files = &.{
-                            "os-windows.cpp",
-                            "os-windows-x86.32.cpp",
-                            "mvm-windows.cpp",
-                            "main-windows.cpp",
-                        },
-                        .flags = common_flags,
-                    });
-                },
-                else => @panic("TODO"),
-            }
-        },
-        else => @panic("TODO"),
-    }
-
-    switch (target.result.cpu.arch) {
-        .aarch64 => {
-            mod.addCSourceFiles(.{
-                .root = b.path("vm/"),
-                .files = &.{"cpu-arm.64.cpp"},
-                .flags = common_flags,
-            });
-        },
-        .x86_64, .x86 => {
-            mod.addCSourceFiles(.{
-                .root = b.path("vm/"),
-                .files = &.{"cpu-x86.cpp"},
-                .flags = common_flags,
-            });
-        },
-        else => @panic("TODO"),
-    }
-
-    const exe = b.addExecutable(.{
-        .name = "factor",
-        .root_module = mod,
-    });
-
-    b.installArtifact(exe);
+fn runCommand(b: *std.Build, argv: []const []const u8) []const u8 {
+    return std.mem.trimEnd(u8, b.run(argv), "\n\r ");
 }
 
-const c_flags: []const []const u8 = &.{
-    // "-Wextra",
-    // "-pedantic",
-    "-Wno-date-time",
-};
+pub fn build(b: *std.Build) void {
+    // Default to x86_64 on macOS because the Factor boot image contains
+    // x86_64 JIT templates. The VM architecture must match the image.
+    const target = b.standardTargetOptions(.{
+        .default_target = .{
+            .cpu_arch = .x86_64,
+            .os_tag = .macos,
+        },
+    });
+    const optimize = b.standardOptimizeOption(.{});
 
-const cpp_flags: []const []const u8 = &.{
-    "-std=c++11",
-};
+    // Get git and date info at build time
+    const git_label = runCommand(b, &.{ "git", "log", "-1", "--format=heads/master-%h" });
+    const compile_time = runCommand(b, &.{ "date", "+%b %e %Y %H:%M:%S" });
 
-const common_flags = c_flags ++ cpp_flags;
+    const options = b.addOptions();
+    options.addOption([]const u8, "git_label", if (git_label.len > 0) git_label else "zig-vm");
+    options.addOption([]const u8, "compile_time", if (compile_time.len > 0) compile_time else "");
+
+    // Main Factor VM executable
+    const exe = b.addExecutable(.{
+        .name = "factor",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+
+    exe.root_module.addOptions("build_options", options);
+
+    // Link libc for system calls
+    exe.root_module.link_libc = true;
+
+    // Export dynamic symbols so Factor runtime can find primitives via dlsym
+    // This is equivalent to -rdynamic in GCC
+    exe.rdynamic = true;
+
+    // Link macOS frameworks (like the C++ Factor VM does)
+    // These are needed so dlopen(NULL) can find system symbols
+    if (target.result.os.tag == .macos) {
+        // Use SDK paths for framework resolution
+        const sdk_path = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk";
+        // Always add framework path for both native and cross-compilation
+        exe.root_module.addSystemFrameworkPath(.{ .cwd_relative = sdk_path ++ "/System/Library/Frameworks" });
+        exe.root_module.addLibraryPath(.{ .cwd_relative = sdk_path ++ "/usr/lib" });
+        // Link frameworks - Factor needs CoreFoundation for IO, Foundation for
+        // ObjC runtime, and AppKit/Cocoa for GUI classes (NSStatusBar, etc.)
+        // These must be linked so dlopen(NULL) can find ObjC class symbols.
+        exe.root_module.linkFramework("CoreFoundation", .{});
+        exe.root_module.linkFramework("Foundation", .{});
+        exe.root_module.linkFramework("Cocoa", .{});
+        exe.root_module.linkFramework("AppKit", .{});
+        exe.root_module.linkFramework("OpenGL", .{});
+        exe.root_module.linkFramework("CoreServices", .{});
+        exe.root_module.linkFramework("CoreGraphics", .{});
+        exe.root_module.linkFramework("CoreText", .{});
+        exe.root_module.linkFramework("ApplicationServices", .{});
+        exe.root_module.linkFramework("Carbon", .{});
+    }
+
+    b.installArtifact(exe);
+
+    // Run command
+    const run_cmd = b.addRunArtifact(exe);
+    run_cmd.step.dependOn(b.getInstallStep());
+
+    if (b.args) |args| {
+        run_cmd.addArgs(args);
+    }
+
+    const run_step = b.step("run", "Run the Factor VM");
+    run_step.dependOn(&run_cmd.step);
+
+    // Unit tests
+    const tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    tests.root_module.link_libc = true;
+
+    const run_tests = b.addRunArtifact(tests);
+    const test_step = b.step("test", "Run tests");
+    test_step.dependOn(&run_tests.step);
+
+    const docs_step = b.step("docs", "Build docs");
+    const docs = b.addObject(.{
+        .name = "factor",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    docs.root_module.addOptions("build_options", options);
+    const install_docs = b.addInstallDirectory(.{
+        .source_dir = docs.getEmittedDocs(),
+        .install_dir = .prefix,
+        .install_subdir = "docs",
+    });
+    docs_step.dependOn(&install_docs.step);
+
+    const cov_step = b.step("cov", "Generate code coverage");
+
+    const cov_run = b.addSystemCommand(&.{ "kcov", "--clean", "--include-pattern=src/" });
+    cov_run.addArg(b.getInstallPath(.prefix, "kcov-output"));
+    cov_run.addArtifactArg(tests);
+
+    cov_step.dependOn(&cov_run.step);
+}
