@@ -285,7 +285,7 @@ fn sampleCallstacksAdd(vm: *vm_mod.FactorVM, wrapper_ptr: *Cell, elt: Cell) void
     contents.data()[count] = elt_root;
 
     // Write barrier
-    vm.writeBarrierWithValue(&contents.data()[count], elt_root);
+    vm.writeBarrierKnownHeapWithValue(&contents.data()[count], elt_root);
 
     // Increment count
     wrapper = @ptrFromInt(layouts.UNTAG(wrapper_ptr.*));

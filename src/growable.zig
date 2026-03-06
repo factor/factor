@@ -67,7 +67,7 @@ pub const GrowableArray = struct {
         data[self.count] = elt_root;
 
         // Write barrier: only needed for pointer stores.
-        self.vm.writeBarrierWithValue(&data[self.count], elt_root);
+        self.vm.writeBarrierKnownHeapWithValue(&data[self.count], elt_root);
 
         self.count += 1;
         return true;

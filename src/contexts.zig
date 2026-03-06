@@ -53,6 +53,7 @@ pub const Context = extern struct {
     pub fn init(allocator: std.mem.Allocator, ds_size: Cell, rs_size: Cell, cs_size: Cell) !Self {
         var ctx: Self = undefined;
 
+        ctx.callstack_save = 0;
         ctx.datastack_seg = null;
         ctx.retainstack_seg = null;
         ctx.callstack_seg = null;

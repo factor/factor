@@ -67,6 +67,8 @@ pub const CodeRoot = struct {
     }
 };
 
+pub const DataRootStack = std.ArrayList(*Cell);
+
 // Use the real CallbackHeap from callbacks module
 pub const CallbackHeap = callbacks_mod.CallbackHeap;
 
@@ -345,8 +347,8 @@ pub const FactorVM = struct {
     // Garbage collector instance
     garbage_collector: ?*gc.GarbageCollector,
 
-    // Data roots for GC
-    data_roots: std.ArrayList(*Cell),
+    // Data roots for GC.
+    data_roots: DataRootStack,
     // Code roots for GC (return addresses that must be updated/invalidated)
     code_roots: std.ArrayList(*CodeRoot),
 

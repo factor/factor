@@ -612,15 +612,62 @@ inline fn methodCacheHashcode(klass: Cell, cache_arr: *const layouts.Array) Cell
     return ((klass >> layouts.tag_bits) & mask) << 1;
 }
 
+inline fn methodCacheAlternateHashcode(hashcode: Cell, cache_arr: *const layouts.Array, xor_mask: Cell) Cell {
+    const capacity = layouts.untagFixnumFast(cache_arr.capacity);
+    const pair_count = capacity >> 1;
+    if (pair_count <= 1) return hashcode;
+
+    std.debug.assert((pair_count & (pair_count - 1)) == 0);
+    const pair_idx = hashcode >> 1;
+    const alt_pair_idx = (pair_idx ^ xor_mask) & (pair_count - 1);
+    return alt_pair_idx << 1;
+}
+
 inline fn updateMethodCache(vm: *FactorVM, cache: Cell, klass: Cell, method: Cell) void {
     const cache_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(cache));
     const hashcode = methodCacheHashcode(klass, cache_arr);
+    const alt_hashcode = methodCacheAlternateHashcode(hashcode, cache_arr, 1);
+    const alt2_hashcode = methodCacheAlternateHashcode(hashcode, cache_arr, 2);
     const data = cache_arr.data();
+
+    // Save canonical pair before overwrite so we can retain one victim entry.
+    const old_klass = data[hashcode];
+    const old_method = data[hashcode + 1];
+
     data[hashcode] = klass;
     data[hashcode + 1] = method;
 
-    // method_cache_hashcode() always returns an even index, so this pair
-    // occupies a single card/deck-aligned 2-cell slot. Mark once.
+    // On collisions, keep previous canonical pair in a secondary probe slot.
+    if (old_klass != layouts.false_object and old_klass != klass) {
+        var inserted = false;
+        if (alt_hashcode != hashcode) {
+            const alt_klass = data[alt_hashcode];
+            // Avoid evicting unrelated canonical data from the secondary slot.
+            if (alt_klass == layouts.false_object or alt_klass == old_klass) {
+                data[alt_hashcode] = old_klass;
+                data[alt_hashcode + 1] = old_method;
+                const alt_slot0 = &data[alt_hashcode];
+                const alt_slot1 = &data[alt_hashcode + 1];
+                std.debug.assert((@intFromPtr(alt_slot0) >> vm_mod.card_bits) == (@intFromPtr(alt_slot1) >> vm_mod.card_bits));
+                vm.writeBarrierKnownHeap(alt_slot0);
+                inserted = true;
+            }
+        }
+        if (!inserted and alt2_hashcode != hashcode and alt2_hashcode != alt_hashcode) {
+            const alt2_klass = data[alt2_hashcode];
+            if (alt2_klass == layouts.false_object or alt2_klass == old_klass) {
+                data[alt2_hashcode] = old_klass;
+                data[alt2_hashcode + 1] = old_method;
+                const alt2_slot0 = &data[alt2_hashcode];
+                const alt2_slot1 = &data[alt2_hashcode + 1];
+                std.debug.assert((@intFromPtr(alt2_slot0) >> vm_mod.card_bits) == (@intFromPtr(alt2_slot1) >> vm_mod.card_bits));
+                vm.writeBarrierKnownHeap(alt2_slot0);
+            }
+        }
+    }
+
+    // Keep method cache card/deck marks conservative and branch-free.
+    // The two adjacent cells always share a card, so one mark is sufficient.
     const slot0 = &data[hashcode];
     const slot1 = &data[hashcode + 1];
     std.debug.assert((@intFromPtr(slot0) >> vm_mod.card_bits) == (@intFromPtr(slot1) >> vm_mod.card_bits));
@@ -644,6 +691,24 @@ pub export fn primitive_mega_cache_miss(vm_asm: *VMAssemblyFields) callconv(.c) 
     const object = @as(*const Cell, @ptrFromInt(stack_addr)).*;
 
     const klass = objectClass(object);
+
+    // Secondary probe fast path: recover from common collisions without a full
+    // generic method lookup.
+    const cache_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(cache));
+    const hashcode = methodCacheHashcode(klass, cache_arr);
+    const alt_hashcode = methodCacheAlternateHashcode(hashcode, cache_arr, 1);
+    const alt2_hashcode = methodCacheAlternateHashcode(hashcode, cache_arr, 2);
+    const data = cache_arr.data();
+
+    if (alt_hashcode != hashcode and data[alt_hashcode] == klass) {
+        ctx.push(data[alt_hashcode + 1]);
+        return;
+    }
+    if (alt2_hashcode != hashcode and alt2_hashcode != alt_hashcode and data[alt2_hashcode] == klass) {
+        ctx.push(data[alt2_hashcode + 1]);
+        return;
+    }
+
     const method = lookupMethod(object, methods);
 
     updateMethodCache(vm, cache, klass, method);

@@ -65,12 +65,7 @@ fn memmoveBytes(dest: Cell, src: Cell, size: Cell) void {
     const n: usize = @intCast(size);
     const dst: [*]u8 = @ptrFromInt(dest);
     const src_ptr: [*]const u8 = @ptrFromInt(src);
-    // Compaction always moves objects downward (dest <= src).
-    // Regions may overlap when the gap is smaller than the object size,
-    // so we must use copyForwards (safe when dest <= src) instead of
-    // @memcpy (which panics on aliasing).
-    std.debug.assert(dest <= src);
-    std.mem.copyForwards(u8, dst[0..n], src_ptr[0..n]);
+    @memmove(dst[0..n], src_ptr[0..n]);
 }
 
 fn fixupSlotValue(fixup: *CompactionFixup, value: Cell) Cell {

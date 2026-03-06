@@ -135,7 +135,7 @@ pub export fn primitive_set_slot(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const slots = obj_ptr.slots();
     const slot_ptr = &slots[@intCast(n)];
     slot_ptr.* = value;
-    vm.writeBarrierWithValue(slot_ptr, value);
+    vm.writeBarrierKnownHeapWithValue(slot_ptr, value);
 }
 
 // --- Tuple Allocation ---
@@ -175,52 +175,41 @@ pub export fn primitive_tuple(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
 pub export fn primitive_tuple_boa(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
+    const ctx = vm_asm.ctx;
     // ( slot-values... layout -- tuple )
     // Create a new tuple filling slots from the stack (BOA = By Order of Arguments)
-    // Keep layout on stack during potential GC - use peek instead of pop
-    var layout_cell = vm.peek();
+    // Pop the layout and root it locally so we can bulk-copy the remaining
+    // stack cells exactly like the C++ VM.
+    var layout_cell = ctx.pop();
 
     // NOTE: tuple_layout objects have tag ARRAY (2), not TUPLE (7)!
     vm.checkTag(layout_cell, .array);
 
-    var layout: *const layouts.TupleLayout = @ptrFromInt(layouts.UNTAG(layout_cell));
+    vm.data_roots.append(vm.allocator, &layout_cell) catch vm.memoryError();
+    defer _ = vm.data_roots.pop();
+
+    const layout: *const layouts.TupleLayout = @ptrFromInt(layouts.UNTAG(layout_cell));
     const num_slots = layouts.untagFixnumUnsigned(layout.size);
     const tuple_size = @sizeOf(layouts.Tuple) + num_slots * @sizeOf(Cell);
+    const slot_size = num_slots * @sizeOf(Cell);
 
     // Allocate tuple (may trigger GC which may move stack values)
     const tagged = vm.allotObject(.tuple, tuple_size) orelse {
-        // Pop slot values and layout before signaling error
-        {
-            const ctx = vm.vm_asm.ctx;
-            ctx.datastack -= num_slots * @sizeOf(Cell);
-        }
+        ctx.datastack -= slot_size;
         vm.memoryError();
     };
-
-    // Re-read layout from stack in case GC moved it
-    layout_cell = vm.peek();
-    layout = @ptrFromInt(layouts.UNTAG(layout_cell));
 
     const tuple: *layouts.Tuple = @ptrFromInt(layouts.UNTAG(tagged));
     tuple.layout = layout_cell;
 
-    // Copy slot values from stack (they're pushed in order, so top of stack is last slot)
-    // Stack is: slot0, slot1, ..., slotN-1, layout
-    // datastack points to layout (TOS)
-    const t_data = tuple.data();
-    {
-        const ctx = vm.vm_asm.ctx;
-        const slot_size = num_slots * @sizeOf(Cell);
-        const src_base = ctx.datastack - slot_size;
-
-        for (0..num_slots) |i| {
-            const src_addr = src_base + i * @sizeOf(Cell);
-            t_data[i] = @as(*const Cell, @ptrFromInt(src_addr)).*;
-        }
-
-        // Pop layout and slot values from stack
-        ctx.datastack -= slot_size + @sizeOf(Cell);
+    if (slot_size > 0) {
+        const src_base = ctx.datastack - slot_size + @sizeOf(Cell);
+        const src_data: [*]const Cell = @ptrFromInt(src_base);
+        @memcpy(tuple.data()[0..num_slots], src_data[0..num_slots]);
     }
+
+    // Pop slot values from stack. The layout was already popped above.
+    ctx.datastack -= slot_size;
 
     std.debug.assert(tuple.header == (@as(Cell, @intFromEnum(layouts.TypeTag.tuple)) << 2));
     std.debug.assert(layouts.hasTag(tuple.layout, .array));
