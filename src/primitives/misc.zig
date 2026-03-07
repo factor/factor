@@ -48,9 +48,9 @@ pub fn nanoCountMonotonic() u64 {
         }
         return mach.mach_absolute_time() * mach.scaling_factor;
     } else {
-        // Linux/generic: use CLOCK_MONOTONIC
-        var ts: std.posix.timespec = undefined;
-        std.posix.clock_gettime(.MONOTONIC, &ts) catch return 0;
+        // Linux/generic: use CLOCK_MONOTONIC via C library
+        var ts: std.c.timespec = undefined;
+        if (std.c.clock_gettime(.MONOTONIC, &ts) != 0) return 0;
         return @as(u64, @intCast(ts.sec)) * 1_000_000_000 + @as(u64, @intCast(ts.nsec));
     }
 }

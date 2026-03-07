@@ -5,14 +5,9 @@ fn runCommand(b: *std.Build, argv: []const []const u8) []const u8 {
 }
 
 pub fn build(b: *std.Build) void {
-    // Default to x86_64 on macOS because the Factor boot image contains
-    // x86_64 JIT templates. The VM architecture must match the image.
-    const target = b.standardTargetOptions(.{
-        .default_target = .{
-            .cpu_arch = .x86_64,
-            .os_tag = .macos,
-        },
-    });
+    // Use native target by default. The VM architecture must match the boot image.
+    // Override with -Dtarget= if cross-compiling.
+    const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
     // Get git and date info at build time
@@ -42,9 +37,10 @@ pub fn build(b: *std.Build) void {
     // This is equivalent to -rdynamic in GCC
     exe.rdynamic = true;
 
-    // Link macOS frameworks (like the C++ Factor VM does)
-    // These are needed so dlopen(NULL) can find system symbols
+    // Platform-specific library linking
     if (target.result.os.tag == .macos) {
+        // Link macOS frameworks (like the C++ Factor VM does)
+        // These are needed so dlopen(NULL) can find system symbols
         // Use SDK paths for framework resolution
         const sdk_path = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk";
         // Always add framework path for both native and cross-compilation
@@ -63,6 +59,9 @@ pub fn build(b: *std.Build) void {
         exe.root_module.linkFramework("CoreText", .{});
         exe.root_module.linkFramework("ApplicationServices", .{});
         exe.root_module.linkFramework("Carbon", .{});
+    } else if (target.result.os.tag == .linux) {
+        // Link math library for floor/ceil/etc
+        exe.root_module.linkSystemLibrary("m", .{});
     }
 
     b.installArtifact(exe);

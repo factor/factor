@@ -184,6 +184,9 @@ fn dieInspectGlobal(vm: *FactorVM, name: []const u8) void {
                 std.debug.print(" str=\"", .{});
                 diePrintString(value);
                 std.debug.print("\"\n", .{});
+            } else if (layouts.hasTag(value, .array)) {
+                std.debug.print("\n", .{});
+                diePrintArrayDeep(value, 0);
             } else {
                 std.debug.print("\n", .{});
             }
@@ -331,6 +334,59 @@ fn dieDecodeConditionSlots(tagged_tuple: layouts.Cell, vm: *FactorVM) void {
                     std.debug.print("[die] continuation call slot: 0x{x} tag={}\n", .{ call_slot, layouts.TAG(call_slot) });
                 }
             }
+        }
+    }
+}
+
+fn diePrintArrayDeep(tagged_arr: layouts.Cell, depth: u32) void {
+    if (depth > 3) return;
+    const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(tagged_arr));
+    const cap = layouts.untagFixnumUnsigned(arr.capacity);
+    if (cap > 100) {
+        std.debug.print("[die:d{}] array cap={} (too large, skipping)\n", .{ depth, cap });
+        return;
+    }
+    std.debug.print("[die:d{}] array[{}]:\n", .{ depth, cap });
+    const data = arr.data();
+    for (0..@min(cap, 15)) |i| {
+        const val = data[i];
+        std.debug.print("[die:d{}]   [{:2}] 0x{x} tag={}", .{ depth, i, val, layouts.TAG(val) });
+        if (val == layouts.false_object) {
+            std.debug.print(" (f)", .{});
+        } else if (layouts.hasTag(val, .string)) {
+            std.debug.print(" str=\"", .{});
+            diePrintString(val);
+            std.debug.print("\"", .{});
+        } else if (layouts.hasTag(val, .word)) {
+            std.debug.print(" word=", .{});
+            diePrintWordName(val);
+        } else if (layouts.hasTag(val, .fixnum)) {
+            std.debug.print(" fixnum={}", .{layouts.untagFixnum(val)});
+        } else if (layouts.hasTag(val, .tuple)) {
+            std.debug.print(" -> ", .{});
+            const naddr = layouts.UNTAG(val);
+            if (naddr >= 0x1000) {
+                const nraw = @as(*const layouts.Cell, @ptrFromInt(naddr + @sizeOf(layouts.Cell))).*;
+                const nlayout = layouts.followForwardingPointers(nraw);
+                const nladdr = layouts.UNTAG(nlayout);
+                if (nladdr >= 0x1000) {
+                    const nk = @as(*const layouts.Cell, @ptrFromInt(nladdr + 2 * @sizeOf(layouts.Cell))).*;
+                    if (layouts.hasTag(nk, .word)) {
+                        diePrintWordName(nk);
+                    }
+                }
+            }
+        } else if (layouts.hasTag(val, .array)) {
+            const arr2: *const layouts.Array = @ptrFromInt(layouts.UNTAG(val));
+            const cap2 = layouts.untagFixnumUnsigned(arr2.capacity);
+            std.debug.print(" array[{}]", .{cap2});
+        }
+        std.debug.print("\n", .{});
+        // Recurse into nested tuples and arrays
+        if (layouts.hasTag(val, .tuple)) {
+            diePrintTupleDeep(val, depth + 1);
+        } else if (layouts.hasTag(val, .array)) {
+            diePrintArrayDeep(val, depth + 1);
         }
     }
 }

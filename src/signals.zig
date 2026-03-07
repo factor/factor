@@ -123,14 +123,61 @@ pub fn getVmForThread(pthread_id: std.c.pthread_t) ?*vm_mod.FactorVM {
     return thread_vm_map.get(key);
 }
 
-// Platform-specific ucontext_t type
-const UContextType = if (builtin.os.tag == .linux)
-    std.os.linux.ucontext_t
-else if (builtin.os.tag == .macos)
-    // On macOS we use raw void pointer since ucontext_t layout is different
-    anyopaque
+// Linux x86_64 ucontext_t structure (from kernel headers)
+const Linux_x86_64_fpregset = extern struct {
+    cwd: u16,
+    swd: u16,
+    ftw: u16,
+    fop: u16,
+    rip: u64,
+    rdp: u64,
+    mxcsr: u32,
+    mxcr_mask: u32,
+    st: [8][16]u8,
+    xmm: [16][16]u8,
+    reserved: [96]u8,
+};
+
+const Linux_x86_64_mcontext = extern struct {
+    gregs: [23]i64,
+    fpregs: ?*Linux_x86_64_fpregset,
+    reserved: [8]u64,
+};
+
+const Linux_x86_64_ucontext = extern struct {
+    uc_flags: c_ulong,
+    uc_link: ?*Linux_x86_64_ucontext,
+    uc_stack: std.posix.stack_t,
+    uc_mcontext: Linux_x86_64_mcontext,
+    uc_sigmask: std.c.sigset_t,
+};
+
+// Linux ARM64 ucontext_t structure
+const Linux_aarch64_mcontext = extern struct {
+    fault_address: u64,
+    regs: [31]u64,
+    sp: u64,
+    pc: u64,
+    pstate: u64,
+    reserved: [4096]u8 align(16),
+};
+
+const Linux_aarch64_ucontext = extern struct {
+    uc_flags: c_ulong,
+    uc_link: ?*Linux_aarch64_ucontext,
+    uc_stack: std.posix.stack_t,
+    uc_sigmask: std.c.sigset_t,
+    padding: [1024 / 8 - @sizeOf(std.c.sigset_t)]u8,
+    uc_mcontext: Linux_aarch64_mcontext,
+};
+
+// Platform-specific ucontext_t type alias
+const Linux_ucontext_t = if (builtin.cpu.arch == .x86_64)
+    Linux_x86_64_ucontext
+else if (builtin.cpu.arch == .aarch64)
+    Linux_aarch64_ucontext
 else
-    @compileError("Unsupported OS for signal handling");
+    @compileError("Unsupported architecture for Linux signal handling");
 
 // Architecture-specific context access
 // These functions extract PC and SP from ucontext_t
@@ -187,11 +234,12 @@ fn getProgramCounter(ucontext_ptr: *anyopaque) *Cell {
             return @ptrCast(&mcontext[32]); // __pc
         }
     } else if (builtin.os.tag == .linux) {
-        const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
         if (builtin.cpu.arch == .x86_64) {
-            return @ptrCast(&ucontext.mcontext.gregs[16]); // REG_RIP
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.gregs[16]); // REG_RIP
         } else if (builtin.cpu.arch == .aarch64) {
-            return @ptrCast(&ucontext.mcontext.pc);
+            const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.pc);
         }
     }
     @panic("Unsupported architecture for signal handling");
@@ -205,9 +253,9 @@ fn getRAX(ucontext_ptr: *anyopaque) Cell {
             return mcontext[2]; // __rax = 2 (skip __es) + 0
         }
     } else if (builtin.os.tag == .linux) {
-        const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
         if (builtin.cpu.arch == .x86_64) {
-            return @bitCast(ucontext.mcontext.gregs[13]); // REG_RAX
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @bitCast(ucontext.uc_mcontext.gregs[13]); // REG_RAX
         }
     }
     return 0;
@@ -221,9 +269,9 @@ fn getRDI(ucontext_ptr: *anyopaque) Cell {
             return mcontext[6]; // __rdi = 2 (skip __es) + 4
         }
     } else if (builtin.os.tag == .linux) {
-        const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
         if (builtin.cpu.arch == .x86_64) {
-            return @bitCast(ucontext.mcontext.gregs[8]); // REG_RDI
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @bitCast(ucontext.uc_mcontext.gregs[8]); // REG_RDI
         }
     }
     return 0;
@@ -241,11 +289,12 @@ fn getStackPointer(ucontext_ptr: *anyopaque) *Cell {
             return @ptrCast(&mcontext[31]); // __sp
         }
     } else if (builtin.os.tag == .linux) {
-        const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
         if (builtin.cpu.arch == .x86_64) {
-            return @ptrCast(&ucontext.mcontext.gregs[15]); // REG_RSP
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.gregs[15]); // REG_RSP
         } else if (builtin.cpu.arch == .aarch64) {
-            return @ptrCast(&ucontext.mcontext.sp);
+            const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return @ptrCast(&ucontext.uc_mcontext.sp);
         }
     }
     @panic("Unsupported architecture for signal handling");
@@ -281,14 +330,13 @@ fn getFPUStatus(ucontext_ptr: *anyopaque) u32 {
     } else if (builtin.os.tag == .linux) {
         if (builtin.cpu.arch == .x86_64) {
             // Linux x86_64: fpregs->swd | fpregs->mxcsr
-            const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            if (ucontext.mcontext.fpregs) |fpregs| {
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            if (ucontext.uc_mcontext.fpregs) |fpregs| {
                 return fpregs.swd | fpregs.mxcsr;
             }
         } else if (builtin.cpu.arch == .aarch64) {
-            // Linux ARM64: fpsr field
-            const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            return ucontext.mcontext.fpsr;
+            // Linux ARM64: fpsr not easily accessible in ucontext, return 0
+            return 0;
         }
     }
     return 0;
@@ -314,14 +362,13 @@ fn clearFPUStatus(ucontext_ptr: *anyopaque) void {
         }
     } else if (builtin.os.tag == .linux) {
         if (builtin.cpu.arch == .x86_64) {
-            const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            if (ucontext.mcontext.fpregs) |fpregs| {
+            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            if (ucontext.uc_mcontext.fpregs) |fpregs| {
                 fpregs.swd = 0;
                 fpregs.mxcsr &= 0xffffffc0;
             }
         } else if (builtin.cpu.arch == .aarch64) {
-            const ucontext: *std.os.linux.ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            ucontext.mcontext.fpsr = 0;
+            // Linux ARM64: fpsr not easily accessible in ucontext
         }
     }
 }
@@ -362,11 +409,11 @@ fn memorySignalHandler(_: std.posix.SIG, siginfo: *const SiginfoType, ucontext_p
     const vm = g_current_vm orelse std.process.abort();
     const ucontext = ucontext_ptr orelse std.process.abort();
 
-    // Get fault address - siginfo_t structure varies by platform
+    // Get fault address - structure varies by platform
     const fault_addr: Cell = if (builtin.os.tag == .linux)
-        @intCast(@intFromPtr(siginfo.fields.common.first.fault_addr))
+        @intFromPtr(siginfo.fields.sigfault.addr)
     else
-        // macOS uses .addr field which is *allowzero anyopaque
+        // macOS uses .addr field directly
         @intFromPtr(siginfo.addr);
 
     const pc_ptr = getProgramCounter(ucontext);
@@ -422,10 +469,7 @@ fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_pt
     // Check if it's integer division (FPE_INTDIV=1 or FPE_INTOVF=2)
     const FPE_INTDIV: c_int = 1;
     const FPE_INTOVF: c_int = 2;
-    const si_code = if (builtin.os.tag == .linux)
-        siginfo.fields.common.second.sigchld.code
-    else
-        siginfo.code;
+    const si_code = siginfo.code;
     const handler = if (si_code == FPE_INTDIV or si_code == FPE_INTOVF)
         @intFromPtr(&synchronous_signal_handler_impl)
     else
@@ -808,12 +852,13 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
     if (comptime builtin.cpu.arch == .x86_64) {
         // Explicit register constraints prevent LLVM from placing inputs
         // in r12-r15, which the asm overwrites before the jmp.
+        // Use movq to specify 64-bit operand size explicitly.
         asm volatile (
-            \\mov %%rsi, %%rsp
-            \\mov %%rcx, %%r13
-            \\mov (%%r13), %%r12
-            \\mov 0x10(%%r12), %%r14
-            \\mov 0x18(%%r12), %%r15
+            \\movq %%rsi, %%rsp
+            \\movq %%rcx, %%r13
+            \\movq (%%r13), %%r12
+            \\movq 0x10(%%r12), %%r14
+            \\movq 0x18(%%r12), %%r15
             \\jmp *%%rax
             :
             : [vm_asm] "{rcx}" (vm_asm_ptr),

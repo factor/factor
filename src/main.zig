@@ -41,22 +41,29 @@ comptime {
     if (@offsetOf(vm_mod.VMAssemblyFields, "ctx") != 0) @compileError("ctx must be at offset 0 in VMAssemblyFields");
 }
 
-// C stdio FILE* pointers — macOS-specific symbol names.
-// Other platforms use `stdin`/`stdout`/`stderr` and need porting.
-comptime {
-    if (builtin.os.tag != .macos) @compileError("C stdio externs use macOS-specific names (__stdinp, etc.)");
+// C stdio FILE* pointers — needed for Factor's OBJ_STDIN/STDOUT/STDERR aliens.
+// Platform-specific symbol names: macOS uses __stdinp, Linux uses stdin.
+// On both macOS and Linux, stdin/stdout/stderr are global variables of type
+// FILE*. @extern gives us the address of the variable itself, so we need
+// *const *FILE (pointer to the variable) and dereference to get the FILE*.
+fn getCStdin() *std.c.FILE {
+    const name = if (builtin.os.tag == .macos) "__stdinp" else "stdin";
+    return @extern(*const *std.c.FILE, .{ .name = name }).*;
 }
-extern "c" var __stdinp: *std.c.FILE;
-extern "c" var __stdoutp: *std.c.FILE;
-extern "c" var __stderrp: *std.c.FILE;
 
-extern "c" fn fprintf(*std.c.FILE, [*:0]const u8, ...) c_int;
-extern "c" fn fflush(*std.c.FILE) c_int;
+fn getCStdout() *std.c.FILE {
+    const name = if (builtin.os.tag == .macos) "__stdoutp" else "stdout";
+    return @extern(*const *std.c.FILE, .{ .name = name }).*;
+}
+
+fn getCStderr() *std.c.FILE {
+    const name = if (builtin.os.tag == .macos) "__stderrp" else "stderr";
+    return @extern(*const *std.c.FILE, .{ .name = name }).*;
+}
+
 extern "c" fn realpath(path: [*:0]const u8, resolved: ?[*:0]u8) ?[*:0]u8;
 extern "c" fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int;
 extern "c" fn free(ptr: ?*anyopaque) void;
-const c_fprintf = fprintf;
-const c_fflush = fflush;
 
 const build_options = @import("build_options");
 
@@ -90,7 +97,7 @@ const FACTOR_GIT_LABEL = build_options.git_label;
 fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     const free_list_mod = @import("free_list.zig");
 
-    _ = c_fprintf(__stdoutp, "*** Stage 2 early init... ");
+    std.debug.print("*** Stage 2 early init... ", .{});
 
     const heap = vm.data orelse return;
 
@@ -187,16 +194,15 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stage2)] =
         vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
 
-    _ = c_fprintf(__stdoutp, "done\n");
-    _ = c_fflush(__stdoutp);
+    std.debug.print("done\n", .{});
 }
 
 // Initialize special objects for stdin/stdout/stderr file handles
 // Matches C++ VM init_factor() in factor.cpp
 fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_path: []const u8) void {
-    const stdin_ptr = __stdinp;
-    const stdout_ptr = __stdoutp;
-    const stderr_ptr = __stderrp;
+    const stdin_ptr = getCStdin();
+    const stdout_ptr = getCStdout();
+    const stderr_ptr = getCStderr();
 
     // OBJ_CELL_SIZE = 7
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.cell_size)] = layouts.tagFixnum(8);
@@ -359,7 +365,7 @@ pub fn main(init: std.process.Init) !void {
     }
 
     if (image_path == null) {
-        _ = c_fprintf(__stderrp, "Error: No image file specified. Use -i=<path> or provide image as argument.\nUsage: factor [-i=<image>] [-e=<code>] [-fep]\n");
+        std.debug.print("Error: No image file specified. Use -i=<path> or provide image as argument.\nUsage: factor [-i=<image>] [-e=<code>] [-fep]\n", .{});
         std.process.exit(1);
     }
 
@@ -403,7 +409,7 @@ pub fn main(init: std.process.Init) !void {
     defer loader.deinit();
 
     loader.loadImage(image_path.?) catch |err| {
-        _ = c_fprintf(__stderrp, "Failed to load image: %d\n", @intFromError(err));
+        std.debug.print("Failed to load image: {}\n", .{err});
         std.process.exit(1);
     };
 
@@ -457,10 +463,10 @@ pub fn main(init: std.process.Init) !void {
     const startup_quot = vm.specialObject(objects.SpecialObject.startup_quot);
     if (startup_quot != layouts.false_object and layouts.hasTag(startup_quot, .quotation)) {
         execution.runFactor(vm) catch |err| {
-            _ = c_fprintf(__stderrp, "Execution error: %d\n", @intFromError(err));
+            std.debug.print("Execution error: {}\n", .{err});
         };
     } else {
-        _ = c_fprintf(__stderrp, "No startup quotation found\n");
+        std.debug.print("No startup quotation found\n", .{});
     }
 }
 

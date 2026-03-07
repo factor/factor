@@ -468,16 +468,15 @@ pub export fn from_unsigned_4(n: u32, vm_asm: *VMAssemblyFields) callconv(.c) Ce
 // Utility Functions
 // ============================================================================
 
-extern "c" fn __error() *c_int;
-
+// Use std.c._errno() which is already platform-independent
 /// Get errno
 pub export fn err_no() callconv(.c) c_int {
-    return __error().*;
+    return std.c._errno().*;
 }
 
 /// Set errno
 pub export fn set_err_no(err: c_int) callconv(.c) void {
-    __error().* = err;
+    std.c._errno().* = err;
 }
 
 /// memcpy wrapper - used by set-callstack inline code
