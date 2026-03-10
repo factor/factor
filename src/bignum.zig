@@ -1053,11 +1053,15 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
 
     // Lehmer/hybrid GCD (matches C++ VM non-Win64 path):
     // keep working values in-place and use occasional Euclidean remainder steps.
+    // Root b before first copy to protect it from GC during allocation.
+    vm.data_roots.ensureUnusedCapacity(vm.allocator, 3) catch return error.OutOfMemory;
+    var b_root: Cell = layouts.tagBignum(@constCast(b));
+    vm.data_roots.appendAssumeCapacity(&b_root);
+    defer _ = vm.data_roots.pop();
     var a_cell: Cell = layouts.tagBignum(try copyBignumWithSign(vm, a, false));
-    var b_cell: Cell = layouts.tagBignum(try copyBignumWithSign(vm, b, false));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
     vm.data_roots.appendAssumeCapacity(&a_cell);
     defer _ = vm.data_roots.pop();
+    var b_cell: Cell = layouts.tagBignum(try copyBignumWithSign(vm, @ptrFromInt(layouts.UNTAG(b_root)), false));
     vm.data_roots.appendAssumeCapacity(&b_cell);
     defer _ = vm.data_roots.pop();
 

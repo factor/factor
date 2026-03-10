@@ -155,6 +155,20 @@ pub const GarbageCollector = struct {
         // ensure the context has the current values before scanning stacks.
         self.vm.syncContextFromRegisters();
 
+        // Only unlock callstack guard pages if the callstack is close to full.
+        // Most GC cycles have plenty of stack space and don't need the mprotect overhead.
+        const need_unlock = self.vm.callstackNeedsGuardUnlock();
+        if (need_unlock) {
+            const ctx = self.vm.vm_asm.ctx;
+            if (ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
+        }
+        defer {
+            if (need_unlock) {
+                const ctx = self.vm.vm_asm.ctx;
+                if (ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
+            }
+        }
+
         self.gc(op) catch @panic("GC failed");
     }
 

@@ -614,7 +614,8 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         index = @intFromEnum(objects.SpecialObject.signal_handler_word);
     } else if (offset == 16 - @sizeOf(Cell)) {
         // Make a fake frame for the leaf procedure
-        delta = 16 + @sizeOf(Cell);
+        // LEAF_FRAME_SIZE = 16 (must match vm/layouts.hpp and core/layouts/layouts.factor)
+        delta = 16;
         index = @intFromEnum(objects.SpecialObject.leaf_signal_handler_word);
     } else {
         fatalError("Invalid stack alignment in signal", offset);
@@ -812,8 +813,12 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
         vm.data_roots.clearRetainingCapacity();
         vm.code_roots.clearRetainingCapacity();
 
+        // Re-read error handler quotation from special_objects in case GC moved it
+        // (allotUninitializedArray above can trigger GC which updates special_objects)
+        const current_handler_quot = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.error_handler_quot)];
+
         // Unwind to Factor's error handler
-        unwindNativeFrames(vm, error_handler_quot, ctx.callstack_top);
+        unwindNativeFrames(vm, current_handler_quot, ctx.callstack_top);
     } else {
         // Error during GC or before error handler is set - fatal error
         std.debug.print("You have triggered a bug in Factor. Please report.\n", .{});

@@ -25,9 +25,26 @@ pub const Segment = struct {
     alloc_base: Cell,
     alloc_size: Cell,
 
+    // Extra low guard pages for callstack segments. Unlocked during GC to provide
+    // stack headroom. Debug builds need more due to large stack frames; release builds
+    // still need extra because std.mem.sort uses ~8KB of stack-allocated buffers.
+    pub const low_guard_pages: usize = if (builtin.mode == .Debug) 16 else 4;
+
+    // Conservative estimate of max stack usage during GC.
+    // Used to decide whether guard page unlock is needed before GC.
+    // Debug: large frames (~2.5KB each) × ~20 deep + sort buffer (~8KB) ≈ 60KB
+    // Release: small frames (~200B each) × ~20 deep + sort buffer (~8KB) ≈ 12KB
+    pub const gc_stack_headroom: usize = if (builtin.mode == .Debug) 65536 else 16384;
+
     // Initialize with optional executable flag
     // Matches C++ segment::segment() in os-unix.cpp
     pub fn init(size_param: Cell, executable: bool) !Segment {
+        return initWithGuardPages(size_param, executable, 1);
+    }
+
+    // Initialize with a specified number of low guard pages.
+    // Extra low guard pages can be unlocked during GC for stack headroom.
+    pub fn initWithGuardPages(size_param: Cell, executable: bool, num_low_guard_pages: usize) !Segment {
         // Page-align size to ensure guard pages work (mprotect requires page alignment)
         const size = layouts.alignCell(size_param, page_size);
 
@@ -37,9 +54,9 @@ pub const Segment = struct {
         else
             .{ .READ = true, .WRITE = true };
 
-        // Allocate: [guard page][usable memory][guard page]
-        // This matches C++ VM: alloc_size = 2 * pagesize + size
-        const alloc_size = 2 * page_size + size;
+        // Allocate: [low guard pages][usable memory][high guard page]
+        const low_guard_size = num_low_guard_pages * page_size;
+        const alloc_size = low_guard_size + size + page_size;
 
         // On ARM64 macOS, executable memory requires MAP_JIT flag
         const is_arm64_macos = builtin.cpu.arch == .aarch64 and
@@ -70,9 +87,8 @@ pub const Segment = struct {
 
         const alloc_base = @intFromPtr(ptr);
 
-        // Usable memory starts after first guard page
-        // Matches C++ VM: start = (cell)(array + pagesize)
-        const start = alloc_base + page_size;
+        // Usable memory starts after low guard pages
+        const start = alloc_base + low_guard_size;
         const end = start + size;
 
         var seg = Segment{
@@ -111,7 +127,8 @@ pub const Segment = struct {
 
     pub fn isUnderflow(self: *const Segment, addr: Cell) bool {
         // Matches C++ VM: addr >= (start - getpagesize()) && addr < start
-        return addr >= (self.start - page_size) and addr < self.start;
+        // Uses alloc_base to cover extended guard areas (multiple low guard pages)
+        return addr >= self.alloc_base and addr < self.start;
     }
 
     pub fn isOverflow(self: *const Segment, addr: Cell) bool {
@@ -125,16 +142,19 @@ pub const Segment = struct {
     }
 
     // Matches C++ VM: set_border_locked() in segments.hpp
+    // Locks/unlocks ALL low guard pages (alloc_base to start) and the high guard page.
     pub fn setBorderLocked(self: *Segment, locked: bool) !void {
         const prot: std.c.PROT = if (locked)
             .{}
         else
             .{ .READ = true, .WRITE = true };
 
-        // Low guard page
-        const lo = self.start - page_size;
-        const lo_ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(lo);
-        if (std.c.mprotect(lo_ptr, page_size, prot) != 0) return error.MprotectFailed;
+        // Low guard area (may be multiple pages)
+        const lo_size = self.start - self.alloc_base;
+        if (lo_size > 0) {
+            const lo_ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(self.alloc_base);
+            if (std.c.mprotect(lo_ptr, lo_size, prot) != 0) return error.MprotectFailed;
+        }
 
         // High guard page
         const hi = self.end;

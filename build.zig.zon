@@ -2,7 +2,7 @@
     .name = .factor,
     .version = "0.102.0",
     .fingerprint = 0xed38ec00cf62a92c,
-    .minimum_zig_version = "0.15.2",
+    .minimum_zig_version = "0.16.0",
     .paths = .{
         "build.zig",
         "build.zig.zon",

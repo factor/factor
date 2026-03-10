@@ -67,7 +67,10 @@ pub const Context = extern struct {
         ctx.retainstack_seg = rs_seg;
 
         const cs_seg = try allocator.create(segments.Segment);
-        cs_seg.* = try segments.Segment.init(cs_size, false);
+        // Callstack segments get extra low guard pages that are unlocked during GC
+        // to provide stack headroom for the GC call chain (especially in debug builds).
+        // Matches C++ VM behavior: ctx->callstack_seg->set_border_locked(false) in gc.cpp
+        cs_seg.* = try segments.Segment.initWithGuardPages(cs_size, false, segments.Segment.low_guard_pages);
         ctx.callstack_seg = cs_seg;
 
         ctx.reset();

@@ -1209,6 +1209,19 @@ pub const FactorVM = struct {
     pub fn minorGc(self: *Self) void {
         // Skip if GC is disabled (for debugging)
         if (self.gc_off) return;
+
+        // Only unlock callstack guard pages if the callstack is close to full.
+        // Most GC cycles have plenty of stack space and don't need the mprotect overhead.
+        const need_unlock = self.callstackNeedsGuardUnlock();
+        if (need_unlock) {
+            if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
+        }
+        defer {
+            if (need_unlock) {
+                if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
+            }
+        }
+
         if (self.garbage_collector) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
@@ -1221,11 +1234,31 @@ pub const FactorVM = struct {
 
     // Trigger a full garbage collection
     pub fn fullGc(self: *Self) void {
+        const need_unlock = self.callstackNeedsGuardUnlock();
+        if (need_unlock) {
+            if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
+        }
+        defer {
+            if (need_unlock) {
+                if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
+            }
+        }
+
         if (self.garbage_collector) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.gc(.collect_full) catch @panic("GC failed");
         }
+    }
+
+    // Check if the callstack has enough space for GC, or if we need to
+    // unlock guard pages first. Most GC cycles have plenty of stack room
+    // and don't need the mprotect syscalls (~240K saved during bootstrap).
+    pub fn callstackNeedsGuardUnlock(self: *Self) bool {
+        const seg = self.vm_asm.ctx.callstack_seg orelse return false;
+        const top = self.vm_asm.ctx.callstack_top;
+        if (top <= seg.start) return true; // already in or past guard area
+        return (top - seg.start) < segments.Segment.gc_stack_headroom;
     }
 
     // Check if nursery needs collection before allocating size bytes
