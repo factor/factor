@@ -31,6 +31,8 @@ code_heap::~code_heap() {
   allocator = NULL;
   delete seg;
   seg = NULL;
+  delete safepoint_seg;
+  safepoint_seg = NULL;
 }
 
 void code_heap::write_barrier(code_block* compiled) {
