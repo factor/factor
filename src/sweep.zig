@@ -12,6 +12,7 @@ const object_start_map = @import("object_start_map.zig");
 const vm_mod = @import("vm.zig");
 
 const Cell = layouts.Cell;
+const CodeBlock = @import("code_blocks.zig").CodeBlock;
 const GC = @import("gc.zig").GarbageCollector;
 
 pub fn sweepPhase(gc: *GC) void {
@@ -155,6 +156,7 @@ pub fn invalidateCodeRootsAfterSweep(gc: *GC, marks: *mark_bits.MarkBits) void {
 
 pub fn sweepCodePhase(gc: *GC, code: *vm_mod.CodeHeap, marks: *mark_bits.MarkBits) void {
     _ = gc;
+    code.flushPending();
     const free_list = code.free_list orelse return;
 
     const code_end = code.code_start + code.code_size;
@@ -183,8 +185,12 @@ pub fn sweepCodePhase(gc: *GC, code: *vm_mod.CodeHeap, marks: *mark_bits.MarkBit
     }
     free_list.sortLargeBlocks();
 
-    // Incrementally drop dead code blocks from metadata instead of rebuilding
-    // all block/scan/literal indexes from scratch.
+    // Incrementally drop dead code blocks from metadata.
+    // Check upfront whether maps have entries — most are empty during sweep,
+    // and skipping the per-block hash lookups saves significant time.
+    const has_uninit = code.uninitialized_blocks.count() > 0;
+    const has_scan_flags = code.scan_literals != null;
+
     var write_idx: usize = 0;
     const items = code.all_blocks_sorted.items;
     for (items) |block_addr| {
@@ -194,9 +200,8 @@ pub fn sweepCodePhase(gc: *GC, code: *vm_mod.CodeHeap, marks: *mark_bits.MarkBit
             continue;
         }
 
-        code.removeScanFlagsByAddress(block_addr);
-        code.removeLiteralSitesByAddress(block_addr);
-        _ = code.removeUninitializedBlock(block_addr);
+        if (has_scan_flags) code.removeScanFlagsByAddress(block_addr);
+        if (has_uninit) _ = code.removeUninitializedBlock(block_addr);
     }
     code.all_blocks_sorted.items.len = write_idx;
     code.clearRememberedSets();

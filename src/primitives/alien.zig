@@ -33,6 +33,13 @@ pub var null_dll: ?*anyopaque = null;
 pub fn initFfi() void {
     var rtld_mode: std.c.RTLD = .{};
     rtld_mode.LAZY = true;
+
+    // Pre-load libm so dlsym(NULL, "pow") etc. work at runtime.
+    // Zig statically resolves math builtins, so libm isn't in NEEDED — load it explicitly.
+    var global_mode = rtld_mode;
+    global_mode.GLOBAL = true;
+    _ = std.c.dlopen("libm.so.6", global_mode);
+
     null_dll = std.c.dlopen(null, rtld_mode);
 }
 

@@ -269,56 +269,57 @@ pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
     // RT_ENTRY_POINT to lazy_jit_compile_ep, and updateWordReferences can
     // never fix it (loadCodeBlock follows the target to the lazy_jit_compile
     // code block, whose owner resolves back to lazy_jit_compile_ep).
-    // This matches C++ behavior where jit_compile_quotation never fails
-    // silently — sub-quotation entry_points are always valid before
-    // code block initialization.
     preCompileQuotationLiterals(vm);
 
-    // Capture a sorted snapshot of blocks AFTER pre-compilation
+    // Initialize all uninitialized blocks upfront by iterating the small map
+    // directly, instead of checking every block against the map in the main loop.
+    {
+        var iter = code_heap.uninitialized_blocks.iterator();
+        while (iter.next()) |entry| {
+            const block: *CodeBlock = @ptrFromInt(entry.key_ptr.*);
+            vm.initializeCodeBlock(block, entry.value_ptr.*);
+        }
+        code_heap.clearUninitializedBlocks();
+    }
+
+    code_heap.flushPending();
     const blocks = code_heap.all_blocks_sorted.items;
     if (blocks.len == 0) return;
 
-    // Get PIC parameters from VM
     const max_pic_size = vm.max_pic_size;
     const lazy_jit_ep = vm.lazyJitCompileEntryPoint();
 
-    // Collect PIC blocks to free (can't free during iteration since it modifies all_blocks)
-    var pics_to_free = std.ArrayListUnmanaged(Cell){};
-    defer pics_to_free.deinit(vm.allocator);
-    pics_to_free.ensureUnusedCapacity(vm.allocator, blocks.len) catch @panic("OOM");
+    // Single pass: update word references and mark PIC blocks for removal.
+    // PIC blocks are freed in-place (marked free + added to free list) but
+    // their removal from all_blocks_sorted is done via a compact pass below.
+    var has_pics = false;
 
     for (blocks) |block_addr| {
         const block: *CodeBlock = @ptrFromInt(block_addr);
 
-        // Check if this block needs initialization (deferred from primitive_modify_code_heap)
-        if (code_heap.uninitialized_blocks.get(block_addr)) |literals_cell| {
-            vm.initializeCodeBlock(block, literals_cell);
-            continue;
-        }
-
-        // Free PIC blocks when resetting inline caches (matching C++ behavior).
         if (reset_inline_caches and block.blockType() == .pic) {
-            pics_to_free.appendAssumeCapacity(block_addr);
+            code_heap.freeBlockOnly(block);
+            has_pics = true;
             continue;
         }
 
-        // Skip blocks that have no code pointer relocations (entry_point/pic)
         if (!code_heap.blockHasCodePointers(block)) continue;
 
         code_blocks.updateWordReferences(block, reset_inline_caches, max_pic_size, lazy_jit_ep);
     }
 
-    // Batch free PIC blocks: O(N) instead of O(K*N)
-    if (pics_to_free.items.len > 0) {
-        for (pics_to_free.items) |pic_addr| {
-            const block: *CodeBlock = @ptrFromInt(pic_addr);
-            code_heap.freeBlockOnly(block);
+    // Compact all_blocks_sorted to remove freed PIC entries
+    if (has_pics) {
+        var write: usize = 0;
+        for (code_heap.all_blocks_sorted.items) |addr| {
+            const b: *const CodeBlock = @ptrFromInt(addr);
+            if (!b.isFree()) {
+                code_heap.all_blocks_sorted.items[write] = addr;
+                write += 1;
+            }
         }
-        code_heap.batchRemoveFromAllBlocks(pics_to_free.items);
+        code_heap.all_blocks_sorted.items.len = write;
     }
-
-    // Clear uninitialized_blocks after processing
-    code_heap.clearUninitializedBlocks();
 }
 
 // Pre-compile quotation literals in uninitialized code blocks.

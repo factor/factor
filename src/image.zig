@@ -958,7 +958,7 @@ pub const ImageLoader = struct {
             return ImageError.OutOfMemory;
         };
         gc_instance.* = gc_mod.GarbageCollector.init(self.vm.allocator, self.vm, heap);
-        self.vm.garbage_collector = gc_instance;
+        self.vm.gc = gc_instance;
     }
 
     // Initialize code heap free list allocator after image load
@@ -1058,9 +1058,9 @@ pub const ImageLoader = struct {
         self.vm.cards_array = null;
         self.vm.decks_array = null;
 
-        if (self.vm.garbage_collector) |gc_inst| {
+        if (self.vm.gc) |gc_inst| {
             self.vm.allocator.destroy(gc_inst);
-            self.vm.garbage_collector = null;
+            self.vm.gc = null;
         }
 
         // Use the full mmap region for munmap (includes safepoint page)

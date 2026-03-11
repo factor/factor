@@ -22,6 +22,7 @@ pub const Lookup = struct {
     const Self = @This();
 
     pub fn init(code_heap: *code_heap_mod.CodeHeap) ?Self {
+        code_heap.flushPending();
         const blocks = code_heap.all_blocks_sorted.items;
         if (blocks.len == 0) return null;
         return .{ .blocks = blocks };

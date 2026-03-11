@@ -15,7 +15,6 @@ const data_heap = @import("data_heap.zig");
 const free_list = @import("free_list.zig");
 const gc = @import("gc.zig");
 const layouts = @import("layouts.zig");
-const mark_stack_mod = @import("mark_stack.zig");
 const objects = @import("objects.zig");
 const safepoints = @import("safepoints.zig");
 const segments = @import("segments.zig");
@@ -184,7 +183,7 @@ pub const GCEvent = extern struct {
 };
 
 fn computeDataHeapRoom(vm: *FactorVM) DataHeapRoom {
-    const gc_instance = vm.garbage_collector orelse return std.mem.zeroes(DataHeapRoom);
+    const gc_instance = vm.gc orelse return std.mem.zeroes(DataHeapRoom);
     const data = gc_instance.heap;
     const nursery = &vm.vm_asm.nursery;
     return DataHeapRoom{
@@ -201,7 +200,7 @@ fn computeDataHeapRoom(vm: *FactorVM) DataHeapRoom {
         .tenured_free_block_count = data.tenured.free_list.free_block_count,
         .cards = (data.segment.size + card_size - 1) / card_size,
         .decks = (data.segment.size + deck_size - 1) / deck_size,
-        .mark_stack = vm.mark_stack.capacity() * @sizeOf(Cell),
+        .mark_stack = vm.gc.?.mark_stack.capacity * @sizeOf(Cell),
     };
 }
 
@@ -338,14 +337,11 @@ pub const FactorVM = struct {
     // Set if we're in the jit
     current_jit_count: Fixnum,
 
-    // Mark stack used for mark & sweep GC
-    mark_stack: mark_stack_mod.MarkStack,
-
     // GC events
     gc_events: ?*std.ArrayList(GCEvent),
 
     // Garbage collector instance
-    garbage_collector: ?*gc.GarbageCollector,
+    gc: ?*gc.GarbageCollector,
 
     // Data roots for GC.
     data_roots: DataRootStack,
@@ -430,9 +426,8 @@ pub const FactorVM = struct {
             .current_gc = null,
             .current_gc_p = false,
             .current_jit_count = 0,
-            .mark_stack = mark_stack_mod.MarkStack.init(allocator),
             .gc_events = null,
-            .garbage_collector = null, // Initialized later when data heap is ready
+            .gc = null, // Initialized later when data heap is ready
             .data_roots = .{},
             .code_roots = .{},
             .fep_p = false,
@@ -478,7 +473,7 @@ pub const FactorVM = struct {
         }
         self.unused_contexts.deinit(self.allocator);
         self.active_contexts.deinit(self.allocator);
-        self.mark_stack.deinit();
+        if (self.gc) |gc_inst| gc_inst.deinit();
         self.profiling_samples.deinit(self.allocator);
         self.data_roots.deinit(self.allocator);
         self.code_roots.deinit(self.allocator);
@@ -1100,7 +1095,7 @@ pub const FactorVM = struct {
         // Ensure tenured has enough space (compact or grow if needed).
         var required_free = size + heap.highWaterMark();
         if (!heap.tenured.free_list.canAllot(required_free)) {
-            if (self.garbage_collector) |gc_instance| {
+            if (self.gc) |gc_instance| {
                 gc_instance.gc(.collect_compact) catch @panic("GC compact failed during large object allocation");
             }
         }
@@ -1109,7 +1104,7 @@ pub const FactorVM = struct {
         heap = @ptrCast(@alignCast(self.data orelse @panic("data heap lost after compaction")));
         required_free = size + heap.highWaterMark();
         if (!heap.tenured.free_list.canAllot(required_free)) {
-            if (self.garbage_collector) |gc_instance| {
+            if (self.gc) |gc_instance| {
                 gc_instance.collectGrowingDataHeap(size) catch @panic("GC grow failed during large object allocation");
             }
         }
@@ -1163,7 +1158,7 @@ pub const FactorVM = struct {
         }
 
         // Code heap full — compact GC and retry (same as C++ allot_code_block)
-        if (self.garbage_collector) |gc_instance| {
+        if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.collect(.collect_compact);
@@ -1222,7 +1217,7 @@ pub const FactorVM = struct {
             }
         }
 
-        if (self.garbage_collector) |gc_instance| {
+        if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.gc(.collect_nursery) catch {
@@ -1244,7 +1239,7 @@ pub const FactorVM = struct {
             }
         }
 
-        if (self.garbage_collector) |gc_instance| {
+        if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.gc(.collect_full) catch @panic("GC failed");
@@ -1412,7 +1407,6 @@ pub const FactorVM = struct {
         if (self.code) |code_heap| {
             code_heap.writeBarrier(block) catch @panic("OOM");
             code_heap.updateScanFlags(self.allocator, block);
-            code_heap.updateLiteralSites(self.allocator, block);
         }
     }
 

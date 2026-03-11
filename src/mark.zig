@@ -47,9 +47,7 @@ fn markCodeBlockIfNeeded(gc: *GC, block: *code_blocks.CodeBlock) void {
 }
 
 inline fn markStackPush(gc: *GC, value: Cell) void {
-    gc.vm.mark_stack.append(value) catch {
-        @panic("Mark stack overflow");
-    };
+    gc.mark_stack.append(gc.allocator, value) catch @panic("Mark stack overflow");
 }
 
 // Inline fast path: immediate check, tenured range+mark-bit check.
@@ -64,7 +62,8 @@ inline fn fullMarkValue(ctx: *FullMarkContext, value: Cell) Cell {
     if (ctx.tenured.contains(untagged)) {
         // Check mark bit BEFORE computing object size. Most revisited
         // objects are already marked; skip the expensive size switch.
-        if (!ctx.tenured.marks.isMarked(untagged)) {
+        // Use unchecked variant — contains() already validated the range.
+        if (!ctx.tenured.marks.isMarkedUnchecked(untagged)) {
             fullMarkTenuredNew(ctx, untagged);
         }
         return value;
@@ -76,7 +75,8 @@ inline fn fullMarkValue(ctx: *FullMarkContext, value: Cell) Cell {
 // Non-inline: first visit to a tenured object — set start bit + push.
 // Size computation deferred to fullProcessDataObject (single type switch).
 fn fullMarkTenuredNew(ctx: *FullMarkContext, untagged: Cell) void {
-    if (ctx.tenured.marks.tryMarkStartBitOnly(untagged)) {
+    // Unchecked — caller already verified address is in tenured range.
+    if (ctx.tenured.marks.tryMarkStartBitOnlyUnchecked(untagged)) {
         markStackPush(ctx.gc, untagged);
     }
 }
@@ -366,56 +366,41 @@ fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkCo
     const is_uninitialized = code_heap.isBlockUninitialized(block);
 
     // Embedded literals (copy/update + mark)
-    if (!is_uninitialized) {
-        var modified = false;
-        if (code_heap.literalSitesForBlock(block)) |sites| {
-            for (sites) |site| {
-                var op = code_blocks.InstructionOperand.init(site.rel, block, @as(Cell, site.param_index));
-                const value = op.loadValue();
-                const value_unsigned: Cell = @bitCast(value);
-                if (!layouts.isImmediate(value_unsigned)) {
-                    const new_value = fullMarkValue(ctx, value_unsigned);
-                    if (new_value != value_unsigned) {
-                        op.storeValue(@bitCast(new_value));
-                        modified = true;
-                    }
-                }
-            }
-        } else if (block.relocation != layouts.false_object and
-            layouts.hasTag(block.relocation, .byte_array))
-        {
-            const reloc_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(block.relocation));
-            const reloc_cap = layouts.untagFixnumUnsigned(reloc_ba.capacity);
-            if (reloc_cap > 0) {
-                const reloc_data = reloc_ba.data();
-                const reloc_count = reloc_cap / @sizeOf(code_blocks.RelocationEntry);
-                var param_index: Cell = 0;
-                for (0..reloc_count) |i| {
-                    const entry_ptr: *const code_blocks.RelocationEntry =
-                        @ptrCast(@alignCast(reloc_data + i * @sizeOf(code_blocks.RelocationEntry)));
-                    const entry = entry_ptr.*;
-                    const rel_type = entry.getType();
-                    if (rel_type == .literal) {
-                        var op = code_blocks.InstructionOperand.init(entry, block, param_index);
-                        const value = op.loadValue();
-                        const value_unsigned: Cell = @bitCast(value);
-                        if (!layouts.isImmediate(value_unsigned)) {
-                            const new_value = fullMarkValue(ctx, value_unsigned);
-                            if (new_value != value_unsigned) {
-                                op.storeValue(@bitCast(new_value));
-                                modified = true;
-                            }
+    if (!is_uninitialized and block.relocation != layouts.false_object and
+        layouts.hasTag(block.relocation, .byte_array))
+    {
+        const reloc_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(block.relocation));
+        const reloc_cap = layouts.untagFixnumUnsigned(reloc_ba.capacity);
+        if (reloc_cap > 0) {
+            const reloc_data = reloc_ba.data();
+            const reloc_count = reloc_cap / @sizeOf(code_blocks.RelocationEntry);
+            var param_index: Cell = 0;
+            var modified = false;
+            for (0..reloc_count) |i| {
+                const entry_ptr: *const code_blocks.RelocationEntry =
+                    @ptrCast(@alignCast(reloc_data + i * @sizeOf(code_blocks.RelocationEntry)));
+                const entry = entry_ptr.*;
+                const rel_type = entry.getType();
+                if (rel_type == .literal) {
+                    var op = code_blocks.InstructionOperand.init(entry, block, param_index);
+                    const value = op.loadValue();
+                    const value_unsigned: Cell = @bitCast(value);
+                    if (!layouts.isImmediate(value_unsigned)) {
+                        const new_value = fullMarkValue(ctx, value_unsigned);
+                        if (new_value != value_unsigned) {
+                            op.storeValue(@bitCast(new_value));
+                            modified = true;
                         }
                     }
-                    switch (rel_type) {
-                        .vm => param_index += 1,
-                        .dlsym => param_index += 2,
-                        else => {},
-                    }
+                }
+                switch (rel_type) {
+                    .vm => param_index += 1,
+                    .dlsym => param_index += 2,
+                    else => {},
                 }
             }
+            if (modified) block.flushIcache();
         }
-        if (modified) block.flushIcache();
     }
 
     // Embedded code pointers
@@ -423,8 +408,10 @@ fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkCo
 }
 
 pub fn fullDrainMarkStack(gc: *GC, ctx: *FullMarkContext) void {
-    while (gc.vm.mark_stack.len() > 0) {
-        const addr = gc.vm.mark_stack.pop() orelse break;
+    const items = &gc.mark_stack.items;
+    while (items.len > 0) {
+        items.len -= 1;
+        const addr = items.*[items.len];
         if ((addr & 1) == 1) {
             const block: *code_blocks.CodeBlock = @ptrFromInt(addr - 1);
             fullProcessCodeBlock(gc, block, ctx);
@@ -447,7 +434,7 @@ pub fn markPhase(gc: *GC) void {
     }
 
     // Clear mark stack
-    gc.vm.mark_stack.clearRetainingCapacity();
+    gc.mark_stack.clearRetainingCapacity();
 
     // Visit all roots - mark reachable tenured objects
     markAllRoots(gc);
@@ -699,7 +686,8 @@ fn markSlot(gc: *GC, slot: *Cell, tenured: *data_heap_mod.TenuredSpace) void {
     if (!tenured.contains(untagged)) return;
 
     // Fast path: skip already-marked objects (single bit test vs 13-type switch)
-    if (tenured.marks.isMarked(untagged)) return;
+    // Unchecked — contains() already validated the range.
+    if (tenured.marks.isMarkedUnchecked(untagged)) return;
 
     const size = free_list.objectSizeFromHeader(untagged);
     if (tenured.marks.tryMarkStart(untagged, size)) {
@@ -727,31 +715,11 @@ fn markEmbeddedLiterals(
     block: *code_blocks.CodeBlock,
     tenured: *data_heap_mod.TenuredSpace,
     is_uninitialized: bool,
-    literal_sites: ?[]const code_blocks.LiteralRelocationSite,
 ) void {
     if (gc.vm.code) |code| {
         if (!code.blockHasLiterals(block)) return;
     }
     if (is_uninitialized) return;
-
-    if (literal_sites) |sites| {
-        for (sites) |site| {
-            const op = code_blocks.InstructionOperand.init(site.rel, block, @as(Cell, site.param_index));
-            const value = op.loadValue();
-            const value_unsigned: Cell = @bitCast(value);
-
-            if (!layouts.isImmediate(value_unsigned)) {
-                const untagged = layouts.UNTAG(value_unsigned);
-                if (untagged >= 0x1000 and tenured.contains(untagged) and !tenured.marks.isMarked(untagged)) {
-                    const size = free_list.objectSizeFromHeader(untagged);
-                    if (tenured.marks.tryMarkStart(untagged, size)) {
-                        markStackPush(gc, untagged);
-                    }
-                }
-            }
-        }
-        return;
-    }
 
     if (block.relocation == layouts.false_object) return;
     if (!layouts.hasTag(block.relocation, .byte_array)) return;
@@ -848,8 +816,10 @@ fn drainMarkStack(gc: *GC) void {
     const code_opt = gc.vm.code;
     const has_uninitialized = if (code_opt) |code| code.uninitialized_blocks.count() != 0 else false;
 
-    while (gc.vm.mark_stack.len() > 0) {
-        const addr = gc.vm.mark_stack.pop() orelse break;
+    const items = &gc.mark_stack.items;
+    while (items.len > 0) {
+        items.len -= 1;
+        const addr = items.*[items.len];
 
         if ((addr & 1) == 1) {
             // Code block
@@ -862,10 +832,9 @@ fn drainMarkStack(gc: *GC) void {
             markSlot(gc, @ptrCast(&block.relocation), tenured);
 
             const is_uninitialized = has_uninitialized and code_opt.?.isBlockUninitialized(block);
-            const literal_sites = code_opt.?.literalSitesForBlock(block);
 
             // Mark embedded literals and code pointers
-            markEmbeddedLiterals(gc, block, tenured, is_uninitialized, literal_sites);
+            markEmbeddedLiterals(gc, block, tenured, is_uninitialized);
             markEmbeddedCodePointers(gc, block, is_uninitialized);
             continue;
         }

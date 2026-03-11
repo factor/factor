@@ -411,7 +411,7 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     // Visit all objects in the heap (tenured + aging). Nursery should be empty
     // after the minor GC above.
-    if (vm.garbage_collector) |gc| {
+    if (vm.gc) |gc| {
         const data_heap = gc.heap;
         const was_gc_off = vm.gc_off;
         vm.gc_off = true;
@@ -432,6 +432,7 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     // Visit all code blocks and update embedded literals
     if (vm.code) |code| {
+        code.flushPending();
         for (code.all_blocks_sorted.items) |addr| {
             const block: *CodeBlock = @ptrFromInt(addr);
             if (block.isFree()) continue;

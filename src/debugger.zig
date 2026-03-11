@@ -1023,7 +1023,7 @@ pub fn factorbug(vm: *FactorVM) void {
         } else if (std.mem.eql(u8, cmd, "code")) {
             dumpCodeHeap(vm);
         } else if (std.mem.eql(u8, cmd, "gc")) {
-            if (vm.garbage_collector) |gc_inst| {
+            if (vm.gc) |gc_inst| {
                 std.debug.print("Running full GC...\n", .{});
                 gc_inst.collectFull(false);
                 std.debug.print("GC complete.\n", .{});
@@ -1031,7 +1031,7 @@ pub fn factorbug(vm: *FactorVM) void {
                 std.debug.print("GC not available.\n", .{});
             }
         } else if (std.mem.eql(u8, cmd, "compact-gc")) {
-            if (vm.garbage_collector) |gc_inst| {
+            if (vm.gc) |gc_inst| {
                 std.debug.print("Running compacting GC...\n", .{});
                 gc_inst.collectFull(true);
                 std.debug.print("Compacting GC complete.\n", .{});

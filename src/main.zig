@@ -386,6 +386,11 @@ pub fn main(init: std.process.Init) !void {
     const vm = try vm_mod.FactorVM.init(allocator);
     defer vm.deinit();
 
+    // Pre-allocate data_roots: primitives push/pop roots but aren't recursive
+    // via Factor (JIT handles recursion), so the max depth is bounded by the
+    // deepest C call chain nesting (~10-15 roots). 32 is generous.
+    try vm.data_roots.ensureTotalCapacity(allocator, 32);
+
     // Set global VM for callbacks and error handlers
     c_api.setGlobalVM(vm);
 

@@ -272,7 +272,10 @@ pub const CodeHeapRememberedSets = struct {
         list.items.len = write_idx;
     }
 
-    // Remove a code block from remembered sets (when it's freed)
+    // Remove a code block from remembered sets (when it's freed).
+    // Only updates the bitsets (O(1)); dirty_blocks lists are left with
+    // stale entries that are filtered by isFree() during iteration.
+    // This avoids the O(n) linear scan per removal that was a 3%+ hotspot.
     pub fn removeCodeBlock(self: *Self, compiled: *CodeBlock) void {
         if (self.points_to_nursery == null or self.points_to_aging == null) return;
         const idx = self.blockIndex(compiled);
@@ -282,7 +285,6 @@ pub const CodeHeapRememberedSets = struct {
                 set.unset(idx);
                 std.debug.assert(self.nursery_count != 0);
                 self.nursery_count -= 1;
-                removeDirtyIndex(&self.nursery_dirty_blocks, idx);
                 changed = true;
             }
         }
@@ -291,7 +293,6 @@ pub const CodeHeapRememberedSets = struct {
                 set.unset(idx);
                 std.debug.assert(self.aging_count != 0);
                 self.aging_count -= 1;
-                removeDirtyIndex(&self.aging_dirty_blocks, idx);
                 changed = true;
             }
         }

@@ -395,6 +395,7 @@ pub fn scanCodeHeapRoots(gc: *GC, destination: *slot_visitor.CopyingDestination,
 // Scan all code blocks (used when growing the data heap).
 pub fn scanAllCodeBlocksForCopy(gc: *GC, destination: *slot_visitor.CopyingDestination) void {
     const code = gc.vm.code orelse return;
+    code.flushPending();
     const has_uninitialized = code.uninitialized_blocks.count() != 0;
     for (code.all_blocks_sorted.items) |block_addr| {
         const block: *code_blocks.CodeBlock = @ptrFromInt(block_addr);
@@ -417,10 +418,8 @@ fn scanCodeBlock(code: *CodeHeap, has_uninitialized: bool, gc: *GC, block: *code
 
     if (!code.blockHasLiterals(block)) return;
     const is_uninitialized = has_uninitialized and code.isBlockUninitialized(block);
-    const literal_sites = code.literalSitesForBlock(block);
-
     // Scan embedded literals in the code
-    scanEmbeddedLiterals(block, destination, is_uninitialized, literal_sites);
+    scanEmbeddedLiterals(block, destination, is_uninitialized);
 }
 
 // Visit a single slot, copying the object if needed (inlined from gc.zig visitSlot)
@@ -439,28 +438,8 @@ fn scanEmbeddedLiterals(
     block: *code_blocks.CodeBlock,
     destination: *slot_visitor.CopyingDestination,
     is_uninitialized: bool,
-    literal_sites: ?[]const code_blocks.LiteralRelocationSite,
 ) void {
     if (is_uninitialized) return;
-
-    if (literal_sites) |sites| {
-        if (sites.len == 0) return;
-        var modified = false;
-        for (sites) |site| {
-            var op = code_blocks.InstructionOperand.init(site.rel, block, @as(Cell, site.param_index));
-            const value = op.loadValue();
-            const value_unsigned: Cell = @bitCast(value);
-            if (!layouts.isImmediate(value_unsigned)) {
-                const new_value = destination.copy(value_unsigned);
-                if (new_value != value_unsigned) {
-                    op.storeValue(@bitCast(new_value));
-                    modified = true;
-                }
-            }
-        }
-        if (modified) block.flushIcache();
-        return;
-    }
 
     // Get relocation table
     if (block.relocation == layouts.false_object) return;

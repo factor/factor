@@ -546,7 +546,7 @@ pub export fn primitive_minor_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // CRITICAL FIX: Sync context stack pointers from CPU registers before GC.
     syncContextFromRegisters(vm);
 
-    if (vm.garbage_collector) |gc| {
+    if (vm.gc) |gc| {
         vm.current_gc_p = true;
         gc.collect(.collect_nursery);
         vm.current_gc_p = false;
@@ -556,7 +556,7 @@ pub export fn primitive_minor_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_full_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     syncContextFromRegisters(vm);
-    if (vm.garbage_collector) |gc_inst| {
+    if (vm.gc) |gc_inst| {
         vm.current_gc_p = true;
         gc_inst.collect(.collect_full);
         vm.current_gc_p = false;
@@ -569,7 +569,7 @@ pub export fn primitive_compact_gc(vm_asm: *VMAssemblyFields) callconv(.c) void 
     syncContextFromRegisters(vm);
 
     // Compact GC
-    if (vm.garbage_collector) |gc| {
+    if (vm.gc) |gc| {
         vm.current_gc_p = true;
         gc.collect(.collect_compact);
         vm.current_gc_p = false;
@@ -665,7 +665,7 @@ pub export fn primitive_data_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // ( -- byte-array )
     // Return data heap statistics as a byte array
     // Structure matches data_heap_room from C++ VM
-    const gc_instance = vm.garbage_collector orelse {
+    const gc_instance = vm.gc orelse {
         vm.push(layouts.false_object);
         return;
     };
@@ -710,7 +710,7 @@ pub export fn primitive_data_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     room_data[11] = cards_count;
     room_data[12] = decks_count;
 
-    room_data[13] = vm.mark_stack.capacity() * @sizeOf(Cell);
+    room_data[13] = vm.gc.?.mark_stack.capacity * @sizeOf(Cell);
     room_data[14] = 0; // Reserved for future use
 
     vm.push(tagged);
@@ -802,7 +802,7 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
 
     // Full GC empties nursery and aging, promoting all live objects to tenured
     syncContextFromRegisters(vm);
-    if (vm.garbage_collector) |gc| {
+    if (vm.gc) |gc| {
         vm.current_gc_p = true;
         gc.collect(.collect_full);
         vm.current_gc_p = false;

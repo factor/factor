@@ -14,7 +14,7 @@ const write_barrier = @import("write_barrier.zig");
 
 const Cell = layouts.Cell;
 const CodeBlock = code_blocks_mod.CodeBlock;
-const LiteralRelocationSite = code_blocks_mod.LiteralRelocationSite;
+
 
 pub const CodeHeap = struct {
     seg: ?*segments.Segment,
@@ -24,7 +24,10 @@ pub const CodeHeap = struct {
     code_start: Cell = 0,
     code_size: Cell = 0,
     // Source of truth for live code block addresses (kept sorted).
+    // New inserts go to pending_blocks (O(1) append) and are merged
+    // into the sorted list lazily via flushPending().
     all_blocks_sorted: std.ArrayList(Cell) = .{},
+    pending_blocks: std.ArrayListUnmanaged(Cell) = .{},
     // Memory allocator used for code heap metadata (mark bits, hash maps, etc.)
     allocator: ?std.mem.Allocator = null,
     // Remembered sets for GC - track code blocks that may reference young objects
@@ -35,11 +38,9 @@ pub const CodeHeap = struct {
     // Uninitialized blocks: code blocks allocated but not yet relocated.
     // Maps block address -> literals Cell for deferred initialization.
     // Matches C++ code_heap::uninitialized_blocks map.
-    uninitialized_blocks: std.AutoHashMapUnmanaged(Cell, Cell) = .{},
+    uninitialized_blocks: std.AutoArrayHashMapUnmanaged(Cell, Cell) = .{},
     // Scratch map reused during compaction to avoid repeated allocations.
-    uninitialized_blocks_scratch: std.AutoHashMapUnmanaged(Cell, Cell) = .{},
-    // Cached literal relocation operands for each code block.
-    literal_sites: std.AutoHashMapUnmanaged(Cell, std.ArrayListUnmanaged(LiteralRelocationSite)) = .{},
+    uninitialized_blocks_scratch: std.AutoArrayHashMapUnmanaged(Cell, Cell) = .{},
     // Mark bits for code heap full GC (mirrors C++ code->allocator->state)
     marks: ?*mark_bits.MarkBits = null,
 
@@ -59,10 +60,65 @@ pub const CodeHeap = struct {
 
     fn addToAllBlocks(self: *Self, block_addr: Cell) void {
         const al = self.allocator orelse return;
-        const pos = std.sort.lowerBound(Cell, self.all_blocks_sorted.items, block_addr, layouts.orderCell);
-        if (pos < self.all_blocks_sorted.items.len and self.all_blocks_sorted.items[pos] == block_addr) return;
-        self.all_blocks_sorted.insert(al, pos, block_addr) catch @panic("OOM");
+        self.pending_blocks.append(al, block_addr) catch @panic("OOM");
     }
+
+    // Merge pending inserts into the sorted list. Call before bulk iteration
+    // or binary-search-dependent operations.
+    pub inline fn flushPending(self: *Self) void {
+        if (self.pending_blocks.items.len == 0) return;
+        self.flushPendingSlow();
+    }
+
+    fn flushPendingSlow(self: *Self) void {
+        const pending = self.pending_blocks.items;
+        const al = self.allocator orelse return;
+
+        // Sort pending, then merge into sorted list
+        std.mem.sortUnstable(Cell, pending, {}, std.sort.asc(Cell));
+
+        const old_len = self.all_blocks_sorted.items.len;
+        const new_total = old_len + pending.len;
+        self.all_blocks_sorted.ensureTotalCapacity(al, new_total) catch @panic("OOM");
+
+        // Merge: append pending, then do a single merge pass in-place.
+        // Since both halves are sorted, we merge from the end backwards.
+        self.all_blocks_sorted.items.len = new_total;
+        const items = self.all_blocks_sorted.items;
+
+        var dst = new_total;
+        var a = old_len; // end of sorted portion
+        var b = pending.len; // end of pending portion
+
+        while (b > 0) {
+            if (a > 0 and items[a - 1] >= pending[b - 1]) {
+                dst -= 1;
+                a -= 1;
+                items[dst] = items[a];
+            } else {
+                dst -= 1;
+                b -= 1;
+                items[dst] = pending[b];
+            }
+        }
+        // Remaining items[0..a] are already in place at items[0..dst] since dst == a.
+
+        // Deduplicate (pending may contain addresses already in sorted list)
+        if (items.len > 1) {
+            var write: usize = 1;
+            for (items[1..]) |v| {
+                if (v != items[write - 1]) {
+                    items[write] = v;
+                    write += 1;
+                }
+            }
+            self.all_blocks_sorted.items.len = write;
+        }
+
+        self.pending_blocks.clearRetainingCapacity();
+    }
+
+
 
     pub fn occupiedSpace(self: *const Self) Cell {
         if (self.free_list) |alloc| {
@@ -97,7 +153,7 @@ pub const CodeHeap = struct {
         try self.remembered_sets.writeBarrier(compiled);
     }
 
-    fn ensureScanFlags(self: *Self, al: std.mem.Allocator) !void {
+    pub fn ensureScanFlags(self: *Self, al: std.mem.Allocator) !void {
         if (self.scan_literals != null and self.scan_code_ptrs != null) return;
         const bit_count: usize = @intCast(self.code_size / layouts.data_alignment);
         self.scan_literals = try std.DynamicBitSet.initEmpty(al, bit_count);
@@ -125,65 +181,12 @@ pub const CodeHeap = struct {
         }
     }
 
-    pub fn updateLiteralSites(self: *Self, al: std.mem.Allocator, block: *CodeBlock) void {
-        var sites = std.ArrayListUnmanaged(LiteralRelocationSite){};
-        code_blocks_mod.collectLiteralRelocationSites(block, &sites, al) catch return;
-
-        const block_addr = @intFromPtr(block);
-        if (self.literal_sites.fetchRemove(block_addr)) |entry| {
-            var old_sites = entry.value;
-            old_sites.deinit(al);
-        }
-
-        if (sites.items.len == 0) {
-            sites.deinit(al);
-            return;
-        }
-
-        self.literal_sites.put(al, block_addr, sites) catch {
-            sites.deinit(al);
-        };
-    }
-
-    fn removeLiteralSites(self: *Self, block_addr: Cell) void {
-        const al = self.allocator orelse return;
-        if (self.literal_sites.fetchRemove(block_addr)) |entry| {
-            var old_sites = entry.value;
-            old_sites.deinit(al);
-        }
-    }
-
-    fn clearLiteralSites(self: *Self) void {
-        const al = self.allocator orelse return;
-        var iter = self.literal_sites.valueIterator();
-        while (iter.next()) |sites| {
-            var list = sites.*;
-            list.deinit(al);
-        }
-        self.literal_sites.clearRetainingCapacity();
-    }
-
-    pub fn rebuildLiteralSites(self: *Self, al: std.mem.Allocator) void {
-        self.clearLiteralSites();
-        for (self.all_blocks_sorted.items) |block_addr| {
-            const block: *CodeBlock = @ptrFromInt(block_addr);
-            if (!block.isFree()) {
-                self.updateLiteralSites(al, block);
-            }
-        }
-    }
-
-    pub fn literalSitesForBlock(self: *const Self, block: *const CodeBlock) ?[]const LiteralRelocationSite {
-        if (self.literal_sites.getPtr(@intFromPtr(block))) |sites| return sites.items;
-        return null;
-    }
-
     pub fn putUninitializedBlock(self: *Self, al: std.mem.Allocator, block_addr: Cell, literals_cell: Cell) !void {
         try self.uninitialized_blocks.put(al, block_addr, literals_cell);
     }
 
     pub fn removeUninitializedBlock(self: *Self, block_addr: Cell) bool {
-        return self.uninitialized_blocks.remove(block_addr);
+        return self.uninitialized_blocks.swapRemove(block_addr);
     }
 
     pub fn clearUninitializedBlocks(self: *Self) void {
@@ -212,10 +215,6 @@ pub const CodeHeap = struct {
         if (self.scan_code_ptrs) |*set| set.unset(idx);
     }
 
-    pub fn removeLiteralSitesByAddress(self: *Self, block_addr: Cell) void {
-        self.removeLiteralSites(block_addr);
-    }
-
     pub fn clearScanFlags(self: *Self) void {
         if (self.scan_literals) |*set| set.unmanaged.unsetAll();
         if (self.scan_code_ptrs) |*set| set.unmanaged.unsetAll();
@@ -240,7 +239,7 @@ pub const CodeHeap = struct {
         self.removeScanFlags(block);
         const block_addr = @intFromPtr(block);
         _ = self.removeUninitializedBlock(block_addr);
-        self.removeLiteralSites(block_addr);
+
         self.removeFromAllBlocks(@intFromPtr(block));
 
         const size = block.size();
@@ -251,7 +250,14 @@ pub const CodeHeap = struct {
     }
 
     fn removeFromAllBlocks(self: *Self, block_addr: Cell) void {
-        // Incremental sorted remove: O(log n) search + O(n) shift
+        // Check pending first (swap-remove is O(1))
+        for (self.pending_blocks.items, 0..) |addr, i| {
+            if (addr == block_addr) {
+                _ = self.pending_blocks.swapRemove(i);
+                return;
+            }
+        }
+        // Fall back to sorted list: O(log n) search + O(n) shift
         const items = self.all_blocks_sorted.items;
         const pos = std.sort.lowerBound(Cell, items, block_addr, layouts.orderCell);
         if (pos < items.len and items[pos] == block_addr) {
@@ -300,7 +306,7 @@ pub const CodeHeap = struct {
         self.removeScanFlags(block);
         const block_addr = @intFromPtr(block);
         _ = self.removeUninitializedBlock(block_addr);
-        self.removeLiteralSites(block_addr);
+
         const size = block.size();
         block.markFree(size);
         if (self.free_list) |alloc| {
@@ -309,18 +315,27 @@ pub const CodeHeap = struct {
     }
 
     pub fn codeBlockForAddress(self: *Self, address: Cell) ?*CodeBlock {
+        // Check sorted list first (binary search)
         const blocks = self.all_blocks_sorted.items;
-        if (blocks.len == 0) return null;
+        if (blocks.len > 0) {
+            const ub = std.sort.upperBound(Cell, blocks, address, layouts.orderCell);
+            if (ub > 0) {
+                const block: *CodeBlock = @ptrFromInt(blocks[ub - 1]);
+                const block_end = blocks[ub - 1] + block.size();
+                if (address < block_end) return block;
+            }
+        }
 
-        // upperBound returns first block > address, so -1 is the block containing address
-        const ub = std.sort.upperBound(Cell, blocks, address, layouts.orderCell);
-        if (ub == 0) return null;
+        // Check pending blocks (linear scan — typically small)
+        for (self.pending_blocks.items) |block_addr| {
+            if (address >= block_addr) {
+                const block: *CodeBlock = @ptrFromInt(block_addr);
+                const block_end = block_addr + block.size();
+                if (address < block_end) return block;
+            }
+        }
 
-        const block: *CodeBlock = @ptrFromInt(blocks[ub - 1]);
-        const block_end = blocks[ub - 1] + block.size();
-        if (address >= block_end) return null;
-
-        return block;
+        return null;
     }
 
     // Get the predecessor frame (caller's frame) given the current frame top
@@ -396,11 +411,10 @@ pub const CodeHeap = struct {
             current += block_size;
         }
 
-        // Rebuild sorted array.
+        // Rebuild sorted array (pending is stale after full scan).
+        self.pending_blocks.clearRetainingCapacity();
         self.all_blocks_sorted.clearRetainingCapacity();
         try self.all_blocks_sorted.ensureTotalCapacity(alloc, count);
-        self.clearLiteralSites();
-
         // Second pass: populate. Iteration order is ascending address, so
         // all_blocks_sorted is naturally sorted without a separate sort call.
         current = self.code_start;
@@ -418,7 +432,7 @@ pub const CodeHeap = struct {
     }
 
     pub fn rebuildScanFlags(self: *Self, al: std.mem.Allocator) void {
-        self.rebuildLiteralSites(al);
+        self.flushPending();
         self.ensureScanFlags(al) catch return;
         self.clearScanFlags();
         for (self.all_blocks_sorted.items) |block_addr| {
@@ -447,11 +461,10 @@ pub const CodeHeap = struct {
 
     pub fn deinit(self: *Self) void {
         const alloc = self.allocator orelse return;
+        self.pending_blocks.deinit(alloc);
         self.all_blocks_sorted.deinit(alloc);
         self.uninitialized_blocks.deinit(alloc);
         self.uninitialized_blocks_scratch.deinit(alloc);
-        self.clearLiteralSites();
-        self.literal_sites.deinit(alloc);
         // Deinit remembered sets and scan flags
         self.remembered_sets.deinit();
         if (self.scan_literals) |*set| {

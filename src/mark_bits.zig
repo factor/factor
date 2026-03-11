@@ -13,6 +13,7 @@ pub const MarkBits = struct {
     allocator: std.mem.Allocator,
     start: Cell,
     size: Cell,
+    end: Cell,
     bits_size: Cell,
     marked: []Cell,
     forwarding: []Cell,
@@ -33,6 +34,7 @@ pub const MarkBits = struct {
             .allocator = allocator,
             .start = start,
             .size = size,
+            .end = start + size,
             .bits_size = cells_needed,
             .marked = marked,
             .forwarding = forwarding,
@@ -50,11 +52,19 @@ pub const MarkBits = struct {
         @memset(self.marked, 0);
     }
 
-    pub inline fn addressToBitIndex(self: *const Self, address: Cell) ?struct { cell_index: usize, bit_index: u6 } {
-        if (address < self.start or address >= self.start + self.size) {
+    pub const BitIndex = struct { cell_index: usize, bit_index: u6 };
+
+    pub inline fn addressToBitIndex(self: *const Self, address: Cell) ?BitIndex {
+        if (address < self.start or address >= self.end) {
             return null;
         }
 
+        return self.addressToBitIndexUnchecked(address);
+    }
+
+    /// Unchecked variant — caller guarantees address is in [start, end).
+    /// Saves a branch + memory load in hot paths where range was already checked.
+    pub inline fn addressToBitIndexUnchecked(self: *const Self, address: Cell) BitIndex {
         const offset = (address - self.start) / layouts.data_alignment;
         const cell_index = offset / mark_bits_granularity;
         const bit_index: u6 = @truncate(offset % mark_bits_granularity);
@@ -65,7 +75,7 @@ pub const MarkBits = struct {
     // Mark all bits covering [address, address + data_size)
     // This matches the C++ VM: mark bits track entire live object ranges.
     pub inline fn setMarked(self: *Self, address: Cell, data_size: Cell) void {
-        if (address < self.start or address >= self.start + self.size) {
+        if (address < self.start or address >= self.end) {
             return;
         }
 
@@ -139,6 +149,23 @@ pub const MarkBits = struct {
         return (self.marked[idx.cell_index] & (@as(Cell, 1) << idx.bit_index)) != 0;
     }
 
+    /// Unchecked isMarked — caller guarantees address is in [start, end).
+    pub inline fn isMarkedUnchecked(self: *const Self, address: Cell) bool {
+        const idx = self.addressToBitIndexUnchecked(address);
+        return (self.marked[idx.cell_index] & (@as(Cell, 1) << idx.bit_index)) != 0;
+    }
+
+    /// Unchecked tryMarkStartBitOnly — caller guarantees address is in [start, end).
+    pub inline fn tryMarkStartBitOnlyUnchecked(self: *Self, address: Cell) bool {
+        const idx = self.addressToBitIndexUnchecked(address);
+        const mask: Cell = (@as(Cell, 1) << idx.bit_index);
+        const prev = self.marked[idx.cell_index];
+        if ((prev & mask) != 0) return false;
+        self.marked[idx.cell_index] = prev | mask;
+        return true;
+    }
+
+
     // Must be called after marking phase and before compaction
     pub fn computeForwarding(self: *Self) void {
         var accum: Cell = 0;
@@ -174,7 +201,7 @@ pub const MarkBits = struct {
     }
 
     pub inline fn nextMarkedBlockAfter(self: *const Self, original: Cell) Cell {
-        const position = self.addressToBitIndex(original) orelse return self.start + self.size;
+        const position = self.addressToBitIndex(original) orelse return self.end;
         var bit_index = position.bit_index;
 
         var index = position.cell_index;
@@ -187,11 +214,11 @@ pub const MarkBits = struct {
             bit_index = 0;
         }
 
-        return self.start + self.size;
+        return self.end;
     }
 
     pub inline fn nextUnmarkedBlockAfter(self: *const Self, original: Cell) Cell {
-        const position = self.addressToBitIndex(original) orelse return self.start + self.size;
+        const position = self.addressToBitIndex(original) orelse return self.end;
         var bit_index = position.bit_index;
 
         var index = position.cell_index;
@@ -205,7 +232,7 @@ pub const MarkBits = struct {
             bit_index = 0;
         }
 
-        return self.start + self.size;
+        return self.end;
     }
 
     pub inline fn unmarkedBlockSize(self: *const Self, original: Cell) Cell {

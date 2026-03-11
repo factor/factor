@@ -49,6 +49,10 @@ pub const GarbageCollector = struct {
     vm: *FactorVM,
     heap: *DataHeap,
 
+    // Mark stack — lives here (not in VM) so the hot marking loop
+    // avoids an extra pointer chase through the large VM struct.
+    mark_stack: std.ArrayList(Cell) = .empty,
+
     collections: Cell = 0,
 
     // Adaptive sizing (used when growing the heap)
@@ -69,7 +73,9 @@ pub const GarbageCollector = struct {
         };
     }
 
-    pub fn deinit(_: *Self) void {}
+    pub fn deinit(self: *Self) void {
+        self.mark_stack.deinit(self.allocator);
+    }
 
     pub fn gc(self: *Self, op: GCOp) !void {
         var current_op = op;
@@ -280,7 +286,7 @@ pub const GarbageCollector = struct {
     fn collectAging(self: *Self) bool {
 
         // Phase 1: promote objects referenced from tenured/code to tenured
-        self.vm.mark_stack.clearRetainingCapacity();
+        self.mark_stack.clearRetainingCapacity();
 
         // Sync nursery 'here' from VM (compiled code allocates from vm_asm.nursery)
         self.heap.nursery.here = self.vm.vm_asm.nursery.here;
@@ -385,7 +391,7 @@ pub const GarbageCollector = struct {
     fn collectToTenured(self: *Self) bool {
 
         // Clear mark stack for copied objects
-        self.vm.mark_stack.clearRetainingCapacity();
+        self.mark_stack.clearRetainingCapacity();
 
         // Copy from both nursery and aging to tenured
         // Sync nursery 'here' from VM (compiled code allocates from vm_asm.nursery)
@@ -504,7 +510,7 @@ pub const GarbageCollector = struct {
             code.clearMarks();
         }
 
-        self.vm.mark_stack.clearRetainingCapacity();
+        self.mark_stack.clearRetainingCapacity();
 
         // Copy from nursery+aging to tenured while marking.
         // Include both aging semispaces: after a failed aging collection that
@@ -621,7 +627,7 @@ pub const GarbageCollector = struct {
         self.heap = new_heap;
 
         // Clear mark stack used by copying
-        self.vm.mark_stack.clearRetainingCapacity();
+        self.mark_stack.clearRetainingCapacity();
 
         // Copy all live objects from old heap to new tenured space
         var copy_ctx = CopyContext{
@@ -686,6 +692,7 @@ pub const GarbageCollector = struct {
     // which re-applies ALL relocations as a side effect of compaction.
     fn updateCodeBlockExternalRelocations(self: *Self) void {
         const code = self.vm.code orelse return;
+        code.flushPending();
         const cards_offset: i64 = @bitCast(self.vm.vm_asm.cards_offset);
         const decks_offset: i64 = @bitCast(self.vm.vm_asm.decks_offset);
         const has_uninitialized = code.uninitialized_blocks.count() != 0;
@@ -926,7 +933,7 @@ pub const GarbageCollector = struct {
 
     fn copyPostCopy(dest: *slot_visitor.CopyingDestination, new_addr: Cell) void {
         const ctx: *CopyContext = @ptrCast(@alignCast(dest.ptr));
-        ctx.gc.vm.mark_stack.append(new_addr) catch @panic("Mark stack overflow");
+        ctx.gc.mark_stack.append(ctx.gc.allocator, new_addr) catch @panic("Mark stack overflow");
     }
 
     // Port of C++ visit_context's fill_stack_seg behavior.
@@ -974,8 +981,8 @@ pub const GarbageCollector = struct {
 
     // Visit all copied objects in mark-stack order (used by collect-to-tenured)
     fn visitCopiedObjects(self: *Self, destination: *slot_visitor.CopyingDestination) void {
-        while (self.vm.mark_stack.len() > 0) {
-            const addr = self.vm.mark_stack.pop() orelse break;
+        while (self.mark_stack.items.len > 0) {
+            const addr = self.mark_stack.pop() orelse break;
             slot_visitor.traceAndCopy(addr, destination);
         }
     }
