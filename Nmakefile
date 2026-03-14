@@ -50,7 +50,16 @@ VISTA_BUILD = 1
 !ENDIF
 !ENDIF
 
-!IF "$(DETECTED_ARCH)" == "x86" || "$(DETECTED_ARCH)" == "Win32"
+!IF "$(DETECTED_ARCH)" == "arm64"
+PLAF_DLL_OBJS = vm\os-windows-arm.64.obj vm\cpu-arm.64-trampoline.obj vm\cpu-arm.64.obj
+!IF DEFINED(VISTA_BUILD)
+SUBSYSTEM_COM_FLAGS = console
+SUBSYSTEM_EXE_FLAGS = windows
+!ELSE
+SUBSYSTEM_COM_FLAGS = console,"6.02"
+SUBSYSTEM_EXE_FLAGS = windows,"6.02"
+!ENDIF
+!ELSEIF "$(DETECTED_ARCH)" == "x86" || "$(DETECTED_ARCH)" == "Win32"
 LINK_FLAGS = $(LINK_FLAGS) /safeseh /largeaddressaware
 PLAF_DLL_OBJS = vm\os-windows-x86.32.obj vm\safeseh.obj vm\cpu-x86.obj
 !IF DEFINED(VISTA_BUILD)
@@ -136,9 +145,10 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm\words.obj \
 	vm\zstd.obj
 
+!MESSAGE Building Factor for $(DETECTED_ARCH) architecture...
+
 # Default target must be first
 all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
-	@echo Building Factor for $(DETECTED_ARCH) architecture...
 
 # batch mode has ::
 .cpp.obj::
@@ -147,11 +157,14 @@ all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.d
 .c.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
+vm\cpu-arm.64-trampoline.obj:
+	armasm64 -nologo vm\cpu-arm.64-trampoline.asm $@
+
 .asm.obj:
 	ml $(ML_FLAGS) /Fo$@ /c $<
 
 .rs.res:
-	rc $<
+	rc /nologo $<
 
 libfactor-ffi-test.dll: vm/ffi_test.obj
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll /def:vm\ffi_test.def vm/ffi_test.obj
@@ -173,11 +186,11 @@ factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 #
 factor.com.manifest: factor.com
 	copy factor.exe.manifest.in factor.exe.manifest
-	mt -manifest factor.exe.manifest -outputresource:"factor.com;#1"
+	mt -nologo -manifest factor.exe.manifest -outputresource:"factor.com;#1"
 
 factor.exe.manifest: factor.exe
 	copy factor.exe.manifest.in factor.exe.manifest
-	mt -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
+	mt -nologo -manifest factor.exe.manifest -outputresource:"factor.exe;#1"
 
 clean:
 	del vm\*.obj

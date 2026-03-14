@@ -2,6 +2,10 @@
 
 namespace factor {
 
+inline static void flush_icache(cell start, cell len) {
+  __builtin___clear_cache((char *)start, (char *)(start + len));
+}
+
 #define UAP_STACK_POINTER(ucontext) (((ucontext_t*)ucontext)->uc_mcontext.sp)
 #define UAP_PROGRAM_COUNTER(ucontext) (((ucontext_t*)ucontext)->uc_mcontext.pc)
 
