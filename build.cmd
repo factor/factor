@@ -73,7 +73,14 @@ if not errorlevel 1 (
         echo x86-64 cl.exe detected.
         set _target=x86-64
         set _bootimage=boot.windows-x86.64.image
-    ) else goto nocl
+    ) else (
+        call cl 2>&1 | find "ARM64" >nul
+        if not errorlevel 1 (
+            echo arm-64 cl.exe detected.
+            set _target=arm-64
+            set _bootimage=boot.windows-arm.64.image
+        ) else goto nocl
+    )
 )
 
 echo Deleting staging images from temp/...

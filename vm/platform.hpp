@@ -2,9 +2,11 @@
   #if defined(WINNT)
     #include "os-windows.hpp"
     #if defined(FACTOR_AMD64)
-      #include "os-windows.64.hpp"
+      #include "os-windows-x86.64.hpp"
     #elif defined(FACTOR_X86)
-      #include "os-windows.32.hpp"
+      #include "os-windows-x86.32.hpp"
+    #elif defined(FACTOR_ARM64)
+      #include "os-windows-arm.64.hpp"
     #else
       #error "Unsupported Windows flavor"
     #endif

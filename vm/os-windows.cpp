@@ -218,6 +218,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
     case STATUS_FLOAT_UNDERFLOW:
     case STATUS_FLOAT_MULTIPLE_FAULTS:
     case STATUS_FLOAT_MULTIPLE_TRAPS:
+#ifndef FACTOR_ARM64
 #ifdef FACTOR_64
       signal_fpu_status = fpu_status(MXCSR(c));
 #else
@@ -227,6 +228,9 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
       X87SW(c) = 0;
 #endif
       MXCSR(c) &= 0xffffffc0;
+#else
+      c->Fpsr = 0;
+#endif
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
                               (cell)factor::fp_signal_handler_impl);
       break;

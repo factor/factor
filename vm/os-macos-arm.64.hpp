@@ -2,6 +2,10 @@
 
 namespace factor {
 
+inline static void flush_icache(cell start, cell len) {
+  __builtin___clear_cache((char *)start, (char *)(start + len));
+}
+
 #define MACH_EXC_INTEGER_DIV EXC_ARM_FP_DZ
 #define MACH_EXC_STATE_TYPE _STRUCT_ARM_EXCEPTION_STATE64
 #define MACH_EXC_STATE_FAULT(exc_state) (exc_state)->__far
