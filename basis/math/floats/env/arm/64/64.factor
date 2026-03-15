@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays assocs biassocs
 classes.struct combinators cpu.arm.64.assembler
 cpu.arm.64.assembler.registers kernel literals math math.bitwise
-math.floats.env math.floats.env.private ;
+math.floats.env math.floats.env.private system ;
 IN: math.floats.env.arm.64
 
 STRUCT: arm64-env
@@ -27,7 +27,7 @@ STRUCT: arm64-env
 : <arm64-env> ( -- arm64-env )
     arm64-env (struct) [ get-arm64-env ] keep ;
 
-M: arm64-env (fp-env-registers) ( -- fp-envs )
+M: arm.64 (fp-env-registers) ( -- fp-envs )
     <arm64-env> 1array ;
 
 M: arm64-env (set-fp-env-register) ( fp-env -- )
