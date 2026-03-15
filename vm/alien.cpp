@@ -84,7 +84,9 @@ void* factor_vm::alien_pointer() {
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
+    JIT_WRITABLE                                                        \
     parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
+    JIT_EXECUTABLE                                                      \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
     type* ptr = (type*)parent->alien_pointer();                         \
