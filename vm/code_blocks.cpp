@@ -344,7 +344,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
 // image load. It finds the symbol and library, and throws an error.
 void factor_vm::undefined_symbol() {
   cell frame = ctx->callstack_top;
-  cell return_address = *(cell*)frame;
+  cell return_address = *(cell*)(frame + FRAME_RETURN_ADDRESS);
   code_block* compiled = code->code_block_for_address(return_address);
 
   // Find the RT_DLSYM relocation nearest to the given return address.
@@ -352,7 +352,12 @@ void factor_vm::undefined_symbol() {
   cell library = false_object;
 
   auto find_symbol_at_address_visitor = [&](instruction_operand op) {
-    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address) {
+#ifdef FACTOR_ARM64
+    static const cell offset = 0xc;
+#else
+    static const cell offset = 0;
+#endif
+    if (op.rel.type() == RT_DLSYM && op.pointer <= return_address + offset) {
       array* parameters = untag<array>(compiled->parameters);
       cell index = op.index;
       symbol = array_nth(parameters, index);
