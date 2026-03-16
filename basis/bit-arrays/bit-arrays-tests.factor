@@ -95,3 +95,8 @@ sequences.private tools.test ;
     3 B{ 0b0 } bit-array boa
     2 B{ 0b0 } bit-array boa =
 ] unit-test
+
+{ f } [
+    ?{ f f f f f f f f f }
+    ?{ f t f f f f f f f } =
+] unit-test
