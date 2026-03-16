@@ -1,15 +1,16 @@
 ! Copyright (C) 2025 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data assocs
-byte-arrays classes.algebra combinators compiler.cfg
-compiler.cfg.comparisons compiler.cfg.instructions
-compiler.cfg.intrinsics compiler.cfg.registers
-compiler.cfg.stack-frame compiler.codegen.gc-maps
-compiler.codegen.labels compiler.codegen.relocation
-compiler.constants cpu.architecture cpu.arm.64.assembler
-cpu.arm.64.assembler.registers generalizations kernel layouts
-literals make math math.bitwise memory namespaces sequences
-system ;
+USING: accessors alien alien.c-types alien.data arrays assocs
+byte-arrays classes.algebra classes.struct combinators
+combinators.short-circuit compiler.cfg
+compiler.cfg.builder.alien.boxing compiler.cfg.comparisons
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.cfg.registers compiler.cfg.stack-frame
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.constants cpu.architecture
+cpu.arm.64.assembler cpu.arm.64.assembler.registers
+generalizations grouping kernel layouts literals make math
+math.bitwise memory namespaces sequences system ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
@@ -766,7 +767,7 @@ M: arm.64 %reload swap %copy ;
 M: arm.64 return-regs
     {
         { int-regs ${ X0 X1 } }
-        { float-regs ${ V0 } }
+        { float-regs ${ V0 V1 V2 V3 } }
     } ;
 
 M: arm.64 param-regs
@@ -775,8 +776,33 @@ M: arm.64 param-regs
         { float-regs ${ V0 V1 V2 V3 V4 V5 V6 V7 } }
     } ;
 
-M: arm.64 return-struct-in-registers? heap-size 16 <= ;
-M: arm.64 value-struct? heap-size 16 <= ;
+M: arm.64 return-struct-in-registers? value-struct? ;
+
+GENERIC: flatten-reps ( c-type -- reps )
+
+M: object flatten-reps c-type-rep 1array ;
+
+M: struct-c-type flatten-reps
+    fields>> [ type>> lookup-c-type flatten-reps ] map concat ;
+
+UNION: float/vector-rep float-rep double-rep vector-rep ;
+
+: homogeneous-float/vector-aggregate? ( c-type -- reps ? )
+    lookup-c-type flatten-reps dup {
+        [ length 4 <= ]
+        [ [ float/vector-rep? ] all? ]
+        [ all-equal? ]
+    } 1&& ;
+
+M: arm.64 value-struct?
+    [ heap-size 16 <= ]
+    [ homogeneous-float/vector-aggregate? nip ] bi or ;
+
+M: arm.64 flatten-struct-type
+    dup homogeneous-float/vector-aggregate?
+    [ nip [ f f 3array ] map record-reg-reps ]
+    [ drop call-next-method ] if ;
+
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
