@@ -1,8 +1,4 @@
-USING: alien.syntax layouts combinators vocabs ;
+USING: accessors sequences system vocabs ;
 IN: unix.stat
 
-cell-bits
-{
-    { 32 [ "unix.stat.linux.32" require ] }
-    { 64 [ "unix.stat.linux.64" require ] }
-} case
+<< "unix.stat.linux." cpu name>> append require >>
