@@ -1,5 +1,5 @@
-USING: kernel alien.c-types alien.syntax math classes.struct
-unix.time unix.types system ;
+USING: alien.c-types alien.syntax classes.struct kernel
+unix.time unix.types ;
 IN: unix.stat
 
 ! Ubuntu 7.10 64-bit
@@ -25,8 +25,6 @@ FUNCTION: int __xstat64  ( int ver, c-string pathname, stat* buf )
 FUNCTION: int __lxstat64 ( int ver, c-string pathname, stat* buf )
 FUNCTION: int __fxstat64 ( int ver, int fd, stat* buf )
 
-: ver ( -- n ) cpu arm.64? 0 1 ? ;
-
-:  stat-func ( pathname buf -- int ) [ ver ] 2dip __xstat64 ;
-: lstat ( pathname buf -- int ) [ ver ] 2dip __lxstat64 ;
-: fstat ( fd buf -- int ) [ ver ] 2dip __fxstat64 ;
+:  stat-func ( pathname buf -- int ) [ 1 ] 2dip __xstat64 ;
+: lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat64 ;
+: fstat ( fd buf -- int ) [ 1 ] 2dip __fxstat64 ;
