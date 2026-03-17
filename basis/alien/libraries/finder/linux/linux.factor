@@ -12,6 +12,13 @@ CONSTANT: mach-map {
     { ppc.64 { "libc6" "64bit" } }
     { x86.32 { "libc6" "x32" } }
     { x86.64 { "libc6" "x86-64" } }
+    { arm.64 { "libc6" "AArch64" } }
+}
+
+CONSTANT: emulation-map {
+    { x86.32 "elf_i386" }
+    { x86.64 "elf_x86_64" }
+    { arm.64 "aarch64linux" }
 }
 
 : parse-ldconfig-lines ( string -- triple )
@@ -48,7 +55,7 @@ CONSTANT: mach-map {
         [
             "ld" , "-t" ,
             "LD_LIBRARY_PATH" os-env ":" split [ "-L" , , ] each
-            cpu x86.64? "-melf_x86_64" "-melf_i386" ? ,
+            "-m" emulation-map cpu of append ,
             "-o" , "/dev/null" , "-l" name append ,
         ] { } make >>command
         +closed+ >>stderr
