@@ -44,7 +44,7 @@ IN: compiler.cfg.builder.alien
     ] [ drop f ] if ;
 
 : (handle-macos-arm64-varargs) ( params -- )
-    function>> "fcntl" = os macos? cpu arm.64? and and
+    function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
     [ int-regs [ 2 tail* ] change ] when ;
 
 : handle-macos-arm64-varargs ( params -- )
