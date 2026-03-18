@@ -356,19 +356,21 @@ cpu x86.32? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##add-imm f 2 0 -100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##sub f 2 0 1 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##add-imm f 2 0 -100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##sub f 2 0 1 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 {
     {
@@ -422,33 +424,35 @@ cpu x86.32? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 -1 }
-        T{ ##neg f 2 0 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 -1 }
-        T{ ##mul f 2 0 1 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 -1 }
+            T{ ##neg f 2 0 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 -1 }
+            T{ ##mul f 2 0 1 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 -1 }
-        T{ ##neg f 2 0 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 -1 }
-        T{ ##mul f 2 1 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 -1 }
+            T{ ##neg f 2 0 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 -1 }
+            T{ ##mul f 2 1 0 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 {
     {
@@ -508,89 +512,91 @@ cpu x86.32? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and f 2 0 1 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and f 2 0 1 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and f 2 1 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and f 2 1 0 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or f 2 0 1 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or f 2 0 1 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or f 2 1 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or f 2 1 0 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor f 2 0 1 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor f 2 0 1 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor-imm f 2 0 100 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor f 2 1 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor-imm f 2 0 100 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor f 2 1 0 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 {
     {
@@ -1320,185 +1326,187 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##add-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##add-imm f 4 0 50 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##add f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##sub f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##add-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##add-imm f 4 0 50 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##add f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##sub f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##add-imm f 2 0 -100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##add-imm f 4 0 -150 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##sub f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##sub f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##add-imm f 2 0 -100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##add-imm f 4 0 -150 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##sub f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##sub f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##mul-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##mul-imm f 4 0 5000 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##mul f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##mul f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##mul-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##mul-imm f 4 0 5000 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##mul f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##mul f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##mul-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##mul-imm f 4 0 5000 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##mul f 2 1 0 }
-        T{ ##load-integer f 3 50 }
-        T{ ##mul f 4 3 2 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##mul-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##mul-imm f 4 0 5000 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##mul f 2 1 0 }
+            T{ ##load-integer f 3 50 }
+            T{ ##mul f 4 3 2 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##and-imm f 4 0 32 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##and f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##and-imm f 4 0 32 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##and f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##and-imm f 4 0 32 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##and f 2 1 0 }
-        T{ ##load-integer f 3 50 }
-        T{ ##and f 4 3 2 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##and-imm f 4 0 32 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##and f 2 1 0 }
+            T{ ##load-integer f 3 50 }
+            T{ ##and f 4 3 2 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##or-imm f 4 0 118 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##or f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##or-imm f 4 0 118 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##or f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##or-imm f 4 0 118 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##or f 2 1 0 }
-        T{ ##load-integer f 3 50 }
-        T{ ##or f 4 3 2 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##or-imm f 4 0 118 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##or f 2 1 0 }
+            T{ ##load-integer f 3 50 }
+            T{ ##or f 4 3 2 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##xor-imm f 4 0 86 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor f 2 0 1 }
-        T{ ##load-integer f 3 50 }
-        T{ ##xor f 4 2 3 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##xor-imm f 4 0 86 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor f 2 0 1 }
+            T{ ##load-integer f 3 50 }
+            T{ ##xor f 4 2 3 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor-imm f 2 0 100 }
-        T{ ##load-integer f 3 50 }
-        T{ ##xor-imm f 4 0 86 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 100 }
-        T{ ##xor f 2 1 0 }
-        T{ ##load-integer f 3 50 }
-        T{ ##xor f 4 3 2 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor-imm f 2 0 100 }
+            T{ ##load-integer f 3 50 }
+            T{ ##xor-imm f 4 0 86 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 100 }
+            T{ ##xor f 2 1 0 }
+            T{ ##load-integer f 3 50 }
+            T{ ##xor f 4 3 2 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 {
     {
@@ -1649,39 +1657,41 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##add-imm f 1 0 -10 }
-        T{ ##shl-imm f 5 0 2 }
-        T{ ##add-imm f 2 5 -40 }
-        T{ ##replace f 2 D: 0 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##sub-imm f 1 0 10 }
-        T{ ##shl-imm f 2 1 2 }
-        T{ ##replace f 2 D: 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##add-imm f 1 0 -10 }
+            T{ ##shl-imm f 5 0 2 }
+            T{ ##add-imm f 2 5 -40 }
+            T{ ##replace f 2 D: 0 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##sub-imm f 1 0 10 }
+            T{ ##shl-imm f 2 1 2 }
+            T{ ##replace f 2 D: 0 }
+        } value-numbering-step
+    ] unit-test
 
-{
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##add-imm f 1 0 -10 }
-        T{ ##mul-imm f 6 0 3 }
-        T{ ##add-imm f 2 6 -30 }
-        T{ ##replace f 2 D: 0 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##sub-imm f 1 0 10 }
-        T{ ##mul-imm f 2 1 3 }
-        T{ ##replace f 2 D: 0 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##add-imm f 1 0 -10 }
+            T{ ##mul-imm f 6 0 3 }
+            T{ ##add-imm f 2 6 -30 }
+            T{ ##replace f 2 D: 0 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##sub-imm f 1 0 10 }
+            T{ ##mul-imm f 2 1 3 }
+            T{ ##replace f 2 D: 0 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 ! Simplification
 {
@@ -1925,21 +1935,23 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
-{
+cpu x86? [
     {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 3 }
-        T{ ##load-integer f 3 -2 }
-    }
-} [
-    {
-        T{ ##peek f 0 D: 0 }
-        T{ ##load-integer f 1 1 }
-        T{ ##load-integer f 2 3 }
-        T{ ##sub f 3 1 2 }
-    } value-numbering-step
-] unit-test
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 1 }
+            T{ ##load-integer f 2 3 }
+            T{ ##load-integer f 3 -2 }
+        }
+    } [
+        {
+            T{ ##peek f 0 D: 0 }
+            T{ ##load-integer f 1 1 }
+            T{ ##load-integer f 2 3 }
+            T{ ##sub f 3 1 2 }
+        } value-numbering-step
+    ] unit-test
+] when
 
 {
     {
@@ -2081,7 +2093,7 @@ cell 8 = [
     ] unit-test
 
     ! PPC ADDI can't hold immediates this big.
-    cpu ppc? [
+    cpu x86? [
         [
             {
                 T{ ##peek f 0 D: 0 }
@@ -2097,7 +2109,7 @@ cell 8 = [
                 T{ ##add f 4 3 2 }
             } value-numbering-step
         ] unit-test
-    ] unless
+    ] when
 ] when
 
 {

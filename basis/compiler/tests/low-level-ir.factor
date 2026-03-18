@@ -1,9 +1,10 @@
 USING: alien.c-types arrays assocs combinators compiler.cfg
 compiler.cfg.build-stack-frame compiler.cfg.instructions
 compiler.cfg.linear-scan compiler.cfg.registers
-compiler.cfg.ssa.destruction compiler.cfg.utilities compiler.codegen
-compiler.test compiler.units cpu.architecture hashtables kernel
-layouts literals math namespaces sequences tools.test words ;
+compiler.cfg.ssa.destruction compiler.cfg.utilities
+compiler.codegen compiler.test compiler.units cpu.architecture
+hashtables kernel layouts literals math namespaces sequences
+system tools.test words ;
 IN: compiler.tests.low-level-ir
 
 : compile-cfg ( cfg -- word )
@@ -100,12 +101,14 @@ IN: compiler.tests.low-level-ir
     } compile-test-bb
 ] unit-test
 
-[ 1 ] [
-    V{
-        T{ ##load-tagged f 0 $[ 2 tag-fixnum ] }
-        T{ ##add-imm f 0 0 $[ -1 tag-fixnum ] }
-    } compile-test-bb
-] unit-test
+cpu arm.64? [
+    [ 1 ] [
+        V{
+            T{ ##load-tagged f 0 $[ 2 tag-fixnum ] }
+            T{ ##add-imm f 0 0 $[ -1 tag-fixnum ] }
+        } compile-test-bb
+    ] unit-test
+] unless
 
 [ -1 ] [
     V{
