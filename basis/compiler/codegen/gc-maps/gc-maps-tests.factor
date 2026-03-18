@@ -1,8 +1,8 @@
 USING: accessors alien.c-types arrays bit-arrays byte-arrays
 classes.struct compiler.cfg compiler.cfg.instructions
 compiler.cfg.stack-frame compiler.cfg.utilities
-compiler.codegen.gc-maps compiler.codegen.relocation cpu.architecture
-cpu.x86 kernel layouts make math namespaces sequences
+compiler.codegen.gc-maps compiler.codegen.relocation
+cpu.architecture kernel layouts make math namespaces sequences
 specialized-arrays system tools.test ;
 QUALIFIED: vm
 SPECIALIZED-ARRAY: uint
@@ -65,55 +65,6 @@ M: fake-cpu gc-root-offset ;
 
 { t } [ "result" get length "expect" get length = ] unit-test
 { t } [ "result" get "expect" get = ] unit-test
-
-! Fix the gc root offset calculations
-SINGLETON: linux-x86.64
-M: linux-x86.64 reserved-stack-space 0 ;
-M: linux-x86.64 gc-root-offset
-    n>> spill-offset cell + cell /i ;
-
-: cfg-w-spill-area-base ( base -- cfg )
-    stack-frame new swap >>spill-area-base
-    { } insns>cfg swap >>stack-frame ;
-
-: array>spill-slots ( seq -- spills )
-    [ spill-slot boa ] map ;
-
-: <gc-map/spills> ( spills -- gc-map )
-    array>spill-slots { } gc-map boa ;
-
-cpu x86.64? [
-    linux-x86.64 \ cpu set
-
-    ! gc-root-offsets
-    { { 1 3 } } [
-        0 cfg-w-spill-area-base cfg [
-            { 0 16 } <gc-map/spills> gc-root-offsets
-        ] with-variable
-    ] unit-test
-
-    { { 6 10 } } [
-        32 cfg-w-spill-area-base cfg [
-            { 8 40 } <gc-map/spills> gc-root-offsets
-        ] with-variable
-    ] unit-test
-
-    { 5 B{ 18 } } [
-        0 cfg-w-spill-area-base cfg [
-            { 0 24 } <gc-map/spills> 1array
-            [ emit-gc-info-bitmap ] B{ } make
-        ] with-variable
-    ] unit-test
-
-    { 9 B{ 32 1 } } [
-        32 cfg-w-spill-area-base cfg [
-            { 0 24 } <gc-map/spills> 1array
-            [ emit-gc-info-bitmap ] B{ } make
-        ] with-variable
-    ] unit-test
-
-    fake-cpu \ cpu set
-] when
 
 ! largest-spill-slot
 {

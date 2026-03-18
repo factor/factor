@@ -1,11 +1,12 @@
-USING: accessors compiler.cfg compiler.cfg.build-stack-frame
-compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.stack-frame compiler.cfg.utilities compiler.codegen
-compiler.codegen.gc-maps compiler.codegen.relocation
-compiler.test cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features kernel
-kernel.private layouts literals make math math.libm namespaces
-sequences slots.syntax system tools.test ;
+USING: accessors arrays compiler.cfg
+compiler.cfg.build-stack-frame compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stack-frame
+compiler.cfg.utilities compiler.codegen compiler.codegen.gc-maps
+compiler.codegen.relocation compiler.test cpu.architecture
+cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
+cpu.x86.features kernel kernel.private layouts literals make
+math math.libm namespaces sequences slots.syntax system
+tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -161,3 +162,54 @@ cpu x86.64? [
     ! on all other platforms.
     reserved-stack-space -
 ] unit-test
+
+SINGLETON: fake-cpu
+
+fake-cpu \ cpu set
+
+M: fake-cpu gc-root-offset ;
+
+! Fix the gc root offset calculations
+SINGLETON: linux-x86.64
+M: linux-x86.64 reserved-stack-space 0 ;
+M: linux-x86.64 gc-root-offset
+    n>> spill-offset cell + cell /i ;
+
+: array>spill-slots ( seq -- spills )
+    [ spill-slot boa ] map ;
+
+: <gc-map/spills> ( spills -- gc-map )
+    array>spill-slots { } gc-map boa ;
+
+cpu x86.64? [
+    linux-x86.64 \ cpu set
+
+    ! gc-root-offsets
+    { { 1 3 } } [
+        0 cfg-w-spill-area-base cfg [
+            { 0 16 } <gc-map/spills> gc-root-offsets
+        ] with-variable
+    ] unit-test
+
+    { { 6 10 } } [
+        32 cfg-w-spill-area-base cfg [
+            { 8 40 } <gc-map/spills> gc-root-offsets
+        ] with-variable
+    ] unit-test
+
+    { 5 B{ 18 } } [
+        0 cfg-w-spill-area-base cfg [
+            { 0 24 } <gc-map/spills> 1array
+            [ emit-gc-info-bitmap ] B{ } make
+        ] with-variable
+    ] unit-test
+
+    { 9 B{ 32 1 } } [
+        32 cfg-w-spill-area-base cfg [
+            { 0 24 } <gc-map/spills> 1array
+            [ emit-gc-info-bitmap ] B{ } make
+        ] with-variable
+    ] unit-test
+
+    fake-cpu \ cpu set
+] when
