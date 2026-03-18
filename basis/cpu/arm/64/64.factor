@@ -187,6 +187,20 @@ M:: arm.64 %bit-count ( DST SRC -- )
     fp-temp dup 16B ADDV
     DST fp-temp >D FMOV ;
 
+:: (%boolean) ( DST TEMP -- )
+    DST \ f type-number MOV
+    t TEMP (LDR=) rel-literal ;
+
+:: %boolean ( DST cc TEMP -- )
+    DST TEMP (%boolean)
+    DST TEMP DST cc CSEL ;
+
+M: arm.64 %bit-test
+    [ dup integer? [ 2^ ] [
+        [ temp ] 2dip LSR
+        temp 1
+    ] if TST NE ] dip %boolean ;
+
 : stack@ ( n -- operand ) [ SP ] dip [+] ;
 
 : spill@ ( n -- operand ) spill-offset stack@ ;
@@ -679,14 +693,6 @@ M: arm.64 %safepoint SAFEPOINT dup [] STR ;
         ${ cc/= NE }
     } at ;
 
-:: (%boolean) ( DST TEMP -- )
-    DST \ f type-number MOV
-    t TEMP (LDR=) rel-literal ;
-
-:: %boolean ( DST cc TEMP -- )
-    DST TEMP (%boolean)
-    DST TEMP DST cc CSEL ;
-
 M: arm.64 %compare [ CMP ] [ cc>cond ] [ %boolean ] tri* ;
 
 : (%compare-imm) ( SRC1 src2 -- ) [ tag-fixnum ] [ \ f type-number ] if* CMP ;
@@ -907,11 +913,11 @@ M: arm.64 enable-cpu-features
     enable-float-min/max
     enable-min/max
     enable-log2
-    enable-bit-count ; ! could include enable-bit-test
+    enable-bit-count
+    enable-bit-test ;
 
 M: arm.64 complex-addressing? f ; ! could be t
 M: arm.64 integer-float-needs-stack-frame? f ;
-M: arm.64 test-instruction? f ; ! could be t
 M: arm.64 fused-unboxing? t ;
 
 M: arm.64 immediate-arithmetic? add/sub-immediate? ;
