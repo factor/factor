@@ -4,7 +4,7 @@ IN: compiler.cfg.representations
 
 HELP: select-representations
 { $values { "cfg" cfg } }
-{ $description "Entry point for the representation selection compiler pass. After this word hasn run, the " { $link representations } " hashtable has been filled with vregs and what their preferred representations are." } ;
+{ $description "Entry point for the representation selection compiler pass. After this word has run, the " { $link representations } " hashtable has been filled with vregs and what their preferred representations are." } ;
 
 ARTICLE: "compiler.cfg.representations" "Virtual register representation selection"
 "Virtual register representation selection. This is where decisions about integer tagging and float and vector boxing are made. The appropriate conversion operations inserted after a cost analysis."
