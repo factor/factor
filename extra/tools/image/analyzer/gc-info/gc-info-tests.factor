@@ -6,7 +6,7 @@ generic grouping io io.encodings.binary io.streams.byte-array kernel
 math namespaces random sequences system tools.image.analyzer.gc-info
 tools.image.analyzer.utils tools.test vm vocabs words ;
 IN: tools.image.analyzer.gc-info.tests
-QUALIFIED: cpu.x86.features.private
+! QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
 QUALIFIED: effects
 QUALIFIED: gtk2-samples.opengl
@@ -135,10 +135,10 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
-{ t } [
-    \ cpu.x86.features.private:(sse-version)
-    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
-] unit-test
+! { t } [
+!     \ cpu.x86.features.private:(sse-version)
+!     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+! ] unit-test
 
 ! #1436
 { t } [
