@@ -1,9 +1,10 @@
-USING: compiler.cfg.instructions compiler.cfg.registers
-compiler.codegen compiler.codegen.gc-maps compiler.codegen.relocation
-compiler.test cpu.architecture cpu.x86 cpu.x86.assembler
-cpu.x86.assembler.operands cpu.x86.features kernel kernel.private
-layouts literals make math math.libm namespaces sequences system
-tools.test ;
+USING: accessors compiler.cfg compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stack-frame
+compiler.cfg.utilities compiler.codegen compiler.codegen.gc-maps
+compiler.codegen.relocation compiler.test cpu.architecture
+cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
+cpu.x86.features kernel kernel.private layouts literals make
+math math.libm namespaces sequences system tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -117,4 +118,24 @@ cpu x86.64? [
     [
         init-relocation [ 34.0 D: 0 %replace-imm ] B{ } make
     ] unit-test
+] when
+
+: cfg-w-spill-area-base ( base -- cfg )
+    stack-frame new swap >>spill-area-base
+    { } insns>cfg swap >>stack-frame ;
+
+: expected-gc-root-offset ( slot-number spill-area-base -- offset )
+    [ spill-slot boa ] [ cfg-w-spill-area-base ] bi*
+    cfg [
+        gc-root-offset reserved-stack-space cell / -
+    ] with-variable ;
+
+cpu x86.64? [
+    ! The offset is 1, not 0 because the return address occupies the
+    ! first position in the stack frame.
+    { 1 } [ 0 0 expected-gc-root-offset ] unit-test
+
+    { 10 } [ 8 64 expected-gc-root-offset ] unit-test
+
+    { 20 } [ 24 128 expected-gc-root-offset ] unit-test
 ] when
