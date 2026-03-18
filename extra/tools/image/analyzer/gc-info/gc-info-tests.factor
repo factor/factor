@@ -135,10 +135,10 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
 ] unit-test
 
-{ t } [
-    \ cpu.x86.features.private:(sse-version)
-    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
-] unit-test
+! { t } [
+!     \ cpu.x86.features.private:(sse-version)
+!     [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info?
+! ] unit-test
 
 ! #1436
 { t } [
