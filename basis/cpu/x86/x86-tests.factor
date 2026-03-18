@@ -1,10 +1,11 @@
-USING: accessors compiler.cfg compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stack-frame
-compiler.cfg.utilities compiler.codegen compiler.codegen.gc-maps
-compiler.codegen.relocation compiler.test cpu.architecture
-cpu.x86 cpu.x86.assembler cpu.x86.assembler.operands
-cpu.x86.features kernel kernel.private layouts literals make
-math math.libm namespaces sequences system tools.test ;
+USING: accessors compiler.cfg compiler.cfg.build-stack-frame
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.stack-frame compiler.cfg.utilities compiler.codegen
+compiler.codegen.gc-maps compiler.codegen.relocation
+compiler.test cpu.architecture cpu.x86 cpu.x86.assembler
+cpu.x86.assembler.operands cpu.x86.features kernel
+kernel.private layouts literals make math math.libm namespaces
+sequences slots.syntax system tools.test ;
 IN: cpu.x86.tests
 
 { } [
@@ -139,3 +140,24 @@ cpu x86.64? [
 
     { 20 } [ 24 128 expected-gc-root-offset ] unit-test
 ] when
+
+{
+    ! 91 8 align
+    96
+    ! 91 8 align 16 +
+    112
+    ! 91 8 align 16 + 16 8 align + cell + 16 align
+    144
+} [
+    T{ stack-frame
+        { params 91 }
+        { allot-area-align 8 }
+        { allot-area-size 10 }
+        { spill-area-align 8 }
+        { spill-area-size 16 }
+    } finalize-stack-frame
+    slots[ allot-area-base spill-area-base total-size ]
+    ! Exclude any reserved stack space 32 bytes on win64, 0 bytes
+    ! on all other platforms.
+    reserved-stack-space -
+] unit-test
