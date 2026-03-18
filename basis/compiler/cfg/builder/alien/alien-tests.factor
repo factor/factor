@@ -1,11 +1,12 @@
-USING: accessors alien alien.c-types alien.strings assocs compiler.cfg
-compiler.cfg.builder compiler.cfg.builder.alien
-compiler.cfg.builder.alien.params compiler.cfg.builder.blocks
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks
-compiler.errors compiler.test compiler.tree.builder
-compiler.tree.optimizer cpu.architecture cpu.x86.assembler
-cpu.x86.assembler.operands kernel literals make namespaces sequences
-stack-checker.alien system tools.test words ;
+USING: accessors alien alien.c-types alien.strings assocs
+combinators compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.alien compiler.cfg.builder.alien.params
+compiler.cfg.builder.blocks compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks compiler.errors
+compiler.test compiler.tree.builder compiler.tree.optimizer
+cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
+cpu.arm.64.assembler.registers kernel literals make namespaces
+sequences stack-checker.alien system tools.test words ;
 IN: compiler.cfg.builder.alien.tests
 
 : dummy-assembly ( -- ass )
@@ -100,8 +101,11 @@ cpu x86.64? [
 
 ! prepare-caller-return
 ${
-    cpu x86.32? { { 1 int-rep EAX } } { { 1 int-rep RAX } } ?
-    cpu x86.32? { { 2 double-rep ST0 } } { { 2 double-rep XMM0 } } ?
+    cpu {
+        { x86.32 [ { { 1 int-rep EAX } } { { 2 double-rep ST0 } } ] }
+        { x86.64 [ { { 1 int-rep RAX } } { { 2 double-rep XMM0 } } ] }
+        { arm.64 [ { ${ 1 int-rep X0 } } { ${ 2 double-rep V0 } } ] }
+    } case
 } [
     T{ alien-invoke-params { return int } } prepare-caller-return
     T{ alien-invoke-params { return double } } prepare-caller-return

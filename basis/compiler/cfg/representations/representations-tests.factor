@@ -829,12 +829,19 @@ cpu x86.64? [
     } test-peephole
 ] unit-test
 
-{
+${
+    complex-addressing?
     V{
         T{ ##peek f 0 D: 0 }
         T{ ##peek f 1 D: 1 }
         T{ ##test-imm-branch f 0 $[ 10 tag-fixnum ] cc= }
     }
+    V{
+        T{ ##peek f 0 D: 0 }
+        T{ ##peek f 1 D: 1 }
+        T{ ##sar-imm f 6 0 4 }
+        T{ ##test-imm-branch f 6 10 cc= }
+    } ?
 } [
     V{
         T{ ##peek f 0 D: 0 }
