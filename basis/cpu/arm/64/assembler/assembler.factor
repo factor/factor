@@ -856,10 +856,11 @@ ERROR: unknown-c-type c-type ;
         { float-rep  [ 2 1 0 2 ] }
         { double     [ 3 1 0 3 ] }
         { double-rep [ 3 1 0 3 ] }
-        [ dup vector-rep? [ drop 4 1 0 4 ] [ unknown-c-type ] if ]
-    } case ] dip
-    dup 0 = [ [ drop 0 ] 2dip ] when
-    pick 1 = [ drop 0 ] when ;
+        [ dup vector-rep? [ drop 0 1 1 4 ] [ unknown-c-type ] if ]
+    } case ] dip reach reach [ 1 = ] both? [
+        dup 0 = [ [ drop 0 ] 2dip ] when
+        pick 1 = [ drop 0 ] when
+    ] unless ;
 
 : load/store-register* ( Rt operand c-type L -- )
     encode-c-type (load/store-register) ;
