@@ -1316,26 +1316,6 @@ M: general-register DUP [ size>> 2^ ] [ Q>> ] bi 1 0 simd-copy ;
 
 
 <PRIVATE
-: simd-3-ext ( Rd Rn Rm shape U opcode -- )
-    {
-        { 0b1 30 }
-        { 0b01110 24 }
-        { 0b1 15 }
-        { 0b1 10 }
-        { V 0 }
-        { V 5 }
-        { V 16 }
-        { size 22 }
-        29
-        11
-    } encode ;
-PRIVATE>
-
-: SDOT ( Rd Rn Rm size -- ) 0 2 simd-3-ext ;
-: UDOT ( Rd Rn Rm size -- ) 1 2 simd-3-ext ;
-
-
-<PRIVATE
 : simd-2-misc ( Rd Rn shape U opcode Q -- )
     {
         { 0b01110 24 }
