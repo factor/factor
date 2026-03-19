@@ -1427,8 +1427,8 @@ PRIVATE>
 : CMGT  ( Rd Rn Rm shape -- ) 0 0b00110 simd-3-same ;
 : CMGE  ( Rd Rn Rm shape -- ) 0 0b00111 simd-3-same ;
 : SSHL  ( Rd Rn Rm shape -- ) 0 0b01000 simd-3-same ;
-: SMAXv ( Rd Rn Rm shape -- ) 0 0b01100 simd-3-same ;
-: SMINv ( Rd Rn Rm shape -- ) 0 0b01101 simd-3-same ;
+: SMAX  ( Rd Rn Rm shape -- ) 0 0b01100 simd-3-same ;
+: SMIN  ( Rd Rn Rm shape -- ) 0 0b01101 simd-3-same ;
 : SABD  ( Rd Rn Rm shape -- ) 0 0b01110 simd-3-same ;
 : ADDv  ( Rd Rn Rm shape -- ) 0 0b10000 simd-3-same ;
 : MLAv  ( Rd Rn Rm shape -- ) 0 0b10010 simd-3-same ;
@@ -1440,8 +1440,8 @@ PRIVATE>
 : CMHI  ( Rd Rn Rm shape -- ) 1 0b00110 simd-3-same ;
 : CMHS  ( Rd Rn Rm shape -- ) 1 0b00111 simd-3-same ;
 : USHL  ( Rd Rn Rm shape -- ) 1 0b01000 simd-3-same ;
-: UMAXv ( Rd Rn Rm shape -- ) 1 0b01100 simd-3-same ;
-: UMINv ( Rd Rn Rm shape -- ) 1 0b01101 simd-3-same ;
+: UMAX  ( Rd Rn Rm shape -- ) 1 0b01100 simd-3-same ;
+: UMIN  ( Rd Rn Rm shape -- ) 1 0b01101 simd-3-same ;
 : UABD  ( Rd Rn Rm shape -- ) 1 0b01110 simd-3-same ;
 : SUBv  ( Rd Rn Rm shape -- ) 1 0b10000 simd-3-same ;
 : CMEQ  ( Rd Rn Rm shape -- ) 1 0b10001 simd-3-same ;
