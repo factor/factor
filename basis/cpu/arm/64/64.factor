@@ -305,8 +305,8 @@ M: arm.64 %add-float [ >D ] tri@ FADDs ;
 M: arm.64 %sub-float [ >D ] tri@ FSUBs ;
 M: arm.64 %mul-float [ >D ] tri@ FMULs ;
 M: arm.64 %div-float [ >D ] tri@ FDIVs ;
-M: arm.64 %min-float [ >D ] tri@ FMINs ;
-M: arm.64 %max-float [ >D ] tri@ FMAXs ;
+M: arm.64 %min-float [ >D ] tri@ FMINNMs ;
+M: arm.64 %max-float [ >D ] tri@ FMAXNMs ;
 M: arm.64 %sqrt [ >D ] bi@ FSQRTs ;
 
 M: arm.64 %single>double-float [ >D ] [ >S ] bi* FCVT ;
@@ -424,8 +424,8 @@ M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
 M: arm.64 %mul-horizontal-add-vector [ MLAv ] [ FMLAv ] integer/float ;
 M: arm.64 %saturated-mul-vector 4drop not-implemented ;
 M: arm.64 %div-vector >shape FDIVv ;
-M: arm.64 %min-vector [ SMINv ] [ UMINv ] [ FMINv ] signed/unsigned/float ;
-M: arm.64 %max-vector [ SMAXv ] [ UMAXv ] [ FMAXv ] signed/unsigned/float ;
+M: arm.64 %min-vector [ SMINv ] [ UMINv ] [ FMINNMv ] signed/unsigned/float ;
+M: arm.64 %max-vector [ SMAXv ] [ UMAXv ] [ FMAXNMv ] signed/unsigned/float ;
 M: arm.64 %avg-vector [ SHADD ] [ UHADD ] signed/unsigned ;
 M: arm.64 %dot-vector [ SDOT ] [ UDOT ] signed/unsigned ;
 M: arm.64 %sad-vector [ [ SABD ] [ UABD ] signed/unsigned ] 4keep 2nip dupd >shape ADDV ;

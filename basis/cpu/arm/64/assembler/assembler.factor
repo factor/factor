@@ -1212,13 +1212,14 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: FMULs ( Rd Rn Rm -- ) 0 fp-data-processing-2-sources ;
-: FDIVs ( Rd Rn Rm -- ) 1 fp-data-processing-2-sources ;
-: FADDs ( Rd Rn Rm -- ) 2 fp-data-processing-2-sources ;
-: FSUBs ( Rd Rn Rm -- ) 3 fp-data-processing-2-sources ;
-: FMAXs ( Rd Rn Rm -- ) 4 fp-data-processing-2-sources ;
-: FMINs ( Rd Rn Rm -- ) 5 fp-data-processing-2-sources ;
-
+: FMULs   ( Rd Rn Rm -- ) 0 fp-data-processing-2-sources ;
+: FDIVs   ( Rd Rn Rm -- ) 1 fp-data-processing-2-sources ;
+: FADDs   ( Rd Rn Rm -- ) 2 fp-data-processing-2-sources ;
+: FSUBs   ( Rd Rn Rm -- ) 3 fp-data-processing-2-sources ;
+: FMAXs   ( Rd Rn Rm -- ) 4 fp-data-processing-2-sources ;
+: FMINs   ( Rd Rn Rm -- ) 5 fp-data-processing-2-sources ;
+: FMAXNMs ( Rd Rn Rm -- ) 6 fp-data-processing-2-sources ;
+: FMINNMs ( Rd Rn Rm -- ) 7 fp-data-processing-2-sources ;
 
 <PRIVATE
 : simd-table-lookup ( Rd Rn Rm op2 len op -- )
@@ -1482,17 +1483,17 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: FMLAv ( Rd Rn Rm shape -- ) 0 0 0b11001 simd-3-same* ;
-: FADDv ( Rd Rn Rm shape -- ) 0 0 0b11010 simd-3-same* ;
-: FCMEQ ( Rd Rn Rm shape -- ) 0 0 0b11100 simd-3-same* ;
-: FMAXv ( Rd Rn Rm shape -- ) 0 0 0b11110 simd-3-same* ;
-: FSUBv ( Rd Rn Rm shape -- ) 0 1 0b11010 simd-3-same* ;
-: FMINv ( Rd Rn Rm shape -- ) 0 1 0b11110 simd-3-same* ;
-: FADDP ( Rd Rn Rm shape -- ) 1 0 0b11010 simd-3-same* ;
-: FMULv ( Rd Rn Rm shape -- ) 1 0 0b11011 simd-3-same* ;
-: FCMGE ( Rd Rn Rm shape -- ) 1 0 0b11100 simd-3-same* ;
-: FDIVv ( Rd Rn Rm shape -- ) 1 0 0b11111 simd-3-same* ;
-: FCMGT ( Rd Rn Rm shape -- ) 1 1 0b11100 simd-3-same* ;
+: FMAXNMv ( Rd Rn Rm shape -- ) 0 0 0b11000 simd-3-same* ;
+: FMLAv   ( Rd Rn Rm shape -- ) 0 0 0b11001 simd-3-same* ;
+: FADDv   ( Rd Rn Rm shape -- ) 0 0 0b11010 simd-3-same* ;
+: FCMEQ   ( Rd Rn Rm shape -- ) 0 0 0b11100 simd-3-same* ;
+: FMINNMv ( Rd Rn Rm shape -- ) 0 1 0b11000 simd-3-same* ;
+: FSUBv   ( Rd Rn Rm shape -- ) 0 1 0b11010 simd-3-same* ;
+: FADDP   ( Rd Rn Rm shape -- ) 1 0 0b11010 simd-3-same* ;
+: FMULv   ( Rd Rn Rm shape -- ) 1 0 0b11011 simd-3-same* ;
+: FCMGE   ( Rd Rn Rm shape -- ) 1 0 0b11100 simd-3-same* ;
+: FDIVv   ( Rd Rn Rm shape -- ) 1 0 0b11111 simd-3-same* ;
+: FCMGT   ( Rd Rn Rm shape -- ) 1 1 0b11100 simd-3-same* ;
 
 <PRIVATE
 : simd-3-same** ( Rd Rn Rm shape U size -- )
