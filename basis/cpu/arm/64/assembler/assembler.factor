@@ -1101,7 +1101,7 @@ PRIVATE>
 
 : FMOVgen ( Rd Rn -- )
     2dup dup general-register?
-    [ [ swap ] when [ encode-width ] [ encode-width*** ] bi* ]
+    [ [ swap ] when [ encode-width ] [ encode-width*** ] bi* [ min ] keep ]
     [ 7 6 ? ] bi {
         { 0b11110 24 }
         { 0b1 21 }
