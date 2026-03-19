@@ -410,16 +410,63 @@ fn preCompileQuotationLiterals(vm: *FactorVM) void {
 pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( -- array )
-    // Returns an array describing all code blocks in the code heap
-    // Each code block contributes 6 elements to the result array:
-    //   owner, parameters, relocation, type, size, entry_point
+    // Returns an array describing all code blocks in the code heap.
+    // Each code block contributes 6 elements:
+    //   owner, parameters, relocation, type (fixnum), size (fixnum), entry_point
+    const code_heap = vm.code orelse {
+        vm.push(layouts.false_object);
+        return;
+    };
+    const alloc = code_heap.free_list orelse {
+        vm.push(layouts.false_object);
+        return;
+    };
 
-    // For stub: return an empty array placeholder
-    // Real implementation would:
-    // 1. Iterate through all code blocks
-    // 2. For each block, push: owner, parameters, relocation, type (fixnum), size (fixnum), entry_point
-    // 3. Convert vector to array and return
-    vm.push(layouts.false_object);
+    // First pass: count live code blocks
+    var count: Cell = 0;
+    {
+        var scan = alloc.start;
+        while (scan < alloc.end) {
+            const block: *const CodeBlock = @ptrFromInt(scan);
+            const block_size = block.size();
+            if (block_size == 0) break;
+            if (!block.isFree()) count += 1;
+            scan += block_size;
+        }
+    }
+
+    // Allocate array for 6 elements per block
+    const array_cell = vm.allotUninitializedArray(count * 6) orelse {
+        vm.memoryError();
+    };
+    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
+    const data = arr.data();
+
+    // Second pass: fill array
+    var idx: Cell = 0;
+    {
+        var scan = alloc.start;
+        while (scan < alloc.end) {
+            const block: *const CodeBlock = @ptrFromInt(scan);
+            const block_size = block.size();
+            if (block_size == 0) break;
+            if (!block.isFree()) {
+                data[idx + 0] = block.owner;
+                data[idx + 1] = block.parameters;
+                data[idx + 2] = block.relocation;
+                data[idx + 3] = layouts.tagFixnum(@intCast(@intFromEnum(block.blockType())));
+                data[idx + 4] = layouts.tagFixnum(@intCast(block_size));
+                // Entry point is always aligned to data_alignment (16 bytes),
+                // so its low bits are 0 = FIXNUM_TYPE tag. Store as-is.
+                const entry_point = block.entryPoint();
+                data[idx + 5] = entry_point;
+                idx += 6;
+            }
+            scan += block_size;
+        }
+    }
+
+    vm.push(array_cell);
 }
 
 pub export fn primitive_strip_stack_traces(_: *VMAssemblyFields) callconv(.c) void {

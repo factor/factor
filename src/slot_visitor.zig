@@ -185,7 +185,8 @@ pub const CopyingDestination = struct {
         return false;
     }
 
-    pub fn copy(self: *CopyingDestination, old_addr: Cell) Cell {
+    pub inline fn copy(self: *CopyingDestination, old_addr: Cell) Cell {
+        @setEvalBranchQuota(10000);
         const original_untagged = layouts.UNTAG(old_addr);
 
         // Only copy objects from the source generation
@@ -258,7 +259,7 @@ inline fn copySlot(slot: *Cell, destination: *CopyingDestination) void {
 // Trace an object's slots, copying children. Returns the object's size
 // so cheneyAlgorithm can avoid a redundant objectSizeFromHeader call.
 // All types are inlined directly to avoid callback indirection.
-pub fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestination) Cell {
+pub inline fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestination) Cell {
     const obj: *Object = @ptrFromInt(address);
     const obj_type = obj.getType();
 

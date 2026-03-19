@@ -1265,7 +1265,7 @@ pub const FactorVM = struct {
 
     // Check if nursery needs collection before allocating size bytes
     // Returns true if allocation can proceed, false if GC failed
-    pub fn ensureNurserySpace(self: *Self, size: Cell) bool {
+    pub inline fn ensureNurserySpace(self: *Self, size: Cell) bool {
         if (self.vm_asm.nursery.here + size <= self.vm_asm.nursery.end) {
             return true; // Space available
         }
