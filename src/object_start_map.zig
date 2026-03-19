@@ -25,7 +25,8 @@ pub const ObjectStartMap = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
-        const card_count = (size + vm.card_size - 1) / vm.card_size;
+        const start_offset = start & (vm.card_size - 1);
+        const card_count = (start_offset + size + vm.card_size - 1) / vm.card_size;
         const entries = try allocator.alloc(u8, card_count);
 
         // Initialize all entries to invalid
@@ -227,7 +228,8 @@ pub const CardTable = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
-        const card_count = (size + vm.card_size - 1) / vm.card_size;
+        const start_offset = start & (vm.card_size - 1);
+        const card_count = (start_offset + size + vm.card_size - 1) / vm.card_size;
         const cards = try allocator.alloc(u8, card_count);
         @memset(cards, 0);
 
@@ -281,7 +283,8 @@ pub const DeckTable = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
-        const deck_count = (size + vm.deck_size - 1) / vm.deck_size;
+        const start_offset = start & (vm.deck_size - 1);
+        const deck_count = (start_offset + size + vm.deck_size - 1) / vm.deck_size;
         const decks = try allocator.alloc(u8, deck_count);
         @memset(decks, 0);
 

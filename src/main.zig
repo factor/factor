@@ -297,7 +297,7 @@ pub fn main(init: std.process.Init) !void {
     c_api.global_io_initialized = true;
 
     // Collect command line arguments into a slice
-    var args_list: std.ArrayList([:0]const u8) = .{};
+    var args_list: std.ArrayList([:0]const u8) = .empty;
     defer args_list.deinit(allocator);
     var args_iter = init.minimal.args.iterate();
     while (args_iter.next()) |arg| {

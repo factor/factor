@@ -125,8 +125,8 @@ pub const CodeHeapRememberedSets = struct {
     // Replaces full bitset scans (750KB+ for 96MB code heap) with
     // compact sequential reads. Stale entries from removeCodeBlock
     // are filtered by isFree() during iteration.
-    nursery_dirty_blocks: std.ArrayListUnmanaged(usize) = .{},
-    aging_dirty_blocks: std.ArrayListUnmanaged(usize) = .{},
+    nursery_dirty_blocks: std.ArrayListUnmanaged(usize) = .empty,
+    aging_dirty_blocks: std.ArrayListUnmanaged(usize) = .empty,
 
     allocator: std.mem.Allocator,
 

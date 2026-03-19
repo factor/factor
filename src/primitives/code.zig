@@ -333,7 +333,7 @@ fn preCompileQuotationLiterals(vm: *FactorVM) void {
 
     // Collect uncompiled quotation literals first (can't compile while iterating
     // uninitialized_blocks because compilation may trigger GC/compaction).
-    var to_compile = std.ArrayListUnmanaged(Cell){};
+    var to_compile: std.ArrayListUnmanaged(Cell) = .empty;
     defer to_compile.deinit(vm.allocator);
 
     var iter = code_heap.uninitialized_blocks.iterator();

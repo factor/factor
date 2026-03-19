@@ -26,15 +26,15 @@ pub const Segment = struct {
     alloc_size: Cell,
 
     // Extra low guard pages for callstack segments. Unlocked during GC to provide
-    // stack headroom. Debug builds need more due to large stack frames; release builds
-    // still need extra because std.mem.sort uses ~8KB of stack-allocated buffers.
-    pub const low_guard_pages: usize = if (builtin.mode == .Debug) 16 else 4;
+    // stack headroom. The Zig debug build uses substantially more native stack
+    // in GC than the C++ VM, so it needs a wider emergency margin.
+    pub const low_guard_pages: usize = 64;
 
     // Conservative estimate of max stack usage during GC.
     // Used to decide whether guard page unlock is needed before GC.
     // Debug: large frames (~2.5KB each) × ~20 deep + sort buffer (~8KB) ≈ 60KB
     // Release: small frames (~200B each) × ~20 deep + sort buffer (~8KB) ≈ 12KB
-    pub const gc_stack_headroom: usize = if (builtin.mode == .Debug) 65536 else 16384;
+    pub const gc_stack_headroom: usize = 65536;
 
     // Initialize with optional executable flag
     // Matches C++ segment::segment() in os-unix.cpp

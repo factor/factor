@@ -362,8 +362,8 @@ pub const ImageLoader = struct {
         // Re-initialize the tenured free list allocator to account for occupied image data.
         // DataHeap.init() created one big free block covering all of tenured.
         // We need the first data_size bytes to be occupied, with a free block after.
-        heap.tenured.free_list.deinit(); // Free the ArrayLists from the initial (wrong) allocator
-        heap.tenured.free_list = free_list.FreeListAllocator.initForImageLoad(
+        heap.tenured.free_list.deinit(); // Discard initial free list (entire space was free)
+        heap.tenured.free_list.* = free_list.FreeListAllocator.initForImageLoad(
             self.vm.allocator,
             tenured_start,
             heap.tenured.size,
@@ -985,14 +985,14 @@ pub const ImageLoader = struct {
                 .end = code.code_start + total_heap_size,
                 .size = total_heap_size,
                 .small_blocks = undefined,
-                .large_blocks = .{},
+                .large_blocks = .empty,
                 .free_block_count = 0,
                 .free_space = 0,
                 .non_empty_mask = 0,
                 .allocator = self.vm.allocator,
             };
             for (&alloc_ptr.small_blocks) |*bucket| {
-                bucket.* = .{};
+                bucket.* = .empty;
             }
             // Store in code heap
             code.free_list = alloc_ptr;

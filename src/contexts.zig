@@ -13,7 +13,7 @@ const VMError = signals.VMError;
 // Stack reserved space for overflow handling
 // When the callstack fills up, we chop off this many bytes to have space to work with
 // macOS 64 bit needs more than 8192. See issue #1419.
-pub const stack_reserved: Cell = if (builtin.mode == .Debug) 32768 else 16384;
+pub const stack_reserved: Cell = 16384;
 
 // Architecture-specific constants for frame layout
 // On x86-64: return address is at offset 0 in the frame
@@ -151,14 +151,10 @@ pub const Context = extern struct {
 
     // Stack operations - used by primitives
     pub inline fn peek(self: *const Self) Cell {
-        std.debug.assert(self.datastack % @sizeOf(Cell) == 0);
-        std.debug.assert(self.datastackDepth() > 0);
         return @as(*Cell, @ptrFromInt(self.datastack)).*;
     }
 
     pub inline fn replace(self: *Self, tagged: Cell) void {
-        std.debug.assert(self.datastack % @sizeOf(Cell) == 0);
-        std.debug.assert(self.datastackDepth() > 0);
         @as(*Cell, @ptrFromInt(self.datastack)).* = tagged;
     }
 
@@ -229,8 +225,13 @@ pub const Context = extern struct {
         // C++ checks: datastack + sizeof(cell) < datastack_seg->start ||
         //             datastack + stack_reserved >= datastack_seg->end
         if (self.datastack_seg) |seg| {
-            if ((self.datastack + @sizeOf(Cell) < seg.start) or
-                (self.datastack + stack_reserved >= seg.end))
+            std.debug.assert(self.datastack <= std.math.maxInt(Cell) - @sizeOf(Cell));
+            std.debug.assert(self.datastack <= std.math.maxInt(Cell) - stack_reserved);
+            const datastack_min = self.datastack + @sizeOf(Cell);
+            const datastack_res = self.datastack + stack_reserved;
+
+            if ((datastack_min < seg.start) or
+                (datastack_res >= seg.end))
             {
                 self.resetDatastack();
             }
@@ -239,8 +240,13 @@ pub const Context = extern struct {
         // C++ checks: retainstack + sizeof(cell) < retainstack_seg->start ||
         //             retainstack + stack_reserved >= retainstack_seg->end
         if (self.retainstack_seg) |seg| {
-            if ((self.retainstack + @sizeOf(Cell) < seg.start) or
-                (self.retainstack + stack_reserved >= seg.end))
+            std.debug.assert(self.retainstack <= std.math.maxInt(Cell) - @sizeOf(Cell));
+            std.debug.assert(self.retainstack <= std.math.maxInt(Cell) - stack_reserved);
+            const retainstack_min = self.retainstack + @sizeOf(Cell);
+            const retainstack_res = self.retainstack + stack_reserved;
+
+            if ((retainstack_min < seg.start) or
+                (retainstack_res >= seg.end))
             {
                 self.resetRetainstack();
             }

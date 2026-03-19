@@ -90,7 +90,6 @@ pub inline fn isImmediate(obj: Cell) bool {
 
 // Fixnum operations
 pub inline fn untagFixnum(tagged: Cell) Fixnum {
-    std.debug.assert(hasTag(tagged, .fixnum));
     return @as(Fixnum, @bitCast(tagged)) >> @intCast(tag_bits);
 }
 
@@ -104,9 +103,7 @@ pub inline fn untagFixnumUnsigned(tagged: Cell) Cell {
 }
 
 // Fast variant of untagFixnumUnsigned for hot paths outside GC.
-// Debug-asserts the tag instead of a runtime branch.
 pub inline fn untagFixnumFast(tagged: Cell) Cell {
-    std.debug.assert(hasTag(tagged, .fixnum));
     return @bitCast(@as(Fixnum, @bitCast(tagged)) >> @intCast(tag_bits));
 }
 

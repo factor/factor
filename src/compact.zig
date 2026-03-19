@@ -19,7 +19,6 @@ const sweep_mod = @import("sweep.zig");
 const layouts = @import("layouts.zig");
 const mark_bits = @import("mark_bits.zig");
 const spill_slots = @import("spill_slots.zig");
-const callstack_lookup = @import("callstack_lookup.zig");
 const trampolines = @import("trampolines.zig");
 const vm_mod = @import("vm.zig");
 
@@ -159,7 +158,8 @@ fn resetFreeListForCompaction(free_list: *free_list_mod.FreeListAllocator, free_
 
 fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
     const code_heap = gc.vm.code orelse return;
-    var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
+    const blocks = code_heap.all_blocks_sorted.items;
+    if (blocks.len == 0) return;
 
     var top = ctx.callstack_top;
     const bottom = ctx.callstack_bottom;
@@ -172,21 +172,21 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            top += LEAF_FRAME_SIZE;
-            continue;
-        };
-
-        const block_end = @intFromPtr(owner) + owner.size();
-        if (addr >= block_end) {
+        // Binary search all_blocks_sorted (old addresses)
+        const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
+        if (ub == 0) {
             top += LEAF_FRAME_SIZE;
             continue;
         }
+        const old_block_addr = blocks[ub - 1];
 
-        const entry_point = owner.entryPoint();
-        const delta = if (addr > entry_point) addr - entry_point else 0;
-        const compiled_addr = fixup.translateCode(@intFromPtr(owner));
-        const compiled: *const code_blocks.CodeBlock = @ptrFromInt(compiled_addr);
+        // Get new block address via forwarding map; read from NEW address
+        const new_block_addr = fixup.translateCode(old_block_addr);
+        const compiled: *const code_blocks.CodeBlock = @ptrFromInt(new_block_addr);
+
+        // Compute offset using old entry point (arithmetic only)
+        const old_entry_point = old_block_addr + @sizeOf(code_blocks.CodeBlock);
+        const delta = if (addr > old_entry_point) addr - old_entry_point else 0;
         const natural_frame_size = compiled.stackFrameSize();
         var frame_size: Cell = LEAF_FRAME_SIZE;
         if (natural_frame_size > 0 and delta > 0) {
@@ -194,8 +194,8 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
         }
 
         if (compiled.blockGcInfo()) |gc_info| {
-            const return_address_offset: u32 = @intCast(owner.offset(addr));
-            if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
+            const return_address_offset: u32 = @intCast(delta);
+            if (gc_info.returnAddressIndex(return_address_offset)) |callsite| {
                 const stack_pointer: [*]Cell = @ptrFromInt(top);
                 const Visit = struct {
                     fn slot(slot_ptr: *Cell, fx: *CompactionFixup) void {
@@ -212,7 +212,8 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
 
 fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *CompactionFixup) void {
     const code_heap = gc.vm.code orelse return;
-    var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
+    const blocks = code_heap.all_blocks_sorted.items;
+    if (blocks.len == 0) return;
     const frame_length = layouts.untagFixnumUnsigned(stack.length);
     if (frame_length == 0) return;
 
@@ -225,17 +226,24 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
+        const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
+        if (ub == 0) {
             frame_offset += LEAF_FRAME_SIZE;
             continue;
-        };
+        }
+        const old_block_addr = blocks[ub - 1];
 
-        const compiled_addr = fixup.translateCode(@intFromPtr(owner));
+        // During data compaction, code hasn't moved yet, so read from old address
+        const old_block: *const code_blocks.CodeBlock = @ptrFromInt(old_block_addr);
+
+        // Get compiled block (may be at new address if code forwarding is active)
+        const compiled_addr = fixup.translateCode(old_block_addr);
         const compiled: *const code_blocks.CodeBlock = @ptrFromInt(compiled_addr);
 
         if (compiled.blockGcInfo()) |gc_info| {
-            const return_address_offset: u32 = @intCast(owner.offset(addr));
-            if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
+            const old_entry_point = old_block.entryPoint();
+            const return_address_offset: u32 = @intCast(if (addr >= old_entry_point) addr - old_entry_point else 0);
+            if (gc_info.returnAddressIndex(return_address_offset)) |callsite| {
                 const stack_pointer: [*]Cell = @ptrFromInt(frame_top);
                 const Visit = struct {
                     fn slot(slot_ptr: *Cell, fx: *CompactionFixup) void {
@@ -246,8 +254,8 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
             }
         }
 
-        const entry_point = owner.entryPoint();
-        const delta = if (addr > entry_point) addr - entry_point else 0;
+        const old_entry_point2 = old_block.entryPoint();
+        const delta = if (addr > old_entry_point2) addr - old_entry_point2 else 0;
         const natural_frame_size = compiled.stackFrameSize();
         var frame_size: Cell = LEAF_FRAME_SIZE;
         if (natural_frame_size > 0 and delta > 0) {
@@ -259,7 +267,9 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
 
 fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
     const code_heap = gc.vm.code orelse return;
-    var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
+    // Use all_blocks_sorted which still has OLD addresses at this point
+    const blocks = code_heap.all_blocks_sorted.items;
+    if (blocks.len == 0) return;
 
     var top = ctx.callstack_top;
     const bottom = ctx.callstack_bottom;
@@ -272,23 +282,33 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
+        // Binary search all_blocks_sorted (old addresses) to find the owner
+        const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
+        if (ub == 0) {
             top += LEAF_FRAME_SIZE;
             continue;
-        };
+        }
+        const old_block_addr = blocks[ub - 1];
 
-        const entry_point = owner.entryPoint();
-        const delta = if (addr > entry_point) addr - entry_point else 0;
-        const new_block_addr = fixup.fixupCode(@intFromPtr(owner));
+        // Use forwarding map to get the new block address
+        const new_block_addr = fixup.translateCode(old_block_addr);
         const new_block: *const code_blocks.CodeBlock = @ptrFromInt(new_block_addr);
+
+        const old_entry_point = old_block_addr + @sizeOf(code_blocks.CodeBlock);
+        const offset = if (addr > old_entry_point) addr - old_entry_point else 0;
+
+        // Get frame size from the NEW block (which has valid data)
         const natural_frame_size = new_block.stackFrameSize();
+        const delta = if (addr > old_entry_point) addr - old_entry_point else 0;
         var frame_size: Cell = LEAF_FRAME_SIZE;
         if (natural_frame_size > 0 and delta > 0) {
             frame_size = natural_frame_size;
         }
 
-        const offset = owner.offset(addr);
-        addr_ptr.* = new_block.entryPoint() + offset;
+        // Update return address to point into the new block
+        const new_addr = new_block.entryPoint() + offset;
+
+        addr_ptr.* = new_addr;
 
         top += frame_size;
     }
@@ -296,7 +316,8 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
 
 fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup: *CompactionFixup) void {
     const code_heap = gc.vm.code orelse return;
-    var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
+    const blocks = code_heap.all_blocks_sorted.items;
+    if (blocks.len == 0) return;
     const frame_length = layouts.untagFixnumUnsigned(stack.length);
     if (frame_length == 0) return;
 
@@ -309,19 +330,27 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
+        const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
+        if (ub == 0) {
             frame_offset += LEAF_FRAME_SIZE;
             continue;
-        };
+        }
+        const old_block_addr = blocks[ub - 1];
 
-        const new_block_addr = fixup.fixupCode(@intFromPtr(owner));
-        const new_block: *const code_blocks.CodeBlock = @ptrFromInt(new_block_addr);
-        const offset = owner.offset(addr);
-        addr_ptr.* = new_block.entryPoint() + offset;
+        // Use fixupCode (forwarding map) — works even before code is physically moved
+        const new_block_addr = fixup.fixupCode(old_block_addr);
 
-        const entry_point = owner.entryPoint();
-        const delta = if (addr > entry_point) addr - entry_point else 0;
-        const natural_frame_size = new_block.stackFrameSize();
+        // Read frame size from OLD block (still valid at this point —
+        // called during data compaction before code blocks move)
+        const old_block: *const code_blocks.CodeBlock = @ptrFromInt(old_block_addr);
+        const old_entry_point = old_block.entryPoint();
+        const offset = if (addr >= old_entry_point) addr - old_entry_point else 0;
+        // Compute new return address arithmetically (don't read from new_block_addr)
+        const new_entry_point = new_block_addr + @sizeOf(code_blocks.CodeBlock);
+        addr_ptr.* = new_entry_point + offset;
+
+        const delta = offset;
+        const natural_frame_size = old_block.stackFrameSize();
         var frame_size: Cell = LEAF_FRAME_SIZE;
         if (natural_frame_size > 0 and delta > 0) {
             frame_size = natural_frame_size;
@@ -406,13 +435,19 @@ fn fixupObjectCodePointers(gc: *GC, addr: Cell, fixup: *CompactionFixup) void {
         .word => {
             const word: *layouts.Word = @ptrFromInt(addr);
             if (word.entry_point != 0) {
-                word.entry_point = fixup.fixupCode(word.entry_point);
+                // entry_point = code_block_addr + sizeof(CodeBlock)
+                // Forward the code_block address, then recompute entry_point
+                const code_block_addr = word.entry_point - @sizeOf(code_blocks.CodeBlock);
+                const new_code_addr = fixup.fixupCode(code_block_addr);
+                word.entry_point = new_code_addr + @sizeOf(code_blocks.CodeBlock);
             }
         },
         .quotation => {
             const quot: *layouts.Quotation = @ptrFromInt(addr);
             if (quot.entry_point != 0) {
-                quot.entry_point = fixup.fixupCode(quot.entry_point);
+                const code_block_addr = quot.entry_point - @sizeOf(code_blocks.CodeBlock);
+                const new_code_addr = fixup.fixupCode(code_block_addr);
+                quot.entry_point = new_code_addr + @sizeOf(code_blocks.CodeBlock);
             }
         },
         .callstack => {
@@ -495,7 +530,6 @@ fn updateInstructionOperandsForCompaction(gc: *GC, block: *code_blocks.CodeBlock
     const reloc_count = reloc_cap / @sizeOf(code_blocks.RelocationEntry);
 
     var param_index: Cell = 0;
-    var modified = false;
 
     for (0..reloc_count) |i| {
         const entry_ptr: *const code_blocks.RelocationEntry = @ptrCast(@alignCast(reloc_data + i * @sizeOf(code_blocks.RelocationEntry)));
@@ -528,15 +562,15 @@ fn updateInstructionOperandsForCompaction(gc: *GC, block: *code_blocks.CodeBlock
             else => computeExternalRelocationValue(gc, block, rel_type, param_index),
         };
 
-        if (new_value != old_value) {
-            op.storeValue(@bitCast(new_value));
-            modified = true;
-        }
+        // Always store: even if the absolute target didn't change, relative
+        // encodings must be re-written because the instruction moved.
+        // C++ always stores unconditionally.
+        op.storeValue(@bitCast(new_value));
 
         param_index += entry_ptr.numberOfParameters();
     }
 
-    return modified;
+    return true;
 }
 
 fn updateUninitializedBlocksForCompaction(gc: *GC, fixup: *CompactionFixup) void {
@@ -606,6 +640,16 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
         .code_finger = &code_finger,
     };
 
+    // Flush any pending code block addresses into the sorted list.
+    // fixupCallstackSlots / fixupCallstackReturnAddresses binary-search
+    // all_blocks_sorted directly (not codeBlockForAddress which also
+    // checks pending_blocks).  Without this flush, recently-compiled
+    // blocks would be missed, causing wrong block lookups and corrupt
+    // return addresses.
+    if (gc.vm.code) |code| {
+        code.flushPending();
+    }
+
     // Update uninitialized block map before moving code blocks
     if (compact_code_heap) {
         updateUninitializedBlocksForCompaction(gc, &fixup);
@@ -644,7 +688,7 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
     }
 
     // Rebuild free list with a single block at the end
-    resetFreeListForCompaction(&tenured.free_list, data_dest, tenured.end);
+    resetFreeListForCompaction(tenured.free_list, data_dest, tenured.end);
 
     // Compact code heap if present
     if (gc.vm.code) |code| {
@@ -821,6 +865,9 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
     if (gc.vm.code) |code| {
         if (compact_code_heap) {
             code.initializeAllBlocksSet() catch @panic("OOM");
+            // scan_literals/scan_code_ptrs are indexed by block address.
+            // After code compaction they must be rebuilt for the new layout.
+            code.rebuildScanFlags(gc.allocator);
         }
         code.clearRememberedSets();
     }

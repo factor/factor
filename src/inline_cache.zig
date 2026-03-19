@@ -151,14 +151,12 @@ pub const InlineCacheJit = struct {
 
 // Handle inline cache miss
 pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
-    // Protect return address across GC/compaction
     var return_root = vm_mod.CodeRoot.init(return_address, vm);
     return_root.register();
     defer return_root.deinit();
 
-    const tail_call_p = CallSitePatcher.isTailCallSite(return_root.value);
-
     const ctx = vm.vm_asm.ctx;
+    const tail_call_p = CallSitePatcher.isTailCallSite(return_root.value);
 
     // Pop parameters from the data stack (pushed by the miss handler in JIT code)
     var cache_entries = ctx.pop();
@@ -187,6 +185,7 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
     var obj: Cell = @as(*const Cell, @ptrFromInt(obj_addr)).*;
     vm.data_roots.appendAssumeCapacity(&obj);
     defer _ = vm.data_roots.pop();
+
 
     // Determine current PIC size
     var pic_size: Cell = 0;
@@ -241,6 +240,7 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
 
     return xt;
 }
+
 
 fn updatePicTransitions(vm: *FactorVM, pic_size: Cell) void {
     if (pic_size == vm.max_pic_size) {

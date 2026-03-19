@@ -93,28 +93,36 @@ pub const AgingSpace = struct {
 
 // Tenured space - free-list allocator with mark bits
 pub const TenuredSpace = struct {
+    // Hot fields first: accessed together in the GC marking fast path
     start: Cell,
     end: Cell,
-    size: Cell,
-    free_list: free_list.FreeListAllocator,
     marks: mark_bits.MarkBits,
+    // Cold fields: free_list is large (~1KB inline), keep it behind a pointer
+    // so marks stays on the same cache line as start/end.
+    size: Cell,
+    free_list: *free_list.FreeListAllocator,
     object_start: object_start_map.ObjectStartMap,
+    allocator: std.mem.Allocator,
 
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
+        const fl = try allocator.create(free_list.FreeListAllocator);
+        fl.* = free_list.FreeListAllocator.init(allocator, start, size);
         return Self{
             .start = start,
             .end = start + size,
-            .size = size,
-            .free_list = free_list.FreeListAllocator.init(allocator, start, size),
             .marks = try mark_bits.MarkBits.init(allocator, start, size),
+            .size = size,
+            .free_list = fl,
             .object_start = try object_start_map.ObjectStartMap.init(allocator, start, size),
+            .allocator = allocator,
         };
     }
 
     pub fn deinit(self: *Self) void {
         self.free_list.deinit();
+        self.allocator.destroy(self.free_list);
         self.marks.deinit();
         self.object_start.deinit();
     }
@@ -192,27 +200,36 @@ pub const DataHeap = struct {
         const self = try allocator.create(Self);
         errdefer allocator.destroy(self);
 
-        // Align generation sizes up to card_size so adjacent generations never
-        // share a card. Without this, a boundary card is processed by both the
-        // tenured and aging card scans: the tenured scan clears the nursery bit
-        // (unmask=0x80) leaving 0x40, then the aging scan skips the card
-        // (mask=0x80 doesn't match 0x40), leaving stale nursery pointers.
-        const card_align = @as(Cell, vm.card_size);
-        const tenured_sz = (tenured_size + card_align - 1) & ~(card_align - 1);
-        const aging_sz = (aging_size + card_align - 1) & ~(card_align - 1);
+        // Align generation sizes up to deck_size like C++:
+        // - prevents boundary card/deck races in GC scanning
+        // - ensures generation boundaries map cleanly onto card/deck tables
+        const heap_align = @as(Cell, vm.deck_size);
+        const tenured_sz = (tenured_size + heap_align - 1) & ~(heap_align - 1);
+        const aging_sz = (aging_size + heap_align - 1) & ~(heap_align - 1);
+        const young_sz = (young_size + heap_align - 1) & ~(heap_align - 1);
 
-        // Calculate total size
-        const total_size = young_size + aging_sz * 2 + tenured_sz;
+        // Allocate one extra deck of slack, matching vm/data_heap.cpp.
+        const total_size = young_sz + aging_sz * 2 + tenured_sz + vm.deck_size;
 
         // Allocate the segment
         self.segment = try segments.Segment.init(total_size, false);
         errdefer self.segment.deinit();
 
+        // C++ aligns the heap base to deck_size, but keeps the underlying segment
+        // pointer unchanged. We preserve the same observable layout by shifting the
+        // in-heap start/end forward while leaving the total mapped bytes untouched.
+        const aligned_heap_start = layouts.alignCell(self.segment.start, vm.deck_size);
+        const aligned_offset = aligned_heap_start - self.segment.start;
+        std.debug.assert(aligned_offset <= self.segment.size);
+        self.segment.size -= aligned_offset;
+        self.segment.start = aligned_heap_start;
+        self.segment.end = aligned_heap_start + self.segment.size;
+
         // Layout: [tenured][aging][aging_semispace][nursery]
         const tenured_start = self.segment.start;
         const aging_start = tenured_start + tenured_sz;
         const aging_semi_start = aging_start + aging_sz;
-        const nursery_start = layouts.alignCell(aging_semi_start + aging_sz, layouts.data_alignment);
+        const nursery_start = aging_semi_start + aging_sz;
 
         // Initialize spaces (using aligned sizes)
         self.tenured = try TenuredSpace.init(allocator, tenured_start, tenured_sz);
@@ -225,8 +242,8 @@ pub const DataHeap = struct {
         self.nursery = bump_allocator.BumpAllocator{
             .start = nursery_start,
             .here = nursery_start,
-            .end = nursery_start + young_size,
-            .size = young_size,
+            .end = nursery_start + young_sz,
+            .size = young_sz,
         };
 
         // Initialize card/deck tables for entire heap
@@ -237,7 +254,7 @@ pub const DataHeap = struct {
         self.decks = try object_start_map.DeckTable.init(allocator, self.segment.start, self.segment.size);
         errdefer self.decks.deinit();
 
-        self.young_size = young_size;
+        self.young_size = young_sz;
         self.aging_size = aging_sz;
         self.tenured_size = tenured_sz;
         self.nursery_collections = 0;

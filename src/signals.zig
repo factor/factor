@@ -580,10 +580,19 @@ pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell)
         fatalError("Signal without code heap", 0);
     };
 
+    if (code_heap.code_size != 0) {
+        std.debug.assert(code_heap.code_size <= std.math.maxInt(Cell) - code_heap.code_start);
+    }
+    const code_heap_end = code_heap.code_start + code_heap.code_size;
+
     // Check if we're in Factor code and have a valid stack
-    const in_code_seg = code_heap.code_start <= pc.* and
-        pc.* < (code_heap.code_start + code_heap.code_size);
+    const in_code_seg = code_heap.code_start != 0 and code_heap.code_size != 0 and
+        code_heap.code_start <= pc.* and
+        pc.* < code_heap_end;
+
+    std.debug.assert(ctx.callstack_seg.?.start <= std.math.maxInt(Cell) - contexts.stack_reserved);
     const cs_limit = ctx.callstack_seg.?.start + contexts.stack_reserved;
+
     vm.signal_resumable = in_code_seg and sp.* >= cs_limit;
 
     if (vm.signal_resumable) {
@@ -620,6 +629,8 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
     } else {
         fatalError("Invalid stack alignment in signal", offset);
     }
+
+    std.debug.assert(sp.* >= delta);
 
     const new_sp = sp.* - delta;
     sp.* = new_sp;
@@ -664,7 +675,9 @@ fn dispatchNonResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handle
         const fault_pc = vm.signal_fault_pc;
         if (code_heap.codeBlockForAddress(fault_pc)) |block| {
             const frame_size = block.stackFrameSizeForAddress(fault_pc);
-            frame_top += frame_size;
+            std.debug.assert(frame_size <= std.math.maxInt(Cell) - frame_top);
+            const frame_top_next = frame_top + frame_size;
+            frame_top = frame_top_next;
         }
     }
 

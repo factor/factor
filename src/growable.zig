@@ -55,6 +55,7 @@ pub const GrowableArray = struct {
         var elt_root = elt;
         self.vm.data_roots.append(self.vm.allocator, &elt_root) catch return false;
         defer _ = self.vm.data_roots.pop();
+        std.debug.assert(self.count <= self.capacity());
 
         if (self.count == self.capacity()) {
             if (!self.reallotArray(2 * self.count)) {
@@ -187,7 +188,7 @@ pub const GrowableByteArray = struct {
         }
 
         // Root old elements so GC can update self.elements if it moves
-        self.vm.data_roots.append(self.vm.allocator, &self.elements) catch return false;
+        self.vm.data_roots.append(self.vm.allocator, &self.elements) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         // Allocate new byte array - may trigger GC, moving self.elements

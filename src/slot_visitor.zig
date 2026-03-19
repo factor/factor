@@ -378,7 +378,8 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddress(addr) orelse {
+        // Match C++ visit_callstack_object/code_block_for_address semantics.
+        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             frame_offset += LEAF_FRAME_SIZE;
             continue;
         };

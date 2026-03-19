@@ -18,22 +18,6 @@ const Cell = layouts.Cell;
 const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 
-fn removeRoot(vm: *FactorVM, target: *Cell) void {
-    // Roots are pushed in order; the target should be at the end.
-    // Pop from the end (O(1)) instead of linear search + orderedRemove (O(n)).
-    if (vm.data_roots.items.len > 0 and vm.data_roots.items[vm.data_roots.items.len - 1] == target) {
-        _ = vm.data_roots.pop();
-        return;
-    }
-    // Fallback: linear search for out-of-order removal
-    for (vm.data_roots.items, 0..) |root, idx| {
-        if (root == target) {
-            _ = vm.data_roots.orderedRemove(idx);
-            return;
-        }
-    }
-}
-
 // JIT template indices (stored in special_objects)
 pub const JitTemplate = enum(u32) {
     // Basic templates
@@ -124,8 +108,8 @@ pub const LabelManager = struct {
 
     pub fn init(allocator: std.mem.Allocator) Self {
         return .{
-            .labels = .{},
-            .forward_refs = .{},
+            .labels = .empty,
+            .forward_refs = .empty,
             .allocator = allocator,
         };
     }
@@ -305,8 +289,8 @@ pub const Jit = struct {
         return Self{
             .vm = vm,
             .owner = owner,
-            .code = .{},
-            .relocation = .{},
+            .code = .empty,
+            .relocation = .empty,
             .parameters = parameters,
             .literals = literals,
             .label_manager = LabelManager.init(vm.allocator),
@@ -327,9 +311,10 @@ pub const Jit = struct {
 
     pub fn deinit(self: *Self) void {
         // Unregister roots (matches C++ data_root<T> destructors)
-        removeRoot(self.vm, &self.owner);
-        removeRoot(self.vm, &self.literals.elements);
-        removeRoot(self.vm, &self.parameters.elements);
+        // Must pop in strict reverse push order to preserve root-stack LIFO.
+        _ = self.vm.data_roots.pop();
+        _ = self.vm.data_roots.pop();
+        _ = self.vm.data_roots.pop();
 
         self.code.deinit(self.vm.allocator);
         self.relocation.deinit(self.vm.allocator);
@@ -358,7 +343,7 @@ pub const Jit = struct {
     // Emit a template by enum (append its relocation info and machine code)
     pub fn emit(self: *Self, template: JitTemplate) !void {
         var template_cell = self.vm.vm_asm.special_objects[@intFromEnum(template)];
-        try self.vm.data_roots.append(self.vm.allocator, &template_cell);
+        self.vm.data_roots.append(self.vm.allocator, &template_cell) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         if (getArrayFromCell(template_cell) == null) return;
@@ -374,7 +359,7 @@ pub const Jit = struct {
     // Emit a template cell (2-element array: { relocation-info, machine-code })
     fn emitTemplateCell(self: *Self, template_cell_: Cell) !void {
         var template_cell = template_cell_;
-        try self.vm.data_roots.append(self.vm.allocator, &template_cell);
+        self.vm.data_roots.append(self.vm.allocator, &template_cell) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         const tmpl = getArrayFromCell(template_cell) orelse return;
@@ -419,7 +404,7 @@ pub const Jit = struct {
     pub fn emitWithLiteral(self: *Self, template: JitTemplate, lit: Cell) !void {
         // Protect literal from GC during allocation (matches C++ data_root<object> argument)
         var lit_copy = lit;
-        try self.vm.data_roots.append(self.vm.allocator, &lit_copy);
+        self.vm.data_roots.append(self.vm.allocator, &lit_copy) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         try self.literal(lit_copy);
@@ -430,7 +415,7 @@ pub const Jit = struct {
     pub fn emitWithParameter(self: *Self, template: JitTemplate, param: Cell) !void {
         // Protect parameter from GC during allocation (matches C++ data_root<object> argument)
         var param_copy = param;
-        try self.vm.data_roots.append(self.vm.allocator, &param_copy);
+        self.vm.data_roots.append(self.vm.allocator, &param_copy) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         try self.parameter(param_copy);
@@ -460,7 +445,7 @@ pub const Jit = struct {
     // Append values from a Factor array to parameters
     pub fn appendParameters(self: *Self, arr_cell: Cell) !void {
         var root = arr_cell;
-        try self.vm.data_roots.append(self.vm.allocator, &root);
+        self.vm.data_roots.append(self.vm.allocator, &root) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         if (root == layouts.false_object) return;
@@ -473,7 +458,7 @@ pub const Jit = struct {
     // Append values from a Factor array to literals
     pub fn appendLiterals(self: *Self, arr_cell: Cell) !void {
         var root = arr_cell;
-        try self.vm.data_roots.append(self.vm.allocator, &root);
+        self.vm.data_roots.append(self.vm.allocator, &root) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         if (root == layouts.false_object) return;
@@ -494,7 +479,7 @@ pub const Jit = struct {
     pub fn emitSubprimitive(self: *Self, word_cell: Cell, tail_call_p: bool, stack_frame_p: bool) !bool {
         // Root the word (matches C++ data_root<word>)
         var word_root = word_cell;
-        try self.vm.data_roots.append(self.vm.allocator, &word_root);
+        self.vm.data_roots.append(self.vm.allocator, &word_root) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         std.debug.assert(layouts.hasTag(word_root, .word));
@@ -502,7 +487,7 @@ pub const Jit = struct {
 
         // Root the subprimitive template array (matches C++ data_root<array>)
         var subprim_root = word.subprimitive;
-        try self.vm.data_roots.append(self.vm.allocator, &subprim_root);
+        self.vm.data_roots.append(self.vm.allocator, &subprim_root) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         if (subprim_root == layouts.false_object) return false;
@@ -801,7 +786,7 @@ pub const Jit = struct {
             @memcpy(reloc_ba.data()[0..self.relocation.items.len], self.relocation.items);
         }
         // Root reloc_cell to protect from GC during subsequent allocations
-        try self.vm.data_roots.append(self.vm.allocator, &reloc_cell);
+        self.vm.data_roots.append(self.vm.allocator, &reloc_cell) catch @panic("OOM");
         defer _ = self.vm.data_roots.pop();
 
         const params_cell = self.parameters.toArray();
@@ -870,7 +855,7 @@ pub const QuotationJit = struct {
     }
 
     pub fn deinit(self: *Self) void {
-        removeRoot(self.jit.vm, &self.elements);
+        _ = self.jit.vm.data_roots.pop();
         self.jit.deinit();
     }
 
@@ -995,7 +980,7 @@ pub const QuotationJit = struct {
         // when the compiled code later dereferences it.
         // Matches C++: data_root<quotation> quot(quot_, parent);
         var rooted_quot = quot_cell;
-        self.jit.vm.data_roots.append(self.jit.vm.allocator, &rooted_quot) catch return error.OutOfMemory;
+        self.jit.vm.data_roots.append(self.jit.vm.allocator, &rooted_quot) catch @panic("OOM");
         defer _ = self.jit.vm.data_roots.pop();
 
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(rooted_quot));
@@ -1238,7 +1223,7 @@ pub fn lazyJitCompile(vm: *FactorVM, quot_cell: Cell) Cell {
     std.debug.assert(layouts.hasTag(quot_cell, .quotation));
 
     var rooted_quot = quot_cell;
-    vm.data_roots.append(vm.allocator, &rooted_quot) catch return quot_cell;
+    vm.data_roots.append(vm.allocator, &rooted_quot) catch @panic("OOM");
     defer _ = vm.data_roots.pop();
 
     var quot: *layouts.Quotation = @ptrFromInt(layouts.UNTAG(rooted_quot));

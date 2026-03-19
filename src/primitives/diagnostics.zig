@@ -13,15 +13,6 @@ const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
-// Sync context stack pointers from CPU registers.
-// Factor JIT code uses R14 for datastack and R15 for retainstack on x86_64.
-// Wrapper for VM's syncContextFromRegisters - kept for compatibility.
-// The jit-save-context in JIT_PRIMITIVE template should save these before
-// primitives run, but we call this as a safety measure in GC primitives.
-fn syncContextFromRegisters(vm: *FactorVM) void {
-    vm.syncContextFromRegisters();
-}
-
 // --- Die Primitive ---
 
 pub export fn primitive_die(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -541,38 +532,20 @@ fn diePrintTuple(tagged_tuple: layouts.Cell) void {
 // --- GC Primitives ---
 
 pub export fn primitive_minor_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
-    const vm = vm_asm.getVM();
-
-    // CRITICAL FIX: Sync context stack pointers from CPU registers before GC.
-    syncContextFromRegisters(vm);
-
-    if (vm.gc) |gc| {
-        vm.current_gc_p = true;
-        gc.collect(.collect_nursery);
-        vm.current_gc_p = false;
-    }
+    vm_asm.getVM().minorGc();
 }
 
 pub export fn primitive_full_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
-    const vm = vm_asm.getVM();
-    syncContextFromRegisters(vm);
-    if (vm.gc) |gc_inst| {
-        vm.current_gc_p = true;
-        gc_inst.collect(.collect_full);
-        vm.current_gc_p = false;
-    }
+    vm_asm.getVM().fullGc();
 }
 
 pub export fn primitive_compact_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
-    // CRITICAL FIX: Sync context stack pointers from CPU registers before GC.
-    syncContextFromRegisters(vm);
 
-    // Compact GC
     if (vm.gc) |gc| {
         vm.current_gc_p = true;
+        defer vm.current_gc_p = false;
         gc.collect(.collect_compact);
-        vm.current_gc_p = false;
     }
 }
 
@@ -583,7 +556,7 @@ pub export fn primitive_enable_gc_events(vm_asm: *VMAssemblyFields) callconv(.c)
     // ( -- )
     if (vm.gc_events == null) {
         const list = vm.allocator.create(std.ArrayListUnmanaged(vm_mod.GCEvent)) catch return;
-        list.* = .{};
+        list.* = .empty;
         vm.gc_events = list;
     }
 }
@@ -801,11 +774,10 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
     //   3. Build a Factor array from collected pointers
 
     // Full GC empties nursery and aging, promoting all live objects to tenured
-    syncContextFromRegisters(vm);
     if (vm.gc) |gc| {
         vm.current_gc_p = true;
+        defer vm.current_gc_p = false;
         gc.collect(.collect_full);
-        vm.current_gc_p = false;
     }
 
     const heap = vm.data orelse {

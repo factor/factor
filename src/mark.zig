@@ -206,7 +206,10 @@ fn fullMarkCallstack(ctx: *FullMarkContext, c: *Context) void {
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddress(addr) orelse {
+        // Match C++ iterate_callstack/code_block_for_address semantics:
+        // return addresses are resolved by previous block start without
+        // requiring an in-block extent check.
+        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             top += LEAF_FRAME_SIZE;
             continue;
         };
@@ -408,10 +411,8 @@ fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkCo
 }
 
 pub fn fullDrainMarkStack(gc: *GC, ctx: *FullMarkContext) void {
-    const items = &gc.mark_stack.items;
-    while (items.len > 0) {
-        items.len -= 1;
-        const addr = items.*[items.len];
+    while (gc.mark_stack.items.len > 0) {
+        const addr = gc.mark_stack.pop().?;
         if ((addr & 1) == 1) {
             const block: *code_blocks.CodeBlock = @ptrFromInt(addr - 1);
             fullProcessCodeBlock(gc, block, ctx);
@@ -572,7 +573,8 @@ fn markCallstack(gc: *GC, ctx: *Context, tenured: *data_heap_mod.TenuredSpace) v
 
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddress(addr) orelse {
+        // Match C++ iterate_callstack/code_block_for_address semantics.
+        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             top += LEAF_FRAME_SIZE;
             continue;
         };
@@ -613,7 +615,8 @@ fn markCallstackObject(gc: *GC, stack: *layouts.Callstack, tenured: *data_heap_m
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        const owner = lookup.ownerForAddress(addr) orelse {
+        // Match C++ iterate_callstack_object/code_block_for_address semantics.
+        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             frame_offset += LEAF_FRAME_SIZE;
             continue;
         };
@@ -816,10 +819,8 @@ fn drainMarkStack(gc: *GC) void {
     const code_opt = gc.vm.code;
     const has_uninitialized = if (code_opt) |code| code.uninitialized_blocks.count() != 0 else false;
 
-    const items = &gc.mark_stack.items;
-    while (items.len > 0) {
-        items.len -= 1;
-        const addr = items.*[items.len];
+    while (gc.mark_stack.items.len > 0) {
+        const addr = gc.mark_stack.pop().?;
 
         if ((addr & 1) == 1) {
             // Code block

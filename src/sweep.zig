@@ -63,19 +63,19 @@ pub fn sweepPhase(gc: *GC) void {
 
         if (mask == ~@as(Cell, 0)) {
             if (free_start != 0) {
-                addFreeRegion(&tenured.free_list, free_start, base_addr);
+                addFreeRegion(tenured.free_list, free_start, base_addr);
                 free_start = 0;
             }
             continue;
         }
 
         // Mixed cell — extract zero-bit runs for free regions
-        free_start = extractFreeRuns(&tenured.free_list, mask, base_addr, free_start);
+        free_start = extractFreeRuns(tenured.free_list, mask, base_addr, free_start);
     }
 
     // Close final free region at end of tenured space
     if (free_start != 0) {
-        addFreeRegion(&tenured.free_list, free_start, tenured.end);
+        addFreeRegion(tenured.free_list, free_start, tenured.end);
     }
 
     tenured.free_list.sortLargeBlocks();

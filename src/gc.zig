@@ -155,23 +155,19 @@ pub const GarbageCollector = struct {
 
     // Alias for gc() for compatibility
     pub fn collect(self: *Self, op: GCOp) void {
-        // CRITICAL: Sync stack pointers from CPU registers before GC.
-        // The JIT code uses R14/R15 for datastack/retainstack pointers.
-        // These may have been updated since the last sync, so we need to
-        // ensure the context has the current values before scanning stacks.
         self.vm.syncContextFromRegisters();
 
-        // Only unlock callstack guard pages if the callstack is close to full.
-        // Most GC cycles have plenty of stack space and don't need the mprotect overhead.
-        const need_unlock = self.vm.callstackNeedsGuardUnlock();
+        const need_unlock = self.vm.callstackNeedsGuardUnlock() or op == .collect_compact;
         if (need_unlock) {
-            const ctx = self.vm.vm_asm.ctx;
-            if (ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
+            if (self.vm.vm_asm.ctx.callstack_seg) |seg| {
+                seg.setBorderLocked(false) catch {};
+            }
         }
         defer {
             if (need_unlock) {
-                const ctx = self.vm.vm_asm.ctx;
-                if (ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
+                if (self.vm.vm_asm.ctx.callstack_seg) |seg| {
+                    seg.setBorderLocked(true) catch {};
+                }
             }
         }
 
@@ -487,10 +483,8 @@ pub const GarbageCollector = struct {
             if (self.current_event) |event| {
                 event.op = @intFromEnum(GCOp.collect_compact);
             }
-            // Skip code compaction: native return addresses on x86 stack
-            // cannot be updated when code blocks move.
             if (self.current_event) |event| event.resetTimer();
-            compact.compactPhase(self, false);
+            compact.compactPhase(self, true);
             if (self.current_event) |event| event.endedPhase(.data_compaction);
         }
 
@@ -563,34 +557,22 @@ pub const GarbageCollector = struct {
 
     // Compact collection
     fn collectCompact(self: *Self) void {
-        if (!self.collectToTenured()) {
-            // Failed to promote into tenured (target full). Running mark/compact
-            // on this partial state is unsafe and wastes work; escalate to a
-            // regular full collection path instead.
-            self.collectFull(false);
+        // Match C++ factor_vm::collect_compact(): do a single full
+        // promote+mark pass, then compact directly. The previous Zig path
+        // split compact GC into collectToTenured() plus a second mark pass,
+        // which diverged from the C++ VM and exercised the deep callstack
+        // roots twice.
+        if (self.current_event) |event| event.resetTimer();
+        const ok = self.markPhaseFull_();
+        if (self.current_event) |event| event.endedPhase(.marking);
+        if (!ok) {
+            _ = self.collectGrowingDataHeap(0) catch @panic("OOM");
+            self.heap.full_collections += 1;
             return;
         }
 
         if (self.current_event) |event| event.resetTimer();
-        mark_mod.markPhase(self);
-        if (self.current_event) |event| event.endedPhase(.marking);
-
-        // Sweep code heap: free dead (unmarked) code blocks and rebuild
-        // all_blocks before compaction. Without this, dead code blocks
-        // retain stale data pointers after compaction moves data objects.
-        if (self.current_event) |event| event.resetTimer();
-        if (self.vm.code) |code| {
-            if (code.marks) |code_marks| {
-                sweep_mod.invalidateCodeRootsAfterSweep(self, code_marks);
-                sweep_mod.sweepCodePhase(self, code, code_marks);
-            }
-        }
-        if (self.current_event) |event| event.endedPhase(.code_sweep);
-
-        // Skip code compaction: native return addresses on x86 stack
-        // cannot be updated when code blocks move.
-        if (self.current_event) |event| event.resetTimer();
-        compact.compactPhase(self, false);
+        compact.compactPhase(self, true);
         if (self.current_event) |event| event.endedPhase(.data_compaction);
 
         // Compaction did not free enough contiguous space
@@ -886,7 +868,9 @@ pub const GarbageCollector = struct {
 
             if (addr == 0) break;
 
-            const owner = lookup.ownerForAddress(addr) orelse {
+            // Match C++ iterate_callstack/code_block_for_address semantics:
+            // use the previous block start for return-address ownership.
+            const owner = lookup.ownerForAddressUnsafe(addr) orelse {
                 top += LEAF_FRAME_SIZE;
                 continue;
             };
@@ -1102,8 +1086,8 @@ test "gc write barrier marks card/deck and dirty list" {
 
     const card_idx: Cell = slot_addr >> @intCast(vm_mod.card_bits);
     const deck_idx: Cell = slot_addr >> @intCast(vm_mod.deck_bits);
-    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset + card_idx);
-    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset + deck_idx);
+    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset +% card_idx);
+    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset +% deck_idx);
 
     card_ptr.* = 0;
     deck_ptr.* = 0;
@@ -1165,8 +1149,8 @@ test "gc scanCardsGeneration scans aging cards for nursery references" {
     };
 
     const slot_addr = @intFromPtr(slot_ptr);
-    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset + (slot_addr >> @intCast(vm_mod.card_bits)));
-    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset + (slot_addr >> @intCast(vm_mod.deck_bits)));
+    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset +% (slot_addr >> @intCast(vm_mod.card_bits)));
+    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset +% (slot_addr >> @intCast(vm_mod.deck_bits)));
     const mask = write_barrier.card_points_to_nursery;
     try std.testing.expect((card_ptr.* & mask) != 0);
     try std.testing.expect((deck_ptr.* & mask) != 0);
@@ -1252,8 +1236,8 @@ test "gc scanCards updates tenured slot spanning card" {
         .source_end = heap.nursery.end,
     };
 
-    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset + (slot_addr >> @intCast(vm_mod.card_bits)));
-    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset + (slot_addr >> @intCast(vm_mod.deck_bits)));
+    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset +% (slot_addr >> @intCast(vm_mod.card_bits)));
+    const deck_ptr: *u8 = @ptrFromInt(vm.vm_asm.decks_offset +% (slot_addr >> @intCast(vm_mod.deck_bits)));
     const mask = write_barrier.card_points_to_nursery;
     try std.testing.expect((card_ptr.* & mask) != 0);
     try std.testing.expect((deck_ptr.* & mask) != 0);

@@ -83,7 +83,7 @@ pub const FreeListAllocator = struct {
             .end = start + region_size,
             .size = region_size,
             .small_blocks = undefined,
-            .large_blocks = .{},
+            .large_blocks = .empty,
             .free_block_count = 0,
             .free_space = 0,
             .non_empty_mask = 0,
@@ -91,7 +91,7 @@ pub const FreeListAllocator = struct {
         };
 
         for (&self.small_blocks) |*bucket| {
-            bucket.* = .{};
+            bucket.* = .empty;
         }
 
         if (region_size >= min_block_size) {
@@ -108,7 +108,7 @@ pub const FreeListAllocator = struct {
             .end = start + total_size,
             .size = total_size,
             .small_blocks = undefined,
-            .large_blocks = .{},
+            .large_blocks = .empty,
             .free_block_count = 0,
             .free_space = 0,
             .non_empty_mask = 0,
@@ -116,7 +116,7 @@ pub const FreeListAllocator = struct {
         };
 
         for (&self.small_blocks) |*bucket| {
-            bucket.* = .{};
+            bucket.* = .empty;
         }
 
         // Create a free block AFTER the occupied data

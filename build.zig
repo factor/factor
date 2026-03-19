@@ -9,6 +9,7 @@ pub fn build(b: *std.Build) void {
     // Override with -Dtarget= if cross-compiling.
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+    const keep_symbols = b.option(bool, "keep_symbols", "Keep symbol names in release builds for debugging") orelse false;
 
     // Get git and date info at build time
     const git_label = runCommand(b, &.{ "git", "log", "-1", "--format=heads/master-%h" });
@@ -25,6 +26,8 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            // Strip debug symbols in release builds to reduce binary size (~6x smaller)
+            .strip = if (optimize != .Debug and !keep_symbols) true else null,
         }),
     });
 

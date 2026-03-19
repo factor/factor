@@ -143,10 +143,10 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
 // Helper to pop alien pointer with offset
 // Stack effect: ( alien offset -- )
 // Returns a valid pointer or raises a Factor-level memory error (never returns null).
-fn alienPointer(vm: *FactorVM) [*]u8 {
+inline fn alienPointer(vm: *FactorVM) [*]u8 {
     const offset_cell = vm.pop();
-    const offset: Fixnum = if (layouts.hasTag(offset_cell, .fixnum))
-        layouts.untagFixnum(offset_cell)
+    const offset: Fixnum = if (layouts.TAG(offset_cell) == @intFromEnum(layouts.TypeTag.fixnum))
+        @bitCast(layouts.untagFixnumFast(offset_cell))
     else
         @call(.never_inline, toFixnum, .{ vm, offset_cell });
     const obj = vm.pop();

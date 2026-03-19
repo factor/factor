@@ -405,13 +405,13 @@ pub const FactorVM = struct {
             .cards_array = null,
             .decks_array = null,
             .callback_id = 0,
-            .callback_ids = .{},
+            .callback_ids = .empty,
             .c_to_factor_func = null,
-            .unused_contexts = .{},
-            .active_contexts = .{},
+            .unused_contexts = .empty,
+            .active_contexts = .empty,
             .sampling_profiler_p = false,
             .samples_per_second = 0,
-            .profiling_samples = .{},
+            .profiling_samples = .empty,
             .signal_resumable = false,
             .signal_number = 0,
             .signal_fault_addr = 0,
@@ -428,8 +428,8 @@ pub const FactorVM = struct {
             .current_jit_count = 0,
             .gc_events = null,
             .gc = null, // Initialized later when data heap is ready
-            .data_roots = .{},
-            .code_roots = .{},
+            .data_roots = .empty,
+            .code_roots = .empty,
             .fep_p = false,
             .fep_help_was_shown = false,
             .fep_disabled = false,
@@ -578,10 +578,25 @@ pub const FactorVM = struct {
 
     // Fast write barrier for slots known to be inside the main data heap segment.
     pub inline fn writeBarrierKnownHeap(self: *Self, slot_ptr: *Cell) void {
+        const data_ptr = self.data orelse return;
+        const heap: *DataHeap = @ptrCast(@alignCast(data_ptr));
         const slot_addr = @intFromPtr(slot_ptr);
-        const card_ptr: *u8 = @ptrFromInt(self.vm_asm.cards_offset + (slot_addr >> card_bits));
+        std.debug.assert(slot_addr >= heap.segment.start);
+        std.debug.assert(slot_addr < heap.segment.end);
+
+        const card_base = heap.segment.start >> @intCast(card_bits);
+        const deck_base = heap.segment.start >> @intCast(deck_bits);
+        const slot_card = slot_addr >> @intCast(card_bits);
+        const slot_deck = slot_addr >> @intCast(deck_bits);
+        if (slot_card < card_base or slot_deck < deck_base) return;
+
+        const card_idx: usize = @intCast(slot_card - card_base);
+        const deck_idx: usize = @intCast(slot_deck - deck_base);
+        std.debug.assert(card_idx < heap.cards.cards.len);
+        std.debug.assert(deck_idx < heap.decks.decks.len);
+        const card_ptr: *u8 = &heap.cards.cards[card_idx];
         card_ptr.* = card_mark_mask;
-        const deck_ptr: *u8 = @ptrFromInt(self.vm_asm.decks_offset + (slot_addr >> deck_bits));
+        const deck_ptr: *u8 = &heap.decks.decks[deck_idx];
         deck_ptr.* = card_mark_mask;
     }
 
@@ -637,20 +652,32 @@ pub const FactorVM = struct {
         const range_end = @min(unclamped_end, heap.segment.end);
         if (range_end <= addr) return;
 
-        // Mark cards in one bulk memset using absolute-index addressing to
-        // match the JIT write barrier formula (cards_offset + (addr >> card_bits)).
+        // Mark cards with direct table indexing (equivalent to the JIT formula:
+        // cards_offset + (addr >> card_bits)).
         const first_card_abs = addr >> @intCast(card_bits);
         const last_card_abs = (range_end - 1) >> @intCast(card_bits);
-        const card_count = last_card_abs - first_card_abs + 1;
-        const cards_ptr: [*]u8 = @ptrFromInt(self.vm_asm.cards_offset +% first_card_abs);
-        @memset(cards_ptr[0..card_count], card_mark_mask);
-
-        // Mark decks similarly.
+        const card_base = heap.segment.start >> @intCast(card_bits);
         const first_deck_abs = addr >> @intCast(deck_bits);
         const last_deck_abs = (range_end - 1) >> @intCast(deck_bits);
+        const deck_base = heap.segment.start >> @intCast(deck_bits);
+        std.debug.assert(first_card_abs >= card_base);
+        std.debug.assert(last_card_abs >= first_card_abs);
+        const card_len: Cell = @intCast(heap.cards.cards.len);
+        const deck_len: Cell = @intCast(heap.decks.decks.len);
+        std.debug.assert(first_card_abs < card_base + card_len);
+        std.debug.assert(last_card_abs < card_base + card_len);
+        std.debug.assert(first_deck_abs < deck_base + deck_len);
+        std.debug.assert(last_deck_abs < deck_base + deck_len);
+        const card_count = last_card_abs - first_card_abs + 1;
+        const first_card: usize = @intCast(first_card_abs - card_base);
+        @memset(heap.cards.cards[first_card..][0..@intCast(card_count)], card_mark_mask);
+
+        // Mark decks similarly (equivalent to decks_offset + (addr >> deck_bits)).
+        std.debug.assert(first_deck_abs >= deck_base);
+        std.debug.assert(last_deck_abs >= first_deck_abs);
         const deck_count = last_deck_abs - first_deck_abs + 1;
-        const decks_ptr: [*]u8 = @ptrFromInt(self.vm_asm.decks_offset +% first_deck_abs);
-        @memset(decks_ptr[0..deck_count], card_mark_mask);
+        const first_deck: usize = @intCast(first_deck_abs - deck_base);
+        @memset(heap.decks.decks[first_deck..][0..@intCast(deck_count)], card_mark_mask);
     }
 
     // Mark all cards and decks as dirty (used by become).
@@ -732,17 +759,18 @@ pub const FactorVM = struct {
 
     // Extract address from alien, byte-array, or false (null).
     // Shared helper for primitives that accept alien-or-byte-array arguments.
-    pub fn alienOffset(self: *Self, obj: Cell) ?[*]u8 {
-        const tag = layouts.typeTag(obj);
-        if (tag == .byte_array) {
+    pub inline fn alienOffset(self: *Self, obj: Cell) ?[*]u8 {
+        if (obj == layouts.false_object) {
+            return null;
+        }
+
+        const tag = layouts.TAG(obj);
+        if (tag == @intFromEnum(layouts.TypeTag.byte_array)) {
             const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(obj));
             return ba.data();
-        } else if (tag == .alien) {
+        } else if (tag == @intFromEnum(layouts.TypeTag.alien)) {
             const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(obj));
-            std.debug.assert(!(alien.address == 0 and alien.expired != layouts.false_object));
             return @ptrFromInt(alien.address);
-        } else if (obj == layouts.false_object) {
-            return null;
         }
         self.typeError(.alien, obj);
     }
@@ -1190,8 +1218,9 @@ pub const FactorVM = struct {
         const data_start = heap.segment.start;
         const cards_ptr = @intFromPtr(heap.cards.cards.ptr);
         const decks_ptr = @intFromPtr(heap.decks.decks.ptr);
-        self.vm_asm.cards_offset = @bitCast(cards_ptr -% (data_start >> card_bits));
-        self.vm_asm.decks_offset = @bitCast(decks_ptr -% (data_start >> deck_bits));
+        // Keep this as raw modulo subtraction; this matches factor_vm::set_data_heap.
+        self.vm_asm.cards_offset = cards_ptr -% (data_start >> card_bits);
+        self.vm_asm.decks_offset = decks_ptr -% (data_start >> deck_bits);
 
         // Keep slices for bulk operations (markAllCards, diagnostics).
         self.cards_array = heap.cards.cards;
@@ -1205,18 +1234,6 @@ pub const FactorVM = struct {
         // Skip if GC is disabled (for debugging)
         if (self.gc_off) return;
 
-        // Only unlock callstack guard pages if the callstack is close to full.
-        // Most GC cycles have plenty of stack space and don't need the mprotect overhead.
-        const need_unlock = self.callstackNeedsGuardUnlock();
-        if (need_unlock) {
-            if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
-        }
-        defer {
-            if (need_unlock) {
-                if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
-            }
-        }
-
         if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
@@ -1229,16 +1246,6 @@ pub const FactorVM = struct {
 
     // Trigger a full garbage collection
     pub fn fullGc(self: *Self) void {
-        const need_unlock = self.callstackNeedsGuardUnlock();
-        if (need_unlock) {
-            if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(false) catch {};
-        }
-        defer {
-            if (need_unlock) {
-                if (self.vm_asm.ctx.callstack_seg) |seg| seg.setBorderLocked(true) catch {};
-            }
-        }
-
         if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;

@@ -26,8 +26,8 @@ pub const CodeHeap = struct {
     // Source of truth for live code block addresses (kept sorted).
     // New inserts go to pending_blocks (O(1) append) and are merged
     // into the sorted list lazily via flushPending().
-    all_blocks_sorted: std.ArrayList(Cell) = .{},
-    pending_blocks: std.ArrayListUnmanaged(Cell) = .{},
+    all_blocks_sorted: std.ArrayList(Cell) = .empty,
+    pending_blocks: std.ArrayListUnmanaged(Cell) = .empty,
     // Memory allocator used for code heap metadata (mark bits, hash maps, etc.)
     allocator: ?std.mem.Allocator = null,
     // Remembered sets for GC - track code blocks that may reference young objects
@@ -332,6 +332,27 @@ pub const CodeHeap = struct {
                 const block: *CodeBlock = @ptrFromInt(block_addr);
                 const block_end = block_addr + block.size();
                 if (address < block_end) return block;
+            }
+        }
+
+        return null;
+    }
+
+    // Match the C++ VM's code_block_for_address() behavior for return-address
+    // walking: choose the previous block start without requiring the address to
+    // lie within the block extent.
+    pub fn codeBlockForReturnAddress(self: *Self, address: Cell) ?*CodeBlock {
+        const blocks = self.all_blocks_sorted.items;
+        if (blocks.len > 0) {
+            const ub = std.sort.upperBound(Cell, blocks, address, layouts.orderCell);
+            if (ub > 0) {
+                return @ptrFromInt(blocks[ub - 1]);
+            }
+        }
+
+        for (self.pending_blocks.items) |block_addr| {
+            if (address >= block_addr) {
+                return @ptrFromInt(block_addr);
             }
         }
 

@@ -247,6 +247,7 @@ pub const CodeBlock = extern struct {
         const jit_mod = @import("jit.zig");
 
         var compiler = jit_mod.QuotationJit.init(vm, quot_cell, false, false);
+        compiler.registerRoot();
         defer compiler.deinit();
         compiler.initQuotation(quot_cell);
         compiler.jit.computePosition(offset_val);
