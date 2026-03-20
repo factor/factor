@@ -426,7 +426,7 @@ M: arm.64 %saturated-mul-vector 4drop not-implemented ;
 M: arm.64 %div-vector >shape FDIVv ;
 M: arm.64 %min-vector [ SMIN ] [ UMIN ] [ FMINNMv ] signed/unsigned/float ;
 M: arm.64 %max-vector [ SMAX ] [ UMAX ] [ FMAXNMv ] signed/unsigned/float ;
-M: arm.64 %avg-vector [ SHADD ] [ UHADD ] signed/unsigned ;
+M: arm.64 %avg-vector [ SRHADD ] [ URHADD ] signed/unsigned ;
 M: arm.64 %sad-vector [ [ SABD ] [ UABD ] signed/unsigned ] 4keep 2nip dupd >shape ADDV ;
 M: arm.64 %sqrt-vector >shape FSQRTv ;
 M: arm.64 %horizontal-add-vector [ ADDP ] [ FADDP ] integer/float ;

@@ -1421,30 +1421,30 @@ PRIVATE>
     } encode ;
 PRIVATE>
 
-: SHADD ( Rd Rn Rm shape -- ) 0 0b00000 simd-3-same ;
-: SQADD ( Rd Rn Rm shape -- ) 0 0b00001 simd-3-same ;
-: SQSUB ( Rd Rn Rm shape -- ) 0 0b00101 simd-3-same ;
-: CMGT  ( Rd Rn Rm shape -- ) 0 0b00110 simd-3-same ;
-: CMGE  ( Rd Rn Rm shape -- ) 0 0b00111 simd-3-same ;
-: SSHL  ( Rd Rn Rm shape -- ) 0 0b01000 simd-3-same ;
-: SMAX  ( Rd Rn Rm shape -- ) 0 0b01100 simd-3-same ;
-: SMIN  ( Rd Rn Rm shape -- ) 0 0b01101 simd-3-same ;
-: SABD  ( Rd Rn Rm shape -- ) 0 0b01110 simd-3-same ;
-: ADDv  ( Rd Rn Rm shape -- ) 0 0b10000 simd-3-same ;
-: MLAv  ( Rd Rn Rm shape -- ) 0 0b10010 simd-3-same ;
-: MULv  ( Rd Rn Rm shape -- ) 0 0b10011 simd-3-same ;
-: ADDP  ( Rd Rn Rm shape -- ) 0 0b10111 simd-3-same ;
-: UHADD ( Rd Rn Rm shape -- ) 1 0b00000 simd-3-same ;
-: UQADD ( Rd Rn Rm shape -- ) 1 0b00001 simd-3-same ;
-: UQSUB ( Rd Rn Rm shape -- ) 1 0b00101 simd-3-same ;
-: CMHI  ( Rd Rn Rm shape -- ) 1 0b00110 simd-3-same ;
-: CMHS  ( Rd Rn Rm shape -- ) 1 0b00111 simd-3-same ;
-: USHL  ( Rd Rn Rm shape -- ) 1 0b01000 simd-3-same ;
-: UMAX  ( Rd Rn Rm shape -- ) 1 0b01100 simd-3-same ;
-: UMIN  ( Rd Rn Rm shape -- ) 1 0b01101 simd-3-same ;
-: UABD  ( Rd Rn Rm shape -- ) 1 0b01110 simd-3-same ;
-: SUBv  ( Rd Rn Rm shape -- ) 1 0b10000 simd-3-same ;
-: CMEQ  ( Rd Rn Rm shape -- ) 1 0b10001 simd-3-same ;
+: SQADD  ( Rd Rn Rm shape -- ) 0 0b00001 simd-3-same ;
+: SRHADD ( Rd Rn Rm shape -- ) 0 0b00010 simd-3-same ;
+: SQSUB  ( Rd Rn Rm shape -- ) 0 0b00101 simd-3-same ;
+: CMGT   ( Rd Rn Rm shape -- ) 0 0b00110 simd-3-same ;
+: CMGE   ( Rd Rn Rm shape -- ) 0 0b00111 simd-3-same ;
+: SSHL   ( Rd Rn Rm shape -- ) 0 0b01000 simd-3-same ;
+: SMAX   ( Rd Rn Rm shape -- ) 0 0b01100 simd-3-same ;
+: SMIN   ( Rd Rn Rm shape -- ) 0 0b01101 simd-3-same ;
+: SABD   ( Rd Rn Rm shape -- ) 0 0b01110 simd-3-same ;
+: ADDv   ( Rd Rn Rm shape -- ) 0 0b10000 simd-3-same ;
+: MLAv   ( Rd Rn Rm shape -- ) 0 0b10010 simd-3-same ;
+: MULv   ( Rd Rn Rm shape -- ) 0 0b10011 simd-3-same ;
+: ADDP   ( Rd Rn Rm shape -- ) 0 0b10111 simd-3-same ;
+: URHADD ( Rd Rn Rm shape -- ) 1 0b00010 simd-3-same ;
+: UQADD  ( Rd Rn Rm shape -- ) 1 0b00001 simd-3-same ;
+: UQSUB  ( Rd Rn Rm shape -- ) 1 0b00101 simd-3-same ;
+: CMHI   ( Rd Rn Rm shape -- ) 1 0b00110 simd-3-same ;
+: CMHS   ( Rd Rn Rm shape -- ) 1 0b00111 simd-3-same ;
+: USHL   ( Rd Rn Rm shape -- ) 1 0b01000 simd-3-same ;
+: UMAX   ( Rd Rn Rm shape -- ) 1 0b01100 simd-3-same ;
+: UMIN   ( Rd Rn Rm shape -- ) 1 0b01101 simd-3-same ;
+: UABD   ( Rd Rn Rm shape -- ) 1 0b01110 simd-3-same ;
+: SUBv   ( Rd Rn Rm shape -- ) 1 0b10000 simd-3-same ;
+: CMEQ   ( Rd Rn Rm shape -- ) 1 0b10001 simd-3-same ;
 
 <PRIVATE
 : simd-3-same* ( Rd Rn Rm shape U size1 opcode -- )
