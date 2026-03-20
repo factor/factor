@@ -442,8 +442,6 @@ M: arm.64 %andn-vector drop 16B BICv ;
 M: arm.64 %or-vector drop 16B ORRv ;
 M: arm.64 %xor-vector drop 16B EORv ;
 M: arm.64 %not-vector drop 16B MVNv ;
-M: arm.64 %shl-vector [ SSHL ] [ USHL ] signed/unsigned ;
-M: arm.64 %shr-vector [ 2nipd dupd >shape NEGv ] 4keep %shl-vector ;
 M: arm.64 %shl-vector-imm >shape SHL ;
 M: arm.64 %shr-vector-imm [ SSHR ] [ USHR ] signed/unsigned ;
 
@@ -531,8 +529,6 @@ M: arm.64 %andn-vector-reps int-vector-reps ;
 M: arm.64 %or-vector-reps int-vector-reps ;
 M: arm.64 %xor-vector-reps int-vector-reps ;
 M: arm.64 %not-vector-reps int-vector-reps ;
-M: arm.64 %shl-vector-reps int-vector-reps ;
-M: arm.64 %shr-vector-reps int-vector-reps ;
 M: arm.64 %shl-vector-imm-reps int-vector-reps ;
 M: arm.64 %shr-vector-imm-reps int-vector-reps ;
 M: arm.64 %horizontal-shl-vector-imm-reps vector-reps ;
