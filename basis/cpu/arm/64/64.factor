@@ -361,7 +361,7 @@ M: arm.64 %shuffle-vector-halves-imm ( DST SRC1 SRC2 shuffle rep -- )
     [ 2nip [ >shape ] dip call ] if ; inline
 
 : integer/float ( Rd Rn Rm rep int-op fp-op -- )
-    [ [ >shape ] [ scalar-rep? ] bi ] 2dip if ; inline
+    [ [ >shape ] [ int-vector-rep? ] bi ] 2dip if ; inline
 
 M: arm.64 %tail>head-vector drop dupd 2D TRN2 ;
 M: arm.64 %merge-vector-head >shape ZIP1 ;
