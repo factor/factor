@@ -425,7 +425,6 @@ M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
     fp-temp2 SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
     DST fp-temp fp-temp2 rep >shape UZP2 ;
 
-M: arm.64 %mul-horizontal-add-vector [ MLAv ] [ FMLAv ] integer/float ;
 M: arm.64 %saturated-mul-vector 4drop not-implemented ;
 M: arm.64 %div-vector >shape FDIVv ;
 M: arm.64 %min-vector [ SMIN ] [ UMIN ] [ FMINNMv ] signed/unsigned/float ;
@@ -518,7 +517,7 @@ M: arm.64 %sub-vector-reps vector-reps ;
 M: arm.64 %saturated-sub-vector-reps int-vector-reps ;
 M: arm.64 %mul-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
 M: arm.64 %mul-high-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
-M: arm.64 %mul-horizontal-add-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
+M: arm.64 %mul-horizontal-add-vector-reps f ;
 M: arm.64 %div-vector-reps float-vector-reps ;
 M: arm.64 %min-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
 M: arm.64 %max-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
