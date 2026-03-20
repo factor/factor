@@ -85,7 +85,7 @@ M: arm.64 %load-vector
 
 : extend-offset ( reg imm -- operand )
     dup 9 >signed over = [
-        [ temp ] dip MOV
+        [ temp ] [ bitnot 16 bits ] bi* 0 MOVN
         temp
     ] unless [+] ;
 
