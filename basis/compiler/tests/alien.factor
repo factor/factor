@@ -87,13 +87,18 @@ FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 { "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
-STRUCT: BAR { x long } { y long } { z long } ;
+! Indirect result register not implemented
+cpu arm.64? [
 
-FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
+    STRUCT: BAR { x long } { y long } { z long } ;
 
-{ 11 6 -7 } [
-    11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
-] unit-test
+    FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
+
+    { 11 6 -7 } [
+        11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
+    ] unit-test
+
+] unless
 
 STRUCT: TINY { x int } ;
 
@@ -139,13 +144,18 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
-: ffi_test_19 ( x y z -- BAR )
-    BAR "f-stdcall" "ffi_test_19" { long long long } f
-    alien-invoke gc ;
+! Indirect result register not implemented
+cpu arm.64? [
 
-{ 11 6 -7 } [
-    11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
-] unit-test
+    : ffi_test_19 ( x y z -- BAR )
+        BAR "f-stdcall" "ffi_test_19" { long long long } f
+        alien-invoke gc ;
+
+    { 11 6 -7 } [
+        11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
+    ] unit-test
+
+] unless
 
 : multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
     [ int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke ]
