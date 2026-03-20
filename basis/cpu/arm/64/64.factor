@@ -381,25 +381,31 @@ M: arm.64 %compare-vector
         { cc>= [ [ CMGE ] [ CMHS ] [ FCMGE ] signed/unsigned/float ] }
     } case ;
 
-:: %move-int-vector-mask ( DST SRC -- )
-    fp-temp SRC 16B CMLT
-    temp 0x0201 0 MOVZ
-    temp 0x0804 1 MOVK
-    fp-temp2 temp 4S DUP
+: %move-float-vector-mask ( DST SRC -- )
+    [ fp-temp ] dip 4S CMLT
+    fp-temp2 B{
+        0x00 0x00 0x00 0x08 0x00 0x00 0x00 0x04
+        0x00 0x00 0x00 0x02 0x00 0x00 0x00 0x01
+    } f %load-vector
+    fp-temp dup fp-temp2 4S ANDv
+    fp-temp dup 4S ADDV
+    fp-temp >S FMOV ;
+
+: %move-int-vector-mask ( DST SRC -- )
+    [ fp-temp ] dip 16B CMLT
+    fp-temp2 B{
+        0x80 0x40 0x20 0x10 0x08 0x04 0x02 0x01
+        0x80 0x40 0x20 0x10 0x08 0x04 0x02 0x01
+    } f %load-vector
     fp-temp dup fp-temp2 16B ANDv
-    fp-temp2 fp-temp 16B SHLL
+    fp-temp2 fp-temp 16B UXTL
     fp-temp dup 16B SHLL2
-    fp-temp2 dup 16B ADDV
-    fp-temp dup 16B ADDV
-    fp-temp dup fp-temp2 16B ZIP1
-    DST fp-temp >S FMOV ;
+    fp-temp dup fp-temp2 8H ADDP
+    fp-temp dup 8H ADDV
+    fp-temp >S FMOV ;
 
 M: arm.64 %move-vector-mask
-    {
-        { double-2-rep [ 2drop not-implemented ] }
-        { float-4-rep [ 2drop not-implemented ] }
-        [ drop %move-int-vector-mask ]
-    } case ;
+    int-vector-rep? [ %move-int-vector-mask ] [ %move-float-vector-mask ] if ;
 
 M: arm.64 %test-vector ( DST SRC TEMP rep vcc -- )
     5drop not-implemented ;
