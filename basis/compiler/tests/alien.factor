@@ -928,24 +928,29 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
     ] times
 ] unit-test
 
-! Varargs with non-float parameters works.
-FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
-FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
+! Varargs are currently not supported on arm64 macos
+cpu arm.64? os macos? and [
 
-{ 30 60 } [
-    2 10 20 do-sum-ints2
-    3 10 20 30 do-sum-ints3
-] unit-test
+    ! Varargs with non-float parameters works.
+    FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
+    FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
 
-! Varargs with non-floats doesn't work on windows
-FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
-FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
-
-os windows? [
-    { 27.0 22.0 } [
-        2 7 20 do-sum-doubles2
-        3 5 10 7 do-sum-doubles3
+    { 30 60 } [
+        2 10 20 do-sum-ints2
+        3 10 20 30 do-sum-ints3
     ] unit-test
+
+    ! Varargs with non-floats doesn't work on windows
+    FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
+    FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
+
+    os windows? [
+        { 27.0 22.0 } [
+            2 7 20 do-sum-doubles2
+            3 5 10 7 do-sum-doubles3
+        ] unit-test
+    ] unless
+
 ] unless
 
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
