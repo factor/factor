@@ -452,7 +452,12 @@ M:: arm.64 %horizontal-shr-vector-imm ( DST SRC1 src2 rep -- )
     DST SRC1 fp-temp src2 16B EXT ;
 
 M: arm.64 %integer>scalar drop [ >D ] dip FMOV ;
-M: arm.64 %scalar>integer drop >D FMOV ;
+
+M: arm.64 %scalar>integer
+    [ 0 ] dip [ rep-size log2 <vector-element> ] keep
+    { char-scalar-rep short-scalar-rep int-scalar-rep } member?
+    [ SMOV ] [ UMOV ] if ;
+
 M: arm.64 %vector>scalar %copy ;
 M: arm.64 %scalar>vector %copy ;
 

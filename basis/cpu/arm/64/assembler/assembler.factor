@@ -1309,7 +1309,7 @@ M: vector-element DUP
 M: general-register DUP [ size>> 2^ ] [ Q>> ] bi 1 0 simd-copy ;
 
 : SMOV ( Rd element -- )
-    >vector-element< [ 1 + shift ] [ 2^ bitor ] [ -1 shift ] tri 0b0101 0 simd-copy ;
+    >vector-element< [ 1 + shift ] [ 2^ bitor ] bi pick encode-width 0b0101 0 simd-copy ;
 
 : UMOV ( Rd element -- )
     >vector-element< [ 1 + shift ] [ 2^ bitor ] [ 1 + -2 shift ] tri 0b0111 0 simd-copy ;
