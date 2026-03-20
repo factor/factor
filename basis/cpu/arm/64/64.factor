@@ -515,7 +515,7 @@ M: arm.64 %add-vector-reps vector-reps ;
 M: arm.64 %saturated-add-vector-reps int-vector-reps ;
 M: arm.64 %sub-vector-reps vector-reps ;
 M: arm.64 %saturated-sub-vector-reps int-vector-reps ;
-M: arm.64 %mul-vector-reps vector-reps ;
+M: arm.64 %mul-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
 M: arm.64 %mul-high-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %mul-horizontal-add-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
 M: arm.64 %div-vector-reps float-vector-reps ;
