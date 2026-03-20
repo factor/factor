@@ -421,11 +421,9 @@ M: arm.64 %saturated-sub-vector [ SQSUB ] [ UQSUB ] signed/unsigned ;
 M: arm.64 %mul-vector [ MULv ] [ FMULv ] integer/float ;
 
 M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
-    DST SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
-    fp-temp SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
-    rep scalar-rep-of rep-size 3 shift :> imm
-    DST DST imm rep >shape SHRN
-    DST fp-temp imm rep >shape SHRN2 ;
+    fp-temp SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
+    fp-temp2 SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
+    DST fp-temp fp-temp2 rep >shape UZP2 ;
 
 M: arm.64 %mul-horizontal-add-vector [ MLAv ] [ FMLAv ] integer/float ;
 M: arm.64 %saturated-mul-vector 4drop not-implemented ;
