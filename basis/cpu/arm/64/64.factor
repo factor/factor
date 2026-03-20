@@ -436,7 +436,7 @@ M: arm.64 %sqrt-vector >shape FSQRTv ;
 M: arm.64 %horizontal-add-vector [ ADDP ] [ FADDP ] integer/float ;
 M: arm.64 %abs-vector [ ABSv ] [ FABSv ] integer/float ;
 M: arm.64 %and-vector drop 16B ANDv ;
-M: arm.64 %andn-vector drop 16B BICv ;
+M: arm.64 %andn-vector drop swap 16B BICv ;
 M: arm.64 %or-vector drop 16B ORRv ;
 M: arm.64 %xor-vector drop 16B EORv ;
 M: arm.64 %not-vector drop 16B MVNv ;
