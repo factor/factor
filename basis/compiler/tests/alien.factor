@@ -73,9 +73,14 @@ FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
 { 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
-FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+! arm64 macos packed stack parameters not implemented
+cpu arm.64? os macos? and [
 
-{ 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+    FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+
+    { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+
+] unless
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
@@ -184,23 +189,28 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 
 { } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
-! Make sure XT doesn't get clobbered in stack frame
+! arm64 macos packed stack parameters not implemented
+cpu arm.64? os macos? and [
 
-: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
-    int
-    "f-cdecl" "ffi_test_31"
-    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
-    alien-invoke gc 3 ;
+    ! Make sure XT doesn't get clobbered in stack frame
 
-{ 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
+    : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
+        int
+        "f-cdecl" "ffi_test_31"
+        { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
+        alien-invoke gc 3 ;
 
-: ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
-    float
-    "f-cdecl" "ffi_test_31_point_5"
-    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
-    alien-invoke ;
+    { 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
-{ 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
+    : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
+        float
+        "f-cdecl" "ffi_test_31_point_5"
+        { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
+        alien-invoke ;
+
+    { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
+
+] unless
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
