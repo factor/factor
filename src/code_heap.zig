@@ -15,7 +15,6 @@ const write_barrier = @import("write_barrier.zig");
 const Cell = layouts.Cell;
 const CodeBlock = code_blocks_mod.CodeBlock;
 
-
 pub const CodeHeap = struct {
     seg: ?*segments.Segment,
     free_list: ?*free_list.FreeListAllocator = null, // typed allocator for JIT
@@ -37,11 +36,9 @@ pub const CodeHeap = struct {
     scan_code_ptrs: ?std.DynamicBitSet = null,
     // Uninitialized blocks: code blocks allocated but not yet relocated.
     // Maps block address -> literals Cell for deferred initialization.
-    // Matches C++ code_heap::uninitialized_blocks map.
     uninitialized_blocks: std.AutoArrayHashMapUnmanaged(Cell, Cell) = .{},
     // Scratch map reused during compaction to avoid repeated allocations.
     uninitialized_blocks_scratch: std.AutoArrayHashMapUnmanaged(Cell, Cell) = .{},
-    // Mark bits for code heap full GC (mirrors C++ code->allocator->state)
     marks: ?*mark_bits.MarkBits = null,
 
     const Self = @This();
@@ -65,7 +62,7 @@ pub const CodeHeap = struct {
 
     // Merge pending inserts into the sorted list. Call before bulk iteration
     // or binary-search-dependent operations.
-    pub inline fn flushPending(self: *Self) void {
+    pub fn flushPending(self: *Self) void {
         if (self.pending_blocks.items.len == 0) return;
         self.flushPendingSlow();
     }
@@ -117,8 +114,6 @@ pub const CodeHeap = struct {
 
         self.pending_blocks.clearRetainingCapacity();
     }
-
-
 
     pub fn occupiedSpace(self: *const Self) Cell {
         if (self.free_list) |alloc| {
@@ -269,8 +264,6 @@ pub const CodeHeap = struct {
     pub fn batchRemoveFromAllBlocks(self: *Self, removes: []const Cell) void {
         if (removes.len == 0) return;
 
-        // Fast path: when removes are sorted, remove in-place with one linear merge.
-        // Falls back to individual removes when input order is arbitrary.
         if (!isNonDecreasing(removes)) {
             for (removes) |addr| {
                 self.removeFromAllBlocks(addr);
@@ -338,7 +331,6 @@ pub const CodeHeap = struct {
         return null;
     }
 
-    // Match the C++ VM's code_block_for_address() behavior for return-address
     // walking: choose the previous block start without requiring the address to
     // lie within the block extent.
     pub fn codeBlockForReturnAddress(self: *Self, address: Cell) ?*CodeBlock {
@@ -527,7 +519,7 @@ fn codeBlockSize(addr: Cell) Cell {
     return size;
 }
 
-inline fn isNonDecreasing(values: []const Cell) bool {
+fn isNonDecreasing(values: []const Cell) bool {
     if (values.len < 2) return true;
     for (1..values.len) |i| {
         if (values[i] < values[i - 1]) return false;

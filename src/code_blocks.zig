@@ -1,9 +1,3 @@
-// code_blocks.zig - Code block and code heap management
-// Ported from vm/code_blocks.hpp, vm/code_heap.hpp
-//
-// Code blocks contain compiled Factor code (JIT output).
-// Each code block has a header followed by machine code.
-
 const std = @import("std");
 const builtin = @import("builtin");
 
@@ -14,8 +8,6 @@ const trampolines = @import("trampolines.zig");
 
 const Cell = layouts.Cell;
 
-// GC info structure - stored at the end of each code block
-// Must match basis/compiler/codegen/gc-maps/gc-maps.factor and vm/gc_info.hpp
 pub const GcInfo = extern struct {
     gc_root_count: u32,
     derived_root_count: u32,
@@ -77,22 +69,12 @@ pub fn isBitmapSet(bitmap: [*]const u8, index: u32) bool {
     return (bitmap[byte_index] & (@as(u8, 1) << bit_index)) != 0;
 }
 
-// Code block types
 pub const CodeBlockType = enum(u2) {
     unoptimized = 0, // Non-optimized (quick compile)
     optimized = 1, // Optimized by Factor compiler
     pic = 2, // Polymorphic inline cache
 };
 
-// Code block header structure
-// Header bit layout:
-//   bit 0:       free? (1 = free block)
-//   bits 1-2:    type (CodeBlockType)
-//   bits 3-23:   size / 8 (when not free)
-//   bits 24-31:  stack_frame_size / 16 (when not free)
-//
-// When free:
-//   bits 3-end:  size (not divided by 8)
 pub const CodeBlock = extern struct {
     header: Cell,
     owner: Cell, // Tagged pointer: word, quotation, or f
@@ -101,7 +83,7 @@ pub const CodeBlock = extern struct {
 
     const Self = @This();
 
-    pub inline fn isFree(self: *const Self) bool {
+    pub fn isFree(self: *const Self) bool {
         return (self.header & 1) == 1;
     }
 
@@ -109,7 +91,7 @@ pub const CodeBlock = extern struct {
         return @enumFromInt(@as(u2, @truncate((self.header >> 1) & 3)));
     }
 
-    pub inline fn size(self: *const Self) Cell {
+    pub fn size(self: *const Self) Cell {
         if (self.isFree()) {
             return self.header & ~@as(Cell, 7);
         }
@@ -126,17 +108,13 @@ pub const CodeBlock = extern struct {
     pub fn stackFrameSizeForAddress(self: *const Self, addr: Cell) Cell {
         const natural_frame_size = self.stackFrameSize();
 
-        // The first instruction in a code block is the prolog safepoint,
-        // and a leaf procedure code block will record a frame size of zero.
-        // If we're seeing a stack frame in either of these cases, it's a
-        // fake "leaf frame" set up by the signal handler.
         if (natural_frame_size == 0 or addr == self.entryPoint()) {
             return Self.LEAF_FRAME_SIZE;
         }
         return natural_frame_size;
     }
 
-    pub inline fn entryPoint(self: *const Self) Cell {
+    pub fn entryPoint(self: *const Self) Cell {
         std.debug.assert(!self.isFree());
         return @intFromPtr(self) + @sizeOf(Self);
     }
@@ -154,7 +132,6 @@ pub const CodeBlock = extern struct {
         std.debug.assert(total_size >= @sizeOf(Self));
         std.debug.assert(total_size % 8 == 0);
         std.debug.assert(frame_size % 16 == 0);
-        // Encode header
         const type_bits = @as(Cell, @intFromEnum(block_type)) << 1;
         const size_bits = total_size & 0xFFFFF8;
         const frame_bits = (frame_size & 0xFF0) << 20;
@@ -202,13 +179,8 @@ pub const CodeBlock = extern struct {
         return addr - self.entryPoint();
     }
 
-    // LEAF_FRAME_SIZE = 16 (from layouts.hpp)
     pub const LEAF_FRAME_SIZE: Cell = 16;
 
-    // Get the owner quotation for this code block
-    // Matches C++ code_block::owner_quot():
-    //   For non-optimized blocks owned by a word: return word->def (the quotation)
-    //   For optimized blocks: return owner as-is (the word itself)
     pub fn ownerQuot(self: *const Self) Cell {
         if (self.blockType() != .optimized and layouts.hasTag(self.owner, .word)) {
             const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(self.owner));
@@ -217,22 +189,17 @@ pub const CodeBlock = extern struct {
         return self.owner;
     }
 
-    // Calculate scan value for single-stepper
-    // Returns -1 for optimized code, or the quotation array index for unoptimized quotations
     pub fn scan(self: *const Self, vm: *@import("vm.zig").FactorVM, addr: Cell) Cell {
-        // Only unoptimized code blocks support scanning
         if (self.blockType() != .unoptimized) {
             return layouts.tagFixnum(-1);
         }
 
-        // Get the quotation - follow word->def if needed
         var ptr = self.owner;
         if (layouts.hasTag(ptr, .word)) {
             const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(ptr));
             ptr = word.def;
         }
 
-        // Must be a quotation
         if (!layouts.hasTag(ptr, .quotation)) {
             return layouts.tagFixnum(-1);
         }
@@ -242,7 +209,6 @@ pub const CodeBlock = extern struct {
     }
 
     // Map a code offset to a quotation array index by replaying JIT compilation
-    // Matches C++ factor_vm::quot_code_offset_to_scan
     fn quotCodeOffsetToScan(vm: *@import("vm.zig").FactorVM, quot_cell: Cell, offset_val: Cell) layouts.Fixnum {
         const jit_mod = @import("jit.zig");
 
@@ -262,7 +228,6 @@ pub const CodeBlock = extern struct {
     }
 };
 
-// Relocation types for code blocks - must match vm/instruction_operands.hpp
 pub const RelocationType = enum(u4) {
     dlsym = 0, // External C symbol
     entry_point = 1, // Word/quotation entry point
@@ -282,11 +247,6 @@ pub const RelocationType = enum(u4) {
     safepoint = 15, // Safepoint page address
 };
 
-// Relocation class (how to patch)
-// From C++: RC_ABSOLUTE_CELL=0, RC_ABSOLUTE=1, RC_RELATIVE=2,
-// RC_RELATIVE_ARM_B=3, RC_RELATIVE_ARM_B_COND_LDR=4,
-// RC_ABSOLUTE_ARM_LDUR=5, RC_ABSOLUTE_ARM_CMP=6,
-// RC_ABSOLUTE_2=10, RC_ABSOLUTE_1=11
 pub const RelocationClass = enum(u4) {
     absolute_cell = 0, // Full pointer
     absolute = 1, // 4-byte absolute
@@ -306,17 +266,11 @@ pub const RelocationClass = enum(u4) {
     _reserved15 = 15,
 };
 
-// ARM instruction masks for relocation classes
 pub const rel_arm_b_mask: u32 = 0x03ffffff;
 pub const rel_arm_b_cond_ldr_mask: u32 = 0x00ffffe0;
 pub const rel_arm_ldur_mask: u32 = 0x001ff000;
 pub const rel_arm_cmp_mask: u32 = 0x003ffc00;
 
-// Relocation entry
-// C++ layout: (rel_type << 28) | (rel_class << 24) | offset
-//   - Type: bits 28-31 (4 bits)
-//   - Class: bits 24-27 (4 bits)
-//   - Offset: bits 0-23 (24 bits)
 pub const RelocationEntry = extern struct {
     value: u32,
 
@@ -340,8 +294,6 @@ pub const RelocationEntry = extern struct {
         };
     }
 
-    // Get number of parameters consumed from literals/parameters array
-    // This matches the C++ number_of_parameters() function
     pub fn numberOfParameters(self: RelocationEntry) u32 {
         return switch (self.getType()) {
             .vm => 1,
@@ -361,8 +313,6 @@ pub const LiteralRelocationSite = struct {
     param_index: u32,
 };
 
-// Scan relocation entries once to determine if a code block contains
-// embedded literals or code pointers.
 pub fn scanRelocationFlags(block: *const CodeBlock) CodeBlockScanFlags {
     var flags = CodeBlockScanFlags{};
 
@@ -436,7 +386,6 @@ pub fn collectLiteralRelocationSites(
     }
 }
 
-// Instruction operand - handles reading/writing instruction operands
 pub const InstructionOperand = struct {
     rel: RelocationEntry,
     compiled: *CodeBlock,
@@ -454,22 +403,16 @@ pub const InstructionOperand = struct {
         };
     }
 
-    // Load a value from a bitfield of an ARM instruction
-    // Extracts bits [msb:lsb] and applies scaling (left shift)
     fn loadValueMasked(self: *const Self, msb: u5, lsb: u5, scaling: u5) i64 {
         const ptr: *align(1) const i32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const value = ptr.*;
 
-        // Extract bits by shifting left to clear high bits, then right to position
         const shifted = value << (31 - msb);
         const extracted: i32 = shifted >> (31 - msb + lsb);
 
-        // Apply scaling (left shift) and convert to i64
         return @as(i64, extracted) << scaling;
     }
 
-    // Load the current value from the instruction
-    // Note: x86 instruction operands are NOT aligned, so we use align(1) pointers
     pub fn loadValue(self: *const Self) i64 {
         return switch (self.rel.getClass()) {
             .absolute_cell => @bitCast(@as(*align(1) const Cell, @ptrFromInt(self.pointer - @sizeOf(Cell))).*),
@@ -499,9 +442,6 @@ pub const InstructionOperand = struct {
         };
     }
 
-    // Load the current value from the instruction, using an explicit base
-    // address for relative relocations. This is needed during code heap
-    // compaction: instruction encodings still reference the OLD code base.
     pub fn loadValueRelative(self: *const Self, relative_to: Cell) i64 {
         return switch (self.rel.getClass()) {
             .absolute_cell => @bitCast(@as(*align(1) const Cell, @ptrFromInt(self.pointer - @sizeOf(Cell))).*),
@@ -531,22 +471,16 @@ pub const InstructionOperand = struct {
         };
     }
 
-    // Store a value into a bitfield of an ARM instruction
-    // Inserts value into bits specified by mask, at position lsb, with scaling (right shift)
     fn storeValueMasked(self: *Self, value: i64, mask: u32, lsb: u5, scaling: u5) void {
         const ptr: *align(1) u32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const old = ptr.*;
 
-        // Right shift to remove scaling, then position at lsb, then apply mask
         const shifted_value: u32 = @truncate(@as(u64, @bitCast(value >> scaling)));
         const positioned = (shifted_value << lsb) & mask;
 
-        // Clear masked bits in original, then OR in new value
         ptr.* = (old & ~mask) | positioned;
     }
 
-    // Store a value to the instruction operand
-    // Note: x86 instruction operands are NOT aligned, so we use align(1) pointers
     pub fn storeValue(self: *Self, absolute_value: i64) void {
         const relative_value = absolute_value - @as(i64, @bitCast(self.pointer));
 
@@ -572,10 +506,7 @@ pub const InstructionOperand = struct {
                 ptr.* = @truncate(relative_value);
             },
             .relative_arm_b => {
-                // Adjust relative value for ARM B/BL (add 4 to compensate for PC offset)
                 const adjusted = relative_value + 4;
-
-                // Assert range and alignment (matching C++ FACTOR_ASSERT)
                 std.debug.assert(adjusted < 0x8000000);
                 std.debug.assert(adjusted >= -0x8000000);
                 std.debug.assert((adjusted & 3) == 0);
@@ -583,10 +514,7 @@ pub const InstructionOperand = struct {
                 self.storeValueMasked(adjusted, rel_arm_b_mask, 0, 2);
             },
             .relative_arm_b_cond_ldr => {
-                // Adjust relative value for ARM B.cond/LDR (add 4 to compensate for PC offset)
                 const adjusted = relative_value + 4;
-
-                // Assert range and alignment
                 std.debug.assert(adjusted < 0x2000000);
                 std.debug.assert(adjusted >= -0x2000000);
                 std.debug.assert((adjusted & 3) == 0);
@@ -594,14 +522,12 @@ pub const InstructionOperand = struct {
                 self.storeValueMasked(adjusted, rel_arm_b_cond_ldr_mask, 5, 2);
             },
             .absolute_arm_ldur => {
-                // LDUR offset is signed 9-bit [-256, 255]
                 std.debug.assert(absolute_value >= -256);
                 std.debug.assert(absolute_value <= 255);
 
                 self.storeValueMasked(absolute_value, rel_arm_ldur_mask, 12, 0);
             },
             .absolute_arm_cmp => {
-                // CMP immediate is unsigned 12-bit [0, 4095]
                 std.debug.assert(absolute_value >= 0);
                 std.debug.assert(absolute_value <= 4095);
 
@@ -616,9 +542,7 @@ pub const InstructionOperand = struct {
         }
     }
 
-    // Load the code block that this operand points to.
-    // Matches C++: (code_block*)(load_value() - sizeof(code_block))
-    pub inline fn loadCodeBlock(self: *const Self) ?*CodeBlock {
+    pub fn loadCodeBlock(self: *const Self) ?*CodeBlock {
         const value = self.loadValue();
         if (value == 0) return null;
         const unsigned_value: Cell = @bitCast(value);
@@ -626,7 +550,6 @@ pub const InstructionOperand = struct {
     }
 };
 
-// Relocation context - provides values for relocation resolution
 pub const RelocationContext = struct {
     vm_ptr: Cell,
     cards_offset: Cell,
@@ -635,11 +558,9 @@ pub const RelocationContext = struct {
     inline_cache_miss_ptr: Cell,
     safepoint_page: Cell,
 
-    // PIC configuration
     max_pic_size: Cell,
     lazy_jit_compile_ep: Cell,
 
-    // Get literal from literals array at given index
     literals: ?*const layouts.Array,
     parameters: ?*const layouts.Array,
 };
@@ -658,7 +579,6 @@ fn requireParameters(ctx: *const RelocationContext, param_index: Cell, needed: C
     return params;
 }
 
-// Apply all relocations to a code block
 pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
     if (block.relocation == layouts.false_object) return;
     if (!layouts.hasTag(block.relocation, .byte_array)) return;
@@ -707,8 +627,6 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
                 if (offset >= 0) {
                     break :blk @as(i64, @bitCast(block.entryPoint() + entry_ptr.getOffset())) + offset;
                 }
-                // Negative: entry_point - n (where n < 0, so this adds |n|)
-                // Intentionally omits reloc_offset, matching C++ compute_here_address
                 break :blk @as(i64, @bitCast(block.entryPoint())) - offset;
             },
             .this => @bitCast(block.entryPoint()),
@@ -743,18 +661,13 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
     }
 }
 
-// Get the actual owner of a code block
-// Cold generic word call sites point to quotations that call inline-cache-miss
-// This function extracts the actual word from such quotations
 fn codeBlockOwner(block: *const CodeBlock) Cell {
     const owner = block.owner;
 
-    // If not a quotation, return as-is
     if (!layouts.hasTag(owner, .quotation)) {
         return owner;
     }
 
-    // For quotations used in PIC, extract the wrapped word
     const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(owner));
     if (quot.array == layouts.false_object) {
         return owner;
@@ -763,12 +676,10 @@ fn codeBlockOwner(block: *const CodeBlock) Cell {
     const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(quot.array));
     const capacity = layouts.untagFixnumUnsigned(arr.capacity);
 
-    // PIC quotations have 5 elements
     if (capacity != 5) {
         return owner;
     }
 
-    // Extract word from wrapper at index 0
     const elem0 = arr.data()[0];
     if (layouts.hasTag(elem0, .wrapper)) {
         const wrapper: *const layouts.Wrapper = @ptrFromInt(layouts.UNTAG(elem0));
@@ -778,9 +689,7 @@ fn codeBlockOwner(block: *const CodeBlock) Cell {
     return owner;
 }
 
-// Compute entry point for a word or quotation.
-// Matches C++ compute_entry_point_address.
-inline fn computeEntryPoint(obj: Cell) Cell {
+fn computeEntryPoint(obj: Cell) Cell {
     const tag = layouts.typeTag(obj);
     if (tag == .word) {
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(obj));
@@ -792,27 +701,20 @@ inline fn computeEntryPoint(obj: Cell) Cell {
     unreachable;
 }
 
-// Check if a quotation is compiled (has valid entry_point)
-// Matches C++ quotation_compiled_p: entry_point != 0 && entry_point != lazy_jit_compile_entry_point()
 fn isQuotationCompiled(quot: *const layouts.Quotation, lazy_jit_ep: Cell) bool {
     return quot.entry_point != 0 and quot.entry_point != lazy_jit_ep;
 }
 
-// Compute entry point for PIC address (non-tail call)
-// Uses word's pic_def if it's a compiled quotation, otherwise falls back to word's entry_point
-// Matches C++ compute_entry_point_pic_address
 fn computeEntryPointPicAddress(word_cell: Cell, max_pic_size: Cell, lazy_jit_ep: Cell) Cell {
     std.debug.assert(layouts.hasTag(word_cell, .word));
 
     const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
     const pic_def = word.pic_def;
 
-    // If pic_def is false/null or max_pic_size is 0, use word's entry_point
     if (pic_def == layouts.false_object or max_pic_size == 0) {
         return word.entry_point;
     }
 
-    // Check if pic_def is a compiled quotation
     if (layouts.hasTag(pic_def, .quotation)) {
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(pic_def));
         if (isQuotationCompiled(quot, lazy_jit_ep)) {
@@ -820,25 +722,19 @@ fn computeEntryPointPicAddress(word_cell: Cell, max_pic_size: Cell, lazy_jit_ep:
         }
     }
 
-    // Fallback to word's entry_point
     return word.entry_point;
 }
 
-// Compute entry point for PIC tail address (tail call)
-// Uses word's pic_tail_def if it's a compiled quotation, otherwise falls back to word's entry_point
-// Matches C++ compute_entry_point_pic_tail_address
 fn computeEntryPointPicTailAddress(word_cell: Cell, max_pic_size: Cell, lazy_jit_ep: Cell) Cell {
     std.debug.assert(layouts.hasTag(word_cell, .word));
 
     const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
     const pic_tail_def = word.pic_tail_def;
 
-    // If pic_tail_def is false/null or max_pic_size is 0, use word's entry_point
     if (pic_tail_def == layouts.false_object or max_pic_size == 0) {
         return word.entry_point;
     }
 
-    // Check if pic_tail_def is a compiled quotation
     if (layouts.hasTag(pic_tail_def, .quotation)) {
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(pic_tail_def));
         if (isQuotationCompiled(quot, lazy_jit_ep)) {
@@ -846,15 +742,9 @@ fn computeEntryPointPicTailAddress(word_cell: Cell, max_pic_size: Cell, lazy_jit
         }
     }
 
-    // Fallback to word's entry_point
     return word.entry_point;
 }
 
-// Compute dlsym address - looks up an external library symbol
-// Parameters array contains: [symbol_name (byte_array), dll (dll object or f)]
-// Returns the symbol address or undefined_symbol handler if not found
-// Look up internal VM symbols by name. The runtime @intFromPtr references
-// prevent Zig's DCE from stripping exported functions in Release builds.
 fn lookupInternalSymbol(name: [*:0]const u8) ?usize {
     const c = @import("c_api.zig");
     const eql = struct {
@@ -906,8 +796,6 @@ pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
         if (dll.handle == null) return undef_addr;
         handle = dll.handle;
     } else {
-        // Null dll — look up in main executable.
-        // Check internal table first (also prevents DCE of exported fns).
         if (lookupInternalSymbol(name_ptr)) |addr| return addr;
 
         handle = alien.null_dll;
@@ -921,8 +809,6 @@ pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
     return undef_addr;
 }
 
-// Update word references in a code block (after word redefinition).
-// Matches C++ factor_vm::update_word_references.
 pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pic_size: Cell, lazy_jit_ep: Cell) void {
     if (block.relocation == layouts.false_object) return;
     if (!layouts.hasTag(block.relocation, .byte_array)) return;
@@ -1007,10 +893,9 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pi
         }
     }
 
-    // Flush only when at least one relocation target changed.
-    if (modified) {
-        block.flushIcache();
-    }
+        if (modified) {
+            block.flushIcache();
+        }
 }
 
 // Compile-time verification

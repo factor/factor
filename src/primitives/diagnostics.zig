@@ -497,7 +497,6 @@ fn diePrintTuple(tagged_tuple: layouts.Cell) void {
             std.debug.print("\n", .{});
         }
     } else {
-        // Layout tag is wrong - try to read the layout address as if it were a tuple layout anyway
         const forced_addr = layouts.UNTAG(layout_cell);
         if (forced_addr > 0x1000) {
             // Read memory at layout address: header, capacity, klass, size, echelon
@@ -568,7 +567,6 @@ pub export fn primitive_disable_gc_events(vm_asm: *VMAssemblyFields) callconv(.c
     // Disable GC event tracking and return collected events as an array.
     // Each event is returned as a byte-array containing the event struct.
     //
-    // Matches C++ primitive_disable_gc_events which uses growable_array
     // for incremental allocation. The previous Zig version tried to
     // pre-allocate all space in one nursery chunk, which failed when
     // there were thousands of GC events (total size > nursery).
@@ -587,7 +585,6 @@ pub export fn primitive_disable_gc_events(vm_asm: *VMAssemblyFields) callconv(.c
             return;
         }
 
-        // Use GrowableArray for incremental allocation (like C++ growable_array).
         // Each add() can trigger GC if the nursery fills up.
         var result = growable.GrowableArray.init(vm, @min(event_count, 1024)) orelse {
             event_list.deinit(vm.allocator);
@@ -597,15 +594,10 @@ pub export fn primitive_disable_gc_events(vm_asm: *VMAssemblyFields) callconv(.c
 
         // Root result.elements so GC can update it when the backing
         // array moves between generations.
-        vm.data_roots.append(vm.allocator, &result.elements) catch {
-            event_list.deinit(vm.allocator);
-            vm.allocator.destroy(event_list);
-            vm.memoryError();
-        };
+        vm.data_roots.appendAssumeCapacity(&result.elements);
         defer _ = vm.data_roots.pop();
 
         // Convert each event to a byte-array and add to result.
-        // Matches C++: byte_array_from_value(&event) + result.add().
         const event_size = @sizeOf(vm_mod.GCEvent);
         for (event_list.items) |event| {
             const ba_tagged = vm.allotByteArray(event_size);
@@ -637,7 +629,6 @@ pub export fn primitive_data_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( -- byte-array )
     // Return data heap statistics as a byte array
-    // Structure matches data_heap_room from C++ VM
     const gc_instance = vm.gc orelse {
         vm.push(layouts.false_object);
         return;
@@ -692,7 +683,6 @@ pub export fn primitive_code_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( -- byte-array )
     // Return code heap statistics as a byte array
-    // Structure matches allocator_room from C++ VM
     const code_heap = vm.code orelse {
         vm.push(layouts.false_object);
         return;
@@ -733,7 +723,6 @@ pub export fn primitive_callback_room(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const vm = vm_asm.getVM();
     // ( -- byte-array )
     // Return callback heap statistics as a byte array
-    // Structure matches allocator_room from C++ VM
     const callback_heap = vm.callbacks orelse {
         vm.push(layouts.false_object);
         return;
@@ -768,7 +757,6 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const vm = vm_asm.getVM();
     // ( -- array )
     // Returns an array of all objects in the data heap.
-    // Mirrors C++ factor_vm::instances(TYPE_COUNT):
     //   1. Full GC to empty nursery/aging into tenured
     //   2. Iterate tenured + large objects, collecting tagged pointers
     //   3. Build a Factor array from collected pointers
@@ -785,12 +773,10 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
         return;
     };
 
-    // Prevent GC during iteration (matches C++ gc_off = true in each_object)
     const was_gc_off = vm.gc_off;
     vm.gc_off = true;
 
     // Count objects in tenured space.
-    // Matches C++ each_object(tenured, ...) which never breaks on header==0
     // and reads free block sizes from the header (header & ~7).
     const free_list = @import("../free_list.zig");
     var count: usize = 0;
@@ -835,7 +821,6 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
         } else {
             const size = free_list.objectSizeFromHeader(scan);
             if (size == 0) break;
-            // Tag the object: address | type_tag (like C++ tag_dynamic)
             const type_tag = @as(Cell, @truncate((header >> 2) & layouts.tag_mask));
             data[idx] = scan | type_tag;
             idx += 1;
@@ -869,7 +854,6 @@ pub export fn primitive_dispatch_stats(vm_asm: *VMAssemblyFields) callconv(.c) v
     const vm = vm_asm.getVM();
     // ( -- byte-array )
     // Returns a byte array containing the dispatch_statistics struct,
-    // matching C++ byte_array_from_value(&dispatch_stats).
     const stats_size = @sizeOf(vm_mod.DispatchStatistics);
     const ba_size = @sizeOf(layouts.ByteArray) + stats_size;
 
@@ -920,18 +904,12 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
     };
 
     // Root samples_array since inner allocations can trigger GC
-    vm.data_roots.append(vm.allocator, &samples_array) catch {
-        vm.push(layouts.false_object);
-        return;
-    };
+    vm.data_roots.appendAssumeCapacity(&samples_array);
     defer _ = vm.data_roots.pop();
 
     // Get the callstacks growable array
     var callstacks_cell = vm.specialObject(.sample_callstacks);
-    vm.data_roots.append(vm.allocator, &callstacks_cell) catch {
-        vm.push(layouts.false_object);
-        return;
-    };
+    vm.data_roots.appendAssumeCapacity(&callstacks_cell);
     defer _ = vm.data_roots.pop();
 
     for (samples, 0..) |sample, i| {
@@ -942,10 +920,7 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
         };
 
         // Root sample_arr for the callstack array allocation below
-        vm.data_roots.append(vm.allocator, &sample_arr) catch {
-            vm.push(layouts.false_object);
-            return;
-        };
+        vm.data_roots.appendAssumeCapacity(&sample_arr);
         defer _ = vm.data_roots.pop();
 
         // Fill in the counts

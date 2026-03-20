@@ -21,7 +21,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     const reset_inline_caches = vm.pop();
     const update_existing_words = vm.pop();
     var rooted_alist = vm.pop();
-    vm.data_roots.append(vm.allocator, &rooted_alist) catch @panic("OOM");
+    vm.data_roots.appendAssumeCapacity(&rooted_alist);
     defer _ = vm.data_roots.pop();
 
     // Validate alist is an array
@@ -38,10 +38,9 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     for (0..count) |i| {
         // CRITICAL: Re-derive alist from rooted_alist each iteration because
         // jitCompileQuotationWithOwner (called in previous iterations) can trigger GC
-        // that moves the alist array. C++ does this via alist.untagged() data_root accessor.
         const alist_fresh: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_alist));
         var rooted_pair = alist_fresh.data()[i];
-        vm.data_roots.append(vm.allocator, &rooted_pair) catch @panic("OOM");
+        vm.data_roots.appendAssumeCapacity(&rooted_pair);
         defer _ = vm.data_roots.pop();
 
         // Each element should be an array of [word, code]
@@ -56,7 +55,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 
         var rooted_word = pair.data()[0];
         var rooted_code = pair.data()[1];
-        vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch @panic("OOM");
         vm.data_roots.appendAssumeCapacity(&rooted_word);
         defer _ = vm.data_roots.pop();
         vm.data_roots.appendAssumeCapacity(&rooted_code);
@@ -67,15 +65,12 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             continue;
         }
 
-        // Handle based on code type
         const code_tag = layouts.typeTag(rooted_code);
 
         if (code_tag == .quotation or code_tag == .tuple) {
             // Quotation or tuple (curry/compose) case: JIT compile and update
-            // word entry point. Matches C++ jit_compile_word which handles both
             // QUOTATION_TYPE and TUPLE_TYPE (see issue #2763).
 
-            // C++ guard: Refuse to recompile lazy-jit-compile word more than once,
             // because quotation-compiled? depends on the identity of its code block.
             // Without this, recompiling lazy-jit-compile changes the sentinel
             // entry_point, causing all quotations with the OLD sentinel to appear
@@ -88,7 +83,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             }
 
             // Compile the definition with the word as owner.
-            // CRITICAL: relocate=false (matching C++ jit_compile_word in modify_code_heap).
             // Code blocks are added to uninitialized_blocks and initialized later by
             // updateCodeHeapWords, after ALL word entry_points have been set.
             // This ensures cross-references between words resolve correctly.
@@ -101,7 +95,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             }
 
             // Compile pic_def and pic_tail_def if present.
-            // Matches C++ jit_compile_word which compiles these after setting entry_point.
             if (word_after.pic_def != layouts.false_object) {
                 vm.jitCompileQuotation(word_after.pic_def, false);
             }
@@ -112,7 +105,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             // Array case: raw compiled code (optimized compilation)
             // Array contains: [parameters, literals, relocation, labels, code, frame_size]
             //
-            // IMPORTANT: Following C++ two-phase approach:
             // Phase 1 (here): Allocate code block, copy machine code, apply labels, set entry_point
             // Phase 2 (in updateCodeHeapWords): Apply relocations after ALL entry_points are set
             // This is critical because code blocks may reference each other.
@@ -131,7 +123,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             var code_bytes_cell = arr_data[4];
             const frame_size = layouts.untagFixnumUnsigned(arr_data[5]);
 
-            vm.data_roots.ensureUnusedCapacity(vm.allocator, 5) catch @panic("OOM");
             vm.data_roots.appendAssumeCapacity(&parameters_cell);
             defer _ = vm.data_roots.pop();
             vm.data_roots.appendAssumeCapacity(&literals_cell);
@@ -225,7 +216,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
             // DO NOT apply relocations here! Defer to updateCodeHeapWords.
             // Store the literals cell in uninitialized_blocks so updateCodeHeapWords
             // can initialize this block later, after all word entry_points are set.
-            // This matches the C++ two-phase approach in add_code_block/update_code_heap_words.
             const code_heap = vm.code orelse continue;
             code_heap.putUninitializedBlock(vm.allocator, @intFromPtr(block), literals_cell) catch {
                 // Fall back to immediate initialization if tracking fails
@@ -247,7 +237,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
         updateCodeHeapWords(vm, reset_inline_caches != layouts.false_object);
     }
     if (update_existing_words == layouts.false_object) {
-        // Fast path: just initialize uninitialized blocks without updating all word references
         if (vm.code) |code_heap| {
             var iter = code_heap.uninitialized_blocks.iterator();
             while (iter.next()) |entry| {
@@ -260,7 +249,6 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 }
 
 // Update all code blocks to point to current word entry points
-// This is equivalent to C++ VM's update_code_heap_words
 pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
     const code_heap = vm.code orelse return;
 
@@ -383,7 +371,7 @@ fn preCompileQuotationLiterals(vm: *FactorVM) void {
 
     if (to_compile.items.len > 0) {
         // Root all quotation cells to protect from GC during compilation.
-        vm.data_roots.ensureUnusedCapacity(vm.allocator, to_compile.items.len) catch @panic("OOM");
+        vm.data_roots.ensureUnusedCapacity(vm.allocator, to_compile.items.len + 32) catch @panic("OOM");
         for (to_compile.items) |*cell_ptr| {
             vm.data_roots.appendAssumeCapacity(cell_ptr);
         }
@@ -474,9 +462,6 @@ pub export fn primitive_strip_stack_traces(_: *VMAssemblyFields) callconv(.c) vo
     // Strips debug information from all code blocks by setting owner to false
     // Used to reduce memory usage after compilation
 
-    // For stub: just return
-    // Real implementation would:
-    // Iterate through all code blocks and set block->owner = false_object
 }
 
 // --- Single-stepper Primitives ---
@@ -575,7 +560,6 @@ pub export fn primitive_quotation_compiled_p(vm_asm: *VMAssemblyFields) callconv
     }
     const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));
     // Quotation is compiled if entry_point is non-zero and not lazy_jit_compile stub
-    // Matches C++ quotation_compiled_p: entry_point != 0 && entry_point != lazy_jit_compile_entry_point()
     const compiled = jit_mod.isQuotationCompiled(vm, quot);
     vm.push(vm.tagBoolean(compiled));
 }
@@ -583,7 +567,6 @@ pub export fn primitive_quotation_compiled_p(vm_asm: *VMAssemblyFields) callconv
 pub export fn primitive_jit_compile(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( quot -- )
-    // Matches C++ primitive_jit_compile: jit_compile_quotation(ctx->pop(), true)
     const quot_cell = vm.pop();
     vm.jitCompileQuotation(quot_cell, true);
 }
@@ -591,7 +574,6 @@ pub export fn primitive_jit_compile(vm_asm: *VMAssemblyFields) callconv(.c) void
 pub export fn primitive_array_to_quotation(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( array -- quotation )
-    // NOTE: C++ VM uses peek/replace:
     // quotation* quot = allot<quotation>(sizeof(quotation));
     // quot->array = ctx->peek();
     // quot->cached_effect = false_object;
@@ -623,7 +605,6 @@ pub export fn primitive_word_optimized_p(vm_asm: *VMAssemblyFields) callconv(.c)
     const word_cell = vm.peek();
     vm.checkTag(word_cell, .word);
     const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
-    // Code block is located just before the entry point
     const block: *const code_blocks.CodeBlock = @ptrFromInt(word.entry_point - @sizeOf(code_blocks.CodeBlock));
     vm.replace(vm.tagBoolean(block.blockType() == .optimized));
 }
@@ -642,7 +623,7 @@ pub export fn primitive_lookup_method(vm_asm: *VMAssemblyFields) callconv(.c) vo
 // For tuples, returns the layout; for other types, returns the tagged fixnum of the tag.
 // No forwarding pointer following needed outside of GC since all references are
 // updated after collection completes.
-pub inline fn objectClass(object: Cell) Cell {
+pub fn objectClass(object: Cell) Cell {
     const tag = layouts.typeTag(object);
     if (tag == .tuple) {
         const tuple: *const layouts.Tuple = @ptrFromInt(layouts.UNTAG(object));
@@ -651,8 +632,7 @@ pub inline fn objectClass(object: Cell) Cell {
     return layouts.tagFixnum(@as(Fixnum, @intCast(@intFromEnum(tag))));
 }
 
-// C++: ((klass >> TAG_BITS) & capacity) << 1
-inline fn methodCacheHashcode(klass: Cell, cache_arr: *const layouts.Array) Cell {
+fn methodCacheHashcode(klass: Cell, cache_arr: *const layouts.Array) Cell {
     const capacity = layouts.untagFixnumFast(cache_arr.capacity);
     // capacity >> 1 gives number of pairs, - 1 for mask
     const mask = (capacity >> 1) - 1;
@@ -660,7 +640,7 @@ inline fn methodCacheHashcode(klass: Cell, cache_arr: *const layouts.Array) Cell
     return ((klass >> layouts.tag_bits) & mask) << 1;
 }
 
-inline fn updateMethodCache(vm: *FactorVM, cache: Cell, klass: Cell, method: Cell) void {
+fn updateMethodCache(vm: *FactorVM, cache: Cell, klass: Cell, method: Cell) void {
     const cache_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(cache));
     const hashcode = methodCacheHashcode(klass, cache_arr);
     const data = cache_arr.data();
@@ -679,7 +659,6 @@ pub export fn primitive_mega_cache_miss(vm_asm: *VMAssemblyFields) callconv(.c) 
     const vm = vm_asm.getVM();
     const ctx = vm_asm.ctx;
     // ( methods index cache -- method )
-    // Matches C++ factor_vm::primitive_mega_cache_miss()
     vm.dispatch_stats.megamorphic_cache_misses += 1;
 
     const cache = ctx.pop();
@@ -728,7 +707,6 @@ inline fn searchLookupHash(table: Cell, klass: Cell, hashcode: Cell) Cell {
     return bucket;
 }
 
-// Matches C++ lookup_tuple_method: no runtime tag checks, just untag directly.
 inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
     const tuple: *const layouts.Tuple = @ptrFromInt(layouts.UNTAG(obj));
 
@@ -767,13 +745,11 @@ inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
         echelon -= 1;
     }
 
-    // C++ calls critical_error here, but it requires VM access.
     // This path should never be reached with valid data.
     if (comptime std.debug.runtime_safety) unreachable;
     return layouts.false_object;
 }
 
-// Matches C++ lookup_method: array_nth(methods, tag) with FACTOR_ASSERT only.
 pub inline fn lookupMethod(object: Cell, methods: Cell) Cell {
     const methods_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(methods));
     const tag: Cell = layouts.TAG(object);
@@ -830,14 +806,12 @@ pub export fn primitive_callstack_for(vm_asm: *VMAssemblyFields) callconv(.c) vo
 
     const ctx = other_ctx.?;
 
-    // Use second_from_top_stack_frame() like C++ does.
     // This skips 2 frames from the top because the 'callstack' primitive frame
     // and its caller frame should not be included - otherwise set-callstack
     // would loop forever.
     const top = secondFromTopStackFrame(vm, ctx);
     const bottom = ctx.callstack_bottom;
 
-    // Match C++: size = max(0, bottom - top). The second_from_top_stack_frame
     // already skipped the primitive frame and its caller, so bottom - top gives
     // the correct callstack size to capture.
     const size: Cell = if (bottom > top) bottom - top else 0;

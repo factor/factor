@@ -15,6 +15,7 @@ const free_list_mod = @import("free_list.zig");
 const gc_mod = @import("gc.zig");
 const icache = @import("icache.zig");
 const segments = @import("segments.zig");
+const slot_visitor = @import("slot_visitor.zig");
 const sweep_mod = @import("sweep.zig");
 const layouts = @import("layouts.zig");
 const mark_bits = @import("mark_bits.zig");
@@ -233,7 +234,6 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
         }
         const old_block_addr = blocks[ub - 1];
 
-        // During data compaction, code hasn't moved yet, so read from old address
         const old_block: *const code_blocks.CodeBlock = @ptrFromInt(old_block_addr);
 
         // Get compiled block (may be at new address if code forwarding is active)
@@ -267,7 +267,6 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
 
 fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
     const code_heap = gc.vm.code orelse return;
-    // Use all_blocks_sorted which still has OLD addresses at this point
     const blocks = code_heap.all_blocks_sorted.items;
     if (blocks.len == 0) return;
 
@@ -290,14 +289,12 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
         }
         const old_block_addr = blocks[ub - 1];
 
-        // Use forwarding map to get the new block address
         const new_block_addr = fixup.translateCode(old_block_addr);
         const new_block: *const code_blocks.CodeBlock = @ptrFromInt(new_block_addr);
 
         const old_entry_point = old_block_addr + @sizeOf(code_blocks.CodeBlock);
         const offset = if (addr > old_entry_point) addr - old_entry_point else 0;
 
-        // Get frame size from the NEW block (which has valid data)
         const natural_frame_size = new_block.stackFrameSize();
         const delta = if (addr > old_entry_point) addr - old_entry_point else 0;
         var frame_size: Cell = LEAF_FRAME_SIZE;
@@ -337,15 +334,10 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
         }
         const old_block_addr = blocks[ub - 1];
 
-        // Use fixupCode (forwarding map) — works even before code is physically moved
         const new_block_addr = fixup.fixupCode(old_block_addr);
-
-        // Read frame size from OLD block (still valid at this point —
-        // called during data compaction before code blocks move)
         const old_block: *const code_blocks.CodeBlock = @ptrFromInt(old_block_addr);
         const old_entry_point = old_block.entryPoint();
         const offset = if (addr >= old_entry_point) addr - old_entry_point else 0;
-        // Compute new return address arithmetically (don't read from new_block_addr)
         const new_entry_point = new_block_addr + @sizeOf(code_blocks.CodeBlock);
         addr_ptr.* = new_entry_point + offset;
 
@@ -359,74 +351,27 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
     }
 }
 
-fn fixupObjectSlots(gc: *GC, addr: Cell, fixup: *CompactionFixup) void {
-    const obj: *layouts.Object = @ptrFromInt(addr);
-    if (obj.isFree()) return;
+/// Fixup for compaction: updates data pointers through the forwarding map.
+const CompactionSlotFixup = struct {
+    gc: *GC,
+    fixup: *CompactionFixup,
 
-    switch (obj.getType()) {
-        .array => {
-            const arr: *layouts.Array = @ptrFromInt(addr);
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            const data = arr.data();
-            for (0..capacity) |i| {
-                fixupSlot(fixup, &data[i]);
-            }
-        },
-        .quotation => {
-            const quot: *layouts.Quotation = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&quot.array));
-            fixupSlot(fixup, @ptrCast(&quot.cached_effect));
-            fixupSlot(fixup, @ptrCast(&quot.cache_counter));
-        },
-        .word => {
-            const word: *layouts.Word = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&word.hashcode_field));
-            fixupSlot(fixup, @ptrCast(&word.name));
-            fixupSlot(fixup, @ptrCast(&word.vocabulary));
-            fixupSlot(fixup, @ptrCast(&word.def));
-            fixupSlot(fixup, @ptrCast(&word.props));
-            fixupSlot(fixup, @ptrCast(&word.pic_def));
-            fixupSlot(fixup, @ptrCast(&word.pic_tail_def));
-            fixupSlot(fixup, @ptrCast(&word.subprimitive));
-        },
-        .tuple => {
-            // Match C++: untag layout, translate via compaction fixup, read size.
-            const tuple: *layouts.Tuple = @ptrFromInt(addr);
-            const layout_addr = fixup.translateData(layouts.UNTAG(tuple.layout));
-            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const slots = layouts.untagFixnumUnsigned(layout.size);
-            fixupSlot(fixup, @ptrCast(&tuple.layout));
-            const data = tuple.data();
-            for (0..slots) |i| {
-                fixupSlot(fixup, &data[i]);
-            }
-        },
-        .wrapper => {
-            const wrapper: *layouts.Wrapper = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&wrapper.object));
-        },
-        .string => {
-            const str: *layouts.String = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&str.aux));
-            fixupSlot(fixup, @ptrCast(&str.hashcode_field));
-        },
-        .alien => {
-            const alien: *layouts.Alien = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&alien.base));
-            fixupSlot(fixup, @ptrCast(&alien.expired));
-            alien.updateAddress();
-        },
-        .dll => {
-            const dll: *layouts.Dll = @ptrFromInt(addr);
-            fixupSlot(fixup, @ptrCast(&dll.path));
-        },
-        .callstack => {
-            const stack: *layouts.Callstack = @ptrFromInt(addr);
-            fixupCallstackObjectSlots(gc, stack, fixup);
-        },
-        .bignum, .byte_array, .float => {},
-        .fixnum, .f => {},
+    pub fn visitSlot(self: *@This(), slot: *Cell) void {
+        fixupSlot(self.fixup, slot);
     }
+
+    pub fn resolveTupleLayout(self: *@This(), layout: Cell) Cell {
+        return self.fixup.translateData(layouts.UNTAG(layout));
+    }
+
+    pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
+        fixupCallstackObjectSlots(self.gc, stack, self.fixup);
+    }
+};
+
+fn fixupObjectSlots(gc: *GC, addr: Cell, fixup: *CompactionFixup) void {
+    var slot_fixup = CompactionSlotFixup{ .gc = gc, .fixup = fixup };
+    _ = slot_visitor.visitDataObjectSlots(CompactionSlotFixup, &slot_fixup, addr);
 }
 
 fn fixupObjectCodePointers(gc: *GC, addr: Cell, fixup: *CompactionFixup) void {
@@ -458,7 +403,7 @@ fn fixupObjectCodePointers(gc: *GC, addr: Cell, fixup: *CompactionFixup) void {
     }
 }
 
-inline fn fixupStackSlots(top: Cell, seg: *const segments.Segment, fixup: *CompactionFixup) void {
+fn fixupStackSlots(top: Cell, seg: *const segments.Segment, fixup: *CompactionFixup) void {
     var ptr = seg.start;
     while (ptr <= top) : (ptr += @sizeOf(Cell)) {
         const slot: *Cell = @ptrFromInt(ptr);
@@ -564,7 +509,6 @@ fn updateInstructionOperandsForCompaction(gc: *GC, block: *code_blocks.CodeBlock
 
         // Always store: even if the absolute target didn't change, relative
         // encodings must be re-written because the instruction moved.
-        // C++ always stores unconditionally.
         op.storeValue(@bitCast(new_value));
 
         param_index += entry_ptr.numberOfParameters();
@@ -738,7 +682,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
 
     // When not compacting code, still fix data pointers in live code blocks
     // (owner, parameters, relocation, embedded literals) since data objects moved.
-    // Matches C++ compact_data_heap() which updates code block references.
     if (!compact_code_heap) {
         if (gc.vm.code) |code| {
             if (code.marks) |marks| {
@@ -768,7 +711,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
     }
 
     // Fix up uninitialized_blocks map values (data pointers).
-    // The C++ VM does this in visit_all_roots() which runs for ALL compaction,
     // not just code compaction. Without this, values in the map become stale
     // after data-only compaction when the pointed-to objects move.
     if (!compact_code_heap) {
@@ -796,7 +738,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
         }
     }
 
-    // NOTE: Do NOT fixup unused_contexts - matches C++ behavior.
 
     for (gc.vm.data_roots.items) |root_ptr| {
         fixupSlot(&fixup, root_ptr);
@@ -835,7 +776,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
             }
         }
 
-        // NOTE: Do NOT fixup unused_contexts - matches C++ behavior.
 
         // Update code roots after code compaction (inline cache call sites)
         if (code_marks) |marks| {

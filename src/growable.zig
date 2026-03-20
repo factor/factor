@@ -1,16 +1,9 @@
-// growable.zig - Growable array and byte array data structures
-// Ported from vm/arrays.hpp, vm/arrays.cpp, vm/byte_arrays.hpp, vm/byte_arrays.cpp
-//
-// These helper structures are used by VM internals for building arrays incrementally.
-// They automatically grow the backing array as needed and can be trimmed to exact size.
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const vm_mod = @import("vm.zig");
 const Cell = layouts.Cell;
 
 /// Growable array for building arrays incrementally
-/// Equivalent to C++ growable_array
 pub const GrowableArray = struct {
     const Self = @This();
 
@@ -51,9 +44,9 @@ pub const GrowableArray = struct {
     /// Grows the array if necessary (doubles capacity)
     /// Allocates memory
     pub fn add(self: *GrowableArray, elt: Cell) bool {
-        // Root elt to protect from GC during reallotArray (matches C++ data_root<object> elt)
+        // Root elt to protect from GC during reallocation.
         var elt_root = elt;
-        self.vm.data_roots.append(self.vm.allocator, &elt_root) catch return false;
+        self.vm.data_roots.appendAssumeCapacity(&elt_root);
         defer _ = self.vm.data_roots.pop();
         std.debug.assert(self.count <= self.capacity());
 
@@ -80,9 +73,9 @@ pub const GrowableArray = struct {
     pub fn append(self: *GrowableArray, elts: Cell) bool {
         std.debug.assert(layouts.hasTag(elts, .array));
 
-        // Root elts to protect from GC during reallotArray (matches C++ data_root<array> elts)
+        // Root elts to protect from GC during reallocation.
         var elts_root = elts;
-        self.vm.data_roots.append(self.vm.allocator, &elts_root) catch return false;
+        self.vm.data_roots.appendAssumeCapacity(&elts_root);
         defer _ = self.vm.data_roots.pop();
 
         const source_capacity = blk: {
@@ -142,7 +135,6 @@ pub const GrowableArray = struct {
 };
 
 /// Growable byte array for building byte arrays incrementally
-/// Equivalent to C++ growable_byte_array
 pub const GrowableByteArray = struct {
     const Self = @This();
 
@@ -180,7 +172,7 @@ pub const GrowableByteArray = struct {
 
         if (new_count == old_capacity) return true;
 
-        // In-place shrink for nursery objects (matches C++ reallot_array_in_place_p)
+        // In-place shrink for nursery objects when possible.
         if (new_count <= old_capacity and self.vm.vm_asm.nursery.contains(@ptrFromInt(layouts.UNTAG(self.elements)))) {
             const ba_mut: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(self.elements));
             ba_mut.capacity = layouts.tagFixnum(@as(layouts.Fixnum, @intCast(new_count)));
@@ -188,7 +180,7 @@ pub const GrowableByteArray = struct {
         }
 
         // Root old elements so GC can update self.elements if it moves
-        self.vm.data_roots.append(self.vm.allocator, &self.elements) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&self.elements);
         defer _ = self.vm.data_roots.pop();
 
         // Allocate new byte array - may trigger GC, moving self.elements
@@ -248,7 +240,7 @@ pub const GrowableByteArray = struct {
         const new_size = self.count + len;
 
         if (new_size >= self.capacity()) {
-            self.vm.data_roots.append(self.vm.allocator, &source_root) catch return false;
+            self.vm.data_roots.appendAssumeCapacity(&source_root);
             defer _ = self.vm.data_roots.pop();
 
             if (!self.reallotArray(2 * new_size)) {

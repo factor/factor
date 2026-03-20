@@ -10,7 +10,7 @@ const layouts = @import("layouts.zig");
 
 const Cell = layouts.Cell;
 
-pub inline fn visit(
+pub fn visit(
     comptime Ctx: type,
     stack_pointer: [*]Cell,
     gc_info: *const code_blocks.GcInfo,

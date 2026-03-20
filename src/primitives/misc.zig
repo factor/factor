@@ -1,5 +1,5 @@
 // primitives/misc.zig - Miscellaneous primitives
-// exit, nano-count, sleep, size, stub, ctrl-break
+// exit, nano-count, sleep, size, ctrl-break
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -28,7 +28,6 @@ pub export fn primitive_exit(vm_asm: *VMAssemblyFields) callconv(.c) void {
 // --- Nano Count ---
 
 pub fn nanoCountMonotonic() u64 {
-    // Use monotonic clock matching C++ VM:
     // macOS: mach_absolute_time() scaled to nanoseconds
     // Linux: clock_gettime(CLOCK_MONOTONIC)
     if (comptime builtin.os.tag == .macos) {
@@ -89,7 +88,6 @@ pub export fn primitive_size(vm_asm: *VMAssemblyFields) callconv(.c) void {
     if (layouts.isImmediate(obj)) {
         vm.push(layouts.tagFixnum(0));
     } else {
-        // Get object size based on type
         const obj_ptr: *const layouts.Object = @ptrFromInt(layouts.UNTAG(obj));
         const type_tag = obj_ptr.getType();
         const base_size: Cell = switch (type_tag) {

@@ -1,8 +1,3 @@
-// cpu.zig - Architecture detection and instruction encoding for JIT
-// References:
-// - vm/cpu-x86.hpp (C++ VM x86_64 support)
-// - vm/cpu-arm.64.hpp (C++ VM ARM64 support)
-
 const std = @import("std");
 const builtin = @import("builtin");
 
@@ -22,7 +17,6 @@ pub const Arch = enum {
     }
 
     /// True for any x86 family (32-bit or 64-bit).
-    /// Matches C++ FACTOR_X86 which is defined for both i386 and x86_64.
     pub fn isX86Family(arch: Arch) bool {
         return arch == .x86 or arch == .x86_64;
     }

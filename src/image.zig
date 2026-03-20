@@ -1,6 +1,5 @@
 // image.zig - Factor boot image loading and saving
-// Image format documentation:
-//   vm/image.hpp, vm/image.cpp
+// Image format documentation
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -76,7 +75,6 @@ pub const EmbeddedImageFooter = extern struct {
     image_offset: Cell,
 };
 
-// Image header structure - must match C++ exactly
 pub const ImageHeader = extern struct {
     magic: Cell,
     version: Cell,
@@ -102,12 +100,12 @@ pub const VMParameters = struct {
     embedded_image: bool = false,
     image_path: ?[]const u8 = null,
     executable_path: ?[]const u8 = null,
-    datastack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB - matches C++ (32 * sizeof(cell) kilobytes)
-    retainstack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB - matches C++ (32 * sizeof(cell) kilobytes)
-    callstack_size: Cell = 128 * @sizeOf(Cell) * 1024, // 1MB - matches C++ (128 * sizeof(cell) kilobytes)
-    young_size: Cell = 2 * 1024 * 1024, // 2MB - matches C++ VM (sizeof(cell)/4 << 20)
+    datastack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB
+    retainstack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB
+    callstack_size: Cell = 128 * @sizeOf(Cell) * 1024, // 1MB
+    young_size: Cell = 2 * 1024 * 1024, // 2MB
     aging_size: Cell = 4 * 1024 * 1024, // 4MB
-    tenured_size: Cell = 192 * 1024 * 1024, // 192MB - matches C++ VM (24 * sizeof(cell) << 20)
+    tenured_size: Cell = 192 * 1024 * 1024, // 192MB
     code_size: Cell = 8 * 1024 * 1024, // 8MB
     fep: bool = false,
     console: bool = true,
@@ -222,7 +220,6 @@ pub const ImageLoader = struct {
             return ImageError.BadVersion;
         }
 
-        // Handle version4 escape format (must match C++ logic in image.cpp:297-302):
         // If version4_escape (data_size field) is 0, use escaped_data_size from reserved_1
         // Otherwise, compressed sizes are in data_size/code_size fields
         if (self.header.data_size == 0) {
@@ -253,13 +250,9 @@ pub const ImageLoader = struct {
         // Copy special objects
         @memcpy(&self.vm.vm_asm.special_objects, &self.header.special_objects);
 
-        // Initialize heap allocators after image load (like C++ init_data_heap/init_code_heap)
-        // This must be done BEFORE fixup because C++ does it in load_code_heap
         try self.initDataHeapAllocators();
         try self.initCodeHeapAllocators();
 
-        // Initialize code block index for frame walking (like C++ all_blocks set)
-        // C++ does this in load_code_heap, BEFORE fixup
         if (self.vm.code) |code| {
             code.initializeAllBlocksSet() catch @panic("OOM");
         }
@@ -331,7 +324,6 @@ pub const ImageLoader = struct {
         const data_size = self.header.data_size;
 
         // Create a proper DataHeap with all generations in a single contiguous Segment.
-        // This matches the C++ VM: data_heap allocates [tenured|aging|aging_semi|nursery]
         // in one mmap, with guard pages. The write barrier's card_offset formula only works
         // when all heap addresses are within the card table's coverage.
         const young_size = self.params.young_size;
@@ -381,13 +373,11 @@ pub const ImageLoader = struct {
         const code_size = self.header.code_size;
 
         // IMPORTANT: Always allocate a code heap, even if the image has no code!
-        // The C++ VM does this too: code = new code_heap(p->code_size);
         // The code heap is needed for:
         // 1. JIT compilation of new quotations
         // 2. Signal handlers that check vm.code for dispatch
         // 3. Callback trampolines
 
-        // C++ default is 96 MB - we use the same to have room for new code blocks
         const default_code_heap_size: Cell = 96 * 1024 * 1024;
         const page_size = std.heap.page_size_min;
         const aligned_code_size = layouts.alignCell(code_size, page_size);
@@ -395,14 +385,12 @@ pub const ImageLoader = struct {
         const heap_size = @max(default_code_heap_size, aligned_code_size);
 
         // ARM64 BL/B instructions encode ±128MB relative offsets.
-        // Code heap must not exceed this limit. Matches C++ code_heap constructor.
         if (comptime builtin.cpu.arch == .aarch64) {
             if (heap_size > 0x8000000) {
                 @panic("Code heap too large for ARM64 (max 128MB)");
             }
         }
 
-        // Total size includes safepoint page at the start (like C++ code_heap constructor)
         const total_size = page_size + heap_size;
 
         // On x86_64 macOS (including under Rosetta), use RWX permissions directly in mmap
@@ -518,7 +506,6 @@ pub const ImageLoader = struct {
                 }.pthread_jit_write_protect_np;
                 pthread_jit_write_protect_np(1); // Enable write protection (allow execution)
             } else {
-                // For x86_64, ensure code is RWX (like C++ Factor)
                 // The mmap already requested RWX, but call mprotect to be sure
                 const code_page_ptr: *align(std.heap.page_size_min) anyopaque = @ptrCast(@alignCast(cr.ptr));
                 _ = std.c.mprotect(code_page_ptr, aligned_code_size, .{ .READ = true, .WRITE = true, .EXEC = true });
@@ -589,14 +576,11 @@ pub const ImageLoader = struct {
                 continue;
             }
 
-            // Get object type and size
             const obj_type = obj.getType();
             const size = objectSize(obj, obj_type, data_offset);
 
-            // Fix up slots based on object type
             self.fixupObjectSlots(obj, obj_type, data_offset, code_offset);
 
-            // Move to next object (aligned)
             current += layouts.alignCell(size, layouts.data_alignment);
         }
     }
@@ -656,12 +640,9 @@ pub const ImageLoader = struct {
                 const q: *layouts.Quotation = @ptrCast(obj);
                 if (!layouts.isImmediate(q.array)) q.array = self.fixupPointer(q.array, data_offset, code_offset);
                 if (!layouts.isImmediate(q.cached_effect)) q.cached_effect = self.fixupPointer(q.cached_effect, data_offset, code_offset);
-                // entry_point is untagged code pointer — fixup like C++ visit_object_code_block
                 if (q.entry_point != 0) {
-                    // C++ does: q->entry_point = fixup.fixup_code(q->code())->entry_point();
-                    // q->code() = (code_block*)(entry_point) - 1, fixup adds code_offset
-                    // The code_block's entry_point() returns the address right after the header
-                    // This is equivalent to: entry_point += code_offset
+                    // The code_block's entry_point returns the address right after the header.
+                    // q.entry_point includes code_offset.
                     q.entry_point +%= code_offset;
                 }
             },
@@ -684,12 +665,10 @@ pub const ImageLoader = struct {
                     a.expired = self.fixupPointer(a.expired, data_offset, code_offset);
                 }
                 // Update computed address after fixing base
-                // Like C++: if base is not false, update address; otherwise mark as expired
                 if (a.base != layouts.false_object) {
                     a.updateAddress();
                 } else {
                     // Mark as expired - the old address is no longer valid
-                    // Note: Like C++, we keep the old address value. Factor code should check
                     // the expired flag before using the alien, but JIT-compiled FFI code often
                     // reads alien.address directly. The old addresses may still be mapped.
                     if (a.address != 0) {
@@ -703,7 +682,6 @@ pub const ImageLoader = struct {
             .dll => {
                 const d: *layouts.Dll = @ptrCast(obj);
                 if (!layouts.isImmediate(d.path)) d.path = self.fixupPointer(d.path, data_offset, code_offset);
-                // Reload the DLL like C++ ffi_dlopen does
                 d.handle = null;
                 if (d.path != layouts.false_object and layouts.hasTag(d.path, .byte_array)) {
                     const path_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(d.path));
@@ -723,7 +701,6 @@ pub const ImageLoader = struct {
             },
             .callstack => {
                 // Callstack contains stack frames with return addresses that need fixing
-                // We must walk the frames properly, like C++ iterate_callstack_object
                 self.fixupCallstackObject(obj, code_offset);
             },
             // Types with no pointer slots to fix
@@ -849,7 +826,6 @@ pub const ImageLoader = struct {
 
         const entries: [*]RelocationEntry = @ptrCast(@alignCast(rel_array.data()));
 
-        // Parameter index tracks which literal we're on
         var param_index: Cell = 0;
         var safepoint_count: usize = 0;
 
@@ -863,10 +839,8 @@ pub const ImageLoader = struct {
             const pointer = block.entryPoint() + offset;
             const old_offset = rel_base + offset;
 
-            // Load the old value based on relocation class
             const old_value = loadRelocValue(pointer, rel_class, old_offset);
 
-            // Compute the new value based on relocation type
             const new_value: Cell = switch (rel_type) {
                 .literal => blk: {
                     // Data heap literal - fix if non-immediate
@@ -884,7 +858,6 @@ pub const ImageLoader = struct {
                 },
                 .this => blk: {
                     // Reference to current code block's entry point
-                    // C++ returns compiled->entry_point(), not the block address
                     break :blk block.entryPoint();
                 },
                 .untagged => old_value, // Untagged numbers don't need relocation
@@ -949,7 +922,6 @@ pub const ImageLoader = struct {
 
     // Initialize data heap allocators after image load.
     // The DataHeap was already created in loadDataHeap with a proper contiguous Segment.
-    // This just creates the GarbageCollector instance.
     fn initDataHeapAllocators(self: *Self) ImageError!void {
         const heap = self.data_heap_ptr orelse return ImageError.OutOfMemory;
 
@@ -962,7 +934,6 @@ pub const ImageLoader = struct {
     }
 
     // Initialize code heap free list allocator after image load
-    // This is analogous to C++ factor_vm::load_code_heap calling allocator->initial_free_list()
     fn initCodeHeapAllocators(self: *Self) ImageError!void {
         // The code heap already has allocated space from loadCodeHeap
         // We need to initialize a free list for the remaining space
@@ -1200,9 +1171,7 @@ fn storeRelocValueMasked(pointer: Cell, value: isize, mask: u32, lsb: u5, scalin
     std.mem.writeInt(u32, ptr[0..@sizeOf(u32)], word, .little);
 }
 
-// Load a value from code based on relocation class
-// Uses unaligned reads since code may have unaligned embedded pointers
-fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) Cell {
+    fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) Cell {
     return switch (rel_class) {
         .absolute_cell => blk: {
             const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(Cell));
@@ -1249,9 +1218,7 @@ fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) 
     };
 }
 
-// Store a value to code based on relocation class
-// Uses unaligned writes since code may have unaligned embedded pointers
-fn storeRelocValue(pointer: Cell, rel_class: RelocationClass, value: Cell) void {
+    fn storeRelocValue(pointer: Cell, rel_class: RelocationClass, value: Cell) void {
     switch (rel_class) {
         .absolute_cell => {
             const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(Cell));
@@ -1327,7 +1294,7 @@ pub fn saveImage(vm: *vm_mod.FactorVM, temp_path: [:0]const u8, final_path: [:0]
     const data_size = heap_data.tenured.usedBytes();
     header.data_size = data_size; // Uncompressed (version4_escape mode)
     header.reserved_1 = data_size; // escaped_data_size
-    header.reserved_2 = data_size; // compressed_data_size (same as uncompressed)
+    header.reserved_2 = data_size; // compressed_data_size
     header.reserved_4 = 0;
 
     // Code heap info
@@ -1339,7 +1306,7 @@ pub fn saveImage(vm: *vm_mod.FactorVM, temp_path: [:0]const u8, final_path: [:0]
     header.code_relocation_base = heap_code.code_start;
     const code_size = heap_code.codeHeapExtent();
     header.code_size = code_size;
-    header.reserved_3 = code_size; // compressed_code_size (same as uncompressed)
+    header.reserved_3 = code_size; // compressed_code_size
 
     // Copy special objects
     @memcpy(&header.special_objects, &vm.vm_asm.special_objects);

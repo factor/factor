@@ -80,7 +80,6 @@ pub fn sweepPhase(gc: *GC) void {
 
     tenured.free_list.sortLargeBlocks();
 
-    // Clear cards/decks for tenured (C++ reset_tenured)
     resetTenuredCards(gc);
 
     if (gc.current_event) |event| event.endedPhase(.data_sweep);
@@ -143,7 +142,6 @@ fn extractFreeRuns(
 }
 
 pub fn invalidateCodeRootsAfterSweep(gc: *GC, marks: *mark_bits.MarkBits) void {
-    // Align return address down to allocation line (matches C++ behavior)
     const mask: Cell = ~@as(Cell, layouts.data_alignment - 1);
     for (gc.vm.code_roots.items) |root| {
         if (!root.valid) continue;
@@ -208,7 +206,6 @@ pub fn sweepCodePhase(gc: *GC, code: *vm_mod.CodeHeap, marks: *mark_bits.MarkBit
 }
 
 // Clear card/deck marks for tenured space
-// Ported from C++ data_heap::reset_tenured
 pub fn resetTenuredCards(gc: *GC) void {
     const tenured = &gc.heap.tenured;
     const cards_offset: Cell = gc.vm.vm_asm.cards_offset;
@@ -228,7 +225,6 @@ pub fn resetTenuredCards(gc: *GC) void {
 }
 
 // Clear write-barrier cards/decks for an arbitrary address range.
-// Uses floor division (no rounding up) to match C++ clear_cards/clear_decks,
 // ensuring partial boundary decks belonging to adjacent generations aren't cleared.
 // Deck bytes are accessed via offset-based indexing to match the JIT write barrier.
 pub fn clearWriteBarrierRange(gc: *GC, start: Cell, end: Cell) void {

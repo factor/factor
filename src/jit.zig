@@ -1,10 +1,3 @@
-// jit.zig - JIT compiler for Factor quotations
-// Ported from vm/jit.hpp, vm/jit.cpp
-//
-// The JIT compiler uses a template-based approach where pre-assembled
-// machine code snippets are concatenated together to produce compiled code.
-// Templates are stored in special_objects and defined in Factor bootstrap code.
-
 const std = @import("std");
 
 const code_blocks = @import("code_blocks.zig");
@@ -165,7 +158,7 @@ pub const LabelManager = struct {
 
     // Returns the fixup data as an array of [relocation_class, offset, target] triples
     pub fn fixupLabels(self: *Self, code_buffer: []u8) !std.ArrayList(Cell) {
-        var fixups = std.ArrayList(Cell){};
+        var fixups: std.ArrayList(Cell) = .empty;
         errdefer fixups.deinit(self.allocator);
 
         try fixups.ensureUnusedCapacity(self.allocator, self.forward_refs.items.len * 3);
@@ -260,7 +253,6 @@ pub const Jit = struct {
     const Self = @This();
 
     pub fn init(vm: *FactorVM, owner: Cell) Self {
-        // Increment current_jit_count (matches C++ jit::jit constructor)
         std.debug.assert(vm.current_jit_count >= 0);
         vm.current_jit_count += 1;
 
@@ -268,7 +260,6 @@ pub const Jit = struct {
         // Without this, the second allotUninitializedArray could trigger GC,
         // moving the first array before it can be rooted (the struct is
         // returned by value, so registerRoot() happens only after init).
-        // In C++, data_root<array> in growable_array ctor roots each array
         // immediately after allocation; Zig can't do RAII, so we pre-reserve.
         const array_size = layouts.alignCell(
             layouts.arraySize(layouts.Array, 10),
@@ -303,14 +294,12 @@ pub const Jit = struct {
     /// Register the owner as a GC root. MUST be called after init() when the
     /// struct is in its final location (not before return-by-value copy).
     pub fn registerRoot(self: *Self) void {
-        self.vm.data_roots.ensureUnusedCapacity(self.vm.allocator, 3) catch @panic("JIT registerRoot: OOM");
         self.vm.data_roots.appendAssumeCapacity(&self.owner);
         self.vm.data_roots.appendAssumeCapacity(&self.literals.elements);
         self.vm.data_roots.appendAssumeCapacity(&self.parameters.elements);
     }
 
     pub fn deinit(self: *Self) void {
-        // Unregister roots (matches C++ data_root<T> destructors)
         // Must pop in strict reverse push order to preserve root-stack LIFO.
         _ = self.vm.data_roots.pop();
         _ = self.vm.data_roots.pop();
@@ -320,7 +309,6 @@ pub const Jit = struct {
         self.relocation.deinit(self.vm.allocator);
         self.label_manager.deinit();
 
-        // Decrement current_jit_count (matches C++ jit::~jit destructor)
         std.debug.assert(self.vm.current_jit_count >= 1);
         self.vm.current_jit_count -= 1;
     }
@@ -343,7 +331,7 @@ pub const Jit = struct {
     // Emit a template by enum (append its relocation info and machine code)
     pub fn emit(self: *Self, template: JitTemplate) !void {
         var template_cell = self.vm.vm_asm.special_objects[@intFromEnum(template)];
-        self.vm.data_roots.append(self.vm.allocator, &template_cell) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&template_cell);
         defer _ = self.vm.data_roots.pop();
 
         if (getArrayFromCell(template_cell) == null) return;
@@ -359,7 +347,7 @@ pub const Jit = struct {
     // Emit a template cell (2-element array: { relocation-info, machine-code })
     fn emitTemplateCell(self: *Self, template_cell_: Cell) !void {
         var template_cell = template_cell_;
-        self.vm.data_roots.append(self.vm.allocator, &template_cell) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&template_cell);
         defer _ = self.vm.data_roots.pop();
 
         const tmpl = getArrayFromCell(template_cell) orelse return;
@@ -376,7 +364,6 @@ pub const Jit = struct {
         const data_after = tmpl_after.data();
         const code_cell = data_after[1];
 
-        // Handle offset computation for source mapping (matches C++)
         if (self.computing_offset_p) {
             if (code_cell != layouts.false_object and
                 layouts.hasTag(code_cell, .byte_array))
@@ -400,22 +387,18 @@ pub const Jit = struct {
         try self.emitCode(code_cell);
     }
 
-    // Matches C++ jit::emit_with_literal in vm/jit.cpp
     pub fn emitWithLiteral(self: *Self, template: JitTemplate, lit: Cell) !void {
-        // Protect literal from GC during allocation (matches C++ data_root<object> argument)
         var lit_copy = lit;
-        self.vm.data_roots.append(self.vm.allocator, &lit_copy) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&lit_copy);
         defer _ = self.vm.data_roots.pop();
 
         try self.literal(lit_copy);
         try self.emit(template);
     }
 
-    // Matches C++ jit::emit_with_parameter in vm/jit.cpp
     pub fn emitWithParameter(self: *Self, template: JitTemplate, param: Cell) !void {
-        // Protect parameter from GC during allocation (matches C++ data_root<object> argument)
         var param_copy = param;
-        self.vm.data_roots.append(self.vm.allocator, &param_copy) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&param_copy);
         defer _ = self.vm.data_roots.pop();
 
         try self.parameter(param_copy);
@@ -423,7 +406,6 @@ pub const Jit = struct {
     }
 
     // Push a literal onto the data stack (emits code to push at runtime)
-    // This is different from literal() which just adds to the literals array
     pub fn push(self: *Self, value: Cell) !void {
         try self.emitWithLiteral(.push_literal, value);
     }
@@ -445,7 +427,7 @@ pub const Jit = struct {
     // Append values from a Factor array to parameters
     pub fn appendParameters(self: *Self, arr_cell: Cell) !void {
         var root = arr_cell;
-        self.vm.data_roots.append(self.vm.allocator, &root) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&root);
         defer _ = self.vm.data_roots.pop();
 
         if (root == layouts.false_object) return;
@@ -458,7 +440,7 @@ pub const Jit = struct {
     // Append values from a Factor array to literals
     pub fn appendLiterals(self: *Self, arr_cell: Cell) !void {
         var root = arr_cell;
-        self.vm.data_roots.append(self.vm.allocator, &root) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&root);
         defer _ = self.vm.data_roots.pop();
 
         if (root == layouts.false_object) return;
@@ -477,17 +459,15 @@ pub const Jit = struct {
     //   [4] = tail continuation (for tail calls)
     // Returns true if this was a tail call (no further code needed)
     pub fn emitSubprimitive(self: *Self, word_cell: Cell, tail_call_p: bool, stack_frame_p: bool) !bool {
-        // Root the word (matches C++ data_root<word>)
         var word_root = word_cell;
-        self.vm.data_roots.append(self.vm.allocator, &word_root) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&word_root);
         defer _ = self.vm.data_roots.pop();
 
         std.debug.assert(layouts.hasTag(word_root, .word));
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_root));
 
-        // Root the subprimitive template array (matches C++ data_root<array>)
         var subprim_root = word.subprimitive;
-        self.vm.data_roots.append(self.vm.allocator, &subprim_root) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&subprim_root);
         defer _ = self.vm.data_roots.pop();
 
         if (subprim_root == layouts.false_object) return false;
@@ -640,7 +620,6 @@ pub const Jit = struct {
             const target_pos = self.label_manager.getLabelPosition(label_id) orelse return error.UndefinedLabel;
             try self.emitJumpDirect(target_pos);
         } else {
-            // Forward jump - emit placeholder and record fixup
             const patch_offset = current_pos;
             try self.emitJumpPlaceholder();
             try self.label_manager.addForwardRef(label_id, patch_offset, rel_class);
@@ -656,7 +635,6 @@ pub const Jit = struct {
             const target_pos = self.label_manager.getLabelPosition(label_id) orelse return error.UndefinedLabel;
             try self.emitCallDirect(target_pos);
         } else {
-            // Forward call - emit placeholder and record fixup
             const patch_offset = current_pos;
             try self.emitCallPlaceholder();
             try self.label_manager.addForwardRef(label_id, patch_offset, rel_class);
@@ -706,7 +684,7 @@ pub const Jit = struct {
             .x86_64 => {
                 // JMP rel32: E9 [4-byte offset]
                 try self.code.append(self.vm.allocator, cpu.X86Instruction.JMP_OPCODE);
-                try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 }); // Placeholder offset
+                try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 });
             },
             .aarch64 => {
                 // B #0 (branch to self, will be patched)
@@ -726,7 +704,7 @@ pub const Jit = struct {
             .x86_64 => {
                 // CALL rel32: E8 [4-byte offset]
                 try self.code.append(self.vm.allocator, cpu.X86Instruction.CALL_OPCODE);
-                try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 }); // Placeholder offset
+                try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 });
             },
             .aarch64 => {
                 // BL #0 (branch with link to self, will be patched)
@@ -755,7 +733,6 @@ pub const Jit = struct {
         // Append dummy GC info (4 bytes of zeros)
         try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 });
 
-        // Trim parameter/literal arrays to exact size (matches C++)
         if (!self.parameters.trim()) @panic("OOM trimming parameters");
         if (!self.literals.trim()) @panic("OOM trimming literals");
 
@@ -786,7 +763,7 @@ pub const Jit = struct {
             @memcpy(reloc_ba.data()[0..self.relocation.items.len], self.relocation.items);
         }
         // Root reloc_cell to protect from GC during subsequent allocations
-        self.vm.data_roots.append(self.vm.allocator, &reloc_cell) catch @panic("OOM");
+        self.vm.data_roots.appendAssumeCapacity(&reloc_cell);
         defer _ = self.vm.data_roots.pop();
 
         const params_cell = self.parameters.toArray();
@@ -800,7 +777,6 @@ pub const Jit = struct {
         const code_dest = block.codeStart();
         @memcpy(code_dest[0..code_size], self.code.items);
 
-        // Defer initialization: add to uninitialized_blocks (matching C++ add_code_block).
         // The caller (jitCompileQuotationWithOwner, inline cache, etc.) decides whether
         // to initialize immediately (relocate=true) or defer to updateCodeHeapWords.
         if (self.vm.code) |ch| {
@@ -846,8 +822,8 @@ pub const QuotationJit = struct {
     /// Register the owner as a GC root. MUST be called after init() when the
     /// struct is in its final location.
     pub fn registerRoot(self: *Self) void {
-        // Batch ensure capacity for all 4 roots (3 from Jit + 1 for elements)
-        self.jit.vm.data_roots.ensureUnusedCapacity(self.jit.vm.allocator, 4) catch @panic("QuotationJit registerRoot: OOM");
+        // 4 roots: owner, literals.elements, parameters.elements, elements.
+        // Capacity is guaranteed by emitQuotation's ensureUnusedCapacity(8).
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.owner);
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.literals.elements);
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.parameters.elements);
@@ -860,7 +836,6 @@ pub const QuotationJit = struct {
     }
 
     // Initialize with quotation's array
-    // Matches C++ quotation_jit::init_quotation: direct untag, no tag check.
     pub fn initQuotation(self: *Self, quot_cell: Cell) void {
         std.debug.assert(layouts.hasTag(quot_cell, .quotation));
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));
@@ -868,7 +843,6 @@ pub const QuotationJit = struct {
     }
 
     // Get element at index from quotation array
-    // Matches C++ quotation_jit::nth: array_nth(elements, index) with FACTOR_ASSERT only.
     fn nth(self: *const Self, index: Cell) Cell {
         std.debug.assert(self.elements != layouts.false_object);
         std.debug.assert(layouts.hasTag(self.elements, .array));
@@ -878,7 +852,6 @@ pub const QuotationJit = struct {
     }
 
     // Get array length
-    // Matches C++ array_capacity(elements.untagged()): direct untag, no checks.
     fn length(self: *const Self) Cell {
         std.debug.assert(self.elements != layouts.false_object);
         std.debug.assert(layouts.hasTag(self.elements, .array));
@@ -969,23 +942,27 @@ pub const QuotationJit = struct {
     }
 
     // Emit a quotation reference (compile if needed)
-    // Matches C++ quotation_jit::emit_quotation which uses data_root<quotation>
     fn emitQuotation(self: *Self, quot_cell: Cell) !void {
         std.debug.assert(layouts.hasTag(quot_cell, .quotation));
+
+        // Each recursion level (emitQuotation → jitCompileQuotation →
+        // jitCompileQuotationWithOwner → registerRoot) pushes 8 data roots.
+        // Ensure capacity so the appendAssumeCapacity calls below and in the
+        // recursive compilation path don't overflow.
+        self.jit.vm.data_roots.ensureUnusedCapacity(self.jit.vm.allocator, 8) catch
+            self.jit.vm.memoryError();
 
         // CRITICAL: Root the quotation before any operation that can trigger GC.
         // jitCompileQuotation (called below) can trigger nursery GC, moving
         // this quotation.  Without rooting, the stale quot_cell would be
         // embedded as a literal in the parent code block, causing crashes
         // when the compiled code later dereferences it.
-        // Matches C++: data_root<quotation> quot(quot_, parent);
         var rooted_quot = quot_cell;
-        self.jit.vm.data_roots.append(self.jit.vm.allocator, &rooted_quot) catch @panic("OOM");
+        self.jit.vm.data_roots.appendAssumeCapacity(&rooted_quot);
         defer _ = self.jit.vm.data_roots.pop();
 
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(rooted_quot));
 
-        // Get the quotation's array
         if (quot.array == layouts.false_object) {
             try self.jit.literal(rooted_quot);
             return;
@@ -993,7 +970,6 @@ pub const QuotationJit = struct {
 
         const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(quot.array));
 
-        // If quotation is trivial (single word), compile direct call
         if (layouts.untagFixnumUnsigned(arr.capacity) == 1) {
             const first = arr.data()[0];
             if (layouts.hasTag(first, .word)) {
@@ -1002,12 +978,10 @@ pub const QuotationJit = struct {
             }
         }
 
-        // Non-trivial quotation - compile it if compiling mode
         if (self.compiling) {
             self.jit.vm.jitCompileQuotation(rooted_quot, self.relocate);
         }
 
-        // Use rooted_quot which tracks GC moves
         try self.jit.literal(rooted_quot);
     }
 
@@ -1057,7 +1031,6 @@ pub const QuotationJit = struct {
                     // Check for primitive call pattern
                     if (self.isPrimitiveCall(i, len)) {
                         // 32-bit x86 jit-load-vm emits rel-vm relocation
-                        // needing an extra VM offset parameter. C++ guards
                         // this with #ifdef FACTOR_X86 (32-bit only, NOT
                         // FACTOR_AMD64). On x86-64 and ARM64 the VM pointer
                         // lives in a register, so no extra parameter.
@@ -1132,25 +1105,20 @@ pub const QuotationJit = struct {
     }
 
     // Push a literal onto the data stack
-    // Matches C++ jit::push in vm/jit.hpp
     fn push(self: *Self, value: Cell) !void {
         try self.jit.emitWithLiteral(.push_literal, value);
     }
 
     // Emit word call
-    // Matches C++ quotation_jit::word_call in vm/quotations.hpp
     fn wordCall(self: *Self, word_cell: Cell) !void {
         try self.jit.emitWithLiteral(.word_call, word_cell);
     }
 
     // Emit word jump (tail call)
-    // Matches C++ quotation_jit::word_jump in vm/quotations.hpp
     fn wordJump(self: *Self, word_cell: Cell) !void {
         // On 32-bit platforms, emit an extra literal for xt_tail_pic_offset
-        // This matches the C++ code: #ifndef FACTOR_64
         const is_64bit = @sizeOf(Cell) == 8;
         if (!is_64bit) {
-            // xt_tail_pic_offset = 4 + 1 on x86 family, 4 on PPC (from vm/cpu-*.hpp)
             const xt_tail_pic_offset: Fixnum = if (comptime cpu.Arch.current().isX86Family()) 5 else 4;
             try self.jit.literal(layouts.tagFixnum(xt_tail_pic_offset));
         }
@@ -1159,7 +1127,6 @@ pub const QuotationJit = struct {
     }
 
     // Emit mega cache lookup
-    // Matches C++ quotation_jit::emit_mega_cache_lookup which uses
     // data_root<array> for both methods and cache
     fn emitMegaCacheLookup(self: *Self, methods_in: Cell, index: Fixnum, cache_in: Cell) !void {
         const vm = self.jit.vm;
@@ -1168,7 +1135,6 @@ pub const QuotationJit = struct {
         // emitWithLiteral, push, and wordCall can all trigger nursery GC.
         var methods = methods_in;
         var cache = cache_in;
-        try vm.data_roots.ensureUnusedCapacity(vm.allocator, 2);
         vm.data_roots.appendAssumeCapacity(&methods);
         defer _ = vm.data_roots.pop();
         vm.data_roots.appendAssumeCapacity(&cache);
@@ -1218,12 +1184,11 @@ pub fn isQuotationCompiled(vm: *FactorVM, quot: *const layouts.Quotation) bool {
 }
 
 // Lazy JIT compilation - compile quotation on first use
-// Matches C++ lazy_jit_compile (quotations.cpp:357-369)
 pub fn lazyJitCompile(vm: *FactorVM, quot_cell: Cell) Cell {
     std.debug.assert(layouts.hasTag(quot_cell, .quotation));
 
     var rooted_quot = quot_cell;
-    vm.data_roots.append(vm.allocator, &rooted_quot) catch @panic("OOM");
+    vm.data_roots.appendAssumeCapacity(&rooted_quot);
     defer _ = vm.data_roots.pop();
 
     var quot: *layouts.Quotation = @ptrFromInt(layouts.UNTAG(rooted_quot));
@@ -1245,7 +1210,7 @@ pub fn lazyJitCompile(vm: *FactorVM, quot_cell: Cell) Cell {
 // Tests
 test "jit byte buffer" {
     const allocator = std.testing.allocator;
-    var buf = std.ArrayList(u8){};
+    var buf: std.ArrayList(u8) = .empty;
     defer buf.deinit(allocator);
 
     try buf.appendSlice(allocator, &[_]u8{ 1, 2, 3 });
@@ -1257,7 +1222,7 @@ test "jit byte buffer" {
 
 test "jit cell buffer" {
     const allocator = std.testing.allocator;
-    var buf = std.ArrayList(Cell){};
+    var buf: std.ArrayList(Cell) = .empty;
     defer buf.deinit(allocator);
 
     try buf.append(allocator, 100);
@@ -1328,16 +1293,15 @@ test "label fixup with x86_64 jump" {
     defer mgr.deinit();
 
     // Create a code buffer with a forward jump
-    var code_buffer = std.ArrayList(u8){};
+    var code_buffer: std.ArrayList(u8) = .empty;
     defer code_buffer.deinit(allocator);
 
     // Emit some padding
     try code_buffer.appendSlice(allocator, &[_]u8{ 0x90, 0x90, 0x90 }); // NOP instructions
 
-    // Emit jump placeholder at offset 3
     const jump_offset = code_buffer.items.len;
     try code_buffer.append(allocator, cpu.X86Instruction.JMP_OPCODE); // JMP opcode
-    try code_buffer.appendSlice(allocator, &[_]u8{ 0x00, 0x00, 0x00, 0x00 }); // Placeholder
+    try code_buffer.appendSlice(allocator, &[_]u8{ 0x00, 0x00, 0x00, 0x00 });
 
     // Emit more code
     try code_buffer.appendSlice(allocator, &[_]u8{ 0x90, 0x90, 0x90, 0x90, 0x90 }); // More NOPs
@@ -1387,7 +1351,7 @@ test "label multiple forward references to same label" {
     var mgr = LabelManager.init(allocator);
     defer mgr.deinit();
 
-    var code_buffer = std.ArrayList(u8){};
+    var code_buffer: std.ArrayList(u8) = .empty;
     defer code_buffer.deinit(allocator);
 
     // Create one label
@@ -1434,7 +1398,7 @@ test "undefined label error" {
     var mgr = LabelManager.init(allocator);
     defer mgr.deinit();
 
-    var code_buffer = std.ArrayList(u8){};
+    var code_buffer: std.ArrayList(u8) = .empty;
     defer code_buffer.deinit(allocator);
 
     // Create a label but don't define it

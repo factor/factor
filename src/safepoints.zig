@@ -1,27 +1,3 @@
-// safepoints.zig - Safepoint handling for JIT synchronization
-// Based on vm/safepoints.cpp and vm/code_heap.cpp from the C++ VM
-//
-// Safepoints are used to synchronize threads for:
-// 1. Garbage collection - stop all threads to perform GC safely
-// 2. Debugger interrupts - Ctrl-C can interrupt compiled code
-// 3. Sampling profiler - collect execution samples
-//
-// How it works:
-// - A safepoint page is the first page of the code heap
-// - When we need to trigger a safepoint, we protect the page with PROT_NONE (armSafepoint)
-// - Compiled code touches this page at strategic points (function prologues)
-// - This causes SIGSEGV which is caught by the signal handler (memorySignalHandler in signals.zig)
-// - The signal handler checks if it's a safepoint fault via isSafepoint()
-// - If yes, it calls handleSafepoint() which processes the event
-// - handleSafepoint() disarms the safepoint (PROT_READ|PROT_WRITE) and handles the condition
-//
-// Integration points:
-// 1. Code heap initialization: safepoint_page is set to seg.start (code_blocks.zig, image.zig)
-// 2. Signal handler: memorySignalHandler checks isSafepoint() (signals.zig)
-// 3. GC: Can call armSafepoint() to stop threads for collection
-// 4. Debugger: enqueueFep() arms safepoint and sets safepoint_fep_p flag
-// 5. Profiler: enqueueSamples() arms safepoint and accumulates sample counts
-
 const std = @import("std");
 
 const callstack = @import("callstack.zig");
@@ -218,7 +194,6 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
 }
 
 // --- Heap-based growable array for sample callstacks ---
-// The C++ VM stores a two-element Factor array [tagFixnum(count), contents_array]
 // in special_objects[OBJ_SAMPLE_CALLSTACKS]. We replicate the same layout.
 
 fn allocSampleCallstacks(vm: *vm_mod.FactorVM) ?Cell {
@@ -227,7 +202,7 @@ fn allocSampleCallstacks(vm: *vm_mod.FactorVM) ?Cell {
 
     // Root contents since the next allot can trigger GC
     var contents_root = contents;
-    vm.data_roots.append(vm.allocator, &contents_root) catch return null;
+    vm.data_roots.appendAssumeCapacity(&contents_root);
     defer _ = vm.data_roots.pop();
 
     // Allocate the 2-element wrapper array
@@ -256,7 +231,7 @@ pub fn sampleCallstacksNth(wrapper_cell: Cell, index: Cell) Cell {
 fn sampleCallstacksAdd(vm: *vm_mod.FactorVM, wrapper_ptr: *Cell, elt: Cell) void {
     // Root elt since reallotArray can trigger GC
     var elt_root = elt;
-    vm.data_roots.append(vm.allocator, &elt_root) catch return;
+    vm.data_roots.appendAssumeCapacity(&elt_root);
     defer _ = vm.data_roots.pop();
 
     var wrapper: *layouts.Array = @ptrFromInt(layouts.UNTAG(wrapper_ptr.*));
@@ -269,7 +244,7 @@ fn sampleCallstacksAdd(vm: *vm_mod.FactorVM, wrapper_ptr: *Cell, elt: Cell) void
 
     if (count == cap) {
         // Need to grow - root contents
-        vm.data_roots.append(vm.allocator, &contents_cell) catch return;
+        vm.data_roots.appendAssumeCapacity(&contents_cell);
         defer _ = vm.data_roots.pop();
 
         const new_contents = vm.reallotArray(contents_cell, 2 * count) orelse return;
@@ -348,7 +323,7 @@ fn recordSampleImpl(vm: *vm_mod.FactorVM, skip_p: bool, current_owner: ?Cell) vo
     if (callstacks_cell == layouts.false_object or callstacks_cell == 0) return;
 
     // Root the growarr since callstack walking adds to it (allocates)
-    vm.data_roots.append(vm.allocator, &callstacks_cell) catch return;
+    vm.data_roots.appendAssumeCapacity(&callstacks_cell);
     defer _ = vm.data_roots.pop();
 
     const callstack_begin = sampleCallstacksCount(callstacks_cell);
@@ -496,7 +471,6 @@ pub fn initSafepoints(vm: *vm_mod.FactorVM) !void {
     const code_heap = vm.code orelse return error.NoCodeHeap;
 
     // Safepoint page is already set to seg.start in code heap initialization
-    // Just verify it's set
     if (code_heap.safepoint_page == 0) {
         return error.NoSafepointPage;
     }

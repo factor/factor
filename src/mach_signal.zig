@@ -1,11 +1,3 @@
-// mach_signal.zig - Mach exception handling for macOS
-// Implements Mach exception port handling for Factor VM
-// Based on vm/mach_signal.cpp from the C++ VM
-//
-// On macOS, hardware exceptions (SIGSEGV, SIGILL, etc.) are better handled via
-// Mach exceptions for more reliable behavior. This replaces Unix signal handling
-// on macOS with a Mach exception port and handler thread.
-
 const std = @import("std");
 const builtin = @import("builtin");
 
@@ -261,7 +253,6 @@ extern "c" fn pthread_from_mach_thread_np(thread: mach_port_t) std.c.pthread_t;
 extern "c" fn exc_server(request: *mach_msg_header_t, reply: *mach_msg_header_t) c_int;
 
 // Call the VM's fault handler to modify thread state
-// Based on factor_vm::call_fault_handler in mach_signal.cpp
 //
 // For memory exceptions, we directly set up the Factor error handler by:
 // 1. Allocating the error object and pushing to datastack
@@ -478,7 +469,6 @@ export fn catch_exception_raise_state_identity(
 
 // Mach exception handler callback
 // This is called by exc_server when an exception message is received
-// Based on catch_exception_raise in mach_signal.cpp
 export fn catch_exception_raise(
     _: mach_port_t,
     thread: mach_port_t,
@@ -548,7 +538,6 @@ export fn catch_exception_raise(
 
 // Mach exception handler thread function
 // This thread receives exception messages and dispatches them
-// Based on mach_exception_thread in mach_signal.cpp
 fn machExceptionThread(_: ?*anyopaque) callconv(.c) ?*anyopaque {
     // Message buffers (contain private kernel data, we just forward them)
     const MsgBuffer = extern struct {
@@ -622,7 +611,6 @@ pub fn isRunningUnderRosetta() bool {
 pub var g_running_under_rosetta: bool = false;
 
 // Initialize Mach exception handling
-// Based on mach_initialize in mach_signal.cpp
 pub fn machInitialize() !void {
     // Force the linker to include catch_exception_raise and friends.
     // exc_server (from libsystem_kernel) calls these by symbol name at runtime.

@@ -1,6 +1,3 @@
-// mark_bits.zig - Bitmap for GC mark phase tracking
-// Ported from vm/mark_bits.hpp
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
@@ -54,7 +51,7 @@ pub const MarkBits = struct {
 
     pub const BitIndex = struct { cell_index: usize, bit_index: u6 };
 
-    pub inline fn addressToBitIndex(self: *const Self, address: Cell) ?BitIndex {
+    pub fn addressToBitIndex(self: *const Self, address: Cell) ?BitIndex {
         if (address < self.start or address >= self.end) {
             return null;
         }
@@ -64,7 +61,7 @@ pub const MarkBits = struct {
 
     /// Unchecked variant — caller guarantees address is in [start, end).
     /// Saves a branch + memory load in hot paths where range was already checked.
-    pub inline fn addressToBitIndexUnchecked(self: *const Self, address: Cell) BitIndex {
+    pub fn addressToBitIndexUnchecked(self: *const Self, address: Cell) BitIndex {
         const offset = (address - self.start) / layouts.data_alignment;
         const cell_index = offset / mark_bits_granularity;
         const bit_index: u6 = @truncate(offset % mark_bits_granularity);
@@ -73,8 +70,7 @@ pub const MarkBits = struct {
     }
 
     // Mark all bits covering [address, address + data_size)
-    // This matches the C++ VM: mark bits track entire live object ranges.
-    pub inline fn setMarked(self: *Self, address: Cell, data_size: Cell) void {
+    pub fn setMarked(self: *Self, address: Cell, data_size: Cell) void {
         if (address < self.start or address >= self.end) {
             return;
         }
@@ -85,7 +81,7 @@ pub const MarkBits = struct {
 
     // Set mark bits given pre-computed start_line, avoiding redundant
     // address-to-line recomputation when caller already has it.
-    inline fn setMarkedFromLine(self: *Self, address: Cell, data_size: Cell, start_line: Cell) void {
+    fn setMarkedFromLine(self: *Self, address: Cell, data_size: Cell, start_line: Cell) void {
         const total_lines = self.size / layouts.data_alignment;
         const raw_end_line = (address + data_size - self.start) / layouts.data_alignment;
         const end_line = @min(raw_end_line, total_lines);
@@ -116,8 +112,7 @@ pub const MarkBits = struct {
 
     // Mark the start bit of an object. Returns true if this was the
     // first time the object was seen. Non-atomic: GC is single-threaded
-    // (stop-the-world), matching C++ which uses plain |=.
-    pub inline fn tryMarkStart(self: *Self, address: Cell, data_size: Cell) bool {
+    pub fn tryMarkStart(self: *Self, address: Cell, data_size: Cell) bool {
         const idx = self.addressToBitIndex(address) orelse return false;
         const mask: Cell = (@as(Cell, 1) << idx.bit_index);
         const prev = self.marked[idx.cell_index];
@@ -135,7 +130,7 @@ pub const MarkBits = struct {
     // if newly marked. Caller MUST later call setMarked(addr, size) to
     // fill the full bit range before sweep. Used by full GC mark to defer
     // size computation to the drain phase.
-    pub inline fn tryMarkStartBitOnly(self: *Self, address: Cell) bool {
+    pub fn tryMarkStartBitOnly(self: *Self, address: Cell) bool {
         const idx = self.addressToBitIndex(address) orelse return false;
         const mask: Cell = (@as(Cell, 1) << idx.bit_index);
         const prev = self.marked[idx.cell_index];
@@ -144,19 +139,19 @@ pub const MarkBits = struct {
         return true;
     }
 
-    pub inline fn isMarked(self: *const Self, address: Cell) bool {
+    pub fn isMarked(self: *const Self, address: Cell) bool {
         const idx = self.addressToBitIndex(address) orelse return false;
         return (self.marked[idx.cell_index] & (@as(Cell, 1) << idx.bit_index)) != 0;
     }
 
     /// Unchecked isMarked — caller guarantees address is in [start, end).
-    pub inline fn isMarkedUnchecked(self: *const Self, address: Cell) bool {
+    pub fn isMarkedUnchecked(self: *const Self, address: Cell) bool {
         const idx = self.addressToBitIndexUnchecked(address);
         return (self.marked[idx.cell_index] & (@as(Cell, 1) << idx.bit_index)) != 0;
     }
 
     /// Unchecked tryMarkStartBitOnly — caller guarantees address is in [start, end).
-    pub inline fn tryMarkStartBitOnlyUnchecked(self: *Self, address: Cell) bool {
+    pub fn tryMarkStartBitOnlyUnchecked(self: *Self, address: Cell) bool {
         const idx = self.addressToBitIndexUnchecked(address);
         const mask: Cell = (@as(Cell, 1) << idx.bit_index);
         const prev = self.marked[idx.cell_index];
@@ -165,6 +160,17 @@ pub const MarkBits = struct {
         return true;
     }
 
+    /// Unchecked tryMarkStart — sets start bit + full range, returns true if newly marked.
+    pub fn tryMarkStartUnchecked(self: *Self, address: Cell, data_size: Cell) bool {
+        const idx = self.addressToBitIndexUnchecked(address);
+        const mask: Cell = (@as(Cell, 1) << idx.bit_index);
+        const prev = self.marked[idx.cell_index];
+        if ((prev & mask) != 0) return false;
+        self.marked[idx.cell_index] = prev | mask;
+        const start_line = idx.cell_index * mark_bits_granularity + idx.bit_index;
+        self.setMarkedFromLine(address, data_size, start_line);
+        return true;
+    }
 
     // Must be called after marking phase and before compaction
     pub fn computeForwarding(self: *Self) void {
@@ -175,7 +181,7 @@ pub const MarkBits = struct {
         }
     }
 
-    pub inline fn forwardBlock(self: *const Self, original: Cell) Cell {
+    pub fn forwardBlock(self: *const Self, original: Cell) Cell {
         const position = self.addressToBitIndex(original) orelse return original;
 
         // Inline isMarked check using already-computed position
@@ -196,11 +202,11 @@ pub const MarkBits = struct {
         return new_block;
     }
 
-    inline fn lineBlock(self: *const Self, line: Cell) Cell {
+    fn lineBlock(self: *const Self, line: Cell) Cell {
         return line * layouts.data_alignment + self.start;
     }
 
-    pub inline fn nextMarkedBlockAfter(self: *const Self, original: Cell) Cell {
+    pub fn nextMarkedBlockAfter(self: *const Self, original: Cell) Cell {
         const position = self.addressToBitIndex(original) orelse return self.end;
         var bit_index = position.bit_index;
 
@@ -217,7 +223,7 @@ pub const MarkBits = struct {
         return self.end;
     }
 
-    pub inline fn nextUnmarkedBlockAfter(self: *const Self, original: Cell) Cell {
+    pub fn nextUnmarkedBlockAfter(self: *const Self, original: Cell) Cell {
         const position = self.addressToBitIndex(original) orelse return self.end;
         var bit_index = position.bit_index;
 
@@ -235,7 +241,7 @@ pub const MarkBits = struct {
         return self.end;
     }
 
-    pub inline fn unmarkedBlockSize(self: *const Self, original: Cell) Cell {
+    pub fn unmarkedBlockSize(self: *const Self, original: Cell) Cell {
         const next_marked = self.nextMarkedBlockAfter(original);
         return next_marked - original;
     }

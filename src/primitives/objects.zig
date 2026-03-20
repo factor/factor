@@ -16,17 +16,14 @@ const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
-// Maximum array size (same as C++ array_size_max: 1 << (WORD_SIZE - TAG_BITS - 2))
 const array_size_max: Cell = @as(Cell, 1) << (64 - layouts.tag_bits - 2);
 
 // Validate and unbox an array size from a cell value.
-// Like C++ unbox_array_size() which uses to_fixnum_strict() first.
 // For bignums that don't fit in fixnum, throws out_of_fixnum_range.
 // For values out of array size range, throws array_size.
 fn unboxArraySize(vm: *FactorVM, obj: Cell) ?Cell {
     var n: Fixnum = undefined;
 
-    // Handle different types like C++ to_fixnum_strict
     const tag = layouts.typeTag(obj);
     if (tag == .fixnum) {
         n = layouts.untagFixnum(obj);
@@ -39,7 +36,6 @@ fn unboxArraySize(vm: *FactorVM, obj: Cell) ?Cell {
         }
         n = bignum.toFixnum(bn);
     } else {
-        // Other types can't be array sizes - throw type error (like C++ type_error)
         vm.fixnumRangeError(obj);
     }
 
@@ -68,7 +64,7 @@ pub export fn primitive_clone(vm_asm: *VMAssemblyFields) callconv(.c) void {
     }
 
     // Root the object - ensureNurserySpace can trigger GC which may move it
-    vm.data_roots.append(vm.allocator, &obj) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&obj);
     defer _ = vm.data_roots.pop();
 
     // Compute object size
@@ -99,7 +95,6 @@ pub export fn primitive_clone(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_wrapper(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( obj -- wrapper )
-    // Matches C++ pattern: allot<wrapper> then peek (after allocation)
     const tagged = vm.allotObject(.wrapper, @sizeOf(layouts.Wrapper)) orelse vm.memoryError();
 
     // Peek AFTER allotObject (which may trigger GC and move stack values)
@@ -179,13 +174,13 @@ pub export fn primitive_tuple_boa(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // ( slot-values... layout -- tuple )
     // Create a new tuple filling slots from the stack (BOA = By Order of Arguments)
     // Pop the layout and root it locally so we can bulk-copy the remaining
-    // stack cells exactly like the C++ VM.
+    // stack cells.
     var layout_cell = ctx.pop();
 
     // NOTE: tuple_layout objects have tag ARRAY (2), not TUPLE (7)!
     vm.checkTag(layout_cell, .array);
 
-    vm.data_roots.append(vm.allocator, &layout_cell) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&layout_cell);
     defer _ = vm.data_roots.pop();
 
     const layout: *const layouts.TupleLayout = @ptrFromInt(layouts.UNTAG(layout_cell));
@@ -222,7 +217,6 @@ pub export fn primitive_tuple_boa(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_identity_hashcode(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const ctx = vm_asm.ctx;
     // ( obj -- hashcode )
-    // C++: ctx->replace(tag_fixnum(obj->hashcode()));
     const obj = ctx.peek();
     if (layouts.isImmediate(obj)) {
         // Immediates - leave unchanged (value is its own hashcode)
@@ -239,7 +233,6 @@ pub export fn primitive_compute_identity_hashcode(vm_asm: *VMAssemblyFields) cal
     const ctx = vm_asm.ctx;
     // ( obj -- )
     // Compute and set identity hashcode (pops the object!)
-    // C++: object* obj = untag<object>(ctx->pop());
     const obj = ctx.pop();
     if (!layouts.isImmediate(obj)) {
         const obj_addr = layouts.UNTAG(obj);
@@ -282,7 +275,6 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         return;
     }
 
-    // Build forwarding map from old objects to new objects
     const BecomeMap = std.AutoHashMap(Cell, Cell);
     var become_map = BecomeMap.init(vm.allocator);
     defer become_map.deinit();
@@ -303,14 +295,12 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         }
     }
 
-    // Define the visitor context for replacing references
-    const BecomeVisitor = struct {
+    // Fixup for become: substitutes old references with new ones via the become map.
+    const BecomeFixup = struct {
         map: *BecomeMap,
 
-        fn visitSlot(slot: *Cell, ctx_ptr: *anyopaque) void {
-            const self: *@This() = @ptrCast(@alignCast(ctx_ptr));
+        pub fn visitSlot(self: *@This(), slot: *Cell) void {
             const value = slot.*;
-
             if (!layouts.isImmediate(value)) {
                 const untagged = layouts.UNTAG(value);
                 if (self.map.get(untagged)) |new_value| {
@@ -320,12 +310,12 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         }
     };
 
-    var visitor_ctx = BecomeVisitor{ .map = &become_map };
+    var become_fixup = BecomeFixup{ .map = &become_map };
 
     // Visit all roots
     // 1. Special objects
     for (&vm.vm_asm.special_objects) |*slot| {
-        BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+        become_fixup.visitSlot(slot);
     }
 
     // 2. Data stack
@@ -335,7 +325,7 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
             var ptr = seg.start;
             while (ptr <= ctx.datastack) {
                 const slot: *Cell = @ptrFromInt(ptr);
-                BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+                become_fixup.visitSlot(slot);
                 ptr += @sizeOf(Cell);
             }
         }
@@ -345,31 +335,31 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
             var ptr = seg.start;
             while (ptr <= ctx.retainstack) {
                 const slot: *Cell = @ptrFromInt(ptr);
-                BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+                become_fixup.visitSlot(slot);
                 ptr += @sizeOf(Cell);
             }
         }
 
         // 4. Context objects
         for (&ctx.context_objects) |*slot| {
-            BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+            become_fixup.visitSlot(slot);
         }
     }
 
     // 5. Data roots
     for (vm.data_roots.items) |root| {
-        BecomeVisitor.visitSlot(root, @ptrCast(&visitor_ctx));
+        become_fixup.visitSlot(root);
     }
 
     // 6. Callback stubs (owners are GC roots)
     if (vm.callbacks) |callback_heap| {
         const Ctx = struct {
-            ctx: *BecomeVisitor,
+            fixup: *BecomeFixup,
             fn visit(slot: *Cell, c: @This()) void {
-                BecomeVisitor.visitSlot(slot, @ptrCast(c.ctx));
+                c.fixup.visitSlot(slot);
             }
         };
-        const ctx = Ctx{ .ctx = &visitor_ctx };
+        const ctx = Ctx{ .fixup = &become_fixup };
         callback_heap.iterateOwnersWithCtx(Ctx, Ctx.visit, ctx);
     }
 
@@ -377,7 +367,7 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
     if (vm.code) |code| {
         var iter = code.uninitialized_blocks.iterator();
         while (iter.next()) |entry| {
-            BecomeVisitor.visitSlot(entry.value_ptr, @ptrCast(&visitor_ctx));
+            become_fixup.visitSlot(entry.value_ptr);
         }
     }
 
@@ -389,7 +379,7 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
             var ptr = seg.start;
             while (ptr <= ctx.datastack) {
                 const slot: *Cell = @ptrFromInt(ptr);
-                BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+                become_fixup.visitSlot(slot);
                 ptr += @sizeOf(Cell);
             }
         }
@@ -398,14 +388,14 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
             var ptr = seg.start;
             while (ptr <= ctx.retainstack) {
                 const slot: *Cell = @ptrFromInt(ptr);
-                BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+                become_fixup.visitSlot(slot);
                 ptr += @sizeOf(Cell);
             }
         }
 
         // Visit context objects
         for (&ctx.context_objects) |*slot| {
-            BecomeVisitor.visitSlot(slot, @ptrCast(&visitor_ctx));
+            become_fixup.visitSlot(slot);
         }
     }
 
@@ -420,13 +410,13 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         // Aging space
         var aging_iter = slot_visitor.ObjectIterator.init(data_heap.aging.start, data_heap.aging.here);
         while (aging_iter.next()) |addr| {
-            slot_visitor.visitObjectSlots(addr, BecomeVisitor.visitSlot, @ptrCast(&visitor_ctx));
+            _ = slot_visitor.visitDataObjectSlots(BecomeFixup, &become_fixup, addr);
         }
 
         // Tenured space
         var tenured_iter = slot_visitor.ObjectIterator.init(data_heap.tenured.start, data_heap.tenured.end);
         while (tenured_iter.next()) |addr| {
-            slot_visitor.visitObjectSlots(addr, BecomeVisitor.visitSlot, @ptrCast(&visitor_ctx));
+            _ = slot_visitor.visitDataObjectSlots(BecomeFixup, &become_fixup, addr);
         }
     }
 
@@ -438,9 +428,9 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
             if (block.isFree()) continue;
 
             // Update header pointers
-            BecomeVisitor.visitSlot(@ptrCast(&block.owner), @ptrCast(&visitor_ctx));
-            BecomeVisitor.visitSlot(@ptrCast(&block.parameters), @ptrCast(&visitor_ctx));
-            BecomeVisitor.visitSlot(@ptrCast(&block.relocation), @ptrCast(&visitor_ctx));
+            become_fixup.visitSlot(@ptrCast(&block.owner));
+            become_fixup.visitSlot(@ptrCast(&block.parameters));
+            become_fixup.visitSlot(@ptrCast(&block.relocation));
 
             // Update embedded literals (skip uninitialized blocks)
             if (!code.isUninitializedAddress(addr)) {
@@ -492,15 +482,18 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( capacity fill -- array )
-    // Matches C++ pattern: data_root<object> fill + allot_uninitialized_array
     var fill = vm.pop();
     const capacity_cell = vm.pop();
 
     const capacity = unboxArraySize(vm, capacity_cell) orelse return;
 
-    // Root fill - allotUninitializedArray can trigger GC which may move heap objects
-    vm.data_roots.append(vm.allocator, &fill) catch @panic("OOM");
-    defer _ = vm.data_roots.pop();
+    // Only root fill if it's a heap object — immediates (fixnums, f) can't be
+    // moved by GC, so skip the root push/pop overhead for the common case.
+    const needs_root = !layouts.isImmediate(fill);
+    if (needs_root) vm.data_roots.appendAssumeCapacity(&fill);
+    defer if (needs_root) {
+        _ = vm.data_roots.pop();
+    };
 
     // Allocate array (may trigger GC). Use no-fill variant since we immediately
     // overwrite every element with fill below.
@@ -516,7 +509,6 @@ pub export fn primitive_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_resize_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( capacity array -- new-array )
-    // Matches C++ pattern: data_root<array> a + reallot_array
     const arr = vm.pop();
     const capacity_cell = vm.pop();
 
@@ -567,7 +559,6 @@ pub export fn primitive_uninitialized_byte_array(vm_asm: *VMAssemblyFields) call
 pub export fn primitive_resize_byte_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( n byte-array -- new-byte-array )
-    // Matches C++ pattern: data_root<byte_array> + reallot_array
     var ba_cell = vm.pop();
     const size_cell = vm.pop();
 
@@ -585,7 +576,6 @@ pub export fn primitive_resize_byte_array(vm_asm: *VMAssemblyFields) callconv(.c
         return;
     }
 
-    // In-place shrink for nursery objects (matches C++ reallot_array_in_place_p)
     if (new_size <= old_size and vm.vm_asm.nursery.contains(@ptrFromInt(layouts.UNTAG(ba_cell)))) {
         const ba_mut: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(ba_cell));
         ba_mut.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(new_size)));
@@ -594,7 +584,7 @@ pub export fn primitive_resize_byte_array(vm_asm: *VMAssemblyFields) callconv(.c
     }
 
     // Root old byte array - allocation can trigger GC
-    vm.data_roots.append(vm.allocator, &ba_cell) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&ba_cell);
     defer _ = vm.data_roots.pop();
 
     const header_size = @sizeOf(layouts.ByteArray);
@@ -645,7 +635,7 @@ pub export fn primitive_string(vm_asm: *VMAssemblyFields) callconv(.c) void {
     } else {
         // Non-ASCII - allocate aux array. Root the string first since
         // the aux allocation can trigger GC which may move the string.
-        vm.data_roots.append(vm.allocator, &tagged) catch vm.memoryError();
+        vm.data_roots.appendAssumeCapacity(&tagged);
         defer _ = vm.data_roots.pop();
 
         const aux_capacity = length * 2;
@@ -675,7 +665,6 @@ pub export fn primitive_string(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( n string -- newstring )
-    // Matches C++ pattern: data_root<string> + allot
     var str_cell = vm.pop();
     const length_cell = vm.pop();
 
@@ -694,7 +683,7 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
     }
 
     // Root old string - allocation can trigger GC
-    vm.data_roots.append(vm.allocator, &str_cell) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&str_cell);
     defer _ = vm.data_roots.pop();
 
     // Use allotObject which routes large objects to tenured space
@@ -720,7 +709,7 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
     // Handle auxiliary byte_array for Unicode strings
     if (has_aux) {
         // Root the new string before second allocation
-        vm.data_roots.append(vm.allocator, &tagged) catch vm.memoryError();
+        vm.data_roots.appendAssumeCapacity(&tagged);
         defer _ = vm.data_roots.pop();
 
         const aux_capacity = new_length * 2;
@@ -781,13 +770,11 @@ pub export fn primitive_set_string_nth_fast(vm_asm: *VMAssemblyFields) callconv(
 pub export fn primitive_word(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( name vocabulary hashcode -- word )
-    // Matches C++ pattern: data_root for name/vocab then allot<word>
     var hashcode = vm.pop();
     var vocab = vm.pop();
     var name = vm.pop();
 
     // Root all three - name and vocab are heap strings, allocation can trigger GC
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 3) catch @panic("OOM");
     vm.data_roots.appendAssumeCapacity(&name);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&vocab);
@@ -807,8 +794,8 @@ pub export fn primitive_word(vm_asm: *VMAssemblyFields) callconv(.c) void {
     word.subprimitive = layouts.false_object;
     word.entry_point = 0;
 
-    // JIT compile the word's def quotation (matches C++ allot_word behavior).
-    vm.data_roots.append(vm.allocator, &word_cell) catch vm.memoryError();
+    // JIT compile the word's def quotation.
+    vm.data_roots.appendAssumeCapacity(&word_cell);
     defer _ = vm.data_roots.pop();
 
     const def = word.def;

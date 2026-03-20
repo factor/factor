@@ -1,10 +1,3 @@
-// object_start_map.zig - Maps card addresses to object start addresses
-// Ported from vm/object_start_map.hpp and vm/object_start_map.cpp
-//
-// The object start map enables finding the object containing any address.
-// For each card (256 bytes), we store the offset to the start of the first
-// object that begins in or before that card.
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const vm = @import("vm.zig");
@@ -45,17 +38,17 @@ pub const ObjectStartMap = struct {
         self.entries = &[_]u8{};
     }
 
-    inline fn addressToCard(self: *const Self, address: Cell) usize {
+    fn addressToCard(self: *const Self, address: Cell) usize {
         std.debug.assert(address >= self.start);
         std.debug.assert(address < self.start + self.size);
         return (address - self.start) / vm.card_size;
     }
 
-    inline fn cardToAddress(self: *const Self, card_index: usize) Cell {
+    fn cardToAddress(self: *const Self, card_index: usize) Cell {
         return self.start + card_index * vm.card_size;
     }
 
-    pub inline fn recordObjectStart(self: *Self, address: Cell) void {
+    pub fn recordObjectStart(self: *Self, address: Cell) void {
         std.debug.assert((address & 0xF) == 0); // Objects must be 16-byte aligned
 
         const card_index = self.addressToCard(address);
@@ -116,20 +109,15 @@ pub const ObjectStartMap = struct {
         return null;
     }
 
-    // Find the object containing the start of this card.
-    // Matches C++ object_start_map::find_object_containing_card() which
-    // starts from card_index-1 and walks back to find objects that span
-    // into the target card. This is critical for write barrier correctness:
-    // the write barrier marks the card containing the SLOT address, but the
-    // object header may be in a previous card.
+    // Find the object containing the start of this card by walking backward to a
+    // card with a known object start.
     pub fn findObjectContainingCard(self: *const Self, card_index: usize) ?Cell {
         if (card_index >= self.entries.len) {
             return null;
         }
-        // C++: if (card_index == 0) return start;
         if (card_index == 0) return self.start;
 
-        // C++: card_index--; then walk back to find valid entry
+        // Walk backward until a card with a valid object-start entry is found.
         var idx = card_index - 1;
         while (self.entries[idx] == invalid_offset) {
             if (idx == 0) return self.start;
@@ -156,7 +144,6 @@ pub const ObjectStartMap = struct {
     }
 
     // Update card offsets after sweep using mark bits.
-    // Matches C++ object_start_map::update_for_sweep.
     pub fn updateForSweep(self: *Self, marks: *const mark_bits.MarkBits) void {
         const is_64 = @sizeOf(Cell) == 8;
         var index: usize = 0;
@@ -246,7 +233,7 @@ pub const CardTable = struct {
         self.cards = &[_]u8{};
     }
 
-    inline fn addressToCard(self: *const Self, address: Cell) usize {
+    fn addressToCard(self: *const Self, address: Cell) usize {
         return (address - self.start) / vm.card_size;
     }
 
@@ -301,7 +288,7 @@ pub const DeckTable = struct {
         self.decks = &[_]u8{};
     }
 
-    inline fn addressToDeck(self: *const Self, address: Cell) usize {
+    fn addressToDeck(self: *const Self, address: Cell) usize {
         return (address - self.start) / vm.deck_size;
     }
 

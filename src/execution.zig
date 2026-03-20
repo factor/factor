@@ -1,12 +1,3 @@
-// execution.zig - Factor VM execution engine
-// Handles quotation execution, word dispatch, and primitive calls
-//
-// Factor normally uses JIT compilation where all code runs as native machine code.
-// This module provides:
-// 1. An interpreter for running quotations when JIT is not available
-// 2. Entry points for calling compiled Factor code
-// 3. Primitive dispatch
-
 const std = @import("std");
 
 const contexts = @import("contexts.zig");
@@ -19,7 +10,6 @@ const Cell = layouts.Cell;
 const Fixnum = layouts.Fixnum;
 const FactorVM = vm_mod.FactorVM;
 
-// Execution error types
 pub const ExecutionError = error{
     StackUnderflow,
     StackOverflow,
@@ -30,8 +20,6 @@ pub const ExecutionError = error{
     NotImplemented,
 };
 
-// Interpreter for quotations
-// This is used when JIT compilation is not available
 pub const Interpreter = struct {
     vm: *FactorVM,
     recursion_depth: u32,
@@ -71,20 +59,17 @@ pub const Interpreter = struct {
 
         const data = arr.data();
 
-        // Check for mega-cache-lookup pattern: [ methods index cache mega-cache-lookup ]
         if (len == 4 and self.isMegaCacheLookupPattern(data[0..4], len)) {
             try self.executeMegaCacheLookup(data[0..4]);
             return;
         }
 
-        // Execute each element
         for (0..len) |i| {
             const elem = data[i];
             try self.executeElement(elem);
         }
     }
 
-    // Check if quotation matches mega-cache-lookup pattern
     fn isMegaCacheLookupPattern(self: *Self, data: []const Cell, len: Cell) bool {
         if (len != 4) return false;
 
@@ -97,7 +82,6 @@ pub const Interpreter = struct {
         return data[3] == mega_lookup_word;
     }
 
-    // Execute mega-cache-lookup pattern for generic dispatch
     fn executeMegaCacheLookup(self: *Self, data: []const Cell) ExecutionError!void {
         const ctx = self.vm.vm_asm.ctx;
 
@@ -142,16 +126,13 @@ pub const Interpreter = struct {
     fn executeWord(self: *Self, word_cell: Cell) ExecutionError!void {
         const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
 
-        // Try built-in words first (single pass of string comparisons)
         if (try self.tryExecuteBuiltin(word)) return;
 
-        // Execute the word's definition quotation
         const def = word.def;
         if (def == layouts.false_object) {
             return ExecutionError.UndefinedWord;
         }
 
-        // Check for self-recursive definition (sub-primitive pattern)
         if (layouts.hasTag(def, .quotation)) {
             const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(def));
             if (quot.array != layouts.false_object and layouts.hasTag(quot.array, .array)) {
@@ -188,7 +169,6 @@ pub const Interpreter = struct {
         return if (cond) self.trueObject() else layouts.false_object;
     }
 
-    // Try to execute a built-in word. Returns true if handled, false if not a builtin.
     fn tryExecuteBuiltin(self: *Self, word: *const layouts.Word) ExecutionError!bool {
         const ctx = self.vm.vm_asm.ctx;
 
@@ -378,7 +358,6 @@ pub const Interpreter = struct {
         return true;
     }
 
-    // Execute special combinators
     pub fn call(self: *Self) ExecutionError!void {
         const quot = self.vm.pop();
         try self.executeQuotation(quot);
@@ -422,7 +401,6 @@ pub const Interpreter = struct {
     }
 };
 
-// Entry point for running Factor code
 pub fn runFactor(vm: *FactorVM) !void {
     const startup_quot = vm.specialObject(objects.SpecialObject.startup_quot);
 
@@ -439,12 +417,10 @@ pub fn runFactor(vm: *FactorVM) !void {
         }
     }
 
-    // Fall back to interpreter
     var interp = Interpreter.init(vm);
     try interp.executeQuotation(startup_quot);
 }
 
-// Tests
 test "interpreter basic literals" {
     const allocator = std.testing.allocator;
     var vm = try FactorVM.init(allocator);

@@ -1,9 +1,3 @@
-// vm.zig - Main Factor VM structure
-// Field layout in the first section is critical for assembly compatibility
-// Must be kept in sync with:
-//   basis/vm/vm.factor
-//   basis/compiler/constants/constants.factor
-
 const std = @import("std");
 const builtin = @import("builtin");
 
@@ -22,7 +16,6 @@ const segments = @import("segments.zig");
 const Cell = layouts.Cell;
 const Fixnum = layouts.Fixnum;
 
-// Write barrier card/deck constants
 pub const card_bits: Cell = 8;
 pub const card_size: Cell = 1 << card_bits; // 256 bytes
 pub const deck_bits: Cell = 18;
@@ -32,17 +25,12 @@ pub const card_mark_mask: u8 = card_points_to_nursery | card_points_to_aging;
 pub const card_points_to_nursery: u8 = 0x80;
 pub const card_points_to_aging: u8 = 0x40;
 
-// Use the actual DataHeap type from data_heap module
 pub const DataHeap = data_heap.DataHeap;
 
-// CodeBlock is defined in code_blocks.zig - re-exported here for compatibility
 pub const CodeBlock = code_blocks_mod.CodeBlock;
 
-// CodeHeap is defined in code_heap.zig - re-exported here for compatibility
 pub const CodeHeap = @import("code_heap.zig").CodeHeap;
 
-// Code roots - return addresses that must be updated/invalidated across GC.
-// Mirrors vm/code_roots.hpp (RAII) from C++.
 pub const CodeRoot = struct {
     value: Cell,
     valid: bool = true,
@@ -68,7 +56,6 @@ pub const CodeRoot = struct {
 
 pub const DataRootStack = std.ArrayList(*Cell);
 
-// Use the real CallbackHeap from callbacks module
 pub const CallbackHeap = callbacks_mod.CallbackHeap;
 
 pub const GCState = struct {
@@ -84,7 +71,6 @@ pub const GCOp = enum {
     collect_growing_data_heap,
 };
 
-// GC phases that we record timing for
 pub const GCPhase = enum(u32) {
     card_scan = 0,
     code_scan = 1,
@@ -94,7 +80,6 @@ pub const GCPhase = enum(u32) {
     marking = 5,
 };
 
-/// Layout must match C++ data_heap_room and Factor data-heap-room STRUCT.
 /// Contains: nursery (copying-sizes), aging (copying-sizes),
 /// tenured (mark-sweep-sizes), cards, decks, mark-stack.
 pub const DataHeapRoom = extern struct {
@@ -114,7 +99,6 @@ pub const DataHeapRoom = extern struct {
     mark_stack: Cell,
 };
 
-/// Layout must match C++ allocator_room and Factor mark-sweep-sizes STRUCT.
 pub const AllocatorRoom = extern struct {
     size: Cell,
     occupied_space: Cell,
@@ -123,8 +107,6 @@ pub const AllocatorRoom = extern struct {
     free_block_count: Cell,
 };
 
-/// Layout must match C++ gc_event and Factor gc-event STRUCT (vm/gc.hpp).
-/// C++ size: 4 (op) + 4 (pad) + 112 + 40 + 112 + 40 + 24 + 8 + 8 + 48 + 8 = 408 bytes
 pub const GCEvent = extern struct {
     comptime {
         std.debug.assert(@sizeOf(DataHeapRoom) == 14 * @sizeOf(Cell)); // 112
@@ -217,7 +199,6 @@ fn computeCodeHeapRoom(vm: *FactorVM) AllocatorRoom {
 }
 
 /// Dispatch statistics for profiling inline cache behavior.
-/// Layout must match C++ dispatch_statistics and Factor dispatch-statistics STRUCT.
 pub const DispatchStatistics = extern struct {
     megamorphic_cache_hits: Cell,
     megamorphic_cache_misses: Cell,
@@ -228,151 +209,69 @@ pub const DispatchStatistics = extern struct {
     pic_tuple_count: Cell,
 };
 
-// Assembly-accessible portion of VM - exact layout required
-// This must match the C++ factor_vm struct's first fields exactly
 pub const VMAssemblyFields = extern struct {
-    // Current context (offset 0)
     ctx: *contexts.Context,
-
-    // Spare context -- for callbacks (offset 1)
     spare_ctx: *contexts.Context,
-
-    // Nursery allocator - new objects are allocated here (offset 2-5)
-    // Note: this is embedded, not a pointer, for assembly access
     nursery: bump_allocator.BumpAllocator,
-
-    // Add this to a shifted address to compute write barrier offsets (offset 6)
     cards_offset: Cell,
-
-    // Write barrier deck offset (offset 7)
     decks_offset: Cell,
-
-    // cdecl signal handler address, used by signal handler subprimitives (offset 8)
     signal_handler_addr: Cell,
-
-    // are we handling a memory error? used to detect double faults (offset 9)
     faulting_p: bool,
-
-    // Padding to align special_objects to offset 10
     _padding: [7]u8,
-
-    // Various special objects (offset 10 in bootstrap cells)
     special_objects: [objects.special_object_count]Cell,
 
-    pub inline fn getVM(self: *VMAssemblyFields) *FactorVM {
+    pub fn getVM(self: *VMAssemblyFields) *FactorVM {
         return @fieldParentPtr("vm_asm", self);
     }
 };
 
-// C-to-Factor function type - takes quotation cell as argument
 pub const CToFactorFuncType = *const fn (Cell) void;
 
-// Global fatal error flag (was pub var in struct, moved out for layout consistency)
 pub var g_fatal_erroring_p: bool = false;
-
-// Main Factor VM structure
 pub const FactorVM = struct {
-    // Assembly-accessible fields - MUST be first (at offset 0)
-    // Using align(1) to prevent padding before this field
     vm_asm: VMAssemblyFields,
-
-    // Handle to the main thread we run in
     thread: ?std.Thread.Id,
-
-    // Data stack and retain stack sizes
     datastack_size: Cell,
     retainstack_size: Cell,
     callstack_size: Cell,
-
-    // GC write barrier tracking arrays (allocated for heap lifetime)
     cards_array: ?[]u8,
     decks_array: ?[]u8,
-    // Next callback ID
     callback_id: i32,
-
-    // Callback IDs stack for tracking nested callbacks
     callback_ids: std.ArrayList(i32),
-
-    // c_to_factor function pointer - lazily initialized
     c_to_factor_func: ?CToFactorFuncType,
-
-    // Pooling unused contexts
     unused_contexts: std.ArrayList(*contexts.Context),
-
-    // Active contexts for GC tracing
     active_contexts: std.ArrayListUnmanaged(*contexts.Context),
-
-    // Is profiling enabled?
     sampling_profiler_p: bool,
     samples_per_second: Fixnum,
     profiling_samples: std.ArrayList(safepoints.SampleRecord),
-
-    // Global variables used to pass fault handler state from signal handler to VM
     signal_resumable: bool,
     signal_number: Cell,
     signal_fault_addr: Cell,
     signal_fault_pc: Cell,
     signal_fpu_status: u32,
-
-    // Pipe used to notify Factor multiplexer of signals
     signal_pipe_input: i32,
     signal_pipe_output: i32,
-
-    // GC is off during heap walking
     gc_off: bool,
-
-    // Data heap
     data: ?*DataHeap,
-
-    // Code heap
     code: ?*CodeHeap,
-
-    // Pinned callback stubs
     callbacks: ?*CallbackHeap,
-
-    // Only set if we're performing a GC
     current_gc: ?*GCState,
     current_gc_p: bool,
-
-    // Set if we're in the jit
     current_jit_count: Fixnum,
-
-    // GC events
     gc_events: ?*std.ArrayList(GCEvent),
-
-    // Garbage collector instance
     gc: ?*gc.GarbageCollector,
-
-    // Data roots for GC.
     data_roots: DataRootStack,
-    // Code roots for GC (return addresses that must be updated/invalidated)
     code_roots: std.ArrayList(*CodeRoot),
-
-    // Debugger
     fep_p: bool,
     fep_help_was_shown: bool,
     fep_disabled: bool,
     full_output: bool,
-
-    // Method dispatch statistics
     dispatch_stats: DispatchStatistics,
-
-    // Number of entries in a polymorphic inline cache
     max_pic_size: Cell,
-
-    // Incrementing object counter for identity hashing
     object_counter: Cell,
-
-    // Sanity check to ensure that monotonic counter doesn't decrease
     last_nano_count: u64,
-
-    // Stack for signal handlers (Unix only)
     signal_callstack_seg: ?segments.Segment,
-
-    // Allow Ctrl-Break in busy loop (Windows only)
     stop_on_ctrl_break: bool,
-
-    // Allocator for internal data structures
     allocator: std.mem.Allocator,
 
     const Self = @This();
@@ -399,9 +298,9 @@ pub const FactorVM = struct {
                 .special_objects = [_]Cell{layouts.false_object} ** objects.special_object_count,
             },
             .thread = null,
-            .datastack_size = 32 * @sizeOf(Cell) * 1024, // 256KB (matches C++ default: 32 * sizeof(cell) kilobytes)
-            .retainstack_size = 32 * @sizeOf(Cell) * 1024, // 256KB (matches C++ default)
-            .callstack_size = 128 * @sizeOf(Cell) * 1024, // 1MB (matches C++ default: 128 * sizeof(cell) kilobytes)
+            .datastack_size = 32 * @sizeOf(Cell) * 1024,
+            .retainstack_size = 32 * @sizeOf(Cell) * 1024,
+            .callstack_size = 128 * @sizeOf(Cell) * 1024,
             .cards_array = null,
             .decks_array = null,
             .callback_id = 0,
@@ -451,11 +350,12 @@ pub const FactorVM = struct {
             .allocator = allocator,
         };
 
+        vm.data_roots.ensureTotalCapacity(allocator, 128) catch {};
+
         return vm;
     }
 
     pub fn deinit(self: *Self) void {
-        // Clean up contexts
         {
             var context = self.vm_asm.ctx;
             context.deinit(self.allocator);
@@ -479,8 +379,6 @@ pub const FactorVM = struct {
         self.code_roots.deinit(self.allocator);
         self.callback_ids.deinit(self.allocator);
 
-        // Clean up GC write barrier tracking arrays.
-        // If a data heap is attached, it owns these arrays.
         if (self.data == null) {
             if (self.cards_array) |cards| {
                 self.allocator.free(cards);
@@ -523,18 +421,14 @@ pub const FactorVM = struct {
         self.active_contexts.clearRetainingCapacity();
     }
 
-    // Create a new context
-    // Matches C++ VM: new_context() in contexts.cpp
     pub fn newContext(self: *Self) !*contexts.Context {
         var new_ctx: *contexts.Context = undefined;
 
-        // Try to reuse an unused context
         if (self.unused_contexts.items.len > 0) {
             const reused_ctx = self.unused_contexts.pop().?;
             reused_ctx.reset();
             new_ctx = reused_ctx;
         } else {
-            // Allocate new context segments.
             const ctx_ptr = try self.allocator.create(contexts.Context);
             ctx_ptr.* = try contexts.Context.init(
                 self.allocator,
@@ -545,16 +439,11 @@ pub const FactorVM = struct {
             new_ctx = ctx_ptr;
         }
 
-        // Add to active contexts list.
         try self.addActiveContext(new_ctx);
 
         return new_ctx;
     }
 
-    // Delete the current context - moves it to unused pool
-    // Matches C++ VM: delete_context() in contexts.cpp
-    // NOTE: This does NOT switch contexts (ctx = spare_ctx). The context switch
-    // is handled by the callback stub's epilogue which restores the saved ctx.
     pub fn deleteContext(self: *Self) void {
         const current = self.vm_asm.ctx;
         self.removeActiveContext(current);
@@ -564,11 +453,6 @@ pub const FactorVM = struct {
             self.allocator.destroy(c);
             return;
         };
-
-        // Limit unused context pool size to 10 (matches C++ VM).
-        // Remove from front (oldest), matching C++ front()/pop_front() FIFO order.
-        // Using pop() (LIFO) would destroy the just-added context while vm_asm.ctx
-        // still references it — a use-after-free that causes NULL derefs in fib6.
         while (self.unused_contexts.items.len > 10) {
             var c = self.unused_contexts.orderedRemove(0);
             c.deinit(self.allocator);
@@ -576,40 +460,23 @@ pub const FactorVM = struct {
         }
     }
 
-    // Fast write barrier for slots known to be inside the main data heap segment.
-    pub inline fn writeBarrierKnownHeap(self: *Self, slot_ptr: *Cell) void {
-        const data_ptr = self.data orelse return;
-        const heap: *DataHeap = @ptrCast(@alignCast(data_ptr));
-        const slot_addr = @intFromPtr(slot_ptr);
-        std.debug.assert(slot_addr >= heap.segment.start);
-        std.debug.assert(slot_addr < heap.segment.end);
-
-        const card_base = heap.segment.start >> @intCast(card_bits);
-        const deck_base = heap.segment.start >> @intCast(deck_bits);
-        const slot_card = slot_addr >> @intCast(card_bits);
-        const slot_deck = slot_addr >> @intCast(deck_bits);
-        if (slot_card < card_base or slot_deck < deck_base) return;
-
-        const card_idx: usize = @intCast(slot_card - card_base);
-        const deck_idx: usize = @intCast(slot_deck - deck_base);
-        std.debug.assert(card_idx < heap.cards.cards.len);
-        std.debug.assert(deck_idx < heap.decks.decks.len);
-        const card_ptr: *u8 = &heap.cards.cards[card_idx];
+    inline fn writeBarrierSlot(self: *Self, slot_addr: Cell) void {
+        const card_ptr: *u8 = @ptrFromInt(self.vm_asm.cards_offset +% (slot_addr >> @intCast(card_bits)));
         card_ptr.* = card_mark_mask;
-        const deck_ptr: *u8 = &heap.decks.decks[deck_idx];
+        const deck_ptr: *u8 = @ptrFromInt(self.vm_asm.decks_offset +% (slot_addr >> @intCast(deck_bits)));
         deck_ptr.* = card_mark_mask;
     }
 
-    // Value-aware fast write barrier for known-heap slots.
-    // Skip marking when storing immediates since they cannot reference young objects.
-    pub inline fn writeBarrierKnownHeapWithValue(self: *Self, slot_ptr: *Cell, value: Cell) void {
+    pub fn writeBarrierKnownHeap(self: *Self, slot_ptr: *Cell) void {
+        self.writeBarrierSlot(@intFromPtr(slot_ptr));
+    }
+
+    pub fn writeBarrierKnownHeapWithValue(self: *Self, slot_ptr: *Cell, value: Cell) void {
         if (layouts.isImmediate(value)) return;
         self.writeBarrierKnownHeap(slot_ptr);
     }
 
-    // Write barrier - must be called when storing a pointer from older to younger generation
-    pub inline fn writeBarrier(self: *Self, slot_ptr: *Cell) void {
-        // Guard against slots outside the main data heap segment.
+    pub fn writeBarrier(self: *Self, slot_ptr: *Cell) void {
         const slot_addr = @intFromPtr(slot_ptr);
         if (self.data) |data_ptr| {
             const heap: *DataHeap = @ptrCast(@alignCast(data_ptr));
@@ -617,12 +484,10 @@ pub const FactorVM = struct {
                 return;
             }
         }
-        self.writeBarrierKnownHeap(slot_ptr);
+        self.writeBarrierSlot(slot_addr);
     }
 
-    // Value-aware write barrier.
-    // Prefer this in hot store paths where the stored value is already available.
-    pub inline fn writeBarrierWithValue(self: *Self, slot_ptr: *Cell, value: Cell) void {
+    pub fn writeBarrierWithValue(self: *Self, slot_ptr: *Cell, value: Cell) void {
         if (layouts.isImmediate(value)) return;
 
         const slot_addr = @intFromPtr(slot_ptr);
@@ -632,11 +497,9 @@ pub const FactorVM = struct {
                 return;
             }
         }
-        self.writeBarrierKnownHeap(slot_ptr);
+        self.writeBarrierSlot(slot_addr);
     }
 
-    // Write barrier for a range - marks all cards covering the object
-    // Used when allocating large objects in tenured space
     pub fn writeBarrierRange(self: *Self, addr: Cell, size: Cell) void {
         if (size == 0) return;
 
@@ -645,15 +508,10 @@ pub const FactorVM = struct {
         if (addr < heap.segment.start or addr >= heap.segment.end) {
             return;
         }
-
-        // Clamp end to heap bounds, handling arithmetic overflow.
         const raw_end = addr +% size;
         const unclamped_end = if (raw_end < addr) heap.segment.end else raw_end;
         const range_end = @min(unclamped_end, heap.segment.end);
         if (range_end <= addr) return;
-
-        // Mark cards with direct table indexing (equivalent to the JIT formula:
-        // cards_offset + (addr >> card_bits)).
         const first_card_abs = addr >> @intCast(card_bits);
         const last_card_abs = (range_end - 1) >> @intCast(card_bits);
         const card_base = heap.segment.start >> @intCast(card_bits);
@@ -671,8 +529,6 @@ pub const FactorVM = struct {
         const card_count = last_card_abs - first_card_abs + 1;
         const first_card: usize = @intCast(first_card_abs - card_base);
         @memset(heap.cards.cards[first_card..][0..@intCast(card_count)], card_mark_mask);
-
-        // Mark decks similarly (equivalent to decks_offset + (addr >> deck_bits)).
         std.debug.assert(first_deck_abs >= deck_base);
         std.debug.assert(last_deck_abs >= first_deck_abs);
         const deck_count = last_deck_abs - first_deck_abs + 1;
@@ -680,7 +536,6 @@ pub const FactorVM = struct {
         @memset(heap.decks.decks[first_deck..][0..@intCast(deck_count)], card_mark_mask);
     }
 
-    // Mark all cards and decks as dirty (used by become).
     pub fn markAllCards(self: *Self) void {
         if (self.cards_array) |cards| {
             @memset(cards, 0xff);
@@ -690,20 +545,7 @@ pub const FactorVM = struct {
         }
     }
 
-    /// Sync context stack pointers from CPU registers to context structure.
-    ///
-    /// NOTE: This is intentionally a no-op. The JIT code's jit-save-context
-    /// template saves R14/R15 (datastack/retainstack) to the context BEFORE
-    /// calling any C/Zig code (primitives, inline_cache_miss, etc.). By the
-    /// time GC runs, ctx.datastack/retainstack already have the correct values.
-    ///
-    /// Reading R14/R15 from Zig code gives GARBAGE because Zig uses those
-    /// registers for its own purposes (they are callee-saved and may contain
-    /// anything). Previously this was overwriting correct context values with
-    /// garbage, causing GC to scan wrong stack ranges.
     pub fn syncContextFromRegisters(_: *Self) void {
-        // No-op: JIT code already saves context before C calls.
-        // See jit-save-context in basis/bootstrap/assembler/x86.64.factor
     }
 
     pub fn specialObject(self: *const Self, index: objects.SpecialObject) Cell {
@@ -718,16 +560,11 @@ pub const FactorVM = struct {
         return if (untagged) self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)] else layouts.false_object;
     }
 
-    // Check that a cell has the expected type tag; throws a Factor-level
-    // type error (which unwinds the native stack) if the tag doesn't match.
     pub fn checkTag(self: *Self, cell: Cell, expected: layouts.TypeTag) void {
         if (!layouts.hasTag(cell, expected)) {
             self.typeError(expected, cell);
         }
     }
-
-    // --- Error helpers ---
-    // These delegate to signals.generalError for common error patterns.
 
     pub fn generalError(self: *Self, error_type: @import("signals.zig").VMError, arg1: Cell, arg2: Cell) noreturn {
         @import("signals.zig").generalError(self, error_type, arg1, arg2);
@@ -757,9 +594,7 @@ pub const FactorVM = struct {
         self.generalError(.out_of_fixnum_range, obj, layouts.false_object);
     }
 
-    // Extract address from alien, byte-array, or false (null).
-    // Shared helper for primitives that accept alien-or-byte-array arguments.
-    pub inline fn alienOffset(self: *Self, obj: Cell) ?[*]u8 {
+    pub fn alienOffset(self: *Self, obj: Cell) ?[*]u8 {
         if (obj == layouts.false_object) {
             return null;
         }
@@ -775,7 +610,6 @@ pub const FactorVM = struct {
         self.typeError(.alien, obj);
     }
 
-    // Extract a context pointer from a pinned alien cell.
     pub fn getContextFromAlien(self: *Self, alien_cell: Cell) ?*contexts.Context {
         if (alien_cell == layouts.false_object) return null;
         self.checkTag(alien_cell, .alien);
@@ -786,57 +620,44 @@ pub const FactorVM = struct {
         return @ptrFromInt(alien.address);
     }
 
-    pub inline fn getCtx(self: *Self) *contexts.Context {
+    pub fn getCtx(self: *Self) *contexts.Context {
         return self.vm_asm.ctx;
     }
 
-    pub inline fn setCtx(self: *Self, c: *contexts.Context) void {
+    pub fn setCtx(self: *Self, c: *contexts.Context) void {
         self.vm_asm.ctx = c;
     }
 
-    pub inline fn getNursery(self: *Self) *bump_allocator.BumpAllocator {
+    pub fn getNursery(self: *Self) *bump_allocator.BumpAllocator {
         return &self.vm_asm.nursery;
     }
 
-    pub inline fn getSpecialObjects(self: *Self) *[objects.special_object_count]Cell {
+    pub fn getSpecialObjects(self: *Self) *[objects.special_object_count]Cell {
         return &self.vm_asm.special_objects;
     }
 
-    pub inline fn peek(self: *const Self) Cell {
+    pub fn peek(self: *const Self) Cell {
         return self.vm_asm.ctx.peek();
     }
 
-    pub inline fn pop(self: *Self) Cell {
+    pub fn pop(self: *Self) Cell {
         return self.vm_asm.ctx.pop();
     }
 
-    pub inline fn push(self: *Self, value: Cell) void {
+    pub fn push(self: *Self, value: Cell) void {
         self.vm_asm.ctx.push(value);
     }
 
-    pub inline fn replace(self: *Self, value: Cell) void {
+    pub fn replace(self: *Self, value: Cell) void {
         self.vm_asm.ctx.replace(value);
     }
 
-    // === c_to_factor and callback management ===
-
-    // Call Factor code from C/Zig
-    // This is the main entry point for calling into compiled Factor code
     pub fn cToFactor(self: *Self, quot: Cell) void {
-        // Validate code heap free list before entering Factor
-        // validateFreeList checkpoint removed (root cause: non-contiguous heap fixed)
-
-        // First time: create callback stub wrapping c-to-factor word
         if (self.c_to_factor_func == null) {
             self.initCToFactorFunc();
         }
 
         if (self.c_to_factor_func) |func| {
-            // CRITICAL: CALLBACK-STUB switches to spare_ctx immediately!
-            // It does: vm->ctx = vm->spare_ctx, then writes to ctx->callstack_save.
-            // spare_ctx is eagerly initialized at startup and refreshed in beginCallback.
-
-            // On ARM64 macOS with MAP_JIT, switch to execute mode before calling callback
             if (builtin.cpu.arch == .aarch64 and (builtin.os.tag == .macos or builtin.os.tag == .ios)) {
                 const pthread_jit_write_protect_np = struct {
                     extern "c" fn pthread_jit_write_protect_np(enabled: c_int) void;
@@ -844,8 +665,6 @@ pub const FactorVM = struct {
                 pthread_jit_write_protect_np(1); // Enable write protection (allow execution)
             }
 
-            // Call the callback with quotation using explicit inline asm
-            // to ensure the first argument register has the correct value
             const func_addr = @intFromPtr(func);
             const quot_val = quot;
 
@@ -871,14 +690,10 @@ pub const FactorVM = struct {
         }
     }
 
-    // Initialize the c_to_factor function pointer
-    // This must be called after CALLBACK_STUB is available (after image load)
     fn initCToFactorFunc(self: *Self) void {
-        // Get C_TO_FACTOR_WORD from special objects
         const c_to_factor_word = self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.c_to_factor_word)];
         if (c_to_factor_word == layouts.false_object) return;
 
-        // Initialize callback heap if needed
         if (self.callbacks == null) {
             const callback_size = 256 * 1024; // 256KB default
             const heap_ptr = self.allocator.create(CallbackHeap) catch @panic("OOM: callback heap");
@@ -889,8 +704,6 @@ pub const FactorVM = struct {
             self.callbacks = heap_ptr;
         }
 
-        // Create callback stub for c_to_factor word
-        // The VM pointer we pass is the address of vm_asm (what JIT code uses)
         const vm_ptr = @intFromPtr(&self.vm_asm);
 
         const c_to_factor_block = self.callbacks.?.add(
@@ -905,15 +718,10 @@ pub const FactorVM = struct {
         }
     }
 
-    // Called at the beginning of a callback from C to Factor
-    // Saves the current state and prepares for Factor execution
     pub fn beginCallback(self: *Self, quot: Cell) Cell {
         self.vm_asm.ctx.reset();
-
-        // Create spare context for nested callbacks
         self.vm_asm.spare_ctx = self.newContext() catch @panic("OOM");
 
-        // Track this callback
         self.callback_ids.append(self.allocator, self.callback_id) catch @panic("OOM");
         self.callback_id += 1;
 
@@ -922,35 +730,22 @@ pub const FactorVM = struct {
         return quot;
     }
 
-    // Called at the end of a callback from C to Factor
-    // Restores the previous state
     pub fn endCallback(self: *Self) void {
-        // Pop callback ID
         if (self.callback_ids.items.len > 0) {
             _ = self.callback_ids.pop();
         }
 
-        // Delete current context and switch to spare
         self.deleteContext();
     }
 
-    // Initialize a context for execution
-    // Matches C++ VM: init_context() in contexts.cpp
-    // Allocates memory (allot_alien)
     pub fn initContext(self: *Self, ctx: *contexts.Context) void {
-        // Store an alien wrapping the context pointer in context_objects[OBJ_CONTEXT]
-        // This is how Factor code accesses the current context
-        // OBJ_CONTEXT = 2 (from C++ context_object enum)
         const ctx_alien = self.allotAlien(layouts.false_object, @intFromPtr(ctx));
         ctx.context_objects[2] = ctx_alien;
     }
 
-    // Allocate an array with given capacity, leaving element slots uninitialized.
-    // Caller must initialize all slots before exposing the object to GC scans.
-    pub inline fn allotUninitializedArrayNoFill(self: *Self, capacity: Cell) ?Cell {
+    pub fn allotUninitializedArrayNoFill(self: *Self, capacity: Cell) ?Cell {
         const size = layouts.arraySize(layouts.Array, capacity);
 
-        // Use allotObject which handles nursery vs tenured routing
         const tagged = self.allotObject(.array, size) orelse return null;
         const addr = layouts.UNTAG(tagged);
         const array: *layouts.Array = @ptrFromInt(addr);
@@ -958,15 +753,10 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    // Allocate an array with given capacity.
-    // Routes through allotObject() so large arrays go to tenured space.
-    // Matches C++: allot_uninitialized_array → allot_array_internal → allot_object
-    pub inline fn allotUninitializedArray(self: *Self, capacity: Cell) ?Cell {
+    pub fn allotUninitializedArray(self: *Self, capacity: Cell) ?Cell {
         const tagged = self.allotUninitializedArrayNoFill(capacity) orelse return null;
         const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
 
-        // Fill with false_object for GC safety — slots may be scanned before
-        // the caller fills them. Marked inline so LLVM can fold with caller's fill.
         const cap: usize = @intCast(capacity);
         if (cap > 0) {
             @memset(array.data()[0..cap], layouts.false_object);
@@ -974,26 +764,20 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    // Reallocate an array to a new capacity
-    // Based on vm/generic_arrays.hpp reallot_array()
-    // Returns tagged pointer to resized array (may be same or new allocation)
     pub fn reallotArray(self: *Self, old_array_: Cell, new_capacity: Cell) ?Cell {
         std.debug.assert(layouts.hasTag(old_array_, .array));
 
-        // Root old_array - allotUninitializedArray can trigger GC which may move it
         var old_array = old_array_;
-        self.data_roots.append(self.allocator, &old_array) catch @panic("OOM");
+        self.data_roots.appendAssumeCapacity(&old_array);
         defer _ = self.data_roots.pop();
 
         const old_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(old_array));
         const old_capacity = old_arr.getCapacity();
 
-        // If capacity unchanged, return same array
         if (old_capacity == new_capacity) {
             return old_array;
         }
 
-        // Check if we can resize in-place (only if in nursery and shrinking or same size)
         const in_nursery = self.vm_asm.nursery.contains(@ptrFromInt(layouts.UNTAG(old_array)));
         if (in_nursery and new_capacity <= old_capacity) {
             const old_arr_mut: *layouts.Array = @ptrFromInt(layouts.UNTAG(old_array));
@@ -1001,22 +785,17 @@ pub const FactorVM = struct {
             return old_array;
         }
 
-        // Need to allocate new array - this may trigger GC, moving old_array.
-        // Use no-fill allocation because we immediately overwrite copied/grown slots.
         const new_array = self.allotUninitializedArrayNoFill(new_capacity) orelse return null;
         const new_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_array));
 
-        // Re-derive old_arr from rooted old_array (may have been moved by GC)
         const old_arr_after_gc: *layouts.Array = @ptrFromInt(layouts.UNTAG(old_array));
 
-        // Copy existing elements
         const to_copy = @min(old_capacity, new_capacity);
         const old_data = old_arr_after_gc.data();
         const new_data = new_arr.data();
 
         @memcpy(new_data[0..to_copy], old_data[0..to_copy]);
 
-        // Zero remaining elements if growing
         if (new_capacity > to_copy) {
             @memset(new_data[to_copy..new_capacity], layouts.false_object);
         }
@@ -1024,13 +803,10 @@ pub const FactorVM = struct {
         return new_array;
     }
 
-    // Allocate a byte array
-    // Routes through allotObject() so large byte arrays go to tenured space.
     pub fn allotByteArray(self: *Self, size: usize) Cell {
         const header_size = @sizeOf(layouts.ByteArray);
         const total_size = layouts.alignCell(header_size + size, layouts.data_alignment);
 
-        // Use allotObject which handles nursery vs tenured routing
         const tagged = self.allotObject(.byte_array, total_size) orelse {
             self.memoryError();
         };
@@ -1038,13 +814,11 @@ pub const FactorVM = struct {
         const ba: *layouts.ByteArray = @ptrFromInt(addr);
         ba.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(size)));
 
-        // Zero the data
         @memset(ba.data()[0..size], 0);
 
         return tagged;
     }
 
-    // Allocate an alien object (wrapper for a C pointer)
     pub fn allotAlien(self: *Self, base: Cell, displacement: Cell) Cell {
         const tagged = self.allotObject(.alien, @sizeOf(layouts.Alien)) orelse {
             self.memoryError();
@@ -1064,8 +838,6 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    // Allocate a bignum from a Cell value
-    // Used by fromUnsignedCell when value doesn't fit in a fixnum
     pub fn allotBignumFromCell(self: *Self, value: Cell) Cell {
         const bignum_mod = @import("bignum.zig");
         const num_digits: Cell = bignum_mod.countDigitsUnsigned(value);
@@ -1087,7 +859,6 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    // Allocate a bignum from a signed i64 value (negative, doesn't fit in fixnum)
     pub fn allotBignumFromSignedCell(self: *Self, value: i64) Cell {
         const bignum_mod = @import("bignum.zig");
         const abs_value: Cell = @bitCast(if (value == std.math.minInt(i64)) value else -value);
@@ -1110,17 +881,13 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    // === Object Allocation Methods ===
 
-    // Allocate a large object (size >= nursery size) in tenured space.
-    // Based on vm/allot.hpp allot_large_object()
     pub fn allotLargeObject(self: *Self, type_tag: layouts.TypeTag, size: Cell) ?Cell {
         const data_heap_mod = @import("data_heap.zig");
         const data_ptr = self.data orelse @panic("data heap not initialized");
 
         var heap: *data_heap_mod.DataHeap = @ptrCast(@alignCast(data_ptr));
 
-        // Ensure tenured has enough space (compact or grow if needed).
         var required_free = size + heap.highWaterMark();
         if (!heap.tenured.free_list.canAllot(required_free)) {
             if (self.gc) |gc_instance| {
@@ -1128,7 +895,6 @@ pub const FactorVM = struct {
             }
         }
 
-        // Heap may have moved during GC; refresh pointer.
         heap = @ptrCast(@alignCast(self.data orelse @panic("data heap lost after compaction")));
         required_free = size + heap.highWaterMark();
         if (!heap.tenured.free_list.canAllot(required_free)) {
@@ -1140,7 +906,6 @@ pub const FactorVM = struct {
         heap = @ptrCast(@alignCast(self.data orelse @panic("data heap lost after growing")));
         const addr = heap.allocateTenured(size) orelse @panic("Out of memory in allot_large_object (tenured)");
 
-        // Only pointerful types need the write barrier for old->new refs.
         if (!layouts.typeHasNoPointers(type_tag)) {
             self.writeBarrierRange(addr, size);
         }
@@ -1151,100 +916,92 @@ pub const FactorVM = struct {
         return addr | @intFromEnum(type_tag);
     }
 
-    // Main allocation function - routes to nursery or tenured based on size
-    // Based on vm/allot.hpp allot_object()
-    pub inline fn allotObject(self: *Self, type_tag: layouts.TypeTag, size: Cell) ?Cell {
+    pub fn allotObject(self: *Self, type_tag: layouts.TypeTag, size: Cell) ?Cell {
         std.debug.assert(!self.current_gc_p);
 
-        // If object is bigger than the nursery, allocate directly in tenured
-        if (size >= self.vm_asm.nursery.size) {
+        const aligned_size = layouts.alignCell(size, layouts.data_alignment);
+
+        const addr = self.vm_asm.nursery.here;
+        const new_here = addr + aligned_size;
+        if (new_here <= self.vm_asm.nursery.end) {
+            self.vm_asm.nursery.here = new_here;
+            const obj_ptr: *layouts.Object = @ptrFromInt(addr);
+            obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
+            return addr | @intFromEnum(type_tag);
+        }
+
+        return self.allotObjectSlow(type_tag, size, aligned_size);
+    }
+
+    noinline fn allotObjectSlow(self: *Self, type_tag: layouts.TypeTag, size: Cell, aligned_size: Cell) ?Cell {
+        if (aligned_size >= self.vm_asm.nursery.size) {
             return self.allotLargeObject(type_tag, size);
         }
 
-        // Object fits in nursery - ensure space is available
-        if (!self.ensureNurserySpace(size)) return null;
+        self.minorGc();
 
-        // Allocate in nursery (ensureNurserySpace guarantees space)
-        const addr = self.vm_asm.nursery.allocate(size);
-
-        // Initialize object header
-        const obj_ptr: *layouts.Object = @ptrFromInt(addr);
-        obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
-
-        return addr | @intFromEnum(type_tag);
+        const addr = self.vm_asm.nursery.here;
+        const new_here = addr + aligned_size;
+        if (new_here <= self.vm_asm.nursery.end) {
+            self.vm_asm.nursery.here = new_here;
+            const obj_ptr: *layouts.Object = @ptrFromInt(addr);
+            obj_ptr.header = @as(Cell, @intFromEnum(type_tag)) << 2;
+            return addr | @intFromEnum(type_tag);
+        }
+        return null;
     }
 
-    // Allocate a code block, triggering compaction if the code heap is full.
-    // Matches C++ allot_code_block() in vm/allot.hpp.
     pub fn allotCodeBlock(self: *Self, size: Cell) *code_blocks_mod.CodeBlock {
         const code_heap = self.code orelse @panic("code heap not initialized");
 
-        // First attempt
         if (code_heap.allocate(size)) |block| {
             code_heap.writeBarrier(block) catch {};
             return block;
         }
 
-        // Code heap full — compact GC and retry (same as C++ allot_code_block)
         if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.collect(.collect_compact);
         }
 
-        // Retry after compaction
         const code_heap2 = self.code orelse @panic("code heap lost after compaction");
         if (code_heap2.allocate(size)) |block| {
             code_heap2.writeBarrier(block) catch {};
             return block;
         }
 
-        // Still can't allocate — fatal
         @panic("Out of memory in allot_code_block");
     }
 
-    // === Garbage Collection Methods ===
 
-    // Update VM fields after replacing the data heap (e.g., after growing).
-    // Mirrors C++ factor_vm::set_data_heap.
     pub fn setDataHeap(self: *Self, heap: *DataHeap) void {
         self.data = heap;
 
-        // Keep VM nursery in sync with the heap's nursery.
         self.vm_asm.nursery = heap.nursery;
 
-        // cards_offset/decks_offset satisfy:
-        // cards_offset + (addr >> card_bits) = &cards[addr_to_card(addr - heap.start)]
         const data_start = heap.segment.start;
         const cards_ptr = @intFromPtr(heap.cards.cards.ptr);
         const decks_ptr = @intFromPtr(heap.decks.decks.ptr);
-        // Keep this as raw modulo subtraction; this matches factor_vm::set_data_heap.
         self.vm_asm.cards_offset = cards_ptr -% (data_start >> card_bits);
         self.vm_asm.decks_offset = decks_ptr -% (data_start >> deck_bits);
 
-        // Keep slices for bulk operations (markAllCards, diagnostics).
         self.cards_array = heap.cards.cards;
         self.decks_array = heap.decks.decks;
     }
 
-    // Trigger a minor (nursery) garbage collection
-    // This is called when the nursery is full and allocation would fail
-    // Uses gc() with automatic escalation: nursery -> aging -> tenured -> full
     pub fn minorGc(self: *Self) void {
-        // Skip if GC is disabled (for debugging)
         if (self.gc_off) return;
 
         if (self.gc) |gc_instance| {
             self.current_gc_p = true;
             defer self.current_gc_p = false;
             gc_instance.gc(.collect_nursery) catch {
-                // Fall back to full collection on failure
                 gc_instance.collectFull(true);
             };
         }
     }
 
-    // Trigger a full garbage collection
     pub fn fullGc(self: *Self) void {
         if (self.gc) |gc_instance| {
             self.current_gc_p = true;
@@ -1253,9 +1010,6 @@ pub const FactorVM = struct {
         }
     }
 
-    // Check if the callstack has enough space for GC, or if we need to
-    // unlock guard pages first. Most GC cycles have plenty of stack room
-    // and don't need the mprotect syscalls (~240K saved during bootstrap).
     pub fn callstackNeedsGuardUnlock(self: *Self) bool {
         const seg = self.vm_asm.ctx.callstack_seg orelse return false;
         const top = self.vm_asm.ctx.callstack_top;
@@ -1263,9 +1017,7 @@ pub const FactorVM = struct {
         return (top - seg.start) < segments.Segment.gc_stack_headroom;
     }
 
-    // Check if nursery needs collection before allocating size bytes
-    // Returns true if allocation can proceed, false if GC failed
-    pub inline fn ensureNurserySpace(self: *Self, size: Cell) bool {
+    pub fn ensureNurserySpace(self: *Self, size: Cell) bool {
         if (self.vm_asm.nursery.here + size <= self.vm_asm.nursery.end) {
             return true; // Space available
         }
@@ -1274,9 +1026,7 @@ pub const FactorVM = struct {
         return self.vm_asm.nursery.here + size <= self.vm_asm.nursery.end;
     }
 
-    // === JIT Compilation Methods ===
 
-    // Get the lazy JIT compile entry point
     pub fn lazyJitCompileEntryPoint(self: *const Self) Cell {
         const lazy_word = self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.lazy_jit_compile_word)];
         if (lazy_word == layouts.false_object) return 0;
@@ -1285,32 +1035,21 @@ pub const FactorVM = struct {
         return word.entry_point;
     }
 
-    // JIT compile a quotation (main entry point)
-    // Matches C++ factor_vm::jit_compile_quotation which uses data_root<quotation>
     pub fn jitCompileQuotation(self: *Self, quot_cell: Cell, relocate: bool) void {
         std.debug.assert(layouts.hasTag(quot_cell, .quotation));
 
-        // CRITICAL: Root the quotation before compilation.
-        // jitCompileQuotationWithOwner can trigger GC (nursery allocation in
-        // toCodeBlock), which may move this quotation.  Without rooting, the
-        // pointer derived from quot_cell becomes stale and the entry_point
-        // write below corrupts freed nursery memory.
-        // Matches C++: data_root<quotation> quot(quot_, this);
         var rooted_quot = quot_cell;
-        self.data_roots.append(self.allocator, &rooted_quot) catch @panic("OOM");
+        self.data_roots.appendAssumeCapacity(&rooted_quot);
         defer _ = self.data_roots.pop();
 
         var quot: *layouts.Quotation = @ptrFromInt(layouts.UNTAG(rooted_quot));
 
-        // Check if already compiled
         if (quot.entry_point != 0 and quot.entry_point != self.lazyJitCompileEntryPoint()) {
             return;
         }
 
-        // Compile the quotation - this can trigger GC!
         const compiled = self.jitCompileQuotationWithOwner(rooted_quot, rooted_quot, relocate);
 
-        // Re-derive quot from rooted value after potential GC
         quot = @ptrFromInt(layouts.UNTAG(rooted_quot));
 
         if (compiled) |cb| {
@@ -1318,29 +1057,18 @@ pub const FactorVM = struct {
         }
     }
 
-    // JIT compile a quotation with explicit owner
-    // Matches C++ jit_compile_quotation(cell owner_, cell quot_, bool relocating)
     pub fn jitCompileQuotationWithOwner(self: *Self, owner_in: Cell, quot_cell_in: Cell, relocate: bool) ?*CodeBlock {
         const jit_mod = @import("jit.zig");
 
-        // Root both heap pointers BEFORE QuotationJit.init, which allocates
-        // GrowableArrays and can trigger GC. Without rooting, the by-value
-        // parameters become stale after GC moves nursery objects.
-        // Matches C++ data_root<object> in quotation_jit constructor.
         var owner = owner_in;
         var quot_cell = quot_cell_in;
-        self.data_roots.ensureUnusedCapacity(self.allocator, 2) catch @panic("OOM");
         self.data_roots.appendAssumeCapacity(&owner);
         defer _ = self.data_roots.pop();
         self.data_roots.appendAssumeCapacity(&quot_cell);
         defer _ = self.data_roots.pop();
 
         var compiler = jit_mod.QuotationJit.init(self, owner, true, relocate);
-        // Register GC root now that compiler is in its final stack location
         compiler.registerRoot();
-        // Fix up potentially stale owner: Jit.init may have triggered GC
-        // (via ensureNurserySpace), updating our rooted locals but leaving
-        // the by-value copy in the struct stale.
         compiler.jit.owner = owner;
         defer compiler.deinit();
 
@@ -1356,8 +1084,6 @@ pub const FactorVM = struct {
             return null;
         };
 
-        // toCodeBlock adds to uninitialized_blocks (matching C++ add_code_block).
-        // If relocating, initialize now (matching C++ jit_compile_quotation line 298-299).
         if (relocate) {
             if (compiled) |block| {
                 self.initializeCodeBlockFromMap(@ptrCast(block));
@@ -1367,15 +1093,9 @@ pub const FactorVM = struct {
         return compiled;
     }
 
-    // Initialize a code block with relocations
     pub fn initializeCodeBlock(self: *Self, block: *CodeBlock, literals_cell: Cell) void {
         const c_api = @import("c_api.zig");
 
-        // Build relocation context
-        // IMPORTANT: vm_ptr must point to vm_asm, not self, because:
-        // 1. FactorVM is not an extern struct, so field ordering isn't guaranteed
-        // 2. JIT code expects ctx at [r13+0], which is offset 0 of VMAssemblyFields
-        // 3. VMAssemblyFields IS an extern struct with ctx at offset 0
         var ctx = code_blocks_mod.RelocationContext{
             .vm_ptr = @intFromPtr(&self.vm_asm),
             .cards_offset = self.vm_asm.cards_offset,
@@ -1389,37 +1109,28 @@ pub const FactorVM = struct {
             .parameters = null,
         };
 
-        // Get literals array if present
         if (literals_cell != layouts.false_object and
             layouts.hasTag(literals_cell, .array))
         {
             ctx.literals = @ptrFromInt(layouts.UNTAG(literals_cell));
         }
 
-        // Get parameters array if present
         if (block.parameters != layouts.false_object and
             layouts.hasTag(block.parameters, .array))
         {
             ctx.parameters = @ptrFromInt(layouts.UNTAG(block.parameters));
         }
 
-        // Apply relocations
         code_blocks_mod.applyRelocations(block, &ctx);
 
-        // Flush instruction cache
         block.flushIcache();
 
-        // CRITICAL: Register code block with remembered sets so GC can update
-        // any embedded literals that point to young generation objects
         if (self.code) |code_heap| {
             code_heap.writeBarrier(block) catch @panic("OOM");
             code_heap.updateScanFlags(self.allocator, block);
         }
     }
 
-    // Initialize a code block from the uninitialized_blocks map.
-    // Matches C++ initialize_code_block(code_block* compiled) overload which
-    // looks up literals in uninitialized_blocks and removes the entry after init.
     pub fn initializeCodeBlockFromMap(self: *Self, block: *code_blocks_mod.CodeBlock) void {
         const code_heap = self.code orelse return;
         const block_addr = @intFromPtr(block);
@@ -1429,7 +1140,6 @@ pub const FactorVM = struct {
         }
     }
 
-    // ==== DEBUGGER (delegates to debugger.zig) ====
 
     pub fn factorbug(self: *Self) void {
         const debugger = @import("debugger.zig");
@@ -1445,14 +1155,11 @@ pub const FactorVM = struct {
 // Compile-time verification of critical field offsets
 comptime {
     // Verify the assembly-accessed fields are at correct offsets
-    // These must match basis/compiler/constants/constants.factor
     const cell_size = @sizeOf(Cell);
 
     // VMAssemblyFields layout verification
-    // vm-context-offset = 0 bootstrap-cells
     std.debug.assert(@offsetOf(VMAssemblyFields, "ctx") == 0 * cell_size);
 
-    // vm-spare-context-offset = 1 bootstrap-cells
     std.debug.assert(@offsetOf(VMAssemblyFields, "spare_ctx") == 1 * cell_size);
 
     // nursery starts at offset 2 (ctx and spare_ctx are 2 pointers)
@@ -1464,13 +1171,10 @@ comptime {
     // decks_offset at offset 7
     std.debug.assert(@offsetOf(VMAssemblyFields, "decks_offset") == 7 * cell_size);
 
-    // vm-signal-handler-addr-offset = 8 bootstrap-cells
     std.debug.assert(@offsetOf(VMAssemblyFields, "signal_handler_addr") == 8 * cell_size);
 
-    // vm-fault-flag-offset = 9 bootstrap-cells
     std.debug.assert(@offsetOf(VMAssemblyFields, "faulting_p") == 9 * cell_size);
 
-    // special_objects starts at offset 10 bootstrap-cells
     std.debug.assert(@offsetOf(VMAssemblyFields, "special_objects") == 10 * cell_size);
 
     // Note: JIT code uses &vm.vm_asm as the VM pointer, not &vm

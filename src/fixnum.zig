@@ -1,13 +1,3 @@
-// fixnum.zig - Math primitives with fixnum/bignum handling
-// Ported from vm/math.hpp and vm/math.cpp
-//
-// Factor numbers are either:
-// - Fixnums: tagged immediate integers (62 bits on 64-bit)
-// - Bignums: arbitrary precision heap-allocated integers
-// - Floats: boxed 64-bit IEEE floats (helpers in float.zig)
-//
-// Arithmetic operations check for overflow and promote to bignum automatically.
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const bignum = @import("bignum.zig");
@@ -44,7 +34,6 @@ pub fn shiftLeft(a: Fixnum, shift: Fixnum) FixnumResult {
         return .{ .overflow = .{ .a = a, .b = shift } };
     }
 
-    // Check if result would overflow when tagged (matching C++ mask approach)
     // mask has all bits set from bit (WORD_SIZE - 1 - TAG_BITS - shift) upward
     const mask_shift: u6 = @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift);
     const mask = -%(@as(Fixnum, 1) << mask_shift);
@@ -78,9 +67,8 @@ pub fn fromFloat(a: f64) ?Fixnum {
 const FactorVM = vm_mod.FactorVM;
 
 // Helper: convert fixnum to bignum.
-// Uses cached constants for 0, 1, -1 (matching C++ BIGNUM_ZERO/BIGNUM_ONE).
 // Other values allocate in nursery.
-pub inline fn toBignum(vm: *FactorVM, n: Fixnum) !*layouts.Bignum {
+pub fn toBignum(vm: *FactorVM, n: Fixnum) !*layouts.Bignum {
     // Fast paths: return cached singletons from special_objects (no allocation)
     if (n == 0) {
         const cached = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.bignum_zero)];

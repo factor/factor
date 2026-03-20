@@ -140,7 +140,6 @@ fn stdinLoop() void {
     _ = std.c.close(@intCast(control_read));
 }
 
-// Create a pipe with FD_CLOEXEC set on both ends (matching C++ safe_pipe)
 fn safePipe() ?[2]c_int {
     var filedes: [2]c_int = undefined;
 
@@ -280,20 +279,18 @@ pub export fn begin_callback(vm_asm: *VMAssemblyFields, quot: Cell) callconv(.c)
 
     // Root the quotation against GC - initContext allocates, which can trigger GC
     var rooted_quot = quot;
-    parent.data_roots.append(parent.allocator, &rooted_quot) catch @panic("OOM");
+    parent.data_roots.appendAssumeCapacity(&rooted_quot);
     defer _ = parent.data_roots.pop();
 
     // Reset the current context
     parent.vm_asm.ctx.reset();
 
-    // CRITICAL: Always create a NEW spare context (like C++)
     parent.vm_asm.spare_ctx = parent.newContext() catch @panic("OOM");
 
     // Track callback
     parent.callback_ids.append(parent.allocator, @intCast(parent.callback_id)) catch @panic("OOM");
     parent.callback_id += 1;
 
-    // Initialize context with alien for self-reference (like C++ init_context)
     parent.initContext(parent.vm_asm.ctx);
 
     return rooted_quot;
@@ -391,15 +388,13 @@ pub export fn overflow_fixnum_multiply(x: Fixnum, y: Fixnum, vm_asm: *VMAssembly
     const bx = fixnum.toBignum(vm, x) catch
         @panic("overflow_fixnum_multiply: out of memory");
     var bx_cell: Cell = layouts.tagBignum(bx);
-    vm.data_roots.append(vm.allocator, &bx_cell) catch
-        @panic("overflow_fixnum_multiply: out of memory");
+    vm.data_roots.appendAssumeCapacity(&bx_cell);
     defer _ = vm.data_roots.pop();
 
     const by = fixnum.toBignum(vm, y) catch
         @panic("overflow_fixnum_multiply: out of memory");
     var by_cell: Cell = layouts.tagBignum(by);
-    vm.data_roots.append(vm.allocator, &by_cell) catch
-        @panic("overflow_fixnum_multiply: out of memory");
+    vm.data_roots.appendAssumeCapacity(&by_cell);
     defer _ = vm.data_roots.pop();
 
     const bx_ptr: *const layouts.Bignum = @ptrFromInt(layouts.UNTAG(bx_cell));

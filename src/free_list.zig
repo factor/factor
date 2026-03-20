@@ -1,9 +1,3 @@
-// free_list.zig - Free list allocator for tenured space
-// Ported from vm/free_list.hpp and vm/free_list.cpp
-//
-// DESIGN: Uses external storage for free block pointers (ArrayLists) like C++.
-// This allows FreeBlock to be just 8 bytes (header only), enabling 16-byte minimum blocks.
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
@@ -15,8 +9,8 @@ pub const free_list_count: usize = 32;
 pub const block_granularity: Cell = layouts.data_alignment; // 16 bytes
 pub const allocation_page_size: Cell = 1024;
 
-// Minimum allocatable block size - matches data_alignment
-// This is possible because we store free block pointers externally (not inline)
+// Minimum allocatable block size
+// Free block pointers are stored externally in ArrayLists.
 pub const min_block_size: Cell = block_granularity; // 16 bytes
 
 // Free block header - stored in-place in free memory
@@ -43,7 +37,6 @@ pub const FreeBlock = struct {
 };
 
 // Free list allocator with size-segregated buckets
-// Like C++, uses external storage (ArrayLists) for free block pointers
 pub const FreeListAllocator = struct {
     // Region of memory managed
     start: Cell,
@@ -136,7 +129,7 @@ pub const FreeListAllocator = struct {
         self.large_blocks.deinit(self.allocator);
     }
 
-    inline fn sizeToIndex(size: Cell) ?usize {
+    fn sizeToIndex(size: Cell) ?usize {
         if (size < min_block_size) return null;
         const index = (size / block_granularity) - 1;
         if (index < free_list_count) {
@@ -223,12 +216,10 @@ pub const FreeListAllocator = struct {
         // Round up to block granularity
         const size = layouts.alignCell(requested_size, block_granularity);
 
-        // Try exact-fit in small blocks (matches C++ find_free_block)
         if (sizeToIndex(size)) |index| {
             if (self.small_blocks[index].items.len == 0) {
                 // Page promotion: exact bucket empty. Grab a large block,
                 // split into uniform small blocks, populate the bucket.
-                // C++ only checks the exact bucket — never steals from
                 // larger buckets, which would create odd-sized remainders
                 // and cascade into fragmentation.
                 const page_size = ((allocation_page_size + size - 1) / size) * size;
@@ -260,12 +251,16 @@ pub const FreeListAllocator = struct {
             if (self.small_blocks[index].items.len == 0) {
                 self.non_empty_mask &= ~(@as(u32, 1) << @intCast(index));
             }
-            const block: *FreeBlock = @ptrFromInt(addr);
-            const block_size = block.size();
+
+            // Block size is determined by the bucket: all blocks in bucket i
+            // have size (i+1)*granularity. Avoids dereferencing the block header.
+            const block_size = (@as(Cell, index) + 1) * block_granularity;
 
             self.free_block_count -= 1;
             self.free_space -= block_size;
 
+            // After page promotion, blocks are exact-fit — skip split check
+            if (block_size == size) return addr;
             return self.splitAndReturn(addr, block_size, size);
         }
 
@@ -274,19 +269,65 @@ pub const FreeListAllocator = struct {
     }
 
     // Find and remove a large block of at least 'size' bytes.
-    // Uses binary search (O(log n)) + orderedRemove on sorted ascending list.
+    // Uses binary search O(log n) to find, then fuses remove+split to avoid
+    // two O(n) memmoves. When the remainder is also a large block, we update
+    // the entry in-place and bubble it left — typically O(1) since nearby
+    // entries have similar sizes.
     fn allocateLargeBlock(self: *Self, size: Cell) ?Cell {
         const idx = self.findLargeBlock(size) orelse return null;
         const item = self.large_blocks.items[idx];
-        _ = self.large_blocks.orderedRemove(idx);
 
         self.free_block_count -= 1;
         self.free_space -= item.size;
 
-        return self.splitAndReturn(item.addr, item.size, size);
+        const remaining = item.size - size;
+
+        if (remaining >= min_block_size) {
+            const remainder_addr = item.addr + size;
+            const rem_block: *FreeBlock = @ptrFromInt(remainder_addr);
+            rem_block.init(remaining);
+
+            if (sizeToIndex(remaining)) |rem_index| {
+                // Remainder fits in small_blocks — remove from large, add to small
+                _ = self.large_blocks.orderedRemove(idx);
+                self.small_blocks[rem_index].append(self.allocator, remainder_addr) catch
+                    @panic("allocateLargeBlock: OOM");
+                self.non_empty_mask |= @as(u32, 1) << @intCast(rem_index);
+                self.free_block_count += 1;
+                self.free_space += remaining;
+            } else {
+                // Remainder is also a large block — update in-place and bubble left.
+                // The remainder is smaller than the original, so it can only move
+                // toward the front of the sorted array.
+                self.large_blocks.items[idx] = .{ .addr = remainder_addr, .size = remaining };
+                self.bubbleLeft(idx);
+                self.free_block_count += 1;
+                self.free_space += remaining;
+            }
+        } else {
+            _ = self.large_blocks.orderedRemove(idx);
+        }
+
+        // Clear free bit - now allocated (caller will write object header)
+        const block: *FreeBlock = @ptrFromInt(item.addr);
+        block.header = 0;
+
+        return item.addr;
     }
 
-    // Split a block if there's leftover space
+    // Bubble an element leftward to restore sort order after its size decreased.
+    fn bubbleLeft(self: *Self, start_idx: usize) void {
+        const items = self.large_blocks.items;
+        var i = start_idx;
+        while (i > 0 and items[i].size < items[i - 1].size) {
+            const tmp = items[i];
+            items[i] = items[i - 1];
+            items[i - 1] = tmp;
+            i -= 1;
+        }
+    }
+
+    // Split a block if there's leftover space (used by small-block allocation path)
     fn splitAndReturn(self: *Self, address: Cell, block_size: Cell, alloc_size: Cell) Cell {
         const remaining = block_size - alloc_size;
 
@@ -294,8 +335,6 @@ pub const FreeListAllocator = struct {
             // Split: add remainder back to free list
             self.addFreeBlock(address + alloc_size, remaining);
         }
-        // Note: if remaining > 0 but < min_block_size, we waste those bytes
-        // This is rare since allocations are aligned to block_granularity
 
         // Clear free bit - now allocated (caller will write object header)
         const block: *FreeBlock = @ptrFromInt(address);
@@ -397,7 +436,7 @@ pub const FreeListAllocator = struct {
 };
 
 // Calculate object size from its header
-pub inline fn objectSizeFromHeader(address: Cell) Cell {
+pub fn objectSizeFromHeader(address: Cell) Cell {
     const obj: *Object = @ptrFromInt(address);
     const obj_type = obj.getType();
 
@@ -428,7 +467,6 @@ pub inline fn objectSizeFromHeader(address: Cell) Cell {
         },
         .tuple => blk: {
             const tuple: *layouts.Tuple = @ptrFromInt(address);
-            // Match C++: untag layout, follow forwarding pointers, read size.
             // No defensive bounds checks — wrong sizes cause worse bugs than crashes.
             const layout_addr = layouts.followForwardingPointers(tuple.layout);
             const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);

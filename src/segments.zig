@@ -5,16 +5,13 @@ const builtin = @import("builtin");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
 
-// Page size: match C++ VM's getpagesize() behavior.
 // On x86_64-macos under Rosetta, getpagesize() returns 4096 even though
-// the hardware page size is 16384. We must match C++ to get equivalent
 // system call performance characteristics.
 pub const page_size: usize = if (builtin.cpu.arch == .x86_64 and builtin.os.tag == .macos)
     4096
 else
     std.heap.page_size_min;
 
-// C++ VM allocates: [guard page][usable memory][guard page]
 // The start/end fields point to the usable memory region
 pub const Segment = struct {
     start: Cell,
@@ -27,7 +24,6 @@ pub const Segment = struct {
 
     // Extra low guard pages for callstack segments. Unlocked during GC to provide
     // stack headroom. The Zig debug build uses substantially more native stack
-    // in GC than the C++ VM, so it needs a wider emergency margin.
     pub const low_guard_pages: usize = 64;
 
     // Conservative estimate of max stack usage during GC.
@@ -37,7 +33,6 @@ pub const Segment = struct {
     pub const gc_stack_headroom: usize = 65536;
 
     // Initialize with optional executable flag
-    // Matches C++ segment::segment() in os-unix.cpp
     pub fn init(size_param: Cell, executable: bool) !Segment {
         return initWithGuardPages(size_param, executable, 1);
     }
@@ -48,7 +43,6 @@ pub const Segment = struct {
         // Page-align size to ensure guard pages work (mprotect requires page alignment)
         const size = layouts.alignCell(size_param, page_size);
 
-        // Set protection flags based on executable parameter
         const prot: std.c.PROT = if (executable)
             .{ .READ = true, .WRITE = true, .EXEC = true }
         else
@@ -100,7 +94,6 @@ pub const Segment = struct {
         };
 
         // Lock the guard pages (make them inaccessible)
-        // Matches C++ VM: set_border_locked(true)
         // Note: On ARM64 macOS with MAP_JIT, mprotect doesn't work on JIT memory,
         // so we skip guard page setup for executable segments
         if (!(executable and is_arm64_macos)) {
@@ -126,13 +119,11 @@ pub const Segment = struct {
     }
 
     pub fn isUnderflow(self: *const Segment, addr: Cell) bool {
-        // Matches C++ VM: addr >= (start - getpagesize()) && addr < start
         // Uses alloc_base to cover extended guard areas (multiple low guard pages)
         return addr >= self.alloc_base and addr < self.start;
     }
 
     pub fn isOverflow(self: *const Segment, addr: Cell) bool {
-        // Matches C++ VM: addr >= end && addr < (end + getpagesize())
         return addr >= self.end and addr < (self.end + page_size);
     }
 
@@ -141,7 +132,6 @@ pub const Segment = struct {
         return addr >= self.start and addr < self.end;
     }
 
-    // Matches C++ VM: set_border_locked() in segments.hpp
     // Locks/unlocks ALL low guard pages (alloc_base to start) and the high guard page.
     pub fn setBorderLocked(self: *Segment, locked: bool) !void {
         const prot: std.c.PROT = if (locked)

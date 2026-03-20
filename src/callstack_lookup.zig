@@ -29,7 +29,7 @@ pub const Lookup = struct {
     }
 
     // Returns owner only if address is inside the block extent.
-    pub inline fn ownerForAddress(self: *Self, address: Cell) ?*const code_blocks.CodeBlock {
+    pub fn ownerForAddress(self: *Self, address: Cell) ?*const code_blocks.CodeBlock {
         if (self.cached_owner) |owner| {
             if (address >= self.cached_start and address < self.cached_end) {
                 return owner;
@@ -51,7 +51,7 @@ pub const Lookup = struct {
     }
 
     // Returns previous block by address order; caller validates extent if needed.
-    pub inline fn ownerForAddressUnsafe(self: *Self, address: Cell) ?*const code_blocks.CodeBlock {
+    pub fn ownerForAddressUnsafe(self: *Self, address: Cell) ?*const code_blocks.CodeBlock {
         if (self.cached_owner) |owner| {
             if (address >= self.cached_start and address < self.cached_end) {
                 return owner;
@@ -70,7 +70,7 @@ pub const Lookup = struct {
     }
 
     // Cached gc_info.returnAddressIndex lookup for repeated PCs in same callsite.
-    pub inline fn callsiteIndex(self: *Self, gc_info: *const code_blocks.GcInfo, return_address_offset: u32) ?u32 {
+    pub fn callsiteIndex(self: *Self, gc_info: *const code_blocks.GcInfo, return_address_offset: u32) ?u32 {
         if (self.cached_gc_info == gc_info and
             self.cached_callsite_return_offset == return_address_offset)
         {
@@ -84,7 +84,7 @@ pub const Lookup = struct {
         return found;
     }
 
-    pub inline fn frameSizeFromAddress(owner: *const code_blocks.CodeBlock, addr: Cell) Cell {
+    pub fn frameSizeFromAddress(owner: *const code_blocks.CodeBlock, addr: Cell) Cell {
         const entry_point = owner.entryPoint();
         const delta = if (addr > entry_point) addr - entry_point else 0;
         const natural_frame_size = owner.stackFrameSize();

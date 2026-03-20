@@ -1,11 +1,3 @@
-// io.zig - Unix I/O infrastructure for Factor VM
-// Ported from vm/io.cpp and vm/os-unix.cpp
-//
-// Provides EINTR-safe I/O operations for Unix file descriptors.
-// Factor's I/O system needs to handle EINTR properly because:
-// 1. Signals (SIGALRM for profiling, SIGINT for interrupts, etc.) can interrupt I/O
-// 2. Naive code that doesn't handle EINTR will fail unpredictably
-// 3. All I/O operations must be restarted after EINTR
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -112,9 +104,6 @@ pub fn deinitSignalPipe(vm: *vm_mod.FactorVM) void {
         vm.signal_pipe_output = -1;
     }
 }
-
-// EINTR-safe FILE* operations for bootstrapping
-// These wrap standard C FILE* functions with EINTR retry loops
 
 // Safe fopen - retries on EINTR
 pub fn safeFopen(path: [*:0]const u8, mode: [*:0]const u8) !*std.c.FILE {

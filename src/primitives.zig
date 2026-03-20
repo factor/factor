@@ -34,7 +34,6 @@ pub const nanoCountMonotonic = misc.nanoCountMonotonic;
 
 pub const PrimitiveFn = *const fn (*VMAssemblyFields) callconv(.c) void;
 
-// Primitive index enum - must match C++ VM order exactly (vm/primitives.hpp)
 pub const PrimitiveIndex = enum(u16) {
     alien_address = 0,
     all_instances = 1,
@@ -373,7 +372,7 @@ fn init_primitives() [primitive_count]PrimitiveFn {
 }
 
 // Call a primitive by index
-pub inline fn callPrimitive(vm: *FactorVM, index: u16) void {
+pub fn callPrimitive(vm: *FactorVM, index: u16) void {
     if (comptime builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
         if (index >= primitive_count) return;
     }
@@ -626,7 +625,8 @@ test "primitive_slot" {
     vm.vm_asm.ctx = try vm.newContext();
     vm.vm_asm.spare_ctx = try vm.newContext();
 
-    var test_obj: [3]Cell = .{ 0, 0, 0 };
+    // Ensure 16-byte alignment so UNTAG (which clears low 4 bits) preserves the address.
+    var test_obj: [3]Cell align(16) = .{ 0, 0, 0 };
     test_obj[0] = @as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2;
     test_obj[1] = layouts.tagFixnum(1);
     test_obj[2] = layouts.tagFixnum(123);

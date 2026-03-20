@@ -1,9 +1,3 @@
-// slot_visitor.zig - Object traversal for GC
-// Ported from vm/slot_visitor.hpp
-//
-// The slot visitor visits all slots (references) in an object.
-// This is the core of garbage collection - tracing live objects.
-
 const std = @import("std");
 const callstack_lookup = @import("callstack_lookup.zig");
 const code_blocks = @import("code_blocks.zig");
@@ -15,331 +9,98 @@ const spill_slots = @import("spill_slots.zig");
 const Cell = layouts.Cell;
 const Object = layouts.Object;
 
-// Slot visitor callback type
-pub const SlotVisitorFn = *const fn (slot: *Cell, ctx: *anyopaque) void;
-
-// Visit all slots in an object at the given address
-pub inline fn visitObjectSlots(address: Cell, callback: SlotVisitorFn, ctx: *anyopaque) void {
+pub fn visitDataObjectSlots(comptime Fixup: type, fixup: *Fixup, address: Cell) Cell {
+    @setEvalBranchQuota(10000);
     const obj: *Object = @ptrFromInt(address);
+    if (obj.isFree()) return 0;
 
-    if (obj.isFree()) {
-        return;
-    }
-
-    const obj_type = obj.getType();
-
-    switch (obj_type) {
+    switch (obj.getType()) {
         .array => {
             const arr: *layouts.Array = @ptrFromInt(address);
             const capacity = layouts.untagFixnumUnsigned(arr.capacity);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(capacity);
             const data = arr.data();
             for (0..capacity) |i| {
-                callback(&data[i], ctx);
-            }
-        },
-
-        .quotation => {
-            const quot: *layouts.Quotation = @ptrFromInt(address);
-            callback(@ptrCast(&quot.array), ctx);
-            callback(@ptrCast(&quot.cached_effect), ctx);
-            callback(@ptrCast(&quot.cache_counter), ctx);
-            // entry_point is untagged, skip
-        },
-
-        .word => {
-            const word: *layouts.Word = @ptrFromInt(address);
-            callback(@ptrCast(&word.hashcode_field), ctx);
-            callback(@ptrCast(&word.name), ctx);
-            callback(@ptrCast(&word.vocabulary), ctx);
-            callback(@ptrCast(&word.def), ctx);
-            callback(@ptrCast(&word.props), ctx);
-            callback(@ptrCast(&word.pic_def), ctx);
-            callback(@ptrCast(&word.pic_tail_def), ctx);
-            callback(@ptrCast(&word.subprimitive), ctx);
-            // entry_point is untagged, skip
-        },
-
-        .tuple => {
-            const tuple: *layouts.Tuple = @ptrFromInt(address);
-            callback(@ptrCast(&tuple.layout), ctx);
-
-            // Get tuple size from layout - MUST follow forwarding pointers
-            // because the layout object may have been moved by GC
-            const layout_addr = layouts.followForwardingPointers(tuple.layout);
-
-            std.debug.assert(layouts.hasTag(tuple.layout, .array));
-            std.debug.assert((layout_addr & 7) == 0);
-
-            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const size = layouts.untagFixnumUnsigned(layout.size);
-            const data = tuple.data();
-            for (0..size) |i| {
-                callback(&data[i], ctx);
-            }
-        },
-
-        .wrapper => {
-            const wrapper: *layouts.Wrapper = @ptrFromInt(address);
-            callback(@ptrCast(&wrapper.object), ctx);
-        },
-
-        .string => {
-            const str: *layouts.String = @ptrFromInt(address);
-            callback(@ptrCast(&str.aux), ctx);
-            callback(@ptrCast(&str.hashcode_field), ctx);
-            // length is a fixnum (immediate), data is bytes, skip both
-        },
-
-        .alien => {
-            const alien: *layouts.Alien = @ptrFromInt(address);
-            callback(@ptrCast(&alien.base), ctx);
-            callback(@ptrCast(&alien.expired), ctx);
-            // displacement and address are untagged, skip
-        },
-
-        .dll => {
-            const dll: *layouts.Dll = @ptrFromInt(address);
-            callback(@ptrCast(&dll.path), ctx);
-            // handle is untagged, skip
-        },
-
-        .callstack => {
-            // Callstack contains raw return addresses, not tagged cells
-            // No slots to visit
-        },
-
-        // Types with only raw data (no slots):
-        .bignum => {},
-        .byte_array => {},
-        .float => {},
-
-        // Immediates should not appear as heap objects:
-        .fixnum => {},
-        .f => {},
-    }
-}
-
-// Interface for copying destinations (aging or tenured space).
-// Field layout optimized for cache locality: hot fields (source range,
-// bump allocator) in first cache line, cold fields after.
-pub const CopyingDestination = struct {
-    const Self = @This();
-
-    // --- Cache line 1: hot path fields (64 bytes) ---
-    // Source range (checked on every copy call)
-    source_start: Cell = 0,
-    source_end: Cell = 0,
-    // Inline bump allocator (used on every allocation for nursery→aging).
-    // When bump_here is non-null, allocate() uses fast inline bump path.
-    bump_here: ?*Cell = null,
-    bump_end: Cell = 0,
-    bump_object_start: *@import("object_start_map.zig").ObjectStartMap = undefined,
-    // Allocation failure flag
-    allocation_failed: bool = false,
-
-    // --- Cache line 2: cold/secondary fields ---
-    // Secondary source ranges (only used for aging/tenured/grow paths)
-    source2_start: Cell = 0,
-    source2_end: Cell = 0,
-    source3_start: Cell = 0,
-    source3_end: Cell = 0,
-    source4_start: Cell = 0,
-    source4_end: Cell = 0,
-    // Function pointers (only used for tenured/grow paths)
-    allocateFn: ?*const fn (*CopyingDestination, Cell) ?Cell = null,
-    postCopyFn: ?*const fn (*CopyingDestination, Cell) void = null,
-    ptr: *anyopaque = undefined,
-    // Code heap pointer for callstack object spill slot visiting
-    code_heap: ?*code_heap_mod.CodeHeap = null,
-
-    pub inline fn allocate(self: *CopyingDestination, size: Cell) ?Cell {
-        // Fast path: inline bump allocation (aging space)
-        // here is always aligned after init/previous allocation, only size needs alignment.
-        if (self.bump_here) |here_ptr| {
-            const h = here_ptr.*;
-            const aligned_size = layouts.alignCell(size, layouts.data_alignment);
-            if (h + aligned_size > self.bump_end) {
-                return null;
-            }
-            here_ptr.* = h + aligned_size;
-            self.bump_object_start.recordObjectStart(h);
-            return h;
-        }
-        // Slow path: function pointer (tenured free list allocator)
-        return self.allocateFn.?(self, size);
-    }
-
-    // Check if an address is within the source generation.
-    // Uses direct range checks instead of function pointer for performance.
-    inline fn inSourceGeneration(self: *const CopyingDestination, addr: Cell) bool {
-        // Fast path: primary source range
-        if (addr >= self.source_start and addr < self.source_end) return true;
-        // Secondary ranges only checked when set
-        if (self.source2_end != 0) {
-            if (addr >= self.source2_start and addr < self.source2_end) return true;
-            if (self.source3_end != 0) {
-                if (addr >= self.source3_start and addr < self.source3_end) return true;
-                if (self.source4_end != 0 and addr >= self.source4_start and addr < self.source4_end) return true;
-            }
-        }
-        return false;
-    }
-
-    pub inline fn copy(self: *CopyingDestination, old_addr: Cell) Cell {
-        @setEvalBranchQuota(10000);
-        const original_untagged = layouts.UNTAG(old_addr);
-
-        // Only copy objects from the source generation
-        if (!self.inSourceGeneration(original_untagged)) {
-            return old_addr;
-        }
-
-        var obj: *Object = @ptrFromInt(original_untagged);
-
-        // Follow forwarding pointer chain (only check destination when
-        // forwarding actually occurred — saves an inSourceGeneration call
-        // for the common un-forwarded case)
-        var untagged = original_untagged;
-        if (obj.isForwardingPointer()) {
-            while (obj.isForwardingPointer()) {
-                obj = obj.forwardingPointer();
-            }
-            untagged = @intFromPtr(obj);
-
-            // After following forwarding pointers, if outside source generation,
-            // return the forwarded address with original tag bits.
-            if (!self.inSourceGeneration(untagged)) {
-                return untagged | layouts.TAG(old_addr);
-            }
-            // NOTE: If we followed forwarding pointers but the result is STILL
-            // in the source generation, we must NOT return early. This happens
-            // during full GC where source = nursery + aging: a nursery object
-            // may have been forwarded to aging by a prior minor GC. The aging
-            // copy must still be promoted to tenured.
-        }
-
-        const size = free_list.objectSizeFromHeader(untagged);
-
-        // Allocate in destination
-        const new_addr = self.allocate(size) orelse {
-            self.allocation_failed = true;
-            return old_addr;
-        };
-
-        // Copy object data
-        if (new_addr != untagged) {
-            const src: [*]u8 = @ptrFromInt(untagged);
-            const dst: [*]u8 = @ptrFromInt(new_addr);
-            @memcpy(dst[0..size], src[0..size]);
-        } else {
-            return old_addr;
-        }
-
-        // Set forwarding pointer in old location
-        obj.forwardTo(@ptrFromInt(new_addr));
-
-        // Call post-copy hook if present (e.g., to push to mark stack)
-        if (self.postCopyFn) |postCopy| {
-            postCopy(self, new_addr);
-        }
-
-        return new_addr | layouts.TAG(old_addr);
-    }
-};
-
-// Inline helper: copy a single slot value if it's a heap pointer.
-inline fn copySlot(slot: *Cell, destination: *CopyingDestination) void {
-    const value = slot.*;
-    if (!layouts.isImmediate(value)) {
-        const new_value = destination.copy(value);
-        if (new_value != value) slot.* = new_value;
-    }
-}
-
-// Trace an object's slots, copying children. Returns the object's size
-// so cheneyAlgorithm can avoid a redundant objectSizeFromHeader call.
-// All types are inlined directly to avoid callback indirection.
-pub inline fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestination) Cell {
-    const obj: *Object = @ptrFromInt(address);
-    const obj_type = obj.getType();
-
-    switch (obj_type) {
-        .array => {
-            const arr: *layouts.Array = @ptrFromInt(address);
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            const data = arr.data();
-            for (0..capacity) |i| {
-                copySlot(&data[i], destination);
+                fixup.visitSlot(&data[i]);
             }
             return layouts.alignCell(@sizeOf(layouts.Array) + capacity * @sizeOf(Cell), layouts.data_alignment);
         },
         .tuple => {
             const tuple: *layouts.Tuple = @ptrFromInt(address);
-            copySlot(@ptrCast(&tuple.layout), destination);
-            const layout_addr = layouts.followForwardingPointers(tuple.layout);
-            if ((layout_addr & 7) == 0) {
-                const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-                if (layouts.hasTag(layout.size, .fixnum)) {
-                    const size = layouts.untagFixnumUnsigned(layout.size);
-                    const data = tuple.data();
-                    for (0..size) |i| {
-                        copySlot(&data[i], destination);
-                    }
-                    return layouts.alignCell(@sizeOf(layouts.Tuple) + size * @sizeOf(Cell), layouts.data_alignment);
-                }
+            const layout_addr = if (@hasDecl(Fixup, "resolveTupleLayout"))
+                fixup.resolveTupleLayout(tuple.layout)
+            else
+                layouts.followForwardingPointers(tuple.layout);
+            std.debug.assert((layout_addr & 7) == 0);
+            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
+            const size = layouts.untagFixnumUnsigned(layout.size);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1 + size);
+            fixup.visitSlot(@ptrCast(&tuple.layout));
+            const data = tuple.data();
+            for (0..size) |i| {
+                fixup.visitSlot(&data[i]);
             }
-            return free_list.objectSizeFromHeader(address);
+            return layouts.alignCell(@sizeOf(layouts.Tuple) + size * @sizeOf(Cell), layouts.data_alignment);
         },
         .quotation => {
             const quot: *layouts.Quotation = @ptrFromInt(address);
-            copySlot(@ptrCast(&quot.array), destination);
-            copySlot(@ptrCast(&quot.cached_effect), destination);
-            copySlot(@ptrCast(&quot.cache_counter), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(3);
+            fixup.visitSlot(@ptrCast(&quot.array));
+            fixup.visitSlot(@ptrCast(&quot.cached_effect));
+            fixup.visitSlot(@ptrCast(&quot.cache_counter));
+            if (@hasDecl(Fixup, "visitEntryPoint")) fixup.visitEntryPoint(quot.entry_point);
             return layouts.alignCell(@sizeOf(layouts.Quotation), layouts.data_alignment);
         },
         .word => {
             const word_obj: *layouts.Word = @ptrFromInt(address);
-            copySlot(@ptrCast(&word_obj.hashcode_field), destination);
-            copySlot(@ptrCast(&word_obj.name), destination);
-            copySlot(@ptrCast(&word_obj.vocabulary), destination);
-            copySlot(@ptrCast(&word_obj.def), destination);
-            copySlot(@ptrCast(&word_obj.props), destination);
-            copySlot(@ptrCast(&word_obj.pic_def), destination);
-            copySlot(@ptrCast(&word_obj.pic_tail_def), destination);
-            copySlot(@ptrCast(&word_obj.subprimitive), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(8);
+            fixup.visitSlot(@ptrCast(&word_obj.hashcode_field));
+            fixup.visitSlot(@ptrCast(&word_obj.name));
+            fixup.visitSlot(@ptrCast(&word_obj.vocabulary));
+            fixup.visitSlot(@ptrCast(&word_obj.def));
+            fixup.visitSlot(@ptrCast(&word_obj.props));
+            fixup.visitSlot(@ptrCast(&word_obj.pic_def));
+            fixup.visitSlot(@ptrCast(&word_obj.pic_tail_def));
+            fixup.visitSlot(@ptrCast(&word_obj.subprimitive));
+            if (@hasDecl(Fixup, "visitEntryPoint")) fixup.visitEntryPoint(word_obj.entry_point);
             return layouts.alignCell(@sizeOf(layouts.Word), layouts.data_alignment);
         },
         .wrapper => {
             const wrapper: *layouts.Wrapper = @ptrFromInt(address);
-            copySlot(@ptrCast(&wrapper.object), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1);
+            fixup.visitSlot(@ptrCast(&wrapper.object));
             return layouts.alignCell(@sizeOf(layouts.Wrapper), layouts.data_alignment);
         },
         .string => {
             const str: *layouts.String = @ptrFromInt(address);
-            copySlot(@ptrCast(&str.aux), destination);
-            copySlot(@ptrCast(&str.hashcode_field), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(2);
+            fixup.visitSlot(@ptrCast(&str.aux));
+            fixup.visitSlot(@ptrCast(&str.hashcode_field));
             const len = layouts.untagFixnumUnsigned(str.length);
             return layouts.alignCell(@sizeOf(layouts.String) + len, layouts.data_alignment);
         },
         .alien => {
             const alien: *layouts.Alien = @ptrFromInt(address);
-            copySlot(@ptrCast(&alien.base), destination);
-            copySlot(@ptrCast(&alien.expired), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(2);
+            fixup.visitSlot(@ptrCast(&alien.base));
+            fixup.visitSlot(@ptrCast(&alien.expired));
             alien.updateAddress();
             return layouts.alignCell(@sizeOf(layouts.Alien), layouts.data_alignment);
         },
         .dll => {
             const dll: *layouts.Dll = @ptrFromInt(address);
-            copySlot(@ptrCast(&dll.path), destination);
+            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1);
+            fixup.visitSlot(@ptrCast(&dll.path));
             return layouts.alignCell(@sizeOf(layouts.Dll), layouts.data_alignment);
         },
         .callstack => {
-            const stack: *layouts.Callstack = @ptrFromInt(address);
-            visitCallstackObjectSlotsForCopy(stack, destination);
-            const frame_length = layouts.untagFixnumUnsigned(stack.length);
+            const cs: *layouts.Callstack = @ptrFromInt(address);
+            if (@hasDecl(Fixup, "visitCallstackObject")) {
+                fixup.visitCallstackObject(cs);
+            }
+            const frame_length = layouts.untagFixnumUnsigned(cs.length);
             return layouts.alignCell(@sizeOf(layouts.Callstack) + frame_length, layouts.data_alignment);
         },
-        // Types with only raw data (no slots):
         .bignum => {
             const bn: *layouts.Bignum = @ptrFromInt(address);
             const capacity = layouts.untagFixnumUnsigned(bn.capacity);
@@ -351,19 +112,125 @@ pub inline fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestina
             return layouts.alignCell(@sizeOf(layouts.ByteArray) + capacity, layouts.data_alignment);
         },
         .float => return layouts.alignCell(@sizeOf(layouts.BoxedFloat), layouts.data_alignment),
-        // Immediates should not appear as heap objects
         .fixnum, .f => return 0,
     }
 }
 
-// Backward-compatible wrapper for callers that don't need the size.
-pub fn traceAndCopy(address: Cell, destination: *CopyingDestination) void {
-    _ = traceAndCopyReturnSize(address, destination);
+pub const CopyingDestination = struct {
+    const Self = @This();
+
+    source_start: Cell = 0,
+    source_end: Cell = 0,
+    bump_here: ?*Cell = null,
+    bump_end: Cell = 0,
+    bump_object_start: *@import("object_start_map.zig").ObjectStartMap = undefined,
+    allocation_failed: bool = false,
+
+    source2_start: Cell = 0,
+    source2_end: Cell = 0,
+    source3_start: Cell = 0,
+    source3_end: Cell = 0,
+    source4_start: Cell = 0,
+    source4_end: Cell = 0,
+    allocateFn: ?*const fn (*CopyingDestination, Cell) ?Cell = null,
+    postCopyFn: ?*const fn (*CopyingDestination, Cell) void = null,
+    ptr: *anyopaque = undefined,
+    code_heap: ?*code_heap_mod.CodeHeap = null,
+
+    pub fn allocate(self: *CopyingDestination, size: Cell) ?Cell {
+        if (self.bump_here) |here_ptr| {
+            const h = here_ptr.*;
+            const aligned_size = layouts.alignCell(size, layouts.data_alignment);
+            if (h + aligned_size > self.bump_end) {
+                return null;
+            }
+            here_ptr.* = h + aligned_size;
+            self.bump_object_start.recordObjectStart(h);
+            return h;
+        }
+        return self.allocateFn.?(self, size);
+    }
+
+    fn inSourceGeneration(self: *const CopyingDestination, addr: Cell) bool {
+        if (addr >= self.source_start and addr < self.source_end) return true;
+        if (self.source2_end != 0) {
+            if (addr >= self.source2_start and addr < self.source2_end) return true;
+            if (self.source3_end != 0) {
+                if (addr >= self.source3_start and addr < self.source3_end) return true;
+                if (self.source4_end != 0 and addr >= self.source4_start and addr < self.source4_end) return true;
+            }
+        }
+        return false;
+    }
+
+    pub fn copy(self: *CopyingDestination, old_addr: Cell) Cell {
+        @setEvalBranchQuota(10000);
+        const original_untagged = layouts.UNTAG(old_addr);
+
+        if (!self.inSourceGeneration(original_untagged)) {
+            return old_addr;
+        }
+
+        var obj: *Object = @ptrFromInt(original_untagged);
+
+        var untagged = original_untagged;
+        if (obj.isForwardingPointer()) {
+            while (obj.isForwardingPointer()) {
+                obj = obj.forwardingPointer();
+            }
+            untagged = @intFromPtr(obj);
+
+            if (!self.inSourceGeneration(untagged)) {
+                return untagged | layouts.TAG(old_addr);
+            }
+        }
+
+        const size = free_list.objectSizeFromHeader(untagged);
+
+        const new_addr = self.allocate(size) orelse {
+            self.allocation_failed = true;
+            return old_addr;
+        };
+
+        if (new_addr != untagged) {
+            const src: [*]u8 = @ptrFromInt(untagged);
+            const dst: [*]u8 = @ptrFromInt(new_addr);
+            @memcpy(dst[0..size], src[0..size]);
+        } else {
+            return old_addr;
+        }
+
+        obj.forwardTo(@ptrFromInt(new_addr));
+
+        if (self.postCopyFn) |postCopy| {
+            postCopy(self, new_addr);
+        }
+
+        return new_addr | layouts.TAG(old_addr);
+    }
+};
+
+pub const CopyFixup = struct {
+    destination: *CopyingDestination,
+
+    pub fn visitSlot(self: *@This(), slot: *Cell) void {
+        const value = slot.*;
+        if (!layouts.isImmediate(value)) {
+            const new_value = self.destination.copy(value);
+            if (new_value != value) slot.* = new_value;
+        }
+    }
+
+    pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
+        visitCallstackObjectSlotsForCopy(stack, self.destination);
+    }
+};
+
+pub fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestination) Cell {
+    var fixup = CopyFixup{ .destination = destination };
+    return visitDataObjectSlots(CopyFixup, &fixup, address);
 }
 
-// Visit spill slots in a callstack OBJECT on the heap and copy referenced
-// objects. Mirrors mark.zig markCallstackObject but uses destination.copy()
-// instead of marking. Matches C++ visit_callstack_object.
 fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *CopyingDestination) void {
     const code_heap = destination.code_heap orelse return;
     var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
@@ -379,7 +246,6 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        // Match C++ visit_callstack_object/code_block_for_address semantics.
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             frame_offset += LEAF_FRAME_SIZE;
             continue;

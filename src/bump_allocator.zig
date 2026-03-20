@@ -46,10 +46,10 @@ pub const BumpAllocator = extern struct {
         return self.here + layouts.alignCell(size, layouts.data_alignment) <= self.end;
     }
 
-    // Match C++ bump_allocator::allot(): here is always aligned after init/reset,
-    // so only the size needs alignment. Caller (ensureNurserySpace) already
+    // here is always aligned after init/reset, so only the size needs alignment.
+    // Caller (ensureNurserySpace) already
     // checked bounds, so no redundant check needed.
-    pub inline fn allocate(self: *BumpAllocator, size: Cell) Cell {
+    pub fn allocate(self: *BumpAllocator, size: Cell) Cell {
         const h = self.here;
         self.here = h + layouts.alignCell(size, layouts.data_alignment);
         return h;
@@ -70,7 +70,7 @@ pub const BumpAllocator = extern struct {
 
 // Compile-time verification of struct layout
 comptime {
-    // Verify field order matches C++ - critical for assembly compatibility
+    // Verify field order for assembly compatibility
     std.debug.assert(@offsetOf(BumpAllocator, "here") == 0 * @sizeOf(Cell));
     std.debug.assert(@offsetOf(BumpAllocator, "start") == 1 * @sizeOf(Cell));
     std.debug.assert(@offsetOf(BumpAllocator, "end") == 2 * @sizeOf(Cell));

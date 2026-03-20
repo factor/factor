@@ -33,9 +33,6 @@ pub export fn primitive_set_special_object(vm_asm: *VMAssemblyFields) callconv(.
 pub export fn primitive_context_object(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const ctx = vm_asm.ctx;
     // ( n -- value )
-    // NOTE: C++ VM uses peek/replace:
-    // fixnum n = untag_fixnum(ctx->peek());
-    // ctx->replace(ctx->context_objects[n]);
     const n = layouts.untagFixnum(ctx.peek());
     ctx.replace(ctx.context_objects[@intCast(n)]);
 }
@@ -51,7 +48,6 @@ pub export fn primitive_set_context_object(vm_asm: *VMAssemblyFields) callconv(.
 pub export fn primitive_context_object_for(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( n context -- obj )
-    // C++ reference: vm/contexts.cpp:187-191
     const ctx_cell = vm.pop();
     const index = layouts.untagFixnum(vm.pop());
 
@@ -140,7 +136,6 @@ pub export fn primitive_retainstack_for(vm_asm: *VMAssemblyFields) callconv(.c) 
 pub export fn primitive_check_datastack(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( saved-datastack in out -- ? )
-    // Check if datastack matches expected state for call(
     // This validates that the preserved portion of the stack hasn't changed
     const out = layouts.untagFixnum(vm.pop());
     const in = layouts.untagFixnum(vm.pop());
@@ -196,10 +191,6 @@ pub export fn primitive_load_locals(vm_asm: *VMAssemblyFields) callconv(.c) void
     const count = layouts.untagFixnum(vm.pop());
     {
         const ctx = vm.vm_asm.ctx;
-        // Bulk copy from datastack to retainstack, matching C++ implementation
-        // C++: memcpy((cell*)(ctx->retainstack + sizeof(cell)),
-        //            (cell*)(ctx->datastack - sizeof(cell) * (count - 1)),
-        //            sizeof(cell) * count);
         const cell_size = @sizeOf(Cell);
         const count_unsigned: Cell = @intCast(count);
         const src_addr = ctx.datastack - cell_size * (count_unsigned - 1);
@@ -222,7 +213,6 @@ fn array_to_stack(arr: *const layouts.Array, bottom: Cell) Cell {
     const depth = capacity * @sizeOf(Cell);
     const data = arr.data();
 
-    // Copy array data to stack segment (matches C++ memcpy)
     const dest: [*]Cell = @ptrFromInt(bottom);
     @memcpy(dest[0..capacity], data[0..capacity]);
 

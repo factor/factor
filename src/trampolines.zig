@@ -1,8 +1,6 @@
 const builtin = @import("builtin");
 
-// Placeholder trampoline implementations.
-// These are only needed for ARM64 relocation types and should never be called
-// on non-ARM64 targets. If they are invoked, we want a hard failure.
+// ARM64 relocation types only; panic on non-ARM64 targets or invocation.
 pub fn trampoline() callconv(.C) noreturn {
     if (builtin.cpu.arch != .aarch64) {
         @panic("trampoline called on non-aarch64");

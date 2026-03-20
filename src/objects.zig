@@ -1,8 +1,4 @@
 // objects.zig - Special object indices
-// Must be kept in sync with:
-//   core/kernel/kernel.factor
-//   basis/bootstrap/image/image.factor
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
@@ -54,7 +50,6 @@ pub const SpecialObject = enum(Cell) {
     // shutdown quotation
     shutdown_quot = 22,
 
-    // Quotation compilation in quotations.cpp
     jit_prolog = 23,
     jit_primitive_word = 24,
     jit_primitive = 25,
@@ -76,7 +71,6 @@ pub const SpecialObject = enum(Cell) {
     jit_execute = 41,
     jit_declare_word = 42,
 
-    // External entry points (defined in bootstrap/assembler/)
     c_to_factor_word = 43,
     lazy_jit_compile_word = 44,
     unwind_native_frames_word = 45,
@@ -92,10 +86,8 @@ pub const SpecialObject = enum(Cell) {
     // Incremented on every modify-code-heap call; invalidates call inline caching
     redefinition_counter = 52,
 
-    // Callback stub generation in callbacks.cpp
     callback_stub = 53,
 
-    // Polymorphic inline cache generation in inline_cache.cpp
     pic_load = 54,
     pic_tag = 55,
     pic_tuple = 56,
@@ -105,7 +97,6 @@ pub const SpecialObject = enum(Cell) {
     pic_miss_word = 60,
     pic_miss_tail_word = 61,
 
-    // Megamorphic cache generation in dispatch.cpp
     mega_lookup = 62,
     mega_lookup_word = 63,
     mega_miss_word = 64,
@@ -116,7 +107,6 @@ pub const SpecialObject = enum(Cell) {
     // stderr FILE* handle
     stderr = 66,
 
-    // have we bootstrapped?
     stage2 = 67,
 
     current_thread = 68,

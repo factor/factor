@@ -28,7 +28,7 @@ pub const FullMarkContext = struct {
     tenured: *data_heap_mod.TenuredSpace,
 };
 
-inline fn markDataIfNeeded(gc: *GC, addr: Cell, size: Cell) void {
+fn markDataIfNeeded(gc: *GC, addr: Cell, size: Cell) void {
     if (gc.heap.tenured.marks.tryMarkStart(addr, size)) {
         markStackPush(gc, addr);
     }
@@ -46,57 +46,69 @@ fn markCodeBlockIfNeeded(gc: *GC, block: *code_blocks.CodeBlock) void {
     }
 }
 
-inline fn markStackPush(gc: *GC, value: Cell) void {
+/// Safe push — for root scanning where total push count is hard to bound.
+fn markStackPush(gc: *GC, value: Cell) void {
     gc.mark_stack.append(gc.allocator, value) catch @panic("Mark stack overflow");
 }
 
-// Inline fast path: immediate check, tenured range+mark-bit check.
-// Slow paths (size computation, copy) stay non-inline to prevent
-// code explosion from objectSizeFromHeader's large switch.
-inline fn fullMarkValue(ctx: *FullMarkContext, value: Cell) Cell {
+/// Fast push — for drain loop where markStackEnsure was called first.
+fn markStackPushFast(gc: *GC, value: Cell) void {
+    gc.mark_stack.appendAssumeCapacity(value);
+}
+
+/// Ensure the mark stack has room for at least `n` more pushes.
+/// Called before scanning an object's slots in the drain loop.
+fn markStackEnsure(gc: *GC, n: Cell) void {
+    gc.mark_stack.ensureUnusedCapacity(gc.allocator, n) catch @panic("Mark stack overflow");
+}
+
+// Mark a value during full GC. Comptime `assume_capacity` selects fast push
+// (drain loop, where markStackEnsure was called) vs safe push (root scanning).
+// Computes object size and sets full mark range at encounter time (matching
+fn fullMarkValueImpl(comptime assume_capacity: bool, ctx: *FullMarkContext, value: Cell) Cell {
     if (layouts.isImmediate(value)) return value;
     const untagged = layouts.UNTAG(value);
     if (untagged < 0x1000) return value;
 
-    // Fast path: 99%+ of pointers land in tenured (simple range check).
     if (ctx.tenured.contains(untagged)) {
-        // Check mark bit BEFORE computing object size. Most revisited
-        // objects are already marked; skip the expensive size switch.
-        // Use unchecked variant — contains() already validated the range.
         if (!ctx.tenured.marks.isMarkedUnchecked(untagged)) {
-            fullMarkTenuredNew(ctx, untagged);
+            const size = free_list.objectSizeFromHeader(untagged);
+            if (ctx.tenured.marks.tryMarkStartUnchecked(untagged, size)) {
+                if (assume_capacity) markStackPushFast(ctx.gc, untagged) else markStackPush(ctx.gc, untagged);
+            }
         }
         return value;
     }
 
-    return fullMarkValueSlow(ctx, value);
-}
-
-// Non-inline: first visit to a tenured object — set start bit + push.
-// Size computation deferred to fullProcessDataObject (single type switch).
-fn fullMarkTenuredNew(ctx: *FullMarkContext, untagged: Cell) void {
-    // Unchecked — caller already verified address is in tenured range.
-    if (ctx.tenured.marks.tryMarkStartBitOnlyUnchecked(untagged)) {
-        markStackPush(ctx.gc, untagged);
-    }
-}
-
-// Non-inline: nursery/aging copy path (rare during full GC).
-fn fullMarkValueSlow(ctx: *FullMarkContext, value: Cell) Cell {
-    // Not in tenured — must be in nursery/aging, copy to tenured.
+    // Slow path: nursery/aging copy
     const new_value = ctx.destination.copy(value);
     const new_addr = layouts.UNTAG(new_value);
     if (ctx.tenured.contains(new_addr)) {
-        if (ctx.tenured.marks.tryMarkStartBitOnly(new_addr)) {
-            markStackPush(ctx.gc, new_addr);
+        const size = free_list.objectSizeFromHeader(new_addr);
+        if (ctx.tenured.marks.tryMarkStartUnchecked(new_addr, size)) {
+            if (assume_capacity) markStackPushFast(ctx.gc, new_addr) else markStackPush(ctx.gc, new_addr);
         }
     }
     return new_value;
 }
 
+// Safe versions (root scanning — no capacity guarantee)
+fn fullMarkValue(ctx: *FullMarkContext, value: Cell) Cell {
+    return fullMarkValueImpl(false, ctx, value);
+}
+
 fn fullMarkSlot(slot: *Cell, ctx_ptr: *anyopaque) void {
     const ctx: *FullMarkContext = @ptrCast(@alignCast(ctx_ptr));
     slot.* = fullMarkValue(ctx, slot.*);
+}
+
+// Fast versions (drain loop — markStackEnsure was called)
+fn fullMarkValueFast(ctx: *FullMarkContext, value: Cell) Cell {
+    return fullMarkValueImpl(true, ctx, value);
+}
+
+fn fullMarkSlotInlineFast(slot: *Cell, ctx: *FullMarkContext) void {
+    slot.* = fullMarkValueFast(ctx, slot.*);
 }
 
 pub fn fullMarkAllRoots(gc: *GC, ctx: *FullMarkContext) void {
@@ -153,7 +165,7 @@ fn fullMarkContexts(gc: *GC, ctx: *FullMarkContext) void {
     }
 }
 
-inline fn fullMarkStackSlots(top: Cell, seg: *const segments.Segment, ctx: *FullMarkContext) void {
+fn fullMarkStackSlots(top: Cell, seg: *const segments.Segment, ctx: *FullMarkContext) void {
     var ptr = seg.start;
     while (ptr <= top) : (ptr += @sizeOf(Cell)) {
         const slot: *Cell = @ptrFromInt(ptr);
@@ -206,7 +218,6 @@ fn fullMarkCallstack(ctx: *FullMarkContext, c: *Context) void {
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        // Match C++ iterate_callstack/code_block_for_address semantics:
         // return addresses are resolved by previous block start without
         // requiring an in-block extent check.
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
@@ -233,12 +244,12 @@ fn fullMarkCallstack(ctx: *FullMarkContext, c: *Context) void {
 
 // Inline helper: mark/copy a single slot value in-place.
 // Eliminates the function pointer indirection that visitObjectSlots uses.
-inline fn fullMarkSlotInline(slot: *Cell, ctx: *FullMarkContext) void {
+fn fullMarkSlotInline(slot: *Cell, ctx: *FullMarkContext) void {
     slot.* = fullMarkValue(ctx, slot.*);
 }
 
 // Inline helper: mark the code block for a word/quotation entry point.
-inline fn fullMarkEntryPoint(gc: *GC, entry_point: Cell) void {
+fn fullMarkEntryPoint(gc: *GC, entry_point: Cell) void {
     if (entry_point != 0) {
         if (gc.vm.code) |code| {
             if (entry_point >= code.code_start and entry_point < code.code_start + code.code_size) {
@@ -249,122 +260,44 @@ inline fn fullMarkEntryPoint(gc: *GC, entry_point: Cell) void {
     }
 }
 
-// Process a data object from the mark stack. Visits all tagged slots
-// and marks referenced code blocks. Uses direct per-type inline visiting
-// instead of visitObjectSlots callback to eliminate indirect call overhead
-// (matches C++ template inlining via visit_slots<Fixup>).
+/// Fixup for full mark phase: marks/copies slot values and tracks code block entry points.
+/// Uses fast mark stack push (assumes capacity was pre-allocated via ensureSlotCapacity).
+const FullMarkFixup = struct {
+    gc: *GC,
+    ctx: *FullMarkContext,
+
+    pub fn visitSlot(self: *@This(), slot: *Cell) void {
+        slot.* = fullMarkValueFast(self.ctx, slot.*);
+    }
+
+    pub fn ensureSlotCapacity(self: *@This(), n: Cell) void {
+        markStackEnsure(self.gc, n);
+    }
+
+    pub fn visitEntryPoint(self: *@This(), entry_point: Cell) void {
+        fullMarkEntryPoint(self.gc, entry_point);
+    }
+
+    pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
+        markCallstackObject(self.gc, stack, self.ctx.tenured);
+    }
+};
+
+// Process a data object from the mark stack using the generic slot visitor.
 fn fullProcessDataObject(gc: *GC, addr: Cell, ctx: *FullMarkContext) void {
-    const obj: *layouts.Object = @ptrFromInt(addr);
-    if (obj.isFree()) return;
-
-    const obj_type = obj.getType();
-
-    // Handle callstack: frames reference code blocks but have no tagged data pointers.
-    if (obj_type == .callstack) {
-        const stack: *layouts.Callstack = @ptrFromInt(addr);
-        const len = layouts.untagFixnumUnsigned(stack.length);
-        ctx.tenured.marks.setMarked(addr, layouts.alignCell(@sizeOf(layouts.Callstack) + len, layouts.data_alignment));
-        markCallstackObject(gc, stack, ctx.tenured);
-        return;
-    }
-
-    // No-pointer types: compute size, set mark range, done.
-    if (layouts.typeHasNoPointers(obj_type)) {
-        const size: Cell = switch (obj_type) {
-            .bignum => blk: {
-                const bn: *layouts.Bignum = @ptrFromInt(addr);
-                break :blk layouts.alignCell(@sizeOf(layouts.Bignum) + layouts.untagFixnumUnsigned(bn.capacity) * @sizeOf(Cell), layouts.data_alignment);
-            },
-            .byte_array => blk: {
-                const arr: *layouts.ByteArray = @ptrFromInt(addr);
-                break :blk layouts.alignCell(@sizeOf(layouts.ByteArray) + layouts.untagFixnumUnsigned(arr.capacity), layouts.data_alignment);
-            },
-            .float => comptime layouts.alignCell(@sizeOf(layouts.BoxedFloat), layouts.data_alignment),
-            else => layouts.data_alignment,
-        };
-        ctx.tenured.marks.setMarked(addr, size);
-        return;
-    }
-
-    const size: Cell = switch (obj_type) {
-        .array => blk: {
-            const arr: *layouts.Array = @ptrFromInt(addr);
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            const data = arr.data();
-            for (0..capacity) |i| {
-                fullMarkSlotInline(&data[i], ctx);
-            }
-            break :blk layouts.alignCell(@sizeOf(layouts.Array) + capacity * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .tuple => blk: {
-            const tuple: *layouts.Tuple = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&tuple.layout), ctx);
-            const layout_addr = layouts.followForwardingPointers(tuple.layout);
-            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const tuple_size = layouts.untagFixnumUnsigned(layout.size);
-            const data = tuple.data();
-            for (0..tuple_size) |i| {
-                fullMarkSlotInline(&data[i], ctx);
-            }
-            break :blk layouts.alignCell(@sizeOf(layouts.Tuple) + tuple_size * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .word => blk: {
-            const word: *layouts.Word = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&word.hashcode_field), ctx);
-            fullMarkSlotInline(@ptrCast(&word.name), ctx);
-            fullMarkSlotInline(@ptrCast(&word.vocabulary), ctx);
-            fullMarkSlotInline(@ptrCast(&word.def), ctx);
-            fullMarkSlotInline(@ptrCast(&word.props), ctx);
-            fullMarkSlotInline(@ptrCast(&word.pic_def), ctx);
-            fullMarkSlotInline(@ptrCast(&word.pic_tail_def), ctx);
-            fullMarkSlotInline(@ptrCast(&word.subprimitive), ctx);
-            fullMarkEntryPoint(gc, word.entry_point);
-            break :blk comptime layouts.alignCell(@sizeOf(layouts.Word), layouts.data_alignment);
-        },
-        .quotation => blk: {
-            const quot: *layouts.Quotation = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&quot.array), ctx);
-            fullMarkSlotInline(@ptrCast(&quot.cached_effect), ctx);
-            fullMarkSlotInline(@ptrCast(&quot.cache_counter), ctx);
-            fullMarkEntryPoint(gc, quot.entry_point);
-            break :blk comptime layouts.alignCell(@sizeOf(layouts.Quotation), layouts.data_alignment);
-        },
-        .wrapper => blk: {
-            const wrapper: *layouts.Wrapper = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&wrapper.object), ctx);
-            break :blk comptime layouts.alignCell(@sizeOf(layouts.Wrapper), layouts.data_alignment);
-        },
-        .string => blk: {
-            const str: *layouts.String = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&str.aux), ctx);
-            fullMarkSlotInline(@ptrCast(&str.hashcode_field), ctx);
-            break :blk layouts.alignCell(@sizeOf(layouts.String) + layouts.untagFixnumUnsigned(str.length), layouts.data_alignment);
-        },
-        .alien => blk: {
-            const alien: *layouts.Alien = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&alien.base), ctx);
-            fullMarkSlotInline(@ptrCast(&alien.expired), ctx);
-            alien.updateAddress();
-            break :blk comptime layouts.alignCell(@sizeOf(layouts.Alien), layouts.data_alignment);
-        },
-        .dll => blk: {
-            const dll: *layouts.Dll = @ptrFromInt(addr);
-            fullMarkSlotInline(@ptrCast(&dll.path), ctx);
-            break :blk comptime layouts.alignCell(@sizeOf(layouts.Dll), layouts.data_alignment);
-        },
-        else => layouts.data_alignment,
-    };
-    ctx.tenured.marks.setMarked(addr, size);
+    var fixup = FullMarkFixup{ .gc = gc, .ctx = ctx };
+    _ = slot_visitor.visitDataObjectSlots(FullMarkFixup, &fixup, addr);
 }
 
 fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkContext) void {
     if (block.isFree()) return;
     const code_heap = gc.vm.code orelse return;
 
-    // Header fields
-    fullMarkSlot(@ptrCast(&block.owner), @ptrCast(ctx));
-    fullMarkSlot(@ptrCast(&block.parameters), @ptrCast(ctx));
-    fullMarkSlot(@ptrCast(&block.relocation), @ptrCast(ctx));
+    // Header fields (3 slots + reloc literals)
+    markStackEnsure(gc, 3);
+    fullMarkSlotInlineFast(@ptrCast(&block.owner), ctx);
+    fullMarkSlotInlineFast(@ptrCast(&block.parameters), ctx);
+    fullMarkSlotInlineFast(@ptrCast(&block.relocation), ctx);
 
     const is_uninitialized = code_heap.isBlockUninitialized(block);
 
@@ -377,6 +310,8 @@ fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkCo
         if (reloc_cap > 0) {
             const reloc_data = reloc_ba.data();
             const reloc_count = reloc_cap / @sizeOf(code_blocks.RelocationEntry);
+            // Each literal can push 1 mark + 1 copy
+            markStackEnsure(gc, reloc_count);
             var param_index: Cell = 0;
             var modified = false;
             for (0..reloc_count) |i| {
@@ -389,7 +324,7 @@ fn fullProcessCodeBlock(gc: *GC, block: *code_blocks.CodeBlock, ctx: *FullMarkCo
                     const value = op.loadValue();
                     const value_unsigned: Cell = @bitCast(value);
                     if (!layouts.isImmediate(value_unsigned)) {
-                        const new_value = fullMarkValue(ctx, value_unsigned);
+                        const new_value = fullMarkValueFast(ctx, value_unsigned);
                         if (new_value != value_unsigned) {
                             op.storeValue(@bitCast(new_value));
                             modified = true;
@@ -504,7 +439,7 @@ fn markContexts(gc: *GC, tenured: *data_heap_mod.TenuredSpace) void {
     }
 }
 
-inline fn markStackSlots(top: Cell, seg: *const segments.Segment, gc: *GC, tenured: *data_heap_mod.TenuredSpace) void {
+fn markStackSlots(top: Cell, seg: *const segments.Segment, gc: *GC, tenured: *data_heap_mod.TenuredSpace) void {
     var ptr = seg.start;
     while (ptr <= top) : (ptr += @sizeOf(Cell)) {
         const slot: *Cell = @ptrFromInt(ptr);
@@ -573,7 +508,6 @@ fn markCallstack(gc: *GC, ctx: *Context, tenured: *data_heap_mod.TenuredSpace) v
 
         if (addr == 0) break;
 
-        // Match C++ iterate_callstack/code_block_for_address semantics.
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             top += LEAF_FRAME_SIZE;
             continue;
@@ -615,7 +549,6 @@ fn markCallstackObject(gc: *GC, stack: *layouts.Callstack, tenured: *data_heap_m
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
-        // Match C++ iterate_callstack_object/code_block_for_address semantics.
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
             frame_offset += LEAF_FRAME_SIZE;
             continue;
@@ -636,44 +569,8 @@ fn markCallstackObject(gc: *GC, stack: *layouts.Callstack, tenured: *data_heap_m
     }
 }
 
-// Mark code blocks referenced by untagged entry_point fields in objects.
-fn markObjectCodePointers(gc: *GC, addr: Cell, tenured: *data_heap_mod.TenuredSpace) void {
-    const code = gc.vm.code orelse return;
-    const obj: *layouts.Object = @ptrFromInt(addr);
-    switch (obj.getType()) {
-        .word => {
-            const word: *layouts.Word = @ptrFromInt(addr);
-            if (word.entry_point != 0) {
-                const ep = word.entry_point;
-                if (ep >= code.code_start and ep < code.code_start + code.code_size) {
-                    const block_addr = ep - @sizeOf(code_blocks.CodeBlock);
-                    const block: *code_blocks.CodeBlock = @ptrFromInt(block_addr);
-                    markCodeBlock(gc, block);
-                }
-            }
-        },
-        .quotation => {
-            const quot: *layouts.Quotation = @ptrFromInt(addr);
-            if (quot.entry_point != 0) {
-                const ep = quot.entry_point;
-                if (ep >= code.code_start and ep < code.code_start + code.code_size) {
-                    const block_addr = ep - @sizeOf(code_blocks.CodeBlock);
-                    const block: *code_blocks.CodeBlock = @ptrFromInt(block_addr);
-                    markCodeBlock(gc, block);
-                }
-            }
-        },
-        .callstack => {
-            const stack: *layouts.Callstack = @ptrFromInt(addr);
-            markCallstackObject(gc, stack, tenured);
-        },
-        else => {},
-    }
-}
-
 // Mark a single slot value. If it points to a tenured object that
 // isn't yet marked, mark it and push to mark stack.
-// Ported from C++ full_collection_copier::fixup_data.
 fn markSlot(gc: *GC, slot: *Cell, tenured: *data_heap_mod.TenuredSpace) void {
     const value = slot.*;
 
@@ -688,8 +585,6 @@ fn markSlot(gc: *GC, slot: *Cell, tenured: *data_heap_mod.TenuredSpace) void {
 
     if (!tenured.contains(untagged)) return;
 
-    // Fast path: skip already-marked objects (single bit test vs 13-type switch)
-    // Unchecked — contains() already validated the range.
     if (tenured.marks.isMarkedUnchecked(untagged)) return;
 
     const size = free_list.objectSizeFromHeader(untagged);
@@ -707,7 +602,6 @@ fn markCodeBlock(gc: *GC, block: *code_blocks.CodeBlock) void {
     const addr: Cell = @intFromPtr(block);
     const size = block.size();
     if (marks.tryMarkStart(addr, size)) {
-        // Use odd address convention for code blocks (matches C++)
         markStackPush(gc, addr | 1);
     }
 }
@@ -809,15 +703,45 @@ fn markEmbeddedCodePointers(gc: *GC, block: *code_blocks.CodeBlock, is_uninitial
     }
 }
 
+/// Fixup for simple mark phase: marks tenured slot values and tracks code blocks.
+const SimpleMarkFixup = struct {
+    gc: *GC,
+    tenured: *data_heap_mod.TenuredSpace,
+
+    pub fn visitSlot(self: *@This(), slot: *Cell) void {
+        const value = slot.*;
+        if (!layouts.isImmediate(value)) {
+            markSlot(self.gc, slot, self.tenured);
+        }
+    }
+
+    pub fn ensureSlotCapacity(self: *@This(), n: Cell) void {
+        markStackEnsure(self.gc, n);
+    }
+
+    pub fn visitEntryPoint(self: *@This(), entry_point: Cell) void {
+        if (entry_point == 0) return;
+        const code = self.gc.vm.code orelse return;
+        if (entry_point >= code.code_start and entry_point < code.code_start + code.code_size) {
+            const block: *code_blocks.CodeBlock = @ptrFromInt(entry_point - @sizeOf(code_blocks.CodeBlock));
+            markCodeBlock(self.gc, block);
+        }
+    }
+
+    pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
+        markCallstackObject(self.gc, stack, self.tenured);
+    }
+};
+
 // Drain the mark stack - pop objects, visit their slots, which may
 // push more objects onto the stack. This implements transitive closure.
-// Ported from C++ visit_mark_stack.
-// We use the same convention: odd addresses are code blocks (ptr+1),
-// even addresses are data objects.
+// Odd addresses are code blocks (ptr+1), even addresses are data objects.
 fn drainMarkStack(gc: *GC) void {
     const tenured = &gc.heap.tenured;
     const code_opt = gc.vm.code;
     const has_uninitialized = if (code_opt) |code| code.uninitialized_blocks.count() != 0 else false;
+
+    var fixup = SimpleMarkFixup{ .gc = gc, .tenured = tenured };
 
     while (gc.mark_stack.items.len > 0) {
         const addr = gc.mark_stack.pop().?;
@@ -827,46 +751,16 @@ fn drainMarkStack(gc: *GC) void {
             const block: *code_blocks.CodeBlock = @ptrFromInt(addr - 1);
             if (block.isFree()) continue;
 
-            // Mark data references in the block header
             markSlot(gc, @ptrCast(&block.owner), tenured);
             markSlot(gc, @ptrCast(&block.parameters), tenured);
             markSlot(gc, @ptrCast(&block.relocation), tenured);
 
             const is_uninitialized = has_uninitialized and code_opt.?.isBlockUninitialized(block);
-
-            // Mark embedded literals and code pointers
             markEmbeddedLiterals(gc, block, tenured, is_uninitialized);
             markEmbeddedCodePointers(gc, block, is_uninitialized);
             continue;
         }
 
-        // Data object: visit slots and code pointers
-        const obj: *layouts.Object = @ptrFromInt(addr);
-        if (obj.isFree()) continue;
-
-        const VisitCtx = struct {
-            g: *GC,
-            ten: *data_heap_mod.TenuredSpace,
-
-            fn visit(slot: *Cell, ctx_ptr: *anyopaque) void {
-                const ctx: *@This() = @ptrCast(@alignCast(ctx_ptr));
-                const value = slot.*;
-                if (!layouts.isImmediate(value)) {
-                    markSlot(ctx.g, slot, ctx.ten);
-                }
-            }
-        };
-
-        var visit_ctx = VisitCtx{ .g = gc, .ten = tenured };
-        slot_visitor.visitObjectSlots(addr, VisitCtx.visit, @ptrCast(&visit_ctx));
-
-        // Mark code blocks referenced by untagged entry points
-        markObjectCodePointers(gc, addr, tenured);
-
-        // Update alien address if needed
-        if (obj.getType() == .alien) {
-            const alien: *layouts.Alien = @ptrFromInt(addr);
-            alien.updateAddress();
-        }
+        _ = slot_visitor.visitDataObjectSlots(SimpleMarkFixup, &fixup, addr);
     }
 }

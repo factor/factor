@@ -1,15 +1,3 @@
-// data_heap.zig - Data heap management with generational GC
-// Ported from vm/data_heap.hpp and vm/data_heap.cpp
-//
-// Memory layout (high to low addresses):
-// [tenured space][aging space][aging semispace][nursery]
-//
-// The heap consists of:
-// - Nursery: bump allocator, collected by copying to aging
-// - Aging: semispace collector, objects that survive nursery GC
-// - Aging semispace: target space for aging collection
-// - Tenured: free-list allocator, long-lived objects
-
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const vm = @import("vm.zig");
@@ -20,14 +8,12 @@ const object_start_map = @import("object_start_map.zig");
 const segments = @import("segments.zig");
 const Cell = layouts.Cell;
 
-// Generation identifiers
 pub const Generation = enum(u2) {
     nursery = 0,
     aging = 1,
     tenured = 2,
 };
 
-// Aging space - semispace collector
 pub const AgingSpace = struct {
     start: Cell,
     end: Cell,
@@ -38,9 +24,6 @@ pub const AgingSpace = struct {
     const Self = @This();
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
-        // Align start to data_alignment (16 bytes). All object addresses must
-        // be 16-byte aligned because the forwarding pointer mechanism uses
-        // UNTAG (clears bottom 4 bits) to recover addresses.
         const aligned_start = layouts.alignCell(start, layouts.data_alignment);
         const effective_size = (start + size) - aligned_start;
         return Self{
@@ -62,9 +45,6 @@ pub const AgingSpace = struct {
     }
 
     pub fn allocate(self: *Self, size: Cell) ?Cell {
-        // Align both 'here' and size to data_alignment (16 bytes).
-        // Objects MUST be 16-byte aligned because the forwarding pointer
-        // mechanism uses UNTAG (clears bottom 4 bits) to recover addresses.
         const aligned_here = layouts.alignCell(self.here, layouts.data_alignment);
         const aligned_size = layouts.alignCell(size, layouts.data_alignment);
         if (aligned_here + aligned_size > self.end) {
@@ -73,7 +53,6 @@ pub const AgingSpace = struct {
         self.here = aligned_here + aligned_size;
         std.debug.assert(aligned_here % layouts.data_alignment == 0);
         std.debug.assert(self.here <= self.end);
-        // Record object start for card-based scanning
         self.object_start.recordObjectStart(aligned_here);
         return aligned_here;
     }
@@ -86,19 +65,15 @@ pub const AgingSpace = struct {
         return self.end - self.here;
     }
 
-    pub inline fn contains(self: *const Self, addr: Cell) bool {
+    pub fn contains(self: *const Self, addr: Cell) bool {
         return addr >= self.start and addr < self.end;
     }
 };
 
-// Tenured space - free-list allocator with mark bits
 pub const TenuredSpace = struct {
-    // Hot fields first: accessed together in the GC marking fast path
     start: Cell,
     end: Cell,
     marks: mark_bits.MarkBits,
-    // Cold fields: free_list is large (~1KB inline), keep it behind a pointer
-    // so marks stays on the same cache line as start/end.
     size: Cell,
     free_list: *free_list.FreeListAllocator,
     object_start: object_start_map.ObjectStartMap,
@@ -135,7 +110,7 @@ pub const TenuredSpace = struct {
         return addr;
     }
 
-    pub inline fn contains(self: *const Self, addr: Cell) bool {
+    pub fn contains(self: *const Self, addr: Cell) bool {
         return addr >= self.start and addr < self.end;
     }
 
@@ -156,37 +131,29 @@ pub const TenuredSpace = struct {
     }
 };
 
-// Complete data heap structure
 pub const DataHeap = struct {
-    // Memory segment for entire heap
     segment: segments.Segment,
 
-    // Generation spaces
     nursery: bump_allocator.BumpAllocator,
     aging: AgingSpace,
     aging_semispace: AgingSpace,
     tenured: TenuredSpace,
 
-    // Card and deck tables for write barrier
     cards: object_start_map.CardTable,
     decks: object_start_map.DeckTable,
 
-    // Configuration
     young_size: Cell,
     aging_size: Cell,
     tenured_size: Cell,
 
-    // Statistics
     nursery_collections: Cell,
     aging_collections: Cell,
     full_collections: Cell,
 
-    // Memory allocator
     allocator: std.mem.Allocator,
 
     const Self = @This();
 
-    // Default sizes
     pub const default_young_size: Cell = 4 * 1024 * 1024; // 4MB
     pub const default_aging_size: Cell = 16 * 1024 * 1024; // 16MB
     pub const default_tenured_size: Cell = 128 * 1024 * 1024; // 128MB
@@ -200,24 +167,17 @@ pub const DataHeap = struct {
         const self = try allocator.create(Self);
         errdefer allocator.destroy(self);
 
-        // Align generation sizes up to deck_size like C++:
-        // - prevents boundary card/deck races in GC scanning
-        // - ensures generation boundaries map cleanly onto card/deck tables
         const heap_align = @as(Cell, vm.deck_size);
         const tenured_sz = (tenured_size + heap_align - 1) & ~(heap_align - 1);
         const aging_sz = (aging_size + heap_align - 1) & ~(heap_align - 1);
         const young_sz = (young_size + heap_align - 1) & ~(heap_align - 1);
 
-        // Allocate one extra deck of slack, matching vm/data_heap.cpp.
         const total_size = young_sz + aging_sz * 2 + tenured_sz + vm.deck_size;
 
         // Allocate the segment
         self.segment = try segments.Segment.init(total_size, false);
         errdefer self.segment.deinit();
 
-        // C++ aligns the heap base to deck_size, but keeps the underlying segment
-        // pointer unchanged. We preserve the same observable layout by shifting the
-        // in-heap start/end forward while leaving the total mapped bytes untouched.
         const aligned_heap_start = layouts.alignCell(self.segment.start, vm.deck_size);
         const aligned_offset = aligned_heap_start - self.segment.start;
         std.debug.assert(aligned_offset <= self.segment.size);
@@ -225,13 +185,11 @@ pub const DataHeap = struct {
         self.segment.start = aligned_heap_start;
         self.segment.end = aligned_heap_start + self.segment.size;
 
-        // Layout: [tenured][aging][aging_semispace][nursery]
         const tenured_start = self.segment.start;
         const aging_start = tenured_start + tenured_sz;
         const aging_semi_start = aging_start + aging_sz;
         const nursery_start = aging_semi_start + aging_sz;
 
-        // Initialize spaces (using aligned sizes)
         self.tenured = try TenuredSpace.init(allocator, tenured_start, tenured_sz);
         errdefer self.tenured.deinit();
 
@@ -246,8 +204,6 @@ pub const DataHeap = struct {
             .size = young_sz,
         };
 
-        // Initialize card/deck tables for entire heap
-        // Use segment.size (page-aligned) instead of total_size to cover the full segment
         self.cards = try object_start_map.CardTable.init(allocator, self.segment.start, self.segment.size);
         errdefer self.cards.deinit();
 
@@ -288,7 +244,6 @@ pub const DataHeap = struct {
         return self.tenured.allocate(size);
     }
 
-    // Determine which generation an address belongs to
     pub fn addressGeneration(self: *const Self, addr: Cell) ?Generation {
         if (addr >= self.nursery.start and addr < self.nursery.end) {
             return .nursery;
@@ -312,7 +267,7 @@ pub const DataHeap = struct {
         return false;
     }
 
-    pub inline fn contains(self: *const Self, addr: Cell) bool {
+    pub fn contains(self: *const Self, addr: Cell) bool {
         return addr >= self.segment.start and addr < self.segment.end;
     }
 
@@ -343,7 +298,6 @@ pub const DataHeap = struct {
         return self.segment.size;
     }
 
-    // Write barrier support
     pub fn writeBarrier(self: *Self, slot_addr: Cell) void {
         if (slot_addr < self.segment.start or slot_addr >= self.segment.end) {
             return;
@@ -353,19 +307,16 @@ pub const DataHeap = struct {
     }
 
     pub fn clearCards(self: *Self, start: Cell, end: Cell) void {
-        // Skip if range is outside the segment (e.g., aging allocated separately)
         if (start >= self.segment.end or end <= self.segment.start) {
             return;
         }
 
-        // Clamp to segment bounds
         const clamped_start = @max(start, self.segment.start);
         const clamped_end = @min(end, self.segment.end);
 
         const start_card = (clamped_start - self.segment.start) / vm.card_size;
         const end_card = (clamped_end - self.segment.start + vm.card_size - 1) / vm.card_size;
 
-        // Also clamp to card count
         const card_count = self.cards.cardCount();
         const safe_end_card = @min(end_card, card_count);
 
@@ -375,12 +326,10 @@ pub const DataHeap = struct {
     }
 
     pub fn clearDecks(self: *Self, start: Cell, end: Cell) void {
-        // Skip if range is outside the segment (e.g., aging allocated separately)
         if (start >= self.segment.end or end <= self.segment.start) {
             return;
         }
 
-        // Clamp to segment bounds
         const clamped_start = @max(start, self.segment.start);
         const clamped_end = @min(end, self.segment.end);
 
@@ -402,37 +351,25 @@ pub const DataHeap = struct {
         return self.young_size + self.aging_size;
     }
 
-    // Check if tenured space has high fragmentation
-    // High fragmentation means the largest free block is smaller than the high water mark,
-    // which would prevent a full collection from succeeding
     pub fn isHighFragmentation(self: *const Self) bool {
         return self.tenured.free_list.largestFreeBlock() <= self.highWaterMark();
     }
 
-    // Check if tenured space has low memory
-    // Low memory means total free space is less than the high water mark
     pub fn isLowMemory(self: *const Self) bool {
         return self.tenured.free_list.free_space <= self.highWaterMark();
     }
 
-    // Add method to reset aging (needed by GC)
     pub fn resetAging(self: *Self) void {
         self.aging.reset();
         self.clearCards(self.aging.start, self.aging.end);
         self.clearDecks(self.aging.start, self.aging.end);
     }
 
-    // Grow the heap - creates a new larger heap
-    // The nursery must be empty when calling this
-    // Returns a new DataHeap with doubled tenured size plus requested bytes
     pub fn grow(self: *const Self, requested_bytes: Cell) !*Self {
         return self.growWithSizes(requested_bytes, self.young_size, self.aging_size);
     }
 
-    // Grow the heap with explicit young/aging sizes (adaptive sizing support).
-    // Tenured size is still doubled plus requested bytes, matching C++ behavior.
     pub fn growWithSizes(self: *const Self, requested_bytes: Cell, young_size: Cell, aging_size: Cell) !*Self {
-        // Calculate new tenured size - double current plus requested bytes
         const new_tenured_size = layouts.alignCell(2 * self.tenured_size + requested_bytes, layouts.data_alignment);
 
         return DataHeap.init(
@@ -444,29 +381,25 @@ pub const DataHeap = struct {
     }
 };
 
-// Tests
 test "data_heap basic allocation" {
     const allocator = std.testing.allocator;
 
     const heap = try DataHeap.init(
         allocator,
-        4096, // Small nursery for testing
-        4096, // Small aging
-        8192, // Small tenured
+        4096,
+        4096,
+        8192,
     );
     defer heap.deinit();
 
-    // Allocate in nursery
     const obj1 = heap.allocateNursery(64);
     try std.testing.expect(obj1 != null);
     try std.testing.expectEqual(Generation.nursery, heap.addressGeneration(obj1.?).?);
 
-    // Allocate in aging
     const obj2 = heap.allocateAging(64);
     try std.testing.expect(obj2 != null);
     try std.testing.expectEqual(Generation.aging, heap.addressGeneration(obj2.?).?);
 
-    // Allocate in tenured
     const obj3 = heap.allocateTenured(64);
     try std.testing.expect(obj3 != null);
     try std.testing.expectEqual(Generation.tenured, heap.addressGeneration(obj3.?).?);
@@ -478,12 +411,10 @@ test "data_heap generations" {
     const heap = try DataHeap.init(allocator, 4096, 4096, 8192);
     defer heap.deinit();
 
-    // Check generation identification
     try std.testing.expect(heap.inYoungGeneration(heap.nursery.start));
     try std.testing.expect(heap.inYoungGeneration(heap.aging.start));
     try std.testing.expect(!heap.inYoungGeneration(heap.tenured.start));
 
-    // Check contains
     try std.testing.expect(heap.contains(heap.nursery.start));
     try std.testing.expect(heap.contains(heap.tenured.start));
     try std.testing.expect(!heap.contains(0));
@@ -498,17 +429,13 @@ test "data_heap swap_aging" {
     const original_aging_start = heap.aging.start;
     const original_semi_start = heap.aging_semispace.start;
 
-    // Allocate something in aging
     _ = heap.allocateAging(64);
     try std.testing.expect(heap.aging.usedBytes() > 0);
 
-    // Swap
     heap.swapAgingSpaces();
 
-    // Spaces should be swapped
     try std.testing.expectEqual(original_semi_start, heap.aging.start);
     try std.testing.expectEqual(original_aging_start, heap.aging_semispace.start);
 
-    // New aging (old semispace) should be reset
     try std.testing.expectEqual(@as(Cell, 0), heap.aging_semispace.usedBytes());
 }

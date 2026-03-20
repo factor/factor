@@ -10,7 +10,7 @@ const Fixnum = layouts.Fixnum;
 
 // Native 128÷64 division using x86_64 divq instruction.
 // On x86_64, hardware divq divides rdx:rax by a 64-bit operand.
-pub inline fn divmod128by64(hi: u64, lo: u64, divisor: u64) struct { q: u64, r: u64 } {
+pub fn divmod128by64(hi: u64, lo: u64, divisor: u64) struct { q: u64, r: u64 } {
     if (comptime builtin.cpu.arch == .x86_64) {
         var q: u64 = undefined;
         var r: u64 = undefined;
@@ -68,20 +68,20 @@ pub const Bignum = extern struct {
     pub const type_number = layouts.TypeTag.bignum;
     pub const element_size = @sizeOf(Cell);
 
-    pub inline fn rawData(self: *const Self) [*]Cell {
+    pub fn rawData(self: *const Self) [*]Cell {
         const base: [*]u8 = @ptrCast(@constCast(self));
         return @ptrCast(@alignCast(base + @sizeOf(Bignum)));
     }
 
-    pub inline fn length(self: *const Bignum) Cell {
+    pub fn length(self: *const Bignum) Cell {
         return layouts.untagFixnumFast(self.capacity) -| 1;
     }
 
-    pub inline fn rawCapacity(self: *const Bignum) Cell {
+    pub fn rawCapacity(self: *const Bignum) Cell {
         return layouts.untagFixnumFast(self.capacity);
     }
 
-    pub inline fn isNegative(self: *const Bignum) bool {
+    pub fn isNegative(self: *const Bignum) bool {
         std.debug.assert(self.rawCapacity() > 0);
         return self.rawData()[0] != 0;
     }
@@ -90,20 +90,20 @@ pub const Bignum = extern struct {
         self.rawData()[0] = if (negative) 1 else 0;
     }
 
-    pub inline fn isZero(self: *const Bignum) bool {
+    pub fn isZero(self: *const Bignum) bool {
         return self.length() == 0;
     }
 
-    pub inline fn digits(self: *const Bignum) [*]Cell {
+    pub fn digits(self: *const Bignum) [*]Cell {
         return self.rawData() + 1;
     }
 
-    pub inline fn getDigit(self: *const Bignum, index: Cell) Cell {
+    pub fn getDigit(self: *const Bignum, index: Cell) Cell {
         std.debug.assert(index < self.length());
         return self.digits()[index];
     }
 
-    pub inline fn setDigit(self: *Bignum, index: Cell, value: Cell) void {
+    pub fn setDigit(self: *Bignum, index: Cell, value: Cell) void {
         std.debug.assert(index < self.length());
         self.digits()[index] = value;
     }
@@ -126,7 +126,7 @@ pub const DivisionResult = struct {
     remainder: *Bignum,
 };
 
-pub inline fn compareUnsigned(x: *const Bignum, y: *const Bignum) Comparison {
+pub fn compareUnsigned(x: *const Bignum, y: *const Bignum) Comparison {
     const x_len = x.length();
     const y_len = y.length();
 
@@ -178,8 +178,7 @@ pub fn compare(x: *const Bignum, y: *const Bignum) Comparison {
 }
 
 // Integer length (number of significant bits).
-// Matches C++ bignum_integer_length: (len-1)*DIGIT_BITS + floor(log2(top_digit)).
-pub inline fn integerLength(x: *const Bignum) Cell {
+pub fn integerLength(x: *const Bignum) Cell {
     if (x.isZero()) return 0;
 
     const len = x.length();
@@ -193,20 +192,20 @@ pub inline fn integerLength(x: *const Bignum) Cell {
 const vm_mod = @import("vm.zig");
 const FactorVM = vm_mod.FactorVM;
 
-inline fn cachedBignum(vm: *FactorVM, which: objects.SpecialObject) ?*Bignum {
+fn cachedBignum(vm: *FactorVM, which: objects.SpecialObject) ?*Bignum {
     const tagged = vm.vm_asm.special_objects[@intFromEnum(which)];
     if (tagged == layouts.false_object) return null;
     return @ptrFromInt(layouts.UNTAG(tagged));
 }
 
-inline fn zeroBignum(vm: *FactorVM) !*Bignum {
+fn zeroBignum(vm: *FactorVM) !*Bignum {
     if (cachedBignum(vm, .bignum_zero)) |z| return z;
     return allocBignumZeroed(vm, 0, false);
 }
 
 // Convert bignum to fixnum
 // Precondition: caller must verify fitsFixnum(bn) first
-pub inline fn toFixnum(bn: *const Bignum) Fixnum {
+pub fn toFixnum(bn: *const Bignum) Fixnum {
     if (bn.isZero()) return 0;
 
     const len = bn.length();
@@ -235,7 +234,7 @@ pub inline fn toFixnum(bn: *const Bignum) Fixnum {
 }
 
 // Check if bignum fits in a fixnum
-pub inline fn fitsFixnum(bn: *const Bignum) bool {
+pub fn fitsFixnum(bn: *const Bignum) bool {
     const len = bn.length();
     if (len == 0) return true;
     if (len > 1) return false;
@@ -251,7 +250,7 @@ pub inline fn fitsFixnum(bn: *const Bignum) bool {
 }
 
 // Returns a tagged value - either a fixnum if it fits, or the bignum pointer tagged
-pub inline fn maybeToFixnum(bn: *const Bignum) Cell {
+pub fn maybeToFixnum(bn: *const Bignum) Cell {
     if (fitsFixnum(bn)) {
         return layouts.tagFixnum(toFixnum(bn));
     }
@@ -259,7 +258,7 @@ pub inline fn maybeToFixnum(bn: *const Bignum) Cell {
 }
 
 // Allocate bignum in VM nursery
-pub inline fn allocBignum(vm: *FactorVM, len: Cell, negative: bool) !*Bignum {
+pub fn allocBignum(vm: *FactorVM, len: Cell, negative: bool) !*Bignum {
     const total_size = @sizeOf(Bignum) + (len + 1) * @sizeOf(Cell);
     const tagged = vm.allotObject(.bignum, total_size) orelse return error.OutOfMemory;
     const bn: *Bignum = @ptrFromInt(layouts.UNTAG(tagged));
@@ -459,7 +458,6 @@ pub fn toCell(bn: *const Bignum) Cell {
 
 // Bignum arithmetic using VM nursery allocation
 pub fn add(vm: *FactorVM, x: *const Bignum, y: *const Bignum) !*Bignum {
-    // Return the other operand directly when one is zero (matching C++)
     if (x.isZero()) return @constCast(y);
     if (y.isZero()) return @constCast(x);
 
@@ -541,7 +539,8 @@ pub fn square(vm: *FactorVM, x_in: *const Bignum) !*Bignum {
 
     // Root x to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const length = x_in.length();
@@ -594,7 +593,8 @@ pub fn divmod(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bignu
     if (numerator.isZero()) {
         const q = try zeroBignum(vm);
         var q_cell: Cell = layouts.tagBignum(q);
-        vm.data_roots.append(vm.allocator, &q_cell) catch return error.OutOfMemory;
+        std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+        vm.data_roots.appendAssumeCapacity(&q_cell);
         defer _ = vm.data_roots.pop();
         const r = try zeroBignum(vm);
         return .{
@@ -606,7 +606,7 @@ pub fn divmod(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bignu
     // Root inputs for the .less and .greater cases
     var num_cell: Cell = layouts.tagBignum(@constCast(numerator));
     var den_cell: Cell = layouts.tagBignum(@constCast(denominator));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&num_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&den_cell);
@@ -620,7 +620,8 @@ pub fn divmod(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bignu
         .equal => blk: {
             const q = try allocBignumWithDigit(vm, 1, q_negative, 1);
             var q_cell: Cell = layouts.tagBignum(q);
-            vm.data_roots.append(vm.allocator, &q_cell) catch return error.OutOfMemory;
+            std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+            vm.data_roots.appendAssumeCapacity(&q_cell);
             defer _ = vm.data_roots.pop();
             const r = try zeroBignum(vm);
             break :blk .{
@@ -631,7 +632,8 @@ pub fn divmod(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bignu
         .less => blk: {
             const q = try zeroBignum(vm);
             var q_cell: Cell = layouts.tagBignum(q);
-            vm.data_roots.append(vm.allocator, &q_cell) catch return error.OutOfMemory;
+            std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+            vm.data_roots.appendAssumeCapacity(&q_cell);
             defer _ = vm.data_roots.pop();
             const num: *const Bignum = @ptrFromInt(layouts.UNTAG(num_cell));
             const r = try copyBignumWithSign(vm, num, r_negative);
@@ -657,7 +659,6 @@ pub fn shift(vm: *FactorVM, x: *const Bignum, shift_amt: Fixnum) !*Bignum {
         return shiftLeft(vm, x, @intCast(shift_amt));
     } else {
         // Arithmetic right shift for negative numbers:
-        // ash(x, -n) = ~(magnitude_shift(~x, -n)) per C++ bignum_arithmetic_shift
         if (x.isNegative()) {
             const not_x = try bitNot(vm, x);
             const shifted = try shiftRight(vm, not_x, @intCast(-shift_amt));
@@ -698,9 +699,8 @@ pub fn bitXor(vm: *FactorVM, x: *const Bignum, y: *const Bignum) !*Bignum {
 const BitwiseOp = enum { and_op, or_op, xor_op };
 
 // Positive-positive bitwise op with direct nursery allocation.
-// Matches C++ bignum_pospos_bitwise_op: allocates result in GC heap,
 // does digit-wise operation in place. No malloc/free intermediate.
-inline fn bignumPosPosOp(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, comptime op: BitwiseOp) !*Bignum {
+fn bignumPosPosOp(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, comptime op: BitwiseOp) !*Bignum {
     if (x_in.isZero()) {
         return switch (op) {
             .and_op => zeroBignum(vm),
@@ -717,7 +717,7 @@ inline fn bignumPosPosOp(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum
     // Root both inputs — allocBignum can trigger GC
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
     var y_cell: Cell = layouts.tagBignum(@constCast(y_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&y_cell);
@@ -763,12 +763,15 @@ inline fn bignumPosPosOp(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum
         }
     }
 
-    // Trim leading zero digits, matching C++ bignum_trim call
+    // OR with trimmed inputs: top digit is at least the longer operand's
+    // top digit (non-zero), so no leading zeros possible.
+    if (op == .or_op) return bn;
+
+    // AND and XOR can produce leading zeros — trim needed
     return trim(vm, bn);
 }
 
 // Positive-negative bitwise op with direct nursery allocation.
-// arg1 is positive, arg2 is negative. Matches C++ bignum_posneg_bitwise_op.
 // Converts arg2 to two's complement on the fly, no intermediate malloc.
 fn bignumPosNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum, comptime op: BitwiseOp) !*Bignum {
     std.debug.assert(!arg1_in.isNegative() and arg2_in.isNegative());
@@ -776,7 +779,7 @@ fn bignumPosNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
     // Root both inputs
     var arg1_cell: Cell = layouts.tagBignum(@constCast(arg1_in));
     var arg2_cell: Cell = layouts.tagBignum(@constCast(arg2_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&arg1_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&arg2_cell);
@@ -784,7 +787,6 @@ fn bignumPosNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
 
     const arg1_len = arg1_in.length();
     const arg2_len = arg2_in.length();
-    // Result is negative for OR and XOR (matches C++)
     const neg_p = (op == .or_op or op == .xor_op);
     const max_len = if (arg1_len > arg2_len + 1) arg1_len else arg2_len + 1;
 
@@ -844,14 +846,13 @@ fn bignumPosNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
 }
 
 // Negative-negative bitwise op with direct nursery allocation.
-// Both args are negative. Matches C++ bignum_negneg_bitwise_op.
 fn bignumNegNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum, comptime op: BitwiseOp) !*Bignum {
     std.debug.assert(arg1_in.isNegative() and arg2_in.isNegative());
 
     // Root both inputs
     var arg1_cell: Cell = layouts.tagBignum(@constCast(arg1_in));
     var arg2_cell: Cell = layouts.tagBignum(@constCast(arg2_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&arg1_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&arg2_cell);
@@ -859,7 +860,6 @@ fn bignumNegNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
 
     const arg1_len = arg1_in.length();
     const arg2_len = arg2_in.length();
-    // Result is negative for AND and OR (matches C++)
     const neg_p = (op == .and_op or op == .or_op);
     const max_len = (if (arg1_len > arg2_len) arg1_len else arg2_len) + 1;
 
@@ -874,9 +874,6 @@ fn bignumNegNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
     const a2_digits = arg2.digits();
     const r_digits = bn.digits();
 
-    // Convert both args from sign-magnitude to two's complement on the fly.
-    // Split into phases based on carry state to eliminate branches once
-    // carries settle (typically after 1-2 digits each).
     var i: usize = 0;
     var carry1: Cell = 1;
     var carry2: Cell = 1;
@@ -926,7 +923,6 @@ fn bignumNegNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
 }
 
 // Negate magnitude in place (two's complement conversion).
-// Matches C++ bignum_negate_magnitude.
 fn negateMagnitude(arg: *Bignum) void {
     const len = arg.length();
     const d = arg.digits();
@@ -962,7 +958,8 @@ pub fn bitNot(vm: *FactorVM, x: *const Bignum) !*Bignum {
 // Add 1 to magnitude of x, set sign. Result allocated in nursery.
 fn addOneMagnitude(vm: *FactorVM, x_in: *const Bignum, negative: bool) !*Bignum {
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const x_len = x_in.length();
@@ -978,7 +975,8 @@ fn addOneMagnitude(vm: *FactorVM, x_in: *const Bignum, negative: bool) !*Bignum 
 
     if (carry != 0) {
         var r_cell: Cell = layouts.tagBignum(r);
-        vm.data_roots.append(vm.allocator, &r_cell) catch return error.OutOfMemory;
+        std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+        vm.data_roots.appendAssumeCapacity(&r_cell);
         defer _ = vm.data_roots.pop();
         const r2 = try allocBignum(vm, x_len + 1, negative);
         const rr: *const Bignum = @ptrFromInt(layouts.UNTAG(r_cell));
@@ -993,7 +991,8 @@ fn addOneMagnitude(vm: *FactorVM, x_in: *const Bignum, negative: bool) !*Bignum 
 // Precondition: x is not zero (caller must check).
 fn subtractOneMagnitude(vm: *FactorVM, x_in: *const Bignum, negative: bool) !*Bignum {
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const x_len = x_in.length();
@@ -1041,7 +1040,7 @@ pub fn remainder(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bi
     };
 }
 
-inline fn setUnsignedLength(bn: *Bignum, len: Cell) void {
+fn setUnsignedLength(bn: *Bignum, len: Cell) void {
     bn.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(len + 1)));
     bn.setNegative(false);
 }
@@ -1051,10 +1050,9 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
     if (a.isZero()) return abs(vm, b);
     if (b.isZero()) return abs(vm, a);
 
-    // Lehmer/hybrid GCD (matches C++ VM non-Win64 path):
     // keep working values in-place and use occasional Euclidean remainder steps.
     // Root b before first copy to protect it from GC during allocation.
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 3) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 3);
     var b_root: Cell = layouts.tagBignum(@constCast(b));
     vm.data_roots.appendAssumeCapacity(&b_root);
     defer _ = vm.data_roots.pop();
@@ -1242,7 +1240,6 @@ pub fn testBit(x: *const Bignum, bit: Cell) bool {
     // Two's complement of -n is ~(n-1). We compute the digit at
     // digit_index by running a borrow chain from digit 0 up to
     // digit_index (subtract 1), then inverting.
-    // C++ equivalent: !bignum_unsigned_logbitp(bit, bignum_bitwise_not(x))
     const len = x.length();
     var borrow: Cell = 1;
     for (0..digit_index + 1) |i| {
@@ -1270,7 +1267,8 @@ pub fn testBit(x: *const Bignum, bit: Cell) bool {
 fn copyBignum(vm: *FactorVM, x: *const Bignum) !*Bignum {
     // Root x to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const len = x.length();
@@ -1387,7 +1385,7 @@ fn addUnsigned(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, negative
     // Root both operands to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
     var y_cell: Cell = layouts.tagBignum(@constCast(y_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&y_cell);
@@ -1439,7 +1437,8 @@ fn addUnsigned(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, negative
     if (carry != 0) {
         // Root r before second allocation
         var r_cell: Cell = layouts.tagBignum(r);
-        vm.data_roots.append(vm.allocator, &r_cell) catch return error.OutOfMemory;
+        std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+        vm.data_roots.appendAssumeCapacity(&r_cell);
         defer _ = vm.data_roots.pop();
 
         const r2 = try allocBignum(vm, x_len + 1, negative);
@@ -1457,7 +1456,7 @@ fn subtractUnsigned(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, neg
     // Root both operands to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
     var y_cell: Cell = layouts.tagBignum(@constCast(y_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&y_cell);
@@ -1513,7 +1512,8 @@ fn multiplyBySingleDigitVM(vm: *FactorVM, x_in: *const Bignum, digit: Cell, nega
 
     // Root operand to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const x_len = x_in.length();
@@ -1687,9 +1687,8 @@ fn effectiveLen(digits: []const Cell) usize {
     return n;
 }
 
-// Multiply digit arrays: dispatches to schoolbook or Karatsuba based on size.
-// r must be zeroed, r.len >= x.len + y.len.
-fn mulDigits(x_in: []const Cell, y_in: []const Cell, r: []Cell, scratch: []Cell) void {
+    // r must be zeroed, r.len >= x.len + y.len.
+    fn mulDigits(x_in: []const Cell, y_in: []const Cell, r: []Cell, scratch: []Cell) void {
     const x = x_in[0..effectiveLen(x_in)];
     const y = y_in[0..effectiveLen(y_in)];
     if (x.len == 0 or y.len == 0) return;
@@ -1700,9 +1699,8 @@ fn mulDigits(x_in: []const Cell, y_in: []const Cell, r: []Cell, scratch: []Cell)
     }
 }
 
-// Square digit arrays: dispatches to schoolbook or Karatsuba based on size.
-// r must be zeroed, r.len >= 2 * x.len.
-fn squareDigits(x_in: []const Cell, r: []Cell, scratch: []Cell) void {
+    // r must be zeroed, r.len >= 2 * x.len.
+    fn squareDigits(x_in: []const Cell, r: []Cell, scratch: []Cell) void {
     const x = x_in[0..effectiveLen(x_in)];
     if (x.len == 0) return;
     if (x.len < KARATSUBA_THRESHOLD) {
@@ -1848,7 +1846,7 @@ fn multiplyUnsigned(vm: *FactorVM, x_in: *const Bignum, y_in: *const Bignum, neg
     // Root both operands to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
     var y_cell: Cell = layouts.tagBignum(@constCast(y_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&y_cell);
@@ -1890,7 +1888,8 @@ fn divideUnsigned(vm: *FactorVM, numerator: *const Bignum, denominator: *const B
 fn divideBySingleDigit(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell, q_negative: bool, r_negative: bool) !DivisionResult {
     // Root numerator to protect from GC during allocation
     var num_cell: Cell = layouts.tagBignum(@constCast(numerator_in));
-    vm.data_roots.append(vm.allocator, &num_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&num_cell);
     defer _ = vm.data_roots.pop();
 
     const n_len = numerator_in.length();
@@ -1900,7 +1899,6 @@ fn divideBySingleDigit(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell
     const numerator: *const Bignum = @ptrFromInt(layouts.UNTAG(num_cell));
 
     // Perform the division. For small divisors (< RADIX_ROOT = 2^31), use the
-    // half-digit approach from C++ bignum_destructive_scale_down. This stays
     // within 64-bit arithmetic (critical for Rosetta 2 performance where
     // 128÷64 divq translates to a slow runtime call).
     const rem = if (divisor < RADIX_ROOT)
@@ -1910,7 +1908,8 @@ fn divideBySingleDigit(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell
 
     // Root q before trim (which allocates)
     var q_cell: Cell = layouts.tagBignum(q);
-    vm.data_roots.append(vm.allocator, &q_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&q_cell);
     defer _ = vm.data_roots.pop();
 
     const trimmed_q = try trim(vm, q);
@@ -1929,7 +1928,8 @@ fn divideBySingleDigit(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell
 // Quotient-only single-digit division. Skips remainder allocation.
 fn divideBySingleDigitQuotientOnly(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell, q_negative: bool) !*Bignum {
     var num_cell: Cell = layouts.tagBignum(@constCast(numerator_in));
-    vm.data_roots.append(vm.allocator, &num_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&num_cell);
     defer _ = vm.data_roots.pop();
 
     const n_len = numerator_in.length();
@@ -1947,7 +1947,8 @@ fn divideBySingleDigitQuotientOnly(vm: *FactorVM, numerator_in: *const Bignum, d
 // Remainder-only single-digit division. Skips quotient allocation.
 fn divideBySingleDigitRemainderOnly(vm: *FactorVM, numerator_in: *const Bignum, divisor: Cell, r_negative: bool) !*Bignum {
     var num_cell: Cell = layouts.tagBignum(@constCast(numerator_in));
-    vm.data_roots.append(vm.allocator, &num_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&num_cell);
     defer _ = vm.data_roots.pop();
 
     const n_len = numerator_in.length();
@@ -1983,7 +1984,6 @@ fn divideBySingleDigitRemainderOnly(vm: *FactorVM, numerator_in: *const Bignum, 
 }
 
 // Half-digit division for small denominators (< RADIX_ROOT).
-// Matches C++ bignum_destructive_scale_down. Each digit is split into
 // two half-digits and divided separately using pure 64-bit arithmetic.
 // This avoids 128-bit division which is slow under Rosetta 2.
 fn scaleDownHalfDigit(numerator: *const Bignum, q: *Bignum, n_len: Cell, divisor: Cell) Cell {
@@ -2056,7 +2056,7 @@ fn divideKnuthCore(
     // Root both inputs to protect from GC
     var num_cell: Cell = layouts.tagBignum(@constCast(numerator_in));
     var den_cell: Cell = layouts.tagBignum(@constCast(denominator_in));
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 2);
     vm.data_roots.appendAssumeCapacity(&num_cell);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&den_cell);
@@ -2079,7 +2079,8 @@ fn divideKnuthCore(
     } else {
         u_cell = num_cell;
     }
-    vm.data_roots.append(vm.allocator, &u_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&u_cell);
     defer _ = vm.data_roots.pop();
 
     var vv_cell: Cell = undefined;
@@ -2089,23 +2090,26 @@ fn divideKnuthCore(
     } else {
         vv_cell = den_cell;
     }
-    vm.data_roots.append(vm.allocator, &vv_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&vv_cell);
     defer _ = vm.data_roots.pop();
 
     var q_cell: Cell = 0;
     if (comptime want_q) {
         const q = try allocBignumZeroed(vm, q_len, q_negative);
         q_cell = layouts.tagBignum(q);
-        vm.data_roots.append(vm.allocator, &q_cell) catch return error.OutOfMemory;
-        defer _ = vm.data_roots.pop();
     }
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&q_cell);
+    defer _ = vm.data_roots.pop();
 
     // Create working copy of numerator with extra digit (may GC)
     const u_for_len: *const Bignum = @ptrFromInt(layouts.UNTAG(u_cell));
     const work_len = u_for_len.length() + 1;
     const work = try allocBignumZeroed(vm, work_len, false);
     var work_cell: Cell = layouts.tagBignum(work);
-    vm.data_roots.append(vm.allocator, &work_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&work_cell);
     defer _ = vm.data_roots.pop();
 
     // Re-derive u after work allocation, copy digits
@@ -2247,21 +2251,25 @@ fn shiftRightInPlace(x: *Bignum, shift_bits: Cell) !*Bignum {
 
     const x_len = x.length();
     const d = x.digits();
-    for (0..x_len) |i| {
-        var digit = d[i] >> bit_shift;
-        if (i + 1 < x_len) {
-            digit |= (d[i + 1] << (@as(u6, DIGIT_BITS) - bit_shift)) & DIGIT_MASK;
+    // Process all elements except the last without a branch,
+    const complement_shift: u6 = @as(u6, DIGIT_BITS) - bit_shift;
+    if (x_len > 1) {
+        for (0..x_len - 1) |i| {
+            d[i] = (d[i] >> bit_shift) | ((d[i + 1] << complement_shift) & DIGIT_MASK);
         }
-        d[i] = digit;
+    }
+    if (x_len > 0) {
+        d[x_len - 1] = d[x_len - 1] >> bit_shift;
     }
 
     return x;
 }
 
-inline fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
+fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
     // Root x to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const digit_shift = shift_bits / DIGIT_BITS;
@@ -2287,13 +2295,15 @@ inline fn shiftLeft(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bign
         }
         if (carry != 0) {
             r_digits[x_len + digit_shift] = carry;
+            // All digits filled including carry — no leading zeros possible
+            return r;
         }
     }
 
     return trim(vm, r);
 }
 
-inline fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
+fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Bignum {
     const digit_shift = shift_bits / DIGIT_BITS;
     const bit_shift: u6 = @intCast(shift_bits % DIGIT_BITS);
 
@@ -2304,7 +2314,8 @@ inline fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Big
 
     // Root x to protect from GC during allocation
     var x_cell: Cell = layouts.tagBignum(@constCast(x_in));
-    vm.data_roots.append(vm.allocator, &x_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&x_cell);
     defer _ = vm.data_roots.pop();
 
     const r_len = x_len - digit_shift;
@@ -2318,20 +2329,30 @@ inline fn shiftRight(vm: *FactorVM, x_in: *const Bignum, shift_bits: Cell) !*Big
 
     if (bit_shift == 0) {
         @memcpy(r_digits[0..r_len], x_digits[digit_shift..][0..r_len]);
+        // Input was already trimmed, so no leading zeros possible
+        return r;
     } else {
-        for (0..r_len) |i| {
-            var digit = x_digits[i + digit_shift] >> bit_shift;
-            if (i + digit_shift + 1 < x_len) {
-                digit |= (x_digits[i + digit_shift + 1] << (@as(u6, DIGIT_BITS) - bit_shift)) & DIGIT_MASK;
+        // Process all elements except the last: merge with next digit
+        // which handles the last element outside the loop.
+        const complement_shift: u6 = @as(u6, DIGIT_BITS) - bit_shift;
+        if (r_len > 1) {
+            for (0..r_len - 1) |i| {
+                r_digits[i] = (x_digits[i + digit_shift] >> bit_shift) |
+                    ((x_digits[i + digit_shift + 1] << complement_shift) & DIGIT_MASK);
             }
-            r_digits[i] = digit;
+        }
+        if (r_len > 0) {
+            const top = x_digits[r_len - 1 + digit_shift] >> bit_shift;
+            r_digits[r_len - 1] = top;
+            // If top digit is non-zero, no trim needed
+            if (top != 0) return r;
         }
     }
 
     return trim(vm, r);
 }
 
-inline fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
+fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
     const orig_len = bn.length();
     const d = bn.digits();
     var new_len = orig_len;
@@ -2344,7 +2365,6 @@ inline fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
     const negative = if (new_len == 0) false else bn.isNegative();
 
     // In-place trim when bignum is in the nursery.
-    // Matches C++ reallot_array_in_place_p: nursery is a bump allocator,
     // so shrinking just wastes trailing bytes (reclaimed on next GC flush).
     const bn_addr = @intFromPtr(bn);
     const nursery = &vm.vm_asm.nursery;
@@ -2356,13 +2376,12 @@ inline fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
 
     // Fall back to allocate + copy for non-nursery bignums (aging/tenured)
     var bn_cell: Cell = layouts.tagBignum(bn);
-    vm.data_roots.append(vm.allocator, &bn_cell) catch return error.OutOfMemory;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&bn_cell);
     defer _ = vm.data_roots.pop();
 
     const new_bn = try allocBignum(vm, new_len, negative);
     const rooted_bn: *const Bignum = @ptrFromInt(layouts.UNTAG(bn_cell));
-    for (0..new_len) |i| {
-        new_bn.setDigit(i, rooted_bn.getDigit(i));
-    }
+    @memcpy(new_bn.digits()[0..new_len], rooted_bn.digits()[0..new_len]);
     return new_bn;
 }

@@ -1,6 +1,5 @@
 // signals.zig - Signal handling infrastructure for Factor VM
 // Implements Unix signal handlers for SIGSEGV, SIGBUS, SIGFPE, SIGINT, etc.
-// Must be kept in sync with the C++ implementation in vm/os-unix.cpp and vm/errors.cpp
 
 const std = @import("std");
 const builtin = @import("builtin");
@@ -29,7 +28,6 @@ fn sigactionInt(sig_num: anytype, act: ?*const std.posix.Sigaction, oact: ?*std.
     _ = C.sigaction(c_sig, act, oact);
 }
 
-// VM error types - must match errors.hpp and basis/debugger/debugger.factor
 pub const VMError = enum(u32) {
     expired = 0,
     io = 1,
@@ -64,7 +62,6 @@ const FPU_STATUS_UE: u32 = 0x10; // Underflow
 const FPU_STATUS_PE: u32 = 0x20; // Precision
 
 // Per-thread VM pointer (for signal handlers)
-// In C++ this is accessed via current_vm() TLS.
 threadlocal var g_current_vm: ?*vm_mod.FactorVM = null;
 
 // Thread->VM map for Mach exception handling (non-signal context)
@@ -181,7 +178,6 @@ else
 
 // Architecture-specific context access
 // These functions extract PC and SP from ucontext_t
-// Based on vm/os-unix.hpp and vm/cpu-x86.hpp
 
 // macOS ucontext_t structure (simplified)
 // On macOS, uc_mcontext is a POINTER to mcontext, not inline
@@ -300,7 +296,6 @@ fn getStackPointer(ucontext_ptr: *anyopaque) *Cell {
     @panic("Unsupported architecture for signal handling");
 }
 
-// FP_TRAP constants from layouts.hpp
 const FP_TRAP_INVALID_OPERATION: u32 = 1 << 0;
 const FP_TRAP_OVERFLOW: u32 = 1 << 1;
 const FP_TRAP_UNDERFLOW: u32 = 1 << 2;
@@ -374,7 +369,6 @@ fn clearFPUStatus(ucontext_ptr: *anyopaque) void {
 }
 
 // Convert FPU status word to Factor format
-// Based on cpu-x86.hpp fpu_status() and cpu-arm.64.hpp fpu_status()
 pub fn processFPUStatus(status: u32) u32 {
     var r: u32 = 0;
     if (builtin.cpu.arch == .x86_64) {
@@ -396,9 +390,6 @@ pub fn processFPUStatus(status: u32) u32 {
     }
     return r;
 }
-
-// Signal handler implementations
-// These correspond to the C++ handlers in vm/os-unix.cpp
 
 // Platform-specific siginfo_t type - use std.posix.siginfo_t on all platforms
 const SiginfoType = std.posix.siginfo_t;
@@ -497,7 +488,6 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
 
 // FEP (Factor Error Protocol) signal handler for SIGINT (Ctrl-C)
 // This enters the low-level debugger instead of just enqueuing the signal
-// Based on vm/os-unix.cpp fep_signal_handler
 fn fepSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, _: ?*anyopaque) callconv(.c) void {
     if (vm_mod.g_fatal_erroring_p) return;
 
@@ -553,7 +543,6 @@ fn sampleSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext
 // Ignore signal handler
 fn ignoreSignalHandler(_: std.posix.SIG, _: *const SiginfoType, _: ?*anyopaque) callconv(.c) void {}
 
-// Store fault info for signal handler - matches C++ set_memory_protection_error
 pub fn setMemoryProtectionError(vm: *vm_mod.FactorVM, fault_addr: Cell, fault_pc: Cell) void {
     if (vm_mod.g_fatal_erroring_p) {
         fatalErrorInFatalError();
@@ -572,7 +561,6 @@ pub fn setMemoryProtectionError(vm: *vm_mod.FactorVM, fault_addr: Cell, fault_pc
 }
 
 // Dispatch signal to Factor code
-// Based on vm/cpu-x86.cpp dispatch_signal_handler
 pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell) void {
     const ctx = vm.vm_asm.ctx;
 
@@ -607,7 +595,6 @@ pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell)
 }
 
 // Dispatch resumable signal (fault in Factor code with good stack)
-// Based on vm/cpu-x86.cpp dispatch_resumable_signal
 fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell) void {
     const offset = sp.* % 16;
 
@@ -623,7 +610,6 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         index = @intFromEnum(objects.SpecialObject.signal_handler_word);
     } else if (offset == 16 - @sizeOf(Cell)) {
         // Make a fake frame for the leaf procedure
-        // LEAF_FRAME_SIZE = 16 (must match vm/layouts.hpp and core/layouts/layouts.factor)
         delta = 16;
         index = @intFromEnum(objects.SpecialObject.leaf_signal_handler_word);
     } else {
@@ -648,13 +634,11 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         fatalError("Signal handler word not initialized", handler_word_cell);
     }
 
-    // Update callstack_top (matches C++ dispatch_resumable_signal)
     const ctx = vm.vm_asm.ctx;
     ctx.callstack_top = sp.*;
 }
 
 // Dispatch non-resumable signal (fault outside Factor code)
-// Based on vm/cpu-x86.cpp dispatch_non_resumable_signal
 //
 // This function modifies the ucontext's SP and PC, then RETURNS.
 // When sigreturn restores the modified context, execution continues
@@ -700,17 +684,11 @@ fn dispatchNonResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handle
     pc.* = handler;
 }
 
-// Signal handler implementation functions (called from Factor code)
-
 fn initHandlerAddress() void {
     // No-op - address is passed through inline assembly input
 }
 
-// Memory signal handler implementation
-// Based on vm/errors.cpp memory_signal_handler_impl
-//
 // This function raises a Factor-level error that Factor's error handling can catch,
-// matching the C++ VM behavior. The unwind_native_frames word will use longjmp-like
 // semantics to transfer control to Factor's error handler.
 pub fn memory_signal_handler_impl() callconv(.c) void {
     const vm = g_current_vm orelse {
@@ -738,7 +716,6 @@ pub fn memory_signal_handler_impl() callconv(.c) void {
     }
 }
 
-// FP signal handler implementation
 pub fn fp_signal_handler_impl() callconv(.c) void {
     const vm = g_current_vm orelse {
         fatalError("FP signal handler without VM", 0);
@@ -747,7 +724,6 @@ pub fn fp_signal_handler_impl() callconv(.c) void {
     generalError(vm, .fp_trap, tagFixnum(vm.signal_fpu_status), layouts.false_object);
 }
 
-// Synchronous signal handler implementation
 pub fn synchronous_signal_handler_impl() callconv(.c) void {
     const vm = g_current_vm orelse {
         fatalError("Sync signal handler without VM", 0);
@@ -776,7 +752,6 @@ fn addressToError(vm: *vm_mod.FactorVM, addr: Cell) VMError {
 var general_error_count: std.atomic.Value(u32) = std.atomic.Value(u32).init(0);
 
 // Raise a general VM error
-// Based on vm/errors.cpp factor_vm::general_error()
 // This allocates memory and may trigger GC
 pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2: Cell) noreturn {
     _ = general_error_count.fetchAdd(1, .monotonic);
@@ -800,7 +775,6 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
         // Root arg1 and arg2 against GC - allotUninitializedArray can trigger GC
         var rooted_arg1 = arg1;
         var rooted_arg2 = arg2;
-        vm.data_roots.ensureUnusedCapacity(vm.allocator, 2) catch @panic("OOM");
         vm.data_roots.appendAssumeCapacity(&rooted_arg1);
         defer _ = vm.data_roots.pop();
         vm.data_roots.appendAssumeCapacity(&rooted_arg2);
@@ -843,7 +817,6 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
 }
 
 // Call the unwind-native-frames word to unwind C stack and jump to Factor error handler
-// Based on vm/entry_points.cpp factor_vm::unwind_native_frames()
 fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
     // Get the unwind_native_frames_word from special objects
     const unwind_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
@@ -949,7 +922,6 @@ pub fn initSignals(vm: *vm_mod.FactorVM) !void {
 
     // Set up signal handlers using Zig std.posix API
     // On macOS, install both Unix signal handlers and Mach exceptions
-    // (matches the C++ VM behavior).
     const use_unix_signals = true;
     if (use_unix_signals) {
         // Memory signals (SIGSEGV, SIGBUS, SIGTRAP)

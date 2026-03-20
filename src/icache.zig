@@ -3,7 +3,7 @@
 // ARM platforms require explicit instruction cache flush after modifying code.
 // x86/x86-64 has coherent instruction caches, so no flush is needed.
 //
-// Platform-specific implementations:
+// Platform-specific behavior:
 // - x86/x86-64: no-op (caches are coherent)
 // - Linux ARM64: use cacheflush syscall
 // - macOS ARM64: use pthread_jit_write_protect_np + __clear_cache

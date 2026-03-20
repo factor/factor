@@ -113,7 +113,6 @@ pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) 
     const f = float_mod.untagFloat(float_cell);
 
     // Handle special cases: NaN, Inf, and values too large for i128
-    // C++ returns BIGNUM_ZERO() for all these cases
     const truncated = @trunc(f);
     if (std.math.isNan(f) or std.math.isInf(f) or
         truncated < @as(f64, @floatFromInt(std.math.minInt(i128))) or
@@ -284,7 +283,7 @@ noinline fn binaryBignumSlow(
     comptime opFn: fn (*FactorVM, *const bignum.Bignum, *const bignum.Bignum) anyerror!*bignum.Bignum,
 ) *bignum.Bignum {
     var a_tagged = ensureBignumCell(vm, a_cell);
-    vm.data_roots.append(vm.allocator, &a_tagged) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&a_tagged);
     defer _ = vm.data_roots.pop();
     const b: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(ensureBignumCell(vm, b_cell)));
     const a: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(a_tagged));
@@ -294,7 +293,7 @@ noinline fn binaryBignumSlow(
 // Binary bignum comparison slow path: handles fixnum args.
 noinline fn binaryBignumCmpSlow(vm: *FactorVM, a_cell: Cell, b_cell: Cell) bignum.Comparison {
     var a_tagged = ensureBignumCell(vm, a_cell);
-    vm.data_roots.append(vm.allocator, &a_tagged) catch vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&a_tagged);
     defer _ = vm.data_roots.pop();
     const b: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(ensureBignumCell(vm, b_cell)));
     const a: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(a_tagged));
@@ -361,7 +360,7 @@ pub export fn primitive_bignum_divmod(vm_asm: *VMAssemblyFields) callconv(.c) vo
     var b_val = b_ptr.*;
     if (layouts.typeTag(a_val) != .bignum or layouts.typeTag(b_val) != .bignum) {
         a_val = ensureBignumCell(vm, a_val);
-        vm.data_roots.append(vm.allocator, &a_val) catch vm.memoryError();
+        vm.data_roots.appendAssumeCapacity(&a_val);
         defer _ = vm.data_roots.pop();
         b_val = ensureBignumCell(vm, b_val);
     }
@@ -648,7 +647,6 @@ pub export fn primitive_bits_float(vm_asm: *VMAssemblyFields) callconv(.c) void 
 
     var bits: u32 = 0;
     if (tag == .fixnum) {
-        // Truncate to u32, matching C++: (uint32_t)to_cell(peek())
         // Negative fixnums give valid bit patterns via truncation.
         const fixnum_val = layouts.untagFixnum(int_cell);
         const as_u64: u64 = @bitCast(@as(i64, fixnum_val));
@@ -714,14 +712,12 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
     var bits: u64 = 0;
     if (tag == .fixnum) {
         // Cast signed fixnum to u64, preserving bit pattern for negative values.
-        // Matches C++: (uint64_t)untag_fixnum(tagged)
         // e.g. -1 → 0xFFFFFFFFFFFFFFFF → NaN double
         const fixnum_val = layouts.untagFixnum(int_cell);
         bits = @bitCast(@as(i64, fixnum_val));
     } else if (tag == .bignum) {
         const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
         // Extract low 64 bits from bignum magnitude.
-        // Matches C++: (uint64_t)bignum_to_uint64(bn)
         const len = bn.length();
         if (len == 0) {
             bits = 0;

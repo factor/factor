@@ -39,7 +39,6 @@ fn peekFileHandle(vm: *FactorVM) ?*std.c.FILE {
 pub export fn primitive_save_image(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( path1 path2 then-die? -- )
-    // path1: temporary path for saving
     // path2: final path to move to
     // then-die?: if true, exit after saving
 

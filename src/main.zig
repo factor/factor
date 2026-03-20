@@ -30,14 +30,12 @@ const vm_mod = @import("vm.zig");
 
 // Comptime verification of struct layouts that JIT code relies on
 comptime {
-    // Context offsets (must match basis/compiler/constants/constants.factor)
     if (@offsetOf(contexts.Context, "callstack_top") != 0) @compileError("callstack_top must be at offset 0");
     if (@offsetOf(contexts.Context, "callstack_bottom") != 8) @compileError("callstack_bottom must be at offset 8");
     if (@offsetOf(contexts.Context, "datastack") != 16) @compileError("datastack must be at offset 16");
     if (@offsetOf(contexts.Context, "retainstack") != 24) @compileError("retainstack must be at offset 24");
     if (@offsetOf(contexts.Context, "callstack_save") != 32) @compileError("callstack_save must be at offset 32");
 
-    // VMAssemblyFields offsets (must match basis/compiler/constants/constants.factor)
     if (@offsetOf(vm_mod.VMAssemblyFields, "ctx") != 0) @compileError("ctx must be at offset 0 in VMAssemblyFields");
 }
 
@@ -89,7 +87,6 @@ const FACTOR_COMPILER_VERSION = std.fmt.comptimePrint("Zig {f} {s}", .{
 const FACTOR_GIT_LABEL = build_options.git_label;
 
 // Compile code in boot image so that we can execute the startup quotation.
-// Matches C++ prepare_boot_image() in factor.cpp:
 //   1. JIT compile all words (using their def quotation)
 //   2. Set uncompiled quotations to lazy_jit_compile entry point
 //   3. Initialize deferred code blocks (updateCodeHeapWords)
@@ -123,9 +120,8 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
             const word: *layouts.Word = @ptrFromInt(scan);
             if (word.entry_point == 0) {
                 // Root the word across JIT compilation (can trigger GC via nursery alloc)
-                // Matches C++ jit_compile_word: data_root<word> word(word_, this);
                 var rooted_word: layouts.Cell = scan | @intFromEnum(layouts.TypeTag.word);
-                vm.data_roots.append(vm.allocator, &rooted_word) catch break;
+                vm.data_roots.appendAssumeCapacity(&rooted_word);
                 defer _ = vm.data_roots.pop();
 
                 const compiled = vm.jitCompileQuotationWithOwner(rooted_word, word.def, false);
@@ -137,7 +133,7 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
                     word_after.entry_point = cb.entryPoint();
                 }
 
-                // Also compile pic_def and pic_tail_def quotations (like C++ jit_compile_word)
+                // Also compile pic_def and pic_tail_def quotations.
                 // These are needed for polymorphic inline cache (PIC) method dispatch
                 if (word_after.pic_def != layouts.false_object and word_after.pic_def != 0) {
                     vm.jitCompileQuotation(word_after.pic_def, false);
@@ -198,7 +194,6 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
 }
 
 // Initialize special objects for stdin/stdout/stderr file handles
-// Matches C++ VM init_factor() in factor.cpp
 fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_path: []const u8) void {
     const stdin_ptr = getCStdin();
     const stdout_ptr = getCStdout();
@@ -263,7 +258,6 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
 }
 
 // Pass command line arguments to Factor via OBJ_ARGS special object
-// Matches C++ VM pass_args_to_factor() in factor.cpp
 fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     const argc: usize = args.len;
 
@@ -308,7 +302,6 @@ pub fn main(init: std.process.Init) !void {
     // Parse command line arguments - we only extract -i= for ourselves
     // All other arguments (including -e=..., -run=...) are passed to Factor via OBJ_ARGS
     // Note: Unlike the old code, we do NOT treat positional arguments as image paths
-    // The C++ VM uses default_image_path() and passes ALL args to Factor unchanged
     var params = image.VMParameters{};
     var image_path: ?[]const u8 = null;
 
@@ -328,7 +321,7 @@ pub fn main(init: std.process.Init) !void {
 
     // Default image path search order:
     // 1. FACTOR_IMAGE env var (set by parent Factor process, inherited by children)
-    // 2. <exe_path>.image (C++ VM approach)
+    // 2. <exe_path>.image
     // 3. factor.image in cwd
     if (image_path == null) {
         if (std.c.getenv("FACTOR_IMAGE")) |env_path| {
@@ -406,7 +399,7 @@ pub fn main(init: std.process.Init) !void {
     const spare = try vm.newContext();
     vm.vm_asm.spare_ctx = spare;
 
-    // Initialize FFI subsystem before image load (matches C++ init_ffi timing)
+    // Initialize FFI subsystem before image load
     primitives_ffi.initFfi();
 
     // Load the image FIRST (this initializes the nursery)
@@ -423,7 +416,6 @@ pub fn main(init: std.process.Init) !void {
     vm.initContext(spare);
 
     // Initialize special objects (stdin, stdout, stderr, etc.)
-    // Resolve executable and image paths to absolute (matching C++ VM's NSBundle behavior).
     // Factor derives resource-path from image-path's parent directory, so relative
     // paths break when current-directory changes (e.g. in with-test-directory).
     const executable_path: []const u8 = blk: {
@@ -444,7 +436,6 @@ pub fn main(init: std.process.Init) !void {
 
     // If the image is a boot image (stage2 not set), JIT compile all words
     // and quotations before running the startup quotation.
-    // Matches C++ prepare_boot_image() in factor.cpp
     const stage2 = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.stage2)];
     if (stage2 == layouts.false_object or stage2 == 0) {
         prepareBootImage(vm);
@@ -479,7 +470,7 @@ pub fn main(init: std.process.Init) !void {
 test "layouts" {
     // Test tag operations
     const tagged = layouts.tagFixnum(42);
-    try std.testing.expectEqual(@as(layouts.Cell, 42), layouts.untagFixnum(tagged));
+    try std.testing.expectEqual(@as(isize, 42), layouts.untagFixnum(tagged));
     try std.testing.expectEqual(@as(layouts.Cell, 0), layouts.TAG(tagged));
 
     // Test alignment
@@ -511,7 +502,7 @@ test "context" {
 }
 
 test "vm struct layout" {
-    // Verify critical offsets match C++
+    // Verify critical offsets.
     const cell_size = @sizeOf(layouts.Cell);
 
     // Test VMAssemblyFields layout

@@ -22,7 +22,6 @@ const CodeHeap = code_heap_mod.CodeHeap;
 const GC = gc_mod.GarbageCollector;
 
 // Scan cards in a generation for cross-generational references.
-// Uses RELATIVE card/deck indices (matching C++ visit_cards), accessing
 // the cards/decks arrays directly. This avoids the bug where absolute
 // indices with cards_offset could address memory before the cards array
 // when the generation start isn't deck-aligned.
@@ -65,7 +64,6 @@ pub fn scanCardsGeneration(
     const precise_aging = aging_end != 0;
 
     // Track last scanned object position across consecutive cards.
-    // Matches C++ visit_cards optimization: when scanning consecutive dirty
     // cards within a large object (e.g. a 600K-element array), reuse the
     // last object position instead of calling findObjectContainingCard
     // (which does a linear backward scan and is O(N) for large objects).
@@ -117,7 +115,6 @@ pub fn scanCardsGeneration(
             const card_end = card_start + vm_mod.card_size;
 
             // Reuse last scanned object position if it extends into this card.
-            // Matches C++ visit_card: if (!start || (start + obj->size()) < start_addr)
             //
             // OSM card index: must use (card_start - gen_start) / card_size, NOT
             // ci - gen_first_card. When gen_start is not card-aligned, the two
@@ -125,7 +122,6 @@ pub fn scanCardsGeneration(
             // skip objects spanning the card boundary.
             const first_obj = if (last_obj_start != 0 and last_obj_start < card_start) blk: {
                 // Use objectOrFreeSize which handles both live objects
-                // and free blocks (matching C++ object::size()).
                 const obj_size = gc_mod.objectOrFreeSize(last_obj_start);
                 if (obj_size > 0 and last_obj_start + obj_size > card_start) {
                     break :blk last_obj_start;
@@ -154,7 +150,6 @@ pub fn scanCardsGeneration(
                 break;
             }
 
-            // In precise mode, set card byte based on actual aging references
             if (precise_aging) {
                 cards[ci] = if (result.has_aging_ref) write_barrier.card_points_to_aging else 0;
             }
@@ -174,7 +169,6 @@ const ScanResult = struct {
 };
 
 // Walk objects in a dirty card and visit their slots.
-// Uses C++ visit_partial_objects approach: all pointer-bearing fields are
 // contiguous after the header, so we use slotCountAndSize() + a single generic
 // scan loop clipped to card boundaries. This eliminates the per-type switch
 // for slot visiting.
@@ -211,7 +205,6 @@ fn scanObjectsInCard(first_obj: Cell, card_start: Cell, card_end: Cell, tenured_
         const info = slotCountAndSize(obj_addr);
         if (info.size == 0) break;
 
-        // C++ visit_partial_objects: scan cells [obj+8 .. obj+8+slot_count*8),
         // clipped to [card_start, card_end). slot_count includes fixnum fields
         // (e.g. array capacity) which are harmless no-ops for visit_handle.
         if (info.slot_count > 0) {
@@ -254,7 +247,7 @@ const SlotCountAndSize = struct {
 // Combined slot count + object size from a single header read / type switch.
 // Replaces separate slotCount() + objectSizeFromHeader() calls, eliminating
 // two redundant header reads per object in the card scan hot path.
-inline fn slotCountAndSize(obj_addr: Cell) SlotCountAndSize {
+fn slotCountAndSize(obj_addr: Cell) SlotCountAndSize {
     const obj: *layouts.Object = @ptrFromInt(obj_addr);
     const t = obj.getType();
     return switch (t) {
@@ -320,7 +313,6 @@ inline fn slotCountAndSize(obj_addr: Cell) SlotCountAndSize {
 
 // Scan code heap for nursery/aging references using the remembered set.
 // Only code blocks that had their literals modified (via write barrier)
-// are scanned. This matches C++ visit_code_heap_roots.
 pub const CodeRootScanMode = enum { nursery, aging, both };
 
 pub fn scanCodeHeapRoots(gc: *GC, destination: *slot_visitor.CopyingDestination, mode: CodeRootScanMode) void {
@@ -423,7 +415,7 @@ fn scanCodeBlock(code: *CodeHeap, has_uninitialized: bool, gc: *GC, block: *code
 }
 
 // Visit a single slot, copying the object if needed (inlined from gc.zig visitSlot)
-inline fn visitSlot(slot: *Cell, destination: *slot_visitor.CopyingDestination) void {
+fn visitSlot(slot: *Cell, destination: *slot_visitor.CopyingDestination) void {
     const value = slot.*;
     if (layouts.isImmediate(value)) return;
     const new_value = destination.copy(value);

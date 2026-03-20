@@ -1,6 +1,3 @@
-// alien.zig - FFI/Alien primitives for Factor VM
-// Ported from vm/alien.cpp
-
 const std = @import("std");
 
 const bignum = @import("../bignum.zig");
@@ -27,7 +24,6 @@ fn toFixnum(vm: *FactorVM, tagged: Cell) Fixnum {
     }
 }
 
-// Cached handle for dlopen(NULL) like C++ null_dll
 pub var null_dll: ?*anyopaque = null;
 
 pub fn initFfi() void {
@@ -60,7 +56,6 @@ fn pinnedAlienOffset(vm: *FactorVM, obj: Cell) ?[*]u8 {
         },
         .f => return null,
         else => {
-            // C++ throws type_error(ALIEN_TYPE, obj) for non-alien, non-f values
             vm.typeError(.alien, obj);
         },
     }
@@ -117,8 +112,7 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
 
     // Root the alien before potential GC from allocation
     var rooted_alien = alien;
-    vm.data_roots.append(vm.allocator, &rooted_alien) catch
-        vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&rooted_alien);
     defer _ = vm.data_roots.pop();
 
     const tagged = vm.allotObject(.alien, @sizeOf(layouts.Alien)) orelse
@@ -151,7 +145,6 @@ inline fn alienPointer(vm: *FactorVM) [*]u8 {
         @call(.never_inline, toFixnum, .{ vm, offset_cell });
     const obj = vm.pop();
     if (vm.alienOffset(obj)) |ptr| {
-        // Wrapping add handles negative offsets correctly (C equivalent: ptr + offset)
         const addr = @intFromPtr(ptr) +% @as(usize, @bitCast(offset));
         return @ptrFromInt(addr);
     }
@@ -324,7 +317,6 @@ pub export fn primitive_alien_cell(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const typed_ptr: *align(1) const Cell = @ptrCast(ptr);
     const value = typed_ptr.*;
 
-    // NULL pointer maps to f (false_object), matching C++ allot_alien(false_object, 0)
     if (value == 0) {
         vm.push(layouts.false_object);
         return;
@@ -353,7 +345,6 @@ pub export fn primitive_set_alien_cell(vm_asm: *VMAssemblyFields) callconv(.c) v
 }
 
 // Signed/unsigned cell primitives — read/write cell-sized integers (not alien pointers).
-// On 64-bit, cell == 8 bytes, so these are equivalent to signed/unsigned 8.
 pub const primitive_alien_signed_cell = primitive_alien_signed_8;
 pub const primitive_set_alien_signed_cell = primitive_set_alien_signed_8;
 pub const primitive_alien_unsigned_cell = primitive_alien_unsigned_8;
@@ -366,7 +357,6 @@ comptime {
     @export(&primitive_set_alien_unsigned_8, .{ .name = "primitive_set_alien_unsigned_cell", .linkage = .strong });
 }
 
-// DLL primitives using direct C library calls (matches C++ VM behavior)
 pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     const path_cell = vm.pop();

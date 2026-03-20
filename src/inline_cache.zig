@@ -1,10 +1,3 @@
-// inline_cache.zig - Polymorphic Inline Cache (PIC) implementation
-// Ported from vm/inline_cache.hpp, vm/inline_cache.cpp
-//
-// PICs optimize method dispatch by caching recent class/method pairs
-// at each call site. This avoids repeated method lookup for monomorphic
-// and oligomorphic call sites.
-
 const std = @import("std");
 const builtin = @import("builtin");
 
@@ -52,7 +45,6 @@ pub const InlineCacheJit = struct {
 
         var klass = klass_in;
         var method = method_in;
-        try vm.data_roots.ensureUnusedCapacity(vm.allocator, 2);
         vm.data_roots.appendAssumeCapacity(&klass);
         defer _ = vm.data_roots.pop();
         vm.data_roots.appendAssumeCapacity(&method);
@@ -100,7 +92,6 @@ pub const InlineCacheJit = struct {
         var generic_word = generic_word_in;
         var methods = methods_in;
         var cache_entries = cache_entries_in;
-        try vm.data_roots.ensureUnusedCapacity(vm.allocator, 3);
         vm.data_roots.appendAssumeCapacity(&generic_word);
         defer _ = vm.data_roots.pop();
         vm.data_roots.appendAssumeCapacity(&methods);
@@ -165,7 +156,6 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
     var generic_word = ctx.pop();
 
     // Register heap pointers as GC roots — batch capacity for all 4 roots
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 4) catch @panic("OOM");
     vm.data_roots.appendAssumeCapacity(&cache_entries);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&methods);
@@ -185,7 +175,6 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
     var obj: Cell = @as(*const Cell, @ptrFromInt(obj_addr)).*;
     vm.data_roots.appendAssumeCapacity(&obj);
     defer _ = vm.data_roots.pop();
-
 
     // Determine current PIC size
     var pic_size: Cell = 0;
@@ -218,7 +207,7 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
 
             if (maybe_new_entries) |new_entries_value| {
                 var new_cache_entries: Cell = new_entries_value;
-                vm.data_roots.append(vm.allocator, &new_cache_entries) catch @panic("OOM");
+                vm.data_roots.appendAssumeCapacity(&new_cache_entries);
                 defer _ = vm.data_roots.pop();
 
                 const new_xt = generateInlineCache(vm, index, generic_word, methods, new_cache_entries, tail_call_p);
@@ -240,7 +229,6 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
 
     return xt;
 }
-
 
 fn updatePicTransitions(vm: *FactorVM, pic_size: Cell) void {
     if (pic_size == vm.max_pic_size) {
@@ -270,13 +258,11 @@ fn deallocateInlineCache(vm: *FactorVM, return_address: Cell) void {
     }
 }
 
-// Add an entry to the cache - implementation that allocates in the VM heap
 pub fn addInlineCacheEntry(vm: *FactorVM, cache_entries: Cell, klass: Cell, method: Cell) ?Cell {
     var klass_copy = klass;
     var method_copy = method;
     var entries_copy = cache_entries;
 
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 3) catch return null;
     vm.data_roots.appendAssumeCapacity(&klass_copy);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&method_copy);
@@ -317,7 +303,6 @@ fn generateInlineCache(vm: *FactorVM, index: Fixnum, generic_word_in: Cell, meth
     var generic_word = generic_word_in;
     var methods = methods_in;
     var cache_entries = cache_entries_in;
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, 3) catch return 0;
     vm.data_roots.appendAssumeCapacity(&generic_word);
     defer _ = vm.data_roots.pop();
     vm.data_roots.appendAssumeCapacity(&methods);
@@ -406,7 +391,7 @@ pub const CallSitePatcher = struct {
         return getCallTargetUnchecked(return_address);
     }
 
-    pub inline fn getCallTargetUnchecked(return_address: Cell) Cell {
+    pub fn getCallTargetUnchecked(return_address: Cell) Cell {
         const offset_ptr: *align(1) const i32 = @ptrFromInt(return_address - 4);
         const offset: i64 = offset_ptr.*;
         return @intCast(@as(i64, @intCast(return_address)) + offset);

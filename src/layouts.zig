@@ -1,12 +1,8 @@
 // layouts.zig - Core type definitions for Factor VM
-// Must be kept in sync with:
-//   basis/bootstrap/layouts.factor
-//   basis/vm/vm.factor
-
 const std = @import("std");
 
-pub const Cell = usize; // Equivalent to C++ cell (uintptr_t)
-pub const Fixnum = isize; // Equivalent to C++ fixnum (intptr_t)
+pub const Cell = usize;
+pub const Fixnum = isize;
 
 pub fn orderCell(context: Cell, item: Cell) std.math.Order {
     return std.math.order(context, item);
@@ -33,7 +29,6 @@ pub inline fn RETAG(x: Cell, new_tag: Cell) Cell {
     return UNTAG(x) | new_tag;
 }
 
-// Type tags - must match basis/bootstrap/layouts.factor
 pub const TypeTag = enum(u4) {
     fixnum = 0,
     f = 1, // false/nil
@@ -59,13 +54,13 @@ pub inline fn typeTag(x: Cell) TypeTag {
     return @enumFromInt(x & tag_mask);
 }
 
-pub fn retag(x: Cell, type_tag: TypeTag) Cell {
+pub inline fn retag(x: Cell, type_tag: TypeTag) Cell {
     return UNTAG(x) | @intFromEnum(type_tag);
 }
 
 pub const type_count: Cell = 14;
 
-pub inline fn typeHasNoPointers(type_tag: TypeTag) bool {
+pub fn typeHasNoPointers(type_tag: TypeTag) bool {
     return switch (type_tag) {
         .bignum, .byte_array, .float, .callstack => true,
         else => false,
@@ -84,18 +79,18 @@ pub const FPTrap = struct {
 // The 'f' (false) object - just the tag value
 pub const false_object: Cell = @intFromEnum(TypeTag.f);
 
-pub inline fn isImmediate(obj: Cell) bool {
+pub fn isImmediate(obj: Cell) bool {
     return TAG(obj) <= @intFromEnum(TypeTag.f);
 }
 
 // Fixnum operations
-pub inline fn untagFixnum(tagged: Cell) Fixnum {
+pub fn untagFixnum(tagged: Cell) Fixnum {
     return @as(Fixnum, @bitCast(tagged)) >> @intCast(tag_bits);
 }
 
 // Same as untagFixnum but returns Cell (usize) - for use in sizes/indices.
 // Returns 0 for invalid inputs during GC to avoid crashing on corrupted objects.
-pub inline fn untagFixnumUnsigned(tagged: Cell) Cell {
+pub fn untagFixnumUnsigned(tagged: Cell) Cell {
     if (!hasTag(tagged, .fixnum)) {
         return 0;
     }
@@ -103,19 +98,19 @@ pub inline fn untagFixnumUnsigned(tagged: Cell) Cell {
 }
 
 // Fast variant of untagFixnumUnsigned for hot paths outside GC.
-pub inline fn untagFixnumFast(tagged: Cell) Cell {
+pub fn untagFixnumFast(tagged: Cell) Cell {
     return @bitCast(@as(Fixnum, @bitCast(tagged)) >> @intCast(tag_bits));
 }
 
-pub inline fn tagFixnum(untagged: Fixnum) Cell {
+pub fn tagFixnum(untagged: Fixnum) Cell {
     return (@as(Cell, @bitCast(untagged << @intCast(tag_bits)))) | @intFromEnum(TypeTag.fixnum);
 }
 
-pub inline fn alignCell(a: Cell, b: Cell) Cell {
+pub fn alignCell(a: Cell, b: Cell) Cell {
     return (a + (b - 1)) & ~(b - 1);
 }
 
-pub inline fn alignmentFor(a: Cell, b: Cell) Cell {
+pub fn alignmentFor(a: Cell, b: Cell) Cell {
     return alignCell(a, b) - a;
 }
 
@@ -132,11 +127,11 @@ pub const Object = extern struct {
 
     header: Cell,
 
-    pub inline fn isFree(self: *const Object) bool {
+    pub fn isFree(self: *const Object) bool {
         return (self.header & 1) == 1;
     }
 
-    pub inline fn getType(self: *const Object) TypeTag {
+    pub fn getType(self: *const Object) TypeTag {
         return @enumFromInt(@as(u4, @truncate((self.header >> 2) & tag_mask)));
     }
 
@@ -152,17 +147,17 @@ pub const Object = extern struct {
         self.header = (self.header & 0x3f) | (hc << 6);
     }
 
-    pub inline fn isForwardingPointer(self: *const Object) bool {
+    pub fn isForwardingPointer(self: *const Object) bool {
         return (self.header & 2) == 2;
     }
 
-    pub inline fn forwardingPointer(self: *const Object) *Object {
+    pub fn forwardingPointer(self: *const Object) *Object {
         std.debug.assert(self.isForwardingPointer());
         std.debug.assert(UNTAG(self.header) != 0);
         return @ptrFromInt(UNTAG(self.header));
     }
 
-    pub inline fn forwardTo(self: *Object, pointer: *Object) void {
+    pub fn forwardTo(self: *Object, pointer: *Object) void {
         self.header = @intFromPtr(pointer) | 2;
     }
 
@@ -194,8 +189,6 @@ pub const Array = extern struct {
         return untagFixnumUnsigned(self.capacity);
     }
 };
-
-// Array helper functions - equivalent to vm/generic_arrays.hpp and vm/arrays.hpp
 
 pub fn arrayCapacity(array: Cell) Cell {
     std.debug.assert(hasTag(array, .array));
@@ -234,7 +227,6 @@ pub const TupleLayout = extern struct {
         return @ptrCast(@alignCast(base + @sizeOf(TupleLayout)));
     }
 
-    // C++ doesn't follow forwarding pointers here - the dispatch tables
     // and layouts are fixed up during image loading, and GC updates them
     pub fn nthSuperclass(self: *const TupleLayout, echelon_idx: Cell) Cell {
         return self.data()[echelon_idx * 2];
@@ -246,7 +238,6 @@ pub const TupleLayout = extern struct {
     }
 };
 
-// Bignum - import from bignum.zig which has the full implementation
 const bignum = @import("bignum.zig");
 pub const Bignum = bignum.Bignum;
 
@@ -283,10 +274,6 @@ pub const String = extern struct {
     }
 };
 
-// Word object - assembly code makes assumptions about layout
-// See: basis/bootstrap/images/images.factor
-//      basis/compiler/constants/constants.factor
-//      basis/bootstrap/primitives.factor
 pub const Word = extern struct {
     header: Cell,
     hashcode_field: Cell, // TAGGED hashcode
@@ -320,10 +307,6 @@ pub const BoxedFloat = extern struct {
     pub const type_number = TypeTag.float;
 };
 
-// Quotation object - assembly code makes assumptions about layout
-// See: basis/bootstrap/images/images.factor
-//      basis/compiler/constants/constants.factor
-//      core/bootstrap/primitives.factor
 pub const Quotation = extern struct {
     header: Cell,
     array: Cell, // tagged
@@ -429,9 +412,7 @@ pub fn stringCapacity(str: *const String) Cell {
     return untagFixnum(str.length);
 }
 
-// Get the number of slots (cells) in an object that should be scanned by GC
-// This is the count of cell-sized fields after the header
-// Based on vm/slot_visitor.hpp slot_count()
+// Get the number of slots (cells) in an object that should be scanned by GC.
 pub fn slotCount(obj: Cell) Cell {
     if (isImmediate(obj)) return 0;
 
@@ -484,7 +465,6 @@ pub fn slotCount(obj: Cell) Cell {
 }
 
 // Like slot_count, but takes an untagged object address (reads type from header).
-// Use this when iterating objects in a heap region where addresses are not tagged.
 pub fn slotCountFromAddress(obj_addr: Cell) Cell {
     if (obj_addr < 0x1000) return 0;
 
@@ -501,7 +481,7 @@ pub fn slotCountFromAddress(obj_addr: Cell) Cell {
         .tuple => {
             const t: *const Tuple = @ptrCast(object_ptr);
             const layout_cell = t.layout;
-            // NOTE: TupleLayout has array tag (2), not tuple tag (7)!
+    // TupleLayout has array tag (2), not tuple tag (7).
             if (hasTag(layout_cell, .array)) {
                 const layout_addr = followForwardingPointers(layout_cell);
                 const layout: *const TupleLayout = @ptrFromInt(layout_addr);
@@ -520,17 +500,11 @@ pub fn slotCountFromAddress(obj_addr: Cell) Cell {
     };
 }
 
-// NOTE: For array reallocation, use FactorVM.reallotArray()
 // Array reallocation requires VM context for proper allocation and GC coordination.
-// See vm.zig FactorVM.reallotArray() for the implementation.
-//
-// The function signature in vm.zig is:
-//   pub fn reallotArray(self: *FactorVM, old_array: Cell, new_capacity: Cell) ?Cell
 
 // Follow forwarding pointer chain to find the actual object location.
 // This is critical during GC when objects may have been moved.
-// Equivalent to C++ fixup.translate_data().
-pub inline fn followForwardingPointers(addr: Cell) Cell {
+pub fn followForwardingPointers(addr: Cell) Cell {
     var current = UNTAG(addr);
 
     // Safety check: don't dereference null/invalid pointers
