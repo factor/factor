@@ -192,13 +192,10 @@ pub export fn primitive_callstack_to_array(vm_asm: *VMAssemblyFields) callconv(.
 
     iterateCallstackObject(vm, callstack, FrameAccumulator, &accumulator);
 
-    const array_size = @sizeOf(layouts.Array) + frame_count * @sizeOf(Cell);
-    const tagged = vm.allotObject(.array, array_size) orelse {
+    const tagged = vm.allotUninitializedArray(frame_count) orelse {
         vm.memoryError();
     };
     const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
-    arr.capacity = layouts.tagFixnum(@intCast(frame_count));
-
     const arr_data = arr.data();
     @memcpy(arr_data[0..frame_count], frame_data[0..frame_count]);
 

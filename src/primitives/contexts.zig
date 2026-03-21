@@ -71,13 +71,10 @@ fn stackToArray(vm: *FactorVM, bottom: Cell, top: Cell) Cell {
     const depth_cells: Cell = @intCast(@divExact(@as(u64, @intCast(depth_bytes)), @sizeOf(Cell)));
 
     // Allocate array, triggering GC if needed
-    const array_size = @sizeOf(layouts.Array) + depth_cells * @sizeOf(Cell);
-    const tagged = vm.allotObject(.array, array_size) orelse {
+    const tagged = vm.allotUninitializedArray(depth_cells) orelse {
         vm.memoryError();
     };
     const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
-
-    arr.capacity = layouts.tagFixnum(@intCast(depth_cells));
 
     // Copy stack data to array
     const src: [*]const Cell = @ptrFromInt(bottom);

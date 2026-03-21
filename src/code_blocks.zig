@@ -691,14 +691,17 @@ fn codeBlockOwner(block: *const CodeBlock) Cell {
 
 fn computeEntryPoint(obj: Cell) Cell {
     const tag = layouts.typeTag(obj);
-    if (tag == .word) {
-        const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(obj));
-        return word.entry_point;
-    } else if (tag == .quotation) {
-        const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(obj));
-        return quot.entry_point;
+    switch (tag) {
+        .word => {
+            const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(obj));
+            return word.entry_point;
+        },
+        .quotation => {
+            const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(obj));
+            return quot.entry_point;
+        },
+        else => unreachable,
     }
-    unreachable;
 }
 
 fn isQuotationCompiled(quot: *const layouts.Quotation, lazy_jit_ep: Cell) bool {

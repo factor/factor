@@ -118,14 +118,10 @@ pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) 
         truncated < @as(f64, @floatFromInt(std.math.minInt(i128))) or
         truncated > @as(f64, @floatFromInt(std.math.maxInt(i128))))
     {
-        const total_size = @sizeOf(bignum.Bignum) + @sizeOf(Cell);
-        const zero_tagged = vm.allotObject(.bignum, total_size) orelse {
+        const bn = bignum.allocBignumZeroed(vm, 0, false) catch {
             vm.memoryError();
         };
-        const bn: *bignum.Bignum = @ptrFromInt(layouts.UNTAG(zero_tagged));
-        bn.capacity = layouts.tagFixnum(1);
-        bn.setNegative(false);
-        ctx.replace(zero_tagged);
+        ctx.replace(layouts.tagBignum(bn));
         return;
     }
 
@@ -133,14 +129,10 @@ pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) 
 
     // Handle zero
     if (int_val == 0) {
-        const total_size = @sizeOf(bignum.Bignum) + @sizeOf(Cell);
-        const zero_tagged = vm.allotObject(.bignum, total_size) orelse {
+        const bn = bignum.allocBignumZeroed(vm, 0, false) catch {
             vm.memoryError();
         };
-        const bn: *bignum.Bignum = @ptrFromInt(layouts.UNTAG(zero_tagged));
-        bn.capacity = layouts.tagFixnum(1);
-        bn.setNegative(false);
-        ctx.replace(zero_tagged);
+        ctx.replace(layouts.tagBignum(bn));
         return;
     }
 
@@ -159,13 +151,9 @@ pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) 
     }
 
     // Allocate bignum
-    const total_size = @sizeOf(bignum.Bignum) + (num_digits + 1) * @sizeOf(Cell);
-    const bn_tagged = vm.allotObject(.bignum, total_size) orelse {
+    const bn = bignum.allocBignum(vm, num_digits, negative) catch {
         vm.memoryError();
     };
-    const bn: *bignum.Bignum = @ptrFromInt(layouts.UNTAG(bn_tagged));
-    bn.capacity = layouts.tagFixnum(@intCast(num_digits + 1));
-    bn.setNegative(negative);
 
     // Fill in the digits (little-endian)
     temp = abs_val;
@@ -174,7 +162,7 @@ pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) 
         temp >>= digit_bits;
     }
 
-    ctx.replace(bn_tagged);
+    ctx.replace(layouts.tagBignum(bn));
 }
 
 // --- Fixnum Arithmetic Primitives ---
@@ -646,20 +634,22 @@ pub export fn primitive_bits_float(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const tag = layouts.typeTag(int_cell);
 
     var bits: u32 = 0;
-    if (tag == .fixnum) {
-        // Negative fixnums give valid bit patterns via truncation.
-        const fixnum_val = layouts.untagFixnum(int_cell);
-        const as_u64: u64 = @bitCast(@as(i64, fixnum_val));
-        bits = @truncate(as_u64);
-    } else if (tag == .bignum) {
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
-        var cell_val: u64 = 0;
-        const len = bn.length();
-        if (len > 0) cell_val = bn.getDigit(0);
-        if (bn.isNegative()) cell_val = ~cell_val +% 1;
-        bits = @truncate(cell_val);
-    } else {
-        vm.typeError(.fixnum, int_cell);
+    switch (tag) {
+        .fixnum => {
+            // Negative fixnums give valid bit patterns via truncation.
+            const fixnum_val = layouts.untagFixnum(int_cell);
+            const as_u64: u64 = @bitCast(@as(i64, fixnum_val));
+            bits = @truncate(as_u64);
+        },
+        .bignum => {
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
+            var cell_val: u64 = 0;
+            const len = bn.length();
+            if (len > 0) cell_val = bn.getDigit(0);
+            if (bn.isNegative()) cell_val = ~cell_val +% 1;
+            bits = @truncate(cell_val);
+        },
+        else => vm.typeError(.fixnum, int_cell),
     }
 
     const f32_val: f32 = @bitCast(bits);
@@ -710,31 +700,33 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
     const tag = layouts.typeTag(int_cell);
 
     var bits: u64 = 0;
-    if (tag == .fixnum) {
-        // Cast signed fixnum to u64, preserving bit pattern for negative values.
-        // e.g. -1 → 0xFFFFFFFFFFFFFFFF → NaN double
-        const fixnum_val = layouts.untagFixnum(int_cell);
-        bits = @bitCast(@as(i64, fixnum_val));
-    } else if (tag == .bignum) {
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
-        // Extract low 64 bits from bignum magnitude.
-        const len = bn.length();
-        if (len == 0) {
-            bits = 0;
-        } else if (len == 1) {
-            bits = bn.getDigit(0);
-        } else {
-            // Use low 64 bits for oversized bignums
-            const low = bn.getDigit(0);
-            const high = bn.getDigit(1);
-            bits = (high << bignum.DIGIT_BITS) | low;
-        }
-        // Handle negative bignums: two's complement
-        if (bn.isNegative()) {
-            bits = ~bits +% 1;
-        }
-    } else {
-        vm.typeError(.fixnum, int_cell);
+    switch (tag) {
+        .fixnum => {
+            // Cast signed fixnum to u64, preserving bit pattern for negative values.
+            // e.g. -1 → 0xFFFFFFFFFFFFFFFF → NaN double
+            const fixnum_val = layouts.untagFixnum(int_cell);
+            bits = @bitCast(@as(i64, fixnum_val));
+        },
+        .bignum => {
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(int_cell));
+            // Extract low 64 bits from bignum magnitude.
+            const len = bn.length();
+            if (len == 0) {
+                bits = 0;
+            } else if (len == 1) {
+                bits = bn.getDigit(0);
+            } else {
+                // Use low 64 bits for oversized bignums
+                const low = bn.getDigit(0);
+                const high = bn.getDigit(1);
+                bits = (high << bignum.DIGIT_BITS) | low;
+            }
+            // Handle negative bignums: two's complement
+            if (bn.isNegative()) {
+                bits = ~bits +% 1;
+            }
+        },
+        else => vm.typeError(.fixnum, int_cell),
     }
 
     const f64_val: f64 = @bitCast(bits);
@@ -877,12 +869,7 @@ pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) voi
 
     // Allocate byte array for result
     const result_len = final_result.len;
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = header_size + result_len;
-
-    const tagged = vm.allotObject(.byte_array, total_size) orelse {
-        vm.memoryError();
-    };
+    const tagged = vm.allotUninitializedByteArray(result_len);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(result_len));
 
@@ -895,17 +882,10 @@ pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) voi
 // --- Helper Functions ---
 
 fn allocBignumWithDigit(vm: *FactorVM, len: Cell, negative: bool, digit_val: Cell) !*bignum.Bignum {
-    const total_size = @sizeOf(bignum.Bignum) + (len + 1) * @sizeOf(Cell);
-    const tagged = vm.allotObject(.bignum, total_size) orelse return error.OutOfMemory;
-    const bn: *bignum.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
-    bn.capacity = layouts.tagFixnum(@intCast(len + 1));
-    bn.setNegative(negative);
+    const bn = try bignum.allocBignumZeroed(vm, len, negative);
 
     if (len > 0) {
         bn.setDigit(0, digit_val);
-    }
-    for (1..len) |i| {
-        bn.setDigit(i, 0);
     }
 
     return bn;

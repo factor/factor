@@ -25,18 +25,20 @@ fn unboxArraySize(vm: *FactorVM, obj: Cell) ?Cell {
     var n: Fixnum = undefined;
 
     const tag = layouts.typeTag(obj);
-    if (tag == .fixnum) {
-        n = layouts.untagFixnum(obj);
-    } else if (tag == .bignum) {
-        // Try to convert bignum to fixnum
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(obj));
-        if (!bignum.fitsFixnum(bn)) {
-            // Bignum too large for fixnum - throw out_of_fixnum_range
-            vm.fixnumRangeError(obj);
-        }
-        n = bignum.toFixnum(bn);
-    } else {
-        vm.fixnumRangeError(obj);
+    switch (tag) {
+        .fixnum => {
+            n = layouts.untagFixnum(obj);
+        },
+        .bignum => {
+            // Try to convert bignum to fixnum
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(obj));
+            if (!bignum.fitsFixnum(bn)) {
+                // Bignum too large for fixnum - throw out_of_fixnum_range
+                vm.fixnumRangeError(obj);
+            }
+            n = bignum.toFixnum(bn);
+        },
+        else => vm.fixnumRangeError(obj),
     }
 
     // Check array size bounds
@@ -495,15 +497,7 @@ pub export fn primitive_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
         _ = vm.data_roots.pop();
     };
 
-    // Allocate array (may trigger GC). Use no-fill variant since we immediately
-    // overwrite every element with fill below.
-    const tagged = vm.allotUninitializedArrayNoFill(capacity) orelse vm.memoryError();
-
-    // Fill with rooted fill value (may have been moved by GC)
-    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
-    @memset(arr.data()[0..capacity], fill);
-
-    vm.push(tagged);
+    vm.push(vm.allotArray(capacity, fill) orelse vm.memoryError());
 }
 
 pub export fn primitive_resize_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -545,15 +539,7 @@ pub export fn primitive_uninitialized_byte_array(vm_asm: *VMAssemblyFields) call
     const size_cell = vm.pop();
     const size = unboxArraySize(vm, size_cell) orelse return;
 
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = layouts.alignCell(header_size + size, layouts.data_alignment);
-
-    // Use allotObject which routes large objects to tenured space
-    const tagged = vm.allotObject(.byte_array, total_size) orelse vm.memoryError();
-    const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
-    ba.capacity = layouts.tagFixnum(@intCast(size));
-    // Don't initialize data - left uninitialized for performance
-    vm.push(tagged);
+    vm.push(vm.allotUninitializedByteArray(size));
 }
 
 pub export fn primitive_resize_byte_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -587,11 +573,8 @@ pub export fn primitive_resize_byte_array(vm_asm: *VMAssemblyFields) callconv(.c
     vm.data_roots.appendAssumeCapacity(&ba_cell);
     defer _ = vm.data_roots.pop();
 
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = layouts.alignCell(header_size + new_size, layouts.data_alignment);
-
     // Use allotObject which routes large objects to tenured space
-    const tagged = vm.allotObject(.byte_array, total_size) orelse vm.memoryError();
+    const tagged = vm.allotUninitializedByteArray(new_size);
     const addr = layouts.UNTAG(tagged);
 
     const new_ba: *layouts.ByteArray = @ptrFromInt(addr);
@@ -682,12 +665,27 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
         return;
     }
 
+    const in_nursery = vm.vm_asm.nursery.contains(@ptrFromInt(layouts.UNTAG(str_cell)));
+    const has_aux = old_str.aux != layouts.false_object and layouts.hasTag(old_str.aux, .byte_array);
+    const aux_in_nursery = !has_aux or vm.vm_asm.nursery.contains(@ptrFromInt(layouts.UNTAG(old_str.aux)));
+    if (in_nursery and aux_in_nursery and new_length <= old_length) {
+        const str_mut: *layouts.String = @ptrFromInt(layouts.UNTAG(str_cell));
+        str_mut.length = layouts.tagFixnum(@intCast(new_length));
+
+        if (has_aux) {
+            const aux: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(str_mut.aux));
+            aux.capacity = layouts.tagFixnum(@intCast(new_length * 2));
+        }
+
+        vm.push(str_cell);
+        return;
+    }
+
     // Root old string - allocation can trigger GC
     vm.data_roots.appendAssumeCapacity(&str_cell);
     defer _ = vm.data_roots.pop();
 
     // Use allotObject which routes large objects to tenured space
-    const has_aux = old_str.aux != layouts.false_object and layouts.hasTag(old_str.aux, .byte_array);
     const string_size = layouts.alignCell(@sizeOf(layouts.String) + new_length, layouts.data_alignment);
 
     var tagged = vm.allotObject(.string, string_size) orelse vm.memoryError();

@@ -116,15 +116,14 @@ pub const InlineCacheJit = struct {
         if (cache_entries != layouts.false_object and
             layouts.hasTag(cache_entries, .array))
         {
+            const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
+            const data = entries.data();
             const entry_count = blk: {
-                const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
                 break :blk layouts.untagFixnumUnsigned(entries.capacity);
             };
 
             var i: Cell = 0;
             while (i + 1 < entry_count) : (i += 2) {
-                const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
-                const data = entries.data();
                 const klass = data[i];
                 const method = data[i + 1];
 
@@ -194,16 +193,15 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
             std.debug.assert(layouts.TAG(obj) < layouts.type_count);
         }
 
-        const klass = dispatch.objectClass(obj);
-        const method = dispatch.lookupMethod(obj, methods);
+        const method_lookup = dispatch.lookupMethodAndClass(obj, methods);
 
-        if (method != layouts.false_object) {
+        if (method_lookup.method != layouts.false_object) {
             if (comptime builtin.mode == .Debug) {
-                const method_tag = layouts.typeTag(method);
+                const method_tag = layouts.typeTag(method_lookup.method);
                 std.debug.assert(method_tag == .word or method_tag == .quotation);
             }
 
-            const maybe_new_entries = addInlineCacheEntry(vm, cache_entries, klass, method);
+            const maybe_new_entries = addInlineCacheEntry(vm, cache_entries, method_lookup.klass, method_lookup.method);
 
             if (maybe_new_entries) |new_entries_value| {
                 var new_cache_entries: Cell = new_entries_value;
@@ -223,8 +221,11 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
         if (comptime builtin.mode == .Debug) {
             std.debug.assert(CallSitePatcher.isValidCallSite(return_root.value));
         }
-        deallocateInlineCache(vm, return_root.value);
-        CallSitePatcher.setCallTarget(return_root.value, xt);
+        const current_target = CallSitePatcher.getCallTarget(return_root.value);
+        if (current_target != xt) {
+            deallocateInlineCache(vm, return_root.value);
+            CallSitePatcher.setCallTarget(return_root.value, xt);
+        }
     }
 
     return xt;
@@ -271,7 +272,7 @@ pub fn addInlineCacheEntry(vm: *FactorVM, cache_entries: Cell, klass: Cell, meth
     defer _ = vm.data_roots.pop();
 
     if (entries_copy == layouts.false_object) {
-        const new_array_cell = vm.allotUninitializedArrayNoFill(2) orelse return null;
+        const new_array_cell = vm.allotUninitializedArray(2) orelse return null;
         const new_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_array_cell));
         const arr_data = new_array.data();
         arr_data[0] = klass_copy;
@@ -281,15 +282,27 @@ pub fn addInlineCacheEntry(vm: *FactorVM, cache_entries: Cell, klass: Cell, meth
 
     std.debug.assert(layouts.hasTag(entries_copy, .array));
 
-    const old_entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(entries_copy));
+    const old_entries: *layouts.Array = @ptrFromInt(layouts.UNTAG(entries_copy));
     const old_size = layouts.untagFixnumUnsigned(old_entries.capacity);
+    const old_data = old_entries.data();
+
+    var i: Cell = 0;
+    while (i < old_size) : (i += 2) {
+        if (old_data[i] == klass_copy) {
+            if (old_data[i + 1] == method_copy) {
+                return null;
+            }
+            old_data[i + 1] = method_copy;
+            vm.writeBarrierKnownHeap(&old_data[i]);
+            return entries_copy;
+        }
+    }
+
     const new_size = old_size + 2;
 
-    const new_array_cell = vm.allotUninitializedArrayNoFill(new_size) orelse return null;
+    const new_array_cell = vm.allotUninitializedArray(new_size) orelse return null;
     const new_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_array_cell));
     const new_data = new_array.data();
-    const old_entries_updated: *const layouts.Array = @ptrFromInt(layouts.UNTAG(entries_copy));
-    const old_data = old_entries_updated.data();
 
     @memcpy(new_data[0..old_size], old_data[0..old_size]);
 

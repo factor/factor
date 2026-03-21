@@ -757,7 +757,7 @@ pub const Jit = struct {
         // Allocate relocation byte array (rooted)
         var reloc_cell: Cell = layouts.false_object;
         if (self.relocation.items.len > 0) {
-            reloc_cell = self.vm.allotByteArray(self.relocation.items.len);
+            reloc_cell = self.vm.allotUninitializedByteArray(self.relocation.items.len);
             if (reloc_cell == layouts.false_object) @panic("OOM allocating relocation byte array");
             const reloc_ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(reloc_cell));
             @memcpy(reloc_ba.data()[0..self.relocation.items.len], self.relocation.items);

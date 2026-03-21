@@ -135,26 +135,30 @@ pub fn fromSignedCell(vm: *FactorVM, n: i64) Cell {
 // Convert Factor integer to unsigned (handles fixnums and bignums)
 pub fn toUnsignedCell(vm: *FactorVM, n: Cell) Cell {
     const tag = layouts.typeTag(n);
-    if (tag == .fixnum) {
-        return layouts.untagFixnumUnsigned(n);
-    } else if (tag == .bignum) {
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(n));
-        return bignum.toCell(bn);
-    } else {
-        vm.typeError(.fixnum, n);
+    switch (tag) {
+        .fixnum => {
+            return layouts.untagFixnumUnsigned(n);
+        },
+        .bignum => {
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(n));
+            return bignum.toCell(bn);
+        },
+        else => vm.typeError(.fixnum, n),
     }
 }
 
 // Convert Factor integer to signed (handles fixnums and bignums)
 pub fn toSignedCell(vm: *FactorVM, n: Cell) i64 {
     const tag = layouts.typeTag(n);
-    if (tag == .fixnum) {
-        return layouts.untagFixnum(n);
-    } else if (tag == .bignum) {
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(n));
-        return bignum.toInt64(bn);
-    } else {
-        vm.typeError(.fixnum, n);
+    switch (tag) {
+        .fixnum => {
+            return layouts.untagFixnum(n);
+        },
+        .bignum => {
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(n));
+            return bignum.toInt64(bn);
+        },
+        else => vm.typeError(.fixnum, n),
     }
 }
 

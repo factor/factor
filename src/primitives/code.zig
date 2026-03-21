@@ -67,166 +67,168 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 
         const code_tag = layouts.typeTag(rooted_code);
 
-        if (code_tag == .quotation or code_tag == .tuple) {
-            // Quotation or tuple (curry/compose) case: JIT compile and update
-            // QUOTATION_TYPE and TUPLE_TYPE (see issue #2763).
+        switch (code_tag) {
+            .quotation, .tuple => {
+                // Quotation or tuple (curry/compose) case: JIT compile and update
+                // QUOTATION_TYPE and TUPLE_TYPE (see issue #2763).
 
-            // because quotation-compiled? depends on the identity of its code block.
-            // Without this, recompiling lazy-jit-compile changes the sentinel
-            // entry_point, causing all quotations with the OLD sentinel to appear
-            // "compiled" (old_ep != new_ep), which creates infinite loops.
-            const word_pre: *const layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
-            if (word_pre.entry_point != 0 and
-                rooted_word == vm.specialObject(.lazy_jit_compile_word))
-            {
-                continue;
-            }
+                // because quotation-compiled? depends on the identity of its code block.
+                // Without this, recompiling lazy-jit-compile changes the sentinel
+                // entry_point, causing all quotations with the OLD sentinel to appear
+                // "compiled" (old_ep != new_ep), which creates infinite loops.
+                const word_pre: *const layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
+                if (word_pre.entry_point != 0 and
+                    rooted_word == vm.specialObject(.lazy_jit_compile_word))
+                {
+                    continue;
+                }
 
-            // Compile the definition with the word as owner.
-            // Code blocks are added to uninitialized_blocks and initialized later by
-            // updateCodeHeapWords, after ALL word entry_points have been set.
-            // This ensures cross-references between words resolve correctly.
-            const compiled = vm.jitCompileQuotationWithOwner(rooted_word, rooted_code, false);
-            const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
-            if (compiled) |cb| {
-                word_after.entry_point = cb.entryPoint();
-            } else {
-                word_after.entry_point = vm.lazyJitCompileEntryPoint();
-            }
+                // Compile the definition with the word as owner.
+                // Code blocks are added to uninitialized_blocks and initialized later by
+                // updateCodeHeapWords, after ALL word entry_points have been set.
+                // This ensures cross-references between words resolve correctly.
+                const compiled = vm.jitCompileQuotationWithOwner(rooted_word, rooted_code, false);
+                const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
+                if (compiled) |cb| {
+                    word_after.entry_point = cb.entryPoint();
+                } else {
+                    word_after.entry_point = vm.lazyJitCompileEntryPoint();
+                }
 
-            // Compile pic_def and pic_tail_def if present.
-            if (word_after.pic_def != layouts.false_object) {
-                vm.jitCompileQuotation(word_after.pic_def, false);
-            }
-            if (word_after.pic_tail_def != layouts.false_object) {
-                vm.jitCompileQuotation(word_after.pic_tail_def, false);
-            }
-        } else if (code_tag == .array) {
-            // Array case: raw compiled code (optimized compilation)
-            // Array contains: [parameters, literals, relocation, labels, code, frame_size]
-            //
-            // Phase 1 (here): Allocate code block, copy machine code, apply labels, set entry_point
-            // Phase 2 (in updateCodeHeapWords): Apply relocations after ALL entry_points are set
-            // This is critical because code blocks may reference each other.
-            const code_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_code));
-            const arr_cap = layouts.untagFixnumUnsigned(code_arr.capacity);
+                // Compile pic_def and pic_tail_def if present.
+                if (word_after.pic_def != layouts.false_object) {
+                    vm.jitCompileQuotation(word_after.pic_def, false);
+                }
+                if (word_after.pic_tail_def != layouts.false_object) {
+                    vm.jitCompileQuotation(word_after.pic_tail_def, false);
+                }
+            },
+            .array => {
+                // Array case: raw compiled code (optimized compilation)
+                // Array contains: [parameters, literals, relocation, labels, code, frame_size]
+                //
+                // Phase 1 (here): Allocate code block, copy machine code, apply labels, set entry_point
+                // Phase 2 (in updateCodeHeapWords): Apply relocations after ALL entry_points are set
+                // This is critical because code blocks may reference each other.
+                const code_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_code));
+                const arr_cap = layouts.untagFixnumUnsigned(code_arr.capacity);
 
-            if (arr_cap < 6) {
-                continue;
-            }
+                if (arr_cap < 6) {
+                    continue;
+                }
 
-            const arr_data = code_arr.data();
-            var parameters_cell = arr_data[0];
-            var literals_cell = arr_data[1];
-            var relocation_cell = arr_data[2];
-            var labels_cell = arr_data[3];
-            var code_bytes_cell = arr_data[4];
-            const frame_size = layouts.untagFixnumUnsigned(arr_data[5]);
+                const arr_data = code_arr.data();
+                var parameters_cell = arr_data[0];
+                var literals_cell = arr_data[1];
+                var relocation_cell = arr_data[2];
+                var labels_cell = arr_data[3];
+                var code_bytes_cell = arr_data[4];
+                const frame_size = layouts.untagFixnumUnsigned(arr_data[5]);
 
-            vm.data_roots.appendAssumeCapacity(&parameters_cell);
-            defer _ = vm.data_roots.pop();
-            vm.data_roots.appendAssumeCapacity(&literals_cell);
-            defer _ = vm.data_roots.pop();
-            vm.data_roots.appendAssumeCapacity(&relocation_cell);
-            defer _ = vm.data_roots.pop();
-            vm.data_roots.appendAssumeCapacity(&labels_cell);
-            defer _ = vm.data_roots.pop();
-            vm.data_roots.appendAssumeCapacity(&code_bytes_cell);
-            defer _ = vm.data_roots.pop();
+                vm.data_roots.appendAssumeCapacity(&parameters_cell);
+                defer _ = vm.data_roots.pop();
+                vm.data_roots.appendAssumeCapacity(&literals_cell);
+                defer _ = vm.data_roots.pop();
+                vm.data_roots.appendAssumeCapacity(&relocation_cell);
+                defer _ = vm.data_roots.pop();
+                vm.data_roots.appendAssumeCapacity(&labels_cell);
+                defer _ = vm.data_roots.pop();
+                vm.data_roots.appendAssumeCapacity(&code_bytes_cell);
+                defer _ = vm.data_roots.pop();
 
-            // Validate code_bytes is a byte-array
-            if (!layouts.hasTag(code_bytes_cell, .byte_array)) {
-                continue;
-            }
+                // Validate code_bytes is a byte-array
+                if (!layouts.hasTag(code_bytes_cell, .byte_array)) {
+                    continue;
+                }
 
-            const code_bytes_pre: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
-            const code_len = layouts.untagFixnumUnsigned(code_bytes_pre.capacity);
+                const code_bytes_pre: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
+                const code_len = layouts.untagFixnumUnsigned(code_bytes_pre.capacity);
 
-            // Allocate code block (triggers compaction if code heap is full)
-            const header_size = @sizeOf(code_blocks.CodeBlock);
-            const total_size = layouts.alignCell(header_size + code_len, layouts.data_alignment);
+                // Allocate code block (triggers compaction if code heap is full)
+                const header_size = @sizeOf(code_blocks.CodeBlock);
+                const total_size = layouts.alignCell(header_size + code_len, layouts.data_alignment);
 
-            const block = vm.allotCodeBlock(total_size);
+                const block = vm.allotCodeBlock(total_size);
 
-            // Initialize the code block header (optimized type)
-            block.initialize(.optimized, total_size, frame_size);
-            block.owner = rooted_word;
+                // Initialize the code block header (optimized type)
+                block.initialize(.optimized, total_size, frame_size);
+                block.owner = rooted_word;
 
-            // Set relocation
-            if (layouts.hasTag(relocation_cell, .byte_array)) {
-                const reloc_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(relocation_cell));
-                if (layouts.untagFixnumUnsigned(reloc_ba.capacity) > 0) {
-                    block.relocation = relocation_cell;
+                // Set relocation
+                if (layouts.hasTag(relocation_cell, .byte_array)) {
+                    const reloc_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(relocation_cell));
+                    if (layouts.untagFixnumUnsigned(reloc_ba.capacity) > 0) {
+                        block.relocation = relocation_cell;
+                    } else {
+                        block.relocation = layouts.false_object;
+                    }
                 } else {
                     block.relocation = layouts.false_object;
                 }
-            } else {
-                block.relocation = layouts.false_object;
-            }
 
-            // Set parameters
-            if (layouts.hasTag(parameters_cell, .array)) {
-                const params_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(parameters_cell));
-                if (layouts.untagFixnumUnsigned(params_arr.capacity) > 0) {
-                    block.parameters = parameters_cell;
+                // Set parameters
+                if (layouts.hasTag(parameters_cell, .array)) {
+                    const params_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(parameters_cell));
+                    if (layouts.untagFixnumUnsigned(params_arr.capacity) > 0) {
+                        block.parameters = parameters_cell;
+                    } else {
+                        block.parameters = layouts.false_object;
+                    }
                 } else {
                     block.parameters = layouts.false_object;
                 }
-            } else {
-                block.parameters = layouts.false_object;
-            }
 
-            // Copy machine code (re-derive pointer after potential GC)
-            const code_bytes: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
-            const code_dest = block.codeStart();
-            @memcpy(code_dest[0..code_len], code_bytes.data()[0..code_len]);
+                // Copy machine code (re-derive pointer after potential GC)
+                const code_bytes: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
+                const code_dest = block.codeStart();
+                @memcpy(code_dest[0..code_len], code_bytes.data()[0..code_len]);
 
-            // Apply labels fixups if present (these are block-internal, safe to do now)
-            if (labels_cell != layouts.false_object and layouts.hasTag(labels_cell, .array)) {
-                const labels_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(labels_cell));
-                const labels_data = labels_arr.data();
-                const labels_cap = layouts.untagFixnumUnsigned(labels_arr.capacity);
+                // Apply labels fixups if present (these are block-internal, safe to do now)
+                if (labels_cell != layouts.false_object and layouts.hasTag(labels_cell, .array)) {
+                    const labels_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(labels_cell));
+                    const labels_data = labels_arr.data();
+                    const labels_cap = layouts.untagFixnumUnsigned(labels_arr.capacity);
 
-                var j: usize = 0;
-                while (j + 2 < labels_cap) : (j += 3) {
-                    const rel_class_cell = labels_data[j];
-                    const offset_cell = labels_data[j + 1];
-                    const target_cell = labels_data[j + 2];
+                    var j: usize = 0;
+                    while (j + 2 < labels_cap) : (j += 3) {
+                        const rel_class_cell = labels_data[j];
+                        const offset_cell = labels_data[j + 1];
+                        const target_cell = labels_data[j + 2];
 
-                    const rel_class: code_blocks.RelocationClass = @enumFromInt(@as(u4, @truncate(layouts.untagFixnumUnsigned(rel_class_cell))));
-                    const offset: u24 = @truncate(layouts.untagFixnumUnsigned(offset_cell));
-                    const target = layouts.untagFixnumUnsigned(target_cell);
+                        const rel_class: code_blocks.RelocationClass = @enumFromInt(@as(u4, @truncate(layouts.untagFixnumUnsigned(rel_class_cell))));
+                        const offset: u24 = @truncate(layouts.untagFixnumUnsigned(offset_cell));
+                        const target = layouts.untagFixnumUnsigned(target_cell);
 
-                    const entry = code_blocks.RelocationEntry.init(.here, rel_class, offset);
-                    var op = code_blocks.InstructionOperand.init(entry, block, 0);
-                    const abs_value = target + block.entryPoint();
-                    op.storeValue(@bitCast(abs_value));
+                        const entry = code_blocks.RelocationEntry.init(.here, rel_class, offset);
+                        var op = code_blocks.InstructionOperand.init(entry, block, 0);
+                        const abs_value = target + block.entryPoint();
+                        op.storeValue(@bitCast(abs_value));
+                    }
                 }
-            }
 
-            // CRITICAL: Add write barrier so GC will scan this code block's
-            // relocation/parameters/owner fields during nursery collection.
-            // Without this, if a subsequent iteration triggers GC (e.g., via
-            // jitCompileQuotationWithOwner), the nursery byte arrays referenced
-            // by relocation/parameters could be moved without updating these fields.
-            // The GC's scanCodeBlock already handles uninitialized blocks correctly
-            // (skips embedded literals, only visits header fields).
-            // write_barrier already called by allotCodeBlock
+                // CRITICAL: Add write barrier so GC will scan this code block's
+                // relocation/parameters/owner fields during nursery collection.
+                // Without this, if a subsequent iteration triggers GC (e.g., via
+                // jitCompileQuotationWithOwner), the nursery byte arrays referenced
+                // by relocation/parameters could be moved without updating these fields.
+                // The GC's scanCodeBlock already handles uninitialized blocks correctly
+                // (skips embedded literals, only visits header fields).
+                // write_barrier already called by allotCodeBlock
 
-            // DO NOT apply relocations here! Defer to updateCodeHeapWords.
-            // Store the literals cell in uninitialized_blocks so updateCodeHeapWords
-            // can initialize this block later, after all word entry_points are set.
-            const code_heap = vm.code orelse continue;
-            code_heap.putUninitializedBlock(vm.allocator, @intFromPtr(block), literals_cell) catch {
-                // Fall back to immediate initialization if tracking fails
-                vm.initializeCodeBlock(block, literals_cell);
-            };
+                // DO NOT apply relocations here! Defer to updateCodeHeapWords.
+                // Store the literals cell in uninitialized_blocks so updateCodeHeapWords
+                // can initialize this block later, after all word entry_points are set.
+                const code_heap = vm.code orelse continue;
+                code_heap.putUninitializedBlock(vm.allocator, @intFromPtr(block), literals_cell) catch {
+                    // Fall back to immediate initialization if tracking fails
+                    vm.initializeCodeBlock(block, literals_cell);
+                };
 
-            // Set word entry point NOW (phase 1) so other blocks can reference it
-            const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
-            word_after.entry_point = block.entryPoint();
-        } else {
-            // Unknown code type - skip
+                // Set word entry point NOW (phase 1) so other blocks can reference it
+                const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
+                word_after.entry_point = block.entryPoint();
+            },
+            else => {},
         }
     }
 
@@ -424,7 +426,7 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
     }
 
     // Allocate array for 6 elements per block
-    const array_cell = vm.allotUninitializedArray(count * 6) orelse {
+    const array_cell = vm.allotArray(count * 6, layouts.false_object) orelse {
         vm.memoryError();
     };
     const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
@@ -644,6 +646,11 @@ fn updateMethodCache(vm: *FactorVM, cache: Cell, klass: Cell, method: Cell) void
     const cache_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(cache));
     const hashcode = methodCacheHashcode(klass, cache_arr);
     const data = cache_arr.data();
+
+    if (data[hashcode] == klass and data[hashcode + 1] == method) {
+        return;
+    }
+
     data[hashcode] = klass;
     data[hashcode + 1] = method;
 
@@ -670,29 +677,30 @@ pub export fn primitive_mega_cache_miss(vm_asm: *VMAssemblyFields) callconv(.c) 
     const stack_addr = ctx.datastack -% (@as(Cell, @intCast(index)) * @sizeOf(Cell));
     const object = @as(*const Cell, @ptrFromInt(stack_addr)).*;
 
-    const klass = objectClass(object);
-    const method = lookupMethod(object, methods);
+    const lookup = lookupMethodAndClass(object, methods);
 
-    updateMethodCache(vm, cache, klass, method);
+    updateMethodCache(vm, cache, lookup.klass, lookup.method);
 
-    ctx.push(method);
+    ctx.push(lookup.method);
 }
 
 inline fn searchLookupAlist(table: Cell, klass: Cell) Cell {
     const elements: *const layouts.Array = @ptrFromInt(layouts.UNTAG(table));
-    const cap: isize = layouts.untagFixnum(elements.capacity);
+    const cap: Cell = layouts.untagFixnumUnsigned(elements.capacity);
     const data = elements.data();
 
-    var index: isize = cap - 2;
-    while (index >= 0) : (index -= 2) {
-        if (data[@intCast(index)] == klass) {
-            return data[@intCast(index + 1)];
-        }
+    if (cap == 0) return layouts.false_object;
+
+    var index: usize = cap - 2;
+    while (true) {
+        if (data[index] == klass) return data[index + 1];
+        if (index == 0) break;
+        index -= 2;
     }
     return layouts.false_object;
 }
 
-inline fn searchLookupHash(table: Cell, klass: Cell, hashcode: Cell) Cell {
+fn searchLookupHash(table: Cell, klass: Cell, hashcode: Cell) Cell {
     const buckets: *const layouts.Array = @ptrFromInt(layouts.UNTAG(table));
 
     std.debug.assert(layouts.hasTag(buckets.capacity, .fixnum));
@@ -707,12 +715,7 @@ inline fn searchLookupHash(table: Cell, klass: Cell, hashcode: Cell) Cell {
     return bucket;
 }
 
-inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
-    const tuple: *const layouts.Tuple = @ptrFromInt(layouts.UNTAG(obj));
-
-    std.debug.assert(layouts.hasTag(tuple.layout, .array));
-
-    const layout: *const layouts.TupleLayout = @ptrFromInt(layouts.UNTAG(tuple.layout));
+fn lookupTupleMethod(layout: *const layouts.TupleLayout, methods: Cell) Cell {
     const echelons: *const layouts.Array = @ptrFromInt(layouts.UNTAG(methods));
 
     std.debug.assert(layouts.hasTag(echelons.capacity, .fixnum));
@@ -720,6 +723,7 @@ inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
 
     const echelons_cap = layouts.untagFixnum(echelons.capacity);
     const echelons_data = echelons.data();
+    const layout_data = layout.data();
 
     var echelon: isize = @min(layouts.untagFixnum(layout.echelon), echelons_cap - 1);
 
@@ -730,8 +734,9 @@ inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
         if (layouts.hasTag(echelon_methods, .word)) {
             return echelon_methods;
         } else if (echelon_methods != layouts.false_object) {
-            const klass = layout.nthSuperclass(echelon_idx);
-            const hashcode_raw = layout.nthHashcode(echelon_idx);
+            const tuple_data_idx = echelon_idx * 2;
+            const klass = layout_data[tuple_data_idx];
+            const hashcode_raw = layout_data[tuple_data_idx + 1];
 
             std.debug.assert(layouts.hasTag(hashcode_raw, .fixnum));
 
@@ -750,7 +755,16 @@ inline fn lookupTupleMethod(obj: Cell, methods: Cell) Cell {
     return layouts.false_object;
 }
 
+pub const MethodLookup = struct {
+    method: Cell,
+    klass: Cell,
+};
+
 pub inline fn lookupMethod(object: Cell, methods: Cell) Cell {
+    return lookupMethodAndClass(object, methods).method;
+}
+
+pub fn lookupMethodAndClass(object: Cell, methods: Cell) MethodLookup {
     const methods_arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(methods));
     const tag: Cell = layouts.TAG(object);
 
@@ -758,13 +772,25 @@ pub inline fn lookupMethod(object: Cell, methods: Cell) Cell {
 
     const method = methods_arr.data()[tag];
 
-    if (tag == @intFromEnum(layouts.TypeTag.tuple)) {
-        if (layouts.hasTag(method, .array)) {
-            return lookupTupleMethod(object, method);
-        }
+    if (!layouts.hasTag(object, .tuple)) {
+        return .{
+            .method = method,
+            .klass = layouts.tagFixnum(@as(Fixnum, @intCast(tag))),
+        };
     }
 
-    return method;
+    const tuple: *const layouts.Tuple = @ptrFromInt(layouts.UNTAG(object));
+    const layout: *const layouts.TupleLayout = @ptrFromInt(layouts.UNTAG(tuple.layout));
+
+    const resolved_method = if (layouts.hasTag(method, .array))
+        lookupTupleMethod(layout, method)
+    else
+        method;
+
+    return .{
+        .method = resolved_method,
+        .klass = tuple.layout,
+    };
 }
 
 // --- Callstack Primitives ---

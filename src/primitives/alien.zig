@@ -14,13 +14,15 @@ const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
 fn toFixnum(vm: *FactorVM, tagged: Cell) Fixnum {
     const tag = layouts.typeTag(tagged);
-    if (tag == .fixnum) {
-        return layouts.untagFixnum(tagged);
-    } else if (tag == .bignum) {
-        const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
-        return bignum.toFixnum(bn);
-    } else {
-        vm.typeError(.fixnum, tagged);
+    switch (tag) {
+        .fixnum => {
+            return layouts.untagFixnum(tagged);
+        },
+        .bignum => {
+            const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
+            return bignum.toFixnum(bn);
+        },
+        else => vm.typeError(.fixnum, tagged),
     }
 }
 
@@ -139,7 +141,7 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
 // Returns a valid pointer or raises a Factor-level memory error (never returns null).
 inline fn alienPointer(vm: *FactorVM) [*]u8 {
     const offset_cell = vm.pop();
-    const offset: Fixnum = if (layouts.TAG(offset_cell) == @intFromEnum(layouts.TypeTag.fixnum))
+    const offset: Fixnum = if (layouts.hasTag(offset_cell, .fixnum))
         @bitCast(layouts.untagFixnumFast(offset_cell))
     else
         @call(.never_inline, toFixnum, .{ vm, offset_cell });

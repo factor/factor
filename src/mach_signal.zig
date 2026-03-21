@@ -394,7 +394,7 @@ fn handleMemoryErrorDirect(vm: *vm_mod.FactorVM, fault_addr: Cell, fault_pc: Cel
     }
 
     // Allocate error array [KERNEL_ERROR, error_type, arg1, false]
-    const error_array = vm.allotUninitializedArray(4) orelse return false;
+    const error_array = vm.allotArray(4, layouts.false_object) orelse return false;
 
     const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(error_array));
     const arr_data = arr.data();

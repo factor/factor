@@ -1112,33 +1112,31 @@ fn resolveDlsym(block: *CodeBlock, param_index: Cell) Cell {
 pub fn extractSymbolName(alien_or_ba: Cell) [:0]const u8 {
     const tag = layouts.typeTag(alien_or_ba);
 
-    // Could be a byte-array directly
-    if (tag == .byte_array) {
-        const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(alien_or_ba));
-        // Validate capacity is a tagged fixnum
-        if (!layouts.hasTag(ba.capacity, .fixnum)) {
-            return "";
-        }
-        const len = layouts.untagFixnumUnsigned(ba.capacity);
-        if (len == 0) return "";
-        const data = ba.data();
-        // Find null terminator
-        var end: usize = 0;
-        while (end < len and data[end] != 0) : (end += 1) {}
-        const slice = data[0..end];
-        return @ptrCast(slice);
+    switch (tag) {
+        .byte_array => {
+            const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(alien_or_ba));
+            // Validate capacity is a tagged fixnum
+            if (!layouts.hasTag(ba.capacity, .fixnum)) {
+                return "";
+            }
+            const len = layouts.untagFixnumUnsigned(ba.capacity);
+            if (len == 0) return "";
+            const data = ba.data();
+            // Find null terminator
+            var end: usize = 0;
+            while (end < len and data[end] != 0) : (end += 1) {}
+            const slice = data[0..end];
+            return @ptrCast(slice);
+        },
+        .alien => {
+            const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(alien_or_ba));
+            // The address field contains the computed address
+            if (alien.address == 0) return "";
+            const ptr: [*:0]const u8 = @ptrFromInt(alien.address);
+            return std.mem.sliceTo(ptr, 0);
+        },
+        else => return "",
     }
-
-    // Could be an alien wrapping a byte-array
-    if (tag == .alien) {
-        const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(alien_or_ba));
-        // The address field contains the computed address
-        if (alien.address == 0) return "";
-        const ptr: [*:0]const u8 = @ptrFromInt(alien.address);
-        return std.mem.sliceTo(ptr, 0);
-    }
-
-    return "";
 }
 
 // Relocation types, classes, entries, and CodeBlock are defined in code_blocks.zig

@@ -250,21 +250,25 @@ pub export fn primitive_fread(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const buf_tag = layouts.typeTag(buf_cell);
     var buffer: *anyopaque = undefined;
 
-    if (buf_tag == .alien) {
-        const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(buf_cell));
-        // Use alien.address which is the precomputed untagged address
-        const buf_addr = alien.address;
-        if (buf_addr == 0) {
+    switch (buf_tag) {
+        .alien => {
+            const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(buf_cell));
+            // Use alien.address which is the precomputed untagged address
+            const buf_addr = alien.address;
+            if (buf_addr == 0) {
+                vm.push(layouts.tagFixnum(0));
+                return;
+            }
+            buffer = @ptrFromInt(buf_addr);
+        },
+        .byte_array => {
+            const byte_array: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(buf_cell));
+            buffer = @constCast(byte_array.data());
+        },
+        else => {
             vm.push(layouts.tagFixnum(0));
             return;
-        }
-        buffer = @ptrFromInt(buf_addr);
-    } else if (buf_tag == .byte_array) {
-        const byte_array: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(buf_cell));
-        buffer = @constCast(byte_array.data());
-    } else {
-        vm.push(layouts.tagFixnum(0));
-        return;
+        },
     }
 
     const bytes_read = io_mod.safeFread(buffer, 1, @intCast(size), file) catch {
@@ -296,16 +300,18 @@ pub export fn primitive_fwrite(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const buf_tag = layouts.typeTag(buf_cell);
     var buffer: *const anyopaque = undefined;
 
-    if (buf_tag == .alien) {
-        const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(buf_cell));
-        const buf_addr = alien.address;
-        if (buf_addr == 0) return;
-        buffer = @ptrFromInt(buf_addr);
-    } else if (buf_tag == .byte_array) {
-        const byte_array: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(buf_cell));
-        buffer = byte_array.data();
-    } else {
-        return;
+    switch (buf_tag) {
+        .alien => {
+            const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(buf_cell));
+            const buf_addr = alien.address;
+            if (buf_addr == 0) return;
+            buffer = @ptrFromInt(buf_addr);
+        },
+        .byte_array => {
+            const byte_array: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(buf_cell));
+            buffer = byte_array.data();
+        },
+        else => return,
     }
 
     _ = io_mod.safeFwrite(buffer, 1, @intCast(length), file) catch return;

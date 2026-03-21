@@ -431,7 +431,7 @@ fn printDatastackStderr(vm: *FactorVM) void {
             tag,
             if (tag < layouts.type_count) @tagName(@as(layouts.TypeTag, @enumFromInt(@as(u4, @truncate(tag))))) else "invalid",
         });
-        if (tag == @intFromEnum(layouts.TypeTag.alien)) {
+        if (layouts.hasTag(val, .alien)) {
             const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(val));
             std.debug.print("       -> alien.base=0x{x} disp=0x{x} addr=0x{x} expired=0x{x}\n", .{
                 alien.base,
@@ -745,30 +745,37 @@ fn dumpWords(vm: *FactorVM) void {
         const obj_type = obj.getType();
         if (obj_count <= 50) {
             const raw_size = objectSizeForDebug(obj, obj_type);
-            if (obj_type == .array) {
-                const arr: *const layouts.Array = @ptrFromInt(addr);
-                std.debug.print("  [obj#{} at 0x{x}: type=array, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
-                    obj_count, addr, obj.header, arr.capacity, raw_size,
-                });
-            } else if (obj_type == .string) {
-                const str: *const layouts.String = @ptrFromInt(addr);
-                std.debug.print("  [obj#{} at 0x{x}: type=string, header=0x{x}, len_raw=0x{x}, size={}]\n", .{
-                    obj_count, addr, obj.header, str.length, raw_size,
-                });
-            } else if (obj_type == .byte_array) {
-                const ba: *const layouts.ByteArray = @ptrFromInt(addr);
-                std.debug.print("  [obj#{} at 0x{x}: type=byte_array, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
-                    obj_count, addr, obj.header, ba.capacity, raw_size,
-                });
-            } else if (obj_type == .bignum) {
-                const bn: *const layouts.Bignum = @ptrFromInt(addr);
-                std.debug.print("  [obj#{} at 0x{x}: type=bignum, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
-                    obj_count, addr, obj.header, bn.capacity, raw_size,
-                });
-            } else {
-                std.debug.print("  [obj#{} at 0x{x}: type={t}, header=0x{x}, size={}]\n", .{
-                    obj_count, addr, obj_type, obj.header, raw_size,
-                });
+            switch (obj_type) {
+                .array => {
+                    const arr: *const layouts.Array = @ptrFromInt(addr);
+                    std.debug.print("  [obj#{} at 0x{x}: type=array, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
+                        obj_count, addr, obj.header, arr.capacity, raw_size,
+                    });
+                },
+                .string => {
+                    const str: *const layouts.String = @ptrFromInt(addr);
+                    std.debug.print("  [obj#{} at 0x{x}: type=string, header=0x{x}, len_raw=0x{x}, size={}]\n", .{
+                        obj_count, addr, obj.header, str.length, raw_size,
+                    });
+                },
+                .byte_array => {
+                    const ba: *const layouts.ByteArray = @ptrFromInt(addr);
+                    std.debug.print("  [obj#{} at 0x{x}: type=byte_array, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
+                        obj_count, addr, obj.header, ba.capacity, raw_size,
+                    });
+                },
+                .bignum => {
+                    const bn: *const layouts.Bignum = @ptrFromInt(addr);
+                    std.debug.print("  [obj#{} at 0x{x}: type=bignum, header=0x{x}, cap_raw=0x{x}, size={}]\n", .{
+                        obj_count, addr, obj.header, bn.capacity, raw_size,
+                    });
+                },
+                .word => {},
+                else => {
+                    std.debug.print("  [obj#{} at 0x{x}: type={t}, header=0x{x}, size={}]\n", .{
+                        obj_count, addr, obj_type, obj.header, raw_size,
+                    });
+                },
             }
         }
         if (obj_type == .word) {

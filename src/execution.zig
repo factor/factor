@@ -96,12 +96,10 @@ pub const Interpreter = struct {
         const method = primitives.lookupMethod(obj, methods_cell);
 
         const method_tag = layouts.typeTag(method);
-        if (method_tag == .quotation) {
-            try self.executeQuotation(method);
-        } else if (method_tag == .word) {
-            try self.executeWord(method);
-        } else {
-            return ExecutionError.TypeError;
+        switch (method_tag) {
+            .quotation => try self.executeQuotation(method),
+            .word => try self.executeWord(method),
+            else => return ExecutionError.TypeError,
         }
     }
 

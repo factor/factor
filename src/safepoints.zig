@@ -198,7 +198,7 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
 
 fn allocSampleCallstacks(vm: *vm_mod.FactorVM) ?Cell {
     // Allocate initial contents array (capacity 10)
-    const contents = vm.allotUninitializedArray(10) orelse return null;
+    const contents = vm.allotArray(10, layouts.false_object) orelse return null;
 
     // Root contents since the next allot can trigger GC
     var contents_root = contents;
@@ -206,7 +206,7 @@ fn allocSampleCallstacks(vm: *vm_mod.FactorVM) ?Cell {
     defer _ = vm.data_roots.pop();
 
     // Allocate the 2-element wrapper array
-    const wrapper = vm.allotUninitializedArray(2) orelse return null;
+    const wrapper = vm.allotArray(2, layouts.false_object) orelse return null;
     const wrapper_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(wrapper));
     const data = wrapper_arr.data();
     data[0] = layouts.tagFixnum(0); // count = 0

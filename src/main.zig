@@ -262,7 +262,7 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     const argc: usize = args.len;
 
     // Allocate array for argument aliens
-    var args_array = vm.allotUninitializedArray(argc) orelse return;
+    var args_array = vm.allotArray(argc, layouts.false_object) orelse return;
 
     // CRITICAL: Store in special_objects BEFORE allocating aliens.
     // This makes the array a GC root so it won't become a stale pointer if GC runs.

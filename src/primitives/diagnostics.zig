@@ -91,17 +91,19 @@ pub export fn primitive_die(vm_asm: *VMAssemblyFields) callconv(.c) void {
                 const val = @as(*const layouts.Cell, @ptrFromInt(addr)).*;
                 const tag = layouts.typeTag(val);
                 std.debug.print("[die] ds[{}] = 0x{x} tag={}", .{ si, val, tag });
-                if (tag == .string) {
-                    std.debug.print(" \"", .{});
-                    diePrintString(val);
-                    std.debug.print("\"", .{});
-                } else if (tag == .word) {
-                    std.debug.print(" word=", .{});
-                    diePrintWordName(val);
-                } else if (val == layouts.false_object) {
-                    std.debug.print(" (f)", .{});
-                } else if (tag == .fixnum) {
-                    std.debug.print(" fixnum={}", .{layouts.untagFixnum(val)});
+                switch (tag) {
+                    .string => {
+                        std.debug.print(" \"", .{});
+                        diePrintString(val);
+                        std.debug.print("\"", .{});
+                    },
+                    .word => {
+                        std.debug.print(" word=", .{});
+                        diePrintWordName(val);
+                    },
+                    .f => std.debug.print(" (f)", .{}),
+                    .fixnum => std.debug.print(" fixnum={}", .{layouts.untagFixnum(val)}),
+                    else => {},
                 }
                 std.debug.print("\n", .{});
             }
@@ -600,7 +602,7 @@ pub export fn primitive_disable_gc_events(vm_asm: *VMAssemblyFields) callconv(.c
         // Convert each event to a byte-array and add to result.
         const event_size = @sizeOf(vm_mod.GCEvent);
         for (event_list.items) |event| {
-            const ba_tagged = vm.allotByteArray(event_size);
+            const ba_tagged = vm.allotUninitializedByteArray(event_size);
             const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(ba_tagged));
             const event_bytes: [*]const u8 = @ptrCast(&event);
             @memcpy(ba.data()[0..event_size], event_bytes[0..event_size]);
@@ -643,12 +645,7 @@ pub export fn primitive_data_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // tenured_contiguous_free, tenured_free_block_count,
     // cards, decks, mark_stack
     const room_size = 15 * @sizeOf(Cell);
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = header_size + room_size;
-
-    const tagged = vm.allotObject(.byte_array, total_size) orelse {
-        vm.memoryError();
-    };
+    const tagged = vm.allotUninitializedByteArray(room_size);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(room_size));
 
@@ -691,12 +688,7 @@ pub export fn primitive_code_room(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // allocator_room structure has 5 cells:
     // size, occupied_space, total_free, contiguous_free, free_block_count
     const room_size = 5 * @sizeOf(Cell);
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = header_size + room_size;
-
-    const tagged = vm.allotObject(.byte_array, total_size) orelse {
-        vm.memoryError();
-    };
+    const tagged = vm.allotUninitializedByteArray(room_size);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(room_size));
 
@@ -731,12 +723,7 @@ pub export fn primitive_callback_room(vm_asm: *VMAssemblyFields) callconv(.c) vo
     // allocator_room structure has 5 cells:
     // size, occupied_space, total_free, contiguous_free, free_block_count
     const room_size = 5 * @sizeOf(Cell);
-    const header_size = @sizeOf(layouts.ByteArray);
-    const total_size = header_size + room_size;
-
-    const tagged = vm.allotObject(.byte_array, total_size) orelse {
-        vm.memoryError();
-    };
+    const tagged = vm.allotUninitializedByteArray(room_size);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(room_size));
 
@@ -802,7 +789,7 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
 
     // Allocate array — nursery is empty after full GC so this should not
     // trigger another GC for reasonably-sized heaps.
-    const array_tagged = vm.allotUninitializedArray(count) orelse {
+    const array_tagged = vm.allotArray(count, layouts.false_object) orelse {
         vm.memoryError();
     };
     const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_tagged));
@@ -855,11 +842,7 @@ pub export fn primitive_dispatch_stats(vm_asm: *VMAssemblyFields) callconv(.c) v
     // ( -- byte-array )
     // Returns a byte array containing the dispatch_statistics struct,
     const stats_size = @sizeOf(vm_mod.DispatchStatistics);
-    const ba_size = @sizeOf(layouts.ByteArray) + stats_size;
-
-    const tagged = vm.allotObject(.byte_array, ba_size) orelse {
-        vm.memoryError();
-    };
+    const tagged = vm.allotUninitializedByteArray(stats_size);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(stats_size));
 
@@ -898,7 +881,7 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
     const num_samples = samples.len;
 
     // Allocate outer array to hold all sample tuples
-    var samples_array = vm.allotUninitializedArray(num_samples) orelse {
+    var samples_array = vm.allotArray(num_samples, layouts.false_object) orelse {
         vm.push(layouts.false_object);
         return;
     };
@@ -914,7 +897,7 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
 
     for (samples, 0..) |sample, i| {
         // Allocate 7-element tuple for this sample
-        var sample_arr = vm.allotUninitializedArray(7) orelse {
+        var sample_arr = vm.allotArray(7, layouts.false_object) orelse {
             vm.push(layouts.false_object);
             return;
         };
@@ -934,7 +917,7 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
 
         // Build callstack sub-array from the growable array indices
         const cs_size = sample.callstack_end - sample.callstack_begin;
-        const cs_arr = vm.allotUninitializedArray(cs_size) orelse {
+        const cs_arr = vm.allotArray(cs_size, layouts.false_object) orelse {
             vm.push(layouts.false_object);
             return;
         };

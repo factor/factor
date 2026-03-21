@@ -342,7 +342,7 @@ pub const FactorVM = struct {
                 .pic_tag_count = 0,
                 .pic_tuple_count = 0,
             },
-            .max_pic_size = 3,
+            .max_pic_size = 16,
             .object_counter = 0,
             .last_nano_count = 0,
             .signal_callstack_seg = null,
@@ -599,15 +599,17 @@ pub const FactorVM = struct {
             return null;
         }
 
-        const tag = layouts.TAG(obj);
-        if (tag == @intFromEnum(layouts.TypeTag.byte_array)) {
-            const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(obj));
-            return ba.data();
-        } else if (tag == @intFromEnum(layouts.TypeTag.alien)) {
-            const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(obj));
-            return @ptrFromInt(alien.address);
+        switch (layouts.typeTag(obj)) {
+            .byte_array => {
+                const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(obj));
+                return ba.data();
+            },
+            .alien => {
+                const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(obj));
+                return @ptrFromInt(alien.address);
+            },
+            else => self.typeError(.alien, obj),
         }
-        self.typeError(.alien, obj);
     }
 
     pub fn getContextFromAlien(self: *Self, alien_cell: Cell) ?*contexts.Context {
@@ -743,7 +745,7 @@ pub const FactorVM = struct {
         ctx.context_objects[2] = ctx_alien;
     }
 
-    pub fn allotUninitializedArrayNoFill(self: *Self, capacity: Cell) ?Cell {
+    pub fn allotUninitializedArray(self: *Self, capacity: Cell) ?Cell {
         const size = layouts.arraySize(layouts.Array, capacity);
 
         const tagged = self.allotObject(.array, size) orelse return null;
@@ -753,13 +755,22 @@ pub const FactorVM = struct {
         return tagged;
     }
 
-    pub fn allotUninitializedArray(self: *Self, capacity: Cell) ?Cell {
-        const tagged = self.allotUninitializedArrayNoFill(capacity) orelse return null;
+    pub fn allotArray(self: *Self, capacity: Cell, fill: Cell) ?Cell {
+        var rooted_fill = fill;
+        const needs_root = !layouts.isImmediate(rooted_fill);
+        if (needs_root) {
+            self.data_roots.appendAssumeCapacity(&rooted_fill);
+        }
+        defer if (needs_root) {
+            _ = self.data_roots.pop();
+        };
+
+        const tagged = self.allotUninitializedArray(capacity) orelse return null;
         const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
 
         const cap: usize = @intCast(capacity);
         if (cap > 0) {
-            @memset(array.data()[0..cap], layouts.false_object);
+            @memset(array.data()[0..cap], rooted_fill);
         }
         return tagged;
     }
@@ -785,7 +796,7 @@ pub const FactorVM = struct {
             return old_array;
         }
 
-        const new_array = self.allotUninitializedArrayNoFill(new_capacity) orelse return null;
+        const new_array = self.allotUninitializedArray(new_capacity) orelse return null;
         const new_arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_array));
 
         const old_arr_after_gc: *layouts.Array = @ptrFromInt(layouts.UNTAG(old_array));
@@ -804,6 +815,13 @@ pub const FactorVM = struct {
     }
 
     pub fn allotByteArray(self: *Self, size: usize) Cell {
+        const tagged = self.allotUninitializedByteArray(size);
+        const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
+        @memset(ba.data()[0..size], 0);
+        return tagged;
+    }
+
+    pub fn allotUninitializedByteArray(self: *Self, size: usize) Cell {
         const header_size = @sizeOf(layouts.ByteArray);
         const total_size = layouts.alignCell(header_size + size, layouts.data_alignment);
 
@@ -813,8 +831,6 @@ pub const FactorVM = struct {
         const addr = layouts.UNTAG(tagged);
         const ba: *layouts.ByteArray = @ptrFromInt(addr);
         ba.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(size)));
-
-        @memset(ba.data()[0..size], 0);
 
         return tagged;
     }
@@ -841,14 +857,9 @@ pub const FactorVM = struct {
     pub fn allotBignumFromCell(self: *Self, value: Cell) Cell {
         const bignum_mod = @import("bignum.zig");
         const num_digits: Cell = bignum_mod.countDigitsUnsigned(value);
-        const total_size: Cell = @sizeOf(layouts.Object) + @sizeOf(Cell) + (num_digits + 1) * @sizeOf(Cell);
-
-        const tagged = self.allotObject(.bignum, total_size) orelse {
+        const bn = bignum_mod.allocBignum(self, num_digits, false) catch {
             self.memoryError();
         };
-        const bn: *bignum_mod.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
-
-        bn.initialize(num_digits, false);
         var val = value;
         var i: Cell = 0;
         while (val != 0) : (i += 1) {
@@ -856,21 +867,16 @@ pub const FactorVM = struct {
             val >>= bignum_mod.DIGIT_BITS;
         }
 
-        return tagged;
+        return layouts.tagBignum(bn);
     }
 
     pub fn allotBignumFromSignedCell(self: *Self, value: i64) Cell {
         const bignum_mod = @import("bignum.zig");
         const abs_value: Cell = @bitCast(if (value == std.math.minInt(i64)) value else -value);
         const num_digits: Cell = bignum_mod.countDigitsUnsigned(abs_value);
-        const total_size: Cell = @sizeOf(layouts.Object) + @sizeOf(Cell) + (num_digits + 1) * @sizeOf(Cell);
-
-        const tagged = self.allotObject(.bignum, total_size) orelse {
+        const bn = bignum_mod.allocBignum(self, num_digits, true) catch {
             self.memoryError();
         };
-        const bn: *bignum_mod.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
-
-        bn.initialize(num_digits, true);
         var val = abs_value;
         var i: Cell = 0;
         while (val != 0) : (i += 1) {
@@ -878,7 +884,7 @@ pub const FactorVM = struct {
             val >>= bignum_mod.DIGIT_BITS;
         }
 
-        return tagged;
+        return layouts.tagBignum(bn);
     }
 
 

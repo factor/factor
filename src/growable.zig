@@ -17,7 +17,7 @@ pub const GrowableArray = struct {
     /// Initialize a new growable array with given capacity
     /// Allocates memory via VM nursery
     pub fn init(parent_vm: *vm_mod.FactorVM, initial_capacity: Cell) ?GrowableArray {
-        const arr = parent_vm.allotUninitializedArray(initial_capacity) orelse return null;
+        const arr = parent_vm.allotArray(initial_capacity, layouts.false_object) orelse return null;
 
         return GrowableArray{
             .count = 0,
@@ -148,7 +148,7 @@ pub const GrowableByteArray = struct {
     /// Initialize a new growable byte array with given capacity
     /// Allocates memory via VM nursery
     pub fn init(parent_vm: *vm_mod.FactorVM, initial_capacity: Cell) GrowableByteArray {
-        const arr = parent_vm.allotByteArray(initial_capacity);
+        const arr = parent_vm.allotUninitializedByteArray(initial_capacity);
         return GrowableByteArray{
             .count = 0,
             .elements = arr,
@@ -184,7 +184,7 @@ pub const GrowableByteArray = struct {
         defer _ = self.vm.data_roots.pop();
 
         // Allocate new byte array - may trigger GC, moving self.elements
-        const new_elements = self.vm.allotByteArray(new_count);
+        const new_elements = self.vm.allotUninitializedByteArray(new_count);
         const new_ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(new_elements));
 
         // Re-derive old_ba from self.elements (updated by GC if moved)

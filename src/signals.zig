@@ -781,7 +781,7 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
         defer _ = vm.data_roots.pop();
 
         // Allocate error object: 4-element array with [KERNEL_ERROR, error_type, arg1, arg2]
-        const error_array = vm.allotUninitializedArray(4) orelse {
+        const error_array = vm.allotArray(4, layouts.false_object) orelse {
             fatalError("Out of memory allocating error object", @intFromEnum(error_type));
         };
 
