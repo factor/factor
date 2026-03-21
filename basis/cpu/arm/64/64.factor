@@ -340,7 +340,11 @@ M:: arm.64 %gather-int-vector-4 ( DST SRC1 SRC2 SRC3 SRC4 rep -- )
 
 : >size ( rep -- size ) rep-component-type heap-size log2 ;
 
-M: arm.64 %select-vector >size <vector-element> UMOV ;
+M: arm.64 %select-vector
+    [ >size <vector-element> ] keep
+    { char-16-rep short-8-rep int-4-rep } member?
+    [ SMOV ] [ UMOV ] if ;
+
 M: arm.64 %shuffle-vector drop TBL ;
 
 M: arm.64 %shuffle-vector-imm
