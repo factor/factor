@@ -32,7 +32,6 @@ fn visitInfoForFixup(comptime Fixup: type, fixup: *Fixup, address: Cell) layouts
 }
 
 pub fn visitDataObjectSlots(comptime Fixup: type, fixup: *Fixup, address: Cell) Cell {
-    @setEvalBranchQuota(10000);
     const obj: *Object = @ptrFromInt(address);
     if (obj.isFree()) return 0;
 
@@ -130,13 +129,20 @@ pub const CopyingDestination = struct {
     }
 
     pub fn copy(self: *CopyingDestination, old_addr: Cell) Cell {
-        @setEvalBranchQuota(10000);
         const original_untagged = layouts.UNTAG(old_addr);
 
         if (!self.inSourceGeneration(original_untagged)) {
             return old_addr;
         }
 
+        return copyInSourceGeneration(self, old_addr, original_untagged);
+    }
+
+    noinline fn copyInSourceGeneration(
+        self: *CopyingDestination,
+        old_addr: Cell,
+        original_untagged: Cell,
+    ) Cell {
         var obj: *Object = @ptrFromInt(original_untagged);
 
         var untagged = original_untagged;

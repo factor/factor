@@ -164,8 +164,12 @@ pub export fn primitive_set_alien_signed_1(vm_asm: *VMAssemblyFields) callconv(.
     const vm = vm_asm.getVM();
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
-    const typed_ptr: *i8 = @ptrCast(@alignCast(ptr));
-    typed_ptr.* = @truncate(toFixnum(vm, value_cell));
+    const value: Fixnum = if (layouts.hasTag(value_cell, .fixnum))
+        layouts.untagFixnum(value_cell)
+    else
+        @call(.never_inline, toFixnum, .{ vm, value_cell });
+    const typed_ptr: *i8 = @ptrCast(ptr);
+    typed_ptr.* = @truncate(value);
 }
 
 pub export fn primitive_alien_signed_2(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -224,8 +228,12 @@ pub export fn primitive_set_alien_unsigned_1(vm_asm: *VMAssemblyFields) callconv
     const vm = vm_asm.getVM();
     const ptr = alienPointer(vm);
     const value_cell = vm.pop();
-    const typed_ptr: *u8 = @ptrCast(@alignCast(ptr));
-    typed_ptr.* = @truncate(@as(u64, @bitCast(toFixnum(vm, value_cell))));
+    const value: Fixnum = if (layouts.hasTag(value_cell, .fixnum))
+        layouts.untagFixnum(value_cell)
+    else
+        @call(.never_inline, toFixnum, .{ vm, value_cell });
+    const typed_ptr: *u8 = @ptrCast(ptr);
+    typed_ptr.* = @truncate(@as(u64, @bitCast(value)));
 }
 
 pub export fn primitive_alien_unsigned_2(vm_asm: *VMAssemblyFields) callconv(.c) void {
