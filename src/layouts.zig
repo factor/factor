@@ -412,92 +412,135 @@ pub fn stringCapacity(str: *const String) Cell {
     return untagFixnum(str.length);
 }
 
-// Get the number of slots (cells) in an object that should be scanned by GC.
-pub fn slotCount(obj: Cell) Cell {
-    if (isImmediate(obj)) return 0;
+pub const ObjectVisitInfo = struct {
+    type: TypeTag,
+    slot_count: Cell,
+    size: Cell,
+};
 
-    const object_ptr: *const Object = @ptrFromInt(UNTAG(obj));
-    if (object_ptr.isFree()) return 0;
+// Get the number of slots and total size for an allocated object.
+pub fn objectVisitInfoFromAddress(obj_addr: Cell) ObjectVisitInfo {
+    if (obj_addr < 0x1000) {
+        return .{ .type = .fixnum, .slot_count = 0, .size = 0 };
+    }
+
+    const object_ptr: *const Object = @ptrFromInt(obj_addr);
+    if (object_ptr.isFree()) {
+        return .{ .type = .fixnum, .slot_count = 0, .size = 0 };
+    }
 
     const obj_type = object_ptr.getType();
 
     return switch (obj_type) {
-        .array => {
+        .array => blk: {
             const arr: *const Array = @ptrCast(object_ptr);
-            return 1 + arr.getCapacity();
+            const capacity = arr.getCapacity();
+            break :blk .{
+                .type = .array,
+                .slot_count = 1 + capacity,
+                .size = alignCell(@sizeOf(Array) + capacity * @sizeOf(Cell), data_alignment),
+            };
         },
-
-        .tuple => {
+        .tuple => blk: {
             const t: *const Tuple = @ptrCast(object_ptr);
             const layout_cell = t.layout;
-            // NOTE: TupleLayout has array tag (2), not tuple tag (7)!
+            // TupleLayout has array tag (2), not tuple tag (7).
             if (hasTag(layout_cell, .array)) {
-                const layout: *const TupleLayout = @ptrFromInt(UNTAG(layout_cell));
-                return 1 + tupleCapacity(layout);
+                const layout_addr = followForwardingPointers(layout_cell);
+                const layout: *const TupleLayout = @ptrFromInt(layout_addr);
+                const tuple_size = tupleCapacity(layout);
+                break :blk .{
+                    .type = .tuple,
+                    .slot_count = 1 + tuple_size,
+                    .size = alignCell(@sizeOf(Tuple) + tuple_size * @sizeOf(Cell), data_alignment),
+                };
             }
-            return 1; // Just the layout field if we can't read it
+            break :blk .{
+                .type = .tuple,
+                .slot_count = 1,
+                .size = alignCell(@sizeOf(Tuple), data_alignment),
+            };
         },
-
-        // Objects that don't refer to other objects
-        .float, .bignum, .byte_array, .callstack => 0,
-
-        // Quotation: array, cached_effect, cache_counter (3 fields after header)
-        .quotation => 3,
-
-        // Alien: base, expired (2 fields after header, not counting displacement/address)
-        .alien => 2,
-
-        // Wrapper: object (1 field after header)
-        .wrapper => 1,
-
-        // String: length, aux, hashcode_field (3 fields after header)
-        .string => 3,
-
-        // Word: hashcode_field, name, vocabulary, def, props, pic_def, pic_tail_def, subprimitive (8 fields after header)
-        .word => 8,
-
-        // DLL: path (1 field after header, handle is not a Factor object)
-        .dll => 1,
-
-        // Fixnum and f are immediates, shouldn't reach here
-        .fixnum, .f => 0,
+        .float => .{
+            .type = .float,
+            .slot_count = 0,
+            .size = alignCell(@sizeOf(BoxedFloat), data_alignment),
+        },
+        .bignum => blk: {
+            const bn: *const Bignum = @ptrCast(object_ptr);
+            const capacity = untagFixnumUnsigned(bn.capacity);
+            break :blk .{
+                .type = .bignum,
+                .slot_count = 0,
+                .size = alignCell(@sizeOf(Bignum) + capacity * @sizeOf(Cell), data_alignment),
+            };
+        },
+        .byte_array => blk: {
+            const ba: *const ByteArray = @ptrCast(object_ptr);
+            const capacity = untagFixnumUnsigned(ba.capacity);
+            break :blk .{
+                .type = .byte_array,
+                .slot_count = 0,
+                .size = alignCell(@sizeOf(ByteArray) + capacity, data_alignment),
+            };
+        },
+        .callstack => blk: {
+            const cs: *const Callstack = @ptrCast(object_ptr);
+            const len = untagFixnumUnsigned(cs.length);
+            break :blk .{
+                .type = .callstack,
+                .slot_count = 0,
+                .size = alignCell(@sizeOf(Callstack) + len, data_alignment),
+            };
+        },
+        .quotation => .{
+            .type = .quotation,
+            .slot_count = 3,
+            .size = alignCell(@sizeOf(Quotation), data_alignment),
+        },
+        .alien => .{
+            .type = .alien,
+            .slot_count = 2,
+            .size = alignCell(@sizeOf(Alien), data_alignment),
+        },
+        .wrapper => .{
+            .type = .wrapper,
+            .slot_count = 1,
+            .size = alignCell(@sizeOf(Wrapper), data_alignment),
+        },
+        .string => blk: {
+            const str: *const String = @ptrCast(object_ptr);
+            const len = untagFixnumUnsigned(str.length);
+            break :blk .{
+                .type = .string,
+                .slot_count = 3,
+                .size = alignCell(@sizeOf(String) + len, data_alignment),
+            };
+        },
+        .word => .{
+            .type = .word,
+            .slot_count = 8,
+            .size = alignCell(@sizeOf(Word), data_alignment),
+        },
+        .dll => .{
+            .type = .dll,
+            .slot_count = 1,
+            .size = alignCell(@sizeOf(Dll), data_alignment),
+        },
+        .fixnum => .{ .type = .fixnum, .slot_count = 0, .size = data_alignment },
+        .f => .{ .type = .f, .slot_count = 0, .size = data_alignment },
     };
+}
+
+// Get the number of slots (cells) in an object that should be scanned by GC.
+pub fn slotCount(obj: Cell) Cell {
+    if (isImmediate(obj)) return 0;
+    return objectVisitInfoFromAddress(UNTAG(obj)).slot_count;
 }
 
 // Like slot_count, but takes an untagged object address (reads type from header).
 pub fn slotCountFromAddress(obj_addr: Cell) Cell {
-    if (obj_addr < 0x1000) return 0;
-
-    const object_ptr: *const Object = @ptrFromInt(obj_addr);
-    if (object_ptr.isFree()) return 0;
-
-    const obj_type = object_ptr.getType();
-
-    return switch (obj_type) {
-        .array => {
-            const arr: *const Array = @ptrCast(object_ptr);
-            return 1 + arr.getCapacity();
-        },
-        .tuple => {
-            const t: *const Tuple = @ptrCast(object_ptr);
-            const layout_cell = t.layout;
-    // TupleLayout has array tag (2), not tuple tag (7).
-            if (hasTag(layout_cell, .array)) {
-                const layout_addr = followForwardingPointers(layout_cell);
-                const layout: *const TupleLayout = @ptrFromInt(layout_addr);
-                return 1 + tupleCapacity(layout);
-            }
-            return 1;
-        },
-        .float, .bignum, .byte_array, .callstack => 0,
-        .quotation => 3,
-        .alien => 2,
-        .wrapper => 1,
-        .string => 3,
-        .word => 8,
-        .dll => 1,
-        .fixnum, .f => 0,
-    };
+    return objectVisitInfoFromAddress(obj_addr).slot_count;
 }
 
 // Array reallocation requires VM context for proper allocation and GC coordination.

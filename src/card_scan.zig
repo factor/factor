@@ -169,13 +169,14 @@ const ScanResult = struct {
 };
 
 // Walk objects in a dirty card and visit their slots.
-// contiguous after the header, so we use slotCountAndSize() + a single generic
+// contiguous after the header, so we use layouts.objectVisitInfoFromAddress()
+// + a single generic
 // scan loop clipped to card boundaries. This eliminates the per-type switch
 // for slot visiting.
 //
-// Optimization: slotCountAndSize() reads the header ONCE and returns both the
-// slot count and object size in a single type switch, eliminating the previous
-// triple header read (free check + slotCount + objectSizeFromHeader).
+// Optimization: objectVisitInfoFromAddress() reads the header ONCE and returns
+// both slot count and object size, eliminating the previous triple header read
+// (free check + slotCount + objectSizeFromHeader).
 //
 // When aging_end != 0 (precise mode), tracks whether any slot in the card
 // points to the aging generation after copy. This allows the caller to
@@ -202,7 +203,7 @@ fn scanObjectsInCard(first_obj: Cell, card_start: Cell, card_end: Cell, tenured_
         if (header == 0) break;
 
         // Combined slot count + object size from single header read.
-        const info = slotCountAndSize(obj_addr);
+        const info = layouts.objectVisitInfoFromAddress(obj_addr);
         if (info.size == 0) break;
 
         // clipped to [card_start, card_end). slot_count includes fixnum fields
@@ -237,78 +238,6 @@ fn scanObjectsInCard(first_obj: Cell, card_start: Cell, card_end: Cell, tenured_
         obj_addr += info.size;
     }
     return .{ .last_obj = last_obj, .has_aging_ref = has_aging_ref };
-}
-
-const SlotCountAndSize = struct {
-    slot_count: Cell,
-    size: Cell,
-};
-
-// Combined slot count + object size from a single header read / type switch.
-// Replaces separate slotCount() + objectSizeFromHeader() calls, eliminating
-// two redundant header reads per object in the card scan hot path.
-fn slotCountAndSize(obj_addr: Cell) SlotCountAndSize {
-    const obj: *layouts.Object = @ptrFromInt(obj_addr);
-    const t = obj.getType();
-    return switch (t) {
-        .array => blk: {
-            const capacity = layouts.untagFixnumUnsigned(@as(*const layouts.Array, @ptrFromInt(obj_addr)).capacity);
-            break :blk .{
-                .slot_count = 1 + capacity,
-                .size = layouts.alignCell(@sizeOf(layouts.Array) + capacity * @sizeOf(Cell), layouts.data_alignment),
-            };
-        },
-        .tuple => blk: {
-            const layout_addr = layouts.followForwardingPointers(@as(*const layouts.Tuple, @ptrFromInt(obj_addr)).layout);
-            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const tuple_size = layouts.untagFixnumUnsigned(layout.size);
-            break :blk .{
-                .slot_count = 1 + tuple_size,
-                .size = layouts.alignCell(@sizeOf(layouts.Tuple) + tuple_size * @sizeOf(Cell), layouts.data_alignment),
-            };
-        },
-        .quotation => .{
-            .slot_count = 3,
-            .size = layouts.alignCell(@sizeOf(layouts.Quotation), layouts.data_alignment),
-        },
-        .word => .{
-            .slot_count = 8,
-            .size = layouts.alignCell(@sizeOf(layouts.Word), layouts.data_alignment),
-        },
-        .wrapper => .{
-            .slot_count = 1,
-            .size = layouts.alignCell(@sizeOf(layouts.Wrapper), layouts.data_alignment),
-        },
-        .string => blk: {
-            const len = layouts.untagFixnumUnsigned(@as(*const layouts.String, @ptrFromInt(obj_addr)).length);
-            break :blk .{
-                .slot_count = 3,
-                .size = layouts.alignCell(@sizeOf(layouts.String) + len, layouts.data_alignment),
-            };
-        },
-        .alien => .{
-            .slot_count = 2,
-            .size = layouts.alignCell(@sizeOf(layouts.Alien), layouts.data_alignment),
-        },
-        .dll => .{
-            .slot_count = 1,
-            .size = layouts.alignCell(@sizeOf(layouts.Dll), layouts.data_alignment),
-        },
-        .bignum => blk: {
-            const capacity = layouts.untagFixnumUnsigned(@as(*const layouts.Bignum, @ptrFromInt(obj_addr)).capacity);
-            break :blk .{ .slot_count = 0, .size = layouts.alignCell(@sizeOf(layouts.Bignum) + capacity * @sizeOf(Cell), layouts.data_alignment) };
-        },
-        .byte_array => blk: {
-            const capacity = layouts.untagFixnumUnsigned(@as(*const layouts.ByteArray, @ptrFromInt(obj_addr)).capacity);
-            break :blk .{ .slot_count = 0, .size = layouts.alignCell(@sizeOf(layouts.ByteArray) + capacity, layouts.data_alignment) };
-        },
-        .callstack => blk: {
-            const len = layouts.untagFixnumUnsigned(@as(*const layouts.Callstack, @ptrFromInt(obj_addr)).length);
-            break :blk .{ .slot_count = 0, .size = layouts.alignCell(@sizeOf(layouts.Callstack) + len, layouts.data_alignment) };
-        },
-        .float => .{ .slot_count = 0, .size = layouts.alignCell(@sizeOf(layouts.BoxedFloat), layouts.data_alignment) },
-        .fixnum, .f => .{ .slot_count = 0, .size = layouts.data_alignment },
-    };
 }
 
 // Scan code heap for nursery/aging references using the remembered set.

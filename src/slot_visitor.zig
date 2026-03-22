@@ -2,30 +2,17 @@ const std = @import("std");
 const callstack_lookup = @import("callstack_lookup.zig");
 const code_blocks = @import("code_blocks.zig");
 const code_heap_mod = @import("code_heap.zig");
-const free_list = @import("free_list.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
 const spill_slots = @import("spill_slots.zig");
 const Cell = layouts.Cell;
 const Object = layouts.Object;
 
-pub fn visitDataObjectSlots(comptime Fixup: type, fixup: *Fixup, address: Cell) Cell {
-    @setEvalBranchQuota(10000);
+fn visitInfoForFixup(comptime Fixup: type, fixup: *Fixup, address: Cell) layouts.ObjectVisitInfo {
     const obj: *Object = @ptrFromInt(address);
-    if (obj.isFree()) return 0;
 
-    switch (obj.getType()) {
-        .array => {
-            const arr: *layouts.Array = @ptrFromInt(address);
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(capacity);
-            const data = arr.data();
-            for (0..capacity) |i| {
-                fixup.visitSlot(&data[i]);
-            }
-            return layouts.alignCell(@sizeOf(layouts.Array) + capacity * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .tuple => {
+    return switch (obj.getType()) {
+        .tuple => blk: {
             const tuple: *layouts.Tuple = @ptrFromInt(address);
             const layout_addr = if (@hasDecl(Fixup, "resolveTupleLayout"))
                 fixup.resolveTupleLayout(tuple.layout)
@@ -33,87 +20,66 @@ pub fn visitDataObjectSlots(comptime Fixup: type, fixup: *Fixup, address: Cell) 
                 layouts.followForwardingPointers(tuple.layout);
             std.debug.assert((layout_addr & 7) == 0);
             const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const size = layouts.untagFixnumUnsigned(layout.size);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1 + size);
-            fixup.visitSlot(@ptrCast(&tuple.layout));
-            const data = tuple.data();
-            for (0..size) |i| {
-                fixup.visitSlot(&data[i]);
-            }
-            return layouts.alignCell(@sizeOf(layouts.Tuple) + size * @sizeOf(Cell), layouts.data_alignment);
+            const tuple_size = layouts.untagFixnumUnsigned(layout.size);
+            break :blk .{
+                .type = .tuple,
+                .slot_count = 1 + tuple_size,
+                .size = layouts.alignCell(@sizeOf(layouts.Tuple) + tuple_size * @sizeOf(Cell), layouts.data_alignment),
+            };
         },
+        else => layouts.objectVisitInfoFromAddress(address),
+    };
+}
+
+pub fn visitDataObjectSlots(comptime Fixup: type, fixup: *Fixup, address: Cell) Cell {
+    @setEvalBranchQuota(10000);
+    const obj: *Object = @ptrFromInt(address);
+    if (obj.isFree()) return 0;
+
+    const info = visitInfoForFixup(Fixup, fixup, address);
+    if (info.size == 0) return 0;
+
+    switch (info.type) {
+        .callstack => {
+            if (@hasDecl(Fixup, "visitCallstackObject")) {
+                const cs: *layouts.Callstack = @ptrFromInt(address);
+                fixup.visitCallstackObject(cs);
+            }
+            return info.size;
+        },
+        .fixnum, .f => return 0,
+        else => {},
+    }
+
+    if (info.slot_count > 0) {
+        if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(info.slot_count);
+        const slots: [*]Cell = @ptrFromInt(address + @sizeOf(Cell));
+        for (0..info.slot_count) |i| {
+            fixup.visitSlot(&slots[i]);
+        }
+    }
+
+    switch (info.type) {
         .quotation => {
-            const quot: *layouts.Quotation = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(3);
-            fixup.visitSlot(@ptrCast(&quot.array));
-            fixup.visitSlot(@ptrCast(&quot.cached_effect));
-            fixup.visitSlot(@ptrCast(&quot.cache_counter));
-            if (@hasDecl(Fixup, "visitEntryPoint")) fixup.visitEntryPoint(quot.entry_point);
-            return layouts.alignCell(@sizeOf(layouts.Quotation), layouts.data_alignment);
+            if (@hasDecl(Fixup, "visitEntryPoint")) {
+                const quot: *layouts.Quotation = @ptrFromInt(address);
+                fixup.visitEntryPoint(quot.entry_point);
+            }
         },
         .word => {
-            const word_obj: *layouts.Word = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(8);
-            fixup.visitSlot(@ptrCast(&word_obj.hashcode_field));
-            fixup.visitSlot(@ptrCast(&word_obj.name));
-            fixup.visitSlot(@ptrCast(&word_obj.vocabulary));
-            fixup.visitSlot(@ptrCast(&word_obj.def));
-            fixup.visitSlot(@ptrCast(&word_obj.props));
-            fixup.visitSlot(@ptrCast(&word_obj.pic_def));
-            fixup.visitSlot(@ptrCast(&word_obj.pic_tail_def));
-            fixup.visitSlot(@ptrCast(&word_obj.subprimitive));
-            if (@hasDecl(Fixup, "visitEntryPoint")) fixup.visitEntryPoint(word_obj.entry_point);
-            return layouts.alignCell(@sizeOf(layouts.Word), layouts.data_alignment);
-        },
-        .wrapper => {
-            const wrapper: *layouts.Wrapper = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1);
-            fixup.visitSlot(@ptrCast(&wrapper.object));
-            return layouts.alignCell(@sizeOf(layouts.Wrapper), layouts.data_alignment);
-        },
-        .string => {
-            const str: *layouts.String = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(2);
-            fixup.visitSlot(@ptrCast(&str.aux));
-            fixup.visitSlot(@ptrCast(&str.hashcode_field));
-            const len = layouts.untagFixnumUnsigned(str.length);
-            return layouts.alignCell(@sizeOf(layouts.String) + len, layouts.data_alignment);
+            if (@hasDecl(Fixup, "visitEntryPoint")) {
+                const word_obj: *layouts.Word = @ptrFromInt(address);
+                fixup.visitEntryPoint(word_obj.entry_point);
+            }
         },
         .alien => {
             const alien: *layouts.Alien = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(2);
-            fixup.visitSlot(@ptrCast(&alien.base));
-            fixup.visitSlot(@ptrCast(&alien.expired));
             alien.updateAddress();
-            return layouts.alignCell(@sizeOf(layouts.Alien), layouts.data_alignment);
         },
-        .dll => {
-            const dll: *layouts.Dll = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "ensureSlotCapacity")) fixup.ensureSlotCapacity(1);
-            fixup.visitSlot(@ptrCast(&dll.path));
-            return layouts.alignCell(@sizeOf(layouts.Dll), layouts.data_alignment);
-        },
-        .callstack => {
-            const cs: *layouts.Callstack = @ptrFromInt(address);
-            if (@hasDecl(Fixup, "visitCallstackObject")) {
-                fixup.visitCallstackObject(cs);
-            }
-            const frame_length = layouts.untagFixnumUnsigned(cs.length);
-            return layouts.alignCell(@sizeOf(layouts.Callstack) + frame_length, layouts.data_alignment);
-        },
-        .bignum => {
-            const bn: *layouts.Bignum = @ptrFromInt(address);
-            const capacity = layouts.untagFixnumUnsigned(bn.capacity);
-            return layouts.alignCell(@sizeOf(layouts.Bignum) + capacity * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .byte_array => {
-            const ba: *layouts.ByteArray = @ptrFromInt(address);
-            const capacity = layouts.untagFixnumUnsigned(ba.capacity);
-            return layouts.alignCell(@sizeOf(layouts.ByteArray) + capacity, layouts.data_alignment);
-        },
-        .float => return layouts.alignCell(@sizeOf(layouts.BoxedFloat), layouts.data_alignment),
-        .fixnum, .f => return 0,
+        else => {},
     }
+
+    return info.size;
 }
 
 pub const CopyingDestination = struct {
@@ -185,7 +151,7 @@ pub const CopyingDestination = struct {
             }
         }
 
-        const size = free_list.objectSizeFromHeader(untagged);
+        const size = layouts.objectVisitInfoFromAddress(untagged).size;
 
         const new_addr = self.allocate(size) orelse {
             self.allocation_failed = true;
@@ -275,7 +241,7 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
 
 // Get size of object for iteration purposes
 pub fn objectSize(address: Cell) Cell {
-    return free_list.objectSizeFromHeader(address);
+    return layouts.objectVisitInfoFromAddress(address).size;
 }
 
 // Iterate over all objects in a memory range

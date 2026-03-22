@@ -1,7 +1,6 @@
 const std = @import("std");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
-const Object = layouts.Object;
 const Allocator = std.mem.Allocator;
 
 // Free list allocator constants
@@ -437,56 +436,7 @@ pub const FreeListAllocator = struct {
 
 // Calculate object size from its header
 pub fn objectSizeFromHeader(address: Cell) Cell {
-    const obj: *Object = @ptrFromInt(address);
-    const obj_type = obj.getType();
-
-    return switch (obj_type) {
-        .array => blk: {
-            const arr: *layouts.Array = @ptrFromInt(address);
-            std.debug.assert(layouts.hasTag(arr.capacity, .fixnum));
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            break :blk layouts.alignCell(@sizeOf(layouts.Array) + capacity * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .byte_array => blk: {
-            const arr: *layouts.ByteArray = @ptrFromInt(address);
-            std.debug.assert(layouts.hasTag(arr.capacity, .fixnum));
-            const capacity = layouts.untagFixnumUnsigned(arr.capacity);
-            break :blk layouts.alignCell(@sizeOf(layouts.ByteArray) + capacity, layouts.data_alignment);
-        },
-        .string => blk: {
-            const str: *layouts.String = @ptrFromInt(address);
-            std.debug.assert(layouts.hasTag(str.length, .fixnum));
-            const len = layouts.untagFixnumUnsigned(str.length);
-            break :blk layouts.alignCell(@sizeOf(layouts.String) + len, layouts.data_alignment);
-        },
-        .bignum => blk: {
-            const bn: *layouts.Bignum = @ptrFromInt(address);
-            std.debug.assert(layouts.hasTag(bn.capacity, .fixnum));
-            const capacity = layouts.untagFixnumUnsigned(bn.capacity);
-            break :blk layouts.alignCell(@sizeOf(layouts.Bignum) + capacity * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .tuple => blk: {
-            const tuple: *layouts.Tuple = @ptrFromInt(address);
-            // No defensive bounds checks — wrong sizes cause worse bugs than crashes.
-            const layout_addr = layouts.followForwardingPointers(tuple.layout);
-            const layout: *layouts.TupleLayout = @ptrFromInt(layout_addr);
-            const tuple_size = layouts.untagFixnumUnsigned(layout.size);
-            break :blk layouts.alignCell(@sizeOf(layouts.Tuple) + tuple_size * @sizeOf(Cell), layouts.data_alignment);
-        },
-        .quotation => layouts.alignCell(@sizeOf(layouts.Quotation), layouts.data_alignment),
-        .word => layouts.alignCell(@sizeOf(layouts.Word), layouts.data_alignment),
-        .wrapper => layouts.alignCell(@sizeOf(layouts.Wrapper), layouts.data_alignment),
-        .float => layouts.alignCell(@sizeOf(layouts.BoxedFloat), layouts.data_alignment),
-        .alien => layouts.alignCell(@sizeOf(layouts.Alien), layouts.data_alignment),
-        .dll => layouts.alignCell(@sizeOf(layouts.Dll), layouts.data_alignment),
-        .callstack => blk: {
-            const cs: *layouts.Callstack = @ptrFromInt(address);
-            std.debug.assert(layouts.hasTag(cs.length, .fixnum));
-            const len = layouts.untagFixnumUnsigned(cs.length);
-            break :blk layouts.alignCell(@sizeOf(layouts.Callstack) + len, layouts.data_alignment);
-        },
-        .fixnum, .f => layouts.data_alignment,
-    };
+    return layouts.objectVisitInfoFromAddress(address).size;
 }
 
 // Tests

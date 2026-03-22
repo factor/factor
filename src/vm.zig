@@ -473,7 +473,25 @@ pub const FactorVM = struct {
 
     pub fn writeBarrierKnownHeapWithValue(self: *Self, slot_ptr: *Cell, value: Cell) void {
         if (layouts.isImmediate(value)) return;
-        self.writeBarrierKnownHeap(slot_ptr);
+
+        const slot_addr = @intFromPtr(slot_ptr);
+        const nursery = self.vm_asm.nursery;
+        if (slot_addr >= nursery.start and slot_addr < nursery.end) return;
+
+        const value_addr = layouts.UNTAG(value);
+        if (value_addr >= nursery.start and value_addr < nursery.end) {
+            self.writeBarrierSlot(slot_addr);
+            return;
+        }
+
+        const data_ptr = self.data orelse return;
+        const heap: *DataHeap = @ptrCast(@alignCast(data_ptr));
+
+        if (slot_addr >= heap.tenured.start and slot_addr < heap.tenured.end and
+            value_addr >= heap.aging.start and value_addr < heap.aging.end)
+        {
+            self.writeBarrierSlot(slot_addr);
+        }
     }
 
     pub fn writeBarrier(self: *Self, slot_ptr: *Cell) void {
