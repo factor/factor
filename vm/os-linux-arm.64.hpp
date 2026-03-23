@@ -6,11 +6,11 @@ namespace factor {
 #define UAP_PROGRAM_COUNTER(ucontext) (((ucontext_t*)ucontext)->uc_mcontext.pc)
 
 inline static fpsimd_context* find_fpsimd_context(void* uap) {
-  unsigned char* extension_records = (unsigned char*)(((ucontext_t*)uap)->uc_mcontext.__reserved);
+  unsigned int* extension_records = (unsigned int*)(((ucontext_t*)uap)->uc_mcontext.__reserved);
   unsigned int magic, size, i = 0;
-  while (magic = extension_records[i], size=extension_records[i+4], magic != 0 && size != 0) {
+  while (magic = extension_records[i], size=extension_records[i + 1], magic != 0 && size != 0) {
     if (magic == FPSIMD_MAGIC) break;
-    i += size;
+    i += size >> 2;
   }
   if (magic == 0 && size == 0) {
     std::cout << "Couldn't find fpsimd_context: " << uap << std::endl;
