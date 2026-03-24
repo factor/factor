@@ -169,9 +169,9 @@ M: gadget draw-children
 ! --- Shader Sources ---
 
 CONSTANT: gl3-vertex-shader-source "
-#version 330 core
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec4 color;
+#version 140
+in vec2 position;
+in vec4 color;
 
 uniform mat4 projection;
 uniform mat4 modelview;
@@ -185,7 +185,7 @@ void main() {
 "
 
 CONSTANT: gl3-fragment-shader-source "
-#version 330 core
+#version 140
 in vec4 frag_color;
 out vec4 out_color;
 
@@ -204,9 +204,9 @@ void main() {
 ! --- Texture Shader Sources ---
 
 CONSTANT: gl3-texture-vertex-shader-source "
-#version 330 core
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec2 texcoord;
+#version 140
+in vec2 position;
+in vec2 texcoord;
 
 uniform mat4 projection;
 uniform mat4 modelview;
@@ -220,7 +220,7 @@ void main() {
 "
 
 CONSTANT: gl3-texture-fragment-shader-source "
-#version 330 core
+#version 140
 in vec2 frag_texcoord;
 out vec4 out_color;
 
@@ -324,8 +324,13 @@ SYMBOL: gl3-render-state
 ! --- Shader Setup ---
 
 : create-gl3-program ( -- program )
-    gl3-vertex-shader-source gl3-fragment-shader-source
-    <simple-gl-program> ;
+    gl3-vertex-shader-source <vertex-shader> check-gl-shader
+    gl3-fragment-shader-source <fragment-shader> check-gl-shader
+    2array [
+        dup 0 "position" glBindAttribLocation
+        dup 1 "color" glBindAttribLocation
+        drop
+    ] (gl-program) check-gl-program ;
 
 : get-uniform-locations ( program -- proj-loc mv-loc color-loc use-color-loc )
     {
@@ -355,8 +360,13 @@ SYMBOL: gl3-render-state
 ! --- GL3 State Management ---
 
 : create-gl3-texture-program ( -- program )
-    gl3-texture-vertex-shader-source gl3-texture-fragment-shader-source
-    <simple-gl-program> ;
+    gl3-texture-vertex-shader-source <vertex-shader> check-gl-shader
+    gl3-texture-fragment-shader-source <fragment-shader> check-gl-shader
+    2array [
+        dup 0 "position" glBindAttribLocation
+        dup 1 "texcoord" glBindAttribLocation
+        drop
+    ] (gl-program) check-gl-program ;
 
 : get-texture-uniform-locations ( program -- proj-loc mv-loc sampler-loc )
     {
