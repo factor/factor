@@ -39,8 +39,14 @@ void factor_vm::call_fault_handler(exception_type_t exception,
     set_memory_protection_error(MACH_EXC_STATE_FAULT(exc_state),
                                 (cell)MACH_PROGRAM_COUNTER(thread_state));
     handler = (cell)factor::memory_signal_handler_impl;
+#ifdef FACTOR_ARM64
+  } else if (exception == EXC_BAD_INSTRUCTION && exc_state->__esr >> 26 == 0x2c) {
+    (void)code;
+    signal_fpu_status = fpu_status(exc_state->__esr);
+#else
   } else if (exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV) {
     signal_fpu_status = fpu_status(mach_fpu_status(float_state));
+#endif
     mach_clear_fpu_status(float_state);
     handler = (cell)factor::fp_signal_handler_impl;
   } else {
