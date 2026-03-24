@@ -368,6 +368,25 @@ fn clearFPUStatus(ucontext_ptr: *anyopaque) void {
     }
 }
 
+fn arm64FpTrapStatusFromEsr(esr: u32) u32 {
+    const ec = esr >> 26;
+    return if (ec == 0x2c) esr & 0x1f else 0;
+}
+
+fn getSignalFPTrapStatus(ucontext_ptr: *anyopaque) u32 {
+    const status = getFPUStatus(ucontext_ptr);
+    if (status != 0) return status;
+
+    if (builtin.os.tag == .macos and builtin.cpu.arch == .aarch64) {
+        const ucontext: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
+        const mc: [*]const u8 = @ptrCast(ucontext.uc_mcontext);
+        const esr = std.mem.readInt(u32, mc[8..][0..4], .little);
+        return arm64FpTrapStatusFromEsr(esr);
+    }
+
+    return 0;
+}
+
 // Convert FPU status word to Factor format
 pub fn processFPUStatus(status: u32) u32 {
     var r: u32 = 0;
@@ -477,9 +496,23 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
         fatalError("Foreign thread received signal", @intFromEnum(sig));
     };
 
+    const ucontext = ucontext_ptr orelse std.process.abort();
+    if (builtin.os.tag == .macos and builtin.cpu.arch == .aarch64 and sig == std.posix.SIG.ILL) {
+        const fpu_status = getSignalFPTrapStatus(ucontext);
+        if (fpu_status != 0) {
+            vm.signal_number = @intFromEnum(sig);
+            vm.signal_fpu_status = processFPUStatus(fpu_status);
+            clearFPUStatus(ucontext);
+
+            const sp_ptr = getStackPointer(ucontext);
+            const pc_ptr = getProgramCounter(ucontext);
+            dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&fp_signal_handler_impl));
+            return;
+        }
+    }
+
     vm.signal_number = @intFromEnum(sig);
 
-    const ucontext = ucontext_ptr orelse std.process.abort();
     const sp_ptr = getStackPointer(ucontext);
     const pc_ptr = getProgramCounter(ucontext);
 

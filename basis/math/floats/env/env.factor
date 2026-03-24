@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations generalizations
-kernel math math.bitwise sequences sets system vocabs ;
+kernel kernel.private math math.bitwise sequences sets system vocabs ;
 IN: math.floats.env
 
 SINGLETONS:
@@ -148,7 +148,15 @@ PRIVATE>
     clear-fp-exception-flags
     fp-traps :> orig
     exceptions set-fp-traps
-    quot [ orig set-fp-traps ] finally ; inline
+    [
+        quot call
+        fp-exception-flags exceptions intersect [
+            vm-error-exception-flag>bit >mask
+            clear-fp-exception-flags
+            KERNEL-ERROR ERROR-FP-TRAP rot f 4array throw
+        ] unless-empty
+    ]
+    [ orig set-fp-traps ] finally ; inline
 
 : without-fp-traps ( quot -- )
     { } swap with-fp-traps ; inline

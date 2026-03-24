@@ -34,13 +34,22 @@ void factor_vm::call_fault_handler(exception_type_t exception,
                                    MACH_THREAD_STATE_TYPE* thread_state,
                                    MACH_FLOAT_STATE_TYPE* float_state) {
   cell handler = 0;
+#if defined(FACTOR_ARM64)
+  const unsigned int fp_status = mach_fp_trap_status(exc_state, float_state);
+#else
+  const unsigned int fp_status = mach_fpu_status(float_state);
+#endif
 
   if (exception == EXC_BAD_ACCESS) {
     set_memory_protection_error(MACH_EXC_STATE_FAULT(exc_state),
                                 (cell)MACH_PROGRAM_COUNTER(thread_state));
     handler = (cell)factor::memory_signal_handler_impl;
-  } else if (exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV) {
-    signal_fpu_status = fpu_status(mach_fpu_status(float_state));
+  } else if ((exception == EXC_ARITHMETIC && code != MACH_EXC_INTEGER_DIV)
+#ifdef __aarch64__
+             || (exception == EXC_BAD_INSTRUCTION && fp_status != 0)
+#endif
+  ) {
+    signal_fpu_status = fpu_status(fp_status);
     mach_clear_fpu_status(float_state);
     handler = (cell)factor::fp_signal_handler_impl;
   } else {

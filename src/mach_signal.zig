@@ -225,6 +225,14 @@ else if (builtin.cpu.arch == .aarch64)
         fn clearFPUStatus(float_state: *float_state_t) void {
             float_state.__fpsr = 0;
         }
+
+        fn getFPTrapStatus(exc_state: *const exception_state_t, float_state: *const float_state_t) u32 {
+            const fpsr = float_state.__fpsr;
+            if (fpsr != 0) return fpsr;
+
+            const ec = exc_state.__esr >> 26;
+            return if (ec == 0x2c) exc_state.__esr & 0x1f else 0;
+        }
     }
 else
     @compileError("Unsupported architecture for Mach exception handling");
@@ -233,6 +241,11 @@ else
 const ExceptionState = ArchState.exception_state_t;
 const ThreadState = ArchState.thread_state_t;
 const FloatState = ArchState.float_state_t;
+
+fn isFloatingPointException(exception: exception_type_t, code: exception_data_type_t, fp_status: u32) bool {
+    return (exception == EXC_ARITHMETIC and code != ArchState.EXC_INTEGER_DIV)
+        or (builtin.cpu.arch == .aarch64 and exception == EXC_BAD_INSTRUCTION and fp_status != 0);
+}
 
 // Exception port (global variable, set by mach_initialize)
 var our_exception_port: mach_port_t = MACH_PORT_NULL;
@@ -270,6 +283,10 @@ fn callFaultHandler(
 ) void {
     const fault_addr = ArchState.getFaultAddr(exc_state);
     const fault_pc = ArchState.getPC(thread_state);
+    const fp_status = if (builtin.cpu.arch == .aarch64)
+        ArchState.getFPTrapStatus(exc_state, float_state)
+    else
+        ArchState.getFPUStatus(float_state);
 
     if (exception == EXC_BAD_ACCESS) {
         if (safepoints.isSafepoint(vm, fault_addr)) {
@@ -308,9 +325,14 @@ fn callFaultHandler(
             ArchState.setSP(thread_state, sp);
             ArchState.setPC(thread_state, pc);
         }
-    } else if (exception == EXC_ARITHMETIC and code != ArchState.EXC_INTEGER_DIV) {
-        // Floating point exception
-        vm.signal_fpu_status = signals.processFPUStatus(ArchState.getFPUStatus(float_state));
+    } else if (isFloatingPointException(exception, code, fp_status)) {
+        // Floating point exception.
+        //
+        // On macOS/arm64, FP traps are commonly delivered as EXC_BAD_INSTRUCTION
+        // with the actual cause recorded in ESR if FPSR is clear. Keep real
+        // bad-instruction crashes distinct by only taking this path when we can
+        // decode FP trap bits from the saved machine state.
+        vm.signal_fpu_status = signals.processFPUStatus(fp_status);
         ArchState.clearFPUStatus(float_state);
         var sp = ArchState.getSP(thread_state);
         var pc = ArchState.getPC(thread_state);
@@ -534,6 +556,13 @@ export fn catch_exception_raise(
     ) != KERN_SUCCESS) return KERN_FAILURE;
 
     return KERN_SUCCESS;
+}
+
+test "arm64 bad instruction only counts as fp trap when decoded fp status is present" {
+    if (builtin.os.tag != .macos or builtin.cpu.arch != .aarch64) return;
+
+    try std.testing.expect(!isFloatingPointException(EXC_BAD_INSTRUCTION, 0, 0));
+    try std.testing.expect(isFloatingPointException(EXC_BAD_INSTRUCTION, 0, 0x1));
 }
 
 // Mach exception handler thread function

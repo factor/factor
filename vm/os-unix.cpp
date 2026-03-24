@@ -162,6 +162,20 @@ void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   factor_vm* vm = current_vm_p();
   if (!vm)
     fatal_error("Foreign thread received signal", signal);
+
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+  if (signal == SIGILL) {
+    unsigned int status = uap_fp_trap_status(uap);
+    if (status != 0) {
+      vm->signal_number = signal;
+      vm->signal_fpu_status = fpu_status(status);
+      uap_clear_fpu_status(uap);
+      vm->dispatch_signal(uap, factor::fp_signal_handler_impl);
+      return;
+    }
+  }
+#endif
+
   vm->signal_number = signal;
   vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
 }
