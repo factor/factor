@@ -70,22 +70,13 @@ HOOK: string>image font-renderer ( font string -- image loc )
 : string-empty? ( obj -- ? )
     dup selection? [ string>> ] when empty? ;
 
-:: draw-string-gl3 ( font string -- )
-    font string string>image :> ( image loc )
-    image dim>> scale-dim :> dim
-    image make-texture-gl3 :> tex-id
-    loc dim tex-id image upside-down?>> gl3-draw-texture
-    tex-id delete-texture ;
+: rendered-text ( font string -- texture )
+    world get world-text-handle
+    [ string>image <texture> ] 2cache ;
 
 : draw-string ( font string -- )
     dup string-empty? [ 2drop ] [
-        gl3-mode? get-global [
-            draw-string-gl3
-        ] [
-            world get world-text-handle
-            [ string>image <texture> ] 2cache
-            draw-texture
-        ] if
+        rendered-text draw-texture
     ] if ;
 
 PRIVATE>

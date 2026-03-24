@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators destructors
-documents.private fonts io io.styles kernel math math.rectangles
+documents.private fonts io io.styles kernel locals math math.rectangles
 math.vectors memoize models models.range namespaces sequences
 sets sorting splitting strings ui.baseline-alignment
 ui.clipboards ui.gadgets ui.gadgets.borders
@@ -9,7 +9,7 @@ ui.gadgets.grid-lines ui.gadgets.grids ui.gadgets.icons
 ui.gadgets.incremental ui.gadgets.labels ui.gadgets.menus
 ui.gadgets.packs ui.gadgets.paragraphs ui.gadgets.presentations
 ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
-ui.gestures ui.images ui.pens.solid ui.render ui.theme
+ui.gestures ui.images ui.pens.solid ui.render ui.text.chunked ui.theme
 ui.traverse unicode ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
@@ -374,12 +374,23 @@ M: styled-pane pane-label style>> "" <styled-label> ;
         children>> ?last [ find-styled-label ] [ f ] if*
     ] unless ;
 
-: pane-text ( string style gadget -- )
-    dup find-styled-label [ pick over style>> = ] [ f f ] if* [
-        2nip [ prepend ] change-text relayout
+:: merge-pane-text? ( string style gadget -- label/f )
+    gadget find-styled-label :> label
+    label [
+        style label style>> = [
+            label text>> string? [
+                string length label text>> length + chunk-size <=
+                [ label ] [ f ] if
+            ] [ f ] if
+        ] [ f ] if
+    ] [ f ] if ; inline
+
+:: pane-text ( string style gadget -- )
+    string style gadget merge-pane-text? [
+        [ string prepend ] change-text relayout
     ] [
-        drop [ swap <styled-label> ] [ swap add-gadget drop ] bi*
-    ] if ;
+        gadget style string <styled-label> add-gadget drop
+    ] if* ;
 
 M: pack pane-line pane-text ;
 

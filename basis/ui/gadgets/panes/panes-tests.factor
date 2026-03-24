@@ -1,6 +1,6 @@
 USING: accessors colors fonts fry help help.markup help.stylesheet
 help.syntax help.topics inspector io io.streams.string io.styles
-kernel literals math models namespaces prettyprint see sequences
+kernel literals math models namespaces prettyprint see sequences strings
 tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
 ui.gadgets.panes.private ui.theme ;
 IN: ui.gadgets.panes.tests
@@ -16,6 +16,11 @@ IN: ui.gadgets.panes.tests
 ] unit-test
 
 { t } [ #children "num-children" get = ] unit-test
+
+{ t } [
+    <pane> dup [ 10000 CHAR: a <string> write ] with-pane
+    current>> children>> length 1 >
+] unit-test
 
 : test-gadget-text ( quot -- ? )
     '[ _ call( -- ) ]

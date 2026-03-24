@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes fonts kernel make math.functions
+USING: accessors arrays classes fonts kernel locals make math.functions
 models namespaces opengl sequences splitting strings
 ui.baseline-alignment ui.gadgets ui.gadgets.tracks ui.render
-ui.text ;
+ui.text ui.text.chunked ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -70,11 +70,22 @@ M: label cap-height*
 
 PRIVATE>
 
-M: label draw-gadget*
-    [ >label< ] keep
-    [ label-background [ font-with-background ] when* ]
-    [ label-foreground [ font-with-foreground ] when* ]
-    bi-curry compose dip draw-text ;
+:: colored-label-font ( label -- font )
+    label font>> :> font0
+    font0 label label-background [ font-with-background ] when* :> font1
+    font1 label label-foreground [ font-with-foreground ] when* ; inline
+
+:: draw-label-text ( font text -- )
+    text string? [
+        text chunked-string? [ font text draw-string-chunked ] [ font text draw-text ] if
+    ] [
+        font text draw-text
+    ] if ; inline
+
+M:: label draw-gadget* ( label -- )
+    label colored-label-font
+    label text>>
+    draw-label-text ;
 
 M: label gadget-text* string>> % ;
 
