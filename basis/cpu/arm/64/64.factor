@@ -85,8 +85,9 @@ M: arm.64 %load-vector
 
 : extend-offset ( reg imm -- operand )
     dup 9 >signed over = [
-        [ temp ] [ bitnot 16 bits ] bi* 0 MOVN
-        temp
+        [ temp ] [ dup neg? ] bi*
+        [ bitnot 16 bits 0 MOVN ] [ MOV ] if
+        temp 0 <UXTX>
     ] unless [+] ;
 
 : loc>operand ( loc -- operand )
@@ -653,10 +654,10 @@ M:: arm.64 %allot ( DST size class TEMP -- )
     temp card-mark MOV
     CARD dup card-bits LSR
     TEMP VM vm-cards-offset-offset [+] LDR
-    temp TEMP CARD [+] STRB
+    temp TEMP CARD 0 <UXTX> [+] STRB
     CARD dup deck-bits card-bits - LSR
     TEMP VM vm-decks-offset-offset [+] LDR
-    temp TEMP CARD [+] STRB ;
+    temp TEMP CARD 0 <UXTX> [+] STRB ;
 
 M:: arm.64 %write-barrier ( SRC SLOT scale tag CARD TEMP -- )
     CARD SRC SLOT ADD
