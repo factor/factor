@@ -1,10 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors kernel
+USING: accessors alien.c-types colors continuations kernel
+locals namespaces opengl
 specialized-arrays tools.test ui.gadgets.labels
 ui.pens.caching ui.pens.gradient ;
+IN: ui.pens.caching.tests
 
 SPECIALIZED-ARRAY: float
+
+:: with-gl3 ( ? quot -- )
+    gl3-mode? get-global :> old
+    [ ? gl3-mode? set-global quot call ]
+    [ old gl3-mode? set-global ] finally ; inline
 
 ! compute-pen
 {
@@ -12,7 +19,28 @@ SPECIALIZED-ARRAY: float
     float-array{ 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 }
     float-array{ 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 }
 } [
-    "hi" <label> { COLOR: white COLOR: black } <gradient>
-    [ compute-pen ] keep
-    [ last-dim>> ] [ last-vertices>> ] [ last-colors>> ] tri
+    f [
+        "hi" <label> { COLOR: white COLOR: black } <gradient>
+        [ compute-pen ] keep
+        [ last-dim>> ] [ last-vertices>> ] [ last-colors>> ] tri
+    ] with-gl3
+] unit-test
+
+{
+    { 0 0 }
+    float-array{
+        0.0 0.0 1.0 1.0 1.0 1.0
+        0.0 0.0 1.0 1.0 1.0 1.0
+        0.0 0.0 0.0 0.0 0.0 1.0
+        0.0 0.0 0.0 0.0 0.0 1.0
+        0.0 0.0 1.0 1.0 1.0 1.0
+        0.0 0.0 0.0 0.0 0.0 1.0
+    }
+    float-array{ 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 }
+} [
+    t [
+        "hi" <label> { COLOR: white COLOR: black } <gradient>
+        [ compute-pen ] keep
+        [ last-dim>> ] [ last-vertices>> ] [ last-colors>> ] tri
+    ] with-gl3
 ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: tools.test math kernel sets generic
+USING: continuations tools.test math kernel namespaces opengl sets generic
 ui.baseline-alignment ui.baseline-alignment.private ;
 
 ! Test baseline calculations
@@ -12,5 +12,13 @@ ui.baseline-alignment ui.baseline-alignment.private ;
 { 15 5 } [ 20 10 0 10 combine-metrics ] unit-test
 { 15 40 } [ 20 10 40 10 combine-metrics ] unit-test
 { 12 3 } [ 0 12 3 9 combine-metrics ] unit-test
+{
+    10 0
+} [
+    gl-scale-factor get-global "orig" [
+        [ 2.0 gl-scale-factor set-global 0 10 0 10 combine-metrics ]
+        [ "orig" get gl-scale-factor set-global ] finally
+    ] with-variable
+] unit-test
 
 { t } [ \ baseline \ cap-height [ dispatch-order ] bi@ set= ] unit-test

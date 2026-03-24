@@ -100,6 +100,9 @@ M: gadget contains-point?
 : sum-dims ( seq -- dim )
     [ 0 0 ] dip [ first2 swapd [ + ] 2bi@ ] each 2array ;
 
+: normalize-layout-dim ( dim -- dim' )
+    [ ?>integer ] map ;
+
 : each-child ( ... gadget quot: ( ... child -- ... ) -- ... )
     [ children>> ] dip each ; inline
 
@@ -186,7 +189,14 @@ M: gadget dim-changed
 
 PRIVATE>
 
+M: gadget loc<<
+    [ normalize-layout-dim ] dip
+    2dup loc>> =
+    [ 2drop ]
+    [ call-next-method ] if ;
+
 M: gadget dim<<
+    [ normalize-layout-dim ] dip
     2dup dim>> =
     [ 2drop ]
     [ [ nip ] [ call-next-method ] 2bi dim-changed ] if ;
@@ -195,7 +205,7 @@ GENERIC: pref-dim* ( gadget -- dim )
 
 : pref-dim ( gadget -- dim )
     [ pref-dim>> ] [
-        [ pref-dim* ] [ ] [ layout-state>> ] tri
+        [ pref-dim* normalize-layout-dim ] [ ] [ layout-state>> ] tri
         [ drop ] [ dupd pref-dim<< ] if
     ] ?unless ;
 
