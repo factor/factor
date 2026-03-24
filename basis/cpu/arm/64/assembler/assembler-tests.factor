@@ -64,7 +64,7 @@ IN: cpu.arm.64.assembler.tests
 0x206961f8 [ X0 X9 X1 0 <LSL*> [+] LDR ] test-insn
 0x207961f8 [ X0 X9 X1 3 <LSL*> [+] LDR ] test-insn
 0x20696138 [ W0 X9 X1 0 <LSL*> [+] LDRB ] test-insn
-0x20216938 [ W0 X9 X1 0 <LSL*> [+] STRB ] test-insn
+0x20692138 [ W0 X9 X1 0 <LSL*> [+] STRB ] test-insn
 0xaf0200f9 [ X15 X21 [] STR ] test-insn
 
 0x6e0dca9a [ X14 X11 X10 SDIV ] test-insn
