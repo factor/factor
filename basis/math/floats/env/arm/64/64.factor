@@ -87,12 +87,12 @@ M: arm64-env (set-rounding-mode) ( fp-env mode -- fp-env )
     '[ _ arm64-rounding-mode>bit at arm64-rounding-mode-bits remask ] change-fpcr ; inline
 
 M: arm64-env (get-denormal-mode) ( fp-env -- mode )
-    fpcr>> arm64-denormal-mode-bit bit? +denormal-keep+ +denormal-flush+ ? ; inline
+    fpcr>> arm64-denormal-mode-bit bit? +denormal-flush+ +denormal-keep+ ? ; inline
 
 M: arm64-env (set-denormal-mode) ( fp-env mode -- fp-env )
     '[
         _ {
-            { +denormal-keep+ [ arm64-denormal-mode-bit set-bit ] }
-            { +denormal-flush+ [ arm64-denormal-mode-bit clear-bit ] }
+            { +denormal-flush+ [ arm64-denormal-mode-bit set-bit ] }
+            { +denormal-keep+ [ arm64-denormal-mode-bit clear-bit ] }
         } case
     ] change-fpcr ;
