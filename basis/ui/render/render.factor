@@ -169,14 +169,14 @@ M: gadget draw-children
 ! --- Shader Sources ---
 
 CONSTANT: gl3-vertex-shader-source "
-#version 140
-in vec2 position;
-in vec4 color;
+#version 120
+attribute vec2 position;
+attribute vec4 color;
 
 uniform mat4 projection;
 uniform mat4 modelview;
 
-out vec4 frag_color;
+varying vec4 frag_color;
 
 void main() {
     gl_Position = projection * modelview * vec4(position, 0.0, 1.0);
@@ -185,18 +185,17 @@ void main() {
 "
 
 CONSTANT: gl3-fragment-shader-source "
-#version 140
-in vec4 frag_color;
-out vec4 out_color;
+#version 120
+varying vec4 frag_color;
 
 uniform vec4 uniform_color;
 uniform int use_uniform_color;
 
 void main() {
     if (use_uniform_color != 0) {
-        out_color = uniform_color;
+        gl_FragColor = uniform_color;
     } else {
-        out_color = frag_color;
+        gl_FragColor = frag_color;
     }
 }
 "
@@ -204,14 +203,14 @@ void main() {
 ! --- Texture Shader Sources ---
 
 CONSTANT: gl3-texture-vertex-shader-source "
-#version 140
-in vec2 position;
-in vec2 texcoord;
+#version 120
+attribute vec2 position;
+attribute vec2 texcoord;
 
 uniform mat4 projection;
 uniform mat4 modelview;
 
-out vec2 frag_texcoord;
+varying vec2 frag_texcoord;
 
 void main() {
     gl_Position = projection * modelview * vec4(position, 0.0, 1.0);
@@ -220,14 +219,13 @@ void main() {
 "
 
 CONSTANT: gl3-texture-fragment-shader-source "
-#version 140
-in vec2 frag_texcoord;
-out vec4 out_color;
+#version 120
+varying vec2 frag_texcoord;
 
 uniform sampler2D tex;
 
 void main() {
-    out_color = texture(tex, frag_texcoord);
+    gl_FragColor = texture2D(tex, frag_texcoord);
 }
 "
 
