@@ -135,7 +135,30 @@ set_md5sum() {
     fi
 }
 
+find_versioned_compiler() {
+    # Find the highest installed version of a versioned compiler (e.g. clang-19, gcc-12)
+    # Usage: find_versioned_compiler clang
+    local best="" best_ver=0 ver cmd
+    while IFS= read -r cmd; do
+        ver="${cmd##*-}"
+        if [[ "$ver" =~ ^[0-9]+$ ]] && (( ver > best_ver )); then
+            best_ver=$ver
+            best=$cmd
+        fi
+    done < <(compgen -c "$1-" 2>/dev/null | grep -E "^$1-[0-9]+$" | sort -u)
+    echo "$best"
+}
+
 set_cc() {
+    # If CC and CXX are already set by the user, trust them and use them directly
+    if [[ -n "$CC" && -n "$CXX" ]]; then
+        if test_programs_installed "$CC" "$CXX"; then
+            return
+        fi
+        $ECHO "error: CC=$CC or CXX=$CXX not found!"
+        exit_script 10
+    fi
+
     # on Cygwin we MUST use the MinGW "cross-compilers", therefore check these first
     # furthermore, we prefer 64 bit over 32 bit versions if both are available
 
@@ -199,10 +222,34 @@ set_cc() {
         return
     fi
 
+    # Try versioned clang (e.g. clang-19, clang-20) — pick highest available
+    local versioned_clang versioned_clangxx
+    versioned_clang=$(find_versioned_compiler clang)
+    versioned_clangxx=$(find_versioned_compiler clang++)
+    if [[ -n "$versioned_clang" && -n "$versioned_clangxx" ]]; then
+        [ -z "$CC" ] && CC=$versioned_clang
+        [ -z "$CXX" ] && CXX=$versioned_clangxx
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto"
+        [ -z "$CXX_OPT" ] && [ "$LTO" == "1" ] && CXX_OPT="-flto"
+        return
+    fi
+
     # gcc and g++ commands will fail to correctly build Factor on Cygwin, need "cross compiler"
     if test_programs_installed gcc g++ ; then
         [ -z "$CC" ] && CC=gcc
         [ -z "$CXX" ] && CXX=g++
+        [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
+        [ -z "$CXX_OPT" ] && [ "$LTO" == "1" ] && CXX_OPT="-flto=auto"
+        return
+    fi
+
+    # Try versioned gcc (e.g. gcc-12, gcc-13) — pick highest available
+    local versioned_gcc versioned_gxx
+    versioned_gcc=$(find_versioned_compiler gcc)
+    versioned_gxx=$(find_versioned_compiler g++)
+    if [[ -n "$versioned_gcc" && -n "$versioned_gxx" ]]; then
+        [ -z "$CC" ] && CC=$versioned_gcc
+        [ -z "$CXX" ] && CXX=$versioned_gxx
         [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
         [ -z "$CXX_OPT" ] && [ "$LTO" == "1" ] && CXX_OPT="-flto=auto"
         return
@@ -232,8 +279,16 @@ check_installed_programs() {
     ensure_program_installed uname
     ensure_program_installed git
     ensure_program_installed wget curl
-    ensure_program_installed clang x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc gcc
-    ensure_program_installed clang++ x86_64-w64-mingw32-g++ i686-w64-mingw32-g++ g++ cl
+    if [[ -n "$CC" ]]; then
+        ensure_program_installed "$CC"
+    else
+        ensure_program_installed clang x86_64-w64-mingw32-gcc i686-w64-mingw32-gcc gcc
+    fi
+    if [[ -n "$CXX" ]]; then
+        ensure_program_installed "$CXX"
+    else
+        ensure_program_installed clang++ x86_64-w64-mingw32-g++ i686-w64-mingw32-g++ g++ cl
+    fi
     ensure_program_installed make gmake
     ensure_program_installed md5sum md5
     ensure_program_installed cut
