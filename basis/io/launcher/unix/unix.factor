@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data assocs combinators
-continuations environment fry io.backend io.backend.unix
-io.files.private io.files.unix io.launcher io.launcher.private
-io.pathnames io.ports kernel libc math namespaces sequences
-simple-tokenizer strings system unix unix.ffi unix.process ;
+USING: accessors alien.c-types alien.data alien.strings
+alien.utilities assocs combinators continuations environment fry
+io.backend io.backend.unix io.encodings.utf8 io.files.private
+io.files.unix io.launcher io.launcher.private io.pathnames
+io.ports kernel libc math namespaces sequences simple-tokenizer
+strings system unix unix.ffi unix.process unix.types ;
 QUALIFIED-WITH: unix.signals sig
 IN: io.launcher.unix
 
@@ -21,17 +22,18 @@ IN: io.launcher.unix
         { +new-session+ [ setsid io-error ] }
     } case ;
 
+: >prio ( priority -- prio )
+    {
+        { +lowest-priority+ [ 20 ] }
+        { +low-priority+ [ 10 ] }
+        { +normal-priority+ [ 0 ] }
+        { +high-priority+ [ -10 ] }
+        { +highest-priority+ [ -20 ] }
+        { +realtime-priority+ [ -20 ] }
+    } case ;
+
 : setup-priority ( process -- process )
-    dup priority>> [
-        {
-            { +lowest-priority+ [ 20 ] }
-            { +low-priority+ [ 10 ] }
-            { +normal-priority+ [ 0 ] }
-            { +high-priority+ [ -10 ] }
-            { +highest-priority+ [ -20 ] }
-            { +realtime-priority+ [ -20 ] }
-        } case set-priority
-    ] when* ;
+    dup priority>> [ >prio set-priority ] when* ;
 
 : reset-fd ( fd -- )
     [ F_SETFL 0 fcntl io-error ] [ F_SETFD 0 fcntl io-error ] bi ;
@@ -39,16 +41,16 @@ IN: io.launcher.unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
 
-: redirect-file ( obj mode fd -- )
+: redirect-file ( obj flags fd -- )
     [ [ normalize-path ] dip file-mode open-file ] dip redirect-fd ;
 
-: redirect-file-append ( obj mode fd -- )
+: redirect-file-append ( obj flags fd -- )
     [ drop path>> normalize-path open-append ] dip redirect-fd ;
 
-: redirect-closed ( obj mode fd -- )
+: redirect-closed ( obj flags fd -- )
     [ drop "/dev/null" ] 2dip redirect-file ;
 
-: redirect ( obj mode fd -- )
+: redirect ( obj flags fd -- )
     {
         { [ pick not ] [ 3drop ] }
         { [ pick string? ] [ redirect-file ] }
@@ -76,7 +78,7 @@ IN: io.launcher.unix
     ] when ;
 
 ! Ignored signals are not reset to the default handler.
-: reset-ignored-signals ( process -- process )
+: reset-ignored-signals ( -- )
     SIGPIPE SIG_DFL signal drop ;
 
 : fork-process ( process -- pid )
@@ -90,19 +92,98 @@ IN: io.launcher.unix
     255 _exit
     f throw ;
 
+: setup-working-directory ( actions -- actions' )
+    dup current-directory get
+    posix_spawn_file_actions_addchdir check-posix ;
+
+: reset-ignored-signals* ( attrp -- attrp' )
+    dup SIGPIPE 2^ sigset_t <ref>
+    posix_spawnattr_setsigdefault check-posix ;
+
+: setup-process-group* ( attrp argv flags process -- attrp' argv flags' )
+    group>> {
+        { +same-group+ [ ] }
+        { +new-group+ [
+            POSIX_SPAWN_SETPGROUP bitor
+            pick 0 posix_spawnattr_setpgroup check-posix
+        ] }
+        { +new-session+ [ POSIX_SPAWN_SETSID bitor ] }
+    } case ;
+
+: reset-fd* ( actions fd -- )
+    posix_spawn_file_actions_addinherit_np check-posix ;
+
+: redirect-fd* ( actions oldfd fd -- )
+    2dup =
+    [ 3drop ]
+    [ posix_spawn_file_actions_adddup2 check-posix ] if ;
+
+: redirect-file* ( actions obj flags fd -- )
+    -rot [ normalize-path ] dip file-mode
+    posix_spawn_file_actions_addopen check-posix ;
+
+: redirect-file-append* ( actions obj flags fd -- )
+    -rot drop path>> normalize-path append-flags file-mode
+    posix_spawn_file_actions_addopen check-posix ;
+
+: redirect-closed* ( actions obj flags fd -- )
+    [ drop "/dev/null" ] 2dip redirect-file* ;
+
+: redirect* ( actions obj flags fd -- )
+    {
+        { [ pick not ] [ 4drop ] }
+        { [ pick string? ] [ redirect-file* ] }
+        { [ pick appender? ] [ redirect-file-append* ] }
+        { [ pick +closed+ eq? ] [ redirect-closed* ] }
+        { [ pick fd? ] [ [ drop fd>> 2dup reset-fd* ] dip redirect-fd* ] }
+        [ [ underlying-handle ] 2dip redirect* ]
+    } cond ;
+
+: setup-redirection* ( actions attrp argv process -- actions' attrp argv )
+    pickd
+    [ stdin>> ?closed read-flags 0 redirect* ]
+    [ stdout>> ?closed write-flags 1 redirect* ]
+    [
+        stderr>> dup +stdout+ eq?
+        [ drop 1 2 posix_spawn_file_actions_adddup2 check-posix ]
+        [ ?closed write-flags 2 redirect* ] if
+    ] 2tri ;
+
+: setup-priority* ( pid process -- pid )
+    priority>> [
+        [
+            [ PRIO_PROCESS ] 2dip >prio
+            unix.process:setpriority io-error
+        ] keepd
+    ] when* ;
+
 : spawn-process ( process -- pid )
-    [ reset-ignored-signals ] [ 2drop 248 _exit ] recover
-    [ setup-process-group ] [ 2drop 249 _exit ] recover
-    [ setup-priority ] [ 2drop 250 _exit ] recover
-    [ setup-redirection ] [ 2drop 251 _exit ] recover
-    [ current-directory get cd ] [ 2drop 252 _exit ] recover
-    [ setup-environment ] [ 2drop 253 _exit ] recover
-    [ get-arguments posix-spawn ] [ drop ] recover ;
+    {
+        [
+            [ 0 pid_t <ref> dup ] dip
+            get-arguments [
+                first utf8 string>alien
+                posix-spawn-file-actions-init setup-working-directory
+                posix-spawnattr-init reset-ignored-signals*
+            ] keep utf8 strings>alien POSIX_SPAWN_SETSIGDEF
+        ]
+        [
+            setup-process-group*
+            overd posix_spawnattr_setflags check-posix
+        ]
+        [ setup-redirection* ]
+        [
+            get-environment assoc>env utf8 strings>alien
+            posix_spawnp check-posix pid_t deref
+        ]
+        [ setup-priority* ]
+    } cleave ;
 
 M: unix (current-process) getpid ;
 
 M: unix (run-process)
-    '[ _ fork-process ] [ ] with-fork ;
+    os macos? cpu arm.64? and
+    [ spawn-process ] [ '[ _ fork-process ] [ ] with-fork ] if ;
 
 M: unix (kill-process)
     [ handle>> SIGTERM ] [ group>> ] bi {

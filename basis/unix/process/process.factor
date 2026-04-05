@@ -26,14 +26,14 @@ FUNCTION: int posix_spawnattr_destroy ( posix_spawnattr_t* attr )
 FUNCTION: int posix_spawn_file_actions_addclose (
     posix_spawn_file_actions_t *file_actions, int filedes )
 FUNCTION: int posix_spawn_file_actions_addopen (
-    posix_spawn_file_actions_t* file_actions, int intfiledes, char* path, int oflag, mode_t mode )
+    posix_spawn_file_actions_t* file_actions, int intfiledes, c-string path, int oflag, mode_t mode )
 FUNCTION: int posix_spawn_file_actions_adddup2 (
     posix_spawn_file_actions_t *file_actions, int filedes, int intnewfiledes )
 FUNCTION: int posix_spawn_file_actions_addinherit_np (
     posix_spawn_file_actions_t *file_actions, int filedes )
-FUNCTION: int posix_spawn_file_actions_addchdir_np (
-    posix_spawn_file_actions_t *file_actions char* path )
-FUNCTION: int posix_spawn_file_actions_addfchdir_np (
+FUNCTION: int posix_spawn_file_actions_addchdir (
+    posix_spawn_file_actions_t *file_actions, c-string path )
+FUNCTION: int posix_spawn_file_actions_addfchdir (
     posix_spawn_file_actions_t *file_actions, int filedes )
 
 FUNCTION: int posix_spawnattr_getsigdefault ( posix_spawnattr_t* attr, sigset_t* sigdefault )
@@ -83,7 +83,7 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     dup 0 = [ drop ] [ (throw-errno) ] if ;
 
 : posix-spawn-file-actions-init ( -- posix_spawn_file_actions_t )
-    posix_spawn_file_actions_t new
+    f posix_spawn_file_actions_t <ref>
     [ posix_spawn_file_actions_init check-posix ] keep ;
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )
@@ -164,7 +164,7 @@ FUNCTION: int getpriority ( int which, int who )
 FUNCTION: int setpriority ( int which, int who, int prio )
 
 : set-priority ( n -- )
-    [ 0 0 ] dip setpriority io-error ;
+    [ PRIO_PROCESS 0 ] dip setpriority io-error ;
 
 ! Flags for waitpid
 
