@@ -448,6 +448,15 @@ TUPLE: optional-parser parser ;
 M: optional-parser parser-quot
     parser>> execute-parser-quot '[ @ check-optional ] ;
 
+TUPLE: optional*-parser parser ;
+
+: check-optional* ( result -- result )
+    [ input-slice swap ast>> dup ignore = [ drop { } clone ]
+      [ 1array ] if ] [ input-slice f ] if* <parse-result> ;
+
+M: optional*-parser parser-quot
+    parser>> execute-parser-quot '[ @ check-optional* ] ;
+
 TUPLE: semantic-parser parser quot ;
 
 : check-semantic ( result quot -- result )
@@ -555,6 +564,9 @@ PRIVATE>
 
 : optional ( parser -- parser )
     optional-parser boa wrap-peg ;
+
+: optional* ( parser -- parser )
+    optional*-parser boa wrap-peg ;
 
 : semantic ( parser quot -- parser )
     semantic-parser boa wrap-peg ;
