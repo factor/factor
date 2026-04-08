@@ -22,7 +22,7 @@ tldr-platform [
 
 <PRIVATE
 
-CONSTANT: tldr-zip URL" https://tldr-pages.github.io/assets/tldr.zip"
+CONSTANT: tldr-zip URL" https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip"
 
 : download-tldr ( -- )
     "tldr" cache-file dup make-directory [
