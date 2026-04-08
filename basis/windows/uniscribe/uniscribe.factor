@@ -115,11 +115,15 @@ PRIVATE>
         if drop
     image RGBA >>component-order ;
 
+:: fill-x-channel ( image -- image' )
+   image bitmap>> uint32_t cast-array
+   [ 0xff000000 bitor ] map! drop image ;
+
 :: render-image ( dc ssa script-string -- image )
     script-string size>> :> size
     size dc [ ssa size script-string draw-script-string ] make-bitmap-image
     script-string font>> [ foreground>> ] [ background>> ] bi
-    >rgba alpha>> 1 number= [ drop ] [ color-to-alpha ] if ;
+    >rgba alpha>> 1 number= [ drop fill-x-channel ] [ color-to-alpha ] if ;
 
 : set-dc-font ( dc font -- )
     cache-font SelectObject win32-error=0/f ;
