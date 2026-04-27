@@ -908,6 +908,26 @@ HELP: SHADER_UNIFORM_IVEC4
     Shader uniform type: ivec4 (4 int)
     { $see-also ShaderUniformDataType } } ;
 
+HELP: SHADER_UNIFORM_UINT
+{ $class-description
+    Shader uniform type: unsigned int
+    { $see-also ShaderUniformDataType } } ;
+
+HELP: SHADER_UNIFORM_UIVEC2
+{ $class-description
+    Shader uniform type: uivec2 (2 unsigned int)
+    { $see-also ShaderUniformDataType } } ;
+
+HELP: SHADER_UNIFORM_UIVEC3
+{ $class-description
+    Shader uniform type: uivec3 (3 unsigned int)
+    { $see-also ShaderUniformDataType } } ;
+
+HELP: SHADER_UNIFORM_UIVEC4
+{ $class-description
+    Shader uniform type: uivec4 (4 unsigned int)
+    { $see-also ShaderUniformDataType } } ;
+
 HELP: SHADER_UNIFORM_SAMPLER2D
 { $class-description
     Shader uniform type: sampler2d
@@ -1719,15 +1739,16 @@ HELP: Mesh
     { "_normals"      { { $link float  } { $snippet "*" } } "Vertex normals (XYZ - 3 components per vertex)"                                 }   
     { "tangents"      { { $link float  } { $snippet "*" } } "Vertex tangents (XYZW - 4 components per vertex)"                              }    
     { "colors"        { { $link uchar  } { $snippet "*" } } "Vertex colors (RGBA - 4 components per vertex)"                                 }      
-    { "indices"       { { $link ushort } { $snippet "*" } } "Vertex indices (in case vertex data comes indexed)"                             }    
-    
-    { "animVertices"  { { $link float  } { $snippet "*" } } "Animated vertex positions (after bones transformations)"                        }
-    { "animNormals"   { { $link float  } { $snippet "*" } } "Animated normals (after bones transformation)"                                  }
-    { "boneIds"       { { $link uchar  } { $snippet "*" } } "Vertex bone ids, max 255 bone ids, up to 4 bones influence by vertex (skining)" }
+    { "indices"       { { $link ushort } { $snippet "*" } } "Vertex indices (in case vertex data comes indexed)"                             }
+
+    { "boneCount"     { $link int                         } "Number of bones (MAX: 256 bones)"                                               }
+    { "boneIds"       { { $link uchar  } { $snippet "*" } } "Vertex bone indices, up to 4 bones influence by vertex (skinning)"              }
     { "boneWeights"   { { $link float  } { $snippet "*" } } "Vertex bone weight, up to 4 bones influence by vertex (skinning)"               }
-    
-    { "vaoId"         { $link uint                      } "OpenGL Vertex Array Object id"                                                    } 
-    { "vboId"         { { $link uint } { $snippet "*" } } "OpenGL Vertex Buffer Objects id (7 types of vertex data)"                         } } ;   
+    { "animVertices"  { { $link float  } { $snippet "*" } } "Animated vertex positions (after bones transformations)"                        }
+    { "animNormals"   { { $link float  } { $snippet "*" } } "Animated normals (after bones transformations)"                                 }
+
+    { "vaoId"         { $link uint                      } "OpenGL Vertex Array Object id"                                                    }
+    { "vboId"         { { $link uint } { $snippet "*" } } "OpenGL Vertex Buffer Objects id (default vertex data)"                            } } ;   
 
 
 HELP: Shader
@@ -1778,32 +1799,40 @@ HELP: BoneInfo
     { { $snippet name }     " is the name of the bone. Max 32 characters." }
     { { $snippet processor }  " the parent index." } } ;
 
+HELP: ModelSkeleton
+{ $class-description
+    Skeleton bone hierarchy used by \ Model for animation. }
+{ $heading Fields }
+{ $table
+    { "boneCount" { $link int                          } "Number of bones."                            }
+    { "_bones"    { { $link void } { $snippet "*"  }   } "Bones information (skeleton)."               }
+    { "bindPose"  { { $link void } { $snippet "*"  }   } "Bones base transformation (Transform[])."    } } ;
+
 HELP: Model
 { $class-description
     Meshes, materials and animation data }
 { $heading Fields }
 { $table
-    { "transform"     { $link Matrix                     } "Local transform matrix."           }
-    { "meshCount"     { $link int                        } "Number of meshes."                 }
-    { "materialCount" { $link int                        } "Number of materials."              }
-    { "_meshes"       { { $link void } { $snippet "*" }  } "Meshes array."                     }
-    { "_materials"    { { $link void } { $snippet "*" }  } "Materials array."                  }
-    { "meshMaterial"  { { $link int  } { $snippet "*" }  } "Mesh material number."             }
-    { "boneCount"     { $link int                        } "Number of bones."                  }
-    { "_bones"        { { $link void } { $snippet "*"  } } "Bones information (skeleton)."     }
-    { "bindPose"      { { $link void } { $snippet "*"  } } "Bones base transformation (pose)." } } ;
+    { "transform"     { $link Matrix                       } "Local transform matrix."                  }
+    { "meshCount"     { $link int                          } "Number of meshes."                        }
+    { "materialCount" { $link int                          } "Number of materials."                     }
+    { "_meshes"       { { $link void }   { $snippet "*" }  } "Meshes array."                            }
+    { "_materials"    { { $link void }   { $snippet "*" }  } "Materials array."                         }
+    { "meshMaterial"  { { $link int  }   { $snippet "*" }  } "Mesh material number."                    }
+    { "skeleton"      { $link ModelSkeleton                } "Skeleton for animation."                  }
+    { "currentPose"   { { $link void }   { $snippet "*" }  } "Current animation pose (Transform[])."    }
+    { "boneMatrices"  { { $link Matrix } { $snippet "*" }  } "Bones animated transformation matrices."  } } ;
 
 
 HELP: ModelAnimation
-{ $class-description 
+{ $class-description
     Represents information about a animation for a 3D model. }
 { $heading Fields }
 { $table
-    { "boneCount"  { $link int                             }  "Number of bones."              }
-    { "frameCount" { $link int                             }  "Number of animation frames."   }
-    { "_bones"     { { $link BoneInfo  } { $snippet "**" } }  "Bones information (skeleton)." }
-    { "framePoses" { { $link Transform } { $snippet "**" } }  "Poses array by frame"          }
-    { "name"       { { $link char } { $snippet "[32]" }    }  "Animation name"                } } ;
+    { "name"          { { $link char } { $snippet "[32]" }    }  "Animation name"                       }
+    { "boneCount"     { $link int                             }  "Number of bones (per pose)."          }
+    { "keyframeCount" { $link int                             }  "Number of animation key frames."      }
+    { "keyframePoses" { { $link Transform } { $snippet "**" } }  "Animation sequence keyframe poses"    } } ;
 
 HELP: AutomationEvent
 { $class-description 
@@ -1899,9 +1928,8 @@ HELP: VrDeviceInfo
     { "hResolution"            { $link int                          } "HMD horizontal resolution in pixels"            }               
     { "vResolution"            { $link int                          } "HMD verticle resolution in pixels"              }               
     { "hScreenSize"            { $link float                        } "HMD horizontal size in meters"                  }             
-    { "vScreenSize"            { $link float                        } "HMD verticle size in meters"                    }             
-    { "vScreenCenter"          { $link float                        } "HMD screen center in meters"                    }           
-    { "eyeToScreenDistance"    { $link float                        } "HMD distance between eye and display in meters" }     
+    { "vScreenSize"            { $link float                        } "HMD verticle size in meters"                    }
+    { "eyeToScreenDistance"    { $link float                        } "HMD distance between eye and display in meters" }
     { "lensSeparationDistance" { $link float                        } "HMD lens separation distance in meters"         }  
     { "interpupillaryDistance" { $link float                        } "HMD IPD in meters"                              }  
     { "lensDistortionValues"   { { $link float } { $snippet "[4]" } } "HMD lens distortion constant parameters"        } 
@@ -1930,7 +1958,6 @@ HELP: FilePathList
 
 { $heading Fields }
 { $table
-    { { $snippet capacity } " the max number of entries." }
     { { $snippet count } " the number of entries found." }
     { { $snippet paths } " array of string where each member is a file path." }
 }
@@ -2673,6 +2700,36 @@ HELP: set-trace-log-level
 { $description
     "Set the current threshold (minimum) log level" } ;
 
+HELP: set-trace-log-callback
+{ $values
+    callback: TraceLogCallback }
+{ $description
+    "Set custom trace log" } ;
+
+HELP: set-load-file-data-callback
+{ $values
+    callback: LoadFileDataCallback }
+{ $description
+    "Set custom file binary data loader" } ;
+
+HELP: set-save-file-data-callback
+{ $values
+    callback: SaveFileDataCallback }
+{ $description
+    "Set custom file binary data saver" } ;
+
+HELP: set-load-file-text-callback
+{ $values
+    callback: LoadFileTextCallback }
+{ $description
+    "Set custom file text data loader" } ;
+
+HELP: set-save-file-text-callback
+{ $values
+    callback: SaveFileTextCallback }
+{ $description
+    "Set custom file text data saver" } ;
+
 HELP: mem-alloc
 { $values
     size: uint
@@ -2755,6 +2812,54 @@ HELP: save-file-text
     bool: bool }
 { $description
     "Save text data to file (write), string must be '\0' terminated, returns true on success" } ;
+
+HELP: file-rename
+{ $values
+    fileName: c-string
+    fileRename: c-string
+    int: int }
+{ $description
+    "Rename file (if exists)" } ;
+
+HELP: file-remove
+{ $values
+    fileName: c-string
+    int: int }
+{ $description
+    "Remove file (if exists)" } ;
+
+HELP: file-copy
+{ $values
+    srcPath: c-string
+    dstPath: c-string
+    int: int }
+{ $description
+    "Copy file from one path to another, dstPath created if it doesn't exist" } ;
+
+HELP: file-move
+{ $values
+    srcPath: c-string
+    dstPath: c-string
+    int: int }
+{ $description
+    "Move file from one directory to another, dstPath created if it doesn't exist" } ;
+
+HELP: file-text-replace
+{ $values
+    fileName: c-string
+    search: c-string
+    replacement: c-string
+    int: int }
+{ $description
+    "Replace text in an existing file" } ;
+
+HELP: file-text-find-index
+{ $values
+    fileName: c-string
+    search: c-string
+    int: int }
+{ $description
+    "Find text in existing file" } ;
 
 HELP: file-exists
 { $values
@@ -2886,6 +2991,22 @@ HELP: unload-dropped-files
 { $description
     "Clear dropped files paths buffer (free memory)" } ;
 
+HELP: get-directory-file-count
+{ $values
+    dirPath: c-string
+    uint: uint }
+{ $description
+    "Get the file count in a directory" } ;
+
+HELP: get-directory-file-count-ex
+{ $values
+    basePath: c-string
+    filter: c-string
+    scanSubdirs: bool
+    uint: uint }
+{ $description
+    "Get the file count in a directory with extension filtering and recursive directory scan" } ;
+
 HELP: get-file-mod-time
 { $values
     fileName: c-string
@@ -2929,6 +3050,14 @@ HELP: decode-data-base64
     uchar*: { "a" { $link pointer } " to a " { $link uchar } } }
 { $description
     "Decode Base64 string data" } ;
+
+HELP: compute-sha256
+{ $values
+    data: { "a " { $link pointer } " to a " { $link uchar } }
+    dataSize: int
+    uint*: { "a " { $link pointer } " to a " { $link uint } } }
+{ $description
+    "Compute SHA256 hash code, returns static int[8] (32 bytes)" } ;
 
 ! Automation events functionality
 HELP: load-automation-event-list
@@ -3037,6 +3166,13 @@ HELP: get-char-pressed
     int: int }
 { $description
     "Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty" } ;
+
+HELP: get-key-name
+{ $values
+    key: int
+    c-string: c-string }
+{ $description
+    "Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)" } ;
 
 
 ! Input-related functions: gamepads
@@ -3376,6 +3512,16 @@ HELP: draw-line-bezier
 { $description
     "Draw a line using cubic-bezier curves in-out" } ;
 
+HELP: draw-line-dashed
+{ $values
+    startPos: Vector2
+    endPos: Vector2
+    dashSize: int
+    spaceSize: int
+    color: Color }
+{ $description
+    "Draw a dashed line" } ;
+
 HELP: draw-line-strip
 { $values
     points: { "a " { $link pointer } " to a " { $link Vector2 } }
@@ -3417,8 +3563,7 @@ HELP: draw-circle-sector-lines
 
 HELP: draw-circle-gradient
 { $values
-    centerX: int
-    centerY: int
+    center: Vector2
     radius: float
     inner: Color
     outer: Color }
@@ -3460,6 +3605,15 @@ HELP: draw-ellipse
 { $description
     "Draw ellipse" } ;
 
+HELP: draw-ellipse-v
+{ $values
+    center: Vector2
+    radiusH: float
+    radiusV: float
+    color: Color }
+{ $description
+    "Draw ellipse (Vector version)" } ;
+
 HELP: draw-ellipse-lines
 { $values
     centerX: int
@@ -3469,6 +3623,15 @@ HELP: draw-ellipse-lines
     color: Color }
 { $description
     "Draw ellipse outline" } ;
+
+HELP: draw-ellipse-lines-v
+{ $values
+    center: Vector2
+    radiusH: float
+    radiusV: float
+    color: Color }
+{ $description
+    "Draw ellipse outline (Vector version)" } ;
 
 HELP: draw-ring
 { $values
@@ -3984,6 +4147,17 @@ HELP: export-image
     bool: bool }
 { $description
     "Export image data to file, returns true on success" } ;
+
+HELP: export-image-to-memory
+{ $values
+    image: Image
+    fileType: c-string
+    fileSize: { "a " { $link pointer } " to a " { $link int } }
+    uchar*: { "a " { $link pointer } " to a " { $link uchar } } }
+{ $description
+    "Export image to memory buffer"
+    { $warning
+        "Memory must be MemFree()!" } } ;
 
 HELP: export-image-as-code
 { $values
@@ -4959,6 +5133,17 @@ HELP: measure-text-ex
 { $description
     "Measure string size for Font" } ;
 
+HELP: measure-text-codepoints
+{ $values
+    font: Font
+    codepoints: { "a " { $link pointer } " to a " { $link int } }
+    length: int
+    fontSize: float
+    spacing: float
+    Vector2: Vector2 }
+{ $description
+    "Measure string size for an existing array of codepoints for Font" } ;
+
 HELP: get-glyph-index
 { $values
     font: Font
@@ -5055,6 +5240,21 @@ HELP: codepoint-to-utf8
 
 ! Text strings management functions (no UTF-8 strings, only byte chars)
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
+HELP: load-text-lines
+{ $values
+    text: c-string
+    count: { "a " { $link pointer } " to a " { $link int } }
+    c-string*: { "a " { $link pointer } " to an array of " { $link c-string } } }
+{ $description
+    "Load text as separate lines ('\\n')" } ;
+
+HELP: unload-text-lines
+{ $values
+    text: { "a " { $link pointer } " to an array of " { $link c-string } }
+    lineCount: int }
+{ $description
+    "Unload text lines" } ;
+
 HELP: text-copy
 { $values
     dst: c-string
@@ -5094,6 +5294,22 @@ HELP: text-subtext
 { $description
     "Get a piece of a text string" } ;
 
+HELP: text-remove-spaces
+{ $values
+    text: c-string
+    c-string: c-string }
+{ $description
+    "Remove text spaces, concat words" } ;
+
+HELP: get-text-between
+{ $values
+    text: c-string
+    begin: c-string
+    end: c-string
+    c-string: c-string }
+{ $description
+    "Get text between two strings" } ;
+
 HELP: text-replace
 { $values
     text: c-string
@@ -5105,6 +5321,39 @@ HELP: text-replace
     { $warning
         "Memory must be freed!" } } ;
 
+HELP: text-replace-alloc
+{ $values
+    text: c-string
+    search: c-string
+    replacement: c-string
+    c-string: c-string }
+{ $description
+    "Replace text string with new string"
+    { $warning
+        "Memory must be MemFree()!" } } ;
+
+HELP: text-replace-between
+{ $values
+    text: c-string
+    begin: c-string
+    end: c-string
+    replacement: c-string
+    c-string: c-string }
+{ $description
+    "Replace text between two specific strings" } ;
+
+HELP: text-replace-between-alloc
+{ $values
+    text: c-string
+    begin: c-string
+    end: c-string
+    replacement: c-string
+    c-string: c-string }
+{ $description
+    "Replace text between two specific strings"
+    { $warning
+        "Memory must be MemFree()!" } } ;
+
 HELP: text-insert
 { $values
     text: c-string
@@ -5115,6 +5364,17 @@ HELP: text-insert
     "Insert text in a position"
     { $warning
         "Memory must be freed!" } } ;
+
+HELP: text-insert-alloc
+{ $values
+    text: c-string
+    insert: c-string
+    position: int
+    c-string: c-string }
+{ $description
+    "Insert text in a defined byte position"
+    { $warning
+        "Memory must be MemFree()!" } } ;
 
 HELP: text-join
 { $values
@@ -5722,11 +5982,16 @@ HELP: update-model-animation
 { $description
     "Update model animation pose" } ;
 
-HELP: unload-model-animation
+HELP: update-model-animation-ex
 { $values
-    anim: ModelAnimation }
+    model: Model
+    animA: ModelAnimation
+    frameA: float
+    animB: ModelAnimation
+    frameB: float
+    blend: float }
 { $description
-    "Unload animation data" } ;
+    "Update model animation pose, blending two animations" } ;
 
 HELP: unload-model-animations
 { $values

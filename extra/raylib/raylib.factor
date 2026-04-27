@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 Jack Lucas
 ! See https://factorcode.org/license.txt for BSD license.
-! These should be complete bindings to the Raylib library. (v4.0)
+! These should be complete bindings to the Raylib library. (v6.0)
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors
@@ -21,11 +21,11 @@ FROM: alien.c-types => float ;
 
 LIBRARY: raylib
 
-! Last updated 1/23/2023
-CONSTANT: RAYLIB_VERSION_MAJOR 5
-CONSTANT: RAYLIB_VERSION_MINOR 5
+! Last updated 4/27/2026
+CONSTANT: RAYLIB_VERSION_MAJOR 6
+CONSTANT: RAYLIB_VERSION_MINOR 0
 CONSTANT: RAYLIB_VERSION_PATCH 0
-CONSTANT: RAYLIB_VERSION  "5.5"
+CONSTANT: RAYLIB_VERSION  "6.0"
 
 ! Enumerations ---------------------------------------------------------
 
@@ -266,9 +266,10 @@ ENUM: ShaderLocationIndex
     SHADER_LOC_MAP_IRRADIANCE      ! Shader location: samplerCube texture: irradiance
     SHADER_LOC_MAP_PREFILTER       ! Shader location: samplerCube texture: prefilter
     SHADER_LOC_MAP_BRDF            ! Shader location: sampler2d texture: brdf
-    SHADER_LOC_VERTEX_BONEIDS      ! Shader location: vertex attribute: boneIds
-    SHADER_LOC_VERTEX_BONEWEIGHTS  ! Shader location: vertex attribute: boneWeights
-    SHADER_LOC_BONE_MATRICES ;     ! Shader location: array of matrices uniform: boneMatrices
+    SHADER_LOC_VERTEX_BONEIDS      ! Shader location: vertex attribute: bone indices
+    SHADER_LOC_VERTEX_BONEWEIGHTS  ! Shader location: vertex attribute: bone weights
+    SHADER_LOC_MATRIX_BONETRANSFORMS    ! Shader location: matrix attribute: bone transforms (animation)
+    SHADER_LOC_VERTEX_INSTANCETRANSFORM ; ! Shader location: vertex attribute: instance transforms
 
 ENUM: ShaderUniformDataType
     SHADER_UNIFORM_FLOAT           ! Shader uniform type: float
@@ -279,6 +280,10 @@ ENUM: ShaderUniformDataType
     SHADER_UNIFORM_IVEC2           ! Shader uniform type: ivec2 (2 int)
     SHADER_UNIFORM_IVEC3           ! Shader uniform type: ivec3 (3 int)
     SHADER_UNIFORM_IVEC4           ! Shader uniform type: ivec4 (4 int)
+    SHADER_UNIFORM_UINT            ! Shader uniform type: unsigned int
+    SHADER_UNIFORM_UIVEC2          ! Shader uniform type: uivec2 (2 unsigned int)
+    SHADER_UNIFORM_UIVEC3          ! Shader uniform type: uivec3 (3 unsigned int)
+    SHADER_UNIFORM_UIVEC4          ! Shader uniform type: uivec4 (4 unsigned int)
     SHADER_UNIFORM_SAMPLER2D ;     ! Shader uniform type: sampler2d
 
 ALIAS: SHADER_LOC_MAP_DIFFUSE SHADER_LOC_MAP_ALBEDO
@@ -569,14 +574,13 @@ STRUCT: Mesh
     { tangents float* }    ! Vertex tangents (XYZW - 4 components per vertex )
     { colors uchar* }      ! Vertex colors (RGBA - 4 components per vertex)
     { indices ushort* }    ! Vertex indices (in case vertex data comes indexed)
-    { animVertices float* }
-    { animNormals float* }
-    { boneIds uchar* }
-    { boneWeights float* }
-    { boneMatrices Matrix* }
-    { boneCount int }
+    { boneCount int }      ! Number of bones (MAX: 256 bones)
+    { boneIds uchar* }     ! Vertex bone indices, up to 4 bones influence by vertex (skinning)
+    { boneWeights float* } ! Vertex bone weight, up to 4 bones influence by vertex (skinning)
+    { animVertices float* } ! Animated vertex positions (after bones transformations)
+    { animNormals float* } ! Animated normals (after bones transformations)
     { vaoId uint }         ! OpenGL Vertex Array Object id
-    { vboId uint* } ;      ! OpenGL Vertex Buffer Objects id (7  types of vertex data)
+    { vboId uint* } ;      ! OpenGL Vertex Buffer Objects id (default vertex data)
 
 ARRAY-SLOT: Mesh Vector3 _vertices [ vertexCount>> ] vertices
 ARRAY-SLOT: Mesh Vector2 _texcoords [ vertexCount>> ] texcoords
@@ -609,6 +613,12 @@ STRUCT: BoneInfo
     { name char[32] }        ! Bone Name
     { parent int } ;         ! Bone parent
 
+! Skeleton, animation bones hierarchy
+STRUCT: ModelSkeleton
+    { boneCount int }        ! Number of bones
+    { _bones void* }         ! Bones information (skeleton)
+    { bindPose void* } ;     ! Bones base transformation (Transform[])
+
 STRUCT: Model
     { transform Matrix }
     { meshCount int }
@@ -616,22 +626,19 @@ STRUCT: Model
     { _meshes void* }
     { _materials void* }
     { meshMaterial int* }
-    { boneCount int }
-    { _bones void* }
-    { bindPose void* } ;
+    { skeleton ModelSkeleton }   ! Skeleton for animation
+    { currentPose void* }        ! Current animation pose (Transform[])
+    { boneMatrices Matrix* } ;   ! Bones animated transformation matrices
 
 ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
 ARRAY-SLOT: Model Mesh _meshes [ meshCount>> ] meshes
-ARRAY-SLOT: Model BoneInfo _bones [ boneCount>> ] bones
+ARRAY-SLOT: ModelSkeleton BoneInfo _bones [ boneCount>> ] bones
 
 STRUCT: ModelAnimation
-    { boneCount int }            ! Number of bones
-    { frameCount int }           ! Number of animation frames
-    { _bones BoneInfo* }         ! Bones information (skeleton)
-    { framePoses Transform** }   ! Poses array by frame
-    { name char[32] } ;          ! Animation name
-
-ARRAY-SLOT: ModelAnimation BoneInfo _bones [ boneCount>> ] bones
+    { name char[32] }            ! Animation name
+    { boneCount int }            ! Number of bones (per pose)
+    { keyframeCount int }        ! Number of animation key frames
+    { keyframePoses Transform** } ; ! Animation sequence keyframe poses [keyframe][pose]
 
 STRUCT: Ray
     { position Vector3 }    ! Ray position (origin)
@@ -677,7 +684,6 @@ STRUCT: VrDeviceInfo
     { vResolution int }               ! HMD verticle resolution in pixels
     { hScreenSize float }             ! HMD horizontal size in meters
     { vScreenSize float }             ! HMD verticle size in meters
-    { vScreenCenter float }           ! HMD screen center in meters
     { eyeToScreenDistance float }     ! HMD distance between eye and display in meters
     { lensSeparationDistance float }  ! HMD lens separation distance in meters
     { interpupillaryDistance float }  ! HMD IPD in meters
@@ -695,7 +701,6 @@ STRUCT: VrStereoConfig
     { scaleIn float[2] } ;            ! VR distortion scale in
 
 STRUCT: FilePathList
-    { capacity uint }                 ! Filepaths max entries
     { count uint }                    ! Filepaths entries count
     { _paths c-string* } ;            ! Filepaths entries
 
@@ -883,10 +888,16 @@ FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                             
 ! Callbacks to hook some internal functions
 ! WARNING: Callbacks setup is intended for advance users
 CALLBACK: void TraceLogCallback ( int logLevel, c-string text )                      ! Logging: Redirect trace log messages
-CALLBACK: uchar* LoadFileDataCallback ( c-string fileName, uint* dataSize )          ! FileIO: Load binary data
+CALLBACK: uchar* LoadFileDataCallback ( c-string fileName, int* dataSize )           ! FileIO: Load binary data
 CALLBACK: bool SaveFileDataCallback ( c-string fileName, void* data, int dataSize )  ! FileIO: Save binary data
 CALLBACK: char* LoadFileTextCallback ( c-string fileName )                            ! FileIO: Load text data
 CALLBACK: bool SaveFileTextCallback ( c-string fileName, c-string text )             ! FileIO: Save text data
+
+FUNCTION-ALIAS: set-trace-log-callback void SetTraceLogCallback ( TraceLogCallback callback )           ! Set custom trace log
+FUNCTION-ALIAS: set-load-file-data-callback void SetLoadFileDataCallback ( LoadFileDataCallback callback ) ! Set custom file binary data loader
+FUNCTION-ALIAS: set-save-file-data-callback void SetSaveFileDataCallback ( SaveFileDataCallback callback ) ! Set custom file binary data saver
+FUNCTION-ALIAS: set-load-file-text-callback void SetLoadFileTextCallback ( LoadFileTextCallback callback ) ! Set custom file text data loader
+FUNCTION-ALIAS: set-save-file-text-callback void SetSaveFileTextCallback ( SaveFileTextCallback callback ) ! Set custom file text data saver
 
 ! Files management functions
 FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, int* bytesRead )           ! Load file data as byte array (read)
@@ -896,6 +907,12 @@ FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, int siz
 FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a '\0' terminated string
 FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be '\0 terminated, returns true on success
+FUNCTION-ALIAS: file-rename int FileRename ( c-string fileName, c-string fileRename )                 ! Rename file (if exists)
+FUNCTION-ALIAS: file-remove int FileRemove ( c-string fileName )                                      ! Remove file (if exists)
+FUNCTION-ALIAS: file-copy int FileCopy ( c-string srcPath, c-string dstPath )                         ! Copy file from one path to another, dstPath created if it doesn't exist
+FUNCTION-ALIAS: file-move int FileMove ( c-string srcPath, c-string dstPath )                         ! Move file from one directory to another, dstPath created if it doesn't exist
+FUNCTION-ALIAS: file-text-replace int FileTextReplace ( c-string fileName, c-string search, c-string replacement ) ! Replace text in an existing file
+FUNCTION-ALIAS: file-text-find-index int FileTextFindIndex ( c-string fileName, c-string search )     ! Find text in existing file
 FUNCTION-ALIAS: file-exists bool FileExists ( c-string fileName )                                     ! Check if file exists
 FUNCTION-ALIAS: directory-exists bool DirectoryExists ( c-string dirPath )                            ! Check if a directory path exists
 FUNCTION-ALIAS: is-file-extension bool IsFileExtension ( c-string fileName, c-string ext )            ! Check file extension (including point: .png, .wav)
@@ -917,6 +934,8 @@ FUNCTION-ALIAS: unload-directory-files void UnloadDirectoryFiles ( FilePathList 
 FUNCTION-ALIAS: is-file-dropped bool IsFileDropped ( )                                                ! Check if a file has been dropped into window
 FUNCTION-ALIAS: load-dropped-files FilePathList LoadDroppedFiles ( )                          ! Get dropped files names (memory should be freed)
 FUNCTION-ALIAS: unload-dropped-files void UnloadDroppedFiles ( FilePathList files )                                      ! Clear dropped files paths buffer (free memory)
+FUNCTION-ALIAS: get-directory-file-count uint GetDirectoryFileCount ( c-string dirPath )                                  ! Get the file count in a directory
+FUNCTION-ALIAS: get-directory-file-count-ex uint GetDirectoryFileCountEx ( c-string basePath, c-string filter, bool scanSubdirs ) ! Get the file count in a directory with extension filtering and recursive directory scan
 FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )                           ! Get file modification time (last write time)
 
 ! Compression/Encoding functionality
@@ -927,6 +946,7 @@ FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* o
 FUNCTION-ALIAS: compute-crc32 uint ComputeCRC32 ( uchar* data, int dataSize )                                   ! Compute CRC32 hash code
 FUNCTION-ALIAS: compute-md5 uint* ComputeMD5 ( uchar* data, int dataSize )                                      ! Compute MD5 hash code, returns static int[4] (16 bytes)
 FUNCTION-ALIAS: compute-sha1 uint* ComputeSHA1 ( uchar* data, int dataSize )                                    ! Compute SHA1 hash code, returns static int[5] (20 bytes)
+FUNCTION-ALIAS: compute-sha256 uint* ComputeSHA256 ( uchar* data, int dataSize )                                ! Compute SHA256 hash code, returns static int[8] (32 bytes)
 
 ! Automation events functionality
 FUNCTION-ALIAS: load-automation-event-list AutomationEventList LoadAutomationEventList ( c-string fileName )  ! Load automation events list from file
@@ -951,6 +971,7 @@ FUNCTION-ALIAS: is-key-up bool IsKeyUp ( KeyboardKey key )                      
 FUNCTION-ALIAS: set-exit-key void SetExitKey ( KeyboardKey key )                         ! Set a custom key to exit program (default is ESC)
 FUNCTION-ALIAS: get-key-pressed KeyboardKey GetKeyPressed ( )                            ! Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
 FUNCTION-ALIAS: get-char-pressed int GetCharPressed ( )                                  ! Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
+FUNCTION-ALIAS: get-key-name c-string GetKeyName ( int key )                             ! Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)
 
 ! Input-related functions: gamepads
 FUNCTION-ALIAS: is-gamepad-available bool IsGamepadAvailable ( int gamepad )                                  ! Check if a gamepad is available
@@ -1025,15 +1046,18 @@ FUNCTION-ALIAS: draw-line-v void DrawLineV ( Vector2 startPos, Vector2 endPos, C
 FUNCTION-ALIAS: draw-line-ex void DrawLineEx ( Vector2 startPos, Vector2 endPos, float thick, Color color )                      ! Draw a line defining thickness
 FUNCTION-ALIAS: draw-line-strip void DrawLineStrip ( Vector2* points, int pointCount, Color color )                              ! Draw lines sequence
 FUNCTION-ALIAS: draw-line-bezier void DrawLineBezier ( Vector2 startPos, Vector2 endPos, float thick, Color color )              ! Draw a line using cubic-bezier curves in-out
+FUNCTION-ALIAS: draw-line-dashed void DrawLineDashed ( Vector2 startPos, Vector2 endPos, int dashSize, int spaceSize, Color color ) ! Draw a dashed line
 FUNCTION-ALIAS: draw-circle void DrawCircle ( int centerX, int centerY, float radius, Color color )                              ! Draw a color-filled circle
 FUNCTION-ALIAS: draw-circle-sector void DrawCircleSector ( Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color )       ! Draw a piece of a circle
 FUNCTION-ALIAS: draw-circle-sector-lines void DrawCircleSectorLines ( Vector2 center, float radius, float startAngle, float endAngle, int segments, Color color )  ! Draw circle sector outline
-FUNCTION-ALIAS: draw-circle-gradient void DrawCircleGradient ( int centerX, int centerY, float radius, Color inner, Color outer ) ! Draw a gradient-filled circle
+FUNCTION-ALIAS: draw-circle-gradient void DrawCircleGradient ( Vector2 center, float radius, Color inner, Color outer ) ! Draw a gradient-filled circle
 FUNCTION-ALIAS: draw-circle-v void DrawCircleV ( Vector2 center, float radius, Color color )                                     ! Draw a color-filled circle (Vector version)
 FUNCTION-ALIAS: draw-circle-lines void DrawCircleLines ( int centerX, int centerY, float radius, Color color )                   ! Draw circle outline
 FUNCTION-ALIAS: draw-circle-lines-v void DrawCircleLinesV ( Vector2 center, float radius, Color color )                          ! Draw circle outline (Vector version)
 FUNCTION-ALIAS: draw-ellipse void DrawEllipse ( int centerX, int centerY, float radiusH, float radiusV, Color color )            ! Draw ellipse
+FUNCTION-ALIAS: draw-ellipse-v void DrawEllipseV ( Vector2 center, float radiusH, float radiusV, Color color )                   ! Draw ellipse (Vector version)
 FUNCTION-ALIAS: draw-ellipse-lines void DrawEllipseLines ( int centerX, int centerY, float radiusH, float radiusV, Color color ) ! Draw ellipse outline
+FUNCTION-ALIAS: draw-ellipse-lines-v void DrawEllipseLinesV ( Vector2 center, float radiusH, float radiusV, Color color )        ! Draw ellipse outline (Vector version)
 FUNCTION-ALIAS: draw-ring void DrawRing ( Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color )  ! Draw ring
 FUNCTION-ALIAS: draw-ring-lines void DrawRingLines ( Vector2 center, float innerRadius, float outerRadius, float startAngle, float endAngle, int segments, Color color )     ! Draw ring outline
 FUNCTION-ALIAS: draw-rectangle void DrawRectangle ( int posX, int posY, int width, int height, Color color )                     ! Draw a color-filled rectangle
@@ -1104,6 +1128,7 @@ FUNCTION-ALIAS: load-image-from-screen Image LoadImageFromScreen ( )            
 FUNCTION-ALIAS: is-image-valid bool IsImageValid ( Image image )                                                                 ! Check if an image is valid (data and parameters)
 FUNCTION-ALIAS: unload-image void UnloadImage ( Image image )                                                                    ! Unload image from CPU memory (RAM)
 FUNCTION-ALIAS: export-image bool ExportImage ( Image image, c-string fileName )                                                 ! Export image data to file, returns true on success
+FUNCTION-ALIAS: export-image-to-memory uchar* ExportImageToMemory ( Image image, c-string fileType, int* fileSize )              ! Export image to memory buffer, memory must be MemFree()
 FUNCTION-ALIAS: export-image-as-code bool ExportImageAsCode ( Image image, c-string fileName )                                   ! Export image as code file defining an array of bytes, returns true on success
 
 ! Image generation functions
@@ -1188,7 +1213,7 @@ FUNCTION-ALIAS: load-texture-cubemap TextureCubemap LoadTextureCubemap ( Image i
 FUNCTION-ALIAS: load-render-texture RenderTexture2D LoadRenderTexture ( int width, int height )                                  ! Load texture for rendering (framebuffer)
 FUNCTION-ALIAS: is-texture-valid bool IsTextureValid ( Texture2D texture )                                                            ! Check if a texture is ready
 FUNCTION-ALIAS: unload-texture void UnloadTexture ( Texture2D texture )                                                          ! Unload texture from GPU memory (VRAM)
-FUNCTION-ALIAS: is-render-texture-valid void IsRenderTextureValid ( RenderTexture2D target )                                     ! Check if a render texture is ready
+FUNCTION-ALIAS: is-render-texture-valid bool IsRenderTextureValid ( RenderTexture2D target )                                     ! Check if a render texture is valid (loaded in GPU)
 FUNCTION-ALIAS: unload-render-texture void UnloadRenderTexture ( RenderTexture2D target )                                        ! Unload render texture from GPU memory (VRAM)
 FUNCTION-ALIAS: update-texture void UpdateTexture ( Texture2D texture, void* pixels )                                            ! Update GPU texture with new data
 FUNCTION-ALIAS: update-texture-rec void UpdateTextureRec ( Texture2D texture, Rectangle rec, void* pixels )                      ! Update GPU texture rectangle with new data
@@ -1254,6 +1279,7 @@ FUNCTION-ALIAS: draw-text-codepoints void DrawTextCodepoints ( Font font, int* c
 FUNCTION-ALIAS: set-text-line-spacing void SetTextLineSpacing ( int spacing )                                        ! Set vertical line spacing when drawing with line-breaks
 FUNCTION-ALIAS: measure-text int MeasureText ( c-string text, int fontSize )                                         ! Measure string width for default font
 FUNCTION-ALIAS: measure-text-ex Vector2 MeasureTextEx ( Font font, c-string text, float fontSize, float spacing )    ! Measure string size for Font
+FUNCTION-ALIAS: measure-text-codepoints Vector2 MeasureTextCodepoints ( Font font, int* codepoints, int length, float fontSize, float spacing ) ! Measure string size for an existing array of codepoints for Font
 FUNCTION-ALIAS: get-glyph-index int GetGlyphIndex ( Font font, int codepoint )                                       ! Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
 FUNCTION-ALIAS: get-glyph-info GlyphInfo GetGlyphInfo ( Font font, int codepoint )                                   ! Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
 FUNCTION-ALIAS: get-glyph-atlas-rec Rectangle GetGlyphAtlasRec ( Font font, int codepoint )                          ! Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
@@ -1271,13 +1297,21 @@ FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int*
 
 ! Text strings management functions (no UTF-8 strings, only byte chars)
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
+FUNCTION-ALIAS: load-text-lines c-string* LoadTextLines ( c-string text, int* count )                 ! Load text as separate lines ('\n')
+FUNCTION-ALIAS: unload-text-lines void UnloadTextLines ( c-string* text, int lineCount )              ! Unload text lines
 FUNCTION-ALIAS: text-copy int TextCopy ( c-string  dst, c-string src )                                ! Copy one string to another, returns bytes copied
 FUNCTION-ALIAS: text-is-equal bool TextIsEqual ( c-string text1, c-string text2 )                     ! Check if two text string are equal
 FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for '\0' ending
 FUNCTION-ALIAS: text-format c-string TextFormat ( c-string text )                                                  ! Text formatting with variables (sprintf() style)
 FUNCTION-ALIAS: text-subtext c-string TextSubtext ( c-string text, int position, int length )         ! Get a piece of a text string
+FUNCTION-ALIAS: text-remove-spaces c-string TextRemoveSpaces ( c-string text )                        ! Remove text spaces, concat words
+FUNCTION-ALIAS: get-text-between c-string GetTextBetween ( c-string text, c-string begin, c-string end ) ! Get text between two strings
 FUNCTION-ALIAS: text-replace c-string TextReplace ( c-string  text, c-string replace, c-string by )   ! Replace text string (WARNING: memory must be freed!)
+FUNCTION-ALIAS: text-replace-alloc c-string TextReplaceAlloc ( c-string text, c-string search, c-string replacement ) ! Replace text string with new string, memory must be MemFree()
+FUNCTION-ALIAS: text-replace-between c-string TextReplaceBetween ( c-string text, c-string begin, c-string end, c-string replacement ) ! Replace text between two specific strings
+FUNCTION-ALIAS: text-replace-between-alloc c-string TextReplaceBetweenAlloc ( c-string text, c-string begin, c-string end, c-string replacement ) ! Replace text between two specific strings, memory must be MemFree()
 FUNCTION-ALIAS: text-insert c-string TextInsert ( c-string text, c-string insert, int position )      ! Insert text in a position (WARNING: memory must be freed!)
+FUNCTION-ALIAS: text-insert-alloc c-string TextInsertAlloc ( c-string text, c-string insert, int position ) ! Insert text in a defined byte position, memory must be MemFree()
 FUNCTION-ALIAS: text-join c-string TextJoin ( c-string* textList, int count, c-string delimiter )     ! Join text strings with delimiter
 FUNCTION-ALIAS: text-split c-string* TextSplit ( c-string text, char delimiter, int* count )          ! Split text into multiple strings
 FUNCTION-ALIAS: text-append void TextAppend ( c-string text, c-string append, int* position )         ! Append text at specific position and move cursor!
@@ -1333,8 +1367,6 @@ FUNCTION-ALIAS: draw-model void DrawModel ( Model model, Vector3 position, float
 FUNCTION-ALIAS: draw-model-ex void DrawModelEx ( Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint )  ! Draw a model with extended parameters
 FUNCTION-ALIAS: draw-model-wires void DrawModelWires ( Model model, Vector3 position, float scale, Color tint ) ! Draw a model wires (with texture if set)
 FUNCTION-ALIAS: draw-model-wires-ex void DrawModelWiresEx ( Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint )  ! Draw a model wires (with texture if set) with extended parameters
-FUNCTION-ALIAS: draw-model-points void DrawModelPoints ( Model model, Vector3 position, float scale, Color tint ) ! Draw a model as points
-FUNCTION-ALIAS: draw-model-points-ex void DrawModelPointsEx ( Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint ) ! Draw a model as points with extended parameters
 FUNCTION-ALIAS: draw-bounding-box void DrawBoundingBox ( BoundingBox box, Color color )               ! Draw bounding box (wires)
 FUNCTION-ALIAS: draw-billboard void DrawBillboard ( Camera camera, Texture2D texture, Vector3 position, float scale, Color tint ) ! Draw a billboard texture
 FUNCTION-ALIAS: draw-billboard-rec void DrawBillboardRec ( Camera camera, Texture2D texture, Rectangle source, Vector3 position, Vector2 size, Color tint )  ! Draw a billboard texture defined by source
@@ -1375,9 +1407,8 @@ FUNCTION-ALIAS: set-model-mesh-material void SetModelMeshMaterial ( Model* model
 ! Model animations loading/unloading functions
 FUNCTION-ALIAS: load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, int* animCount ) ! Load model animations from file
 FUNCTION-ALIAS: update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, int frame ) ! Update model animation pose
-FUNCTION-ALIAS: update-model-animation-bones void UpdateModelAnimationBones ( Model model, ModelAnimation anim, int frame ) ! Update model animation mesh bone matrices (GPU skinning)
-FUNCTION-ALIAS: unload-model-animation void UnloadModelAnimation ( ModelAnimation anim )                         ! Unload animation data
-FUNCTION-ALIAS: unload-model-animations void UnloadModelAnimations ( ModelAnimation* animations, int count )    ! Unload animation array data
+FUNCTION-ALIAS: update-model-animation-ex void UpdateModelAnimationEx ( Model model, ModelAnimation animA, float frameA, ModelAnimation animB, float frameB, float blend ) ! Update model animation pose, blending two animations
+FUNCTION-ALIAS: unload-model-animations void UnloadModelAnimations ( ModelAnimation* animations, int animCount ) ! Unload animation array data
 FUNCTION-ALIAS: is-model-animation-valid bool IsModelAnimationValid ( Model model, ModelAnimation anim )         ! Check model animation skeleton match
 
 ! Collision detection functions
@@ -1519,7 +1550,6 @@ DESTRUCTOR: unload-image-palette
 DESTRUCTOR: unload-material
 DESTRUCTOR: unload-mesh
 DESTRUCTOR: unload-model
-DESTRUCTOR: unload-model-animation
 DESTRUCTOR: unload-music-stream
 DESTRUCTOR: unload-render-texture
 DESTRUCTOR: unload-shader
