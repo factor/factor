@@ -4716,7 +4716,8 @@ HELP: unload-texture
 
 HELP: is-render-texture-valid
 { $values
-    target: RenderTexture2D }
+    target: RenderTexture2D
+    bool: boolean }
 { $description
     "Check if a render texture is ready" } ;
 
@@ -5996,7 +5997,7 @@ HELP: update-model-animation-ex
 HELP: unload-model-animations
 { $values
     animations: { "a " { $link pointer } " to a "  { $link ModelAnimation } }
-    count: int }
+    animCount: int }
 { $description
     "Unload animation array data" } ;
 
