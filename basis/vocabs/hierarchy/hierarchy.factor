@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators
-combinators.short-circuit io.directories io.files io.files.info
-io.files.types io.pathnames kernel make namespaces sequences
-sets sorting splitting vocabs vocabs.loader vocabs.metadata
-vocabs.private ;
+combinators.short-circuit continuations io.directories io.files
+io.files.info io.files.types io.pathnames kernel make namespaces
+sequences sets sorting splitting vocabs vocabs.loader
+vocabs.metadata vocabs.private ;
 IN: vocabs.hierarchy
 
 TUPLE: vocab-prefix name ;
@@ -20,7 +20,7 @@ M: vocab-prefix vocab-name name>> ;
         [
             dup type>> {
                 { +directory+ [ drop t ] }
-                { +symbolic-link+ [ name>> file-info type>> +directory+ = ] }
+                { +symbolic-link+ [ name>> [ file-info type>> +directory+ = ] [ 2drop f ] recover ] }
                 [ 2drop f ]
             } case
         ]
