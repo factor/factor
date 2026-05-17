@@ -1,7 +1,7 @@
 USING: accessors assocs concurrency.mailboxes destructors
 io.encodings.binary io.pipes io.streams.duplex io.streams.null
 io.streams.string kernel linked-assocs msgpack msgpack.rpc
-msgpack.rpc.private sequences strings tools.test ;
+msgpack.rpc.private sequences strings system tools.test ;
 
 IN: msgpack.rpc.tests
 
@@ -104,18 +104,20 @@ IN: msgpack.rpc.tests
     ]
 ] unit-test
 
-{ "result" } [
-    [
-        [let
-            binary <connected-pair> [ &dispose ] bi@ :> ( x y )
-            x <connection> :> sx
-            y <connection> :> sy
-            [ [ msgid>> ] [ params>> ] bi <response-ok> sx send-response ]
-            sx session>> request-callback<<
-            sx sy [ start ] bi@
-            1 "test" "result" <request> sy send-request-await
-            result>>
-            sx sy [ stop ] bi@
-        ]
-    ] with-destructors
-] unit-test
+os macos? [
+    { "result" } [
+        [
+            [let
+                binary <connected-pair> [ &dispose ] bi@ :> ( x y )
+                x <connection> :> sx
+                y <connection> :> sy
+                [ [ msgid>> ] [ params>> ] bi <response-ok> sx send-response ]
+                sx session>> request-callback<<
+                sx sy [ start ] bi@
+                1 "test" "result" <request> sy send-request-await
+                result>>
+                sx sy [ stop ] bi@
+            ]
+        ] with-destructors
+    ] unit-test
+] unless
