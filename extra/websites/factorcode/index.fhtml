@@ -69,7 +69,7 @@ xml>string write-html
 
 <p>To download a binary, follow the link for the desired OS / CPU configuration. Binary packages are the recommended route for new users who wish to try Factor.</p>
 
-<h2>Stable release:
+<h2 id="stable-release">Stable release:
 <% latest-version <a [ announcement-url>> =href a> ] [ version>> write ] bi </a> %>
 </h2>
 <% release-grid write-xml %>
@@ -78,7 +78,7 @@ xml>string write-html
 <% latest-version <a [ source-path>> download-url =href a> ] [ version>> write ] bi </a> %>
 </p>
 
-<h2>Development release</h2>
+<h2 id="development-release">Development release</h2>
 <% package-grid write-xml %>
 
 <% ] with-mason-db %>
