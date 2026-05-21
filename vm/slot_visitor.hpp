@@ -123,7 +123,7 @@ template <typename Fixup> struct slot_visitor {
   cell cards_scanned;
   cell decks_scanned;
 
-  slot_visitor<Fixup>(factor_vm* parent, Fixup fixup)
+  slot_visitor(factor_vm* parent, Fixup fixup)
   : parent(parent),
     fixup(fixup),
     cards_scanned(0),
