@@ -42,7 +42,8 @@ PRIVATE>
 
 : word-help ( word -- content )
     [ [ "help" word-prop ] [ word-help* ] ?unless ] keep
-    inputs-and-outputs fix-shuffle drop ;
+    dup parsing-word? [ inputs-and-outputs ] unless
+    fix-shuffle drop ;
 
 : effect-help ( effect -- content )
     [ in>> ] [ out>> ] bi [
