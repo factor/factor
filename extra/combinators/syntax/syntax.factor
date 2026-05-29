@@ -50,23 +50,23 @@ DEFER: | delimiter
 
 PRIVATE>
 
-SYNTAX: cleave[ \ cleave parse-cleave-like ;
 SYNTAX: &[ \ cleave parse-cleave-like ;
+ALIAS: cleave[ &[
 
-SYNTAX: spread[ \ spread parse-cleave-like ;
 SYNTAX: *[ \ spread parse-cleave-like ;
+ALIAS: spread[ &[
 
-SYNTAX: apply[ parse-apply ;
 SYNTAX: @[ parse-apply ;
+ALIAS: apply[ @[
 
-SYNTAX: ncleave[ \ ncleave parse-ncleave-like ;
 SYNTAX: n&[ \ ncleave parse-ncleave-like ;
+ALIAS: ncleave[ n&[
 
-SYNTAX: nspread[ \ nspread parse-ncleave-like ;
 SYNTAX: n*[ \ nspread parse-ncleave-like ;
+ALIAS: nspread[ n*[
 
-SYNTAX: napply[ parse-mnapply ;
 SYNTAX: n@[ parse-mnapply ;
+ALIAS: napply[ n@[
 
 SYNTAX: n&&[ \ n&& parse-ncleave-like ;
 SYNTAX: n||[ \ n|| parse-ncleave-like ;
