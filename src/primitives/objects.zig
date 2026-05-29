@@ -65,7 +65,7 @@ pub export fn primitive_clone(vm_asm: *VMAssemblyFields) callconv(.c) void {
         std.debug.assert(layouts.hasTag(tuple.layout, .array));
     }
 
-    // Root the object - ensureNurserySpace can trigger GC which may move it
+    // Root the object - allocation can trigger GC which may move it
     vm.data_roots.appendAssumeCapacity(&obj);
     defer _ = vm.data_roots.pop();
 
@@ -73,25 +73,25 @@ pub export fn primitive_clone(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const size = slot_visitor.objectSize(layouts.UNTAG(obj));
     if (size == 0) return;
 
-    // Ensure nursery space (may trigger GC, moving obj via data_root)
-    if (!vm.ensureNurserySpace(size)) vm.memoryError();
+    // Allocate via the general path so objects larger than the nursery are
+    // placed directly in tenured space (allotObject -> allotLargeObject).
+    // The previous nursery-only path raised a spurious "memory error" whenever
+    // the clone exceeded the nursery (e.g. large hash-sets in benchmark.hash-sets).
+    const tagged_dst = vm.allotObject(tag, size) orelse vm.memoryError();
+    const dst_addr = layouts.UNTAG(tagged_dst);
 
     // After potential GC, re-derive source pointer from rooted obj
-    const src_addr = layouts.UNTAG(obj);
-    const src_ptr: [*]const u8 = @ptrFromInt(src_addr);
-
-    // Allocate - guaranteed to succeed after ensureNurserySpace
-    const dst_addr = vm.vm_asm.nursery.allocate(size);
+    const src_ptr: [*]const u8 = @ptrFromInt(layouts.UNTAG(obj));
     const dst_ptr: [*]u8 = @ptrFromInt(dst_addr);
 
-    // Copy entire object
+    // Copy entire object (overwrites the freshly-set header with the source's)
     @memcpy(dst_ptr[0..size], src_ptr[0..size]);
 
-    // Reset hashcode (bits 6+ of header)
+    // Reset hashcode (bits 6+ of header), keeping free/forwarding/tag bits
     const dst_obj: *layouts.Object = @ptrFromInt(dst_addr);
     dst_obj.header = dst_obj.header & 0x3F;
 
-    vm.replace(dst_addr | @intFromEnum(tag));
+    vm.replace(tagged_dst);
 }
 
 pub export fn primitive_wrapper(vm_asm: *VMAssemblyFields) callconv(.c) void {
