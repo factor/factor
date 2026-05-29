@@ -2,7 +2,7 @@ USING: combinators.short-circuit help.markup help.syntax combinators kernel gene
 IN: combinators.syntax
 
 HELP: &[
-    { $syntax "*[ A | B | C ]" }
+    { $syntax "&[ A | B | C ]" }
     { $description { "Applies quotations (separated by " { $link \ | } ") to the first value on the stack one by one, restoring the original value to the top of the stack each time"  }  }
     { $see-also \ cleave \ bi } ;
 
