@@ -699,63 +699,17 @@ pub const GarbageCollector = struct {
 
     fn visitCallstack(self: *Self, ctx: *Context, destination: *slot_visitor.CopyingDestination) void {
         const code_heap = self.vm.code orelse return;
-        var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
-
-        var top = ctx.callstack_top;
-        const bottom = ctx.callstack_bottom;
-
-        if (top == 0 or bottom == 0 or top >= bottom) {
-            return;
-        }
-
-        const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
-        const is_arm64 = builtin.cpu.arch == .aarch64;
-
-        while (top < bottom) {
-            // The return address lives at frame_top+0 on x86-64 and frame_top+8
-            // on arm64 (where +0 is the saved frame pointer of the predecessor).
-            const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
-            if (addr == 0) break;
-
-            // arm64 frames are chained: *(top) is the predecessor frame top.
-            const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
-
-            const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-                if (is_arm64) {
-                    if (next_top <= top) break;
-                    top = next_top;
-                } else {
-                    top += LEAF_FRAME_SIZE;
-                }
-                continue;
-            };
-            const cb: *const code_blocks.CodeBlock = @ptrCast(owner);
-            if (cb.blockGcInfo()) |gc_info| {
-                const return_address_offset: u32 = @intCast(cb.offset(addr));
-                if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
-                    const stack_pointer: [*]Cell = @ptrFromInt(top);
-                    const Visit = struct {
-                        fn slot(slot_ptr: *Cell, dest: *slot_visitor.CopyingDestination) void {
-                            const value = slot_ptr.*;
-                            if (layouts.isImmediate(value)) return;
-                            const copied = dest.copy(value);
-                            if (copied != value) slot_ptr.* = copied;
-                        }
-                    };
-                    spill_slots.visit(*slot_visitor.CopyingDestination, stack_pointer, gc_info, callsite, destination, Visit.slot);
-                }
-            } else {
-                lookup.cached_gc_info = null;
-                lookup.cached_callsite_index = null;
-            }
-
-            if (is_arm64) {
-                if (next_top <= top) break;
-                top = next_top;
-            } else {
-                top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
-            }
-        }
+        // The live-callstack frame walk is shared with primitive_become via
+        // slot_visitor.visitLiveCallstackRoots; CopyFixup.visitSlot performs the
+        // copying-collector slot update (was an inline Visit.slot here).
+        var fixup = slot_visitor.CopyFixup{ .destination = destination };
+        slot_visitor.visitLiveCallstackRoots(
+            slot_visitor.CopyFixup,
+            &fixup,
+            code_heap,
+            ctx.callstack_top,
+            ctx.callstack_bottom,
+        );
     }
 
     fn fillUnusedStacks(self: *Self) void {

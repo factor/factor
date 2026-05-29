@@ -261,6 +261,72 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
     }
 }
 
+/// Walk the live native callstack of a context (between `callstack_top` and
+/// `callstack_bottom`) and apply `fixup.visitSlot(*Cell)` to every spilled
+/// object pointer. This is the exact arm64-aware frame walk used by the GC's
+/// visitCallstack, factored out so non-GC root scanners (primitive_become)
+/// reuse one validated implementation instead of re-deriving the frame
+/// conventions. The caller must pass the context's *saved* callstack pointers
+/// (valid after a GC/safepoint save) and a live code heap.
+pub fn visitLiveCallstackRoots(
+    comptime Fixup: type,
+    fixup: *Fixup,
+    code_heap: *code_heap_mod.CodeHeap,
+    callstack_top: Cell,
+    callstack_bottom: Cell,
+) void {
+    var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
+
+    var top = callstack_top;
+    const bottom = callstack_bottom;
+    if (top == 0 or bottom == 0 or top >= bottom) return;
+
+    const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
+
+    while (top < bottom) {
+        // Return address: frame_top+0 on x86-64, frame_top+8 on arm64.
+        const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
+        if (addr == 0) break;
+
+        // arm64 frames are chained: *(top) is the predecessor frame top.
+        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+
+        const owner = lookup.ownerForAddressUnsafe(addr) orelse {
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += LEAF_FRAME_SIZE;
+            }
+            continue;
+        };
+
+        if (owner.blockGcInfo()) |gc_info| {
+            const return_address_offset: u32 = @intCast(owner.offset(addr));
+            if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
+                const stack_pointer: [*]Cell = @ptrFromInt(top);
+                const Visit = struct {
+                    fn slot(slot_ptr: *Cell, fx: *Fixup) void {
+                        fx.visitSlot(slot_ptr);
+                    }
+                };
+                spill_slots.visit(*Fixup, stack_pointer, gc_info, callsite, fixup, Visit.slot);
+            }
+        } else {
+            lookup.cached_gc_info = null;
+            lookup.cached_callsite_index = null;
+        }
+
+        if (is_arm64) {
+            if (next_top <= top) break;
+            top = next_top;
+        } else {
+            top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
+        }
+    }
+}
+
 // Get size of object for iteration purposes
 pub fn objectSize(address: Cell) Cell {
     return layouts.objectVisitInfoFromAddress(address).size;

@@ -7,6 +7,7 @@ const layouts = @import("../layouts.zig");
 const math = @import("../fixnum.zig");
 const objects = @import("../objects.zig");
 const slot_visitor = @import("../slot_visitor.zig");
+const jit_protect = @import("../jit_protect.zig");
 const vm_mod = @import("../vm.zig");
 const diagnostics = @import("diagnostics.zig");
 
@@ -346,6 +347,15 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         for (&ctx.context_objects) |*slot| {
             become_fixup.visitSlot(slot);
         }
+
+        // 4b. Native callstack spill slots. C++ become reaches these via
+        // visit_all_roots(); without them an object live only in a spilled
+        // register (not on the data/retain stacks) would not be remapped.
+        // The callstack pointers were saved by the minor GC at the top of
+        // become, so ctx.callstack_top/bottom are valid here.
+        if (vm.code) |code| {
+            slot_visitor.visitLiveCallstackRoots(BecomeFixup, &become_fixup, code, ctx.callstack_top, ctx.callstack_bottom);
+        }
     }
 
     // 5. Data roots
@@ -399,6 +409,11 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         for (&ctx.context_objects) |*slot| {
             become_fixup.visitSlot(slot);
         }
+
+        // Native callstack spill slots for this context (see 4b above).
+        if (vm.code) |code| {
+            slot_visitor.visitLiveCallstackRoots(BecomeFixup, &become_fixup, code, ctx.callstack_top, ctx.callstack_bottom);
+        }
     }
 
     // Visit all objects in the heap (tenured + aging). Nursery should be empty
@@ -424,6 +439,14 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     // Visit all code blocks and update embedded literals
     if (vm.code) |code| {
+        // op.storeValue and the block-header visitSlot writes below mutate
+        // executable MAP_JIT memory. On Apple Silicon (W^X) that write faults
+        // (SIGBUS) unless the page is made writable first; the fault is not
+        // resumable, so the handler loops forever re-executing the store. Open
+        // a W^X writable scope for the duration (matches gc()'s jit_protect.Scope).
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
         code.flushPending();
         for (code.all_blocks_sorted.items) |addr| {
             const block: *CodeBlock = @ptrFromInt(addr);
