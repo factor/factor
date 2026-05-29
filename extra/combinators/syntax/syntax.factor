@@ -27,15 +27,25 @@ DEFER: | delimiter
 : parse-cleave-quotations ( -- quotations )
     100 <vector> [ (parse-cleave-like) ] loop ;
 
+! parses syntax of the form "quot1 | quot2 | etc. ]"
+! into something of the form "{ [ quot1 ] [ quot2 ] [ etc. ] } some-word"
 : parse-cleave-like ( acc word -- acc )
     parse-cleave-quotations swap [ suffix! ] bi@ ;
 
 ! couldn't think of a better name. napply, nspread, ncleave etc.
 ! are all macros that take in numbers as the top parameter on the
 ! stack, meaning that you have to do a bit of shuffling around ! before they work
+
+! takes the last item on the accumulator, the given word, and the result quot
+! of evaluating the parser quot and appends a quotation of the form
+! [ last-item given-word result-quot.. ] to the accumulator
 : parse-number-macro-input ( acc word parser-quot -- acc )
     [ unclip-last ] [ 1quotation ] [ call( -- quot ) ] tri* -rot 2curry append! ;
 
+
+! takes the last two items on the accumulator, the given word,
+! and the result quot of evaluating the parser quot and appends a quotation of the form
+! [ second-to-last-item last-item given-word result-quot.. ] to the accumulator
 : 2parse-number-macro-input ( acc word parser-quot -- acc )
     [ 2 cut* ] 2dip [ suffix! >quotation ] dip call( -- quot ) swap curry append! ;
 
@@ -54,7 +64,7 @@ SYNTAX: &[ \ cleave parse-cleave-like ;
 ALIAS: cleave[ &[
 
 SYNTAX: *[ \ spread parse-cleave-like ;
-ALIAS: spread[ &[
+ALIAS: spread[ *[
 
 SYNTAX: @[ parse-apply ;
 ALIAS: apply[ @[
