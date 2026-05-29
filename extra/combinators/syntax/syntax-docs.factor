@@ -2,12 +2,12 @@ USING: combinators.short-circut help.markup help.syntax combinators kernel gener
 IN: combinators.syntax
 
 HELP: &[
-    { $syntax "&[ A | B | C ]"  }
+    { $syntax "*[ A | B | C ]" }
     { $description { "Applies quotations (separated by " { $link \ | } ") to the first value on the stack one by one, restoring the original value to the top of the stack each time"  }  }
     { $see-also \ cleave \ bi } ;
 
 HELP: *[
-    { $syntax "*[ A | B | C ]"  }
+    { $syntax "*[ A | B | C ]" }
     { $description { "Applies quotations (separated by " { $link \ | } ") to successive values on the stack, applying the first quotation to the first value, the second to the second value, and so on" } }
     { $see-also \ spread \ bi* } ;
 
