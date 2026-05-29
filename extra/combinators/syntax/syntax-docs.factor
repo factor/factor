@@ -1,4 +1,4 @@
-USING: combinators.short-circut help.markup help.syntax combinators kernel generalizations ;
+USING: combinators.short-circuit help.markup help.syntax combinators kernel generalizations ;
 IN: combinators.syntax
 
 HELP: &[
