@@ -81,6 +81,6 @@ ALIAS: napply[ n@[
 SYNTAX: n&&[ \ n&& parse-ncleave-like ;
 SYNTAX: n||[ \ n|| parse-ncleave-like ;
 
-SYNTAX: &&[ parse-quotation '[ dup [ drop @ ] when ] append! ;
+SYNTAX: &&[ \ 0&& parse-cleave-like ;
 
-SYNTAX: ||[ parse-quotation '[ dup [ drop @ ] unless ] append! ;
+SYNTAX: ||[ \ 0|| parse-cleave-like ;
