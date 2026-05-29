@@ -1687,8 +1687,8 @@ fn effectiveLen(digits: []const Cell) usize {
     return n;
 }
 
-    // r must be zeroed, r.len >= x.len + y.len.
-    fn mulDigits(x_in: []const Cell, y_in: []const Cell, r: []Cell, scratch: []Cell) void {
+// r must be zeroed, r.len >= x.len + y.len.
+fn mulDigits(x_in: []const Cell, y_in: []const Cell, r: []Cell, scratch: []Cell) void {
     const x = x_in[0..effectiveLen(x_in)];
     const y = y_in[0..effectiveLen(y_in)];
     if (x.len == 0 or y.len == 0) return;
@@ -1699,8 +1699,8 @@ fn effectiveLen(digits: []const Cell) usize {
     }
 }
 
-    // r must be zeroed, r.len >= 2 * x.len.
-    fn squareDigits(x_in: []const Cell, r: []Cell, scratch: []Cell) void {
+// r must be zeroed, r.len >= 2 * x.len.
+fn squareDigits(x_in: []const Cell, r: []Cell, scratch: []Cell) void {
     const x = x_in[0..effectiveLen(x_in)];
     if (x.len == 0) return;
     if (x.len < KARATSUBA_THRESHOLD) {

@@ -2,6 +2,8 @@ const std = @import("std");
 const builtin = @import("builtin");
 
 const code_blocks = @import("code_blocks.zig");
+const icache = @import("icache.zig");
+const jit_protect = @import("jit_protect.zig");
 const jit = @import("jit.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
@@ -141,6 +143,9 @@ pub const InlineCacheJit = struct {
 
 // Handle inline cache miss
 pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
+    var jit_scope = jit_protect.Scope.init();
+    defer jit_scope.deinit();
+
     var return_root = vm_mod.CodeRoot.init(return_address, vm);
     return_root.register();
     defer return_root.deinit();
@@ -381,19 +386,32 @@ pub const MegamorphicCache = struct {
     }
 };
 
-// Call site patching for x86-64
+// Call site patching for supported JIT backends.
 pub const CallSitePatcher = struct {
     const call_opcode: u8 = 0xe8;
     const jmp_opcode: u8 = 0xe9;
+    const arm_b_mask: u32 = 0x7c000000;
+    const arm_b_pattern: u32 = 0x14000000;
 
-    fn callSiteOpcode(return_address: Cell) u8 {
+    fn x86CallSiteOpcode(return_address: Cell) u8 {
         const opcode_ptr: *const u8 = @ptrFromInt(return_address - 5);
         return opcode_ptr.*;
     }
 
+    fn armCallSiteInsn(return_address: Cell) u32 {
+        const insn_ptr: *align(1) const u32 = @ptrFromInt(return_address - 4);
+        return insn_ptr.*;
+    }
+
     fn isValidCallSite(return_address: Cell) bool {
-        const opcode = callSiteOpcode(return_address);
-        return opcode == call_opcode or opcode == jmp_opcode;
+        return switch (builtin.cpu.arch) {
+            .x86, .x86_64 => blk: {
+                const opcode = x86CallSiteOpcode(return_address);
+                break :blk opcode == call_opcode or opcode == jmp_opcode;
+            },
+            .aarch64 => (armCallSiteInsn(return_address) & arm_b_mask) == arm_b_pattern,
+            else => @compileError("Unsupported architecture for call site patching"),
+        };
     }
 
     pub fn getCallTarget(return_address: Cell) Cell {
@@ -405,19 +423,52 @@ pub const CallSitePatcher = struct {
     }
 
     pub fn getCallTargetUnchecked(return_address: Cell) Cell {
-        const offset_ptr: *align(1) const i32 = @ptrFromInt(return_address - 4);
-        const offset: i64 = offset_ptr.*;
-        return @intCast(@as(i64, @intCast(return_address)) + offset);
+        return switch (builtin.cpu.arch) {
+            .x86, .x86_64 => blk: {
+                const offset_ptr: *align(1) const i32 = @ptrFromInt(return_address - 4);
+                const offset: i64 = offset_ptr.*;
+                break :blk @intCast(@as(i64, @intCast(return_address)) + offset);
+            },
+            .aarch64 => blk: {
+                const insn: i32 = @bitCast(armCallSiteInsn(return_address));
+                const offset: i64 = (insn & 0x03ffffff) << 6 >> 4;
+                // AArch64 branch immediates are relative to the branch instruction,
+                // while callers pass the address of the following instruction.
+                break :blk @intCast(@as(i64, @intCast(return_address)) + offset - 4);
+            },
+            else => @compileError("Unsupported architecture for call site patching"),
+        };
     }
 
     pub fn setCallTarget(return_address: Cell, target: Cell) void {
-        const offset: i32 = @truncate(@as(i64, @intCast(target)) - @as(i64, @intCast(return_address)));
-        const offset_ptr: *align(1) i32 = @ptrFromInt(return_address - 4);
-        offset_ptr.* = offset;
+        switch (builtin.cpu.arch) {
+            .x86, .x86_64 => {
+                const offset: i32 = @truncate(@as(i64, @intCast(target)) - @as(i64, @intCast(return_address)));
+                const offset_ptr: *align(1) i32 = @ptrFromInt(return_address - 4);
+                offset_ptr.* = offset;
+            },
+            .aarch64 => {
+                const delta = @as(i64, @intCast(target)) - @as(i64, @intCast(return_address)) + 4;
+                std.debug.assert((delta & 3) == 0);
+                std.debug.assert(delta >= -0x8000000);
+                std.debug.assert(delta < 0x8000000);
+
+                const insn_ptr: *align(1) u32 = @ptrFromInt(return_address - 4);
+                const insn = insn_ptr.*;
+                const imm26: u32 = @truncate(@as(u64, @bitCast(@divTrunc(delta, 4))));
+                insn_ptr.* = (insn & 0xfc000000) | (imm26 & 0x03ffffff);
+                icache.flushICache(return_address - 4, 4);
+            },
+            else => @compileError("Unsupported architecture for call site patching"),
+        }
     }
 
     pub fn isTailCallSite(return_address: Cell) bool {
-        return callSiteOpcode(return_address) == jmp_opcode;
+        return switch (builtin.cpu.arch) {
+            .x86, .x86_64 => x86CallSiteOpcode(return_address) == jmp_opcode,
+            .aarch64 => (armCallSiteInsn(return_address) >> 31) == 0,
+            else => @compileError("Unsupported architecture for call site patching"),
+        };
     }
 };
 
@@ -459,7 +510,42 @@ test "megamorphic cache hashcode" {
 }
 
 test "call site patcher" {
-    _ = CallSitePatcher.isTailCallSite;
-    _ = CallSitePatcher.getCallTarget;
-    _ = CallSitePatcher.setCallTarget;
+    switch (builtin.cpu.arch) {
+        .x86, .x86_64 => {
+            var x86_call = [_]u8{ 0xe8, 0, 0, 0, 0 };
+            const call_return_address = @intFromPtr(&x86_call[4]) + 1;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(call_return_address));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(call_return_address));
+            try std.testing.expectEqual(call_return_address, CallSitePatcher.getCallTarget(call_return_address));
+
+            const call_target = call_return_address + 16;
+            CallSitePatcher.setCallTarget(call_return_address, call_target);
+            try std.testing.expectEqual(call_target, CallSitePatcher.getCallTarget(call_return_address));
+
+            var x86_jmp = [_]u8{ 0xe9, 0, 0, 0, 0 };
+            const jmp_return_address = @intFromPtr(&x86_jmp[4]) + 1;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(jmp_return_address));
+            try std.testing.expect(CallSitePatcher.isTailCallSite(jmp_return_address));
+        },
+        .aarch64 => {
+            var arm_bl = [_]u8{ 0, 0, 0, 0 };
+            std.mem.writeInt(u32, arm_bl[0..4], 0x94000000, .little);
+            const bl_return_address = @intFromPtr(&arm_bl[0]) + 4;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(bl_return_address));
+            try std.testing.expect(!CallSitePatcher.isTailCallSite(bl_return_address));
+            try std.testing.expectEqual(bl_return_address - 4, CallSitePatcher.getCallTarget(bl_return_address));
+
+            const bl_target = bl_return_address + 16;
+            CallSitePatcher.setCallTarget(bl_return_address, bl_target);
+            try std.testing.expectEqual(bl_target, CallSitePatcher.getCallTarget(bl_return_address));
+
+            var arm_b = [_]u8{ 0, 0, 0, 0 };
+            std.mem.writeInt(u32, arm_b[0..4], 0x14000000, .little);
+            const b_return_address = @intFromPtr(&arm_b[0]) + 4;
+            try std.testing.expect(CallSitePatcher.isValidCallSite(b_return_address));
+            try std.testing.expect(CallSitePatcher.isTailCallSite(b_return_address));
+            try std.testing.expectEqual(b_return_address - 4, CallSitePatcher.getCallTarget(b_return_address));
+        },
+        else => return error.SkipZigTest,
+    }
 }

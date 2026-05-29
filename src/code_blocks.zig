@@ -896,9 +896,9 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pi
         }
     }
 
-        if (modified) {
-            block.flushIcache();
-        }
+    if (modified) {
+        block.flushIcache();
+    }
 }
 
 // Compile-time verification

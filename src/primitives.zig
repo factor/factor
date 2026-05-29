@@ -197,7 +197,7 @@ pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".fields.len;
 pub const primitives: [primitive_count]PrimitiveFn = init_primitives();
 
 fn init_primitives() [primitive_count]PrimitiveFn {
-    var table: [primitive_count]PrimitiveFn = [_]PrimitiveFn{misc.primitive_stub} ** primitive_count;
+    var table: [primitive_count]PrimitiveFn = @splat(misc.primitive_stub);
 
     // Object primitives
     table[@intFromEnum(PrimitiveIndex.clone)] = obj.primitive_clone;

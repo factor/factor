@@ -8,6 +8,7 @@ const contexts = @import("contexts.zig");
 const data_heap = @import("data_heap.zig");
 const free_list = @import("free_list.zig");
 const gc = @import("gc.zig");
+const jit_protect = @import("jit_protect.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
 const safepoints = @import("safepoints.zig");
@@ -139,7 +140,7 @@ pub const GCEvent = extern struct {
             .code_blocks_scanned = 0,
             .start_time = primitives.nanoCountMonotonic(),
             .total_time = 0,
-            .times = [_]Cell{0} ** 6,
+            .times = @splat(0),
             .temp_time = 0,
         };
     }
@@ -294,8 +295,8 @@ pub const FactorVM = struct {
                 .decks_offset = 0,
                 .signal_handler_addr = 0,
                 .faulting_p = false,
-                ._padding = [_]u8{0} ** 7,
-                .special_objects = [_]Cell{layouts.false_object} ** objects.special_object_count,
+                ._padding = @splat(0),
+                .special_objects = @splat(layouts.false_object),
             },
             .thread = null,
             .datastack_size = 32 * @sizeOf(Cell) * 1024,
@@ -563,8 +564,7 @@ pub const FactorVM = struct {
         }
     }
 
-    pub fn syncContextFromRegisters(_: *Self) void {
-    }
+    pub fn syncContextFromRegisters(_: *Self) void {}
 
     pub fn specialObject(self: *const Self, index: objects.SpecialObject) Cell {
         return self.vm_asm.special_objects[@intFromEnum(index)];
@@ -678,12 +678,7 @@ pub const FactorVM = struct {
         }
 
         if (self.c_to_factor_func) |func| {
-            if (builtin.cpu.arch == .aarch64 and (builtin.os.tag == .macos or builtin.os.tag == .ios)) {
-                const pthread_jit_write_protect_np = struct {
-                    extern "c" fn pthread_jit_write_protect_np(enabled: c_int) void;
-                }.pthread_jit_write_protect_np;
-                pthread_jit_write_protect_np(1); // Enable write protection (allow execution)
-            }
+            jit_protect.ensureExecutable();
 
             const func_addr = @intFromPtr(func);
             const quot_val = quot;
@@ -905,7 +900,6 @@ pub const FactorVM = struct {
         return layouts.tagBignum(bn);
     }
 
-
     pub fn allotLargeObject(self: *Self, type_tag: layouts.TypeTag, size: Cell) ?Cell {
         const data_heap_mod = @import("data_heap.zig");
         const data_ptr = self.data orelse @panic("data heap not initialized");
@@ -998,7 +992,6 @@ pub const FactorVM = struct {
         @panic("Out of memory in allot_code_block");
     }
 
-
     pub fn setDataHeap(self: *Self, heap: *DataHeap) void {
         self.data = heap;
 
@@ -1049,7 +1042,6 @@ pub const FactorVM = struct {
         self.minorGc();
         return self.vm_asm.nursery.here + size <= self.vm_asm.nursery.end;
     }
-
 
     pub fn lazyJitCompileEntryPoint(self: *const Self) Cell {
         const lazy_word = self.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.lazy_jit_compile_word)];
@@ -1119,6 +1111,8 @@ pub const FactorVM = struct {
 
     pub fn initializeCodeBlock(self: *Self, block: *CodeBlock, literals_cell: Cell) void {
         const c_api = @import("c_api.zig");
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
 
         var ctx = code_blocks_mod.RelocationContext{
             .vm_ptr = @intFromPtr(&self.vm_asm),
@@ -1163,7 +1157,6 @@ pub const FactorVM = struct {
             _ = code_heap.removeUninitializedBlock(block_addr);
         }
     }
-
 
     pub fn factorbug(self: *Self) void {
         const debugger = @import("debugger.zig");

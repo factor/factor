@@ -17,12 +17,11 @@ comptime {
     }
 }
 
-// Mach kernel types, constants, and functions from system headers
-const c = @cImport({
-    @cInclude("mach/mach.h");
-    @cInclude("mach/exception_types.h");
-    @cInclude("pthread.h");
-});
+// Mach kernel types, constants, and functions from system headers.
+// Zig 0.17 removed @cImport from source; these headers are translated by a
+// b.addTranslateC step in build.zig and exposed as the "c" module. The header
+// list lives in src/mach_imports.h.
+const c = @import("c");
 
 const mach_port_t = c.mach_port_t;
 const kern_return_t = c.kern_return_t;

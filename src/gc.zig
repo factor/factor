@@ -13,6 +13,7 @@ const vm_mod = @import("vm.zig");
 const card_scan = @import("card_scan.zig");
 const compact = @import("compact.zig");
 const callstack_lookup = @import("callstack_lookup.zig");
+const jit_protect = @import("jit_protect.zig");
 const mark_mod = @import("mark.zig");
 const sweep_mod = @import("sweep.zig");
 const write_barrier = @import("write_barrier.zig");
@@ -65,6 +66,15 @@ pub const GarbageCollector = struct {
     }
 
     pub fn gc(self: *Self, op: GCOp) !void {
+        // The collector writes relocated pointers back into the code heap and
+        // callback heap (e.g. callback stub `owner` fields in visitAllRoots).
+        // On Apple Silicon those are MAP_JIT and must be made writable for the
+        // duration of GC. collect() also opens a scope; jit_protect.Scope is
+        // re-entrant (depth-counted), so nesting is safe and this also covers
+        // the direct gc() callers (allotObjectSlow / allotLargeObject).
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
         var current_op = op;
 
         if (self.vm.gc_events != null) {
@@ -137,6 +147,8 @@ pub const GarbageCollector = struct {
 
     pub fn collect(self: *Self, op: GCOp) void {
         self.vm.syncContextFromRegisters();
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
 
         const need_unlock = self.vm.callstackNeedsGuardUnlock() or op == .collect_compact;
         if (need_unlock) {
@@ -238,7 +250,6 @@ pub const GarbageCollector = struct {
     }
 
     fn collectAging(self: *Self) bool {
-
         self.mark_stack.clearRetainingCapacity();
 
         self.heap.nursery.here = self.vm.vm_asm.nursery.here;
@@ -718,18 +729,26 @@ pub const GarbageCollector = struct {
         }
 
         const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+        const is_arm64 = builtin.cpu.arch == .aarch64;
 
         while (top < bottom) {
-            const addr_ptr: *const Cell = @ptrFromInt(top);
-            const addr = addr_ptr.*;
-
+            // The return address lives at frame_top+0 on x86-64 and frame_top+8
+            // on arm64 (where +0 is the saved frame pointer of the predecessor).
+            const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
             if (addr == 0) break;
 
+            // arm64 frames are chained: *(top) is the predecessor frame top.
+            const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+
             const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-                top += LEAF_FRAME_SIZE;
+                if (is_arm64) {
+                    if (next_top <= top) break;
+                    top = next_top;
+                } else {
+                    top += LEAF_FRAME_SIZE;
+                }
                 continue;
             };
-            const frame_size = callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
             const cb: *const code_blocks.CodeBlock = @ptrCast(owner);
             if (cb.blockGcInfo()) |gc_info| {
                 const return_address_offset: u32 = @intCast(cb.offset(addr));
@@ -750,7 +769,12 @@ pub const GarbageCollector = struct {
                 lookup.cached_callsite_index = null;
             }
 
-            top += frame_size;
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
+            }
         }
     }
 
@@ -1168,5 +1192,4 @@ test "gc clearWriteBarrierRange clears cards and decks" {
             try std.testing.expectEqual(@as(u8, 0), cards[ci]);
         }
     }
-
 }

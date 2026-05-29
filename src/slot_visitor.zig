@@ -1,6 +1,8 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const callstack_lookup = @import("callstack_lookup.zig");
 const code_blocks = @import("code_blocks.zig");
+const contexts = @import("contexts.zig");
 const code_heap_mod = @import("code_heap.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
@@ -210,20 +212,24 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
-        const addr_ptr: *const Cell = @ptrFromInt(frame_top);
-        const addr = addr_ptr.*;
+
+        // arm64 callstack objects store the (relative) frame size at slot 0 and
+        // the return address at +8; x86-64 stores the return address at +0.
+        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+
+        const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            frame_offset += LEAF_FRAME_SIZE;
+            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
             continue;
         };
-
-        const frame_size = owner.stackFrameSizeForAddress(addr);
 
         if (owner.blockGcInfo()) |gc_info| {
             const return_address_offset: u32 = @intCast(owner.offset(addr));
@@ -241,7 +247,7 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
             }
         }
 
-        frame_offset += frame_size;
+        frame_offset += if (is_arm64) arm_frame_size else owner.stackFrameSizeForAddress(addr);
     }
 }
 

@@ -167,16 +167,26 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
 
     while (top < bottom) {
-        const addr_ptr: *const Cell = @ptrFromInt(top);
-        const addr = addr_ptr.*;
+        // Return address: frame_top+0 (x86-64) / frame_top+8 (arm64, where +0
+        // holds the predecessor frame pointer). See iterateCallstack.
+        const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
+
+        // arm64 live frames are chained by absolute frame pointer at *(top).
+        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         // Binary search all_blocks_sorted (old addresses)
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            top += LEAF_FRAME_SIZE;
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += LEAF_FRAME_SIZE;
+            }
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -188,11 +198,6 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
         // Compute offset using old entry point (arithmetic only)
         const old_entry_point = old_block_addr + @sizeOf(code_blocks.CodeBlock);
         const delta = if (addr > old_entry_point) addr - old_entry_point else 0;
-        const natural_frame_size = compiled.stackFrameSize();
-        var frame_size: Cell = LEAF_FRAME_SIZE;
-        if (natural_frame_size > 0 and delta > 0) {
-            frame_size = natural_frame_size;
-        }
 
         if (compiled.blockGcInfo()) |gc_info| {
             const return_address_offset: u32 = @intCast(delta);
@@ -207,7 +212,13 @@ fn fixupCallstackSlots(gc: *GC, ctx: *Context, fixup: *CompactionFixup) void {
             }
         }
 
-        top += frame_size;
+        if (is_arm64) {
+            if (next_top <= top) break;
+            top = next_top;
+        } else {
+            const natural_frame_size = compiled.stackFrameSize();
+            top += if (natural_frame_size > 0 and delta > 0) natural_frame_size else LEAF_FRAME_SIZE;
+        }
     }
 }
 
@@ -219,17 +230,23 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
-        const addr_ptr: *const Cell = @ptrFromInt(frame_top);
-        const addr = addr_ptr.*;
+
+        // arm64 callstack objects store the (relative) frame size at slot 0, and
+        // the return address at +8; x86-64 stores the return address at +0.
+        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+
+        const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            frame_offset += LEAF_FRAME_SIZE;
+            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -254,14 +271,14 @@ fn fixupCallstackObjectSlots(gc: *GC, stack: *layouts.Callstack, fixup: *Compact
             }
         }
 
-        const old_entry_point2 = old_block.entryPoint();
-        const delta = if (addr > old_entry_point2) addr - old_entry_point2 else 0;
-        const natural_frame_size = compiled.stackFrameSize();
-        var frame_size: Cell = LEAF_FRAME_SIZE;
-        if (natural_frame_size > 0 and delta > 0) {
-            frame_size = natural_frame_size;
+        if (is_arm64) {
+            frame_offset += arm_frame_size;
+        } else {
+            const old_entry_point2 = old_block.entryPoint();
+            const delta = if (addr > old_entry_point2) addr - old_entry_point2 else 0;
+            const natural_frame_size = compiled.stackFrameSize();
+            frame_offset += if (natural_frame_size > 0 and delta > 0) natural_frame_size else LEAF_FRAME_SIZE;
         }
-        frame_offset += frame_size;
     }
 }
 
@@ -275,16 +292,26 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
 
     while (top < bottom) {
-        const addr_ptr: *Cell = @ptrFromInt(top);
+        // Return address slot: top+0 (x86-64) / top+8 (arm64).
+        const addr_ptr: *Cell = @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS);
         const addr = addr_ptr.*;
         if (addr == 0) break;
+
+        // Read the predecessor frame pointer (arm64) before mutating the frame.
+        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         // Binary search all_blocks_sorted (old addresses) to find the owner
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            top += LEAF_FRAME_SIZE;
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += LEAF_FRAME_SIZE;
+            }
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -295,19 +322,16 @@ fn fixupCallstackReturnAddresses(gc: *GC, ctx: *Context, fixup: *CompactionFixup
         const old_entry_point = old_block_addr + @sizeOf(code_blocks.CodeBlock);
         const offset = if (addr > old_entry_point) addr - old_entry_point else 0;
 
-        const natural_frame_size = new_block.stackFrameSize();
-        const delta = if (addr > old_entry_point) addr - old_entry_point else 0;
-        var frame_size: Cell = LEAF_FRAME_SIZE;
-        if (natural_frame_size > 0 and delta > 0) {
-            frame_size = natural_frame_size;
-        }
-
         // Update return address to point into the new block
-        const new_addr = new_block.entryPoint() + offset;
+        addr_ptr.* = new_block.entryPoint() + offset;
 
-        addr_ptr.* = new_addr;
-
-        top += frame_size;
+        if (is_arm64) {
+            if (next_top <= top) break;
+            top = next_top;
+        } else {
+            const natural_frame_size = new_block.stackFrameSize();
+            top += if (natural_frame_size > 0 and offset > 0) natural_frame_size else LEAF_FRAME_SIZE;
+        }
     }
 }
 
@@ -319,17 +343,23 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
-        const addr_ptr: *Cell = @ptrFromInt(frame_top);
+
+        // arm64 objects: (relative) frame size at slot 0, return address at +8.
+        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+
+        const addr_ptr: *Cell = @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS);
         const addr = addr_ptr.*;
         if (addr == 0) break;
 
         const ub = std.sort.upperBound(Cell, blocks, addr, layouts.orderCell);
         if (ub == 0) {
-            frame_offset += LEAF_FRAME_SIZE;
+            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
             continue;
         }
         const old_block_addr = blocks[ub - 1];
@@ -341,13 +371,12 @@ fn fixupCallstackObjectReturnAddresses(gc: *GC, stack: *layouts.Callstack, fixup
         const new_entry_point = new_block_addr + @sizeOf(code_blocks.CodeBlock);
         addr_ptr.* = new_entry_point + offset;
 
-        const delta = offset;
-        const natural_frame_size = old_block.stackFrameSize();
-        var frame_size: Cell = LEAF_FRAME_SIZE;
-        if (natural_frame_size > 0 and delta > 0) {
-            frame_size = natural_frame_size;
+        if (is_arm64) {
+            frame_offset += arm_frame_size;
+        } else {
+            const natural_frame_size = old_block.stackFrameSize();
+            frame_offset += if (natural_frame_size > 0 and offset > 0) natural_frame_size else LEAF_FRAME_SIZE;
         }
-        frame_offset += frame_size;
     }
 }
 
@@ -738,7 +767,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
         }
     }
 
-
     for (gc.vm.data_roots.items) |root_ptr| {
         fixupSlot(&fixup, root_ptr);
     }
@@ -775,7 +803,6 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
                 fixupCallstackReturnAddresses(gc, ctx, &fixup);
             }
         }
-
 
         // Update code roots after code compaction (inline cache call sites)
         if (code_marks) |marks| {

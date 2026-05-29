@@ -225,9 +225,13 @@ fn getProgramCounter(ucontext_ptr: *anyopaque) *Cell {
             const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
             return @ptrCast(&mcontext[18]); // __rip = 2 (skip __es) + 16
         } else if (builtin.cpu.arch == .aarch64) {
+            // macOS _STRUCT_MCONTEXT64 (arm): __es (2 u64: __far,__esr/__exception),
+            // then __ss { __x[29], __fp, __lr, __sp, __pc, ... }.
+            //   __x[0]=mc[2] .. __x[28]=mc[30], __fp=mc[31], __lr=mc[32],
+            //   __sp=mc[33], __pc=mc[34].
             const ucontext: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
             const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
-            return @ptrCast(&mcontext[32]); // __pc
+            return @ptrCast(&mcontext[34]); // __pc
         }
     } else if (builtin.os.tag == .linux) {
         if (builtin.cpu.arch == .x86_64) {
@@ -280,9 +284,11 @@ fn getStackPointer(ucontext_ptr: *anyopaque) *Cell {
             const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
             return @ptrCast(&mcontext[9]); // __rsp = 2 (skip __es) + 7
         } else if (builtin.cpu.arch == .aarch64) {
+            // See getProgramCounter: __sp is mcontext[33] (after the 2-u64 __es
+            // prefix and __x[29]/__fp/__lr).
             const ucontext: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
             const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
-            return @ptrCast(&mcontext[31]); // __sp
+            return @ptrCast(&mcontext[33]); // __sp
         }
     } else if (builtin.os.tag == .linux) {
         if (builtin.cpu.arch == .x86_64) {

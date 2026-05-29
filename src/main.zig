@@ -443,7 +443,7 @@ pub fn main(init: std.process.Init) !void {
 
     // Initialize safepoint system after image load (code heap must exist)
     const safepoints = @import("safepoints.zig");
-    safepoints.initSafepoints(vm) catch @panic("safepoint init failed");
+    safepoints.initSafepoints(vm) catch |err| std.debug.panic("safepoint init failed: {s}", .{@errorName(err)});
 
     // Initialize signal handlers (unless disabled)
     if (params.signals) {

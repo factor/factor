@@ -19,6 +19,31 @@ pub fn build(b: *std.Build) void {
     options.addOption([]const u8, "git_label", if (git_label.len > 0) git_label else "zig-vm");
     options.addOption([]const u8, "compile_time", if (compile_time.len > 0) compile_time else "");
 
+    // macOS Mach exception handler imports (mach/pthread headers). Zig 0.17
+    // removed @cImport from source; the headers are translated via a build
+    // step and exposed to mach_signal.zig as the "c" module. Only macOS
+    // references this module (gated in signals.zig), so only build it there.
+    const c_module: ?*std.Build.Module = if (target.result.os.tag == .macos) blk: {
+        const translate_c = b.addTranslateC(.{
+            .root_source_file = b.path("src/mach_imports.h"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        });
+        break :blk translate_c.createModule();
+    } else null;
+
+    const addVmSupportFiles = struct {
+        fn f(module: *std.Build.Module, builder: *std.Build, arch: std.Target.Cpu.Arch, c_mod: ?*std.Build.Module) void {
+            if (arch == .aarch64) {
+                module.addAssemblyFile(builder.path("src/trampolines_arm64.S"));
+            }
+            if (c_mod) |m| {
+                module.addImport("c", m);
+            }
+        }
+    }.f;
+
     // Main Factor VM executable
     const exe = b.addExecutable(.{
         .name = "factor",
@@ -32,6 +57,7 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.root_module.addOptions("build_options", options);
+    addVmSupportFiles(exe.root_module, b, target.result.cpu.arch, c_module);
 
     // Link libc for system calls
     exe.root_module.link_libc = true;
@@ -89,6 +115,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
     tests.root_module.link_libc = true;
+    addVmSupportFiles(tests.root_module, b, target.result.cpu.arch, c_module);
 
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
@@ -104,6 +131,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
     docs.root_module.addOptions("build_options", options);
+    addVmSupportFiles(docs.root_module, b, target.result.cpu.arch, c_module);
     const install_docs = b.addInstallDirectory(.{
         .source_dir = docs.getEmittedDocs(),
         .install_dir = .prefix,

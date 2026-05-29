@@ -3,6 +3,7 @@ const std = @import("std");
 const code_blocks = @import("code_blocks.zig");
 const cpu = @import("cpu.zig");
 const growable = @import("growable.zig");
+const jit_protect = @import("jit_protect.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
 const vm_mod = @import("vm.zig");
@@ -740,6 +741,9 @@ pub const Jit = struct {
         const header_size = @sizeOf(code_blocks.CodeBlock);
         const code_size = self.code.items.len;
         const total_size = layouts.alignCell(header_size + code_size, alignment);
+
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
 
         // Allocate from code heap, triggering compaction if full
         const block = self.vm.allotCodeBlock(total_size);

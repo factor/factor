@@ -5,6 +5,7 @@
 // Extracted from gc.zig to reduce file size.
 
 const std = @import("std");
+const builtin = @import("builtin");
 
 const code_blocks = @import("code_blocks.zig");
 const contexts = @import("contexts.zig");
@@ -212,22 +213,29 @@ fn fullMarkCallstack(ctx: *FullMarkContext, c: *Context) void {
     if (top == 0 or bottom == 0 or top >= bottom) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
 
     while (top < bottom) {
-        const addr_ptr: *const Cell = @ptrFromInt(top);
-        const addr = addr_ptr.*;
+        // Return address: top+0 (x86-64) / top+8 (arm64). See iterateCallstack.
+        const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
+
+        // arm64 live frames are chained by absolute frame pointer at *(top).
+        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
 
         // return addresses are resolved by previous block start without
         // requiring an in-block extent check.
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            top += LEAF_FRAME_SIZE;
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += LEAF_FRAME_SIZE;
+            }
             continue;
         };
 
         markCodeBlockIfNeeded(ctx.gc, @constCast(owner));
-
-        const frame_size = callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
 
         const cb: *const code_blocks.CodeBlock = @ptrCast(owner);
         if (cb.blockGcInfo()) |gc_info| {
@@ -238,7 +246,12 @@ fn fullMarkCallstack(ctx: *FullMarkContext, c: *Context) void {
             }
         }
 
-        top += frame_size;
+        if (is_arm64) {
+            if (next_top <= top) break;
+            top = next_top;
+        } else {
+            top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
+        }
     }
 }
 
@@ -501,22 +514,26 @@ fn markCallstack(gc: *GC, ctx: *Context, tenured: *data_heap_mod.TenuredSpace) v
     }
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
 
     while (top < bottom) {
-        const addr_ptr: *const Cell = @ptrFromInt(top);
-        const addr = addr_ptr.*;
-
+        const addr = @as(*const Cell, @ptrFromInt(top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
+        const next_top: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(top)).* else 0;
+
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            top += LEAF_FRAME_SIZE;
+            if (is_arm64) {
+                if (next_top <= top) break;
+                top = next_top;
+            } else {
+                top += LEAF_FRAME_SIZE;
+            }
             continue;
         };
 
         // Mark owning code block as live
         markCodeBlock(gc, @constCast(owner));
-
-        const frame_size = callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
 
         // Visit GC roots in this frame's spill slots
         const cb: *const code_blocks.CodeBlock = @ptrCast(owner);
@@ -529,7 +546,12 @@ fn markCallstack(gc: *GC, ctx: *Context, tenured: *data_heap_mod.TenuredSpace) v
             }
         }
 
-        top += frame_size;
+        if (is_arm64) {
+            if (next_top <= top) break;
+            top = next_top;
+        } else {
+            top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
+        }
     }
 }
 
@@ -541,16 +563,22 @@ fn markCallstackObject(gc: *GC, stack: *layouts.Callstack, tenured: *data_heap_m
     if (frame_length == 0) return;
 
     const LEAF_FRAME_SIZE: Cell = code_blocks.CodeBlock.LEAF_FRAME_SIZE;
+    const is_arm64 = builtin.cpu.arch == .aarch64;
     var frame_offset: Cell = 0;
 
     while (frame_offset < frame_length) {
         const frame_top = stack.frameTopAt(frame_offset);
-        const addr_ptr: *const Cell = @ptrFromInt(frame_top);
-        const addr = addr_ptr.*;
+
+        // arm64 callstack objects store the (relative) frame size at slot 0 and
+        // the return address at +8; x86-64 stores the return address at +0.
+        const arm_frame_size: Cell = if (is_arm64) @as(*const Cell, @ptrFromInt(frame_top)).* else 0;
+        if (is_arm64 and (arm_frame_size == 0 or frame_offset + arm_frame_size > frame_length)) break;
+
+        const addr = @as(*const Cell, @ptrFromInt(frame_top + contexts.FRAME_RETURN_ADDRESS)).*;
         if (addr == 0) break;
 
         const owner = lookup.ownerForAddressUnsafe(addr) orelse {
-            frame_offset += LEAF_FRAME_SIZE;
+            frame_offset += if (is_arm64) arm_frame_size else LEAF_FRAME_SIZE;
             continue;
         };
 
@@ -564,8 +592,7 @@ fn markCallstackObject(gc: *GC, stack: *layouts.Callstack, tenured: *data_heap_m
             }
         }
 
-        const frame_size = owner.stackFrameSizeForAddress(addr);
-        frame_offset += frame_size;
+        frame_offset += if (is_arm64) arm_frame_size else owner.stackFrameSizeForAddress(addr);
     }
 }
 

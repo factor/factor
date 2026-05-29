@@ -138,8 +138,12 @@ pub const ImageLoader = struct {
     // Allocated heap regions
     data_region: ?[]u8 = null,
     code_region: ?[]u8 = null,
-    // Full mmap region for code (includes safepoint page) - needed for munmap
+    // Full mmap region for code - needed for munmap
     code_mmap_region: ?[]align(std.heap.page_size_min) u8 = null,
+    // Separate non-executable mapping for the safepoint guard page. Kept apart
+    // from the code region because the code heap is MAP_JIT on Apple Silicon and
+    // mprotect() (used to arm/disarm the safepoint) is rejected on JIT memory.
+    safepoint_mmap_region: ?[]align(std.heap.page_size_min) u8 = null,
     // Note: nursery_region, aging_region, cards, decks are now part of DataHeap
     // and are freed by DataHeap.deinit()
     // Real DataHeap pointer (for proper cleanup of mark bits etc)
@@ -416,10 +420,30 @@ pub const ImageLoader = struct {
         const region_bytes: [*]align(std.heap.page_size_min) u8 = @ptrCast(@alignCast(full_region));
         self.code_mmap_region = region_bytes[0..total_size];
 
-        // The first page is the safepoint page
-        const safepoint_page = @intFromPtr(full_region);
+        // Safepoint guard page: a dedicated, NON-executable mapping. It must live
+        // outside the code heap because the code heap is mapped MAP_JIT on Apple
+        // Silicon, and arm/disarm uses mprotect(), which the kernel rejects
+        // (EACCES) on JIT memory. The C++ VM does the same: a separate
+        // non-executable safepoint segment (vm/code_heap.cpp:16).
+        const safepoint_region = std.c.mmap(
+            null,
+            page_size,
+            .{ .READ = true, .WRITE = true },
+            .{ .TYPE = .PRIVATE, .ANONYMOUS = true },
+            -1,
+            0,
+        );
+        if (safepoint_region == std.c.MAP_FAILED) {
+            _ = std.c.munmap(@ptrCast(region_bytes), total_size);
+            self.code_mmap_region = null;
+            return ImageError.OutOfMemory;
+        }
+        const safepoint_bytes: [*]align(std.heap.page_size_min) u8 = @ptrCast(@alignCast(safepoint_region));
+        self.safepoint_mmap_region = safepoint_bytes[0..page_size];
+        const safepoint_page = @intFromPtr(safepoint_region);
 
-        // Code starts after the safepoint page
+        // The leading page of the code region is left unused as padding; code
+        // starts one page in (keeps prior code_start/relocation layout stable).
         const code_start = region_bytes + page_size;
 
         // On Apple Silicon (ARM64), MAP_JIT memory is write-protected by default.
@@ -717,8 +741,12 @@ pub const ImageLoader = struct {
 
         if (frame_length == 0) return;
 
-        // FRAME_RETURN_ADDRESS for x86-64 is 0 (return address at top of frame)
-        const FRAME_RETURN_ADDRESS: Cell = 0;
+        // Offset of the return address within a stack frame. x86-64 stores it at
+        // the top of the frame (0); arm64 stores it at offset 8 (saved LR after
+        // the saved FP). Must match cpu-{x86.64,arm.64}.hpp FRAME_RETURN_ADDRESS,
+        // otherwise the frame chain is fixed up at the wrong slot and set-callstack
+        // walks a corrupt chain.
+        const FRAME_RETURN_ADDRESS: Cell = if (builtin.cpu.arch == .aarch64) 8 else 0;
         const LEAF_FRAME_SIZE: Cell = 16;
 
         var frame_offset: Cell = 0;
@@ -1034,11 +1062,17 @@ pub const ImageLoader = struct {
             self.vm.gc = null;
         }
 
-        // Use the full mmap region for munmap (includes safepoint page)
+        // Use the full mmap region for munmap
         if (self.code_mmap_region) |region| {
             _ = std.c.munmap(@ptrCast(region.ptr), region.len);
             self.code_mmap_region = null;
             self.code_region = null; // code_region is a slice of code_mmap_region
+        }
+
+        // Free the separate safepoint guard page mapping.
+        if (self.safepoint_mmap_region) |region| {
+            _ = std.c.munmap(@ptrCast(region.ptr), region.len);
+            self.safepoint_mmap_region = null;
         }
 
         if (mapped_pages_initialized) {
@@ -1169,7 +1203,7 @@ fn storeRelocValueMasked(pointer: Cell, value: isize, mask: u32, lsb: u5, scalin
     std.mem.writeInt(u32, ptr[0..@sizeOf(u32)], word, .little);
 }
 
-    fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) Cell {
+fn loadRelocValue(pointer: Cell, rel_class: RelocationClass, relative_to: Cell) Cell {
     return switch (rel_class) {
         .absolute_cell => blk: {
             const ptr: [*]const u8 = @ptrFromInt(pointer - @sizeOf(Cell));
@@ -1216,7 +1250,7 @@ fn storeRelocValueMasked(pointer: Cell, value: isize, mask: u32, lsb: u5, scalin
     };
 }
 
-    fn storeRelocValue(pointer: Cell, rel_class: RelocationClass, value: Cell) void {
+fn storeRelocValue(pointer: Cell, rel_class: RelocationClass, value: Cell) void {
     switch (rel_class) {
         .absolute_cell => {
             const ptr: [*]u8 = @ptrFromInt(pointer - @sizeOf(Cell));

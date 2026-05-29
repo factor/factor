@@ -14,7 +14,11 @@ pub const stack_reserved: Cell = 16384;
 
 pub const FRAME_RETURN_ADDRESS: Cell = if (builtin.cpu.arch == .aarch64) 8 else 0;
 
-pub const CALLSTACK_BOTTOM_OFFSET: Cell = if (builtin.cpu.arch == .aarch64) 6 else 5;
+// Number of cells subtracted from the callstack segment end to get the
+// callstack bottom. Must match the C++ VM (and thus the image's compiled
+// subprimitives): aarch64 uses end-16 (CALLSTACK_BOTTOM in cpu-arm.64.hpp),
+// x86-64 uses end-40 (cpu-x86.64.hpp).
+pub const CALLSTACK_BOTTOM_OFFSET: Cell = if (builtin.cpu.arch == .aarch64) 2 else 5;
 
 pub const Context = extern struct {
     callstack_top: Cell,

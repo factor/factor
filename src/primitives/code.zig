@@ -1,8 +1,10 @@
 // primitives/code.zig - Code heap, quotation compilation, and method dispatch
 
 const std = @import("std");
+const builtin = @import("builtin");
 const code_blocks = @import("../code_blocks.zig");
 const contexts = @import("../contexts.zig");
+const jit_protect = @import("../jit_protect.zig");
 const jit_mod = @import("../jit.zig");
 const layouts = @import("../layouts.zig");
 const vm_mod = @import("../vm.zig");
@@ -17,6 +19,8 @@ const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
 pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
+    var jit_scope = jit_protect.Scope.init();
+    defer jit_scope.deinit();
 
     const reset_inline_caches = vm.pop();
     const update_existing_words = vm.pop();
@@ -24,8 +28,10 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     vm.data_roots.appendAssumeCapacity(&rooted_alist);
     defer _ = vm.data_roots.pop();
 
-    // Validate alist is an array
-    if (!layouts.hasTag(rooted_alist, .array)) return;
+    if (!layouts.hasTag(rooted_alist, .array)) {
+        vm.criticalError("modify_code_heap: expected alist array", rooted_alist);
+        return;
+    }
 
     const count = blk: {
         const alist: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_alist));
@@ -43,14 +49,15 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
         vm.data_roots.appendAssumeCapacity(&rooted_pair);
         defer _ = vm.data_roots.pop();
 
-        // Each element should be an array of [word, code]
         if (!layouts.hasTag(rooted_pair, .array)) {
-            continue;
+            vm.criticalError("modify_code_heap: expected pair array", rooted_pair);
+            return;
         }
 
         const pair: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_pair));
         if (layouts.untagFixnumUnsigned(pair.capacity) < 2) {
-            continue;
+            vm.criticalError("modify_code_heap: pair must have word and payload", rooted_pair);
+            return;
         }
 
         var rooted_word = pair.data()[0];
@@ -60,9 +67,9 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
         vm.data_roots.appendAssumeCapacity(&rooted_code);
         defer _ = vm.data_roots.pop();
 
-        // Validate word
         if (!layouts.hasTag(rooted_word, .word)) {
-            continue;
+            vm.criticalError("modify_code_heap: expected word", rooted_word);
+            return;
         }
 
         const code_tag = layouts.typeTag(rooted_code);
@@ -114,7 +121,8 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 const arr_cap = layouts.untagFixnumUnsigned(code_arr.capacity);
 
                 if (arr_cap < 6) {
-                    continue;
+                    vm.criticalError("modify_code_heap: optimized code payload too small", rooted_code);
+                    return;
                 }
 
                 const arr_data = code_arr.data();
@@ -136,9 +144,9 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 vm.data_roots.appendAssumeCapacity(&code_bytes_cell);
                 defer _ = vm.data_roots.pop();
 
-                // Validate code_bytes is a byte-array
                 if (!layouts.hasTag(code_bytes_cell, .byte_array)) {
-                    continue;
+                    vm.criticalError("modify_code_heap: expected code bytes byte-array", code_bytes_cell);
+                    return;
                 }
 
                 const code_bytes_pre: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
@@ -218,7 +226,10 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 // DO NOT apply relocations here! Defer to updateCodeHeapWords.
                 // Store the literals cell in uninitialized_blocks so updateCodeHeapWords
                 // can initialize this block later, after all word entry_points are set.
-                const code_heap = vm.code orelse continue;
+                const code_heap = vm.code orelse {
+                    vm.criticalError("modify_code_heap: code heap not initialized", rooted_code);
+                    return;
+                };
                 code_heap.putUninitializedBlock(vm.allocator, @intFromPtr(block), literals_cell) catch {
                     // Fall back to immediate initialization if tracking fails
                     vm.initializeCodeBlock(block, literals_cell);
@@ -228,7 +239,10 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
                 word_after.entry_point = block.entryPoint();
             },
-            else => {},
+            else => {
+                vm.criticalError("Expected a quotation or an array", rooted_code);
+                return;
+            },
         }
     }
 
@@ -252,6 +266,9 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 
 // Update all code blocks to point to current word entry points
 pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
+    var jit_scope = jit_protect.Scope.init();
+    defer jit_scope.deinit();
+
     const code_heap = vm.code orelse return;
 
     // Pre-compilation pass: ensure all quotation literals in uninitialized
@@ -459,11 +476,20 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
     vm.push(array_cell);
 }
 
-pub export fn primitive_strip_stack_traces(_: *VMAssemblyFields) callconv(.c) void {
-    // ( -- )
-    // Strips debug information from all code blocks by setting owner to false
-    // Used to reduce memory usage after compilation
+pub export fn primitive_strip_stack_traces(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    const vm = vm_asm.getVM();
+    const code_heap = vm.code orelse return;
 
+    var jit_scope = jit_protect.Scope.init();
+    defer jit_scope.deinit();
+
+    code_heap.flushPending();
+    for (code_heap.all_blocks_sorted.items) |block_addr| {
+        const block: *CodeBlock = @ptrFromInt(block_addr);
+        if (!block.isFree()) {
+            block.owner = layouts.false_object;
+        }
+    }
 }
 
 // --- Single-stepper Primitives ---
@@ -855,6 +881,24 @@ pub export fn primitive_callstack_for(vm_asm: *VMAssemblyFields) callconv(.c) vo
         const src: [*]const u8 = @ptrFromInt(top);
         const dest: [*]u8 = @ptrFromInt(callstack.top());
         @memcpy(dest[0..size], src[0..size]);
+
+        // On arm64, convert absolute saved frame pointers to relative offsets so
+        // the callstack object can move through memory; set-callstack converts
+        // them back (FP = top + delta). Mirrors C++ capture_callstack
+        // (vm/callstack.cpp) and the FACTOR_ARM64 block there. Without this the
+        // restore loop follows garbage frame pointers and overruns the stack.
+        if (builtin.cpu.arch == .aarch64) {
+            var scan_top = top;
+            var scan_dst = callstack.top();
+            while (scan_top < bottom) {
+                const saved_fp = @as(*const Cell, @ptrFromInt(scan_top)).*;
+                if (saved_fp <= scan_top) break;
+                const dst_ptr: *Cell = @ptrFromInt(scan_dst);
+                dst_ptr.* = saved_fp - scan_top;
+                scan_top = saved_fp;
+                scan_dst += dst_ptr.*;
+            }
+        }
     }
 
     vm.replace(tagged);

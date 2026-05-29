@@ -4,6 +4,7 @@ const builtin = @import("builtin");
 const code_blocks = @import("code_blocks.zig");
 const free_list = @import("free_list.zig");
 const icache = @import("icache.zig");
+const jit_protect = @import("jit_protect.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
 const segments = @import("segments.zig");
@@ -45,6 +46,9 @@ pub const CallbackHeap = struct {
     }
 
     pub fn add(self: *Self, owner: Cell, return_rewind: Cell, vm_ptr: Cell, vm: *const @import("vm.zig").FactorVM) ?*code_blocks.CodeBlock {
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
         const special_objects = &vm.vm_asm.special_objects;
         const callback_stub = special_objects[@intFromEnum(objects.SpecialObject.callback_stub)];
         if (callback_stub == layouts.false_object) return null;
@@ -98,6 +102,9 @@ pub const CallbackHeap = struct {
     }
 
     pub fn update(_: *Self, stub: *code_blocks.CodeBlock, vm: *const @import("vm.zig").FactorVM) void {
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
         if (stub.owner == layouts.false_object) return;
         if (!layouts.hasTag(stub.owner, .word)) return;
 
@@ -114,6 +121,9 @@ pub const CallbackHeap = struct {
     }
 
     pub fn free(self: *Self, stub: *code_blocks.CodeBlock) void {
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
         const size = stub.size();
         stub.markFree(size);
         self.free_list.free(@intFromPtr(stub), size);
