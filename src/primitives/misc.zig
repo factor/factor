@@ -122,6 +122,12 @@ pub export fn primitive_stub(_: *VMAssemblyFields) callconv(.c) void {
     std.process.exit(1);
 }
 
-pub export fn primitive_enable_ctrl_break(_: *VMAssemblyFields) callconv(.c) void {}
+pub export fn primitive_enable_ctrl_break(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    // Matches C++ os-unix.cpp: a Ctrl-Break/SIGINT then raises a catchable
+    // interrupt error (see safepoints.handleSafepoint) instead of entering FEP.
+    vm_asm.getVM().stop_on_ctrl_break = true;
+}
 
-pub export fn primitive_disable_ctrl_break(_: *VMAssemblyFields) callconv(.c) void {}
+pub export fn primitive_disable_ctrl_break(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    vm_asm.getVM().stop_on_ctrl_break = false;
+}

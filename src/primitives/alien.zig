@@ -73,7 +73,9 @@ pub export fn primitive_alien_address(vm_asm: *VMAssemblyFields) callconv(.c) vo
                 vm.expiredError(obj);
             }
             if (alien.base != layouts.false_object) {
-                vm.generalError(.unused, layouts.tagFixnum(0), layouts.false_object);
+                // A non-pinned (displaced) alien has no stable address.
+                // Matches C++ pinned_alien_offset: type_error(ALIEN_TYPE, obj).
+                vm.typeError(.alien, obj);
             }
             vm.replace(math_mod.fromUnsignedCell(vm, alien.address));
         },
@@ -92,10 +94,9 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
     const alien = vm.pop();
     const displacement_cell = vm.pop();
 
-    const displacement: Cell = if (layouts.hasTag(displacement_cell, .fixnum))
-        @bitCast(layouts.untagFixnum(displacement_cell))
-    else
-        0;
+    // Displacement may be a fixnum or a bignum (C++ uses to_cell). The old
+    // fixnum-only path silently dropped bignum displacements to 0.
+    const displacement: Cell = math_mod.toUnsignedCell(vm, displacement_cell);
 
     // Validate alien type - must be byte_array, alien, or f (false)
     const tag = layouts.typeTag(alien);

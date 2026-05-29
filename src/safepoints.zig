@@ -159,10 +159,13 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
             endSamplingProfiler(vm);
         }
 
-        // On Windows with Ctrl-Break, throw an exception instead of entering debugger
+        // With Ctrl-Break enabled, raise a catchable interrupt error instead of
+        // entering the low-level debugger. Matches C++ handle_safepoint
+        // (vm/safepoints.cpp): general_error(ERROR_INTERRUPT, ...). generalError
+        // is noreturn (it unwinds to Factor's error handler).
         if (vm.stop_on_ctrl_break) {
             safepoint_fep_p.store(false, .monotonic);
-            return;
+            vm.generalError(.interrupt, layouts.false_object, layouts.false_object);
         }
 
         // Enter the low-level debugger (Factor Error Protocol)

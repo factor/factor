@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 const code_blocks = @import("code_blocks.zig");
 const cpu = @import("cpu.zig");
@@ -797,8 +798,9 @@ pub const Jit = struct {
 };
 
 // Stack frame size constants
-pub const JIT_FRAME_SIZE: Cell = 32; // Standard JIT frame size
-pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = 192; // Signal handler frame size
+// Must match cpu-{x86.64,arm.64}.hpp. arm64 frames differ from x86-64.
+pub const JIT_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64) 16 else 32;
+pub const SIGNAL_HANDLER_STACK_FRAME_SIZE: Cell = if (builtin.cpu.arch == .aarch64) 288 else 192;
 
 // Quotation-specific JIT compiler
 // This implements the non-optimizing compiler that compiles quotations by
