@@ -4,6 +4,7 @@ const callstack_lookup = @import("callstack_lookup.zig");
 const code_blocks = @import("code_blocks.zig");
 const contexts = @import("contexts.zig");
 const code_heap_mod = @import("code_heap.zig");
+const data_heap_mod = @import("data_heap.zig");
 const layouts = @import("layouts.zig");
 const objects = @import("objects.zig");
 const spill_slots = @import("spill_slots.zig");
@@ -99,9 +100,16 @@ pub const CopyingDestination = struct {
     source3_end: Cell = 0,
     source4_start: Cell = 0,
     source4_end: Cell = 0,
-    allocateFn: ?*const fn (*CopyingDestination, Cell) ?Cell = null,
-    postCopyFn: ?*const fn (*CopyingDestination, Cell) void = null,
-    ptr: *anyopaque = undefined,
+    // Promotion target (used when bump_here is null). Replaces the previous
+    // allocateFn/postCopyFn function pointers with typed fields so the copy hot
+    // path has no indirect calls (the slot_visitor->gc import cycle is why
+    // fn-pointers were used originally; data_heap has no such cycle).
+    tenured_target: ?*data_heap_mod.TenuredSpace = null,
+    // Cheney worklist: copied objects pushed here for later slot scanning.
+    // null for bump/semispace collectors (which use a finger) and for the
+    // full-mark copy path (which drains via its own mark phase).
+    mark_stack: ?*std.ArrayList(Cell) = null,
+    mark_stack_allocator: std.mem.Allocator = undefined,
     code_heap: ?*code_heap_mod.CodeHeap = null,
 
     pub fn allocate(self: *CopyingDestination, size: Cell) ?Cell {
@@ -115,7 +123,8 @@ pub const CopyingDestination = struct {
             self.bump_object_start.recordObjectStart(h);
             return h;
         }
-        return self.allocateFn.?(self, size);
+        if (self.tenured_target) |space| return space.allocate(size);
+        return null;
     }
 
     fn inSourceGeneration(self: *const CopyingDestination, addr: Cell) bool {
@@ -176,8 +185,9 @@ pub const CopyingDestination = struct {
 
         obj.forwardTo(@ptrFromInt(new_addr));
 
-        if (self.postCopyFn) |postCopy| {
-            postCopy(self, new_addr);
+        // Cheney worklist push (inlined; was postCopyFn indirect call).
+        if (self.mark_stack) |ms| {
+            ms.append(self.mark_stack_allocator, new_addr) catch @panic("Mark stack overflow");
         }
 
         return new_addr | layouts.TAG(old_addr);

@@ -602,12 +602,30 @@ pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell)
 
 // Dispatch resumable signal (fault in Factor code with good stack)
 fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell) void {
-    const offset = sp.* % 16;
-
     vm.vm_asm.signal_handler_addr = handler;
 
-    // True stack frames are always 16-byte aligned.
-    // Leaf procedures without stack frames are misaligned by sizeof(Cell).
+    if (builtin.cpu.arch == .aarch64) {
+        // Match C++ dispatch_resumable_signal (vm/cpu-arm.64.cpp). Build an arm64
+        // frame so the signal-handler subprimitive's trailing
+        // `LDP FP, LR, [SP], 16 ; RET` restores FP=old-SP, LR=old-PC and resumes
+        // the faulting instruction. Always uses signal_handler_word — there is no
+        // leaf variant / alignment delta on arm64 (those are x86-only).
+        @as(*Cell, @ptrFromInt(sp.* - 16)).* = sp.*; // old SP -> [new_sp+0] (FP slot)
+        @as(*Cell, @ptrFromInt(sp.* - 8)).* = pc.*; // old PC -> [new_sp+8] (LR slot)
+        sp.* -= 16;
+
+        const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
+        if (!layouts.hasTag(handler_word_cell, .word)) {
+            fatalError("Signal handler word not initialized", handler_word_cell);
+        }
+        const handler_word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(handler_word_cell));
+        pc.* = handler_word.entry_point;
+        return;
+    }
+
+    // x86-64: true stack frames are 16-byte aligned; leaf procedures without a
+    // frame are misaligned by sizeof(Cell) and need a fake frame.
+    const offset = sp.* % 16;
     var delta: Cell = 0;
     var index: usize = 0;
 
@@ -615,7 +633,6 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         delta = @sizeOf(Cell);
         index = @intFromEnum(objects.SpecialObject.signal_handler_word);
     } else if (offset == 16 - @sizeOf(Cell)) {
-        // Make a fake frame for the leaf procedure
         delta = 16;
         index = @intFromEnum(objects.SpecialObject.leaf_signal_handler_word);
     } else {

@@ -257,15 +257,10 @@ pub const GarbageCollector = struct {
         const aging = &self.heap.aging;
         const aging_used: Cell = aging.here - aging.start;
 
-        var copy_ctx = CopyContext{
-            .gc = self,
-            .space = &self.heap.tenured,
-        };
-
         var promote_destination = slot_visitor.CopyingDestination{
-            .allocateFn = copyAllocate,
-            .postCopyFn = copyPostCopy,
-            .ptr = @ptrCast(&copy_ctx),
+            .tenured_target = &self.heap.tenured,
+            .mark_stack = &self.mark_stack,
+            .mark_stack_allocator = self.allocator,
             .source_start = nursery.start,
             .source_end = nursery.end,
             .source2_start = aging.start,
@@ -348,15 +343,10 @@ pub const GarbageCollector = struct {
         const aging = &self.heap.aging;
         const aging_semi = &self.heap.aging_semispace;
 
-        var copy_ctx = CopyContext{
-            .gc = self,
-            .space = &self.heap.tenured,
-        };
-
         var destination = slot_visitor.CopyingDestination{
-            .allocateFn = copyAllocate,
-            .postCopyFn = copyPostCopy,
-            .ptr = @ptrCast(&copy_ctx),
+            .tenured_target = &self.heap.tenured,
+            .mark_stack = &self.mark_stack,
+            .mark_stack_allocator = self.allocator,
             .source_start = nursery.start,
             .source_end = nursery.end,
             .source2_start = aging.start,
@@ -437,14 +427,9 @@ pub const GarbageCollector = struct {
         const nursery = &self.vm.vm_asm.nursery;
         const aging = &self.heap.aging;
         const aging_semi = &self.heap.aging_semispace;
-        var copy_ctx = CopyContext{
-            .gc = self,
-            .space = &self.heap.tenured,
-        };
         var destination = slot_visitor.CopyingDestination{
-            .allocateFn = copyAllocate,
-            .postCopyFn = null,
-            .ptr = @ptrCast(&copy_ctx),
+            .tenured_target = &self.heap.tenured,
+            .mark_stack = null,
             .source_start = nursery.start,
             .source_end = nursery.end,
             .source2_start = aging.start,
@@ -522,15 +507,10 @@ pub const GarbageCollector = struct {
 
         self.mark_stack.clearRetainingCapacity();
 
-        var copy_ctx = CopyContext{
-            .gc = self,
-            .space = &new_heap.tenured,
-        };
-
         var destination = slot_visitor.CopyingDestination{
-            .allocateFn = copyAllocate,
-            .postCopyFn = copyPostCopy,
-            .ptr = @ptrCast(&copy_ctx),
+            .tenured_target = &new_heap.tenured,
+            .mark_stack = &self.mark_stack,
+            .mark_stack_allocator = self.allocator,
             .source_start = old_nursery_start,
             .source_end = old_nursery_end,
             .source2_start = old_aging_start,
@@ -776,21 +756,6 @@ pub const GarbageCollector = struct {
                 top += callstack_lookup.Lookup.frameSizeFromAddress(owner, addr);
             }
         }
-    }
-
-    const CopyContext = struct {
-        gc: *Self,
-        space: *data_heap_mod.TenuredSpace,
-    };
-
-    fn copyAllocate(dest: *slot_visitor.CopyingDestination, size: Cell) ?Cell {
-        const ctx: *CopyContext = @ptrCast(@alignCast(dest.ptr));
-        return ctx.space.allocate(size);
-    }
-
-    fn copyPostCopy(dest: *slot_visitor.CopyingDestination, new_addr: Cell) void {
-        const ctx: *CopyContext = @ptrCast(@alignCast(dest.ptr));
-        ctx.gc.mark_stack.append(ctx.gc.allocator, new_addr) catch @panic("Mark stack overflow");
     }
 
     fn fillUnusedStacks(self: *Self) void {
