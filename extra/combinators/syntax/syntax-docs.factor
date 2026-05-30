@@ -33,22 +33,22 @@ HELP: n@[
 
 HELP: &&[
     { $syntax "&&[ A | B | C ]" }
-    { $description "Runs quotations (seperated by " { $link \ | } "), returning the result of the last quotation only if all previous quotations output true values. Otherwise, outputs " { $link POSTPONE: f }  "." }
+    { $description "Runs quotations (separated by " { $link \ | } "), returning the result of the last quotation only if all previous quotations output true values. Otherwise, outputs " { $link POSTPONE: f }  "." }
     { $see-also \ 0&& } ;
 
 HELP: ||[
     { $syntax "||[ A | B | C ]" }
-    { $description "Runs quotations (seperated by " { $link \ | } "), returning the result of the first quotation to produce a true value, or " { $link POSTPONE: f } " if none of them do." }
+    { $description "Runs quotations (separated by " { $link \ | } "), returning the result of the first quotation to produce a true value, or " { $link POSTPONE: f } " if none of them do." }
     { $see-also \ 0|| } ;
 
 HELP: n&&[
     { $syntax "N n&&[ A | B | C ]" }
-    { $description "Applies quotations (seperated by " { $link \ | } "), to the first N elements on the stack, restoring the original values to the top of the stack each time. Returns the result of the last quotation, or " { $link POSTPONE: f } " if any previous quotation returns " { $link POSTPONE: f } "." }
+    { $description "Applies quotations (separated by " { $link \ | } "), to the first N elements on the stack, restoring the original values to the top of the stack each time. Returns the result of the last quotation, or " { $link POSTPONE: f } " if any previous quotation returns " { $link POSTPONE: f } "." }
     { $see-also POSTPONE: &&[ \ n&& } ;
 
 HELP: n||[
     { $syntax "N n||[ A | B | C ]" }
-    { $description "Applies quotations (seperated by " { $link \ | } "), to the first N elements on the stack, restoring the original values to the top of the stack each time. Returns the result of the first qquotation to return a true value, or " { $link POSTPONE: f } " if none of them do" }
+    { $description "Applies quotations (separated by " { $link \ | } "), to the first N elements on the stack, restoring the original values to the top of the stack each time. Returns the result of the first qquotation to return a true value, or " { $link POSTPONE: f } " if none of them do" }
     { $see-also POSTPONE: ||[ \ n|| } ;
 
 HELP: |
