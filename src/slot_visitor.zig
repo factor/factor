@@ -100,10 +100,9 @@ pub const CopyingDestination = struct {
     source3_end: Cell = 0,
     source4_start: Cell = 0,
     source4_end: Cell = 0,
-    // Promotion target (used when bump_here is null). Replaces the previous
-    // allocateFn/postCopyFn function pointers with typed fields so the copy hot
-    // path has no indirect calls (the slot_visitor->gc import cycle is why
-    // fn-pointers were used originally; data_heap has no such cycle).
+    // Promotion target: where survivors are copied when bump_here is null (no
+    // semispace finger). A typed field, not a fn-pointer, so the copy hot path
+    // has no indirect calls.
     tenured_target: ?*data_heap_mod.TenuredSpace = null,
     // Cheney worklist: copied objects pushed here for later slot scanning.
     // null for bump/semispace collectors (which use a finger) and for the
@@ -185,7 +184,7 @@ pub const CopyingDestination = struct {
 
         obj.forwardTo(@ptrFromInt(new_addr));
 
-        // Cheney worklist push (inlined; was postCopyFn indirect call).
+        // Cheney worklist push: queue the copied object for later slot scanning.
         if (self.mark_stack) |ms| {
             ms.append(self.mark_stack_allocator, new_addr) catch @panic("Mark stack overflow");
         }

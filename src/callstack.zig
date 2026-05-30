@@ -13,15 +13,6 @@ const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
 const FRAME_RETURN_ADDRESS = contexts.FRAME_RETURN_ADDRESS;
 
-fn derelativizeFramePointer(frame_top: Cell, base_addr: Cell) void {
-    if (builtin.cpu.arch != .aarch64) return;
-
-    const saved_fp_ptr: *Cell = @ptrFromInt(frame_top);
-    const offset = saved_fp_ptr.*;
-
-    saved_fp_ptr.* = base_addr + offset;
-}
-
 pub fn iterateCallstackObject(vm: *FactorVM, callstack: *const layouts.Callstack, comptime Iterator: type, iterator: *Iterator) void {
     const frame_length = layouts.untagFixnum(callstack.length);
     var frame_offset: Cell = 0;

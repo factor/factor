@@ -29,12 +29,6 @@ pub const FullMarkContext = struct {
     tenured: *data_heap_mod.TenuredSpace,
 };
 
-fn markDataIfNeeded(gc: *GC, addr: Cell, size: Cell) void {
-    if (gc.heap.tenured.marks.tryMarkStart(addr, size)) {
-        markStackPush(gc, addr);
-    }
-}
-
 fn markCodeBlockIfNeeded(gc: *GC, block: *code_blocks.CodeBlock) void {
     const code = gc.vm.code orelse return;
     const marks = code.marks orelse return;

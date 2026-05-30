@@ -1610,34 +1610,6 @@ fn addDigits(a: []const Cell, b: []const Cell, r: []Cell) Cell {
     return @truncate(carry);
 }
 
-// Subtract digit arrays: r = a - b (unsigned, a >= b assumed). Return borrow for debug.
-fn subtractDigits(a: []const Cell, b: []const Cell, r: []Cell) void {
-    std.debug.assert(a.len >= b.len);
-    std.debug.assert(r.len >= a.len);
-    var borrow: i128 = 0;
-    for (0..b.len) |i| {
-        borrow += @as(i128, a[i]) - @as(i128, b[i]);
-        if (borrow >= 0) {
-            r[i] = @intCast(@as(u128, @bitCast(borrow)) & DIGIT_MASK);
-            borrow >>= DIGIT_BITS;
-        } else {
-            r[i] = @intCast(@as(u128, @bitCast(borrow + @as(i128, RADIX))) & DIGIT_MASK);
-            borrow = -1;
-        }
-    }
-    for (b.len..a.len) |i| {
-        borrow += @as(i128, a[i]);
-        if (borrow >= 0) {
-            r[i] = @intCast(@as(u128, @bitCast(borrow)) & DIGIT_MASK);
-            borrow >>= DIGIT_BITS;
-        } else {
-            r[i] = @intCast(@as(u128, @bitCast(borrow + @as(i128, RADIX))) & DIGIT_MASK);
-            borrow = -1;
-        }
-    }
-    std.debug.assert(borrow == 0);
-}
-
 // Add into: r += a, shifted by offset digits. r.len must be large enough.
 fn addInto(r: []Cell, a: []const Cell, offset: usize) void {
     var carry: u128 = 0;

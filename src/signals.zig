@@ -245,38 +245,6 @@ fn getProgramCounter(ucontext_ptr: *anyopaque) *Cell {
     @panic("Unsupported architecture for signal handling");
 }
 
-fn getRAX(ucontext_ptr: *anyopaque) Cell {
-    if (builtin.os.tag == .macos) {
-        if (builtin.cpu.arch == .x86_64) {
-            const ucontext: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
-            return mcontext[2]; // __rax = 2 (skip __es) + 0
-        }
-    } else if (builtin.os.tag == .linux) {
-        if (builtin.cpu.arch == .x86_64) {
-            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
-            return @bitCast(ucontext.uc_mcontext.gregs[13]); // REG_RAX
-        }
-    }
-    return 0;
-}
-
-fn getRDI(ucontext_ptr: *anyopaque) Cell {
-    if (builtin.os.tag == .macos) {
-        if (builtin.cpu.arch == .x86_64) {
-            const ucontext: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext_ptr));
-            const mcontext: [*]u64 = @ptrCast(@alignCast(ucontext.uc_mcontext));
-            return mcontext[6]; // __rdi = 2 (skip __es) + 4
-        }
-    } else if (builtin.os.tag == .linux) {
-        if (builtin.cpu.arch == .x86_64) {
-            const ucontext: *Linux_x86_64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
-            return @bitCast(ucontext.uc_mcontext.gregs[8]); // REG_RDI
-        }
-    }
-    return 0;
-}
-
 fn getStackPointer(ucontext_ptr: *anyopaque) *Cell {
     if (builtin.os.tag == .macos) {
         if (builtin.cpu.arch == .x86_64) {
