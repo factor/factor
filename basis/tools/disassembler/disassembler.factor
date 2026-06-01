@@ -63,5 +63,5 @@ M: callable disassemble
 
 cpu x86?
 "tools.disassembler.udis"
-"tools.disassembler.gdb" ?
+"tools.disassembler.capstone" ?
 require

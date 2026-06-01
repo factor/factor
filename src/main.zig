@@ -63,6 +63,42 @@ extern "c" fn realpath(path: [*:0]const u8, resolved: ?[*:0]u8) ?[*:0]u8;
 extern "c" fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int;
 extern "c" fn free(ptr: ?*anyopaque) void;
 
+// macOS: locate factor.image relative to a .app bundle, independent of cwd.
+// Mirrors the C++ VM's default_image_path (vm/os-macos.mm): when the executable
+// lives at .../Foo.app/Contents/MacOS/<name>, look for <name>.image in the
+// bundle's Contents/Resources (deployed layout), else next to the .app (dev
+// layout, where Factor.app and factor.image are siblings). Without this,
+// `open Factor.app` launches with cwd=/ and the cwd-relative factor.image
+// search fails. Returns an owned resolved path (process-lifetime) or null.
+fn findBundleImage(allocator: std.mem.Allocator) ?[]const u8 {
+    if (comptime builtin.os.tag != .macos) return null;
+    const _NSGetExecutablePath = struct {
+        extern "c" fn _NSGetExecutablePath(buf: [*]u8, bufsize: *u32) c_int;
+    }._NSGetExecutablePath;
+
+    var exe_buf: [4096]u8 = undefined;
+    var exe_size: u32 = exe_buf.len;
+    if (_NSGetExecutablePath(&exe_buf, &exe_size) != 0) return null;
+    const abs_exe = realpath(@ptrCast(&exe_buf), null) orelse return null;
+    defer free(abs_exe);
+    const exe: []const u8 = std.mem.span(abs_exe);
+
+    const marker = ".app/Contents/MacOS/";
+    const idx = std.mem.indexOf(u8, exe, marker) orelse return null;
+    const app_path = exe[0 .. idx + 4]; // ".../Foo.app"
+    const app_dir = std.fs.path.dirname(app_path) orelse return null;
+    const name = std.fs.path.basename(exe); // e.g. "factor"
+
+    const candidates = [_][:0]const u8{
+        std.fmt.allocPrintSentinel(allocator, "{s}/Contents/Resources/{s}.image", .{ app_path, name }, 0) catch return null,
+        std.fmt.allocPrintSentinel(allocator, "{s}/{s}.image", .{ app_dir, name }, 0) catch return null,
+    };
+    for (candidates) |c| {
+        if (realpath(c.ptr, null)) |abs| return std.mem.span(abs);
+    }
+    return null;
+}
+
 const build_options = @import("build_options");
 
 // Version/build info strings
@@ -345,6 +381,11 @@ pub fn main(init: std.process.Init) !void {
             const span = std.mem.span(env_path);
             if (span.len > 0) image_path = span;
         }
+    }
+    // macOS .app bundle: locate the image relative to the bundle (Resources or
+    // sibling of the .app), so `open Factor.app` works despite cwd=/.
+    if (image_path == null) {
+        if (findBundleImage(allocator)) |p| image_path = p;
     }
     if (image_path == null) {
         if (args.len > 0) {

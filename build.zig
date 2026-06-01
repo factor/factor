@@ -33,17 +33,6 @@ pub fn build(b: *std.Build) void {
         break :blk translate_c.createModule();
     } else null;
 
-    const addVmSupportFiles = struct {
-        fn f(module: *std.Build.Module, builder: *std.Build, arch: std.Target.Cpu.Arch, c_mod: ?*std.Build.Module) void {
-            if (arch == .aarch64) {
-                module.addAssemblyFile(builder.path("src/trampolines_arm64.S"));
-            }
-            if (c_mod) |m| {
-                module.addImport("c", m);
-            }
-        }
-    }.f;
-
     // Main Factor VM executable
     const exe = b.addExecutable(.{
         .name = "factor",
@@ -57,7 +46,9 @@ pub fn build(b: *std.Build) void {
     });
 
     exe.root_module.addOptions("build_options", options);
-    addVmSupportFiles(exe.root_module, b, target.result.cpu.arch, c_module);
+    if (c_module) |m| {
+        exe.root_module.addImport("c", m);
+    }
 
     // Link libc for system calls
     exe.root_module.link_libc = true;
@@ -95,6 +86,29 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
+    // On macOS, also drop the binary into Factor.app/Contents/MacOS/factor and
+    // refresh the ./factor symlink, mirroring `make`'s macos.app target. The
+    // bundle (Info.plist, Resources, Frameworks) is already in the repo. Running
+    // ./factor — which resolves into the bundle — gives the VM a proper bundle
+    // context (GUI session, NSBundle mainBundle, resources) that a bare
+    // zig-out/bin/factor lacks; without it Cocoa/UI code hangs headless.
+    // We copy from the freshly-built artifact (not ./factor) so we never mv the
+    // symlink over the real binary.
+    if (target.result.os.tag == .macos) {
+        // Run with cwd = build root, so the bundle paths stay relative.
+        const mkdir_bundle = b.addSystemCommand(&.{ "mkdir", "-p", "Factor.app/Contents/MacOS", "Factor.app/Contents/Frameworks" });
+        mkdir_bundle.setCwd(b.path("."));
+        const copy_to_bundle = b.addSystemCommand(&.{"cp"});
+        copy_to_bundle.setCwd(b.path("."));
+        copy_to_bundle.addArtifactArg(exe);
+        copy_to_bundle.addArg("Factor.app/Contents/MacOS/factor");
+        copy_to_bundle.step.dependOn(&mkdir_bundle.step);
+        const link_factor = b.addSystemCommand(&.{ "ln", "-sf", "Factor.app/Contents/MacOS/factor", "factor" });
+        link_factor.setCwd(b.path("."));
+        link_factor.step.dependOn(&copy_to_bundle.step);
+        b.getInstallStep().dependOn(&link_factor.step);
+    }
+
     // Run command
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
@@ -113,7 +127,9 @@ pub fn build(b: *std.Build) void {
         }),
     });
     tests.root_module.link_libc = true;
-    addVmSupportFiles(tests.root_module, b, target.result.cpu.arch, c_module);
+    if (c_module) |m| {
+        tests.root_module.addImport("c", m);
+    }
 
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
@@ -129,7 +145,9 @@ pub fn build(b: *std.Build) void {
         }),
     });
     docs.root_module.addOptions("build_options", options);
-    addVmSupportFiles(docs.root_module, b, target.result.cpu.arch, c_module);
+    if (c_module) |m| {
+        docs.root_module.addImport("c", m);
+    }
     const install_docs = b.addInstallDirectory(.{
         .source_dir = docs.getEmittedDocs(),
         .install_dir = .prefix,

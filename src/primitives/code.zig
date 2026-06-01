@@ -417,9 +417,20 @@ fn preCompileQuotationLiterals(vm: *FactorVM) void {
 pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( -- array )
-    // Returns an array describing all code blocks in the code heap.
-    // Each code block contributes 6 elements:
+    // Returns an array describing all code blocks in the code heap. Each code
+    // block contributes 6 elements:
     //   owner, parameters, relocation, type (fixnum), size (fixnum), entry_point
+    //
+    // We must NOT allocate on the Factor heap while reading the code heap. The
+    // result-array allocation can trigger a GC (and, on arm64, a code-heap
+    // compaction) that relocates blocks and invalidates an in-progress scan,
+    // yielding garbage / non-16-aligned entry points (which library code then
+    // reads as tagged pointers instead of fixnums). This mirrors the C++ VM
+    // (vm/code_heap.cpp primitive_code_blocks + vm/arrays.cpp
+    // std_vector_to_array): capture every block's fields in one uninterrupted
+    // pass into a side buffer, register the captured cells as GC data roots so
+    // the collector fixes up the tagged pointers, then allocate the result
+    // array once and copy in.
     const code_heap = vm.code orelse {
         vm.push(layouts.false_object);
         return;
@@ -429,7 +440,7 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
         return;
     };
 
-    // First pass: count live code blocks
+    // First pass: count live code blocks (no allocation).
     var count: Cell = 0;
     {
         var scan = alloc.start;
@@ -442,15 +453,12 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
         }
     }
 
-    // Allocate array for 6 elements per block
-    const array_cell = vm.allotArray(count * 6, layouts.false_object) orelse {
-        vm.memoryError();
-    };
-    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
-    const data = arr.data();
-
-    // Second pass: fill array
-    var idx: Cell = 0;
+    // Second pass: capture each live block's six fields into a side buffer on
+    // the Zig heap. Growing this buffer never touches the Factor heap, so the
+    // code-heap layout stays fixed across the whole scan.
+    var objects: std.ArrayList(Cell) = .empty;
+    defer objects.deinit(vm.allocator);
+    objects.ensureUnusedCapacity(vm.allocator, count * 6) catch vm.memoryError();
     {
         var scan = alloc.start;
         while (scan < alloc.end) {
@@ -458,20 +466,40 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
             const block_size = block.size();
             if (block_size == 0) break;
             if (!block.isFree()) {
-                data[idx + 0] = block.owner;
-                data[idx + 1] = block.parameters;
-                data[idx + 2] = block.relocation;
-                data[idx + 3] = layouts.tagFixnum(@intCast(@intFromEnum(block.blockType())));
-                data[idx + 4] = layouts.tagFixnum(@intCast(block_size));
-                // Entry point is always aligned to data_alignment (16 bytes),
-                // so its low bits are 0 = FIXNUM_TYPE tag. Store as-is.
-                const entry_point = block.entryPoint();
-                data[idx + 5] = entry_point;
-                idx += 6;
+                objects.appendAssumeCapacity(block.owner);
+                objects.appendAssumeCapacity(block.parameters);
+                objects.appendAssumeCapacity(block.relocation);
+                objects.appendAssumeCapacity(layouts.tagFixnum(@intCast(@intFromEnum(block.blockType()))));
+                objects.appendAssumeCapacity(layouts.tagFixnum(@intCast(block_size)));
+                // Entry point is data_alignment-aligned (16 bytes), so its low
+                // tag bits are 0 (FIXNUM_TYPE); library code shifts it left by
+                // tag_bits to recover the address. Captured from the live heap,
+                // it is always a valid fixnum.
+                objects.appendAssumeCapacity(block.entryPoint());
             }
             scan += block_size;
         }
     }
+    const element_count = objects.items.len;
+
+    // Register the captured cells as data roots so a GC during the array
+    // allocation fixes up the tagged pointers (owner/parameters/relocation).
+    // The fixnum cells (type/size/entry_point) are ignored by the collector.
+    const roots_base = vm.data_roots.items.len;
+    vm.data_roots.ensureUnusedCapacity(vm.allocator, element_count) catch vm.memoryError();
+    for (objects.items) |*cell_ptr| {
+        vm.data_roots.appendAssumeCapacity(cell_ptr);
+    }
+
+    const array_cell = vm.allotArray(@intCast(element_count), layouts.false_object) orelse {
+        vm.data_roots.shrinkRetainingCapacity(roots_base);
+        vm.memoryError();
+    };
+    vm.data_roots.shrinkRetainingCapacity(roots_base);
+
+    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
+    const data = arr.data();
+    @memcpy(data[0..element_count], objects.items);
 
     vm.push(array_cell);
 }
