@@ -306,10 +306,12 @@ pub fn addInlineCacheEntry(vm: *FactorVM, cache_entries: Cell, klass: Cell, meth
     const new_size = old_size + 2;
 
     const new_array_cell = vm.allotUninitializedArray(new_size) orelse return null;
+    const old_entries_live: *layouts.Array = @ptrFromInt(layouts.UNTAG(entries_copy));
+    const old_data_live = old_entries_live.data();
     const new_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_array_cell));
     const new_data = new_array.data();
 
-    @memcpy(new_data[0..old_size], old_data[0..old_size]);
+    @memcpy(new_data[0..old_size], old_data_live[0..old_size]);
 
     new_data[old_size] = klass_copy;
     new_data[old_size + 1] = method_copy;

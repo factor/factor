@@ -89,6 +89,24 @@ pub export fn primitive_save_image(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const path1_slice: [:0]const u8 = path1_buf[0..path1_end :0];
     const path2_slice: [:0]const u8 = path2_buf[0..path2_end :0];
 
+    // Fail fast on an unwritable output path BEFORE the destructive steps
+    // below (clearing volatile data, compact GC). The C++ VM notes that arg
+    // unboxing is "the only point where we might throw an error, since later
+    // steps destroy the current image" (vm/image.cpp). On arm64, throwing the
+    // late ERROR_IO after compact-gc/save leaves VM state the error handler
+    // can't safely unwind through (it jumps to a stale code pointer and loops
+    // on memory-protection faults). Probing the path here turns a bad path
+    // into a clean early ERROR_IO, so e.g. `"does/not/exist" save-image`
+    // throws and `must-fail` catches it. saveImage re-creates the file below.
+    {
+        const probe = std.c.fopen(path1_slice.ptr, "wb");
+        if (probe == null) {
+            const errno_val: Fixnum = @intCast(std.c._errno().*);
+            vm.ioError(errno_val);
+        }
+        _ = std.c.fclose(probe.?);
+    }
+
     // If then_die is true, clear volatile data that shouldn't be saved
     if (then_die) {
         // Strip out special_objects data which is set on startup anyway
@@ -108,9 +126,11 @@ pub export fn primitive_save_image(vm_asm: *VMAssemblyFields) callconv(.c) void 
             code.clearUninitializedBlocks();
         }
 
-        // Clear callback heap allocator
+        // Clear callback heap allocator. clearFreeList makes the MAP_JIT
+        // callback heap writable first (W^X); writing the free-list header
+        // directly would SIGBUS on arm64.
         if (vm.callbacks) |cb| {
-            cb.free_list.initialFreeList(0);
+            cb.clearFreeList();
         }
     }
 

@@ -482,6 +482,8 @@ pub const GarbageCollector = struct {
     }
 
     pub fn collectGrowingDataHeap(self: *Self, requested_size: Cell) !void {
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
         const old_heap = self.heap;
 
         old_heap.nursery.here = self.vm.vm_asm.nursery.here;

@@ -199,6 +199,7 @@ big-endian off
 \ (execute) define-combinator-primitive
 
 [
+    FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP
     arg2 VM MOV
     "lazy_jit_compile" LDR=BLR*
@@ -209,6 +210,7 @@ big-endian off
 \ lazy-jit-compile define-combinator-primitive
 
 [
+    FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP
     arg1 FP 8 [+] LDR
     arg2 VM MOV
@@ -221,6 +223,7 @@ big-endian off
 \ inline-cache-miss define-combinator-primitive
 
 [
+    FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP
     arg1 PIC-TAIL MOV
     arg2 VM MOV

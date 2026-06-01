@@ -319,6 +319,23 @@ pub fn main(init: std.process.Init) !void {
         // are passed to Factor via OBJ_ARGS - we don't consume them here
     }
 
+    // Embedded image: a deployed Factor binary has its image appended, marked
+    // by a footer at EOF. When no -i= was given, prefer the executable's own
+    // embedded image (matches C++ factor.cpp embedded_image_p). This must come
+    // BEFORE the FACTOR_IMAGE env / defaults below: a deployed binary launched
+    // as a child of Factor inherits FACTOR_IMAGE pointing at the parent's image,
+    // and must still run its own embedded image, not the parent's.
+    if (image_path == null and args.len > 0) {
+        if (realpath(args[0].ptr, null)) |abs_exe| {
+            if (image.hasEmbeddedImage(abs_exe)) {
+                image_path = std.mem.span(abs_exe); // kept for process lifetime
+                params.embedded_image = true;
+            } else {
+                free(abs_exe);
+            }
+        }
+    }
+
     // Default image path search order:
     // 1. FACTOR_IMAGE env var (set by parent Factor process, inherited by children)
     // 2. <exe_path>.image

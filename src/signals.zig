@@ -828,6 +828,17 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
     // Reset error counter since we successfully handled the error
     general_error_count.store(0, .monotonic);
 
+    // We are about to jump into the Factor error handler (JIT code) on the
+    // Factor callstack, abandoning every C frame between the fault and here.
+    // Force the code heap executable AND reset the W^X writable-nesting depth
+    // to 0: any jit_protect.Scope open at fault time (inlineCacheMiss /
+    // lazyJitCompile / GC) lives in one of those abandoned frames, so its
+    // `defer deinit()` will never run. Leaving the depth >0 would desync all
+    // later Scope nesting and leave code pages writable, faulting the handler
+    // (ERROR_MEMORY at a code address) into an error-recursion that ends in
+    // `die`. No-op on non-W^X platforms (x86-64).
+    @import("jit_protect.zig").resetForUnwind();
+
     // Do the unwind via inline asm
     const vm_asm_ptr = @intFromPtr(&vm.vm_asm);
 
@@ -849,19 +860,46 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
               [to_in] "{rsi}" (to),
         );
     } else if (comptime builtin.cpu.arch == .aarch64) {
-        // ARM64: x16 (IP0 scratch) holds entry to avoid conflicts with x19-x22.
+        // x86-64 has no dedicated trampoline/safepoint registers, so its unwind
+        // only restores vm/ctx/ds/rs. arm64 keeps fixed VM addresses in dedicated
+        // registers loaded once at Factor entry (cpu/arm/64 c-to-factor):
+        //   X24=SAFEPOINT X25=TRAMPOLINE X26=TRAMPOLINE2 X27=CACHE-MISS X28=MEGA-HITS
+        // The error handler uses them (e.g. `blr TRAMPOLINE`=x25 to call a
+        // primitive). When we unwind into the handler from a fault that happened
+        // in VM C code, these registers hold C-side garbage, so we MUST reload
+        // them — otherwise the handler branches through a stale register into
+        // non-code memory (observed: blr x25 -> __thread_vars, infinite fault).
+        // Values match the RelocationContext used to relocate this code (vm.zig).
+        const trampolines = @import("trampolines.zig");
+        const c_api = @import("c_api.zig");
+        const safepoint_val: Cell = if (vm.code) |c| c.safepoint_page else 0;
+        const tramp_val: Cell = @intFromPtr(&trampolines.trampoline);
+        const tramp2_val: Cell = @intFromPtr(&trampolines.trampoline2);
+        const cachemiss_val: Cell = @intFromPtr(&c_api.inline_cache_miss);
+        const megahits_val: Cell = @intFromPtr(&vm.dispatch_stats.megamorphic_cache_hits);
+        // x16 (IP0 scratch) holds entry to avoid conflicts with x19-x22.
         asm volatile (
             \\mov sp, x1
             \\mov x19, x2
             \\ldr x20, [x19]
             \\ldr x21, [x20, #0x10]
             \\ldr x22, [x20, #0x18]
+            \\mov x24, x3
+            \\mov x25, x4
+            \\mov x26, x5
+            \\mov x27, x6
+            \\mov x28, x7
             \\br x16
             :
             : [vm_asm] "{x2}" (vm_asm_ptr),
               [entry] "{x16}" (quot_entry),
               [quot_in] "{x0}" (quot),
               [to_in] "{x1}" (to),
+              [safepoint] "{x3}" (safepoint_val),
+              [tramp] "{x4}" (tramp_val),
+              [tramp2] "{x5}" (tramp2_val),
+              [cachemiss] "{x6}" (cachemiss_val),
+              [megahits] "{x7}" (megahits_val),
         );
     } else @compileError("Unsupported architecture for unwindNativeFrames");
 

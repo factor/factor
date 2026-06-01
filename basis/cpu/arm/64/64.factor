@@ -849,6 +849,7 @@ M:: arm.64 %box ( DST SRC func rep gc-map -- )
     DST int-rep %load-return ;
 
 M:: arm.64 %save-context ( TEMP1 TEMP2 -- )
+    FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP ;
 
 M: arm.64 %c-invoke [ (LDR=BLR*) ] dip gc-map-here ;

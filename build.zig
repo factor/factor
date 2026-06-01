@@ -99,9 +99,7 @@ pub fn build(b: *std.Build) void {
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
 
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    run_cmd.addPassthruArgs();
 
     const run_step = b.step("run", "Run the Factor VM");
     run_step.dependOn(&run_cmd.step);
@@ -138,12 +136,4 @@ pub fn build(b: *std.Build) void {
         .install_subdir = "docs",
     });
     docs_step.dependOn(&install_docs.step);
-
-    const cov_step = b.step("cov", "Generate code coverage");
-
-    const cov_run = b.addSystemCommand(&.{ "kcov", "--clean", "--include-pattern=src/" });
-    cov_run.addArg(b.getInstallPath(.prefix, "kcov-output"));
-    cov_run.addArtifactArg(tests);
-
-    cov_step.dependOn(&cov_run.step);
 }

@@ -8,6 +8,7 @@ const std = @import("std");
 
 const bignum = @import("bignum.zig");
 const code_blocks = @import("code_blocks.zig");
+const builtin = @import("builtin");
 const contexts = @import("contexts.zig");
 const image = @import("image.zig");
 const inline_cache = @import("inline_cache.zig");
@@ -516,7 +517,9 @@ pub export fn undefined_symbol() callconv(.c) void {
     const ctx = vm.vm_asm.ctx;
 
     const frame = ctx.callstack_top;
-    const return_address: Cell = @as(*const Cell, @ptrFromInt(frame)).*;
+    // Return address is at frame + FRAME_RETURN_ADDRESS (8 on arm64 where [frame]
+    // is the saved FP chain, 0 on x86). Reading *(frame) gave the FP chain on arm64.
+    const return_address: Cell = @as(*const Cell, @ptrFromInt(frame + contexts.FRAME_RETURN_ADDRESS)).*;
 
     // Find the code block and relocation entry
     var symbol: Cell = layouts.false_object;
@@ -587,8 +590,12 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
     const entry_point = block.entryPoint();
     const entries: [*]const code_blocks.RelocationEntry = @ptrCast(@alignCast(reloc_array.data()));
 
-    // Scan relocations looking for RT_DLSYM entries near return_address
+    // Scan relocations for the RT_DLSYM entry of THIS call site. On x86 the reloc
+    // (call immediate) sits before the return address; on arm64 the symbol pointer
+    // lives in the trailing literal pool, AFTER the call site, so pointer >=
+    // return_address. Match the dlsym reloc nearest the return address either way.
     var best_offset: Cell = 0;
+    var best_dist: Cell = std.math.maxInt(Cell);
     var best_param_index: Cell = 0;
     var found = false;
 
@@ -601,10 +608,19 @@ fn findDlsymRelocation(block: *code_blocks.CodeBlock, return_address: Cell) Dlsy
 
         if (rel_type == .dlsym) {
             const pointer = entry_point + offset;
-            if (pointer < return_address and offset > best_offset) {
-                best_offset = offset;
-                best_param_index = param_index;
-                found = true;
+            if (builtin.cpu.arch == .aarch64) {
+                const dist = if (pointer >= return_address) pointer - return_address else return_address - pointer;
+                if (dist < best_dist) {
+                    best_dist = dist;
+                    best_param_index = param_index;
+                    found = true;
+                }
+            } else {
+                if (pointer < return_address and offset > best_offset) {
+                    best_offset = offset;
+                    best_param_index = param_index;
+                    found = true;
+                }
             }
         }
 

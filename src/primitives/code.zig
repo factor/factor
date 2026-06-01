@@ -551,11 +551,20 @@ pub export fn primitive_set_innermost_stack_frame_quotation(vm_asm: *VMAssemblyF
     // ( quot callstack -- )
     // Patches the innermost frame to execute a different quotation
     // Used by the single-stepper to modify execution flow
-    const cs_cell = vm.pop();
-    const quot_cell = vm.pop();
+    var cs_cell = vm.pop();
+    var quot_cell = vm.pop();
 
     vm.checkTag(cs_cell, .callstack);
     vm.checkTag(quot_cell, .quotation);
+
+    // Compile the new quotation before patching the frame PC into it (matches
+    // C++ jit_compile_quotation); otherwise entry_point is the lazy-jit stub
+    // and entry_point+offset is a garbage PC. Root both cells across the GC.
+    vm.data_roots.appendAssumeCapacity(&cs_cell);
+    defer _ = vm.data_roots.pop();
+    vm.data_roots.appendAssumeCapacity(&quot_cell);
+    defer _ = vm.data_roots.pop();
+    vm.jitCompileQuotation(quot_cell, true);
 
     const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell));
     const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));

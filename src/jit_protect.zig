@@ -59,3 +59,29 @@ pub inline fn ensureExecutable() void {
         current_mode = .executable;
     }
 }
+
+/// Reset W^X bookkeeping after a non-local unwind (unwind_native_frames) that
+/// abandons every C stack frame between the fault and Factor's error handler.
+///
+/// Those abandoned frames' `defer scope.deinit()` calls never run, so any
+/// jit_protect.Scope open at fault time (inlineCacheMiss / lazyJitCompile / GC)
+/// would leak its `writable_depth` increment forever. A leaked depth desyncs
+/// all later Scope nesting: jitExecutable() then never reaches depth 0, so it
+/// never flips the code heap back to executable, and the next Factor code we
+/// run faults executing writable pages (ERROR_MEMORY at a code address) — an
+/// error-handler recursion that ends in `die`.
+///
+/// Factor JIT code only ever runs with depth 0 (scopes live solely inside VM C
+/// functions), so the unwind target's correct state is depth 0 + executable.
+/// This is why the reset belongs HERE and not in ensureExecutable(): cToFactor
+/// also calls ensureExecutable() but may have a still-live caller Scope (e.g. a
+/// callback invoked mid-GC), whose depth must be preserved.
+pub inline fn resetForUnwind() void {
+    if (is_arm64_macos) {
+        writable_depth = 0;
+        if (current_mode != .executable) {
+            pthread_jit_write_protect_np(1);
+            current_mode = .executable;
+        }
+    }
+}

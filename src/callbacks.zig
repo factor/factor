@@ -129,6 +129,19 @@ pub const CallbackHeap = struct {
         self.free_list.free(@intFromPtr(stub), size);
     }
 
+    /// Reset the callback heap to a single empty free block. Used by
+    /// (save-image)/save-image-and-exit to drop volatile callback stubs before
+    /// saving. initialFreeList writes a FreeBlock header into the heap, which
+    /// is MAP_JIT (W^X) on arm64 — must be made writable first, or the write
+    /// SIGBUSes at the heap base. Mirrors the scope discipline of the other
+    /// JIT-touching methods here.
+    pub fn clearFreeList(self: *Self) void {
+        var jit_scope = jit_protect.Scope.init();
+        defer jit_scope.deinit();
+
+        self.free_list.initialFreeList(0);
+    }
+
     pub fn room(self: *const Self) AllocatorRoom {
         return AllocatorRoom{
             .size = self.segment.?.size,

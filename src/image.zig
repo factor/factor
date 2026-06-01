@@ -75,6 +75,25 @@ pub const EmbeddedImageFooter = extern struct {
     image_offset: Cell,
 };
 
+/// True if the file at `path` ends with a valid embedded-image footer — i.e.
+/// it is a deployed Factor binary with its image appended. Mirrors C++
+/// factor_vm::embedded_image_p (vm/image.cpp). Used by main() to prefer a
+/// deployed binary's own image when no -i= is given.
+pub fn hasEmbeddedImage(path: [*:0]const u8) bool {
+    const file = io_mod.safeFopen(path, "rb") catch return false;
+    defer io_mod.safeFclose(file) catch {};
+
+    const footer_size = @sizeOf(EmbeddedImageFooter);
+    io_mod.safeFseek(file, -@as(i64, @intCast(footer_size)), 2) catch return false;
+
+    var footer_bytes: [footer_size]u8 = undefined;
+    const items_read = io_mod.safeFread(@ptrCast(&footer_bytes), 1, footer_size, file) catch return false;
+    if (items_read != footer_size) return false;
+
+    const footer: EmbeddedImageFooter = @bitCast(footer_bytes);
+    return footer.magic == image_magic;
+}
+
 pub const ImageHeader = extern struct {
     magic: Cell,
     version: Cell,
