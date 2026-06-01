@@ -481,12 +481,9 @@ pub fn main(init: std.process.Init) !void {
         if (realpath(raw, null)) |resolved| break :blk std.mem.span(resolved);
         break :blk if (args.len > 0) args[0] else "";
     };
-    const abs_image_path: []const u8 = blk: {
-        const raw: [*:0]const u8 = @ptrCast(image_path.?.ptr);
-        if (realpath(raw, null)) |resolved| break :blk std.mem.span(resolved);
-        break :blk image_path.?;
-    };
-    initSpecialObjects(vm, abs_image_path, executable_path);
+
+    // image path goes into the image-path special object exactly as received
+    initSpecialObjects(vm, image_path.?, executable_path);
 
     // Pass ALL command line arguments to Factor via OBJ_ARGS
     // Factor's startup quotation handles parsing -e=... and other flags

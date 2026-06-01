@@ -24,6 +24,9 @@ ERROR: image-too-big actual-size max-size ;
     [
         cell 4 / *
         cpu ppc? [ 100000 + ] when
+        ! arm64 uses fixed-width 4-byte instructions, so deployed code is
+        ! larger than the variable-length x86 baseline these limits assume.
+        cpu arm.64? [ 2000000 + ] when
         os windows? [ 160000 + ] when
     ] bi*
     2dup <= [ 2drop ] [ image-too-big ] if ;
