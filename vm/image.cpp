@@ -391,8 +391,12 @@ void factor_vm::primitive_save_image() {
     active_contexts.clear();
     code->uninitialized_blocks.clear();
 
-    // I think clearing the callback heap should be fine too.
+    // I think clearing the callback heap should be fine too. The callback
+    // heap is MAP_JIT (W^X) on Apple Silicon, so it must be made writable
+    // before writing the free-list header or the store faults.
+    JIT_WRITABLE
     callbacks->allocator->initial_free_list(0);
+    JIT_EXECUTABLE
   }
 
   // do a full GC to push everything remaining into tenured space
