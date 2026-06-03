@@ -1,6 +1,7 @@
 // primitives/math.zig - Number type conversions, fixnum/bignum/float arithmetic
 
 const std = @import("std");
+const builtin = @import("builtin");
 const bignum = @import("../bignum.zig");
 const float_mod = @import("../float.zig");
 const layouts = @import("../layouts.zig");
@@ -786,102 +787,112 @@ pub export fn primitive_float_greatereq(vm_asm: *VMAssemblyFields) callconv(.c) 
 // --- Float Formatting ---
 
 // ( n fill width precision format locale -- byte-array )
+// libc bindings used to reproduce the C++ VM's float formatting (vm/math.cpp
+// uses std::ostringstream + std::locale, which ultimately route through the
+// platform's printf-family conversion — round-half-to-even, "e+08"-style
+// exponents). Going through libc directly guarantees byte-for-byte parity.
+extern "c" fn snprintf(buf: [*c]u8, size: usize, fmt: [*c]const u8, ...) c_int;
+extern "c" fn newlocale(category_mask: c_int, locale: [*c]const u8, base: ?*anyopaque) ?*anyopaque;
+extern "c" fn uselocale(loc: ?*anyopaque) ?*anyopaque;
+extern "c" fn freelocale(loc: ?*anyopaque) c_int;
+
+// LC_ALL_MASK is libc-specific: BSD/macOS has 6 categories (bits 0..5), glibc
+// has 12 (bits 0..11). Only used to validate the locale name, matching the way
+// std::locale(name) throws on an unknown locale.
+const lc_all_mask: c_int = switch (builtin.os.tag) {
+    .linux => 0xFFF,
+    else => 0x3F,
+};
+
 pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     const ctx = vm_asm.ctx;
-    // Pop arguments from stack
-    _ = ctx.pop(); // locale
+    // ( n fill width precision format locale -- byte-array )
+    const locale_cell = ctx.pop();
     const format_cell = ctx.pop();
     const precision_cell = ctx.pop();
     const width_cell = ctx.pop();
-    _ = ctx.pop(); // fill
-    const float_cell = ctx.peek(); // Keep float on stack for now
+    const fill_cell = ctx.pop();
+    const float_cell = ctx.peek(); // result replaces the float in place
 
-    // Extract float value
     const value = float_mod.untagFloat(float_cell);
 
-    // Get format string (alien or byte-array)
     const format_bytes: [*]const u8 = vm.alienOffset(format_cell) orelse {
         vm.typeError(.byte_array, format_cell);
     };
     const format_char = format_bytes[0];
 
-    // Get precision and width
     const precision = layouts.untagFixnum(precision_cell);
     const width = layouts.untagFixnum(width_cell);
 
-    // Format the float to a buffer
-    // Note: Zig requires compile-time format strings, so we use a switch on precision
-    var buf: [256]u8 = undefined;
-    const result: []const u8 = blk: {
-        const formatted = switch (format_char) {
-            'f', 'F' => if (precision >= 0 and precision <= 10) switch (precision) {
-                0 => std.fmt.bufPrint(&buf, "{d:.0}", .{value}),
-                1 => std.fmt.bufPrint(&buf, "{d:.1}", .{value}),
-                2 => std.fmt.bufPrint(&buf, "{d:.2}", .{value}),
-                3 => std.fmt.bufPrint(&buf, "{d:.3}", .{value}),
-                4 => std.fmt.bufPrint(&buf, "{d:.4}", .{value}),
-                5 => std.fmt.bufPrint(&buf, "{d:.5}", .{value}),
-                6 => std.fmt.bufPrint(&buf, "{d:.6}", .{value}),
-                7 => std.fmt.bufPrint(&buf, "{d:.7}", .{value}),
-                8 => std.fmt.bufPrint(&buf, "{d:.8}", .{value}),
-                9 => std.fmt.bufPrint(&buf, "{d:.9}", .{value}),
-                10 => std.fmt.bufPrint(&buf, "{d:.10}", .{value}),
-                else => unreachable,
-            } else std.fmt.bufPrint(&buf, "{d}", .{value}),
-            'e', 'E' => if (precision >= 0 and precision <= 10) switch (precision) {
-                0 => std.fmt.bufPrint(&buf, "{e:.0}", .{value}),
-                1 => std.fmt.bufPrint(&buf, "{e:.1}", .{value}),
-                2 => std.fmt.bufPrint(&buf, "{e:.2}", .{value}),
-                3 => std.fmt.bufPrint(&buf, "{e:.3}", .{value}),
-                4 => std.fmt.bufPrint(&buf, "{e:.4}", .{value}),
-                5 => std.fmt.bufPrint(&buf, "{e:.5}", .{value}),
-                6 => std.fmt.bufPrint(&buf, "{e:.6}", .{value}),
-                7 => std.fmt.bufPrint(&buf, "{e:.7}", .{value}),
-                8 => std.fmt.bufPrint(&buf, "{e:.8}", .{value}),
-                9 => std.fmt.bufPrint(&buf, "{e:.9}", .{value}),
-                10 => std.fmt.bufPrint(&buf, "{e:.10}", .{value}),
-                else => unreachable,
-            } else std.fmt.bufPrint(&buf, "{e}", .{value}),
-            else => std.fmt.bufPrint(&buf, "{d}", .{value}),
-        };
-
-        break :blk formatted catch {
-            ctx.replace(layouts.false_object);
-            return;
-        };
+    // Validate the locale exactly like std::locale(name): an unknown name makes
+    // the C++ VM hand back an empty byte-array rather than formatting.
+    const locale_ptr: [*c]const u8 = @ptrCast(vm.alienOffset(locale_cell) orelse {
+        ctx.replace(vm.allotByteArray(0));
+        return;
+    });
+    const loc = newlocale(lc_all_mask, locale_ptr, null) orelse {
+        ctx.replace(vm.allotByteArray(0));
+        return;
     };
+    defer _ = freelocale(loc);
 
-    // Apply width padding if needed
-    const final_result: []const u8 = if (width > 0 and result.len < @as(usize, @intCast(width))) blk2: {
-        const pad_len = @as(usize, @intCast(width)) - result.len;
-        // Shift result to the right and pad with spaces
-        const padded_len = @as(usize, @intCast(width));
-        if (padded_len > buf.len) {
-            // Width too large for buffer
-            ctx.replace(layouts.false_object);
-            return;
-        }
-        // Move existing content to the right
+    // Map the format char to a printf conversion, mirroring vm/math.cpp:
+    //   'f' -> std::fixed       -> %f   (precision = digits after the point)
+    //   'e' -> std::scientific  -> %e   (precision = digits after the point)
+    //   else -> default float   -> %g   (precision = significant digits)
+    // std::uppercase (any uppercase format char) selects the uppercase variant.
+    var conv: u8 = switch (format_char) {
+        'f' => 'f',
+        'e' => 'e',
+        else => 'g',
+    };
+    if (format_char >= 'A' and format_char <= 'Z') {
+        conv = switch (conv) {
+            'e' => 'E',
+            'g' => 'G',
+            else => conv,
+        };
+    }
+    // C++ uses the stream's default precision (6) when no setprecision is done.
+    const prec_arg: c_int = if (precision >= 0) @intCast(precision) else 6;
+    const fmt_buf = [_]u8{ '%', '.', '*', conv, 0 };
+
+    var buf: [256]u8 = undefined;
+    const old_loc = uselocale(loc);
+    const written = snprintf(&buf, buf.len, &fmt_buf, prec_arg, value);
+    _ = uselocale(old_loc);
+
+    if (written < 0 or @as(usize, @intCast(written)) >= buf.len) {
+        ctx.replace(vm.allotByteArray(0));
+        return;
+    }
+    const result: []const u8 = buf[0..@intCast(written)];
+
+    // Right-justify within `width`, padding with `fill` (a null fill byte means
+    // the default space), matching std::setw + std::setfill.
+    const final_result: []const u8 = blk: {
+        if (width <= 0) break :blk result;
+        const width_chars: usize = @intCast(width);
+        if (result.len >= width_chars or width_chars > buf.len) break :blk result;
+        const pad_char: u8 = pad: {
+            const fill_bytes = vm.alienOffset(fill_cell) orelse break :pad ' ';
+            break :pad if (fill_bytes[0] != 0) fill_bytes[0] else ' ';
+        };
+        const pad_len = width_chars - result.len;
         var i: usize = result.len;
         while (i > 0) : (i -= 1) {
-            buf[pad_len + i - 1] = result[i - 1];
+            buf[pad_len + i - 1] = buf[i - 1];
         }
-        // Fill left with spaces
-        for (0..pad_len) |j| {
-            buf[j] = ' ';
-        }
-        break :blk2 buf[0..padded_len];
-    } else result;
+        @memset(buf[0..pad_len], pad_char);
+        break :blk buf[0..width_chars];
+    };
 
-    // Allocate byte array for result
     const result_len = final_result.len;
     const tagged = vm.allotUninitializedByteArray(result_len);
     const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
     ba.capacity = layouts.tagFixnum(@intCast(result_len));
-
-    const data = ba.data();
-    @memcpy(data[0..result_len], final_result);
+    @memcpy(ba.data()[0..result_len], final_result);
 
     ctx.replace(tagged);
 }
