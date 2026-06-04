@@ -17,6 +17,7 @@ big-endian off
 ] JIT-PROLOG jit-define
 
 [
+    FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP
     arg1 VM MOV
     f LDR=BLR*
@@ -288,6 +289,7 @@ big-endian off
         X28 X29  SP -16 [pre] STP
         temp NZCV MRS
         X30 temp SP -16 [pre] STP
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         IP0 VM vm-signal-handler-addr-offset [+] LDR
         TRAMPOLINE BLR
@@ -446,6 +448,7 @@ big-endian off
     ] }
     { fixnum+ [
         arg1 arg2 DS -8 [pre] LDP
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         ds-0 arg1 arg2 ADDS
         ds-0 DS [] STR
@@ -456,6 +459,7 @@ big-endian off
     ] }
     { fixnum- [
         arg1 arg2 DS -8 [pre] LDP
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         ds-0 arg1 arg2 SUBS
         ds-0 DS [] STR
@@ -466,6 +470,7 @@ big-endian off
     ] }
     { fixnum* [
         arg1 arg2 DS -8 [pre] LDP
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         arg1 dup tag-bits get ASR
         ds-0 arg1 arg2 MUL
@@ -583,6 +588,7 @@ big-endian off
         ds-1 DS 8 [pre] STR
     ] }
     { (start-context) [
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         arg1 VM MOV
         "new_context" LDR=BLR*
@@ -605,6 +611,7 @@ big-endian off
         temp BR
     ] }
     { (start-context-and-delete) [
+        FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
         arg1 VM MOV
         "reset_context" LDR=BLR*
