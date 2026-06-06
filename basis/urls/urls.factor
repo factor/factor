@@ -60,15 +60,15 @@ M: url >url ;
 
 EBNF: parse-url [=[
 
-protocol = [a-zA-Z0-9.+-]+ => [[ url-decode ]]
-username = [^/:@#?]*       => [[ url-decode ]]
-password = [^/:@#?]*       => [[ url-decode ]]
-path     = [^#?]+          => [[ parse-path ]]
-query    = [^#]+           => [[ query>assoc ]]
-anchor   = .+              => [[ url-decode ]]
-hostname = [^/#?:]+        => [[ url-decode ]]
-ipv6     = "[" [^\]]+ "]"  => [[ concat url-decode ]]
-port     = [^/#?]+         => [[ url-decode parse-port ]]
+protocol = [a-zA-Z0-9.+-]+  => [[ url-decode ]]
+username = [^/:@#?]*        => [[ url-decode ]]
+password = [^/:@#?]*        => [[ url-decode ]]
+path     = [^#?]+           => [[ parse-path ]]
+query    = [^#]+            => [[ query>assoc ]]
+anchor   = .+               => [[ url-decode ]]
+hostname = [^/#?:]+         => [[ url-decode ]]
+ipv6     = "["~ [^\]]+ "]"~ => [[ url-decode ]]
+port     = [^/#?]+          => [[ url-decode parse-port ]]
 
 auth     = username (":"~ password?)? "@"~
 host     = (ipv6 | hostname) (":"~ port?)?
@@ -118,13 +118,8 @@ M: pathname >url string>> >url ;
     [ port>> ] [ protocol>> lookup-protocol-port ] bi over =
     [ drop f ] when ;
 
-: ipv6-host ( host -- host/ipv6 ipv6? )
-    dup { [ "[" head? ] [ "]" tail? ] } 1&& [
-        1 swap index-of-last subseq t
-    ] [ f ] if ;
-
 : unparse-host ( url -- host )
-    host>> ipv6-host [ url-encode ] [ [ "[" "]" surround ] when ] bi* ;
+    host>> [ url-encode ] [ CHAR: : swap member? [ "[" "]" surround ] when ] bi ;
 
 : unparse-host-part ( url -- )
     {
@@ -199,18 +194,17 @@ PRIVATE>
 
 : url-addr ( url -- addr )
     [
-        [ host>> ipv6-host drop ]
+        [ host>> ]
         [ port>> ]
         [ protocol>> lookup-protocol-port ]
         tri or <inet>
     ] [
         dup protocol>> secure-protocol?
-        [ host>> ipv6-host drop <secure> ] [ drop ] if
+        [ host>> <secure> ] [ drop ] if
     ] bi ;
 
 : set-url-addr ( url addr -- url )
-    [ [ host>> ] [ inet6? ] bi [ "[" "]" surround ] when >>host ]
-    [ port>> >>port ] bi ;
+    [ host>> >>host ] [ port>> >>port ] bi ;
 
 : ensure-port ( url -- url' )
     clone dup protocol>> '[ _ lookup-protocol-port or ] change-port ;

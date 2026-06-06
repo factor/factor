@@ -469,7 +469,7 @@ urls [
 {
     T{ url
         { protocol "ldap" }
-        { host "[2001:db8::7]" }
+        { host "2001:db8::7" }
         { path "/c=GB" }
         { query LH{ { "objectClass?one" f } } }
     }
@@ -529,3 +529,10 @@ urls [
     } [ >url present "http://example.com/" = ] all?
 ] unit-test
 
+{
+    T{ url
+        { protocol "http" }
+        { host "fe80::4%eth0" }
+        { path "/" }
+    }
+} [ "http://[fe80::4%25eth0]/" >url ] unit-test
