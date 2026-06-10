@@ -199,9 +199,26 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
 // --- Heap-based growable array for sample callstacks ---
 // in special_objects[OBJ_SAMPLE_CALLSTACKS]. We replicate the same layout.
 
-fn allocSampleCallstacks(vm: *vm_mod.FactorVM) ?Cell {
-    // Allocate initial contents array (capacity 10)
-    const contents = vm.allotArray(10, layouts.false_object) orelse return null;
+// Hard cap on recorded callstack entries per profiling session. The contents
+// array is fully pre-allocated at startSamplingProfiler so that
+// sampleCallstacksAdd NEVER allocates: recordSample runs inside the safepoint
+// handler, and a GC there is unsafe on arm64 — at entry/frameless safepoints
+// the caller's return address lives only in LR (nothing on the callstack
+// references its call-site GC map), so a GC would skip the caller's spill
+// slots and leave stale pointers behind. No allocation => no GC => no hole.
+// On overflow further entries are dropped (counted in dropped_callstack_entries).
+const MAX_SAMPLE_CALLSTACK_ENTRIES: Cell = 2 * 1024 * 1024; // 16MB of cells
+pub var dropped_callstack_entries: std.atomic.Value(u64) = std.atomic.Value(u64).init(0);
+
+fn sampleCallstackCapacity(samples_per_second: Cell) Cell {
+    // ~10s of samples at ~64 frames each, clamped to the hard cap.
+    const want = 10 * samples_per_second * 64;
+    return @min(want, MAX_SAMPLE_CALLSTACK_ENTRIES);
+}
+
+fn allocSampleCallstacks(vm: *vm_mod.FactorVM, capacity: Cell) ?Cell {
+    // Allocate the full contents array up front (see comment above).
+    const contents = vm.allotArray(capacity, layouts.false_object) orelse return null;
 
     // Root contents since the next allot can trigger GC
     var contents_root = contents;
@@ -241,25 +258,18 @@ fn sampleCallstacksAdd(vm: *vm_mod.FactorVM, wrapper_ptr: *Cell, elt: Cell) void
     const count = layouts.untagFixnumUnsigned(wrapper.data()[0]);
 
     // Get contents array and check capacity
-    var contents_cell = wrapper.data()[1];
-    var contents: *layouts.Array = @ptrFromInt(layouts.UNTAG(contents_cell));
+    const contents_cell = wrapper.data()[1];
+    const contents: *layouts.Array = @ptrFromInt(layouts.UNTAG(contents_cell));
     const cap = contents.getCapacity();
 
     if (count == cap) {
-        // Need to grow - root contents
-        vm.data_roots.appendAssumeCapacity(&contents_cell);
-        defer _ = vm.data_roots.pop();
-
-        const new_contents = vm.reallotArray(contents_cell, 2 * count) orelse return;
-        contents_cell = new_contents;
-
-        // Re-derive wrapper after potential GC
-        wrapper = @ptrFromInt(layouts.UNTAG(wrapper_ptr.*));
-        wrapper.data()[1] = contents_cell;
+        // Full: DROP instead of growing. This runs inside the safepoint
+        // handler where allocation (=> GC) is forbidden — see
+        // MAX_SAMPLE_CALLSTACK_ENTRIES.
+        _ = dropped_callstack_entries.fetchAdd(1, .monotonic);
+        return;
     }
 
-    // Re-derive contents after potential GC
-    contents = @ptrFromInt(layouts.UNTAG(contents_cell));
     contents.data()[count] = elt_root;
 
     // Write barrier
@@ -324,6 +334,16 @@ fn recordSampleImpl(vm: *vm_mod.FactorVM, skip_p: bool, current_owner: ?Cell) vo
     // Get the growarr for callstacks
     var callstacks_cell = vm.specialObject(.sample_callstacks);
     if (callstacks_cell == layouts.false_object or callstacks_cell == 0) return;
+
+    // This runs from the safepoint handler, on top of whatever the
+    // interrupted code already has rooted — e.g. the JIT compiler ensures
+    // exactly 8 unused data_roots slots per recursion level and uses them
+    // all, so unused capacity here can legitimately be ZERO. The appends
+    // below (callstacks_cell + elt_root + contents_cell in
+    // sampleCallstacksAdd) are appendAssumeCapacity: without this ensure
+    // they write out of bounds in ReleaseFast and silently corrupt the
+    // malloc heap.
+    vm.data_roots.ensureUnusedCapacity(vm.allocator, 4) catch return;
 
     // Root the growarr since callstack walking adds to it (allocates)
     vm.data_roots.appendAssumeCapacity(&callstacks_cell);
@@ -417,9 +437,13 @@ extern "c" fn setitimer(which: c_int, new_value: *const itimerval, old_value: ?*
 
 // Start the sampling profiler
 pub fn startSamplingProfiler(vm: *vm_mod.FactorVM, samples_per_second: Cell) !void {
-    // Allocate the heap growable array for callstack entries
-    const callstacks = allocSampleCallstacks(vm) orelse return error.AllocFailed;
+    // Allocate the heap growable array for callstack entries — fully
+    // pre-sized so sample recording never allocates (no GC inside the
+    // safepoint handler).
+    const capacity = sampleCallstackCapacity(samples_per_second);
+    const callstacks = allocSampleCallstacks(vm, capacity) orelse return error.AllocFailed;
     vm.setSpecialObject(.sample_callstacks, callstacks);
+    dropped_callstack_entries.store(0, .monotonic);
 
     vm.samples_per_second = @intCast(samples_per_second);
     current_sample.reset();
