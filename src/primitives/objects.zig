@@ -719,6 +719,11 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
     var new_str: *layouts.String = @ptrFromInt(layouts.UNTAG(tagged));
     new_str.length = layouts.tagFixnum(@intCast(new_length));
     new_str.hashcode_field = layouts.false_object;
+    // Initialize aux BEFORE the aux byte-array allocation below: that
+    // allocation can trigger a GC which visits this string's slots, and an
+    // uninitialized aux slot full of nursery garbage gets dereferenced as a
+    // pointer (matches C++ allot_string_internal, which sets aux up front).
+    new_str.aux = layouts.false_object;
 
     const copy_length = @min(old_length, new_length);
     @memcpy(new_str.data()[0..copy_length], old_str.data()[0..copy_length]);
