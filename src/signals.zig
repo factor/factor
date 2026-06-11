@@ -457,6 +457,26 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
     const sp_ptr = getStackPointer(ucontext);
     const pc_ptr = getProgramCounter(ucontext);
 
+    // On Apple Silicon, FP exceptions enabled via FPCR trap bits arrive as
+    // SIGILL (EXC_BAD_INSTRUCTION at the mach layer), NOT SIGFPE. The ESR in
+    // the exception state identifies them: EC bits [31:26] == 0x2c is
+    // "trapped floating-point exception", and ESR bits [7,4:0]
+    // (IDF,IXF,UFF,OFF,DZF,IOF) use the same layout as the FPSR cumulative
+    // flags. Route these to the FP-trap handler so `with-fp-traps` raises
+    // ERROR-FP-TRAP instead of a generic signal-4 error.
+    if (builtin.cpu.arch == .aarch64 and builtin.os.tag == .macos) {
+        const uc: *MacOS_ucontext_t = @ptrCast(@alignCast(ucontext));
+        const mcontext: [*]u64 = @ptrCast(@alignCast(uc.uc_mcontext));
+        const esr = mcontext[1]; // __es.__esr (mc[0]=__far, mc[1]=__esr|__exception)
+        const ec = (esr >> 26) & 0x3f;
+        if (@intFromEnum(sig) == @intFromEnum(std.c.SIG.ILL) and ec == 0x2c) {
+            vm.signal_fpu_status = processFPUStatus(@truncate(esr & 0x9f));
+            clearFPUStatus(ucontext);
+            dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&fp_signal_handler_impl));
+            return;
+        }
+    }
+
     dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&synchronous_signal_handler_impl));
 }
 

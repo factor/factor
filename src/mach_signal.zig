@@ -316,6 +316,21 @@ fn callFaultHandler(
         signals.dispatchSignal(vm, @ptrCast(&sp), @ptrCast(&pc), @intFromPtr(&signals.fp_signal_handler_impl));
         ArchState.setSP(thread_state, sp);
         ArchState.setPC(thread_state, pc);
+    } else if (builtin.cpu.arch == .aarch64 and exception == EXC_BAD_INSTRUCTION and
+        ((@as(u64, exc_state.__esr) >> 26) & 0x3f) == 0x2c)
+    {
+        // Apple Silicon delivers FPCR-enabled FP traps as EXC_BAD_INSTRUCTION,
+        // not EXC_ARITHMETIC. ESR EC 0x2c = trapped FP exception; ESR bits
+        // [7,4:0] carry the cause in FPSR flag layout. Mirrors the SIGILL
+        // reroute in signals.zig synchronousSignalHandler (the BSD fallback
+        // path, which handles this when the mach handler is bypassed).
+        vm.signal_fpu_status = signals.processFPUStatus(@truncate(@as(u64, exc_state.__esr) & 0x9f));
+        ArchState.clearFPUStatus(float_state);
+        var sp = ArchState.getSP(thread_state);
+        var pc = ArchState.getPC(thread_state);
+        signals.dispatchSignal(vm, @ptrCast(&sp), @ptrCast(&pc), @intFromPtr(&signals.fp_signal_handler_impl));
+        ArchState.setSP(thread_state, sp);
+        ArchState.setPC(thread_state, pc);
     } else {
         // Other synchronous exceptions
         vm.signal_number = switch (exception) {
