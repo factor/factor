@@ -3,7 +3,7 @@ combinators continuations destructors formatting fry grouping.extras imap
 imap.private io.streams.duplex kernel math math.parser ranges
 namespaces random sequences sets sorting uuid multiline
 splitting strings system tools.test memoize combinators.smart ;
-FROM: pcre => findall ;
+FROM: pcre2 => findall ;
 IN: imap.tests
 
 : random-ascii ( n -- str )
