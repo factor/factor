@@ -6,6 +6,7 @@ io.encodings.utf8 io.files io.files.info io.files.info.unix
 io.files.unix libc kernel math sequences specialized-arrays
 system unix unix.getfsstat.macos unix.statfs.macos
 unix.statvfs.macos ;
+FROM: unix.getfsstat.macos => MNT_NOWAIT ;
 SPECIALIZED-ARRAY: uint
 SPECIALIZED-ARRAY: statfs64
 IN: io.files.info.unix.macos
@@ -25,10 +26,17 @@ M: macos stat>file-info
 TUPLE: macos-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
+: statfs>file-systems-info ( statfs -- file-system-info )
+    [ new-file-system-info ] dip statfs>file-system-info
+    file-system-calculations ;
+
+: (file-systems) ( -- statfs64-array )
+    f 0 MNT_NOWAIT getfsstat64 dup io-error statfs64 <c-array>
+    [ dup length statfs64 heap-size * MNT_NOWAIT getfsstat64 dup io-error ] keep
+    swap index-or-length head ;
+
 M: macos file-systems
-    f void* <ref> dup 0 getmntinfo dup io-error
-    [ void* deref ] dip \ statfs64 <c-direct-array>
-    [ f_mntonname>> utf8 alien>string file-system-info ] { } map-as ;
+    (file-systems) [ statfs>file-systems-info ] { } map-as ;
 
 M: macos new-file-system-info macos-file-system-info new ;
 
