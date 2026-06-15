@@ -4,8 +4,8 @@
 USING: accessors alien.c-types alien.data alien.strings arrays
 assocs byte-arrays combinators combinators.short-circuit
 destructors endian grouping io.encodings.string
-io.encodings.utf8 kernel literals make math pcre2.ffi regexp
-sequences sorting specialized-arrays splitting strings ;
+io.encodings.utf8 kernel literals make math math.parser pcre2.ffi
+regexp sequences sorting specialized-arrays splitting strings ;
 
 SPECIALIZED-ARRAY: PCRE2_SIZE
 
@@ -30,6 +30,11 @@ ERROR: bad-option what ;
 : check-bad-option ( err value what -- value )
     rot 0 = [ drop ] [ bad-option ] if ;
 
+! ovector offsets are byte offsets into the utf8-encoded subject, so
+! slice the bytes and decode rather than indexing the decoded string.
+: match-substring ( from to byte-array -- string )
+    subseq utf8 decode ;
+
 : pcre2-config-string ( what length -- string )
     <byte-array> [ pcre2_config ] keep utf8 alien>string nip ;
 
@@ -51,14 +56,8 @@ ERROR: bad-option what ;
 : pcre2-version ( -- string )
     PCRE2_CONFIG_VERSION pcre2-config ;
 
-: <pcre2> ( expr -- pcre2 )
-    utf8 encode dup length 0
-    { int PCRE2_SIZE } [ f pcre2_compile ] with-out-parameters
-    pick [
-        2drop pcre2 new-disposable swap >>handle
-    ] [
-        [ int deref ] [ PCRE2_SIZE deref ] bi* pcre2-error
-    ] if ;
+: default-opts ( -- opts )
+    flags{ PCRE2_UTF PCRE2_UCP } ;
 
 : pcre2-pattern-info-ptr ( handle what -- where )
     [
@@ -79,9 +78,21 @@ ERROR: bad-option what ;
 : pcre2-name-entry-size ( handle -- n )
     PCRE2_INFO_NAMEENTRYSIZE pcre2-pattern-info-number ;
 
+:: pcre2-name-table-entries ( handle -- alist )
+    handle pcre2-name-count :> name-count
+    name-count zero? [ f ] [
+        handle pcre2-name-table
+        handle pcre2-name-entry-size
+        [ name-count * memory>byte-array ] keep <groups>
+        [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] map>alist
+        sort-keys
+    ] if ;
+
+: pcre2-options ( handle -- opts )
+    PCRE2_INFO_ALLOPTIONS pcre2-pattern-info-number ;
+
 : pcre2-utf? ( handle -- ? )
-    PCRE2_INFO_ALLOPTIONS pcre2-pattern-info-number
-    PCRE2_UTF bitand zero? not ;
+    pcre2-options PCRE2_UTF bitand zero? not ;
 
 : pcre2-crlf? ( handle -- ? )
     PCRE2_INFO_NEWLINE pcre2-pattern-info-number ${
@@ -89,6 +100,21 @@ ERROR: bad-option what ;
     } member? ;
 
 PRIVATE>
+
+: <pcre2> ( expr -- pcre2 )
+    utf8 encode dup length default-opts
+    { int PCRE2_SIZE } [ f pcre2_compile ] with-out-parameters
+    pick [
+        2drop pcre2 new-disposable swap >>handle
+    ] [
+        [ drop ] 2dip pcre2-error
+    ] if ;
+
+: version ( -- f )
+    pcre2-version " -" split first string>number ;
+
+: has-option? ( pcre2 option -- ? )
+    [ handle>> pcre2-options ] dip bitand zero? not ;
 
 GENERIC: findall ( subject obj -- matches )
 
@@ -117,16 +143,7 @@ M:: pcre2 findall ( subject obj -- matches )
         f
         pcre2_match :> rc
 
-        re pcre2-name-count :> name_count
-        name_count [
-            f
-        ] [
-            re pcre2-name-table
-            re pcre2-name-entry-size
-            [ rot * memory>byte-array ] [ <groups> ] bi
-            [ 2 cut [ be> ] [ utf8 alien>string ] bi* ] map>alist
-            sort-keys
-        ] if-zero :> name_table
+        re pcre2-name-table-entries :> name_table
 
         rc 0 < [
             rc {
@@ -139,10 +156,10 @@ M:: pcre2 findall ( subject obj -- matches )
 
             [
                 [
-                    f ovector first2 subject subseq 2array ,
+                    f ovector first2 subject_bytes match-substring 2array ,
                     name_table [
-                        ovector rot 2 * tail-slice first2 subject
-                        subseq 2array ,
+                        ovector rot 2 * tail-slice first2 subject_bytes
+                        match-substring 2array ,
                     ] assoc-each
                 ] { } make ,
 
@@ -209,13 +226,16 @@ M:: pcre2 findall ( subject obj -- matches )
                                 ] when
                             ] if
 
-                            f
+                            ! Stop once the empty-match retry has advanced past
+                            ! the final character; the trailing empty match (if
+                            ! any) is produced after a non-empty match instead.
+                            break? not ovector second subject_length < and
                         ] [
                             [
-                                f ovector first2 subject subseq 2array ,
+                                f ovector first2 subject_bytes match-substring 2array ,
                                 name_table [
-                                    ovector rot 2 * tail-slice first2 subject
-                                    subseq 2array ,
+                                    ovector rot 2 * tail-slice first2 subject_bytes
+                                    match-substring 2array ,
                                 ] assoc-each
                             ] { } make ,
                             t
