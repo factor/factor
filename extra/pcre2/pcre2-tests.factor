@@ -84,15 +84,23 @@ CONSTANT: iso-date "(?P<year>\\d{4})-(?P<month>\\d{2})-(?P<day>\\d{2})"
     { { f "1999-01-12" } { "year" "1999" } { "month" "01" } { "day" "12" } }
 } [ "1999-01-12" iso-date findall first ] unit-test
 
+! Unnamed capturing groups are reported with an f key, like the full
+! match; group 0 is the whole match and group 1 is the single character.
 {
     {
-        { { f "h" } }
-        { { f "e" } }
-        { { f "l" } }
-        { { f "l" } }
-        { { f "o" } }
+        { { f "h" } { f "h" } }
+        { { f "e" } { f "e" } }
+        { { f "l" } { f "l" } }
+        { { f "l" } { f "l" } }
+        { { f "o" } { f "o" } }
     }
 } [ "hello" "(.)" findall ] unit-test
+
+! Groups appear in order; a group that did not participate (the optional
+! (x)? here) yields the empty string.
+{ { { f "ac" } { f "a" } { f "" } { f "c" } } } [
+    "ac" "(a)(x)?(c)" findall first
+] unit-test
 
 { 3 } [
     "2003-10-09 1999-09-01 1514-10-20" iso-date findall length

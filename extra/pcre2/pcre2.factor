@@ -99,6 +99,22 @@ ERROR: bad-option what ;
         PCRE2_NEWLINE_ANY PCRE2_NEWLINE_CRLF PCRE2_NEWLINE_ANYCRLF
     } member? ;
 
+! Build one match: every capturing group 0..rc-1, keyed by its name or
+! f (group 0 is the whole match, unnamed groups are f). A group that did
+! not participate has its start set to PCRE2_UNSET (> subject_length) and
+! yields the empty string, matching the PCRE1 binding.
+:: parse-match ( rc ovector name_table subject_bytes subject_length -- match )
+    rc <iota> [| i |
+        i 2 * :> start_index
+        i name_table at
+        start_index ovector nth dup subject_length > [
+            drop ""
+        ] [
+            start_index 1 + ovector nth subject_bytes match-substring
+        ] if
+        2array
+    ] map ;
+
 PRIVATE>
 
 : <pcre2> ( expr -- pcre2 )
@@ -151,17 +167,13 @@ M:: pcre2 findall ( subject obj -- matches )
                 [ throw ]
             } case
         ] [
+            rc assert-positive drop
             match_data pcre2_get_ovector_pointer
-            rc assert-positive 2 * PCRE2_SIZE <c-direct-array> :> ovector
+            match_data pcre2_get_ovector_count 2 *
+            PCRE2_SIZE <c-direct-array> :> ovector
 
             [
-                [
-                    f ovector first2 subject_bytes match-substring 2array ,
-                    name_table [
-                        ovector rot 2 * tail-slice first2 subject_bytes
-                        match-substring 2array ,
-                    ] assoc-each
-                ] { } make ,
+                rc ovector name_table subject_bytes subject_length parse-match ,
 
                 [
                     f :> break?!
@@ -231,13 +243,8 @@ M:: pcre2 findall ( subject obj -- matches )
                             ! any) is produced after a non-empty match instead.
                             break? not ovector second subject_length < and
                         ] [
-                            [
-                                f ovector first2 subject_bytes match-substring 2array ,
-                                name_table [
-                                    ovector rot 2 * tail-slice first2 subject_bytes
-                                    match-substring 2array ,
-                                ] assoc-each
-                            ] { } make ,
+                            rc ovector name_table subject_bytes subject_length
+                            parse-match ,
                             t
                         ] if
                     ] if

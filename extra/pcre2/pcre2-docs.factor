@@ -39,7 +39,7 @@ HELP: findall
   { "obj" "a string, compiled regular expression or a regexp literal" }
   { "matches" sequence }
 }
-{ $description "Finds all matches of the given regexp in the string. Matches is a sequence of associative arrays where the key is the name of the capturing group, or f to denote the full match." }
+{ $description "Finds all matches of the given regexp in the string. Matches is a sequence of associative arrays, one per match, holding the full match followed by every capturing group in order. The key is the name of the capturing group, or f for the full match and for unnamed groups. A group that did not participate in the match is reported as an empty string." }
 { $examples
   { $code
     "USE: pcre2"
