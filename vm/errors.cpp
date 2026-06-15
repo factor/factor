@@ -67,6 +67,7 @@ void factor_vm::general_error(vm_error_type error, cell arg1_, cell arg2_) {
     // Clear the data roots since arg1 and arg2's destructors won't be
     // called.
     data_roots.clear();
+    code_roots.clear();
 
     // The unwind-native-frames subprimitive will clear faulting_p
     // if it was successfully reached.
