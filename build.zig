@@ -108,6 +108,15 @@ pub fn build(b: *std.Build) void {
         link_factor.setCwd(b.path("."));
         link_factor.step.dependOn(&copy_to_bundle.step);
         b.getInstallStep().dependOn(&link_factor.step);
+    } else {
+        // On non-macOS platforms there's no app bundle, so just drop the
+        // freshly-built binary at the build root as ./factor (mirroring `make`'s
+        // default target). Use the build system's own file-copy step rather than
+        // shelling out to `cp`, which doesn't exist on a stock Windows shell.
+        const copy_factor = b.addUpdateSourceFiles();
+        const factor_name = if (target.result.os.tag == .windows) "factor.exe" else "factor";
+        copy_factor.addCopyFileToSource(exe.getEmittedBin(), factor_name);
+        b.getInstallStep().dependOn(&copy_factor.step);
     }
 
     // Run command
