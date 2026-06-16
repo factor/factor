@@ -101,6 +101,11 @@ void factor_vm::primitive_become() {
 
   // Update all references to old objects to point to new objects
   {
+    // Patches owners in the callback heap (visit_all_roots) and embedded
+    // literals in every code block, so the JIT heaps must be writable across
+    // the whole traversal.
+    jit_writable_scope jit_writable;
+
     slot_visitor<slot_become_fixup> visitor(this,
                                             slot_become_fixup(&become_map));
     visitor.visit_all_roots();
