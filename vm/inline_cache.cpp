@@ -141,7 +141,10 @@ void factor_vm::update_pic_transitions(cell pic_size) {
 // code_root to take care of the details.
 // Allocates memory
 cell factor_vm::inline_cache_miss(cell return_address_) {
-  JIT_WRITABLE
+  // Installs a new PIC stub and patches the call site; both write the code
+  // heap. The PIC creation funnels through add_code_block/initialize_code_block
+  // (which also guard), nesting safely under this scope.
+  jit_writable_scope jit_writable;
   code_root return_address(return_address_, this);
   bool tail_call_site = tail_call_site_p(return_address.value);
 
@@ -195,7 +198,6 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
 #endif
   }
 
-  JIT_EXECUTABLE
   return xt;
 }
 

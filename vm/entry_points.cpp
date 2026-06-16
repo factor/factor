@@ -14,7 +14,7 @@ void factor_vm::c_to_factor(cell quot) {
     CODE_TO_FUNCTION_POINTER_CALLBACK(this, func);
     c_to_factor_func = (c_to_factor_func_type) func;
   }
-  JIT_EXECUTABLE
+  jit_force_executable();
   c_to_factor_func(quot);
 }
 
@@ -22,7 +22,12 @@ void factor_vm::unwind_native_frames(cell quot, cell to) {
   tagged<word> entry_point_word(special_objects[UNWIND_NATIVE_FRAMES_WORD]);
   cell func = entry_point_word->entry_point;
   CODE_TO_FUNCTION_POINTER(func);
-  JIT_EXECUTABLE
+  // This is a non-local jump: the abandoned C frames between the fault and the
+  // error handler never run their jit_writable_scope destructors, so the
+  // thread may be left writable with no scope to restore it. Force executable
+  // and reset the mode (Factor code always runs at the outermost, executable
+  // state). Mirrors the Zig VM's resetForUnwind.
+  jit_force_executable();
   ((unwind_native_frames_func_type) func)(quot, to);
 }
 

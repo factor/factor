@@ -68,6 +68,13 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   FACTOR_ASSERT(!gc_off);
   FACTOR_ASSERT(!current_gc);
 
+  // Compaction and the slot visitor write relocated pointers back into the
+  // MAP_JIT code heap, so make it writable for the duration. This is what lets
+  // ordinary primitives allocate without each wrapping themselves in W^X: any
+  // GC they trigger flips for itself. Re-entrant, so a GC nested inside a
+  // compile path (allot_code_block -> compact GC) is a flip-free no-op.
+  jit_writable_scope jit_writable;
+
   // Important invariant: tenured space must have enough contiguous free
   // space to fit the entire contents of the aging space and nursery. This is
   // because when doing a full collection, objects from younger generations

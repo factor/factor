@@ -380,6 +380,11 @@ void factor_vm::primitive_save_image() {
   vm_char* path1_saved = safe_strdup(path1->data<vm_char>());
   vm_char* path2_saved = safe_strdup(path2->data<vm_char>());
 
+  // Clearing the callback heap below and the compacting GC further down both
+  // write the MAP_JIT code/callback heaps, so hold one writable region across
+  // the rest of the function. The compact GC's own guard nests as a no-op.
+  jit_writable_scope jit_writable;
+
   if (then_die) {
     // strip out special_objects data which is set on startup anyway
     for (cell i = 0; i < special_object_count; i++)
@@ -391,11 +396,8 @@ void factor_vm::primitive_save_image() {
     active_contexts.clear();
     code->uninitialized_blocks.clear();
 
-    // I think clearing the callback heap should be fine too. The callback
-    // heap is MAP_JIT (W^X) on Apple Silicon, but the PRIMITIVE wrapper
-    // already made this thread JIT-writable, and it must stay writable for
-    // the compacting GC below, which writes to the code heap. Do not flip
-    // back to JIT_EXECUTABLE here.
+    // Clearing the callback heap writes a free-list header into MAP_JIT memory,
+    // hence the writable scope above.
     callbacks->allocator->initial_free_list(0);
   }
 

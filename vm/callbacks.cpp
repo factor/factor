@@ -53,6 +53,9 @@ void callback_heap::update(code_block* stub) {
 }
 
 code_block* callback_heap::add(cell owner, cell return_rewind) {
+  // Allocates a stub in the MAP_JIT callback heap, memcpy's the template code
+  // in and stores its relocations (via update() below).
+  jit_writable_scope jit_writable;
   // code_template is a 2-tuple where the first element contains the
   // relocations and the second a byte array of compiled assembly
   // code. The code assumes that there are four relocations on x86 and
@@ -110,6 +113,8 @@ void factor_vm::primitive_callback() {
 void factor_vm::primitive_free_callback() {
   void* entry_point = alien_offset(ctx->pop());
   code_block* stub = (code_block*)entry_point - 1;
+  // Writes a free-list header into the MAP_JIT callback heap.
+  jit_writable_scope jit_writable;
   callbacks->allocator->free(stub);
 }
 

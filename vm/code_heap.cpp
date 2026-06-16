@@ -2,6 +2,12 @@
 
 namespace factor {
 
+#if defined(__APPLE__) && defined(FACTOR_ARM64)
+// Current W^X mode of this thread's JIT pages. False = executable (the state
+// Factor code runs in), true = writable. See code_heap.hpp.
+thread_local bool jit_thread_writable = false;
+#endif
+
 code_heap::code_heap(cell size) {
   if (size > ((uint64_t)1 << (sizeof(cell) * 8 - 5)))
     fatal_error("Heap too large", size);
@@ -54,6 +60,8 @@ void code_heap::free(code_block* compiled) {
   points_to_nursery.erase(compiled);
   points_to_aging.erase(compiled);
   all_blocks.erase((cell)compiled);
+  // Writes a free-list header into the MAP_JIT code heap.
+  jit_writable_scope jit_writable;
   allocator->free(compiled);
 }
 
@@ -131,6 +139,8 @@ void code_heap::initialize_all_blocks_set() {
 // Only needed after redefining an existing word.
 // If generic words were redefined, inline caches need to be reset.
 void factor_vm::update_code_heap_words(bool reset_inline_caches) {
+  // Patches call sites in every existing code block.
+  jit_writable_scope jit_writable;
   auto word_updater = [&](code_block* block, cell size) {
     (void)size;
     update_word_references(block, reset_inline_caches);
@@ -148,6 +158,10 @@ void factor_vm::primitive_modify_code_heap() {
 
   if (count == 0)
     return;
+
+  // Compiles and patches many blocks; hold one writable region across the
+  // whole unit so the per-block funnel scopes below are flip-free no-ops.
+  jit_writable_scope jit_writable;
 
   for (cell i = 0; i < count; i++) {
     data_root<array> pair(array_nth(alist.untagged(), i), this);
