@@ -214,6 +214,7 @@ void factor_vm::primitive_code_room() {
 }
 
 void factor_vm::primitive_strip_stack_traces() {
+  jit_writable_scope jit_writable;
   auto stack_trace_stripper = [](code_block* block, cell size) {
     (void)size;
     block->owner = false_object;
