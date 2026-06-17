@@ -8,7 +8,11 @@ alien.libraries.finder ;
 IN: yaml.ffi
 
 <<
-"libyaml" { "yaml" "yaml-0" "libyaml-0-2" } find-library-from-list cdecl add-library
+"libyaml" {
+    { [ os windows? ] [ "yaml.dll" ] }
+    { [ os macos? ] [ "libyaml.dylib" ] }
+    { [ os unix? ] [ "libyaml.so" ] }
+} cond cdecl add-library
 >>
 
 C-TYPE: FILE
