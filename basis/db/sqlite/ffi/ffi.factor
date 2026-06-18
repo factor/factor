@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-! An interface to the sqlite database. Tested against sqlite v3.1.3.
+! An interface to the sqlite database. Updated against sqlite 3.51.0.
 ! Not all functions have been wrapped.
 USING: alien alien.c-types alien.libraries alien.syntax
 classes.struct combinators system ;
@@ -12,9 +12,14 @@ C-LIBRARY: sqlite {
     { unix "libsqlite3.so" }
 }
 
+! Reference version this binding was last audited against. The actual
+! linked library version is available at runtime via sqlite3_libversion.
+CONSTANT: SQLITE_VERSION        "3.51.0"
+CONSTANT: SQLITE_VERSION_NUMBER 3051000
+
 ! Return values from sqlite functions
 CONSTANT: SQLITE_OK           0  ! Successful result
-CONSTANT: SQLITE_ERROR        1  ! SQL error or missing database
+CONSTANT: SQLITE_ERROR        1  ! Generic error
 CONSTANT: SQLITE_INTERNAL     2  ! An internal logic error in SQLite
 CONSTANT: SQLITE_PERM         3  ! Access permission denied
 CONSTANT: SQLITE_ABORT        4  ! Callback routine requested an abort
@@ -22,22 +27,22 @@ CONSTANT: SQLITE_BUSY         5  ! The database file is locked
 CONSTANT: SQLITE_LOCKED       6  ! A table in the database is locked
 CONSTANT: SQLITE_NOMEM        7  ! A malloc() failed
 CONSTANT: SQLITE_READONLY     8  ! Attempt to write a readonly database
-CONSTANT: SQLITE_INTERRUPT    9  ! Operation terminated by sqlite_interrupt()
+CONSTANT: SQLITE_INTERRUPT    9  ! Operation terminated by sqlite3_interrupt()
 CONSTANT: SQLITE_IOERR       10  ! Some kind of disk I/O error occurred
 CONSTANT: SQLITE_CORRUPT     11  ! The database disk image is malformed
-CONSTANT: SQLITE_NOTFOUND    12  ! (Internal Only) Table or record not found
+CONSTANT: SQLITE_NOTFOUND    12  ! Unknown opcode in sqlite3_file_control()
 CONSTANT: SQLITE_FULL        13  ! Insertion failed because database is full
 CONSTANT: SQLITE_CANTOPEN    14  ! Unable to open the database file
 CONSTANT: SQLITE_PROTOCOL    15  ! Database lock protocol error
 CONSTANT: SQLITE_EMPTY       16  ! (Internal Only) Database table is empty
 CONSTANT: SQLITE_SCHEMA      17  ! The database schema changed
-CONSTANT: SQLITE_TOOBIG      18  ! Too much data for one row of a table
-CONSTANT: SQLITE_CONSTRAINT  19  ! Abort due to contraint violation
+CONSTANT: SQLITE_TOOBIG      18  ! String or BLOB exceeds size limit
+CONSTANT: SQLITE_CONSTRAINT  19  ! Abort due to constraint violation
 CONSTANT: SQLITE_MISMATCH    20  ! Data type mismatch
 CONSTANT: SQLITE_MISUSE      21  ! Library used incorrectly
 CONSTANT: SQLITE_NOLFS       22  ! Uses OS features not supported on host
 CONSTANT: SQLITE_AUTH        23  ! Authorization denied
-CONSTANT: SQLITE_FORMAT      24  ! Auxiliary database format error
+CONSTANT: SQLITE_FORMAT      24  ! Not used
 CONSTANT: SQLITE_RANGE       25  ! 2nd parameter to sqlite3_bind out of range
 CONSTANT: SQLITE_NOTADB      26  ! File opened that is not a database file
 CONSTANT: SQLITE_NOTICE      27  ! Notifications from sqlite3_log()
@@ -45,7 +50,7 @@ CONSTANT: SQLITE_WARNING     28  ! Warnings from sqlite3_log()
 
 CONSTANT: sqlite-error-messages {
     "Successful result"
-    "SQL error or missing database"
+    "Generic error"
     "An internal logic error in SQLite"
     "Access permission denied"
     "Callback routine requested an abort"
@@ -53,27 +58,108 @@ CONSTANT: sqlite-error-messages {
     "A table in the database is locked"
     "A malloc() failed"
     "Attempt to write a readonly database"
-    "Operation terminated by sqlite_interrupt()"
+    "Operation terminated by sqlite3_interrupt()"
     "Some kind of disk I/O error occurred"
     "The database disk image is malformed"
-    "(Internal Only) Table or record not found"
+    "Unknown opcode in sqlite3_file_control()"
     "Insertion failed because database is full"
     "Unable to open the database file"
     "Database lock protocol error"
-    "(Internal Only) Database table is empty"
+    "Internal use only"
     "The database schema changed"
-    "Too much data for one row of a table"
-    "Abort due to contraint violation"
+    "String or BLOB exceeds size limit"
+    "Abort due to constraint violation"
     "Data type mismatch"
     "Library used incorrectly"
     "Uses OS features not supported on host"
     "Authorization denied"
-    "Auxiliary database format error"
+    "Not used"
     "2nd parameter to sqlite3_bind out of range"
     "File opened that is not a database file"
     "Notifications from sqlite3_log()"
     "Warnings from sqlite3_log()"
 }
+
+! Extended result codes ( primary | (n<<8) ). These are only returned
+! when sqlite3_extended_result_codes is enabled; otherwise the primary
+! code (low 8 bits) is returned. Defined here for diagnostics.
+CONSTANT: SQLITE_ERROR_MISSING_COLLSEQ   0x101
+CONSTANT: SQLITE_ERROR_RETRY             0x201
+CONSTANT: SQLITE_ERROR_SNAPSHOT          0x301
+CONSTANT: SQLITE_IOERR_READ              0x10A
+CONSTANT: SQLITE_IOERR_SHORT_READ        0x20A
+CONSTANT: SQLITE_IOERR_WRITE             0x30A
+CONSTANT: SQLITE_IOERR_FSYNC             0x40A
+CONSTANT: SQLITE_IOERR_DIR_FSYNC         0x50A
+CONSTANT: SQLITE_IOERR_TRUNCATE          0x60A
+CONSTANT: SQLITE_IOERR_FSTAT             0x70A
+CONSTANT: SQLITE_IOERR_UNLOCK            0x80A
+CONSTANT: SQLITE_IOERR_RDLOCK            0x90A
+CONSTANT: SQLITE_IOERR_DELETE            0xA0A
+CONSTANT: SQLITE_IOERR_BLOCKED           0xB0A
+CONSTANT: SQLITE_IOERR_NOMEM             0xC0A
+CONSTANT: SQLITE_IOERR_ACCESS            0xD0A
+CONSTANT: SQLITE_IOERR_CHECKRESERVEDLOCK 0xE0A
+CONSTANT: SQLITE_IOERR_LOCK              0xF0A
+CONSTANT: SQLITE_IOERR_CLOSE             0x100A
+CONSTANT: SQLITE_IOERR_DIR_CLOSE         0x110A
+CONSTANT: SQLITE_IOERR_SHMOPEN           0x120A
+CONSTANT: SQLITE_IOERR_SHMSIZE           0x130A
+CONSTANT: SQLITE_IOERR_SHMLOCK           0x140A
+CONSTANT: SQLITE_IOERR_SHMMAP            0x150A
+CONSTANT: SQLITE_IOERR_SEEK              0x160A
+CONSTANT: SQLITE_IOERR_DELETE_NOENT      0x170A
+CONSTANT: SQLITE_IOERR_MMAP              0x180A
+CONSTANT: SQLITE_IOERR_GETTEMPPATH       0x190A
+CONSTANT: SQLITE_IOERR_CONVPATH          0x1A0A
+CONSTANT: SQLITE_IOERR_VNODE             0x1B0A
+CONSTANT: SQLITE_IOERR_AUTH              0x1C0A
+CONSTANT: SQLITE_IOERR_BEGIN_ATOMIC      0x1D0A
+CONSTANT: SQLITE_IOERR_COMMIT_ATOMIC     0x1E0A
+CONSTANT: SQLITE_IOERR_ROLLBACK_ATOMIC   0x1F0A
+CONSTANT: SQLITE_IOERR_DATA              0x200A
+CONSTANT: SQLITE_IOERR_CORRUPTFS         0x210A
+CONSTANT: SQLITE_IOERR_IN_PAGE           0x220A
+CONSTANT: SQLITE_LOCKED_SHAREDCACHE      0x106
+CONSTANT: SQLITE_LOCKED_VTAB             0x206
+CONSTANT: SQLITE_BUSY_RECOVERY           0x105
+CONSTANT: SQLITE_BUSY_SNAPSHOT           0x205
+CONSTANT: SQLITE_BUSY_TIMEOUT            0x305
+CONSTANT: SQLITE_CANTOPEN_NOTEMPDIR      0x10E
+CONSTANT: SQLITE_CANTOPEN_ISDIR          0x20E
+CONSTANT: SQLITE_CANTOPEN_FULLPATH       0x30E
+CONSTANT: SQLITE_CANTOPEN_CONVPATH       0x40E
+CONSTANT: SQLITE_CANTOPEN_DIRTYWAL       0x50E
+CONSTANT: SQLITE_CANTOPEN_SYMLINK        0x60E
+CONSTANT: SQLITE_CORRUPT_VTAB            0x10B
+CONSTANT: SQLITE_CORRUPT_SEQUENCE        0x20B
+CONSTANT: SQLITE_CORRUPT_INDEX           0x30B
+CONSTANT: SQLITE_READONLY_RECOVERY       0x108
+CONSTANT: SQLITE_READONLY_CANTLOCK       0x208
+CONSTANT: SQLITE_READONLY_ROLLBACK       0x308
+CONSTANT: SQLITE_READONLY_DBMOVED        0x408
+CONSTANT: SQLITE_READONLY_CANTINIT       0x508
+CONSTANT: SQLITE_READONLY_DIRECTORY      0x608
+CONSTANT: SQLITE_ABORT_ROLLBACK          0x204
+CONSTANT: SQLITE_CONSTRAINT_CHECK        0x113
+CONSTANT: SQLITE_CONSTRAINT_COMMITHOOK   0x213
+CONSTANT: SQLITE_CONSTRAINT_FOREIGNKEY   0x313
+CONSTANT: SQLITE_CONSTRAINT_FUNCTION     0x413
+CONSTANT: SQLITE_CONSTRAINT_NOTNULL      0x513
+CONSTANT: SQLITE_CONSTRAINT_PRIMARYKEY   0x613
+CONSTANT: SQLITE_CONSTRAINT_TRIGGER      0x713
+CONSTANT: SQLITE_CONSTRAINT_UNIQUE       0x813
+CONSTANT: SQLITE_CONSTRAINT_VTAB         0x913
+CONSTANT: SQLITE_CONSTRAINT_ROWID        0xA13
+CONSTANT: SQLITE_CONSTRAINT_PINNED       0xB13
+CONSTANT: SQLITE_CONSTRAINT_DATATYPE     0xC13
+CONSTANT: SQLITE_NOTICE_RECOVER_WAL      0x11B
+CONSTANT: SQLITE_NOTICE_RECOVER_ROLLBACK 0x21B
+CONSTANT: SQLITE_NOTICE_RBU              0x31B
+CONSTANT: SQLITE_WARNING_AUTOINDEX       0x11C
+CONSTANT: SQLITE_AUTH_USER               0x117
+CONSTANT: SQLITE_OK_LOAD_PERMANENTLY     0x100
+CONSTANT: SQLITE_OK_SYMLINK              0x200
 
 ! Return values from sqlite3_step
 CONSTANT: SQLITE_ROW         100
@@ -95,13 +181,24 @@ CONSTANT: SQLITE_OPEN_READWRITE        0x00000002
 CONSTANT: SQLITE_OPEN_CREATE           0x00000004
 CONSTANT: SQLITE_OPEN_DELETEONCLOSE    0x00000008
 CONSTANT: SQLITE_OPEN_EXCLUSIVE        0x00000010
+CONSTANT: SQLITE_OPEN_AUTOPROXY        0x00000020
+CONSTANT: SQLITE_OPEN_URI              0x00000040
+CONSTANT: SQLITE_OPEN_MEMORY           0x00000080
 CONSTANT: SQLITE_OPEN_MAIN_DB          0x00000100
 CONSTANT: SQLITE_OPEN_TEMP_DB          0x00000200
 CONSTANT: SQLITE_OPEN_TRANSIENT_DB     0x00000400
 CONSTANT: SQLITE_OPEN_MAIN_JOURNAL     0x00000800
 CONSTANT: SQLITE_OPEN_TEMP_JOURNAL     0x00001000
 CONSTANT: SQLITE_OPEN_SUBJOURNAL       0x00002000
+CONSTANT: SQLITE_OPEN_SUPER_JOURNAL    0x00004000
 CONSTANT: SQLITE_OPEN_MASTER_JOURNAL   0x00004000
+CONSTANT: SQLITE_OPEN_NOMUTEX          0x00008000
+CONSTANT: SQLITE_OPEN_FULLMUTEX        0x00010000
+CONSTANT: SQLITE_OPEN_SHAREDCACHE      0x00020000
+CONSTANT: SQLITE_OPEN_PRIVATECACHE     0x00040000
+CONSTANT: SQLITE_OPEN_WAL              0x00080000
+CONSTANT: SQLITE_OPEN_NOFOLLOW         0x01000000
+CONSTANT: SQLITE_OPEN_EXRESCODE        0x02000000
 
 CONSTANT: SQLITE_IOCAP_ATOMIC                 0x00000001
 CONSTANT: SQLITE_IOCAP_ATOMIC512              0x00000002
@@ -128,6 +225,102 @@ CONSTANT: SQLITE_LOCK_EXCLUSIVE     4
 CONSTANT: SQLITE_SYNC_NORMAL        0x00002
 CONSTANT: SQLITE_SYNC_FULL          0x00003
 CONSTANT: SQLITE_SYNC_DATAONLY      0x00010
+
+! Flags for sqlite3_prepare_v3
+CONSTANT: SQLITE_PREPARE_PERSISTENT 0x01
+CONSTANT: SQLITE_PREPARE_NORMALIZE  0x02
+CONSTANT: SQLITE_PREPARE_NO_VTAB    0x04
+
+! Text encodings / function flags
+CONSTANT: SQLITE_UTF8           1
+CONSTANT: SQLITE_UTF16LE        2
+CONSTANT: SQLITE_UTF16BE        3
+CONSTANT: SQLITE_UTF16          4
+CONSTANT: SQLITE_ANY           5  ! deprecated
+CONSTANT: SQLITE_UTF16_ALIGNED 8
+CONSTANT: SQLITE_DETERMINISTIC  0x000000800
+CONSTANT: SQLITE_DIRECTONLY     0x000080000
+CONSTANT: SQLITE_SUBTYPE        0x000100000
+CONSTANT: SQLITE_INNOCUOUS      0x000200000
+CONSTANT: SQLITE_RESULT_SUBTYPE 0x001000000
+
+! Configuration options for sqlite3_config
+CONSTANT: SQLITE_CONFIG_SINGLETHREAD          1
+CONSTANT: SQLITE_CONFIG_MULTITHREAD           2
+CONSTANT: SQLITE_CONFIG_SERIALIZED            3
+CONSTANT: SQLITE_CONFIG_MALLOC                4
+CONSTANT: SQLITE_CONFIG_GETMALLOC             5
+CONSTANT: SQLITE_CONFIG_SCRATCH               6
+CONSTANT: SQLITE_CONFIG_PAGECACHE             7
+CONSTANT: SQLITE_CONFIG_HEAP                  8
+CONSTANT: SQLITE_CONFIG_MEMSTATUS             9
+CONSTANT: SQLITE_CONFIG_MUTEX                10
+CONSTANT: SQLITE_CONFIG_GETMUTEX             11
+CONSTANT: SQLITE_CONFIG_LOOKASIDE           13
+CONSTANT: SQLITE_CONFIG_PCACHE              14
+CONSTANT: SQLITE_CONFIG_GETPCACHE           15
+CONSTANT: SQLITE_CONFIG_LOG                 16
+CONSTANT: SQLITE_CONFIG_URI                 17
+CONSTANT: SQLITE_CONFIG_PCACHE2             18
+CONSTANT: SQLITE_CONFIG_GETPCACHE2          19
+CONSTANT: SQLITE_CONFIG_COVERING_INDEX_SCAN 20
+CONSTANT: SQLITE_CONFIG_SQLLOG              21
+CONSTANT: SQLITE_CONFIG_MMAP_SIZE           22
+CONSTANT: SQLITE_CONFIG_WIN32_HEAPSIZE      23
+CONSTANT: SQLITE_CONFIG_PCACHE_HDRSZ        24
+CONSTANT: SQLITE_CONFIG_PMASZ               25
+CONSTANT: SQLITE_CONFIG_STMTJRNL_SPILL      26
+CONSTANT: SQLITE_CONFIG_SMALL_MALLOC        27
+CONSTANT: SQLITE_CONFIG_SORTERREF_SIZE      28
+CONSTANT: SQLITE_CONFIG_MEMDB_MAXSIZE       29
+CONSTANT: SQLITE_CONFIG_ROWID_IN_VIEW       30
+
+! Database connection configuration options for sqlite3_db_config
+CONSTANT: SQLITE_DBCONFIG_MAINDBNAME            1000
+CONSTANT: SQLITE_DBCONFIG_LOOKASIDE             1001
+CONSTANT: SQLITE_DBCONFIG_ENABLE_FKEY           1002
+CONSTANT: SQLITE_DBCONFIG_ENABLE_TRIGGER        1003
+CONSTANT: SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER 1004
+CONSTANT: SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION 1005
+CONSTANT: SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE      1006
+CONSTANT: SQLITE_DBCONFIG_ENABLE_QPSG           1007
+CONSTANT: SQLITE_DBCONFIG_TRIGGER_EQP           1008
+CONSTANT: SQLITE_DBCONFIG_RESET_DATABASE        1009
+CONSTANT: SQLITE_DBCONFIG_DEFENSIVE             1010
+CONSTANT: SQLITE_DBCONFIG_WRITABLE_SCHEMA       1011
+CONSTANT: SQLITE_DBCONFIG_LEGACY_ALTER_TABLE    1012
+CONSTANT: SQLITE_DBCONFIG_DQS_DML               1013
+CONSTANT: SQLITE_DBCONFIG_DQS_DDL               1014
+CONSTANT: SQLITE_DBCONFIG_ENABLE_VIEW           1015
+CONSTANT: SQLITE_DBCONFIG_LEGACY_FILE_FORMAT    1016
+CONSTANT: SQLITE_DBCONFIG_TRUSTED_SCHEMA        1017
+CONSTANT: SQLITE_DBCONFIG_STMT_SCANSTATUS       1018
+CONSTANT: SQLITE_DBCONFIG_REVERSE_SCANORDER     1019
+
+! Run-time limit categories for sqlite3_limit
+CONSTANT: SQLITE_LIMIT_LENGTH              0
+CONSTANT: SQLITE_LIMIT_SQL_LENGTH          1
+CONSTANT: SQLITE_LIMIT_COLUMN              2
+CONSTANT: SQLITE_LIMIT_EXPR_DEPTH          3
+CONSTANT: SQLITE_LIMIT_COMPOUND_SELECT     4
+CONSTANT: SQLITE_LIMIT_VDBE_OP             5
+CONSTANT: SQLITE_LIMIT_FUNCTION_ARG        6
+CONSTANT: SQLITE_LIMIT_ATTACHED            7
+CONSTANT: SQLITE_LIMIT_LIKE_PATTERN_LENGTH 8
+CONSTANT: SQLITE_LIMIT_VARIABLE_NUMBER     9
+CONSTANT: SQLITE_LIMIT_TRIGGER_DEPTH      10
+CONSTANT: SQLITE_LIMIT_WORKER_THREADS     11
+
+! Checkpoint modes for sqlite3_wal_checkpoint_v2
+CONSTANT: SQLITE_CHECKPOINT_PASSIVE  0
+CONSTANT: SQLITE_CHECKPOINT_FULL     1
+CONSTANT: SQLITE_CHECKPOINT_RESTART  2
+CONSTANT: SQLITE_CHECKPOINT_TRUNCATE 3
+
+! Allowed return values from sqlite3_txn_state
+CONSTANT: SQLITE_TXN_NONE  0
+CONSTANT: SQLITE_TXN_READ  1
+CONSTANT: SQLITE_TXN_WRITE 2
 
 LIBRARY: sqlite
 
@@ -240,7 +433,11 @@ FUNCTION: void sqlite3_set_last_insert_rowid ( sqlite3* dummy, sqlite3_int64 dum
 
 FUNCTION: int sqlite3_changes ( sqlite3* dummy )
 
+FUNCTION: sqlite3_int64 sqlite3_changes64 ( sqlite3* dummy )
+
 FUNCTION: int sqlite3_total_changes ( sqlite3* dummy )
+
+FUNCTION: sqlite3_int64 sqlite3_total_changes64 ( sqlite3* dummy )
 
 FUNCTION: void sqlite3_interrupt ( sqlite3* dummy )
 
@@ -314,6 +511,8 @@ FUNCTION: void* sqlite3_errmsg16 ( sqlite3* dummy )
 
 FUNCTION: c-string sqlite3_errstr ( int dummy )
 
+FUNCTION: int sqlite3_error_offset ( sqlite3* db )
+
 C-TYPE: sqlite3_stmt
 FUNCTION: int sqlite3_limit ( sqlite3* dummy, int id, int newVal )
 
@@ -338,6 +537,8 @@ FUNCTION: c-string sqlite3_normalized_sql ( sqlite3_stmt* pStmt )
 FUNCTION: int sqlite3_stmt_readonly ( sqlite3_stmt* pStmt )
 
 FUNCTION: int sqlite3_stmt_isexplain ( sqlite3_stmt* pStmt )
+
+FUNCTION: int sqlite3_stmt_explain ( sqlite3_stmt* pStmt, int eMode )
 
 FUNCTION: int sqlite3_stmt_busy ( sqlite3_stmt* dummy )
 
@@ -560,9 +761,13 @@ FUNCTION: int sqlite3_win32_set_directory16 ( ulong type, void* zValue )
 
 FUNCTION: int sqlite3_get_autocommit ( sqlite3* dummy )
 
+FUNCTION: int sqlite3_txn_state ( sqlite3* db, c-string zSchema )
+
 FUNCTION: sqlite3* sqlite3_db_handle ( sqlite3_stmt* dummy )
 
 FUNCTION: c-string sqlite3_db_filename ( sqlite3* db, c-string zDbName )
+
+FUNCTION: c-string sqlite3_db_name ( sqlite3* db, int N )
 
 FUNCTION: int sqlite3_db_readonly ( sqlite3* db, c-string zDbName )
 
