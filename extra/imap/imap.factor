@@ -5,7 +5,7 @@ io.encodings.binary io.encodings.string io.encodings.utf7
 io.encodings.utf8 io.sockets io.sockets.secure io.streams.duplex
 io.streams.string kernel math math.parser multiline sequences
 sequences.extras splitting splitting.monotonic strings ;
-QUALIFIED: pcre
+QUALIFIED: pcre2
 IN: imap
 
 ERROR: imap4-error ind data ;
@@ -46,11 +46,11 @@ CONSTANT: IMAP4_SSL_PORT 993
     over "OK" = not [ imap4-error ] [ 2drop ] if ;
 
 : read-response-chunk ( stop-expr -- item ? )
-    read-?crlf ascii decode swap dupd pcre:findall
+    read-?crlf ascii decode swap dupd pcre2:findall
     [
-        dup [[ ^.*{(\d+)}$]] pcre:findall
+        dup [[ ^.*{(\d+)}$]] pcre2:findall
         [
-            dup [[ ^\* (\d+) [A-Z-]+ (.*)$]] pcre:findall
+            dup [[ ^\* (\d+) [A-Z-]+ (.*)$]] pcre2:findall
             [ ] [ nip first third second ] if-empty
         ]
         [
@@ -82,24 +82,24 @@ CONSTANT: IMAP4_SSL_PORT 993
     first split-words 2 tail ;
 
 : parse-list-folders ( str -- folder )
-    [[ \* LIST \(([^\)]+)\) "([^"]+)" "?([^"]+)"?]] pcre:findall
+    [[ \* LIST \(([^\)]+)\) "([^"]+)" "?([^"]+)"?]] pcre2:findall
     first rest values [ utf7imap4 decode ] map ;
 
 : parse-select-folder ( seq -- count )
-    [ [[ \* (\d+) EXISTS]] pcre:findall ] map harvest
+    [ [[ \* (\d+) EXISTS]] pcre2:findall ] map harvest
     [ f ] [ first first last last string>number ] if-empty ;
 
 ! Returns uid if the server supports the UIDPLUS extension.
 : parse-append-mail ( seq -- uid/f )
-    [ [=[ \[APPENDUID (\d+) \d+\]]=] pcre:findall ] map harvest
+    [ [=[ \[APPENDUID (\d+) \d+\]]=] pcre2:findall ] map harvest
     [ f ] [ first first last last string>number ] if-empty ;
 
 : parse-status ( seq -- assoc )
-    first [[ \* STATUS "[^"]+" \(([^\)]+)\)]] pcre:findall first last last
+    first [[ \* STATUS "[^"]+" \(([^\)]+)\)]] pcre2:findall first last last
     split-words 2 group [ string>number ] assoc-map ;
 
 : parse-store-mail-line ( str -- pair/f )
-    [[ \(FLAGS \(([^\)]+)\) UID (\d+)\)]] pcre:findall [ f ] [
+    [[ \(FLAGS \(([^\)]+)\) UID (\d+)\)]] pcre2:findall [ f ] [
         first rest values first2 [ split-words ] dip string>number swap 2array
     ] if-empty ;
 
