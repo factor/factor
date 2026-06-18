@@ -166,4 +166,4 @@ VERTEX-FORMAT: collada-vertex-format
 PRIVATE>
 
 M: collada-models stream>models
-    drop read-xml "mesh" deep-tags-named [ mesh>models ] map flatten ;
+    drop stream-read-xml "mesh" deep-tags-named [ mesh>models ] map flatten ;

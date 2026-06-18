@@ -177,35 +177,44 @@ PRIVATE>
         xml-loop
     ] with-state ; inline
 
-: read-xml ( stream -- xml )
+: stream-read-xml ( stream -- xml )
     dup stream-element-type {
         { +character+ [ [ check ] make-xml ] }
         { +byte+ [ [ start-document [ process ] when* ] make-xml ] }
     } case ;
 
-: read-xml-chunk ( stream -- seq )
+: read-xml ( -- xml )
+    input-stream get stream-read-xml ;
+
+: stream-read-xml-chunk ( stream -- seq )
     [ check ] 1 read-seq <xml-chunk> ;
 
+: read-xml-chunk ( -- seq )
+    input-stream get stream-read-xml-chunk ;
+
 : string>xml ( string -- xml )
-    <string-reader> read-xml ;
+    [ read-xml ] with-string-reader ;
 
 : string>xml-chunk ( string -- xml )
-    <string-reader> read-xml-chunk ;
+    [ read-xml-chunk ] with-string-reader ;
 
 : file>xml ( filename -- xml )
-    binary <file-reader> read-xml ;
+    binary [ read-xml ] with-file-reader ;
 
 : bytes>xml ( byte-array -- xml )
-    binary <byte-reader> read-xml ;
+    binary [ read-xml ] with-byte-reader ;
 
-: read-dtd ( stream -- dtd )
+: stream-read-dtd ( stream -- dtd )
     [
         H{ } clone extra-entities namespaces:set
         take-internal-subset
     ] with-state ;
 
+: read-dtd ( -- dtd )
+    input-stream get stream-read-dtd ;
+
 : file>dtd ( filename -- dtd )
-    utf8 <file-reader> read-dtd ;
+    utf8 [ read-dtd ] with-file-reader ;
 
 : string>dtd ( string -- dtd )
-    <string-reader> read-dtd ;
+    [ read-dtd ] with-string-reader ;
