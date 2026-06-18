@@ -8,9 +8,13 @@ HELP: string>xml
 { $description "Converts a string into an " { $link xml }
     " tree for further processing." } ;
 
-HELP: read-xml
+HELP: stream-read-xml
 { $values { "stream" "an input stream" } { "xml" xml } }
 { $description "Exhausts the given stream, reading an XML document from it. A binary stream, one without encoding, should be used as input, and the encoding is automatically detected." } ;
+
+HELP: read-xml
+{ $values { "xml" xml } }
+{ $description "Exhausts the " { $link input-stream } ", reading an XML document from it. A binary stream, one without encoding, should be used as input, and the encoding is automatically detected." } ;
 
 HELP: file>xml
 { $values { "filename" string } { "xml" xml } }
@@ -20,11 +24,16 @@ HELP: bytes>xml
 { $values { "byte-array" byte-array } { "xml" xml } }
 { $description "Parses a byte array as an XML document. The encoding is automatically detected." } ;
 
-{ string>xml read-xml file>xml bytes>xml } related-words
+{ string>xml stream-read-xml read-xml file>xml bytes>xml } related-words
 
-HELP: read-xml-chunk
+HELP: stream-read-xml-chunk
 { $values { "stream" "an input stream" } { "seq" "a sequence of elements" } }
 { $description "Rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc), ie a document fragment. This is useful for pieces of XML which may have more than one main tag. The encoding is not automatically detected, and a stream with an encoding (ie. one which returns strings from " { $link read } ") should be used as input." }
+{ $see-also read-xml } ;
+
+HELP: read-xml-chunk
+{ $values { "seq" "a sequence of elements" } }
+{ $description "Rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc), ie a document fragment. This is useful for pieces of XML which may have more than one main tag. The encoding is not automatically detected." }
 { $see-also read-xml } ;
 
 HELP: each-element
@@ -51,9 +60,13 @@ HELP: pull-event
 { $description "Gets the next XML event from the given XML pull parser. Returns f upon exhaustion." }
 { $see-also pull-xml <pull-xml> pull-elem } ;
 
-HELP: read-dtd
+HELP: stream-read-dtd
 { $values { "stream" "an input stream" } { "dtd" dtd } }
 { $description "Exhausts a stream, producing a " { $link dtd } " from the contents." } ;
+
+HELP: read-dtd
+{ $values { "dtd" dtd } }
+{ $description "Exhausts the " { $link input-stream } ", producing a " { $link dtd } " from the contents." } ;
 
 HELP: file>dtd
 { $values { "filename" string } { "dtd" dtd } }
