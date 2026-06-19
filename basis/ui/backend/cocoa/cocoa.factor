@@ -3,9 +3,11 @@
 USING: accessors alien.c-types alien.data cocoa
 cocoa.application cocoa.classes cocoa.nibs cocoa.pasteboard
 cocoa.runtime cocoa.subclassing cocoa.views cocoa.windows
-combinators core-foundation.run-loop core-foundation.strings
-core-graphics core-graphics.types io.thread kernel literals math
-math.bitwise math.rectangles namespaces sequences threads ui
+combinators continuations core-foundation.run-loop
+core-foundation.strings core-graphics core-graphics.types debugger
+io.thread kernel
+literals math math.bitwise math.rectangles namespaces sequences
+threads ui
 ui.backend ui.backend.cocoa.views ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.private ui.render ui.theme
 ui.theme.switching ;
@@ -181,8 +183,12 @@ M: cocoa-ui-backend raise-window*
 M: window-handle select-gl-context
     view>> -> openGLContext -> makeCurrentContext ;
 
+: display-asleep? ( -- ? )
+    CGMainDisplayID CGDisplayIsAsleep c-bool> ;
+
 M: window-handle flush-gl-context
-    view>> -> openGLContext -> flushBuffer ;
+    display-asleep?
+    [ drop ] [ view>> -> openGLContext -> flushBuffer ] if ;
 
 M: cocoa-ui-backend beep
     NSBeep ;
@@ -202,7 +208,8 @@ M: cocoa-ui-backend system-alert
 
 <CLASS: FactorApplicationDelegate < NSObject
 
-    METHOD: void applicationDidUpdate: id obj [ reset-thread-timer ] ;
+    METHOD: void applicationDidUpdate: id obj
+        [ [ reset-thread-timer ] [ print-error ] recover ] ;
 
     METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
         ui-stop-after-last-window? get 1 0 ?

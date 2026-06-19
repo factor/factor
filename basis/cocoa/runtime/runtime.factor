@@ -43,7 +43,7 @@ FUNCTION: Protocol objc_getProtocol ( c-string class )
 FUNCTION: Class objc_allocateClassPair ( Class superclass, c-string name, size_t extraBytes )
 FUNCTION: void objc_registerClassPair ( Class cls )
 
-FUNCTION: void* objc_getAssociatedObject ( void* obj, c-string key )
+FUNCTION: void* objc_getAssociatedObject ( void* obj, void* key )
 
 FUNCTION: id class_createInstance ( Class class, uint additionalByteCount )
 

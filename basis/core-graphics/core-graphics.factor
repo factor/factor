@@ -151,6 +151,8 @@ FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pnam
 
 FUNCTION: CGDirectDisplayID CGMainDisplayID ( )
 
+FUNCTION: boolean_t CGDisplayIsAsleep ( CGDirectDisplayID display )
+
 FUNCTION: CGError CGDisplayHideCursor ( CGDirectDisplayID display )
 FUNCTION: CGError CGDisplayShowCursor ( CGDirectDisplayID display )
 

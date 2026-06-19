@@ -85,8 +85,9 @@ TUPLE: platform-menu-item title { quot callable } key-equivalent selector target
 : hide-statusbar-item ( statusbar-item-alien -- )
     [ get-system-statusbar ] dip -> removeStatusItem: ;
 
-: hide-statusbar* ( platform-menu -- )
-    [ get-system-statusbar ] dip -> removeStatusItem: ;
+: hide-statusbar* ( statusbar-item-alien -- )
+    [ [ get-system-statusbar ] dip -> removeStatusItem: ] keep
+    -> release ;
 
 : hide-statusbar ( platform-menu -- platform-menu )
     [ statusbar-alien>> hide-statusbar* ] keep ;
