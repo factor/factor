@@ -21,7 +21,7 @@ HELP: jit-define
 HELP: make-image
 { $values { "arch" string } }
 { $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
-{ $code "\"windows-x86.32\"" "\"unix-x86.32\"" "\"windows-x86.64\"" "\"unix-x86.64\"" }
+{ $code "\"windows-x86.32\"" "\"unix-x86.32\"" "\"windows-x86.64\"" "\"unix-x86.64\"" "\"windows-arm.64\"" "\"unix-arm.64\"" }
   "The new image file is written to the " { $link resource-path } " and is named " { $snippet "boot." { $emphasis "architecture" } ".image" } "." } ;
 
 HELP: make-jit

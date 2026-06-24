@@ -141,6 +141,22 @@ set_cc() {
 
     # we need this condition so we don't find a mingw32 compiler on linux
     if [[ $OS == windows ]] ; then
+        if [[ $ARCH == arm && $WORD == 64 ]] ; then
+            if test_programs_installed aarch64-w64-mingw32-gcc aarch64-w64-mingw32-g++; then
+                [ -z "$CC" ] && CC=aarch64-w64-mingw32-gcc
+                [ -z "$CXX" ] && CXX=aarch64-w64-mingw32-g++
+                [ -z "$CC_OPT" ] && [ "$LTO" == "1" ] && CC_OPT="-flto=auto"
+                [ -z "$CXX_OPT" ] && [ "$LTO" == "1" ] && CXX_OPT="-flto=auto"
+                return
+            fi
+
+            if test_programs_installed aarch64-w64-mingw32-clang aarch64-w64-mingw32-clang++; then
+                [ -z "$CC" ] && CC=aarch64-w64-mingw32-clang
+                [ -z "$CXX" ] && CXX=aarch64-w64-mingw32-clang++
+                return
+            fi
+        fi
+
         if test_programs_installed x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; then
             [ -z "$CC" ] && CC=x86_64-w64-mingw32-gcc
             [ -z "$CXX" ] && CXX=x86_64-w64-mingw32-g++
@@ -843,6 +859,7 @@ usage() {
     $ECHO ""
     $ECHO "Example for overriding the default target:"
     $ECHO "    $0 update macos-x86-32"
+    $ECHO "    $0 update windows-arm-64"
 }
 
 MAKE_TARGET=unknown

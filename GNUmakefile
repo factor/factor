@@ -248,6 +248,7 @@ help:
 	@echo "macos-arm-64"
 	@echo "windows-x86-32"
 	@echo "windows-x86-64"
+	@echo "windows-arm-64"
 	@echo ""
 	@echo "Additional modifiers:"
 	@echo ""
@@ -304,6 +305,10 @@ windows-x86-32:
 windows-x86-64:
 	$(MAKE) $(ALL) CONFIG=vm/Config.windows.x86.64
 	$(MAKE) factor-console CONFIG=vm/Config.windows.x86.64
+
+windows-arm-64:
+	$(MAKE) $(ALL) CONFIG=vm/Config.windows.arm.64
+	$(MAKE) factor-console CONFIG=vm/Config.windows.arm.64
 
 # Actually build Factor
 ifdef CONFIG
@@ -385,4 +390,4 @@ clean:
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
 .PHONY: factor-executable factor-lib factor-console factor-ffi-test tags clean help macos.app
-.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64
+.PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64
