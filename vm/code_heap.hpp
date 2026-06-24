@@ -1,6 +1,8 @@
 namespace factor {
 
-#if defined(WINDOWS) && defined(FACTOR_64)
+#if defined(WINDOWS) && defined(FACTOR_ARM64)
+const cell seh_area_size = 4096;
+#elif defined(WINDOWS) && defined(FACTOR_64)
 const cell seh_area_size = 1024;
 #else
 const cell seh_area_size = 0;

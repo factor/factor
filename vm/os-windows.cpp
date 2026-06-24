@@ -229,6 +229,7 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
 #endif
       MXCSR(c) &= 0xffffffc0;
 #else
+      signal_fpu_status = fpu_status(c->Fpsr);
       c->Fpsr = 0;
 #endif
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
