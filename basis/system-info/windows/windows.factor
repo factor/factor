@@ -18,9 +18,10 @@ IN: system-info.windows
 : processor-type ( -- n )
     system-info dwProcessorType>> ;
 
-! 0 = x86, 6 = Intel Itanium, 9 = x64 (AMD or Intel), 10 = WOW64, 0xffff = Unk
+! 0 = x86, 5 = ARM, 6 = Intel Itanium, 9 = x64 (AMD or Intel),
+! 12 = ARM64, 0xffff = Unknown
 : processor-architecture ( -- n )
-    system-info dwOemId>> 0xffff0000 bitand ;
+    system-info dwOemId>> 0xffff bitand ;
 
 : os-version-struct ( -- os-version )
     OSVERSIONINFO new
