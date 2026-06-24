@@ -46,7 +46,7 @@ https://downloads.factorcode.org/images/master/, put it in the `factor`
 directory and run:
 
 * Unix: `make` and then `./factor -i=boot.unix-x86.64.image`
-* Windows: `nmake /f Nmakefile` and then `factor.com -i=boot.windows-x86.64.image`
+* Windows: `nmake /f Nmakefile` and then `factor.com -i=boot.windows-x86.64.image` or `factor.com -i=boot.windows-arm.64.image` for ARM64
 
 Now you should have a complete Factor system ready to run.
 

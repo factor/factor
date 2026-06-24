@@ -1,0 +1,8 @@
+PLAF_DLL_OBJS += $(BUILD_DIR)/os-windows-arm.64.o
+PLAF_MASTER_HEADERS += vm/os-windows-arm.64.hpp vm/atomic-cl-64.hpp vm/atomic.hpp
+WINARM64_PATH ?= aarch64-w64-mingw32
+CC=$(WINARM64_PATH)-gcc
+CXX=$(WINARM64_PATH)-g++
+WINDRES=$(WINARM64_PATH)-windres
+include vm/Config.windows
+include vm/Config.arm.64
