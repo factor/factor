@@ -525,12 +525,13 @@ update_script_name() {
 update_script() {
   set_current_branch
   local -r update_script=$(update_script_name)
-  local -r shell_path="$SHELL"
   {
-    echo "#!$shell_path"
+    echo "#!/usr/bin/env bash"
     echo "set -ex"
-    echo "git pull ${GIT_URL} ${CURRENT_BRANCH}"
-    echo "exit 0"
+    printf "git pull %q %q\n" "$GIT_URL" "$CURRENT_BRANCH"
+    printf "exec %q" "$0"
+    printf " %q" "$@"
+    printf "\n"
   } > "$update_script"
   chmod 755 "$update_script"
   $ECHO "Running the build.sh updater script: $update_script"
@@ -551,7 +552,7 @@ git_fetch() {
 
     if update_script_changed; then
         $ECHO "Updating and restarting the build.sh script..."
-        update_script
+        update_script "$@"
     else
         $ECHO "Updating the working tree..."
         invoke_git pull "$GIT_URL" "${CURRENT_BRANCH}"
@@ -763,7 +764,7 @@ install() {
 
 update() {
     get_config_info
-    git_fetch
+    git_fetch "$@"
     backup_factor
     make_clean_factor
 }
@@ -886,9 +887,9 @@ case "$1" in
     info-check-factor-refresh-all-locally) info_check_factor_refresh_all_locally ;;
     update-boot-image) find_build_info; check_installed_programs; update_boot_image ;;
     self-bootstrap) get_config_info; make_boot_image; bootstrap  ;;
-    self-update) update; make_boot_image; bootstrap  ;;
-    quick-update) update; refresh_image ;;
-    update|latest) update; download_and_bootstrap ;;
+    self-update) update "$@"; make_boot_image; bootstrap  ;;
+    quick-update) update "$@"; refresh_image ;;
+    update|latest) update "$@"; download_and_bootstrap ;;
     clean) find_build_info; make_clean ;;
     compile) find_build_info; make_factor ;;
     recompile) find_build_info; make_clean; make_factor ;;
