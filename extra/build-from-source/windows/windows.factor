@@ -1,6 +1,6 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: build-from-source combinators.smart continuations
+USING: build-from-source combinators combinators.smart continuations
 environment http.download io.directories io.files.temp io.launcher
 io.pathnames kernel layouts qw sequences windows.shell32 ;
 IN: build-from-source.windows
@@ -99,8 +99,26 @@ IN: build-from-source.windows
         { "apps/libssl-3-x64.dll" "apps/libcrypto-3-x64.dll" } copy-output-files
     ] with-github-worktree-tag ;
 
+: build-openssl-arm64-dlls ( -- )
+    "openssl" "openssl" openssl-release-versions last [
+        check-perl
+        check-nmake
+        qw{ perl Configure -DOPENSSL_PIC VC-WIN64-ARM /FS } try-process
+        have-jom? qw{ jom -j 32 } { "nmake" } ? try-process
+        { "apps/libssl-3-arm64.dll" "apps/libcrypto-3-arm64.dll" } copy-output-files
+    ] with-github-worktree-tag ;
+
 : build-openssl-dlls ( -- )
-    32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ;
+    cpu arm.64?
+    [ build-openssl-arm64-dlls ]
+    [ 32-bit? [ build-openssl-32-dlls ] [ build-openssl-64-dlls ] if ] if ;
+
+: msvc-machine ( -- str )
+    cpu {
+        { x86.32 [ "/machine:x86" ] }
+        { x86.64 [ "/machine:x64" ] }
+        { arm.64 [ "/machine:arm64" ] }
+    } case ;
 
 : build-cairo-dll ( -- )
     "gitlab.freedesktop.org" "cairo" "cairo" cairo-versions first [
@@ -256,7 +274,7 @@ IN: build-from-source.windows
         32-bit? [
             [ "cl" "/O2" "/I" $raylib-src "/D_USRDLL" "/D_WINDLL" "/DRAYGUI_IMPLEMENTATION" "/DBUILD_LIBTYPE_SHARED" "src/raygui.c" "/LD" "/Feraygui.dll" "/link" "/LIBPATH" $raylib-lib "/subsystem:windows" "/machine:x86" ] output>array try-process
         ] [
-            [ "cl" "/O2" "/I" $raylib-src "/D_USRDLL" "/D_WINDLL" "/DRAYGUI_IMPLEMENTATION" "/DBUILD_LIBTYPE_SHARED" "src/raygui.c" "/LD" "/Feraygui.dll" "/link" "/LIBPATH" $raylib-lib "/subsystem:windows" "/machine:x64" ] output>array try-process
+            [ "cl" "/O2" "/I" $raylib-src "/D_USRDLL" "/D_WINDLL" "/DRAYGUI_IMPLEMENTATION" "/DBUILD_LIBTYPE_SHARED" "src/raygui.c" "/LD" "/Feraygui.dll" "/link" "/LIBPATH" $raylib-lib "/subsystem:windows" msvc-machine ] output>array try-process
         ] if
         "raygui.dll" copy-output-file
     ] with-github-worktree-tag ;

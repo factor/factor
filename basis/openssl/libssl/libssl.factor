@@ -8,7 +8,13 @@ sequences system words ;
 IN: openssl.libssl
 
 C-LIBRARY: libssl {
-    { windows $[ cpu x86.64 = "-x64" "" ? "libssl-3" ".dll" surround ] }
+    { windows $[
+        cpu {
+            { x86.64 [ "-x64" ] }
+            { arm.64 [ "-arm64" ] }
+            [ drop "" ]
+        } case "libssl-3" ".dll" surround
+    ] }
     { macos "libssl.35.dylib" }
     { unix "libssl.so" }
 }
