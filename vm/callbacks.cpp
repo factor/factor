@@ -78,6 +78,9 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
+  // Rewrite callback stubs copied from boot images built before the
+  // jit-save-teb / jit-update-teb fix into the current form; stubs from a
+  // current boot image already match and are left unchanged.
 #if defined(FACTOR_ARM64) && defined(WINDOWS)
   uint32_t* instructions = (uint32_t*)stub->entry_point();
   for (cell i = 0; i < size / sizeof(uint32_t); i++) {

@@ -16,6 +16,8 @@ trampoline PROC
 	RET
 trampoline ENDP
 
+; trampoline2 has no .pdata/.xdata: it builds its frame at [X17] with a
+; per-call-site SP delta, so no single static unwind descriptor applies.
 trampoline2 PROC
 	STP	FP, LR, [X17]
 	MOV	FP, X17
