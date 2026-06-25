@@ -2,7 +2,7 @@
 
 namespace factor {
 
-static const DWORD arm64_unwind_code_end = 0xe3e3e3e4;
+static const DWORD arm64_unwind_code_fplr_frame = 0xe3e481e1;
 static const cell arm64_function_fragment_size = ((1 << 18) - 1) * 4;
 
 struct arm64_unwind_info {
@@ -45,7 +45,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
 
     unwind->header =
       (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 27));
-    unwind->unwind_codes = arm64_unwind_code_end;
+    unwind->unwind_codes = arm64_unwind_code_fplr_frame;
     unwind->exception_handler = handler_rva;
 
     func->BeginAddress = (DWORD)(fragment_start - base);

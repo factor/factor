@@ -21,6 +21,9 @@
 #include <time.h>
 #include <wchar.h>
 #include <stdint.h>
+#if defined(_MSC_VER)
+#include <io.h>
+#endif
 
 // C++ headers
 #include <algorithm>
