@@ -297,7 +297,7 @@ HELP: assoc-filter-as
 
 HELP: assoc-filter!
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
-{ $description "Removes all entries for which the predicate quotation yields true." }
+{ $description "Removes all entries for which the predicate quotation yields false." }
 { $side-effects "assoc" } ;
 
 { assoc-filter assoc-filter-as assoc-filter! } related-words
@@ -312,7 +312,7 @@ HELP: assoc-reject-as
 
 HELP: assoc-reject!
 { $values { "assoc" assoc } { "quot" { $quotation ( ... key value -- ... ? ) } } }
-{ $description "Removes all entries for which the predicate quotation yields false." }
+{ $description "Removes all entries for which the predicate quotation yields true." }
 { $side-effects "assoc" } ;
 
 { assoc-reject assoc-reject-as assoc-reject! } related-words
