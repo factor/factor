@@ -16,7 +16,7 @@ IN: bootstrap.assembler.arm
     temp CTX context-callstack-seg-offset [+] LDR
     temp2 temp segment-end-offset [+] LDR
     temp1 temp segment-start-offset [+] LDR
-    temp1 temp2 temp teb-stack-base-offset [+] STP ;
+    temp2 temp1 PR teb-stack-base-offset [+] STP ;
 
 : jit-restore-teb ( -- )
     temp1 temp2 SP 16 [post] LDP

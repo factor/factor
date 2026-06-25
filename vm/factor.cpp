@@ -2,6 +2,23 @@
 
 namespace factor {
 
+#ifdef WINDOWS
+static FILE* factor_std_stream(FILE* handle, const char* mode) {
+  const int no_associated_stream = -2;
+  int fd = _fileno(handle);
+  if (fd != no_associated_stream) {
+    int dup_fd = _dup(fd);
+    if (dup_fd != -1) {
+      FILE* stream = _fdopen(dup_fd, mode);
+      if (stream)
+        return stream;
+      _close(dup_fd);
+    }
+  }
+  return fopen("nul", mode);
+}
+#endif
+
 // Compile code in boot image so that we can execute the startup quotation
 // Allocates memory
 void factor_vm::prepare_boot_image() {
@@ -82,8 +99,7 @@ void factor_vm::init_factor(vm_parameters* p) {
   special_objects[OBJ_EMBEDDED] = false_object;
 
 #ifdef WINDOWS
-#define NO_ASSOCIATED_STREAM -2
-#define VALID_HANDLE(handle,mode) (_fileno (handle)!= NO_ASSOCIATED_STREAM ? handle : fopen ("nul",(mode)))
+#define VALID_HANDLE(handle,mode) (factor_std_stream((handle),(mode)))
 #else
 #define VALID_HANDLE(handle,mode) (handle)
 #endif

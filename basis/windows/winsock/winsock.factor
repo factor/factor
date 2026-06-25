@@ -8,7 +8,7 @@ IN: windows.winsock
 
 <<
 ! Some differences between Win32 and Win64
-cpu x86.64? "windows.winsock.64" "windows.winsock.32" ? use-vocab
+cpu x86.32? "windows.winsock.32" "windows.winsock.64" ? use-vocab
 >>
 
 TYPEDEF: int* SOCKET

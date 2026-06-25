@@ -78,6 +78,28 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
+#if defined(FACTOR_ARM64) && defined(WINDOWS)
+  uint32_t* instructions = (uint32_t*)stub->entry_point();
+  for (cell i = 0; i < size / sizeof(uint32_t); i++) {
+    if (instructions[i] == 0xa900bd2e || instructions[i] == 0xa900b92f) {
+      instructions[i] = 0xa900ba4f;
+    }
+
+    if (i + 4 < size / sizeof(uint32_t) &&
+        instructions[i] == 0x910003e9 &&
+        instructions[i + 1] == 0xf9001289 &&
+        instructions[i + 2] == 0xf940064e &&
+        instructions[i + 3] == 0xf9400a4f &&
+        instructions[i + 4] == 0xa9bf3fee) {
+      instructions[i] = 0xf940064e;
+      instructions[i + 1] = 0xf9400a4f;
+      instructions[i + 2] = 0xa9bf3fee;
+      instructions[i + 3] = 0x910003e9;
+      instructions[i + 4] = 0xf9001289;
+    }
+  }
+#endif
+
   // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
 #ifdef FACTOR_ARM64
