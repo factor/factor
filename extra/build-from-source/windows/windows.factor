@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: build-from-source combinators combinators.smart continuations
 environment http.download io.directories io.files.temp io.launcher
-io.pathnames kernel layouts qw sequences windows.shell32 ;
+io.pathnames kernel layouts qw sequences system windows.shell32 ;
 IN: build-from-source.windows
 
 ! choco install -y meson StrawberryPerl nasm winflexbison3 glfw3 jom
