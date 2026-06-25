@@ -16,7 +16,7 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(return_address + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
+  return (void*)((return_address - 4) + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
 }
 
 inline static void set_call_target(cell return_address, cell target) {
