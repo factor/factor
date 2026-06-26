@@ -112,6 +112,10 @@ SYMBOL: foo
     10 [ fill-and-free-callback-heap ] times
 ] unit-test
 
+[ 0 <alien> free-callback ] must-fail
+
+[ \ foo 33 <callback> dup free-callback free-callback ] must-fail
+
 : <cb-creator> ( -- alien )
     \ int { pointer: void pointer: void } \ cdecl
     [ 2drop 37 ] alien-callback ;
