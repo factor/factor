@@ -89,7 +89,8 @@ bool quotation_jit::mega_lookup_p(cell i, cell length) {
 bool quotation_jit::special_subprimitive_p(cell obj) {
   return obj == parent->special_objects[SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD] ||
-         obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
+         obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD] ||
+         obj == parent->special_objects[PIC_MISS_RESUME_WORD];
 }
 
 // All quotations want a stack frame, except if they contain:

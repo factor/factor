@@ -124,21 +124,30 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
   // If none of the above conditionals tested true, then execution "falls
   // through" to here.
 
-  // A stack frame is set up, since the inline-cache-miss sub-primitive
-  // makes a subroutine call to the VM.
-  emit(parent->special_objects[JIT_PROLOG]);
-
-  // The inline-cache-miss sub-primitive call receives enough information to
-  // reconstruct the PIC with the new entry.
   push(generic_word.value());
   push(methods.value());
   push(tag_fixnum(index));
   push(cache_entries.value());
 
-  emit_subprimitive(
-      parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD],
-      true,  // tail_call_p
-      true); // stack_frame_p
+  cell resume = parent->special_objects[PIC_MISS_RESUME_WORD];
+  if (to_boolean(resume)) {
+    // The miss path tail-branches to the shared inline-cache-miss-resume stub,
+    // which owns the frame and the return into inline_cache_miss. The PIC is
+    // never a live frame on the callstack, so deallocate_inline_cache frees it
+    // safely. The stub reads the call site from the pic-tail register, which
+    // the non-tail jump template loads from the return address.
+    emit_with_literal(
+        parent->special_objects[tail_call_p ? PIC_MISS_TAIL_JUMP : PIC_MISS_JUMP],
+        resume);
+  } else {
+    // Arches without the resume stub inline the miss handler (the old path,
+    // which leaves the PIC on the callstack across inline_cache_miss).
+    emit(parent->special_objects[JIT_PROLOG]);
+    emit_subprimitive(
+        parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD],
+        true,
+        true);
+  }
 }
 
 // Allocates memory

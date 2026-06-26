@@ -457,6 +457,7 @@ M: quotation prepare-object
         { JIT-3DIP-WORD 3dip }
         { PIC-MISS-WORD inline-cache-miss }
         { PIC-MISS-TAIL-WORD inline-cache-miss-tail }
+        { PIC-MISS-RESUME-WORD inline-cache-miss-resume }
         { MEGA-LOOKUP-WORD mega-cache-lookup }
         { MEGA-MISS-WORD mega-cache-miss }
         { JIT-DECLARE-WORD declare }
