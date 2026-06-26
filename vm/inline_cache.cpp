@@ -2,14 +2,46 @@
 
 namespace factor {
 
+#if defined(FACTOR_DEBUG) || defined(PIC_FREE_GUARD)
+struct pic_free_liveness_checker {
+  code_block* victim;
+  bool live;
+  cell live_addr;
+  cell frames;
+  void operator()(cell frame_top, cell frame_size, code_block* owner, cell addr) {
+    (void)frame_top;
+    (void)frame_size;
+    frames++;
+    if (owner == victim) {
+      live = true;
+      live_addr = addr;
+    }
+  }
+};
+#endif
+
 void factor_vm::deallocate_inline_cache(cell return_address) {
   // Find the call target.
   void* old_entry_point = get_call_target(return_address);
   code_block* old_block = (code_block*)old_entry_point - 1;
 
   // Free the old PIC since we know its unreachable
-  if (old_block->pic_p())
+  if (old_block->pic_p()) {
+#if defined(FACTOR_DEBUG) || defined(PIC_FREE_GUARD)
+    pic_free_liveness_checker checker = { old_block, false, 0, 0 };
+    iterate_callstack(ctx, checker);
+    if (checker.live) {
+      std::cout << "PIC-FREE-GUARD: freeing live on-stack PIC " << (void*)old_block
+                << " of size " << old_block->size()
+                << "; return address " << (void*)checker.live_addr
+                << " sits on ctx->callstack (" << checker.frames << " frames)"
+                << std::endl;
+      fatal_error("deallocate_inline_cache freed a PIC live on the callstack",
+                  (cell)old_block);
+    }
+#endif
     code->free(old_block);
+  }
 }
 
 // Figure out what kind of type check the PIC needs based on the methods
