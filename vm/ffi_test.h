@@ -264,6 +264,12 @@ FACTOR_EXPORT unsigned long ffi_test_69(unsigned long a, unsigned long b, unsign
 
 FACTOR_EXPORT unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c);
 
+FACTOR_EXPORT long ffi_test_71(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7, signed char c,
+                               short s, int i, long l);
+FACTOR_EXPORT long ffi_test_73(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7, signed char c,
+                               short s, int n, ...);
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

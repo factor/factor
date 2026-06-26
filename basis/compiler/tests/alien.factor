@@ -73,14 +73,24 @@ FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
 { 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
+FUNCTION: long ffi_test_71 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, char c, short s, int i, long l )
 
-    FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+{ 9101112 } [
+    1 2 3 4 5 6 7 8 9 10 11 12 ffi_test_71
+] unit-test
 
-    { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+FUNCTION: long ffi_test_73 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, char c, short s, int n,
+    ... int i, long l )
 
-] unless
+{ 9101112 } [
+    1 2 3 4 5 6 7 8 9 10 2 11 12 ffi_test_73
+] unit-test
+
+FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+
+{ 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
@@ -189,28 +199,23 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 
 { } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
+! Make sure XT doesn't get clobbered in stack frame
 
-    ! Make sure XT doesn't get clobbered in stack frame
+: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
+    int
+    "f-cdecl" "ffi_test_31"
+    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
+    alien-invoke gc 3 ;
 
-    : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
-        int
-        "f-cdecl" "ffi_test_31"
-        { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
-        alien-invoke gc 3 ;
+{ 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
-    { 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
+: ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
+    float
+    "f-cdecl" "ffi_test_31_point_5"
+    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
+    alien-invoke ;
 
-    : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
-        float
-        "f-cdecl" "ffi_test_31_point_5"
-        { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
-        alien-invoke ;
-
-    { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
-
-] unless
+{ 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
@@ -948,29 +953,24 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
     ] times
 ] unit-test
 
-! Varargs are currently not supported on arm64 macos
-cpu arm.64? os macos? and [
+! Varargs with non-float parameters works.
+FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, ... int a, int b )
+FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, ... int a, int b, int c )
 
-    ! Varargs with non-float parameters works.
-    FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
-    FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
+{ 30 60 } [
+    2 10 20 do-sum-ints2
+    3 10 20 30 do-sum-ints3
+] unit-test
 
-    { 30 60 } [
-        2 10 20 do-sum-ints2
-        3 10 20 30 do-sum-ints3
+FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, ... double a, double b )
+FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, ... double a, double b, double c )
+
+! Varargs with non-floats doesn't work on windows
+os windows? [
+    { 27.0 22.0 } [
+        2 7 20 do-sum-doubles2
+        3 5 10 7 do-sum-doubles3
     ] unit-test
-
-    ! Varargs with non-floats doesn't work on windows
-    FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
-    FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
-
-    os windows? [
-        { 27.0 22.0 } [
-            2 7 20 do-sum-doubles2
-            3 5 10 7 do-sum-doubles3
-        ] unit-test
-    ] unless
-
 ] unless
 
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )

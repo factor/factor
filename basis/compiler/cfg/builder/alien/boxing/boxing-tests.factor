@@ -1,6 +1,6 @@
 USING: alien.c-types classes.struct compiler.cfg.builder.alien.boxing
 compiler.cfg.instructions compiler.cfg.registers compiler.test
-cpu.architecture kernel make system tools.test ;
+cpu.architecture kernel layouts literals make system tools.test ;
 IN: compiler.cfg.builder.alien.boxing.tests
 
 STRUCT: some-struct
@@ -11,7 +11,7 @@ STRUCT: some-struct
 
 ! flatten-c-type
 {
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
 } [
     int base-type flatten-c-type
 ] unit-test
@@ -37,7 +37,7 @@ cpu x86.32?
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     {
         T{ ##unbox
            { dst 1 }
@@ -48,7 +48,7 @@ cpu x86.32?
     }
 } {
     { 20 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     { }
 } ? [
     reset-vreg-counter [ 20 int base-type unbox ] { } make
@@ -115,7 +115,7 @@ cpu x86.32?
 ! unbox-parameter
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f $[ cell ] } }
     { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
 } [
     [ 77 c-string base-type unbox-parameter ] { } make
@@ -125,7 +125,7 @@ cpu x86.32?
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     {
         T{ ##unbox
            { dst 1 }
@@ -135,7 +135,7 @@ cpu x86.32?
         }
     }
 } {
-    { 77 } { { int-rep f f } } { }
+    { 77 } { { int-rep f f 4 } } { }
 } ? [
     [ 77 int base-type unbox-parameter ] { } make
 ] cfg-unit-test

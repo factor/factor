@@ -3,8 +3,8 @@
 USING: accessors alien alien.c-types alien.data arrays assocs
 byte-arrays classes.algebra classes.struct combinators
 combinators.short-circuit compiler.cfg
-compiler.cfg.builder.alien.boxing compiler.cfg.comparisons
-compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
+compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.intrinsics
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
@@ -889,27 +889,50 @@ M: arm.64 %alien-indirect
 
 : temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
 
-:: %store-stack-param ( vreg rep n -- )
+: store-stack-narrow ( Xreg operand size -- )
+    {
+        { 1 [ [ >W ] dip STRB ] }
+        { 2 [ [ >W ] dip STRH ] }
+        { 4 [ [ >W ] dip STR ] }
+        [ drop STR ]
+    } case ;
+
+:: %store-stack-param ( vreg rep n size -- )
     rep temp-reg vreg rep %copy
-    n stack@ rep temp-reg rep %copy ;
+    rep integer-rep?
+    [ rep temp-reg n stack@ size store-stack-narrow ]
+    [ n stack@ rep temp-reg rep %copy ] if ;
+
+: stack-param-values ( tuple -- vreg rep n size )
+    [ first3 ] [ param-natural-size ] bi ;
 
 M: arm.64 %alien-assembly
     3nip swap {
         [ [ first3 %store-reg-param ] each ]
-        [ [ first3 %store-stack-param ] each ]
+        [ [ stack-param-values %store-stack-param ] each ]
         [ call( -- ) ]
         [ [ first3 %load-reg-param ] each ]
     } spread drop ;
 
 : next-stack@ ( n -- operand ) [ FP ] dip 16 + [+] ;
 
-:: %load-stack-param ( vreg rep n -- )
-    rep temp-reg n next-stack@ rep %copy
+: load-stack-narrow ( Xreg operand size -- )
+    {
+        { 1 [ [ >W ] dip LDRB ] }
+        { 2 [ [ >W ] dip LDRH ] }
+        { 4 [ [ >W ] dip LDR ] }
+        [ drop LDR ]
+    } case ;
+
+:: %load-stack-param ( vreg rep n size -- )
+    rep integer-rep?
+    [ rep temp-reg n next-stack@ size load-stack-narrow ]
+    [ rep temp-reg n next-stack@ rep %copy ] if
     vreg rep temp-reg rep %copy ;
 
 M: arm.64 %callback-inputs
     [ [ first3 %load-reg-param ] each ]
-    [ [ first3 %load-stack-param ] each ] bi*
+    [ [ stack-param-values %load-stack-param ] each ] bi*
     arg1 VM MOV
     arg2 XZR MOV
     "begin_callback" f f %c-invoke ;

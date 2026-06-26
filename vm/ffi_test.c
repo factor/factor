@@ -392,6 +392,43 @@ unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, stru
     return x;
 }
 
+static long ffi_test_encode_packed_stack(signed char c, short s, int i, long l) {
+  return (long)c * 1000000L + (long)s * 10000L + (long)i * 100L + l;
+}
+
+int ffi_test_packed_stack_registers_ok(int a0, int a1, int a2, int a3,
+                                       int a4, int a5, int a6, int a7) {
+  return a0 == 1 && a1 == 2 && a2 == 3 && a3 == 4 &&
+         a4 == 5 && a5 == 6 && a6 == 7 && a7 == 8;
+}
+
+long ffi_test_71(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
+                 int a7, signed char c, short s, int i, long l) {
+  if (!ffi_test_packed_stack_registers_ok(a0, a1, a2, a3, a4, a5, a6, a7))
+    return -1;
+  return ffi_test_encode_packed_stack(c, s, i, l);
+}
+
+long ffi_test_73(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
+                 int a7, signed char c, short s, int n, ...) {
+  va_list ap;
+  int i;
+  long l;
+
+  if (!ffi_test_packed_stack_registers_ok(a0, a1, a2, a3, a4, a5, a6, a7))
+    return -1;
+
+  va_start(ap, n);
+  i = va_arg(ap, int);
+  l = va_arg(ap, long);
+  va_end(ap);
+
+  if (n != 2)
+    return -2;
+
+  return ffi_test_encode_packed_stack(c, s, i, l);
+}
+
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);
