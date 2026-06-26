@@ -35,8 +35,11 @@ IN: io.launcher.unix
 : setup-priority ( process -- process )
     dup priority>> [ >prio set-priority ] when* ;
 
+: reset-status-flags ( fd -- )
+    F_SETFL 0 fcntl io-error ;
+
 : reset-fd ( fd -- )
-    [ F_SETFL 0 fcntl io-error ] [ F_SETFD 0 fcntl io-error ] bi ;
+    [ reset-status-flags ] [ F_SETFD 0 fcntl io-error ] bi ;
 
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
@@ -111,6 +114,7 @@ IN: io.launcher.unix
     } case ;
 
 : reset-fd* ( actions fd -- )
+    dup reset-status-flags
     posix_spawn_file_actions_addinherit_np check-posix ;
 
 : redirect-fd* ( actions oldfd fd -- )
