@@ -30,16 +30,24 @@ M: kqueue-mx dispose* fd>> close-file ;
     fd>> swap 1 f 0 f kevent-func io-error ;
 
 M: kqueue-mx add-input-callback
-    [ call-next-method ] [
-        [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
-        register-kevent
-    ] 2bi ;
+    2dup reads>> key? [
+        call-next-method
+    ] [
+        [ call-next-method ] [
+            [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
+            register-kevent
+        ] 2bi
+    ] if ;
 
 M: kqueue-mx add-output-callback
-    [ call-next-method ] [
-        [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
-        register-kevent
-    ] 2bi ;
+    2dup writes>> key? [
+        call-next-method
+    ] [
+        [ call-next-method ] [
+            [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
+            register-kevent
+        ] 2bi
+    ] if ;
 
 M: kqueue-mx remove-input-callbacks
     2dup reads>> key? [
