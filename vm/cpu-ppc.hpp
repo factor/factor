@@ -33,7 +33,9 @@ inline static void* get_call_target(cell return_address) {
 
   uint32_t insn = *(uint32_t*)return_address;
   uint32_t unsigned_addr = (insn & b_mask);
-  int32_t signed_addr = (int32_t)(unsigned_addr << 6) >> 6;
+  fixnum signed_addr = (unsigned_addr & 0x02000000)
+                           ? (fixnum)unsigned_addr - ((fixnum)1 << 26)
+                           : unsigned_addr;
   return (void*)(signed_addr + return_address);
 }
 
