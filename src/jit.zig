@@ -45,6 +45,8 @@ pub const JitTemplate = enum(u32) {
     pic_hit = @intFromEnum(objects.SpecialObject.pic_hit),
     pic_miss_word = @intFromEnum(objects.SpecialObject.pic_miss_word),
     pic_miss_tail_word = @intFromEnum(objects.SpecialObject.pic_miss_tail_word),
+    pic_miss_jump = @intFromEnum(objects.SpecialObject.pic_miss_jump),
+    pic_miss_tail_jump = @intFromEnum(objects.SpecialObject.pic_miss_tail_jump),
 
     // Megamorphic templates
     mega_lookup = @intFromEnum(objects.SpecialObject.mega_lookup),
@@ -917,7 +919,8 @@ pub const QuotationJit = struct {
         const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
         const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
         const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
-        return obj == signal_handler or obj == leaf_signal or obj == unwind;
+        const pic_miss_resume = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
+        return obj == signal_handler or obj == leaf_signal or obj == unwind or obj == pic_miss_resume;
     }
 
     // Check if quotation needs a stack frame
@@ -1166,7 +1169,10 @@ pub const QuotationJit = struct {
 
     // Get stack frame size for a word
     pub fn wordStackFrameSize(self: *const Self, obj: Cell) Cell {
-        if (self.isSpecialSubprimitive(obj)) {
+        const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
+        const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
+        const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
+        if (obj == signal_handler or obj == leaf_signal or obj == unwind) {
             return SIGNAL_HANDLER_STACK_FRAME_SIZE;
         }
         return JIT_FRAME_SIZE;

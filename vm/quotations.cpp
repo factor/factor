@@ -249,7 +249,9 @@ void quotation_jit::iterate_quotation() {
 }
 
 cell quotation_jit::word_stack_frame_size(cell obj) {
-  if (special_subprimitive_p(obj))
+  if (obj == parent->special_objects[SIGNAL_HANDLER_WORD] ||
+      obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD] ||
+      obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD])
     return SIGNAL_HANDLER_STACK_FRAME_SIZE;
   return JIT_FRAME_SIZE;
 }
