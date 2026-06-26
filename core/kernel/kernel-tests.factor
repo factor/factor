@@ -45,6 +45,14 @@ IN: kernel.tests
 
 { } [ :c ] unit-test
 
+[ 100000 f <array> set-datastack ] [
+    2 head ${ KERNEL-ERROR ERROR-DATASTACK-OVERFLOW } =
+] must-fail-with
+
+[ 100000 f <array> set-retainstack ] [
+    2 head ${ KERNEL-ERROR ERROR-RETAINSTACK-OVERFLOW } =
+] must-fail-with
+
 : overflow-d ( -- ) 3 overflow-d ;
 
 : (overflow-d-alt) ( -- n ) 3 ;

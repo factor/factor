@@ -230,21 +230,33 @@ void factor_vm::primitive_retainstack_for() {
   ctx->replace(retainstack_to_array(other_ctx));
 }
 
-// returns pointer to top of stack
-static cell array_to_stack(array* array, cell bottom) {
-  cell depth = array_capacity(array) * sizeof(cell);
-  memcpy((void*)bottom, array + 1, depth);
-  return bottom + depth - sizeof(cell);
+// Returns pointer to top of stack.
+static cell array_to_stack(factor_vm* parent, array* array_, segment* seg,
+                           vm_error_type error) {
+  cell depth = array_capacity(array_) * sizeof(cell);
+  if (depth > seg->size) {
+    parent->general_error(error, tag(array_),
+                          tag_fixnum(seg->size / sizeof(cell)));
+    return seg->start - sizeof(cell); // can't happen
+  }
+  memcpy((void*)seg->start, array_ + 1, depth);
+  return seg->start + depth - sizeof(cell);
 }
 
 void factor_vm::primitive_set_datastack() {
-  array* arr = untag_check<array>(ctx->pop());
-  ctx->datastack = array_to_stack(arr, ctx->datastack_seg->start);
+  data_root<array> arr(ctx->pop(), this);
+  check_tagged(arr);
+  ctx->datastack =
+      array_to_stack(this, arr.untagged(), ctx->datastack_seg,
+                     ERROR_DATASTACK_OVERFLOW);
 }
 
 void factor_vm::primitive_set_retainstack() {
-  array* arr = untag_check<array>(ctx->pop());
-  ctx->retainstack = array_to_stack(arr, ctx->retainstack_seg->start);
+  data_root<array> arr(ctx->pop(), this);
+  check_tagged(arr);
+  ctx->retainstack =
+      array_to_stack(this, arr.untagged(), ctx->retainstack_seg,
+                     ERROR_RETAINSTACK_OVERFLOW);
 }
 
 // Used to implement call(
