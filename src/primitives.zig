@@ -190,7 +190,7 @@ pub const PrimitiveIndex = enum(u16) {
     set_alien_cell = 152,
 };
 
-pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".fields.len;
+pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".field_names.len;
 
 // --- Dispatch table ---
 
