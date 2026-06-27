@@ -325,19 +325,34 @@ pub fn fromUint64(vm: *FactorVM, n: u64) !*Bignum {
 }
 
 // Convert bignum to signed 64-bit integer (may overflow)
+fn twosComplementSigned(comptime T: type, accumulator: u64, negative: bool) T {
+    if (!negative) return @bitCast(accumulator);
+
+    const min_magnitude: u64 = @as(u64, @intCast(std.math.maxInt(T))) + 1;
+    if (accumulator == min_magnitude) {
+        return std.math.minInt(T);
+    }
+    return -@as(T, @intCast(accumulator));
+}
+
+fn twosComplementUnsigned(comptime T: type, accumulator: T, negative: bool) T {
+    if (!negative) return accumulator;
+    return 0 -% accumulator;
+}
+
 pub fn toInt64(bn: *const Bignum) i64 {
     if (bn.isZero()) return 0;
 
     const len = bn.length();
     if (len == 1) {
         const result: u64 = @intCast(bn.getDigit(0));
-        return if (bn.isNegative()) -%@as(i64, @bitCast(result)) else @bitCast(result);
+        return twosComplementSigned(i64, result, bn.isNegative());
     }
     if (len == 2) {
         const lo: u64 = @intCast(bn.getDigit(0));
         const hi: u64 = @intCast(bn.getDigit(1));
         const result: u64 = (hi << DIGIT_BITS) | lo;
-        return if (bn.isNegative()) -%@as(i64, @bitCast(result)) else @bitCast(result);
+        return twosComplementSigned(i64, result, bn.isNegative());
     }
 
     var result: u64 = 0;
@@ -348,10 +363,7 @@ pub fn toInt64(bn: *const Bignum) i64 {
         result = (result << DIGIT_BITS) | bn.getDigit(i);
     }
 
-    if (bn.isNegative()) {
-        return -%@as(i64, @bitCast(result));
-    }
-    return @bitCast(result);
+    return twosComplementSigned(i64, result, bn.isNegative());
 }
 
 // Convert bignum to unsigned 64-bit integer (may overflow)
@@ -360,12 +372,12 @@ pub fn toUint64(bn: *const Bignum) u64 {
 
     const len = bn.length();
     if (len == 1) {
-        return @intCast(bn.getDigit(0));
+        return twosComplementUnsigned(u64, @intCast(bn.getDigit(0)), bn.isNegative());
     }
     if (len == 2) {
         const lo: u64 = @intCast(bn.getDigit(0));
         const hi: u64 = @intCast(bn.getDigit(1));
-        return (hi << DIGIT_BITS) | lo;
+        return twosComplementUnsigned(u64, (hi << DIGIT_BITS) | lo, bn.isNegative());
     }
 
     var result: u64 = 0;
@@ -376,7 +388,7 @@ pub fn toUint64(bn: *const Bignum) u64 {
         result = (result << DIGIT_BITS) | bn.getDigit(i);
     }
 
-    return result;
+    return twosComplementUnsigned(u64, result, bn.isNegative());
 }
 
 // Create bignum from fixnum using VM nursery
@@ -2356,4 +2368,12 @@ fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
     const rooted_bn: *const Bignum = @ptrFromInt(layouts.UNTAG(bn_cell));
     @memcpy(new_bn.digits()[0..new_len], rooted_bn.digits()[0..new_len]);
     return new_bn;
+}
+
+test "two's-complement bignum scalar conversion helpers" {
+    try std.testing.expectEqual(@as(i64, std.math.minInt(i64)), twosComplementSigned(i64, @as(u64, 1) << 63, true));
+    try std.testing.expectEqual(@as(i64, -42), twosComplementSigned(i64, 42, true));
+    try std.testing.expectEqual(@as(i64, 42), twosComplementSigned(i64, 42, false));
+    try std.testing.expectEqual(std.math.maxInt(u64), twosComplementUnsigned(u64, 1, true));
+    try std.testing.expectEqual(@as(u64, 42), twosComplementUnsigned(u64, 42, false));
 }

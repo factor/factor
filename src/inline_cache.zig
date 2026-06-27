@@ -437,11 +437,13 @@ pub const CallSitePatcher = struct {
                 break :blk @intCast(@as(i64, @intCast(return_address)) + offset);
             },
             .aarch64 => blk: {
-                const insn: i32 = @bitCast(armCallSiteInsn(return_address));
-                const offset: i64 = (insn & 0x03ffffff) << 6 >> 4;
-                // AArch64 branch immediates are relative to the branch instruction,
-                // while callers pass the address of the following instruction.
-                break :blk @intCast(@as(i64, @intCast(return_address)) + offset - 4);
+                const call_site = return_address - 4;
+                const imm26 = armCallSiteInsn(return_address) & 0x03ffffff;
+                const signed_imm: i64 = if ((imm26 & 0x02000000) != 0)
+                    @as(i64, @intCast(imm26)) - (@as(i64, 1) << 26)
+                else
+                    @intCast(imm26);
+                break :blk @intCast(@as(i64, @intCast(call_site)) + signed_imm * 4);
             },
             else => @compileError("Unsupported architecture for call site patching"),
         };

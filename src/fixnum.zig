@@ -27,21 +27,29 @@ pub fn div(a: Fixnum, b: Fixnum) ?Fixnum {
 // Shift operations
 pub fn shiftLeft(a: Fixnum, shift: Fixnum) FixnumResult {
     if (shift < 0) {
-        // Right shift
-        return .{ .fixnum = a >> @intCast(-shift) };
+        return .{ .fixnum = shiftRight(a, -shift) };
     }
     if (shift >= layouts.word_size - layouts.tag_bits) {
         return .{ .overflow = .{ .a = a, .b = shift } };
     }
 
-    // mask has all bits set from bit (WORD_SIZE - 1 - TAG_BITS - shift) upward
-    const mask_shift: u6 = @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift);
-    const mask = -%(@as(Fixnum, 1) << mask_shift);
-    if ((if (a < 0) -a else a) & mask != 0) {
-        return .{ .overflow = .{ .a = a, .b = shift } };
+    const unsigned_shift: u6 = @intCast(shift);
+    if (a > 0) {
+        const max_magnitude: Cell = @as(Cell, @bitCast(fixnum_max)) >> unsigned_shift;
+        if (@as(Cell, @bitCast(a)) <= max_magnitude) {
+            return .{ .fixnum = @as(Fixnum, @bitCast(@as(Cell, @bitCast(a)) << unsigned_shift)) };
+        }
+    } else {
+        const magnitude: Cell = @as(Cell, @bitCast(0 -% a));
+        const max_magnitude: Cell =
+            (@as(Cell, 1) << @intCast(layouts.word_size - layouts.tag_bits - 1)) >> unsigned_shift;
+        if (magnitude <= max_magnitude) {
+            const shifted = magnitude << unsigned_shift;
+            return .{ .fixnum = 0 -% @as(Fixnum, @bitCast(shifted)) };
+        }
     }
 
-    return .{ .fixnum = a << @intCast(shift) };
+    return .{ .overflow = .{ .a = a, .b = shift } };
 }
 
 pub fn shiftRight(a: Fixnum, shift: Fixnum) Fixnum {
@@ -182,4 +190,8 @@ test "fixnum shifts" {
     try std.testing.expectEqual(FixnumResult{ .fixnum = 8 }, shiftLeft(2, 2));
     try std.testing.expectEqual(@as(Fixnum, 2), shiftRight(8, 2));
     try std.testing.expectEqual(@as(Fixnum, -1), shiftRight(-1, 10)); // Sign extension
+    try std.testing.expectEqual(FixnumResult{ .fixnum = fixnum_min }, shiftLeft(fixnum_min, 0));
+    try std.testing.expectEqual(FixnumResult{ .fixnum = fixnum_min }, shiftLeft(@divTrunc(fixnum_min, 2), 1));
+    try std.testing.expectEqual(FixnumResult{ .overflow = .{ .a = fixnum_min, .b = 1 } }, shiftLeft(fixnum_min, 1));
+    try std.testing.expectEqual(FixnumResult{ .overflow = .{ .a = fixnum_max, .b = 1 } }, shiftLeft(fixnum_max, 1));
 }

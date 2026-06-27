@@ -1,7 +1,6 @@
 const std = @import("std");
 
 const bignum = @import("../bignum.zig");
-const code_blocks = @import("../code_blocks.zig");
 const float_mod = @import("../float.zig");
 const layouts = @import("../layouts.zig");
 const math_mod = @import("../fixnum.zig");
@@ -519,13 +518,13 @@ pub export fn primitive_free_callback(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const vm = vm_asm.getVM();
     const alien_cell = vm.pop();
 
-    if (vm.alienOffset(alien_cell)) |entry_point| {
-        const entry_addr: usize = @intFromPtr(entry_point);
-        const code_block_addr = entry_addr - @sizeOf(code_blocks.CodeBlock);
-        const stub: *code_blocks.CodeBlock = @ptrFromInt(code_block_addr);
-
-        if (vm.callbacks) |callback_heap| {
-            callback_heap.free(stub);
-        }
+    if (pinnedAlienOffset(vm, alien_cell)) |entry_point| {
+        const callback_heap = vm.callbacks orelse {
+            vm.expiredError(alien_cell);
+        };
+        const stub = callback_heap.stubForEntryPoint(@intFromPtr(entry_point)) orelse {
+            vm.expiredError(alien_cell);
+        };
+        callback_heap.free(stub);
     }
 }

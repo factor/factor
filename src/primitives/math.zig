@@ -227,23 +227,13 @@ pub export fn primitive_fixnum_shift(vm_asm: *VMAssemblyFields) callconv(.c) voi
     }
 
     if (shift_amt < 0) {
-        // Right shift
         const result = fixnum.shiftRight(value, -shift_amt);
         ctx.replace(layouts.tagFixnum(result));
     } else {
-        const max_shift: Fixnum = @intCast(layouts.word_size - layouts.tag_bits);
-        if (shift_amt < max_shift) {
-            const mask_shift: u6 =
-                @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift_amt);
-            const mask = -%(@as(Fixnum, 1) << mask_shift);
-            const abs_value = if (value < 0) -value else value;
-            if ((abs_value & mask) == 0) {
-                ctx.replace(layouts.tagFixnum(value << @as(u6, @intCast(shift_amt))));
-                return;
-            }
+        switch (fixnum.shiftLeft(value, shift_amt)) {
+            .fixnum => |result| ctx.replace(layouts.tagFixnum(result)),
+            .overflow => ctx.replace(fixnumShiftOverflow(vm_asm.getVM(), value, shift_amt)),
         }
-
-        ctx.replace(fixnumShiftOverflow(vm_asm.getVM(), value, shift_amt));
     }
 }
 
