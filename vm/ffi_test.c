@@ -429,6 +429,31 @@ long ffi_test_73(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
   return ffi_test_encode_packed_stack(c, s, i, l);
 }
 
+static long ffi_test_encode_packed_struct(struct packed_test_struct p,
+                                          signed char z) {
+  return (long)p.c * 1000000L + (long)p.i * 100L + (long)z;
+}
+
+long ffi_test_74(struct packed_test_struct p, signed char z) {
+  return ffi_test_encode_packed_struct(p, z);
+}
+
+long ffi_test_75(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
+                 int a7, struct packed_test_struct p, signed char z) {
+  if (!ffi_test_packed_stack_registers_ok(a0, a1, a2, a3, a4, a5, a6, a7))
+    return -1;
+  return ffi_test_encode_packed_struct(p, z);
+}
+
+struct packed_test_struct ffi_test_76(void) {
+  struct packed_test_struct p = {9, 11};
+  return p;
+}
+
+long ffi_test_77(ffi_test_packed_callback cb) {
+  struct packed_test_struct p = {9, 11};
+  return cb(p, 12);
+}
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);

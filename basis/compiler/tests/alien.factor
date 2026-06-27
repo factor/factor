@@ -88,6 +88,35 @@ FUNCTION: long ffi_test_73 ( int a0, int a1, int a2, int a3,
     1 2 3 4 5 6 7 8 9 10 2 11 12 ffi_test_73
 ] unit-test
 
+PACKED-STRUCT: packed-test-struct { c char } { i int } ;
+
+: make-packed-test-struct ( -- p )
+    packed-test-struct <struct> 9 >>c 11 >>i ;
+
+FUNCTION: long ffi_test_74 ( packed-test-struct p, char z )
+
+{ 9001112 } [ make-packed-test-struct 12 ffi_test_74 ] unit-test
+
+FUNCTION: long ffi_test_75 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, packed-test-struct p, char z )
+
+{ 9001112 } [
+    1 2 3 4 5 6 7 8 make-packed-test-struct 12 ffi_test_75
+] unit-test
+
+FUNCTION: packed-test-struct ffi_test_76 ( )
+
+{ 9 11 } [ ffi_test_76 [ c>> ] [ i>> ] bi ] unit-test
+
+FUNCTION: long ffi_test_77 ( void* callback )
+
+: packed-test-callback ( -- callback )
+    long { packed-test-struct char } cdecl [
+        swap [ c>> 1000000 * ] [ i>> 100 * ] bi + +
+    ] alien-callback ;
+
+{ 9001112 } [ packed-test-callback [ ffi_test_77 ] with-callback ] unit-test
+
 FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
 { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
