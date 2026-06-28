@@ -518,13 +518,14 @@ pub export fn primitive_free_callback(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const vm = vm_asm.getVM();
     const alien_cell = vm.pop();
 
-    if (pinnedAlienOffset(vm, alien_cell)) |entry_point| {
-        const callback_heap = vm.callbacks orelse {
-            vm.expiredError(alien_cell);
-        };
-        const stub = callback_heap.stubForEntryPoint(@intFromPtr(entry_point)) orelse {
-            vm.expiredError(alien_cell);
-        };
-        callback_heap.free(stub);
-    }
+    const entry_point = pinnedAlienOffset(vm, alien_cell) orelse {
+        vm.expiredError(alien_cell);
+    };
+    const callback_heap = vm.callbacks orelse {
+        vm.expiredError(alien_cell);
+    };
+    const stub = callback_heap.stubForEntryPoint(@intFromPtr(entry_point)) orelse {
+        vm.expiredError(alien_cell);
+    };
+    callback_heap.free(stub);
 }
