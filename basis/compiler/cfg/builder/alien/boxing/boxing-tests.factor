@@ -30,8 +30,8 @@ cpu x86.32?
     }
 } {
     {
-        { int-rep f f }
-        { int-rep f f }
+        { int-rep f f 8 }
+        { int-rep f f 8 }
     }
 } ? [
     some-struct base-type base-type flatten-c-type
@@ -108,7 +108,7 @@ cpu x86.32?
     }
 } {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f 8 } { int-rep f f 8 } }
     {
         T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
         T{ ##load-memory-imm

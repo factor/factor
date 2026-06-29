@@ -25,9 +25,16 @@ pub fn div(a: Fixnum, b: Fixnum) ?Fixnum {
 }
 
 // Shift operations
+pub fn rightShiftAmount(shift: Fixnum) Fixnum {
+    std.debug.assert(shift < 0);
+    const min_shift: Fixnum = -@as(Fixnum, @intCast(layouts.word_size)) + 1;
+    const clamped = if (shift < min_shift) min_shift else shift;
+    return -clamped;
+}
+
 pub fn shiftLeft(a: Fixnum, shift: Fixnum) FixnumResult {
     if (shift < 0) {
-        return .{ .fixnum = shiftRight(a, -shift) };
+        return .{ .fixnum = shiftRight(a, rightShiftAmount(shift)) };
     }
     if (shift >= layouts.word_size - layouts.tag_bits) {
         return .{ .overflow = .{ .a = a, .b = shift } };
@@ -194,4 +201,5 @@ test "fixnum shifts" {
     try std.testing.expectEqual(FixnumResult{ .fixnum = fixnum_min }, shiftLeft(@divTrunc(fixnum_min, 2), 1));
     try std.testing.expectEqual(FixnumResult{ .overflow = .{ .a = fixnum_min, .b = 1 } }, shiftLeft(fixnum_min, 1));
     try std.testing.expectEqual(FixnumResult{ .overflow = .{ .a = fixnum_max, .b = 1 } }, shiftLeft(fixnum_max, 1));
+    try std.testing.expectEqual(FixnumResult{ .fixnum = -1 }, shiftLeft(-1, fixnum_min));
 }

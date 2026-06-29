@@ -227,7 +227,7 @@ pub export fn primitive_fixnum_shift(vm_asm: *VMAssemblyFields) callconv(.c) voi
     }
 
     if (shift_amt < 0) {
-        const result = fixnum.shiftRight(value, -shift_amt);
+        const result = fixnum.shiftRight(value, fixnum.rightShiftAmount(shift_amt));
         ctx.replace(layouts.tagFixnum(result));
     } else {
         switch (fixnum.shiftLeft(value, shift_amt)) {

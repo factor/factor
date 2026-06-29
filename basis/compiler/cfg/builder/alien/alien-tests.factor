@@ -18,6 +18,10 @@ STRUCT: macos-arm64-varargs-three-ints
     { b int }
     { c int } ;
 
+PACKED-STRUCT: macos-arm64-packed-five
+    { c char }
+    { i int } ;
+
 : dummy-assembly ( -- ass )
     int { } cdecl [
         EAX 33 MOV
@@ -145,6 +149,22 @@ os macos? cpu arm.64? and [
     } [
         int { int int int int int int int int char short int }
         cdecl 10 f "func" alien-invoke-params boa caller-parameter-shape
+    ] unit-test
+
+    {
+        V{
+            { 1 "int-rep" { 0 64 } } { 2 "int-rep" { 1 64 } }
+            { 3 "int-rep" { 2 64 } } { 4 "int-rep" { 3 64 } }
+            { 5 "int-rep" { 4 64 } } { 6 "int-rep" { 5 64 } }
+            { 7 "int-rep" { 6 64 } } { 8 "int-rep" { 7 64 } }
+        }
+        V{
+            { 11 "int-rep" 0 5 }
+            { 12 "int-rep" 5 1 }
+        }
+    } [
+        int { int int int int int int int int macos-arm64-packed-five char }
+        cdecl f f "func" alien-invoke-params boa caller-parameter-shape
     ] unit-test
 ] when
 

@@ -326,13 +326,9 @@ pub fn fromUint64(vm: *FactorVM, n: u64) !*Bignum {
 
 // Convert bignum to signed 64-bit integer (may overflow)
 fn twosComplementSigned(comptime T: type, accumulator: u64, negative: bool) T {
-    if (!negative) return @bitCast(accumulator);
-
-    const min_magnitude: u64 = @as(u64, @intCast(std.math.maxInt(T))) + 1;
-    if (accumulator == min_magnitude) {
-        return std.math.minInt(T);
-    }
-    return -@as(T, @intCast(accumulator));
+    comptime std.debug.assert(@bitSizeOf(T) == 64);
+    const signed: T = @bitCast(accumulator);
+    return if (negative) 0 -% signed else signed;
 }
 
 fn twosComplementUnsigned(comptime T: type, accumulator: T, negative: bool) T {
@@ -2374,6 +2370,8 @@ test "two's-complement bignum scalar conversion helpers" {
     try std.testing.expectEqual(@as(i64, std.math.minInt(i64)), twosComplementSigned(i64, @as(u64, 1) << 63, true));
     try std.testing.expectEqual(@as(i64, -42), twosComplementSigned(i64, 42, true));
     try std.testing.expectEqual(@as(i64, 42), twosComplementSigned(i64, 42, false));
+    try std.testing.expectEqual(@as(i64, std.math.maxInt(i64)), twosComplementSigned(i64, (@as(u64, 1) << 63) + 1, true));
+    try std.testing.expectEqual(@as(i64, std.math.minInt(i64)), twosComplementSigned(i64, @as(u64, 1) << 63, false));
     try std.testing.expectEqual(std.math.maxInt(u64), twosComplementUnsigned(u64, 1, true));
     try std.testing.expectEqual(@as(u64, 42), twosComplementUnsigned(u64, 42, false));
 }

@@ -137,7 +137,7 @@ FUNCTION: uint htonl ( uint n )
 FUNCTION: ushort htons ( ushort n )
 ! FUNCTION: int issetugid ;
 FUNCTION: int isatty ( int fildes )
-FUNCTION: int ioctl ( int fd, ulong request, void* argp )
+FUNCTION: int ioctl ( int fd, ulong request, ... void* argp )
 FUNCTION: int lchown ( c-string path, uid_t owner, gid_t group )
 FUNCTION: int listen ( int s, int backlog )
 FUNCTION: off_t lseek ( int fildes, off_t offset, int whence )
