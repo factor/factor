@@ -890,6 +890,7 @@ M: arm.64 %alien-indirect
 : temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
 
 :: store-stack-int ( Xreg n size -- )
+    size
     {
         { 1 [ Xreg >W n stack@ STRB ] }
         { 2 [ Xreg >W n stack@ STRH ] }
@@ -940,6 +941,7 @@ M: arm.64 %alien-assembly
 : next-stack@ ( n -- operand ) [ FP ] dip 16 + [+] ;
 
 :: load-stack-int ( Xreg n size -- )
+    size
     {
         { 1 [ Xreg >W n next-stack@ LDRB ] }
         { 2 [ Xreg >W n next-stack@ LDRH ] }
