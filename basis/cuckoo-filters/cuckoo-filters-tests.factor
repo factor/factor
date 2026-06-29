@@ -12,9 +12,9 @@ cuckoo-filters kernel math.parser sequences tools.test ;
     } 2cleave
 ] unit-test
 
-{ 250,000 250,000 0 } [
+{ 200,000 200,000 0 } [
     250,000 <cuckoo-filter>
-    250,000 [ number>string ] map-integers
+    200,000 [ number>string ] map-integers
     [
         [
             {

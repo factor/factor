@@ -6,19 +6,28 @@ IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 
-GENERIC: alloc-stack-param ( rep -- n )
+SYMBOL: compact-stack-params?
 
-M: object alloc-stack-param
-    stack-params get
-    [ rep-size cell align stack-params +@ ] dip ;
+: param-natural-size ( rep-tuple -- size )
+    dup length 3 > [ fourth ] [ drop cell ] if ;
 
-M: float-rep alloc-stack-param
-    stack-params get swap rep-size
-    [ cell align stack-params +@ ] keep
-    float-right-align-on-stack? [ + ] [ drop ] if ;
+GENERIC#: alloc-stack-param 1 ( rep size -- n )
+
+M:: object alloc-stack-param ( rep size -- n )
+    compact-stack-params? get
+    [ stack-params get size align dup size + stack-params set ]
+    [ stack-params get dup rep rep-size cell align + stack-params set ]
+    if ;
+
+M:: float-rep alloc-stack-param ( rep size -- n )
+    compact-stack-params? get
+    [ stack-params get size align dup size + stack-params set ]
+    [ stack-params get rep rep-size [ cell align stack-params +@ ] keep
+      float-right-align-on-stack? [ + ] [ drop ] if ]
+    if ;
 
 : ?dummy-stack-params ( rep -- )
-    dummy-stack-params? [ alloc-stack-param drop ] [ drop ] if ;
+    dummy-stack-params? [ cell alloc-stack-param drop ] [ drop ] if ;
 
 : ?dummy-int-params ( rep -- )
     dummy-int-params? [
@@ -55,11 +64,12 @@ M: object next-reg-param
 
 SYMBOLS: stack-values reg-values ;
 
-:: next-parameter ( vreg rep on-stack? odd-register? -- )
+:: next-parameter ( vreg rep on-stack? odd-register? size -- )
     vreg rep on-stack?
     [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ alloc-stack-param stack-values ] [ odd-register? swap next-reg-param reg-values ] if
-    [ 3array ] dip get push ;
+    [ size alloc-stack-param size 4array stack-values ]
+    [ odd-register? swap next-reg-param 3array reg-values ]
+    if get push ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 

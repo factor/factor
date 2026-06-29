@@ -404,13 +404,18 @@ pub const InstructionOperand = struct {
     }
 
     fn loadValueMasked(self: *const Self, msb: u5, lsb: u5, scaling: u5) i64 {
-        const ptr: *align(1) const i32 = @ptrFromInt(self.pointer - @sizeOf(u32));
+        const ptr: *align(1) const u32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const value = ptr.*;
+        const width: u6 = @as(u6, msb) - lsb + 1;
+        const mask: u32 = if (width == 32) std.math.maxInt(u32) else (@as(u32, 1) << @intCast(width)) - 1;
+        var extracted: i64 = @intCast((value >> lsb) & mask);
 
-        const shifted = value << (31 - msb);
-        const extracted: i32 = shifted >> (31 - msb + lsb);
+        const sign_bit: u32 = @as(u32, 1) << @intCast(width - 1);
+        if ((((value >> lsb) & mask) & sign_bit) != 0) {
+            extracted -= @as(i64, 1) << @intCast(width);
+        }
 
-        return @as(i64, extracted) << scaling;
+        return extracted * (@as(i64, 1) << @intCast(scaling));
     }
 
     pub fn loadValue(self: *const Self) i64 {
@@ -475,8 +480,8 @@ pub const InstructionOperand = struct {
         const ptr: *align(1) u32 = @ptrFromInt(self.pointer - @sizeOf(u32));
         const old = ptr.*;
 
-        const shifted_value: u32 = @truncate(@as(u64, @bitCast(value >> scaling)));
-        const positioned = (shifted_value << lsb) & mask;
+        const scaled = @divTrunc(value, @as(i64, 1) << @intCast(scaling));
+        const positioned = (@as(u32, @truncate(@as(u64, @bitCast(scaled)))) << lsb) & mask;
 
         ptr.* = (old & ~mask) | positioned;
     }
@@ -941,4 +946,19 @@ test "relocation entry" {
     try std.testing.expectEqual(RelocationType.entry_point, entry.getType());
     try std.testing.expectEqual(RelocationClass.relative, entry.getClass());
     try std.testing.expectEqual(@as(u24, 0x1234), entry.getOffset());
+}
+
+test "ARM relocation masked values sign extend without signed shift UB" {
+    var instruction: u32 = 0x17ffffff; // B #-4, imm26 is -1.
+    var op = InstructionOperand{
+        .rel = RelocationEntry.init(.entry_point, .relative_arm_b, 4),
+        .compiled = undefined,
+        .index = 0,
+        .pointer = @intFromPtr(&instruction) + @sizeOf(u32),
+    };
+
+    try std.testing.expectEqual(@as(i64, -4), op.loadValueMasked(25, 0, 2));
+
+    op.storeValueMasked(-8, rel_arm_b_mask, 0, 2);
+    try std.testing.expectEqual(@as(i64, -8), op.loadValueMasked(25, 0, 2));
 }

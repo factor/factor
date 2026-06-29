@@ -965,6 +965,7 @@ test "gc scanCards updates tenured slot spanning card" {
     if (heap.segment.start < 0x100000000 or heap.segment.start > 0x800000000) return;
 
     var gc_instance = GarbageCollector.init(allocator, vm, heap);
+    defer gc_instance.deinit();
 
     const nursery_cap: Cell = 1;
     const nursery_size = layouts.alignCell(@sizeOf(layouts.Array) + nursery_cap * @sizeOf(Cell), layouts.data_alignment);

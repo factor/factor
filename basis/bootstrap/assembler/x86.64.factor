@@ -136,6 +136,15 @@ IN: bootstrap.assembler.x86
 [ return-reg JMP ]
 \ inline-cache-miss-tail define-combinator-primitive
 
+[
+    pic-tail-reg stack-reg [] MOV
+    0 JMP f rc-relative rel-word
+] PIC-MISS-JUMP jit-define
+
+[
+    0 JMP f rc-relative rel-word
+] PIC-MISS-TAIL-JUMP jit-define
+
 ! Overflowing fixnum arithmetic
 : jit-overflow ( insn func -- )
     ds-reg 8 SUB
@@ -270,6 +279,12 @@ IN: bootstrap.assembler.x86
 
         ! Call quotation
         jit-jump-quot
+    ] }
+    { inline-cache-miss-resume [
+        stack-reg stack-frame-size bootstrap-cell - SUB
+        jit-inline-cache-miss
+        stack-reg stack-frame-size bootstrap-cell - ADD
+        return-reg JMP
     ] }
 
     ! ## Math

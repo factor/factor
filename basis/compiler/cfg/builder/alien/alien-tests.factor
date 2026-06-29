@@ -1,13 +1,26 @@
-USING: accessors alien alien.c-types alien.strings assocs
-combinators compiler.cfg compiler.cfg.builder
+USING: accessors alien alien.c-types alien.strings arrays assocs
+classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer
-cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.arm.64.assembler.registers kernel literals make namespaces
+cpu.architecture cpu.arm.64.assembler.registers cpu.x86.assembler
+cpu.x86.assembler.operands kernel layouts literals make namespaces
 sequences stack-checker.alien system tools.test words ;
 IN: compiler.cfg.builder.alien.tests
+
+STRUCT: macos-arm64-varargs-hfa
+    { a float }
+    { b float } ;
+
+STRUCT: macos-arm64-varargs-three-ints
+    { a int }
+    { b int }
+    { c int } ;
+
+PACKED-STRUCT: macos-arm64-packed-five
+    { c char }
+    { i int } ;
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
@@ -88,6 +101,73 @@ cpu x86.64? [
     ] cfg-unit-test
 ] when
 
+os macos? cpu arm.64? and [
+    : register-id ( reg -- id )
+        [ n>> ] [ width>> ] bi 2array ;
+
+    : normalize-reg-param ( param -- param' )
+        first3 [ name>> ] [ register-id ] bi* 3array ;
+
+    : normalize-stack-param ( param -- param' )
+        first4 [ name>> ] 2dip 4array ;
+
+    : caller-parameter-shape ( params -- reg-inputs stack-inputs )
+        init-cfg-test [
+            caller-parameters
+            [ [ normalize-reg-param ] map ]
+            [ [ normalize-stack-param ] map ] bi*
+        ] V{ } make drop ;
+
+    {
+        V{ { 3 "float-rep" { 0 128 } } { 4 "float-rep" { 1 128 } } }
+        V{ { 5 "int-rep" 0 8 } }
+    } [
+        int { macos-arm64-varargs-hfa int } cdecl 1 f "func"
+        alien-invoke-params boa caller-parameter-shape
+    ] unit-test
+
+    {
+        V{ { 3 "int-rep" { 0 64 } } { 4 "int-rep" { 1 64 } } }
+        V{ { 5 "int-rep" 0 8 } }
+    } [
+        int { macos-arm64-varargs-three-ints int } cdecl 1 f "func"
+        alien-invoke-params boa caller-parameter-shape
+    ] unit-test
+
+    {
+        V{
+            { 1 "int-rep" { 0 64 } } { 2 "int-rep" { 1 64 } }
+            { 3 "int-rep" { 2 64 } } { 4 "int-rep" { 3 64 } }
+            { 5 "int-rep" { 4 64 } } { 6 "int-rep" { 5 64 } }
+            { 7 "int-rep" { 6 64 } } { 8 "int-rep" { 7 64 } }
+        }
+        V{
+            { 9 "int-rep" 0 1 }
+            { 10 "int-rep" 2 2 }
+            { 11 "int-rep" 8 8 }
+        }
+    } [
+        int { int int int int int int int int char short int }
+        cdecl 10 f "func" alien-invoke-params boa caller-parameter-shape
+    ] unit-test
+
+    {
+        V{
+            { 1 "int-rep" { 0 64 } } { 2 "int-rep" { 1 64 } }
+            { 3 "int-rep" { 2 64 } } { 4 "int-rep" { 3 64 } }
+            { 5 "int-rep" { 4 64 } } { 6 "int-rep" { 5 64 } }
+            { 7 "int-rep" { 6 64 } } { 8 "int-rep" { 7 64 } }
+        }
+        V{
+            { 11 "int-rep" 0 5 }
+            { 12 "int-rep" 5 1 }
+        }
+    } [
+        int { int int int int int int int int macos-arm64-packed-five char }
+        cdecl f f "func" alien-invoke-params boa caller-parameter-shape
+    ] unit-test
+] when
+
 ! caller-stack-cleanup
 { 0 } [
     alien-node-params new long >>return cdecl >>abi 25
@@ -117,7 +197,7 @@ ${
 cpu x86.32?
 {
     { 2 4 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{
         T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
         T{ ##unbox
@@ -130,7 +210,7 @@ cpu x86.32?
 }
 {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
 } ? [
     [ { c-string int } unbox-parameters ] V{ } make

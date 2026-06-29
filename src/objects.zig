@@ -137,6 +137,10 @@ pub const SpecialObject = enum(Cell) {
     bignum_zero = 79,
     bignum_pos_one = 80,
     bignum_neg_one = 81,
+
+    pic_miss_resume_word = 82,
+    pic_miss_jump = 83,
+    pic_miss_tail_jump = 84,
 };
 
 // Determine if a special object should be saved in images
@@ -149,7 +153,9 @@ pub fn isSaveSpecial(i: Cell) bool {
             i <= @intFromEnum(SpecialObject.undefined)) or
         i == @intFromEnum(SpecialObject.stage2) or
         (i >= @intFromEnum(SpecialObject.canonical_true) and
-            i <= @intFromEnum(SpecialObject.bignum_neg_one));
+            i <= @intFromEnum(SpecialObject.bignum_neg_one)) or
+        (i >= @intFromEnum(SpecialObject.pic_miss_resume_word) and
+            i <= @intFromEnum(SpecialObject.pic_miss_tail_jump));
 }
 
 pub const context_object_count: Cell = 4;

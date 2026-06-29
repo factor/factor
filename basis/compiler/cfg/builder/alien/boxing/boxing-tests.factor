@@ -1,6 +1,6 @@
 USING: alien.c-types classes.struct compiler.cfg.builder.alien.boxing
 compiler.cfg.instructions compiler.cfg.registers compiler.test
-cpu.architecture kernel make system tools.test ;
+cpu.architecture kernel layouts literals make system tools.test ;
 IN: compiler.cfg.builder.alien.boxing.tests
 
 STRUCT: some-struct
@@ -9,9 +9,13 @@ STRUCT: some-struct
     { f3 int }
     { f4 int } ;
 
+PACKED-STRUCT: packed-some-struct
+    { c char }
+    { i int } ;
+
 ! flatten-c-type
 {
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
 } [
     int base-type flatten-c-type
 ] unit-test
@@ -26,18 +30,30 @@ cpu x86.32?
     }
 } {
     {
-        { int-rep f f }
-        { int-rep f f }
+        { int-rep f f 8 }
+        { int-rep f f 8 }
     }
 } ? [
     some-struct base-type base-type flatten-c-type
 ] unit-test
 
+cpu x86.64? os unix? and [
+    {
+        { { int-rep t f } }
+    } [
+        packed-some-struct base-type base-type flatten-c-type
+    ] unit-test
+
+    { f } [
+        packed-some-struct base-type base-type return-struct-in-registers?
+    ] unit-test
+] when
+
 ! unbox
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     {
         T{ ##unbox
            { dst 1 }
@@ -48,7 +64,7 @@ cpu x86.32?
     }
 } {
     { 20 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     { }
 } ? [
     reset-vreg-counter [ 20 int base-type unbox ] { } make
@@ -92,7 +108,7 @@ cpu x86.32?
     }
 } {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f 8 } { int-rep f f 8 } }
     {
         T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
         T{ ##load-memory-imm
@@ -115,7 +131,7 @@ cpu x86.32?
 ! unbox-parameter
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f $[ cell ] } }
     { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
 } [
     [ 77 c-string base-type unbox-parameter ] { } make
@@ -125,7 +141,7 @@ cpu x86.32?
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 } }
     {
         T{ ##unbox
            { dst 1 }
@@ -135,7 +151,7 @@ cpu x86.32?
         }
     }
 } {
-    { 77 } { { int-rep f f } } { }
+    { 77 } { { int-rep f f 4 } } { }
 } ? [
     [ 77 int base-type unbox-parameter ] { } make
 ] cfg-unit-test

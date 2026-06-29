@@ -264,6 +264,40 @@ FACTOR_EXPORT unsigned long ffi_test_69(unsigned long a, unsigned long b, unsign
 
 FACTOR_EXPORT unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c);
 
+FACTOR_EXPORT long ffi_test_71(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7, signed char c,
+                               short s, int i, long l);
+FACTOR_EXPORT long ffi_test_73(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7, signed char c,
+                               short s, int n, ...);
+
+#pragma pack(push, 1)
+struct packed_test_struct {
+  signed char c;
+  int i;
+};
+struct packed_test_struct_2 {
+  signed char c;
+  long l;
+};
+#pragma pack(pop)
+
+FACTOR_EXPORT long ffi_test_74(struct packed_test_struct p, signed char z);
+FACTOR_EXPORT long ffi_test_75(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7,
+                               struct packed_test_struct p, signed char z);
+FACTOR_EXPORT struct packed_test_struct ffi_test_76(void);
+typedef long (*ffi_test_packed_callback)(struct packed_test_struct p,
+                                         signed char z);
+FACTOR_EXPORT long ffi_test_77(ffi_test_packed_callback cb);
+FACTOR_EXPORT long ffi_test_78(struct packed_test_struct_2 p, signed char z);
+FACTOR_EXPORT long ffi_test_79(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7,
+                               struct packed_test_struct_2 p, signed char z);
+FACTOR_EXPORT struct packed_test_struct_2 ffi_test_80(void);
+typedef long (*ffi_test_packed_callback_2)(struct packed_test_struct_2 p,
+                                           signed char z);
+FACTOR_EXPORT long ffi_test_81(ffi_test_packed_callback_2 cb);
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

@@ -1,8 +1,10 @@
-USING: accessors calendar concurrency.promises destructors io
-io.backend.unix io.directories io.encodings.ascii
+USING: accessors calendar concurrency.promises cpu.architecture
+destructors io io.backend.unix io.directories io.encodings.ascii
 io.encodings.binary io.encodings.utf8 io.files io.launcher
-io.streams.duplex io.timeouts kernel libc locals math namespaces
-sequences threads tools.test unix.process unix.signals ;
+io.pipes io.streams.duplex io.timeouts kernel libc locals math
+math.bitwise namespaces sequences system threads tools.test
+unix unix.process unix.signals ;
+QUALIFIED: unix.ffi
 IN: io.launcher.unix.tests
 
 [
@@ -106,6 +108,22 @@ IN: io.launcher.unix.tests
         input-stream get stream-contents
     ] with-stream
 ] unit-test
+
+os macos? cpu arm.64? and [
+    : fd-status-flags ( fd -- flags )
+        fd>> unix.ffi:F_GETFL 0 [ unix.ffi:fcntl ] unix-system-call ;
+
+    : nonblocking-fd? ( fd -- ? )
+        fd-status-flags unix.ffi:O_NONBLOCK bitand 0 > ;
+
+    { t } [
+        (pipe) [
+            out>> dup nonblocking-fd? swap
+            <process> { "echo" "ok" } >>command over >>stdout try-process
+            nonblocking-fd? and
+        ] with-disposal
+    ] unit-test
+] when
 
 ! Test process timeouts
 [

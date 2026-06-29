@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-alien.utilities assocs combinators continuations environment fry
+alien.utilities assocs combinators combinators.short-circuit
+continuations environment fry
 io.backend io.backend.unix io.encodings.utf8 io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc math namespaces sequences simple-tokenizer
@@ -36,7 +37,7 @@ IN: io.launcher.unix
     dup priority>> [ >prio set-priority ] when* ;
 
 : reset-fd ( fd -- )
-    [ F_SETFL 0 fcntl io-error ] [ F_SETFD 0 fcntl io-error ] bi ;
+    F_SETFD 0 fcntl io-error ;
 
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
@@ -113,6 +114,27 @@ IN: io.launcher.unix
 : reset-fd* ( actions fd -- )
     posix_spawn_file_actions_addinherit_np check-posix ;
 
+: fd-redirection? ( obj -- ? )
+    {
+        { [ dup not ] [ drop f ] }
+        { [ dup string? ] [ drop f ] }
+        { [ dup appender? ] [ drop f ] }
+        { [ dup +closed+ eq? ] [ drop f ] }
+        { [ dup +stdout+ eq? ] [ drop f ] }
+        { [ dup fd? ] [ drop t ] }
+        [ underlying-handle fd-redirection? ]
+    } cond ;
+
+: spawn-safe-redirection? ( process -- ? )
+    {
+        [ stdin>> fd-redirection? not ]
+        [ stdout>> fd-redirection? not ]
+        [
+            stderr>> dup +stdout+ eq?
+            [ drop t ] [ fd-redirection? not ] if
+        ]
+    } 1&& ;
+
 : redirect-fd* ( actions oldfd fd -- )
     2dup =
     [ 3drop ]
@@ -183,6 +205,7 @@ M: unix (current-process) getpid ;
 
 M: unix (run-process)
     os macos? cpu arm.64? and
+    [ dup spawn-safe-redirection? ] [ f ] if
     [ spawn-process ] [ '[ _ fork-process ] [ ] with-fork ] if ;
 
 M: unix (kill-process)

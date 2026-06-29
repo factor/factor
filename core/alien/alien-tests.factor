@@ -42,6 +42,18 @@ IN: alien.tests
     "dump" get 0 alien-signed-8
 ] unit-test
 
+{ -2147483648 } [
+    4 <byte-array>
+    -2147483648 over 0 set-alien-signed-4
+    0 alien-signed-4
+] unit-test
+
+{ -9223372036854775808 } [
+    8 <byte-array>
+    -9223372036854775808 over 0 set-alien-signed-8
+    0 alien-signed-8
+] unit-test
+
 cell 8 = [
     [ 0x123412341234 ] [
       8 <byte-array>
@@ -99,6 +111,10 @@ SYMBOL: foo
 { } [
     10 [ fill-and-free-callback-heap ] times
 ] unit-test
+
+[ 0 <alien> free-callback ] must-fail
+
+[ \ foo 33 <callback> dup free-callback free-callback ] must-fail
 
 : <cb-creator> ( -- alien )
     \ int { pointer: void pointer: void } \ cdecl

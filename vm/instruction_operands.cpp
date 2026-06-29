@@ -12,9 +12,16 @@ instruction_operand::instruction_operand(relocation_entry rel,
 // Load a value from a bitfield of an ARM/RISC-V instruction
 fixnum instruction_operand::load_value_masked(cell msb, cell lsb,
                                               cell scaling) {
-  int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
+  uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
+  cell width = msb - lsb + 1;
+  uint32_t mask = width == 32 ? 0xffffffff : ((uint32_t)1 << width) - 1;
+  fixnum value = (*ptr >> lsb) & mask;
 
-  return *ptr << (31 - msb) >> (31 - msb + lsb) << scaling;
+  uint32_t sign_bit = (uint32_t)1 << (width - 1);
+  if (value & sign_bit)
+    value -= (fixnum)1 << width;
+
+  return value * ((fixnum)1 << scaling);
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
@@ -51,7 +58,8 @@ code_block* instruction_operand::load_code_block() {
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell lsb, cell scaling) {
   uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
-  *ptr = (uint32_t)((*ptr & ~mask) | (value >> scaling << lsb & mask));
+  fixnum scaled = value / ((fixnum)1 << scaling);
+  *ptr = (uint32_t)((*ptr & ~mask) | (((uint32_t)scaled << lsb) & mask));
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
