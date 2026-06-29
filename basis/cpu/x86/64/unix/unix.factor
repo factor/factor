@@ -1,10 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs
+USING: accessors alien.c-types arrays assocs classes.struct
 compiler.cfg.builder.alien.boxing cpu.architecture cpu.x86
 cpu.x86.assembler cpu.x86.assembler.operands kernel layouts locals
 make math math.order namespaces sequences splitting system ;
 IN: cpu.x86.64.unix
+
+DEFER: unaligned-struct?
 
 M: x86.64 param-regs
     drop {
@@ -24,6 +26,17 @@ M: x86.64 reserved-stack-space 0 ;
         [ 8 mod zero? [ t , ] when , ] assoc-each
     ] { } make { t } split harvest ;
 
+:: unaligned-struct-field? ( field -- ? )
+    field type>> lookup-c-type :> type
+    field offset>> type c-type-align mod zero? not
+    type struct-c-type? [ type unaligned-struct? or ] when ;
+
+: unaligned-struct? ( c-type -- ? )
+    base-type fields>> [ unaligned-struct-field? ] any? ;
+
+: register-struct? ( c-type -- ? )
+    base-type dup heap-size 16 <= [ unaligned-struct? not ] [ drop f ] if ;
+
 :: flatten-small-struct ( c-type -- seq )
     c-type struct-types&offset split-struct [
         [ lookup-c-type c-type-rep reg-class-of ] map
@@ -39,14 +52,14 @@ M: x86.64 reserved-stack-space 0 ;
     ] [ reps ] if ;
 
 M: x86.64 flatten-struct-type
-    dup heap-size 16 <=
+    dup register-struct?
     [ flatten-small-struct record-reg-reps ] [
         call-next-method unrecord-reg-reps
         [ first t f 3array ] map
     ] if ;
 
 M: x86.64 return-struct-in-registers?
-    heap-size 2 cells <= ;
+    register-struct? ;
 
 M: x86.64 dummy-stack-params? f ;
 
