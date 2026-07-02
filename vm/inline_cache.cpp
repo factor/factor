@@ -129,25 +129,17 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
   push(tag_fixnum(index));
   push(cache_entries.value());
 
+  // The miss path tail-branches to the shared inline-cache-miss-resume stub,
+  // which owns the frame and the return into inline_cache_miss. The PIC is
+  // never a live frame on the callstack, so deallocate_inline_cache frees it
+  // safely. The stub reads the call site from the pic-tail register, which
+  // the non-tail jump template loads from the return address.
   cell resume = parent->special_objects[PIC_MISS_RESUME_WORD];
-  if (to_boolean(resume)) {
-    // The miss path tail-branches to the shared inline-cache-miss-resume stub,
-    // which owns the frame and the return into inline_cache_miss. The PIC is
-    // never a live frame on the callstack, so deallocate_inline_cache frees it
-    // safely. The stub reads the call site from the pic-tail register, which
-    // the non-tail jump template loads from the return address.
-    emit_with_literal(
-        parent->special_objects[tail_call_p ? PIC_MISS_TAIL_JUMP : PIC_MISS_JUMP],
-        resume);
-  } else {
-    // Arches without the resume stub inline the miss handler (the old path,
-    // which leaves the PIC on the callstack across inline_cache_miss).
-    emit(parent->special_objects[JIT_PROLOG]);
-    emit_subprimitive(
-        parent->special_objects[tail_call_p ? PIC_MISS_TAIL_WORD : PIC_MISS_WORD],
-        true,
-        true);
-  }
+  if (!to_boolean(resume))
+    fatal_error("Boot image lacks inline-cache-miss-resume", 0);
+  emit_with_literal(
+      parent->special_objects[tail_call_p ? PIC_MISS_TAIL_JUMP : PIC_MISS_JUMP],
+      resume);
 }
 
 // Allocates memory
@@ -227,12 +219,10 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
   if (return_address.valid) {
     // Since each PIC is only referenced from a single call site,
     // if the old call target was a PIC, we can deallocate it immediately,
-    // instead of leaving dead PICs around until the next GC. Only safe
-    // when the miss ran off-stack via inline-cache-miss-resume; a boot
-    // image without that word uses the inline miss path, where the old
-    // PIC is still a live callstack frame.
-    if (to_boolean(special_objects[PIC_MISS_RESUME_WORD]))
-      deallocate_inline_cache(return_address.value);
+    // instead of leaving dead PICs around until the next GC. This is safe
+    // because the miss ran off-stack via inline-cache-miss-resume, so the
+    // PIC is not a live callstack frame.
+    deallocate_inline_cache(return_address.value);
     set_call_target(return_address.value, xt);
 
 #ifdef PIC_DEBUG

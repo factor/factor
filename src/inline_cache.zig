@@ -72,18 +72,10 @@ pub const InlineCacheJit = struct {
 
         const vm = self.base_jit.vm;
         const resume_word = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
-        if (resume_word != layouts.false_object) {
-            const jump_template: jit.JitTemplate = if (tail_call) .pic_miss_tail_jump else .pic_miss_jump;
-            try self.base_jit.emitWithLiteral(jump_template, resume_word);
-            return;
-        }
-
-        try self.base_jit.emit(.prolog);
-        const miss_word = if (tail_call)
-            vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_tail_word)]
-        else
-            vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_word)];
-        _ = try self.base_jit.emitSubprimitive(miss_word, true, true);
+        if (resume_word == layouts.false_object)
+            @panic("Boot image lacks inline-cache-miss-resume");
+        const jump_template: jit.JitTemplate = if (tail_call) .pic_miss_tail_jump else .pic_miss_jump;
+        try self.base_jit.emitWithLiteral(jump_template, resume_word);
     }
 
     pub fn emitInlineCache(
@@ -233,13 +225,9 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
         }
         const current_target = CallSitePatcher.getCallTarget(return_root.value);
         if (current_target != xt) {
-            // Eager PIC free is only safe when the miss ran off-stack via
-            // inline-cache-miss-resume; a boot image without that word uses
-            // the inline miss path, where the old PIC is still a live frame.
-            const resume_word = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
-            if (resume_word != layouts.false_object) {
-                deallocateInlineCache(vm, return_root.value);
-            }
+            // The miss ran off-stack via inline-cache-miss-resume, so the
+            // old PIC is not a live callstack frame and can be freed now.
+            deallocateInlineCache(vm, return_root.value);
             CallSitePatcher.setCallTarget(return_root.value, xt);
         }
     }
