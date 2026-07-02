@@ -5,10 +5,12 @@ assocs classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture kernel layouts make math namespaces
-sequences sequences.generalizations stack-checker.alien system
-words ;
+compiler.tree cpu.architecture kernel layouts locals make math
+math.order namespaces sequences sequences.generalizations
+stack-checker.alien system words ;
 IN: compiler.cfg.builder.alien
+
+SYMBOL: vararg-rep-start
 
 : with-param-regs ( abi quot -- reg-values stack-values )
     '[
@@ -18,6 +20,8 @@ IN: compiler.cfg.builder.alien
         V{ } clone stack-values set
         0 int-reg-reps set
         0 float-reg-reps set
+        os macos? cpu arm.64? and compact-stack-params? set
+        f vararg-rep-start set
         @
         reg-values get
         stack-values get
@@ -43,16 +47,47 @@ IN: compiler.cfg.builder.alien
         ] keep
     ] [ drop f ] if ;
 
-: (handle-macos-arm64-varargs) ( params -- )
-    function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
-    [ int-regs [ 2 tail* ] change ] when ;
+:: fixed-vararg-reps ( params -- reps )
+    params parameters>> params varargs?>> head
+    [ base-type flatten-parameter-type ] map concat ;
+
+:: fixed-vararg-reg-classes ( reps params -- classes )
+    reps keys
+    params return>> large-struct? [ int-rep prefix ] when
+    [ reg-class-of ] map ;
+
+: reserved-regs ( regs n -- regs' )
+    over length min tail* ;
+
+:: (handle-macos-arm64-varargs) ( params -- )
+    params varargs?>> integer? os macos? cpu arm.64? and and [
+        params fixed-vararg-reps :> reps
+        reps length
+        params return>> large-struct? [ 1 + ] when
+        vararg-rep-start set
+        reps params fixed-vararg-reg-classes :> classes
+        int-regs [ classes [ int-regs = ] count reserved-regs ] change
+        float-regs [ classes [ float-regs = ] count reserved-regs ] change
+    ] when ;
 
 : handle-macos-arm64-varargs ( params -- )
     dup alien-invoke-params?
     [ (handle-macos-arm64-varargs) ] [ drop ] if ;
 
+: stack-cell-size ( rep -- rep' )
+    first3 cell 4array ;
+
+:: adjust-macos-arm64-vararg-size ( rep i -- rep' )
+    vararg-rep-start get :> start
+    start [
+        i start >= [ rep stack-cell-size ] [ rep ] if
+    ] [ rep ] if ;
+
+: adjust-macos-arm64-vararg-sizes ( reps -- reps' )
+    [ adjust-macos-arm64-vararg-size ] map-index ;
+
 : (caller-parameters) ( vregs reps -- )
-    [ first3 next-parameter ] 2each ;
+    [ [ first3 ] [ param-natural-size ] bi next-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
@@ -65,6 +100,7 @@ IN: compiler.cfg.builder.alien
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         _ handle-macos-arm64-varargs
+        adjust-macos-arm64-vararg-sizes
         (caller-parameters)
     ] with-param-regs ;
 
@@ -140,16 +176,16 @@ M: #alien-assembly emit-node
     ]
     [ caller-return ] bi ;
 
-: callee-parameter ( rep on-stack? odd-register? -- dst )
-    [ next-vreg dup ] 3dip next-parameter ;
+: callee-parameter ( rep on-stack? odd-register? size -- dst )
+    [ next-vreg dup ] 4dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
     large-struct?
-    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
+    [ int-rep struct-return-on-stack? f cell callee-parameter ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first3 callee-parameter ] map ] map ]
+    [ [ [ [ first3 ] [ param-natural-size ] bi callee-parameter ] map ] map ]
     [ [ keys ] map ] bi ;
 
 : box-parameters ( vregs reps params -- )

@@ -12,6 +12,9 @@ SYMBOL: struct-return-area
 
 SYMBOLS: int-reg-reps float-reg-reps ;
 
+: rep-tuple ( rep size -- tuple )
+    [ f f ] dip 4array ;
+
 : reg-reps ( reps -- int-reps float-reps )
     [ second ] reject [ [ first int-rep? ] count ] [ length over - ] bi ;
 
@@ -24,7 +27,7 @@ SYMBOLS: int-reg-reps float-reg-reps ;
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
-    rep>> f f 3array 1array record-reg-reps ;
+    [ rep>> ] [ heap-size ] bi rep-tuple 1array record-reg-reps ;
 
 M: long-long-type flatten-c-type
     drop 2 [ int-rep long-long-on-stack? f 3array ] replicate record-reg-reps ;
@@ -33,7 +36,9 @@ HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
 M: object flatten-struct-type
-    heap-size cell align cell /i { int-rep f f } <array> record-reg-reps ;
+    heap-size cell align cell /i
+    [ int-rep cell rep-tuple ] replicate
+    record-reg-reps ;
 
 M: struct-c-type flatten-c-type
     flatten-struct-type ;
@@ -65,8 +70,8 @@ M: object flatten-struct-type-return
 
 GENERIC: unbox ( src c-type -- vregs reps )
 
-M: c-type unbox
-    [ rep>> ] [ unboxer>> ] bi
+M:: c-type unbox ( src c-type -- vregs reps )
+    src c-type [ rep>> ] [ unboxer>> ] bi
     [
         {
             { "to_float" [ drop ] }
@@ -83,7 +88,7 @@ M: c-type unbox
             ]
         } case 1array
     ]
-    [ drop f f 3array 1array ] 2bi record-reg-reps ;
+    [ drop c-type heap-size rep-tuple 1array ] 2bi record-reg-reps ;
 
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
