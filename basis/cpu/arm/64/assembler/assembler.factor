@@ -755,7 +755,7 @@ M: integer LDRSW 2 0 load-register-literal ;
 : load/store-pair ( Rt Rt2 offset L -- )
     [
         [ 2encode-width* ] dip >offset< dup 0 = [ drop 2 ] when
-        [ reach reach + 1 + ?>> 7 check-signed-immediate ] dip
+        [ reach reach 0 = [ 2/ ] when 2 + ?>> 7 check-signed-immediate ] dip
     ] dip {
         { 0b101 27 }
         { R/ZR 0 }
