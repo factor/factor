@@ -107,6 +107,12 @@ IN: io.launcher.unix.tests
     ] with-stream
 ] unit-test
 
+{ 524288 } [
+    <process>
+        { "sh" "-c" "dd if=/dev/zero bs=65536 count=8 2>/dev/null" } >>command
+    binary <process-reader> stream-contents length
+] unit-test
+
 ! Test process timeouts
 [
     <process>
