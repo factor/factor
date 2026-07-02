@@ -1,8 +1,8 @@
 // primitives/contexts.zig - Context, stack, and special object primitives
 
-const std = @import("std");
+const signals = @import("../signals.zig");
 const layouts = @import("../layouts.zig");
-const math = @import("../fixnum.zig");
+const segments = @import("../segments.zig");
 const vm_mod = @import("../vm.zig");
 
 const Cell = layouts.Cell;
@@ -205,16 +205,18 @@ pub export fn primitive_load_locals(vm_asm: *VMAssemblyFields) callconv(.c) void
 }
 
 // Helper: copy array contents to a stack segment, returns new stack top
-fn array_to_stack(arr: *const layouts.Array, bottom: Cell) Cell {
+fn array_to_stack(vm: *FactorVM, arr: *const layouts.Array, seg: *segments.Segment, error_type: signals.VMError) Cell {
     const capacity = layouts.untagFixnumUnsigned(arr.capacity);
     const depth = capacity * @sizeOf(Cell);
+    if (depth > seg.size) {
+        vm.generalError(error_type, layouts.retag(@intFromPtr(arr), .array), layouts.tagFixnum(@intCast(seg.size / @sizeOf(Cell))));
+    }
     const data = arr.data();
 
-    const dest: [*]Cell = @ptrFromInt(bottom);
+    const dest: [*]Cell = @ptrFromInt(seg.start);
     @memcpy(dest[0..capacity], data[0..capacity]);
 
-    // Return pointer to top of stack (last element)
-    return bottom + depth - @sizeOf(Cell);
+    return seg.start + depth - @sizeOf(Cell);
 }
 
 pub export fn primitive_set_datastack(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -224,11 +226,12 @@ pub export fn primitive_set_datastack(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const arr_cell = vm.pop();
     {
         const ctx = vm.vm_asm.ctx;
-        if (layouts.hasTag(arr_cell, .array)) {
-            const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
-            if (ctx.datastack_seg) |seg| {
-                ctx.datastack = array_to_stack(arr, seg.start);
-            }
+        if (!layouts.hasTag(arr_cell, .array)) {
+            vm.typeError(.array, arr_cell);
+        }
+        const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
+        if (ctx.datastack_seg) |seg| {
+            ctx.datastack = array_to_stack(vm, arr, seg, .datastack_overflow);
         }
     }
 }
@@ -240,11 +243,12 @@ pub export fn primitive_set_retainstack(vm_asm: *VMAssemblyFields) callconv(.c) 
     const arr_cell = vm.pop();
     {
         const ctx = vm.vm_asm.ctx;
-        if (layouts.hasTag(arr_cell, .array)) {
-            const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
-            if (ctx.retainstack_seg) |seg| {
-                ctx.retainstack = array_to_stack(arr, seg.start);
-            }
+        if (!layouts.hasTag(arr_cell, .array)) {
+            vm.typeError(.array, arr_cell);
+        }
+        const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
+        if (ctx.retainstack_seg) |seg| {
+            ctx.retainstack = array_to_stack(vm, arr, seg, .retainstack_overflow);
         }
     }
 }

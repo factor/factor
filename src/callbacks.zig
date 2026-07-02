@@ -129,6 +129,24 @@ pub const CallbackHeap = struct {
         self.free_list.free(@intFromPtr(stub), size);
     }
 
+    pub fn stubForEntryPoint(self: *Self, entry_point: Cell) ?*code_blocks.CodeBlock {
+        const seg = self.segment orelse return null;
+
+        var current = seg.start;
+        while (current < seg.end) {
+            const block: *code_blocks.CodeBlock = @ptrFromInt(current);
+            const block_size = block.size();
+
+            if (block_size == 0) break;
+            if (!block.isFree() and block.entryPoint() == entry_point) {
+                return block;
+            }
+
+            current += block_size;
+        }
+        return null;
+    }
+
     /// Reset the callback heap to a single empty free block. Used by
     /// (save-image)/save-image-and-exit to drop volatile callback stubs before
     /// saving. initialFreeList writes a FreeBlock header into the heap, which

@@ -524,18 +524,28 @@ test "safepoint page protection" {
     vm.vm_asm.ctx = try vm.newContext();
     vm.vm_asm.spare_ctx = try vm.newContext();
 
-    // Create an executable segment for the safepoint page
+    // Mirror image.zig: the safepoint page is a dedicated non-executable
+    // mapping because macOS rejects mprotect() on MAP_JIT memory.
     const page_size = segments.page_size;
-    var seg = try segments.Segment.init(page_size + 64 * 1024, true);
-    defer seg.deinit();
+    const safepoint_region = std.c.mmap(
+        null,
+        page_size,
+        .{ .READ = true, .WRITE = true },
+        .{ .TYPE = .PRIVATE, .ANONYMOUS = true },
+        -1,
+        0,
+    );
+    if (safepoint_region == std.c.MAP_FAILED) return error.OutOfMemory;
+    const safepoint_ptr: *align(std.heap.page_size_min) anyopaque = @alignCast(safepoint_region);
+    defer _ = std.c.munmap(safepoint_ptr, page_size);
 
     // Create a CodeHeap with safepoint page at segment start
     const code_heap = try std.testing.allocator.create(vm_mod.CodeHeap);
     defer std.testing.allocator.destroy(code_heap);
     code_heap.* = .{
         .seg = undefined,
-        .safepoint_page = seg.start,
-        .code_start = seg.start + page_size,
+        .safepoint_page = @intFromPtr(safepoint_ptr),
+        .code_start = @intFromPtr(safepoint_ptr) + page_size,
         .code_size = 64 * 1024,
         .remembered_sets = write_barrier.CodeHeapRememberedSets.init(std.testing.allocator),
     };
