@@ -38,7 +38,7 @@ math.rectangles accessors sequences namespaces ;
     pref-dim
 ] unit-test
 
-{ V{ { 10 10 } { 10 80 } { 10 10 } } } [
+{ V{ { 10.0 10.0 } { 10.0 80.0 } { 10.0 10.0 } } } [
     vertical <track>
         0 >>fill
         <gadget> { 10 10 } >>dim f track-add
@@ -60,10 +60,10 @@ math.rectangles accessors sequences namespaces ;
     "track" set
 ] unit-test
 
-{ V{ { 10 10 } { 10 35 } { 10 10 } { 10 35 } { 10 10 } } }
+{ V{ { 10.0 10.0 } { 10.0 35.0 } { 10.0 10.0 } { 10.0 35.0 } { 10.0 10.0 } } }
 [ "track" get [ layout ] [ children>> [ dim>> ] map ] bi ] unit-test
 
-{ V{ { 10 10 } { 10 80 } { 10 10 } } } [
+{ V{ { 10.0 10.0 } { 10.0 80.0 } { 10.0 10.0 } } } [
     "g1" get unparent
     "g2" get unparent
     "track" get [ layout ] [ children>> [ dim>> ] map ] bi

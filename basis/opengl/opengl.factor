@@ -294,13 +294,13 @@ MACRO: set-draw-buffers ( buffers -- quot )
     gl-scale-factor get-global [ / ] when* ; inline
 
 : gl-floor ( m -- n )
-    gl-scale floor gl-unscale ; inline
+    gl-scale floor gl-unscale >float ; inline
 
 : gl-ceiling ( m -- n )
-    gl-scale ceiling gl-unscale ; inline
+    gl-scale ceiling gl-unscale >float ; inline
 
 : gl-round ( m -- n )
-    gl-scale round gl-unscale ; inline
+    gl-scale round gl-unscale >float ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y1 x2 y2 )
     [ first2 [ gl-scale >fixnum ] bi@ ] bi@ ;
