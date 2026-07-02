@@ -25,7 +25,7 @@ ui.gadgets.frames ui.gadgets.grids ui.gadgets.labels ;
     "dim1" get "dim2" get =
 ] unit-test
 
-{ { 5 20 } { 20 20 } } [
+{ { 5 20.0 } { 20.0 20.0 } } [
     2 3 <frame>
     { 0 1 } >>filled-cell
     { 5 5 } >>gap

@@ -27,7 +27,7 @@ ui.gadgets.scrollers.private ;
 "v" get [
     [ { 10 20 } ] [ "v" get scroll-position ] unit-test
 
-    [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
+    { { 10.0 20.0 } } [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
 
 { } [
@@ -40,7 +40,7 @@ ui.gadgets.scrollers.private ;
 { } [ "s" get layout ] unit-test
 
 "s" get [
-    [ { 38 38 } ] [ "s" get viewport>> dim>> ] unit-test
+    { { 38.0 38.0 } } [ "s" get viewport>> dim>> ] unit-test
 
     [ { 100 100 } ] [ "s" get viewport>> gadget-child pref-dim ] unit-test
 
@@ -56,7 +56,7 @@ ui.gadgets.scrollers.private ;
 
     [ { 10 20 } ] [ "s" get viewport>> scroll-position ] unit-test
 
-    [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
+    { { 10.0 20.0 } } [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
 
 <gadget> { 600 400 } >>dim "g1" set

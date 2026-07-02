@@ -5,7 +5,7 @@ ui.gadgets.private ui.private ;
 FROM: sets => members ;
 IN: ui.gadgets.tests
 
-{ { 300 300 } }
+{ { 300.0 300.0 } }
 [
     ! c contains b contains a
     <gadget> "a" set
@@ -37,13 +37,13 @@ IN: ui.gadgets.tests
 "g2" get "g1" get add-gadget drop
 "g3" get "g2" get add-gadget drop
 
-{ { 30 30 } } [ "g1" get screen-loc ] unit-test
-{ { 30 30 } } [ "g1" get screen-rect loc>> ] unit-test
-{ { 30 30 } } [ "g1" get screen-rect dim>> ] unit-test
-{ { 20 20 } } [ "g2" get screen-loc ] unit-test
-{ { 20 20 } } [ "g2" get screen-rect loc>> ] unit-test
-{ { 50 180 } } [ "g2" get screen-rect dim>> ] unit-test
-{ { 0 0 } } [ "g3" get screen-loc ] unit-test
+{ { 30.0 30.0 } } [ "g1" get screen-loc ] unit-test
+{ { 30.0 30.0 } } [ "g1" get screen-rect loc>> ] unit-test
+{ { 30.0 30.0 } } [ "g1" get screen-rect dim>> ] unit-test
+{ { 20.0 20.0 } } [ "g2" get screen-loc ] unit-test
+{ { 20.0 20.0 } } [ "g2" get screen-rect loc>> ] unit-test
+{ { 50.0 180.0 } } [ "g2" get screen-rect dim>> ] unit-test
+{ { 0.0 0.0 } } [ "g3" get screen-loc ] unit-test
 { { 0 0 } } [ "g3" get screen-rect loc>> ] unit-test
 { { 100 200 } } [ "g3" get screen-rect dim>> ] unit-test
 

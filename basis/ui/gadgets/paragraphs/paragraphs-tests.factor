@@ -39,7 +39,7 @@ INSTANCE: fake-break word-break
 20 20 { 40 30 } <baseline-gadget> dup "c" set add-gadget
 "p" set
 
-{ { 85 65 } } [ "p" get pref-dim ] unit-test
+{ { 85 65.0 } } [ "p" get pref-dim ] unit-test
 
 { } [ "p" get prefer ] unit-test
 
@@ -49,4 +49,4 @@ INSTANCE: fake-break word-break
 
 { { 45 5 } } [ "b" get loc>> ] unit-test
 
-{ { 0 35 } } [ "c" get loc>> ] unit-test
+{ { 0 35.0 } } [ "c" get loc>> ] unit-test

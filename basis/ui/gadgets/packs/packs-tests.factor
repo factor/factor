@@ -13,7 +13,7 @@ sequences math.rectangles accessors math ;
     visible-children [ label? ] all?
 ] unit-test
 
-{ { { 10 30 } } } [
+{ { { 10.0 30.0 } } } [
     { { 10 20 } }
     { { 100 30 } }
     <gadget> vertical >>orientation
@@ -28,9 +28,9 @@ sequences math.rectangles accessors math ;
 
 { } [ "g" get prefer ] unit-test
 
-{ { 20 15 } } [ "g" get dim>> ] unit-test
+{ { 20 15.0 } } [ "g" get dim>> ] unit-test
 
-{ V{ { 0 5 } { 10 0 } } } [
+{ V{ { 0.0 5.0 } { 10.0 0.0 } } } [
     "g" get
     dup layout
     children>> [ loc>> ] map
@@ -42,11 +42,11 @@ sequences math.rectangles accessors math ;
     10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 30 20 } } [ "g" get pref-dim ] unit-test
+{ { 30 20.0 } } [ "g" get pref-dim ] unit-test
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 0 } { 20 5 } } } [
+{ V{ { 0.0 0.0 } { 20.0 5.0 } } } [
     "g" get children>> [ loc>> ] map
 ] unit-test
 
@@ -55,13 +55,13 @@ sequences math.rectangles accessors math ;
     5 5 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 25 15 } } [ "g" get pref-dim ] unit-test
+{ { 25 15.0 } } [ "g" get pref-dim ] unit-test
 
 { } [ "g" get prefer ] unit-test
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 0 } { 15 5 } } } [
+{ V{ { 0.0 0.0 } { 15.0 5.0 } } } [
     "g" get children>> [ loc>> ] map
 ] unit-test
 
@@ -70,13 +70,13 @@ sequences math.rectangles accessors math ;
     30 30 { 10 50 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 30 50 } } [ "g" get pref-dim ] unit-test
+{ { 30 50.0 } } [ "g" get pref-dim ] unit-test
 
 { } [ "g" get prefer ] unit-test
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 5 } { 20 0 } } } [
+{ V{ { 0.0 5.0 } { 20.0 0.0 } } } [
     "g" get children>> [ loc>> ] map
 ] unit-test
 
@@ -85,7 +85,7 @@ sequences math.rectangles accessors math ;
     30 4 { 30 30 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 60 43 } } [ "g" get pref-dim ] unit-test
+{ { 60 43.0 } } [ "g" get pref-dim ] unit-test
 
 { } [ "g" get prefer ] unit-test
 
@@ -103,7 +103,7 @@ sequences math.rectangles accessors math ;
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 0 } { 30 5 } } }
+{ V{ { 0.0 0.0 } { 30.0 5.0 } } }
 [ "g" get children>> [ loc>> ] map ] unit-test
 
 <shelf> +baseline+ >>align
@@ -115,7 +115,7 @@ sequences math.rectangles accessors math ;
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 0 } { 30 10 } } }
+{ V{ { 0.0 0.0 } { 30.0 10.0 } } }
 [ "g" get children>> [ loc>> ] map ] unit-test
 
 <shelf> +baseline+ >>align
@@ -127,7 +127,7 @@ sequences math.rectangles accessors math ;
 
 { } [ "g" get layout ] unit-test
 
-{ V{ { 0 0 } { 30 10 } } }
+{ V{ { 0.0 0.0 } { 30.0 10.0 } } }
 [ "g" get children>> [ loc>> ] map ] unit-test
 
 <shelf> +baseline+ >>align
@@ -135,4 +135,4 @@ sequences math.rectangles accessors math ;
 12 9 { 15 15 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 39 24 } } [ "g" get pref-dim ] unit-test
+{ { 39 24.0 } } [ "g" get pref-dim ] unit-test
