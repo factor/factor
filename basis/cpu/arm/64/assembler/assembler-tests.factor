@@ -51,6 +51,11 @@ IN: cpu.arm.64.assembler.tests
 0xfd27bfa9 [ FP X9 SP -16 [pre] STP ] test-insn
 0xaaae3fa9 [ X10 X11 X21 -8 [+] STP ] test-insn
 
+0x61080129 [ W1 W2 X3 8 [+] STP ] test-insn
+0xc4947e29 [ W4 W5 X6 -12 [+] LDP ] test-insn
+0xaa2e3f29 [ W10 W11 X21 -8 [+] STP ] test-insn
+0xa006ff29 [ W0 W1 X21 -8 [pre] LDP ] test-insn
+
 0xae0240f8 [ X14 X21 [] LDUR ] test-insn
 
 0x4a554039 [ X10 X10 21 [+] LDRB ] test-insn
