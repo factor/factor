@@ -9,6 +9,10 @@ STRUCT: some-struct
     { f3 int }
     { f4 int } ;
 
+PACKED-STRUCT: packed-some-struct
+    { c char }
+    { i int } ;
+
 ! flatten-c-type
 {
     { { int-rep f f 4 } }
@@ -32,6 +36,18 @@ cpu x86.32?
 } ? [
     some-struct base-type base-type flatten-c-type
 ] unit-test
+
+cpu x86.64? os unix? and [
+    {
+        { { int-rep t f } }
+    } [
+        packed-some-struct base-type base-type flatten-c-type
+    ] unit-test
+
+    { f } [
+        packed-some-struct base-type base-type return-struct-in-registers?
+    ] unit-test
+] when
 
 ! unbox
 cpu x86.32?
