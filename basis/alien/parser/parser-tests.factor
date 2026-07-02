@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.parser alien.parser.private classes
 alien.syntax compiler.units continuations debugger eval kernel
 lexer namespaces parser sequences sets summary tools.test
-vocabs.loader vocabs.parser words ;
+vocabs.parser words ;
 IN: alien.parser.tests
 
 <<
@@ -111,7 +111,6 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
 { t } [ \ alien-parser-callback-effect-test inline? ] unit-test
 
 [
-    "alien.parser" reload "alien.syntax" reload
     "USING: alien.c-types alien.syntax ; CALLBACK: void alien-parser-varargs-callback-test ( ... int arg )"
     eval( -- )
 ] [ error>> class-of name>> "varargs-in-callback-declaration" = ] must-fail-with

@@ -890,35 +890,11 @@ M: arm.64 %alien-indirect
 : temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
 
 :: store-stack-int ( Xreg n size -- )
-    size
-    {
+    size {
         { 1 [ Xreg >W n stack@ STRB ] }
         { 2 [ Xreg >W n stack@ STRH ] }
-        { 3 [
-            Xreg >W n stack@ STRH
-            IP0 Xreg 16 LSR
-            IP0 >W n 2 + stack@ STRB
-        ] }
         { 4 [ Xreg >W n stack@ STR ] }
-        { 5 [
-            Xreg >W n stack@ STR
-            IP0 Xreg 32 LSR
-            IP0 >W n 4 + stack@ STRB
-        ] }
-        { 6 [
-            Xreg >W n stack@ STR
-            IP0 Xreg 32 LSR
-            IP0 >W n 4 + stack@ STRH
-        ] }
-        { 7 [
-            Xreg >W n stack@ STR
-            IP0 Xreg 32 LSR
-            IP0 >W n 4 + stack@ STRH
-            IP0 Xreg 48 LSR
-            IP0 >W n 6 + stack@ STRB
-        ] }
         { 8 [ Xreg n stack@ STR ] }
-        [ drop Xreg n stack@ STR ]
     } case ;
 
 :: %store-stack-param ( vreg rep n size -- )
@@ -941,35 +917,11 @@ M: arm.64 %alien-assembly
 : next-stack@ ( n -- operand ) [ FP ] dip 16 + [+] ;
 
 :: load-stack-int ( Xreg n size -- )
-    size
-    {
+    size {
         { 1 [ Xreg >W n next-stack@ LDRB ] }
         { 2 [ Xreg >W n next-stack@ LDRH ] }
-        { 3 [
-            Xreg >W n next-stack@ LDRH
-            IP0 >W n 2 + next-stack@ LDRB
-            Xreg Xreg IP0 16 <LSL> ORR
-        ] }
         { 4 [ Xreg >W n next-stack@ LDR ] }
-        { 5 [
-            Xreg >W n next-stack@ LDR
-            IP0 >W n 4 + next-stack@ LDRB
-            Xreg Xreg IP0 32 <LSL> ORR
-        ] }
-        { 6 [
-            Xreg >W n next-stack@ LDR
-            IP0 >W n 4 + next-stack@ LDRH
-            Xreg Xreg IP0 32 <LSL> ORR
-        ] }
-        { 7 [
-            Xreg >W n next-stack@ LDR
-            IP0 >W n 4 + next-stack@ LDRH
-            Xreg Xreg IP0 32 <LSL> ORR
-            IP0 >W n 6 + next-stack@ LDRB
-            Xreg Xreg IP0 48 <LSL> ORR
-        ] }
         { 8 [ Xreg n next-stack@ LDR ] }
-        [ drop Xreg n next-stack@ LDR ]
     } case ;
 
 :: %load-stack-param ( vreg rep n size -- )

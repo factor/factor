@@ -10,8 +10,6 @@ math.order namespaces sequences sequences.generalizations
 stack-checker.alien system words ;
 IN: compiler.cfg.builder.alien
 
-SYMBOL: vararg-rep-start
-
 : with-param-regs ( abi quot -- reg-values stack-values )
     '[
         param-regs init-regs
@@ -20,8 +18,6 @@ SYMBOL: vararg-rep-start
         V{ } clone stack-values set
         0 int-reg-reps set
         0 float-reg-reps set
-        os macos? cpu arm.64? and compact-stack-params? set
-        f vararg-rep-start set
         @
         reg-values get
         stack-values get
@@ -47,44 +43,26 @@ SYMBOL: vararg-rep-start
         ] keep
     ] [ drop f ] if ;
 
-:: fixed-vararg-reps ( params -- reps )
-    params parameters>> params varargs?>> head
-    [ base-type flatten-parameter-type ] map concat ;
-
-:: fixed-vararg-reg-classes ( reps params -- classes )
-    reps keys
-    params return>> large-struct? [ int-rep prefix ] when
-    [ reg-class-of ] map ;
-
 : reserved-regs ( regs n -- regs' )
     over length min tail* ;
 
-:: (handle-macos-arm64-varargs) ( params -- )
-    params varargs?>> integer? os macos? cpu arm.64? and and [
-        params fixed-vararg-reps :> reps
-        reps length
-        params return>> large-struct? [ 1 + ] when
-        vararg-rep-start set
-        reps params fixed-vararg-reg-classes :> classes
-        int-regs [ classes [ int-regs = ] count reserved-regs ] change
-        float-regs [ classes [ float-regs = ] count reserved-regs ] change
-    ] when ;
+:: vararg-boundary ( params -- n )
+    params parameters>> params varargs?>> head
+    [ base-type flatten-parameter-type length ] map-sum
+    params return>> large-struct? [ 1 + ] when ;
 
-: handle-macos-arm64-varargs ( params -- )
-    dup alien-invoke-params?
-    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
+:: promote-varargs ( reps params -- reps' )
+    reps params vararg-boundary cut
+    [ first3 cell 4array ] map :> ( fixed varargs )
+    fixed keys [ reg-class-of ] map :> classes
+    int-regs [ classes [ int-regs = ] count reserved-regs ] change
+    float-regs [ classes [ float-regs = ] count reserved-regs ] change
+    fixed varargs append ;
 
-: stack-cell-size ( rep -- rep' )
-    first3 cell 4array ;
-
-:: adjust-macos-arm64-vararg-size ( rep i -- rep' )
-    vararg-rep-start get :> start
-    start [
-        i start >= [ rep stack-cell-size ] [ rep ] if
-    ] [ rep ] if ;
-
-: adjust-macos-arm64-vararg-sizes ( reps -- reps' )
-    [ adjust-macos-arm64-vararg-size ] map-index ;
+: handle-macos-arm64-varargs ( reps params -- reps' )
+    dup dup alien-invoke-params? [ varargs?>> integer? ] [ drop f ] if
+    compact-stack-params? and
+    [ promote-varargs ] [ drop ] if ;
 
 : (caller-parameters) ( vregs reps -- )
     [ [ first3 ] [ param-natural-size ] bi next-parameter ] 2each ;
@@ -100,7 +78,6 @@ SYMBOL: vararg-rep-start
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         _ handle-macos-arm64-varargs
-        adjust-macos-arm64-vararg-sizes
         (caller-parameters)
     ] with-param-regs ;
 

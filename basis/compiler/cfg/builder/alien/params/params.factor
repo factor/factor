@@ -1,12 +1,12 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs cpu.architecture fry kernel layouts locals
-math math.order namespaces sequences vectors ;
+math math.order namespaces sequences system vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 
-SYMBOL: compact-stack-params?
+: compact-stack-params? ( -- ? ) os macos? cpu arm.64? and ;
 
 : param-natural-size ( rep-tuple -- size )
     dup length 3 > [ fourth ] [ drop cell ] if ;
@@ -17,13 +17,13 @@ GENERIC#: alloc-stack-param 1 ( rep size -- n )
     stack-params get size align dup size + stack-params set ;
 
 M:: object alloc-stack-param ( rep size -- n )
-    compact-stack-params? get
+    compact-stack-params?
     [ size alloc-compact-param ]
     [ stack-params get dup rep rep-size cell align + stack-params set ]
     if ;
 
 M:: float-rep alloc-stack-param ( rep size -- n )
-    compact-stack-params? get
+    compact-stack-params?
     [ size alloc-compact-param ]
     [ stack-params get rep rep-size [ cell align stack-params +@ ] keep
       float-right-align-on-stack? [ + ] [ drop ] if ]
