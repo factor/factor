@@ -334,8 +334,10 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
     if (n < (type) 0 && n == (type) -1)                               \
       return (BIGNUM_ONE(1));                                         \
     {                                                                 \
-      utype accumulator =                                             \
-          ((negative_p = n < (type) 0) ? -n : n);                     \
+      negative_p = n < (type)0;                                       \
+      utype accumulator = (utype)n;                                   \
+      if (negative_p)                                                 \
+        accumulator = (utype)0 - accumulator;                         \
       if (accumulator < BIGNUM_RADIX)                                 \
       {                                                               \
         bignum* result = allot_bignum(1, negative_p);                 \
@@ -403,6 +405,21 @@ FOO_TO_BIGNUM_SIGNED(int32, int32_t, uint32_t)
 FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
 #endif
 
+template <typename type, typename utype>
+type bignum_twos_complement_value(utype accumulator, bool negative_p) {
+  if (!negative_p)
+    return (type)accumulator;
+
+  if constexpr (std::numeric_limits<type>::is_signed) {
+    utype min_magnitude = (utype)std::numeric_limits<type>::max() + 1;
+    if (accumulator == min_magnitude)
+      return std::numeric_limits<type>::min();
+    return -(type)accumulator;
+  } else {
+    return (type)((utype)0 - accumulator);
+  }
+}
+
 // cannot allocate memory
 // bignum_to_cell, bignum_to_fixnum, bignum_to_int64, bignum_to_uint64
 // bignum_to_int32, bignum_to_uint32
@@ -416,8 +433,8 @@ FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
       bignum_digit_type* scan = (start + (BIGNUM_LENGTH(bn)));             \
       while (start < scan)                                                 \
         accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));  \
-      return ((BIGNUM_NEGATIVE_P(bn)) ? ((type)(-(stype) accumulator))     \
-                                      : accumulator);                      \
+      return bignum_twos_complement_value<type, utype>(                   \
+          accumulator, BIGNUM_NEGATIVE_P(bn));                             \
     }                                                                      \
   }
 
