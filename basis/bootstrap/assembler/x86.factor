@@ -253,6 +253,15 @@ big-endian off
 
 [ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
 
+[
+    pic-tail-reg stack-reg [] MOV
+    0 JMP f rc-relative rel-word
+] PIC-MISS-JUMP jit-define
+
+[
+    0 JMP f rc-relative rel-word
+] PIC-MISS-TAIL-JUMP jit-define
+
 ! ! ! Megamorphic caches
 
 [

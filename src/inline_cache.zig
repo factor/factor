@@ -65,19 +65,24 @@ pub const InlineCacheJit = struct {
     }
 
     pub fn emitMissHandler(self: *Self, generic_word: *Cell, methods: *Cell, index: Cell, cache_entries: *Cell, tail_call: bool) !void {
-        try self.base_jit.emit(.prolog);
-
         try self.base_jit.push(generic_word.*);
         try self.base_jit.push(methods.*);
         try self.base_jit.push(layouts.tagFixnum(@intCast(index)));
         try self.base_jit.push(cache_entries.*);
 
         const vm = self.base_jit.vm;
+        const resume_word = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
+        if (resume_word != layouts.false_object) {
+            const jump_template: jit.JitTemplate = if (tail_call) .pic_miss_tail_jump else .pic_miss_jump;
+            try self.base_jit.emitWithLiteral(jump_template, resume_word);
+            return;
+        }
+
+        try self.base_jit.emit(.prolog);
         const miss_word = if (tail_call)
             vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_tail_word)]
         else
             vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_word)];
-
         _ = try self.base_jit.emitSubprimitive(miss_word, true, true);
     }
 

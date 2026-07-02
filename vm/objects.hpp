@@ -121,6 +121,11 @@ enum special_object {
   OBJ_BIGNUM_ZERO,
   OBJ_BIGNUM_POS_ONE,
   OBJ_BIGNUM_NEG_ONE = 81,
+
+  // Off-stack PIC miss handler, inline_cache.cpp
+  PIC_MISS_RESUME_WORD = 82,
+  PIC_MISS_JUMP = 83,
+  PIC_MISS_TAIL_JUMP = 84,
 };
 
 // save-image-and-exit discards special objects that are filled in on startup
@@ -130,7 +135,8 @@ inline static bool save_special_p(cell i) {
   return (i >= OBJ_STARTUP_QUOT && i <= LEAF_SIGNAL_HANDLER_WORD) ||
       (i >= REDEFINITION_COUNTER && i <= OBJ_UNDEFINED) ||
       i == OBJ_STAGE2 ||
-      (i >= OBJ_CANONICAL_TRUE && i <= OBJ_BIGNUM_NEG_ONE);
+      (i >= OBJ_CANONICAL_TRUE && i <= OBJ_BIGNUM_NEG_ONE) ||
+      (i >= PIC_MISS_RESUME_WORD && i <= PIC_MISS_TAIL_JUMP);
 }
 
 template <typename Iterator> void object::each_slot(Iterator& iter) {

@@ -16,12 +16,16 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(return_address + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
+  return (void*)((return_address - 4) + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
 }
 
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(unsigned int*)(return_address - 4) = (*(unsigned int*)(return_address - 4) & 0xfc000000) | ((target - return_address + 4) >> 2 & 0x03ffffff);
+  cell call_site = return_address - 4;
+  *(unsigned int*)call_site =
+      (*(unsigned int*)call_site & 0xfc000000) |
+      ((target - return_address + 4) >> 2 & 0x03ffffff);
+  flush_icache(call_site, 4);
 }
 
 inline static bool tail_call_site_p(cell return_address) {
@@ -30,7 +34,7 @@ inline static bool tail_call_site_p(cell return_address) {
 
 static const unsigned JIT_FRAME_SIZE = 16;
 
-// Must match the calculation in word jit-signal-handler-prolog in
+// Must match the stack frame built by the signal-handler sub-primitive in
 // basis/bootstrap/assembler/arm.64.factor
 static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
 
