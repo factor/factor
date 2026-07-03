@@ -852,14 +852,20 @@ M:: arm.64 %save-context ( TEMP1 TEMP2 -- )
     FP CTX context-callstack-top-offset [+] STR
     DS RS CTX context-datastack-offset [+] STP ;
 
-M: arm.64 %c-invoke [ (LDR=BLR*) ] dip gc-map-here ;
+M:: arm.64 %c-invoke ( symbols dll gc-map -- )
+    (LDR=BLR*-call)
+    gc-map gc-map-here
+    symbols dll (LDR=BLR-pool) ;
+
+:: %c-invoke-tramp2 ( stack-size symbols dll gc-map -- )
+    IP1 SP stack-size 16 - ADD
+    (LDR=BLR**-call)
+    gc-map gc-map-here
+    symbols dll (LDR=BLR-pool) ;
 
 M: arm.64 %alien-invoke
-    reach [ '[ _ _ _ %c-invoke ] ] [ -roll '[
-        IP1 SP _ 16 - ADD
-        _ _ (LDR=BLR**)
-        _ gc-map-here
-    ] ] if-zero %alien-assembly ;
+    reach [ '[ _ _ _ %c-invoke ] ] [ -roll '[ _ _ _ _ %c-invoke-tramp2 ] ]
+    if-zero %alien-assembly ;
 
 : ?spill-slot* ( obj -- obj )
     dup spill-slot? [

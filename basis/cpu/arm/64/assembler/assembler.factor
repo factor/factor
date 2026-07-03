@@ -676,20 +676,23 @@ M: label BL 0 BL rc-relative-arm-b label-fixup ;
 
 : LDR=BLR ( -- dll class ) f (LDR=BLR) ;
 
-! literal load, save context and call
-: (LDR=BLR*) ( word dll -- )
-    IP0 3 insns LDR
-    TRAMPOLINE BLR
+! literal load, save context and call. The literal pool is
+! separated from the call so codegen can record the gc map at the
+! actual return address (right after the BLR) instead of past the
+! embedded literal.
+: (LDR=BLR*-call) ( -- ) IP0 3 insns LDR TRAMPOLINE BLR ;
+
+: (LDR=BLR**-call) ( -- ) IP0 3 insns LDR TRAMPOLINE2 BLR ;
+
+: (LDR=BLR-pool) ( word dll -- )
     3 insns B
     8 0 <array> % rc-absolute-cell rel-dlsym ;
+
+: (LDR=BLR*) ( word dll -- ) (LDR=BLR*-call) (LDR=BLR-pool) ;
 
 : LDR=BLR* ( word -- ) f (LDR=BLR*) ;
 
-: (LDR=BLR**) ( word dll -- )
-    IP0 3 insns LDR
-    TRAMPOLINE2 BLR
-    3 insns B
-    8 0 <array> % rc-absolute-cell rel-dlsym ;
+: (LDR=BLR**) ( word dll -- ) (LDR=BLR**-call) (LDR=BLR-pool) ;
 
 ! literal load and jump
 : (LDR=BR) ( -- class )
