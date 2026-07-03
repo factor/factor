@@ -826,6 +826,7 @@ M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
 M: arm.64 float-right-align-on-stack? f ;
 M: arm.64 struct-return-on-stack? f ;
+M: arm.64 compact-stack-params? os macos? ;
 
 : return-reg ( rep -- reg ) reg-class-of return-regs at first ;
 
@@ -902,9 +903,6 @@ M: arm.64 %alien-indirect
     rep integer-rep?
     [ rep temp-reg n size store-stack-int ]
     [ n stack@ rep temp-reg rep %copy ] if ;
-
-: stack-param-values ( tuple -- vreg rep n size )
-    [ first3 ] [ param-natural-size ] bi ;
 
 M: arm.64 %alien-assembly
     3nip swap {

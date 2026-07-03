@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.parser alien.parser.private classes
-alien.syntax compiler.units continuations debugger eval kernel
-lexer namespaces parser sequences sets summary tools.test
+USING: accessors alien.c-types alien.parser alien.parser.private
+alien.syntax classes compiler.units continuations debugger eval
+kernel lexer namespaces parser sequences sets summary tools.test
 vocabs.parser words ;
 IN: alien.parser.tests
 

@@ -62,6 +62,7 @@ M: x86.64 return-struct-in-registers?
     register-struct? ;
 
 M: x86.64 dummy-stack-params? f ;
+M: x86.64 compact-stack-params? f ;
 
 M: x86.64 dummy-int-params? f ;
 

@@ -19,6 +19,7 @@ M: x86.64 return-struct-in-registers?
 M: x86.64 value-struct? heap-size { 1 2 4 8 } member? ;
 
 M: x86.64 dummy-stack-params? f ;
+M: x86.64 compact-stack-params? f ;
 
 M: x86.64 dummy-int-params? t ;
 

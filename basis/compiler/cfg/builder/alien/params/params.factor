@@ -6,28 +6,27 @@ IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 
-: compact-stack-params? ( -- ? ) os macos? cpu arm.64? and ;
-
 : param-natural-size ( rep-tuple -- size )
     dup length 3 > [ fourth ] [ drop cell ] if ;
 
-GENERIC#: alloc-stack-param 1 ( rep size -- n )
+: stack-param-values ( rep-tuple -- vreg rep n size )
+    [ first3 ] [ param-natural-size ] bi ;
+
+GENERIC: (alloc-stack-param) ( rep -- n )
+
+M:: object (alloc-stack-param) ( rep -- n )
+    stack-params get dup rep rep-size cell align + stack-params set ;
+
+M:: float-rep (alloc-stack-param) ( rep -- n )
+    stack-params get rep rep-size [ cell align stack-params +@ ] keep
+    float-right-align-on-stack? [ + ] [ drop ] if ;
 
 :: alloc-compact-param ( size -- n )
     stack-params get size align dup size + stack-params set ;
 
-M:: object alloc-stack-param ( rep size -- n )
+: alloc-stack-param ( rep size -- n )
     compact-stack-params?
-    [ size alloc-compact-param ]
-    [ stack-params get dup rep rep-size cell align + stack-params set ]
-    if ;
-
-M:: float-rep alloc-stack-param ( rep size -- n )
-    compact-stack-params?
-    [ size alloc-compact-param ]
-    [ stack-params get rep rep-size [ cell align stack-params +@ ] keep
-      float-right-align-on-stack? [ + ] [ drop ] if ]
-    if ;
+    [ nip alloc-compact-param ] [ drop (alloc-stack-param) ] if ;
 
 : ?dummy-stack-params ( rep -- )
     dummy-stack-params? [ cell alloc-stack-param drop ] [ drop ] if ;

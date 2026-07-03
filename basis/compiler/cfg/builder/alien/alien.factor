@@ -44,7 +44,7 @@ IN: compiler.cfg.builder.alien
     ] [ drop f ] if ;
 
 : reserved-regs ( regs n -- regs' )
-    over length min tail* ;
+    index-or-length tail* ;
 
 :: vararg-boundary ( params -- n )
     params parameters>> params varargs?>> head

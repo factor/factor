@@ -42,13 +42,7 @@ M: alien-call-insn rename-insn-defs
 
 M: ##callback-inputs rename-insn-defs
     [ [ first3 DEF-QUOT 2dip 3array ] map ] change-reg-outputs
-    [
-        [
-            dup length 3 >
-            [ first4 DEF-QUOT 3dip 4array ]
-            [ first3 DEF-QUOT 2dip 3array ] if
-        ] map
-    ] change-stack-outputs
+    [ [ first4 DEF-QUOT 3dip 4array ] map ] change-stack-outputs
     drop ;
 
 ! Special rename-insn-uses methods
@@ -60,13 +54,7 @@ M: ##phi rename-insn-uses
 
 M: alien-call-insn rename-insn-uses
     [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
-    [
-        [
-            dup length 3 >
-            [ first4 USE-QUOT 3dip 4array ]
-            [ first3 USE-QUOT 2dip 3array ] if
-        ] map
-    ] change-stack-inputs
+    [ [ first4 USE-QUOT 3dip 4array ] map ] change-stack-inputs
     drop ;
 
 M: ##alien-indirect rename-insn-uses

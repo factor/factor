@@ -24,6 +24,7 @@ M: ppc value-struct?
     [ complex-float lookup-c-type = ] bi or ;
 
 M: ppc dummy-stack-params? f ;
+M: ppc compact-stack-params? f ;
 
 M: ppc dummy-int-params? f ;
 

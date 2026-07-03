@@ -566,6 +566,10 @@ HOOK: float-right-align-on-stack? cpu ( -- ? )
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
+! If t, stack parameters are packed at their natural size and
+! alignment instead of one cell per parameter
+HOOK: compact-stack-params? cpu ( -- ? )
+
 HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
