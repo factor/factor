@@ -489,6 +489,15 @@ long ffi_test_82(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
   return (long)b * 10000000L + ffi_test_encode_packed_struct(p, z);
 }
 
+long ffi_test_83(int a, int b, ...) {
+  va_list args;
+  va_start(args, b);
+  int c = va_arg(args, int);
+  long d = va_arg(args, long);
+  va_end(args);
+  return (long)a * 1000000L + (long)b * 10000L + (long)c * 100L + d;
+}
+
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);
 }

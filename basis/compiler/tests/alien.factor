@@ -154,6 +154,25 @@ FUNCTION: long ffi_test_82 ( int a0, int a1, int a2, int a3,
     1 2 3 4 5 6 7 8 3 make-packed-test-struct 12 ffi_test_82
 ] unit-test
 
+FUNCTION: long ffi_test_83 ( int a, int b, ... int c, long d )
+
+{ 1020304 } [ 1 2 3 4 ffi_test_83 ] unit-test
+
+! The stack layout bugs these cover only show up when the stack
+! holds garbage, so exercise them under compaction churn.
+{ t } [
+    50 <iota> [
+        drop
+        1 2 3 4 5 6 7 8 make-packed-test-struct 12 ffi_test_75 9001112 =
+        1 2 3 4 5 6 7 8 make-packed-test-struct-2 12 ffi_test_79
+        9000000001112 = and
+        1 2 3 4 5 6 7 8 3 make-packed-test-struct 12 ffi_test_82
+        39001112 = and
+        1 2 3 4 ffi_test_83 1020304 = and
+        compact-gc
+    ] all?
+] unit-test
+
 FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
 { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test

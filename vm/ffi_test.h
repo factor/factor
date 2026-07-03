@@ -301,6 +301,7 @@ FACTOR_EXPORT long ffi_test_81(ffi_test_packed_callback_2 cb);
 FACTOR_EXPORT long ffi_test_82(int a0, int a1, int a2, int a3, int a4,
                                int a5, int a6, int a7, signed char b,
                                struct packed_test_struct p, signed char z);
+FACTOR_EXPORT long ffi_test_83(int a, int b, ...);
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
