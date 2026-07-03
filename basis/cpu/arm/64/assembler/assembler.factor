@@ -487,7 +487,9 @@ M: logical-immediate ANDS [ check-zero-register  ] 2dip 3 logical-imm ;
 
 
 <PRIVATE
-: move-wide-imm ( Rd uimm16 hw opc -- )
+:: move-wide-imm ( Rd uimm16 hw opc -- )
+    uimm16 16 check-unsigned-immediate drop
+    Rd uimm16 hw opc
     [ 1encode-width ] 3dip [ pick 1 + check-unsigned-immediate ] dip {
         { 0b100101 23 }
         { R/ZR 0 }
@@ -830,8 +832,12 @@ M: offset LDRB 0 0 0 0 1 (load/store-register) ;
 M: offset STRH 1 0 0 1 0 (load/store-register) ;
 M: offset LDRH 1 0 0 1 1 (load/store-register) ;
 
-M: offset LDRSB 0 0 1 0 0 (load/store-register) ;
-M: offset LDRSH 1 0 1 1 0 (load/store-register) ;
+! opc[0] (the L bit) selects a 32-bit (W) vs 64-bit (X) destination
+! for signed loads, so take it from Rt rather than hardcoding X.
+M:: offset LDRSB ( Rt operand -- )
+    Rt operand 0 0 1 0 Rt encode-width 1 bitxor (load/store-register) ;
+M:: offset LDRSH ( Rt operand -- )
+    Rt operand 1 0 1 1 Rt encode-width 1 bitxor (load/store-register) ;
 M: offset LDRSW 2 0 1 2 0 (load/store-register) ;
 
 <PRIVATE
@@ -905,8 +911,10 @@ M: register-offset LDRB 0 0 0 1 (load/store-register-register) ;
 M: register-offset STRH 1 0 0 0 (load/store-register-register) ;
 M: register-offset LDRH 1 0 0 1 (load/store-register-register) ;
 
-M: register-offset LDRSB 0 0 1 0 (load/store-register-register) ;
-M: register-offset LDRSH 1 0 1 0 (load/store-register-register) ;
+M:: register-offset LDRSB ( Rt operand -- )
+    Rt operand 0 0 1 Rt encode-width 1 bitxor (load/store-register-register) ;
+M:: register-offset LDRSH ( Rt operand -- )
+    Rt operand 1 0 1 Rt encode-width 1 bitxor (load/store-register-register) ;
 M: register-offset LDRSW 2 0 1 0 (load/store-register-register) ;
 
 <PRIVATE
@@ -1029,8 +1037,14 @@ M: shifted-register SUBS 3 add/sub-shifted-register ;
 
 
 <PRIVATE
+! The extended form takes its sf from Rd/Rn; Rm may be a W register
+! (the extend option encodes the source width), so it is excluded
+! from the width check.
+: ext-encode-width ( Rd Rn Rm -- Rd Rn Rm w )
+    [ 2encode-width ] dip swap ;
+
 : add/sub-extended-register ( Rd Rn operand op -- )
-    [ >operand< ] dip [ 3encode-width ] 3dip {
+    [ >operand< ] dip [ ext-encode-width ] 3dip {
         { 0b01011001 21 }
         { R/SP 0 }
         { R/SP 5 }
@@ -1245,7 +1259,6 @@ PRIVATE>
 <PRIVATE
 : simd-permute ( Rd Rn Rm shape opcode -- )
     dupd {
-        { 0b1 30 }
         { 0b001110 24 }
         { 0b10 10 }
         { V 0 }
@@ -1332,15 +1345,19 @@ M: general-register DUP [ size>> 2^ ] [ Q>> ] bi 1 0 simd-copy ;
         12
         30
     } encode ;
+
+! The element-preserving members take Q from the arrangement; the
+! narrowing members (SQXTN etc.) use Q to pick the low/high half.
+: simd-2-misc-elt ( Rd Rn shape U opcode -- ) pick Q simd-2-misc ;
 PRIVATE>
 
-: CNTv    ( Rd Rn shape -- ) 0 0b00101 1 simd-2-misc ;
-: ABSv    ( Rd Rn shape -- ) 0 0b01011 1 simd-2-misc ;
-: CMLT    ( Rd Rn shape -- ) 0 0b01010 1 simd-2-misc ;
+: CNTv    ( Rd Rn shape -- ) 0 0b00101 simd-2-misc-elt ;
+: ABSv    ( Rd Rn shape -- ) 0 0b01011 simd-2-misc-elt ;
+: CMLT    ( Rd Rn shape -- ) 0 0b01010 simd-2-misc-elt ;
 : SQXTN   ( Rd Rn shape -- ) 0 0b10100 0 simd-2-misc ;
 : SQXTN2  ( Rd Rn shape -- ) 0 0b10100 1 simd-2-misc ;
-: MVNv    ( Rd Rn shape -- ) 1 0b00101 1 simd-2-misc ;
-: NEGv    ( Rd Rn shape -- ) 1 0b01011 1 simd-2-misc ;
+: MVNv    ( Rd Rn shape -- ) 1 0b00101 simd-2-misc-elt ;
+: NEGv    ( Rd Rn shape -- ) 1 0b01011 simd-2-misc-elt ;
 : SQXTUN  ( Rd Rn shape -- ) 1 0b10010 0 simd-2-misc ;
 : SQXTUN2 ( Rd Rn shape -- ) 1 0b10010 1 simd-2-misc ;
 : SHLL    ( Rd Rn shape -- ) 1 0b10011 0 simd-2-misc ;
@@ -1362,27 +1379,29 @@ PRIVATE>
         12
         30
     } encode ;
+
+: simd-2-misc*-elt ( Rd Rn shape U size1 opcode -- ) reach Q simd-2-misc* ;
 PRIVATE>
 
 : FCVTN    ( Rd Rn shape -- ) 0 0 0b10110 0 simd-2-misc* ;
 : FCVTL    ( Rd Rn shape -- ) 0 0 0b10111 0 simd-2-misc* ;
 : FCVTL2   ( Rd Rn shape -- ) 0 0 0b10111 1 simd-2-misc* ;
-: SCVTFvi  ( Rd Rn shape -- ) 0 0 0b11101 1 simd-2-misc* ;
-: FABSv    ( Rd Rn shape -- ) 0 1 0b01111 1 simd-2-misc* ;
-: UCVTFvi  ( Rd Rn shape -- ) 1 0 0b11101 1 simd-2-misc* ;
-: FCVTZSvi ( Rd Rn shape -- ) 0 1 0b11011 1 simd-2-misc* ;
-: FSQRTv   ( Rd Rn shape -- ) 1 1 0b11111 1 simd-2-misc* ;
+: SCVTFvi  ( Rd Rn shape -- ) 0 0 0b11101 simd-2-misc*-elt ;
+: FABSv    ( Rd Rn shape -- ) 0 1 0b01111 simd-2-misc*-elt ;
+: UCVTFvi  ( Rd Rn shape -- ) 1 0 0b11101 simd-2-misc*-elt ;
+: FCVTZSvi ( Rd Rn shape -- ) 0 1 0b11011 simd-2-misc*-elt ;
+: FSQRTv   ( Rd Rn shape -- ) 1 1 0b11111 simd-2-misc*-elt ;
 
 
 <PRIVATE
-: simd-across-lanes ( Rd Rn size U opcode -- )
-    {
-        { 0b1 30 }
+: simd-across-lanes ( Rd Rn shape U opcode -- )
+    [ dup ] 2dip {
         { 0b01110 24 }
         { 0b11000 17 }
         { 0b10 10 }
         { V 0 }
         { V 5 }
+        { Q 30 }
         { size 22 }
         29
         12
@@ -1415,14 +1434,14 @@ PRIVATE>
 
 <PRIVATE
 : simd-3-same ( Rd Rn Rm shape U opcode -- )
-    {
-        { 0b1 30 }
+    [ dup ] 2dip {
         { 0b01110 24 }
         { 0b1 21 }
         { 0b1 10 }
         { V 0 }
         { V 5 }
         { V 16 }
+        { Q 30 }
         { size 22 }
         29
         11
@@ -1456,14 +1475,14 @@ PRIVATE>
 
 <PRIVATE
 : simd-3-same* ( Rd Rn Rm shape U size1 opcode -- )
-    {
-        { 0b1 30 }
+    [ dup ] 3dip {
         { 0b01110 24 }
         { 0b1 21 }
         { 0b1 10 }
         { V 0 }
         { V 5 }
         { V 16 }
+        { Q 30 }
         { sz 22 }
         29
         23
