@@ -187,18 +187,43 @@ FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 { "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
-! Indirect result register not implemented
-cpu arm.64? [
+STRUCT: BAR { x long } { y long } { z long } ;
 
-    STRUCT: BAR { x long } { y long } { z long } ;
+FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
-    FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
 
-    { 11 6 -7 } [
-        11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
-    ] unit-test
+FUNCTION: BAR ffi_test_84 ( long x, ... long y, long z )
 
-] unless
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_84 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
+
+: callback-19 ( -- callback )
+    BAR { long long long } cdecl
+    [
+        BAR <struct>
+            swap >>z
+            swap >>y
+            swap >>x
+    ] alien-callback ;
+
+: callback-19-test ( x y z callback -- result )
+    BAR { long long long } cdecl alien-indirect ;
+
+{ 11 6 -7 } [
+    11 6 -7 callback-19 [
+        callback-19-test [ x>> ] [ y>> ] [ z>> ] tri
+    ] with-callback
+] unit-test
+
+FUNCTION: long ffi_test_85 ( void* f, long x, long y, long z )
+
+{ -69389 } [
+    callback-19 [ 11 6 -7 ffi_test_85 ] with-callback
+] unit-test
 
 STRUCT: TINY { x int } ;
 
@@ -244,18 +269,13 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
-! Indirect result register not implemented
-cpu arm.64? [
+: ffi_test_19 ( x y z -- BAR )
+    BAR "f-stdcall" "ffi_test_19" { long long long } f
+    alien-invoke gc ;
 
-    : ffi_test_19 ( x y z -- BAR )
-        BAR "f-stdcall" "ffi_test_19" { long long long } f
-        alien-invoke gc ;
-
-    { 11 6 -7 } [
-        11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
-    ] unit-test
-
-] unless
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
 
 : multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
     [ int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke ]

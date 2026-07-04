@@ -566,6 +566,12 @@ HOOK: float-right-align-on-stack? cpu ( -- ? )
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
+! Dedicated register for the struct return pointer, or f if it
+! is passed as an ordinary parameter
+HOOK: struct-return-reg cpu ( -- reg/f )
+
+M: object struct-return-reg f ;
+
 ! If t, stack parameters are packed at their natural size and
 ! alignment instead of one cell per parameter
 HOOK: compact-stack-params? cpu ( -- ? )

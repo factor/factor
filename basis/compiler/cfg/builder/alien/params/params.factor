@@ -73,6 +73,9 @@ SYMBOLS: stack-values reg-values ;
     [ odd-register? swap next-reg-param 3array reg-values ]
     if get push ;
 
+: fixed-reg-parameter ( vreg rep reg -- )
+    3array reg-values get push ;
+
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 
 : with-return-regs ( quot -- )

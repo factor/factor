@@ -498,6 +498,22 @@ long ffi_test_83(int a, int b, ...) {
   return (long)a * 1000000L + (long)b * 10000L + (long)c * 100L + d;
 }
 
+struct bar ffi_test_84(long x, ...) {
+  va_list args;
+  struct bar r;
+  va_start(args, x);
+  r.x = x;
+  r.y = va_arg(args, long);
+  r.z = va_arg(args, long);
+  va_end(args);
+  return r;
+}
+
+long ffi_test_85(struct bar (*f)(long, long, long), long x, long y, long z) {
+  struct bar r = f(x, y, z);
+  return r.x + r.y * 100 + r.z * 10000;
+}
+
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);
 }

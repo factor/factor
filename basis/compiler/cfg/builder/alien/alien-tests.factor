@@ -158,15 +158,15 @@ os macos? cpu arm.64? and [
 
     {
         V{
-            { 12 "int-rep" { 0 64 } } { 1 "int-rep" { 1 64 } }
-            { 2 "int-rep" { 2 64 } } { 3 "int-rep" { 3 64 } }
-            { 4 "int-rep" { 4 64 } } { 5 "int-rep" { 5 64 } }
-            { 6 "int-rep" { 6 64 } } { 7 "int-rep" { 7 64 } }
+            { 12 "int-rep" { 8 64 } } { 1 "int-rep" { 0 64 } }
+            { 2 "int-rep" { 1 64 } } { 3 "int-rep" { 2 64 } }
+            { 4 "int-rep" { 3 64 } } { 5 "int-rep" { 4 64 } }
+            { 6 "int-rep" { 5 64 } } { 7 "int-rep" { 6 64 } }
+            { 8 "int-rep" { 7 64 } }
         }
         V{
-            { 8 "int-rep" 0 4 }
-            { 9 "int-rep" 4 1 }
-            { 10 "int-rep" 6 2 }
+            { 9 "int-rep" 0 1 }
+            { 10 "int-rep" 2 2 }
             { 11 "int-rep" 8 8 }
         }
     } [

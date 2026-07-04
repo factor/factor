@@ -37,10 +37,14 @@ IN: compiler.cfg.builder.alien
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [
-        heap-size cell f ^^local-allot [
-            '[ _ prefix ]
-            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
-        ] keep
+        heap-size cell f ^^local-allot struct-return-reg [
+            [ dup int-rep ] dip fixed-reg-parameter
+        ] [
+            [
+                '[ _ prefix ]
+                [ int-rep struct-return-on-stack? f 3array prefix ] bi*
+            ] keep
+        ] if*
     ] [ drop f ] if ;
 
 : reserved-regs ( regs n -- regs' )
@@ -49,7 +53,8 @@ IN: compiler.cfg.builder.alien
 :: vararg-boundary ( params -- n )
     params parameters>> params varargs?>> head
     [ base-type flatten-parameter-type length ] map-sum
-    params return>> large-struct? [ 1 + ] when ;
+    params return>> large-struct? struct-return-reg not and
+    [ 1 + ] when ;
 
 :: promote-varargs ( reps params -- reps' )
     reps params vararg-boundary cut
@@ -157,8 +162,13 @@ M: #alien-assembly emit-node
     [ next-vreg dup ] 4dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
-    large-struct?
-    [ int-rep struct-return-on-stack? f cell callee-parameter ] [ f ] if ;
+    large-struct? [
+        struct-return-reg [
+            [ next-vreg dup int-rep ] dip fixed-reg-parameter
+        ] [
+            int-rep struct-return-on-stack? f cell callee-parameter
+        ] if*
+    ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
