@@ -130,21 +130,16 @@ pub const CallbackHeap = struct {
     }
 
     pub fn stubForEntryPoint(self: *Self, entry_point: Cell) ?*code_blocks.CodeBlock {
-        const seg = self.segment orelse return null;
-
-        var current = seg.start;
-        while (current < seg.end) {
-            const block: *code_blocks.CodeBlock = @ptrFromInt(current);
-            const block_size = block.size();
-
-            if (block_size == 0) break;
-            if (!block.isFree() and block.entryPoint() == entry_point) {
-                return block;
-            }
-
-            current += block_size;
-        }
-        return null;
+        // A callback stub's entry point immediately follows its header, so
+        // the stub is recovered in O(1). Reject an entry point outside the
+        // callback heap or one naming an already-freed stub, rather than
+        // writing a free-list header through an invalid pointer.
+        const stub_addr = entry_point -% @sizeOf(code_blocks.CodeBlock);
+        if (stub_addr < self.free_list.start or stub_addr >= self.free_list.end)
+            return null;
+        const block: *code_blocks.CodeBlock = @ptrFromInt(stub_addr);
+        if (block.isFree()) return null;
+        return block;
     }
 
     /// Reset the callback heap to a single empty free block. Used by

@@ -110,23 +110,15 @@ void factor_vm::primitive_callback() {
   ctx->push(allot_alien(func));
 }
 
-static code_block* callback_stub_for_entry_point(callback_heap* callbacks,
-                                                 void* entry_point) {
-  code_block* found = NULL;
-  auto callback_finder = [&](code_block* stub, cell size) {
-    (void)size;
-    if ((void*)stub->entry_point() == entry_point)
-      found = stub;
-  };
-  callbacks->allocator->iterate(callback_finder, no_fixup());
-  return found;
-}
-
 void factor_vm::primitive_free_callback() {
   cell callback = ctx->pop();
   void* entry_point = pinned_alien_offset(callback);
-  code_block* stub = callback_stub_for_entry_point(callbacks, entry_point);
-  if (!stub) {
+  // A callback stub's entry point immediately follows its header, so the
+  // stub is recovered in O(1). Reject an alien that does not point into
+  // the callback heap or names an already-freed stub, rather than writing
+  // a free-list header through an invalid pointer.
+  code_block* stub = (code_block*)entry_point - 1;
+  if (!callbacks->allocator->contains_p(stub) || stub->free_p()) {
     general_error(ERROR_EXPIRED, callback, false_object);
     return;
   }
