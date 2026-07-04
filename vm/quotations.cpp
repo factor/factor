@@ -84,12 +84,22 @@ bool quotation_jit::mega_lookup_p(cell i, cell length) {
       nth(i + 3) == parent->special_objects[MEGA_LOOKUP_WORD];
 }
 
-// Subprimitives should be flagged with whether they require a stack frame.
-// See #295.
-bool quotation_jit::special_subprimitive_p(cell obj) {
+// The signal/unwind handlers are the raw subprimitives that build a
+// signal-handler-sized frame; word_stack_frame_size must describe them
+// as such.
+bool quotation_jit::signal_handler_word_p(cell obj) {
   return obj == parent->special_objects[SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[LEAF_SIGNAL_HANDLER_WORD] ||
          obj == parent->special_objects[UNWIND_NATIVE_FRAMES_WORD];
+}
+
+// Subprimitives should be flagged with whether they require a stack frame.
+// See #295. inline-cache-miss-resume is emitted raw like the signal
+// handlers, but builds an ordinary JIT frame, so it belongs here but not
+// in signal_handler_word_p.
+bool quotation_jit::special_subprimitive_p(cell obj) {
+  return signal_handler_word_p(obj) ||
+         obj == parent->special_objects[PIC_MISS_RESUME_WORD];
 }
 
 // All quotations want a stack frame, except if they contain:
@@ -248,9 +258,8 @@ void quotation_jit::iterate_quotation() {
 }
 
 cell quotation_jit::word_stack_frame_size(cell obj) {
-  if (special_subprimitive_p(obj))
-    return SIGNAL_HANDLER_STACK_FRAME_SIZE;
-  return JIT_FRAME_SIZE;
+  return signal_handler_word_p(obj) ? SIGNAL_HANDLER_STACK_FRAME_SIZE
+                                    : JIT_FRAME_SIZE;
 }
 
 // Allocates memory

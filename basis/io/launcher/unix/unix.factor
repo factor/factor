@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-alien.utilities assocs combinators continuations environment fry
+alien.utilities assocs combinators combinators.short-circuit
+continuations environment fry
 io.backend io.backend.unix io.encodings.utf8 io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc math namespaces sequences simple-tokenizer
@@ -110,13 +111,26 @@ IN: io.launcher.unix
         { +new-session+ [ POSIX_SPAWN_SETSID bitor ] }
     } case ;
 
-: reset-fd* ( actions fd -- )
-    posix_spawn_file_actions_addinherit_np check-posix ;
+: fd-redirection? ( obj -- ? )
+    {
+        { [ dup not ] [ drop f ] }
+        { [ dup string? ] [ drop f ] }
+        { [ dup appender? ] [ drop f ] }
+        { [ dup +closed+ eq? ] [ drop f ] }
+        { [ dup +stdout+ eq? ] [ drop f ] }
+        { [ dup fd? ] [ drop t ] }
+        [ underlying-handle fd-redirection? ]
+    } cond ;
 
-: redirect-fd* ( actions oldfd fd -- )
-    2dup =
-    [ 3drop ]
-    [ posix_spawn_file_actions_adddup2 check-posix ] if ;
+: spawn-safe-redirection? ( process -- ? )
+    {
+        [ stdin>> fd-redirection? not ]
+        [ stdout>> fd-redirection? not ]
+        [
+            stderr>> dup +stdout+ eq?
+            [ drop t ] [ fd-redirection? not ] if
+        ]
+    } 1&& ;
 
 : redirect-file* ( actions obj flags fd -- )
     -rot [ normalize-path ] dip file-mode
@@ -135,7 +149,6 @@ IN: io.launcher.unix
         { [ pick string? ] [ redirect-file* ] }
         { [ pick appender? ] [ redirect-file-append* ] }
         { [ pick +closed+ eq? ] [ redirect-closed* ] }
-        { [ pick fd? ] [ [ drop fd>> 2dup reset-fd* ] dip redirect-fd* ] }
         [ [ underlying-handle ] 2dip redirect* ]
     } cond ;
 
@@ -183,6 +196,7 @@ M: unix (current-process) getpid ;
 
 M: unix (run-process)
     os macos? cpu arm.64? and
+    [ dup spawn-safe-redirection? ] [ f ] if
     [ spawn-process ] [ '[ _ fork-process ] [ ] with-fork ] if ;
 
 M: unix (kill-process)

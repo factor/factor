@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.instructions.syntax fry
-functors generic.parser kernel lexer namespaces parser sequences
+functors generic.parser kernel lexer math namespaces parser sequences
 sets slots words ;
 IN: compiler.cfg.renaming.functor
 
@@ -42,7 +42,7 @@ M: alien-call-insn rename-insn-defs
 
 M: ##callback-inputs rename-insn-defs
     [ [ first3 DEF-QUOT 2dip 3array ] map ] change-reg-outputs
-    [ [ first3 DEF-QUOT 2dip 3array ] map ] change-stack-outputs
+    [ [ first4 DEF-QUOT 3dip 4array ] map ] change-stack-outputs
     drop ;
 
 ! Special rename-insn-uses methods
@@ -54,7 +54,7 @@ M: ##phi rename-insn-uses
 
 M: alien-call-insn rename-insn-uses
     [ [ first3 USE-QUOT 2dip 3array ] map ] change-reg-inputs
-    [ [ first3 USE-QUOT 2dip 3array ] map ] change-stack-inputs
+    [ [ first4 USE-QUOT 3dip 4array ] map ] change-stack-inputs
     drop ;
 
 M: ##alien-indirect rename-insn-uses

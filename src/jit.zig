@@ -45,6 +45,8 @@ pub const JitTemplate = enum(u32) {
     pic_hit = @intFromEnum(objects.SpecialObject.pic_hit),
     pic_miss_word = @intFromEnum(objects.SpecialObject.pic_miss_word),
     pic_miss_tail_word = @intFromEnum(objects.SpecialObject.pic_miss_tail_word),
+    pic_miss_jump = @intFromEnum(objects.SpecialObject.pic_miss_jump),
+    pic_miss_tail_jump = @intFromEnum(objects.SpecialObject.pic_miss_tail_jump),
 
     // Megamorphic templates
     mega_lookup = @intFromEnum(objects.SpecialObject.mega_lookup),
@@ -549,7 +551,7 @@ pub const Jit = struct {
         // Adjust relocation offsets and append
         for (0..entry_count) |i| {
             const entry_bytes = reloc_data[i * 4 .. (i + 1) * 4];
-            var entry: code_blocks.RelocationEntry = @bitCast(entry_bytes[0..4].*);
+            var entry = code_blocks.RelocationEntry{ .value = std.mem.readInt(u32, entry_bytes[0..4], .little) };
 
             // Adjust offset to account for code already emitted
             const new_offset = entry.getOffset() + @as(u24, @intCast(current_offset));
@@ -559,8 +561,7 @@ pub const Jit = struct {
                 new_offset,
             );
 
-            const entry_u32: u32 = @bitCast(entry);
-            try self.relocation.appendSlice(self.vm.allocator, std.mem.asBytes(&entry_u32));
+            try self.relocation.appendSlice(self.vm.allocator, std.mem.asBytes(&entry.value));
         }
     }
 
@@ -912,12 +913,23 @@ pub const QuotationJit = struct {
         return self.nth(i + 3) == mega_word;
     }
 
-    // Check if word is a special subprimitive (signal handlers, unwinders)
-    fn isSpecialSubprimitive(self: *const Self, obj: Cell) bool {
+    // The signal/unwind handlers are the raw subprimitives that build a
+    // signal-handler-sized frame; wordStackFrameSize must describe them as
+    // such.
+    fn isSignalHandlerWord(self: *const Self, obj: Cell) bool {
         const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
         const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
         const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
         return obj == signal_handler or obj == leaf_signal or obj == unwind;
+    }
+
+    // Check if word is a special subprimitive (signal handlers, unwinders).
+    // inline-cache-miss-resume is emitted raw like the signal handlers, but
+    // builds an ordinary JIT frame, so it belongs here but not in
+    // isSignalHandlerWord.
+    fn isSpecialSubprimitive(self: *const Self, obj: Cell) bool {
+        const pic_miss_resume = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
+        return self.isSignalHandlerWord(obj) or obj == pic_miss_resume;
     }
 
     // Check if quotation needs a stack frame
@@ -1166,7 +1178,7 @@ pub const QuotationJit = struct {
 
     // Get stack frame size for a word
     pub fn wordStackFrameSize(self: *const Self, obj: Cell) Cell {
-        if (self.isSpecialSubprimitive(obj)) {
+        if (self.isSignalHandlerWord(obj)) {
             return SIGNAL_HANDLER_STACK_FRAME_SIZE;
         }
         return JIT_FRAME_SIZE;

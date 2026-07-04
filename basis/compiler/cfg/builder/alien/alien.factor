@@ -5,9 +5,9 @@ assocs classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture kernel layouts make math namespaces
-sequences sequences.generalizations stack-checker.alien system
-words ;
+compiler.tree cpu.architecture kernel layouts locals make math
+math.order namespaces sequences sequences.generalizations
+stack-checker.alien system words ;
 IN: compiler.cfg.builder.alien
 
 : with-param-regs ( abi quot -- reg-values stack-values )
@@ -27,42 +27,104 @@ IN: compiler.cfg.builder.alien
     struct-return-area set
     stack-params set ; inline
 
-: unbox-parameters ( parameters -- vregs reps )
-    [
+: macos-arm64-varargs-start ( params -- n/f )
+    dup alien-invoke-params? [ varargs?>> ] [ drop f ] if
+    dup integer? compact-stack-params? and [ drop f ] unless ;
+
+: vararg-value-struct? ( c-type vararg? -- ? )
+    [ dup struct-c-type? [ value-struct? ] [ drop f ] if ] [ drop f ] if ;
+
+:: (unbox-parameter) ( src c-type vararg? -- vregs reps )
+    c-type vararg? vararg-value-struct?
+    [ src c-type unbox-vararg-struct ]
+    [ src c-type unbox-parameter ] if ;
+
+: on-stack-rep ( rep-tuple -- rep-tuple' )
+    [ first ] [ third ] [ param-natural-size ] tri [ t ] 2dip 4array ;
+
+! AAPCS64: an aggregate that does not fit entirely in the remaining
+! parameter registers of its class is passed wholly on the stack, and
+! the unused registers of that class are wasted (N*RN is set to 8). A
+! single forward pass over the per-argument register groups computes
+! the on-stack flags so next-parameter honors them; the registers it
+! then skips stay unused.
+:: assign-aapcs64-flags ( groups -- groups' )
+    0 :> ngrn! 0 :> nsrn!
+    f :> int-done! f :> float-done!
+    groups [| group |
+        group first first reg-class-of int-regs eq? :> int?
+        group length :> n
+        int? [ int-done ngrn ] [ float-done nsrn ] if :> ( done used )
+        done used n + 8 > or
+        [ int? [ t int-done! ] [ t float-done! ] if group [ on-stack-rep ] map ]
+        [ int? [ used n + ngrn! ] [ used n + nsrn! ] if group ] if
+    ] map ;
+
+:: assign-fixed-aapcs64-flags ( groups vararg-start -- groups' )
+    compact-stack-params? [
+        groups vararg-start [ groups length ] unless* cut
+        [ assign-aapcs64-flags ] dip append
+    ] [ groups ] if ;
+
+:: unbox-parameters ( parameters vararg-start -- vregs reps )
+    parameters length :> len
+    parameters [
         [ length <iota> <reversed> ] keep
-        [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
-        2 2 mnmap [ concat ] bi@
+        [| n c-type |
+            n <ds-loc> peek-loc c-type base-type
+            vararg-start dup [ len 1 - n - swap >= ] when
+            (unbox-parameter)
+        ] 2 2 mnmap
+        [ concat ]
+        [ vararg-start assign-fixed-aapcs64-flags concat ] bi*
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
 : prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
     dup large-struct? [
-        heap-size cell f ^^local-allot [
-            '[ _ prefix ]
-            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
-        ] keep
+        heap-size cell f ^^local-allot struct-return-reg [
+            [ dup int-rep ] dip fixed-reg-parameter
+        ] [
+            [
+                '[ _ prefix ]
+                [ int-rep struct-return-on-stack? f 3array prefix ] bi*
+            ] keep
+        ] if*
     ] [ drop f ] if ;
 
-: (handle-macos-arm64-varargs) ( params -- )
-    function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
-    [ int-regs [ 2 tail* ] change ] when ;
+: reserved-regs ( regs n -- regs' )
+    index-or-length tail* ;
 
-: handle-macos-arm64-varargs ( params -- )
-    dup alien-invoke-params?
-    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
+:: vararg-boundary ( params -- n )
+    params parameters>> params varargs?>> head
+    [ base-type flatten-parameter-type length ] map-sum
+    params return>> large-struct? struct-return-reg not and
+    [ 1 + ] when ;
+
+:: promote-varargs ( reps params -- reps' )
+    reps params vararg-boundary cut
+    [ first3 cell 4array ] map :> ( fixed varargs )
+    fixed [ second ] reject keys [ reg-class-of ] map :> classes
+    int-regs [ classes [ int-regs = ] count reserved-regs ] change
+    float-regs [ classes [ float-regs = ] count reserved-regs ] change
+    fixed varargs append ;
+
+: handle-macos-arm64-varargs ( reps params -- reps' )
+    dup macos-arm64-varargs-start
+    [ promote-varargs ] [ drop ] if ;
 
 : (caller-parameters) ( vregs reps -- )
-    [ first3 next-parameter ] 2each ;
+    [ [ first3 ] [ param-natural-size ] bi next-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
         [ abi>> ]
-        [ parameters>> ]
+        [ [ parameters>> ] [ macos-arm64-varargs-start ] bi ]
         [ return>> ]
         [ ]
     } cleave
     '[
-        _ unbox-parameters
+        _ _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         _ handle-macos-arm64-varargs
         (caller-parameters)
@@ -140,16 +202,21 @@ M: #alien-assembly emit-node
     ]
     [ caller-return ] bi ;
 
-: callee-parameter ( rep on-stack? odd-register? -- dst )
-    [ next-vreg dup ] 3dip next-parameter ;
+: callee-parameter ( rep on-stack? odd-register? size -- dst )
+    [ next-vreg dup ] 4dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
-    large-struct?
-    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
+    large-struct? [
+        struct-return-reg [
+            [ next-vreg dup int-rep ] dip fixed-reg-parameter
+        ] [
+            int-rep struct-return-on-stack? f cell callee-parameter
+        ] if*
+    ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first3 callee-parameter ] map ] map ]
+    [ [ [ [ first3 ] [ param-natural-size ] bi callee-parameter ] map ] map ]
     [ [ keys ] map ] bi ;
 
 : box-parameters ( vregs reps params -- )

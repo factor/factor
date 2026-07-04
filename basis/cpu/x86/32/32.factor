@@ -212,6 +212,7 @@ M: x86.32 %safepoint
     0 EAX MOVABS rc-absolute rel-safepoint ;
 
 M: x86.32 dummy-stack-params? f ;
+M: x86.32 compact-stack-params? f ;
 
 M: x86.32 dummy-int-params? f ;
 

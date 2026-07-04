@@ -51,6 +51,11 @@ IN: cpu.arm.64.assembler.tests
 0xfd27bfa9 [ FP X9 SP -16 [pre] STP ] test-insn
 0xaaae3fa9 [ X10 X11 X21 -8 [+] STP ] test-insn
 
+0x61080129 [ W1 W2 X3 8 [+] STP ] test-insn
+0xc4947e29 [ W4 W5 X6 -12 [+] LDP ] test-insn
+0xaa2e3f29 [ W10 W11 X21 -8 [+] STP ] test-insn
+0xa006ff29 [ W0 W1 X21 -8 [pre] LDP ] test-insn
+
 0xae0240f8 [ X14 X21 [] LDUR ] test-insn
 
 0x4a554039 [ X10 X10 21 [+] LDRB ] test-insn
@@ -131,3 +136,33 @@ IN: cpu.arm.64.assembler.tests
 0x8454324f [ V4 V4 18 4S SHL ] test-insn
 0x4204356f [ V2 V2 11 4S USHR ] test-insn
 0x04a4082f [ V4 V0 16B UXTL ] test-insn
+
+! Signed loads into a W register (opc[0] set from Rt), vs X dest
+0x2000c039 [ W0 X1 [] LDRSB ] test-insn
+0x20008039 [ X0 X1 [] LDRSB ] test-insn
+0x2000c079 [ W0 X1 [] LDRSH ] test-insn
+0x20008079 [ X0 X1 [] LDRSH ] test-insn
+0x2068e238 [ W0 X1 X2 [+] LDRSB ] test-insn
+0x2078e278 [ W0 X1 X2 1 <LSL*> [+] LDRSH ] test-insn
+
+! Extended-register ADD/SUB with a W-sized Rm
+0x2048228b [ X0 X1 W2 2 <UXTW> ADD ] test-insn
+0x20a022cb [ X0 X1 W2 0 <SXTH> SUB ] test-insn
+0x2068228b [ X0 X1 X2 2 <UXTX> ADD ] test-insn
+
+! SIMD arrangements narrower than 128 bits (Q taken from the shape)
+0x2084220e [ V0 V1 V2 8B ADDv ] test-insn
+0x2084620e [ V0 V1 V2 4H ADDv ] test-insn
+0x2084a20e [ V0 V1 V2 2S ADDv ] test-insn
+0x20d4220e [ V0 V1 V2 2S FADDv ] test-insn
+0x2058200e [ V0 V1 8B CNTv ] test-insn
+0x20b8202e [ V0 V1 8B NEGv ] test-insn
+0x20a8600e [ V0 V1 4H CMLT ] test-insn
+0x20d8210e [ V0 V1 2S SCVTFvi ] test-insn
+0x20f8a00e [ V0 V1 2S FABSv ] test-insn
+0x20b8710e [ V0 V1 4H ADDV ] test-insn
+0x2028820e [ V0 V1 V2 2S TRN1 ] test-insn
+0x2038020e [ V0 V1 V2 8B ZIP1 ] test-insn
+
+! MOVZ rejects an out-of-range immediate
+[ W0 0x1ffff 0 MOVZ ] must-fail

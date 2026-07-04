@@ -1,24 +1,35 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs cpu.architecture fry kernel layouts locals
-math math.order namespaces sequences vectors ;
+math math.order namespaces sequences system vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 
-GENERIC: alloc-stack-param ( rep -- n )
+: param-natural-size ( rep-tuple -- size )
+    dup length 3 > [ fourth ] [ drop cell ] if ;
 
-M: object alloc-stack-param
-    stack-params get
-    [ rep-size cell align stack-params +@ ] dip ;
+: stack-param-values ( rep-tuple -- vreg rep n size )
+    [ first3 ] [ param-natural-size ] bi ;
 
-M: float-rep alloc-stack-param
-    stack-params get swap rep-size
-    [ cell align stack-params +@ ] keep
+GENERIC: (alloc-stack-param) ( rep -- n )
+
+M:: object (alloc-stack-param) ( rep -- n )
+    stack-params get dup rep rep-size cell align + stack-params set ;
+
+M:: float-rep (alloc-stack-param) ( rep -- n )
+    stack-params get rep rep-size [ cell align stack-params +@ ] keep
     float-right-align-on-stack? [ + ] [ drop ] if ;
 
+:: alloc-compact-param ( size -- n )
+    stack-params get size align dup size + stack-params set ;
+
+: alloc-stack-param ( rep size -- n )
+    compact-stack-params?
+    [ nip alloc-compact-param ] [ drop (alloc-stack-param) ] if ;
+
 : ?dummy-stack-params ( rep -- )
-    dummy-stack-params? [ alloc-stack-param drop ] [ drop ] if ;
+    dummy-stack-params? [ cell alloc-stack-param drop ] [ drop ] if ;
 
 : ?dummy-int-params ( rep -- )
     dummy-int-params? [
@@ -55,11 +66,15 @@ M: object next-reg-param
 
 SYMBOLS: stack-values reg-values ;
 
-:: next-parameter ( vreg rep on-stack? odd-register? -- )
+:: next-parameter ( vreg rep on-stack? odd-register? size -- )
     vreg rep on-stack?
     [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ alloc-stack-param stack-values ] [ odd-register? swap next-reg-param reg-values ] if
-    [ 3array ] dip get push ;
+    [ size alloc-stack-param size 4array stack-values ]
+    [ odd-register? swap next-reg-param 3array reg-values ]
+    if get push ;
+
+: fixed-reg-parameter ( vreg rep reg -- )
+    3array reg-values get push ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 

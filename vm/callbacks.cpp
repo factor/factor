@@ -78,28 +78,6 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);
 
-#if defined(FACTOR_ARM64) && defined(WINDOWS)
-  uint32_t* instructions = (uint32_t*)stub->entry_point();
-  for (cell i = 0; i < size / sizeof(uint32_t); i++) {
-    if (instructions[i] == 0xa900bd2e || instructions[i] == 0xa900b92f) {
-      instructions[i] = 0xa900ba4f;
-    }
-
-    if (i + 4 < size / sizeof(uint32_t) &&
-        instructions[i] == 0x910003e9 &&
-        instructions[i + 1] == 0xf9001289 &&
-        instructions[i + 2] == 0xf940064e &&
-        instructions[i + 3] == 0xf9400a4f &&
-        instructions[i + 4] == 0xa9bf3fee) {
-      instructions[i] = 0xf940064e;
-      instructions[i + 1] = 0xf9400a4f;
-      instructions[i + 2] = 0xa9bf3fee;
-      instructions[i + 3] = 0x910003e9;
-      instructions[i + 4] = 0xf9001289;
-    }
-  }
-#endif
-
   // Store VM pointer in two relocations.
   store_callback_operand(stub, 0, (cell)parent);
 #ifdef FACTOR_ARM64
@@ -133,8 +111,17 @@ void factor_vm::primitive_callback() {
 }
 
 void factor_vm::primitive_free_callback() {
-  void* entry_point = alien_offset(ctx->pop());
+  cell callback = ctx->pop();
+  void* entry_point = pinned_alien_offset(callback);
+  // A callback stub's entry point immediately follows its header, so the
+  // stub is recovered in O(1). Reject an alien that does not point into
+  // the callback heap or names an already-freed stub, rather than writing
+  // a free-list header through an invalid pointer.
   code_block* stub = (code_block*)entry_point - 1;
+  if (!callbacks->allocator->contains_p(stub) || stub->free_p()) {
+    general_error(ERROR_EXPIRED, callback, false_object);
+    return;
+  }
   // Writes a free-list header into the MAP_JIT callback heap.
   jit_writable_scope jit_writable;
   callbacks->allocator->free(stub);

@@ -22,6 +22,7 @@ M: ppc param-regs
 M: ppc value-struct? drop t ;
 
 M: ppc dummy-stack-params? t ;
+M: ppc compact-stack-params? f ;
 
 M: ppc dummy-int-params? t ;
 

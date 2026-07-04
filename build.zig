@@ -87,6 +87,8 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
+    var macos_bundle_step: ?*std.Build.Step = null;
+
     // On macOS, also drop the binary into Factor.app/Contents/MacOS/factor and
     // refresh the ./factor symlink, mirroring `make`'s macos.app target. The
     // bundle (Info.plist, Resources, Frameworks) is already in the repo. Running
@@ -104,10 +106,16 @@ pub fn build(b: *std.Build) void {
         copy_to_bundle.addArtifactArg(exe);
         copy_to_bundle.addArg("Factor.app/Contents/MacOS/factor");
         copy_to_bundle.step.dependOn(&mkdir_bundle.step);
+        const sign_bundle = b.addSystemCommand(&.{ "codesign", "--force", "--sign", "-", "--entitlements", "factor.entitlements", "Factor.app/Contents/MacOS/factor" });
+        sign_bundle.setCwd(b.path("."));
+        sign_bundle.step.dependOn(&copy_to_bundle.step);
         const link_factor = b.addSystemCommand(&.{ "ln", "-sf", "Factor.app/Contents/MacOS/factor", "factor" });
         link_factor.setCwd(b.path("."));
-        link_factor.step.dependOn(&copy_to_bundle.step);
+        link_factor.step.dependOn(&sign_bundle.step);
+        const app_step = b.step("app", "Build the Zig VM and copy it into Factor.app/Contents/MacOS/factor");
+        app_step.dependOn(&link_factor.step);
         b.getInstallStep().dependOn(&link_factor.step);
+        macos_bundle_step = &link_factor.step;
     } else {
         // On non-macOS platforms there's no app bundle, so just drop the
         // freshly-built binary at the build root as ./factor (mirroring `make`'s
@@ -120,12 +128,17 @@ pub fn build(b: *std.Build) void {
     }
 
     // Run command
-    const run_cmd = b.addRunArtifact(exe);
-    run_cmd.step.dependOn(b.getInstallStep());
-
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    const run_cmd = if (target.result.os.tag == .macos) blk: {
+        const cmd = b.addSystemCommand(&.{"Factor.app/Contents/MacOS/factor"});
+        cmd.setCwd(b.path("."));
+        cmd.step.dependOn(macos_bundle_step.?);
+        break :blk cmd;
+    } else blk: {
+        const cmd = b.addRunArtifact(exe);
+        cmd.step.dependOn(b.getInstallStep());
+        break :blk cmd;
+    };
+    run_cmd.addPassthruArgs();
 
     const run_step = b.step("run", "Run the Factor VM");
     run_step.dependOn(&run_cmd.step);

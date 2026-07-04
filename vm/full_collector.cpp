@@ -99,7 +99,7 @@ void factor_vm::collect_sweep_impl() {
   mark_bits* state = &code->allocator->state;
   FACTOR_FOR_EACH(code_roots) {
     code_root* root = *iter;
-    cell block = root->value & (~data_alignment - 1);
+    cell block = root->value & (~data_alignment + 1);
     if (root->valid && !state->marked_p(block))
       root->valid = false;
   }

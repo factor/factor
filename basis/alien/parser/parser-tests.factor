@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.parser alien.parser.private
-alien.syntax compiler.units continuations debugger eval kernel
-lexer namespaces parser sequences sets summary tools.test
+alien.syntax classes compiler.units continuations debugger eval
+kernel lexer namespaces parser sequences sets summary tools.test
 vocabs.parser words ;
 IN: alien.parser.tests
 
@@ -109,6 +109,21 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
 ] unit-test
 
 { t } [ \ alien-parser-callback-effect-test inline? ] unit-test
+
+[
+    "USING: alien.c-types alien.syntax ; CALLBACK: void alien-parser-varargs-callback-test ( ... int arg )"
+    eval( -- )
+] [ error>> class-of name>> "varargs-in-callback-declaration" = ] must-fail-with
+
+! Variadic float promotes to double (C default argument promotion);
+! other types are unchanged. The type words are resolved when this file
+! is parsed, so the test does not depend on the ambient vocabulary.
+{ t } [ \ float promote-vararg-type \ double eq? ] unit-test
+{ t } [ \ int promote-vararg-type \ int eq? ] unit-test
+
+[
+    { "( int a, ... int b, ... int c )" } [ scan-c-args* ] with-parsing
+] [ error>> duplicate-varargs-marker? ] must-fail-with
 
 ! Reported by mnestic
 TYPEDEF: int alien-parser-test-int ! reasonably unique name...

@@ -73,14 +73,109 @@ FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
 { 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
+FUNCTION: long ffi_test_71 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, char c, short s, int i, long l )
 
-    FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+{ 9101112 } [
+    1 2 3 4 5 6 7 8 9 10 11 12 ffi_test_71
+] unit-test
 
-    { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
+FUNCTION: long ffi_test_73 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, char c, short s, int n,
+    ... int i, long l )
 
-] unless
+{ 9101112 } [
+    1 2 3 4 5 6 7 8 9 10 2 11 12 ffi_test_73
+] unit-test
+
+PACKED-STRUCT: packed-test-struct { c char } { i int } ;
+PACKED-STRUCT: packed-test-struct-2 { c char } { l long } ;
+
+: make-packed-test-struct ( -- p )
+    packed-test-struct <struct> 9 >>c 11 >>i ;
+
+: make-packed-test-struct-2 ( -- p )
+    packed-test-struct-2 <struct> 9 >>c 11 >>l ;
+
+FUNCTION: long ffi_test_74 ( packed-test-struct p, char z )
+
+{ 9001112 } [ make-packed-test-struct 12 ffi_test_74 ] unit-test
+
+FUNCTION: long ffi_test_75 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, packed-test-struct p, char z )
+
+{ 9001112 } [
+    1 2 3 4 5 6 7 8 make-packed-test-struct 12 ffi_test_75
+] unit-test
+
+FUNCTION: packed-test-struct ffi_test_76 ( )
+
+{ 9 11 } [ ffi_test_76 [ c>> ] [ i>> ] bi ] unit-test
+
+FUNCTION: long ffi_test_77 ( void* callback )
+
+: packed-test-callback ( -- callback )
+    long { packed-test-struct char } cdecl [
+        swap [ c>> 1000000 * ] [ i>> 100 * ] bi + +
+    ] alien-callback ;
+
+{ 9001112 } [ packed-test-callback [ ffi_test_77 ] with-callback ] unit-test
+
+FUNCTION: long ffi_test_78 ( packed-test-struct-2 p, char z )
+
+{ 9000000001112 } [ make-packed-test-struct-2 12 ffi_test_78 ] unit-test
+
+FUNCTION: long ffi_test_79 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, packed-test-struct-2 p, char z )
+
+{ 9000000001112 } [
+    1 2 3 4 5 6 7 8 make-packed-test-struct-2 12 ffi_test_79
+] unit-test
+
+FUNCTION: packed-test-struct-2 ffi_test_80 ( )
+
+{ 9 11 } [ ffi_test_80 [ c>> ] [ l>> ] bi ] unit-test
+
+FUNCTION: long ffi_test_81 ( void* callback )
+
+: packed-test-callback-2 ( -- callback )
+    long { packed-test-struct-2 char } cdecl [
+        swap [ c>> 1000000000000 * ] [ l>> 100 * ] bi + +
+    ] alien-callback ;
+
+{ 9000000001112 } [
+    packed-test-callback-2 [ ffi_test_81 ] with-callback
+] unit-test
+
+FUNCTION: long ffi_test_82 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, char b, packed-test-struct p, char z )
+
+{ 39001112 } [
+    1 2 3 4 5 6 7 8 3 make-packed-test-struct 12 ffi_test_82
+] unit-test
+
+FUNCTION: long ffi_test_83 ( int a, int b, ... int c, long d )
+
+{ 1020304 } [ 1 2 3 4 ffi_test_83 ] unit-test
+
+! The stack layout bugs these cover only show up when the stack
+! holds garbage, so exercise them under compaction churn.
+{ t } [
+    50 <iota> [
+        drop
+        1 2 3 4 5 6 7 8 make-packed-test-struct 12 ffi_test_75 9001112 =
+        1 2 3 4 5 6 7 8 make-packed-test-struct-2 12 ffi_test_79
+        9000000001112 = and
+        1 2 3 4 5 6 7 8 3 make-packed-test-struct 12 ffi_test_82
+        39001112 = and
+        1 2 3 4 ffi_test_83 1020304 = and
+        compact-gc
+    ] all?
+] unit-test
+
+FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
+
+{ 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
@@ -92,18 +187,83 @@ FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 { "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
-! Indirect result register not implemented
-cpu arm.64? [
+STRUCT: BAR { x long } { y long } { z long } ;
 
-    STRUCT: BAR { x long } { y long } { z long } ;
+FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
-    FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
 
-    { 11 6 -7 } [
-        11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
-    ] unit-test
+FUNCTION: BAR ffi_test_84 ( long x, ... long y, long z )
 
-] unless
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_84 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
+
+: callback-19 ( -- callback )
+    BAR { long long long } cdecl
+    [
+        BAR <struct>
+            swap >>z
+            swap >>y
+            swap >>x
+    ] alien-callback ;
+
+: callback-19-test ( x y z callback -- result )
+    BAR { long long long } cdecl alien-indirect ;
+
+{ 11 6 -7 } [
+    11 6 -7 callback-19 [
+        callback-19-test [ x>> ] [ y>> ] [ z>> ] tri
+    ] with-callback
+] unit-test
+
+FUNCTION: long ffi_test_85 ( void* f, long x, long y, long z )
+
+{ -69389 } [
+    callback-19 [ 11 6 -7 ffi_test_85 ] with-callback
+] unit-test
+
+STRUCT: FLOAT-PAIR { a float } { b float } ;
+STRUCT: LONG-PAIR { a long } { b long } ;
+
+! A homogeneous-float aggregate that does not fit in the remaining
+! SIMD registers goes wholly on the stack, wasting V7.
+FUNCTION: double ffi_test_86 ( float f0, float f1, float f2, float f3, float f4, float f5, float f6, FLOAT-PAIR h, float tail )
+
+{ 30279.5 } [
+    1.0 2.0 3.0 4.0 5.0 6.0 7.0
+    S{ FLOAT-PAIR { a 1.5 } { b 2.5 } } 3.0 ffi_test_86
+] unit-test
+
+! Same for an integer aggregate that does not fit, wasting X7.
+FUNCTION: long ffi_test_87 ( long x0, long x1, long x2, long x3, long x4, long x5, long x6, LONG-PAIR s, long tail )
+
+{ 332239 } [
+    1 2 3 4 5 6 7
+    S{ LONG-PAIR { a 11 } { b 22 } } 33 ffi_test_87
+] unit-test
+
+FUNCTION: double ffi_test_88 ( long n, ... FLOAT-PAIR h, int tail )
+
+{ 70251.5 } [
+    1 S{ FLOAT-PAIR { a 1.5 } { b 2.5 } } 7 ffi_test_88
+] unit-test
+
+FUNCTION: double ffi_test_89 ( long n, ... float x )
+
+{ 1.5 } [ 1 1.5 ffi_test_89 ] unit-test
+
+! A spilled integer aggregate exhausts the integer registers (X7 wasted)
+! but leaves the SIMD registers free, so the following double still lands
+! in V0.
+FUNCTION: double ffi_test_91 ( long x0, long x1, long x2, long x3, long x4, long x5, long x6, LONG-PAIR s, double d, long tail )
+
+{ 3311239.0 } [
+    1 2 3 4 5 6 7
+    S{ LONG-PAIR { a 11 } { b 22 } } 9.0 33 ffi_test_91
+] unit-test
 
 STRUCT: TINY { x int } ;
 
@@ -149,18 +309,13 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
-! Indirect result register not implemented
-cpu arm.64? [
+: ffi_test_19 ( x y z -- BAR )
+    BAR "f-stdcall" "ffi_test_19" { long long long } f
+    alien-invoke gc ;
 
-    : ffi_test_19 ( x y z -- BAR )
-        BAR "f-stdcall" "ffi_test_19" { long long long } f
-        alien-invoke gc ;
-
-    { 11 6 -7 } [
-        11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
-    ] unit-test
-
-] unless
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
 
 : multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
     [ int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke ]
@@ -189,28 +344,23 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 
 { } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
+! Make sure XT doesn't get clobbered in stack frame
 
-    ! Make sure XT doesn't get clobbered in stack frame
+: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
+    int
+    "f-cdecl" "ffi_test_31"
+    { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
+    alien-invoke gc 3 ;
 
-    : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
-        int
-        "f-cdecl" "ffi_test_31"
-        { int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int int } f
-        alien-invoke gc 3 ;
+{ 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
 
-    { 861 3 } [ 42 [ ] each-integer ffi_test_31 ] unit-test
+: ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
+    float
+    "f-cdecl" "ffi_test_31_point_5"
+    { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
+    alien-invoke ;
 
-    : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
-        float
-        "f-cdecl" "ffi_test_31_point_5"
-        { float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float float } f
-        alien-invoke ;
-
-    { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
-
-] unless
+{ 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
@@ -948,29 +1098,24 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
     ] times
 ] unit-test
 
-! Varargs are currently not supported on arm64 macos
-cpu arm.64? os macos? and [
+! Varargs with non-float parameters works.
+FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, ... int a, int b )
+FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, ... int a, int b, int c )
 
-    ! Varargs with non-float parameters works.
-    FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
-    FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
+{ 30 60 } [
+    2 10 20 do-sum-ints2
+    3 10 20 30 do-sum-ints3
+] unit-test
 
-    { 30 60 } [
-        2 10 20 do-sum-ints2
-        3 10 20 30 do-sum-ints3
+FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, ... double a, double b )
+FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, ... double a, double b, double c )
+
+! Varargs with non-floats doesn't work on windows
+os windows? [
+    { 27.0 22.0 } [
+        2 7 20 do-sum-doubles2
+        3 5 10 7 do-sum-doubles3
     ] unit-test
-
-    ! Varargs with non-floats doesn't work on windows
-    FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
-    FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
-
-    os windows? [
-        { 27.0 22.0 } [
-            2 7 20 do-sum-doubles2
-            3 5 10 7 do-sum-doubles3
-        ] unit-test
-    ] unless
-
 ] unless
 
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
