@@ -913,13 +913,23 @@ pub const QuotationJit = struct {
         return self.nth(i + 3) == mega_word;
     }
 
-    // Check if word is a special subprimitive (signal handlers, unwinders)
-    fn isSpecialSubprimitive(self: *const Self, obj: Cell) bool {
+    // The signal/unwind handlers are the raw subprimitives that build a
+    // signal-handler-sized frame; wordStackFrameSize must describe them as
+    // such.
+    fn isSignalHandlerWord(self: *const Self, obj: Cell) bool {
         const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
         const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
         const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
+        return obj == signal_handler or obj == leaf_signal or obj == unwind;
+    }
+
+    // Check if word is a special subprimitive (signal handlers, unwinders).
+    // inline-cache-miss-resume is emitted raw like the signal handlers, but
+    // builds an ordinary JIT frame, so it belongs here but not in
+    // isSignalHandlerWord.
+    fn isSpecialSubprimitive(self: *const Self, obj: Cell) bool {
         const pic_miss_resume = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.pic_miss_resume_word)];
-        return obj == signal_handler or obj == leaf_signal or obj == unwind or obj == pic_miss_resume;
+        return self.isSignalHandlerWord(obj) or obj == pic_miss_resume;
     }
 
     // Check if quotation needs a stack frame
@@ -1168,10 +1178,7 @@ pub const QuotationJit = struct {
 
     // Get stack frame size for a word
     pub fn wordStackFrameSize(self: *const Self, obj: Cell) Cell {
-        const signal_handler = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
-        const leaf_signal = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
-        const unwind = self.jit.vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)];
-        if (obj == signal_handler or obj == leaf_signal or obj == unwind) {
+        if (self.isSignalHandlerWord(obj)) {
             return SIGNAL_HANDLER_STACK_FRAME_SIZE;
         }
         return JIT_FRAME_SIZE;

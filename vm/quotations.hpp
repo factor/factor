@@ -21,6 +21,7 @@ struct quotation_jit : public jit {
   bool fast_3dip_p(cell i, cell length);
   bool mega_lookup_p(cell i, cell length);
   bool declare_p(cell i, cell length);
+  bool signal_handler_word_p(cell obj);
   bool special_subprimitive_p(cell obj);
 
   void emit_mega_cache_lookup(cell methods, fixnum index, cell cache);
