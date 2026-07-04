@@ -115,6 +115,21 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
     eval( -- )
 ] [ error>> class-of name>> "varargs-in-callback-declaration" = ] must-fail-with
 
+: vararg-arg-type-names ( -- names names' varargs? )
+    scan-c-args* [ [ name>> ] map ] 2dip ;
+
+{ { "int" "double" } { "a" "b" } 1 } [
+    { "( int a, ... float b )" } [ vararg-arg-type-names ] with-parsing
+] unit-test
+
+{ { "float" "int" "double" } { "a" "b" "c" } 1 } [
+    { "( float a, ... int b, float c )" } [ vararg-arg-type-names ] with-parsing
+] unit-test
+
+[
+    { "( int a, ... int b, ... int c )" } [ scan-c-args* ] with-parsing
+] [ error>> duplicate-varargs-marker? ] must-fail-with
+
 ! Reported by mnestic
 TYPEDEF: int alien-parser-test-int ! reasonably unique name...
 

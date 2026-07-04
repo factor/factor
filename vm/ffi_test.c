@@ -514,6 +514,23 @@ long ffi_test_85(struct bar (*f)(long, long, long), long x, long y, long z) {
   return r.x + r.y * 100 + r.z * 10000;
 }
 
+double ffi_test_88(long n, ...) {
+  va_list args;
+  va_start(args, n);
+  struct float_pair h = va_arg(args, struct float_pair);
+  int tail = va_arg(args, int);
+  va_end(args);
+  return h.a + h.b * 100 + tail * 10000;
+}
+
+double ffi_test_89(long n, ...) {
+  va_list args;
+  va_start(args, n);
+  double x = va_arg(args, double);
+  va_end(args);
+  return x;
+}
+
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);
 }

@@ -1,6 +1,6 @@
 USING: alien alien.libraries compiler.cfg compiler.cfg.builder
 compiler.cfg.instructions compiler.errors compiler.tree help.markup
-help.syntax literals make multiline sequences stack-checker.alien
+help.syntax literals make math multiline sequences stack-checker.alien
 strings ;
 IN: compiler.cfg.builder.alien
 
@@ -48,8 +48,8 @@ HELP: emit-callback-return
 { $description "Emits a " { $link ##callback-outputs } " instruction for the " { $link #alien-callback } " if needed." } ;
 
 HELP: unbox-parameters
-{ $values { "parameters" sequence } { "vregs" sequence } { "reps" sequence } }
-{ $description "Unboxes a sequence of parameters to send to an ffi function." } ;
+{ $values { "parameters" sequence } { "vararg-start" { $maybe integer } } { "vregs" sequence } { "reps" sequence } }
+{ $description "Unboxes a sequence of parameters to send to an ffi function. Parameters at or past " { $snippet "vararg-start" } " follow the platform's variadic ABI." } ;
 
 ARTICLE: "compiler.cfg.builder.alien"
 "CFG node emitter for alien nodes"

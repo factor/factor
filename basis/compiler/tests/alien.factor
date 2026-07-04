@@ -225,6 +225,18 @@ FUNCTION: long ffi_test_85 ( void* f, long x, long y, long z )
     callback-19 [ 11 6 -7 ffi_test_85 ] with-callback
 ] unit-test
 
+STRUCT: FLOAT-PAIR { a float } { b float } ;
+
+FUNCTION: double ffi_test_88 ( long n, ... FLOAT-PAIR h, int tail )
+
+{ 70251.5 } [
+    1 S{ FLOAT-PAIR { a 1.5 } { b 2.5 } } 7 ffi_test_88
+] unit-test
+
+FUNCTION: double ffi_test_89 ( long n, ... float x )
+
+{ 1.5 } [ 1 1.5 ffi_test_89 ] unit-test
+
 STRUCT: TINY { x int } ;
 
 FUNCTION: TINY ffi_test_17 ( int x )

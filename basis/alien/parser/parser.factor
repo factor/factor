@@ -5,6 +5,7 @@ arrays classes classes.parser combinators
 combinators.short-circuit compiler.units effects kernel lexer
 math namespaces parser sequences splitting summary vocabs.parser
 words ;
+QUALIFIED-WITH: alien.c-types c
 IN: alien.parser
 
 SYMBOL: current-library
@@ -113,16 +114,25 @@ PRIVATE>
 : scan-function-name ( -- return function )
     scan-c-type scan-token parse-pointers ;
 
+ERROR: duplicate-varargs-marker ;
+
+: promote-vararg-type ( type -- type )
+    dup c:float eq? [ drop c:double ] when ;
+
 :: scan-c-args* ( -- types names varargs? )
     V{ } clone :> types
     V{ } clone :> names
     f :> varargs!
     "(" expect scan-token [ dup ")" = ] [
-        dup "..." =
-        [ drop types length varargs! ] [
+        dup "..." = [
+            drop varargs [ duplicate-varargs-marker ] when
+            types length varargs!
+        ] [
             parse-c-type
             scan-token "," ?tail drop
-            parse-pointers [ types push ] [ names push ] bi*
+            parse-pointers
+            [ varargs [ promote-vararg-type ] when types push ]
+            [ names push ] bi*
         ] if
         scan-token
     ] until drop types names [ >array ] bi@ varargs ;

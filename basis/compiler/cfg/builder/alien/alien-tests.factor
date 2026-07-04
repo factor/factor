@@ -254,7 +254,7 @@ cpu x86.32?
     { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
 } ? [
-    [ { c-string int } unbox-parameters ] V{ } make
+    [ { c-string int } f unbox-parameters ] V{ } make
 ] cfg-unit-test
 
 ! with-param-regs*

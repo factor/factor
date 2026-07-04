@@ -306,6 +306,13 @@ FACTOR_EXPORT struct bar ffi_test_84(long x, ...);
 FACTOR_EXPORT long ffi_test_85(struct bar (*f)(long, long, long), long x,
                                long y, long z);
 
+struct float_pair {
+  float a, b;
+};
+
+FACTOR_EXPORT double ffi_test_88(long n, ...);
+FACTOR_EXPORT double ffi_test_89(long n, ...);
+
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);
 FACTOR_EXPORT void* bug1021_test_3(int x);

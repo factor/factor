@@ -35,10 +35,12 @@ M: long-long-type flatten-c-type
 HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
-M: object flatten-struct-type
+: flatten-cell-struct ( c-type -- reps )
     heap-size cell align cell /i
-    [ int-rep cell rep-tuple ] replicate
-    record-reg-reps ;
+    [ int-rep cell rep-tuple ] replicate ;
+
+M: object flatten-struct-type
+    flatten-cell-struct record-reg-reps ;
 
 M: struct-c-type flatten-c-type
     flatten-struct-type ;
@@ -67,6 +69,15 @@ M: object flatten-struct-type-return
 :: implode-struct ( src vregs reps -- )
     vregs reps dup component-offsets
     [| vreg rep offset | vreg src offset rep f ##store-memory-imm, ] 3each ;
+
+:: explode-struct-cells ( src c-type -- vregs reps )
+    c-type flatten-cell-struct :> reps
+    reps keys dup component-offsets
+    [| rep offset | src offset rep f ^^load-memory-imm ] 2map
+    reps ;
+
+: unbox-vararg-struct ( src c-type -- vregs reps )
+    [ ^^unbox-any-c-ptr ] dip explode-struct-cells ;
 
 GENERIC: unbox ( src c-type -- vregs reps )
 

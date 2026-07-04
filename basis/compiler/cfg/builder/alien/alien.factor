@@ -27,11 +27,27 @@ IN: compiler.cfg.builder.alien
     struct-return-area set
     stack-params set ; inline
 
-: unbox-parameters ( parameters -- vregs reps )
-    [
+: macos-arm64-varargs-start ( params -- n/f )
+    dup alien-invoke-params? [ varargs?>> ] [ drop f ] if
+    dup integer? compact-stack-params? and [ drop f ] unless ;
+
+: vararg-value-struct? ( c-type vararg? -- ? )
+    [ dup struct-c-type? [ value-struct? ] [ drop f ] if ] [ drop f ] if ;
+
+:: (unbox-parameter) ( src c-type vararg? -- vregs reps )
+    c-type vararg? vararg-value-struct?
+    [ src c-type unbox-vararg-struct ]
+    [ src c-type unbox-parameter ] if ;
+
+:: unbox-parameters ( parameters vararg-start -- vregs reps )
+    parameters length :> len
+    parameters [
         [ length <iota> <reversed> ] keep
-        [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
-        2 2 mnmap [ concat ] bi@
+        [| n c-type |
+            n <ds-loc> peek-loc c-type base-type
+            vararg-start dup [ len 1 - n - swap >= ] when
+            (unbox-parameter)
+        ] 2 2 mnmap [ concat ] bi@
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
@@ -65,8 +81,7 @@ IN: compiler.cfg.builder.alien
     fixed varargs append ;
 
 : handle-macos-arm64-varargs ( reps params -- reps' )
-    dup dup alien-invoke-params? [ varargs?>> integer? ] [ drop f ] if
-    compact-stack-params? and
+    dup macos-arm64-varargs-start
     [ promote-varargs ] [ drop ] if ;
 
 : (caller-parameters) ( vregs reps -- )
@@ -75,12 +90,12 @@ IN: compiler.cfg.builder.alien
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
         [ abi>> ]
-        [ parameters>> ]
+        [ [ parameters>> ] [ macos-arm64-varargs-start ] bi ]
         [ return>> ]
         [ ]
     } cleave
     '[
-        _ unbox-parameters
+        _ _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
         _ handle-macos-arm64-varargs
         (caller-parameters)
