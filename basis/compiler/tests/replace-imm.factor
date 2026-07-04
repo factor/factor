@@ -1,6 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences tools.test ;
+USING: arrays kernel math sequences sequences.generalizations
+tools.test ;
 IN: compiler.tests.replace-imm
 
 ! Immediate stores into stack slots beyond the signed unscaled
