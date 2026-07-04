@@ -514,6 +514,16 @@ long ffi_test_85(struct bar (*f)(long, long, long), long x, long y, long z) {
   return r.x + r.y * 100 + r.z * 10000;
 }
 
+double ffi_test_86(float f0, float f1, float f2, float f3, float f4,
+                   float f5, float f6, struct float_pair h, float tail) {
+  return h.a + h.b * 100 + tail * 10000 + f0 + f1 + f2 + f3 + f4 + f5 + f6;
+}
+
+long ffi_test_87(long x0, long x1, long x2, long x3, long x4, long x5,
+                 long x6, struct long_pair s, long tail) {
+  return s.a + s.b * 100 + tail * 10000 + x0 + x1 + x2 + x3 + x4 + x5 + x6;
+}
+
 double ffi_test_88(long n, ...) {
   va_list args;
   va_start(args, n);
@@ -521,6 +531,12 @@ double ffi_test_88(long n, ...) {
   int tail = va_arg(args, int);
   va_end(args);
   return h.a + h.b * 100 + tail * 10000;
+}
+
+double ffi_test_91(long x0, long x1, long x2, long x3, long x4, long x5,
+                   long x6, struct long_pair s, double d, long tail) {
+  return s.a + s.b * 100 + d * 1000 + tail * 100000 + x0 + x1 + x2 + x3 +
+         x4 + x5 + x6;
 }
 
 double ffi_test_89(long n, ...) {

@@ -39,6 +39,33 @@ IN: compiler.cfg.builder.alien
     [ src c-type unbox-vararg-struct ]
     [ src c-type unbox-parameter ] if ;
 
+: on-stack-rep ( rep-tuple -- rep-tuple' )
+    [ first ] [ third ] [ param-natural-size ] tri [ t ] 2dip 4array ;
+
+! AAPCS64: an aggregate that does not fit entirely in the remaining
+! parameter registers of its class is passed wholly on the stack, and
+! the unused registers of that class are wasted (N*RN is set to 8). A
+! single forward pass over the per-argument register groups computes
+! the on-stack flags so next-parameter honors them; the registers it
+! then skips stay unused.
+:: assign-aapcs64-flags ( groups -- groups' )
+    0 :> ngrn! 0 :> nsrn!
+    f :> int-done! f :> float-done!
+    groups [| group |
+        group first first reg-class-of int-regs eq? :> int?
+        group length :> n
+        int? [ int-done ngrn ] [ float-done nsrn ] if :> ( done used )
+        done used n + 8 > or
+        [ int? [ t int-done! ] [ t float-done! ] if group [ on-stack-rep ] map ]
+        [ int? [ used n + ngrn! ] [ used n + nsrn! ] if group ] if
+    ] map ;
+
+:: assign-fixed-aapcs64-flags ( groups vararg-start -- groups' )
+    compact-stack-params? [
+        groups vararg-start [ groups length ] unless* cut
+        [ assign-aapcs64-flags ] dip append
+    ] [ groups ] if ;
+
 :: unbox-parameters ( parameters vararg-start -- vregs reps )
     parameters length :> len
     parameters [
@@ -47,7 +74,9 @@ IN: compiler.cfg.builder.alien
             n <ds-loc> peek-loc c-type base-type
             vararg-start dup [ len 1 - n - swap >= ] when
             (unbox-parameter)
-        ] 2 2 mnmap [ concat ] bi@
+        ] 2 2 mnmap
+        [ concat ]
+        [ vararg-start assign-fixed-aapcs64-flags concat ] bi*
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
@@ -75,7 +104,7 @@ IN: compiler.cfg.builder.alien
 :: promote-varargs ( reps params -- reps' )
     reps params vararg-boundary cut
     [ first3 cell 4array ] map :> ( fixed varargs )
-    fixed keys [ reg-class-of ] map :> classes
+    fixed [ second ] reject keys [ reg-class-of ] map :> classes
     int-regs [ classes [ int-regs = ] count reserved-regs ] change
     float-regs [ classes [ float-regs = ] count reserved-regs ] change
     fixed varargs append ;

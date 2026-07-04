@@ -310,8 +310,21 @@ struct float_pair {
   float a, b;
 };
 
+struct long_pair {
+  long a, b;
+};
+
+FACTOR_EXPORT double ffi_test_86(float f0, float f1, float f2, float f3,
+                                 float f4, float f5, float f6,
+                                 struct float_pair h, float tail);
+FACTOR_EXPORT long ffi_test_87(long x0, long x1, long x2, long x3, long x4,
+                               long x5, long x6, struct long_pair s,
+                               long tail);
 FACTOR_EXPORT double ffi_test_88(long n, ...);
 FACTOR_EXPORT double ffi_test_89(long n, ...);
+FACTOR_EXPORT double ffi_test_91(long x0, long x1, long x2, long x3, long x4,
+                                 long x5, long x6, struct long_pair s,
+                                 double d, long tail);
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

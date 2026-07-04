@@ -226,6 +226,24 @@ FUNCTION: long ffi_test_85 ( void* f, long x, long y, long z )
 ] unit-test
 
 STRUCT: FLOAT-PAIR { a float } { b float } ;
+STRUCT: LONG-PAIR { a long } { b long } ;
+
+! A homogeneous-float aggregate that does not fit in the remaining
+! SIMD registers goes wholly on the stack, wasting V7.
+FUNCTION: double ffi_test_86 ( float f0, float f1, float f2, float f3, float f4, float f5, float f6, FLOAT-PAIR h, float tail )
+
+{ 30279.5 } [
+    1.0 2.0 3.0 4.0 5.0 6.0 7.0
+    S{ FLOAT-PAIR { a 1.5 } { b 2.5 } } 3.0 ffi_test_86
+] unit-test
+
+! Same for an integer aggregate that does not fit, wasting X7.
+FUNCTION: long ffi_test_87 ( long x0, long x1, long x2, long x3, long x4, long x5, long x6, LONG-PAIR s, long tail )
+
+{ 332239 } [
+    1 2 3 4 5 6 7
+    S{ LONG-PAIR { a 11 } { b 22 } } 33 ffi_test_87
+] unit-test
 
 FUNCTION: double ffi_test_88 ( long n, ... FLOAT-PAIR h, int tail )
 
@@ -236,6 +254,16 @@ FUNCTION: double ffi_test_88 ( long n, ... FLOAT-PAIR h, int tail )
 FUNCTION: double ffi_test_89 ( long n, ... float x )
 
 { 1.5 } [ 1 1.5 ffi_test_89 ] unit-test
+
+! A spilled integer aggregate exhausts the integer registers (X7 wasted)
+! but leaves the SIMD registers free, so the following double still lands
+! in V0.
+FUNCTION: double ffi_test_91 ( long x0, long x1, long x2, long x3, long x4, long x5, long x6, LONG-PAIR s, double d, long tail )
+
+{ 3311239.0 } [
+    1 2 3 4 5 6 7
+    S{ LONG-PAIR { a 11 } { b 22 } } 9.0 33 ffi_test_91
+] unit-test
 
 STRUCT: TINY { x int } ;
 
