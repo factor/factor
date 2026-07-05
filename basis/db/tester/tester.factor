@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs concurrency.combinators db db.pools
 db.postgresql db.queries db.sqlite db.tuples db.types
@@ -35,8 +36,10 @@ IN: db.tester
 
 : test-postgresql ( quot -- )
     '[
-        ! disable on windows-x86-32
-        os windows? cpu x86.32? and [
+        ! Skip on windows-x86-32 and when no postgresql-db has been
+        ! configured (\ postgresql-db set-global).
+        os windows? cpu x86.32? and
+        \ postgresql-db get-global not or [
             postgresql-template1-db [
                 postgresql-test-db-name ensure-database
             ] with-db
