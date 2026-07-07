@@ -94,7 +94,7 @@ IN: io.launcher.unix
 
 : setup-working-directory ( actions -- actions' )
     dup current-directory get
-    posix_spawn_file_actions_addchdir check-posix ;
+    posix-spawn-file-actions-addchdir ;
 
 : reset-ignored-signals* ( attrp -- attrp' )
     dup SIGPIPE 2^ sigset_t <ref>
