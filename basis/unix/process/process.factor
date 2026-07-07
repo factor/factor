@@ -1,5 +1,5 @@
-USING: alien.c-types alien.data alien.syntax alien.utilities
-classes.struct environment.unix generalizations
+USING: alien.c-types alien.data alien.libraries alien.syntax
+alien.utilities classes.struct environment.unix generalizations
 io.encodings.utf8 kernel libc math sequences simple-tokenizer
 strings unix unix.types ;
 QUALIFIED-WITH: alien.c-types ac
@@ -31,9 +31,16 @@ FUNCTION: int posix_spawn_file_actions_adddup2 (
     posix_spawn_file_actions_t *file_actions, int filedes, int intnewfiledes )
 FUNCTION: int posix_spawn_file_actions_addinherit_np (
     posix_spawn_file_actions_t *file_actions, int filedes )
+! addchdir/addfchdir are POSIX-2024 names, only available on
+! macOS 26+ and glibc 2.40+; the _np variants go back to
+! macOS 10.15 and glibc 2.29.
 FUNCTION: int posix_spawn_file_actions_addchdir (
     posix_spawn_file_actions_t *file_actions, c-string path )
 FUNCTION: int posix_spawn_file_actions_addfchdir (
+    posix_spawn_file_actions_t *file_actions, int filedes )
+FUNCTION: int posix_spawn_file_actions_addchdir_np (
+    posix_spawn_file_actions_t *file_actions, c-string path )
+FUNCTION: int posix_spawn_file_actions_addfchdir_np (
     posix_spawn_file_actions_t *file_actions, int filedes )
 
 FUNCTION: int posix_spawnattr_getsigdefault ( posix_spawnattr_t* attr, sigset_t* sigdefault )
@@ -88,6 +95,9 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )
     posix_spawn_file_actions_destroy check-posix ;
+
+: posix-spawn-file-actions-addchdir ( posix_spawn_file_actions_t path -- )
+    posix_spawn_file_actions_addchdir_np check-posix ;
 
 : posix-spawnattr-init ( -- posix_spawnattr_t )
     f posix_spawnattr_t <ref>
