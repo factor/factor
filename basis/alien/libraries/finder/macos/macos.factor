@@ -27,16 +27,12 @@ TUPLE: framework-info location name shortname version suffix ;
     ] [ drop ] if* dup shortname>> empty? [ drop f ] when ;
 
 CONSTANT: default-framework-fallback {
-    "~/Library/Frameworks"
     "/Library/Frameworks"
-    "/Network/Library/Frameworks"
     "/System/Library/Frameworks"
 }
 
 CONSTANT: default-library-fallback {
-    "~/lib"
     "/usr/local/lib"
-    "/lib"
     "/usr/lib"
 }
 
@@ -78,18 +74,16 @@ SYMBOL: dyld-executable-path
         name ,
 
         framework [
+            name>> default-framework-fallback paths%
+        ] when*
+
+        basename default-library-fallback paths%
+
+        framework [
             name>> fallback-framework-path paths%
         ] when*
 
         basename fallback-library-path paths%
-
-        framework fallback-framework-path empty? and [
-            framework name>> default-framework-fallback paths%
-        ] when
-
-        fallback-library-path empty? [
-            basename default-library-fallback paths%
-        ] when
     ] { } make ;
 
 : dyld-image-suffix-search ( seq -- str )
