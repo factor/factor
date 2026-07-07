@@ -1,8 +1,8 @@
 ! Copyright (C) 2018 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: io.launcher io.standard-paths json kernel literals
-namespaces sequences strings system ;
+USING: combinators.smart io.launcher io.standard-paths json
+kernel namespaces sequences strings system ;
 
 IN: docker
 
@@ -61,12 +61,12 @@ SYMBOL: docker-password
     { "image" "ls" } docker-lines ;
 
 : docker-login ( -- )
-    ${
+    [
         "sudo"
         docker-path "login"
         "-p" docker-password get-global
         "-u" docker-username get-global
-    } try-process ;
+    ] output>array try-process ;
 
 GENERIC: docker-pull ( obj -- )
 
