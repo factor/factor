@@ -108,9 +108,9 @@ big-endian off
     MEGA-HITS (LDR=) rel-megamorphic-cache-hits
     CTX VM vm-spare-context-offset [+] LDR
     CTX VM vm-context-offset [+] STR
-    jit-save-teb
     temp SP MOV
     temp CTX context-callstack-save-offset [+] STR
+    jit-save-teb
     temp CTX context-callstack-bottom-offset [+] LDR
     SP temp 16 ADD
     FP XZR MOV

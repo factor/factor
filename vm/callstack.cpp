@@ -19,8 +19,6 @@ callstack* factor_vm::allot_callstack(cell size) {
 // be calling it at all, so we leave it as it is for now.
 cell factor_vm::second_from_top_stack_frame(context* ctx) {
   cell frame_top = ctx->callstack_top;
-  if (frame_top >= ctx->callstack_bottom)
-    return ctx->callstack_bottom;
   for (cell i = 0; i < 2; ++i) {
     cell pred = code->frame_predecessor(frame_top);
     if (pred >= ctx->callstack_bottom)
@@ -35,9 +33,7 @@ cell factor_vm::capture_callstack(context* ctx) {
   cell top = second_from_top_stack_frame(ctx);
   cell bottom = ctx->callstack_bottom;
 
-  cell size = 0;
-  if (top < bottom)
-    size = bottom - top;
+  fixnum size = std::max((cell)0, bottom - top);
 
   callstack* stack = allot_callstack(size);
   memcpy((void*)stack->top(), (void *)top, size);
