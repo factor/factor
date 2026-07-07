@@ -10,8 +10,21 @@ permissions:
   contents: read
 
 jobs:
-  build-linux:
+  build-linux-intel:
     runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: bootstrap
+      run: ./build.sh net-bootstrap
+    - name: load-all
+      run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
+    - name: test
+      run: './factor -run=tools.test resource:core compiler threads io'
+    - name: help-lint
+      run: './factor -run=help.lint resource:core resource:basis resource:extra'
+
+  build-linux-arm:
+    runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
     - name: bootstrap
@@ -49,7 +62,7 @@ jobs:
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
-  build-windows:
+  build-windows-intel:
     runs-on: windows-2022
     steps:
     - uses: actions/checkout@v4
@@ -72,3 +85,27 @@ jobs:
     - name: help-lint
       shell: cmd
       run: 'factor -run=help.lint resource:core resource:basis resource:extra'
+
+    build-windows-arm:
+      runs-on: windows-11-arm
+      steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: build
+        shell: cmd
+        run: build.cmd compile
+      - name: build-report
+        run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
+      - name: bootstrap
+        run: |
+             .\build.cmd update-boot-image
+             .\build.cmd bootstrap
+      - name: load-all
+        shell: cmd
+        run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
+      - name: test
+        shell: cmd
+        run: 'factor -run=tools.test resource:core'
+      - name: help-lint
+        shell: cmd
+        run: 'factor -run=help.lint resource:core resource:basis resource:extra'
