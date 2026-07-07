@@ -364,11 +364,10 @@ HELP: gram-schmidt-normalize
 { $examples
     { $example
         "USING: math.matrices.extras prettyprint ;"
-        "{ { 1 2 } { 3 4 } { 5 6 } } gram-schmidt-normalize ."
+        "{ { 1 2 } { 3 4 } } gram-schmidt-normalize ."
 "{
     { 0.4472135954999579 0.8944271909999159 }
     { 0.894427190999916 -0.447213595499958 }
-    { -0/0. -0/0. }
 }"
     }
 } ;
