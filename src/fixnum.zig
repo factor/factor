@@ -57,11 +57,20 @@ pub fn toFloat(a: Fixnum) f64 {
     return @floatFromInt(a);
 }
 
-pub fn fromFloat(a: f64) ?Fixnum {
-    if (a < @as(f64, @floatFromInt(fixnum_min)) or a > @as(f64, @floatFromInt(fixnum_max))) {
-        return null;
-    }
-    return @intFromFloat(a);
+// Convert a float to a fixnum the way the C++ VM's `(fixnum)untag_float` does:
+// always produce a fixnum, with NaN -> 0. The previous version returned an
+// optional and let @intFromFloat run on NaN/out-of-range inputs, which is
+// illegal behavior in Zig (a NaN passes both range comparisons since every
+// comparison with NaN is false), so `0/0. float>fixnum` aborted the VM. We
+// clamp to the fixnum range (arm64 fcvtzs saturates similarly) so the result is
+// always a valid tagged fixnum and @intFromFloat only ever sees an in-range,
+// truncated value.
+pub fn floatToFixnum(a: f64) Fixnum {
+    if (std.math.isNan(a)) return 0;
+    const t = @trunc(a);
+    if (t <= @as(f64, @floatFromInt(fixnum_min))) return fixnum_min;
+    if (t >= @as(f64, @floatFromInt(fixnum_max))) return fixnum_max;
+    return @intFromFloat(t);
 }
 
 const FactorVM = vm_mod.FactorVM;

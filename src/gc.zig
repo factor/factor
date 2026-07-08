@@ -624,6 +624,13 @@ pub const GarbageCollector = struct {
                 }
             }
         }
+
+        // Recorded profiler samples hold a tagged thread object each; it lives
+        // only in this malloc-side list, so it must be traced like any other
+        // root or get-samples will hand back a moved/dead pointer.
+        for (self.vm.profiling_samples.items) |*sample| {
+            visitSlot(&sample.thread, destination);
+        }
     }
 
     fn visitContexts(self: *Self, destination: *slot_visitor.CopyingDestination) void {

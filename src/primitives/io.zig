@@ -168,13 +168,9 @@ pub export fn primitive_fopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const mode_cell = vm.pop();
     const path_cell = vm.pop();
 
-    // Extract byte array contents
-    if (!layouts.hasTag(mode_cell, .byte_array) or
-        !layouts.hasTag(path_cell, .byte_array))
-    {
-        vm.push(layouts.false_object);
-        return;
-    }
+    // C++ untag_check<byte_array> on both args -> type error on a mismatch.
+    vm.checkTag(mode_cell, .byte_array);
+    vm.checkTag(path_cell, .byte_array);
 
     const mode_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(mode_cell));
     const path_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(path_cell));
@@ -182,10 +178,12 @@ pub export fn primitive_fopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const mode_data: [*:0]const u8 = @ptrCast(mode_ba.data());
     const path_data: [*:0]const u8 = @ptrCast(path_ba.data());
 
-    // Open file with EINTR handling
+    // Open file with EINTR handling. safe_fopen raises ERROR_IO on failure and
+    // never returns f, so callers see a clean io-error at the open site rather
+    // than a stale f handle that type-errors on the next read/write (C++ parity).
     const file = io_mod.safeFopen(path_data, mode_data) catch {
-        vm.push(layouts.false_object);
-        return;
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
     };
 
     // Use allotAlien helper
@@ -202,7 +200,10 @@ pub export fn primitive_fclose(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // ( file -- )
     const file = popFileHandle(vm) orelse return;
     io_mod.safeFclose(file) catch {
-        // Error during close - Factor code should check errno if needed
+        // C++ raw_fclose -> io_error_if_not_EINTR: a close failure is raised,
+        // not swallowed.
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
     };
 }
 
@@ -211,7 +212,8 @@ pub export fn primitive_fflush(vm_asm: *VMAssemblyFields) callconv(.c) void {
     // ( file -- )
     const file = popFileHandle(vm) orelse return;
     io_mod.safeFflush(file) catch {
-        // Error during flush
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
     };
 }
 
@@ -292,10 +294,11 @@ pub export fn primitive_fread(vm_asm: *VMAssemblyFields) callconv(.c) void {
     }
 
     const bytes_read = io_mod.safeFread(buffer, 1, @intCast(size), file) catch {
-        // Clear EOF indicator after error so file can be reused
-        io_mod.safeClearerr(file);
-        vm.push(layouts.tagFixnum(0));
-        return;
+        // A real read error (not EOF — safeFread returns EOF as a short count):
+        // raise ERROR_IO rather than masking it as a 0/EOF result, which the
+        // caller cannot distinguish from a clean end-of-file (C++ parity).
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
     };
 
     // If we read less than requested, we may have hit EOF - clear the indicator
@@ -334,7 +337,13 @@ pub export fn primitive_fwrite(vm_asm: *VMAssemblyFields) callconv(.c) void {
         else => return,
     }
 
-    _ = io_mod.safeFwrite(buffer, 1, @intCast(length), file) catch return;
+    // safe_fwrite loops until every byte is written or errors; on error raise
+    // ERROR_IO rather than silently dropping the write. The old `catch return`
+    // lost data on e.g. ENOSPC / a broken pipe (C++ parity).
+    _ = io_mod.safeFwrite(buffer, 1, @intCast(length), file) catch {
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
+    };
 }
 
 pub export fn primitive_ftell(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -346,8 +355,8 @@ pub export fn primitive_ftell(vm_asm: *VMAssemblyFields) callconv(.c) void {
     };
 
     const offset = io_mod.safeFtell(file) catch {
-        vm.replace(layouts.tagFixnum(0));
-        return;
+        const errno_val: Fixnum = @intCast(std.c._errno().*);
+        vm.ioError(errno_val);
     };
 
     vm.replace(math.fromSignedCell(vm, offset));

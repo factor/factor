@@ -6,6 +6,7 @@ const builtin = @import("builtin");
 
 const layouts = @import("../layouts.zig");
 const math = @import("../fixnum.zig");
+const slot_visitor = @import("../slot_visitor.zig");
 const vm_mod = @import("../vm.zig");
 
 const Cell = layouts.Cell;
@@ -88,30 +89,12 @@ pub export fn primitive_size(vm_asm: *VMAssemblyFields) callconv(.c) void {
     if (layouts.isImmediate(obj)) {
         vm.push(layouts.tagFixnum(0));
     } else {
-        const obj_ptr: *const layouts.Object = @ptrFromInt(layouts.UNTAG(obj));
-        const type_tag = obj_ptr.getType();
-        const base_size: Cell = switch (type_tag) {
-            .array => blk: {
-                const arr: *const layouts.Array = @ptrCast(obj_ptr);
-                break :blk layouts.arraySize(layouts.Array, @intCast(layouts.untagFixnumUnsigned(arr.capacity)));
-            },
-            .byte_array => blk: {
-                const ba: *const layouts.ByteArray = @ptrCast(obj_ptr);
-                break :blk layouts.arraySize(layouts.ByteArray, @intCast(layouts.untagFixnumUnsigned(ba.capacity)));
-            },
-            .string => blk: {
-                const str: *const layouts.String = @ptrCast(obj_ptr);
-                break :blk layouts.stringSize(@intCast(layouts.untagFixnumUnsigned(str.length)));
-            },
-            .word => @sizeOf(layouts.Word),
-            .quotation => @sizeOf(layouts.Quotation),
-            .wrapper => @sizeOf(layouts.Wrapper),
-            .float => @sizeOf(layouts.BoxedFloat),
-            .alien => @sizeOf(layouts.Alien),
-            .dll => @sizeOf(layouts.Dll),
-            else => @sizeOf(layouts.Object),
-        };
-        const size = layouts.alignCell(base_size, layouts.data_alignment);
+        // Use the canonical object-size computation the GC walks the heap with
+        // (layouts.objectVisitInfoFromAddress). The old per-type switch here
+        // fell through to a bare Object header for tuple/bignum/callstack,
+        // reporting ~16 bytes for every tuple and bignum. Matches C++
+        // object_size -> object::size (vm/objects.cpp).
+        const size = slot_visitor.objectSize(layouts.UNTAG(obj));
         vm.push(layouts.tagFixnum(@intCast(size)));
     }
 }

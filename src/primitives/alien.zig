@@ -391,12 +391,21 @@ pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     rtld_mode.GLOBAL = true;
     const handle = std.c.dlopen(@ptrCast(&path_buf), rtld_mode);
 
+    // Root the path byte-array across the dll allocation: allotObject can GC and
+    // move it, and it is no longer referenced from the data stack after the pop
+    // above, so storing the pre-allocation pointer would dangle (matches the C++
+    // data_root<byte_array> path in vm/alien.cpp).
+    var rooted_path = path_cell;
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&rooted_path);
+    defer _ = vm.data_roots.pop();
+
     const tagged = vm.allotObject(.dll, @sizeOf(layouts.Dll)) orelse {
         if (handle) |h| _ = std.c.dlclose(h);
         vm.memoryError();
     };
     const dll: *layouts.Dll = @ptrFromInt(layouts.UNTAG(tagged));
-    dll.path = path_cell;
+    dll.path = rooted_path;
     dll.handle = handle;
     vm.push(tagged);
 }

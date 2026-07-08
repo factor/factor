@@ -139,9 +139,18 @@ pub const ImageError = error{
     BadMagic,
     BadVersion,
     CompressedNotSupported,
+    InvalidSize,
     OutOfMemory,
     AllocationFailed,
 };
+
+/// Upper bound on the data/code size fields read from an image header. Real
+/// images are well under this; the cap exists so a hostile/corrupt header
+/// cannot overflow the size arithmetic below (tenured_size = data_size*3/2,
+/// alignCell(code_size, page)) and drive an out-of-bounds read of the file
+/// body past the mapped heap. 1 TiB is safely below the point where any of
+/// that arithmetic wraps a 64-bit cell.
+pub const max_image_heap_size: Cell = 1 << 40;
 
 const DlsymKey = struct { symbol: Cell, library: Cell };
 
@@ -216,6 +225,11 @@ pub const ImageLoader = struct {
                 return ImageError.BadMagic;
             }
 
+            // Reject an offset that would trap the @intCast (i64 fseek arg) or
+            // seek absurdly far; a hostile appended footer controls this value.
+            if (footer.image_offset > std.math.maxInt(i64)) {
+                return ImageError.InvalidSize;
+            }
             io_mod.safeFseek(file, @intCast(footer.image_offset), 0) catch return ImageError.ReadError;
         }
 
@@ -262,6 +276,13 @@ pub const ImageLoader = struct {
         const code_compressed = self.header.code_size != self.header.reserved_3;
         if (data_compressed or code_compressed) {
             return ImageError.CompressedNotSupported;
+        }
+
+        // Reject an oversized/corrupt header before any size arithmetic or read.
+        if (self.header.data_size > max_image_heap_size or
+            self.header.code_size > max_image_heap_size)
+        {
+            return ImageError.InvalidSize;
         }
 
         // Load data heap
@@ -365,6 +386,14 @@ pub const ImageLoader = struct {
 
         const tenured_start = heap.tenured.start;
 
+        // The image body must fit inside the tenured region we actually mapped.
+        // Guards against a header whose data_size exceeds the (possibly wrapped)
+        // tenured_size computed above — otherwise the fread streams the file
+        // body past tenured into aging/nursery/guard space.
+        if (data_size > heap.tenured.size) {
+            return ImageError.InvalidSize;
+        }
+
         // Read image data into the tenured portion of the heap
         const tenured_slice_ptr: [*]u8 = @ptrFromInt(tenured_start);
         const tenured_slice = tenured_slice_ptr[0..data_size];
@@ -406,6 +435,13 @@ pub const ImageLoader = struct {
         const aligned_code_size = layouts.alignCell(code_size, page_size);
         // Use the larger of default size or image's code size
         const heap_size = @max(default_code_heap_size, aligned_code_size);
+
+        // The image's code must fit in the region we map. Guaranteed by the
+        // header size cap in loadImageFromFile, but re-checked here (a real
+        // check, not a debug assert) so the fread below can never overrun.
+        if (code_size > heap_size) {
+            return ImageError.InvalidSize;
+        }
 
         // ARM64 BL/B instructions encode ±128MB relative offsets.
         if (comptime builtin.cpu.arch == .aarch64) {

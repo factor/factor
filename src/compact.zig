@@ -771,6 +771,11 @@ pub fn compactPhase(gc: *GC, compact_code_heap: bool) void {
         fixupSlot(&fixup, root_ptr);
     }
 
+    // Profiler sample threads (see gc.visitAllRoots).
+    for (gc.vm.profiling_samples.items) |*sample| {
+        fixupSlot(&fixup, &sample.thread);
+    }
+
     if (gc.vm.callbacks) |callback_heap| {
         const seg = callback_heap.segment orelse null;
         if (seg) |s| {

@@ -187,18 +187,23 @@ pub const CodeHeapRememberedSets = struct {
             return error.RememberedSetsUninitialized;
         }
         const idx = self.blockIndex(compiled);
+        // Append to the dirty list BEFORE setting the bit. The GC scan iterates
+        // only the dirty list, so a set bit with no list entry (the old order,
+        // if the append OOM'd) is an invisible-until-clear() remembered-set
+        // hole — a missed root. On append failure the error propagates and the
+        // bit is never set, keeping bit⟺entry consistent.
         if (self.points_to_nursery) |*set| {
             if (!set.isSet(idx)) {
+                try self.nursery_dirty_blocks.append(self.allocator, idx);
                 set.set(idx);
                 self.nursery_count += 1;
-                try self.nursery_dirty_blocks.append(self.allocator, idx);
             }
         }
         if (self.points_to_aging) |*set| {
             if (!set.isSet(idx)) {
+                try self.aging_dirty_blocks.append(self.allocator, idx);
                 set.set(idx);
                 self.aging_count += 1;
-                try self.aging_dirty_blocks.append(self.allocator, idx);
             }
         }
         // writeBarrier only sets bits, so has_any can only go false→true.

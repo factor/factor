@@ -351,7 +351,13 @@ pub const FactorVM = struct {
             .allocator = allocator,
         };
 
-        vm.data_roots.ensureTotalCapacity(allocator, 128) catch {};
+        // Baseline capacity for the GC root stack. Hot paths that need more
+        // (e.g. the JIT's per-nesting-level roots) call ensureUnusedCapacity
+        // before their appendAssumeCapacity, but everything else relies on this
+        // reservation, so a failure here is fatal rather than silently ignored:
+        // a short root stack turns appendAssumeCapacity into an out-of-bounds
+        // write in release builds.
+        vm.data_roots.ensureTotalCapacity(allocator, 256) catch @panic("OOM reserving data_roots");
 
         return vm;
     }
@@ -973,7 +979,10 @@ pub const FactorVM = struct {
         const code_heap = self.code orelse @panic("code heap not initialized");
 
         if (code_heap.allocate(size)) |block| {
-            code_heap.writeBarrier(block) catch {};
+            // Must not swallow: a dropped barrier is a missed remembered-set
+            // root, i.e. silent heap corruption on the next GC (matches the
+            // fail-fast at initializeCodeBlock's writeBarrier below).
+            code_heap.writeBarrier(block) catch @panic("OOM: code heap write barrier");
             return block;
         }
 
@@ -985,7 +994,7 @@ pub const FactorVM = struct {
 
         const code_heap2 = self.code orelse @panic("code heap lost after compaction");
         if (code_heap2.allocate(size)) |block| {
-            code_heap2.writeBarrier(block) catch {};
+            code_heap2.writeBarrier(block) catch @panic("OOM: code heap write barrier");
             return block;
         }
 

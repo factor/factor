@@ -958,11 +958,13 @@ pub fn initSignals(vm: *vm_mod.FactorVM) !void {
     // Create signal pipe for async signal delivery (uses io.zig helper)
     try io.initSignalPipe(vm);
 
-    // On macOS, try to initialize Mach exception handling
-    if (builtin.os.tag == .macos) {
-        const mach_signal = @import("mach_signal.zig");
-        try mach_signal.machInitialize();
-    }
+    // NOTE: macOS hardware faults are handled entirely through the BSD signal
+    // handlers below (SIGSEGV/SIGBUS/SIGILL/SIGFPE) running on the alternate
+    // signal stack. There used to be a Mach exception path (mach_signal.zig),
+    // but it never functioned on arm64 — its NEON thread-state struct was
+    // mis-sized so thread_get_state always failed and every exception fell
+    // through to BSD — so it was removed rather than kept as an illusory,
+    // drift-prone second copy of the fault logic.
 
     // Allocate alternate signal stack
     vm.signal_callstack_seg = try @import("segments.zig").Segment.init(vm.callstack_size, false);

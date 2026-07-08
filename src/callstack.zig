@@ -3,6 +3,7 @@ const builtin = @import("builtin");
 
 const code_blocks = @import("code_blocks.zig");
 const contexts = @import("contexts.zig");
+const growable = @import("growable.zig");
 const layouts = @import("layouts.zig");
 const vm_mod = @import("vm.zig");
 
@@ -13,14 +14,20 @@ const VMAssemblyFields = vm_mod.VMAssemblyFields;
 
 const FRAME_RETURN_ADDRESS = contexts.FRAME_RETURN_ADDRESS;
 
-pub fn iterateCallstackObject(vm: *FactorVM, callstack: *const layouts.Callstack, comptime Iterator: type, iterator: *Iterator) void {
-    const frame_length = layouts.untagFixnum(callstack.length);
-    var frame_offset: Cell = 0;
-
+/// Iterate a callstack *object's* frames. `cs_cell` must be a GC root the
+/// caller keeps live (e.g. pushed on data_roots): `iterator.call` may allocate
+/// and trigger a GC that moves the callstack object, so the callstack base is
+/// re-derived from `cs_cell` every iteration rather than captured once.
+pub fn iterateCallstackObject(vm: *FactorVM, cs_cell: *Cell, comptime Iterator: type, iterator: *Iterator) void {
     const code = vm.code orelse return;
+    // Length is an immutable fixnum, so reading it once (as a number) is safe
+    // even though the object may move.
+    const frame_length = layouts.untagFixnum(@as(*const layouts.Callstack, @ptrFromInt(layouts.UNTAG(cs_cell.*))).length);
+    var frame_offset: Cell = 0;
 
     if (builtin.cpu.arch == .aarch64) {
         while (frame_offset < frame_length) {
+            const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell.*));
             const frame_top = callstack.frameTopAt(frame_offset);
             const frame_size = @as(*const Cell, @ptrFromInt(frame_top)).*;
 
@@ -35,6 +42,7 @@ pub fn iterateCallstackObject(vm: *FactorVM, callstack: *const layouts.Callstack
         }
     } else {
         while (frame_offset < frame_length) {
+            const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell.*));
             const frame_top = callstack.frameTopAt(frame_offset);
             const ret_addr = @as(*const Cell, @ptrFromInt(frame_top + FRAME_RETURN_ADDRESS)).*;
 
@@ -140,57 +148,65 @@ pub fn captureCallstack(vm: *FactorVM, ctx: *const contexts.Context) ?Cell {
 
 pub export fn primitive_callstack_to_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
-    const cs_cell = vm.peek();
 
+    var cs_cell = vm.peek();
     vm.checkTag(cs_cell, .callstack);
 
-    const callstack: *const layouts.Callstack = @ptrFromInt(layouts.UNTAG(cs_cell));
+    // Root the callstack object: block.scan() below can JIT-compile a quotation
+    // and trigger a GC that moves it, and the frame walk dereferences it every
+    // iteration (matches C++ data_root<callstack>).
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&cs_cell);
+    defer _ = vm.data_roots.pop();
 
-    var frame_data: [256]Cell = undefined; // Max 256/3 = ~85 frames
-    var frame_count: usize = 0;
+    // Accumulate into a rooted, growable Factor array. The old fixed 256-cell
+    // Zig buffer silently truncated callstacks past ~85 frames and held tagged
+    // pointers that a GC inside scan() could invalidate before they were copied
+    // into the result (matches C++ growable_array frames).
+    var frames = growable.GrowableArray.init(vm, 8) orelse vm.memoryError();
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&frames.elements);
+    defer _ = vm.data_roots.pop();
 
     const FrameAccumulator = struct {
-        data: []Cell,
-        count: *usize,
-        vm_ref: *@import("vm.zig").FactorVM,
+        frames: *growable.GrowableArray,
+        vm_ref: *FactorVM,
 
         pub fn call(self: *@This(), _: Cell, _: Cell, block: *const CodeBlock, addr: Cell) void {
-            const owner = block.owner;
-
-            const owner_quot = if (block.blockType() != .optimized and
+            var owner = block.owner;
+            var owner_quot = if (block.blockType() != .optimized and
                 layouts.hasTag(owner, .word))
             blk: {
                 const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(owner));
                 break :blk word.def;
             } else owner;
 
-            const scan = block.scan(self.vm_ref, addr);
-
-            if (self.count.* + 3 <= self.data.len) {
-                self.data[self.count.*] = owner;
-                self.data[self.count.* + 1] = owner_quot;
-                self.data[self.count.* + 2] = scan;
-                self.count.* += 3;
+            // scan() may GC (it can JIT-compile the frame's quotation), so root
+            // owner and owner_quot across it before reading scan (C++ wraps each
+            // in a data_root). scan itself is a fixnum (immediate).
+            const vm_ref = self.vm_ref;
+            std.debug.assert(vm_ref.data_roots.items.len + 2 <= vm_ref.data_roots.capacity);
+            vm_ref.data_roots.appendAssumeCapacity(&owner);
+            vm_ref.data_roots.appendAssumeCapacity(&owner_quot);
+            defer {
+                _ = vm_ref.data_roots.pop();
+                _ = vm_ref.data_roots.pop();
             }
+
+            const scan = block.scan(vm_ref, addr);
+
+            // add() may GC; owner/owner_quot stay rooted above, scan is immediate.
+            if (!self.frames.add(owner)) vm_ref.memoryError();
+            if (!self.frames.add(owner_quot)) vm_ref.memoryError();
+            if (!self.frames.add(scan)) vm_ref.memoryError();
         }
     };
 
-    var accumulator = FrameAccumulator{
-        .data = &frame_data,
-        .count = &frame_count,
-        .vm_ref = vm,
-    };
+    var accumulator = FrameAccumulator{ .frames = &frames, .vm_ref = vm };
+    iterateCallstackObject(vm, &cs_cell, FrameAccumulator, &accumulator);
 
-    iterateCallstackObject(vm, callstack, FrameAccumulator, &accumulator);
-
-    const tagged = vm.allotUninitializedArray(frame_count) orelse {
-        vm.memoryError();
-    };
-    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
-    const arr_data = arr.data();
-    @memcpy(arr_data[0..frame_count], frame_data[0..frame_count]);
-
-    vm.replace(tagged);
+    if (!frames.trim()) vm.memoryError();
+    vm.replace(frames.toArray());
 }
 
 pub export fn primitive_callstack_bounds(vm_asm: *VMAssemblyFields) callconv(.c) void {

@@ -205,7 +205,8 @@ pub const CopyFixup = struct {
     }
 
     pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
-        visitCallstackObjectSlotsForCopy(stack, self.destination);
+        const code_heap = self.destination.code_heap orelse return;
+        visitCallstackObjectRoots(CopyFixup, self, code_heap, stack);
     }
 };
 
@@ -214,8 +215,21 @@ pub fn traceAndCopyReturnSize(address: Cell, destination: *CopyingDestination) C
     return visitDataObjectSlots(CopyFixup, &fixup, address);
 }
 
-fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *CopyingDestination) void {
-    const code_heap = destination.code_heap orelse return;
+/// Walk a *callstack object's* frames and apply `fixup.visitSlot(*Cell)` to
+/// every spilled object pointer. If `Fixup` declares `visitCodeBlockOwner`, it
+/// is also called for each frame's owning code block (the full/mark collector
+/// needs this to keep the block live across a code-heap sweep; the copying
+/// collector does not and omits the method). Callstack objects store frames
+/// relative to the object body; on arm64 the relative frame size is at slot 0
+/// and the return address at +8, on x86-64 the return address is at +0. Shared
+/// by the copying and full-mark collectors so this frame convention — and the
+/// GC-safety of promoting spilled referents — lives in exactly one place.
+pub fn visitCallstackObjectRoots(
+    comptime Fixup: type,
+    fixup: *Fixup,
+    code_heap: *code_heap_mod.CodeHeap,
+    stack: *layouts.Callstack,
+) void {
     var lookup = callstack_lookup.Lookup.init(code_heap) orelse return;
     const frame_length = layouts.untagFixnumUnsigned(stack.length);
     if (frame_length == 0) return;
@@ -240,23 +254,34 @@ fn visitCallstackObjectSlotsForCopy(stack: *layouts.Callstack, destination: *Cop
             continue;
         };
 
+        const advance = if (is_arm64) arm_frame_size else owner.stackFrameSizeForAddress(addr);
+
+        if (comptime @hasDecl(Fixup, "visitCodeBlockOwner")) {
+            fixup.visitCodeBlockOwner(owner);
+        }
+
         if (owner.blockGcInfo()) |gc_info| {
             const return_address_offset: u32 = @intCast(owner.offset(addr));
             if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {
+                // A frame's spilled roots number at most frame_size/cell. Fixups
+                // that push assume-capacity (the full-mark collector) must have
+                // room reserved first, since visitDataObjectSlots does not
+                // pre-ensure capacity for callstack objects the way it does for
+                // ordinary slot loops.
+                if (comptime @hasDecl(Fixup, "ensureSlotCapacity")) {
+                    fixup.ensureSlotCapacity(advance / @sizeOf(Cell));
+                }
                 const stack_pointer: [*]Cell = @ptrFromInt(frame_top);
                 const Visit = struct {
-                    fn slot(slot_ptr: *Cell, dest: *CopyingDestination) void {
-                        const value = slot_ptr.*;
-                        if (layouts.isImmediate(value)) return;
-                        const copied = dest.copy(value);
-                        if (copied != value) slot_ptr.* = copied;
+                    fn slot(slot_ptr: *Cell, fx: *Fixup) void {
+                        fx.visitSlot(slot_ptr);
                     }
                 };
-                spill_slots.visit(*CopyingDestination, stack_pointer, gc_info, callsite, destination, Visit.slot);
+                spill_slots.visit(*Fixup, stack_pointer, gc_info, callsite, fixup, Visit.slot);
             }
         }
 
-        frame_offset += if (is_arm64) arm_frame_size else owner.stackFrameSizeForAddress(addr);
+        frame_offset += advance;
     }
 }
 

@@ -652,6 +652,10 @@ pub export fn primitive_string(vm_asm: *VMAssemblyFields) callconv(.c) void {
             const aux: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(aux_tagged));
             aux.capacity = layouts.tagFixnum(@intCast(aux_capacity));
             str2.aux = aux_tagged;
+            // The aux allocation above may have promoted the string to aging/
+            // tenured; record the old->young pointer so the next minor GC keeps
+            // (and updates) aux (matches C++ write_barrier(&str->aux)).
+            vm.writeBarrierKnownHeapWithValue(&str2.aux, aux_tagged);
 
             const lo_fill: u8 = @truncate((fill & 0x7f) | 0x80);
             @memset(str2.data()[0..length], lo_fill);
@@ -758,6 +762,9 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
             // Re-derive new_str from rooted tagged (GC may have moved it)
             new_str = @ptrFromInt(layouts.UNTAG(tagged));
             new_str.aux = aux_tagged;
+            // Barrier the old->young store (new_str may be aging/tenured after
+            // the aux allocation; aux is a fresh nursery object).
+            vm.writeBarrierKnownHeapWithValue(&new_str.aux, aux_tagged);
         } else {
             new_str = @ptrFromInt(layouts.UNTAG(tagged));
             new_str.aux = layouts.false_object;

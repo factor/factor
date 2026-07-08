@@ -746,20 +746,14 @@ pub const Jit = struct {
         var jit_scope = jit_protect.Scope.init();
         defer jit_scope.deinit();
 
-        // Allocate from code heap, triggering compaction if full
-        const block = self.vm.allotCodeBlock(total_size);
-
-        // Initialize the code block header
-        block.initialize(block_type, total_size, frame_size);
-        block.owner = self.owner;
-
-        // validateFreeList checkpoints removed (root cause: non-contiguous heap fixed)
-
-        // CRITICAL: Allocate all nursery objects FIRST, rooting them to protect from GC.
-        // Then store them into the code block only after all allocations are complete.
-        // This prevents stale pointers if GC moves objects during allocation.
-
-        // Allocate relocation byte array (rooted)
+        // Allocate the relocation byte array BEFORE the code block. The code
+        // block is not reachable by any GC root (nor in uninitialized_blocks)
+        // until putUninitializedBlock below, so a data-heap allocation issued
+        // after allotCodeBlock — as this once was — can trigger a full GC that
+        // sweeps or compacts the code heap and frees/moves the half-built block
+        // under us. Do every Factor-heap allocation first (rooted), matching the
+        // C++ VM, which performs none after allot_code_block. relocation.items
+        // is a plain Zig buffer, so this is safe to hoist.
         var reloc_cell: Cell = layouts.false_object;
         if (self.relocation.items.len > 0) {
             reloc_cell = self.vm.allotUninitializedByteArray(self.relocation.items.len);
@@ -767,16 +761,23 @@ pub const Jit = struct {
             const reloc_ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(reloc_cell));
             @memcpy(reloc_ba.data()[0..self.relocation.items.len], self.relocation.items);
         }
-        // Root reloc_cell to protect from GC during subsequent allocations
         self.vm.data_roots.appendAssumeCapacity(&reloc_cell);
         defer _ = self.vm.data_roots.pop();
 
-        const params_cell = self.parameters.toArray();
-        const literals_cell = self.literals.toArray();
+        // Allocate from code heap, triggering compaction if full. No further
+        // Factor-heap allocation happens after this point, so `block` stays put.
+        const block = self.vm.allotCodeBlock(total_size);
 
-        // NOW store into code block - all allocations complete, values are final
+        // Initialize the code block header.
+        block.initialize(block_type, total_size, frame_size);
+
+        // Re-derive every stored pointer: allotCodeBlock's compaction may have
+        // moved these data-heap objects (owner and the parameter/literal arrays
+        // via the JIT's registered roots; reloc_cell via the root above).
+        block.owner = self.owner;
         block.relocation = reloc_cell;
-        block.parameters = params_cell;
+        block.parameters = self.parameters.toArray();
+        const literals_cell = self.literals.toArray();
 
         // Copy machine code
         const code_dest = block.codeStart();

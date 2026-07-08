@@ -145,6 +145,11 @@ pub fn fullMarkAllRoots(gc: *GC, ctx: *FullMarkContext) void {
             markCodeBlockIfNeeded(gc, block);
         }
     }
+
+    // Profiler sample threads (see gc.visitAllRoots).
+    for (gc.vm.profiling_samples.items) |*sample| {
+        fullMarkSlot(&sample.thread, @ptrCast(ctx));
+    }
 }
 
 fn fullMarkContexts(gc: *GC, ctx: *FullMarkContext) void {
@@ -285,8 +290,17 @@ const FullMarkFixup = struct {
         fullMarkEntryPoint(self.gc, entry_point);
     }
 
+    pub fn visitCodeBlockOwner(self: *@This(), owner: *const code_blocks.CodeBlock) void {
+        markCodeBlockIfNeeded(self.gc, @constCast(owner));
+    }
+
     pub fn visitCallstackObject(self: *@This(), stack: *layouts.Callstack) void {
-        markCallstackObject(self.gc, stack, self.ctx.tenured);
+        // Route through the shared walker so a callstack object's spilled
+        // referents in nursery/aging get promoted to tenured and written back
+        // (via visitSlot), not merely marked — otherwise a full GC would reset
+        // nursery/aging out from under a live continuation's spill slots.
+        const code_heap = self.gc.vm.code orelse return;
+        slot_visitor.visitCallstackObjectRoots(@This(), self, code_heap, stack);
     }
 };
 

@@ -928,13 +928,20 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
             cs.data()[j] = safepoints.sampleCallstacksNth(callstacks_cell, sample.callstack_begin + j);
         }
 
-        // Re-derive sample_arr after potential GC from cs_arr allocation
+        // Re-derive sample_arr after potential GC from cs_arr allocation. The
+        // cs_arr allocation may have promoted sample_arr to aging/tenured, so
+        // barrier this store of the fresh nursery cs_arr (matches C++
+        // set_array_nth, which always write-barriers).
         sa = @ptrFromInt(layouts.UNTAG(sample_arr));
         sa.data()[6] = cs_arr;
+        vm.writeBarrierKnownHeapWithValue(&sa.data()[6], cs_arr);
 
-        // Store in outer array (re-derive after potential GC)
+        // Store in outer array (re-derive after potential GC). samples_array can
+        // be tenured (large) or promoted across iterations while sample_arr is a
+        // fresh nursery object, so barrier this store too.
         const outer: *layouts.Array = @ptrFromInt(layouts.UNTAG(samples_array));
         outer.data()[i] = sample_arr;
+        vm.writeBarrierKnownHeapWithValue(&outer.data()[i], sample_arr);
     }
 
     vm.push(samples_array);

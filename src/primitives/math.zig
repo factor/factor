@@ -99,12 +99,10 @@ pub export fn primitive_float_to_fixnum(vm_asm: *VMAssemblyFields) callconv(.c) 
     const ctx = vm_asm.ctx;
     const float_cell = ctx.peek();
     const f = float_mod.untagFloat(float_cell);
-    if (fixnum.fromFloat(f)) |result| {
-        ctx.replace(layouts.tagFixnum(result));
-    } else {
-        // Overflow - would need bignum
-        ctx.replace(layouts.false_object);
-    }
+    // Always yields a fixnum (matches C++ float_to_fixnum's `( float -- fixnum )`
+    // contract); NaN -> 0, out-of-range saturates. Callers that want bignum
+    // promotion use >integer, not this primitive.
+    ctx.replace(layouts.tagFixnum(fixnum.floatToFixnum(f)));
 }
 
 pub export fn primitive_float_to_bignum(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -268,6 +266,17 @@ fn ensureBignumCell(vm: *FactorVM, cell_val: Cell) Cell {
     vm.typeError(.bignum, cell_val);
 }
 
+// Map a bignum-operation error to the matching Factor error. Division routines
+// return error.DivisionByZero, which must surface as a divide-by-zero condition
+// (not a memory error) to match the C++ VM's divide_by_zero_error (vm/bignum.cpp
+// bignum_divide/quotient/remainder).
+fn bignumOpError(vm: *FactorVM, err: anyerror) noreturn {
+    switch (err) {
+        error.DivisionByZero => vm.divideByZeroError(),
+        else => vm.memoryError(),
+    }
+}
+
 // Binary bignum arithmetic slow path: handles fixnum args from compiler
 // constant folding. Converts to bignums with proper GC rooting.
 // Only 'a' is rooted here because opFn internally roots both operands
@@ -283,7 +292,7 @@ noinline fn binaryBignumSlow(
     defer _ = vm.data_roots.pop();
     const b: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(ensureBignumCell(vm, b_cell)));
     const a: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(a_tagged));
-    return opFn(vm, a, b) catch vm.memoryError();
+    return opFn(vm, a, b) catch |e| bignumOpError(vm, e);
 }
 
 // Binary bignum comparison slow path: handles fixnum args.
@@ -339,7 +348,7 @@ pub export fn primitive_bignum_divint(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const b_cell = ctx.pop();
     const a_cell = ctx.peek();
     const result = if (layouts.typeTag(a_cell) == .bignum and layouts.typeTag(b_cell) == .bignum)
-        bignum.quotient(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
+        bignum.quotient(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch |e| bignumOpError(vm, e)
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.quotient);
     ctx.replace(layouts.tagBignum(result));
@@ -363,7 +372,7 @@ pub export fn primitive_bignum_divmod(vm_asm: *VMAssemblyFields) callconv(.c) vo
     const a: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(a_val));
     const b: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(b_val));
 
-    const div_result = bignum.divmod(vm, a, b) catch vm.memoryError();
+    const div_result = bignum.divmod(vm, a, b) catch |e| bignumOpError(vm, e);
 
     a_ptr.* = layouts.tagBignum(div_result.quotient);
     if (bignum.fitsFixnum(div_result.remainder)) {
@@ -533,7 +542,7 @@ pub export fn primitive_bignum_mod(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const b_cell = ctx.pop();
     const a_cell = ctx.peek();
     const result = if (layouts.typeTag(a_cell) == .bignum and layouts.typeTag(b_cell) == .bignum)
-        bignum.remainder(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
+        bignum.remainder(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch |e| bignumOpError(vm, e)
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.remainder);
     ctx.replace(bignum.maybeToFixnum(result));

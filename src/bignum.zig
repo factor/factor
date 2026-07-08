@@ -1040,9 +1040,25 @@ pub fn remainder(vm: *FactorVM, numerator: *const Bignum, denominator: *const Bi
     };
 }
 
-fn setUnsignedLength(bn: *Bignum, len: Cell) void {
-    bn.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(len + 1)));
-    bn.setNegative(false);
+// Allocate a fresh, trimmed bignum holding the low `len` digits of `src`.
+// Never mutates `src` (in particular never shrinks its capacity), so it is safe
+// to call on a working buffer that a GC may have promoted out of the nursery.
+fn trimmedCopy(vm: *FactorVM, src: *const Bignum, len: Cell) !*Bignum {
+    std.debug.assert(len <= src.length());
+    var actual = len;
+    while (actual > 0 and src.getDigit(actual - 1) == 0) actual -= 1;
+    const negative = actual != 0 and src.isNegative();
+
+    var src_cell: Cell = layouts.tagBignum(@constCast(src));
+    std.debug.assert(vm.data_roots.items.len < vm.data_roots.capacity);
+    vm.data_roots.appendAssumeCapacity(&src_cell);
+    defer _ = vm.data_roots.pop();
+
+    const out = try allocBignum(vm, actual, negative);
+    const s: *const Bignum = @ptrFromInt(layouts.UNTAG(src_cell));
+    var i: Cell = 0;
+    while (i < actual) : (i += 1) out.setDigit(i, s.getDigit(i));
+    return out;
 }
 
 // Bignum GCD (greatest common divisor)
@@ -1050,9 +1066,15 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
     if (a.isZero()) return abs(vm, b);
     if (b.isZero()) return abs(vm, a);
 
-    // keep working values in-place and use occasional Euclidean remainder steps.
-    // Root b before first copy to protect it from GC during allocation.
-    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 3);
+    // Lehmer's GCD. We keep two full-capacity working copies and mutate their
+    // digits in place, tracking the logical lengths only in size_a/size_b. We
+    // never shrink the objects' capacity: doing so on a buffer that the
+    // remainder step has promoted out of the nursery would leave stale trailing
+    // digits that a later heap walk (card scan / sweep) misparses as an object
+    // header. This mirrors the C++ bignum_gcd, which likewise tracks sizes in
+    // locals and trims only freshly-allocated copies. Every digit read below is
+    // bounded by size_a/size_b, so stale high digits are never observed.
+    std.debug.assert(vm.data_roots.capacity - vm.data_roots.items.len >= 5);
     var b_root: Cell = layouts.tagBignum(@constCast(b));
     vm.data_roots.appendAssumeCapacity(&b_root);
     defer _ = vm.data_roots.pop();
@@ -1061,6 +1083,15 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
     defer _ = vm.data_roots.pop();
     var b_cell: Cell = layouts.tagBignum(try copyBignumWithSign(vm, @ptrFromInt(layouts.UNTAG(b_root)), false));
     vm.data_roots.appendAssumeCapacity(&b_cell);
+    defer _ = vm.data_roots.pop();
+
+    // Scratch roots reused each iteration for the Euclidean remainder step; GC
+    // keeps whatever they currently hold updated in place.
+    var tmp1_cell: Cell = 0;
+    vm.data_roots.appendAssumeCapacity(&tmp1_cell);
+    defer _ = vm.data_roots.pop();
+    var tmp2_cell: Cell = 0;
+    vm.data_roots.appendAssumeCapacity(&tmp2_cell);
     defer _ = vm.data_roots.pop();
 
     var a_bn: *Bignum = @ptrFromInt(layouts.UNTAG(a_cell));
@@ -1122,26 +1153,34 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
         }
 
         if (k == 0) {
+            // No Lehmer progress: take one full Euclidean step, a,b = b, a mod b.
             if (size_b == 0) {
-                setUnsignedLength(a_bn, size_a);
-                return a_bn;
+                return trimmedCopy(vm, a_bn, size_a);
             }
 
-            const rem = try remainder(vm, a_bn, b_bn);
+            // remainder needs canonically-trimmed operands, so divide fresh
+            // copies rather than the (never-resized) working buffers.
+            tmp1_cell = layouts.tagBignum(try trimmedCopy(vm, @ptrFromInt(layouts.UNTAG(a_cell)), size_a));
+            tmp2_cell = layouts.tagBignum(try trimmedCopy(vm, @ptrFromInt(layouts.UNTAG(b_cell)), size_b));
+            const e: *const Bignum = @ptrFromInt(layouts.UNTAG(tmp1_cell));
+            const f: *const Bignum = @ptrFromInt(layouts.UNTAG(tmp2_cell));
+            const rem = try remainder(vm, e, f);
+            tmp1_cell = layouts.tagBignum(rem); // keep rem rooted; e no longer needed
 
+            // remainder may have GC'd: re-derive the working buffers.
             a_bn = @ptrFromInt(layouts.UNTAG(a_cell));
             b_bn = @ptrFromInt(layouts.UNTAG(b_cell));
+            const rem_bn: *const Bignum = @ptrFromInt(layouts.UNTAG(tmp1_cell));
+            const rem_len = rem_bn.length();
             const a_mut = a_bn.digits();
             const b_mut = b_bn.digits();
 
+            // a = b (both bounded by size_b <= size_a <= capacity_a)
             @memcpy(a_mut[0..size_b], b_mut[0..size_b]);
             size_a = size_b;
-            setUnsignedLength(a_bn, size_a);
-
-            const rem_len = rem.length();
-            @memcpy(b_mut[0..rem_len], rem.digits()[0..rem_len]);
+            // b = rem (rem_len <= size_b <= capacity_b)
+            @memcpy(b_mut[0..rem_len], rem_bn.digits()[0..rem_len]);
             size_b = rem_len;
-            setUnsignedLength(b_bn, size_b);
             continue;
         }
 
@@ -1200,16 +1239,12 @@ pub fn gcd(vm: *FactorVM, a: *const Bignum, b: *const Bignum) !*Bignum {
         while (size_a > 0 and a_mut[size_a - 1] == 0) size_a -= 1;
         while (size_b > 0 and b_mut[size_b - 1] == 0) size_b -= 1;
         std.debug.assert(size_a >= size_b);
-
-        setUnsignedLength(a_bn, size_a);
-        setUnsignedLength(b_bn, size_b);
     }
 
     a_bn = @ptrFromInt(layouts.UNTAG(a_cell));
     b_bn = @ptrFromInt(layouts.UNTAG(b_cell));
-    setUnsignedLength(a_bn, size_a);
-    setUnsignedLength(b_bn, size_b);
 
+    // size_a <= 1 and size_a >= size_b, so both fit in a single digit.
     var xx: i64 = if (size_a == 0) 0 else @intCast(a_bn.digits()[0]);
     var yy: i64 = if (size_b == 0) 0 else @intCast(b_bn.digits()[0]);
     while (yy != 0) {
@@ -1241,9 +1276,16 @@ pub fn testBit(x: *const Bignum, bit: Cell) bool {
     // digit_index by running a borrow chain from digit 0 up to
     // digit_index (subtract 1), then inverting.
     const len = x.length();
+
+    // Above the magnitude, a negative value is sign-extended with all-ones
+    // digits, so every such bit is set. Short-circuit here: this both matches
+    // the two's-complement semantics and bounds the borrow loop below by `len`
+    // rather than by the caller-supplied (arbitrarily large) bit index.
+    if (digit_index >= len) return true;
+
     var borrow: Cell = 1;
     for (0..digit_index + 1) |i| {
-        const d = if (i < len) x.getDigit(i) else 0;
+        const d = x.getDigit(i);
         if (d >= borrow) {
             if (i == digit_index) {
                 // (d - borrow) inverted, test bit
@@ -1259,8 +1301,7 @@ pub fn testBit(x: *const Bignum, bit: Cell) bool {
             borrow = 1;
         }
     }
-    // Beyond length: all ones in two's complement for negative
-    return true;
+    unreachable; // loop covers 0..=digit_index and digit_index < len
 }
 
 // Helper functions for VM-based allocation
@@ -2190,7 +2231,6 @@ fn divideKnuthCore(
         q_ptr = @ptrFromInt(layouts.UNTAG(q_cell));
         const trimmed_q = try trim(vm, q_ptr);
         q_cell = layouts.tagBignum(trimmed_q);
-        out.quotient = @ptrFromInt(layouts.UNTAG(q_cell));
     }
 
     if (comptime want_r) {
@@ -2209,6 +2249,13 @@ fn divideKnuthCore(
         }
         const trimmed_r = try trim(vm, rem);
         out.remainder = trimmed_r;
+    }
+
+    // Re-derive the quotient only now: the want_r block's allocBignum may have
+    // triggered a GC that moved it. q_cell stayed rooted, so GC kept it updated;
+    // capturing the raw pointer any earlier would leave out.quotient stale.
+    if (comptime want_q) {
+        out.quotient = @ptrFromInt(layouts.UNTAG(q_cell));
     }
 
     return out;
