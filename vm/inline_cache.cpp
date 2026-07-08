@@ -109,6 +109,12 @@ void inline_cache_jit::emit_inline_cache(fixnum index, cell generic_word_,
       true); // stack_frame_p
 }
 
+// Returns f when the (class, method) pair is already cached: rebuilding the
+// PIC could not fix such a miss, so the caller sends the call site to the
+// generic word's full dispatch instead of compiling an identical stub. A
+// same-class method change is patched into the existing entries in place so
+// the rebuilt PIC keeps its size instead of accumulating a duplicate class
+// check that would shadow the new method.
 // Allocates memory
 cell factor_vm::add_inline_cache_entry(cell cache_entries_, cell klass_,
                                        cell method_) {
@@ -117,6 +123,15 @@ cell factor_vm::add_inline_cache_entry(cell cache_entries_, cell klass_,
   data_root<word> method(method_, this);
 
   cell pic_size = array_capacity(cache_entries.untagged());
+  for (cell i = 0; i < pic_size; i += 2) {
+    if (array_nth(cache_entries.untagged(), i) == klass.value()) {
+      if (array_nth(cache_entries.untagged(), i + 1) == method.value())
+        return false_object;
+      set_array_nth(cache_entries.untagged(), i + 1, method.value());
+      return cache_entries.value();
+    }
+  }
+
   data_root<array> new_cache_entries(
       reallot_array(cache_entries.untagged(), pic_size + 2), this);
   set_array_nth(new_cache_entries.untagged(), pic_size, klass.value());
@@ -171,15 +186,19 @@ cell factor_vm::inline_cache_miss(cell return_address_) {
     cell klass = object_class(object.value());
     cell method = lookup_method(object.value(), methods.value());
 
-    data_root<array> new_cache_entries(
-        add_inline_cache_entry(cache_entries.value(), klass, method), this);
+    cell added = add_inline_cache_entry(cache_entries.value(), klass, method);
+    // f means the pair was already cached, so a rebuilt PIC would miss the
+    // same way again; leave xt at the generic's full dispatch entry point.
+    if (to_boolean(added)) {
+      data_root<array> new_cache_entries(added, this);
 
-    inline_cache_jit jit(generic_word.value(), this);
-    jit.emit_inline_cache(index, generic_word.value(), methods.value(),
-                          new_cache_entries.value(), tail_call_site);
-    code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
-    initialize_code_block(code);
-    xt = code->entry_point();
+      inline_cache_jit jit(generic_word.value(), this);
+      jit.emit_inline_cache(index, generic_word.value(), methods.value(),
+                            new_cache_entries.value(), tail_call_site);
+      code_block* code = jit.to_code_block(CODE_BLOCK_PIC, JIT_FRAME_SIZE);
+      initialize_code_block(code);
+      xt = code->entry_point();
+    }
   }
 
   // Install the new stub.
