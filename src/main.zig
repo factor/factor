@@ -192,7 +192,7 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     // Phase 2: Initialize all deferred code blocks (must happen before
     // reading lazy_jit_compile entry point, since it needs relocated code)
     const primitives_mod = @import("primitives.zig");
-    primitives_mod.updateCodeHeapWords(vm, true);
+    primitives_mod.updateCodeHeapWords(vm, true, null);
 
     // Phase 3: Set uncompiled quotations to lazy_jit_compile entry point
     // (must be after phase 2 so the lazy_jit_compile word has a valid entry point)

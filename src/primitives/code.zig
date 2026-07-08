@@ -250,7 +250,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     // to point to the new entry points. This is critical for existing call
     // sites to use the newly compiled code.
     if (update_existing_words != layouts.false_object) {
-        updateCodeHeapWords(vm, reset_inline_caches != layouts.false_object);
+        updateCodeHeapWords(vm, reset_inline_caches != layouts.false_object, &rooted_alist);
     }
     if (update_existing_words == layouts.false_object) {
         if (vm.code) |code_heap| {
@@ -264,8 +264,11 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     }
 }
 
-// Update all code blocks to point to current word entry points
-pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
+// Update all code blocks to point to current word entry points.
+// redefined_alist, when given, points at a GC-rooted cell holding the
+// compilation unit's alist; only PICs referencing one of its words are
+// invalidated instead of every PIC in the code heap.
+pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool, redefined_alist: ?*const Cell) void {
     var jit_scope = jit_protect.Scope.init();
     defer jit_scope.deinit();
 
@@ -296,15 +299,59 @@ pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
     const max_pic_size = vm.max_pic_size;
     const lazy_jit_ep = vm.lazyJitCompileEntryPoint();
 
-    // Single pass: update word references and mark PIC blocks for removal.
-    // PIC blocks are freed in-place (marked free + added to free list) but
-    // their removal from all_blocks_sorted is done via a compact pass below.
+    // Selective PIC invalidation: only PICs referencing a word redefined in
+    // this compilation unit can hold stale dispatch decisions, so free just
+    // those instead of every PIC. The set is built here, after the compile
+    // passes above, because compiling can GC and move the word objects;
+    // redefined_alist points at a GC-rooted cell so it is read fresh.
+    var redefined_words: std.AutoHashMapUnmanaged(Cell, void) = .empty;
+    defer redefined_words.deinit(vm.allocator);
+    var selective = false;
+    if (reset_inline_caches) {
+        if (redefined_alist) |alist_ptr| {
+            const alist: *const layouts.Array = @ptrFromInt(layouts.UNTAG(alist_ptr.*));
+            const count = layouts.untagFixnumUnsigned(alist.capacity);
+            selective = true;
+            for (0..count) |i| {
+                const pair: *const layouts.Array = @ptrFromInt(layouts.UNTAG(alist.data()[i]));
+                redefined_words.put(vm.allocator, pair.data()[0], {}) catch {
+                    // Fall back to blanket invalidation if the set can't grow.
+                    selective = false;
+                    break;
+                };
+            }
+        }
+    }
+
     var has_pics = false;
 
+    // Free stale PICs before the patch pass so their call sites observe
+    // isFree() and get reset to the miss stub, while call sites of surviving
+    // PICs are left intact. This must complete before any patching: with the
+    // interleaved single pass below, a call site patched early would keep
+    // pointing at a PIC freed later in the walk.
+    if (reset_inline_caches and selective) {
+        for (blocks) |block_addr| {
+            const block: *CodeBlock = @ptrFromInt(block_addr);
+            if (block.isFree()) continue;
+            if (block.blockType() == .pic and
+                code_blocks.picReferencesWords(block, &redefined_words))
+            {
+                code_heap.freeBlockOnly(block);
+                has_pics = true;
+            }
+        }
+    }
+
+    // Patch pass: update word references and, in blanket mode, mark PIC
+    // blocks for removal. PIC blocks are freed in-place (marked free + added
+    // to the free list) but their removal from all_blocks_sorted is done via
+    // a compact pass below.
     for (blocks) |block_addr| {
         const block: *CodeBlock = @ptrFromInt(block_addr);
+        if (block.isFree()) continue;
 
-        if (reset_inline_caches and block.blockType() == .pic) {
+        if (reset_inline_caches and !selective and block.blockType() == .pic) {
             code_heap.freeBlockOnly(block);
             has_pics = true;
             continue;
@@ -312,7 +359,7 @@ pub fn updateCodeHeapWords(vm: *FactorVM, reset_inline_caches: bool) void {
 
         if (!code_heap.blockHasCodePointers(block)) continue;
 
-        code_blocks.updateWordReferences(block, reset_inline_caches, max_pic_size, lazy_jit_ep);
+        code_blocks.updateWordReferences(block, reset_inline_caches, selective, max_pic_size, lazy_jit_ep);
     }
 
     // Compact all_blocks_sorted to remove freed PIC entries

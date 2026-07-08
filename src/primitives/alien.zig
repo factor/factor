@@ -391,6 +391,9 @@ pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     rtld_mode.GLOBAL = true;
     const handle = std.c.dlopen(@ptrCast(&path_buf), rtld_mode);
 
+    // A newly opened RTLD_GLOBAL library can change what a symbol resolves to.
+    if (handle != null) code_blocks.clearDlsymCache();
+
     // Root the path byte-array across the dll allocation: allotObject can GC and
     // move it, and it is no longer referenced from the data stack after the pop
     // above, so storing the pre-allocation pointer would dangle (matches the C++
@@ -464,6 +467,8 @@ pub export fn primitive_dlclose(vm_asm: *VMAssemblyFields) callconv(.c) void {
     if (dll.handle) |handle| {
         _ = std.c.dlclose(handle);
         dll.handle = null;
+        // Cached addresses into the closed library are now dangling.
+        code_blocks.clearDlsymCache();
     }
 }
 

@@ -780,6 +780,29 @@ fn lookupInternalSymbol(name: [*:0]const u8) ?usize {
     return null;
 }
 
+// Runtime dlsym cache. dlsym walks the dyld export trie on every call, and
+// the same handful of symbols are re-resolved for every code block that
+// references them. Keyed by symbol name bytes + library handle; only
+// successful lookups are cached so a later dlopen can resolve a previously
+// missing symbol. Cleared on dlopen/dlclose: a newly opened RTLD_GLOBAL
+// library can change what a symbol resolves to, and a closed one leaves
+// dangling addresses. (The image loader keeps its own per-load cache in
+// image.zig; this one covers code blocks compiled at runtime.)
+const dlsym_cache_name_max = 256;
+const dlsym_cache_entries_max = 4096;
+const dlsym_cache_key_max = dlsym_cache_name_max + @sizeOf(usize);
+
+var dlsym_cache: std.StringHashMapUnmanaged(Cell) = .empty;
+
+pub fn clearDlsymCache() void {
+    var it = dlsym_cache.keyIterator();
+    while (it.next()) |key| {
+        std.heap.c_allocator.free(key.*);
+    }
+    dlsym_cache.deinit(std.heap.c_allocator);
+    dlsym_cache = .empty;
+}
+
 pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
     const symbol = parameters.data()[index];
     const library = parameters.data()[index + 1];
@@ -804,15 +827,78 @@ pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
         handle = alien.null_dll;
     }
 
+    const name = std.mem.span(name_ptr);
+    const cacheable = name.len <= dlsym_cache_name_max;
+    var key_buf: [dlsym_cache_key_max]u8 = undefined;
+    var key: []const u8 = &.{};
+    if (cacheable) {
+        @memcpy(key_buf[0..name.len], name);
+        std.mem.writeInt(usize, key_buf[name.len..][0..@sizeOf(usize)], @intFromPtr(handle), .little);
+        key = key_buf[0 .. name.len + @sizeOf(usize)];
+        if (dlsym_cache.get(key)) |cached| return cached;
+    }
+
     const sym_addr = std.c.dlsym(handle, name_ptr);
     if (sym_addr) |addr| {
-        return @intFromPtr(addr);
+        const value: Cell = @intFromPtr(addr);
+        if (cacheable and dlsym_cache.count() < dlsym_cache_entries_max) {
+            const owned_key: ?[]u8 = std.heap.c_allocator.dupe(u8, key) catch null;
+            if (owned_key) |k| {
+                dlsym_cache.put(std.heap.c_allocator, k, value) catch std.heap.c_allocator.free(k);
+            }
+        }
+        return value;
     }
 
     return undef_addr;
 }
 
-pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pic_size: Cell, lazy_jit_ep: Cell) void {
+// Returns true if the PIC references any word in the set, either as a
+// literal (the generic word pushed for the miss handler) or as the owner of
+// a called code block (a cached method). Such a PIC may dispatch stale
+// methods after the redefinition, so it must be thrown away.
+pub fn picReferencesWords(block: *CodeBlock, words: *const std.AutoHashMapUnmanaged(Cell, void)) bool {
+    if (block.relocation == layouts.false_object) return false;
+    if (!layouts.hasTag(block.relocation, .byte_array)) return false;
+
+    const reloc_ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(block.relocation));
+    const reloc_cap = layouts.untagFixnumUnsigned(reloc_ba.capacity);
+    if (reloc_cap == 0) return false;
+
+    const reloc_data = reloc_ba.data();
+    const reloc_count = reloc_cap / @sizeOf(RelocationEntry);
+
+    var literal_index: Cell = 0;
+    for (0..reloc_count) |i| {
+        const entry_ptr: *const RelocationEntry = @ptrCast(@alignCast(reloc_data + i * @sizeOf(RelocationEntry)));
+        const rel_type = entry_ptr.getType();
+        switch (rel_type) {
+            .literal => {
+                var op = InstructionOperand.init(entry_ptr.*, block, literal_index);
+                const value: Cell = @bitCast(op.loadValue());
+                if (layouts.hasTag(value, .word) and words.contains(value)) return true;
+                literal_index += 1;
+            },
+            .entry_point, .entry_point_pic, .entry_point_pic_tail => {
+                var op = InstructionOperand.init(entry_ptr.*, block, literal_index);
+                if (op.loadCodeBlock()) |dest| {
+                    const owner = dest.owner;
+                    if (layouts.hasTag(owner, .word) and words.contains(owner)) return true;
+                }
+                literal_index += 1;
+            },
+            .here, .untagged => literal_index += 1,
+            else => {},
+        }
+    }
+    return false;
+}
+
+// When selective is set, stale PICs were already freed by updateCodeHeapWords,
+// so a call site is reset exactly when its target PIC is gone; sites of
+// surviving PICs are left alone. A freed block's header holds its size, so
+// isFree() must be checked before isPic().
+pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, selective: bool, max_pic_size: Cell, lazy_jit_ep: Cell) void {
     if (block.relocation == layouts.false_object) return;
     if (!layouts.hasTag(block.relocation, .byte_array)) return;
 
@@ -862,7 +948,11 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pi
             .entry_point_pic => {
                 var op = InstructionOperand.init(entry_ptr.*, block, literal_index);
                 if (op.loadCodeBlock()) |dest| {
-                    if (reset_inline_caches or !dest.isPic()) {
+                    const reset_site = if (selective)
+                        dest.isFree() or !dest.isPic()
+                    else
+                        reset_inline_caches or !dest.isPic();
+                    if (reset_site) {
                         const owner = codeBlockOwner(dest);
                         if (owner != layouts.false_object) {
                             const new_ep_value: i64 = @bitCast(computeEntryPointPicAddress(owner, max_pic_size, lazy_jit_ep));
@@ -878,7 +968,11 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, max_pi
             .entry_point_pic_tail => {
                 var op = InstructionOperand.init(entry_ptr.*, block, literal_index);
                 if (op.loadCodeBlock()) |dest| {
-                    if (reset_inline_caches or !dest.isPic()) {
+                    const reset_site = if (selective)
+                        dest.isFree() or !dest.isPic()
+                    else
+                        reset_inline_caches or !dest.isPic();
+                    if (reset_site) {
                         const owner = codeBlockOwner(dest);
                         if (owner != layouts.false_object) {
                             const new_ep_value: i64 = @bitCast(computeEntryPointPicTailAddress(owner, max_pic_size, lazy_jit_ep));
