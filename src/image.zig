@@ -114,24 +114,80 @@ pub const ImageHeader = extern struct {
     special_objects: [objects.special_object_count]Cell,
 };
 
-// VM parameters for initialization
+// VM parameters for initialization.
+// All *size fields are stored in **bytes** (post unit conversion).
+// CLI flags use the same units as the C++ VM (see initFromArgs):
+//   stacks/callbacks: kilobytes  →  << 10, page-aligned
+//   young/aging/tenured/codeheap: megabytes → << 20
 pub const VMParameters = struct {
     embedded_image: bool = false,
     image_path: ?[]const u8 = null,
     executable_path: ?[]const u8 = null,
-    datastack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB
-    retainstack_size: Cell = 32 * @sizeOf(Cell) * 1024, // 256KB
-    callstack_size: Cell = 128 * @sizeOf(Cell) * 1024, // 1MB
-    young_size: Cell = 2 * 1024 * 1024, // 2MB
-    aging_size: Cell = 4 * 1024 * 1024, // 4MB
-    tenured_size: Cell = 192 * 1024 * 1024, // 192MB
-    code_size: Cell = 8 * 1024 * 1024, // 8MB
+    // Defaults match C++ vm_parameters after init_factor unit conversion
+    // (vm/image.cpp constructor + vm/factor.cpp init_factor shifts).
+    datastack_size: Cell = alignPageBytes(32 * @sizeOf(Cell) * 1024), // 256KB
+    retainstack_size: Cell = alignPageBytes(32 * @sizeOf(Cell) * 1024), // 256KB
+    callstack_size: Cell = alignPageBytes(128 * @sizeOf(Cell) * 1024), // 1MB
+    young_size: Cell = 2 * 1024 * 1024, // 2MB  (cell/4 MB on 64-bit)
+    aging_size: Cell = 4 * 1024 * 1024, // 4MB  (cell/2 MB on 64-bit)
+    tenured_size: Cell = 192 * 1024 * 1024, // 192MB (24*cell MB on 64-bit)
+    code_size: Cell = 96 * 1024 * 1024, // 96MB
     fep: bool = false,
     console: bool = true,
     signals: bool = true,
     max_pic_size: Cell = 3,
-    callback_size: Cell = 256 * 1024, // 256KB
+    callback_size: Cell = alignPageBytes(256 * 1024), // 256KB
+
+    /// Parse C++-compatible heap/runtime flags from argv.
+    /// Stops at `--`. Unknown flags (e.g. `-e=`, `-run=`) are left for Factor.
+    /// Returns the `-i=` image path if present.
+    pub fn initFromArgs(self: *VMParameters, args: []const [:0]const u8) ?[]const u8 {
+        var image_path: ?[]const u8 = null;
+        // Skip argv[0]
+        var i: usize = 1;
+        while (i < args.len) : (i += 1) {
+            const arg = args[i];
+            if (std.mem.eql(u8, arg, "--")) break;
+
+            if (parseUsizeFlag(arg, "-datastack=")) |n| {
+                self.datastack_size = alignPageBytes(n << 10);
+            } else if (parseUsizeFlag(arg, "-retainstack=")) |n| {
+                self.retainstack_size = alignPageBytes(n << 10);
+            } else if (parseUsizeFlag(arg, "-callstack=")) |n| {
+                self.callstack_size = alignPageBytes(n << 10);
+            } else if (parseUsizeFlag(arg, "-young=")) |n| {
+                self.young_size = n << 20;
+            } else if (parseUsizeFlag(arg, "-aging=")) |n| {
+                self.aging_size = n << 20;
+            } else if (parseUsizeFlag(arg, "-tenured=")) |n| {
+                self.tenured_size = n << 20;
+            } else if (parseUsizeFlag(arg, "-codeheap=")) |n| {
+                self.code_size = n << 20;
+            } else if (parseUsizeFlag(arg, "-callbacks=")) |n| {
+                self.callback_size = alignPageBytes(n << 10);
+            } else if (parseUsizeFlag(arg, "-pic=")) |n| {
+                self.max_pic_size = n;
+            } else if (std.mem.startsWith(u8, arg, "-i=")) {
+                image_path = arg[3..];
+            } else if (std.mem.eql(u8, arg, "-fep")) {
+                self.fep = true;
+            } else if (std.mem.eql(u8, arg, "-no-signals")) {
+                self.signals = false;
+            }
+        }
+        return image_path;
+    }
 };
+
+fn alignPageBytes(n: Cell) Cell {
+    const page: Cell = @intCast(std.heap.page_size_min);
+    return (n + page - 1) & ~(page - 1);
+}
+
+fn parseUsizeFlag(arg: []const u8, prefix: []const u8) ?Cell {
+    if (!std.mem.startsWith(u8, arg, prefix)) return null;
+    return std.fmt.parseInt(Cell, arg[prefix.len..], 10) catch null;
+}
 
 pub const ImageError = error{
     FileNotFound,
@@ -430,16 +486,14 @@ pub const ImageLoader = struct {
         // 2. Signal handlers that check vm.code for dispatch
         // 3. Callback trampolines
 
-        const default_code_heap_size: Cell = 96 * 1024 * 1024;
+        // Heap capacity comes from -codeheap=N (megabytes) via VMParameters,
+        // matching C++ load_code_heap(p->code_size). Default is 96MB.
         const page_size = std.heap.page_size_min;
-        const aligned_code_size = layouts.alignCell(code_size, page_size);
-        // Use the larger of default size or image's code size
-        const heap_size = @max(default_code_heap_size, aligned_code_size);
+        const heap_size = layouts.alignCell(self.params.code_size, page_size);
 
-        // The image's code must fit in the region we map. Guaranteed by the
-        // header size cap in loadImageFromFile, but re-checked here (a real
-        // check, not a debug assert) so the fread below can never overrun.
+        // Image body must fit; C++ fatals with "Code heap too small to fit image".
         if (code_size > heap_size) {
+            std.debug.print("Code heap too small to fit image: need {d} bytes, have {d} (use -codeheap=N megabytes)\n", .{ code_size, heap_size });
             return ImageError.InvalidSize;
         }
 

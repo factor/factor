@@ -235,6 +235,8 @@ pub const FactorVM = struct {
     datastack_size: Cell,
     retainstack_size: Cell,
     callstack_size: Cell,
+    /// Callback heap capacity in bytes (from -callbacks=N kilobytes / default 256KB).
+    callback_size: Cell,
     cards_array: ?[]u8,
     decks_array: ?[]u8,
     callback_id: i32,
@@ -302,6 +304,7 @@ pub const FactorVM = struct {
             .datastack_size = 32 * @sizeOf(Cell) * 1024,
             .retainstack_size = 32 * @sizeOf(Cell) * 1024,
             .callstack_size = 128 * @sizeOf(Cell) * 1024,
+            .callback_size = 256 * 1024,
             .cards_array = null,
             .decks_array = null,
             .callback_id = 0,
@@ -343,7 +346,7 @@ pub const FactorVM = struct {
                 .pic_tag_count = 0,
                 .pic_tuple_count = 0,
             },
-            .max_pic_size = 16,
+            .max_pic_size = 3,
             .object_counter = 0,
             .last_nano_count = 0,
             .signal_callstack_seg = null,
@@ -716,9 +719,8 @@ pub const FactorVM = struct {
         if (c_to_factor_word == layouts.false_object) return;
 
         if (self.callbacks == null) {
-            const callback_size = 256 * 1024; // 256KB default
             const heap_ptr = self.allocator.create(CallbackHeap) catch @panic("OOM: callback heap");
-            heap_ptr.* = CallbackHeap.init(self.allocator, callback_size) catch {
+            heap_ptr.* = CallbackHeap.init(self.allocator, self.callback_size) catch {
                 self.allocator.destroy(heap_ptr);
                 return;
             };

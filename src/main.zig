@@ -335,25 +335,11 @@ pub fn main(init: std.process.Init) !void {
     }
     const args = args_list.items;
 
-    // Parse command line arguments - we only extract -i= for ourselves
-    // All other arguments (including -e=..., -run=...) are passed to Factor via OBJ_ARGS
-    // Note: Unlike the old code, we do NOT treat positional arguments as image paths
+    // Parse VM heap/runtime flags (-codeheap, -callbacks, -young, …) the same
+    // way as the C++ VM. Remaining args (-e=, -run=, positionals) still go to
+    // Factor via OBJ_ARGS; Factor ignores the heap flags it does not understand.
     var params = image.VMParameters{};
-    var image_path: ?[]const u8 = null;
-
-    for (1..args.len) |i| {
-        const arg = args[i];
-
-        if (std.mem.startsWith(u8, arg, "-i=")) {
-            image_path = arg[3..];
-        } else if (std.mem.eql(u8, arg, "-fep")) {
-            params.fep = true;
-        } else if (std.mem.eql(u8, arg, "-no-signals")) {
-            params.signals = false;
-        }
-        // All other arguments (including -e=..., -run=..., and positional args)
-        // are passed to Factor via OBJ_ARGS - we don't consume them here
-    }
+    var image_path = params.initFromArgs(args);
 
     // Embedded image: a deployed Factor binary has its image appended, marked
     // by a footer at EOF. When no -i= was given, prefer the executable's own
@@ -416,7 +402,15 @@ pub fn main(init: std.process.Init) !void {
     }
 
     if (image_path == null) {
-        std.debug.print("Error: No image file specified. Use -i=<path> or provide image as argument.\nUsage: factor [-i=<image>] [-e=<code>] [-fep]\n", .{});
+        std.debug.print(
+            \\Error: No image file specified. Use -i=<path>.
+            \\Usage: factor [-i=<image>] [-e=<code>] [-fep]
+            \\  [-datastack=N] [-retainstack=N] [-callstack=N]   (kilobytes)
+            \\  [-young=N] [-aging=N] [-tenured=N] [-codeheap=N] (megabytes)
+            \\  [-callbacks=N]  (kilobytes)
+            \\  [-pic=N] [-no-signals]
+            \\
+        , .{});
         std.process.exit(1);
     }
 
@@ -445,10 +439,11 @@ pub fn main(init: std.process.Init) !void {
     // Set global VM for callbacks and error handlers
     c_api.setGlobalVM(vm);
 
-    // Set up VM parameters
+    // Set up VM parameters (byte sizes after CLI unit conversion)
     vm.datastack_size = params.datastack_size;
     vm.retainstack_size = params.retainstack_size;
     vm.callstack_size = params.callstack_size;
+    vm.callback_size = params.callback_size;
     vm.max_pic_size = params.max_pic_size;
 
     // Create initial context and spare context (for callbacks)
