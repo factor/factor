@@ -91,6 +91,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: arm64
     - name: build
       shell: cmd
       run: build.cmd compile
