@@ -352,41 +352,11 @@ fn generateInlineCache(vm: *FactorVM, index: Fixnum, generic_word_in: Cell, meth
     return 0;
 }
 
-// Megamorphic cache operations
-pub const MegamorphicCache = struct {
-    pub fn hashcode(klass: Cell, capacity_mask: Cell) Cell {
-        return ((klass >> layouts.tag_bits) & capacity_mask) << 1;
-    }
-
-    pub fn lookup(cache: *const layouts.Array, klass: Cell) ?Cell {
-        const capacity = layouts.untagFixnumFast(cache.capacity);
-        if (capacity == 0) return null;
-
-        const capacity_mask = (capacity >> 1) - 1;
-        const slot = hashcode(klass, capacity_mask);
-        std.debug.assert(slot < capacity);
-
-        const data = cache.data();
-        if (data[slot] == klass) {
-            return data[slot + 1];
-        }
-
-        return null;
-    }
-
-    pub fn update(cache: *layouts.Array, klass: Cell, method: Cell) void {
-        const capacity = layouts.untagFixnumFast(cache.capacity);
-        if (capacity == 0) return;
-
-        const capacity_mask = (capacity >> 1) - 1;
-        const slot = hashcode(klass, capacity_mask);
-        std.debug.assert(slot < capacity);
-
-        const arr_data = cache.data();
-        arr_data[slot] = klass;
-        arr_data[slot + 1] = method;
-    }
-};
+/// Hash a class into a mega-cache pair index (even slot). Live miss path is
+/// primitives/code.updateMethodCache; lookup/update helpers were never wired.
+pub fn megaCacheHashcode(klass: Cell, capacity_mask: Cell) Cell {
+    return ((klass >> layouts.tag_bits) & capacity_mask) << 1;
+}
 
 // Call site patching for supported JIT backends.
 pub const CallSitePatcher = struct {
@@ -506,7 +476,7 @@ test "object class" {
 test "megamorphic cache hashcode" {
     const klass = layouts.tagFixnum(5);
     const capacity_mask: Cell = 14;
-    const slot = MegamorphicCache.hashcode(klass, capacity_mask);
+    const slot = megaCacheHashcode(klass, capacity_mask);
     try std.testing.expect(slot < 16);
     try std.testing.expect(slot % 2 == 0);
 }

@@ -741,25 +741,8 @@ pub const FactorVM = struct {
         }
     }
 
-    pub fn beginCallback(self: *Self, quot: Cell) Cell {
-        self.vm_asm.ctx.reset();
-        self.vm_asm.spare_ctx = self.newContext() catch @panic("OOM");
-
-        self.callback_ids.append(self.allocator, self.callback_id) catch @panic("OOM");
-        self.callback_id += 1;
-
-        self.initContext(self.vm_asm.ctx);
-
-        return quot;
-    }
-
-    pub fn endCallback(self: *Self) void {
-        if (self.callback_ids.items.len > 0) {
-            _ = self.callback_ids.pop();
-        }
-
-        self.deleteContext();
-    }
+    // Callback entry/exit is c_api.begin_callback / end_callback (exported for
+    // JIT/dlsym). Do not add a parallel unrooted FactorVM.beginCallback.
 
     pub fn initContext(self: *Self, ctx: *contexts.Context) void {
         const ctx_alien = self.allotAlien(layouts.false_object, @intFromPtr(ctx));

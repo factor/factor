@@ -69,46 +69,6 @@ pub const ObjectStartMap = struct {
         @memset(self.entries, invalid_offset);
     }
 
-    // Find the first object at or after the start of a card
-    // Used when scanning cards for write barrier
-    pub fn findFirstObjectInCard(self: *const Self, card_index: usize) ?Cell {
-        if (card_index >= self.entries.len) {
-            return null;
-        }
-
-        // If this card has a valid offset, use it
-        if (self.entries[card_index] != invalid_offset) {
-            return self.cardToAddress(card_index) + self.entries[card_index];
-        }
-
-        // Otherwise, walk back to find the object spanning into this card
-        var idx = card_index;
-        while (idx > 0) {
-            idx -= 1;
-            if (self.entries[idx] != invalid_offset) {
-                var object_addr = self.cardToAddress(idx) + self.entries[idx];
-                const card_start = self.cardToAddress(card_index);
-
-                // Walk forward to find object in or spanning into the card
-                while (object_addr < card_start + vm.card_size) {
-                    const size = @import("free_list.zig").objectSizeFromHeader(object_addr);
-                    if (object_addr + size > card_start) {
-                        return object_addr;
-                    }
-                    object_addr += size;
-
-                    if (object_addr >= self.start + self.size) {
-                        return null;
-                    }
-                }
-
-                return null;
-            }
-        }
-
-        return null;
-    }
-
     // Find the object containing the start of this card by walking backward to a
     // card with a known object start.
     pub fn findObjectContainingCard(self: *const Self, card_index: usize) ?Cell {

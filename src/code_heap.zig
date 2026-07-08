@@ -331,26 +331,6 @@ pub const CodeHeap = struct {
         return null;
     }
 
-    // walking: choose the previous block start without requiring the address to
-    // lie within the block extent.
-    pub fn codeBlockForReturnAddress(self: *Self, address: Cell) ?*CodeBlock {
-        const blocks = self.all_blocks_sorted.items;
-        if (blocks.len > 0) {
-            const ub = std.sort.upperBound(Cell, blocks, address, layouts.orderCell);
-            if (ub > 0) {
-                return @ptrFromInt(blocks[ub - 1]);
-            }
-        }
-
-        for (self.pending_blocks.items) |block_addr| {
-            if (address >= block_addr) {
-                return @ptrFromInt(block_addr);
-            }
-        }
-
-        return null;
-    }
-
     // Get the predecessor frame (caller's frame) given the current frame top
     pub fn framePredecessor(self: *Self, frame_top: Cell) Cell {
         if (builtin.cpu.arch == .aarch64) {

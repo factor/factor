@@ -91,61 +91,6 @@ pub fn iterateCallstack(vm: *FactorVM, ctx: *const contexts.Context, comptime It
     }
 }
 
-pub fn captureCallstack(vm: *FactorVM, ctx: *const contexts.Context) ?Cell {
-    var top = ctx.callstack_top;
-    const bottom = ctx.callstack_bottom;
-
-    const code = vm.code orelse @panic("code heap not initialized");
-    var frames_skipped: usize = 0;
-    while (frames_skipped < 2 and top < bottom) {
-        if (builtin.cpu.arch == .aarch64) {
-            const next_frame = @as(*const Cell, @ptrFromInt(top)).*;
-            if (next_frame >= bottom or next_frame == 0) break;
-            top = next_frame;
-        } else {
-            const ret_addr = @as(*const Cell, @ptrFromInt(top + FRAME_RETURN_ADDRESS)).*;
-            if (ret_addr == 0) break;
-            const block = code.codeBlockForAddress(ret_addr) orelse break;
-            const frame_size = block.stackFrameSizeForAddress(ret_addr);
-            top += frame_size;
-        }
-        frames_skipped += 1;
-    }
-
-    const size: i64 = @as(i64, @intCast(bottom)) - @as(i64, @intCast(top));
-    if (size < 0) return null;
-    const size_bytes: usize = @intCast(size);
-
-    // Allocate callstack object
-    const cs_size = @sizeOf(layouts.Callstack) + size_bytes;
-    const tagged = vm.allotObject(.callstack, cs_size) orelse return null;
-    const cs: *layouts.Callstack = @ptrFromInt(layouts.UNTAG(tagged));
-
-    cs.length = layouts.tagFixnum(@intCast(size_bytes));
-
-    const src: [*]const u8 = @ptrFromInt(top);
-    const dst = cs.data();
-    @memcpy(dst[0..size_bytes], src[0..size_bytes]);
-
-    if (builtin.cpu.arch == .aarch64) {
-        var scan_top = top;
-        var scan_dst = cs.top();
-        while (scan_top < bottom) {
-            const saved_fp = @as(*const Cell, @ptrFromInt(scan_top)).*;
-            if (saved_fp > scan_top) {
-                const dst_ptr: *Cell = @ptrFromInt(scan_dst);
-                dst_ptr.* = saved_fp - scan_top;
-                scan_top = saved_fp;
-                scan_dst += dst_ptr.*;
-            } else {
-                break;
-            }
-        }
-    }
-
-    return tagged;
-}
-
 pub export fn primitive_callstack_to_array(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
 

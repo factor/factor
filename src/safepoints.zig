@@ -145,8 +145,8 @@ pub fn enqueueSamples(vm: *vm_mod.FactorVM, samples: Cell, pc: Cell, foreign_thr
 
 // Handle a safepoint fault
 // Called from the signal handler when code touches the protected safepoint page.
-// On macOS, profiler safepoints are handled directly in the Mach handler
-// (recordSampleFromMach), so this path is primarily for FEP and Unix signals.
+// On macOS, profiler and FEP safepoints use the BSD signal path (Mach
+// exception handler was removed; see signals.zig).
 pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
     // Disarm the safepoint so we can run without faulting again
     try disarmSafepoint(vm);
@@ -380,49 +380,6 @@ fn recordSampleImpl(vm: *vm_mod.FactorVM, skip_p: bool, current_owner: ?Cell) vo
 
 fn recordSample(vm: *vm_mod.FactorVM, prolog_p: bool) void {
     recordSampleImpl(vm, prolog_p, null);
-}
-
-fn recordSampleWithCurrentOwner(vm: *vm_mod.FactorVM, current_owner: Cell) void {
-    recordSampleImpl(vm, false, current_owner);
-}
-
-// Record a sample directly from the Mach exception handler thread.
-// The faulted thread is suspended, so its callstack is frozen and walkable.
-// This avoids the signal handler word dispatch entirely.
-pub fn recordSampleFromMach(vm: *vm_mod.FactorVM, fault_pc: Cell, thread_sp: Cell) void {
-    const code_heap = vm.code orelse return;
-    if (code_heap.seg) |seg| {
-        if (!seg.contains(fault_pc)) return;
-    }
-    const block = code_heap.codeBlockForAddress(fault_pc) orelse return;
-    const prolog_p = block.entryPoint() == fault_pc;
-
-    // Determine the correct callstack_top for the walk.
-    // For prolog safepoints (at function entry): RSP points to the return
-    // address pushed by `call` — this IS the correct callstack_top.
-    // For non-prolog safepoints (mid-function): the function's frame has
-    // been set up, so RSP is inside the frame. The caller's return address
-    // is at RSP + (frame_size - sizeof(Cell)). We also need to manually
-    // record the current function's owner since the walk won't see it.
-    var walk_top = thread_sp;
-    if (!prolog_p) {
-        const frame_size = block.stackFrameSize();
-        if (frame_size > 0) {
-            walk_top = thread_sp + frame_size - @sizeOf(Cell);
-        }
-    }
-
-    const ctx = vm.vm_asm.ctx;
-    const saved_top = ctx.callstack_top;
-    ctx.callstack_top = walk_top;
-    defer ctx.callstack_top = saved_top;
-
-    if (!prolog_p) {
-        // For non-prolog: record the current function's owner before walking
-        recordSampleWithCurrentOwner(vm, block.owner);
-    } else {
-        recordSample(vm, true);
-    }
 }
 
 // itimerval and setitimer definitions for Unix platforms

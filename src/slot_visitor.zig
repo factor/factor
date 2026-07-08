@@ -326,6 +326,12 @@ pub fn visitLiveCallstackRoots(
             continue;
         };
 
+        // Full-mark GC needs the frame's code block kept live (return addresses
+        // alone are not heap roots). Optional so become/copy paths can omit it.
+        if (comptime @hasDecl(Fixup, "visitCodeBlockOwner")) {
+            fixup.visitCodeBlockOwner(owner);
+        }
+
         if (owner.blockGcInfo()) |gc_info| {
             const return_address_offset: u32 = @intCast(owner.offset(addr));
             if (lookup.callsiteIndex(gc_info, return_address_offset)) |callsite| {

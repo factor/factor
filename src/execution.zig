@@ -1,3 +1,6 @@
+// Fallback interpreter for startup quotations that have no compiled entry
+// point (boot image before JIT, tests). Production path is vm.cToFactor.
+// Intentionally limited: do not grow this into a second execution engine.
 const std = @import("std");
 
 const contexts = @import("contexts.zig");

@@ -87,9 +87,25 @@ pub fn build(b: *std.Build) void {
         copy_to_bundle.addArtifactArg(exe);
         copy_to_bundle.addArg("Factor.app/Contents/MacOS/factor");
         copy_to_bundle.step.dependOn(&mkdir_bundle.step);
+        // Re-sign after copy into the .app. A plain `cp` of a linker-signed
+        // Mach-O into Factor.app is rejected by taskgated on modern macOS
+        // (EXC_CRASH SIGKILL / CODESIGNING "Taskgated Invalid Signature").
+        // Ad-hoc sign with factor.entitlements so MAP_JIT / W^X stays allowed.
+        const codesign = b.addSystemCommand(&.{
+            "codesign",
+            "-s",
+            "-",
+            "-f",
+            "--timestamp=none",
+            "--entitlements",
+            "factor.entitlements",
+            "Factor.app/Contents/MacOS/factor",
+        });
+        codesign.setCwd(b.path("."));
+        codesign.step.dependOn(&copy_to_bundle.step);
         const link_factor = b.addSystemCommand(&.{ "ln", "-sf", "Factor.app/Contents/MacOS/factor", "factor" });
         link_factor.setCwd(b.path("."));
-        link_factor.step.dependOn(&copy_to_bundle.step);
+        link_factor.step.dependOn(&codesign.step);
         b.getInstallStep().dependOn(&link_factor.step);
     } else {
         // On non-macOS platforms there's no app bundle, so just drop the
