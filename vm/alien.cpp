@@ -102,6 +102,8 @@ void factor_vm::primitive_dlopen() {
   data_root<dll> library(allot<dll>(sizeof(dll)), this);
   library->path = path.value();
   ffi_dlopen(library.untagged());
+  // A newly opened library can change what a symbol resolves to.
+  dlsym_cache.clear();
   ctx->push(library.value());
 }
 
@@ -128,8 +130,11 @@ void factor_vm::primitive_dlsym() {
 // close a native library handle
 void factor_vm::primitive_dlclose() {
   dll* d = untag_check<dll>(ctx->pop());
-  if (d->handle != NULL)
+  if (d->handle != NULL) {
     ffi_dlclose(d);
+    // Cached addresses into the closed library are now dangling.
+    dlsym_cache.clear();
+  }
 }
 
 void factor_vm::primitive_dll_validp() {

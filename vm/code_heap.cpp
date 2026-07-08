@@ -138,12 +138,29 @@ void code_heap::initialize_all_blocks_set() {
 // Update pointers to words referenced from all code blocks.
 // Only needed after redefining an existing word.
 // If generic words were redefined, inline caches need to be reset.
-void factor_vm::update_code_heap_words(bool reset_inline_caches) {
+// When redefined_words is given, only PICs referencing one of those words
+// are invalidated instead of every PIC in the code heap.
+void factor_vm::update_code_heap_words(bool reset_inline_caches,
+                                       const std::set<cell>* redefined_words) {
   // Patches call sites in every existing code block.
   jit_writable_scope jit_writable;
+
+  if (reset_inline_caches && redefined_words) {
+    // Free stale PICs before the patch pass so their call sites observe
+    // free_p() and get reset to the miss stub, while call sites of
+    // surviving PICs are left intact.
+    auto pic_freer = [&](code_block* block, cell size) {
+      (void)size;
+      if (block->pic_p() && !code->uninitialized_p(block) &&
+          pic_references_words(block, *redefined_words))
+        code->free(block);
+    };
+    each_code_block(pic_freer);
+  }
+
   auto word_updater = [&](code_block* block, cell size) {
     (void)size;
-    update_word_references(block, reset_inline_caches);
+    update_word_references(block, reset_inline_caches, redefined_words);
   };
   each_code_block(word_updater);
 }
@@ -195,9 +212,17 @@ void factor_vm::primitive_modify_code_heap() {
     }
   }
 
-  if (update_existing_words)
-    update_code_heap_words(reset_inline_caches);
-  else {
+  if (update_existing_words) {
+    // Collect the words being (re)defined in this compilation unit. Built
+    // after the compile loop above since jit_compile_word can trigger GC,
+    // which would move the word objects; nothing below allocates.
+    std::set<cell> redefined_words;
+    for (cell i = 0; i < count; i++) {
+      array* pair = untag<array>(array_nth(alist.untagged(), i));
+      redefined_words.insert(array_nth(pair, 0));
+    }
+    update_code_heap_words(reset_inline_caches, &redefined_words);
+  } else {
     // Fast path for compilation units that only define new words.
     FACTOR_FOR_EACH(code->uninitialized_blocks) {
       initialize_code_block(iter->first, iter->second);

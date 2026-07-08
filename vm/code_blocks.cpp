@@ -83,8 +83,40 @@ cell factor_vm::compute_entry_point_pic_tail_address(cell w_) {
 // dlsyms, and words. For all other words in the code heap, we only need
 // to update references to other words, without worrying about literals
 // or dlsyms.
+// Returns true if the PIC references any word in the set, either as a
+// literal (the generic word pushed for the miss handler) or as the owner of
+// a called code block (a cached method). Such a PIC may dispatch stale
+// methods after the redefinition, so it must be thrown away.
+bool factor_vm::pic_references_words(code_block* compiled,
+                                     const std::set<cell>& words) {
+  bool stale = false;
+  auto check_func = [&](instruction_operand op) {
+    switch (op.rel.type()) {
+      case RT_LITERAL: {
+        cell value = op.load_value(op.pointer);
+        if (TAG(value) == WORD_TYPE && words.count(value))
+          stale = true;
+        break;
+      }
+      case RT_ENTRY_POINT:
+      case RT_ENTRY_POINT_PIC:
+      case RT_ENTRY_POINT_PIC_TAIL: {
+        cell owner = op.load_code_block()->owner;
+        if (TAG(owner) == WORD_TYPE && words.count(owner))
+          stale = true;
+        break;
+      }
+      default:
+        break;
+    }
+  };
+  compiled->each_instruction_operand(check_func);
+  return stale;
+}
+
 void factor_vm::update_word_references(code_block* compiled,
-                                       bool reset_inline_caches) {
+                                       bool reset_inline_caches,
+                                       const std::set<cell>* redefined_words) {
   if (code->uninitialized_p(compiled)) {
     initialize_code_block(compiled);
     // update_word_references() is always applied to every block in
@@ -94,9 +126,32 @@ void factor_vm::update_word_references(code_block* compiled,
     // are referenced after this is done. So instead of polluting
     // the code heap with dead PICs that will be freed on the next
     // GC, we add them to the free list immediately.
-  } else if (reset_inline_caches && compiled->pic_p()) {
+    //
+    // When the set of redefined words is known, only PICs that reference
+    // one of them can hold stale dispatch decisions; those were already
+    // freed by update_code_heap_words before this pass, and unrelated PICs
+    // are kept (their embedded entry points still get patched below). This
+    // avoids re-warming every inline cache in the image on each redefining
+    // compilation unit.
+  } else if (reset_inline_caches && !redefined_words && compiled->pic_p()) {
     code->free(compiled);
   } else {
+    // Most blocks already point at the correct entry points, so only store
+    // when the value changes and only flush the icache when a store happened.
+    bool modified = false;
+    auto store_if_changed = [&](instruction_operand& op, cell value) {
+      if (op.load_value(op.pointer) != (fixnum)value) {
+        op.store_value(value);
+        modified = true;
+      }
+    };
+    // With a redefined-word set, stale PICs were already freed by
+    // update_code_heap_words, so a call site is reset exactly when its
+    // target PIC is gone; sites of surviving PICs are left alone. A freed
+    // block's header holds its size, so free_p() must be checked before
+    // pic_p(). The owner cell of a freed PIC is not clobbered by
+    // make_free(), so resetting through code_block_owner() still works.
+    bool selective = (redefined_words != NULL);
     auto visit_func = [&](instruction_operand op) {
 
       switch (op.rel.type()) {
@@ -104,24 +159,26 @@ void factor_vm::update_word_references(code_block* compiled,
           code_block* dest = op.load_code_block();
           cell owner = dest->owner;
           if (to_boolean(owner))
-            op.store_value(compute_entry_point_address(owner));
+            store_if_changed(op, compute_entry_point_address(owner));
           break;
         }
         case RT_ENTRY_POINT_PIC:  {
           code_block* dest = op.load_code_block();
-          if (reset_inline_caches || !dest->pic_p()) {
+          if (selective ? (dest->free_p() || !dest->pic_p())
+                        : (reset_inline_caches || !dest->pic_p())) {
             cell owner = code_block_owner(dest);
             if (to_boolean(owner))
-              op.store_value(compute_entry_point_pic_address(owner));
+              store_if_changed(op, compute_entry_point_pic_address(owner));
           }
           break;
         }
         case RT_ENTRY_POINT_PIC_TAIL: {
           code_block* dest = op.load_code_block();
-          if (reset_inline_caches || !dest->pic_p()) {
+          if (selective ? (dest->free_p() || !dest->pic_p())
+                        : (reset_inline_caches || !dest->pic_p())) {
             cell owner = code_block_owner(dest);
             if (to_boolean(owner))
-              op.store_value(compute_entry_point_pic_tail_address(owner));
+              store_if_changed(op, compute_entry_point_pic_tail_address(owner));
           }
           break;
         }
@@ -130,7 +187,8 @@ void factor_vm::update_word_references(code_block* compiled,
       }
     };
     compiled->each_instruction_operand(visit_func);
-    compiled->flush_icache();
+    if (modified)
+      compiled->flush_icache();
   }
 }
 
@@ -149,9 +207,24 @@ cell factor_vm::compute_dlsym_address(array* parameters,
 
   FACTOR_ASSERT(TAG(symbol) == BYTE_ARRAY_TYPE);
   symbol_char* name = alien_offset(symbol);
+
+  // dlsym walks the dyld export trie on every call, and the same handful of
+  // symbols are re-resolved for every code block that references them.
+  void* handle = d ? d->handle : NULL;
+  byte_array* name_bytes = untag<byte_array>(symbol);
+  std::string key((const char*)name, untag_fixnum(name_bytes->capacity));
+  key.push_back(toc ? '\1' : '\0');
+  key.append((const char*)&handle, sizeof(handle));
+  auto cached = dlsym_cache.find(key);
+  if (cached != dlsym_cache.end())
+    return cached->second;
+
   cell sym = ffi_dlsym(d, name);
   sym = toc ? FUNCTION_TOC_POINTER(sym) : FUNCTION_CODE_POINTER(sym);
-  return sym ? sym : undef;
+  if (!sym)
+    return undef;
+  dlsym_cache[key] = sym;
+  return sym;
 }
 
 cell factor_vm::lookup_external_address(relocation_type rel_type,

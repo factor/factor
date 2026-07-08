@@ -97,6 +97,11 @@ struct factor_vm {
   // Code heap
   code_heap* code;
 
+  // Caches dlsym lookups for code block relocation; keyed by symbol name +
+  // library handle, cleared on dlopen/dlclose. Only successful lookups are
+  // cached so a later dlopen can resolve a previously missing symbol.
+  std::unordered_map<std::string, cell> dlsym_cache;
+
   // Pinned callback stubs
   callback_heap* callbacks;
 
@@ -558,7 +563,9 @@ struct factor_vm {
   cell compute_entry_point_pic_tail_address(cell w_);
   cell compute_external_address(instruction_operand op);
 
-  void update_word_references(code_block* compiled, bool reset_inline_caches);
+  void update_word_references(code_block* compiled, bool reset_inline_caches,
+                              const std::set<cell>* redefined_words);
+  bool pic_references_words(code_block* compiled, const std::set<cell>& words);
   void undefined_symbol();
   cell compute_dlsym_address(array* literals, cell index, bool toc);
   cell lookup_external_address(relocation_type rel_type,
@@ -578,7 +585,8 @@ struct factor_vm {
     code->allocator->iterate(iter, no_fixup());
   }
 
-  void update_code_heap_words(bool reset_inline_caches);
+  void update_code_heap_words(bool reset_inline_caches,
+                              const std::set<cell>* redefined_words = NULL);
   void primitive_modify_code_heap();
   void primitive_code_room();
   void primitive_strip_stack_traces();

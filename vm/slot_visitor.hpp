@@ -161,7 +161,7 @@ template <typename Fixup> struct slot_visitor {
   // Visits pointers embedded in instructions in code blocks.
   void visit_instruction_operands(code_block* block, cell rel_base);
   void visit_embedded_code_pointers(code_block* compiled);
-  void visit_embedded_literals(code_block* compiled);
+  bool visit_embedded_literals(code_block* compiled);
 
   // Visits data pointers in code blocks.
   void visit_code_block_objects(code_block* compiled);
@@ -339,20 +339,28 @@ void slot_visitor<Fixup>::visit_code_block_objects(code_block* compiled) {
   visit_handle(&compiled->relocation);
 }
 
+// Returns true if any embedded literal was actually rewritten, so callers
+// can skip the icache flush for blocks whose instructions did not change.
 template <typename Fixup>
-void slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
+bool slot_visitor<Fixup>::visit_embedded_literals(code_block* compiled) {
   if (parent->code->uninitialized_p(compiled))
-    return;
+    return false;
 
+  bool modified = false;
   auto update_literal_refs = [&](instruction_operand op) {
     if (op.rel.type() == RT_LITERAL) {
       cell value = op.load_value(op.pointer);
       if (!immediate_p(value)) {
-        op.store_value(visit_pointer(value));
+        cell forwarded = visit_pointer(value);
+        if (forwarded != value) {
+          op.store_value(forwarded);
+          modified = true;
+        }
       }
     }
   };
   compiled->each_instruction_operand(update_literal_refs);
+  return modified;
 }
 
 template <typename Fixup> struct call_frame_code_block_visitor {
@@ -422,7 +430,9 @@ void slot_visitor<Fixup>::visit_embedded_code_pointers(code_block* compiled) {
         type == RT_ENTRY_POINT_PIC ||
         type == RT_ENTRY_POINT_PIC_TAIL) {
       code_block* block = fixup.fixup_code(op.load_code_block());
-      op.store_value(block->entry_point());
+      fixnum entry_point = block->entry_point();
+      if (op.load_value(op.pointer) != entry_point)
+        op.store_value(entry_point);
     }
   };
   compiled->each_instruction_operand(update_code_block_refs);
@@ -580,9 +590,12 @@ template <typename Fixup>
 void slot_visitor<Fixup>::visit_code_heap_roots(std::set<code_block*>* remembered_set) {
   FACTOR_FOR_EACH(*remembered_set) {
     code_block* compiled = *iter;
+    // visit_code_block_objects only touches header cells (owner, parameters,
+    // relocation), which are data reads, so only instruction changes from
+    // embedded literals require an icache flush.
     visit_code_block_objects(compiled);
-    visit_embedded_literals(compiled);
-    compiled->flush_icache();
+    if (visit_embedded_literals(compiled))
+      compiled->flush_icache();
   }
 }
 
