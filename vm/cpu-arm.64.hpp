@@ -22,6 +22,10 @@ inline static void* get_call_target(cell return_address) {
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
   *(unsigned int*)(return_address - 4) = (*(unsigned int*)(return_address - 4) & 0xfc000000) | ((target - return_address + 4) >> 2 & 0x03ffffff);
+  // Without this the core can keep executing the stale branch from its
+  // icache, so the call site re-enters the inline-cache miss handler on
+  // every call, compiling and immediately discarding a PIC each time.
+  flush_icache(return_address - 4, 4);
 }
 
 inline static bool tail_call_site_p(cell return_address) {
