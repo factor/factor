@@ -343,6 +343,7 @@ macos.app: $(EXECUTABLE)
 	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	ln -s $(BUNDLE)/Contents/MacOS/factor ./factor
+	codesign --force --sign - $(BUNDLE)
 
 $(ENGINE): $(DLL_OBJS)
 ifeq ($(IS_CLANG), 1)
