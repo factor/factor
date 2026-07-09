@@ -328,12 +328,17 @@ pub export fn delete_context(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn reset_context(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const parent = vm_asm.getVM();
     const ctx = parent.vm_asm.ctx;
-    const arg1 = ctx.pop();
-    const arg2 = ctx.pop();
+    var arg1 = ctx.pop();
+    var arg2 = ctx.pop();
+    parent.data_roots.appendAssumeCapacity(&arg1);
+    defer _ = parent.data_roots.pop();
+    parent.data_roots.appendAssumeCapacity(&arg2);
+    defer _ = parent.data_roots.pop();
+
     ctx.reset();
+    parent.initContext(ctx);
     ctx.push(arg2);
     ctx.push(arg1);
-    parent.initContext(ctx);
 }
 
 // ============================================================================

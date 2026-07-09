@@ -361,6 +361,7 @@ pub const FactorVM = struct {
         // a short root stack turns appendAssumeCapacity into an out-of-bounds
         // write in release builds.
         vm.data_roots.ensureTotalCapacity(allocator, 256) catch @panic("OOM reserving data_roots");
+        vm.code_roots.ensureTotalCapacity(allocator, 16) catch @panic("OOM reserving code_roots");
 
         return vm;
     }
@@ -840,19 +841,26 @@ pub const FactorVM = struct {
     }
 
     pub fn allotAlien(self: *Self, base: Cell, displacement: Cell) Cell {
+        var rooted_base = base;
+        const needs_root = !layouts.isImmediate(rooted_base);
+        if (needs_root) self.data_roots.appendAssumeCapacity(&rooted_base);
+        defer if (needs_root) {
+            _ = self.data_roots.pop();
+        };
+
         const tagged = self.allotObject(.alien, @sizeOf(layouts.Alien)) orelse {
             self.memoryError();
         };
         const alien: *layouts.Alien = @ptrFromInt(layouts.UNTAG(tagged));
 
-        alien.base = base;
+        alien.base = rooted_base;
         alien.expired = layouts.false_object;
         alien.displacement = displacement;
 
-        if (base == layouts.false_object) {
+        if (rooted_base == layouts.false_object) {
             alien.address = displacement;
         } else {
-            alien.address = layouts.UNTAG(base) + @sizeOf(layouts.ByteArray) + displacement;
+            alien.address = layouts.UNTAG(rooted_base) + @sizeOf(layouts.ByteArray) + displacement;
         }
 
         return tagged;
@@ -1191,4 +1199,38 @@ comptime {
     // Note: JIT code uses &vm.vm_asm as the VM pointer, not &vm
     // So offsets within VMAssemblyFields matter (verified above), but
     // the offset of vm_asm within FactorVM doesn't matter for JIT
+}
+
+test "allotAlien roots a movable base across allocation" {
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+
+    const heap = try DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // Leave less than one Alien object free so allotAlien must collect and
+    // move this otherwise-unreachable byte array into aging space.
+    const payload_size = heap.nursery.size - @sizeOf(layouts.ByteArray) - layouts.data_alignment;
+    const old_base = vm.allotByteArray(payload_size);
+    const alien_cell = vm.allotAlien(old_base, 7);
+    const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(alien_cell));
+
+    try std.testing.expectEqual(@as(Cell, 1), heap.nursery_collections);
+    try std.testing.expect(alien.base != old_base);
+    const live_base = layouts.UNTAG(alien.base);
+    try std.testing.expect(live_base >= heap.aging.start and live_base < heap.aging.here);
+    try std.testing.expectEqual(live_base + @sizeOf(layouts.ByteArray) + 7, alien.address);
 }
