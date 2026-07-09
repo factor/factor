@@ -249,8 +249,9 @@ IN: bootstrap.assembler.ppc
 
 ! ! ! Polymorphic inline caches
 
-! Don't touch r6 here; it's used to pass the tail call site
-! address for tail PICs
+! PIC checks and hits must preserve r6 for tail calls. The ordinary miss
+! template captures LR there before leaving the PIC; the tail miss template
+! preserves the existing call-site address.
 
 ! Load a value from a stack position
 [
@@ -305,6 +306,15 @@ IN: bootstrap.assembler.ppc
 [ 3 MTLR BLRL ]
 [ 3 MTCTR BCTR ]
 \ inline-cache-miss-tail define-combinator-primitive
+
+[
+    6 MFLR
+    0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
+] PIC-MISS-JUMP jit-define
+
+[
+    0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
+] PIC-MISS-TAIL-JUMP jit-define
 
 ! ! ! Megamorphic caches
 
@@ -538,6 +548,23 @@ IN: bootstrap.assembler.ppc
 
         ! Call quotation
         jit-jump-quot
+    ] }
+    { inline-cache-miss-resume [
+        0 MFLR
+        0 1 lr-save jit-save-cell
+        0 jit-load-this-arg
+        0 1 cell-size 2 * neg jit-save-cell
+        0 stack-frame LI
+        0 1 cell-size 1 * neg jit-save-cell
+        1 1 stack-frame neg jit-save-cell-update
+
+        jit-inline-cache-miss
+
+        1 1 stack-frame ADDI
+        0 1 lr-save jit-load-cell
+        0 MTLR
+        3 MTCTR
+        BCTR
     ] }
 
     ! ## Fixnums

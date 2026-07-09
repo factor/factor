@@ -1,7 +1,7 @@
 namespace factor {
 
 static const cell image_magic = 0x0f0e0d0c;
-static const cell image_version = 4;
+static const cell image_version = 5;
 
 const size_t STRERROR_BUFFER_SIZE = 1024;
 

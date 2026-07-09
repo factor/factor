@@ -14,18 +14,38 @@ inline static void check_call_site(cell return_address) {
   (void)opcode;
 }
 
+constexpr fixnum arm64_branch_displacement(uint32_t opcode) {
+  uint32_t imm26 = opcode & 0x03ffffff;
+  fixnum signed_imm =
+      (imm26 & 0x02000000) ? (fixnum)imm26 - ((fixnum)1 << 26) : imm26;
+  return signed_imm * 4;
+}
+
+constexpr cell decode_arm64_call_target(cell return_address, uint32_t opcode) {
+  return (cell)((fixnum)return_address - 4 +
+                arm64_branch_displacement(opcode));
+}
+
+static_assert(decode_arm64_call_target(0x1004, 0x94000000) == 0x1000,
+              "ARM64 branch targets are relative to the instruction");
+static_assert(decode_arm64_call_target(0x1004, 0x97ffffff) == 0x0ffc,
+              "ARM64 branch immediates must be sign-extended");
+
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(return_address + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
+  return (void*)decode_arm64_call_target(return_address,
+                                         call_site_opcode(return_address));
 }
 
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(unsigned int*)(return_address - 4) = (*(unsigned int*)(return_address - 4) & 0xfc000000) | ((target - return_address + 4) >> 2 & 0x03ffffff);
+  cell call_site = return_address - 4;
+  *(unsigned int*)call_site =
+      (*(unsigned int*)call_site & 0xfc000000) |
+      ((target - return_address + 4) >> 2 & 0x03ffffff);
   // Without this the core can keep executing the stale branch from its
-  // icache, so the call site re-enters the inline-cache miss handler on
-  // every call, compiling and immediately discarding a PIC each time.
-  flush_icache(return_address - 4, 4);
+  // I-cache, so a stale branch can re-enter a PIC after it has been freed.
+  flush_icache(call_site, 4);
 }
 
 inline static bool tail_call_site_p(cell return_address) {
@@ -34,7 +54,7 @@ inline static bool tail_call_site_p(cell return_address) {
 
 static const unsigned JIT_FRAME_SIZE = 16;
 
-// Must match the calculation in word jit-signal-handler-prolog in
+// Must match the stack frame built by the signal-handler sub-primitive in
 // basis/bootstrap/assembler/arm.64.factor
 static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
 
