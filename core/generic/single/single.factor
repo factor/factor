@@ -9,6 +9,7 @@ IN: generic.single
 <PRIVATE
 PRIMITIVE: inline-cache-miss ( generic methods index cache -- )
 PRIMITIVE: inline-cache-miss-tail ( generic methods index cache -- )
+PRIMITIVE: inline-cache-miss-resume ( generic methods index cache -- )
 PRIMITIVE: lookup-method ( object methods -- method )
 PRIMITIVE: mega-cache-lookup ( methods index cache -- )
 PRIMITIVE: mega-cache-miss ( methods index cache -- method )

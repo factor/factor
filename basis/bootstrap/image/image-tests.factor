@@ -27,7 +27,7 @@ IN: bootstrap.image.tests
     ] keep 11 swap nth
 ] unit-test
 
-{ 18 } [
+{ 19 } [
     H{ } [ special-objects set emit-jit-data ] keep assoc-size
 ] unit-test
 

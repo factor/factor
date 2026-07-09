@@ -216,6 +216,7 @@ CONSTANT: all-primitives {
         {
             { "inline-cache-miss" ( generic methods index cache -- ) f f f f }
             { "inline-cache-miss-tail" ( generic methods index cache -- ) f f f f }
+            { "inline-cache-miss-resume" ( generic methods index cache -- ) f f f f }
             {
                 "lookup-method" ( object methods -- method ) "lookup_method"
                 { object array } { word } f
