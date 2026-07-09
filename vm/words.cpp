@@ -26,12 +26,13 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating) {
 
 // Allocates memory
 word* factor_vm::allot_word(cell name_, cell vocab_, cell hashcode_) {
+  data_root<object> hashcode(hashcode_, this);
   data_root<object> vocab(vocab_, this);
   data_root<object> name(name_, this);
 
   data_root<word> new_word(allot<word>(sizeof(word)), this);
 
-  new_word->hashcode = hashcode_;
+  new_word->hashcode = hashcode.value();
   new_word->vocabulary = vocab.value();
   new_word->name = name.value();
   new_word->def = special_objects[OBJ_UNDEFINED];
