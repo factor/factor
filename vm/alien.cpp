@@ -81,15 +81,26 @@ void* factor_vm::alien_pointer() {
   return alien_offset(ctx->pop()) + offset;
 }
 
+template <typename T> static T read_unaligned(const void* pointer) {
+  T value;
+  memcpy(&value, pointer, sizeof(value));
+  return value;
+}
+
+template <typename T> static void write_unaligned(void* pointer, T value) {
+  memcpy(pointer, &value, sizeof(value));
+}
+
 // define words to read/write values at an alien address
 #define DEFINE_ALIEN_ACCESSOR(name, type, from, to)                     \
   VM_C_API void primitive_alien_##name(factor_vm * parent) {            \
-    parent->ctx->push(parent->from(*(type*)(parent->alien_pointer()))); \
+    type value = read_unaligned<type>(parent->alien_pointer());         \
+    parent->ctx->push(parent->from(value));                             \
   }                                                                     \
   VM_C_API void primitive_set_alien_##name(factor_vm * parent) {        \
-    type* ptr = (type*)parent->alien_pointer();                         \
+    void* pointer = parent->alien_pointer();                            \
     type value = (type)parent->to(parent->ctx->pop());                  \
-    *ptr = value;                                                       \
+    write_unaligned(pointer, value);                                    \
   }
 
 EACH_ALIEN_PRIMITIVE(DEFINE_ALIEN_ACCESSOR)

@@ -32,6 +32,13 @@ IN: alien.tests
     "dump" get 0 alien-signed-4
 ] unit-test
 
+! Scalar alien accessors permit byte-aligned offsets.
+{ 0x12345678 } [
+    5 <byte-array>
+    0x12345678 over 1 set-alien-unsigned-4
+    1 alien-unsigned-4
+] unit-test
+
 { 12345678901234567 } [
     12345678901234567 "dump" get 0 set-alien-signed-8
     "dump" get 0 alien-signed-8
