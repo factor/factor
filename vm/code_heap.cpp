@@ -249,29 +249,50 @@ void factor_vm::primitive_strip_stack_traces() {
 
 // Allocates memory
 void factor_vm::primitive_code_blocks() {
-  std::vector<cell> objects;
-  auto code_block_accumulator = [&](code_block* block, cell size) {
-    (void)size;
-    objects.push_back(block->owner);
-    objects.push_back(block->parameters);
-    objects.push_back(block->relocation);
+  // Allocate before capturing any fields. The allocation may collect and
+  // compact the code heap, so a malloc-side snapshot of raw entry points can
+  // be stale by the time it is copied. If that collection also reclaims code,
+  // retry with the new count; the fill pass itself never allocates.
+  for (;;) {
+    cell block_count = 0;
+    auto code_block_counter = [&](code_block* block, cell size) {
+      (void)block;
+      (void)size;
+      block_count++;
+    };
+    each_code_block(code_block_counter);
 
-    objects.push_back(tag_fixnum(block->type()));
-    objects.push_back(tag_fixnum(block->size()));
+    tagged<array> objects(allot_uninitialized_array<array>(block_count * 6));
+    cell count = 0;
+    bool count_changed = false;
+    auto code_block_accumulator = [&](code_block* block, cell size) {
+      (void)size;
+      if (count + 6 > block_count * 6) {
+        count_changed = true;
+        return;
+      }
 
-    // Note: the entry point is always a multiple of the heap
-    // alignment (16 bytes). We cannot allocate while iterating
-    // through the code heap, so it is not possible to call
-    // from_unsigned_cell() here. It is OK, however, to add it as
-    // if it were a fixnum, and have library code shift it to the
-    // left by 4.
-    cell entry_point = block->entry_point();
-    FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
-    FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
-    objects.push_back(entry_point);
-  };
-  each_code_block(code_block_accumulator);
-  ctx->push(std_vector_to_array(objects));
+      cell* data = objects->data();
+      data[count++] = block->owner;
+      data[count++] = block->parameters;
+      data[count++] = block->relocation;
+      data[count++] = tag_fixnum(block->type());
+      data[count++] = tag_fixnum(block->size());
+
+      // Entry points are heap-aligned, so library code can treat this cell as
+      // a fixnum and shift it back to an address without allocating here.
+      cell entry_point = block->entry_point();
+      FACTOR_ASSERT((entry_point & (data_alignment - 1)) == 0);
+      FACTOR_ASSERT((entry_point & TAG_MASK) == FIXNUM_TYPE);
+      data[count++] = entry_point;
+    };
+    each_code_block(code_block_accumulator);
+
+    if (!count_changed && count == block_count * 6) {
+      ctx->push(objects.value());
+      return;
+    }
+  }
 }
 
 }
