@@ -47,21 +47,6 @@ void factor_vm::primitive_fixnum_divmod() {
   }
 }
 
-
-// If we're shifting right by n bits, we won't overflow as long as none of the
-// high WORD_SIZE-TAG_BITS-n bits are set.
-inline fixnum factor_vm::sign_mask(fixnum x) {
-    return x >> (WORD_SIZE - 1);
-}
-
-inline fixnum factor_vm::branchless_max(fixnum x, fixnum y) {
-  return (x - ((x - y) & sign_mask(x - y)));
-}
-
-inline fixnum factor_vm::branchless_abs(fixnum x) {
-  return (x ^ sign_mask(x)) - sign_mask(x);
-}
-
 // Allocates memory
 void factor_vm::primitive_fixnum_shift() {
   fixnum y = untag_fixnum(ctx->pop());
@@ -70,14 +55,25 @@ void factor_vm::primitive_fixnum_shift() {
   if (x == 0)
     return;
   else if (y < 0) {
-    y = branchless_max(y, -WORD_SIZE + 1);
+    if (y < -WORD_SIZE + 1)
+      y = -WORD_SIZE + 1;
     ctx->replace(tag_fixnum(x >> -y));
     return;
   } else if (y < WORD_SIZE - TAG_BITS) {
-    fixnum mask = -((fixnum)1 << (WORD_SIZE - 1 - TAG_BITS - y));
-    if (!(branchless_abs(x) & mask)) {
-      ctx->replace(tag_fixnum(x << y));
-      return;
+    if (x > 0) {
+      cell max_magnitude = (cell)fixnum_max >> y;
+      if ((cell)x <= max_magnitude) {
+        ctx->replace(tag_fixnum((fixnum)((cell)x << y)));
+        return;
+      }
+    } else {
+      cell magnitude = (cell)(-x);
+      cell max_magnitude =
+          ((cell)1 << (WORD_SIZE - TAG_BITS - 1)) >> y;
+      if (magnitude <= max_magnitude) {
+        ctx->replace(tag_fixnum(-(fixnum)(magnitude << y)));
+        return;
+      }
     }
   }
 
