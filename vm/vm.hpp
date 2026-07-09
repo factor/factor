@@ -457,9 +457,6 @@ struct factor_vm {
   bignum* int32_to_bignum(int32_t n);
   bignum* uint32_to_bignum(uint32_t n);
 #endif
-  inline fixnum sign_mask(fixnum x);
-  inline fixnum branchless_max(fixnum x, fixnum y);
-  inline fixnum branchless_abs(fixnum x);
   void primitive_fixnum_shift();
   void primitive_fixnum_to_bignum();
   void primitive_float_to_bignum();

@@ -231,12 +231,13 @@ pub export fn primitive_fixnum_shift(vm_asm: *VMAssemblyFields) callconv(.c) voi
     } else {
         const max_shift: Fixnum = @intCast(layouts.word_size - layouts.tag_bits);
         if (shift_amt < max_shift) {
-            const mask_shift: u6 =
-                @intCast(@as(Fixnum, @intCast(layouts.word_size - 1 - layouts.tag_bits)) - shift_amt);
-            const mask = -%(@as(Fixnum, 1) << mask_shift);
-            const abs_value = if (value < 0) -value else value;
-            if ((abs_value & mask) == 0) {
-                ctx.replace(layouts.tagFixnum(value << @as(u6, @intCast(shift_amt))));
+            const amount: std.math.Log2Int(Cell) = @intCast(shift_amt);
+            // The negative fixnum range includes one extra magnitude. Keep
+            // its boundary results as fixnums instead of promoting them.
+            if (value >= (fixnum.fixnum_min >> amount) and
+                value <= (fixnum.fixnum_max >> amount))
+            {
+                ctx.replace(layouts.tagFixnum(value << amount));
                 return;
             }
         }

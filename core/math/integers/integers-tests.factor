@@ -1,4 +1,4 @@
-USING: continuations kernel math math.functions math.order
+USING: continuations kernel layouts math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
 sequences tools.test ;
 IN: math.integers.tests
@@ -125,6 +125,11 @@ IN: math.integers.tests
 { 530505719624382123 } [ 13262642990609552931 1591517158873146351 mod ] unit-test
 
 { -351382792 } [ -43922849 3 shift ] unit-test
+{ -351382792 } [ -43922849 3 fixnum-shift ] unit-test
+{ t } [ most-negative-fixnum 0 shift most-negative-fixnum eq? ] unit-test
+{ t } [ most-negative-fixnum 0 fixnum-shift most-negative-fixnum eq? ] unit-test
+{ t } [ -1 fixnum-bits 1 - shift most-negative-fixnum eq? ] unit-test
+{ t } [ -1 fixnum-bits 1 - fixnum-shift most-negative-fixnum eq? ] unit-test
 
 { t } [ 0 zero? ] unit-test
 { f } [ 30 zero? ] unit-test
