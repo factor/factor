@@ -2,6 +2,37 @@
 
 namespace factor {
 
+template <typename T> T load_unaligned(cell address) {
+  T value;
+  memcpy(&value, (const void*)address, sizeof(value));
+  return value;
+}
+
+template <typename T> void store_unaligned(cell address, T value) {
+  memcpy((void*)address, &value, sizeof(value));
+}
+
+constexpr fixnum decode_signed_instruction_field(uint32_t instruction,
+                                                 cell msb, cell lsb,
+                                                 cell scaling) {
+  cell width = msb - lsb + 1;
+  uint32_t mask = width == 32 ? 0xffffffff : ((uint32_t)1 << width) - 1;
+  fixnum value = (instruction >> lsb) & mask;
+
+  uint32_t sign_bit = (uint32_t)1 << (width - 1);
+  if (value & sign_bit)
+    value -= (fixnum)1 << width;
+
+  return value * ((fixnum)1 << scaling);
+}
+
+static_assert(decode_signed_instruction_field(0x00000001, 25, 0, 2) == 4,
+              "positive ARM branch displacement");
+static_assert(decode_signed_instruction_field(0x03ffffff, 25, 0, 2) == -4,
+              "negative ARM branch displacement");
+static_assert(decode_signed_instruction_field(0x00ffffe0, 23, 5, 2) == -4,
+              "negative ARM conditional branch displacement");
+
 instruction_operand::instruction_operand(relocation_entry rel,
                                          code_block* compiled, cell index)
     : rel(rel),
@@ -12,23 +43,22 @@ instruction_operand::instruction_operand(relocation_entry rel,
 // Load a value from a bitfield of an ARM/RISC-V instruction
 fixnum instruction_operand::load_value_masked(cell msb, cell lsb,
                                               cell scaling) {
-  int32_t* ptr = (int32_t*)(pointer - sizeof(uint32_t));
-
-  return *ptr << (31 - msb) >> (31 - msb + lsb) << scaling;
+  uint32_t instruction = load_unaligned<uint32_t>(pointer - sizeof(uint32_t));
+  return decode_signed_instruction_field(instruction, msb, lsb, scaling);
 }
 
 fixnum instruction_operand::load_value(cell relative_to) {
   switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
-      return *(cell*)(pointer - sizeof(cell));
+      return load_unaligned<cell>(pointer - sizeof(cell));
     case RC_ABSOLUTE:
-      return *(uint32_t*)(pointer - sizeof(uint32_t));
+      return load_unaligned<uint32_t>(pointer - sizeof(uint32_t));
     case RC_ABSOLUTE_2:
-      return *(uint16_t*)(pointer - sizeof(uint16_t));
+      return load_unaligned<uint16_t>(pointer - sizeof(uint16_t));
     case RC_ABSOLUTE_1:
-      return *(uint8_t*)(pointer - sizeof(uint8_t));
+      return load_unaligned<uint8_t>(pointer - sizeof(uint8_t));
     case RC_RELATIVE:
-      return *(int32_t*)(pointer - sizeof(uint32_t)) + relative_to;
+      return load_unaligned<int32_t>(pointer - sizeof(uint32_t)) + relative_to;
     case RC_RELATIVE_ARM_B:
       return load_value_masked(25, 0, 2) + relative_to - 4;
     case RC_RELATIVE_ARM_B_COND_LDR:
@@ -50,8 +80,12 @@ code_block* instruction_operand::load_code_block() {
 // Store a value into a bitfield of an ARM/RISC-V instruction
 void instruction_operand::store_value_masked(fixnum value, cell mask,
                                              cell lsb, cell scaling) {
-  uint32_t* ptr = (uint32_t*)(pointer - sizeof(uint32_t));
-  *ptr = (uint32_t)((*ptr & ~mask) | (value >> scaling << lsb & mask));
+  cell address = pointer - sizeof(uint32_t);
+  uint32_t instruction = load_unaligned<uint32_t>(address);
+  fixnum scaled = value / ((fixnum)1 << scaling);
+  instruction =
+      (uint32_t)((instruction & ~mask) | (((uint32_t)scaled << lsb) & mask));
+  store_unaligned<uint32_t>(address, instruction);
 }
 
 void instruction_operand::store_value(fixnum absolute_value) {
@@ -59,19 +93,23 @@ void instruction_operand::store_value(fixnum absolute_value) {
 
   switch (rel.klass()) {
     case RC_ABSOLUTE_CELL:
-      *(cell*)(pointer - sizeof(cell)) = absolute_value;
+      store_unaligned<cell>(pointer - sizeof(cell), absolute_value);
       break;
     case RC_ABSOLUTE:
-      *(uint32_t*)(pointer - sizeof(uint32_t)) = (uint32_t)absolute_value;
+      store_unaligned<uint32_t>(pointer - sizeof(uint32_t),
+                                (uint32_t)absolute_value);
       break;
     case RC_ABSOLUTE_2:
-      *(uint16_t*)(pointer - sizeof(uint16_t)) = (uint16_t)absolute_value;
+      store_unaligned<uint16_t>(pointer - sizeof(uint16_t),
+                                (uint16_t)absolute_value);
       break;
     case RC_ABSOLUTE_1:
-      *(uint8_t*)(pointer - sizeof(uint8_t)) = (uint8_t)absolute_value;
+      store_unaligned<uint8_t>(pointer - sizeof(uint8_t),
+                               (uint8_t)absolute_value);
       break;
     case RC_RELATIVE:
-      *(int32_t*)(pointer - sizeof(int32_t)) = (int32_t)relative_value;
+      store_unaligned<int32_t>(pointer - sizeof(int32_t),
+                               (int32_t)relative_value);
       break;
     case RC_RELATIVE_ARM_B:
       FACTOR_ASSERT(relative_value + 4 < 0x8000000);
