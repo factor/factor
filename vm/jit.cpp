@@ -35,12 +35,21 @@ void jit::emit_relocation(cell relocation_template_) {
   data_root<byte_array> relocation_template(relocation_template_, parent);
   cell capacity =
       array_capacity(relocation_template.untagged()) / sizeof(relocation_entry);
-  relocation_entry* relocations = relocation_template->data<relocation_entry>();
+
+  // Grow once before deriving either heap pointer. grow_bytes() can collect and
+  // move relocation_template; after it returns there are no allocations in the
+  // loop, so both input and output pointers remain valid. This also avoids one
+  // grow/capacity check per relocation entry.
+  cell old_count = relocation.count;
+  relocation.grow_bytes(capacity * sizeof(relocation_entry));
+  relocation_entry* relocations =
+      relocation_template->data<relocation_entry>();
+  relocation_entry* output = reinterpret_cast<relocation_entry*>(
+      &relocation.elements->data<uint8_t>()[old_count]);
   for (cell i = 0; i < capacity; i++) {
     relocation_entry entry = relocations[i];
-    relocation_entry new_entry(entry.type(), entry.klass(),
-                               entry.offset() + code.count);
-    relocation.append_bytes(&new_entry, sizeof(relocation_entry));
+    output[i] = relocation_entry(entry.type(), entry.klass(),
+                                 entry.offset() + code.count);
   }
 }
 
