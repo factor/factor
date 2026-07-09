@@ -187,6 +187,15 @@ IN: math.integers.tests
     ] each
 ] unit-test
 
+! Bignum digit shifts use unsigned intermediates when bits cross a limb.
+{ 9223372036854775808 } [
+    1152921504606846976 >bignum 3 shift
+] unit-test
+
+{ 2658455991569831745807614120560689152 } [
+    5316911983139663491615228241121378304 >bignum -1 shift
+] unit-test
+
 { 12 } [ 11 4 align ] unit-test
 { 12 } [ 12 4 align ] unit-test
 { 10 } [ 10 2 align ] unit-test
