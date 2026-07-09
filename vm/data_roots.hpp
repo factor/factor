@@ -19,6 +19,8 @@ template <typename Type> struct data_root : public tagged<Type> {
   }
 
   ~data_root() {
+    FACTOR_ASSERT(!parent->data_roots.empty());
+    FACTOR_ASSERT(parent->data_roots.back() == &this->value_);
     parent->data_roots.pop_back();
   }
 

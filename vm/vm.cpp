@@ -35,6 +35,11 @@ factor_vm::factor_vm(THREADHANDLE thread)
       sampler_thread(NULL)
 #endif
 {
+  // Most runtime calls only need a handful of temporary roots. Reserve the
+  // hot-path storage once so constructing data_root/code_root handles does not
+  // repeatedly grow malloc-side vectors while compiling or handling PIC misses.
+  data_roots.reserve(256);
+  code_roots.reserve(16);
   primitive_reset_dispatch_stats();
 }
 
