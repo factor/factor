@@ -22,7 +22,7 @@ M: arm.64 machine-registers
     {
         { int-regs ${
             X0  X1  X2  X3  X4  X5  X6  X7  X8
-            X10 X11 X12 X13 X14 X15 X16 X17
+            X10 X11 X12 X13 X14 X16 X17
         } }
         { float-regs ${
             V0  V1  V2  V3  V4  V5  V6  V7
@@ -104,13 +104,13 @@ M: arm.64 %replace-imm
         ] }
         { [ over fixnum? ] [
             [
-                [ temp ] dip tag-fixnum MOV
-                temp
+                [ temp2 ] dip tag-fixnum MOV
+                temp2
             ] dip
         ] }
         { [ swap not ] [
-            temp \ f type-number MOV
-            [ temp ] dip
+            temp2 \ f type-number MOV
+            [ temp2 ] dip
         ] }
     } cond %replace ;
 
