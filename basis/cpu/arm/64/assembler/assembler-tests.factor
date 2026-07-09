@@ -56,6 +56,16 @@ IN: cpu.arm.64.assembler.tests
 0xaa2e3f29 [ W10 W11 X21 -8 [+] STP ] test-insn
 0xa006ff29 [ W0 W1 X21 -8 [pre] LDP ] test-insn
 
+! FP/SIMD pair offsets scale with the S/D/Q register width
+0x4084002d [ S0 S1 X2 4 [+] STP ] test-insn
+0x4084006d [ D0 D1 X2 8 [+] STP ] test-insn
+0x408400ad [ Q0 Q1 X2 16 [+] STP ] test-insn
+0x828cff2d [ S2 S3 X4 -4 [pre] LDP ] test-insn
+0x828cc06c [ D2 D3 X4 8 [post] LDP ] test-insn
+0x828c7fad [ Q2 Q3 X4 -16 [+] LDP ] test-insn
+[ SP X0 X1 [] STP ] must-fail
+[ X0 D1 X2 [] STP ] must-fail
+
 0xae0240f8 [ X14 X21 [] LDUR ] test-insn
 
 0x4a554039 [ X10 X10 21 [+] LDRB ] test-insn
@@ -149,6 +159,8 @@ IN: cpu.arm.64.assembler.tests
 0x2048228b [ X0 X1 W2 2 <UXTW> ADD ] test-insn
 0x20a022cb [ X0 X1 W2 0 <SXTH> SUB ] test-insn
 0x2068228b [ X0 X1 X2 2 <UXTX> ADD ] test-insn
+0x2048220b [ W0 W1 W2 2 <UXTW> ADD ] test-insn
+[ W0 W1 X2 2 <UXTX> ADD ] must-fail
 
 ! SIMD arrangements narrower than 128 bits (Q taken from the shape)
 0x2084220e [ V0 V1 V2 8B ADDv ] test-insn

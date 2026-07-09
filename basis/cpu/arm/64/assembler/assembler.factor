@@ -40,6 +40,10 @@ ERROR: register-type-error reg ;
 : V    ( Vn -- n )              check-vector-register                       n>> ;
 :  /ZR ( Rn -- n )                                     check-zero-register  n>> ;
 
+! Load/store-pair uses the same register fields for general and FP/SIMD
+! registers. General register 31 denotes ZR here, never SP.
+: R/ZR/F ( Rn -- n ) dup general-register? [ R/ZR ] [ F ] if ;
+
 : >zero-register ( reg -- new-reg ) width>> 31 swap zero-register boa ;
 : insert-zero-register ( Rn operand -- ZR Rn operand ) [ [ >zero-register ] keep ] dip ;
 : insert-zero-register* ( Rd operand -- Rd ZR operand ) [ dup >zero-register ] dip ;
@@ -763,8 +767,8 @@ M: integer LDRSW 2 0 load-register-literal ;
         [ reach reach 0 = [ 2/ ] when 2 + ?>> 7 check-signed-immediate ] dip
     ] dip {
         { 0b101 27 }
-        { R/ZR 0 }
-        { R/ZR 10 }
+        { R/ZR/F 0 }
+        { R/ZR/F 10 }
         30
         26
         { X/SP 5 }
@@ -1037,11 +1041,13 @@ M: shifted-register SUBS 3 add/sub-shifted-register ;
 
 
 <PRIVATE
-! The extended form takes its sf from Rd/Rn; Rm may be a W register
-! (the extend option encodes the source width), so it is excluded
-! from the width check.
-: ext-encode-width ( Rd Rn Rm -- Rd Rn Rm w )
-    [ 2encode-width ] dip swap ;
+! The extended form takes its sf from Rd/Rn. A 64-bit operation may
+! extend either Wm or Xm, while a 32-bit operation can only consume Wm.
+ERROR: extended-register-width-mismatch Rd Rn Rm ;
+:: ext-encode-width ( Rd Rn Rm -- Rd Rn Rm w )
+    Rd Rn 2encode-width 2nip :> w
+    Rm encode-width w > [ Rd Rn Rm extended-register-width-mismatch ] when
+    Rd Rn Rm w ;
 
 : add/sub-extended-register ( Rd Rn operand op -- )
     [ >operand< ] dip [ ext-encode-width ] 3dip {
