@@ -1489,11 +1489,12 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
     end = scan1 + BIGNUM_LENGTH(arg1);
 
     while (scan1 < end) {
-      *scanr = *scanr | (*scan1 & BIGNUM_DIGIT_MASK) << bit_offset;
-      *scanr = *scanr & BIGNUM_DIGIT_MASK;
+      cell digit = (cell)(*scan1++ & BIGNUM_DIGIT_MASK);
+      *scanr = (bignum_digit_type)(((cell)*scanr | (digit << bit_offset)) &
+                                   (cell)BIGNUM_DIGIT_MASK);
       scanr++;
-      *scanr = *scan1++ >> (BIGNUM_DIGIT_LENGTH - bit_offset);
-      *scanr = *scanr & BIGNUM_DIGIT_MASK;
+      *scanr = (bignum_digit_type)(digit >>
+                                   (BIGNUM_DIGIT_LENGTH - bit_offset));
     }
   } else if (n < 0 && (-n >= (BIGNUM_LENGTH(arg1) * (bignum_length_type)
                               BIGNUM_DIGIT_LENGTH))) {
@@ -1510,9 +1511,12 @@ bignum* factor_vm::bignum_magnitude_ash(bignum* arg1_, fixnum n) {
     end = scanr + BIGNUM_LENGTH(result) - 1;
 
     while (scanr < end) {
-      *scanr = (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset;
-      *scanr = (*scanr | *scan1 << (BIGNUM_DIGIT_LENGTH - bit_offset)) &
-               BIGNUM_DIGIT_MASK;
+      cell low = (cell)(*scan1++ & BIGNUM_DIGIT_MASK);
+      cell high = (cell)(*scan1 & BIGNUM_DIGIT_MASK);
+      *scanr = (bignum_digit_type)(
+          ((low >> bit_offset) |
+           (high << (BIGNUM_DIGIT_LENGTH - bit_offset))) &
+          (cell)BIGNUM_DIGIT_MASK);
       scanr++;
     }
     *scanr = (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset;
