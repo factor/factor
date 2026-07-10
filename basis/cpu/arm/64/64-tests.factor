@@ -1,6 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.accessors alien.data byte-arrays compiler.cfg.instructions
+USING: accessors alien.accessors alien.data byte-arrays compiler.cfg
+compiler.cfg.instructions compiler.cfg.registers
 compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
 cpu.architecture cpu.arm.64.assembler.registers kernel kernel.private
 locals make math namespaces sequences system tools.test vectors ;
@@ -25,6 +26,18 @@ IN: cpu.arm.64.tests
     [ X0 "compiler-test-global" "compiler-test-library" %alien-global ]
     B{ } make ;
 
+: large-spill-reload-code ( -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0x10000 >>spill-area-base drop ] keep cfg set
+    init-relocation
+    [ X0 int-rep 0 <spill-slot> %reload ] B{ } make ;
+
+: large-spill-store-code ( -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0x10000 >>spill-area-base drop ] keep cfg set
+    init-relocation
+    [ X0 int-rep 0 <spill-slot> %spill ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t } [
@@ -39,6 +52,12 @@ IN: cpu.arm.64.tests
 { 16 2 } [
     alien-global-code length
     parameter-table get length
+] unit-test
+
+! Large spill areas need a materialized register offset before access.
+{ 8 8 } [
+    large-spill-reload-code length
+    large-spill-store-code length
 ] unit-test
 
 cpu arm.64? [
