@@ -676,7 +676,7 @@ M: arm.64 %set-vm-field [ VM ] dip [+] STR ;
 
 M:: arm.64 %allot ( DST size class TEMP -- )
     DST VM vm-nursery-here-offset [+] LDR
-    temp DST size data-alignment get align ADD
+    temp DST size data-alignment get align %add-offset
     temp VM vm-nursery-here-offset [+] STR
     temp class type-number tag-header MOV
     temp DST [] STR
@@ -701,7 +701,7 @@ M:: arm.64 %write-barrier-imm ( SRC slot tag CARD TEMP -- )
 
 M:: arm.64 %check-nursery-branch ( label size cc TEMP1 TEMP2 -- )
     TEMP1 VM vm-nursery-here-offset [+] LDR
-    TEMP1 dup size ADD
+    TEMP1 dup size %add-offset
     TEMP2 VM vm-nursery-end-offset [+] LDR
     TEMP1 TEMP2 CMP
     cc {
