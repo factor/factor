@@ -106,8 +106,11 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 if (word_after.pic_def != layouts.false_object) {
                     vm.jitCompileQuotation(word_after.pic_def, false);
                 }
-                if (word_after.pic_tail_def != layouts.false_object) {
-                    vm.jitCompileQuotation(word_after.pic_tail_def, false);
+                // The pic_def compilation above can move the word. Re-derive
+                // it from the registered word cell before reading pic_tail_def.
+                const word_after_pic: *const layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
+                if (word_after_pic.pic_tail_def != layouts.false_object) {
+                    vm.jitCompileQuotation(word_after_pic.pic_tail_def, false);
                 }
             },
             .array => {
