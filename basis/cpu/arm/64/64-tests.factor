@@ -213,6 +213,29 @@ cpu arm.64? [
         [ { char-16 } declare 17 hrshift ] compile-call
     ] unit-test
 
+    ! Lane shifts use the element width as their immediate boundary.
+    {
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 }
+    } [
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 0 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 8 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 9 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 0 vrshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 9 vrshift ] compile-call
+        char-16{ -1 1 -2 2 -3 3 -4 4 -5 5 -6 6 -7 7 -8 8 }
+        [ { char-16 } declare 9 vrshift ] compile-call
+    ] unit-test
+
     ! Shifted add/sub immediates accepted by the optimizer can exceed a
     ! single MOVZ halfword when fused into an alien memory operation.
     { 0 } [
