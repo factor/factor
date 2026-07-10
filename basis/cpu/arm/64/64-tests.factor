@@ -1,8 +1,9 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.instructions compiler.codegen.gc-maps
-compiler.codegen.relocation cpu.architecture kernel locals make
-math namespaces sequences tools.test vectors ;
+USING: alien.accessors alien.data byte-arrays compiler.cfg.instructions
+compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
+cpu.architecture kernel kernel.private locals make math namespaces
+sequences system tools.test vectors ;
 IN: cpu.arm.64.tests
 
 :: alien-call-code+return-address ( stack-size -- code return-address )
@@ -28,3 +29,21 @@ IN: cpu.arm.64.tests
     16 alien-call-code+return-address
     B{ 0x40 0x03 0x3f 0xd6 } return-address-follows? ! BLR X26
 ] unit-test
+
+cpu arm.64? [
+    ! Shifted add/sub immediates accepted by the optimizer can exceed a
+    ! single MOVZ halfword when fused into an alien memory operation.
+    { 0 } [
+        0x100001 <byte-array>
+        [ { byte-array } declare 0x100000 alien-unsigned-1 ] compile-call
+    ] unit-test
+
+    { 123 } [
+        0x100001 <byte-array>
+        dup 123 swap 0x100000 [
+            { fixnum byte-array fixnum } declare
+            set-alien-unsigned-1
+        ] compile-call
+        0x100000 alien-unsigned-1
+    ] unit-test
+] when
