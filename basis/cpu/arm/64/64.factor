@@ -10,7 +10,7 @@ compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.arm.64.assembler cpu.arm.64.assembler.registers
 generalizations grouping kernel layouts literals make math
-math.bitwise memory namespaces sequences system ;
+math.bitwise math.order memory namespaces sequences system ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
@@ -366,6 +366,8 @@ M:: arm.64 %gather-int-vector-4 ( DST SRC1 SRC2 SRC3 SRC4 rep -- )
 
 : >size ( rep -- size ) rep-component-type heap-size log2 ;
 
+: rep-bit-width ( rep -- bits ) rep-component-type heap-size 8 * ;
+
 M: arm.64 %select-vector
     [ >size <vector-element> ] keep
     { char-16-rep short-8-rep int-4-rep } member?
@@ -474,8 +476,17 @@ M: arm.64 %andn-vector drop swap 16B BICv ;
 M: arm.64 %or-vector drop 16B ORRv ;
 M: arm.64 %xor-vector drop 16B EORv ;
 M: arm.64 %not-vector drop 16B MVNv ;
-M: arm.64 %shl-vector-imm >shape SHL ;
-M: arm.64 %shr-vector-imm [ SSHR ] [ USHR ] signed/unsigned ;
+M:: arm.64 %shl-vector-imm ( DST SRC1 src2 rep -- )
+    src2 rep rep-bit-width >=
+    [ DST dup dup 16B EORv ]
+    [ DST SRC1 src2 rep >shape SHL ] if ;
+
+M:: arm.64 %shr-vector-imm ( DST SRC1 src2 rep -- )
+    src2 0 =
+    [ DST SRC1 16B MOVv ] [
+        DST SRC1 src2 rep rep-bit-width min rep
+        [ SSHR ] [ USHR ] signed/unsigned
+    ] if ;
 
 M:: arm.64 %horizontal-shl-vector-imm ( DST SRC1 src2 rep -- )
     src2 0 =
