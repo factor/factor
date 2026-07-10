@@ -115,14 +115,18 @@ pub const InlineCacheJit = struct {
         if (cache_entries != layouts.false_object and
             layouts.hasTag(cache_entries, .array))
         {
-            const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
-            const data = entries.data();
             const entry_count = blk: {
+                const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
                 break :blk layouts.untagFixnumUnsigned(entries.capacity);
             };
 
             var i: Cell = 0;
             while (i + 1 < entry_count) : (i += 2) {
+                // emitCheckAndJump grows JIT buffers and can collect. Re-derive
+                // the array and its data pointer on every iteration from the
+                // registered cache_entries cell.
+                const entries: *const layouts.Array = @ptrFromInt(layouts.UNTAG(cache_entries));
+                const data = entries.data();
                 const klass = data[i];
                 const method = data[i + 1];
 
@@ -295,7 +299,7 @@ pub fn addInlineCacheEntry(vm: *FactorVM, cache_entries: Cell, klass: Cell, meth
                 return null;
             }
             old_data[i + 1] = method_copy;
-            vm.writeBarrierKnownHeap(&old_data[i]);
+            vm.writeBarrierKnownHeapWithValue(&old_data[i + 1], method_copy);
             return entries_copy;
         }
     }

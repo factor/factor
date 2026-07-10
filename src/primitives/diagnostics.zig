@@ -895,7 +895,10 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
     vm.data_roots.appendAssumeCapacity(&callstacks_cell);
     defer _ = vm.data_roots.pop();
 
-    for (samples, 0..) |sample, i| {
+    // Capture each record by pointer: profiling_samples is a GC root table, so
+    // its thread fields are rewritten in place when an inner allocation moves
+    // the referenced thread. A by-value loop capture would retain a stale cell.
+    for (samples, 0..) |*sample, i| {
         // Allocate 7-element tuple for this sample
         var sample_arr = vm.allotArray(7, layouts.false_object) orelse {
             vm.push(layouts.false_object);
@@ -945,4 +948,65 @@ pub export fn primitive_get_samples(vm_asm: *VMAssemblyFields) callconv(.c) void
     }
 
     vm.push(samples_array);
+}
+
+test "get_samples re-reads malloc-side roots after collection" {
+    const data_heap = @import("../data_heap.zig");
+    const gc = @import("../gc.zig");
+
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    const profiling_was_running = safepoints.sampling_profiler_p.swap(false, .seq_cst);
+    defer safepoints.sampling_profiler_p.store(profiling_was_running, .seq_cst);
+
+    const callstacks = vm.allotArray(2, layouts.false_object) orelse return error.OutOfMemory;
+    const callstacks_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(callstacks));
+    callstacks_array.data()[0] = layouts.tagFixnum(0);
+    callstacks_array.data()[1] = layouts.false_object;
+    vm.setSpecialObject(.sample_callstacks, callstacks);
+
+    const old_thread = vm.allotByteArray(1);
+    try vm.profiling_samples.append(allocator, .{
+        .thread = old_thread,
+        .callstack_begin = 0,
+        .callstack_end = 0,
+        .sample_count = 1,
+        .gc_sample_count = 0,
+        .jit_sample_count = 0,
+        .foreign_sample_count = 0,
+        .foreign_thread_sample_count = 0,
+    });
+
+    // Leave exactly enough nursery space for get_samples' outer array. Its
+    // first inner array must then collect after the loop captures the record.
+    const outer_size = layouts.alignCell(layouts.arraySize(layouts.Array, 1), layouts.data_alignment);
+    const filler_size = heap.nursery.end - vm.vm_asm.nursery.here - outer_size;
+    _ = vm.allotByteArray(filler_size - @sizeOf(layouts.ByteArray));
+
+    primitive_get_samples(&vm.vm_asm);
+
+    try std.testing.expectEqual(@as(Cell, 1), heap.nursery_collections);
+    const live_thread = vm.profiling_samples.items[0].thread;
+    try std.testing.expect(live_thread != old_thread);
+
+    const result: *const layouts.Array = @ptrFromInt(layouts.UNTAG(vm.peek()));
+    const sample: *const layouts.Array = @ptrFromInt(layouts.UNTAG(result.data()[0]));
+    try std.testing.expectEqual(live_thread, sample.data()[5]);
 }
