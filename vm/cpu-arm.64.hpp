@@ -16,7 +16,11 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(return_address + ((*(int*)(return_address - 4) & 0x03ffffff) << 6 >> 4));
+  cell call_site = return_address - 4;
+  uint32_t imm26 = call_site_opcode(return_address) & 0x03ffffff;
+  fixnum signed_imm =
+      (imm26 & 0x02000000) ? (fixnum)imm26 - ((fixnum)1 << 26) : imm26;
+  return (void*)(call_site + signed_imm * 4);
 }
 
 inline static void set_call_target(cell return_address, cell target) {
