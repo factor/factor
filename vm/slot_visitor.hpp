@@ -131,6 +131,7 @@ template <typename Fixup> struct slot_visitor {
 
   cell visit_pointer(cell pointer);
   void visit_handle(cell* handle);
+  void visit_raw_handle(cell* handle);
   void visit_object_array(cell* start, cell* end);
   void visit_partial_objects(cell start, cell card_start, cell card_end);
   void visit_slots(object* ptr);
@@ -177,6 +178,13 @@ template <typename Fixup> void slot_visitor<Fixup>::visit_handle(cell* handle) {
   if (!immediate_p(*handle)) {
     *handle = visit_pointer(*handle);
   }
+}
+
+template <typename Fixup>
+void slot_visitor<Fixup>::visit_raw_handle(cell* handle) {
+  cell value = factor_raw_load_cell(handle);
+  if (!immediate_p(value))
+    factor_raw_store_cell(handle, visit_pointer(value));
 }
 
 template <typename Fixup>
@@ -275,7 +283,9 @@ template <typename Fixup> struct call_frame_slot_visitor {
         FACTOR_PRINT("visiting derived root " << spill_slot
                      << " with base pointer " << base_pointer);
 #endif
-        stack_pointer[spill_slot] -= stack_pointer[base_pointer];
+        cell derived = factor_raw_load_cell(stack_pointer + spill_slot);
+        cell base = factor_raw_load_cell(stack_pointer + base_pointer);
+        factor_raw_store_cell(stack_pointer + spill_slot, derived - base);
       }
     }
 
@@ -287,7 +297,7 @@ template <typename Fixup> struct call_frame_slot_visitor {
         #ifdef DEBUG_GC_MAPS
         FACTOR_PRINT("visiting GC root " << spill_slot);
         #endif
-        visitor->visit_handle(stack_pointer + spill_slot);
+        visitor->visit_raw_handle(stack_pointer + spill_slot);
       }
     }
 
@@ -295,8 +305,11 @@ template <typename Fixup> struct call_frame_slot_visitor {
     for (cell spill_slot = 0; spill_slot < info->derived_root_count;
          spill_slot++) {
       uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1)
-        stack_pointer[spill_slot] += stack_pointer[base_pointer];
+      if (base_pointer != (uint32_t)-1) {
+        cell derived = factor_raw_load_cell(stack_pointer + spill_slot);
+        cell base = factor_raw_load_cell(stack_pointer + base_pointer);
+        factor_raw_store_cell(stack_pointer + spill_slot, derived + base);
+      }
     }
   }
 };
@@ -374,7 +387,7 @@ template <typename Fixup> struct call_frame_code_block_visitor {
         Fixup::translated_code_block_map ? owner : fixup.fixup_code(owner);
     cell fixed_addr = compiled->address_for_offset(owner->offset(addr));
 
-    *(cell*)(frame_top + FRAME_RETURN_ADDRESS) = fixed_addr;
+    factor_raw_store_cell((cell*)(frame_top + FRAME_RETURN_ADDRESS), fixed_addr);
   }
 };
 

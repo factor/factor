@@ -9,6 +9,19 @@ factor_vm::factor_vm(THREADHANDLE thread)
       thread(thread),
       callback_id(0),
       c_to_factor_func(NULL),
+#if defined(FACTOR_ASAN)
+      asan_native_fake_stack(NULL),
+      asan_native_stack_bottom(NULL),
+      asan_native_stack_size(0),
+      asan_switch_pending(false),
+      asan_switch_kind(0),
+#endif
+#if defined(FACTOR_TSAN)
+      tsan_native_fiber(__tsan_get_current_fiber()),
+#if defined(__APPLE__)
+      tsan_mach_exception_sync(0),
+#endif
+#endif
       sampling_profiler_p(false),
       signal_pipe_input(0),
       signal_pipe_output(0),

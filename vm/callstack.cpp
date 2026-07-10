@@ -36,7 +36,7 @@ cell factor_vm::capture_callstack(context* ctx) {
   fixnum size = std::max((cell)0, bottom - top);
 
   callstack* stack = allot_callstack(size);
-  memcpy((void*)stack->top(), (void *)top, size);
+  factor_raw_memcpy((void*)stack->top(), (void*)top, size);
 #ifdef FACTOR_ARM64
   // Convert absolute frame pointers to relative offsets. This allows
   // moving the callstack through memory. They will be converted back

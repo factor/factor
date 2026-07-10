@@ -42,6 +42,18 @@ struct context {
   // set-context-object primitives
   cell context_objects[context_object_count];
 
+  unsigned valgrind_stack_id;
+
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  context* sanitizer_previous_ctx;
+#endif
+#if defined(FACTOR_ASAN)
+  void* asan_fake_stack;
+#endif
+#if defined(FACTOR_TSAN)
+  void* tsan_fiber;
+#endif
+
   context(cell ds_size, cell rs_size, cell cs_size);
   ~context();
 
@@ -75,6 +87,18 @@ VM_C_API void delete_context(factor_vm* parent);
 VM_C_API void reset_context(factor_vm* parent);
 VM_C_API cell begin_callback(factor_vm* parent, cell quot);
 VM_C_API void end_callback(factor_vm* parent);
+VM_C_API FACTOR_PRESERVE_ALL FACTOR_NO_SANITIZE_FIBER
+void sanitizer_start_callback();
+VM_C_API FACTOR_PRESERVE_ALL FACTOR_NO_SANITIZE_FIBER
+void sanitizer_finish_callback();
+VM_C_API FACTOR_PRESERVE_ALL FACTOR_NO_SANITIZE_FIBER
+void sanitizer_start_callback_return();
+VM_C_API FACTOR_PRESERVE_CALLBACK_RETURN FACTOR_NO_SANITIZE_FIBER
+void sanitizer_finish_callback_return();
+VM_C_API FACTOR_NO_SANITIZE_FIBER
+void sanitizer_start_context_switch(factor_vm* parent, context* target);
+VM_C_API FACTOR_PRESERVE_ALL FACTOR_NO_SANITIZE_FIBER
+void sanitizer_finish_context_switch();
 VM_C_API void trampoline();
 VM_C_API void trampoline2();
 

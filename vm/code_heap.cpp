@@ -124,9 +124,9 @@ code_block* code_heap::code_block_for_address(cell address) {
 
 cell code_heap::frame_predecessor(cell frame_top) {
 #ifdef FACTOR_ARM64
-  return *(cell*)frame_top;
+  return factor_raw_load_cell((cell*)frame_top);
 #else
-  cell addr = *(cell*)frame_top;
+  cell addr = factor_raw_load_cell((cell*)frame_top);
   FACTOR_ASSERT(seg->in_segment_p(addr));
   code_block* owner = code_block_for_address(addr);
   cell frame_size = owner->stack_frame_size_for_address(addr);

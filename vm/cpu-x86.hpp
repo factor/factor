@@ -5,7 +5,14 @@ namespace factor {
 
 static const unsigned FRAME_RETURN_ADDRESS = 0;
 
-inline static void flush_icache(cell start, cell len) { (void)start; (void)len; }
+inline static void flush_icache(cell start, cell len) {
+#ifdef FACTOR_HAS_VALGRIND
+  VALGRIND_DISCARD_TRANSLATIONS(start, len);
+#else
+  (void)start;
+  (void)len;
+#endif
+}
 
 // In the instruction sequence:
 
@@ -44,6 +51,7 @@ inline static void set_call_target(cell return_address, cell target) {
   uint32_t relative_target = static_cast<uint32_t>(target - return_address);
   memcpy(reinterpret_cast<void*>(return_address - 4), &relative_target,
          sizeof(relative_target));
+  flush_icache(return_address - 5, 5);
 }
 
 inline static bool tail_call_site_p(cell return_address) {

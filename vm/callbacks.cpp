@@ -36,6 +36,14 @@ instruction_operand callback_heap::callback_operand(code_block* stub,
   return instruction_operand(entry, stub, 0);
 }
 
+cell callback_heap::callback_operand_count() {
+  tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
+  tagged<byte_array> relocation_template(
+      array_nth(code_template.untagged(), 0));
+  return array_capacity(relocation_template.untagged()) /
+         sizeof(relocation_entry);
+}
+
 void callback_heap::store_callback_operand(code_block* stub, cell index,
                                            cell value) {
   instruction_operand op = callback_operand(stub, index);
@@ -45,9 +53,11 @@ void callback_heap::store_callback_operand(code_block* stub, cell index,
 void callback_heap::update(code_block* stub) {
   word* w = untag<word>(stub->owner);
 #ifdef FACTOR_ARM64
-  store_callback_operand(stub, 6, w->entry_point);
+  cell word_operand = callback_operand_count() == 11 ? 8 : 6;
+  store_callback_operand(stub, word_operand, w->entry_point);
 #else
-  store_callback_operand(stub, 1, w->entry_point);
+  cell word_operand = callback_operand_count() == 8 ? 3 : 1;
+  store_callback_operand(stub, word_operand, w->entry_point);
 #endif
   stub->flush_icache();
 }
@@ -58,8 +68,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   jit_writable_scope jit_writable;
   // code_template is a 2-tuple where the first element contains the
   // relocations and the second a byte array of compiled assembly
-  // code. The code assumes that there are four relocations on x86 and
-  // three on ppc.
+  // code. The relocation layout is fixed for each architecture and template.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
@@ -108,14 +117,38 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   store_callback_operand(stub, 3, (cell)&factor::trampoline2);
   store_callback_operand(stub, 4, (cell)&factor::inline_cache_miss);
   store_callback_operand(stub, 5, (cell)&parent->dispatch_stats.megamorphic_cache_hits);
+  if (callback_operand_count() == 11) {
+    store_callback_operand(stub, 6, (cell)&factor::sanitizer_start_callback);
+    store_callback_operand(stub, 7, (cell)&factor::sanitizer_finish_callback);
+    store_callback_operand(stub, 9,
+                           (cell)&factor::sanitizer_start_callback_return);
+    store_callback_operand(stub, 10,
+                           (cell)&factor::sanitizer_finish_callback_return);
+  }
 #else
-  store_callback_operand(stub, 2, (cell)parent);
+  if (callback_operand_count() == 8) {
+    store_callback_operand(stub, 1, (cell)&factor::sanitizer_start_callback);
+    store_callback_operand(stub, 2, (cell)&factor::sanitizer_finish_callback);
+    store_callback_operand(stub, 4, (cell)parent);
+    store_callback_operand(stub, 5,
+                           (cell)&factor::sanitizer_start_callback_return);
+    store_callback_operand(stub, 6,
+                           (cell)&factor::sanitizer_finish_callback_return);
+  } else {
+    store_callback_operand(stub, 2, (cell)parent);
+  }
 #endif
 
   // On x86, the RET instruction takes an argument which depends on
   // the callback's calling convention
-  if (return_takes_param_p())
+  if (return_takes_param_p()) {
+#if defined(FACTOR_X86) || defined(FACTOR_AMD64)
+    cell return_operand = callback_operand_count() == 8 ? 7 : 3;
+    store_callback_operand(stub, return_operand, return_rewind);
+#else
     store_callback_operand(stub, 3, return_rewind);
+#endif
+  }
 
   update(stub);
   return stub;

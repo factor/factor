@@ -110,18 +110,30 @@ big-endian off
     CTX VM vm-context-offset [+] STR
     temp SP MOV
     temp CTX context-callstack-save-offset [+] STR
+    sanitizer-fibers? get [
+        "sanitizer_start_callback" LDR=BLR rel-dlsym
+    ] when
     jit-save-teb
     temp CTX context-callstack-bottom-offset [+] LDR
     SP temp 16 ADD
     FP XZR MOV
     jit-update-teb
+    sanitizer-fibers? get [
+        "sanitizer_finish_callback" LDR=BLR rel-dlsym
+    ] when
     DS RS CTX context-datastack-offset [+] LDP
     LDR=BLR rel-word
+    sanitizer-fibers? get [
+        "sanitizer_start_callback_return" LDR=BLR rel-dlsym
+    ] when
     temp CTX context-callstack-save-offset [+] LDR
     SP temp MOV
     jit-restore-teb
     X30 CTX SP 16 [post] LDP
     CTX VM vm-context-offset [+] STR
+    sanitizer-fibers? get [
+        "sanitizer_finish_callback_return" LDR=BLR rel-dlsym
+    ] when
     X28 X29 SP 16 [post] LDP
     X26 X27 SP 16 [post] LDP
     X24 X25 SP 16 [post] LDP
@@ -595,12 +607,22 @@ big-endian off
         FP SP MOV
         FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
+        sanitizer-fibers? get [
+            ds-0 ds-1 SP -16 [pre] STP
+            arg1 VM MOV
+            arg2 ds-0 MOV
+            "sanitizer_start_context_switch" LDR=BLR rel-dlsym
+            ds-0 ds-1 SP 16 [post] LDP
+        ] when
         CTX ds-0 MOV
         jit-update-teb
         CTX VM vm-context-offset [+] STR
         temp CTX context-callstack-top-offset [+] LDR
         SP temp MOV
         FP SP 16 [post] LDR
+        sanitizer-fibers? get [
+            "sanitizer_finish_context_switch" LDR=BLR rel-dlsym
+        ] when
         DS RS CTX context-datastack-offset [+] LDP
         ds-1 DS 8 [pre] STR
     ] }
@@ -610,12 +632,22 @@ big-endian off
         ds-0 DS -8 [post] LDR
         ds-0 dup alien-offset [+] LDR
         ds-1 DS -8 [post] LDR
+        sanitizer-fibers? get [
+            ds-0 ds-1 SP -16 [pre] STP
+            arg1 VM MOV
+            arg2 ds-0 MOV
+            "sanitizer_start_context_switch" LDR=BLR rel-dlsym
+            ds-0 ds-1 SP 16 [post] LDP
+        ] when
         CTX ds-0 MOV
         jit-update-teb
         CTX VM vm-context-offset [+] STR
         temp CTX context-callstack-top-offset [+] LDR
         SP temp MOV
         FP SP 16 [post] LDR
+        sanitizer-fibers? get [
+            "sanitizer_finish_context_switch" LDR=BLR rel-dlsym
+        ] when
         DS RS CTX context-datastack-offset [+] LDP
         ds-1 DS 8 [pre] STR
     ] }
@@ -631,11 +663,23 @@ big-endian off
         FP SP MOV
         FP CTX context-callstack-top-offset [+] STR
         DS RS CTX context-datastack-offset [+] STP
+        sanitizer-fibers? get [
+            RETURN ds-0 SP -16 [pre] STP
+            ds-1 XZR SP -16 [pre] STP
+            arg2 RETURN MOV
+            arg1 VM MOV
+            "sanitizer_start_context_switch" LDR=BLR rel-dlsym
+            ds-1 XZR SP 16 [post] LDP
+            RETURN ds-0 SP 16 [post] LDP
+        ] when
         CTX RETURN MOV
         jit-update-teb
         CTX VM vm-context-offset [+] STR
         FP CTX context-callstack-top-offset [+] LDR
         SP FP MOV
+        sanitizer-fibers? get [
+            "sanitizer_finish_context_switch" LDR=BLR rel-dlsym
+        ] when
         DS RS CTX context-datastack-offset [+] LDP
         ds-1 DS 8 [pre] STR
         arg1 ds-0 MOV

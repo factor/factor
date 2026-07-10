@@ -32,6 +32,23 @@ IN: bootstrap.assembler.x86
     RAX 0 MOV f rc-absolute-cell rel-dlsym
     RAX CALL ;
 
+: jit-preserve-call ( name -- )
+    R11 0 MOV f rc-absolute-cell rel-dlsym
+    R11 CALL ;
+
+: jit-finish-sanitizer-callback-return ( -- )
+    RSP 5 bootstrap-cells SUB
+    RSP [] XMM0 MOVDQU
+    RSP 2 bootstrap-cells [+] XMM1 MOVDQU
+    RAX PUSH
+    RDX PUSH
+    "sanitizer_finish_callback_return" jit-preserve-call
+    RDX POP
+    RAX POP
+    XMM1 RSP 2 bootstrap-cells [+] MOVDQU
+    XMM0 RSP [] MOVDQU
+    RSP 5 bootstrap-cells ADD ;
+
 :: jit-call-1arg ( arg1s name -- )
     arg1 arg1s MOV
     name jit-call ;
@@ -155,12 +172,31 @@ IN: bootstrap.assembler.x86
     ! to the owner
     0 CALL
 
+    sanitizer-fibers? get [
+        nv-reg swap MOV
+        arg1 PUSH
+        arg2 PUSH
+        stack-reg bootstrap-cell SUB
+        vm-reg nv-reg "sanitizer_start_context_switch" jit-call-2arg
+        stack-reg bootstrap-cell ADD
+        arg2 POP
+        arg1 POP
+        nv-reg
+    ] when
+
     ! Make the new context the current one
     ctx-reg swap MOV
     vm-reg vm-context-offset [+] ctx-reg MOV
 
     ! Load new stack pointer
     RSP ctx-reg context-callstack-top-offset [+] MOV
+
+
+    sanitizer-fibers? get [
+        RSP bootstrap-cell SUB
+        "sanitizer_finish_context_switch" jit-preserve-call
+        RSP bootstrap-cell ADD
+    ] when
 
     ! Load new ds, rs registers
     jit-restore-context

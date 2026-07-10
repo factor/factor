@@ -38,15 +38,23 @@ big-endian off
 
     ! Switch over to the spare context
     nv-reg vm-reg vm-spare-context-offset [+] MOV
-    vm-reg vm-context-offset [+] nv-reg MOV
 
     ! Save C callstack pointer
     nv-reg context-callstack-save-offset [+] stack-reg MOV
+
+    sanitizer-fibers? get [
+        "sanitizer_start_callback" jit-preserve-call
+    ] when
+
+    vm-reg vm-context-offset [+] nv-reg MOV
 
     ! Load Factor stack pointers
     stack-reg nv-reg context-callstack-bottom-offset [+] MOV
     nv-reg jit-update-tib
     jit-install-seh
+    sanitizer-fibers? get [
+        "sanitizer_finish_callback" jit-preserve-call
+    ] when
 
     rs-reg nv-reg context-retainstack-offset [+] MOV
     ds-reg nv-reg context-datastack-offset [+] MOV
@@ -59,6 +67,10 @@ big-endian off
     ! hurt on x86-64
     vm-reg 0 MOV 0 rc-absolute-cell rel-vm
 
+    sanitizer-fibers? get [
+        "sanitizer_start_callback_return" jit-preserve-call
+    ] when
+
     ! Load C callstack pointer
     nv-reg vm-reg vm-context-offset [+] MOV
     stack-reg nv-reg context-callstack-save-offset [+] MOV
@@ -66,6 +78,10 @@ big-endian off
     ! Load old context
     nv-reg POP
     vm-reg vm-context-offset [+] nv-reg MOV
+
+    sanitizer-fibers? get [
+        jit-finish-sanitizer-callback-return
+    ] when
 
     ! Restore non-volatile registers
     jit-restore-tib

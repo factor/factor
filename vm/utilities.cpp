@@ -38,4 +38,16 @@ VM_C_API void* factor_memcpy(void* dst, void* src, size_t len) {
   return memcpy(dst, src, len);
 }
 
+void* factor_raw_memcpy(void* dst, const void* src, size_t len) {
+  volatile uint8_t* out = static_cast<volatile uint8_t*>(dst);
+  const volatile uint8_t* in = static_cast<const volatile uint8_t*>(src);
+  for (size_t i = 0; i < len; ++i)
+    out[i] = in[i];
+  return dst;
+}
+
+cell factor_raw_load_cell(const cell* ptr) { return *ptr; }
+
+void factor_raw_store_cell(cell* ptr, cell value) { *ptr = value; }
+
 }

@@ -93,6 +93,14 @@ ifdef CONFIG
 	ifdef SANITIZER
 		CFLAGS += -fsanitize=$(SANITIZER)
 		CXXFLAGS += -fsanitize=$(SANITIZER)
+		ifneq (,$(findstring address,$(SANITIZER)))
+			CFLAGS += -DFACTOR_ASAN
+			CXXFLAGS += -DFACTOR_ASAN
+		endif
+		ifneq (,$(findstring thread,$(SANITIZER)))
+			CFLAGS += -DFACTOR_TSAN
+			CXXFLAGS += -DFACTOR_TSAN
+		endif
 	endif
 
 	ifneq ($(DEBUG), 0)

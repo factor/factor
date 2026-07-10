@@ -10,7 +10,23 @@ context::context(cell ds_size, cell rs_size, cell cs_size)
       callstack_save(0),
       datastack_seg(new segment(ds_size, false)),
       retainstack_seg(new segment(rs_size, false)),
-      callstack_seg(new segment(cs_size, false)) {
+      callstack_seg(new segment(cs_size, false)),
+      valgrind_stack_id(0)
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+      , sanitizer_previous_ctx(NULL)
+#endif
+#if defined(FACTOR_ASAN)
+      , asan_fake_stack(NULL)
+#endif
+#if defined(FACTOR_TSAN)
+      , tsan_fiber(__tsan_create_fiber(0))
+#endif
+      {
+#ifdef FACTOR_HAS_VALGRIND
+  valgrind_stack_id = VALGRIND_STACK_REGISTER(
+      reinterpret_cast<void*>(callstack_seg->start),
+      reinterpret_cast<void*>(callstack_seg->end));
+#endif
   reset();
 }
 
@@ -80,6 +96,12 @@ void context::fix_stacks() {
 }
 
 context::~context() {
+#ifdef FACTOR_HAS_VALGRIND
+  VALGRIND_STACK_DEREGISTER(valgrind_stack_id);
+#endif
+#ifdef FACTOR_TSAN
+  __tsan_destroy_fiber(tsan_fiber);
+#endif
   delete datastack_seg;
   delete retainstack_seg;
   delete callstack_seg;
@@ -168,6 +190,121 @@ void factor_vm::end_callback() {
 }
 
 void end_callback(factor_vm* parent) { parent->end_callback(); }
+
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+static FACTOR_NO_SANITIZE_FIBER factor_vm* sanitizer_vm() {
+  return current_vm();
+}
+
+static FACTOR_NO_SANITIZE_FIBER void sanitizer_switch_to(
+    factor_vm* parent, context* source, context* target, int kind) {
+  if (source == target)
+    return;
+
+#ifdef FACTOR_ASAN
+  if (parent->asan_switch_pending) {
+    fprintf(stderr,
+            "Factor ASan switch %d (%p -> %p) started before switch %d "
+            "finished\n",
+            kind, (void*)source, (void*)target, parent->asan_switch_kind);
+    abort();
+  }
+  parent->asan_switch_pending = true;
+  parent->asan_switch_kind = kind;
+  void** fake_stack = source ? &source->asan_fake_stack
+                             : &parent->asan_native_fake_stack;
+  const void* bottom = target ? reinterpret_cast<void*>(target->callstack_seg->start)
+                              : parent->asan_native_stack_bottom;
+  size_t size = target ? target->callstack_seg->size
+                       : parent->asan_native_stack_size;
+  __sanitizer_start_switch_fiber(fake_stack, bottom, size);
+#endif
+#ifdef FACTOR_TSAN
+  void* fiber = target ? target->tsan_fiber : parent->tsan_native_fiber;
+  __tsan_switch_to_fiber(fiber, 0);
+#endif
+}
+
+static FACTOR_NO_SANITIZE_FIBER void sanitizer_finish_switch(
+    factor_vm* parent, context* target, bool source_was_native) {
+#ifdef FACTOR_ASAN
+  if (!parent->asan_switch_pending) {
+    fprintf(stderr, "Factor ASan switch finished without a start\n");
+    abort();
+  }
+  void* fake_stack = target ? target->asan_fake_stack
+                            : parent->asan_native_fake_stack;
+  const void* old_bottom = NULL;
+  size_t old_size = 0;
+  __sanitizer_finish_switch_fiber(fake_stack, &old_bottom, &old_size);
+  parent->asan_switch_pending = false;
+  parent->asan_switch_kind = 0;
+  if (source_was_native) {
+    parent->asan_native_stack_bottom = old_bottom;
+    parent->asan_native_stack_size = old_size;
+  }
+#else
+  (void)parent;
+#endif
+}
+#endif
+
+void sanitizer_start_callback() {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  factor_vm* parent = sanitizer_vm();
+  context* target = parent->spare_ctx;
+  target->sanitizer_previous_ctx = parent->ctx;
+  sanitizer_switch_to(parent, parent->ctx, target, 1);
+#endif
+}
+
+void sanitizer_finish_callback() {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  factor_vm* parent = sanitizer_vm();
+  context* target = parent->ctx;
+  context* source = target->sanitizer_previous_ctx;
+  if (source != target)
+    sanitizer_finish_switch(parent, target, source == NULL);
+#endif
+}
+
+void sanitizer_start_callback_return() {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  factor_vm* parent = sanitizer_vm();
+  context* source = parent->ctx;
+  sanitizer_switch_to(parent, source, source->sanitizer_previous_ctx, 2);
+#endif
+}
+
+void sanitizer_finish_callback_return() {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  factor_vm* parent = sanitizer_vm();
+  context* target = parent->ctx;
+  // The source is always a Factor context on callback return. Its bounds are
+  // fixed, so only the destination fake stack must be restored here.
+  sanitizer_finish_switch(parent, target, false);
+#endif
+}
+
+void sanitizer_start_context_switch(factor_vm* parent, context* target) {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  target->sanitizer_previous_ctx = parent->ctx;
+  sanitizer_switch_to(parent, parent->ctx, target, 3);
+#else
+  (void)parent;
+  (void)target;
+#endif
+}
+
+void sanitizer_finish_context_switch() {
+#if defined(FACTOR_ASAN) || defined(FACTOR_TSAN)
+  factor_vm* parent = sanitizer_vm();
+  context* target = parent->ctx;
+  context* source = target->sanitizer_previous_ctx;
+  if (source != target)
+    sanitizer_finish_switch(parent, target, source == NULL);
+#endif
+}
 
 void factor_vm::primitive_current_callback() {
   ctx->push(tag_fixnum(callback_ids.back()));

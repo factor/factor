@@ -3,7 +3,7 @@
 USING: accessors arrays assocs byte-arrays classes
 classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
-combinators.smart command-line compiler.codegen.relocation
+combinators.smart command-line compiler.codegen.relocation environment
 compiler.units endian generic generic.single.private grouping
 hashtables hashtables.private io io.encodings.binary io.files
 io.pathnames kernel kernel.private layouts locals.types make
@@ -35,6 +35,8 @@ CONSTANT: image-names
     }
 
 <PRIVATE
+
+SYMBOL: sanitizer-fibers?
 
 ! Object cache; we only consider numbers equal if they have the
 ! same type
@@ -543,15 +545,17 @@ M: quotation prepare-object
 PRIVATE>
 
 : make-image ( arch -- )
-    architecture associate H{
-        { parser-quiet? f }
-        { auto-use? f }
-    } assoc-union! [
-        H{ } clone special-objects set
-        "resource:basis/bootstrap/stage1.factor" run-file
-        build-image
-        write-image
-    ] with-variables ;
+    "FACTOR_SANITIZER_FIBERS" os-env empty? not sanitizer-fibers? [
+        architecture associate H{
+            { parser-quiet? f }
+            { auto-use? f }
+        } assoc-union! [
+            H{ } clone special-objects set
+            "resource:basis/bootstrap/stage1.factor" run-file
+            build-image
+            write-image
+        ] with-variables
+    ] with-variable ;
 
 : make-images ( -- )
     image-names [ make-image ] each ;

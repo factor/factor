@@ -38,6 +38,54 @@
 #include <sstream>
 #include <string>
 
+#if defined(FACTOR_ASAN)
+extern "C" void __sanitizer_start_switch_fiber(
+    void** fake_stack_save, const void* bottom, size_t size);
+extern "C" void __sanitizer_finish_switch_fiber(
+    void* fake_stack_save, const void** bottom_old, size_t* size_old);
+#endif
+#if defined(FACTOR_TSAN)
+extern "C" void* __tsan_get_current_fiber();
+extern "C" void* __tsan_create_fiber(unsigned flags);
+extern "C" void __tsan_destroy_fiber(void* fiber);
+extern "C" void __tsan_switch_to_fiber(void* fiber, unsigned flags);
+extern "C" void __tsan_acquire(void* addr);
+extern "C" void __tsan_release(void* addr);
+#endif
+
+#if defined(__clang__)
+#if defined(__i386__) || defined(__x86_64__)
+#define FACTOR_ALIGN_STACK __attribute__((force_align_arg_pointer))
+#else
+#define FACTOR_ALIGN_STACK
+#endif
+#define FACTOR_PRESERVE_ALL __attribute__((preserve_all)) FACTOR_ALIGN_STACK
+#if defined(__aarch64__)
+#define FACTOR_PRESERVE_CALLBACK_RETURN FACTOR_PRESERVE_ALL
+#else
+#define FACTOR_PRESERVE_CALLBACK_RETURN
+#endif
+#define FACTOR_NO_SANITIZE_ADDRESS \
+  __attribute__((no_sanitize("address"), noinline))
+#define FACTOR_NO_SANITIZE_FIBER \
+  __attribute__((no_sanitize("address", "thread"), \
+                 disable_sanitizer_instrumentation, noinline))
+#else
+#define FACTOR_ALIGN_STACK
+#define FACTOR_PRESERVE_ALL
+#define FACTOR_PRESERVE_CALLBACK_RETURN
+#define FACTOR_NO_SANITIZE_ADDRESS \
+  __attribute__((no_sanitize_address, noinline))
+#define FACTOR_NO_SANITIZE_FIBER __attribute__((noinline))
+#endif
+
+#if defined(__has_include)
+#if __has_include(<valgrind/valgrind.h>)
+#include <valgrind/valgrind.h>
+#define FACTOR_HAS_VALGRIND 1
+#endif
+#endif
+
 #define FACTOR_STRINGIZE_I(x) #x
 #define FACTOR_STRINGIZE(x) FACTOR_STRINGIZE_I(x)
 

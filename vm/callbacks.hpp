@@ -32,6 +32,7 @@ struct callback_heap {
   ~callback_heap();
 
   instruction_operand callback_operand(code_block* stub, cell index);
+  cell callback_operand_count();
   void store_callback_operand(code_block* stub, cell index, cell value);
   void update(code_block* stub);
   code_block* add(cell owner, cell return_rewind);

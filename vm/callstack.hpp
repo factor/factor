@@ -68,7 +68,8 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
 
 #ifdef FACTOR_ARM64
   while (top < bottom) {
-    cell addr = *(cell*)(top + FRAME_RETURN_ADDRESS);
+    cell addr = factor_raw_load_cell(
+        (cell*)(top + FRAME_RETURN_ADDRESS));
     FACTOR_ASSERT(addr != 0);
 
     // Only the address is valid, if the code heap has been compacted,
@@ -76,14 +77,15 @@ void factor_vm::iterate_callstack(context* ctx, Iterator& iterator,
     code_block* owner = code->code_block_for_address(addr);
     fixup.translate_code(owner);
 
-    cell size = *(cell*)top - top;
+    cell next = factor_raw_load_cell((cell*)top);
+    cell size = next - top;
 
     iterator(top, size, owner, addr);
-    top = *(cell*)top;
+    top = next;
   }
 #else
   while (top < bottom) {
-    cell addr = *(cell*)top;
+    cell addr = factor_raw_load_cell((cell*)top);
     FACTOR_ASSERT(addr != 0);
 
     // Only the address is valid, if the code heap has been compacted,

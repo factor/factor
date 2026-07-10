@@ -52,5 +52,9 @@ void* function_descriptor_field(void* ptr, size_t idx);
 vm_char* safe_strdup(const vm_char* str);
 cell read_cell_hex();
 VM_C_API void* factor_memcpy(void* dst, void* src, size_t len);
+FACTOR_NO_SANITIZE_FIBER void* factor_raw_memcpy(void* dst, const void* src,
+                                                size_t len);
+FACTOR_NO_SANITIZE_FIBER cell factor_raw_load_cell(const cell* ptr);
+FACTOR_NO_SANITIZE_FIBER void factor_raw_store_cell(cell* ptr, cell value);
 
 }

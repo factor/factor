@@ -117,6 +117,9 @@ void factor_vm::divide_by_zero_error() {
 // Allocates memory
 void memory_signal_handler_impl() {
   factor_vm* vm = current_vm();
+#if defined(FACTOR_TSAN) && defined(__APPLE__)
+  __tsan_acquire(&vm->tsan_mach_exception_sync);
+#endif
   if (vm->code->safepoint_p(vm->signal_fault_addr)) {
     vm->handle_safepoint(vm->signal_fault_pc);
   }
@@ -135,6 +138,9 @@ void memory_signal_handler_impl() {
 // Allocates memory
 void synchronous_signal_handler_impl() {
   factor_vm* vm = current_vm();
+#if defined(FACTOR_TSAN) && defined(__APPLE__)
+  __tsan_acquire(&vm->tsan_mach_exception_sync);
+#endif
   vm->general_error(ERROR_SIGNAL,
                     vm->from_unsigned_cell(vm->signal_number),
                     false_object);
@@ -143,6 +149,9 @@ void synchronous_signal_handler_impl() {
 // Allocates memory
 void fp_signal_handler_impl() {
   factor_vm* vm = current_vm();
+#if defined(FACTOR_TSAN) && defined(__APPLE__)
+  __tsan_acquire(&vm->tsan_mach_exception_sync);
+#endif
 
   // Clear pending exceptions to avoid getting stuck in a loop
   vm->set_fpu_state(vm->get_fpu_state());

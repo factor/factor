@@ -69,6 +69,20 @@ struct factor_vm {
   // External entry points
   c_to_factor_func_type c_to_factor_func;
 
+#if defined(FACTOR_ASAN)
+  void* asan_native_fake_stack;
+  const void* asan_native_stack_bottom;
+  size_t asan_native_stack_size;
+  bool asan_switch_pending;
+  int asan_switch_kind;
+#endif
+#if defined(FACTOR_TSAN)
+  void* tsan_native_fiber;
+#if defined(__APPLE__)
+  char tsan_mach_exception_sync;
+#endif
+#endif
+
   // Is profiling enabled?
   volatile bool sampling_profiler_p;
   fixnum samples_per_second;
@@ -627,11 +641,14 @@ struct factor_vm {
   void iterate_callstack(context* ctx, Iterator& iterator);
 
   // cpu-*
+  FACTOR_NO_SANITIZE_ADDRESS
   void dispatch_signal_handler(cell* sp, cell* pc, cell newpc);
 #if defined(FACTOR_X86) || defined(FACTOR_64)
+  FACTOR_NO_SANITIZE_ADDRESS
   void dispatch_non_resumable_signal(cell* sp, cell* pc,
                                      cell handler,
                                      cell limit);
+  FACTOR_NO_SANITIZE_ADDRESS
   void dispatch_resumable_signal(cell* sp, cell* pc, cell handler);
 #endif
 

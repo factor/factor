@@ -70,6 +70,9 @@ void factor_vm::call_fault_handler(exception_type_t exception,
   dispatch_signal_handler((cell*)&MACH_STACK_POINTER(thread_state),
                           (cell*)&MACH_PROGRAM_COUNTER(thread_state),
                           (cell)handler);
+#ifdef FACTOR_TSAN
+  __tsan_release(&tsan_mach_exception_sync);
+#endif
 }
 
 static void call_fault_handler(mach_port_t thread, exception_type_t exception,
