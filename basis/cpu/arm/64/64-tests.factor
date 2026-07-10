@@ -39,6 +39,18 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 int-rep 0 <spill-slot> %spill ] B{ } make ;
 
+: scaled-spill-reload-code ( -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0x100 >>spill-area-base drop ] keep cfg set
+    init-relocation
+    [ X0 int-rep 0 <spill-slot> %reload ] B{ } make ;
+
+: large-spill-from-temp-code ( -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0x10000 >>spill-area-base drop ] keep cfg set
+    init-relocation
+    [ 0 <spill-slot> temp int-rep %copy ] B{ } make ;
+
 :: stack-param-store-code ( n -- code )
     init-relocation
     [ X0 int-rep n %store-stack-param ] B{ } make ;
@@ -67,6 +79,12 @@ IN: cpu.arm.64.tests
 { 8 8 } [
     large-spill-reload-code length
     large-spill-store-code length
+] unit-test
+
+! Preserve scaled immediate spills, and use temp2 if temp holds the value.
+{ 4 B{ 0x2f 0x00 0xa0 0xd2 } } [
+    scaled-spill-reload-code length
+    large-spill-from-temp-code 4 head
 ] unit-test
 
 ! Integer FFI values occupy temp, so their large addresses use temp2.

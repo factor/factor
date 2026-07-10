@@ -215,14 +215,19 @@ M: arm.64 %bit-test
 :: stack@ ( n rep -- operand )
     SP n rep rep reg-class-of int-regs = temp2 temp ? memory-offset ;
 
-: spill@ ( n -- operand ) spill-offset SP swap extend-offset ;
+:: spill@ ( n rep -- operand )
+    n spill-offset :> offset
+    SP offset rep rep reg-class-of int-regs = temp2 temp ? memory-offset ;
 
-: ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
+:: ?spill-slot ( obj rep -- obj' )
+    obj spill-slot? [ obj n>> rep spill@ ] [ obj ] if ;
 
 UNION: integer-rep int-rep tagged-rep ;
 
-M: arm.64 %copy
-    [ [ ?spill-slot ] bi@ ] dip {
+M:: arm.64 %copy ( dst src rep -- )
+    dst rep ?spill-slot
+    src rep ?spill-slot
+    rep {
         { [ 2over eq? ] [ 3drop ] }
         { [
             3dup
@@ -881,7 +886,7 @@ M: arm.64 %alien-invoke
 
 : ?spill-slot* ( obj -- obj )
     dup spill-slot? [
-        [ temp ] dip n>> spill@ LDR
+        [ temp ] dip n>> int-rep spill@ LDR
         temp
     ] when ;
 
