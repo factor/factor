@@ -98,6 +98,9 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 slot 0 X1 X2 %write-barrier-imm ] B{ } make ;
 
+:: inc-code ( n -- code )
+    init-relocation [ n <ds-loc> %inc ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t t t } [
@@ -170,6 +173,13 @@ IN: cpu.arm.64.tests
 { 32 36 } [
     512 write-barrier-imm-code length
     513 write-barrier-imm-code length
+] unit-test
+
+! Generated stack effects can exceed the immediate adjustment range.
+{ 4 8 8 } [
+    512 inc-code length
+    513 inc-code length
+    -513 inc-code length
 ] unit-test
 
 cpu arm.64? [
