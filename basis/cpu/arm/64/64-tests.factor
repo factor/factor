@@ -3,8 +3,9 @@
 USING: accessors alien.accessors alien.data byte-arrays compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers
 compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
-cpu.architecture cpu.arm.64.assembler.registers kernel kernel.private
-locals make math namespaces sequences system tools.test vectors ;
+cpu.architecture cpu.arm.64 cpu.arm.64.assembler.registers kernel
+kernel.private locals make math namespaces sequences system tools.test
+vectors ;
 IN: cpu.arm.64.tests
 
 :: alien-call-code+return-address ( stack-size -- code return-address )
@@ -38,6 +39,14 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 int-rep 0 <spill-slot> %spill ] B{ } make ;
 
+:: stack-param-store-code ( n -- code )
+    init-relocation
+    [ X0 int-rep n %store-stack-param ] B{ } make ;
+
+:: stack-param-load-code ( n -- code )
+    init-relocation
+    [ X0 int-rep n %load-stack-param ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t } [
@@ -58,6 +67,18 @@ IN: cpu.arm.64.tests
 { 8 8 } [
     large-spill-reload-code length
     large-spill-store-code length
+] unit-test
+
+! Integer FFI values occupy temp, so their large addresses use temp2.
+{ 12 16 } [
+    0x10000 stack-param-store-code length
+    0x10000 stack-param-load-code length
+] unit-test
+
+! Keep using scaled immediate operands whenever they fit.
+{ 8 8 } [
+    0x100 stack-param-store-code length
+    0x100 stack-param-load-code length
 ] unit-test
 
 cpu arm.64? [
