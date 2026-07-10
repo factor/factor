@@ -1,9 +1,9 @@
-USING: assocs compiler.cfg compiler.cfg.instructions
+USING: accessors assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture cpu.x86.assembler.operands kernel linked-assocs
-locals namespaces tools.test vectors ;
+locals namespaces sequences tools.test vectors ;
 IN: compiler.cfg.linear-scan.allocation.spilling.tests
 
 : test-live-interval ( -- live-interval )
@@ -62,6 +62,43 @@ IN: compiler.cfg.linear-scan.allocation.spilling.tests
          }
        }
     } ;
+
+: test-spilled-atomic-use ( -- live-interval )
+    T{ live-interval-state
+       { vreg 22 }
+       { reload-from T{ spill-slot { n 8 } } }
+       { reload-rep double-rep }
+       { ranges V{ { 42 42 } } }
+       { uses
+         V{
+             T{ vreg-use
+                { n 42 }
+                { use-rep double-rep }
+                { spill-slot? t }
+             }
+         }
+       }
+    } ;
+
+! A forced stack use which was already spilled has no register-backed
+! fragment to split at its only position.
+{ t } [ test-spilled-atomic-use 42 already-spilled-atomic-use? ] unit-test
+
+{ f f f } [
+    test-spilled-atomic-use f >>reload-from
+    42 already-spilled-atomic-use?
+
+    test-spilled-atomic-use
+    dup uses>> first f >>spill-slot? drop
+    42 already-spilled-atomic-use?
+
+    test-spilled-atomic-use V{ { 41 42 } } >>ranges
+    42 already-spilled-atomic-use?
+] unit-test
+
+{ } [
+    t check-allocation? [ test-spilled-atomic-use 42 spill ] with-variable
+] unit-test
 
 ! active-positions
 {
