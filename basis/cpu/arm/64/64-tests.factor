@@ -59,6 +59,12 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 int-rep n %load-stack-param ] B{ } make ;
 
+:: local-allot-code ( offset -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0 >>allot-area-base drop ] keep cfg set
+    init-relocation
+    [ X0 16 8 offset %local-allot ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t } [
@@ -97,6 +103,12 @@ IN: cpu.arm.64.tests
 { 8 8 } [
     0x100 stack-param-store-code length
     0x100 stack-param-load-code length
+] unit-test
+
+! Stack-local offsets are aligned, but not necessarily ADD immediates.
+{ 4 8 } [
+    0x1000 local-allot-code length
+    0x1008 local-allot-code length
 ] unit-test
 
 cpu arm.64? [

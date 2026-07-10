@@ -856,8 +856,13 @@ M:: arm.64 %unbox ( DST SRC func rep -- )
     func f f %c-invoke
     DST rep %load-return ;
 
+:: %add-offset ( DST SRC offset -- )
+    offset add/sub-immediate?
+    [ DST SRC offset ADD ]
+    [ temp offset (%load-immediate) DST SRC temp ADD ] if ;
+
 M:: arm.64 %local-allot ( DST size align offset -- )
-    DST SP offset local-allot-offset ADD ;
+    DST SP offset local-allot-offset %add-offset ;
 
 M:: arm.64 %box ( DST SRC func rep gc-map -- )
     rep reg-class-of f param-regs at first SRC rep %copy
