@@ -29,6 +29,12 @@ M: ##load-integer insn>integer val>> ;
         [ val>> immediate-bitwise? ]
     } 1&& ;
 
+: vreg-immediate-shift-count? ( vreg -- ? )
+    vreg>insn {
+        [ ##load-integer? ]
+        [ val>> immediate-shift-count? ]
+    } 1&& ;
+
 UNION: literal-insn ##load-integer ##load-reference ;
 
 GENERIC: insn>literal ( insn -- n )
