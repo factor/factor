@@ -760,66 +760,39 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
         return;
     };
 
-    const was_gc_off = vm.gc_off;
-    vm.gc_off = true;
+    // Snapshot object cells into malloc-side memory while heap walking has GC
+    // disabled. The subsequent Factor-array allocation may compact or grow the
+    // heap, so cellsToArray registers every snapshot entry and lets GC rewrite
+    // it before copying. Re-scanning old tenured addresses after allocation is
+    // unsafe for large result arrays.
+    var objects_list: std.ArrayList(Cell) = .empty;
+    defer objects_list.deinit(vm.allocator);
 
-    // Count objects in tenured space.
-    // and reads free block sizes from the header (header & ~7).
     const free_list = @import("../free_list.zig");
-    var count: usize = 0;
-    var scan = heap.tenured.start;
-    const tenured_end = heap.tenured.end;
-    while (scan < tenured_end) {
-        const header: Cell = @as(*const Cell, @ptrFromInt(scan)).*;
-        if (header & 1 == 1) {
-            // Free block - size is always encoded in header
-            const size = header & ~@as(Cell, 7);
-            if (size == 0) break; // Invalid free block
-            scan += size;
-        } else {
-            const size = free_list.objectSizeFromHeader(scan);
-            if (size == 0) break;
-            count += 1;
-            scan += size;
+    {
+        const was_gc_off = vm.gc_off;
+        vm.gc_off = true;
+        defer vm.gc_off = was_gc_off;
+
+        var scan = heap.tenured.start;
+        const tenured_end = heap.tenured.end;
+        while (scan < tenured_end) {
+            const header: Cell = @as(*const Cell, @ptrFromInt(scan)).*;
+            if (header & 1 == 1) {
+                const size = header & ~@as(Cell, 7);
+                if (size == 0) break;
+                scan += size;
+            } else {
+                const size = free_list.objectSizeFromHeader(scan);
+                if (size == 0) break;
+                const type_tag = @as(Cell, @truncate((header >> 2) & layouts.tag_mask));
+                objects_list.append(vm.allocator, scan | type_tag) catch vm.memoryError();
+                scan += size;
+            }
         }
     }
 
-    // Restore gc_off for allocation
-    vm.gc_off = was_gc_off;
-
-    // Allocate array — nursery is empty after full GC so this should not
-    // trigger another GC for reasonably-sized heaps.
-    const array_tagged = vm.allotArray(count, layouts.false_object) orelse {
-        vm.memoryError();
-    };
-    const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_tagged));
-    const data = array.data();
-
-    // Fill array with tagged object pointers from tenured space
-    var idx: usize = 0;
-    scan = heap.tenured.start;
-    while (scan < tenured_end and idx < count) {
-        const header: Cell = @as(*const Cell, @ptrFromInt(scan)).*;
-        if (header & 1 == 1) {
-            // Free block - size is always encoded in header
-            const size = header & ~@as(Cell, 7);
-            if (size == 0) break; // Invalid free block
-            scan += size;
-        } else {
-            const size = free_list.objectSizeFromHeader(scan);
-            if (size == 0) break;
-            const type_tag = @as(Cell, @truncate((header >> 2) & layouts.tag_mask));
-            data[idx] = scan | type_tag;
-            idx += 1;
-            scan += size;
-        }
-    }
-
-    // Adjust capacity if we got fewer objects
-    if (idx < count) {
-        array.capacity = layouts.tagFixnum(@as(Fixnum, @intCast(idx)));
-    }
-
+    const array_tagged = vm.cellsToArray(objects_list.items) orelse vm.memoryError();
     vm.push(array_tagged);
 }
 
