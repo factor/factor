@@ -111,11 +111,11 @@ M: ##epilogue generate-insn
 : insn-slot-quot ( spec -- quot )
     name>> reader-word 1quotation ;
 
+: insn-slots-quot ( class -- quot )
+    "insn-slots" word-prop [ insn-slot-quot ] map cleave>quot ;
+
 : codegen-method-body ( class word -- quot )
-    [
-        "insn-slots" word-prop
-        [ insn-slot-quot ] map cleave>quot
-    ] dip suffix ;
+    [ insn-slots-quot ] dip suffix ;
 
 SYNTAX: CODEGEN:
     scan-word [ \ generate-insn create-method-in ] keep scan-word
