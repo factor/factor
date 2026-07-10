@@ -203,7 +203,7 @@ M: arm.64 %bit-test
 
 : stack@ ( n -- operand ) [ SP ] dip [+] ;
 
-: spill@ ( n -- operand ) spill-offset stack@ ;
+: spill@ ( n -- operand ) spill-offset SP swap extend-offset ;
 
 : ?spill-slot ( obj -- obj ) dup spill-slot? [ n>> spill@ ] when ;
 
