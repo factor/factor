@@ -696,7 +696,7 @@ M:: arm.64 %write-barrier ( SRC SLOT scale tag CARD TEMP -- )
     CARD TEMP (%write-barrier) ;
 
 M:: arm.64 %write-barrier-imm ( SRC slot tag CARD TEMP -- )
-    CARD SRC slot tag slot-offset ADD
+    CARD SRC slot tag slot-offset %add-offset
     CARD TEMP (%write-barrier) ;
 
 M:: arm.64 %check-nursery-branch ( label size cc TEMP1 TEMP2 -- )

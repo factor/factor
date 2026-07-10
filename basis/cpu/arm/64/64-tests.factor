@@ -94,6 +94,10 @@ IN: cpu.arm.64.tests
         done resolve-label
     ] B{ } make ;
 
+:: write-barrier-imm-code ( slot -- code )
+    init-relocation
+    [ X0 slot 0 X1 X2 %write-barrier-imm ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t t t } [
@@ -160,6 +164,12 @@ IN: cpu.arm.64.tests
     0x1008 allot-code length
     0x1000 nursery-check-code length
     0x1010 nursery-check-code length
+] unit-test
+
+! Large tuple slot offsets need the same address materialization.
+{ 32 36 } [
+    512 write-barrier-imm-code length
+    513 write-barrier-imm-code length
 ] unit-test
 
 cpu arm.64? [
