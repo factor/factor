@@ -640,8 +640,9 @@ M: arm.64 %load-memory-imm or* [ extend-offset ] dip LDR* ;
 M: arm.64 %store-memory or* [ (%memory) ] dip STR* ;
 M: arm.64 %store-memory-imm or* [ extend-offset ] dip STR* ;
 
-M: arm.64 %alien-global ( DST symbol library -- )
-    3drop not-implemented ;
+M:: arm.64 %alien-global ( DST symbol library -- )
+    DST (LDR=) :> class
+    symbol library class rel-dlsym ;
 
 M: arm.64 %vm-field [ VM ] dip [+] LDR ;
 M: arm.64 %set-vm-field [ VM ] dip [+] STR ;
