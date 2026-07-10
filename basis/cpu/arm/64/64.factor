@@ -169,8 +169,7 @@ M: arm.64 %sub-imm SUBS ;
 M: arm.64 %mul MUL ;
 
 M:: arm.64 %mul-imm ( DST SRC1 src2 -- )
-    temp XZR MOV
-    temp dup src2 ADD
+    temp src2 (%load-immediate)
     DST SRC1 temp MUL ;
 
 M: arm.64 %and AND ;
