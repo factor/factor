@@ -5,8 +5,8 @@ compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.registers
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.test
 cpu.architecture cpu.arm.64 cpu.arm.64.assembler.registers kernel
-kernel.private locals make math namespaces sequences system tools.test
-vectors ;
+kernel.private locals make math math.vectors math.vectors.simd namespaces
+sequences system tools.test vectors ;
 IN: cpu.arm.64.tests
 
 :: alien-call-code+return-address ( stack-size -- code return-address )
@@ -192,6 +192,27 @@ IN: cpu.arm.64.tests
 ] unit-test
 
 cpu arm.64? [
+    ! EXT only has a four-bit byte offset. Handle the identity and zero cases
+    ! without emitting the out-of-range offsets 16 or greater.
+    {
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+    } [
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 0 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 16 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 17 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 16 hrshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 17 hrshift ] compile-call
+    ] unit-test
+
     ! Shifted add/sub immediates accepted by the optimizer can exceed a
     ! single MOVZ halfword when fused into an alien memory operation.
     { 0 } [
