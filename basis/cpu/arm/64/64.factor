@@ -83,11 +83,22 @@ M: arm.64 %load-vector
     [ >Q 0 LDR ]
     [ rc-relative-arm-b.cond/ldr rel-binary-literal ] bi* ;
 
-: extend-offset ( reg imm -- operand )
-    dup 9 >signed over = [
-        [ temp ] dip (%load-immediate)
-        temp
-    ] unless [+] ;
+:: extend-offset-with ( reg imm scratch -- operand )
+    imm 9 >signed imm =
+    [ reg imm [+] ] [ scratch imm (%load-immediate) reg scratch [+] ] if ;
+
+: extend-offset ( reg imm -- operand ) temp extend-offset-with ;
+
+:: memory-offset-immediate? ( imm rep -- ? )
+    rep rep-size :> size
+    imm 9 >signed imm = :> unscaled?
+    imm 0 >= imm size mod zero? and
+    imm size /i dup 12 bits = and
+    unscaled? or ;
+
+:: memory-offset ( reg imm rep scratch -- operand )
+    imm rep memory-offset-immediate?
+    [ reg imm [+] ] [ reg imm scratch extend-offset-with ] if ;
 
 : loc>operand ( loc -- operand )
     [ ds-loc? DS RS ? ] [ n>> cells neg extend-offset ] bi ;
@@ -201,7 +212,8 @@ M: arm.64 %bit-test
         temp 1
     ] if TST NE ] dip %boolean ;
 
-: stack@ ( n -- operand ) [ SP ] dip [+] ;
+:: stack@ ( n rep -- operand )
+    SP n rep rep reg-class-of int-regs = temp2 temp ? memory-offset ;
 
 : spill@ ( n -- operand ) spill-offset SP swap extend-offset ;
 
@@ -897,7 +909,7 @@ M: arm.64 %alien-indirect
 
 :: %store-stack-param ( vreg rep n -- )
     rep temp-reg vreg rep %copy
-    n stack@ rep temp-reg rep %copy ;
+    n rep stack@ rep temp-reg rep %copy ;
 
 M: arm.64 %alien-assembly
     3nip swap {
@@ -907,10 +919,12 @@ M: arm.64 %alien-assembly
         [ [ first3 %load-reg-param ] each ]
     } spread drop ;
 
-: next-stack@ ( n -- operand ) [ FP ] dip 16 + [+] ;
+:: next-stack@ ( n rep -- operand )
+    FP n 16 + rep reg-class-of int-regs = temp2 temp ?
+    rep swap memory-offset ;
 
 :: %load-stack-param ( vreg rep n -- )
-    rep temp-reg n next-stack@ rep %copy
+    rep temp-reg n rep next-stack@ rep %copy
     vreg rep temp-reg rep %copy ;
 
 M: arm.64 %callback-inputs
