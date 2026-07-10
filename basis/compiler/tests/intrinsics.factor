@@ -99,6 +99,15 @@ IN: compiler.tests.intrinsics
 { 11 } [ [ 12 7 fixnum-bitxor ] compile-call ] unit-test
 { 15 } [ -1 [ -16 fixnum-bitxor ] compile-call ] unit-test
 
+! Machine bit-test instructions mask register indices. Factor instead returns
+! false for negative indices and reads the sign extension above bit 63.
+{ f f f t } [
+    -1 -1 [ fixnum-bit? ] compile-call
+    13 64 [ fixnum-bit? ] compile-call
+    1 40 shift 1000 [ fixnum-bit? ] compile-call
+    -14 64 [ fixnum-bit? ] compile-call
+] unit-test
+
 { f } [ 12 7 [ fixnum< [ t ] [ f ] if ] compile-call ] unit-test
 { f } [ 12 [ 7 fixnum< [ t ] [ f ] if ] compile-call ] unit-test
 { f } [ [ 12 7 fixnum< [ t ] [ f ] if ] compile-call ] unit-test

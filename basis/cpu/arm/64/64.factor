@@ -215,11 +215,21 @@ M:: arm.64 %bit-count ( DST SRC -- )
     DST TEMP (%boolean)
     DST TEMP DST cc CSEL ;
 
-M: arm.64 %bit-test
-    [ dup integer? [ 2^ ] [
-        [ temp ] 2dip LSR
-        temp 1
-    ] if TST NE ] dip %boolean ;
+M:: arm.64 %bit-test ( DST SRC1 SRC2 TEMP -- )
+    <label> :> negative
+    <label> :> done
+    SRC2 XZR CMP
+    negative BLT
+    temp2 63 MOV
+    SRC2 temp2 CMP
+    TEMP SRC2 temp2 LE CSEL
+    TEMP SRC1 TEMP LSR
+    TEMP 1 TST
+    DST NE temp2 %boolean
+    done B
+    negative resolve-label
+    DST \ f type-number MOV
+    done resolve-label ;
 
 :: stack@ ( n rep -- operand )
     SP n rep rep reg-class-of int-regs = temp2 temp ? memory-offset ;

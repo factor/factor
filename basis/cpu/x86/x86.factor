@@ -772,8 +772,19 @@ M: x86 immediate-bitwise?
     } case ;
 
 M:: x86 %bit-test ( dst src1 src2 temp -- )
-    src1 src2 BT
-    dst temp \ CMOVB (%boolean) ;
+    <label> :> negative
+    <label> :> done
+    src2 0 CMP
+    negative JL
+    temp cell-bits 1 - MOV
+    src2 cell-bits 1 - CMP
+    temp src2 CMOVLE
+    src1 temp BT
+    dst temp \ CMOVB (%boolean)
+    done JMP
+    negative resolve-label
+    dst \ f type-number MOV
+    done resolve-label ;
 
 M: x86 enable-cpu-features
     enable-min/max
