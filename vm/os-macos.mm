@@ -60,7 +60,9 @@ const char* default_image_path(void) {
     returnVal = [path stringByAppendingPathComponent:image];
   }
 
-  return [returnVal UTF8String];
+  // vm_parameters owns this path and releases it with free(). NSString's
+  // UTF8String buffer is only borrowed, so return an owned copy.
+  return safe_strdup([returnVal UTF8String]);
 }
 
 void factor_vm::init_signals(void) {
