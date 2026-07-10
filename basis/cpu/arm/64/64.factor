@@ -469,11 +469,32 @@ M: arm.64 %compare-vector
 M: arm.64 %move-vector-mask
     int-vector-rep? [ %move-int-vector-mask ] [ %move-float-vector-mask ] if ;
 
-M: arm.64 %test-vector ( DST SRC TEMP rep vcc -- )
-    5drop not-implemented ;
+: vector-test-mask ( rep -- mask )
+    float-vector-rep? 0x0f000000 0xffff ? ;
 
-M: arm.64 %test-vector-branch ( label SRC TEMP rep vcc -- )
-    5drop not-implemented ;
+: vector-test-condition ( vcc -- condition )
+    {
+        { vcc-any    [ NE ] }
+        { vcc-none   [ EQ ] }
+        { vcc-all    [ EQ ] }
+        { vcc-notall [ NE ] }
+    } case ;
+
+:: prepare-vector-test ( SRC TEMP rep vcc -- condition )
+    TEMP SRC rep %move-vector-mask
+    vcc { vcc-all vcc-notall } member-eq? [
+        temp2 rep vector-test-mask (%load-immediate)
+        TEMP temp2 CMP
+    ] [ TEMP XZR CMP ] if
+    vcc vector-test-condition ;
+
+M:: arm.64 %test-vector ( DST SRC TEMP rep vcc -- )
+    SRC TEMP rep vcc prepare-vector-test :> condition
+    DST condition TEMP %boolean ;
+
+M:: arm.64 %test-vector-branch ( label SRC TEMP rep vcc -- )
+    SRC TEMP rep vcc prepare-vector-test :> condition
+    label condition B.cond ;
 
 M: arm.64 %add-vector [ ADDv ] [ FADDv ] integer/float ;
 M: arm.64 %saturated-add-vector [ SQADD ] [ UQADD ] signed/unsigned ;
@@ -591,7 +612,7 @@ M: arm.64 %compare-vector-ccs
     } case ;
 
 M: arm.64 %move-vector-mask-reps vector-reps ;
-M: arm.64 %test-vector-reps f ;
+M: arm.64 %test-vector-reps vector-reps ;
 M: arm.64 %add-vector-reps vector-reps ;
 M: arm.64 %saturated-add-vector-reps int-vector-reps ;
 M: arm.64 %sub-vector-reps vector-reps ;

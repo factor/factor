@@ -565,6 +565,19 @@ TUPLE: inconsistent-vector-test bool branch ;
 { t f f }
 [ int-4{ f f f f } { int-4 } test-vector-tests ] unit-test
 
+cpu arm.64? [
+    { f t f } [
+        uchar-16{
+            f f f f  f f f t
+            f f f f  f f f f
+        }
+        { uchar-16 } test-vector-tests
+    ] unit-test
+
+    { f t t }
+    [ ulonglong-2{ t t } { ulonglong-2 } test-vector-tests ] unit-test
+] when
+
 "== Checking element access" print
 
 ! Test element access -- it should box bignums for int-4 on x86
