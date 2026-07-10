@@ -97,6 +97,13 @@ M: register displacement, drop ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
+        ! When the reg field is an XMM register, REX.W follows the r/m
+        ! *register* width only. Scalar/vector SSE moves ignore REX.W, so
+        ! emitting it for a 64-bit *memory* r/m (as operand-64? did) is
+        ! redundant -- see e951d073c7. Caveat: CVTSI2SD/CVTSI2SS/MOVD share
+        ! this path, and with a 64-bit memory source they now assemble as
+        ! 32-bit. No in-tree caller uses that form (all pass register
+        ! operands); revisit here before emitting a 64-bit memory convert.
         { [ over register-128? ] [ nip register-64? ] }
         { [ over not ] [ nip operand-64? ] }
         [ drop operand-64? ]
