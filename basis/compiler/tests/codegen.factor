@@ -18,6 +18,11 @@ IN: compiler.tests.codegen
 { 5000 } [ [ 5000 ] compile-call ] unit-test
 { "hi" } [ [ "hi" ] compile-call ] unit-test
 
+: large-immediate-shift-regression ( x -- y )
+    { fixnum } declare 255 fixnum-shift-fast ;
+
+{ 0 } [ 1 large-immediate-shift-regression ] unit-test
+
 { 1 2 3 4 } [ [ 1 2 3 4 ] compile-call ] unit-test
 
 { 1 1 } [ 1 [ dup ] compile-call ] unit-test
