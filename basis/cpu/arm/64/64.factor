@@ -885,7 +885,7 @@ M:: arm.64 %c-invoke ( symbols dll gc-map -- )
     symbols dll (LDR=BLR-pool) ;
 
 :: %c-invoke-tramp2 ( stack-size symbols dll gc-map -- )
-    IP1 SP stack-size 16 - ADD
+    IP1 SP stack-size 16 - %add-offset
     (LDR=BLR**-call)
     gc-map gc-map-here
     symbols dll (LDR=BLR-pool) ;
@@ -906,7 +906,7 @@ M: arm.64 %alien-indirect
         TRAMPOLINE BLR
         _ gc-map-here
     ] ] [ -rot '[
-        IP1 SP _ 16 - ADD
+        IP1 SP _ 16 - %add-offset
         IP0 _ ?spill-slot* MOV
         TRAMPOLINE2 BLR
         _ gc-map-here
