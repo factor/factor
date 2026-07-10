@@ -100,6 +100,16 @@ M: arm.64 %load-vector
     imm rep memory-offset-immediate?
     [ reg imm [+] ] [ reg imm scratch extend-offset-with ] if ;
 
+:: %add-offset ( DST SRC offset -- )
+    offset add/sub-immediate?
+    [ DST SRC offset ADD ]
+    [ temp offset (%load-immediate) DST SRC temp ADD ] if ;
+
+:: %sub-offset ( DST SRC offset -- )
+    offset add/sub-immediate?
+    [ DST SRC offset SUB ]
+    [ temp offset (%load-immediate) DST SRC temp SUB ] if ;
+
 : loc>operand ( loc -- operand )
     [ ds-loc? DS RS ? ] [ n>> cells neg extend-offset ] bi ;
 
@@ -128,7 +138,7 @@ M: arm.64 %clear [ 297 ] dip %replace-imm ;
 
 M: arm.64 %inc
     [ ds-loc? DS RS ? dup ] [ n>> cells ] bi
-    dup 0 > [ ADD ] [ neg SUB ] if ;
+    dup 0 > [ %add-offset ] [ neg %sub-offset ] if ;
 
 M: arm.64 stack-frame-size (stack-frame-size) 16 + 16 align ;
 
@@ -666,7 +676,7 @@ M: arm.64 %set-vm-field [ VM ] dip [+] STR ;
 
 M:: arm.64 %allot ( DST size class TEMP -- )
     DST VM vm-nursery-here-offset [+] LDR
-    temp DST size data-alignment get align ADD
+    temp DST size data-alignment get align %add-offset
     temp VM vm-nursery-here-offset [+] STR
     temp class type-number tag-header MOV
     temp DST [] STR
@@ -686,12 +696,12 @@ M:: arm.64 %write-barrier ( SRC SLOT scale tag CARD TEMP -- )
     CARD TEMP (%write-barrier) ;
 
 M:: arm.64 %write-barrier-imm ( SRC slot tag CARD TEMP -- )
-    CARD SRC slot tag slot-offset ADD
+    CARD SRC slot tag slot-offset %add-offset
     CARD TEMP (%write-barrier) ;
 
 M:: arm.64 %check-nursery-branch ( label size cc TEMP1 TEMP2 -- )
     TEMP1 VM vm-nursery-here-offset [+] LDR
-    TEMP1 dup size ADD
+    TEMP1 dup size %add-offset
     TEMP2 VM vm-nursery-end-offset [+] LDR
     TEMP1 TEMP2 CMP
     cc {
@@ -704,10 +714,10 @@ M: arm.64 %call-gc \ minor-gc %call gc-map-here ;
 M: arm.64 %prologue
     FP LR SP -16 [pre] STP
     FP SP MOV
-    16 - [ [ SP dup ] dip SUB ] unless-zero ;
+    16 - [ [ SP dup ] dip %sub-offset ] unless-zero ;
 
 M: arm.64 %epilogue
-    16 - [ [ SP dup ] dip ADD ] unless-zero
+    16 - [ [ SP dup ] dip %add-offset ] unless-zero
     FP LR SP 16 [post] LDP ;
 
 M: arm.64 %safepoint SAFEPOINT dup [] STR ;
@@ -857,7 +867,7 @@ M:: arm.64 %unbox ( DST SRC func rep -- )
     DST rep %load-return ;
 
 M:: arm.64 %local-allot ( DST size align offset -- )
-    DST SP offset local-allot-offset ADD ;
+    DST SP offset local-allot-offset %add-offset ;
 
 M:: arm.64 %box ( DST SRC func rep gc-map -- )
     rep reg-class-of f param-regs at first SRC rep %copy
@@ -875,7 +885,7 @@ M:: arm.64 %c-invoke ( symbols dll gc-map -- )
     symbols dll (LDR=BLR-pool) ;
 
 :: %c-invoke-tramp2 ( stack-size symbols dll gc-map -- )
-    IP1 SP stack-size 16 - ADD
+    IP1 SP stack-size 16 - %add-offset
     (LDR=BLR**-call)
     gc-map gc-map-here
     symbols dll (LDR=BLR-pool) ;
@@ -896,7 +906,7 @@ M: arm.64 %alien-indirect
         TRAMPOLINE BLR
         _ gc-map-here
     ] ] [ -rot '[
-        IP1 SP _ 16 - ADD
+        IP1 SP _ 16 - %add-offset
         IP0 _ ?spill-slot* MOV
         TRAMPOLINE2 BLR
         _ gc-map-here

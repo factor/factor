@@ -1,8 +1,9 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.data byte-arrays compiler.cfg
-compiler.cfg.instructions compiler.cfg.registers
-compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
+USING: accessors alien.accessors alien.data arrays byte-arrays compiler.cfg
+compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.registers
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.test
 cpu.architecture cpu.arm.64 cpu.arm.64.assembler.registers kernel
 kernel.private locals make math namespaces sequences system tools.test
 vectors ;
@@ -16,6 +17,17 @@ IN: cpu.arm.64.tests
         f { } { } { } { } 0 stack-size { } "dll"
         T{ gc-map { gc-roots V{ 0 } } }
         %alien-invoke
+    ] B{ } make
+    return-addresses get first ;
+
+:: alien-indirect-code+return-address ( stack-size -- code return-address )
+    init-relocation
+    V{ } clone return-addresses set
+    V{ } clone gc-maps set
+    [
+        X0 f { } { } { } { } 0 stack-size
+        T{ gc-map { gc-roots V{ 0 } } }
+        %alien-indirect
     ] B{ } make
     return-addresses get first ;
 
@@ -59,13 +71,49 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 int-rep n %load-stack-param ] B{ } make ;
 
+:: local-allot-code ( offset -- code )
+    f f <basic-block> <cfg>
+    [ stack-frame>> 0 >>allot-area-base drop ] keep cfg set
+    init-relocation
+    [ X0 16 8 offset %local-allot ] B{ } make ;
+
+:: prologue-code ( size -- code )
+    init-relocation [ size %prologue ] B{ } make ;
+
+:: epilogue-code ( size -- code )
+    init-relocation [ size %epilogue ] B{ } make ;
+
+:: allot-code ( size -- code )
+    init-relocation [ X0 size array X1 %allot ] B{ } make ;
+
+:: nursery-check-code ( size -- code )
+    init-relocation [
+        V{ } clone label-table set
+        <label> :> done
+        done size cc<= X0 X1 %check-nursery-branch
+        done resolve-label
+    ] B{ } make ;
+
+:: write-barrier-imm-code ( slot -- code )
+    init-relocation
+    [ X0 slot 0 X1 X2 %write-barrier-imm ] B{ } make ;
+
+:: inc-code ( n -- code )
+    init-relocation [ n <ds-loc> %inc ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
-{ t t } [
+{ t t t t } [
     0 alien-call-code+return-address
     B{ 0x20 0x03 0x3f 0xd6 } return-address-follows? ! BLR X25
 
     16 alien-call-code+return-address
+    B{ 0x40 0x03 0x3f 0xd6 } return-address-follows? ! BLR X26
+
+    0x1020 alien-call-code+return-address
+    B{ 0x40 0x03 0x3f 0xd6 } return-address-follows? ! BLR X26
+
+    0x1020 alien-indirect-code+return-address
     B{ 0x40 0x03 0x3f 0xd6 } return-address-follows? ! BLR X26
 ] unit-test
 
@@ -97,6 +145,41 @@ IN: cpu.arm.64.tests
 { 8 8 } [
     0x100 stack-param-store-code length
     0x100 stack-param-load-code length
+] unit-test
+
+! Stack-local offsets are aligned, but not necessarily ADD immediates.
+{ 4 8 } [
+    0x1000 local-allot-code length
+    0x1008 local-allot-code length
+] unit-test
+
+! Frame sizes are 16-byte aligned, which does not imply ADD encodability.
+{ 12 16 8 12 } [
+    0x1010 prologue-code length
+    0x1020 prologue-code length
+    0x1010 epilogue-code length
+    0x1020 epilogue-code length
+] unit-test
+
+! Allot and its nursery check use the same potentially large size.
+{ 24 28 20 24 } [
+    0x1000 allot-code length
+    0x1008 allot-code length
+    0x1000 nursery-check-code length
+    0x1010 nursery-check-code length
+] unit-test
+
+! Large tuple slot offsets need the same address materialization.
+{ 32 36 } [
+    512 write-barrier-imm-code length
+    513 write-barrier-imm-code length
+] unit-test
+
+! Generated stack effects can exceed the immediate adjustment range.
+{ 4 8 8 } [
+    512 inc-code length
+    513 inc-code length
+    -513 inc-code length
 ] unit-test
 
 cpu arm.64? [
