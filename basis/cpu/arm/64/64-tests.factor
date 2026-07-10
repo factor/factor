@@ -101,6 +101,9 @@ IN: cpu.arm.64.tests
 :: inc-code ( n -- code )
     init-relocation [ n <ds-loc> %inc ] B{ } make ;
 
+:: mul-imm-code ( n -- code )
+    init-relocation [ X0 X1 n %mul-imm ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t t t } [
@@ -180,6 +183,12 @@ IN: cpu.arm.64.tests
     512 inc-code length
     513 inc-code length
     -513 inc-code length
+] unit-test
+
+! Representation lowering emits negative multiply immediates for tagged negation.
+{ 8 8 } [
+    100 mul-imm-code length
+    -16 mul-imm-code length
 ] unit-test
 
 cpu arm.64? [
