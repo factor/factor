@@ -1,8 +1,9 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.data byte-arrays compiler.cfg
-compiler.cfg.instructions compiler.cfg.registers
-compiler.codegen.gc-maps compiler.codegen.relocation compiler.test
+USING: accessors alien.accessors alien.data arrays byte-arrays compiler.cfg
+compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.registers
+compiler.codegen.gc-maps compiler.codegen.labels
+compiler.codegen.relocation compiler.test
 cpu.architecture cpu.arm.64 cpu.arm.64.assembler.registers kernel
 kernel.private locals make math namespaces sequences system tools.test
 vectors ;
@@ -82,6 +83,17 @@ IN: cpu.arm.64.tests
 :: epilogue-code ( size -- code )
     init-relocation [ size %epilogue ] B{ } make ;
 
+:: allot-code ( size -- code )
+    init-relocation [ X0 size array X1 %allot ] B{ } make ;
+
+:: nursery-check-code ( size -- code )
+    init-relocation [
+        V{ } clone label-table set
+        <label> :> done
+        done size cc<= X0 X1 %check-nursery-branch
+        done resolve-label
+    ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t t t } [
@@ -140,6 +152,14 @@ IN: cpu.arm.64.tests
     0x1020 prologue-code length
     0x1010 epilogue-code length
     0x1020 epilogue-code length
+] unit-test
+
+! Allot and its nursery check use the same potentially large size.
+{ 24 28 20 24 } [
+    0x1000 allot-code length
+    0x1008 allot-code length
+    0x1000 nursery-check-code length
+    0x1010 nursery-check-code length
 ] unit-test
 
 cpu arm.64? [
