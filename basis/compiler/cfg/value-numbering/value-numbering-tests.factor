@@ -424,6 +424,64 @@ cpu x86? [
     } value-numbering-step
 ] unit-test
 
+! Shift immediates have their own narrow encoding. Do not use the target's
+! unrelated logical-immediate predicate to select them.
+{
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##shl f 2 0 1 }
+    }
+} [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##shl f 2 0 1 }
+    } value-numbering-step
+] unit-test
+
+{
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##shr f 2 0 1 }
+    }
+} [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##shr f 2 0 1 }
+    } value-numbering-step
+] unit-test
+
+{
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##sar f 2 0 1 }
+    }
+} [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 255 }
+        T{ ##sar f 2 0 1 }
+    } value-numbering-step
+] unit-test
+
+{
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 5 }
+        T{ ##shl-imm f 2 0 5 }
+    }
+} [
+    {
+        T{ ##peek f 0 D: 0 }
+        T{ ##load-integer f 1 5 }
+        T{ ##shl f 2 0 1 }
+    } value-numbering-step
+] unit-test
+
 cpu x86? [
     {
         {
