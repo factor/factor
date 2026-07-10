@@ -780,6 +780,26 @@ pub const FactorVM = struct {
         return tagged;
     }
 
+    /// Copy malloc-side tagged cells into a Factor array. Every source cell is
+    /// registered while the Factor allocation runs so a moving collection can
+    /// update the side buffer before it is copied. This is the Zig equivalent
+    /// of the C++ VM's std_vector_to_array().
+    pub fn cellsToArray(self: *Self, cells: []Cell) ?Cell {
+        const roots_base = self.data_roots.items.len;
+        self.data_roots.ensureUnusedCapacity(self.allocator, cells.len) catch return null;
+        for (cells) |*cell_ptr| {
+            self.data_roots.appendAssumeCapacity(cell_ptr);
+        }
+        defer self.data_roots.shrinkRetainingCapacity(roots_base);
+
+        const tagged = self.allotUninitializedArray(cells.len) orelse return null;
+        if (cells.len > 0) {
+            const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(tagged));
+            @memcpy(array.data()[0..cells.len], cells);
+        }
+        return tagged;
+    }
+
     pub fn reallotArray(self: *Self, old_array_: Cell, new_capacity: Cell) ?Cell {
         std.debug.assert(layouts.hasTag(old_array_, .array));
 
