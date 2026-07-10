@@ -12,6 +12,8 @@ QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
 IN: math.vectors.simd.tests
 
+{ 16 } [ \ float-4 c:c-type-align-first ] unit-test
+
 ! Test type propagation
 { V{ float } } [ [ { float-4 } declare norm-sq ] final-classes ] unit-test
 

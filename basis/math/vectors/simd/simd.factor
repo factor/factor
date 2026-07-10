@@ -325,6 +325,7 @@ c:<c-type>
     } >quotation >>setter
     16 >>size
     16 >>align
+    16 >>align-first
     A-rep >>rep
 \ A c:typedef
 
