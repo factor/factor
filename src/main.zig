@@ -133,16 +133,23 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     std.debug.print("*** Stage 2 early init... ", .{});
 
     const heap = vm.data orelse return;
+    vm.gc_off = false;
 
-    // Phase 1: JIT compile all words
+    // Snapshot every word and quotation before compiling. Compilation can
+    // allocate in both heaps and compact/move the data heap, so walking the
+    // original tenured addresses across a compile is unsafe. cellsToArray
+    // roots the malloc-side snapshot while materializing one heap array; from
+    // then on that single registered array keeps all entries current.
+    var words: std.ArrayList(layouts.Cell) = .empty;
+    defer words.deinit(vm.allocator);
+    var quotations: std.ArrayList(layouts.Cell) = .empty;
+    defer quotations.deinit(vm.allocator);
+
     var scan = heap.tenured.start;
     const tenured_end = heap.tenured.end;
-    var words_compiled: usize = 0;
-
     while (scan < tenured_end) {
         const header: layouts.Cell = @as(*const layouts.Cell, @ptrFromInt(scan)).*;
         if (header & 1 == 1) {
-            // Free block
             const size = header & ~@as(layouts.Cell, 7);
             if (size == 0) break;
             scan += size;
@@ -152,42 +159,47 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
         if (size == 0) break;
 
         const obj: *const layouts.Object = @ptrFromInt(scan);
-        if (obj.getType() == .word) {
-            const word: *layouts.Word = @ptrFromInt(scan);
-            if (word.entry_point == 0) {
-                // Root the word across JIT compilation (can trigger GC via nursery alloc)
-                var rooted_word: layouts.Cell = scan | @intFromEnum(layouts.TypeTag.word);
-                vm.data_roots.appendAssumeCapacity(&rooted_word);
-                defer _ = vm.data_roots.pop();
-
-                const compiled = vm.jitCompileQuotationWithOwner(rooted_word, word.def, false);
-
-                // Re-derive word pointer after potential GC
-                var word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
-
-                if (compiled) |cb| {
-                    word_after.entry_point = cb.entryPoint();
-                }
-
-                // Also compile pic_def and pic_tail_def quotations.
-                // These are needed for polymorphic inline cache (PIC) method dispatch
-                if (word_after.pic_def != layouts.false_object and word_after.pic_def != 0) {
-                    vm.jitCompileQuotation(word_after.pic_def, false);
-                    // Re-derive after potential GC
-                    word_after = @ptrFromInt(layouts.UNTAG(rooted_word));
-                }
-                if (word_after.pic_tail_def != layouts.false_object and word_after.pic_tail_def != 0) {
-                    vm.jitCompileQuotation(word_after.pic_tail_def, false);
-                }
-
-                words_compiled += 1;
-            }
+        switch (obj.getType()) {
+            .word => words.append(vm.allocator, scan | @intFromEnum(layouts.TypeTag.word)) catch vm.memoryError(),
+            .quotation => quotations.append(vm.allocator, scan | @intFromEnum(layouts.TypeTag.quotation)) catch vm.memoryError(),
+            else => {},
         }
 
         scan += size;
     }
 
-    vm.gc_off = false;
+    const word_count = words.items.len;
+    words.ensureUnusedCapacity(vm.allocator, quotations.items.len) catch vm.memoryError();
+    words.appendSliceAssumeCapacity(quotations.items);
+
+    var boot_array_cell = vm.cellsToArray(words.items) orelse vm.memoryError();
+    vm.data_roots.appendAssumeCapacity(&boot_array_cell);
+    defer _ = vm.data_roots.pop();
+
+    // Phase 1: JIT compile all words.
+    for (0..word_count) |i| {
+        var boot_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(boot_array_cell));
+        const word_cell = boot_array.data()[i];
+        const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
+        if (word.entry_point != 0) continue;
+
+        const compiled = vm.jitCompileQuotationWithOwner(word_cell, word.def, false);
+
+        // Re-read the array slot after every allocating call. The array and
+        // word can both have moved, but the registered slot is current.
+        boot_array = @ptrFromInt(layouts.UNTAG(boot_array_cell));
+        var word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(boot_array.data()[i]));
+        if (compiled) |cb| word_after.entry_point = cb.entryPoint();
+
+        if (word_after.pic_def != layouts.false_object and word_after.pic_def != 0) {
+            vm.jitCompileQuotation(word_after.pic_def, false);
+            boot_array = @ptrFromInt(layouts.UNTAG(boot_array_cell));
+            word_after = @ptrFromInt(layouts.UNTAG(boot_array.data()[i]));
+        }
+        if (word_after.pic_tail_def != layouts.false_object and word_after.pic_tail_def != 0) {
+            vm.jitCompileQuotation(word_after.pic_tail_def, false);
+        }
+    }
 
     // Phase 2: Initialize all deferred code blocks (must happen before
     // reading lazy_jit_compile entry point, since it needs relocated code)
@@ -197,29 +209,10 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     // Phase 3: Set uncompiled quotations to lazy_jit_compile entry point
     // (must be after phase 2 so the lazy_jit_compile word has a valid entry point)
     const lazy_ep = vm.lazyJitCompileEntryPoint();
-    scan = heap.tenured.start;
-    var quotations_set: usize = 0;
-    while (scan < tenured_end) {
-        const header: layouts.Cell = @as(*const layouts.Cell, @ptrFromInt(scan)).*;
-        if (header & 1 == 1) {
-            const size = header & ~@as(layouts.Cell, 7);
-            if (size == 0) break;
-            scan += size;
-            continue;
-        }
-        const size = free_list_mod.objectSizeFromHeader(scan);
-        if (size == 0) break;
-
-        const obj2: *const layouts.Object = @ptrFromInt(scan);
-        if (obj2.getType() == .quotation) {
-            const quot: *layouts.Quotation = @ptrFromInt(scan);
-            if (quot.entry_point == 0) {
-                quot.entry_point = lazy_ep;
-                quotations_set += 1;
-            }
-        }
-
-        scan += size;
+    for (word_count..words.items.len) |i| {
+        const boot_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(boot_array_cell));
+        const quot: *layouts.Quotation = @ptrFromInt(layouts.UNTAG(boot_array.data()[i]));
+        if (quot.entry_point == 0) quot.entry_point = lazy_ep;
     }
 
     // Phase 4: Set OBJ_STAGE2 = canonical_true
