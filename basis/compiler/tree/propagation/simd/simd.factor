@@ -52,6 +52,7 @@ CONSTANT: vector>vector-intrinsics
         (simd-vunordered?)
         (simd-v>float)
         (simd-v>integer)
+        (simd-v>unsigned-integer)
         (simd-vpack-signed)
         (simd-vpack-unsigned)
         (simd-vunpack-head)

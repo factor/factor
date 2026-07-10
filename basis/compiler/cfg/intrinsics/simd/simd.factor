@@ -578,7 +578,13 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-v>integer ( node -- )
     {
-        { float-vector-rep [ ^^float>integer-vector ] }
+        { float-vector-rep [ f ^^float>integer-vector ] }
+        { int-vector-rep [ drop ] }
+    } emit-v-vector-op ;
+
+: emit-simd-v>unsigned-integer ( node -- )
+    {
+        { float-vector-rep [ t ^^float>integer-vector ] }
         { int-vector-rep [ drop ] }
     } emit-v-vector-op ;
 
@@ -702,6 +708,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vnone?)             [ emit-simd-vnone?              ] }
         { (simd-v>float)            [ emit-simd-v>float             ] }
         { (simd-v>integer)          [ emit-simd-v>integer           ] }
+        { (simd-v>unsigned-integer) [ emit-simd-v>unsigned-integer  ] }
         { (simd-vpack-signed)       [ emit-simd-vpack-signed        ] }
         { (simd-vpack-unsigned)     [ emit-simd-vpack-unsigned      ] }
         { (simd-vunpack-head)       [ emit-simd-vunpack-head        ] }

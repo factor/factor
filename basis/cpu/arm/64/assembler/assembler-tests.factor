@@ -122,6 +122,7 @@ IN: cpu.arm.64.assembler.tests
 0x2118601e [ D1 D1 D0 FDIVs ] test-insn
 
 0x42b8a14e [ V2 V2 4S FCVTZSvi ] test-insn
+0x42b8a16e [ V2 V2 4S FCVTZUvi ] test-insn
 
 0x21001e4e [ V1 V1 V30 TBL ] test-insn
 
