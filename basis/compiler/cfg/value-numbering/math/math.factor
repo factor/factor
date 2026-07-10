@@ -268,18 +268,18 @@ M: ##xor rewrite
 
 M: ##shl rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ ##shl-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-shift-count? ] [ ##shl-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##shr rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ ##shr-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-shift-count? ] [ ##shr-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
 
 M: ##sar rewrite
     {
-        { [ dup src2>> vreg-immediate-bitwise? ] [ ##sar-imm f insn>imm-insn ] }
+        { [ dup src2>> vreg-immediate-shift-count? ] [ ##sar-imm f insn>imm-insn ] }
         [ drop f ]
     } cond ;
