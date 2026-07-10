@@ -1,5 +1,6 @@
-USING: compiler.cfg.utilities compiler.codegen compiler.codegen.labels
-compiler.constants cpu.architecture kernel make math tools.test ;
+USING: compiler.cfg.instructions compiler.cfg.utilities compiler.codegen
+compiler.codegen.labels compiler.constants cpu.architecture effects
+generic kernel make math tools.test words ;
 IN: compiler.codegen.tests
 
 ! useless-branch?
@@ -19,3 +20,7 @@ IN: compiler.codegen.tests
 [ [ <label> dup define-label %jump-label ] with-fixup ] must-fail
 [ [ <label> dup define-label B{ 0 0 0 0 } % rc-relative label-fixup ] with-fixup ] must-fail
 [ [ <label> dup define-label B{ 0 0 0 0 } % rc-absolute-cell label-fixup ] with-fixup ] must-fail
+
+! Generated code generators must consume every instruction literal slot.
+{ ( insn -- ) }
+[ M\ ##float>integer-vector generate-insn stack-effect ] unit-test

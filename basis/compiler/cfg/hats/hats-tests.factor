@@ -1,5 +1,5 @@
 USING: compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.registers make tools.test ;
+compiler.cfg.registers effects make tools.test words ;
 IN: compiler.cfg.hats.tests
 
 {
@@ -7,3 +7,7 @@ IN: compiler.cfg.hats.tests
 } [
     reset-vreg-counter [ 32 8 f ^^local-allot ] V{ } make
 ] unit-test
+
+! Generated hats must be refreshed when an instruction gains a literal slot.
+{ ( src rep unsigned? -- vreg ) }
+[ \ ^^float>integer-vector stack-effect ] unit-test

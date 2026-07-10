@@ -25,10 +25,12 @@ IN: compiler.cfg.hats
         ] reduce
     ] keep insn-ctor-name "compiler.cfg.instructions" lookup-word suffix ;
 
-: hat-effect ( insn -- effect )
+: hat-input-names ( insn -- names )
     "insn-slots" word-prop
-    [ type>> { def temp } member-eq? ] reject [ name>> ] map
-    { "vreg" } <effect> ;
+    [ type>> { def temp } member-eq? ] reject [ name>> ] map ;
+
+: hat-effect ( insn -- effect )
+    hat-input-names { "vreg" } <effect> ;
 
 : define-hat ( insn -- )
     [ hat-name ] [ hat-quot ] [ hat-effect ] tri define-inline ;
