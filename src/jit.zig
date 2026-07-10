@@ -547,6 +547,7 @@ pub const Jit = struct {
         // Each relocation entry is 4 bytes
         const entry_count = reloc_size / @sizeOf(code_blocks.RelocationEntry);
         const current_offset = self.code.items.len;
+        try self.relocation.ensureUnusedCapacity(self.vm.allocator, entry_count * @sizeOf(code_blocks.RelocationEntry));
 
         // Adjust relocation offsets and append
         for (0..entry_count) |i| {
@@ -562,7 +563,7 @@ pub const Jit = struct {
             );
 
             const entry_u32: u32 = @bitCast(entry);
-            try self.relocation.appendSlice(self.vm.allocator, std.mem.asBytes(&entry_u32));
+            self.relocation.appendSliceAssumeCapacity(std.mem.asBytes(&entry_u32));
         }
     }
 
