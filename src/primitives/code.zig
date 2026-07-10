@@ -471,28 +471,25 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
     // block contributes 6 elements:
     //   owner, parameters, relocation, type (fixnum), size (fixnum), entry_point
     //
-    // We must NOT allocate on the Factor heap while reading the code heap. The
-    // result-array allocation can trigger a GC (and, on arm64, a code-heap
-    // compaction) that relocates blocks and invalidates an in-progress scan,
-    // yielding garbage / non-16-aligned entry points (which library code then
-    // reads as tagged pointers instead of fixnums). This mirrors the C++ VM
-    // (vm/code_heap.cpp primitive_code_blocks + vm/arrays.cpp
-    // std_vector_to_array): capture every block's fields in one uninterrupted
-    // pass into a side buffer, register the captured cells as GC data roots so
-    // the collector fixes up the tagged pointers, then allocate the result
-    // array once and copy in.
-    const code_heap = vm.code orelse {
+    // Count without allocating, then allocate the result before capturing any
+    // fields. That allocation may collect and compact the code heap; the second
+    // pass therefore reads current data/code pointers and performs no Factor
+    // allocation while it walks the heap.
+    _ = vm.code orelse {
         vm.push(layouts.false_object);
         return;
     };
-    const alloc = code_heap.free_list orelse {
+    _ = vm.code.?.free_list orelse {
         vm.push(layouts.false_object);
         return;
     };
 
-    // First pass: count live code blocks (no allocation).
-    var count: Cell = 0;
-    {
+    // If the result allocation also reclaims dead code, retry with the new
+    // count. Once the counts agree, every captured address came from the live
+    // post-allocation heap and the array's physical size remains exact.
+    while (true) {
+        const alloc = vm.code.?.free_list.?;
+        var count: Cell = 0;
         var scan = alloc.start;
         while (scan < alloc.end) {
             const block: *const CodeBlock = @ptrFromInt(scan);
@@ -501,57 +498,44 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
             if (!block.isFree()) count += 1;
             scan += block_size;
         }
-    }
 
-    // Second pass: capture each live block's six fields into a side buffer on
-    // the Zig heap. Growing this buffer never touches the Factor heap, so the
-    // code-heap layout stays fixed across the whole scan.
-    var objects: std.ArrayList(Cell) = .empty;
-    defer objects.deinit(vm.allocator);
-    objects.ensureUnusedCapacity(vm.allocator, count * 6) catch vm.memoryError();
-    {
-        var scan = alloc.start;
-        while (scan < alloc.end) {
+        const array_cell = vm.allotUninitializedArray(count * 6) orelse vm.memoryError();
+        const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
+        const data = arr.data();
+
+        // Reacquire the allocator after the result allocation in case it
+        // compacted the code heap, then fill without further allocation.
+        const current_alloc = vm.code.?.free_list.?;
+        var element_count: Cell = 0;
+        var count_changed = false;
+        scan = current_alloc.start;
+        while (scan < current_alloc.end) {
             const block: *const CodeBlock = @ptrFromInt(scan);
             const block_size = block.size();
             if (block_size == 0) break;
             if (!block.isFree()) {
-                objects.appendAssumeCapacity(block.owner);
-                objects.appendAssumeCapacity(block.parameters);
-                objects.appendAssumeCapacity(block.relocation);
-                objects.appendAssumeCapacity(layouts.tagFixnum(@intCast(@intFromEnum(block.blockType()))));
-                objects.appendAssumeCapacity(layouts.tagFixnum(@intCast(block_size)));
-                // Entry point is data_alignment-aligned (16 bytes), so its low
-                // tag bits are 0 (FIXNUM_TYPE); library code shifts it left by
-                // tag_bits to recover the address. Captured from the live heap,
-                // it is always a valid fixnum.
-                objects.appendAssumeCapacity(block.entryPoint());
+                if (element_count + 6 > count * 6) {
+                    count_changed = true;
+                    break;
+                }
+                data[element_count] = block.owner;
+                data[element_count + 1] = block.parameters;
+                data[element_count + 2] = block.relocation;
+                data[element_count + 3] = layouts.tagFixnum(@intCast(@intFromEnum(block.blockType())));
+                data[element_count + 4] = layouts.tagFixnum(@intCast(block_size));
+                // Entry points are data_alignment-aligned, so library code can
+                // treat this cell as a fixnum and shift it back to an address.
+                data[element_count + 5] = block.entryPoint();
+                element_count += 6;
             }
             scan += block_size;
         }
+
+        if (!count_changed and element_count == count * 6) {
+            vm.push(array_cell);
+            return;
+        }
     }
-    const element_count = objects.items.len;
-
-    // Register the captured cells as data roots so a GC during the array
-    // allocation fixes up the tagged pointers (owner/parameters/relocation).
-    // The fixnum cells (type/size/entry_point) are ignored by the collector.
-    const roots_base = vm.data_roots.items.len;
-    vm.data_roots.ensureUnusedCapacity(vm.allocator, element_count) catch vm.memoryError();
-    for (objects.items) |*cell_ptr| {
-        vm.data_roots.appendAssumeCapacity(cell_ptr);
-    }
-
-    const array_cell = vm.allotArray(@intCast(element_count), layouts.false_object) orelse {
-        vm.data_roots.shrinkRetainingCapacity(roots_base);
-        vm.memoryError();
-    };
-    vm.data_roots.shrinkRetainingCapacity(roots_base);
-
-    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
-    const data = arr.data();
-    @memcpy(data[0..element_count], objects.items);
-
-    vm.push(array_cell);
 }
 
 pub export fn primitive_strip_stack_traces(vm_asm: *VMAssemblyFields) callconv(.c) void {
