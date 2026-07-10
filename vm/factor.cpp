@@ -126,6 +126,11 @@ void factor_vm::init_factor(vm_parameters* p) {
     special_objects[idx] = allot_alien(false_object, aliens[n][1]);
   }
 
+  free((vm_char*)p->executable_path);
+  free((vm_char*)p->image_path);
+  p->executable_path = NULL;
+  p->image_path = NULL;
+
   // We can GC now
   gc_off = false;
 

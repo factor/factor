@@ -178,6 +178,7 @@ struct factor_vm {
 
   // run
   void primitive_exit();
+  void free_vm_paths();
   void primitive_nano_count();
   void primitive_sleep();
   void primitive_set_slot();

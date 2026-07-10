@@ -44,8 +44,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
 }
 
 factor_vm::~factor_vm() {
-  free(alien_offset(special_objects[OBJ_EXECUTABLE]));
-  free(alien_offset(special_objects[OBJ_IMAGE]));
+  free_vm_paths();
   close_console();
   FACTOR_ASSERT(!ctx);
   FACTOR_FOR_EACH(unused_contexts) {
@@ -66,6 +65,17 @@ factor_vm::~factor_vm() {
   }
   FACTOR_FOR_EACH(function_descriptors) {
     delete[] * iter;
+  }
+}
+
+void factor_vm::free_vm_paths() {
+  cell path_indexes[] = {OBJ_EXECUTABLE, OBJ_IMAGE};
+  for (cell index : path_indexes) {
+    cell path = special_objects[index];
+    if (path != false_object) {
+      special_objects[index] = false_object;
+      free(alien_offset(path));
+    }
   }
 }
 
