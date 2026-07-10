@@ -65,6 +65,12 @@ IN: cpu.arm.64.tests
     init-relocation
     [ X0 16 8 offset %local-allot ] B{ } make ;
 
+:: prologue-code ( size -- code )
+    init-relocation [ size %prologue ] B{ } make ;
+
+:: epilogue-code ( size -- code )
+    init-relocation [ size %epilogue ] B{ } make ;
+
 ! A GC map for a C call is keyed by the address execution resumes at,
 ! immediately after BLR. The branch and inline dlsym literal pool come later.
 { t t } [
@@ -109,6 +115,14 @@ IN: cpu.arm.64.tests
 { 4 8 } [
     0x1000 local-allot-code length
     0x1008 local-allot-code length
+] unit-test
+
+! Frame sizes are 16-byte aligned, which does not imply ADD encodability.
+{ 12 16 8 12 } [
+    0x1010 prologue-code length
+    0x1020 prologue-code length
+    0x1010 epilogue-code length
+    0x1020 epilogue-code length
 ] unit-test
 
 cpu arm.64? [

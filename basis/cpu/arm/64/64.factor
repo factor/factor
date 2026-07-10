@@ -100,6 +100,16 @@ M: arm.64 %load-vector
     imm rep memory-offset-immediate?
     [ reg imm [+] ] [ reg imm scratch extend-offset-with ] if ;
 
+:: %add-offset ( DST SRC offset -- )
+    offset add/sub-immediate?
+    [ DST SRC offset ADD ]
+    [ temp offset (%load-immediate) DST SRC temp ADD ] if ;
+
+:: %sub-offset ( DST SRC offset -- )
+    offset add/sub-immediate?
+    [ DST SRC offset SUB ]
+    [ temp offset (%load-immediate) DST SRC temp SUB ] if ;
+
 : loc>operand ( loc -- operand )
     [ ds-loc? DS RS ? ] [ n>> cells neg extend-offset ] bi ;
 
@@ -704,10 +714,10 @@ M: arm.64 %call-gc \ minor-gc %call gc-map-here ;
 M: arm.64 %prologue
     FP LR SP -16 [pre] STP
     FP SP MOV
-    16 - [ [ SP dup ] dip SUB ] unless-zero ;
+    16 - [ [ SP dup ] dip %sub-offset ] unless-zero ;
 
 M: arm.64 %epilogue
-    16 - [ [ SP dup ] dip ADD ] unless-zero
+    16 - [ [ SP dup ] dip %add-offset ] unless-zero
     FP LR SP 16 [post] LDP ;
 
 M: arm.64 %safepoint SAFEPOINT dup [] STR ;
@@ -855,11 +865,6 @@ M:: arm.64 %unbox ( DST SRC func rep -- )
     arg2 VM MOV
     func f f %c-invoke
     DST rep %load-return ;
-
-:: %add-offset ( DST SRC offset -- )
-    offset add/sub-immediate?
-    [ DST SRC offset ADD ]
-    [ temp offset (%load-immediate) DST SRC temp ADD ] if ;
 
 M:: arm.64 %local-allot ( DST size align offset -- )
     DST SP offset local-allot-offset %add-offset ;
