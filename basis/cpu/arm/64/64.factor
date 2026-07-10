@@ -478,12 +478,21 @@ M: arm.64 %shl-vector-imm >shape SHL ;
 M: arm.64 %shr-vector-imm [ SSHR ] [ USHR ] signed/unsigned ;
 
 M:: arm.64 %horizontal-shl-vector-imm ( DST SRC1 src2 rep -- )
-    fp-temp dup dup 16B EORv
-    DST fp-temp SRC1 16 src2 - 16B EXT ;
+    src2 0 =
+    [ DST SRC1 16B MOVv ] [
+        src2 16 >=
+        [ DST dup dup 16B EORv ] [
+            fp-temp dup dup 16B EORv
+            DST fp-temp SRC1 16 src2 - 16B EXT
+        ] if
+    ] if ;
 
 M:: arm.64 %horizontal-shr-vector-imm ( DST SRC1 src2 rep -- )
-    fp-temp dup dup 16B EORv
-    DST SRC1 fp-temp src2 16B EXT ;
+    src2 16 >=
+    [ DST dup dup 16B EORv ] [
+        fp-temp dup dup 16B EORv
+        DST SRC1 fp-temp src2 16B EXT
+    ] if ;
 
 M: arm.64 %integer>scalar drop [ >D ] dip FMOV ;
 
