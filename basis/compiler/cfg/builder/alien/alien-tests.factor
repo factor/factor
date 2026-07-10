@@ -63,6 +63,23 @@ SYMBOL: foo
     [ no-such-symbol? ] [ name>> ] bi
 ] unit-test
 
+cpu arm.64? [
+    ! Once both register banks are exhausted, a preceding eight-byte stack
+    ! argument must not misalign a 128-bit SIMD argument.
+    {
+        V{
+            { 8 int-rep 0 }
+            { 200 float-4-rep 16 }
+        }
+    } [
+        cdecl [
+            9 <iota> [ int-rep f f next-parameter ] each
+            8 <iota> [ 100 + float-rep f f next-parameter ] each
+            200 float-4-rep f f next-parameter
+        ] with-param-regs nip
+    ] unit-test
+] when
+
 ! caller-parameters
 cpu x86.64? [
     ${

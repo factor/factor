@@ -894,6 +894,7 @@ M: arm.64 flatten-struct-type
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
+M: arm.64 stack-param-alignment rep-size cell max ;
 M: arm.64 float-right-align-on-stack? f ;
 M: arm.64 struct-return-on-stack? f ;
 

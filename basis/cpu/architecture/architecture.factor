@@ -553,6 +553,9 @@ HOOK: dummy-stack-params? cpu ( -- ? )
 HOOK: dummy-int-params? cpu ( -- ? )
 HOOK: dummy-fp-params? cpu ( -- ? )
 
+HOOK: stack-param-alignment cpu ( rep -- n )
+M: object stack-param-alignment drop cell ;
+
 ! If t, long longs are never passed in param regs
 HOOK: long-long-on-stack? cpu ( -- ? )
 

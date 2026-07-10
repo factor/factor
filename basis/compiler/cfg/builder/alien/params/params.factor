@@ -9,8 +9,9 @@ SYMBOL: stack-params
 GENERIC: alloc-stack-param ( rep -- n )
 
 M: object alloc-stack-param
-    stack-params get
-    [ rep-size cell align stack-params +@ ] dip ;
+    dup stack-param-alignment stack-params get swap align
+    dup stack-params set
+    swap rep-size cell align stack-params +@ ;
 
 M: float-rep alloc-stack-param
     stack-params get swap rep-size
