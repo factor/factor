@@ -366,6 +366,7 @@ M: x86 %integer>float-vector-reps
     } available-reps ;
 
 M: x86 %float>integer-vector
+    drop
     {
         { float-4-rep [ CVTTPS2DQ ] }
     } case ;

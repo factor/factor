@@ -1396,6 +1396,7 @@ PRIVATE>
 : FABSv    ( Rd Rn shape -- ) 0 1 0b01111 simd-2-misc*-elt ;
 : UCVTFvi  ( Rd Rn shape -- ) 1 0 0b11101 simd-2-misc*-elt ;
 : FCVTZSvi ( Rd Rn shape -- ) 0 1 0b11011 simd-2-misc*-elt ;
+: FCVTZUvi ( Rd Rn shape -- ) 1 1 0b11011 simd-2-misc*-elt ;
 : FSQRTv   ( Rd Rn shape -- ) 1 1 0b11111 simd-2-misc*-elt ;
 
 

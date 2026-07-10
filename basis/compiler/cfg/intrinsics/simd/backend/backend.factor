@@ -33,7 +33,12 @@ M: ##unpack-vector-head insn-available? rep>> %unpack-vector-head-reps member? ;
 M: ##unpack-vector-tail insn-available? rep>> %unpack-vector-tail-reps member? ;
 M: ##tail>head-vector insn-available? rep>> %unpack-vector-head-reps member? ;
 M: ##integer>float-vector insn-available? rep>> %integer>float-vector-reps member? ;
-M: ##float>integer-vector insn-available? rep>> %float>integer-vector-reps member? ;
+M: ##float>integer-vector insn-available?
+    [ rep>> ] [
+        unsigned?>>
+        [ %float>unsigned-integer-vector-reps ]
+        [ %float>integer-vector-reps ] if
+    ] bi member? ;
 M: ##compare-vector insn-available? [ rep>> ] [ cc>> ] bi %compare-vector-reps member? ;
 M: ##move-vector-mask insn-available? rep>> %move-vector-mask-reps member? ;
 M: ##test-vector insn-available? rep>> %test-vector-reps member? ;

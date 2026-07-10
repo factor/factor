@@ -373,7 +373,7 @@ literal: rep ;
 FOLDABLE-INSN: ##float>integer-vector
 def: dst
 use: src
-literal: rep ;
+literal: rep unsigned? ;
 
 FOLDABLE-INSN: ##compare-vector
 def: dst

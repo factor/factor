@@ -429,6 +429,7 @@ unit-test
 TUPLE: convert-cpu < simple-ops-cpu ;
 M: convert-cpu %integer>float-vector-reps { int-4-rep } ;
 M: convert-cpu %float>integer-vector-reps { float-4-rep } ;
+M: convert-cpu %float>unsigned-integer-vector-reps { float-4-rep } ;
 
 ! v>float
 { { } }
@@ -446,6 +447,10 @@ unit-test
 
 { { ##float>integer-vector } }
 [ convert-cpu float-4-rep [ emit-simd-v>integer ] test-emit ]
+unit-test
+
+{ { ##float>integer-vector } }
+[ convert-cpu float-4-rep [ emit-simd-v>unsigned-integer ] test-emit ]
 unit-test
 
 ! vpack-signed

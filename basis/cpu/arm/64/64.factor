@@ -409,7 +409,20 @@ M: arm.64 %unsigned-pack-vector >size 1 - 1 <vector-shape> [ nip UQXTN ] 4keep n
 M: arm.64 %unpack-vector-head [ SXTL ] [ UXTL ] [ FCVTL ] signed/unsigned/float ;
 M: arm.64 %unpack-vector-tail [ SXTL2 ] [ UXTL2 ] [ FCVTL2 ] signed/unsigned/float ;
 M: arm.64 %integer>float-vector [ SCVTFvi ] [ UCVTFvi ] signed/unsigned ;
-M: arm.64 %float>integer-vector >shape FCVTZSvi ;
+
+M:: arm.64 %float>integer-vector ( DST SRC rep unsigned? -- )
+    unsigned? [
+        rep >shape :> shape
+        fp-temp2 dup dup 16B EORv
+        fp-temp fp-temp2 SRC shape FCMGT
+        fp-temp2 SRC shape FABSv
+        fp-temp2 dup shape FCVTZUvi
+        fp-temp2 dup shape NEGv
+        fp-temp2 dup fp-temp 16B ANDv
+        DST SRC shape FCVTZUvi
+        DST dup fp-temp 16B BICv
+        DST dup fp-temp2 16B ORRv
+    ] [ DST SRC rep >shape FCVTZSvi ] if ;
 
 M: arm.64 %compare-vector
     {
@@ -552,6 +565,7 @@ M: arm.64 %unpack-vector-head-reps { float-4-rep char-16-rep uchar-16-rep short-
 M: arm.64 %unpack-vector-tail-reps { float-4-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %integer>float-vector-reps { int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } ;
 M: arm.64 %float>integer-vector-reps float-vector-reps ;
+M: arm.64 %float>unsigned-integer-vector-reps float-vector-reps ;
 M: arm.64 %compare-vector-reps { cc< cc<= cc> cc>= cc= cc<> } member? vector-reps and ;
 
 M: arm.64 %compare-vector-ccs

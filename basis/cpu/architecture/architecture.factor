@@ -315,7 +315,7 @@ HOOK: %unsigned-pack-vector cpu ( dst src1 src2 rep -- )
 HOOK: %unpack-vector-head cpu ( dst src rep -- )
 HOOK: %unpack-vector-tail cpu ( dst src rep -- )
 HOOK: %integer>float-vector cpu ( dst src rep -- )
-HOOK: %float>integer-vector cpu ( dst src rep -- )
+HOOK: %float>integer-vector cpu ( dst src rep unsigned? -- )
 HOOK: %compare-vector cpu ( dst src1 src2 rep cc -- )
 HOOK: %move-vector-mask cpu ( dst src rep -- )
 HOOK: %test-vector cpu ( dst src1 temp rep vcc -- )
@@ -375,6 +375,7 @@ HOOK: %unpack-vector-head-reps cpu ( -- reps )
 HOOK: %unpack-vector-tail-reps cpu ( -- reps )
 HOOK: %integer>float-vector-reps cpu ( -- reps )
 HOOK: %float>integer-vector-reps cpu ( -- reps )
+HOOK: %float>unsigned-integer-vector-reps cpu ( -- reps )
 HOOK: %compare-vector-reps cpu ( cc -- reps )
 HOOK: %compare-vector-ccs cpu ( rep cc -- {cc,swap?}s not? )
 HOOK: %move-vector-mask-reps cpu ( -- reps )
@@ -429,6 +430,7 @@ M: object %unpack-vector-head-reps { } ;
 M: object %unpack-vector-tail-reps { } ;
 M: object %integer>float-vector-reps { } ;
 M: object %float>integer-vector-reps { } ;
+M: object %float>unsigned-integer-vector-reps { } ;
 M: object %compare-vector-reps drop { } ;
 M: object %compare-vector-ccs 2drop { } f ;
 M: object %test-vector-reps { } ;

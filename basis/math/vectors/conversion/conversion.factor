@@ -33,7 +33,12 @@ ERROR: bad-vconvert-input value expected-type ;
         }
         {
             [ from-element float-type? ]
-            [ from-type new simd-rep '[ underlying>> _ (simd-v>integer) to-type boa ] ]
+            [
+                from-type new simd-rep
+                to-element unsigned-type?
+                [ '[ underlying>> _ (simd-v>unsigned-integer) to-type boa ] ]
+                [ '[ underlying>> _ (simd-v>integer) to-type boa ] ] if
+            ]
         }
         {
             [ to-element   float-type? ]
