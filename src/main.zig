@@ -306,16 +306,18 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)] = args_array;
 
     // Create an alien for each argument string
-    // NOTE: allotAlien can trigger GC, but args_array is now a GC root via special_objects
+    // NOTE: allotAlien can trigger GC, but args_array is a GC root via special_objects.
     for (args, 0..) |arg, i| {
-        // Re-fetch array pointer after potential GC (special_objects is scanned by GC)
+        const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
+
+        // Re-fetch the array pointer AFTER the allocation. It may have moved,
+        // and after its first promotion this old->young store also needs the
+        // generational write barrier.
         args_array = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)];
         const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(args_array));
         const data = arr.data();
-
-        // Create alien pointing to the C string (null-terminated)
-        const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
         data[i] = alien;
+        vm.writeBarrierKnownHeapWithValue(&data[i], alien);
     }
 }
 
@@ -563,6 +565,47 @@ test "vm struct layout" {
     try std.testing.expectEqual(@as(usize, 7 * cell_size), @offsetOf(vm_mod.VMAssemblyFields, "decks_offset"));
     try std.testing.expectEqual(@as(usize, 8 * cell_size), @offsetOf(vm_mod.VMAssemblyFields, "signal_handler_addr"));
     try std.testing.expectEqual(@as(usize, 10 * cell_size), @offsetOf(vm_mod.VMAssemblyFields, "special_objects"));
+}
+
+test "passArgsToFactor survives repeated nursery collections" {
+    const allocator = std.testing.allocator;
+    const vm = try vm_mod.FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 1024 * 1024, 1024 * 1024);
+    vm.setDataHeap(heap);
+
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // The minimum nursery is one deck (256 KiB). Enough aliens to collect it
+    // twice exercise both hazards: re-deriving the promoted args array after
+    // each allocation and remembering its later old->young stores.
+    const arg_count = 12_000;
+    var args: [arg_count][:0]const u8 = undefined;
+    @memset(&args, "gc-root");
+    passArgsToFactor(vm, &args);
+
+    try std.testing.expect(heap.nursery_collections >= 2);
+    const args_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)];
+    const args_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(args_cell));
+    try std.testing.expectEqual(@as(layouts.Cell, arg_count), args_array.getCapacity());
+
+    for (args_array.data()[0..arg_count]) |alien_cell| {
+        try std.testing.expect(layouts.hasTag(alien_cell, .alien));
+        const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(alien_cell));
+        try std.testing.expectEqual(layouts.false_object, alien.base);
+        try std.testing.expectEqual(@intFromPtr(args[0].ptr), alien.address);
+    }
 }
 
 // Reference all test modules

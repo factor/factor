@@ -844,15 +844,22 @@ pub export fn primitive_word(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_word_code(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( word -- start end )
-    const word_cell = vm.peek();
+    var word_cell = vm.peek();
 
     if (!layouts.hasTag(word_cell, .word)) {
         vm.typeError(.word, word_cell);
     }
+    vm.data_roots.appendAssumeCapacity(&word_cell);
+    defer _ = vm.data_roots.pop();
 
-    const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
-    const entry = word.entry_point;
+    var word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
+    var entry = word.entry_point;
     vm.replace(math.fromUnsignedCell(vm, entry));
+
+    // fromUnsignedCell can allocate a bignum. Re-read the entry point through
+    // the registered word in case a full collection compacted the code heap.
+    word = @ptrFromInt(layouts.UNTAG(word_cell));
+    entry = word.entry_point;
 
     // Compute end address: code_block_addr + code_block.size()
     if (entry >= @sizeOf(CodeBlock)) {
@@ -868,15 +875,20 @@ pub export fn primitive_word_code(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_quotation_code(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( quotation -- start end )
-    const quot_cell = vm.peek();
+    var quot_cell = vm.peek();
 
     if (!layouts.hasTag(quot_cell, .quotation)) {
         vm.typeError(.quotation, quot_cell);
     }
+    vm.data_roots.appendAssumeCapacity(&quot_cell);
+    defer _ = vm.data_roots.pop();
 
-    const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));
-    const entry = quot.entry_point;
+    var quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));
+    var entry = quot.entry_point;
     vm.replace(math.fromUnsignedCell(vm, entry));
+
+    quot = @ptrFromInt(layouts.UNTAG(quot_cell));
+    entry = quot.entry_point;
 
     // Compute end address: code_block_addr + code_block.size()
     if (entry >= @sizeOf(CodeBlock)) {
