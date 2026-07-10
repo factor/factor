@@ -32,12 +32,18 @@ inline static void check_call_site(cell return_address) {
 
 inline static void* get_call_target(cell return_address) {
   check_call_site(return_address);
-  return (void*)(*(int*)(return_address - 4) + return_address);
+  int32_t relative_target;
+  memcpy(&relative_target, reinterpret_cast<const void*>(return_address - 4),
+         sizeof(relative_target));
+  return reinterpret_cast<void*>(
+      return_address + static_cast<cell>(static_cast<fixnum>(relative_target)));
 }
 
 inline static void set_call_target(cell return_address, cell target) {
   check_call_site(return_address);
-  *(int*)(return_address - 4) = (uint32_t)(target - return_address);
+  uint32_t relative_target = static_cast<uint32_t>(target - return_address);
+  memcpy(reinterpret_cast<void*>(return_address - 4), &relative_target,
+         sizeof(relative_target));
 }
 
 inline static bool tail_call_site_p(cell return_address) {
