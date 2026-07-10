@@ -97,7 +97,7 @@ M: register displacement, drop ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
-        { [ over register-128? ] [ nip operand-64? ] }
+        { [ over register-128? ] [ nip register-64? ] }
         { [ over not ] [ nip operand-64? ] }
         [ drop operand-64? ]
     } cond and ;
