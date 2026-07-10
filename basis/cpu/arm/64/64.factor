@@ -138,7 +138,7 @@ M: arm.64 %clear [ 297 ] dip %replace-imm ;
 
 M: arm.64 %inc
     [ ds-loc? DS RS ? dup ] [ n>> cells ] bi
-    dup 0 > [ ADD ] [ neg SUB ] if ;
+    dup 0 > [ %add-offset ] [ neg %sub-offset ] if ;
 
 M: arm.64 stack-frame-size (stack-frame-size) 16 + 16 align ;
 
