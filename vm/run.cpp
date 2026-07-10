@@ -2,7 +2,12 @@
 
 namespace factor {
 
-void factor_vm::primitive_exit() { exit((int)to_fixnum(ctx->pop())); }
+void factor_vm::primitive_exit() {
+  int status = static_cast<int>(to_fixnum(ctx->pop()));
+  free(alien_offset(special_objects[OBJ_EXECUTABLE]));
+  free(alien_offset(special_objects[OBJ_IMAGE]));
+  exit(status);
+}
 
 void exit(int status) {
   close_console();
