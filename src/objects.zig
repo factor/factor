@@ -3,7 +3,7 @@ const std = @import("std");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
 
-pub const special_object_count: Cell = 85;
+pub const special_object_count: Cell = 83;
 
 // Special object indices
 pub const SpecialObject = enum(Cell) {
@@ -94,53 +94,51 @@ pub const SpecialObject = enum(Cell) {
     pic_check_tag = 57,
     pic_check_tuple = 58,
     pic_hit = 59,
-    pic_miss_word = 60,
-    pic_miss_tail_word = 61,
 
-    mega_lookup = 62,
-    mega_lookup_word = 63,
-    mega_miss_word = 64,
+    mega_lookup = 60,
+    mega_lookup_word = 61,
+    mega_miss_word = 62,
 
     // default quotation for undefined words
-    undefined = 65,
+    undefined = 63,
 
     // stderr FILE* handle
-    stderr = 66,
+    stderr = 64,
 
-    stage2 = 67,
+    stage2 = 65,
 
-    current_thread = 68,
+    current_thread = 66,
 
-    threads = 69,
-    run_queue = 70,
-    sleep_queue = 71,
+    threads = 67,
+    run_queue = 68,
+    sleep_queue = 69,
 
     // version string of the compiler we were built with
-    vm_compiler = 72,
+    vm_compiler = 70,
 
-    waiting_callbacks = 73,
+    waiting_callbacks = 71,
 
     // file descriptor for pipe used to communicate signals (unix only)
-    signal_pipe = 74,
+    signal_pipe = 72,
     // when the binary was built
-    vm_compile_time = 75,
+    vm_compile_time = 73,
     // factor version
-    vm_version = 76,
+    vm_version = 74,
     // git label (git describe --all --long)
-    vm_git_label = 77,
+    vm_git_label = 75,
 
     // Canonical truth value. In Factor, 't'
-    canonical_true = 78,
+    canonical_true = 76,
 
     // Canonical bignums. These need to be kept in the image in case
     // some heap objects refer to them.
-    bignum_zero = 79,
-    bignum_pos_one = 80,
-    bignum_neg_one = 81,
+    bignum_zero = 77,
+    bignum_pos_one = 78,
+    bignum_neg_one = 79,
 
-    pic_miss_resume_word = 82,
-    pic_miss_jump = 83,
-    pic_miss_tail_jump = 84,
+    pic_miss_resume_word = 80,
+    pic_miss_jump = 81,
+    pic_miss_tail_jump = 82,
 };
 
 // Determine if a special object should be saved in images
