@@ -4,7 +4,7 @@ namespace factor {
 //   core/kernel/kernel.factor
 //   basis/bootstrap/image/image.factor
 
-static const cell special_object_count = 85;
+static const cell special_object_count = 83;
 
 enum special_object {
   OBJ_WALKER_HOOK = 3, // non-local exit hook, used by library only
@@ -83,49 +83,47 @@ enum special_object {
   PIC_CHECK_TAG,
   PIC_CHECK_TUPLE,
   PIC_HIT,
-  PIC_MISS_WORD,
-  PIC_MISS_TAIL_WORD,
 
   // Megamorphic cache generation in dispatch.cpp
-  MEGA_LOOKUP = 62,
+  MEGA_LOOKUP = 60,
   MEGA_LOOKUP_WORD,
   MEGA_MISS_WORD,
 
-  OBJ_UNDEFINED = 65, // default quotation for undefined words
+  OBJ_UNDEFINED = 63, // default quotation for undefined words
 
-  OBJ_STDERR = 66, // stderr FILE* handle
+  OBJ_STDERR = 64, // stderr FILE* handle
 
-  OBJ_STAGE2 = 67, // have we bootstrapped?
+  OBJ_STAGE2 = 65, // have we bootstrapped?
 
-  OBJ_CURRENT_THREAD = 68,
+  OBJ_CURRENT_THREAD = 66,
 
-  OBJ_THREADS = 69,
-  OBJ_RUN_QUEUE = 70,
-  OBJ_SLEEP_QUEUE = 71,
+  OBJ_THREADS = 67,
+  OBJ_RUN_QUEUE = 68,
+  OBJ_SLEEP_QUEUE = 69,
 
-  OBJ_VM_COMPILER = 72, // version string of the compiler we were built with
+  OBJ_VM_COMPILER = 70, // version string of the compiler we were built with
 
-  OBJ_WAITING_CALLBACKS = 73,
+  OBJ_WAITING_CALLBACKS = 71,
 
-  OBJ_SIGNAL_PIPE = 74, // file descriptor for pipe used to communicate signals
+  OBJ_SIGNAL_PIPE = 72, // file descriptor for pipe used to communicate signals
                         //  only used on unix
-  OBJ_VM_COMPILE_TIME = 75, // when the binary was built
-  OBJ_VM_VERSION = 76, // factor version
-  OBJ_VM_GIT_LABEL = 77, // git label (git describe --all --long)
+  OBJ_VM_COMPILE_TIME = 73, // when the binary was built
+  OBJ_VM_VERSION = 74, // factor version
+  OBJ_VM_GIT_LABEL = 75, // git label (git describe --all --long)
 
   // Canonical truth value. In Factor, 't'
-  OBJ_CANONICAL_TRUE = 78,
+  OBJ_CANONICAL_TRUE = 76,
 
   // Canonical bignums. These needs to be kept in the image in case
   // some heap objects refer to them.
   OBJ_BIGNUM_ZERO,
   OBJ_BIGNUM_POS_ONE,
-  OBJ_BIGNUM_NEG_ONE = 81,
+  OBJ_BIGNUM_NEG_ONE = 79,
 
   // Off-stack PIC miss handler, inline_cache.cpp
-  PIC_MISS_RESUME_WORD = 82,
-  PIC_MISS_JUMP = 83,
-  PIC_MISS_TAIL_JUMP = 84,
+  PIC_MISS_RESUME_WORD = 80,
+  PIC_MISS_JUMP = 81,
+  PIC_MISS_TAIL_JUMP = 82,
 };
 
 // save-image-and-exit discards special objects that are filled in on startup

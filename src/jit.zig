@@ -43,8 +43,6 @@ pub const JitTemplate = enum(u32) {
     pic_check_tag = @intFromEnum(objects.SpecialObject.pic_check_tag),
     pic_check_tuple = @intFromEnum(objects.SpecialObject.pic_check_tuple),
     pic_hit = @intFromEnum(objects.SpecialObject.pic_hit),
-    pic_miss_word = @intFromEnum(objects.SpecialObject.pic_miss_word),
-    pic_miss_tail_word = @intFromEnum(objects.SpecialObject.pic_miss_tail_word),
     pic_miss_jump = @intFromEnum(objects.SpecialObject.pic_miss_jump),
     pic_miss_tail_jump = @intFromEnum(objects.SpecialObject.pic_miss_tail_jump),
 
