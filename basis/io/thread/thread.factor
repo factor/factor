@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: continuations init io.backend kernel namespaces threads ;
+USING: continuations init io.backend kernel namespaces threads
+threads.private ;
 IN: io.thread
 
 ! The Cocoa and Gtk UI backend stops the I/O thread and takes
@@ -12,7 +13,7 @@ TUPLE: io-thread < thread ;
 : <io-thread> ( -- thread )
     [
         [ io-thread-running? get-global ]
-        [ sleep-time io-multiplex yield ]
+        [ sleep-time io-multiplex drain-run-queue yield ]
         while
     ]
     "I/O wait"

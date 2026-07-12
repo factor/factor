@@ -209,6 +209,16 @@ PRIVATE>
 : yield ( -- )
     self resume f suspend drop ;
 
+<PRIVATE
+
+CONSTANT: drain-budget-nanos 8,000,000 ! 8 ms
+
+: drain-run-queue ( -- )
+    nano-count drain-budget-nanos +
+    [ dup nano-count > sleep-time 0 = and ] [ yield ] while drop ;
+
+PRIVATE>
+
 GENERIC: sleep-until ( n/f -- )
 
 M: integer sleep-until

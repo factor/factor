@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.syntax
 core-foundation core-foundation.file-descriptors
 core-foundation.strings core-foundation.time
 core-foundation.timers destructors init kernel math namespaces
-sequences threads ;
+sequences threads threads.private ;
 FROM: calendar.unix => system-micros ;
 IN: core-foundation.run-loop
 
@@ -113,8 +113,11 @@ STARTUP-HOOK: [ f thread-timer set-global ]
 : reset-thread-timer ( -- )
     thread-timer get-global [ (reset-thread-timer) ] when* ;
 
+! Drain the run queue before re-arming, so the timer is set from the
+! post-work sleep-time and one wakeup serves a whole burst of ready
+! threads instead of one per yield.
 : thread-timer-callback ( -- callback )
-    [ drop (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
+    [ drop drain-run-queue (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
 
 : init-thread-timer ( -- )
     60 thread-timer-callback <CFTimer>
