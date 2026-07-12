@@ -113,9 +113,6 @@ STARTUP-HOOK: [ f thread-timer set-global ]
 : reset-thread-timer ( -- )
     thread-timer get-global [ (reset-thread-timer) ] when* ;
 
-! Drain the run queue before re-arming, so the timer is set from the
-! post-work sleep-time and one wakeup serves a whole burst of ready
-! threads instead of one per yield.
 : thread-timer-callback ( -- callback )
     [ drop drain-run-queue (reset-thread-timer) yield ] CFRunLoopTimerCallBack ;
 
