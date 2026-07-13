@@ -129,7 +129,7 @@ M: postgresql-result-null summary
         3nip
         [
             memory>byte-array >string
-            { uint }
+            { size_t }
             [
                 PQunescapeBytea dup zero? [
                     postgresql-result-error-message throw

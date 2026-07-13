@@ -47,6 +47,9 @@ TYPEDEF: longlong SQLBIGINT
 TYPEDEF: ulonglong SQLUBIGINT
 64>
 
+<32 TYPEDEF: SQLUSMALLINT SQLSETPOSIROW 32>
+<64 TYPEDEF: SQLULEN SQLSETPOSIROW 64>
+
 CONSTANT: SQL_MAX_MESSAGE_LENGTH 512
 
 CONSTANT: SQL_SQLSTATE_SIZE 5
@@ -164,22 +167,22 @@ FUNCTION: SQLRETURN SQLAllocConnect ( SQLHENV environmentHandle, SQLHDBC* connec
 FUNCTION: SQLRETURN SQLAllocEnv ( SQLHENV* environmentHandlePtr )
 FUNCTION: SQLRETURN SQLAllocHandle ( SQLSMALLINT handleType, SQLHANDLE inputHandle, SQLHANDLE* outputHandlePtr )
 FUNCTION: SQLRETURN SQLAllocStmt ( SQLHDBC connectionHandle, SQLHSTMT* statementHandlePtr )
-FUNCTION: SQLRETURN SQLBindCol ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLINTEGER bufferLength, SQLINTEGER* strlen_or_indPtr )
-FUNCTION: SQLRETURN SQLBindParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLUINTEGER lengthPrecision, SQLSMALLINT parameterScale, SQLPOINTER parameterValuePtr, SQLINTEGER* indPtr )
-FUNCTION: SQLRETURN SQLBindParameter ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT inputOutputType, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLUINTEGER columnSize, SQLSMALLINT decimalDigits, SQLPOINTER parameterValuePtr, SQLINTEGER bufferLength, SQLINTEGER* indPtr )
+FUNCTION: SQLRETURN SQLBindCol ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLLEN bufferLength, SQLLEN* strlen_or_indPtr )
+FUNCTION: SQLRETURN SQLBindParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLULEN lengthPrecision, SQLSMALLINT parameterScale, SQLPOINTER parameterValuePtr, SQLLEN* indPtr )
+FUNCTION: SQLRETURN SQLBindParameter ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT inputOutputType, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLULEN columnSize, SQLSMALLINT decimalDigits, SQLPOINTER parameterValuePtr, SQLLEN bufferLength, SQLLEN* indPtr )
 FUNCTION: SQLRETURN SQLBrowseConnect ( SQLHDBC connectionHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr )
 FUNCTION: SQLRETURN SQLBulkOperations ( SQLHSTMT statementHandle, SQLSMALLINT operation )
 FUNCTION: SQLRETURN SQLCancel ( SQLHSTMT statementHandle )
 FUNCTION: SQLRETURN SQLCloseCursor ( SQLHSTMT statementHandle )
 FUNCTION: SQLRETURN SQLColAttribute ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr, SQLLEN* numericAttributePtr )
-FUNCTION: SQLRETURN SQLColAttributes ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr, SQLINTEGER* numericAttributePtr )
+FUNCTION: SQLRETURN SQLColAttributes ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLUSMALLINT fieldIdentifier, SQLPOINTER characterAttributePtr, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr, SQLLEN* numericAttributePtr )
 FUNCTION: SQLRETURN SQLColumnPrivileges ( SQLHSTMT statementHandle, SQLCHAR* catalogName, SQLSMALLINT nameLength1, SQLCHAR* schemaName, SQLSMALLINT nameLength2, SQLCHAR* tableName, SQLSMALLINT nameLength3, SQLCHAR* columnName, SQLSMALLINT nameLength4 )
 FUNCTION: SQLRETURN SQLColumns ( SQLHSTMT statementHandle, SQLCHAR* catalogName, SQLSMALLINT nameLength1, SQLCHAR* schemaName, SQLSMALLINT nameLength2, SQLCHAR* tableName, SQLSMALLINT nameLength3, SQLCHAR* columnName, SQLSMALLINT nameLength4 )
 FUNCTION: SQLRETURN SQLConnect ( SQLHDBC connectionHandle, SQLCHAR* serverName, SQLSMALLINT nameLength1, SQLCHAR* userName, SQLSMALLINT nameLength2, SQLCHAR* authentication, SQLSMALLINT nameLength3 )
 FUNCTION: SQLRETURN SQLCopyDesc ( SQLHDESC sourceDescHandle, SQLHDESC targetDescHandle )
 FUNCTION: SQLRETURN SQLDataSources ( SQLHENV environmentHandle, SQLUSMALLINT direction, SQLCHAR* serverName, SQLSMALLINT bufferLength1, SQLSMALLINT* nameLength1Ptr, SQLCHAR* description, SQLSMALLINT bufferLength2, SQLSMALLINT* nameLength2Ptr )
-FUNCTION: SQLRETURN SQLDescribeCol ( SQLHSTMT statementHandle, SQLSMALLINT columnNumber, SQLCHAR* columnName, SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr, SQLUINTEGER* columnSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
-FUNCTION: SQLRETURN SQLDescribeParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT* dataTypePtr, SQLUINTEGER* parameterSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
+FUNCTION: SQLRETURN SQLDescribeCol ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLCHAR* columnName, SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr, SQLSMALLINT* dataTypePtr, SQLULEN* columnSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
+FUNCTION: SQLRETURN SQLDescribeParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT* dataTypePtr, SQLULEN* parameterSizePtr, SQLSMALLINT* decimalDigitsPtr, SQLSMALLINT* nullablePtr )
 FUNCTION: SQLRETURN SQLDisconnect ( SQLHDBC connectionHandle )
 FUNCTION: SQLRETURN SQLDriverConnect ( SQLHDBC connectionHandle, SQLHWND windowHandle, SQLCHAR* inConnectionString, SQLSMALLINT stringLength, SQLCHAR* outConnectionString, SQLSMALLINT bufferLength, SQLSMALLINT* stringLength2Ptr, SQLUSMALLINT driverCompletion )
 FUNCTION: SQLRETURN SQLEndTran ( SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT completionType )
@@ -197,7 +200,7 @@ FUNCTION: SQLRETURN SQLFreeStmt ( SQLHSTMT statementHandle, SQLUSMALLINT option 
 FUNCTION: SQLRETURN SQLGetConnectAttr ( SQLHDBC connectionHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr )
 FUNCTION: SQLRETURN SQLGetConnectOption ( SQLHDBC connectionHandle, SQLUSMALLINT option, SQLPOINTER valuePtr )
 FUNCTION: SQLRETURN SQLGetCursorName ( SQLHSTMT statementHandle, SQLCHAR* cursorName, SQLSMALLINT bufferLength, SQLSMALLINT* nameLengthPtr )
-FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLINTEGER bufferLength, SQLINTEGER* strlen_or_indPtr )
+FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNumber, SQLSMALLINT targetType, SQLPOINTER targetValuePtr, SQLLEN bufferLength, SQLLEN* strlen_or_indPtr )
 FUNCTION: SQLRETURN SQLGetDescField ( SQLHDESC descriptorHandle, SQLSMALLINT recNumber, SQLSMALLINT fieldIdentifier, SQLPOINTER valuePtr, SQLINTEGER bufferLength, SQLINTEGER* stringLengthPtr )
 FUNCTION: SQLRETURN SQLGetDescRec ( SQLHDESC descriptorHandle, SQLSMALLINT recNumber, SQLCHAR* name, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr, SQLSMALLINT* typePtr, SQLSMALLINT* subTypePtr, SQLLEN* lengthPtr, SQLSMALLINT* precisionPtr, SQLSMALLINT* scalePtr, SQLSMALLINT* nullablePtr )
 FUNCTION: SQLRETURN SQLGetDiagField ( SQLSMALLINT handleType, SQLHANDLE handle, SQLSMALLINT recNumber, SQLSMALLINT diagIdentifier, SQLPOINTER diagInfoPtr, SQLSMALLINT bufferLength, SQLSMALLINT* stringLengthPtr )
@@ -226,9 +229,9 @@ FUNCTION: SQLRETURN SQLSetCursorName ( SQLHSTMT statementHandle, SQLCHAR* cursor
 FUNCTION: SQLRETURN SQLSetDescField ( SQLHDESC descriptorHandle, SQLSMALLINT recNumber, SQLSMALLINT fieldIdentifier, SQLPOINTER valuePtr, SQLINTEGER bufferLength )
 FUNCTION: SQLRETURN SQLSetDescRec ( SQLHDESC descriptorHandle, SQLSMALLINT recNumber, SQLSMALLINT type, SQLSMALLINT subType, SQLLEN length, SQLSMALLINT precision, SQLSMALLINT scale, SQLPOINTER dataPtr, SQLLEN* stringLengthPtr, SQLLEN* indicatorPtr )
 FUNCTION: SQLRETURN SQLSetEnvAttr ( SQLHENV environmentHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER stringLength )
-FUNCTION: SQLRETURN SQLSetParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLUINTEGER lengthPrecision, SQLSMALLINT parameterScale, SQLPOINTER parameterValuePtr, SQLINTEGER* indPtr )
-FUNCTION: SQLRETURN SQLSetPos ( SQLHSTMT statementHandle, SQLUSMALLINT rowNumber, SQLUSMALLINT operation, SQLUSMALLINT lockType )
-FUNCTION: SQLRETURN SQLSetScrollOptions ( SQLHSTMT statementHandle, SQLUSMALLINT concurrency, SQLINTEGER rowNumber, SQLUSMALLINT cacheSize )
+FUNCTION: SQLRETURN SQLSetParam ( SQLHSTMT statementHandle, SQLUSMALLINT parameterNumber, SQLSMALLINT valueType, SQLSMALLINT parameterType, SQLULEN lengthPrecision, SQLSMALLINT parameterScale, SQLPOINTER parameterValuePtr, SQLLEN* indPtr )
+FUNCTION: SQLRETURN SQLSetPos ( SQLHSTMT statementHandle, SQLSETPOSIROW rowNumber, SQLUSMALLINT operation, SQLUSMALLINT lockType )
+FUNCTION: SQLRETURN SQLSetScrollOptions ( SQLHSTMT statementHandle, SQLUSMALLINT concurrency, SQLLEN rowNumber, SQLUSMALLINT cacheSize )
 FUNCTION: SQLRETURN SQLSetStmtAttr ( SQLHSTMT statementHandle, SQLINTEGER attribute, SQLPOINTER valuePtr, SQLINTEGER stringLength )
 FUNCTION: SQLRETURN SQLSetStmtOption ( SQLHSTMT statementHandle, SQLUSMALLINT option, SQLULEN value )
 FUNCTION: SQLRETURN SQLSpecialColumns ( SQLHSTMT statementHandle, SQLUSMALLINT identifierType, SQLCHAR* catalogName, SQLSMALLINT nameLength1, SQLCHAR* schemaName, SQLSMALLINT nameLength2, SQLCHAR* tableName, SQLSMALLINT nameLength3, SQLUSMALLINT scope, SQLUSMALLINT nullable )
@@ -354,7 +357,7 @@ C: <column> column
     bufferLen alien-space-str :> columnName
     0 short <ref> :> nameLengthPtr
     0 short <ref> :> dataTypePtr
-    0 uint  <ref> :> columnSizePtr
+    0 SQLULEN <ref> :> columnSizePtr
     0 short <ref> :> decimalDigitsPtr
     0 short <ref> :> nullablePtr
     statement columnNumber columnName bufferLen nameLengthPtr
@@ -362,7 +365,7 @@ C: <column> column
     SQLDescribeCol "SQLDescribeCol" check-odbc
         nullablePtr short deref
         decimalDigitsPtr short deref
-        columnSizePtr uint deref
+        columnSizePtr SQLULEN deref
         dataTypePtr short deref convert-sql-type
         columnName utf8 alien>string
         columnNumber <column> ;
@@ -401,10 +404,10 @@ C: <field> field
     8192 :> bufferLen
     bufferLen alien-space-str :> targetValuePtr
     statement column number>> SQL_C_DEFAULT
-    targetValuePtr bufferLen 0 SQLINTEGER <ref> :> outlen
+    targetValuePtr bufferLen 0 SQLLEN <ref> :> outlen
     outlen SQLGetData
     succeeded? [
-        outlen SQLINTEGER deref -1 = [
+        outlen SQLLEN deref -1 = [
             f column <field>
         ] [
             targetValuePtr column dereference-type-pointer
