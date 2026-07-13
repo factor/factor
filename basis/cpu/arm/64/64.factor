@@ -882,6 +882,14 @@ UNION: float/vector-rep float-rep double-rep vector-rep ;
         [ all-equal? ]
     } 1&& ;
 
+:: mark-register-group ( reps -- reps' )
+    reps length :> n
+    n 1 > [
+        reps first :> first-rep
+        first-rep first first-rep second n 3array
+        reps rest swap prefix
+    ] [ reps ] if ;
+
 M: arm.64 value-struct?
     [ heap-size 16 <= ]
     [ homogeneous-float/vector-aggregate? nip ] bi or ;
@@ -889,7 +897,7 @@ M: arm.64 value-struct?
 M: arm.64 flatten-struct-type
     dup homogeneous-float/vector-aggregate?
     [ nip [ f f 3array ] map record-reg-reps ]
-    [ drop call-next-method ] if ;
+    [ drop call-next-method ] if mark-register-group ;
 
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;

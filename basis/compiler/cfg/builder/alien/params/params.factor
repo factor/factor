@@ -5,6 +5,7 @@ math math.order namespaces sequences vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
+SYMBOLS: stack-param-group-remaining stack-param-group-next ;
 
 GENERIC: alloc-stack-param ( rep -- n )
 
@@ -17,6 +18,23 @@ M: float-rep alloc-stack-param
     stack-params get swap rep-size
     [ cell align stack-params +@ ] keep
     float-right-align-on-stack? [ + ] [ drop ] if ;
+
+:: alloc-stack-param-group ( rep register-requirement -- n )
+    stack-param-group-remaining get zero? [
+        register-requirement integer?
+        [ register-requirement 1 > ] [ f ] if [
+            rep stack-param-alignment stack-params get swap align :> offset
+            offset rep rep-size register-requirement * cell align +
+            stack-params set
+            register-requirement 1 - stack-param-group-remaining set
+            offset rep rep-size + stack-param-group-next set
+            offset
+        ] [ rep alloc-stack-param ] if
+    ] [
+        stack-param-group-next get
+        rep rep-size stack-param-group-next +@
+        -1 stack-param-group-remaining +@
+    ] if ;
 
 : ?dummy-stack-params ( rep -- )
     dummy-stack-params? [ alloc-stack-param drop ] [ drop ] if ;
@@ -35,7 +53,7 @@ GENERIC: next-reg-param ( odd-register? rep -- reg )
 M: int-rep next-reg-param
     [ nip ?dummy-stack-params ]
     [ nip ?dummy-fp-params ]
-    [ drop [
+    [ drop t = [
         int-regs get last even?
         [ int-regs get pop* ] when
     ] when ]
@@ -45,8 +63,12 @@ M: object next-reg-param
     nip [ ?dummy-stack-params ] [ ?dummy-int-params ] bi
     float-regs get pop ;
 
-: reg-class-full? ( reg-class odd-register? -- ? )
-    over length 1 = and [ dup delete-all ] when empty? ;
+:: reg-class-full? ( reg-class register-requirement -- ? )
+    register-requirement integer?
+    [ reg-class length register-requirement < ]
+    [ reg-class length 1 = register-requirement and ] if
+    [ reg-class delete-all ] when
+    reg-class empty? ;
 
 : init-reg-class ( abi reg-class -- )
     [ swap param-regs at <reversed> >vector ] keep set ;
@@ -59,7 +81,8 @@ SYMBOLS: stack-values reg-values ;
 :: next-parameter ( vreg rep on-stack? odd-register? -- )
     vreg rep on-stack?
     [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ alloc-stack-param stack-values ] [ odd-register? swap next-reg-param reg-values ] if
+    [ odd-register? alloc-stack-param-group stack-values ]
+    [ odd-register? swap next-reg-param reg-values ] if
     [ 3array ] dip get push ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;

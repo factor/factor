@@ -1,13 +1,18 @@
-USING: accessors alien alien.c-types alien.strings assocs
-combinators compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien compiler.cfg.builder.alien.params
+USING: accessors alien alien.c-types alien.strings alien.syntax assocs
+classes.struct combinators compiler.cfg compiler.cfg.builder
+compiler.cfg.builder.alien compiler.cfg.builder.alien.boxing
+compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.arm.64.assembler.registers kernel literals make namespaces
+cpu.arm.64.assembler.registers kernel literals locals make math namespaces
 sequences stack-checker.alien system tools.test words ;
+QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.tests
+
+STRUCT: arm64-register-pair { x longlong } { y longlong } ;
+STRUCT: arm64-hfa-pair { x c:float } { y c:float } ;
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
@@ -78,6 +83,46 @@ cpu arm.64? [
             200 float-4-rep f f next-parameter
         ] with-param-regs nip
     ] unit-test
+
+    ! Homogeneous aggregates also allocate atomically. When the final FP
+    ! register cannot hold the whole pair, preserve its packed field offsets
+    ! on the stack and exhaust the FP register bank for later arguments.
+    {
+        V{
+            { 100 float-rep 0 }
+            { 101 float-rep 4 }
+            { 200 float-rep 8 }
+        }
+    } [
+        cdecl [
+            7 <iota> [ double-rep f f next-parameter ] each
+            \ arm64-hfa-pair lookup-c-type flatten-parameter-type
+            [| triple i |
+                100 i + triple first3 next-parameter
+            ] each-index
+            200 float-rep f f next-parameter
+        ] with-param-regs nip
+    ] unit-test
+
+    ! A composite cannot be split between the final argument register and the
+    ! stack. Reject the two-register group atomically, then keep later integer
+    ! arguments on the stack as required by AAPCS64.
+    {
+        V{
+            { 100 int-rep 0 }
+            { 101 int-rep 8 }
+            { 200 int-rep 16 }
+        }
+    } [
+        cdecl [
+            7 <iota> [ int-rep f f next-parameter ] each
+            \ arm64-register-pair lookup-c-type flatten-parameter-type
+            [| triple i |
+                100 i + triple first3 next-parameter
+            ] each-index
+            200 int-rep f f next-parameter
+        ] with-param-regs nip
+    ] unit-test
 ] when
 
 ! caller-parameters
@@ -100,7 +145,7 @@ cpu x86.64? [
         ] if
         V{ }
     } [
-        void { int float double char } cdecl f f "func"
+        void { int c:float double char } cdecl f f "func"
         alien-invoke-params boa caller-parameters
     ] cfg-unit-test
 ] when
