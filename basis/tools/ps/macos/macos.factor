@@ -25,8 +25,8 @@ IN: tools.ps.macos
 : hostname ( -- str ) { 1 10 } sysctl-query-string ;
 
 : sysctl-query-bytes ( seq -- n )
-    [ int >c-array ] [ length ] bi f 0 uint <ref>
-    [ f 0 sysctl io-error ] keep uint deref ;
+    [ int >c-array ] [ length ] bi f 0 size_t <ref>
+    [ f 0 sysctl io-error ] keep size_t deref ;
 
 STRUCT: _pcred
     { pc_lock char[72] }
@@ -134,8 +134,12 @@ STRUCT: kinfo_proc
     4 cut-slice swap >byte-array uint deref
     [ zero? ] head-split-skip [ >string ] map ;
 
+: process-bytes ( -- bytes )
+    ! Leave headroom for processes spawned between the two sysctl calls.
+    { 1 14 0 0 } dup sysctl-query-bytes 2 * sysctl-query ;
+
 : procs ( -- seq )
-    { 1 14 0 0 } dup sysctl-query-bytes sysctl-query
+    process-bytes
     kinfo_proc struct-size group
     [ kinfo_proc memory>struct ] map ;
 

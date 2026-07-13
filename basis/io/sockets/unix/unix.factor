@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 byte-arrays classes.struct combinators destructors
 io.backend.unix io.encodings.ascii io.encodings.utf8 io.files
 io.pathnames io.ports io.sockets io.sockets.private kernel libc
-locals math namespaces sequences system unix unix.ffi vocabs ;
+locals math namespaces sequences system unix unix.ffi unix.types vocabs ;
 
 IN: io.sockets.unix
 
@@ -14,7 +14,7 @@ IN: io.sockets.unix
 
 : get-socket-option ( fd level opt -- val )
     [ handle-fd ] 2dip -1 int <ref> [
-        dup byte-length int <ref> getsockopt io-error
+        dup byte-length socklen_t <ref> getsockopt io-error
     ] keep int deref ;
 
 : set-socket-option ( fd level opt -- )
@@ -41,11 +41,11 @@ M: unix addrspec-of-family
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address)
-    [ handle-fd ] dip empty-sockaddr/size int <ref>
+    [ handle-fd ] dip empty-sockaddr/size socklen_t <ref>
     [ getsockname io-error ] keepd ;
 
 M: object (get-remote-address)
-    [ handle-fd ] dip empty-sockaddr/size int <ref>
+    [ handle-fd ] dip empty-sockaddr/size socklen_t <ref>
     [ getpeername io-error ] keepd ;
 
 : init-client-socket ( fd -- )
@@ -95,7 +95,7 @@ M: object (server)
     ] with-destructors ;
 
 : do-accept ( server addrspec -- fd sockaddr )
-    [ handle>> handle-fd ] [ empty-sockaddr/size int <ref> ] bi*
+    [ handle>> handle-fd ] [ empty-sockaddr/size socklen_t <ref> ] bi*
     [ unix.ffi:accept ] keepd ; inline
 
 M: object (accept)
@@ -131,7 +131,7 @@ M: unix (broadcast)
     n ! nbytes
     0 ! flags
     sockaddr ! from
-    len int <ref> ! fromlen
+    len socklen_t <ref> ! fromlen
     recvfrom sockaddr ; inline
 
 : (receive-loop) ( n buf datagram -- count sockaddr )

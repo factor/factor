@@ -55,7 +55,7 @@ ERROR: cl-error err ;
     kernel 1 cl_mem heap-size output void* <ref> clSetKernelArg cl-success
     kernel 2 uint heap-size in length uint <ref> clSetKernelArg cl-success
 
-    queue kernel 1 f in length ulonglong <ref> f
+    queue kernel 1 f in length size_t <ref> f
     0 f f clEnqueueNDRangeKernel cl-success
 
     queue clFinish cl-success

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.data alien.strings alien.syntax
-byte-arrays io.encodings.utf8 kernel libc sequences
+byte-arrays io.encodings.utf8 kernel libc locals sequences
 specialized-arrays ;
 IN: unix.sysctl
 
@@ -17,12 +17,18 @@ FUNCTION: int sysctlbyname ( c-string name, void* oldp, size_t* oldlenp, void* n
 : (sysctl-name-query) ( name oldp oldlenp -- oldp )
     over [ f 0 sysctlbyname io-error ] dip ;
 
-: sysctl-query ( seq n -- byte-array )
-    [ [ int >c-array ] [ length ] bi ] dip
-    [ <byte-array> ] [ uint <ref> ] bi (sysctl-query) ;
+:: sysctl-query ( seq n -- byte-array )
+    seq int >c-array :> name
+    n <byte-array> :> bytes
+    n size_t <ref> :> oldlen
+    name seq length bytes oldlen (sysctl-query) drop
+    oldlen size_t deref bytes resize-byte-array ;
 
-: sysctl-name-query ( name n -- byte-array )
-    [ <byte-array> ] [ uint <ref> ] bi (sysctl-name-query) ;
+:: sysctl-name-query ( name n -- byte-array )
+    n <byte-array> :> bytes
+    n size_t <ref> :> oldlen
+    name bytes oldlen (sysctl-name-query) drop
+    oldlen size_t deref bytes resize-byte-array ;
 
 : sysctl-query-string ( seq -- n )
     4096 sysctl-query utf8 alien>string ;

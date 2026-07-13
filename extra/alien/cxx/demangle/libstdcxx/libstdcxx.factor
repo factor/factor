@@ -25,7 +25,7 @@ ERROR: invalid-demangle-args name ;
 DESTRUCTOR: (free)
 
 :: demangle ( mangled-name -- c++-name )
-    0 ulong <ref> :> length
+    0 size_t <ref> :> length
     0 int <ref> :> status [
         mangled-name ascii string>alien f length status __cxa_demangle &(free) :> demangled-buf
         mangled-name status int deref demangle-error
