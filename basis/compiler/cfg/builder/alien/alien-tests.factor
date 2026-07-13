@@ -175,6 +175,14 @@ cpu arm.64? [
             [ [ third n>> ] map , ] [ , ] bi*
         ] V{ } make rest first2
     ] cfg-unit-test
+
+    os macos? [
+        { V{ 0 1 } V{ 0 } } [
+            int { c-string int int } cdecl f f "open"
+            alien-invoke-params boa caller-parameters
+            [ [ third n>> ] map ] [ [ third ] map ] bi*
+        ] cfg-unit-test
+    ] when
 ] when
 
 cpu x86.64? [

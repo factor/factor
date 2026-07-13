@@ -53,8 +53,7 @@ IN: compiler.cfg.builder.alien
     ] [ vregs reps f ] if ;
 
 :: keep-param-registers ( regs n -- regs' )
-    regs length n min :> keep
-    regs regs length keep - tail* ;
+    regs n regs length min tail* ;
 
 : (handle-macos-arm64-varargs) ( params -- )
     function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
