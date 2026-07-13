@@ -36,7 +36,7 @@ HELP: FUNCTION:
 { $values { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new word " { $snippet "name" } " which calls the C library function with the same " { $snippet "name" } " in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
 $nl
-"The new word must be compiled before being executed." }
+"The new word must be compiled before being executed. For a variadic C function, place " { $snippet "..." } " between the fixed parameters and the explicitly declared variadic parameters; for example, " { $snippet "( int count, ... int value )" } "." }
 { $examples
 "For example, suppose the " { $snippet "foo" } " library exports the following function:"
 { $code
@@ -59,7 +59,7 @@ HELP: FUNCTION-ALIAS:
 { $values { "factor-name" "a Factor word name" } { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new word " { $snippet "factor-name" } " which calls the C library function named " { $snippet "c_name" } " in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
 $nl
-"The new word must be compiled before being executed." }
+"The new word must be compiled before being executed. Variadic declarations use the same " { $snippet "..." } " boundary syntax as " { $link POSTPONE: FUNCTION: } "." }
 { $notes "Note that the parentheses and commas are only syntax sugar and can be omitted. They serve no purpose other than to make the declaration easier to read." } ;
 
 { POSTPONE: FUNCTION: POSTPONE: FUNCTION-ALIAS: } related-words

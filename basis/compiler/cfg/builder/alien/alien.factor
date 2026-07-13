@@ -52,26 +52,44 @@ IN: compiler.cfg.builder.alien
         ] if
     ] [ vregs reps f ] if ;
 
-:: keep-param-registers ( regs n -- regs' )
-    regs n regs length min tail* ;
+: parameter-component-count ( parameters -- n )
+    0 int-reg-reps [
+        0 float-reg-reps [
+            [ base-type flatten-parameter-type length ] map-sum
+        ] with-variable
+    ] with-variable ;
 
-: (handle-macos-arm64-varargs) ( params -- )
-    function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
-    [
+:: macos-arm64-varargs-boundary ( params -- n/f )
+    os macos? cpu arm.64? and params alien-invoke-params? and [
+        params varargs?>> dup integer? [
+            params parameters>> swap head parameter-component-count
+        ] [
+            drop params function>> { "fcntl" "open" } member? 2 f ?
+        ] if
+    ] [ f ] if ;
+
+:: caller-parameter ( vreg rep-tuple force-stack? -- )
+    vreg
+    rep-tuple first
+    rep-tuple second force-stack? or
+    rep-tuple third
+    rep-tuple param-natural-size
+    rep-tuple param-signed?
+    next-parameter ;
+
+:: (caller-parameters) ( vregs reps boundary -- )
+    boundary integer? [
+        vregs boundary head
+        reps boundary head
+        [ f caller-parameter ] 2each
+
         f compact-stack-params? set
-        int-regs [ 2 keep-param-registers ] change
-        float-regs [ 0 keep-param-registers ] change
-    ] when ;
-
-: handle-macos-arm64-varargs ( params -- )
-    dup alien-invoke-params?
-    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
-
-: (caller-parameters) ( vregs reps -- )
-    [
-        [ first3 ] [ param-natural-size ] [ param-signed? ] tri
-        next-parameter
-    ] 2each ;
+        vregs boundary tail
+        reps boundary tail
+        [ t caller-parameter ] 2each
+    ] [
+        vregs reps [ f caller-parameter ] 2each
+    ] if ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
@@ -83,7 +101,7 @@ IN: compiler.cfg.builder.alien
     '[
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
-        _ handle-macos-arm64-varargs
+        _ macos-arm64-varargs-boundary
         (caller-parameters)
     ] with-param-regs ;
 

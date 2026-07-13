@@ -75,7 +75,7 @@ init-relocation [ RAX RBX 3 -14 RCX RDX %write-barrier ] B{ } make disassemble
 
 HELP: %alien-invoke
 { $values
-  { "varargs?" boolean }
+  { "varargs?" object }
   { "reg-inputs" sequence }
   { "stack-inputs" sequence }
   { "reg-outputs" sequence }

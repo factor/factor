@@ -113,15 +113,29 @@ PRIVATE>
 : scan-function-name ( -- return function )
     scan-c-type scan-token parse-pointers ;
 
-:: scan-c-args ( -- types names )
+ERROR: duplicate-varargs-marker ;
+ERROR: varargs-in-function-declaration ;
+ERROR: varargs-in-callback-declaration ;
+
+:: scan-c-args* ( -- types names varargs? )
     V{ } clone :> types
     V{ } clone :> names
+    f :> varargs!
     "(" expect scan-token [ dup ")" = ] [
-        parse-c-type
-        scan-token "," ?tail drop
-        parse-pointers [ types push ] [ names push ] bi*
+        dup "..." = [
+            drop
+            varargs [ duplicate-varargs-marker ] when
+            types length varargs!
+        ] [
+            parse-c-type
+            scan-token "," ?tail drop
+            parse-pointers [ types push ] [ names push ] bi*
+        ] if
         scan-token
-    ] until drop types names [ >array ] bi@ ;
+    ] until drop types names [ >array ] bi@ varargs ;
+
+: scan-c-args ( -- types names )
+    scan-c-args* dup [ varargs-in-function-declaration ] [ drop ] if ;
 
 : function-effect ( names return -- effect )
     [ { } ] [ c-type-string 1array ] if-void <effect> ;
@@ -129,16 +143,22 @@ PRIVATE>
 : create-function ( name -- word )
     create-word-in dup reset-generic ;
 
-:: (make-function) ( return function library types names -- quot effect )
-    return library function types '[ _ _ _ _ f alien-invoke ]
+:: (make-var-function) ( return function library types names varargs? -- quot effect )
+    return library function types varargs? '[ _ _ _ _ _ alien-invoke ]
     names return function-effect ;
 
-:: make-function ( return function library types names -- word quot effect )
+:: make-var-function ( return function library types names varargs? -- word quot effect )
     function create-function
-    return function library types names (make-function) ;
+    return function library types names varargs? (make-var-function) ;
 
-: (FUNCTION:) ( -- return function library types names )
-    scan-function-name current-library get scan-c-args ;
+: (make-function) ( return function library types names -- quot effect )
+    f (make-var-function) ;
+
+: make-function ( return function library types names -- word quot effect )
+    f make-var-function ;
+
+: (FUNCTION:) ( -- return function library types names varargs? )
+    scan-function-name current-library get scan-c-args* ;
 
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
@@ -151,7 +171,9 @@ PRIVATE>
     type-word return types library library-abi callback-quot ( quot -- alien ) ;
 
 : (CALLBACK:) ( -- word quot effect )
-    (FUNCTION:) make-callback-type ;
+    (FUNCTION:) dup
+    [ varargs-in-callback-declaration ]
+    [ drop make-callback-type ] if ;
 
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip

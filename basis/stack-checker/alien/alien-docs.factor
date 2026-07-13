@@ -8,6 +8,7 @@ HELP: alien-node-params
     { "return" { "a " { $link c-type-name } " which indicates the type of the functions return value." } }
     { "parameters" { "a " { $link sequence } " of " { $link c-type-name } " giving the types of the functions parameters." } }
     { "abi" { "calling convention of the function the node parameters operates on." } }
+    { "varargs?" { { $link f } " for a fixed-arity call, or the number of fixed parameters for a variadic call." } }
   }
 }
 { $see-also abi } ;

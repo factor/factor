@@ -110,6 +110,16 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
 
 { t } [ \ alien-parser-callback-effect-test inline? ] unit-test
 
+[
+    "USING: alien.c-types alien.syntax ; CALLBACK: void alien-parser-varargs-callback-test ( ... int arg )"
+    eval( -- )
+] [ error>> varargs-in-callback-declaration? ] must-fail-with
+
+[
+    "USING: alien.c-types alien.syntax ; FUNCTION: void alien-parser-duplicate-varargs-test ( int a, ... int b, ... int c )"
+    eval( -- )
+] [ error>> duplicate-varargs-marker? ] must-fail-with
+
 ! Reported by mnestic
 TYPEDEF: int alien-parser-test-int ! reasonably unique name...
 

@@ -4,6 +4,7 @@ USING: alien.parser kernel sequences words x11.io ;
 IN: x11.syntax
 
 SYNTAX: X-FUNCTION:
-    (FUNCTION:) make-function
+    (FUNCTION:) dup
+    [ varargs-in-function-declaration ] [ drop make-function ] if
     [ \ awaken-event-loop suffix ] dip
     define-declared ;

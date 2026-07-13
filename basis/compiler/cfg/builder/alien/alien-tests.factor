@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types alien.strings alien.syntax assocs
+USING: accessors alien alien.c-types alien.strings alien.syntax arrays assocs
 classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.builder.alien.boxing
 compiler.cfg.builder.alien.params
@@ -13,6 +13,7 @@ IN: compiler.cfg.builder.alien.tests
 
 STRUCT: arm64-register-pair { x longlong } { y longlong } ;
 STRUCT: arm64-hfa-pair { x c:float } { y c:float } ;
+STRUCT: arm64-three-ints { x int } { y int } { z int } ;
 UNION-STRUCT: arm64-mixed-vector { v float-4 } { x int } ;
 STRUCT: arm64-large-return { x longlong } { y longlong } { z longlong } ;
 
@@ -181,6 +182,24 @@ cpu arm.64? [
             int { c-string int int } cdecl f f "open"
             alien-invoke-params boa caller-parameters
             [ [ third n>> ] map ] [ [ third ] map ] bi*
+        ] cfg-unit-test
+
+        { V{ 0 1 } V{ 0 } } [
+            int { arm64-hfa-pair int } cdecl 1 f "func"
+            alien-invoke-params boa caller-parameters
+            [ [ third n>> ] map ] [ [ third ] map ] bi*
+        ] cfg-unit-test
+
+        { V{ 0 1 } V{ 0 } } [
+            int { arm64-three-ints int } cdecl 1 f "func"
+            alien-invoke-params boa caller-parameters
+            [ [ third n>> ] map ] [ [ third ] map ] bi*
+        ] cfg-unit-test
+
+        { V{ { 0 4 } { 8 4 } } } [
+            int { int int int int int int int int int int }
+            cdecl 9 f "func" alien-invoke-params boa
+            caller-parameters nip [ [ third ] [ fourth ] bi 2array ] map
         ] cfg-unit-test
     ] when
 ] when
