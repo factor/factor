@@ -1,4 +1,5 @@
 USING: alien.c-types classes.struct compiler.cfg.builder.alien.boxing
+compiler.cfg.builder.alien.params
 compiler.cfg.instructions compiler.cfg.registers compiler.test
 cpu.architecture kernel make system tools.test ;
 IN: compiler.cfg.builder.alien.boxing.tests
@@ -24,12 +25,20 @@ cpu x86.32?
         { int-rep t f }
         { int-rep t f }
     }
+} cpu arm.64? {
+    {
+        {
+            int-rep f
+            T{ register-group { count 2 } { alignment 4 } }
+        }
+        { int-rep f f }
+    }
 } {
     {
         { int-rep f f }
         { int-rep f f }
     }
-} ? [
+} ? ? [
     some-struct base-type base-type flatten-c-type
 ] unit-test
 
@@ -90,6 +99,30 @@ cpu x86.32?
            { rep int-rep }
          }
     }
+} cpu arm.64? {
+    { 2 3 }
+    {
+        {
+            int-rep f
+            T{ register-group { count 2 } { alignment 4 } }
+        }
+        { int-rep f f }
+    }
+    {
+        T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
+        T{ ##load-memory-imm
+           { dst 2 }
+           { base 1 }
+           { offset 0 }
+           { rep int-rep }
+        }
+        T{ ##load-memory-imm
+           { dst 3 }
+           { base 1 }
+           { offset 8 }
+           { rep int-rep }
+        }
+    }
 } {
     { 2 3 }
     { { int-rep f f } { int-rep f f } }
@@ -108,7 +141,7 @@ cpu x86.32?
            { rep int-rep }
          }
     }
-} ? [
+} ? ? [
     [ 20 some-struct base-type unbox ] { } make
 ] cfg-unit-test
 

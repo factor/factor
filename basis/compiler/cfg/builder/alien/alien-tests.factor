@@ -7,12 +7,13 @@ compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 cpu.arm.64.assembler.registers kernel literals locals make math namespaces
-sequences stack-checker.alien system tools.test words ;
+math.vectors.simd sequences stack-checker.alien system tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.tests
 
 STRUCT: arm64-register-pair { x longlong } { y longlong } ;
 STRUCT: arm64-hfa-pair { x c:float } { y c:float } ;
+UNION-STRUCT: arm64-mixed-vector { v float-4 } { x int } ;
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
@@ -81,6 +82,38 @@ cpu arm.64? [
             9 <iota> [ int-rep f f next-parameter ] each
             8 <iota> [ 100 + float-rep f f next-parameter ] each
             200 float-4-rep f f next-parameter
+        ] with-param-regs nip
+    ] unit-test
+
+    ! Standard AAPCS64 starts a 16-byte-aligned composite in an even-numbered
+    ! X register. Apple's ABI explicitly permits an odd-numbered start.
+    {
+        $[ os macos? V{ 0 1 2 } V{ 0 2 3 } ? ]
+    } [
+        cdecl [
+            0 int-rep f f next-parameter
+            \ arm64-mixed-vector lookup-c-type flatten-parameter-type
+            [| triple i |
+                100 i + triple first3 next-parameter
+            ] each-index
+        ] with-param-regs drop [ third n>> ] map
+    ] unit-test
+
+    ! Preserve the original composite alignment after flattening a mixed
+    ! vector union into integer-sized chunks.
+    {
+        V{
+            { 8 int-rep 0 }
+            { 100 int-rep 16 }
+            { 101 int-rep 24 }
+        }
+    } [
+        cdecl [
+            9 <iota> [ int-rep f f next-parameter ] each
+            \ arm64-mixed-vector lookup-c-type flatten-parameter-type
+            [| triple i |
+                100 i + triple first3 next-parameter
+            ] each-index
         ] with-param-regs nip
     ] unit-test
 

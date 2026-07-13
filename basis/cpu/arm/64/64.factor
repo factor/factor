@@ -3,7 +3,8 @@
 USING: accessors alien alien.c-types alien.data arrays assocs
 byte-arrays classes.algebra classes.struct combinators
 combinators.short-circuit compiler.cfg
-compiler.cfg.builder.alien.boxing compiler.cfg.comparisons
+compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
+compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.intrinsics
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.codegen.gc-maps compiler.codegen.labels
@@ -882,11 +883,11 @@ UNION: float/vector-rep float-rep double-rep vector-rep ;
         [ all-equal? ]
     } 1&& ;
 
-:: mark-register-group ( reps -- reps' )
+:: mark-register-group ( reps alignment -- reps' )
     reps length :> n
     n 1 > [
         reps first :> first-rep
-        first-rep first first-rep second n 3array
+        first-rep first first-rep second n alignment register-group boa 3array
         reps rest swap prefix
     ] [ reps ] if ;
 
@@ -894,10 +895,11 @@ M: arm.64 value-struct?
     [ heap-size 16 <= ]
     [ homogeneous-float/vector-aggregate? nip ] bi or ;
 
-M: arm.64 flatten-struct-type
-    dup homogeneous-float/vector-aggregate?
-    [ nip [ f f 3array ] map record-reg-reps ]
-    [ drop call-next-method ] if mark-register-group ;
+M:: arm.64 flatten-struct-type ( c-type -- reps )
+    c-type homogeneous-float/vector-aggregate?
+    [ [ f f 3array ] map record-reg-reps ]
+    [ drop c-type call-next-method ] if
+    c-type c-type-align mark-register-group ;
 
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;

@@ -1,11 +1,16 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs cpu.architecture fry kernel layouts locals
-math math.order namespaces sequences vectors ;
+USING: accessors arrays assocs cpu.architecture fry kernel layouts locals
+math math.order namespaces sequences system vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 SYMBOLS: stack-param-group-remaining stack-param-group-next ;
+
+TUPLE: register-group count alignment ;
+
+: register-group-count ( register-requirement -- count/f )
+    dup register-group? [ count>> ] [ dup integer? [ ] [ drop f ] if ] if ;
 
 GENERIC: alloc-stack-param ( rep -- n )
 
@@ -21,12 +26,15 @@ M: float-rep alloc-stack-param
 
 :: alloc-stack-param-group ( rep register-requirement -- n )
     stack-param-group-remaining get zero? [
-        register-requirement integer?
-        [ register-requirement 1 > ] [ f ] if [
-            rep stack-param-alignment stack-params get swap align :> offset
-            offset rep rep-size register-requirement * cell align +
+        register-requirement register-group-count :> count
+        count integer? [ count 1 > ] [ f ] if [
+            register-requirement register-group?
+            [ register-requirement alignment>> ]
+            [ rep stack-param-alignment ] if :> alignment
+            alignment stack-params get swap align :> offset
+            offset rep rep-size count * cell align +
             stack-params set
-            register-requirement 1 - stack-param-group-remaining set
+            count 1 - stack-param-group-remaining set
             offset rep rep-size + stack-param-group-next set
             offset
         ] [ rep alloc-stack-param ] if
@@ -63,9 +71,20 @@ M: object next-reg-param
     nip [ ?dummy-stack-params ] [ ?dummy-int-params ] bi
     float-regs get pop ;
 
+:: align-register-group ( reg-class register-requirement -- )
+    register-requirement register-group? [
+        reg-class int-regs get eq?
+        os macos? not and
+        register-requirement alignment>> cell > and
+        reg-class length odd? and
+        [ reg-class pop* ] when
+    ] when ;
+
 :: reg-class-full? ( reg-class register-requirement -- ? )
-    register-requirement integer?
-    [ reg-class length register-requirement < ]
+    reg-class register-requirement align-register-group
+    register-requirement register-group-count :> count
+    count
+    [ reg-class length count < ]
     [ reg-class length 1 = register-requirement and ] if
     [ reg-class delete-all ] when
     reg-class empty? ;
