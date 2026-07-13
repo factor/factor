@@ -10,7 +10,7 @@ IN: tools.image
 ! support multiple image formats if needed in here
 
 CONSTANT: image-magic   0x0f0e0d0c
-CONSTANT: image-version 4
+CONSTANT: image-version 5
 
 STRUCT: image-header.32
     { magic u32 }

@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.libraries.finder assocs bootstrap.image
-combinators.short-circuit hashtables io io.directories
-io.encodings.utf8 io.files io.files.temp io.launcher
-io.pathnames kernel make namespaces prettyprint sequences
+USING: accessors alien.accessors alien.libraries.finder assocs
+bootstrap.image bootstrap.image.private combinators.short-circuit
+hashtables io io.directories
+io.encodings.binary io.encodings.utf8 io.files io.files.temp io.launcher
+io.pathnames kernel layouts make namespaces prettyprint sequences
 splitting system tools.deploy.config tools.deploy.config.editor
 tools.deploy.embed vocabs.loader vocabs.metadata.resources
 webbrowser ;
@@ -43,10 +44,13 @@ ERROR: can't-deploy-library-file library ;
         +low-priority+ >>priority
     utf8 [ copy-lines ] with-process-reader ;
 
+: current-boot-image? ( path -- ? )
+    binary file-contents cell alien-unsigned-cell image-version = ;
+
 : make-boot-image ( -- )
-    ! If stage1 image doesn't exist, create one.
-    my-boot-image-name resource-path file-exists?
-    [ make-my-image ] unless ;
+    my-boot-image-name resource-path
+    dup file-exists? [ dup current-boot-image? ] [ f ] if
+    [ drop ] [ drop make-my-image ] if ;
 
 : staging-image-name ( profile -- name )
     "-" join "." my-arch-name 3append
