@@ -92,18 +92,13 @@ FUNCTION: c-string ffi_test_15 ( c-string x, c-string y )
 { "bar" } [ "xy" "xy" ffi_test_15 ] unit-test
 [ 1 2 ffi_test_15 ] must-fail
 
-! Indirect result register not implemented
-cpu arm.64? [
+STRUCT: BAR { x long } { y long } { z long } ;
 
-    STRUCT: BAR { x long } { y long } { z long } ;
+FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
 
-    FUNCTION: BAR ffi_test_16 ( long x, long y, long z )
-
-    { 11 6 -7 } [
-        11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
-    ] unit-test
-
-] unless
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
 
 STRUCT: TINY { x int } ;
 
@@ -149,18 +144,28 @@ FUNCTION: TINY ffi_test_17 ( int x )
 
 { 25 } [ 2 3 4 5 ffi_test_18 ] unit-test
 
-! Indirect result register not implemented
-cpu arm.64? [
+: ffi_test_19 ( x y z -- BAR )
+    BAR "f-stdcall" "ffi_test_19" { long long long } f
+    alien-invoke gc ;
 
-    : ffi_test_19 ( x y z -- BAR )
-        BAR "f-stdcall" "ffi_test_19" { long long long } f
-        alien-invoke gc ;
+{ 11 6 -7 } [
+    11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
+] unit-test
+
+cpu arm.64? [
+    : bar-indirect ( x y z ptr -- BAR )
+        BAR { long long long } cdecl alien-indirect ;
+
+    : bar-callback ( -- ptr )
+        BAR { long long long } cdecl [
+            BAR <struct> swap >>z swap >>y swap >>x
+        ] alien-callback ;
 
     { 11 6 -7 } [
-        11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri
+        11 6 -7 bar-callback [ bar-indirect ] with-callback
+        [ x>> ] [ y>> ] [ z>> ] tri
     ] unit-test
-
-] unless
+] when
 
 : multi_ffi_test_18 ( w x y z w' x' y' z' -- int int )
     [ int "f-stdcall" "ffi_test_18" { int int int int } f alien-invoke ]

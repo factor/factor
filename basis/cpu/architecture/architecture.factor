@@ -544,6 +544,11 @@ HOOK: param-regs cpu ( abi -- regs )
 
 HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
+! Dedicated register for an indirect struct result pointer, or f if the
+! pointer follows the normal parameter convention.
+HOOK: struct-return-reg cpu ( -- reg/f )
+M: object struct-return-reg f ;
+
 ! Do we pass this struct by value or hidden reference?
 HOOK: value-struct? cpu ( c-type -- ? )
 

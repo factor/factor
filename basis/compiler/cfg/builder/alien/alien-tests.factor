@@ -14,6 +14,7 @@ IN: compiler.cfg.builder.alien.tests
 STRUCT: arm64-register-pair { x longlong } { y longlong } ;
 STRUCT: arm64-hfa-pair { x c:float } { y c:float } ;
 UNION-STRUCT: arm64-mixed-vector { v float-4 } { x int } ;
+STRUCT: arm64-large-return { x longlong } { y longlong } { z longlong } ;
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
@@ -159,6 +160,19 @@ cpu arm.64? [
 ] when
 
 ! caller-parameters
+cpu arm.64? [
+    {
+        V{ 8 0 }
+        V{ }
+    } [
+        [
+            \ arm64-large-return { int } cdecl f f "func"
+            alien-invoke-params boa caller-parameters
+            [ [ third n>> ] map , ] [ , ] bi*
+        ] V{ } make rest first2
+    ] cfg-unit-test
+] when
+
 cpu x86.64? [
     ${
         os windows? [

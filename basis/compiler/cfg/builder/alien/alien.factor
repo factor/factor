@@ -6,7 +6,7 @@ compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
 compiler.tree cpu.architecture kernel layouts make math namespaces
-sequences sequences.generalizations stack-checker.alien system
+locals sequences sequences.generalizations stack-checker.alien system
 words ;
 IN: compiler.cfg.builder.alien
 
@@ -37,13 +37,19 @@ IN: compiler.cfg.builder.alien
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
-: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
-    dup large-struct? [
-        heap-size cell f ^^local-allot [
-            '[ _ prefix ]
-            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
-        ] keep
-    ] [ drop f ] if ;
+:: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
+    return large-struct? [
+        return heap-size cell f ^^local-allot :> return-vreg
+        struct-return-reg :> return-reg
+        return-reg [
+            return-vreg int-rep return-reg 3array reg-values get push
+            vregs reps return-vreg
+        ] [
+            return-vreg vregs prefix
+            int-rep struct-return-on-stack? f 3array reps prefix
+            return-vreg
+        ] if
+    ] [ vregs reps f ] if ;
 
 : (handle-macos-arm64-varargs) ( params -- )
     function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
@@ -145,9 +151,15 @@ M: #alien-assembly emit-node
 : callee-parameter ( rep on-stack? odd-register? -- dst )
     [ next-vreg dup ] 3dip next-parameter ;
 
-: prepare-struct-callee ( c-type -- vreg )
-    large-struct?
-    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
+:: prepare-struct-callee ( c-type -- vreg )
+    c-type large-struct? [
+        struct-return-reg :> return-reg
+        return-reg [
+            next-vreg :> vreg
+            vreg int-rep return-reg 3array reg-values get push
+            vreg
+        ] [ int-rep struct-return-on-stack? f callee-parameter ] if
+    ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map

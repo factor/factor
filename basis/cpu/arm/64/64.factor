@@ -866,6 +866,7 @@ M: arm.64 param-regs
     } ;
 
 M: arm.64 return-struct-in-registers? value-struct? ;
+M: arm.64 struct-return-reg X8 ;
 
 GENERIC: flatten-reps ( c-type -- reps )
 

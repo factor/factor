@@ -404,6 +404,10 @@ HELP: return-struct-in-registers?
 { $values { "c-type" class } { "?" boolean } }
 { $description "Whether the size of the struct is so small that it will be returned in registers or not." } ;
 
+HELP: struct-return-reg
+{ $values { "reg/f" { $maybe object } } }
+{ $description "Returns the dedicated register used to pass an indirect struct result pointer, or " { $link f } " if it follows the normal parameter convention." } ;
+
 HELP: signed-rep
 { $values { "rep" representation } { "rep'" representation } }
 { $description "Maps any representation to its signed counterpart, if it has one." } ;
