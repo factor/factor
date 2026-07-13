@@ -270,6 +270,39 @@ typedef long (*ffi_test_narrow_callback)(
 
 FACTOR_EXPORT long ffi_test_71(ffi_test_narrow_callback callback);
 
+FACTOR_EXPORT double ffi_test_72(int n, ...);
+FACTOR_EXPORT int ffi_test_73(int n, ...);
+
+#pragma pack(push, 1)
+struct packed_test_struct {
+  signed char c;
+  int i;
+};
+struct packed_test_struct_2 {
+  signed char c;
+  long long l;
+};
+#pragma pack(pop)
+
+FACTOR_EXPORT long ffi_test_74(struct packed_test_struct p, signed char z);
+FACTOR_EXPORT long ffi_test_75(int a0, int a1, int a2, int a3, int a4,
+                               int a5, int a6, int a7,
+                               struct packed_test_struct p, signed char z);
+FACTOR_EXPORT struct packed_test_struct ffi_test_76(void);
+typedef long (*ffi_test_packed_callback)(struct packed_test_struct p,
+                                         signed char z);
+FACTOR_EXPORT long ffi_test_77(ffi_test_packed_callback callback);
+FACTOR_EXPORT long long ffi_test_78(struct packed_test_struct_2 p,
+                                    signed char z);
+FACTOR_EXPORT long long ffi_test_79(int a0, int a1, int a2, int a3, int a4,
+                                    int a5, int a6, int a7,
+                                    struct packed_test_struct_2 p,
+                                    signed char z);
+FACTOR_EXPORT struct packed_test_struct_2 ffi_test_80(void);
+typedef long long (*ffi_test_packed_callback_2)(struct packed_test_struct_2 p,
+                                                signed char z);
+FACTOR_EXPORT long long ffi_test_81(ffi_test_packed_callback_2 callback);
+
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

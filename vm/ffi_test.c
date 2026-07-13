@@ -396,6 +396,77 @@ long ffi_test_71(ffi_test_narrow_callback callback) {
   return callback(1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3);
 }
 
+double ffi_test_72(int n, ...) {
+  va_list args;
+  va_start(args, n);
+  double x = va_arg(args, double);
+  va_end(args);
+  return x;
+}
+
+int ffi_test_73(int n, ...) {
+  va_list args;
+  va_start(args, n);
+  int x = va_arg(args, int);
+  int y = va_arg(args, int);
+  va_end(args);
+  return x + y;
+}
+
+static long ffi_test_encode_packed_struct(struct packed_test_struct p,
+                                          signed char z) {
+  return (long)p.c * 1000000L + (long)p.i * 100L + (long)z;
+}
+
+long ffi_test_74(struct packed_test_struct p, signed char z) {
+  return ffi_test_encode_packed_struct(p, z);
+}
+
+long ffi_test_75(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
+                 int a7, struct packed_test_struct p, signed char z) {
+  if (a0 != 1 || a1 != 2 || a2 != 3 || a3 != 4 ||
+      a4 != 5 || a5 != 6 || a6 != 7 || a7 != 8)
+    return -1;
+  return ffi_test_encode_packed_struct(p, z);
+}
+
+struct packed_test_struct ffi_test_76(void) {
+  struct packed_test_struct p = {9, 11};
+  return p;
+}
+
+long ffi_test_77(ffi_test_packed_callback callback) {
+  struct packed_test_struct p = {9, 11};
+  return callback(p, 12);
+}
+
+static long long ffi_test_encode_packed_struct_2(struct packed_test_struct_2 p,
+                                                 signed char z) {
+  return (long long)p.c * 1000000000000LL + p.l * 100LL + (long long)z;
+}
+
+long long ffi_test_78(struct packed_test_struct_2 p, signed char z) {
+  return ffi_test_encode_packed_struct_2(p, z);
+}
+
+long long ffi_test_79(int a0, int a1, int a2, int a3, int a4, int a5, int a6,
+                      int a7, struct packed_test_struct_2 p, signed char z) {
+  if (a0 != 1 || a1 != 2 || a2 != 3 || a3 != 4 ||
+      a4 != 5 || a5 != 6 || a6 != 7 || a7 != 8)
+    return -1;
+  return ffi_test_encode_packed_struct_2(p, z);
+}
+
+struct packed_test_struct_2 ffi_test_80(void) {
+  struct packed_test_struct_2 p = {9, 11};
+  return p;
+}
+
+long long ffi_test_81(ffi_test_packed_callback_2 callback) {
+  struct packed_test_struct_2 p = {9, 11};
+  return callback(p, 12);
+}
+
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);

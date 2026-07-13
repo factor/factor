@@ -4,6 +4,7 @@ USING: accessors alien.c-types alien.parser alien.parser.private
 alien.syntax compiler.units continuations debugger eval kernel
 lexer namespaces parser sequences sets summary tools.test
 vocabs.parser words ;
+QUALIFIED-WITH: alien.parser ap
 IN: alien.parser.tests
 
 <<
@@ -109,6 +110,17 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
 ] unit-test
 
 { t } [ \ alien-parser-callback-effect-test inline? ] unit-test
+
+: vararg-arg-type-names ( -- names names' varargs? )
+    ap:scan-c-args* [ [ name>> ] map ] 2dip ;
+
+{ { "float" "double" "int" "int" } { "a" "b" "c" "d" } 1 } [
+    [
+        "alien.c-types" use-vocab
+        { "( float a, ... float b, char c, ushort d )" }
+        [ vararg-arg-type-names ] with-parsing
+    ] with-file-vocabs
+] unit-test
 
 [
     "USING: alien.c-types alien.syntax ; CALLBACK: void alien-parser-varargs-callback-test ( ... int arg )"

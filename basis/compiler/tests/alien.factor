@@ -971,6 +971,73 @@ os windows? [
     ] unit-test
 ] unless
 
+FUNCTION: double ffi_test_72 ( int n, ... float x )
+
+{ 1.5 } [ 1 1.5 ffi_test_72 ] unit-test
+
+FUNCTION: int ffi_test_73 ( int n, ... char x, ushort y )
+
+{ 65534 } [ 2 -1 65535 ffi_test_73 ] unit-test
+
+PACKED-STRUCT: packed-test-struct { c char } { i int } ;
+PACKED-STRUCT: packed-test-struct-2 { c char } { l longlong } ;
+
+: make-packed-test-struct ( -- p )
+    packed-test-struct <struct> 9 >>c 11 >>i ;
+
+: make-packed-test-struct-2 ( -- p )
+    packed-test-struct-2 <struct> 9 >>c 11 >>l ;
+
+FUNCTION: long ffi_test_74 ( packed-test-struct p, char z )
+
+{ 9001112 } [ make-packed-test-struct 12 ffi_test_74 ] unit-test
+
+FUNCTION: long ffi_test_75 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, packed-test-struct p, char z )
+
+{ 9001112 } [
+    1 2 3 4 5 6 7 8 make-packed-test-struct 12 ffi_test_75
+] unit-test
+
+FUNCTION: packed-test-struct ffi_test_76 ( )
+
+{ 9 11 } [ ffi_test_76 [ c>> ] [ i>> ] bi ] unit-test
+
+: packed-test-callback ( -- callback )
+    long { packed-test-struct char } cdecl [
+        swap [ c>> 1000000 * ] [ i>> 100 * ] bi + +
+    ] alien-callback ;
+
+FUNCTION: long ffi_test_77 ( void* callback )
+
+{ 9001112 } [ packed-test-callback [ ffi_test_77 ] with-callback ] unit-test
+
+FUNCTION: longlong ffi_test_78 ( packed-test-struct-2 p, char z )
+
+{ 9000000001112 } [ make-packed-test-struct-2 12 ffi_test_78 ] unit-test
+
+FUNCTION: longlong ffi_test_79 ( int a0, int a1, int a2, int a3,
+    int a4, int a5, int a6, int a7, packed-test-struct-2 p, char z )
+
+{ 9000000001112 } [
+    1 2 3 4 5 6 7 8 make-packed-test-struct-2 12 ffi_test_79
+] unit-test
+
+FUNCTION: packed-test-struct-2 ffi_test_80 ( )
+
+{ 9 11 } [ ffi_test_80 [ c>> ] [ l>> ] bi ] unit-test
+
+: packed-test-callback-2 ( -- callback )
+    longlong { packed-test-struct-2 char } cdecl [
+        swap [ c>> 1000000000000 * ] [ l>> 100 * ] bi + +
+    ] alien-callback ;
+
+FUNCTION: longlong ffi_test_81 ( void* callback )
+
+{ 9000000001112 } [
+    packed-test-callback-2 [ ffi_test_81 ] with-callback
+] unit-test
+
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
 FUNCTION: void* bug1021_test_3 ( c-string a )
 

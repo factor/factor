@@ -34,13 +34,9 @@ M: long-long-type flatten-c-type
 HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
-: struct-chunk-sizes ( size -- sizes )
-    [ cell align cell /i <iota> ] keep
-    '[ _ swap cell * - cell min ] map ;
-
 M: object flatten-struct-type
-    heap-size struct-chunk-sizes
-    [| size | int-rep f f size f 5 narray ] map record-reg-reps ;
+    heap-size cell align cell /i
+    [ int-rep f f cell f 5 narray ] replicate record-reg-reps ;
 
 M: struct-c-type flatten-c-type
     flatten-struct-type ;

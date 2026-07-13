@@ -5,6 +5,7 @@ arrays classes classes.parser combinators
 combinators.short-circuit compiler.units effects kernel lexer
 math namespaces parser sequences splitting summary vocabs.parser
 words ;
+QUALIFIED-WITH: alien.c-types c
 IN: alien.parser
 
 SYMBOL: current-library
@@ -117,6 +118,16 @@ ERROR: duplicate-varargs-marker ;
 ERROR: varargs-in-function-declaration ;
 ERROR: varargs-in-callback-declaration ;
 
+:: promote-vararg-type ( type -- type' )
+    type base-type :> base
+    base c:float base-type eq? [
+        c:double
+    ] [
+        base {
+            c:char c:uchar c:short c:ushort c:bool
+        } [ base-type ] map member? [ c:int ] [ type ] if
+    ] if ;
+
 :: scan-c-args* ( -- types names varargs? )
     V{ } clone :> types
     V{ } clone :> names
@@ -129,7 +140,9 @@ ERROR: varargs-in-callback-declaration ;
         ] [
             parse-c-type
             scan-token "," ?tail drop
-            parse-pointers [ types push ] [ names push ] bi*
+            parse-pointers
+            [ varargs [ promote-vararg-type ] when types push ]
+            [ names push ] bi*
         ] if
         scan-token
     ] until drop types names [ >array ] bi@ varargs ;
