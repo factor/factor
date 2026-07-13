@@ -392,6 +392,10 @@ unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, stru
     return x;
 }
 
+long ffi_test_71(ffi_test_narrow_callback callback) {
+  return callback(1, 2, 3, 4, 5, 6, 7, 8, -1, -2, -3);
+}
+
 
 void* bug1021_test_1(void* x, int y) {
   return (void*)(y * y + (size_t)x);

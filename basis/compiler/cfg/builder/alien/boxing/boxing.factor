@@ -3,8 +3,8 @@
 USING: accessors alien.c-types arrays assocs classes.struct
 combinators compiler.cfg.builder.alien.params compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.intrinsics.allot
-compiler.cfg.registers cpu.architecture kernel layouts
-locals math namespaces sequences system ;
+compiler.cfg.registers cpu.architecture kernel layouts locals math
+math.order namespaces sequences sequences.generalizations system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 
@@ -24,16 +24,23 @@ SYMBOLS: int-reg-reps float-reg-reps ;
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
-    rep>> f f 3array 1array record-reg-reps ;
+    { [ rep>> ] [ drop f ] [ drop f ] [ heap-size ] [ c-type-signed ] } cleave
+    5 narray 1array record-reg-reps ;
 
 M: long-long-type flatten-c-type
-    drop 2 [ int-rep long-long-on-stack? f 3array ] replicate record-reg-reps ;
+    drop 2 [ int-rep long-long-on-stack? f cell f 5 narray ] replicate
+    record-reg-reps ;
 
 HOOK: flatten-struct-type cpu ( type -- pairs )
 HOOK: flatten-struct-type-return cpu ( type -- pairs )
 
+: struct-chunk-sizes ( size -- sizes )
+    [ cell align cell /i <iota> ] keep
+    '[ _ swap cell * - cell min ] map ;
+
 M: object flatten-struct-type
-    heap-size cell align cell /i { int-rep f f } <array> record-reg-reps ;
+    heap-size struct-chunk-sizes
+    [| size | int-rep f f size f 5 narray ] map record-reg-reps ;
 
 M: struct-c-type flatten-c-type
     flatten-struct-type ;
@@ -65,8 +72,8 @@ M: object flatten-struct-type-return
 
 GENERIC: unbox ( src c-type -- vregs reps )
 
-M: c-type unbox
-    [ rep>> ] [ unboxer>> ] bi
+M:: c-type unbox ( src c-type -- vregs reps )
+    src c-type [ rep>> ] [ unboxer>> ] bi
     [
         {
             { "to_float" [ drop ] }
@@ -83,12 +90,14 @@ M: c-type unbox
             ]
         } case 1array
     ]
-    [ drop f f 3array 1array ] 2bi record-reg-reps ;
+    [
+        drop f f c-type heap-size c-type c-type-signed 5 narray 1array
+    ] 2bi record-reg-reps ;
 
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
-    int-rep long-long-on-stack? long-long-odd-register? 3array
-    int-rep long-long-on-stack? f 3array 2array record-reg-reps ;
+    int-rep long-long-on-stack? long-long-odd-register? cell f 5 narray
+    int-rep long-long-on-stack? f cell f 5 narray 2array record-reg-reps ;
 
 M: struct-c-type unbox
     [ ^^unbox-any-c-ptr ] dip explode-struct ;

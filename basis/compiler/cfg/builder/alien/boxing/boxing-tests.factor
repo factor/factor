@@ -1,7 +1,7 @@
 USING: alien.c-types classes.struct compiler.cfg.builder.alien.boxing
 compiler.cfg.builder.alien.params
 compiler.cfg.instructions compiler.cfg.registers compiler.test
-cpu.architecture kernel make system tools.test ;
+cpu.architecture kernel layouts literals make system tools.test ;
 IN: compiler.cfg.builder.alien.boxing.tests
 
 STRUCT: some-struct
@@ -12,7 +12,7 @@ STRUCT: some-struct
 
 ! flatten-c-type
 {
-    { { int-rep f f } }
+    { { int-rep f f 4 t } }
 } [
     int base-type flatten-c-type
 ] unit-test
@@ -20,23 +20,24 @@ STRUCT: some-struct
 cpu x86.32?
 {
     {
-        { int-rep t f }
-        { int-rep t f }
-        { int-rep t f }
-        { int-rep t f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
     }
 } cpu arm.64? {
     {
         {
             int-rep f
             T{ register-group { count 2 } { alignment 4 } }
+            8 f
         }
-        { int-rep f f }
+        { int-rep f f 8 f }
     }
 } {
     {
-        { int-rep f f }
-        { int-rep f f }
+        { int-rep f f 8 f }
+        { int-rep f f 8 f }
     }
 } ? ? [
     some-struct base-type base-type flatten-c-type
@@ -46,7 +47,7 @@ cpu x86.32?
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 t } }
     {
         T{ ##unbox
            { dst 1 }
@@ -57,7 +58,7 @@ cpu x86.32?
     }
 } {
     { 20 }
-    { { int-rep f f } }
+    { { int-rep f f 4 t } }
     { }
 } ? [
     reset-vreg-counter [ 20 int base-type unbox ] { } make
@@ -67,10 +68,10 @@ cpu x86.32?
 {
     { 2 3 4 5 }
     {
-        { int-rep t f }
-        { int-rep t f }
-        { int-rep t f }
-        { int-rep t f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
+        { int-rep t f 4 f }
     }
     {
         T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
@@ -105,8 +106,9 @@ cpu x86.32?
         {
             int-rep f
             T{ register-group { count 2 } { alignment 4 } }
+            8 f
         }
-        { int-rep f f }
+        { int-rep f f 8 f }
     }
     {
         T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
@@ -125,7 +127,7 @@ cpu x86.32?
     }
 } {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f 8 f } { int-rep f f 8 f } }
     {
         T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
         T{ ##load-memory-imm
@@ -148,7 +150,7 @@ cpu x86.32?
 ! unbox-parameter
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f $[ cell ] f } }
     { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
 } [
     [ 77 c-string base-type unbox-parameter ] { } make
@@ -158,7 +160,7 @@ cpu x86.32?
 cpu x86.32?
 {
     { 1 }
-    { { int-rep f f } }
+    { { int-rep f f 4 t } }
     {
         T{ ##unbox
            { dst 1 }
@@ -168,7 +170,7 @@ cpu x86.32?
         }
     }
 } {
-    { 77 } { { int-rep f f } } { }
+    { 77 } { { int-rep f f 4 t } } { }
 } ? [
     [ 77 int base-type unbox-parameter ] { } make
 ] cfg-unit-test

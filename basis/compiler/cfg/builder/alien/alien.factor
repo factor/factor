@@ -5,7 +5,7 @@ assocs classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture kernel layouts make math namespaces
+compiler.tree cpu.architecture kernel layouts make math math.order namespaces
 locals sequences sequences.generalizations stack-checker.alien system
 words ;
 IN: compiler.cfg.builder.alien
@@ -20,6 +20,7 @@ IN: compiler.cfg.builder.alien
         V{ } clone stack-values set
         0 int-reg-reps set
         0 float-reg-reps set
+        os macos? cpu arm.64? and compact-stack-params? set
         @
         reg-values get
         stack-values get
@@ -51,16 +52,27 @@ IN: compiler.cfg.builder.alien
         ] if
     ] [ vregs reps f ] if ;
 
+:: keep-param-registers ( regs n -- regs' )
+    regs length n min :> keep
+    regs regs length keep - tail* ;
+
 : (handle-macos-arm64-varargs) ( params -- )
     function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
-    [ int-regs [ 2 tail* ] change ] when ;
+    [
+        f compact-stack-params? set
+        int-regs [ 2 keep-param-registers ] change
+        float-regs [ 0 keep-param-registers ] change
+    ] when ;
 
 : handle-macos-arm64-varargs ( params -- )
     dup alien-invoke-params?
     [ (handle-macos-arm64-varargs) ] [ drop ] if ;
 
 : (caller-parameters) ( vregs reps -- )
-    [ first3 next-parameter ] 2each ;
+    [
+        [ first3 ] [ param-natural-size ] [ param-signed? ] tri
+        next-parameter
+    ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
@@ -148,8 +160,9 @@ M: #alien-assembly emit-node
     ]
     [ caller-return ] bi ;
 
-: callee-parameter ( rep on-stack? odd-register? -- dst )
-    [ next-vreg dup ] 3dip next-parameter ;
+:: callee-parameter ( rep on-stack? register-requirement size signed? -- dst )
+    next-vreg :> dst
+    dst dst rep on-stack? register-requirement size signed? next-parameter ;
 
 :: prepare-struct-callee ( c-type -- vreg )
     c-type large-struct? [
@@ -158,12 +171,19 @@ M: #alien-assembly emit-node
             next-vreg :> vreg
             vreg int-rep return-reg 3array reg-values get push
             vreg
-        ] [ int-rep struct-return-on-stack? f callee-parameter ] if
+        ] [ int-rep struct-return-on-stack? f cell f callee-parameter ] if
     ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first3 callee-parameter ] map ] map ]
+    [
+        [
+            [
+                [ first3 ] [ param-natural-size ] [ param-signed? ] tri
+                callee-parameter
+            ] map
+        ] map
+    ]
     [ [ keys ] map ] bi ;
 
 : box-parameters ( vregs reps params -- )

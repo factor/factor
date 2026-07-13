@@ -6,7 +6,7 @@ compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.arm.64.assembler.registers kernel literals locals make math namespaces
+cpu.arm.64.assembler.registers kernel layouts literals locals make math namespaces
 math.vectors.simd sequences stack-checker.alien system tools.test words ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.tests
@@ -15,6 +15,10 @@ STRUCT: arm64-register-pair { x longlong } { y longlong } ;
 STRUCT: arm64-hfa-pair { x c:float } { y c:float } ;
 UNION-STRUCT: arm64-mixed-vector { v float-4 } { x int } ;
 STRUCT: arm64-large-return { x longlong } { y longlong } { z longlong } ;
+
+: next-flattened-parameter ( vreg tuple -- )
+    [ first3 ] [ param-natural-size ] [ param-signed? ] tri
+    next-parameter ;
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
@@ -75,14 +79,14 @@ cpu arm.64? [
     ! argument must not misalign a 128-bit SIMD argument.
     {
         V{
-            { 8 int-rep 0 }
-            { 200 float-4-rep 16 }
+            { 8 int-rep 0 4 t }
+            { 200 float-4-rep 16 16 f }
         }
     } [
         cdecl [
-            9 <iota> [ int-rep f f next-parameter ] each
-            8 <iota> [ 100 + float-rep f f next-parameter ] each
-            200 float-4-rep f f next-parameter
+            9 <iota> [ int-rep f f 4 t next-parameter ] each
+            8 <iota> [ 100 + float-rep f f 4 f next-parameter ] each
+            200 float-4-rep f f 16 f next-parameter
         ] with-param-regs nip
     ] unit-test
 
@@ -92,10 +96,10 @@ cpu arm.64? [
         $[ os macos? V{ 0 1 2 } V{ 0 2 3 } ? ]
     } [
         cdecl [
-            0 int-rep f f next-parameter
+            0 int-rep f f 4 t next-parameter
             \ arm64-mixed-vector lookup-c-type flatten-parameter-type
             [| triple i |
-                100 i + triple first3 next-parameter
+                100 i + triple next-flattened-parameter
             ] each-index
         ] with-param-regs drop [ third n>> ] map
     ] unit-test
@@ -104,16 +108,16 @@ cpu arm.64? [
     ! vector union into integer-sized chunks.
     {
         V{
-            { 8 int-rep 0 }
-            { 100 int-rep 16 }
-            { 101 int-rep 24 }
+            { 8 int-rep 0 4 t }
+            { 100 int-rep 16 8 f }
+            { 101 int-rep 24 8 f }
         }
     } [
         cdecl [
-            9 <iota> [ int-rep f f next-parameter ] each
+            9 <iota> [ int-rep f f 4 t next-parameter ] each
             \ arm64-mixed-vector lookup-c-type flatten-parameter-type
             [| triple i |
-                100 i + triple first3 next-parameter
+                100 i + triple next-flattened-parameter
             ] each-index
         ] with-param-regs nip
     ] unit-test
@@ -123,18 +127,18 @@ cpu arm.64? [
     ! on the stack and exhaust the FP register bank for later arguments.
     {
         V{
-            { 100 float-rep 0 }
-            { 101 float-rep 4 }
-            { 200 float-rep 8 }
+            { 100 float-rep 0 4 f }
+            { 101 float-rep 4 4 f }
+            { 200 float-rep 8 4 f }
         }
     } [
         cdecl [
-            7 <iota> [ double-rep f f next-parameter ] each
+            7 <iota> [ double-rep f f 8 f next-parameter ] each
             \ arm64-hfa-pair lookup-c-type flatten-parameter-type
             [| triple i |
-                100 i + triple first3 next-parameter
+                100 i + triple next-flattened-parameter
             ] each-index
-            200 float-rep f f next-parameter
+            200 float-rep f f 4 f next-parameter
         ] with-param-regs nip
     ] unit-test
 
@@ -143,18 +147,18 @@ cpu arm.64? [
     ! arguments on the stack as required by AAPCS64.
     {
         V{
-            { 100 int-rep 0 }
-            { 101 int-rep 8 }
-            { 200 int-rep 16 }
+            { 100 int-rep 0 8 f }
+            { 101 int-rep 8 8 f }
+            { 200 int-rep 16 4 t }
         }
     } [
         cdecl [
-            7 <iota> [ int-rep f f next-parameter ] each
+            7 <iota> [ int-rep f f 4 t next-parameter ] each
             \ arm64-register-pair lookup-c-type flatten-parameter-type
             [| triple i |
-                100 i + triple first3 next-parameter
+                100 i + triple next-flattened-parameter
             ] each-index
-            200 int-rep f f next-parameter
+            200 int-rep f f 4 t next-parameter
         ] with-param-regs nip
     ] unit-test
 ] when
@@ -226,7 +230,7 @@ ${
 cpu x86.32?
 {
     { 2 4 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] f } { int-rep f f 4 t } }
     V{
         T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
         T{ ##unbox
@@ -239,7 +243,7 @@ cpu x86.32?
 }
 {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] f } { int-rep f f 4 t } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
 } ? [
     [ { c-string int } unbox-parameters ] V{ } make

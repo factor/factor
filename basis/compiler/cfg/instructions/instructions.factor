@@ -665,8 +665,8 @@ def: dst/tagged-rep
 use: src1/int-rep src2/int-rep
 literal: boxer gc-map ;
 
-! Alien call inputs and outputs are arrays of triples with shape
-! { vreg rep stack#/reg }
+! Register inputs and outputs are triples with shape { vreg rep reg }.
+! Stack inputs and outputs have shape { vreg rep offset size signed? }.
 
 VREG-INSN: ##alien-invoke
 literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack-size symbols dll gc-map ;

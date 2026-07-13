@@ -5,7 +5,7 @@ compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.registers
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.test
 cpu.architecture cpu.arm.64 cpu.arm.64.assembler.registers kernel
-kernel.private locals make math math.vectors math.vectors.simd namespaces
+kernel.private layouts locals make math math.vectors math.vectors.simd namespaces
 sequences system tools.test vectors ;
 IN: cpu.arm.64.tests
 
@@ -65,11 +65,11 @@ IN: cpu.arm.64.tests
 
 :: stack-param-store-code ( n -- code )
     init-relocation
-    [ X0 int-rep n %store-stack-param ] B{ } make ;
+    [ X0 int-rep n cell f %store-stack-param ] B{ } make ;
 
 :: stack-param-load-code ( n -- code )
     init-relocation
-    [ X0 int-rep n %load-stack-param ] B{ } make ;
+    [ X0 int-rep n cell f %load-stack-param ] B{ } make ;
 
 :: local-allot-code ( offset -- code )
     f f <basic-block> <cfg>
@@ -138,14 +138,15 @@ IN: cpu.arm.64.tests
     large-spill-from-temp-code 4 head
 ] unit-test
 
-! Integer FFI values occupy temp, so their large addresses use temp2.
-{ 12 16 } [
+! Callback stack loads first recover the native stack pointer saved by the
+! callback stub.
+{ 12 20 } [
     0x10000 stack-param-store-code length
     0x10000 stack-param-load-code length
 ] unit-test
 
 ! Keep using scaled immediate operands whenever they fit.
-{ 8 8 } [
+{ 8 12 } [
     0x100 stack-param-store-code length
     0x100 stack-param-load-code length
 ] unit-test

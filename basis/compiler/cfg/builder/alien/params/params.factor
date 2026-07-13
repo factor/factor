@@ -1,30 +1,46 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs cpu.architecture fry kernel layouts locals
-math math.order namespaces sequences system vectors ;
+USING: accessors arrays assocs cpu.architecture fry generalizations kernel
+layouts locals math math.order namespaces sequences
+sequences.generalizations system vectors ;
 IN: compiler.cfg.builder.alien.params
 
 SYMBOL: stack-params
 SYMBOLS: stack-param-group-remaining stack-param-group-next ;
+SYMBOL: compact-stack-params?
 
 TUPLE: register-group count alignment ;
 
 : register-group-count ( register-requirement -- count/f )
     dup register-group? [ count>> ] [ dup integer? [ ] [ drop f ] if ] if ;
 
-GENERIC: alloc-stack-param ( rep -- n )
+: param-natural-size ( rep-tuple -- size )
+    dup length 3 > [ fourth ] [ drop cell ] if ;
 
-M: object alloc-stack-param
-    dup stack-param-alignment stack-params get swap align
-    dup stack-params set
-    swap rep-size cell align stack-params +@ ;
+: param-signed? ( rep-tuple -- ? )
+    dup length 4 > [ 4 swap nth ] [ drop f ] if ;
 
-M: float-rep alloc-stack-param
-    stack-params get swap rep-size
-    [ cell align stack-params +@ ] keep
-    float-right-align-on-stack? [ + ] [ drop ] if ;
+GENERIC#: alloc-stack-param 1 ( rep size -- n )
 
-:: alloc-stack-param-group ( rep register-requirement -- n )
+M:: object alloc-stack-param ( rep size -- n )
+    compact-stack-params? get [
+        stack-params get size align dup size + stack-params set
+    ] [
+        rep stack-param-alignment stack-params get swap align
+        dup stack-params set
+        rep rep-size cell align stack-params +@
+    ] if ;
+
+M:: float-rep alloc-stack-param ( rep size -- n )
+    compact-stack-params? get [
+        stack-params get size align dup size + stack-params set
+    ] [
+        stack-params get rep rep-size
+        [ cell align stack-params +@ ] keep
+        float-right-align-on-stack? [ + ] [ drop ] if
+    ] if ;
+
+:: alloc-stack-param-group ( rep register-requirement size -- n )
     stack-param-group-remaining get zero? [
         register-requirement register-group-count :> count
         count integer? [ count 1 > ] [ f ] if [
@@ -32,20 +48,24 @@ M: float-rep alloc-stack-param
             [ register-requirement alignment>> ]
             [ rep stack-param-alignment ] if :> alignment
             alignment stack-params get swap align :> offset
-            offset rep rep-size count * cell align +
-            stack-params set
             count 1 - stack-param-group-remaining set
-            offset rep rep-size + stack-param-group-next set
+            offset size + dup stack-param-group-next set stack-params set
             offset
-        ] [ rep alloc-stack-param ] if
+        ] [ rep size alloc-stack-param ] if
     ] [
-        stack-param-group-next get
-        rep rep-size stack-param-group-next +@
+        stack-param-group-next get :> offset
+        size stack-param-group-next +@
+        stack-param-group-next get stack-params set
         -1 stack-param-group-remaining +@
+        stack-param-group-remaining get zero?
+        compact-stack-params? get not and [
+            stack-params get cell align stack-params set
+        ] when
+        offset
     ] if ;
 
 : ?dummy-stack-params ( rep -- )
-    dummy-stack-params? [ alloc-stack-param drop ] [ drop ] if ;
+    dummy-stack-params? [ cell alloc-stack-param drop ] [ drop ] if ;
 
 : ?dummy-int-params ( rep -- )
     dummy-int-params? [
@@ -97,12 +117,14 @@ M: object next-reg-param
 
 SYMBOLS: stack-values reg-values ;
 
-:: next-parameter ( vreg rep on-stack? odd-register? -- )
-    vreg rep on-stack?
-    [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ odd-register? alloc-stack-param-group stack-values ]
-    [ odd-register? swap next-reg-param reg-values ] if
-    [ 3array ] dip get push ;
+:: next-parameter ( vreg rep on-stack? register-requirement size signed? -- )
+    rep reg-class-of get register-requirement reg-class-full? on-stack? or [
+        rep register-requirement size alloc-stack-param-group :> offset
+        vreg rep offset size signed? 5 narray stack-values get push
+    ] [
+        register-requirement rep next-reg-param :> reg
+        vreg rep reg 3array reg-values get push
+    ] if ;
 
 : next-return-reg ( rep -- reg ) reg-class-of get pop ;
 

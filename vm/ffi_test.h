@@ -264,6 +264,12 @@ FACTOR_EXPORT unsigned long ffi_test_69(unsigned long a, unsigned long b, unsign
 
 FACTOR_EXPORT unsigned long ffi_test_70(struct test_struct_68 a, struct test_struct_68 b, struct test_struct_66 c);
 
+typedef long (*ffi_test_narrow_callback)(
+    long a, long b, long c, long d, long e, long f, long g, long h,
+    char i, short j, int k);
+
+FACTOR_EXPORT long ffi_test_71(ffi_test_narrow_callback callback);
+
 
 FACTOR_EXPORT void* bug1021_test_1(void* x, int y);
 FACTOR_EXPORT int bug1021_test_2(int x, char* y, void *z);

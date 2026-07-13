@@ -11,7 +11,8 @@ compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.arm.64.assembler cpu.arm.64.assembler.registers
 generalizations grouping kernel layouts literals make math
-math.bitwise math.order memory namespaces sequences system ;
+math.bitwise math.order memory namespaces sequences
+sequences.generalizations system ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
@@ -888,7 +889,9 @@ UNION: float/vector-rep float-rep double-rep vector-rep ;
     reps length :> n
     n 1 > [
         reps first :> first-rep
-        first-rep first first-rep second n alignment register-group boa 3array
+        first-rep first first-rep second
+        n alignment register-group boa
+        first-rep param-natural-size first-rep param-signed? 5 narray
         reps rest swap prefix
     ] [ reps ] if ;
 
@@ -898,7 +901,7 @@ M: arm.64 value-struct?
 
 M:: arm.64 flatten-struct-type ( c-type -- reps )
     c-type homogeneous-float/vector-aggregate?
-    [ [ f f 3array ] map record-reg-reps ]
+    [ [| rep | rep f f rep rep-size f 5 narray ] map record-reg-reps ]
     [ drop c-type call-next-method ] if
     c-type c-type-align mark-register-group ;
 
@@ -977,29 +980,65 @@ M: arm.64 %alien-indirect
 
 : temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
 
-:: %store-stack-param ( vreg rep n -- )
+: store-stack-narrow ( Xreg operand size -- )
+    {
+        { 1 [ [ >W ] dip STRB ] }
+        { 2 [ [ >W ] dip STRH ] }
+        { 4 [ [ >W ] dip STR ] }
+        [ drop STR ]
+    } case ;
+
+:: %store-stack-param ( vreg rep n size signed? -- )
+    signed? drop
     rep temp-reg vreg rep %copy
-    n rep stack@ rep temp-reg rep %copy ;
+    rep integer-rep?
+    [ rep temp-reg n rep stack@ size store-stack-narrow ]
+    [ n rep stack@ rep temp-reg rep %copy ] if ;
 
 M: arm.64 %alien-assembly
     3nip swap {
         [ [ first3 %store-reg-param ] each ]
-        [ [ first3 %store-stack-param ] each ]
+        [ [ [ first4 ] [ 4 swap nth ] bi %store-stack-param ] each ]
         [ call( -- ) ]
         [ [ first3 %load-reg-param ] each ]
     } spread drop ;
 
-:: next-stack@ ( n rep -- operand )
-    FP n 16 + rep reg-class-of int-regs = temp2 temp ?
-    rep swap memory-offset ;
+! The callback stub saves seven register pairs before switching from the
+! native C stack to Factor's call stack.
+CONSTANT: callback-stub-frame-size 112
 
-:: %load-stack-param ( vreg rep n -- )
-    rep temp-reg n rep next-stack@ rep %copy
+:: next-stack@ ( n rep -- operand )
+    temp1 CTX context-callstack-save-offset [+] LDR
+    temp1 n callback-stub-frame-size + rep temp2 memory-offset ;
+
+: load-stack-narrow ( Xreg operand size signed? -- )
+    [
+        {
+            { 1 [ LDRSB ] }
+            { 2 [ LDRSH ] }
+            { 4 [ LDRSW ] }
+            [ drop LDR ]
+        } case
+    ] [
+        {
+            { 1 [ [ >W ] dip LDRB ] }
+            { 2 [ [ >W ] dip LDRH ] }
+            { 4 [ [ >W ] dip LDR ] }
+            [ drop LDR ]
+        } case
+    ] if ;
+
+:: %load-stack-param ( vreg rep n size signed? -- )
+    rep integer-rep? [
+        rep temp-reg n rep next-stack@ size signed? load-stack-narrow
+    ] [
+        rep temp-reg n rep next-stack@ rep %copy
+    ] if
     vreg rep temp-reg rep %copy ;
 
 M: arm.64 %callback-inputs
     [ [ first3 %load-reg-param ] each ]
-    [ [ first3 %load-stack-param ] each ] bi*
+    [ [ [ first4 ] [ 4 swap nth ] bi %load-stack-param ] each ] bi*
     arg1 VM MOV
     arg2 XZR MOV
     "begin_callback" f f %c-invoke ;

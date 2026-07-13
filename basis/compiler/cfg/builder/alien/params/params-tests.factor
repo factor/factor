@@ -1,5 +1,5 @@
 USING: alien compiler.cfg.builder.alien.params cpu.architecture
-cpu.x86.assembler.operands kernel literals system tools.test ;
+cpu.x86.assembler.operands kernel literals namespaces system tools.test ;
 IN: compiler.cfg.builder.alien.params.tests
 
 ! next-reg-param
@@ -20,4 +20,16 @@ cpu x86.64? [
     V{ 1 2 3 } clone f reg-class-full?
     V{ 1 } clone [ t reg-class-full? ] keep
     V{ 1 2 } t reg-class-full?
+] unit-test
+
+! Apple ARM64 stack arguments use natural sizes rather than eight-byte slots.
+{ 0 4 8 12 } [
+    0 stack-params [
+        t compact-stack-params? [
+            int-rep 4 alloc-stack-param
+            int-rep 4 alloc-stack-param
+            float-rep 4 alloc-stack-param
+            stack-params get
+        ] with-variable
+    ] with-variable
 ] unit-test
