@@ -5,7 +5,8 @@ USING: accessors arrays assocs classes classes.parser
 classes.private combinators compiler.units kernel lexer make
 math parser prettyprint.backend prettyprint.custom
 prettyprint.sections see see.private sequences splitting
-vocabs.prettyprint words words.constant ;
+vocabs.prettyprint words words.constant definitions
+combinators.smart prettyprint ;
 
 IN: classes.enumeration
 
@@ -18,7 +19,7 @@ ERROR: incorrect-type-in-enum-value expected-type value word ;
 
 <PRIVATE
 
-: verify-types ( superclass member-assoc -- ) 
+: verify-types ( superclass member-assoc -- )
     [ drop dup "enum-elt-value" word-prop ] assoc-map
     [ pick instance? not nip ] assoc-find [ swap incorrect-type-in-enum-value ] [ 3drop ] if* ;
 
@@ -44,7 +45,7 @@ ERROR: incorrect-type-in-enum-value expected-type value word ;
                 [ CHAR: . prefix [ dup name>> ] dip append create-word-in ] dip
                 [ define-constant ] keepd swap [ "parent-enum" set-word-prop ] keepd
             ] keep [ [ swap ,, ] [ [ "enum-elt-value" set-word-prop ] keepd [ f "parsing-word" set-word-prop ] keep ] 2bi ] keep
-        ] dip swap [ "enum-value-overwritten" set-word-prop ] dip 
+        ] dip swap [ [ "enum-value-overwritten" set-word-prop ] keepd f "constant" set-word-prop ] dip
     ] with-nested-compilation-unit ;
 
 : parse-enum-elt ( class name counter counter-quot -- counter counter-quot )
@@ -135,5 +136,19 @@ M: enumeration-class see-class*
             block> pprint-;
         ]
     } cleave block> ;
+
+M: enumeration-member-word see*
+    [
+        dup seeing-word
+        <colon \ ENUMERATION: pprint-word {
+            [ "parent-enum" word-prop pprint-word ]
+            [ "parent-enum" word-prop superclass-of dup fixnum eq? [ drop ] [ "<" text pprint-word ] if ]
+            [
+                <block
+                [ enum-elt-root-name string-wrapper boa ] [ "enum-elt-value" word-prop ] bi 2array pprint-object
+                block> pprint-;
+            ]
+        } cleave block>
+    ] with-use ;
 
 PRIVATE>
