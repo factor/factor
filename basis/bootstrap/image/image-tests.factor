@@ -31,7 +31,7 @@ IN: bootstrap.image.tests
     H{ } [ special-objects set emit-jit-data ] keep assoc-size
 ] unit-test
 
-{ 95 } [
+{ 93 } [
     50 <vector> [ bootstrapping-image set emit-image-header ] keep length
 ] unit-test
 
@@ -49,31 +49,31 @@ IN: bootstrap.image.tests
 ] unit-test
 
 ! emit-object
-{ -96 } [
+{ -94 } [
     V{ } clone bootstrapping-image set array [ ] emit-object
     data-base - 15 unmask bootstrap-cell /
 ] unit-test
 
-! heap-size 10 header + 85 special objects
-{ -95 } [
+! heap-size 10 header + 83 special objects
+{ -93 } [
     V{ } clone bootstrapping-image set heap-size
     bootstrap-cell /
 ] unit-test
 
 ! here
-{ -95 } [
+{ -93 } [
     V{ } clone bootstrapping-image set here
     data-base - bootstrap-cell /
 ] unit-test
 
 ! here-as
-{ -96 } [
+{ -94 } [
     V{ } clone bootstrapping-image set array type-number here-as
     data-base - 15 unmask bootstrap-cell /
 ] unit-test
 
 ! prepare-object
-{ -96 } [
+{ -94 } [
     V{ } clone bootstrapping-image set
     H{ } clone objects set
     55 >bignum prepare-object
