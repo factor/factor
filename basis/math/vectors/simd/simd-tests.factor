@@ -1,15 +1,17 @@
-USING: accessors arrays classes compiler.test compiler.tree.debugger
-effects fry io kernel kernel.private math math.functions
-math.private math.vectors math.vectors.simd ranges
-math.vectors.simd.private prettyprint random sequences system
-tools.test vocabs assocs compiler.cfg.debugger words
-locals combinators cpu.architecture namespaces byte-arrays alien
-specialized-arrays classes.struct eval classes.algebra sets
-quotations math.constants compiler.units splitting math.matrices
-math.vectors.simd.cords alien.data ;
-FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
+USING: accessors alien alien.data arrays assocs byte-arrays
+classes classes.algebra classes.struct combinators
+compiler.cfg.debugger compiler.test compiler.tree.debugger
+compiler.units cpu.architecture effects eval fry io kernel
+kernel.private locals math math.constants math.functions
+math.matrices math.private math.vectors math.vectors.simd
+math.vectors.simd.cords math.vectors.simd.private multiline
+namespaces prettyprint quotations random ranges sequences sets
+specialized-arrays
+specialized-arrays.instances.alien.c-types.float splitting
+system tools.test tools.test.fuzz vocabs words vectors ;
+FROM: math.vectors.simd.intrinsics => alien-vector
+set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
-SPECIALIZED-ARRAY: c:float
 IN: math.vectors.simd.tests
 
 ! Test type propagation
@@ -132,6 +134,44 @@ TUPLE: simd-test-failure
     optimized-result
     nonintrinsic-result ;
 
+:: check-optimizer-1 (
+    seq
+    test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    eq-quot: ( resulta resultb -- ? )
+    --
+)
+    ! Use test-quot to generate a bunch of test cases from the
+    ! given inputs. Run each test case optimized and
+    ! unoptimized. Compare results with eq-quot.
+    !
+    ! seq: sequence of inputs
+    ! test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
+    ! eq-quot: ( ..a -- ? )
+    seq >vector :> seq
+    seq length fuzz-test-trials [
+        [| |
+            seq pop test-quot call :> ( input-quot code-quot )
+            input-quot [ class-of ] { } map-as ! input classes
+            code-quot '[ _ declare @ ] :> code-quot'
+            
+            "print-mr" get [ code-quot' regs. ] when
+            "print-checks" get [ input-quot . code-quot' . ] when
+            
+            input-quot code-quot' [ [ call ] dip call ]
+            call( i c -- result )
+            
+            input-quot code-quot' [ [ call ] dip compile-call ]
+            call( i c -- result )
+            input-quot code-quot' [
+                t "always-inline-simd-intrinsics" [
+                    "print-inline-mr" get [ code-quot' regs. ] when
+                    [ call ] dip compile-call
+                ] with-variable
+            ] call( i c -- result )
+        ] eq-quot fuzz-test
+    ] with-variable
+    ; inline
+
 :: check-optimizer (
     seq
     test-quot: ( input -- input-quot: ( -- ..v ) code-quot: ( ..v -- result ) )
@@ -151,11 +191,12 @@ TUPLE: simd-test-failure
         input-quot [ class-of ] { } map-as :> input-classes
         input-classes code-quot '[ _ declare @ ] :> code-quot'
 
-        "print-mr" get [ code-quot' regs. ] when
-        "print-checks" get [ input-quot . code-quot' . ] when
+        ! "print-mr" get [ code-quot' regs. ] when
+        ! "print-checks" get [ input-quot . code-quot' . ] when
 
         input-quot code-quot' [ [ call ] dip call ]
         call( i c -- result ) :> unoptimized-result
+        
         input-quot code-quot' [ [ call ] dip compile-call ]
         call( i c -- result ) :> optimized-result
         input-quot code-quot' [
@@ -175,12 +216,9 @@ TUPLE: simd-test-failure
     ] map sift
     dup empty? [ dup ... ] unless ! Print full errors
     ; inline
-
 "== Checking -new constructors" print
 
-{ { } } [
-    simd-classes [ [ [ ] ] dip '[ _ new ] ] [ = ] check-optimizer
-] unit-test
+simd-classes [ [ [ ] ] dip '[ _ new ] ] [ = ] check-optimizer-1
 
 { { } } [
     simd-classes [ '[ _ new ] compile-call [ zero? ] all? ] reject
@@ -188,11 +226,9 @@ TUPLE: simd-test-failure
 
 "== Checking -with constructors" print
 
-{ { } } [
-    with-ctors [
-        [ 1000 random '[ _ ] ] dip '[ _ execute ]
-    ] [ = ] check-optimizer
-] unit-test
+with-ctors [
+    [ 1000 random '[ _ ] ] dip '[ _ execute ]
+] [ = ] check-optimizer-1
 
 { 0xffffffff } [ 0xffffffff uint-4-with first ] unit-test
 
@@ -202,12 +238,10 @@ TUPLE: simd-test-failure
 
 "== Checking -boa constructors" print
 
-{ { } } [
-    boa-ctors [
-        [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
-        '[ _ execute ]
-    ] [ = ] check-optimizer
-] unit-test
+boa-ctors [
+    [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
+    '[ _ execute ]
+] [ = ] check-optimizer-1
 
 { 0xffffffff } [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
@@ -260,7 +294,7 @@ TUPLE: simd-test-failure
     [
         [ nip ops-to-check ] 2keep
         '[ first2 vector-word-inputs _ _ check-vector-op ]
-    ] dip check-optimizer ; inline
+    ] dip check-optimizer-1 ; inline
 
 : (approx=) ( x y -- ? )
     {
@@ -292,7 +326,7 @@ TUPLE: simd-test-failure
     ] map ;
 
 simd-classes&reps [
-    [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
+    first3 check-vector-ops
 ] each
 
 "== Checking boolean operations" print
@@ -313,11 +347,9 @@ simd-classes&reps [
     [
         [ boolean-ops [ dup vector-words at ] map>alist ] 2dip
         '[ first2 vector-word-inputs _ _ check-boolean-op ]
-    ] dip check-optimizer ; inline
+    ] dip check-optimizer-1 ; inline
 
-simd-classes&reps [
-    [ [ { } ] ] dip first3 '[ _ _ _ check-boolean-ops ] unit-test
-] each
+simd-classes&reps [ first3 check-boolean-ops ] each
 
 "== Checking vector blend" print
 
@@ -466,16 +498,12 @@ simd-classes&reps [
     } case ;
 
 simd-classes [
-    [ [ { } ] ] dip
     [ new length shuffles-for ] keep
-    '[
-        _ [ [ _ new [ length <iota> ] keep like 1quotation ] dip '[ _ vshuffle ] ]
-        [ = ] check-optimizer
-    ] unit-test
+    _ [ [ _ new [ length <iota> ] keep like 1quotation ] dip '[ _ vshuffle ] ]
+    [ = ] check-optimizer-1
 ] each
 
 simd-classes [
-    [ [ { } ] ] dip
     [ new length 2shuffles-for ] keep
     '[
         _ [ [
@@ -483,8 +511,8 @@ simd-classes [
             [ [ length <iota> ] keep like ]
             [ [ length dup dup + [a..b) ] keep like ] bi [ ] 2sequence
         ] dip '[ _ vshuffle2-elements ] ]
-        [ = ] check-optimizer
-    ] unit-test
+        [ = ] check-optimizer-1
+    ] call
 ] each
 
 "== Checking variable shuffles" print
@@ -568,7 +596,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 ! Test element access -- it should box bignums for int-4 on x86
 : test-accesses ( seq -- failures )
     [ length <iota> dup [ >bignum ] map append ] keep
-    '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer ; inline
+    '[ [ _ 1quotation ] dip '[ _ swap nth ] ] [ = ] check-optimizer-1 ; inline
 
 { { } } [ float-4{ 1.0 2.0 3.0 4.0 } test-accesses ] unit-test
 { { } } [ int-4{ 0x7fffffff 3 4 -8 } test-accesses ] unit-test
@@ -585,7 +613,7 @@ TUPLE: inconsistent-vector-test bool branch ;
 "== Checking broadcast" print
 : test-broadcast ( seq -- failures )
     [ length <iota> >array ] keep
-    '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer ;
+    '[ [ _ 1quotation ] dip '[ _ vbroadcast ] ] [ = ] check-optimizer-1 ;
 
 { { } } [ float-4{ 1.0 2.0 3.0 4.0 } test-broadcast ] unit-test
 { { } } [ int-4{ 0x7fffffff 3 4 -8 } test-broadcast ] unit-test
@@ -773,3 +801,4 @@ STRUCT: simd-struct
 { 33.0 } [
     double-4{ 2 20 30 40 } double-4{ 2 4 3 2 } test-1308 first
 ] unit-test
+*/
