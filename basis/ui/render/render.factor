@@ -231,6 +231,69 @@ void main() {
 }
 "
 
+! --- GLSL 1.30 Fallback Shader Sources (OpenGL 3.0) ---
+
+CONSTANT: gl3-vertex-shader-source-130 "
+#version 130
+in vec2 position;
+in vec4 color;
+
+uniform mat4 projection;
+uniform mat4 modelview;
+
+out vec4 frag_color;
+
+void main() {
+    gl_Position = projection * modelview * vec4(position, 0.0, 1.0);
+    frag_color = color;
+}
+"
+
+CONSTANT: gl3-fragment-shader-source-130 "
+#version 130
+in vec4 frag_color;
+out vec4 out_color;
+
+uniform vec4 uniform_color;
+uniform int use_uniform_color;
+
+void main() {
+    if (use_uniform_color != 0) {
+        out_color = uniform_color;
+    } else {
+        out_color = frag_color;
+    }
+}
+"
+
+CONSTANT: gl3-texture-vertex-shader-source-130 "
+#version 130
+in vec2 position;
+in vec2 texcoord;
+
+uniform mat4 projection;
+uniform mat4 modelview;
+
+out vec2 frag_texcoord;
+
+void main() {
+    gl_Position = projection * modelview * vec4(position, 0.0, 1.0);
+    frag_texcoord = texcoord;
+}
+"
+
+CONSTANT: gl3-texture-fragment-shader-source-130 "
+#version 130
+in vec2 frag_texcoord;
+out vec4 out_color;
+
+uniform sampler2D tex;
+
+void main() {
+    out_color = texture(tex, frag_texcoord);
+}
+"
+
 ! --- GL3 Render State ---
 
 SYMBOL: current-modelview
@@ -323,9 +386,34 @@ SYMBOL: gl3-render-state
 
 ! --- Shader Setup ---
 
+: glsl-330? ( -- ? )
+    "3.30" has-glsl-version? ;
+
+: gl3-color-shader-sources ( -- vertex-source fragment-source )
+    glsl-330?
+    [ gl3-vertex-shader-source gl3-fragment-shader-source ]
+    [ gl3-vertex-shader-source-130 gl3-fragment-shader-source-130 ] if ;
+
+: gl3-texture-shader-sources ( -- vertex-source fragment-source )
+    glsl-330?
+    [ gl3-texture-vertex-shader-source gl3-texture-fragment-shader-source ]
+    [ gl3-texture-vertex-shader-source-130 gl3-texture-fragment-shader-source-130 ] if ;
+
+: bind-gl3-attributes ( program attributes -- )
+    [ rot glBindAttribLocation ] with each-index ;
+
+: <gl3-program> ( vertex-source fragment-source attributes -- program )
+    [
+        [ <vertex-shader> check-gl-shader ]
+        [ <fragment-shader> check-gl-shader ] bi* 2array
+        glCreateProgram [ swap attach-shaders ] keep
+    ] dip
+    dupd bind-gl3-attributes
+    dup 0 "out_color" glBindFragDataLocation
+    [ glLinkProgram ] keep gl-error check-gl-program ;
+
 : create-gl3-program ( -- program )
-    gl3-vertex-shader-source gl3-fragment-shader-source
-    <simple-gl-program> ;
+    gl3-color-shader-sources { "position" "color" } <gl3-program> ;
 
 : get-uniform-locations ( program -- proj-loc mv-loc color-loc use-color-loc )
     {
@@ -355,8 +443,7 @@ SYMBOL: gl3-render-state
 ! --- GL3 State Management ---
 
 : create-gl3-texture-program ( -- program )
-    gl3-texture-vertex-shader-source gl3-texture-fragment-shader-source
-    <simple-gl-program> ;
+    gl3-texture-shader-sources { "position" "texcoord" } <gl3-program> ;
 
 : get-texture-uniform-locations ( program -- proj-loc mv-loc sampler-loc )
     {
