@@ -11,6 +11,10 @@ USING: bencode linked-assocs tools.test ;
 
 { { "spam" 42 } } [ "l4:spami42ee" bencode> ] unit-test
 
+{ "d3:bar4:spam3:fooi42ee" } [
+    LH{ { "foo" 42 } { "bar" "spam" } } >bencode
+] unit-test
+
 { LH{ { "bar" "spam" } { "foo" 42 } } } [
     "d3:bar4:spam3:fooi42ee" bencode>
 ] unit-test
