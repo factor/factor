@@ -61,8 +61,9 @@ PRIVATE>
     dup [ swap ] when ;
 
 : split1-last-slice ( seq subseq -- before-slice after-slice )
-    [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
-    [ f ] [ swap ] if-empty ;
+    [ <reversed> ] bi@ split1-slice
+    [ <reversed> ] dip
+    dup [ <reversed> swap ] when ;
 
 <PRIVATE
 
