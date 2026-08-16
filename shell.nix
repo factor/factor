@@ -15,6 +15,7 @@ let
     libogg
     libvorbis
     zlib
+    readline
   ] ++ (if stdenv.isDarwin then [] else [
     gtk2-x11
     gdk-pixbuf
