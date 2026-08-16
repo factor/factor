@@ -1,6 +1,7 @@
 USING: arrays assocs byte-arrays combinators io
 io.encodings.binary io.streams.byte-array io.streams.string
-kernel linked-assocs math math.parser sequences sequences.extras strings ;
+kernel linked-assocs math math.parser sequences sequences.extras sorting
+strings ;
 IN: bencode
 
 GENERIC: >bencode ( obj -- bencode )
@@ -17,7 +18,7 @@ M: sequence >bencode
     [ >bencode ] map concat "l" "e" surround ;
 
 M: assoc >bencode
-    [ [ >bencode ] bi@ append ] { } assoc>map concat
+    sort-keys [ [ >bencode ] bi@ append ] { } assoc>map concat
     "d" "e" surround ;
 
 DEFER: read-bencode
