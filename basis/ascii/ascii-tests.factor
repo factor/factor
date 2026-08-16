@@ -17,5 +17,7 @@ USING: ascii kernel math sequences strings tools.test ;
 { "HELLO HOW ARE YOU?" } [ "hellO hOw arE YOU?" >upper ] unit-test
 { "i'm good thx bai" } [ "I'm Good THX bai" >lower ] unit-test
 
+{ "" } [ "" capitalize ] unit-test
+
 { "Hello How Are You?" } [ "hEllo how ARE yOU?" >title ] unit-test
 { { " " "Hello" " " " " " " "World" } } [ " Hello   World" >words [ >string ] map ] unit-test
