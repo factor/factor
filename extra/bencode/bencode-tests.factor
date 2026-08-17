@@ -1,4 +1,4 @@
-USING: bencode linked-assocs tools.test ;
+USING: bencode byte-arrays linked-assocs tools.test ;
 
 { "i42e" } [ 42 >bencode ] unit-test
 { "i0e" } [ 0 >bencode ] unit-test
@@ -18,3 +18,7 @@ USING: bencode linked-assocs tools.test ;
 { LH{ { "bar" "spam" } { "foo" 42 } } } [
     "d3:bar4:spam3:fooi42ee" bencode>
 ] unit-test
+
+[ "i42ei43e" bencode> ] must-fail
+[ "i42eJUNK" bencode> ] must-fail
+[ "i42eJUNK" >byte-array bencode> ] must-fail
