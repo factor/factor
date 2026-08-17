@@ -71,6 +71,8 @@ sequences.private tools.test ;
 
 { 14 } [ ?{ f t t t } bit-array>integer ] unit-test
 { 0 } [ ?{ } bit-array>integer ] unit-test
+{ 1 } [ 1 <bit-array> dup set-bits bit-array>integer ] unit-test
+{ 3 } [ 2 B{ 0b111 } bit-array boa bit-array>integer ] unit-test
 { 0xffffffffffffffffffffffffffffffff } [ ?{
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
