@@ -7,4 +7,4 @@ HELP: >bencode
 
 HELP: bencode>
 { $values { "bencode" string } { "obj" object } }
-{ $description "Decodes an object using the bencode algorithm." } ;
+{ $description "Decodes exactly one object using the bencode algorithm. Throws an error if the input contains trailing data." } ;

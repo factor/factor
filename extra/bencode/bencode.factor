@@ -51,10 +51,17 @@ PRIVATE>
         [ read-string ]
     } case ;
 
+<PRIVATE
+
+: read-bencode-input ( -- obj )
+    read-bencode read1 f assert= ;
+
+PRIVATE>
+
 GENERIC: bencode> ( bencode -- obj )
 
 M: byte-array bencode>
-    binary [ read-bencode ] with-byte-reader ;
+    binary [ read-bencode-input ] with-byte-reader ;
 
 M: string bencode>
-    [ read-bencode ] with-string-reader ;
+    [ read-bencode-input ] with-string-reader ;
