@@ -101,7 +101,7 @@ SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
     [ dup log2 1 + [ nip ] [ bits>bytes >le ] 2bi bit-array boa ] if ;
 
 : bit-array>integer ( bit-array -- n )
-    underlying>> le> ;
+    [ underlying>> le> ] keep length bits ;
 
 INSTANCE: bit-array sequence
 
