@@ -34,9 +34,9 @@ IN: http.server.cgi
         request get "accept" header "HTTP_ACCEPT" ,,
 
         post-request? [
-            request get data>> data>>
-            [ "CONTENT_TYPE" ,, ]
-            [ length number>string "CONTENT_LENGTH" ,, ]
+            request get data>>
+            [ content-type>> "CONTENT_TYPE" ,, ]
+            [ data>> length number>string "CONTENT_LENGTH" ,, ]
             bi
         ] when
     ] H{ } make ;
