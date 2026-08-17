@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: kernel uuid tools.test ;
+USING: kernel math math.bitwise sequences tools.test uuid ;
 
 { t } [ NAMESPACE_DNS  [ uuid-parse uuid-unparse ] keep = ] unit-test
 { t } [ NAMESPACE_URL  [ uuid-parse uuid-unparse ] keep = ] unit-test
@@ -13,3 +13,7 @@ USING: kernel uuid tools.test ;
 
 { t } [ NAMESPACE_URL "ABCD" uuid5
         "0aa883d6-7953-57e7-a8f0-66db29ce5a91" = ] unit-test
+
+{ 0x80 } [ uuid1 uuid-parse 8 swap nth 0xc0 bitand ] unit-test
+{ 0x80 } [ uuid7 uuid-parse 8 swap nth 0xc0 bitand ] unit-test
+{ 0x80 } [ 0 0 0 uuid8 uuid-parse 8 swap nth 0xc0 bitand ] unit-test
