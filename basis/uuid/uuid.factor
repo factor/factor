@@ -29,6 +29,10 @@ IN: uuid
         0xf000 64 shift bitnot bitand
     ] dip 76 shift bitor ;
 
+! RFC 9562 section 4.1 defines the RFC UUID variant as 0b10.
+! https://www.rfc-editor.org/rfc/rfc9562.html#section-4.1
+CONSTANT: rfc-variant 0b10
+
 : (uuid) ( a version b variant c -- n )
     {
         [ 48 bits 80 shift ]
@@ -59,7 +63,7 @@ PRIVATE>
 : uuid1 ( -- string )
     (timestamp)
     [ 32 bits 16 shift ] [ -32 shift 16 bits + 1 ] [ -48 shift ] tri
-    0b01 (clock) 48 shift (hardware) +
+    rfc-variant (clock) 48 shift (hardware) +
     (uuid) uuid>string ;
 
 : uuid3 ( namespace name -- string )
@@ -78,16 +82,16 @@ PRIVATE>
 
 : uuid6 ( -- string )
     (timestamp) [ -12 shift 6 ] [ 12 bits ] bi
-    0b10 (clock) 48 shift $[ 48 random-bits ] +
+    rfc-variant (clock) 48 shift $[ 48 random-bits ] +
     (uuid) uuid>string  ;
 
 : uuid7 ( -- string )
     now timestamp>millis 7
-    12 random-bits 0b11
+    12 random-bits rfc-variant
     62 random-bits (uuid) uuid>string ;
 
 : uuid8 ( a b c -- string )
-    [ 8 ] 2dip [ 0b01 ] dip (uuid) uuid>string ;
+    [ 8 ] 2dip [ rfc-variant ] dip (uuid) uuid>string ;
 
 : uuid-urn ( string -- url )
     "url:urn:" prepend ;
