@@ -984,7 +984,7 @@ $nl "This is the matrix norm when " { $snippet "p=1" } ", and is the overall max
 HELP: matrix-l2-norm
 { $values { "m" matrix } { "n" number } }
 { $description "Find the norm (size) of a matrix in 𝑙₂ (" { $snippet "L^2" } ") vector space, usually written ∥･∥₂."
-$nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sums of the squares of all the elements of the matrix." }
+$nl "This is the matrix norm when " { $snippet "p=2" } ", and is the square root of the sum of the squared magnitudes of all the elements of the matrix." }
 { $notelist
     { "This norm is sometimes called the Hilbert-Schmidt norm." }
     { "User code should call the generic " { $link p-norm } " instead." }
