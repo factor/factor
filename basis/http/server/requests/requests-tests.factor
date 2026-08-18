@@ -11,6 +11,10 @@ IN: http.server.requests.tests
 : string>request ( str -- request )
     [ request-limit get limited-input read-request ] with-string-reader ;
 
+: content-length>request ( content-length -- request )
+    { { "foo" "bar" } } "localhost" <post-request> request>string
+    "7" rot replace string>request ;
+
 ! POST requests
 { "foo=bar" "7" } [
     "foo=bar" "localhost" <post-request> request>string string>request
@@ -107,13 +111,26 @@ hello
     [ content-length>> "i am not a number!" = ] bi and
 ] must-fail-with
 
-! Negative is it too.
-[
-    { { "foo" "bar" } } "localhost" <post-request> request>string
-    "7" "-1234" replace string>request
-] [
+! Content-Length permits decimal digits only.
+[ "0x7" content-length>request ] [
     [ invalid-content-length? ]
-    [ content-length>> -1234 = ] bi and
+    [ content-length>> "0x7" = ] bi and
+] must-fail-with
+
+[ "+7" content-length>request ] [
+    [ invalid-content-length? ]
+    [ content-length>> "+7" = ] bi and
+] must-fail-with
+
+[ "7.0" content-length>request ] [
+    [ invalid-content-length? ]
+    [ content-length>> "7.0" = ] bi and
+] must-fail-with
+
+! Negative is it too.
+[ "-1234" content-length>request ] [
+    [ invalid-content-length? ]
+    [ content-length>> "-1234" = ] bi and
 ] must-fail-with
 
 ! And too big
