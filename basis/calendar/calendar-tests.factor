@@ -211,6 +211,11 @@ IN: calendar
     12 [1..b] [ 2020 swap 1 <date> quarter ] map
 ] unit-test
 
+{ t } [
+    2024 2 15 12 34 56 instant <timestamp> start-of-quarter
+    2024 1 1 <date-gmt> =
+] unit-test
+
 { 0 }
 [ now-gmt gmt-offset>> duration>seconds ] unit-test
 
