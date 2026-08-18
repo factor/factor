@@ -138,9 +138,9 @@ IN: math.statistics
 { 0 } [ { 1 } { 1 } sample-cov ] unit-test
 { 2/3 } [ { 1 2 3 } { 4 5 6 } population-cov ] unit-test
 
-{ 0.75 } [ { 1 2 3 4 } dup sample-corr ] unit-test
+{ 1.0 } [ { 1 2 3 4 } dup sample-corr ] unit-test
 { 1.0 } [ { 1 2 3 4 } dup population-corr ] unit-test
-{ -0.75 } [ { 1 2 3 4 } { -4 -5 -6 -7 } sample-corr ] unit-test
+{ -1.0 } [ { 1 2 3 4 } { -4 -5 -6 -7 } sample-corr ] unit-test
 
 { { 1 2 4 7 } } [ { 1 1 2 3 } cum-sum ] unit-test
 { { 1 1 2 6 } } [ { 1 1 2 3 } cum-product ] unit-test
