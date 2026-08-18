@@ -345,7 +345,7 @@ PRIVATE>
 : sample-cov ( x-seq y-seq -- cov ) 1 cov-ddof ; inline
 
 : corr-ddof ( x-seq y-seq n -- corr )
-    [ [ population-cov ] ] dip
+    [ '[ _ cov-ddof ] ] keep
     '[ [ _ var-ddof ] bi@ * sqrt ] 2bi / ;
 
 : population-corr ( x-seq y-seq -- corr ) 0 corr-ddof ; inline
