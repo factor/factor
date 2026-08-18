@@ -269,7 +269,7 @@ DEFER: matrix-set-nths
 
 : matrix-l2-norm ( m -- n )
     dup zero-matrix? [ drop 0 ] [
-        [ [ sq ] map-sum ] map-sum sqrt
+        [ [ absq ] map-sum ] map-sum sqrt
     ] if ; inline foldable
 
 ! XXX: M: zero-matrix l1-norm drop 0 ; inline
