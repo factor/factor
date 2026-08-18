@@ -41,9 +41,12 @@ DEFER: parse-tnetstring
 : parse-null ( data -- f )
     [ f ] [ drop "Payload must be 0 length" throw ] if-empty ;
 
+: parse-number ( data -- number )
+    string>number [ "Invalid number" throw ] unless* ;
+
 : parse-tnetstring ( data -- remain value )
     parse-payload {
-        { CHAR: # [ string>number ] }
+        { CHAR: # [ parse-number ] }
         { CHAR: \" [ ] }
         { CHAR: } [ parse-dict ] }
         { CHAR: ] [ parse-list ] }
