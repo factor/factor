@@ -1,4 +1,4 @@
-USING: accessors combinators continuations http http.parsers io
+USING: accessors ascii combinators continuations http http.parsers io
 io.crlf io.encodings io.encodings.binary io.streams.limited
 kernel math.order math.parser namespaces sequences splitting
 urls urls.encoding ;
@@ -48,7 +48,7 @@ upload-limit [ 200,000,000 ] initialize
 
 : parse-content-length-safe ( request -- content-length )
     "content-length" header [
-        [ string>number ]
+        [ dup [ digit? ] all? [ string>number ] [ drop f ] if ]
         [
             dup 0 upload-limit get between? [
                 invalid-content-length
