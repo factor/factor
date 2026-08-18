@@ -41,6 +41,11 @@ TUPLE: foo ;
     } [ (parse-options) ] with map
 ] unit-test
 
+{ H{ { "flag" t } } } [
+    { T{ option { name "--flag" } { #args 0 } { const t } } }
+    { "--flag" } (parse-options)
+] unit-test
+
 { H{ { "username" "test" } } } [
     { T{ option { name "--username" } } }
     { "--user" "test" } (parse-options)
