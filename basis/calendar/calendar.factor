@@ -544,7 +544,7 @@ ALIAS: start-of-day midnight
     [ end-of-day ] [ days-in-month ] bi >>day ;
 
 : start-of-quarter ( timestamp -- timestamp' )
-    [ start-of-day ] [ quarter 1 - 3 * ] bi >>month ; inline
+    [ start-of-month ] [ quarter 1 - 3 * 1 + ] bi >>month ; inline
 
 : end-of-quarter ( timestamp -- timestamp' )
     dup quarter 1 - 3 * 3 + >>month end-of-month ; inline
