@@ -15,6 +15,8 @@ DEFER: read-bson-assoc
 
 ERROR: unknown-bson-type type msg ;
 
+ERROR: invalid-bson-boolean value ;
+
 <PRIVATE
 
 SYMBOL: state
@@ -35,6 +37,13 @@ DEFER: read-elements
 
 : read-byte ( -- byte )
     read-byte-raw first ; inline
+
+: read-boolean ( -- ? )
+    read-byte {
+        { 0 [ f ] }
+        { 1 [ t ] }
+        [ invalid-bson-boolean ]
+    } case ; inline
 
 : read-cstring ( -- string )
     input-stream get utf8 <decoder>
@@ -87,7 +96,7 @@ TYPED: element-data-read ( type: integer -- object )
         { T_Object      [ [ bson-object-data-read drop ] object-result check-object ] }
         { T_Array       [ [ bson-object-data-read drop ] object-result values ] }
         { T_Double      [ read-double ] }
-        { T_Boolean     [ read-byte 1 = ] }
+        { T_Boolean     [ read-boolean ] }
         { T_Date        [ read-longlong millis>timestamp ] }
         { T_Regexp      [ bson-regexp-read ] }
         { T_Timestamp   [ read-timestamp ] }
