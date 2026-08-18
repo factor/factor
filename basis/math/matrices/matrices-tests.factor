@@ -327,6 +327,9 @@ PRIVATE>
 { 2.0 }
 [ { { 1 1 } { 1 1 } } matrix-l2-norm ] unit-test
 
+{ 1.0 }
+[ { { C{ 0 1 } } } matrix-l2-norm ] unit-test
+
 { 10e-8 }
 [
   5.4772255
