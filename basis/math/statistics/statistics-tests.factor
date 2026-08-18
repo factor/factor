@@ -100,6 +100,7 @@ IN: math.statistics
 { 0.0 } [ { 1 } sample-ste ] unit-test
 
 { 2 } [ { 1 3 5 7 } mean-dev ] unit-test
+{ 2 } [ { 1 3 } sum-of-absolute-errors ] unit-test
 { 4/5 } [ { 1 3 3 3 5 } median-dev ] unit-test
 
 {
