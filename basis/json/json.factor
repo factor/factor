@@ -80,7 +80,7 @@ DEFER: (read-json-string)
         { CHAR: r [ CHAR: \r ] }
         { CHAR: t [ CHAR: \t ] }
         { CHAR: u [ over read-json-escape-unicode ] }
-        [ ]
+        [ drop f ]
     } case [ suffix! (read-json-string) ] [ json-error ] if* ;
 
 : (read-json-string) ( stream accum -- accum )
