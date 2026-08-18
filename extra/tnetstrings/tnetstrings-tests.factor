@@ -24,3 +24,5 @@ USING: kernel tnetstrings sequences tools.test ;
         first2 [ tnetstring> = ] [ swap >tnetstring = ] 2bi and
     ] all?
 ] unit-test
+
+[ "1:x#" tnetstring> ] must-fail
