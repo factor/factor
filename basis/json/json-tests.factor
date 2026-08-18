@@ -39,6 +39,7 @@ IN: json.tests
 ! unicode is allowed in json
 { "ß∂¬ƒ˚∆" } [ "  \"ß∂¬ƒ˚∆\""  json> ] unit-test
 ${ { 8 9 10 12 13 34 47 92 } >string } [ " \"\\b\\t\\n\\f\\r\\\"\\/\\\\\" " json> ] unit-test
+[ "\"\\q\"" json> ] [ json-error? ] must-fail-with
 ${ { 0xabcd } >string } [ " \"\\uaBCd\" " json> ] unit-test
 { "𝄞" } [ "\"\\ud834\\udd1e\"" json> ] unit-test
 
