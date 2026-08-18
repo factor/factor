@@ -150,6 +150,7 @@ M: class argvalid? instance? ;
 
 :: option-value ( args option -- args' value )
     args option option-#args {
+        { 0 [ option const>> ] }
         { "+" [
             [ option expected-arguments ]
             [ f swap [ option option-convert ] map ]
