@@ -1,7 +1,13 @@
-USING: bson bson.constants calendar kernel linked-assocs math sequences
-tools.test ;
+USING: bson bson.constants calendar hex-strings kernel
+linked-assocs math sequences tools.test ;
 
 { LH{ { "a" "a string" } } } [ LH{ { "a" "a string" } } >bson bson> ] unit-test
+
+{ LH{ { "false" f } { "true" t } } } [
+    LH{ { "false" f } { "true" t } } >bson bson>
+] unit-test
+
+[ "090000000878000200" hex-string>bytes bson> ] must-fail
 
 { LH{ { "a" "a string" } { "b" LH{ { "a" "アップルからの最新のニュースや情報を読む" } } } } }
 [ LH{ { "a" "a string" } { "b" LH{ { "a" "アップルからの最新のニュースや情報を読む" } } } } >bson bson> ] unit-test
