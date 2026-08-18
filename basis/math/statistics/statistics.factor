@@ -61,7 +61,7 @@ M: ranges:range sum-of-quads
     [ mean ] keep [ - sq ] with map-sum ; inline
 
 : sum-of-absolute-errors ( seq -- x )
-    [ mean ] keep [ - ] with map-sum ; inline
+    [ mean ] keep [ - abs ] with map-sum ; inline
 
 : quadratic-mean ( seq -- x ) ! root-mean-square
     [ sum-of-squares ] [ length ] bi / sqrt ; inline
