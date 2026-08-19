@@ -59,7 +59,7 @@ IN: ini-file
                 { CHAR: \n   "\\n"  }
                 { CHAR: \r   "\\r"  }
                 { CHAR: \t   "\\t"  }
-                { CHAR: \b   "\\v"  }
+                { CHAR: \v   "\\v"  }
                 { CHAR: '    "\\'"  }
                 { CHAR: \"   "\\\"" }
                 { CHAR: \\   "\\\\" }
