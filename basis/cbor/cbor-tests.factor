@@ -63,6 +63,7 @@ linked-assocs literals math ranges tools.test urls ;
     }
     { T{ cbor-tagged f 23 B{ 1 2 3 4 } } "d74401020304" }
     { T{ cbor-tagged f 24 B{ 0x64 0x49 0x45 0x54 0x46 } } "d818456449455446" }
+    { B{ 0xfb } "d821622d77" }
     { URL" http://www.example.com" "d82076687474703a2f2f7777772e6578616d706c652e636f6d" }
     { B{ } "40" }
     { B{ 1 2 3 4 } "4401020304" }
