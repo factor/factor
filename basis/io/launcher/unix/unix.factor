@@ -111,6 +111,7 @@ IN: io.launcher.unix
     } case ;
 
 : reset-fd* ( actions fd -- )
+    dup F_SETFL 0 fcntl io-error
     posix_spawn_file_actions_addinherit_np check-posix ;
 
 : redirect-fd* ( actions oldfd fd -- )
