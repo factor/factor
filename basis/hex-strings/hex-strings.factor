@@ -22,9 +22,12 @@ IN: hex-strings
 : sha512-string? ( str -- ? ) { [ length 128 = ] [ hex-string? ] } 1&& ;
 
 ERROR: invalid-hex-string-length n ;
+ERROR: invalid-hex-string string ;
 
 : hex-string>bytes ( hex-string -- bytes )
-    dup length dup even? [ invalid-hex-string-length ] unless 2/ <byte-array> [
+    dup length dup even? [ invalid-hex-string-length ] unless
+    over hex-string? [ drop invalid-hex-string ] unless
+    2/ <byte-array> [
         [
             [ digit> ] 2dip over even? [
                 [ 16 * ] [ 2/ ] [ set-nth-unsafe ] tri*
