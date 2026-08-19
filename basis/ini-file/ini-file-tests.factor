@@ -5,6 +5,13 @@ USING: ini-file linked-assocs tools.test ;
 
 { LH{ } } [ "" string>ini ] unit-test
 
+{ "backspace=a\\bb\nvertical-tab=a\\vb\n" } [
+    LH{
+        { "backspace" "a\bb" }
+        { "vertical-tab" "a\vb" }
+    } ini>string
+] unit-test
+
 { LH{ { "section" LH{ } } } } [ "[section]" string>ini ] unit-test
 
 { "[\"test \\\"section with quotes\\\"\"]\n\n" } [
