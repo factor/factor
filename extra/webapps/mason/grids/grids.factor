@@ -22,6 +22,7 @@ CONSTANT: oses
 
 CONSTANT: cpus
 {
+    { "arm.64" "arm-64" }
     { "x86.32" "x86" }
     { "x86.64" "x86-64" }
 }
