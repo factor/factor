@@ -116,8 +116,15 @@ PRIVATE>
         state [ bson-object-data-read ] with-variable
     ] 1guard ;
 
+<PRIVATE
+
+: read-bson-input ( -- assoc )
+    LH{ } read-bson-assoc read1 f assert= ;
+
+PRIVATE>
+
 : bson> ( bytes -- assoc )
-    binary [ LH{ } read-bson-assoc ] with-byte-reader ;
+    binary [ read-bson-input ] with-byte-reader ;
 
 : read-bson-sequence ( exemplar -- seq )
     '[ _ read-bson-assoc ] loop>array ;
