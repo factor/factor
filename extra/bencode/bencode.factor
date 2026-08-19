@@ -1,6 +1,7 @@
 USING: arrays assocs byte-arrays combinators io
 io.encodings.binary io.streams.byte-array io.streams.string
-kernel linked-assocs math math.parser sequences sequences.extras sorting
+io.streams.throwing kernel linked-assocs math math.parser sequences
+sequences.extras sorting
 strings ;
 IN: bencode
 
@@ -38,7 +39,7 @@ DEFER: read-bencode
 
 : read-string ( prefix -- obj )
     ":" read-until CHAR: : assert= swap prefix
-    string>number read "" like ;
+    string>number [ read ] throw-on-eof "" like ;
 
 PRIVATE>
 
