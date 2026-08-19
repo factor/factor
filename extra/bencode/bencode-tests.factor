@@ -1,4 +1,5 @@
-USING: bencode byte-arrays linked-assocs tools.test ;
+USING: bencode byte-arrays io.streams.throwing linked-assocs
+tools.test ;
 
 { "i42e" } [ 42 >bencode ] unit-test
 { "i0e" } [ 0 >bencode ] unit-test
@@ -22,3 +23,8 @@ USING: bencode byte-arrays linked-assocs tools.test ;
 [ "i42ei43e" bencode> ] must-fail
 [ "i42eJUNK" bencode> ] must-fail
 [ "i42eJUNK" >byte-array bencode> ] must-fail
+
+{ "" } [ "0:" bencode> ] unit-test
+
+[ "3:ab" bencode> ] [ stream-exhausted? ] must-fail-with
+[ "3:ab" >byte-array bencode> ] [ stream-exhausted? ] must-fail-with
