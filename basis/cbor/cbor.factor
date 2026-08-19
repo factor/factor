@@ -69,7 +69,7 @@ TUPLE: cbor-simple value ;
         { 2 [ be> ] }
         { 3 [ be> neg 1 - ] }
         { 32 [ >url ] }
-        { 33 [ base64> ] }
+        { 33 [ urlsafe-base64> ] }
         [ swap cbor-tagged boa ]
     } case ;
 
