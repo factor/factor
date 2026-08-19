@@ -1,4 +1,4 @@
-USING: bson bson.constants calendar linked-assocs math
+USING: bson bson.constants calendar kernel linked-assocs math sequences
 tools.test ;
 
 { LH{ { "a" "a string" } } } [ LH{ { "a" "a string" } } >bson bson> ] unit-test
@@ -45,3 +45,10 @@ tools.test ;
           { "quot" [ 1 2 + ] }
      } >bson bson>
 ] unit-test
+
+{ { LH{ { "a" 1 } } LH{ { "a" 1 } } } } [
+    LH{ { "a" 1 } } >bson dup append bson-sequence>
+] unit-test
+
+[ LH{ { "a" 1 } } >bson dup append bson> ] must-fail
+[ LH{ { "a" 1 } } >bson 0 suffix bson> ] must-fail
