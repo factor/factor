@@ -408,6 +408,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 { 4 } [ 5 <iota> maximum ] unit-test
 { 0 } [ 5 <iota> minimum ] unit-test
+[ 0 <iota> minimum ] must-fail
 
 { 4 } [ 5 <iota> [ ] maximum-by ] unit-test
 { 0 } [ 5 <iota> [ ] minimum-by ] unit-test

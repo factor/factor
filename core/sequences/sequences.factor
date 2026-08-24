@@ -1139,7 +1139,8 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 GENERIC: minimum ( seq -- elt )
 M: sequence minimum [ ] [ min ] map-reduce ; inline
-M: iota minimum drop 0 ; inline
+M: iota minimum
+    dup empty? [ call-next-method ] [ drop 0 ] if ; inline
 M: reversed minimum seq>> minimum ; inline
 M: repetition minimum elt>> ; inline
 
