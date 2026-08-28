@@ -95,7 +95,17 @@ HELP: optional
 }
 { $description
     "Returns a parser that parses 0 or 1 instances of the " { $snippet "parser" } ". The AST produced is "
-    { $link f } " if 0 instances are parsed, otherwise it is the AST produced by " { $snippet "parser" } "." } ;
+    { $link f } " if 0 instances are parsed, otherwise it is the AST produced by " { $snippet "parser" } "." }
+{ $see-also optional* } ;
+
+HELP: optional*
+{ $values
+  { "parser" parser }
+}
+{ $description
+    "Returns a parser that parses 0 or 1 instances of the " { $snippet "parser" } ". The AST produced is "
+    { $link f } " if 0 instances are parsed, otherwise it is a singleton array containing the AST produced by " { $snippet "parser" } " or an empty array if the AST produced was " { $link ignore } "." }
+{ $see-also optional } ;
 
 HELP: semantic
 { $values

@@ -95,6 +95,26 @@ IN: peg.tests
     "cb" "a" token optional "b" token 2array seq parse
 ] must-fail
 
+{ V{ { "a" } "b" } } [
+    "ab" "a" token optional* "b" token 2array seq parse
+] unit-test
+
+{ V{ f "b" } } [
+    "b" "a" token optional* "b" token 2array seq parse
+] unit-test
+
+[
+    "cb" "a" token optional* "b" token 2array seq parse
+] must-fail
+
+{ V{ { f } "b" } } [
+    "ab" "a" token [ drop f ] action optional* "b" token 2array seq parse
+] unit-test
+
+{ V{ { } "b" } } [
+    "ab" "a" token [ drop ignore ] action optional* "b" token 2array seq parse
+] unit-test
+
 { V{ CHAR: a CHAR: b } } [
     "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse
 ] unit-test
