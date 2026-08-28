@@ -416,28 +416,36 @@ M: choice-parser parser-quot
 
 TUPLE: repeat0-parser parser ;
 
-: repeat-loop ( quot: ( -- result/f ) result -- result )
+: repeat0-loop ( quot: ( -- result/f ) result -- result )
     over call [
         [ remaining>> >>remaining ] [ ast>> ] bi
-        over ast>> push repeat-loop
+        dup ignore = [ drop ] [ over ast>> push ] if
+        repeat0-loop
     ] [
         nip
     ] if* ; inline recursive
 
 M: repeat0-parser parser-quot
     parser>> execute-parser-quot '[
-        input-slice V{ } clone <parse-result> _ swap repeat-loop
+        input-slice V{ } clone <parse-result> _ swap
+        repeat0-loop
     ] ;
 
 TUPLE: repeat1-parser parser ;
 
-: repeat1-empty-check ( result -- result )
-    [ dup ast>> empty? [ drop f ] when ] [ f ] if* ;
+: repeat1-loop ( quot: ( -- result/f ) result -- result )
+    over call [
+        [ remaining>> >>remaining ] [ ast>> ] bi
+        dup ignore = [ drop ] [ over ast>> push ] if
+        repeat0-loop
+    ] [
+        2drop f
+    ] if* ; inline
 
 M: repeat1-parser parser-quot
     parser>> execute-parser-quot '[
-        input-slice V{ } clone <parse-result> _ swap repeat-loop
-        repeat1-empty-check
+        input-slice V{ } clone <parse-result> _ swap
+        repeat1-loop
     ] ;
 
 TUPLE: optional-parser parser ;

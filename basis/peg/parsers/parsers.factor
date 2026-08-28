@@ -32,8 +32,8 @@ M: list-parser parser-quot
     '[
         input-slice V{ } clone <parse-result>
         _ parse-seq-element [
-            [ @ _ [ f ] if ] swap repeat-loop
-            _ [ dup ast>> length 2 < [ drop f ] when ] when
+            [ @ _ [ f ] if ] swap
+            _ [ repeat1-loop ] [ repeat0-loop ] if
         ] [ f ] if*
     ] ;
 
