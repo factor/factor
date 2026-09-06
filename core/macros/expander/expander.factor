@@ -71,11 +71,13 @@ M: wrapper expand-macros* wrapped>> literal ;
     } 1|| ;
 
 : expand-macro? ( word -- quot ? )
-    dup macro-quot [
-        swap macro-effect stack get length <=
-    ] [
-        drop f f
-    ] if* ;
+    dup "no-parse-expand" word-prop [ drop f f ] [
+        dup macro-quot [
+            swap macro-effect stack get length <=
+        ] [
+            drop f f
+        ] if*
+    ] if ;
 
 M: word expand-macros*
     {

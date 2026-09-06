@@ -89,6 +89,9 @@ ERROR: no-next-method method ;
 : (call-next-method) ( method -- )
     [ next-method-quot ] [ call ] [ no-next-method ] ?if ;
 
+! The compiler must see this call to record its next-method dependency.
+\ (call-next-method) t "no-parse-expand" set-word-prop
+
 ERROR: check-method-error class generic ;
 
 : check-method ( classoid generic -- class generic )
