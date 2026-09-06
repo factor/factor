@@ -10,6 +10,8 @@ C: <lambda> lambda
 
 TUPLE: let body ;
 
+TUPLE: tuple-template class values ;
+
 C: <let> let
 
 TUPLE: quote local ;

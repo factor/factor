@@ -1,9 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects.parser fry generic.parser
+USING: accessors arrays assocs classes.tuple classes.tuple.parser
+effects.parser fry generic.parser
 kernel lexer locals.errors locals.rewrite locals.types
 make namespaces parser quotations sequences splitting
 vocabs.parser words ;
+FROM: classes.tuple.private => pad-slots ;
 IN: locals.parser
 
 SYMBOL: in-lambda?
@@ -30,6 +32,10 @@ ERROR: invalid-local-name name ;
     "|" parse-tokens make-locals ;
 
 SINGLETON: lambda-parser
+
+M: lambda-parser literal>object
+    drop over tuple-class? over rewrite-literal? and
+    [ swap pad-slots swap tuple-template boa ] [ boa>object ] if ;
 
 : with-lambda-scope ( assoc reader-quot: ( -- quot ) -- quot )
     H{

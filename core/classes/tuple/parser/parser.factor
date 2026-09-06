@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.parser classes.tuple
-combinators kernel lexer make parser parser.notes sequences sets
+combinators kernel lexer make namespaces parser parser.notes sequences sets
 slots ;
 IN: classes.tuple.parser
 
@@ -96,6 +96,13 @@ GENERIC#: boa>object 1 ( class slots -- tuple )
 M: tuple-class boa>object
     swap slots>tuple ;
 
+GENERIC: literal>object ( class slots parser -- object )
+
+M: object literal>object drop boa>object ;
+
+: parsed>object ( class slots -- object )
+    quotation-parser get literal>object ;
+
 : check-slot-exists ( class initials slot-spec/f index/f name -- class initials slot-spec index )
     over [ drop ] [ 3nip bad-slot-name ] if ;
 
@@ -105,11 +112,11 @@ M: tuple-class boa>object
 : assoc>object ( class slots values -- tuple )
     [ [ [ initial>> ] map <enumerated> ] keep ] dip
     swap [ [ slot-named-checked ] curry dip ] curry assoc-map
-    assoc-union! seq>> boa>object ;
+    assoc-union! seq>> parsed>object ;
 
 : parse-tuple-literal-slots ( class slots -- tuple )
     scan-token {
-        { "f" [ drop \ } parse-until boa>object ] }
+        { "f" [ drop \ } parse-until parsed>object ] }
         { "{" [ 2dup parse-slot-values assoc>object ] }
         { "}" [ drop new ] }
         [ bad-literal-tuple ]
