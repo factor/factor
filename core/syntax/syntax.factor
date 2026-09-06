@@ -252,7 +252,7 @@ IN: bootstrap.syntax
     "<<" [
         [
             \ >> parse-until >quotation
-        ] with-nested-compilation-unit call( -- )
+        ] with-nested-compilation-unit call( accum -- accum )
     ] define-core-syntax
 
     "call-next-method" [

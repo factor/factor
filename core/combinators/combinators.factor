@@ -15,6 +15,10 @@ IN: combinators
 
 : execute-effect-unsafe ( word effect -- ) drop execute ;
 
+GENERIC#: check-call-effect 1 ( quot effect -- )
+
+M: object check-call-effect 2drop ;
+
 M: object throw
     ERROR-HANDLER-QUOT special-object [ die ] or
     ( error -- * ) call-effect-unsafe ;
@@ -31,6 +35,7 @@ SLOT: terminated?
 : call-effect ( quot effect -- )
     ! Don't use fancy combinators here, since this word always
     ! runs unoptimized
+    2dup check-call-effect
     2dup [
         [ [ get-datastack ] dip dip ] dip
         dup terminated?>> [ 2drop f ] [
@@ -41,6 +46,7 @@ SLOT: terminated?
     [ 2drop ] [ wrong-values ] if ;
 
 : execute-effect ( word effect -- )
+    2dup check-call-effect
     [ [ execute ] curry ] dip call-effect ;
 
 ! cleave

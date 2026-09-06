@@ -951,7 +951,9 @@ HELP: PRIVATE>
 HELP: <<
 { $syntax "<< ... >>" }
 { $description "Evaluates some code at parse time." }
-{ $notes "Calling words defined in the same source file at parse time is prohibited; see compilation unit as where it was defined; see " { $link "compilation-units" } "." } ;
+{ $notes "The code may access the parser's accumulation vector with stack effect " { $snippet "( accum -- accum )" } ", for example to append a literal using " { $link suffix! } ". Code with stack effect " { $snippet "( -- )" } " is also accepted."
+    $nl
+    "Calling words defined in the same source file at parse time is prohibited; see " { $link "compilation-units" } "." } ;
 
 HELP: >>
 { $syntax ">>" }
