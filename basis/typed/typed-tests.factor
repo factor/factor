@@ -1,8 +1,25 @@
-USING: accessors combinators compiler.units effects eval kernel kernel.private layouts
-literals math namespaces quotations tools.test typed words words.symbol
+USING: accessors combinators compiler.units continuations effects
+eval kernel kernel.private layouts literals math namespaces
+quotations tools.test typed words words.symbol
 combinators.short-circuit compiler.tree.debugger prettyprint definitions
 sequences classes.intersection strings classes.union ;
 IN: typed.tests
+
+! Termination must survive construction of the unboxed signature.
+TYPED: typed-stop ( n: fixnum -- * ) drop "typed stop" throw ;
+TYPED:: typed-local-stop ( n: fixnum -- * ) n drop "typed local stop" throw ;
+: typed-stop-caller ( n -- * ) typed-stop ;
+{ t } [ \ typed-stop word-optimized? ] unit-test
+{ t } [ \ typed-local-stop word-optimized? ] unit-test
+{ t } [ \ typed-stop-caller word-optimized? ] unit-test
+[ 1 typed-stop ] [ "typed stop" = ] must-fail-with
+[ 1 typed-local-stop ] [ "typed local stop" = ] must-fail-with
+[ 1 typed-stop-caller ] [ "typed stop" = ] must-fail-with
+
+TYPED: invalid-typed-stop ( n: fixnum -- * ) drop ;
+{ f } [ \ invalid-typed-stop "typed-word" word-prop word-optimized? ] unit-test
+[ 1 invalid-typed-stop ] must-fail
+FORGET: invalid-typed-stop
 
 ! #743: recursive must also apply to the inline wrapper.
 TYPED: typed-countdown ( n: fixnum -- result: fixnum )

@@ -61,6 +61,8 @@ ARTICLE: "typed" "Strongly-typed word definitions"
 "The Factor compiler supports advanced compiler optimizations that take advantage of the type information it can glean from source code. The " { $vocab-link "typed" } " vocabulary provides syntax that allows words to provide checked type information about their inputs and outputs and improve the performance of compiled code."
 $nl
 "Parameters and return values of typed words where the type is declared to be a " { $link POSTPONE: final } " tuple class with all slots " { $link read-only } " are passed by value."
+$nl
+"A terminating stack effect, ending in " { $snippet "-- * )" } ", is preserved by both the generated implementation and the public wrapper. A body that returns normally does not satisfy this declaration."
 { $subsections
     POSTPONE: TYPED:
     POSTPONE: TYPED::
