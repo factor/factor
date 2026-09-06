@@ -10,7 +10,7 @@ void factor_vm::primitive_tuple() {
   t->layout = layout.value();
 
   memset_cell(t->data(), false_object,
-              tuple_size(layout.untagged()) - sizeof(cell));
+              tuple_capacity(layout.untagged()) * sizeof(cell));
 
   ctx->push(t.value());
 }
