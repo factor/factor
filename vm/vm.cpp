@@ -55,6 +55,7 @@ factor_vm::~factor_vm() {
     delete data;
   if (code)
     delete code;
+  delete gc_events;
   if (signal_callstack_seg) {
     delete signal_callstack_seg;
     signal_callstack_seg = NULL;
