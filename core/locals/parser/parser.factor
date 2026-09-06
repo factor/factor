@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects.parser generic.parser
+USING: accessors arrays assocs effects.parser fry generic.parser
 kernel lexer locals.errors locals.rewrite locals.types
 make namespaces parser quotations sequences splitting
 vocabs.parser words ;
@@ -36,6 +36,13 @@ SINGLETON: lambda-parser
         { in-lambda? t }
         { quotation-parser lambda-parser }
     } -rot '[ _ _ with-words ] with-variables ; inline
+
+: parse-fry ( reader-quot: ( -- object ) -- quot )
+    '[ t in-fry? _ with-variable fry ]
+    in-lambda? get [ call ] [
+        H{ } clone swap with-lambda-scope
+        <let> rewrite-closures
+    ] if ; inline
 
 : (parse-lambda) ( assoc -- quot )
     [ \ ] parse-until >quotation ] with-lambda-scope ;

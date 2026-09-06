@@ -221,6 +221,8 @@ $nl
 ARTICLE: "locals-fry" "Lexical variables and fry"
 "Lexical variables integrate with " { $link "fry" } " so that mixing variables with fried quotations gives intuitive results."
 $nl
+"A fried quotation establishes a lexical parsing scope, so nested lexical bindings are rewritten after fry has placed its captured values. This also works outside an enclosing lexical word or quotation."
+$nl
 "The following two code snippets are equivalent:"
 { $code "'[ sq _ + ]" }
 { $code "[ [ sq ] dip + ] curry" }
