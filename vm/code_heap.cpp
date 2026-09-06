@@ -262,7 +262,9 @@ void factor_vm::primitive_code_blocks() {
     };
     each_code_block(code_block_counter);
 
-    tagged<array> objects(allot_uninitialized_array<array>(block_count * 6));
+    // A retry can discard this array with unused slots. Large arrays live in
+    // tenured space, where remembered-card scans also visit unreachable objects.
+    tagged<array> objects(allot_array(block_count * 6, false_object));
     cell count = 0;
     bool count_changed = false;
     auto code_block_accumulator = [&](code_block* block, cell size) {
