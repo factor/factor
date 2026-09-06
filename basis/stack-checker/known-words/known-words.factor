@@ -260,6 +260,7 @@ M: object infer-call* \ call bad-macro-input ;
     mega-cache-miss
     inline-cache-miss
     inline-cache-miss-tail
+    inline-cache-miss-resume
     lazy-jit-compile
     set-callstack
     set-datastack
