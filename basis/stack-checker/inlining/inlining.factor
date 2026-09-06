@@ -42,6 +42,7 @@ loop? ;
 
 SYMBOL: enter-in
 SYMBOL: enter-out
+SYMBOL: current-recursive
 
 : prepare-stack ( word -- )
     required-stack-effect in>>
@@ -51,6 +52,7 @@ SYMBOL: enter-out
     ] bi ;
 
 : emit-enter-recursive ( label -- )
+    dup current-recursive set
     enter-out get >>enter-out
     enter-in get enter-out get #enter-recursive,
     enter-out get >vector (meta-d) set
@@ -96,9 +98,14 @@ SYMBOL: enter-out
         terminated? get
     ] with-scope ;
 
+:: preserve-recursive-prefix ( out n -- )
+    enter-in get n head out n head
+    [ [ known ] dip set-known ] 2each ;
+
 : inline-recursive-word ( word -- )
     (inline-recursive-word)
     [
+        3dup nip preserve-recursive-prefix
         ! The recursive node carries the entire stack through its SSA inputs,
         ! but only the prefix reached by its body belongs to its effect.
         inner-d-index get min
@@ -143,9 +150,11 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 : call-recursive-inline-word ( word label -- )
     over recursive? [
         [ required-stack-effect dup in>> length ensure-d drop adjust-stack-effect ] dip
-        ! A new callback boundary needs the conservative depth: this backedge
-        ! can reach row accesses elsewhere in the recursive body.
-        dup effect-scope>> effect-scope get eq? [ inner-d-index get ] [ f ] if [
+        ! An outer recursive label or a new callback boundary can reach
+        ! deeper accesses outside the body whose depth we are measuring.
+        dup [ effect-scope>> effect-scope get eq? ]
+        [ current-recursive get eq? ] bi and
+        [ inner-d-index get ] [ f ] if [
             [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
         ] dip [ inner-d-index set ] when*
     ] [
