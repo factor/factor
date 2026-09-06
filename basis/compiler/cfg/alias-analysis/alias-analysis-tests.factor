@@ -270,6 +270,35 @@ IN: compiler.cfg.alias-analysis.tests
 ] unit-test
 
 ! Make sure that input to ##box-displaced-alien becomes heap-ac
+
+{ t } [
+    V{
+        T{ ##allot f 0 16 byte-array }
+        T{ ##copy f 1 0 any-rep }
+        T{ ##load-integer f 2 0 }
+        T{ ##box-displaced-alien f 3 2 1 4 byte-array }
+        T{ ##compare f 5 0 3 cc= }
+    } test-alias-analysis last ##compare?
+] unit-test
+
+{ t } [
+    V{
+        T{ ##load-integer f 0 0 }
+        T{ ##box-alien f 1 0 2 }
+        T{ ##box-alien f 3 0 4 }
+        T{ ##compare f 5 1 3 cc= }
+    } test-alias-analysis last ##compare?
+] unit-test
+
+{ t } [
+    V{
+        T{ ##allot f 0 16 byte-array }
+        T{ ##load-integer f 1 0 }
+        T{ ##box-displaced-alien f 2 1 0 3 byte-array }
+        T{ ##compare f 4 0 2 cc= }
+    } test-alias-analysis last ##compare?
+] unit-test
+
 {
     V{
         T{ ##allot f 1 16 byte-array }
