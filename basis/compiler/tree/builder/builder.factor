@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators compiler.tree continuations hints
-kernel locals namespaces quotations sequences
+USING: accessors combinators compiler.tree continuations effects
+hints kernel locals namespaces quotations sequences
 stack-checker.backend stack-checker.errors
-stack-checker.recursive-state stack-checker.state
-stack-checker.visitor vectors words ;
+stack-checker.recursive-state stack-checker.row-polymorphism
+stack-checker.state stack-checker.visitor vectors words ;
 IN: compiler.tree.builder
 
 <PRIVATE
@@ -19,10 +19,19 @@ M: callable (build-tree) infer-quot-here ;
 : word-body ( word -- quot )
     dup inline-recursive? [ 1quotation ] [ specialized-def ] if ;
 
+:: check-word-effect ( word -- )
+    word required-stack-effect :> effect
+    word inline? effect variable-effect? and effect terminated?>> not and [
+        ! An inline word can consume values in its row even when static calls
+        ! let us infer its body without knowing its quotation arguments.
+        H{ } clone effect current-effect check-variables
+        [ ] [ current-effect effect effect-error ] if
+    ] [ effect check-effect ] if ;
+
 M: word (build-tree)
     [ check-no-compile ]
     [ word-body infer-quot-here ]
-    [ required-stack-effect check-effect ] tri ;
+    [ check-word-effect ] tri ;
 
 : build-tree-with ( in-stack word/quot -- nodes )
     [
