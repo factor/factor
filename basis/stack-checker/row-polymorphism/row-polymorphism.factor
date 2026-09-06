@@ -6,6 +6,8 @@ math.order namespaces sequences stack-checker.errors
 stack-checker.state stack-checker.values ;
 IN: stack-checker.row-polymorphism
 
+SYMBOL: effect-scope
+
 : with-inner-d ( quot -- inner-d )
     inner-d-index get
     [ meta-d length inner-d-index set call ] dip
@@ -17,8 +19,11 @@ IN: stack-checker.row-polymorphism
     <terminated-effect> ; inline
 
 : with-effect-here ( quot -- effect )
-    meta-d length input-count get
-    [ with-inner-d ] 2dip (effect-here) ; inline
+    effect-scope get [
+        V{ } clone effect-scope set
+        meta-d length input-count get
+        [ with-inner-d ] 2dip (effect-here)
+    ] dip effect-scope set ; inline
 
 : (diff-variable) ( diff variable vars -- diff' )
     [ key? ] [ '[ _ _ at - ] ] [ '[ _ _ set-at 0 ] ] 2tri if ;

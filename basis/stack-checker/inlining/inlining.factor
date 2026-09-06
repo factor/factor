@@ -4,8 +4,8 @@ USING: accessors arrays effects fry hints kernel locals math
 math.order namespaces sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors
 stack-checker.known-words stack-checker.recursive-state
-stack-checker.state stack-checker.values stack-checker.visitor
-vectors words ;
+stack-checker.row-polymorphism stack-checker.state
+stack-checker.values stack-checker.visitor vectors words ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from
@@ -17,6 +17,7 @@ IN: stack-checker.inlining
 TUPLE: inline-recursive < identity-tuple
 id
 word
+effect-scope
 enter-out enter-recursive
 return calls
 fixed-point
@@ -28,7 +29,8 @@ loop? ;
 : <inline-recursive> ( word -- label )
     inline-recursive new
         gensym dup t "inlined-block" set-word-prop >>id
-        swap >>word ;
+        swap >>word
+        effect-scope get >>effect-scope ;
 
 : quotation-param? ( obj -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;
@@ -51,7 +53,8 @@ SYMBOL: enter-out
 : emit-enter-recursive ( label -- )
     enter-out get >>enter-out
     enter-in get enter-out get #enter-recursive,
-    enter-out get >vector (meta-d) set ;
+    enter-out get >vector (meta-d) set
+    meta-d length inner-d-index set ;
 
 : entry-stack-height ( label -- stack )
     enter-out>> length ;
@@ -74,7 +77,7 @@ SYMBOL: enter-out
 : recursive-word-inputs ( label -- n )
     entry-stack-height input-count get + ;
 
-: (inline-recursive-word) ( word -- label in out visitor terminated? )
+: (inline-recursive-word) ( word -- label in out visitor inner-d terminated? )
     dup prepare-stack
     [
         init-inference
@@ -89,12 +92,19 @@ SYMBOL: enter-out
         dup recursive-word-inputs
         meta-d
         stack-visitor get
+        inner-d-index get
         terminated? get
     ] with-scope ;
 
 : inline-recursive-word ( word -- )
     (inline-recursive-word)
-    [ [ consume-d ] [ output-d ] [ ] tri* #recursive, ] dip
+    [
+        ! The recursive node carries the entire stack through its SSA inputs,
+        ! but only the prefix reached by its body belongs to its effect.
+        inner-d-index get min
+        [ [ consume-d ] [ output-d ] [ ] tri* #recursive, ] dip
+        inner-d-index set
+    ] dip
     [ terminate ] when ;
 
 : check-call-height ( label -- )
@@ -132,8 +142,12 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 : call-recursive-inline-word ( word label -- )
     over recursive? [
-        [ required-stack-effect adjust-stack-effect ] dip
-        [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
+        [ required-stack-effect dup in>> length ensure-d drop adjust-stack-effect ] dip
+        ! A new callback boundary needs the conservative depth: this backedge
+        ! can reach row accesses elsewhere in the recursive body.
+        dup effect-scope>> effect-scope get eq? [ inner-d-index get ] [ f ] if [
+            [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
+        ] dip [ inner-d-index set ] when*
     ] [
         drop undeclared-recursion-error inference-error
     ] if ;
