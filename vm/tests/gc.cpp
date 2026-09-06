@@ -139,6 +139,26 @@ static void test_tuple_bounds(cell capacity) {
     check(result->data()[i] == false_object, "tuple slot was not initialized");
 }
 
+static void test_gc_events() {
+  test_vm vm;
+  for (cell i = 0; i < 3; i++) {
+    vm.primitive_enable_gc_events();
+    vm.gc(COLLECT_NURSERY_OP, 0);
+    vm.primitive_enable_gc_events();
+    check(vm.gc_events->empty(), "enabling GC events did not reset recording");
+    vm.gc(COLLECT_NURSERY_OP, 0);
+    vm.primitive_disable_gc_events();
+    check(vm.gc_events == NULL, "GC recording was not disabled");
+    check(array_capacity(untag<factor::array>(vm.ctx->pop())) == 1,
+          "GC events were not returned");
+    vm.primitive_disable_gc_events();
+    check(vm.ctx->pop() == false_object, "disabling inactive recording failed");
+  }
+  // Also exercise VM destruction while recording is enabled, for leak checks.
+  vm.primitive_enable_gc_events();
+  vm.gc(COLLECT_NURSERY_OP, 0);
+}
+
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
@@ -155,5 +175,7 @@ int main(int argc, char** argv) {
     test_tuple_bounds(2);
     test_tuple_bounds(3);
   }
+  if (argc == 1 || strcmp(argv[1], "events") == 0)
+    test_gc_events();
   std::cout << "GC tests passed" << std::endl;
 }

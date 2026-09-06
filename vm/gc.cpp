@@ -165,7 +165,10 @@ void factor_vm::primitive_compact_gc() {
 }
 
 void factor_vm::primitive_enable_gc_events() {
-  gc_events = new std::vector<gc_event>();
+  if (gc_events)
+    gc_events->clear();
+  else
+    gc_events = new std::vector<gc_event>();
 }
 
 // Allocates memory (byte_array_from_value, result.add)
@@ -174,10 +177,10 @@ void factor_vm::primitive_disable_gc_events() {
   if (gc_events) {
     growable_array result(this);
 
-    std::vector<gc_event>* gc_events = this->gc_events;
+    std::vector<gc_event>* events = gc_events;
     this->gc_events = NULL;
 
-    FACTOR_FOR_EACH(*gc_events) {
+    FACTOR_FOR_EACH(*events) {
       gc_event event = *iter;
       byte_array* obj = byte_array_from_value(&event);
       result.add(tag<byte_array>(obj));
@@ -186,7 +189,7 @@ void factor_vm::primitive_disable_gc_events() {
     result.trim();
     ctx->push(result.elements.value());
 
-    delete this->gc_events;
+    delete events;
   } else
     ctx->push(false_object);
 }
