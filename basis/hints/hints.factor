@@ -121,9 +121,9 @@ set-specializer
 
 \ split { string string } set-specializer
 
-\ member? { { array } { string } } set-specializer
-
-\ member-eq? { { array } { string } } set-specializer
+{ member? member-eq? index index-from last-index last-index-from } [
+    { { array } { string } } set-specializer
+] each
 
 \ assoc-stack { vector } set-specializer
 
