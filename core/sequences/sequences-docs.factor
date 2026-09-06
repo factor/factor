@@ -1815,9 +1815,10 @@ HELP: collector
 
 HELP: binary-reduce
 { $values
-    { "seq" sequence } { "start" integer } { "quot" { $quotation ( elt1 elt2 -- newelt ) } }
+    { "seq" sequence } { "start" object } { "quot" { $quotation ( ... elt1 elt2 -- ... newelt ) } }
     { "value" object } }
 { $description "Like " { $link reduce } ", but splits the sequence in half recursively until each sequence is small enough, and calls the quotation on these smaller sequences. If the quotation computes values that depend on the size of their input, such as bignum arithmetic, then this algorithm can be more efficient than using " { $link reduce } "." }
+{ $notes "The quotation may update values below its two inputs. The left half is reduced before the right half, and intermediate results are kept out of the quotation's row." }
 { $examples "Computing factorial:"
     { $example "USING: prettyprint sequences math ;"
     "40 <iota> rest-slice 1 [ * ] binary-reduce ."

@@ -1011,7 +1011,7 @@ PRIVATE>
 : nth3-unsafe ( n seq -- a b c )
     [ nth2-unsafe ] [ [ 2 + ] dip nth-unsafe ] 2bi ; inline
 
-: (binary-reduce) ( seq start quot: ( elt1 elt2 -- newelt ) from length -- value )
+: (binary-reduce) ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) from length -- ... value )
     ! We can't use case here since combinators depends on
     ! sequences
     dup 4 < [
@@ -1024,12 +1024,15 @@ PRIVATE>
     ] [
         [ 2/ ] [ over - ] bi [ 2dup + ] dip
         [ (binary-reduce) ] [ 2curry ] curry 2bi@
-        pick [ 3bi ] dip call
+        pick [
+            [ 3curry ] bi-curry@ 3bi
+            [ call ] dip swap [ call ] dip swap
+        ] dip call
     ] if ; inline recursive
 
 PRIVATE>
 
-: binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
+: binary-reduce ( ... seq start quot: ( ... elt1 elt2 -- ... newelt ) -- ... value )
     pick dup slice? [
         [ seq>> ] 3dip [ from>> 0 max ] [ to>> 0 max over - ] bi
     ] [

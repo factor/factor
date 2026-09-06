@@ -3,6 +3,25 @@ math.functions math.order math.parser math.vectors sbufs
 sequences sequences.private strings tools.test vectors ;
 IN: sequences.tests
 
+! #879: recursive reduction must leave the accumulator below its inputs.
+: counted-tree ( seq -- count tree )
+    0 swap f [ [ 1 + ] 2dip 2array ] binary-reduce ;
+
+{ 0 f } [ { } counted-tree ] unit-test
+{ 0 1 } [ { 1 } counted-tree ] unit-test
+{ 1 { 1 2 } } [ { 1 2 } counted-tree ] unit-test
+{ 2 { { 1 2 } 3 } } [ { 1 2 3 } counted-tree ] unit-test
+{ 3 { { 1 2 } { 3 4 } } } [ { 1 2 3 4 } counted-tree ] unit-test
+{ 4 { { 1 2 } { { 3 4 } 5 } } } [ { 1 2 3 4 5 } counted-tree ] unit-test
+{ 3 { { 1 2 } { 3 4 } } } [ 1 5 { 0 1 2 3 4 5 } <slice> counted-tree ] unit-test
+
+: product2 ( seq -- n )
+    0 swap 1 [
+        dup even? [ 2/ * [ 1 + ] dip ] [ * ] if
+    ] binary-reduce swap shift ;
+
+{ 5040 } [ { 1 2 3 4 5 6 7 } product2 ] unit-test
+
 { "empty" } [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
 { { 1 } "not empty" } [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
 
