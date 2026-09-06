@@ -136,12 +136,12 @@ VM_C_API void reset_context(factor_vm* parent) {
   // been resetted.
 
   context* ctx = parent->ctx;
-  cell arg1 = ctx->pop();
-  cell arg2 = ctx->pop();
+  data_root<object> arg1(ctx->pop(), parent);
+  data_root<object> arg2(ctx->pop(), parent);
   ctx->reset();
-  ctx->push(arg2);
-  ctx->push(arg1);
   parent->init_context(ctx);
+  ctx->push(arg2.value());
+  ctx->push(arg1.value());
 }
 
 // Allocates memory

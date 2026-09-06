@@ -52,7 +52,8 @@ cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
   }
 
   tagged<array> objects(allot_uninitialized_array<array>(element_count));
-  memcpy(objects->data(), &elements[0], element_count * sizeof(cell));
+  if (element_count > 0)
+    memcpy(objects->data(), &elements[0], element_count * sizeof(cell));
   data_roots.resize(orig_size);
   return objects.value();
 }
