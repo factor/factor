@@ -123,6 +123,9 @@ M: typed-gensym parent-word "typed-gensym" word-prop ;
 M: typed-gensym crossref? parent-word crossref? ;
 M: typed-gensym where parent-word where ;
 
+M: typed-gensym make-recursive
+    [ call-next-method ] [ parent-word make-recursive ] bi ;
+
 : define-typed-gensym ( word def effect -- gensym )
     [ 2drop <typed-gensym> dup ]
     [ [ (typed) ] 3curry ]

@@ -8,7 +8,7 @@ HELP: TYPED:
 "TYPED: word ( a b: class ... -- x: class y ... )
     body ;" }
 { $description "Like " { $link POSTPONE: : } ", defines a new word with a given stack effect in the current vocabulary. The inputs and outputs of the stack effect can additionally be given type annotations in the form " { $snippet "a: class" } ". When invoked, the word will attempt to coerce its input values to the declared input types before executing the body, throwing an " { $link input-mismatch-error } " if the types cannot be made to match. The word will likewise attempt to coerce its outputs to their declared types and throw an " { $link output-mismatch-error } " if the types cannot be made to match." }
-{ $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." }
+{ $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." $nl "The " { $link POSTPONE: recursive } " declaration marks both the generated implementation and its inline wrapper, so recursive typed calls retain their input and output checks." }
 { $examples
 "A version of " { $link + } " specialized for floats, converting other real number types:"
 { $example
@@ -26,7 +26,7 @@ HELP: TYPED::
 "TYPED:: word ( a b: class ... -- x: class y ... )
     body ;" }
 { $description "Like " { $link POSTPONE: :: } ", defines a new word with named inputs in the current vocabulary. The inputs and outputs of the stack effect can additionally be given type annotations in the form " { $snippet "a: class" } ". When invoked, the word will attempt to coerce its input values to the declared input types before executing the body, throwing an " { $link input-mismatch-error } " if the types cannot be made to match. The word will likewise attempt to coerce its outputs to their declared types and throw an " { $link output-mismatch-error } " if the types cannot be made to match." }
-{ $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." }
+{ $notes "The aforementioned type conversions and checks are structured in such a way that they will be eliminated by the compiler if it can statically determine that the types of the inputs at a call site or of the outputs in the word definition are always correct." $nl "The " { $link POSTPONE: recursive } " declaration marks both the generated implementation and its inline wrapper, so recursive typed calls retain their input and output checks." }
 { $examples
 "A version of the quadratic formula specialized for floats, converting other real number types:"
 { $example

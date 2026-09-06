@@ -4,6 +4,38 @@ combinators.short-circuit compiler.tree.debugger prettyprint definitions
 sequences classes.intersection strings classes.union ;
 IN: typed.tests
 
+! #743: recursive must also apply to the inline wrapper.
+TYPED: typed-countdown ( n: fixnum -- result: fixnum )
+    dup zero? [ ] [ 1 - typed-countdown ] if ; inline recursive
+
+: typed-countdown-caller ( -- n ) 5 typed-countdown ;
+{ 0 } [ typed-countdown-caller ] unit-test
+{ 0 } [ 0 typed-countdown ] unit-test
+
+TYPED:: typed-factorial ( n: fixnum -- result: fixnum )
+    n zero? [ 1 ] [ n n 1 - typed-factorial * ] if ; inline recursive
+
+: typed-factorial-caller ( -- n ) 5 typed-factorial ;
+{ 120 } [ typed-factorial-caller ] unit-test
+
+TYPED: typed-countdown-input ( n: fixnum -- result )
+    dup zero? [ ] [ 1 - typed-countdown-input ] if ; inline recursive
+
+: typed-countdown-input-caller ( -- n ) 5 typed-countdown-input ;
+{ 0 } [ typed-countdown-input-caller ] unit-test
+
+TUPLE: recursive-pair
+    { n fixnum read-only } { acc fixnum read-only } ; final
+
+TYPED: typed-pair-countdown ( pair: recursive-pair -- result: recursive-pair )
+    dup n>> zero? [ ] [
+        [ n>> 1 - ] [ acc>> 2 * ] bi recursive-pair boa
+        typed-pair-countdown
+    ] if ; inline recursive
+
+: typed-pair-caller ( -- pair ) 3 1 recursive-pair boa typed-pair-countdown ;
+{ 0 8 } [ typed-pair-caller [ n>> ] [ acc>> ] bi ] unit-test
+
 TYPED: f+ ( a: float b: float -- c: float )
     + ;
 
