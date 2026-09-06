@@ -4,6 +4,19 @@ USING: fry tools.test math prettyprint kernel io arrays
 sequences eval accessors ;
 IN: fry.tests
 
+! Placeholders are ordinary words so templates can be constructed and passed.
+{ t } [ [ _ ] first \ _ eq? ] unit-test
+{ t } [ [ @ ] first \ @ eq? ] unit-test
+{ 42 } [ 41 [ _ 1 + ] fry call call ] unit-test
+{ 42 } [ 41 [ 1 + ] [ @ ] fry call call ] unit-test
+{ 1 2 } [ 1 2 [ [ _ _ ] ] fry call call call ] unit-test
+
+MACRO: from-template ( template -- quot ) fry ;
+{ 42 } [ 41 [ _ 1 + ] from-template call ] unit-test
+
+[ [ _ ] call ] [ not-in-a-fry? ] must-fail-with
+[ [ @ ] call ] [ not-in-a-fry? ] must-fail-with
+
 SYMBOLS: a b c d e f g h ;
 
 { [ ] } [ '[ ] ] unit-test

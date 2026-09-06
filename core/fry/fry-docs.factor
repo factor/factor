@@ -2,18 +2,18 @@ USING: help.markup help.syntax quotations kernel ;
 IN: fry
 
 HELP: _
-{ $description "Fry specifier. Inserts a literal value into the fried quotation." }
+{ $description "Fry specifier. Inserts a literal value into the fried quotation. It may also appear in a quotation template passed to " { $link fry } "; executing an unexpanded specifier raises an error." }
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: @
-{ $description "Fry specifier. Splices a quotation into the fried quotation." }
+{ $description "Fry specifier. Splices a quotation into the fried quotation. It may also appear in a quotation template passed to " { $link fry } "; executing an unexpanded specifier raises an error." }
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: fry
 { $values { "object" object } { "quot" quotation } }
 { $description "Outputs a quotation that when called, fries " { $snippet "object" } " by taking values from the stack and substituting them in." }
 { $notes "This word is used to implement " { $link POSTPONE: '[ } "; the following two lines are equivalent:"
-    { $code "[ X ] fry call" "'[ X ]" }
+    { $code "[ _ + ] fry call" "'[ _ + ]" }
 }
 { $examples "See " { $link "fry.examples" } "." } ;
 
