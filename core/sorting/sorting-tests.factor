@@ -1,5 +1,5 @@
 USING: grouping kernel math math.order random sequences sets
-sorting tools.test vocabs ;
+sorting splitting tools.test unicode vocabs ;
 
 { { } } [ { } sort ] unit-test
 
@@ -27,3 +27,18 @@ unit-test
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
 
 [ all-words sort ] must-not-fail
+
+IN: sorting.tests
+
+! #2638: infer recursive key extractors inside a compiled sorting word.
+: digit-order ( str -- str' )
+    " " split [ [ digit? ] find nip ] sort-by " " join ;
+
+: digit-order-comparator ( str -- str' )
+    " " split [ [ [ digit? ] find nip ] bi@ <=> ] sort-with " " join ;
+
+{ "Thi1s is2 3a T4est" } [ "is2 Thi1s T4est 3a" digit-order ] unit-test
+{ "Thi1s is2 3a T4est" } [ "is2 Thi1s T4est 3a" digit-order-comparator ] unit-test
+{ "Fo1r the2 g3ood 4of th5e pe6ople" }
+[ "4of Fo1r pe6ople g3ood th5e the2" digit-order ] unit-test
+{ "" } [ "" digit-order ] unit-test

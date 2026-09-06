@@ -36,8 +36,9 @@ HELP: invert-comparison
     { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
 
 HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" { $quotation ( obj -- newobj ) } } { "<=>" "an ordering specifier" } }
+{ $values { "obj1" object } { "obj2" object } { "quot" { $quotation ( ... obj -- ... key ) } } { "<=>" "an ordering specifier" } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
+{ $notes "The quotation is applied to the first object, then the second. It may update values below its input; computed keys are kept outside that row." }
 { $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "+gt+" }
 } ;
 
