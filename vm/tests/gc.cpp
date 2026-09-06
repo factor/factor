@@ -159,6 +159,44 @@ static void test_gc_events() {
   vm.gc(COLLECT_NURSERY_OP, 0);
 }
 
+static void test_code_blocks_retry() {
+  test_vm vm;
+  const cell block_count = vm.nursery.size / (6 * sizeof(cell)) + 2;
+  {
+    jit_writable_scope writable;
+    delete vm.code;
+    vm.code = new code_heap(align(block_count * 48, deck_size) + deck_size);
+    for (cell i = 0; i < block_count; i++) {
+      code_block* block = vm.code->allocator->allot(48);
+      check(block != NULL, "test code heap filled up");
+      block->set_type(CODE_BLOCK_UNOPTIMIZED);
+      block->owner = block->parameters = block->relocation = false_object;
+      memset(block->block_gc_info(), 0, sizeof(gc_info));
+    }
+    vm.code->initialize_all_blocks_set();
+  }
+
+  // Leave enough space for GC's promotion reserve, but not its reserve plus
+  // the large result array. Its allocation must collect all the dead code.
+  cell size = vm.data->tenured->size - 3 * deck_size;
+  byte_array* garbage = (byte_array*)vm.data->tenured->allot(size);
+  garbage->initialize(BYTE_ARRAY_TYPE);
+  garbage->capacity = tag_fixnum(size - sizeof(byte_array));
+  memset_cell(garbage + 1, 0x12345679, size - sizeof(byte_array));
+  vm.primitive_code_blocks();
+  check(array_capacity(untag<factor::array>(vm.ctx->pop())) == 0,
+        "code-blocks did not retry after collecting dead code");
+
+  // The discarded tenured result is still subject to remembered-card scans.
+  factor::array* discarded = (factor::array*)vm.data->tenured->first_object();
+  check(discarded && discarded->type() == ARRAY_TYPE,
+        "missing discarded code-blocks result");
+  for (cell i = 0; i < array_capacity(discarded); i++)
+    check(discarded->data()[i] == false_object,
+          "code-blocks retry left uninitialized pointer slots in tenured space");
+  vm.gc(COLLECT_AGING_OP, 0);
+}
+
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
@@ -177,5 +215,7 @@ int main(int argc, char** argv) {
   }
   if (argc == 1 || strcmp(argv[1], "events") == 0)
     test_gc_events();
+  if (argc == 1 || strcmp(argv[1], "code-blocks") == 0)
+    test_code_blocks_retry();
   std::cout << "GC tests passed" << std::endl;
 }
