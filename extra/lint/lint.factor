@@ -1,11 +1,12 @@
 ! Copyright (C) 2007, 2008, 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.extras classes
-classes.tuple.private combinators.short-circuit continuations io
-kernel kernel.private locals.backend make math math.private
+classes.tuple.private combinators.short-circuit compiler.tree
+compiler.tree.builder compiler.tree.combinators continuations io
+kernel kernel.private locals locals.backend make math math.private
 namespaces prettyprint quotations sequences sequences.deep
-shuffle slots.private splitting stack-checker vocabs words
-words.alias ;
+shuffle slots.private splitting stack-checker
+stack-checker.dependencies vocabs words words.alias ;
 IN: lint
 
 <PRIVATE
@@ -317,16 +318,46 @@ PRIVATE>
         } 1&&
     ] filter ;
 
+<PRIVATE
+
+: calls-recursively? ( nodes word -- ? )
+    swap [
+        dup #call-recursive?
+        [ label>> word>> over eq? ] [ drop f ] if
+    ] contains-node? nip ;
+
+:: (unused-recursive?) ( word -- ? )
+    word [ build-tree ] without-dependencies word calls-recursively? not ;
+
+PRIVATE>
+
+: unused-recursive? ( word -- ? )
+    error get-global error-continuation get-global [
+        dup inline-recursive? [
+            [ (unused-recursive?) ] [ 2drop f ] recover
+        ] [ drop f ] if
+    ] 2dip
+    [ error set-global ] [ error-continuation set-global ] bi* ;
+
+<PRIVATE
+
+: lint-recursive ( words -- )
+    [ unused-recursive? ] filter [
+        "Unneeded recursive declaration: " write .
+    ] each ;
+
+PRIVATE>
+
 : lint-all ( -- seq )
-    all-words run-lint dup lint. ;
+    all-words [ lint-recursive ] [ run-lint dup lint. ] bi ;
 
 : lint-vocab ( vocab -- seq )
-    vocab-words run-lint dup lint. ;
+    vocab-words [ lint-recursive ] [ run-lint dup lint. ] bi ;
 
 : lint-vocabs ( prefix -- seq )
     [ loaded-vocab-names ] dip [ head? ] curry filter [ lint-vocab ] map ;
 
 : lint-word ( word -- seq )
-    1array run-lint dup lint. ;
+    1array [ lint-recursive ] [ run-lint dup lint. ] bi ;
 
 reload-definitions
