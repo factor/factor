@@ -279,25 +279,33 @@ template <typename Fixup> struct call_frame_slot_visitor {
       }
     }
 
+    auto restore_derived_roots = [&]() {
+      for (cell spill_slot = 0; spill_slot < info->derived_root_count;
+           spill_slot++) {
+        uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
+        if (base_pointer != (uint32_t)-1)
+          stack_pointer[spill_slot] += stack_pointer[base_pointer];
+      }
+    };
+
     // Update all GC roots, including base pointers.
     cell callsite_gc_roots = info->callsite_gc_roots(callsite);
-
-    for (cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++) {
-      if (bitmap_p(bitmap, callsite_gc_roots + spill_slot)) {
-        #ifdef DEBUG_GC_MAPS
-        FACTOR_PRINT("visiting GC root " << spill_slot);
-        #endif
-        visitor->visit_handle(stack_pointer + spill_slot);
+    try {
+      for (cell spill_slot = 0; spill_slot < info->gc_root_count; spill_slot++) {
+        if (bitmap_p(bitmap, callsite_gc_roots + spill_slot)) {
+          #ifdef DEBUG_GC_MAPS
+          FACTOR_PRINT("visiting GC root " << spill_slot);
+          #endif
+          visitor->visit_handle(stack_pointer + spill_slot);
+        }
       }
+    } catch (...) {
+      // A copying collection can run out of space after forwarding only some
+      // bases. Restore pointers using their current bases before GC retries.
+      restore_derived_roots();
+      throw;
     }
-
-    // Add the base pointers to obtain new derived pointer values.
-    for (cell spill_slot = 0; spill_slot < info->derived_root_count;
-         spill_slot++) {
-      uint32_t base_pointer = info->lookup_base_pointer(callsite, spill_slot);
-      if (base_pointer != (uint32_t)-1)
-        stack_pointer[spill_slot] += stack_pointer[base_pointer];
-    }
+    restore_derived_roots();
   }
 };
 

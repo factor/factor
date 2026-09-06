@@ -76,10 +76,63 @@ static void test_compact_alien() {
         "heap growth left a stale alien address");
 }
 
+struct failing_fixup : no_fixup {
+  cell visits = 0;
+  cell fail_at;
+
+  explicit failing_fixup(cell fail_at) : fail_at(fail_at) {}
+
+  object* fixup_data(object* obj) {
+    if (++visits == fail_at)
+      throw must_start_gc_again();
+    return (object*)((cell)obj + 0x1000);
+  }
+};
+
+static void test_derived_roots(cell fail_at) {
+  alignas(data_alignment) uint8_t storage[128] = {};
+  code_block* block = (code_block*)storage;
+  block->header = sizeof(storage);
+  gc_info* info = block->block_gc_info();
+  info->gc_root_count = 4;
+  info->derived_root_count = 4;
+  info->return_address_count = 1;
+  info->return_addresses()[0] = 4;
+  std::fill(info->base_pointer_map(), info->base_pointer_map() + 4, UINT32_MAX);
+  info->base_pointer_map()[1] = 0;
+  info->base_pointer_map()[3] = 2;
+  info->gc_info_bitmap()[0] = 0x5; // Base roots in slots 0 and 2.
+
+  cell stack[] = {0x10009, 0x10031, 0x20009, 0x20002};
+  cell offsets[] = {stack[1] - stack[0], stack[3] - stack[2]};
+  slot_visitor<failing_fixup> visitor(NULL, failing_fixup(fail_at));
+  call_frame_slot_visitor<failing_fixup> visit_frame(&visitor);
+  bool failed = false;
+  try {
+    visit_frame((cell)stack, sizeof(stack), block, block->address_for_offset(4));
+  } catch (const must_start_gc_again&) {
+    failed = true;
+  }
+  check(failed == (fail_at != 0), "unexpected collection failure");
+  check(stack[1] - stack[0] == offsets[0] && stack[3] - stack[2] == offsets[1],
+        "collection failure corrupted derived roots");
+
+  // The higher-generation retry must see pointers, not the temporary offsets.
+  visitor.fixup.fail_at = 0;
+  visit_frame((cell)stack, sizeof(stack), block, block->address_for_offset(4));
+  check(stack[1] - stack[0] == offsets[0] && stack[3] - stack[2] == offsets[1],
+        "collection retry corrupted derived roots");
+}
+
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
   if (argc == 1 || strcmp(argv[1], "become") == 0)
     test_become_alien();
+  if (argc == 1 || strcmp(argv[1], "derived") == 0) {
+    test_derived_roots(0);
+    test_derived_roots(1);
+    test_derived_roots(2);
+  }
   std::cout << "GC tests passed" << std::endl;
 }
