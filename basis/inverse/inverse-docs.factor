@@ -8,7 +8,7 @@ HELP: [undo]
 
 HELP: undo
 { $values { "quot" quotation } }
-{ $description "Executes the inverse of the given quotation" }
+{ $description "Executes the inverse of the given quotation. Captured lexical variables can supply arithmetic operands or values to match. Their values are read when the inverse runs; a value used as a pattern must equal the corresponding stack value." }
 { $see-also [undo] } ;
 
 HELP: define-inverse

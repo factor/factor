@@ -3,7 +3,7 @@
 USING: accessors arrays assocs bit-arrays byte-arrays classes
 classes.tuple combinators combinators.short-circuit
 combinators.smart continuations effects generalizations
-kernel make math math.functions namespaces parser
+kernel locals.types make math math.functions namespaces parser
 quotations sbufs sequences sequences.generalizations slots
 splitting stack-checker strings summary vectors words
 words.symbol ;
@@ -40,8 +40,11 @@ ERROR: bad-math-inverse ;
 : constant-word? ( word -- ? )
     stack-effect [ out>> length 1 = ] [ in>> empty? ] bi and ;
 
+: lexical-value? ( obj -- ? ) [ local? ] [ local-reader? ] bi or ;
+
 : assure-constant ( constant -- quot )
-    dup word? [ bad-math-inverse ] when 1quotation ;
+    dup [ word? ] [ lexical-value? not ] bi and
+    [ bad-math-inverse ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
     next assure-constant rot second '[ @ swap @ ] ;
@@ -80,6 +83,7 @@ SYMBOL: visited
         [ word? ]
         [ primitive? not ]
         [ explicit-inverse? not ]
+        [ lexical-value? not ]
     } 1&& ;
 
 : flatten ( quot -- expanded )
@@ -101,6 +105,9 @@ GENERIC: inverse ( revquot word -- revquot* quot )
 M: object inverse undo-literal ;
 
 M: symbol inverse undo-literal ;
+
+M: local inverse 1quotation [ =/fail ] append ;
+M: local-reader inverse 1quotation [ =/fail ] append ;
 
 M: word inverse undefined-inverse ;
 
