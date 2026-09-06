@@ -8,8 +8,8 @@ compiler.tree.escape-analysis compiler.tree.identities
 compiler.tree.modular-arithmetic compiler.tree.normalization
 compiler.tree.optimizer compiler.tree.propagation
 compiler.tree.recursive compiler.tree.tuple-unboxing effects
-generic hints io kernel make match math namespaces prettyprint
-prettyprint.config prettyprint.custom prettyprint.sections
+generic hints io kernel make match math math.order namespaces
+prettyprint prettyprint.config prettyprint.custom prettyprint.sections
 quotations sequences sequences.private sets sorting words ;
 FROM: syntax => _ ;
 RENAME: _ match => __
@@ -27,10 +27,7 @@ MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( effect -- word/f )
     [ in>> ] [ out>> ] bi 2array {
-        { { { } { } } [ ] }
-        { { { ?a } { ?a } } [ ] }
-        { { { ?a ?b } { ?a ?b } } [ ] }
-        { { { ?a ?b ?c } { ?a ?b ?c } } [ ] }
+        { { ?a ?a } [ ] }
         { { { ?a } { } } [ drop ] }
         { { { ?a ?b } { } } [ 2drop ] }
         { { { ?a ?b ?c } { } } [ 3drop ] }
@@ -123,8 +120,48 @@ M: #alien-callback node>quot
 
 M: node node>quot drop ;
 
-: nodes>quot ( node -- quot )
-    [ [ node>quot ] each ] [ ] make ;
+<PRIVATE
+
+: data-shuffle? ( node -- ? )
+    dup #shuffle? [
+        [ in-r>> empty? ] [ out-r>> empty? ] bi and
+    ] [ drop f ] if ;
+
+: resolve-shuffle-value ( value mapping -- value' )
+    over [ at ] dip or ;
+
+:: compose-data-shuffles ( first second -- node )
+    second in-d>> length :> consumed
+    second in-d>> consumed first out-d>> length - 0 max head :> prefix
+    prefix first out-d>> append :> stack
+    second in-d>> stack consumed tail* zip :> inputs
+    second mapping>> [
+        inputs resolve-shuffle-value
+        first mapping>> resolve-shuffle-value
+    ] assoc-map :> mapping
+    stack consumed head* second out-d>> append :> outputs
+    prefix first in-d>> append outputs
+    outputs first mapping>> mapping assoc-union extract-keys
+    <#data-shuffle> ;
+
+:: (nodes>quot) ( nodes -- )
+    f :> pending!
+    nodes [| node |
+        node data-shuffle? [
+            pending [ pending node compose-data-shuffles ] [ node ] if
+            pending!
+        ] [
+            pending [ node>quot ] when*
+            f pending!
+            node node>quot
+        ] if
+    ] each
+    pending [ node>quot ] when* ;
+
+PRIVATE>
+
+: nodes>quot ( nodes -- quot )
+    [ (nodes>quot) ] [ ] make ;
 
 GENERIC: optimized. ( quot/word -- )
 
