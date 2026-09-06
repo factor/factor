@@ -6,6 +6,24 @@ definitions compiler.units fry lexer words.symbol see multiline
 combinators.smart ;
 IN: locals.tests
 
+! #910: a later intermediate method must invalidate a locals method's caller.
+TUPLE: late-parent ;
+TUPLE: late-middle < late-parent ;
+TUPLE: late-child < late-middle ;
+GENERIC: late-value ( obj -- n )
+M: late-parent late-value drop 1 ;
+M:: late-child late-value ( obj -- n ) obj call-next-method ;
+
+{ 1 } [ late-child new late-value ] unit-test
+{ 2 } [
+    "USING: kernel locals.tests ; IN: locals.tests M: late-middle late-value drop 2 ;" eval( -- )
+    late-child new late-value
+] unit-test
+{ 1 } [
+    "USING: compiler.units definitions kernel locals.tests ; IN: locals.tests [ M\\ late-middle late-value forget ] with-compilation-unit" eval( -- )
+    late-child new late-value
+] unit-test
+
 :: foo ( a b -- a a ) a a ;
 
 { 1 1 } [ 1 2 foo ] unit-test

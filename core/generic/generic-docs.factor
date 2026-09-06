@@ -171,7 +171,7 @@ HELP: create-method
 
 HELP: (call-next-method)
 { $values { "method" method } }
-{ $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
+{ $description "Low-level word implementing " { $link POSTPONE: call-next-method } ". Locals macro expansion preserves this call so the compiler can track changes to the next applicable method." }
 { $notes
     "The " { $link POSTPONE: call-next-method } " word parses into this word. The following are equivalent:"
     { $code
