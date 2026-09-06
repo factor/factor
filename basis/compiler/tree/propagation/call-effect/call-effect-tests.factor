@@ -4,8 +4,8 @@ USING: accessors combinators combinators.private compiler.test
 compiler.tree compiler.tree.builder compiler.tree.debugger
 compiler.tree.optimizer compiler.tree.propagation.call-effect
 compiler.tree.propagation.info
-compiler.units effects eval fry kernel kernel.private math sequences
-tools.test ;
+compiler.units continuations effects eval fry kernel kernel.private
+math namespaces sequences tools.test unicode unicode.normalize ;
 IN: compiler.tree.propagation.call-effect.tests
 
 ! cached-effect
@@ -13,6 +13,32 @@ IN: compiler.tree.propagation.call-effect.tests
 { t } [ \ + cached-effect ( a b -- c ) effect= ] unit-test
 { t } [ 1 \ + curry cached-effect ( a -- c ) effect= ] unit-test
 { t } [ \ + \ sq compose cached-effect ( a b -- c ) effect= ] unit-test
+
+! #949: preserved values do not excuse a known incompatible effect.
+: checked-empty-call ( quot -- ) call( -- ) ;
+: checked-empty-execute ( word -- ) execute( -- ) ;
+: checked-unknown-call ( x input-quot quot -- y ) call( x quot -- y ) ;
+
+[ "Factor" \ nfc checked-empty-execute drop ] [ wrong-values? ] must-fail-with
+[ "Factor" [ nfc ] checked-empty-call drop ] [ wrong-values? ] must-fail-with
+[ 1 [ dup drop ] checked-empty-call drop ] [ wrong-values? ] must-fail-with
+[ "Factor" \ nfc execute( -- ) drop ] [ wrong-values? ] must-fail-with
+[ "Factor" [ nfc ] call( -- ) drop ] [ wrong-values? ] must-fail-with
+{ "Factor" } [ "Factor" \ nfc execute( str -- str' ) ] unit-test
+{ 2 } [ 1 [ 1 + ] [ call ] checked-unknown-call ] unit-test
+
+SYMBOL: incompatible-ran?
+: incompatible-identity ( x -- x ) incompatible-ran? on ;
+{ t } [
+    incompatible-ran? off
+    [ 1 [ incompatible-identity ] checked-empty-call drop f ]
+    [ wrong-values? incompatible-ran? get not and ] recover
+] unit-test
+{ t } [
+    incompatible-ran? off
+    [ 1 \ incompatible-identity checked-empty-execute drop f ]
+    [ wrong-values? incompatible-ran? get not and ] recover
+] unit-test
 { t } [ 5 [ + ] curry cached-effect ( a -- c ) effect= ] unit-test
 { t } [ 5 [ ] curry cached-effect ( -- c ) effect= ] unit-test
 { t } [ [ dup ] [ drop ] compose cached-effect ( a -- b ) effect= ] unit-test
@@ -37,6 +63,7 @@ IN: compiler.tree.propagation.call-effect.tests
     [
         [
             ( -- a b c )
+            2dup check-call-effect
             2dup
             [
                 [ [ get-datastack ] dip dip ] dip dup terminated?>>

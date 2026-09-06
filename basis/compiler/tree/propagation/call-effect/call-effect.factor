@@ -72,10 +72,28 @@ M: word cached-effect 1quotation cached-effect ;
     over +unknown+ eq?
     [ 2drop f ] [ [ { effect } declare ] dip effect<= ] if ; inline
 
+<PRIVATE
+
+SYMBOL: checking-call-effect?
+
+: (check-known-call-effect) ( quot effect -- )
+    over cached-effect dup +unknown+ eq? [ 3drop ] [
+        over effect<= [ 2drop ] [ wrong-values ] if
+    ] if ;
+
+PRIVATE>
+
+: check-known-call-effect ( quot effect -- )
+    checking-call-effect? get [ 2drop ] [
+        t checking-call-effect? [ (check-known-call-effect) ] with-variable
+    ] if ;
+
+M: callable check-call-effect check-known-call-effect ;
+
 : call-effect-fast ( quot effect inline-cache -- )
     2over call-effect-unsafe?
     [ [ nip update-inline-cache ] [ drop call-effect-unsafe ] 3bi ]
-    [ drop call-effect-slow ]
+    [ drop [ check-known-call-effect ] [ call-effect-slow ] 2bi ]
     if ; inline
 
 : call-effect-ic ( quot effect inline-cache -- )
@@ -88,7 +106,8 @@ M: word cached-effect 1quotation cached-effect ;
     inline-cache new '[ drop _ _ call-effect-ic ] ;
 
 : execute-effect-slow ( word effect -- )
-    [ '[ _ execute ] ] dip call-effect-slow ; inline
+    [ [ 1quotation ] dip check-known-call-effect ]
+    [ [ '[ _ execute ] ] dip call-effect-slow ] 2bi ; inline
 
 : execute-effect-unsafe? ( word effect -- ? )
     over word-optimized?

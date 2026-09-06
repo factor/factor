@@ -6,6 +6,14 @@ source-files.errors splitting strings tools.crossref tools.test
 vocabs vocabs.parser words words.symbol ;
 IN: parser.tests
 
+{ 123 } [
+    "USING: sequences ; << 123 suffix! >>" eval( -- n )
+] unit-test
+
+{ 7 } [
+    "USE: kernel << 1 drop >> 7" eval( -- n )
+] unit-test
+
 { 1 [ 2 [ 3 ] 4 ] 5 }
 [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval( -- a b c ) ]
 unit-test

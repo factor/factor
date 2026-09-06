@@ -26,6 +26,10 @@ HELP: call-effect-unsafe?
 { $values { "quot" quotation } { "effect" effect } { "?" boolean } }
 { $description "Checks if the given effect is safe with regards to the quotation." } ;
 
+HELP: check-known-call-effect
+{ $values { "quot" callable } { "effect" effect } }
+{ $description "Rejects a callable whose known effect is incompatible with the call site, before it executes. If inference cannot determine its effect, leaves validation to the runtime stack check." } ;
+
 HELP: safe-infer
 { $values { "quot" quotation } { "effect" effect } }
 { $description "Save and restore error variables here, so that we don't pollute words such as " { $link :error } " and " { $link :c } " for the user." } ;
