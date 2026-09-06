@@ -5,7 +5,8 @@ combinators.short-circuit compiler.tree compiler.tree.builder
 compiler.tree.normalization compiler.tree.propagation.info
 compiler.tree.propagation.nodes compiler.tree.recursive generic
 generic.math generic.single generic.standard kernel locals math
-math.partial-dispatch namespaces quotations sequences words ;
+math.partial-dispatch namespaces quotations sequences
+stack-checker.dependencies words ;
 IN: compiler.tree.propagation.inlining
 
 : splicing-call ( #call word -- nodes )
@@ -98,7 +99,7 @@ SYMBOL: history
     "custom-inlining" word-prop ;
 
 : inline-custom ( #call word -- ? )
-    [ dup ] [ custom-inlining? ] bi*
+    [ dup ] [ dup +definition+ depends-on custom-inlining? ] bi*
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 

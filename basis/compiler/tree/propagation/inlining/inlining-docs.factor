@@ -15,7 +15,7 @@ HELP: custom-inlining?
 
 HELP: do-inlining
 { $values { "#call" #call } { "word" word } { "?" boolean } }
-{ $description "Performs inlining of the word in the #call node. If there's a custom inlining hook, it is permitted to return f, which means that we try the normal inlining heuristic." } ;
+{ $description "Performs inlining of the word in the #call node. If there's a custom inlining hook, it is permitted to return f, which means that we try the normal inlining heuristic. Invoking a custom hook records a dependency on the owning word's definition, so redefining that word recompiles callers and reruns the hook." } ;
 
 HELP: inline-math-method
 { $values { "#call" #call } { "word" word } { "?" boolean } }
