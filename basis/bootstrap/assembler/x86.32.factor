@@ -311,6 +311,12 @@ IN: bootstrap.assembler.x86
 
         jit-jump-quot
     ] }
+    { inline-cache-miss-resume [
+        stack-reg stack-frame-size bootstrap-cell - SUB
+        jit-inline-cache-miss
+        stack-reg stack-frame-size bootstrap-cell - ADD
+        return-reg JMP
+    ] }
 
     ! ## Math
     { fixnum+ [ [ ADD ] "overflow_fixnum_add" jit-overflow ] }

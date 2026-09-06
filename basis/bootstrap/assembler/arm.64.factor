@@ -163,6 +163,15 @@ big-endian off
 ] PIC-HIT jit-define
 
 [
+    PIC-TAIL LR MOV
+    0 B f rc-relative-arm-b rel-word
+] PIC-MISS-JUMP jit-define
+
+[
+    0 B f rc-relative-arm-b rel-word
+] PIC-MISS-TAIL-JUMP jit-define
+
+[
     type obj tag-bits get dup UBFIZ
     type tuple type-number tag-fixnum CMP
     [ BNE ] [
@@ -268,6 +277,19 @@ big-endian off
         XZR VM vm-fault-flag-offset [+] STR
         temp arg1 quot-entry-point-offset [+] LDR
         temp BR
+    ] }
+    { inline-cache-miss-resume [
+        FP LR SP -16 [pre] STP
+        FP SP MOV
+        FP CTX context-callstack-top-offset [+] STR
+        DS RS CTX context-datastack-offset [+] STP
+        arg1 PIC-TAIL MOV
+        arg2 VM MOV
+        IP0 CACHE-MISS MOV
+        TRAMPOLINE BLR
+        DS RS CTX context-datastack-offset [+] LDP
+        FP LR SP 16 [post] LDP
+        RETURN BR
     ] }
     { fpu-state [ FPSR XZR MSR ] }
     { set-fpu-state [ ] }

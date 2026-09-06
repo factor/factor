@@ -229,7 +229,9 @@ big-endian off
 
 ! ! ! Polymorphic inline caches
 
-! The PIC stubs are not permitted to touch pic-tail-reg.
+! PIC checks and hits must preserve pic-tail-reg for tail calls. The ordinary
+! miss template captures its call-site return address there before leaving the
+! PIC; the tail miss template preserves the existing value.
 
 ! Load a value from a stack position
 [
@@ -252,6 +254,15 @@ big-endian off
 ] PIC-CHECK-TAG jit-define
 
 [ 0 JE f rc-relative rel-word ] PIC-HIT jit-define
+
+[
+    pic-tail-reg stack-reg [] MOV
+    0 JMP f rc-relative rel-word
+] PIC-MISS-JUMP jit-define
+
+[
+    0 JMP f rc-relative rel-word
+] PIC-MISS-TAIL-JUMP jit-define
 
 ! ! ! Megamorphic caches
 
