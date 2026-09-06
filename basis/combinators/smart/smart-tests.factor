@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.smart kernel
-math random sequences stack-checker tools.test ;
+math random sequences stack-checker stack-checker.errors tools.test ;
 IN: combinators.smart.tests
 
 : test-bi ( -- 9 11 )
@@ -46,6 +46,32 @@ IN: combinators.smart.tests
 \ nested-smart-combo-test def>> must-infer
 
 { { { 1 2 } { 3 4 } } } [ nested-smart-combo-test ] unit-test
+
+! #2096: infer the captured quotation, not just its unbound body.
+: nested-fry ( a b -- array )
+    '[ [ _ _ ] output>array ] output>array ;
+
+{ 2 1 } [ '[ [ _ _ ] output>array ] output>array ] must-infer-as
+{ { { 1 2 } } } [ 1 2 nested-fry ] unit-test
+
+:: nested-locals ( a b -- array )
+    [ [ a b ] output>array ] output>array ;
+
+{ { { 3 4 } } } [ 3 4 nested-locals ] unit-test
+
+: composed-smart ( x -- array )
+    [ [ ] curry ] curry [ call ] compose output>array ;
+
+{ { 5 } } [ 5 composed-smart ] unit-test
+{ 1 1 } [ [ [ ] curry ] curry [ call ] compose output>array ] must-infer-as
+
+: dynamic-composed-inputs ( quot -- n ) [ ] compose inputs ;
+{ 2 } [ [ + ] dynamic-composed-inputs ] unit-test
+
+! Unknown callable values must still be checked when they become available.
+[ [ '[ _ call ] output>array ] infer ] must-fail
+[ [ '[ _ [ 1 ] [ ] if ] output>array ] infer ]
+[ unbalanced-branches-error? ] must-fail-with
 
 { 14 } [ [ 1 2 3 ] [ sq ] [ + ] map-reduce-outputs ] unit-test
 

@@ -1,8 +1,10 @@
 ! Copyright (C) 2009, 2011 Doug Coleman, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators effects
-generalizations kernel math sequences sequences.generalizations
-stack-checker stack-checker.backend stack-checker.values
+USING: accessors arrays assocs combinators continuations effects
+generalizations kernel math namespaces sequences
+sequences.generalizations stack-checker stack-checker.backend
+stack-checker.errors stack-checker.inlining
+stack-checker.known-words stack-checker.state stack-checker.values
 stack-checker.visitor words ;
 IN: combinators.smart
 
@@ -32,17 +34,27 @@ IDENTITY-MEMO: inputs/outputs ( quot -- in out )
     ] if*
 ] "special" set-word-prop
 
-M: curried-effect infer-known*
-    quot>> infer-known dup [
-        curry-effect
-    ] [
-        drop f
-    ] if ;
+<PRIVATE
 
-M: composed-effect infer-known*
-    [ quot1>> ] [ quot2>> ] bi
-    [ infer-known ] bi@
-    2dup and [ compose-effects ] [ 2drop f ] if ;
+: infer-known-call ( known -- effect/f )
+    ! Preserve captures, but do not bind the enclosing quotation declarations
+    ! while probing a callable's arity.
+    known-values get [ (undeclared-known) ] map-values [
+        [
+            known-values set
+            V{ } clone (meta-r) set
+            make-known dup known infer-call*
+        ] with-infer drop
+    ] [
+        dup [ unknown-macro-input? ] [ bad-macro-input? ] bi or
+        [ 3drop f ] [ rethrow ] if
+    ] recover ;
+
+PRIVATE>
+
+M: curried-effect infer-known* infer-known-call ;
+
+M: composed-effect infer-known* infer-known-call ;
 
 M: declared-effect infer-known*
     known>> infer-known* ;
