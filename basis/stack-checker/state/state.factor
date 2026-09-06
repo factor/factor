@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: assocs arrays namespaces sequences kernel definitions
-math effects accessors words fry classes.algebra
+math effects accessors words classes.algebra
 compiler.units stack-checker.values stack-checker.visitor
 stack-checker.errors ;
 IN: stack-checker.state

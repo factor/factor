@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects fry grouping kernel locals math
+USING: accessors arrays assocs effects grouping kernel math
 namespaces quotations sequences stack-checker.backend
 stack-checker.errors stack-checker.recursive-state
 stack-checker.row-polymorphism stack-checker.state

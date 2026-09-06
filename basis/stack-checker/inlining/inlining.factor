@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays effects fry hints kernel locals math
+USING: accessors arrays effects hints kernel math
 math.order namespaces sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors
 stack-checker.known-words stack-checker.recursive-state
