@@ -253,6 +253,7 @@ ABOUT: "combinators"
 HELP: call-effect
 { $values { "quot" quotation } { "effect" effect } }
 { $description "Given a quotation and a stack effect, calls the quotation, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary quotation which is not required at compile time." }
+{ $notes "The runtime check requires enough values for the declared inputs and outputs, the declared change in stack height, and an unchanged stack prefix below the inputs. It checks the resulting stack rather than tracing every access made by the quotation." }
 { $examples
   "The following two lines are equivalent:"
   { $code

@@ -251,13 +251,13 @@ void factor_vm::primitive_set_retainstack() {
 void factor_vm::primitive_check_datastack() {
   fixnum out = to_fixnum(ctx->pop());
   fixnum in = to_fixnum(ctx->pop());
-  fixnum height = out - in;
   array* saved_datastack = untag_check<array>(ctx->pop());
   fixnum saved_height = array_capacity(saved_datastack);
   fixnum current_height =
       (ctx->datastack - ctx->datastack_seg->start + sizeof(cell)) /
       sizeof(cell);
-  if (current_height - height != saved_height)
+  if (in < 0 || out < 0 || in > saved_height || out > current_height ||
+      current_height - out != saved_height - in)
     ctx->push(false_object);
   else {
     cell* ds_bot = (cell*)ctx->datastack_seg->start;
