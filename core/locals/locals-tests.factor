@@ -6,6 +6,13 @@ definitions compiler.units fry lexer words.symbol see multiline
 combinators.smart ;
 IN: locals.tests
 
+TUPLE: typed-local-tuple { value integer } { other integer initial: 10 } ;
+{ 5 } [ 5 [| x | T{ typed-local-tuple f x } ] call value>> ] unit-test
+{ 6 } [ 6 [| x | T{ typed-local-tuple { value x } } ] call value>> ] unit-test
+{ 10 } [ 6 [| x | T{ typed-local-tuple f x } ] call other>> ] unit-test
+{ 5 } [ 5 [| x | { T{ typed-local-tuple f x } } ] call first value>> ] unit-test
+[ "bad" [| x | T{ typed-local-tuple f x } ] call ] must-fail
+
 ! #910: a later intermediate method must invalidate a locals method's caller.
 TUPLE: late-parent ;
 TUPLE: late-middle < late-parent ;

@@ -158,6 +158,8 @@ IN: scratchpad
 ARTICLE: "locals-literals" "Lexical variables in literals"
 "Certain data type literals are permitted to contain lexical variables. Any such literals are rewritten into code which constructs an instance of the type with the values of the variables spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
 $nl
+"Tuple literals may use lexical variables in typed slots. These values are checked when the tuple is constructed, and omitted slots retain their declared defaults."
+$nl
 "The data types which receive this special handling are the following:"
 { $list
     { $link "arrays" }

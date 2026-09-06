@@ -36,6 +36,8 @@ GENERIC: rewrite-literal? ( obj -- ? )
 
 M: special rewrite-literal? drop t ;
 
+M: tuple-template rewrite-literal? drop t ;
+
 M: sequence rewrite-literal? [ rewrite-literal? ] any? ;
 
 M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
@@ -65,6 +67,9 @@ M: tuple rewrite-element
     dup rewrite-literal? [
         [ tuple-slots rewrite-elements ] [ class-of ] bi '[ _ boa ] %
     ] [ , ] if ;
+
+M: tuple-template rewrite-element
+    [ values>> rewrite-elements ] [ class>> ] bi '[ _ boa ] % ;
 
 M: quotation rewrite-element rewrite-sugar* ;
 
