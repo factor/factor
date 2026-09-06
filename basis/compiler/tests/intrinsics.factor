@@ -10,6 +10,21 @@ QUALIFIED-WITH: alien.c-types c
 IN: compiler.tests.intrinsics
 
 ! Make sure that intrinsic ops compile to correct code.
+
+! Pointer boxing can return f or the original base, rather than allocate.
+{ t } [ [ 0 <alien> 0 <alien> = ] compile-call ] unit-test
+{ t } [ [ 0 <alien> 0 <alien> eq? ] compile-call ] unit-test
+{ t } [ [ 0 <alien> f eq? ] compile-call ] unit-test
+{ t } [
+    [ 8 <byte-array> dup 0 swap <displaced-alien> eq? ] compile-call
+] unit-test
+{ t } [
+    [ 123 <alien> dup 0 swap <displaced-alien> eq? ] compile-call
+] unit-test
+{ t } [
+    [ cell <byte-array> 0 alien-cell 0 <alien> eq? ] compile-call
+] unit-test
+{ f } [ [ 1 <alien> 0 <alien> = ] compile-call ] unit-test
 { } [ 1 [ drop ] compile-call ] unit-test
 { } [ 1 2 [ 2drop ] compile-call ] unit-test
 { } [ 1 2 3 [ 3drop ] compile-call ] unit-test

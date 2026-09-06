@@ -175,9 +175,15 @@ M: allocation-insn analyze-aliases
     ! object.
     dup dst>> set-new-ac ;
 
+M: ##box-alien analyze-aliases
+    ! Boxing a null address returns f, not a fresh object.
+    dup dst>> heap-ac get set-ac ;
+
 M: ##box-displaced-alien analyze-aliases
-    [ call-next-method ]
-    [ base>> heap-ac get merge-acs ] bi ;
+    ! Zero displacement returns the base itself. The base also
+    ! escapes through the newly allocated alien for nonzero offsets.
+    dup [ dst>> heap-ac get set-ac ]
+    [ base>> resolve heap-ac get merge-acs ] bi ;
 
 M: read-insn analyze-aliases
     call-next-method

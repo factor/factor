@@ -16,6 +16,8 @@ $nl
 $nl
 "Freshly-allocated objects get their own alias class."
 $nl
+"Pointer boxing is an exception: " { $link ##box-alien } " can return " { $link f } ", and " { $link ##box-displaced-alien } " can return its base when the displacement is zero. Their results belong to the shared heap alias class."
+$nl
 "Simple pseudo-C example showing load elimination:"
 { $code
   "int *x, *y, z: inputs"
