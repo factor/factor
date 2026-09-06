@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2011 Slava Pestov, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: fry accessors alien alien.accessors alien.private arrays
+USING: accessors alien alien.accessors alien.private arrays
 byte-arrays classes continuations.private effects generic
 hashtables hashtables.private io io.backend io.files
 io.files.private io.streams.c kernel kernel.private math
@@ -11,7 +11,7 @@ sequences.private slots.private strings strings.private system
 threads.private classes.tuple classes.tuple.private vectors
 vectors.private words words.private definitions assocs summary
 compiler.units system.private combinators tools.memory.private
-combinators.short-circuit locals locals.backend locals.types
+combinators.short-circuit locals.backend locals.types
 combinators.private stack-checker.values generic.single
 generic.single.private alien.libraries tools.dispatch.private
 macros tools.profiler.sampling.private classes.algebra

@@ -3,7 +3,7 @@
 
 USING: accessors alien.c-types arrays assocs classes
 classes.algebra classes.algebra.private classes.maybe
-classes.tuple combinators.short-circuit fry generic kernel math
+classes.tuple combinators.short-circuit generic kernel math
 namespaces sequences sets words ;
 
 FROM: classes.tuple.private => tuple-layout ;

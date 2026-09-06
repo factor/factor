@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs fry kernel namespaces quotations
+USING: accessors assocs kernel namespaces quotations
 sequences stack-checker.errors stack-checker.recursive-state ;
 IN: stack-checker.values
 

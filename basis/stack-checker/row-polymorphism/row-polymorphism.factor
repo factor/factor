@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff
 ! See https://factorcode.org/license.txt for BSD license
 USING: accessors arrays assocs combinators
-combinators.short-circuit effects fry kernel locals math
+combinators.short-circuit effects kernel math
 math.order namespaces sequences stack-checker.errors
 stack-checker.state stack-checker.values ;
 IN: stack-checker.row-polymorphism
