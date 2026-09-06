@@ -4,7 +4,8 @@ USING: accessors combinators compiler.tree continuations effects
 hints kernel locals namespaces quotations sequences
 stack-checker.backend stack-checker.errors
 stack-checker.recursive-state stack-checker.row-polymorphism
-stack-checker.state stack-checker.visitor vectors words ;
+stack-checker.state stack-checker.values stack-checker.visitor
+vectors words ;
 IN: compiler.tree.builder
 
 <PRIVATE
@@ -28,10 +29,28 @@ M: callable (build-tree) infer-quot-here ;
         [ ] [ current-effect effect effect-error ] if
     ] [ effect check-effect ] if ;
 
+:: declare-runtime-effects ( word -- )
+    word required-stack-effect :> effect
+    word inline? effect variable-effect? or [ ] [
+        effect in>> [
+            ?quotation-effect dup [
+                dup variable-effect? [ drop f ] when
+            ] when
+        ] map :> effects
+        effects [ ] any? [
+            effects length ensure-d effects [| value effect/f |
+                effect/f [ <runtime-effect> value set-known ] when*
+            ] 2each
+        ] when
+    ] if ;
+
 M: word (build-tree)
-    [ check-no-compile ]
-    [ word-body infer-quot-here ]
-    [ check-word-effect ] tri ;
+    {
+        [ check-no-compile ]
+        [ declare-runtime-effects ]
+        [ word-body infer-quot-here ]
+        [ check-word-effect ]
+    } cleave ;
 
 : build-tree-with ( in-stack word/quot -- nodes )
     [

@@ -36,10 +36,23 @@ SYMBOLS: +bottom+ +top+ ;
 : remove-bottom ( seq -- seq' )
     +bottom+ swap remove ;
 
+<PRIVATE
+
+:: same-runtime-effect? ( knowns -- ? )
+    knowns [ runtime-effect? ] all? [
+        knowns first effect>> :> effect
+        knowns [ effect>> effect effect= ] all?
+    ] [ f ] if ;
+
+: same-known? ( knowns -- ? )
+    dup all-eq? [ drop t ] [ same-runtime-effect? ] if ;
+
+PRIVATE>
+
 : unify-values ( values -- phi-out )
     remove-bottom
     [ <value> ] [
-        [ known ] map dup all-eq?
+        [ known ] map dup same-known?
         [ first make-known ] [ drop <value> ] if
     ] if-empty ;
 
@@ -148,11 +161,12 @@ M: word infer-branch >quotation infer-branch ;
     infer-branches
     [ first2 #if, ] dip compute-phi-function ;
 
-GENERIC: curried/composed? ( known -- ? )
-M: object curried/composed? drop f ;
-M: curried-effect curried/composed? drop t ;
-M: composed-effect curried/composed? drop t ;
-M: declared-effect curried/composed? known>> curried/composed? ;
+GENERIC: indirect-branch? ( known -- ? )
+M: object indirect-branch? drop f ;
+M: curried-effect indirect-branch? drop t ;
+M: composed-effect indirect-branch? drop t ;
+M: runtime-effect indirect-branch? drop t ;
+M: declared-effect indirect-branch? known>> indirect-branch? ;
 
 : declare-if-effects ( -- )
     H{ } clone V{ } clone
@@ -167,7 +181,7 @@ M: declared-effect curried/composed? known>> curried/composed? ;
         drop 2 ensure-d
         declare-if-effects
         2 shorten-d
-        dup [ known curried/composed? ] any? [
+        dup [ known indirect-branch? ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here

@@ -240,6 +240,10 @@ M: object infer-call* \ call bad-macro-input ;
     add-effect-input add-effect-input
     apply-word/effect ;
 
+M: runtime-effect infer-call*
+    [ push-d ] [ effect>> push-literal ] bi*
+    \ call-effect infer-call-effect ;
+
 { call-effect execute-effect } [
     dup t "no-compile" set-word-prop
     dup '[ _ infer-call-effect ] "special" set-word-prop

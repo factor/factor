@@ -16,12 +16,13 @@ $nl
 { $example "[ 2 + ] infer." "( x -- x )" } ;
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
-"If a word calls a combinator, one of the following two conditions must hold for the stack checker to succeed:"
+"If a word calls a combinator, one of the following conditions must hold for the stack checker to succeed:"
 { $list
   { "The combinator must be called with a quotation that is either literal or built from literal quotations, " { $link curry } ", and " { $link compose } ". (Note that quotations that use " { $vocab-link "fry" } " or " { $vocab-link "locals" } " use " { $link curry } " and " { $link compose } " from the perspective of the stack checker.)" }
   { "If the word is declared " { $link POSTPONE: inline } ", the combinator may additionally be called on one of the word's input parameters or with quotations built from the word's input parameters, literal quotations, " { $link curry } ", and " { $link compose } ". When inline, a word is itself considered to be a combinator, and its callers must in turn satisfy these conditions." }
+  { "In a non-inline word with a fixed stack effect, a quotation input with a monomorphic effect annotation can be called. The compiler inserts a checked static call, including when the parameter is passed through locals, " { $link curry } " or " { $link compose } ". This supplies a call contract, not a literal value for arbitrary macro expansion." }
 }
-"If neither condition holds, the stack checker throws an " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
+"If none of these conditions holds, the stack checker throws an " { $link unknown-macro-input } " or " { $link bad-macro-input } " error. To make the code compile, a runtime checking combinator such as " { $link POSTPONE: call( } " must be used instead. See " { $link "inference-escape" } " for details. An inline combinator can be called with an unknown quotation by " { $link curry } "ing the quotation onto a literal quotation that uses " { $link POSTPONE: call( } "."
 { $heading "Input stack effects" }
 "Inline combinators will verify the stack effect of their input quotations if they are declared in the combinator's stack effect. See " { $link "effects-variables" } " for details."
 { $heading "Examples" }
@@ -37,6 +38,10 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "The following code now passes the stack checker; it would fail were " { $snippet "twice" } " not declared " { $link POSTPONE: inline } ":"
 { $unchecked-example "USE: math.functions" "[ [ sqrt ] twice ] infer." "( x -- x )" }
 { $subheading "Defining a combinator for unknown quotations" }
+"A fixed quotation input annotation lets a non-inline word use " { $link call } ":"
+{ $code ": apply-one ( x quot: ( x -- y ) -- y ) call ;" }
+"This compiles the call with the same runtime checking as " { $snippet "call( x -- y )" } ". Row-polymorphic quotation parameters still require inlining."
+$nl
 "In the next example, " { $link POSTPONE: call( } " must be used because the quotation is the result of calling a runtime accessor, and the compiler cannot make any static assumptions about this quotation at all:"
 { $code
   "TUPLE: action name quot ;"

@@ -97,6 +97,14 @@ M: input-parameter (literal-value?) drop f ;
 
 M: input-parameter (literal) current-word get unknown-macro-input ;
 
+! A monomorphic quotation argument of a non-inline definition.
+TUPLE: runtime-effect effect ;
+C: <runtime-effect> runtime-effect
+
+M: runtime-effect (input-value?) drop t ;
+M: runtime-effect (literal-value?) drop f ;
+M: runtime-effect (literal) current-word get unknown-macro-input ;
+
 ! Argument corresponding to polymorphic declared input of inline combinator
 
 TUPLE: declared-effect known word effect variables branches actual ;

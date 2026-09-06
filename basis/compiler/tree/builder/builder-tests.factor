@@ -1,6 +1,6 @@
-USING: arrays compiler.tree compiler.tree.builder continuations
-kernel locals math ranges sequences stack-checker
-stack-checker.errors tools.test ;
+USING: arrays combinators combinators.smart compiler.tree
+compiler.tree.builder continuations kernel locals math ranges
+sequences stack-checker stack-checker.errors tools.test words ;
 IN: compiler.tree.builder.tests
 
 : inline-recursive ( -- ) inline-recursive ; inline recursive
@@ -84,3 +84,45 @@ FORGET: bad-terminating-row
 
 : terminating-row ( ... -- * ) "stop" throw ; inline
 [ \ terminating-row build-tree ] must-not-fail
+
+! #140: monomorphic quotation parameters can be called without inlining.
+: annotated-call ( x quot: ( x -- y ) -- y ) call ;
+{ 42 } [ 41 [ 1 + ] annotated-call ] unit-test
+{ f } [ \ annotated-call inline? ] unit-test
+{ "below" 42 } [ "below" 41 [ 1 + ] annotated-call ] unit-test
+[ 41 [ drop ] annotated-call ] [ wrong-values? ] must-fail-with
+
+:: annotated-locals ( x quot: ( x -- y ) -- y ) x quot call ;
+{ 42 } [ 41 [ 1 + ] annotated-locals ] unit-test
+
+: annotated-curry ( x quot: ( x y -- z ) -- z )
+    1 swap curry call ;
+{ 42 } [ 41 [ + ] annotated-curry ] unit-test
+
+: annotated-compose ( x quot: ( x -- y ) -- z )
+    [ 1 + ] compose call ;
+{ 42 } [ 40 [ 1 + ] annotated-compose ] unit-test
+
+: annotated-outputs ( quot: ( x -- y z ) -- n ) outputs ;
+{ 3 } [ [ dup dup ] annotated-outputs ] unit-test
+
+:: annotated-choice ( x ? q1: ( a -- b ) q2: ( x -- y ) -- z )
+    x ? [ q1 ] [ q2 ] if call ;
+{ 42 } [ 41 t [ 1 + ] [ 1 - ] annotated-choice ] unit-test
+{ 40 } [ 41 f [ 1 + ] [ 1 - ] annotated-choice ] unit-test
+
+: annotated-if ( x ? q1: ( x -- y ) q2: ( x -- y ) -- z ) if ;
+{ 42 } [ 41 t [ 1 + ] [ 1 - ] annotated-if ] unit-test
+{ 40 } [ 41 f [ 1 + ] [ 1 - ] annotated-if ] unit-test
+
+:: annotated-repeat ( n x quot: ( x -- x' ) -- y )
+    n 0 > [ n 1 - x quot call quot annotated-repeat ] [ x ] if ;
+{ 42 } [ 3 39 [ 1 + ] annotated-repeat ] unit-test
+
+: missing-annotation ( x quot -- y ) call ;
+[ \ missing-annotation build-tree ] [ unknown-macro-input? ] must-fail-with
+FORGET: missing-annotation
+
+: annotated-stopping ( quot: ( -- * ) -- * ) call ;
+[ [ "stopped" throw ] annotated-stopping ] [ "stopped" = ] must-fail-with
+[ [ ] annotated-stopping ] [ wrong-values? ] must-fail-with
