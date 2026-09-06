@@ -1,9 +1,10 @@
 ! Copyright (C) 2008, 2010 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs effects fry grouping kernel math
+USING: accessors arrays assocs effects fry grouping kernel locals math
 namespaces quotations sequences stack-checker.backend
 stack-checker.errors stack-checker.recursive-state
-stack-checker.state stack-checker.values stack-checker.visitor
+stack-checker.row-polymorphism stack-checker.state
+stack-checker.values stack-checker.visitor
 vectors ;
 FROM: sequences.private => dispatch ;
 IN: stack-checker.branches
@@ -47,16 +48,15 @@ SYMBOLS: +bottom+ +top+ ;
 
 SYMBOLS: combinator quotations ;
 
-: simple-unbalanced-branches-error ( word quots branches -- * )
-    [ length [ ( ..a -- ..b ) ] replicate ]
-    [ [ length [ "x" <array> ] bi@ <effect> ] { } assoc>map ] bi
+: simple-unbalanced-branches-error ( word quots actuals -- * )
+    >array dup length [ ( ..a -- ..b ) ] replicate swap
     unbalanced-branches-error ;
 
-: unify-branches ( ins stacks -- in phi-in phi-out )
-    zip [ 0 { } { } ] [
+:: unify-branches ( ins stacks actuals -- in phi-in phi-out )
+    ins stacks zip [ 0 { } { } ] [
         [ keys maximum ] [ ] [ balanced? ] tri
         [ dupd phi-inputs dup phi-outputs ] [
-            [ combinator get quotations get ] dip
+            2drop combinator get quotations get actuals
             simple-unbalanced-branches-error
         ] if
     ] if-empty ;
@@ -68,10 +68,14 @@ SYMBOLS: combinator quotations ;
     [ [ terminated? over at [ drop f ] when ] map ] dip
     branch-variable ;
 
+SYMBOL: branch-effect
+
 : datastack-phi ( seq -- phi-in phi-out )
-    [ input-count branch-variable ]
-    [ inner-d-index branch-variable minimum inner-d-index set ]
-    [ (meta-d) active-variable ] tri
+    [
+        [ input-count branch-variable ]
+        [ inner-d-index branch-variable minimum inner-d-index set ]
+        [ (meta-d) active-variable ] tri
+    ] [ branch-effect active-variable sift ] bi
     unify-branches
     [ input-count set ] [ ] [ dup >vector (meta-d) set ] tri* ;
 
@@ -105,15 +109,20 @@ SYMBOLS: combinator quotations ;
         recursive-state
         stack-visitor
         terminated?
+        branch-effect
     } [ dup get ] H{ } map>assoc ;
 
 GENERIC: infer-branch ( literal -- namespace )
+
+: infer-branch-effect ( quot -- )
+    meta-d length input-count get
+    [ with-inner-d ] 2dip (effect-here) branch-effect set ; inline
 
 M: literal-tuple infer-branch
     [
         copy-inference
         nest-visitor
-        [ value>> quotation set ] [ infer-literal-quot ] bi
+        [ [ value>> quotation set ] [ infer-literal-quot ] bi ] infer-branch-effect
         collect-variables
     ] with-scope ;
 
@@ -124,7 +133,7 @@ M: callable infer-branch
     [
         copy-inference
         nest-visitor
-        [ quotation set ] [ infer-quot-here ] bi
+        [ [ quotation set ] [ infer-quot-here ] bi ] infer-branch-effect
         collect-variables
     ] with-scope ;
 
