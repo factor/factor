@@ -2,6 +2,10 @@ USING: classes compiler.units definitions effects help.markup
 help.syntax kernel parser quotations sequences strings vocabs ;
 IN: words
 
+HELP: make-recursive
+{ $values { "word" word } }
+{ $description "Marks a word as recursive. Methods for generated words may also mark the wrapper through which recursive calls enter the implementation." } ;
+
 ARTICLE: "interned-words" "Looking up and creating words"
 "A word is said to be " { $emphasis "interned" } " if it is a member of the vocabulary named by its vocabulary slot. Otherwise, the word is " { $emphasis "uninterned" } "."
 $nl

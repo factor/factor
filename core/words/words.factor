@@ -149,7 +149,9 @@ M: word make-inline
 : define-inline ( word def effect -- )
     [ define-declared ] [ 2drop make-inline ] 3bi ;
 
-: make-recursive ( word -- )
+GENERIC: make-recursive ( word -- )
+
+M: word make-recursive
     t "recursive" set-word-prop ;
 
 GENERIC: flushable? ( word -- ? )
