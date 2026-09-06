@@ -77,6 +77,7 @@ ERROR: invalid-outputs #call infos ;
     recover ;
 
 : fold-call ( #call word -- )
+    over undo-inlining drop
     [ (fold-call) ] [ drop out-d>> ] 2bi set-value-infos ;
 
 : predicate-output-infos/literal ( info class -- info )
