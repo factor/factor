@@ -1,9 +1,20 @@
 USING: accessors arrays assocs compiler.tree
 compiler.tree.propagation.constraints compiler.tree.propagation.copy
 compiler.tree.propagation.info compiler.tree.propagation.simple hashtables
-kernel math math.intervals math.private namespaces sequences system tools.test
+kernel kernel.private math math.intervals math.private namespaces sequences system tools.test
 words ;
 IN: compiler.tree.propagation.simple.tests
+
+! A later propagation iteration may fold a previously inlined call.
+: folded-recursive-result ( n -- n )
+    integer>fixnum-strict { fixnum } declare
+    dup zero? [ ] [ 1 - folded-recursive-result ] if
+    integer>fixnum-strict ; inline recursive
+
+: folded-recursive-caller ( -- n ) 3 folded-recursive-result ;
+
+{ 0 } [ folded-recursive-caller ] unit-test
+{ 0 } [ 0 folded-recursive-result ] unit-test
 
 : make-value-infos ( classes intervals -- seq )
     [ <class/interval-info>  ] 2map ;
