@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data arrays colors
 combinators combinators.smart continuations kernel math
 math.constants math.functions math.rectangles math.vectors
 namespaces opengl opengl.capabilities opengl.gl opengl.shaders
-opengl.textures sequences sets specialized-arrays
+opengl.textures sequences sets specialized-arrays splitting
 ui.gadgets ui.pens ;
 SPECIALIZED-ARRAY: alien.c-types:float
 IN: ui.render
@@ -170,8 +170,8 @@ M: gadget draw-children
 
 CONSTANT: gl3-vertex-shader-source "
 #version 330 core
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec4 color;
+in vec2 position;
+in vec4 color;
 
 uniform mat4 projection;
 uniform mat4 modelview;
@@ -205,8 +205,8 @@ void main() {
 
 CONSTANT: gl3-texture-vertex-shader-source "
 #version 330 core
-layout(location = 0) in vec2 position;
-layout(location = 1) in vec2 texcoord;
+in vec2 position;
+in vec2 texcoord;
 
 uniform mat4 projection;
 uniform mat4 modelview;
@@ -323,9 +323,28 @@ SYMBOL: gl3-render-state
 
 ! --- Shader Setup ---
 
+: glsl-330? ( -- ? )
+    "3.30" has-glsl-version? ;
+
+: gl3-shader-source ( source -- source' )
+    glsl-330? [ "#version 330 core" "#version 130" replace ] unless ;
+
+: bind-gl3-attributes ( program attributes -- )
+    [ rot glBindAttribLocation ] with each-index ;
+
+: <gl3-program> ( vertex-source fragment-source attributes -- program )
+    [
+        [ gl3-shader-source <vertex-shader> check-gl-shader ]
+        [ gl3-shader-source <fragment-shader> check-gl-shader ] bi* 2array
+        glCreateProgram [ swap attach-shaders ] keep
+    ] dip
+    dupd bind-gl3-attributes
+    dup 0 "out_color" glBindFragDataLocation
+    [ glLinkProgram ] keep gl-error check-gl-program ;
+
 : create-gl3-program ( -- program )
     gl3-vertex-shader-source gl3-fragment-shader-source
-    <simple-gl-program> ;
+    { "position" "color" } <gl3-program> ;
 
 : get-uniform-locations ( program -- proj-loc mv-loc color-loc use-color-loc )
     {
@@ -356,7 +375,7 @@ SYMBOL: gl3-render-state
 
 : create-gl3-texture-program ( -- program )
     gl3-texture-vertex-shader-source gl3-texture-fragment-shader-source
-    <simple-gl-program> ;
+    { "position" "texcoord" } <gl3-program> ;
 
 : get-texture-uniform-locations ( program -- proj-loc mv-loc sampler-loc )
     {
