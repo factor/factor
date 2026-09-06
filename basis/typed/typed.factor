@@ -126,7 +126,8 @@ MACRO: (typed) ( word def effect -- quot )
 
 : unboxed-effect ( effect -- effect' )
     [ in>> "in" unboxed-effect-values ]
-    [ out>> "out" unboxed-effect-values ] bi <effect> ;
+    [ out>> "out" unboxed-effect-values ]
+    [ terminated?>> ] tri <terminated-effect> ;
 
 M: typed-gensym stack-effect call-next-method unboxed-effect ;
 M: typed-gensym parent-word "typed-gensym" word-prop ;
