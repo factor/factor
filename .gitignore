@@ -8,6 +8,8 @@
 *.exe
 *.exp
 *.gch*
+gc-tests
+gc-tests.dSYM/
 *.image
 factor.image.*
 boot.*.image.*

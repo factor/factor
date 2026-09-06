@@ -111,7 +111,7 @@ void factor_vm::collect_compact_impl() {
     auto compact_object_func = [&](object* old_addr, object* new_addr, cell size) {
       (void)old_addr;
       (void)size;
-      forwarder.visit_slots(new_addr);
+      forwarder.visit_object(new_addr);
       forwarder.visit_object_code_block(new_addr);
       tenured->starts.record_object_start_offset(new_addr);
     };
