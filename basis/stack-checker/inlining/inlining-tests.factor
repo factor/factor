@@ -2,6 +2,19 @@ USING: fry kernel locals math namespaces sequences stack-checker
 stack-checker.errors tools.test ;
 IN: stack-checker.inlining.tests
 
+! #2807: the loop must not claim an untouched value buried by its caller.
+: bury-zero ( quot: ( -- ) -- n ) 0 swap call ; inline
+: buried-loop ( -- n ) [ [ f ] loop ] bury-zero ;
+: buried-while ( -- n ) [ [ f ] [ ] while ] bury-zero ;
+: buried-until ( -- n ) [ [ t ] [ ] until ] bury-zero ;
+{ 0 } [ buried-loop ] unit-test
+{ 0 } [ buried-while ] unit-test
+{ 0 } [ buried-until ] unit-test
+{ 0 1 } [ [ [ f ] loop ] bury-zero ] must-infer-as
+
+[ [ [ [ dup drop f ] loop ] bury-zero ] infer ]
+[ unbalanced-branches-error? ] must-fail-with
+
 ! #165: an inline recursive callback must not appear to touch the whole stack.
 : countdown ( n -- n ) dup zero? [ ] [ 1 - countdown ] if ; inline recursive
 : invoke-one ( quot: ( x -- x ) -- ) call ; inline
@@ -11,6 +24,14 @@ IN: stack-checker.inlining.tests
 
 ! #2241: the loop does not consume the variable beneath the callback's input.
 SYMBOL: counter
+
+{ 0 3 } [
+    0 counter [
+        [ [ counter [ 1 + ] change counter get 3 < ] loop ] bury-zero
+        counter get
+    ] with-variable
+] unit-test
+
 : with-value-change ( var quot: ( value -- value' ) -- )
     [ dup get ] dip call swap set ; inline
 

@@ -348,7 +348,7 @@ UNION: boolean POSTPONE: t POSTPONE: f ;
 
 ! Loops
 : loop ( ... pred: ( ... -- ... ? ) -- ... )
-    [ call ] keep [ loop ] curry when ; inline recursive
+    [ call ] keep swap [ loop ] [ drop ] if ; inline recursive
 
 : do ( pred body -- pred body )
     dup 2dip ; inline

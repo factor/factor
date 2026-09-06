@@ -1237,6 +1237,7 @@ HELP: loop
 { $values
     { "pred" quotation } }
     { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
+{ $notes "A loop inside a fixed-effect callback can preserve values beneath that callback's inputs without including them in its stack effect." }
 { $examples "Loop until we hit a zero:"
     { $unchecked-example "USING: kernel random math io ; "
     " [ \"hi\" write bl 10 random zero? not ] loop"
