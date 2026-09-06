@@ -4,7 +4,7 @@ IN: compiler.tree.builder
 
 HELP: build-tree
 { $values { "word/quot" { $or word quotation } } { "nodes" "a sequence of nodes" } }
-{ $description "Attempts to construct tree SSA IR from a word or quotation. When compiling an inline word with a row-polymorphic declaration, checks the inferred effect against its row variables. Non-inline words are checked against their fixed input and output counts." }
+{ $description "Attempts to construct tree SSA IR from a word or quotation. When compiling an inline word with a row-polymorphic declaration, checks the inferred effect against its row variables. Non-inline words are checked against their fixed input and output counts. Calls to their monomorphic quotation parameters are compiled as checked static calls using the declared quotation effects." }
 { $notes "This is the first stage of the compiler." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 

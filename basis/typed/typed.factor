@@ -114,9 +114,19 @@ MACRO: (typed) ( word def effect -- quot )
     [ name>> "( typed " " )" surround f <word> dup ]
     [ "typed-gensym" set-word-prop ] bi ;
 
+:: unboxed-effect-values ( values name -- values' )
+    values [| value |
+        value pair? [ value second effect? ] [ f ] if [
+            value 1array
+        ] [
+            value effect>type (unboxed-types)
+            [ name swap 2array ] map
+        ] if
+    ] map concat ;
+
 : unboxed-effect ( effect -- effect' )
-    [ effect-in-types unboxed-types [ "in" swap 2array ] map ]
-    [ effect-out-types unboxed-types [ "out" swap 2array ] map ] bi <effect> ;
+    [ in>> "in" unboxed-effect-values ]
+    [ out>> "out" unboxed-effect-values ] bi <effect> ;
 
 M: typed-gensym stack-effect call-next-method unboxed-effect ;
 M: typed-gensym parent-word "typed-gensym" word-prop ;

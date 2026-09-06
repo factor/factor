@@ -1,4 +1,5 @@
-USING: hashtables help.markup help.syntax math quotations sequences words ;
+USING: effects hashtables help.markup help.syntax math quotations
+sequences words ;
 IN: stack-checker.values
 
 HELP: curried-effect
@@ -9,6 +10,13 @@ HELP: composed-effect
 
 HELP: input-parameter
 { $class-description "Symbol used to indicate that some known value is an input parameter to the word. If it is, then the stack checker can't infer any information for it." } ;
+
+HELP: runtime-effect
+{ $class-description "A monomorphic quotation parameter of a non-inline word. Calls use its declared effect with a runtime stack check. The parameter is not treated as a literal or as an inferred quotation." } ;
+
+HELP: <runtime-effect>
+{ $values { "effect" effect } { "runtime-effect" runtime-effect } }
+{ $description "Constructs the abstract value for a checked quotation parameter." } ;
 
 HELP: known
 { $values { "value" number } { "known" "obj" } }

@@ -1,4 +1,4 @@
-USING: accessors compiler.units effects eval kernel kernel.private layouts
+USING: accessors combinators compiler.units effects eval kernel kernel.private layouts
 literals math namespaces quotations tools.test typed words words.symbol
 combinators.short-circuit compiler.tree.debugger prettyprint definitions
 sequences classes.intersection strings classes.union ;
@@ -35,6 +35,18 @@ TYPED: typed-pair-countdown ( pair: recursive-pair -- result: recursive-pair )
 
 : typed-pair-caller ( -- pair ) 3 1 recursive-pair boa typed-pair-countdown ;
 { 0 8 } [ typed-pair-caller [ n>> ] [ acc>> ] bi ] unit-test
+
+! Monomorphic callback effects survive the generated unboxed signature.
+TYPED: typed-callback ( x: fixnum quot: ( x -- y ) -- y: fixnum ) call ;
+{ 42 } [ 41 [ 1 + ] typed-callback ] unit-test
+[ 41 [ drop ] typed-callback ] [ wrong-values? ] must-fail-with
+[ 41 [ drop "wrong type" ] typed-callback ] must-fail
+
+TYPED:: typed-pair-callback ( pair: recursive-pair quot: ( pair -- n ) -- n: fixnum )
+    pair quot call ;
+{ 11 } [
+    3 8 recursive-pair boa [ [ n>> ] [ acc>> ] bi + ] typed-pair-callback
+] unit-test
 
 TYPED: f+ ( a: float b: float -- c: float )
     + ;
