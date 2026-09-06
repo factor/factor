@@ -51,12 +51,12 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "This restriction exists because without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the stack checker encounters a " { $link call } " without further information, a " { $link unknown-macro-input } " or " { $link bad-macro-input } " error is raised."
 $nl
 "On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point."
-{ $heading "Limitations" }
-"The stack checker cannot guarantee that a literal quotation is still literal if it is passed on the data stack to an inlined recursive combinator such as " { $link each } " or " { $link map } ". For example, the following will not infer:"
+{ $heading "Passing quotations through recursive combinators" }
+"A known quotation remains known after an inline recursive combinator such as " { $link each } " or " { $link map } " returns, provided its body never accesses that value in the caller's stack prefix:"
 { $example
-  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Cannot apply 'call' to a run-time computed value\nmacro call"
+  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "( x -- x )"
 }
-"To make this work, use " { $link dip } " to pass the quotation instead:"
+"The quotation can also be held with " { $link dip } ":"
 { $example
   "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( x -- x )"
 } ;
@@ -80,6 +80,8 @@ $nl
 "The effect of the nested quotation itself is only present for documentation purposes; the mere presence of a nested effect is sufficient to mark that value as a quotation parameter."
 { $heading "Data flow restrictions" }
 "The stack checker does not trace data flow in two instances."
+$nl
+"Values in the caller's stack prefix that the recursive body never accesses remain known after the recursive word returns. For example, a known quotation can remain below the inputs of " { $link each } " and be called afterwards."
 $nl
 "An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
 { $unchecked-example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Cannot apply 'call' to a run-time computed value\nmacro call" }

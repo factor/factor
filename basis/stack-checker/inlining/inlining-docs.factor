@@ -3,7 +3,7 @@ IN: stack-checker.inlining
 
 HELP: inline-recursive-word
 { $values { "word" word } }
-{ $description "Emits an " { $link #recursive } " SSA node for a call to the given inline recursive word. Effect inference tracks the stack depth accessed by the body, excluding untouched values carried through the node." } ;
+{ $description "Emits an " { $link #recursive } " SSA node for a call to the given inline recursive word. Effect inference tracks the stack depth accessed by the body, excluding untouched values carried through the node. Known values in this untouched prefix are preserved when inference returns to the caller." } ;
 
 HELP: prepare-stack
 { $values { "word" word } }

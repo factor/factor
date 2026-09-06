@@ -1,4 +1,4 @@
-USING: kernel math namespaces sequences stack-checker
+USING: fry kernel locals math namespaces sequences stack-checker
 stack-checker.errors tools.test ;
 IN: stack-checker.inlining.tests
 
@@ -43,3 +43,26 @@ SYMBOL: counter
 [ [ [ ] 2dip callback-recursion ] infer ]
 [ unbalanced-branches-error? ] must-fail-with
 FORGET: callback-recursion
+
+! #241: each must not erase a callable in its untouched caller prefix.
+: invoke ( quot -- ) call ; inline
+: after-each ( quot -- ) [ { 1 2 3 } [ drop ] each call ] invoke ; inline
+: known-after-each ( -- n ) [ 42 ] after-each ;
+{ 42 } [ known-after-each ] unit-test
+{ 0 1 } [ [ 42 ] after-each ] must-infer-as
+
+:: captured-after-each ( n -- n ) n '[ _ 1 + ] after-each ;
+{ 42 } [ 41 captured-after-each ] unit-test
+
+: composed-after-each ( -- n ) [ 40 ] [ 2 + ] compose after-each ;
+{ 42 } [ composed-after-each ] unit-test
+{ 1 1 } [ [ reverse ] swap [ reverse ] map swap call ] must-infer-as
+
+! A touched prefix must not be restored to its value at recursive entry.
+: replace-prefix ( ... n -- ... n )
+    dup zero? [ [ drop [ 2 ] ] dip ]
+    [ 1 - replace-prefix ] if ; inline recursive
+
+[ [ [ 1 ] 3 replace-prefix drop call ] infer ]
+[ bad-macro-input? ] must-fail-with
+{ 2 } [ [ 1 ] 3 replace-prefix drop call( -- n ) ] unit-test
