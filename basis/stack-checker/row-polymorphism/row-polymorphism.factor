@@ -25,59 +25,64 @@ SYMBOL: effect-scope
         [ with-inner-d ] 2dip (effect-here)
     ] dip effect-scope set ; inline
 
-: (diff-variable) ( diff variable vars -- diff' )
-    [ key? ] [ '[ _ _ at - ] ] [ '[ _ _ set-at 0 ] ] 2tri if ;
+<PRIVATE
 
-: (check-variable) ( actual-count declared-count variable vars -- diff ? )
-    [ - ] 2dip dupd '[ _ _ (diff-variable) t ] [ dup 0 <= ] if ;
+TUPLE: row-group < identity-tuple ;
+TUPLE: row-variable group height ;
 
-: adjust-variable ( diff var vars -- )
-    pick 0 >= [ at+ ] [ 3drop ] if ; inline
+: get-row ( name vars -- row )
+    [ drop row-group new 0 row-variable boa ] cache ;
 
-:: check-variable ( vars declared actual slot var-slot -- diff ok? var )
-    actual declared [ slot call length ] bi@ declared var-slot call
-    [ vars (check-variable) ] keep ; inline
+:: raise-row ( row amount vars -- ? )
+    amount 0 <= [ t ] [
+        row group>> :> group
+        f vars get-row group>> group eq? [ f ] [
+            vars values [| other |
+                other group>> group eq? [
+                    other [ amount + ] change-height drop
+                ] when
+            ] each t
+        ] if
+    ] if ;
 
-:: unify-variables ( in-diff in-ok? in-var out-diff out-ok? out-var vars -- ? )
-    { [ in-ok? ] [ out-ok? ] [ in-diff out-diff = ] } 0&& dup [
-        in-var  [ in-diff  swap vars adjust-variable ] when*
-        out-var [ out-diff swap vars adjust-variable ] when*
-    ] when ;
+:: bound-row ( row minimum vars -- ? )
+    row minimum row height>> - vars raise-row ;
 
-! A bit of a hack. If the declared effect is one-sided monomorphic and the actual effect is a
-! shallow subtype of the root effect, adjust it here
-:: (balance-actual-depth) ( declared actual -- depth/f )
-    {
-        { [ {
-            [ declared in-var>> ]
-            [ declared out-var>> not ]
-            [ actual out>> length declared out>> length < ]
-        } 0&& ] [ declared out>> length actual out>> length - ] }
-        { [ {
-            [ declared in-var>> not ]
-            [ declared out-var>> ]
-            [ actual in>> length declared in>> length < ]
-        } 0&& ] [ declared in>> length actual in>> length - ] }
-        [ f ]
-    } cond ;
+:: join-rows ( left right vars -- )
+    left group>> :> group
+    right group>> :> old-group
+    vars values [| row |
+        row group>> old-group eq? [ row group >>group drop ] when
+    ] each ;
 
-: (balance-by) ( effect n -- effect' )
-    "x" <array> swap
-    [ in>> append ]
-    [ out>> append ]
-    [ nip terminated?>> ] 2tri <terminated-effect> ;
+:: equate-rows ( left right difference vars -- ? )
+    difference left height>> right height>> - - :> adjustment
+    left group>> right group>> eq? [ adjustment zero? ] [
+        adjustment 0 >= [
+            left adjustment vars raise-row
+        ] [
+            right adjustment neg vars raise-row
+        ] if dup [ left right vars join-rows ] when
+    ] if ;
 
-: balance-actual ( declared actual -- declared actual' )
-    2dup (balance-actual-depth) [ (balance-by) ] when* ;
+:: (check-variables) ( vars declared actual -- ? )
+    declared in-var>> vars get-row :> left
+    declared out-var>> vars get-row :> right
+    actual in>> length declared in>> length - :> inputs
+    actual out>> length declared out>> length - :> outputs
+    ! Each effect may be lifted by an untouched stack prefix. Related rows
+    ! must grow together so earlier quotation constraints remain satisfied.
+    left inputs vars bound-row
+    right outputs vars bound-row and [
+        left right inputs outputs - vars equate-rows
+    ] [ f ] if ;
 
-: (check-variables) ( vars declared actual -- ? )
-    balance-actual
-    [ [ in>>  ] [ in-var>>  ] check-variable ]
-    [ [ out>> ] [ out-var>> ] check-variable ]
-    [ 2drop ] 3tri unify-variables ;
+PRIVATE>
 
 : check-variables ( vars declared actual -- ? )
-    dup terminated?>> [ 3drop t ] [ (check-variables) ] if ;
+    dup terminated?>> [ 3drop t ] [
+        over terminated?>> [ 3drop f ] [ (check-variables) ] if
+    ] if ;
 
 : combinator-branches-effects ( branches -- quots declareds actuals )
     [ [ known>callable ] { } map-as ]
