@@ -318,13 +318,12 @@ IN: bootstrap.syntax
         [ parse-hashtable ] compose append!
     ] define-core-syntax
 
-    "_" [
-        in-fry? get [ \ _ suffix! ] [ not-in-a-fry ] if
-    ] define-core-syntax
-
-    "@" [
-        in-fry? get [ \ @ suffix! ] [ not-in-a-fry ] if
-    ] define-core-syntax
+    ! Placeholders can be passed around in quotation templates. They only
+    ! become an error if executed without first being expanded by fry.
+    { "_" "@" } [
+        "syntax" lookup-word dup "parsing" remove-word-prop
+        [ not-in-a-fry ] ( -- * ) define-declared
+    ] each
 
     "MACRO:" [ (:) define-macro ] define-core-syntax
 
