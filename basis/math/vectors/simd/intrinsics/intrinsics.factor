@@ -254,6 +254,10 @@ PRIVATE>
 : (simd-v>integer)         ( a   rep -- c )
     [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
     [ >int-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
+: (simd-v>unsigned-integer) ( a   rep -- c )
+    [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
+    [ >int-vector-rep >uint-vector-rep <rep-array> ] bi
+    unrolled-map-as-unsafe underlying>> ;
 : (simd-vpack-signed)      ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi

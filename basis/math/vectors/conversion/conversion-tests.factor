@@ -44,8 +44,31 @@ MACRO:: test-vconvert ( from-type to-type -- quot )
 { int-4{ -5 1 2 6 } }
 [ float-4{ -5.0 1.0 2.0 6.0 } float-4 int-4 test-vconvert ] unit-test
 
+{ uint-4{ 4294967295 4294967294 3000000000 3 } }
+[
+    float-4{ -1.75 -2.25 3000000000.0 3.0 }
+    float-4 uint-4 test-vconvert
+] unit-test
+
+{ ulonglong-2{ 18446744073709551615 10000000000000000000 } }
+[
+    double-2{ -1.75 10000000000000000000.0 }
+    double-2 ulonglong-2 test-vconvert
+] unit-test
+
 { int-4{ -5 1 2 6 } }
 [ float-4{ -5.0 1.0 2.3 6.7 } float-4 int-4 test-vconvert ] unit-test
+
+! Values beyond the unsigned range wrap after truncation, rather than saturate.
+{ uint-4{ 0 0 512 4294966784 } } [
+    float-4{ 4294967296.0 -4294967296.0 4294967808.0 -4294967808.0 }
+    float-4 uint-4 test-vconvert
+] unit-test
+
+{ ulonglong-2{ 0 0 } } [
+    double-2{ 18446744073709551616.0 -18446744073709551616.0 }
+    double-2 ulonglong-2 test-vconvert
+] unit-test
 
 { double-2{ -5.0 1.0 } }
 [ longlong-2{ -5 1 } longlong-2 double-2 test-vconvert ] unit-test
