@@ -124,6 +124,21 @@ static void test_derived_roots(cell fail_at) {
         "collection retry corrupted derived roots");
 }
 
+static void test_tuple_bounds(cell capacity) {
+  test_vm vm;
+  data_root<tuple_layout> layout((tuple_layout*)vm.allot_array(3, false_object), &vm);
+  layout->size = tag_fixnum(capacity);
+  cell* boundary = (cell*)(vm.nursery.here + align(factor::tuple_size(layout.untagged()),
+                                                 data_alignment));
+  *boundary = 0x12345678;
+  vm.ctx->push(layout.value());
+  vm.primitive_tuple();
+  check(*boundary == 0x12345678, "tuple initialization wrote past its allocation");
+  factor::tuple* result = untag<factor::tuple>(vm.ctx->pop());
+  for (cell i = 0; i < capacity; i++)
+    check(result->data()[i] == false_object, "tuple slot was not initialized");
+}
+
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
@@ -133,6 +148,12 @@ int main(int argc, char** argv) {
     test_derived_roots(0);
     test_derived_roots(1);
     test_derived_roots(2);
+  }
+  if (argc == 1 || strcmp(argv[1], "tuple") == 0) {
+    test_tuple_bounds(0);
+    test_tuple_bounds(1);
+    test_tuple_bounds(2);
+    test_tuple_bounds(3);
   }
   std::cout << "GC tests passed" << std::endl;
 }
