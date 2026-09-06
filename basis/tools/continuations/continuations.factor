@@ -30,7 +30,7 @@ GENERIC: add-breakpoint ( quot -- quot' )
 
 <PRIVATE
 
-M: callable add-breakpoint
+M: quotation-like add-breakpoint
     dup [ break ] head? [ \ break prefix ] unless ;
 
 M: array add-breakpoint

@@ -9,6 +9,7 @@ IN: stack-checker
 
 : infer ( quot -- effect )
     callable check-instance
+    dup word? [ 1quotation ] when
     [ infer-quot-here ] with-infer drop ;
 
 : infer. ( quot -- )

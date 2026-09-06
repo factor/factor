@@ -18,7 +18,7 @@ TUPLE: fake-quotation seq ;
 
 GENERIC: >fake-quotations ( quot -- fake )
 
-M: callable >fake-quotations
+M: quotation-like >fake-quotations
     >array >fake-quotations fake-quotation boa ;
 
 M: array >fake-quotations [ >fake-quotations ] { } map-as ;

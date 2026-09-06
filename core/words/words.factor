@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions hashtables kernel
-kernel.private math math.order namespaces quotations sequences
+kernel.private math math.order namespaces quotations quotations.private sequences
 slots.private strings vocabs ;
 IN: words
 
@@ -9,6 +9,12 @@ BUILTIN: word
 { hashcode fixnum initial: 0 } name vocabulary
 { def quotation initial: [ ] } props pic-def pic-tail-def
 { sub-primitive read-only } ;
+
+INSTANCE: word callable
+
+M: word call execute ;
+M: word >quotation 1quotation ; inline
+M: word call-sequence 1quotation ; inline
 
 PRIMITIVE: word-code ( word -- start end )
 PRIMITIVE: word-optimized? ( word -- ? )

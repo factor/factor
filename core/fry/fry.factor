@@ -138,7 +138,7 @@ DEFER: dredge-fry
 
 PRIVATE>
 
-M: callable fry
+M: quotation-like fry
     [ [ [ ] ] ] [ (fry) ] if-empty ;
 
 M: sequence fry

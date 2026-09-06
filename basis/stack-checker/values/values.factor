@@ -122,7 +122,7 @@ M: f (literal) current-word get bad-macro-input ;
 GENERIC: known>callable ( known -- quot )
 
 : ?@ ( x -- y )
-    dup callable? [ drop \ _ ] unless ;
+    dup callable? [ >quotation ] [ drop [ _ ] ] if ;
 
 M: object known>callable drop \ _ ;
 
@@ -132,7 +132,8 @@ M: composed-effect known>callable
     >composed-effect< [ known known>callable ?@ ] bi@ append ;
 
 M: curried-effect known>callable
-    >curried-effect< [ known known>callable ] bi@ swap prefix ;
+    >curried-effect<
+    [ known known>callable ] [ known known>callable ?@ ] bi* swap prefix ;
 
 M: declared-effect known>callable
     known>> known>callable ;

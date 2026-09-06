@@ -110,15 +110,19 @@ M: object apply-object push-literal ;
     time-bomb-quot infer-quot-here ;
 
 : infer-literal-quot ( literal -- )
-    dup recursive-quotation? [
-        value>> recursive-quotation-error
+    dup value>> word? [
+        value>> apply-object
     ] [
-        dup value>> callable? [
-            [ value>> ]
-            [ [ recursion>> ] keep add-local-quotation ]
-            bi infer-quot
+        dup recursive-quotation? [
+            value>> recursive-quotation-error
         ] [
-            value>> \ call time-bomb
+            dup value>> callable? [
+                [ value>> ]
+                [ [ recursion>> ] keep add-local-quotation ]
+                bi infer-quot
+            ] [
+                value>> \ call time-bomb
+            ] if
         ] if
     ] if ;
 
