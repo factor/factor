@@ -64,6 +64,18 @@ ERROR: bad-live-ranges interval ;
 : split-for-spill ( live-interval n -- before/f after/f )
     split-interval [ spill-before ] [ spill-after ] bi* ;
 
+: spill-slot-use? ( n live-interval -- ? )
+    find-use [
+        [ use-rep>> >boolean ] [ spill-slot?>> ] bi and
+    ] ?call >boolean ;
+
+: already-spilled-atomic-use? ( live-interval n -- ? )
+    {
+        [ drop [ live-interval-start ] [ live-interval-end ] bi = ]
+        [ drop reload-from>> >boolean ]
+        [ swap spill-slot-use? ]
+    } 2&& ;
+
 : find-next-use ( live-interval new -- n )
     [ uses>> ] [ live-interval-start ] bi*
     '[ [ spill-slot?>> not ] [ n>> ] bi _ >= and ] find nip
@@ -95,8 +107,10 @@ ERROR: bad-live-ranges interval ;
     drop spill-after add-unhandled ;
 
 : spill ( live-interval n -- )
-    split-for-spill
-    [ [ add-handled ] when* ] [ [ add-unhandled ] when* ] bi* ;
+    2dup already-spilled-atomic-use? [ 2drop ] [
+        split-for-spill
+        [ [ add-handled ] when* ] [ [ add-unhandled ] when* ] bi*
+    ] if ;
 
 :: spill-intersecting-active ( new reg -- )
     new active-intervals-for [ [ reg>> reg = ] find swap dup ] keep

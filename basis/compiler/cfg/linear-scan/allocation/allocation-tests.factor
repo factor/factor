@@ -83,7 +83,7 @@ cpu x86.64? [
             }
             T{ live-interval-state
                { vreg 50 }
-               { ranges V{ { 5 10 } } }
+               { ranges V{ { 5 40 } } }
                { uses
                  V{ T{ vreg-use { n 8 } { def-rep double-rep } } }
                }
@@ -92,7 +92,7 @@ cpu x86.64? [
         { float-regs V{ } }
     } ;
 
-! Why are they both spilled?
+! A sync point spills every live active interval.
 {
     { { int-regs V{ } } { float-regs V{ } } }
 } [
