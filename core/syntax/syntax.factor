@@ -301,20 +301,20 @@ IN: bootstrap.syntax
     ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
 
     "'[" [
-        t in-fry? [ parse-quotation ] with-variable fry append!
+        [ parse-quotation ] parse-fry append!
     ] define-core-syntax
 
     "'{" [
-        t in-fry? [ \ } parse-until >array ] with-variable fry append!
+        [ \ } parse-until >array ] parse-fry append!
     ] define-core-syntax
 
     "'HS{" [
-        t in-fry? [ \ } parse-until >array ] with-variable fry
+        [ \ } parse-until >array ] parse-fry
         [ >hash-set ] compose append!
     ] define-core-syntax
 
     "'H{" [
-        t in-fry? [ \ } parse-until >array ] with-variable fry
+        [ \ } parse-until >array ] parse-fry
         [ parse-hashtable ] compose append!
     ] define-core-syntax
 

@@ -405,10 +405,21 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 
 { 10 } [ 10 [| A | { [ A ] } ] call first call ] unit-test
 
-[
-    "USING: locals fry math ; 1 '[ [let 10 :> A A _ + ] ]"
-    eval( -- ) call
-] [ error>> >r/r>-in-fry-error? ] must-fail-with
+! #118: fry must run before locals are lowered to retain-stack operations.
+{ 11 } [
+    "USING: locals fry kernel math ; 1 '[ [let 10 :> A A _ + ] ] call"
+    eval( -- n )
+] unit-test
+
+{ 10 } [ 0 '[ 10 [| A | A _ + ] ] call call ] unit-test
+{ 13 } [ 10 '[ 1 2 [| a b | a b + _ + ] ] call call ] unit-test
+{ 11 22 } [ 10 20 '[ 1 2 [| a b | a _ + b _ + ] ] call call ] unit-test
+{ 1 } [ '[ 1 [| a | a ] ] call call ] unit-test
+{ 17 } [ [let 5 :> outer 10 '[ 2 [| a | a _ + outer + ] ] call call ] ] unit-test
+{ 12 } [ 2 '[ [let 10 :> A A _ + ] ] call ] unit-test
+{ 12 } [ 2 '{ [let 10 :> A A _ + ] } first ] unit-test
+{ 11 } [ [ 1 + ] '[ 10 [| a | a @ ] ] call call ] unit-test
+{ { 11 } } [ 1 '[ 10 [| a | a _ + ] ] call output>array ] unit-test
 
 :: (funny-macro-test) ( obj quot -- ? ) obj { [ quot call ] } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
