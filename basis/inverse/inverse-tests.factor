@@ -1,8 +1,29 @@
 ! Copyright (C) 2007, 2009 Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: inverse tools.test arrays math kernel sequences
-math.functions math.constants continuations combinators.smart ;
+math.functions math.constants continuations combinators.smart locals ;
 IN: inverse.tests
+
+! #119: captured locals are values, not words to expand while inverting.
+:: un-add-local ( n a -- b ) n [ a - ] undo ;
+:: un-subtract-local ( n a -- b ) n [ a + ] undo ;
+:: un-divide-local ( n a -- b ) n [ a / ] undo ;
+:: un-left-subtract-local ( n a -- b ) n [ a swap - ] undo ;
+
+{ 14 } [ 10 4 un-add-local ] unit-test
+{ 6 } [ 10 4 un-subtract-local ] unit-test
+{ 40 } [ 10 4 un-divide-local ] unit-test
+{ 6 } [ 4 10 un-left-subtract-local ] unit-test
+
+:: un-affine-local ( n a b -- m ) n [ a * b + ] undo ;
+{ 5 } [ 13 2 3 un-affine-local ] unit-test
+{ } [ { 4 5 } 4 5 [| obj a b | obj [ a b 2array ] undo ] call ] unit-test
+
+{ 15 } [ [let 4 :> a! 5 a! 10 [ a - ] undo ] ] unit-test
+{ } [ 4 [| a | 4 [ a ] undo ] call ] unit-test
+[ 4 [| a | 5 [ a ] undo ] call ] [ fail? ] must-fail-with
+{ } [ [let 4 :> a! 4 [ a ] undo ] ] unit-test
+[ [let 4 :> a! 5 [ a ] undo ] ] [ fail? ] must-fail-with
 
 { 2 } [ { 3 2 } [ 3 swap 2array ] undo ] unit-test
 [ { 3 4 } [ dup 2array ] undo ] must-fail
