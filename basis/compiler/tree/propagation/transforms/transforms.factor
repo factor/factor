@@ -30,6 +30,17 @@ IN: compiler.tree.propagation.transforms
         [ power-of-2? [ 1 - bitand ] f ? ] [ drop f ] if
     ] [ drop f ] if ;
 
+: one-mod-custom-inlining ( inputs -- quot/f )
+    dup first value-info literal>> 1 eq? [
+        second value-info class>> integer class<= [
+            [
+                nip dup zero?
+                [ 1 swap /mod nip ]
+                [ dup 1 = swap -1 = or 0 1 ? ] if
+            ]
+        ] [ f ] if
+    ] [ drop f ] if ;
+
 {
     mod-integer-integer
     mod-integer-fixnum
@@ -37,8 +48,10 @@ IN: compiler.tree.propagation.transforms
     fixnum-mod
 } [
     [
-        in-d>> dup first value-info interval>> [0,inf] interval-subset?
-        [ rem-custom-inlining ] [ drop f ] if
+        in-d>> dup one-mod-custom-inlining [ nip ] [
+            dup first value-info interval>> [0,inf] interval-subset?
+            [ rem-custom-inlining ] [ drop f ] if
+        ] if*
     ] "custom-inlining" set-word-prop
 ] each
 
