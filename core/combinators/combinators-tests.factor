@@ -1,7 +1,20 @@
-USING: accessors arrays combinators combinators.private io
-kernel math math.functions prettyprint sequences stack-checker
-tools.test words ;
+USING: accessors arrays combinators combinators.private
+continuations io kernel kernel.private math math.functions
+prettyprint sequences stack-checker tools.test words ;
 IN: combinators.tests
+
+! #949: matching height deltas do not imply the declared inputs existed.
+[ { 1 [ drop ] ( x x -- x ) } [ call-effect ] with-datastack ]
+[ wrong-values? ] must-fail-with
+
+{ f } [ { } 1 1 check-datastack ] unit-test
+{ f } [ { 1 } 2 1 check-datastack ] unit-test
+{ f } [ { } -1 -1 check-datastack ] unit-test
+{ f } [ { } 0 -1 check-datastack ] unit-test
+{ t } [ { } 0 0 check-datastack ] unit-test
+{ 1 t } [ 1 { 1 } 0 0 check-datastack ] unit-test
+{ 2 f } [ 2 { 1 } 0 0 check-datastack ] unit-test
+{ 2 t } [ 2 { 1 } 1 1 check-datastack ] unit-test
 
 { 3 } [ 1 2 [ + ] call( x y -- z ) ] unit-test
 [ 1 2 [ + ] call( -- z ) ] must-fail
