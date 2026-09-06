@@ -64,7 +64,7 @@ M: generic (deep-annotate)
 
 M: word (deep-annotate)
     prepare-annotate
-    '[ dup callable? [ _ call( old -- new ) ] when ] deep-map define ;
+    '[ dup quotation-like? [ _ call( old -- new ) ] when ] deep-map define ;
 
 PRIVATE>
 

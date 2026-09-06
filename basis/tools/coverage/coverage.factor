@@ -113,7 +113,7 @@ M: string count-callables
     [ count-callables ] map-words sum ;
 
 M: word count-callables
-    def>> 0 [ callable? [ 1 + ] when ] deep-reduce ;
+    def>> 0 [ quotation-like? [ 1 + ] when ] deep-reduce ;
 
 PRIVATE>
 

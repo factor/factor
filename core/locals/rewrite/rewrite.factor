@@ -20,7 +20,7 @@ GENERIC: rewrite-sugar* ( obj -- )
 
 GENERIC: quotation-rewrite ( form -- form' )
 
-M: callable quotation-rewrite [ [ rewrite-sugar* ] each ] [ ] make ;
+M: quotation-like quotation-rewrite [ [ rewrite-sugar* ] each ] [ ] make ;
 
 : var-defs ( vars -- defs )
     [ [ ] ] [ <multi-def> 1quotation ] if-empty ;
@@ -28,7 +28,7 @@ M: callable quotation-rewrite [ [ rewrite-sugar* ] each ] [ ] make ;
 M: lambda quotation-rewrite
     [ body>> ] [ vars>> var-defs ] bi prepend quotation-rewrite ;
 
-M: callable rewrite-sugar* quotation-rewrite , ;
+M: quotation-like rewrite-sugar* quotation-rewrite , ;
 
 M: lambda rewrite-sugar* quotation-rewrite , ;
 
@@ -151,7 +151,7 @@ M: quotation uses-vars* [ uses-vars* ] each ;
 : free-vars ( form -- seq )
     [ uses-vars ] [ defs-vars ] bi diff ;
 
-M: callable rewrite-closures*
+M: quotation-like rewrite-closures*
     ! Turn free variables into bound variables, curry them
     ! onto the body
     dup free-vars [ <quote> ] map

@@ -5,7 +5,7 @@ namespaces quotations sequences stack-checker.backend
 stack-checker.errors stack-checker.recursive-state
 stack-checker.row-polymorphism stack-checker.state
 stack-checker.values stack-checker.visitor
-vectors ;
+vectors words ;
 FROM: sequences.private => dispatch ;
 IN: stack-checker.branches
 
@@ -136,6 +136,8 @@ M: callable infer-branch
         [ [ quotation set ] [ infer-quot-here ] bi ] infer-branch-effect
         collect-variables
     ] with-scope ;
+
+M: word infer-branch >quotation infer-branch ;
 
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip

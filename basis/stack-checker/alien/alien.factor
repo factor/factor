@@ -129,6 +129,7 @@ SYMBOL: wait-for-callback-hook
 wait-for-callback-hook [ [ drop ] ] initialize
 
 M: callable wrap-callback-quot
+    >quotation
     swap [ callback-parameter-quot ] [ callback-return-quot ] bi surround
     wait-for-callback-hook get
     '[ _ _ do-callback ] >quotation ;

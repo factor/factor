@@ -321,11 +321,12 @@ HELP: (execute)
 
 HELP: call
 { $values { "callable" callable } }
-{ $description "Calls a quotation. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal quotation can have a static stack effect." }
+{ $description "Calls a quotation or composition, or executes a word. Words which " { $link call } " an input parameter must be declared " { $link POSTPONE: inline } " so that a caller which passes in a literal callable can have a static stack effect." }
 { $notes "To call a non-literal quotation you can use " { $link POSTPONE: call( } " to check the stack effect before calling at runtime." }
 { $examples
     "The following two lines are equivalent:"
     { $code "2 [ 2 + 3 * ] call" "2 2 + 3 *" }
+    { $example "USING: kernel math prettyprint ;" "1 2 \\ + call ." "3" }
 } ;
 
 { call POSTPONE: call( } related-words

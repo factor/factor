@@ -255,4 +255,5 @@ M: quotation bad-effect-test call ; inline
 { } [ [ M\ quotation bad-effect-test forget ] with-compilation-unit ] unit-test
 
 ! Make sure time bombs literalize
-[ [ \ + call ] compile-call ] [ no-method? ] must-fail-with
+[ [ W{ W{ + } } call ] compile-call ] [ no-method? ] must-fail-with
+{ 3 } [ 1 2 [ \ + call ] compile-call ] unit-test

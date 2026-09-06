@@ -223,7 +223,7 @@ CONSTANT: trivial-defs
     } 1|| ;
 
 : all-callables ( def -- seq )
-    [ { [ callable? ] [ ignore-def? not ] } 1&& ] deep-filter ;
+    [ { [ quotation-like? ] [ ignore-def? not ] } 1&& ] deep-filter ;
 
 : (load-definitions) ( word def hash -- )
     [ all-callables ] dip push-at-each ;
@@ -255,11 +255,11 @@ GENERIC: lint ( obj -- seq )
 
 M: object lint ( obj -- seq ) drop f ;
 
-M: callable lint ( quot -- seq )
+M: quotation-like lint ( quot -- seq )
     lint-definitions-keys get-global [ subseq-of? ] with filter ;
 
 M: word lint ( word -- seq/f )
-    def>> [ callable? ] deep-filter [ lint ] map concat ;
+    def>> [ quotation-like? ] deep-filter [ lint ] map concat ;
 
 : word-path. ( word -- )
     [ vocabulary>> write ":" write ] [ . ] bi ;
@@ -298,7 +298,7 @@ M: word run-lint ( word -- seq ) 1array run-lint ;
 PRIVATE>
 
 : find-swap/swap ( word -- ? )
-    def>> [ callable? ] deep-filter
+    def>> [ quotation-like? ] deep-filter
     [
         {
             [ [ \ swap = ] count 2 >= ]

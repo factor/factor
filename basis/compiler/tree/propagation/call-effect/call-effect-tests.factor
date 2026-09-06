@@ -10,6 +10,9 @@ IN: compiler.tree.propagation.call-effect.tests
 
 ! cached-effect
 { t } [ [ + ] cached-effect ( a b -- c ) effect= ] unit-test
+{ t } [ \ + cached-effect ( a b -- c ) effect= ] unit-test
+{ t } [ 1 \ + curry cached-effect ( a -- c ) effect= ] unit-test
+{ t } [ \ + \ sq compose cached-effect ( a b -- c ) effect= ] unit-test
 { t } [ 5 [ + ] curry cached-effect ( a -- c ) effect= ] unit-test
 { t } [ 5 [ ] curry cached-effect ( -- c ) effect= ] unit-test
 { t } [ [ dup ] [ drop ] compose cached-effect ( a -- b ) effect= ] unit-test
@@ -96,6 +99,8 @@ IN: compiler.tree.propagation.call-effect.tests
 
 { [ 3 ] } [ [ 1 2 \ + execute( a b -- c ) ] optimized-quot ] unit-test
 { [ 3 ] } [ [ 1 2 [ + ] call( a b -- c ) ] optimized-quot ] unit-test
+{ [ 3 ] } [ [ 1 2 \ + call( a b -- c ) ] optimized-quot ] unit-test
+{ [ 9 ] } [ [ 1 2 \ + \ sq compose call( a b -- c ) ] optimized-quot ] unit-test
 { [ 3 ] } [ [ 1 2 '[ _ + ] call( a -- b ) ] optimized-quot ] unit-test
 { [ 3 ] } [ [ 1 2 '[ _ ] [ + ] compose call( a -- b ) ] optimized-quot ] unit-test
 

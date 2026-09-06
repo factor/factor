@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel sequences ;
+USING: help.markup help.syntax kernel sequences words ;
 IN: quotations
 
 ARTICLE: "quotations" "Quotations"
@@ -11,7 +11,7 @@ $nl
     quotation
     quotation?
 }
-"A more general class is provided for methods to dispatch on that includes quotations, " { $link curry } ", and " { $link compose } " objects:"
+"The callable class includes words, quotations, and objects constructed with " { $link curry } " and " { $link compose } ":"
 { $subsections
     callable
 }
@@ -42,14 +42,17 @@ ARTICLE: "wrappers" "Wrappers"
 ABOUT: "quotations"
 
 HELP: callable
-{ $class-description "The class whose instances can be passed to " { $link call } ". This includes quotations and composed quotations built up with " { $link curry } " or " { $link compose } "." } ;
+{ $class-description "The mixin class of objects which can be called. Built-in instances include words, quotations, and compositions built with " { $link curry } " or " { $link compose } ". Words execute when called, and remain ordinary word objects rather than sequences." } ;
+
+HELP: quotation-like
+{ $class-description "Quotations and compositions built with " { $link curry } " or " { $link compose } ". These callables also implement the sequence protocol. A word used inside a composition contributes one executable element to its sequence view." } ;
 
 HELP: quotation
 { $class-description "The class of quotations. See " { $link "syntax-quots" } " for syntax and " { $link "quotations" } " for general information." } ;
 
 HELP: >quotation
-{ $values { "seq" sequence } { "quot" quotation } }
-{ $description "Outputs a freshly-allocated quotation with the same elements as a given sequence." } ;
+{ $values { "obj" { $or sequence word } } { "quot" quotation } }
+{ $description "Outputs a freshly allocated quotation with the elements of a sequence, or a single executable word. Converting a word has the same result as passing it to " { $link 1quotation } "." } ;
 
 HELP: 1quotation
 { $values { "obj" object } { "quot" quotation } }

@@ -55,6 +55,8 @@ M: quotation cached-effect
     dup cached-effect-valid?
     [ cached-effect>> ] [ [ safe-infer dup ] keep save-effect ] if ;
 
+M: word cached-effect 1quotation cached-effect ;
+
 : call-effect-slow>quot ( effect -- quot )
     [ \ call-effect def>> curry ] [ add-effect-input ] bi
     '[ _ _ call-effect-unsafe ] ;
@@ -120,6 +122,7 @@ M: composed already-inlined-quot?
     } 1|| ;
 
 M: quotation already-inlined-quot? already-inlined? ;
+M: word already-inlined-quot? already-inlined? ;
 
 GENERIC: add-quot-to-history ( quot -- )
 
@@ -130,6 +133,7 @@ M: composed add-quot-to-history
     [ second>> add-quot-to-history ] bi ;
 
 M: quotation add-quot-to-history add-to-history ;
+M: word add-quot-to-history add-to-history ;
 
 : top-two ( #call -- effect value )
     in-d>> last2 [ value-info ] bi@

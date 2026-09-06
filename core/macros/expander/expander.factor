@@ -18,13 +18,13 @@ SYMBOL: stack
 GENERIC: condomize? ( obj -- ? )
 
 M: array condomize? [ condomize? ] any? ;
-M: callable condomize? [ condomize? ] any? ;
+M: quotation-like condomize? [ condomize? ] any? ;
 M: object condomize? drop f ;
 
 GENERIC: condomize ( obj -- obj' )
 
 M: array condomize [ condomize ] map ;
-M: callable condomize [ condomize ] map ;
+M: quotation-like condomize [ condomize ] map ;
 M: object condomize ;
 
 : literal ( obj -- )
@@ -88,8 +88,8 @@ M: word expand-macros*
 
 M: object expand-macros* literal ;
 
-M: callable expand-macros*
+M: quotation-like expand-macros*
     expand-macros literal ;
 
-M: callable expand-macros
+M: quotation-like expand-macros
     [ begin [ expand-macros* ] each end ] [ ] make ;

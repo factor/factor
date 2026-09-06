@@ -9,7 +9,7 @@ IN: infix
 
 <PRIVATE
 : prepare-operand ( term -- quot )
-    dup callable? [ 1quotation ] unless ;
+    dup quotation-like? [ 1quotation ] unless ;
 
 ERROR: local-not-defined name ;
 M: local-not-defined summary
@@ -93,7 +93,7 @@ M: ast-negation infix-codegen
     term>> infix-codegen
     {
         { [ dup number? ] [ neg ] }
-        { [ dup callable? ] [ '[ @ neg ] ] }
+        { [ dup quotation-like? ] [ '[ @ neg ] ] }
         [ '[ _ neg ] ] ! local word
     } cond ;
 
