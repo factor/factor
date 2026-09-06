@@ -231,6 +231,11 @@ endif
 default:
 	$(MAKE) $(shell ./build.sh make-target)
 
+ifndef CONFIG
+test-vm:
+	$(MAKE) test-vm CONFIG=vm/Config.$(subst -,.,$(shell ./build.sh make-target))
+endif
+
 help:
 	@echo "Run '$(MAKE)' with one of the following parameters:"
 	@echo ""
@@ -370,6 +375,13 @@ endif
 
 factor-ffi-test: $(FFI_TEST_LIBRARY)
 
+$(BUILD_DIR)/gc-tests$(EXE_EXTENSION): vm/tests/gc.cpp $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
+
+# Run with the same CONFIG and build flags used for the VM.
+test-vm: $(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
+	./$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
+
 .SUFFIXES: .mm
 
 endif
@@ -390,5 +402,5 @@ clean:
 	rm -f libfactor-ffi-test.*
 	rm -f Factor.app/Contents/Frameworks/libfactor.dylib
 
-.PHONY: factor-executable factor-lib factor-console factor-ffi-test tags clean help macos.app
+.PHONY: factor-executable factor-lib factor-console factor-ffi-test test-vm tags clean help macos.app
 .PHONY: linux-x86-32 linux-x86-64 linux-ppc-32 linux-ppc-64 linux-arm-64 freebsd-x86-32 freebsd-x86-64 macos-x86-32 macos-x86-64 macos-x86-fat macos-arm64 windows-x86-32 windows-x86-64 windows-arm-64

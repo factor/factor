@@ -111,7 +111,7 @@ void factor_vm::primitive_become() {
     visitor.visit_all_roots();
 
     auto object_become_func = [&](object* obj) {
-      visitor.visit_slots(obj);
+      visitor.visit_object(obj);
     };
     each_object(object_become_func);
 

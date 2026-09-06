@@ -517,6 +517,9 @@ void slot_visitor<Fixup>::visit_partial_objects(cell start,
   scan_end = std::min(scan_end, (cell*)card_end);
 
   visit_object_array(scan_start, scan_end);
+  // become can introduce an old alien whose base is in a younger generation.
+  if (((object*)start)->type() == ALIEN_TYPE)
+    ((alien*)start)->update_address();
 }
 
 template <typename Fixup>
