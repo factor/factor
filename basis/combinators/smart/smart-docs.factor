@@ -23,7 +23,7 @@ HELP: output>array
     { "quot" quotation }
     { "array" array }
 }
-{ $description "Infers the number of outputs from the quotation and constructs an array from those outputs." }
+{ $description "Infers the number of outputs from the quotation and constructs an array from those outputs. Known captures in curried and composed quotations are preserved during inference, including when smart combinators are nested." }
 { $examples
     { $example
         "USING: combinators combinators.smart math prettyprint ;
