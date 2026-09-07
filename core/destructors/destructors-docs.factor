@@ -1,4 +1,5 @@
-USING: classes help.markup help.syntax io quotations sequences ;
+USING: classes continuations help.markup help.syntax io quotations
+sequences ;
 IN: destructors
 
 HELP: debug-leaks?
@@ -37,7 +38,8 @@ HELP: dispose*
 
 HELP: with-disposal
 { $values { "object" "a disposable object" } { "quot" { $quotation ( object -- ) } } }
-{ $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
+{ $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." }
+{ $notes "Jumping out of the quotation with " { $link continue } " or " { $link continue-with } " bypasses disposal. See " { $link "destructors-continuations" } "." } ;
 
 HELP: with-destructors
 { $values { "quot" quotation } }
@@ -91,6 +93,18 @@ ARTICLE: "destructors-using" "Using destructors"
     |dispose
 } ;
 
+ARTICLE: "destructors-continuations" "Resource disposal and continuations"
+"The cleanup performed by " { $link with-disposal } " and " { $link with-destructors } " runs on normal return or when an error is thrown. Directly restoring a continuation with " { $link continue } " or " { $link continue-with } " replaces the stacks without unwinding the scopes it leaves, so their destructors do not run."
+$nl
+"Keep the disposal scope outside the continuation capture when possible. Returning to that continuation can then leave the disposal scope normally:"
+{ $code
+    "resource ["
+    "    [ nip continue ] callcc0"
+    "    drop"
+    "] with-disposal"
+}
+"Here, the continuation restores the resource on the data stack, and the quotation returns through " { $link with-disposal } ". If a continuation must escape the disposal scope, arrange explicit disposal before leaving it. Do not resume a continuation that would use a resource after it has been disposed." ;
+
 ARTICLE: "destructors-extending" "Writing new destructors"
 "Superclass for disposable objects:"
 { $subsections disposable }
@@ -107,6 +121,7 @@ ARTICLE: "destructors" "Deterministic resource disposal"
     "destructors-using"
     "destructors-extending"
     "destructors-anti-patterns"
+    "destructors-continuations"
 }
 { $see-also "tools.destructors" } ;
 
