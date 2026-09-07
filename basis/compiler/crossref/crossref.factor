@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs combinators compiler.units grouping kernel
+USING: assocs combinators compiler.units grouping kernel locals
 namespaces sequences sets stack-checker.dependencies words ;
 IN: compiler.crossref
 
@@ -28,10 +28,12 @@ generic-call-site-crossref [ H{ } clone ] initialize
     [ "dependency-checks" word-prop ] dip
     '[ _ [ satisfied? ] cache ] all? ;
 
-: outdated-conditional-usages ( set -- assocs )
-    members H{ } clone '[
+:: outdated-conditional-usages ( set -- assocs )
+    H{ } clone :> checks
+    H{ } clone :> usages
+    set members [
         +conditional+ dependencies-of
-        [ _ dependencies-satisfied? ] reject-keys
+        [ usages [ checks dependencies-satisfied? ] cache ] reject-keys
     ] map ;
 
 : generic-call-sites-of ( word -- assoc )
