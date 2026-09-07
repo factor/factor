@@ -209,7 +209,7 @@ SYMBOL: stomp-subscription#
 
 : adjust-stomp-version ( frame -- frame )
     dup headers>> "accept-version" of [
-        '[ _ min ] stomp-version change
+        stomp-version swap '[ _ min ] change
     ] when* ;
 
 :: stomp-loop ( mailbox quot: ( frame -- ) -- )
