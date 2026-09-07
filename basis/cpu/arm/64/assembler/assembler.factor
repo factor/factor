@@ -540,8 +540,9 @@ PRIVATE>
 M: integer ASR ( Rd Rn shift -- ) ?max-width on-bits SBFM ;
 M: integer LSR ( Rd Rn shift -- ) ?max-width on-bits UBFM ;
 
-M: integer LSL ( Rd Rn shift -- )
-    ?max-width [ bitnot ] [ bits ] bi* [ 1 + ] keep UBFM ;
+M:: integer LSL ( Rd Rn shift -- )
+    Rn shift ?max-width 2nip :> nbits
+    Rd Rn shift neg nbits bits shift bitnot nbits bits UBFM ;
 
 <PRIVATE
 : (BFIZ) ( Rn lsb width -- Rn immr imms )
