@@ -76,9 +76,28 @@ PRIVATE>
 
 : embedded? ( -- ? ) OBJ-EMBEDDED special-object ;
 
+<PRIVATE
+
+: flush-exit-stream ( stream/f -- )
+    [ '[ _ stream-flush ] ignore-errors ] when* ;
+
+: flush-exit-streams ( -- )
+    output-stream get flush-exit-stream
+    error-stream get flush-exit-stream
+    output-stream get-global flush-exit-stream
+    error-stream get-global flush-exit-stream ;
+
+PRIVATE>
+
 : exit ( n -- * )
-    [ do-shutdown-hooks (exit) ] ignore-errors
+    [
+        flush-exit-streams
+        do-shutdown-hooks
+        flush-exit-streams
+        (exit)
+    ] ignore-errors
     [ "Unexpected error during shutdown!" print flush ] ignore-errors
+    flush-exit-streams
     255 (exit) ;
 
 : quit ( -- * ) 0 exit ;
