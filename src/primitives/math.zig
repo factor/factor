@@ -315,7 +315,7 @@ pub export fn primitive_bignum_add(vm_asm: *VMAssemblyFields) callconv(.c) void 
         bignum.add(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.add);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_subtract(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -327,7 +327,7 @@ pub export fn primitive_bignum_subtract(vm_asm: *VMAssemblyFields) callconv(.c) 
         bignum.subtract(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.subtract);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_multiply(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -340,7 +340,7 @@ pub export fn primitive_bignum_multiply(vm_asm: *VMAssemblyFields) callconv(.c) 
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.multiply);
     std.debug.assert(result.length() == 0 or result.getDigit(result.length() - 1) != 0);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_divint(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -352,7 +352,7 @@ pub export fn primitive_bignum_divint(vm_asm: *VMAssemblyFields) callconv(.c) vo
         bignum.quotient(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch |e| bignumOpError(vm, e)
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.quotient);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_divmod(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -375,7 +375,7 @@ pub export fn primitive_bignum_divmod(vm_asm: *VMAssemblyFields) callconv(.c) vo
 
     const div_result = bignum.divmod(vm, a, b) catch |e| bignumOpError(vm, e);
 
-    a_ptr.* = layouts.tagBignum(div_result.quotient);
+    a_ptr.* = bignum.maybeToFixnum(div_result.quotient);
     if (bignum.fitsFixnum(div_result.remainder)) {
         b_ptr.* = layouts.tagFixnum(bignum.toFixnum(div_result.remainder));
     } else {
@@ -420,7 +420,7 @@ pub export fn primitive_bignum_and(vm_asm: *VMAssemblyFields) callconv(.c) void 
         bignum.bitAnd(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.bitAnd);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_or(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -432,7 +432,7 @@ pub export fn primitive_bignum_or(vm_asm: *VMAssemblyFields) callconv(.c) void {
         bignum.bitOr(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.bitOr);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_xor(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -444,7 +444,7 @@ pub export fn primitive_bignum_xor(vm_asm: *VMAssemblyFields) callconv(.c) void 
         bignum.bitXor(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.bitXor);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_not(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -453,7 +453,7 @@ pub export fn primitive_bignum_not(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const a_cell = ctx.peek();
     const a: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(ensureBignumCell(vm, a_cell)));
     const result = bignum.bitNot(vm, a) catch vm.memoryError();
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_shift(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -464,7 +464,7 @@ pub export fn primitive_bignum_shift(vm_asm: *VMAssemblyFields) callconv(.c) voi
     const bn: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(ensureBignumCell(vm, bn_cell)));
     const shift_amt = layouts.untagFixnum(shift_cell);
     const result = bignum.shift(vm, bn, shift_amt) catch vm.memoryError();
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_eq(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -558,7 +558,7 @@ pub export fn primitive_bignum_gcd(vm_asm: *VMAssemblyFields) callconv(.c) void 
         bignum.gcd(vm, @ptrFromInt(layouts.UNTAG(a_cell)), @ptrFromInt(layouts.UNTAG(b_cell))) catch vm.memoryError()
     else
         binaryBignumSlow(vm, a_cell, b_cell, bignum.gcd);
-    ctx.replace(layouts.tagBignum(result));
+    ctx.replace(bignum.maybeToFixnum(result));
 }
 
 pub export fn primitive_bignum_bitp(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -917,4 +917,60 @@ fn allocBignumWithDigit(vm: *FactorVM, len: Cell, negative: bool, digit_val: Cel
     }
 
     return bn;
+}
+
+test "bignum arithmetic normalizes small results without changing explicit conversion" {
+    const data_heap = @import("../data_heap.zig");
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    defer {
+        vm.deinit();
+        heap.deinit();
+    }
+    const ctx = vm.vm_asm.ctx;
+
+    inline for (.{
+        .{ primitive_bignum_add, @as(Fixnum, 15) },
+        .{ primitive_bignum_subtract, @as(Fixnum, 3) },
+        .{ primitive_bignum_multiply, @as(Fixnum, 54) },
+        .{ primitive_bignum_divint, @as(Fixnum, 1) },
+        .{ primitive_bignum_mod, @as(Fixnum, 3) },
+        .{ primitive_bignum_gcd, @as(Fixnum, 3) },
+        .{ primitive_bignum_and, @as(Fixnum, 0) },
+        .{ primitive_bignum_or, @as(Fixnum, 15) },
+        .{ primitive_bignum_xor, @as(Fixnum, 15) },
+    }) |case| {
+        ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 9)));
+        ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 6)));
+        case[0](&vm.vm_asm);
+        try std.testing.expectEqual(layouts.tagFixnum(case[1]), ctx.pop());
+    }
+
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 9)));
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 6)));
+    primitive_bignum_divmod(&vm.vm_asm);
+    try std.testing.expectEqual(layouts.tagFixnum(3), ctx.pop());
+    try std.testing.expectEqual(layouts.tagFixnum(1), ctx.pop());
+
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 12)));
+    ctx.push(layouts.tagFixnum(-1));
+    primitive_bignum_shift(&vm.vm_asm);
+    try std.testing.expectEqual(layouts.tagFixnum(6), ctx.pop());
+
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 9)));
+    primitive_bignum_not(&vm.vm_asm);
+    try std.testing.expectEqual(layouts.tagFixnum(-10), ctx.pop());
+
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, fixnum.fixnum_max)));
+    ctx.push(layouts.tagBignum(try bignum.fromFixnum(vm, 1)));
+    primitive_bignum_add(&vm.vm_asm);
+    try std.testing.expect(layouts.hasTag(ctx.pop(), .bignum));
+
+    ctx.push(layouts.tagFixnum(3));
+    primitive_fixnum_to_bignum(&vm.vm_asm);
+    try std.testing.expect(layouts.hasTag(ctx.pop(), .bignum));
 }

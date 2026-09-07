@@ -1,7 +1,8 @@
 namespace factor {
 
 static const cell image_magic = 0x0f0e0d0c;
-static const cell image_version = 5;
+// Integer arithmetic now normalizes results; old compiled code is incompatible.
+static const cell image_version = 6;
 
 const size_t STRERROR_BUFFER_SIZE = 1024;
 

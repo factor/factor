@@ -102,25 +102,25 @@ void factor_vm::primitive_bignum_eq() {
 // Allocates memory
 void factor_vm::primitive_bignum_add() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_add(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_add(x, y)));
 }
 
 // Allocates memory
 void factor_vm::primitive_bignum_subtract() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_subtract(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_subtract(x, y)));
 }
 
 // Allocates memory
 void factor_vm::primitive_bignum_multiply() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_multiply(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_multiply(x, y)));
 }
 
 // Allocates memory
 void factor_vm::primitive_bignum_divint() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_quotient(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_quotient(x, y)));
 }
 
 // Allocates memory
@@ -131,7 +131,7 @@ void factor_vm::primitive_bignum_divmod() {
   bignum* x = untag<bignum>(*s1);
   bignum* q, *r;
   bignum_divide(x, y, &q, &r);
-  *s1 = tag<bignum>(q);
+  *s1 = bignum_maybe_to_fixnum(q);
   *s0 = bignum_maybe_to_fixnum(r);
 }
 
@@ -143,29 +143,29 @@ void factor_vm::primitive_bignum_mod() {
 
 void factor_vm::primitive_bignum_gcd() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_gcd(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_gcd(x, y)));
 }
 
 void factor_vm::primitive_bignum_and() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_bitwise_and(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_bitwise_and(x, y)));
 }
 
 void factor_vm::primitive_bignum_or() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_bitwise_ior(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_bitwise_ior(x, y)));
 }
 
 void factor_vm::primitive_bignum_xor() {
   POP_BIGNUMS(x, y);
-  ctx->replace(tag<bignum>(bignum_bitwise_xor(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_bitwise_xor(x, y)));
 }
 
 // Allocates memory
 void factor_vm::primitive_bignum_shift() {
   fixnum y = untag_fixnum(ctx->pop());
   bignum* x = untag<bignum>(ctx->peek());
-  ctx->replace(tag<bignum>(bignum_arithmetic_shift(x, y)));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_arithmetic_shift(x, y)));
 }
 
 void factor_vm::primitive_bignum_less() {
@@ -189,7 +189,7 @@ void factor_vm::primitive_bignum_greatereq() {
 }
 
 void factor_vm::primitive_bignum_not() {
-  ctx->replace(tag<bignum>(bignum_bitwise_not(untag<bignum>(ctx->peek()))));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_bitwise_not(untag<bignum>(ctx->peek()))));
 }
 
 void factor_vm::primitive_bignum_bitp() {
@@ -199,7 +199,7 @@ void factor_vm::primitive_bignum_bitp() {
 }
 
 void factor_vm::primitive_bignum_log2() {
-  ctx->replace(tag<bignum>(bignum_integer_length(untag<bignum>(ctx->peek()))));
+  ctx->replace(bignum_maybe_to_fixnum(bignum_integer_length(untag<bignum>(ctx->peek()))));
 }
 
 // Allocates memory

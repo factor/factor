@@ -91,7 +91,8 @@ SYMBOL: objects
 ! Constants need to be synced with
 !   vm/image.hpp
 CONSTANT: image-magic 0x0f0e0d0c
-CONSTANT: image-version 5
+! Integer arithmetic now normalizes results; rebuild compiled images.
+CONSTANT: image-version 6
 
 CONSTANT: data-base 1024
 

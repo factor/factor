@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators compiler.tree
+USING: accessors arrays classes.algebra combinators compiler.tree
 compiler.tree.combinators compiler.tree.propagation.info fry
 hashtables kernel math math.partial-dispatch sequences words ;
 IN: compiler.tree.identities
@@ -67,12 +67,17 @@ GENERIC: apply-identities* ( node -- node )
     [ [ in-d>> ] [ out-d>> ] bi ] dip
     pick nth over first associate <#data-shuffle> ;
 
+! Selecting an explicit, small bignum would bypass arithmetic normalization.
+: select-normalized-input ( node n -- node' )
+    2dup [ node-input-infos ] dip swap nth class>> bignum classes-intersect?
+    [ drop ] [ select-input ] if ;
+
 M: #call apply-identities*
     dup word>> "identities" word-prop [
         over node-input-infos find-identity [
             {
-                { \ drop [ 0 select-input ] }
-                { \ nip [ 1 select-input ] }
+                { \ drop [ 0 select-normalized-input ] }
+                { \ nip [ 1 select-normalized-input ] }
                 [ simplify-to-constant ]
             } case
         ] when*

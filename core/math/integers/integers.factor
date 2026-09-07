@@ -118,6 +118,8 @@ M: bignum bitor bignum-bitor ; inline
 M: bignum bitxor bignum-bitxor ; inline
 M: bignum shift shift-count bignum-shift ; inline
 
+M: bignum abs dup 0 < [ neg ] [ >integer ] if ; inline
+
 M: bignum bitnot bignum-bitnot ; inline
 M: bignum bit? bit-count bignum-bit? ; inline
 M: bignum (log2) bignum-log2 ; inline

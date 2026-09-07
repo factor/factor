@@ -52,8 +52,19 @@ IN: compiler.tree.propagation.known-words
 : ensure-math-class ( class must-be -- class' )
     [ class<= ] most ;
 
+! Arithmetic can demote a bignum result to a fixnum. Explicit conversions
+! still retain their requested representation.
+: normalize-integer-result ( class interval -- class' interval' )
+    over null-class? [
+        over integer class<= [
+            over fixnum class<= [
+                nip dup fits-in-fixnum? fixnum integer ? swap
+            ] unless
+        ] when
+    ] unless ;
+
 : number-valued ( class interval -- class' interval' )
-    [ number ensure-math-class ] dip ;
+    [ number ensure-math-class ] dip normalize-integer-result ;
 
 : fixnum-valued ( class interval -- class' interval' )
     over null-class? [
@@ -61,10 +72,10 @@ IN: compiler.tree.propagation.known-words
     ] unless ;
 
 : integer-valued ( class interval -- class' interval' )
-    [ integer ensure-math-class ] dip ;
+    [ integer ensure-math-class ] dip normalize-integer-result ;
 
 : real-valued ( class interval -- class' interval' )
-    [ real ensure-math-class ] dip ;
+    [ real ensure-math-class ] dip normalize-integer-result ;
 
 : float-valued ( class interval -- class' interval' )
     over null-class? [
@@ -258,10 +269,13 @@ generic-comparison-ops [
     { >float float }
     { bignum>float float }
 
-    { >integer integer }
 } [
     '[ _ swap interval>> <class/interval-info> ] "outputs" set-word-prop
 ] assoc-each
+
+\ >integer [
+    integer swap interval>> normalize-integer-result <class/interval-info>
+] "outputs" set-word-prop
 
 ! For these we limit the output interval
 {
@@ -295,7 +309,8 @@ generic-comparison-ops [
 
 { (log2) fixnum-log2 bignum-log2 } [
     [
-        [ class>> ] [ interval>> interval-log2 ] bi <class/interval-info>
+        [ class>> ] [ interval>> interval-log2 ] bi
+        normalize-integer-result <class/interval-info>
     ] "outputs" set-word-prop
 ] each
 
@@ -407,3 +422,5 @@ generic-comparison-ops [
     [ propagate-resize-fixed-length-sequence ] curry
     "outputs" set-word-prop
 ] assoc-each
+
+\ bignum-gcd [ 2drop integer <class-info> ] "outputs" set-word-prop
