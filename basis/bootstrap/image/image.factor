@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs byte-arrays classes
+USING: accessors alien.accessors arrays assocs byte-arrays classes
 classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
-compiler.units endian generic generic.single.private grouping
-hashtables hashtables.private io io.encodings.binary io.files
+compiler.units endian endian.private generic generic.single.private
+grouping hashtables hashtables.private io io.encodings.binary io.files
 io.pathnames kernel kernel.private layouts locals.types make
 math math.bitwise math.order namespaces namespaces.private
 parser parser.notes prettyprint quotations sequences
@@ -47,7 +47,9 @@ M: eql-wrapper hashcode* obj>> hashcode* ;
 GENERIC: (eql?) ( obj1 obj2 -- ? )
 
 : eql? ( obj1 obj2 -- ? )
-    { [ [ class-of ] same? ] [ (eql?) ] } 2&& ;
+    2dup eq? [ 2drop t ] [
+        { [ [ class-of ] same? ] [ (eql?) ] } 2&&
+    ] if ;
 
 M: fixnum (eql?) eq? ;
 
@@ -535,11 +537,32 @@ M: quotation prepare-object
 
 ! Image output
 
+:: write-image-cells ( image cell-size order -- )
+    ! Reuse a bounded buffer instead of allocating and writing every cell.
+    65,536 <byte-array> :> bytes
+    image 65,536 cell-size /i <groups> [| cells |
+        cells [| value i |
+            value order cell-size f ?byte-reverse
+            bytes i cell-size *
+            cell-size 4 = [ set-alien-signed-4 ] [ set-alien-signed-8 ] if
+        ] each-index
+        bytes cells length cell-size * head-slice write
+    ] each ; inline
+
 : (write-image) ( image -- )
-    bootstrap-cell output-stream get
-    big-endian get
-    [ '[ _ >be _ stream-write ] each ]
-    [ '[ _ >le _ stream-write ] each ] if ;
+    ! Specialize the cell store and byte swapping outside the loop.
+    bootstrap-cell {
+        { 4 [
+            big-endian get
+            [ 4 endian:big-endian write-image-cells ]
+            [ 4 little-endian write-image-cells ] if
+        ] }
+        { 8 [
+            big-endian get
+            [ 8 endian:big-endian write-image-cells ]
+            [ 8 little-endian write-image-cells ] if
+        ] }
+    } case ;
 
 : write-image ( image -- )
     "Writing image to " write
