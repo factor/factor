@@ -1,9 +1,48 @@
 USING: accessors arrays calendar combinators.short-circuit
-concurrency.promises continuations documents io kernel lexer
+concurrency.promises continuations documents io io.directories
+io.encodings.utf8 io.files io.pathnames kernel lexer
 listener math namespaces parser quotations sequences threads
 tools.test ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
-ui.gestures ui.tools.common ui.tools.listener vocabs.parser ;
+ui.gestures ui.tools.common ui.tools.listener ui.tools.listener.private
+vocabs.parser ;
 IN: ui.tools.listener.tests
+
+! Finder folder drops change the listener's directory instead of running it.
+{ t } [
+    [
+        "project with spaces" make-directory
+        "project with spaces" absolute-path
+        dup 1array (listener-run-files) current-directory get =
+    ] with-test-directory
+] unit-test
+
+! File paths in the same batch remain relative to the original directory.
+{ "ran" } [
+    [
+        "project" make-directory
+        "USING: io.files io.encodings.utf8 ; \"ran\" \"result\" utf8 set-file-contents"
+        "script.factor" utf8 set-file-contents
+        { "project" "script.factor" } (listener-run-files)
+        "result" utf8 file-contents
+    ] with-test-directory
+] unit-test
+
+{ t } [
+    [
+        "first" make-directory "second" make-directory
+        "second" absolute-path
+        { "first" "second" } (listener-run-files)
+        current-directory get =
+    ] with-test-directory
+] unit-test
+
+{ t } [
+    current-directory get { } listener-run-files current-directory get =
+] unit-test
+
+[
+    [ { "missing.factor" } (listener-run-files) ] with-test-directory
+] must-fail
 
 [
     [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
