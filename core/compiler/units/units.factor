@@ -64,8 +64,26 @@ HOOK: to-recompile compiler-impl ( -- words )
 
 HOOK: process-forgotten-words compiler-impl ( words -- )
 
+<PRIVATE
+
+SYMBOL: pending-new-words
+pending-new-words [ V{ } clone ] initialize
+
+: update-code-heap ( alist update-existing? reset-pics? -- changed? )
+    pick empty? not [ modify-code-heap ] dip ;
+
+: invalidate-new-words ( -- )
+    pending-new-words get-global [ clear-set ] each ;
+
+: invalidate-other-new-words ( -- )
+    pending-new-words get-global [
+        dup new-words get eq? [ drop ] [ clear-set ] if
+    ] each ;
+
+PRIVATE>
+
 : compile ( words -- )
-    recompile t f modify-code-heap ;
+    recompile t f update-code-heap [ invalidate-new-words ] when ;
 
 : filter-word-defs ( defset -- words )
     members [ word? ] filter ;
@@ -92,6 +110,7 @@ SYMBOL: definition-observers
 GENERIC: definitions-changed ( set obj -- )
 
 STARTUP-HOOK: [
+    V{ } clone pending-new-words set-global
     V{ } clone definition-observers set-global
 
     ! This goes here because vocabs cannot depend on init
@@ -167,22 +186,19 @@ M: object always-bump-effect-counter? drop f ;
             recompile
             outdated-tuples get update-tuples
             forgotten-definitions get process-forgotten-definitions
-        ] keep update-existing? reset-pics? modify-code-heap
+        ] keep update-existing? reset-pics? update-code-heap
+        ! Newly installed code may call a word in any unfinished unit,
+        ! even across dynamic namespaces or threads.
+        [ invalidate-other-new-words ] when
         bump-effect-counter
         notify-observers
     ] if-bootstrapping ;
 
-TUPLE: nesting-observer { new-words hash-set } ;
-
-M: nesting-observer definitions-changed
-    [ members ] dip new-words>> [ delete ] curry each ;
-
-: add-nesting-observer ( -- )
-    new-words get nesting-observer boa
-    [ nesting-observer namespaces:set ] [ add-definition-observer ] bi ;
-
-: remove-nesting-observer ( -- )
-    nesting-observer get remove-definition-observer ;
+: with-pending-new-words ( quot -- )
+    new-words get pending-new-words get-global push
+    [ [ finish-compilation-unit ] finally ]
+    [ new-words get pending-new-words get-global remove-eq! drop ]
+    finally ; inline
 
 PRIVATE>
 
@@ -193,13 +209,8 @@ PRIVATE>
     HS{ } clone changed-effects pick set-at
     HS{ } clone outdated-generics pick set-at
     H{ } clone outdated-tuples pick set-at
-    HS{ } clone new-words pick set-at [
-        add-nesting-observer
-        [
-            remove-nesting-observer
-            finish-compilation-unit
-        ] finally
-    ] with-variables ; inline
+    HS{ } clone new-words pick set-at
+    [ with-pending-new-words ] with-variables ; inline
 
 : with-compilation-unit ( quot -- )
     H{ } clone

@@ -32,6 +32,8 @@ ARTICLE: "compilation-units" "Compilation units"
 $nl
 "When a source file is being parsed, all definitions are part of a single compilation unit, unless the " { $link POSTPONE: << } " parsing word is used to create nested compilation units."
 $nl
+"Code installed by a nested unit may refer to words still awaiting compilation in an enclosing unit. The enclosing unit then updates existing call sites when it installs those words. An empty nested unit does not require this update. Explicit calls to " { $link compile } " also invalidate the new-word assumptions of unfinished units."
+$nl
 "Words defined in a compilation unit may not be called until the compilation unit is finished. The parser detects this case for parsing words and throws a " { $link staging-violation } ". Similarly, an attempt to use a macro from a word defined in the same compilation unit will throw a " { $link transform-expansion-error } ". Calling any other word from within its own compilation unit throws an " { $link undefined } " error."
 $nl
 "This means that parsing words and macros generally cannot be used in the same source file as they are defined. There are two means of getting around this:"
