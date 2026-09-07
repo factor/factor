@@ -138,14 +138,14 @@ IN: cpu.arm.64.tests
     large-spill-from-temp-code 4 head
 ] unit-test
 
-! Integer FFI values occupy temp, so their large addresses use temp2.
-{ 12 16 } [
+! Callback loads first recover the native stack saved by CALLBACK-STUB.
+{ 12 20 } [
     0x10000 stack-param-store-code length
     0x10000 stack-param-load-code length
 ] unit-test
 
 ! Keep using scaled immediate operands whenever they fit.
-{ 8 8 } [
+{ 8 12 } [
     0x100 stack-param-store-code length
     0x100 stack-param-load-code length
 ] unit-test

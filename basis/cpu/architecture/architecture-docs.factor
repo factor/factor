@@ -4,6 +4,10 @@ help.syntax kernel layouts literals math multiline sequences
 strings system vm words ;
 IN: cpu.architecture
 
+HELP: struct-return-register
+{ $values { "reg/f" "a machine register or f" } }
+{ $description "Returns the dedicated register for a hidden structure result pointer, or f when the pointer uses normal parameter allocation. A dedicated result register does not consume an argument register or stack slot." } ;
+
 <<
 STRING: ex-%allot
 USING: cpu.architecture make ;

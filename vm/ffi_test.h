@@ -43,6 +43,17 @@ struct bar {
   long x, y, z;
 };
 FACTOR_EXPORT struct bar ffi_test_16(long x, long y, long z);
+
+struct large_return {
+  long long x, y, z;
+};
+FACTOR_EXPORT struct large_return ffi_test_large_return(
+    long long a, long long b, long long c, long long d, long long e,
+    long long f, long long g, long long h, long long i);
+FACTOR_EXPORT long long ffi_test_large_return_callback(
+    struct large_return (*callback)(long long, long long, long long,
+                                   long long, long long, long long,
+                                   long long, long long, long long));
 struct tiny {
   int x;
 };

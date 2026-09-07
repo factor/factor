@@ -65,6 +65,21 @@ struct bar ffi_test_16(long x, long y, long z) {
   return r;
 }
 
+struct large_return ffi_test_large_return(
+    long long a, long long b, long long c, long long d, long long e,
+    long long f, long long g, long long h, long long i) {
+  struct large_return result = {a + b + c, d + e + f, g + h + i};
+  return result;
+}
+
+long long ffi_test_large_return_callback(
+    struct large_return (*callback)(long long, long long, long long,
+                                   long long, long long, long long,
+                                   long long, long long, long long)) {
+  struct large_return result = callback(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  return result.x + result.y + result.z;
+}
+
 struct tiny ffi_test_17(int x) {
   struct tiny r;
   r.x = x;
