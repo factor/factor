@@ -242,3 +242,17 @@ ${
     -100 100 [a,b] array-capacity wrap-interval
     -100 100 [a,b] integer wrap-interval
 ] unit-test
+
+! Singleton integer intervals must retain values outside the fixnum range.
+{ t t } [
+    integer 100 2^ [a,a] <class/interval-info> >literal<
+    [ 100 2^ = ] dip
+] unit-test
+{ t t } [
+    integer 100 2^ neg [a,a] <class/interval-info> >literal<
+    [ 100 2^ neg = ] dip
+] unit-test
+{ t t } [
+    integer 3 >bignum [a,a] <class/interval-info> >literal<
+    [ fixnum? ] dip
+] unit-test
