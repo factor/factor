@@ -13,9 +13,13 @@ HELP: custom-inlining?
 { $values { "word" word } { "quot/f" "a quotation or " { $link f } } }
 { $description "Returns the custom inlining " { $link quotation } " for a word if it has one." } ;
 
+HELP: set-dispatch-independent-inlining
+{ $values { "word" word } { "quot" quotation } }
+{ $description "Installs a custom inlining hook whose result does not depend on the owning generic's generated dispatch definition. Callers depend on the hook quotation instead, so rebuilding dispatch after an unrelated method change does not invalidate them. The hook must record any method or class assumptions separately. Replacing the hook through the ordinary word property API restores the conservative definition dependency." } ;
+
 HELP: do-inlining
 { $values { "#call" #call } { "word" word } { "?" boolean } }
-{ $description "Performs inlining of the word in the #call node. If there's a custom inlining hook, it is permitted to return f, which means that we try the normal inlining heuristic. Invoking a custom hook records a dependency on the owning word's definition, so redefining that word recompiles callers and reruns the hook." } ;
+{ $description "Performs inlining of the word in the #call node. If there's a custom inlining hook, it is permitted to return f, which means that we try the normal inlining heuristic. Invoking a custom hook normally records a dependency on the owning word's definition. Hooks installed with " { $link set-dispatch-independent-inlining } " depend on their hook quotation instead. Both successful and declined attempts record the dependency." } ;
 
 HELP: inline-math-method
 { $values { "#call" #call } { "word" word } { "?" boolean } }

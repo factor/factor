@@ -163,7 +163,10 @@ M: optimizing-compiler to-recompile ( -- words )
         changed-definitions get new-words get diff
         outdated-definition-usages %
 
-        maybe-changed get new-words get diff
+        ! Definition changes can also invalidate conditional assumptions,
+        ! such as a custom inlining hook being replaced or removed.
+        maybe-changed get changed-definitions get union
+        new-words get diff
         outdated-conditional-usages %
 
         changed-definitions get filter-word-defs dup zip ,

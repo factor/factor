@@ -4,7 +4,8 @@
 USING: accessors alien.c-types arrays assocs byte-arrays classes
 classes.algebra classes.struct classes.tuple
 classes.tuple.private combinators combinators.short-circuit
-compiler.tree.propagation.info effects generalizations generic
+compiler.tree.propagation.info compiler.tree.propagation.inlining
+effects generalizations generic
 generic.single growable hash-sets hashtables kernel layouts math
 math.integers.private math.intervals math.order
 math.partial-dispatch math.private namespaces quotations
@@ -22,7 +23,7 @@ IN: compiler.tree.propagation.transforms
         value-info class>> \ equal? method-for-class
         [ swap equal? ] f ?
     ] [ drop f ] if
-] "custom-inlining" set-word-prop
+] set-dispatch-independent-inlining
 
 : rem-custom-inlining ( inputs -- quot/f )
     dup first value-info class>> integer class<= [
@@ -174,7 +175,7 @@ IN: compiler.tree.propagation.transforms
         { HS{ } [ [ drop 0 <hash-set> ] ] }
         [ drop f ]
     } case
-] "custom-inlining" set-word-prop
+] set-dispatch-independent-inlining
 
 ERROR: bad-partial-eval quot word ;
 
@@ -330,6 +331,7 @@ CONSTANT: lookup-table-at-max 256
     ] [ drop f ] if ;
 
 \ at* [ at-quot ] 1 define-partial-eval
+\ at* dup "custom-inlining" word-prop set-dispatch-independent-inlining
 
 : diff-quot ( seq -- quot: ( seq' -- seq'' ) )
     [ tester ] keep '[ members _ reject _ set-like ] ;

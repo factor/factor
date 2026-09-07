@@ -98,8 +98,17 @@ SYMBOL: history
 : custom-inlining? ( word -- quot/f )
     "custom-inlining" word-prop ;
 
+: set-dispatch-independent-inlining ( word quot -- )
+    2dup "custom-inlining" set-word-prop
+    "dispatch-independent-inlining" set-word-prop ;
+
+: depend-on-custom-inlining ( word quot -- )
+    over "dispatch-independent-inlining" word-prop over eq?
+    [ add-depends-on-custom-inlining ]
+    [ drop +definition+ depends-on ] if ;
+
 : inline-custom ( #call word -- ? )
-    [ dup ] [ dup +definition+ depends-on custom-inlining? ] bi*
+    [ dup ] [ dup custom-inlining? [ depend-on-custom-inlining ] keep ] bi*
     call( #call -- word/quot/f )
     object swap eliminate-dispatch ;
 
