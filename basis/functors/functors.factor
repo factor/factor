@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.mixin classes.parser
 classes.singleton classes.tuple classes.tuple.parser combinators
-effects.parser functors.backend generic generic.parser io
+effects.parser fry functors.backend generic generic.parser io
 io.streams.string kernel lexer locals.parser locals.types macros
 make namespaces parser present quotations sequences splitting
 strings vocabs.parser words words.symbol ;
@@ -16,12 +16,18 @@ TUPLE: fake-call-next-method ;
 
 TUPLE: fake-quotation seq ;
 
+TUPLE: fake-fry source body ;
+
 GENERIC: >fake-quotations ( quot -- fake )
 
 M: quotation-like >fake-quotations
     >array >fake-quotations fake-quotation boa ;
 
 M: array >fake-quotations [ >fake-quotations ] { } map-as ;
+
+M: fry-form >fake-quotations
+    [ source>> >fake-quotations ] [ body>> >fake-quotations ] bi
+    fake-fry boa ;
 
 M: object >fake-quotations ;
 
@@ -35,6 +41,10 @@ M: fake-quotation (fake-quotations>)
 
 M: array (fake-quotations>)
     [ [ (fake-quotations>) ] each ] { } make , ;
+
+M: fake-fry (fake-quotations>)
+    [ source>> fake-quotations> first ]
+    [ body>> fake-quotations> first ] bi <fry-word> , ;
 
 M: fake-call-next-method (fake-quotations>)
     drop \ method get literalize , \ (call-next-method) , ;
