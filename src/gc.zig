@@ -63,15 +63,36 @@ pub const GarbageCollector = struct {
     }
 
     pub fn gc(self: *Self, op: GCOp) !void {
-        // The collector writes relocated pointers back into the code heap and
-        // callback heap (e.g. callback stub `owner` fields in visitAllRoots).
-        // On Apple Silicon those are MAP_JIT and must be made writable for the
-        // duration of GC. collect() also opens a scope; jit_protect.Scope is
-        // re-entrant (depth-counted), so nesting is safe and this also covers
-        // the direct gc() callers (allotObjectSlow / allotLargeObject).
+        self.vm.syncContextFromRegisters();
+        const need_unlock = self.vm.callstackNeedsGuardUnlock() or op == .collect_compact;
+        const stack_seg = self.vm.vm_asm.ctx.callstack_seg;
+        if (need_unlock) {
+            if (stack_seg) |seg| try seg.setBorderLocked(false);
+        }
+        defer {
+            if (need_unlock) {
+                if (stack_seg) |seg| seg.setBorderLocked(true) catch @panic("Cannot protect callstack guard");
+            }
+        }
+
+        // Guard transitions may fault on a nearly full native stack. They
+        // must happen outside the active-GC interval so overflow can recover.
+        self.vm.current_gc_p = true;
+        defer self.vm.current_gc_p = false;
+
+        // Both collection and its nursery retry can relocate code/callback
+        // pointers in MAP_JIT pages. Restore execution before relocking guards.
         var jit_scope = jit_protect.Scope.init();
         defer jit_scope.deinit();
 
+        self.gcImpl(op) catch |err| {
+            // Preserve the nursery-failure fallback while its native stack
+            // headroom and active-GC state are still in scope.
+            if (op == .collect_nursery) self.collectFull(true) else return err;
+        };
+    }
+
+    fn gcImpl(self: *Self, op: GCOp) !void {
         var current_op = op;
 
         if (self.vm.gc_events != null) {
@@ -143,24 +164,6 @@ pub const GarbageCollector = struct {
     }
 
     pub fn collect(self: *Self, op: GCOp) void {
-        self.vm.syncContextFromRegisters();
-        var jit_scope = jit_protect.Scope.init();
-        defer jit_scope.deinit();
-
-        const need_unlock = self.vm.callstackNeedsGuardUnlock() or op == .collect_compact;
-        if (need_unlock) {
-            if (self.vm.vm_asm.ctx.callstack_seg) |seg| {
-                seg.setBorderLocked(false) catch {};
-            }
-        }
-        defer {
-            if (need_unlock) {
-                if (self.vm.vm_asm.ctx.callstack_seg) |seg| {
-                    seg.setBorderLocked(true) catch {};
-                }
-            }
-        }
-
         self.gc(op) catch @panic("GC failed");
     }
 

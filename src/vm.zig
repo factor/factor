@@ -1000,8 +1000,6 @@ pub const FactorVM = struct {
         }
 
         if (self.gc) |gc_instance| {
-            self.current_gc_p = true;
-            defer self.current_gc_p = false;
             gc_instance.collect(.collect_compact);
         }
 
@@ -1033,18 +1031,12 @@ pub const FactorVM = struct {
         if (self.gc_off) return;
 
         if (self.gc) |gc_instance| {
-            self.current_gc_p = true;
-            defer self.current_gc_p = false;
-            gc_instance.gc(.collect_nursery) catch {
-                gc_instance.collectFull(true);
-            };
+            gc_instance.gc(.collect_nursery) catch @panic("GC failed");
         }
     }
 
     pub fn fullGc(self: *Self) void {
         if (self.gc) |gc_instance| {
-            self.current_gc_p = true;
-            defer self.current_gc_p = false;
             gc_instance.gc(.collect_full) catch @panic("GC failed");
         }
     }
