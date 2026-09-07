@@ -5,7 +5,7 @@ assocs cache classes colors combinators core-foundation
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts io.encodings.string io.encodings.utf16 kernel make math
-math.functions math.order math.vectors namespaces sequences
+math.functions math.order math.vectors namespaces opengl sequences
 strings ;
 IN: core-text
 
@@ -172,6 +172,7 @@ M: line dispose* line>> CFRelease ;
 SYMBOL: cached-lines
 
 : cached-line ( font string -- line )
-    cached-lines get-global [ <line> ] 2cache ;
+    gl-scale-factor get-global 3array
+    cached-lines get-global [ first2 <line> ] cache ;
 
 STARTUP-HOOK: [ <cache-assoc> cached-lines set-global ]

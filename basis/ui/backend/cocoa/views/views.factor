@@ -281,8 +281,21 @@ IMPORT: NSAttributedString
     ] when ;
 
 : set-scale-factor ( n -- )
-    [ 1.0 > ] keep f ? gl-scale-factor set-global
-    cached-lines get-global clear-assoc ;
+    [ 1.0 > ] keep f ? gl-scale-factor set-global ;
+
+: invalidate-scale-layout ( gadget -- )
+    dup [ invalidate-scale-layout ] each-child
+    f >>pref-dim \ invalidate* >>layout-state drop ;
+
+: backing-scale-changed ( world -- )
+    dup handle>> [
+        dup set-gl-context
+        {
+            [ text-handle>> [ clear-assoc ] when* ]
+            [ images>> [ clear-assoc ] when* ]
+            [ dup invalidate-scale-layout layout-later ]
+        } cleave
+    ] [ drop ] if ;
 
 PRIVATE>
 
@@ -290,7 +303,6 @@ PRIVATE>
     COCOA-PROTOCOL: NSTextInputClient
 
     METHOD: void prepareOpenGL [
-        self -> backingScaleFactor set-scale-factor
         self -> update
     ] ;
 
@@ -712,7 +724,8 @@ PRIVATE>
 
     METHOD: void windowDidChangeBackingProperties: id notification
     [
-        notification -> object -> backingScaleFactor set-scale-factor
+        notification -> object -> contentView
+        [ -> update ] [ window [ backing-scale-changed ] when* ] bi
     ] ;
 ;CLASS>
 
