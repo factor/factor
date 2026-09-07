@@ -3,7 +3,8 @@
 USING: tools.test core-text core-text.fonts core-foundation
 core-foundation.dictionaries destructors arrays kernel
 generalizations math accessors core-foundation.utilities
-combinators hashtables colors ;
+combinators hashtables colors continuations fonts namespaces opengl
+sequences ;
 IN: core-text.tests
 
 : test-font ( name -- font )
@@ -35,3 +36,20 @@ IN: core-text.tests
 { t } [ "Hello world" "Chicago" test-typographic-bounds ] unit-test
 
 { t } [ "日本語" "Helvetica" test-typographic-bounds ] unit-test
+
+! Identical text on 1x and 2x displays needs different rasterized lines.
+! Switching back should reuse the original cache entry.
+:: test-scale-cache ( -- distinct? larger? reused? )
+    gl-scale-factor get-global :> original-scale
+    [
+        f gl-scale-factor set-global
+        sans-serif-font "Retina cache" cached-line :> normal
+        2.0 gl-scale-factor set-global
+        sans-serif-font "Retina cache" cached-line :> retina
+        normal retina eq? not
+        retina dim>> first normal dim>> first >
+        f gl-scale-factor set-global
+        sans-serif-font "Retina cache" cached-line normal eq?
+    ] [ original-scale gl-scale-factor set-global ] finally ;
+
+{ t t t } [ test-scale-cache ] unit-test

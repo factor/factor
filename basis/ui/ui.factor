@@ -115,10 +115,18 @@ M: world ungraft*
 : slurp-vector ( ... seq quot: ( ... elt -- ... ) -- ... )
     over '[ _ empty? not ] -rot '[ _ pop @ ] while ; inline
 
+: select-layout-context ( gadget -- )
+    find-world [
+        dup handle>> [ set-gl-context ] [ drop ] if
+    ] when* ;
+
 : layout-queued ( -- seq )
     layout-queue [
         in-layout? on
-        [ dup layout find-world [ , ] when* ] slurp-vector
+        [
+            dup select-layout-context
+            dup layout find-world [ , ] when*
+        ] slurp-vector
     ] { } make members ;
 
 : redraw-worlds ( seq -- )

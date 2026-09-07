@@ -8,7 +8,7 @@ core-foundation.strings core-graphics core-graphics.types debugger
 io.thread kernel
 literals math math.bitwise math.rectangles namespaces sequences
 threads ui
-ui.backend ui.backend.cocoa.views ui.clipboards
+ui.backend ui.backend.cocoa.views ui.backend.cocoa.views.private ui.clipboards
 ui.gadgets.worlds ui.pixel-formats ui.private ui.render ui.theme
 ui.theme.switching ;
 IN: ui.backend.cocoa
@@ -181,7 +181,8 @@ M: cocoa-ui-backend raise-window*
     ] when* ;
 
 M: window-handle select-gl-context
-    view>> -> openGLContext -> makeCurrentContext ;
+    [ window>> -> backingScaleFactor set-scale-factor ]
+    [ view>> -> openGLContext -> makeCurrentContext ] bi ;
 
 : display-asleep? ( -- ? )
     CGMainDisplayID CGDisplayIsAsleep c-bool> ;
