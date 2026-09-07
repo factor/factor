@@ -91,7 +91,7 @@ HELP: file-lines
 
 HELP: change-file-lines
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
-{ $description "Reads the file lines, transforms the file lines, and writes them back to the same file name." }
+{ $description "Reads the file lines, transforms the file lines, and writes them back to the same file name. Preserves the original line separators by position and whether the final line has a separator. Additional line separators use the first separator found in the file, or LF if there are none. An empty transformation preserves the text, including mixed line endings." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: set-file-contents

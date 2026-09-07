@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.strings io io.backend io.encodings
-io.pathnames kernel kernel.private namespaces sequences
-splitting system ;
+USING: alien.strings arrays io io.backend io.encodings
+io.pathnames kernel kernel.private math namespaces sequences
+splitting strings system vectors ;
 IN: io.files
 
 <PRIVATE
@@ -64,8 +64,43 @@ HOOK: (file-appender) io-backend ( path -- stream )
 : set-file-lines ( seq path encoding -- )
     [ write-lines ] with-file-writer ;
 
-: change-file-lines ( ..a path encoding quot: ( ..a seq -- ..b seq' ) -- ..b )
-    '[ file-lines @ ] [ set-file-lines ] 2bi ; inline
+<PRIVATE
+
+:: file-line-endings ( contents -- lines endings )
+    V{ } clone :> lines
+    V{ } clone :> endings
+    contents string? "\r\n" "\n" ? :> separators
+    0 :> start!
+    [ start contents length < ] [
+        start contents [ separators member? ] find-from drop :> eol
+        eol [
+            eol contents nth CHAR: \r =
+            eol 1 + contents ?nth CHAR: \n = and
+            2 1 ? eol +
+        ] [ contents length ] if :> end
+        start eol contents length or contents subseq lines push
+        eol contents length or end contents subseq endings push
+        end start!
+    ] while
+    lines >array endings >array ;
+
+:: write-file-line-endings ( lines endings -- )
+    endings [ empty? not ] find nip "\n" or :> default-ending
+    lines [| line i |
+        line write
+        i lines length 1 - = endings empty? not and [
+            endings last
+        ] [
+            i endings ?nth dup empty? [ drop default-ending ] when
+        ] if [ write1 ] each
+    ] each-index ;
+
+PRIVATE>
+
+:: change-file-lines ( ..a path encoding quot: ( ..a seq -- ..b seq' ) -- ..b )
+    path encoding file-contents file-line-endings :> ( lines endings )
+    lines quot call
+    path encoding [ endings write-file-line-endings ] with-file-writer ; inline
 
 : set-file-contents ( seq path encoding -- )
     [ write ] with-file-writer ;

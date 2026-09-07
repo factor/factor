@@ -8,6 +8,78 @@ specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
 IN: io.files.tests
 
+:: rewrite-file-lines ( text encoding quot -- text' )
+    [| path |
+        text path encoding set-file-contents
+        path encoding quot change-file-lines
+        path encoding file-contents
+    ] with-test-file ; inline
+
+{ t } [
+    {
+        "" "a" "a\n" "a\r\n" "a\r" "a\n\n" "\r\n"
+        "a\r\nb\nc\rd" "日本語\r\n🍆\r\n" "a\u000085b\u002028c\n"
+    } [ dup utf8 [ ] rewrite-file-lines = ] all?
+] unit-test
+
+{ "a!\r\nb!\r\n" } [
+    "a\r\nb\r\n" utf8 [ [ "!" append ] map ] rewrite-file-lines
+] unit-test
+
+{ "a!\r\nb!" } [
+    "a\r\nb" utf8 [ [ "!" append ] map ] rewrite-file-lines
+] unit-test
+
+{ "a!\r\nb!\nc!\r" } [
+    "a\r\nb\nc\r" utf8 [ [ "!" append ] map ] rewrite-file-lines
+] unit-test
+
+{ "a\r\nb\r\nc\r\n" } [
+    "a\r\nb\r\n" utf8 [ "c" suffix ] rewrite-file-lines
+] unit-test
+
+{ "a\nb" } [ "a" utf8 [ "b" suffix ] rewrite-file-lines ] unit-test
+{ "a\n" } [ "" utf8 [ "a" suffix ] rewrite-file-lines ] unit-test
+{ "" } [ "a\r\nb\r\n" utf8 [ drop { } ] rewrite-file-lines ] unit-test
+
+! The quotation sees the same lines as file-lines, including binary CRs.
+{ "a\r\nb\r\n" } [
+    "a\r\nb\r\n" utf8 [ dup { "a" "b" } assert= ] rewrite-file-lines
+] unit-test
+
+{ B{ 97 13 10 98 13 10 } } [
+    B{ 97 13 10 98 13 10 } binary
+    [ dup { B{ 97 13 } B{ 98 13 } } assert= ] rewrite-file-lines
+] unit-test
+
+:: unchanged-line-bytes? ( encoding -- ? )
+    [| path |
+        "日本語\r\n🍆\r\n" path encoding set-file-contents
+        path binary file-contents
+        path encoding [ ] change-file-lines
+        path binary file-contents =
+    ] with-test-file ;
+
+{ t } [ { utf8 utf16 utf16le utf16be } [ unchanged-line-bytes? ] all? ] unit-test
+
+! A failed transformation must not truncate the source file.
+{ "original\r\n" } [
+    [| path |
+        "original\r\n" path utf8 set-file-contents
+        [ path utf8 [ drop "failed" throw ] change-file-lines ] [ drop ] recover
+        path utf8 file-contents
+    ] with-test-file
+] unit-test
+
+! Preserve the combinator's data-stack threading contract.
+{ 42 "prefix:a\r\n" } [
+    [| path |
+        "a\r\n" path utf8 set-file-contents
+        42 "prefix:" path utf8 [ swap [ prepend ] curry map ] change-file-lines
+        path utf8 file-contents
+    ] with-test-file
+] unit-test
+
 SPECIALIZED-ARRAY: int
 
 { } [
