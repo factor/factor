@@ -2,6 +2,14 @@ IN: ui.backend.cocoa.views.tests
 USING: ui.backend.cocoa.views tools.test kernel math.rectangles
 namespaces ;
 
+! #2379: unbound control keys must not insert invisible characters.
+{ f } [ "\x05" cocoa-input-text ] unit-test
+{ f } [ "\x00\x05\x0b\x1b\x7f" cocoa-input-text ] unit-test
+{ "USE: math" } [ "USE: math\x05" cocoa-input-text ] unit-test
+{ "\t\n\r" } [ "\t\n\r" cocoa-input-text ] unit-test
+{ "日本語 é 🍆 —" } [ "日本語 é 🍆 —" cocoa-input-text ] unit-test
+{ "" } [ "" cocoa-input-text ] unit-test
+
 { t } [
     T{ rect
         { loc { 0 0 } }

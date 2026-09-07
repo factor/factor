@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays assocs classes cocoa cocoa.application cocoa.classes
+arrays ascii assocs classes cocoa cocoa.application cocoa.classes
 cocoa.pasteboard cocoa.runtime cocoa.subclassing cocoa.touchbar
 cocoa.types cocoa.views combinators continuations
 core-foundation.strings core-graphics core-graphics.types
@@ -98,6 +98,15 @@ CONSTANT: key-codes
 
 : send-key-up-event ( view event -- )
     key-event>gesture <key-up> send-key-event ;
+
+: cocoa-input-text ( str -- str/f )
+    ! Cocoa can send control characters for unbound Ctrl-Option keys.
+    ! Ignore those keystrokes rather than inserting invisible text or
+    ! replacing a selection. Preserve empty replacement strings for IMEs.
+    dup empty? [
+        [ [ control? not ] [ "\t\n\r" member? ] bi or ] filter
+        dup empty? [ drop f ] when
+    ] unless ;
 
 : mouse-event>gesture ( event -- modifiers button )
     [ event-modifiers ] [ button ] bi ;
@@ -473,32 +482,35 @@ PRIVATE>
             ] [
                 text -> string CF>string str!
             ] if
-            window world-focus :> gadget
-            gadget [
-                gadget support-input-methods? [
-                    replacementRange location>> NSNotFound = [
-                        gadget editor-caret first
-                        dup gadget editor-line
-                        [
-                            replacementRange location>> >codepoint-index
-                            2array gadget set-caret
+            str cocoa-input-text str!
+            str [
+                window world-focus :> gadget
+                gadget [
+                    gadget support-input-methods? [
+                        replacementRange location>> NSNotFound = [
+                            gadget editor-caret first
+                            dup gadget editor-line
+                            [
+                                replacementRange location>> >codepoint-index
+                                2array gadget set-caret
+                            ] [
+                                replacementRange [ location>> ] [ length>> ] bi +
+                                >codepoint-index
+                                2array gadget set-mark
+                            ] 2bi
+                        ] unless
+                        gadget preedit? [
+                            gadget remove-preedit-text
+                            gadget remove-preedit-info
+                            str gadget user-input* drop
+                            f gadget preedit-selection-mode?<<
                         ] [
-                            replacementRange [ location>> ] [ length>> ] bi +
-                            >codepoint-index
-                            2array gadget set-mark
-                        ] 2bi
-                    ] unless
-                    gadget preedit? [
-                        gadget remove-preedit-text
-                        gadget remove-preedit-info
-                        str gadget user-input* drop
-                        f gadget preedit-selection-mode?<<
+                            str window user-input
+                        ] if
                     ] [
                         str window user-input
                     ] if
-                ] [
-                    str window user-input
-                ] if
+                ] when
             ] when
         ] when
     ] ;
