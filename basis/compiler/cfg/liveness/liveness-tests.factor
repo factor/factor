@@ -2,7 +2,7 @@ USING: accessors alien assocs compiler.cfg compiler.cfg.comparisons
 compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.test compiler.utilities cpu.architecture
-cpu.x86.assembler.operands kernel math namespaces sequences system
+cpu.x86.assembler.operands kernel locals math namespaces sequences system
 tools.test ;
 IN: compiler.cfg.liveness.tests
 
@@ -86,6 +86,74 @@ IN: compiler.cfg.liveness.tests
 { H{ { 3 3 } } } [
     H{ { 37 99 } { 99 99 } { 2 99 } } leader-map set
     H{ { 37 37 } { 3 3 } } dup T{ ##peek f 2 D: 0 0 } kill-defs
+] unit-test
+
+! Uncoalesced registers can be killed without enumerating the live set.
+TUPLE: counted-live-set assoc { scans integer initial: 0 } ;
+
+M: counted-live-set >alist
+    [ 1 + ] change-scans assoc>> >alist ;
+
+M: counted-live-set delete-at assoc>> delete-at ;
+
+{ H{ { 3 3 } } 0 } [
+    [
+        f leader-map set
+        counted-live-set new H{ { 1 1 } { 3 3 } } clone >>assoc
+        [ T{ ##peek f 1 D: 0 } kill-defs ] keep
+        [ assoc>> ] [ scans>> ] bi
+    ] with-scope
+] unit-test
+
+! Instructions without definitions need no scan, even after coalescing.
+{ H{ { 1 1 } { 3 3 } } 0 } [
+    [
+        H{ { 1 3 } { 3 3 } } clone leader-map set
+        counted-live-set new H{ { 1 1 } { 3 3 } } clone >>assoc
+        [ T{ ##replace f 1 D: 0 } kill-defs ] keep
+        [ assoc>> ] [ scans>> ] bi
+    ] with-scope
+] unit-test
+
+! All definitions of a parallel copy must be removed.
+{ H{ { 3 3 } } } [
+    [
+        f leader-map set
+        H{ { 1 1 } { 2 2 } { 3 3 } } clone
+        [ T{ ##parallel-copy { values { { 1 10 } { 2 20 } } } } kill-defs ] keep
+    ] with-scope
+] unit-test
+
+! A coalesced definition kills every live alias, including chained aliases.
+{ H{ { 4 4 } { 99 99 } } } [
+    [
+        H{ { 1 2 } { 2 3 } { 3 3 } { 4 4 } } clone leader-map set
+        H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 99 99 } } clone
+        [ T{ ##peek f 1 D: 0 } kill-defs ] keep
+    ] with-scope
+] unit-test
+
+! compute-live-out
+! Edge sets are merged after all successor sets, into a fresh result.
+{
+    H{ { 10 3 } { 20 2 } { 30 3 } }
+    H{ { 1 H{ { 10 1 } } } { 2 H{ { 10 2 } { 20 2 } } } }
+    H{ { 10 3 } { 30 3 } }
+} [
+    [
+        [let
+            init-liveness
+            <basic-block> V{ 1 2 } >>successors :> bb
+            H{ { 1 H{ { 10 1 } } } { 2 H{ { 10 2 } { 20 2 } } } }
+            live-ins set
+            H{ } clone :> edges
+            H{ { 10 3 } { 30 3 } } bb edges set-at
+            edges 1 edge-live-ins get set-at
+            bb compute-live-out
+            live-ins get
+            bb 1 edge-live-in
+        ]
+    ] with-scope
 ] unit-test
 
 ! liveness-step

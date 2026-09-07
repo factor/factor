@@ -27,10 +27,16 @@ SYMBOL: base-pointers
 
 GENERIC: visit-insn ( live-set insn -- )
 
-! This would be much better if live-set was a real set
 : kill-defs ( live-set insn -- )
-    defs-vregs [ ?leader ] map
-    '[ drop ?leader _ in? ] assoc-reject! drop ; inline
+    defs-vregs [ drop ] [
+        leader-map get [
+            [ ?leader ] map
+            '[ drop ?leader _ in? ] assoc-reject! drop
+        ] [
+            ! Before coalescing there are no aliases to search for.
+            [ over delete-at ] each drop
+        ] if
+    ] if-empty ; inline
 
 : gen-uses ( live-set insn -- )
     uses-vregs [ swap conjoin ] with each ; inline
@@ -121,10 +127,12 @@ M: insn visit-insn 2drop ;
     [ [ compute-edge-live-in ] keep edge-live-ins get maybe-set-at ]
     bi or ;
 
-: compute-live-out ( basic-block -- live-out )
-    [ successors>> [ live-in ] map ]
-    [ dup successors>> [ edge-live-in ] with map ] bi
-    append assoc-union-all ;
+:: compute-live-out ( basic-block -- live-out )
+    H{ } clone :> result
+    basic-block successors>> :> succs
+    succs [ live-in result swap assoc-union! drop ] each
+    succs [ basic-block swap edge-live-in result swap assoc-union! drop ] each
+    result ;
 
 : update-live-out ( basic-block -- changed? )
     [ compute-live-out ] keep
