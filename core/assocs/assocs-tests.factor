@@ -77,6 +77,18 @@ H{ } clone "cache-test" set
 { 4 } [ 1 "cache-test" get [ 3 + ] cache ] unit-test
 { 5 } [ 2 "cache-test" get [ 3 + ] cache ] unit-test
 
+{ f } [
+    f H{ { f f } } [ "cache hit evaluated quotation" throw ] cache
+] unit-test
+
+{ f t } [
+    H{ } clone [ f swap [ drop f ] cache drop ] keep f swap at*
+] unit-test
+
+{ { 1 2 } } [
+    "key" H{ } clone [ drop { 1 2 } ] cache
+] unit-test
+
 {
     H{ { "factor" "rocks" } { 3 4 } }
 } [
