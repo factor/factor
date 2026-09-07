@@ -1,1 +1,1 @@
-Numbered and named regular expression capture groups
+Ordered NFA implementation for regular expression captures

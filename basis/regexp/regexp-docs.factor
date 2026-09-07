@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: kernel strings help.markup help.syntax math regexp.parser
-regexp.ast ;
+regexp.ast regexp.captures ;
 IN: regexp
 
 ABOUT: "regexp"
@@ -19,7 +19,7 @@ ARTICLE: "regexp" "Regular expressions"
     "regexp-operations"
 }
 "Advanced topics:"
-{ $vocab-subsection "Capture groups" "regexp.captures" }
+{ $subsections "regexp.captures" }
 { $vocab-subsection "Regular expression combinators" "regexp.combinators" }
 { $subsections
     "regexp-theory"
@@ -114,7 +114,7 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
 { $heading "Quotation" }
 "To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Capture groups" }
-"Parentheses capture the text they match. Groups are numbered from one by their opening parentheses; group zero is the whole match. Use " { $snippet "(?:...)" } " to group without capturing, or " { $snippet "(?<name>...)" } " to name a capturing group. Capture results are available through " { $vocab-link "regexp.captures" } "; existing matching operations keep their return values and matching behavior."
+"Parentheses capture the text they match. Groups are numbered from one by their opening parentheses; group zero is the whole match. Use " { $snippet "(?:...)" } " to group without capturing, or " { $snippet "(?<name>...)" } " to name a capturing group. Capture results are described in " { $link "regexp.captures" } "; existing matching operations keep their return values and matching behavior."
 { $heading "Unsupported features" }
 { $subheading "Reluctant and possessive quantifiers" }
 { $subheading "Backreferences" }
@@ -175,13 +175,16 @@ ARTICLE: "regexp-operations" "Matching operations with regular expressions"
 "Testing if a string matches a regular expression:"
 { $subsections matches? }
 "Finding a match inside a string:"
-{ $subsections re-contains? first-match }
+{ $subsections re-contains? first-match first-match-with-captures }
 "Finding all matches inside a string:"
 { $subsections
     count-matches
     all-matching-slices
     all-matching-subseqs
+    all-matches-with-captures
 }
+"Retrieving captured text and its coordinates:"
+{ $subsections capture capture-bounds }
 "Splitting a string into tokens delimited by a regular expression:"
 { $subsections re-split }
 "Replacing occurrences of a regular expression with a string:"
@@ -257,3 +260,52 @@ HELP: first-match
 HELP: re-contains?
 { $values { "string" string } { "regexp" regexp } { "?" boolean } }
 { $description "Determines whether the string has a substring which matches the regular expression given." } ;
+
+ARTICLE: "regexp.captures" "Regular expression capture groups"
+"Capture operations are available from " { $vocab-link "regexp" } "; no separate vocabulary is needed."
+{ $subsections first-match-with-captures all-matches-with-captures capture capture-bounds regexp-match }
+"Ordinary parentheses capture; " { $snippet "(?:...)" } " groups without capturing. Groups are numbered from one in opening-parenthesis order, including groups in alternatives that do not participate and groups repeated zero times. Group zero is the whole match. A named group, written " { $snippet "(?<name>...)" } ", also has a number. Names consist of ASCII letters, digits and underscores, with a letter or underscore first. Names must be unique within the expression."
+$nl
+"Each group is a slice of the original input, or " { $link f } " if it did not participate. An empty capture is an empty slice. The " { $snippet "groups>>" } " accessor returns the array of groups; " { $link capture } " selects a group by number or name. Slice offsets are zero-based character indices in the original input, with an exclusive end. Use " { $link capture-bounds } " to retrieve both offsets; group zero gives the whole match bounds. Converting a slice with " { $link >string } " discards its original offsets."
+{ $example
+    "USING: prettyprint regexp strings ;"
+    "\"2026-09\" R/ (?<year>\\d{4})-(\\d{2})/ first-match-with-captures"
+    "\"year\" swap capture >string ."
+    "\"2026\"" }
+{ $heading "Match selection" }
+"The whole match is exactly the one chosen by " { $link first-match } " or " { $link all-matching-slices } ", including leftmost-longest selection and reversed searches. Within that fixed span, captures prefer earlier alternatives and greedy repetitions. For example, matching " { $snippet "(a|aa)(a?)" } " against " { $snippet "aa" } " captures " { $snippet "a" } " in both groups. This is not POSIX longest-subexpression disambiguation. Reluctant quantifier spellings retain Factor's existing greedy behavior."
+$nl
+"A repeated group retains its last participating capture. Inner groups that do not participate in a later repetition retain their previous capture. Empty loops are cut off when they revisit the same automaton state at the same input position. Group numbering and capture extraction proceed left to right even for reversed searches."
+{ $heading "Lookaround and complement" }
+"Positive lookaround can capture outside the whole match. It chooses the longest matching lookahead or lookbehind span, then resolves captures within that span using the same rules. Anchors and boundaries refer to the original input. Groups inside negative lookaround or a complemented expression " { $snippet "(?~...)" } " retain their numbers but do not participate, so their values are " { $link f } "."
+{ $heading "Execution" }
+"The existing DFA chooses each whole match. A separate ordered NFA pass records captures only when requested, and its compiled program is cached on the regular expression. Capture registers belong to each call. Without lookaround, the pass visits each state at most once per input position, avoiding exponential backtracking. Lookaround adds nested matching work. Backreferences remain unsupported." ;
+
+HELP: first-match-with-captures
+{ $values { "string" string } { "regexp" regexp } { "match/f" { $maybe regexp-match } } }
+{ $description "Returns captures for the same whole match as " { $link first-match } ", or " { $link f } " if no match exists. Capture selection is described in " { $link "regexp.captures" } "." }
+{ $errors "Throws " { $link duplicate-capture-name } " when compiling captures for an expression with duplicate names." } ;
+
+HELP: all-matches-with-captures
+{ $values { "string" string } { "regexp" regexp } { "matches" "an array of capture results" } }
+{ $description "Returns captures for every match selected by " { $link all-matching-slices } ", in the same order. Empty matches advance in the same way as ordinary matching." }
+{ $errors "Throws " { $link duplicate-capture-name } " when compiling captures for an expression with duplicate names." } ;
+
+HELP: capture
+{ $values { "group" "a group number or name" } { "match" regexp-match } { "slice/f" { $maybe slice } } }
+{ $description "Returns a group by its zero-based number or string name. Group zero is the whole match. Returns " { $link f } " for a group that did not participate." }
+{ $errors "Throws " { $link unknown-capture-group } " if the group number or name does not exist." } ;
+
+
+HELP: capture-bounds
+{ $values { "group" "a group number or name" } { "match" regexp-match } { "from/f" { $maybe integer } } { "to/f" { $maybe integer } } }
+{ $description "Returns the zero-based start and exclusive end character indices of a capture in the original input. Group zero gives the whole match bounds. An unmatched group returns two " { $link f } " values; an empty capture returns two equal indices." }
+{ $errors "Throws " { $link unknown-capture-group } " for an unknown group." }
+{ $examples
+    { $example
+        "USING: arrays kernel prettyprint regexp sequences ;"
+        "\"abcdefghijklmnopqrstuvwxyz\" dup append"
+        "R/ (abc)/ all-matches-with-captures"
+        "[ 1 swap capture-bounds 2array ] map ."
+        "{ { 0 3 } { 26 29 } }" }
+} ;

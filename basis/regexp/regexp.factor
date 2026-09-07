@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes compiler.units kernel
+USING: accessors arrays assocs classes compiler.units kernel
 kernel.private lexer make math ranges namespaces quotations
-regexp.ast regexp.compiler regexp.negation regexp.parser
+regexp.ast regexp.captures regexp.compiler regexp.negation regexp.parser
 sequences sequences.private splitting strings vocabs.loader
 words ;
 IN: regexp
@@ -125,6 +125,35 @@ PRIVATE>
     [ prepare-match-iterator do-next-match ] 2keep swap '[
         _ reverse-regexp? [ [ 1 + ] bi@ ] when _ <slice-unsafe>
     ] [ 2drop f ] if ;
+
+<PRIVATE
+
+: ensure-capture-code ( regexp -- code )
+    dup capture-program>> [ nip ] [
+        dup [ [ parse-tree>> ] [ options>> ] bi compile-captures ] with-compilation-unit
+        [ >>capture-program drop ] keep
+    ] if* ;
+
+PRIVATE>
+
+:: first-match-with-captures ( string regexp -- match/f )
+    regexp ensure-capture-code :> code
+    string regexp first-match
+    [ >slice< code captures-at ] [ f ] if* ;
+
+:: all-matches-with-captures ( string regexp -- matches )
+    regexp ensure-capture-code :> code
+    string regexp [ code captures-at ] map-matches ;
+
+:: capture ( group match -- slice/f )
+    group string? [
+        group match names>> at [ group unknown-capture-group ] unless*
+    ] [ group ] if :> index
+    index integer? [ index 0 >= index match groups>> length < and ] [ f ] if
+    [ index match groups>> nth ] [ group unknown-capture-group ] if ;
+
+: capture-bounds ( group match -- from/f to/f )
+    capture [ [ from>> ] [ to>> ] bi ] [ f f ] if* ;
 
 : re-contains? ( string regexp -- ? )
     prepare-match-iterator do-next-match 2nip >boolean ;
