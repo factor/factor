@@ -31,6 +31,16 @@ unit-test
 { t } [ 12 hashcode 12 hashcode = ] unit-test
 { t } [ 12 >bignum hashcode 12 hashcode = ] unit-test
 
+! #2098: exercise growth, equal but distinct pair keys, and rehashing.
+{ t } [
+    H{ } clone
+    100 <iota> dup cartesian-product concat
+    [ dup pick set-at ] each
+    [ rehash ] keep
+    100 <iota> dup cartesian-product concat
+    [ dup rot at = ] with all?
+] unit-test
+
 ! Test various odd keys to see if they work.
 
 16 <hashtable> "testhash" set

@@ -1893,7 +1893,7 @@ HELP: sequence-hashcode
 { $values
     { "depth" integer } { "seq" sequence }
     { "x" integer } }
-{ $description "Iterates over a sequence, computes a hashcode with " { $link hashcode* } " for each element, and combines them." } ;
+{ $description "Iterates over a sequence, computes a hashcode with " { $link hashcode* } " for each element, and combines them using fixnum arithmetic. Both the element order and the sequence length contribute to the hash." } ;
 
 HELP: index-or-length
 { $values

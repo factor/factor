@@ -1,6 +1,6 @@
 USING: arrays assocs byte-arrays generic.single kernel make math
 math.functions math.order math.parser math.vectors sbufs
-sequences sequences.private strings tools.test vectors ;
+sequences sequences.private sets strings tools.test vectors ;
 IN: sequences.tests
 
 ! #879: recursive reduction must leave the accumulator below its inputs.
@@ -353,7 +353,32 @@ TUPLE: bogus-hashcode ;
 
 M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
-{ 0 } [ { T{ bogus-hashcode } } hashcode ] unit-test
+{ t } [ { T{ bogus-hashcode } } { 0 } [ hashcode ] same? ] unit-test
+{ t } [ { T{ bogus-hashcode } } hashcode fixnum? ] unit-test
+
+! #2098: small integer pairs should not collapse to a few thousand hashes.
+{ t } [
+    100 <iota> dup cartesian-product concat
+    [ hashcode ] map members length 9900 >
+] unit-test
+
+{ t } [
+    100 <iota> [ 100 - ] map dup cartesian-product concat
+    [ hashcode ] map members length 9900 >
+] unit-test
+
+! The length must distinguish runs of zero-hash elements.
+{ 10 } [ 10 <iota> [ 0 <array> hashcode ] map members length ] unit-test
+
+! Equal sequence views must hash alike regardless of backing storage.
+{ t } [
+    { 0 1 2 3 } 1 tail-slice V{ 1 2 3 4 } 3 head-slice
+    [ = ] [ [ hashcode ] same? ] 2bi and
+] unit-test
+
+! Recursive sequences still terminate at the hash depth limit.
+{ t } [ 1 f <array> dup dup 0 rot set-nth hashcode fixnum? ] unit-test
+{ 0 } [ 0 { 1 2 } hashcode* ] unit-test
 
 { { 2 4 6 } { 1 3 5 7 } } [ { 1 2 3 4 5 6 7 } [ even? ] partition ] unit-test
 

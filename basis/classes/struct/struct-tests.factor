@@ -548,7 +548,7 @@ STRUCT: some-accessors { aaa uint } { bbb int } ;
 << \ some-accessors forget >>
 
 ! hashcode tests
-{ 0 } [ struct-test-equality-1 new hashcode ] unit-test
+{ t } [ struct-test-equality-1 new hashcode fixnum? ] unit-test
 
 { t } [
     [

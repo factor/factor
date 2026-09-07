@@ -759,18 +759,15 @@ M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
 M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
-<PRIVATE
-
-: sequence-hashcode-step ( oldhash newpart -- newhash )
-    integer>fixnum swap [
-        [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
-        fixnum+fast fixnum+fast
-    ] keep fixnum-bitxor ; inline
-
-PRIVATE>
-
 : sequence-hashcode ( depth seq -- x )
-    [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
+    ! Use the tuple mixer so small integer pairs do not cluster (#2098).
+    [ 1000003 0x345678 ] 2dip [
+        length integer>fixnum dup fixnum+fast
+        82520 fixnum+fast swap
+    ] keep [
+        hashcode* integer>fixnum rot fixnum-bitxor
+        pick fixnum*fast [ [ fixnum+fast ] keep ] dip swap
+    ] with each drop nip 97531 fixnum+fast ; inline
 
 M: sequence hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
