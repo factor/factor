@@ -36,6 +36,11 @@ SYMBOL: nfa-table
 
 GENERIC: nfa-node ( node -- start-state end-state )
 
+M: capture-group nfa-node term>> nfa-node ;
+
+M: repeated nfa-node
+    [ term>> ] [ times>> ] bi <times> nfa-node ;
+
 : add-simple-entry ( obj -- start-state end-state )
     [ next-state next-state 2dup ] dip
     nfa-table get add-transition ;

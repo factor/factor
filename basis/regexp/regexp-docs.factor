@@ -19,6 +19,7 @@ ARTICLE: "regexp" "Regular expressions"
     "regexp-operations"
 }
 "Advanced topics:"
+{ $vocab-subsection "Capture groups" "regexp.captures" }
 { $vocab-subsection "Regular expression combinators" "regexp.combinators" }
 { $subsections
     "regexp-theory"
@@ -112,8 +113,9 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
 "Anchors and word boundaries inside lookaround remain zero-width assertions. For example, " { $snippet "R/ (?<=^)./" } " matches the first character of the input. Lookaround inherits the surrounding mode settings; lookahead scans forward and lookbehind scans backward even in a reversed search."
 { $heading "Quotation" }
 "To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
+{ $heading "Capture groups" }
+"Parentheses capture the text they match. Groups are numbered from one by their opening parentheses; group zero is the whole match. Use " { $snippet "(?:...)" } " to group without capturing, or " { $snippet "(?<name>...)" } " to name a capturing group. Capture results are available through " { $vocab-link "regexp.captures" } "; existing matching operations keep their return values and matching behavior."
 { $heading "Unsupported features" }
-{ $subheading "Group capture" }
 { $subheading "Reluctant and possessive quantifiers" }
 { $subheading "Backreferences" }
 "Backreferences were omitted because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link "regexp-theory" } "."
