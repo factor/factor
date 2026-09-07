@@ -1,11 +1,18 @@
 USING: alien alien.libraries compiler.cfg compiler.cfg.builder
-compiler.cfg.instructions compiler.errors compiler.tree help.markup
+compiler.cfg.instructions compiler.errors compiler.tree cpu.architecture help.markup
 help.syntax literals make multiline sequences stack-checker.alien
 strings ;
 IN: compiler.cfg.builder.alien
 
 HELP: callback-struct-return-area
 { $var-description "The virtual register holding a callback's incoming structure result pointer. It is kept separate from result areas for C calls emitted inside the callback." } ;
+
+HELP: prepare-struct-caller
+{ $values
+    { "vregs" sequence } { "reps" sequence } { "return" "a C type" }
+    { "vregs'" sequence } { "reps'" sequence }
+    { "return-vreg/f" "a virtual register or f" } }
+{ $description "Allocates an indirect structure result area when required. If " { $link struct-return-register } " is f, prepends the result pointer and its representation to the ordinary parameters, preserving their order. Otherwise, assigns the pointer to the dedicated result register." } ;
 
 <<
 STRING: ex-caller-return

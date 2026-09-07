@@ -42,8 +42,8 @@ IN: compiler.cfg.builder.alien
             result int-rep rot 3array reg-values get push
             vregs reps
         ] [
-            result vregs prefix
-            int-rep struct-return-on-stack? f 3array reps prefix
+            vregs result prefix
+            reps int-rep struct-return-on-stack? f 3array prefix
         ] if* result
     ] [ vregs reps f ] if ;
 
