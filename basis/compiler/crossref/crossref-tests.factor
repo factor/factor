@@ -89,14 +89,14 @@ TUPLE: counted-checks contents { reads integer initial: 0 } ;
 M: counted-checks length [ 1 + ] change-reads contents>> length ;
 M: counted-checks nth-unsafe contents>> nth-unsafe ;
 
-:: shared-dependency-checks ( answer -- outdated reads )
+:: shared-dependency-checks ( answer strength -- outdated reads )
     answer test-dependency boa 1array
     counted-checks new swap >>contents :> checks
     gensym :> dependent
     dependent checks "dependency-checks" set-word-prop
     H{ } clone :> xref
     { 1 2 3 } [
-        dependent +conditional+ 2array 1array swap xref set-at
+        dependent strength 2array 1array swap xref set-at
     ] each
     xref compiled-crossref [
         { 1 2 3 } outdated-conditional-usages
@@ -104,5 +104,8 @@ M: counted-checks nth-unsafe contents>> nth-unsafe ;
     ] with-variable
     checks reads>> ;
 
-{ { f f f } 1 } [ t shared-dependency-checks ] unit-test
-{ { t t t } 1 } [ f shared-dependency-checks ] unit-test
+{ { f f f } 1 } [ t +conditional+ shared-dependency-checks ] unit-test
+{ { t t t } 1 } [ f +conditional+ shared-dependency-checks ] unit-test
+{ { t t t } 1 } [ f +definition+ shared-dependency-checks ] unit-test
+! Effect-only dependencies must be excluded before checking their conditions.
+{ { f f f } 0 } [ f +effect+ shared-dependency-checks ] unit-test

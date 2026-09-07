@@ -32,8 +32,11 @@ generic-call-site-crossref [ H{ } clone ] initialize
     H{ } clone :> checks
     H{ } clone :> usages
     set members [
-        +conditional+ dependencies-of
-        [ usages [ checks dependencies-satisfied? ] cache ] reject-keys
+        all-dependencies-of [
+            +conditional+ dependency>=
+            [ usages [ checks dependencies-satisfied? ] cache not ]
+            [ drop f ] if
+        ] assoc-filter
     ] map ;
 
 : generic-call-sites-of ( word -- assoc )
