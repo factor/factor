@@ -4,6 +4,7 @@ namespace factor {
 #define FACTOR_OS_STRING "macos"
 
 void early_init();
+void reexec_from_app_bundle(char** argv);
 
 const char* vm_executable_path();
 const char* default_image_path();

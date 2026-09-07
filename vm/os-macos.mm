@@ -1,6 +1,7 @@
 #import <Cocoa/Cocoa.h>
 
 #include <mach/mach_time.h>
+#include <mach-o/dyld.h>
 #include <sys/utsname.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -8,6 +9,34 @@
 #include "master.hpp"
 
 namespace factor {
+
+void reexec_from_app_bundle(char** argv) {
+  // NSBundle uses the invocation path, so a symlink outside the bundle
+  // otherwise loses the app's identity and resources. Do this only for
+  // standalone app executables, before initializing Cocoa or the VM.
+  uint32_t size = 1024;
+  std::vector<char> executable(size);
+  if (_NSGetExecutablePath(executable.data(), &size) != 0) {
+    executable.resize(size);
+    if (_NSGetExecutablePath(executable.data(), &size) != 0)
+      return;
+  }
+  char* resolved = realpath(executable.data(), nullptr);
+  if (!resolved)
+    return;
+
+  std::string path(resolved);
+  size_t contents = path.rfind(".app/Contents/MacOS/");
+  bool bundled = contents != std::string::npos &&
+      path.find('/', contents + strlen(".app/Contents/MacOS/")) == std::string::npos;
+  if (bundled && strcmp(executable.data(), resolved) != 0) {
+    argv[0] = resolved;
+    execv(resolved, argv);
+    perror("Unable to launch resolved app executable");
+    exit(1);
+  }
+  free(resolved);
+}
 
 void factor_vm::c_to_factor_toplevel(cell quot) { c_to_factor(quot); }
 

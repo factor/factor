@@ -1,6 +1,9 @@
 #include "master.hpp"
 
 int main(int argc, char** argv) {
+#ifdef __APPLE__
+  factor::reexec_from_app_bundle(argv);
+#endif
   // Image load writes the code heap with raw memcpy / free-list setup that does
   // not go through the guarded funnels, so make the thread writable for startup.
   // The first c-to-factor flips it executable (jit_force_executable) before any
