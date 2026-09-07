@@ -1,4 +1,4 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
+USING: accessors arrays assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
 compiler.cfg.liveness compiler.cfg.registers
@@ -176,4 +176,23 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     H{ { 37 int-rep } } representations set
     37 20 f record-def
     37 vreg>live-interval
+] unit-test
+
+! Explicit GC checks must keep derived pointers' base objects live until
+! the check, so register assignment can spill them into the GC map.
+{
+    V{ { 0 10 } }
+    V{ T{ vreg-use { n 10 } { use-rep tagged-rep } } }
+} [
+    [
+        0 from set
+        H{ { 1 1 } } leader-map set
+        H{ { 1 tagged-rep } } representations set
+        H{ } clone live-intervals set
+        T{ ##call-gc
+            { gc-map T{ gc-map { derived-roots V{ { 2 1 } } } } }
+            { insn# 10 }
+        } compute-live-intervals*
+        1 vreg>live-interval [ ranges>> ] [ uses>> ] bi
+    ] with-scope
 ] unit-test
