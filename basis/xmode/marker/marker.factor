@@ -139,6 +139,7 @@ M: string-matcher fixup-end
 MEMO: <fixup-regexp> ( raw matched options -- regexp )
     <optioned-regexp> {
         [ parse-tree>> ] [ options>> ] [ dfa>> ] [ next-match>> ]
+        [ capture-program>> ]
     } cleave regexp boa ;
 
 M: regexp fixup-end

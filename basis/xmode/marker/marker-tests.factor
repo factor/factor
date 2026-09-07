@@ -1,5 +1,18 @@
-USING: xmode.tokens xmode.catalog
-xmode.marker tools.test kernel ;
+USING: accessors kernel regexp regexp.captures sequences strings
+tools.test xmode.catalog xmode.marker xmode.marker.private xmode.tokens ;
+
+! Preserve the original end-pattern text while matching and capturing with
+! the substituted pattern, including the regexp capture-program slot.
+{ "($1)" t { "abc" "abc" } } [
+    "($1)" "(abc)" "" <fixup-regexp>
+    [ raw>> ]
+    [ "abc" swap matches? ]
+    [ "abc" swap first-match-with-captures groups>> [ >string ] map ] tri
+] unit-test
+
+{ t } [
+    "ABC" "($1)" "(abc)" "i" <fixup-regexp> matches?
+] unit-test
 
 {
     {
