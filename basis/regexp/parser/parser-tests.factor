@@ -1,4 +1,4 @@
-USING: kernel tools.test regexp.parser fry sequences ;
+USING: accessors kernel tools.test regexp.parser fry sequences ;
 IN: regexp.parser.tests
 
 : regexp-parses ( string -- )
@@ -22,3 +22,13 @@ IN: regexp.parser.tests
     "[^]" "[]" "a{foo}" "a{,}" "a{}" "(?)" "\\p{foo}" "\\P{foo}"
     "\\ueeeg" "\\0339" "\\xfg"
 } [ regexp-fails ] each
+
+! Capturing parentheses must survive parsing; noncapturing ones do not.
+{ f } [ "(a)" parse-regexp "a" parse-regexp = ] unit-test
+{ t } [ "(?:a)" parse-regexp "a" parse-regexp = ] unit-test
+{ } [ "(?<name>a)" parse-regexp drop ] unit-test
+
+{ "_name2" } [ "(?<_name2>a)" parse-regexp name>> ] unit-test
+[ "(?<>a)" parse-regexp ] must-fail
+[ "(?<2name>a)" parse-regexp ] must-fail
+[ "(?<a-b>a)" parse-regexp ] must-fail

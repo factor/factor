@@ -3,6 +3,14 @@
 USING: accessors arrays kernel math regexp.classes sequences ;
 IN: regexp.ast
 
+TUPLE: capture-group term name ;
+C: <capture-group> capture-group
+
+! Keep counted repetitions intact until NFA construction, so even a
+! group repeated zero times retains its place in the capture numbering.
+TUPLE: repeated term times ;
+C: <repeated> repeated
+
 TUPLE: negation term ;
 C: <negation> negation
 
@@ -42,7 +50,7 @@ SINGLETONS: unix-lines dotall multiline case-insensitive reversed-regexp ;
     f <concatenation> 2array <alternation> ;
 
 : <plus> ( term -- term' )
-    dup <star> 2array <concatenation> ;
+    1 <at-least> <repeated> ;
 
 : repetition ( n term -- term' )
     <array> <concatenation> ;

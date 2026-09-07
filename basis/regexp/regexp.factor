@@ -11,7 +11,7 @@ TUPLE: regexp
     { raw read-only }
     { parse-tree read-only }
     { options read-only }
-    dfa next-match ;
+    dfa next-match capture-program ;
 
 TUPLE: reverse-regexp < regexp ;
 
@@ -179,7 +179,7 @@ DEFER: compile-next-match
 PRIVATE>
 
 : new-regexp ( string ast options class -- regexp )
-    [ \ regexp-initial-word \ next-initial-word ] dip boa ; inline
+    [ \ regexp-initial-word \ next-initial-word f ] dip boa ; inline
 
 : make-regexp ( string ast -- regexp )
     f f <options> regexp new-regexp ;

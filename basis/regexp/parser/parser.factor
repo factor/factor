@@ -177,6 +177,8 @@ CharClass = BasicCharClass:b "&&" CharClass:c
 
 Options = [idmsux]*
 
+GroupName = [a-zA-Z_]:a [a-zA-Z_0-9]*:b => [[ b a prefix >string ]]
+
 Parenthized = "?:" Alternation:a => [[ a ]]
             | "?" Options:on "-"? Options:off ":" Alternation:a
                 => [[ a on off parse-options <with-options> ]]
@@ -186,7 +188,8 @@ Parenthized = "?:" Alternation:a => [[ a ]]
             | "?!" Alternation:a => [[ a <lookahead> <not-class> <tagged-epsilon> ]]
             | "?<=" Alternation:a => [[ a <lookbehind> <tagged-epsilon> ]]
             | "?<!" Alternation:a => [[ a <lookbehind> <not-class> <tagged-epsilon> ]]
-            | Alternation
+            | "?<" GroupName:n ">" Alternation:a => [[ a n <capture-group> ]]
+            | Alternation:a => [[ a f <capture-group> ]]
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
@@ -201,7 +204,7 @@ Times = "," Number:n "}" => [[ 0 n <from-to> ]]
       | "}" => [[ bad-number ]]
       | Number:n "," Number:m "}" => [[ n m <from-to> ]]
 
-Repeated = Element:e "{" Times:t => [[ e t <times> ]]
+Repeated = Element:e "{" Times:t => [[ e t <repeated> ]]
          | Element:e "??" => [[ e <maybe> ]]
          | Element:e "*?" => [[ e <star> ]]
          | Element:e "+?" => [[ e <plus> ]]

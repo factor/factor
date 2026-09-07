@@ -23,7 +23,7 @@ CONSTANT: <nothing> R/ (?~.*)/s
     [ <range-class> ] 2bi make-regexp ;
 
 : <or> ( regexps -- disjunction )
-    [ [ raw>> "(" ")" surround ] map "|" join ]
+    [ [ raw>> "(?:" ")" surround ] map "|" join ]
     [ [ parse-tree>> ] map <alternation> ] bi
     make-regexp ; foldable
 
@@ -43,13 +43,13 @@ CONSTANT: <nothing> R/ (?~.*)/s
     [ <not> ] map <or> <not> ; foldable
 
 : <zero-or-more> ( regexp -- regexp* )
-    [ "(" ")*" surround ]
+    [ "(?:" ")*" surround ]
     [ <star> ] modify-regexp ; foldable
 
 : <one-or-more> ( regexp -- regexp+ )
-    [ "(" ")+" surround ]
+    [ "(?:" ")+" surround ]
     [ <plus> ] modify-regexp ; foldable
 
 : <option> ( regexp -- regexp? )
-    [ "(" ")?" surround ]
+    [ "(?:" ")?" surround ]
     [ <maybe> ] modify-regexp ; foldable
