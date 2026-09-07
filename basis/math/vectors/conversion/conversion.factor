@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types classes combinators
-combinators.short-circuit kernel math math.vectors.simd
+combinators.short-circuit kernel math math.floats.small.c-types math.vectors.simd
+math.vectors.simd.extensions
 math.vectors.simd.intrinsics sequences ;
 FROM: alien.c-types =>
     char uchar short ushort int uint longlong ulonglong
@@ -14,7 +15,7 @@ ERROR: bad-vconvert-input value expected-type ;
 <PRIVATE
 
 : float-type? ( c-type -- ? )
-    { float double } member-eq? ;
+    { float double half bfloat } member-eq? ;
 : unsigned-type? ( c-type -- ? )
     { uchar ushort uint ulonglong } member-eq? ;
 
@@ -26,6 +27,10 @@ ERROR: bad-vconvert-input value expected-type ;
         {
             [ from-element to-element eq? ]
             [ [ ] ]
+        }
+        {
+            [ from-element to-element [ { half bfloat } member-eq? ] both? ]
+            [ [ to-type new clone-like ] ]
         }
         {
             [ from-element to-element [ float-type? not ] both? ]
@@ -73,8 +78,12 @@ ERROR: bad-vconvert-input value expected-type ;
 
     from-element to-element from-type to-type steps check-vpack
 
-    from-type to-type to-element unsigned-type?
-    [ ([vpack-unsigned]) ] [ ([vpack-signed]) ] if ;
+    to-element {
+        { half [ [ [ from-type check-vconvert-type ] bi@ v>half ] ] }
+        { bfloat [ [ [ from-type check-vconvert-type ] bi@ v>bfloat ] ] }
+        [ drop from-type to-type to-element unsigned-type?
+          [ ([vpack-unsigned]) ] [ ([vpack-signed]) ] if ]
+    } case ;
 
 :: check-vunpack ( from-element to-element from-type to-type steps -- )
     {

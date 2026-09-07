@@ -23,6 +23,7 @@ M: ##select-vector insn-available? rep>> %select-vector-reps member? ;
 M: ##store-memory-imm insn-available? rep>> %alien-vector-reps member? ;
 M: ##shuffle-vector insn-available? rep>> %shuffle-vector-reps member? ;
 M: ##shuffle-vector-imm insn-available? rep>> %shuffle-vector-imm-reps member? ;
+M: ##shuffle2-vector-imm insn-available? rep>> %shuffle2-vector-imm-reps member? ;
 M: ##shuffle-vector-halves-imm insn-available? rep>> %shuffle-vector-halves-imm-reps member? ;
 M: ##merge-vector-head insn-available? rep>> %merge-vector-reps member? ;
 M: ##merge-vector-tail insn-available? rep>> %merge-vector-reps member? ;
@@ -160,3 +161,26 @@ MACRO:: emit-vv-or-vl-vector-op ( var-trials imm-trials literal-pred -- quot )
         [ _ _ emit-vl-vector-op ]
         [ _   emit-vv-vector-op ] if
     ] ;
+
+M: ##shl-vector-count insn-available? rep>> %shl-vector-count-reps member? ;
+
+M: ##shr-vector-count insn-available? rep>> %shr-vector-count-reps member? ;
+
+M: ##unary-vector-function insn-available? [ rep>> ] [ op>> ] bi %unary-vector-function-reps member? ;
+
+M: ##binary-vector-function insn-available? [ rep>> ] [ op>> ] bi %binary-vector-function-reps member? ;
+
+M: ##fma-vector insn-available? rep>> %fma-vector-reps member? ;
+
+M: ##mul-wide-vector insn-available? rep>> %mul-wide-vector-reps member? ;
+
+MACRO: vvv-vector-op ( trials -- quot )
+    [ 1 4 >vector-op-cond ] map '[ f f _ cond ] ;
+CONSTANT: ternary [
+    ds-drop D: 2 peek-loc D: 1 peek-loc D: 0 peek-loc
+    -3 <ds-loc> inc-stack
+]
+MACRO: emit-vvv-vector-op ( trials -- quot )
+    ternary [ vvv-vector-op ] { [ representation? ] } emit-vector-op ;
+
+M: ##blend-vector insn-available? rep>> %blend-vector-reps member? ;

@@ -35,6 +35,8 @@ TUPLE: c-type < abstract-c-type
     unboxer
     { rep initial: int-rep } ;
 
+TUPLE: vector-c-type < c-type ;
+
 : <c-type> ( -- c-type )
     \ c-type new ; inline
 

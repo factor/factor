@@ -9,6 +9,12 @@ IN: compiler.tree.propagation.simd
 
 CONSTANT: vector>vector-intrinsics
     {
+        (simd-unary)
+        (simd-binary)
+        (simd-vfma)
+        (simd-mul-wide-head)
+        (simd-mul-wide-tail)
+        (simd-v>unsigned-integer)
         (simd-v+)
         (simd-v-)
         (simd-vneg)
@@ -64,6 +70,7 @@ CONSTANT: vector>vector-intrinsics
 
 CONSTANT: vector-other-intrinsics
     {
+        (simd-reduce)
         (simd-vdot)
         (simd-vsad)
         (simd-sum)
@@ -95,6 +102,8 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
     <class-info> ;
 
 \ (simd-sum) [ nip scalar-output-class ] "outputs" set-word-prop
+
+\ (simd-reduce) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
 \ (simd-vdot) [ 2nip scalar-output-class ] "outputs" set-word-prop
 

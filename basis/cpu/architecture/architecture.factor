@@ -45,7 +45,9 @@ SINGLETONS:
 
 SINGLETONS:
     float-4-rep
-    double-2-rep ;
+    double-2-rep
+    half-8-rep
+    bfloat-8-rep ;
 
 UNION: int-vector-rep
     char-16-rep
@@ -83,11 +85,14 @@ UNION: float-vector-rep
     float-4-rep
     double-2-rep ;
 
+UNION: small-float-vector-rep half-8-rep bfloat-8-rep ;
+
 UNION: vector-rep
     int-vector-rep
-    float-vector-rep ;
+    float-vector-rep
+    small-float-vector-rep ;
 
-CONSTANT: vector-reps
+CONSTANT: baseline-vector-reps
     {
         char-16-rep
         uchar-16-rep
@@ -100,6 +105,9 @@ CONSTANT: vector-reps
         float-4-rep
         double-2-rep
     }
+
+: vector-reps ( -- reps )
+    baseline-vector-reps { half-8-rep bfloat-8-rep } append ; foldable
 
 UNION: representation
     any-rep
@@ -131,6 +139,8 @@ UNION: representation
         { ushort-8-rep    uint-4-rep      }
         { uint-4-rep      ulonglong-2-rep }
         { float-4-rep     double-2-rep    }
+        { half-8-rep      float-4-rep     }
+        { bfloat-8-rep    float-4-rep     }
     } at ; foldable
 
 : narrow-vector-rep ( rep -- rep' )
@@ -190,6 +200,7 @@ M: longlong-2-rep rep-length drop 2 ;
 M: ulonglong-2-rep rep-length drop 2 ;
 M: float-4-rep rep-length drop 4 ;
 M: double-2-rep rep-length drop 2 ;
+M: small-float-vector-rep rep-length drop 8 ;
 
 GENERIC: rep-component-type ( rep -- n )
 
@@ -199,6 +210,7 @@ GENERIC: scalar-rep-of ( rep -- rep' )
 
 M: float-4-rep scalar-rep-of drop float-rep ;
 M: double-2-rep scalar-rep-of drop double-rep ;
+M: small-float-vector-rep scalar-rep-of drop float-rep ;
 M: char-16-rep scalar-rep-of drop char-scalar-rep ;
 M: uchar-16-rep scalar-rep-of drop uchar-scalar-rep ;
 M: short-8-rep scalar-rep-of drop short-scalar-rep ;
@@ -305,6 +317,10 @@ HOOK: %gather-int-vector-4 cpu ( dst src1 src2 src3 src4 rep -- )
 HOOK: %select-vector cpu ( dst src n rep -- )
 HOOK: %shuffle-vector cpu ( dst src shuffle rep -- )
 HOOK: %shuffle-vector-imm cpu ( dst src shuffle rep -- )
+HOOK: %shuffle2-vector-imm cpu ( dst src1 src2 shuffle rep -- )
+HOOK: %shuffle2-vector-imm-reps cpu ( -- reps )
+M: object %shuffle2-vector-imm-reps { } ;
+
 HOOK: %shuffle-vector-halves-imm cpu ( dst src1 src2 shuffle rep -- )
 HOOK: %tail>head-vector cpu ( dst src rep -- )
 HOOK: %merge-vector-head cpu ( dst src1 src2 rep -- )
@@ -609,3 +625,31 @@ HOOK: stack-cleanup cpu ( stack-size return abi -- n )
 M: object stack-cleanup 3drop 0 ;
 
 HOOK: enable-cpu-features cpu ( -- )
+
+HOOK: %shl-vector-count cpu ( dst src count rep -- )
+HOOK: %shl-vector-count-reps cpu ( -- reps )
+M: object %shl-vector-count-reps { } ;
+
+HOOK: %shr-vector-count cpu ( dst src count rep -- )
+HOOK: %shr-vector-count-reps cpu ( -- reps )
+M: object %shr-vector-count-reps { } ;
+
+HOOK: %unary-vector-function cpu ( dst src op rep -- )
+HOOK: %unary-vector-function-reps cpu ( op -- reps )
+M: object %unary-vector-function-reps drop { } ;
+
+HOOK: %binary-vector-function cpu ( dst src1 src2 op rep -- )
+HOOK: %binary-vector-function-reps cpu ( op -- reps )
+M: object %binary-vector-function-reps drop { } ;
+
+HOOK: %fma-vector cpu ( dst src1 src2 src3 rep -- )
+HOOK: %fma-vector-reps cpu ( -- reps )
+M: object %fma-vector-reps { } ;
+
+HOOK: %mul-wide-vector cpu ( dst src1 src2 high? rep -- )
+HOOK: %mul-wide-vector-reps cpu ( -- reps )
+M: object %mul-wide-vector-reps { } ;
+
+HOOK: %blend-vector cpu ( dst mask yes no rep -- )
+HOOK: %blend-vector-reps cpu ( -- reps )
+M: object %blend-vector-reps { } ;

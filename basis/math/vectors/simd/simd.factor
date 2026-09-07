@@ -1,9 +1,9 @@
-USING: accessors alien arrays byte-arrays classes combinators
+USING: accessors alien alien.accessors arrays byte-arrays classes combinators
 cpu.architecture effects functors generalizations kernel lexer
-literals math math.bitwise math.vectors
+literals math math.floats.small.c-types math.bitwise math.functions math.vectors
 math.vectors.simd.intrinsics parser prettyprint.custom
 quotations sequences sequences.generalizations sequences.private
-words ;
+words vocabs vocabs.loader ;
 QUALIFIED-WITH: alien.c-types c
 IN: math.vectors.simd
 
@@ -39,6 +39,11 @@ PRIVATE>
         { f [ vector-false-value ] }
         [ nip ]
     } case ; inline
+
+:: set-vector-element ( value index data type -- )
+    type { half bfloat } member? value { t f } member? and
+    [ value -1 0 ? data index 2 * set-alien-unsigned-2 ]
+    [ value type boolean>element index data type c:set-alien-element ] if ; inline
 
 PRIVATE>
 
@@ -112,6 +117,8 @@ DEFER: simd-construct-op
     [ bit-count ] dip {
         { float-4-rep     [ ] }
         { double-2-rep    [ -1 shift ] }
+        { half-8-rep      [ -1 shift ] }
+        { bfloat-8-rep    [ -1 shift ] }
         { uchar-16-rep    [ ] }
         { char-16-rep     [ ] }
         { ushort-8-rep    [ -1 shift ] }
@@ -290,8 +297,7 @@ M: A simd-with         drop A-with ; inline
 M: A nth-unsafe
     swap \ A-rep [ (simd-select) ] [ call-next-method ] vx->x-op ; inline
 M: A set-nth-unsafe
-    [ ELT boolean>element ] 2dip
-    underlying>> ELT c:set-alien-element ; inline
+    underlying>> ELT set-vector-element ; inline
 
 : >A ( seq -- simd ) \ A new clone-like ; inline
 
@@ -315,14 +321,15 @@ SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
 
-c:<c-type>
+c:vector-c-type new
     byte-array >>class
     A >>boxed-class
-    { A-rep alien-vector A boa } >quotation >>getter
+    { A-rep alien-vector } >quotation >>getter
+    { A boa } >quotation >>boxer-quot
     {
-        [ dup simd-128? [ bad-simd-vector ] unless underlying>> ] 2dip
-        A-rep set-alien-vector
-    } >quotation >>setter
+        dup simd-128? [ bad-simd-vector ] unless underlying>>
+    } >quotation >>unboxer-quot
+    { A-rep set-alien-vector } >quotation >>setter
     16 >>size
     16 >>align
     A-rep >>rep
@@ -349,6 +356,8 @@ SIMD-128: longlong-2
 SIMD-128: ulonglong-2
 SIMD-128: float-4
 SIMD-128: double-2
+SIMD-128: half-8
+SIMD-128: bfloat-8
 
 ! misc
 
@@ -367,3 +376,154 @@ M: short-8 v*hs+
     short-8-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op int-4-cast ; inline
 M: int-4 v*hs+
     int-4-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op longlong-2-cast ; inline
+
+M: simd-128 vfloor
+    "floor" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vceiling
+    "ceiling" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vtruncate
+    "truncate" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vround
+    "round" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vround-to-even
+    "round-even" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vbit-count
+    "bit-count" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vclz
+    "clz" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vctz
+    "ctz" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+M: simd-128 vbit-reverse
+    "bit-reverse" over simd-rep [ (simd-unary) ] [ call-next-method ] vx->v-op ; inline
+
+! Operations with a different output type have explicit typed methods. This
+! keeps constructors and representations literal during inference.
+M: simd-128 vfma 2drop bad-simd-vector ;
+M: simd-128 vabsdiff drop bad-simd-vector ;
+M: simd-128 vmul-wide drop bad-simd-vector ;
+M: simd-128 vshift drop bad-simd-vector ;
+
+M: simd-128 vmin-element
+    "min-element" over simd-rep [ (simd-reduce) ] [ call-next-method ] vx->x-op ; inline
+M: simd-128 vmax-element
+    "max-element" over simd-rep [ (simd-reduce) ] [ call-next-method ] vx->x-op ; inline
+
+M:: float-4 vfma ( a b c -- d )
+    a float-4? b float-4? and [
+        a underlying>> b underlying>> c underlying>> float-4-rep (simd-vfma) float-4 boa
+    ] [ b bad-simd-vector ] if ; inline
+
+M:: double-2 vfma ( a b c -- d )
+    a double-2? b double-2? and [
+        a underlying>> b underlying>> c underlying>> double-2-rep (simd-vfma) double-2 boa
+    ] [ b bad-simd-vector ] if ; inline
+
+M:: char-16 vabsdiff ( a b -- c )
+    a char-16? [
+        a underlying>> b underlying>> "absdiff" char-16-rep (simd-binary) uchar-16 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: uchar-16 vabsdiff ( a b -- c )
+    a uchar-16? [
+        a underlying>> b underlying>> "absdiff" uchar-16-rep (simd-binary) uchar-16 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: short-8 vabsdiff ( a b -- c )
+    a short-8? [
+        a underlying>> b underlying>> "absdiff" short-8-rep (simd-binary) ushort-8 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: ushort-8 vabsdiff ( a b -- c )
+    a ushort-8? [
+        a underlying>> b underlying>> "absdiff" ushort-8-rep (simd-binary) ushort-8 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: int-4 vabsdiff ( a b -- c )
+    a int-4? [
+        a underlying>> b underlying>> "absdiff" int-4-rep (simd-binary) uint-4 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: uint-4 vabsdiff ( a b -- c )
+    a uint-4? [
+        a underlying>> b underlying>> "absdiff" uint-4-rep (simd-binary) uint-4 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: longlong-2 vabsdiff ( a b -- c )
+    a longlong-2? [
+        a underlying>> b underlying>> "absdiff" longlong-2-rep (simd-binary) ulonglong-2 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: ulonglong-2 vabsdiff ( a b -- c )
+    a ulonglong-2? [
+        a underlying>> b underlying>> "absdiff" ulonglong-2-rep (simd-binary) ulonglong-2 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: char-16 vshift ( a counts -- b )
+    a char-16? [ a underlying>> counts underlying>> "shift" char-16-rep (simd-binary) char-16 boa ] [
+        a uchar-16? [ a underlying>> counts underlying>> "shift" uchar-16-rep (simd-binary) uchar-16 boa ]
+        [ a bad-simd-vector ] if
+    ] if ; inline
+
+M:: short-8 vshift ( a counts -- b )
+    a short-8? [ a underlying>> counts underlying>> "shift" short-8-rep (simd-binary) short-8 boa ] [
+        a ushort-8? [ a underlying>> counts underlying>> "shift" ushort-8-rep (simd-binary) ushort-8 boa ]
+        [ a bad-simd-vector ] if
+    ] if ; inline
+
+M:: int-4 vshift ( a counts -- b )
+    a int-4? [ a underlying>> counts underlying>> "shift" int-4-rep (simd-binary) int-4 boa ] [
+        a uint-4? [ a underlying>> counts underlying>> "shift" uint-4-rep (simd-binary) uint-4 boa ]
+        [ a bad-simd-vector ] if
+    ] if ; inline
+
+M:: longlong-2 vshift ( a counts -- b )
+    a longlong-2? [ a underlying>> counts underlying>> "shift" longlong-2-rep (simd-binary) longlong-2 boa ] [
+        a ulonglong-2? [ a underlying>> counts underlying>> "shift" ulonglong-2-rep (simd-binary) ulonglong-2 boa ]
+        [ a bad-simd-vector ] if
+    ] if ; inline
+
+M:: char-16 vmul-wide ( a b -- lo hi )
+    a char-16? [
+        a underlying>> b underlying>> char-16-rep (simd-mul-wide-head) short-8 boa
+        a underlying>> b underlying>> char-16-rep (simd-mul-wide-tail) short-8 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: uchar-16 vmul-wide ( a b -- lo hi )
+    a uchar-16? [
+        a underlying>> b underlying>> uchar-16-rep (simd-mul-wide-head) ushort-8 boa
+        a underlying>> b underlying>> uchar-16-rep (simd-mul-wide-tail) ushort-8 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: short-8 vmul-wide ( a b -- lo hi )
+    a short-8? [
+        a underlying>> b underlying>> short-8-rep (simd-mul-wide-head) int-4 boa
+        a underlying>> b underlying>> short-8-rep (simd-mul-wide-tail) int-4 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: ushort-8 vmul-wide ( a b -- lo hi )
+    a ushort-8? [
+        a underlying>> b underlying>> ushort-8-rep (simd-mul-wide-head) uint-4 boa
+        a underlying>> b underlying>> ushort-8-rep (simd-mul-wide-tail) uint-4 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: int-4 vmul-wide ( a b -- lo hi )
+    a int-4? [
+        a underlying>> b underlying>> int-4-rep (simd-mul-wide-head) longlong-2 boa
+        a underlying>> b underlying>> int-4-rep (simd-mul-wide-tail) longlong-2 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+M:: uint-4 vmul-wide ( a b -- lo hi )
+    a uint-4? [
+        a underlying>> b underlying>> uint-4-rep (simd-mul-wide-head) ulonglong-2 boa
+        a underlying>> b underlying>> uint-4-rep (simd-mul-wide-tail) ulonglong-2 boa
+    ] [ a bad-simd-vector ] if ; inline
+
+"math.vectors.simd.extensions" require

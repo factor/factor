@@ -633,3 +633,67 @@ HELP: vnone?
 { v< v<= v= v> v>= vunordered? vand vor vxor vnot vany? vall? vnone? v? } related-words
 
 { vbitand vbitandn vbitor vbitxor vbitnot } related-words
+
+HELP: vfma
+{ $values { "a" sequence } { "b" sequence } { "c" sequence } { "d" sequence } }
+{ $description "Computes a*b+c per lane with one rounding. SIMD float-4 and double-2 round at their lane precision; half-8 rounds once to binary16. The compiler does not implicitly fuse v* followed by v+." } ;
+
+HELP: vround
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Rounds each lane to the nearest integer, with halfway cases rounded away from zero." } ;
+
+HELP: vround-to-even
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Rounds each lane to the nearest integer, with halfway cases rounded to even." } ;
+
+HELP: vbit-count
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Counts set bits in each fixed-width integer SIMD lane." } ;
+
+HELP: vclz
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Counts leading zero bits in each integer SIMD lane. A zero lane returns its bit width." } ;
+
+HELP: vctz
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Counts trailing zero bits in each integer SIMD lane. A zero lane returns its bit width." } ;
+
+HELP: vbit-reverse
+{ $values { "v" sequence } { "w" sequence } }
+{ $description "Reverses the bits within each integer SIMD lane, retaining the vector type." } ;
+
+HELP: vshift
+{ $values { "v" sequence } { "counts" sequence } { "w" sequence } }
+{ $description "Shifts integer SIMD lanes using signed per-lane counts. Counts use the signed type of the same lane width. Positive counts shift left; negative counts shift right. Counts at least as large as the lane width yield zero or signed right-shift sign fill." } ;
+
+HELP: vmul-wide
+{ $values { "a" sequence } { "b" sequence } { "lo" sequence } { "hi" sequence } }
+{ $description "Multiplies matching 8-, 16-, or 32-bit integer SIMD vectors exactly into lanes of twice the width and the same signedness. Returns the lower input lanes first, then the upper input lanes." } ;
+
+HELP: vabsdiff
+{ $values { "a" sequence } { "b" sequence } { "w" sequence } }
+{ $description "Returns the absolute differences of matching integer SIMD lanes as an unsigned vector of the same lane width. Signed extrema therefore remain representable." } ;
+
+HELP: vmin-element
+{ $values { "v" sequence } { "n" real } }
+{ $description "Returns the minimum lane value, reducing lanes in order." } ;
+
+HELP: vmax-element
+{ $values { "v" sequence } { "n" real } }
+{ $description "Returns the maximum lane value, reducing lanes in order." } ;
+
+HELP: vdot4+
+{ $values { "a" sequence } { "b" sequence } { "accumulator" sequence } { "result" sequence } }
+{ $description "Adds groups of four adjacent byte products to four 32-bit accumulators. Both unsigned inputs require uint-4 accumulators; all other signedness combinations require int-4. Accumulation wraps modulo 2^32. Optional ARM kernels are selected at runtime." } ;
+
+HELP: vmatmul2x8+
+{ $values { "a" sequence } { "b" sequence } { "accumulator" sequence } { "result" sequence } }
+{ $description "Multiplies a row-major 2 by 8 byte matrix A by a column-major 8 by 2 byte matrix B, adding four row-major 32-bit accumulators. Signedness and wrapping follow vdot4+." } ;
+
+HELP: vbdot2+
+{ $values { "a" sequence } { "b" sequence } { "accumulator" sequence } { "result" sequence } }
+{ $description "Adds adjacent pairs of bfloat-8 products to float-4 accumulators. Products, pair sums and accumulator sums round to odd in binary32; subnormals flush to signed zero and NaNs canonicalize, matching baseline Arm BFDotAdd." } ;
+
+HELP: vbmatmul2x4+
+{ $values { "a" sequence } { "b" sequence } { "accumulator" sequence } { "result" sequence } }
+{ $description "Multiplies a row-major 2 by 4 BF16 matrix A by a column-major 4 by 2 BF16 matrix B, adding four row-major float-4 accumulators. Each output applies two adjacent-pair BFDotAdd operations in order." } ;

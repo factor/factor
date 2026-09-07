@@ -94,3 +94,5 @@ M: ##callback-outputs uses-vreg-reps
 
 : each-rep ( insn vreg-quot: ( vreg rep -- ) -- )
     [ each-def-rep ] [ each-use-rep ] [ each-temp-rep ] 2tri ; inline
+
+M: ##mul-wide-vector defs-vreg-reps rep>> widen-vector-rep 1array ;

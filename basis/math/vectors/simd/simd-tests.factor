@@ -88,6 +88,16 @@ CONSTANT: vector-words
         { vfloor { +vector+ -> +vector+ } }
         { vmax { +vector+ +vector+ -> +vector+ } }
         { vmin { +vector+ +vector+ -> +vector+ } }
+        { vbit-count { +vector+ -> +vector+ } }
+        { vclz { +vector+ -> +vector+ } }
+        { vctz { +vector+ -> +vector+ } }
+        { vbit-reverse { +vector+ -> +vector+ } }
+        { vround { +vector+ -> +vector+ } }
+        { vround-to-even { +vector+ -> +vector+ } }
+        { vmin-element { +vector+ -> +scalar+ } }
+        { vmax-element { +vector+ -> +scalar+ } }
+        { vfma { +vector+ +vector+ +vector+ -> +vector+ } }
+        { vabsdiff { +vector+ +vector+ -> +vector+ } }
         { vavg { +vector+ +vector+ -> +vector+ } }
         { vneg { +vector+ -> +vector+ } }
         { vtruncate { +vector+ -> +vector+ } }
@@ -238,11 +248,11 @@ TUPLE: simd-test-failure
     word '[ _ execute ] ;
 
 : remove-float-words ( alist -- alist' )
-    { distance vsqrt n/v v/n v/ normalize }
+    { distance vsqrt n/v v/n v/ normalize vfma }
     '[ _ member? ] reject-keys ;
 
 : remove-integer-words ( alist -- alist' )
-    { vlshift vrshift v*high v*hs+ }
+    { vlshift vrshift v*high v*hs+ vbit-count vclz vctz vbit-reverse vabsdiff }
     '[ _ member? ] reject-keys ;
 
 : boolean-ops ( -- words )

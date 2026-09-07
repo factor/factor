@@ -188,6 +188,7 @@ CODEGEN: ##gather-int-vector-2 %gather-int-vector-2
 CODEGEN: ##gather-int-vector-4 %gather-int-vector-4
 CODEGEN: ##select-vector %select-vector
 CODEGEN: ##shuffle-vector-imm %shuffle-vector-imm
+CODEGEN: ##shuffle2-vector-imm %shuffle2-vector-imm
 CODEGEN: ##shuffle-vector-halves-imm %shuffle-vector-halves-imm
 CODEGEN: ##shuffle-vector %shuffle-vector
 CODEGEN: ##tail>head-vector %tail>head-vector
@@ -299,3 +300,17 @@ CODEGEN: ##alien-indirect %alien-indirect
 CODEGEN: ##alien-assembly %alien-assembly
 CODEGEN: ##callback-inputs %callback-inputs
 CODEGEN: ##callback-outputs %callback-outputs
+
+CODEGEN: ##shl-vector-count %shl-vector-count
+
+CODEGEN: ##shr-vector-count %shr-vector-count
+
+CODEGEN: ##unary-vector-function %unary-vector-function
+
+CODEGEN: ##binary-vector-function %binary-vector-function
+
+CODEGEN: ##fma-vector %fma-vector
+
+CODEGEN: ##mul-wide-vector %mul-wide-vector
+
+CODEGEN: ##blend-vector %blend-vector

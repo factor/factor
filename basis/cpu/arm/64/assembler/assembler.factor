@@ -977,6 +977,8 @@ M: register ROR RORV ;
     } encode ;
 PRIVATE>
 
+: RBIT ( Rd Rn -- ) 0b000000 data-processing-1-source ;
+
 : CLZ ( Rd Rn -- ) 0b000100 data-processing-1-source ;
 : CLS ( Rd Rn -- ) 0b000101 data-processing-1-source ;
 
@@ -1358,6 +1360,12 @@ M: general-register DUP [ size>> 2^ ] [ Q>> ] bi 1 0 simd-copy ;
 : simd-2-misc-elt ( Rd Rn shape U opcode -- ) pick Q simd-2-misc ;
 PRIVATE>
 
+: REV64v  ( Rd Rn shape -- ) 0 0b00000 simd-2-misc-elt ;
+: REV32v  ( Rd Rn shape -- ) 1 0b00000 simd-2-misc-elt ;
+: REV16v  ( Rd Rn shape -- ) 0 0b00001 simd-2-misc-elt ;
+: UADDLP  ( Rd Rn shape -- ) 1 0b00010 simd-2-misc-elt ;
+: CLZv    ( Rd Rn shape -- ) 1 0b00100 simd-2-misc-elt ;
+: RBITv   ( Rd Rn -- ) 8H 1 0b00101 simd-2-misc-elt ;
 : CNTv    ( Rd Rn shape -- ) 0 0b00101 simd-2-misc-elt ;
 : ABSv    ( Rd Rn shape -- ) 0 0b01011 simd-2-misc-elt ;
 : CMLT    ( Rd Rn shape -- ) 0 0b01010 simd-2-misc-elt ;
@@ -1393,6 +1401,12 @@ PRIVATE>
 : FCVTN    ( Rd Rn shape -- ) 0 0 0b10110 0 simd-2-misc* ;
 : FCVTL    ( Rd Rn shape -- ) 0 0 0b10111 0 simd-2-misc* ;
 : FCVTL2   ( Rd Rn shape -- ) 0 0 0b10111 1 simd-2-misc* ;
+: FRINTNv ( Rd Rn shape -- ) 0 0 0b11000 simd-2-misc*-elt ;
+: FRINTMv ( Rd Rn shape -- ) 0 0 0b11001 simd-2-misc*-elt ;
+: FRINTPv ( Rd Rn shape -- ) 0 1 0b11000 simd-2-misc*-elt ;
+: FRINTZv ( Rd Rn shape -- ) 0 1 0b11001 simd-2-misc*-elt ;
+: FRINTAv ( Rd Rn shape -- ) 1 0 0b11000 simd-2-misc*-elt ;
+: FCVTZUvi ( Rd Rn shape -- ) 1 1 0b11011 simd-2-misc*-elt ;
 : SCVTFvi  ( Rd Rn shape -- ) 0 0 0b11101 simd-2-misc*-elt ;
 : FABSv    ( Rd Rn shape -- ) 0 1 0b01111 simd-2-misc*-elt ;
 : UCVTFvi  ( Rd Rn shape -- ) 1 0 0b11101 simd-2-misc*-elt ;
@@ -1416,6 +1430,7 @@ PRIVATE>
 PRIVATE>
 
 : ADDV ( Rd Rn shape -- ) 0 0b11011 simd-across-lanes ;
+: UADDLV ( Rd Rn shape -- ) 1 0b00011 simd-across-lanes ;
 
 
 <PRIVATE
@@ -1530,6 +1545,7 @@ PRIVATE>
 : ORRv ( Rd Rn Rm shape -- ) 0 2 simd-3-same** ;
 : ORNv ( Rd Rn Rm shape -- ) 0 3 simd-3-same** ;
 : EORv ( Rd Rn Rm shape -- ) 1 0 simd-3-same** ;
+: BSLv ( Rd Rn Rm shape -- ) 1 1 simd-3-same** ;
 
 : MOVv ( Rd Rn shape -- ) dupd ORRv ;
 
@@ -1569,3 +1585,37 @@ PRIVATE>
 : SXTL2 ( Rd Rn shape -- ) [ 0 ] dip SSHLL2 ;
 : UXTL  ( Rd Rn shape -- ) [ 0 ] dip USHLL ;
 : UXTL2 ( Rd Rn shape -- ) [ 0 ] dip USHLL2 ;
+
+! Optional Advanced SIMD extensions. These fixed arrangements deliberately
+! expose only the 128-bit forms used by the guarded vector kernels.
+<PRIVATE
+: neon-extension-3 ( Rd Rn Rm opcode -- )
+    { { V 0 } { V 5 } { V 16 } 0 } encode ;
+: neon-extension-2 ( Rd Rn opcode -- )
+    { { V 0 } { V 5 } 0 } encode ;
+PRIVATE>
+: SDOT ( Rd Rn Rm -- ) 0x4e809400 neon-extension-3 ;
+: UDOT ( Rd Rn Rm -- ) 0x6e809400 neon-extension-3 ;
+: USDOT ( Rd Rn Rm -- ) 0x4e809c00 neon-extension-3 ;
+: SMMLA ( Rd Rn Rm -- ) 0x4e80a400 neon-extension-3 ;
+: UMMLA ( Rd Rn Rm -- ) 0x6e80a400 neon-extension-3 ;
+: USMMLA ( Rd Rn Rm -- ) 0x4e80ac00 neon-extension-3 ;
+: BFDOT ( Rd Rn Rm -- ) 0x6e40fc00 neon-extension-3 ;
+: BFMMLA ( Rd Rn Rm -- ) 0x6e40ec00 neon-extension-3 ;
+: FADDHv ( Rd Rn Rm -- ) 0x4e401400 neon-extension-3 ;
+: FSUBHv ( Rd Rn Rm -- ) 0x4ec01400 neon-extension-3 ;
+: FMULHv ( Rd Rn Rm -- ) 0x6e401c00 neon-extension-3 ;
+: FDIVHv ( Rd Rn Rm -- ) 0x6e403c00 neon-extension-3 ;
+: FMLAHv ( Rd Rn Rm -- ) 0x4e400c00 neon-extension-3 ;
+: FMINNMHv ( Rd Rn Rm -- ) 0x4ec00400 neon-extension-3 ;
+: FMAXNMHv ( Rd Rn Rm -- ) 0x4e400400 neon-extension-3 ;
+: FCMEQHv ( Rd Rn Rm -- ) 0x4e402400 neon-extension-3 ;
+: FCMGTHv ( Rd Rn Rm -- ) 0x6ec02400 neon-extension-3 ;
+: FCMGEHv ( Rd Rn Rm -- ) 0x6e402400 neon-extension-3 ;
+: FSQRTHv ( Rd Rn -- ) 0x6ef9f800 neon-extension-2 ;
+: FCVTLH ( Rd Rn -- ) 0x0e217800 neon-extension-2 ;
+: FCVTLH2 ( Rd Rn -- ) 0x4e217800 neon-extension-2 ;
+: FCVTNH ( Rd Rn -- ) 0x0e216800 neon-extension-2 ;
+: FCVTNH2 ( Rd Rn -- ) 0x4e216800 neon-extension-2 ;
+: BFCVTN ( Rd Rn -- ) 0x0ea16800 neon-extension-2 ;
+: BFCVTN2 ( Rd Rn -- ) 0x4ea16800 neon-extension-2 ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data combinators cpu.architecture
-grouping kernel libc math math.libm math.order ranges
+grouping kernel libc math math.bitwise math.functions math.floats.small.c-types math.libm math.order ranges
 sequences sequences.cords sequences.generalizations sequences.private
 sequences.unrolled sequences.unrolled.private specialized-arrays
 vocabs ;
@@ -9,7 +9,7 @@ QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAYS:
     c:char c:short c:int c:longlong
     c:uchar c:ushort c:uint c:ulonglong
-    c:float c:double ;
+    c:float c:double half bfloat ;
 IN: math.vectors.simd.intrinsics
 
 ! Word props are added later
@@ -20,6 +20,8 @@ IN: math.vectors.simd.intrinsics
 : >bitwise-vector-rep ( rep -- rep' )
     {
         { float-4-rep    [ uint-4-rep      ] }
+        { half-8-rep     [ ushort-8-rep    ] }
+        { bfloat-8-rep   [ ushort-8-rep    ] }
         { double-2-rep   [ ulonglong-2-rep ] }
         [ ]
     } case ; foldable
@@ -57,6 +59,8 @@ IN: math.vectors.simd.intrinsics
         { ulonglong-2-rep  [  2 c:ulonglong <c-direct-array> ] }
         { float-4-rep      [  4 c:float <c-direct-array>     ] }
         { double-2-rep     [  2 c:double <c-direct-array>    ] }
+        { half-8-rep       [  8 half <c-direct-array>        ] }
+        { bfloat-8-rep     [  8 bfloat <c-direct-array>      ] }
     } case ; inline
 
 : >rep-array ( seq rep -- array )
@@ -71,6 +75,8 @@ IN: math.vectors.simd.intrinsics
         { ulonglong-2-rep  [ c:ulonglong >c-array ] }
         { float-4-rep      [ c:float >c-array     ] }
         { double-2-rep     [ c:double >c-array    ] }
+        { half-8-rep       [ half >c-array        ] }
+        { bfloat-8-rep     [ bfloat >c-array      ] }
     } case ; inline
 
 : <rep-array> ( rep -- array )
@@ -85,6 +91,8 @@ IN: math.vectors.simd.intrinsics
         { ulonglong-2-rep  [  2 c:ulonglong (c-array) ] }
         { float-4-rep      [  4 c:float (c-array)     ] }
         { double-2-rep     [  2 c:double (c-array)    ] }
+        { half-8-rep       [  8 half (c-array)        ] }
+        { bfloat-8-rep     [  8 bfloat (c-array)      ] }
     } case ; inline
 
 : rep-tf-values ( rep -- t f )
@@ -112,8 +120,8 @@ IN: math.vectors.simd.intrinsics
     [ >bitwise-vector-rep byte>rep-array ] 2dip reduce ; inline
 
 :: (vshuffle) ( a elts rep -- c )
-    a rep byte>rep-array :> a'
-    rep <rep-array> :> c'
+    a rep >bitwise-vector-rep byte>rep-array :> a'
+    rep >bitwise-vector-rep <rep-array> :> c'
     elts rep rep-length [| from to |
         from rep rep-length 1 - bitand
            a' nth-unsafe
@@ -122,10 +130,10 @@ IN: math.vectors.simd.intrinsics
     c' underlying>> ; inline
 
 :: (vshuffle2) ( a b elts rep -- c )
-    a rep byte>rep-array :> a'
-    b rep byte>rep-array :> b'
+    a rep >bitwise-vector-rep byte>rep-array :> a'
+    b rep >bitwise-vector-rep byte>rep-array :> b'
     a' b' cord-append :> ab'
-    rep <rep-array> :> c'
+    rep >bitwise-vector-rep <rep-array> :> c'
     elts rep rep-length [| from to |
         from rep rep-length dup + 1 - bitand
            ab' nth-unsafe
@@ -214,34 +222,39 @@ PRIVATE>
 : (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;
 :: (simd-vmerge-head)      ( a b rep -- c )
-    a b rep 2byte>rep-array :> ( a' b' )
-    rep <rep-array> :> c'
+    a b rep >bitwise-vector-rep 2byte>rep-array :> ( a' b' )
+    rep >bitwise-vector-rep <rep-array> :> c'
     rep rep-length 2 /i [| n |
         n a' nth-unsafe n 2 *     c' set-nth-unsafe
         n b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] unrolled-each-integer
     c' underlying>> ;
 :: (simd-vmerge-tail)      ( a b rep -- c )
-    a b rep 2byte>rep-array :> ( a' b' )
-    rep <rep-array> :> c'
+    a b rep >bitwise-vector-rep 2byte>rep-array :> ( a' b' )
+    rep >bitwise-vector-rep <rep-array> :> c'
     rep rep-length 2 /i :> len
     len [| n |
         n len + a' nth-unsafe n 2 *     c' set-nth-unsafe
         n len + b' nth-unsafe n 2 * 1 + c' set-nth-unsafe
     ] unrolled-each-integer
     c' underlying>> ;
+:: compare-components ( a b rep quot: ( x y -- ? ) -- c )
+    a b rep 2byte>rep-array
+    [ quot call -1 0 ? ] rep >bitwise-vector-rep <rep-array>
+    2map-as underlying>> ; inline
+
 : (simd-v<=)               ( a b rep -- c )
-    dup rep-tf-values '[ <= _ _ ? ] components-2map ;
+    [ <= ] compare-components ;
 : (simd-v<)                ( a b rep -- c )
-    dup rep-tf-values '[ <  _ _ ? ] components-2map ;
+    [ < ] compare-components ;
 : (simd-v=)                ( a b rep -- c )
-    dup rep-tf-values '[ =  _ _ ? ] components-2map ;
+    [ = ] compare-components ;
 : (simd-v>)                ( a b rep -- c )
-    dup rep-tf-values '[ >  _ _ ? ] components-2map ;
+    [ > ] compare-components ;
 : (simd-v>=)               ( a b rep -- c )
-    dup rep-tf-values '[ >= _ _ ? ] components-2map ;
+    [ >= ] compare-components ;
 : (simd-vunordered?)       ( a b rep -- c )
-    dup rep-tf-values '[ unordered? _ _ ? ] components-2map ;
+    [ unordered? ] compare-components ;
 : (simd-vany?)             ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero? not ;
 : (simd-vall?)             ( a   rep -- ? ) [ bitand ] bitwise-components-reduce zero? not ;
 : (simd-vnone?)            ( a   rep -- ? ) [ bitor  ] bitwise-components-reduce zero?     ;
@@ -254,10 +267,14 @@ PRIVATE>
 : (simd-v>integer)         ( a   rep -- c )
     [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
     [ >int-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
-: (simd-v>unsigned-integer) ( a   rep -- c )
-    [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
-    [ >int-vector-rep >uint-vector-rep <rep-array> ] bi
-    unrolled-map-as-unsafe underlying>> ;
+:: (simd-v>unsigned-integer) ( a rep -- c )
+    rep >int-vector-rep >uint-vector-rep :> output-rep
+    a rep byte>rep-array [
+        dup 1/0. = [ drop output-rep rep-component-type c:c-type-interval nip ] [
+            dup dup unordered? over -1/0. = or [ drop 0 ]
+            [ >integer output-rep rep-component-type c:c-type-clamp ] if
+        ] if
+    ] output-rep <rep-array> map-as underlying>> ;
 : (simd-vpack-signed)      ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
@@ -283,6 +300,60 @@ PRIVATE>
     [ swap <displaced-alien> ] dip rep-size memory>byte-array ;
 : set-alien-vector ( value c-ptr n rep -- )
     [ swap <displaced-alien> swap ] dip rep-size memcpy ;
+
+
+<PRIVATE
+:: reverse-lane-bits ( x width -- y )
+    width <iota> 0 [| result i | result 1 shift x i neg shift 1 bitand bitor ] reduce ;
+:: lane-leading-zeros ( x width -- n )
+    x zero? [ width ] [ width x log2 1 + - ] if ;
+:: lane-trailing-zeros ( x width -- n )
+    x zero? [ width ] [ x x neg bitand log2 ] if ;
+PRIVATE>
+
+:: (simd-unary) ( a op rep -- c )
+    rep rep-component-type c:heap-size 8 * :> width
+    op {
+        { "floor" [ a rep [ floor ] components-map ] }
+        { "ceiling" [ a rep [ ceiling ] components-map ] }
+        { "truncate" [ a rep [ truncate ] components-map ] }
+        { "round" [ a rep [ round ] components-map ] }
+        { "round-even" [ a rep [ round-to-even ] components-map ] }
+        { "bit-count" [ a rep [ width bits bit-count ] components-map ] }
+        { "clz" [ a rep [ width bits width lane-leading-zeros ] components-map ] }
+        { "ctz" [ a rep [ width bits width lane-trailing-zeros ] components-map ] }
+        { "bit-reverse" [ a rep [ width reverse-lane-bits ] components-map ] }
+    } case ;
+
+:: (simd-binary) ( a b op rep -- c )
+    op {
+        { "shift" [
+            rep rep-component-type c:heap-size 8 * :> width
+            a rep byte>rep-array b rep signed-rep byte>rep-array
+            [ width neg max width min shift ] rep <rep-array> 2map-as underlying>>
+        ] }
+        { "absdiff" [ a b rep [ - abs ] components-2map ] }
+    } case ;
+
+! Keep dynamic representation selection outside the three-input map. Expanding
+! three type switches together creates a needlessly large fallback method.
+: fma-rep-array ( data rep -- array ) byte>rep-array ;
+
+:: (simd-vfma) ( a b c rep -- d )
+    a rep fma-rep-array b rep fma-rep-array c rep fma-rep-array
+    rep float-4-rep eq?
+    [ [ ffmaf ] rep <rep-array> 3map-as ]
+    [ [ ffma ] rep <rep-array> 3map-as ] if underlying>> ;
+
+:: (simd-mul-wide-head) ( a b rep -- c )
+    a b rep 2byte>rep-array [ * ] { } 2map-as
+    rep rep-length 2 /i head rep widen-vector-rep >rep-array underlying>> ;
+:: (simd-mul-wide-tail) ( a b rep -- c )
+    a b rep 2byte>rep-array [ * ] { } 2map-as
+    rep rep-length 2 /i tail rep widen-vector-rep >rep-array underlying>> ;
+
+:: (simd-reduce) ( a op rep -- n )
+    a rep byte>rep-array op "min-element" = [ minimum ] [ maximum ] if ;
 
 "compiler.cfg.intrinsics.simd" require
 "compiler.tree.propagation.simd" require
