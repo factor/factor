@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays combinators.smart environment fry
 io.directories io.files io.pathnames io.standard-paths
-kernel sequences sets splitting system unicode windows.shell32 ;
+io.standard-paths.private kernel sequences sets splitting system unicode
+windows.shell32 ;
 IN: io.standard-paths.windows
 
 M: windows application-directories
@@ -22,6 +23,8 @@ M: windows find-in-applications
     >lower
     '[ [ >lower _ tail? ] find-in-program-files ] map-find drop ;
 
-M: windows find-in-path*
-    [ "PATH" os-env ";" split ] dip
-    '[ _ append-path file-exists? ] find nip ;
+M:: windows find-in-path* ( command -- path/f )
+    "PATHEXT" os-env executable-extensions :> extensions
+    command extensions windows-command-names
+    "PATH" os-env [ ";" split ] [ { } ] if*
+    [ extensions windows-executable-file? ] find-path-entry ;
