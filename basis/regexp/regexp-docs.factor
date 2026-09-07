@@ -109,6 +109,7 @@ ARTICLE: "regexp-syntax" "Regular expression syntax"
     { { $snippet "(?!a)" } "Asserts that the current position is not immediately followed by a" }
     { { $snippet "(?<=a)" } "Asserts that the current position is immediately preceded by a" }
     { { $snippet "(?<!a)" } "Asserts that the current position is not immediately preceded by a" } }
+"Anchors and word boundaries inside lookaround remain zero-width assertions. For example, " { $snippet "R/ (?<=^)./" } " matches the first character of the input. Lookaround inherits the surrounding mode settings; lookahead scans forward and lookbehind scans backward even in a reversed search."
 { $heading "Quotation" }
 "To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Unsupported features" }
