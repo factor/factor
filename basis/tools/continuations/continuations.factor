@@ -1,8 +1,8 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators continuations
-continuations.private fry generic generic.single kernel
-kernel.private make math namespaces namespaces.private
+continuations.private effects fry generic generic.single kernel
+kernel.private macros macros.private make math namespaces namespaces.private
 quotations sequences sequences.private threads threads.private
 tools.crossref words ;
 IN: tools.continuations
@@ -52,9 +52,15 @@ M: object add-breakpoint ;
 
 : (step-into-execute) ( word -- )
     {
-        { [ dup fry-word? ] [ execute break ] }
+        { [ dup fry-word? ] [ execute add-breakpoint break ] }
         { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
         { [ dup single-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup macro? ] [
+            ! Walk a fresh expansion; instrumenting the memoizer can
+            ! leave breakpoints in quotations cached for other callers.
+            [ "macro" word-prop ] [ stack-effect real-macro-effect ] bi
+            call-effect (step-into-quotation)
+        ] }
         { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
         [ def>> (step-into-quotation) ]
