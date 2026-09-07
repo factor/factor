@@ -1,4 +1,5 @@
-USING: accessors arrays kernel regexp sequences strings tools.test words ;
+USING: accessors arrays kernel namespaces parser regexp sequences
+strings tools.test vocabs.loader words ;
 IN: regexp.tests.captures
 
 ! Capture operations belong alongside the existing matching operations.
@@ -6,6 +7,13 @@ IN: regexp.tests.captures
 { t } [ "all-matches-with-captures" "regexp" lookup-word >boolean ] unit-test
 { t } [ "capture" "regexp" lookup-word >boolean ] unit-test
 { t } [ "capture-bounds" "regexp" lookup-word >boolean ] unit-test
+
+! Documentation must load in listeners without automatic vocabulary use.
+{ } [
+    f auto-use? [
+        "resource:basis/regexp/regexp-docs.factor" run-file
+    ] with-variable
+] unit-test
 
 { { { "abc" 0 3 } { "abc" 26 29 } } } [
     "abcdefghijklmnopqrstuvwxyz" dup append
