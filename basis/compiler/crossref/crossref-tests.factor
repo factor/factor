@@ -1,4 +1,5 @@
-USING: assocs compiler.crossref fry io kernel namespaces sequences
+USING: accessors arrays assocs compiler.crossref fry io kernel
+locals math namespaces sequences sequences.private
 stack-checker.dependencies tools.test vocabs words ;
 IN: compiler.crossref.tests
 
@@ -78,3 +79,30 @@ SYMBOL: foo
     foo [ setup-deps store-dependencies ] keep "dependencies" word-prop
     foo delete-compiled-xref
 ] unit-test
+
+! A word reached through several changed definitions only needs its
+! dependency list checked once per invalidation pass, including false results.
+TUPLE: test-dependency answer ;
+M: test-dependency satisfied? answer>> ;
+
+TUPLE: counted-checks contents { reads integer initial: 0 } ;
+M: counted-checks length [ 1 + ] change-reads contents>> length ;
+M: counted-checks nth-unsafe contents>> nth-unsafe ;
+
+:: shared-dependency-checks ( answer -- outdated reads )
+    answer test-dependency boa 1array
+    counted-checks new swap >>contents :> checks
+    gensym :> dependent
+    dependent checks "dependency-checks" set-word-prop
+    H{ } clone :> xref
+    { 1 2 3 } [
+        dependent +conditional+ 2array 1array swap xref set-at
+    ] each
+    xref compiled-crossref [
+        { 1 2 3 } outdated-conditional-usages
+        [ dependent swap key? ] map
+    ] with-variable
+    checks reads>> ;
+
+{ { f f f } 1 } [ t shared-dependency-checks ] unit-test
+{ { t t t } 1 } [ f shared-dependency-checks ] unit-test
