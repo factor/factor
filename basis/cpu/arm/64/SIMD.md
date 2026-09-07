@@ -94,6 +94,12 @@ Kernel requirements can be inspected with `arm64-kernel-requirements`.
 
 ## Validation and measurement
 
+Reloading `compiler.cfg.instructions` also regenerates the instruction builders,
+operand metadata, and register-renaming methods in already loaded compiler
+vocabularies. For an existing image left with missing generated words such as
+`^^blend-vector`, run `"compiler.cfg.instructions" reload` before loading SIMD
+again. A fresh bootstrap is not required for this recovery.
+
 The assembler tests include encodings independently produced by Clang targeting
 `armv8.6-a+fp16`. SIMD tests compare compiled intrinsics, forced reference
 implementations, and ordinary calls. Extension tests compare native and disabled
