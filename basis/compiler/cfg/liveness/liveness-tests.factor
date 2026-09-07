@@ -467,3 +467,15 @@ H{
 { V{ { 1 0 } } } [ 1 get instructions>> 4 swap nth gc-map>> derived-roots>> ] unit-test
 
 { { 0 } } [ 1 get instructions>> 4 swap nth gc-map>> gc-roots>> ] unit-test
+
+! A derived pointer's base is an implicit use at a GC point, even if
+! ordinary instructions no longer use the base object.
+{ H{ { 1 1 } { 2 2 } } } [
+    [
+        f leader-map set
+        H{ { 1 tagged-rep } { 2 int-rep } } representations set
+        H{ { 2 1 } } clone base-pointers set
+        H{ { 2 2 } } clone
+        [ T{ ##call-gc { gc-map T{ gc-map } } } clone visit-insn ] keep
+    ] with-scope
+] unit-test

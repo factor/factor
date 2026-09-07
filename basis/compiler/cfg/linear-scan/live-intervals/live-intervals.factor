@@ -86,6 +86,9 @@ M: insn compute-live-intervals* drop ;
         [ uses-vregs ] [ gc-map>> derived-roots>> values ] bi append
     ] [ uses-vregs ] if ;
 
+M: ##call-gc compute-live-intervals*
+    [ uses-vregs* ] [ insn#>> ] bi '[ _ f record-use ] each ;
+
 UNION: hairy-clobber-insn
     alien-call-insn
     ##callback-inputs
