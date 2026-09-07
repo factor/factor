@@ -55,8 +55,6 @@ M:: star nfa-node ( node -- start end )
 
 DEFER: modify-class
 
-! Potential off-by-one errors when lookaround nested in lookbehind
-
 M: tagged-epsilon nfa-node
     clone [ modify-class ] change-tag add-simple-entry ;
 
@@ -92,11 +90,17 @@ M: alternation modify-class
     [ first>> ] [ second>> ] bi [ modify-class ] bi@
     alternation boa ;
 
+: lookaround-options ( ast -- ast' )
+    ! Preserve lexical flags until the nested automaton is built. Its
+    ! direction is chosen by the lookaround operator, not the parent.
+    { unix-lines dotall multiline case-insensitive }
+    [ option? ] partition <options> <with-options> ;
+
 M: lookahead modify-class
-    term>> modify-class lookahead boa ;
+    term>> lookaround-options lookahead boa ;
 
 M: lookbehind modify-class
-    term>> modify-class lookbehind boa ;
+    term>> lookaround-options lookbehind boa ;
 
 : line-option ( multiline unix-lines default -- option )
     multiline option? [

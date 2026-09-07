@@ -19,7 +19,9 @@ TUPLE: reverse-regexp < regexp ;
 
 M: lookahead question>quot
     ! Returns ( index string -- ? )
-    term>> ast>dfa dfa>shortest-word 1quotation [ f ] prepose ;
+    f backwards? [
+        term>> ast>dfa dfa>shortest-word 1quotation [ f ] prepose
+    ] with-variable ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
@@ -88,7 +90,7 @@ PRIVATE>
 
 GENERIC: match-iterator-start ( string regexp -- start )
 M: regexp match-iterator-start 2drop 0 ;
-M: reverse-regexp match-iterator-start drop length ;
+M: reverse-regexp match-iterator-start drop length 1 - ;
 
 : prepare-match-iterator ( string regexp -- i string regexp )
     [ string check-instance ] dip [ match-iterator-start ] 2keep ; inline

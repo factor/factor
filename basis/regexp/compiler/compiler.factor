@@ -45,10 +45,16 @@ M: ^unix question>quot
 M: word-break question>quot
     drop [ word-break-at? ] ;
 
+: boundary-question>quot ( question -- quot )
+    question>quot backwards? get [
+        ! Backwards states point at the character before the boundary.
+        [ [ 1 + ] dip ] prepose
+    ] when ;
+
 : (execution-quot) ( next-state -- quot )
     ! The conditions here are for lookaround and anchors, etc
     dup condition? [
-        [ question>> question>quot ] [ yes>> ] [ no>> ] tri
+        [ question>> boundary-question>quot ] [ yes>> ] [ no>> ] tri
         [ (execution-quot) ] bi@
         '[ 2dup @ _ _ if ]
     ] [ 1quotation ] if ;
@@ -125,7 +131,11 @@ C: <box> box
     states>words [ states>code ] keep start-state>> ;
 
 : word-template ( quot -- quot' )
-    '[ drop [ f ] 2dip over array-capacity? _ [ 2drop ] if ] ;
+    ! -1 is the boundary before the first character in a backwards scan.
+    backwards? get
+    [ [ dup -1 = swap array-capacity? or ] ]
+    [ [ array-capacity? ] ] if swap
+    '[ drop [ f ] 2dip over @ _ [ 2drop ] if ] ;
 
 PRIVATE>
 
