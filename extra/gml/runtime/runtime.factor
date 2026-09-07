@@ -35,7 +35,7 @@ FROM: kernel.private => declare ;
 
 : (EXEC:) ( quot -- method def )
     scan-word \ (exec) create-method-in
-    swap call( -- quot ) [ is-gml ] prepend ;
+    swap call( method -- method quot ) [ is-gml ] prepend ;
 
 SYNTAX: EXEC: [ parse-definition ] (EXEC:) define ;
 
