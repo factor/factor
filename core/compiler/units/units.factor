@@ -194,6 +194,21 @@ M: object always-bump-effect-counter? drop f ;
         notify-observers
     ] if-bootstrapping ;
 
+! Keep these definitions while older images can still have compilation
+! units on the stack that registered a nesting-observer. Reloading this
+! vocab must preserve both their notification method and cleanup words.
+TUPLE: nesting-observer { new-words hash-set } ;
+
+M: nesting-observer definitions-changed
+    [ members ] dip new-words>> [ delete ] curry each ;
+
+: add-nesting-observer ( -- )
+    new-words get nesting-observer boa
+    [ nesting-observer namespaces:set ] [ add-definition-observer ] bi ;
+
+: remove-nesting-observer ( -- )
+    nesting-observer get remove-definition-observer ;
+
 : with-pending-new-words ( quot -- )
     new-words get pending-new-words get-global push
     [ [ finish-compilation-unit ] finally ]
