@@ -5,16 +5,21 @@ kernel namespaces prettyprint ui ui.gadgets.worlds ;
 IN: ui.debugger
 
 : error-alert ( error -- )
-    [ dup error. ] with-global
-    [ "Error" ] dip [ print-error ] with-string-writer
-    system-alert ;
+    [ dup error. flush ] with-global
+    ! A modal event loop can re-enter the failing native callback. Cocoa
+    ! also prohibits runModal during drawing and transaction commits.
+    in-callback? [ drop ] [
+        [ "Error" ] dip [ print-error ] with-string-writer
+        system-alert
+    ] if ;
 
 ! ( error -- )
 [ error-alert ] ui-error-hook set-global
 
 ! ( error -- * )
 [
-    ui-running? [ dup error-alert ] [ dup print-error ] if die
+    ui-running? [ dup error-alert ] [ dup print-error flush ] if
+    die rethrow
 ] callback-error-hook set-global
 
 M: world-error error.
