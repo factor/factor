@@ -60,6 +60,7 @@ void factor_vm::primitive_callstack_for() {
 // Allocates memory (frames.trim()), iterate_callstack_object()
 void factor_vm::primitive_callstack_to_array() {
   data_root<callstack> callstack(ctx->peek(), this);
+  check_tagged(callstack);
   // Allocates memory here.
   growable_array frames(this);
 

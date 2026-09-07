@@ -126,6 +126,19 @@ IN: kernel.tests
 
 { } [ get-callstack set-callstack ] unit-test
 
+! Invalid callstacks must raise type errors before frame walking (#1279).
+[ "hello" callstack>array ] [
+    2 head ${ KERNEL-ERROR ERROR-TYPE } =
+] must-fail-with
+
+[ 123 callstack>array ] [
+    2 head ${ KERNEL-ERROR ERROR-TYPE } =
+] must-fail-with
+
+[ f callstack>array ] [
+    2 head ${ KERNEL-ERROR ERROR-TYPE } =
+] must-fail-with
+
 [ 3drop get-datastack ] must-fail
 { } [ :c ] unit-test
 

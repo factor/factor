@@ -62,7 +62,8 @@ HELP: swapd $shuffle ;
 
 HELP: callstack>array
 { $values { "callstack" callstack } { "array" array } }
-{ $description "Converts the callstack to an array containing groups of three elements. The array is in reverse order so that the innermost frame comes first." } ;
+{ $description "Converts the callstack to an array containing groups of three elements. The array is in reverse order so that the innermost frame comes first." }
+{ $errors "Throws a type error if the input is not a callstack." } ;
 
 HELP: get-datastack
 { $values { "array" array } }
