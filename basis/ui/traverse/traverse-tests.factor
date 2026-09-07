@@ -1,8 +1,9 @@
 USING: accessors arrays compiler.units definitions kernel make
-sequences tools.test ui.traverse ;
+sequences strings tools.test ui.traverse ;
 IN: ui.traverse.tests
 
 M: array children>> ;
+M: string children>> drop f ;
 
 GENERIC: flatten-tree% ( node -- )
 
@@ -60,4 +61,30 @@ M: object flatten-tree% , ;
     { 0 1 } { 2 0 1 } { { "a" "b" "c" "d" } { "e" "f" "g" } { { "h" "i" } "j" } } gadgets-in-range
 ] unit-test
 
-[ M\ array children>> forget ] with-compilation-unit
+! A selected prompt can lose its children when the listener starts a line.
+{ { "b" "c" } } [
+    { 0 1 1 } { 1 } { { "a" "b" } "c" } gadgets-in-range
+] unit-test
+
+{ { "b" } } [
+    { 0 1 } { 0 3 } { { "a" "b" } } gadgets-in-range
+] unit-test
+
+{ { { } } } [
+    { 0 1 } { 1 2 } { } gadgets-in-range
+] unit-test
+
+{ { "a" "b" } } [
+    { 0 } { 1 3 } { "a" "b" } gadgets-in-range
+] unit-test
+
+{ { "b" "c" } } [
+    { 0 1 } { 1 0 } { { "a" "b" "c" } } gadgets-in-range
+] unit-test
+
+{ { } } [ { 0 } { 1 } f gadgets-in-range ] unit-test
+
+[
+    M\ array children>> forget
+    M\ string children>> forget
+] with-compilation-unit

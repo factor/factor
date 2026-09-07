@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry generic io kernel locals
-make math namespaces sequences sets ui.gadgets ;
+make math math.order namespaces sequences sets ui.gadgets ;
 IN: ui.traverse
 
 TUPLE: node value children ;
@@ -63,8 +63,24 @@ DEFER: gadget-subtree%
         [ traverse-middle ]
     } cond ;
 
-: gadget-subtree ( frompath topath gadget -- seq )
-    [ gadget-subtree% ] { } make ;
+:: clamp-gadget-path ( path gadget -- path' )
+    path empty? gadget not or [ { } ] [
+        gadget children>> :> children
+        children empty? [ { } ] [
+            path first 0 children length 1 - clamp :> index
+            path first index = [
+                path rest-slice index children nth clamp-gadget-path
+            ] [ { } ] if
+            index prefix
+        ] if
+    ] if ;
+
+:: gadget-subtree ( frompath topath gadget -- seq )
+    ! Output can change the gadget tree while a pane selection is active.
+    ! Keep stale endpoints within the surviving tree before making slices.
+    frompath gadget clamp-gadget-path
+    topath gadget clamp-gadget-path
+    gadget [ gadget-subtree% ] { } make ;
 
 M: node gadget-text*
     [ children>> ] [ value>> ] bi gadget-seq-text ;
