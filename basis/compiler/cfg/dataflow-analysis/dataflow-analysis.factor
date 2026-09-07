@@ -23,10 +23,10 @@ MIXIN: dataflow-analysis
 :: compute-in-set ( bb out-sets dfa -- set )
     ! Only consider initialized sets.
     bb dfa ignore-block? [ f ] [
-        bb dfa predecessors
-        [ out-sets key? ] filter
-        [ out-sets at ] map
-        bb dfa join-sets
+        bb dfa predecessors :> preds
+        preds length preds new-resizable :> sets
+        preds [ out-sets at* [ sets push ] [ drop ] if ] each
+        sets preds like bb dfa join-sets
     ] if ;
 
 :: update-in-set ( bb in-sets out-sets dfa -- ? )
