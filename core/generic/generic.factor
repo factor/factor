@@ -60,8 +60,11 @@ PRIVATE>
     method-classes interesting-classes smallest-class ;
 
 : method-for-class ( class generic -- method/f )
-    [ nip ] [ nearest-class ] 2bi
-    [ swap ?lookup-method ] [ drop f ] if* ;
+    ! Class and method changes reset this with the class algebra caches.
+    method-for-class-cache get [
+        [ nip ] [ nearest-class ] 2bi
+        [ swap ?lookup-method ] [ drop f ] if*
+    ] 2cache ;
 
 GENERIC: effective-method ( generic -- method )
 
