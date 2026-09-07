@@ -1,4 +1,5 @@
-USING: arrays compiler compiler.units definitions eval fry
+USING: arrays compiler compiler.units compiler.units.private
+continuations definitions eval fry
 kernel math namespaces quotations sequences tools.test words ;
 IN: compiler.units.tests
 
@@ -70,3 +71,85 @@ M: integer uncompiled-generic-test 1 + ;
 { 4 } [ 3 "q" get call ] unit-test
 
 { } [ [ \ uncompiled-generic-test forget ] with-compilation-unit ] unit-test
+
+! #67: installing a nested caller can reference a word that is still new
+! in an enclosing unit. Its call site must be patched when that unit ends.
+{ 17 } [
+    [
+        [
+            gensym dup [ 17 ] ( -- n ) define-declared
+            [ 1quotation ( -- n ) define-temp ] with-compilation-unit
+        ] with-compilation-unit execute( -- n )
+    ] without-optimizer
+] unit-test
+
+! The invalidation must reach all enclosing units, including across an
+! intermediate unit that does not itself define any words.
+{ 23 } [
+    [
+        [
+            gensym dup [ 23 ] ( -- n ) define-declared
+            [
+                [ 1quotation ( -- n ) define-temp ] with-compilation-unit
+            ] with-compilation-unit
+        ] with-compilation-unit execute( -- n )
+    ] without-optimizer
+] unit-test
+
+{ 31 } [
+    [
+        gensym dup [ 31 ] ( -- n ) define-declared
+        [ 1quotation ( -- n ) define-temp ] with-compilation-unit
+    ] with-compilation-unit execute( -- n )
+] unit-test
+
+! Explicit compilation can also install a caller before its unit finishes.
+! Keep a quotation pointing at that installed caller across the final update.
+{ 41 } [
+    [
+        [
+            gensym dup [ 41 ] ( -- n ) define-declared
+            1quotation ( -- n ) define-temp
+            dup 1array compile
+            1quotation dup jit-compile
+        ] with-compilation-unit call( -- n )
+    ] without-optimizer
+] unit-test
+
+! A nested unit installs definitions in its cleanup even if its body throws.
+{ 53 } [
+    [
+        [
+            gensym dup [ 53 ] ( -- n ) define-declared
+            [
+                [ 1quotation ( -- n ) define-temp throw ]
+                with-compilation-unit
+            ] [ nip ] recover
+        ] with-compilation-unit execute( -- n )
+    ] without-optimizer
+] unit-test
+
+! Changing the dynamic namespace must not hide other unfinished units.
+{ 59 } [
+    [
+        [
+            gensym dup [ 59 ] ( -- n ) define-declared
+            [
+                [
+                    [ 1quotation ( -- n ) define-temp ] with-compilation-unit
+                ] without-optimizer
+            ] with-global
+        ] with-compilation-unit execute( -- n )
+    ] without-optimizer
+] unit-test
+
+! Parser definition bookkeeping is shared by nested units. An empty unit
+! must not make its parent's new definitions look like installed code.
+{ f } [
+    [
+        gensym dup [ 17 ] ( -- n ) define-declared
+        dup f remember-definition
+        [ ] with-nested-compilation-unit
+        1array update-existing?
+    ] with-compilation-unit
+] unit-test
