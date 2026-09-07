@@ -66,7 +66,7 @@ fixnum instruction_operand::load_value(cell relative_to) {
     case RC_ABSOLUTE_ARM_LDUR:
       return load_value_masked(20, 12, 0);
     case RC_ABSOLUTE_ARM_CMP:
-      return load_value_masked(21, 10, 0);
+      return (load_unaligned<uint32_t>(pointer - sizeof(uint32_t)) >> 10) & 0xfff;
     default:
       critical_error("Bad rel class", rel.klass());
       return 0;
@@ -118,8 +118,8 @@ void instruction_operand::store_value(fixnum absolute_value) {
       store_value_masked(relative_value + 4, rel_arm_b_mask, 0, 2);
       break;
     case RC_RELATIVE_ARM_B_COND_LDR:
-      FACTOR_ASSERT(relative_value + 4 < 0x2000000);
-      FACTOR_ASSERT(relative_value + 4 >= -0x2000000);
+      FACTOR_ASSERT(relative_value + 4 < 0x100000);
+      FACTOR_ASSERT(relative_value + 4 >= -0x100000);
       FACTOR_ASSERT((relative_value & 3) == 0);
       store_value_masked(relative_value + 4, rel_arm_b_cond_ldr_mask, 5, 2);
       break;
