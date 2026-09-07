@@ -4,8 +4,9 @@ USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
 documents.elements fonts hashtables help help.markup help.tips
-io io.styles kernel lexer listener literals math math.vectors
-models models.arrow models.delay namespaces parser prettyprint
+io io.directories io.files.info io.pathnames io.styles kernel lexer
+listener literals math math.vectors models models.arrow models.delay
+namespaces parser prettyprint
 sequences source-files.errors splitting strings system threads
 ui ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
@@ -312,9 +313,19 @@ M: listener-operation invoke-command
     get-listener input>> [ set-editor-string ] keep
     evaluate-input ;
 
+<PRIVATE
+
+: (listener-run-files) ( paths -- )
+    ! Resolve the whole batch before a dropped directory changes the cwd.
+    [ absolute-path ] map [
+        dup directory? [ set-current-directory ] [ run-file ] if
+    ] each ;
+
+PRIVATE>
+
 : listener-run-files ( seq -- )
     [
-        '[ _ [ run-file ] each ]
+        '[ _ (listener-run-files) ]
         \ listener-run-files
         call-listener
     ] unless-empty ;
