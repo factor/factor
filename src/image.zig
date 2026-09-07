@@ -215,6 +215,29 @@ const DlsymKey = struct { symbol: Cell, library: Cell };
 pub const ImageLoader = struct {
     const Self = @This();
 
+    test "ARM64 saved callstack relocation follows relative frame links" {
+        if (builtin.cpu.arch != .aarch64) return error.SkipZigTest;
+        var vm: vm_mod.FactorVM = undefined;
+        vm.code = null;
+        var loader: Self = undefined;
+        loader.vm = &vm;
+        // The first frame spans 32 bytes, including two ordinary spill cells.
+        // Metadata-based stepping with the leaf fallback would relocate them.
+        var storage = [_]Cell{
+            0,      layouts.tagFixnum(48),
+            32,     0x1000,
+            0xaaaa, 0xbbbb,
+            16,     0x2000,
+        };
+        loader.fixupCallstackObject(@ptrCast(&storage), 0x4000);
+        try std.testing.expectEqualSlices(Cell, &.{
+            0,      layouts.tagFixnum(48),
+            32,     0x5000,
+            0xaaaa, 0xbbbb,
+            16,     0x6000,
+        }, &storage);
+    }
+
     vm: *vm_mod.FactorVM,
     io: Io,
     header: ImageHeader,
@@ -843,8 +866,8 @@ pub const ImageLoader = struct {
     }
 
     // Fix up return addresses in a callstack object
-    // This properly walks frames using frame sizes from code blocks
-    // instead of treating every cell as a code address.
+    // ARM64 objects contain relative frame links; other architectures
+    // derive frame sizes from the owning code blocks.
     fn fixupCallstackObject(self: *Self, obj: *layouts.Object, code_offset: Cell) void {
         const cs: *layouts.Callstack = @ptrCast(obj);
         const frame_length = layouts.untagFixnumUnsigned(cs.length);
@@ -875,6 +898,15 @@ pub const ImageLoader = struct {
 
             // Translate the address by adding code_offset
             const fixed_addr = old_addr +% code_offset;
+
+            if (builtin.cpu.arch == .aarch64) {
+                const frame_size = @as(*const Cell, @ptrFromInt(frame_top)).*;
+                std.debug.assert(frame_size >= 16 and frame_size % 16 == 0);
+                std.debug.assert(frame_size <= frame_length - frame_offset);
+                ret_addr_ptr.* = fixed_addr;
+                frame_offset += frame_size;
+                continue;
+            }
 
             // Look up the code block using the TRANSLATED address
             // (all_blocks was populated with final addresses before fixup)

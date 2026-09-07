@@ -618,6 +618,7 @@ test {
     _ = jit;
     _ = inline_cache;
     _ = c_api;
+    _ = image.ImageLoader;
 }
 
 // Force linker to keep exported symbols by referencing them
