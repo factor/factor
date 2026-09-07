@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.units grouping kernel
-locals math namespaces regexp regexp.ast regexp.classes
+USING: accessors arrays assocs combinators grouping kernel
+locals math namespaces regexp.ast regexp.classes
 regexp.compiler regexp.negation regexp.nfa regexp.transition-tables
 sequences sets strings vectors ;
 IN: regexp.captures
@@ -130,7 +130,7 @@ M: tagged-epsilon prepare-capture-label
     ] change-transitions
     [ prepare-capture-target ] change-start-state ;
 
-:: <capture-code> ( regexp -- code )
+:: <capture-code> ( ast options -- code )
     [
         { 0 } clone capture-number namespaces:set
         H{ } clone capture-names namespaces:set
@@ -138,19 +138,13 @@ M: tagged-epsilon prepare-capture-label
         t recording-captures? namespaces:set
         f backwards? namespaces:set
         f shortest? namespaces:set
-        regexp parse-tree>> number-captures
-        regexp options>> clone
+        ast number-captures
+        options clone
             [ reversed-regexp swap remove ] change-on
             <with-options>
         construct-nfa prepare-capture-table
         capture-number get first capture-names get capture-code boa
     ] with-scope ;
-
-: ensure-capture-code ( regexp -- code )
-    dup capture-program>> [ nip ] [
-        dup [ <capture-code> ] with-compilation-unit
-        [ >>capture-program drop ] keep
-    ] if* ;
 
 :: push-capture-targets ( targets registers work -- )
     targets <reversed> [ registers capture-thread boa work push ] each ;
@@ -255,18 +249,6 @@ M: tagged-epsilon prepare-capture-label
 
 PRIVATE>
 
-:: first-match-with-captures ( string regexp -- match/f )
-    regexp ensure-capture-code :> code
-    string regexp first-match
-    [ >slice< code capture-result ] [ f ] if* ;
+: compile-captures ( ast options -- code ) <capture-code> ;
 
-:: all-matches-with-captures ( string regexp -- matches )
-    regexp ensure-capture-code :> code
-    string regexp [ code capture-result ] map-matches ;
-
-:: capture ( group match -- slice/f )
-    group string? [
-        group match names>> at [ group unknown-capture-group ] unless*
-    ] [ group ] if :> index
-    index integer? [ index 0 >= index match groups>> length < and ] [ f ] if
-    [ index match groups>> nth ] [ group unknown-capture-group ] if ;
+: captures-at ( start end string code -- match ) capture-result ;

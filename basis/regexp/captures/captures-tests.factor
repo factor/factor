@@ -1,5 +1,5 @@
 USING: accessors arrays kernel locals regexp regexp.captures
-regexp.captures.private regexp.combinators sequences strings tools.test ;
+regexp.captures.private regexp.combinators regexp.private sequences strings tools.test ;
 IN: regexp.captures.tests
 
 : capture-strings ( match/f -- groups/f )
