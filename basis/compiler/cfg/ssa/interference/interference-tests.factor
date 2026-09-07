@@ -1,4 +1,4 @@
-USING: accessors alien.c-types compiler.cfg.comparisons
+USING: accessors alien.c-types arrays compiler.cfg.comparisons
 compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.registers compiler.cfg.ssa.interference
 compiler.cfg.ssa.interference.live-ranges
