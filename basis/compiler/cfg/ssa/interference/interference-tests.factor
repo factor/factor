@@ -358,3 +358,42 @@ V{
 { f } [ 33 21 test-vregs-intersect? ] unit-test
 { f } [ 32 21 test-vregs-intersect? ] unit-test
 { f } [ 32 33 test-vregs-intersect? ] unit-test
+
+! Check merge order and the colors used by the interference test, including
+! equal keys (red comes first) and either input running out.
+: test-merge-order ( blues reds -- keys colors )
+    [
+        [ first2 [ vreg-info new swap >>pre-of ] dip >>def-index ] map
+    ] bi@ merge-sets
+    [ [ [ pre-of>> ] [ def-index>> ] bi 2array ] map ]
+    [ [ color>> ] map ] bi ;
+
+{ { } { } } [ { } { } test-merge-order ] unit-test
+
+{ { { 0 0 } { 1 0 } } { blue blue } } [
+    { { 0 0 } { 1 0 } } { } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 1 0 } } { red red } } [
+    { } { { 0 0 } { 1 0 } } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 1 0 } { 2 0 } { 3 0 } } { blue red blue red } } [
+    { { 0 0 } { 2 0 } } { { 1 0 } { 3 0 } } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 0 1 } { 0 2 } { 0 3 } } { red blue red blue } } [
+    { { 0 1 } { 0 3 } } { { 0 0 } { 0 2 } } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 0 0 } { 0 0 } { 0 0 } } { red red blue blue } } [
+    { { 0 0 } { 0 0 } } { { 0 0 } { 0 0 } } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 1 0 } { 2 0 } } { blue red red } } [
+    V{ { 0 0 } } V{ { 1 0 } { 2 0 } } test-merge-order
+] unit-test
+
+{ { { 0 0 } { 1 0 } { 2 0 } } { red blue blue } } [
+    V{ { 1 0 } { 2 0 } } V{ { 0 0 } } test-merge-order
+] unit-test

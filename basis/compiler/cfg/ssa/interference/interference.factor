@@ -95,36 +95,22 @@ M: vreg-info <=> ( vreg1 vreg2 -- <=> )
 
 SYMBOLS: blue red ;
 
-TUPLE: iterator seq n ;
-: <iterator> ( seq -- iterator ) 0 iterator boa ; inline
-: done? ( iterator -- ? ) [ seq>> length ] [ n>> ] bi = ; inline
-: this ( iterator -- obj ) [ n>> ] [ seq>> ] bi nth ; inline
-: ++ ( iterator -- ) [ 1 + ] change-n drop ; inline
-: take ( iterator -- obj ) [ this ] [ ++ ] bi ; inline
-
-: blue-smaller? ( blue red -- ? )
-    [ this ] bi@ before? ; inline
-
-: take-blue? ( blue red -- ? )
-    {
-        [ nip done? ]
-        [
-            {
-                [ drop done? not ]
-                [ blue-smaller? ]
-            } 2&&
-        ]
-    } 2|| ; inline
-
-: merge-sets ( blue red -- seq )
-    [ <iterator> ] bi@
-    [ 2dup [ done? ] both? not ]
-    [
-        2dup take-blue?
-        [ over take blue >>color ]
-        [ dup take red >>color ]
-        if
-    ] produce 2nip ;
+! The merged length is known. Fill one array instead of growing a collector
+! and allocating iterator objects for each coalescing attempt.
+:: merge-sets ( blues reds -- seq )
+    blues length :> nb
+    reds length :> nr
+    0 :> b!
+    0 :> r!
+    nb nr + [
+        r nr = [ t ] [
+            b nb < [ b blues nth r reds nth before? ] [ f ] if
+        ] if [
+            b blues nth blue >>color b 1 + b!
+        ] [
+            r reds nth red >>color r 1 + r!
+        ] if
+    ] replicate ;
 
 : update-for-merge ( seq -- )
     [
