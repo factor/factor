@@ -92,7 +92,7 @@ SYMBOL: objects
 !   vm/image.hpp
 CONSTANT: image-magic 0x0f0e0d0c
 ! Integer arithmetic now normalizes results; rebuild compiled images.
-CONSTANT: image-version 6
+CONSTANT: image-version 5
 
 CONSTANT: data-base 1024
 
