@@ -1,33 +1,20 @@
-USING: calendar continuations io kernel libc math namespaces
-threads tools.test unix.ffi unix.process unix.signals ;
+USING: assocs calendar concurrency.promises continuations kernel
+libc locals namespaces sequences threads tools.test unix.ffi
+unix.signals unix.signals.private ;
 IN: unix.signals.tests
 
-SYMBOL: sigusr1-count
-0 sigusr1-count set-global
+:: test-sigusr1 ( delay -- received? registered? )
+    <promise> :> received
+    [ delay sleep t received fulfill ] :> handler
+    handler SIGUSR1 add-signal-handler
+    [
+        SIGUSR1 raise 0 assert=
+        received 10 seconds ?promise-timeout
+    ] [ handler SIGUSR1 remove-signal-handler ] finally
+    handler SIGUSR1 signal-handlers get-global at member? ;
 
-CONSTANT: test-sigusr1-handler [ 1 sigusr1-count +@ ]
+! Wait for the handler itself, rather than assuming delivery within a sleep.
+{ t f } [ 0 milliseconds test-sigusr1 ] unit-test
 
-"=========" print
-"NOTE: This test uses SIGUSR1. It may break or cause unwanted behavior" print
-"if other SIGUSR1 handlers are installed." print
-"=========" print flush
-
-test-sigusr1-handler SIGUSR1 add-signal-handler
-[
-
-    [ 1 ] [
-        sigusr1-count get-global
-        SIGUSR1 raise yield drop
-        1.0 seconds sleep
-        sigusr1-count get-global
-        swap -
-    ] unit-test
-
-] [ test-sigusr1-handler SIGUSR1 remove-signal-handler ] finally
-
-{ 0 } [
-    sigusr1-count get-global
-    SIGUSR1 raise yield drop
-    1.0 seconds sleep
-    sigusr1-count get-global swap -
-] unit-test
+! Handler scheduling can exceed the old one-second sleep under load (#2259).
+{ t f } [ 1250 milliseconds test-sigusr1 ] unit-test
