@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.short-circuit
 compiler.cfg.dominance compiler.cfg.ssa.interference.live-ranges
-kernel locals math math.order sequences sorting.specification ;
+kernel locals math math.order sequences ;
 IN: compiler.cfg.ssa.interference
 
 TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out ;
@@ -87,8 +87,11 @@ TUPLE: vreg-info vreg value def-index bb pre-of color equal-anc-in equal-anc-out
     [ same-values? ] [ update-equal-anc-out f ] [ chain-intersect >boolean ] 2if ;
 
 ! Merging lists of vregs sorted by dominance.
+! Register coalescing calls this frequently; compare the two keys directly.
 M: vreg-info <=> ( vreg1 vreg2 -- <=> )
-    { { pre-of>> <=> } { def-index>> <=> } } compare-with-spec ;
+    2dup [ pre-of>> ] bi@ <=>
+    dup +eq+ eq?
+    [ drop [ def-index>> ] bi@ <=> ] [ 2nip ] if ;
 
 SYMBOLS: blue red ;
 
