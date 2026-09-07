@@ -121,11 +121,7 @@ M: #call propagate-before
         { [ 2dup do-inlining ] [
             [ output-value-infos ] [ drop out-d>> ] 2bi refine-value-infos
         ] }
-        [
-            [ [ output-value-infos ] [ drop out-d>> ] 2bi set-value-infos ]
-            [ compute-constraints ]
-            2bi
-        ]
+        [ [ output-value-infos ] [ drop out-d>> ] 2bi set-value-infos ]
     } cond ;
 
 M: #call annotate-node
@@ -135,7 +131,14 @@ M: #call annotate-node
     swap in-d>> refine-value-infos ;
 
 M: #call propagate-after
-    dup word>> word>input-infos propagate-input-infos ;
+    ! Annotate the call before its result constrains its own inputs. Otherwise
+    ! predicate folding can record a dependency that assumes its conclusion.
+    [
+        dup body>> [ drop ] [
+            dup word>> 2dup foldable-call?
+            [ 2drop ] [ compute-constraints ] if
+        ] if
+    ] [ dup word>> word>input-infos propagate-input-infos ] bi ;
 
 : propagate-alien-invoke ( node -- )
     [ out-d>> ] [ params>> return>> ] bi
