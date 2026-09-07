@@ -1,6 +1,7 @@
 USING: arrays compiler compiler.units compiler.units.private
 continuations definitions eval fry
-kernel math namespaces quotations sequences tools.test words ;
+kernel math namespaces quotations sequences tools.test
+vocabs.loader words ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
@@ -81,6 +82,18 @@ M: integer uncompiled-generic-test 1 + ;
             [ 1quotation ( -- n ) define-temp ] with-compilation-unit
         ] with-compilation-unit execute( -- n )
     ] without-optimizer
+] unit-test
+
+! Refreshing an older image can reload this vocab while an old unit's
+! nesting observer is still registered. Its method and cleanup must survive.
+{ t } [
+    definition-observers get length
+    [
+        add-nesting-observer
+        [ "compiler.units" reload ]
+        [ remove-nesting-observer ] finally
+    ] with-compilation-unit
+    definition-observers get length =
 ] unit-test
 
 ! The invalidation must reach all enclosing units, including across an
