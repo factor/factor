@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types alien.strings assocs
+USING: accessors alien alien.c-types alien.strings assocs classes.struct
 combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
@@ -87,6 +87,28 @@ cpu x86.64? [
         alien-invoke-params boa caller-parameters
     ] cfg-unit-test
 ] when
+
+! Targets without a dedicated result register prepend a hidden argument.
+SINGLETON: ordinary-struct-result-cpu
+M: ordinary-struct-result-cpu return-struct-in-registers? drop f ;
+M: ordinary-struct-result-cpu struct-return-on-stack? f ;
+
+STRUCT: indirect-result { a longlong } { b longlong } { c longlong } ;
+
+{ { 1 42 } { { int-rep f f } { double-rep f f } } 1 } [
+    ordinary-struct-result-cpu \ cpu [
+        [
+            { 42 } { { double-rep f f } } indirect-result
+            prepare-struct-caller
+        ] V{ } make drop
+    ] with-variable
+] cfg-unit-test
+
+{ { 1 } { { int-rep f f } } 1 } [
+    ordinary-struct-result-cpu \ cpu [
+        [ { } { } indirect-result prepare-struct-caller ] V{ } make drop
+    ] with-variable
+] cfg-unit-test
 
 ! caller-stack-cleanup
 { 0 } [
