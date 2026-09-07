@@ -169,7 +169,7 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
     fry-walker-stops drop continuation-current unparse
 ] unit-test
 
-{ t { [ 3 1 + ] } } [
+{ t { [ break 3 1 + ] } } [
     fry-walker-stops nip
     [ continuation-current \ call eq? ] [ data>> ] bi
 ] unit-test
@@ -193,3 +193,49 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 ] unit-test
 
 { { 1 2 } } [ [ 1 '[ _ 2 '[ _ ] call ] call ] test-walker ] unit-test
+
+! Into on fry behaves like Into on a quotation literal: construct and
+! arm it, then stop inside its body when the program calls it.
+:: walk-fry-commands ( quot commands -- data stops )
+    V{ } clone :> stops
+    [
+        dup stops push
+        stops length 1 - commands ?nth
+        [ call( continuation -- continuation' ) ] when*
+    ] break-hook [
+        { } [ quot add-breakpoint call ] with-datastack
+    ] with-variable stops ;
+
+{ { [ 1 34 3 5 + + ] } } [
+    [ 3 '[ 1 34 _ 5 + + ] ]
+    { [ continuation-step ] [ continuation-step ] }
+    walk-fry-commands drop
+] unit-test
+
+{ { [ break 1 34 3 5 + + ] } } [
+    [ 3 '[ 1 34 _ 5 + + ] ]
+    { [ continuation-step ] [ continuation-step-into ] }
+    walk-fry-commands drop
+] unit-test
+
+{ { 1 42 } { { } { 1 } { 1 34 } { 1 34 3 } { 1 34 3 5 } { 1 34 8 } } } [
+    [ 3 '[ 1 34 _ 5 + + ] call ]
+    {
+        [ continuation-step ] [ continuation-step-into ]
+        [ continuation-step ] [ continuation-step ]
+        [ continuation-step ] [ continuation-step ]
+        [ continuation-step ] [ continuation-step ]
+        [ continuation-step ]
+    } walk-fry-commands
+    3 9 rot subseq [ data>> ] map >array
+] unit-test
+
+! Walking a cold macro must not cache an armed fry for later callers.
+MACRO: fry-walker-macro ( n -- quot ) '[ _ ] ;
+
+{ { 42 } } [ [ 42 fry-walker-macro ] test-walker ] unit-test
+
+{ 42 } [
+    [ "Breakpoint escaped the walker" throw ] break-hook
+    [ 42 fry-walker-macro ] with-variable
+] unit-test
