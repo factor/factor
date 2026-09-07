@@ -1724,15 +1724,17 @@ bignum* factor_vm::bignum_integer_length(bignum* x_) {
 }
 
 // Allocates memory
-int factor_vm::bignum_logbitp(int shift, bignum* arg) {
+int factor_vm::bignum_logbitp(fixnum shift, bignum* arg) {
   return ((BIGNUM_NEGATIVE_P(arg))
               ? !bignum_unsigned_logbitp(shift, bignum_bitwise_not(arg))
               : bignum_unsigned_logbitp(shift, arg));
 }
 
-int factor_vm::bignum_unsigned_logbitp(int shift, bignum* bn) {
+int factor_vm::bignum_unsigned_logbitp(fixnum shift, bignum* bn) {
   bignum_length_type len = (BIGNUM_LENGTH(bn));
-  int index = shift / BIGNUM_DIGIT_LENGTH;
+  if (shift < 0)
+    return 0;
+  fixnum index = shift / BIGNUM_DIGIT_LENGTH;
   if (index >= len)
     return 0;
   bignum_digit_type digit = (BIGNUM_REF(bn, index));

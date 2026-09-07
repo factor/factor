@@ -193,7 +193,7 @@ void factor_vm::primitive_bignum_not() {
 }
 
 void factor_vm::primitive_bignum_bitp() {
-  int bit = (int)to_fixnum(ctx->pop());
+  fixnum bit = to_fixnum(ctx->pop());
   bignum* x = untag<bignum>(ctx->peek());
   ctx->replace(tag_boolean(bignum_logbitp(bit, x)));
 }
