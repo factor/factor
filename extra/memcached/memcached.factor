@@ -18,7 +18,7 @@ SYMBOL: memcached-server
 "127.0.0.1" 11211 <inet> memcached-server set-global
 
 : with-memcached ( quot -- )
-    memcached-server get-global
+    memcached-server get
     binary [ call ] with-client ; inline
 
 ERROR: key-not-found ;
