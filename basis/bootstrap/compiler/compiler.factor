@@ -126,6 +126,12 @@ gc
 
     "." write flush
 
+    ! Optimize the compiler passes before using them for the full sweep.
+    { "compiler.tree" "compiler.cfg" } [
+        loaded-vocab-names swap [ head? ] curry filter
+        [ vocab-words compile-unoptimized ] each
+    ] each
+
     loaded-vocab-names [ vocab-words compile-unoptimized "." write flush ] each
 
     " done" print flush
