@@ -17,6 +17,8 @@ HELP: propagate-predicate
 { $description "We need to force the caller word to recompile when the class is redefined, since now we're making assumptions but the class definition itself." } ;
 
 ARTICLE: "compiler.tree.propagation.simple" "Propagation for straight-line code"
-"Propagation computes output value information and may inline or fold calls. If a later recursive propagation iteration folds a previously inlined call, the old inlined body is discarded so cleanup uses the newly computed constant result." ;
+"Propagation computes output value information and may inline or fold calls. If a later recursive propagation iteration folds a previously inlined call, the old inlined body is discarded so cleanup uses the newly computed constant result."
+$nl
+"Calls are annotated with their input information before constraints derived from their results are applied. Predicate folding uses these annotations to record dependencies during cleanup. Using input information already narrowed by the predicate's own result can miss class changes that invalidate the original assumption." ;
 
 ABOUT: "compiler.tree.propagation.simple"
