@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators kernel kernel.private math math.order
+USING: combinators kernel kernel.private layouts math math.order
 math.private ;
 IN: math.integers
 
@@ -50,15 +50,28 @@ M: fixnum /mod fixnum/mod ; inline
 M: fixnum bitand fixnum-bitand ; inline
 M: fixnum bitor fixnum-bitor ; inline
 M: fixnum bitxor fixnum-bitxor ; inline
-M: fixnum shift integer>fixnum fixnum-shift ; inline
+! Large right shifts saturate; large left shifts must not wrap their count.
+: bignum-shift-count ( n -- n' )
+    most-negative-fixnum max integer>fixnum-strict ;
+
+: shift-count ( n -- n' )
+    dup fixnum? [ bignum-shift-count ] unless ; inline
+
+M: fixnum shift shift-count fixnum-shift ; inline
 
 M: fixnum bitnot fixnum-bitnot ; inline
 
 : fixnum-bit? ( x n -- ? )
     { fixnum fixnum } declare
-    dup 0 >= [ neg shift even? not ] [ 2drop f ] if ;
+    dup 0 >= [ neg shift even? not ] [ drop 0 < ] if ;
 
-M: fixnum bit? integer>fixnum-strict fixnum-bit? ; inline
+: bignum-bit-count ( n -- n' )
+    most-negative-fixnum max most-positive-fixnum min integer>fixnum-strict ;
+
+: bit-count ( n -- n' )
+    dup fixnum? [ bignum-bit-count ] unless ; inline
+
+M: fixnum bit? bit-count fixnum-bit? ; inline
 
 : fixnum-log2 ( x -- n )
     { fixnum } declare
@@ -103,10 +116,10 @@ M: bignum /mod bignum/mod ; inline
 M: bignum bitand bignum-bitand ; inline
 M: bignum bitor bignum-bitor ; inline
 M: bignum bitxor bignum-bitxor ; inline
-M: bignum shift integer>fixnum bignum-shift ; inline
+M: bignum shift shift-count bignum-shift ; inline
 
 M: bignum bitnot bignum-bitnot ; inline
-M: bignum bit? bignum-bit? ; inline
+M: bignum bit? bit-count bignum-bit? ; inline
 M: bignum (log2) bignum-log2 ; inline
 
 ! Converting ratios to floats. Based on FLOAT-RATIO from

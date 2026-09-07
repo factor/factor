@@ -128,7 +128,7 @@ IN: compiler.tree.propagation.transforms
 : shift-2^ ( -- quot )
     cell-bits tag-bits get - 1 -
     '[
-        integer>fixnum-strict dup 0 < [ 2drop 0 ] [
+        shift-count dup 0 < [ 2drop 0 ] [
             dup _ < [ fixnum-shift ] [
                 fixnum-shift
             ] if

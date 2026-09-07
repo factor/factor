@@ -1,4 +1,4 @@
-USING: continuations kernel layouts math math.functions math.order
+USING: continuations kernel kernel.private layouts math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
 sequences tools.test ;
 IN: math.integers.tests
@@ -304,3 +304,45 @@ IN: math.integers.tests
 
 ! rounding triggering special case in post-scale
 { 1.0 } [ 300 2^ 1 - 300 2^ /f ] unit-test
+
+! #799: bignum shift counts must not wrap or reverse direction.
+{ 0 } [ 12 200 2^ 1 - neg shift ] unit-test
+{ -1 } [ -12 200 2^ 1 - neg shift ] unit-test
+{ 0 } [ 12 >bignum 200 2^ 1 - neg shift ] unit-test
+{ -1 } [ -12 >bignum 200 2^ 1 - neg shift ] unit-test
+{ 0 } [ 12 most-negative-fixnum 1 - shift ] unit-test
+{ -1 } [ -12 most-negative-fixnum 1 - shift ] unit-test
+{ 6 } [ 12 -1 >bignum shift ] unit-test
+{ 24 } [ 12 1 >bignum shift ] unit-test
+{ 6 } [ 12 >bignum -1 >bignum shift ] unit-test
+{ 24 } [ 12 >bignum 1 >bignum shift ] unit-test
+[ 12 200 2^ 1 - shift ] [ second 7 = ] must-fail-with
+[ 12 >bignum 200 2^ 1 - shift ] [ second 7 = ] must-fail-with
+
+! Bit indices must retain their full width; negative indices use the sign bit.
+{ f } [ 1 >bignum 32 2^ bit? ] unit-test
+{ t } [ -2 >bignum 32 2^ bit? ] unit-test
+{ f } [ 1 >bignum most-positive-fixnum bit? ] unit-test
+{ t } [ -2 >bignum most-positive-fixnum bit? ] unit-test
+{ f } [ 1 >bignum -64 bit? ] unit-test
+{ t } [ -2 >bignum -64 bit? ] unit-test
+
+{ f } [ 1 200 2^ bit? ] unit-test
+{ t } [ -2 200 2^ bit? ] unit-test
+{ f } [ 1 >bignum 200 2^ bit? ] unit-test
+{ t } [ -2 >bignum 200 2^ bit? ] unit-test
+{ f } [ 1 >bignum 200 2^ neg bit? ] unit-test
+{ t } [ -2 >bignum 200 2^ neg bit? ] unit-test
+
+! Exercise compiler dispatch and the 2^ shortcut with runtime counts.
+: checked-shift ( x n -- y ) { integer integer } declare shift ;
+: checked-power-of-two ( n -- y ) 1 swap shift ;
+: checked-bit? ( x n -- ? ) { integer integer } declare bit? ;
+{ 0 } [ 12 200 2^ neg checked-shift ] unit-test
+{ -1 } [ -12 >bignum 200 2^ neg checked-shift ] unit-test
+{ 0 } [ 200 2^ neg checked-power-of-two ] unit-test
+[ 12 200 2^ 1 - checked-shift ] [ second 7 = ] must-fail-with
+[ 200 2^ 1 - checked-power-of-two ] [ second 7 = ] must-fail-with
+{ f } [ 1 >bignum 32 2^ checked-bit? ] unit-test
+{ t } [ -13 -1 checked-bit? ] unit-test
+{ f } [ 13 -1 checked-bit? ] unit-test

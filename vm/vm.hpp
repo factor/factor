@@ -276,8 +276,8 @@ struct factor_vm {
   bignum* bignum_negneg_bitwise_op(int op, bignum* arg1_, bignum* arg2_);
   void bignum_negate_magnitude(bignum* arg);
   bignum* bignum_integer_length(bignum* x_);
-  int bignum_logbitp(int shift, bignum* arg);
-  int bignum_unsigned_logbitp(int shift, bignum* bn);
+  int bignum_logbitp(fixnum shift, bignum* arg);
+  int bignum_unsigned_logbitp(fixnum shift, bignum* bn);
   bignum* bignum_gcd(bignum* a_, bignum* b_);
 
   //data heap
