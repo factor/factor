@@ -1,5 +1,5 @@
 USING: accessors continuations destructors destructors.private
-kernel math namespaces sequences tools.test ;
+kernel locals math namespaces sequences tools.test ;
 IN: destructors.tests
 
 TUPLE: dispose-error ;
@@ -9,6 +9,24 @@ M: dispose-error dispose 3 throw ;
 TUPLE: dispose-dummy disposed n ;
 
 M: dispose-dummy dispose* [ 0 or 1 + ] change-n drop ;
+
+! Direct continuation restoration does not unwind disposal scopes (#2491).
+{ f t } [
+    [let
+        dispose-dummy new :> obj
+        [ obj swap [ nip continue ] curry with-disposal ] callcc0
+        obj disposed>>
+        obj dispose
+        obj disposed>>
+    ]
+] unit-test
+
+! Capture inside the disposal scope so cleanup runs on normal return.
+{ t 1 } [
+    dispose-dummy new
+    [ [ [ nip continue ] callcc0 drop ] with-disposal ] keep
+    [ disposed>> ] [ n>> ] bi
+] unit-test
 
 T{ dispose-error } "a" set
 T{ dispose-dummy } "b" set
