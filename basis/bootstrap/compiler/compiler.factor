@@ -48,7 +48,9 @@ gc
 
         array? hashtable? vector?
         tuple? sbuf? tombstone?
-        curried? composed? callable?
+        ! callable? delegates to quotation-like?. Compile both before
+        ! curry and compose are used throughout compiler bootstrap.
+        curried? composed? quotation-like? callable?
         quotation?
 
         curry compose uncurry
