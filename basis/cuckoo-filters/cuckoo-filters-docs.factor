@@ -3,7 +3,7 @@ IN: cuckoo-filters
 
 HELP: cuckoo-insert
 { $values { "bytes" byte-array } { "cuckoo-filter" cuckoo-filter } { "?" boolean } }
-{ $description "Insert the data into the " { $snippet "cuckoo-filter" } ", returning " { $link t } " if the data was inserted." }
+{ $description "Insert the data into the " { $snippet "cuckoo-filter" } ", returning " { $link t } " if the data was inserted. If insertion fails, returns " { $link f } " and leaves existing entries unchanged." }
 { $notes "Attempting to insert data twice will result in the hashed fingerprint of the data appearing twice and the " { $link cuckoo-filter } " size being incremented twice." } ;
 
 HELP: cuckoo-lookup

@@ -1,7 +1,7 @@
 ! Copyright (C) 2016 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license
 
-USING: accessors alien alien.c-types alien.data arrays checksums
+USING: accessors alien alien.c-types alien.data arrays assocs checksums
 checksums.sha combinators.short-circuit kernel math math.bitwise
 random sequences ;
 
@@ -64,14 +64,20 @@ TUPLE: cuckoo-filter buckets checksum size ;
     } 0|| [
         t
     ] [
+        H{ } clone :> originals
         2 random zero? i1 i2 ? :> i!
         max-cuckoo-count [
             drop
-            fp i n mod buckets nth bucket-swap fp!
+            i n mod :> index
+            index originals [ buckets nth clone ] cache drop
+            fp index buckets nth bucket-swap fp!
             fp i alt-index i!
 
             fp i n mod buckets nth bucket-insert
         ] find-integer >boolean
+        dup [
+            originals [ swap buckets set-nth ] assoc-each
+        ] unless
     ] if
     dup [ cuckoo-filter [ 1 + ] change-size drop ] when ;
 
