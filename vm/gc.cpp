@@ -81,9 +81,12 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   // are promoted before any unreachable tenured objects are freed.
   FACTOR_ASSERT(!data->high_fragmentation_p());
 
-  current_gc = new gc_state(op, this);
+  // Guard transitions can themselves overflow a nearly full native stack.
+  // Keep GC state inactive until the extra stack space is accessible, so a
+  // fault here can still unwind as an ordinary callstack overflow (#1419).
   if (ctx)
     ctx->callstack_seg->set_border_locked(false);
+  current_gc = new gc_state(op, this);
   atomic::store(&current_gc_p, true);
 
   // Keep trying to GC higher and higher generations until we don't run
@@ -143,13 +146,16 @@ void factor_vm::gc(gc_op op, cell requested_size) {
   }
 
   atomic::store(&current_gc_p, false);
-  if (ctx)
-    ctx->callstack_seg->set_border_locked(true);
   delete current_gc;
   current_gc = NULL;
 
   // Check the invariant again, just in case.
   FACTOR_ASSERT(!data->high_fragmentation_p());
+
+  // Relocking can fault before this call returns if a native frame occupies
+  // the guard page. Collection and its bookkeeping must already be finished.
+  if (ctx)
+    ctx->callstack_seg->set_border_locked(true);
 }
 
 void factor_vm::primitive_minor_gc() {

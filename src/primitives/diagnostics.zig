@@ -544,8 +544,6 @@ pub export fn primitive_compact_gc(vm_asm: *VMAssemblyFields) callconv(.c) void 
     const vm = vm_asm.getVM();
 
     if (vm.gc) |gc| {
-        vm.current_gc_p = true;
-        defer vm.current_gc_p = false;
         gc.collect(.collect_compact);
     }
 }
@@ -750,8 +748,6 @@ pub export fn primitive_all_instances(vm_asm: *VMAssemblyFields) callconv(.c) vo
 
     // Full GC empties nursery and aging, promoting all live objects to tenured
     if (vm.gc) |gc| {
-        vm.current_gc_p = true;
-        defer vm.current_gc_p = false;
         gc.collect(.collect_full);
     }
 
