@@ -197,7 +197,39 @@ static void test_code_blocks_retry() {
   vm.gc(COLLECT_AGING_OP, 0);
 }
 
+static void test_arm64_relocations() {
+  struct {
+    code_block block;
+    uint32_t instruction;
+  } buffer;
+  buffer.instruction = 0xf100001f; // CMP X0, #0
+  instruction_operand op(
+      relocation_entry(RT_UNTAGGED, RC_ABSOLUTE_ARM_CMP, 4), &buffer.block, 0);
+  for (fixnum value : {0, 2047, 2048, 4095}) {
+    op.store_value(value);
+    check(op.load_value(op.pointer) == value,
+          "ARM64 CMP immediate was sign-extended");
+  }
+  buffer.instruction = 0xf8400000; // LDUR X0, [X0]
+  op.rel = relocation_entry(RT_UNTAGGED, RC_ABSOLUTE_ARM_LDUR, 4);
+  for (fixnum value : {-256, -1, 0, 255}) {
+    op.store_value(value);
+    check(op.load_value(op.pointer) == value,
+          "ARM64 LDUR immediate lost its sign");
+  }
+  buffer.instruction = 0x54000000; // B.EQ
+  op.rel = relocation_entry(RT_HERE, RC_RELATIVE_ARM_B_COND_LDR, 4);
+  for (fixnum offset : {-0x100000, -4, 0, 0xffffc}) {
+    cell target = op.pointer - 4 + offset;
+    op.store_value(target);
+    check((cell)op.load_value(op.pointer) == target,
+          "ARM64 conditional branch boundary did not round trip");
+  }
+}
+
 int main(int argc, char** argv) {
+  if (argc == 1 || strcmp(argv[1], "arm64-relocations") == 0)
+    test_arm64_relocations();
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
   if (argc == 1 || strcmp(argv[1], "become") == 0)

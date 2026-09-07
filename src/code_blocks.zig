@@ -432,7 +432,7 @@ pub const InstructionOperand = struct {
                 break :blk masked + @as(i64, @bitCast(self.pointer)) - 4;
             },
             .absolute_arm_ldur => self.loadValueMasked(20, 12, 0),
-            .absolute_arm_cmp => self.loadValueMasked(21, 10, 0),
+            .absolute_arm_cmp => self.loadValueMasked(21, 10, 0) & 0xfff,
             ._reserved7, ._reserved8, ._reserved9, ._reserved12, ._reserved13, ._reserved14, ._reserved15 => {
                 std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} pointer=0x{x}\n", .{
                     @intFromEnum(self.rel.getClass()), self.rel.value, self.pointer,
@@ -461,7 +461,7 @@ pub const InstructionOperand = struct {
                 break :blk masked + @as(i64, @bitCast(relative_to)) - 4;
             },
             .absolute_arm_ldur => self.loadValueMasked(20, 12, 0),
-            .absolute_arm_cmp => self.loadValueMasked(21, 10, 0),
+            .absolute_arm_cmp => self.loadValueMasked(21, 10, 0) & 0xfff,
             ._reserved7, ._reserved8, ._reserved9, ._reserved12, ._reserved13, ._reserved14, ._reserved15 => {
                 std.debug.print("[RELOC] FATAL: invalid relocation class {} in entry raw=0x{x} relative_to=0x{x}\n", .{
                     @intFromEnum(self.rel.getClass()), self.rel.value, relative_to,
@@ -515,8 +515,8 @@ pub const InstructionOperand = struct {
             },
             .relative_arm_b_cond_ldr => {
                 const adjusted = relative_value + 4;
-                std.debug.assert(adjusted < 0x2000000);
-                std.debug.assert(adjusted >= -0x2000000);
+                std.debug.assert(adjusted < 0x100000);
+                std.debug.assert(adjusted >= -0x100000);
                 std.debug.assert((adjusted & 3) == 0);
 
                 self.storeValueMasked(adjusted, rel_arm_b_cond_ldr_mask, 5, 2);
@@ -1035,4 +1035,25 @@ test "relocation entry" {
     try std.testing.expectEqual(RelocationType.entry_point, entry.getType());
     try std.testing.expectEqual(RelocationClass.relative, entry.getClass());
     try std.testing.expectEqual(@as(u24, 0x1234), entry.getOffset());
+}
+
+test "ARM64 CMP relocation is unsigned and LDUR is signed" {
+    var instruction: u32 = 0xf100001f; // CMP X0, #0
+    var operand = InstructionOperand{
+        .rel = RelocationEntry.init(.untagged, .absolute_arm_cmp, 4),
+        .compiled = undefined,
+        .index = 0,
+        .pointer = @intFromPtr(&instruction) + 4,
+    };
+    for ([_]i64{ 0, 2047, 2048, 4095 }) |value| {
+        operand.storeValue(value);
+        try std.testing.expectEqual(value, operand.loadValue());
+        try std.testing.expectEqual(value, operand.loadValueRelative(0));
+    }
+    instruction = 0xf8400000; // LDUR X0, [X0]
+    operand.rel = RelocationEntry.init(.untagged, .absolute_arm_ldur, 4);
+    for ([_]i64{ -256, -1, 0, 255 }) |value| {
+        operand.storeValue(value);
+        try std.testing.expectEqual(value, operand.loadValue());
+    }
 }
