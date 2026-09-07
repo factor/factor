@@ -178,11 +178,12 @@ M: assoc assoc-clone-like
 : substitute ( seq assoc -- newseq )
     substituter map ;
 
+! Branch directly so unoptimized calls do not allocate closures.
 : cache ( ... key assoc quot: ( ... key -- ... value ) -- ... value )
-    [ [ at* ] 2keep ] dip
-    [ [ nip call dup ] [ drop ] 3bi set-at ] 3curry
-    [ drop ] prepose
-    unless ; inline
+    [ [ at* ] 2keep rot ] dip swap
+    [ 3drop ]
+    [ [ drop ] 3dip [ nip call dup ] [ drop ] 3bi set-at ]
+    if ; inline
 
 : 2cache ( ... key1 key2 assoc quot: ( ... key1 key2 -- ... value ) -- ... value )
     [ 2array ] 2dip [ first2-unsafe ] prepose cache ; inline
