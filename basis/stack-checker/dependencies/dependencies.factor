@@ -145,6 +145,15 @@ SLOT: fields
 M: depends-on-struct-slots satisfied?
     [ class>> "c-type" word-prop fields>> ] [ slots>> ] bi eq? ;
 
+TUPLE: depends-on-custom-inlining word quot ;
+
+: add-depends-on-custom-inlining ( word quot -- )
+    [ drop +conditional+ depends-on ]
+    [ depends-on-custom-inlining add-conditional-dependency ] 2bi ;
+
+M: depends-on-custom-inlining satisfied?
+    [ word>> "custom-inlining" word-prop ] [ quot>> ] bi eq? ;
+
 TUPLE: depends-on-flushable word ;
 
 : add-depends-on-flushable ( word -- )

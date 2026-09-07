@@ -1,4 +1,4 @@
-USING: classes help.markup help.syntax ;
+USING: classes help.markup help.syntax quotations words ;
 IN: stack-checker.dependencies
 
 HELP: +conditional+
@@ -26,6 +26,13 @@ HELP: depends-on-class-predicate
 HELP: depends-on-flushable
 { $class-description "Conditional dependency on a " { $link \ flushable } " word. The dependency becomes unsatisfied if the word no longer is flushable." } ;
 
+HELP: depends-on-custom-inlining
+{ $class-description "Conditional dependency on the identity of a word's custom inlining quotation. Replacing or removing the hook invalidates the dependency; rebuilding the generic's dispatch definition does not." } ;
+
+HELP: add-depends-on-custom-inlining
+{ $values { "word" word } { "quot" quotation } }
+{ $description "Records a conditional dependency on the word's current custom inlining quotation." } ;
+
 HELP: generic-dependencies
 { $var-description "Generic words that the current quotation depends on." } ;
 
@@ -41,6 +48,7 @@ $nl
 "The third dependency type, +conditional+ encodes a conditional dependency between a word and other word which is usually a class. A condition object, kept in the word property \"dependency-checks\" evaluates if the condition is satisfied or not. If it isn't satisfied, then the word is recompiled. The types of condition objects are:"
 { $subsections
   depends-on-class-predicate
+  depends-on-custom-inlining
   depends-on-final
   depends-on-flushable
   depends-on-instance-predicate
@@ -61,6 +69,7 @@ $nl
   add-depends-on-c-type
   add-depends-on-class
   add-depends-on-class-predicate
+  add-depends-on-custom-inlining
   add-depends-on-final
   add-depends-on-flushable
   add-depends-on-generic
