@@ -1,7 +1,33 @@
-USING: classes.struct classes.tuple functors tools.test math
-words kernel multiline parser io.streams.string generic ;
+USING: accessors classes.struct classes.tuple fry functors tools.test math
+words kernel multiline parser io.streams.string generic sequences ;
 QUALIFIED-WITH: alien.c-types c
 IN: functors.tests
+
+<<
+
+<FUNCTOR: define-fried-wrapper ( W -- )
+
+WW DEFINES ${W}-fried
+FIXED DEFINES ${W}-fried-fixed
+NESTED DEFINES ${W}-fried-nested
+
+WHERE
+
+: WW ( n -- quot ) '[ _ W ] ;
+: FIXED ( n -- quot ) '[ _ 1 + ] ;
+: NESTED ( n m -- quot ) '[ _ [ _ W ] ] ;
+
+;FUNCTOR>
+
+\ sq define-fried-wrapper
+
+>>
+
+{ 1 0 } [ define-fried-wrapper ] must-infer-as
+{ 9 } [ 3 sq-fried call ] unit-test
+{ 4 } [ 3 sq-fried-fixed call ] unit-test
+{ 9 } [ 2 3 sq-fried-nested call nip call ] unit-test
+{ t } [ \ sq-fried def>> first fry-word? >boolean ] unit-test
 
 <<
 
