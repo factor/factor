@@ -893,6 +893,7 @@ M: arm.64 dummy-int-params? f ;
 M: arm.64 dummy-fp-params? f ;
 M: arm.64 float-right-align-on-stack? f ;
 M: arm.64 struct-return-on-stack? f ;
+M: arm.64 struct-return-register XR ;
 
 : return-reg ( rep -- reg ) reg-class-of return-regs at first ;
 
@@ -975,8 +976,11 @@ M: arm.64 %alien-assembly
     } spread drop ;
 
 :: next-stack@ ( n rep -- operand )
-    FP n 16 + rep reg-class-of int-regs = temp2 temp ?
-    rep swap memory-offset ;
+    ! CALLBACK-STUB switches to a Factor stack after saving seven register
+    ! pairs on the native stack. Incoming stack arguments remain on that
+    ! native stack; Windows additionally saves a pair of TEB stack bounds.
+    temp2 CTX context-callstack-save-offset [+] LDR
+    temp2 n os windows? 128 112 ? + rep temp memory-offset ;
 
 :: %load-stack-param ( vreg rep n -- )
     rep temp-reg n rep next-stack@ rep %copy

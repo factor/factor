@@ -5,7 +5,7 @@ assocs classes.struct combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien.boxing compiler.cfg.builder.alien.params
 compiler.cfg.hats compiler.cfg.instructions compiler.cfg.registers
 compiler.cfg.stacks compiler.cfg.stacks.local compiler.errors
-compiler.tree cpu.architecture kernel layouts make math namespaces
+compiler.tree cpu.architecture kernel layouts locals make math namespaces
 sequences sequences.generalizations stack-checker.alien system
 words ;
 IN: compiler.cfg.builder.alien
@@ -35,13 +35,17 @@ IN: compiler.cfg.builder.alien
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
-: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
-    dup large-struct? [
-        heap-size cell f ^^local-allot [
-            '[ _ prefix ]
-            [ int-rep struct-return-on-stack? f 3array prefix ] bi*
-        ] keep
-    ] [ drop f ] if ;
+:: prepare-struct-caller ( vregs reps return -- vregs' reps' return-vreg/f )
+    return large-struct? [
+        return heap-size cell f ^^local-allot :> result
+        struct-return-register [
+            result int-rep rot 3array reg-values get push
+            vregs reps
+        ] [
+            result vregs prefix
+            int-rep struct-return-on-stack? f 3array reps prefix
+        ] if* result
+    ] [ vregs reps f ] if ;
 
 : (handle-macos-arm64-varargs) ( params -- )
     function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
@@ -145,7 +149,11 @@ M: #alien-assembly emit-node
 
 : prepare-struct-callee ( c-type -- vreg )
     large-struct?
-    [ int-rep struct-return-on-stack? f callee-parameter ] [ f ] if ;
+    [
+        struct-return-register [
+            [ next-vreg dup int-rep ] dip 3array reg-values get push
+        ] [ int-rep struct-return-on-stack? f callee-parameter ] if*
+    ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
@@ -162,17 +170,26 @@ M: #alien-assembly emit-node
         _ [ base-type ] map (callee-parameters)
     ] with-param-regs ;
 
+! Calls emitted inside a callback have their own structure result areas.
+! Keep the incoming C caller's pointer for the callback's eventual return.
+SYMBOL: callback-struct-return-area
+
 : callee-return ( params -- reg-inputs )
     return>> [ { } ] [
         [ ds-pop ] dip
-        base-type unbox-return store-return
+        base-type callback-struct-return-area get struct-return-area
+        [ unbox-return ] with-variable store-return
     ] if-void ;
 
 : emit-callback-body ( block nodes -- block' )
     dup last #return? t assert= but-last emit-nodes ;
 
 : emit-callback-inputs ( params -- )
-    [ callee-parameters ##callback-inputs, ] keep box-parameters ;
+    [
+        callee-parameters
+        struct-return-area get callback-struct-return-area set
+        ##callback-inputs,
+    ] keep box-parameters ;
 
 : callback-stack-cleanup ( params -- )
     [ xt>> ]

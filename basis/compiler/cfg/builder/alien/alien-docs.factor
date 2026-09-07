@@ -4,6 +4,9 @@ help.syntax literals make multiline sequences stack-checker.alien
 strings ;
 IN: compiler.cfg.builder.alien
 
+HELP: callback-struct-return-area
+{ $var-description "The virtual register holding a callback's incoming structure result pointer. It is kept separate from result areas for C calls emitted inside the callback." } ;
+
 <<
 STRING: ex-caller-return
 USING: compiler.cfg.builder.alien make prettyprint ;

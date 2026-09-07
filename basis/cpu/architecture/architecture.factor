@@ -566,6 +566,10 @@ HOOK: float-right-align-on-stack? cpu ( -- ? )
 ! If t, the struct return pointer is never passed in a param reg
 HOOK: struct-return-on-stack? cpu ( -- ? )
 
+! A dedicated indirect-result register, or f to use the normal parameters.
+HOOK: struct-return-register cpu ( -- reg/f )
+M: object struct-return-register f ;
+
 HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
