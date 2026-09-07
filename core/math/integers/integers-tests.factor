@@ -334,6 +334,60 @@ IN: math.integers.tests
 { f } [ 1 >bignum 200 2^ neg bit? ] unit-test
 { t } [ -2 >bignum 200 2^ neg bit? ] unit-test
 
+! #224/#989: arithmetic returns a fixnum whenever the result fits.
+: normalized-add ( x y -- z ) { bignum bignum } declare bignum+ ;
+{ 5 t } [ 3 >bignum 2 >bignum normalized-add dup fixnum? ] unit-test
+{ 6 } [ 3 >bignum 2 >bignum normalized-add 1 + ] unit-test
+: normalized-subtract ( x y -- z ) { bignum bignum } declare bignum- ;
+{ 1 t } [ 3 >bignum 2 >bignum normalized-subtract dup fixnum? ] unit-test
+{ 2 } [ 3 >bignum 2 >bignum normalized-subtract 1 + ] unit-test
+: normalized-multiply ( x y -- z ) { bignum bignum } declare bignum* ;
+{ 6 t } [ 3 >bignum 2 >bignum normalized-multiply dup fixnum? ] unit-test
+{ 7 } [ 3 >bignum 2 >bignum normalized-multiply 1 + ] unit-test
+: normalized-divide ( x y -- z ) { bignum bignum } declare bignum/i ;
+{ 4 t } [ 9 >bignum 2 >bignum normalized-divide dup fixnum? ] unit-test
+{ 5 } [ 9 >bignum 2 >bignum normalized-divide 1 + ] unit-test
+: normalized-and ( x y -- z ) { bignum bignum } declare bignum-bitand ;
+{ 2 t } [ 3 >bignum 2 >bignum normalized-and dup fixnum? ] unit-test
+{ 3 } [ 3 >bignum 2 >bignum normalized-and 1 + ] unit-test
+: normalized-or ( x y -- z ) { bignum bignum } declare bignum-bitor ;
+{ 3 t } [ 3 >bignum 2 >bignum normalized-or dup fixnum? ] unit-test
+{ 4 } [ 3 >bignum 2 >bignum normalized-or 1 + ] unit-test
+: normalized-xor ( x y -- z ) { bignum bignum } declare bignum-bitxor ;
+{ 1 t } [ 3 >bignum 2 >bignum normalized-xor dup fixnum? ] unit-test
+{ 2 } [ 3 >bignum 2 >bignum normalized-xor 1 + ] unit-test
+: normalized-gcd ( x y -- z ) { bignum bignum } declare bignum-gcd ;
+{ 3 t } [ 9 >bignum 6 >bignum normalized-gcd dup fixnum? ] unit-test
+{ 4 } [ 9 >bignum 6 >bignum normalized-gcd 1 + ] unit-test
+
+: normalized-shift ( x n -- z ) { bignum fixnum } declare bignum-shift ;
+: normalized-not ( x -- z ) { bignum } declare bignum-bitnot ;
+: normalized-log2 ( x -- n ) { bignum } declare bignum-log2 ;
+: normalized-divmod ( x y -- q r ) { bignum bignum } declare bignum/mod ;
+{ 6 t } [ 12 >bignum -1 normalized-shift dup fixnum? ] unit-test
+{ -1 t } [ 0 >bignum normalized-not dup fixnum? ] unit-test
+{ 100 t } [ 100 2^ normalized-log2 dup fixnum? ] unit-test
+{ 4 t 1 t } [ 9 >bignum 2 >bignum normalized-divmod [ dup fixnum? ] bi@ ] unit-test
+{ 2 t } [ 2 600 ^ 2 599 ^ /i dup fixnum? ] unit-test
+{ t } [ 1 >bignum 2 * fixnum? ] unit-test
+{ t } [ 1 >bignum 2 * dup >integer eq? ] unit-test
+{ t } [ 200 2^ dup >integer eq? ] unit-test
+{ t } [ 3 >bignum bignum? ] unit-test
+{ t } [ 3 >bignum >integer fixnum? ] unit-test
+{ t } [ most-positive-fixnum >bignum 0 >bignum normalized-add fixnum? ] unit-test
+{ t } [ most-negative-fixnum >bignum 0 >bignum normalized-add fixnum? ] unit-test
+{ t } [ most-positive-fixnum >bignum 1 >bignum normalized-add bignum? ] unit-test
+{ t } [ most-negative-fixnum >bignum 1 >bignum normalized-subtract bignum? ] unit-test
+{ 0 t } [ 200 2^ dup normalized-subtract dup fixnum? ] unit-test
+{ 0 t } [ 200 2^ dup normalized-xor dup fixnum? ] unit-test
+{ 0 t } [ 200 2^ 0 >bignum normalized-multiply dup fixnum? ] unit-test
+{ t } [ 200 2^ dup normalized-add bignum? ] unit-test
+{ t } [ 200 2^ dup normalized-multiply bignum? ] unit-test
+
+: normalized-abs ( x -- y ) { bignum } declare abs ;
+{ 3 t } [ 3 >bignum normalized-abs dup fixnum? ] unit-test
+{ 3 t } [ -3 >bignum normalized-abs dup fixnum? ] unit-test
+
 ! Exercise compiler dispatch and the 2^ shortcut with runtime counts.
 : checked-shift ( x n -- y ) { integer integer } declare shift ;
 : checked-power-of-two ( n -- y ) 1 swap shift ;
@@ -346,3 +400,15 @@ IN: math.integers.tests
 { f } [ 1 >bignum 32 2^ checked-bit? ] unit-test
 { t } [ -13 -1 checked-bit? ] unit-test
 { f } [ 13 -1 checked-bit? ] unit-test
+
+! Optimizer identities and mask shortcuts must also normalize the result.
+: normalized-add-zero ( x -- y ) { bignum } declare 0 + ;
+: normalized-multiply-one ( x -- y ) { bignum } declare 1 * ;
+: normalized-shift-zero ( x -- y ) { bignum } declare 0 shift ;
+: normalized-mask ( x -- y ) { bignum } declare 15 bitand ;
+: normalized-zero-mask ( x -- y ) { bignum } declare 0 bitand ;
+{ 3 t } [ 3 >bignum normalized-add-zero dup fixnum? ] unit-test
+{ 3 t } [ 3 >bignum normalized-multiply-one dup fixnum? ] unit-test
+{ 3 t } [ 3 >bignum normalized-shift-zero dup fixnum? ] unit-test
+{ 3 t } [ 3 >bignum normalized-mask dup fixnum? ] unit-test
+{ 0 t } [ 3 >bignum normalized-zero-mask dup fixnum? ] unit-test

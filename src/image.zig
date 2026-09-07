@@ -67,7 +67,8 @@ fn mapDummyMemoryIfNeeded(address: Cell, allocator: std.mem.Allocator) void {
 
 // Image format constants
 pub const image_magic: Cell = 0x0f0e0d0c;
-pub const image_version: Cell = 5;
+// Integer arithmetic now normalizes results; old compiled code is incompatible.
+pub const image_version: Cell = 6;
 
 // Embedded image footer (for executables with appended images)
 pub const EmbeddedImageFooter = extern struct {

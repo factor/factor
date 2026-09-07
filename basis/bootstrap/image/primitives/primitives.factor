@@ -490,15 +490,15 @@ CONSTANT: all-primitives {
             }
             {
                 "bignum*" ( x y -- z ) "bignum_multiply"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum+" ( x y -- z ) "bignum_add"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-" ( x y -- z ) "bignum_subtract"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-bit?" ( x n -- ? ) "bignum_bitp"
@@ -506,23 +506,23 @@ CONSTANT: all-primitives {
             }
             {
                 "bignum-bitand" ( x y -- z ) "bignum_and"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-bitnot" ( x -- y ) "bignum_not"
-                { bignum } { bignum } make-foldable
+                { bignum } { integer } make-foldable
             }
             {
                 "bignum-bitor" ( x y -- z ) "bignum_or"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-bitxor" ( x y -- z ) "bignum_xor"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-log2" ( x -- n ) "bignum_log2"
-                { bignum } { bignum } make-foldable
+                { bignum } { integer } make-foldable
             }
             {
                 "bignum-mod" ( x y -- z ) "bignum_mod"
@@ -530,19 +530,19 @@ CONSTANT: all-primitives {
             }
             {
                 "bignum-gcd" ( x y -- z ) "bignum_gcd"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum-shift" ( x y -- z ) "bignum_shift"
-                { bignum fixnum } { bignum } make-foldable
+                { bignum fixnum } { integer } make-foldable
             }
             {
                 "bignum/i" ( x y -- z ) "bignum_divint"
-                { bignum bignum } { bignum } make-foldable
+                { bignum bignum } { integer } make-foldable
             }
             {
                 "bignum/mod" ( x y -- z w ) "bignum_divmod"
-                { bignum bignum } { bignum integer } make-foldable
+                { bignum bignum } { integer integer } make-foldable
             }
             {
                 "bignum<" ( x y -- ? ) "bignum_less"

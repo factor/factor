@@ -60,12 +60,12 @@ IN: compiler.tree.propagation.transforms
     in-d>> rem-custom-inlining
 ] "custom-inlining" set-word-prop
 
-: non-negative-fixnum? ( obj -- ? )
-    { [ fixnum? ] [ 0 >= ] } 1&& ;
+: fixnum-mask? ( obj -- ? )
+    { [ integer? ] [ 0 most-positive-fixnum between? ] } 1&& ;
 
 : simplify-bitand? ( value1 value2 -- ? )
-    [ literal>> non-negative-fixnum? ]
-    [ class>> fixnum swap class<= ]
+    [ literal>> fixnum-mask? ]
+    [ class>> integer classes-intersect? ]
     bi* and ;
 
 : all-ones? ( n -- ? ) dup 1 + bitand zero? ; inline
@@ -88,33 +88,34 @@ IN: compiler.tree.propagation.transforms
     bitand-integer-integer
     bitand-integer-fixnum
     bitand-fixnum-integer
+    bignum-bitand
     bitand
 } [
     [
         in-d>> first2 [ value-info ] bi@ {
             {
                 [ 2dup zero-bitand? ]
-                [ nip class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
                 [ 2dup swap zero-bitand? ]
-                [ drop class>> bignum = 0 >bignum 0 ? '[ 2drop _ ] ]
+                [ 2drop [ 2drop 0 ] ]
             }
             {
                 [ 2dup redundant-bitand? ]
-                [ nip class>> bignum = [ drop >bignum ] [ drop ] ? ]
+                [ 2drop [ drop >integer ] ]
             }
             {
                 [ 2dup swap redundant-bitand? ]
-                [ drop class>> bignum = [ nip >bignum ] [ nip ] ? ]
+                [ 2drop [ nip >integer ] ]
             }
             {
                 [ 2dup simplify-bitand? ]
-                [ 2drop [ integer>fixnum fixnum-bitand ] ]
+                [ 2drop [ [ integer>fixnum ] bi@ fixnum-bitand ] ]
             }
             {
                 [ 2dup swap simplify-bitand? ]
-                [ 2drop [ [ integer>fixnum ] dip fixnum-bitand ] ]
+                [ 2drop [ [ integer>fixnum ] bi@ fixnum-bitand ] ]
             }
             [ 2drop f ]
         } cond

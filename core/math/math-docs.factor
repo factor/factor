@@ -62,7 +62,7 @@ HELP: +
     "Adds two numbers."
     { $list
         "Addition of fixnums may overflow and convert the result to a bignum."
-        "Addition of bignums always yields a bignum."
+        "Integer addition yields a fixnum when the result fits, and a bignum otherwise."
         "Addition of floats always yields a float."
         "Addition of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
@@ -74,7 +74,7 @@ HELP: -
     "Subtracts " { $snippet "y" } " from " { $snippet "x" } "."
     { $list
         "Subtraction of fixnums may overflow and convert the result to a bignum."
-        "Subtraction of bignums always yields a bignum."
+        "Integer subtraction yields a fixnum when the result fits, and a bignum otherwise."
         "Subtraction of floats always yields a float."
         "Subtraction of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
@@ -86,7 +86,7 @@ HELP: *
     "Multiplies two numbers."
     { $list
         "Multiplication of fixnums may overflow and convert the result to a bignum."
-        "Multiplication of bignums always yields a bignum."
+        "Integer multiplication yields a fixnum when the result fits, and a bignum otherwise."
         "Multiplication of floats always yields a float."
         "Multiplication of ratios and complex numbers proceeds using the relevant mathematical rules."
     }
@@ -125,7 +125,7 @@ HELP: mod
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
     { $list
         "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."
+        "Integer remainders are returned as fixnums when they fit."
         { "Modulus of rationals always yields a rational. In this case, the remainder is computed using the formula " { $snippet "x - (x mod y) * y" } "." }
     }
 }
@@ -137,7 +137,7 @@ HELP: /mod
     "Computes the quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
     { $list
         "The quotient of two fixnums may overflow and yield a bignum; the remainder is always a fixnum"
-        "The quotient and remainder of two bignums is always a bignum."
+        "Integer quotients and remainders are each returned as fixnums when they fit."
     }
 }
 { $examples
@@ -219,7 +219,7 @@ HELP: rem
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive or zero."
     { $list
         "Given fixnums, always yields a fixnum."
-        "Given bignums, always yields a bignum."
+        "Integer results are returned as fixnums when they fit."
         "Given rationals, always yields a rational."
     }
 }
@@ -538,7 +538,7 @@ ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $nl
 "Two examples where you should note the types of the inputs and outputs:"
-{ $example "USE: classes" "3 >fixnum 6 >bignum * class-of ." "bignum" }
+{ $example "USE: classes" "3 >fixnum 6 >bignum * class-of ." "fixnum" }
 { $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
 { $subsections

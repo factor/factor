@@ -34,11 +34,11 @@ HELP: bignum
 
 HELP: >bignum
 { $values { "x" real } { "n" bignum } }
-{ $description "Converts a real number to a bignum, with a possible loss of precision." } ;
+{ $description "Converts a real number to a bignum, with a possible loss of precision. This explicit conversion produces a bignum even when the value fits in a fixnum; subsequent arithmetic normalizes its result." } ;
 
 HELP: >integer
 { $values { "x" real } { "n" integer } }
-{ $description "Converts a real number to an integer, with a possible loss of precision." } ;
+{ $description "Converts a real number to an integer, with a possible loss of precision. Values that fit in a fixnum are returned as fixnums. Arithmetic already normalizes integer results this way." } ;
 
 HELP: integer
 { $class-description "The class of integers, which is a disjoint union of fixnums and bignums." } ;
@@ -148,32 +148,32 @@ HELP: fixnum*fast
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
 
 HELP: bignum+
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link + } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link + } " instead." } ;
 
 HELP: bignum-
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link - } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link - } " instead." } ;
 
 HELP: bignum*
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link * } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link * } " instead." } ;
 
 HELP: bignum/i
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link /i } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /i } " instead." } ;
 
 HELP: bignum-mod
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link mod } " instead." } ;
 
 HELP: bignum/mod
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } { "w" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } { "w" integer } }
 { $description "Primitive version of " { $link /mod } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link /mod } " instead." } ;
 
@@ -203,26 +203,26 @@ HELP: bignum=
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link number= } " instead." } ;
 
 HELP: bignum-bitand
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link bitand } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitand } " instead." } ;
 
 HELP: bignum-bitor
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link bitor } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitor } " instead." } ;
 
 HELP: bignum-bitxor
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" bignum } { "z" integer } }
 { $description "Primitive version of " { $link bitxor } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitxor } " instead." } ;
 
 HELP: bignum-bitnot
-{ $values { "x" bignum } { "y" bignum } }
+{ $values { "x" bignum } { "y" integer } }
 { $description "Primitive version of " { $link bitnot } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link bitnot } " instead." } ;
 
 HELP: bignum-shift
-{ $values { "x" bignum } { "y" bignum } { "z" bignum } }
+{ $values { "x" bignum } { "y" fixnum } { "z" integer } }
 { $description "Primitive version of " { $link shift } "." }
 { $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link shift } " instead." } ;

@@ -156,11 +156,11 @@ IN: compiler.tree.propagation.tests
 
 { number } [ [ + ] final-math-class ] unit-test
 
-{ bignum } [ [ { fixnum bignum } declare + ] final-math-class ] unit-test
+{ integer } [ [ { fixnum bignum } declare + ] final-math-class ] unit-test
 
 { integer } [ [ { fixnum integer } declare + ] final-math-class ] unit-test
 
-{ bignum } [ [ { integer bignum } declare + ] final-math-class ] unit-test
+{ integer } [ [ { integer bignum } declare + ] final-math-class ] unit-test
 
 { integer } [ [ { fixnum fixnum } declare + ] final-math-class ] unit-test
 
@@ -194,9 +194,9 @@ IN: compiler.tree.propagation.tests
 
 { float } [ [ { float fixnum } declare + ] final-math-class ] unit-test
 
-{ bignum } [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
+{ integer } [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
 
-{ bignum } [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
+{ fixnum } [ [ { integer } declare 123 >bignum bitand ] final-math-class ] unit-test
 
 { float } [ [ { float float } declare mod ] final-math-class ] unit-test
 
@@ -857,7 +857,7 @@ MIXIN: empty-mixin
 ] unit-test
 
 ! And here
-{ V{ bignum integer } } [
+{ V{ integer integer } } [
     [ { bignum bignum } declare /mod ] final-classes
 ] unit-test
 
@@ -898,11 +898,11 @@ MIXIN: empty-mixin
     [ [ 123 bitand ] [ drop f ] if dup [ 0 >= ] [ not ] if ] final-literals
 ] unit-test
 
-{ V{ bignum } } [
+{ V{ integer } } [
     [ { bignum } declare dup 1 - bitxor ] final-classes
 ] unit-test
 
-{ V{ bignum integer } } [
+{ V{ integer integer } } [
     [ { bignum integer } declare [ shift ] keep ] final-classes
 ] unit-test
 
@@ -1062,16 +1062,16 @@ M: tuple-with-read-only-slot clone
 { f } [ [ { fixnum } declare 257 rem -256 bitand ] { fixnum-bitand } inlined? ] unit-test
 
 { V{ fixnum } } [ [ >bignum 10 mod 2^ ] final-classes ] unit-test
-{ V{ bignum } } [ [ >bignum 10 bitand ] final-classes ] unit-test
-{ V{ bignum } } [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ >bignum 10 bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ >bignum 10 >bignum bitand ] final-classes ] unit-test
 { V{ fixnum } } [ [ >bignum 10 mod ] final-classes ] unit-test
-{ V{ bignum } } [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
-{ V{ bignum } } [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ { fixnum } declare -1 >bignum bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ { fixnum } declare -1 >bignum swap bitand ] final-classes ] unit-test
 
-! Could be bignum not integer but who cares
-{ V{ integer } } [ [ 10 >bignum bitand ] final-classes ] unit-test
-{ V{ bignum } } [ [ { fixnum } declare 10 >bignum bitand ] final-classes ] unit-test
-{ V{ bignum } } [ [ { integer } declare 10 >bignum bitand ] final-classes ] unit-test
+! A bounded integer result can be unboxed regardless of the input representation.
+{ V{ fixnum } } [ [ 10 >bignum bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ { fixnum } declare 10 >bignum bitand ] final-classes ] unit-test
+{ V{ fixnum } } [ [ { integer } declare 10 >bignum bitand ] final-classes ] unit-test
 
 { t } [ [ { fixnum fixnum } declare min ] { min } inlined? ] unit-test
 { f } [ [ { fixnum fixnum } declare min ] { fixnum-min } inlined? ] unit-test
@@ -1178,3 +1178,10 @@ STRUCT: bar { s bar* } ;
     child>> [ { [ #call? ] [ word>> \ alien-cell = ] } 1&& ] find nip
     >boolean
 ] unit-test
+
+! #224/#989: primitive results can shrink; explicit coercions stay explicit.
+{ V{ integer } } [ [ { bignum bignum } declare bignum+ ] final-classes ] unit-test
+{ V{ integer } } [ [ { bignum bignum } declare bignum/i ] final-classes ] unit-test
+{ V{ integer integer } } [ [ bignum/mod ] final-classes ] unit-test
+{ V{ fixnum } } [ [ { bignum } declare 15 >bignum bignum-bitand ] final-classes ] unit-test
+{ V{ bignum } } [ [ { fixnum } declare >bignum ] final-classes ] unit-test
