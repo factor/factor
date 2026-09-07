@@ -17,7 +17,7 @@ $nl
 "There should never be any reason to use " { $link "math.vectors.simd.intrinsics" } " directly, but they too have a straightforward, but lower-level, interface." ;
 
 ARTICLE: "math.vectors.simd.support" "Supported SIMD instruction sets and operations"
-"At present, the SIMD support makes use of a subset of SSE up to SSE4.1. The subset used depends on the current CPU type."
+"SIMD support includes ARM64 Advanced SIMD and a subset of SSE up to SSE4.1. ARM64 optionally dispatches to DotProd, FP16, BF16 and I8MM kernels after checking runtime capabilities. Each operation also has a portable implementation."
 $nl
 "SSE1 only supports single-precision SIMD (" { $snippet "float-4" } ")."
 $nl
@@ -48,6 +48,8 @@ $nl
     "ulonglong-2"
     "float-4"
     "double-2"
+    "half-8"
+    "bfloat-8"
 }
 "Double-width 256-bit vector types are defined in the " { $vocab-link "math.vectors.simd.cords" } " vocabulary:"
 { $code
@@ -203,3 +205,8 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 } ;
 
 ABOUT: "math.vectors.simd"
+
+HELP: half-8
+{ $class-description "A 128-bit sequence of eight IEEE binary16 values. Elements are Factor floats; numeric stores round to nearest, ties to even, and canonicalize NaNs. Raw casts preserve bits. Arithmetic and conversions have portable implementations and optional FP16 kernels." } ;
+HELP: bfloat-8
+{ $class-description "A 128-bit sequence of eight BF16 values. Elements are Factor floats. Ordinary arithmetic computes in binary32 before rounding the stored result to BF16. Dedicated BF16 dot and matrix operations accumulate in float-4 with Arm's baseline BF16 computation semantics." } ;

@@ -57,6 +57,9 @@ FUNCTION-ALIAS: fsqrt
 FUNCTION-ALIAS: ffma
     double fma ( double x, double y, double z )
 
+FUNCTION-ALIAS: ffmaf
+    alien.c-types:float fmaf ( alien.c-types:float x, alien.c-types:float y, alien.c-types:float z )
+
 FUNCTION: double fmod ( double x, double y )
 
 M: float mod fmod ; inline

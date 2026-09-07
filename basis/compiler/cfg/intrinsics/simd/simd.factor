@@ -6,7 +6,7 @@ compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
 cpu.architecture kernel layouts math math.vectors
-math.vectors.simd.intrinsics sequences specialized-arrays ;
+math.vectors.simd.intrinsics sequences specialized-arrays strings ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char uchar short ushort int uint longlong ulonglong float double ;
 IN: compiler.cfg.intrinsics.simd
@@ -82,10 +82,15 @@ CONSTANT: rep>half {
 : ^load-immediate-shuffle ( shuffle rep -- dst )
     >variable-shuffle ^^load-literal ;
 
-:: ^blend-vector ( mask true false rep -- dst )
-    true mask rep ^^and-vector
-    mask false rep ^^andn-vector
-    rep ^^or-vector ;
+: ^blend-vector ( mask true false rep -- dst )
+    {
+        [ ^^blend-vector ]
+        [| mask true false rep |
+            true mask rep ^^and-vector
+            mask false rep ^^andn-vector
+            rep ^^or-vector
+        ]
+    } vvv-vector-op ;
 
 : ^not-vector ( src rep -- dst )
     {
@@ -287,6 +292,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : ^shuffle-2-vectors-imm ( src1 src2 shuffle rep -- dst )
     [ rep-length 0 pad-tail ] keep {
+        [ ^^shuffle2-vector-imm ]
         { double-2-rep [| src1 src2 shuffle rep |
             shuffle first2 [ 4 mod ] bi@ :> ( i j )
             {
@@ -383,6 +389,24 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : emit-simd-v*hs+ ( node -- )
     {
         [ ^^mul-horizontal-add-vector ]
+        [| a b rep |
+            rep { char-16-rep uchar-16-rep } member?
+            [ uchar-16-rep char-16-rep ] [ rep rep ] if :> ( ar br )
+            br widen-vector-rep :> wide
+            a ar ^unpack-vector-head b br ^unpack-vector-head wide ^^mul-vector :> lo
+            a ar ^unpack-vector-tail b br ^unpack-vector-tail wide ^^mul-vector :> hi
+            wide rep-length <iota> [ 2 * ] map :> even
+            lo hi even wide ^shuffle-2-vectors-imm
+            lo hi even [ 1 + ] map wide ^shuffle-2-vectors-imm
+            wide ^^saturated-add-vector :> result
+            wide unsigned-int-vector-rep? [
+                wide rep-component-type heap-size :> bytes
+                16 <iota> [ bytes mod bytes 1 - = 0x7f 0xff ? ] map >byte-array
+                ^^load-literal :> limit
+                result limit wide cc> ^compare-vector
+                limit result wide ^blend-vector
+            ] [ result ] if
+        ]
     } emit-vv-vector-op ;
 
 : emit-simd-v/ ( node -- )
@@ -481,6 +505,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vlshift ( node -- )
     {
+        [ ^^shl-vector-count ]
         [ ^^shl-vector ]
     } {
         [ ^^shl-vector-imm ]
@@ -488,6 +513,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vrshift ( node -- )
     {
+        [ ^^shr-vector-count ]
         [ ^^shr-vector ]
     } {
         [ ^^shr-vector-imm ]
@@ -651,8 +677,33 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ byte-array inline-store-memory? ] inline-accessor
     ] with { [ %alien-vector-reps member? ] } if-literals-match ;
 
+
+: emit-simd-unary ( node -- )
+    { [ ^^unary-vector-function ] } [ string? ] emit-vl-vector-op ;
+: emit-simd-binary ( node -- )
+    { [ ^^binary-vector-function ] } [ string? ] emit-vvl-vector-op ;
+: emit-simd-vfma ( node -- )
+    { [ ^^fma-vector ] } emit-vvv-vector-op ;
+: emit-simd-mul-wide-head ( node -- )
+    { [ f swap ^^mul-wide-vector ] } emit-vv-vector-op ;
+: emit-simd-mul-wide-tail ( node -- )
+    { [ t swap ^^mul-wide-vector ] } emit-vv-vector-op ;
+: emit-simd-v>unsigned-integer ( node -- )
+    { [ "float>unsigned" swap ^^unary-vector-function ] } emit-v-vector-op ;
+
+: emit-simd-reduce ( node -- )
+    { [| src op rep | src op rep ^^unary-vector-function rep ^^vector>scalar ] }
+    [ string? ] emit-vl-vector-op ;
+
 : enable-simd ( -- )
     {
+        { (simd-reduce) [ emit-simd-reduce ] }
+        { (simd-unary) [ emit-simd-unary ] }
+        { (simd-binary) [ emit-simd-binary ] }
+        { (simd-vfma) [ emit-simd-vfma ] }
+        { (simd-mul-wide-head) [ emit-simd-mul-wide-head ] }
+        { (simd-mul-wide-tail) [ emit-simd-mul-wide-tail ] }
+        { (simd-v>unsigned-integer) [ emit-simd-v>unsigned-integer ] }
         { (simd-v+)                 [ emit-simd-v+                  ] }
         { (simd-v-)                 [ emit-simd-v-                  ] }
         { (simd-vneg)               [ emit-simd-vneg                ] }

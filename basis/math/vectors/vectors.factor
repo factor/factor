@@ -209,9 +209,12 @@ M: object v?
     } cond ; inline
 
 : v>integer ( v -- w ) [ >integer ] map ;
-: vfloor ( v -- w ) [ floor ] map ;
-: vceiling ( v -- w ) [ ceiling ] map ;
-: vtruncate ( v -- w ) [ truncate ] map ;
+GENERIC: vfloor ( v -- w )
+M: object vfloor [ floor ] map ; inline
+GENERIC: vceiling ( v -- w )
+M: object vceiling [ ceiling ] map ; inline
+GENERIC: vtruncate ( v -- w )
+M: object vtruncate [ truncate ] map ; inline
 
 : vmaximum ( seq -- vmax ) [ ] [ vmax ] map-reduce ; inline
 : vminimum ( seq -- vmin ) [ ] [ vmin ] map-reduce ; inline
@@ -303,3 +306,26 @@ PRIVATE>
     [ normalize ] bi@ hdot acos ;
 
 { "math.vectors" "ranges" } "math.vectors.ranges" require-when
+
+GENERIC: vfma ( a b c -- d )
+M: object vfma [ fma ] 3map ; inline
+GENERIC: vround ( v -- w )
+M: object vround [ round ] map ; inline
+GENERIC: vround-to-even ( v -- w )
+M: object vround-to-even [ round-to-even ] map ; inline
+GENERIC: vbit-count ( v -- w )
+GENERIC: vclz ( v -- w )
+GENERIC: vctz ( v -- w )
+GENERIC: vbit-reverse ( v -- w )
+GENERIC: vshift ( v counts -- w )
+GENERIC: vmul-wide ( a b -- lo hi )
+GENERIC: vabsdiff ( a b -- w )
+GENERIC: vmin-element ( v -- n )
+M: object vmin-element minimum ; inline
+GENERIC: vmax-element ( v -- n )
+M: object vmax-element maximum ; inline
+
+GENERIC: vdot4+ ( a b accumulator -- result )
+GENERIC: vmatmul2x8+ ( a b accumulator -- result )
+GENERIC: vbdot2+ ( a b accumulator -- result )
+GENERIC: vbmatmul2x4+ ( a b accumulator -- result )

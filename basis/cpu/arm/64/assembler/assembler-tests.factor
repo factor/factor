@@ -184,3 +184,47 @@ IN: cpu.arm.64.assembler.tests
 0x20fc40d3 [ X0 X1 0 LSL ] test-insn
 0x20781f53 [ W0 W1 1 LSL ] test-insn
 0x20000153 [ W0 W1 31 LSL ] test-insn
+
+! Independently assembled with Clang for AArch64.
+0x20cc224e [ V0 V1 V2 4S FMLAv ] test-insn
+0x2088214e [ V0 V1 4S FRINTNv ] test-insn
+0x2098214e [ V0 V1 4S FRINTMv ] test-insn
+0x2088a14e [ V0 V1 4S FRINTPv ] test-insn
+0x2098a14e [ V0 V1 4S FRINTZv ] test-insn
+0x2088216e [ V0 V1 4S FRINTAv ] test-insn
+0x2038306e [ V0 V1 16B UADDLV ] test-insn
+0x2028206e [ V0 V1 16B UADDLP ] test-insn
+0x2048a06e [ V0 V1 4S CLZv ] test-insn
+0x2058606e [ V0 V1 RBITv ] test-insn
+0x2008204e [ V0 V1 16B REV64v ] test-insn
+0x2008206e [ V0 V1 16B REV32v ] test-insn
+0x2018204e [ V0 V1 16B REV16v ] test-insn
+0x20b8a16e [ V0 V1 4S FCVTZUvi ] test-insn
+0x201c626e [ V0 V1 V2 16B BSLv ] test-insn
+
+! Encodings independently assembled by Clang for armv8.6-a+fp16.
+{ 0x2094824e } [ [ V0 V1 V2 SDOT ] { } make be> ] unit-test
+{ 0x2094826e } [ [ V0 V1 V2 UDOT ] { } make be> ] unit-test
+{ 0x209c824e } [ [ V0 V1 V2 USDOT ] { } make be> ] unit-test
+{ 0x20a4824e } [ [ V0 V1 V2 SMMLA ] { } make be> ] unit-test
+{ 0x20a4826e } [ [ V0 V1 V2 UMMLA ] { } make be> ] unit-test
+{ 0x20ac824e } [ [ V0 V1 V2 USMMLA ] { } make be> ] unit-test
+{ 0x20fc426e } [ [ V0 V1 V2 BFDOT ] { } make be> ] unit-test
+{ 0x20ec426e } [ [ V0 V1 V2 BFMMLA ] { } make be> ] unit-test
+{ 0x2014424e } [ [ V0 V1 V2 FADDHv ] { } make be> ] unit-test
+{ 0x2014c24e } [ [ V0 V1 V2 FSUBHv ] { } make be> ] unit-test
+{ 0x201c426e } [ [ V0 V1 V2 FMULHv ] { } make be> ] unit-test
+{ 0x203c426e } [ [ V0 V1 V2 FDIVHv ] { } make be> ] unit-test
+{ 0x200c424e } [ [ V0 V1 V2 FMLAHv ] { } make be> ] unit-test
+{ 0x2004c24e } [ [ V0 V1 V2 FMINNMHv ] { } make be> ] unit-test
+{ 0x2004424e } [ [ V0 V1 V2 FMAXNMHv ] { } make be> ] unit-test
+{ 0x2024424e } [ [ V0 V1 V2 FCMEQHv ] { } make be> ] unit-test
+{ 0x2024c26e } [ [ V0 V1 V2 FCMGTHv ] { } make be> ] unit-test
+{ 0x2024426e } [ [ V0 V1 V2 FCMGEHv ] { } make be> ] unit-test
+{ 0x20f8f96e } [ [ V0 V1 FSQRTHv ] { } make be> ] unit-test
+{ 0x2078210e } [ [ V0 V1 FCVTLH ] { } make be> ] unit-test
+{ 0x2078214e } [ [ V0 V1 FCVTLH2 ] { } make be> ] unit-test
+{ 0x2068210e } [ [ V0 V1 FCVTNH ] { } make be> ] unit-test
+{ 0x2068214e } [ [ V0 V1 FCVTNH2 ] { } make be> ] unit-test
+{ 0x2068a10e } [ [ V0 V1 BFCVTN ] { } make be> ] unit-test
+{ 0x2068a14e } [ [ V0 V1 BFCVTN2 ] { } make be> ] unit-test

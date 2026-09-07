@@ -6,6 +6,19 @@ sequences stack-checker tools.test sequences.generalizations ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion.tests
 
+{ uint-4{ 2147483648 4294967040 0 4294967295 } } [
+    float-4{ 2147483648.0 4294967040.0 -1.0 1/0. }
+    [ { float-4 } declare float-4 uint-4 vconvert ] compile-call
+] unit-test
+{ uint-4{ 0 0 4294967295 4294967295 } } [
+    float-4{ 0/0. -1/0. 4294967296.0 1/0. }
+    [ { float-4 } declare float-4 uint-4 vconvert ] compile-call
+] unit-test
+{ ulonglong-2{ 18446744073709551615 18446744073709551615 } } [
+    double-2{ 18446744073709551616.0 1/0. }
+    [ { double-2 } declare double-2 ulonglong-2 vconvert ] compile-call
+] unit-test
+
 ERROR: optimized-vconvert-inconsistent
     unoptimized-result
     optimized-result ;

@@ -9,6 +9,19 @@ kernel.private locals make math math.vectors math.vectors.simd namespaces
 sequences system tools.test vectors ;
 IN: cpu.arm.64.tests
 
+! Public entry points must retain vector operations after specialization.
+{ t } [ [ { int-4 int-4 } declare vmul-wide ] [ ##mul-wide-vector? ] contains-insn? ] unit-test
+{ t } [ [ { int-4 int-4 } declare vabsdiff ] [ ##binary-vector-function? ] contains-insn? ] unit-test
+{ t } [ [ { float-4 float-4 float-4 } declare vfma ] [ ##fma-vector? ] contains-insn? ] unit-test
+{ t } [ [ { uint-4 int-4 } declare vshift ] [ ##binary-vector-function? ] contains-insn? ] unit-test
+
+{ uint-4{ 0xa8800000 0xa8800000 0xa8800000 0xa8800000 } } [
+    float-4{ 1.0000001192092896 1.0000001192092896 1.0000001192092896 1.0000001192092896 }
+    float-4{ 0.9999998807907104 0.9999998807907104 0.9999998807907104 0.9999998807907104 }
+    float-4{ -1 -1 -1 -1 }
+    [ { float-4 float-4 float-4 } declare vfma uint-4-cast ] compile-call
+] unit-test
+
 :: alien-call-code+return-address ( stack-size -- code return-address )
     init-relocation
     V{ } clone return-addresses set
@@ -252,3 +265,95 @@ cpu arm.64? [
         0x100000 alien-unsigned-1
     ] unit-test
 ] when
+
+! SIMD coverage regressions: dynamic inputs keep these checks on the native path.
+{ uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } } [
+    uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 } 0x100000000
+    [ { uchar-16 fixnum } declare vlshift ] compile-call
+] unit-test
+
+{ char-16{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } } [
+    char-16{ -1 1 -2 2 -3 3 -4 4 -5 5 -6 6 -7 7 -8 8 } 256
+    [ { char-16 fixnum } declare vrshift ] compile-call
+] unit-test
+
+{ int-4{ 127 -128 5 6 } } [
+    int-4{ 5 6 127 -128 }
+    [ { int-4 } declare { 2 3 0 1 } vshuffle-elements ] compile-call
+] unit-test
+
+{ double-2{ 4.0 1.0 } } [
+    double-2{ 1.0 2.0 } double-2{ 3.0 4.0 }
+    [ { double-2 double-2 } declare { 3 0 } vshuffle2-elements ] compile-call
+] unit-test
+
+{ short-8{ 32767 -32768 6 -6 32767 -32768 6 -6 } } [
+    short-8{ 32767 -32768 2 -2 32767 -32768 2 -2 }
+    short-8{ 2 2 3 3 2 2 3 3 }
+    [ { short-8 short-8 } declare vs* ] compile-call
+] unit-test
+
+{ 4080 } [
+    uchar-16{ 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 255 }
+    uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+    [ { uchar-16 uchar-16 } declare vsad ] compile-call
+] unit-test
+
+{ longlong-2{ 0 -6 } } [
+    longlong-2{ 0x100000000 -2 } longlong-2{ 0x100000000 3 }
+    [ { longlong-2 longlong-2 } declare v* ] compile-call
+] unit-test
+
+{ ulonglong-2{ 0xffffffffffffffff 0x8000000000000000 } } [
+    ulonglong-2{ 0xffffffffffffffff 0xffffffffffffffff }
+    ulonglong-2{ 0xffffffffffffffff 1 }
+    [ { ulonglong-2 ulonglong-2 } declare vavg ] compile-call
+] unit-test
+
+{ int-4{ 2147483647 2147483647 2147483647 2147483647 } } [
+    short-8{ -32768 -32768 -32768 -32768 -32768 -32768 -32768 -32768 }
+    dup [ { short-8 short-8 } declare v*hs+ ] compile-call
+] unit-test
+
+{ int-4{ 32 0 1 1 } } [
+    int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vbit-count ] compile-call
+] unit-test
+{ int-4{ 0 32 31 0 } } [
+    int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vclz ] compile-call
+] unit-test
+{ int-4{ 0 32 0 31 } } [
+    int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vctz ] compile-call
+] unit-test
+{ int-4{ -1 0 -2147483648 1 } } [
+    int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vbit-reverse ] compile-call
+] unit-test
+{ longlong-2{ 64 63 } } [
+    longlong-2{ 0 1 } [ { longlong-2 } declare vclz ] compile-call
+] unit-test
+{ uint-4{ 2 1 0 0 } } [
+    uint-4{ 1 2 3 4 } int-4{ 1 -1 256 -256 }
+    [ { uint-4 int-4 } declare vshift ] compile-call
+] unit-test
+{ longlong-2{ -1 0 } } [
+    longlong-2{ -1 1 } longlong-2{ -256 256 }
+    [ { longlong-2 longlong-2 } declare vshift ] compile-call
+] unit-test
+{ uint-4{ 4294967295 4294967295 0 3 } } [
+    int-4{ -2147483648 2147483647 1 -2 } int-4{ 2147483647 -2147483648 1 1 }
+    [ { int-4 int-4 } declare vabsdiff ] compile-call
+] unit-test
+{ longlong-2{ 4294967296 -6 } longlong-2{ 20 -42 } } [
+    int-4{ 65536 -2 4 -6 } int-4{ 65536 3 5 7 }
+    [ { int-4 int-4 } declare vmul-wide ] compile-call
+] unit-test
+{ float-4{ -2.0 -1.0 1.0 2.0 } float-4{ -2.0 -0.0 0.0 2.0 } } [
+    float-4{ -1.5 -0.5 0.5 1.5 }
+    [ { float-4 } declare dup vround swap vround-to-even ] compile-call
+] unit-test
+{ float-4{ -3.0 -1.0 0.0 2.0 } } [
+    float-4{ -2.5 -0.5 0.5 2.5 } [ { float-4 } declare vfloor ] compile-call
+] unit-test
+{ float-4{ 5.0 10.0 17.0 26.0 } } [
+    float-4{ 1 2 3 4 } float-4{ 2 3 4 5 } float-4{ 3 4 5 6 }
+    [ { float-4 float-4 float-4 } declare vfma ] compile-call
+] unit-test

@@ -85,6 +85,11 @@ M: c-type unbox
     ]
     [ drop f f 3array 1array ] 2bi record-reg-reps ;
 
+! SIMD values are byte arrays between the tree and CFG stages. The normal
+! representation conversion pass loads/stores their 128-bit payloads.
+M: vector-c-type unbox
+    [ 1array ] [ rep>> f f 3array 1array record-reg-reps ] bi* ;
+
 M: long-long-type unbox
     [ next-vreg next-vreg 2dup ] 2dip unboxer>> ##unbox-long-long, 2array
     int-rep long-long-on-stack? long-long-odd-register? 3array
@@ -155,6 +160,8 @@ M: c-type box
             [ swap <gc-map> ^^box ] if*
         ]
     } case ;
+
+M: vector-c-type box 2drop first ;
 
 M: long-long-type box
     [ first2 ] [ drop ] [ boxer>> ] tri*

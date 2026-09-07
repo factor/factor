@@ -315,6 +315,11 @@ def: dst
 use: src shuffle
 literal: rep ;
 
+FOLDABLE-INSN: ##shuffle2-vector-imm
+def: dst
+use: src1 src2
+literal: shuffle rep ;
+
 FOLDABLE-INSN: ##shuffle-vector-halves-imm
 def: dst
 use: src1 src2
@@ -496,6 +501,31 @@ def: dst
 use: src
 literal: rep ;
 
+FOLDABLE-INSN: ##unary-vector-function
+def: dst
+use: src
+literal: op rep ;
+
+FOLDABLE-INSN: ##binary-vector-function
+def: dst
+use: src1 src2
+literal: op rep ;
+
+FOLDABLE-INSN: ##blend-vector
+def: dst
+use: mask yes no
+literal: rep ;
+
+FOLDABLE-INSN: ##fma-vector
+def: dst
+use: src1 src2 src3
+literal: rep ;
+
+FOLDABLE-INSN: ##mul-wide-vector
+def: dst
+use: src1 src2
+literal: high? rep ;
+
 FOLDABLE-INSN: ##sqrt-vector
 def: dst
 use: src
@@ -536,9 +566,19 @@ def: dst
 use: src1
 literal: src2 rep ;
 
+FOLDABLE-INSN: ##shl-vector-count
+def: dst
+use: src count/int-rep
+literal: rep ;
+
 FOLDABLE-INSN: ##shl-vector
 def: dst
 use: src1 src2/int-scalar-rep
+literal: rep ;
+
+FOLDABLE-INSN: ##shr-vector-count
+def: dst
+use: src count/int-rep
 literal: rep ;
 
 FOLDABLE-INSN: ##shr-vector

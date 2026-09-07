@@ -373,14 +373,38 @@ M: arm.64 %select-vector
     { char-16-rep short-8-rep int-4-rep } member?
     [ SMOV ] [ UMOV ] if ;
 
-M: arm.64 %shuffle-vector drop TBL ;
+M:: arm.64 %shuffle-vector ( DST SRC INDEX rep -- )
+    ! Factor byte shuffles wrap indices, whereas TBL zeroes out-of-range lanes.
+    temp 15 MOV
+    fp-temp2 temp 16B DUP
+    fp-temp2 INDEX fp-temp2 16B ANDv
+    DST SRC fp-temp2 TBL ;
 
-M: arm.64 %shuffle-vector-imm
-    [ fp-temp ] [ >byte-array ] [ ] tri* %load-vector
-    fp-temp TBL ;
+M:: arm.64 %shuffle-vector-imm ( DST SRC shuffle rep -- )
+    rep rep-component-type heap-size :> bytes
+    shuffle [ rep rep-length 1 - bitand bytes * bytes <iota> [ + ] with map ] map concat
+    fp-temp swap rep %load-vector
+    DST SRC fp-temp TBL ;
 
-M: arm.64 %shuffle-vector-halves-imm ( DST SRC1 SRC2 shuffle rep -- )
-    5drop not-implemented ;
+M:: arm.64 %shuffle2-vector-imm ( DST SRC1 SRC2 shuffle rep -- )
+    rep rep-length :> lanes
+    shuffle [| index i |
+        index lanes 2 * 1 - bitand :> lane
+        fp-temp i rep >size <vector-element>
+        lane lanes < SRC1 SRC2 ? lane lanes mod rep >size <vector-element> INS
+    ] each-index
+    DST fp-temp 16B MOVv ;
+
+M: arm.64 %shuffle2-vector-imm-reps vector-reps ;
+
+M:: arm.64 %shuffle-vector-halves-imm ( DST SRC1 SRC2 shuffle rep -- )
+    rep rep-length 2 /i :> half
+    shuffle [| lane i |
+        fp-temp i rep >size <vector-element>
+        i half < SRC1 SRC2 ? lane rep rep-length 1 - bitand
+        rep >size <vector-element> INS
+    ] each-index
+    DST fp-temp 16B MOVv ;
 
 : >shape ( rep -- shape ) >size 1 <vector-shape> ;
 
@@ -413,6 +437,12 @@ M: arm.64 %float>integer-vector >shape FCVTZSvi ;
 
 M: arm.64 %compare-vector
     {
+        { cc/<>= [ [| DST SRC1 SRC2 rep |
+            fp-temp SRC1 SRC1 rep >shape FCMEQ
+            fp-temp2 SRC2 SRC2 rep >shape FCMEQ
+            DST fp-temp fp-temp2 16B ANDv
+            DST DST 16B MVNv
+        ] call ] }
         { cc=  [ [ CMEQ ] [ FCMEQ ] integer/float ] }
         { cc>  [ [ CMGT ] [ CMHI ] [ FCMGT ] signed/unsigned/float ] }
         { cc>= [ [ CMGE ] [ CMHS ] [ FCMGE ] signed/unsigned/float ] }
@@ -442,7 +472,7 @@ M: arm.64 %compare-vector
     fp-temp >S FMOV ;
 
 M: arm.64 %move-vector-mask
-    int-vector-rep? [ %move-int-vector-mask ] [ %move-float-vector-mask ] if ;
+    float-vector-rep? [ %move-float-vector-mask ] [ %move-int-vector-mask ] if ;
 
 : vector-test-mask ( rep -- mask )
     float-vector-rep? 0x0f000000 0xffff ? ;
@@ -476,19 +506,40 @@ M: arm.64 %saturated-add-vector [ SQADD ] [ UQADD ] signed/unsigned ;
 M: arm.64 %add-sub-vector 4drop not-implemented ;
 M: arm.64 %sub-vector [ SUBv ] [ FSUBv ] integer/float ;
 M: arm.64 %saturated-sub-vector [ SQSUB ] [ UQSUB ] signed/unsigned ;
-M: arm.64 %mul-vector [ MULv ] [ FMULv ] integer/float ;
+M:: arm.64 %mul-vector ( DST SRC1 SRC2 rep -- )
+    rep { longlong-2-rep ulonglong-2-rep } member? [
+        2 <iota> [| i |
+            temp SRC1 i D[] UMOV
+            temp2 SRC2 i D[] UMOV
+            temp temp temp2 MUL
+            fp-temp i D[] temp INS
+        ] each
+        DST fp-temp 16B MOVv
+    ] [ DST SRC1 SRC2 rep [ MULv ] [ FMULv ] integer/float ] if ;
 
 M:: arm.64 %mul-high-vector ( DST SRC1 SRC2 rep -- )
     fp-temp SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
     fp-temp2 SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
     DST fp-temp fp-temp2 rep >shape UZP2 ;
 
-M: arm.64 %saturated-mul-vector 4drop not-implemented ;
+M:: arm.64 %saturated-mul-vector ( DST SRC1 SRC2 rep -- )
+    fp-temp SRC1 SRC2 rep [ SMULL ] [ UMULL ] signed/unsigned
+    fp-temp2 SRC1 SRC2 rep [ SMULL2 ] [ UMULL2 ] signed/unsigned
+    DST fp-temp rep [ SQXTN ] [ UQXTN ] signed/unsigned
+    DST fp-temp2 rep [ SQXTN2 ] [ UQXTN2 ] signed/unsigned ;
 M: arm.64 %div-vector >shape FDIVv ;
 M: arm.64 %min-vector [ SMIN ] [ UMIN ] [ FMINNMv ] signed/unsigned/float ;
 M: arm.64 %max-vector [ SMAX ] [ UMAX ] [ FMAXNMv ] signed/unsigned/float ;
-M: arm.64 %avg-vector [ SRHADD ] [ URHADD ] signed/unsigned ;
-M: arm.64 %sad-vector [ [ SABD ] [ UABD ] signed/unsigned ] 4keep 2nip dupd >shape ADDV ;
+M:: arm.64 %avg-vector ( DST SRC1 SRC2 rep -- )
+    rep { longlong-2-rep ulonglong-2-rep } member? [
+        fp-temp SRC1 SRC2 16B ORRv
+        fp-temp2 SRC1 SRC2 16B EORv
+        fp-temp2 fp-temp2 1 rep [ SSHR ] [ USHR ] signed/unsigned
+        DST fp-temp fp-temp2 2D SUBv
+    ] [ DST SRC1 SRC2 rep [ SRHADD ] [ URHADD ] signed/unsigned ] if ;
+M:: arm.64 %sad-vector ( DST SRC1 SRC2 rep -- )
+    fp-temp SRC1 SRC2 rep [ SABD ] [ UABD ] signed/unsigned
+    DST fp-temp rep >shape UADDLV ;
 M: arm.64 %sqrt-vector >shape FSQRTv ;
 M: arm.64 %horizontal-add-vector [ ADDP ] [ FADDP ] integer/float ;
 M: arm.64 %abs-vector [ ABSv ] [ FABSv ] integer/float ;
@@ -497,6 +548,21 @@ M: arm.64 %andn-vector drop swap 16B BICv ;
 M: arm.64 %or-vector drop 16B ORRv ;
 M: arm.64 %xor-vector drop 16B EORv ;
 M: arm.64 %not-vector drop 16B MVNv ;
+
+:: %vector-shift-count ( COUNT rep -- )
+    temp rep rep-bit-width MOV
+    COUNT temp CMP
+    temp COUNT temp LO CSEL
+    fp-temp temp rep >shape DUP ;
+
+M:: arm.64 %shl-vector-count ( DST SRC COUNT rep -- )
+    COUNT rep %vector-shift-count
+    DST SRC fp-temp rep >shape USHL ;
+
+M:: arm.64 %shr-vector-count ( DST SRC COUNT rep -- )
+    COUNT rep %vector-shift-count
+    fp-temp fp-temp rep >shape NEGv
+    DST SRC fp-temp rep [ SSHL ] [ USHL ] signed/unsigned ;
 M:: arm.64 %shl-vector-imm ( DST SRC1 src2 rep -- )
     src2 rep rep-bit-width >=
     [ DST dup dup 16B EORv ]
@@ -562,9 +628,9 @@ M: arm.64 %gather-vector-4-reps { float-4-rep int-4-rep uint-4-rep } ;
 M: arm.64 %gather-int-vector-4-reps { int-4-rep uint-4-rep } ;
 M: arm.64 %select-vector-reps int-vector-reps ;
 M: arm.64 %alien-vector-reps vector-reps ;
-M: arm.64 %shuffle-vector-reps { char-16-rep uchar-16-rep } ;
-M: arm.64 %shuffle-vector-imm-reps { char-16-rep uchar-16-rep } ;
-M: arm.64 %shuffle-vector-halves-imm-reps f ;
+M: arm.64 %shuffle-vector-reps vector-reps ;
+M: arm.64 %shuffle-vector-imm-reps vector-reps ;
+M: arm.64 %shuffle-vector-halves-imm-reps { float-4-rep double-2-rep } ;
 M: arm.64 %merge-vector-reps vector-reps ;
 M: arm.64 %float-pack-vector-reps { double-2-rep } ;
 M: arm.64 %signed-pack-vector-reps { short-8-rep ushort-8-rep int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } ;
@@ -573,10 +639,13 @@ M: arm.64 %unpack-vector-head-reps { float-4-rep char-16-rep uchar-16-rep short-
 M: arm.64 %unpack-vector-tail-reps { float-4-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %integer>float-vector-reps { int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } ;
 M: arm.64 %float>integer-vector-reps float-vector-reps ;
-M: arm.64 %compare-vector-reps { cc< cc<= cc> cc>= cc= cc<> } member? vector-reps and ;
+M: arm.64 %compare-vector-reps
+    dup cc/<>= eq? [ drop float-vector-reps ]
+    [ { cc< cc<= cc> cc>= cc= cc<> } member? baseline-vector-reps and ] if ;
 
 M: arm.64 %compare-vector-ccs
     nip {
+        { cc/<>= [ { { cc/<>= f } } f ] }
         { cc<  [ { { cc>  t } } f ] }
         { cc<= [ { { cc>= t } } f ] }
         { cc>  [ { { cc>  f } } f ] }
@@ -587,26 +656,29 @@ M: arm.64 %compare-vector-ccs
 
 M: arm.64 %move-vector-mask-reps vector-reps ;
 M: arm.64 %test-vector-reps vector-reps ;
-M: arm.64 %add-vector-reps vector-reps ;
+M: arm.64 %add-vector-reps baseline-vector-reps ;
 M: arm.64 %saturated-add-vector-reps int-vector-reps ;
-M: arm.64 %sub-vector-reps vector-reps ;
+M: arm.64 %sub-vector-reps baseline-vector-reps ;
 M: arm.64 %saturated-sub-vector-reps int-vector-reps ;
-M: arm.64 %mul-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
+M: arm.64 %mul-vector-reps baseline-vector-reps ;
 M: arm.64 %mul-high-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
+M: arm.64 %saturated-mul-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %mul-horizontal-add-vector-reps f ;
 M: arm.64 %div-vector-reps float-vector-reps ;
 M: arm.64 %min-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
 M: arm.64 %max-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
-M: arm.64 %avg-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
+M: arm.64 %avg-vector-reps int-vector-reps ;
 M: arm.64 %sad-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %sqrt-vector-reps float-vector-reps ;
-M: arm.64 %horizontal-add-vector-reps vector-reps ;
-M: arm.64 %abs-vector-reps vector-reps ;
+M: arm.64 %horizontal-add-vector-reps baseline-vector-reps ;
+M: arm.64 %abs-vector-reps baseline-vector-reps ;
 M: arm.64 %and-vector-reps int-vector-reps ;
 M: arm.64 %andn-vector-reps int-vector-reps ;
 M: arm.64 %or-vector-reps int-vector-reps ;
 M: arm.64 %xor-vector-reps int-vector-reps ;
 M: arm.64 %not-vector-reps int-vector-reps ;
+M: arm.64 %shl-vector-count-reps int-vector-reps ;
+M: arm.64 %shr-vector-count-reps int-vector-reps ;
 M: arm.64 %shl-vector-imm-reps int-vector-reps ;
 M: arm.64 %shr-vector-imm-reps int-vector-reps ;
 M: arm.64 %horizontal-shl-vector-imm-reps vector-reps ;
@@ -1021,3 +1093,126 @@ M: arm.64 immediate-store?
         { [ dup not ] [ drop t ] }
         [ drop f ]
     } cond ;
+
+! Portable SIMD operation families. The operation is a compile-time literal.
+: reduction-vector-reps ( -- reps )
+    { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
+
+M: arm.64 %unary-vector-function-reps
+    {
+        { "min-element" [ reduction-vector-reps ] }
+        { "max-element" [ reduction-vector-reps ] }
+        { "floor" [ float-vector-reps ] }
+        { "ceiling" [ float-vector-reps ] }
+        { "truncate" [ float-vector-reps ] }
+        { "round" [ float-vector-reps ] }
+        { "round-even" [ float-vector-reps ] }
+        { "float>unsigned" [ float-vector-reps ] }
+        { "bit-count" [ int-vector-reps ] }
+        { "clz" [ int-vector-reps ] }
+        { "ctz" [ int-vector-reps ] }
+        { "bit-reverse" [ int-vector-reps ] }
+        [ drop { } ]
+    } case ;
+
+:: %reverse-lane-bits ( DST SRC rep -- )
+    DST SRC RBITv
+    rep >size {
+        { 0 [ ] }
+        { 1 [ DST DST 16B REV16v ] }
+        { 2 [ DST DST 16B REV32v ] }
+        { 3 [ DST DST 16B REV64v ] }
+    } case ;
+
+:: %leading-lane-zeros ( DST SRC rep -- )
+    rep >size 3 = [
+        2 <iota> [| i |
+            temp SRC i D[] UMOV
+            temp temp CLZ
+            fp-temp i D[] temp INS
+        ] each
+        DST fp-temp 16B MOVv
+    ] [ DST SRC rep >shape CLZv ] if ;
+
+:: %reduce-vector ( DST SRC op rep -- )
+    fp-temp SRC 16B MOVv
+    rep rep-length 1 - <iota> [| i |
+        fp-temp2 SRC i 1 + rep >size <vector-element> rep >shape DUP
+        fp-temp fp-temp fp-temp2 rep
+        op "min-element" = [ %min-vector ] [ %max-vector ] if
+    ] each
+    DST fp-temp 16B MOVv ;
+
+M:: arm.64 %unary-vector-function ( DST SRC op rep -- )
+    op {
+        { "min-element" [ DST SRC op rep %reduce-vector ] }
+        { "max-element" [ DST SRC op rep %reduce-vector ] }
+        { "floor" [ DST SRC rep >shape FRINTMv ] }
+        { "ceiling" [ DST SRC rep >shape FRINTPv ] }
+        { "truncate" [ DST SRC rep >shape FRINTZv ] }
+        { "round" [ DST SRC rep >shape FRINTAv ] }
+        { "round-even" [ DST SRC rep >shape FRINTNv ] }
+        { "float>unsigned" [ DST SRC rep >shape FCVTZUvi ] }
+        { "bit-count" [
+            DST SRC 16B CNTv
+            rep >size <iota> [| size | DST DST size 1 <vector-shape> UADDLP ] each
+        ] }
+        { "clz" [ DST SRC rep %leading-lane-zeros ] }
+        { "ctz" [ fp-temp2 SRC rep %reverse-lane-bits DST fp-temp2 rep %leading-lane-zeros ] }
+        { "bit-reverse" [ DST SRC rep %reverse-lane-bits ] }
+    } case ;
+
+M: arm.64 %binary-vector-function-reps
+    { { "shift" [ int-vector-reps ] } { "absdiff" [ int-vector-reps ] } [ drop { } ] } case ;
+
+:: %lane-shift-counts ( COUNT rep -- )
+    rep >size 3 = [
+        2 <iota> [| i |
+            temp COUNT i D[] UMOV
+            temp2 64 MOV
+            temp temp2 CMP
+            temp temp temp2 LT CSEL
+            temp2 -64 (%load-immediate)
+            temp temp2 CMP
+            temp temp temp2 GT CSEL
+            fp-temp i D[] temp INS
+        ] each
+    ] [
+        temp rep rep-bit-width MOV
+        fp-temp2 temp rep >shape DUP
+        fp-temp COUNT fp-temp2 rep >shape SMIN
+        temp rep rep-bit-width neg (%load-immediate)
+        fp-temp2 temp rep >shape DUP
+        fp-temp fp-temp fp-temp2 rep >shape SMAX
+    ] if ;
+
+M:: arm.64 %binary-vector-function ( DST A B op rep -- )
+    op {
+        { "shift" [ B rep %lane-shift-counts DST A fp-temp rep [ SSHL ] [ USHL ] signed/unsigned ] }
+        { "absdiff" [
+            rep >size 3 = [
+                fp-temp A B 2D SUBv
+                fp-temp2 B A 2D SUBv
+                DST A B rep [ CMGT ] [ CMHI ] signed/unsigned
+                DST fp-temp fp-temp2 16B BSLv
+            ] [ DST A B rep [ SABD ] [ UABD ] signed/unsigned ] if
+        ] }
+    } case ;
+
+M: arm.64 %fma-vector-reps float-vector-reps ;
+M:: arm.64 %fma-vector ( DST A B C rep -- )
+    fp-temp C 16B MOVv
+    fp-temp A B rep >shape FMLAv
+    DST fp-temp 16B MOVv ;
+
+M: arm.64 %mul-wide-vector-reps
+    { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
+M:: arm.64 %mul-wide-vector ( DST A B high? rep -- )
+    high? [ DST A B rep [ SMULL2 ] [ UMULL2 ] signed/unsigned ]
+    [ DST A B rep [ SMULL ] [ UMULL ] signed/unsigned ] if ;
+
+M: arm.64 %blend-vector-reps vector-reps ;
+M:: arm.64 %blend-vector ( DST MASK YES NO rep -- )
+    fp-temp MASK 16B MOVv
+    fp-temp YES NO 16B BSLv
+    DST fp-temp 16B MOVv ;
