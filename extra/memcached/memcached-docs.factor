@@ -2,14 +2,15 @@
 ! See https://factorcode.org/license.txt for BSD license
 
 USING: help.syntax help.markup io.sockets math memcached
-quotations sequences strings ;
+namespaces quotations sequences strings ;
 
 IN: memcached
 
 HELP: memcached-server
 { $var-description
     "Holds an " { $link inet } " object with the address of "
-    "an Memcached server."
+    "a Memcached server. Bind it with " { $link with-variable }
+    " to use a different server within a dynamic scope."
 } ;
 
 HELP: with-memcached
