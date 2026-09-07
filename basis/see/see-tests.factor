@@ -20,3 +20,8 @@ ALIAS: test-alias +
 
 { } [ gensym see ] unit-test
 
+! #758
+: fry-definition ( x -- quot ) '[ _ ] ;
+
+{ "IN: see.tests\n: fry-definition ( x -- quot ) '[ _ ] ;\n" }
+[ [ \ fry-definition see ] with-string-writer ] unit-test

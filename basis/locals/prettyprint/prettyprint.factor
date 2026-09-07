@@ -5,6 +5,8 @@ prettyprint.backend prettyprint.custom prettyprint.sections
 sequences words ;
 IN: locals.prettyprint
 
+M: fry-form pprint* source>> pprint-fry ;
+
 : pprint-var ( var -- )
     ! Prettyprint a read/write local as its writer, just like
     ! in the input syntax: [| x! | ... x 3 + x! ]

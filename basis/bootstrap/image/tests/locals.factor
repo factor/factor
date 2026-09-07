@@ -7,7 +7,7 @@ IN: bootstrap.image.tests.locals
         seed 1vector bootstrapping-image set
         H{ } clone objects set
         H{ } clone sub-primitives set
-        emit-locals
+        emit-uninterned-words
         expected [ lookup-object >boolean ] all?
     ] with-scope ;
 

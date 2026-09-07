@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays effects hints kernel math
+USING: accessors arrays effects fry hints kernel math
 math.order namespaces sequences stack-checker.backend
 stack-checker.dependencies stack-checker.errors
 stack-checker.known-words stack-checker.recursive-state
@@ -178,3 +178,8 @@ M: declared-effect (undeclared-known) known>> (undeclared-known) ;
 
 M: word apply-object
     dup inline? [ inline-word ] [ non-inline-word ] if ;
+
+M: fry-word apply-object
+    ! This is syntax in the containing quotation, including its lexical
+    ! scope. An ordinary inline call would start a new retain stack.
+    def>> [ apply-object terminated? get not ] all? drop ;

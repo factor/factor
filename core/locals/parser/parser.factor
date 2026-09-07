@@ -43,12 +43,21 @@ M: lambda-parser literal>object
         { quotation-parser lambda-parser }
     } -rot '[ _ _ with-words ] with-variables ; inline
 
-: parse-fry ( reader-quot: ( -- object ) -- quot )
-    '[ t in-fry? _ with-variable fry ]
+: with-fry-scope ( quot: ( -- quot ) -- quot )
     in-lambda? get [ call ] [
         H{ } clone swap with-lambda-scope
         <let> rewrite-closures
     ] if ; inline
+
+! Older images still have syntax words calling this while refreshing.
+: parse-fry ( reader-quot: ( -- object ) -- quot )
+    '[ t in-fry? _ with-variable fry ] with-fry-scope ; inline
+
+: parse-fry-form ( opener reader-quot: ( -- object ) finish-quot -- quot )
+    swapd '[
+        t in-fry? _ with-variable
+        [ _ swap 2array ] [ fry _ append ] bi <fry-form> 1quotation
+    ] with-fry-scope ; inline
 
 : (parse-lambda) ( assoc -- quot )
     [ \ ] parse-until >quotation ] with-lambda-scope ;

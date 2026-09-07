@@ -5,7 +5,7 @@ classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
 compiler.units endian endian.private generic generic.single.private
-grouping hashtables hashtables.private io io.encodings.binary io.files
+fry grouping hashtables hashtables.private io io.encodings.binary io.files
 io.pathnames kernel kernel.private layouts locals.types make
 math math.bitwise math.order namespaces namespaces.private
 parser parser.notes prettyprint quotations sequences
@@ -480,12 +480,12 @@ M: quotation prepare-object
 : emit-special-objects ( -- )
     special-objects get [ swap emit-special-object ] assoc-each ;
 
-: emit-locals ( -- )
-    ! Mutable locals use reader/writer words linked through their properties.
-    ! Follow newly appended references too, emitting each lexical word once.
+: emit-uninterned-words ( -- )
+    ! Local readers/writers and preserved fry forms are not in all-words.
+    ! Follow newly appended references too, emitting each word once.
     0 [ dup bootstrapping-image get length < ] [
         dup bootstrapping-image get nth
-        dup lexical? [
+        dup [ lexical? ] [ fry-word? ] bi or [
             dup lookup-object [ 2drop ] [ emit-word ] if*
         ] [ drop ] if
         1 +
@@ -509,8 +509,6 @@ M: quotation prepare-object
     build-generics
     "Serializing words..." print flush
     emit-words
-    "Serializing locals..." print flush
-    emit-locals
     "Serializing JIT data..." print flush
     emit-jit-data
 ! special-objects get ...
@@ -526,6 +524,8 @@ M: quotation prepare-object
     emit-singletons
     "Serializing special object table..." print flush
     emit-special-objects
+    "Serializing uninterned words..." print flush
+    emit-uninterned-words
     "Performing word fixups..." print flush
     fixup-words
     "Performing header fixups..." print flush

@@ -2,7 +2,8 @@ USING: tools.walker io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
 continuations math.parser threads arrays tools.walker.debug
 generic.single sequences.private kernel.private
-tools.continuations accessors words combinators ;
+tools.continuations accessors words combinators fry locals
+vectors prettyprint.private ;
 IN: tools.walker.tests
 
 { { } } [
@@ -146,3 +147,49 @@ M: method-breakpoint-tuple method-breakpoint-test break drop 1 2 + ;
 \ call(-breakpoint-test don't-step-into
 
 { { 3 } } [ [ call(-breakpoint-test ] test-walker ] unit-test
+
+! #758: stepping over construction must preserve the source form, and
+! stepping into the constructed quotation must still reach its body.
+: fry-walker-test ( -- n ) 3 '[ _ 1 + ] call ;
+
+:: trace-fry-walker ( quot -- data stops )
+    V{ } clone :> stops
+    break-hook get :> hook
+    [ dup stops push hook call ] break-hook
+    [ quot test-walker ] with-variable stops ;
+
+:: fry-walker-stops ( -- before after )
+    [ fry-walker-test ] trace-fry-walker nip :> stops
+    stops [ continuation-current fry-word? ] find drop :> i
+    i stops nth i 1 + stops nth ;
+
+{ { 4 } } [ [ fry-walker-test ] test-walker ] unit-test
+
+{ "'[ _ 1 + ]" } [
+    fry-walker-stops drop continuation-current unparse
+] unit-test
+
+{ t { [ 3 1 + ] } } [
+    fry-walker-stops nip
+    [ continuation-current \ call eq? ] [ data>> ] bi
+] unit-test
+
+: fry-stop-display ( continuation -- string )
+    call>> [ innermost-frame-executing ] [ innermost-frame-scan ] bi
+    remove-breakpoints unparse ;
+
+{ "[ 3 => '[ _ 1 + ] call ]" "[ 3 '[ _ 1 + ] => call ]" } [
+    fry-walker-stops [ fry-stop-display ] bi@
+] unit-test
+
+{ t } [
+    [ fry-walker-test ] trace-fry-walker nip
+    [ continuation-current \ + eq? ] any?
+] unit-test
+
+{ { 17 } } [
+    [ 5 [| outer | 10 '[ 2 [| a | a _ + outer + ] ] call call ] call ]
+    test-walker
+] unit-test
+
+{ { 1 2 } } [ [ 1 '[ _ 2 '[ _ ] call ] call ] test-walker ] unit-test

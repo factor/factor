@@ -3,7 +3,7 @@
 USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
 classes.tuple combinators combinators.short-circuit
-continuations effects generic hash-sets hashtables io.pathnames
+continuations effects fry generic hash-sets hashtables io.pathnames
 io.styles kernel lists make math math.order math.parser
 namespaces prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.stylesheet quotations sbufs
@@ -221,6 +221,13 @@ M: tuple pprint*
     do-length-limit
     [ [ pprint* ] each ] dip
     [ number>string "~" " more~" surround text ] when* ;
+
+: pprint-fry ( source -- )
+    <flow dup first "syntax" lookup-word pprint-word
+    dup second f <inset pprint-elements block>
+    first "'[" = \ ] \ } ? pprint-word block> ;
+
+M: fry-word pprint* "fry" word-prop pprint-fry ;
 
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curried pprint-delims drop \ [ \ ] ;
