@@ -62,11 +62,8 @@ HINTS: next* { spot } ;
     swap [ init-parser call ] with-input-stream ; inline
 
 :: (skip-until) ( ... quot: ( ... char -- ... ? ) spot -- ... )
-    spot char>> [
-        quot call [
-            spot next* quot spot (skip-until)
-        ] unless
-    ] when* ; inline recursive
+    [ spot char>> [ quot call not ] [ f ] if* ]
+    [ spot next* ] while ; inline
 
 : skip-until ( ... quot: ( ... char -- ... ? ) -- ... )
     spot get (skip-until) ; inline
@@ -133,24 +130,19 @@ HINTS: next* { spot } ;
     [ swap push-all ] [ no-entity ] ?if ;
 
 :: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
-    spot char>> :> char
-    {
-        { [ char not ] [ ] }
-        { [ char quot call ] [ spot next* ] }
-        { [ char CHAR: & eq? ] [
-            accum parse-entity
-            quot accum spot (parse-char)
-        ] }
-        { [ char CHAR: % eq? [ in-dtd? get ] [ f ] if ] [
-            accum parse-pe
-            quot accum spot (parse-char)
-        ] }
-        [
-            char accum push
-            spot next*
-            quot accum spot (parse-char)
-        ]
-    } cond ; inline recursive
+    ! Release each iteration's locals before continuing, so long tokens
+    ! also use bounded stack space with the optimizer disabled.
+    [
+        spot char>> :> char
+        {
+            { [ char not ] [ f ] }
+            { [ char quot call ] [ spot next* f ] }
+            { [ char CHAR: & eq? ] [ accum parse-entity t ] }
+            { [ char CHAR: % eq? [ in-dtd? get ] [ f ] if ]
+                [ accum parse-pe t ] }
+            [ char accum push spot next* t ]
+        } cond
+    ] loop ; inline
 
 : parse-char ( quot: ( ch -- ? ) -- seq )
     512 <sbuf> [ spot get (parse-char) ] keep "" like ; inline
