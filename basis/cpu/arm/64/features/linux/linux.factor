@@ -7,15 +7,16 @@ IN: cpu.arm.64.features.linux
 LIBRARY: libc
 FUNCTION: ulong getauxval ( ulong type )
 
-M:: linux probe-arm64-features
-    [
-        16 getauxval 26 getauxval :> ( hwcap hwcap2 )
-        {
-            { "dotprod" 20 }
-            { "fp16" 10 }
-        } [ second hwcap swap bit? ] filter [ first ] map
-        {
-            { "bf16" 14 }
-            { "i8mm" 13 }
-        } [ second hwcap2 swap bit? ] filter [ first ] map append
-    ] [ drop { } ] recover ;
+:: hwcaps>arm64-features ( hwcap hwcap2 -- features )
+    {
+        { "dotprod" 20 }
+        { "fp16" 10 }
+    } [ second hwcap swap bit? ] filter [ first ] map
+    {
+        { "bf16" 14 }
+        { "i8mm" 13 }
+    } [ second hwcap2 swap bit? ] filter [ first ] map append ;
+
+M: linux probe-arm64-features
+    [ 16 getauxval 26 getauxval hwcaps>arm64-features ]
+    [ drop { } ] recover ;
