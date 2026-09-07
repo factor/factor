@@ -348,6 +348,7 @@ IN: tools.deploy.shaker
                 gensym
                 name>char-hook
                 classes.private:next-method-quot-cache
+                classes.private:method-for-class-cache
                 classes.private:class-and-cache
                 classes.private:class-not-cache
                 classes.private:class-or-cache
