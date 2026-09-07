@@ -178,3 +178,9 @@ IN: cpu.arm.64.assembler.tests
 
 ! MOVZ rejects an out-of-range immediate
 [ W0 0x1ffff 0 MOVZ ] must-fail
+
+! LSL #0 must wrap immr to zero, including for 32-bit registers.
+0x207c0053 [ W0 W1 0 LSL ] test-insn
+0x20fc40d3 [ X0 X1 0 LSL ] test-insn
+0x20781f53 [ W0 W1 1 LSL ] test-insn
+0x20000153 [ W0 W1 31 LSL ] test-insn
