@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs assocs.private classes
-classes.tuple.private compiler.units cpu.architecture hashtables
+classes.tuple.private compiler.units cpu.architecture generic hashtables
 hashtables.private io kernel libc math math.parser memory
 namespaces namespaces.private quotations quotations.private
 sbufs sequences sequences.private splitting system vectors
@@ -63,6 +63,10 @@ gc
     } compile-unoptimized
 
     "." write flush
+
+    ! Compiler passes use these methods heavily. Compile them before the
+    ! larger arithmetic and sequence batches.
+    M\ hashtable at* M\ hashtable set-at 2array compile-unoptimized
 
     {
         bitand bitor bitxor bitnot
