@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg.instructions.syntax kernel math
-namespaces ;
+namespaces sequences vocabs vocabs.loader ;
 IN: compiler.cfg.instructions
 
 <<
@@ -899,3 +899,23 @@ UNION: def-is-use-insn
     ##box-alien
     ##box-displaced-alien
     ##unbox-any-c-ptr ;
+
+! These vocabularies generate definitions by enumerating insn-classes.
+! Reloading this file must update those definitions even when their own
+! source files have not changed. Skip vocabularies still being parsed:
+! they will generate their definitions after requiring this vocabulary.
+<<
+{
+    "compiler.cfg.hats"
+    "compiler.cfg.def-use"
+    "compiler.cfg.value-numbering.expressions"
+    "compiler.cfg.representations.preferred"
+    "compiler.cfg.renaming"
+    "compiler.cfg.ssa.construction"
+    "compiler.cfg.representations.rewrite"
+    "compiler.cfg.linear-scan.assignment"
+} [
+    dup lookup-vocab dup [ source-loaded?>> +done+ = ] when
+    [ reload ] [ drop ] if
+] each
+>>
