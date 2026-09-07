@@ -478,7 +478,15 @@ M: quotation prepare-object
     special-objects get [ swap emit-special-object ] assoc-each ;
 
 : emit-locals ( -- )
-    bootstrapping-image get [ dup local? [ emit-word ] [ drop ] if ] each ;
+    ! Mutable locals use reader/writer words linked through their properties.
+    ! Follow newly appended references too, emitting each lexical word once.
+    0 [ dup bootstrapping-image get length < ] [
+        dup bootstrapping-image get nth
+        dup lexical? [
+            dup lookup-object [ 2drop ] [ emit-word ] if*
+        ] [ drop ] if
+        1 +
+    ] while drop ;
 
 : fixup-header ( -- )
     heap-size data-heap-size-offset fixup ;
