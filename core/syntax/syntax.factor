@@ -301,21 +301,19 @@ IN: bootstrap.syntax
     ">>>>>>" [ version-control-merge-conflict ] define-core-syntax
 
     "'[" [
-        [ parse-quotation ] parse-fry append!
+        "'[" [ parse-quotation ] [ ] parse-fry-form append!
     ] define-core-syntax
 
     "'{" [
-        [ \ } parse-until >array ] parse-fry append!
+        "'{" [ \ } parse-until >array ] [ ] parse-fry-form append!
     ] define-core-syntax
 
     "'HS{" [
-        [ \ } parse-until >array ] parse-fry
-        [ >hash-set ] compose append!
+        "'HS{" [ \ } parse-until >array ] [ >hash-set ] parse-fry-form append!
     ] define-core-syntax
 
     "'H{" [
-        [ \ } parse-until >array ] parse-fry
-        [ parse-hashtable ] compose append!
+        "'H{" [ \ } parse-until >array ] [ parse-hashtable ] parse-fry-form append!
     ] define-core-syntax
 
     ! Placeholders can be passed around in quotation templates. They only

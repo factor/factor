@@ -428,6 +428,13 @@ M:: integer lambda-method-forget-test ( a -- b ) a ;
 { 11 } [ [ 1 + ] '[ 10 [| a | a @ ] ] call call ] unit-test
 { { 11 } } [ 1 '[ 10 [| a | a _ + ] ] call output>array ] unit-test
 
+! #758: preserved fry forms share the enclosing word's lexical scope
+! during compilation as well as when interpreted by the walker.
+:: compiled-fry-capture ( outer -- n )
+    10 '[ 2 [| a | a _ + outer + ] ] call call ;
+
+{ 17 } [ 5 compiled-fry-capture ] unit-test
+
 :: (funny-macro-test) ( obj quot -- ? ) obj { [ quot call ] } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
 

@@ -1,4 +1,4 @@
-USING: arrays assocs bootstrap.image.private endian grouping io
+USING: arrays assocs bootstrap.image.private endian fry grouping io
 io.encodings.binary io.streams.byte-array kernel layouts math
 math.bitwise namespaces sequences tools.test vectors ;
 IN: bootstrap.image.tests
@@ -144,4 +144,17 @@ IN: bootstrap.image.tests
 
 { t } [
     8,195 <iota> dup 8 t image-bytes 8 <groups> [ be> ] map sequence=
+] unit-test
+
+! #758: anonymous fry words, including ones referenced by other fry
+! expansions, must survive generating a boot image from the new image.
+{ t } [
+    [
+        H{ } clone objects set
+        H{ } clone sub-primitives set
+        [ '[ _ 2 '[ _ ] call ] ] first 1vector bootstrapping-image set
+        emit-uninterned-words
+        bootstrapping-image get [ fry-word? ] filter
+        [ lookup-object integer? ] all?
+    ] with-scope
 ] unit-test

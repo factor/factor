@@ -105,3 +105,17 @@ SYMBOLS: a b c d e f g h ;
 { { 1 [ 2 { 3 4 } ] } } [ 1 2 3 4 '{ _ [ _ { _ _ } ] } ] unit-test
 { H{ { 1 1 } { 2 2 } { 3 4 } } } [ 1 2 3 4 'H{ { 1 _ } { _ 2 } { _ _ } } ] unit-test
 { HS{ 1 [ 2 { 3 } ] } } [ 1 2 3 'HS{ _ [ _ { _ } ] } ] unit-test
+
+! #758: preserve source forms, including nested fry, without changing
+! the values produced by their expansions.
+{ "[ '[ _ ] ]" } [ [ '[ _ ] ] unparse ] unit-test
+{ "[ '[ _ @ [ _ ] ] ]" } [ [ '[ _ @ [ _ ] ] ] unparse ] unit-test
+{ "[ '{ _ } ]" } [ [ '{ _ } ] unparse ] unit-test
+{ "[ 'H{ { _ _ } } ]" } [ [ 'H{ { _ _ } } ] unparse ] unit-test
+{ "[ 'HS{ _ } ]" } [ [ 'HS{ _ } ] unparse ] unit-test
+{ "[ '[ _ 2 '[ _ ] call ] ]" }
+[ [ '[ _ 2 '[ _ ] call ] ] unparse ] unit-test
+{ 1 2 } [ 1 '[ _ 2 '[ _ ] call ] call ] unit-test
+
+! Fry can also run at parse time, before its compilation unit finishes.
+<< { 42 } [ 42 '[ _ ] call ] unit-test >>

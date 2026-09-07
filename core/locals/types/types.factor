@@ -10,6 +10,10 @@ C: <lambda> lambda
 
 TUPLE: let body ;
 
+TUPLE: fry-form source body ;
+
+C: <fry-form> fry-form
+
 TUPLE: tuple-template class values ;
 
 C: <let> let

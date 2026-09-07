@@ -1,13 +1,16 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
-fry.private hashtables kernel locals.backend locals.errors
+fry fry.private hashtables kernel locals.backend locals.errors
 locals.types macros.expander make math memoize.private
 quotations sequences sets words ;
 
 IN: locals.rewrite
 
 DEFER: point-free
+
+M: fry-form expand-macros*
+    end clone [ expand-macros ] change-body , ;
 
 ! Step 1: rewrite [| into :> forms, turn
 ! literals with locals in them into code which constructs
@@ -31,6 +34,9 @@ M: lambda quotation-rewrite
 M: quotation-like rewrite-sugar* quotation-rewrite , ;
 
 M: lambda rewrite-sugar* quotation-rewrite , ;
+
+M: fry-form rewrite-sugar*
+    clone [ quotation-rewrite ] change-body , ;
 
 GENERIC: rewrite-literal? ( obj -- ? )
 
@@ -132,6 +138,8 @@ M: multi-def defs-vars* locals>> [ unquote suffix ] each ;
 
 M: quotation defs-vars* [ defs-vars* ] each ;
 
+M: fry-form defs-vars* body>> defs-vars* ;
+
 M: object defs-vars* drop ;
 
 GENERIC: uses-vars* ( seq form -- seq' )
@@ -148,6 +156,8 @@ M: object uses-vars* drop ;
 
 M: quotation uses-vars* [ uses-vars* ] each ;
 
+M: fry-form uses-vars* body>> uses-vars* ;
+
 : free-vars ( form -- seq )
     [ uses-vars ] [ defs-vars ] bi diff ;
 
@@ -161,6 +171,9 @@ M: quotation-like rewrite-closures*
     tri ;
 
 M: object rewrite-closures* , ;
+
+M: fry-form rewrite-closures*
+    clone [ (rewrite-closures) ] change-body , ;
 
 ! Step 3: rewrite locals usage within a single quotation into
 ! retain stack manipulation
@@ -197,6 +210,11 @@ M: multi-def localize
     ] tri append ;
 
 M: object localize 1quotation ;
+
+M: fry-form localize
+    [ source>> ] [ body>> ] bi swapd
+    [ [ localize % ] each ] [ ] make
+    swapd <fry-word> 1quotation ;
 
 : drop-locals-quot ( args -- )
     [ length , [ drop-locals ] % ] unless-empty ;

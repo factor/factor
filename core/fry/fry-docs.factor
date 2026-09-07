@@ -93,6 +93,8 @@ $nl
 }
 "Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link POSTPONE: _ } " and " { $link POSTPONE: @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
 $nl
+"Printed definitions preserve the fry syntax. The single-step walker treats filling the holes as one step; stepping into a call of the resulting quotation walks its body normally."
+$nl
 "Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
 { $subsections fry }
 "Fried quotations are an abstraction on top of the " { $link "compositional-combinators" } "; their use is encouraged over the combinators, because often the fry form is shorter and clearer than the combinator form." ;

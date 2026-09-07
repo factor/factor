@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov, Eduardo Cavazos, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel locals.backend math
+USING: accessors arrays combinators compiler.units effects kernel locals.backend math
 quotations sequences sets splitting vectors words ;
 IN: fry
 
@@ -11,6 +11,11 @@ SYMBOL: in-fry?
 ERROR: >r/r>-in-fry-error ;
 
 GENERIC: fry ( object -- quot )
+
+! Keep a parsed fry as an inline word so tools can display and step over
+! the source form while the compiler still sees its ordinary expansion.
+PREDICATE: fry-word < word
+    dup vocabulary>> [ drop f ] [ "fry" word-prop ] if ;
 
 <PRIVATE
 
@@ -137,6 +142,18 @@ DEFER: dredge-fry
     [ quot>> >quotation shallow-fry ] tri append ;
 
 PRIVATE>
+
+: <fry-word> ( source quot -- word )
+    over second count-inputs object <array> { object } <effect>
+    [
+        "( fry )" <uninterned-word>
+        ! Its definition may read the enclosing quotation's locals.
+        dup t "no-compile" set-word-prop dup dup
+    ] 3dip
+    [ "fry" set-word-prop ] 2dip define-inline
+    ! Macros can execute this expansion before the enclosing compilation
+    ! unit finishes. Install its unoptimized entry point immediately.
+    dup dup def>> 2array 1array f f modify-code-heap ;
 
 M: quotation-like fry
     [ [ [ ] ] ] [ (fry) ] if-empty ;
