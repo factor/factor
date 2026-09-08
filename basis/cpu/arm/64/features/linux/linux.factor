@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax continuations cpu.arm.64.features kernel
-locals math.bitwise sequences system ;
+locals math math.bitwise sequences system ;
 IN: cpu.arm.64.features.linux
 
 LIBRARY: libc
