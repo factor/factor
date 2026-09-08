@@ -34,7 +34,11 @@ M: integer wrap-shape
 
 M: sequence wrap-shape
     dup all-equal? [
-        [ length ] [ first ] bi 2array <uniform-shape>
+        dup first wrap-shape dup uniform-shape? [
+            shape>> swap length prefix <uniform-shape>
+        ] [
+            drop <abnormal-shape>
+        ] if
     ] [
         <abnormal-shape>
     ] if ;

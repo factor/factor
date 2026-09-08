@@ -52,3 +52,16 @@ USING: accessors arrays.shaped kernel math sequences tools.test ;
 
 
 [ 15 <iota> { 3 5 1 } reshape ] must-not-fail
+
+! #2378: dimensions must remain flat at every nesting level.
+{ { 3 3 3 } } [ { 3 3 3 } zeros shaped-array>array shape shape>> ] unit-test
+{ { 2 3 4 5 } } [ { 2 3 4 5 } zeros shaped-array>array shape shape>> ] unit-test
+{ t } [ { 3 3 3 } increasing dup shaped-array>array >shaped-array = ] unit-test
+{ t } [ { 2 3 4 5 } increasing dup shaped-array>array >shaped-array = ] unit-test
+{ { 2 0 } } [ { { } { } } shape shape>> ] unit-test
+{ t } [
+    { { { 1 } { 2 3 } } { { 4 } { 5 6 } } } shape abnormal-shape?
+] unit-test
+[
+    { { { 1 } { 2 3 } } { { 4 } { 5 6 } } } >shaped-array
+] [ no-abnormally-shaped-arrays? ] must-fail-with
