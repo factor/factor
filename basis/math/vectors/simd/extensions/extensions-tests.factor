@@ -1,7 +1,7 @@
 USING: accessors alien.data arrays cpu.arm.64.features kernel
 math math.bitwise math.vectors math.vectors.conversion
 math.vectors.simd math.vectors.simd.extensions namespaces random
-sequences tools.test ;
+sequences tools.test tools.test.fuzz ;
 IN: math.vectors.simd.extensions.tests
 
 <PRIVATE
@@ -15,8 +15,7 @@ IN: math.vectors.simd.extensions.tests
     8 [ 65536 random ] replicate >ushort-8 bfloat-8-cast ;
 : random-float ( -- vector )
     4 [ 0x100000000 random ] replicate >uint-4 float-4-cast ;
-:: half-trial ( -- ? )
-    random-half :> a random-half :> b random-half :> c
+:: half-trial ( a b c -- ? )
     [ a b v+ ] same-dispatch?
     [ a b v- ] same-dispatch? and
     [ a b v* ] same-dispatch? and
@@ -30,8 +29,7 @@ IN: math.vectors.simd.extensions.tests
     [ a b v> ] same-dispatch? and
     [ a b v>= ] same-dispatch? and
     [ a b vunordered? ] same-dispatch? and ;
-:: bfloat-trial ( -- ? )
-    random-bfloat :> a random-bfloat :> b random-float :> c
+:: bfloat-trial ( a b c -- ? )
     [ a b c vbdot2+ ] same-dispatch?
     [ a b c vbmatmul2x4+ ] same-dispatch? and ;
 PRIVATE>
@@ -110,14 +108,10 @@ PRIVATE>
 
 ! Differential checks compare bytes, so signs of zero and NaN canonicalization
 ! are covered as well as ordinary values. They also run on fallback-only hosts.
-{ t } [ 100 [ half-trial ] replicate [ ] all? ] unit-test
-{ t } [ 100 [ bfloat-trial ] replicate [ ] all? ] unit-test
-{ t } [
-    100 [
-        random-float random-float [ v>half ] 2curry same-dispatch?
-        random-float random-float [ v>bfloat ] 2curry same-dispatch? and
-    ] replicate [ ] all?
-] unit-test
+[ random-half random-half random-half ] [ half-trial ] fuzz-test
+[ random-bfloat random-bfloat random-float ] [ bfloat-trial ] fuzz-test
+[ random-float random-float ] [ [ v>half ] 2curry same-dispatch? ] fuzz-test
+[ random-float random-float ] [ [ v>bfloat ] 2curry same-dispatch? ] fuzz-test
 { t } [
     [ 255 uchar-16-with -128 char-16-with 0 int-4-with vmatmul2x8+ ] same-dispatch?
 ] unit-test
