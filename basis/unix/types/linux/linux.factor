@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types classes.struct ;
+USING: alien.syntax alien.c-types classes.struct layouts literals math ;
 IN: unix.types
 
 TYPEDEF: ulonglong __uquad_type
@@ -33,11 +33,11 @@ TYPEDEF: __slongword_type time_t
 TYPEDEF: __slongword_type __time_t
 
 TYPEDEF: ssize_t __SWORD_TYPE
-TYPEDEF: ulonglong blkcnt64_t
+TYPEDEF: longlong blkcnt64_t
 TYPEDEF: ulonglong __fsblkcnt64_t
 TYPEDEF: ulonglong __fsfilcnt64_t
 TYPEDEF: ulonglong ino64_t
-TYPEDEF: ulonglong off64_t
+TYPEDEF: longlong off64_t
 
 STRUCT: sched_param
     { sched_priority int } ;
@@ -51,7 +51,7 @@ STRUCT: posix_spawn_file_actions_t
     { __pad int[16] } ;
 
 STRUCT: sigset_t
-    { val uchar[128] } ;
+    { val { ulong $[ 128 cell / ] } } ;
 
 STRUCT: posix_spawnattr_t
   { __flags short }
