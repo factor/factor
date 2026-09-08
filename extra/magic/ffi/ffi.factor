@@ -8,6 +8,7 @@ IN: magic.ffi
 
 C-LIBRARY: magic {
     { macos "libmagic.dylib" }
+    { linux "libmagic.so.1" }
     { unix "libmagic.so" }
 }
 

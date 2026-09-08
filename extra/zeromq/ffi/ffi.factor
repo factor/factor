@@ -10,6 +10,7 @@ IN: zeromq.ffi
 C-LIBRARY: zmq {
     { windows "libzmq.dll" }
     { macos "libzmq.dylib" }
+    { linux "libzmq.so.5" }
     { unix "libzmq.so" }
 }
 

@@ -16,6 +16,7 @@ IN: gdk3.ffi
 LIBRARY: gdk3
 
 C-LIBRARY: gdk3 {
+    { linux "libgdk-3.so.0" }
     { unix "libgdk-3.so" }
 }
 

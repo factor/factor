@@ -11,6 +11,7 @@ IN: yaml.ffi
 "libyaml" {
     { [ os windows? ] [ "yaml.dll" ] }
     { [ os macos? ] [ "libyaml.dylib" ] }
+    { [ os linux? ] [ "libyaml-0.so.2" ] }
     { [ os unix? ] [ "libyaml.so" ] }
 } cond cdecl add-library
 >>

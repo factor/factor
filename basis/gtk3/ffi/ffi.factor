@@ -11,6 +11,7 @@ IN: gtk3.ffi
 LIBRARY: gtk3
 
 C-LIBRARY: gtk3 {
+    { linux "libgtk-3.so.0" }
     { unix "libgtk-3.so" }
 }
 

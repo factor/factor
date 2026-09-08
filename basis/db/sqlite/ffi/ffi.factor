@@ -9,6 +9,7 @@ IN: db.sqlite.ffi
 C-LIBRARY: sqlite {
     { windows "sqlite3.dll" }
     { macos "libsqlite3.dylib" }
+    { linux "libsqlite3.so.0" }
     { unix "libsqlite3.so" }
 }
 

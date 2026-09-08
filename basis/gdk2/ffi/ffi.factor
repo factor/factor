@@ -18,6 +18,7 @@ LIBRARY: gdk2
 "gdk2" {
     { [ os windows? ] [ "libgdk-win32-2.0-0.dll" cdecl add-library ] }
     { [ os macos? ] [ drop ] }
+    { [ os linux? ] [ "libgdk-x11-2.0.so.0" cdecl add-library ] }
     { [ os unix? ] [ "libgdk-x11-2.0.so" cdecl add-library ] }
 } cond
 >>

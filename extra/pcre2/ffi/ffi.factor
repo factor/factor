@@ -6,6 +6,7 @@ IN: pcre2.ffi
 C-LIBRARY: pcre2 {
     { windows "pcre2-8.dll" }
     { macos "libpcre2-8.dylib" }
+    { linux "libpcre2-8.so.0" }
     { unix "libpcre2-8.so" }
 }
 

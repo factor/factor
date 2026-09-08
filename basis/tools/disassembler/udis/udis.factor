@@ -9,6 +9,7 @@ IN: tools.disassembler.udis
 C-LIBRARY: libudis86 {
     { windows "libudis86.dll" }
     { macos "libudis86.dylib" }
+    { linux "libudis86.so.0" }
     { unix "libudis86.so" }
 }
 

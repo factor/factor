@@ -11,6 +11,7 @@ LIBRARY: atk
 C-LIBRARY: atk {
     { windows "libatk-1.0-0.dll" }
     { macos "libatk-1.0.dylib" }
+    { linux "libatk-1.0.so.0" }
     { unix "libatk-1.0.so" }
 }
 
