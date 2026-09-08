@@ -54,4 +54,4 @@ CONSTANT: IN_ALL_EVENTS
 
 FUNCTION: int inotify_init ( )
 FUNCTION: int inotify_add_watch ( int fd, c-string name, uint mask )
-FUNCTION: int inotify_rm_watch ( int fd, uint wd )
+FUNCTION: int inotify_rm_watch ( int fd, int wd )
