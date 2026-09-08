@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays byte-arrays classes
-classes.algebra compiler.cfg.instructions compiler.test cpu.architecture fry kernel kernel.private math
+classes.algebra compiler.cfg.instructions compiler.test cpu.architecture fry kernel kernel.private math math.order
 math.floats.small.c-types math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
 math.vectors math.vectors.simd namespaces sequences specialized-arrays tools.test ;
 IN: math.vectors.simd.intrinsics.tests
@@ -43,7 +43,7 @@ all-simd-classes [
 :: lane-shift-matches? ( input n op: ( v n -- w ) -- ? )
     input class-of 1array :> declaration
     input t "always-inline-simd-intrinsics" [
-        declaration n op '[ _ declare _ @ ]
+        declaration n 64 min op '[ _ declare _ @ ]
         [ compile-call ] call( v quot -- w )
     ] with-variable underlying>> :> expected
     input declaration n op '[ _ declare _ @ ]
@@ -52,6 +52,8 @@ all-simd-classes [
     [ compile-call ] call( v n quot -- w ) underlying>> expected = and ; inline
 
 {
+    char-16{ -128 127 -1 1 -2 2 -3 3 -128 127 -1 1 -2 2 -3 3 }
+    uchar-16{ 255 128 127 0 1 2 3 4 255 128 127 0 1 2 3 4 }
     short-8{ -1 -32768 32767 1 -2 2 -3 3 }
     ushort-8{ 1 65535 32768 32767 2 3 4 5 }
     int-4{ -2147483648 2147483647 -1 1 }
@@ -60,7 +62,8 @@ all-simd-classes [
     ulonglong-2{ 18446744073709551615 1 }
 } [
     '[
-        { 0 15 16 31 32 63 64 255 256 257 1000 } [
+        { 0 7 8 15 16 31 32 63 64 255 256 257 1000
+          0x10000000000000000000000000 0x10000000000000000000000001 } [
             _ swap [ [ vlshift ] lane-shift-matches? ]
             [ [ vrshift ] lane-shift-matches? ] 2bi and
         ] all?
