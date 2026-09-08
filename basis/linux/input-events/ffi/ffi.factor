@@ -101,11 +101,11 @@ STRUCT: ff_effect
 : n>explode-positions ( x -- seq )
     n>explode-values [ log2 ] map ; inline
 
-: seq>explode-values ( seq -- seq' )
-    [ [ n>explode-values ] dip 8 * v+n ] map-index concat ;
-
 : seq>explode-positions ( seq -- seq' )
-    [ [ n>explode-positions ] dip 8 * v+n ] map-index concat ;
+    >array [ [ n>explode-positions ] dip 8 * v+n ] map-index concat ;
+
+: seq>explode-values ( seq -- seq' )
+    seq>explode-positions [ 2^ ] map ;
 
 : values>implode ( seq -- x ) 0 [ bitor ] reduce ;
 : positions>implode ( seq -- x ) 0 [ 2^ bitor ] reduce ;
@@ -179,12 +179,13 @@ CONSTANT: IOC_DIRSHIFT 30  ! SIZESHIFT + SIZEBITS
 : evdev-get-physical ( handle -- physical ) CHAR: E 0x07 { char 256 } IOR c-string-ioctl ;
 : evdev-get-unique ( handle -- unique )
     '[ _ CHAR: E 0x08 { char 512 } IOR c-string-ioctl ] [ drop "" ] recover ;
-: evdev-get-prop ( handle -- prop ) CHAR: E 0x09 { char 256 } IOR c-string-ioctl ;
+: evdev-get-prop ( handle -- bytes ) CHAR: E 0x09 256 IOR-size 256 byte-array-ioctl ;
 ! EVIOCGMTSLOTS, size is encoded by IOR
 STRUCT: input_mt_request_layout
     { code __u32 }
-    { values __s32* } ; ! values[num_slots]
-: evdev-get-mt-slots ( handle size input_mt_request_layout -- prop )
+    { values __s32[0] } ; ! Inline flexible array, not a pointer.
+! Pass a buffer containing code followed by the requested slot values.
+: evdev-get-mt-slots ( handle size buffer -- prop )
     '[ _ CHAR: E 0x0a _ IOR-size _ call-ioctl-out ] [ drop f ] recover ;
 ! EVIOCGKEY EVIOCGLED EVIOCGSND EVIOCGSW EVIOCGABS EVIOCSABS
 : evdev-get-key ( handle -- bytes ) CHAR: E 0x18 256 IOR-size 256 byte-array-ioctl ;
@@ -192,12 +193,13 @@ STRUCT: input_mt_request_layout
 : evdev-get-sound ( handle -- bytes ) CHAR: E 0x1a 256 IOR-size 256 byte-array-ioctl ;
 : evdev-get-switch ( handle -- bytes ) CHAR: E 0x1b 256 IOR-size 256 byte-array-ioctl ;
 : evdev-get-abs ( handle n -- int[6] ) [ CHAR: E ] dip 0x40 + input_absinfo IOR struct-ioctl ;
-: evdev-set-abs ( handle input_absinfo -- int[6] ) [ CHAR: E ] dip 0xc0 + input_absinfo IOW struct-ioctl ;
+: evdev-set-abs ( handle n input_absinfo -- input_absinfo )
+    [ [ CHAR: E ] dip 0xc0 + ] dip IOW call-ioctl-out ;
 ! EVIOCSFF EVIOCRMFF EVIOCGEFFECTS
 : evdev-set-force-feedback ( handle ff_effect -- out )
     [ CHAR: E 0x80 ] dip IOW call-ioctl-out ;
 : evdev-unset-force-feedback ( handle int -- int )
-    [ CHAR: E 0x81 ] dip IOW int ctype-ioctl-inout ;
+    [ [ CHAR: E 0x81 int heap-size IOW-size ] dip <alien> call-ioctl ] keep ;
 : evdev-get-simulataneous-effects ( handle -- int )
     CHAR: E 0x84 int IOR ctype-ioctl-out ;
 ! EVIOCGRAB EVIOCREVOKE
@@ -1023,4 +1025,3 @@ ENUM: FF_STATUS
     { FF_STATUS_STOPPED 0x00 }
     { FF_STATUS_PLAYING 0x01 }
     { FF_STATUS_MAX   0x01 } ;
-
