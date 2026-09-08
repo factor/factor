@@ -79,3 +79,9 @@ bytes and 24 spill/reload pairs versus backtracking 576 bytes and 25 pairs; both
 used 192 spill bytes. Six small integer, float, branch, reduction, map and bitwise
 examples had identical code sizes. These are correctness smoke comparisons, not
 evidence of a performance advantage.
+
+The shared 32-live-float kernel (input 2.5, result 5092.0) also executed with both
+verifiers enabled: backtracking generated 832 bytes, 11 spill/reload pairs and
+88 spill bytes, versus linear scan's 848 bytes, 12 pairs and 96 spill bytes.
+Backtracking performed 11 evictions and 11 splits. All 13 compilation bodies in
+the shared compiler/benchmark corpus passed both allocation verifiers.
