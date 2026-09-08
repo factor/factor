@@ -93,8 +93,22 @@ SYMBOLS: graph-colors chordal-statistics phi-locations ;
 ! Phi operands live on their incoming edges, and all phi results are
 ! defined simultaneously at block entry. The normal liveness pass already
 ! supplies the edge uses. No SSA destruction or graph coalescing occurs.
-M: ##phi compute-live-intervals*
-    dst>> from get f record-def ;
+:: compute-ssa-intervals-in-block ( bb -- )
+    bb block-from from namespaces:set
+    bb block-to to namespaces:set
+    bb handle-live-out
+    bb instructions>> <reversed> [
+        dup ##phi?
+        [ dst>> from get f record-def ]
+        [ compute-live-intervals* ] if
+    ] each ;
+
+: compute-ssa-intervals ( cfg -- intervals/sync-points )
+    H{ } clone live-intervals namespaces:set
+    [
+        linearization-order <reversed> [ compute-ssa-intervals-in-block ] each
+        live-intervals get values dup [ finish-live-interval ] each
+    ] [ cfg>sync-points ] bi append ;
 
 :: preferred-register ( interval -- reg/f )
     interval vreg>> graph-colors get at :> color
@@ -192,7 +206,7 @@ M: ##phi compute-live-intervals*
     cfg compute-live-sets
     representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
     cfg number-instructions
-    cfg compute-live-intervals :> intervals
+    cfg compute-ssa-intervals :> intervals
     intervals [ live-interval-state? ] filter color-ssa-intervals
     check-allocation? get [ intervals required-register-uses ] [ f ] if :> expected
     cfg admissible-registers :> available
