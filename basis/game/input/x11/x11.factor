@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data assocs bit-arrays
-game.input kernel math namespaces sequences system x11 x11.xlib ;
+game.input game.input.x11.buttons kernel math namespaces sequences
+system x11 x11.X x11.xlib ;
 IN: game.input.x11
 
 SINGLETON: x11-game-input-backend
@@ -87,7 +88,7 @@ M: x11-game-input-backend read-keyboard
 
 : query-pointer ( -- x y buttons )
     dpy get dup XDefaultRootWindow
-    { int int int int int int int }
+    { Window Window int int int int uint }
     [ XQueryPointer drop ] with-out-parameters
     [ 4drop ] 3dip ;
 
@@ -97,7 +98,7 @@ M: x11-game-input-backend read-mouse
     mouse-reset? get [ reset-mouse ] unless
     query-pointer
     mouse-state new
-    swap 256 /i >>buttons
+    swap button-mask>buttons >>buttons
     swap 400 - >>dy
     swap 400 - >>dx
     0 >>scroll-dy 0 >>scroll-dx ;

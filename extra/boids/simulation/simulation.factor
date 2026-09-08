@@ -2,7 +2,7 @@
 ! Copyright (C) 2011 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators.short-circuit kernel math
-math.vectors random sequences ;
+math.order math.vectors random sequences ;
 IN: boids.simulation
 
 CONSTANT: WIDTH 512
@@ -57,26 +57,35 @@ GENERIC: force ( neighbors boid behavior -- force )
     boid boids behavior neighbors
     [ { 0.0 0.0 } ] [ boid behavior force ] if-empty ;
 
-: wrap-pos ( pos -- pos )
-    WIDTH HEIGHT 2array [ [ + ] keep mod ] 2map ;
+: wrap-pos-in ( pos dim -- pos )
+    [ 1 max [ mod ] keep [ + ] keep mod ] 2map ;
 
-:: simulate ( boids behaviors dt -- boids )
+: wrap-pos ( pos -- pos )
+    WIDTH HEIGHT 2array wrap-pos-in ;
+
+:: simulate-in ( boids behaviors dt dim -- boids )
     boids [| boid |
         boid boids behaviors
         [ [ (force) ] keep weight>> v*n ] 2with map vsum :> a
 
         boid vel>> a dt v*n v+ normalize :> vel
-        boid pos>> vel dt v*n v+ wrap-pos :> pos
+        boid pos>> vel dt v*n v+ dim wrap-pos-in :> pos
 
         pos vel <boid>
     ] map ;
 
-: random-boids ( count -- boids )
-    [
-        WIDTH HEIGHT [ random ] bi@ 2array
+: simulate ( boids behaviors dt -- boids )
+    WIDTH HEIGHT 2array simulate-in ;
+
+: random-boids-in ( count dim -- boids )
+    '[
+        _ [ >integer 1 max random ] map
         2 [ 0 1 normal-random ] replicate
         <boid>
     ] replicate ;
+
+: random-boids ( count -- boids )
+    WIDTH HEIGHT 2array random-boids-in ;
 
 TUPLE: cohesion < behavior ;
 TUPLE: alignment < behavior ;

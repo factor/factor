@@ -2,7 +2,7 @@
 ! Copyright (C) 2011 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays boids.simulation calendar classes colors
+USING: accessors arrays boids.simulation calendar classes colors combinators
 kernel literals math math.functions math.vectors models
 models.range namespaces opengl opengl.demo-support opengl.gl sequences
 threads ui ui.commands ui.gadgets ui.gadgets.borders
@@ -95,8 +95,8 @@ M: boids-gadget draw-gadget* ( boids-gadget -- )
     boids>> draw-boids ;
 
 : iterate-system ( boids-gadget -- )
-    dup [ boids>> ] [ behaviors>> ] [ dt>> ] tri
-    simulate >>boids drop ;
+    dup { [ boids>> ] [ behaviors>> ] [ dt>> ] [ dim>> ] } cleave
+    simulate-in >>boids drop ;
 
 :: start-boids-thread ( gadget -- )
     [
@@ -142,7 +142,7 @@ M: range-observer model-changed
     boids-gadget [
         dup length n >integer - dup 0 >
         [ head* ]
-        [ neg random-boids append ] if
+        [ neg boids-gadget dim>> random-boids-in append ] if
     ] change-boids drop ;
 
 <PRIVATE
@@ -157,7 +157,7 @@ PRIVATE>
 
 : com-randomize ( boids-gadget -- )
     find-boids-gadget
-    [ length random-boids ] change-boids relayout-1 ;
+    dup dim>> '[ length _ random-boids-in ] change-boids relayout-1 ;
 
 :: simulation-panel ( boids-gadget -- gadget )
     <pile> white-interior

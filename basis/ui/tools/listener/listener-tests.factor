@@ -7,6 +7,14 @@ ui.gestures ui.tools.common ui.tools.listener ui.tools.listener.private
 vocabs.parser ;
 IN: ui.tools.listener.tests
 
+! Both Enter keys retain Shift's editor newline behavior.
+{ "\n" "\n" } [
+    { "RET" "ENTER" } [
+        [ { S+ } swap key-down boa ] [ drop <interactor> ] bi
+        [ handle-gesture drop ] keep editor-string
+    ] map first2
+] unit-test
+
 ! Finder folder drops change the listener's directory instead of running it.
 { t } [
     [
@@ -59,13 +67,13 @@ IN: ui.tools.listener.tests
     ] "Interactor test" spawn drop
 
     ! This should not throw an exception
-    [ ] [ "interactor" get evaluate-input ] unit-test
+    [ ] [ T{ key-down f f "ENTER" } "interactor" get handle-gesture drop ] unit-test
 
     [ ] [ [ "interactor" get interactor-busy? ] [ yield ] while ] unit-test
 
     [ ] [ "[ 1 2 3 ]" "interactor" get set-editor-string ] unit-test
 
-    [ ] [ "interactor" get evaluate-input ] unit-test
+    [ ] [ T{ key-down f f "ENTER" } "interactor" get handle-gesture drop ] unit-test
 
     [ [ [ 1 2 3 ] ] ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 ] with-interactive-vocabs
