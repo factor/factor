@@ -1,0 +1,11 @@
+# Retain the review records; local builds, images, dependencies, and logs are generated.
+*
+!.gitignore
+!AUDIT.md
+!FLOATS-ISSUES.md
+!RESULTS.md
+!fix-commits.txt
+!commits.txt
+!audit-files.tsv
+!changed-files.txt
+!final-source-manifest.json

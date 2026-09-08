@@ -1,0 +1,21 @@
+c458cd1558 math.libm: Match power documentation to the wrapper effect
+759981327a compiler: Fold literal conversions before modular tree splicing
+cd0cb05eec math.parser: Disambiguate ratios in rectangular complex literals
+14906289a4 compiler: Fold exact float conversions across literal selections
+16f4564a08 math.parser: Accept rectangular complex literals with a j suffix
+39404f24d2 math: Restore signaling NaN truncation and printing regressions
+b2a4f18cb0 math.libm: Report underflow for finite powers rounded to zero on UCRT
+7af529d080 vm: Distinguish ordered and unordered floating comparisons
+b19d446316 math.functions: Handle indeterminate powers and floating zero exponents
+ccf77f588b ranges: Compute integer membership without enumerating elements
+41478aa0d1 benchmark.parse-float: Exercise the full finite range with exact round trips
+1bf4fccf1d vm: Preserve NaN encodings through float bit conversions
+734552bd4a arrays.shaped: Infer flat dimensions for deeply nested arrays
+bb60999474 math.floats: Clarify NaN identity and mixed numeric equality
+822b497caa math.parser: Fix Dragonbox cache bounds and open interval rounding
+78d0710faf simd: Keep extrema in vector code and handle signaling NaNs
+7f43a86dd2 tools.image: Match compression header documentation to its effect
+85af67b02d zig vm: Initialize discarded code-block snapshots before GC
+d92fe138bf vm: Preserve unchanged FP state during Mach safepoints
+3612abbd69 vm: Reserve GC stack space and probe x64 native call entry
+044b93e5e1 simd: Align floating rounding and extrema across ARM64 and x64

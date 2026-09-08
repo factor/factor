@@ -1,0 +1,142 @@
+3f94e11027 python.syntax: Test reference counts with non-immortal integers
+fbb70d89c2 math.integers: Accept x86 division traps in regression tests
+6c3aea0c8d cpu.arm.64.features.linux: Import math for bit tests
+77cc8602f4 bootstrap: Compile profiled helpers before compiler passes
+d496c02977 Update image tooling and fixtures to format version 5
+ab205e9104 Resolve Graphviz preview formats through registered image loaders
+eb82eccb27 Disable auto-use in the missing-import loader regression
+b76e099eaa Track references inside fried quotations
+7cad2b8d12 Parse empty and dotted-key TOML inline tables
+ca884927c5 Fix GdkPixbuf library registration and encoded buffer length
+c93218feed Dispatch SIMD fallback arrays by representation
+8b0f5f8c25 Preserve numeric SIMD conversions and unsigned wrapping
+b154ade026 Limit ARM64 two-vector shuffles to destination lanes
+a52d0f2c0d Compile hash-table mutation helpers early during bootstrap
+2e90dbd2cb Short-circuit reflexive class comparisons
+e2b7d377e9 Reuse the escaping representative when filtering allocations
+f37ebb6ae6 Skip redundant parent writes in disjoint-set lookup
+fcfe2926e8 Use a vector work queue for dead-code liveness
+cd1f24f141 Avoid temporary value-info sequences during tree cleanup
+929350bb0a Invalidate struct dependencies after redefinition or forgetting
+f41e24ba66 Cache conditional dependency checks by word identity
+8f1c30200d Trace derived GC roots through parallel copies
+2e8abdf703 Raise divide-by-zero errors in ARM64 integer fast paths
+17ae73e203 Cache static generic method resolution with class caches
+a41214d881 Filter conditional compiler dependencies in one pass
+841730c5c2 Fix namespace update order in STOMP version adjustment
+c555117700 Preserve regexp capture state in XMode end-pattern fixups
+945c360f05 Fix Linux ARM64 feature probing and platform selection
+7e8935dde5 Regenerate compiler helpers when reloading instruction definitions
+b971f9322a destructors: Document continuation jumps and cleanup scopes (#2491)
+2eab55e945 memcached: Isolate tests from shared cache flushes (#649)
+6067c08ae5 unix.signals: Wait for handler acknowledgement in tests (#2259)
+d7d9d66199 cuckoo-filters: Preserve entries after failed insertion (#2236)
+579b1de525 Expand ARM64 SIMD with portable optional NEON kernels
+26211fd3e9 compiler.crossref: Cache each dependent word check per invalidation pass
+e6d3afaae5 functors: Preserve fried quotations in generated definitions (#758)
+d93f187b96 gml.runtime: Pass the method word through EXEC:: parsing
+55c61c9bbe compiler.cfg: Keep derived-pointer bases live at GC checks
+17c58e5996 compiler.cfg.liveness: Avoid unnecessary live-set scans and temporary sequences
+2537b61257 compiler.cfg.dataflow-analysis: Collect predecessor sets in one pass
+6d49455b6c bootstrap.compiler: Compile compiler passes before the full sweep
+101414f3be sequences: Improve hashing of small integer pairs
+e07bc14c9c compiler.cfg.builder.alien: Fix hidden struct return argument order
+37519991b8 tools.walker: Arm fried quotations on Into (fixes #758)
+80e19a20e6 fry: Preserve source syntax and single-step boundaries (fixes #758)
+6fbc5bc8b2 compiler.cfg.ssa: Import arrays in interference tests
+a019b51597 bootstrap.compiler: Warm quotation-like? before compiler startup
+3879095201 vm: Keep GC guard transitions outside active collection (#1419)
+d84b43f907 bootstrap.image: Buffer cell output and short-circuit identity hits
+ec2c7f209c bootstrap.compiler: Compile hot hashtable methods earlier
+6c2b59206f compiler.cfg.ssa: Preallocate merged interference sets
+71fce0997b assocs: Avoid allocating closures on cache lookups
+05f974d7f0 kernel: Reject invalid callstack>array inputs (#1279)
+c77b85f36d vm.zig: Relocate saved ARM64 callstacks using frame links
+4d99a3cf0e vm: Correct ARM64 immediate relocation decoding and bounds
+f3c7ba2a4b cpu.arm.64.assembler: Encode zero-distance left shifts correctly
+bd6e762cf5 cpu.arm.64: Support large structure returns across FFI calls
+134986bdc8 bootstrap: Retain image format version 5
+154874b1f8 math: Normalize integer arithmetic results (fixes #224, fixes #989)
+146340b797 compiler.tree.propagation: Preserve large singleton integers
+b00281d59f math.integers: Validate shift counts and preserve bit indices (fixes #799)
+9fbbc2da4e bootstrap.image: Serialize mutable lexical words
+ffe481afc1 compiler.cfg.ssa: Compare register order directly during coalescing
+430b5db39d io.standard-paths: Find executable files and honor PATHEXT (fixes #1332)
+9e4a6d26f2 io.files: Preserve line endings in change-file-lines (fixes #2794)
+c17a5052aa ui.tools.listener: Accept folders dropped from Finder (fixes #1416)
+56ac94f40c system: Flush output streams when exiting (fixes #2012)
+9ab2e18d2f io.sockets.unix: Avoid a fixed port in the connection-refused test
+34c357d02a compiler: Avoid recompilation cascades from dispatch-independent inlining
+5d608d324e compiler.units: Preserve nesting observers while refreshing old images
+42cefe8985 ui.backend.cocoa: Refresh window resources when display scale changes (fixes #855)
+d1d8696c4a ui.debugger: Avoid modal alerts inside native callbacks (fixes #1824)
+068c0dcd79 ui.traverse: Bound stale pane selection paths (fixes #2765)
+4a5068d53a ui.backend.cocoa: Ignore control characters in text input (fixes #2379)
+5770fc6bb7 cocoa.application: Resolve symlink launches inside app bundles (fixes #1745)
+96a3fc09cf regexp: Fix missing sequences import in capture documentation
+a753451743 regexp: Expose captures from the main vocabulary and add bounds
+2e107ccad2 regexp: Add numbered and named capture groups
+4dc573e5fb regexp: Preserve assertion boundaries in lookbehind (fixes #2684)
+d9992fef6e xml.tokenize: Bound stack use without the optimizer (fixes #3046)
+adc18186f6 compiler.units: Repair call sites after nested compilation (fixes #67)
+9d895edcaf compiler.tree.propagation: Preserve predicate dependency inputs (fixes #1751)
+0c6e4ca805 kernel: Use literal recursive branches in loop
+bb54e59b10 compiler.tree.propagation.inlining: Track custom hook definition dependencies
+0e02a98895 compiler.cfg.alias-analysis: Preserve aliases when boxing pointers
+d67aaa1e73 compiler.tree.debugger: Compose consecutive data-stack shuffles in diagnostic output
+670997d598 stack-checker: Remove unused fry and locals syntax imports
+3eb32093c7 hints: Specialize index searches for arrays and strings
+a2363279d5 typed: Preserve termination in unboxed stack effects
+eca79672e4 stack-checker: Compile annotated quotation parameters as checked calls
+57c16db3c2 lint: Report unused recursive annotations conservatively
+b33a144ccf foogle: Search loaded words by stack effect and documented types
+6d974103c1 compiler.tree.propagation.call-effect: Reject known incompatible dynamic effects
+16df4f91fe compiler.tree.propagation.transforms: Specialize integer remainder of one
+9ffa6f86d3 quotations: Support words as callables without treating them as sequences
+354e024e5c syntax.inferred: Add optional definitions with inferred stack effects
+101ce838a5 vm: Check declared stack bounds before comparing dynamic call results
+612cfd53dd stack-checker.branches: Report quotation-local effects in branch errors
+a7b3d59f1f inverse: Preserve captured lexical values during expansion
+e1c7956b34 stack-checker.inlining: Preserve known values in untouched recursive prefixes
+9a1dc02fb6 typed: Mark recursive implementations and their inline wrappers
+17012c13e0 compiler.tree.propagation.simple: Discard stale inlining when folding a call
+b634fbafe3 locals: Defer typed tuple construction until locals are substituted
+7a2780cb4f locals.fry: Expand fry before lowering lexical bindings
+e7998ed41b locals: Preserve next-method dependencies during macro expansion
+acbe41c2d9 math.order: Preserve the caller row while computing comparison keys
+a35444a448 sequences: Keep intermediate binary reductions outside the callback row
+ef384edba9 fry: Allow unexpanded quotation templates
+64158cf69a stack-checker.row-polymorphism: Preserve linked row constraints
+d3d5b9075c stack-checker.inlining: Track the stack depth accessed by recursive bodies
+ec1936d44d combinators.smart: Preserve captures when inferring composed callables
+77364fe071 compiler.tree.builder: Honor row variables when compiling inline words
+cf41acb0b1 vm: Initialize discarded code-block snapshots before GC can scan them
+d2c7ccc580 vm: Release GC event recordings on reset, disable, and shutdown
+fcd5191eba vm: Bound tuple initialization to its payload slots
+80c0ba24fa vm: Restore derived stack pointers before retrying a failed GC
+316c6ae35b vm: Refresh displaced alien addresses on every base relocation
+fa8adf9723 ui.render: support GLSL 1.30 with shared shader sources
+8044860e24 io.launcher.unix: test large redirected process output
+50d8485a2f math.vectors.conversion: preserve unsigned float conversion semantics
+25dc46881c cpu.arm.64: lower SIMD mask predicates natively
+04e042284d compiler: validate scalar shift immediates
+574d5e3545 cpu.arm.64: clamp SIMD lane shift immediates
+b5a21f4e19 cpu.arm.64: define whole-vector shift boundaries
+85887a339f cpu.arm.64: materialize multiply immediates directly
+74f37335f5 cpu.arm.64: materialize large stack and allocation offsets
+96d55c2bbc cpu.arm.64: materialize large spill and FFI stack addresses
+c18667f4e6 cpu.arm.64: lower C global addresses
+c839f93e5c cpu.arm.64: materialize fused memory offsets fully
+be74900bbe compiler.cfg.linear-scan: retire atomic spill-slot uses
+628aa0302f zig vm: root native snapshots during materialization
+8100837f59 zig vm: rederive heap references after allocation
+a481c3a51b zig safepoints: test a dedicated guard mapping
+baad99fec3 zig gc: release collector state in card-scan test
+b79156b9dd vm: capture code blocks after result allocation
+175fdea0f6 vm: batch JIT relocation emission safely
+c3cf1eb019 vm: keep native allocation inputs rooted
+02ff85720f vm: avoid signed overflow in checked fixnum shifts
+5d1abb5f92 vm: support unaligned alien scalar access
+dafa6f5f47 vm: shift bignum limbs without signed overflow
+2f6fe8bd1b vm: make instruction operand access defined
+6d5ebc095b vm: move PIC misses off inline-cache frames
