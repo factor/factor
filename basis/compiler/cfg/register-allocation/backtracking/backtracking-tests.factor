@@ -153,3 +153,20 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     T{ sync-point { n 40 } } 2array swap backtracking-allocation empty?
     spill-slots get assoc-size
 ] unit-test
+
+! Compare indexed queries with the original pairwise oracle after real
+! evictions and spills have removed/replaced ranges in the occupancy index.
+{ t } [
+    init-test-allocation
+    1 { 0 100 } test-interval
+    2 { 20 22 24 40 } test-interval 2array swap backtracking-allocation drop
+    assigned-bundles get [| bundle |
+        bundle intervals>> first reg>> :> reg
+        bundle reg bundle-conflicts
+        assigned-bundles get [| other |
+            other intervals>> first reg>> reg =
+            other bundle-reg-class bundle bundle-reg-class = and
+            other bundle bundles-intersect? and
+        ] filter >array =
+    ] all?
+] unit-test

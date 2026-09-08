@@ -192,3 +192,12 @@ IN: compiler.cfg.register-allocation.greedy.tests
         2.5 \ pressure-kernel def>> compile-call
     ] with-variable
 ] unit-test
+
+! Eviction reuses cached costs; a split mutates its input and must discard
+! that cache entry before computing child priorities from shortened ranges.
+{ t } [
+    init-test
+    1 { { 0 20 } } { 0 20 } test-interval
+    2 { { 6 10 } } { 6 8 10 } test-interval 2array allocate-test drop
+    greedy-costs get [ swap greedy-priority = ] assoc-all?
+] unit-test
