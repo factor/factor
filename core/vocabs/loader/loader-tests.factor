@@ -78,7 +78,7 @@ IN: vocabs.loader.tests
     ] with-compilation-unit
 ] unit-test
 
-[ "vocabs.loader.test.b" require ] must-fail
+[ f auto-use? [ "vocabs.loader.test.b" require ] with-variable ] must-fail
 
 { 1 } [ "count-me" get-global ] unit-test
 
