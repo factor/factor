@@ -1031,6 +1031,7 @@ FUNCTION: BOOL CloseHandle ( HANDLE h )
 ! FUNCTION: CompareFileTime
 ! FUNCTION: CompareStringA
 ! FUNCTION: CompareStringW
+FUNCTION: int CompareStringOrdinal ( LPCWSTR lpString1, int cchCount1, LPCWSTR lpString2, int cchCount2, BOOL bIgnoreCase )
 FUNCTION: BOOL ConnectNamedPipe ( HANDLE hNamedPipe, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: ConsoleMenuControl
 ! FUNCTION: ContinueDebugEvent

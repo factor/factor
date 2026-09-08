@@ -1,15 +1,15 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data arrays assocs
+USING: accessors alien alien.c-types alien.data alien.strings arrays assocs
 classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors init io
 io.backend io.backend.windows io.files io.files.private
 io.files.windows io.launcher io.launcher.private io.pathnames
-io.pipes io.pipes.windows io.ports kernel libc literals locals
-make math namespaces prettyprint sequences specialized-arrays
+io.pipes io.pipes.windows io.ports io.standard-paths kernel libc literals locals
+make math math.order namespaces prettyprint sequences sorting specialized-arrays
 splitting splitting.monotonic strings system threads windows
 windows.errors windows.handles windows.kernel32 windows.types
-windows.user32 ;
+windows.user32 unicode ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
@@ -50,6 +50,11 @@ TUPLE: CreateProcess-args
     } cleave
     CreateProcess win32-error=0/f ;
 
+ERROR: invalid-process-argument argument ;
+ERROR: invalid-batch-argument argument ;
+ERROR: batch-script-not-found path ;
+ERROR: batch-command-line-too-long length ;
+
 : count-trailing-backslashes ( str n -- str n )
     [ "\\" ?tail ] dip swap [
         1 + count-trailing-backslashes
@@ -80,13 +85,70 @@ TUPLE: CreateProcess-args
 ! If there's a space, double trailing backslashes and surround by quotes
 ! See https://msdn.microsoft.com/en-us/library/ms647232.aspx
 : escape-argument ( str -- newstr )
+    dup CHAR: \0 swap member? [ invalid-process-argument ] when
     escape-double-quote
-    CHAR: \s over member? [
+    dup { [ empty? ] [ [ " \t" member? ] any? ] } 1|| [
         fix-trailing-backslashes "\"" 1surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )
     [ escape-argument ] map join-words ;
+
+! cmd.exe does not use the C runtime's quoting rules (#3049 / BatBadBut).
+! Percent expansion must be stopped before cmd.exe parses metacharacters.
+! See https://github.com/ziglang/zig/pull/19698.
+:: escape-batch-argument ( str -- escaped )
+    str [ "\0\r\n" member? ] any? [ str invalid-batch-argument ] when
+    str {
+        [ empty? ]
+        [ "\\" tail? ]
+        [ [ "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$*+-./:?@\\_" member? not ] any? ]
+    } 1|| :> quoted?
+    [
+        quoted? [ CHAR: \" , ] when
+        0 :> backslashes!
+        str [| ch |
+            ch CHAR: \\ = [ backslashes 1 + backslashes! ] [
+                ch CHAR: \" = [
+                    backslashes CHAR: \\ <repetition> % CHAR: \" ,
+                ] when
+                ch CHAR: % = [ "%%cd:~," % ] when
+                0 backslashes!
+            ] if
+            ch ,
+        ] each
+        quoted? [ backslashes CHAR: \\ <repetition> % CHAR: \" , ] when
+    ] "" make ;
+
+: batch-script? ( path -- ? )
+    >lower [ ". " member? ] trim-tail
+    [ ".bat" tail? ] [ ".cmd" tail? ] bi or ;
+
+: batch-command? ( command -- ? )
+    dup string? [ drop f ] [ ?first [ batch-script? ] [ f ] if* ] if ;
+
+: resolve-batch-script ( path -- path' )
+    dup normalize-path dup file-exists?
+    [ nip ] [ drop ?find-in-path normalize-path ] if
+    dup file-exists? [ dup batch-script-not-found ] unless
+    "\\\\?\\UNC\\" ?head
+    [ "\\\\" prepend ] [ remove-unicode-prefix ] if ;
+
+: batch-command-line ( command -- cmd-line )
+    unclip resolve-batch-script escape-batch-argument
+    ! Always quote the script path, even if it contains no spaces.
+    dup "\"" head? [ "\"" 1surround ] unless
+    [ [ escape-batch-argument ] map ] dip prefix join-words
+    "\"" 1surround "cmd.exe /d /e:ON /v:OFF /s /c " prepend
+    ! cmd.exe has a shorter command-line limit than CreateProcess. Reject
+    ! overlong input instead of allowing the shell to truncate quoting.
+    dup 0 [ 0xffff > 2 1 ? + ] reduce
+    dup 8191 > [ batch-command-line-too-long ] [ drop ] if ;
+
+: windows-command-interpreter ( -- path )
+    MAX_UNICODE_PATH ushort <c-array>
+    [ MAX_UNICODE_PATH GetSystemDirectory win32-error=0/f ] keep
+    alien>native-string "cmd.exe" append-path ;
 
 : lookup-priority ( process -- n )
     priority>> {
@@ -100,9 +162,14 @@ TUPLE: CreateProcess-args
     } case ;
 
 : cmd-line ( process -- cmd-line )
-    command>> dup string? [ join-arguments ] unless ;
+    command>> dup string? [
+        dup batch-command? [ batch-command-line ] [ join-arguments ] if
+    ] unless ;
 
 : fill-lpCommandLine ( process args -- process args )
+    over command>> batch-command? [
+        windows-command-interpreter >>lpApplicationName
+    ] when
     over cmd-line >>lpCommandLine ;
 
 : fill-dwCreateFlags ( process args -- process args )
@@ -119,12 +186,37 @@ TUPLE: CreateProcess-args
     pick lookup-priority [ bitor ] when*
     >>dwCreateFlags ;
 
+! Use Windows' ordinal case mapping, not linguistic Unicode folding
+! (which would, for example, incorrectly equate sharp S with "SS").
+: compare-environment-keys ( key1 key2 -- n )
+    [ -1 ] dip -1 1 CompareStringOrdinal
+    dup 0 = [ win32-error ] when ;
+
+: environment-key= ( key1 key2 -- ? )
+    compare-environment-keys 2 = ;
+
+M:: windows environment-union ( assoc1 assoc2 -- assoc )
+    V{ } clone :> result
+    assoc1 >alist assoc2 >alist append
+    ! Stable sorting preserves override precedence and also produces
+    ! the sorted block required by CreateProcess, in O(n log n) time.
+    [ [ first ] bi@ compare-environment-keys 2 - 0 <=> ] sort-with
+    [| entry |
+        result empty? [ f ] [
+            result last first entry first environment-key=
+        ] if
+        [ entry result set-last ] [ entry result push ] if
+    ] each
+    result ;
+
 : fill-lpEnvironment ( process args -- process args )
     over pass-environment? [
         [
             over get-environment
-            [ swap % "=" % % "\0" % ] assoc-each
-            "\0" %
+            dup assoc-empty? [ drop "\0\0" % ] [
+                [ swap % "=" % % "\0" % ] assoc-each
+                "\0" %
+            ] if
         ] ushort-array{ } make
         >>lpEnvironment
     ] when ;

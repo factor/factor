@@ -4,10 +4,69 @@ hashtables io io.directories io.encodings.ascii
 io.encodings.utf8 io.files io.files.temp io.files.unique
 io.launcher io.launcher.private io.launcher.windows
 io.pathnames kernel math namespaces parser sequences
-splitting system tools.test ;
+splitting strings system tools.test ;
 IN: io.launcher.windows.tests
 
+: console-vm-path ( -- path )
+    vm-path ".exe" ?tail [ ".com" append ] when ;
+
+! Windows environment names are case-insensitive, including non-ASCII
+! names. Later entries win without leaving duplicate keys in the block.
+{ H{ { "PATH" "new" } { "OTHER" "keep" } } } [
+    { { "Path" "old" } { "OTHER" "keep" } }
+    { { "PATH" "new" } } environment-union >hashtable
+] unit-test
+
+{ H{ { "Ä" "new" } { "SS" "distinct" } { "ß" "sharp" } } } [
+    { { "ä" "old" } { "SS" "distinct" } }
+    { { "Ä" "new" } { "ß" "sharp" } } environment-union >hashtable
+] unit-test
+
+{ V{ { "path" "last" } } } [
+    <process> +replace-environment+ >>environment-mode
+    { { "Path" "first" } { "path" "last" } } >>environment
+    get-environment
+] unit-test
+
+{ { "A" "b" } } [
+    H{ } { { "b" "second" } { "A" "first" } }
+    environment-union keys >array
+] unit-test
+
+! Even an empty Unicode environment block needs two NUL code units.
+{ { 0 0 } } [
+    <process> +replace-environment+ >>environment-mode
+    CreateProcess-args new fill-lpEnvironment nip lpEnvironment>> >array
+] unit-test
+
+{ { 97 61 98 0 0 } } [
+    <process> +replace-environment+ >>environment-mode
+    { { "a" "b" } } >>environment
+    CreateProcess-args new fill-lpEnvironment nip lpEnvironment>> >array
+] unit-test
+
+: child-case-environment ( mode -- value )
+    <process> swap >>environment-mode
+    console-vm-path "-script"
+    "vocab:io/launcher/windows/test/env.factor" 3array >>command
+    os-envs [ drop "Factor_Case_Test" environment-key= ] assoc-reject
+    { { "FACTOR_CASE_TEST" "child" } } assoc-union >>environment
+    utf8 [ read-contents ] with-process-reader eval( -- assoc ) >alist
+    [ first "FACTOR_CASE_TEST" environment-key= ] filter
+    dup length 1 assert= first second ;
+
+{ "child" "parent" "child" } [
+    "parent" "Factor_Case_Test" [
+        +append-environment+ child-case-environment
+        +prepend-environment+ child-case-environment
+        +replace-environment+ child-case-environment
+    ] with-os-env
+] unit-test
+
 { "hello world" } [ { "hello" "world" } join-arguments ] unit-test
+
+{ "\"\" \"a\tb\"" } [ { "" "a\tb" } join-arguments ] unit-test
+[ "a\0b" escape-argument ] [ invalid-process-argument? ] must-fail-with
 
 { "bob \"mac arthur\"" } [ { "bob" "mac arthur" } join-arguments ] unit-test
 
@@ -42,41 +101,100 @@ IN: io.launcher.windows.tests
 [ { "\\foo\\\\bar bar\\\\\\bas\\" } join-arguments ] unit-test
 
 
-{ } [
-    <process>
-        "notepad" >>command
-        1/2 seconds >>timeout
-    "notepad" set
+CONSTANT: argument-cases {
+    "" "plain" "two words" "a\tb" "trailing\\" "two words\\\\"
+    "\"" "a\"b" "\\\"key=value\\\"" "a\\\\\"b"
+    "Örjan" "日本語" "&|<>()^!" "%PATH%" "!PATH!"
+    "%%" "%CD%" "%cd:~,%" "%CMDCMDLINE:~-1%&echo BATBADBUT-PROBE"
+    "\"&echo BATBADBUT-PROBE&rem \"" "=,;[]{}"
+}
+
+: argument-command ( arguments -- command )
+    [
+        console-vm-path "-no-user-init"
+        "vocab:io/launcher/windows/test/argv.factor" absolute-path 3array
+    ] dip append ;
+
+: read-arguments ( command -- arguments )
+    utf8 [ read-contents ] with-process-reader eval( -- arguments ) ;
+
+{ t } [ argument-cases dup argument-command read-arguments = ] unit-test
+
+{ t } [
+    argument-cases dup argument-command
+    "vocab:io/launcher/windows/test/argv.cmd" absolute-path prefix
+    read-arguments =
 ] unit-test
 
-{ f } [ "notepad" get process-running? ] unit-test
+! Script paths can themselves contain percent signs, spaces and Unicode.
+{ t } [
+    [
+        "vocab:io/launcher/windows/test/argv.cmd"
+        "argv %PATH% & 日本語.CMD" copy-file
+        argument-cases dup argument-command
+        "argv %PATH% & 日本語.CMD" absolute-path prefix read-arguments =
+    ] with-test-directory
+] unit-test
 
-{ f } [ "notepad" get process-started? ] unit-test
+{ t t t f } [
+    "a.cmd" batch-script? "a.BAT" batch-script?
+    "a.CmD. " batch-script? "a.exe" batch-script?
+] unit-test
 
-{ } [ "notepad" [ run-detached ] change ] unit-test
+{ "\"%%cd:~,%PATH%%cd:~,%\"" } [ "%PATH%" escape-batch-argument ] unit-test
+[ "x\ny" escape-batch-argument ] [ invalid-batch-argument? ] must-fail-with
+[ "x\ry" escape-batch-argument ] [ invalid-batch-argument? ] must-fail-with
+[ "x\0y" escape-batch-argument ] [ invalid-batch-argument? ] must-fail-with
 
-[ "notepad" get wait-for-process ] must-fail
+[
+    "vocab:io/launcher/windows/test/argv.cmd"
+    8192 CHAR: a <string> 2array batch-command-line
+] [ batch-command-line-too-long? ] must-fail-with
 
-{ t } [ "notepad" get killed>> ] unit-test
+! A supplementary character takes two UTF-16 code units on Windows.
+[
+    "vocab:io/launcher/windows/test/argv.cmd"
+    4096 0x1f600 <string> 2array batch-command-line
+] [ batch-command-line-too-long? ] must-fail-with
 
-{ f } [ "notepad" get process-running? ] unit-test
+! Notepad may forward to an existing window and exit immediately. Use a
+! console child with a known lifetime to exercise process timeout handling.
+: timeout-test-command ( -- command )
+    console-vm-path "-no-user-init"
+    "-e=USING: calendar threads ; 30 seconds sleep" 3array ;
+
+{ } [
+    <process>
+        timeout-test-command >>command
+        1/2 seconds >>timeout
+    "timeout-process" set
+] unit-test
+
+{ f } [ "timeout-process" get process-running? ] unit-test
+
+{ f } [ "timeout-process" get process-started? ] unit-test
+
+{ } [ "timeout-process" [ run-detached ] change ] unit-test
+
+[ "timeout-process" get wait-for-process ] must-fail
+
+{ t } [ "timeout-process" get killed>> ] unit-test
+
+{ f } [ "timeout-process" get process-running? ] unit-test
 
 [
     <process>
-        "notepad" >>command
+        timeout-test-command >>command
         1/2 seconds >>timeout
     try-process
 ] must-fail
 
 [
     <process>
-        "notepad" >>command
+        timeout-test-command >>command
         1/2 seconds >>timeout
     try-output-process
 ] must-fail
-
-: console-vm-path ( -- path )
-    vm-path ".exe" ?tail [ ".com" append ] when ;
 
 SYMBOLS: out-path err-path ;
 

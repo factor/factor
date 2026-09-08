@@ -5,7 +5,11 @@ io.launcher.private kernel literals quotations splitting ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
-"The " { $snippet "command" } " slot of a " { $link process } " can contain either a string or a sequence of strings. In the first case, the string is processed in an operating system-specific manner. In the second case, the first element is a program name and the remaining elements are passed to the program as command-line arguments." ;
+"The " { $snippet "command" } " slot of a " { $link process } " can contain either a string or a sequence of strings. In the first case, the string is processed in an operating system-specific manner. In the second case, the first element is a program name and the remaining elements are passed to the program as command-line arguments."
+$nl
+"On Windows, sequence commands naming a " { $snippet ".bat" } " or " { $snippet ".cmd" } " file use batch-specific escaping, with AutoRun and delayed expansion disabled. Batch arguments cannot contain NUL, carriage return or newline characters, and encoded batch command lines cannot exceed 8191 UTF-16 code units. Other sequence commands use native executable quoting and cannot contain NUL characters."
+$nl
+{ $warning "String commands are raw command lines. Do not interpolate untrusted data into them, or into commands explicitly invoking a shell such as cmd.exe /c. Use a sequence command instead. Batch scripts may themselves reinterpret arguments; the launcher cannot secure unsafe code inside a script." } ;
 
 ARTICLE: "io.launcher.detached" "Running processes in the background"
 "By default, " { $link run-process } " waits for the process to complete. To run a process without waiting for it to finish, set the " { $snippet "detached" } " slot of a " { $link process } ", or use the following word:"
@@ -25,7 +29,9 @@ $nl
     +replace-environment+
     +append-environment+
 }
-"The default value is " { $link +append-environment+ } "." ;
+"The default value is " { $link +append-environment+ } "."
+$nl
+"On Windows, environment names are compared case-insensitively using the operating system's ordinal comparison. For example, an appended " { $snippet "PATH" } " overrides an inherited " { $snippet "Path" } ", without creating two entries for the same variable. Names remain case-sensitive on Unix." ;
 
 ARTICLE: "io.launcher.redirection" "Input/output redirection"
 "On all operating systems, the default input/output/error streams can be redirected."
