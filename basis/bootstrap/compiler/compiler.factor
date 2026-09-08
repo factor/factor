@@ -129,6 +129,48 @@ gc
 
     "." write flush
 
+    ! Compile profiled helpers before the compiler passes that use them.
+    ! Look up already-loaded words without changing vocabulary load order.
+    {
+        { "compile" "compiler.units" }
+        { "backend" "compiler" }
+        { "infer-quot-here" "stack-checker.backend" }
+        { "infer-quot" "stack-checker.backend" }
+        { "sequence-operator" "sequences.private" }
+        { "copy-unsafe" "sequences.private" }
+        { "(infer-if)" "stack-checker.branches" }
+        { "(adjoin)" "hash-sets.private" }
+        { "infer-branches" "stack-checker.branches" }
+        { "infer-ndip" "stack-checker.known-words" }
+        { "struct-class?" "classes.struct" }
+        { "update-code-heap" "compiler.units.private" }
+        { "tuple-class?" "classes.tuple" }
+        { "length-operator" "sequences.private" }
+        { "concat-as" "sequences" }
+        { "inline-recursive-word" "stack-checker.inlining" }
+        { "apply-literal-values-transform" "stack-checker.transforms" }
+        { "superclass-of" "classes" }
+        { "hash-count+" "hashtables.private" }
+        { "at" "assocs" }
+        { "grow-hash" "hash-sets.private" }
+        { "new-dlist-link" "dlists" }
+        { "push-front" "deques" }
+        { "nearest-class" "generic" }
+        { "subseq-unsafe-as" "sequences.private" }
+        { "(selector-as)" "sequences.private" }
+        { "2nth-unsafe" "sequences.private" }
+        { "interesting-classes" "generic.private" }
+        { "infer-shuffle" "stack-checker.known-words" }
+        { "length-iterator" "sequences.private" }
+        { ">underlying<" "sequences.private" }
+        { "search-alist" "assocs.private" }
+        { "reset-hash" "hash-sets.private" }
+        { "assoc-operator" "assocs.private" }
+        { "<hash-array>" "hash-sets.private" }
+        { "compress-path" "compiler.utilities" }
+        { "meta-d" "stack-checker.state" }
+    } [ first2 lookup-word ] map compile-unoptimized
+
     ! Optimize the compiler passes before using them for the full sweep.
     { "compiler.tree" "compiler.cfg" } [
         loaded-vocab-names swap [ head? ] curry filter
