@@ -14,6 +14,7 @@ STRUCT: statfs64
     { f_fsid __fsid_t }
     { f_namelen __SWORD_TYPE }
     { f_frsize __SWORD_TYPE }
-    { f_spare __SWORD_TYPE[5] } ;
+    { f_flags __SWORD_TYPE }
+    { f_spare __SWORD_TYPE[4] } ;
 
 FUNCTION: int statfs64 ( c-string path, statfs64* buf )

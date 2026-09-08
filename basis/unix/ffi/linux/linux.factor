@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax classes.struct unix.time
-unix.types ;
+USING: alien.c-types alien.syntax classes.struct kernel system
+unix.time unix.types ;
 IN: unix.ffi
 
 CONSTANT: MAXPATHLEN 1024
@@ -54,7 +54,7 @@ STRUCT: sockaddr-in
     { family ushort }
     { port ushort }
     { addr in_addr_t }
-    { unused longlong } ;
+    { unused char[8] } ;
 
 STRUCT: sockaddr-in6
     { family ushort }
@@ -131,6 +131,18 @@ STRUCT: exit_status
     { e_termination short }
     { e_exit short } ;
 
+! x86 glibc shares the on-disk format between 32- and 64-bit
+! processes. AArch64 uses the native long/timeval layout instead.
+C-TYPE: utmpx-session
+C-TYPE: utmpx-seconds
+<<
+cpu x86? int long ? \ utmpx-session typedef
+cpu x86? uint long ? \ utmpx-seconds typedef
+>>
+STRUCT: utmpx-timeval
+    { sec utmpx-seconds }
+    { usec utmpx-session } ;
+
 STRUCT: utmpx
     { ut_type short }
     { ut_pid pid_t }
@@ -139,7 +151,7 @@ STRUCT: utmpx
     { ut_user char[__UT_NAMESIZE] }
     { ut_host char[__UT_HOSTSIZE] }
     { ut_exit exit_status }
-    { ut_session long }
-    { ut_tv timeval }
+    { ut_session utmpx-session }
+    { ut_tv utmpx-timeval }
     { ut_addr_v6 int[4] }
     { __unused char[20] } ;
