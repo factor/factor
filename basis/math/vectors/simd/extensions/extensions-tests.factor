@@ -20,6 +20,7 @@ IN: math.vectors.simd.extensions.tests
     [ a b v- ] same-dispatch? and
     [ a b v* ] same-dispatch? and
     [ a b v/ ] same-dispatch? and
+    [ a vsqrt ] same-dispatch? and
     [ a b c vfma ] same-dispatch? and
     [ a b vmin ] same-dispatch? and
     [ a b vmax ] same-dispatch? and
@@ -47,6 +48,23 @@ PRIVATE>
     half-8{ 1 2 3 4 5 6 7 8 } half-8{ 1 3 2 4 6 5 7 9 } v= ushort-8-cast
 ] unit-test
 { 4 } [ half-8{ t f t f t f t f } vcount ] unit-test
+
+! SIMD square root returns a NaN for negative lanes, including when optional
+! FP16 instructions are disabled. Scalar sqrt would produce a complex value.
+{ ushort-8{ 0x7e00 0x7e00 0x8000 0 0x4000 0x7c00 0x7e00 0x1c00 } } [
+    half-8{ -1 -1/0. -0.0 0.0 4 1/0. 0/0. 0.0000152587890625 }
+    vsqrt ushort-8-cast
+] unit-test
+{ ushort-8{ 0x7e00 0x7e00 0x8000 0 0x4000 0x7c00 0x7e00 0x1c00 } } [
+    optional-arm64-features disabled-arm64-features [
+        half-8{ -1 -1/0. -0.0 0.0 4 1/0. 0/0. 0.0000152587890625 }
+        vsqrt ushort-8-cast
+    ] with-variable
+] unit-test
+{ ushort-8{ 0x7fc0 0x7fc0 0x8000 0 0x4000 0x7f80 0x7fc0 0x3b80 } } [
+    bfloat-8{ -1 -1/0. -0.0 0.0 4 1/0. 0/0. 0.0000152587890625 }
+    vsqrt ushort-8-cast
+] unit-test
 
 ! These expectations run on fallback-only hosts as well as optional FP16
 ! kernels. Random pairs rarely exercise signed zeros or a NaN in each order.

@@ -5,7 +5,7 @@ compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks compiler.errors
 compiler.test compiler.tree.builder compiler.tree.optimizer
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
-cpu.arm.64.assembler.registers kernel literals make namespaces
+cpu.arm.64.assembler.registers kernel layouts literals make namespaces
 sequences stack-checker.alien system tools.test words ;
 IN: compiler.cfg.builder.alien.tests
 
@@ -139,7 +139,7 @@ ${
 cpu x86.32?
 {
     { 2 4 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{
         T{ ##unbox-any-c-ptr { dst 2 } { src 1 } }
         T{ ##unbox
@@ -152,7 +152,7 @@ cpu x86.32?
 }
 {
     { 2 3 }
-    { { int-rep f f } { int-rep f f } }
+    { { int-rep f f $[ cell ] } { int-rep f f 4 } }
     V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
 } ? [
     [ { c-string int } unbox-parameters ] V{ } make

@@ -1,0 +1,1057 @@
+Unit Test: {
+    { int-4{ 5 6 7 8 } }
+    [
+        int-4{ 1 2 3 4 } int-4{ 5 6 7 8 } [
+            { int-4 int-4 } declare
+            { 4 5 6 7 0 1 2 3 } vshuffle2-elements
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { double-2{ 4.0 1.0 } }
+    [
+        double-2{ 1.0 2.0 } double-2{ 3.0 4.0 } [
+            { double-2 double-2 } declare
+            { 7 4 0 1 } vshuffle2-elements
+        ] compile-call
+    ]
+}
+Unit Test: {
+    {
+        uchar-16{
+            0
+            1
+            254
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            254
+            1
+            0
+        }
+    }
+    [
+        ushort-8{ 0 1 254 255 256 32767 32768 65535 }
+        ushort-8{ 65535 32768 32767 256 255 254 1 0 } [
+            { ushort-8 ushort-8 } declare [ underlying>> ] bi@
+            ushort-8-rep (simd-vpack-signed) uchar-16 boa
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { ushort-8{ 65535 65535 65535 65535 0 1 65534 65535 } }
+    [
+        uint-4{ 2147483648 4294967295 65536 65535 }
+        uint-4{ 0 1 65534 65535 } [
+            { uint-4 uint-4 } declare [ underlying>> ] bi@
+            uint-4-rep (simd-vpack-signed) ushort-8 boa
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { uint-4{ 4294967295 4294967295 4294967294 4294967295 } }
+    [
+        ulonglong-2{ 9223372036854775808 18446744073709551615 }
+        ulonglong-2{ 4294967294 4294967296 } [
+            { ulonglong-2 ulonglong-2 } declare
+            [ underlying>> ] bi@
+            ulonglong-2-rep (simd-vpack-signed) uint-4 boa
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            { uint-4 uint-4 } declare [ underlying>> ] bi@
+            uint-4-rep (simd-vpack-signed) ushort-8 boa
+        ] [ ##signed-pack-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { int-4 int-4 } declare vmul-wide ]
+        [ ##mul-wide-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { int-4 int-4 } declare vabsdiff ]
+        [ ##binary-vector-function? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { float-4 float-4 float-4 } declare vfma ]
+        [ ##fma-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { uint-4 int-4 } declare vshift ]
+        [ ##binary-vector-function? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { float-4 } declare float-4 double-2 vconvert ]
+        [ ##unpack-vector-head? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { float-4 } declare float-4 double-2 vconvert ]
+        [ ##unpack-vector-tail? ] contains-insn?
+    ]
+}
+Unit Test: {
+    {
+        ulonglong-2{ 9223372036854775808 3936146074321813504 }
+        ulonglong-2{ 4607182419336888320 9218868437227405312 }
+    }
+    [
+        uint-4{ 2147483648 1 1065353217 2139095040 }
+        float-4-cast [
+            { float-4 } declare float-4 double-2 vconvert
+            [ ulonglong-2-cast ] bi@
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { uint-4{ 2826960896 2826960896 2826960896 2826960896 } }
+    [
+        float-4{
+            1.0000001192092896
+            1.0000001192092896
+            1.0000001192092896
+            1.0000001192092896
+        } float-4{
+            0.9999998807907104
+            0.9999998807907104
+            0.9999998807907104
+            0.9999998807907104
+        } float-4{ -1.0 -1.0 -1.0 -1.0 }
+        [ { float-4 float-4 float-4 } declare vfma uint-4-cast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t t t t }
+    [
+        0 alien-call-code+return-address
+        B{ 32 3 63 214 } return-address-follows?
+        16 alien-call-code+return-address
+        B{ 64 3 63 214 } return-address-follows?
+        4128 alien-call-code+return-address
+        B{ 64 3 63 214 } return-address-follows?
+        4128 alien-indirect-code+return-address
+        B{ 64 3 63 214 } return-address-follows?
+    ]
+}
+Unit Test: {
+    { 16 2 }
+    [ alien-global-code length parameter-table get length ]
+}
+Unit Test: {
+    { 8 8 }
+    [
+        large-spill-reload-code length large-spill-store-code
+        length
+    ]
+}
+Unit Test: {
+    { 4 B{ 47 0 160 210 } }
+    [
+        scaled-spill-reload-code length
+        large-spill-from-temp-code 4 head
+    ]
+}
+Unit Test: {
+    { 12 20 }
+    [
+        65536 stack-param-store-code length 65536
+        stack-param-load-code length
+    ]
+}
+Unit Test: {
+    { 8 12 }
+    [
+        256 stack-param-store-code length 256
+        stack-param-load-code length
+    ]
+}
+Unit Test: {
+    { 4 8 }
+    [
+        4096 local-allot-code length 4104 local-allot-code
+        length
+    ]
+}
+Unit Test: {
+    { 12 16 8 12 }
+    [
+        4112 prologue-code length 4128 prologue-code length 4112
+        epilogue-code length 4128 epilogue-code length
+    ]
+}
+Unit Test: {
+    { 24 28 20 24 }
+    [
+        4096 allot-code length 4104 allot-code length 4096
+        nursery-check-code length 4112 nursery-check-code length
+    ]
+}
+Unit Test: {
+    { 32 36 }
+    [
+        512 write-barrier-imm-code length 513
+        write-barrier-imm-code length
+    ]
+}
+Unit Test: {
+    { 4 8 8 }
+    [
+        512 inc-code length 513 inc-code length -513 inc-code
+        length
+    ]
+}
+Unit Test: { { 8 8 } [ 100 mul-imm-code length -16 mul-imm-code length ] }
+Unit Test: {
+    {
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+    }
+    [
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 0 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 16 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 17 hlshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 16 hrshift ] compile-call
+        char-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { char-16 } declare 17 hrshift ] compile-call
+    ]
+}
+Unit Test: {
+    {
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        char-16{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 }
+    }
+    [
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 0 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 8 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 9 vlshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 0 vrshift ] compile-call
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        [ { uchar-16 } declare 9 vrshift ] compile-call
+        char-16{ -1 1 -2 2 -3 3 -4 4 -5 5 -6 6 -7 7 -8 8 }
+        [ { char-16 } declare 9 vrshift ] compile-call
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1048577 <byte-array>
+        [ { byte-array } declare 1048576 alien-unsigned-1 ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 123 }
+    [
+        1048577 <byte-array> dup 123 swap 1048576 [
+            { fixnum byte-array fixnum } declare
+            set-alien-unsigned-1
+        ] compile-call 1048576 alien-unsigned-1
+    ]
+}
+Unit Test: {
+    { uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 } }
+    [
+        uchar-16{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 }
+        4294967296
+        [ { uchar-16 fixnum } declare vlshift ] compile-call
+    ]
+}
+Unit Test: {
+    { char-16{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } }
+    [
+        char-16{ -1 1 -2 2 -3 3 -4 4 -5 5 -6 6 -7 7 -8 8 } 256
+        [ { char-16 fixnum } declare vrshift ] compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 127 -128 5 6 } }
+    [
+        int-4{ 5 6 127 -128 }
+        [ { int-4 } declare { 2 3 0 1 } vshuffle-elements ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { double-2{ 4.0 1.0 } }
+    [
+        double-2{ 1.0 2.0 } double-2{ 3.0 4.0 } [
+            { double-2 double-2 } declare
+            { 3 0 } vshuffle2-elements
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { short-8{ 32767 -32768 6 -6 32767 -32768 6 -6 } }
+    [
+        short-8{ 32767 -32768 2 -2 32767 -32768 2 -2 }
+        short-8{ 2 2 3 3 2 2 3 3 }
+        [ { short-8 short-8 } declare vs* ] compile-call
+    ]
+}
+Unit Test: {
+    { 4080 }
+    [
+        uchar-16{
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+            255
+        } uchar-16{ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 }
+        [ { uchar-16 uchar-16 } declare vsad ] compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ 0 -6 } }
+    [
+        longlong-2{ 4294967296 -2 } longlong-2{ 4294967296 3 }
+        [ { longlong-2 longlong-2 } declare v* ] compile-call
+    ]
+}
+Unit Test: {
+    { ulonglong-2{ 18446744073709551615 9223372036854775808 } }
+    [
+        ulonglong-2{ 18446744073709551615 18446744073709551615 }
+        ulonglong-2{ 18446744073709551615 1 }
+        [ { ulonglong-2 ulonglong-2 } declare vavg ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 2147483647 2147483647 2147483647 2147483647 } }
+    [
+        short-8{
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+        } dup [ { short-8 short-8 } declare v*hs+ ] compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 32 0 1 1 } }
+    [
+        int-4{ -1 0 1 -2147483648 }
+        [ { int-4 } declare vbit-count ] compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 0 32 31 0 } }
+    [
+        int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vclz ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 0 32 0 31 } }
+    [
+        int-4{ -1 0 1 -2147483648 } [ { int-4 } declare vctz ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ -1 0 -2147483648 1 } }
+    [
+        int-4{ -1 0 1 -2147483648 }
+        [ { int-4 } declare vbit-reverse ] compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ 64 63 } }
+    [
+        longlong-2{ 0 1 } [ { longlong-2 } declare vclz ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { uint-4{ 2 1 0 0 } }
+    [
+        uint-4{ 1 2 3 4 } int-4{ 1 -1 256 -256 }
+        [ { uint-4 int-4 } declare vshift ] compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ -1 0 } }
+    [
+        longlong-2{ -1 1 } longlong-2{ -256 256 }
+        [ { longlong-2 longlong-2 } declare vshift ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { uint-4{ 4294967295 4294967295 0 3 } }
+    [
+        int-4{ -2147483648 2147483647 1 -2 }
+        int-4{ 2147483647 -2147483648 1 1 }
+        [ { int-4 int-4 } declare vabsdiff ] compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ 4294967296 -6 } longlong-2{ 20 -42 } }
+    [
+        int-4{ 65536 -2 4 -6 } int-4{ 65536 3 5 7 }
+        [ { int-4 int-4 } declare vmul-wide ] compile-call
+    ]
+}
+Unit Test: {
+    {
+        float-4{ -2.0 -1.0 1.0 2.0 }
+        float-4{ -2.0 -0.0 0.0 2.0 }
+    }
+    [
+        float-4{ -1.5 -0.5 0.5 1.5 }
+        [ { float-4 } declare dup vround swap vround-to-even ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { float-4{ -3.0 -1.0 0.0 2.0 } }
+    [
+        float-4{ -2.5 -0.5 0.5 2.5 }
+        [ { float-4 } declare vfloor ] compile-call
+    ]
+}
+Unit Test: {
+    { float-4{ 5.0 10.0 17.0 26.0 } }
+    [
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 2.0 3.0 4.0 5.0 }
+        float-4{ 3.0 4.0 5.0 6.0 }
+        [ { float-4 float-4 float-4 } declare vfma ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ -2147483648 512 2147483392 -512 } }
+    [
+        float-4{
+            2147483648.0
+            4294967808.0
+            -2147483904.0
+            -4294967808.0
+        } [ { float-4 } declare float-4 int-4 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 2147483520 -2147483648 -1 1 } }
+    [
+        float-4{ 2147483520.0 -2147483648.0 -1.75 1.75 }
+        [ { float-4 } declare float-4 int-4 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ -9223372036854775808 4096 } }
+    [
+        double-2{ 9.223372036854776e+18 1.8446744073709556e+19 }
+        [ { double-2 } declare double-2 longlong-2 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ 9223372036854773760 -4096 } }
+    [
+        double-2{
+            -9.223372036854778e+18
+            -1.8446744073709556e+19
+        } [ { double-2 } declare double-2 longlong-2 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { B{ 32 121 226 60 } }
+    [
+        [ V0 X1 X2 4 0 float-4-rep f %load-memory ] B{ } make
+        4 tail-slice >byte-array
+    ]
+}
+Unit Test: {
+    { B{ 32 121 162 60 } }
+    [
+        [ V0 X1 X2 4 0 float-4-rep f %store-memory ] B{ } make
+        4 tail-slice >byte-array
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { longlong-2 longlong-2 } declare vmin ]
+        [ ##min-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { ulonglong-2 ulonglong-2 } declare vmax ]
+        [ ##max-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { float-4 } declare float-4 int-4 vconvert ]
+        [ ##float>integer-vector? ] contains-insn?
+    ]
+}
+Unit Test: {
+    {
+        longlong-2{ -9223372036854775808 -1 }
+        longlong-2{ 9223372036854775807 0 }
+    }
+    [
+        longlong-2{ -9223372036854775808 0 }
+        longlong-2{ 9223372036854775807 -1 } [
+            { longlong-2 longlong-2 } declare
+            [ vmin ] [ vmax ] 2bi
+        ] compile-call
+    ]
+}
+Unit Test: {
+    {
+        ulonglong-2{ 0 9223372036854775807 }
+        ulonglong-2{ 18446744073709551615 9223372036854775808 }
+    }
+    [
+        ulonglong-2{ 18446744073709551615 9223372036854775807 }
+        ulonglong-2{ 0 9223372036854775808 } [
+            { ulonglong-2 ulonglong-2 } declare
+            [ vmin ] [ vmax ] 2bi
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 0 0 0 0 } }
+    [
+        uint-4{ 2139095040 4286578688 2143289345 4290772993 }
+        float-4-cast
+        [ { float-4 } declare float-4 int-4 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 0 0 0 0 } }
+    [
+        uint-4{ 1 2155872255 2139095039 4286578687 }
+        float-4-cast
+        [ { float-4 } declare float-4 int-4 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        512 <iota> [
+            23 shift
+            uint-4{ 0 1 4194303 8388607 } [ bitor ] with map
+            >uint-4 float-4-cast
+            [ underlying>> float-4-rep scalar-float>integer ]
+            [ compiled-float>integer underlying>> ] bi =
+        ] all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        4096 <iota> [
+            1664525 * 1013904223 + 4294967295 bitand
+            uint-4{ 0 2097151 1431655765 4294967295 } [ bitxor ]
+            with map >uint-4 float-4-cast
+            [ underlying>> float-4-rep scalar-float>integer ]
+            [ compiled-float>integer underlying>> ] bi =
+        ] all?
+    ]
+}
+Unit Test: {
+    { longlong-2{ 0 0 } }
+    [
+        double-2{ 1/0. -1/0. }
+        [ { double-2 } declare double-2 longlong-2 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { longlong-2{ 0 0 } }
+    [
+        ulonglong-2{ 9221120237041090561 18442240474082181121 }
+        double-2-cast
+        [ { double-2 } declare double-2 longlong-2 vconvert ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { { } }
+    [
+        uint-4{ 2139095041 4286578689 1069547520 3217031168 }
+        float-4-cast
+        [ compiled-float>integer drop ] collect-fp-exceptions
+    ]
+}
+Unit Test: {
+    { { +fp-zero-divide+ } }
+    [
+        uint-4{ 2139095041 4286578689 1069547520 3217031168 }
+        float-4-cast [
+            { +fp-zero-divide+ } set-fp-exception-flags
+            compiled-float>integer drop fp-exception-flags
+        ] without-fp-traps
+    ]
+}
+Unit Test: {
+    { uint-4{ 2147483648 4294967040 4294967295 0 } }
+    [
+        float-4{ 2147483648.0 4294967040.0 -1.0 4294967296.0 }
+        float-4 uint-4 test-vconvert
+    ]
+}
+Unit Test: {
+    {
+        half-8{
+            -32768.0
+            -2048.0
+            -1.0
+            0.0
+            1.0
+            2048.0
+            32752.0
+            32768.0
+        }
+    }
+    [
+        short-8{ -32768 -2049 -1 0 1 2049 32752 32767 } short-8
+        half-8 test-vconvert
+    ]
+}
+Unit Test: {
+    {
+        half-8{
+            0.0
+            1.0
+            2048.0
+            2052.0
+            32768.0
+            32768.0
+            65024.0
+            65504.0
+        }
+    }
+    [
+        ushort-8{ 0 1 2049 2051 32767 32768 65024 65504 }
+        ushort-8 half-8 test-vconvert
+    ]
+}
+Unit Test: {
+    {
+        bfloat-8{
+            -32768.0
+            -256.0
+            -1.0
+            0.0
+            1.0
+            256.0
+            32768.0
+            32768.0
+        }
+    }
+    [
+        short-8{ -32768 -257 -1 0 1 257 32704 32767 } short-8
+        bfloat-8 test-vconvert
+    ]
+}
+Unit Test: {
+    {
+        bfloat-8{
+            0.0
+            1.0
+            256.0
+            260.0
+            32768.0
+            32768.0
+            65280.0
+            65536.0
+        }
+    }
+    [
+        ushort-8{ 0 1 257 259 32767 32768 65280 65535 } ushort-8
+        bfloat-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { short-8{ -32768 -2 -1 0 0 1 2 32752 } }
+    [
+        half-8{
+            -32768.0
+            -2.75
+            -1.75
+            -0.75
+            0.75
+            1.75
+            2.75
+            32752.0
+        } half-8 short-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { ushort-8{ 65534 65535 0 0 1 2 32768 65504 } }
+    [
+        half-8{
+            -2.75
+            -1.75
+            -0.75
+            0.75
+            1.75
+            2.75
+            32768.0
+            65504.0
+        } half-8 ushort-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { short-8{ -32768 -2 -1 0 0 1 2 32640 } }
+    [
+        bfloat-8{
+            -32768.0
+            -2.75
+            -1.75
+            -0.75
+            0.75
+            1.75
+            2.75
+            32640.0
+        } bfloat-8 short-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { ushort-8{ 65534 65535 0 1 65280 0 0 512 } }
+    [
+        bfloat-8{
+            -2.75
+            -1.75
+            0.75
+            1.75
+            65280.0
+            65536.0
+            -65536.0
+            66048.0
+        } bfloat-8 ushort-8 test-vconvert
+    ]
+}
+Must Fail With: {
+    [ uint-4{ 5 1 2 6 } int-4 float-4 vconvert ]
+    [ bad-vconvert-input? ]
+}
+Must Fail With: {
+    [
+        int-4{ 1 2 3 4 } uint-4{ 5 1 2 6 } int-4 short-8
+        vconvert
+    ]
+    [ bad-vconvert-input? ]
+}
+Must Fail With: {
+    [
+        uint-4{ 1 2 3 4 } int-4{ 5 1 2 6 } int-4 short-8
+        vconvert
+    ]
+    [ bad-vconvert-input? ]
+}
+Must Fail With: {
+    [ uint-4{ 5 1 2 6 } int-4 longlong-2 vconvert ]
+    [ bad-vconvert-input? ]
+}
+Unit Test: {
+    { float-4{ -5.0 1.0 2.0 6.0 } }
+    [ int-4{ -5 1 2 6 } int-4 float-4 test-vconvert ]
+}
+Unit Test: {
+    { float-4{ 0.0 2147483648.0 4294967296.0 16777216.0 } }
+    [
+        uint-4{ 0 2147483648 4294967295 16777217 } uint-4
+        float-4 test-vconvert
+    ]
+}
+Unit Test: {
+    { double-2{ 9.223372036854776e+18 1.8446744073709552e+19 } }
+    [
+        ulonglong-2{ 9223372036854775808 18446744073709551615 }
+        ulonglong-2 double-2 test-vconvert
+    ]
+}
+Unit Test: {
+    { float-4{ 0.0 2147483648.0 4294967296.0 16777216.0 } }
+    [
+        t "always-inline-simd-intrinsics" [
+            uint-4{ 0 2147483648 4294967295 16777217 }
+            [ { uint-4 } declare uint-4 float-4 vconvert ]
+            compile-call
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { double-2{ 9.223372036854776e+18 1.8446744073709552e+19 } }
+    [
+        t "always-inline-simd-intrinsics" [
+            ulonglong-2{
+                9223372036854775808
+                18446744073709551615
+            } [
+                { ulonglong-2 } declare
+                ulonglong-2 double-2 vconvert
+            ] compile-call
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { int-4{ -5 1 2 6 } }
+    [ float-4{ -5.0 1.0 2.0 6.0 } float-4 int-4 test-vconvert ]
+}
+Unit Test: {
+    { uint-4{ 4294967295 4294967294 3000000000 3 } }
+    [
+        float-4{ -1.75 -2.25 3000000000.0 3.0 } float-4 uint-4
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { ulonglong-2{ 18446744073709551615 10000000000000000000 } }
+    [
+        double-2{ -1.75 1e+19 } double-2 ulonglong-2
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { int-4{ -5 1 2 6 } }
+    [
+        float-4{ -5.0 1.0 2.299999952316284 6.699999809265137 }
+        float-4 int-4 test-vconvert
+    ]
+}
+Unit Test: {
+    { uint-4{ 0 0 512 4294966784 } }
+    [
+        float-4{
+            4294967296.0
+            -4294967296.0
+            4294967808.0
+            -4294967808.0
+        } float-4 uint-4 test-vconvert
+    ]
+}
+Unit Test: {
+    { ulonglong-2{ 0 0 } }
+    [
+        double-2{
+            1.8446744073709552e+19
+            -1.8446744073709552e+19
+        } double-2 ulonglong-2 test-vconvert
+    ]
+}
+Unit Test: {
+    { double-2{ -5.0 1.0 } }
+    [ longlong-2{ -5 1 } longlong-2 double-2 test-vconvert ]
+}
+Unit Test: {
+    { longlong-2{ -5 1 } }
+    [ double-2{ -5.0 1.0 } double-2 longlong-2 test-vconvert ]
+}
+Must Fail With: {
+    [
+        double-2{ -5.0 1.0 } double-2{ 12.0 34.0 } double-2
+        int-4 test-vconvert
+    ]
+    [ error>> bad-vconvert? ]
+}
+Unit Test: {
+    { float-4{ -1.25 2.0 3.0 -4.0 } }
+    [
+        double-2{ -1.25 2.0 } double-2{ 3.0 -4.0 } double-2
+        float-4 test-vconvert
+    ]
+}
+Unit Test: {
+    { int-4{ -1 2 3 -4 } }
+    [
+        longlong-2{ -1 2 } longlong-2{ 3 -4 } longlong-2 int-4
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { short-8{ -1 2 3 -32768 5 32767 -7 32767 } }
+    [
+        int-4{ -1 2 3 -40000 } int-4{ 5 60000 -7 80000 } int-4
+        short-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { short-8{ -1 2 3 -32768 5 32767 -7 32767 } }
+    [
+        int-4{ -1 2 3 -40000 } int-4{ 5 60000 -7 80000 } int-4
+        short-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { ushort-8{ 0 2 3 0 5 60000 0 65535 } }
+    [
+        int-4{ -1 2 3 -40000 } int-4{ 5 60000 -7 80000 } int-4
+        ushort-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { ushort-8{ 65535 2 3 65535 5 60000 65535 65535 } }
+    [
+        uint-4{ 4294967295 2 3 4294927296 }
+        uint-4{ 5 60000 4294967289 80000 } uint-4 ushort-8
+        test-vconvert
+    ]
+}
+Must Fail With: {
+    [
+        uint-4{ 4294967295 2 3 4294927296 }
+        uint-4{ 5 60000 4294967289 80000 } uint-4 short-8
+        test-vconvert
+    ]
+    [ error>> bad-vconvert? ]
+}
+Unit Test: {
+    {
+        ushort-8{ 0 1 2 3 128 129 130 131 }
+        ushort-8{ 4 5 6 7 132 133 134 135 }
+    }
+    [
+        uchar-16{
+            0
+            1
+            2
+            3
+            128
+            129
+            130
+            131
+            4
+            5
+            6
+            7
+            132
+            133
+            134
+            135
+        } uchar-16 ushort-8 test-vconvert
+    ]
+}
+Unit Test: {
+    { double-2{ -1.25 2.0 } double-2{ 3.0 -4.0 } }
+    [
+        float-4{ -1.25 2.0 3.0 -4.0 } float-4 double-2
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { int-4{ -1 2 3 -4 } }
+    [ int-4{ -1 2 3 -4 } int-4 int-4 test-vconvert ]
+}
+Unit Test: {
+    { longlong-2{ -1 2 } longlong-2{ 3 -4 } }
+    [ int-4{ -1 2 3 -4 } int-4 longlong-2 test-vconvert ]
+}
+Must Fail With: {
+    [ int-4{ -1 2 3 -4 } int-4 ulonglong-2 test-vconvert ]
+    [ error>> bad-vconvert? ]
+}
+Unit Test: {
+    { ulonglong-2{ 1 2 } ulonglong-2{ 3 4 } }
+    [ uint-4{ 1 2 3 4 } uint-4 ulonglong-2 test-vconvert ]
+}
+Unit Test: {
+    { longlong-2{ 1 2 } longlong-2{ 3 4 } }
+    [ uint-4{ 1 2 3 4 } uint-4 longlong-2 test-vconvert ]
+}
+Unit Test: {
+    { int-4{ 1 2 -3 -4 } int-4{ 5 -6 7 -8 } }
+    [
+        short-8{ 1 2 -3 -4 5 -6 7 -8 } short-8 int-4
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { uint-4{ 1 2 3 4 } uint-4{ 5 6 7 8 } }
+    [
+        ushort-8{ 1 2 3 4 5 6 7 8 } ushort-8 uint-4
+        test-vconvert
+    ]
+}
+Unit Test: {
+    { longlong-2{ 1 2 } longlong-2{ 3 4 } }
+    [ uint-4{ 1 2 3 4 } uint-4 longlong-2 test-vconvert ]
+}
+Must Fail With: {
+    [
+        ushort-8{ 1 2 3 4 5 6 7 8 } ushort-8 longlong-2
+        test-vconvert
+    ]
+    [ error>> bad-vconvert? ]
+}
+Must Fail With: {
+    [
+        longlong-2{ 1 2 } longlong-2{ 3 4 } longlong-2{ 5 6 }
+        longlong-2{ 7 8 } longlong-2 ushort-8 test-vconvert
+    ]
+    [ error>> bad-vconvert? ]
+}
+TEST FAILURES 0
+COMPILER ERRORS 0

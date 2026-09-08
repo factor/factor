@@ -1,0 +1,2 @@
+clang -target aarch64-windows-msvc -ffreestanding -O2 -S probe.c
+Exit0; no diagnostics. Compiler ABI oracle only, no Windows runtime execution.

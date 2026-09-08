@@ -1,0 +1,27 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: alien alien.c-types compiler.codegen.labels
+cpu.arm.64.assembler cpu.arm.64.assembler.registers io kernel
+math prettyprint sequences tools.time ;
+IN: arm64-gap-isa.runtime-benchmark
+
+Equal wrapped results:
+t
+Interleaved separate/fused times, 10 million dependent multiplies (ns):
+12156254
+9624709
+12170727
+9113808
+12667852
+9986247
+13440497
+9118113
+12154491
+9503103
+13813556
+9155505
+19593941
+12422795

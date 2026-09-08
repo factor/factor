@@ -33,6 +33,7 @@ ERROR: register-type-error reg ;
 : W    ( Wn -- n ) check-32-bit check-general-register                      n>> ;
 : X    ( Xn -- n ) check-64-bit check-general-register                      n>> ;
 : R/ZR ( Rn -- n )              check-general-register check-zero-register  n>> ;
+: W/ZR ( Wn -- n ) check-32-bit check-general-register check-zero-register  n>> ;
 : X/ZR ( Xn -- n ) check-64-bit check-general-register check-zero-register  n>> ;
 : R/SP ( Rn -- n )              check-general-register check-stack-register n>> ;
 : X/SP ( Xn -- n ) check-64-bit check-general-register check-stack-register n>> ;
@@ -202,7 +203,7 @@ PRIVATE>
 : <SXTH> ( Rm uimm3 -- er ) check-Wm 5 <extended-register> ;
 : <SXTW> ( Rm uimm3 -- er ) check-Wm 6 <extended-register> ;
 : <SXTX> ( Rm uimm3 -- er ) check-Xm 7 <extended-register> ;
-: <LSL*> ( Rm uimm3 -- er ) over encode-width 2 + <extended-register> ;
+: <LSL*> ( Rm uimm3 -- er ) check-amount over encode-width 2 + <extended-register> ;
 
 <PRIVATE
 TUPLE: shifted-register < operand ;
@@ -458,7 +459,9 @@ UNION: logical-immediate
     6 toggle-bit [ -6 shift 1 bits ] [ 6 bits ] bi ;
 
 : immr ( pairs -- immr )
-    [ { f t } sequence= ] find drop bitnot 6 bits ;
+    ! The rotation is modulo the repeated element width. Keep the ignored
+    ! upper bits clear so narrow elements use the canonical encoding.
+    [ length 1 - ] [ [ { f t } sequence= ] find drop bitnot ] bi bitand ;
 
 ERROR: logical-immediate-error imm imm-width ;
 ERROR: element-error element element-width transitions ;
@@ -512,7 +515,10 @@ M: integer MOV 0 MOVZ ;
 
 
 <PRIVATE
-: bitfield ( Rd Rn immr imms opc -- )
+:: bitfield ( Rd Rn immr imms opc -- )
+    Rn encode-width 5 + :> nbits
+    Rd Rn immr nbits check-unsigned-immediate
+    imms nbits check-unsigned-immediate opc
     [ 2encode-width dup ] 3dip {
         { 0b100110 23 }
         { R/ZR 0 }
@@ -529,8 +535,14 @@ PRIVATE>
 :  BFM ( Rd Rn immr imms -- ) 1 bitfield ;
 : UBFM ( Rd Rn immr imms -- ) 2 bitfield ;
 
-: SBFX ( Rd Rn lsb width -- ) over + 1 - SBFM ;
-: UBFX ( Rd Rn lsb width -- ) over + 1 - UBFM ;
+<PRIVATE
+: bitfield-extract ( lsb width -- immr imms )
+    dup 0 > [ immediate-error ] unless over + 1 - ;
+PRIVATE>
+
+: SBFX  ( Rd Rn lsb width -- ) bitfield-extract SBFM ;
+: UBFX  ( Rd Rn lsb width -- ) bitfield-extract UBFM ;
+: BFXIL ( Rd Rn lsb width -- ) bitfield-extract BFM ;
 
 <PRIVATE
 : ?max-width ( Rn n -- Rn n max-width )
@@ -552,10 +564,25 @@ PRIVATE>
 
 : UBFIZ ( Rd Rn lsb width -- ) (BFIZ) UBFM ;
 : SBFIZ ( Rd Rn lsb width -- ) (BFIZ) SBFM ;
+: BFI   ( Rd Rn lsb width -- ) (BFIZ) BFM ;
+
+: EXTR ( Rd Rn Rm lsb -- )
+    ?max-width drop [ 3encode-width dup ] dip {
+        { 0b100111 23 }
+        { R/ZR 0 }
+        { R/ZR 5 }
+        { R/ZR 16 }
+        31
+        22
+        10
+    } encode ;
+
+M: integer ROR [ dup ] dip EXTR ;
 
 
 <PRIVATE
 : conditional-branch ( imm21 cond op -- )
+    [ 4 check-unsigned-immediate ] dip
     [ 2 ?>> 19 check-signed-immediate ] 2dip {
         { 0b0101010 25 }
         5
@@ -731,6 +758,7 @@ M: label CBNZ [ 0 CBNZ ] dip rc-relative-arm-b.cond/ldr label-fixup ;
 
 <PRIVATE
 : test-and-branch ( Rt imm6 imm14 op -- )
+    [ ?max-width drop ] 2dip
     [ [ -5 shift ] [ 5 bits ] bi ] 2dip
     [ 2 ?>> 14 check-signed-immediate ] dip {
         { 0b011011 25 }
@@ -869,6 +897,8 @@ ERROR: unknown-c-type c-type ;
         { tagged-rep [ 3 0 0 3 ] }
         { float      [ 2 1 0 2 ] }
         { float-rep  [ 2 1 0 2 ] }
+        { half-rep   [ 1 1 0 1 ] }
+        { bfloat-rep [ 1 1 0 1 ] }
         { double     [ 3 1 0 3 ] }
         { double-rep [ 3 1 0 3 ] }
         [ dup vector-rep? [ drop 0 1 1 4 ] [ unknown-c-type ] if ]
@@ -892,9 +922,11 @@ M: offset LDR* 1 load/store-register* ;
         [ scaling-error ]
     } cond ;
 
-: (load/store-register-register) ( Rt operand size VR opc1 L -- )
-    [ >offset< [ >operand< ] dip ] 4dip
-    [ tuck [ amount/size>S ] 2dip ] 3dip {
+:: (load/store-register-register) ( Rt operand size VR opc1 sh L -- )
+    operand >offset< :> ( Rn offset type )
+    offset >operand< :> ( Rm option amount )
+    ! Q registers encode size=0, but their scaled index shifts by four.
+    Rt Rn Rm option amount sh amount/size>S type size VR opc1 L {
         { 0b111 27 }
         { 0b1 21 }
         { n>> 0 }
@@ -910,21 +942,21 @@ M: offset LDR* 1 load/store-register* ;
     } encode ;
 PRIVATE>
 
-M: register-offset STRB 0 0 0 0 (load/store-register-register) ;
-M: register-offset LDRB 0 0 0 1 (load/store-register-register) ;
+M: register-offset STRB 0 0 0 0 0 (load/store-register-register) ;
+M: register-offset LDRB 0 0 0 0 1 (load/store-register-register) ;
 
-M: register-offset STRH 1 0 0 0 (load/store-register-register) ;
-M: register-offset LDRH 1 0 0 1 (load/store-register-register) ;
+M: register-offset STRH 1 0 0 1 0 (load/store-register-register) ;
+M: register-offset LDRH 1 0 0 1 1 (load/store-register-register) ;
 
 M:: register-offset LDRSB ( Rt operand -- )
-    Rt operand 0 0 1 Rt encode-width 1 bitxor (load/store-register-register) ;
+    Rt operand 0 0 1 0 Rt encode-width 1 bitxor (load/store-register-register) ;
 M:: register-offset LDRSH ( Rt operand -- )
-    Rt operand 1 0 1 Rt encode-width 1 bitxor (load/store-register-register) ;
-M: register-offset LDRSW 2 0 1 0 (load/store-register-register) ;
+    Rt operand 1 0 1 1 Rt encode-width 1 bitxor (load/store-register-register) ;
+M: register-offset LDRSW 2 0 1 2 0 (load/store-register-register) ;
 
 <PRIVATE
 : load/store-register-register ( Rt operand L -- )
-    [ over encode-width** drop ] dip (load/store-register-register) ;
+    [ over encode-width** ] dip (load/store-register-register) ;
 PRIVATE>
 
 M: register-offset STR 0 load/store-register-register ;
@@ -932,7 +964,7 @@ M: register-offset LDR 1 load/store-register-register ;
 
 <PRIVATE
 : load/store-register-register* ( Rt operand c-type L -- )
-    encode-c-type nip (load/store-register-register) ;
+    encode-c-type (load/store-register-register) ;
 PRIVATE>
 
 M: register-offset STR* 0 load/store-register-register* ;
@@ -978,6 +1010,10 @@ M: register ROR RORV ;
 PRIVATE>
 
 : RBIT ( Rd Rn -- ) 0b000000 data-processing-1-source ;
+: REV16 ( Rd Rn -- ) 0b000001 data-processing-1-source ;
+: REV32 ( Xd Xn -- )
+    [ check-64-bit ] bi@ 0b000010 data-processing-1-source ;
+: REV ( Rd Rn -- ) dup encode-width 2 + data-processing-1-source ;
 
 : CLZ ( Rd Rn -- ) 0b000100 data-processing-1-source ;
 : CLS ( Rd Rn -- ) 0b000101 data-processing-1-source ;
@@ -1025,7 +1061,8 @@ M: register MOV ( Rd register -- )
 
 <PRIVATE
 : add/sub-shifted-register ( Rd Rn operand op -- )
-    [ >operand< ] dip [ 3encode-width ] 3dip {
+    [ >operand< [ dup 3 = [ immediate-error ] when ] dip ] dip
+    [ 3encode-width ] 3dip {
         { 0b01011 24 }
         { R/ZR 0 }
         { R/ZR 5 }
@@ -1055,7 +1092,7 @@ ERROR: extended-register-width-mismatch Rd Rn Rm ;
 : add/sub-extended-register ( Rd Rn operand op -- )
     [ >operand< ] dip [ ext-encode-width ] 3dip {
         { 0b01011001 21 }
-        { R/SP 0 }
+        { R 0 }
         { R/SP 5 }
         { R/ZR 16 }
         31
@@ -1065,14 +1102,59 @@ ERROR: extended-register-width-mismatch Rd Rn Rm ;
     } encode ;
 PRIVATE>
 
-M: extended-register ADD  0 add/sub-extended-register ;
-M: extended-register ADDS 1 add/sub-extended-register ;
-M: extended-register SUB  2 add/sub-extended-register ;
-M: extended-register SUBS 3 add/sub-extended-register ;
+M: extended-register ADD  [ check-stack-register ] 2dip 0 add/sub-extended-register ;
+M: extended-register ADDS [ check-zero-register  ] 2dip 1 add/sub-extended-register ;
+M: extended-register SUB  [ check-stack-register ] 2dip 2 add/sub-extended-register ;
+M: extended-register SUBS [ check-zero-register  ] 2dip 3 add/sub-extended-register ;
+
+
+<PRIVATE
+: add/sub-carry ( Rd Rn Rm op -- )
+    [ 3encode-width ] dip {
+        { 0b11010000 21 }
+        { R/ZR 0 }
+        { R/ZR 5 }
+        { R/ZR 16 }
+        31
+        29
+    } encode ;
+PRIVATE>
+
+: ADC  ( Rd Rn Rm -- ) 0 add/sub-carry ;
+: ADCS ( Rd Rn Rm -- ) 1 add/sub-carry ;
+: SBC  ( Rd Rn Rm -- ) 2 add/sub-carry ;
+: SBCS ( Rd Rn Rm -- ) 3 add/sub-carry ;
+: NGC  ( Rd Rm -- ) insert-zero-register* SBC ;
+: NGCS ( Rd Rm -- ) insert-zero-register* SBCS ;
+
+
+<PRIVATE
+: conditional-compare ( Rn operand sf nzcv cond immediate op -- )
+    [ [ 4 check-unsigned-immediate ] bi@ ] 2dip {
+        { 0b11010010 21 }
+        { 0b1 29 }
+        { R/ZR 5 }
+        16
+        31
+        0
+        12
+        11
+        30
+    } encode ;
+PRIVATE>
+
+GENERIC#: CCMN 2 ( Rn operand nzcv cond -- )
+GENERIC#: CCMP 2 ( Rn operand nzcv cond -- )
+
+M: register CCMN [ 2encode-width [ R/ZR ] dip ] 2dip 0 0 conditional-compare ;
+M: register CCMP [ 2encode-width [ R/ZR ] dip ] 2dip 0 1 conditional-compare ;
+M: integer CCMN [ [ 1encode-width ] dip 5 check-unsigned-immediate swap ] 2dip 1 0 conditional-compare ;
+M: integer CCMP [ [ 1encode-width ] dip 5 check-unsigned-immediate swap ] 2dip 1 1 conditional-compare ;
 
 
 <PRIVATE
 : conditional-select ( Rd Rn Rm cond op op2 -- )
+    [ 4 check-unsigned-immediate ] 2dip
     [ 3encode-width ] 3dip {
         { 0b11010100 21 }
         { R/ZR 0 }
@@ -1108,6 +1190,31 @@ PRIVATE>
 : MSUB ( Rd Rn Rm Ra -- ) 1 data-processing-3-sources ;
 
 : MUL ( Rd Rn Rm -- ) dup >zero-register MADD ;
+: MNEG ( Rd Rn Rm -- ) dup >zero-register MSUB ;
+
+<PRIVATE
+: multiply-long ( Xd Wn Wm Xa U op -- )
+    {
+        { 0b10011011 24 }
+        { 0b1 21 }
+        { X/ZR 0 }
+        { W/ZR 5 }
+        { W/ZR 16 }
+        { X/ZR 10 }
+        23
+        15
+    } encode ;
+PRIVATE>
+
+: SMADDL ( Xd Wn Wm Xa -- ) 0 0 multiply-long ;
+: SMSUBL ( Xd Wn Wm Xa -- ) 0 1 multiply-long ;
+: UMADDL ( Xd Wn Wm Xa -- ) 1 0 multiply-long ;
+: UMSUBL ( Xd Wn Wm Xa -- ) 1 1 multiply-long ;
+! SMULL/UMULL already name the SIMD forms below.
+: SMULLs  ( Xd Wn Wm -- ) XZR SMADDL ;
+: SMNEGL  ( Xd Wn Wm -- ) XZR SMSUBL ;
+: UMULLs  ( Xd Wn Wm -- ) XZR UMADDL ;
+: UMNEGL  ( Xd Wn Wm -- ) XZR UMSUBL ;
 
 <PRIVATE
 : data-processing-3-sources* ( Xd Xn Xm op -- )
@@ -1396,11 +1503,15 @@ PRIVATE>
     } encode ;
 
 : simd-2-misc*-elt ( Rd Rn shape U size1 opcode -- ) reach Q simd-2-misc* ;
+
+! FCVTL encodes the destination precision, but takes the source arrangement
+! like the other widening instructions (4H -> 4S, 2S -> 2D).
+: simd-fp-widen-shape ( shape -- shape' ) size>> 1 + 1 <vector-shape> ;
 PRIVATE>
 
 : FCVTN    ( Rd Rn shape -- ) 0 0 0b10110 0 simd-2-misc* ;
-: FCVTL    ( Rd Rn shape -- ) 0 0 0b10111 0 simd-2-misc* ;
-: FCVTL2   ( Rd Rn shape -- ) 0 0 0b10111 1 simd-2-misc* ;
+: FCVTL    ( Rd Rn shape -- ) simd-fp-widen-shape 0 0 0b10111 0 simd-2-misc* ;
+: FCVTL2   ( Rd Rn shape -- ) simd-fp-widen-shape 0 0 0b10111 1 simd-2-misc* ;
 : FRINTNv ( Rd Rn shape -- ) 0 0 0b11000 simd-2-misc*-elt ;
 : FRINTMv ( Rd Rn shape -- ) 0 0 0b11001 simd-2-misc*-elt ;
 : FRINTPv ( Rd Rn shape -- ) 0 1 0b11000 simd-2-misc*-elt ;
@@ -1619,3 +1730,84 @@ PRIVATE>
 : FCVTNH2 ( Rd Rn -- ) 0x4e216800 neon-extension-2 ;
 : BFCVTN ( Rd Rn -- ) 0x0ea16800 neon-extension-2 ;
 : BFCVTN2 ( Rd Rn -- ) 0x4ea16800 neon-extension-2 ;
+
+! Baseline A64 memory ordering. Address operands are bare X registers or SP;
+! these instructions have no displacement, indexing, or writeback forms.
+<PRIVATE
+:: ordered-memory ( Rt Rn size opcode -- )
+    Rt R/ZR Rn X/SP size opcode {
+        { 0b001000 24 }
+        0 5 30 10
+    } encode ;
+
+:: ordered-memory-word ( Rt Rn opcode -- )
+    Rt Rn Rt encode-width 2 + opcode ordered-memory ;
+
+:: ordered-memory-small ( Wt Rn size opcode -- )
+    Wt check-32-bit Rn size opcode ordered-memory ;
+
+ERROR: exclusive-register-overlap status data base ;
+:: exclusive-store ( Ws Rt Rn size release -- )
+    ! Overlap of status with data, or a non-SP base, is constrained
+    ! unpredictable. Match Clang's rejection, including WZR/XZR overlap.
+    Ws W/ZR :> status
+    Rt R/ZR :> data
+    Rn X/SP :> base
+    status data = status base = base 31 = not and or
+    [ Ws Rt Rn exclusive-register-overlap ] when
+    status data base size release {
+        { 0b001000 24 }
+        { 0b11111 10 }
+        16 0 5 30 15
+    } encode ;
+
+:: exclusive-store-word ( Ws Rt Rn release -- )
+    Ws Rt Rn Rt encode-width 2 + release exclusive-store ;
+
+:: exclusive-store-small ( Ws Wt Rn size release -- )
+    Ws Wt check-32-bit Rn size release exclusive-store ;
+PRIVATE>
+
+: LDAR   ( Rt Rn -- ) 0b11011111111111 ordered-memory-word ;
+: STLR   ( Rt Rn -- ) 0b10011111111111 ordered-memory-word ;
+: LDXR   ( Rt Rn -- ) 0b01011111011111 ordered-memory-word ;
+: LDAXR  ( Rt Rn -- ) 0b01011111111111 ordered-memory-word ;
+: LDARB  ( Wt Rn -- ) 0 0b11011111111111 ordered-memory-small ;
+: LDARH  ( Wt Rn -- ) 1 0b11011111111111 ordered-memory-small ;
+: STLRB  ( Wt Rn -- ) 0 0b10011111111111 ordered-memory-small ;
+: STLRH  ( Wt Rn -- ) 1 0b10011111111111 ordered-memory-small ;
+: LDXRB  ( Wt Rn -- ) 0 0b01011111011111 ordered-memory-small ;
+: LDXRH  ( Wt Rn -- ) 1 0b01011111011111 ordered-memory-small ;
+: LDAXRB ( Wt Rn -- ) 0 0b01011111111111 ordered-memory-small ;
+: LDAXRH ( Wt Rn -- ) 1 0b01011111111111 ordered-memory-small ;
+: STXR   ( Ws Rt Rn -- ) 0 exclusive-store-word ;
+: STLXR  ( Ws Rt Rn -- ) 1 exclusive-store-word ;
+: STXRB  ( Ws Wt Rn -- ) 0 0 exclusive-store-small ;
+: STXRH  ( Ws Wt Rn -- ) 1 0 exclusive-store-small ;
+: STLXRB ( Ws Wt Rn -- ) 0 1 exclusive-store-small ;
+: STLXRH ( Ws Wt Rn -- ) 1 1 exclusive-store-small ;
+
+! DMB/DSB accept the architectural four-bit immediate option. ISB and CLREX
+! expose the ordinary full-system/default forms, with option 15.
+: DMB ( option -- )
+    4 check-unsigned-immediate { { 0xd50330bf 0 } 8 } encode ;
+: DSB ( option -- )
+    4 check-unsigned-immediate { { 0xd503309f 0 } 8 } encode ;
+: ISB ( -- ) { { 0xd5033fdf 0 } } encode ;
+: CLREX ( -- ) { { 0xd5033f5f 0 } } encode ;
+
+<PRIVATE
+: fp-data-processing-3-sources ( Rd Rn Rm Ra negate subtract -- )
+    [ 4 (nencode-width***) ] 2dip {
+        { 0b11111 24 }
+        { F 0 } { F 5 } { F 16 } { F 10 }
+        22 21 15
+    } encode ;
+PRIVATE>
+
+! Fused operations round once; selecting them for a separate multiply/add
+! would change numerical semantics, so they are assembler-only for now.
+: FMADDs  ( Rd Rn Rm Ra -- ) 0 0 fp-data-processing-3-sources ;
+: FMSUBs  ( Rd Rn Rm Ra -- ) 0 1 fp-data-processing-3-sources ;
+: FNMADDs ( Rd Rn Rm Ra -- ) 1 0 fp-data-processing-3-sources ;
+: FNMSUBs ( Rd Rn Rm Ra -- ) 1 1 fp-data-processing-3-sources ;

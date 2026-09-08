@@ -1,0 +1,6 @@
+7a46a73edcd4d5086c5701b487ec42511fe2867e295c28aa20f1fc9ba9374740  basis/cpu/arm/64/assembler/assembler.factor
+c369b4fc0c28383f2e777a1c11fb97d3598f546cea94193eb83fd9b80b5064ee  basis/cpu/arm/64/assembler/assembler-tests.factor
+545070c52b2c6a22033df217066c304ed29595ed02c35ab8a1df015af7d00578  basis/cpu/arm/64/64.factor
+0c1108a565f2a857a862c29313e25d75bda915d527d4fe0050b91585dc8bfcf6  basis/cpu/arm/64/64-tests.factor
+621e8f436138fdedf962536a85d25dcc2c668ea1ba91852d9b49705fd03c88bd  basis/math/vectors/simd/extensions/extensions.factor
+6b646e6f66bf13928e41f034e3f620dc3abada249b0b3b9a34406369214a6863  basis/math/vectors/simd/extensions/extensions-tests.factor

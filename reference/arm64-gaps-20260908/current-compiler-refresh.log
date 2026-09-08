@@ -1,0 +1,16 @@
+compiler.cfg.checker
+compiler.cfg.copy-prop
+compiler.cfg.linear-scan.checker
+compiler.cfg.linear-scan
+compiler.cfg.register-allocation
+compiler.cfg.register-allocation.greedy
+compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.chordal
+compiler.cfg.value-numbering.folding
+compiler.cfg.representations.selection
+compiler.cfg.finalization
+compiler.cfg.value-numbering.simd
+compiler.cfg.value-numbering.global
+compiler.cfg.value-numbering
+compiler.cfg.optimizer
+Current compiler integration refreshed

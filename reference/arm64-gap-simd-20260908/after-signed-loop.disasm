@@ -1,0 +1,109 @@
+
+live-compiled-word.o:	file format mach-o arm64
+
+Disassembly of section __TEXT,__text:
+
+0000000000000000 <ltmp0>:
+       0: f9000318     	str	x24, [x24]
+       4: a9bf7bfd     	stp	x29, x30, [sp, #-0x10]!
+       8: 910003fd     	mov	x29, sp
+       c: f94002a0     	ldr	x0, [x21]
+      10: 58000041     	ldr	x1, 0x18 <ltmp0+0x18>
+      14: 14000003     	b	0x20 <ltmp0+0x20>
+      18: 14a2f4e7     	b	0x28bd3b4 <ltmp0+0x28bd3b4>
+      1c: 00000001     	udf	#0x1
+      20: d2800002     	mov	x2, #0x0                ; =0
+      24: 910042b5     	add	x21, x21, #0x10
+      28: f81f02a1     	stur	x1, [x21, #-0x10]
+      2c: f81f82bf     	stur	xzr, [x21, #-0x8]
+      30: 14000004     	b	0x40 <ltmp0+0x40>
+      34: f9000318     	str	x24, [x24]
+      38: 910022b5     	add	x21, x21, #0x8
+      3c: d10022d6     	sub	x22, x22, #0x8
+      40: 910042b5     	add	x21, x21, #0x10
+      44: f81f82a2     	stur	x2, [x21, #-0x8]
+      48: f90002a0     	str	x0, [x21]
+      4c: f81f02a0     	stur	x0, [x21, #-0x10]
+      50: 97bbe17c     	bl	0xfffffffffeef8640 <ltmp0+0xfffffffffeef8640>
+      54: f94002a0     	ldr	x0, [x21]
+      58: d10022b5     	sub	x21, x21, #0x8
+      5c: f100041f     	cmp	x0, #0x1
+      60: 54000820     	b.eq	0x164 <ltmp0+0x164>
+      64: f9400a60     	ldr	x0, [x19, #0x10]
+      68: 91010000     	add	x0, x0, #0x40
+      6c: f9401261     	ldr	x1, [x19, #0x20]
+      70: eb01001f     	cmp	x0, x1
+      74: 5400004d     	b.le	0x7c <ltmp0+0x7c>
+      78: 97cfda6e     	bl	0xffffffffff3f6a30 <ltmp0+0xffffffffff3f6a30>
+      7c: f85f02a1     	ldur	x1, [x21, #-0x10]
+      80: f85f82a2     	ldur	x2, [x21, #-0x8]
+      84: f94002a0     	ldr	x0, [x21]
+      88: f8409021     	ldur	x1, [x1, #0x9]
+      8c: 9c0007a0     	ldr	q0, 0x180 <ltmp0+0x180>
+      90: 3cc07021     	ldur	q1, [x1, #0x7]
+      94: 4ee0343e     	cmgt.2d	v30, v1, v0
+      98: 6e611c1e     	bsl.16b	v30, v0, v1
+      9c: 4ebe1fc1     	mov.16b	v1, v30
+      a0: 9c000780     	ldr	q0, 0x190 <ltmp0+0x190>
+      a4: 4ee08421     	add.2d	v1, v1, v0
+      a8: f9400a63     	ldr	x3, [x19, #0x10]
+      ac: 91008069     	add	x9, x3, #0x20
+      b0: f9000a69     	str	x9, [x19, #0x10]
+      b4: d2800489     	mov	x9, #0x24               ; =36
+      b8: f9000069     	str	x9, [x3]
+      bc: 91002463     	add	x3, x3, #0x9
+      c0: b27803e1     	orr	x1, xzr, #0x100
+      c4: f81ff061     	stur	x1, [x3, #-0x1]
+      c8: 3c807061     	stur	q1, [x3, #0x7]
+      cc: 58000041     	ldr	x1, 0xd4 <ltmp0+0xd4>
+      d0: 14000003     	b	0xdc <ltmp0+0xdc>
+      d4: 102bb432     	adr	x18, 0x57758 <ltmp0+0x57758>
+      d8: 00000001     	udf	#0x1
+      dc: f9400a65     	ldr	x5, [x19, #0x10]
+      e0: 910080a9     	add	x9, x5, #0x20
+      e4: f9000a69     	str	x9, [x19, #0x10]
+      e8: d2800389     	mov	x9, #0x1c               ; =28
+      ec: f90000a9     	str	x9, [x5]
+      f0: 91001ca5     	add	x5, x5, #0x7
+      f4: f80010a1     	stur	x1, [x5, #0x1]
+      f8: f80090a3     	stur	x3, [x5, #0x9]
+      fc: b27c03e1     	orr	x1, xzr, #0x10
+     100: 92400c43     	and	x3, x2, #0xf
+     104: 910022d6     	add	x22, x22, #0x8
+     108: f100007f     	cmp	x3, #0x0
+     10c: 540001c1     	b.ne	0x144 <ltmp0+0x144>
+     110: ab010042     	adds	x2, x2, x1
+     114: 540000a6     	b.vs	0x128 <ltmp0+0x128>
+     118: d10022b5     	sub	x21, x21, #0x8
+     11c: f81f82a5     	stur	x5, [x21, #-0x8]
+     120: f90002a2     	str	x2, [x21]
+     124: 17ffffc4     	b	0x34 <ltmp0+0x34>
+     128: f90002c0     	str	x0, [x22]
+     12c: f81f02a5     	stur	x5, [x21, #-0x10]
+     130: f90002a1     	str	x1, [x21]
+     134: 97c45d07     	bl	0xffffffffff117550 <ltmp0+0xffffffffff117550>
+     138: f94002c0     	ldr	x0, [x22]
+     13c: f94002a2     	ldr	x2, [x21]
+     140: 17ffffbd     	b	0x34 <ltmp0+0x34>
+     144: f90002c0     	str	x0, [x22]
+     148: f81f02a5     	stur	x5, [x21, #-0x10]
+     14c: f90002a1     	str	x1, [x21]
+     150: 97cf0fbc     	bl	0xffffffffff3c4040 <ltmp0+0xffffffffff3c4040>
+     154: 97cf0b6b     	bl	0xffffffffff3c2f00 <ltmp0+0xffffffffff3c2f00>
+     158: f94002c0     	ldr	x0, [x22]
+     15c: f94002a2     	ldr	x2, [x21]
+     160: 17ffffb5     	b	0x34 <ltmp0+0x34>
+     164: d10042b5     	sub	x21, x21, #0x10
+     168: f9000318     	str	x24, [x24]
+     16c: a8c17bfd     	ldp	x29, x30, [sp], #0x10
+     170: d65f03c0     	ret
+		...
+     180: ffffffff     	<unknown>
+     184: 7fffffff     	<unknown>
+     188: 30f8500d     	adr	x13, 0xffffffffffff0b89 <ltmp0+0xffffffffffff0b89>
+     18c: 00038244     	<unknown>
+     190: 00000001     	udf	#0x1
+     194: 00000000     	udf	#0x0
+     198: ffffffff     	<unknown>
+     19c: ffffffff     	<unknown>
+		...

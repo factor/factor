@@ -1,0 +1,13 @@
+Unit Test: {
+    { 81 }
+    [
+        81 <iota> [
+            {
+                [ 3 mod ]
+                [ 3 /i 3 mod ]
+                [ 9 /i 3 mod ]
+                [ 27 /i 3 mod ]
+            } cleave 4array check-dispatch
+        ] count
+    ]
+}

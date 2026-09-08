@@ -421,3 +421,8 @@ int bug1021_test_2(int x, char *y, void *z) {
 void* bug1021_test_3(int x) {
   return (void*)(size_t)((long)x);
 }
+
+#include "ffi_test_small.h"
+#if defined(__APPLE__) && defined(__aarch64__)
+#include "ffi_test_arm64.c"
+#endif

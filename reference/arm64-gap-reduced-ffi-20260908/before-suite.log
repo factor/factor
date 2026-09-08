@@ -1,0 +1,29 @@
+Generic word unbox-parameter does not define a method for the small-float-c-type class.
+Dispatching on object: T{ small-float-c-type f float float ~quotation~ ~quotation~...
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(O) parse-file
+(O) parse-stream
+(O) finish-compilation-unit
+(O) M\ optimizing-compiler recompile
+(O) compile-word
+(O) backend
+(O) build-cfg
+(O) (build-cfg)
+(O) emit-nodes
+(O) M\ #alien-invoke emit-node
+(O) params>alien-insn-params
+(O) caller-parameters
+(O) unbox-parameters
+(O) M\ object unbox-parameter
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

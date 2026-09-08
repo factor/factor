@@ -36,7 +36,9 @@ HELP: FUNCTION:
 { $values { "return" "a C return type" } { "name" "a C function name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
 { $description "Defines a new word " { $snippet "name" } " which calls the C library function with the same " { $snippet "name" } " in the logical library given by the most recent " { $link POSTPONE: LIBRARY: } " declaration."
 $nl
-"The new word must be compiled before being executed." }
+"The new word must be compiled before being executed."
+$nl
+"For a variadic C function, put " { $snippet "..." } " between the named and unnamed parameters. List the concrete types and names for every argument at this call site. For example, " { $snippet "FUNCTION: int printf ( c-string format, ... int value )" } ". Unnamed float arguments are promoted to double; integer types narrower than int are promoted to int. The FFI normalizes these types before coercion; supply the desired promoted value. To model an intermediate C float cast, explicitly round with float>bits bits>float before the call. A declaration has at most one marker. CALLBACK: does not accept variadic declarations." }
 { $examples
 "For example, suppose the " { $snippet "foo" } " library exports the following function:"
 { $code

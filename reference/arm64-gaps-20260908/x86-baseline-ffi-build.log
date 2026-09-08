@@ -1,0 +1,3 @@
+BUILD_DIR: build
+clang -arch x86_64 -c -mmacos-version-min=14.0 -target x86_64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-gap-isa-3c430ff2fc8d4e658bda985a0e5f412f1836930d"  -O3  -std=c99 -o build/ffi_test.o vm/ffi_test.c
+clang -arch x86_64 -mmacos-version-min=14.0 -target x86_64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-gap-isa-3c430ff2fc8d4e658bda985a0e5f412f1836930d"  -O3  -dynamiclib -o libfactor-ffi-test.dylib build/ffi_test.o

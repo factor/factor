@@ -2,7 +2,7 @@ USING: help.markup help.syntax math ;
 IN: math.floats.small
 
 ARTICLE: "small-float-memory-types" "Small floating-point memory types"
-"The " { $vocab-link "math.floats.small.c-types" } " vocabulary defines two-byte half and bfloat memory element types. They can be used with alien memory accessors; scalar calls by value are not supported." ;
+"The " { $vocab-link "math.floats.small.c-types" } " vocabulary defines two-byte half and bfloat memory element types. They can be used with alien memory accessors. On ARM64, scalar calls by value use the C _Float16 and __bf16 conventions; direct calls, indirect calls and callbacks are supported when the C toolchain supports these types. Values convert numerically, using round-to-nearest ties-to-even and canonical NaNs. Windows ARM64 variadic signatures containing scalar half/BF16 parameters are rejected because their integer-register calling convention is not implemented. Other architectures retain memory-only support." ;
 
 HELP: float>half-bits
 { $values { "x" real } { "bits" integer } }

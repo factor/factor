@@ -1,0 +1,10 @@
+50 x three frontend/register-allocation compilations (ns):
+25873542
+36373396
+40882699
+31651385
+34385757
+28947148
+28359700
+No-negation CFG: 10,000 x 200 instructions pass time (ns):
+12750631

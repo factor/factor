@@ -1,0 +1,82 @@
+Unit Test: { { t } [ arm64-features optional-arm64-features subset? ] }
+Unit Test: {
+    { { } }
+    [
+        optional-arm64-features disabled-arm64-features
+        [ arm64-features ] with-variable
+    ]
+}
+Unit Test: {
+    { { } }
+    [
+        t "disable-neon-extensions"
+        [ arm64-features ] with-variable
+    ]
+}
+Unit Test: { { f } [ "not-a-cpu-feature" arm64-feature? ] }
+Unit Test: { { t } [ { } arm64-features-supported? ] }
+Unit Test: { { { 43 67 68 66 } } [ { 43 67 68 66 } ] }
+Unit Test: { { { } } [ [ drop 0 ] windows-query>arm64-features ] }
+Unit Test: {
+    { { "dotprod" "fp16" "bf16" "i8mm" } }
+    [ [ drop 1 ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { { "dotprod" "fp16" "bf16" "i8mm" } }
+    [ [ drop -1 ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { { } }
+    [
+        [ { 29 30 31 34 44 45 46 47 52 57 69 } member? 1 0 ? ]
+        windows-query>arm64-features
+    ]
+}
+Unit Test: {
+    { { } }
+    [ [ "query failed" throw ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { t }
+    [
+        81 <iota> [
+            {
+                [ 3 mod ]
+                [ 3 /i 3 mod ]
+                [ 9 /i 3 mod ]
+                [ 27 /i 3 mod ]
+            } cleave 4array check-windows-responses
+        ] all?
+    ]
+}
+Unit Test: {
+    { { 43 67 68 66 } }
+    [
+        V{ } clone
+        [ '[ _ push 0 ] windows-query>arm64-features drop ] keep
+        >array
+    ]
+}
+Unit Test: {
+    { t }
+    [ windows \ probe-arm64-features ?lookup-method >boolean ]
+}
+Unit Test: {
+    { t }
+    [
+        "cpu.arm.64.features.windows.kernel32" lookup-vocab
+        >boolean os windows? =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            \ detected-arm64-features "memoize" word-prop [
+                t over set-first
+                { "saved-image-only" } swap set-second
+            ] keep startup-hooks get "cpu.arm.64.features" of
+            ( -- ) call-effect first not
+        ] [ \ detected-arm64-features reset-memoized ] finally
+    ]
+}

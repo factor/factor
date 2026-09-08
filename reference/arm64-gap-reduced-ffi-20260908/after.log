@@ -1,0 +1,155 @@
+Unit Test: { { 1.5 } [ 1.5 half_identity ] }
+Unit Test: {
+    { -2.5 }
+    [
+        -2.5 "half_identity" "small-floats-test" library-dll
+        dlsym half-indirect
+    ]
+}
+Unit Test: { { 16.0 } [ 1 2.5 3.0 4.5 5 half_mixed ] }
+Unit Test: { { 2.0 } [ half-cb [ 1.5 half_callback ] with-callback ] }
+Unit Test: { { 55.0 } [ 1 2 3 4 5 6 7 8 9 10 half_overflow ] }
+Unit Test: {
+    { 55.0 }
+    [
+        half-overflow-cb
+        [ half_overflow_callback ] with-callback
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0.0
+            -0.0
+            1.0
+            -1.0
+            1.00048828125
+            1.00146484375
+            1.00390625
+            1.01171875
+            5.960464477539063e-8
+            0.00006103515625
+            65504.0
+            65520.0
+            1/0.
+            -1/0.
+        }
+        [ [ half_bits ] [ half_convert float>half-bits ] bi = ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            2
+            127
+            128
+            255
+            256
+            1023
+            1024
+            16383
+            16384
+            30000
+            32768
+            32769
+            49152
+        } [ [ half_from_bits float>half-bits ] keep = ] all?
+    ]
+}
+Unit Test: { { 1.5 } [ 1.5 bfloat_identity ] }
+Unit Test: {
+    { -2.5 }
+    [
+        -2.5 "bfloat_identity" "small-floats-test" library-dll
+        dlsym bfloat-indirect
+    ]
+}
+Unit Test: { { 16.0 } [ 1 2.5 3.0 4.5 5 bfloat_mixed ] }
+Unit Test: { { 2.0 } [ bfloat-cb [ 1.5 bfloat_callback ] with-callback ] }
+Unit Test: { { 55.0 } [ 1 2 3 4 5 6 7 8 9 10 bfloat_overflow ] }
+Unit Test: {
+    { 55.0 }
+    [
+        bfloat-overflow-cb
+        [ bfloat_overflow_callback ] with-callback
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0.0
+            -0.0
+            1.0
+            -1.0
+            1.00048828125
+            1.00146484375
+            1.00390625
+            1.01171875
+            5.960464477539063e-8
+            0.00006103515625
+            65504.0
+            65520.0
+            1/0.
+            -1/0.
+        } [
+            [ bfloat_bits ] [ bfloat_convert float>bfloat-bits ]
+            bi =
+        ] all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            2
+            127
+            128
+            255
+            256
+            1023
+            1024
+            16383
+            16384
+            30000
+            32768
+            32769
+            49152
+        } [ [ bfloat_from_bits float>bfloat-bits ] keep = ] all?
+    ]
+}
+Unit Test: {
+    { 4.0 }
+    [ mixed-small <struct> 1.5 >>a 2.5 >>b mixed_small_sum ]
+}
+Unit Test: {
+    { t }
+    [
+        65536 <iota> [
+            [ half_from_bits float>half-bits ]
+            [ half-bits>float float>half-bits ] bi =
+        ] all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        65536 <iota> [
+            [ bfloat_from_bits float>bfloat-bits ]
+            [ bfloat-bits>float float>bfloat-bits ] bi =
+        ] all?
+    ]
+}
+Unit Test: { { 11.5 } [ 0 1.5 2.5 3 4.5 half_varargs ] }
+Unit Test: { { 11.5 } [ 0 1.5 2.5 3 4.5 bfloat_varargs ] }
+Unit Test: { { 1.0 1.0 } [ half_dirty_result bfloat_dirty_result ] }
+Unit Test: { { 2.0 } [ 0 1.00048828125 1.00048828125 0 0.0 half_varargs ] }
+Unit Test: { { 2.0 } [ 0 1.00390625 1.00390625 0 0.0 bfloat_varargs ] }
+0

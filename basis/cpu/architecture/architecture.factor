@@ -19,7 +19,10 @@ SINGLETONS: tagged-rep int-rep ;
 
 ! Floating point registers can contain data with
 ! one of these representations
-SINGLETONS: float-rep double-rep ;
+SINGLETONS: float-rep double-rep half-rep bfloat-rep ;
+
+! Raw binary16/BF16 payloads in the low 16 bits of an FP register.
+UNION: small-float-rep half-rep bfloat-rep ;
 
 ! On x86, floating point registers are really vector registers
 SINGLETONS:
@@ -115,6 +118,7 @@ UNION: representation
     int-rep
     float-rep
     double-rep
+    small-float-rep
     vector-rep
     scalar-rep ;
 
@@ -166,6 +170,7 @@ M: tagged-rep reg-class-of drop int-regs ;
 M: int-rep reg-class-of drop int-regs ;
 M: float-rep reg-class-of drop float-regs ;
 M: double-rep reg-class-of drop float-regs ;
+M: small-float-rep reg-class-of drop float-regs ;
 
 ! Note that on PowerPC, vectors and floats are stored in different
 ! register banks. But Factor doesn't support SIMD on that platform.
@@ -178,6 +183,7 @@ M: tagged-rep rep-size drop cell ;
 M: int-rep rep-size drop cell ;
 M: float-rep rep-size drop 4 ;
 M: double-rep rep-size drop 8 ;
+M: small-float-rep rep-size drop 2 ;
 M: vector-rep rep-size drop 16 ;
 M: char-scalar-rep rep-size drop 1 ;
 M: uchar-scalar-rep rep-size drop 1 ;
@@ -263,6 +269,7 @@ HOOK: %add-imm cpu ( dst src1 src2 -- )
 HOOK: %sub     cpu ( dst src1 src2 -- )
 HOOK: %sub-imm cpu ( dst src1 src2 -- )
 HOOK: %mul     cpu ( dst src1 src2 -- )
+HOOK: %mneg    cpu ( dst src1 src2 -- )
 HOOK: %mul-imm cpu ( dst src1 src2 -- )
 HOOK: %and     cpu ( dst src1 src2 -- )
 HOOK: %and-imm cpu ( dst src1 src2 -- )
@@ -280,6 +287,13 @@ HOOK: %min     cpu ( dst src1 src2 -- )
 HOOK: %max     cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 HOOK: %neg     cpu ( dst src -- )
+
+! Portable lowering for backends without a fused integer multiply-negate.
+M:: object %mneg ( dst src1 src2 -- )
+    ! Two-operand backends require the aliased input in src1.
+    dst src2 eq?
+    [ dst src2 src1 %mul ] [ dst src1 src2 %mul ] if
+    dst dst %neg ;
 HOOK: %log2    cpu ( dst src -- )
 HOOK: %bit-count cpu ( dst src -- )
 HOOK: %bit-test cpu ( dst src1 src2 temp -- )

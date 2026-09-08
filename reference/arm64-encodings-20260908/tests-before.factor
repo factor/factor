@@ -1,0 +1,250 @@
+! Copyright (C) 2024 Giftpflanze.
+! See https://factorcode.org/license.txt for BSD license.
+USING: arrays cpu.arm.64.assembler
+cpu.arm.64.assembler.registers endian kernel make tools.test ;
+FROM: cpu.arm.64.assembler => B ;
+IN: cpu.arm.64.assembler.tests
+
+: test-insn ( n quot -- ) [ 1array ] dip '[ _ { } make be> ] unit-test ;
+
+0xb7000010 [ X23 5 insns ADR ] test-insn
+
+0x41190091 [ X1 X10 6 ADD ] test-insn
+0xff8300d1 [ SP SP 32 SUB ] test-insn
+0x3f1d00f1 [ X9 7 CMP ] test-insn
+
+0x6bed7c92 [ X11 X11 -16 AND ] test-insn
+0x4aed7cd2 [ X10 X10 -16 EOR ] test-insn
+0xcf0d40f2 [ X15 X14 15 ANDS ] test-insn
+0x5f0d40f2 [ X10 15 TST ] test-insn
+
+0x290080d2 [ X9 1 MOV ] test-insn
+
+0x00fc4493 [ X0 X0 4 ASR ] test-insn
+0x42fc44d3 [ X2 X2 4 LSR ] test-insn
+0xceed7cd3 [ X14 X14 4 LSL ] test-insn
+0xcf0d7cd3 [ X15 X14 4 4 UBFIZ ] test-insn
+
+0x60000054 [ 3 insns BEQ ] test-insn
+0xa1000054 [ 5 insns BNE ] test-insn
+0x46000054 [ 2 insns BVS ] test-insn
+0x47000054 [ 2 insns BVC ] test-insn
+
+0x3f441bd5 [ FPSR XZR MSR ] test-insn
+0x00421bd5 [ NZCV X0 MSR ] test-insn
+0x00423bd5 [ X0 NZCV MRS ] test-insn
+
+0x00001fd6 [ X0 BR ] test-insn
+0x20033fd6 [ X25 BLR ] test-insn
+0xc0035fd6 [ RET ] test-insn
+
+0x03000014 [ 3 insns B ] test-insn
+0x00000094 [ 0 BL ] test-insn
+
+0x41002836 [ X1 5 2 insns TBZ ] test-insn
+
+0x49000058 [ X9 2 insns LDR ] test-insn
+
+0xa086ffa9 [ X0 X1 X21 -8 [pre] LDP ] test-insn
+0xabaa7fa9 [ X11 X10 X21 -8 [+] LDP ] test-insn
+0xfd7bc1a8 [ FP LR SP 16 [post] LDP ] test-insn
+0xfd27bfa9 [ FP X9 SP -16 [pre] STP ] test-insn
+0xaaae3fa9 [ X10 X11 X21 -8 [+] STP ] test-insn
+
+0x61080129 [ W1 W2 X3 8 [+] STP ] test-insn
+0xc4947e29 [ W4 W5 X6 -12 [+] LDP ] test-insn
+0xaa2e3f29 [ W10 W11 X21 -8 [+] STP ] test-insn
+0xa006ff29 [ W0 W1 X21 -8 [pre] LDP ] test-insn
+
+! FP/SIMD pair offsets scale with the S/D/Q register width
+0x4084002d [ S0 S1 X2 4 [+] STP ] test-insn
+0x4084006d [ D0 D1 X2 8 [+] STP ] test-insn
+0x408400ad [ Q0 Q1 X2 16 [+] STP ] test-insn
+0x828cff2d [ S2 S3 X4 -4 [pre] LDP ] test-insn
+0x828cc06c [ D2 D3 X4 8 [post] LDP ] test-insn
+0x828c7fad [ Q2 Q3 X4 -16 [+] LDP ] test-insn
+[ SP X0 X1 [] STP ] must-fail
+[ X0 D1 X2 [] STP ] must-fail
+
+0xae0240f8 [ X14 X21 [] LDUR ] test-insn
+
+0x4a554039 [ X10 X10 21 [+] LDRB ] test-insn
+
+0x800640f9 [ X0 X20 8 [+] LDR ] test-insn
+0xa0865ff8 [ X0 X21 -8 [post] LDR ] test-insn
+0xf40700f9 [ X20 SP 8 [+] STR ] test-insn
+0xaa8e00f8 [ X10 X21 8 [pre] STR ] test-insn
+
+0x890340f9 [ X9 X28 [] LDR ] test-insn
+0x207961f8 [ X0 X9 X1 3 <LSL*> [+] LDR ] test-insn
+0xaf0200f9 [ X15 X21 [] STR ] test-insn
+
+0x6e0dca9a [ X14 X11 X10 SDIV ] test-insn
+
+0x6e21ca9a [ X14 X11 X10 LSL ] test-insn
+0x6f29ca9a [ X15 X11 X10 ASR ] test-insn
+
+0x6a010a8a [ X10 X11 X10 AND ] test-insn
+0x4a010baa [ X10 X10 X11 ORR ] test-insn
+0x6a010aca [ X10 X11 X10 EOR ] test-insn
+0xf40300aa [ X20 X0 MOV ] test-insn
+
+0xce01098b [ X14 X14 X9 ADD ] test-insn
+0x4a118b8b [ X10 X10 X11 4 <ASR> ADD ] test-insn
+0x0a0001ab [ X10 X0 X1 ADDS ] test-insn
+0x000002cb [ X0 X0 X2 SUB ] test-insn
+0xd6068acb [ X22 X22 X10 1 <ASR> SUB ] test-insn
+0x0a0001eb [ X10 X0 X1 SUBS ] test-insn
+0x5f0109eb [ X10 X9 CMP ] test-insn
+0x3ffd8aeb [ X9 X10 63 <ASR> CMP ] test-insn
+0xea030aeb [ X10 X10 NEGS ] test-insn
+
+0xca418f9a [ X10 X14 X15 MI CSEL ] test-insn
+
+0x4fad0e9b [ X15 X10 X14 ds-1 MSUB ] test-insn
+0x0a7c019b [ X10 X0 X1 MUL ] test-insn
+0x097c419b [ X9 X0 X1 SMULH ] test-insn
+
+0xc703669e [ X7 D30 FMOV ] test-insn
+0x9e00679e [ D30 X4 FMOV ] test-insn
+0xa340601e [ D3 D5 FMOV ] test-insn
+
+0x0200789e [ X2 D0 FCVTZSsi ] test-insn
+0x6100629e [ D1 X3 SCVTFsi ] test-insn
+0x21c0611e [ D1 D1 FSQRTs ] test-insn
+0x01c0221e [ D1 S0 FCVT ] test-insn
+0x4540621e [ S5 D2 FCVT ] test-insn
+
+0x0020611e [ D0 D1 FCMP ] test-insn
+0x7020601e [ D3 D0 FCMPE ] test-insn
+
+0x6408651e [ D4 D3 D5 FMULs ] test-insn
+0x2118601e [ D1 D1 D0 FDIVs ] test-insn
+
+0x42b8a14e [ V2 V2 4S FCVTZSvi ] test-insn
+
+0x21001e4e [ V1 V1 V30 TBL ] test-insn
+
+0x2328824e [ V3 V1 V2 4S TRN1 ] test-insn
+
+0xc30b036e [ V3 V30 V3 1 16B EXT ] test-insn
+
+0x2506186e [ V5 1 D[] V17 0 D[] INS ] test-insn
+0x801c1c4e [ V0 3 S[] X4 INS ] test-insn
+0x3f0d044e [ V31 X9 4S DUP ] test-insn
+
+0xde5b204e [ V30 V30 16B CNTv ] test-insn
+0x1ea8204e [ V30 V0 16B CMLT ] test-insn
+0xdf3b212e [ V31 V30 16B SHLL ] test-insn
+
+0xffbb314e [ V31 V31 16B ADDV ] test-insn
+
+0x50d4e04e [ V16 V2 V0 2D FSUBv ] test-insn
+0xa0d4656e [ V0 V5 V5 2D FADDP ] test-insn
+0xa51c256e [ V5 V5 V5 16B EORv ] test-insn
+
+0x8454324f [ V4 V4 18 4S SHL ] test-insn
+0x4204356f [ V2 V2 11 4S USHR ] test-insn
+0x04a4082f [ V4 V0 16B UXTL ] test-insn
+
+! Signed loads into a W register (opc[0] set from Rt), vs X dest
+0x2000c039 [ W0 X1 [] LDRSB ] test-insn
+0x20008039 [ X0 X1 [] LDRSB ] test-insn
+0x2000c079 [ W0 X1 [] LDRSH ] test-insn
+0x20008079 [ X0 X1 [] LDRSH ] test-insn
+0x2068e238 [ W0 X1 X2 [+] LDRSB ] test-insn
+0x2078e278 [ W0 X1 X2 1 <LSL*> [+] LDRSH ] test-insn
+
+! Extended-register ADD/SUB with a W-sized Rm
+0x2048228b [ X0 X1 W2 2 <UXTW> ADD ] test-insn
+0x20a022cb [ X0 X1 W2 0 <SXTH> SUB ] test-insn
+0x2068228b [ X0 X1 X2 2 <UXTX> ADD ] test-insn
+0x2048220b [ W0 W1 W2 2 <UXTW> ADD ] test-insn
+[ W0 W1 X2 2 <UXTX> ADD ] must-fail
+
+! SIMD arrangements narrower than 128 bits (Q taken from the shape)
+0x2084220e [ V0 V1 V2 8B ADDv ] test-insn
+0x2084620e [ V0 V1 V2 4H ADDv ] test-insn
+0x2084a20e [ V0 V1 V2 2S ADDv ] test-insn
+0x20d4220e [ V0 V1 V2 2S FADDv ] test-insn
+0x2058200e [ V0 V1 8B CNTv ] test-insn
+0x20b8202e [ V0 V1 8B NEGv ] test-insn
+0x20a8600e [ V0 V1 4H CMLT ] test-insn
+0x20d8210e [ V0 V1 2S SCVTFvi ] test-insn
+0x20f8a00e [ V0 V1 2S FABSv ] test-insn
+0x20b8710e [ V0 V1 4H ADDV ] test-insn
+0x2028820e [ V0 V1 V2 2S TRN1 ] test-insn
+0x2038020e [ V0 V1 V2 8B ZIP1 ] test-insn
+
+! MOVZ rejects an out-of-range immediate
+[ W0 0x1ffff 0 MOVZ ] must-fail
+
+! LSL #0 must wrap immr to zero, including for 32-bit registers.
+0x207c0053 [ W0 W1 0 LSL ] test-insn
+0x20fc40d3 [ X0 X1 0 LSL ] test-insn
+0x20781f53 [ W0 W1 1 LSL ] test-insn
+0x20000153 [ W0 W1 31 LSL ] test-insn
+
+! Independently assembled with Clang for AArch64.
+0x20cc224e [ V0 V1 V2 4S FMLAv ] test-insn
+0x2088214e [ V0 V1 4S FRINTNv ] test-insn
+0x2098214e [ V0 V1 4S FRINTMv ] test-insn
+0x2088a14e [ V0 V1 4S FRINTPv ] test-insn
+0x2098a14e [ V0 V1 4S FRINTZv ] test-insn
+0x2088216e [ V0 V1 4S FRINTAv ] test-insn
+0x2038306e [ V0 V1 16B UADDLV ] test-insn
+0x2028206e [ V0 V1 16B UADDLP ] test-insn
+0x2048a06e [ V0 V1 4S CLZv ] test-insn
+0x2058606e [ V0 V1 RBITv ] test-insn
+0x2008204e [ V0 V1 16B REV64v ] test-insn
+0x2008206e [ V0 V1 16B REV32v ] test-insn
+0x2018204e [ V0 V1 16B REV16v ] test-insn
+0x20b8a16e [ V0 V1 4S FCVTZUvi ] test-insn
+0x201c626e [ V0 V1 V2 16B BSLv ] test-insn
+
+! Encodings independently assembled by Clang for armv8.6-a+fp16.
+{ 0x2094824e } [ [ V0 V1 V2 SDOT ] { } make be> ] unit-test
+{ 0x2094826e } [ [ V0 V1 V2 UDOT ] { } make be> ] unit-test
+{ 0x209c824e } [ [ V0 V1 V2 USDOT ] { } make be> ] unit-test
+{ 0x20a4824e } [ [ V0 V1 V2 SMMLA ] { } make be> ] unit-test
+{ 0x20a4826e } [ [ V0 V1 V2 UMMLA ] { } make be> ] unit-test
+{ 0x20ac824e } [ [ V0 V1 V2 USMMLA ] { } make be> ] unit-test
+{ 0x20fc426e } [ [ V0 V1 V2 BFDOT ] { } make be> ] unit-test
+{ 0x20ec426e } [ [ V0 V1 V2 BFMMLA ] { } make be> ] unit-test
+{ 0x2014424e } [ [ V0 V1 V2 FADDHv ] { } make be> ] unit-test
+{ 0x2014c24e } [ [ V0 V1 V2 FSUBHv ] { } make be> ] unit-test
+{ 0x201c426e } [ [ V0 V1 V2 FMULHv ] { } make be> ] unit-test
+{ 0x203c426e } [ [ V0 V1 V2 FDIVHv ] { } make be> ] unit-test
+{ 0x200c424e } [ [ V0 V1 V2 FMLAHv ] { } make be> ] unit-test
+{ 0x2004c24e } [ [ V0 V1 V2 FMINNMHv ] { } make be> ] unit-test
+{ 0x2004424e } [ [ V0 V1 V2 FMAXNMHv ] { } make be> ] unit-test
+{ 0x2024424e } [ [ V0 V1 V2 FCMEQHv ] { } make be> ] unit-test
+{ 0x2024c26e } [ [ V0 V1 V2 FCMGTHv ] { } make be> ] unit-test
+{ 0x2024426e } [ [ V0 V1 V2 FCMGEHv ] { } make be> ] unit-test
+{ 0x20f8f96e } [ [ V0 V1 FSQRTHv ] { } make be> ] unit-test
+{ 0x2078210e } [ [ V0 V1 FCVTLH ] { } make be> ] unit-test
+{ 0x2078214e } [ [ V0 V1 FCVTLH2 ] { } make be> ] unit-test
+{ 0x2068210e } [ [ V0 V1 FCVTNH ] { } make be> ] unit-test
+{ 0x2068214e } [ [ V0 V1 FCVTNH2 ] { } make be> ] unit-test
+{ 0x2068a10e } [ [ V0 V1 BFCVTN ] { } make be> ] unit-test
+{ 0x2068a14e } [ [ V0 V1 BFCVTN2 ] { } make be> ] unit-test
+
+! Widening FP conversions take the source arrangement. In particular, 4S
+! must encode single-to-double, not half-to-single (Clang reference bytes).
+0x2078610e [ V0 V1 4S FCVTL ] test-insn
+0x2078614e [ V0 V1 4S FCVTL2 ] test-insn
+0x3f7a610e [ V31 V17 2S FCVTL ] test-insn
+0x3f7a614e [ V31 V17 4S FCVTL2 ] test-insn
+0x2078210e [ V0 V1 4H FCVTL ] test-insn
+0x2078214e [ V0 V1 8H FCVTL2 ] test-insn
+
+! Register-indexed Q loads/stores use a 16-byte scale even though size=0.
+! Reference bytes assembled independently with Clang for AArch64.
+0x2078e23c [ Q0 X1 X2 4 <LSL*> [+] LDR ] test-insn
+0x2078a23c [ Q0 X1 X2 4 <LSL*> [+] STR ] test-insn
+0x2058e23c [ Q0 X1 W2 4 <UXTW> [+] LDR ] test-insn
+0x20d8a23c [ Q0 X1 W2 4 <SXTW> [+] STR ] test-insn
+0x2068e23c [ Q0 X1 X2 [+] LDR ] test-insn
+0x3f7bbe3c [ Q31 X25 X30 4 <LSL*> [+] STR ] test-insn
+[ Q0 X1 X2 3 <LSL*> [+] LDR ] must-fail
+[ D0 X1 X2 4 <LSL*> [+] LDR ] must-fail

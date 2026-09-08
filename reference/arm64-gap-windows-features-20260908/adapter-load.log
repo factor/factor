@@ -1,0 +1,33 @@
+1: USING: cpu.arm.64.features.windows.kernel32 generic system tools.test ; { t } [ windows \ windows-processor-feature ?lookup-method >boolean ] unit-test
+                                              ^
+Current operating system not supported by this vocabulary
+vocab    "cpu.arm.64.features.windows.kernel32"
+requires { windows }
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(O) (eval-with-stack)
+(O) parse-string
+(O) (parse-lines)
+(O) (parse-until)
+(O) execute-parsing
+(O) POSTPONE: USING:
+(O) use-vocab
+(O) ?load-vocab
+(O) M\ string require
+(O) M\ string (require)
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(O) throw-continue
+(O) throw-restarts
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

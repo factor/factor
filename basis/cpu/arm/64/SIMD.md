@@ -15,6 +15,7 @@ Multiplication and addition are never implicitly fused; use `vfma` explicitly.
 | Saturated multiply `vs*` | Signed/unsigned 8, 16, 32-bit | Widening multiply and saturating narrow |
 | Pairwise multiply-add `v*hs+` | 8, 16, 32-bit | Widen, multiply, permute, saturated add |
 | Sum of absolute differences `vsad` | 8, 16, 32-bit | SABD/UABD followed by widening UADDLV |
+| Minimum and maximum | Signed/unsigned 64-bit | Compare and bit-select; signed and unsigned ordering |
 | Low multiply and rounded average | Signed/unsigned 64-bit | Scalar lane MUL/INS; overflow-safe vector average |
 | Runtime scalar shifts | All integer types | Clamp the full count before DUP and SSHL/USHL |
 | Signed per-lane shift `vshift` | All integer types | Clamp signed counts to ±lane width before SSHL/USHL |
@@ -25,13 +26,28 @@ Multiplication and addition are never implicitly fused; use `vfma` explicitly.
 | Floor, ceiling, truncate, round, round-to-even | float-4, double-2 | FRINT variants; round uses ties away, round-to-even uses ties to even |
 | `vmin-element`, `vmax-element` | 8, 16, 32-bit integers; float-4, double-2 | Ordered lane reduction using native min/max |
 | Mask blend and unordered comparison | Baseline types | BSL and ordered self-comparison masks |
-| Float to unsigned integer conversion | float-4 to uint-4; double-2 to ulonglong-2; half-8/bfloat-8 to ushort-8 | Portable conversion; truncate finite values and wrap modulo the destination lane width |
+| Float to signed integer conversion | float-4 to int-4 | Extract significand/exponent and shift; truncate and wrap modulo 2^32 |
+| Other float to integer conversions | float-4 to uint-4; double-2 to longlong-2/ulonglong-2; half-8/bfloat-8 to short-8/ushort-8 | Portable conversion; truncate finite values and wrap modulo the destination lane width |
 
 `vshift` takes a count vector of the corresponding **signed** type: for example,
 `uint-4 int-4 vshift`. Positive counts shift left; negative counts shift right.
 Large counts produce zero, or sign fill for signed right shifts. `vclz` and
 `vctz` return the lane width for zero. Bit operations inspect only the lane's
 fixed-width two's-complement bits.
+
+NEON FCVTZS saturates values outside the signed lane range, whereas Factor's
+conversion stores the truncated integer's low bits. The float-4 to int-4 path
+reconstructs these bits with integer SIMD instructions, including for finite
+values outside the signed range. NaNs and infinities convert to zero, matching
+Factor. Binary64 and unsigned conversions retain the portable path.
+
+The bitwise float-4 conversion preserves numeric lane results, but floating-point
+status and traps differ from the portable implementation: it leaves FPSR flags
+unchanged and does not trigger floating-point traps. The portable path can raise
+inexact (including on fractional, subnormal, and large finite inputs) or invalid
+(on NaNs), and throws when the corresponding traps are enabled. `vconvert` does
+not specify a floating-point exception-flag contract; callers observing this
+state must account for the backend-dependent behavior.
 
 The existing unusual byte `v*hs+` contract is preserved: the first input is
 interpreted as unsigned bytes and the second as signed bytes. Wider unsigned
@@ -51,7 +67,17 @@ vector; unpacking produces the low and high `float-4` values. Same-width
 half/BF16 conversion is numeric, as is conversion between either format and
 `short-8`/`ushort-8`. Conversion to integers truncates; unsigned destinations
 wrap modulo 2^16. `half-8-cast` and `bfloat-8-cast` reinterpret bits. Scalar
-half/BF16 C parameters and return values are not supported.
+`half` and `bfloat` C parameters, results, indirect calls, and callbacks use the
+ARM64 `_Float16` and `__bf16` conventions when the C toolchain supports them.
+These conversions use the same numeric rounding and NaN canonicalization as
+memory access; they do not require optional FP16 or BF16 hardware. The low
+16 bits travel in FP registers or naturally sized stack slots (on macOS).
+BF16 storage support alone does not imply support for C arithmetic or a scalar
+ABI in older compilers. Native coverage uses Apple Clang 21; Linux follows
+AAPCS64 but has not been executed in this validation. Windows fixed scalar
+signatures match the independent Clang ABI oracle, but have not been executed.
+Windows variadic signatures containing scalar half/BF16 parameters are explicitly
+rejected: their integer-register convention is not implemented.
 
 | Feature | Public operation | Native instructions |
 | --- | --- | --- |

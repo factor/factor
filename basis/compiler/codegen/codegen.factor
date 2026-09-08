@@ -147,6 +147,7 @@ CODEGEN: ##add-imm %add-imm
 CODEGEN: ##sub %sub
 CODEGEN: ##sub-imm %sub-imm
 CODEGEN: ##mul %mul
+CODEGEN: ##mneg %mneg
 CODEGEN: ##mul-imm %mul-imm
 CODEGEN: ##and %and
 CODEGEN: ##and-imm %and-imm

@@ -1,0 +1,33 @@
+Refreshing backend
+Backend refreshed; compiling workload
+signed min nanoseconds / 1000000 iterations
+longlong-2{ -9223372036853775808 123456788012345 }
+4921394
+4954071
+4827750
+4993800
+5136316
+5119055
+5658082
+unsigned max nanoseconds / 1000000 iterations
+ulonglong-2{ 9223372036855775808 987654321098764 }
+4483268
+4958950
+5368745
+5600600
+5411344
+4941238
+5158620
+float to int nanoseconds / 1000000 iterations
+int-4{ 1680198416 -1469948416 1512644608 1781678080 }
+6238314
+6080669
+6224743
+6330482
+6093256
+6130115
+6235157
+float conversion reps: { float-4-rep }
+signed min CFG: t
+unsigned max CFG: t
+float conversion CFG: t

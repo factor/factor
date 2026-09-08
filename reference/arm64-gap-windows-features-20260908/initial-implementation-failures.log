@@ -1,0 +1,384 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: arrays assocs combinators continuations
+cpu.arm.64.features cpu.arm.64.features.windows generic
+hashtables init kernel locals math math.order memoize namespaces
+sequences sets system tools.test vocabs words ;
+IN: cpu.arm.64.features.windows.tests
+
+Unit Test: {
+    { { 43 67 68 66 } }
+    [
+        {
+            PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V82_FP16_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V86_BF16_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE
+        }
+    ]
+}
+--> test failed!
+Unit Test: { { { } } [ [ drop 0 ] windows-query>arm64-features ] }
+Unit Test: {
+    { { "dotprod" "fp16" "bf16" "i8mm" } }
+    [ [ drop 1 ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { { "dotprod" "fp16" "bf16" "i8mm" } }
+    [ [ drop -1 ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { { } }
+    [
+        [ { 29 30 31 34 44 45 46 47 52 57 69 } member? 1 0 ? ]
+        windows-query>arm64-features
+    ]
+}
+Unit Test: {
+    { { } }
+    [ [ "query failed" throw ] windows-query>arm64-features ]
+}
+Unit Test: {
+    { t }
+    [
+        81 <iota> [
+            [ 3 mod ] [ 3 /i 3 mod ] [ 9 /i 3 mod ]
+            [ 27 /i 3 mod ] 4cleave 4array
+            check-windows-responses
+        ] all?
+    ]
+}
+--> test failed!
+Unit Test: {
+    { { 43 67 68 66 } }
+    [
+        V{ } clone
+        [ '[ _ push 0 ] windows-query>arm64-features drop ] keep
+        >array
+    ]
+}
+--> test failed!
+Unit Test: {
+    { t }
+    [ windows \ probe-arm64-features ?lookup-method >boolean ]
+}
+Unit Test: {
+    { t }
+    [
+        "cpu.arm.64.features.windows.kernel32" lookup-vocab
+        >boolean os windows? =
+    ]
+}
+
+==== resource:basis/cpu/arm/64/features/windows/windows-tests.factor
+
+resource:basis/cpu/arm/64/features/windows/windows-tests.factor: 14
+
+Unit Test: {
+    { { 43 67 68 66 } }
+    [
+        {
+            PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V82_FP16_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V86_BF16_INSTRUCTIONS_AVAILABLE
+            PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE
+        }
+    ]
+}
+
+=== Expected:
+{ 43 67 68 66 }
+=== Got:
+{ PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE...
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [ "cpu.arm.64.features.windows" test => :test-failures ]
+(O) test-vocabs
+(O) test-vocab
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ] \ (unit-test) 14 experiment =>
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 15 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 18 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 21 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 25 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 26 experiment
+        { t } [ 81 <iota> ~quotation~ all? ] \ (unit-test) 43
+        experiment
+        { ~array~ } [ ~vector~ clone ~quotation~ keep >array ]
+        \ (unit-test) 49 experiment
+        { t }
+        [ windows \ probe-arm64-features ?lookup-method >boolean ]
+        \ (unit-test) 53 experiment
+        { t } [
+            "cpu.arm.64.features.windows.kernel32" lookup-vocab
+            >boolean os windows? =
+        ] \ (unit-test) 56 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/cpu/arm/64/features/windows/windows-tests.factor: 43
+
+Unit Test: {
+    { t }
+    [
+        81 <iota> [
+            [ 3 mod ] [ 3 /i 3 mod ] [ 9 /i 3 mod ]
+            [ 27 /i 3 mod ] 4cleave 4array
+            check-windows-responses
+        ] all?
+    ]
+}
+
+Generic word call does not define a method for the fixnum class.
+Dispatching on object: 27
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [ "cpu.arm.64.features.windows" test => :test-failures ]
+(O) test-vocabs
+(O) test-vocab
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ] \ (unit-test) 14 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 15 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 18 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 21 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 25 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 26 experiment
+        { t } [ 81 <iota> ~quotation~ all? ] \ (unit-test) 43
+        experiment =>
+        { ~array~ } [ ~vector~ clone ~quotation~ keep >array ]
+        \ (unit-test) 49 experiment
+        { t }
+        [ windows \ probe-arm64-features ?lookup-method >boolean ]
+        \ (unit-test) 53 experiment
+        { t } [
+            "cpu.arm.64.features.windows.kernel32" lookup-vocab
+            >boolean os windows? =
+        ] \ (unit-test) 56 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(U) [
+        [ nip call ] 3check =>
+        [ ~quotation~ 2dip all-integers-from? ] [ 3drop f ] if
+    ]
+(U) [ 3keep => roll ]
+    3check
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [
+        [ 3 mod ] [ 3 /i 3 mod ] [ 9 /i 3 mod ] [ 27 /i 3 mod ]
+        4cleave => 4array check-windows-responses
+    ]
+(U) [ [ 4keep ] each => 4drop ]
+    4cleave
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ swap [ 3dip ] dip => ]
+    4dip
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) M\ object call
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/cpu/arm/64/features/windows/windows-tests.factor: 49
+
+Unit Test: {
+    { { 43 67 68 66 } }
+    [
+        V{ } clone
+        [ '[ _ push 0 ] windows-query>arm64-features drop ] keep
+        >array
+    ]
+}
+
+=== Expected:
+{ 43 67 68 66 }
+=== Got:
+{ PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE...
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [ "cpu.arm.64.features.windows" test => :test-failures ]
+(O) test-vocabs
+(O) test-vocab
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ] \ (unit-test) 14 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 15 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 18 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 21 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 25 experiment
+        { ~array~ } [ ~quotation~ windows-query>arm64-features ]
+        \ (unit-test) 26 experiment
+        { t } [ 81 <iota> ~quotation~ all? ] \ (unit-test) 43
+        experiment
+        { ~array~ } [ ~vector~ clone ~quotation~ keep >array ]
+        \ (unit-test) 49 experiment =>
+        { t }
+        [ windows \ probe-arm64-features ?lookup-method >boolean ]
+        \ (unit-test) 53 experiment
+        { t } [
+            "cpu.arm.64.features.windows.kernel32" lookup-vocab
+            >boolean os windows? =
+        ] \ (unit-test) 56 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

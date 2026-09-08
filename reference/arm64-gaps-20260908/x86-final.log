@@ -1,0 +1,1059 @@
+Reloading cpu.architecture
+Reloading alien.c-types
+Reloading alien
+Reloading alien.parser
+Reloading alien.syntax
+Reloading stack-checker.alien
+Reloading stack-checker.known-words
+Reloading compiler.cfg.builder.alien.params
+Reloading compiler.cfg.builder.alien.boxing
+Reloading compiler.cfg.builder.alien
+Reloading compiler.cfg.renaming.functor
+cpu.architecture
+compiler.cfg.instructions
+compiler.cfg.def-use
+compiler.cfg.hats
+compiler.cfg.renaming.functor
+compiler.cfg.renaming
+compiler.cfg.linear-scan.assignment
+compiler.cfg.representations.rewrite
+compiler.cfg.ssa.construction
+compiler.cfg.representations.preferred
+compiler.cfg.value-numbering.expressions
+compiler.codegen
+cpu.x86
+cpu.x86.64
+compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.folding
+compiler.cfg.value-numbering.math
+compiler.cfg.value-numbering
+compiler.cfg.multiply-negate
+compiler.cfg.optimizer
+Unit Test: {
+    { 15360 48128 32768 31744 64512 }
+    [
+        1.0 float>half-bits -1.0 float>half-bits -0.0
+        float>half-bits 1/0. float>half-bits -1/0.
+        float>half-bits
+    ]
+}
+Unit Test: {
+    { 16256 49024 32768 32640 65408 }
+    [
+        1.0 float>bfloat-bits -1.0 float>bfloat-bits -0.0
+        float>bfloat-bits 1/0. float>bfloat-bits -1/0.
+        float>bfloat-bits
+    ]
+}
+Unit Test: {
+    { 15360 15362 1 1024 31743 31744 }
+    [
+        1.00048828125 float>half-bits 1.00146484375
+        float>half-bits 5.960464477539063e-8 float>half-bits
+        0.00006103515625 float>half-bits 65504.0 float>half-bits
+        65520.0 float>half-bits
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        65536 <iota> [
+            dup half-bits>float float>half-bits swap dup 31744
+            bitand 31744 = over 1023 bitand zero? not and
+            [ drop 32256 ] when =
+        ] all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        65536 <iota> [
+            dup bfloat-bits>float float>bfloat-bits swap dup
+            32640 bitand 32640 = over 127 bitand zero? not and
+            [ drop 32704 ] when =
+        ] all?
+    ]
+}
+Unit Test: { { 2 2 } [ half heap-size bfloat heap-size ] }
+Unit Test: { { 1.5 } [ 1.5 half <ref> half deref ] }
+Unit Test: { { -2.5 } [ -2.5 bfloat <ref> bfloat deref ] }
+Scalar half/BF16 C fixtures unavailable on this toolchain; skipped.
+Unit Test: {
+    { t }
+    [
+        {
+            T{ ##mul { dst 2 } { src1 0 } { src2 1 } }
+            T{ ##neg { dst 3 } { src 2 } }
+        } fused-insns last
+        T{ ##mneg { dst 3 } { src1 0 } { src2 1 } } =
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        {
+            T{ ##mul { dst 2 } { src1 0 } { src2 1 } }
+            T{ ##neg { dst 3 } { src 2 } }
+            T{ ##add { dst 4 } { src1 2 } { src2 3 } }
+        } fused-insns [ ##mneg? ] count
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        {
+            T{ ##fixnum-mul { dst 2 } { src1 0 } { src2 1 } }
+            T{ ##neg { dst 3 } { src 2 } }
+        } fused-insns [ ##mneg? ] count
+    ]
+}
+Unit Test: {
+    { 1 }
+    [
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        [ ##mneg? ] count-insns
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        [ ##mul? ] count-insns
+    ]
+}
+Unit Test: {
+    { -42 }
+    [
+        6 7
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 42 }
+    [
+        -6 7
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        0 -7
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { -49 }
+    [
+        7
+        [ { fixnum } declare dup fixnum*fast -1 fixnum*fast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        most-negative-fixnum 1
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        compile-call most-negative-fixnum =
+    ]
+}
+Unit Test: {
+    { 2 }
+    [
+        most-positive-fixnum 2
+        [ { fixnum fixnum } declare fixnum*fast -1 fixnum*fast ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        most-positive-fixnum 2 * neg most-positive-fixnum 2
+        [ { fixnum fixnum } declare * neg ] compile-call =
+    ]
+}
+Unit Test: { { 0 } [ shared-use-in-successor ] }
+Unit Test: {
+    { "hello" }
+    [ { "hello" } [ CREATE-C-TYPE name>> ] with-parsing ]
+}
+Unit Test: {
+    { 0 }
+    [
+        { } [
+            "hello" current-vocab create-word
+            old-definitions get first adjoin
+            "hello" (CREATE-C-TYPE) drop
+            old-definitions get first cardinality
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { "what-type" }
+    [
+        { } [
+            void "what-type" f { } { } make-callback-type 2drop
+            name>>
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { 1 }
+    [
+        { } [
+            "hello" current-vocab create-word
+            old-definitions get first adjoin void "hello" f
+            { } { } make-callback-type 3drop
+            old-definitions get first cardinality
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        { "ayae" }
+        [ parse-enum-name new-definitions get first in? ]
+        with-parsing
+    ]
+}
+Unit Test: {
+    {
+        "Cannot define a C type 'hello*' that ends with an asterisk (*)"
+    }
+    [ [ "hello*" validate-c-type-name ] [ ] recover summary ]
+}
+Unit Test: {
+    { { int double int } { "tag" "named" "arg" } 2 }
+    [
+        { "( int tag, double named, ... int arg )" }
+        [ scan-c-args* ] with-parsing
+    ]
+}
+Unit Test: {
+    { { int } { "tag" } f }
+    [ { "( int tag )" } [ scan-c-args* ] with-parsing ]
+}
+Must Fail With: {
+    [
+        { "( int tag, ... ... int arg )" } [ scan-c-args* ]
+        with-parsing
+    ]
+    [ error>> duplicate-varargs-marker? ]
+}
+Must Fail With: {
+    [
+        { "( int tag, ... int arg )" } [ scan-c-args ]
+        with-parsing
+    ]
+    [ error>> varargs-in-function-declaration? ]
+}
+Unit Test: { [ int ] [ "int" parse-c-type ] }
+Unit Test: { [ { int 5 } ] [ "int[5]" parse-c-type ] }
+Unit Test: { [ { int 5 10 11 } ] [ "int[5][10][11]" parse-c-type ] }
+Unit Test: {
+    [ { int 5 10 eleven } ]
+    [ "int[5][10][eleven]" parse-c-type ]
+}
+Unit Test: { [ pointer: void ] [ "void*" parse-c-type ] }
+Unit Test: { [ pointer: int ] [ "int*" parse-c-type ] }
+Unit Test: { [ pointer: pointer: int ] [ "int**" parse-c-type ] }
+Unit Test: { [ pointer: pointer: pointer: int ] [ "int***" parse-c-type ] }
+Unit Test: {
+    [ pointer: pointer: pointer: pointer: int ]
+    [ "int****" parse-c-type ]
+}
+Unit Test: { [ { pointer: int 3 } ] [ "int*[3]" parse-c-type ] }
+Unit Test: { [ { pointer: void 3 } ] [ "void*[3]" parse-c-type ] }
+Unit Test: { [ pointer: { int 3 } ] [ "int[3]*" parse-c-type ] }
+Unit Test: { [ c-string ] [ "c-string" parse-c-type ] }
+Unit Test: { [ char2 ] [ "char2" parse-c-type ] }
+Unit Test: { [ pointer: char2 ] [ "char2*" parse-c-type ] }
+Must Fail: { [ "void[3]" parse-c-type ] }
+Must Fail: { [ "int[3" parse-c-type ] }
+Must Fail: { [ "int[3][4" parse-c-type ] }
+Must Fail With: { [ "not-word" parse-c-type ] [ error>> no-word-error? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ alien-parser-function-effect-test "declared-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ alien-parser-function-effect-test inline? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ (alien-parser-function-effect-test) "declared-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ (alien-parser-function-effect-test) inline? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ alien-parser-callback-effect-test "callback-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ alien-parser-callback-effect-test inline? ] }
+Unit Test: {
+    { "OK!" }
+    [
+        [
+            "USE: specialized-arrays SPECIALIZED-ARRAY: alien-parser-test-int"
+            ( -- ) eval "OK!"
+        ] [ :1 ] recover
+    ]
+}
+Unit Test: { { } [ [ ] with-compilation-unit ] }
+Unit Test: {
+    { t }
+    [
+        init-cfg-test
+        <basic-block>
+        dup
+        set-basic-block
+        dup
+        \ dummy-assembly
+        build-tree
+        optimize-tree
+        first
+        [ emit-node ]
+        V{ }
+        make
+        drop
+        eq?
+    ]
+}
+Unit Test: {
+    { 2 t }
+    [
+        \ dummy-callback build-tree optimize-tree gensym
+        build-cfg [ length ] [ second frame-pointer?>> ] bi
+    ]
+}
+Unit Test: {
+    {
+        V{
+            T{ ##load-reference { dst 1 } { obj t } }
+            T{ ##load-integer { dst 2 } { val 3 } }
+            T{ ##copy { dst 4 } { src 1 } { rep any-rep } }
+            T{ ##copy { dst 3 } { src 2 } { rep any-rep } }
+            T{ ##inc { loc D: 2 } }
+            T{ ##branch }
+        }
+    }
+    [
+        init-cfg-test
+        <basic-block>
+        dup
+        set-basic-block
+        \ dummy-callback
+        build-tree
+        optimize-tree
+        3
+        swap
+        nth
+        child>>
+        [ emit-callback-body drop ]
+        V{ }
+        make
+    ]
+}
+Unit Test: {
+    { "malloc" f }
+    [
+        f f cdecl f "libc" "malloc" alien-invoke-params boa
+        caller-linkage [ path>> alien>native-string ] ?call
+    ]
+}
+Unit Test: {
+    { t "fdkjlsdflfd" }
+    [
+        begin-stack-analysis \ foo f begin-cfg drop
+        f f cdecl f f "fdkjlsdflfd" alien-invoke-params boa
+        caller-linkage 2drop linkage-errors get foo of error>>
+        [ no-such-symbol? ] [ name>> ] bi
+    ]
+}
+Unit Test: {
+    {
+        V{
+            { 1 int-rep RDI }
+            { 2 float-rep XMM0 }
+            { 3 double-rep XMM1 }
+            { 4 int-rep RSI }
+        }
+        V{ }
+    }
+    [
+        init-cfg-test
+        void
+        { int float double char }
+        cdecl
+        f
+        f
+        "func"
+        alien-invoke-params
+        boa
+        caller-parameters
+    ]
+}
+Unit Test: {
+    { { 1 42 } { { int-rep f f } { double-rep f f } } 1 }
+    [
+        init-cfg-test
+        ordinary-struct-result-cpu
+        \ cpu
+        [
+            [
+                { 42 } { { double-rep f f } } indirect-result
+                prepare-struct-caller
+            ] V{ } make drop
+        ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { { 1 } { { int-rep f f } } 1 }
+    [
+        init-cfg-test
+        ordinary-struct-result-cpu
+        \ cpu
+        [
+            [ { } { } indirect-result prepare-struct-caller ]
+            V{ } make drop
+        ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        alien-node-params new long >>return cdecl >>abi
+        25 caller-stack-cleanup
+    ]
+}
+Unit Test: { { } [ "malloc" f check-dlsym ] }
+Unit Test: {
+    { { { 1 int-rep RAX } } { { 2 double-rep XMM0 } } }
+    [
+        init-cfg-test
+        T{ alien-invoke-params { return int } }
+        prepare-caller-return
+        T{ alien-invoke-params { return double } }
+        prepare-caller-return
+    ]
+}
+Unit Test: {
+    {
+        { 2 3 }
+        { { int-rep f f 8 } { int-rep f f 4 } }
+        V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
+    }
+    [
+        init-cfg-test
+        [ { c-string int } unbox-parameters ]
+        V{ }
+        make
+    ]
+}
+Unit Test: {
+    { V{ } V{ } f f }
+    [
+        cdecl
+        [ ] with-param-regs reg-values get stack-values get
+    ]
+}
+Unit Test: { { { { int-rep f f 4 } } } [ int base-type flatten-c-type ] }
+Unit Test: {
+    { { { int-rep f f } { int-rep f f } } }
+    [
+        some-struct base-type base-type flatten-c-type
+        [ first3 3array ] map
+    ]
+}
+Unit Test: {
+    { { 20 } { { int-rep f f 4 } } { } }
+    [ reset-vreg-counter [ 20 int base-type unbox ] { } make ]
+}
+Unit Test: {
+    {
+        { 2 3 }
+        { { int-rep f f } { int-rep f f } }
+        {
+            T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
+            T{ ##load-memory-imm
+                { dst 2 }
+                { base 1 }
+                { offset 0 }
+                { rep int-rep }
+            }
+            T{ ##load-memory-imm
+                { dst 3 }
+                { base 1 }
+                { offset 8 }
+                { rep int-rep }
+            }
+        }
+    }
+    [
+        init-cfg-test
+        [ 20 some-struct base-type unbox [ first3 3array ] map ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    {
+        { 1 }
+        { { int-rep f f 8 } }
+        { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
+    }
+    [
+        init-cfg-test
+        [ 77 c-string base-type unbox-parameter ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    { { 77 } { { int-rep f f 4 } } { } }
+    [
+        init-cfg-test
+        [ 77 int base-type unbox-parameter ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    { RDI XMM0 XMM1 RSI }
+    [
+        cdecl param-regs init-regs f int-rep next-reg-param
+        f double-rep next-reg-param f float-rep next-reg-param
+        f int-rep next-reg-param
+    ]
+}
+Unit Test: {
+    { f t V{ } f }
+    [
+        V{ 1 2 3 } clone f reg-class-full? V{ 1 } clone
+        [ t reg-class-full? ] keep V{ 1 2 } t reg-class-full?
+    ]
+}
+Must Fail: { [ [ void { } "cdecl" alien-indirect ] infer ] }
+Must Fail: { [ [ "void" { } cdecl alien-indirect ] infer ] }
+Must Fail: { [ [ void* 3 cdecl alien-indirect ] infer ] }
+Must Fail: { [ [ void* { "int" } cdecl alien-indirect ] infer ] }
+Must Fail: { [ [ void* { int } cdecl { } alien-callback ] infer ] }
+Unit Test: { { } [ ffi_test_0 ] }
+Unit Test: { { 3 } [ ffi_test_1 ] }
+Unit Test: { { } [ \ ffi_test_1 def>> [ drop ] append compile-call ] }
+Unit Test: { { 5 } [ 2 3 ffi_test_2 ] }
+Must Fail: { [ "hi" 3 ffi_test_2 ] }
+Unit Test: { { 25 } [ 2 3 4 5 ffi_test_3 ] }
+Unit Test: { { 1.5 } [ ffi_test_4 ] }
+Unit Test: { { 1.5 } [ ffi_test_5 ] }
+Unit Test: { { 28 } [ 1 2 3 4 5 6 7 ffi_test_9 ] }
+Must Fail: { [ "a" 2 3 4 5 6 7 ffi_test_9 ] }
+Must Fail: { [ 1 2 3 4 5 6 "a" ffi_test_9 ] }
+Unit Test: { { 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] }
+Unit Test: { { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] }
+Unit Test: { { 11 6 } [ 11 6 ffi_test_14 [ x>> ] [ y>> ] bi ] }
+Unit Test: { { "foo" } [ "xy" "zt" ffi_test_15 ] }
+Unit Test: { { "bar" } [ "xy" "xy" ffi_test_15 ] }
+Must Fail: { [ 1 2 ffi_test_15 ] }
+Unit Test: {
+    { 11 6 -7 }
+    [ 11 6 -7 ffi_test_16 [ x>> ] [ y>> ] [ z>> ] tri ]
+}
+Unit Test: { { 11 } [ 11 ffi_test_17 x>> ] }
+Must Fail With: { [ [ alien-indirect ] infer ] [ inference-error? ] }
+Must Infer As: { { 1 1 } [ indirect-test-1 ] }
+Unit Test: { { 3 } [ "ffi_test_1" "f-cdecl" address-of indirect-test-1 ] }
+Must Infer As: { { 1 0 } [ indirect-test-1' ] }
+Unit Test: { { } [ "ffi_test_1" "f-cdecl" address-of indirect-test-1' ] }
+Must Fail: { [ -1 indirect-test-1 ] }
+Must Infer As: { { 3 1 } [ indirect-test-2 ] }
+Unit Test: {
+    { 5 }
+    [ 2 3 "ffi_test_2" "f-cdecl" address-of indirect-test-2 ]
+}
+Unit Test: { { f } [ "f-stdcall" library-dll f = ] }
+Unit Test: { { stdcall } [ "f-stdcall" lookup-library abi>> ] }
+Unit Test: { { 25 } [ 2 3 4 5 ffi_test_18 ] }
+Unit Test: {
+    { 11 6 -7 }
+    [ 11 6 -7 ffi_test_19 [ x>> ] [ y>> ] [ z>> ] tri ]
+}
+Unit Test: { { 25 85 } [ 2 3 4 5 6 7 8 9 multi_ffi_test_18 ] }
+Unit Test: { { 6.0 } [ 3.0 2.0 ffi_test_6 ] }
+Must Fail: { [ "a" "b" ffi_test_6 ] }
+Unit Test: { { 6.0 } [ 3.0 2.0 ffi_test_7 ] }
+Unit Test: { { 19.0 } [ 3.0 2.0 1.0 6.0 7 ffi_test_8 ] }
+Unit Test: { { -34 } [ 1 2 3.0 4 5.0 6 7 8 ffi_test_10 ] }
+Unit Test: { { } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] }
+Unit Test: { { 861 3 } [ 42 [ ] each-integer ffi_test_31 ] }
+Unit Test: { { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] }
+Unit Test: { { 121932631112635269 } [ 123456789 987654321 ffi_test_21 ] }
+Unit Test: {
+    { 987655432 }
+    [ 1111 121932631112635269 123456789 ffi_test_22 ]
+}
+Must Fail: { [ 1111 f 123456789 ffi_test_22 ] }
+Unit Test: { { 45 } [ 1 2 3.0 4.0 5.0 6.0 <RECT> 7 8 9 ffi_test_12 ] }
+Must Fail: { [ 1 2 { 1 2 3 } 7 8 9 ffi_test_12 ] }
+Unit Test: {
+    { 32.0 }
+    [
+        { 1.0 2.0 3.0 } float >c-array
+        { 4.0 5.0 6.0 } float >c-array ffi_test_23
+    ]
+}
+Unit Test: { { S{ test-struct-1 { x char-array{ 1 } } } } [ ffi_test_24 ] }
+Unit Test: {
+    { S{ test-struct-2 { x char-array{ 1 2 } } } }
+    [ ffi_test_25 ]
+}
+Unit Test: {
+    { S{ test-struct-3 { x char-array{ 1 2 3 } } } }
+    [ ffi_test_26 ]
+}
+Unit Test: {
+    { S{ test-struct-4 { x char-array{ 1 2 3 4 } } } }
+    [ ffi_test_27 ]
+}
+Unit Test: {
+    { S{ test-struct-5 { x char-array{ 1 2 3 4 5 } } } }
+    [ ffi_test_28 ]
+}
+Unit Test: {
+    { S{ test-struct-6 { x char-array{ 1 2 3 4 5 6 } } } }
+    [ ffi_test_29 ]
+}
+Unit Test: {
+    { S{ test-struct-7 { x char-array{ 1 2 3 4 5 6 7 } } } }
+    [ ffi_test_30 ]
+}
+Unit Test: {
+    { 9.0 }
+    [ test-struct-8 <struct> 1.0 >>x 2.0 >>y 3 ffi_test_32 ]
+}
+Unit Test: {
+    { 9.0 }
+    [ test-struct-9 <struct> 1.0 >>x 2.0 >>y 3 ffi_test_33 ]
+}
+Unit Test: {
+    { 9.0 }
+    [ test-struct-10 <struct> 1.0 >>x 2 >>y 3 ffi_test_34 ]
+}
+Unit Test: {
+    { 9.0 }
+    [ test-struct-11 <struct> 1 >>x 2 >>y 3 ffi_test_35 ]
+}
+Unit Test: { { 1.23456 } [ 1.23456 make-struct-12 ffi_test_36 ] }
+Unit Test: { { t } [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] }
+Unit Test: { { t } [ callback-throws [ alien? ] with-callback ] }
+Unit Test: {
+    { 0 1 }
+    [ [ callback-1 ] infer [ in>> length ] [ out>> length ] bi ]
+}
+Unit Test: { { t } [ callback-1 [ alien? ] with-callback ] }
+Unit Test: { { } [ callback-1 [ callback_test_1 ] with-callback ] }
+Unit Test: { { } [ callback-2 [ callback_test_1 ] with-callback ] }
+Unit Test: {
+    { t 3 5 }
+    [
+        [
+            (get-namestack) 3 "x" set callback-3
+            [ callback_test_1 ] with-callback
+            (get-namestack) eq? "x" get "x" get-global
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { "testing" }
+    [ "testing" callback-5 [ callback_test_1 ] with-callback ]
+}
+Unit Test: {
+    { "testing" }
+    [ "testing" callback-5b [ callback_test_1 ] with-callback ]
+}
+Unit Test: {
+    { 1 2 3 }
+    [ callback-6 [ callback_test_1 1 2 3 ] with-callback ]
+}
+Unit Test: {
+    { 1 2 3 }
+    [ callback-7 [ callback_test_1 1 2 3 ] with-callback ]
+}
+Unit Test: { { f } [ namespace global eq? ] }
+Unit Test: { { } [ callback-8 [ callback_test_1 ] with-callback ] }
+Unit Test: { { } [ ffi_test_36_point_5 ] }
+Unit Test: { { 1 } [ callback-9 [ ffi_test_37 ] with-callback ] }
+Unit Test: { { 7 } [ callback-9 [ ffi_test_37 ] with-callback ] }
+Unit Test: { { 21 } [ 12347 12347 make-test-struct-13 ffi_test_39 ] }
+Unit Test: {
+    { byte-array 1.0 2.0 3.0 4.0 }
+    [
+        1.0 2.0 3.0 4.0 <double-rect> double-rect-callback [
+            double-rect-test
+            [ >c-ptr class-of ] [ >double-rect< ] bi
+        ] with-callback
+    ]
+}
+Unit Test: { { 1.0 2.0 } [ 1.0 2.0 ffi_test_40 [ x1>> ] [ x2>> ] bi ] }
+Unit Test: {
+    { 1.0 2.0 }
+    [
+        1.0 2.0 callback-10
+        [ callback-10-test [ x1>> ] [ x2>> ] bi ] with-callback
+    ]
+}
+Unit Test: { { 1 2.0 } [ 1 2.0 ffi_test_41 [ a>> ] [ x>> ] bi ] }
+Unit Test: {
+    { 1 2.0 }
+    [
+        1 2.0 callback-11
+        [ callback-11-test [ a>> ] [ x>> ] bi ] with-callback
+    ]
+}
+Unit Test: { { 1.0 2.0 } [ 1.0 2.0 ffi_test_42 [ x>> ] [ y>> ] bi ] }
+Unit Test: {
+    { 1.0 2.0 }
+    [
+        1.0 2.0 callback-12
+        [ callback-12-test [ x>> ] [ y>> ] bi ] with-callback
+    ]
+}
+Unit Test: { { 1.0 2 } [ 1.0 2 ffi_test_43 [ x>> ] [ a>> ] bi ] }
+Unit Test: {
+    { 1.0 2 }
+    [
+        1.0 2 callback-13
+        [ callback-13-test [ x>> ] [ a>> ] bi ] with-callback
+    ]
+}
+Unit Test: { { 1.0 2.0 } [ ffi_test_44 [ x1>> ] [ x2>> ] bi ] }
+Must Not Fail: { [ stack-frame-bustage ] }
+Unit Test: { { C{ 3.0 0.0 } } [ 3 ffi_test_45 ] }
+Unit Test: { { C{ 3.0 0.0 } } [ 3 ffi_test_46 ] }
+Unit Test: { { C{ 4.0 4.0 } } [ C{ 1.0 2.0 } C{ 1.5 1.0 } ffi_test_47 ] }
+Unit Test: {
+    { 123 }
+    [ bool-field-test <struct> 123 >>parents ffi_test_48 ]
+}
+Unit Test: {
+    { 200 }
+    [
+        thread-callback-2
+        [ thread-callback-invoker ] with-callback
+    ]
+}
+Unit Test: { { 100 } [ "p" get ?promise ] }
+Unit Test: { { } [ assembly-test-1 ] }
+Unit Test: { { f } [ "f-fastcall" library-dll f = ] }
+Unit Test: { { fastcall } [ "f-fastcall" lookup-library abi>> ] }
+Unit Test: { { 4 } [ 3 ffi_test_49 ] }
+Unit Test: { { 8 } [ 3 4 ffi_test_50 ] }
+Unit Test: { { 13 } [ 3 4 5 ffi_test_51 ] }
+Unit Test: { { 13 22 } [ 3 4 5 6 7 8 multi_ffi_test_51 ] }
+Unit Test: { { t } [ most-positive-fixnum 1 + [ ffi_test_59 ] keep = ] }
+Unit Test: { { t } [ most-positive-fixnum 1 + [ ffi_test_60 ] keep = ] }
+Unit Test: { { -1 } [ -1 ffi_test_59 ] }
+Unit Test: { { -1 } [ 18446744073709551615 ffi_test_59 ] }
+Unit Test: { { 18446744073709551615 } [ -1 ffi_test_60 ] }
+Unit Test: {
+    { 18446744073709551615 }
+    [ 18446744073709551615 ffi_test_60 ]
+}
+Unit Test: { { 13 } [ 3 4.0 5 ffi_test_52 ] }
+Unit Test: { { 19 } [ 3 4.0 5 6 ffi_test_53 ] }
+Unit Test: { { S{ test-struct-11 { x 7 } { y -1 } } } [ 3 4 ffi_test_57 ] }
+Unit Test: {
+    { S{ test-struct-11 { x 7 } { y -3 } } }
+    [ 3 4 7 ffi_test_58 ]
+}
+Unit Test: {
+    { 8 }
+    [
+        3 4 "ffi_test_50" "f-cdecl" address-of
+        fastcall-ii-indirect
+    ]
+}
+Unit Test: {
+    { 13 }
+    [
+        3 4 5 "ffi_test_51" "f-cdecl" address-of
+        fastcall-iii-indirect
+    ]
+}
+Unit Test: {
+    { 13 }
+    [
+        3 4.0 5 "ffi_test_52" "f-cdecl" address-of
+        fastcall-ifi-indirect
+    ]
+}
+Unit Test: {
+    { 19 }
+    [
+        3 4.0 5 6 "ffi_test_53" "f-cdecl" address-of
+        fastcall-ifii-indirect
+    ]
+}
+Unit Test: {
+    { S{ test-struct-11 { x 7 } { y -1 } } }
+    [
+        3 4 "ffi_test_57" "f-cdecl" address-of
+        fastcall-struct-return-ii-indirect
+    ]
+}
+Unit Test: {
+    { S{ test-struct-11 { x 7 } { y -3 } } }
+    [
+        3 4 7 "ffi_test_58" "f-cdecl" address-of
+        fastcall-struct-return-iii-indirect
+    ]
+}
+Unit Test: {
+    { 8 }
+    [
+        3 4 fastcall-ii-callback
+        [ fastcall-ii-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { 13 }
+    [
+        3 4 5 fastcall-iii-callback
+        [ fastcall-iii-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { 13 }
+    [
+        3 4.0 5 fastcall-ifi-callback
+        [ fastcall-ifi-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { 19 }
+    [
+        3 4.0 5 6 fastcall-ifii-callback
+        [ fastcall-ifii-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { S{ test-struct-11 { x 7 } { y -1 } } }
+    [
+        3 4 fastcall-struct-return-ii-callback
+        [ fastcall-struct-return-ii-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { S{ test-struct-11 { x 7 } { y -3 } } }
+    [
+        3 4 7 fastcall-struct-return-iii-callback
+        [ fastcall-struct-return-iii-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { 661 }
+    [
+        100 500 50 10 1 x64-regression-1
+        [ x64-regression-2 ] with-callback
+    ]
+}
+Unit Test: { { 3 } [ blah ] }
+Unit Test: { { 12 } [ out-param-test-1 ] }
+Unit Test: { { 12 } [ out-param-test-2 ] }
+Unit Test: { { 3.0 4.0 } [ out-param-test-3 ] }
+Unit Test: {
+    { 12 }
+    [
+        6 out-param-callback
+        [ out-param-indirect ] with-callback
+    ]
+}
+Unit Test: {
+    { T{ some-tuple { x 5.0 } } }
+    [
+        [
+            some-tuple new aa-callback-1
+            [ aa-indirect-1 ] with-callback >>x
+        ] compile-call
+    ]
+}
+Unit Test: { { } [ anton's-regression ] }
+Unit Test: { { t } [ ffi_test_61 bool-and-ptr? ] }
+Unit Test: { { { t f } } [ ffi_test_61 [ b>> ] [ ptr>> ] bi 2array ] }
+Unit Test: {
+    { S{ uint-pair { a 2882400171 } { b 305419896 } } }
+    [ ffi_test_62 ]
+}
+Unit Test: {
+    {
+        S{ ulonglong-pair
+            { a 12379814471884843981 }
+            { b 1311768467302729063 }
+        }
+    }
+    [ ffi_test_63 ]
+}
+Unit Test: {
+    { t }
+    [
+        10 [ [ 100 random ] twice 2array ] replicate [
+            [
+                first2 [ <alien> ] dip bug1021_test_1
+                alien-address
+            ] map
+        ] [ [ first2 sq + ] map ] bi =
+    ]
+}
+Unit Test: {
+    { }
+    [
+        minor-gc 2000
+        [ 101 <alien> run-test [ alien-address ] map drop ]
+        times
+    ]
+}
+Unit Test: { { 30 60 } [ 2 10 20 do-sum-ints2 3 10 20 30 do-sum-ints3 ] }
+Unit Test: {
+    { 27.0 22.0 }
+    [ 2 7 20 do-sum-doubles2 3 5 10 7 do-sum-doubles3 ]
+}
+Unit Test: { { } [ 10000 [ 0 doit 33 assert= ] times ] }
+Unit Test: {
+    { 28 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_66 { mem1 6 } { mem2 7 } } ffi_test_66
+    ]
+}
+Unit Test: {
+    { 28 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_66 { mem1 6 } { mem2 7 } } callback-14
+        [ callback-14-test ] with-callback
+    ]
+}
+Unit Test: {
+    { 44 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_66 { mem1 6 } { mem2 7 } } 8 ffi_test_67
+    ]
+}
+Unit Test: {
+    { 44 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_66 { mem1 6 } { mem2 7 } } 8 callback-15
+        [ callback-15-test ] with-callback
+    ]
+}
+Unit Test: {
+    { 55 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_68 { mem1 6 } { mem2 7 } { mem3 8 } }
+        S{ test_struct_66 { mem1 9 } { mem2 10 } } ffi_test_68
+    ]
+}
+Unit Test: {
+    { 55 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_68 { mem1 6 } { mem2 7 } { mem3 8 } }
+        S{ test_struct_66 { mem1 9 } { mem2 10 } } callback-16
+        [ callback-16-test ] with-callback
+    ]
+}
+Unit Test: {
+    { 55 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_69 { mem1 6.0 } { mem2 7 } { mem3 8 } }
+        S{ test_struct_66 { mem1 9 } { mem2 10 } } ffi_test_69
+    ]
+}
+Unit Test: {
+    { 55 }
+    [
+        1 2 3
+        S{ test_struct_66 { mem1 4 } { mem2 5 } }
+        S{ test_struct_69 { mem1 6.0 } { mem2 7 } { mem3 8 } }
+        S{ test_struct_66 { mem1 9 } { mem2 10 } } callback-17
+        [ callback-17-test ] with-callback
+    ]
+}
+Unit Test: {
+    { 36 }
+    [
+        S{ test_struct_68 { mem1 1 } { mem2 2 } { mem3 3 } }
+        S{ test_struct_68 { mem1 4 } { mem2 5 } { mem3 6 } }
+        S{ test_struct_66 { mem1 7 } { mem2 8 } } ffi_test_70
+    ]
+}
+Unit Test: {
+    { 36 }
+    [
+        S{ test_struct_68 { mem1 1 } { mem2 2 } { mem3 3 } }
+        S{ test_struct_68 { mem1 4 } { mem2 5 } { mem3 6 } }
+        S{ test_struct_66 { mem1 7 } { mem2 8 } } callback-18
+        [ callback-18-test ] with-callback
+    ]
+}
+Unit Test: {
+    { 6 15 24 }
+    [
+        1 2 3 4 5 6 7 8 9 ffi_test_large_return
+        large-return-values
+    ]
+}
+Unit Test: {
+    { -6 -15 -24 }
+    [
+        -1 -2 -3 -4 -5 -6 -7 -8 -9 ffi_test_large_return
+        large-return-values
+    ]
+}
+Unit Test: {
+    { 6 15 24 }
+    [
+        1 2 3 4 5 6 7 8 9 "ffi_test_large_return"
+        "large-return-test" library-dll dlsym
+        indirect-large-return large-return-values
+    ]
+}
+Unit Test: {
+    { 45 }
+    [
+        large-return-callback
+        [ ffi_test_large_return_callback ] with-callback
+    ]
+}
+Unit Test: {
+    { 45 }
+    [
+        nested-large-return-callback
+        [ ffi_test_large_return_callback ] with-callback
+    ]
+}
+TEST FAILURES 0
+COMPILER ERRORS 0

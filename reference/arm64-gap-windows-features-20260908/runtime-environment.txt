@@ -1,0 +1,9 @@
+Host: macOS-26.6.2-arm64-arm-64bit
+wine: None
+wine64: None
+qemu-aarch64: None
+qemu-system-aarch64: /opt/homebrew/bin/qemu-system-aarch64
+prlctl: None
+limactl: None
+multipass: None
+No native Windows runtime was executed. qemu-system-aarch64 exists but is not a Windows installation.

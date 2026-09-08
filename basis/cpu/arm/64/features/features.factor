@@ -29,3 +29,4 @@ STARTUP-HOOK: [ \ detected-arm64-features reset-memoized ]
 
 os macos? [ "cpu.arm.64.features.macos" require ] when
 os linux? [ "cpu.arm.64.features.linux" require ] when
+os windows? [ "cpu.arm.64.features.windows" require ] when

@@ -63,8 +63,8 @@ IN: cpu.arm.64.assembler.tests
 0x828cff2d [ S2 S3 X4 -4 [pre] LDP ] test-insn
 0x828cc06c [ D2 D3 X4 8 [post] LDP ] test-insn
 0x828c7fad [ Q2 Q3 X4 -16 [+] LDP ] test-insn
-[ SP X0 X1 [] STP ] must-fail
-[ X0 D1 X2 [] STP ] must-fail
+[ [ SP X0 X1 [] STP ] { } make ] must-fail
+[ [ X0 D1 X2 [] STP ] { } make ] must-fail
 
 0xae0240f8 [ X14 X21 [] LDUR ] test-insn
 
@@ -160,7 +160,7 @@ IN: cpu.arm.64.assembler.tests
 0x20a022cb [ X0 X1 W2 0 <SXTH> SUB ] test-insn
 0x2068228b [ X0 X1 X2 2 <UXTX> ADD ] test-insn
 0x2048220b [ W0 W1 W2 2 <UXTW> ADD ] test-insn
-[ W0 W1 X2 2 <UXTX> ADD ] must-fail
+[ [ W0 W1 X2 2 <UXTX> ADD ] { } make ] must-fail
 
 ! SIMD arrangements narrower than 128 bits (Q taken from the shape)
 0x2084220e [ V0 V1 V2 8B ADDv ] test-insn
@@ -177,7 +177,7 @@ IN: cpu.arm.64.assembler.tests
 0x2038020e [ V0 V1 V2 8B ZIP1 ] test-insn
 
 ! MOVZ rejects an out-of-range immediate
-[ W0 0x1ffff 0 MOVZ ] must-fail
+[ [ W0 0x1ffff 0 MOVZ ] { } make ] must-fail
 
 ! LSL #0 must wrap immr to zero, including for 32-bit registers.
 0x207c0053 [ W0 W1 0 LSL ] test-insn
@@ -228,3 +228,216 @@ IN: cpu.arm.64.assembler.tests
 { 0x2068214e } [ [ V0 V1 FCVTNH2 ] { } make be> ] unit-test
 { 0x2068a10e } [ [ V0 V1 BFCVTN ] { } make be> ] unit-test
 { 0x2068a14e } [ [ V0 V1 BFCVTN2 ] { } make be> ] unit-test
+
+! Widening FP conversions take the source arrangement. In particular, 4S
+! must encode single-to-double, not half-to-single (Clang reference bytes).
+0x2078610e [ V0 V1 4S FCVTL ] test-insn
+0x2078614e [ V0 V1 4S FCVTL2 ] test-insn
+0x3f7a610e [ V31 V17 2S FCVTL ] test-insn
+0x3f7a614e [ V31 V17 4S FCVTL2 ] test-insn
+0x2078210e [ V0 V1 4H FCVTL ] test-insn
+0x2078214e [ V0 V1 8H FCVTL2 ] test-insn
+
+! Register-indexed Q loads/stores use a 16-byte scale even though size=0.
+! Reference bytes assembled independently with Clang for AArch64.
+0x2078e23c [ Q0 X1 X2 4 <LSL*> [+] LDR ] test-insn
+0x2078a23c [ Q0 X1 X2 4 <LSL*> [+] STR ] test-insn
+0x2058e23c [ Q0 X1 W2 4 <UXTW> [+] LDR ] test-insn
+0x20d8a23c [ Q0 X1 W2 4 <SXTW> [+] STR ] test-insn
+0x2068e23c [ Q0 X1 X2 [+] LDR ] test-insn
+0x3f7bbe3c [ Q31 X25 X30 4 <LSL*> [+] STR ] test-insn
+[ [ Q0 X1 X2 3 <LSL*> [+] LDR ] { } make ] must-fail
+[ [ D0 X1 X2 4 <LSL*> [+] LDR ] { } make ] must-fail
+
+! Baseline integer additions; reference bytes assembled with Clang/AArch64.
+0x2000021a [ W0 W1 W2 ADC ] test-insn
+0x2000023a [ W0 W1 W2 ADCS ] test-insn
+0x2000025a [ W0 W1 W2 SBC ] test-insn
+0x2000027a [ W0 W1 W2 SBCS ] test-insn
+0xe003015a [ W0 W1 NGC ] test-insn
+0xe003017a [ W0 W1 NGCS ] test-insn
+0x2004c05a [ W0 W1 REV16 ] test-insn
+0x2008c05a [ W0 W1 REV ] test-insn
+0x20fc021b [ W0 W1 W2 MNEG ] test-insn
+0x202cc21a [ W0 W1 W2 ROR ] test-insn
+0x20008113 [ W0 W1 0 ROR ] test-insn
+0x20008213 [ W0 W1 W2 0 EXTR ] test-insn
+0x207c0033 [ W0 W1 0 32 BFXIL ] test-insn
+0x207c0033 [ W0 W1 0 32 BFI ] test-insn
+0x2000423a [ W1 W2 0 EQ CCMN ] test-insn
+0x2008403a [ W1 0 0 EQ CCMN ] test-insn
+0x2000427a [ W1 W2 0 EQ CCMP ] test-insn
+0x2008407a [ W1 0 0 EQ CCMP ] test-insn
+0x2000029a [ X0 X1 X2 ADC ] test-insn
+0x200002ba [ X0 X1 X2 ADCS ] test-insn
+0x200002da [ X0 X1 X2 SBC ] test-insn
+0x200002fa [ X0 X1 X2 SBCS ] test-insn
+0xe00301da [ X0 X1 NGC ] test-insn
+0xe00301fa [ X0 X1 NGCS ] test-insn
+0x2004c0da [ X0 X1 REV16 ] test-insn
+0x200cc0da [ X0 X1 REV ] test-insn
+0x2008c0da [ X0 X1 REV32 ] test-insn
+0x20fc029b [ X0 X1 X2 MNEG ] test-insn
+0x202cc29a [ X0 X1 X2 ROR ] test-insn
+0x2000c193 [ X0 X1 0 ROR ] test-insn
+0x2000c293 [ X0 X1 X2 0 EXTR ] test-insn
+0x20fc40b3 [ X0 X1 0 64 BFXIL ] test-insn
+0x20fc40b3 [ X0 X1 0 64 BFI ] test-insn
+0x200042ba [ X1 X2 0 EQ CCMN ] test-insn
+0x200840ba [ X1 0 0 EQ CCMN ] test-insn
+0x200042fa [ X1 X2 0 EQ CCMP ] test-insn
+0x200840fa [ X1 0 0 EQ CCMP ] test-insn
+0x200c229b [ X0 W1 W2 X3 SMADDL ] test-insn
+0x208c229b [ X0 W1 W2 X3 SMSUBL ] test-insn
+0x200ca29b [ X0 W1 W2 X3 UMADDL ] test-insn
+0x208ca29b [ X0 W1 W2 X3 UMSUBL ] test-insn
+0x207c229b [ X0 W1 W2 SMULLs ] test-insn
+0x20fc229b [ X0 W1 W2 SMNEGL ] test-insn
+0x207ca29b [ X0 W1 W2 UMULLs ] test-insn
+0x20fca29b [ X0 W1 W2 UMNEGL ] test-insn
+
+! Boundary fields, ZR/SP semantics, and canonical logical immediates.
+0x3e021d1a [ W30 W17 W29 ADC ] test-insn
+0xff031ffa [ XZR XZR XZR SBCS ] test-insn
+0x207c8213 [ W0 W1 W2 31 EXTR ] test-insn
+0x20fcc293 [ X0 X1 X2 63 EXTR ] test-insn
+0x207c8113 [ W0 W1 31 ROR ] test-insn
+0x20fcc193 [ X0 X1 63 ROR ] test-insn
+0x20f87fb3 [ X0 X1 1 63 BFI ] test-insn
+0x207c1f33 [ W0 W1 31 1 BFXIL ] test-insn
+0x2fc25dfa [ X17 X29 15 GT CCMP ] test-insn
+0x251a5f3a [ W17 31 5 NE CCMN ] test-insn
+0x3e2e3d9b [ X30 W17 W29 X11 SMADDL ] test-insn
+0xffffbf9b [ XZR WZR WZR XZR UMSUBL ] test-insn
+0xffd322eb [ XZR SP W2 4 <SXTW> SUBS ] test-insn
+0xffd322eb [ SP W2 4 <SXTW> CMP ] test-insn
+0xff53222b [ WZR WSP W2 4 <UXTW> ADDS ] test-insn
+0xff53222b [ WSP W2 4 <UXTW> CMN ] test-insn
+0xff73228b [ SP SP X2 4 <UXTX> ADD ] test-insn
+0x20000012 [ W0 W1 1 AND ] test-insn
+0x206c1c12 [ W0 W1 -16 AND ] test-insn
+0x209c0892 [ X0 X1 18374966859414961920 AND ] test-insn
+
+! Reject operands which would spill into adjacent fields or encode reserved forms.
+! Use a builder so failure must come from validation, not emitting outside make.
+[ [ W0 W1 X2 ADC ] { } make ] must-fail
+[ [ SP X1 X2 SBC ] { } make ] must-fail
+[ [ W0 W1 REV32 ] { } make ] must-fail
+[ [ X0 SP REV ] { } make ] must-fail
+[ [ W0 W1 W2 32 EXTR ] { } make ] must-fail
+[ [ X0 X1 X2 64 EXTR ] { } make ] must-fail
+[ [ X0 X1 X2 -1 EXTR ] { } make ] must-fail
+[ [ X0 X1 W2 0 EXTR ] { } make ] must-fail
+[ [ W0 W1 32 ROR ] { } make ] must-fail
+[ [ W0 W1 32 0 SBFM ] { } make ] must-fail
+[ [ X0 X1 0 64 UBFM ] { } make ] must-fail
+[ [ X0 X1 -1 0 BFM ] { } make ] must-fail
+[ [ X0 X1 1 0 SBFX ] { } make ] must-fail
+[ [ X0 X1 1 0 UBFX ] { } make ] must-fail
+[ [ X0 X1 1 0 BFXIL ] { } make ] must-fail
+[ [ X0 X1 63 2 BFI ] { } make ] must-fail
+[ [ X0 X1 1 0 BFI ] { } make ] must-fail
+[ [ X0 X1 X2 1 <ROR> ADD ] { } make ] must-fail
+[ [ X0 X1 X2 1 <ROR> SUBS ] { } make ] must-fail
+[ [ XZR X1 W2 0 <UXTW> ADD ] { } make ] must-fail
+[ [ SP X1 W2 0 <UXTW> ADDS ] { } make ] must-fail
+[ [ X0 X1 16 EQ CCMP ] { } make ] must-fail
+[ [ X0 X1 0 16 CCMN ] { } make ] must-fail
+[ [ X0 32 0 EQ CCMP ] { } make ] must-fail
+[ [ X0 -1 0 EQ CCMN ] { } make ] must-fail
+[ [ X0 W1 0 EQ CCMP ] { } make ] must-fail
+[ [ SP X1 0 EQ CCMN ] { } make ] must-fail
+[ [ X0 X1 X2 16 CSEL ] { } make ] must-fail
+[ [ X0 X1 W2 X3 SMADDL ] { } make ] must-fail
+[ [ W0 W1 W2 X3 SMSUBL ] { } make ] must-fail
+[ [ X0 W1 W2 W3 UMADDL ] { } make ] must-fail
+[ [ X0 WSP W2 X3 UMSUBL ] { } make ] must-fail
+[ [ 0 16 B.cond ] { } make ] must-fail
+[ [ W0 32 0 TBZ ] { } make ] must-fail
+[ [ X0 64 0 TBNZ ] { } make ] must-fail
+[ [ X0 -1 0 TBZ ] { } make ] must-fail
+[ [ X0 X1 X2 5 <LSL*> ADD ] { } make ] must-fail
+[ [ X0 X1 X2 -1 <LSL*> SUB ] { } make ] must-fail
+0x20fcdf88 [ W0 X1 LDAR ] test-insn
+0x20fc9f88 [ W0 X1 STLR ] test-insn
+0x207c5f88 [ W0 X1 LDXR ] test-insn
+0x20fc5f88 [ W0 X1 LDAXR ] test-insn
+0x207c0288 [ W2 W0 X1 STXR ] test-insn
+0x20fc0288 [ W2 W0 X1 STLXR ] test-insn
+0x20fcdf08 [ W0 X1 LDARB ] test-insn
+0x20fc9f08 [ W0 X1 STLRB ] test-insn
+0x207c5f08 [ W0 X1 LDXRB ] test-insn
+0x20fc5f08 [ W0 X1 LDAXRB ] test-insn
+0x207c0208 [ W2 W0 X1 STXRB ] test-insn
+0x20fc0208 [ W2 W0 X1 STLXRB ] test-insn
+0x20fcdf48 [ W0 X1 LDARH ] test-insn
+0x20fc9f48 [ W0 X1 STLRH ] test-insn
+0x207c5f48 [ W0 X1 LDXRH ] test-insn
+0x20fc5f48 [ W0 X1 LDAXRH ] test-insn
+0x207c0248 [ W2 W0 X1 STXRH ] test-insn
+0x20fc0248 [ W2 W0 X1 STLXRH ] test-insn
+0x20fcdfc8 [ X0 X1 LDAR ] test-insn
+0x20fc9fc8 [ X0 X1 STLR ] test-insn
+0x207c5fc8 [ X0 X1 LDXR ] test-insn
+0x20fc5fc8 [ X0 X1 LDAXR ] test-insn
+0xbf3003d5 [ 0 DMB ] test-insn
+0xbf3103d5 [ 1 DMB ] test-insn
+0xbf3203d5 [ 2 DMB ] test-insn
+0xbf3303d5 [ 3 DMB ] test-insn
+0xbf3403d5 [ 4 DMB ] test-insn
+0xbf3503d5 [ 5 DMB ] test-insn
+0xbf3603d5 [ 6 DMB ] test-insn
+0xbf3703d5 [ 7 DMB ] test-insn
+0xbf3803d5 [ 8 DMB ] test-insn
+0xbf3903d5 [ 9 DMB ] test-insn
+0x9f3003d5 [ 0 DSB ] test-insn
+0x9f3103d5 [ 1 DSB ] test-insn
+0x9f3203d5 [ 2 DSB ] test-insn
+0x9f3303d5 [ 3 DSB ] test-insn
+0x9f3403d5 [ 4 DSB ] test-insn
+0x9f3503d5 [ 5 DSB ] test-insn
+0x9f3603d5 [ 6 DSB ] test-insn
+0x9f3703d5 [ 7 DSB ] test-insn
+0x9f3803d5 [ 8 DSB ] test-insn
+0x9f3903d5 [ 9 DSB ] test-insn
+0xdf3f03d5 [ ISB ] test-insn
+0x5f3f03d5 [ CLREX ] test-insn
+0x200c021f [ S0 S1 S2 S3 FMADDs ] test-insn
+0x208c021f [ S0 S1 S2 S3 FMSUBs ] test-insn
+0x200c221f [ S0 S1 S2 S3 FNMADDs ] test-insn
+0x208c221f [ S0 S1 S2 S3 FNMSUBs ] test-insn
+0x200c421f [ D0 D1 D2 D3 FMADDs ] test-insn
+0x208c421f [ D0 D1 D2 D3 FMSUBs ] test-insn
+0x200c621f [ D0 D1 D2 D3 FNMADDs ] test-insn
+0x208c621f [ D0 D1 D2 D3 FNMSUBs ] test-insn
+
+! Type/width/address validation and constrained-unpredictable store overlap.
+[ [ X0 W1 LDAR ] { } make ] must-fail
+[ [ X0 XZR LDAR ] { } make ] must-fail
+[ [ SP X1 LDAR ] { } make ] must-fail
+[ [ S0 X1 STLR ] { } make ] must-fail
+[ [ X0 X1 LDARB ] { } make ] must-fail
+[ [ WSP X1 LDARH ] { } make ] must-fail
+[ [ X0 X1 STLRB ] { } make ] must-fail
+[ [ W0 WSP STLRH ] { } make ] must-fail
+[ [ X0 X1 LDXRB ] { } make ] must-fail
+[ [ X0 X1 LDAXRH ] { } make ] must-fail
+[ [ X0 X1 X2 STXR ] { } make ] must-fail
+[ [ W0 X0 X1 STXR ] { } make ] must-fail
+[ [ W0 X1 X0 STLXR ] { } make ] must-fail
+[ [ WZR XZR SP STXR ] { } make ] must-fail
+[ [ W0 X1 SP STXRB ] { } make ] must-fail
+[ [ W0 W1 XZR STLXRH ] { } make ] must-fail
+[ [ -1 DMB ] { } make ] must-fail
+[ [ 16 DSB ] { } make ] must-fail
+[ [ S0 D1 S2 S3 FMADDs ] { } make ] must-fail
+[ [ X0 X1 X2 X3 FMSUBs ] { } make ] must-fail
+[ [ Q0 Q1 Q2 Q3 FNMADDs ] { } make ] must-fail
+
+! Clang oracle: reference/arm64-gap-reduced-ffi-20260908/moves.s.
+! Scalar small-float aggregate accesses retain their two-byte width.
+USE: cpu.architecture
+0xe007407d [ V0 SP 2 [+] half-rep LDR* ] test-insn
+0xe007407d [ V0 SP 2 [+] bfloat-rep LDR* ] test-insn
+0xe10f007d [ V1 SP 6 [+] half-rep STR* ] test-insn
+0xe10f007d [ V1 SP 6 [+] bfloat-rep STR* ] test-insn

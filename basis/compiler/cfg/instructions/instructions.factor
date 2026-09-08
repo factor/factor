@@ -141,6 +141,11 @@ FOLDABLE-INSN: ##mul
 def: dst/int-rep
 use: src1/int-rep src2/int-rep ;
 
+! Integer multiplication followed by negation, modulo the machine cell size.
+FOLDABLE-INSN: ##mneg
+def: dst/int-rep
+use: src1/int-rep src2/int-rep ;
+
 FOLDABLE-INSN: ##mul-imm
 def: dst/int-rep
 use: src1/int-rep

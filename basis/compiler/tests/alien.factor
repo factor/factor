@@ -73,14 +73,11 @@ FUNCTION: int ffi_test_11 ( int a, FOO b, int c )
 
 { 14 } [ 1 2 3 make-FOO 4 ffi_test_11 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
 
     FUNCTION: int ffi_test_13 ( int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k )
 
     { 66 } [ 1 2 3 4 5 6 7 8 9 10 11 ffi_test_13 ] unit-test
 
-] unless
 
 FUNCTION: FOO ffi_test_14 ( int x, int y )
 
@@ -179,8 +176,6 @@ FUNCTION: void ffi_test_20 ( double x1, double x2, double x3,
 
 { } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 ffi_test_20 ] unit-test
 
-! arm64 macos packed stack parameters not implemented
-cpu arm.64? os macos? and [
 
     ! Make sure XT doesn't get clobbered in stack frame
 
@@ -200,7 +195,6 @@ cpu arm.64? os macos? and [
 
     { 861.0 } [ 42 [ >float ] each-integer ffi_test_31_point_5 ] unit-test
 
-] unless
 
 FUNCTION: longlong ffi_test_21 ( long x, long y )
 
@@ -938,12 +932,10 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
     ] times
 ] unit-test
 
-! Varargs are currently not supported on arm64 macos
-cpu arm.64? os macos? and [
 
     ! Varargs with non-float parameters works.
-    FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, int a, int b )
-    FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, int a, int b, int c )
+    FUNCTION-ALIAS: do-sum-ints2 int ffi_test_64 ( int n, ... int a, int b )
+    FUNCTION-ALIAS: do-sum-ints3 int ffi_test_64 ( int n, ... int a, int b, int c )
 
     { 30 60 } [
         2 10 20 do-sum-ints2
@@ -951,8 +943,8 @@ cpu arm.64? os macos? and [
     ] unit-test
 
     ! Varargs with non-floats doesn't work on windows
-    FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, double a, double b )
-    FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, double a, double b, double c )
+    FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, ... double a, double b )
+    FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, ... double a, double b, double c )
 
     os windows? [
         { 27.0 22.0 } [
@@ -961,7 +953,7 @@ cpu arm.64? os macos? and [
         ] unit-test
     ] unless
 
-] unless
+
 
 FUNCTION: int bug1021_test_2 ( int a, char* b, void* c )
 FUNCTION: void* bug1021_test_3 ( c-string a )

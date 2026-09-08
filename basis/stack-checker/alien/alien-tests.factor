@@ -56,3 +56,31 @@ ${
     int { int int } cdecl f alien-node-params boa
     [ "hello" ] wrap-callback-quot
 ] unit-test
+
+USING: cpu.architecture system ;
+[
+    alien-invoke-params new { int } >>parameters -1 >>varargs? prepare-varargs
+] [ invalid-varargs-count? ] must-fail-with
+[
+    alien-invoke-params new { int } >>parameters 2 >>varargs? prepare-varargs
+] [ invalid-varargs-count? ] must-fail-with
+cpu arm.64? os macos? and [
+    [ alien-invoke-params new { int } >>parameters t >>varargs? prepare-varargs ]
+    [ missing-varargs-count? ] must-fail-with
+] when
+
+USE: math.floats.small.c-types
+! Windows variadic functions carry FP parameters in integer registers.
+! Both named direct and unnamed indirect scalars must be rejected.
+[
+    alien-invoke-params new { half int } >>parameters 1 >>varargs?
+    check-windows-small-float-varargs
+] [ windows-small-float-varargs-unsupported? ] must-fail-with
+[
+    alien-indirect-params new { int bfloat } >>parameters 1 >>varargs?
+    check-windows-small-float-varargs
+] [ windows-small-float-varargs-unsupported? ] must-fail-with
+{ } [
+    alien-invoke-params new { half bfloat } >>parameters f >>varargs?
+    check-windows-small-float-varargs
+] unit-test

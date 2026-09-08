@@ -1,6 +1,6 @@
 ! Copyright (C) 2025 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data arrays assocs
+USING: accessors alien alien.arrays alien.c-types alien.data arrays assocs
 byte-arrays classes.algebra classes.struct combinators
 combinators.short-circuit compiler.cfg
 compiler.cfg.builder.alien.boxing compiler.cfg.comparisons
@@ -9,8 +9,8 @@ compiler.cfg.registers compiler.cfg.stack-frame
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
 cpu.arm.64.assembler cpu.arm.64.assembler.registers
-generalizations grouping kernel layouts literals make math
-math.bitwise math.order memory namespaces sequences system ;
+generalizations grouping kernel layouts literals locals make math
+math.bitwise math.functions math.order memory namespaces sequences sequences.repeating system ;
 FROM: cpu.arm.64.assembler => B ;
 IN: cpu.arm.64
 
@@ -167,10 +167,15 @@ M: arm.64 %add-imm ADDS ;
 M: arm.64 %sub SUBS ;
 M: arm.64 %sub-imm SUBS ;
 M: arm.64 %mul MUL ;
+M: arm.64 %mneg MNEG ;
 
 M:: arm.64 %mul-imm ( DST SRC1 src2 -- )
-    temp src2 (%load-immediate)
-    DST SRC1 temp MUL ;
+    src2 2 > src2 1 - power-of-2? and [
+        DST SRC1 SRC1 src2 1 - log2 <LSL> ADD
+    ] [
+        temp src2 (%load-immediate)
+        DST SRC1 temp MUL
+    ] if ;
 
 M: arm.64 %and AND ;
 M: arm.64 %and-imm AND ;
@@ -289,6 +294,19 @@ M:: arm.64 %copy ( dst src rep -- )
             [ offset? ]
             [ float-rep? ] tri* and and
         ] [ drop [ >S ] dip LDR ] }
+        { [
+            3dup
+            [ [ register? ] both? ]
+            [ small-float-rep? ] bi* and
+        ] [ drop [ >S ] bi@ FMOV ] }
+        { [
+            3dup
+            [ offset? ] [ register? ] [ small-float-rep? ] tri* and and
+        ] [ drop >H swap STR ] }
+        { [
+            3dup
+            [ register? ] [ offset? ] [ small-float-rep? ] tri* and and
+        ] [ drop [ >H ] dip LDR ] }
         { [
             3dup
             [ [ register? ] both? ]
@@ -425,15 +443,38 @@ M: arm.64 %merge-vector-tail >shape ZIP2 ;
 M: arm.64 %float-pack-vector >shape FCVTN ;
 
 M: arm.64 %signed-pack-vector
+    ! The representation describes both input and narrowed output signedness.
     [ >size 1 - 1 <vector-shape> ] [ signed-int-vector-rep? ] bi
     [ [ nip SQXTN ] 4keep nipd SQXTN2 ]
-    [ [ nip SQXTUN ] 4keep nipd SQXTUN2 ] if ;
+    [ [ nip UQXTN ] 4keep nipd UQXTN2 ] if ;
 
 M: arm.64 %unsigned-pack-vector >size 1 - 1 <vector-shape> [ nip UQXTN ] 4keep nipd UQXTN2 ;
 M: arm.64 %unpack-vector-head [ SXTL ] [ UXTL ] [ FCVTL ] signed/unsigned/float ;
 M: arm.64 %unpack-vector-tail [ SXTL2 ] [ UXTL2 ] [ FCVTL2 ] signed/unsigned/float ;
 M: arm.64 %integer>float-vector [ SCVTFvi ] [ UCVTFvi ] signed/unsigned ;
-M: arm.64 %float>integer-vector >shape FCVTZSvi ;
+M:: arm.64 %float>integer-vector ( DST SRC rep -- )
+    ! Binary32 conversion truncates and wraps modulo 2^32. FCVTZS would
+    ! saturate. Recover the integer from the significand and exponent instead.
+    ! Keep sign+exponent together: the sign contributes 256 to the shift count,
+    ! which USHL ignores. After subtracting 150, nonnegative-source counts are
+    ! -150..105 and negative-source counts are 106..361. The wrapped low-byte
+    ! counts outside -31..31 all give zero, including subnormals and NaN/inf.
+    rep drop
+    fp-temp SRC 23 4S USHR
+    DST SRC 9 4S SHL
+    DST DST 9 4S USHR
+    temp 0x800000 (%load-immediate)
+    fp-temp2 temp 4S DUP
+    DST DST fp-temp2 16B ORRv
+    temp 150 MOV
+    fp-temp2 temp 4S DUP
+    fp-temp fp-temp fp-temp2 4S SUBv
+    DST DST fp-temp 4S USHL
+    temp 106 MOV
+    fp-temp2 temp 4S DUP
+    fp-temp fp-temp fp-temp2 4S CMGE
+    DST DST fp-temp 16B EORv
+    DST DST fp-temp 4S SUBv ;
 
 M: arm.64 %compare-vector
     {
@@ -528,8 +569,18 @@ M:: arm.64 %saturated-mul-vector ( DST SRC1 SRC2 rep -- )
     DST fp-temp rep [ SQXTN ] [ UQXTN ] signed/unsigned
     DST fp-temp2 rep [ SQXTN2 ] [ UQXTN2 ] signed/unsigned ;
 M: arm.64 %div-vector >shape FDIVv ;
-M: arm.64 %min-vector [ SMIN ] [ UMIN ] [ FMINNMv ] signed/unsigned/float ;
-M: arm.64 %max-vector [ SMAX ] [ UMAX ] [ FMAXNMv ] signed/unsigned/float ;
+M:: arm.64 %min-vector ( DST SRC1 SRC2 rep -- )
+    rep { longlong-2-rep ulonglong-2-rep } member? [
+        fp-temp SRC1 SRC2 rep [ CMGT ] [ CMHI ] signed/unsigned
+        fp-temp SRC2 SRC1 16B BSLv
+        DST fp-temp 16B MOVv
+    ] [ DST SRC1 SRC2 rep [ SMIN ] [ UMIN ] [ FMINNMv ] signed/unsigned/float ] if ;
+M:: arm.64 %max-vector ( DST SRC1 SRC2 rep -- )
+    rep { longlong-2-rep ulonglong-2-rep } member? [
+        fp-temp SRC1 SRC2 rep [ CMGT ] [ CMHI ] signed/unsigned
+        fp-temp SRC1 SRC2 16B BSLv
+        DST fp-temp 16B MOVv
+    ] [ DST SRC1 SRC2 rep [ SMAX ] [ UMAX ] [ FMAXNMv ] signed/unsigned/float ] if ;
 M:: arm.64 %avg-vector ( DST SRC1 SRC2 rep -- )
     rep { longlong-2-rep ulonglong-2-rep } member? [
         fp-temp SRC1 SRC2 16B ORRv
@@ -638,7 +689,8 @@ M: arm.64 %unsigned-pack-vector-reps { ushort-8-rep uint-4-rep ulonglong-2-rep }
 M: arm.64 %unpack-vector-head-reps { float-4-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %unpack-vector-tail-reps { float-4-rep char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %integer>float-vector-reps { int-4-rep uint-4-rep longlong-2-rep ulonglong-2-rep } ;
-M: arm.64 %float>integer-vector-reps float-vector-reps ;
+! Binary64 still uses the portable truncation/modulo conversion.
+M: arm.64 %float>integer-vector-reps { float-4-rep } ;
 M: arm.64 %compare-vector-reps
     dup cc/<>= eq? [ drop float-vector-reps ]
     [ { cc< cc<= cc> cc>= cc= cc<> } member? baseline-vector-reps and ] if ;
@@ -665,8 +717,8 @@ M: arm.64 %mul-high-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-
 M: arm.64 %saturated-mul-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %mul-horizontal-add-vector-reps f ;
 M: arm.64 %div-vector-reps float-vector-reps ;
-M: arm.64 %min-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
-M: arm.64 %max-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep float-4-rep double-2-rep } ;
+M: arm.64 %min-vector-reps baseline-vector-reps ;
+M: arm.64 %max-vector-reps baseline-vector-reps ;
 M: arm.64 %avg-vector-reps int-vector-reps ;
 M: arm.64 %sad-vector-reps { char-16-rep uchar-16-rep short-8-rep ushort-8-rep int-4-rep uint-4-rep } ;
 M: arm.64 %sqrt-vector-reps float-vector-reps ;
@@ -939,26 +991,37 @@ GENERIC: flatten-reps ( c-type -- reps )
 
 M: object flatten-reps c-type-rep 1array ;
 
+M: array flatten-reps
+    unclip [ array-length ] [ lookup-c-type flatten-reps ] bi* <repetition> concat ;
+
+M: string-type flatten-reps drop int-rep 1array ;
+
 M: struct-c-type flatten-reps
     fields>> [ type>> lookup-c-type flatten-reps ] map concat ;
 
-UNION: float/vector-rep float-rep double-rep vector-rep ;
+UNION: float/vector-rep float-rep double-rep small-float-rep vector-rep ;
 
 : homogeneous-float/vector-aggregate? ( c-type -- reps ? )
     lookup-c-type flatten-reps dup {
         [ length 4 <= ]
         [ [ float/vector-rep? ] all? ]
-        [ all-equal? ]
+        [ [ dup small-float-rep? [ drop small-float-rep ] when ] map all-equal? ]
     } 1&& ;
 
 M: arm.64 value-struct?
     [ heap-size 16 <= ]
     [ homogeneous-float/vector-aggregate? nip ] bi or ;
 
+:: mark-struct-reps ( reps -- reps' )
+    reps [| rep i |
+        rep first3 rep first rep-size 4array
+        i 0 = reps length 0 ? suffix
+    ] map-index ;
+
 M: arm.64 flatten-struct-type
     dup homogeneous-float/vector-aggregate?
     [ nip [ f f 3array ] map record-reg-reps ]
-    [ drop call-next-method ] if ;
+    [ drop call-next-method ] if mark-struct-reps ;
 
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
@@ -977,14 +1040,23 @@ M:: arm.64 %unbox ( DST SRC func rep -- )
     arg1 SRC tagged-rep %copy
     arg2 VM MOV
     func f f %c-invoke
-    DST rep %load-return ;
+    rep small-float-rep?
+    [ fp-temp >S W0 FMOV DST fp-temp rep %copy ]
+    [ DST rep %load-return ] if ;
 
 M:: arm.64 %local-allot ( DST size align offset -- )
     DST SP offset local-allot-offset %add-offset ;
 
 M:: arm.64 %box ( DST SRC func rep gc-map -- )
-    rep reg-class-of f param-regs at first SRC rep %copy
-    rep int-rep? arg2 arg1 ? VM MOV
+    rep small-float-rep? [
+        fp-temp SRC rep %copy
+        W0 fp-temp >S FMOV
+        W0 W0 0xffff AND
+        arg2 VM MOV
+    ] [
+        rep reg-class-of f param-regs at first SRC rep %copy
+        rep int-rep? arg2 arg1 ? VM MOV
+    ] if
     func f gc-map %c-invoke
     DST int-rep %load-return ;
 
@@ -1035,14 +1107,24 @@ M: arm.64 %alien-indirect
 
 : temp-reg ( rep -- reg ) reg-class-of temp-regs at first ;
 
-:: %store-stack-param ( vreg rep n -- )
+: store-stack-narrow ( Xreg operand size -- )
+    {
+        { 1 [ [ >W ] dip STRB ] }
+        { 2 [ [ >W ] dip STRH ] }
+        { 4 [ [ >W ] dip STR ] }
+        [ drop STR ]
+    } case ;
+
+:: %store-stack-param ( vreg rep n size -- )
     rep temp-reg vreg rep %copy
-    n rep stack@ rep temp-reg rep %copy ;
+    rep integer-rep?
+    [ rep temp-reg n rep stack@ size store-stack-narrow ]
+    [ n rep stack@ rep temp-reg rep %copy ] if ;
 
 M: arm.64 %alien-assembly
     3nip swap {
         [ [ first3 %store-reg-param ] each ]
-        [ [ first3 %store-stack-param ] each ]
+        [ [ first4 %store-stack-param ] each ]
         [ call( -- ) ]
         [ [ first3 %load-reg-param ] each ]
     } spread drop ;
@@ -1054,13 +1136,23 @@ M: arm.64 %alien-assembly
     temp2 CTX context-callstack-save-offset [+] LDR
     temp2 n os windows? 128 112 ? + rep temp memory-offset ;
 
-:: %load-stack-param ( vreg rep n -- )
-    rep temp-reg n rep next-stack@ rep %copy
+: load-stack-narrow ( Xreg operand size -- )
+    {
+        { 1 [ [ >W ] dip LDRB ] }
+        { 2 [ [ >W ] dip LDRH ] }
+        { 4 [ [ >W ] dip LDR ] }
+        [ drop LDR ]
+    } case ;
+
+:: %load-stack-param ( vreg rep n size -- )
+    rep integer-rep?
+    [ rep temp-reg n rep next-stack@ size load-stack-narrow ]
+    [ rep temp-reg n rep next-stack@ rep %copy ] if
     vreg rep temp-reg rep %copy ;
 
 M: arm.64 %callback-inputs
     [ [ first3 %load-reg-param ] each ]
-    [ [ first3 %load-stack-param ] each ] bi*
+    [ [ first4 %load-stack-param ] each ] bi*
     arg1 VM MOV
     arg2 XZR MOV
     "begin_callback" f f %c-invoke ;

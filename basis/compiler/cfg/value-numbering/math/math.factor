@@ -238,8 +238,15 @@ M: ##sub rewrite
         [ drop f ]
     } cond ;
 
+! Multiplication by -1 is negation even when the target cannot encode -1
+! as an arithmetic immediate (A64 ADD/SUB immediates are unsigned).
+: negative-one-vreg? ( vreg -- ? )
+    vreg>insn { [ ##load-integer? ] [ val>> -1 = ] } 1&& ;
+
 M: ##mul rewrite
     {
+        { [ dup src2>> negative-one-vreg? ] [ [ dst>> ] [ src1>> ] bi ##neg new-insn ] }
+        { [ dup src1>> negative-one-vreg? ] [ [ dst>> ] [ src2>> ] bi ##neg new-insn ] }
         { [ dup src2>> vreg-immediate-arithmetic? ] [ ##mul-imm f insn>imm-insn ] }
         { [ dup src1>> vreg-immediate-arithmetic? ] [ ##mul-imm t insn>imm-insn ] }
         [ drop f ]

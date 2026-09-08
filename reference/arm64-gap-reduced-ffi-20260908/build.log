@@ -1,0 +1,2 @@
+/usr/bin/clang -c -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-gap-reduced-ffi-2b9aa7b82c1cd84ca439d9ed8be04057e0695d2c"  -O3  -std=c99 -o build/ffi_test.o vm/ffi_test.c
+/usr/bin/clang -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-gap-reduced-ffi-2b9aa7b82c1cd84ca439d9ed8be04057e0695d2c"  -O3  -dynamiclib -o libfactor-ffi-test.dylib build/ffi_test.o
