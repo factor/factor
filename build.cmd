@@ -83,8 +83,11 @@ if not errorlevel 1 (
     )
 )
 
-echo Deleting staging images from temp/...
-del temp\staging.*.image
+if exist temp\staging.*.image (
+    echo Deleting staging images from temp/...
+    del temp\staging.*.image
+    if errorlevel 1 goto fail
+)
 
 if "%_git_pull%"=="1" (
     echo Updating working copy from %GIT_BRANCH%...
@@ -126,20 +129,20 @@ if "%_bootstrap_factor%"=="1" (
 )
 
 echo Build complete.
-goto :EOF
+exit /b 0
 
 :fail
 echo Build failed.
-goto :EOF
+exit /b 1
 
 :wrongdir
 echo build.cmd must be run from the root of the Factor source tree.
-goto :EOF
+exit /b 1
 
 :nocl
 echo Unable to detect cl.exe target platform.
 echo Make sure you're running within the Visual Studio or Windows SDK environment.
-goto :EOF
+exit /b 1
 
 :usage
 echo Usage: build.cmd [command]
@@ -154,4 +157,5 @@ echo     self-bootstrap - git pull, make a boot image, bootstrap
 echo     bootstrap - existing boot image, bootstrap
 echo     net-bootstrap - recompile vm, download a boot image, bootstrap
 echo     update-boot-image - get the boot image for the current branch
-goto :EOF
+if "%1"=="/?" exit /b 0
+exit /b 1
