@@ -333,8 +333,8 @@ M: x86 %unsigned-pack-vector-reps
 
 M: x86 %tail>head-vector
     dup {
-        { float-4-rep [ drop UNPCKHPD ] }
-        { double-2-rep [ drop UNPCKHPD ] }
+        { float-4-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
+        { double-2-rep [ [ %copy ] [ drop UNPCKHPD ] 3bi ] }
         [ drop [ %copy ] [ drop PUNPCKHQDQ ] 3bi ]
     } case ;
 
