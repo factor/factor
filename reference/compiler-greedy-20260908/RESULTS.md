@@ -62,6 +62,17 @@ heap arrays and the pressure kernel. Both range non-overlap and preservation of
 mandatory register uses are checked. The whole compiler suite is coordinated by
 the integration worktree.
 
+Integration testing exposed an ABI defect in the initial implementation:
+memory-only clobber fragments could retain a physical register, and ABI slots
+were assigned only as a side effect of creating register-backed fragments.
+The corrected implementation reserves forced operand slots before splitting
+and represents a fragment used solely at the clobber directly by its slot.
+Two targeted regressions cover atomic and wide memory-only fragments.
+`large-return-before.log` reproduces four failures from the original allocator
+in the existing `compiler/tests/alien-large-return.factor` tests: wrong direct
+results, an indirect-call memory fault, and a wrong nested callback result.
+`large-return-tests.log` shows all five tests passing after the correction.
+
 Run from the repository root with an absolute image path:
 
 ```sh

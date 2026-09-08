@@ -80,6 +80,23 @@ Unit Test: {
     ]
 }
 Unit Test: {
+    { 0 1 }
+    [
+        init-test 1 { { 10 10 } } { 10 } test-interval
+        dup first-use t >>spill-slot? drop 10 f sync-point boa
+        2array allocate-test length spill-slots get assoc-size
+    ]
+}
+Unit Test: {
+    { 0 1 }
+    [
+        init-test 1 { { 0 10 } } { 10 } test-interval
+        dup first-use f >>def-rep int-rep >>use-rep
+        t >>spill-slot? drop 10 f sync-point boa 2array
+        allocate-test length spill-slots get assoc-size
+    ]
+}
+Unit Test: {
     { 4950 }
     [
         greedy-allocator register-allocator

@@ -126,12 +126,33 @@ ERROR: greedy-register-pressure interval ;
 
 ! Calls and boxing instructions impose Factor-specific clobbers. Split them
 ! before arbitrary-order allocation, preserving the baseline's keep-dst rule.
+:: reserve-clobber-slot ( interval sync -- )
+    sync n>> interval find-use [| use |
+        use spill-slot?>> [
+            interval vreg>> use def-rep>> use use-rep>> or
+            assign-spill-slot drop
+        ] when
+    ] when* ;
+
+:: memory-only-at-clobber? ( interval sync -- ? )
+    interval uses>> length 1 = [
+        interval first-use [ spill-slot?>> ] [ n>> sync n>> = ] bi and
+    ] [ f ] if ;
+
 :: split-at-clobber ( interval sync -- fragments )
+    interval sync reserve-clobber-slot
     sync n>> interval covers?
     sync interval spill-at-sync-point? and [
-        interval sync n>> already-spilled-atomic-use? [ interval 1array ] [
-            interval sync n>> split-for-spill 2array sift
-            "clobber-splits" greedy-count
+        interval sync memory-only-at-clobber? [
+            ! The ABI consumes/defines the slot directly. No register use
+            ! survives, including when the entire interval is atomic.
+            { }
+            "memory-only-clobbers" greedy-count
+        ] [
+            interval sync n>> already-spilled-atomic-use? [ interval 1array ] [
+                interval sync n>> split-for-spill 2array sift
+                "clobber-splits" greedy-count
+            ] if
         ] if
     ] [ interval 1array ] if ;
 
