@@ -7,6 +7,7 @@ compiler.cfg.branch-splitting
 compiler.cfg.checker
 compiler.cfg.copy-prop
 compiler.cfg.dce
+compiler.cfg.multiply-negate
 compiler.cfg.ssa.construction
 compiler.cfg.tco
 compiler.cfg.useless-conditionals
@@ -20,6 +21,7 @@ IN: compiler.cfg.optimizer
     dup \ alias-analysis checked-ssa-pass
     dup \ value-numbering checked-ssa-pass
     dup \ copy-propagation checked-ssa-pass
+    dup \ fuse-multiply-negate checked-ssa-pass
     \ eliminate-dead-code checked-ssa-pass ;
 
 : optimize-cfg ( cfg -- )

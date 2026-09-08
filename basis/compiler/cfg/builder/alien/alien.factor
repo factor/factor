@@ -18,6 +18,7 @@ IN: compiler.cfg.builder.alien
         V{ } clone stack-values set
         0 int-reg-reps set
         0 float-reg-reps set
+        os macos? cpu arm.64? and compact-stack-params? set
         @
         reg-values get
         stack-values get
@@ -27,11 +28,25 @@ IN: compiler.cfg.builder.alien
     struct-return-area set
     stack-params set ; inline
 
+SYMBOL: varargs-named-count
+
+:: mark-vararg-group ( reps -- reps' )
+    reps [| rep i |
+        rep first3 rep param-natural-size 4array
+        rep length 4 > [ 4 rep nth ] [ 0 ] if suffix
+        i 0 = suffix i reps length 1 - = suffix
+    ] map-index ;
+
+: mark-varargs ( groups -- groups' )
+    varargs-named-count get dup integer? [
+        '[ _ >= [ mark-vararg-group ] when ] map-index
+    ] [ drop ] if ;
+
 : unbox-parameters ( parameters -- vregs reps )
     [
         [ length <iota> <reversed> ] keep
         [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
-        2 2 mnmap [ concat ] bi@
+        2 2 mnmap mark-varargs [ concat ] bi@
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
@@ -47,28 +62,36 @@ IN: compiler.cfg.builder.alien
         ] if* result
     ] [ vregs reps f ] if ;
 
-: (handle-macos-arm64-varargs) ( params -- )
-    function>> { "fcntl" "open" } member? os macos? cpu arm.64? and and
-    [ int-regs [ 2 tail* ] change ] when ;
-
 : handle-macos-arm64-varargs ( params -- )
-    dup alien-invoke-params?
-    [ (handle-macos-arm64-varargs) ] [ drop ] if ;
+    varargs?>> os macos? cpu arm.64? and [ drop f ] unless
+    varargs-named-count set ;
+
+: start-vararg ( -- )
+    ! Apple rounds the named stack area and each variadic argument to
+    ! eight-byte slots, but fields within an aggregate retain their layout.
+    int-regs get delete-all float-regs get delete-all
+    stack-params [ 8 align ] change ;
+
+:: caller-parameter ( vreg rep -- )
+    rep length 7 = [ 5 rep nth [ start-vararg ] when ] when
+    rep prepare-parameter-group
+    vreg rep first3 rep param-natural-size next-parameter
+    rep length 7 = [ 6 rep nth [ stack-params [ 8 align ] change ] when ] when ;
 
 : (caller-parameters) ( vregs reps -- )
-    [ first3 next-parameter ] 2each ;
+    [ caller-parameter ] 2each ;
 
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
         [ abi>> ]
+        [ ]
         [ parameters>> ]
         [ return>> ]
-        [ ]
     } cleave
     '[
+        _ handle-macos-arm64-varargs
         _ unbox-parameters
         _ prepare-struct-caller struct-return-area set
-        _ handle-macos-arm64-varargs
         (caller-parameters)
     ] with-param-regs ;
 
@@ -144,20 +167,20 @@ M: #alien-assembly emit-node
     ]
     [ caller-return ] bi ;
 
-: callee-parameter ( rep on-stack? odd-register? -- dst )
-    [ next-vreg dup ] 3dip next-parameter ;
+: callee-parameter ( rep on-stack? odd-register? size -- dst )
+    [ next-vreg dup ] 4dip next-parameter ;
 
 : prepare-struct-callee ( c-type -- vreg )
     large-struct?
     [
         struct-return-register [
             [ next-vreg dup int-rep ] dip 3array reg-values get push
-        ] [ int-rep struct-return-on-stack? f callee-parameter ] if*
+        ] [ int-rep struct-return-on-stack? f cell callee-parameter ] if*
     ] [ f ] if ;
 
 : (callee-parameters) ( params -- vregs reps )
     [ flatten-parameter-type ] map
-    [ [ [ first3 callee-parameter ] map ] map ]
+    [ [ [ dup prepare-parameter-group [ first3 ] [ param-natural-size ] bi callee-parameter ] map ] map ]
     [ [ keys ] map ] bi ;
 
 : box-parameters ( vregs reps params -- )

@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.libraries
-alien.private arrays assocs combinators effects kernel math
+alien.private arrays assocs combinators cpu.architecture effects kernel locals math math.order
 namespaces quotations sequences stack-checker.backend
 stack-checker.dependencies stack-checker.state
-stack-checker.visitor strings words ;
+stack-checker.visitor strings system words ;
 FROM: kernel.private => declare ;
+QUALIFIED-WITH: alien.c-types c
 IN: stack-checker.alien
 
 TUPLE: alien-node-params
@@ -62,6 +63,40 @@ TUPLE: alien-callback-params < alien-node-params
 : pop-varargs? ( params -- params )
     pop-literal >>varargs? ;
 
+ERROR: missing-varargs-count ;
+
+ERROR: invalid-varargs-count count parameters ;
+
+: promote-vararg-type ( type -- type' )
+    dup lookup-c-type {
+        { [ dup c:float lookup-c-type eq? ] [ 2drop c:double ] }
+        { [ dup small-float-c-type? os macos? cpu arm.64? and and ]
+          [ nip vararg-type>> ] }
+        { [ dup dup c-type? [ [ rep>> int-rep = ] [ heap-size 4 < ] bi and ] [ drop f ] if ]
+          [ 2drop c:int ] }
+        [ drop ]
+    } cond ;
+
+ERROR: windows-small-float-varargs-unsupported ;
+
+: check-windows-small-float-varargs ( params -- )
+    dup varargs?>> [
+        parameters>> [ lookup-c-type small-float-c-type? ] any?
+        [ windows-small-float-varargs-unsupported ] when
+    ] [ drop ] if ;
+
+:: prepare-varargs ( params -- params )
+    os windows? cpu arm.64? and
+    [ params check-windows-small-float-varargs ] when
+    params varargs?>> :> count
+    count t eq? os macos? cpu arm.64? and and
+    [ missing-varargs-count ] when
+    count integer? [
+        count 0 params parameters>> length between? [
+            params [ [| type i | type i count >= [ promote-vararg-type ] when ] map-index ] change-parameters
+        ] [ count params parameters>> invalid-varargs-count ] if
+    ] [ params ] if ;
+
 : infer-alien-invoke ( -- )
     alien-invoke-params new
     ! Compile-time parameters
@@ -69,7 +104,7 @@ TUPLE: alien-callback-params < alien-node-params
     pop-params
     pop-function
     pop-library
-    pop-return
+    pop-return prepare-varargs
     ! Set ABI
     dup library>> library-abi >>abi
     ! Quotation which coerces parameters to required types
@@ -79,18 +114,17 @@ TUPLE: alien-callback-params < alien-node-params
     ! Quotation which coerces return value to required type
     infer-return ;
 
-: infer-alien-indirect ( -- )
-    alien-indirect-params new
-    ! Compile-time parameters
-    pop-abi
-    pop-params
-    pop-return
-    ! Coerce parameters to required types
+: (infer-alien-indirect) ( params -- )
+    pop-abi pop-params pop-return prepare-varargs
     dup param-prep-quot '[ _ [ >c-ptr ] bi* ] infer-quot-here
-    ! Consume inputs and outputs and add node to IR
     dup dup inputs/outputs #alien-indirect,
-    ! Quotation which coerces return value to required type
     infer-return ;
+
+: infer-alien-indirect ( -- )
+    alien-indirect-params new (infer-alien-indirect) ;
+
+: infer-alien-indirect-varargs ( -- )
+    alien-indirect-params new pop-varargs? (infer-alien-indirect) ;
 
 : infer-alien-assembly ( -- )
     alien-assembly-params new

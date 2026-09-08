@@ -1,0 +1,1 @@
+Fuse a single-use integer multiplication followed by negation

@@ -5,31 +5,40 @@ cpu.architecture kernel math.floats.small ;
 QUALIFIED: math
 IN: math.floats.small.c-types
 
-! These are memory element types. Passing a scalar half or bfloat by value
-! requires an ABI definition; only the 128-bit vector types have one here.
+! Scalar ABI support uses numeric conversion and raw 16-bit FP payloads.
 SYMBOLS: half bfloat ;
-TUPLE: small-float-c-type < abstract-c-type ;
-ERROR: small-float-scalar-abi-unsupported ;
-M: small-float-c-type c-type-rep drop small-float-scalar-abi-unsupported ;
-M: small-float-c-type c-type-getter getter>> ;
-M: small-float-c-type c-type-setter setter>> ;
-M: small-float-c-type c-type-copier drop [ ] ;
-M: small-float-c-type base-type ;
+
+<PRIVATE
+SYMBOLS: half-vararg bfloat-vararg ;
+PRIVATE>
 
 [
+    ! Apple promotes scalar small floats to double in variadic calls.
+    ! Quantize before promotion, as a C expression of the declared type does.
+    double lookup-c-type clone
+        [ math:>float float>half-bits half-bits>float ] >>unboxer-quot
+    \ half-vararg typedef
+    double lookup-c-type clone
+        [ math:>float float>bfloat-bits bfloat-bits>float ] >>unboxer-quot
+    \ bfloat-vararg typedef
+
     small-float-c-type new
-        math:float >>class math:float >>boxed-class
-        [ alien-unsigned-2 half-bits>float ] >>getter
-        [ [ float>half-bits ] 2dip set-alien-unsigned-2 ] >>setter
-        [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
+        math:fixnum >>class math:float >>boxed-class
+        [ alien-unsigned-2 ] >>getter
+        [ set-alien-unsigned-2 ] >>setter
+        [ half-bits>float ] >>boxer-quot [ math:>float float>half-bits ] >>unboxer-quot
+        "from_unsigned_4" >>boxer "to_unsigned_4" >>unboxer
+        half-rep >>rep half-vararg >>vararg-type
         2 >>size 2 >>align 2 >>align-first
     \ half typedef
 
     small-float-c-type new
-        math:float >>class math:float >>boxed-class
-        [ alien-unsigned-2 bfloat-bits>float ] >>getter
-        [ [ float>bfloat-bits ] 2dip set-alien-unsigned-2 ] >>setter
-        [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
+        math:fixnum >>class math:float >>boxed-class
+        [ alien-unsigned-2 ] >>getter
+        [ set-alien-unsigned-2 ] >>setter
+        [ bfloat-bits>float ] >>boxer-quot [ math:>float float>bfloat-bits ] >>unboxer-quot
+        "from_unsigned_4" >>boxer "to_unsigned_4" >>unboxer
+        bfloat-rep >>rep bfloat-vararg >>vararg-type
         2 >>size 2 >>align 2 >>align-first
     \ bfloat typedef
 ] with-compilation-unit

@@ -36,6 +36,9 @@ TUPLE: c-type < abstract-c-type
     { rep initial: int-rep } ;
 
 TUPLE: vector-c-type < c-type ;
+TUPLE: small-float-c-type < c-type vararg-type ;
+ERROR: small-float-scalar-abi-unsupported ;
+
 
 : <c-type> ( -- c-type )
     \ c-type new ; inline
@@ -83,6 +86,9 @@ M: abstract-c-type c-type-unboxer-quot unboxer-quot>> ;
 GENERIC: c-type-rep ( name -- rep )
 
 M: c-type c-type-rep rep>> ;
+
+M: small-float-c-type c-type-rep
+    cpu arm.64? [ rep>> ] [ drop small-float-scalar-abi-unsupported ] if ;
 
 GENERIC: c-type-getter ( name -- quot )
 

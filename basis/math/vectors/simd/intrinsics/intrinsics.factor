@@ -60,8 +60,10 @@ IN: math.vectors.simd.intrinsics
 
 : >float-vector-rep ( rep -- rep' )
     {
-        { int-4-rep      [ float-4-rep  ] }
-        { longlong-2-rep [ double-2-rep ] }
+        { int-4-rep       [ float-4-rep  ] }
+        { uint-4-rep      [ float-4-rep  ] }
+        { longlong-2-rep  [ double-2-rep ] }
+        { ulonglong-2-rep [ double-2-rep ] }
     } case ; foldable
 
 ! Dispatch on the representation before inlining element access. An unknown

@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays compiler.test continuations generalizations
 kernel kernel.private locals math.vectors.conversion math.vectors.simd
-sequences stack-checker tools.test sequences.generalizations ;
+namespaces sequences stack-checker tools.test sequences.generalizations ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion.tests
 
@@ -87,6 +87,28 @@ MACRO:: test-vconvert ( from-type to-type -- quot )
 
 { float-4{ -5.0 1.0 2.0 6.0 } }
 [ int-4{ -5 1 2 6 } int-4 float-4 test-vconvert ] unit-test
+
+! Unsigned inputs must also work without native SIMD conversion support.
+{ float-4{ 0 2147483648 4294967296 16777216 } } [
+    uint-4{ 0 2147483648 4294967295 16777217 }
+    uint-4 float-4 test-vconvert
+] unit-test
+{ double-2{ 9223372036854775808 18446744073709551616 } } [
+    ulonglong-2{ 9223372036854775808 18446744073709551615 }
+    ulonglong-2 double-2 test-vconvert
+] unit-test
+{ float-4{ 0 2147483648 4294967296 16777216 } } [
+    t "always-inline-simd-intrinsics" [
+        uint-4{ 0 2147483648 4294967295 16777217 }
+        [ { uint-4 } declare uint-4 float-4 vconvert ] compile-call
+    ] with-variable
+] unit-test
+{ double-2{ 9223372036854775808 18446744073709551616 } } [
+    t "always-inline-simd-intrinsics" [
+        ulonglong-2{ 9223372036854775808 18446744073709551615 }
+        [ { ulonglong-2 } declare ulonglong-2 double-2 vconvert ] compile-call
+    ] with-variable
+] unit-test
 
 { int-4{ -5 1 2 6 } }
 [ float-4{ -5.0 1.0 2.0 6.0 } float-4 int-4 test-vconvert ] unit-test

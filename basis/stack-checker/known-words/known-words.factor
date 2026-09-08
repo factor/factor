@@ -254,6 +254,7 @@ M: runtime-effect infer-call*
 
 \ alien-invoke [ infer-alien-invoke ] "special" set-word-prop
 \ alien-indirect [ infer-alien-indirect ] "special" set-word-prop
+\ alien-indirect-varargs [ infer-alien-indirect-varargs ] "special" set-word-prop
 \ alien-assembly [ infer-alien-assembly ] "special" set-word-prop
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
 

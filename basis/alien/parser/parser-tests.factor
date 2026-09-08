@@ -125,3 +125,18 @@ TYPEDEF: int alien-parser-test-int ! reasonably unique name...
 { } [
     [ C-TYPE: hi TYPEDEF: void* hi ] with-compilation-unit
 ] unit-test
+
+<<
+{ { int double int } { "tag" "named" "arg" } 2 } [
+    { "( int tag, double named, ... int arg )" } [ scan-c-args* ] with-parsing
+] unit-test
+{ { int } { "tag" } f } [
+    { "( int tag )" } [ scan-c-args* ] with-parsing
+] unit-test
+[
+    { "( int tag, ... ... int arg )" } [ scan-c-args* ] with-parsing
+] [ error>> duplicate-varargs-marker? ] must-fail-with
+[
+    { "( int tag, ... int arg )" } [ scan-c-args ] with-parsing
+] [ error>> varargs-in-function-declaration? ] must-fail-with
+>>

@@ -24,7 +24,10 @@ SYMBOLS: int-reg-reps float-reg-reps ;
 GENERIC: flatten-c-type ( c-type -- pairs )
 
 M: c-type flatten-c-type
-    rep>> f f 3array 1array record-reg-reps ;
+    [ rep>> f f ] [ heap-size ] bi 4array 1array record-reg-reps ;
+
+M: small-float-c-type flatten-c-type
+    [ c-type-rep f f ] [ heap-size ] bi 4array 1array record-reg-reps ;
 
 M: long-long-type flatten-c-type
     drop 2 [ int-rep long-long-on-stack? f 3array ] replicate record-reg-reps ;
@@ -65,8 +68,8 @@ M: object flatten-struct-type-return
 
 GENERIC: unbox ( src c-type -- vregs reps )
 
-M: c-type unbox
-    [ rep>> ] [ unboxer>> ] bi
+M:: c-type unbox ( src c-type -- vregs reps )
+    src c-type [ rep>> ] [ unboxer>> ] bi
     [
         {
             { "to_float" [ drop ] }
@@ -83,7 +86,13 @@ M: c-type unbox
             ]
         } case 1array
     ]
-    [ drop f f 3array 1array ] 2bi record-reg-reps ;
+    [ drop f f c-type heap-size 4array 1array ] 2bi record-reg-reps ;
+
+! Numeric quotations convert small floats to/from raw fixnum payloads.
+! Keep the ABI representation distinct from the fixnum representation.
+M: small-float-c-type unbox
+    [ [ unboxer>> ] [ c-type-rep ] bi ^^unbox 1array ]
+    [ nip flatten-c-type ] 2bi ;
 
 ! SIMD values are byte arrays between the tree and CFG stages. The normal
 ! representation conversion pass loads/stores their 128-bit payloads.
@@ -164,6 +173,9 @@ M: c-type box
             [ swap <gc-map> ^^box ] if*
         ]
     } case ;
+
+M: small-float-c-type box
+    [ [ first ] bi@ ] [ boxer>> ] bi* swap <gc-map> ^^box ;
 
 M: vector-c-type box 2drop first ;
 

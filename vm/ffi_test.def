@@ -72,3 +72,4 @@ EXPORTS
         bug1021_test_1
         bug1021_test_2
         bug1021_test_3
+        ffi_test_small_floats_available

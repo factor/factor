@@ -497,6 +497,7 @@ $nl
   ##fixnum-add
   ##fixnum-sub
   ##mul
+  ##mneg
   ##mul-imm
   ##neg
   ##not

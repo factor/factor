@@ -85,7 +85,7 @@ M:: object half-binary ( a b op -- result )
         { "unordered" [ [ unordered? -1 0 ? ] ushort-8 new 2map-as half-8-cast ] }
     } case ;
 M: object half-fma [ half-fma-value ] 3map ;
-M: object half-sqrt [ sqrt ] map ;
+M: object half-sqrt [ fsqrt ] map ;
 M: object pack-half [ >array ] bi@ append >half-8 ;
 M: object pack-bfloat [ >array ] bi@ append >bfloat-8 ;
 
@@ -109,7 +109,7 @@ M: half-8 vs* v* ;
 M: bfloat-8 vs+ v+ ;
 M: bfloat-8 vs- v- ;
 M: bfloat-8 vs* v* ;
-M: bfloat-8 vsqrt [ sqrt float>bits bits>float ] map ;
+M: bfloat-8 vsqrt [ fsqrt float>bits bits>float ] map ;
 
 ! Ordinary BF16 arithmetic rounds in binary32 before storage as BF16.
 M: bfloat-8 v+ [ + float>bits bits>float ] 2map ;
