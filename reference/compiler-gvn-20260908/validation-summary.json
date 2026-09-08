@@ -1,0 +1,22 @@
+{
+  "platform": "macOS ARM64",
+  "global-numbering-default": false,
+  "ssa-checker-compiler-suite": {
+    "local-exit-code": 0,
+    "global-exit-code": 0
+  },
+  "bootstrap-exit-code": 0,
+  "load-all": {
+    "exit-code": 0,
+    "vocabularies": 3388,
+    "compiler-errors": 0
+  },
+  "test-all": {
+    "exit-code": 0,
+    "test-files": 1252,
+    "test-failures": 0,
+    "compiler-errors": 0,
+    "long-tests": true
+  },
+  "help-lint": "passed"
+}

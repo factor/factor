@@ -6,6 +6,7 @@ compiler.cfg.loop-detection compiler.cfg.registers
 compiler.cfg.representations.coalescing
 compiler.cfg.representations.preferred compiler.cfg.rpo
 compiler.cfg.utilities compiler.utilities cpu.architecture
+compiler.cfg.value-numbering.folding
 disjoint-sets fry kernel locals math math.functions namespaces
 sequences sets ;
 IN: compiler.cfg.representations.selection
@@ -25,7 +26,11 @@ GENERIC: (collect-vreg-reps) ( insn -- )
 
 M: ##load-reference (collect-vreg-reps)
     [ dst>> ] [ obj>> ] bi {
-        { [ dup float? ] [ drop { float-rep double-rep } ] }
+        { [ dup float? ] [
+            ! An inexact single must be narrowed at runtime, rather than
+            ! rounded while the code generator writes its literal pool.
+            exact-single? [ { float-rep double-rep } ] [ { double-rep } ] if
+        ] }
         { [ dup byte-array? ] [ drop vector-reps ] }
         [ drop { } ]
     } cond handle-def ;

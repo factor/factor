@@ -1,0 +1,4 @@
+stage1: exit=0, seconds=1.795
+bootstrap: exit=0, seconds=155.663
+load-all: exit=0, seconds=737.165
+test-all: exit=0, seconds=4868.968
