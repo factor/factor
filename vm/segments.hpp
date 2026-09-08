@@ -31,6 +31,17 @@ struct segment {
   void set_border_locked(bool locked) {
     int pagesize = getpagesize();
     cell lo = start - low_guard_size;
+#ifdef WINDOWS
+    // Windows delivers exceptions on the faulting stack. A callstack's
+    // emergency reserve must become accessible when its guard is touched.
+    // PAGE_NOACCESS would prevent the OS from entering our exception handler.
+    if (low_guard_size > (cell)pagesize) {
+      DWORD old_protect;
+      DWORD protect = PAGE_READWRITE | (locked ? PAGE_GUARD : 0);
+      if (!VirtualProtect((void*)lo, low_guard_size, protect, &old_protect))
+        fatal_error("Cannot (un)protect callstack guard", lo);
+    } else
+#endif
     if (!set_memory_locked(lo, low_guard_size, locked)) {
       fatal_error("Cannot (un)protect low guard page", lo);
     }
