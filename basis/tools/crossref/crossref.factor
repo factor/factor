@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-combinators.smart compiler.units generic generic.single
+combinators.smart compiler.units fry generic generic.single
 hash-sets.identity hashtables help help.crossref help.markup
 help.topics init io io.pathnames io.styles kernel namespaces
 quotations see sequences sets sorting source-files threads
@@ -37,6 +37,8 @@ M: array quot-uses seq-uses ;
 M: hashtable quot-uses assoc-uses ;
 
 M: callable quot-uses seq-uses ;
+
+M: fry-word quot-uses [ def>> ] dip seq-uses ;
 
 M: wrapper quot-uses [ wrapped>> ] dip quot-uses ;
 

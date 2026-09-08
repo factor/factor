@@ -1,8 +1,23 @@
-USING: math kernel sequences io.files io.pathnames
+USING: fry math kernel sequences io.files io.pathnames
 tools.crossref tools.crossref.private tools.test parser
 namespaces source-files generic definitions words accessors
 compiler.units classes ;
 IN: tools.crossref.tests
+
+: fry-target ( x -- y ) 1 + ;
+: fry-user ( x -- quot ) '[ _ fry-target ] ;
+: nested-fry-user ( x -- quot ) '[ _ '[ _ fry-target ] ] ;
+
+{ t } [ \ fry-target \ fry-user uses member? ] unit-test
+{ t } [ \ fry-user \ fry-target usage member? ] unit-test
+{ t } [ \ fry-target \ nested-fry-user uses member? ] unit-test
+{ t } [ \ nested-fry-user \ fry-target usage member? ] unit-test
+
+! Forgetting the enclosing definition also removes its fried references.
+{ } [ [ \ fry-user forget ] with-compilation-unit ] unit-test
+{ f } [
+    \ fry-target usage [ word? ] filter [ name>> "fry-user" = ] any?
+] unit-test
 
 GENERIC: predicate-test ( a -- b )
 
