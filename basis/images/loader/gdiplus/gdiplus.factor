@@ -7,6 +7,7 @@ system windows.com windows.gdiplus windows.streams windows.types ;
 IN: images.loader.gdiplus
 
 SPECIALIZED-ARRAY: ImageCodecInfo
+SPECIALIZED-ARRAY: uint
 
 SINGLETON: gdi+-image
 
@@ -65,9 +66,27 @@ ERROR: unsupported-pixel-format component-order ;
 : check-pixel-format ( component-order -- )
     dup { BGRX BGRA RGBA } member? [ drop ] [ unsupported-pixel-format ] if ;
 
-: image>gdi+-bitmap ( image -- bitmap )
-    dup component-order>> check-pixel-format
-    [ dim>> first2 ] [ rowstride PixelFormat32bppARGB ] [ bitmap>> ] tri
+:: image>gdi+-bitmap ( image -- bitmap )
+    image component-order>> check-pixel-format
+    image rowstride :> stride
+    image component-order>> BGRX =
+    PixelFormat32bppRGB PixelFormat32bppARGB ? :> format
+    ! GDI+ retains this pointer while encoding and can call back into
+    ! Factor, so the pixels must not move during a collection.
+    image bitmap>> malloc-byte-array &free :> pixels
+    ! Swap R/B directly in the native copy, preserving alpha and green.
+    image component-order>> RGBA = [
+        pixels image dim>> product uint <c-direct-array> [
+            [ 0xff00ff00 bitand ]
+            [ 0xff bitand 16 shift ]
+            [ -16 shift 0xff bitand ] tri bitor bitor
+        ] map! drop
+    ] when
+    image dim>> first2
+    image upside-down?>> [
+        stride neg format
+        image dim>> second 1 - stride * pixels <displaced-alien>
+    ] [ stride format pixels ] if
     { void* } [
         GdipCreateBitmapFromScan0 check-gdi+-status
     ] with-out-parameters &GdipFree ;
@@ -103,4 +122,4 @@ M: gdi+-image stream>image*
     data>image ;
 
 M: gdi+-image image>stream
-    drop output-stream get swap write-image-to-stream ;
+    drop [ output-stream get swap write-image-to-stream ] with-destructors ;
