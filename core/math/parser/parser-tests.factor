@@ -2,6 +2,27 @@ USING: kernel layouts literals math math.parser
 math.parser.private sequences strings tools.test ;
 IN: math.parser.tests
 
+! #507: whole-token complex literals, including signed exponents and ratios.
+{ C{ -1.5 3.0 } } [ -1.5+3.0j ] unit-test
+{ C{ -1.5 3.0 } } [ "-1.5+3.0j" string>number ] unit-test
+{ C{ 1/2 -1/3 } } [ "1/2-1/3j" string>number ] unit-test
+{ C{ 0.001 20000.0 } } [ "1e-3+2e+4j" string>number ] unit-test
+{ C{ 1+1/2 3 } } [ "1+1/2+3j" string>number ] unit-test
+{ C{ -1-1/2 -3 } } [ "-1-1/2-3j" string>number ] unit-test
+{ C{ 0 2 } } [ "2j" string>number ] unit-test
+{ C{ 0 -2.0 } } [ "-2.0j" string>number ] unit-test
+{ C{ 0 1 } } [ "+j" string>number ] unit-test
+{ C{ 0 -1 } } [ "-j" string>number ] unit-test
+{ C{ 2 1 } } [ "2+j" string>number ] unit-test
+{ C{ 2 -1 } } [ "2-j" string>number ] unit-test
+{ 3 } [ "3+0j" string>number ] unit-test
+{ C{ 3 -0.0 } } [ "3-0.0j" string>number ] unit-test
+{ f } [ "j" string>number ] unit-test
+{ f } [ "abcj" string>number ] unit-test
+{ f } [ "1++2j" string>number ] unit-test
+{ f } [ "1+2jj" string>number ] unit-test
+{ f } [ "1+2j3" string>number ] unit-test
+
 { f } [ f string>number ] unit-test
 { f } [ ";" string>number ] unit-test
 { f } [ "<>" string>number ] unit-test

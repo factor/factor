@@ -376,8 +376,39 @@ PRIVATE>
 : digits> ( seq -- n ) 10 base-digits> ;
 : >digits ( n -- seq ) 10 >base-digits ;
 
-: string>number ( str -- n/f )
+<PRIVATE
+
+: string>real ( str -- n/f )
     10 <number-parse> [ @first-char ] require-next-digit ;
+
+: imaginary-coefficient ( str -- n/f )
+    dup "+" sequence= [ drop 1 ] [
+        dup "-" sequence= [ drop -1 ] [ string>real ] if
+    ] if ;
+
+: complex-parts ( str i -- n/f )
+    cut-slice [ string>real ] [ imaginary-coefficient ] bi*
+    2dup and [ rect> ] [ 2drop f ] if ;
+
+: (string>complex) ( str i -- n/f )
+    2dup swap length < [
+        2dup swap nth "+-" member-eq? [
+            2dup complex-parts [ 2nip ] [ 1 + (string>complex) ] if*
+        ] [ 1 + (string>complex) ] if
+    ] [ 2drop f ] if ;
+
+: string>complex ( str -- n/f )
+    dup empty? [ drop f ] [
+        dup last CHAR: j = [
+            but-last-slice dup imaginary-coefficient
+            [ 0 swap rect> nip ] [ 1 (string>complex) ] if*
+        ] [ drop f ] if
+    ] if ;
+
+PRIVATE>
+
+: string>number ( str -- n/f )
+    dup string>real [ nip ] [ string>complex ] if* ;
 
 : base> ( str radix -- n/f )
     <number-parse> [ @first-char-no-radix ] require-next-digit ;
