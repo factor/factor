@@ -88,7 +88,10 @@ PRIVATE>
     dup classoid? [ class? not ] [ drop f ] if ;
 
 : class<= ( first second -- ? )
-    class<=-cache get [ (class<=) ] 2cache ;
+    ! Reflexivity needs no cache key or hash lookup.
+    2dup eq? [ 2drop t ] [
+        class<=-cache get [ (class<=) ] 2cache
+    ] if ;
 
 : class< ( first second -- ? )
     {
