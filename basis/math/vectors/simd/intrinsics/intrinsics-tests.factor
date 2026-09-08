@@ -67,6 +67,36 @@ all-simd-classes [
     ] { t } swap unit-test
 ] each
 
+:: multiply-add-matches? ( a b expected -- ? )
+    a b a class-of b class-of 2array '[ _ declare v*hs+ ]
+    [ compile-call ] call( a b quot -- c ) expected =
+    a b t "always-inline-simd-intrinsics" [
+        a class-of b class-of 2array '[ _ declare v*hs+ ]
+        [ compile-call ] call( a b quot -- c )
+    ] with-variable expected = and ;
+
+! PMADDWD wraps only when both products are (-32768)*(-32768). The
+! saturating public operation must correct that lane without changing others.
+{ t } [
+    short-8{ -32768 -32768 -32768 -32768 -32768 32767 32767 32767 }
+    short-8{ -32768 -32768 -32768 32767 32767 -32768 32767 32767 }
+    int-4{ 2147483647 32768 -2147418112 2147352578 }
+    multiply-add-matches?
+] unit-test
+
+{ t } [
+    short-8{ -32768 -32768 -32768 -32768 -32768 -32768 -32768 -32768 }
+    dup int-4{ 2147483647 2147483647 2147483647 2147483647 }
+    multiply-add-matches?
+] unit-test
+
+{ t } [
+    uchar-16{ 255 255 255 255 1 2 3 4 255 255 255 255 1 2 3 4 }
+    uchar-16{ 127 127 128 128 127 128 127 128 127 127 128 128 127 128 127 128 }
+    short-8{ 32767 -32768 -129 -131 32767 -32768 -129 -131 }
+    multiply-add-matches?
+] unit-test
+
 ! Dot products accumulate scalar products rather than wrapping integer lanes.
 ! Compare all representations, including half/bfloat, with exact small sums.
 :: dot-matches? ( a b expected -- ? )
