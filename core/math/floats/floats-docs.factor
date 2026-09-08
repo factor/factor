@@ -64,8 +64,8 @@ HELP: float>
 
 HELP: float>=
 { $values { "x" float } { "y" float } { "?" boolean } }
-{ $description "Primitive version of " { $link u>= } "." }
-{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link u>= } " instead." } ;
+{ $description "Primitive version of " { $link >= } "." }
+{ $warning "This word does not perform type checking, and passing objects of the wrong type can crash the runtime. User code should call the generic word " { $link >= } " instead." } ;
 
 HELP: float-u<
 { $values { "x" float } { "y" float } { "?" boolean } }
@@ -96,7 +96,9 @@ ARTICLE: "math.floats.compare" "Floating point comparison operations"
 }
 "With floating point values, there is a fourth possibility; " { $snippet "a" } " and " { $snippet "b" } " may be " { $emphasis "unordered" } ". This happens if one or both values are Not-a-Number values."
 $nl
-"All comparison operators, including " { $link number= } ", return " { $link f } " in the unordered case (and in particular, this means that a NaN is not equal to itself)."
+"Numeric comparison operators, including " { $link number= } ", return " { $link f } " in the unordered case. The " { $link equal? } " method for floats also returns " { $link f } " when either operand is a NaN. However, " { $link = } " first checks object identity, so comparing a NaN object to itself with " { $link = } " returns " { $link t } "."
+$nl
+"Object equality distinguishes floats from integers: both " { $snippet "0.0 0 =" } " and " { $snippet "-0.0 0 =" } " return " { $link f } ". Use " { $link number= } " to compare numeric values across types. Positive and negative floating point zero compare equal with both " { $link = } " and " { $link number= } "."
 $nl
 "The " { $emphasis "ordered" } " comparison operators set floating point exception flags if the result of the comparison is unordered. The standard comparison operators (" { $link < } ", " { $link <= } ", " { $link > } ", " { $link >= } ") perform ordered comparisons."
 $nl
