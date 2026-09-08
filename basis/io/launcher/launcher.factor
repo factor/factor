@@ -112,11 +112,15 @@ STARTUP-HOOK: [
     dup environment>> assoc-empty? not
     swap environment-mode>> +replace-environment+ eq? or ;
 
+HOOK: environment-union os ( assoc1 assoc2 -- assoc )
+
+M: object environment-union assoc-union ;
+
 : get-environment ( process -- env )
     [ environment>> ] [ environment-mode>> ] bi {
-        { +prepend-environment+ [ os-envs assoc-union ] }
-        { +append-environment+ [ os-envs swap assoc-union ] }
-        { +replace-environment+ [ ] }
+        { +prepend-environment+ [ os-envs environment-union ] }
+        { +append-environment+ [ os-envs swap environment-union ] }
+        { +replace-environment+ [ H{ } swap environment-union ] }
     } case ;
 
 PRIVATE>
