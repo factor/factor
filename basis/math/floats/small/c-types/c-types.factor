@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types cpu.architecture
-kernel math.floats.small ;
+USING: accessors alien.accessors alien.c-types compiler.units
+cpu.architecture kernel math.floats.small ;
 QUALIFIED: math
 IN: math.floats.small.c-types
 
@@ -16,21 +16,23 @@ M: small-float-c-type c-type-setter setter>> ;
 M: small-float-c-type c-type-copier drop [ ] ;
 M: small-float-c-type base-type ;
 
-small-float-c-type new
-    math:float >>class math:float >>boxed-class
-    [ alien-unsigned-2 half-bits>float ] >>getter
-    [ [ float>half-bits ] 2dip set-alien-unsigned-2 ] >>setter
-    [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
-    2 >>size 2 >>align 2 >>align-first
-\ half typedef
+[
+    small-float-c-type new
+        math:float >>class math:float >>boxed-class
+        [ alien-unsigned-2 half-bits>float ] >>getter
+        [ [ float>half-bits ] 2dip set-alien-unsigned-2 ] >>setter
+        [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
+        2 >>size 2 >>align 2 >>align-first
+    \ half typedef
 
-small-float-c-type new
-    math:float >>class math:float >>boxed-class
-    [ alien-unsigned-2 bfloat-bits>float ] >>getter
-    [ [ float>bfloat-bits ] 2dip set-alien-unsigned-2 ] >>setter
-    [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
-    2 >>size 2 >>align 2 >>align-first
-\ bfloat typedef
+    small-float-c-type new
+        math:float >>class math:float >>boxed-class
+        [ alien-unsigned-2 bfloat-bits>float ] >>getter
+        [ [ float>bfloat-bits ] 2dip set-alien-unsigned-2 ] >>setter
+        [ ] >>boxer-quot [ math:>float ] >>unboxer-quot
+        2 >>size 2 >>align 2 >>align-first
+    \ bfloat typedef
+] with-compilation-unit
 
 M: half-8-rep rep-component-type drop half ;
 M: bfloat-8-rep rep-component-type drop bfloat ;
