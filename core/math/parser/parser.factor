@@ -922,7 +922,10 @@ CONSTANT: lookup-table {
 :: wi ( F φ β n parity? -- wi wi? )
     F 2 * n + φ * β 128 -
     [ shift parity? [ odd? ] when ]
-    [ neg 2^ 1 - bitand zero? ] 2bi ; inline
+    ! Only the leading 64 fractional bits determine integrality. The lower
+    ! bits contain the cached power's approximation error, even when the
+    ! true endpoint is an integer.
+    [ 64 + shift 64 2^ 1 - bitand zero? ] 2bi ; inline
 
 : xi ( F φ β -- xi-odd? xi? ) -1 t wi ; inline
 : yi ( F φ β -- yi-odd? yi? )  0 t wi ; inline

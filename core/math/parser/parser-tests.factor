@@ -643,5 +643,10 @@ unit-test
         0x0360000000000001 0x27bfffffffffffff 0x4362f1d733d57c5b
         0xb26acfe5d0306d63 0xc1acf41b303a50b9 0xc35523481023d74f
         0xc36b559af854ca2b 0xdf81591c93e77cf9
+        ! Exact upper endpoints despite nonzero low cached-product bits.
+        0x4414ef5e01a83aa7 0xc414ef5e01a83aa7
+        0x43d871205007251d 0xc3d871205007251d
+        0x43d900918da00d49 0xc3d900918da00d49
+        0x43f3632af22edbe1 0xc3f3632af22edbe1
     } [ dup bits>double number>string string>number double>bits = ] all?
 ] unit-test
