@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov, Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.data combinators cpu.architecture
+USING: accessors alien alien.data byte-arrays combinators cpu.architecture
 grouping kernel libc math math.bitwise math.functions math.floats.small.c-types math.libm math.order ranges
 sequences sequences.cords sequences.generalizations sequences.private
 sequences.unrolled sequences.unrolled.private specialized-arrays
@@ -210,7 +210,8 @@ PRIVATE>
     [ + dup integer? [ 1 + -1 shift ] [ 0.5 * ] if ] components-2map ;
 : (simd-vmin)              ( a b rep -- c ) [ min-vector-lane ] components-2map ;
 : (simd-vmax)              ( a b rep -- c ) [ max-vector-lane ] components-2map ;
-! XXX
+! Accumulate scalar products without narrowing them to the lane type. In
+! particular, integer dot products must retain values larger than one lane.
 : (simd-vdot)              ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
     1 swap rep-length [a..b) [ '[ _ swap nth-unsafe ] bi@ * + ] 2with each ;
@@ -230,12 +231,12 @@ PRIVATE>
 : (simd-vnot)              ( a   rep -- c ) [ bitnot ] bitwise-components-map ;
 : (simd-vlshift)           ( a n rep -- c ) swap '[ _ shift ] bitwise-components-map ;
 : (simd-vrshift)           ( a n rep -- c ) swap '[ _ neg shift ] bitwise-components-map ;
-! XXX
+! Horizontal shifts count bytes, independent of the representation. A shift
+! of at least one register width clears every byte, including for bignum n.
 : (simd-hlshift)           ( a n rep -- c )
-    drop head-slice* 16 0 pad-head ;
-! XXX
+    drop 16 min head-slice* 16 0 pad-head >byte-array ;
 : (simd-hrshift)           ( a n rep -- c )
-    drop tail-slice 16 0 pad-tail ;
+    drop 16 min tail-slice 16 0 pad-tail >byte-array ;
 : (simd-vshuffle-elements) ( a n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle) ;
 : (simd-vshuffle2-elements) ( a b n rep -- c ) [ rep-length 0 pad-tail ] keep (vshuffle2) ;
 : (simd-vshuffle-bytes)    ( a b rep -- c ) drop uchar-16-rep (vshuffle) ;

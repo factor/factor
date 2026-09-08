@@ -212,9 +212,9 @@ M: simd-128 vlshift
 M: simd-128 vrshift
     over simd-rep [ (simd-vrshift) ] [ call-next-method ] vn->v-op ; inline
 M: simd-128 hlshift
-    over simd-rep [ (simd-hlshift) ] [ call-next-method ] vn->v-op ; inline
+    over simd-rep [ (simd-hlshift) ] [ call-next-method ] vx->v-op ; inline
 M: simd-128 hrshift
-    over simd-rep [ (simd-hrshift) ] [ call-next-method ] vn->v-op ; inline
+    over simd-rep [ (simd-hrshift) ] [ call-next-method ] vx->v-op ; inline
 M: simd-128 vshuffle-elements
     over simd-rep [ (simd-vshuffle-elements) ] [ call-next-method ] vx->v-op ; inline
 M: simd-128 vshuffle2-elements
