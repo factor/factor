@@ -9,6 +9,19 @@ kernel.private locals make math math.vectors math.vectors.simd namespaces
 sequences system tools.test vectors ;
 IN: cpu.arm.64.tests
 
+! Extra shuffle indices are ignored after filling the destination vector.
+{ int-4{ 5 6 7 8 } } [
+    int-4{ 1 2 3 4 } int-4{ 5 6 7 8 }
+    [ { int-4 int-4 } declare
+      { 4 5 6 7 0 1 2 3 } vshuffle2-elements ] compile-call
+] unit-test
+
+{ double-2{ 4.0 1.0 } } [
+    double-2{ 1.0 2.0 } double-2{ 3.0 4.0 }
+    [ { double-2 double-2 } declare
+      { 7 4 0 1 } vshuffle2-elements ] compile-call
+] unit-test
+
 ! Public entry points must retain vector operations after specialization.
 { t } [ [ { int-4 int-4 } declare vmul-wide ] [ ##mul-wide-vector? ] contains-insn? ] unit-test
 { t } [ [ { int-4 int-4 } declare vabsdiff ] [ ##binary-vector-function? ] contains-insn? ] unit-test
