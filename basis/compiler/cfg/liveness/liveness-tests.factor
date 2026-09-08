@@ -186,6 +186,69 @@ cpu x86.64? [
     456 T{ ##peek f 123 D: 0 } lookup-base-pointer*
 ] unit-test
 
+! Parallel copies map destinations to sources. Follow the source through
+! further copies to the tagged base, and keep that base live at GC points.
+{
+    T{ gc-map { gc-roots { 1 } } { derived-roots V{ { 30 1 } } } }
+    H{ { 1 1 } { 30 30 } }
+} [
+    [
+        f leader-map set
+        H{ } clone base-pointers set
+        H{ { 1 tagged-rep } { 30 int-rep } } representations set
+        H{
+            { 10 T{ ##tagged>integer { dst 10 } { src 1 } } }
+            { 20 T{ ##parallel-copy { values { { 20 10 } } } } }
+            { 30 T{ ##copy { dst 30 } { src 20 } { rep int-rep } } }
+        } insns set
+        H{ { 30 30 } } clone
+        T{ ##call-gc { gc-map T{ gc-map } } } clone
+        [ visit-insn ] 2keep gc-map>> swap
+    ] with-scope
+] unit-test
+
+! The full liveness pass must rebuild the definition map before tracing copies.
+{ T{ gc-map { gc-roots { 1 } } { derived-roots V{ { 20 1 } } } } } [
+    [
+        f leader-map set
+        H{ { 1 tagged-rep } { 10 int-rep } { 20 int-rep } } representations set
+        {
+            T{ ##peek { dst 1 } { loc D: 0 } }
+            T{ ##tagged>integer { dst 10 } { src 1 } }
+            T{ ##parallel-copy { values { { 20 10 } } } }
+            T{ ##call-gc { gc-map T{ gc-map } } }
+            T{ ##replace { src 20 } { loc D: 0 } }
+        } [ insns>cfg compute-live-sets ] keep
+        3 swap nth gc-map>>
+    ] with-scope
+] unit-test
+
+! Copying an ordinary integer does not make it a derived root.
+{ f f } [
+    [
+        f leader-map set
+        H{ } clone base-pointers set
+        H{
+            { 10 T{ ##load-integer { dst 10 } { val 7 } } }
+            { 20 T{ ##parallel-copy { values { { 20 10 } } } } }
+        } insns set
+        20 lookup-base-pointer 20 lookup-base-pointer
+    ] with-scope
+] unit-test
+
+! Recursive copy lookup must still terminate on cycles.
+{ f } [
+    [
+        f leader-map set
+        H{ } clone base-pointers set
+        H{
+            { 10 T{ ##copy { dst 10 } { src 20 } { rep int-rep } } }
+            { 20 T{ ##parallel-copy { values { { 20 10 } } } } }
+        } insns set
+        20 lookup-base-pointer
+    ] with-scope
+] unit-test
+
 ! transfer-liveness
 {
     H{ { 37 37 } }
