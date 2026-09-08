@@ -1,0 +1,6 @@
+*.image
+*.log
+*.jsonl
+counters
+*.so
+*.dylib
