@@ -27,11 +27,13 @@ PRIVATE>
 GENERIC: representative ( a disjoint-set -- p )
 
 M:: disjoint-set representative ( a disjoint-set -- p )
-    a disjoint-set parents>> at :> p
+    a disjoint-set parents>> at* :> ( p present? )
     a p = [ a ] [
-        p disjoint-set representative [
-            a disjoint-set set-parent
-        ] keep
+        p disjoint-set representative :> root
+        ! Keep the implicit entry created for a previously unseen atom,
+        ! but avoid rewriting an existing edge that already reaches its root.
+        root p = present? and [ root a disjoint-set set-parent ] unless
+        root
     ] if ;
 
 <PRIVATE
