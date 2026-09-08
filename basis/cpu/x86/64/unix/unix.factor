@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays assocs
+USING: accessors alien alien.arrays alien.c-types arrays assocs classes.struct
 compiler.cfg.builder.alien.boxing cpu.architecture cpu.x86
 cpu.x86.assembler cpu.x86.assembler.operands kernel layouts locals
 make math math.order namespaces sequences splitting system ;
@@ -14,10 +14,24 @@ M: x86.64 param-regs
 
 M: x86.64 reserved-stack-space 0 ;
 
-: struct-types&offset ( struct-type -- pairs )
+GENERIC: struct-types&offset ( type -- pairs )
+
+M: object struct-types&offset 0 2array 1array ;
+
+M: struct-c-type struct-types&offset
     fields>> [
-        [ type>> ] [ offset>> ] bi 2array
-    ] map ;
+        [ type>> lookup-c-type struct-types&offset ] [ offset>> ] bi
+        '[ first2 _ + 2array ] map
+    ] map concat ;
+
+M:: array struct-types&offset ( type -- pairs )
+    type unclip :> ( dimensions element )
+    dimensions array-length <iota> [| i |
+        element lookup-c-type struct-types&offset
+        [ first2 i element heap-size * + 2array ] map
+    ] map concat ;
+
+M: string-type struct-types&offset drop void* base-type 0 2array 1array ;
 
 : split-struct ( pairs -- seq )
     [
@@ -26,7 +40,7 @@ M: x86.64 reserved-stack-space 0 ;
 
 :: flatten-small-struct ( c-type -- seq )
     c-type struct-types&offset split-struct [
-        [ lookup-c-type c-type-rep reg-class-of ] map
+        [ c-type-rep reg-class-of ] map
         int-regs swap member? int-rep double-rep ?
         f f 3array
     ] map :> reps
