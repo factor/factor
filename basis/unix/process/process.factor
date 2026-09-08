@@ -1,7 +1,7 @@
 USING: alien.c-types alien.data alien.libraries alien.syntax
 alien.utilities byte-arrays classes.struct environment.unix generalizations
-io.encodings.utf8 kernel libc math sequences simple-tokenizer
-strings unix unix.types ;
+io.encodings.utf8 kernel libc literals math sequences simple-tokenizer
+strings system unix unix.types ;
 QUALIFIED-WITH: alien.c-types ac
 IN: unix.process
 
@@ -78,7 +78,7 @@ CONSTANT: POSIX_SPAWN_SETSCHEDULER        0x0020
 ! Darwin-specific flags
 CONSTANT: POSIX_SPAWN_SETEXEC             0x0040
 CONSTANT: POSIX_SPAWN_START_SUSPENDED     0x0080
-CONSTANT: POSIX_SPAWN_SETSID              0x0400
+CONSTANT: POSIX_SPAWN_SETSID $[ os linux? 0x0080 0x0400 ? ]
 CONSTANT: POSIX_SPAWN_CLOEXEC_DEFAULT     0x4000
 
 CONSTANT: POSIX_SPAWN_PCONTROL_NONE       0x0000
