@@ -608,3 +608,17 @@ unit-test
     { n } [ n bits>double float>dec dec> double>bits ]
     unit-test
 ] each
+
+! Shorter intervals at the largest powers of two need cache entries -292/-291.
+! Open lower boundaries must not round an odd significand to its even neighbor.
+{ t } [
+    {
+        0x7fb0000000000000 0x7fc0000000000000
+        0x7fd0000000000000 0x7fe0000000000000
+        0xffb0000000000000 0xffc0000000000000
+        0xffd0000000000000 0xffe0000000000000
+        0x0360000000000001 0x27bfffffffffffff 0x4362f1d733d57c5b
+        0xb26acfe5d0306d63 0xc1acf41b303a50b9 0xc35523481023d74f
+        0xc36b559af854ca2b 0xdf81591c93e77cf9
+    } [ dup bits>double number>string string>number double>bits = ] all?
+] unit-test
