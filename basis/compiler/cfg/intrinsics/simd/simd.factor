@@ -390,7 +390,17 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-v*hs+ ( node -- )
     {
-        [ ^^mul-horizontal-add-vector ]
+        [| a b rep |
+            a b rep ^^mul-horizontal-add-vector :> result
+            rep short-8-rep eq? [
+                ! PMADDWD's only overflow is two (-32768)*(-32768)
+                ! products. INT_MIN cannot otherwise be produced; flip its
+                ! bits to INT_MAX to match the saturating fallback.
+                int-4-rep sign-bit-mask ^^load-literal :> minimum
+                result result minimum int-4-rep cc= ^compare-vector
+                int-4-rep ^^xor-vector
+            ] [ result ] if
+        ]
         [| a b rep |
             rep { char-16-rep uchar-16-rep } member?
             [ uchar-16-rep char-16-rep ] [ rep rep ] if :> ( ar br )
