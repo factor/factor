@@ -596,21 +596,20 @@ CONSTANT: all-primitives {
                 "float-" ( x y -- z ) "float_subtract"
                 { float float } { float } make-foldable
             }
-            ! -u ones redundant?
             {
-                "float-u<" ( x y -- ? ) "float_less"
+                "float-u<" ( x y -- ? ) "float_unordered_less"
                 { float float } { object } make-foldable
             }
             {
-                "float-u<=" ( x y -- ? ) "float_lesseq"
+                "float-u<=" ( x y -- ? ) "float_unordered_lesseq"
                 { float float } { object } make-foldable
             }
             {
-                "float-u>" ( x y -- ? ) "float_greater"
+                "float-u>" ( x y -- ? ) "float_unordered_greater"
                 { float float } { object } make-foldable
             }
             {
-                "float-u>=" ( x y -- ? ) "float_greatereq"
+                "float-u>=" ( x y -- ? ) "float_unordered_greatereq"
                 { float float } { object } make-foldable
             }
             {

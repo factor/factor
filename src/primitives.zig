@@ -188,6 +188,10 @@ pub const PrimitiveIndex = enum(u16) {
     set_alien_double = 150,
     alien_cell = 151,
     set_alien_cell = 152,
+    float_unordered_less = 153,
+    float_unordered_lesseq = 154,
+    float_unordered_greater = 155,
+    float_unordered_greatereq = 156,
 };
 
 pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".fields.len;
@@ -313,10 +317,14 @@ fn init_primitives() [primitive_count]PrimitiveFn {
     table[@intFromEnum(PrimitiveIndex.float_multiply)] = math_prims.primitive_float_multiply;
     table[@intFromEnum(PrimitiveIndex.float_divfloat)] = math_prims.primitive_float_divfloat;
     table[@intFromEnum(PrimitiveIndex.float_less)] = math_prims.primitive_float_less;
+    table[@intFromEnum(PrimitiveIndex.float_unordered_less)] = math_prims.primitive_float_unordered_less;
     table[@intFromEnum(PrimitiveIndex.float_lesseq)] = math_prims.primitive_float_lesseq;
+    table[@intFromEnum(PrimitiveIndex.float_unordered_lesseq)] = math_prims.primitive_float_unordered_lesseq;
     table[@intFromEnum(PrimitiveIndex.float_eq)] = math_prims.primitive_float_eq;
     table[@intFromEnum(PrimitiveIndex.float_greater)] = math_prims.primitive_float_greater;
+    table[@intFromEnum(PrimitiveIndex.float_unordered_greater)] = math_prims.primitive_float_unordered_greater;
     table[@intFromEnum(PrimitiveIndex.float_greatereq)] = math_prims.primitive_float_greatereq;
+    table[@intFromEnum(PrimitiveIndex.float_unordered_greatereq)] = math_prims.primitive_float_unordered_greatereq;
     table[@intFromEnum(PrimitiveIndex.float_bits)] = math_prims.primitive_float_bits;
     table[@intFromEnum(PrimitiveIndex.bits_float)] = math_prims.primitive_bits_float;
     table[@intFromEnum(PrimitiveIndex.double_bits)] = math_prims.primitive_double_bits;
@@ -468,9 +476,13 @@ pub fn getAllPrimitives() [primitive_count]PrimitiveFn {
         math_prims.primitive_float_multiply,
         math_prims.primitive_float_divfloat,
         math_prims.primitive_float_less,
+        math_prims.primitive_float_unordered_less,
         math_prims.primitive_float_lesseq,
+        math_prims.primitive_float_unordered_lesseq,
         math_prims.primitive_float_greater,
+        math_prims.primitive_float_unordered_greater,
         math_prims.primitive_float_greatereq,
+        math_prims.primitive_float_unordered_greatereq,
         math_prims.primitive_float_eq,
         math_prims.primitive_float_to_fixnum,
         math_prims.primitive_float_to_bignum,

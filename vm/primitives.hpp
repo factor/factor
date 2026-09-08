@@ -38,7 +38,8 @@ namespace factor {
       _(set_string_nth_fast) _(size) _(sleep) _(special_object) _(string)      \
       _(strip_stack_traces) _(tuple) _(tuple_boa)                              \
       _(uninitialized_byte_array) _(word) _(word_code) _(word_optimized_p)     \
-      _(wrapper)
+      _(wrapper) _(float_unordered_less) _(float_unordered_lesseq) \
+      _(float_unordered_greater) _(float_unordered_greatereq)
 
 #define EACH_ALIEN_PRIMITIVE(_)                               \
       _(signed_cell, fixnum, from_signed_cell, to_fixnum)     \
