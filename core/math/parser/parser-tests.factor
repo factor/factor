@@ -6,6 +6,8 @@ IN: math.parser.tests
 { C{ -1.5 3.0 } } [ -1.5+3.0j ] unit-test
 { C{ -1.5 3.0 } } [ "-1.5+3.0j" string>number ] unit-test
 { C{ 1/2 -1/3 } } [ "1/2-1/3j" string>number ] unit-test
+{ C{ 1 1/2 } } [ "1+1/2j" string>number ] unit-test
+{ C{ -1 -1/2 } } [ "-1-1/2j" string>number ] unit-test
 { C{ 0.001 20000.0 } } [ "1e-3+2e+4j" string>number ] unit-test
 { C{ 1+1/2 3 } } [ "1+1/2+3j" string>number ] unit-test
 { C{ -1-1/2 -3 } } [ "-1-1/2-3j" string>number ] unit-test
