@@ -1,7 +1,7 @@
 USING: accessors math kernel namespaces continuations
 io.files io.monitors io.monitors.recursive io.backend
 concurrency.mailboxes tools.test destructors io.files.info
-io.pathnames io.files.temp io.directories fry ;
+io.pathnames io.files.temp io.directories fry sequences threads ;
 IN: io.monitors.recursive.tests
 
 SINGLETON: mock-io-backend
@@ -58,4 +58,32 @@ M: mock-io-backend link-info
 { } [
     "resource:core/io" <mailbox> <recursive-monitor>
     [ dispose ] [ dispose ] bi
+] unit-test
+
+! A failed initial directory scan must dispose children already opened.
+SINGLETON: failing-init-backend
+SYMBOL: disappearing-directories
+
+M: failing-init-backend (monitor)
+    nip dummy-monitor new-monitor
+    dummy-monitor-created get [ 1 + ] change-i drop
+    ! These are the two empty directories created by the test below.
+    ! Removing them after enumeration makes the next link-info fail.
+    disappearing-directories get
+    global [ [ delete-directory ] each ] with-variables ;
+
+{ 1 1 } [
+    [
+        "a" make-directory "b" make-directory
+        { "a" "b" } [ absolute-path ] map disappearing-directories set
+        0 mock-counter boa dummy-monitor-created set
+        0 mock-counter boa dummy-monitor-disposed set
+        [
+            failing-init-backend io-backend [
+                "." <mailbox> <recursive-monitor> dispose
+            ] with-variable
+        ] [ linked-error? ] must-fail-with
+        dummy-monitor-created get i>>
+        dummy-monitor-disposed get i>>
+    ] with-test-directory
 ] unit-test

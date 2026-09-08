@@ -82,10 +82,16 @@ M: recursive-monitor dispose*
 
 : pump-thread ( monitor -- )
     monitor tset
-    [ "" add-child-monitor t monitor-ready ]
-    [ [ self <linked-error> monitor-ready ] keep rethrow ]
+    [ "" add-child-monitor t monitor-ready t ]
+    [
+        ! The constructor receives this error through ready. Clean up
+        ! partial initialization without also logging an unhandled error
+        ! in this worker thread.
+        [ [ stop-pump ] ignore-errors ] dip
+        self <linked-error> monitor-ready f
+    ]
     recover
-    pump-loop ;
+    [ pump-loop ] when ;
 
 : start-pump-thread ( monitor -- )
     dup '[ _ pump-thread ]
