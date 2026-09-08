@@ -16,6 +16,12 @@ SINGLETON: linear-scan-allocator
 ! The output must be ready for build-stack-frame and code generation.
 GENERIC: allocate-cfg ( cfg allocator -- )
 
+! Optional diagnostics for the most recent allocation in the current scope.
+! Values are observational only and must not affect allocation decisions.
+GENERIC: allocator-statistics ( allocator -- assoc )
+
+M: object allocator-statistics drop H{ } clone ;
+
 M: linear-scan-allocator allocate-cfg
     drop dup destruct-ssa linear-scan ;
 

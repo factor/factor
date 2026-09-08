@@ -47,12 +47,14 @@ ERROR: unrecognized-pass-pipeline word ;
         procedure cfg set
         \ optimize-cfg pass-list \ finalize-cfg pass-list append
         [ procedure swap measure-pass ] map :> passes
+        current-register-allocator allocator-statistics :> allocation
         [ procedure generate ] benchmark :> ( code ns )
         ! generate returns parameter/literal/relocation/label tables, code
         ! bytes, and frame size. No generated code is installed here.
         4 code nth length :> code-bytes
         H{
             { "passes" passes }
+            { "allocation" allocation }
             { "code-bytes" code-bytes }
             { "codegen-nanoseconds" ns }
         }

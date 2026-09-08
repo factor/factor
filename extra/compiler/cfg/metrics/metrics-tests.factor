@@ -20,6 +20,9 @@ SYMBOL: measured-cfgs
 M: delegated-allocator allocate-cfg
     drop dup measured-cfgs get push linear-scan-allocator allocate-cfg ;
 
+M: delegated-allocator allocator-statistics
+    drop H{ { "test-diagnostic" t } } clone ;
+
 ! A third-party allocator runs in the actual finalization pipeline. Each
 ! comparison gets a fresh CFG and leaves the caller's selection unchanged.
 { t t t t } [
@@ -27,7 +30,11 @@ M: delegated-allocator allocate-cfg
         f register-allocator [
             [ { fixnum fixnum } declare + ]
             { delegated-allocator delegated-allocator } compare-allocators
-            [ [ "allocator" of "delegated-allocator" = ] all? ]
+            [ [
+                [ "allocator" of "delegated-allocator" = ]
+                [ "procedures" of first "allocation" of
+                  "test-diagnostic" of ] bi and
+              ] all? ]
             [ [ "procedures" of first "code-bytes" of ] map
               first2 = ] bi
             measured-cfgs get first2 eq? not
