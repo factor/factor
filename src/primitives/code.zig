@@ -499,7 +499,9 @@ pub export fn primitive_code_blocks(vm_asm: *VMAssemblyFields) callconv(.c) void
             scan += block_size;
         }
 
-        const array_cell = vm.allotUninitializedArray(count * 6) orelse vm.memoryError();
+        // A retry abandons this array in tenured space. Remembered-card
+        // scans still visit its slots even when it is no longer a root.
+        const array_cell = vm.allotArray(count * 6, layouts.false_object) orelse vm.memoryError();
         const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
         const data = arr.data();
 
@@ -973,4 +975,73 @@ pub export fn primitive_callstack_for(vm_asm: *VMAssemblyFields) callconv(.c) vo
     }
 
     vm.replace(tagged);
+}
+
+test "code_blocks initializes discarded snapshots before retrying" {
+    const data_heap = @import("../data_heap.zig");
+    const free_list = @import("../free_list.zig");
+    const gc = @import("../gc.zig");
+    const segments = @import("../segments.zig");
+    const write_barrier = @import("../write_barrier.zig");
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 1024 * 1024);
+    vm.setDataHeap(heap);
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.deinit();
+        heap.deinit();
+    }
+
+    const block_count = heap.nursery.size / (6 * @sizeOf(Cell)) + 2;
+    const code_size = layouts.alignCell(block_count * 48, segments.page_size);
+    var segment = try segments.Segment.init(code_size, false);
+    defer segment.deinit();
+    var code_allocator = free_list.FreeListAllocator.init(allocator, segment.start, code_size);
+    defer code_allocator.deinit();
+    var code_heap = vm_mod.CodeHeap{
+        .seg = &segment,
+        .safepoint_page = 0,
+        .code_start = segment.start,
+        .code_size = code_size,
+        .allocator = allocator,
+        .free_list = &code_allocator,
+        .remembered_sets = write_barrier.CodeHeapRememberedSets.init(allocator),
+    };
+    defer code_heap.deinit();
+    vm.code = &code_heap;
+    defer vm.code = null;
+    try code_heap.ensureMarks(allocator);
+    for (0..block_count) |_| {
+        const block = code_heap.allocate(48) orelse return error.OutOfMemory;
+        block.initialize(.unoptimized, 48, 0);
+        @memset(block.codeStart()[0..block.codeSize()], 0);
+    }
+    try code_heap.initializeAllBlocksSet();
+
+    // Force the oversized result allocation to collect all the dead code.
+    // Poison the reclaimed data memory so an uninitialized snapshot cannot
+    // accidentally pass because fresh mappings happened to contain zeros.
+    const garbage_size = heap.tenured.size - 3 * vm_mod.deck_size;
+    const garbage_addr = heap.allocateTenured(garbage_size) orelse return error.OutOfMemory;
+    const garbage: *layouts.ByteArray = @ptrFromInt(garbage_addr);
+    garbage.header = @as(Cell, @intFromEnum(layouts.TypeTag.byte_array)) << 2;
+    garbage.capacity = layouts.tagFixnum(@intCast(garbage_size - @sizeOf(layouts.ByteArray)));
+    @memset(garbage.data()[0 .. garbage_size - @sizeOf(layouts.ByteArray)], 0x79);
+
+    primitive_code_blocks(&vm.vm_asm);
+    const result: *const layouts.Array = @ptrFromInt(layouts.UNTAG(vm.pop()));
+    try std.testing.expectEqual(@as(Cell, 0), result.getCapacity());
+    const discarded: *const layouts.Array = @ptrFromInt(heap.tenured.start);
+    try std.testing.expectEqual(@as(Cell, @intFromEnum(layouts.TypeTag.array)) << 2, discarded.header);
+    try std.testing.expectEqual(block_count * 6, discarded.getCapacity());
+    for (discarded.data()[0..discarded.getCapacity()]) |value| {
+        try std.testing.expectEqual(layouts.false_object, value);
+    }
+    try collector.gc(.collect_aging);
 }
