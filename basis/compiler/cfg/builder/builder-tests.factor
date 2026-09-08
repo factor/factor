@@ -13,6 +13,13 @@ tools.test vectors words ;
 FROM: alien.c-types => int ;
 IN: compiler.cfg.builder.tests
 
+! Both node-only arithmetic emitters and block-aware memory emitters must be
+! accepted when probing an intrinsic, including with checked call effects.
+{ } [ 42 [ 42 assert= ] with-dummy-cfg-builder ] unit-test
+{ } [
+    42 [ 42 assert= basic-block? t assert= f ] with-dummy-cfg-builder
+] unit-test
+
 ! Just ensure that various CFGs build correctly.
 : unit-test-builder ( quot -- )
     '[
