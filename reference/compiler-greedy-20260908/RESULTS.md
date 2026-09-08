@@ -72,6 +72,9 @@ Two targeted regressions cover atomic and wide memory-only fragments.
 in the existing `compiler/tests/alien-large-return.factor` tests: wrong direct
 results, an indirect-call memory fault, and a wrong nested callback result.
 `large-return-tests.log` shows all five tests passing after the correction.
+The entire existing `alien.factor` and `alien-large-return.factor` files then
+passed together with checking enabled: 135 unit tests and 13 expected-failure
+tests, with zero failures (`alien-tests.log`).
 
 Run from the repository root with an absolute image path:
 
