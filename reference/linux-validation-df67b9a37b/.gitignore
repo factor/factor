@@ -1,0 +1,8 @@
+*
+!.gitignore
+!README.md
+!results.json
+!provenance.json
+!build.json
+!services-stopped.json
+!summarize-final.py
