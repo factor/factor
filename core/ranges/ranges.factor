@@ -32,6 +32,22 @@ M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 
+<PRIVATE
+
+:: integer-range-member? ( elt seq -- ? )
+    elt integer? seq empty? not and [
+        seq step>> zero? [ elt seq from>> = ] [
+            elt seq from>> - seq step>> /mod :> ( index remainder )
+            remainder zero? index 0 >= and index seq length>> < and
+        ] if
+    ] [ f ] if ;
+
+PRIVATE>
+
+M: range member?
+    dup [ from>> integer? ] [ step>> integer? ] bi and
+    [ integer-range-member? ] [ call-next-method ] if ;
+
 M: range sum
     dup length
     [ drop 0 ]

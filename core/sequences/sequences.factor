@@ -714,7 +714,9 @@ PRIVATE>
 : none? ( ... seq quot: ( ... elt -- ... ? ) -- ... ? )
     any? not ; inline
 
-: member? ( elt seq -- ? )
+GENERIC: member? ( elt seq -- ? )
+
+M: object member?
     [ = ] with any? ;
 
 : member-eq? ( elt seq -- ? )
