@@ -109,8 +109,10 @@ DEFER: copy-value
 SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
-    allocations get escaping-values get
-    '[ _ (escaping-value?) ] filter-keys
+    ! The escaping representative is stable while filtering allocations.
+    allocations get
+    escaping-values get dup +escaping+ swap representative
+    '[ _ representative _ = ] filter-keys
     escaping-allocations set ;
 
 : escaping-allocation? ( value -- ? )
