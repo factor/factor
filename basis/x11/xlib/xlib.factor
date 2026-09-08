@@ -994,7 +994,7 @@ X-FUNCTION: Status XSendEvent ( Display* display,
 
 ! 11.8 - Handling Protocol Errors
 
-X-FUNCTION: int XSetErrorHandler ( void* handler )
+X-FUNCTION: void* XSetErrorHandler ( void* handler )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 12 - Input Device Functions
@@ -1340,13 +1340,13 @@ X-FUNCTION: XIM XOpenIM ( Display* dpy,
 
 X-FUNCTION: Status XCloseIM ( XIM im )
 
-X-FUNCTION: XIC XCreateIC ( XIM im,
+X-FUNCTION: XIC XCreateIC ( XIM im, ...
                             c-string key1, Window value1,
                             c-string key2, Window value2,
-                            c-string key3, int value3,
+                            c-string key3, ulong value3,
                             c-string key4, c-string value4,
                             c-string key5, c-string value5,
-                            int key6 )
+                            void* key6 )
 
 X-FUNCTION: void XDestroyIC ( XIC ic )
 

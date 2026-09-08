@@ -30,7 +30,7 @@ SYMBOL: xim
         XNInputStyle flags{ XIMPreeditNothing XIMStatusNothing }
         XNResourceName
     ] dip
-    XNResourceClass over 0 XCreateIC
+    XNResourceClass over f XCreateIC
     [ "XCreateIC() failed" throw ] unless* ;
 
 <<
