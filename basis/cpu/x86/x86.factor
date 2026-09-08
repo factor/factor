@@ -690,6 +690,8 @@ M: x86 %callback-outputs
     [ first3 %store-reg-param ] each ;
 
 M:: x86 %save-context ( temp1 temp2 -- )
+    ! Probe native entry headroom while the fault still belongs to Factor.
+    cell 8 = [ temp2 stack-reg -4096 [+] MOV ] when
     ! Save Factor stack pointers in case the C code calls a
     ! callback which does a GC, which must reliably trace
     ! all roots.
