@@ -16,7 +16,7 @@ HELP: bits>double
 
 HELP: bits>float
 { $values { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } { "x" float } }
-{ $description "Creates a " { $link float } " object from a 32-bit binary representation. This word is usually used to reconstruct floats read from streams." } ;
+{ $description "Creates a " { $link float } " object from a 32-bit binary representation. This word is usually used to reconstruct floats read from streams. NaN signs, payloads and signaling bits are preserved when widening to double precision." } ;
 
 HELP: double>bits
 { $values { "x" float } { "n" "a 64-bit integer representing an IEEE 754 double-precision float" } }
@@ -24,7 +24,7 @@ HELP: double>bits
 
 HELP: float>bits
 { $values { "x" float } { "n" "a 32-bit integer representing an IEEE 754 single-precision float" } }
-{ $description "Creates a 32-bit binary representation of a " { $link float } " object. This can be used in the process of writing a float to a stream." } ;
+{ $description "Creates a 32-bit binary representation of a " { $link float } " object. This can be used in the process of writing a float to a stream. NaNs preserve their sign and the most significant 23 payload bits, including the signaling bit. A payload that would become zero is replaced with one so that the result remains a NaN. All binary32 NaN encodings round-trip through " { $link bits>float } " and this word." } ;
 
 ! Unsafe primitives
 HELP: float+

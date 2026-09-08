@@ -1,4 +1,4 @@
-USING: grouping kernel math math.constants math.order sequences
+USING: compiler.test grouping kernel math math.constants math.order sequences
 tools.test ;
 
 { t } [ 0.0 float? ] unit-test
@@ -39,6 +39,27 @@ tools.test ;
 { f } [ e 2 <= ] unit-test
 
 { t } [ 1.0 dup float>bits bits>float = ] unit-test
+
+! #2182: preserve the sign, payload and signaling bit of binary32 NaNs.
+{ t } [
+    {
+        0x00000000 0x80000000 0x00000001 0x007fffff
+        0x00800000 0x3f800000 0x7f7fffff 0x7f800000 0xff800000
+        0x7f800001 0x7f802000 0x7fbfffff 0x7fc00000 0x7fffffff
+        0xff800001 0xff802000 0xffbfffff 0xffc00000 0xffffffff
+    } [ dup [ bits>float float>bits ] compile-call = ] all?
+] unit-test
+{ 0x7f800001 } [ 0x7ff0000000000001 bits>double float>bits ] unit-test
+{ 0xff800001 } [ 0xfff0000000000001 bits>double float>bits ] unit-test
+{ 0x7fc00000 } [ 0x7ff8000000000001 bits>double float>bits ] unit-test
+
+! #2594: transporting a double's bits must not quiet signaling NaNs either.
+{ t } [
+    {
+        0x7ff0000000000123 0x7ff8000000000123
+        0xfff0000000000123 0xfff8000000000123
+    } [ dup [ bits>double double>bits ] compile-call = ] all?
+] unit-test
 { t } [ pi double>bits bits>double pi = ] unit-test
 { t } [ e double>bits bits>double e = ] unit-test
 

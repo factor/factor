@@ -26,6 +26,12 @@ inline cell factor_vm::allot_float(double n) {
   return tag(flo);
 }
 
+inline cell factor_vm::allot_float_bits(uint64_t bits) {
+  boxed_float* flo = allot<boxed_float>(sizeof(boxed_float));
+  memcpy(&flo->n, &bits, sizeof(bits));
+  return tag(flo);
+}
+
 // Allocates memory
 inline bignum* factor_vm::float_to_bignum(cell tagged) {
   return double_to_bignum(untag_float(tagged));
