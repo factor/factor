@@ -1,1 +1,1 @@
-Local value numbering for common subexpression elimination
+Value numbering, constant folding and optional global common subexpression elimination

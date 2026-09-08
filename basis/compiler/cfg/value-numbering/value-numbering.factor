@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
-compiler.cfg.instructions compiler.cfg.rpo
+USING: accessors arrays assocs compiler.cfg compiler.cfg.copy-prop compiler.cfg.def-use
+compiler.cfg.instructions compiler.cfg.predecessors compiler.cfg.rpo
+compiler.cfg.value-numbering.global
 compiler.cfg.utilities kernel locals namespaces sequences
 sequences.deep ;
 
@@ -62,11 +63,23 @@ M: array process-instruction
     init-value-graph
     [ process-instruction ] map flatten ;
 
-: value-numbering ( cfg -- )
+: local-value-numbering ( cfg -- )
     [
         H{ } clone constant-instructions [
             [ value-numbering-step ] simple-optimization
         ] with-variable
     ]
     [ cfg-changed ]
-    [ predecessors-changed ] tri ;
+    [ dup predecessors-changed needs-predecessors ] tri ;
+
+! Keep global reuse opt-in until representative workloads justify its
+! compile-time cost. Local simplification remains the shared rewrite layer.
+SYMBOL: global-value-numbering?
+
+: value-numbering ( cfg -- )
+    dup local-value-numbering
+    global-value-numbering? get [
+        dup global-value-numbering [
+            [ copy-propagation ] [ local-value-numbering ] bi
+        ] [ drop ] if
+    ] [ drop ] if ;

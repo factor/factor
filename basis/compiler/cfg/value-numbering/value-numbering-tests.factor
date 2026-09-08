@@ -2858,12 +2858,17 @@ test-diamond
 
 { } [
     0 get block>cfg
-    { value-numbering eliminate-dead-code } apply-passes
+    t global-value-numbering? [
+        { value-numbering eliminate-dead-code } apply-passes
+    ] with-variable
 ] unit-test
 
 { t } [ 1 get successors>> first 3 get eq? ] unit-test
 
-{ 1 } [ 3 get instructions>> first inputs>> assoc-size ] unit-test
+! The now-single-input phi is eliminated, and its consumer uses the
+! definition on the surviving edge.
+{ f } [ 3 get instructions>> [ ##phi? ] any? ] unit-test
+{ 1 } [ 4 get instructions>> first src>> ] unit-test
 
 V{ T{ ##prologue } T{ ##branch } } 0 test-bb
 

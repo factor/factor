@@ -1,6 +1,6 @@
-USING: accessors compiler.cfg.copy-prop compiler.cfg.instructions
+USING: accessors arrays assocs compiler.cfg.copy-prop compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.utilities compiler.test
-cpu.architecture namespaces tools.test ;
+cpu.architecture kernel namespaces sequences tools.test ;
 IN: compiler.cfg.copy-prop.tests
 
 : test-copy-propagation ( -- )
@@ -104,3 +104,23 @@ V{
         T{ ##branch }
     }
 } [ 3 get instructions>> ] unit-test
+
+! Association iteration order is not phi input order. These first two
+! phis select different values; the third has the same mapping as the first.
+{ 3 { 2 3 2 } } [
+    V{ T{ ##peek { dst 0 } { loc D: 0 } }
+       T{ ##peek { dst 1 } { loc D: 1 } } T{ ##branch } } 0 test-bb
+    V{ T{ ##branch } } 1 test-bb
+    V{ T{ ##branch } } 2 test-bb
+    V{ T{ ##phi { dst 2 } { inputs { { 1 0 } { 2 1 } } } }
+       T{ ##phi { dst 3 } { inputs { { 2 0 } { 1 1 } } } }
+       T{ ##phi { dst 4 } { inputs { { 2 1 } { 1 0 } } } }
+       T{ ##replace { src 2 } { loc D: 0 } }
+       T{ ##replace { src 3 } { loc D: 1 } }
+       T{ ##replace { src 4 } { loc D: 2 } }
+       T{ ##branch } } 3 test-bb
+    0 { 1 2 } edges 1 3 edge 2 3 edge
+    test-copy-propagation
+    3 get instructions>> [ [ ##phi? ] count ]
+    [ [ ##replace? ] filter [ src>> ] map >array ] bi
+] unit-test
