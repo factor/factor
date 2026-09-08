@@ -142,6 +142,14 @@ ARTICLE: "syntax-complex-numbers" "Complex number syntax"
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
 }
+"A single token ending in " { $snippet "j" } " can also express a complex number:"
+{ $code
+    "-1.5+3.0j     ! equivalent to C{ -1.5 3.0 }"
+    "1/2-1/3j      ! equivalent to C{ 1/2 -1/3 }"
+    "2j            ! equivalent to C{ 0 2 }"
+    "1e-3+2e+4j    ! exponents may contain signs"
+}
+"The bare token " { $snippet "j" } " remains a word name, not a number."
 { $subsections POSTPONE: C{ }
 "More information on complex numbers can be found in " { $link "complex-numbers" } "." ;
 

@@ -49,8 +49,8 @@ $nl
 { >base base> } related-words
 
 HELP: string>number
-{ $values { "str" string } { "n/f" { $maybe real } } }
-{ $description "Creates a real number from a string representation of a number in base 10."
+{ $values { "str" string } { "n/f" { $maybe number } } }
+{ $description "Creates a number from its string representation. In addition to real numbers, accepts complex numbers written as " { $snippet "a+bj" } ", " { $snippet "a-bj" } " or " { $snippet "bj" } ". Both components can be integers, ratios or floats. A coefficient of one may be omitted after the sign, as in " { $snippet "2+j" } "."
 $nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
