@@ -1,0 +1,64 @@
+{
+  "stages": {
+    "bootstrap": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/boot.unix-x86.64.image",
+        "-output-image=/home/erg/factor-linux-validation-20260908/factor.image"
+      ],
+      "status": 0,
+      "seconds": 123.28575656656176
+    },
+    "load-all": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/factor.image",
+        "/home/erg/factor-linux-validation-20260908/validation/load-all.factor"
+      ],
+      "status": 0,
+      "seconds": 399.19412362761796
+    },
+    "help-lint": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/loaded.image",
+        "/home/erg/factor-linux-validation-20260908/validation/help-lint.factor"
+      ],
+      "status": 0,
+      "seconds": 11.278341345489025
+    },
+    "test-all": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/loaded.image",
+        "/home/erg/factor-linux-validation-20260908/validation/test-all.factor"
+      ],
+      "status": 1,
+      "seconds": 930.0156970331445
+    }
+  },
+  "test_files": 1240,
+  "test_failures": 22,
+  "compiler_errors": 0,
+  "failures_by_file": {
+    "resource:basis/compiler/tests/callstack-overflow.factor": 1,
+    "resource:extra/euler/b-rep/triangulation/triangulation-tests.factor": 4,
+    "resource:basis/images/loader/loader-tests.factor": 4,
+    "resource:basis/images/loader/gtk/gtk-tests.factor": 2,
+    "resource:basis/ui/gadgets/editors/editors-tests.factor": 4,
+    "resource:basis/ui/text/text-tests.factor": 7
+  },
+  "expected_test_framework_notifications": 2
+}

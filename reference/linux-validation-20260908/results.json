@@ -1,0 +1,81 @@
+{
+  "source_commit": "9d57d73a4e5c57c860c49ab01ed517299604f804",
+  "stages": {
+    "bootstrap": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/boot.unix-x86.64.image",
+        "-output-image=/home/erg/factor-linux-validation-20260908/factor.image"
+      ],
+      "status": 0,
+      "seconds": 127.17365769390017
+    },
+    "load-all": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/factor.image",
+        "/home/erg/factor-linux-validation-20260908/validation/load-all.factor"
+      ],
+      "status": 0,
+      "seconds": 414.85129323229194
+    },
+    "help-lint": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/loaded.image",
+        "/home/erg/factor-linux-validation-20260908/validation/help-lint.factor"
+      ],
+      "status": 0,
+      "seconds": 8.427452101372182
+    },
+    "test-all": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/loaded.image",
+        "/home/erg/factor-linux-validation-20260908/validation/test-all.factor"
+      ],
+      "status": 0,
+      "seconds": 934.2540922882035
+    },
+    "final-gtk": {
+      "command": [
+        "/home/erg/factor-linux-validation-20260908/factor",
+        "-resource-path=/home/erg/factor-linux-validation-20260908",
+        "-no-user-init",
+        "-no-monitors",
+        "-i=/home/erg/factor-linux-validation-20260908/loaded.image",
+        "/home/erg/factor-linux-validation-20260908/validation/final-gtk.factor"
+      ],
+      "status": 0,
+      "seconds": 0.6146811619400978
+    }
+  },
+  "loaded_vocabularies": 3354,
+  "load_compiler_errors": 0,
+  "help_failures": 0,
+  "test_files": 1247,
+  "test_failures": 0,
+  "test_compiler_errors": 0,
+  "simd_test_files": [
+    "resource:basis/compiler/cfg/intrinsics/simd/simd-tests.factor",
+    "resource:basis/compiler/tree/propagation/simd/simd-tests.factor",
+    "resource:extra/math/matrices/simd/simd-tests.factor",
+    "resource:basis/math/vectors/simd/simd-tests.factor",
+    "resource:basis/math/vectors/simd/cords/cords-tests.factor",
+    "resource:basis/math/vectors/simd/extensions/extensions-tests.factor",
+    "resource:basis/math/vectors/simd/intrinsics/intrinsics-tests.factor"
+  ],
+  "vm_stack_safety": ".\nMeasured recursion limit: 4067; probing GC boundary\n.....\n----------------------------------------------------------------------\nRan 6 tests in 117.415s\n\nOK\n"
+}
