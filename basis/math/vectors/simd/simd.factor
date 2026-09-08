@@ -364,6 +364,10 @@ SIMD-128: bfloat-8
 M: simd-128 vshuffle
     vshuffle-bytes ; inline
 
+M: byte-array vshuffle
+    dup length 16 = [ uchar-16 boa vshuffle-bytes ]
+    [ bad-simd-vector ] if ; inline
+
 M: uchar-16 v*hs+
     uchar-16-rep [ (simd-v*hs+) ] [ call-next-method ] vv->v-op short-8-cast ; inline
 M: ushort-8 v*hs+
