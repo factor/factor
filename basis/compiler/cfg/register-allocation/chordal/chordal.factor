@@ -324,6 +324,19 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     leader dup pending-interval-assoc get at
     [ nip ] [ dup rep-of assign-spill-slot ] if* ;
 
+! A value can cross a block with no local register use. Splitting may then
+! leave no assigned fragment at that boundary, even if a later-layout SSA
+! definition has not allocated a spill slot yet. Reserve an edge destination;
+! parallel edge resolution supplies the value from each actual predecessor.
+: ssa-live-locations ( live-set -- locations )
+    [ phi-vreg>location ] assoc-map ;
+
+: compute-ssa-live-in ( bb -- )
+    [ live-in ssa-live-locations ] keep machine-live-ins get set-at ;
+
+: compute-ssa-live-out ( bb -- )
+    [ live-out ssa-live-locations ] keep machine-live-outs get set-at ;
+
 :: record-phi-locations ( bb -- )
     bb instructions>> [ ##phi? ] filter [| phi |
         phi dst>> phi-vreg>location phi inputs>> phi dst>> rep-of 3array
@@ -332,7 +345,7 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
 :: assign-ssa-block ( bb -- )
     bb basic-block namespaces:set
     bb block-from unhandled-intervals get activate-new-intervals
-    bb compiler.cfg.linear-scan.assignment:compute-live-in
+    bb compute-ssa-live-in
     bb record-phi-locations
     bb [ [
         [
@@ -341,7 +354,7 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
                 [ assign-all-registers ] [ emit-insn ] bi
             ] if
         ] each
-    ] V{ } make ] change-instructions compiler.cfg.linear-scan.assignment:compute-live-out ;
+    ] V{ } make ] change-instructions compute-ssa-live-out ;
 
 :: assign-ssa-registers ( cfg intervals -- )
     intervals init-assignment
@@ -424,7 +437,7 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
         ] when
     ] each ;
 
-:: chordal-allocation ( cfg -- )
+:: chordal-allocation-with-registers ( cfg available -- )
     f leader-map namespaces:set
     cfg construct-ssa-bases
     cfg compute-ssa-live-sets
@@ -433,7 +446,6 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     cfg compute-ssa-intervals :> intervals
     intervals [ live-interval-state? ] filter cfg color-ssa-intervals
     check-allocation? get [ intervals required-register-uses ] [ f ] if :> expected
-    cfg admissible-registers :> available
     intervals available allocate-colored-intervals :> allocated
     check-allocation? get [
         allocated available check-allocated-intervals
@@ -442,6 +454,9 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     cfg allocated assign-ssa-registers
     cfg resolve-ssa-data-flow
     cfg check-numbering ;
+
+: chordal-allocation ( cfg -- )
+    dup admissible-registers chordal-allocation-with-registers ;
 
 M: chordal-allocator allocate-cfg drop chordal-allocation ;
 
