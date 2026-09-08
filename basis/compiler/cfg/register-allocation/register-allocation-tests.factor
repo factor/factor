@@ -1,4 +1,5 @@
-USING: compiler.cfg.register-allocation kernel namespaces tools.test ;
+USING: compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation kernel namespaces tools.test ;
 IN: compiler.cfg.register-allocation.tests
 
 SINGLETON: recording-allocator
@@ -15,7 +16,9 @@ M: recording-allocator allocate-cfg drop recorded-cfg set ;
 { 1234 linear-scan-allocator } [
     f register-allocator [
         recording-allocator register-allocator [
-            1234 allocate-registers recorded-cfg get
+            f check-allocation? [
+                1234 allocate-registers recorded-cfg get
+            ] with-variable
         ] with-variable
         current-register-allocator
     ] with-variable
