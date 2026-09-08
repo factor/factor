@@ -170,8 +170,8 @@ CONSTANT: PRIO_MIN -20
 CONSTANT: PRIO_MAX 20
 
 ! which/who = 0 for current process
-FUNCTION: int getpriority ( int which, int who )
-FUNCTION: int setpriority ( int which, int who, int prio )
+FUNCTION: int getpriority ( int which, id_t who )
+FUNCTION: int setpriority ( int which, id_t who, int prio )
 
 : set-priority ( n -- )
     [ PRIO_PROCESS 0 ] dip setpriority io-error ;

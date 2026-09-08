@@ -1,6 +1,9 @@
 USING: alien.c-types alien.syntax classes.struct unix.types unix.ffi.bsd ;
 IN: unix.ffi
 
+FUNCTION: int getgrouplist ( c-string name, int basegid, int* groups, int* ngroups )
+FUNCTION: int setgroups ( int ngroups, gid_t* gidset )
+
 CONSTANT: AF_INET 2
 ALIAS: PF_INET AF_INET
 CONSTANT: AF_INET6 28
@@ -49,4 +52,3 @@ CONSTANT: SO_SNDTIMEO 0x1005
 CONSTANT: SO_RCVTIMEO 0x1006
 CONSTANT: SO_ERROR 0x1007
 CONSTANT: SO_TYPE 0x1008
-

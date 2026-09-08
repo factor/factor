@@ -6,3 +6,4 @@ IN: unix.types.linux.tests
 { t } [ posix_spawnattr_t c-type-align cell = ] unit-test
 { t } [ off64_t c-type-signed ] unit-test
 { t } [ blkcnt64_t c-type-signed ] unit-test
+{ 4 } [ clockid_t heap-size ] unit-test
