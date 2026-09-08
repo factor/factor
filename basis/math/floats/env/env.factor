@@ -125,7 +125,7 @@ PRIVATE>
 : vm-error>exception-flags ( error -- exceptions )
     third vm-error-exception-flag>bit mask> ;
 : vm-error-exception-flag? ( error flag -- ? )
-    vm-error>exception-flags member? ;
+    swap vm-error>exception-flags member? ;
 
 : denormal-mode ( -- mode ) fp-env-register (get-denormal-mode) ;
 

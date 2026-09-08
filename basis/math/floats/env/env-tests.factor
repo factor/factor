@@ -221,3 +221,6 @@ set-default-fp-env
     { float< float<= float> float>= float-u< float-u<= float-u> float-u>= }
     [ 0x3ff0000000000000 swap primitive-comparison-invalid? ] any?
 ] unit-test
+
+{ t } [ { 0 0 8 } +fp-zero-divide+ vm-error-exception-flag? ] unit-test
+{ f } [ { 0 0 8 } +fp-overflow+ vm-error-exception-flag? ] unit-test
