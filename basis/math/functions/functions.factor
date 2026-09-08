@@ -43,7 +43,7 @@ M: bignum ^n
 M: ratio ^n
     [ >fraction ] dip '[ _ ^n ] bi@ / ;
 
-M: float ^n [ >float fpow ] unless-zero ;
+M: float ^n [ drop 1.0 ] [ >float fpow ] if-zero ;
 
 M: complex ^n (^n) ;
 
@@ -87,6 +87,13 @@ M: complex e^ >rect [ e^ ] dip polar> ; inline
 : real^? ( x y -- ? )
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
+:: indeterminate-real-power? ( x y -- ? )
+    x real? y real? and [
+        x fp-nan? y fp-nan? or
+        x fp-infinity? y zero? and or
+        y fp-infinity? x abs 1 number= and or
+    ] [ f ] if ; inline
+
 : 0^ ( zero x -- z )
     swap [ 0/0. ] swap '[ 0 < 1/0. _ ? ] if-zero ; inline
 
@@ -102,6 +109,7 @@ PRIVATE>
 
 : ^ ( x y -- x^y )
     {
+        { [ 2dup indeterminate-real-power? ] [ 2drop 0/0. ] }
         { [ over zero? ] [ 0^ ] }
         { [ dup integer? ] [ ^integer ] }
         { [ 2dup real^? ] [ [ >float ] bi@ fpow ] }
