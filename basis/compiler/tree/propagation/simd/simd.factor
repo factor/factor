@@ -105,7 +105,15 @@ vector>vector-intrinsics [ { byte-array } "default-output-classes" set-word-prop
 
 \ (simd-reduce) [ 2nip scalar-output-class ] "outputs" set-word-prop
 
-\ (simd-vdot) [ 2nip scalar-output-class ] "outputs" set-word-prop
+! Dot products accumulate scalar products without narrowing to a lane. An
+! integer result can be a bignum even when each input lane fits in a fixnum.
+: dot-output-class ( rep -- class )
+    dup literal?>> [
+        literal>> scalar-rep-of { float-rep double-rep } member?
+        float integer ?
+    ] [ drop real ] if <class-info> ;
+
+\ (simd-vdot) [ 2nip dot-output-class ] "outputs" set-word-prop
 
 {
     (simd-vany?)
