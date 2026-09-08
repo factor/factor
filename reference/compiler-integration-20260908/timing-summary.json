@@ -1,0 +1,113 @@
+{
+  "platform": "macOS ARM64",
+  "trials": 3,
+  "allocation-checks": false,
+  "global-numbering": false,
+  "metric": "sum of per-word medians across fresh processes",
+  "allocators": {
+    "linear-scan": {
+      "compile-instructions": 3930264830,
+      "compile-cpu-seconds": 0.308265082000001,
+      "code-bytes": 24496,
+      "spills": 40,
+      "reloads": 40,
+      "copies": 17,
+      "runtime": {
+        "tree-workload": {
+          "result": -20,
+          "samples": 15,
+          "instructions": 5845768,
+          "cpu-seconds": 0.00034429099999933044,
+          "nanoseconds": 343457
+        },
+        "norm-workload": {
+          "result": 1.2742199912349306,
+          "samples": 15,
+          "instructions": 9088759,
+          "cpu-seconds": 0.0003591250000010149,
+          "nanoseconds": 357274
+        }
+      },
+      "compile-instructions-relative": 1.0,
+      "compile-cpu-seconds-relative": 1.0
+    },
+    "greedy": {
+      "compile-instructions": 3985666939,
+      "compile-cpu-seconds": 0.3444007500000019,
+      "code-bytes": 24496,
+      "spills": 40,
+      "reloads": 40,
+      "copies": 17,
+      "runtime": {
+        "tree-workload": {
+          "result": -20,
+          "samples": 15,
+          "instructions": 5853479,
+          "cpu-seconds": 0.0003711249999991395,
+          "nanoseconds": 370353
+        },
+        "norm-workload": {
+          "result": 1.2742199912349306,
+          "samples": 15,
+          "instructions": 9088834,
+          "cpu-seconds": 0.00037491600000016945,
+          "nanoseconds": 368795
+        }
+      },
+      "compile-instructions-relative": 1.0140962788505017,
+      "compile-cpu-seconds-relative": 1.1172227089930373
+    },
+    "backtracking": {
+      "compile-instructions": 5429586465,
+      "compile-cpu-seconds": 0.399473418999996,
+      "code-bytes": 24496,
+      "spills": 40,
+      "reloads": 40,
+      "copies": 17,
+      "runtime": {
+        "tree-workload": {
+          "result": -20,
+          "samples": 15,
+          "instructions": 5845843,
+          "cpu-seconds": 0.0003717910000009539,
+          "nanoseconds": 370722
+        },
+        "norm-workload": {
+          "result": 1.2742199912349306,
+          "samples": 15,
+          "instructions": 9089987,
+          "cpu-seconds": 0.00040375000000025807,
+          "nanoseconds": 396388
+        }
+      },
+      "compile-instructions-relative": 1.3814810705771194,
+      "compile-cpu-seconds-relative": 1.2958763166046638
+    },
+    "chordal": {
+      "compile-instructions": 4454129538,
+      "compile-cpu-seconds": 0.3755774159999996,
+      "code-bytes": 25664,
+      "spills": 58,
+      "reloads": 58,
+      "copies": 153,
+      "runtime": {
+        "tree-workload": {
+          "result": -20,
+          "samples": 15,
+          "instructions": 5927768,
+          "cpu-seconds": 0.0004051660000001789,
+          "nanoseconds": 401554
+        },
+        "norm-workload": {
+          "result": 1.2742199912349306,
+          "samples": 15,
+          "instructions": 9090012,
+          "cpu-seconds": 0.0004061670000012896,
+          "nanoseconds": 401882
+        }
+      },
+      "compile-instructions-relative": 1.133289925910667,
+      "compile-cpu-seconds-relative": 1.2183586073494965
+    }
+  }
+}
