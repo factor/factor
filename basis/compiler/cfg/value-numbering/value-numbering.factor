@@ -19,6 +19,10 @@ IN: compiler.cfg.value-numbering
 
 GENERIC: process-instruction ( insn -- insn' )
 
+: remember-constant ( insn dst -- )
+    over literal-insn? constant-instructions get and
+    [ constant-instructions get set-at ] [ 2drop ] if ;
+
 : redundant-instruction ( insn vn -- insn' )
     [ dst>> ] dip [ swap set-vn ] [ <copy> ] 2bi ;
 
@@ -42,7 +46,14 @@ M: foldable-insn process-instruction
     [ dup defs-vregs length 1 = [ check-redundancy ] when ] ?if ;
 
 M: ##copy process-instruction
+    dup [ src>> vreg>insn ] [ dst>> ] bi remember-constant
     dup [ src>> vreg>vn ] [ dst>> ] bi set-vn ;
+
+M: ##load-integer process-instruction
+    dup dup dst>> remember-constant call-next-method ;
+
+M: ##load-reference process-instruction
+    dup dup dst>> remember-constant call-next-method ;
 
 M: array process-instruction
     [ process-instruction ] map ;
@@ -52,6 +63,10 @@ M: array process-instruction
     [ process-instruction ] map flatten ;
 
 : value-numbering ( cfg -- )
-    [ [ value-numbering-step ] simple-optimization ]
+    [
+        H{ } clone constant-instructions [
+            [ value-numbering-step ] simple-optimization
+        ] with-variable
+    ]
     [ cfg-changed ]
     [ predecessors-changed ] tri ;

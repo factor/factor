@@ -41,6 +41,9 @@ M: ##not rewrite
         [ drop f ]
     } cond ;
 
+M: ##integer>float rewrite
+    dup unary-constant-fold? [ unary-constant-fold ] [ drop f ] if ;
+
 ! Reassociation converts
 ! ## *-imm 2 1 X
 ! ## *-imm 3 2 Y

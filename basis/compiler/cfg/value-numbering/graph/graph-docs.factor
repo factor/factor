@@ -10,6 +10,9 @@ HELP: exprs>vns
 HELP: vns>insns
 { $var-description "assoc mapping value numbers to instructions." } ;
 
+HELP: constant-instructions
+{ $var-description "Maps SSA registers to constant load instructions, including registers that copy constants. This map is shared across basic blocks during value numbering and discarded at the end of the CFG. Other expressions remain local to each block." } ;
+
 ARTICLE: "compiler.cfg.value-numbering.graph" "Value numbering expression graph"
 "Makes value number graphs."
 $nl
@@ -18,6 +21,7 @@ $nl
   exprs>vns
   vns>insns
   vregs>vns
+  constant-instructions
 } ;
 
 ABOUT: "compiler.cfg.value-numbering.graph"
