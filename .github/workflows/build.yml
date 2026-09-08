@@ -20,6 +20,10 @@ jobs:
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core compiler threads io'
+    - name: ffi-allocator-regressions
+      run: ./factor -no-user-init -no-monitors .github/ffi-allocators.factor
+    - name: compiler-verification
+      run: ./factor -no-user-init -no-monitors .github/compiler-verify.factor
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -27,9 +31,26 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
+    - name: qualification-toolchain
+      run: |
+        mkdir -p logs/arm64-qualification
+        uname -a > logs/arm64-qualification/host.txt
+        lscpu >> logs/arm64-qualification/host.txt
+        git rev-parse HEAD > logs/arm64-qualification/source.txt
+        sudo apt-get update
+        sudo apt-get install -y clang-18 libclang-rt-18-dev
+        dpkg-query -W gcc clang-18 libclang-rt-18-dev libc6 > logs/arm64-qualification/packages.txt
     - name: bootstrap
-      run: ./build.sh net-bootstrap
+      env:
+        CC: gcc
+        CXX: g++
+      run: |
+        set -o pipefail
+        ./build.sh net-bootstrap 2>&1 | tee logs/arm64-qualification/bootstrap.log
+        ./factor -no-user-init -no-monitors .github/arm64-source-boot.factor 2>&1 | tee logs/arm64-qualification/source-boot.log
+        ./factor -i=boot.unix-arm.64.image -no-user-init -no-monitors -output-image=factor.image 2>&1 | tee logs/arm64-qualification/source-bootstrap.log
     - name: load-all
+      id: loaded
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core compiler threads io'
@@ -41,6 +62,19 @@ jobs:
       run: ./factor -no-user-init -no-monitors .github/arm64-feature-cache-save.factor
     - name: arm64-feature-cache-restart
       run: ./factor -i=arm64-feature-cache.image -no-user-init -no-monitors .github/arm64-feature-cache-check.factor
+    - name: gcc-abi-qualification
+      if: ${{ !cancelled() && steps.loaded.outcome == 'success' }}
+      run: python3 .github/ffi-qualify.py --cc gcc --out logs/arm64-qualification/gcc --native-arm64 --full
+    - name: clang-abi-qualification
+      if: ${{ !cancelled() && steps.loaded.outcome == 'success' }}
+      run: python3 .github/ffi-qualify.py --cc clang-18 --out logs/arm64-qualification/clang-18 --native-arm64 --require-small
+    - name: qualification-evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-arm64-abi-evidence
+        path: logs/arm64-qualification/
+        if-no-files-found: error
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -54,6 +88,10 @@ jobs:
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core'
+    - name: ffi-allocator-regressions
+      run: ./factor -no-user-init -no-monitors .github/ffi-allocators.factor
+    - name: compiler-verification
+      run: ./factor -no-user-init -no-monitors .github/compiler-verify.factor
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 
@@ -75,6 +113,10 @@ jobs:
       run: ./factor -no-user-init -no-monitors .github/arm64-feature-cache-save.factor
     - name: arm64-feature-cache-restart
       run: ./factor -i=arm64-feature-cache.image -no-user-init -no-monitors .github/arm64-feature-cache-check.factor
+    - name: ffi-allocator-regressions
+      run: ./factor -no-user-init -no-monitors .github/ffi-allocators.factor
+    - name: compiler-verification
+      run: ./factor -no-user-init -no-monitors .github/compiler-verify.factor
     - name: help-lint
       run: './factor -run=help.lint resource:core resource:basis resource:extra'
 

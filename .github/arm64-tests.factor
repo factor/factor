@@ -29,6 +29,8 @@ cpu arm.64? [ "ARM64 regression tests require an ARM64 VM" throw ] unless
 {
     "resource:basis/compiler/tests/alien.factor"
     "resource:basis/compiler/tests/alien-large-return.factor"
+    "resource:basis/compiler/tests/alien-linux-runtime.factor"
+    "resource:basis/compiler/tests/alien-linux-regressions.factor"
     "resource:basis/compiler/tests/alien-small-floats.factor"
     "resource:basis/compiler/tests/alien-arm64-abi.factor"
     "resource:basis/compiler/tests/float.factor"
