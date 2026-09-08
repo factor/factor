@@ -128,7 +128,11 @@ M: abstract-c-type unbox-return
 M: struct-c-type unbox-return
     dup return-struct-in-registers?
     [ call-next-method ]
-    [ [ struct-return-area get ] 2dip unbox keys implode-struct { } { } ] if ;
+    [
+        [ struct-return-area get ] 2dip unbox keys implode-struct
+        return-struct-pointer?
+        [ struct-return-area get 1array { int-rep } ] [ { } { } ] if
+    ] if ;
 
 GENERIC: flatten-parameter-type ( c-type -- reps )
 

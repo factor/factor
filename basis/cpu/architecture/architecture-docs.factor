@@ -8,6 +8,10 @@ HELP: struct-return-register
 { $values { "reg/f" "a machine register or f" } }
 { $description "Returns the dedicated register for a hidden structure result pointer, or f when the pointer uses normal parameter allocation. A dedicated result register does not consume an argument register or stack slot." } ;
 
+HELP: return-struct-pointer?
+{ $values { "?" boolean } }
+{ $description "Whether a callback returning a structure in caller-provided memory must also return that memory's address in the integer return register. Windows x64 requires this in RAX." } ;
+
 <<
 STRING: ex-%allot
 USING: cpu.architecture make ;

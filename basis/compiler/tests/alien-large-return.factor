@@ -60,6 +60,7 @@ FUNCTION: longlong ffi_test_large_return_callback ( void* callback )
 
 ! A real C caller validates the callback ABI; a Factor-only round trip
 ! could conceal matching mistakes in caller and callee lowering.
+! MSVC also reads the hidden result pointer returned in RAX on Windows x64.
 { 45 } [
     large-return-callback [ ffi_test_large_return_callback ] with-callback
 ] unit-test
