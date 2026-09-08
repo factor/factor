@@ -10,7 +10,7 @@ HELP: delete-compiled-xref
 
 HELP: dependencies-satisfied?
 { $values { "word" word } { "cache" assoc } { "?" boolean } }
-{ $description "Checks if all the words dependencies are satisfied or not." } ;
+{ $description "Checks whether all of the word's dependency conditions are satisfied, caching the result by word. Use a fresh cache for each invalidation pass. Individual conditions are not used as cache keys: conditions with equal contents can refer to distinct inlining hooks or layouts." } ;
 
 HELP: load-dependencies
 { $values { "word" word } { "seq" sequence } }

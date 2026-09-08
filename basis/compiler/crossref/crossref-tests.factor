@@ -1,5 +1,5 @@
-USING: accessors arrays assocs compiler.crossref fry io kernel
-locals math namespaces sequences sequences.private
+USING: accessors arrays assocs compiler.crossref fry hashtables io kernel
+locals math namespaces quotations sequences sequences.private
 stack-checker.dependencies tools.test vocabs words ;
 IN: compiler.crossref.tests
 
@@ -109,3 +109,28 @@ M: counted-checks nth-unsafe contents>> nth-unsafe ;
 { { t t t } 1 } [ f +definition+ shared-dependency-checks ] unit-test
 ! Effect-only dependencies must be excluded before checking their conditions.
 { { f f f } 0 } [ f +effect+ shared-dependency-checks ] unit-test
+
+! Equal quotations can describe different assumptions: custom inlining
+! checks compare the installed hook by identity, not by contents.
+:: equal-hooks ( reverse? -- outdated )
+    gensym :> generic
+    1 1quotation :> current
+    1 1quotation :> stale
+    current stale eq? f assert=
+    current stale = t assert=
+    generic current "custom-inlining" set-word-prop
+    gensym :> valid
+    gensym :> invalid
+    valid generic current depends-on-custom-inlining boa 1array
+    "dependency-checks" set-word-prop
+    invalid generic stale depends-on-custom-inlining boa 1array
+    "dependency-checks" set-word-prop
+    valid +conditional+ 2array invalid +conditional+ 2array 2array
+    reverse? [ reverse ] when
+    1 associate compiled-crossref [
+        { 1 } outdated-conditional-usages first
+        [ valid swap key? ] [ invalid swap key? ] bi 2array
+    ] with-variable ;
+
+{ { f t } } [ f equal-hooks ] unit-test
+{ { f t } } [ t equal-hooks ] unit-test

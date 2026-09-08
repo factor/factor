@@ -25,16 +25,16 @@ generic-call-site-crossref [ H{ } clone ] initialize
     filter-word-defs [ all-dependencies-of ] map ;
 
 : dependencies-satisfied? ( word cache -- ? )
-    [ "dependency-checks" word-prop ] dip
-    '[ _ [ satisfied? ] cache ] all? ;
+    ! Cache by word: structurally equal conditions can have different
+    ! answers when their expected values are compared by identity.
+    [ "dependency-checks" word-prop [ satisfied? ] all? ] cache ;
 
 :: outdated-conditional-usages ( set -- assocs )
     H{ } clone :> checks
-    H{ } clone :> usages
     set members [
         all-dependencies-of [
             +conditional+ dependency>=
-            [ usages [ checks dependencies-satisfied? ] cache not ]
+            [ checks dependencies-satisfied? not ]
             [ drop f ] if
         ] assoc-filter
     ] map ;
