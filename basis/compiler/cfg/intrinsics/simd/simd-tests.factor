@@ -214,20 +214,20 @@ M: compare-cpu %compare-vector-ccs nip f 2array 1array f ;
 
 ! vmin
 { { ##min-vector } }
-[ minmax-cpu float-4-rep [ emit-simd-vmin ] test-emit ]
+[ minmax-cpu int-4-rep [ emit-simd-vmin ] test-emit ]
 unit-test
 
 { { ##compare-vector ##and-vector ##andn-vector ##or-vector } }
-[ compare-cpu float-4-rep [ emit-simd-vmin ] test-emit ]
+[ compare-cpu int-4-rep [ emit-simd-vmin ] test-emit ]
 unit-test
 
 ! vmax
 { { ##max-vector } }
-[ minmax-cpu float-4-rep [ emit-simd-vmax ] test-emit ]
+[ minmax-cpu int-4-rep [ emit-simd-vmax ] test-emit ]
 unit-test
 
 { { ##compare-vector ##and-vector ##andn-vector ##or-vector } }
-[ compare-cpu float-4-rep [ emit-simd-vmax ] test-emit ]
+[ compare-cpu int-4-rep [ emit-simd-vmax ] test-emit ]
 unit-test
 
 TUPLE: dot-cpu < simple-ops-cpu ;

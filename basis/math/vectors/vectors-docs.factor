@@ -298,11 +298,13 @@ HELP: v^
 HELP: vmax
 { $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Creates a sequence where each element is the maximum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $notes "Floating-point SIMD vectors select the number when exactly one operand is NaN, and +0.0 when comparing opposite signed zeros. NaN payloads are unspecified." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmax ." "{ 1 6 5 }" } } ;
 
 HELP: vmin
 { $values { "u" { $sequence real } } { "v" { $sequence real } } { "w" { $sequence real } } }
 { $description "Creates a sequence where each element is the minimum of the corresponding elements from " { $snippet "u" } " and " { $snippet "v" } "." }
+{ $notes "Floating-point SIMD vectors select the number when exactly one operand is NaN, and -0.0 when comparing opposite signed zeros. NaN payloads are unspecified." }
 { $examples { $example "USING: math.vectors prettyprint ;" "{ 1 2 5 } { -7 6 3 } vmin ." "{ -7 2 3 }" } } ;
 
 HELP: vclamp
@@ -676,11 +678,11 @@ HELP: vabsdiff
 
 HELP: vmin-element
 { $values { "v" sequence } { "n" real } }
-{ $description "Returns the minimum lane value, reducing lanes in order." } ;
+{ $description "Returns the minimum lane value, reducing lanes in order. Floating-point SIMD reductions select the number when only one operand is NaN, and select negative zero when comparing zeros of different signs." } ;
 
 HELP: vmax-element
 { $values { "v" sequence } { "n" real } }
-{ $description "Returns the maximum lane value, reducing lanes in order." } ;
+{ $description "Returns the maximum lane value, reducing lanes in order. Floating-point SIMD reductions select the number when only one operand is NaN, and select positive zero when comparing zeros of different signs." } ;
 
 HELP: vdot4+
 { $values { "a" sequence } { "b" sequence } { "accumulator" sequence } { "result" sequence } }

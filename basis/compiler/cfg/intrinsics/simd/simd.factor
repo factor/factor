@@ -414,22 +414,42 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ ^^div-vector ]
     } emit-vv-vector-op ;
 
-: emit-simd-vmin ( node -- )
+: ^min-vector ( a b rep -- dst )
     {
         [ ^^min-vector ]
-        [
-            [ cc< ^compare-vector ]
-            [ ^blend-vector ] 3bi
-        ]
+        [ [ cc< ^compare-vector ] [ ^blend-vector ] 3bi ]
+    } vv-vector-op ;
+
+: emit-simd-vmin ( node -- )
+    {
+        { float-vector-rep [| a b rep |
+            ! MINPS/MAXPS select a NaN second operand and break zero ties
+            ! differently from ARM's minimum/maximum-number instructions.
+            b b rep cc/= ^compare-vector
+            a a b rep ^min-vector rep ^blend-vector :> result
+            a b rep cc= ^compare-vector
+            a b rep ^^or-vector result rep ^blend-vector
+        ] }
+        [ ^min-vector ]
     } emit-vv-vector-op ;
+
+: ^max-vector ( a b rep -- dst )
+    {
+        [ ^^max-vector ]
+        [ [ cc> ^compare-vector ] [ ^blend-vector ] 3bi ]
+    } vv-vector-op ;
 
 : emit-simd-vmax ( node -- )
     {
-        [ ^^max-vector ]
-        [
-            [ cc> ^compare-vector ]
-            [ ^blend-vector ] 3bi
-        ]
+        { float-vector-rep [| a b rep |
+            ! MINPS/MAXPS select a NaN second operand and break zero ties
+            ! differently from ARM's minimum/maximum-number instructions.
+            b b rep cc/= ^compare-vector
+            a a b rep ^max-vector rep ^blend-vector :> result
+            a b rep cc= ^compare-vector
+            a b rep ^^and-vector result rep ^blend-vector
+        ] }
+        [ ^max-vector ]
     } emit-vv-vector-op ;
 
 : emit-simd-vavg ( node -- )
