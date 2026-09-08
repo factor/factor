@@ -1,6 +1,7 @@
 USING: accessors alien.c-types arrays compiler.cfg.comparisons
 compiler.cfg.def-use compiler.cfg.instructions compiler.cfg.liveness
 compiler.cfg.registers compiler.cfg.ssa.interference
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.ssa.interference.live-ranges
 compiler.cfg.ssa.interference.private compiler.cfg.utilities
 compiler.test cpu.architecture kernel namespaces sequences slots
@@ -396,4 +397,24 @@ V{
 
 { { { 0 0 } { 1 0 } { 2 0 } } { red blue blue } } [
     V{ { 1 0 } { 2 0 } } V{ { 0 0 } } test-merge-order
+] unit-test
+
+! A derived pointer and its tagged base overlap at collection even when
+! the base's last explicit use preceded the pointer's definition. Coalescing
+! them would overwrite the only root with a nonzero-offset raw address.
+{ t f } [
+    [
+        f leader-map set
+        H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep } } representations set
+        {
+            T{ ##peek { dst 0 } { loc D: 0 } }
+            T{ ##tagged>integer { dst 1 } { src 0 } }
+            T{ ##add-imm { dst 2 } { src1 1 } { src2 16 } }
+            T{ ##call-gc { gc-map T{ gc-map } } }
+            T{ ##replace { src 2 } { loc D: 0 } }
+        } insns>cfg
+        dup compute-live-sets dup compute-defs compute-live-ranges
+        0 2 test-vregs-interfere?
+        0 1 test-vregs-interfere?
+    ] with-scope
 ] unit-test

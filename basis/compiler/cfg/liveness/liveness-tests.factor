@@ -223,6 +223,23 @@ cpu x86.64? [
     ] with-scope
 ] unit-test
 
+! The conversion can be deleted by coalescing while its integer operand
+! remains live at GC. Its tagged leader still needs a root slot, even when
+! the leader was defined by a stack peek rather than a conversion.
+{ T{ gc-map { gc-roots { 1 } } { derived-roots V{ } } } } [
+    [
+        H{ { 1 1 } { 20 1 } } clone leader-map set
+        H{ { 1 tagged-rep } { 20 int-rep } } representations set
+        H{ { 20 T{ ##tagged>integer { dst 20 } { src 1 } } } } insns set
+        {
+            T{ ##peek { dst 1 } { loc D: 0 } }
+            T{ ##call-gc { gc-map T{ gc-map } } }
+            T{ ##replace { src 20 } { loc D: 0 } }
+        } [ insns>cfg compute-live-sets-with-insns ] keep
+        second gc-map>>
+    ] with-scope
+] unit-test
+
 ! Copying an ordinary integer does not make it a derived root.
 { f f } [
     [
