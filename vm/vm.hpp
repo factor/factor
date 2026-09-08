@@ -514,6 +514,7 @@ struct factor_vm {
   inline cell from_signed_cell(fixnum x);
   inline cell from_unsigned_cell(cell x);
   inline cell allot_float(double n);
+  inline cell allot_float_bits(uint64_t bits);
   inline bignum* float_to_bignum(cell tagged);
   inline double untag_float(cell tagged);
   inline double untag_float_check(cell tagged);

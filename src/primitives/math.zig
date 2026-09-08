@@ -636,9 +636,8 @@ pub export fn primitive_float_bits(vm_asm: *VMAssemblyFields) callconv(.c) void 
     vm.checkTag(float_cell, .float);
 
     const boxed: *const layouts.BoxedFloat = @ptrFromInt(layouts.UNTAG(float_cell));
-    const f64_val = boxed.n;
-    const f32_val: f32 = @floatCast(f64_val);
-    const bits: u32 = @bitCast(f32_val);
+    const source_bits: *const u64 = @ptrCast(&boxed.n);
+    const bits = float_mod.narrowFloatBits(source_bits.*);
 
     // Convert u32 to Factor integer (fixnum or bignum)
     const result = fixnum.fromUnsignedCell(vm, bits);
@@ -670,9 +669,7 @@ pub export fn primitive_bits_float(vm_asm: *VMAssemblyFields) callconv(.c) void 
         else => vm.typeError(.fixnum, int_cell),
     }
 
-    const f32_val: f32 = @bitCast(bits);
-    const f64_val: f64 = @floatCast(f32_val);
-    const boxed = float_mod.allocBoxedFloat(vm, f64_val) catch vm.memoryError();
+    const boxed = float_mod.allocBoxedFloatBits(vm, float_mod.widenFloatBits(bits)) catch vm.memoryError();
     ctx.replace(layouts.tagFloat(boxed));
 }
 
@@ -683,8 +680,8 @@ pub export fn primitive_double_bits(vm_asm: *VMAssemblyFields) callconv(.c) void
     vm.checkTag(float_cell, .float);
 
     const boxed: *const layouts.BoxedFloat = @ptrFromInt(layouts.UNTAG(float_cell));
-    const f64_val = boxed.n;
-    const bits: u64 = @bitCast(f64_val);
+    const source_bits: *const u64 = @ptrCast(&boxed.n);
+    const bits = source_bits.*;
 
     // Convert u64 to Factor integer (fixnum or bignum)
     // Check if it fits in a fixnum
@@ -747,8 +744,7 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
         else => vm.typeError(.fixnum, int_cell),
     }
 
-    const f64_val: f64 = @bitCast(bits);
-    const boxed = float_mod.allocBoxedFloat(vm, f64_val) catch vm.memoryError();
+    const boxed = float_mod.allocBoxedFloatBits(vm, bits) catch vm.memoryError();
     ctx.replace(layouts.tagFloat(boxed));
 }
 
