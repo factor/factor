@@ -6,7 +6,8 @@ tools.test vocabs assocs compiler.cfg.debugger words
 locals combinators cpu.architecture namespaces byte-arrays alien
 specialized-arrays classes.struct eval classes.algebra sets
 quotations math.constants compiler.units splitting math.matrices
-math.vectors.simd.cords alien.data ;
+math.vectors.simd.cords alien.data combinators.smart continuations
+tools.test.fuzz tools.test.private ;
 FROM: math.vectors.simd.intrinsics => alien-vector set-alien-vector ;
 QUALIFIED-WITH: alien.c-types c
 SPECIALIZED-ARRAY: c:float
@@ -186,6 +187,61 @@ TUPLE: simd-test-failure
     dup empty? [ dup ... ] unless ! Print full errors
     ; inline
 
+! #283: compile each operation once, then let tools.test.fuzz generate and
+! retain individual trials. Failed cases include inputs, code, all three
+! results, and any exception, so a failure can be reproduced without its seed.
+TUPLE: simd-fuzz-case inputs code
+    unoptimized-result optimized-result nonintrinsic-result error ;
+
+: compile-evaluator ( quot -- word )
+    [ ( inputs -- result ) define-temp ] with-compilation-unit ;
+
+:: check-simd-fuzz-case ( trial unoptimized optimized nonintrinsic compare -- ? )
+    [
+        trial inputs>> unoptimized call( inputs -- result )
+        trial swap >>unoptimized-result drop
+        trial inputs>> optimized execute( inputs -- result )
+        trial swap >>optimized-result drop
+        trial inputs>> nonintrinsic execute( inputs -- result )
+        trial swap >>nonintrinsic-result drop
+        trial [ unoptimized-result>> ] [ optimized-result>> ] bi
+        compare call( a b -- ? )
+        trial [ optimized-result>> ] [ nonintrinsic-result>> ] bi
+        compare call( a b -- ? ) and
+    ] [ trial swap >>error drop f ] recover ;
+
+:: fuzz-optimizer ( generator code compare -- )
+    generator call( -- inputs ) [ class-of ] { } map-as
+    code '[ _ declare @ ] :> declared
+    declared '[ _ input<sequence ] :> unoptimized
+    unoptimized compile-evaluator :> optimized
+    t "always-inline-simd-intrinsics" [
+        unoptimized compile-evaluator
+    ] with-variable :> nonintrinsic
+    [ generator call( -- inputs ) simd-fuzz-case new swap >>inputs code >>code ]
+    unoptimized optimized nonintrinsic compare
+    '[ _ _ _ _ check-simd-fuzz-case ] fuzz-test ;
+
+! Failed predicates and exceptions must retain the actual generated inputs.
+{ { 1 } [ 1 + ] 2 2 2 f } [
+    [
+        1 fuzz-test-trials [
+            [ { 1 } ] [ 1 + ] [ 2drop f ] fuzz-optimizer
+        ] with-variable
+    ] fake-unit-test first error>> failures>> first first
+    { [ inputs>> ] [ code>> ] [ unoptimized-result>> ]
+      [ optimized-result>> ] [ nonintrinsic-result>> ] [ error>> ] } cleave
+] unit-test
+
+{ { 1 } "SIMD fuzz test exception" } [
+    [
+        1 fuzz-test-trials [
+            [ { 1 } ] [ drop "SIMD fuzz test exception" throw ] [ = ] fuzz-optimizer
+        ] with-variable
+    ] fake-unit-test first error>> failures>> first first
+    [ inputs>> ] [ error>> ] bi
+] unit-test
+
 "== Checking -new constructors" print
 
 { { } } [
@@ -198,11 +254,9 @@ TUPLE: simd-test-failure
 
 "== Checking -with constructors" print
 
-{ { } } [
-    with-ctors [
-        [ 1000 random '[ _ ] ] dip '[ _ execute ]
-    ] [ = ] check-optimizer
-] unit-test
+with-ctors [
+    [ [ 1000 random 1array ] ] dip '[ _ execute ] [ = ] fuzz-optimizer
+] each
 
 { 0xffffffff } [ 0xffffffff uint-4-with first ] unit-test
 
@@ -212,12 +266,10 @@ TUPLE: simd-test-failure
 
 "== Checking -boa constructors" print
 
-{ { } } [
-    boa-ctors [
-        [ stack-effect in>> length [ 1000 random ] [ ] replicate-as ] keep
-        '[ _ execute ]
-    ] [ = ] check-optimizer
-] unit-test
+boa-ctors [
+    [ stack-effect in>> length '[ _ [ 1000 random ] replicate ] ]
+    [ '[ _ execute ] ] bi [ = ] fuzz-optimizer
+] each
 
 { 0xffffffff } [ 0xffffffff 2 3 4 [ uint-4-boa ] compile-call first ] unit-test
 
@@ -238,14 +290,13 @@ TUPLE: simd-test-failure
     [ random-float-vector ]
     [ random-int-vector ] if ;
 
-:: check-vector-op ( word inputs class elt-class -- inputs quot )
+:: random-vector-inputs ( inputs class elt-class -- inputs )
     inputs [
         {
             { +vector+ [ class elt-class random-vector ] }
             { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
         } case
-    ] [ ] map-as
-    word '[ _ execute ] ;
+    ] { } map-as ;
 
 : remove-float-words ( alist -- alist' )
     { distance vsqrt n/v v/n v/ normalize vfma }
@@ -266,11 +317,11 @@ TUPLE: simd-test-failure
     float = [ remove-integer-words ] [ remove-float-words ] if
     remove-boolean-words ;
 
-: check-vector-ops ( class elt-class compare-quot -- failures )
-    [
-        [ nip ops-to-check ] 2keep
-        '[ first2 vector-word-inputs _ _ check-vector-op ]
-    ] dip check-optimizer ; inline
+:: fuzz-vector-ops ( class elt-class compare -- )
+    elt-class ops-to-check [| word schema |
+        [ schema vector-word-inputs class elt-class random-vector-inputs ]
+        word '[ _ execute ] compare fuzz-optimizer
+    ] assoc-each ;
 
 : (approx=) ( x y -- ? )
     {
@@ -302,7 +353,7 @@ TUPLE: simd-test-failure
     ] map ;
 
 simd-classes&reps [
-    [ [ { } ] ] dip first3 '[ _ _ _ check-vector-ops ] unit-test
+    first3 fuzz-vector-ops
 ] each
 
 "== Checking boolean operations" print
@@ -310,24 +361,21 @@ simd-classes&reps [
 : random-boolean-vector ( class -- vec )
     new [ drop 2 random zero? ] map ;
 
-:: check-boolean-op ( word inputs class elt-class -- inputs quot )
+:: random-boolean-inputs ( inputs class elt-class -- inputs )
     inputs [
         {
             { +vector+ [ class random-boolean-vector ] }
             { +scalar+ [ 1000 random elt-class float = [ >float ] when ] }
         } case
-    ] [ ] map-as
-    word '[ _ execute ] ;
+    ] { } map-as ;
 
-: check-boolean-ops ( class elt-class compare-quot -- seq )
-    [
-        [ boolean-ops [ dup vector-words at ] map>alist ] 2dip
-        '[ first2 vector-word-inputs _ _ check-boolean-op ]
-    ] dip check-optimizer ; inline
+:: fuzz-boolean-ops ( class elt-class compare -- )
+    boolean-ops [| word |
+        [ word vector-words at vector-word-inputs class elt-class random-boolean-inputs ]
+        word '[ _ execute ] compare fuzz-optimizer
+    ] each ;
 
-simd-classes&reps [
-    [ [ { } ] ] dip first3 '[ _ _ _ check-boolean-ops ] unit-test
-] each
+simd-classes&reps [ first3 fuzz-boolean-ops ] each
 
 "== Checking vector blend" print
 
@@ -502,19 +550,11 @@ simd-classes [
 : random-shift-vector ( class -- vec )
     new [ drop 16 random ] map ;
 
-:: test-shift-vector ( class -- ? )
-    [
-        class random-int-vector :> src
-        char-16 random-shift-vector :> perm
-        { class char-16 } :> decl
-
-        src perm vshuffle
-        src perm [ decl declare vshuffle ] compile-call
-        =
-    ] call( -- ? ) ;
-
 { char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2 }
-[ 10 swap '[ [ t ] [ _ test-shift-vector ] unit-test ] times ] each
+[
+    '[ _ random-int-vector char-16 random-shift-vector 2array ]
+    [ vshuffle ] [ = ] fuzz-optimizer
+] each
 
 "== Checking vector tests" print
 
