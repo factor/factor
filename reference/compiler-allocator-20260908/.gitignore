@@ -1,0 +1,5 @@
+*.log
+*.jsonl
+!matching-vm-baseline.jsonl
+!shared-*-check.jsonl
+!integrated-pressure.jsonl
