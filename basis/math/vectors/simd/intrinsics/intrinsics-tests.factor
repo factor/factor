@@ -1,8 +1,8 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays byte-arrays classes
-classes.algebra compiler.test cpu.architecture fry kernel kernel.private math
-math.floats.small.c-types math.vectors.simd.intrinsics.private
+classes.algebra compiler.cfg.instructions compiler.test cpu.architecture fry kernel kernel.private math
+math.floats.small.c-types math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
 math.vectors math.vectors.simd sequences specialized-arrays tools.test ;
 IN: math.vectors.simd.intrinsics.tests
 
@@ -117,4 +117,50 @@ IN: math.vectors.simd.intrinsics.tests
 { t } [
     double-2{ 0/0. -1/0. } double-2{ 1/0. 0/0. }
     double-2{ 1/0. -1/0. } [ vmax ] extrema-match?
+] unit-test
+
+! Keep signaling NaNs in raw storage: scalar float conversion may quiet them.
+{ t } [
+    uint-4{ 0x7f800001 0x3f800000 0xff800001 0x40000000 } float-4-cast
+    uint-4{ 0x40000000 0x7f800001 0x40400000 0xff800001 } float-4-cast
+    float-4{ 2.0 1.0 3.0 2.0 } [ vmin ] extrema-match?
+] unit-test
+{ t } [
+    uint-4{ 0x7f800001 0x3f800000 0xff800001 0x40000000 } float-4-cast
+    uint-4{ 0x40000000 0x7f800001 0x40400000 0xff800001 } float-4-cast
+    float-4{ 2.0 1.0 3.0 2.0 } [ vmax ] extrema-match?
+] unit-test
+{ t } [
+    ulonglong-2{ 0x7ff0000000000001 0x3ff0000000000000 } double-2-cast
+    ulonglong-2{ 0x4000000000000000 0xfff0000000000001 } double-2-cast
+    double-2{ 2.0 1.0 } [ vmin ] extrema-match?
+] unit-test
+{ t } [
+    ulonglong-2{ 0x7ff0000000000001 0x3ff0000000000000 } double-2-cast
+    ulonglong-2{ 0x4000000000000000 0xfff0000000000001 } double-2-cast
+    double-2{ 2.0 1.0 } [ vmax ] extrema-match?
+] unit-test
+{ t } [
+    uint-4{ 0x7f800001 0x3f800000 0xff800001 0x40000000 } float-4-cast
+    1.0 [ vmin-element ] reduction-matches?
+] unit-test
+{ t } [
+    uint-4{ 0x7f800001 0x40000000 0xff800001 0x3f800000 } float-4-cast
+    2.0 [ vmax-element ] reduction-matches?
+] unit-test
+{ t } [
+    ulonglong-2{ 0x3ff0000000000000 0x7ff0000000000001 } double-2-cast
+    1.0 [ vmin-element ] reduction-matches?
+] unit-test
+{ t } [
+    ulonglong-2{ 0x7ff0000000000001 0x3ff0000000000000 } double-2-cast
+    1.0 [ vmax-element ] reduction-matches?
+] unit-test
+
+! Matching fallback results must not conceal failed native SIMD lowering.
+{ t } [
+    [ float-4-rep (simd-vmin) ] [ ##compare-vector? ] contains-insn?
+] unit-test
+{ t } [
+    [ double-2-rep (simd-vmax) ] [ ##compare-vector? ] contains-insn?
 ] unit-test
