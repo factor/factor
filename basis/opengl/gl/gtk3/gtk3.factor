@@ -10,6 +10,7 @@ IN: opengl.gl.gtk3
 LIBRARY: epoxy
 
 C-LIBRARY: epoxy {
+    { linux "libepoxy.so.0" }
     { unix "libepoxy.so" }
 }
 
@@ -17,5 +18,5 @@ C-LIBRARY: epoxy {
     ! libepoxy exports function pointer variables (epoxy_glXXX),
     ! not the actual functions. dlsym returns the address of the
     ! variable, so we must dereference it to get the function pointer.
-    "epoxy_" prepend DLL" libepoxy.so" dlsym
+    "epoxy_" prepend "epoxy" library-dll dlsym
     dup [ 0 alien-cell ] when ; inline
