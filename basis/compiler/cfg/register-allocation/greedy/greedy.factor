@@ -10,6 +10,7 @@ compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
 compiler.cfg.linear-scan.resolve compiler.cfg.utilities
 compiler.cfg.linearization compiler.cfg.loop-detection
 compiler.cfg.register-allocation compiler.cfg.ssa.destruction
+compiler.cfg.register-allocation.occupancy hashtables.identity
 heaps kernel locals math math.functions math.order namespaces sequences sorting vectors ;
 IN: compiler.cfg.register-allocation.greedy
 
@@ -18,7 +19,7 @@ IN: compiler.cfg.register-allocation.greedy
 SINGLETON: greedy-allocator
 
 SYMBOLS: greedy-queue greedy-registers greedy-unions greedy-statistics
-greedy-use-weights greedy-region-boundaries ;
+greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs ;
 
 : greedy-count ( key -- ) greedy-statistics get inc-at ;
 
@@ -38,29 +39,38 @@ greedy-use-weights greedy-region-boundaries ;
 : greedy-priority ( interval -- priority )
     [ interval-size ] [ spill-weight ] [ vreg>> neg ] tri 3array ;
 
+: cached-priority ( interval -- priority )
+    greedy-costs get [ greedy-priority ] cache ;
+
+: cached-spill-weight ( interval -- weight ) cached-priority second ;
+
 : greedy-enqueue ( interval -- )
-    f >>reg dup greedy-priority greedy-queue get heap-push ;
+    f >>reg dup cached-priority greedy-queue get heap-push ;
 
 : register-union ( interval reg -- intervals )
     [ interval-reg-class ] dip 2array greedy-unions get at ;
 
+: register-index ( interval reg -- occupancy )
+    [ interval-reg-class ] dip 2array greedy-occupancies get at ;
+
 :: register-conflicts ( interval reg -- conflicts )
-    interval reg register-union
-    [ interval intervals-intersect? ] filter ;
+    interval ranges>> interval reg register-index occupancy-conflicts ;
 
 :: greedy-assign ( interval reg -- )
     interval reg >>reg interval reg register-union push
+    interval interval ranges>> interval reg register-index occupy-ranges
     "assignments" greedy-count ;
 
 :: evictable? ( interval conflicts -- ? )
-    interval spill-weight :> weight
-    conflicts [ spill-weight weight < ] all? ;
+    interval cached-spill-weight :> weight
+    conflicts [ cached-spill-weight weight < ] all? ;
 
-: eviction-cost ( conflicts -- cost ) [ spill-weight ] map-sum ;
+: eviction-cost ( conflicts -- cost ) [ cached-spill-weight ] map-sum ;
 
 :: greedy-evict ( interval reg -- )
     interval reg register-conflicts [| victim |
         victim reg register-union victim swap remove-eq! drop
+        victim victim reg register-index release-ranges
         victim greedy-enqueue
         "evictions" greedy-count
     ] each
@@ -103,6 +113,8 @@ ERROR: greedy-register-pressure interval ;
     ] if ;
 
 :: greedy-split ( interval -- )
+    ! split-for-spill mutates its input; child priorities must be recomputed.
+    interval greedy-costs get delete-at
     interval region-split :> position!
     position [ "region-splits" greedy-count ] [
         interval use-gap [ interval single-use-split ] unless* position!
@@ -114,15 +126,22 @@ ERROR: greedy-register-pressure interval ;
     ] [ interval greedy-register-pressure ] if ;
 
 :: greedy-allocate-one ( interval -- )
-    interval interval-reg-class greedy-registers get at :> regs
-    regs [ interval swap register-conflicts empty? ] find nip
-    [ interval swap greedy-assign ] [
-        regs [ interval swap register-conflicts interval swap evictable? ] filter
-        dup empty? [ drop interval greedy-split ] [
-            [ interval swap register-conflicts eviction-cost ] sort-by first
-            interval swap greedy-evict
+    f :> cheapest!
+    interval interval-reg-class greedy-registers get at [| reg |
+        interval reg register-conflicts :> conflicts
+        conflicts empty? [
+            interval reg greedy-assign t
+        ] [
+            interval conflicts evictable? [
+                conflicts eviction-cost :> cost
+                cheapest [ cost cheapest second < ] [ t ] if [
+                    reg cost 2array cheapest!
+                ] when
+            ] when f
         ] if
-    ] if* ;
+    ] any? [
+        cheapest [ first interval swap greedy-evict ] [ interval greedy-split ] if*
+    ] unless ;
 
 ! Calls and boxing instructions impose Factor-specific clobbers. Split them
 ! before arbitrary-order allocation, preserving the baseline's keep-dst rule.
@@ -171,8 +190,13 @@ ERROR: greedy-register-pressure interval ;
     H{ } clone spill-slots set
     H{ } clone greedy-statistics set
     H{ } clone greedy-unions set
+    H{ } clone greedy-occupancies set
+    32 <identity-hashtable> greedy-costs set
     registers [| class regs |
-        regs [| reg | V{ } clone class reg 2array greedy-unions get set-at ] each
+        regs [| reg |
+            V{ } clone class reg 2array greedy-unions get set-at
+            <register-occupancy> class reg 2array greedy-occupancies get set-at
+        ] each
     ] assoc-each
     <max-heap> greedy-queue set
     intervals/sync-points prepare-greedy-intervals [ greedy-enqueue ] each
