@@ -5,7 +5,7 @@ compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.predecessors compiler.cfg.registers
 compiler.cfg.rpo compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.utilities cpu.architecture
-deques dlists kernel namespaces sequences sets ;
+deques dlists kernel locals namespaces sequences sets ;
 IN: compiler.cfg.liveness
 
 SYMBOL: live-ins
@@ -84,14 +84,39 @@ M: vreg-insn lookup-base-pointer* 2drop f ;
 : lookup-base-pointer ( vreg -- vreg/f )
     base-pointers get ?at [
         f over base-pointers get set-at
-        [ dup ?leader insn-of lookup-base-pointer* ] keep
+        [
+            dup insn-of [ lookup-base-pointer* ] [
+                dup ?leader insn-of lookup-base-pointer*
+            ] if*
+        ] keep
         dupd base-pointers get set-at
     ] unless ;
+
+! Leader equality can also mean register reuse between different values.
+! Only original bit-preserving definitions prove that a derived value and
+! its tagged base contain identical bits and can share a root slot.
+:: same-base-bits? ( vreg base -- ? )
+    vreg base = [ t ] [
+        vreg insn-of :> insn
+        insn ##copy? insn ##tagged>integer? or [
+            insn src>> base same-base-bits?
+        ] [
+            insn ##parallel-copy? [
+                vreg insn values>> at base same-base-bits?
+            ] [ f ] if
+        ] if
+    ] if ;
 
 :: visit-derived-root ( vreg derived-roots gc-roots -- )
     vreg lookup-base-pointer :> base
     base [
-        { vreg base } derived-roots push
+        ! A coalesced base already occupies the derived value's slot. A
+        ! self-pair would make the collector subtract the root from itself
+        ! before tracing it, replacing the live pointer with zero.
+        vreg base [ ?leader ] bi@ =
+        [ vreg base same-base-bits? ] [ f ] if [ ] [
+            { vreg base } derived-roots push
+        ] if
         base gc-roots adjoin
     ] when ;
 
@@ -156,11 +181,14 @@ M: insn visit-insn 2drop ;
     H{ } clone live-outs namespaces:set
     H{ } clone base-pointers namespaces:set ;
 
-: compute-live-sets ( cfg -- )
+: compute-live-sets-with-insns ( cfg -- )
     init-liveness
-    dup needs-predecessors dup compute-insns
+    dup needs-predecessors
     post-order <hashed-dlist> [ push-all-front ] keep
     [ liveness-step ] slurp/replenish-deque ;
+
+: compute-live-sets ( cfg -- )
+    dup compute-insns compute-live-sets-with-insns ;
 
 : live-in? ( vreg bb -- ? ) live-in key? ;
 

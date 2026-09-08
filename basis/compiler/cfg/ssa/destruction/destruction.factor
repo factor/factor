@@ -44,5 +44,8 @@ PRIVATE>
         compute-live-ranges
         coalesce-cfg
         cleanup-cfg
-        compute-live-sets
+        ! Keep the CSSA definition map from the first liveness pass. Cleanup
+        ! removes bitcasts and copies whose original provenance still tells
+        ! us which tagged base an integer operand needs across collection.
+        compute-live-sets-with-insns
     } apply-passes ;

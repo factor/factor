@@ -13,8 +13,13 @@ SYMBOLS: local-def-indices local-kill-indices ;
 : record-defs ( n insn -- )
     defs-vregs [ local-def-indices get set-at ] with each ;
 
+: interference-uses ( insn -- uses )
+    dup gc-map-insn? [
+        [ uses-vregs ] [ gc-map>> gc-roots>> ] bi append
+    ] [ uses-vregs ] if ;
+
 : record-uses ( n insn -- )
-    dup uses-vregs [ 2drop ] [
+    dup interference-uses [ 2drop ] [
         swap def-is-use-insn?
         [ [ first local-kill-indices get set-at ] [ rest-slice ] 2bi ] unless
         [ 1 + ] dip [ local-kill-indices get set-at ] with each
@@ -33,6 +38,9 @@ M: ##parallel-copy record-insn
 
 M: vreg-insn record-insn
     [ 2 * ] dip [ record-defs ] [ record-uses ] 2bi ;
+
+M: ##call-gc record-insn
+    [ 2 * ] dip record-uses ;
 
 M: insn record-insn
     2drop ;
