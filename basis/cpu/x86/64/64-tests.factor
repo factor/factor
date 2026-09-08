@@ -18,3 +18,17 @@ IN: cpu.x86.64.tests
 { B{ 73 131 198 24 } } [
     [ T{ ds-loc { n 3 } } %inc ] B{ } make
 ] unit-test
+
+! High-half extraction must initialize a distinct destination. UNPCKHPD
+! reads its first operand as well as its second; coalescing can hide this.
+{ B{ 0x0f 0x28 0xc1 0x66 0x0f 0x15 0xc1 } } [
+    [ XMM0 XMM1 float-4-rep %tail>head-vector ] B{ } make
+] unit-test
+
+{ B{ 0x0f 0x28 0xc1 0x66 0x0f 0x15 0xc1 } } [
+    [ XMM0 XMM1 double-2-rep %tail>head-vector ] B{ } make
+] unit-test
+
+{ B{ 0x66 0x0f 0x15 0xc0 } } [
+    [ XMM0 XMM0 float-4-rep %tail>head-vector ] B{ } make
+] unit-test
