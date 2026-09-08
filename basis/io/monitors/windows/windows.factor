@@ -84,9 +84,15 @@ TUPLE: win32-monitor < monitor port ;
 : (fill-queue-thread) ( monitor -- )
     dup fill-queue (fill-queue-thread) ;
 
-: fill-queue-thread ( monitor -- )
-    '[ _ dup fill-queue (fill-queue-thread) ]
-    [ already-disposed? ] ignore-error ;
+:: monitor-stopped-error? ( error monitor -- ? )
+    error already-disposed? error windows-error? [
+        error n>> ERROR_OPERATION_ABORTED =
+        monitor port>> disposed>> and
+    ] [ f ] if or ;
+
+:: fill-queue-thread ( monitor -- )
+    [ monitor (fill-queue-thread) ]
+    [ monitor monitor-stopped-error? ] ignore-error ;
 
 M:: windows (monitor) ( path recursive? mailbox -- monitor )
     [
