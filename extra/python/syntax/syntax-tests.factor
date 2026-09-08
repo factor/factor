@@ -40,8 +40,10 @@ IN: python.syntax.tests
 ! Reference counting
 { 1 } [ 3 <py-tuple> getrefcount py> ] py-test
 
+! CPython's cached small integers can be immortal. Use an uncached value
+! whose reference count still changes when borrowed references are retained.
 { -1 } [
-    H{ { "foo" 33 } { "bar" 44 } } >py
+    H{ { "foo" 333 } { "bar" 444 } } >py
     [ "foo" py-dict-get-item-string getrefcount py> ]
     [
         '[
