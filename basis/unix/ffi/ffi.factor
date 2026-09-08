@@ -149,6 +149,7 @@ FUNCTION: uint ntohl ( uint n )
 FUNCTION: ushort ntohs ( ushort n )
 FUNCTION: int shutdown ( int fd, int how )
 FUNCTION: int open ( c-string path, int flags, int prot )
+FUNCTION: int openat ( int dirfd, c-string path, int flags, int mode )
 FUNCTION: DIR* opendir ( c-string path )
 
 STRUCT: utimbuf

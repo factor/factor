@@ -1,9 +1,10 @@
 ! Copyright (C) 2013 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators combinators.smart
-io.encodings.utf8 io.files kernel math math.order math.parser
+USING: accessors arrays combinators combinators.smart io
+io.backend.unix io.encodings io.encodings.utf8 io.files
+io.files.unix io.ports kernel math math.order math.parser
 memoize sequences sorting.specification splitting
-splitting.monotonic strings io.pathnames calendar words ;
+splitting.monotonic strings io.pathnames calendar unix unix.ffi words ;
 IN: unix.linux.proc
 
 ! /proc/*
@@ -300,11 +301,24 @@ M: string proc-pid-path
 : proc-file-lines ( path -- strings ) utf8 file-lines ;
 : proc-first-line ( path -- string/f ) proc-file-lines ?first ;
 
-: proc-pid-first-line ( pid string -- string )
+! Keep one directory descriptor across related reads. If the process exits,
+! openat fails instead of following a reused PID to a different process.
+: <proc-pid-directory> ( pid -- fd )
+    "" proc-pid-path open-read <fd> init-fd ;
+
+GENERIC#: proc-pid-contents 1 ( pid name -- string )
+
+M: object proc-pid-contents proc-pid-path utf8 file-contents ;
+
+M: fd proc-pid-contents
+    [ handle-fd ] dip O_RDONLY 0 [ openat ] unix-system-call
+    <fd> init-fd <input-port> utf8 <decoder> stream-contents ;
+
+: proc-pid-first-line ( pid string -- string/f )
     proc-pid-path proc-first-line ;
 
 : parse-proc-pid-cmdline ( pid -- string/f )
-    "cmdline" proc-pid-path proc-first-line ;
+    "cmdline" proc-pid-contents [ f ] [ ] if-empty ;
 
 TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     terminal-group-id task-flags
@@ -338,10 +352,14 @@ TUPLE: pid-stat pid filename state parent-pid group-id session-id terminal#
     env-start env-end
     exit-code ;
 
-: parse-proc-pid-stat ( pid -- stat )
-    "stat" proc-pid-path
-    proc-first-line
-    split-words harvest
-    pid-stat "slots" word-prop length "0" pad-tail
-    [ [ string>number ] transmute ] map
+: string>pid-stat ( string -- stat )
+    ! comm can contain whitespace and parentheses; the final ')' ends it.
+    " " split1 [ string>number ] dip
+    ")" split1-last [ ")" append ] dip
+    split-words harvest [ [ string>number ] transmute ] map
+    [ 2array ] dip append
+    pid-stat "slots" word-prop length 0 pad-tail
     [ pid-stat boa ] input<sequence ;
+
+: parse-proc-pid-stat ( pid -- stat )
+    "stat" proc-pid-contents string>pid-stat ;
