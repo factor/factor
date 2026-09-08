@@ -398,3 +398,16 @@ CONSTANT: log10-factorial-1000 0x1.40f3593ed6f8ep11
 { -2 } [ 4/10 integer-log2 ] unit-test
 { -3 } [ 2/10 integer-log2 ] unit-test
 { -4 } [ 1/10 integer-log2 ] unit-test
+
+! #515: indeterminate powers must not depend on libm or complex promotion.
+{ t } [
+    {
+        { 0 0 } { 0.0 0.0 } { -0.0 0 }
+        { 1 1/0. } { 1 -1/0. } { -1 1/0. } { -1 -1/0. }
+        { 1.0 1/0. } { -1.0 -1/0. }
+        { 1/0. 0 } { -1/0. 0.0 }
+        { 0/0. 0 } { 1 0/0. } { 0 0/0. }
+    } [ first2 ^ fp-nan? ] all?
+] unit-test
+{ 1 1 1.0 } [ 1 0 ^ -1 0 ^ 2.0 0 ^ ] unit-test
+{ 0.0 1/0. 0.0 1/0. } [ 0.0 1/0. ^ 0.0 -1/0. ^ 1/0. -1/0. ^ 1/0. 1/0. ^ ] unit-test

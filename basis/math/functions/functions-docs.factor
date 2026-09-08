@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math math.order
+USING: help.markup help.syntax kernel math math.libm math.order
 sequences quotations math.functions.private math.constants ;
 IN: math.functions
 
@@ -279,7 +279,7 @@ HELP: absq
 HELP: ^
 { $values { "x" number } { "y" number } { "x^y" number } }
 { $description "Raises " { $snippet "x" } " to the power of " { $snippet "y" } ". If " { $snippet "y" } " is an integer the answer is computed exactly, otherwise a floating point approximation is used." }
-{ $errors "Throws an error if " { $snippet "x" } " and " { $snippet "y" } " are both integer 0." } ;
+{ $notes "Returns NaN for indeterminate real powers: zero or infinity raised to zero, and positive or negative one raised to either infinity. A NaN real operand also produces NaN. These rules apply to " { $link ^ } "; the low-level " { $link fpow } " word follows the platform math library." } ;
 
 HELP: nth-root
 { $values { "n" integer } { "x" number } { "y" number } }
