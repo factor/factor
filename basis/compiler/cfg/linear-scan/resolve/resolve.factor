@@ -5,6 +5,7 @@ combinators.short-circuit compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment compiler.cfg.parallel-copy
 compiler.cfg.predecessors compiler.cfg.registers
+compiler.cfg.register-allocation.rematerialization
 compiler.cfg.rpo compiler.cfg.utilities cpu.architecture kernel
 make namespaces sequences ;
 IN: compiler.cfg.linear-scan.resolve
@@ -42,7 +43,9 @@ SYMBOL: temp-locations
     H{ } clone temp-locations set ;
 
 : add-mapping ( from to rep -- )
-    '[ _ <location> ] bi@ 2array , ;
+    over constant-recipe? [ 3drop ] [
+        '[ _ <location> ] bi@ 2array ,
+    ] if ;
 
 :: resolve-value-data-flow ( vreg live-out live-in edge-live-in -- )
     vreg live-out ?at [ bad-vreg ] unless
@@ -73,6 +76,9 @@ SYMBOL: temp-locations
 
 : >insn ( from to -- )
     {
+        { [ over reg>> constant-recipe? ] [
+            [ reg>> ] bi@ emit-rematerialization
+        ] }
         { [ over reg>> spill-slot? ] [ memory->register ] }
         { [ dup reg>> spill-slot? ] [ register->memory ] }
         [ register->register ]

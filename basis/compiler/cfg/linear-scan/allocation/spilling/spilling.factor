@@ -4,8 +4,9 @@ USING: accessors assocs combinators combinators.short-circuit
 compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
-compiler.cfg.linear-scan.ranges compiler.utilities kernel
-linked-assocs math namespaces sequences ;
+compiler.cfg.linear-scan.ranges
+compiler.cfg.register-allocation.rematerialization
+compiler.utilities kernel linked-assocs math namespaces sequences ;
 IN: compiler.cfg.linear-scan.allocation.spilling
 
 : trim-before-ranges ( live-interval -- )
@@ -18,11 +19,13 @@ IN: compiler.cfg.linear-scan.allocation.spilling
     last-use { [ def-rep>> ] [ use-rep>> ] } 1|| ; inline
 
 : assign-spill ( live-interval -- )
-    dup last-use-rep dup [
-        >>spill-rep
-        dup [ vreg>> ] [ spill-rep>> ] bi
-        assign-spill-slot >>spill-to drop
-    ] [ 2drop ] if ;
+    dup vreg>> rematerialization-of [ drop ] [
+        dup last-use-rep dup [
+            >>spill-rep
+            dup [ vreg>> ] [ spill-rep>> ] bi
+            assign-spill-slot >>spill-to drop
+        ] [ 2drop ] if
+    ] if ;
 
 ERROR: bad-live-ranges interval ;
 
@@ -47,8 +50,9 @@ ERROR: bad-live-ranges interval ;
 : assign-reload ( live-interval -- )
     dup first-use-rep dup [
         >>reload-rep
-        dup [ vreg>> ] [ reload-rep>> ] bi
-        assign-spill-slot >>reload-from drop
+        dup vreg>> rematerialization-of [ ] [
+            dup [ vreg>> ] [ reload-rep>> ] bi assign-spill-slot
+        ] if* >>reload-from drop
     ] [ 2drop ] if ;
 
 : spill-after ( after -- after/f )
