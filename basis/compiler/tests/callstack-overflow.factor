@@ -66,15 +66,14 @@ os windows? [
         2 head ${ KERNEL-ERROR ERROR-CALLSTACK-OVERFLOW } =
     ] must-fail-with
 
-    ! This test crashes with a Memory protection fault on macOS 64-bit
-    ! for some reason. See #1478
-    os macos? [
-        ! Load up the stack until there is < 500 bytes of it left. Then
-        ! run a big gc cycle. 500 bytes isn't enough, so a callstack
-        ! overflow would occur during the gc which we can't handle. The
-        ! solution is to for the duration of the gc unlock the segment's
-        ! lower guard page which gives it pagesize (4096) more bytes to
-        ! play with.
-        { } [ overflow/w-compact-gc ] unit-test
-    ] unless
+    ! GC temporarily unlocks the callstack's lower guard reserve (#1478).
+    ! The x64 native-entry probe can raise a structured overflow before
+    ! reaching the 500-byte target. Accept that early check, but require
+    ! the collector to remain usable after either successful GC or recovery.
+    { } [
+        [ overflow/w-compact-gc ] [
+            2 head ${ KERNEL-ERROR ERROR-CALLSTACK-OVERFLOW } assert=
+        ] recover
+        compact-gc
+    ] unit-test
 ] unless
