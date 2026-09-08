@@ -120,7 +120,10 @@ CONSTANT: type-tags
     } cleave ;
 
 : load-functions ( xml tag-name -- functions )
-    tags-named [ "moved-to" attr ] reject [ xml>function ] map ;
+    tags-named
+    [ "moved-to" attr ] reject
+    [ "identifier" attr skip-definition? ] reject
+    [ xml>function ] map ;
 
 : xml>field ( xml -- field )
     [ field new ] dip {

@@ -23,12 +23,14 @@ LIBRARY: gtk2
 
 IMPLEMENT-STRUCTS: GtkTreeIter ;
 
+! Keep manual bindings out of GIR generation so reload preserves word identity.
+SKIP-DEFINITIONS: gtk_im_context_get_preedit_string ;
+
 GIR: vocab:gir/Gtk-2.0.gir
 
 DESTRUCTOR: gtk_widget_destroy
 
 ! <workaround
-FORGET: gtk_im_context_get_preedit_string
 FUNCTION: void
 gtk_im_context_get_preedit_string ( GtkIMContext* imcontext, gchar** str, PangoAttrList** attrs, gint* cursor_pos )
 ! workaround>
