@@ -586,6 +586,10 @@ HOOK: struct-return-on-stack? cpu ( -- ? )
 HOOK: struct-return-register cpu ( -- reg/f )
 M: object struct-return-register f ;
 
+! Some ABIs also return the hidden result pointer in the integer return register.
+HOOK: return-struct-pointer? cpu ( -- ? )
+M: object return-struct-pointer? f ;
+
 HOOK: %unbox cpu ( dst src func rep -- )
 
 HOOK: %unbox-long-long cpu ( dst1 dst2 src func -- )
