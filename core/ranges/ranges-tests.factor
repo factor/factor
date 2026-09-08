@@ -100,3 +100,16 @@ USING: arrays kernel math ranges sequences sets tools.test ;
 
 { { 1.5 2.5 3.5 } } [ 1.5 3.7 [a..b) >array ] unit-test
 { { 1+1/2 2+1/2 3+1/2 } } [ 3/2 37/10 [a..b) >array ] unit-test
+
+! #1313: integer range membership must not enumerate the range.
+{ t } [ 1000000000000000 0 1000000000000001 1 <range> member? ] unit-test
+{ f } [ 1000000000000001 0 1000000000000000 1 <range> member? ] unit-test
+{ t } [ -1000000000000000 0 -1000000000000000 -2 <range> member? ] unit-test
+{ f } [ -999999999999999 0 -1000000000000000 -2 <range> member? ] unit-test
+{ t } [ 3 0 5 1 <range> member? ] unit-test
+{ f } [ 3.0 0 5 1 <range> member? ] unit-test
+{ f } [ 3.3 0 5 1 <range> member? ] unit-test
+{ f } [ 0 0 -1 1 <range> member? ] unit-test
+{ t } [ 5 5 100 0 range boa member? ] unit-test
+{ f } [ 6 5 100 0 range boa member? ] unit-test
+{ t } [ 0.5 0.0 1.0 0.25 <range> member? ] unit-test
