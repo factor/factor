@@ -4,7 +4,7 @@ compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.chordal compiler.cfg.registers
 compiler.cfg.utilities compiler.test cpu.architecture generalizations kernel kernel.private locals make math
-math.functions math.libm math.private memory namespaces quotations
+math.bitwise math.functions math.libm math.private memory namespaces quotations
 sequences sequences.generalizations tools.test ;
 IN: compiler.cfg.register-allocation.chordal.tests
 
@@ -17,6 +17,59 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
 ] unit-test
 
 { f } [ cycle-graph dup maximum-cardinality-order perfect-order? ] unit-test
+
+! Compare both optimized graph algorithms to simple independent oracles on
+! every undirected graph with four vertices, including non-chordal graphs.
+:: scan-cardinality-order ( graph -- order )
+    graph keys sort :> remaining!
+    H{ } clone :> weights
+    V{ } clone :> order
+    [ remaining empty? not ] [
+        remaining first :> best!
+        remaining [| vertex |
+            vertex weights at 0 or best weights at 0 or >
+            [ vertex best! ] when
+        ] each
+        best order push
+        best remaining remove remaining!
+        best graph at [ weights inc-at ] each
+    ] while
+    order ;
+
+:: oracle-earlier-neighbors ( vertex graph seen -- neighbors )
+    vertex graph at [ seen key? ] filter ;
+
+:: oracle-clique? ( vertices graph -- ? )
+    vertices [| a |
+        vertices [| b | a b = b a graph at member? or ] all?
+    ] all? ;
+
+:: clique-perfect-order? ( graph order -- ? )
+    H{ } clone :> seen
+    order [| vertex |
+        vertex graph seen oracle-earlier-neighbors graph oracle-clique?
+        vertex seen conjoin
+    ] all? ;
+
+:: four-vertex-graph ( mask -- graph )
+    4 <iota> [ V{ } clone ] H{ } map>assoc :> graph
+    { { 0 1 } { 0 2 } { 0 3 } { 1 2 } { 1 3 } { 2 3 } }
+    [| pair index |
+        mask 1 index shift bitand 0 > [
+            pair first2 graph at push
+            pair reverse first2 graph at push
+        ] when
+    ] each-index
+    graph ;
+
+{ t } [
+    64 <iota> [ [let
+        four-vertex-graph :> graph
+        graph maximum-cardinality-order :> order
+        graph scan-cardinality-order order =
+        graph order perfect-order? graph order clique-perfect-order? = and
+    ] ] all?
+] unit-test
 
 ! Disjoint live-range holes must not become interference via a hull.
 { H{ { 0 V{ } } { 1 V{ } } } } [

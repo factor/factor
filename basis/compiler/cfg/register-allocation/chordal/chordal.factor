@@ -23,18 +23,23 @@ SINGLETON: chordal-allocator
 ! graph. Keep the certificate explicit: machine operand constraints can
 ! add interference beyond the ideal strict-SSA graph.
 :: maximum-cardinality-order ( graph -- order )
-    graph keys sort :> remaining!
     H{ } clone :> weights
+    H{ } clone :> selected
+    <max-heap> :> pending
     V{ } clone :> order
-    [ remaining empty? not ] [
-        remaining first :> best!
-        remaining [| vertex |
-            vertex weights at 0 or best weights at 0 or >
-            [ vertex best! ] when
-        ] each
-        best order push
-        best remaining remove remaining!
-        best graph at [ weights inc-at ] each
+    graph keys [| vertex | vertex 0 vertex neg 2array pending heap-push ] each
+    [ order length graph assoc-size < ] [
+        pending heap-pop drop :> best
+        best selected key? [ ] [
+            best selected conjoin
+            best order push
+            best graph at [| neighbor |
+                neighbor selected key? [ ] [
+                    neighbor weights inc-at
+                    neighbor neighbor weights at neighbor neg 2array pending heap-push
+                ] if
+            ] each
+        ] if
     ] while
     order ;
 
@@ -48,9 +53,18 @@ SINGLETON: chordal-allocator
 
 :: perfect-order? ( graph order -- ? )
     H{ } clone :> seen
+    graph [ [ dup ] H{ } map>assoc ] assoc-map :> neighbors
+    0 :> index!
     order [| vertex |
-        vertex graph seen earlier-neighbors graph clique?
-        vertex seen conjoin
+        vertex graph seen earlier-neighbors :> earlier
+        earlier empty? [ t ] [
+            earlier [ seen at ] sort-by last :> parent
+            earlier [| neighbor |
+                neighbor parent = neighbor parent neighbors at key? or
+            ] all?
+        ] if
+        index vertex seen set-at
+        index 1 + index!
     ] all? ;
 
 :: greedy-colors ( graph order -- colors )
@@ -98,8 +112,11 @@ SINGLETON: chordal-allocator
 
 :: interference-graph ( intervals -- graph )
     intervals [ vreg>> V{ } clone ] H{ } map>assoc :> graph
-    intervals [| a i |
-        intervals i 1 + tail-slice [| b |
+    intervals [ live-interval-start ] sort-by :> ordered
+    ordered [| a i |
+        ordered i 1 + tail-slice :> later
+        later [ live-interval-start a live-interval-end > ] find drop
+        later length or later swap head-slice [| b |
             a interval-reg-class b interval-reg-class = [
                 a b intervals-intersect? [
                     b vreg>> a vreg>> graph at push
