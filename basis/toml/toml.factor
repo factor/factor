@@ -35,14 +35,14 @@ TUPLE: entry key value ;
         over ?at [ nip ] [ swap check-no-value ] if
     ] each ;
 
-GENERIC: update-toml ( root table entry -- root table' )
+GENERIC: update-toml ( assoc node -- assoc' )
 
 M: entry update-toml
     dupd [ key>> entries-at ] [ value>> ] bi
     -rot check-no-key set-at ;
 
 M: table update-toml
-    nip dupd [ name>> entries-at ] [ array?>> ] bi
+    [ name>> entries-at ] [ array?>> ] bi
     [ LH{ } clone [ -rot push-at ] keep ] [ check-no-value ] if ;
 
 : ws ( -- parser )
@@ -240,8 +240,7 @@ DEFER: key-value-parser
         ws-comment-newline hide ,
         "}" token hide ,
     ] seq* [
-        first [ length <hashtable> <linked-assoc> dup ] keep
-        [ update-toml ] each drop
+        first [ length <hashtable> <linked-assoc> ] keep [ update-toml ] each
     ] action ;
 
 : value-parser ( -- parser )
@@ -325,7 +324,10 @@ PEG: parse-toml ( string -- ast )
 PRIVATE>
 
 : toml> ( string -- assoc )
-    [ LH{ } clone dup ] dip parse-toml [ update-toml ] each drop ;
+    [ LH{ } clone dup ] dip parse-toml [
+        ! Table headers are relative to the root, entries to the current table.
+        dup table? [ nip over swap ] when update-toml
+    ] each drop ;
 
 : path>toml ( path -- assoc )
     utf8 file-contents toml> ;
