@@ -1,0 +1,33 @@
+{
+  "source-head": "b26683e4196097836d0e02e6b4c86199c2f5c094",
+  "platform": "macOS ARM64",
+  "sha256": {
+    "basis/compiler/cfg/finalization/finalization.factor": "41acefa54bf92eb67323a27f8e64291d28d015bf7f75c68c91f1aee2301308fd",
+    "basis/compiler/cfg/linear-scan/checker/checker-tests.factor": "2a47f905eec8209e847d843070c5285609ffce4ceb89e0c0ca934debf5aa3d39",
+    "basis/compiler/cfg/linear-scan/checker/checker.factor": "ec516da27f4016ba0511a421ada0ae030328717af4d9985299d5ec9996a0f61a",
+    "basis/compiler/cfg/linear-scan/linear-scan.factor": "939b8365769997a6c222513307b5b39bede3bed2eb63726c38479bf6ff50ad08",
+    "basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor": "6b8c8667c4e52e4fd09bdbd8f0d4c1a91ab1a8fa6eda7cf8feed3db21e23db20",
+    "basis/compiler/cfg/register-allocation/backtracking/backtracking.factor": "dc12af929fb9d497756615a6fde85abe49179df369543fc1848c26785b9a4335",
+    "basis/compiler/cfg/register-allocation/chordal/bases/bases-tests.factor": "74d66231b560411029a4fadb0eba5961a2c57a8cb9a66056af13388d282ba05f",
+    "basis/compiler/cfg/register-allocation/chordal/bases/bases.factor": "b1d67915ad372ef24ba18e68b8b931b155de6aaf1be4f878ae0123d85a4baff3",
+    "basis/compiler/cfg/register-allocation/chordal/chordal-tests.factor": "5c9117af3e8ed37f7b2e258b839417df608dafbeadea94054b975ea9684d10ec",
+    "basis/compiler/cfg/register-allocation/chordal/chordal.factor": "8b57b31f5003b8a6e9c6bb3598b66b0643a4d2ae52053f8fe68e958c3a905d69",
+    "basis/compiler/cfg/register-allocation/greedy/greedy-docs.factor": "e6af69babefbcbbdd286bbde11a4f3fbebbf3c65db9f9859f3b5c6cb75f1ca6c",
+    "basis/compiler/cfg/register-allocation/greedy/greedy-tests.factor": "fd8ec850b9e7c11ed7f12362b28da4d2a3e499657579ee629ae4b766afba45cc",
+    "basis/compiler/cfg/register-allocation/greedy/greedy.factor": "fb30f494ff730114d5c1774522bce9a3647667c50bbefafb64503fb33468ec41",
+    "basis/compiler/cfg/register-allocation/register-allocation-docs.factor": "fadfad5c68abca362c907e8de361bf2a46da413d61fa0ea12004092f37d287a9",
+    "basis/compiler/cfg/register-allocation/register-allocation-tests.factor": "f393eee6ac7d675b249b8dadf1b92b82ca36075204caac32217b543548f8f707",
+    "basis/compiler/cfg/register-allocation/register-allocation.factor": "0421bbdac096d0ef5f0794406357e53c33b6446f9d174991f25a1d6a7c41eaa7",
+    "extra/compiler/cfg/metrics/metrics-docs.factor": "b46076ffb47c457ab480a01dd0ffe89a5f8497d485653cd799ec1668672f7b59",
+    "extra/compiler/cfg/metrics/metrics-tests.factor": "4a2413517e0c66b47beaae8d3ad2bca838ad16b32d6dba141e615956e1ae95b0",
+    "extra/compiler/cfg/metrics/metrics.factor": "8f45fa966a3060e2d0b4d0b07c3197732c291b428809135d660babe58a3cda6c",
+    "reference/compiler-greedy-20260908/measure.factor": "6c1e96697a3bb26fff06bc9d7300dbb122fb103e8e5405fdebea044432877443",
+    "reference/compiler-allocator-20260908/compare.factor": "fc478f28d3b022923a286eb65a3063e71a2da8f657ecfbad4ab9af1cdf61d371",
+    "reference/compiler-allocator-20260908/pressure.factor": "208fa6984b68bd62d066267655727738b55ff35a1b574de4cf51353daede0e72",
+    "reference/compiler-allocator-20260908/compiler-suite.factor": "0a187a8b7f51b9cd3ed6f52520329ec131a5e1ffd5ca561738f646d7ebf413c5",
+    "Factor.app/Contents/MacOS/factor": "f46b60dc8730e46bf53e5a5be1bc69e1dd72fc7e6e6dfc876cfde1b8f1b7642f",
+    "factor.image": "5afec950057a6a68624839c213131fbc8ba0f26071b805f09d8d0462cb62611f",
+    "libfactor.dylib": "b23e0fe014fdac7011768c35733e279b20ed2f35c75bf5f78d13972d8aa77b68",
+    "libfactor-ffi-test.dylib": "01f448f36ae6f66b3f854513f88d100b1b9c88d64acbf0e3702aec2e1fe1e335"
+  }
+}

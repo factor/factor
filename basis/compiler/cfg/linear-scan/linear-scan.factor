@@ -1,11 +1,13 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs compiler.cfg.linear-scan.allocation
+compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment
+compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.resolve compiler.cfg.utilities cpu.architecture
-kernel sequences ;
+kernel locals namespaces sequences ;
 IN: compiler.cfg.linear-scan
 
 : admissible-registers ( cfg -- regs )
@@ -13,9 +15,16 @@ IN: compiler.cfg.linear-scan
         [ [ frame-reg = ] reject ] assoc-map
     ] when ;
 
-: allocate-and-assign-registers ( cfg -- )
-    [ ] [ compute-live-intervals ] [ admissible-registers ] tri
-    allocate-registers assign-registers ;
+:: allocate-and-assign-registers ( cfg -- )
+    cfg admissible-registers :> registers
+    cfg compute-live-intervals :> input
+    check-allocation? get [ input required-register-uses ] [ f ] if :> uses
+    input registers allocate-registers :> intervals
+    check-allocation? get [
+        intervals registers check-allocated-intervals
+        intervals uses check-register-uses
+    ] when
+    cfg intervals assign-registers ;
 
 : linear-scan ( cfg -- )
     {

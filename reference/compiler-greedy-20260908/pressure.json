@@ -1,0 +1,386 @@
+[
+  {
+    "input": "pressure-kernel",
+    "procedures": [
+      {
+        "allocation": {},
+        "passes": [
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "optimize-tail-calls",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 8651
+          },
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "delete-useless-conditionals",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 1558
+          },
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "split-branches",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 2870
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "join-blocks",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 5904
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "construct-ssa",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 156620
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "alias-analysis",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 34522
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "value-numbering",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 163713
+          },
+          {
+            "reloads": 0,
+            "instructions": 104,
+            "pass": "copy-propagation",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 34358
+          },
+          {
+            "reloads": 0,
+            "instructions": 104,
+            "pass": "eliminate-dead-code",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 438782
+          },
+          {
+            "reloads": 0,
+            "instructions": 107,
+            "pass": "select-representations",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 223573
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "insert-gc-checks",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 20213
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "eliminate-write-barriers",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 6560
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "clear-uninitialized",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 56006
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "insert-save-contexts",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 3116
+          },
+          {
+            "reloads": 12,
+            "instructions": 134,
+            "pass": "allocate-registers",
+            "frame-bytes": 0,
+            "spill-bytes": 96,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 12,
+            "nanoseconds": 1394082
+          },
+          {
+            "reloads": 12,
+            "instructions": 134,
+            "pass": "build-stack-frame",
+            "frame-bytes": 112,
+            "spill-bytes": 96,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 12,
+            "nanoseconds": 15662
+          }
+        ],
+        "code-bytes": 848,
+        "codegen-nanoseconds": 140958
+      }
+    ],
+    "allocator": "linear-scan-allocator",
+    "frontend-nanoseconds": 4797246
+  },
+  {
+    "input": "pressure-kernel",
+    "procedures": [
+      {
+        "allocation": {
+          "assignments": 91,
+          "evictions": 11,
+          "splits": 11
+        },
+        "passes": [
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "optimize-tail-calls",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 7257
+          },
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "delete-useless-conditionals",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 1312
+          },
+          {
+            "reloads": 0,
+            "instructions": 141,
+            "pass": "split-branches",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 2665
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "join-blocks",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 6150
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "construct-ssa",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 86387
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "alias-analysis",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 33210
+          },
+          {
+            "reloads": 0,
+            "instructions": 139,
+            "pass": "value-numbering",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 35,
+            "spills": 0,
+            "nanoseconds": 234315
+          },
+          {
+            "reloads": 0,
+            "instructions": 104,
+            "pass": "copy-propagation",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 31037
+          },
+          {
+            "reloads": 0,
+            "instructions": 104,
+            "pass": "eliminate-dead-code",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 45551
+          },
+          {
+            "reloads": 0,
+            "instructions": 107,
+            "pass": "select-representations",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 3,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 239522
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "insert-gc-checks",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 22509
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "eliminate-write-barriers",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 7093
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "clear-uninitialized",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 56621
+          },
+          {
+            "reloads": 0,
+            "instructions": 110,
+            "pass": "insert-save-contexts",
+            "frame-bytes": 0,
+            "spill-bytes": 0,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 0,
+            "nanoseconds": 2952
+          },
+          {
+            "reloads": 11,
+            "instructions": 132,
+            "pass": "allocate-registers",
+            "frame-bytes": 0,
+            "spill-bytes": 88,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 11,
+            "nanoseconds": 1902646
+          },
+          {
+            "reloads": 11,
+            "instructions": 132,
+            "pass": "build-stack-frame",
+            "frame-bytes": 112,
+            "spill-bytes": 88,
+            "blocks": 5,
+            "copies": 0,
+            "spills": 11,
+            "nanoseconds": 14678
+          }
+        ],
+        "code-bytes": 832,
+        "codegen-nanoseconds": 113406
+      }
+    ],
+    "allocator": "greedy-allocator",
+    "frontend-nanoseconds": 5827904
+  }
+]
