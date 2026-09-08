@@ -101,6 +101,26 @@ IN: compiler.cfg.register-allocation.greedy.tests
     "clobber-splits" greedy-statistics get at
 ] unit-test
 
+! A stack-only ABI operand can occupy an atomic interval; it has no
+! register fragment to split, but must retain a real spill-slot location.
+{ 0 1 } [
+    init-test
+    1 { { 10 10 } } { 10 } test-interval
+    dup first-use t >>spill-slot? drop
+    10 f sync-point boa 2array allocate-test length
+    spill-slots get assoc-size
+] unit-test
+
+! The same stack-only operand can precede its SSA definition in layout,
+! leaving a wide range and no local use before the clobber to assign a slot.
+{ 0 1 } [
+    init-test
+    1 { { 0 10 } } { 10 } test-interval
+    dup first-use f >>def-rep int-rep >>use-rep t >>spill-slot? drop
+    10 f sync-point boa 2array allocate-test length
+    spill-slots get assoc-size
+] unit-test
+
 ! Execute optimized machine code, covering loops, integer arithmetic,
 ! floating-point boxing and allocations (including their GC paths).
 { 4950 } [
