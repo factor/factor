@@ -726,6 +726,12 @@ literal: varargs? reg-inputs stack-inputs reg-outputs dead-outputs cleanup stack
 VREG-INSN: ##callback-inputs
 literal: reg-outputs stack-outputs ;
 
+! The native entry stack pointer of an ARM64 variadic callback. Its
+! register-save areas stay on the native stack until the callback exits.
+! This reads the current callback context and must not be hoisted or CSE'd.
+VREG-INSN: ##callback-stack
+def: dst/int-rep ;
+
 VREG-INSN: ##callback-outputs
 literal: reg-inputs ;
 

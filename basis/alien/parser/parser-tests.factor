@@ -110,6 +110,22 @@ CALLBACK: void* alien-parser-callback-effect-test ( int *arg1 float arg2 )
 
 { t } [ \ alien-parser-callback-effect-test inline? ] unit-test
 
+CALLBACK: int alien-parser-varargs-reader ( int count, ... )
+
+{ ( count args -- int ) } [
+    \ alien-parser-varargs-reader "callback-effect" word-prop
+] unit-test
+
+{ 1 } [ \ alien-parser-varargs-reader "callback-varargs" word-prop ] unit-test
+
+CALLBACK: double alien-parser-varargs-tail ( int tag, ... char code, float value )
+
+{ ( tag code value -- double ) } [
+    \ alien-parser-varargs-tail "callback-effect" word-prop
+] unit-test
+
+{ t } [ \ alien-parser-varargs-tail inline? ] unit-test
+
 ! Reported by mnestic
 TYPEDEF: int alien-parser-test-int ! reasonably unique name...
 

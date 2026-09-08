@@ -1,6 +1,6 @@
 ! Focused native ARM64 coverage, shared by Linux, macOS and Windows CI.
 USING: assocs combinators compiler.errors cpu.arm.64.features debugger io kernel
-namespaces sequences system tools.test vocabs.hierarchy ;
+namespaces parser sequences system tools.test vocabs.hierarchy ;
 IN: arm64-ci
 
 ! Test failures must be recorded instead of opening an interactive restart.
@@ -10,7 +10,10 @@ cpu arm.64? [ "ARM64 regression tests require an ARM64 VM" throw ] unless
     arm64-features empty? [ "Optional ARM64 extensions are still enabled" throw ] unless
 ] when
 
+"resource:.github/arm64-varargs-coverage.factor" run-file
+
 {
+    "alien.varargs"
     "cpu.arm.64"
     "alien.parser"
     "stack-checker.alien"
@@ -27,6 +30,10 @@ cpu arm.64? [ "ARM64 regression tests require an ARM64 VM" throw ] unless
 
 ! These are test files belonging to compiler, not loadable vocabularies.
 {
+    "resource:basis/compiler/tests/alien-varargs.factor"
+    "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+    "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+    "resource:basis/compiler/tests/alien-arm64-unions.factor"
     "resource:basis/compiler/tests/alien.factor"
     "resource:basis/compiler/tests/alien-large-return.factor"
     "resource:basis/compiler/tests/alien-linux-runtime.factor"

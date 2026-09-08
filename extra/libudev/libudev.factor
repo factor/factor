@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Niklas Waern.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
+USING: alien alien.c-types alien.libraries alien.syntax alien.varargs
 fry kernel sequences unix.types ;
 IN: libudev
 
@@ -30,8 +30,8 @@ CALLBACK: void udev_set_log_fn_callback (
     c-string file,
     int line,
     c-string fn,
-    c-string format )
-    ! va_list args ) ;
+    c-string format,
+    va_list args )
 FUNCTION: void udev_set_log_fn (
     udev* udev,
     udev_set_log_fn_callback log_fn )

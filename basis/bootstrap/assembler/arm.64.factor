@@ -1,12 +1,13 @@
 ! Copyright (C) 2025 Giftpflanze.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: bootstrap.image.private compiler.codegen.relocation
+USING: assocs bootstrap.image.private compiler.codegen.relocation
 compiler.constants compiler.units cpu.arm.64.assembler
 cpu.arm.64.assembler.registers generic.single.private kernel
-kernel.private layouts locals.backend math math.private
-namespaces slots.private strings.private threads.private vocabs
+kernel.private layouts locals locals.backend math math.private
+namespaces sequences slots.private strings.private threads.private vocabs
 ;
 FROM: cpu.arm.64.assembler => B ;
+FROM: cpu.arm.64.assembler.registers => cache ;
 IN: bootstrap.assembler.arm
 
 big-endian off
@@ -101,7 +102,21 @@ big-endian off
     temp BR
 ] JIT-EXECUTE jit-define
 
-[
+! Keep the register snapshot contiguous with the incoming native arguments.
+! The Windows va_list reader can then walk X0-X7 and the native stack as one
+! region. SIMD saves precede it for the Linux register-save-area reader.
+:: jit-callback-stub ( varargs? -- )
+    varargs? [
+        SP SP 192 SUB
+        Q0 Q1 SP 0 [+] STP
+        Q2 Q3 SP 32 [+] STP
+        Q4 Q5 SP 64 [+] STP
+        Q6 Q7 SP 96 [+] STP
+        X0 X1 SP 128 [+] STP
+        X2 X3 SP 144 [+] STP
+        X4 X5 SP 160 [+] STP
+        X6 X7 SP 176 [+] STP
+    ] when
     X18 X19 SP -16 [pre] STP
     X20 X21 SP -16 [pre] STP
     X22 X23 SP -16 [pre] STP
@@ -118,9 +133,12 @@ big-endian off
     MEGA-HITS (LDR=) rel-megamorphic-cache-hits
     CTX VM vm-spare-context-offset [+] LDR
     CTX VM vm-context-offset [+] STR
+    ! The new template saves CTX's stack pointer below the Windows TEB pair,
+    ! matching next-stack@. Preserve the legacy template byte-for-byte.
+    varargs? [ jit-save-teb ] when
     temp SP MOV
     temp CTX context-callstack-save-offset [+] STR
-    jit-save-teb
+    varargs? [ jit-save-teb ] unless
     temp CTX context-callstack-bottom-offset [+] LDR
     SP temp 16 ADD
     FP XZR MOV
@@ -138,8 +156,16 @@ big-endian off
     X22 X23 SP 16 [post] LDP
     X20 X21 SP 16 [post] LDP
     X18 X19 SP 16 [post] LDP
-    RET
-] CALLBACK-STUB jit-define
+    varargs? [ SP SP 192 ADD ] when
+    RET ;
+
+[ f jit-callback-stub ] CALLBACK-STUB jit-define
+
+! Extend the existing special object, without changing special-object indexes
+! or the ordinary two-element template consumed by older runtimes.
+[ t jit-callback-stub ] make-jit-no-params
+CALLBACK-STUB special-objects get at swap suffix
+CALLBACK-STUB special-objects get set-at
 
 [
     obj DS [] LDUR f rc-absolute-arm-ldur rel-untagged

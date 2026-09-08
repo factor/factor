@@ -38,7 +38,7 @@ HELP: FUNCTION:
 $nl
 "The new word must be compiled before being executed."
 $nl
-"For a variadic C function, put " { $snippet "..." } " between the named and unnamed parameters. List the concrete types and names for every argument at this call site. For example, " { $snippet "FUNCTION: int printf ( c-string format, ... int value )" } ". Unnamed float arguments are promoted to double; integer types narrower than int are promoted to int. The FFI normalizes these types before coercion; supply the desired promoted value. To model an intermediate C float cast, explicitly round with float>bits bits>float before the call. A declaration has at most one marker. CALLBACK: does not accept variadic declarations." }
+"For a variadic C function, put " { $snippet "..." } " between the named and unnamed parameters. List the concrete types and names for every argument at this call site. For example, " { $snippet "FUNCTION: int printf ( c-string format, ... int value )" } ". Unnamed float arguments are promoted to double; integer types narrower than int are promoted to int. The FFI normalizes these types before coercion; supply the desired promoted value. To model an intermediate C float cast, explicitly round with float>bits bits>float before the call. A declaration has at most one marker. The declaration specifies one typed call shape; it does not infer argument types from a printf format string." }
 { $examples
 "For example, suppose the " { $snippet "foo" } " library exports the following function:"
 { $code
@@ -118,7 +118,13 @@ STRUCT: forward { x backward* } ;" } }
 HELP: CALLBACK:
 { $syntax "CALLBACK: return type ( parameters )" }
 { $values { "return" "a C return type" } { "type" "a type name" } { "parameters" "a comma-separated sequence of type/name pairs; " { $snippet "type1 arg1, type2 arg2, ..." } } }
-{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters. The ABI of the callback is decided from the ABI of the active " { $link POSTPONE: LIBRARY: } " declaration." }
+{ $description "Defines a new function pointer C type word " { $snippet "type" } ". The newly defined word works both as a C type and as a wrapper for " { $link alien-callback } " for callbacks that accept the given return type and parameters. The ABI of the callback is decided from the ABI of the active " { $link POSTPONE: LIBRARY: } " declaration."
+$nl
+"On ARM64, a terminal ellipsis declares a runtime variadic callback: " { $snippet "CALLBACK: int sum-callback ( int count, ... )" } ". Its quotation receives the named arguments followed by an argument cursor. Read the tail with va-arg from alien.varargs, using the types prescribed by the C API. An ellipsis followed by type/name pairs declares a fixed tail instead: " { $snippet "CALLBACK: double event-callback ( int tag, ... int code, double value )" } ". Its quotation receives those values directly."
+$nl
+"A callback parameter explicitly typed va_list is a different C interface: import the ABI-aware type from alien.varargs. Its value is a borrowed cursor on ARM64. Cursors, including copies, are usable only during their originating callback execution; they cannot be retained after return or accessed from a nested callback. The outer callback may resume using its cursor after the nested call returns."
+$nl
+"A cursor has no discoverable length or argument types. Supplying the wrong type or reading beyond the C caller's tail is invalid." }
 { $examples
     { $code
         "CALLBACK: bool FakeCallback ( int message, void* payload )"

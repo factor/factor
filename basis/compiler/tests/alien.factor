@@ -942,11 +942,11 @@ FUNCTION: void* bug1021_test_1 ( void* s, int x )
         3 10 20 30 do-sum-ints3
     ] unit-test
 
-    ! Varargs with non-floats doesn't work on windows
+    ! Windows ARM64 supports variadic FP arguments in the GP bank.
     FUNCTION-ALIAS: do-sum-doubles2 double ffi_test_65 ( int n, ... double a, double b )
     FUNCTION-ALIAS: do-sum-doubles3 double ffi_test_65 ( int n, ... double a, double b, double c )
 
-    os windows? [
+    os windows? cpu arm.64? not and [
         { 27.0 22.0 } [
             2 7 20 do-sum-doubles2
             3 5 10 7 do-sum-doubles3

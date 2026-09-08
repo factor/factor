@@ -8,6 +8,9 @@ locals math namespaces sequences system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 
+! Scoped to argument classification; return values keep their ordinary ABI.
+SYMBOL: windows-arm64-varargs?
+
 SYMBOL: struct-return-area
 
 SYMBOLS: int-reg-reps float-reg-reps ;
@@ -221,3 +224,38 @@ M: struct-c-type box-return
             explode-struct-return keys
         ] keep box
     ] if ;
+
+! Windows ARM64 variadic callbacks receive the same raw GP payloads as
+! outgoing calls. These helpers leave the flag scoped to argument work.
+: flatten-windows-vararg-type ( c-type -- reps )
+    t windows-arm64-varargs? [
+        flatten-parameter-type [
+            dup first dup vector-rep? [
+                2drop { { int-rep f f 8 } { int-rep f f 8 } }
+            ] [
+                reg-class-of float-regs eq? [
+                    rest int-rep prefix
+                ] when 1array
+            ] if
+        ] map concat
+    ] with-variable ;
+
+:: (box-windows-vararg-parameter) ( vregs reps c-type -- dst )
+    c-type struct-c-type? [ vregs reps c-type box-parameter ] [
+        c-type c-type-rep :> rep
+        rep vector-rep? [
+            16 16 f ^^local-allot :> buffer
+            buffer vregs { int-rep int-rep } implode-struct
+            buffer 0 rep f ^^load-memory-imm 1array
+            rep 1array c-type box-parameter
+        ] [
+            rep reg-class-of float-regs eq? [
+                vregs first rep ^^integer>scalar 1array
+                rep 1array c-type box-parameter
+            ] [ vregs reps c-type box-parameter ] if
+        ] if
+    ] if ;
+
+: box-windows-vararg-parameter ( vregs reps c-type -- dst )
+    t windows-arm64-varargs?
+    [ (box-windows-vararg-parameter) ] with-variable ;

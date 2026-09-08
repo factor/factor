@@ -327,7 +327,7 @@ c:vector-c-type new
     byte-array >>class
     A >>boxed-class
     { A-rep alien-vector } >quotation >>getter
-    { A boa } >quotation >>boxer-quot
+    A '[ _ boa ] >>boxer-quot
     {
         dup simd-128? [ bad-simd-vector ] unless underlying>>
     } >quotation >>unboxer-quot

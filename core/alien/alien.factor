@@ -92,6 +92,9 @@ ERROR: callsite-not-compiled word ;
 : alien-callback ( return parameters abi quot -- alien )
     \ alien-callback callsite-not-compiled ;
 
+: alien-callback-varargs ( return named-parameters abi quot -- alien )
+    \ alien-callback-varargs callsite-not-compiled ;
+
 : alien-indirect ( args... funcptr return parameters abi -- return... )
     \ alien-indirect callsite-not-compiled ;
 

@@ -8,7 +8,7 @@ compiler.cfg.instructions compiler.cfg.intrinsics
 compiler.cfg.registers compiler.cfg.stack-frame
 compiler.codegen.gc-maps compiler.codegen.labels
 compiler.codegen.relocation compiler.constants cpu.architecture
-cpu.arm.64.assembler cpu.arm.64.assembler.registers
+cpu.arm.64.abi cpu.arm.64.assembler cpu.arm.64.assembler.registers
 generalizations grouping kernel layouts literals locals make math
 math.bitwise math.functions math.order memory namespaces sequences sequences.repeating system ;
 FROM: cpu.arm.64.assembler => B ;
@@ -1002,15 +1002,14 @@ M: struct-c-type flatten-reps
 UNION: float/vector-rep float-rep double-rep small-float-rep vector-rep ;
 
 : homogeneous-float/vector-aggregate? ( c-type -- reps ? )
-    lookup-c-type flatten-reps dup {
-        [ length 4 <= ]
-        [ [ float/vector-rep? ] all? ]
-        [ [ dup small-float-rep? [ drop small-float-rep ] when ] map all-equal? ]
-    } 1&& ;
+    lookup-c-type homogeneous-aggregate-members
+    [ [ third ] map t ] [ { } f ] if* ;
 
 M: arm.64 value-struct?
-    [ heap-size 16 <= ]
-    [ homogeneous-float/vector-aggregate? nip ] bi or ;
+    windows-arm64-varargs? get [ heap-size 16 <= ] [
+        [ heap-size 16 <= ]
+        [ homogeneous-float/vector-aggregate? nip ] bi or
+    ] if ;
 
 :: mark-struct-reps ( reps -- reps' )
     reps [| rep i |
@@ -1019,9 +1018,13 @@ M: arm.64 value-struct?
     ] map-index ;
 
 M: arm.64 flatten-struct-type
-    dup homogeneous-float/vector-aggregate?
-    [ nip [ f f 3array ] map record-reg-reps ]
-    [ drop call-next-method ] if mark-struct-reps ;
+    windows-arm64-varargs? get [
+        call-next-method
+    ] [
+        dup homogeneous-float/vector-aggregate?
+        [ nip [ f f 3array ] map record-reg-reps ]
+        [ drop call-next-method ] if mark-struct-reps
+    ] if ;
 
 M: arm.64 dummy-stack-params? f ;
 M: arm.64 dummy-int-params? f ;
@@ -1156,6 +1159,10 @@ M: arm.64 %callback-inputs
     arg1 VM MOV
     arg2 XZR MOV
     "begin_callback" f f %c-invoke ;
+
+M: arm.64 %callback-stack
+    dup CTX context-callstack-save-offset [+] LDR
+    dup os windows? 320 304 ? ADD ;
 
 M: arm.64 %callback-outputs
     arg1 VM MOV

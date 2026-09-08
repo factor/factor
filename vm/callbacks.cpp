@@ -26,9 +26,26 @@ callback_heap::~callback_heap() {
   seg = NULL;
 }
 
+// A fixnum marker survives GC without adding another callback heap root.
+// In particular, do not store a template pointer in parameters: callback GC
+// visitors intentionally visit only owner.
+static bool variadic_callback_p(code_block* stub) {
+  return stub->parameters == tag_fixnum(1);
+}
+
+VM_C_API bool arm64_variadic_callbacks_supported() {
+#ifdef FACTOR_ARM64
+  return true;
+#else
+  return false;
+#endif
+}
+
 instruction_operand callback_heap::callback_operand(code_block* stub,
                                                     cell index) {
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
+  if (variadic_callback_p(stub))
+    code_template = tagged<array>(array_nth(code_template.untagged(), 2));
   tagged<byte_array> relocation_template(
       array_nth(code_template.untagged(), 0));
 
@@ -56,11 +73,18 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   // Allocates a stub in the MAP_JIT callback heap, memcpy's the template code
   // in and stores its relocations (via update() below).
   jit_writable_scope jit_writable;
-  // code_template is a 2-tuple where the first element contains the
-  // relocations and the second a byte array of compiled assembly
-  // code. The code assumes that there are four relocations on x86 and
-  // three on ppc.
+  // The first two elements contain relocations and machine code. ARM64's
+  // optional third element contains the corresponding variadic template.
   tagged<array> code_template(parent->special_objects[CALLBACK_STUB]);
+  bool variadic = false;
+#ifdef FACTOR_ARM64
+  variadic = return_rewind == (cell)-1;
+  if (variadic) {
+    if (array_capacity(code_template.untagged()) < 3)
+      parent->general_error(ERROR_FFI, false_object, false_object);
+    code_template = tagged<array>(array_nth(code_template.untagged(), 2));
+  }
+#endif
   tagged<byte_array> insns(array_nth(code_template.untagged(), 1));
   cell size = array_capacity(insns.untagged());
 
@@ -73,7 +97,7 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
   }
   stub->header = bump & ~7;
   stub->owner = owner;
-  stub->parameters = false_object;
+  stub->parameters = variadic ? tag_fixnum(1) : false_object;
   stub->relocation = false_object;
 
   memcpy((void*)stub->entry_point(), insns->data<void>(), size);

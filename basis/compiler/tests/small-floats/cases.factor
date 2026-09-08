@@ -111,3 +111,18 @@ FUNCTION: bfloat bfloat_dirty_result ( )
 os linux? [
     "resource:basis/compiler/tests/small-floats/linux.factor" run-test-file
 ] when
+
+! Named and anonymous small payloads share Windows's GP argument stream.
+FUNCTION: ulonglong varout_half_bits ( half named, int count, ... half a, half b, half c, half d, half e, half f, half g, half h )
+FUNCTION: ulonglong varout_bfloat_bits ( bfloat named, int count, ... bfloat a, bfloat b, bfloat c, bfloat d, bfloat e, bfloat f, bfloat g, bfloat h )
+{ 806016 } [ 1 8 2 3 4 5 6 7 8 9 varout_half_bits ] unit-test
+{ 745872 } [ 1 8 2 3 4 5 6 7 8 9 varout_bfloat_bits ] unit-test
+
+USING: classes.struct math.vectors.simd ;
+STRUCT: varout-vector-hva { a float-4 } { b float-4 } ;
+FUNCTION: double varout_vector_args ( int tag, ... float-4 a, varout-vector-hva h, double tail )
+{ 212.0 } [
+    1 float-4{ 1 2 3 4 }
+    float-4{ 5 6 7 8 } float-4{ 9 10 11 12 } varout-vector-hva boa 1
+    varout_vector_args
+] unit-test

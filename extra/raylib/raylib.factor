@@ -4,7 +4,7 @@
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.syntax classes.struct combinators kernel
+alien.libraries alien.syntax alien.varargs classes.struct combinators kernel
 math raylib.util sequences sequences.private system ;
 IN: raylib
 FROM: alien.c-types => float ;
@@ -887,7 +887,7 @@ FUNCTION-ALIAS: mem-free void MemFree ( void* ptr )                             
 
 ! Callbacks to hook some internal functions
 ! WARNING: Callbacks setup is intended for advance users
-CALLBACK: void TraceLogCallback ( int logLevel, c-string text )                      ! Logging: Redirect trace log messages
+CALLBACK: void TraceLogCallback ( int logLevel, c-string text, va_list args )                      ! Logging: Redirect trace log messages
 CALLBACK: uchar* LoadFileDataCallback ( c-string fileName, int* dataSize )           ! FileIO: Load binary data
 CALLBACK: bool SaveFileDataCallback ( c-string fileName, void* data, int dataSize )  ! FileIO: Save binary data
 CALLBACK: char* LoadFileTextCallback ( c-string fileName )                            ! FileIO: Load text data

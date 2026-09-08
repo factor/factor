@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: command-line compiler.units continuations definitions io
+USING: bootstrap.compat command-line compiler.units continuations definitions io
 io.pathnames kernel math math.parser memory namespaces parser
 parser.notes sequences sets splitting system
 vocabs vocabs.loader ;
@@ -84,6 +84,9 @@ CONSTANT: default-components
     ] if
 
     load-components
+
+    ! Downloaded seed images can predate the variadic callback entry template.
+    cpu arm.64? [ "bootstrap.compat.arm64" require ] when
 
     nano-count over - core-bootstrap-time set-global
 
