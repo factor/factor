@@ -1,0 +1,8 @@
+Unit Test: {
+    { 11.0 22.0 33.0 }
+    [
+        float-array-struct <struct>
+        float-array{ 1.0 2.0 3.0 } >>values
+        ffi_array_struct values>> first3
+    ]
+}

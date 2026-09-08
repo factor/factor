@@ -1,0 +1,1356 @@
+{
+  "scope": "native Linux x86-64 glibc C++ VM; Linux AArch64 qualification incomplete",
+  "proof": {
+    "gcc": [
+      {
+        "case": "uint_callback",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      },
+      {
+        "case": "array_struct",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      },
+      {
+        "case": "fp_status",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      }
+    ],
+    "clang-21": [
+      {
+        "case": "uint_callback",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      },
+      {
+        "case": "array_struct",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      },
+      {
+        "case": "fp_status",
+        "control": 0,
+        "baseline": 1,
+        "candidate": 0,
+        "classification": "baseline-failure",
+        "passed": true
+      }
+    ]
+  },
+  "integration": {
+    "gcc-native-final": [
+      {
+        "name": "cpu",
+        "command": [
+          "lscpu"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015587971545755863
+      },
+      {
+        "name": "kernel",
+        "command": [
+          "uname",
+          "-a"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0033646682277321815
+      },
+      {
+        "name": "libc",
+        "command": [
+          "getconf",
+          "GNU_LIBC_VERSION"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0012866323813796043
+      },
+      {
+        "name": "toolchain",
+        "command": [
+          "gcc",
+          "--version"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.001344149000942707
+      },
+      {
+        "name": "vm-toolchain",
+        "command": [
+          "g++",
+          "--version"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013114893808960915
+      },
+      {
+        "name": "distribution",
+        "command": [
+          "cat",
+          "/etc/os-release"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.003322949633002281
+      },
+      {
+        "name": "fixture",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-shared",
+          "-Wl,-z,defs",
+          "vm/ffi_test.c",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/libfactor-ffi-test.so"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.16370548401027918
+      },
+      {
+        "name": "assembly",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/ffi_test.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fixture.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.11385153420269489
+      },
+      {
+        "name": "uint_callback-object",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_uint_callback.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/uint_callback.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0318002849817276
+      },
+      {
+        "name": "uint_callback-link",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_uint_callback.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/uint_callback.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/uint_callback-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03167280647903681
+      },
+      {
+        "name": "uint_callback-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/uint_callback-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013584159314632416
+      },
+      {
+        "name": "uint_callback-assembly",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_uint_callback.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/uint_callback.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015500198118388653
+      },
+      {
+        "name": "array_struct-object",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_array_struct.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/array_struct.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015523291192948818
+      },
+      {
+        "name": "array_struct-link",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_array_struct.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/array_struct.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/array_struct-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03154830262064934
+      },
+      {
+        "name": "array_struct-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/array_struct-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.001256946474313736
+      },
+      {
+        "name": "array_struct-assembly",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_array_struct.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/array_struct.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.01541963592171669
+      },
+      {
+        "name": "fp_status-object",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_fp_status.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fp_status.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015541775152087212
+      },
+      {
+        "name": "fp_status-link",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_fp_status.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fp_status.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fp_status-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.031640615314245224
+      },
+      {
+        "name": "fp_status-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fp_status-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0012323306873440742
+      },
+      {
+        "name": "fp_status-assembly",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_fp_status.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fp_status.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015463238582015038
+      },
+      {
+        "name": "general-object",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/ffi_test_arm64.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/general.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0636228621006012
+      },
+      {
+        "name": "general-link",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "vm/tests/ffi_abi_control.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/general.o",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/general-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06373981107026339
+      },
+      {
+        "name": "general-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/general-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013799769803881645
+      },
+      {
+        "name": "fpsimd-link",
+        "command": [
+          "gcc",
+          "-x",
+          "c++",
+          "-O2",
+          "vm/tests/linux_arm64_fpsimd.cpp",
+          "-lstdc++",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fpsimd-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.21383395791053772
+      },
+      {
+        "name": "fpsimd-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/fpsimd-control"
+        ],
+        "exit": 77,
+        "expected": [
+          0,
+          77
+        ],
+        "passed": true,
+        "seconds": 0.0013727229088544846
+      },
+      {
+        "name": "thread-link",
+        "command": [
+          "g++",
+          "-std=c++17",
+          "-O2",
+          "vm/tests/thread_entry.cpp",
+          "-Wl,--whole-archive",
+          "libfactor.a",
+          "-Wl,--no-whole-archive",
+          "-ldl",
+          "-lm",
+          "-lrt",
+          "-pthread",
+          "-Wl,--export-dynamic",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/thread-entry"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.3640762837603688
+      },
+      {
+        "name": "thread-runtime",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/thread-entry",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-compare.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.664485071785748
+      },
+      {
+        "name": "small-link",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "vm/tests/ffi_small_control.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/libfactor-ffi-test.so",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/small-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03185590822249651
+      },
+      {
+        "name": "small-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/small-control"
+        ],
+        "exit": 77,
+        "expected": [
+          0,
+          77
+        ],
+        "passed": true,
+        "seconds": 0.0013113981112837791
+      },
+      {
+        "name": "regressions",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-regressions.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.16367964632809162
+      },
+      {
+        "name": "allocators",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-allocators.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 21.391048984602094
+      },
+      {
+        "name": "compiler",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/compiler-verify.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 39.269124230369925
+      },
+      {
+        "name": "assertion",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-assertion.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.16425824724137783
+      },
+      {
+        "name": "negative-assertion",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/negative-assertion.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 0.16438230779021978
+      },
+      {
+        "name": "negative-suite",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/negative-suite.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 5.721597382798791
+      },
+      {
+        "name": "negative-fixture-build",
+        "command": [
+          "gcc",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-shared",
+          "-Wl,-z,defs",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/unavailable.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/gcc-native-final/unavailable.so"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.031729874201118946
+      },
+      {
+        "name": "negative-unavailable",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-small.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 0.16389000602066517
+      }
+    ],
+    "clang-native-final": [
+      {
+        "name": "cpu",
+        "command": [
+          "lscpu"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.015600436367094517
+      },
+      {
+        "name": "kernel",
+        "command": [
+          "uname",
+          "-a"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.003349809907376766
+      },
+      {
+        "name": "libc",
+        "command": [
+          "getconf",
+          "GNU_LIBC_VERSION"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013291118666529655
+      },
+      {
+        "name": "toolchain",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "--version"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.01542713027447462
+      },
+      {
+        "name": "vm-toolchain",
+        "command": [
+          "g++",
+          "--version"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013277698308229446
+      },
+      {
+        "name": "distribution",
+        "command": [
+          "cat",
+          "/etc/os-release"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0033582160249352455
+      },
+      {
+        "name": "fixture",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-shared",
+          "-Wl,-z,defs",
+          "vm/ffi_test.c",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/libfactor-ffi-test.so"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.1136446138843894
+      },
+      {
+        "name": "assembly",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/ffi_test.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fixture.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.11406972073018551
+      },
+      {
+        "name": "uint_callback-object",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_uint_callback.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/uint_callback.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03182010259479284
+      },
+      {
+        "name": "uint_callback-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_uint_callback.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/uint_callback.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/uint_callback-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06368132028728724
+      },
+      {
+        "name": "uint_callback-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/uint_callback-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.001295778900384903
+      },
+      {
+        "name": "uint_callback-assembly",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_uint_callback.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/uint_callback.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.031519156880676746
+      },
+      {
+        "name": "array_struct-object",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_array_struct.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/array_struct.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03157674614340067
+      },
+      {
+        "name": "array_struct-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_array_struct.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/array_struct.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/array_struct-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06368158012628555
+      },
+      {
+        "name": "array_struct-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/array_struct-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013547101989388466
+      },
+      {
+        "name": "array_struct-assembly",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_array_struct.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/array_struct.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.031441411934792995
+      },
+      {
+        "name": "fp_status-object",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/tests/ffi_fp_status.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fp_status.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03165868856012821
+      },
+      {
+        "name": "fp_status-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-DABI_CONTROL",
+          "vm/tests/ffi_fp_status.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fp_status.o",
+          "-lm",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fp_status-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06376389507204294
+      },
+      {
+        "name": "fp_status-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fp_status-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0012811822816729546
+      },
+      {
+        "name": "fp_status-assembly",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-S",
+          "vm/tests/ffi_fp_status.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fp_status.s"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.03155706822872162
+      },
+      {
+        "name": "general-object",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-c",
+          "vm/ffi_test_arm64.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/general.o"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06383432727307081
+      },
+      {
+        "name": "general-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "vm/tests/ffi_abi_control.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/general.o",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/general-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06388381961733103
+      },
+      {
+        "name": "general-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/general-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.0013470957055687904
+      },
+      {
+        "name": "fpsimd-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-x",
+          "c++",
+          "-O2",
+          "vm/tests/linux_arm64_fpsimd.cpp",
+          "-lstdc++",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fpsimd-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.21383585687726736
+      },
+      {
+        "name": "fpsimd-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/fpsimd-control"
+        ],
+        "exit": 77,
+        "expected": [
+          0,
+          77
+        ],
+        "passed": true,
+        "seconds": 0.0033568628132343292
+      },
+      {
+        "name": "thread-link",
+        "command": [
+          "g++",
+          "-std=c++17",
+          "-O2",
+          "vm/tests/thread_entry.cpp",
+          "-Wl,--whole-archive",
+          "libfactor.a",
+          "-Wl,--no-whole-archive",
+          "-ldl",
+          "-lm",
+          "-lrt",
+          "-pthread",
+          "-Wl,--export-dynamic",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/thread-entry"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.3647535527125001
+      },
+      {
+        "name": "thread-runtime",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/thread-entry",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-compare.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.6651257267221808
+      },
+      {
+        "name": "small-link",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "vm/tests/ffi_small_control.c",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/libfactor-ffi-test.so",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/small-control"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06368034891784191
+      },
+      {
+        "name": "small-control",
+        "command": [
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/small-control"
+        ],
+        "exit": 77,
+        "expected": [
+          0,
+          77
+        ],
+        "passed": true,
+        "seconds": 0.0012681474909186363
+      },
+      {
+        "name": "regressions",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-regressions.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.16389811132103205
+      },
+      {
+        "name": "allocators",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-allocators.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 21.34754936490208
+      },
+      {
+        "name": "assertion",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-assertion.factor"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.1640195269137621
+      },
+      {
+        "name": "negative-assertion",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/negative-assertion.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 0.11390239652246237
+      },
+      {
+        "name": "negative-suite",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/negative-suite.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 5.771803506650031
+      },
+      {
+        "name": "negative-fixture-build",
+        "command": [
+          "/usr/lib/llvm-21/bin/clang",
+          "-O2",
+          "-fno-lto",
+          "-fno-fast-math",
+          "-fPIC",
+          "-shared",
+          "-Wl,-z,defs",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/unavailable.c",
+          "-o",
+          "/tmp/factor-abi-candidate-233db947/logs/qualification/clang-native-final/unavailable.so"
+        ],
+        "exit": 0,
+        "expected": [
+          0
+        ],
+        "passed": true,
+        "seconds": 0.06363359000533819
+      },
+      {
+        "name": "negative-unavailable",
+        "command": [
+          "./factor",
+          "-resource-path=/tmp/factor-abi-candidate-233db947",
+          "-i=abi-candidate-r2.image",
+          "-no-user-init",
+          "-no-monitors",
+          ".github/ffi-small.factor"
+        ],
+        "exit": 1,
+        "expected": [
+          1
+        ],
+        "passed": true,
+        "seconds": 0.1639743335545063
+      }
+    ]
+  },
+  "controls": {
+    "gcc-native-final": {
+      "assertion": 0,
+      "negative-assertion": 1,
+      "negative-suite": 1,
+      "negative-fixture-build": 0,
+      "negative-unavailable": 1
+    },
+    "clang-native-final": {
+      "assertion": 0,
+      "negative-assertion": 1,
+      "negative-suite": 1,
+      "negative-fixture-build": 0,
+      "negative-unavailable": 1
+    }
+  },
+  "cross_compile": {
+    "gcc": 0,
+    "clang": 0,
+    "small-control": 0,
+    "fpsimd": 0,
+    "fpsimd-link": 0
+  },
+  "baseline_compiler_exit": 0,
+  "baseline_allocator_exit": 0,
+  "native_gate_exit": 1,
+  "logged_compiler_experiments": {
+    "baseline": 3253,
+    "candidate": 3288
+  }
+}
