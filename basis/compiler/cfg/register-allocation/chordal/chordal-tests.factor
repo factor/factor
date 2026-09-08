@@ -1,9 +1,11 @@
 USING: accessors arrays assocs combinators compiler.cfg.linear-scan.allocation.state
+compiler.cfg compiler.cfg.instructions compiler.cfg.linear-scan.resolve
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.chordal compiler.cfg.registers
-compiler.test cpu.architecture generalizations kernel locals math
-math.functions math.libm math.private memory namespaces sequences sequences.generalizations tools.test ;
+compiler.cfg.utilities compiler.test cpu.architecture generalizations kernel kernel.private locals make math
+math.functions math.libm math.private memory namespaces quotations
+sequences sequences.generalizations tools.test ;
 IN: compiler.cfg.register-allocation.chordal.tests
 
 CONSTANT: tree-graph H{ { 0 { 1 2 } } { 1 { 0 3 } } { 2 { 0 } } { 3 { 1 } } }
@@ -40,6 +42,21 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
     0 [ dup 0 > [ 2 * ] [ 3 + ] if 3 + ] compile-call
 ] with-chordal-test ] unit-test
 
+! A scalar stack copy may borrow a register holding a live vector. Its
+! save/restore must preserve the widest representation in that class.
+{ { double-2-rep double-rep double-rep double-2-rep } } [
+    [
+        H{ { 0 double-rep } { 1 double-2-rep } } representations set
+        machine-registers registers set
+        H{ } clone scratch-spills set
+        { } insns>cfg dup stack-frame>> 32 >>spill-area-size drop cfg set
+        [
+            0 <spill-slot> double-rep <location>
+            8 <spill-slot> double-rep <location> memory>memory
+        ] { } make [ rep>> ] map
+    ] with-scope
+] unit-test
+
 { 55 } [ [
     10 [ 0 swap [ dup 0 > ] [ [ + ] keep 1 - ] while drop ] compile-call
 ] with-chordal-test ] unit-test
@@ -73,6 +90,22 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
     pressure-quotation measure-compilation "procedures" of first
     [ "allocation" of "repair-assignments" of 0 > ]
     [ "passes" of last "spills" of 0 > ] bi
+] with-chordal-test ] unit-test
+
+:: phi-pressure-quotation ( -- quot )
+    40 <iota> [ 1 + >float '[ _ float+ ] ] map :> positive
+    40 <iota> [ 1 + >float '[ _ float- ] ] map :> negative
+    '[ positive cleave ] :> positive-branch
+    '[ negative cleave ] :> negative-branch
+    39 [ \ float+ ] replicate >quotation :> reduction
+    '[ [ { float } declare ] dip
+        positive-branch negative-branch if reduction call ] ;
+
+! Forty simultaneous phi results must permit stack destinations. The
+! resulting edges also exercise stack-to-stack moves under full pressure.
+{ 920.0 -720.0 } [ [
+    2.5 t phi-pressure-quotation compile-call
+    2.5 f phi-pressure-quotation compile-call
 ] with-chordal-test ] unit-test
 
 ! Allocation diagnostics make the theorem's certificate and the actual

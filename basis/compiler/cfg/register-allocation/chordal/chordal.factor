@@ -9,7 +9,9 @@ compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.resolve compiler.cfg.linearization
 compiler.cfg.liveness compiler.cfg.predecessors
-compiler.cfg.register-allocation compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.parallel-copy
+compiler.cfg.register-allocation compiler.cfg.register-allocation.chordal.bases
+compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities compiler.utilities
 cpu.architecture heaps kernel locals make math namespaces sequences
 sets sorting ;
@@ -61,6 +63,39 @@ SINGLETON: chordal-allocator
     ] each
     colors ;
 
+:: affinity-colors ( graph order affinities -- colors )
+    H{ } clone :> colors
+    order [| vertex |
+        vertex graph at [ colors at ] map sift :> used
+        vertex affinities at [ colors at ] map sift
+        [ used member? not ] find nip :> preferred
+        0 :> color!
+        [ color used member? ] [ color 1 + color! ] while
+        preferred color or vertex colors set-at
+    ] each
+    colors ;
+
+:: add-affinity ( source destination affinities -- )
+    source destination = [
+        source rep-of reg-class-of destination rep-of reg-class-of = [
+            source destination affinities push-at
+            destination source affinities push-at
+        ] when
+    ] unless ;
+
+:: cfg-affinities ( cfg -- affinities )
+    H{ } clone :> affinities
+    cfg cfg>insns [| insn |
+        insn ##phi? [
+            insn inputs>> values [ insn dst>> affinities add-affinity ] each
+        ] [
+            insn ##copy? insn ##tagged>integer? or [
+                insn src>> insn dst>> affinities add-affinity
+            ] when
+        ] if
+    ] each
+    affinities ;
+
 :: interference-graph ( intervals -- graph )
     intervals [ vreg>> V{ } clone ] H{ } map>assoc :> graph
     intervals [| a i |
@@ -75,12 +110,13 @@ SINGLETON: chordal-allocator
     ] each-index
     graph ;
 
-SYMBOLS: graph-colors chordal-statistics phi-locations ;
+SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
+    scratch-spills ;
 
-:: color-ssa-intervals ( intervals -- )
+:: color-ssa-intervals ( intervals cfg -- )
     intervals interference-graph :> graph
     graph maximum-cardinality-order :> order
-    graph order greedy-colors graph-colors namespaces:set
+    graph order cfg cfg-affinities affinity-colors graph-colors namespaces:set
     graph assoc-size :> vertices
     graph values [ length ] map-sum 2 / :> edges
     graph order perfect-order? :> chordal?
@@ -99,12 +135,16 @@ SYMBOLS: graph-colors chordal-statistics phi-locations ;
     bb handle-live-out
     bb instructions>> <reversed> [
         dup ##phi?
-        [ dst>> from get f record-def ]
+        [
+            dst>> from get over phi-entry-positions get set-at
+            from get t record-def
+        ]
         [ compute-live-intervals* ] if
     ] each ;
 
 : compute-ssa-intervals ( cfg -- intervals/sync-points )
     H{ } clone live-intervals namespaces:set
+    H{ } clone phi-entry-positions namespaces:set
     [
         linearization-order <reversed> [ compute-ssa-intervals-in-block ] each
         live-intervals get values dup [ finish-live-interval ] each
@@ -140,7 +180,10 @@ SYMBOLS: graph-colors chordal-statistics phi-locations ;
     ! earlier local definition to allocate its slot. Reserve ABI operand
     ! slots now; edge resolution supplies their values.
     intervals [ live-interval-state? ] filter [| interval |
-        interval uses>> [ spill-slot?>> ] filter [| use |
+        interval uses>> [| use |
+            use spill-slot?>>
+            use n>> interval vreg>> phi-entry-positions get at = not and
+        ] filter [| use |
             interval vreg>> use use-rep>> use def-rep>> or
             assign-spill-slot drop
         ] each
@@ -150,9 +193,13 @@ SYMBOLS: graph-colors chordal-statistics phi-locations ;
     ] slurp-heap
     gather-intervals ;
 
+: phi-vreg>location ( vreg -- reg/slot )
+    dup pending-interval-assoc get at
+    [ nip ] [ dup rep-of assign-spill-slot ] if* ;
+
 :: record-phi-locations ( bb -- )
     bb instructions>> [ ##phi? ] filter [| phi |
-        phi dst>> vreg>reg phi inputs>> phi dst>> rep-of 3array
+        phi dst>> phi-vreg>location phi inputs>> phi dst>> rep-of 3array
     ] map bb phi-locations get set-at ;
 
 :: assign-ssa-block ( bb -- )
@@ -190,24 +237,60 @@ SYMBOLS: graph-colors chordal-statistics phi-locations ;
         ] each
     ] { } make ;
 
+:: scratch-representation ( reg-class -- rep )
+    representations get values [ reg-class-of reg-class = ] filter
+    [ rep-size ] sort-by last ;
+
+:: memory>memory ( source destination -- )
+    source rep>> :> rep
+    rep reg-class-of :> reg-class
+    reg-class registers get at first :> scratch
+    reg-class scratch-representation :> saved-rep
+    saved-rep scratch-spills get [
+        rep-size cfg get stack-frame>>
+        [ align-spill-area ] [ next-spill-slot ] 2bi
+    ] cache :> slot
+    scratch saved-rep slot ##spill,
+    scratch rep source reg>> ##reload,
+    scratch rep destination reg>> ##spill,
+    scratch saved-rep slot ##reload, ;
+
+: ssa>insn ( source destination -- )
+    2dup [ reg>> spill-slot? ] both?
+    [ memory>memory ] [ >insn ] if ;
+
+: ssa-mapping-instructions ( mappings -- insns )
+    [ swap ] H{ } assoc-map-as [
+        [ temp-location ] [ swap ssa>insn ] parallel-mapping
+        ##branch,
+    ] { } make ;
+
+: perform-ssa-mappings ( bb to mappings -- )
+    [ 2drop ] [
+        ssa-mapping-instructions insert-basic-block
+        cfg get cfg-changed
+    ] if-empty ;
+
 :: resolve-ssa-block ( bb -- )
     bb kill-block?>> [
         bb successors>> clone [| to |
-            bb to bb to ssa-edge-mappings perform-mappings
+            bb to bb to ssa-edge-mappings perform-ssa-mappings
         ] each
     ] unless ;
 
 : resolve-ssa-data-flow ( cfg -- )
     init-resolve
+    H{ } clone scratch-spills namespaces:set
     [ needs-predecessors ] [ [ resolve-ssa-block ] each-basic-block ] bi ;
 
 :: chordal-allocation ( cfg -- )
     f leader-map namespaces:set
-    cfg compute-live-sets
+    cfg construct-ssa-bases
+    cfg compute-ssa-live-sets
     representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
     cfg number-instructions
     cfg compute-ssa-intervals :> intervals
-    intervals [ live-interval-state? ] filter color-ssa-intervals
+    intervals [ live-interval-state? ] filter cfg color-ssa-intervals
     check-allocation? get [ intervals required-register-uses ] [ f ] if :> expected
     cfg admissible-registers :> available
     intervals available allocate-colored-intervals :> allocated

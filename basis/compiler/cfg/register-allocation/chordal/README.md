@@ -31,9 +31,20 @@ Implementation and limits:
   pressure-reduction and register-targeting algorithm. The certificate does not
   assert globally optimal spilling or constrained physical assignment.
 - Phi edges are resolved after assignment, with simultaneous physical moves and
-  spill-slot temporaries for cycles. Identical locations need no move. There is
-  no speculative graph coalescing; copy quality can therefore trail the default
-  allocator's SSA coalescer.
+  spill-slot temporaries for cycles. Phi results can occupy stack slots, so a
+  join with more live phis than registers remains allocatable. Stack-to-stack
+  copies borrow an admissible register, preserving the widest representation
+  used in its class in a separate temporary slot. Identical locations need no
+  move. Coloring prefers available colors of phi/copy partners without deleting
+  interference edges or merging vertices. Copy quality can still trail the
+  default allocator's SSA coalescer.
+- Derived-pointer phis receive companion tagged-base phis before liveness.
+  These select the matching GC base on each incoming edge; a plain integer edge
+  selects immutable false. The local liveness pass seeds these relationships so
+  moving GC updates derived values correctly. Provenance uses the existing
+  arithmetic rules, including XOR for the two inputs of addition. Inconsistent
+  cyclic provenance equations raise an explicit error instead of silently
+  omitting a root.
 - SSA uses can occur before their definition in linearized block order. ABI
   operand slots are reserved before splitting so a use-only call fragment can
   receive its value through an incoming edge even if synchronization removes
@@ -52,3 +63,8 @@ assignments, and preservation of mandatory register uses across splitting.
 The tests exercise graph certification (including rejection of a chordless
 cycle), interval holes, branch joins, loop phi swaps, tagged roots across GC,
 FFI calls in loops, and a generated 40-value floating-point pressure case.
+Additional tests execute both paths through a 40-result phi join and check
+scalar scratch copies preserve a live-vector-width register. A native lowered
+CFG carries fresh nursery addresses through an integer phi and explicitly
+collects before returning the selected object. Both exact pointer-identity
+checks pass; disabling companion-base construction makes both fail.
