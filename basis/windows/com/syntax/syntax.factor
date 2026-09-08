@@ -83,7 +83,7 @@ ERROR: no-com-interface interface ;
 PRIVATE>
 
 SYNTAX: COM-INTERFACE:
-    CREATE-C-TYPE
+    CREATE-C-TYPE dup save-location
     void* over typedef
     scan-object find-com-interface-definition
     scan-token string>guid
