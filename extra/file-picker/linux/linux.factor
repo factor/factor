@@ -14,6 +14,7 @@ FUNCTION: GtkWidget* gtk_file_chooser_dialog_new (
     GtkWindow* parent,
     GtkFileChooserAction action,
     gchar* first_button_text,
+    ...
     gint first_button_response,
     gchar* second_button_text,
     gint second_button_response,

@@ -12,10 +12,10 @@ IN: terminal.linux
 CONSTANT: TIOCGWINSZ 0x5413
 
 STRUCT: winsize
-{ ws_row c:short }
-{ ws_col c:short }
-{ ws_xpixel c:short }
-{ ws_ypixel c:short } ;
+{ ws_row c:ushort }
+{ ws_col c:ushort }
+{ ws_xpixel c:ushort }
+{ ws_ypixel c:ushort } ;
 
 PRIVATE>
 

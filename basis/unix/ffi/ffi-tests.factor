@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.utilities continuations
 io.encodings.utf8 io.files.unique kernel libc locals sequences tools.test
-unix unix.ffi ;
+unix unix.ffi unix.types ;
 IN: unix.ffi.tests
 
 { 80 } [ "http" f getservbyname port>> ntohs ] unit-test
@@ -26,4 +26,6 @@ IN: unix.ffi.tests
         fd 0 SEEK_END lseek 0x100000003 assert=
     ] [ fd close-file ] finally ;
 
-{ } [ "factor-truncate-" "" [ check-large-truncation ] cleanup-unique-file ] unit-test
+off_t heap-size 8 = [
+    { } [ "factor-truncate-" "" [ check-large-truncation ] cleanup-unique-file ] unit-test
+] when
