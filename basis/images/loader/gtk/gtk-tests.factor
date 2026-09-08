@@ -15,6 +15,19 @@ IN: images.loader.gtk.tests
     ] with-destructors
 ] unit-test
 
+! Exercise the encoded buffer and its native-size length out-parameter.
+{ t } [
+    [
+        open-png-image [ dim>> ] [
+            image>GdkPixbuf &g_object_unref
+            "png" GdkPixbuf>byte-array
+            data>GInputStream &g_object_unref
+            GInputStream>GdkPixbuf &g_object_unref
+            [ gdk_pixbuf_get_width ] [ gdk_pixbuf_get_height ] bi 2array
+        ] bi =
+    ] with-destructors
+] unit-test
+
 { t } [
     [
         [
