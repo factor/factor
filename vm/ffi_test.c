@@ -426,3 +426,7 @@ void* bug1021_test_3(int x) {
 #if defined(__APPLE__) && defined(__aarch64__)
 #include "ffi_test_arm64.c"
 #endif
+
+#if defined(__linux__) || defined(__APPLE__)
+#include "tests/ffi_uint_callback.c"
+#endif
