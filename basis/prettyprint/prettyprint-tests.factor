@@ -24,10 +24,8 @@ IN: prettyprint.tests
 { "0/0." } [ 0/0. unparse ] unit-test
 { "-0/0." } [ -0/0. unparse ] unit-test
 
-! XXX: disabling on linux/x86.32
-os linux? cpu x86.32? and [
-    { "NAN: 123" } [ NAN: 123 unparse ] unit-test
-] unless
+! Bit transport must not quiet signaling NaNs before printing (#2594).
+{ "NAN: 123" } [ NAN: 123 unparse ] unit-test
 { "NAN: -123" } [ NAN: -123 unparse ] unit-test
 
 { "+" } [ \ + unparse ] unit-test
