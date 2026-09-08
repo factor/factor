@@ -1,0 +1,12 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-speed-crossarch/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-speed-crossarch",
+    "-i=/Users/erg/factor.worktrees/allocator-speed-crossarch/factor.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-speed-crossarch/reference/allocator-speed-crossarch-20260908/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 125.976556917,
+  "taskpolicy_exit": 0
+}

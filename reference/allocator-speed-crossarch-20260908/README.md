@@ -10,8 +10,8 @@ scheduling guards. The source baseline is `233db947df`.
 Six added workloads create real register pressure: 32 live scalar floats,
 40 live integers, a two-arm branch under float pressure, 32 live SIMD values,
 32 float values live across a real foreign call, and 32 heap references live
-across explicit full GC. Inputs vary across 32 values and exercise both branch
-arms. Each workload asserts an independently calculated integer or exactly
+across explicit full GC. Arithmetic inputs vary across 32 values and exercise both branch
+arms; the explicit-GC case uses 4 inputs to keep collection cost bounded. Each workload asserts an independently calculated integer or exactly
 representable floating result. `ffi.c` implements the foreign function separately.
 The existing scalar/SIMD nbody and matrix exponential workloads provide broader
 numerical and loop coverage; hashes, pi digits and tree counts retain the original
@@ -19,7 +19,8 @@ independent Python checks.
 
 `metric-workloads` chooses 12 actual kernel definitions for final emitted code
 size, spill/reload/copy instruction counts, frame size and allocator diagnostics.
-These diagnostic compilations run after the timed full-closure installation and
+The code reports retain their index in that 12-kernel sequence as part of the
+identity because scalar and SIMD nbody share a printed word name. These diagnostic compilations run after the timed full-closure installation and
 before warmup; they do not install code or contribute to compile timing. The
 original dispatch audit already established that concrete allocator methods run.
 

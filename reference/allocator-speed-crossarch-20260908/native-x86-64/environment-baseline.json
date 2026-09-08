@@ -1,0 +1,58 @@
+{
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+  "machine": "x86_64",
+  "processor": "",
+  "source_commit": "233db947df",
+  "mode": "native",
+  "artifacts": {
+    "factor": {
+      "bytes": 420160,
+      "sha256": "ef8c0ed63339f3da0a40066cf65aa1940cbbe6ec7a17874798c82f7d671e5bf3"
+    },
+    "seed.image": {
+      "bytes": 146570056,
+      "sha256": "7d5f6792c659aa68a87b50234e9593c96a3dfbe134958ab6aaa3fb11b3b0c347"
+    },
+    "boot.unix-x86.64.image": {
+      "bytes": 4863000,
+      "sha256": "3786287bc0319a09710941ba6b26d3757bc19514a8d59e6364dbaa1186190a15"
+    },
+    "factor.image": {
+      "bytes": 148146600,
+      "sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e"
+    },
+    "prepared.image": {
+      "bytes": 161187656,
+      "sha256": "3bfa68b1f1b99c7d78989975942a909cb01623c779a655315fb48f08234a3fde"
+    },
+    "counters": {
+      "bytes": 16328,
+      "sha256": "0d5f6af0fd7a11208cc3a25331dd8fa34549e8068759d2ff951b4075c15a12c5"
+    }
+  },
+  "cpu": {
+    "status": 0,
+    "stdout": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  32\nOn-line CPU(s) list:                     0-31\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 9 7950X3D 16-Core Processor\nCPU family:                              25\nModel:                                   97\nThread(s) per core:                      2\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                2\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      80%\nCPU max MHz:                             5763.3560\nCPU min MHz:                             416.6290\nBogoMIPS:                                8384.45\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca fsrm flush_l1d amd_lbr_pmc_freeze\nVirtualization:                          AMD-V\nL1d cache:                               512 KiB (16 instances)\nL1i cache:                               512 KiB (16 instances)\nL2 cache:                                16 MiB (16 instances)\nL3 cache:                                128 MiB (2 instances)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-31\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Mitigation; Clear CPU buffers\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+    "stderr": ""
+  },
+  "load": {
+    "status": 0,
+    "stdout": " 23:26:22 up 52 days, 18:07, 17 users,  load average: 2.99, 2.83, 2.39\n",
+    "stderr": ""
+  },
+  "perf_permissions": {
+    "status": 0,
+    "stdout": "4\n",
+    "stderr": ""
+  },
+  "vm_capabilities": {
+    "status": 0,
+    "stdout": "/home/erg/factor-allocator-speed-20260908/factor cap_perfmon=ep\n",
+    "stderr": ""
+  },
+  "compiler": {
+    "status": 0,
+    "stdout": "gcc (Ubuntu 15.2.0-16ubuntu1) 15.2.0\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "stderr": ""
+  }
+}

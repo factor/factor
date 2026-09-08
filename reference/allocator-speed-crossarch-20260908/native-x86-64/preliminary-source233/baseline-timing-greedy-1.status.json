@@ -1,0 +1,24 @@
+{
+  "exit_code": 0,
+  "seconds": 83.3841290473938,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-speed-20260908/factor",
+    "-resource-path=/home/erg/factor-allocator-speed-20260908",
+    "-i=/home/erg/factor-allocator-speed-20260908/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-speed-20260908/reference/allocator-speed-crossarch-20260908/timing.factor",
+    "greedy",
+    "timing",
+    "3"
+  ],
+  "ok": true,
+  "counts": {
+    "code": 12,
+    "runtime": 104,
+    "compile": 1,
+    "scope": 1
+  }
+}

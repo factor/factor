@@ -78,6 +78,7 @@ CONSTANT: batch-counts H{
     allocator "allocator" pick set-at
     checked "checked" pick set-at
     selected [ [ word-id ] [ number>string ] bi* "|" glue ] map-index "words" pick set-at emit
+    compiler_foreground 0 assert=
     compiler_instructions :> before
     compiler_cpu_seconds :> cpu
     [ selected compile ] benchmark :> ns
