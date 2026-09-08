@@ -35,9 +35,13 @@ Implementation and limits:
   join with more live phis than registers remains allocatable. Stack-to-stack
   copies borrow an admissible register, preserving the widest representation
   used in its class in a separate temporary slot. Identical locations need no
-  move. Coloring prefers available colors of phi/copy partners without deleting
-  interference edges or merging vertices. Copy quality can still trail the
-  default allocator's SSA coalescer.
+  move. Exact SSA copies with identical representations share one interval
+  representative; representation changes and phi definitions remain distinct.
+  Initial coloring prefers phi/copy partners, then bounded recoloring revisits
+  late partners. Whole two-color connected components may exchange colors only
+  when this strictly reduces unmatched affinities. These exchanges preserve
+  every interference edge and the color palette. Copy quality can still trail
+  the default allocator's SSA coalescer.
 - Derived-pointer phis receive companion tagged-base phis before liveness.
   These select the matching GC base on each incoming edge; a plain integer edge
   selects immutable false. The local liveness pass seeds these relationships so
@@ -57,7 +61,8 @@ Implementation and limits:
   storage and candidate work; this remains an experimental allocator.
 
 `allocator-statistics` returns vertices, edges, `chordal?`, direct physical color
-assignments, and repair assignments. Counts include split fragments, making the
+assignments, repair assignments, exact-copy aliases, and unmatched graph-color
+affinities before/after improvement. Counts include split fragments, making the
 amount of work performed by each policy visible in `compiler.cfg.metrics`.
 `check-allocation?` verifies register classes, range coverage, overlapping
 assignments, and preservation of mandatory register uses across splitting.
@@ -70,3 +75,9 @@ scalar scratch copies preserve a live-vector-width register. A native lowered
 CFG carries fresh nursery addresses through an integer phi and explicitly
 collects before returning the selected object. Both exact pointer-identity
 checks pass; disabling companion-base construction makes both fail.
+
+Graph ordering and certification are checked against independent scan/clique
+oracles over all 64 undirected four-vertex graphs. Coalescing tests include a
+blocked phi affinity unlocked by a two-color exchange, an exchange that would
+lose more affinities than it gains, and copy chains whose representation changes
+must remain distinct.

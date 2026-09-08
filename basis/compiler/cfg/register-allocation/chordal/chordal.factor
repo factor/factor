@@ -58,7 +58,7 @@ SINGLETON: chordal-allocator
     order [| vertex |
         vertex graph seen earlier-neighbors :> earlier
         earlier empty? [ t ] [
-            earlier [ seen at ] sort-by last :> parent
+            earlier [ seen at ] maximum-by :> parent
             earlier [| neighbor |
                 neighbor parent = neighbor parent neighbors at key? or
             ] all?
@@ -89,7 +89,101 @@ SINGLETON: chordal-allocator
     ] each
     colors ;
 
-:: add-affinity ( source destination affinities -- )
+:: affinity-score ( vertex color affinities colors -- score )
+    vertex affinities at [ colors at color = ] count ;
+
+! A later phi partner may not have a color when MCS first visits a value.
+! Revisit affinities after coloring without changing any interference edge.
+! Every accepted recoloring strictly reduces the number of unequal partners.
+:: improve-affinity-colors ( graph order affinities colors -- )
+    0 :> passes!
+    t :> changed!
+    [ changed passes 3 < and ] [
+        f changed!
+        passes 1 + passes!
+        order <reversed> [| vertex |
+            vertex graph at [ colors at ] map :> used
+            vertex colors at :> current
+            vertex current affinities colors affinity-score :> score!
+            current :> best!
+            vertex affinities at [ colors at ] map sift [| candidate |
+                candidate used member? [ ] [
+                    vertex candidate affinities colors affinity-score :> candidate-score
+                    candidate-score score > [
+                        candidate best! candidate-score score!
+                    ] when
+                ] if
+            ] each
+            best current = [ ] [ t changed! ] if
+            best vertex colors set-at
+        ] each
+    ] while ;
+
+:: two-color-component ( vertex first-color second-color graph colors -- component )
+    H{ } clone :> component
+    V{ vertex } clone :> pending
+    [ pending empty? not ] [
+        pending pop :> current
+        current component key? [ ] [
+            current component conjoin
+            current graph at [| neighbor |
+                neighbor colors at :> color
+                color first-color = color second-color = or [
+                    neighbor component key? [ ] [ neighbor pending push ] if
+                ] when
+            ] each
+        ] if
+    ] while
+    component ;
+
+:: exchanged-color ( color first-color second-color -- color' )
+    color first-color = second-color first-color ? ;
+
+:: exchange-benefit ( component first-color second-color affinities colors -- benefit )
+    component keys [| vertex |
+        vertex colors at :> before
+        before first-color second-color exchanged-color :> after
+        vertex affinities at [ component key? ] reject [| partner |
+            partner colors at :> other
+            after other = 1 0 ? before other = 1 0 ? -
+        ] map-sum
+    ] map-sum ;
+
+! Swapping both colors in an entire connected component preserves every
+! interference constraint. It can free a phi partner's color even when a
+! single-vertex recoloring cannot. Accept only a strict net affinity gain.
+:: exchange-affinity-colors ( graph order affinities colors -- )
+    0 :> passes!
+    t :> changed!
+    [ changed passes 2 < and ] [
+        f changed!
+        passes 1 + passes!
+        order [| vertex |
+            vertex affinities at [| partner |
+                vertex colors at :> first-color
+                partner colors at :> second-color
+                second-color [
+                    first-color second-color = not
+                    partner vertex graph at member? not and
+                ] [ f ] if [
+                    vertex first-color second-color graph colors two-color-component :> component
+                    partner component key? [ ] [
+                        component first-color second-color affinities colors exchange-benefit 0 > [
+                            t changed!
+                            component keys [| member |
+                                member colors at first-color second-color exchanged-color
+                                member colors set-at
+                            ] each
+                        ] when
+                    ] if
+                ] when
+            ] each
+        ] each
+    ] while ;
+
+:: add-affinity ( source-vreg destination-vreg affinities -- )
+    source-vreg leader :> source
+    destination-vreg leader :> destination
     source destination = [
         source rep-of reg-class-of destination rep-of reg-class-of = [
             source destination affinities push-at
@@ -130,22 +224,38 @@ SINGLETON: chordal-allocator
 SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     scratch-spills ;
 
+:: affinity-misses ( affinities colors -- n )
+    affinities >alist [| pair |
+        pair first colors at :> color
+        pair second [ colors at color = not ] count
+    ] map-sum 2 / ;
+
 :: color-ssa-intervals ( intervals cfg -- )
     intervals interference-graph :> graph
     graph maximum-cardinality-order :> order
-    graph order cfg cfg-affinities affinity-colors graph-colors namespaces:set
+    cfg cfg-affinities :> affinities
+    graph order affinities affinity-colors :> colors
+    affinities colors affinity-misses :> before
+    graph order affinities colors improve-affinity-colors
+    graph order affinities colors exchange-affinity-colors
+    colors graph-colors namespaces:set
     graph assoc-size :> vertices
     graph values [ length ] map-sum 2 / :> edges
     graph order perfect-order? :> chordal?
+    affinities colors affinity-misses :> after
+    leader-map get keys [ dup leader = not ] count :> aliases
     H{
         { "vertices" vertices } { "edges" edges } { "chordal?" chordal? }
         { "color-assignments" 0 } { "repair-assignments" 0 }
+        { "affinity-misses-before" before }
+        { "affinity-misses-after" after }
+        { "copy-aliases" aliases }
     }
     chordal-statistics namespaces:set ;
 
 ! Phi operands live on their incoming edges, and all phi results are
 ! defined simultaneously at block entry. The normal liveness pass already
-! supplies the edge uses. No SSA destruction or graph coalescing occurs.
+! supplies the edge uses. Exact copies share intervals; phis stay in SSA.
 :: compute-ssa-intervals-in-block ( bb -- )
     bb block-from from namespaces:set
     bb block-to to namespaces:set
@@ -211,7 +321,7 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     gather-intervals ;
 
 : phi-vreg>location ( vreg -- reg/slot )
-    dup pending-interval-assoc get at
+    leader dup pending-interval-assoc get at
     [ nip ] [ dup rep-of assign-spill-slot ] if* ;
 
 :: record-phi-locations ( bb -- )
@@ -300,11 +410,25 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     H{ } clone scratch-spills namespaces:set
     [ needs-predecessors ] [ [ resolve-ssa-block ] each-basic-block ] bi ;
 
+! Exact SSA copies denote the same value on every path dominated by the
+! copy. Give their intervals one representative before coloring; phis retain
+! their own definitions and are resolved only on their incoming edges. Do not
+! merge representation changes: tagged and derived roots need distinct maps.
+:: copy-leaders ( cfg -- )
+    representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
+    cfg cfg>insns [| insn |
+        insn ##copy? [
+            insn src>> rep-of insn dst>> rep-of = [
+                insn src>> leader insn dst>> leader-map get set-at
+            ] when
+        ] when
+    ] each ;
+
 :: chordal-allocation ( cfg -- )
     f leader-map namespaces:set
     cfg construct-ssa-bases
     cfg compute-ssa-live-sets
-    representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
+    cfg copy-leaders
     cfg number-instructions
     cfg compute-ssa-intervals :> intervals
     intervals [ live-interval-state? ] filter cfg color-ssa-intervals

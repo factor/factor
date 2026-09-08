@@ -32,3 +32,42 @@ root comparison harness owns final repeated performance measurements after all
 correctness fixes. Compiler codegen, float, spilling, alien, and large-return
 tests, plus the allocator's direct tests, provide correctness checks independent
 of the benchmark numbers.
+
+A later matched native ARM64 run uses the explicit worktree resource path and
+loads the independent final value-flow verifier. The 13-body corpus still
+produces 19 procedures. The graph-only revision is `1cc32e7cb6`.
+
+| Policy | Code bytes | Spills | Reloads | Copies |
+| --- | ---: | ---: | ---: | ---: |
+| Graph-only chordal | 25,616 | 56 | 56 | 145 |
+| Chordal with bounded phi-color improvement | 25,264 | 48 | 48 | 58 |
+
+Both rows passed final symbolic value-flow checks and interval allocation checks;
+all 19 graphs were certified chordal. The new graph colors reduce unmatched
+static affinities from 271 to 169. No exact-copy aliases survive in this corpus,
+so its measured improvement comes from phi-color placement, not the separate
+SSA-copy representative optimization. Exact-copy chains and representation
+boundaries are tested directly. The historical 153-copy report and earlier
+unqualified-resource experiments are not used as this matched baseline.
+
+These are final emitted static counts: 87 fewer copies, eight fewer spill/reload
+pairs, and 352 fewer bytes. This changes physical assignment and reduces edge
+preservation traffic; it does not implement loop/cold-edge spill-site selection.
+No runtime-speed or bootstrap-speed claim follows from these static counters.
+The integrated comparison harness owns those measurements. Linear scan remains
+the default and global value numbering remains disabled.
+
+The final checker-enabled run passed 389 tests across the chordal subtree and
+compiler codegen, float, spilling, alien, ARM64 ABI, and large-return suites.
+This includes executed branch joins, phi cycles, full-pressure phi joins,
+stack-to-stack edges, and derived-root collection. Graph tests compare heap MCS
+and parent-neighbor certification to simple scan/clique oracles on all 64
+four-vertex undirected graphs; a second exhaustive test verifies every graph
+edge after recoloring, including nonchordal graphs and conflicting affinities.
+
+Reproduction scripts and per-word totals are in
+`reference/chordal-placement-20260908/`. Use the matching native VM/image and
+explicit `-resource-path` and `-i` arguments. The scripts reload changed
+allocator words and assert the final verifier is enabled. A separate attempted
+linear-scan baseline currently exposes an `invalid-allocation-gc-root` verifier
+failure on `spectral-norm`; its partial counts are not included in the table.

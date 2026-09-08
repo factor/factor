@@ -3,6 +3,7 @@ compiler.cfg compiler.cfg.instructions compiler.cfg.linear-scan.resolve
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.chordal compiler.cfg.registers
+compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.test cpu.architecture generalizations kernel kernel.private locals make math
 math.bitwise math.functions math.libm math.private memory namespaces quotations
 sequences sequences.generalizations tools.test ;
@@ -79,6 +80,62 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
             T{ live-interval-state { vreg 1 } { ranges V{ { 4 6 } } } }
         } interference-graph
     ] with-variable
+] unit-test
+
+! A phi affinity can be blocked by a neighbor using the desired color.
+! Exchanging the whole two-color component preserves both interference edges.
+CONSTANT: exchange-graph H{
+    { 0 { 1 } } { 1 { 0 } } { 2 { 3 } } { 3 { 2 } }
+}
+
+{ t t 0 } [ [let
+    H{ { 0 0 } { 1 1 } { 2 1 } { 3 0 } } clone :> colors
+    H{ { 0 { 2 } } { 2 { 0 } } } :> affinities
+    exchange-graph { 0 1 2 3 } affinities colors exchange-affinity-colors
+    0 colors at 1 colors at = not
+    2 colors at 3 colors at = not
+    affinities colors affinity-misses
+] ] unit-test
+
+! A superficially attractive exchange must account for every affected edge:
+! gaining one affinity while losing two has negative benefit.
+{ -1 } [
+    H{ { 0 t } { 1 t } } 0 1
+    H{ { 0 { 2 } } { 1 { 4 4 } } }
+    H{ { 0 0 } { 1 1 } { 2 1 } { 4 1 } }
+    exchange-benefit
+] unit-test
+
+! Recoloring preserves every original edge, including graphs for which the
+! chordality certificate fails and affinities that directly conflict.
+{ t } [
+    64 <iota> [ [let
+        four-vertex-graph :> graph
+        graph maximum-cardinality-order :> order
+        graph order greedy-colors :> colors
+        graph keys [| vertex | vertex 4 <iota> [ vertex = not ] filter ]
+        H{ } map>assoc :> affinities
+        graph order affinities colors improve-affinity-colors
+        graph order affinities colors exchange-affinity-colors
+        graph >alist [| pair |
+            pair second [ colors at pair first colors at = not ] all?
+        ] all?
+    ] ] all?
+] unit-test
+
+! Exact copies may alias even when their original intervals overlap. A
+! representation-changing copy must keep its own root/derived-root identity.
+{ 0 0 3 } [
+    [
+        H{ { 0 int-rep } { 1 int-rep } { 2 int-rep } { 3 tagged-rep } }
+        representations set
+        {
+            T{ ##copy { dst 2 } { src 1 } { rep int-rep } }
+            T{ ##copy { dst 1 } { src 0 } { rep int-rep } }
+            T{ ##copy { dst 3 } { src 0 } { rep tagged-rep } }
+        } insns>cfg copy-leaders
+        1 leader 2 leader 3 leader
+    ] with-scope
 ] unit-test
 
 : with-chordal-test ( quot -- )
