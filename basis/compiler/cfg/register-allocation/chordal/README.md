@@ -49,10 +49,12 @@ Implementation and limits:
   operand slots are reserved before splitting so a use-only call fragment can
   receive its value through an incoming edge even if synchronization removes
   its only interval use.
-- This deliberately simple implementation explicitly builds the graph with
-  pairwise range intersections and uses a quadratic maximum-cardinality search.
-  Its compile-time cost is unsuitable for very large procedures without further
-  engineering. It is a measurable contender, not the new default.
+- Graph construction sorts intervals by start and stops candidate scans beyond
+  each interval's final endpoint, then intersects complete range lists to keep
+  holes exact. Maximum-cardinality search uses a heap with deterministic vertex
+  tie breaking. Certification checks each earlier neighbor against the latest
+  earlier neighbor, using hashed adjacency. Dense graphs still require quadratic
+  storage and candidate work; this remains an experimental allocator.
 
 `allocator-statistics` returns vertices, edges, `chordal?`, direct physical color
 assignments, and repair assignments. Counts include split fragments, making the
