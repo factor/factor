@@ -196,3 +196,26 @@ os windows? cpu x86.64? and [
 
 ! In case the tests screw up the FP env because of bugs in math.floats.env
 set-default-fp-env
+
+! #1598: dynamic primitive execution must match optimized comparisons.
+:: primitive-comparison-invalid? ( bits word -- ? )
+    bits bits>double 1.0
+    [ word execute( x y -- ? ) ] collect-fp-exceptions nip
+    +fp-invalid-operation+ swap member? ;
+
+{ t } [
+    { float< float<= float> float>= }
+    [ 0x7ff8000000000001 swap primitive-comparison-invalid? ] all?
+] unit-test
+{ f } [
+    { float-u< float-u<= float-u> float-u>= }
+    [ 0x7ff8000000000001 swap primitive-comparison-invalid? ] any?
+] unit-test
+{ t } [
+    { float< float<= float> float>= float-u< float-u<= float-u> float-u>= }
+    [ 0x7ff0000000000001 swap primitive-comparison-invalid? ] all?
+] unit-test
+{ f } [
+    { float< float<= float> float>= float-u< float-u<= float-u> float-u>= }
+    [ 0x3ff0000000000000 swap primitive-comparison-invalid? ] any?
+] unit-test

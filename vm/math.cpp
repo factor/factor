@@ -289,25 +289,52 @@ void factor_vm::primitive_float_divfloat() {
   ctx->replace(allot_float(x / y));
 }
 
-void factor_vm::primitive_float_less() {
-  POP_FLOATS(x, y);
-  ctx->replace(tag_boolean(x < y));
+enum class float_comparison { less, lesseq, greater, greatereq };
+
+static bool compare_float(factor_vm* vm, float_comparison op, bool ordered) {
+  uint64_t y_bits, x_bits;
+  memcpy(&y_bits, &untag<boxed_float>(vm->ctx->pop())->n, sizeof(y_bits));
+  memcpy(&x_bits, &untag<boxed_float>(vm->ctx->peek())->n, sizeof(x_bits));
+  auto nan = [](uint64_t bits) {
+    return (bits & 0x7fffffffffffffffULL) > 0x7ff0000000000000ULL;
+  };
+  bool x_nan = nan(x_bits), y_nan = nan(y_bits);
+  if (x_nan || y_nan) {
+    if (ordered || (x_nan && !(x_bits & 0x0008000000000000ULL)) ||
+        (y_nan && !(y_bits & 0x0008000000000000ULL))) {
+      // Volatile arithmetic raises invalid using the platform's FP control
+      // state. A quiet comparison must only do this for signaling NaNs.
+      volatile double snan = bits_double(0x7ff0000000000001ULL);
+      volatile double result = snan + snan;
+      (void)result;
+    }
+    return false;
+  }
+  double x = bits_double(x_bits), y = bits_double(y_bits);
+  switch (op) {
+    case float_comparison::less: return x < y;
+    case float_comparison::lesseq: return x <= y;
+    case float_comparison::greater: return x > y;
+    case float_comparison::greatereq: return x >= y;
+  }
+  return false;
 }
 
-void factor_vm::primitive_float_lesseq() {
-  POP_FLOATS(x, y);
-  ctx->replace(tag_boolean(x <= y));
-}
+#define FLOAT_COMPARISON(name, op, ordered) \
+  void factor_vm::primitive_##name() { \
+    ctx->replace(tag_boolean(compare_float(this, float_comparison::op, ordered))); \
+  }
 
-void factor_vm::primitive_float_greater() {
-  POP_FLOATS(x, y);
-  ctx->replace(tag_boolean(x > y));
-}
+FLOAT_COMPARISON(float_less, less, true)
+FLOAT_COMPARISON(float_lesseq, lesseq, true)
+FLOAT_COMPARISON(float_greater, greater, true)
+FLOAT_COMPARISON(float_greatereq, greatereq, true)
+FLOAT_COMPARISON(float_unordered_less, less, false)
+FLOAT_COMPARISON(float_unordered_lesseq, lesseq, false)
+FLOAT_COMPARISON(float_unordered_greater, greater, false)
+FLOAT_COMPARISON(float_unordered_greatereq, greatereq, false)
 
-void factor_vm::primitive_float_greatereq() {
-  POP_FLOATS(x, y);
-  ctx->replace(tag_boolean(x >= y));
-}
+#undef FLOAT_COMPARISON
 
 // Allocates memory
 void factor_vm::primitive_float_bits() {

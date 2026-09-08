@@ -750,20 +750,77 @@ pub export fn primitive_bits_double(vm_asm: *VMAssemblyFields) callconv(.c) void
 
 // --- Float Comparison Primitives ---
 
-pub export fn primitive_float_less(vm_asm: *VMAssemblyFields) callconv(.c) void {
+const FloatComparison = enum { less, lesseq, greater, greatereq };
+
+fn compareFloatBits(x_bits: u64, y_bits: u64, comptime op: FloatComparison, ordered: bool) bool {
+    @setFloatMode(.strict);
+    const x_nan = x_bits & 0x7fffffffffffffff > 0x7ff0000000000000;
+    const y_nan = y_bits & 0x7fffffffffffffff > 0x7ff0000000000000;
+    if (x_nan or y_nan) {
+        if (ordered or (x_nan and x_bits & 0x0008000000000000 == 0) or
+            (y_nan and y_bits & 0x0008000000000000 == 0))
+        {
+            // Use the platform's FP environment without depending on libc's
+            // target-specific exception constants. Volatile loads prevent folding.
+            var snan: f64 = @bitCast(@as(u64, 0x7ff0000000000001));
+            const source: *volatile f64 = &snan;
+            var result: f64 = undefined;
+            const sink: *volatile f64 = &result;
+            sink.* = source.* + source.*;
+        }
+        return false;
+    }
+    const x: f64 = @bitCast(x_bits);
+    const y: f64 = @bitCast(y_bits);
+    return switch (op) {
+        .less => x < y,
+        .lesseq => x <= y,
+        .greater => x > y,
+        .greatereq => x >= y,
+    };
+}
+
+fn compareFloats(vm_asm: *VMAssemblyFields, comptime op: FloatComparison, ordered: bool) void {
     const ctx = vm_asm.ctx;
-    const b = float_mod.untagFloat(ctx.pop());
-    const a = float_mod.untagFloat(ctx.peek());
+    const y: *const layouts.BoxedFloat = @ptrFromInt(layouts.UNTAG(ctx.pop()));
+    const x: *const layouts.BoxedFloat = @ptrFromInt(layouts.UNTAG(ctx.peek()));
+    const y_bits: *const u64 = @ptrCast(&y.n);
+    const x_bits: *const u64 = @ptrCast(&x.n);
+    const result = compareFloatBits(x_bits.*, y_bits.*, op, ordered);
     const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
-    ctx.replace(if (a < b) true_obj else layouts.false_object);
+    ctx.replace(if (result) true_obj else layouts.false_object);
+}
+
+pub export fn primitive_float_less(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .less, true);
 }
 
 pub export fn primitive_float_lesseq(vm_asm: *VMAssemblyFields) callconv(.c) void {
-    const ctx = vm_asm.ctx;
-    const b = float_mod.untagFloat(ctx.pop());
-    const a = float_mod.untagFloat(ctx.peek());
-    const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
-    ctx.replace(if (a <= b) true_obj else layouts.false_object);
+    compareFloats(vm_asm, .lesseq, true);
+}
+
+pub export fn primitive_float_greater(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .greater, true);
+}
+
+pub export fn primitive_float_greatereq(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .greatereq, true);
+}
+
+pub export fn primitive_float_unordered_less(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .less, false);
+}
+
+pub export fn primitive_float_unordered_lesseq(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .lesseq, false);
+}
+
+pub export fn primitive_float_unordered_greater(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .greater, false);
+}
+
+pub export fn primitive_float_unordered_greatereq(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    compareFloats(vm_asm, .greatereq, false);
 }
 
 pub export fn primitive_float_eq(vm_asm: *VMAssemblyFields) callconv(.c) void {
@@ -772,22 +829,6 @@ pub export fn primitive_float_eq(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const a = float_mod.untagFloat(ctx.peek());
     const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
     ctx.replace(if (a == b) true_obj else layouts.false_object);
-}
-
-pub export fn primitive_float_greater(vm_asm: *VMAssemblyFields) callconv(.c) void {
-    const ctx = vm_asm.ctx;
-    const b = float_mod.untagFloat(ctx.pop());
-    const a = float_mod.untagFloat(ctx.peek());
-    const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
-    ctx.replace(if (a > b) true_obj else layouts.false_object);
-}
-
-pub export fn primitive_float_greatereq(vm_asm: *VMAssemblyFields) callconv(.c) void {
-    const ctx = vm_asm.ctx;
-    const b = float_mod.untagFloat(ctx.pop());
-    const a = float_mod.untagFloat(ctx.peek());
-    const true_obj = vm_asm.special_objects[@intFromEnum(objects.SpecialObject.canonical_true)];
-    ctx.replace(if (a >= b) true_obj else layouts.false_object);
 }
 
 // --- Float Formatting ---
