@@ -150,7 +150,7 @@ M: addsub-cpu %add-sub-vector-reps { int-4-rep float-4-rep } ;
 [ addsub-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
-{ { ##load-reference ##xor-vector ##add-vector } }
+{ { ##load-reference ##mul-vector ##add-vector } }
 [ simple-ops-cpu float-4-rep [ emit-simd-v+- ] test-emit ]
 unit-test
 
@@ -544,11 +544,11 @@ unit-test
     V{
         T{ ##load-reference
            { dst 1 }
-           { obj B{ 0 0 0 128 0 0 0 0 0 0 0 128 0 0 0 0 } }
+           { obj B{ 0 0 128 191 0 0 128 63 0 0 128 191 0 0 128 63 } }
         }
         T{ ##load-reference
            { dst 2 }
-           { obj B{ 0 0 0 0 0 0 0 128 0 0 0 0 0 0 0 0 } }
+           { obj B{ 0 0 0 0 0 0 240 191 0 0 0 0 0 0 240 63 } }
         }
         T{ ##load-reference
            { dst 3 }

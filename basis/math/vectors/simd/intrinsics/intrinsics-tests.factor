@@ -3,8 +3,81 @@
 USING: accessors alien.data arrays byte-arrays classes
 classes.algebra compiler.cfg.instructions compiler.test cpu.architecture fry kernel kernel.private math
 math.floats.small.c-types math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
-math.vectors math.vectors.simd sequences specialized-arrays tools.test ;
+math.vectors math.vectors.simd namespaces sequences specialized-arrays tools.test ;
 IN: math.vectors.simd.intrinsics.tests
+
+CONSTANT: all-simd-classes {
+    char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2
+    float-4 double-2 half-8 bfloat-8
+}
+
+! #665: compare byte shifts with an independent byte-index reference. Counts
+! are bytes even for floating lanes, and oversized counts clear the register.
+:: horizontal-shift-matches? ( class n op: ( v n -- w ) left? -- ? )
+    B{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 } :> bytes
+    bytes clone class boa :> input
+    16 <iota> [ n left? [ - ] [ + ] if bytes ?nth 0 or ] B{ } map-as :> expected
+    input n op call underlying>> expected =
+    input n class n class-of 2array op '[ _ declare @ ]
+    compile-call underlying>> expected = and
+    input class 1array n op '[ _ declare _ @ ]
+    compile-call underlying>> expected = and
+    input t "always-inline-simd-intrinsics" [
+        class 1array n op '[ _ declare _ @ ] compile-call
+    ] with-variable underlying>> expected = and ; inline
+
+all-simd-classes [
+    '[
+        { 0 1 3 7 15 16 17 255 256 1000 0x10000000000000000000000000 } [
+            _ swap [
+                [ hlshift ] t horizontal-shift-matches?
+            ] [
+                [ hrshift ] f horizontal-shift-matches?
+            ] 2bi and
+        ] all?
+    ] { t } swap unit-test
+] each
+
+! Dot products accumulate scalar products rather than wrapping integer lanes.
+! Compare all representations, including half/bfloat, with exact small sums.
+:: dot-matches? ( a b expected -- ? )
+    a b vdot expected number=
+    a b a class-of b class-of 2array '[ _ declare vdot ]
+    [ compile-call ] call( a b quot -- result ) expected number= and
+    a b t "always-inline-simd-intrinsics" [
+        a class-of b class-of 2array '[ _ declare vdot ]
+        [ compile-call ] call( a b quot -- result )
+    ] with-variable expected number= and ;
+
+all-simd-classes [
+    '[ _ new [ drop 100 ] map dup dup length 10000 * dot-matches? ]
+    { t } swap unit-test
+] each
+
+{ t } [
+    longlong-2{ -9223372036854775808 9223372036854775807 } dup
+    170141183460469231713240559642174554113 dot-matches?
+] unit-test
+
+{ t } [
+    ulonglong-2{ 18446744073709551615 18446744073709551615 } dup
+    680564733841876926852962238568698216450 dot-matches?
+] unit-test
+
+! #283: the SSE2 add/sub fallback must preserve NaN signs as well as zeros.
+:: add-sub-matches? ( a b -- ? )
+    a b v+- underlying>>
+    a b a class-of b class-of 2array '[ _ declare v+- ]
+    [ compile-call ] call( a b quot -- result ) underlying>> = ;
+
+{ t } [ double-2{ 1 2 } double-2{ 0/0. 1 } add-sub-matches? ] unit-test
+{ t } [
+    float-4{ 1 2 3 4 } float-4{ 0/0. 1 0/0. 1 } add-sub-matches?
+] unit-test
+{ t } [ double-2{ -0.0 -0.0 } double-2{ 0.0 -0.0 } add-sub-matches? ] unit-test
+{ t } [
+    float-4{ -0.0 -0.0 0.0 0.0 } float-4{ 0.0 -0.0 -0.0 0.0 } add-sub-matches?
+] unit-test
 
 ! Dynamic dispatch must retain the element type, length, and shared storage.
 :: check-rep-array ( rep -- ? )

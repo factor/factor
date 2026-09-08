@@ -5,7 +5,7 @@ combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
-cpu.architecture kernel layouts math math.vectors
+cpu.architecture kernel layouts math math.order math.vectors
 math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
 sequences specialized-arrays strings ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
@@ -55,8 +55,8 @@ CONSTANT: rep>neg-zero {
     rep>neg-zero at underlying>> ^^load-literal ;
 
 CONSTANT: rep>add-sub {
-    { float-4-rep float-array{ -0.0  0.0 -0.0  0.0 } }
-    { double-2-rep double-array{ -0.0  0.0 } }
+    { float-4-rep float-array{ -1.0 1.0 -1.0 1.0 } }
+    { double-2-rep double-array{ -1.0 1.0 } }
     { char-16-rep char-array{ -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 -1 0 } }
     { short-8-rep short-array{ -1 0 -1 0 -1 0 -1 0 } }
     { int-4-rep int-array{ -1 0 -1 0 } }
@@ -348,7 +348,8 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ ^^add-sub-vector ]
         { float-vector-rep [| src1 src2 rep |
             rep ^load-add-sub-vector :> signs
-            src2 signs rep ^^xor-vector :> src2'
+            ! Multiplication preserves NaN signs; XOR would flip them.
+            src2 signs rep ^^mul-vector :> src2'
             src1 src2' rep ^^add-vector
         ] }
         { int-vector-rep   [| src1 src2 rep |
@@ -541,12 +542,12 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-hlshift ( node -- )
     {
-        [ ^^horizontal-shl-vector-imm ]
+        [ [ 16 min ] dip ^^horizontal-shl-vector-imm ]
     } [ integer? ] emit-vl-vector-op ;
 
 : emit-simd-hrshift ( node -- )
     {
-        [ ^^horizontal-shr-vector-imm ]
+        [ [ 16 min ] dip ^^horizontal-shr-vector-imm ]
     } [ integer? ] emit-vl-vector-op ;
 
 : emit-simd-vshuffle-elements ( node -- )
