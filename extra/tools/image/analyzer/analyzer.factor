@@ -3,6 +3,7 @@ io.streams.byte-array kernel math sequences
 tools.image.analyzer.code-heap-reader
 tools.image.analyzer.data-heap-reader tools.image.analyzer.utils
 tools.image.analyzer.vm ;
+FROM: tools.image => valid-header? ;
 IN: tools.image.analyzer
 
 TUPLE: image header heap ;
@@ -25,6 +26,9 @@ TUPLE: image header heap ;
 
 ERROR: unsupported-image-format ;
 
+: check-supported-header ( header -- header )
+    dup valid-header? [ unsupported-image-format ] unless ;
+
 : compressed-data? ( header -- ? ) [ data-heap-size ] [ compressed-data-size>> ] bi [ dup ] when-zero = not ;
 : compressed-code? ( header -- ? ) [ code-size>>    ] [ compressed-code-size>> ] bi [ dup ] when-zero = not ;
 
@@ -33,7 +37,7 @@ ERROR: unsupported-image-format ;
 
 : load-image ( image-file -- image )
     binary [
-        image-header read-struct check-uncompressed dup [
+        image-header read-struct check-supported-header check-uncompressed dup [
             [ data-relocation-base>> ] [ data-heap-size read ] bi
             data-heap>objects
         ]

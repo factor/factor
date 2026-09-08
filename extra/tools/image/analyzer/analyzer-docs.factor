@@ -6,7 +6,7 @@ HELP: load-image
   { "image-file" string }
   { "image" image }
 }
-{ $description "Loads and decodes Factor image." } ;
+{ $description "Loads and decodes an uncompressed Factor image of the current image version and native cell size. An incompatible header raises " { $link unsupported-image-format } "." } ;
 
 ARTICLE: "tools.image.analyzer" "Loader for Factor images"
 "The " { $vocab-link "tools.image.analyzer" } " loads and decodes Factor images."
