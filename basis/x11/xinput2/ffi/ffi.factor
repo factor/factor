@@ -1,10 +1,13 @@
 ! Copyright (C) 2010 Niklas Waern.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax classes.struct
-locals math sequences x11.X x11.syntax x11.xlib ;
+locals math sequences system x11.X x11.syntax x11.xlib ;
 IN: x11.xinput2.ffi
 
-<< "xinput2" "libXi.so" cdecl add-library >>
+C-LIBRARY: xinput2 {
+    { linux "libXi.so.6" }
+    { unix "libXi.so" }
+}
 
 LIBRARY: xinput2
 

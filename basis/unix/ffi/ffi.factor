@@ -200,4 +200,7 @@ FUNCTION: ssize_t writev ( int fds, iovec* iov, int iovcnt )
 TYPEDEF: void* sighandler_t
 FUNCTION: sighandler_t signal ( int signum, sighandler_t handler )
 
-"librt" "librt.so" cdecl add-library
+C-LIBRARY: librt {
+    { linux "librt.so.1" }
+    { unix "librt.so" }
+}
