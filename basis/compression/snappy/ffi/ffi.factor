@@ -7,6 +7,7 @@ IN: compression.snappy.ffi
 C-LIBRARY: snappy {
     { windows "snappy.dll" }
     { macos "libsnappy.dylib" }
+    { linux "libsnappy.so.1" }
     { unix "libsnappy.so" }
 }
 

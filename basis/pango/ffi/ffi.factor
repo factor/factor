@@ -12,6 +12,7 @@ LIBRARY: pango
 C-LIBRARY: pango {
     { windows "libpango-1.0-0.dll" }
     { macos "libpango-1.0.dylib" }
+    { linux "libpango-1.0.so.0" }
     { unix "libpango-1.0.so" }
 }
 

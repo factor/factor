@@ -8,6 +8,7 @@ blas-library [
     {
         { [ os macos?  ] [ "libblas.dylib" ] }
         { [ os windows? ] [ "blas.dll"      ] }
+        { [ os linux? ] [ "libblas.so.3" ] }
         [ "libblas.so" ]
     } cond
 ] initialize

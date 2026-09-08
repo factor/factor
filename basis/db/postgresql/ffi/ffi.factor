@@ -8,6 +8,7 @@ IN: db.postgresql.ffi
 C-LIBRARY: postgresql {
     { windows "libpq.dll" }
     { macos "libpq.dylib" }
+    { linux "libpq.so.5" }
     { unix "libpq.so" }
 }
 

@@ -16,7 +16,7 @@ LIBRARY: gtk2
 <<
 "gtk" {
     { [ os windows? ] [ "libgtk-win32-2.0-0.dll" cdecl add-library ] }
-    { [ os linux? ] [ "libgtk-x11-2.0.so" cdecl add-library ] }
+    { [ os linux? ] [ "libgtk-x11-2.0.so.0" cdecl add-library ] }
     [ drop ]
 } cond
 >>

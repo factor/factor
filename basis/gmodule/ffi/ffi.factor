@@ -11,6 +11,7 @@ LIBRARY: gmodule
 C-LIBRARY: gmodule {
     { windows "gmodule-2.0-0.dll" }
     { macos "libgmodule-2.0.dylib" }
+    { linux "libgmodule-2.0.so.0" }
     { unix "libgmodule-2.0.so" }
 }
 
