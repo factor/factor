@@ -50,6 +50,57 @@ IN: compiler.cfg.register-allocation.chordal.bases.tests
     ] ] with-scope
 ] unit-test
 
+:: derived-loop ( derived? -- cfg header body call )
+    H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep } { 3 int-rep } }
+    representations set
+    4 vreg-counter set
+    f leader-map set
+    {
+        T{ ##load-reference { dst 0 } { obj "base" } }
+        T{ ##tagged>integer { dst 1 } { src 0 } }
+        T{ ##branch }
+    } [ clone ] map 0 insns>block :> entry
+    derived? [
+        T{ ##load-integer { dst 1 } { val 0 } } clone
+        1 entry instructions>> set-nth
+    ] unless
+    {
+        T{ ##add-imm { dst 3 } { src1 2 } { src2 1 } }
+        T{ ##branch }
+    } [ clone ] map 2 insns>block :> body
+    ##phi new 2 >>dst H{ { entry 1 } { body 3 } } >>inputs :> phi
+    ##call-gc new <gc-map> >>gc-map :> call
+    T{ ##branch } clone :> branch
+    { phi call branch } 1 insns>block :> header
+    entry header connect-bbs
+    header body connect-bbs
+    body header connect-bbs
+    entry block>cfg header body call ;
+
+! The base on the backedge of a derived-pointer recurrence is the
+! companion phi itself; the entry edge still supplies the original base.
+{ t t t } [
+    [ [let
+        t derived-loop :> ( cfg header body call )
+        cfg construct-ssa-bases
+        cfg compute-ssa-live-sets
+        2 phi-bases get at :> base
+        header instructions>> first inputs>> :> inputs
+        cfg entry>> inputs at 0 =
+        body inputs at base =
+        call gc-map>> derived-roots>> { 2 base } swap member?
+    ] ] with-scope
+] unit-test
+
+! An integer-only recurrence has no origin pointer and must not acquire
+! a spurious tagged base merely because it is cyclic.
+{ t } [
+    [
+        f derived-loop 3drop construct-ssa-bases
+        phi-bases get assoc-empty?
+    ] with-scope
+] unit-test
+
 :: executable-derived-cfg ( -- cfg )
     f derived-diamond :> ( cfg join call )
     tagged-rep 6 set-rep-of
