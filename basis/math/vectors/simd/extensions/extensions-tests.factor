@@ -49,6 +49,20 @@ PRIVATE>
     half-8{ 1 2 3 4 5 6 7 8 } half-8{ 1 3 2 4 6 5 7 9 } v= ushort-8-cast
 ] unit-test
 { 4 } [ half-8{ t f t f t f t f } vcount ] unit-test
+
+! These expectations run on fallback-only hosts as well as optional FP16
+! kernels. Random pairs rarely exercise signed zeros or a NaN in each order.
+{ ushort-8{ 0x8000 0x8000 0x3c00 0x3c00 0xbc00 0x7e00 0xfc00 0xfc00 } } [
+    half-8{ 0.0 -0.0 1.0 0/0. -1.0 0/0. 1/0. -1/0. }
+    half-8{ -0.0 0.0 0/0. 1.0 0/0. 0/0. -1/0. 1/0. }
+    vmin ushort-8-cast
+] unit-test
+{ ushort-8{ 0 0 0x3c00 0x3c00 0xbc00 0x7e00 0x7c00 0x7c00 } } [
+    half-8{ 0.0 -0.0 1.0 0/0. -1.0 0/0. 1/0. -1/0. }
+    half-8{ -0.0 0.0 0/0. 1.0 0/0. 0/0. -1/0. 1/0. }
+    vmax ushort-8-cast
+] unit-test
+
 { half-8{ 5 6 7 8 1 2 3 4 } } [
     half-8{ 1 2 3 4 5 6 7 8 } { 4 5 6 7 0 1 2 3 } vshuffle-elements
 ] unit-test

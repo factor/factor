@@ -207,6 +207,6 @@ ARTICLE: "math.vectors.simd" "Hardware vector arithmetic (SIMD)"
 ABOUT: "math.vectors.simd"
 
 HELP: half-8
-{ $class-description "A 128-bit sequence of eight IEEE binary16 values. Elements are Factor floats; numeric stores round to nearest, ties to even, and canonicalize NaNs. Raw casts preserve bits. Arithmetic and conversions have portable implementations and optional FP16 kernels." } ;
+{ $class-description "A 128-bit sequence of eight IEEE binary16 values. Elements are Factor floats; numeric stores round to nearest, ties to even, and canonicalize NaNs. Raw casts preserve bits. Arithmetic and conversions have portable implementations and optional FP16 kernels. Minimum and maximum select the number when only one operand is NaN. For zeros of different signs, minimum selects negative zero and maximum selects positive zero." } ;
 HELP: bfloat-8
 { $class-description "A 128-bit sequence of eight BF16 values. Elements are Factor floats. Ordinary arithmetic computes in binary32 before rounding the stored result to BF16. Dedicated BF16 dot and matrix operations accumulate in float-4 with Arm's baseline BF16 computation semantics." } ;

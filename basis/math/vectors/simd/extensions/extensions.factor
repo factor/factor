@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators cpu.architecture kernel locals
 math math.bitwise math.floats.small math.floats.small.bfloat math.functions math.libm math.order
-math.vectors math.vectors.simd sequences system vocabs vocabs.loader ;
+math.vectors math.vectors.simd math.vectors.simd.intrinsics.private
+sequences system vocabs vocabs.loader ;
 IN: math.vectors.simd.extensions
 
 ! Stable public contracts are shared by the scalar and optional ARM kernels.
@@ -74,8 +75,8 @@ M:: object half-binary ( a b op -- result )
         { "-" [ [ - ] 2map ] }
         { "*" [ [ * ] 2map ] }
         { "/" [ [ /f ] 2map ] }
-        { "min" [ [ min ] 2map ] }
-        { "max" [ [ max ] 2map ] }
+        { "min" [ [ min-vector-lane ] 2map ] }
+        { "max" [ [ max-vector-lane ] 2map ] }
         { "=" [ [ = -1 0 ? ] ushort-8 new 2map-as half-8-cast ] }
         { "<" [ [ < -1 0 ? ] ushort-8 new 2map-as half-8-cast ] }
         { "<=" [ [ <= -1 0 ? ] ushort-8 new 2map-as half-8-cast ] }

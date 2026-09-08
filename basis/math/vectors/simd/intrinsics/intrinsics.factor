@@ -17,6 +17,21 @@ IN: math.vectors.simd.intrinsics
 
 <PRIVATE
 
+! Floating SIMD operations use minimum/maximum-number semantics.
+! Do not inherit the host's scalar min/max handling of NaNs or signed zeros.
+:: min-vector-lane ( a b -- c )
+    b fp-nan? [ a ] [ a fp-nan? [ b ] [
+        a float? b float? and a zero? b zero? and and
+        [ a double>bits b double>bits bitor bits>double ]
+        [ a b min ] if
+    ] if ] if ;
+:: max-vector-lane ( a b -- c )
+    b fp-nan? [ a ] [ a fp-nan? [ b ] [
+        a float? b float? and a zero? b zero? and and
+        [ a double>bits b double>bits bitand bits>double ]
+        [ a b max ] if
+    ] if ] if ;
+
 : >bitwise-vector-rep ( rep -- rep' )
     {
         { float-4-rep    [ uint-4-rep      ] }
@@ -193,8 +208,8 @@ PRIVATE>
 : (simd-v/)                ( a b rep -- c ) [ native/ ] components-2map ;
 : (simd-vavg)              ( a b rep -- c )
     [ + dup integer? [ 1 + -1 shift ] [ 0.5 * ] if ] components-2map ;
-: (simd-vmin)              ( a b rep -- c ) [ min ] components-2map ;
-: (simd-vmax)              ( a b rep -- c ) [ max ] components-2map ;
+: (simd-vmin)              ( a b rep -- c ) [ min-vector-lane ] components-2map ;
+: (simd-vmax)              ( a b rep -- c ) [ max-vector-lane ] components-2map ;
 ! XXX
 : (simd-vdot)              ( a b rep -- n )
     [ 2byte>rep-array [ [ first ] bi@ * ] 2keep ] keep
@@ -308,6 +323,25 @@ PRIVATE>
     x zero? [ width ] [ width x log2 1 + - ] if ;
 :: lane-trailing-zeros ( x width -- n )
     x zero? [ width ] [ x x neg bitand log2 ] if ;
+
+! Match FRINTA/FRINTN without adding 0.5 to the input: that addition can
+! round an already integral double, or a value just below a halfway point.
+! Keep special values and the sign of zero, including negative values whose
+! rounded magnitude is zero.
+:: round-vector-lane ( x even? -- y )
+    x float? [
+        x fp-special? x abs 4503599627370496.0 >= or [ x ] [
+            x abs floor :> whole
+            x abs whole - :> fraction
+            fraction 0.5 >
+            fraction 0.5 = even? [ whole >integer odd? ] [ t ] if and or
+            [ whole 1.0 + ] [ whole ] if x copysign
+        ] if
+    ] [ x ] if ;
+
+: reduce-vector-array ( array op -- n )
+    [ unclip ] dip "min-element" =
+    [ [ min-vector-lane ] reduce ] [ [ max-vector-lane ] reduce ] if ;
 PRIVATE>
 
 :: (simd-unary) ( a op rep -- c )
@@ -316,8 +350,8 @@ PRIVATE>
         { "floor" [ a rep [ floor ] components-map ] }
         { "ceiling" [ a rep [ ceiling ] components-map ] }
         { "truncate" [ a rep [ truncate ] components-map ] }
-        { "round" [ a rep [ round ] components-map ] }
-        { "round-even" [ a rep [ round-to-even ] components-map ] }
+        { "round" [ a rep [ f round-vector-lane ] components-map ] }
+        { "round-even" [ a rep [ t round-vector-lane ] components-map ] }
         { "bit-count" [ a rep [ width bits bit-count ] components-map ] }
         { "clz" [ a rep [ width bits width lane-leading-zeros ] components-map ] }
         { "ctz" [ a rep [ width bits width lane-trailing-zeros ] components-map ] }
@@ -352,7 +386,7 @@ PRIVATE>
     rep rep-length 2 /i tail rep widen-vector-rep >rep-array underlying>> ;
 
 :: (simd-reduce) ( a op rep -- n )
-    a rep byte>rep-array op "min-element" = [ minimum ] [ maximum ] if ;
+    a rep byte>rep-array op reduce-vector-array ;
 
 "compiler.cfg.intrinsics.simd" require
 "compiler.tree.propagation.simd" require
