@@ -204,6 +204,14 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
   (void)frame;
   (void)dispatch;
   switch (e->ExceptionCode) {
+    case EXCEPTION_STACK_OVERFLOW:
+      // Unlike access violations, stack overflows do not promise fault
+      // address parameters. Classify them using the current callstack guard.
+      set_memory_protection_error(ctx->callstack_seg->start - 1, c->EIP);
+      dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,
+                              (cell)factor::memory_signal_handler_impl);
+      break;
+    case STATUS_GUARD_PAGE_VIOLATION:
     case EXCEPTION_ACCESS_VIOLATION:
       set_memory_protection_error(e->ExceptionInformation[1], c->EIP);
       dispatch_signal_handler((cell*)&c->ESP, (cell*)&c->EIP,

@@ -122,6 +122,12 @@ void memory_signal_handler_impl() {
   }
   else {
     vm_error_type type = vm->ctx->address_to_error(vm->signal_fault_addr);
+#ifdef WINDOWS
+    // PAGE_GUARD is cleared by the OS on access. Dispatch has already
+    // unwound the overflowing callstack, so it is safe to re-arm the reserve.
+    if (type == ERROR_CALLSTACK_OVERFLOW)
+      vm->ctx->callstack_seg->set_border_locked(true);
+#endif
     cell number = vm->from_unsigned_cell(vm->signal_fault_addr);
     vm->general_error(type, number, false_object);
   }

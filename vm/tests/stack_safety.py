@@ -3,6 +3,7 @@
 """Subprocess regressions for VM type errors and small callstacks (#1279/#1419)."""
 
 import argparse
+import os
 from pathlib import Path
 import subprocess
 import unittest
@@ -144,10 +145,29 @@ class StackSafetyTests(unittest.TestCase):
             """
         )
 
+    def test_overflow_recovery_without_gc(self):
+        # GC also restores stack guards. Recovery must re-arm them itself,
+        # including on Windows where PAGE_GUARD is cleared on access.
+        self.run_factor(
+            PRELUDE
+            + """
+            20 [
+                [ 100000 depth drop "missing overflow" throw ]
+                [ check-overflow ] recover
+            ] times
+            100 depth 100 assert=
+            compact-gc
+            "STACK-SAFETY-PASS" print 0 exit
+            """
+        )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--factor", type=Path, default=ROOT / "factor")
+    parser.add_argument(
+        "--factor", type=Path,
+        default=ROOT / ("factor.com" if os.name == "nt" else "factor"),
+    )
     parser.add_argument("--image", type=Path, default=ROOT / "factor.image")
     parser.add_argument("--timeout", type=float, default=60)
     OPTIONS, test_args = parser.parse_known_args()
