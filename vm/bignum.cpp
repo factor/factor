@@ -334,8 +334,11 @@ bignum* factor_vm::bignum_remainder(bignum* numerator, bignum* denominator) {
     if (n < (type) 0 && n == (type) -1)                               \
       return (BIGNUM_ONE(1));                                         \
     {                                                                 \
-      utype accumulator =                                             \
-          ((negative_p = n < (type) 0) ? -n : n);                     \
+      /* The magnitude of the signed minimum requires unsigned negation. */ \
+      negative_p = n < (type) 0;                                     \
+      utype accumulator = static_cast<utype>(n);                     \
+      if (negative_p)                                                \
+        accumulator = utype(0) - accumulator;                       \
       if (accumulator < BIGNUM_RADIX)                                 \
       {                                                               \
         bignum* result = allot_bignum(1, negative_p);                 \
@@ -416,8 +419,9 @@ FOO_TO_BIGNUM_UNSIGNED(uint32, uint32_t, uint32_t)
       bignum_digit_type* scan = (start + (BIGNUM_LENGTH(bn)));             \
       while (start < scan)                                                 \
         accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));  \
-      return ((BIGNUM_NEGATIVE_P(bn)) ? ((type)(-(stype) accumulator))     \
-                                      : accumulator);                      \
+      if (BIGNUM_NEGATIVE_P(bn))                                         \
+        accumulator = utype(0) - accumulator;                           \
+      return static_cast<type>(accumulator);                            \
     }                                                                      \
   }
 
