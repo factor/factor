@@ -97,6 +97,25 @@ all-simd-classes [
     multiply-add-matches?
 ] unit-test
 
+! The documented byte-array permutation form must reach the byte shuffle,
+! preserving the input vector type and rejecting incorrectly sized masks.
+{ int-4{ 42 69 13 911 } } [
+    int-4{ 69 42 911 13 }
+    B{ 4 5 6 7 0 1 2 3 12 13 14 15 8 9 10 11 }
+    [ { int-4 byte-array } declare vshuffle ] compile-call
+] unit-test
+
+{ int-4{ 42 69 13 911 } } [
+    int-4{ 69 42 911 13 }
+    B{ 4 5 6 7 0 1 2 3 12 13 14 15 8 9 10 11 }
+    t "always-inline-simd-intrinsics" [
+        [ { int-4 byte-array } declare vshuffle ] compile-call
+    ] with-variable
+] unit-test
+
+[ int-4{ 1 2 3 4 } B{ 0 } vshuffle ] [ bad-simd-vector? ] must-fail-with
+[ int-4{ 1 2 3 4 } 17 <byte-array> vshuffle ] [ bad-simd-vector? ] must-fail-with
+
 ! Dot products accumulate scalar products rather than wrapping integer lanes.
 ! Compare all representations, including half/bfloat, with exact small sums.
 :: dot-matches? ( a b expected -- ? )
