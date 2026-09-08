@@ -153,6 +153,17 @@ qux = 456
 ]=] toml>
 ] unit-test
 
+{ LH{ { "empty" LH{ } } } } [ "empty = {}" toml> ] unit-test
+
+{
+    LH{
+        { "point" LH{
+            { "coords" LH{ { "x" 1 } { "y" 2 } } }
+            { "label" "p" }
+        } }
+    }
+} [ "point = { coords.x = 1, coords.y = 2, label = 'p' }" toml> ] unit-test
+
 ! TESTS FROM 1.0.0 SPEC
 
 ! Comments

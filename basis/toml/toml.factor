@@ -235,12 +235,13 @@ DEFER: key-value-parser
 : inline-table-parser ( -- parser )
     [
         "{" token hide ,
-        inline-table-key-value separator list-of ,
+        inline-table-key-value separator list-of optional [ { } or ] action ,
         separator optional hide ,
         ws-comment-newline hide ,
         "}" token hide ,
     ] seq* [
-        first [ length <hashtable> <linked-assoc> ] keep [ update-toml ] each
+        first [ length <hashtable> <linked-assoc> dup ] keep
+        [ update-toml ] each drop
     ] action ;
 
 : value-parser ( -- parser )
