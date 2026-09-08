@@ -5,7 +5,7 @@ compiler.cfg.register-allocation.chordal
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.registers compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.codegen compiler.units cpu.architecture
-kernel locals namespaces sequences sorting tools.test words ;
+hashtables kernel locals namespaces sequences sorting tools.test words ;
 IN: compiler.cfg.register-allocation.chordal.bases.tests
 
 :: derived-diamond ( mixed? -- cfg join call )
