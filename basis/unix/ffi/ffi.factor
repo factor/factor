@@ -53,7 +53,7 @@ LIBRARY: libc
 STRUCT: group
     { gr_name c-string }
     { gr_passwd c-string }
-    { gr_gid int }
+    { gr_gid gid_t }
     { gr_mem c-string* } ;
 
 STRUCT: protoent
@@ -126,7 +126,7 @@ FUNCTION: int setpriority ( int which, id_t who, int prio )
 FUNCTION: int getrusage ( int who, rusage* r_usage )
 FUNCTION: group* getgrent ( )
 FUNCTION: void endgrent ( )
-FUNCTION: int gethostname ( c-string name, int len )
+FUNCTION: int gethostname ( c-string name, size_t len )
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len )
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len )
 FUNCTION: protoent* getprotobyname ( c-string name )
@@ -193,8 +193,8 @@ FUNCTION: int setuid ( uid_t uid )
 FUNCTION: int socket ( int domain, int type, int protocol )
 FUNCTION: int symlink ( c-string path1, c-string path2 )
 FUNCTION: int link ( c-string path1, c-string path2 )
-FUNCTION: int ftruncate ( int fd, int length )
-FUNCTION: int truncate ( c-string path, int length )
+FUNCTION: int ftruncate ( int fd, off_t length )
+FUNCTION: int truncate ( c-string path, off_t length )
 FUNCTION: int unlink ( c-string path )
 FUNCTION: int utimes ( c-string path, timeval[2] times )
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes )
