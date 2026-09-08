@@ -17,14 +17,16 @@ C-LIBRARY: gdk-pixbuf {
     { unix "libgdk_pixbuf-2.0.so" }
 }
 
+! Keep manual bindings out of GIR generation so reload preserves word identity.
+SKIP-DEFINITIONS: gdk_pixbuf_get_pixels gdk_pixbuf_new_from_data
+gdk_pixbuf_save_to_bufferv ;
+
 GIR: vocab:gir/GdkPixbuf-2.0.gir
 
 ! <workaround incorrect return-values in gir
 
-FORGET: gdk_pixbuf_get_pixels
 FUNCTION: guint8* gdk_pixbuf_get_pixels ( GdkPixbuf* pixbuf )
 
-FORGET: gdk_pixbuf_new_from_data
 FUNCTION: GdkPixbuf* gdk_pixbuf_new_from_data ( guint8* data,
                                                 GdkColorspace colorspace,
                                                 gboolean has_alpha,
@@ -35,7 +37,6 @@ FUNCTION: GdkPixbuf* gdk_pixbuf_new_from_data ( guint8* data,
                                                 GdkPixbufDestroyNotify destroy_fn,
                                                 gpointer destroy_fn_data )
 
-FORGET: gdk_pixbuf_save_to_bufferv
 FUNCTION: gboolean gdk_pixbuf_save_to_bufferv ( GdkPixbuf* pixbuf,
                                                 guint8** data,
                                                 gsize* buffer_size,
