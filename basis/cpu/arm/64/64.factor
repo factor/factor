@@ -388,7 +388,7 @@ M:: arm.64 %shuffle-vector-imm ( DST SRC shuffle rep -- )
 
 M:: arm.64 %shuffle2-vector-imm ( DST SRC1 SRC2 shuffle rep -- )
     rep rep-length :> lanes
-    shuffle [| index i |
+    shuffle lanes head-slice [| index i |
         index lanes 2 * 1 - bitand :> lane
         fp-temp i rep >size <vector-element>
         lane lanes < SRC1 SRC2 ? lane lanes mod rep >size <vector-element> INS
