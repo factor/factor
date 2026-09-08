@@ -40,7 +40,6 @@ PRIVATE>
         needs-dominance
         construct-cssa
         compute-defs
-        compute-insns
         compute-live-sets
         compute-live-ranges
         coalesce-cfg

@@ -67,7 +67,8 @@ M: ##add-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
 
 M: ##sub-imm lookup-base-pointer* nip src1>> lookup-base-pointer ;
 
-M: ##parallel-copy lookup-base-pointer* values>> value-at ;
+M: ##parallel-copy lookup-base-pointer*
+    values>> at lookup-base-pointer ;
 
 M: ##add lookup-base-pointer*
     ! If both operands have a base pointer, then the user better
