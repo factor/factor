@@ -1,7 +1,8 @@
 # master-candidate validation — 2026-09-08
 
-Code snapshot: `c458cd155876cf3ec9870e95f6d7de4c476051f2` on `master-candidate`.
-The 21 code/test/documentation commits are listed in `fix-commits.txt`.
+Full-sweep code snapshot: `c458cd155876cf3ec9870e95f6d7de4c476051f2` on `master-candidate`.
+The 21 code/test/documentation commits in that snapshot are listed in
+`fix-commits.txt`. The later stack-pointer correction is recorded below.
 `final-source-manifest.json` verifies that all 49 changed files match the
 committed snapshot in both final validation worktrees.
 
@@ -60,7 +61,29 @@ The final x64 sweep additionally exposed two `unix.signals` timeouts after
 sampling-profiler tests. A focused profiler→signals sequence reproduces these,
 and a separate diagnostic reproduced a Rosetta failure restoring general
 register state (`unable to set arm gpr state`). Follow-up validation of the
-POSIX signal path is in progress; the completed sweep above is not green.
+POSIX signal path completed, but did not establish a safe workaround; the
+completed sweep above is not green.
+
+### Follow-up signal investigation
+
+- `e063144be6` corrects `UAP_STACK_POINTER` to read the interrupted SP from
+  the saved registers. `uc_stack.ss_sp` describes the alternate signal stack.
+- An experimental POSIX-only x64 build passed all five stack-safety tests
+  (284.99 s, `posix-stack-safety.log`) and one complete profiler→signals run
+  (`signals-profile-posix.log`).
+- Native ARM64 with the corrected macro passed profiler→signals, with zero
+  test failures and compiler errors (`signals-auto-arm.log`).
+- A subsequent POSIX-only x64 run passed signal delivery but failed two
+  profiler tests: a callstack overflow and a missing-sample expectation
+  (`signals-auto-x64.log`). Another diagnostic run also missed a sample.
+  Automatic POSIX selection under Rosetta was therefore **not committed**.
+  The existing Mach handler remains enabled.
+- The full suites above predate the isolated stack-pointer correction. The
+  launchers still use their fully swept VM binaries. No second full sweep
+  is claimed for the follow-up.
+
+The two signal timeouts and intermittent Rosetta profiler behavior remain
+unresolved. Experiments and logs are retained for further investigation.
 
 ## Additional independent checks
 
@@ -119,8 +142,8 @@ limitation is not hidden by changing or disabling Factor's tests.
   bottle hashes verified and PCRE2/libjpeg source builds retained. Native
   ARM64 uses the existing Homebrew installation.
 - Database tests use separate local PostgreSQL clusters on ports 64578 and
-  64579 so the two suites do not share test databases. The ARM64 test cluster
-  was stopped after its completed sweep.
+  64579 so the two suites do not share test databases. Both test clusters
+  were stopped after validation.
 
 Native Windows/UCRT, Linux32/VMware, and physical Intel hardware have not been
 executed here. Their regression tests remain enabled for subsequent builders.
