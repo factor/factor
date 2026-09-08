@@ -86,6 +86,11 @@ if a.require_small:
 fixture = out / 'libfactor-ffi-test.so'
 original = root / 'libfactor-ffi-test.so'
 backup = out / 'original-fixture.so'
+default_image = root / 'factor.image'
+image_backup = out / 'original-factor.image'
+install_image = Path(a.image).resolve() != default_image.resolve()
+if install_image and default_image.exists():
+    shutil.copy2(default_image, image_backup)
 if original.exists():
     shutil.copy2(original, backup)
 env = os.environ.copy()
@@ -94,6 +99,8 @@ env['TMPDIR'] = str(out / 'tmp')
 env['FACTOR_REQUIRE_SMALL_FLOATS'] = '1' if a.require_small else '0'
 factor = ['./factor', '-resource-path=' + str(root), '-i=' + a.image, '-no-user-init', '-no-monitors']
 try:
+    if install_image:
+        shutil.copy2(a.image, default_image)
     built = run('fixture', [a.cc, *flags, '-shared', '-Wl,-z,defs', 'vm/ffi_test.c', '-lm', '-o', str(fixture)])
     run('assembly', [a.cc, *flags, '-S', 'vm/ffi_test.c', '-o', str(out / 'fixture.s')])
     for defect in ['uint_callback', 'array_struct', 'fp_status']:
@@ -159,6 +166,11 @@ try:
             if 'Required half/BF16 fixtures unavailable' not in (out / 'negative-unavailable.log').read_text():
                 raise RuntimeError('Unavailable fixture control failed for an unrelated reason')
 finally:
+    if install_image:
+        if image_backup.exists():
+            shutil.copy2(image_backup, default_image)
+        elif default_image.exists():
+            default_image.unlink()
     if backup.exists():
         shutil.copy2(backup, original)
     elif original.exists():
