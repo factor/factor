@@ -8,6 +8,21 @@ IN: alien.data.tests
 { -1 } [ -1 c:short <ref> c:short deref ] unit-test
 { -1 } [ -1 c:int <ref> c:int deref ] unit-test
 
+! Boxing signed minima must not negate them in the signed C++ type.
+{ -2147483648 } [ -2147483648 c:int <ref> c:int deref ] unit-test
+{ -9223372036854775808 } [
+    -9223372036854775808 c:longlong <ref> c:longlong deref
+] unit-test
+{ -9223372036854775807 } [
+    -9223372036854775807 c:longlong <ref> c:longlong deref
+] unit-test
+{ 9223372036854775807 } [
+    9223372036854775807 c:longlong <ref> c:longlong deref
+] unit-test
+{ 18446744073709551615 } [
+    18446744073709551615 c:ulonglong <ref> c:ulonglong deref
+] unit-test
+
 ! I don't care if this throws an error or works, but at least
 ! it should be consistent between platforms
 { -1 } [ -1.0 c:int <ref> c:int deref ] unit-test
