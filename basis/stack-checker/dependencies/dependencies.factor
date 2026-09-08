@@ -143,7 +143,12 @@ TUPLE: depends-on-struct-slots class slots ;
 SLOT: fields
 
 M: depends-on-struct-slots satisfied?
-    [ class>> "c-type" word-prop fields>> ] [ slots>> ] bi eq? ;
+    ! Redefining or forgetting a struct can remove its class or C type.
+    {
+        [ class>> tuple-class? ]
+        [ class>> "c-type" word-prop >boolean ]
+        [ [ class>> "c-type" word-prop fields>> ] [ slots>> ] bi eq? ]
+    } 1&& ;
 
 TUPLE: depends-on-custom-inlining word quot ;
 
