@@ -1,15 +1,25 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types combinators
+USING: accessors alien.c-types arrays combinators
 combinators.short-circuit compiler.cfg.instructions
 compiler.cfg.utilities compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.folding
 compiler.cfg.value-numbering.math
 compiler.cfg.value-numbering.rewrite cpu.architecture
-endian generalizations grouping kernel make math sequences ;
+endian generalizations grouping kernel locals make math sequences ;
 IN: compiler.cfg.value-numbering.simd
 
-! Some lame constant folding for SIMD intrinsics. Eventually this
-! should be redone completely.
+! Fold literal lanes and compose shuffles. Narrowing a scalar to binary32
+! must remain at runtime unless its FP-environment behavior is preserved.
+
+: scalar-literal? ( insn rep -- ? )
+    {
+        { float-4-rep [
+            { [ ##load-reference? ] [ obj>> float? ] [ obj>> exact-single? ] } 1&&
+        ] }
+        { double-2-rep [ { [ ##load-reference? ] [ obj>> float? ] } 1&& ] }
+        [ drop ##load-integer? ]
+    } case ;
 
 : useless-shuffle-vector-imm? ( insn -- ? )
     [ shuffle>> ] [ rep>> rep-length <iota> ] bi sequence= ;
@@ -53,7 +63,7 @@ M: ##shuffle-vector-imm rewrite
 
 M: ##scalar>vector rewrite
     dup src>> vreg>insn {
-        { [ dup literal-insn? ] [ fold-scalar>vector ] }
+        { [ 2dup swap rep>> scalar-literal? ] [ fold-scalar>vector ] }
         { [ dup ##vector>scalar? ] [ [ dst>> ] [ src>> ] bi* <copy> ] }
         [ 2drop f ]
     } cond ;
@@ -63,11 +73,11 @@ M: ##scalar>vector rewrite
     src1 src2 [ insn rep>> scalar-value ] bi@ append
     ##load-reference new-insn ;
 
-: rewrite-gather-vector-2 ( insn -- insn/f )
-    dup [ src1>> vreg>insn ] [ src2>> vreg>insn ] bi {
-        { [ 2dup [ literal-insn? ] both? ] [ fold-gather-vector-2 ] }
-        [ 3drop f ]
-    } cond ;
+:: rewrite-gather-vector-2 ( insn -- insn/f )
+    insn src1>> vreg>insn :> src1
+    insn src2>> vreg>insn :> src2
+    src1 src2 [ insn rep>> scalar-literal? ] both?
+    [ insn src1 src2 fold-gather-vector-2 ] [ f ] if ;
 
 M: ##gather-vector-2 rewrite rewrite-gather-vector-2 ;
 
@@ -81,12 +91,11 @@ M: ##gather-int-vector-2 rewrite rewrite-gather-vector-2 ;
     ] B{ } make
     ##load-reference new-insn ;
 
-: rewrite-gather-vector-4 ( insn -- insn/f )
-    dup { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave [ vreg>insn ] 4 napply
-    {
-        { [ 4dup [ literal-insn? ] 4 napply and and and ] [ fold-gather-vector-4 ] }
-        [ 5drop f ]
-    } cond ;
+:: rewrite-gather-vector-4 ( insn -- insn/f )
+    insn { [ src1>> ] [ src2>> ] [ src3>> ] [ src4>> ] } cleave
+    4array [ vreg>insn ] map :> sources
+    sources [ insn rep>> scalar-literal? ] all?
+    [ insn sources first4 fold-gather-vector-4 ] [ f ] if ;
 
 M: ##gather-vector-4 rewrite rewrite-gather-vector-4 ;
 

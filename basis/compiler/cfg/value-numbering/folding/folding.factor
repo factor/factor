@@ -2,8 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
-compiler.cfg.value-numbering.rewrite kernel layouts math
-math.bitwise ;
+compiler.cfg.value-numbering.rewrite kernel layouts locals math
+math.bitwise math.order ;
 IN: compiler.cfg.value-numbering.folding
 
 : binary-constant-fold? ( insn -- ? )
@@ -24,16 +24,39 @@ M: ##shl-imm binary-constant-fold* drop shift ;
 : binary-constant-fold ( insn -- insn' )
     [ dst>> ]
     [ [ src1>> vreg>integer ] [ src2>> ] [ ] tri binary-constant-fold* ] bi
-    ##load-integer new-insn ; inline
+    ! Machine arithmetic wraps at the target width, even though the
+    ! compiler evaluates it with arbitrary-precision Factor integers.
+    cell-bits >signed ##load-integer new-insn ; inline
 
-: unary-constant-fold? ( insn -- ? )
-    src>> vreg>insn ##load-integer? ; inline
+GENERIC: unary-constant-fold? ( insn -- ? )
+
+M: insn unary-constant-fold?
+    src>> vreg>insn ##load-integer? ;
+
+M: ##integer>float unary-constant-fold?
+    ! Inexact conversions must honor runtime rounding modes and exception flags.
+    dup call-next-method [
+        src>> vreg>integer abs 0x20000000000000 <=
+    ] [ drop f ] if ;
 
 GENERIC: unary-constant-fold* ( x insn -- y )
 
 M: ##not unary-constant-fold* drop bitnot ;
 M: ##neg unary-constant-fold* drop neg ;
+M: ##integer>float unary-constant-fold* drop >float ;
 
 : unary-constant-fold ( insn -- insn' )
     [ dst>> ] [ [ src>> vreg>integer ] [ ] bi unary-constant-fold* ] bi
-    ##load-integer new-insn ; inline
+    dup float?
+    [ ##load-reference new-insn ]
+    [ cell-bits >signed ##load-integer new-insn ] if ; inline
+
+:: exact-single? ( x -- ? )
+    ! Check the binary64 encoding without performing a narrowing conversion.
+    ! Keep subnormals and NaNs at runtime: denormal modes and signaling NaN
+    ! behavior can affect their conversion even when rounding is exact.
+    x double>bits 0x7fffffffffffffff bitand :> encoding
+    encoding 0 = encoding 0x7ff0000000000000 = or [ t ] [
+        encoding -52 shift 1023 - -126 127 between?
+        encoding 29 bits zero? and
+    ] if ;

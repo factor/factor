@@ -12,7 +12,6 @@ compiler.tree.identities
 compiler.tree.def-use
 compiler.tree.dead-code
 compiler.tree.modular-arithmetic
-compiler.tree.float-conversions
 compiler.tree.finalization
 compiler.tree.checker ;
 IN: compiler.tree.optimizer
@@ -38,7 +37,6 @@ SYMBOL: check-optimizer?
         compute-def-use
         remove-dead-code
         ?check
-        fold-literal-float-conversions
         compute-def-use
         optimize-modular-arithmetic
         finalize

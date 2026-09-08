@@ -1,1 +1,0 @@
-Fold exact float conversions across literal selections
