@@ -2,7 +2,8 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg compiler.cfg.debugger
 compiler.cfg.finalization compiler.cfg.instructions compiler.cfg.linearization
-compiler.cfg.optimizer compiler.cfg.utilities compiler.codegen kernel
+compiler.cfg.optimizer compiler.cfg.register-allocation
+compiler.cfg.utilities compiler.codegen kernel
 locals namespaces prettyprint sequences tools.time words ;
 IN: compiler.cfg.metrics
 
@@ -62,9 +63,17 @@ ERROR: unrecognized-pass-pipeline word ;
         [ word/quot test-builder ] benchmark :> ( cfgs ns )
         cfgs [ measure-cfg ] map :> procedures
         word/quot unparse :> input
+        current-register-allocator unparse :> allocator
         H{
             { "input" input }
+            { "allocator" allocator }
             { "frontend-nanoseconds" ns }
             { "procedures" procedures }
         }
     ] with-scope ;
+
+:: compare-allocators ( word/quot allocators -- reports )
+    allocators [| allocator |
+        allocator register-allocator
+        [ word/quot measure-compilation ] with-variable
+    ] map ;
