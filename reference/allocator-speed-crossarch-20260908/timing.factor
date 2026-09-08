@@ -65,10 +65,18 @@ CONSTANT: batch-counts H{
         "background policy changed during sample" "reason" pick set-at emit
         word trial sample
     ] if ;
+:: optional-flag ( index name vocab -- enabled )
+    command-line get :> args
+    args length index > [ index args nth "on" = ] [ f ] if :> enabled
+    name vocab lookup-word :> key
+    key [ enabled key namespaces:set ] [ enabled f assert= ] if
+    enabled ;
 :: main ( -- )
     command-line get first :> allocator
     command-line get second "check" = :> checked
     allocator select-allocator
+    3 "rematerialize-constants?" "compiler.cfg.register-allocation.rematerialization" optional-flag :> rematerialize
+    4 "backtracking-loop-spills?" "compiler.cfg.register-allocation.backtracking" optional-flag :> loop-spills
     checked check-allocation? namespaces:set
     checked check-ssa? namespaces:set
     f global-value-numbering? namespaces:set
@@ -77,6 +85,8 @@ CONSTANT: batch-counts H{
     H{ } clone "scope" "kind" pick set-at
     allocator "allocator" pick set-at
     checked "checked" pick set-at
+    H{ { "rematerialize_constants" rematerialize }
+       { "backtracking_loop_spills" loop-spills } { "gvn" f } } "options" pick set-at
     selected [ [ word-id ] [ number>string ] bi* "|" glue ] map-index "words" pick set-at emit
     compiler_foreground 0 assert=
     compiler_instructions :> before

@@ -32,7 +32,8 @@ processes to logical CPU 2. The machine is shared: affinity does not reserve a
 core or prevent contention. Existing other jobs are left untouched.
 
 Linux retired-instruction counters use a per-thread `perf_event_open` hardware
-counter with kernel/hypervisor excluded. `CAP_PERFMON` is granted only to the
+counter with kernel/hypervisor excluded. The counter is pinned to avoid
+silent multiplexing; an unavailable counter causes a failed read and abort. `CAP_PERFMON` is granted only to the
 isolated Factor executable because the existing host policy
 `perf_event_paranoid=4` blocks unprivileged access. No global kernel policy is
 changed. Counter open/read failure aborts, rather than silently producing zeros.
@@ -64,3 +65,26 @@ records artifact hashes and machine/compiler information.
 The default remains linear scan. Measurements, including compile regressions and
 per-workload tradeoffs, must be assessed on both architectures before proposing
 any default change.
+
+## Final paired protocol
+
+`pair.py BASELINE_ROOT CANDIDATE_ROOT --rounds 2 --samples 3
+--linear-scan-remat-attribution` alternates separate source roots and frozen
+images for each allocator. Round 2 reverses revision order and rotates allocator
+order. Baseline flags are disabled (or absent); candidate rematerialization is
+explicitly enabled. Candidate loop-aware spills remain disabled unless explicitly
+requested. Every scope record stores the actual requested flags; requesting an
+enabled flag absent from that compiler fails immediately.
+
+The extra linear-scan attribution runs use candidate source with rematerialization
+disabled, adjacent to the usual enabled candidate runs. Their label is `remat-off`
+and they do not enter the main candidate aggregate. Comparing `remat-off` to
+`candidate` isolates that feature with identical compiler source and closure.
+The main matrix contains 6 measured samples per workload/revision/allocator;
+these two additional processes add 6 rematerialization-off samples per workload.
+
+`prepare.py` retains an explicit resource root and reapplies external macOS
+foreground policy while preparing the image. Preparation is unranked; timing
+still uses the stricter in-process priority guards. Linux hardware counters are
+pinned in the final protocol. The preliminary source-233 counter was unpinned;
+its distinct library hash and known-bug results remain separate.

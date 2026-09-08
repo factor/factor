@@ -9,18 +9,22 @@ p=argparse.ArgumentParser()
 p.add_argument('label')
 p.add_argument('--mode',choices=['check','timing'],default='timing')
 p.add_argument('--rounds',type=int,default=1)
+p.add_argument('--round-offset',type=int,default=0)
 p.add_argument('--samples',type=int,default=3)
 p.add_argument('--allocator',choices=ALLOCATORS)
+p.add_argument('--rematerialize',choices=['on','off'],default='off')
+p.add_argument('--loop-spills',choices=['on','off'],default='off')
 p.add_argument('--image',default=str(OUT/'prepared.image'))
 p.add_argument('--cpu',default='2')
 a=p.parse_args()
 for r in range(1 if a.mode=='check' else a.rounds):
-    order=ALLOCATORS[r%4:]+ALLOCATORS[:r%4]
+    ordinal=r+a.round_offset
+    order=ALLOCATORS[ordinal%4:]+ALLOCATORS[:ordinal%4]
     if a.allocator: order=[a.allocator]
     for allocator in order:
-        name=f'{a.label}-{a.mode}-{allocator}-{r+1}'
+        name=f'{a.label}-{a.mode}-{allocator}-{ordinal+1}'
         log=OUT/(name+'.log')
-        cmd=[str(ROOT/'factor'),'-resource-path='+str(ROOT),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(OUT/'timing.factor'),allocator,a.mode,str(a.samples)]
+        cmd=[str(ROOT/'factor'),'-resource-path='+str(ROOT),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(OUT/'timing.factor'),allocator,a.mode,str(a.samples),a.rematerialize,a.loop_spills]
         if platform.system()=='Linux':cmd=['taskset','-c',a.cpu]+cmd
         print('START',name,flush=True)
         start=time.time()

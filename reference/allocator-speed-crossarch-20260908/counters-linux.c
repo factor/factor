@@ -14,6 +14,8 @@ __attribute__((constructor)) static void init_counter(void) {
   attr.type = PERF_TYPE_HARDWARE;
   attr.size = sizeof(attr);
   attr.config = PERF_COUNT_HW_INSTRUCTIONS;
+  /* Fail instead of silently multiplexing this single event. */
+  attr.pinned = 1;
   attr.exclude_kernel = 1;
   attr.exclude_hv = 1;
   counter_fd = syscall(SYS_perf_event_open, &attr, 0, -1, -1, 0);
