@@ -68,7 +68,7 @@ CONSTANT: bits>components {
     } cleave f f gdk_pixbuf_new_from_data ;
 
 : GdkPixbuf>byte-array ( GdkPixbuf type -- byte-array )
-    { void* int } [
+    { void* size_t } [
         rot f f
         { { pointer: GError initial: f } } [
             gdk_pixbuf_save_to_bufferv drop
