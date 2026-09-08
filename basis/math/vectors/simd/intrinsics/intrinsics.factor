@@ -49,21 +49,22 @@ IN: math.vectors.simd.intrinsics
         { longlong-2-rep [ double-2-rep ] }
     } case ; foldable
 
-: byte>rep-array ( byte-array rep -- array )
-    {
-        { char-16-rep      [ 16 c:char <c-direct-array>      ] }
-        { uchar-16-rep     [ 16 c:uchar <c-direct-array>     ] }
-        { short-8-rep      [  8 c:short <c-direct-array>     ] }
-        { ushort-8-rep     [  8 c:ushort <c-direct-array>    ] }
-        { int-4-rep        [  4 c:int <c-direct-array>       ] }
-        { uint-4-rep       [  4 c:uint <c-direct-array>      ] }
-        { longlong-2-rep   [  2 c:longlong <c-direct-array>  ] }
-        { ulonglong-2-rep  [  2 c:ulonglong <c-direct-array> ] }
-        { float-4-rep      [  4 c:float <c-direct-array>     ] }
-        { double-2-rep     [  2 c:double <c-direct-array>    ] }
-        { half-8-rep       [  8 half <c-direct-array>        ] }
-        { bfloat-8-rep     [  8 bfloat <c-direct-array>      ] }
-    } case ; inline
+! Dispatch on the representation before inlining element access. An unknown
+! representation must not expand every array type into each fallback caller.
+GENERIC: byte>rep-array ( byte-array rep -- array )
+
+M: char-16-rep byte>rep-array drop 16 c:char <c-direct-array> ; inline
+M: uchar-16-rep byte>rep-array drop 16 c:uchar <c-direct-array> ; inline
+M: short-8-rep byte>rep-array drop 8 c:short <c-direct-array> ; inline
+M: ushort-8-rep byte>rep-array drop 8 c:ushort <c-direct-array> ; inline
+M: int-4-rep byte>rep-array drop 4 c:int <c-direct-array> ; inline
+M: uint-4-rep byte>rep-array drop 4 c:uint <c-direct-array> ; inline
+M: longlong-2-rep byte>rep-array drop 2 c:longlong <c-direct-array> ; inline
+M: ulonglong-2-rep byte>rep-array drop 2 c:ulonglong <c-direct-array> ; inline
+M: float-4-rep byte>rep-array drop 4 c:float <c-direct-array> ; inline
+M: double-2-rep byte>rep-array drop 2 c:double <c-direct-array> ; inline
+M: half-8-rep byte>rep-array drop 8 half <c-direct-array> ; inline
+M: bfloat-8-rep byte>rep-array drop 8 bfloat <c-direct-array> ; inline
 
 : >rep-array ( seq rep -- array )
     {
