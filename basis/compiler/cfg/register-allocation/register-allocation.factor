@@ -1,10 +1,14 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: compiler.cfg.linear-scan compiler.cfg.ssa.destruction
-kernel namespaces ;
+USING: compiler.cfg.linear-scan compiler.cfg.linear-scan.allocation.state
+compiler.cfg.ssa.destruction kernel namespaces ;
 IN: compiler.cfg.register-allocation
 
 SYMBOL: register-allocator
+
+! Loading compiler.cfg.register-allocation.verifier installs the optional
+! final-machine checker. Default bootstrap does not load that vocabulary.
+SYMBOL: allocation-verifier
 
 SINGLETON: linear-scan-allocator
 
@@ -26,4 +30,5 @@ M: linear-scan-allocator allocate-cfg
     drop dup destruct-ssa linear-scan ;
 
 : allocate-registers ( cfg -- )
-    current-register-allocator allocate-cfg ;
+    check-allocation? get [ allocation-verifier get ] [ f ] if
+    [ call( cfg -- ) ] [ current-register-allocator allocate-cfg ] if* ;
