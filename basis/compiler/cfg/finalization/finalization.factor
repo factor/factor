@@ -1,8 +1,8 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: compiler.cfg.build-stack-frame compiler.cfg.gc-checks
-compiler.cfg.linear-scan compiler.cfg.representations
-compiler.cfg.save-contexts compiler.cfg.ssa.destruction
+compiler.cfg.register-allocation compiler.cfg.representations
+compiler.cfg.save-contexts
 compiler.cfg.stacks.clearing compiler.cfg.utilities
 compiler.cfg.write-barrier ;
 IN: compiler.cfg.finalization
@@ -14,7 +14,6 @@ IN: compiler.cfg.finalization
         eliminate-write-barriers
         clear-uninitialized
         insert-save-contexts
-        destruct-ssa
-        linear-scan
+        allocate-registers
         build-stack-frame
     } apply-passes ;
