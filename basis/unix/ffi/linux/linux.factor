@@ -4,7 +4,10 @@ USING: alien.c-types alien.syntax classes.struct kernel system
 unix.time unix.types ;
 IN: unix.ffi
 
-CONSTANT: MAXPATHLEN 1024
+CONSTANT: MAXPATHLEN 4096
+
+FUNCTION: int getgrouplist ( c-string name, gid_t basegid, gid_t* groups, int* ngroups )
+FUNCTION: int setgroups ( size_t ngroups, gid_t* gidset )
 
 CONSTANT: O_RDONLY   0x0000
 CONSTANT: O_WRONLY   0x0001
@@ -30,7 +33,8 @@ CONSTANT: SO_DONTROUTE 5
 CONSTANT: SO_BROADCAST 6
 CONSTANT: SO_SNDBUF 7
 CONSTANT: SO_RCVBUF 8
-CONSTANT: SO_KEEPALINE 9
+CONSTANT: SO_KEEPALIVE 9
+ALIAS: SO_KEEPALINE SO_KEEPALIVE
 CONSTANT: SO_OOBINLINE 10
 CONSTANT: SO_SNDTIMEO 0x15
 CONSTANT: SO_RCVTIMEO 0x14
@@ -115,7 +119,7 @@ STRUCT: dirent
     { d_type uchar }
     { d_name char[256] } ;
 
-FUNCTION: int open64 ( c-string path, int flags, int prot )
+FUNCTION: int open64 ( c-string path, int flags, ... int prot )
 FUNCTION: dirent* readdir64 ( DIR* dirp )
 FUNCTION: int readdir64_r ( void* dirp, dirent* entry, dirent** result )
 

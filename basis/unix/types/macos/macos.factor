@@ -1,6 +1,8 @@
 USING: alien.syntax alien.c-types ;
 IN: unix.types
 
+TYPEDEF: long clockid_t
+
 ! Darwin 9.1.0
 
 TYPEDEF: ushort   __uint16_t

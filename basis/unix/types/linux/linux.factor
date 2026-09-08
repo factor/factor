@@ -1,6 +1,8 @@
 USING: alien.syntax alien.c-types classes.struct layouts literals math ;
 IN: unix.types
 
+TYPEDEF: int clockid_t
+
 TYPEDEF: ulonglong __uquad_type
 TYPEDEF: ulong     __ulongword_type
 TYPEDEF: long      __sword_type

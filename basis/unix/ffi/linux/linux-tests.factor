@@ -3,6 +3,7 @@ unix.ffi ;
 IN: unix.ffi.linux.tests
 
 { 16 4 } [ sockaddr-in heap-size sockaddr-in c-type-align ] unit-test
+{ 4096 4096 9 } [ MAXPATHLEN PATH_MAX SO_KEEPALIVE ] unit-test
 
 cpu x86? [
     { 384 4 } [ utmpx heap-size utmpx c-type-align ] unit-test

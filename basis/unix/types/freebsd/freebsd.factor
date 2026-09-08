@@ -1,6 +1,8 @@
 USING: alien.syntax alien.c-types ;
 IN: unix.types
 
+TYPEDEF: long clockid_t
+
 TYPEDEF: ushort   __uint16_t
 TYPEDEF: uint     __uint32_t
 TYPEDEF: int      __int32_t

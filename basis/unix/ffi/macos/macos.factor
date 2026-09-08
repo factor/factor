@@ -3,6 +3,9 @@ classes.struct combinators kernel system unix unix.time
 unix.types vocabs vocabs.loader ;
 IN: unix.ffi
 
+FUNCTION: int getgrouplist ( c-string name, int basegid, int* groups, int* ngroups )
+FUNCTION: int setgroups ( int ngroups, gid_t* gidset )
+
 {
     { [ cpu x86? ] [ "unix.ffi.macos.x86" require ] }
     { [ cpu arm.64? ] [ "unix.ffi.macos.arm" require ] }
