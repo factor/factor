@@ -30,7 +30,7 @@ implements the algorithm proposed by its issue.
 | Fresh boot-image generation and bootstrap | Pass; 401.03 s | Pass; 164.90 s |
 | `load-all` | 3,403 vocabularies; 0 compiler errors; 1,080.27 s | 3,397 vocabularies; 0 compiler errors; 531.69 s |
 | `help-lint-all` | 0 failures; 26.48 s | 0 failures; 14.22 s |
-| Final `test-all` | Running; only the 26 known Rosetta FP-trap failures so far | **1,247 test files; 0 failures; 0 compiler errors**; 1,583.25 s |
+| Final `test-all` | 1,249 test files; 28 failures (26 FP traps, 2 signal timeouts); 0 compiler errors; 2,020.99 s | **1,247 test files; 0 failures; 0 compiler errors**; 1,583.25 s |
 | Final C++ stack safety, including GC at measured stack boundaries | All 5 tests pass; 192.70 s | All 5 tests pass; 104.12 s |
 
 Timings are observations from a shared, busy machine, not controlled performance
@@ -55,6 +55,12 @@ layout was corrected and the complete sweep restarted. Its partial log is
 `final-arm-test-all-before-bundle.log`; it is not a completed test result.
 The first final ARM help lint found an `fpow` output-name mismatch, fixed in
 `c458cd1558`; the recorded passing rerun includes that correction.
+
+The final x64 sweep additionally exposed two `unix.signals` timeouts after
+sampling-profiler tests. A focused profiler→signals sequence reproduces these,
+and a separate diagnostic reproduced a Rosetta failure restoring general
+register state (`unable to set arm gpr state`). Follow-up validation of the
+POSIX signal path is in progress; the completed sweep above is not green.
 
 ## Additional independent checks
 
