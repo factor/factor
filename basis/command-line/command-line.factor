@@ -44,10 +44,17 @@ SYMBOL: command-line
 : run-user-init ( -- )
     "~/.factor-rc" try-user-init ;
 
+<PRIVATE
+
+: load-vocab-roots-file ( path -- )
+    utf8-bom file-lines harvest [ add-vocab-root ] each ;
+
+PRIVATE>
+
 : load-vocab-roots ( -- )
     "user-init" get [
         "~/.factor-roots" [
-            utf8 file-lines harvest [ add-vocab-root ] each
+            load-vocab-roots-file
         ] when-file-exists
         "roots" get [
             os windows? ";" ":" ?

@@ -1,4 +1,28 @@
-USING: command-line namespaces tools.test ;
+USING: arrays command-line command-line.private io.encodings.utf8 io.files
+io.pathnames kernel namespaces sequences tools.test vocabs.loader ;
+
+! A UTF-8 BOM must not turn the first absolute root into a relative path.
+{ t } [
+    [
+        [ "resource:work" absolute-path "\r\n\r\n" append ] dip
+        [ utf8-bom set-file-contents ] keep
+        V{ } clone vocab-roots [
+            load-vocab-roots-file vocab-roots get
+            "resource:work" absolute-path 1array sequence=
+        ] with-variable
+    ] with-test-file
+] unit-test
+
+{ t } [
+    [
+        [ "resource:work" absolute-path "\n" append ] dip
+        [ utf8 set-file-contents ] keep
+        V{ } clone vocab-roots [
+            load-vocab-roots-file vocab-roots get
+            "resource:work" absolute-path 1array sequence=
+        ] with-variable
+    ] with-test-file
+] unit-test
 
 { f { "a" "b" "c" } } [
     { "factor" "-run=test-voc" "a" "b" "c" } parse-command-line
