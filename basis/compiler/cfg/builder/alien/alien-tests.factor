@@ -167,3 +167,35 @@ cpu x86.32?
     cdecl [ ] with-param-regs
     reg-values get stack-values get
 ] unit-test
+
+USING: compiler.cfg.builder.alien.boxing math.floats.small.c-types math.vectors.simd ;
+STRUCT: windows-vararg-pair { x double } { y double } ;
+STRUCT: windows-vararg-hfa { x double } { y double } { z double } ;
+
+: windows-vararg-layout ( types -- regs stack )
+    '[
+        t windows-arm64-varargs? [ _ unbox-parameters ] with-variable
+        (caller-parameters)
+    ] cdecl swap with-param-regs [ [ rest ] map ] bi@ ;
+
+cpu arm.64? [
+    { V{ { int-rep $[ X0 ] } { int-rep $[ X1 ] } { int-rep $[ X2 ] } { int-rep $[ X3 ] } } V{ } } [
+        { float double half bfloat } windows-vararg-layout
+    ] cfg-unit-test
+    { V{ { int-rep $[ X0 ] } { int-rep $[ X1 ] } { int-rep $[ X2 ] } } V{ } } [
+        { windows-vararg-pair windows-vararg-hfa } windows-vararg-layout
+    ] cfg-unit-test
+    { V{ { int-rep $[ X0 ] } { int-rep $[ X1 ] } { int-rep $[ X2 ] } { int-rep $[ X3 ] }
+         { int-rep $[ X4 ] } { int-rep $[ X5 ] } { int-rep $[ X6 ] } { int-rep $[ X7 ] } }
+      V{ { int-rep 0 8 } { int-rep 8 8 } } } [
+        { int int int int int int int windows-vararg-pair double }
+        windows-vararg-layout
+    ] cfg-unit-test
+    { V{ { int-rep $[ X0 ] } { int-rep $[ X1 ] } { int-rep $[ X2 ] } } V{ } } [
+        { int float-4 } windows-vararg-layout
+    ] cfg-unit-test
+    { { { int-rep f f 8 } } { { int-rep f f 2 } } } [
+        double base-type flatten-windows-vararg-type
+        half base-type flatten-windows-vararg-type
+    ] cfg-unit-test
+] when

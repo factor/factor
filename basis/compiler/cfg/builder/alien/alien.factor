@@ -42,11 +42,32 @@ SYMBOL: varargs-named-count
         '[ _ >= [ mark-vararg-group ] when ] map-index
     ] [ drop ] if ;
 
+! Windows passes every argument of a variadic signature through the GP
+! bank. Preserve floating-point payloads instead of converting numerically.
+:: windows-vararg-payload ( vreg rep -- vregs reps )
+    rep first :> representation
+    representation vector-rep? [
+        16 16 f ^^local-allot :> buffer
+        vreg buffer 0 representation f ##store-memory-imm,
+        buffer 0 int-rep f ^^load-memory-imm
+        buffer 8 int-rep f ^^load-memory-imm 2array
+        { { int-rep f f 8 } { int-rep f f 8 } }
+    ] [
+        representation reg-class-of float-regs eq? [
+            vreg representation ^^scalar>integer
+            int-rep f f rep param-natural-size 4array
+        ] [ vreg rep ] if [ 1array ] bi@
+    ] if ;
+
+: windows-vararg-parameters ( vregs reps -- vregs' reps' )
+    [ windows-vararg-payload ] 2 2 mnmap [ concat ] bi@ ;
+
 : unbox-parameters ( parameters -- vregs reps )
     [
         [ length <iota> <reversed> ] keep
         [ [ <ds-loc> peek-loc ] [ base-type ] bi* unbox-parameter ]
         2 2 mnmap mark-varargs [ concat ] bi@
+        windows-arm64-varargs? get [ windows-vararg-parameters ] when
     ]
     [ length neg <ds-loc> inc-stack ] bi ;
 
@@ -81,16 +102,20 @@ SYMBOL: varargs-named-count
 : (caller-parameters) ( vregs reps -- )
     [ caller-parameter ] 2each ;
 
+: windows-arm64-varargs-call? ( params -- ? )
+    varargs?>> >boolean os windows? cpu arm.64? and and ;
+
 : caller-parameters ( params -- reg-inputs stack-inputs )
     {
         [ abi>> ]
         [ ]
+        [ windows-arm64-varargs-call? ]
         [ parameters>> ]
         [ return>> ]
     } cleave
     '[
         _ handle-macos-arm64-varargs
-        _ unbox-parameters
+        _ windows-arm64-varargs? [ _ unbox-parameters ] with-variable
         _ prepare-struct-caller struct-return-area set
         (caller-parameters)
     ] with-param-regs ;
@@ -183,14 +208,29 @@ M: #alien-assembly emit-node
     [ [ [ dup prepare-parameter-group [ first3 ] [ param-natural-size ] bi callee-parameter ] map ] map ]
     [ [ keys ] map ] bi ;
 
-: box-parameters ( vregs reps params -- )
-    parameters>> [ base-type box-parameter ds-push ] 3each ;
+:: box-parameters ( vregs reps params -- )
+    params varargs?>> os windows? cpu arm.64? and and [
+        vregs reps params parameters>>
+        [ base-type box-windows-vararg-parameter ds-push ] 3each
+    ] [
+        vregs reps params parameters>> [ base-type box-parameter ds-push ] 3each
+    ] if ;
 
-: callee-parameters ( params -- vregs reps reg-outputs stack-outputs )
-    [ abi>> ] [ return>> ] [ parameters>> ] tri
-    '[
-        _ prepare-struct-callee struct-return-area set
-        _ [ base-type ] map (callee-parameters)
+:: named-callee-parameters ( params -- vregs reps )
+    params varargs?>> os windows? cpu arm.64? and and [
+        params parameters>> [ base-type flatten-windows-vararg-type ] map
+        [ [ [ dup prepare-parameter-group [ first3 ] [ param-natural-size ] bi callee-parameter ] map ] map ]
+        [ [ keys ] map ] bi
+    ] [ params parameters>> [ base-type ] map (callee-parameters) ] if ;
+
+:: callee-parameters ( params -- vregs reps layout reg-outputs stack-outputs )
+    params abi>> [
+        params return>> prepare-struct-callee struct-return-area set
+        params named-callee-parameters
+        params varargs?>> [
+            stack-params get 8 align
+            int-regs get length float-regs get length 3array
+        ] [ f ] if
     ] with-param-regs ;
 
 ! Calls emitted inside a callback have their own structure result areas.
@@ -207,12 +247,30 @@ SYMBOL: callback-struct-return-area
 : emit-callback-body ( block nodes -- block' )
     dup last #return? t assert= but-last emit-nodes ;
 
-: emit-callback-inputs ( params -- )
-    [
-        callee-parameters
-        struct-return-area get callback-struct-return-area set
-        ##callback-inputs,
-    ] keep box-parameters ;
+:: emit-va-cursor-inputs ( layout -- )
+    layout first3 :> ( stack-offset gp-left fp-left )
+    ^^callback-stack :> entry-sp
+    os windows? gp-left 0 > and
+    [ entry-sp gp-left 8 * ^^sub-imm ]
+    [ entry-sp stack-offset ^^add-imm ] if ^^box-alien ds-push
+    os linux? [
+        entry-sp ^^box-alien ds-push
+        entry-sp 64 ^^sub-imm ^^box-alien ds-push
+        gp-left -8 * ^^load-literal ds-push
+        fp-left -16 * ^^load-literal ds-push
+    ] [
+        f ^^load-literal ds-push f ^^load-literal ds-push
+        0 ^^load-literal ds-push 0 ^^load-literal ds-push
+    ] if ;
+
+:: emit-callback-inputs ( params -- )
+    params callee-parameters :> ( vregs reps layout reg-outputs stack-outputs )
+    struct-return-area get callback-struct-return-area set
+    reg-outputs stack-outputs layout [
+        [ first4 [ 192 + ] dip 4array ] map
+    ] when ##callback-inputs,
+    vregs reps params box-parameters
+    layout [ emit-va-cursor-inputs ] when* ;
 
 : callback-stack-cleanup ( params -- )
     [ xt>> ]

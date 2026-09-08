@@ -636,6 +636,8 @@ HOOK: %alien-assembly cpu ( varargs? reg-inputs stack-inputs
 
 HOOK: %callback-inputs cpu ( reg-outputs stack-outputs -- )
 
+HOOK: %callback-stack cpu ( dst -- )
+
 HOOK: %callback-outputs cpu ( reg-inputs -- )
 
 HOOK: stack-cleanup cpu ( stack-size return abi -- n )

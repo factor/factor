@@ -135,6 +135,12 @@ HELP: alien-callback
 }
 { $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-callback } " is not compiled." } ;
 
+HELP: alien-callback-varargs
+{ $values { "return" "a C return type" } { "named-parameters" "a sequence of named C parameter types" } { "abi" "a C calling convention" } { "quot" quotation } { "alien" alien } }
+{ $description "Defines an ARM64 variadic callback. The quotation receives the named parameters followed by one borrowed argument cursor. Use the words in " { $vocab-link "alien.varargs" } " to read, copy, or forward its position. All four constructor arguments must be compile-time literals, as for " { $link alien-callback } "." }
+{ $notes "The C caller determines the anonymous argument types and count. The cursor and its copies expire when the callback exits. Callback execution and error handling follow the ordinary callback rules. A runtime and image built with variadic callback support are required." }
+{ $see-also alien-callback alien-indirect-varargs } ;
+
 HELP: alien-assembly
 { $values { "args..." "zero or more objects passed to the C function" } { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $link cdecl } " or " { $link stdcall } } { "quot" quotation } { "return..." "the return value of the function, if not " { $link void } } }
 { $description
@@ -152,7 +158,7 @@ HELP: alien-assembly
 { $notes "C type names are documented in " { $link "c-types-specs" } "." }
 { $errors "Throws an " { $link callsite-not-compiled } " if the word calling " { $link alien-assembly } " is not compiled." } ;
 
-{ alien-invoke alien-indirect alien-assembly alien-callback } related-words
+{ alien-invoke alien-indirect alien-indirect-varargs alien-assembly alien-callback alien-callback-varargs } related-words
 
 ARTICLE: "alien-expiry" "Alien expiry"
 "When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."

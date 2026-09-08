@@ -300,6 +300,7 @@ CODEGEN: ##alien-invoke %alien-invoke
 CODEGEN: ##alien-indirect %alien-indirect
 CODEGEN: ##alien-assembly %alien-assembly
 CODEGEN: ##callback-inputs %callback-inputs
+CODEGEN: ##callback-stack %callback-stack
 CODEGEN: ##callback-outputs %callback-outputs
 
 CODEGEN: ##shl-vector-count %shl-vector-count

@@ -9,7 +9,9 @@
 #define FACTOR_FASTCALL(return_type) return_type
 #endif
 
-#if defined(__APPLE__)
+#if defined(_WIN32)
+#define FACTOR_EXPORT __declspec(dllexport)
+#elif defined(__APPLE__)
 #define FACTOR_EXPORT __attribute__((visibility("default")))
 #else
 #define FACTOR_EXPORT

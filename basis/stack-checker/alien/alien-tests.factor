@@ -1,8 +1,15 @@
 USING: accessors alien alien.c-types alien.private kernel
-kernel.private literals math namespaces stack-checker.alien
+kernel.private literals math namespaces sequences stack-checker.alien
 stack-checker.state stack-checker.values system threads.private
 tools.test ;
 IN: stack-checker.alien.tests
+
+! The internal callback entry carries the five native cursor fields. The
+! public quotation receives the single cursor constructed by its wrapper.
+{ 7 1 } [
+    alien-callback-params new int >>return { int double } >>parameters
+    t >>varargs? stack-shape
+] unit-test
 
 ! alien-inputs/outputs
 {
@@ -70,17 +77,9 @@ cpu arm.64? os macos? and [
 ] when
 
 USE: math.floats.small.c-types
-! Windows variadic functions carry FP parameters in integer registers.
-! Both named direct and unnamed indirect scalars must be rejected.
-[
-    alien-invoke-params new { half int } >>parameters 1 >>varargs?
-    check-windows-small-float-varargs
-] [ windows-small-float-varargs-unsupported? ] must-fail-with
-[
-    alien-indirect-params new { int bfloat } >>parameters 1 >>varargs?
-    check-windows-small-float-varargs
-] [ windows-small-float-varargs-unsupported? ] must-fail-with
-{ } [
-    alien-invoke-params new { half bfloat } >>parameters f >>varargs?
-    check-windows-small-float-varargs
+! Windows leaves half/BF16 payload types intact; argument allocation moves
+! them into GP registers for both named and anonymous arguments.
+{ t } [
+    alien-invoke-params new { half bfloat } >>parameters 1 >>varargs?
+    prepare-varargs parameters>> length 2 =
 ] unit-test

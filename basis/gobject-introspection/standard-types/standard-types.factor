@@ -2,6 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax
 classes.struct gobject-introspection.types kernel parser ;
+QUALIFIED: alien.varargs
 IN: gobject-introspection.standard-types
 
 <<
@@ -35,7 +36,7 @@ TYPEDEF: uintptr_t guintptr
 TYPEDEF: gulong GType
 TYPEDEF: void* gpointer
 TYPEDEF: guint32 gunichar
-TYPEDEF: void* va_list
+TYPEDEF: alien.varargs:va_list va_list
 
 int lookup-c-type clone
     [ >c-bool ] >>unboxer-quot

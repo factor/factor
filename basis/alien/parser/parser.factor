@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.enums alien.libraries
 arrays classes classes.parser combinators
 combinators.short-circuit compiler.units effects kernel lexer
 math namespaces parser sequences splitting summary vocabs.parser
-words ;
+vocabs vocabs.loader words ;
 IN: alien.parser
 
 SYMBOL: current-library
@@ -51,6 +51,7 @@ ERROR: bad-array-type ;
         "c-type"
         "callback-effect"
         "callback-library"
+        "callback-varargs"
     } remove-word-props ;
 
 ERROR: *-in-c-type-name name ;
@@ -160,6 +161,23 @@ ERROR: varargs-in-function-declaration ;
 : callback-quot ( return types abi -- quot )
     '[ [ _ _ _ ] dip alien-callback ] ;
 
+:: varargs-callback-quot ( return types abi named-count -- quot )
+    types named-count head :> named
+    types named-count tail :> tail
+    tail empty? [
+        '[ [ return named abi ] dip alien-callback-varargs ]
+    ] [
+        ! Loading the reader while alien.syntax itself loads would recurse
+        ! through alien.data and libc. Ordinary FUNCTION declarations must
+        ! be available before this optional callback reader is required.
+        "alien.varargs" require
+        "va-arg" "alien.varargs" lookup-word :> read-arg
+        tail [| type | type read-arg '[ dup _ @ swap ] ] map concat
+        [ drop ] append :> reader
+        '[ [ return named abi ] dip
+           [ reader ] dip compose alien-callback-varargs ]
+    ] if ;
+
 :: make-callback-type ( return function library types names -- word quot effect )
     function create-function :> type-word
     void* type-word typedef
@@ -167,8 +185,22 @@ ERROR: varargs-in-function-declaration ;
     type-word library "callback-library" set-word-prop
     type-word return types library library-abi callback-quot ( quot -- alien ) ;
 
+:: make-varargs-callback-type ( return function library types names named-count -- word quot effect )
+    named-count [
+        named-count types length =
+        [ names "args" suffix ] [ names ] if :> callback-names
+        return function library types callback-names make-callback-type
+        :> ( type-word old-quot effect )
+        old-quot drop
+        type-word named-count "callback-varargs" set-word-prop
+        type-word return types library library-abi named-count varargs-callback-quot effect
+    ] [
+        return function library types names make-callback-type
+    ] if ;
+
 : (CALLBACK:) ( -- word quot effect )
-    scan-function-name current-library get scan-c-args make-callback-type ;
+    scan-function-name current-library get scan-c-args*
+    make-varargs-callback-type ;
 
 : global-quot ( type word -- quot )
     swap [ name>> current-library get ] dip

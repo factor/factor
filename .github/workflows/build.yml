@@ -73,6 +73,12 @@ jobs:
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core compiler threads io'
+    - name: native-varargs-gcc
+      run: python3 .github/check-arm64-varargs.py --cc gcc
+    - name: install-varargs-clang
+      run: sudo apt-get update && sudo apt-get install -y clang-18
+    - name: native-varargs-clang
+      run: python3 .github/check-arm64-varargs.py --cc clang-18 --require-small
     - name: arm64-regressions
       run: ./factor -no-user-init -no-monitors .github/arm64-tests.factor
     - name: arm64-regressions-portable
@@ -124,6 +130,12 @@ jobs:
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
       run: './factor -run=tools.test resource:core'
+    - name: native-varargs-apple-clang
+      run: python3 .github/check-arm64-varargs.py --cc /usr/bin/clang
+    - name: install-varargs-clang
+      run: brew install llvm
+    - name: native-varargs-clang
+      run: python3 .github/check-arm64-varargs.py --cc "$(brew --prefix llvm)/bin/clang" --require-small
     - name: arm64-regressions
       run: ./factor -no-user-init -no-monitors .github/arm64-tests.factor
     - name: arm64-regressions-portable
@@ -203,6 +215,12 @@ jobs:
       run: python vm/tests/stack_safety.py -v
     - name: allocation-failure
       run: python vm/tests/windows_allocation.py -v
+    - name: native-varargs-msvc
+      run: python .github/check-arm64-varargs.py --cc cl
+    - name: install-varargs-clang
+      run: choco upgrade llvm --yes --no-progress
+    - name: native-varargs-clang
+      run: python .github/check-arm64-varargs.py --cc 'C:\Program Files\LLVM\bin\clang-cl.exe' --require-small
     - name: arm64-regressions
       shell: cmd
       run: factor.com -no-user-init -no-monitors .github/arm64-tests.factor

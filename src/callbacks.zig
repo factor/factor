@@ -11,6 +11,10 @@ const segments = @import("segments.zig");
 
 const Cell = layouts.Cell;
 
+pub export fn arm64_variadic_callbacks_supported() callconv(.c) bool {
+    return builtin.cpu.arch == .aarch64;
+}
+
 fn returnTakesParam() bool {
     return builtin.cpu.arch == .x86_64 or builtin.cpu.arch == .x86;
 }
@@ -54,8 +58,16 @@ pub const CallbackHeap = struct {
         if (callback_stub == layouts.false_object) return null;
 
         std.debug.assert(layouts.hasTag(callback_stub, .array));
-        const stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
+        var stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
         std.debug.assert(layouts.untagFixnumUnsigned(stub_array.capacity) >= 2);
+
+        const variadic = builtin.cpu.arch == .aarch64 and return_rewind == std.math.maxInt(Cell);
+        if (variadic) {
+            if (layouts.untagFixnumUnsigned(stub_array.capacity) < 3) {
+                @constCast(vm).generalError(.ffi, layouts.false_object, layouts.false_object);
+            }
+            stub_array = @ptrFromInt(layouts.UNTAG(stub_array.data()[2]));
+        }
 
         const insns_cell = stub_array.data()[1];
         std.debug.assert(layouts.hasTag(insns_cell, .byte_array));
@@ -69,7 +81,8 @@ pub const CallbackHeap = struct {
         // low 3 bits are clear (not free, type bits 0).
         stub.header = total_size & ~@as(Cell, 7);
         stub.owner = owner;
-        stub.parameters = layouts.false_object;
+        // Callback GC visits only owner, so keep template selection immediate.
+        stub.parameters = if (variadic) layouts.tagFixnum(1) else layouts.false_object;
         stub.relocation = layouts.false_object;
 
         const dest: [*]u8 = @ptrFromInt(stub.entryPoint());
@@ -193,7 +206,10 @@ fn storeCallbackOperand(stub: *code_blocks.CodeBlock, special_objects: *const [o
     const callback_stub = special_objects[@intFromEnum(objects.SpecialObject.callback_stub)];
     if (callback_stub == layouts.false_object) return;
 
-    const stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
+    var stub_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(callback_stub));
+    if (stub.parameters == layouts.tagFixnum(1)) {
+        stub_array = @ptrFromInt(layouts.UNTAG(stub_array.data()[2]));
+    }
     const reloc_cell = stub_array.data()[0];
     if (!layouts.hasTag(reloc_cell, .byte_array)) return;
 

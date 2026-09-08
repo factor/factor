@@ -432,3 +432,7 @@ void* bug1021_test_3(int x) {
 #include "tests/ffi_array_struct.c"
 #include "tests/ffi_fp_status.c"
 #endif
+#include "ffi_test_varargs.c"
+#include "ffi_test_varargs_outgoing.c"
+#include "ffi_test_varargs_promotions.c"
+#include "ffi_test_arm64_unions.c"

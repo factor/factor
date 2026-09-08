@@ -3,6 +3,7 @@
 USING: accessors alien alien.c-types alien.libraries
 alien.libraries.finder alien.syntax classes.struct combinators
 kernel literals math system unix.types ;
+QUALIFIED: alien.varargs
 IN: curses.ffi
 
 C-LIBRARY: curses {
@@ -12,7 +13,7 @@ C-LIBRARY: curses {
 }
 
 C-TYPE: SCREEN
-TYPEDEF: void* va_list
+TYPEDEF: alien.varargs:va_list va_list
 
 TYPEDEF: uint chtype
 TYPEDEF: chtype attr_t

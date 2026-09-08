@@ -257,6 +257,7 @@ M: runtime-effect infer-call*
 \ alien-indirect-varargs [ infer-alien-indirect-varargs ] "special" set-word-prop
 \ alien-assembly [ infer-alien-assembly ] "special" set-word-prop
 \ alien-callback [ infer-alien-callback ] "special" set-word-prop
+\ alien-callback-varargs [ infer-alien-callback-varargs ] "special" set-word-prop
 
 {
     c-to-factor
@@ -278,7 +279,7 @@ M: runtime-effect infer-call*
     execute (execute) call-effect-unsafe execute-effect-unsafe
     if dispatch <tuple-boa> do-primitive
     load-local load-locals get-local drop-locals
-    alien-invoke alien-indirect alien-callback alien-assembly
+    alien-invoke alien-indirect alien-callback alien-callback-varargs alien-assembly
 } [ t "no-compile" set-word-prop ] each
 
 ! Exceptions to the above

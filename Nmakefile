@@ -169,7 +169,7 @@ vm\cpu-arm.64-trampoline.obj:
 .rs.res:
 	rc /nologo $<
 
-vm/ffi_test.obj: vm/ffi_test.h vm/ffi_test_small.h
+vm/ffi_test.obj: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_varargs.c vm/ffi_test_varargs.h vm/ffi_test_varargs_outgoing.c vm/ffi_test_varargs_promotions.c vm/ffi_test_arm64_unions.c
 
 libfactor-ffi-test.dll: vm/ffi_test.obj vm/ffi_test.def
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll /def:vm\ffi_test.def vm/ffi_test.obj
