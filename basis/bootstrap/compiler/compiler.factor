@@ -70,6 +70,9 @@ gc
     ! larger arithmetic and sequence batches.
     M\ hashtable at* M\ hashtable set-at 2array compile-unoptimized
 
+    ! Hash-table growth and mutation remain separate calls in compiler code.
+    M\ hashtable delete-at \ grow-hash \ maybe-set-at 3array compile-unoptimized
+
     {
         bitand bitor bitxor bitnot
     } compile-unoptimized
