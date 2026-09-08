@@ -400,8 +400,11 @@ PRIVATE>
 : string>complex ( str -- n/f )
     dup empty? [ drop f ] [
         dup last CHAR: j = [
-            but-last-slice dup imaginary-coefficient
-            [ 0 swap rect> nip ] [ 1 (string>complex) ] if*
+            ! Prefer rectangular syntax to a mixed-ratio imaginary part:
+            ! 1+1/2j means C{ 1 1/2 }, rather than C{ 0 1+1/2 }.
+            but-last-slice dup 1 (string>complex) [ nip ] [
+                imaginary-coefficient [ 0 swap rect> ] [ f ] if*
+            ] if*
         ] [ drop f ] if
     ] if ;
 

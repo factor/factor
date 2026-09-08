@@ -52,6 +52,8 @@ HELP: string>number
 { $values { "str" string } { "n/f" { $maybe number } } }
 { $description "Creates a number from its string representation. In addition to real numbers, accepts complex numbers written as " { $snippet "a+bj" } ", " { $snippet "a-bj" } " or " { $snippet "bj" } ". Both components can be integers, ratios or floats. A coefficient of one may be omitted after the sign, as in " { $snippet "2+j" } "."
 $nl
+"Rectangular syntax takes precedence over a mixed-ratio imaginary coefficient: " { $snippet "1+1/2j" } " means " { $snippet "C{ 1 1/2 }" } "."
+$nl
 "Outputs " { $link f } " if the string does not represent a number." } ;
 
 { string>number number>string } related-words
