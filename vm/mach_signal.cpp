@@ -123,9 +123,19 @@ extern "C" kern_return_t catch_exception_raise(
     return KERN_FAILURE;
   }
 
+  // Only floating-point traps change FP state. Rewriting unchanged state
+  // during a sampling safepoint can trip Rosetta's register-state assertions.
+#ifdef FACTOR_ARM64
+  bool fp_exception = exception == EXC_BAD_INSTRUCTION &&
+                      (exc_state.__esr >> 26) == 0x2c;
+#else
+  bool fp_exception = exception == EXC_ARITHMETIC &&
+                      code[0] != MACH_EXC_INTEGER_DIV;
+#endif
   MACH_FLOAT_STATE_TYPE float_state;
   mach_msg_type_number_t float_state_count = MACH_FLOAT_STATE_COUNT;
-  if (thread_get_state(thread, MACH_FLOAT_STATE_FLAVOR,
+  if (fp_exception &&
+      thread_get_state(thread, MACH_FLOAT_STATE_FLAVOR,
                        (natural_t*)&float_state, &float_state_count) !=
       KERN_SUCCESS) {
     // The thread is supposed to be suspended while the exception
@@ -140,7 +150,8 @@ extern "C" kern_return_t catch_exception_raise(
 
   // Set the faulting thread's register contents..
   // See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_set_state.html.
-  if (thread_set_state(thread, MACH_FLOAT_STATE_FLAVOR,
+  if (fp_exception &&
+      thread_set_state(thread, MACH_FLOAT_STATE_FLAVOR,
                        (natural_t*)&float_state, float_state_count) !=
       KERN_SUCCESS) {
     return KERN_FAILURE;
