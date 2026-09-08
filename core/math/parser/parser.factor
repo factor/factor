@@ -569,6 +569,7 @@ M: ratio >base
 : k ( E -- k ) ⌊nlog10_2⌋ neg 2 + ; inline
 
 CONSTANT: lookup-table {
+0xff77b1fcbebcdc4f25e8e89c13bb0f7b 0x9faacf3df73609b177b191618c54e9ad
 0xc795830d75038c1dd59df5b9ef6a2418 0xf97ae3d0d2446f254b0573286b44ad1e
 0x9becce62836ac5774ee367f9430aec33 0xc2e801fb244576d5229c41f793cda740
 0xf3a20279ed56d48a6b43527578c11110 0x9845418c345644d6830a13896b78aaaa
@@ -880,7 +881,7 @@ CONSTANT: lookup-table {
 0xf70867153aa2db38b8cbee4fc66d1ea8
 }
 
-: φ ( k -- φ ) 290 + lookup-table nth ; inline
+: φ ( k -- φ ) 292 + lookup-table nth ; inline
 
 : β ( E k -- β ) ⌊nlog2_10⌋ + ; inline
 
@@ -914,7 +915,7 @@ CONSTANT: lookup-table {
     dup δi 2dup > [ 2drop f ] [
         number= [
             F φ β xi :> ( xi-odd? xi? )
-            xi-odd? [ w∈I? not xi? or ] unless*
+            xi-odd? [ w∈I? xi? and ] unless*
         ] [
             w∈I? not over zero? zi? and and
             [ [ [ 1 - ] [ drop 1000 ] bi* ] when ] keep not
