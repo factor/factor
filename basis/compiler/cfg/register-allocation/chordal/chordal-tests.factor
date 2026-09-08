@@ -1,12 +1,13 @@
 USING: accessors arrays assocs combinators compiler.cfg.linear-scan.allocation.state
-compiler.cfg compiler.cfg.instructions compiler.cfg.linear-scan.resolve
+compiler.cfg compiler.cfg.gc-checks.private compiler.cfg.instructions
+compiler.cfg.linear-scan compiler.cfg.linear-scan.resolve
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.chordal compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.test cpu.architecture generalizations kernel kernel.private locals make math
-math.bitwise math.functions math.libm math.private memory namespaces quotations
-sequences sequences.generalizations tools.test ;
+math.bitwise math.functions math.libm math.order math.private memory namespaces quotations
+sequences sequences.generalizations tools.test words ;
 IN: compiler.cfg.register-allocation.chordal.tests
 
 CONSTANT: tree-graph H{ { 0 { 1 2 } } { 1 { 0 3 } } { 2 { 0 } } { 3 { 1 } } }
@@ -145,6 +146,27 @@ CONSTANT: exchange-graph H{
         chordal-allocator register-allocator set
         call
     ] with-scope ; inline
+
+SINGLETON: small-bank-chordal-allocator
+
+M: small-bank-chordal-allocator allocate-cfg
+    drop dup admissible-registers
+    [ dup length 8 min head ] assoc-map chordal-allocation-with-registers ;
+
+! A live-through phi-edge value has no pending register fragment after
+! pressure splitting, before its SSA definition in layout reserves a slot.
+! This real word failed with bad-vreg on x86 and with eight ARM registers.
+{ t t } [ [ [let
+    small-bank-chordal-allocator register-allocator set
+    basic-block new :> from-bb
+    basic-block new :> other-bb
+    basic-block new :> replacement
+    ##phi new 0 >>dst H{ { from-bb 7 } { other-bb 8 } } >>inputs :> phi
+    basic-block new V{ phi } >>instructions :> to-bb
+    from-bb to-bb replacement \ update-predecessor-phis def>> compile-call
+    replacement phi inputs>> at 7 =
+    other-bb phi inputs>> at 8 = from-bb phi inputs>> key? not and
+] ] with-chordal-test ] unit-test
 
 ! Executed optimized machine code: branch joins and cyclic phi copies.
 { 13 6 } [ [

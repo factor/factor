@@ -52,7 +52,10 @@ Implementation and limits:
 - SSA uses can occur before their definition in linearized block order. ABI
   operand slots are reserved before splitting so a use-only call fragment can
   receive its value through an incoming edge even if synchronization removes
-  its only interval use.
+  its only interval use. Live-through values can likewise lose all local
+  register fragments under pressure before their definition in layout. SSA
+  live-in/live-out mapping reserves those missing stack destinations, and
+  parallel edge resolution fills them from each predecessor.
 - Graph construction sorts intervals by start and stops candidate scans beyond
   each interval's final endpoint, then intersects complete range lists to keep
   holes exact. Maximum-cardinality search uses a heap with deterministic vertex
@@ -81,3 +84,8 @@ oracles over all 64 undirected four-vertex graphs. Coalescing tests include a
 blocked phi affinity unlocked by a two-color exchange, an exchange that would
 lose more affinities than it gains, and copy chains whose representation changes
 must remain distinct.
+
+An executed regression compiles `update-predecessor-phis` with an eight-register
+bank and checks both replaced and untouched incoming values. Without boundary
+slot reservation this fails with `bad-vreg` during live-in mapping. The same
+failure was independently reproduced and fixed on native x86-64.
