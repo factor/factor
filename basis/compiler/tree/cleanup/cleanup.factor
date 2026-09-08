@@ -26,8 +26,9 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 
 ! Constant folding
 : cleanup-folding? ( #call -- ? )
-    node-output-infos
-    [ f ] [ [ literal?>> ] all? ] if-empty ;
+    dup out-d>> [ drop f ] [
+        [ node-value-info literal?>> ] with all?
+    ] if-empty ;
 
 : (cleanup-folding) ( #call -- nodes )
     [
@@ -38,9 +39,9 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
     bi prefix ;
 
 : >predicate-folding< ( #call -- value-info class result )
-    [ node-input-infos first ]
+    [ dup in-d>> first node-value-info ]
     [ word>> "predicating" word-prop ]
-    [ node-output-infos first literal>> ] tri ;
+    [ dup out-d>> first node-value-info literal>> ] tri ;
 
 : record-predicate-folding ( #call -- )
     >predicate-folding< pick literal?>>
@@ -75,10 +76,10 @@ GENERIC: cleanup-tree* ( node -- node/nodes )
 
 ! Removing overflow checks
 : (remove-overflow-check?) ( #call -- ? )
-    node-output-infos first class>> fixnum class<= ;
+    dup out-d>> first node-value-info class>> fixnum class<= ;
 
 : small-shift? ( #call -- ? )
-    node-input-infos second interval>>
+    dup in-d>> second node-value-info interval>>
     cell-bits tag-bits get - [ neg ] keep [a,b] interval-subset? ;
 
 : remove-overflow-check? ( #call -- ? )
