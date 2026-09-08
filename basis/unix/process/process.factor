@@ -1,5 +1,5 @@
 USING: alien.c-types alien.data alien.libraries alien.syntax
-alien.utilities classes.struct environment.unix generalizations
+alien.utilities byte-arrays classes.struct environment.unix generalizations
 io.encodings.utf8 kernel libc math sequences simple-tokenizer
 strings unix unix.types ;
 QUALIFIED-WITH: alien.c-types ac
@@ -62,10 +62,10 @@ FUNCTION: int sigfillset ( sigset_t* set )
 FUNCTION: int sigismember ( sigset_t* set, int signo )
 
 ! Not on macOS
-FUNCTION: int posix_spawnattr_getschedparam ( posix_spawnattr_t* attr )
-FUNCTION: int posix_spawnattr_setschedparam ( posix_spawnattr_t* attr )
-FUNCTION: int posix_spawnattr_getschedpolicy ( posix_spawnattr_t* attr )
-FUNCTION: int posix_spawnattr_setschedpolicy ( posix_spawnattr_t* attr )
+FUNCTION: int posix_spawnattr_getschedparam ( posix_spawnattr_t* attr, void* schedparam )
+FUNCTION: int posix_spawnattr_setschedparam ( posix_spawnattr_t* attr, void* schedparam )
+FUNCTION: int posix_spawnattr_getschedpolicy ( posix_spawnattr_t* attr, int* policy )
+FUNCTION: int posix_spawnattr_setschedpolicy ( posix_spawnattr_t* attr, int policy )
 
 CONSTANT: POSIX_SPAWN_RESETIDS            0x0001
 CONSTANT: POSIX_SPAWN_SETPGROUP           0x0002
@@ -90,7 +90,7 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     dup 0 = [ drop ] [ (throw-errno) ] if ;
 
 : posix-spawn-file-actions-init ( -- posix_spawn_file_actions_t )
-    f posix_spawn_file_actions_t <ref>
+    posix_spawn_file_actions_t heap-size <byte-array>
     [ posix_spawn_file_actions_init check-posix ] keep ;
 
 : posix-spawn-file-actions-destroy ( posix_spawn_file_actions_t -- )
@@ -100,7 +100,7 @@ CONSTANT: POSIX_SPAWN_PCONTROL_KILL       0x0003
     posix_spawn_file_actions_addchdir_np check-posix ;
 
 : posix-spawnattr-init ( -- posix_spawnattr_t )
-    f posix_spawnattr_t <ref>
+    posix_spawnattr_t heap-size <byte-array>
     [ posix_spawnattr_init check-posix ] keep ;
 
 : posix-spawnattr-destroy ( posix_spawnattr_t -- )
