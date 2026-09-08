@@ -6,19 +6,6 @@ sequences stack-checker tools.test sequences.generalizations ;
 FROM: alien.c-types => char uchar short ushort int uint longlong ulonglong float double ;
 IN: math.vectors.conversion.tests
 
-{ uint-4{ 2147483648 4294967040 0 4294967295 } } [
-    float-4{ 2147483648.0 4294967040.0 -1.0 1/0. }
-    [ { float-4 } declare float-4 uint-4 vconvert ] compile-call
-] unit-test
-{ uint-4{ 0 0 4294967295 4294967295 } } [
-    float-4{ 0/0. -1/0. 4294967296.0 1/0. }
-    [ { float-4 } declare float-4 uint-4 vconvert ] compile-call
-] unit-test
-{ ulonglong-2{ 18446744073709551615 18446744073709551615 } } [
-    double-2{ 18446744073709551616.0 1/0. }
-    [ { double-2 } declare double-2 ulonglong-2 vconvert ] compile-call
-] unit-test
-
 ERROR: optimized-vconvert-inconsistent
     unoptimized-result
     optimized-result ;
@@ -38,6 +25,53 @@ MACRO:: test-vconvert ( from-type to-type -- quot )
         2dup = [ optimized-vconvert-inconsistent ] unless
         drop outputs firstn
     ] ;
+
+! Keep the full unsigned range as well as wrapping negative and large values.
+{ uint-4{ 2147483648 4294967040 4294967295 0 } } [
+    float-4{ 2147483648.0 4294967040.0 -1.0 4294967296.0 }
+    float-4 uint-4 test-vconvert
+] unit-test
+
+! Every same-width integer/small-float direction must be numeric.
+{ half-8{ -32768 -2048 -1 0 1 2048 32752 32768 } } [
+    short-8{ -32768 -2049 -1 0 1 2049 32752 32767 }
+    short-8 half-8 test-vconvert
+] unit-test
+
+{ half-8{ 0 1 2048 2052 32768 32768 65024 65504 } } [
+    ushort-8{ 0 1 2049 2051 32767 32768 65024 65504 }
+    ushort-8 half-8 test-vconvert
+] unit-test
+
+{ bfloat-8{ -32768 -256 -1 0 1 256 32768 32768 } } [
+    short-8{ -32768 -257 -1 0 1 257 32704 32767 }
+    short-8 bfloat-8 test-vconvert
+] unit-test
+
+{ bfloat-8{ 0 1 256 260 32768 32768 65280 65536 } } [
+    ushort-8{ 0 1 257 259 32767 32768 65280 65535 }
+    ushort-8 bfloat-8 test-vconvert
+] unit-test
+
+{ short-8{ -32768 -2 -1 0 0 1 2 32752 } } [
+    half-8{ -32768 -2.75 -1.75 -0.75 0.75 1.75 2.75 32752 }
+    half-8 short-8 test-vconvert
+] unit-test
+
+{ ushort-8{ 65534 65535 0 0 1 2 32768 65504 } } [
+    half-8{ -2.75 -1.75 -0.75 0.75 1.75 2.75 32768 65504 }
+    half-8 ushort-8 test-vconvert
+] unit-test
+
+{ short-8{ -32768 -2 -1 0 0 1 2 32640 } } [
+    bfloat-8{ -32768 -2.75 -1.75 -0.75 0.75 1.75 2.75 32640 }
+    bfloat-8 short-8 test-vconvert
+] unit-test
+
+{ ushort-8{ 65534 65535 0 1 65280 0 0 512 } } [
+    bfloat-8{ -2.75 -1.75 0.75 1.75 65280 65536 -65536 66048 }
+    bfloat-8 ushort-8 test-vconvert
+] unit-test
 
 [ uint-4{ 5 1 2 6 } int-4 float-4 vconvert ]
 [ bad-vconvert-input? ] must-fail-with

@@ -25,7 +25,7 @@ Multiplication and addition are never implicitly fused; use `vfma` explicitly.
 | Floor, ceiling, truncate, round, round-to-even | float-4, double-2 | FRINT variants; round uses ties away, round-to-even uses ties to even |
 | `vmin-element`, `vmax-element` | 8, 16, 32-bit integers; float-4, double-2 | Ordered lane reduction using native min/max |
 | Mask blend and unordered comparison | Baseline types | BSL and ordered self-comparison masks |
-| Float to unsigned integer conversion | float-4 to uint-4; double-2 to ulonglong-2 | FCVTZU; truncate, saturate out of range, NaN becomes zero |
+| Float to unsigned integer conversion | float-4 to uint-4; double-2 to ulonglong-2; half-8/bfloat-8 to ushort-8 | Portable conversion; truncate finite values and wrap modulo the destination lane width |
 
 `vshift` takes a count vector of the corresponding **signed** type: for example,
 `uint-4 int-4 vshift`. Positive counts shift left; negative counts shift right.
@@ -48,8 +48,10 @@ use raw all-one or all-zero lanes. Shuffles preserve raw lane bits.
 
 Use `vconvert` with these types. Packing two `float-4` values produces one small
 vector; unpacking produces the low and high `float-4` values. Same-width
-half/BF16 conversion is numeric; `half-8-cast` and `bfloat-8-cast` reinterpret
-bits. Scalar half/BF16 C parameters and return values are not supported.
+half/BF16 conversion is numeric, as is conversion between either format and
+`short-8`/`ushort-8`. Conversion to integers truncates; unsigned destinations
+wrap modulo 2^16. `half-8-cast` and `bfloat-8-cast` reinterpret bits. Scalar
+half/BF16 C parameters and return values are not supported.
 
 | Feature | Public operation | Native instructions |
 | --- | --- | --- |

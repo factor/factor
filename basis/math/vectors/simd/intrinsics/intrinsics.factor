@@ -39,6 +39,8 @@ IN: math.vectors.simd.intrinsics
     {
         { float-4-rep  [ int-4-rep      ] }
         { double-2-rep [ longlong-2-rep ] }
+        { half-8-rep   [ short-8-rep    ] }
+        { bfloat-8-rep [ short-8-rep    ] }
     } case ; foldable
 
 : >float-vector-rep ( rep -- rep' )
@@ -267,14 +269,10 @@ PRIVATE>
 : (simd-v>integer)         ( a   rep -- c )
     [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
     [ >int-vector-rep <rep-array> ] bi unrolled-map-as-unsafe underlying>> ;
-:: (simd-v>unsigned-integer) ( a rep -- c )
-    rep >int-vector-rep >uint-vector-rep :> output-rep
-    a rep byte>rep-array [
-        dup 1/0. = [ drop output-rep rep-component-type c:c-type-interval nip ] [
-            dup dup unordered? over -1/0. = or [ drop 0 ]
-            [ >integer output-rep rep-component-type c:c-type-clamp ] if
-        ] if
-    ] output-rep <rep-array> map-as underlying>> ;
+: (simd-v>unsigned-integer) ( a rep -- c )
+    [ [ byte>rep-array ] [ rep-length ] bi [ >integer ] ]
+    [ >int-vector-rep >uint-vector-rep <rep-array> ] bi
+    unrolled-map-as-unsafe underlying>> ;
 : (simd-vpack-signed)      ( a b rep -- c )
     [ [ 2byte>rep-array cord-append ] [ rep-length 2 * ] bi ]
     [ narrow-vector-rep [ <rep-array> ] [ rep-component-type ] bi ] bi
