@@ -80,7 +80,7 @@ HELP: flog10
 { $description "Calls the base 10 logarithm function from the C standard library. User code should call " { $link log10 } " instead." } ;
 
 HELP: fpow
-{ $values { "x" real } { "y" real } { "double" real } }
+{ $values { "x" real } { "y" real } { "z" real } }
 { $description "Calls the power function (" { $snippet "z=x^y" } ") from the C standard library. User code should call " { $link ^ } " instead." } ;
 
 HELP: fsqrt
