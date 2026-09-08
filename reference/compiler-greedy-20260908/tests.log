@@ -1,0 +1,108 @@
+Unit Test: {
+    { 2 f }
+    [
+        init-test 1
+        { { 0 2 } { 10 12 } } { 0 2 10 12 } test-interval 2
+        { { 4 8 } } { 4 8 } test-interval 2array
+        allocate-test length "splits" greedy-statistics get at
+    ]
+}
+Unit Test: {
+    { 12 }
+    [
+        greedy-allocator register-allocator
+        [ "greedy" [ dup length swap strlen + ] compile-call ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { 10880000 }
+    [
+        greedy-allocator register-allocator [
+            [
+                20000 [ 32 17 <array> ] replicate [ sum ] map
+                sum
+            ] compile-call
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { t t t }
+    [
+        init-test 1 { { 0 20 } } { 0 20 } test-interval 2
+        { { 6 10 } } { 6 8 10 } test-interval 2array
+        allocate-test length 2 >
+        "evictions" greedy-statistics get at 0 >
+        "splits" greedy-statistics get at 0 >
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        init-test H{ { 6 8 } { 10 8 } } greedy-use-weights set 1
+        { { 0 4 } } { 0 4 } test-interval spill-weight 2
+        { { 6 10 } } { 6 10 } test-interval spill-weight <
+    ]
+}
+Unit Test: {
+    { 7 }
+    [
+        init-test { { 7 1 } } greedy-region-boundaries set 1
+        { { 0 40 } } { 0 8 10 40 } test-interval region-split
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        init-test { { 7 1 } } greedy-region-boundaries set 1
+        { { 0 40 } } { 0 6 12 40 } test-interval 2
+        { { 8 10 } } { 8 10 } test-interval 2array
+        allocate-test drop
+        "region-splits" greedy-statistics get at 0 >
+    ]
+}
+Unit Test: {
+    { 2 t }
+    [
+        init-test 1 { { 0 20 } } { 0 20 } test-interval
+        10 f sync-point boa 2array allocate-test dup length swap
+        [ spill-to>> ] map
+        sift first spill-slots get values first =
+    ]
+}
+Unit Test: {
+    { 1 f }
+    [
+        init-test 1 { { 10 20 } } { 10 20 } test-interval
+        10 t sync-point boa 2array
+        allocate-test length "clobber-splits" greedy-statistics
+        get at
+    ]
+}
+Unit Test: {
+    { 4950 }
+    [
+        greedy-allocator register-allocator
+        [ 100 [ 0 swap [ + ] each-integer ] compile-call ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } }
+    [
+        greedy-allocator register-allocator
+        [ { 0.0 1.0 2.0 3.0 } [ [ 1.0 + ] map ] compile-call ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { 5092.0 }
+    [
+        greedy-allocator register-allocator
+        [ 2.5 \ pressure-kernel def>> compile-call ]
+        with-variable
+    ]
+}
+0
+Checking compiler.cfg.register-allocation.greedy...
+Checking compiler.cfg.register-allocation.greedy.tests...
