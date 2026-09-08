@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Alex Vondrak.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: calendar combinators compiler.units continuations
-graphviz.dot images.viewer io.backend io.directories
+USING: assocs calendar combinators compiler.units continuations
+graphviz.dot images.loader.private images.viewer io.backend io.directories
 io.encodings.latin1 io.encodings.utf8 io.files
 io.files.temp io.files.unique io.launcher io.standard-paths
 kernel locals make namespaces sequences summary system threads
@@ -99,18 +99,10 @@ PRIVATE>
 ! images.loader
 
 : preview-extension ( -- extension )
-    preview-format get-global >lower {
-        { "bmp"  [ ".bmp" ] }
-        { "gif"  [ ".gif" ] }
-        { "ico"  [ ".ico" ] }
-        { "jpg"  [ ".jpg" ] }
-        { "jpeg" [ ".jpg" ] }
-        { "jpe"  [ ".jpg" ] }
-        { "png"  [ ".png" ] }
-        { "tif"  [ ".tif" ] }
-        { "tiff" [ ".tif" ] }
-        [ unsupported-preview-format ]
-    } case ;
+    preview-format get-global >lower
+    dup "jpe" = [ drop "jpg" ] when
+    dup types get key?
+    [ "." prepend ] [ unsupported-preview-format ] if ;
 
 :: with-preview ( ..a graph quot: ( ..a path -- ..b ) -- ..b )
     [
