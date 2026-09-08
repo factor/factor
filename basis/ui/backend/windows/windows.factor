@@ -595,7 +595,7 @@ SYMBOL: trace-messages?
 
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
-    c:uint { c:void* c:uint WPARAM LPARAM } stdcall [
+    LRESULT { HWND UINT WPARAM LPARAM } stdcall [
         pick wm-handlers get-global at*
         [ flush call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
     ] alien-callback ;
