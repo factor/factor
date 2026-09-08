@@ -27,9 +27,11 @@ SYMBOL: loops
     ] with-scope ; inline
 
 : with-dummy-cfg-builder ( node quot -- )
+    ! Memory intrinsics consume and return a block as well as consuming the
+    ! node. Keep the dummy block available and check the full intrinsic effect.
     [
         [ V{ } clone procedures ] 2dip
-        '[ _ t t [ drop _ call( node -- ) ] with-cfg-builder ] with-variable
+        '[ _ t t [ swap _ call( block node -- block' ) drop ] with-cfg-builder ] with-variable
     ] { } make drop ;
 
 GENERIC: emit-node ( block node -- block' )
