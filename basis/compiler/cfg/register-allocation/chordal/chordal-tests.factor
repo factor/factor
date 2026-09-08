@@ -69,6 +69,12 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
     40 <iota> [ >float 0.5 float+ ] map =
 ] with-chordal-test ] unit-test
 
+{ t t } [ [
+    pressure-quotation measure-compilation "procedures" of first
+    [ "allocation" of "repair-assignments" of 0 > ]
+    [ "passes" of last "spills" of 0 > ] bi
+] with-chordal-test ] unit-test
+
 ! Allocation diagnostics make the theorem's certificate and the actual
 ! graph-policy work visible to the comparison harness.
 { t t } [ [
