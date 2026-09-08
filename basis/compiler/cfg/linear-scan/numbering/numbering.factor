@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.cfg.linearization grouping kernel math
+USING: accessors compiler.cfg.linearization
+compiler.cfg.register-allocation.rematerialization grouping kernel math
 namespaces sequences ;
 IN: compiler.cfg.linear-scan.numbering
 
@@ -8,6 +9,7 @@ IN: compiler.cfg.linear-scan.numbering
     [ insn#<< ] [ drop 2 + ] 2bi ;
 
 : number-instructions ( cfg -- )
+    dup prepare-rematerialization
     linearization-order
     0 [ instructions>> [ number-instruction ] each ] reduce
     drop ;

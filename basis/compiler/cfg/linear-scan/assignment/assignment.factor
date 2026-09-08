@@ -5,6 +5,7 @@ combinators.short-circuit compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linearization compiler.cfg.liveness
+compiler.cfg.register-allocation.rematerialization
 compiler.cfg.registers compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 heaps kernel make math namespaces sequences ;
@@ -35,7 +36,10 @@ SYMBOL: pending-interval-assoc
 
 : vreg>reg ( vreg -- reg/spill-slot )
     dup leader dup pending-interval-assoc get at
-    [ 2nip ] [ swap rep-of lookup-spill-slot ] if* ;
+    [ 2nip ] [
+        dup rematerialization-of
+        [ 2nip ] [ swap rep-of lookup-spill-slot ] if*
+    ] if* ;
 
 : vregs>regs ( assoc -- assoc' )
     [ vreg>reg ] assoc-map ;
@@ -74,7 +78,9 @@ SYMBOL: machine-live-outs
     [ > ] with heap-pop-while [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ;
+    dup reload-from>> dup constant-recipe?
+    [ swap reg>> emit-rematerialization ]
+    [ drop [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ] if ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -118,7 +124,15 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 : spill/reload ( n interval -- {reg,rep,slot} )
     [ rep-at-insn ] keep [ reg>> ] [ vreg>> ] bi
-    pick assign-spill-slot swapd 3array ;
+    dup rematerialization-of
+    [ nip ] [ pick assign-spill-slot ] if* swapd 3array ;
+
+: emit-save ( reg rep slot/recipe -- )
+    dup constant-recipe? [ 3drop ] [ ##spill, ] if ;
+
+: emit-restore ( reg rep slot/recipe -- )
+    dup constant-recipe?
+    [ nip swap emit-rematerialization ] [ ##reload, ] if ;
 
 : spill/reloads ( n intervals -- spill/reloads )
     [ spill/reload ] with map ;
@@ -129,9 +143,9 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 
 : emit-##call-gc ( insn -- )
     dup spill/reloads-for-call-gc
-    dup [ first3 ##spill, ] each
+    dup [ first3 emit-save ] each
     swap ,
-    [ first3 ##reload, ] each ;
+    [ first3 emit-restore ] each ;
 
 : emit-gc-map-insn ( gc-map-insn -- )
     [ [ leader ] change-insn-gc-roots ]
