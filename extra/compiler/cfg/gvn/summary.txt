@@ -1,1 +1,1 @@
-Global value numbering for common subexpression elimination
+Compatibility entry point for production global value numbering
