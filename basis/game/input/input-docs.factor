@@ -152,7 +152,7 @@ HELP: mouse-state
     { { $snippet "dy" } " contains the mouse's Y axis movement." }
     { { $snippet "scroll-dx" } " contains the scroller's X axis movement." }
     { { $snippet "scroll-dy" } " contains the scroller's Y axis movement." }
-    { { $snippet "buttons" } " contains a sequence of boolean values indicate the state of the mouse's buttons." }
+    { { $snippet "buttons" } " contains a sequence of boolean values indicating the state of the mouse's buttons. On X11, these are the five core pointer buttons in X11 button order; keyboard modifiers are excluded." }
 }
 "Mouse movement is recorded relative to when the game input interface was opened with " { $link open-game-input } " or the mouse state is reset with " { $link reset-mouse } "."
 } ;

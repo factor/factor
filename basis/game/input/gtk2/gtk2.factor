@@ -1,10 +1,10 @@
 ! Copyright (C) 2010 Erik Charlebois, William Schlieper.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs bit-arrays destructors game.input gdk2.ffi
+assocs bit-arrays destructors game.input game.input.x11.buttons gdk2.ffi
 io.encodings.binary io.files kernel linux.input-events
 linux.input-events.ffi math namespaces sequences
-system unix.ffi x11.xlib ;
+system unix.ffi x11.X x11.xlib ;
 IN: game.input.gtk2
 
 SINGLETON: gtk2-game-input-backend
@@ -115,14 +115,14 @@ M: gtk2-game-input-backend read-keyboard
 
 : query-pointer ( -- x y buttons )
     get-dpy dup XDefaultRootWindow
-    { int int int int int int int }
+    { Window Window int int int int uint }
     [ XQueryPointer drop ] with-out-parameters
     [ 4drop ] 3dip ;
 
 M: gtk2-game-input-backend read-mouse
     query-pointer
     mouse-state new
-    swap 256 /i >>buttons
+    swap button-mask>buttons >>buttons
     swap 400 - >>dy
     swap 400 - >>dx
     0 >>scroll-dy 0 >>scroll-dx ;

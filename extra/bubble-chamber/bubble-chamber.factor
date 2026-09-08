@@ -55,7 +55,7 @@ TUPLE: particle
   0 0 0 1 rgba boa >>myc
   0 0 0 1 rgba boa >>mya ;
 
-: center ( particle -- point ) bubble-chamber>> size>> 2 v/n ;
+: center ( particle -- point ) bubble-chamber>> dim>> 2 v/n ;
 
 DEFER: collision-theta
 
@@ -78,8 +78,8 @@ DEFER: collision-theta
 :: out-of-bounds? ( PARTICLE -- ? )
     PARTICLE pos>> first :> X
     PARTICLE pos>> second :> Y
-    PARTICLE bubble-chamber>> size>> first :> WIDTH
-    PARTICLE bubble-chamber>> size>> second :> HEIGHT
+    PARTICLE bubble-chamber>> dim>> first :> WIDTH
+    PARTICLE bubble-chamber>> dim>> second :> HEIGHT
 
     WIDTH  neg :> LEFT
     WIDTH  2 * :> RIGHT
@@ -248,7 +248,7 @@ M: muon collide
 
 M:: muon move ( MUON -- )
 
-    MUON bubble-chamber>> size>> first :> WIDTH
+    MUON bubble-chamber>> dim>> first :> WIDTH
 
     MUON
 
@@ -288,7 +288,7 @@ M: quark collide
 
 M:: quark move ( QUARK -- )
 
-    QUARK bubble-chamber>> size>> first :> WIDTH
+    QUARK bubble-chamber>> dim>> first :> WIDTH
 
     QUARK
 
@@ -354,7 +354,7 @@ M:: bubble-chamber update-frame-buffer ( BUBBLE-CHAMBER -- )
 
 :: mouse->collision-theta ( BUBBLE-CHAMBER -- BUBBLE-CHAMBER )
     mouse
-    BUBBLE-CHAMBER size>> 2 v/n
+    BUBBLE-CHAMBER dim>> 2 v/n
     v-
     first2
     fatan2

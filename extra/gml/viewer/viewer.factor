@@ -272,10 +272,7 @@ gml-viewer-world H{
 
 AFTER: gml-viewer-world tick-game-world
     dup drag?>> [
-        read-mouse buttons>>
-        ! FIXME: GTK Mouse buttons are an integer
-        ! macOS mouse buttons are an array of bools
-        dup integer? [ 0 bit? ] [ first ] if >>drag?
+        read-mouse buttons>> first >>drag?
     ] when drop ;
 
 M: gml-viewer-world wasd-mouse-scale drag?>> -1/600. 0.0 ? ;
