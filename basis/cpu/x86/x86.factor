@@ -371,7 +371,7 @@ M: x86 %convert-integer
         { c:short  [ 16 %sign-extend ] }
         { c:ushort [ 16 %zero-extend ] }
         { c:int    [ 32 %sign-extend ] }
-        { c:uint   [ 32 [ 2drop ] (%convert-integer) ] }
+        { c:uint   [ [ 32 n-bit-version-of ] bi@ MOV ] }
     } case ;
 
 :: %alien-integer-getter ( dst exclude address bits quot -- )
