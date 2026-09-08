@@ -1,7 +1,28 @@
-USING: continuations kernel kernel.private layouts math math.functions math.order
+USING: compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
 sequences tools.test ;
 IN: math.integers.tests
+
+! Integer division must raise on every path, including ARM64 SDIV fast paths.
+{ -5 0 5 } [
+    '[ _ 0 [ fixnum/i ] compile-call ]
+    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+] each
+
+{ fixnum/i-fast fixnum-mod } [
+    '[ 0 0 [ _ execute ] compile-call ]
+    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+] each
+
+{ fixnum/mod fixnum/mod-fast } [
+    '[ 5 0 [ _ execute ] compile-call ]
+    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+] each
+
+{ /i mod /mod } [
+    '[ 0 0 [ _ execute ] compile-call ]
+    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+] each
 
 10 number-base [
     [ "-8" ] [ -8 unparse ] unit-test

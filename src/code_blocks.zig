@@ -765,6 +765,7 @@ fn lookupInternalSymbol(name: [*:0]const u8) ?usize {
     if (eql(name, "overflow_fixnum_add")) return @intFromPtr(&c.overflow_fixnum_add);
     if (eql(name, "overflow_fixnum_subtract")) return @intFromPtr(&c.overflow_fixnum_subtract);
     if (eql(name, "overflow_fixnum_multiply")) return @intFromPtr(&c.overflow_fixnum_multiply);
+    if (eql(name, "divide_by_zero")) return @intFromPtr(&c.divide_by_zero);
     if (eql(name, "from_signed_cell")) return @intFromPtr(&c.from_signed_cell);
     if (eql(name, "from_unsigned_cell")) return @intFromPtr(&c.from_unsigned_cell);
     if (eql(name, "from_signed_8")) return @intFromPtr(&c.from_signed_8);
