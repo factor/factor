@@ -23,6 +23,8 @@ void factor_vm::primitive_float_to_fixnum() {
 void factor_vm::primitive_fixnum_divint() {
   fixnum y = untag_fixnum(ctx->pop());
   fixnum x = untag_fixnum(ctx->peek());
+  if (y == 0)
+    divide_by_zero_error();
   fixnum result = x / y;
   if (result == -fixnum_min)
     // Does not allocate
@@ -37,6 +39,8 @@ void factor_vm::primitive_fixnum_divmod() {
   cell* s1 = (cell*)(ctx->datastack - sizeof(cell));
   fixnum y = untag_fixnum(*s0);
   fixnum x = untag_fixnum(*s1);
+  if (y == 0)
+    divide_by_zero_error();
   if (y == -1 && x == fixnum_min) {
     // Does not allocate
     *s1 = from_signed_cell(-fixnum_min);
@@ -45,6 +49,10 @@ void factor_vm::primitive_fixnum_divmod() {
     *s1 = tag_fixnum(x / y);
     *s0 = tag_fixnum(x % y);
   }
+}
+
+VM_C_API void divide_by_zero(factor_vm* parent) {
+  parent->divide_by_zero_error();
 }
 
 // Allocates memory

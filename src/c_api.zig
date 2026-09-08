@@ -366,6 +366,11 @@ pub export fn inline_cache_miss(return_address: Cell, vm_asm: *VMAssemblyFields)
 // Math Operations (overflow handling)
 // ============================================================================
 
+/// Raise the integer division error from an ARM64 subprimitive.
+pub export fn divide_by_zero(vm_asm: *VMAssemblyFields) callconv(.c) void {
+    vm_asm.getVM().divideByZeroError();
+}
+
 /// Handle fixnum addition overflow - promote to bignum.
 pub export fn overflow_fixnum_add(x: Fixnum, y: Fixnum, vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();

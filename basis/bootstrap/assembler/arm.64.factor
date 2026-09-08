@@ -11,6 +11,16 @@ IN: bootstrap.assembler.arm
 
 big-endian off
 
+! SDIV returns zero for a zero divisor instead of raising an exception.
+: check-divisor ( -- )
+    ds-0 0 CMP
+    [ BNE ] [
+        FP CTX context-callstack-top-offset [+] STR
+        DS RS CTX context-datastack-offset [+] STP
+        arg1 VM MOV
+        "divide_by_zero" LDR=BLR*
+    ] jit-conditional* ;
+
 [
     FP LR SP -16 [pre] STP
     FP SP MOV
@@ -538,6 +548,7 @@ big-endian off
     ] }
     { fixnum-mod [
         ds-1 ds-0 DS -8 [pre] LDP
+        check-divisor
         quotient ds-1 ds-0 SDIV
         remainder ds-0 quotient ds-1 MSUB
         remainder DS [] STR
@@ -554,12 +565,14 @@ big-endian off
     ] }
     { fixnum/i-fast [
         ds-1 ds-0 DS -8 [pre] LDP
+        check-divisor
         quotient ds-1 ds-0 SDIV
         quotient dup tag-bits get LSL
         quotient DS [] STR
     ] }
     { fixnum/mod-fast [
         ds-1 ds-0 DS -8 [+] LDP
+        check-divisor
         quotient ds-1 ds-0 SDIV
         remainder ds-0 quotient ds-1 MSUB
         quotient dup tag-bits get LSL
