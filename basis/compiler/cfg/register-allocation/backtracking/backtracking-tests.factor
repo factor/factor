@@ -144,3 +144,12 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         second "procedures" of first "allocation" of "evictions" of 0 >
     ] bi
 ] unit-test
+
+! An atomic memory-only clobber operand still needs a stack slot, although
+! it has no surviving register interval on either side of the instruction.
+{ t 1 } [
+    init-test-allocation
+    1 { 40 } test-interval dup uses>> first t >>spill-slot? drop
+    T{ sync-point { n 40 } } 2array swap backtracking-allocation empty?
+    spill-slots get assoc-size
+] unit-test
