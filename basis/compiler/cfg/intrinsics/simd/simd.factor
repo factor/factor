@@ -6,7 +6,8 @@ compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
 cpu.architecture kernel layouts math math.vectors
-math.vectors.simd.intrinsics sequences specialized-arrays strings ;
+math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
+sequences specialized-arrays strings ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
 SPECIALIZED-ARRAYS: char uchar short ushort int uint longlong ulonglong float double ;
 IN: compiler.cfg.intrinsics.simd
@@ -420,16 +421,22 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         [ [ cc< ^compare-vector ] [ ^blend-vector ] 3bi ]
     } vv-vector-op ;
 
+:: ^extreme-number-vector ( a b rep min? -- dst )
+    ! Ordered comparisons choose the numeric operand for either kind of NaN.
+    ! ARM FMINNM/FMAXNM alone propagate signaling NaNs, while x64 MIN/MAX
+    ! select their second operand for all unordered comparisons.
+    a b rep min? cc< cc> ? ^compare-vector
+    a b rep ^blend-vector :> ordered
+    b b rep cc= ^compare-vector ordered a rep ^blend-vector :> number
+    ! Equal nonzero numbers have identical bits. Opposite zeros need OR for
+    ! minimum and AND for maximum. Use an integer rep for ARM bitwise ops.
+    a b rep cc= ^compare-vector
+    a b rep >bitwise-vector-rep min? [ ^^or-vector ] [ ^^and-vector ] if
+    number rep ^blend-vector ;
+
 : emit-simd-vmin ( node -- )
     {
-        { float-vector-rep [| a b rep |
-            ! MINPS/MAXPS select a NaN second operand and break zero ties
-            ! differently from ARM's minimum/maximum-number instructions.
-            b b rep cc/= ^compare-vector
-            a a b rep ^min-vector rep ^blend-vector :> result
-            a b rep cc= ^compare-vector
-            a b rep ^^or-vector result rep ^blend-vector
-        ] }
+        { float-vector-rep [ t ^extreme-number-vector ] }
         [ ^min-vector ]
     } emit-vv-vector-op ;
 
@@ -441,14 +448,7 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vmax ( node -- )
     {
-        { float-vector-rep [| a b rep |
-            ! MINPS/MAXPS select a NaN second operand and break zero ties
-            ! differently from ARM's minimum/maximum-number instructions.
-            b b rep cc/= ^compare-vector
-            a a b rep ^max-vector rep ^blend-vector :> result
-            a b rep cc= ^compare-vector
-            a b rep ^^and-vector result rep ^blend-vector
-        ] }
+        { float-vector-rep [ f ^extreme-number-vector ] }
         [ ^max-vector ]
     } emit-vv-vector-op ;
 
@@ -709,9 +709,19 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 : emit-simd-mul-wide-tail ( node -- )
     { [ t swap ^^mul-wide-vector ] } emit-vv-vector-op ;
 
+:: ^reduce-number-vector ( src op rep -- dst )
+    rep rep-length 1 - <iota> src [| accum i |
+        accum src i 1 + rep ^broadcast-vector rep
+        op "min-element" = ^extreme-number-vector
+    ] reduce ;
+
 : emit-simd-reduce ( node -- )
-    { [| src op rep | src op rep ^^unary-vector-function rep ^^vector>scalar ] }
-    [ string? ] emit-vl-vector-op ;
+    {
+        { float-vector-rep [| src op rep |
+            src op rep ^reduce-number-vector rep ^^vector>scalar
+        ] }
+        [| src op rep | src op rep ^^unary-vector-function rep ^^vector>scalar ]
+    } [ string? ] emit-vl-vector-op ;
 
 : enable-simd ( -- )
     {
