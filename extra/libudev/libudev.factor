@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.libraries alien.syntax
 fry kernel sequences unix.types ;
 IN: libudev
 
-<< "libudev" "libudev.so" cdecl add-library >>
+<< "libudev" "libudev.so.1" cdecl add-library >>
 
 LIBRARY: libudev
 
