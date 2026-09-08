@@ -340,7 +340,7 @@ $(FFI_TEST_LIBRARY): $(BUILD_DIR)/ffi_test.o | $(BUILD_DIR)
 $(BUILD_DIR)/resources.o: vm/factor.rs | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(WINDRES) --preprocessor=cat $< $@
 
-$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c | $(BUILD_DIR)
+$(BUILD_DIR)/ffi_test.o: vm/ffi_test.c vm/ffi_test.h vm/ffi_test_small.h vm/ffi_test_arm64.c vm/ffi_test_arm64.h vm/tests/ffi_uint_callback.c vm/tests/ffi_array_struct.c | $(BUILD_DIR)
 	$(TOOLCHAIN_PREFIX)$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -std=c99 -o $@ $<
 
 macos.app: $(EXECUTABLE)

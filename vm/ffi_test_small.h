@@ -39,6 +39,15 @@ FACTOR_EXPORT __bf16 bfloat_dirty_result(void) {
 typedef struct { _Float16 a; __bf16 b; } mixed_small;
 FACTOR_EXPORT double mixed_small_sum(mixed_small x) { return (double)x.a + (double)x.b; }
 
+#define VAR_SPILL(T,N) \
+FACTOR_EXPORT double N##_varargs_spill(double named, ...) { \
+  va_list ap; va_start(ap, named); double total = named; \
+  for (int i = 1; i <= 10; ++i) { T x = va_arg(ap, T); int n = va_arg(ap, int); total += (double)x * i + n; } \
+  va_end(ap); return total; }
+VAR_SPILL(_Float16,half)
+VAR_SPILL(__bf16,bfloat)
+#undef VAR_SPILL
+
 #undef DEFINE
 #else
 int ffi_test_small_floats_available(void) { return 0; }

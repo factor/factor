@@ -423,7 +423,7 @@ void* bug1021_test_3(int x) {
 }
 
 #include "ffi_test_small.h"
-#if defined(__APPLE__) && defined(__aarch64__)
+#if (defined(__APPLE__) && defined(__aarch64__)) || defined(__linux__)
 #include "ffi_test_arm64.c"
 #endif
 
