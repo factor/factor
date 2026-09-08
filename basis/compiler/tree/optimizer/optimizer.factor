@@ -38,8 +38,8 @@ SYMBOL: check-optimizer?
         compute-def-use
         remove-dead-code
         ?check
+        fold-literal-float-conversions
         compute-def-use
         optimize-modular-arithmetic
-        fold-literal-float-conversions
         finalize
     ] with-scope ;
