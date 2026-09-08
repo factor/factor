@@ -17,8 +17,13 @@ IN: compiler.cfg.linear-scan
 
 :: allocate-and-assign-registers ( cfg -- )
     cfg admissible-registers :> registers
-    cfg compute-live-intervals registers allocate-registers :> intervals
-    check-allocation? get [ intervals registers check-allocated-intervals ] when
+    cfg compute-live-intervals :> input
+    check-allocation? get [ input required-register-uses ] [ f ] if :> uses
+    input registers allocate-registers :> intervals
+    check-allocation? get [
+        intervals registers check-allocated-intervals
+        intervals uses check-register-uses
+    ] when
     cfg intervals assign-registers ;
 
 : linear-scan ( cfg -- )

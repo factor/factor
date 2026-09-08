@@ -1,6 +1,6 @@
 USING: accessors arrays compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture kernel namespaces tools.test ;
+cpu.architecture kernel namespaces sequences tools.test ;
 IN: compiler.cfg.linear-scan.checker.tests
 
 : interval-a ( -- interval )
@@ -35,3 +35,26 @@ IN: compiler.cfg.linear-scan.checker.tests
 
 [ interval-a interval-b V{ { 7 4 } } >>ranges check-pair ]
 [ invalid-allocated-ranges? ] must-fail-with
+
+{ } [
+    interval-a interval-b 2array dup required-register-uses
+    check-register-uses
+] unit-test
+
+! Losing an entire interval is invisible to a range-overlap-only check.
+[
+    interval-a interval-b 2array required-register-uses
+    interval-a 1array swap check-register-uses
+] [ changed-register-uses? ] must-fail-with
+
+[
+    interval-a interval-b 2array required-register-uses
+    interval-a dup interval-b 3array swap check-register-uses
+] [ changed-register-uses? ] must-fail-with
+
+! Memory operands at clobbers can disappear from the register intervals.
+{ { { 0 0 } } } [
+    interval-a V{ T{ vreg-use { n 0 } }
+                  T{ vreg-use { n 10 } { spill-slot? t } } } >>uses
+    1array required-register-uses
+] unit-test

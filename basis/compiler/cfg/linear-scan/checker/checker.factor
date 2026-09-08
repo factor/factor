@@ -8,6 +8,21 @@ ERROR: invalid-allocated-ranges interval ;
 ERROR: invalid-allocated-register interval ;
 ERROR: uncovered-allocated-use interval use ;
 ERROR: overlapping-allocated-ranges first-interval second-interval ;
+ERROR: changed-register-uses expected actual ;
+
+! Snapshot before splitting. Checking only the final intervals cannot detect
+! a lost or duplicated operand. Clobber operands explicitly assigned spill
+! slots do not require a surviving register interval at the clobber itself.
+:: required-register-uses ( intervals/sync-points -- uses )
+    intervals/sync-points [ live-interval-state? ] filter [| interval |
+        interval uses>> [ spill-slot?>> not ] filter [| use |
+            interval vreg>> use n>> 2array
+        ] map
+    ] map concat natural-sort ;
+
+:: check-register-uses ( intervals expected -- )
+    intervals required-register-uses :> actual
+    expected actual = [ expected actual changed-register-uses ] unless ;
 
 :: check-interval ( interval registers -- )
     interval ranges>> valid-ranges?
