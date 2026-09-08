@@ -112,7 +112,7 @@ HELP: >hex
 
 HELP: number>string
 { $values { "n" real } { "str" string } }
-{ $description "Converts a real number to a string." }
+{ $description "Converts a real number to a string. Finite floating-point values use a shortest decimal representation that recovers the same binary value when read by " { $link string>number } ", including at rounding interval boundaries." }
 { $notes "Printing complex numbers requires the more general prettyprinter facility (see " { $link "prettyprint" } ")." } ;
 
 HELP: #
