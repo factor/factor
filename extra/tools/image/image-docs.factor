@@ -77,8 +77,8 @@ HELP: image-header
 
 HELP: >compression-header
 { $values
-    { "headerv4" image-header }
-    { "headerv4+" image-header }
+    { "header" image-header }
+    { "header'" image-header }
 }
 { $description "Converts any header into a compression supporting header" }
 ;
