@@ -150,6 +150,9 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 # Default target must be first
 all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
 
+# Shared layouts and inline VM code must not leave stale objects behind.
+$(DLL_OBJS) vm\main-windows.obj vm\tests\gc.obj vm\tests\windows_allocation.obj: vm\*.hpp
+
 # batch mode has ::
 .cpp.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
@@ -166,7 +169,9 @@ vm\cpu-arm.64-trampoline.obj:
 .rs.res:
 	rc /nologo $<
 
-libfactor-ffi-test.dll: vm/ffi_test.obj
+vm/ffi_test.obj: vm/ffi_test.h
+
+libfactor-ffi-test.dll: vm/ffi_test.obj vm/ffi_test.def
 	link $(LINK_FLAGS) /out:libfactor-ffi-test.dll /dll /def:vm\ffi_test.def vm/ffi_test.obj
 
 factor.dll.lib: $(DLL_OBJS)
@@ -177,6 +182,21 @@ factor.com: $(EXE_OBJS) $(DLL_OBJS)
 
 factor.exe: $(EXE_OBJS) $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:factor.exe /SUBSYSTEM:$(SUBSYSTEM_EXE_FLAGS) $(EXE_OBJS) $(DLL_OBJS)
+
+vm\tests\gc.obj: vm\tests\gc.cpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\gc.obj /c vm\tests\gc.cpp
+
+gc-tests.exe: vm\tests\gc.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:gc-tests.exe /SUBSYSTEM:console vm\tests\gc.obj $(DLL_OBJS)
+
+vm\tests\windows_allocation.obj: vm\tests\windows_allocation.cpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_allocation.obj /c vm\tests\windows_allocation.cpp
+
+windows-allocation-tests.exe: vm\tests\windows_allocation.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:windows-allocation-tests.exe /SUBSYSTEM:console vm\tests\windows_allocation.obj $(DLL_OBJS)
+
+test-vm: gc-tests.exe windows-allocation-tests.exe
+	.\gc-tests.exe
 
 # If we compile factor.exe, run mt.exe, and run factor.exe,
 # then Windows caches the manifest. Even on a recompile without applying
@@ -194,6 +214,14 @@ factor.exe.manifest: factor.exe
 
 clean:
 	del vm\*.obj
+	if exist vm\tests\gc.obj del vm\tests\gc.obj
+	if exist vm\tests\windows_allocation.obj del vm\tests\windows_allocation.obj
+	if exist gc-tests.exe del gc-tests.exe
+	if exist gc-tests.lib del gc-tests.lib
+	if exist gc-tests.exp del gc-tests.exp
+	if exist windows-allocation-tests.exe del windows-allocation-tests.exe
+	if exist windows-allocation-tests.lib del windows-allocation-tests.lib
+	if exist windows-allocation-tests.exp del windows-allocation-tests.exp
 	if exist vm\factor.res del vm\factor.res
 	if exist factor.lib del factor.lib
 	if exist factor.com del factor.com
@@ -207,6 +235,6 @@ clean:
 	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
 	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
-.PHONY: all clean factor.exe.manifest
+.PHONY: all clean factor.exe.manifest test-vm
 
 .SUFFIXES: .rs
