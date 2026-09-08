@@ -38,6 +38,35 @@ all-simd-classes [
     ] { t } swap unit-test
 ] each
 
+! SSE lane shifts encode literal counts in one byte. Oversized counts must
+! saturate the shift, not wrap modulo 256. Check literal and register paths.
+:: lane-shift-matches? ( input n op: ( v n -- w ) -- ? )
+    input class-of 1array :> declaration
+    input t "always-inline-simd-intrinsics" [
+        declaration n op '[ _ declare _ @ ]
+        [ compile-call ] call( v quot -- w )
+    ] with-variable underlying>> :> expected
+    input declaration n op '[ _ declare _ @ ]
+    [ compile-call ] call( v quot -- w ) underlying>> expected =
+    input n input class-of n class-of 2array op '[ _ declare @ ]
+    [ compile-call ] call( v n quot -- w ) underlying>> expected = and ; inline
+
+{
+    short-8{ -1 -32768 32767 1 -2 2 -3 3 }
+    ushort-8{ 1 65535 32768 32767 2 3 4 5 }
+    int-4{ -2147483648 2147483647 -1 1 }
+    uint-4{ 4294967295 2147483648 1 0 }
+    longlong-2{ -9223372036854775808 9223372036854775807 }
+    ulonglong-2{ 18446744073709551615 1 }
+} [
+    '[
+        { 0 15 16 31 32 63 64 255 256 257 1000 } [
+            _ swap [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ] 2bi and
+        ] all?
+    ] { t } swap unit-test
+] each
+
 ! Dot products accumulate scalar products rather than wrapping integer lanes.
 ! Compare all representations, including half/bfloat, with exact small sums.
 :: dot-matches? ( a b expected -- ? )

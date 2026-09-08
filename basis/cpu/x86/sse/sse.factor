@@ -868,9 +868,11 @@ M: x86 %shr-vector-reps
         { sse2? { short-8-rep ushort-8-rep int-4-rep uint-4-rep ulonglong-2-rep } }
     } available-reps ;
 
-M: x86 %shl-vector-imm %shl-vector ;
+! The encoding has an imm8 count, but counts at least 64 already shift out
+! every lane (or replicate its sign). Do not wrap oversized counts to zero.
+M: x86 %shl-vector-imm [ 64 min ] dip %shl-vector ;
 M: x86 %shl-vector-imm-reps %shl-vector-reps ;
-M: x86 %shr-vector-imm %shr-vector ;
+M: x86 %shr-vector-imm [ 64 min ] dip %shr-vector ;
 M: x86 %shr-vector-imm-reps %shr-vector-reps ;
 
 M: x86 %integer>scalar drop MOVD ;
