@@ -55,6 +55,10 @@ IN: bootstrap.assembler.x86
     ctx-reg vm-reg vm-context-offset [+] MOV ;
 
 : jit-save-context ( -- )
+    ! Fault in Factor code before a native prologue crosses the guard.
+    ! Rosetta cannot always recover a fault partway through its translated
+    ! sequence of pushes. Leave enough room to enter GC and unlock its reserve.
+    R11 RSP -4096 [+] MOV
     jit-load-context
     ! The reason for -8 I think is because we are anticipating a CALL
     ! instruction. After the call instruction, the contexts frame_top

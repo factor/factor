@@ -82,10 +82,11 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
   return ret == 0;
 }
 
-segment::segment(cell size_, bool executable_p) {
+segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
   size = size_;
 
   int pagesize = getpagesize();
+  low_guard_size = std::max((cell)pagesize, align_page(low_guard_size_));
 
 #if defined(__APPLE__) && defined(FACTOR_ARM64)
   int prot = PROT_READ | PROT_WRITE;
@@ -99,13 +100,13 @@ segment::segment(cell size_, bool executable_p) {
   int flags = MAP_ANON | MAP_PRIVATE;
 #endif
 
-  cell alloc_size = 2 * pagesize + size;
+  cell alloc_size = low_guard_size + pagesize + size;
   char* array = (char*)mmap(NULL, alloc_size, prot, flags, -1, 0);
 
   if (array == (char*)-1)
     fatal_error("Out of memory in mmap", alloc_size);
 
-  start = (cell)(array + pagesize);
+  start = (cell)(array + low_guard_size);
   end = start + size;
 
 #if defined(__APPLE__) && defined(FACTOR_ARM64)
@@ -120,7 +121,7 @@ segment::segment(cell size_, bool executable_p) {
 
 segment::~segment() {
   int pagesize = getpagesize();
-  int retval = munmap((void*)(start - pagesize), 2 * pagesize + size);
+  int retval = munmap((void*)(start - low_guard_size), low_guard_size + pagesize + size);
   if (retval)
     fatal_error("Segment deallocation failed", 0);
 }

@@ -10,7 +10,10 @@ context::context(cell ds_size, cell rs_size, cell cs_size)
       callstack_save(0),
       datastack_seg(new segment(ds_size, false)),
       retainstack_seg(new segment(rs_size, false)),
-      callstack_seg(new segment(cs_size, false)) {
+      // GC unlocks this reserve while the Factor callstack remains in place.
+      // A single 4 KiB page is insufficient for native symbol lookup during
+      // compaction on macOS x64, even with an optimized VM.
+      callstack_seg(new segment(cs_size, false, 64 * 1024)) {
   reset();
 }
 

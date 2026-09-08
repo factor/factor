@@ -96,11 +96,12 @@ void factor_vm::primitive_existsp() {
   ctx->push(tag_boolean(windows_stat(path)));
 }
 
-segment::segment(cell size_, bool executable_p) {
+segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
   size = size_;
+  low_guard_size = std::max((cell)getpagesize(), align_page(low_guard_size_));
 
   char* mem;
-  cell alloc_size = getpagesize() * 2 + size;
+  cell alloc_size = low_guard_size + getpagesize() + size;
   if ((mem = (char*)VirtualAlloc(
            NULL, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
@@ -108,14 +109,14 @@ segment::segment(cell size_, bool executable_p) {
     fatal_error("Out of memory in VirtualAlloc", alloc_size);
   }
 
-  start = (cell)mem + getpagesize();
+  start = (cell)mem + low_guard_size;
   end = start + size;
 
   set_border_locked(true);
 }
 
 segment::~segment() {
-  if (!VirtualFree((void*)(start - getpagesize()), 0, MEM_RELEASE))
+  if (!VirtualFree((void*)(start - low_guard_size), 0, MEM_RELEASE))
     fatal_error("Segment deallocation failed", 0);
 }
 
