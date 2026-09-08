@@ -1,27 +1,38 @@
-USING: compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
+USING: arrays compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
-sequences tools.test ;
+sequences system tools.test ;
 IN: math.integers.tests
+
+! x86 IDIV traps become OS signal errors; VM primitives and ARM64's explicit
+! zero-divisor checks produce ERROR-DIVIDE-BY-ZERO instead. Accept only those
+! specific errors, so unrelated faults still fail these regression tests.
+: division-by-zero-error? ( error -- ? )
+    dup ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = [ drop t ] [
+        cpu x86? [
+            KERNEL-ERROR ERROR-SIGNAL
+            os windows? 0xc0000094 8 ? f 4array =
+        ] [ drop f ] if
+    ] if ;
 
 ! Integer division must raise on every path, including ARM64 SDIV fast paths.
 { -5 0 5 } [
     '[ _ 0 [ fixnum/i ] compile-call ]
-    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+    [ division-by-zero-error? ] must-fail-with
 ] each
 
 { fixnum/i-fast fixnum-mod } [
     '[ 0 0 [ _ execute ] compile-call ]
-    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+    [ division-by-zero-error? ] must-fail-with
 ] each
 
 { fixnum/mod fixnum/mod-fast } [
     '[ 5 0 [ _ execute ] compile-call ]
-    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+    [ division-by-zero-error? ] must-fail-with
 ] each
 
 { /i mod /mod } [
     '[ 0 0 [ _ execute ] compile-call ]
-    [ ${ KERNEL-ERROR ERROR-DIVIDE-BY-ZERO f f } = ] must-fail-with
+    [ division-by-zero-error? ] must-fail-with
 ] each
 
 10 number-base [
