@@ -1,6 +1,6 @@
 USING: accessors alien alien.accessors arrays byte-arrays classes combinators
 cpu.architecture effects functors generalizations kernel lexer
-literals math math.floats.small.c-types math.bitwise math.functions math.vectors
+literals math math.floats.small.c-types math.bitwise math.functions math.order math.vectors
 math.vectors.simd.intrinsics parser prettyprint.custom
 quotations sequences sequences.generalizations sequences.private
 words vocabs vocabs.loader ;
@@ -82,7 +82,9 @@ DEFER: simd-construct-op
     drop [ simd-unbox ] 3dip 3curry make-underlying ; inline
 
 : vn->v-op ( a n rep quot: ( (a) n rep -- (c) ) fallback-quot -- c )
-    drop [ [ simd-unbox ] [ >fixnum ] bi* ] 2dip 3curry make-underlying ; inline
+    ! No lane is wider than 64 bits. Clamp before unboxing so that bignum
+    ! counts cannot truncate to zero (or to a negative machine integer).
+    drop [ [ simd-unbox ] [ 64 min >fixnum ] bi* ] 2dip 3curry make-underlying ; inline
 
 : vx->x-op ( a obj rep quot: ( (a) obj rep -- obj ) fallback-quot -- obj )
     drop [ underlying>> ] 3dip call ; inline
