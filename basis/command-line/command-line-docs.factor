@@ -8,7 +8,7 @@ HELP: run-user-init
 { $description "Runs the startup initialization file in the user's " { $link home } " directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-rc" } "." } ;
 
 HELP: load-vocab-roots
-{ $description "Loads the newline-separated list of additional vocabulary roots from the file named " { $snippet ".factor-roots" } "." } ;
+{ $description "Loads the newline-separated list of additional vocabulary roots from the UTF-8 file named " { $snippet ".factor-roots" } ". An optional UTF-8 byte-order mark is ignored." } ;
 
 HELP: param
 { $values { "param" string } }
