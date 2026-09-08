@@ -430,4 +430,5 @@ void* bug1021_test_3(int x) {
 #if defined(__linux__) || defined(__APPLE__)
 #include "tests/ffi_uint_callback.c"
 #include "tests/ffi_array_struct.c"
+#include "tests/ffi_fp_status.c"
 #endif

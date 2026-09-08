@@ -36,3 +36,13 @@ double call_int_boundary(int_cb f) {
     return f(1,2,3,4,5,6,7,(struct longs){8,9},10);
 }
 double abi_hfa_stack(long long a,long long b,long long c,long long d,long long e,long long f,long long g,long long h,float a0,float a1,float a2,float a3,float a4,float a5,float a6,float a7,signed char i,struct pair j,float k) { return a+b+c+d+e+f+g+h+a0+a1+a2+a3+a4+a5+a6+a7+i+j.x+2*j.y+k; }
+
+int abi_call_int(int (*cb)(int), int x) { return cb(x); }
+int abi_pointer_gc(void (*cb)(unsigned char *)) {
+    unsigned char bytes[32];
+    for (int i=0; i<32; ++i) bytes[i] = 0x5a;
+    cb(bytes);
+    if (bytes[0] != 0xa5) return 0;
+    for (int i=1; i<32; ++i) if (bytes[i] != 0x5a) return 0;
+    return 1;
+}

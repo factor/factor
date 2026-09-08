@@ -30,4 +30,6 @@ double abi_var_array(int named,...);
 double abi_int_boundary(long long a,long long b,long long c,long long d,long long e,long long f,long long g,struct longs h,long long i);
 double call_int_boundary(int_cb f);
 double abi_hfa_stack(long long a,long long b,long long c,long long d,long long e,long long f,long long g,long long h,float a0,float a1,float a2,float a3,float a4,float a5,float a6,float a7,signed char i,struct pair j,float k);
+int abi_call_int(int (*cb)(int), int x);
+int abi_pointer_gc(void (*cb)(unsigned char *));
 #endif
