@@ -1,4 +1,4 @@
-USING: accessors alien.c-types classes.struct kernel libc
+USING: accessors alien.c-types arrays classes.struct kernel libc
 linux.input-events.ffi sequences tools.test ;
 IN: linux.input-events.ffi.tests
 

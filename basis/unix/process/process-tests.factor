@@ -14,6 +14,9 @@ IN: unix.process.tests
     ] [ attr posix-spawnattr-destroy ] finally ;
 
 ! Linux's struct sched_param contains one int; other OS layouts may differ.
-os linux? [ { 0 7 } [ scheduler-roundtrip ] unit-test ] when
+os linux? [
+    { 0 7 } [ scheduler-roundtrip ] unit-test
+    { 0x80 } [ POSIX_SPAWN_SETSID ] unit-test
+] when
 
 { } [ posix-spawn-file-actions-init posix-spawn-file-actions-destroy ] unit-test

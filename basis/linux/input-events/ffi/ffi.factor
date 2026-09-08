@@ -1,6 +1,6 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax byte-arrays
+USING: alien alien.c-types alien.data alien.syntax arrays byte-arrays
 classes.struct combinators continuations io.encodings.string
 io.encodings.utf8 kernel libc math math.vectors sequences
 splitting unix.ffi unix.types ;
@@ -929,8 +929,10 @@ ENUM: INPUT_SW
     { SW_LINEIN_INSERT             0x0d }    ! set = inserted
     { SW_MUTE_DEVICE               0x0e }    ! set = device disabled
     { SW_PEN_INSERTED              0x0f }    ! set = pen inserted
-    { SW_MAX                       0x0f }
-    { SW_CNT                       0x10 } ;  ! (SW_MAX+1)
+    { SW_MACHINE_COVER             0x10 }
+    { SW_USB_INSERT                0x11 }
+    { SW_MAX                       0x11 }
+    { SW_CNT                       0x12 } ;  ! (SW_MAX+1)
 
 CONSTANT: SW_RADIO                     SW_RFKILL_ALL  ! deprecated
 
