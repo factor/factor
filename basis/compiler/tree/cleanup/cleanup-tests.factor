@@ -538,6 +538,28 @@ M: float detect-float ;
 MIXIN: foo-mix
 
 ! cleanup-folding?
+! A literal false is foldable, but no outputs, a nonliteral output, or
+! missing output information must prevent folding.
+{ { f t t f f f } } [
+    { { } { 1 } { 1 3 } { 1 2 } { 2 1 } { 4 } } [
+        #call new swap >>out-d
+        H{
+            { 1 T{ value-info-state { literal f } { literal? t } } }
+            { 2 T{ value-info-state { class object } } }
+            { 3 T{ value-info-state { literal t } { literal? t } } }
+        } >>info cleanup-folding?
+    ] map
+] unit-test
+
+! Predicate folding reads the first input and output, preserving false.
+{ object fixnum f } [
+    #call new \ fixnum? >>word { 1 2 } >>in-d { 3 4 } >>out-d
+    H{
+        { 1 T{ value-info-state { class object } } }
+        { 3 T{ value-info-state { literal f } { literal? t } } }
+    } >>info >predicate-folding< [ class>> ] 2dip
+] unit-test
+
 : call-node-foldable2 ( -- node )
     T{ #call
        { word foo-mix? }
