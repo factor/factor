@@ -1,5 +1,5 @@
 USING: accessors assocs continuations http http.client
-http.client.private http.server http.server.requests io.crlf
+http.client.private http.server http.server.requests io io.crlf
 io.streams.limited io.streams.string linked-assocs kernel math
 math.parser multiline namespaces peg sequences splitting
 tools.test urls ;
@@ -94,6 +94,28 @@ hello
 
 ! Empty request lines
 [ "" string>request ] [ parse-error>> parse-error? ] must-fail-with
+
+! An incomplete TLS record must be rejected without waiting for more
+! input. A finite string alone would not catch the blocking-read bug.
+TUPLE: incomplete-tls-stream read? ;
+
+M: incomplete-tls-stream stream-read1
+    dup read?>> [ drop "Read past TLS record type" throw ] [
+        t >>read? drop 0x16
+    ] if ;
+
+M: incomplete-tls-stream stream-read-until
+    nip dup stream-read1 drop stream-read1 drop f f ;
+
+[
+    incomplete-tls-stream new [ <request> read-request-line ]
+    with-input-stream*
+] [ bad-request-line? ] must-fail-with
+
+{ "GET" "GET" } [
+    "\n\nGET / HTTP/1.0\n\n" string>request method>>
+    "\tGET / HTTP/1.0\r\n\r\n" string>request method>>
+] unit-test
 
 ! Missing content-length is probably not ok. It's plausible
 ! transfer-length could replace it, but we don't handle it atm anyway.

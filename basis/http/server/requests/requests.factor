@@ -1,6 +1,6 @@
 USING: accessors ascii combinators continuations http http.parsers io
 io.crlf io.encodings io.encodings.binary io.streams.limited
-kernel math.order math.parser namespaces sequences splitting
+kernel math.order math.parser namespaces sequences splitting strings
 urls urls.encoding ;
 FROM: mime.multipart => parse-multipart ;
 IN: http.server.requests
@@ -23,8 +23,30 @@ ERROR: bad-request-line < request-error parse-error ;
 : parse-request-line-safe ( string -- triple )
     [ parse-request-line ] [ nip bad-request-line ] recover ;
 
+<PRIVATE
+
+: read-request-line-string ( -- string/f )
+    read1 {
+        { f [ f ] }
+        { CHAR: \r [ read1 CHAR: \n assert= "" ] }
+        { CHAR: \n [ "" ] }
+        [
+            ! Reject binary protocols before waiting for a newline. In
+            ! particular, a TLS ClientHello starts with the control byte
+            ! 0x16; waiting for its random payload to contain a newline
+            ! deadlocks the HTTP server and the TLS client (#2823).
+            dup control? over CHAR: \t = not and [
+                dup 1string parse-request-line-safe drop
+            ] when
+            read-?crlf "" or swap prefix
+        ]
+    } case ;
+
+PRIVATE>
+
 : read-request-line ( request -- request )
-    read-?crlf [ dup "" = ] [ drop read-?crlf ] while
+    read-request-line-string
+    [ dup "" = ] [ drop read-request-line-string ] while
     parse-request-line-safe first3
     [ >>method ] [ >url dup check-absolute >>url ] [ >>version ] tri* ;
 
