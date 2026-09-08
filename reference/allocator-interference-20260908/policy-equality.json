@@ -1,0 +1,79 @@
+{
+  "equal": true,
+  "baseline": "233db947df",
+  "candidate": "40daa1f79e",
+  "cases": [
+    {
+      "input": "[ { fixnum fixnum } declare + ]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 64,
+      "fingerprint": "f230237cb93fd2762a4e971f9103cbbd0955c20065271b7eaaf57b3da3ce1e16"
+    },
+    {
+      "input": "[ { fixnum fixnum } declare + ]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 64,
+      "fingerprint": "9737174c68f8c95371c39d2e9bbb43446fbd1fa8bc3da7b0b3857ac3db4d59a8"
+    },
+    {
+      "input": "[ { float float float } declare * + ]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 128,
+      "fingerprint": "b31cdea0c622630e8591653b0713075b43667d392c74e5284b158951a49633d6"
+    },
+    {
+      "input": "[ { float float float } declare * + ]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 128,
+      "fingerprint": "b3dc3c69542b78319248834085d11257fb014a87f473de100b7e14df737ddb81"
+    },
+    {
+      "input": "[ <iota> 0 [ + ] reduce ]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 976,
+      "fingerprint": "12c1c56fc36dd7198ac3e1571e83afd6fe126fd83be59cf0b8313cae4a720283"
+    },
+    {
+      "input": "[ <iota> 0 [ + ] reduce ]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 976,
+      "fingerprint": "bd893978e9d046e8d3d3231bd842b7723d41bef7b40032665186e11ae38101db"
+    },
+    {
+      "input": "[ [ dup * ] map ]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 784,
+      "fingerprint": "3e26a955cd36ebd1feb509fee572b6b8c2a30e6d76e2fcde3cc5fe35cd81e2f7"
+    },
+    {
+      "input": "[ [ dup * ] map ]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 784,
+      "fingerprint": "b96af7bbb5cfe3fe6362464b91bd39d70072af0dec54106ed54c06f84619b75d"
+    },
+    {
+      "input": "[ dup [ 1 - ] [ 2 + ] if ]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 80,
+      "fingerprint": "14854ccb7e09b3fc3e1ebbd0fdf78e21892eaf465a55c7a1d96ad3748cad5274"
+    },
+    {
+      "input": "[ dup [ 1 - ] [ 2 + ] if ]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 80,
+      "fingerprint": "5953a77bf523190f7d7efa941dc128f0bca0084be1578e3a14a6d1a5e6767e8a"
+    },
+    {
+      "input": "[\n    {\n        [ 1 fixnum+fast ]\n        [ 2 fixnum+fast ]\n        [ 3 fixnum+fast ]\n        [ 4 fixnum+fast ]\n        [ 5 fixnum+fast ]\n        [ 6 fixnum+fast ]\n        [ 7 fixnum+fast ]\n        [ 8 fixnum+fast ]\n        [ 9 fixnum+fast ]\n        [ 10 fixnum+fast ]\n        [ 11 fixnum+fast ]\n        [ 12 fixnum+fast ]\n        [ 13 fixnum+fast ]\n        [ 14 fixnum+fast ]\n        [ 15 fixnum+fast ]\n        [ 16 fixnum+fast ]\n        [ 17 fixnum+fast ]\n        [ 18 fixnum+fast ]\n        [ 19 fixnum+fast ]\n        [ 20 fixnum+fast ]\n        [ 21 fixnum+fast ]\n        [ 22 fixnum+fast ]\n        [ 23 fixnum+fast ]\n        [ 24 fixnum+fast ]\n        [ 25 fixnum+fast ]\n        [ 26 fixnum+fast ]\n        [ 27 fixnum+fast ]\n        [ 28 fixnum+fast ]\n        [ 29 fixnum+fast ]\n        [ 30 fixnum+fast ]\n        [ 31 fixnum+fast ]\n        [ 32 fixnum+fast ]\n        [ 33 fixnum+fast ]\n        [ 34 fixnum+fast ]\n        [ 35 fixnum+fast ]\n        [ 36 fixnum+fast ]\n        [ 37 fixnum+fast ]\n        [ 38 fixnum+fast ]\n        [ 39 fixnum+fast ]\n        [ 40 fixnum+fast ]\n    } cleave fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n]",
+      "allocator": "backtracking-allocator",
+      "code_bytes": 576,
+      "fingerprint": "1d307b8d6554b27284f26d616cb10e0d4e4c823fc71432d1ee6118b28e0e21f8"
+    },
+    {
+      "input": "[\n    {\n        [ 1 fixnum+fast ]\n        [ 2 fixnum+fast ]\n        [ 3 fixnum+fast ]\n        [ 4 fixnum+fast ]\n        [ 5 fixnum+fast ]\n        [ 6 fixnum+fast ]\n        [ 7 fixnum+fast ]\n        [ 8 fixnum+fast ]\n        [ 9 fixnum+fast ]\n        [ 10 fixnum+fast ]\n        [ 11 fixnum+fast ]\n        [ 12 fixnum+fast ]\n        [ 13 fixnum+fast ]\n        [ 14 fixnum+fast ]\n        [ 15 fixnum+fast ]\n        [ 16 fixnum+fast ]\n        [ 17 fixnum+fast ]\n        [ 18 fixnum+fast ]\n        [ 19 fixnum+fast ]\n        [ 20 fixnum+fast ]\n        [ 21 fixnum+fast ]\n        [ 22 fixnum+fast ]\n        [ 23 fixnum+fast ]\n        [ 24 fixnum+fast ]\n        [ 25 fixnum+fast ]\n        [ 26 fixnum+fast ]\n        [ 27 fixnum+fast ]\n        [ 28 fixnum+fast ]\n        [ 29 fixnum+fast ]\n        [ 30 fixnum+fast ]\n        [ 31 fixnum+fast ]\n        [ 32 fixnum+fast ]\n        [ 33 fixnum+fast ]\n        [ 34 fixnum+fast ]\n        [ 35 fixnum+fast ]\n        [ 36 fixnum+fast ]\n        [ 37 fixnum+fast ]\n        [ 38 fixnum+fast ]\n        [ 39 fixnum+fast ]\n        [ 40 fixnum+fast ]\n    } cleave fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n    fixnum+fast fixnum+fast fixnum+fast fixnum+fast fixnum+fast\n]",
+      "allocator": "greedy-allocator",
+      "code_bytes": 560,
+      "fingerprint": "6b91e79d37d486298c2ee03170c2ea8332135a919548baea4a2b299bdafdd434"
+    }
+  ]
+}
