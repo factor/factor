@@ -8,7 +8,7 @@ compiler.tree.debugger compiler.units definitions delegate
 destructors eval generic generic.single io.encodings.utf8
 io.streams.string kernel layouts lexer libc literals math
 mirrors namespaces parser prettyprint prettyprint.config see
-sequences specialized-arrays specialized-arrays.private
+sequences specialized-arrays specialized-arrays.private stack-checker.dependencies
 system tools.test vocabs ;
 FROM: math => float ;
 QUALIFIED-WITH: alien.c-types c
@@ -571,3 +571,43 @@ STRUCT: some-accessors { aaa uint } { bbb int } ;
     B{ 98 0 22 0 1 1 1 1 1 1 1 1 } struct-test-foo memory>struct
     =
 ] unit-test
+
+! A conditional struct-layout dependency becomes unsatisfied when the class
+! is redefined or forgotten; checking it must not access nonexistent fields.
+STRUCT: dependency-struct { value int } ;
+SYMBOL: saved-struct-dependency
+
+{ t } [
+    dependency-struct dup struct-slots depends-on-struct-slots boa
+    dup saved-struct-dependency set satisfied?
+] unit-test
+
+{ } [
+    "USING: alien.c-types classes.struct ; IN: classes.struct.tests STRUCT: dependency-struct { value int } { extra int } ;"
+    eval( -- )
+] unit-test
+
+{ f } [ saved-struct-dependency get satisfied? ] unit-test
+
+{ t } [
+    dependency-struct dup struct-slots depends-on-struct-slots boa
+    dup saved-struct-dependency set satisfied?
+] unit-test
+
+{ } [
+    "USING: classes.tuple ; IN: classes.struct.tests TUPLE: dependency-struct value ;"
+    eval( -- )
+] unit-test
+
+{ f } [ saved-struct-dependency get satisfied? ] unit-test
+
+STRUCT: forgotten-dependency-struct { value int } ;
+
+{ t } [
+    forgotten-dependency-struct dup struct-slots depends-on-struct-slots boa
+    dup saved-struct-dependency set satisfied?
+] unit-test
+
+{ } [ [ forgotten-dependency-struct forget ] with-compilation-unit ] unit-test
+
+{ f } [ saved-struct-dependency get satisfied? ] unit-test
