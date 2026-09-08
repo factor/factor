@@ -20,6 +20,21 @@ ARTICLE: "compiler.cfg.register-allocation" "Selecting a register allocator"
         "linear-scan-allocator register-allocator"
         "[ [ + ] measure-compilation . ] with-variable" }
 "Allocator implementations receive the CFG before SSA destruction so that SSA-based algorithms can use their required invariants. Each implementation must produce a fully allocated CFG."
+"Three experimental alternatives are available:"
+{ $list
+    { { $vocab-link "compiler.cfg.register-allocation.greedy" } ": LLVM-inspired priority allocation, eviction and loop-aware splitting." }
+    { { $vocab-link "compiler.cfg.register-allocation.backtracking" } ": regalloc2-inspired affinity bundles, eviction and use-boundary splitting." }
+    { { $vocab-link "compiler.cfg.register-allocation.chordal" } ": SSA interference-graph coloring with a chordality certificate and interval-based spill repair." }
+}
+"These are Factor implementations of the approaches, with different engineering tradeoffs from their reference compilers. Compare generated code and execution as well as compilation cost before choosing a default."
+{ $code "USING: compiler.cfg.metrics compiler.cfg.register-allocation"
+        "compiler.cfg.register-allocation.greedy"
+        "compiler.cfg.register-allocation.backtracking"
+        "compiler.cfg.register-allocation.chordal"
+        "kernel.private math prettyprint ;"
+        "[ { fixnum fixnum } declare + ]"
+        "{ linear-scan-allocator greedy-allocator"
+        "  backtracking-allocator chordal-allocator } compare-allocators ." }
 ;
 
 ABOUT: "compiler.cfg.register-allocation"
