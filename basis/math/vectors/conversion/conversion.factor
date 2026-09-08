@@ -29,7 +29,7 @@ ERROR: bad-vconvert-input value expected-type ;
             [ [ ] ]
         }
         {
-            [ from-element to-element [ { half bfloat } member-eq? ] both? ]
+            [ to-element { half bfloat } member-eq? ]
             [ [ to-type new clone-like ] ]
         }
         {

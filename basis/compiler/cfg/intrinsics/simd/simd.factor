@@ -688,8 +688,6 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
     { [ f swap ^^mul-wide-vector ] } emit-vv-vector-op ;
 : emit-simd-mul-wide-tail ( node -- )
     { [ t swap ^^mul-wide-vector ] } emit-vv-vector-op ;
-: emit-simd-v>unsigned-integer ( node -- )
-    { [ "float>unsigned" swap ^^unary-vector-function ] } emit-v-vector-op ;
 
 : emit-simd-reduce ( node -- )
     { [| src op rep | src op rep ^^unary-vector-function rep ^^vector>scalar ] }
@@ -703,7 +701,6 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
         { (simd-vfma) [ emit-simd-vfma ] }
         { (simd-mul-wide-head) [ emit-simd-mul-wide-head ] }
         { (simd-mul-wide-tail) [ emit-simd-mul-wide-tail ] }
-        { (simd-v>unsigned-integer) [ emit-simd-v>unsigned-integer ] }
         { (simd-v+)                 [ emit-simd-v+                  ] }
         { (simd-v-)                 [ emit-simd-v-                  ] }
         { (simd-vneg)               [ emit-simd-vneg                ] }

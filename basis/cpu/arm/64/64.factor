@@ -1107,7 +1107,6 @@ M: arm.64 %unary-vector-function-reps
         { "truncate" [ float-vector-reps ] }
         { "round" [ float-vector-reps ] }
         { "round-even" [ float-vector-reps ] }
-        { "float>unsigned" [ float-vector-reps ] }
         { "bit-count" [ int-vector-reps ] }
         { "clz" [ int-vector-reps ] }
         { "ctz" [ int-vector-reps ] }
@@ -1152,7 +1151,6 @@ M:: arm.64 %unary-vector-function ( DST SRC op rep -- )
         { "truncate" [ DST SRC rep >shape FRINTZv ] }
         { "round" [ DST SRC rep >shape FRINTAv ] }
         { "round-even" [ DST SRC rep >shape FRINTNv ] }
-        { "float>unsigned" [ DST SRC rep >shape FCVTZUvi ] }
         { "bit-count" [
             DST SRC 16B CNTv
             rep >size <iota> [| size | DST DST size 1 <vector-shape> UADDLP ] each
