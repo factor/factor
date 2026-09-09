@@ -598,7 +598,10 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     t backtracking-phase-mode? set
     int-rep 3 set-rep-of
     H{ { 1 1 } { 2 2 } { 3 3 } } clone leader-map set
-    [ 1 11 ##load-integer, 2 22 ##load-integer, ##branch, ] V{ } make
+    ! The hand-authored intervals below require actual memory homes. Runtime
+    ! inputs keep that premise valid when the enclosing suite enables
+    ! rematerialization; constants would legitimately use recipe locations.
+    [ 1 D: 0 ##peek, 2 D: 1 ##peek, ##branch, ] V{ } make
     0 insns>block :> source
     V{ T{ ##branch } } clone 1 insns>block :> left
     V{ T{ ##branch } } clone 2 insns>block :> right
