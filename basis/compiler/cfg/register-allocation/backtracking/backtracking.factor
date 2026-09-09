@@ -437,6 +437,13 @@ M: backtracking-register-home emit-restore
         bb backtracking-phase-mode? get [ phase-block-from ] [ block-from ] if :> entry
         bb entry backtracking-point-blocks get set-at
         t entry backtracking-block-starts get set-at
+        ! Physical SSA assignment skips complete Factor call/prologue/epilogue
+        ! blocks. A second-chance range must neither cross their clobbers nor
+        ! start inside them and strand the assignment heap.
+        bb kill-block?>> [
+            entry bb block-to backtracking-phase-mode? get [ 1 + ] when
+            2array backtracking-barriers get push
+        ] when
         bb instructions>> [| insn |
             insn phase-split-insn? [
                 t insn insn#>> 1 + backtracking-late-points get set-at
@@ -485,7 +492,14 @@ M: backtracking-register-home emit-restore
         backtracking-phase-mode? get [ 1 + ] when = [ ] [
             vreg dup rep-of assign-spill-slot >>spill-to
         ] if
-        start backtracking-block-starts get key? [ ] [
+        start backtracking-block-starts get key?
+        start backtracking-point-blocks get at predecessors>>
+        [ kill-block?>> ] any? not and [ ] [
+            ! Kill-block outgoing edges have no physical register map. The
+            ! resident version must start with an explicit memory reload in
+            ! the ordinary successor, even at its first instruction. Entry
+            ! recording publishes this home, so ordinary predecessors of a
+            ! mixed join also initialize it through normal edge resolution.
             vreg dup rep-of assign-spill-slot >>reload-from
         ] if
     ] [ f ] if ;
