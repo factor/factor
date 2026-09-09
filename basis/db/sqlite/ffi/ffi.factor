@@ -1478,7 +1478,7 @@ FUNCTION: int sqlite3_carray_bind_v2 ( sqlite3_stmt* arg0, int arg1, void* arg2,
 
 FUNCTION: sqlite3_filename sqlite3_create_filename ( c-string arg0, c-string arg1, c-string arg2, int arg3, char** arg4 )
 
-FUNCTION: sqlite3_file* sqlite3_database_file_object ( c-string arg0 )
+FUNCTION: sqlite3_file* sqlite3_database_file_object ( sqlite3_filename arg0 )
 
 FUNCTION: int sqlite3_db_status64 ( sqlite3* arg0, int arg1, sqlite3_int64* arg2, sqlite3_int64* arg3, int arg4 )
 

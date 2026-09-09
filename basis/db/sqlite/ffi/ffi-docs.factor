@@ -59,7 +59,7 @@ $nl
 $nl
 "sqlite3_prepare16 now takes a raw pointer to UTF-16 bytes, consistently with sqlite3_prepare16_v2 and sqlite3_prepare16_v3. Its byte count is measured in bytes."
 $nl
-"sqlite3_filename is a raw char* alias. sqlite3_db_filename and sqlite3_filename_database/journal/wal preserve SQLite filename object identity; decode only when a display string is wanted. sqlite3_create_filename returns an owned filename object released by sqlite3_free_filename. URI lookup functions require the original SQLite filename object. db.sqlite.lib's current-sqlite-filename continues returning a Factor string."
+"sqlite3_filename is a raw char* alias. sqlite3_db_filename and sqlite3_filename_database/journal/wal preserve SQLite filename object identity; decode only when a display string is wanted. sqlite3_create_filename returns an owned filename object released by sqlite3_free_filename. URI lookup functions require the original SQLite filename object. sqlite3_database_file_object requires the original journal/WAL filename received by a VFS xOpen callback; a copied display string is invalid. db.sqlite.lib's current-sqlite-filename continues returning a Factor string."
 $nl
 "FTS5 phrase-iterator fields retain raw byte positions. The extended FTS5 API structs and sqlite3_module include all members in the reference header. Respect each interface's iVersion when using older runtimes, and initialize versioned structs consistently with the callbacks supplied."
 $nl

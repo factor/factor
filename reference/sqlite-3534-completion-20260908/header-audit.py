@@ -140,6 +140,10 @@ def audit(header, factor):
         'sqlite3_expanded_sql': ('returns', 'char*'),
         'sqlite3_serialize': ('returns', 'uchar*'),
         'sqlite3_create_filename': ('returns', 'sqlite3_filename'),
+        'sqlite3_db_filename': ('returns', 'sqlite3_filename'),
+        'sqlite3_filename_database': ('returns', 'sqlite3_filename'),
+        'sqlite3_filename_journal': ('returns', 'sqlite3_filename'),
+        'sqlite3_filename_wal': ('returns', 'sqlite3_filename'),
         'sqlite3_mprintf': ('returns', 'char*'),
         'sqlite3_vmprintf': ('returns', 'char*'),
         'sqlite3_str_finish': ('returns', 'char*'),
@@ -156,9 +160,12 @@ def audit(header, factor):
     for name, (key, typ) in expected.items():
         if name in header['functions'] and name in factor['functions'] and factor['functions'][name][key] != typ:
             result['ownership_mismatches'].append(dict(name=name, expected=typ, actual=factor['functions'][name][key]))
-    for name, index, typ in [('sqlite3_snprintf', 1, 'char*'), ('sqlite3_vsnprintf', 1, 'char*'), ('sqlite3_complete16', 0, 'void*')]:
+    for name, index, typ in [('sqlite3_snprintf', 1, 'char*'), ('sqlite3_vsnprintf', 1, 'char*'), ('sqlite3_complete16', 0, 'void*'), ('sqlite3_prepare16', 1, 'void*'), ('sqlite3_deserialize', 2, 'uchar*'), ('sqlite3_database_file_object', 0, 'sqlite3_filename'), ('sqlite3_uri_parameter', 0, 'sqlite3_filename'), ('sqlite3_uri_boolean', 0, 'sqlite3_filename'), ('sqlite3_uri_int64', 0, 'sqlite3_filename'), ('sqlite3_uri_key', 0, 'sqlite3_filename')]:
         if name in factor['functions'] and factor['functions'][name]['params'][index] != typ:
             result['ownership_mismatches'].append(dict(name=name, argument=index, expected=typ, actual=factor['functions'][name]['params'][index]))
+    for field in ('a', 'b'):
+        if factor['records'].get('Fts5PhraseIter', {}).get(field) != 'uchar*':
+            result['ownership_mismatches'].append(dict(name='Fts5PhraseIter', field=field, expected='uchar*', actual=factor['records'].get('Fts5PhraseIter', {}).get(field)))
     result['pass'] = not any(v['missing'] for v in result['coverage'].values()) and not any(result[k] for k in ('signature_mismatches', 'field_mismatches', 'typedef_mismatches', 'constant_value_mismatches', 'ownership_mismatches', 'record_reset_mismatches'))
     return result
 

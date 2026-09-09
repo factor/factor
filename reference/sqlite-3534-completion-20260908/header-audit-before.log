@@ -7,5 +7,5 @@ field_mismatches 3
 typedef_mismatches 0
 constant_value_mismatches 2
 record_reset_mismatches 1
-ownership_mismatches 2
+ownership_mismatches 10
 FAIL

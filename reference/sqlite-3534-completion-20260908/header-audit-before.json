@@ -1327,32 +1327,6 @@
               "sqlite3_file"
             ]
           ],
-          "int",
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xFileControl",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
           "int"
         ]
       ],
@@ -1361,270 +1335,6 @@
         "void"
       ],
       "location": "sqlite3_io_methods.xUnlock",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "long long",
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xUnfetch",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          [
-            "pointer",
-            "void"
-          ],
-          "int",
-          "long long"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xWrite",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xSectorSize",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          [
-            "pointer",
-            "int"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xCheckReservedLock",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xSync",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "long long"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xTruncate",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xShmBarrier",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          [
-            "pointer",
-            "long long"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xFileSize",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xDeviceCharacteristics",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "int",
-          "int",
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xShmLock",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "long long",
-          "int",
-          [
-            "pointer",
-            [
-              "pointer",
-              "void"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_io_methods.xFetch",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -1689,6 +1399,181 @@
             ]
           ],
           "int",
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xFileControl",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xSync",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          [
+            "pointer",
+            "void"
+          ],
+          "int",
+          "long long"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xWrite",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "int",
+          "int",
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xShmLock",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xSectorSize",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "long long",
+          "int",
+          [
+            "pointer",
+            [
+              "pointer",
+              "void"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xFetch",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          [
+            "pointer",
+            "long long"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xFileSize",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "int",
           "int",
           "int",
           [
@@ -1705,6 +1590,70 @@
         "void"
       ],
       "location": "sqlite3_io_methods.xShmMap",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xShmBarrier",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xClose",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "long long"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xTruncate",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -1740,6 +1689,10 @@
               "record",
               "sqlite3_file"
             ]
+          ],
+          [
+            "pointer",
+            "int"
           ]
         ]
       ],
@@ -1747,7 +1700,54 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_io_methods.xClose",
+      "location": "sqlite3_io_methods.xCheckReservedLock",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xDeviceCharacteristics",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "long long",
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_io_methods.xUnfetch",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -1778,9 +1778,47 @@
     {
       "c": [
         "callback",
+        "int",
         [
-          "pointer",
-          "void ("
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vfs"
+            ]
+          ],
+          [
+            "pointer",
+            "char"
+          ],
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_file"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            "int"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_vfs.xOpen",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        [
+          "callback",
+          "void",
+          []
         ],
         [
           [
@@ -1792,33 +1830,7 @@
           ],
           [
             "pointer",
-            "void"
-          ],
-          "char *))(void"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_vfs.xDlSym",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vfs"
-            ]
-          ],
-          [
-            "pointer",
-            "void"
+            "char"
           ]
         ]
       ],
@@ -1826,29 +1838,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_vfs.xDlClose",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vfs"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_vfs.xSleep",
+      "location": "sqlite3_vfs.xGetSystemCall",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -1879,6 +1869,32 @@
         "void"
       ],
       "location": "sqlite3_vfs.xFullPathname",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vfs"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            "char"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_vfs.xGetLastError",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -1942,7 +1958,7 @@
         "callback",
         [
           "pointer",
-          "void"
+          "void ("
         ],
         [
           [
@@ -1954,74 +1970,16 @@
           ],
           [
             "pointer",
-            "char"
-          ]
+            "void"
+          ],
+          "char *))(void"
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_vfs.xDlOpen",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        [
-          "callback",
-          "void",
-          []
-        ],
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vfs"
-            ]
-          ],
-          [
-            "pointer",
-            "char"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_vfs.xGetSystemCall",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vfs"
-            ]
-          ],
-          [
-            "pointer",
-            "char"
-          ],
-          [
-            "callback",
-            "void",
-            []
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_vfs.xSetSystemCall",
+      "location": "sqlite3_vfs.xDlSym",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2061,10 +2019,14 @@
               "sqlite3_vfs"
             ]
           ],
-          "int",
           [
             "pointer",
             "char"
+          ],
+          [
+            "callback",
+            "void",
+            []
           ]
         ]
       ],
@@ -2072,13 +2034,13 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_vfs.xGetLastError",
+      "location": "sqlite3_vfs.xSetSystemCall",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
       "c": [
         "callback",
-        "int",
+        "void",
         [
           [
             "pointer",
@@ -2089,19 +2051,7 @@
           ],
           [
             "pointer",
-            "char"
-          ],
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_file"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            "int"
+            "void"
           ]
         ]
       ],
@@ -2109,7 +2059,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_vfs.xOpen",
+      "location": "sqlite3_vfs.xDlClose",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2136,6 +2086,56 @@
         "void"
       ],
       "location": "sqlite3_vfs.xDlError",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        [
+          "pointer",
+          "void"
+        ],
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vfs"
+            ]
+          ],
+          [
+            "pointer",
+            "char"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_vfs.xDlOpen",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vfs"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_vfs.xSleep",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2195,7 +2195,7 @@
     {
       "c": [
         "callback",
-        "int",
+        "void",
         [
           [
             "pointer",
@@ -2207,7 +2207,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mem_methods.xSize",
+      "location": "sqlite3_mem_methods.xFree",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2225,7 +2225,58 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mem_methods.xFree",
+      "location": "sqlite3_mem_methods.xShutdown",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mem_methods.xInit",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mem_methods.xRoundup",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        [
+          "pointer",
+          "void"
+        ],
+        [
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mem_methods.xMalloc",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2255,21 +2306,6 @@
         "callback",
         "int",
         [
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_mem_methods.xRoundup",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
           [
             "pointer",
             "void"
@@ -2280,61 +2316,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mem_methods.xInit",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_mem_methods.xShutdown",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        [
-          "pointer",
-          "void"
-        ],
-        [
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_mem_methods.xMalloc",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            "char"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xShadowName",
+      "location": "sqlite3_mem_methods.xSize",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2348,112 +2330,14 @@
               "record",
               "sqlite3_vtab"
             ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xDisconnect",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab_cursor"
-            ]
           ],
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_context"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xColumn",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xCommit",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab_cursor"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xNext",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab_cursor"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            "char"
-          ],
-          "int",
           [
             "pointer",
             [
               "pointer",
               [
                 "record",
-                "sqlite3_value"
+                "sqlite3_vtab_cursor"
               ]
             ]
           ]
@@ -2463,28 +2347,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xFilter",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab_cursor"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xEof",
+      "location": "sqlite3_module.xOpen",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2506,84 +2369,6 @@
         "void"
       ],
       "location": "sqlite3_module.xSync",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            [
-              "pointer",
-              [
-                "record",
-                "sqlite3_value"
-              ]
-            ]
-          ],
-          [
-            "pointer",
-            "long long"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xUpdate",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xDestroy",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xRollback",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2629,6 +2414,27 @@
         "pointer",
         "void"
       ],
+      "location": "sqlite3_module.xCommit",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
       "location": "sqlite3_module.xBegin",
       "reason": "opaque pointer/callback ABI representation"
     },
@@ -2651,41 +2457,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xRollbackTo",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            "char"
-          ],
-          "void (**)(sqlite3_context *, int, sqlite3_value **)",
-          [
-            "pointer",
-            [
-              "pointer",
-              "void"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xFindFunction",
+      "location": "sqlite3_module.xSavepoint",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2747,6 +2519,48 @@
             "pointer",
             [
               "record",
+              "sqlite3_vtab_cursor"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xNext",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xRollback",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
               "sqlite3_vtab"
             ]
           ],
@@ -2757,7 +2571,90 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xSavepoint",
+      "location": "sqlite3_module.xRollbackTo",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ],
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_index_info"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xBestIndex",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            "char"
+          ],
+          "void (**)(sqlite3_context *, int, sqlite3_value **)",
+          [
+            "pointer",
+            [
+              "pointer",
+              "void"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xFindFunction",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xDisconnect",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2774,6 +2671,144 @@
           ],
           [
             "pointer",
+            [
+              "record",
+              "sqlite3_context"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xColumn",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            "char"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xShadowName",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab_cursor"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            "char"
+          ],
+          "int",
+          [
+            "pointer",
+            [
+              "pointer",
+              [
+                "record",
+                "sqlite3_value"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xFilter",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab_cursor"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xClose",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_module.xRelease",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            [
+              "pointer",
+              [
+                "record",
+                "sqlite3_value"
+              ]
+            ]
+          ],
+          [
+            "pointer",
             "long long"
           ]
         ]
@@ -2782,7 +2817,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xRowid",
+      "location": "sqlite3_module.xUpdate",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2844,17 +2879,7 @@
             "pointer",
             [
               "record",
-              "sqlite3_vtab"
-            ]
-          ],
-          [
-            "pointer",
-            [
-              "pointer",
-              [
-                "record",
-                "sqlite3_vtab_cursor"
-              ]
+              "sqlite3_vtab_cursor"
             ]
           ]
         ]
@@ -2863,57 +2888,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xOpen",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xRelease",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_vtab"
-            ]
-          ],
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_index_info"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_module.xBestIndex",
+      "location": "sqlite3_module.xEof",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2927,6 +2902,10 @@
               "record",
               "sqlite3_vtab_cursor"
             ]
+          ],
+          [
+            "pointer",
+            "long long"
           ]
         ]
       ],
@@ -2934,28 +2913,70 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_module.xClose",
+      "location": "sqlite3_module.xRowid",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
       "c": [
         "callback",
+        "int",
         [
-          "pointer",
           [
-            "record",
-            "sqlite3_mutex"
+            "pointer",
+            [
+              "record",
+              "sqlite3_vtab"
+            ]
           ]
-        ],
-        [
-          "int"
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mutex_methods.xMutexAlloc",
+      "location": "sqlite3_module.xDestroy",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_mutex"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mutex_methods.xMutexFree",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_mutex"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mutex_methods.xMutexTry",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -2989,28 +3010,41 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mutex_methods.xMutexFree",
+      "location": "sqlite3_mutex_methods.xMutexEnter",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
       "c": [
         "callback",
-        "void",
         [
+          "pointer",
           [
-            "pointer",
-            [
-              "record",
-              "sqlite3_mutex"
-            ]
+            "record",
+            "sqlite3_mutex"
           ]
+        ],
+        [
+          "int"
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mutex_methods.xMutexLeave",
+      "location": "sqlite3_mutex_methods.xMutexAlloc",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        []
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_mutex_methods.xMutexEnd",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3052,41 +3086,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_mutex_methods.xMutexEnter",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_mutex"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_mutex_methods.xMutexTry",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        []
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_mutex_methods.xMutexEnd",
+      "location": "sqlite3_mutex_methods.xMutexLeave",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3117,26 +3117,15 @@
         [
           [
             "pointer",
-            [
-              "record",
-              "sqlite3_pcache"
-            ]
-          ],
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_pcache_page"
-            ]
-          ],
-          "int"
+            "void"
+          ]
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods2.xUnpin",
+      "location": "sqlite3_pcache_methods2.xShutdown",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3151,22 +3140,32 @@
               "sqlite3_pcache"
             ]
           ],
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_pcache_page"
-            ]
-          ],
-          "unsigned int",
-          "unsigned int"
+          "int"
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods2.xRekey",
+      "location": "sqlite3_pcache_methods2.xCachesize",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods2.xInit",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3246,6 +3245,36 @@
               "sqlite3_pcache"
             ]
           ],
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_pcache_page"
+            ]
+          ],
+          "unsigned int",
+          "unsigned int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods2.xRekey",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_pcache"
+            ]
+          ],
           "unsigned int"
         ]
       ],
@@ -3268,6 +3297,13 @@
               "sqlite3_pcache"
             ]
           ],
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_pcache_page"
+            ]
+          ],
           "int"
         ]
       ],
@@ -3275,64 +3311,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods2.xCachesize",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_pcache"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods2.xDestroy",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods2.xInit",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods2.xShutdown",
+      "location": "sqlite3_pcache_methods2.xUnpin",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3375,19 +3354,32 @@
               "record",
               "sqlite3_pcache"
             ]
-          ],
-          [
-            "pointer",
-            "void"
-          ],
-          "int"
+          ]
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods.xUnpin",
+      "location": "sqlite3_pcache_methods2.xDestroy",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods.xShutdown",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3402,19 +3394,32 @@
               "sqlite3_pcache"
             ]
           ],
-          [
-            "pointer",
-            "void"
-          ],
-          "unsigned int",
-          "unsigned int"
+          "int"
         ]
       ],
       "factor": [
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods.xRekey",
+      "location": "sqlite3_pcache_methods.xCachesize",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods.xInit",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3472,6 +3477,33 @@
               "sqlite3_pcache"
             ]
           ],
+          [
+            "pointer",
+            "void"
+          ],
+          "unsigned int",
+          "unsigned int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods.xRekey",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_pcache"
+            ]
+          ],
           "unsigned int"
         ]
       ],
@@ -3494,6 +3526,10 @@
               "sqlite3_pcache"
             ]
           ],
+          [
+            "pointer",
+            "void"
+          ],
           "int"
         ]
       ],
@@ -3501,64 +3537,7 @@
         "pointer",
         "void"
       ],
-      "location": "sqlite3_pcache_methods.xCachesize",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "sqlite3_pcache"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods.xDestroy",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods.xInit",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_pcache_methods.xShutdown",
+      "location": "sqlite3_pcache_methods.xUnpin",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3585,6 +3564,27 @@
         "void"
       ],
       "location": "sqlite3_pcache_methods.xFetch",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "sqlite3_pcache"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_pcache_methods.xDestroy",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3632,7 +3632,7 @@
         "pointer",
         "char"
       ],
-      "location": "Fts5PhraseIter.a",
+      "location": "Fts5PhraseIter.b",
       "reason": "UTF-8 byte pointer represented as char pointer/string"
     },
     {
@@ -3644,91 +3644,8 @@
         "pointer",
         "char"
       ],
-      "location": "Fts5PhraseIter.b",
+      "location": "Fts5PhraseIter.a",
       "reason": "UTF-8 byte pointer represented as char pointer/string"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            [
-              "pointer",
-              "char"
-            ]
-          ],
-          [
-            "pointer",
-            "int"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xColumnText",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        [
-          "pointer",
-          "void"
-        ],
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xGetAuxdata",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          [
-            "pointer",
-            "int"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xInstCount",
-      "reason": "opaque pointer/callback ABI representation"
     },
     {
       "c": [
@@ -3768,9 +3685,18 @@
               "Fts5Context"
             ]
           ],
+          "int",
           [
             "pointer",
-            "long long"
+            "int"
+          ],
+          [
+            "pointer",
+            "int"
+          ],
+          [
+            "pointer",
+            "int"
           ]
         ]
       ],
@@ -3778,7 +3704,29 @@
         "pointer",
         "void"
       ],
-      "location": "Fts5ExtensionApi.xRowCount",
+      "location": "Fts5ExtensionApi.xInst",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xPhraseSize",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -3853,63 +3801,6 @@
           [
             "pointer",
             "int"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xPhraseNextColumn",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        [
-          "pointer",
-          "void"
-        ],
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xUserData",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5PhraseIter"
-            ]
-          ],
-          [
-            "pointer",
-            "int"
           ],
           [
             "pointer",
@@ -3921,76 +3812,7 @@
         "pointer",
         "void"
       ],
-      "location": "Fts5ExtensionApi.xPhraseFirst",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xColumnCount",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          "int",
-          [
-            "pointer",
-            "long long"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xColumnTotalSize",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            [
-              "record",
-              "Fts5Context"
-            ]
-          ],
-          "int"
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xPhraseSize",
+      "location": "Fts5ExtensionApi.xPhraseNext",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4015,6 +3837,35 @@
           [
             "pointer",
             "int"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xPhraseNextColumn",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ],
+          "int",
+          [
+            "pointer",
+            [
+              "pointer",
+              "char"
+            ]
           ],
           [
             "pointer",
@@ -4026,7 +3877,78 @@
         "pointer",
         "void"
       ],
-      "location": "Fts5ExtensionApi.xPhraseNext",
+      "location": "Fts5ExtensionApi.xColumnText",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ],
+          [
+            "pointer",
+            "int"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xInstCount",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ],
+          [
+            "pointer",
+            "long long"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xRowCount",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xColumnCount",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4100,6 +4022,97 @@
     {
       "c": [
         "callback",
+        [
+          "pointer",
+          "void"
+        ],
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xUserData",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xPhraseCount",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "long long",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xRowid",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        [
+          "pointer",
+          "void"
+        ],
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Context"
+            ]
+          ],
+          "int"
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "Fts5ExtensionApi.xGetAuxdata",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
         "int",
         [
           [
@@ -4160,36 +4173,18 @@
           "int",
           [
             "pointer",
-            "int"
-          ],
-          [
-            "pointer",
-            "int"
-          ],
-          [
-            "pointer",
-            "int"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xInst",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "long long",
-        [
-          [
-            "pointer",
             [
               "record",
-              "Fts5Context"
+              "Fts5PhraseIter"
             ]
+          ],
+          [
+            "pointer",
+            "int"
+          ],
+          [
+            "pointer",
+            "int"
           ]
         ]
       ],
@@ -4197,7 +4192,7 @@
         "pointer",
         "void"
       ],
-      "location": "Fts5ExtensionApi.xRowid",
+      "location": "Fts5ExtensionApi.xPhraseFirst",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4211,27 +4206,11 @@
               "record",
               "Fts5Context"
             ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "Fts5ExtensionApi.xPhraseCount",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
+          ],
+          "int",
           [
             "pointer",
-            [
-              "record",
-              "Fts5Tokenizer"
-            ]
+            "long long"
           ]
         ]
       ],
@@ -4239,7 +4218,7 @@
         "pointer",
         "void"
       ],
-      "location": "fts5_tokenizer.xDelete",
+      "location": "Fts5ExtensionApi.xColumnTotalSize",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4325,6 +4304,27 @@
         "void"
       ],
       "location": "fts5_tokenizer.xCreate",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "Fts5Tokenizer"
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "fts5_tokenizer.xDelete",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4422,6 +4422,52 @@
           ],
           [
             "pointer",
+            "void"
+          ],
+          [
+            "pointer",
+            [
+              "record",
+              "fts5_tokenizer"
+            ]
+          ],
+          [
+            "callback",
+            "void",
+            [
+              [
+                "pointer",
+                "void"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "fts5_api.xCreateTokenizer",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "int",
+        [
+          [
+            "pointer",
+            [
+              "record",
+              "fts5_api"
+            ]
+          ],
+          [
+            "pointer",
+            "char"
+          ],
+          [
+            "pointer",
             [
               "pointer",
               "void"
@@ -4450,34 +4496,21 @@
         [
           [
             "pointer",
-            [
-              "record",
-              "fts5_api"
-            ]
-          ],
-          [
-            "pointer",
-            "char"
-          ],
-          [
-            "pointer",
             "void"
           ],
+          "int",
           [
             "pointer",
             [
-              "record",
-              "fts5_tokenizer"
+              "pointer",
+              "char"
             ]
           ],
           [
-            "callback",
-            "void",
+            "pointer",
             [
-              [
-                "pointer",
-                "void"
-              ]
+              "pointer",
+              "char"
             ]
           ]
         ]
@@ -4486,7 +4519,38 @@
         "pointer",
         "void"
       ],
-      "location": "fts5_api.xCreateTokenizer",
+      "location": "sqlite3_callback",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        [
+          [
+            "pointer",
+            "void"
+          ]
+        ]
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_destructor_type",
+      "reason": "opaque pointer/callback ABI representation"
+    },
+    {
+      "c": [
+        "callback",
+        "void",
+        []
+      ],
+      "factor": [
+        "pointer",
+        "void"
+      ],
+      "location": "sqlite3_syscall_ptr",
       "reason": "opaque pointer/callback ABI representation"
     },
     {
@@ -4533,70 +4597,6 @@
         "void"
       ],
       "location": "fts5_extension_function",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        []
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_syscall_ptr",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "void",
-        [
-          [
-            "pointer",
-            "void"
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_destructor_type",
-      "reason": "opaque pointer/callback ABI representation"
-    },
-    {
-      "c": [
-        "callback",
-        "int",
-        [
-          [
-            "pointer",
-            "void"
-          ],
-          "int",
-          [
-            "pointer",
-            [
-              "pointer",
-              "char"
-            ]
-          ],
-          [
-            "pointer",
-            [
-              "pointer",
-              "char"
-            ]
-          ]
-        ]
-      ],
-      "factor": [
-        "pointer",
-        "void"
-      ],
-      "location": "sqlite3_callback",
       "reason": "opaque pointer/callback ABI representation"
     }
   ],
@@ -5162,6 +5162,53 @@
       "actual": "c-string",
       "expected": "uchar*",
       "name": "sqlite3_serialize"
+    },
+    {
+      "actual": "c-string",
+      "expected": "sqlite3_filename",
+      "name": "sqlite3_db_filename"
+    },
+    {
+      "actual": "c-string",
+      "argument": 1,
+      "expected": "void*",
+      "name": "sqlite3_prepare16"
+    },
+    {
+      "actual": "c-string",
+      "argument": 2,
+      "expected": "uchar*",
+      "name": "sqlite3_deserialize"
+    },
+    {
+      "actual": "c-string",
+      "argument": 0,
+      "expected": "sqlite3_filename",
+      "name": "sqlite3_uri_parameter"
+    },
+    {
+      "actual": "c-string",
+      "argument": 0,
+      "expected": "sqlite3_filename",
+      "name": "sqlite3_uri_boolean"
+    },
+    {
+      "actual": "c-string",
+      "argument": 0,
+      "expected": "sqlite3_filename",
+      "name": "sqlite3_uri_int64"
+    },
+    {
+      "actual": "c-string",
+      "expected": "uchar*",
+      "field": "a",
+      "name": "Fts5PhraseIter"
+    },
+    {
+      "actual": "c-string",
+      "expected": "uchar*",
+      "field": "b",
+      "name": "Fts5PhraseIter"
     }
   ],
   "pass": false,
