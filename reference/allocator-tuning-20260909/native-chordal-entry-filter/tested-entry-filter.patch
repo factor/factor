@@ -1,0 +1,30 @@
+--- a/basis/compiler/cfg/register-allocation/chordal/spilling/spilling.factor
++++ b/basis/compiler/cfg/register-allocation/chordal/spilling/spilling.factor
+@@ -199,6 +199,18 @@
+         candidates through diff retained append
+     ] [ candidates ] if* ;
+ 
++! Do not reload a memory-only value merely to fill the entry bank. A
++! known single predecessor supplies its own resident set; fully known
++! joins may keep values resident on some incoming paths. Unknown loop
++! backedges retain the existing conservative entry-selection behavior.
++:: entry-resident-candidate? ( value plan -- ? )
++    plan bb>> predecessors>> [| predecessor |
++        predecessor spill-plans get at exit-versions>> :> residents
++        residents [
++            value plan predecessor predecessor-value residents key?
++        ] [ t ] if
++    ] any? ;
++
+ :: choose-entry-values ( plan -- values )
+     ! Factor call/prologue/epilogue blocks are not register allocation
+     ! regions. In particular, a callback's hidden raw result pointer can
+@@ -206,7 +218,7 @@
+     ! Creating a register repair phi here would both cross the call's
+     ! clobbers and strand an interval in the skipped assignment block.
+     plan bb>> kill-block?>> [ { } ] [
+-    plan distances>> keys :> candidates
++    plan distances>> keys [ plan entry-resident-candidate? ] filter :> candidates
+     candidates [| value |
+         value plan known-predecessor-residents dup empty?
+         [ drop f ] [ [ ] all? ] if

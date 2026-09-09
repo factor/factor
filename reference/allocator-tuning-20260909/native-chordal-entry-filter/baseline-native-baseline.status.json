@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "seconds": 1.1686891559511423,
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+    "-i=/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-chordal-20260909/diagnose.factor"
+  ]
+}

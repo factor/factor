@@ -1,0 +1,142 @@
+{
+  "rounds": 2,
+  "order": "baseline/candidate, candidate/baseline",
+  "runs": {
+    "ffi-runtime-index-1": [
+      {
+        "workload-iterations": 600,
+        "trial": -1,
+        "instructions": 6327356133,
+        "ns": 363098801,
+        "cpu_seconds": 0.36309156799999975
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 0,
+        "instructions": 6327605240,
+        "ns": 363317879,
+        "cpu_seconds": 0.3633187630000001
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 1,
+        "instructions": 6327605263,
+        "ns": 362841603,
+        "cpu_seconds": 0.36283440600000016
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 2,
+        "instructions": 6327605256,
+        "ns": 362582884,
+        "cpu_seconds": 0.3625845280000002
+      }
+    ],
+    "ffi-runtime-index-2": [
+      {
+        "workload-iterations": 600,
+        "trial": -1,
+        "instructions": 6327356124,
+        "ns": 365702300,
+        "cpu_seconds": 0.3656950059999997
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 0,
+        "instructions": 6327605267,
+        "ns": 365952909,
+        "cpu_seconds": 0.36595342900000016
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 1,
+        "instructions": 6327605256,
+        "ns": 365784620,
+        "cpu_seconds": 0.3657855559999996
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 2,
+        "instructions": 6327605266,
+        "ns": 366013848,
+        "cpu_seconds": 0.36601471499999993
+      }
+    ],
+    "ffi-runtime-gap-1": [
+      {
+        "workload-iterations": 600,
+        "trial": -1,
+        "instructions": 6135368288,
+        "ns": 346609668,
+        "cpu_seconds": 0.3466016620000003
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 0,
+        "instructions": 6135611712,
+        "ns": 343404044,
+        "cpu_seconds": 0.343404794
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 1,
+        "instructions": 6135611690,
+        "ns": 343582680,
+        "cpu_seconds": 0.34357456100000006
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 2,
+        "instructions": 6135611681,
+        "ns": 343540386,
+        "cpu_seconds": 0.3435413589999996
+      }
+    ],
+    "ffi-runtime-gap-2": [
+      {
+        "workload-iterations": 600,
+        "trial": -1,
+        "instructions": 6135368282,
+        "ns": 344670718,
+        "cpu_seconds": 0.34467170700000005
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 0,
+        "instructions": 6135611689,
+        "ns": 343942359,
+        "cpu_seconds": 0.3439357479999998
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 1,
+        "instructions": 6135611689,
+        "ns": 343896419,
+        "cpu_seconds": 0.3438973459999999
+      },
+      {
+        "workload-iterations": 600,
+        "trial": 2,
+        "instructions": 6135611689,
+        "ns": 343810327,
+        "cpu_seconds": 0.3438024180000001
+      }
+    ]
+  },
+  "medians": {
+    "index": {
+      "observations": 6,
+      "cpu_seconds": 0.36455215949999986,
+      "instructions": 6327605259.5
+    },
+    "gap": {
+      "observations": 6,
+      "cpu_seconds": 0.3436884895000001,
+      "instructions": 6135611689.0
+    }
+  },
+  "candidate_over_baseline": {
+    "cpu_seconds": 0.942769040159808,
+    "instructions": 0.969657783217158
+  }
+}

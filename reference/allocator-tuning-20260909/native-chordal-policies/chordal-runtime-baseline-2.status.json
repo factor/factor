@@ -1,0 +1,28 @@
+{
+  "exit_code": 0,
+  "seconds": 3.89869998767972,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+    "-i=/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-20260909/chordal-runtime.factor"
+  ],
+  "host_load_before": [
+    2.02197265625,
+    1.25537109375,
+    1.125
+  ],
+  "host_load_after": [
+    1.93994140625,
+    1.2509765625,
+    1.1240234375
+  ],
+  "diagnostic_kernel_only": true,
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "spilling_sha256": "063c9eceb48a92fa6fc62eaa409c1af683bf915dc7008465356a686c9daea54a",
+  "script_sha256": "555ae9f80b59f104c1b9992d9260740bfd7b2886c9339353e8d446d9dcf18c84"
+}

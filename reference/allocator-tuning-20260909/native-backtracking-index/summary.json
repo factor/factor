@@ -1,0 +1,55 @@
+{
+  "rounds": 2,
+  "order": "baseline/candidate, candidate/baseline",
+  "runs": {
+    "index-compile-baseline-1": [
+      {
+        "ns": 57838451056,
+        "instructions": 742319271782,
+        "kind": "compile",
+        "cpu_seconds": 57.445239298
+      }
+    ],
+    "index-compile-baseline-2": [
+      {
+        "ns": 56741863260,
+        "instructions": 742209755200,
+        "kind": "compile",
+        "cpu_seconds": 56.72304403
+      }
+    ],
+    "index-compile-index-1": [
+      {
+        "ns": 49361698112,
+        "instructions": 584438049668,
+        "kind": "compile",
+        "cpu_seconds": 48.979488525
+      }
+    ],
+    "index-compile-index-2": [
+      {
+        "ns": 48282898388,
+        "instructions": 584438193950,
+        "kind": "compile",
+        "cpu_seconds": 48.268073443999995
+      }
+    ]
+  },
+  "medians": {
+    "baseline": {
+      "observations": 2,
+      "cpu_seconds": 57.084141664,
+      "instructions": 742264513491.0
+    },
+    "index": {
+      "observations": 2,
+      "cpu_seconds": 48.6237809845,
+      "instructions": 584438121809.0
+    }
+  },
+  "candidate_over_baseline": {
+    "cpu_seconds": 0.8517914006783515,
+    "instructions": 0.7873717673235989
+  },
+  "scope_records": "Full ordered scopes are retained in each raw .log.gz and checked .jsonl.gz; scope-difference.json isolates the one-word replacement."
+}

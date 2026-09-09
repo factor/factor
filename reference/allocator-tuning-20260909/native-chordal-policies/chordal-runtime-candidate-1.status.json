@@ -1,0 +1,28 @@
+{
+  "exit_code": 0,
+  "seconds": 3.87164453137666,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-tuning-chordal-probe-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-chordal-probe-20260909",
+    "-i=/home/erg/factor-allocator-tuning-chordal-probe-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-chordal-probe-20260909/reference/allocator-tuning-20260909/chordal-runtime.factor"
+  ],
+  "host_load_before": [
+    2.20849609375,
+    1.26416015625,
+    1.126953125
+  ],
+  "host_load_after": [
+    2.111328125,
+    1.259765625,
+    1.1259765625
+  ],
+  "diagnostic_kernel_only": true,
+  "source_commit": "bd2edfd3a17440b25bc8fd0da944f41ea04d885b",
+  "spilling_sha256": "0b99de1ca0b34495605f7750c24bec261b7b51d43c13b87c1bdb83c97509f7df",
+  "script_sha256": "555ae9f80b59f104c1b9992d9260740bfd7b2886c9339353e8d446d9dcf18c84"
+}

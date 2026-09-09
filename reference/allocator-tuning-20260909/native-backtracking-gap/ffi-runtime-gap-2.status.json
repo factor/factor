@@ -1,0 +1,28 @@
+{
+  "exit_code": 0,
+  "seconds": 3.6956541752442718,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-tuning-gap-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-gap-20260909",
+    "-i=/home/erg/factor-allocator-tuning-gap-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-gap-20260909/reference/allocator-tuning-20260909/backtracking-ffi-runtime.factor"
+  ],
+  "host_load_before": [
+    1.30712890625,
+    0.677734375,
+    0.94189453125
+  ],
+  "host_load_after": [
+    1.44287109375,
+    0.71630859375,
+    0.953125
+  ],
+  "diagnostic_kernel_only": true,
+  "source_commit": "7e3f572c199b12a02208b77e012f3e20072162c4",
+  "backtracking_sha256": "7aeeee65d4c4bc78e38fadb324bd03a5ea796c305facf2b055dbb1a96bb10160",
+  "script_sha256": "bd27b48b905a353d305edcf61bae49478980f7f5d62555f34241d2a9a9148baa"
+}
