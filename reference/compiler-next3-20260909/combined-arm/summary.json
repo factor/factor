@@ -1,0 +1,9 @@
+{
+  "source": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "seconds": 11.953732792,
+  "all_four_features_enabled": true,
+  "strict_ssa": true,
+  "allocation_interval_and_final_value_checks": true,
+  "passed": true,
+  "harness_sha256": "d81af0e2fdfbc0baef15d48ad6cac1ac6dff27a00d37cc5da062d6b9b022cf2b"
+}
