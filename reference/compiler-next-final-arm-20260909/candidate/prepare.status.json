@@ -1,0 +1,37 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-final-20260909/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 6.0566238750000005,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "initial_image_sha256": "c7c77e23d95b19d19d6016b2fa5484b2f6684303af8e2adfb1d30da81fc8aed1",
+  "preparation_script_sha256": "d58f98bba6a19e684080b7dc4e6dcaff695889ab6600a55a3070548b37be9c7b",
+  "prepared_image_sha256": "beb3fba75cf0895272c906db69b76c5d320cb9c85c7af07fba676b7de2813224"
+}

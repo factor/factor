@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Read completed ARM queue artifacts; write this evidence directory only."""
-import gzip, hashlib, json, math, statistics, collections
+import gzip, hashlib, json, math, statistics, collections, subprocess
 from pathlib import Path
 OUT=Path(__file__).resolve().parent
 ROOTS={'baseline':Path('/Users/erg/factor.worktrees/compiler-next-comparison'), 'candidate':Path('/Users/erg/factor.worktrees/compiler-next-integration')}
 REL=Path('reference/allocator-speed-crossarch-20260908'); NEXT=Path('reference/compiler-next-20260909')
-REVISIONS={'baseline':'c1f7e4d34cd604bbdf22576b237406b39758896d','candidate':'c6948a99de5ebfb7251c322382dba66d6f8050df'}
+REVISIONS={'baseline':'c1f7e4d34cd604bbdf22576b237406b39758896d','candidate':'a7f554b613bd763fb7fbfc520643b75b321a6e16'}
 def dump(p,x):p.parent.mkdir(parents=True,exist_ok=True);p.write_text(json.dumps(x,indent=2,sort_keys=True)+'\n')
 def archive(src,dst):
  if src.exists() and not dst.exists():
@@ -21,6 +21,14 @@ def geo(xs):return math.exp(statistics.mean(map(math.log,xs)))
 def records(p):return [json.loads(x) for x in p.read_text().splitlines()]
 audit={'scope':'Targeted final ARM backtracking timing; all-four full-compiler suites, backtracking/chordal checked closures, not all-four timing.', 'sources':{},'runs':{},'pending':[],'comparisons':{}}
 data={};outputs={};scopes={};code={}
+old_candidate='c6948a99de5ebfb7251c322382dba66d6f8050df'
+diff=subprocess.check_output(['git','diff','--name-only',old_candidate,REVISIONS['candidate']],cwd=ROOTS['candidate'],text=True).splitlines()
+production=[p for p in diff if not p.startswith('reference/') and p!='basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor']
+assert not production,('production changed; LS gate reuse invalid',production)
+assert sha(ROOTS['candidate']/'basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor')=='3bc5c4808cb2b1be9b0778b8af23891bad60fc4538706da9a1167065f98fb5ec'
+for flag in ['on','off']:assert json.loads((OUT/'fixed-fixture'/flag/'status.json').read_text())['exit_code']==0
+audit['reused_linear_scan_suite']={'source':old_candidate,'new_source':REVISIONS['candidate'],'production_identical':True,'changed_paths':diff,'reason':'Only test/doc/evidence changes; original c694 LS suite is reused alongside explicit fixed-fixture both-flag validation.'}
+
 for label,root in ROOTS.items():
  expected=json.loads((root/REL/'source-expected.json').read_text())
  assert expected['source_commit']==REVISIONS[label]
@@ -112,7 +120,7 @@ for allocator in ['backtracking']:
 for allocator in ['linear-scan','greedy','backtracking','chordal']:
  p=Path('/tmp/compiler-next-final-compiler-'+allocator)
  if (p/'status.json').exists():
-  st=json.loads((p/'status.json').read_text());assert st['exit_code']==0 and st['source']==REVISIONS['candidate']
+  st=json.loads((p/'status.json').read_text());assert st['exit_code']==0 and st['source']==(old_candidate if allocator=='linear-scan' else REVISIONS['candidate'])
   for fname in ['status.json','output.log']:archive(p/fname,OUT/'full-compiler'/allocator/(fname+('.gz' if fname.endswith('.log') else '')))
  else:audit['pending'].append('full compiler '+allocator)
 for label,dirname in [('candidate','compiler-next-final-bootstrap'),('baseline','compiler-next-baseline-bootstrap')]:

@@ -1,0 +1,58 @@
+{
+  "comparisons": {
+    "backtracking": {
+      "rounds": []
+    }
+  },
+  "pending": [
+    "final-baseline-timing-backtracking-1",
+    "final-baseline-timing-backtracking-2",
+    "final-candidate-timing-backtracking-1",
+    "final-candidate-timing-backtracking-2",
+    "final-check-backtracking-1",
+    "final-check-chordal-1",
+    "callback-matrix.factor",
+    "moving-gc.factor",
+    "compiler-next-final-bootstrap",
+    "compiler-next-final-image-check"
+  ],
+  "reused_linear_scan_suite": {
+    "changed_paths": [
+      "basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor",
+      "reference/compiler-next-20260909/PRE-FIX-RESULTS.md",
+      "reference/compiler-next-backtracking-profitability-20260909/README.md",
+      "reference/compiler-next-backtracking-profitability-20260909/checked-probe/environment.json",
+      "reference/compiler-next-backtracking-profitability-20260909/checked-probe/output.log",
+      "reference/compiler-next-backtracking-profitability-20260909/checked-probe/status.json",
+      "reference/compiler-next-backtracking-profitability-20260909/focused-tests/environment.json",
+      "reference/compiler-next-backtracking-profitability-20260909/focused-tests/output.log",
+      "reference/compiler-next-backtracking-profitability-20260909/focused-tests/status.json",
+      "reference/compiler-next-backtracking-profitability-20260909/gate.factor",
+      "reference/compiler-next-backtracking-profitability-20260909/probe.factor",
+      "reference/compiler-next-backtracking-profitability-20260909/source-hashes.json"
+    ],
+    "new_source": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+    "production_identical": true,
+    "reason": "Only test/doc/evidence changes; original c694 LS suite is reused alongside explicit fixed-fixture both-flag validation.",
+    "source": "c6948a99de5ebfb7251c322382dba66d6f8050df"
+  },
+  "runs": {},
+  "scope": "Targeted final ARM backtracking timing; all-four full-compiler suites, backtracking/chordal checked closures, not all-four timing.",
+  "scope_differences": {},
+  "sources": {
+    "baseline": {
+      "all_hashes_match": true,
+      "guarded_files": 1587,
+      "prepared_image_hash_matches": true,
+      "prepared_image_sha256": "809b23bf992f2be10c72758d7d736b0722c3b1bc6065375010976617b20f3119",
+      "revision": "c1f7e4d34cd604bbdf22576b237406b39758896d"
+    },
+    "candidate": {
+      "all_hashes_match": true,
+      "guarded_files": 1589,
+      "prepared_image_hash_matches": true,
+      "prepared_image_sha256": "beb3fba75cf0895272c906db69b76c5d320cb9c85c7af07fba676b7de2813224",
+      "revision": "a7f554b613bd763fb7fbfc520643b75b321a6e16"
+    }
+  }
+}
