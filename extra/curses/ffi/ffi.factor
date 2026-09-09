@@ -183,10 +183,10 @@ FUNCTION: int mvwgetstr ( WINDOW* win, int y, int x, c-string str )
 FUNCTION: int mvgetnstr ( int y, int x, c-string str, int n )
 FUNCTION: int mvwgetnstr ( WINDOW* win, int y, int x, c-string str, int n )
 
-FUNCTION: int printw ( c-string fmt, int lol )
-FUNCTION: int wprintw ( WINDOW* win, c-string fmt, int lol )
-FUNCTION: int mvprintw ( int y, int x, c-string fmt, int lol )
-FUNCTION: int mvwprintw ( WINDOW* win, int y, int x, c-string fmt, int lol )
+FUNCTION: int printw ( c-string fmt, ... int value )
+FUNCTION: int wprintw ( WINDOW* win, c-string fmt, ... int value )
+FUNCTION: int mvprintw ( int y, int x, c-string fmt, ... int value )
+FUNCTION: int mvwprintw ( WINDOW* win, int y, int x, c-string fmt, ... int value )
 FUNCTION: int vwprintw ( WINDOW* win, c-string fmt, va_list varglist )
 FUNCTION: int vw_printw ( WINDOW* win, c-string fmt, va_list varglist )
 
@@ -202,7 +202,8 @@ FUNCTION: int wscrl ( WINDOW* win, int n )
 ! TERMINAL *set_curterm(TERMINAL *nterm);
 ! int del_curterm(TERMINAL *oterm);
 ! int restartterm(const char *term, int fildes, int *errret);
-! char *tparm(char *str, ...);
+! ncurses uses long numeric parameters; unused parameters may be zero.
+FUNCTION: c-string tparm ( c-string capability, ... long p1, long p2, long p3, long p4, long p5, long p6, long p7, long p8, long p9 )
 ! int tputs(const char *str, int affcnt, int (*putc)(int));
 ! int putp(const char *str);
 ! int vidputs(chtype attrs, int (*putc)(int));
