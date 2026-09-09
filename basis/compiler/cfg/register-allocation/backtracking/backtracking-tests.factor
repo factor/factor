@@ -1,7 +1,7 @@
 USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.cfg.metrics
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
-compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
+compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.checker compiler.cfg.liveness compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
 compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.liveness
 compiler.cfg.register-allocation.ssa.phases
@@ -10,7 +10,7 @@ compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture layouts generalizations kernel kernel.private locals make math math.order quotations math.private namespaces sequences tools.test
-vectors memory continuations hashtables io.sockets io.sockets.private words ;
+vectors memory continuations hashtables io.sockets io.sockets.private words sequences.generalizations ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
 :: test-interval ( vreg positions -- interval )
