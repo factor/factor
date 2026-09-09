@@ -52,3 +52,12 @@ IN: windows.directwrite.render.tests
       bitmap>> 4 group [ { 255 0 0 128 } sequence= ] any?
     ] with-destructors
 ] unit-test
+
+[ emoji-font "x" <directwrite-layout> dup dispose directwrite-layout>image ]
+[ already-disposed? ] must-fail-with
+
+! Even a cached bitmap does not make a disposed native layout usable.
+[
+    emoji-font "x" <directwrite-layout>
+    dup directwrite-layout>image drop dup dispose directwrite-layout>image
+] [ already-disposed? ] must-fail-with

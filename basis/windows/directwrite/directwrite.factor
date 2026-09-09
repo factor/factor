@@ -130,9 +130,11 @@ ERROR: missing-directwrite-fallback-font ;
         ] with-com-interface
     ] with-com-interface ] with-destructors ;
 
-M: directwrite-layout dispose* pointer>> com-release ;
+M: directwrite-layout dispose*
+    [ pointer>> com-release ] [ f >>pointer drop ] bi ;
 
 :: directwrite-offset>x ( index layout -- x )
+    layout check-disposed drop
     layout string>> dup selection? [ string>> ] when :> text
     layout pointer>> text index directwrite-utf16-index FALSE
     0.0 float <ref> :> x
@@ -142,6 +144,7 @@ M: directwrite-layout dispose* pointer>> com-release ;
     x float deref ;
 
 :: directwrite-x>offset ( x layout -- index )
+    layout check-disposed drop
     DWRITE_HIT_TEST_METRICS new :> hit
     FALSE int <ref> :> trailing
     FALSE int <ref> :> inside
@@ -161,6 +164,7 @@ STARTUP-HOOK: [ <cache-assoc> cached-directwrite-layouts set-global ]
 
 ! A logical selection can cover several disjoint visual runs in bidi text.
 :: directwrite-selection-rects ( layout -- rects )
+    layout check-disposed drop
     layout string>> :> selection
     selection selection? [
         selection string>> :> text
