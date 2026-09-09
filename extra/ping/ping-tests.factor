@@ -1,4 +1,4 @@
-USING: continuations destructors io.sockets kernel math.order
+USING: accessors continuations destructors io.sockets kernel math.order
 ping system system-info tools.test ;
 IN: ping.tests
 
@@ -12,4 +12,5 @@ test-ping? [
     [ t ] [ "localhost" alive? ] unit-test
     [ t ] [ "127.0.0.1" alive? ] unit-test
     [ f ] [ "0.0.0.0" alive? ] unit-test
+    { 0 } [ local-ping type>> ] unit-test
 ] when
