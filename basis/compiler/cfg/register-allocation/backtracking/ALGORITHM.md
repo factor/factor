@@ -21,15 +21,19 @@ data structures, instruction numbering or output to regalloc2.
 | Directed splitting | `first-bundle-conflict`, `conflict-split-site`, `split-bundle-at`; score obstruction with maximum conflict weight plus loop move cost; preserve groups and hints | Obstruction at 12 selects cut 9; initial obstruction peels first use; exported complete split partition |
 | Hot/cold clusters | Cached nesting weights at early and late points; choose cheaper loop transition within the conflict prefix | Five-use fixture selects cut 19 before hot cluster; paired phase-weight test; optional loop-store pressure tests |
 | Bounded progress | At most 16 progressive splits per original spillset, then directly partition remaining mandatory instruction clusters | 400-use alternating pressure triggers budget and >100 minimal fragments while interval/operand checks pass |
-| Canonical spill bundles | Subtract allocated ranges and clobber/GC barriers from original ranges; offer remaining no-use bundle one non-evicting second chance | Required fragments on register 0 with blocked middle; canonical gap assigned register 1, transition reified |
+| Canonical spill bundles | Subtract allocated ranges, complete Factor-call blocks and clobber/GC barriers from original ranges; offer remaining no-use bundle one non-evicting second chance | Required fragments on register 0 with blocked middle; canonical gap assigned register 1, transition reified |
 | Shared spill homes | `ensure-spillset-home` reuses exact-representation storage only for disjoint complete original spillset ranges | Two real pressure allocations share slot 0; exported member/descendant ranges and slots checked independently |
-| Move reification | Local split transitions collected with all simultaneous reloads into parallel mappings; shared SSA edge transport handles phi, cycle and stack moves | Physical register swap passes original-value checker; native pressure and distinct phi branches; no-use second-chance transition |
+| Move reification | Local split transitions collected with simultaneous reloads and emitted during phase assignment before phi removal and GC saves; shared SSA edge transport handles phi, cycle and stack moves | Physical register swap passes original-value checker; native pressure and distinct phi branches; no-use second-chance transition |
 
 Factor ranges use **inclusive** endpoints. Ordinary first inputs occupy early
 point n; later inputs and results occupy n+1. For `def-is-use-insn`, all inputs
 stay live through the result. Input fragments reload at an early point, even
 when their first operand use is late. Temps conflict across both phases.
-Clobber/ABI and explicit GC instructions remain atomic. Implicit derived GC
+Clobber/ABI and explicit GC instructions remain atomic. Second-chance ranges
+exclude whole Factor-call blocks. Successors of those blocks reload from memory;
+ordinary predecessors at mixed joins initialize the same home through edge
+resolution. Spill tails stay inside their original contiguous live range.
+Implicit derived GC
 bases participate in liveness; shared SSA machinery owns their transport.
 
 Factor's lowered target contract has register classes, temporary registers,
