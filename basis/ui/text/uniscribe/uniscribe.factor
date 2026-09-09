@@ -7,8 +7,7 @@ IN: ui.text.uniscribe
 SINGLETON: uniscribe-renderer
 
 M: uniscribe-renderer string-dim
-    [ " " string-dim { 0 1 } v* ]
-    [ cached-script-string size>> scale-dim ] if-empty ;
+    cached-script-string size>> scale-dim ;
 
 M: uniscribe-renderer flush-layout-cache
     cached-script-strings get-global purge-cache ;
@@ -18,19 +17,15 @@ M: uniscribe-renderer string>image
     [ script-string>image ] [ origin>> { 0 0 } or scale-dim vneg ] bi ;
 
 M: uniscribe-renderer x>offset
-    [ 2drop 0 ] [
-        [ gl-scale ] 2dip cached-script-string x>line-offset +
-    ] if-empty ;
+    [ gl-scale ] 2dip cached-script-string x>line-offset + ;
 
 M: uniscribe-renderer offset>x
-    [ 2drop 0 ] [ cached-script-string line-offset>x gl-unscale ] if-empty ;
+    cached-script-string line-offset>x gl-unscale ;
 
 M: uniscribe-renderer font-metrics
     " " cached-script-string metrics>> clone scale-metrics f >>width ;
 
 M: uniscribe-renderer line-metrics
-    [ " " line-metrics 0 >>width ]
-    [ cached-script-string metrics>> clone scale-metrics ]
-    if-empty ;
+    cached-script-string metrics>> clone scale-metrics ;
 
 uniscribe-renderer font-renderer set-global
