@@ -61,10 +61,10 @@ IN: compiler.cfg.register-allocation.validation.entry-residency.tests
 ] ] with-scope ] unit-test
 
 ! One predecessor has a dirty register, the other only a valid memory home.
-! Keeping the value resident still requires BOTH an edge store on the dirty
-! path and an edge reload on the memory path. An any-predecessor saved flag
-! must never suppress the first path's store.
-{ t t t } [ [ [let
+! The resident join must not force the dirty path to initialize a memory
+! home just because the other path already saved it. Its S fact is false;
+! a later eviction must store the joined register before any local reload.
+{ t t t t t t } [ [ [let
     entry-fixture :> ( left right join plan )
     left spill-plans get at
         H{ { 1 10 } } clone >>exit-versions H{ } clone >>saved-exit drop
@@ -75,10 +75,38 @@ IN: compiler.cfg.register-allocation.validation.entry-residency.tests
     0 <spill-slot> 11 spill-memory-locations get set-at
     H{ } clone spill-statistics namespaces:set
     plan make-entry-versions
-    plan saved-entry>> 1 swap key?
+    plan saved-entry>> 1 swap key? not
     left spill-plans get at plan couple-spill-edge
     right spill-plans get at plan couple-spill-edge
-    left successors>> first instructions>> first
-    dup ##spill? swap src>> 10 = and
+    left successors>> first join eq?
     right successors>> first instructions>> first ##reload?
+    plan entry-versions>> clone spill-W namespaces:set
+    plan saved-entry>> clone spill-S namespaces:set
+    V{ } clone spill-output namespaces:set
+    { 1 } H{ { 1 1 } } evict-values
+    1 ensure-register
+    spill-output get first2 :> ( store reload )
+    store ##spill? reload ##reload? and
+    store src>> 1 plan entry-versions>> at =
+    store dst>> reload src>> =
+] ] with-scope ] unit-test
+
+! Unknown backedges retain the existing known-predecessor policy. Only a
+! fully known join uses intersection, and a phi result never inherits its
+! incoming source's memory-home identity.
+{ t f t f f } [ [ [let
+    entry-fixture :> ( left right join plan )
+    join right connect-bbs
+    left spill-plans get at H{ { 1 t } } clone >>saved-exit drop
+    1 plan entry-memory-valid?
+    left spill-plans get at H{ } clone >>saved-exit drop
+    1 plan entry-memory-valid?
+    left spill-plans get at H{ { 1 t } } clone >>saved-exit drop
+    right spill-plans get at H{ { 1 t } } clone >>saved-exit drop
+    1 plan entry-memory-valid?
+    right spill-plans get at H{ } clone >>saved-exit drop
+    1 plan entry-memory-valid?
+    right spill-plans get at H{ { 1 t } } clone >>saved-exit drop
+    H{ } clone 1 plan phi-sources>> set-at
+    1 plan entry-memory-valid?
 ] ] with-scope ] unit-test
