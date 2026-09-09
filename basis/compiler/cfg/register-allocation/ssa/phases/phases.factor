@@ -4,7 +4,7 @@ USING: accessors assocs compiler.cfg compiler.cfg.def-use compiler.cfg.instructi
 compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.ranges compiler.cfg.linearization
 compiler.cfg.register-allocation.ssa compiler.cfg.registers
-compiler.cfg.renaming.functor compiler.cfg.utilities kernel locals make math
+compiler.cfg.renaming.functor compiler.cfg.utilities heaps kernel locals make math
 namespaces sequences sets ;
 IN: compiler.cfg.register-allocation.ssa.phases
 
@@ -37,8 +37,11 @@ IN: compiler.cfg.register-allocation.ssa.phases
         insn temp-vregs [ insn insn#>> record-phase-temp ] each
     ] [ insn compute-live-intervals* ] if ;
 
+: phase-block-from ( bb -- n )
+    block-from 1 + ;
+
 :: compute-phase-ssa-block ( bb -- )
-    bb block-from from namespaces:set
+    bb phase-block-from from namespaces:set
     bb block-to 1 + to namespaces:set
     bb handle-live-out
     bb instructions>> <reversed> [
@@ -106,13 +109,35 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
         insn emit-insn
     ] if ;
 
+! Entry transports execute in the successor. Edge maps describe their
+! source homes, before the reload, so every predecessor initializes those
+! homes. Phi results with an entry reload similarly receive their value in
+! memory before the reload copies it into the allocated register.
+:: record-phase-entry-locations ( bb reloads -- )
+    reloads empty? [
+        bb compute-ssa-live-in bb record-phi-locations
+    ] [
+        pending-interval-assoc get clone :> incoming
+        reloads [| interval |
+            interval reload-from>> interval vreg>> incoming set-at
+        ] each
+        incoming pending-interval-assoc [
+            bb compute-ssa-live-in bb record-phi-locations
+        ] with-variable
+    ] if ;
+
 :: assign-phase-ssa-block ( bb -- )
     bb expire-at-block-entry
     bb basic-block namespaces:set
-    bb block-from unhandled-intervals get activate-new-intervals
-    bb compute-ssa-live-in
-    bb record-phi-locations
-    bb [ [ [ assign-phase-insn ] each ] V{ } make ] change-instructions
+    bb [ [
+        bb phase-block-from :> entry
+        unhandled-intervals get heap-members [| interval |
+            interval live-interval-start entry = interval reload-from>> and
+        ] filter :> reloads
+        entry unhandled-intervals get activate-new-intervals
+        bb reloads record-phase-entry-locations
+        [ assign-phase-insn ] each
+    ] V{ } make ] change-instructions
     compute-ssa-live-out ;
 
 :: assign-phase-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
