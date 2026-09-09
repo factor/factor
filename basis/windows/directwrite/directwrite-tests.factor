@@ -1,8 +1,29 @@
-USING: accessors arrays combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
-math.order namespaces opengl sequences tools.test windows.directwrite ;
+USING: accessors arrays assocs combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
+math.order namespaces opengl sequences tools.test windows.directwrite windows.fonts ;
 IN: windows.directwrite.tests
 
 : test-font ( -- font ) "Segoe UI" <font> ;
+
+:: directwrite-alias-snapshot? ( -- pinned? new-entry? new-width? restored-entry? )
+    "monospace" windows-fonts at :> original
+    [
+        "Arial" "monospace" windows-fonts set-at
+        "monospace" <font> 28 >>size :> font
+        font "DirectWrite alias WWWWiiii" cached-directwrite-layout :> before
+        "Courier New" "monospace" windows-fonts set-at
+        font "DirectWrite alias WWWWiiii" cached-directwrite-layout :> after
+        before font>> name>> "Arial" =
+        before after eq? not
+        before metrics>> width>> after metrics>> width>> = not
+        ! Layout-owned strings must not also be the memo table's hash key.
+        [
+            CHAR: X 0 before font>> name>> set-nth
+            "Arial" "monospace" windows-fonts set-at
+            font "DirectWrite alias WWWWiiii" cached-directwrite-layout before eq?
+        ] [ CHAR: A 0 before font>> name>> set-nth ] finally
+    ] [ original "monospace" windows-fonts set-at ] finally ;
+
+{ t t t t } [ directwrite-alias-snapshot? ] unit-test
 
 { 0 0 1 2 } [
     "\u01f600x" { [ 0 directwrite-codepoint-index ]

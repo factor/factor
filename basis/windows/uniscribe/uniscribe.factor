@@ -348,7 +348,7 @@ PRIVATE>
     ] H{ } assoc-map-as ;
 
 : snapshot-font ( font -- copy )
-    clone [ clone ] change-name
+    clone [ windows-font-name clone ] change-name
     [ snapshot-color ] change-foreground
     [ snapshot-color ] change-background
     dup shaped-font? [ [ snapshot-shaping-options ] change-shaping-options ] when ;

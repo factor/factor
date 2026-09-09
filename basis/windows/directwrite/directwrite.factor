@@ -103,7 +103,11 @@ ERROR: missing-directwrite-fallback-font ;
         ] with-com-interface
     ] with-com-interface ;
 
-:: <directwrite-layout> ( font string -- layout )
+: snapshot-directwrite-font-name ( font -- copy )
+    clone [ windows-font-name clone ] change-name ;
+
+:: <directwrite-layout> ( input-font string -- layout )
+    input-font snapshot-directwrite-font-name :> font
     [ <directwrite-factory> [ :> factory
         factory font <directwrite-format> [ :> format
             string dup selection? [ string>> ] when :> text
@@ -157,7 +161,7 @@ M: directwrite-layout dispose*
 SYMBOL: cached-directwrite-layouts
 
 :: cached-directwrite-layout ( font string -- layout )
-    font string directwrite-scale 3array cached-directwrite-layouts get-global
+    font snapshot-directwrite-font-name string directwrite-scale 3array cached-directwrite-layouts get-global
     [ drop font string <directwrite-layout> ] cache ;
 
 STARTUP-HOOK: [ <cache-assoc> cached-directwrite-layouts set-global ]
