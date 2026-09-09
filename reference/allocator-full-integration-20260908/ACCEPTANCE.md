@@ -1,7 +1,9 @@
 # Integrated compiler checks and default bootstrap
 
-Frozen candidate compiler revision: `29b4551bb3`. Full checked benchmark closure
-installation and paired performance comparisons follow this compiler-suite gate.
+Initial compiler-suite candidate: `29b4551bb3`. Corrected candidate:
+`30a50ab0df`. The final full compiler and documentation checks below pass on
+the corrected source; fresh benchmark closure checks and paired comparisons
+follow this gate.
 No allocator is promoted by these correctness results alone.
 
 - Full compiler suite, linear scan selected, rematerialization off: passed with
@@ -68,3 +70,27 @@ checks active. A second verbose run isolated the same callback. Both original
 logs, exact source/assets and process status are retained in the adjacent
 `backtracking-prefix-suite-*` directories. These are rejected acceptance runs;
 the callback repair and a corrected full-suite pass are required before timing.
+
+## Corrected final compiler gate
+
+Candidate `30a50ab0df` passes the full `compiler` suite with backtracking,
+rematerialization and loop spilling enabled, GVN off, and SSA, interval,
+operand and strengthened final value-flow checks active: **zero test failures**
+in 61.22 seconds. This supersedes the rejected callback runs above.
+
+The integrated repairs preserve representations in greedy fragments, emit
+backtracking transitions before phi removal and GC saves, keep spill tails
+inside their original live ranges, exclude skipped call blocks from second
+chances, and reload memory homes at call successors. The verifier now
+invalidates allocator registers across ordinary Factor calls.
+
+All four allocators with rematerialization off/on pass the native ARM64
+large-struct-return callback fixture: 40 ABI assertions, with exact evidence
+in `../allocator-full-callback-20260908/`. The independent checker regressions
+retain an old-checker negative control in `call-clobber-verifier/`.
+
+Selection and greedy documentation lint passes with zero compiler errors
+on the same source (4.16 seconds). Neither result is a runtime measurement.
+The final comparison uses immutable source `30a50ab0df` and the same native
+VM/input image as its repaired prototype baseline. Later evidence-only
+commits on this integration branch do not change the measured source.

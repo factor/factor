@@ -16,8 +16,10 @@ compiler-suite gate at source `29b4551bb3`, including the unresolved two-minute
 bootstrap target. Subsequent full benchmark-closure checks exposed greedy
 fragment representation and backtracking transport failures. Their original
 logs are retained in the comparison directory; the earlier suite pass does not
-supersede those failures. Final performance comparisons require a corrected,
-immutable source passing all four allocators on both architectures.
+supersede those failures. The corrected source `30a50ab0df` passes the final full compiler suite and
+documentation checks. Final performance comparisons still require its fresh
+all-four benchmark closure checks on both architectures; see the acceptance
+record for the exact distinction.
 
 `reduced-bank.factor` independently checks 33 generated CFGs and 225 native
 answers per allocator: nine pressure diamonds with three supplied register
