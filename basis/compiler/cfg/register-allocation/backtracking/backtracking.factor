@@ -469,14 +469,23 @@ M: backtracking-register-home emit-restore
     start end <= [ start end 2array remaining push ] when
     remaining [ first2 <= ] filter ;
 
+:: uncovered-vreg-ranges ( interval fragments -- ranges )
+    ! The overwhelmingly common unsplit interval has no spill bundle. Avoid
+    ! rescanning every clobber and sorting an unchanged full range set.
+    fragments length 1 = [
+        fragments first ranges>> interval ranges>> =
+    ] [ f ] if [ { } ] [
+        fragments [ ranges>> ] map concat backtracking-barriers get append
+        [ first ] sort-by :> occupied
+        interval ranges>> [| range |
+            occupied [ range intersect-range ] filter
+            range swap subtract-live-range
+        ] map concat
+    ] if ;
+
 :: uncovered-ranges ( interval allocated -- ranges )
-    allocated [ vreg>> interval vreg>> = ] filter
-    [ ranges>> ] map concat backtracking-barriers get append
-    [ first ] sort-by :> occupied
-    interval ranges>> [| range |
-        occupied [ range intersect-range ] filter
-        range swap subtract-live-range
-    ] map concat ;
+    interval allocated [ vreg>> interval vreg>> = ] filter
+    uncovered-vreg-ranges ;
 
 :: gap-interval ( vreg range -- interval/f )
     range first :> start!
@@ -506,9 +515,11 @@ M: backtracking-register-home emit-restore
 
 :: second-chance-bundles ( allocated -- bundles )
     H{ } clone :> groups
+    H{ } clone :> by-vreg
+    allocated [ dup vreg>> by-vreg push-at ] each
     backtracking-original-intervals get [| interval |
         interval vreg>> rematerialization-of [ ] [
-            interval allocated uncovered-ranges [| range |
+            interval interval vreg>> by-vreg at uncovered-vreg-ranges [| range |
                 interval vreg>> range gap-interval [| gap |
                     gap interval vreg>> bundle-spillsets get at groups push-at
                 ] when*
