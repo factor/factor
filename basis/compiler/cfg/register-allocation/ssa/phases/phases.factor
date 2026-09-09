@@ -131,10 +131,9 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
     bb basic-block namespaces:set
     bb [ [
         bb phase-block-from :> entry
-        unhandled-intervals get heap-members [| interval |
-            interval live-interval-start entry = interval reload-from>> and
-        ] filter :> reloads
-        entry unhandled-intervals get activate-new-intervals
+        entry unhandled-intervals get [ = ] with heap-pop-while :> entering
+        entering [ reload-from>> ] filter :> reloads
+        entering [ activate-interval ] each
         bb reloads record-phase-entry-locations
         [ assign-phase-insn ] each
     ] V{ } make ] change-instructions
