@@ -1,13 +1,17 @@
-USING: alien alien.syntax alien.parser combinators
+USING: accessors alien alien.syntax alien.parser combinators
 kernel parser sequences system words namespaces hashtables init
-math arrays assocs continuations lexer fry locals vocabs.parser ;
+math arrays assocs continuations lexer fry locals ui.backend vocabs.parser ;
 IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;
 << {
     { [ os windows? ] [ "opengl.gl.windows" ] }
     { [ os macos? ]  [ "opengl.gl.macos" ] }
-    { [ os unix? ] [ "opengl.gl.gtk3" ] }
+    { [ os unix? ] [
+        ui-backend get [ name>> "gtk2-ui-backend" = ]
+        [ "ui-backend" get "gtk2" = ] if*
+        "opengl.gl.gtk2" "opengl.gl.gtk3" ?
+    ] }
     [ unknown-gl-platform ]
 } cond use-vocab >>
 
@@ -56,4 +60,3 @@ SYNTAX: GL-FUNCTION:
     "{" expect "}" parse-tokens over prefix
     gl-function-counter '[ _ _ gl-function-pointer ]
     scan-c-args define-indirect ;
-
