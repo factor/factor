@@ -22,9 +22,9 @@ ARTICLE: "compiler.cfg.register-allocation" "Selecting a register allocator"
 "Allocator implementations receive the CFG before SSA destruction so that SSA-based algorithms can use their required invariants. Each implementation must produce a fully allocated CFG."
 "Three experimental alternatives are available:"
 { $list
-    { { $vocab-link "compiler.cfg.register-allocation.greedy" } ": LLVM-inspired priority allocation, eviction and loop-aware splitting." }
-    { { $vocab-link "compiler.cfg.register-allocation.backtracking" } ": regalloc2-inspired affinity bundles, eviction and use-boundary splitting." }
-    { { $vocab-link "compiler.cfg.register-allocation.chordal" } ": SSA interference-graph coloring with a chordality certificate and interval-based spill repair." }
+    { { $vocab-link "compiler.cfg.register-allocation.greedy" } ": LLVM-inspired priority allocation with eviction, CFG region placement, local splitting and bounded last-chance recoloring." }
+    { { $vocab-link "compiler.cfg.register-allocation.backtracking" } ": regalloc2-inspired SSA affinity bundles with eviction, conflict-directed splitting, shared spill homes and second-chance allocation." }
+    { { $vocab-link "compiler.cfg.register-allocation.chordal" } ": SSA pressure reduction with explicit spills and reloads before certified interference-graph coloring and affinity-guided assignment." }
 }
 "These are Factor implementations of the approaches, with different engineering tradeoffs from their reference compilers. Compare generated code and execution as well as compilation cost before choosing a default."
 { $code "USING: compiler.cfg.metrics compiler.cfg.register-allocation"
