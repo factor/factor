@@ -14,7 +14,10 @@ IN: git.tests
     '[
         "empty-file" touch-file
         { "git" "add" "empty-file" } try-process
-        { "git" "commit" "-m" "initial commit of empty file" } try-process
+        { "git" "-c" "user.name=Factor tests"
+          "-c" "user.email=tests@factorcode.org"
+          "-c" "commit.gpgsign=false"
+          "commit" "-m" "initial commit of empty file" } try-process
         @
     ] with-empty-test-git-repo ; inline
 
