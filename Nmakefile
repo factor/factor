@@ -201,9 +201,29 @@ vm\tests\windows_services.obj: vm\tests\windows_services.cpp
 windows-services-tests.exe: vm\tests\windows_services.obj $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:windows-services-tests.exe /SUBSYSTEM:console vm\tests\windows_services.obj $(DLL_OBJS)
 
-test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe
+vm\tests\windows_threads.obj: vm\tests\windows_threads.cpp vm\*.hpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_threads.obj /c vm\tests\windows_threads.cpp
+
+windows-threads-tests.exe: vm\tests\windows_threads.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:windows-threads-tests.exe /SUBSYSTEM:console vm\tests\windows_threads.obj $(DLL_OBJS)
+
+vm\tests\windows_io.obj: vm\tests\windows_io.cpp vm\io.cpp vm\*.hpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_io.obj /c vm\tests\windows_io.cpp
+
+windows-io-tests.exe: vm\tests\windows_io.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:windows-io-tests.exe /SUBSYSTEM:console vm\tests\windows_io.obj $(DLL_OBJS:vm\io.obj=)
+
+vm\tests\windows_code_heap.obj: vm\tests\windows_code_heap.cpp vm\*.hpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_code_heap.obj /c vm\tests\windows_code_heap.cpp
+
+windows-code-heap-tests.exe: vm\tests\windows_code_heap.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:windows-code-heap-tests.exe /SUBSYSTEM:console vm\tests\windows_code_heap.obj $(DLL_OBJS)
+
+test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe windows-threads-tests.exe windows-io-tests.exe windows-code-heap-tests.exe
 	.\gc-tests.exe
 	.\windows-services-tests.exe
+	.\windows-threads-tests.exe
+	.\windows-io-tests.exe
 
 # If we compile factor.exe, run mt.exe, and run factor.exe,
 # then Windows caches the manifest. Even on a recompile without applying
@@ -221,6 +241,18 @@ factor.exe.manifest: factor.exe
 
 clean:
 	del vm\*.obj
+	if exist vm\tests\windows_threads.obj del vm\tests\windows_threads.obj
+	if exist vm\tests\windows_io.obj del vm\tests\windows_io.obj
+	if exist vm\tests\windows_code_heap.obj del vm\tests\windows_code_heap.obj
+	if exist windows-threads-tests.exe del windows-threads-tests.exe
+	if exist windows-threads-tests.lib del windows-threads-tests.lib
+	if exist windows-threads-tests.exp del windows-threads-tests.exp
+	if exist windows-io-tests.exe del windows-io-tests.exe
+	if exist windows-io-tests.lib del windows-io-tests.lib
+	if exist windows-io-tests.exp del windows-io-tests.exp
+	if exist windows-code-heap-tests.exe del windows-code-heap-tests.exe
+	if exist windows-code-heap-tests.lib del windows-code-heap-tests.lib
+	if exist windows-code-heap-tests.exp del windows-code-heap-tests.exp
 	if exist vm\tests\gc.obj del vm\tests\gc.obj
 	if exist vm\tests\windows_allocation.obj del vm\tests\windows_allocation.obj
 	if exist vm\tests\windows_services.obj del vm\tests\windows_services.obj
