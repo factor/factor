@@ -1,5 +1,5 @@
-USING: accessors assocs colors combinators destructors fonts fonts.shaping images kernel locals sequences
- tools.test windows.uniscribe windows.uniscribe.private ;
+USING: accessors assocs colors combinators continuations destructors fonts fonts.shaping images kernel locals sequences
+ tools.test windows.fonts windows.uniscribe windows.uniscribe.private ;
 IN: windows.uniscribe.snapshots.tests
 
 :: font-text-snapshot? ( -- same-pixels? same-name? same-size? same-text? )
@@ -44,6 +44,23 @@ IN: windows.uniscribe.snapshots.tests
     layout eq? ;
 
 { t } [ stable-cache-key? ] unit-test
+
+:: font-alias-snapshot? ( -- pixels? new-entry? restored-entry? )
+    "monospace" windows-fonts at :> original
+    [ [
+        "Arial" "monospace" windows-fonts set-at
+        "monospace" <font> 28 >>size :> font
+        font "alias snapshot WWWWiiii" cached-script-string :> before
+        "Arial" <font> 28 >>size "alias snapshot WWWWiiii"
+        <script-string> &dispose script-string>image bitmap>> :> expected
+        "Courier New" "monospace" windows-fonts set-at
+        before script-string>image bitmap>> expected =
+        font "alias snapshot WWWWiiii" cached-script-string before eq? not
+        "Arial" "monospace" windows-fonts set-at
+        font "alias snapshot WWWWiiii" cached-script-string before eq?
+    ] with-destructors ] [ original "monospace" windows-fonts set-at ] finally ;
+
+{ t t t } [ font-alias-snapshot? ] unit-test
 
 ! parsed-color is mutable even though its RGBA value is immutable.
 :: color-snapshot? ( -- same-pixels? )
