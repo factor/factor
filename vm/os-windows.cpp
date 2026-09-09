@@ -12,7 +12,7 @@ bool set_memory_locked(cell base, cell size, bool locked) {
 }
 
 void* native_dlopen(const char* path) {
-  return LoadLibraryEx((WCHAR*)path, NULL, 0);
+  return LoadLibraryExA(path, NULL, 0);
 }
 
 void* native_dlsym(void* handle, const char* symbol) {
