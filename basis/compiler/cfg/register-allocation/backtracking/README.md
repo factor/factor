@@ -1,87 +1,52 @@
-# Backtracking allocator
+# SSA bundle backtracking allocator
 
-`backtracking-allocator` implements the common `allocate-cfg` protocol. Select it
-with `backtracking-allocator register-allocator [ ... ] with-variable`.
+Select `backtracking-allocator` through the common `register-allocator` protocol.
+The default remains linear scan. `backtracking-allocation-with-registers
+( cfg registers -- )` accepts a reduced bank for validation; it does not call
+another allocation policy.
 
-This is an independent allocator inspired by regalloc2's bundle work queue and
-backtracking approach. It shares Factor's SSA destruction, precise live ranges,
-spill-slot representation, instruction assignment and edge move resolution.
-It never calls the linear-scan allocator as a fallback.
+The implementation now retains original SSA identities through allocation.
+Copy and phi affinities request noninterfering bundle merges; they do not
+assert that different incoming phi values have equal bits. Spillsets retain
+original complete ranges, typed storage and register hints across splitting.
+Nonoverlapping spillsets may share one stack home.
 
-The implementation:
+The main priority queue probes indexed physical occupancy, evicts strictly
+lower-weight conflicts, and splits bundles at actual obstruction positions.
+Splits preserve compatible groups on each side and retain their spillset.
+Loop nesting weights both uses and candidate move sites. At an obstruction
+on the first use, shrinking reaches a minimal mandatory fragment with infinite
+weight; this is the progress case, not a claim that this immediate prefix is
+already free. Impossible mandatory pressure raises an error.
 
-* Splits ranges at mandatory call clobbers, preserving stack operands, destination
-  exceptions, and spill/reload representations from Factor's existing IR.
-* Bundles disjoint fragments with the same coalesced SSA leader, including values
-  carried across calls. These affinity bundles receive one register atomically.
-* Processes bundles in a maximum heap ordered by total live-range length.
-* Probes all admissible registers against complete assigned ranges, including
-  holes. Frame-pointer and integer/vector register restrictions are preserved.
-* Evicts and requeues all conflicting bundles if their maximum spill density is
-  strictly lower than the requesting bundle's density.
-* Unbundles unsuccessful affinity groups, then splits individual intervals at
-  their median use boundary, connecting the pieces through typed spill slots.
-* Shrinks a final single-use interval to its operand and spill position. Such a
-  minimal interval has infinite weight and cannot be evicted by another minimal
-  interval. Impossible operand pressure raises an explicit error.
+After mandatory allocation, canonical no-use ranges receive one non-evicting
+second chance. Clobber and GC points remain barriers. Register transitions
+inside a block are reified as parallel moves, including every simultaneous
+stack reload or constant recipe. Phi and CFG edge moves use the shared SSA
+transport, including cycle and stack-to-stack handling. Stack-capable phi
+fragments never force simultaneous phi outputs into physical registers.
 
-Termination follows from strict weight increases along evictions while the bundle
-set is unchanged, plus a finite number of unbundlings and use partitions. Each
-partition reduces the number of uses per piece; single-use trimming happens at
-most once per piece. There is no retry-limit fallback or hidden linear scan.
+This is ongoing implementation of the pinned Ion contract in
+[ALGORITHM.md](ALGORITHM.md), not a claim to reproduce regalloc2 byte for byte.
+The current conservative SSA interval builder still prevents productive copy
+merging at touching use/definition positions; phase-aware constraints are the
+next implementation step. Fixed preg, pinned-vreg and reused-input-index
+fields do not exist in Factor's lowered allocator IR; its ABI slots, clobbers,
+temporary registers and architecture emitter constraints are the actual
+contract. The final symbolic verifier checks original value provenance.
 
-Differences from full regalloc2 are deliberate: affinities come from Factor's
-existing SSA coalescer and same-leader fragments, rather than a separate general
-cross-vreg bundle merger; occupancy uses vectors rather than per-register B-trees;
-spill density is unweighted use count divided by live-range length, and splits
-are median-use boundaries rather than loop-aware placement. Thus this is a
-correctness-oriented experimental implementation, with potentially quadratic
-conflict-query cost, not a claim to reproduce regalloc2 performance.
+`allocator-statistics` reports the algorithm, zero fallback count, bundle
+merges, evictions, directed/minimal splits, hint reuse, second-chance attempts
+and successes, shared homes and reified register transitions. The live
+`bundle-spillsets`, `spill-home-pool`, `assigned-bundles` and
+`backtracking-original-intervals` expose small-fixture witnesses without
+instrumenting production allocation.
 
-Primary design references:
-
-* [Chris Fallin's regalloc2 design article](https://cfallin.org/blog/2022/06/09/cranelift-regalloc2/)
-* [regalloc2 bundle processing implementation](https://github.com/bytecodealliance/regalloc2/blob/main/src/ion/process.rs)
-
-## Executable comparison
-
-```factor
-USING: compiler.cfg.metrics compiler.cfg.register-allocation
-compiler.cfg.register-allocation.backtracking kernel.private math prettyprint ;
-
-[ { fixnum fixnum } declare + ]
-{ linear-scan-allocator backtracking-allocator } compare-allocators .
-```
-
-The common harness builds a fresh CFG for each allocator and reports code bytes,
-spill/reload counts and compilation pass timings. Warm up both choices and repeat
-in alternating order before interpreting timings.
-
-## Tests
-
-```factor
-USING: compiler.cfg.register-allocation.backtracking tools.test ;
-"compiler.cfg.register-allocation.backtracking" test
-```
-
-Tests force eviction and splitting with a single available register, verify
-same-value affinity bundles, check clobber spill/reload formation, execute
-compiled integer/float/loop/GC code and compare fresh CFGs through the common API.
-
-Initial native ARM64 validation (2026-09-08): the focused tests, including a
-forty-live-value compiled integer reduction, passed range and mandatory-use
-verification. Existing `compiler/tests/{spilling,float,alien,simple}.factor`
-completed with 301 unit-test cases and 16 expected-failure cases, with range
-verification enabled. This includes executed FFI and GC cases.
-
-On the forty-value reduction, fresh-CFG measurements gave linear scan 560 code
-bytes and 24 spill/reload pairs versus backtracking 576 bytes and 25 pairs; both
-used 192 spill bytes. Six small integer, float, branch, reduction, map and bitwise
-examples had identical code sizes. These are correctness smoke comparisons, not
-evidence of a performance advantage.
-
-The shared 32-live-float kernel (input 2.5, result 5092.0) also executed with both
-verifiers enabled: backtracking generated 832 bytes, 11 spill/reload pairs and
-88 spill bytes, versus linear scan's 848 bytes, 12 pairs and 96 spill bytes.
-Backtracking performed 11 evictions and 11 splits. All 13 compilation bodies in
-the shared compiler/benchmark corpus passed both allocation verifiers.
+Tests cover distinct-value and rejected overlapping bundles, shared-home
+noninterference, obstruction splits, register-cycle reification, a successful
+second chance, native forty-value pressure and forty distinct phi results on
+both branch paths. On native ARM64 the forty-phi fixture executes to 920.0 and
+-720.0 and exercises 80 bundle merges, 38 evictions and 62 directed splits.
+The complete register-allocation subtree passes with SSA, interval, mandatory
+operand and final value-flow checks enabled. These are mechanism/correctness
+results; performance comparisons wait for completion of the remaining contract.
