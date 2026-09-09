@@ -157,6 +157,12 @@ IN: compiler.tree.propagation.transforms
     } cond
 ] "custom-inlining" set-word-prop
 
+! Right shifts cannot overflow, but machine shifts mask oversized counts.
+\ fixnum-shift [
+    in-d>> second value-info interval>> 0 [-inf,b] interval-subset?
+    [ [ fixnum-bits neg max fixnum-shift-fast ] ] [ f ] if
+] "custom-inlining" set-word-prop
+
 { /i fixnum/i fixnum/i-fast bignum/i } [
     [
         in-d>> first2 [ value-info ] bi@ {

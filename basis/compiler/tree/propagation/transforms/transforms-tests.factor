@@ -1,7 +1,18 @@
-USING: arrays assocs classes compiler.test
+USING: arrays assocs classes compiler.test compiler.tree.debugger
 compiler.tree.propagation.transforms continuations kernel
-kernel.private layouts math sequences tools.test words ;
+kernel.private layouts math math.private sequences tools.test words ;
 IN: compiler.tree.propagation.transforms.tests
+
+! #786: known right shifts use the intrinsic, including saturated counts.
+{ t } [
+    [ { fixnum fixnum } declare dup 0 <= [ shift ] [ drop ] if ]
+    \ fixnum-shift inlined?
+] unit-test
+
+{ f } [
+    [ { fixnum fixnum } declare dup 0 <= [ shift ] [ drop ] if ]
+    \ fixnum-shift-fast inlined?
+] unit-test
 
 ! #2141: malformed literal alists must not crash the optimizer itself.
 { f f f f } [
