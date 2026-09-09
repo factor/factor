@@ -1,5 +1,9 @@
 # ARM64 variadic FFI regression evidence
 
+For the final integrated feature scope and qualification results, see
+[AUDIT.md](AUDIT.md) and [RESULTS.md](RESULTS.md). The fixture development
+record below preserves the earlier fail-before/pass-after evidence.
+
 Baseline: `233db947df`. Tests use independent ordinary C callers and C `va_arg`
 readers in `vm/ffi_test_varargs.c`. The fixture is included by the existing FFI
 shared library; it can also be compiled alone as a control executable:

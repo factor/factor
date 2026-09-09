@@ -1,5 +1,7 @@
 # ARM64 port work — completed
 
+Follow-up: ARM64 variadic callbacks, native `va_list`, and Windows variadic FP transport are implemented. See the [current varargs audit](../arm64-varargs-20260908/AUDIT.md) for the added C regressions, Linux emulation results, and native CI qualification limits. The original six-workstream results below remain the historical snapshot.
+
 All six authorized workstreams were implemented, independently verified, integrated with the concurrent allocator/GVN changes, and applied to the main working tree. The delivered ARM64 source, tests, evidence, and Linux plan are now committed on `master-candidate`. Unrelated files were excluded. Existing allocator/GVN changes remain intact.
 
 - macOS ABI oracle: 25 failures before, 27 passes after.

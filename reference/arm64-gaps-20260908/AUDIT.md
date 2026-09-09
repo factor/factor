@@ -1,5 +1,7 @@
 # ARM64 port work — verification record
 
+Follow-up: ARM64 variadic callbacks, native `va_list`, and Windows variadic FP transport are implemented. See the [current varargs audit](../arm64-varargs-20260908/AUDIT.md) for the added C regressions, Linux emulation results, and native CI qualification limits. The original six-workstream results below remain the historical snapshot.
+
 The six workstreams were developed in isolated Astra agent worktrees and combined without committing or replacing the original working tree. Initial baseline: `3c430ff2fc`. Concurrent allocator/GVN work was subsequently preserved via snapshot `5c67055ef9`; multiply-negate runs as a checked SSA pass after copy propagation.
 
 | Workstream | Change | Fail-before / pass-after evidence |
