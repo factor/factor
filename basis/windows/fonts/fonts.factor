@@ -1,4 +1,4 @@
-USING: assocs memoize locals kernel accessors init fonts math
+USING: assocs memoize locals kernel accessors init fonts math math.order
 combinators opengl system-info.windows windows.errors
 windows.types windows.gdi32 namespaces ;
 IN: windows.fonts
@@ -19,7 +19,7 @@ MEMO: windows-fonts ( -- fonts )
 : windows-font-name ( string -- string' )
     windows-fonts ?at drop ;
 
-MEMO:: (cache-font-with-quality) ( name size bold? italic? quality -- HFONT )
+MEMO:: (cached-gdi-font) ( name size bold? italic? quality -- HFONT )
     size neg ! nHeight
     0 0 0 ! nWidth, nEscapement, nOrientation
     bold? FW_BOLD FW_NORMAL ? ! fnWeight
@@ -35,21 +35,27 @@ MEMO:: (cache-font-with-quality) ( name size bold? italic? quality -- HFONT )
     CreateFont
     dup win32-error=0/f ;
 
+:: (cache-font-with-quality) ( name size bold? italic? quality -- HFONT )
+    ! GDI accepts integer heights. Normalize before memoization so equivalent
+    ! fractional sizes share a handle; positive subpixel sizes must not become
+    ! zero, which asks GDI to substitute its default font height.
+    name size dup 0 > [ >integer 1 max ] [ >integer ] if
+    bold? italic? quality (cached-gdi-font) ;
+
 : (cache-font) ( name size bold? italic? -- HFONT )
     DEFAULT_QUALITY (cache-font-with-quality) ;
 
+:: cache-font-at-scale ( font quality scale -- HFONT )
+    font name>> font size>> scale *
+    font bold?>> font italic?>> quality (cache-font-with-quality) ;
+
 : cache-font-with-quality ( font quality -- HFONT )
-    [ {
-        [ name>> ]
-        [ size>> gl-scale-factor get-global [ * ] when* ]
-        [ bold?>> ]
-        [ italic?>> ]
-    } cleave ] dip (cache-font-with-quality) ;
+    gl-scale-factor get-global 1.0 or cache-font-at-scale ;
 
 : cache-font ( font -- HFONT )
     DEFAULT_QUALITY cache-font-with-quality ;
 STARTUP-HOOK: [
-    \ (cache-font-with-quality) reset-memoized
+    \ (cached-gdi-font) reset-memoized
     \ windows-fonts reset-memoized
 ]
 
