@@ -1,0 +1,53 @@
+{
+  "command": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-full-integration/factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-integration",
+    "-e=USING: vocabs.loader vocabs.refresh namespaces io kernel eval ; \"cpu.architecture\" reload \"cpu\" refresh \"compiler\" refresh \"reference/allocator-full-integration-20260908/reduced-bank.factor\" run-file \"USING: allocator-full.integration.validation compiler.cfg.register-allocation.greedy ; greedy-allocator [ greedy-allocation-with-registers ] validate-reduced-corpus\" eval( -- )"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/allocator-full-integration",
+  "source": "dec2e3bee3fcbaa4d1ab772150485af758b5540c",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "Mac",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2",
+    "libfactor.dylib": "a37ddbab96cdcbd030f4ac6681db8b003a5a22230ab013bc59a42eda2cc7830a",
+    "factor.image": "4271203b7b563ef903d40f735e59ab5bf5980b3daace3f5dc8da5f30e628dfc0"
+  },
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/allocator-full-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-full-integration/factor.image",
+    "sha256": "4271203b7b563ef903d40f735e59ab5bf5980b3daace3f5dc8da5f30e628dfc0"
+  },
+  "exit_code": 0,
+  "seconds": 4.155916,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [],
+  "last_process_usage": {
+    "cpu": 3.993119458333333,
+    "user": 3.8926804166666664,
+    "system": 0.10043904166666666,
+    "instructions": 55286850548,
+    "cycles": 15033077352,
+    "rss": 246595584,
+    "background_cpu": 0.046388791666666665,
+    "disk_read_bytes": 1601536,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}
