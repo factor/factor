@@ -141,6 +141,10 @@ GENERIC: compute-shared-conversion-costs ( insn -- )
 
 M: insn compute-shared-conversion-costs compute-insn-costs ;
 
+! Copies bypass conversion insertion, unlike ordinary vreg instructions.
+! Retain their existing cost treatment; do not claim cache sharing here.
+M: ##copy compute-shared-conversion-costs compute-insn-costs ;
+
 M: vreg-insn compute-shared-conversion-costs
     dup peephole-optimizable? [ compute-insn-costs ] [
         [ [ compute-shared-use-cost ] each-use-rep ]
