@@ -1,0 +1,50 @@
+{
+  "source_commit": "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+  "gvn": "off",
+  "rematerialize": "off",
+  "loop_spills": "off",
+  "image_sha256": "76166829c9dc9a1b57053a9eb8b047de406306632c886067034480511c9570be",
+  "vm_sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+  "script_sha256": {
+    "timing.factor": "102ef7cb1ba652048f03722798404c6ade2feea13b1189b9f51aa22df3f4dee1",
+    "drive.py": "57e96073e760e7df28ef28b3edd1909f86b920493b673720450fea3a97e91059"
+  },
+  "host_load_before": [
+    34.099609375,
+    33.47607421875,
+    32.408203125
+  ],
+  "host_load_after": [
+    40.5712890625,
+    36.595703125,
+    33.84130859375
+  ],
+  "final_value_verifier": false,
+  "exit_code": 0,
+  "seconds": 130.57807993888855,
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-features-arm/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-features-arm",
+    "-i=/Users/erg/factor.worktrees/compiler-features-arm/reference/compiler-features-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-features-arm/reference/compiler-flags-20260909/timing.factor",
+    "linear-scan",
+    "timing",
+    "3",
+    "off",
+    "off",
+    "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+    "off"
+  ],
+  "ok": true,
+  "counts": {
+    "compile": 1,
+    "code": 12,
+    "scope": 1,
+    "runtime": 104
+  },
+  "taskpolicy": {
+    "exit_code": 0,
+    "stderr": ""
+  }
+}
