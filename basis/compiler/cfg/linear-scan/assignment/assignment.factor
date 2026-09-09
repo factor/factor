@@ -17,8 +17,13 @@ QUALIFIED: sets
 SYMBOL: pending-interval-heap
 SYMBOL: pending-interval-assoc
 
+! Locations choose their transport. Allocators can supply register homes
+! without duplicating assignment or bypassing the shared move checker.
+GENERIC: emit-save ( reg rep destination -- )
+GENERIC: emit-restore ( reg rep source -- )
+
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri ##spill, ;
+    [ reg>> ] [ spill-rep>> ] [ spill-to>> ] tri emit-save ;
 
 : handle-spill ( live-interval -- )
     dup spill-to>> [ insert-spill ] [ drop ] if ;
@@ -78,9 +83,7 @@ SYMBOL: machine-live-outs
     [ > ] with heap-pop-while [ expire-interval ] each ;
 
 : insert-reload ( live-interval -- )
-    dup reload-from>> dup constant-recipe?
-    [ swap reg>> emit-rematerialization ]
-    [ drop [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri ##reload, ] if ;
+    [ reg>> ] [ reload-rep>> ] [ reload-from>> ] tri emit-restore ;
 
 : handle-reload ( live-interval -- )
     dup reload-from>> [ insert-reload ] [ drop ] if ;
@@ -127,12 +130,13 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     dup rematerialization-of
     [ nip ] [ pick assign-spill-slot ] if* swapd 3array ;
 
-: emit-save ( reg rep slot/recipe -- )
-    dup constant-recipe? [ 3drop ] [ ##spill, ] if ;
+M: object emit-save ##spill, ;
 
-: emit-restore ( reg rep slot/recipe -- )
-    dup constant-recipe?
-    [ nip swap emit-rematerialization ] [ ##reload, ] if ;
+M: constant-recipe emit-save 3drop ;
+
+M: object emit-restore ##reload, ;
+
+M: constant-recipe emit-restore nip swap emit-rematerialization ;
 
 : spill/reloads ( n intervals -- spill/reloads )
     [ spill/reload ] with map ;
