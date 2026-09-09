@@ -4,8 +4,9 @@
 ! Most of the comments are included from the original header
 ! for your convenience.
 USING: accessors alien alien.c-types alien.destructors
-alien.libraries alien.syntax alien.varargs classes.struct combinators kernel
-math raylib.util sequences sequences.private system ;
+alien.data alien.libraries alien.strings alien.syntax alien.varargs
+classes.struct combinators continuations io.encodings.utf8 kernel
+locals math raylib.util sequences sequences.private system ;
 IN: raylib
 FROM: alien.c-types => float ;
 
@@ -42,6 +43,7 @@ ENUM: ConfigFlags
     { FLAG_WINDOW_TOPMOST     0x00001000 }   ! Set to window always on top
     { FLAG_WINDOW_ALWAYS_RUN  0x00000100 }   ! Set to allow windows running while minimized
     { FLAG_WINDOW_TRANSPARENT 0x00000010 }   ! Set to allow transparent framebuffer
+    { FLAG_WINDOW_MOUSE_PASSTHROUGH 0x00004000 } ! Let mouse events pass through the window
     { FLAG_WINDOW_HIGHDPI     0x00002000 }   ! Set to support HighDPI
     { FLAG_BORDERLESS_WINDOWED_MODE 0x00008000 } ! Set to run program in borderless windowed mode
     { FLAG_MSAA_4X_HINT       0x00000020 }   ! Set to try enabling MSAA 4X
@@ -609,6 +611,8 @@ STRUCT: Transform
     { rotation Quaternion }
     { scale Vector3 } ;
 
+TYPEDEF: Transform* ModelAnimPose
+
 STRUCT: BoneInfo
     { name char[32] }        ! Bone Name
     { parent int } ;         ! Bone parent
@@ -616,18 +620,18 @@ STRUCT: BoneInfo
 ! Skeleton, animation bones hierarchy
 STRUCT: ModelSkeleton
     { boneCount int }        ! Number of bones
-    { _bones void* }         ! Bones information (skeleton)
-    { bindPose void* } ;     ! Bones base transformation (Transform[])
+    { _bones BoneInfo* }         ! Bones information (skeleton)
+    { bindPose ModelAnimPose } ;     ! Bones base transformation (Transform[])
 
 STRUCT: Model
     { transform Matrix }
     { meshCount int }
     { materialCount int }
-    { _meshes void* }
-    { _materials void* }
+    { _meshes Mesh* }
+    { _materials Material* }
     { meshMaterial int* }
     { skeleton ModelSkeleton }   ! Skeleton for animation
-    { currentPose void* }        ! Current animation pose (Transform[])
+    { currentPose ModelAnimPose }        ! Current animation pose (Transform[])
     { boneMatrices Matrix* } ;   ! Bones animated transformation matrices
 
 ARRAY-SLOT: Model Material _materials [ materialCount>> ] materials
@@ -638,7 +642,7 @@ STRUCT: ModelAnimation
     { name char[32] }            ! Animation name
     { boneCount int }            ! Number of bones (per pose)
     { keyframeCount int }        ! Number of animation key frames
-    { keyframePoses Transform** } ; ! Animation sequence keyframe poses [keyframe][pose]
+    { keyframePoses ModelAnimPose* } ; ! Animation sequence keyframe poses [keyframe][pose]
 
 STRUCT: Ray
     { position Vector3 }    ! Ray position (origin)
@@ -661,9 +665,12 @@ STRUCT: Wave
     { channels uint }       ! Number of channels (1-mono, 2-stereo)
     { data void* } ;        ! Buffer data pointer
 
+C-TYPE: rAudioBuffer
+C-TYPE: rAudioProcessor
+
 STRUCT: AudioStream
-    { buffer void* }    ! Pointer to internal data used by the audio system
-    { processor void* } ! Pointer to internal data processor, useful for audio effects
+    { buffer rAudioBuffer* }    ! Pointer to internal data used by the audio system
+    { processor rAudioProcessor* } ! Pointer to internal data processor, useful for audio effects
     { sampleRate uint } ! Frequency (samples per second)
     { sampleSize uint } ! Bit depth (bits per sample): 8, 16, 32 (24 not supported)
     { channels uint } ; ! Number of channels (1-mono, 2-stereo)
@@ -900,12 +907,12 @@ FUNCTION-ALIAS: set-load-file-text-callback void SetLoadFileTextCallback ( LoadF
 FUNCTION-ALIAS: set-save-file-text-callback void SetSaveFileTextCallback ( SaveFileTextCallback callback ) ! Set custom file text data saver
 
 ! Files management functions
-FUNCTION-ALIAS: load-file-data c-string LoadFileData ( c-string fileName, int* bytesRead )           ! Load file data as byte array (read)
-FUNCTION-ALIAS: unload-file-data void UnloadFileData ( c-string data )                                ! Unload file data allocated by LoadFileData()
+FUNCTION-ALIAS: load-file-data uchar* LoadFileData ( c-string fileName, int* bytesRead )           ! Load file data as byte array (read)
+FUNCTION-ALIAS: unload-file-data void UnloadFileData ( uchar* data )                                ! Unload file data allocated by LoadFileData()
 FUNCTION-ALIAS: save-file-data bool SaveFileData ( c-string fileName, void* data, int bytesToWrite ) ! Save data to file from byte array (write), returns true on success
 FUNCTION-ALIAS: export-data-as-code bool ExportDataAsCode ( uchar* data, int size, c-string fileName ) ! Export data to code (.h), returns true on success
-FUNCTION-ALIAS: load-file-text c-string LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a '\0' terminated string
-FUNCTION-ALIAS: unload-file-text void UnloadFileText ( c-string text )                                ! Unload file text data allocated by LoadFileText()
+FUNCTION-ALIAS: load-file-text-raw char* LoadFileText ( c-string fileName )                            ! Load text data from file (read), returns a '\0' terminated string
+FUNCTION-ALIAS: unload-file-text void UnloadFileText ( char* text )                                ! Unload file text data allocated by LoadFileText()
 FUNCTION-ALIAS: save-file-text bool SaveFileText ( c-string fileName, c-string text )                 ! Save text data to file (write), string must be '\0 terminated, returns true on success
 FUNCTION-ALIAS: file-rename int FileRename ( c-string fileName, c-string fileRename )                 ! Rename file (if exists)
 FUNCTION-ALIAS: file-remove int FileRemove ( c-string fileName )                                      ! Remove file (if exists)
@@ -941,8 +948,8 @@ FUNCTION-ALIAS: get-file-mod-time long GetFileModTime ( c-string fileName )     
 ! Compression/Encoding functionality
 FUNCTION-ALIAS: compress-data uchar* CompressData ( uchar* data, int dataLength, int* compDataLength )          ! Compress data (DEFLATE algorithm)
 FUNCTION-ALIAS: decompress-data uchar* DecompressData ( uchar* compData, int compDataLength, int* dataLength )  ! Decompress data (DEFLATE algorithm)
-FUNCTION-ALIAS: encode-data-base64 c-string EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength ) ! Encode data to Base64 string
-FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( uchar* data, int* outputLength )                   ! Decode Base64 string data
+FUNCTION-ALIAS: encode-data-base64-raw char* EncodeDataBase64 ( uchar* data, int dataLength, int* outputLength ) ! Encode data to Base64 string
+FUNCTION-ALIAS: decode-data-base64 uchar* DecodeDataBase64 ( c-string data, int* outputLength )                   ! Decode Base64 string data
 FUNCTION-ALIAS: compute-crc32 uint ComputeCRC32 ( uchar* data, int dataSize )                                   ! Compute CRC32 hash code
 FUNCTION-ALIAS: compute-md5 uint* ComputeMD5 ( uchar* data, int dataSize )                                      ! Compute MD5 hash code, returns static int[4] (16 bytes)
 FUNCTION-ALIAS: compute-sha1 uint* ComputeSHA1 ( uchar* data, int dataSize )                                    ! Compute SHA1 hash code, returns static int[5] (20 bytes)
@@ -1122,7 +1129,7 @@ FUNCTION-ALIAS: load-image Image LoadImage ( c-string fileName )                
 FUNCTION-ALIAS: load-image-raw Image LoadImageRaw ( c-string fileName, int width, int height, int format, int headerSize )       ! Load image from RAW file data
 FUNCTION-ALIAS: load-image-anim Image LoadImageAnim ( c-string fileName, int* frames )                                           ! Load image sequence from file (frames appended to image.data)
 FUNCTION-ALIAS: load-image-anim-from-memory Image LoadImageAnimFromMemory ( c-string fileType, uchar* fileData, int dataSize, int* frames ) ! Load image sequence from memory buffer
-FUNCTION-ALIAS: load-image-from-memory Image LoadImageFromMemory ( c-string fileType, c-string fileData, int dataSize )          ! Load image from memory buffer, fileType refers to extension: i.e. '.png'
+FUNCTION-ALIAS: load-image-from-memory Image LoadImageFromMemory ( c-string fileType, uchar* fileData, int dataSize )          ! Load image from memory buffer, fileType refers to extension: i.e. '.png'
 FUNCTION-ALIAS: load-image-from-texture Image LoadImageFromTexture ( Texture2D texture )                                         ! Load image from GPU texture data
 FUNCTION-ALIAS: load-image-from-screen Image LoadImageFromScreen ( )                                                             ! Load image from screen buffer and (screenshot)
 FUNCTION-ALIAS: is-image-valid bool IsImageValid ( Image image )                                                                 ! Check if an image is valid (data and parameters)
@@ -1259,9 +1266,9 @@ FUNCTION-ALIAS: get-font-default Font GetFontDefault ( )                        
 FUNCTION-ALIAS: load-font Font LoadFont ( c-string fileName )                                                        ! Load font from file into GPU memory (VRAM)
 FUNCTION-ALIAS: load-font-ex Font LoadFontEx ( c-string fileName, int fontSize, int* fontChars, int glyphCount )     ! Load font from file with extended parameters, use NULL for codepoints and 0 for codepointCount to load the default character set, font size is provided in pixels height
 FUNCTION-ALIAS: load-font-from-image Font LoadFontFromImage ( Image image, Color key, int firstChar )                ! Load font from Image (XNA style)
-FUNCTION-ALIAS: load-font-from-memory Font LoadFontFromMemory ( c-string fileType, c-string fileData, int dataSize, int fontSize, int* fontChars, int glyphCount )  ! Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+FUNCTION-ALIAS: load-font-from-memory Font LoadFontFromMemory ( c-string fileType, uchar* fileData, int dataSize, int fontSize, int* fontChars, int glyphCount )  ! Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
 FUNCTION-ALIAS: is-font-valid bool IsFontValid ( Font font )                                                         ! Check if a font is valid (font data loaded, WARNING: GPU texture not checked)
-FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( c-string  fileData, int dataSize, int fontSize, int* codepoints, int codepointCount, FontType type )  ! Load font data for further use
+FUNCTION-ALIAS: load-font-data GlyphInfo* LoadFontData ( uchar* fileData, int dataSize, int fontSize, int* codepoints, int codepointCount, FontType type, int* glyphCount )  ! Load font data for further use
 FUNCTION-ALIAS: gen-image-font-atlas Image GenImageFontAtlas ( GlyphInfo* chars, Rectangle** recs, int glyphCount, int fontSize, int padding, int packMethod )  ! Generate image font atlas using chars info
 FUNCTION-ALIAS: unload-font-data void UnloadFontData ( GlyphInfo* chars, int glyphCount )                            ! Unload font chars info data (RAM)
 FUNCTION-ALIAS: unload-font void UnloadFont ( Font font )                                                            ! Unload Font from GPU memory (VRAM)
@@ -1285,8 +1292,8 @@ FUNCTION-ALIAS: get-glyph-info GlyphInfo GetGlyphInfo ( Font font, int codepoint
 FUNCTION-ALIAS: get-glyph-atlas-rec Rectangle GetGlyphAtlasRec ( Font font, int codepoint )                          ! Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
 
 ! Text codepoints management functions (unicode characters)
-FUNCTION-ALIAS: load-utf8 c-string LoadUTF8 ( int *codepoints, int length )                     ! Load UTF-8 text encoded from codepoints array
-FUNCTION-ALIAS: unload-utf8 void UnloadUTF8 ( c-string text )                                   ! Unload UTF-8 text encoded from codepoints array
+FUNCTION-ALIAS: load-utf8-raw char* LoadUTF8 ( int *codepoints, int length )                     ! Load UTF-8 text encoded from codepoints array
+FUNCTION-ALIAS: unload-utf8 void UnloadUTF8 ( char* text )                                   ! Unload UTF-8 text encoded from codepoints array
 FUNCTION-ALIAS: load-codepoints int* LoadCodepoints ( c-string text, int* count )                     ! Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
 FUNCTION-ALIAS: unload-codepoints void UnloadCodepoints ( int* codepoints )                           ! Unload codepoints data from memory
 FUNCTION-ALIAS: get-codepoint-count int GetCodepointCount ( c-string text )                           ! Get total number of codepoints in a UTF-8 encoded string
@@ -1299,22 +1306,22 @@ FUNCTION-ALIAS: codepoint-to-utf8 c-string CodepointToUTF8 ( int codepoint, int*
 ! NOTE: Some strings allocate memory internally for returned strings, just be careful!
 FUNCTION-ALIAS: load-text-lines c-string* LoadTextLines ( c-string text, int* count )                 ! Load text as separate lines ('\n')
 FUNCTION-ALIAS: unload-text-lines void UnloadTextLines ( c-string* text, int lineCount )              ! Unload text lines
-FUNCTION-ALIAS: text-copy int TextCopy ( c-string  dst, c-string src )                                ! Copy one string to another, returns bytes copied
+FUNCTION-ALIAS: text-copy int TextCopy ( char* dst, c-string src )                                ! Copy one string to another, returns bytes copied
 FUNCTION-ALIAS: text-is-equal bool TextIsEqual ( c-string text1, c-string text2 )                     ! Check if two text string are equal
 FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for '\0' ending
 FUNCTION-ALIAS: text-format c-string TextFormat ( c-string text, ... )                                                  ! Text formatting with variables (sprintf() style)
 FUNCTION-ALIAS: text-subtext c-string TextSubtext ( c-string text, int position, int length )         ! Get a piece of a text string
 FUNCTION-ALIAS: text-remove-spaces c-string TextRemoveSpaces ( c-string text )                        ! Remove text spaces, concat words
 FUNCTION-ALIAS: get-text-between c-string GetTextBetween ( c-string text, c-string begin, c-string end ) ! Get text between two strings
-FUNCTION-ALIAS: text-replace c-string TextReplace ( c-string  text, c-string replace, c-string by )   ! Replace text string (WARNING: memory must be freed!)
-FUNCTION-ALIAS: text-replace-alloc c-string TextReplaceAlloc ( c-string text, c-string search, c-string replacement ) ! Replace text string with new string, memory must be MemFree()
+FUNCTION-ALIAS: text-replace c-string TextReplace ( c-string  text, c-string replace, c-string by )   ! Replace text string using static storage
+FUNCTION-ALIAS: text-replace-alloc-raw char* TextReplaceAlloc ( c-string text, c-string search, c-string replacement ) ! Replace text string with new string, memory must be MemFree()
 FUNCTION-ALIAS: text-replace-between c-string TextReplaceBetween ( c-string text, c-string begin, c-string end, c-string replacement ) ! Replace text between two specific strings
-FUNCTION-ALIAS: text-replace-between-alloc c-string TextReplaceBetweenAlloc ( c-string text, c-string begin, c-string end, c-string replacement ) ! Replace text between two specific strings, memory must be MemFree()
-FUNCTION-ALIAS: text-insert c-string TextInsert ( c-string text, c-string insert, int position )      ! Insert text in a position (WARNING: memory must be freed!)
-FUNCTION-ALIAS: text-insert-alloc c-string TextInsertAlloc ( c-string text, c-string insert, int position ) ! Insert text in a defined byte position, memory must be MemFree()
+FUNCTION-ALIAS: text-replace-between-alloc-raw char* TextReplaceBetweenAlloc ( c-string text, c-string begin, c-string end, c-string replacement ) ! Replace text between two specific strings, memory must be MemFree()
+FUNCTION-ALIAS: text-insert c-string TextInsert ( c-string text, c-string insert, int position )      ! Insert text in a position using static storage
+FUNCTION-ALIAS: text-insert-alloc-raw char* TextInsertAlloc ( c-string text, c-string insert, int position ) ! Insert text in a defined byte position, memory must be MemFree()
 FUNCTION-ALIAS: text-join c-string TextJoin ( c-string* textList, int count, c-string delimiter )     ! Join text strings with delimiter
 FUNCTION-ALIAS: text-split c-string* TextSplit ( c-string text, char delimiter, int* count )          ! Split text into multiple strings
-FUNCTION-ALIAS: text-append void TextAppend ( c-string text, c-string append, int* position )         ! Append text at specific position and move cursor!
+FUNCTION-ALIAS: text-append void TextAppend ( char* text, c-string append, int* position )         ! Append text at specific position and move cursor!
 FUNCTION-ALIAS: text-find-index int TextFindIndex ( c-string text, c-string find )                    ! Find first text occurrence within a string
 FUNCTION-ALIAS: text-to-upper c-string TextToUpper ( c-string text )                                  ! Get upper case version of provided string
 FUNCTION-ALIAS: text-to-lower c-string TextToLower ( c-string text )                                  ! Get lower case version of provided string
@@ -1406,7 +1413,7 @@ FUNCTION-ALIAS: set-model-mesh-material void SetModelMeshMaterial ( Model* model
 
 ! Model animations loading/unloading functions
 FUNCTION-ALIAS: load-model-animations ModelAnimation* LoadModelAnimations ( c-string fileName, int* animCount ) ! Load model animations from file
-FUNCTION-ALIAS: update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, int frame ) ! Update model animation pose
+FUNCTION-ALIAS: update-model-animation void UpdateModelAnimation ( Model model, ModelAnimation anim, float frame ) ! Update model animation pose
 FUNCTION-ALIAS: update-model-animation-ex void UpdateModelAnimationEx ( Model model, ModelAnimation animA, float frameA, ModelAnimation animB, float frameB, float blend ) ! Update model animation pose, blending two animations
 FUNCTION-ALIAS: unload-model-animations void UnloadModelAnimations ( ModelAnimation* animations, int animCount ) ! Unload animation array data
 FUNCTION-ALIAS: is-model-animation-valid bool IsModelAnimationValid ( Model model, ModelAnimation anim )         ! Check model animation skeleton match
@@ -1459,7 +1466,7 @@ PRIVATE>
 ! Audio Loading and Playing Functions (Module: audio)
 ! ------------------------------------------------------------------------------------
 
-CALLBACK: void AudioCallback ( void* bufferData, int frames )
+CALLBACK: void AudioCallback ( void* bufferData, uint frames )
 
 ! Audio device management functions
 FUNCTION-ALIAS: init-audio-device void InitAudioDevice ( )                                      ! Initialize audio device and context
@@ -1470,7 +1477,7 @@ FUNCTION-ALIAS: get-master-volume float GetMasterVolume ( )                     
 
 ! Wave/Sound loading/unloading functions
 FUNCTION-ALIAS: load-wave Wave LoadWave ( c-string fileName )                                   ! Load wave data from file
-FUNCTION-ALIAS: load-wave-from-memory Wave LoadWaveFromMemory ( c-string fileType, c-string fileData, int dataSize )  ! Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+FUNCTION-ALIAS: load-wave-from-memory Wave LoadWaveFromMemory ( c-string fileType, uchar* fileData, int dataSize )  ! Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
 FUNCTION-ALIAS: is-wave-valid bool IsWaveValid ( Wave wave )                                    ! Checks if wave data is valid (data loaded and parameters)
 FUNCTION-ALIAS: load-sound Sound LoadSound ( c-string fileName )                                ! Load sound from file
 FUNCTION-ALIAS: load-sound-from-wave Sound LoadSoundFromWave ( Wave wave )                      ! Load sound from wave data
@@ -1500,7 +1507,7 @@ FUNCTION-ALIAS: unload-wave-samples void UnloadWaveSamples ( float* samples )   
 
 ! Music management functions
 FUNCTION-ALIAS: load-music-stream Music LoadMusicStream ( c-string fileName )                   ! Load music stream from file
-FUNCTION-ALIAS: load-music-stream-from-memory Music LoadMusicStreamFromMemory ( c-string fileType, c-string data, int dataSize ) ! Load music stream from data
+FUNCTION-ALIAS: load-music-stream-from-memory Music LoadMusicStreamFromMemory ( c-string fileType, uchar* data, int dataSize ) ! Load music stream from data
 FUNCTION-ALIAS: is-music-valid bool IsMusicValid ( Music music )                                ! Checks if a music stream is valid (context and buffers initialized)
 FUNCTION-ALIAS: unload-music-stream void UnloadMusicStream ( Music music )                      ! Unload music stream
 FUNCTION-ALIAS: play-music-stream void PlayMusicStream ( Music music )                          ! Start music playing
@@ -1556,3 +1563,36 @@ DESTRUCTOR: unload-shader
 DESTRUCTOR: unload-sound
 DESTRUCTOR: unload-texture
 DESTRUCTOR: unload-wave
+
+! Allocating C functions expose their ownership-bearing pointers with -raw.
+! Keep the existing string conveniences, copying before exception-safe release.
+<PRIVATE
+
+:: copy-raylib-string ( pointer release -- string/f )
+    [ pointer utf8 alien>string ] [ pointer release call ] finally ; inline
+
+PRIVATE>
+
+: load-file-text ( fileName -- string/f )
+    load-file-text-raw [ unload-file-text ] copy-raylib-string ;
+
+: load-utf8 ( codepoints length -- string/f )
+    load-utf8-raw [ unload-utf8 ] copy-raylib-string ;
+
+: encode-data-base64 ( data dataLength outputLength -- string/f )
+    encode-data-base64-raw [ mem-free ] copy-raylib-string ;
+
+: text-replace-alloc ( text search replacement -- string/f )
+    text-replace-alloc-raw [ mem-free ] copy-raylib-string ;
+
+: text-replace-between-alloc ( text begin end replacement -- string/f )
+    text-replace-between-alloc-raw [ mem-free ] copy-raylib-string ;
+
+: text-insert-alloc ( text insert position -- string/f )
+    text-insert-alloc-raw [ mem-free ] copy-raylib-string ;
+
+:: load-file-data-bytes ( fileName -- bytes/f )
+    0 int <ref> :> count
+    fileName count load-file-data :> pointer
+    [ pointer [ pointer count int deref memory>byte-array ] [ f ] if ]
+    [ pointer unload-file-data ] finally ;

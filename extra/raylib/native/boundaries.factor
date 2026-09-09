@@ -1,9 +1,9 @@
 ! Optional headless ABI tests. Register the C fixture as "raylib-api60" and
 ! set RAYLIB_API60_FONT to upstream examples/text/resources/anonymous_pro_bold.ttf.
 ! api60.c uses the real raylib 6.0 header and library as an independent oracle.
-USING: accessors alien alien.c-types alien.data alien.syntax arrays
-classes.struct compiler.test continuations kernel locals math
-namespaces raylib sequences system tools.test words ;
+USING: accessors alien alien.c-types alien.data alien.enums alien.syntax arrays
+classes.struct compiler.test continuations environment kernel locals math
+namespaces raylib sequences system tools.test vocabs words ;
 IN: raylib.tests
 FROM: alien.c-types => float ;
 
@@ -44,8 +44,7 @@ FUNCTION: bool raylib_api60_controls ( c-string path )
 { float } [ \ update-model-animation def>> fourth third ] unit-test
 \ update-model-animation def>> fourth third float = [
     { t } [ [
-        [ [ Model memory>struct ] [ ModelAnimation memory>struct ] bi*
-          0.5 update-model-animation ] RaylibAnimationProbe
+        [ 0.5 update-model-animation ] RaylibAnimationProbe
         [ raylib_api60_animation_case ] with-callback
     ] compile-call ] unit-test
 ] when
@@ -76,3 +75,9 @@ SYMBOL: raylib-audio-frames
         ] with-callback
     ] compile-call ] unit-test
 ] when
+
+{ 0x4000 } [
+    "FLAG_WINDOW_MOUSE_PASSTHROUGH" "raylib" lookup-word
+    [ execute( -- flag ) enum>number ] [ f ] if*
+] unit-test
+{ t } [ "ModelAnimPose" "raylib" lookup-word >boolean ] unit-test
