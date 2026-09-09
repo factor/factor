@@ -251,7 +251,8 @@ TUPLE: gl3-state
     tex-vbo
     tex-projection-loc
     tex-modelview-loc
-    tex-sampler-loc ;
+    tex-sampler-loc
+    tex-projection-dim ;
 
 SYMBOL: gl3-render-state
 
@@ -320,6 +321,19 @@ SYMBOL: gl3-render-state
             col 4 * row + c set-nth
         ] each
     ] each c ;
+
+! Post-multiplying by a 2D translation changes only the final column.
+! The temporary float-array rounds x/y to float32 before arithmetic, as
+! make-translation-matrix did; first2 alone would retain double precision.
+! Preserve the original matrix, which may be held by the modelview stack.
+:: translate-matrix ( matrix x y -- translated )
+    x y 2array float-array{ } like first2 :> ( tx ty )
+    matrix clone :> translated
+    4 <iota> [| row |
+        row matrix nth tx * row 4 + matrix nth ty * +
+        row 12 + matrix nth + row 12 + translated set-nth
+    ] each
+    translated ;
 
 ! --- Shader Setup ---
 
@@ -430,9 +444,13 @@ SYMBOL: gl3-render-state
     make-2d-ortho
     gl3-state> projection-loc>> swap upload-matrix ;
 
-: set-texture-projection ( width height -- )
-    make-2d-ortho
-    gl3-state> tex-projection-loc>> swap upload-matrix ;
+:: set-texture-projection ( width height -- )
+    width height 2array :> dim
+    gl3-state> :> state
+    state tex-projection-dim>> dim = [
+        state tex-projection-loc>> width height make-2d-ortho upload-matrix
+        dim state tex-projection-dim<<
+    ] unless ;
 
 : set-gl3-modelview ( matrix -- )
     gl3-state> modelview-loc>> swap upload-matrix ;
@@ -678,8 +696,7 @@ SYMBOL: gl3-render-state
     [ set-gl3-modelview ] bi ;
 
 :: gl3-translate ( x y -- )
-    x y make-translation-matrix :> trans
-    current-modelview get-global trans mat4-multiply
+    current-modelview get-global x y translate-matrix
     [ current-modelview set-global ]
     [ set-gl3-modelview ] bi ;
 
@@ -720,6 +737,9 @@ SYMBOL: gl3-render-state
 
 : gl3-reshape ( width height -- )
     2dup 2array current-projection-dim set-global
+    ! A new frame may use a different GL context, even at the same size.
+    ! Upload its first text projection, then reuse it for the frame's draws.
+    f gl3-state> tex-projection-dim<<
     set-gl3-projection
     reset-gl3-modelview ;
 
@@ -831,6 +851,25 @@ SYMBOL: gl3-render-state
     flipped? [ loc dim make-textured-quad-vertices-flipped ]
              [ loc dim make-textured-quad-vertices ] if
     texture-id gl3-draw-texture-vertices ;
+
+! Set shared uniforms once for all cached tiles in the current transform.
+: with-gl3-cached-textures ( quot -- )
+    gl3-state> tex-program>> glUseProgram
+    current-projection-dim get-global first2 set-texture-projection
+    current-modelview get-global gl3-state> tex-modelview-loc>> swap upload-matrix
+    GL_TEXTURE0 glActiveTexture
+    gl3-state> tex-sampler-loc>> 0 glUniform1i
+    [ call ] [
+        GL_TEXTURE_2D 0 glBindTexture
+        restore-color-state
+    ] finally ; inline
+
+! The VAO retains its vertex format and static buffer binding. Must be called
+! inside with-gl3-cached-textures; no vertex upload is needed on repaint.
+:: gl3-draw-cached-texture ( vao texture-id -- )
+    vao glBindVertexArray
+    GL_TEXTURE_2D texture-id glBindTexture
+    GL_TRIANGLES 0 6 glDrawArrays ;
 
 ! --- Cleanup ---
 

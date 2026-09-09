@@ -1,6 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs cache combinators continuations
+USING: accessors alien alien.c-types alien.data arrays assocs cache
+combinators continuations
 core-graphics.types core-text core-text.fonts destructors kernel
 locals math math.functions math.order
 math.rectangles math.vectors namespaces opengl opengl.gl
@@ -48,9 +49,12 @@ M: core-text-renderer line-metrics
 
 CONSTANT: text-tile-dim { 512 256 }
 
-TUPLE: text-tile < disposable texture vertices ;
+TUPLE: text-tile < disposable texture vao vbo ;
 
-M: text-tile dispose* texture>> [ delete-texture ] when* ;
+M: text-tile dispose*
+    [ vao>> [ 1 swap uint <ref> glDeleteVertexArrays ] when* ]
+    [ vbo>> [ 1 swap uint <ref> glDeleteBuffers ] when* ]
+    [ texture>> [ delete-texture ] when* ] tri ;
 
 ! Convert the clip through the actual text transform, including translations
 ! made by editors/tables inside a gadget. Unusual transforms draw all tiles.
@@ -104,7 +108,12 @@ M: text-tile dispose* texture>> [ delete-texture ] when* ;
     [
         text-tile new-disposable |dispose
         image make-texture-gl3 >>texture
-        vertices >>vertices
+        create-gl3-vao >>vao
+        create-gl3-vbo >>vbo
+        dup vao>> glBindVertexArray
+        dup vbo>> GL_ARRAY_BUFFER swap glBindBuffer
+        GL_ARRAY_BUFFER vertices [ byte-length ] keep GL_STATIC_DRAW glBufferData
+        setup-texture-vertex-attributes
     ] with-destructors ;
 
 :: cached-text-tile ( line offset -- tile )
@@ -112,13 +121,17 @@ M: text-tile dispose* texture>> [ delete-texture ] when* ;
 
 :: draw-line-tiles ( line -- )
     line text-clip visible-tile-offsets :> offsets
-    GL_ONE GL_ONE_MINUS_SRC_ALPHA glBlendFunc
-    [
-        offsets [
-            line swap cached-text-tile
-            [ vertices>> ] [ texture>> ] bi gl3-draw-texture-vertices
-        ] each
-    ] [ GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc ] finally ;
+    offsets empty? [
+        GL_ONE GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+        [
+            [
+                offsets [
+                    line swap cached-text-tile
+                    [ vao>> ] [ texture>> ] bi gl3-draw-cached-texture
+                ] each
+            ] with-gl3-cached-textures
+        ] [ GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc ] finally
+    ] unless ;
 
 :: selection-outside-image ( line height -- bands )
     line prepare-render
