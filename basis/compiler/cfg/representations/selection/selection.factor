@@ -64,6 +64,11 @@ SYMBOL: possibilities
 
 SYMBOL: costs
 
+! Opt in until whole-compiler and runtime measurements establish the cost
+! of this more accurate model. Representation possibilities are unchanged.
+SYMBOL: conversion-aware-representation-costs?
+SYMBOL: costed-use-conversions
+
 : init-costs ( -- )
     possibilities get [ [ 0 ] H{ } map>assoc ] assoc-map costs namespaces:set ;
 
@@ -124,12 +129,40 @@ M: insn compute-insn-costs drop ;
 M: vreg-insn compute-insn-costs
     dup peephole-optimizable? 2 5 ? '[ _ increase-costs ] each-rep ;
 
+:: compute-shared-use-cost ( vreg required -- )
+    ! insert-conversions caches an alternative by original vreg and required
+    ! representation, and clears that cache at each basic-block boundary.
+    ! Match that key, not the phi/copy component: distinct definitions need
+    ! distinct conversions even when they must share a representation.
+    vreg required 2array costed-use-conversions get ?adjoin
+    [ vreg required 5 increase-costs ] when ;
+
+GENERIC: compute-shared-conversion-costs ( insn -- )
+
+M: insn compute-shared-conversion-costs compute-insn-costs ;
+
+M: vreg-insn compute-shared-conversion-costs
+    dup peephole-optimizable? [ compute-insn-costs ] [
+        [ [ compute-shared-use-cost ] each-use-rep ]
+        [ [ 5 increase-costs ] each-def-rep ]
+        [ [ 5 increase-costs ] each-temp-rep ] tri
+    ] if ;
+
+: compute-block-costs ( bb -- )
+    [ basic-block namespaces:set ]
+    [ [ compute-insn-costs ] each-non-phi ] bi ;
+
+: compute-shared-block-costs ( bb -- )
+    costed-use-conversions get clear-set
+    [ basic-block namespaces:set ]
+    [ [ compute-shared-conversion-costs ] each-non-phi ] bi ;
+
 : compute-costs ( cfg -- )
     init-costs
-    [
-        [ basic-block namespaces:set ]
-        [ [ compute-insn-costs ] each-non-phi ] bi
-    ] each-basic-block ;
+    conversion-aware-representation-costs? get [
+        HS{ } clone costed-use-conversions namespaces:set
+        [ compute-shared-block-costs ] each-basic-block
+    ] [ [ compute-block-costs ] each-basic-block ] if ;
 
 : minimize-costs ( costs -- representations )
     [ assoc-empty? ] reject-values
