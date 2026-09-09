@@ -56,3 +56,15 @@ Exact commands, source/VM/image hashes, process samples and logs are retained in
 the adjacent directories. Process samples can precede exit; validation durations
 are not runtime benchmark measurements. The paired benchmark images continue to
 use the original common per-architecture seed specified in the comparison runbook.
+
+## Subsequent backtracking callback failure
+
+The full compiler suite at `84a10fe6be` (the integrated phi/GC-prefix repair)
+failed in native ARM64 execution of the large-struct-return C callback:
+`large-return-callback [ ffi_test_large_return_callback ] with-callback`.
+The VM reported a memory protection fault at address `0x180`, with
+backtracking, rematerialization and loop spills enabled and all allocation
+checks active. A second verbose run isolated the same callback. Both original
+logs, exact source/assets and process status are retained in the adjacent
+`backtracking-prefix-suite-*` directories. These are rejected acceptance runs;
+the callback repair and a corrected full-suite pass are required before timing.
