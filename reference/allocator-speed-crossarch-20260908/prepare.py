@@ -4,8 +4,8 @@ import argparse,hashlib,json,platform,subprocess,time
 from pathlib import Path
 root=Path(__file__).resolve().parents[2]
 out=Path(__file__).resolve().parent
-p=argparse.ArgumentParser();p.add_argument('--image',default=str(root/'factor.image'));p.add_argument('--label',default='prepare');a=p.parse_args()
-cmd=[str(root/'factor'),'-resource-path='+str(root),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(out/'prepare.factor')]
+p=argparse.ArgumentParser();p.add_argument('--image',default=str(root/'factor.image'));p.add_argument('--label',default='prepare');p.add_argument('--script',type=Path,default=out/'prepare.factor');a=p.parse_args()
+cmd=[str(root/'factor'),'-resource-path='+str(root),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(a.script.resolve())]
 if platform.system()=='Linux':cmd=['taskset','-c','2']+cmd
 def digest(path):
  with Path(path).open('rb') as source:
@@ -28,7 +28,8 @@ with (out/(a.label+'.log')).open('w') as f:
  status=child.wait()
 prepared=out/'prepared.image'
 result=dict(command=cmd,status=status,seconds=time.monotonic()-start,taskpolicy=policies,
- source_commit=revision,initial_image_sha256=initial_image_sha256)
+ source_commit=revision,initial_image_sha256=initial_image_sha256,
+ preparation_script_sha256=digest(a.script))
 if status==0:
  result['prepared_image_sha256']=digest(prepared)
  current=marker.read_text().strip() if marker.exists() else subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip()
