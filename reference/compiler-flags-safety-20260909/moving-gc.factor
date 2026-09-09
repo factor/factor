@@ -98,7 +98,11 @@ IN: allocator-derived-phi-gc-probe
     graph cfg set allocator register-allocator set t check-allocation? set
     graph \ value-numbering checked-ssa-pass
     graph insert-moving-collection
-    graph allocate-registers graph build-stack-frame
+    graph allocate-registers
+    graph cfg>insns [ ##call-gc? ] filter :> collectors
+    collectors length 1 assert=
+    collectors first gc-map>> derived-roots>> assoc-empty? f assert=
+    graph build-stack-frame
     gensym [ graph generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
 
