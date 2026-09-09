@@ -8,6 +8,17 @@ IN: libudev
 
 LIBRARY: libudev
 
+! These legacy entry points are not exported by current libudev. Keep the
+! public words for old runtimes, but make availability queryable and report
+! an explicit capability error instead of entering an unresolved FFI call.
+ERROR: unavailable-udev-function name ;
+
+: udev-function-available? ( name -- ? )
+    "libudev" dlsym? >boolean ;
+
+: require-udev-function ( name -- )
+    dup udev-function-available? [ drop ] [ unavailable-udev-function ] if ;
+
 C-TYPE: udev
 
 FUNCTION: udev* udev_ref (
@@ -49,13 +60,19 @@ FUNCTION: void udev_set_log_priority (
 
 
 
-FUNCTION: c-string udev_get_sys_path (
+FUNCTION-ALIAS: (udev_get_sys_path) c-string udev_get_sys_path (
     udev* udev )
 
+: udev_get_sys_path ( udev -- path )
+    "udev_get_sys_path" require-udev-function (udev_get_sys_path) ;
 
 
-FUNCTION: c-string udev_get_dev_path (
+
+FUNCTION-ALIAS: (udev_get_dev_path) c-string udev_get_dev_path (
     udev* udev )
+
+: udev_get_dev_path ( udev -- path )
+    "udev_get_dev_path" require-udev-function (udev_get_dev_path) ;
 
 
 
@@ -253,9 +270,12 @@ FUNCTION: udev_monitor* udev_monitor_new_from_netlink (
 
 
 
-FUNCTION: udev_monitor* udev_monitor_new_from_socket (
+FUNCTION-ALIAS: (udev_monitor_new_from_socket) udev_monitor* udev_monitor_new_from_socket (
     udev* udev,
     c-string socket_path )
+
+: udev_monitor_new_from_socket ( udev socket-path -- monitor )
+    "udev_monitor_new_from_socket" require-udev-function (udev_monitor_new_from_socket) ;
 
 
 
@@ -439,5 +459,8 @@ FUNCTION: udev_list_entry* udev_queue_get_queued_list_entry (
 
 
 
-FUNCTION: udev_list_entry* udev_queue_get_failed_list_entry (
+FUNCTION-ALIAS: (udev_queue_get_failed_list_entry) udev_list_entry* udev_queue_get_failed_list_entry (
     udev_queue* udev_queue )
+
+: udev_queue_get_failed_list_entry ( queue -- entry )
+    "udev_queue_get_failed_list_entry" require-udev-function (udev_queue_get_failed_list_entry) ;
