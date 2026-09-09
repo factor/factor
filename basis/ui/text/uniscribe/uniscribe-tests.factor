@@ -1,10 +1,23 @@
-USING: accessors fonts kernel locals math sequences tools.test ui.text ;
+USING: accessors colors fonts kernel locals math namespaces sequences tools.test
+ui.text ui.text.private ui.text.uniscribe ;
 IN: ui.text.uniscribe.tests
 
 ! Line width must describe the shaped string, not a placeholder value.
 { t } [
     sans-serif-font "iii" [ line-metrics width>> ] [ text-width ] 2bi =
 ] unit-test
+
+:: selected-ui-geometry? ( text -- ? )
+    monospace-font :> font
+    text 0 text length COLOR: red <selection> :> selection
+    font text string-dim font selection string-dim =
+    font text line-metrics font selection line-metrics = and
+    0 font text offset>x 0 font selection offset>x = and
+    100 font text x>offset 100 font selection x>offset = and ;
+
+{ t } [ uniscribe-renderer font-renderer [ "" selected-ui-geometry? ] with-variable ] unit-test
+{ t } [ uniscribe-renderer font-renderer [ "abc" selected-ui-geometry? ] with-variable ] unit-test
+{ t } [ uniscribe-renderer font-renderer [ "a\u000301" selected-ui-geometry? ] with-variable ] unit-test
 
 :: near-cluster-end ( str -- n )
     str length monospace-font str offset>x 1 -
