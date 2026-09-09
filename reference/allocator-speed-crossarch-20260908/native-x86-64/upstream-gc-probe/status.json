@@ -1,0 +1,6 @@
+{
+  "exit_code": 1,
+  "upstream_commit": "b21f5d1611ca25407b20edbc1c89bfad1e42bf44",
+  "result": "linear-scan-allocator: plain=false, offset=false; assertion failure",
+  "mode": "native x86-64, source233 prepared VM/image with three exact upstream compiler implementations; not a clean upstream bootstrap"
+}
