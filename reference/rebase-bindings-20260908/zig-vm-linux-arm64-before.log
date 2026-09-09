@@ -1,0 +1,25 @@
+install
++- install factor
+   +- compile exe factor ReleaseFast aarch64-linux-gnu 1 errors
+src/image.zig:537:54: error: no field named 'JIT' in struct 'os.linux.MAP__struct_3230'
+            .{ .TYPE = .PRIVATE, .ANONYMOUS = true, .JIT = true }
+                                                     ^~~
+/Users/erg/.zvm/0.16.0/lib/std/os/linux.zig:177:69: note: struct declared here
+    .aarch64, .aarch64_be, .arm, .armeb, .thumb, .thumbeb => packed struct(u32) {
+                                                             ~~~~~~~^~~~~~
+referenced by:
+    loadImageFromFile: src/image.zig:372:30
+    loadImage: src/image.zig:316:35
+    5 reference(s) hidden; use '-freference-trace=7' to see all references
+error: 1 compilation errors
+failed command: /Users/erg/.zvm/0.16.0/zig build-exe -fllvm -fstrip -OReleaseFast -target aarch64-linux-gnu -mcpu baseline --dep build_options -Mroot=/Users/erg/factor.worktrees/rebase-bindings-validation-20260908/src/main.zig -Mbuild_options=.zig-cache/c/d3531ab13de3205e834452b3d463df08/options.zig -lc --cache-dir .zig-cache --global-cache-dir /Users/erg/.cache/zig --name factor -rdynamic --zig-lib-dir /Users/erg/.zvm/0.16.0/lib/ --listen=-
+
+Build Summary: 1/5 steps succeeded (1 failed)
+install transitive failure
++- install factor transitive failure
+|  +- compile exe factor ReleaseFast aarch64-linux-gnu 1 errors
++- UpdateSourceFiles transitive failure
+   +- compile exe factor ReleaseFast aarch64-linux-gnu (+1 more reused dependencies)
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/43a7ad5ff16d637e328a63bfee3c1392/build /Users/erg/.zvm/0.16.0/zig /Users/erg/.zvm/0.16.0/lib /Users/erg/factor.worktrees/rebase-bindings-validation-20260908 .zig-cache /Users/erg/.cache/zig --seed 0x971bd07d -Z2dec3b6652fc22d7 -Dtarget=aarch64-linux-gnu -Doptimize=ReleaseFast

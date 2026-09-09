@@ -530,10 +530,11 @@ pub const ImageLoader = struct {
 
         const total_size = page_size + heap_size;
 
-        // On x86_64 macOS (including under Rosetta), use RWX permissions directly in mmap
-        // Note: MAP_JIT is for Apple Silicon - on x86_64, standard RWX should work
+        // MAP_JIT is specific to Apple Silicon. Linux ARM64 and x86_64
+        // use ordinary executable anonymous mappings.
         const is_arm64 = builtin.cpu.arch == .aarch64;
-        const map_flags: std.c.MAP = if (is_arm64)
+        const needs_map_jit = builtin.os.tag == .macos and is_arm64;
+        const map_flags: std.c.MAP = if (needs_map_jit)
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true, .JIT = true }
         else
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true };

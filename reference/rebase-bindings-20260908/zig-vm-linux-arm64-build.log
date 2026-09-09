@@ -1,0 +1,2 @@
+Command: /Users/erg/.zvm/0.16.0/zig build -Dtarget=aarch64-linux-gnu -Doptimize=ReleaseFast
+Exit status: 0
