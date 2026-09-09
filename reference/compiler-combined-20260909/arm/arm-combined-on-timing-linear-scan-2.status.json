@@ -1,0 +1,54 @@
+{
+  "source_commit": "6b14328972",
+  "feature": "all",
+  "enabled": "on",
+  "gvn": "off",
+  "rematerialize": "off",
+  "loop_spills": "off",
+  "image_sha256": "e1f9c08256de399b32e5112b0256bcbf6111edb03c2d643a2ccf658a92f239a0",
+  "vm_sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+  "script_sha256": {
+    "timing.factor": "ff845a5564152f15ee75b5199cf7a09212bb9ac1bab78bcc12cff4328c461833",
+    "drive.py": "b780c4733d48975f21757cded401529b040324f9c99b5ce86edd99befac59aff"
+  },
+  "host_load_before": [
+    36.0537109375,
+    31.71875,
+    31.28857421875
+  ],
+  "host_load_after": [
+    29.9384765625,
+    31.0771484375,
+    31.1005859375
+  ],
+  "final_value_verifier": false,
+  "exit_code": 0,
+  "seconds": 90.8348970413208,
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next3-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next3-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-combined-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-combined-20260909/timing.factor",
+    "linear-scan",
+    "timing",
+    "3",
+    "off",
+    "off",
+    "6b14328972",
+    "off",
+    "all",
+    "on"
+  ],
+  "ok": true,
+  "counts": {
+    "runtime": 120,
+    "code": 16,
+    "compile": 1,
+    "scope": 1
+  },
+  "taskpolicy": {
+    "exit_code": 0,
+    "stderr": ""
+  }
+}

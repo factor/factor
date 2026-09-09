@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next3-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next3-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-next3-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-combined-20260909/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 3.051703292,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "source_commit": "6b14328972",
+  "initial_image_sha256": "2fe3a28e41e9d187ba8937f6584ba5f70ca3e78a8320470c2f92b835f3e4f84a",
+  "preparation_script_sha256": "667f519480614e8f6d56e29c906da3b194c225c91f19804bc1f7088035fe8109",
+  "prepared_image_sha256": "e1f9c08256de399b32e5112b0256bcbf6111edb03c2d643a2ccf658a92f239a0"
+}

@@ -1,0 +1,30 @@
+{
+  "benchmark.nbody:nbody": {
+    "off_bytes": 3120,
+    "on_bytes": 3168,
+    "matches_prior_individual_final_static": [
+      "representations"
+    ]
+  },
+  "compiler-next3-representation-workload:representation-loop-values": {
+    "off_bytes": 1840,
+    "on_bytes": 1792,
+    "matches_prior_individual_final_static": [
+      "representations"
+    ]
+  },
+  ":( typed memory-loop-work )": {
+    "off_bytes": 512,
+    "on_bytes": 496,
+    "matches_prior_individual_final_static": [
+      "memory"
+    ]
+  },
+  "benchmark.scalar-mixing:mixing-pair": {
+    "off_bytes": 272,
+    "on_bytes": 208,
+    "matches_prior_individual_final_static": [
+      "slp"
+    ]
+  }
+}
