@@ -1,0 +1,37 @@
+{
+  "recorded_at_unix": 1788983318.0962307,
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+  "uname": [
+    "Linux",
+    "agent1",
+    "7.0.0-28-generic",
+    "#28-Ubuntu SMP PREEMPT_DYNAMIC Sun Jun 21 01:01:36 UTC 2026",
+    "x86_64",
+    ""
+  ],
+  "cpuinfo": "processor\t: 0\nvendor_id\t: AuthenticAMD\ncpu family\t: 25\nmodel\t\t: 97\nmodel name\t: AMD Ryzen 9 7950X3D 16-Core Processor\nstepping\t: 2\nmicrocode\t: 0xa60120a\ncpu MHz\t\t: 2985.835\ncache size\t: 1024 KB\nphysical id\t: 0\nsiblings\t: 32\ncore id\t\t: 0\ncpu cores\t: 16\napicid\t\t: 0\ninitial apicid\t: 0\nfpu\t\t: yes\nfpu_exception\t: yes\ncpuid level\t: 16\nwp\t\t: yes\nflags\t\t: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca fsrm flush_l1d amd_lbr_pmc_freeze\nbugs\t\t: sysret_ss_attrs spectre_v1 spectre_v2 spec_store_bypass srso spectre_v2_user tsa vmscape\nbogomips\t: 8384.45\nTLB size\t: 3584 4K pages\nclflush size\t: 64\ncache_alignment\t: 64\naddress sizes\t: 48 bits physical, 48 bits virtual\npower management: ts ttp tm hwpstate cpb eff_freq_ro [13] [14]",
+  "cpu2_topology": {
+    "physical_package_id": "0",
+    "core_id": "2",
+    "thread_siblings_list": "2,18"
+  },
+  "vm_capability": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep",
+  "assets": {
+    "factor": {
+      "resolved": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+      "sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f"
+    },
+    "libfactor-ffi-test.so": {
+      "resolved": "/home/erg/factor-compiler-next3-candidate-20260909/libfactor-ffi-test.so",
+      "sha256": "821d94227c02b44089dc3bebe416acc6a5d7525dd90322c9d8ada3f0fda5eb8d"
+    },
+    "reference/allocator-speed-crossarch-20260908/counters": {
+      "resolved": "/home/erg/factor-compiler-next3-candidate-20260909/reference/allocator-speed-crossarch-20260908/counters",
+      "sha256": "fb380f29e9265891875d2079707f903a8503c4c526e62d33ea579b1f53ce1fd7"
+    },
+    "reference/allocator-speed-crossarch-20260908/counters-linux.c": {
+      "resolved": "/home/erg/factor-compiler-next3-candidate-20260909/reference/allocator-speed-crossarch-20260908/counters-linux.c",
+      "sha256": "a405b26a0b0de10f257bb837933eb70abfb2e696314e9ae22bd3295d6e70bb41"
+    }
+  }
+}

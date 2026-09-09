@@ -14,4 +14,4 @@ Example after a source freeze and successful common preparation:
 python3 reference/compiler-next3-20260909/drive.py native-loops-on --feature loops --enabled on --mode check --allocator linear-scan --image ABS_PREPARED_IMAGE
 ```
 
-Preparation and full end-to-end execution await the final compiler freeze. The configuration/timing definitions have passed a standalone native syntax gate; this is not a claim that candidate feature gates or timings have run.
+The final production freeze is `020b74ce5d8f8fac9b5df5642afad8787da98896`. The native common preparation and all five checked configurations passed, as did the independent all-four-ON corpus gate. Exact executed scripts, image/source hashes, warnings, and process statuses are retained under `candidate-native/`; timing results are accepted only by `analyze.py` after every required process completes.

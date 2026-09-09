@@ -1,0 +1,27 @@
+{
+  "protocol": "shared",
+  "order": [
+    "off",
+    "loops",
+    "representations",
+    "memory",
+    "slp",
+    "slp",
+    "memory",
+    "representations",
+    "loops",
+    "off"
+  ],
+  "processes": 10,
+  "measured_batches": 900,
+  "shared_off_anchors": true,
+  "source_commit": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "image_sha256": "15a12ce2c70d85f4a43adb10f5816cabf68492ae68dfbccd44b8bedb4ebe4e45",
+  "queue_sha256": "1d5068751a9725712b52627d2cc1090d7b9d59478a7aab9291ce558883554abf",
+  "analyzer_sha256": "7d9f769a64ae4c3543c8fc577989fcb3cae0564834a67f5c82198ed7d58a8f9c",
+  "host_load_before": [
+    0.10791015625,
+    0.443359375,
+    0.40478515625
+  ]
+}

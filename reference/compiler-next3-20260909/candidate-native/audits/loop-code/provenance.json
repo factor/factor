@@ -1,0 +1,14 @@
+{
+  "source_hashes": {
+    "loop-code.factor": "f2948ebc2cc4850da8c65bf4dcc5b4f4b091349aea50ca858dd6bb3c4ab001f3",
+    "loop-code-definitions.factor": "ddf2de0c78ac9d6eb2a4de223e8c74cb0c0b82a27160f75d79c222a3389cbb70",
+    "analyze-loop-code.py": "3ef7cf0eeee20729c64d364dbe22b0d55f29c0362ef8413abfecfc2dfe5805ff"
+  },
+  "off_repr_different_byte_offsets": [
+    3,
+    58,
+    84
+  ],
+  "differences_within_three_rip_relative_safepoint_displacements": true,
+  "note": "Decoded target instructions and operands are identical except relocation displacements to the same safepoint address. Untimed separate captures do not identify timing-process placement."
+}
