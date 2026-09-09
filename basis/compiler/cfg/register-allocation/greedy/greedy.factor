@@ -123,9 +123,21 @@ TUPLE: greedy-progress stage cascade hint ;
     victim interval-progress cascade>> :> other
     cascade 0 = other cascade < or ;
 
+:: urgent-eviction? ( interval victim -- ? )
+    interval minimal-interval? victim minimal-interval? not and ;
+
+:: younger-cascade? ( interval victim -- ? )
+    interval interval-progress cascade>> :> cascade
+    cascade 0 > victim interval-progress cascade>> cascade > and ;
+
+:: eviction-cascade-safe? ( interval victim -- ? )
+    interval victim cascade-safe?
+    interval victim urgent-eviction?
+    interval interval-progress cascade>> victim interval-progress cascade>> = not and or ;
+
 :: evictable-victim? ( interval victim reg -- ? )
     victim interval-stage done-stage <
-    interval victim cascade-safe? and [
+    interval victim eviction-cascade-safe? and [
         interval cached-spill-weight victim cached-spill-weight >
         interval reg hint-score 0 >
         victim reg hint-score 0 = and
@@ -140,6 +152,7 @@ TUPLE: greedy-progress stage cascade hint ;
 
 :: candidate-cost ( interval reg conflicts -- cost )
     conflicts [ reg hint-score ] map-sum
+    conflicts [ interval swap younger-cascade? ] count 10 * +
     interval reg hint-score -
     conflicts 0 [ cached-spill-weight max ] reduce
     conflicts eviction-cost 3array ;
@@ -154,6 +167,7 @@ TUPLE: greedy-progress stage cascade hint ;
 :: greedy-evict ( interval reg -- )
     interval eviction-cascade :> cascade
     interval reg register-conflicts [| victim |
+        interval victim younger-cascade? [ "urgent-evictions" greedy-count ] when
         victim reg hint-score 0 > [ "broken-hints" greedy-count ] when
         cascade victim interval-progress cascade<<
         victim greedy-unassign

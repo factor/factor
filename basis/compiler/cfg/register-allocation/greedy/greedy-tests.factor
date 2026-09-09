@@ -364,3 +364,22 @@ IN: compiler.cfg.register-allocation.greedy.tests
         ] call
     ] call
 ] unit-test
+
+! Mandatory uses may break a younger spillable cascade (with a cost
+! penalty), but never their own cascade. A hard rejection here incorrectly
+! reports pressure even though the occupied range can spill around the use.
+{ 10 f 1 f } [
+    init-recolor-test
+    H{ { int-regs { 10 } } } greedy-registers set
+    1 { { 4 5 } } { 4 } test-interval
+    2 { { 0 10 } } { 0 10 } test-interval
+    [| incoming victim |
+        incoming done-stage advance-stage
+        1 incoming interval-progress cascade<<
+        2 victim interval-progress cascade<<
+        victim 10 greedy-assign incoming greedy-allocate-one
+        incoming reg>> victim reg>>
+        "urgent-evictions" greedy-statistics get at
+        incoming victim 10 evictable-victim?
+    ] call
+] unit-test
