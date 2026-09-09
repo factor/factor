@@ -4,7 +4,7 @@
 `binary.factor` checks binary file ownership, Base64 decoding, PNG round trips,
 and WAV samples without opening a window or audio device. `ownership.factor`
 checks allocated text raw pointers and copying conveniences, writable text
-buffers, static results, and cleanup during a decoding error.
+buffers, static results, and cleanup when copying raises an exception.
 
 `boundaries.factor` uses the independent C oracle `api60.c` against the real
 Raylib **6.0** header and library. It checks every offset in ModelSkeleton,

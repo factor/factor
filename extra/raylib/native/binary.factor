@@ -1,6 +1,6 @@
 ! Headless native binary-buffer tests; all calls use the real raylib library.
-USING: accessors alien alien.accessors alien.c-types alien.data alien.syntax
-arrays byte-arrays compiler.test continuations kernel locals namespaces
+USING: accessors alien alien.accessors alien.c-types alien.data alien.strings alien.syntax
+arrays byte-arrays compiler.test continuations io.encodings.utf8 kernel locals namespaces
 raylib sequences tools.test ;
 IN: raylib.tests
 
@@ -67,3 +67,18 @@ SYMBOL: raylib-binary-allocation
       wave data>> 4 memory>byte-array ]
     [ wave unload-wave ] finally
 ] compile-call ] unit-test
+
+: raylib-buffer-unit-test ( expected quot -- ) [ compile-call ] curry unit-test ;
+
+{ 3 "abcdef" 6 } [| |
+    16 <byte-array> :> buffer
+    buffer "abc" text-copy
+    3 int <ref> :> position
+    buffer "def" position text-append
+    buffer utf8 alien>string position int deref
+] raylib-buffer-unit-test
+! A Factor string is not writable native storage. Old c-string declarations
+! silently mutated a temporary encoding instead of the supplied object.
+[ [ "____" "abc" text-copy ] compile-call ] must-fail
+[ [ "ab__" "c" 2 int <ref> text-append ] compile-call ] must-fail
+

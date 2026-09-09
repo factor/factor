@@ -64,26 +64,18 @@ SPECIALIZED-ARRAY: int
     "abc" text-to-upper
 ] raylib-owned-unit-test
 
-{ 3 "abcdef" 6 } [| |
-    16 <byte-array> :> buffer
-    buffer "abc" text-copy
-    3 int <ref> :> position
-    buffer "def" position text-append
-    buffer utf8 alien>string position int deref
-] raylib-owned-unit-test
-! A Factor string is not writable native storage. Old c-string declarations
-! silently mutated a temporary encoding instead of the supplied object.
-[ [ "____" "abc" text-copy ] compile-call ] must-fail
-[ [ "ab__" "c" 2 int <ref> text-append ] compile-call ] must-fail
-
-! Cleanup must still run if copying a native allocation throws. Use a custom
-! release quotation around the actual native MemFree, retaining no freed data.
+! Inject a copying exception while using real native allocation/release.
+! UTF-8 normally replaces invalid bytes, so malformed text is not an exception.
+TUPLE: raylib-copy-failure pointer ;
+C: <raylib-copy-failure> raylib-copy-failure
+ERROR: raylib-copy-error ;
+M: raylib-copy-failure alien>string 2drop raylib-copy-error ;
 SYMBOL: raylib-string-released
 { t } [| |
     f raylib-string-released set
-    2 mem-alloc :> ptr
-    255 ptr 0 set-alien-unsigned-1 0 ptr 1 set-alien-unsigned-1
-    [ ptr [ mem-free t raylib-string-released set ] copy-raylib-string drop f ]
-    [ drop t ] recover
+    2 mem-alloc <raylib-copy-failure> :> ptr
+    [ ptr [ pointer>> mem-free t raylib-string-released set ]
+      copy-raylib-string drop f ]
+    [ raylib-copy-error? ] recover
     raylib-string-released get and
 ] raylib-owned-unit-test
