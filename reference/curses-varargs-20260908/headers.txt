@@ -1,0 +1,24 @@
+macOS-26.6.2-arm64-arm-64bit
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin25.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+extern int mvprintw (int,int, const char *,...)
+extern int mvwprintw (WINDOW*,int,int, const char *,...)
+extern int printw (const char *,...)
+extern int vwprintw (WINDOW *, const char *,va_list);
+extern int vw_printw (WINDOW *, const char *,va_list);
+extern int wprintw (WINDOW *, const char *,...)
+extern char * tparm ( char *, ...);
+extern int mvprintw (int,int, const char *,...)
+extern int mvwprintw (WINDOW*,int,int, const char *,...)
+extern int printw (const char *,...)
+extern int vwprintw (WINDOW *, const char *,va_list) __asm("_" "vwprintw" "$NCURSES60") __attribute__((availability(macosx,introduced=15.0))) __attribute__((availability(ios,introduced=18.0))) __attribute__((availability(watchos,introduced=11.0))) __attribute__((availability(tvos,introduced=18.0)));
+extern int vw_printw (WINDOW *, const char *,va_list)
+extern int wprintw (WINDOW *, const char *,...)
+#define NCURSES_TPARM_ARG long
+#define NCURSES_TPARM_VARARGS 1
+#define NCURSES_VERSION "6.0"
+#define NCURSES_VERSION_MAJOR 6
+#define NCURSES_VERSION_MINOR 0
+#define NCURSES_VERSION_PATCH 20150808
