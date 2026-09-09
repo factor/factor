@@ -26,6 +26,8 @@ for r in range(1 if a.mode=='check' else a.rounds):
         log=OUT/(name+'.log')
         marker=ROOT/'.allocator-source-commit'
         revision=marker.read_text().strip() if marker.exists() else subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
+        prepared_marker=ROOT/'.allocator-prepared-source-commit'
+        if prepared_marker.exists():assert prepared_marker.read_text().strip()==revision, 'Prepared image/source mismatch; refresh the image before measuring'
         entry=OUT/'timing.factor'
         final_verifier=False
         if a.mode=='check' and (ROOT/'basis/compiler/cfg/register-allocation/verifier/verifier.factor').exists():
