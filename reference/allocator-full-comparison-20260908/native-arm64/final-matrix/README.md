@@ -2,6 +2,15 @@
 
 Backtracking has the lowest recorded aggregate runtime CPU on this ARM run: 0.8031 times final linear scan. Greedy is 1.0037 and chordal 1.2168. This timing advantage cannot be confidently attributed to allocator quality on the heavily loaded host. Retired instruction ratios are respectively 1.0269, 1.0089, and 1.0956: every alternative performs more retired work than linear scan.
 
+Each final allocator compared with its own corrected prototype has the following ratios. Values below 1 mean less recorded time/work; the execution-rate limitations below apply to every CPU ratio.
+
+| Allocator | Runtime CPU | Runtime retired | Compile CPU | Compile retired |
+|---|---:|---:|---:|---:|
+| linear-scan | 1.0204 | 1.0030 | 1.2367 | 1.0729 |
+| greedy | 1.1158 | 1.0116 | 1.1398 | 1.1087 |
+| backtracking | 1.1365 | 1.0312 | 1.0914 | 1.4027 |
+| chordal | 1.3899 | 1.0551 | 1.5273 | 1.4775 |
+
 - [Final allocator comparison](final-rank.md): all four final implementations, identical 27,296-word closure.
 - [Each allocator versus its corrected prototype](summary.md): baseline `f5a6d4739eb6aa5203df67719ad8cfba1410484c`, final `30a50ab0df1147eb5c7d852b5d6aad2c0835464e`. Baseline has 26,212 frozen words; final adds compiler helpers. Compilation comparisons include the complete changed closure.
 - [Linear-scan rematerialization attribution](remat-attribution.md): same final source/scope, ON/OFF runtime CPU ratio 1.0348 and retired ratio 1.000506. CPU direction reverses between rounds (1.1510 and 0.9541); this does not establish a broad runtime benefit or penalty.
