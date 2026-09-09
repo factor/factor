@@ -48,9 +48,9 @@ CONSTANT: emulation-map {
     bytes length 20 >= [
         bytes 4 head B{ 127 69 76 70 } =
         4 bytes nth cell 8 = 2 1 ? = and
-        5 bytes nth little-endian? 1 2 ? = and
-        16 18 bytes subseq little-endian? [ le> ] [ be> ] if 3 = and
-        18 20 bytes subseq little-endian? [ le> ] [ be> ] if
+        5 bytes nth alien.data:little-endian? 1 2 ? = and
+        16 18 bytes subseq alien.data:little-endian? [ le> ] [ be> ] if 3 = and
+        18 20 bytes subseq alien.data:little-endian? [ le> ] [ be> ] if
         elf-machine-map cpu of = and
     ] [ f ] if ;
 

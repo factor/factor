@@ -151,7 +151,7 @@ CONSTANT: IOC_DIRSHIFT 30  ! SIZESHIFT + SIZEBITS
 ! Optional ioctls may be absent on a device/kernel. Never hide bad file
 ! descriptors, permissions, memory faults, or Factor programming errors.
 : unsupported-ioctl? ( error -- ? )
-    dup libc-error? [ errno>> { EINVAL ENOTTY ENOSYS EOPNOTSUPP } member? ]
+    dup libc-error? [ errno>> EINVAL ENOTTY ENOSYS EOPNOTSUPP 4array member? ]
     [ drop f ] if ;
 
 : optional-ioctl ( quot: ( -- result ) -- result/f )
