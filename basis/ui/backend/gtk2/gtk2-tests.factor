@@ -1,5 +1,6 @@
-USING: alien.syntax classes.struct gdk2.ffi kernel sequences system
-tools.test ui.backend.gtk2 ui.gestures ;
+USING: alien.syntax classes.struct destructors environment gdk2.ffi
+gtk2.ffi kernel namespaces sequences system tools.test ui.backend
+ui.backend.gtk2 ui.gestures ;
 IN: ui.backend.gtk2.tests
 
 : gdk-key-release-event ( -- event )
@@ -87,3 +88,10 @@ os linux? [
 { 9854 } [
     "gpu.demos.bunny" vocab-icon-data length
 ] unit-test
+
+ui-backend get gtk2-ui-backend eq? "DISPLAY" os-env empty? not and [
+    { } [
+        f f gtk_init_check [ "GTK2 init failed" throw ] unless
+        [ GTK_WINDOW_TOPLEVEL gtk_window_new &gtk_widget_destroy drop ] with-destructors
+    ] unit-test
+] when
