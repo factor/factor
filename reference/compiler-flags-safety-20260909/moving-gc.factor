@@ -91,7 +91,7 @@ IN: allocator-derived-phi-gc-probe
             dup , ##save-context? [
                 V{ } clone H{ } clone gc-map boa ##call-gc,
             ] when
-        ] { } make swap >>instructions drop
+        ] { } make >>instructions drop
     ] each-basic-block ;
 
 :: compile-moving-probe ( graph allocator -- word )
