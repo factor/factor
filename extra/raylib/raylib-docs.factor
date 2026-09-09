@@ -2694,6 +2694,16 @@ HELP: set-config-flags
 
 
 
+HELP: trace-log
+{ $values { "logLevel" TraceLogLevel } { "text" c-string } }
+{ $description "Calls TraceLog with no anonymous arguments. The text is a C format string; write %% for a literal percent sign. For a format that consumes values, declare a typed alias with an ellipsis before the anonymous arguments." }
+{ $examples
+    { $code
+        "LIBRARY: raylib"
+        "FUNCTION-ALIAS: log-value void TraceLog ("
+        "    TraceLogLevel level, c-string format, ... int value, double number )"
+        "LOG_INFO \"value=%d number=%.2f\" 7 2.5 log-value" } } ;
+
 HELP: set-trace-log-level
 { $values
     logLevel: int }
@@ -2704,7 +2714,7 @@ HELP: set-trace-log-callback
 { $values
     callback: TraceLogCallback }
 { $description
-    "Set custom trace log" } ;
+    "Sets a custom trace logger. On ARM64 its quotation receives the log level, format string, and a borrowed va_list cursor. Read or forward the cursor according to the format during the callback; it expires when the callback returns." } ;
 
 HELP: set-load-file-data-callback
 { $values
@@ -5284,7 +5294,13 @@ HELP: text-format
     text: c-string
     c-string: c-string }
 { $description
-    "Text formatting with variables (sprintf() style)" } ;
+    "Calls TextFormat with no anonymous arguments and copies its result to a Factor string. Write %% for a literal percent sign. For formats that consume values, declare a typed alias; the FFI does not infer types from the format string." }
+{ $examples
+    { $code
+        "LIBRARY: raylib"
+        "FUNCTION-ALIAS: format-five c-string TextFormat ("
+        "    c-string format, ... int a, double b, int c, double d, int e )"
+        "\"%d/%.2f/%d/%.1f/%d\" 7 2.5 -3 4.5 11 format-five" } } ;
 
 HELP: text-subtext
 { $values
