@@ -4,6 +4,10 @@ USING: alien classes classes.struct.private help.markup help.syntax
 kernel libc math sequences ;
 IN: classes.struct
 
+HELP: bad-struct-array-length
+{ $values { "value" object } { "expected" integer } }
+{ $description "Thrown when a source buffer assigned to a fixed-length struct array field has a different byte length from the field. The expected length is measured in bytes." } ;
+
 HELP: <struct-boa>
 { $values
     { "class" class }
@@ -135,11 +139,11 @@ ARTICLE: "classes.struct.examples" "Struct class examples"
 { $code "test-struct <struct> ." }
 "Creating a new instance with slots initialized from the stack:"
 { $code
-    "USING: libc specialized-arrays alien.data ;"
+    "USING: libc specialized-arrays alien.data sequences ;"
     "SPECIALIZED-ARRAY: char"
     ""
     "42"
-    "\"Hello, chicken.\" char >c-array"
+    "\"Hello, chicken.\" char >c-array 0 suffix"
     "1024 malloc"
     "test-struct <struct-boa> ."
 } ;
@@ -158,6 +162,7 @@ ARTICLE: "classes.struct.create" "Creating instances of structs"
     malloc-struct
     memory>struct
 }
+"Fixed-length array fields require a source buffer with exactly the field's byte length, both in constructors and slot setters. A mismatched buffer throws " { $link bad-struct-array-length } ". Raw " { $link alien } " pointers have no declared length and are copied without this check."
 "When the contents of a struct will be immediately reset, faster primitive words are available that will create a struct without initializing its contents:"
 { $subsections
     (struct)
