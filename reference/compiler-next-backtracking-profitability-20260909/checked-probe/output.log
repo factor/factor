@@ -1,0 +1,547 @@
+H{
+    { "input" "ffi-pressure" }
+    {
+        "procedures"
+        V{
+            H{
+                {
+                    "allocation"
+                    H{
+                        { "register-hint-hits" 2 }
+                        { "edge-entry-reloads" 2 }
+                        { "shared-spill-homes" 0 }
+                        { "evictions" 0 }
+                        { "register-transitions" 20 }
+                        { "assigned-bundles" 95 }
+                        { "splits" 0 }
+                        { "bundle-merges" 32 }
+                        { "second-chance-assignments" 22 }
+                        { "interior-gaps-skipped" 32 }
+                        { "conflict-directed-splits" 0 }
+                        {
+                            "algorithm"
+                            "ssa-bundle-backtracking"
+                        }
+                        { "fallback-count" 0 }
+                        { "second-chance-attempts" 33 }
+                        { "split-budget-exhaustions" 0 }
+                        { "loop-cluster-splits" 0 }
+                        { "minimal-splits" 0 }
+                    }
+                }
+                {
+                    "passes"
+                    {
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 145 }
+                            { "pass" "optimize-tail-calls" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 36 }
+                            { "spills" 0 }
+                            { "nanoseconds" 11316 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 145 }
+                            {
+                                "pass"
+                                "delete-useless-conditionals"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 36 }
+                            { "spills" 0 }
+                            { "nanoseconds" 1927 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 145 }
+                            { "pass" "split-branches" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 36 }
+                            { "spills" 0 }
+                            { "nanoseconds" 3608 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 143 }
+                            { "pass" "join-blocks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 36 }
+                            { "spills" 0 }
+                            { "nanoseconds" 6273 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 106 }
+                            { "pass" "optimize-ssa" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 766003 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 109 }
+                            { "pass" "select-representations" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 341284 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 112 }
+                            { "pass" "insert-gc-checks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 30053 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 112 }
+                            {
+                                "pass"
+                                "eliminate-write-barriers"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 11767 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 112 }
+                            { "pass" "clear-uninitialized" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 84337 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 113 }
+                            { "pass" "insert-save-contexts" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 21320 }
+                        }
+                        H{
+                            { "reloads" 55 }
+                            { "instructions" 245 }
+                            { "pass" "allocate-registers" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 280 }
+                            { "blocks" 6 }
+                            { "copies" 20 }
+                            { "spills" 56 }
+                            { "nanoseconds" 27088331 }
+                        }
+                        H{
+                            { "reloads" 55 }
+                            { "instructions" 245 }
+                            { "pass" "build-stack-frame" }
+                            { "frame-bytes" 304 }
+                            { "spill-bytes" 280 }
+                            { "blocks" 6 }
+                            { "copies" 20 }
+                            { "spills" 56 }
+                            { "nanoseconds" 29561 }
+                        }
+                    }
+                }
+                { "code-bytes" 1312 }
+                { "codegen-nanoseconds" 205287 }
+            }
+        }
+    }
+    { "allocator" "backtracking-allocator" }
+    { "frontend-nanoseconds" 6030157 }
+}
+H{
+    { "input" "branch-pressure" }
+    {
+        "procedures"
+        V{
+            H{
+                {
+                    "allocation"
+                    H{
+                        { "register-hint-hits" 15 }
+                        { "edge-entry-reloads" 0 }
+                        { "shared-spill-homes" 0 }
+                        { "evictions" 5 }
+                        { "register-transitions" 2 }
+                        { "assigned-bundles" 85 }
+                        { "splits" 14 }
+                        { "bundle-merges" 33 }
+                        { "second-chance-assignments" 1 }
+                        { "interior-gaps-skipped" 0 }
+                        { "conflict-directed-splits" 14 }
+                        {
+                            "algorithm"
+                            "ssa-bundle-backtracking"
+                        }
+                        { "fallback-count" 0 }
+                        { "second-chance-attempts" 14 }
+                        { "split-budget-exhaustions" 0 }
+                        { "loop-cluster-splits" 0 }
+                        { "minimal-splits" 0 }
+                    }
+                }
+                {
+                    "passes"
+                    {
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 195 }
+                            { "pass" "optimize-tail-calls" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 78 }
+                            { "spills" 0 }
+                            { "nanoseconds" 9102 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 195 }
+                            {
+                                "pass"
+                                "delete-useless-conditionals"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 78 }
+                            { "spills" 0 }
+                            { "nanoseconds" 2460 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 195 }
+                            { "pass" "split-branches" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 78 }
+                            { "spills" 0 }
+                            { "nanoseconds" 4961 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 193 }
+                            { "pass" "join-blocks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 6 }
+                            { "copies" 78 }
+                            { "spills" 0 }
+                            { "nanoseconds" 5904 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 114 }
+                            { "pass" "optimize-ssa" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 6 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 749644 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 117 }
+                            { "pass" "select-representations" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 6 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 512623 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 120 }
+                            { "pass" "insert-gc-checks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 17179 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 120 }
+                            {
+                                "pass"
+                                "eliminate-write-barriers"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 6437 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 150 }
+                            { "pass" "clear-uninitialized" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 91799 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 150 }
+                            { "pass" "insert-save-contexts" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 3813 }
+                        }
+                        H{
+                            { "reloads" 31 }
+                            { "instructions" 211 }
+                            { "pass" "allocate-registers" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 248 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 31 }
+                            { "nanoseconds" 19599640 }
+                        }
+                        H{
+                            { "reloads" 31 }
+                            { "instructions" 211 }
+                            { "pass" "build-stack-frame" }
+                            { "frame-bytes" 272 }
+                            { "spill-bytes" 248 }
+                            { "blocks" 8 }
+                            { "copies" 0 }
+                            { "spills" 31 }
+                            { "nanoseconds" 24149 }
+                        }
+                    }
+                }
+                { "code-bytes" 1264 }
+                { "codegen-nanoseconds" 205574 }
+            }
+        }
+    }
+    { "allocator" "backtracking-allocator" }
+    { "frontend-nanoseconds" 8743045 }
+}
+H{
+    { "input" "integer-pressure" }
+    {
+        "procedures"
+        V{
+            H{
+                {
+                    "allocation"
+                    H{
+                        { "register-hint-hits" 16 }
+                        { "edge-entry-reloads" 0 }
+                        { "shared-spill-homes" 0 }
+                        { "evictions" 1 }
+                        { "register-transitions" 0 }
+                        { "assigned-bundles" 67 }
+                        { "splits" 25 }
+                        { "bundle-merges" 40 }
+                        { "second-chance-assignments" 0 }
+                        { "interior-gaps-skipped" 0 }
+                        { "conflict-directed-splits" 25 }
+                        {
+                            "algorithm"
+                            "ssa-bundle-backtracking"
+                        }
+                        { "fallback-count" 0 }
+                        { "second-chance-attempts" 25 }
+                        { "split-budget-exhaustions" 0 }
+                        { "loop-cluster-splits" 0 }
+                        { "minimal-splits" 0 }
+                    }
+                }
+                {
+                    "passes"
+                    {
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 172 }
+                            { "pass" "optimize-tail-calls" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 42 }
+                            { "spills" 0 }
+                            { "nanoseconds" 8282 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 172 }
+                            {
+                                "pass"
+                                "delete-useless-conditionals"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 42 }
+                            { "spills" 0 }
+                            { "nanoseconds" 1804 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 172 }
+                            { "pass" "split-branches" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 5 }
+                            { "copies" 42 }
+                            { "spills" 0 }
+                            { "nanoseconds" 3403 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 170 }
+                            { "pass" "join-blocks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 42 }
+                            { "spills" 0 }
+                            { "nanoseconds" 5986 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 88 }
+                            { "pass" "optimize-ssa" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 547965 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 90 }
+                            { "pass" "select-representations" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 174742 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 90 }
+                            { "pass" "insert-gc-checks" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 3280 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 90 }
+                            {
+                                "pass"
+                                "eliminate-write-barriers"
+                            }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 4633 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 90 }
+                            { "pass" "clear-uninitialized" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 41820 }
+                        }
+                        H{
+                            { "reloads" 0 }
+                            { "instructions" 90 }
+                            { "pass" "insert-save-contexts" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 0 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 0 }
+                            { "nanoseconds" 3198 }
+                        }
+                        H{
+                            { "reloads" 25 }
+                            { "instructions" 140 }
+                            { "pass" "allocate-registers" }
+                            { "frame-bytes" 0 }
+                            { "spill-bytes" 200 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 25 }
+                            { "nanoseconds" 17059444 }
+                        }
+                        H{
+                            { "reloads" 25 }
+                            { "instructions" 140 }
+                            { "pass" "build-stack-frame" }
+                            { "frame-bytes" 224 }
+                            { "spill-bytes" 200 }
+                            { "blocks" 3 }
+                            { "copies" 0 }
+                            { "spills" 25 }
+                            { "nanoseconds" 17712 }
+                        }
+                    }
+                }
+                { "code-bytes" 576 }
+                { "codegen-nanoseconds" 90323 }
+            }
+        }
+    }
+    { "allocator" "backtracking-allocator" }
+    { "frontend-nanoseconds" 28695818 }
+}
+PROFITABILITY-PROBE PASS

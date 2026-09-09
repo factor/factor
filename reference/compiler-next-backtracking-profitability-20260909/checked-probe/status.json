@@ -1,0 +1,49 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-backtracking-profitability",
+    "reference/compiler-next-backtracking-profitability-20260909/probe.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-backtracking-profitability",
+  "source": "eccfc0accc5c513b44701f2e59d4a9bafb7515f0",
+  "source_status": "M basis/compiler/cfg/register-allocation/backtracking/ALGORITHM.md\n M basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor\n M basis/compiler/cfg/register-allocation/backtracking/backtracking.factor\n M basis/compiler/cfg/register-allocation/ssa/phases/phases.factor",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {},
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "sha256": "7876bb33ea23908a688a2af33ebe9032621a9fe014a62eaf8076d36df6c036a9"
+  },
+  "exit_code": 0,
+  "seconds": 65.242240708,
+  "timed_out": false,
+  "foreground_refresh_failures": 2,
+  "phase_usage": [],
+  "last_process_usage": {
+    "cpu": 53.60724066666666,
+    "user": 52.55628175,
+    "system": 1.0509589166666666,
+    "instructions": 449535117675,
+    "cycles": 137486276489,
+    "rss": 356466688,
+    "background_cpu": 0.010423458333333331,
+    "disk_read_bytes": 11231232,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}
