@@ -174,6 +174,50 @@ IN: compiler.cfg.register-allocation.verifier.tests
 [ t abi-fixture check-value-flow ]
 [ bad-allocation-value? ] must-fail-with
 
+! A large callback result pointer arrives through an ABI output spill slot.
+! Ordinary Factor calls can overwrite every allocator register. The native
+! pointer's spill survives; an earlier register copy does not, even across
+! separate CFG blocks with no explicit vreg operands on the call.
+:: callback-pointer-fixture ( -- cfg snapshot )
+    init-flow-reps
+    ##callback-inputs new
+        { { 1 0 int-rep } } >>reg-outputs { } >>stack-outputs :> inputs
+    ##branch new :> branch
+    inputs branch 2array 0 insns>block :> entry
+    ##call new \ drop >>word :> call
+    call ##branch new 2array 1 insns>block t >>kill-block? :> body
+    ##add-imm new 2 >>dst 1 >>src1 16 >>src2 :> use
+    use 1array 2 insns>block :> tail
+    body 1vector entry successors<<
+    tail 1vector body successors<<
+    entry block>cfg :> graph
+    graph snapshot-value-flow :> snapshot
+    { { T{ spill-slot { n 0 } } 0 int-rep } } inputs reg-outputs<<
+    inputs 0 0 flow-reload branch 3array >vector entry instructions<<
+    use 1 >>dst 0 >>src1 drop
+    0 0 flow-reload use 2array >vector tail instructions<<
+    graph snapshot ;
+
+{ } [ callback-pointer-fixture check-value-flow ] unit-test
+
+! Removing the post-call reload leaves a legal register operand carrying a
+! stale raw pointer. This used to pass because ##call is not clobber-insn.
+[ [let
+    callback-pointer-fixture :> ( graph snapshot )
+    graph entry>> successors>> first successors>> first
+    [ rest ] change-instructions drop
+    graph snapshot check-value-flow
+] ] [ bad-allocation-value? ] must-fail-with
+
+! A post-call store cannot repair the missing reload: it also reads a
+! clobbered register and would overwrite the only valid memory copy.
+[ [let
+    callback-pointer-fixture :> ( graph snapshot )
+    graph entry>> successors>> first successors>> first
+    [ 0 0 flow-spill prefix ] change-instructions drop
+    graph snapshot check-value-flow
+] ] [ bad-allocation-value? ] must-fail-with
+
 ! A call destroys the stale register copy even though the input has been
 ! spilled correctly and the following use still has a legal register.
 [ [let

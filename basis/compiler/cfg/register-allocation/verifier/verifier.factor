@@ -257,7 +257,12 @@ ERROR: invalid-allocation-operand-constraint insn ;
         { [ insn ##spill? insn ##reload? or ] [ insn state snapshot transfer-value-flow-copy ] }
         { [ expected >boolean ] [
             insn gc-map-insn? [ insn expected state snapshot relocate-value-flow-roots ] when
-            insn clobber-insn? insn ##call-gc? or [ state value-flow-clobber ] when
+            ! Ordinary Factor calls live in kill blocks, but CFG boundaries
+            ! do not themselves invalidate physical registers. In particular,
+            ! a callback's raw result pointer must survive these calls in
+            ! memory, never in an allocator register.
+            insn clobber-insn? insn ##call-gc? or insn ##call? or
+            [ state value-flow-clobber ] when
             insn expected state forget-value-flow-temps
             insn expected state snapshot define-value-flow-outputs
         ] }
