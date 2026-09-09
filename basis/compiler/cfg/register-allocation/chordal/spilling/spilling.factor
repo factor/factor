@@ -232,8 +232,21 @@ RENAMING: spill-rename
 
 :: entry-memory-valid? ( value plan -- ? )
     value plan phi-sources>> key? [ f ] [
-        plan bb>> predecessors>> [ spill-plans get at saved-exit>> ] map
-        sift [ value swap key? ] any?
+        plan bb>> predecessors>> [ spill-plans get at saved-exit>> ] map :> saved
+        saved empty? [ f ] [
+            saved [ ] all? [
+                ! Resident values need no new store just to make a dirty hot
+                ! path agree with a saved cold/GC path. Record only homes
+                ! already valid on every predecessor; a later real eviction
+                ! or clobber will save the joined register value if needed.
+                saved [ value swap key? ] all?
+            ] [
+                ! Keep existing loop-header planning while a backedge's
+                ! exit state is unknown. Edge coupling still establishes
+                ! every memory requirement selected by that planning.
+                saved sift [ value swap key? ] any?
+            ] if
+        ] if
     ] if ;
 
 :: make-entry-versions ( plan -- )
