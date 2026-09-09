@@ -63,7 +63,14 @@ typedef int au_ivec __attribute__((vector_size(16)));
 union au_vector { au_fvec a; au_ivec b; };
 struct au_fvec_pair { au_fvec a,b; };
 struct au_ivec_pair { au_ivec a,b; };
-union au_vector_two { struct au_fvec_pair a; struct au_ivec_pair b; };
+/* GCC 15 can eliminate the va_arg copy for overlapping vector members under
+   strict aliasing. This annotation affects alias analysis, not the ABI layout. */
+#if defined(__GNUC__) && !defined(__clang__)
+#define UNION_VECTOR_ALIAS __attribute__((__may_alias__))
+#else
+#define UNION_VECTOR_ALIAS
+#endif
+union au_vector_two { struct au_fvec_pair a; struct au_ivec_pair b; } UNION_VECTOR_ALIAS;
 UNION_EXPORT UNION_NOINLINE double au_take_vector_two(union au_vector_two v,double tail) { return v.a.a[0]+v.a.a[1]+v.a.a[2]+v.a.a[3]+v.a.b[0]+v.a.b[1]+v.a.b[2]+v.a.b[3]+tail; }
 UNION_EXPORT UNION_NOINLINE union au_vector_two au_return_vector_two(void) { union au_vector_two v; v.a.a=(au_fvec){1,2,3,4}; v.a.b=(au_fvec){5,6,7,8}; return v; }
 UNION_EXPORT UNION_NOINLINE double au_call_vector_variadic(double (*cb)(int,...)) { union au_vector_two v=au_return_vector_two(); return cb(7,v,10.0); }
