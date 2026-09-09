@@ -11,7 +11,9 @@ compiler.cfg.linear-scan.resolve compiler.cfg.utilities
 compiler.cfg.instructions compiler.cfg.ssa.destruction.leaders
 compiler.cfg.linearization compiler.cfg.loop-detection
 compiler.cfg.register-allocation compiler.cfg.ssa.destruction
-compiler.cfg.register-allocation.occupancy hashtables.identity
+compiler.cfg.register-allocation.occupancy
+compiler.cfg.register-allocation.greedy.regions
+compiler.cfg.register-allocation.rematerialization compiler.cfg.registers hashtables.identity
 heaps kernel locals math math.functions math.order namespaces sequences sorting vectors ;
 IN: compiler.cfg.register-allocation.greedy
 
@@ -20,9 +22,9 @@ IN: compiler.cfg.register-allocation.greedy
 SINGLETON: greedy-allocator
 
 SYMBOLS: greedy-queue greedy-registers greedy-unions greedy-statistics
-greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs
+greedy-use-weights greedy-occupancies greedy-costs
  greedy-progress-map greedy-cascade-counter greedy-copy-hints greedy-vreg-unions
- greedy-recolor-fixed greedy-recolor-budget ;
+ greedy-recolor-fixed greedy-recolor-budget greedy-blocks ;
 
 ! Stages advance monotonically. Splits must reduce the number of uses; spill
 ! products are minimal and cannot be evicted or split indefinitely.
@@ -65,9 +67,11 @@ TUPLE: greedy-progress stage cascade hint ;
 : cached-spill-weight ( interval -- weight ) cached-priority second ;
 
 : greedy-enqueue ( interval -- )
-    f >>reg dup cached-priority
-    over interval-stage assign-stage = [ 1 ] [ 0 ] if prefix
-    greedy-queue get heap-push ;
+    dup uses>> empty? [ drop ] [
+        f >>reg dup cached-priority
+        over interval-stage assign-stage = [ 1 ] [ 0 ] if prefix
+        greedy-queue get heap-push
+    ] if ;
 
 : register-union ( interval reg -- intervals )
     [ interval-reg-class ] dip 2array greedy-unions get at ;
@@ -125,7 +129,8 @@ TUPLE: greedy-progress stage cascade hint ;
         interval cached-spill-weight victim cached-spill-weight >
         interval reg hint-score 0 >
         victim reg hint-score 0 = and
-        victim interval-stage spill-stage < and or
+        victim interval-stage spill-stage < and
+        victim minimal-interval? not and or
     ] [ f ] if ;
 
 :: evictable? ( interval conflicts -- ? )
@@ -214,58 +219,180 @@ DEFER: recolor-interval
     32 <identity-hashtable> greedy-recolor-fixed set
     64 greedy-recolor-budget set
     interval 5 recolor-interval
+    64 greedy-recolor-budget get - "recolor-search-steps" greedy-statistics get at 0 or +
+    "recolor-search-steps" greedy-statistics get set-at
     dup [ "recolor-successes" greedy-count ] when ;
-
-! Split at the widest gap between uses. This preserves a cluster of nearby
-! uses instead of immediately creating a separate reload for every use.
-:: use-gap ( interval -- position/f )
-    f :> position!
-    0 :> widest!
-    f :> previous!
-    interval uses>> [ n>> ] map [| n |
-        previous [
-            n previous - widest > [
-                n previous - widest!
-                previous 1 + position!
-            ] when
-        ] when
-        n previous!
-    ] each
-    position ;
-
-! A one-use interval may still span blocks. Isolate its mandatory register
-! use before declaring it unspillable. Edge resolution supplies its slot.
-:: single-use-split ( interval -- position/f )
-    interval first-use n>> :> n
-    interval live-interval-start n < [ n 1 - ] [
-        interval live-interval-end n 1 + > [ n 1 + ] [ f ] if
-    ] if ;
 
 ERROR: greedy-register-pressure interval ;
 
-:: region-split ( interval -- position/f )
-    greedy-region-boundaries get [| boundary |
-        boundary first :> n
-        interval first-use n>> n <
-        interval last-use n>> n > and
-    ] filter dup empty? [ drop f ] [
-        [ second ] sort-by last first
+! Local splitting grows a use cluster inside a physically free window.
+! The window includes the post-use spill position, so assigning the product
+! cannot create interference that was absent at the instruction itself.
+:: register-free-windows ( interval reg -- windows )
+    interval live-interval-start :> cursor!
+    interval live-interval-end 1 + :> end
+    V{ } clone :> windows
+    interval reg register-index entries>> [| entry |
+        entry second cursor >= entry first end <= and [
+            entry first cursor > [ cursor entry first 1 - 2array windows push ] when
+            cursor entry second 1 + max cursor!
+        ] when
+    ] each
+    cursor end <= [ cursor end 2array windows push ] when
+    windows ;
+
+:: local-split-plan ( interval -- plan/f )
+    f :> best!
+    interval allocation-order [| reg |
+        interval reg register-free-windows [| window |
+            interval uses>> [| use |
+                use n>> window first >= use n>> 1 + window second <= and
+            ] filter :> uses
+            uses empty? [ ] [
+                uses [ n>> greedy-use-weights get at 1 or ] map-sum :> benefit
+                best [ benefit best fourth > ] [ t ] if [
+                    reg uses first n>> uses last n>> benefit 4array best!
+                ] when
+            ] if
+        ] each
+    ] each best ;
+
+:: enqueue-split-product ( interval stage cascade -- )
+    interval [
+        interval stage advance-stage
+        cascade interval interval-progress cascade<<
+        interval greedy-enqueue
+    ] when ;
+
+:: apply-local-split ( interval plan -- )
+    interval greedy-costs get delete-at
+    interval interval-progress cascade>> :> cascade
+    interval :> selected!
+    plan second interval first-use n>> > [
+        selected plan second 1 - split-for-spill selected!
+        spill-stage cascade enqueue-split-product
+    ] when
+    plan third selected last-use n>> < [
+        selected plan third 1 + split-for-spill
+        spill-stage cascade enqueue-split-product selected!
+    ] when
+    selected spill-after spill-before selected!
+    selected spill-stage advance-stage
+    cascade selected interval-progress cascade<<
+    plan first selected interval-progress hint<<
+    selected plan first greedy-assign
+    "local-splits" greedy-count "splits" greedy-count ;
+
+! Global splitting evaluates each legal register on the actual live CFG.
+! Whole-block residency is a first stage; blocked blocks are refined to
+! local use products. Edge resolution places traffic at register/memory
+! transitions, retaining registers around hot cycles and transparent blocks.
+TUPLE: greedy-region-block block ranges uses frequency ;
+TUPLE: greedy-region-plan reg blocks resident cost benefit ;
+
+:: ranges-in-block ( interval bb -- ranges )
+    interval ranges>> [| range |
+        range first bb block-from max
+        range second bb block-to min 2array
+        dup first2 > over second bb block-from <= or [ drop f ] when
+    ] map sift >vector ;
+
+:: interval-region-blocks ( interval -- blocks )
+    greedy-blocks get [| bb |
+        interval bb ranges-in-block :> ranges
+        ranges empty? [ f ] [
+            interval uses>> [| use |
+                use n>> bb block-from >= use n>> bb block-to <= and
+            ] filter >vector :> uses
+            bb ranges uses 8 bb loop-nesting-at 3 min ^ greedy-region-block boa
+        ] if
+    ] map sift ;
+
+:: region-network-edges ( blocks -- edges )
+    32 <identity-hashtable> :> indices
+    blocks [| node i | i node block>> indices set-at ] each-index
+    V{ } clone :> edges
+    blocks [| node i |
+        node block>> :> bb
+        bb block-to node ranges>> ranges-cover? [
+            bb successors>> [| successor |
+                successor indices at :> j
+                j [
+                    j blocks nth :> target
+                    successor block-from target ranges>> ranges-cover? [
+                        i j node frequency>> target frequency>> min 3array edges push
+                    ] when
+                ] when
+            ] each
+        ] when
+    ] each-index edges ;
+
+:: global-split-plan ( interval -- plan/f )
+    interval interval-region-blocks :> blocks
+    f :> best!
+    ! Bound the global solver; oversized functions proceed to local splitting.
+    blocks length 1 > blocks length 128 <= and [
+        blocks region-network-edges :> edges
+        interval allocation-order [| reg |
+            blocks [| block |
+                block uses>> length block frequency>> * 2 *
+                block ranges>> interval reg register-index occupancy-conflicts empty? not
+                2array
+            ] map :> nodes
+            nodes edges solve-residency :> placement
+            placement resident>> [ ] any? placement resident>> [ not ] any? and [
+                nodes [ first ] map-sum placement cost>> - :> benefit
+                benefit 0 > best [ benefit best benefit>> > ] [ t ] if and [
+                    reg blocks placement resident>> placement cost>> benefit
+                    greedy-region-plan boa best!
+                ] when
+            ] when
+        ] each
+    ] when best ;
+
+:: region-fragment ( interval block -- fragment )
+    interval clone f >>reg
+        block ranges>> clone >>ranges block uses>> clone >>uses :> fragment
+    fragment live-interval-start interval live-interval-start = [ ] [
+        fragment f >>reload-from drop
+    ] if
+    block uses>> [ n>> interval last-use n>> = ] any? [ ] [
+        fragment f >>spill-to drop
+    ] if fragment ;
+
+:: memory-region-products ( interval block cascade -- )
+    block uses>> empty? [ ] [
+        interval block region-fragment
+            f >>reload-from f >>spill-to
+            spill-after spill-before :> product
+        product last-use n>> block block>> block-to = [
+            product f >>spill-to drop
+            product [ block block>> block-to swap fix-upper-bound ] change-ranges drop
+        ] when
+        ! Refine blocked blocks locally before spilling individual uses.
+        product local-stage cascade enqueue-split-product
+        "block-split-products" greedy-count
     ] if ;
 
-:: greedy-split ( interval -- )
-    ! split-for-spill mutates its input; child priorities must be recomputed.
+:: apply-global-split ( interval plan -- )
     interval greedy-costs get delete-at
-    interval region-split :> position!
-    position [ "region-splits" greedy-count ] [
-        interval use-gap [ interval single-use-split ] unless* position!
-    ] if
-    position [
-        interval interval-stage 1 + spill-stage min :> stage
-        interval position split-for-spill [
-            [ dup stage advance-stage greedy-enqueue ] when*
-        ] bi@
-        "splits" greedy-count
-    ] [ interval greedy-register-pressure ] if ;
+    interval interval-progress cascade>> :> cascade
+    interval vreg>> rematerialization-of [ drop ] [
+        interval vreg>> dup rep-of assign-spill-slot drop
+    ] if*
+    plan blocks>> plan resident>> [| block resident? |
+        resident? [
+            interval block region-fragment :> fragment
+            fragment local-stage advance-stage
+            cascade fragment interval-progress cascade<<
+            plan reg>> fragment interval-progress hint<<
+            fragment plan reg>> greedy-assign
+            "resident-blocks" greedy-count
+        ] [ interval block cascade memory-region-products ] if
+    ] 2each
+    plan cost>> "region-cut-cost" greedy-statistics get at 0 or +
+    "region-cut-cost" greedy-statistics get set-at
+    "region-splits" greedy-count "splits" greedy-count ;
 
 :: spill-to-minimal-ranges ( interval -- )
     interval greedy-costs get delete-at
@@ -281,6 +408,8 @@ ERROR: greedy-register-pressure interval ;
     "spill-products" greedy-count ;
 
 :: greedy-allocate-one ( interval -- )
+    interval interval-stage
+    { "stage-assign" "stage-region" "stage-local" "stage-spill" "stage-done" } nth greedy-count
     f :> cheapest!
     interval allocation-order [| reg |
         interval reg register-conflicts :> conflicts
@@ -305,7 +434,17 @@ ERROR: greedy-register-pressure interval ;
                 ] }
                 { 4 [ interval last-chance-recolor [ interval greedy-register-pressure ] unless ] }
                 { 3 [ interval last-chance-recolor [ interval spill-to-minimal-ranges ] unless ] }
-                [ drop interval greedy-split ]
+                { 1 [
+                    interval global-split-plan [ interval swap apply-global-split ] [
+                        interval local-stage advance-stage interval greedy-enqueue
+                    ] if*
+                ] }
+                { 2 [
+                    interval local-split-plan [ interval swap apply-local-split ] [
+                        interval spill-stage advance-stage interval greedy-enqueue
+                    ] if*
+                ] }
+                [ drop interval greedy-register-pressure ]
             } case
         ] if*
     ] unless ;
@@ -379,17 +518,11 @@ ERROR: greedy-register-pressure interval ;
 ! so deeply nested loops cannot swamp all other uses through huge integers.
 :: prepare-greedy-regions ( cfg -- )
     cfg needs-loops
+    cfg linearization-order [ kill-block?>> ] reject greedy-blocks set
     H{ } clone greedy-copy-hints set
     H{ } clone greedy-use-weights set
-    V{ } clone greedy-region-boundaries set
-    0 :> previous-depth!
     cfg linearization-order [| bb |
         bb loop-nesting-at 3 min :> depth
-        depth previous-depth = [ ] [
-            bb block-from depth previous-depth - abs 2array
-            greedy-region-boundaries get push
-        ] if
-        depth previous-depth!
         bb instructions>> [| insn |
             8 depth ^ insn insn#>> greedy-use-weights get set-at
             insn ##copy? [

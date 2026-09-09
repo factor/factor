@@ -6,7 +6,7 @@ compiler.cfg.linear-scan.resolve compiler.cfg.liveness
 compiler.cfg.register-allocation.verifier
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands heaps kernel locals make
+cpu.architecture cpu.x86.assembler.operands heaps kernel locals make math
 namespaces sequences sorting tools.test ;
 IN: compiler.cfg.linear-scan.assignment.tests
 

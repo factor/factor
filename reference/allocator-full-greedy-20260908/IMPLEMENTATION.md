@@ -15,17 +15,17 @@ Primary sources:
 ## Audit and completion matrix
 
 All code below is in `compiler.cfg.register-allocation.greedy`, unless noted.
-Rows marked pending are explicit implementation work remaining in this branch.
+The tests exercise state and generated machine flow as well as diagnostics.
 
 | LLVM mechanism | Factor implementation | Behavioral evidence |
 | --- | --- | --- |
 | Priority advisor / enqueue | Large intervals first, loop-weighted density, stable vreg tie-break; initial assignment tier precedes retry stages | Long sparse interval initially allocated, then displaced by dense interval |
 | RS_Assign, RS_Split, RS_Split2, RS_Spill, RS_Done | `interval-progress`, monotone `advance-stage`; initial failure defers; successive region/local/spill stages; terminal minimal products | Stage regression fixture; eviction/split fixture preserves all required uses |
-| Eviction cascade and hint-aware cost | `cascade-safe?`, `eviction-cascade`, `evictable-victim?`, lexicographic `candidate-cost`; victims inherit cascade | Equal/younger cascade rejection; hinted physical register order |
-| Last-chance recoloring | `last-chance-recolor`, recursive `recolor-interval`; depth 5, max 8 interferers, budget 64; fixed choices; full state rollback | Two-move augmenting chain; impossible coloring restores union order, occupancy serials and register fields |
-| Interference-directed local splitting | Pending replacement of widest-gap heuristic | Pending |
-| Global region splitting / SpillPlacement | Pending replacement of linear loop-boundary heuristic with CFG residency network and edge lowering | Pending |
-| Spill products / rematerialization | `spill-to-minimal-ranges` and shared spill, rematerialization, assignment and edge resolution | Native 32-float pressure; libc ABI; loops and allocation/GC tests |
+| Eviction cascade and hint-aware cost | `cascade-safe?`, `eviction-cascade`, `evictable-victim?`, lexicographic `candidate-cost`; victims inherit cascade | Equal/younger cascade rejection; actual eviction transfers cascade and queues victim; hinted physical register order; hint-only eviction cannot displace an infinite-weight mandatory interval |
+| Last-chance recoloring | `last-chance-recolor`, recursive `recolor-interval`; depth 5, max 8 interferers, budget 64; fixed choices; full state rollback | Two-move augmenting chain; impossible coloring restores union order, occupancy serials and register fields; insufficient depth fails and rolls back before a deeper search succeeds |
+| Interference-directed local splitting | `register-free-windows`, `local-split-plan`, `apply-local-split` select weighted use clusters inside actual physical interference windows, including the post-use spill position | A long interference forces selection of the final four uses, independently of the largest use gap |
+| Global region splitting / SpillPlacement | `global-split-plan` constructs a per-register CFG residency network; `greedy.regions:solve-residency` computes a minimum cut; `apply-global-split` assigns resident blocks and sends blocked blocks to local refinement | Hard-interference, transparent-loop, cold-use and exhaustive 32-network minimum-energy tests; `region-lowering-fixture` selects the actual physically free loop, lowers transfers on edges, and passes the original-SSA/final-machine verifier including a zero-iteration bypass |
+| Spill products / rematerialization | `memory-region-products` refines blocked blocks; `spill-to-minimal-ranges` is the final stage, using shared spill/rematerialization/edge lowering | Native 32-float pressure also checked against original SSA; libc ABI; loops and allocation/GC tests |
 | No alternate allocator escape | Complete `greedy-allocation-with-registers ( cfg registers -- )`; zero fallback count | Full method uses greedy work queue and raises impossible pressure instead of invoking another allocator |
 
 The previous implementation already had an indexed physical-register occupancy
@@ -48,3 +48,38 @@ ML eviction advisors and target-specific split hooks are not represented by this
 Factor IR interface. Static loop depth supplies bounded frequency estimates.
 The default allocator remains linear scan; this work changes only explicit
 greedy selection.
+
+## Algorithm choices and termination
+
+The Factor region objective is weighted memory-use traffic plus disagreement
+costs on actual CFG edges, with hard per-register interference constraints.
+LLVM SpillPlacement uses an iterative weighted residency network; Factor solves
+its binary, whole-register version by an exact deterministic minimum cut.
+This handles transparent blocks and cycles without relying on layout adjacency.
+The global solver is limited to 128 live blocks. Larger regions advance to the
+same allocator's interference-directed local stage. Recoloring is limited to
+depth 5, 8 interferers per candidate, and 64 searched intervals per attempt.
+These are search limits, not a fallback to a different allocator.
+
+Region products advance to local refinement, local products advance to spill,
+and minimal spill products are terminal. Eviction cascades prevent two peers
+from repeatedly displacing each other; split stages never regress. A genuinely
+impossible mandatory use reports `greedy-register-pressure` after recoloring.
+
+Per-block resident products retain register locations at entry and exit.
+The shared edge resolver emits stores/reloads/copies only where locations change.
+The accompanying shared assignment fix expires old products before block-entry
+activation. It leaves boundary stores to that resolver, since an overflowing
+arithmetic terminator can define the value being spilled. The explicit
+`defining-terminator-fixture` checks both outgoing edge stores and original-SSA
+value flow. Ordinary within-block spills retain the established insertion path.
+
+Diagnostics include `algorithm="llvm-style-greedy"`, `fallback-count=0`, each
+processed stage, assignments/evictions, hint assignments/breaks, global/local
+splits, block products, resident blocks, cut cost, and recoloring attempts,
+successes, search steps and rollback counts. Tests can inspect plans and full
+occupancy state directly; no trace collection is enabled in the allocation loop.
+
+Validation so far is correctness validation on native ARM64 using the matching
+integration VM and image with explicit source reloads. No speed claim or ranking
+is made for this algorithm before the independent frozen-candidate benchmarks.
