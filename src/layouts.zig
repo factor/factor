@@ -333,7 +333,7 @@ pub const Alien = extern struct {
         if (self.base == false_object) {
             self.address = self.displacement;
         } else {
-            self.address = UNTAG(self.base) + @sizeOf(ByteArray) + self.displacement;
+            self.address = UNTAG(self.base) +% @sizeOf(ByteArray) +% self.displacement;
         }
     }
 };
