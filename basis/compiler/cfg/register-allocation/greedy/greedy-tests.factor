@@ -3,6 +3,7 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.checker compiler.cfg.linear-scan.live-intervals
 compiler.cfg.register-allocation compiler.cfg.register-allocation.greedy
 compiler.cfg.register-allocation.occupancy
+compiler.cfg.register-allocation.rematerialization
 compiler.cfg.register-allocation.verifier compiler.cfg.instructions compiler.cfg.comparisons
 compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.resolve compiler.cfg.ssa.destruction
@@ -320,8 +321,11 @@ IN: compiler.cfg.register-allocation.greedy.tests
     graph snapshot hot latch ;
 
 { t t } [
-    region-lowering-fixture [ check-value-flow ] 2dip
-    [ instructions>> [ dup ##spill? swap ##reload? or ] any? not ] bi@
+    ! Exercise spill-slot placement independently of constant recipes.
+    f rematerialize-constants? [
+        region-lowering-fixture [ check-value-flow ] 2dip
+        [ instructions>> [ dup ##spill? swap ##reload? or ] any? not ] bi@
+    ] with-variable
 ] unit-test
 
 ! Run real pressure through the original-SSA/final-machine verifier too.
