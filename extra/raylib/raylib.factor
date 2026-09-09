@@ -879,7 +879,7 @@ FUNCTION-ALIAS: take-screenshot void TakeScreenshot ( c-string fileName )       
 FUNCTION-ALIAS: set-config-flags void SetConfigFlags ( uint flags )                      ! Setup init configuration flags (view FLAGS)
 FUNCTION-ALIAS: open-url void OpenURL ( c-string url )                                   ! Open URL with default system browser (if available)
 
-FUNCTION-ALIAS: trace-log void TraceLog ( TraceLogLevel logLevel, c-string text )                  ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
+FUNCTION-ALIAS: trace-log void TraceLog ( TraceLogLevel logLevel, c-string text, ... )                  ! Show trace log messages (LOG_DEBUG, LOG_INFO, LOG_WARNING, LOG_ERROR...)
 FUNCTION-ALIAS: set-trace-log-level void SetTraceLogLevel ( TraceLogLevel logLevel )               ! Set the current threshold (minimum) log level
 FUNCTION-ALIAS: mem-alloc void* MemAlloc ( uint size )                                    ! Internal memory allocator
 FUNCTION-ALIAS: mem-realloc void* MemRealloc ( void* ptr, uint size )                     ! Internal memory reallocator
@@ -1302,7 +1302,7 @@ FUNCTION-ALIAS: unload-text-lines void UnloadTextLines ( c-string* text, int lin
 FUNCTION-ALIAS: text-copy int TextCopy ( c-string  dst, c-string src )                                ! Copy one string to another, returns bytes copied
 FUNCTION-ALIAS: text-is-equal bool TextIsEqual ( c-string text1, c-string text2 )                     ! Check if two text string are equal
 FUNCTION-ALIAS: text-length uint TextLength ( c-string text )                                         ! Get text length, checks for '\0' ending
-FUNCTION-ALIAS: text-format c-string TextFormat ( c-string text )                                                  ! Text formatting with variables (sprintf() style)
+FUNCTION-ALIAS: text-format c-string TextFormat ( c-string text, ... )                                                  ! Text formatting with variables (sprintf() style)
 FUNCTION-ALIAS: text-subtext c-string TextSubtext ( c-string text, int position, int length )         ! Get a piece of a text string
 FUNCTION-ALIAS: text-remove-spaces c-string TextRemoveSpaces ( c-string text )                        ! Remove text spaces, concat words
 FUNCTION-ALIAS: get-text-between c-string GetTextBetween ( c-string text, c-string begin, c-string end ) ! Get text between two strings
