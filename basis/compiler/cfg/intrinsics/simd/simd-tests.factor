@@ -394,7 +394,7 @@ unit-test
 unit-test
 
 ! vshuffle-bytes
-{ { ##shuffle-vector } }
+{ { ##load-reference ##and-vector ##shuffle-vector } }
 [ shuffle-cpu int-4-rep [ emit-simd-vshuffle-bytes ] test-emit ]
 unit-test
 
