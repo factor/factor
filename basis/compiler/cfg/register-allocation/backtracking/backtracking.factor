@@ -14,7 +14,7 @@ compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.chordal.ba
 compiler.cfg.register-allocation.ssa.phases compiler.cfg.rpo
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.register-allocation.rematerialization
-cpu.architecture heaps kernel locals make math
+continuations cpu.architecture heaps kernel locals make math
 math.order namespaces sequences sorting vectors ;
 FROM: sets => members ;
 FROM: compiler.cfg.linear-scan.live-intervals => intervals-intersect? ;
@@ -612,6 +612,19 @@ M: backtracking-register-home emit-restore
         1 + t swap cold-definition-sites get set-at
     ] each ;
 
+ERROR: unconsumed-backtracking-moves mappings ;
+
+:: assign-backtracking-registers ( cfg intervals -- )
+    ! Assignment publishes phi/edge locations in this namespace. A dynamic
+    ! with-variable scope here would discard those results before resolution.
+    phase-insn-prefixes get :> previous
+    backtracking-local-moves get clone phase-insn-prefixes set
+    [
+        cfg intervals assign-phase-ssa-registers
+        phase-insn-prefixes get dup assoc-empty?
+        [ drop ] [ unconsumed-backtracking-moves ] if
+    ] [ previous phase-insn-prefixes set ] finally ;
+
 :: backtracking-allocation-with-registers ( cfg machine-regs -- )
     t backtracking-phase-mode? set
     f leader-map set
@@ -635,9 +648,9 @@ M: backtracking-register-home emit-restore
         intervals machine-regs check-allocated-intervals
         intervals uses check-register-uses
     ] when
+    cfg intervals check-phase-ssa-transports
     intervals prepare-backtracking-moves
-    cfg intervals assign-phase-ssa-registers
-    cfg insert-backtracking-moves
+    cfg intervals assign-backtracking-registers
     cfg resolve-ssa-data-flow
     cfg check-numbering ;
 

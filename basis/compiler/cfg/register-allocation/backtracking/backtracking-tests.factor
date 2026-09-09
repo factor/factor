@@ -2,13 +2,14 @@ USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.c
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
 compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
-compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
-compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.occupancy
+compiler.cfg.checker compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
+compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.phases
+compiler.cfg.linear-scan.assignment compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture layouts generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
-vectors memory ;
+vectors memory hashtables io.sockets io.sockets.private words ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
 :: test-interval ( vreg positions -- interval )
@@ -381,3 +382,58 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     0 spill-site-weights get at 1 spill-site-weights get at
     1 cold-definition-sites get key?
 ] with-scope ] unit-test
+
+
+! A parallel transition at a phi's original position must execute even
+! though assignment emits no machine instruction for the phi itself.
+{ t t } [ [ [let
+    init-test-allocation drop
+    1 { 0 } test-interval 1 >>reg int-rep >>reload-rep
+        0 backtracking-register-home boa >>reload-from
+    2 { 0 } test-interval 0 >>reg int-rep >>reload-rep
+        1 backtracking-register-home boa >>reload-from
+    2array prepare-backtracking-moves
+    0 backtracking-local-moves get at :> prefix
+    { } init-assignment
+    backtracking-local-moves get clone phase-insn-prefixes set
+    [ T{ ##phi { insn# 0 } } assign-phase-insn ] V{ } make
+    prefix sequence=
+    phase-insn-prefixes get assoc-empty?
+] ] with-scope ] unit-test
+
+! GC saves must observe the transitioned register, so the transport precedes
+! the save/GC/restore sequence generated for the same original instruction.
+{ t t t t t } [ [ [let
+    init-test-allocation drop
+    tagged-rep 1 set-rep-of
+    H{ { 1 1 } } clone leader-map set
+    1 { 0 2 } test-interval
+        1 >>reg tagged-rep >>spill-rep
+        dup uses>> [ tagged-rep >>use-rep drop ] each
+    1array init-assignment
+    [ 1 0 tagged-rep ##copy, ] V{ } make :> prefix
+    prefix 0 associate phase-insn-prefixes set
+    [ T{ ##call-gc { insn# 0 }
+        { gc-map T{ gc-map { gc-roots { 1 } } { derived-roots H{ } } } } } clone
+      assign-phase-insn ] V{ } make :> emitted
+    emitted first ##copy?
+    emitted second ##spill?
+    emitted third ##call-gc?
+    emitted fourth ##reload?
+    phase-insn-prefixes get assoc-empty?
+] ] with-scope ] unit-test
+
+! Real IPv6 lowering has three phis followed by an FFI clobber. Second
+! chance allocation moves two phi results at another phi's removed point;
+! losing those copies left htons' root slots holding stale registers.
+{ t } [
+    backtracking-allocator register-allocator [
+        t check-allocation? set t check-ssa? set
+        M\ ipv6 make-sockaddr measure-compilation drop
+        { 0 80 } [| port |
+            "0:0:0:0:0:0:0:1" port <inet6> :> address
+            address M\ ipv6 make-sockaddr def>> compile-call
+            address parse-sockaddr address =
+        ] all?
+    ] with-variable
+] unit-test
