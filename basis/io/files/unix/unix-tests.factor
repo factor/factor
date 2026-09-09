@@ -1,6 +1,6 @@
 USING: accessors arrays calendar grouping io.files.info
-io.files.info.unix io.files.unix io.pathnames kernel literals
-locals math math.bitwise math.functions sequences strings system
+io.files.info.unix io.files.unix io.launcher io.pathnames kernel literals
+locals math math.bitwise math.functions sequences sequences.generalizations strings system
 tools.test unix unix.groups unix.users ;
 
 { "/usr/libexec/" } [ "/usr/libexec/awk/" parent-directory ] unit-test
@@ -199,3 +199,9 @@ os linux? [
 ] when
 
 "resource:basis/io/files/unix/fixtures/append.factor" run-test-file
+
+[
+    vm-path "-i=" image-path append "-no-user-init" "-no-monitors"
+    "resource:basis/io/files/unix/fixtures/fifo-run.factor" absolute-path
+    5 narray <process> swap >>command 20 seconds >>timeout try-process
+] must-not-fail
