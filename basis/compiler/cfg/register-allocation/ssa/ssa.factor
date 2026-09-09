@@ -96,6 +96,10 @@ ERROR: invalid-ssa-fixed-location vreg location ;
         fixed-locations [| vreg location |
             location spill-slot? location constant-recipe? or [
                 location vreg leader pending-interval-assoc get set-at
+                location spill-slot? [
+                    location vreg leader vreg rep-of rep-size 2array
+                    spill-slots get set-at
+                ] when
             ] [ vreg location invalid-ssa-fixed-location ] if
         ] assoc-each
     ] when ;
