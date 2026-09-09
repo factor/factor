@@ -1,0 +1,17 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: compiler.cfg.register-allocation.spill-sites.fixtures io
+kernel locals math prettyprint sequences tools.time ;
+IN: compiler.cfg.register-allocation.spill-sites.runtime
+
+READY
+READY
+READY
+READY
+READY
+READY
+READY
+READY
