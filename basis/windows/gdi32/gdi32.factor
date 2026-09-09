@@ -1662,9 +1662,9 @@ FUNCTION: int GetDeviceCaps ( HDC hdc, int index )
 ! FUNCTION: GetFontUnicodeRanges
 ! FUNCTION: GetGlyphIndicesA
 ! FUNCTION: GetGlyphIndicesW
-! FUNCTION: GetGlyphOutline
 ! FUNCTION: GetGlyphOutlineA
-! FUNCTION: GetGlyphOutlineW
+FUNCTION: DWORD GetGlyphOutlineW ( HDC hdc, UINT uChar, UINT fuFormat, GLYPHMETRICS* lpgm, DWORD cjBuffer, void* pvBuffer, MAT2* lpmat2 )
+ALIAS: GetGlyphOutline GetGlyphOutlineW
 ! FUNCTION: GetGlyphOutlineWow
 ! FUNCTION: GetGraphicsMode
 ! FUNCTION: GetHFONT

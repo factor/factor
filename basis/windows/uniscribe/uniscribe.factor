@@ -19,7 +19,13 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
 :: >codepoint-index ( str utf16-index -- codepoint-index )
-    0 utf16-index 2 * str utf16n encode subseq utf16n decode length ;
+    ! A hit may lie inside a surrogate pair; do not decode a split prefix.
+    ! A native index can split a surrogate pair; keep it at the leading edge.
+    0 :> units!
+    str [
+        0xffff > [ 2 ] [ 1 ] if units + units!
+        units utf16-index <=
+    ] count ;
 
 :: >utf16-index ( str codepoint-index -- utf16-index )
     0 codepoint-index str subseq utf16n encode length 2 /i ;
@@ -42,8 +48,15 @@ PRIVATE>
     script-string ssa>> ! ssa
     x ! iX
     { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
-    swap dup 0 < [ script-string string>> swap >codepoint-index ] unless
-    swap ;
+    :> trailing :> n
+    ! Both outputs use Factor codepoints. Native trailing is a cluster
+    ! length in UTF-16 units, not a boolean and not necessarily one.
+    n 0 < [ n trailing ] [
+        ! Trailing is a UTF-16 cluster length, not a boolean.
+        script-string string>> :> str
+        str n >codepoint-index :> start
+        start str n trailing + >codepoint-index start -
+    ] if ;
 
 <PRIVATE
 
@@ -64,11 +77,18 @@ PRIVATE>
     [ ScriptStringAnalyse ] keep
     [ check-ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
 
+:: opaque-text-color ( font -- color )
+    font foreground>> >rgba-components :> alpha 3array
+    font background>> >rgba-components drop 3array
+    [ [ alpha * ] [ 1 alpha - * ] bi* + ] 2map
+    first3 1 <rgba> ;
+
 : set-dc-colors ( dc font -- )
     dup background>> >rgba alpha>> 1 number= [
-        ! No transparency needed, set colors from the font.
+        ! Composite translucent text against the opaque background before
+        ! GDI applies glyph coverage, retaining its native antialiasing.
         [ background>> color>RGB SetBkColor drop ]
-        [ foreground>> color>RGB SetTextColor drop ] 2bi
+        [ opaque-text-color color>RGB SetTextColor drop ] 2bi
     ] [
         ! Draw white text on black background. The resulting grayscale
         ! image will be used as transparency mask for the actual color.
@@ -107,7 +127,8 @@ PRIVATE>
 ! transparency.
 :: color-to-alpha ( image color -- image' )
     color >rgba-components :> alpha
-    [ 255 * round >integer ] tri@ 3byte-array uint32_t deref 24 bits :> rgb
+    [ 255 * round >integer ] tri@
+    16 shift swap 8 shift bitor bitor :> rgb
     image bitmap>> uint32_t cast-array
         alpha 1 <
         [ [ 0xff bitand alpha * >integer 24 shift rgb bitor ] map! ]
@@ -129,10 +150,12 @@ PRIVATE>
     dup win32-error=0/f
     [ cx>> ] [ cy>> ] bi 2array ;
 
-: dc-metrics ( dc -- metrics )
-    TEXTMETRICW new
-    [ GetTextMetrics drop ] keep
-    TEXTMETRIC>metrics ;
+:: dc-metrics ( dc -- metrics )
+    dc TEXTMETRICW new
+    [ GetTextMetrics win32-error=0/f ] keep
+    TEXTMETRIC>metrics
+    dc CHAR: H dc-glyph-height >>cap-height
+    dc CHAR: x dc-glyph-height >>x-height ;
 
 ! DC limit is default soft-limited to 10,000 per process.
 : <script-string> ( font string -- script-string )
@@ -144,7 +167,8 @@ PRIVATE>
             [ dc-metrics >>metrics ]
             [ over string>> make-ssa [ >>ssa ] [ ssa-size >>size ] bi ]
         } cleave
-    ] with-memory-dc ;
+    ] with-memory-dc
+    dup [ size>> first ] [ metrics>> ] bi swap >>width drop ;
 
 PRIVATE>
 
