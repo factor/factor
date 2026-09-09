@@ -158,7 +158,7 @@ struct factor_vm {
 
   // contexts
   context* new_context();
-  void init_context(context* ctx);
+  void init_context(context* new_ctx);
   void delete_context();
   cell begin_callback(cell quot);
   void end_callback();
@@ -167,9 +167,9 @@ struct factor_vm {
   void primitive_context_object_for();
   void primitive_set_context_object();
   cell stack_to_array(cell bottom, cell top, vm_error_type error);
-  cell datastack_to_array(context* ctx);
+  cell datastack_to_array(context* stack_ctx);
   void primitive_datastack_for();
-  cell retainstack_to_array(context* ctx);
+  cell retainstack_to_array(context* stack_ctx);
   void primitive_retainstack_for();
   void primitive_set_datastack();
   void primitive_set_retainstack();
@@ -616,8 +616,8 @@ struct factor_vm {
   void iterate_callstack_object(callstack* stack_, Iterator& iterator);
 
   callstack* allot_callstack(cell size);
-  cell second_from_top_stack_frame(context* ctx);
-  cell capture_callstack(context* ctx);
+  cell second_from_top_stack_frame(context* stack_ctx);
+  cell capture_callstack(context* stack_ctx);
   void primitive_callstack_for();
   void primitive_callstack_to_array();
   void primitive_innermost_stack_frame_executing();
@@ -689,7 +689,7 @@ struct factor_vm {
 
   // safepoints
   void handle_safepoint(cell pc);
-  void enqueue_samples(cell samples, cell pc, bool foreign_thread_p);
+  void enqueue_samples(cell sample_count, cell pc, bool foreign_thread_p);
   void enqueue_fep();
 
   // factor

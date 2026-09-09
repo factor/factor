@@ -59,9 +59,9 @@ cell factor_vm::std_vector_to_array(std::vector<cell>& elements) {
 }
 
 // Allocates memory
-void growable_array::reallot_array(cell count) {
+void growable_array::reallot_array(cell capacity) {
   array *a_old = elements.untagged();
-  array *a_new = elements.parent->reallot_array(a_old, count);
+  array *a_new = elements.parent->reallot_array(a_old, capacity);
   elements.set_untagged(a_new);
 }
 

@@ -259,7 +259,7 @@ cell factor_vm::lookup_external_address(relocation_type rel_type,
       return (cell)&factor::trampoline2;
 #endif
     default:
-      return -1;
+      return static_cast<cell>(-1);
   }
 }
 
@@ -370,14 +370,14 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
                                       cell relocation_, cell parameters_,
                                       cell literals_,
                                       cell frame_size_untagged) {
-  data_root<byte_array> code(code_, this);
+  data_root<byte_array> instructions(code_, this);
   data_root<object> labels(labels_, this);
   data_root<object> owner(owner_, this);
   data_root<byte_array> relocation(relocation_, this);
   data_root<array> parameters(parameters_, this);
   data_root<array> literals(literals_, this);
 
-  cell code_length = array_capacity(code.untagged());
+  cell code_length = array_capacity(instructions.untagged());
 
   // Everything below writes into the MAP_JIT code heap: allot_code_block writes
   // the block header (and may run a compacting GC, which flips for itself and
@@ -402,7 +402,7 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
     compiled->parameters = parameters.value();
 
   // code
-  memcpy(compiled + 1, code.untagged() + 1, code_length);
+  memcpy(compiled + 1, instructions.untagged() + 1, code_length);
 
   // fixup labels
   if (to_boolean(labels.value()))

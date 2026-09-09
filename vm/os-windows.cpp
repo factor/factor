@@ -6,8 +6,8 @@ HMODULE hFactorDll;
 
 bool set_memory_locked(cell base, cell size, bool locked) {
   int prot = locked ? PAGE_NOACCESS : PAGE_READWRITE;
-  DWORD ignore;
-  int status = VirtualProtect((char*)base, size, prot, &ignore);
+  DWORD old_protection;
+  int status = VirtualProtect((char*)base, size, prot, &old_protection);
   return status != 0;
 }
 
@@ -71,7 +71,8 @@ const vm_char* factor_vm::default_image_path() {
   if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
     fatal_error("GetModuleFileName() failed", 0);
 
-  if ((ptr = wcsrchr(full_path, '.')))
+  ptr = wcsrchr(full_path, '.');
+  if (ptr)
     *ptr = 0;
 
   wcsncpy(temp_path, full_path, MAX_UNICODE_PATH - 1);
@@ -169,8 +170,8 @@ uint64_t nano_count() {
 
   if (scale_factor == 0.0) {
     LARGE_INTEGER frequency;
-    BOOL ret = QueryPerformanceFrequency(&frequency);
-    if (ret == 0)
+    BOOL frequency_status = QueryPerformanceFrequency(&frequency);
+    if (frequency_status == 0)
       fatal_error("QueryPerformanceFrequency", 0);
     scale_factor = (1000000000.0 / frequency.QuadPart);
   }
@@ -395,17 +396,17 @@ void factor_vm::sampler_thread_loop() {
     ok = QueryPerformanceCounter(&new_counter);
     FACTOR_ASSERT(ok);
     new_counter.QuadPart *= samples_per_second;
-    cell samples = 0;
+    cell sample_count = 0;
     while (new_counter.QuadPart - counter.QuadPart >
            units_per_second.QuadPart) {
-      ++samples;
+      ++sample_count;
       counter.QuadPart += units_per_second.QuadPart;
     }
-    if (samples == 0)
+    if (sample_count == 0)
       continue;
 
     cell pc = get_thread_pc(thread);
-    enqueue_samples(samples, pc, false);
+    enqueue_samples(sample_count, pc, false);
   }
 
   (void)ok; // use all variables
