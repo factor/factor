@@ -71,3 +71,16 @@ spill/reload obligations. Entry, exit, and multiblock ranges remain eligible,
 including fast-path carriers around out-of-line GC blocks. This is a local
 transport-cost bound, not a claim of globally optimal CFG placement.
 `interior-gaps-skipped` reports this decision separately from assignments.
+
+Ordinary block-entry reloads can use the shared SSA edge resolver directly.
+For an original live-in register fragment beginning exactly at phase entry,
+with a stack-slot reload and only non-kill predecessors, the allocator may
+publish its assigned register as the incoming location. Each predecessor then
+supplies its actual register or memory value through the existing parallel
+mapping. This avoids an edge store followed by a successor reload; it neither
+assumes the spill home is initialized nor equates spillset members. The
+fragment's outgoing store remains intact. Phi, GC, and ABI entry instructions,
+blocks with kill predecessors, and values absent from the original live-in set
+retain their explicit reload. `edge-entry-reloads` counts the delegated
+transports. Tests exercise a simultaneous register swap and a mixed register /
+memory incoming edge, and reject deleting their required edge copies.

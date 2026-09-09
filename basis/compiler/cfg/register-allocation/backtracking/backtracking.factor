@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.linearization
-compiler.cfg.def-use
+compiler.cfg.def-use compiler.cfg.liveness
 compiler.cfg.linear-scan compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.splitting
@@ -35,7 +35,8 @@ SYMBOLS: bundle-spillsets spill-home-pool backtracking-affinities
     backtracking-second-chance-attempts backtracking-second-chance-assignments
     backtracking-register-transitions backtracking-interior-gaps-skipped backtracking-original-intervals
     backtracking-local-moves backtracking-phase-mode? backtracking-late-points
-    backtracking-cluster-splits backtracking-split-budget-exhaustions ;
+    backtracking-cluster-splits backtracking-split-budget-exhaustions
+    backtracking-edge-entry-reloads ;
 SYMBOL: bundle-occupancy
 SYMBOL: bundle-queue
 SYMBOL: assigned-bundles
@@ -640,6 +641,7 @@ M: backtracking-register-home emit-restore
     0 backtracking-second-chance-attempts set
     0 backtracking-second-chance-assignments set
     0 backtracking-register-transitions set
+    0 backtracking-edge-entry-reloads set
     0 backtracking-interior-gaps-skipped set
     intervals/syncs [ live-interval-state? ] filter coalesce-bundle-groups :> groups
     groups initialize-spillsets
@@ -678,6 +680,34 @@ M: backtracking-register-home emit-restore
 
 ERROR: unconsumed-backtracking-moves mappings ;
 
+:: edge-entry-reload? ( interval -- ? )
+    interval live-interval-start :> start
+    interval reload-from>> spill-slot?
+    start backtracking-block-starts get key? and [
+        start backtracking-point-blocks get at :> bb
+        bb predecessors>> :> predecessors
+        bb kill-block?>> not predecessors empty? not and
+        predecessors [ kill-block?>> ] any? not and
+        bb instructions>> first :> first-insn
+        first-insn clobber-insn? first-insn gc-map-insn? or
+        first-insn ##phi? or not and
+        interval vreg>> bb live-in key? and
+    ] [ f ] if ;
+
+:: reify-entry-transports ( intervals -- )
+    ! Publish the assigned register as the incoming destination and let SSA
+    ! edge resolution supply each predecessor's actual original value. This
+    ! avoids register -> slot -> register round trips at ordinary entries.
+    ! Kill predecessors require the explicit successor reload (no edge map),
+    ! and ABI/GC/phi entries remain on their existing transport path.
+    0 backtracking-edge-entry-reloads set
+    intervals [| interval |
+        interval edge-entry-reload? [
+            interval f >>reload-from drop
+            backtracking-edge-entry-reloads inc
+        ] when
+    ] each ;
+
 :: assign-backtracking-registers ( cfg intervals -- )
     ! Assignment publishes phi/edge locations in this namespace. A dynamic
     ! with-variable scope here would discard those results before resolution.
@@ -713,6 +743,7 @@ ERROR: unconsumed-backtracking-moves mappings ;
         intervals uses check-register-uses
     ] when
     cfg intervals check-phase-ssa-transports
+    intervals reify-entry-transports
     intervals prepare-backtracking-moves
     cfg intervals assign-backtracking-registers
     cfg resolve-ssa-data-flow
@@ -740,6 +771,7 @@ M: backtracking-allocator allocator-statistics
     backtracking-second-chance-attempts get "second-chance-attempts" pick set-at
     backtracking-second-chance-assignments get "second-chance-assignments" pick set-at
     backtracking-register-transitions get "register-transitions" pick set-at
+    backtracking-edge-entry-reloads get "edge-entry-reloads" pick set-at
     backtracking-interior-gaps-skipped get "interior-gaps-skipped" pick set-at
     backtracking-evictions get "evictions" pick set-at
     backtracking-splits get "splits" pick set-at
