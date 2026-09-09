@@ -1,11 +1,13 @@
 USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.cfg.metrics
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
-compiler.cfg.register-allocation.verifier compiler.cfg.instructions
+compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
+compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
 compiler.cfg.linear-scan.numbering compiler.cfg.utilities
 compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.occupancy
+compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
+cpu.architecture layouts generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
 vectors memory ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
@@ -15,6 +17,7 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     positions [ <vreg-use> int-rep >>use-rep ] map >vector >>uses ;
 
 : init-test-allocation ( -- registers )
+    f backtracking-phase-mode? set
     f backtracking-point-blocks set
     f f <basic-block> <cfg> cfg set
     H{ { 1 int-rep } { 2 int-rep } } representations set
@@ -301,4 +304,70 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     backtracking-second-chance-assignments get
     assigned [ uses>> empty? ] any?
     before spill-to>> not after reload-from>> backtracking-register-home? and
+] ] with-scope ] unit-test
+
+
+! Productive cross-vreg copy merging needs distinct early-use/late-def
+! phases. Preserve each original SSA identity while eliminating the moves.
+{ 11 t t } [ [ [let
+    init-validation-representations
+    [
+        ##prologue,
+        1 D: 0 ##peek,
+        2 1 int-rep ##copy,
+        3 2 int-rep ##copy,
+        4 3 1 tag-fixnum ##add-imm,
+        4 D: 0 ##replace,
+        ##epilogue, ##return,
+    ] V{ } make insns>cfg backtracking-allocator compile-validation-cfg :> word
+    10 word execute( x -- result )
+    backtracking-merges get 2 >=
+    { 1 2 3 } [ dup leader = ] all?
+] ] with-scope ] unit-test
+
+! A split between consecutive late/early uses retains both mandatory uses.
+! The legacy synchronization splitter intentionally removes its cut point;
+! applying that convention here would silently drop the use at point 3.
+{ { 3 } { 4 } } [ [ [let
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    H{ { 3 t } } backtracking-late-points set
+    H{ } clone spill-slots set
+    1 { 3 4 } test-interval 3 split-for-bundle
+    [ uses>> [ n>> ] map >array ] bi@
+] ] with-scope ] unit-test
+
+
+! Keep the hot cluster together when a preceding loop-depth transition has
+! a cheaper store/reload boundary inside the same obstruction-free prefix.
+{ 19 1 } [ [ [let
+    init-test-allocation drop
+    H{ { 0 1 } { 10 1 } { 20 8 } { 30 8 } { 40 8 } } spill-site-weights set
+    0 backtracking-cluster-splits set
+    1 { 0 10 20 30 40 } test-interval 1array <allocation-bundle>
+    41 conflict-split-site
+    backtracking-cluster-splits get
+] ] with-scope ] unit-test
+
+! When the first use is already obstructed, peel that mandatory use. The
+! next queue iterations reach a minimal fragment; no empty-prefix promise.
+{ 9 } [ [
+    init-test-allocation drop
+    1 { 0 10 20 30 } test-interval 1array <allocation-bundle>
+    0 conflict-split-site
+] with-scope ] unit-test
+
+! Alternating mandatory uses repeatedly obstruct each other's first free
+! prefix. The per-spillset budget must switch to a direct minimal partition,
+! while preserving every use exactly and assigning the single register.
+{ t t } [ [ [let
+    init-test-allocation :> bank
+    1 200 <iota> [ 4 * ] map test-interval
+    2 200 <iota> [ 4 * 2 + ] map test-interval 2array :> input
+    input required-register-uses :> expected
+    input bank backtracking-allocation :> assigned
+    assigned bank check-allocated-intervals
+    assigned expected check-register-uses
+    backtracking-split-budget-exhaustions get 0 >
+    backtracking-minimal-splits get 100 >
 ] ] with-scope ] unit-test
