@@ -1,0 +1,143 @@
+Unit Test: { { t } [ "lua_pushfstring" "lua" lookup-word >boolean ] }
+Unit Test: { { t } [ "lua_pushvfstring" "lua" lookup-word >boolean ] }
+Unit Test: { { t } [ "luaL_error" "lua" lookup-word >boolean ] }
+Unit Test: {
+    { 2 2 2 2 }
+    [
+        \ lua_pushfstring def>> 4 swap nth
+        \ luaL_error def>> 4 swap nth
+        \ lua-push-mixed def>> 4 swap nth
+        \ lua-error-mixed def>> 4 swap nth
+    ]
+}
+Unit Test: { { t } [ \ lua_pushvfstring def>> 3 swap nth last va_list = ] }
+Unit Test: {
+    { "literal %" 1 "literal %" }
+    [
+        [
+            [
+                load-local
+                0 get-local "literal %%" lua_pushfstring
+                0 get-local lua_gettop 0 get-local -1 f
+                lua_tolstring 1 drop-locals
+            ] with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { "lua/-37/2.5/Z/%" 1 "lua/-37/2.5/Z/%" }
+    [
+        [
+            [
+                load-local
+                0 get-local "%s/%d/%f/%c/%%" "lua" -37 2.5 90
+                lua-push-mixed
+                0 get-local lua_gettop 0 get-local -1 f
+                lua_tolstring 1 drop-locals
+            ] with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { "-1/2.5" }
+    [
+        [
+            [ "%d/%f" 255 2.5 lua-push-promoted ]
+            with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { }
+    [
+        [ [ lua-error-mixed ] dup infer define-temp drop ]
+        with-compilation-unit
+    ]
+}
+Unit Test: {
+    { "lua/-37/2.5/Z/%" }
+    [
+        [ [ factor_lua_format_control ] with-lua-test-state ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            [
+                load-local
+                0 get-local "%p" 0 get-local lua-push-pointer
+                0 get-local 0 get-local
+                factor_lua_pointer_control = 1 drop-locals
+            ] with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 2 "failure lua/-37/2.5" 1 }
+    [
+        [
+            [
+                load-local
+                0 get-local "luaL_error" "liblua5.1" address-of
+                factor_lua_protected_error
+                0 get-local -1 f lua_tolstring
+                0 get-local lua_gettop 1 drop-locals
+            ] with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 73 3 }
+    [
+        [
+            [
+                load-local 0 get-local [
+                    [
+                        3 load-locals
+                        0 get-local va-copy lua-escaped-list
+                        set-global
+                        -2 get-local -1 get-local 0 get-local
+                        lua_pushvfstring
+                        -2 get-local -1 get-local 0 get-local
+                        va-copy lua_pushvfstring
+                        0 get-local c-string va-arg -2 get-local
+                        "%d/%f/%c/%%" 0 get-local
+                        lua_pushvfstring
+                        0 get-local int va-arg 5
+                        { } new-sequence
+                        [ 4 swap set-nth-unsafe ] keep
+                        [ 3 swap set-nth-unsafe ] keep
+                        [ 2 swap set-nth-unsafe ] keep
+                        [ 1 swap set-nth-unsafe ] keep
+                        [ 0 swap set-nth-unsafe ] keep { } like
+                        lua-list-results set-global
+                        73 3 drop-locals
+                    ] call
+                ] lua-list-reader factor_lua_call_list
+                0 get-local lua_gettop 1 drop-locals
+            ] with-lua-test-state
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    {
+        {
+            "lua/-37/2.5/Z/%"
+            "lua/-37/2.5/Z/%"
+            "lua"
+            "-37/2.5/Z/%"
+            -37
+        }
+    }
+    [ lua-list-results get ]
+}
+Must Fail With: { [ lua-escaped-list get int va-arg ] [ expired-va-list? ] }
+0

@@ -1,0 +1,412 @@
+Unit Test: { { t } [ "lua_pushfstring" "lua" lookup-word >boolean ] }
+--> test failed!
+Unit Test: { { t } [ "lua_pushvfstring" "lua" lookup-word >boolean ] }
+--> test failed!
+Unit Test: { { t } [ "luaL_error" "lua" lookup-word >boolean ] }
+--> test failed!
+--> test failed!
+--> test failed!
+
+==== resource:extra/lua/lua-tests.factor
+
+resource:extra/lua/lua-tests.factor: 23
+
+resource:extra/lua/lua-tests.factor
+
+23:     \ lua_pushfstring def>> 4 swap nth
+                         ^
+No word named 'lua_pushfstring' found in current vocabulary search path
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global "lua" reload
+        "liblua5.1"
+        "resource:reference/lua-varargs-20260908/build/liblua5.1.dylib"
+        absolute-path cdecl add-library
+        "lua-varargs-fixture"
+        "resource:reference/lua-varargs-20260908/build/liblua-varargs-..."
+        absolute-path cdecl add-library
+        "resource:reference/lua-varargs-20260908/api-probe.factor"
+        run-test-file "lua" test
+        => "resource:extra/lua/native/varargs.factor" run-test-file
+        :test-failures compiler-errors get assoc-size .
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) test-vocabs
+(O) test-vocab
+(O) run-test-file
+(O) run-file
+(O) parse-file
+(O) parse-stream
+(O) finish-compilation-unit
+(O) M\ optimizing-compiler recompile
+(O) compile-word
+(O) frontend
+(O) build-tree-with
+(O) M\ word (build-tree)
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) (infer-if)
+(O) M\ callable infer-branch
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) M\ input-parameter infer-call*
+(O) unknown-macro-input
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+==== resource:extra/lua/native/varargs.factor
+
+resource:extra/lua/native/varargs.factor: 44
+
+resource:extra/lua/native/varargs.factor
+
+42:         state [| callback-state format args |
+44:             callback-state format args lua_pushvfstring
+                                                           ^
+No word named 'lua_pushvfstring' found in current vocabulary search path
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global "lua" reload
+        "liblua5.1"
+        "resource:reference/lua-varargs-20260908/build/liblua5.1.dylib"
+        absolute-path cdecl add-library
+        "lua-varargs-fixture"
+        "resource:reference/lua-varargs-20260908/build/liblua-varargs-..."
+        absolute-path cdecl add-library
+        "resource:reference/lua-varargs-20260908/api-probe.factor"
+        run-test-file "lua" test
+        "resource:extra/lua/native/varargs.factor" run-test-file
+        => :test-failures compiler-errors get assoc-size .
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) run-test-file
+(O) run-file
+(O) parse-file
+(O) parse-stream
+(O) finish-compilation-unit
+(O) M\ optimizing-compiler recompile
+(O) compile-word
+(O) frontend
+(O) build-tree-with
+(O) M\ word (build-tree)
+(O) infer-quot-here
+(O) (infer-alien-callback)
+(O) pop-literal
+(O) M\ input-parameter (literal)
+(O) unknown-macro-input
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+==== resource:reference/lua-varargs-20260908/api-probe.factor
+
+resource:reference/lua-varargs-20260908/api-probe.factor: 2
+
+Unit Test: { { t } [ "lua_pushfstring" "lua" lookup-word >boolean ] }
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global "lua" reload
+        "liblua5.1"
+        "resource:reference/lua-varargs-20260908/build/liblua5.1.dylib"
+        absolute-path cdecl add-library
+        "lua-varargs-fixture"
+        "resource:reference/lua-varargs-20260908/build/liblua-varargs-..."
+        absolute-path cdecl add-library
+        "resource:reference/lua-varargs-20260908/api-probe.factor"
+        run-test-file => "lua" test
+        "resource:extra/lua/native/varargs.factor" run-test-file
+        :test-failures compiler-errors get assoc-size .
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) run-test-file
+(U) [
+        { t } [ "lua_pushfstring" "lua" lookup-word >boolean ]
+        \ (unit-test) 2 experiment =>
+        { t } [ "lua_pushvfstring" "lua" lookup-word >boolean ]
+        \ (unit-test) 3 experiment
+        { t } [ "luaL_error" "lua" lookup-word >boolean ]
+        \ (unit-test) 4 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:reference/lua-varargs-20260908/api-probe.factor: 3
+
+Unit Test: { { t } [ "lua_pushvfstring" "lua" lookup-word >boolean ] }
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global "lua" reload
+        "liblua5.1"
+        "resource:reference/lua-varargs-20260908/build/liblua5.1.dylib"
+        absolute-path cdecl add-library
+        "lua-varargs-fixture"
+        "resource:reference/lua-varargs-20260908/build/liblua-varargs-..."
+        absolute-path cdecl add-library
+        "resource:reference/lua-varargs-20260908/api-probe.factor"
+        run-test-file => "lua" test
+        "resource:extra/lua/native/varargs.factor" run-test-file
+        :test-failures compiler-errors get assoc-size .
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) run-test-file
+(U) [
+        { t } [ "lua_pushfstring" "lua" lookup-word >boolean ]
+        \ (unit-test) 2 experiment
+        { t } [ "lua_pushvfstring" "lua" lookup-word >boolean ]
+        \ (unit-test) 3 experiment =>
+        { t } [ "luaL_error" "lua" lookup-word >boolean ]
+        \ (unit-test) 4 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:reference/lua-varargs-20260908/api-probe.factor: 4
+
+Unit Test: { { t } [ "luaL_error" "lua" lookup-word >boolean ] }
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global "lua" reload
+        "liblua5.1"
+        "resource:reference/lua-varargs-20260908/build/liblua5.1.dylib"
+        absolute-path cdecl add-library
+        "lua-varargs-fixture"
+        "resource:reference/lua-varargs-20260908/build/liblua-varargs-..."
+        absolute-path cdecl add-library
+        "resource:reference/lua-varargs-20260908/api-probe.factor"
+        run-test-file => "lua" test
+        "resource:extra/lua/native/varargs.factor" run-test-file
+        :test-failures compiler-errors get assoc-size .
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) run-test-file
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+0
