@@ -1,0 +1,491 @@
+ALLOCATED IR
+V{
+    T{ ##safepoint { insn# 0 } }
+    T{ ##prologue { insn# 2 } }
+    T{ ##branch { insn# 4 } }
+    T{ ##check-nursery-branch
+        { size 80 }
+        { cc cc<= }
+        { temp1 RBX }
+        { temp2 RAX }
+        { insn# 6 }
+    }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots { } } { derived-roots V{ } } }
+        }
+        { insn# 8 }
+    }
+    T{ ##branch { insn# 10 } }
+    T{ ##peek { dst RAX } { loc D: 0 } { insn# 12 } }
+    T{ ##load-tagged { dst RCX } { val 448 } { insn# 14 } }
+    T{ ##allot
+        { dst RBX }
+        { size 44 }
+        { class-of byte-array }
+        { temp RDX }
+        { insn# 16 }
+    }
+    T{ ##set-slot-imm
+        { src RCX }
+        { obj RBX }
+        { slot 1 }
+        { tag 9 }
+        { insn# 18 }
+    }
+    T{ ##load-integer { dst RDX } { val 0 } { insn# 20 } }
+    T{ ##tagged>integer { dst RCX } { src RBX } { insn# 22 } }
+    T{ ##store-memory-imm
+        { src RDX }
+        { base RCX }
+        { offset 7 }
+        { rep int-rep }
+        { insn# 24 }
+    }
+    T{ ##store-memory-imm
+        { src RDX }
+        { base RCX }
+        { offset 15 }
+        { rep int-rep }
+        { insn# 26 }
+    }
+    T{ ##store-memory-imm
+        { src RDX }
+        { base RCX }
+        { offset 23 }
+        { rep int-rep }
+        { insn# 28 }
+    }
+    T{ ##store-memory-imm
+        { src RDX }
+        { base RCX }
+        { offset 31 }
+        { rep int-rep }
+        { insn# 30 }
+    }
+    T{ ##load-reference
+        { dst RBP }
+        { obj
+            {
+                sockaddr-in6
+                1
+                2
+                tuple
+                236985587512
+                struct
+                286361846888410896
+                sockaddr-in6
+                -398648919746547801
+            }
+        }
+        { insn# 32 }
+    }
+    T{ ##allot
+        { dst RDX }
+        { size 24 }
+        { class-of tuple }
+        { temp RSI }
+        { insn# 34 }
+    }
+    T{ ##set-slot-imm
+        { src RBP }
+        { obj RDX }
+        { slot 1 }
+        { tag 7 }
+        { insn# 36 }
+    }
+    T{ ##set-slot-imm
+        { src RBX }
+        { obj RDX }
+        { slot 2 }
+        { tag 7 }
+        { insn# 38 }
+    }
+    T{ ##load-integer { dst RBX } { val 10 } { insn# 40 } }
+    T{ ##store-memory-imm
+        { src RBX }
+        { base RCX }
+        { offset 7 }
+        { rep int-rep }
+        { c-type ushort }
+        { insn# 42 }
+    }
+    T{ ##inc { loc D: 1 } { insn# 44 } }
+    T{ ##inc { loc R: 1 } { insn# 46 } }
+    T{ ##replace { src RAX } { loc R: 0 } { insn# 48 } }
+    T{ ##replace { src RDX } { loc D: 1 } { insn# 50 } }
+    T{ ##replace { src RAX } { loc D: 0 } { insn# 52 } }
+    T{ ##branch { insn# 54 } }
+    T{ ##call { word port>> } { insn# 56 } }
+    T{ ##branch { insn# 58 } }
+    T{ ##peek { dst RAX } { loc D: 0 } { insn# 60 } }
+    T{ ##inc { loc D: 1 } { insn# 62 } }
+    T{ ##compare-imm-branch
+        { src1 RAX }
+        { cc cc/= }
+        { insn# 64 }
+    }
+    T{ ##inc { loc D: -1 } { insn# 66 } }
+    T{ ##branch { insn# 68 } }
+    T{ ##call { word >fixnum } { insn# 70 } }
+    T{ ##branch { insn# 72 } }
+    T{ ##peek { dst RBX } { loc D: 1 } { insn# 74 } }
+    T{ ##peek { dst RCX } { loc D: 0 } { insn# 76 } }
+    T{ ##peek { dst RAX } { loc R: 0 } { insn# 78 } }
+    T{ ##branch { insn# 80 } }
+    T{ ##inc { loc D: -1 } { insn# 82 } }
+    T{ ##replace-imm { src 0 } { loc D: 0 } { insn# 84 } }
+    T{ ##branch { insn# 86 } }
+    T{ ##call { word >fixnum } { insn# 88 } }
+    T{ ##branch { insn# 90 } }
+    T{ ##peek { dst RBX } { loc D: 1 } { insn# 92 } }
+    T{ ##peek { dst RCX } { loc D: 0 } { insn# 94 } }
+    T{ ##peek { dst RAX } { loc R: 0 } { insn# 96 } }
+    T{ ##branch { insn# 98 } }
+    T{ ##save-context
+        { temp1 RAX }
+        { temp2 RBX }
+        { insn# 106 }
+    }
+    T{ ##sar-imm
+        { dst RAX }
+        { src1 RCX }
+        { src2 4 }
+        { insn# 108 }
+    }
+    T{ ##spill
+        { src RDX }
+        { rep tagged-rep }
+        { dst T{ spill-slot { n 16 } } }
+    }
+    T{ ##spill
+        { src RBP }
+        { rep tagged-rep }
+        { dst T{ spill-slot { n 8 } } }
+    }
+    T{ ##spill
+        { src RAX }
+        { rep int-rep }
+        { dst T{ spill-slot } }
+    }
+    T{ ##alien-invoke
+        { reg-inputs V{ { T{ spill-slot } int-rep RDI } } }
+        { stack-inputs V{ } }
+        { reg-outputs
+            { { T{ spill-slot { n 24 } } int-rep RAX } }
+        }
+        { dead-outputs { } }
+        { cleanup 0 }
+        { stack-size 0 }
+        { symbols "htons" }
+        { gc-map
+            T{ gc-map
+                { gc-roots
+                    {
+                        T{ spill-slot { n 8 } }
+                        T{ spill-slot { n 16 } }
+                    }
+                }
+                { derived-roots V{ } }
+            }
+        }
+        { insn# 110 }
+    }
+    T{ ##reload
+        { dst RDX }
+        { rep tagged-rep }
+        { src T{ spill-slot { n 16 } } }
+    }
+    T{ ##reload
+        { dst RAX }
+        { rep int-rep }
+        { src T{ spill-slot { n 24 } } }
+    }
+    T{ ##reload
+        { dst RBP }
+        { rep tagged-rep }
+        { src T{ spill-slot { n 8 } } }
+    }
+    T{ ##convert-integer
+        { dst RAX }
+        { src RAX }
+        { c-type ushort }
+        { insn# 112 }
+    }
+    T{ ##copy { dst RBX } { src RBP } { rep tagged-rep } }
+    T{ ##slot-imm
+        { dst RBX }
+        { obj RBX }
+        { slot 2 }
+        { tag 7 }
+        { insn# 114 }
+    }
+    T{ ##tagged>integer { dst RBX } { src RBX } { insn# 116 } }
+    T{ ##store-memory-imm
+        { src RAX }
+        { base RBX }
+        { offset 9 }
+        { rep int-rep }
+        { c-type ushort }
+        { insn# 118 }
+    }
+    T{ ##copy { dst RAX } { src RDX } { rep tagged-rep } }
+    T{ ##slot-imm
+        { dst RBX }
+        { obj RAX }
+        { slot 2 }
+        { tag 7 }
+        { insn# 120 }
+    }
+    T{ ##load-reference { dst RCX } { obj "::" } { insn# 122 } }
+    T{ ##inc { loc D: 1 } { insn# 124 } }
+    T{ ##inc { loc R: 1 } { insn# 126 } }
+    T{ ##compare-imm-branch
+        { src1 RBX }
+        { cc cc/= }
+        { insn# 128 }
+    }
+    T{ ##inc { loc D: -1 } { insn# 130 } }
+    T{ ##inc { loc D: 1 } { insn# 132 } }
+    T{ ##inc { loc R: -1 } { insn# 134 } }
+    T{ ##replace { src RBX } { loc D: 1 } { insn# 136 } }
+    T{ ##replace { src RAX } { loc D: 0 } { insn# 138 } }
+    T{ ##branch { insn# 140 } }
+    T{ ##call { word M\ ipv6 inet-pton } { insn# 142 } }
+    T{ ##branch { insn# 144 } }
+    T{ ##peek { dst RAX } { loc D: 1 } { insn# 146 } }
+    T{ ##branch { insn# 148 } }
+    T{ ##inc { loc D: -1 } { insn# 150 } }
+    T{ ##inc { loc D: 1 } { insn# 152 } }
+    T{ ##inc { loc R: -1 } { insn# 154 } }
+    T{ ##replace { src RCX } { loc D: 1 } { insn# 156 } }
+    T{ ##replace { src RAX } { loc D: 0 } { insn# 158 } }
+    T{ ##branch { insn# 160 } }
+    T{ ##call { word M\ ipv6 inet-pton } { insn# 162 } }
+    T{ ##branch { insn# 164 } }
+    T{ ##peek { dst RAX } { loc D: 1 } { insn# 166 } }
+    T{ ##branch { insn# 168 } }
+    T{ ##slot-imm
+        { dst RAX }
+        { obj RAX }
+        { slot 2 }
+        { tag 7 }
+        { insn# 172 }
+    }
+    T{ ##inc { loc R: 2 } { insn# 174 } }
+    T{ ##replace { src RAX } { loc R: 1 } { insn# 176 } }
+    T{ ##replace-imm { src 8 } { loc R: 0 } { insn# 178 } }
+    T{ ##branch { insn# 180 } }
+    T{ ##call { word >c-ptr } { insn# 182 } }
+    T{ ##branch { insn# 184 } }
+    T{ ##check-nursery-branch
+        { size 48 }
+        { cc cc<= }
+        { temp1 RBX }
+        { temp2 RAX }
+        { insn# 186 }
+    }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots { } } { derived-roots V{ } } }
+        }
+        { insn# 188 }
+    }
+    T{ ##branch { insn# 190 } }
+    T{ ##peek { dst RBX } { loc R: 1 } { insn# 192 } }
+    T{ ##peek { dst RAX } { loc D: 0 } { insn# 194 } }
+    T{ ##peek { dst RCX } { loc R: 0 } { insn# 196 } }
+    T{ ##sar-imm
+        { dst RDX }
+        { src1 RCX }
+        { src2 4 }
+        { insn# 198 }
+    }
+    T{ ##box-displaced-alien
+        { dst RCX }
+        { displacement RDX }
+        { base RBX }
+        { temp RBP }
+        { base-class byte-array }
+        { insn# 200 }
+    }
+    T{ ##inc { loc D: 1 } { insn# 202 } }
+    T{ ##inc { loc R: -2 } { insn# 204 } }
+    T{ ##replace { src RCX } { loc D: 1 } { insn# 206 } }
+    T{ ##replace { src RAX } { loc D: 0 } { insn# 208 } }
+    T{ ##branch { insn# 210 } }
+    T{ ##call { word >c-ptr } { insn# 212 } }
+    T{ ##branch { insn# 214 } }
+    T{ ##save-context
+        { temp1 RBX }
+        { temp2 RAX }
+        { insn# 216 }
+    }
+    T{ ##peek { dst RAX } { loc D: 2 } { insn# 218 } }
+    T{ ##copy { dst RSI } { src RAX } { rep tagged-rep } }
+    T{ ##peek { dst RAX } { loc D: 1 } { insn# 220 } }
+    T{ ##peek { dst RBX } { loc R: 0 } { insn# 222 } }
+    T{ ##copy { dst RBP } { src RBX } { rep tagged-rep } }
+    T{ ##peek { dst RBX } { loc D: 0 } { insn# 224 } }
+    T{ ##load-tagged { dst RCX } { val 256 } { insn# 226 } }
+    T{ ##copy { dst RDX } { src RCX } { rep tagged-rep } }
+    T{ ##unbox-any-c-ptr { dst RCX } { src RAX } { insn# 228 } }
+    T{ ##unbox-any-c-ptr { dst RAX } { src RBX } { insn# 230 } }
+    T{ ##spill
+        { src RSI }
+        { rep tagged-rep }
+        { dst T{ spill-slot { n 8 } } }
+    }
+    T{ ##spill
+        { src RDX }
+        { rep tagged-rep }
+        { dst T{ spill-slot { n 32 } } }
+    }
+    T{ ##spill
+        { src RAX }
+        { rep int-rep }
+        { dst T{ spill-slot { n 24 } } }
+    }
+    T{ ##spill
+        { src RCX }
+        { rep int-rep }
+        { dst T{ spill-slot } }
+    }
+    T{ ##spill
+        { src RBP }
+        { rep tagged-rep }
+        { dst T{ spill-slot { n 16 } } }
+    }
+    T{ ##unbox
+        { dst RAX }
+        { src T{ spill-slot { n 32 } } }
+        { unboxer "to_unsigned_8" }
+        { rep int-rep }
+        { insn# 232 }
+    }
+    T{ ##spill
+        { src RAX }
+        { rep int-rep }
+        { dst T{ spill-slot { n 40 } } }
+    }
+    T{ ##alien-invoke
+        { reg-inputs
+            V{
+                { T{ spill-slot } int-rep RDI }
+                { T{ spill-slot { n 24 } } int-rep RSI }
+                { T{ spill-slot { n 40 } } int-rep RDX }
+            }
+        }
+        { stack-inputs V{ } }
+        { reg-outputs { } }
+        { dead-outputs { } }
+        { cleanup 0 }
+        { stack-size 0 }
+        { symbols "memcpy" }
+        { gc-map
+            T{ gc-map
+                { gc-roots
+                    {
+                        T{ spill-slot { n 16 } }
+                        T{ spill-slot { n 8 } }
+                    }
+                }
+                { derived-roots V{ } }
+            }
+        }
+        { insn# 234 }
+    }
+    T{ ##reload
+        { dst RSI }
+        { rep tagged-rep }
+        { src T{ spill-slot { n 8 } } }
+    }
+    T{ ##reload
+        { dst RBX }
+        { rep tagged-rep }
+        { src T{ spill-slot { n 16 } } }
+    }
+    T{ ##slot-imm
+        { dst RBX }
+        { obj RBX }
+        { slot 3 }
+        { tag 7 }
+        { insn# 236 }
+    }
+    T{ ##copy { dst RAX } { src RSI } { rep tagged-rep } }
+    T{ ##slot-imm
+        { dst RAX }
+        { obj RAX }
+        { slot 2 }
+        { tag 7 }
+        { insn# 238 }
+    }
+    T{ ##inc { loc D: -1 } { insn# 240 } }
+    T{ ##inc { loc R: 1 } { insn# 242 } }
+    T{ ##replace-imm { src 24 } { loc R: 0 } { insn# 244 } }
+    T{ ##replace { src RBX } { loc D: 0 } { insn# 246 } }
+    T{ ##replace { src RAX } { loc R: 1 } { insn# 248 } }
+    T{ ##branch { insn# 250 } }
+    T{ ##call { word >fixnum } { insn# 252 } }
+    T{ ##branch { insn# 254 } }
+    T{ ##peek { dst RAX } { loc R: 0 } { insn# 256 } }
+    T{ ##peek { dst RCX } { loc D: 0 } { insn# 258 } }
+    T{ ##peek { dst RBX } { loc R: 1 } { insn# 260 } }
+    T{ ##tagged>integer { dst RBX } { src RBX } { insn# 262 } }
+    T{ ##sar-imm
+        { dst RCX }
+        { src1 RCX }
+        { src2 4 }
+        { insn# 264 }
+    }
+    T{ ##sar-imm
+        { dst RAX }
+        { src1 RAX }
+        { src2 4 }
+        { insn# 266 }
+    }
+    T{ ##store-memory
+        { src RCX }
+        { base RBX }
+        { displacement RAX }
+        { scale 0 }
+        { offset 7 }
+        { rep int-rep }
+        { c-type uint }
+        { insn# 268 }
+    }
+    T{ ##inc { loc D: -1 } { insn# 270 } }
+    T{ ##inc { loc R: -2 } { insn# 272 } }
+    T{ ##branch { insn# 274 } }
+    T{ ##safepoint { insn# 276 } }
+    T{ ##epilogue { insn# 278 } }
+    T{ ##return { insn# 280 } }
+}
+FAIL T{ invalid-allocation-gc-root
+    { insn
+        T{ ##alien-invoke
+            { reg-inputs V{ { T{ spill-slot } int-rep RDI } } }
+            { stack-inputs V{ } }
+            { reg-outputs
+                { { T{ spill-slot { n 24 } } int-rep RAX } }
+            }
+            { dead-outputs { } }
+            { cleanup 0 }
+            { stack-size 0 }
+            { symbols "htons" }
+            { gc-map
+                T{ gc-map
+                    { gc-roots
+                        {
+                            T{ spill-slot { n 8 } }
+                            T{ spill-slot { n 16 } }
+                        }
+                    }
+                    { derived-roots V{ } }
+                }
+            }
+            { insn# 110 }
+        }
+    }
+    { value 5941188 }
+}

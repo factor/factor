@@ -1,0 +1,139 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: arrays compiler compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation
+compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.rematerialization
+compiler.cfg.register-allocation.spill-sites
+compiler.cfg.value-numbering compiler.units continuations
+generic io io.sockets io.sockets.private kernel namespaces
+parser prettyprint sequences vocabs vocabs.loader ;
+IN: allocator-backtracking-ipv6-probe
+
+flags loop/remat={ f f }
+FAIL T{ invalid-allocation-gc-root
+    { insn
+        T{ ##alien-invoke
+            { reg-inputs
+                V{ { T{ spill-slot { n 16 } } int-rep RDI } }
+            }
+            { stack-inputs V{ } }
+            { reg-outputs
+                { { T{ spill-slot { n 24 } } int-rep RAX } }
+            }
+            { dead-outputs { } }
+            { cleanup 0 }
+            { stack-size 0 }
+            { symbols "htons" }
+            { gc-map
+                T{ gc-map
+                    { gc-roots
+                        {
+                            T{ spill-slot }
+                            T{ spill-slot { n 8 } }
+                        }
+                    }
+                    { derived-roots V{ } }
+                }
+            }
+            { insn# 110 }
+        }
+    }
+    { value 5940172 }
+}
+flags loop/remat={ f t }
+FAIL T{ invalid-allocation-gc-root
+    { insn
+        T{ ##alien-invoke
+            { reg-inputs
+                V{ { T{ spill-slot { n 32 } } int-rep RDI } }
+            }
+            { stack-inputs V{ } }
+            { reg-outputs
+                { { T{ spill-slot { n 16 } } int-rep RAX } }
+            }
+            { dead-outputs { } }
+            { cleanup 0 }
+            { stack-size 0 }
+            { symbols "htons" }
+            { gc-map
+                T{ gc-map
+                    { gc-roots
+                        {
+                            T{ spill-slot }
+                            T{ spill-slot { n 8 } }
+                        }
+                    }
+                    { derived-roots V{ } }
+                }
+            }
+            { insn# 110 }
+        }
+    }
+    { value 5940364 }
+}
+flags loop/remat={ t f }
+FAIL T{ invalid-allocation-gc-root
+    { insn
+        T{ ##alien-invoke
+            { reg-inputs
+                V{ { T{ spill-slot { n 16 } } int-rep RDI } }
+            }
+            { stack-inputs V{ } }
+            { reg-outputs
+                { { T{ spill-slot { n 24 } } int-rep RAX } }
+            }
+            { dead-outputs { } }
+            { cleanup 0 }
+            { stack-size 0 }
+            { symbols "htons" }
+            { gc-map
+                T{ gc-map
+                    { gc-roots
+                        {
+                            T{ spill-slot }
+                            T{ spill-slot { n 8 } }
+                        }
+                    }
+                    { derived-roots V{ } }
+                }
+            }
+            { insn# 110 }
+        }
+    }
+    { value 5940556 }
+}
+flags loop/remat={ t t }
+FAIL T{ invalid-allocation-gc-root
+    { insn
+        T{ ##alien-invoke
+            { reg-inputs
+                V{ { T{ spill-slot { n 32 } } int-rep RDI } }
+            }
+            { stack-inputs V{ } }
+            { reg-outputs
+                { { T{ spill-slot { n 16 } } int-rep RAX } }
+            }
+            { dead-outputs { } }
+            { cleanup 0 }
+            { stack-size 0 }
+            { symbols "htons" }
+            { gc-map
+                T{ gc-map
+                    { gc-roots
+                        {
+                            T{ spill-slot }
+                            T{ spill-slot { n 8 } }
+                        }
+                    }
+                    { derived-roots V{ } }
+                }
+            }
+            { insn# 110 }
+        }
+    }
+    { value 5940748 }
+}

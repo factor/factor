@@ -1,0 +1,10 @@
+{
+  "source_commit": "cad423bf910a88720158c6473641e7d85643ce2d",
+  "accepted": false,
+  "passed_cases": 0,
+  "failed_cases": 4,
+  "note": "Probe catches errors to execute all four flag combinations; shell exit zero is not acceptance.",
+  "word": "io.sockets:ipv6 / io.sockets.private:make-sockaddr",
+  "ffi": "htons",
+  "architecture": "native x86-64"
+}
