@@ -2,14 +2,14 @@ USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.c
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
 compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
-compiler.cfg.checker compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
+compiler.cfg.checker compiler.cfg.liveness compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
 compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.phases
 compiler.cfg.linear-scan.assignment compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 cpu.architecture layouts generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
-vectors memory hashtables io.sockets io.sockets.private words ;
+vectors memory continuations hashtables io.sockets io.sockets.private words ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
 :: test-interval ( vreg positions -- interval )
@@ -459,3 +459,59 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         V{ { 424 424 } { 500 510 } } >>ranges
     T{ sync-point { n 502 } } split-at-sync first ranges>>
 ] ] with-scope ] unit-test
+
+! Exercise the GC transport with the independent original-value checker,
+! then deliberately reproduce the old copy-after-save ordering.
+:: gc-transition-fixture ( -- graph snapshot )
+    init-test-allocation registers set
+    tagged-rep 1 set-rep-of
+    H{ { 1 1 } } clone leader-map set
+    [
+        1 { 1 2 3 } ##load-reference,
+        ##call-gc new <gc-map> >>gc-map ,
+        1 D: 0 ##replace,
+        ##return,
+    ] V{ } make insns>cfg :> graph
+    graph cfg set graph number-instructions
+    graph snapshot-value-flow :> snapshot
+    1 { 1 } test-interval 0 >>reg :> before
+    before uses>> first f >>use-rep tagged-rep >>def-rep drop
+    1 { 2 4 } test-interval 1 >>reg tagged-rep >>reload-rep
+        0 backtracking-register-home boa >>reload-from :> after
+    after uses>> [ tagged-rep >>use-rep drop ] each
+    before after 2array :> intervals
+    intervals prepare-backtracking-moves
+    graph intervals assign-backtracking-registers
+    graph snapshot ;
+
+{ } [ [ gc-transition-fixture check-value-flow ] with-scope ] unit-test
+
+[
+    [ [let
+        gc-transition-fixture :> ( graph snapshot )
+        graph entry>> instructions>> :> instructions
+        instructions second :> copy
+        instructions third 1 instructions set-nth
+        copy 2 instructions set-nth
+        graph snapshot check-value-flow
+    ] ] with-scope
+] [ invalid-allocation-gc-root? ] must-fail-with
+
+:: prefix-context-fixture ( missing-point? -- failed? restored? published? )
+    init-test-allocation registers set
+    { T{ ##return } } insns>cfg :> graph
+    graph cfg set graph compute-live-sets graph number-instructions
+    H{ { "outer" "sentinel" } } clone :> previous
+    previous phase-insn-prefixes set
+    missing-point? [ { } 999 associate ] [ H{ } clone ] if
+    backtracking-local-moves set
+    [ graph { } assign-backtracking-registers f ] [
+        dup unconsumed-backtracking-moves? [ drop t ] [ rethrow ] if
+    ] recover
+    phase-insn-prefixes get previous eq?
+    graph entry>> machine-live-ins get key? ;
+
+! Restoring only the prefix binding must retain assignment's new edge maps,
+! on both success and an unconsumed-prefix failure.
+{ f t t } [ [ f prefix-context-fixture ] with-scope ] unit-test
+{ t t t } [ [ t prefix-context-fixture ] with-scope ] unit-test
