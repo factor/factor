@@ -1,0 +1,759 @@
+Unit Test: { { 570.0 } [ varout_control ] }
+Unit Test: { { 317.0 } [ varout_split_control ] }
+Unit Test: { { 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] }
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 varout-small-hfa boa 3 4 5 varout-pair boa
+        6 7 8 varout-hfa boa 9 varout_hfas
+    ]
+}
+Unit Test: {
+    { 317.0 }
+    [ 1 2 3 4 5 6 7 4 5 varout-pair boa 10 varout_split ]
+}
+Unit Test: {
+    { 16.0 27.0 38.0 }
+    [
+        10 6 7 8 varout-hfa boa varout_return
+        [ x>> ] [ y>> ] [ z>> ] tri
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing"
+        library-dll dlsym indirect-varout-mixed
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+--> test failed!
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+--> test failed!
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+--> test failed!
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+--> test failed!
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+--> test failed!
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
+--> test failed!
+TEST FAILURES 6
+COMPILER ERRORS 0
+
+==== resource:basis/compiler/tests/varargs/outgoing-alignment.factor
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 15
+
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+
+=== Expected:
+0
+=== Got:
+8
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 varout_hva_alignment
+        ] \ (unit-test) 8 experiment
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 "varout_hva_alignment" "varargs-outgoing" library-dll
+            dlsym indirect-alignment
+        ] \ (unit-test) 11 experiment
+        { 0 } [
+            1 2 3 align-prior boa 1 varout_return_alignment
+            alignment>>
+        ] \ (unit-test) 15 experiment =>
+        { t }
+        [ align-vector-first heap-size varout_vector_first_size = ]
+        \ (unit-test) 24 experiment
+        { t } [
+            align-vector-first c-type-align
+            varout_vector_first_align =
+        ] \ (unit-test) 25 experiment
+        { t } [
+            align-vector-union c-type-align
+            varout_vector_union_align =
+        ] \ (unit-test) 26 experiment
+        { 36.0 } [
+            1 2 ~float-4~ 3 align-vector-first boa
+            varout_vector_first_after_int
+        ] \ (unit-test) 27 experiment
+        { 36.0 } [
+            1 2 align-vector-union <struct> ~float-4~ >>value
+            3 varout_vector_union_after_int
+        ] \ (unit-test) 28 experiment
+        { 2 30.0 } [
+            64 malloc load-local 0 get-local ~quotation~ curry
+            0 get-local ~quotation~ curry finally 1 drop-locals
+        ] \ (unit-test) 43 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 24
+
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 varout_hva_alignment
+        ] \ (unit-test) 8 experiment
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 "varout_hva_alignment" "varargs-outgoing" library-dll
+            dlsym indirect-alignment
+        ] \ (unit-test) 11 experiment
+        { 0 } [
+            1 2 3 align-prior boa 1 varout_return_alignment
+            alignment>>
+        ] \ (unit-test) 15 experiment
+        { t }
+        [ align-vector-first heap-size varout_vector_first_size = ]
+        \ (unit-test) 24 experiment =>
+        { t } [
+            align-vector-first c-type-align
+            varout_vector_first_align =
+        ] \ (unit-test) 25 experiment
+        { t } [
+            align-vector-union c-type-align
+            varout_vector_union_align =
+        ] \ (unit-test) 26 experiment
+        { 36.0 } [
+            1 2 ~float-4~ 3 align-vector-first boa
+            varout_vector_first_after_int
+        ] \ (unit-test) 27 experiment
+        { 36.0 } [
+            1 2 align-vector-union <struct> ~float-4~ >>value
+            3 varout_vector_union_after_int
+        ] \ (unit-test) 28 experiment
+        { 2 30.0 } [
+            64 malloc load-local 0 get-local ~quotation~ curry
+            0 get-local ~quotation~ curry finally 1 drop-locals
+        ] \ (unit-test) 43 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 25
+
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 varout_hva_alignment
+        ] \ (unit-test) 8 experiment
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 "varout_hva_alignment" "varargs-outgoing" library-dll
+            dlsym indirect-alignment
+        ] \ (unit-test) 11 experiment
+        { 0 } [
+            1 2 3 align-prior boa 1 varout_return_alignment
+            alignment>>
+        ] \ (unit-test) 15 experiment
+        { t }
+        [ align-vector-first heap-size varout_vector_first_size = ]
+        \ (unit-test) 24 experiment
+        { t } [
+            align-vector-first c-type-align
+            varout_vector_first_align =
+        ] \ (unit-test) 25 experiment =>
+        { t } [
+            align-vector-union c-type-align
+            varout_vector_union_align =
+        ] \ (unit-test) 26 experiment
+        { 36.0 } [
+            1 2 ~float-4~ 3 align-vector-first boa
+            varout_vector_first_after_int
+        ] \ (unit-test) 27 experiment
+        { 36.0 } [
+            1 2 align-vector-union <struct> ~float-4~ >>value
+            3 varout_vector_union_after_int
+        ] \ (unit-test) 28 experiment
+        { 2 30.0 } [
+            64 malloc load-local 0 get-local ~quotation~ curry
+            0 get-local ~quotation~ curry finally 1 drop-locals
+        ] \ (unit-test) 43 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 26
+
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 varout_hva_alignment
+        ] \ (unit-test) 8 experiment
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 "varout_hva_alignment" "varargs-outgoing" library-dll
+            dlsym indirect-alignment
+        ] \ (unit-test) 11 experiment
+        { 0 } [
+            1 2 3 align-prior boa 1 varout_return_alignment
+            alignment>>
+        ] \ (unit-test) 15 experiment
+        { t }
+        [ align-vector-first heap-size varout_vector_first_size = ]
+        \ (unit-test) 24 experiment
+        { t } [
+            align-vector-first c-type-align
+            varout_vector_first_align =
+        ] \ (unit-test) 25 experiment
+        { t } [
+            align-vector-union c-type-align
+            varout_vector_union_align =
+        ] \ (unit-test) 26 experiment =>
+        { 36.0 } [
+            1 2 ~float-4~ 3 align-vector-first boa
+            varout_vector_first_after_int
+        ] \ (unit-test) 27 experiment
+        { 36.0 } [
+            1 2 align-vector-union <struct> ~float-4~ >>value
+            3 varout_vector_union_after_int
+        ] \ (unit-test) 28 experiment
+        { 2 30.0 } [
+            64 malloc load-local 0 get-local ~quotation~ curry
+            0 get-local ~quotation~ curry finally 1 drop-locals
+        ] \ (unit-test) 43 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 28
+
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+
+=== Expected:
+36.0
+=== Got:
+22.5
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 varout_hva_alignment
+        ] \ (unit-test) 8 experiment
+        { 0 } [
+            1 2 3 align-prior boa ~float-4~ ~float-4~ align-hva boa
+            1 "varout_hva_alignment" "varargs-outgoing" library-dll
+            dlsym indirect-alignment
+        ] \ (unit-test) 11 experiment
+        { 0 } [
+            1 2 3 align-prior boa 1 varout_return_alignment
+            alignment>>
+        ] \ (unit-test) 15 experiment
+        { t }
+        [ align-vector-first heap-size varout_vector_first_size = ]
+        \ (unit-test) 24 experiment
+        { t } [
+            align-vector-first c-type-align
+            varout_vector_first_align =
+        ] \ (unit-test) 25 experiment
+        { t } [
+            align-vector-union c-type-align
+            varout_vector_union_align =
+        ] \ (unit-test) 26 experiment
+        { 36.0 } [
+            1 2 ~float-4~ 3 align-vector-first boa
+            varout_vector_first_after_int
+        ] \ (unit-test) 27 experiment
+        { 36.0 } [
+            1 2 align-vector-union <struct> ~float-4~ >>value
+            3 varout_vector_union_after_int
+        ] \ (unit-test) 28 experiment =>
+        { 2 30.0 } [
+            64 malloc load-local 0 get-local ~quotation~ curry
+            0 get-local ~quotation~ curry finally 1 drop-locals
+        ] \ (unit-test) 43 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/varargs/outgoing-alignment.factor: 43
+
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
+
+=== Expected:
+2
+30.0
+=== Got:
+2
+11.0
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+        run-test-file => "TEST FAILURES " write
+        test-failures get length . "COMPILER ERRORS " write
+        compiler-errors get assoc-size .
+        :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and 0 1 ? exit
+    ]
+(O) run-test-file
+(O) run-test-file
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

@@ -1,0 +1,4 @@
+992aa19c73c988a1b749cb46170068a86ef0ee51492ec37235ebcf03f39c1714  vm/ffi_test_varargs_outgoing.c
+bbc3a2a3a345eca969e0cd8e4125cdf125f5e4b3d8fadf5965e46839a1c694f7  basis/compiler/tests/alien-varargs-outgoing.factor
+ab3590f9d26b4fe626d670fd0730b4ccf0a3c3eab46ea6966bbadc49b691c22e  basis/compiler/tests/varargs/outgoing-alignment.factor
+4e888bf3f8975cd9cfbbefceb7999de8eaee056fb8b648e6a00ebd91242996ce  basis/math/vectors/simd/simd.factor

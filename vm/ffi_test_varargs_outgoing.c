@@ -1,5 +1,6 @@
 /* Independent C varargs callees, shared by all native test platforms. */
 #include <stdarg.h>
+#include <stdint.h>
 #ifndef FACTOR_EXPORT
 #define FACTOR_EXPORT
 #endif
@@ -90,3 +91,49 @@ FACTOR_EXPORT VAROUT_NOINLINE double varout_vector_args(int tag, ...) {
       + h.b[0] + 2*h.b[1] + 3*h.b[2] + 4*h.b[3] + tail;
 }
 #endif
+
+/* Address probes must observe the actual ABI pointers, without letting
+ * the optimizer replace alignment checks with the declared type alignment. */
+#if defined(__aarch64__) && (defined(__clang__) || defined(__GNUC__))
+struct varout_prior { long long a, b, c; };
+struct varout_aligned_result { uintptr_t alignment; varout_vector value; };
+FACTOR_EXPORT VAROUT_NOINLINE uintptr_t varout_hva_alignment(struct varout_prior prior, struct varout_hva h, int tag, ...) {
+  uintptr_t address = (uintptr_t)&h;
+  __asm__("" : "+r"(address));
+  return (address & 15) + prior.a + tag - 2;
+}
+FACTOR_EXPORT VAROUT_NOINLINE struct varout_aligned_result varout_return_alignment(struct varout_prior prior, int tag, ...) {
+  register uintptr_t address __asm__("x8");
+  __asm__("" : "=r"(address));
+  struct varout_aligned_result result = {(address & 15) + prior.a + tag - 2, {0,0,0,0}};
+  return result;
+}
+struct varout_vector_first { varout_vector value; uintptr_t tail; };
+union varout_vector_union { varout_vector value; long long integer; };
+FACTOR_EXPORT uintptr_t varout_vector_first_size(void) { return sizeof(struct varout_vector_first); }
+FACTOR_EXPORT uintptr_t varout_vector_first_align(void) { return _Alignof(struct varout_vector_first); }
+FACTOR_EXPORT uintptr_t varout_vector_union_align(void) { return _Alignof(union varout_vector_union); }
+FACTOR_EXPORT double varout_vector_first_after_int(int tag, ...) {
+  va_list ap; va_start(ap, tag);
+  int prefix = va_arg(ap, int);
+  struct varout_vector_first value = va_arg(ap, struct varout_vector_first);
+  va_end(ap);
+  return tag + prefix + value.value[0] + 2*value.value[1]
+      + 3*value.value[2] + 4*value.value[3] + value.tail;
+}
+FACTOR_EXPORT double varout_vector_union_after_int(int tag, ...) {
+  va_list ap; va_start(ap, tag);
+  int prefix = va_arg(ap, int);
+  union varout_vector_union value = va_arg(ap, union varout_vector_union);
+  double tail = va_arg(ap, double); va_end(ap);
+  return tag + prefix + value.value[0] + 2*value.value[1]
+      + 3*value.value[2] + 4*value.value[3] + tail;
+}
+#endif
+FACTOR_EXPORT int varout_alignment_supported(void) {
+#if defined(__aarch64__) && (defined(__clang__) || defined(__GNUC__))
+  return 1;
+#else
+  return 0;
+#endif
+}

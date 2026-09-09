@@ -1,5 +1,5 @@
 USING: accessors alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators io io.pathnames kernel locals math system tools.test ;
+classes.struct combinators io io.pathnames kernel locals math parser system tools.test ;
 FROM: alien.c-types => float ;
 IN: compiler.tests.alien-varargs-outgoing
 << "varargs-outgoing" "resource:" absolute-path os {
@@ -36,3 +36,10 @@ cpu arm.64? [
 : indirect-varout-mixed ( first second tag i d l e j f ptr -- result )
     double { float double int int double longlong double int double } cdecl 3 alien-indirect-varargs ;
 { 285.0 } [ 1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing" library-dll dlsym indirect-varout-mixed ] unit-test
+
+FUNCTION: int varout_alignment_supported ( )
+varout_alignment_supported 0 > [
+    "resource:basis/compiler/tests/varargs/outgoing-alignment.factor" run-test-file
+] [
+    cpu arm.64? [ "C vector pointer alignment probes require GCC or Clang inline assembly." print ] when
+] if

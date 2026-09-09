@@ -17,3 +17,7 @@ The original image was `/Users/erg/factor.worktrees/arm64-gaps-x86/factor.image`
 `cursor-before.log` shows the original synthetic half/BF16 HFA cursor test reaching unsupported scalar ABI representation on x86. The portable suite now explicitly checks unsupported x86 half/BF16 representation and guards ARM64-specific reader cases. `run.log` then exposed discovery of the ARM64 native forwarding helper under `tests/` despite its caller guard. Commit 9884ba3b95 moves the helper to `native/`; `final.log` verifies the whole corrected suite.
 
 The copied implementation source is not part of this evidence commit. Binary, image, and dylib artifacts are intentionally excluded.
+
+## Follow-up after aggregate/SIMD alignment repair
+
+`alignment-final.factor` applies the compiler helper changes from f730b1a03c, reloads SIMD C types with the corrected first-member alignment, and reruns the complete shared suite. Result: **264 Unit Test reports, zero failures, zero compiler errors, exit0** (`alignment-final.log`). The isolated x86 fixture was rebuilt from the updated outgoing C source; ARM64-only pointer probes report unsupported and are not invoked. `alignment-source-sha256.txt` records changed source files relative to the preceding source manifest. The helper installer is tracked under `reference/arm64-varargs-alignment-20260908/fix.factor` in f730b1a03c. This confirms that the shared allocation and helper changes preserve the covered x86 behavior.
