@@ -60,3 +60,14 @@ separate shared derived-phi GC work and cross-architecture validation must be
 integrated before declaring the complete compiler candidate validated.
 Default linear scan remains unchanged. Performance claims require the separate
 frozen-source benchmark run; mechanism counters alone are not performance.
+
+
+Second-chance profitability refinement: a normalized no-use range strictly
+inside one basic block is omitted unless it touches assigned fragments of
+the same original value at both ends. One-ended residency only relocates the
+existing memory transfer and may add a register copy; a range touching
+neither end adds transfers. The original mandatory fragments retain their
+spill/reload obligations. Entry, exit, and multiblock ranges remain eligible,
+including fast-path carriers around out-of-line GC blocks. This is a local
+transport-cost bound, not a claim of globally optimal CFG placement.
+`interior-gaps-skipped` reports this decision separately from assignments.

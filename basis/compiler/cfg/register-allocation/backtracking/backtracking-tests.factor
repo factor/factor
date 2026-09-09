@@ -564,3 +564,27 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         original prefix slow-uncovered-points sequence=
     ] all?
 ] ] with-scope ] unit-test
+
+
+! An interior no-use range is worthwhile only if it can replace both a
+! store and a reload. One-ended and isolated interiors cannot transport a
+! value across an edge. Check normalized phase endpoints, and retain the
+! entry/exit carriers used by nonadjacent successors around GC blocks.
+{ { f f f t t f t t } } [ [ [let
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    [ 10 [ ##branch, ] times ] V{ } make insns>cfg :> graph
+    graph cfg set graph number-instructions graph prepare-backtracking-points
+    1 { 0 3 } test-interval :> before
+    1 { 8 11 } test-interval :> after
+    {
+        [ { 4 7 } { } productive-gap? ]
+        [ { 4 7 } before 1array productive-gap? ]
+        [ { 4 7 } after 1array productive-gap? ]
+        [ { 4 7 } before after 2array productive-gap? ]
+        [ { 3 7 } before after 2array productive-gap? ]
+        [ { 5 7 } before after 2array productive-gap? ]
+        [ { 0 3 } { } productive-gap? ]
+        [ { 16 19 } { } productive-gap? ]
+    } [ call( -- ? ) ] map
+] ] with-scope ] unit-test

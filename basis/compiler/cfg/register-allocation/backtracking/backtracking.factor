@@ -33,7 +33,7 @@ SYMBOLS: bundle-spillsets spill-home-pool backtracking-affinities
     backtracking-directed-splits backtracking-minimal-splits
     backtracking-point-blocks backtracking-block-starts backtracking-barriers
     backtracking-second-chance-attempts backtracking-second-chance-assignments
-    backtracking-register-transitions backtracking-original-intervals
+    backtracking-register-transitions backtracking-interior-gaps-skipped backtracking-original-intervals
     backtracking-local-moves backtracking-phase-mode? backtracking-late-points
     backtracking-cluster-splits backtracking-split-budget-exhaustions ;
 SYMBOL: bundle-occupancy
@@ -487,11 +487,32 @@ M: backtracking-register-home emit-restore
     interval allocated [ vreg>> interval vreg>> = ] filter
     uncovered-vreg-ranges ;
 
-:: gap-interval ( vreg range -- interval/f )
-    range first :> start!
+:: gap-start ( range -- start )
+    range first :> start
     ! Instruction positions are even; odd starts only represent block entry.
     start 2 mod 0 = start backtracking-block-starts get key? or
-    [ ] [ start 1 + start! ] if
+    [ start ] [ start 1 + ] if ;
+
+:: productive-gap? ( range fragments -- ? )
+    range gap-start :> start
+    range second :> end
+    start end > [ t ] [
+        start backtracking-point-blocks get at :> bb
+        start bb backtracking-phase-mode? get [ phase-block-from ] [ block-from ] if >
+        bb end backtracking-point-blocks get at eq? and
+        end bb block-to backtracking-phase-mode? get [ 1 + ] when < and [
+            ! Strictly interior ranges cross no CFG edge. Unless both sides
+            ! touch existing register fragments of this original value, residency
+            ! saves no memory operation: it merely moves a store or reload and
+            ! can add a register copy. Keep every entry/exit and multiblock gap;
+            ! those can bridge useful nonadjacent CFG edges (including GC fast paths).
+            fragments [ live-interval-end 1 + start = ] any?
+            fragments [ live-interval-start end 1 + = ] any? and
+        ] [ t ] if
+    ] if ;
+
+:: gap-interval ( vreg range -- interval/f )
+    range gap-start :> start
     start range second <= [
         vreg <live-interval>
         start range second 2array 1vector >>ranges
@@ -519,10 +540,13 @@ M: backtracking-register-home emit-restore
     allocated [ dup vreg>> by-vreg push-at ] each
     backtracking-original-intervals get [| interval |
         interval vreg>> rematerialization-of [ ] [
-            interval interval vreg>> by-vreg at uncovered-vreg-ranges [| range |
-                interval vreg>> range gap-interval [| gap |
-                    gap interval vreg>> bundle-spillsets get at groups push-at
-                ] when*
+            interval vreg>> by-vreg at :> fragments
+            interval fragments uncovered-vreg-ranges [| range |
+                range fragments productive-gap? [
+                    interval vreg>> range gap-interval [| gap |
+                        gap interval vreg>> bundle-spillsets get at groups push-at
+                    ] when*
+                ] [ backtracking-interior-gaps-skipped inc ] if
             ] each
         ] if
     ] each
@@ -616,6 +640,7 @@ M: backtracking-register-home emit-restore
     0 backtracking-second-chance-attempts set
     0 backtracking-second-chance-assignments set
     0 backtracking-register-transitions set
+    0 backtracking-interior-gaps-skipped set
     intervals/syncs [ live-interval-state? ] filter coalesce-bundle-groups :> groups
     groups initialize-spillsets
     intervals/syncs [ live-interval-state? not ] filter :> syncs
@@ -715,6 +740,7 @@ M: backtracking-allocator allocator-statistics
     backtracking-second-chance-attempts get "second-chance-attempts" pick set-at
     backtracking-second-chance-assignments get "second-chance-assignments" pick set-at
     backtracking-register-transitions get "register-transitions" pick set-at
+    backtracking-interior-gaps-skipped get "interior-gaps-skipped" pick set-at
     backtracking-evictions get "evictions" pick set-at
     backtracking-splits get "splits" pick set-at
     assigned-bundles get length "assigned-bundles" pick set-at
