@@ -30,3 +30,10 @@ rejected late reload, and native unknown-input addition using exactly two
 integer registers with no spill/reload interval fragments. The explicitly
 named test kernel uses the reference interval allocator only to exercise the
 mechanical API; it is not an implementation of the chordal algorithm.
+
+The `-with-locations` variants accept the same fixed memory-token map as the
+shared SSA mechanics. Fixed tokens are filtered before interval finalization
+and seeded after assignment initialization. The block walk expires outgoing
+products before activating incoming products, using the shared block-boundary
+lifecycle. This prevents an old fragment from deleting its replacement's
+pending register mapping.
