@@ -1,0 +1,15 @@
+{
+  "source_commit": "6b1432897261fd72aa0578afb8e621224cdf629f",
+  "prior_production_commit": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "native_root": "/home/erg/factor-compiler-combined-20260909",
+  "seed_root": "/home/erg/factor-compiler-next3-candidate-20260909",
+  "only_source_changes": [
+    "basis/compiler/cfg/slp/slp-tests.factor"
+  ],
+  "only_test_changes": true,
+  "production_equal": true,
+  "source_manifest_paths": 1603,
+  "input_image": "/home/erg/factor-compiler-next3-candidate-20260909/reference/compiler-next3-20260909/prepared.image",
+  "input_image_sha256": "15a12ce2c70d85f4a43adb10f5816cabf68492ae68dfbccd44b8bedb4ebe4e45",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f"
+}

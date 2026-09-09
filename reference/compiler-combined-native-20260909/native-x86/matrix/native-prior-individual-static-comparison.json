@@ -1,0 +1,180 @@
+{
+  "all_on_targets": {
+    "allocator-runtime-comparison:float-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 1264,
+      "code_bytes_on": 1264
+    },
+    "allocator-runtime-comparison:ffi-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 1664,
+      "code_bytes_on": 1664
+    },
+    "allocator-runtime-comparison:branch-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 1888,
+      "code_bytes_on": 1888
+    },
+    "allocator-runtime-comparison:integer-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 672,
+      "code_bytes_on": 672
+    },
+    "allocator-runtime-comparison:simd-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 1504,
+      "code_bytes_on": 1504
+    },
+    "allocator-runtime-comparison:gc-pressure": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 11968,
+      "code_bytes_on": 11968
+    },
+    "benchmark.spectral-norm:spectral-norm": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 3104,
+      "code_bytes_on": 3104
+    },
+    "benchmark.nbody:nbody": {
+      "changed_from_off": true,
+      "matches_prior_states": [
+        "representations"
+      ],
+      "code_bytes_off": 2960,
+      "code_bytes_on": 2992
+    },
+    "benchmark.nbody-simd:nbody": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 4368,
+      "code_bytes_on": 4368
+    },
+    "benchmark.fannkuch:fannkuch": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 3392,
+      "code_bytes_on": 3392
+    },
+    "benchmark.binary-trees:binary-trees": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 8640,
+      "code_bytes_on": 8640
+    },
+    "benchmark.struct-arrays:struct-arrays-bench": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 1584,
+      "code_bytes_on": 1584
+    },
+    ":( typed invariant-xor-loop )": {
+      "changed_from_off": false,
+      "matches_prior_states": [
+        "off",
+        "loops",
+        "representations",
+        "memory",
+        "slp"
+      ],
+      "code_bytes_off": 96,
+      "code_bytes_on": 96
+    },
+    "compiler-next3-representation-workload:representation-loop-values": {
+      "changed_from_off": true,
+      "matches_prior_states": [
+        "representations"
+      ],
+      "code_bytes_off": 2496,
+      "code_bytes_on": 2448
+    },
+    ":( typed memory-loop-work )": {
+      "changed_from_off": true,
+      "matches_prior_states": [
+        "memory"
+      ],
+      "code_bytes_off": 496,
+      "code_bytes_on": 496
+    },
+    "benchmark.scalar-mixing:mixing-pair": {
+      "changed_from_off": true,
+      "matches_prior_states": [
+        "slp"
+      ],
+      "code_bytes_off": 224,
+      "code_bytes_on": 240
+    }
+  }
+}

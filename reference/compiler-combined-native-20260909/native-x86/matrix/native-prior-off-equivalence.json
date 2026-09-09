@@ -1,0 +1,8 @@
+{
+  "old_source": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "new_source": "6b14328972",
+  "old_record": "/home/erg/factor-compiler-next3-candidate-20260909/reference/compiler-next3-20260909/native-final-baseline-check-linear-scan-1.jsonl",
+  "identical_selected_word_sequence": true,
+  "identical_30_outputs": true,
+  "identical_16_final_static_reports": true
+}
