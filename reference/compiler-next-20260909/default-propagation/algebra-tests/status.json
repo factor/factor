@@ -1,0 +1,74 @@
+{
+  "command": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-20260909/algebra-tests.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-integration",
+  "source": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "source_status": "M core/classes/algebra/algebra-tests.factor\n M core/classes/algebra/algebra.factor",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/compiler-next-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "sha256": "7876bb33ea23908a688a2af33ebe9032621a9fe014a62eaf8076d36df6c036a9"
+  },
+  "exit_code": 0,
+  "seconds": 1.7003253749999994,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [
+    {
+      "kind": "phase",
+      "elapsed": 1.6952697080000005,
+      "snapshot_valid": true,
+      "load": [
+        55.67041015625,
+        52.44921875,
+        59.38330078125
+      ],
+      "cpu": 1.4066308749999998,
+      "user": 1.3127450833333332,
+      "system": 0.09388579166666666,
+      "instructions": 21513090565,
+      "cycles": 5919058299,
+      "rss": 236240896,
+      "background_cpu": 0.009154875,
+      "disk_read_bytes": 10723328,
+      "disk_written_bytes": 4096,
+      "text": "TEST-FAILURES 0"
+    }
+  ],
+  "last_process_usage": {
+    "cpu": 1.4066308749999998,
+    "user": 1.3127450833333332,
+    "system": 0.09388579166666666,
+    "instructions": 21513090565,
+    "cycles": 5919058299,
+    "rss": 236240896,
+    "background_cpu": 0.009154875,
+    "disk_read_bytes": 10723328,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}

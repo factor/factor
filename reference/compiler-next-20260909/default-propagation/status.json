@@ -1,0 +1,53 @@
+{
+  "command": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-20260909/propagation-probe.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-integration",
+  "source": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/compiler-next-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/full-tuning-default.factor.image",
+    "sha256": "7876bb33ea23908a688a2af33ebe9032621a9fe014a62eaf8076d36df6c036a9"
+  },
+  "exit_code": 0,
+  "seconds": 7.106621999999998,
+  "timed_out": false,
+  "foreground_refresh_failures": 2,
+  "phase_usage": [],
+  "last_process_usage": {
+    "cpu": 3.710668416666666,
+    "user": 3.571312333333333,
+    "system": 0.13935608333333332,
+    "instructions": 55473257711,
+    "cycles": 14850088896,
+    "rss": 351879168,
+    "background_cpu": 0.015106291666666665,
+    "disk_read_bytes": 8294400,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}

@@ -1,4 +1,5 @@
 USING: accessors arrays assocs classes classes.algebra
+classes.algebra.private classes.private locals namespaces
 classes.tuple classes.union generic generic.private growable
 kernel math prettyprint quotations random sbufs sequences
 stack-checker strings tools.test vectors words ;
@@ -361,3 +362,45 @@ TUPLE: xh < xb ;
 { sa } [ sa { sa sb sc } min-class ] unit-test
 
 [ \ + flatten-class ] must-fail
+
+! Idempotency for named classes, including different metaclasses.
+{ t } [
+    { object null fixnum integer number string sequence a b c sa
+      no-docs no-docs-union generic-class mixin-with-one-member }
+    [ [ dup dup class-and eq? ] [ dup dup class-or eq? ] bi and ] all?
+] unit-test
+
+: anonymous-identity-cases ( -- classes )
+    { }
+    { integer string } anonymous-union boa suffix
+    { object integer } anonymous-intersection boa suffix
+    { } anonymous-union boa suffix
+    { } anonymous-intersection boa suffix
+    object anonymous-complement boa suffix
+    integer [ even? ] anonymous-predicate boa suffix ;
+
+:: legacy-class-and ( first second -- class )
+    first second class-and-cache get [ (class-and) ] symmetric-class-op ;
+
+:: legacy-class-or ( first second -- class )
+    first second class-or-cache get [ (class-or) ] symmetric-class-op ;
+
+! Anonymous descriptors use structural cache keys. A distinct equal clone
+! must retain the existing cached result, including for opaque predicates
+! whose later class<= query can depend on descriptor identity.
+:: cached-anonymous-identity? ( class -- ? )
+    class clone :> equal-class
+    class class legacy-class-and :> old-and
+    class class legacy-class-or :> old-or
+    equal-class equal-class class-and :> new-and
+    equal-class equal-class class-or :> new-or
+    class equal-class eq? not
+    old-and new-and eq? and old-or new-or eq? and
+    equal-class old-and class<= equal-class new-and class<= = and
+    equal-class old-or class<= equal-class new-or class<= = and ;
+
+{ t } [
+    anonymous-identity-cases [
+        [ init-caches cached-anonymous-identity? ] with-scope
+    ] all?
+] unit-test
