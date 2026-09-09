@@ -32,6 +32,7 @@ class RuntimeLibraryProbe(unittest.TestCase):
                     command = probe + '\ncheck_ret() { :; }\ncheck_library_exists "$1" "$2"'
                     run = subprocess.run(['bash', '-c', command, 'probe', name, soname], env=env,
                                          cwd=directory, capture_output=True, text=True, timeout=30)
+                    self.assertEqual(run.returncode, 0 if expected == 'found.' else 1)
                     self.assertEqual(run.stdout, f'Checking for library {name}...{expected}\n')
             bad = dict(env, CC='/nonexistent/compiler')
             run = subprocess.run(['bash', '-c', probe + '\ncheck_library_exists factor-probe libfactor-probe.so.1'],
