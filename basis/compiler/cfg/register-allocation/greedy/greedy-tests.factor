@@ -271,6 +271,55 @@ IN: compiler.cfg.register-allocation.greedy.tests
     1 { { 0 30 } } { 0 4 24 26 28 30 } test-interval local-split-plan
 ] unit-test
 
+! Final definitions and uses preserve their exact lifetime end. An existing
+! store or a live-through tail must still use the normal spill path.
+{ f f 0 t f 4 t 5 t 5 } [
+    f rematerialize-constants? [
+        init-recolor-test
+        1 { { 0 0 } } { 0 } test-interval finish-local-product
+        [ reload-from>> ] [ spill-to>> ] [ live-interval-end ] tri
+        1 { { 4 4 } } { 4 } test-interval
+        dup first-use f >>def-rep int-rep >>use-rep drop
+        finish-local-product
+        [ reload-from>> >boolean ] [ spill-to>> ] [ live-interval-end ] tri
+        1 { { 4 4 } } { 4 } test-interval
+        1 int-rep assign-spill-slot >>spill-to finish-local-product
+        [ spill-to>> >boolean ] [ live-interval-end ] bi
+        1 { { 4 10 } } { 4 } test-interval finish-local-product
+        [ spill-to>> >boolean ] [ live-interval-end ] bi
+    ] with-variable
+] unit-test
+
+! A real split stores at the definition and reloads for the final use.
+! The later instruction forces expiry so an invented trailing store is
+! observable, rather than silently remaining in the pending heap at return.
+:: local-final-use-fixture ( -- graph snapshot )
+    init-recolor-test
+    V{ T{ ##load-integer { dst 1 } { val 42 } }
+        T{ ##replace { src 1 } { loc D: 0 } }
+        T{ ##load-integer { dst 2 } { val 7 } }
+        T{ ##replace { src 2 } { loc D: 1 } }
+        T{ ##return } } [ clone ] map insns>cfg :> graph
+    graph cfg set graph snapshot-value-flow :> snapshot
+    graph destruct-ssa graph number-instructions graph prepare-greedy-regions
+    graph compute-live-intervals :> intervals
+    intervals [ vreg>> 1 = ] find nip :> interval
+    interval last-use n>> :> n
+    interval 11 n n 1 4array apply-local-split
+    [ greedy-queue get heap-empty? ] [
+        greedy-queue get heap-pop drop 10 greedy-assign
+    ] until
+    intervals [ vreg>> 2 = ] find nip 10 greedy-assign
+    graph greedy-unions get values concat assign-registers
+    graph resolve-data-flow graph snapshot ;
+
+{ 1 1 } [
+    f rematerialize-constants? [
+        local-final-use-fixture [ check-value-flow ] 2keep drop
+        entry>> instructions>> [ [ ##spill? ] count ] [ [ ##reload? ] count ] bi
+    ] with-variable
+] unit-test
+
 ! A hint alone cannot evict a mandatory atomic victim with infinite weight.
 { f } [
     init-recolor-test
@@ -360,6 +409,42 @@ IN: compiler.cfg.register-allocation.greedy.tests
         f V{ { 22 25 } } V{ } 1 greedy-region-block boa
         interval swap region-fragment 24 swap rep-at-insn
     ] call
+] unit-test
+
+! A final terminator use can still be live on outgoing CFG edges. Keeping
+! the original upper bound retains its register home; each edge must supply
+! the successor's explicit reload, including the loop's backedge.
+:: local-terminator-tail-fixture ( -- graph snapshot entry hot )
+    init-recolor-test
+    V{ T{ ##load-integer { dst 1 } { val 42 } } T{ ##branch } }
+    [ clone ] map 0 insns>block :> entry
+    V{ T{ ##compare-integer-imm-branch { src1 1 } { src2 0 } { cc cc= } } }
+    [ clone ] map 1 insns>block :> hot
+    V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##return } }
+    [ clone ] map 2 insns>block :> tail
+    entry hot connect-bbs hot hot connect-bbs hot tail connect-bbs
+    entry block>cfg :> graph
+    graph cfg set graph snapshot-value-flow :> snapshot
+    graph destruct-ssa graph number-instructions graph prepare-greedy-regions
+    graph compute-live-intervals first :> interval
+    interval interval-region-blocks :> blocks
+    blocks [ block>> entry eq? ] find nip interval swap region-fragment
+    10 greedy-assign
+    blocks [ block>> entry eq? not ] filter [| block |
+        interval block region-fragment :> fragment
+        fragment last-use n>> :> n
+        fragment 11 n n 1 4array apply-local-split
+    ] each
+    graph greedy-unions get values concat assign-registers
+    graph resolve-data-flow graph snapshot entry hot ;
+
+{ t t t } [
+    f rematerialize-constants? [
+        local-terminator-tail-fixture [ check-value-flow ] 2dip
+        [ successors>> first instructions>> [ ##spill? ] any? ]
+        [ [ instructions>> [ ##spill? ] any? not ]
+          [ successors>> [ instructions>> [ ##spill? ] any? ] all? ] bi ] bi*
+    ] with-variable
 ] unit-test
 
 ! Run real pressure through the original-SSA/final-machine verifier too.
