@@ -1,0 +1,31 @@
+Unit Test: {
+    { ( logLevel text args -- ) }
+    [ \ TraceLogCallback "callback-effect" word-prop ]
+}
+Unit Test: { { 2 } [ 4 \ trace-log def>> nth ] }
+Unit Test: { { 1 } [ 4 \ text-format def>> nth ] }
+Unit Test: { { "literal 100%" } [ "literal 100%%" text-format ] }
+Unit Test: {
+    { "7/2.50/-3/4.5/11" }
+    [ "%d/%.2f/%d/%.1f/%d" 7 2.5 -3 4.5 11 raylib-test-format ]
+}
+Unit Test: {
+    { { 3 "%d/%.2f" 7 2.5 } }
+    [
+        [
+            [ capture-raylib-log ] TraceLogCallback [
+                load-local 0 get-local [
+                    load-local LOG_ALL set-trace-log-level
+                    0 get-local set-trace-log-callback
+                    LOG_INFO "%d/%.2f" 7 2.5 raylib-test-log
+                    raylib-log-result get-global 1 drop-locals
+                ] curry [
+                    f set-trace-log-callback
+                    LOG_INFO set-trace-log-level
+                ] finally 1 drop-locals
+            ] with-callback
+        ] compile-call
+    ]
+}
+TEST FAILURES 0
+COMPILER ERRORS 0

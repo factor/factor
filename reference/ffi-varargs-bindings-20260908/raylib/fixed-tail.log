@@ -1,0 +1,62 @@
+Unit Test: {
+    { "7/2.50/-3/4.5/11" }
+    [ "%d/%.2f/%d/%.1f/%d" 7 2.5 -3 4.5 11 fixed-format ]
+}
+=== Expected:
+"7/2.50/-3/4.5/11"
+=== Got:
+"113590000/0.00/-3/0.0/7"
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        { "7/2.50/-3/4.5/11" }
+        [ "%d/%.2f/%d/%.1f/%d" 7 2.5 -3 4.5 11 fixed-format ]
+        \ (unit-test) 11 experiment
+        => :test-failures test-failures get empty? compiler-errors
+        get assoc-empty? and [ 0 ] [ 1 ] if exit
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
