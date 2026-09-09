@@ -2,7 +2,7 @@
 """Validate isolated feature records, retain all cases, and separate corpus/witnesses."""
 from pathlib import Path
 import argparse,gzip,json,math,statistics
-p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--prefix',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--old-baseline-record',type=Path);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--prefix',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--old-baseline-record',type=Path);p.add_argument('--protocol',choices=['shared','individual'],default='shared');a=p.parse_args()
 features=['loops','representations','memory','slp'];metrics=['instructions','cpu_seconds','ns'];identity=None;scope_words=None;language=None;metric_ids=None;measured=0
 
 def read_rows(path):
@@ -56,8 +56,9 @@ def geo(values):return math.exp(statistics.mean(math.log(x) for x in values))
 
 corpus=[w for w,_ in language[:26]];witnesses=[w for w,_ in language[26:]];assert len(set(corpus+witnesses))==30
 results={};observations={}
+shared_off=[read(a.prefix+'-baseline','loops',False,'timing',i) for i in [1,2]] if a.protocol=='shared' else None
 for f in features:
- runs={s:[read(a.prefix+'-'+f+'-'+s,f,s=='on','timing',i) for i in [1,2]] for s in ['off','on']};observations[f]=runs
+ runs={'off':shared_off if shared_off is not None else [read(a.prefix+'-'+f+'-off',f,False,'timing',i) for i in [1,2]],'on':[read(a.prefix+'-'+f+'-on',f,True,'timing',i) for i in [1,2]]};observations[f]=runs
  equal={};checked_equal={}
  for s in ['off','on']:
   equal[s]=all(static(runs[s][0]['code'][w])==static(runs[s][1]['code'][w]) for w in metric_ids);assert equal[s],('Static metrics differ across rounds',f,s)
@@ -72,7 +73,7 @@ for f in features:
   rounds.append({'compile':{m:on['compile'][m]/off['compile'][m] for m in metrics},'corpus_geomean':{m:geo(cases[w][m] for w in corpus) for m in metrics},'per_case':cases})
  per_case={w:{m:geo(r['per_case'][w][m] for r in rounds) for m in metrics} for w,_ in language}
  results[f]={'rounds':rounds,'compile_geomean':{m:geo(r['compile'][m] for r in rounds) for m in metrics},'corpus_geomean':{m:geo(r['corpus_geomean'][m] for r in rounds) for m in metrics},'witnesses':{w:per_case[w] for w in witnesses},'per_case':per_case,'static_equal_across_rounds':equal,'final_static_matches_checked':checked_equal,'final_static':{s:{w:final_static(runs[s][0]['code'][w]) for w in metric_ids} for s in ['off','on']}}
-assert measured==1440
-result={'accepted':True,'source_commit':identity[0],'image_sha256':identity[1],'vm_sha256':identity[2],'checked_processes':5,'timing_processes':16,'measured_batches':measured,'scope_count':len(scope_words),'language_outputs_match':True,'corpus_cases':corpus,'witness_cases':witnesses,'metric_ids':metric_ids,'default_off_first12_match_old':old_equal,'all_off_groups_match_checked_baseline':True,'features':results,'observations':observations}
+assert measured==(900 if a.protocol=='shared' else 1440)
+result={'accepted':True,'source_commit':identity[0],'image_sha256':identity[1],'vm_sha256':identity[2],'checked_processes':5,'timing_processes':10 if a.protocol=='shared' else 16,'protocol':a.protocol,'shared_off_anchors':a.protocol=='shared','comparisons_correlated':a.protocol=='shared','temporal_order':['off',*features,*reversed(features),'off'] if a.protocol=='shared' else [v for f in features for v in ['off',f,f,'off']],'measured_batches':measured,'scope_count':len(scope_words),'language_outputs_match':True,'corpus_cases':corpus,'witness_cases':witnesses,'metric_ids':metric_ids,'default_off_first12_match_old':old_equal,'all_off_groups_match_checked_baseline':True,'features':results,'observations':observations}
 a.output.write_text(json.dumps(result,indent=2)+'\n')
 for f,d in results.items():print(f,'compiler',d['compile_geomean'],'corpus26',d['corpus_geomean'],'witnesses',d['witnesses'])
