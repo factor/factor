@@ -14,7 +14,8 @@ M: uniscribe-renderer flush-layout-cache
     cached-script-strings get-global purge-cache ;
 
 M: uniscribe-renderer string>image
-    cached-script-string script-string>image { 0 0 } ;
+    cached-script-string
+    [ script-string>image ] [ origin>> { 0 0 } or scale-dim vneg ] bi ;
 
 M: uniscribe-renderer x>offset
     [ 2drop 0 ] [

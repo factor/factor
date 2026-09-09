@@ -45,7 +45,41 @@ API references:
 - [ScriptShapeOpenType feature ranges](https://learn.microsoft.com/en-us/windows/win32/api/usp10/nf-usp10-scriptshapeopentype)
 - [DirectWrite color-font support](https://learn.microsoft.com/en-us/windows/win32/directwrite/color-fonts)
 
+## Additional Uniscribe corrections
+
+- Empty layouts no longer call `ScriptStringAnalyse` with zero characters.
+  They retain font height, return caret position zero, and produce an empty image.
+- Caret conversion unwraps selections before converting UTF-16 indexes. Native
+  probes previously raised `no-method` errors for both caret directions.
+- Layouts register their disposable owner only after native setup succeeds,
+  avoiding a partially initialized owner when setup fails.
+- Selection coverage converts the starting UTF-16 prefix once and advances
+  through codepoints, removing repeated prefix encoding for long selections.
+- Transparent and selected text use `ANTIALIASED_QUALITY` during native analysis
+  and drawing. `DEFAULT_QUALITY` can produce ClearType RGB channel differences,
+  which are invalid as a single-channel coverage mask. Opaque plain text retains
+  the system quality. Native tests also check fallback-font mask coverage.
+- Rasterization expands its padding when ink approaches the guard region, then
+  crops to the union of logical bounds and actual ink. This preserves italic
+  overhang and tall stacks of combining accents. Logical dimensions and caret
+  coordinates stay unchanged; the UI applies the resulting bitmap offset.
+  Zero-advance combining marks still render: zero advance does not imply empty
+  ink. Native examples include standalone U+0301 and U+0338 in Consolas.
+- Offscreen rendering restores the original selected bitmap on success and
+  exceptions before deleting the temporary DIB. Before the fix, 30 renders on
+  one DC increased live GDI objects from 4 to 34; afterward the count stays at 4.
+  Bitmap readback also flushes GDI drawing before copying DIB memory.
+
 ## Validation
+
+The additional Uniscribe pass finishes with 178 checks from the saved image,
+including nine native overhang regressions and offscreen GDI ownership tests.
+Both source-reload and saved-image runs report zero failures; the saved-image
+run does not reload implementations.
+The overhang tests compare coverage against an independently padded reference,
+including 24 stacked accents, standalone zero-advance marks, opaque native pixels,
+selection geometry, unchanged advances, and UI bitmap offsets. A native UI smoke
+test at 1.5 DPI displays the formerly clipped italic and stacked-accent glyphs.
 
 The two Uniscribe test vocabularies contain 19 native checks, including 18 added
 regressions. The metric tests produced five failures before the fix. Tests cover

@@ -1,5 +1,5 @@
 USING: accessors continuations fonts fonts.shaping kernel locals math math.functions
-namespaces opengl tools.test ui.text ;
+namespaces opengl tools.test ui.text ui.text.directwrite ui.text.private ;
 IN: ui.text.directwrite.tests
 
 ! UI coordinates stay logical as native layouts change backing scale.
@@ -11,10 +11,14 @@ IN: ui.text.directwrite.tests
         32 sans-serif-font 32 font-with-tab-width "a\tb" x>offset
     ] [ original gl-scale-factor set-global ] finally ;
 
-{ t 2 } [ scaled-tab-caret [ 32.0 0.01 ~ ] dip ] unit-test
+{ t 2 } [
+    directwrite-renderer font-renderer [ scaled-tab-caret [ 32.0 0.01 ~ ] dip ] with-variable
+] unit-test
 
 { t } [
-    sans-serif-font right-to-left font-with-direction "abc אבג"
-    [ 0 -rot offset>x ] [ 0 -rot x>offset ] 2bi
-    [ 0 > ] [ 0 > ] bi* and
+    directwrite-renderer font-renderer [
+        sans-serif-font right-to-left font-with-direction "abc אבג"
+        [ 0 -rot offset>x ] [ 0 -rot x>offset ] 2bi
+        [ 0 > ] [ 0 > ] bi* and
+    ] with-variable
 ] unit-test
