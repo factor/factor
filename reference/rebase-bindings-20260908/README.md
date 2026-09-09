@@ -6,7 +6,7 @@ All runs used a new isolated agent1 tree at `/home/erg/factor-rebase-validation-
 
 ## Corrections demonstrated by tests
 
-- `finder-before.log`: importing both `endian` and `alien.data` makes the incoming unqualified `little-endian?` ambiguous. The former is the generated predicate for the endian singleton; the latter detects native byte order. Qualifying all four uses as `alien.data:little-endian?` resolves the parser error.
+- `finder-before.log`: importing both `endian` and `alien.data` makes the incoming unqualified `little-endian?` ambiguous. The former is the generated predicate for the endian singleton; the latter detects native byte order. Qualifying all three uses as `alien.data:little-endian?` resolves the parser error.
 - `linux-native-errno-before.log`: incoming `unsupported-ioctl?` compared the numeric errno with an array of constant *words*, so EINVAL returned false. Evaluating the four errno constants before constructing the array fixes it. The regression now checks EINVAL, ENOTTY, ENOSYS and EOPNOTSUPP, alongside unrelated EBADF/EACCES and a non-error object. Other incoming array literals were reviewed; the event-mask table intentionally stores alien enum words and converts them through `enum>number`.
 - Both fixes are committed as `cf93253f36`. `linux-native.log` records all 20 unit tests and 8 expected-failure tests passing, including existing libudev callback-signature coverage preserved by conflict resolution. This runner tests `linux.input-events` recursively, so its FFI tests run once.
 
@@ -26,7 +26,7 @@ The full Zig VM initially failed Linux ARM64 cross-compilation because image map
 
 ## ARM64 emulation boundary
 
-`linux-arm64-qemu.log` runs the same Factor integration tests. The20 ordinary unit tests pass; three of 8 expected-failure tests differ because QEMU returns ENOTTY 25 for these input ioctl requests before validating fd=-1, whereas a native Linux kernel returns EBADF 9. The first optional ioctl therefore correctly returns false under emulation; the other two propagate ENOTTY. `ioctl-control.c` reproduces the exact three requests directly in C; `ioctl-native-c.log` and `ioctl-arm64-qemu-c.log` establish this distinction independently of Factor. The correct native expectations were preserved. No input device or graphical session was opened.
+`linux-arm64-qemu.log` runs the same Factor integration tests. The 20 ordinary unit tests pass; three of 8 expected-failure tests differ because QEMU returns ENOTTY 25 for these input ioctl requests before validating fd=-1, whereas a native Linux kernel returns EBADF 9. The first optional ioctl therefore correctly returns false under emulation; the other two propagate ENOTTY. `ioctl-control.c` reproduces the exact three requests directly in C; `ioctl-native-c.log` and `ioctl-arm64-qemu-c.log` establish this distinction independently of Factor. The correct native expectations were preserved. No input device or graphical session was opened.
 
 ## Reproduction
 

@@ -3,6 +3,11 @@
 Checked 2026-09-08 against stable released headers, after the variadic binding
 cleanup. This report inventories declarations; it does not upgrade libraries.
 
+The findings below are the preserved baseline. The follow-up
+[Raylib 6.0 completion](../raylib-6-completion-20260908/README.md) and
+[SQLite 3.53.4 completion](../sqlite-3534-completion-20260908/README.md)
+resolve the declaration and ownership gaps, with native regression evidence.
+
 | Library | Binding reference | Latest stable | Result |
 | --- | --- | --- | --- |
 | Raylib | 6.0 | 6.0, 2026-04-23 | All 600 exported function names; nine function type/arity discrepancies, one callback signedness mismatch, one missing enum member |

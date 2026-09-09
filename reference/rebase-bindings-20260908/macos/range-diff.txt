@@ -1,0 +1,41 @@
+ 1:  5a2e08d354 =  1:  251858c496 alien: implement ARM64 variadic callbacks and native va_list
+ 2:  23ab3b259d =  2:  db93717d44 test: record ARM64 varargs ABI regression evidence
+ 3:  fac2e4dd62 =  3:  96c5779e79 alien: preserve aggregate alignment through ARM64 varargs
+ 4:  ab34e88f90 =  4:  c39bed697a test: verify Linux ARM64 varargs under emulation
+ 5:  b82192b546 =  5:  e491611e12 test: record final ARM64 alignment regression runs
+ 6:  f3ae75ab07 !  6:  7cd06de60b test: include native va_list binding signature regressions
+    @@ extra/curses/ffi/ffi-tests.factor (new)
+     +    va_list lookup-c-type alien.varargs:va_list lookup-c-type eq?
+     +] unit-test
+
+    - ## extra/libudev/libudev-tests.factor (new) ##
+    + ## extra/libudev/libudev-tests.factor ##
+     @@
+    -+! Check the deprecated callback's complete signature without opening libudev.
+    -+USING: effects libudev tools.test words ;
+    -+IN: libudev.tests
+    +-USING: accessors kernel libudev tools.test ;
+    ++USING: accessors effects kernel libudev tools.test words ;
+    + IN: libudev.tests
+    +
+    + ! Deterministic missing capability; no udev object or device is touched.
+    + { f } [ "factor_deliberately_missing_udev_symbol" udev-function-available? ] unit-test
+    + [ "factor_deliberately_missing_udev_symbol" require-udev-function ]
+    + [ unavailable-udev-function? ] must-fail-with
+     +
+    ++! Check the deprecated callback's complete signature without opening libudev.
+     +{ ( udev priority file line fn format args -- ) } [
+     +    \ udev_set_log_fn_callback "callback-effect" word-prop
+     +] unit-test
+ 7:  f3bd59c73a =  7:  e780dee259 test: preserve GCC vector-union va_arg oracle copies under optimization
+ 8:  bad7a4f010 =  8:  b5936687f3 test: complete GCC and Clang Linux ARM64 varargs matrix
+ 9:  f9b63c2cef =  9:  f3511f361c docs: summarize ARM64 varargs implementation and qualification
+10:  454af1b852 = 10:  ac2ed9ce47 curses: correct variadic calls and verify headless formatting
+11:  73a402d41f = 11:  5ad9e69a12 sqlite: complete variadic formatting bindings and preserve ownership
+12:  91aeac870e = 12:  b39b237f1f lua: enable variadic formatting and native va_list bindings
+13:  d95546eb5f = 13:  669abbed9f test: record Lua and SQLite native varargs regression evidence
+14:  d6f31d2616 = 14:  f350a838de raylib: correct variadic calls and cover native formatting callbacks
+15:  d46fd41f31 = 15:  717a7639ca ffi: finish curl and BIO varargs cleanup with native regressions
+16:  9cf4b25ad5 = 16:  1fb9bc0d62 test: merge X11 and GTK varargs regressions with current bindings
+17:  550dd5e5a6 = 17:  b081fa24d4 docs: compare SQLite and Raylib bindings against latest releases
+18:  c40418fff8 = 18:  2bff152061 test: record merged variadic binding verification
