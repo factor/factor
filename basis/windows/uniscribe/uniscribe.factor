@@ -12,7 +12,8 @@ windows.usp10 ;
 SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
-TUPLE: script-string < disposable font string metrics ssa size image ;
+! Size and metrics remain logical; origin locates (0,0) inside the ink bitmap.
+TUPLE: script-string < disposable font string metrics ssa size image origin ;
 
 <PRIVATE
 
@@ -98,12 +99,65 @@ PRIVATE>
 : selection-start/end ( script-string -- iMinSel iMaxSel )
     string>> dup selection? [ [ start>> ] [ end>> ] bi ] [ drop 0 0 ] if ;
 
-:: draw-script-string ( ssa size script-string -- )
-    ! Selection is composited separately; system highlight colors are never
-    ! suitable for an application-provided RGBA selection background.
-    script-string drop
-    ssa 0 0 ETO_OPAQUE { 0 0 } size <RECT> 0 0 FALSE
+:: draw-script-string-at ( ssa size origin -- )
+    ssa origin first2 ETO_OPAQUE { 0 0 } size <RECT> 0 0 FALSE
     ScriptStringOut check-ole32-error ;
+
+:: bitmap-ink-bounds ( image background logical-size padding -- bounds )
+    image dim>> first2 :> height :> width
+    padding :> left! padding :> top!
+    logical-size first padding + :> right!
+    logical-size second padding + :> bottom!
+    image bitmap>> uint32_t cast-array [ :> index
+        0xffffff bitand background = not [
+            index width mod :> x
+            height 1 - index width /i - :> y
+            left x min left! top y min top!
+            right x 1 + max right! bottom y 1 + max bottom!
+        ] when
+    ] each-index
+    left top right bottom 4array ;
+
+:: crop-text-bitmap ( image bounds -- image' )
+    bounds first4 :> bottom :> right :> top :> left
+    right left - :> width bottom top - :> height
+    image dim>> first :> source-width
+    image dim>> second bottom - :> source-row
+    image bitmap>> uint32_t cast-array :> source
+    width height * 4 * <byte-array> :> bytes
+    bytes uint32_t cast-array :> target
+    target [ :> index drop
+        index width /i source-row + source-width *
+        index width mod left + + source nth
+        index target set-nth
+    ] each-index
+    image clone bytes >>bitmap width height 2array >>dim ;
+
+:: padded-text-bitmap ( dc ssa script padding -- image origin )
+    script size>> :> logical-size
+    logical-size [ padding 2 * + ] map :> dim
+    ! COLORREF and DIB pixels have opposite red/blue ordering.
+    dc 0 SetBkColor :> native-background
+    dc native-background SetBkColor drop
+    native-background 0xff bitand 16 shift
+    native-background 0xff00 bitand bitor
+    native-background -16 shift 0xff bitand bitor :> background
+    dim dc [ ssa dim padding dup 2array draw-script-string-at ] make-bitmap-image :> image
+    image background logical-size padding bitmap-ink-bounds :> bounds
+    ! Keep a generous clear guard, expanding for stacked marks instead of
+    ! assuming a fixed overhang limit. The final crop also retains whitespace.
+    padding 2 /i :> guard
+    bounds first guard < bounds second guard < or
+    bounds third dim first guard - > or
+    bounds fourth dim second guard - > or [
+        dc ssa script padding 2 * padded-text-bitmap
+    ] [
+        image bounds crop-text-bitmap
+        padding bounds first - padding bounds second - 2array
+    ] if ;
+
+:: draw-script-string ( ssa size script-string -- )
+    script-string drop ssa size { 0 0 } draw-script-string-at ;
 
 ! The image is a grayscale rendering of a text string. We want the text to
 ! have the given color. Move the blue channel of the image (any color
@@ -169,17 +223,23 @@ PRIVATE>
         256 <iota> [ 255 / font foreground>> bg rot over-rgba packed-rgba ] map
     ] map :> palettes
     script-string selection-columns :> columns
+    script-string origin>> { 0 0 } or :> origin
+    image dim>> script-string size>> or first2 :> height :> width
     image bitmap>> uint32_t cast-array :> pixels
     pixels [ :> index
-        0xff bitand
-        index columns length mod columns nth palettes nth nth
-            index pixels set-nth
+        0xff bitand :> coverage
+        index width mod origin first - :> x
+        height 1 - index width /i - origin second - :> y
+        x 0 >= x columns length < and
+        y 0 >= y script-string size>> second < and and
+        [ x columns nth ] [ 0 ] if palettes nth
+        coverage swap nth index pixels set-nth
     ] each-index
     image RGBA >>component-order ;
 
 :: render-image ( dc ssa script-string -- image )
-    script-string size>> :> size
-    size dc [ ssa size script-string draw-script-string ] make-bitmap-image
+    dc ssa script-string script-string size>> second 16 max
+    padded-text-bitmap script-string swap >>origin drop
     script-string font>> background>> >rgba alpha>> 1 number=
     script-string string>> selection? not and
     [ ] [ script-string composite-text-image ] if ;
@@ -240,7 +300,8 @@ SYMBOL: cached-script-strings
 
 : script-string>image ( script-string -- image )
     dup image>> [
-        dup size>> [ zero? ] any? [
+        ! Nonempty zero-advance strings can still contain visible marks.
+        dup ssa>> not [
             dup size>> <image> swap >>dim B{ } >>bitmap
                 RGBA >>component-order ubyte-components >>component-type
                 t >>upside-down? >>image
