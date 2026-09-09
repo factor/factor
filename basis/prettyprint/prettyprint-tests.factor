@@ -1,12 +1,23 @@
 USING: accessors arrays classes.intersection classes.maybe
 classes.union compiler.units continuations definitions effects
 eval generic generic.standard hashtables io io.streams.duplex
-io.streams.string kernel listener make math namespaces parser
+io.streams.string io.styles kernel listener make math namespaces parser
 prettyprint prettyprint.backend prettyprint.config prettyprint.private
-prettyprint.sections see sequences splitting
+prettyprint.sections quotations see sequences splitting
 strings system tools.continuations tools.continuations.private
 tools.test vectors vocabs.parser words ;
 IN: prettyprint.tests
+
+! The walker's current instruction must remain visible past element 100.
+{ t t f } [
+    [
+        f 355 <iota> >quotation 300 3array
+        { } [ callframe. ] tabular-output
+    ] with-string-writer
+    [ "=>" swap subseq? ]
+    [ "354" swap subseq? ]
+    [ "more~" swap subseq? ] tri
+] unit-test
 
 { "4" } [ 4 unparse ] unit-test
 { "4096" } [ 4096 unparse ] unit-test

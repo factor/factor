@@ -93,7 +93,7 @@ SYMBOL: =>
             dup [ second ] [ third ] bi remove-breakpoints
             H{
                 { nesting-limit 3 }
-                { length-limit 100 }
+                { length-limit f }
             } clone [ pprint ] with-variables
         ] with-cell
     ] with-row
