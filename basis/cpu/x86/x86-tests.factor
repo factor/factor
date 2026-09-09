@@ -89,7 +89,11 @@ ${
     ! xor eax, eax
     cpu x86.64? os unix? and B{ 49 192 } B{ } ?
     ! mov al, 2
-    cpu x86.64? os unix? and B{ 176 2 } B{ } ?
+    cpu x86.64? [
+        os unix? B{ 176 2 }
+        ! movq rcx, xmm0; movq rdx, xmm1
+        B{ 102 72 15 126 193 102 72 15 126 202 } ?
+    ] [ B{ } ] if
 } [
     [ { } %prepare-var-args ] B{ } make
     [
@@ -100,6 +104,19 @@ ${
         } %prepare-var-args
     ] B{ } make
 ] unit-test
+
+cpu x86.64? os windows? and [
+    { B{ 102 73 15 126 208 102 73 15 126 217 } } [
+        [
+            {
+                { T{ spill-slot } int-rep RCX }
+                { T{ spill-slot } int-rep RDX }
+                { T{ spill-slot } double-rep XMM2 }
+                { T{ spill-slot } double-rep XMM3 }
+            } %prepare-var-args
+        ] B{ } make
+    ] unit-test
+] when
 
 ! %prologue
 { t } [

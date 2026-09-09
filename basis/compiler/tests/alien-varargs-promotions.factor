@@ -58,6 +58,8 @@ FUNCTION: double vap_call_reader ( void* callback )
     int { int bool } cdecl 1 alien-indirect-varargs ;
 : indirect-vap-unsigned ( tag value ptr -- result )
     int { int vap-unsigned-enum } cdecl 1 alien-indirect-varargs ;
+: indirect-vap-float ( tag value ptr -- result )
+    double { int float } cdecl 1 alien-indirect-varargs ;
 { 1 } [
     0 t "vap_read_integer" "varargs-promotions" library-dll dlsym
     indirect-vap-bool
@@ -65,6 +67,10 @@ FUNCTION: double vap_call_reader ( void* callback )
 { 65530 } [
     0 vap-positive "vap_read_integer" "varargs-promotions" library-dll dlsym
     indirect-vap-unsigned
+] promotion-unit-test
+{ t } [
+    0 0.1 "vap_read_float" "varargs-promotions" library-dll dlsym
+    indirect-vap-float vap_control_float =
 ] promotion-unit-test
 
 cpu arm.64? [
