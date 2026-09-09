@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! An interface to the sqlite database. Updated against sqlite 3.51.0.
 ! Not all functions have been wrapped.
-USING: alien alien.c-types alien.libraries alien.syntax
+USING: alien alien.c-types alien.libraries alien.syntax alien.varargs
 classes.struct combinators system ;
 IN: db.sqlite.ffi
 
@@ -411,9 +411,9 @@ FUNCTION: int sqlite3_os_init ( )
 
 FUNCTION: int sqlite3_os_end ( )
 
-FUNCTION: int sqlite3_config ( int dummy )
+FUNCTION: int sqlite3_config ( int op, ... )
 
-FUNCTION: int sqlite3_db_config ( sqlite3* dummy, int op )
+FUNCTION: int sqlite3_db_config ( sqlite3* db, int op, ... )
 
 C-TYPE: sqlite3_mem_methods
 STRUCT: sqlite3_mem_methods
@@ -454,13 +454,17 @@ FUNCTION: int sqlite3_get_table ( sqlite3* db, c-string zSql, char*** pazResult,
 
 FUNCTION: void sqlite3_free_table ( char** result )
 
-FUNCTION: c-string sqlite3_mprintf ( c-string dummy )
+! Allocated results must be released with sqlite3_free.
+! The zero-tail declarations accept formats with no conversions requiring arguments.
+! Declare typed FUNCTION-ALIAS call shapes for other formats.
+FUNCTION: char* sqlite3_mprintf ( c-string format, ... )
 
-! FUNCTION: c-string sqlite3_vmprintf ( c-string dummy, va_list dummy )
+FUNCTION: char* sqlite3_vmprintf ( c-string format, va_list args )
 
-FUNCTION: c-string sqlite3_snprintf ( int dummy, c-string dummy, c-string dummy )
+! The caller owns this writable buffer; SQLite returns that same buffer.
+FUNCTION: char* sqlite3_snprintf ( int size, char* buffer, c-string format, ... )
 
-! FUNCTION: c-string sqlite3_vsnprintf ( int dummy, c-string dummy, c-string dummy, va_list dummy )
+FUNCTION: char* sqlite3_vsnprintf ( int size, char* buffer, c-string format, va_list args )
 
 FUNCTION: void* sqlite3_malloc ( int dummy )
 
@@ -926,7 +930,7 @@ FUNCTION: sqlite3_mutex* sqlite3_db_mutex ( sqlite3* dummy )
 
 FUNCTION: int sqlite3_file_control ( sqlite3* dummy, c-string zDbName, int op, void* dummy )
 
-FUNCTION: int sqlite3_test_control ( int op )
+FUNCTION: int sqlite3_test_control ( int op, ... )
 
 FUNCTION: int sqlite3_keyword_count ( )
 
@@ -937,11 +941,12 @@ FUNCTION: int sqlite3_keyword_check ( c-string dummy, int dummy )
 C-TYPE: sqlite3_str
 FUNCTION: sqlite3_str* sqlite3_str_new ( sqlite3* dummy )
 
-FUNCTION: c-string sqlite3_str_finish ( sqlite3_str* dummy )
+! Destroys the builder; the returned allocation is owned by the caller.
+FUNCTION: char* sqlite3_str_finish ( sqlite3_str* builder )
 
-FUNCTION: void sqlite3_str_appendf ( sqlite3_str* dummy, c-string zFormat )
+FUNCTION: void sqlite3_str_appendf ( sqlite3_str* builder, c-string format, ... )
 
-! FUNCTION: void sqlite3_str_vappendf ( sqlite3_str* dummy, c-string zFormat, va_list dummy )
+FUNCTION: void sqlite3_str_vappendf ( sqlite3_str* builder, c-string format, va_list args )
 
 FUNCTION: void sqlite3_str_append ( sqlite3_str* dummy, c-string zIn, int N )
 
@@ -1022,7 +1027,7 @@ FUNCTION: int sqlite3_strglob ( c-string zGlob, c-string zStr )
 
 FUNCTION: int sqlite3_strlike ( c-string zGlob, c-string zStr, uint cEsc )
 
-FUNCTION: void sqlite3_log ( int iErrCode, c-string zFormat )
+FUNCTION: void sqlite3_log ( int iErrCode, c-string zFormat, ... )
 
 FUNCTION: void* sqlite3_wal_hook ( sqlite3* dummy, void* dummy, void* dummy )
 
@@ -1032,7 +1037,7 @@ FUNCTION: int sqlite3_wal_checkpoint ( sqlite3* db, c-string zDb )
 
 FUNCTION: int sqlite3_wal_checkpoint_v2 ( sqlite3* db, c-string zDb, int eMode, int* pnLog, int* pnCkpt )
 
-FUNCTION: int sqlite3_vtab_config ( sqlite3* dummy, int op )
+FUNCTION: int sqlite3_vtab_config ( sqlite3* db, int op, ... )
 
 FUNCTION: int sqlite3_vtab_on_conflict ( sqlite3* dummy )
 
