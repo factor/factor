@@ -133,18 +133,30 @@ def check_spillsets(w):
 
 def check_recolor(w):
     g = graph(w["graph"])
-    coloring(g, w["before"], w.get("allowed"))
+    pending = w.get("new_request")
+    before_graph = {v: neighbors - {pending} for v, neighbors in g.items() if v != pending}
+    coloring(before_graph, w["before"], w.get("allowed"))
     coloring(g, w["after"], w.get("allowed"))
-    require(w["before"] != w["after"], "no recoloring occurred")
+    require(any(w["before"][v] != w["after"][v] for v in before_graph), "no existing assignment recolored")
     for vertex in w.get("fixed", []):
         require(w["before"][vertex] == w["after"][vertex], "recolored fixed vertex")
+    if pending is not None:
+        require(pending in g and pending not in w["before"], "request was already assigned")
+        return
     def cost(colors):
         return sum(weight for left, right, weight in w["affinities"] if colors[left] != colors[right])
     require(cost(w["after"]) < cost(w["before"]), "recoloring did not improve weighted affinity cost")
 
 
+def check_rollback(w):
+    for field in ("unions", "index", "serial", "assignments"):
+        require(field in w["before"] and field in w["after"], "incomplete rollback snapshot")
+    require(w["before"] == w["after"], "failed search did not restore exact allocation state")
+
+
 CHECKS = {"coloring": check_coloring, "split": check_split, "bundle": check_bundle,
-          "eviction": check_eviction, "spillsets": check_spillsets, "recolor": check_recolor}
+          "eviction": check_eviction, "spillsets": check_spillsets, "recolor": check_recolor,
+          "rollback": check_rollback}
 
 
 def validate(document):

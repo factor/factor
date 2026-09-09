@@ -63,6 +63,17 @@ class WitnessChecks(unittest.TestCase):
                       after={"a": 0, "b": 1, "c": 0}, affinities=[["a", "c", 4]])
         self.rejected(audit.check_recolor, sample, lambda x: x["after"].update(b=0))
 
+    def test_augmenting_recolor_assigns_pending_request(self):
+        sample = dict(graph={"a": ["b", "c"], "b": ["a", "c"], "c": ["a", "b"]},
+                      before={"a": 0, "b": 1}, after={"a": 1, "b": 2, "c": 0},
+                      allowed={"a": [0, 1], "b": [1, 2], "c": [0]}, new_request="c")
+        self.rejected(audit.check_recolor, sample, lambda x: x["after"].update(c=2))
+
+    def test_rollback_restores_index_serial(self):
+        state = dict(unions={"r0": [1]}, index=[[0, 2, 1]], serial=3, assignments={"1": "r0"})
+        sample = dict(before=state, after=copy.deepcopy(state))
+        self.rejected(audit.check_rollback, sample, lambda x: x["after"].update(serial=4))
+
 
 if __name__ == "__main__":
     unittest.main()
