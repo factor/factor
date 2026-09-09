@@ -1,0 +1,396 @@
+Unit Test: {
+    { ( logLevel text args -- ) }
+    [ \ TraceLogCallback "callback-effect" word-prop ]
+}
+Unit Test: { { 2 } [ 4 \ trace-log def>> nth ] }
+Unit Test: { { 1 } [ 4 \ text-format def>> nth ] }
+Unit Test: { { "literal 100%" } [ "literal 100%%" text-format ] }
+Unit Test: {
+    { "7/2.50/-3/4.5/11" }
+    [ "%d/%.2f/%d/%.1f/%d" 7 2.5 -3 4.5 11 raylib-test-format ]
+}
+Unit Test: {
+    { { 3 "%d/%.2f" 7 2.5 } }
+    [
+        [
+            [ capture-raylib-log ] TraceLogCallback [
+                load-local 0 get-local [
+                    load-local LOG_ALL set-trace-log-level
+                    0 get-local set-trace-log-callback
+                    LOG_INFO "%d/%.2f" 7 2.5 raylib-test-log
+                    raylib-log-result get-global 1 drop-locals
+                ] curry [
+                    f set-trace-log-callback
+                    LOG_INFO set-trace-log-level
+                ] finally 1 drop-locals
+            ] with-callback
+        ] compile-call
+    ]
+}
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: accessors alien alien.accessors alien.c-types alien.data
+alien.strings alien.syntax arrays byte-arrays compiler.test
+continuations io.encodings.utf8 kernel libc locals namespaces
+raylib sequences tools.test ;
+IN: raylib.tests
+
+Unit Test: {
+    { B{ 0 65 255 0 66 } 5 }
+    [
+        [
+            [ raylib-binary-loader ] LoadFileDataCallback [
+                [
+                    load-local 0 get-local [
+                        load-local
+                        0 get-local set-load-file-data-callback
+                        0 int <ref> load-local
+                        "native-binary" 0 get-local
+                        load-file-data dup alien? 0 get-local [
+                            load-local 0 get-local int deref
+                            memory>byte-array 1 drop-locals
+                        ] curry
+                        [ drop "ownership pointer was lost" ] if
+                        0 get-local int deref 2 drop-locals
+                    ] curry [
+                        f set-load-file-data-callback
+                        raylib-binary-allocation get-global
+                        unload-file-data
+                        f raylib-binary-allocation set-global
+                    ] finally 1 drop-locals
+                ] call
+            ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { B{ 0 65 255 0 66 } }
+    [
+        [
+            0 int <ref> load-local
+            "AEH/AEI=" 0 get-local decode-data-base64 load-local
+            0 get-local -1 get-local [
+                2 load-locals -1 get-local 0 get-local int deref
+                memory>byte-array 2 drop-locals
+            ] curry curry 0 get-local
+            [ load-local 0 get-local mem-free 1 drop-locals ]
+            curry finally 2 drop-locals
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 3 2 }
+    [
+        [
+            3 2 RED gen-image-color load-local 0 get-local [
+                load-local 0 int <ref> load-local
+                -1 get-local ".png" 0 get-local
+                export-image-to-memory load-local
+                0 get-local -1 get-local [
+                    2 load-locals
+                    ".png" -1 get-local 0 get-local int deref
+                    load-image-from-memory load-local
+                    0 get-local [
+                        load-local 0 get-local
+                        [ width>> ] [ height>> ] bi
+                        1 drop-locals
+                    ] curry 0 get-local [
+                        load-local 0 get-local unload-image
+                        1 drop-locals
+                    ] curry finally 3 drop-locals
+                ] curry curry 0 get-local [
+                    load-local 0 get-local mem-free
+                    1 drop-locals
+                ] curry finally 3 drop-locals
+            ] curry 0 get-local [
+                load-local 0 get-local unload-image
+                1 drop-locals
+            ] curry finally 1 drop-locals
+        ] compile-call
+    ]
+}
+INFO: IMAGE: Data loaded successfully (3x2 | R8G8B8A8 | 1 mipmaps)
+Unit Test: {
+    { 2 8000 16 1 B{ 0 128 0 127 } }
+    [
+        [
+            B{
+                82 73 70 70 38 0 0 0 87 65 86 69 102 109 116 32
+                16 0 0 0 1 0 1 0 64 31 0 0 64 31 0 0 1 0 8 0 100
+                97 116 97 2 0 0 0 0 255
+            } load-local
+            ".wav" 0 get-local 0 get-local length
+            load-wave-from-memory load-local 0 get-local [
+                load-local
+                0 get-local frameCount>> 0 get-local
+                sampleRate>> 0 get-local sampleSize>> 0
+                get-local channels>> 0 get-local data>> 4
+                memory>byte-array 1 drop-locals
+            ] curry 0 get-local
+            [ load-local 0 get-local unload-wave 1 drop-locals ]
+            curry finally 2 drop-locals
+        ] compile-call
+    ]
+}
+INFO: WAVE: Data loaded successfully (8000 Hz, 16 bit, 1 channels)
+Unit Test: {
+    { 3 "abcdef" 6 }
+    [
+        [
+            16 <byte-array> load-local
+            0 get-local "abc" text-copy 3 int <ref> load-local
+            -1 get-local "def" 0 get-local text-append
+            -1 get-local utf8 alien>string 0 get-local int deref
+            2 drop-locals
+        ]
+        compile-call
+    ]
+}
+Must Fail: { [ [ "____" "abc" text-copy ] compile-call ] }
+Must Fail: { [ [ "ab__" "c" 2 int <ref> text-append ] compile-call ] }
+Unit Test: {
+    { t "raylib 6.0\n" }
+    [
+        [
+            "resource:extra/raylib/native/text.txt"
+            absolute-path load-file-text-raw load-local
+            0 get-local [
+                load-local
+                0 get-local alien? 0 get-local utf8 alien>string
+                1 drop-locals
+            ] curry 0 get-local [
+                load-local 0 get-local unload-file-text
+                1 drop-locals
+            ] curry finally 1 drop-locals
+        ]
+        compile-call
+    ]
+}
+INFO: FILEIO: [/Users/erg/factor.worktrees/raylib-6-completion/extra/raylib/native/text.txt] Text file loaded successfully
+Unit Test: {
+    { "raylib 6.0\n" }
+    [
+        [
+            "resource:extra/raylib/native/text.txt"
+            absolute-path load-file-text
+        ]
+        compile-call
+    ]
+}
+INFO: FILEIO: [/Users/erg/factor.worktrees/raylib-6-completion/extra/raylib/native/text.txt] Text file loaded successfully
+Unit Test: {
+    { B{ 114 97 121 108 105 98 32 54 46 48 10 } }
+    [
+        [
+            "resource:extra/raylib/native/text.txt"
+            absolute-path load-file-data-bytes
+        ]
+        compile-call
+    ]
+}
+INFO: FILEIO: [/Users/erg/factor.worktrees/raylib-6-completion/extra/raylib/native/text.txt] File loaded successfully
+Unit Test: {
+    { t "Aλ🙂" "Aλ🙂" }
+    [
+        [
+            { 65 955 128578 } int >c-array load-local
+            0 get-local 3 load-utf8-raw load-local 0 get-local [
+                load-local
+                0 get-local alien? 0 get-local utf8 alien>string
+                1 drop-locals
+            ] curry 0 get-local
+            [ load-local 0 get-local unload-utf8 1 drop-locals ]
+            curry finally -1 get-local 3 load-utf8 2 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t "AEH/AEI=" 9 "AEH/AEI=" 9 }
+    [
+        [
+            0 int <ref> load-local
+            B{ 0 65 255 0 66 } 5 0 get-local
+            encode-data-base64-raw load-local
+            0 get-local -1 get-local [
+                2 load-locals
+                -1 get-local alien? -1 get-local utf8
+                alien>string 0 get-local int deref 2 drop-locals
+            ] curry curry 0 get-local
+            [ load-local 0 get-local mem-free 1 drop-locals ]
+            curry finally
+            B{ 0 65 255 0 66 } 5 -1 get-local encode-data-base64
+            -1 get-local int deref 2 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t "ray two ray" }
+    [
+        [
+            "one two one" "one" "ray" text-replace-alloc-raw
+            load-local 0 get-local [
+                load-local
+                0 get-local alien? 0 get-local utf8 alien>string
+                1 drop-locals
+            ] curry 0 get-local
+            [ load-local 0 get-local mem-free 1 drop-locals ]
+            curry finally 1 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t "a[x]c" }
+    [
+        [
+            "a[b]c" "[" "]" "x" text-replace-between-alloc-raw
+            load-local 0 get-local [
+                load-local
+                0 get-local alien? 0 get-local utf8 alien>string
+                1 drop-locals
+            ] curry 0 get-local
+            [ load-local 0 get-local mem-free 1 drop-locals ]
+            curry finally 1 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t "ab" }
+    [
+        [
+            "a" "b" 1 text-insert-alloc-raw load-local
+            0 get-local [
+                load-local
+                0 get-local alien? 0 get-local utf8 alien>string
+                1 drop-locals
+            ] curry 0 get-local
+            [ load-local 0 get-local mem-free 1 drop-locals ]
+            curry finally 1 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { "ray two ray" "a[x]c" "ab" f }
+    [
+        [
+            "one two one" "one" "ray" text-replace-alloc
+            "a[b]c" "[" "]" "x" text-replace-between-alloc
+            "a" "b" 1 text-insert-alloc
+            "missing delimiters" "[" "]" "x"
+            text-replace-between-alloc
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { "ray two ray" "a[x]c" "ab" "b" "ABC" }
+    [
+        [
+            "one two one" "one" "ray" text-replace
+            "a[b]c" "[" "]" "x" text-replace-between
+            "a" "b" 1 text-insert
+            "a[b]c" "[" "]" get-text-between "abc" text-to-upper
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            f raylib-string-released set
+            2 mem-alloc <raylib-copy-failure> load-local
+            0 get-local [
+                load-local 0 get-local [
+                    pointer>> mem-free
+                    t raylib-string-released set
+                ] copy-raylib-string drop f 1 drop-locals
+            ] curry [ raylib-copy-error? ] recover
+            raylib-string-released get and 1 drop-locals
+        ]
+        compile-call
+    ]
+}
+Unit Test: { { t } [ "RAYLIB_API60_FONT" os-env raylib_api60_controls ] }
+Unit Test: {
+    { t }
+    [
+        {
+            [ ModelSkeleton heap-size ]
+            [ "boneCount" ModelSkeleton offset-of ]
+            [ "_bones" ModelSkeleton offset-of ]
+            [ "bindPose" ModelSkeleton offset-of ]
+            [ Model heap-size ]
+            [ "transform" Model offset-of ]
+            [ "meshCount" Model offset-of ]
+            [ "materialCount" Model offset-of ]
+            [ "_meshes" Model offset-of ]
+            [ "_materials" Model offset-of ]
+            [ "meshMaterial" Model offset-of ]
+            [ "skeleton" Model offset-of ]
+            [ "currentPose" Model offset-of ]
+            [ "boneMatrices" Model offset-of ]
+            [ ModelAnimation heap-size ]
+            [ "name" ModelAnimation offset-of ]
+            [ "boneCount" ModelAnimation offset-of ]
+            [ "keyframeCount" ModelAnimation offset-of ]
+            [ "keyframePoses" ModelAnimation offset-of ]
+            [ AudioStream heap-size ]
+            [ "buffer" AudioStream offset-of ]
+            [ "processor" AudioStream offset-of ]
+            [ "sampleRate" AudioStream offset-of ]
+            [ "sampleSize" AudioStream offset-of ]
+            [ "channels" AudioStream offset-of ]
+        } [ ( -- n ) call-effect ] map 25 <iota>
+        [ raylib_api60_layout ] map =
+    ]
+}
+Unit Test: { { float } [ \ update-model-animation def>> fourth third ] }
+Unit Test: {
+    { t }
+    [
+        [
+            [ 0.5 update-model-animation ] RaylibAnimationProbe
+            [ raylib_api60_animation_case ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 2147483653 }
+    [
+        [
+            [ nip raylib-audio-frames set-global ] AudioCallback
+            [ raylib_api60_audio_case ] with-callback
+            raylib-audio-frames get-global
+        ] compile-call
+    ]
+}
+Unit Test: { { 7 } [ \ load-font-data def>> fourth length ] }
+Unit Test: {
+    { t }
+    [
+        [
+            [ raylib-font-probe ] RaylibFontProbe [
+                load-local
+                "RAYLIB_API60_FONT" os-env 0 get-local
+                raylib_api60_font_case 1 drop-locals
+            ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 16384 }
+    [
+        "FLAG_WINDOW_MOUSE_PASSTHROUGH" "raylib" lookup-word
+        [ ( -- flag ) execute-effect enum>number ] [ f ] if*
+    ]
+}
+Unit Test: { { t } [ "ModelAnimPose" "raylib" lookup-word >boolean ] }
+0
