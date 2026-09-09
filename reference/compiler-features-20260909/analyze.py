@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate the factorial records and retain per-case and per-round ratios."""
 import argparse
+import gzip
 import json
 import math
 from pathlib import Path
@@ -17,12 +18,18 @@ runs = {}
 scope_words = None
 outputs = {}
 
+def read_text(path):
+    if path.exists():
+        return path.read_text()
+    with gzip.open(str(path) + '.gz', 'rt') as stream:
+        return stream.read()
+
 def read(config, mode, ordinal):
     global scope_words
     stem = a.directory / f'{a.prefix}-{config}-{mode}-linear-scan-{ordinal}'
     status = json.loads(stem.with_suffix('.status.json').read_text())
     assert status['ok'] and status['exit_code'] == 0, stem
-    rows = [json.loads(line) for line in stem.with_suffix('.jsonl').read_text().splitlines()]
+    rows = [json.loads(line) for line in read_text(stem.with_suffix('.jsonl')).splitlines()]
     scope, = [r for r in rows if r['kind'] == 'scope']
     assert scope['options'] == dict(gvn=config[0] == '1', rematerialize_constants=config[1] == '1', backtracking_loop_spills=False)
     assert scope['checked'] == (mode == 'check')
