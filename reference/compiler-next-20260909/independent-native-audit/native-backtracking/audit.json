@@ -1,0 +1,114 @@
+{
+  "accepted": true,
+  "scope_words": {
+    "baseline": 28489,
+    "candidate": 28492
+  },
+  "required_candidate_words": [
+    "classes.algebra:class-and",
+    "classes.algebra:class-or",
+    "compiler.cfg.register-allocation.backtracking:reify-entry-transports"
+  ],
+  "added_words": [
+    "compiler.cfg.register-allocation.backtracking:backtracking-edge-entry-reloads",
+    "compiler.cfg.register-allocation.backtracking:edge-entry-reload?",
+    "compiler.cfg.register-allocation.backtracking:reify-entry-transports"
+  ],
+  "removed_words": [],
+  "identical_scope_sequence": false,
+  "compile": {
+    "baseline": [
+      {
+        "ns": 46683463853,
+        "instructions": 576262640812,
+        "kind": "compile",
+        "cpu_seconds": 46.668382662
+      },
+      {
+        "ns": 46812722487,
+        "instructions": 576262756291,
+        "kind": "compile",
+        "cpu_seconds": 46.794984504
+      }
+    ],
+    "candidate": [
+      {
+        "ns": 46536079259,
+        "instructions": 574545574131,
+        "kind": "compile",
+        "cpu_seconds": 46.521051342
+      },
+      {
+        "ns": 46801126629,
+        "instructions": 574549660845,
+        "kind": "compile",
+        "cpu_seconds": 46.785993557
+      }
+    ]
+  },
+  "compile_candidate_over_baseline": {
+    "cpu_seconds": 0.9983274487990321,
+    "instructions": 0.9970237860826129,
+    "ns": 0.9982996049547747
+  },
+  "per_round_compile_candidate_over_baseline": [
+    {
+      "cpu_seconds": 0.9968430163721965,
+      "instructions": 0.9970203401029425,
+      "ns": 0.9968428950674249
+    },
+    {
+      "cpu_seconds": 0.9998078651570185,
+      "instructions": 0.9970272320615928,
+      "ns": 0.9997522925951761
+    }
+  ],
+  "preparation": {
+    "baseline": {
+      "command": [
+        "taskset",
+        "-c",
+        "2",
+        "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+        "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+        "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+        "-no-user-init",
+        "/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepare-greedy.factor"
+      ],
+      "status": 0,
+      "seconds": 2.0008452301844954,
+      "taskpolicy": [],
+      "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+      "initial_image_sha256": "542d992eb62967bf032e4a69dd6a1706d77fd1edc4a3a3c72effe14e59f839e1",
+      "preparation_script_sha256": "3a34870835f2d69148f0ccbc69b3b74ca20babcc88e11e47a41c14e88ed6543f",
+      "prepared_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996"
+    },
+    "candidate": {
+      "command": [
+        "taskset",
+        "-c",
+        "2",
+        "/home/erg/factor-compiler-next-backtracking-20260909/factor",
+        "-resource-path=/home/erg/factor-compiler-next-backtracking-20260909",
+        "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+        "-no-user-init",
+        "/home/erg/factor-compiler-next-backtracking-20260909/reference/compiler-next-20260909/prepare-next.factor"
+      ],
+      "status": 0,
+      "seconds": 3.0009506726637483,
+      "taskpolicy": [],
+      "source_commit": "784a05ead7ca2371ad4f97dbea440f515fcb35f0",
+      "initial_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996",
+      "preparation_script_sha256": "dceea3632e34fd28181e335d05499d5496d5b37a1638e5582f0a0eac5efb9ded",
+      "prepared_image_sha256": "9498647245ea333a7ca9caad5adf829d5d5cb3644f9e3917494c90a6b5ab07a7"
+    }
+  },
+  "order": [
+    "baseline-1",
+    "candidate-1",
+    "candidate-2",
+    "baseline-2"
+  ],
+  "all_kernel_non_timing_metrics_equal": false,
+  "outputs_identical_26_cases_all_batches": true
+}

@@ -1,0 +1,19 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+    "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepare-greedy.factor"
+  ],
+  "status": 0,
+  "seconds": 2.0008452301844954,
+  "taskpolicy": [],
+  "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "initial_image_sha256": "542d992eb62967bf032e4a69dd6a1706d77fd1edc4a3a3c72effe14e59f839e1",
+  "preparation_script_sha256": "3a34870835f2d69148f0ccbc69b3b74ca20babcc88e11e47a41c14e88ed6543f",
+  "prepared_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996"
+}
