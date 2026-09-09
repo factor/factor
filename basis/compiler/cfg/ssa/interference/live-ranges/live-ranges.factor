@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs compiler.cfg compiler.cfg.def-use
+USING: accessors assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.dominance compiler.cfg.instructions
 compiler.cfg.liveness compiler.cfg.rpo kernel math namespaces
 sequences ;
