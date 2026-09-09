@@ -38,6 +38,7 @@ for r in range(1 if a.mode=='check' else a.rounds):
         if platform.system()=='Linux':cmd=['taskset','-c',a.cpu]+cmd
         print('START',name,flush=True)
         start=time.time()
+        load_before=os.getloadavg()
         policy=None
         with log.open('w') as f:
             child=subprocess.Popen(cmd,cwd=ROOT,stdout=f,stderr=subprocess.STDOUT)
@@ -54,7 +55,7 @@ for r in range(1 if a.mode=='check' else a.rounds):
         kinds=[x['kind'] for x in records]
         expected=26*(1 if a.mode=='check' else a.samples+1)
         ok=code==0 and kinds.count('scope')==1 and kinds.count('compile')==1 and kinds.count('code')==12 and kinds.count('runtime')==expected
-        status=dict(final_value_verifier=final_verifier,exit_code=code,seconds=time.time()-start,command=cmd,ok=ok,counts={x:kinds.count(x) for x in set(kinds)})
+        status=dict(host_load_before=load_before,host_load_after=os.getloadavg(),final_value_verifier=final_verifier,exit_code=code,seconds=time.time()-start,command=cmd,ok=ok,counts={x:kinds.count(x) for x in set(kinds)})
         if policy:status['taskpolicy']=dict(exit_code=policy.returncode,stderr=policy.stderr)
         (OUT/(name+'.status.json')).write_text(json.dumps(status,indent=2)+'\n')
         print('DONE',name,'exit',code,'records',len(records),'seconds',round(time.time()-start,1),'OK',ok,flush=True)

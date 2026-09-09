@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Check outputs, then compare each candidate allocator to its own baseline."""
-import argparse,collections,gzip,importlib.util,json,math,statistics
+import argparse,collections,functools,gzip,importlib.util,json,math,statistics
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--baseline',default='baseline');p.add_argument('--candidate',default='candidate');p.add_argument('--require-complete',action='store_true');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument('--baseline',default='baseline');p.add_argument('--candidate',default='candidate');p.add_argument('--require-complete',action='store_true');p.add_argument('--min-samples',type=int,default=3);p.add_argument('--allocator',choices=['linear-scan','greedy','backtracking','chordal']);p.add_argument('--output-prefix',default='summary');a=p.parse_args()
 spec=importlib.util.spec_from_file_location('original',Path(__file__).with_name('original-analysis.py'));original=importlib.util.module_from_spec(spec);spec.loader.exec_module(original)
+original.pi_digits=functools.lru_cache()(original.pi_digits)
 results=collections.defaultdict(list)
 scopes={}
 options={}
@@ -19,6 +20,7 @@ for path in sorted(a.directory.glob('*.jsonl*')):
   if not status.get('ok',False):
    failures.append(dict(file=name,status=status));continue
  with (gzip.open(path,'rt') if path.suffix=='.gz' else path.open()) as f: records=[json.loads(line) for line in f]
+ for record in records:record['_round']=int(name.removesuffix('.gz').removesuffix('.jsonl').rsplit('-',1)[1])
  scope=next(x for x in records if x['kind']=='scope');allocator=scope['allocator']
  # Anonymous words use a frozen object index as well as a label.
  scope_words=scope['words']
@@ -38,7 +40,7 @@ for path in sorted(a.directory.glob('*.jsonl*')):
  if not scope['checked']:results[(label,allocator)].extend(records)
 summary=dict(failed_runs=failures,options=options,scope_words={k:len(v) for k,v in scopes.items()},correctness='All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.',allocators={})
 metrics=('cpu_seconds','ns','instructions')
-for allocator in original.ALLOCATORS:
+for allocator in ([a.allocator] if a.allocator else original.ALLOCATORS):
  b=results[(a.baseline,allocator)];c=results[(a.candidate,allocator)]
  if a.require_complete:assert b and c,(allocator,'missing baseline/candidate')
  if not b or not c:continue
@@ -52,12 +54,22 @@ for allocator in original.ALLOCATORS:
    vals=[]
    for records in (b,c):
     vals.append([r[metric]/r.get('iterations',1) for r in records if r['kind']=='runtime' and r['word']==word and r['trial']>=0])
-   if a.require_complete:assert all(len(v)>=3 for v in vals),(allocator,word,'fewer than3 samples')
+   if a.require_complete:assert all(len(v)>=a.min_samples for v in vals),(allocator,word,'insufficient samples')
    if not all(vals):continue
    bv,cv=map(statistics.median,vals)
    wr[metric]=dict(baseline=bv,candidate=cv,ratio=cv/bv,samples=list(map(len,vals)))
   report['workloads'][word]=wr
  report['runtime_geomean']={metric:math.exp(statistics.mean(math.log(x[metric]['ratio']) for x in report['workloads'].values())) for metric in metrics}
+ report['runtime_by_round']={}
+ for ordinal in sorted({x['_round'] for x in b if x['kind']=='runtime'} & {x['_round'] for x in c if x['kind']=='runtime'}):
+  by_metric={}
+  for metric in metrics:
+   ratios=[]
+   for word in outputs:
+    vals=[[r[metric]/r.get('iterations',1) for r in records if r['kind']=='runtime' and r['word']==word and r['trial']>=0 and r['_round']==ordinal] for records in (b,c)]
+    if all(vals):ratios.append(statistics.median(vals[1])/statistics.median(vals[0]))
+   if ratios:by_metric[metric]=math.exp(statistics.mean(map(math.log,ratios)))
+  report['runtime_by_round'][str(ordinal)]=by_metric
  for records,label in ((b,'baseline'),(c,'candidate')):
   code={}
   for code_index,r in enumerate(x for x in records if x['kind']=='code'):
@@ -70,7 +82,7 @@ for allocator in original.ALLOCATORS:
    code[f"{v['input']}|{code_index % 12}"]=dict(values)
   report['code'][label]=code
  summary['allocators'][allocator]=report
-(a.directory/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+(a.directory/(a.output_prefix+'.json')).write_text(json.dumps(summary,indent=2)+'\n')
 print(json.dumps({k:v for k,v in summary.items() if k!='allocators'},indent=2))
 for allocator,r in summary['allocators'].items():print(allocator,'runtime',r['runtime_geomean'],'compile',{k:v['ratio'] for k,v in r['compile'].items()})
 lines=['# Same-host candidate / baseline allocator comparison','',summary['correctness'],'',
@@ -82,11 +94,11 @@ if failures:
  lines+=['','Failed runs retained and excluded from ratios:']
  for failure in failures:lines.append(f"- `{failure['file']}`: exit {failure['status']['exit_code']}.")
 for allocator,r in summary['allocators'].items():
- lines+=['',f'## {allocator}','', '| Workload | CPU ratio | Retired ratio | Samples before / after |','|---|---:|---:|---:|']
+ lines+=['',f'## {allocator}','', 'Per-round geometric-mean ratios: '+json.dumps(r['runtime_by_round'],sort_keys=True),'', '| Workload | CPU ratio | Retired ratio | Samples before / after |','|---|---:|---:|---:|']
  for word,v in r['workloads'].items():
   lines.append(f"| {word.rsplit(':',1)[-1]} | {v['cpu_seconds']['ratio']:.4f} | {v['instructions']['ratio']:.4f} | {' / '.join(map(str,v['cpu_seconds']['samples']))} |")
  lines+=['','| Kernel / index | Code bytes before → after | Spills before → after | Reloads before → after | Copies before → after |','|---|---:|---:|---:|---:|']
  for word,b in r['code']['baseline'].items():
   c=r['code']['candidate'][word]
   lines.append('| '+word+' | '+' | '.join(f'{b[k]} → {c[k]}' for k in ('code-bytes','spills','reloads','copies'))+' |')
-(a.directory/'summary.md').write_text('\n'.join(lines).replace('below1','below 1').replace('weight26','weight 26')+'\n')
+(a.directory/(a.output_prefix+'.md')).write_text('\n'.join(lines).replace('below1','below 1').replace('weight26','weight 26')+'\n')

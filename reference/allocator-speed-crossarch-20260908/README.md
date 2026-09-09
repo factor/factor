@@ -88,3 +88,11 @@ foreground policy while preparing the image. Preparation is unranked; timing
 still uses the stricter in-process priority guards. Linux hardware counters are
 pinned in the final protocol. The preliminary source-233 counter was unpinned;
 its distinct library hash and known-bug results remain separate.
+
+Candidate checked runs explicitly load the independent final value-flow verifier
+and its rematerialization observer before installation. The correctness-only
+baseline predates that optional verifier and uses SSA and interval allocation
+checks. Unchecked timing runs disable allocation checks; the driver records
+verifier setup separately from optimization flags. Final analysis reports both
+per-round and aggregate runtime ratios, and status files retain host load before
+and after each process. Host load is observational and does not reserve a core.
