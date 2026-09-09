@@ -44,7 +44,15 @@ cover 160 C ABI assertions and 1,536 fresh object pairs. Exact preparation,
 matched VM/image assets, commands and outcomes are retained in
 [gate acceptance](gates/acceptance.json).
 
-The broad two-round timing matrix and unprofiled saved-image bootstrap remain
-pending. The diagnostic
+## Default saved-image bootstrap
+
+The final unprofiled bootstrap passes in **1:52 core / 116.00 seconds whole
+process**, within the requested two-minute budget. The new saved image passes
+default selection, zero compiler errors, integer/float/loop and moving-GC checks.
+The root image hash is unchanged. [Retained bootstrap evidence](default-bootstrap/README.md)
+includes both commands, source/asset hashes, counters and the execution-rate
+limitation when comparing the earlier 2:12 observation.
+
+The broad two-round timing report is pending. The diagnostic
 [bootstrap profile](bootstrap-profile/README.md) is not an unprofiled bootstrap
 or fresh-image acceptance run.
