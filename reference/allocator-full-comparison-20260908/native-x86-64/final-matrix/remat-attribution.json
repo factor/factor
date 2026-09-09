@@ -1,0 +1,1064 @@
+{
+  "failed_runs": [],
+  "source_commits": {
+    "candidate": "30a50ab0df1147eb5c7d852b5d6aad2c0835464e",
+    "remat-off": "30a50ab0df1147eb5c7d852b5d6aad2c0835464e"
+  },
+  "options": {
+    "candidate": {
+      "backtracking_loop_spills": true,
+      "gvn": false,
+      "rematerialize_constants": true
+    },
+    "remat-off": {
+      "backtracking_loop_spills": true,
+      "gvn": false,
+      "rematerialize_constants": false
+    }
+  },
+  "scope_words": {
+    "candidate": 28375,
+    "remat-off": 28375
+  },
+  "correctness": "All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.",
+  "allocators": {
+    "linear-scan": {
+      "compile": {
+        "cpu_seconds": {
+          "baseline": 46.670163316,
+          "candidate": 46.7785651775,
+          "ratio": 1.0023227229946898
+        },
+        "ns": {
+          "baseline": 46686704516.5,
+          "candidate": 46794947056.0,
+          "ratio": 1.0023184874713473
+        },
+        "instructions": {
+          "baseline": 567573450663.5,
+          "candidate": 573330289744.0,
+          "ratio": 1.010142897053712
+        }
+      },
+      "workloads": {
+        "allocator-runtime-comparison:norm-work": {
+          "cpu_seconds": {
+            "baseline": 0.013454276464285795,
+            "candidate": 0.013483593214286112,
+            "ratio": 1.0021789911986823,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 13455592.607142858,
+            "candidate": 13485010.142857142,
+            "ratio": 1.0021862683103728,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 235341680.1785714,
+            "candidate": 235341649.75,
+            "ratio": 0.9999998707047074,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:nbody-work": {
+          "cpu_seconds": {
+            "baseline": 0.08292788874999957,
+            "candidate": 0.07914438799999957,
+            "ratio": 0.9543760150290812,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 82935052.0,
+            "candidate": 79148475.25,
+            "ratio": 0.9543428663914023,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 1258056858.75,
+            "candidate": 1258037542.5,
+            "ratio": 0.9999846459642379,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:nbody-simd-work": {
+          "cpu_seconds": {
+            "baseline": 0.004605893553571454,
+            "candidate": 0.004621810214285712,
+            "ratio": 1.0034557161447892,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 4606455.178571428,
+            "candidate": 4631784.392857143,
+            "ratio": 1.0054986346993111,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 81630712.14285713,
+            "candidate": 81629604.625,
+            "ratio": 0.9999864325836678,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:trees-work": {
+          "cpu_seconds": {
+            "baseline": 0.06071992325000153,
+            "candidate": 0.060924368749997626,
+            "ratio": 1.003367025006839,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 60724326.25,
+            "candidate": 60937501.75,
+            "ratio": 1.0035105453310813,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 1083196895.5,
+            "candidate": 1083065308.5,
+            "ratio": 0.9998785197773862,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:fannkuch-work": {
+          "cpu_seconds": {
+            "baseline": 0.025693470600000268,
+            "candidate": 0.0256281100999999,
+            "ratio": 0.9974561435853525,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 25694441.299999997,
+            "candidate": 25630301.5,
+            "ratio": 0.9975037480188371,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 426628258.5,
+            "candidate": 426626503.2,
+            "ratio": 0.9999958856452543,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:sieve-work": {
+          "cpu_seconds": {
+            "baseline": 0.056003055500003285,
+            "candidate": 0.05632713800000033,
+            "ratio": 1.0057868717537568,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 56006499.0,
+            "candidate": 56332887.75,
+            "ratio": 1.0058276942109878,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 1357753745.75,
+            "candidate": 1357753747.0,
+            "ratio": 1.0000000009206382,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:pi-work": {
+          "cpu_seconds": {
+            "baseline": 0.03759939887499897,
+            "candidate": 0.03772188075000216,
+            "ratio": 1.0032575487552444,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 37602287.125,
+            "candidate": 37726754.0,
+            "ratio": 1.0033100878833843,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 426506368.875,
+            "candidate": 426500863.75,
+            "ratio": 0.9999870925139652,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:md5-work": {
+          "cpu_seconds": {
+            "baseline": 0.031602277875000695,
+            "candidate": 0.031200505124999722,
+            "ratio": 0.9872865889101368,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 31606505.25,
+            "candidate": 31203135.75,
+            "ratio": 0.9872377696676857,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 507140915.5,
+            "candidate": 507142362.375,
+            "ratio": 1.0000028530038807,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:sha1-work": {
+          "cpu_seconds": {
+            "baseline": 0.045015512999999174,
+            "candidate": 0.04430879216666502,
+            "ratio": 0.9843005047319096,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 45019113.16666667,
+            "candidate": 44313312.0,
+            "ratio": 0.9843221885768006,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 892688952.1666667,
+            "candidate": 892688157.6666667,
+            "ratio": 0.9999991099923461,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:base64-work": {
+          "cpu_seconds": {
+            "baseline": 0.01876600714285713,
+            "candidate": 0.01797707485714284,
+            "ratio": 0.9579595020022903,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 18770075.928571425,
+            "candidate": 17977775.714285716,
+            "ratio": 0.9577891843751316,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 405137341.42857146,
+            "candidate": 405135147.14285713,
+            "ratio": 0.9999945838472786,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:base32-work": {
+          "cpu_seconds": {
+            "baseline": 0.12310133399999756,
+            "candidate": 0.12585180299999976,
+            "ratio": 1.0223431291167182,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 123103027.0,
+            "candidate": 125874485.0,
+            "ratio": 1.0225133213011894,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 2359341448.0,
+            "candidate": 2359320546.0,
+            "ratio": 0.9999911407481873,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "benchmark.csv:csv-benchmark": {
+          "cpu_seconds": {
+            "baseline": 0.06835327112500078,
+            "candidate": 0.06834515462500157,
+            "ratio": 0.9998812565972978,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 68358460.75,
+            "candidate": 68351912.125,
+            "ratio": 0.9999042016902056,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 944457053.125,
+            "candidate": 944487366.25,
+            "ratio": 1.000032095821509,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:json-work": {
+          "cpu_seconds": {
+            "baseline": 0.1045206592500012,
+            "candidate": 0.10228145375000075,
+            "ratio": 0.9785764315297272,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 104528394.75,
+            "candidate": 102445197.5,
+            "ratio": 0.98007051332815,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 1870955239.0,
+            "candidate": 1870916455.0,
+            "ratio": 0.9999792704821625,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "benchmark.msgpack:msgpack-benchmark": {
+          "cpu_seconds": {
+            "baseline": 0.6017469450000021,
+            "candidate": 0.5901609634999971,
+            "ratio": 0.9807460900362278,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 603018384.5,
+            "candidate": 590229868.5,
+            "ratio": 0.9787924940122618,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 9961079612.5,
+            "candidate": 9960473812.0,
+            "ratio": 0.9999391832488479,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "benchmark.lcs:lcs-benchmark": {
+          "cpu_seconds": {
+            "baseline": 0.161807933500004,
+            "candidate": 0.1491683530000003,
+            "ratio": 0.9218852856803627,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 161814740.5,
+            "candidate": 149182855.0,
+            "ratio": 0.9219361260848792,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 2579348872.0,
+            "candidate": 2579324429.5,
+            "ratio": 0.9999905237712257,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "benchmark.tuple-arrays:tuple-arrays-benchmark": {
+          "cpu_seconds": {
+            "baseline": 0.1429951960000011,
+            "candidate": 0.144843814999998,
+            "ratio": 1.0129278398974808,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 143012801.0,
+            "candidate": 144852698.5,
+            "ratio": 1.0128652644178335,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 2882800049.5,
+            "candidate": 2882762320.5,
+            "ratio": 0.9999869123770806,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:struct-work": {
+          "cpu_seconds": {
+            "baseline": 0.006159864462962827,
+            "candidate": 0.00616001192592582,
+            "ratio": 1.000023939319425,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 6160141.0,
+            "candidate": 6161005.185185185,
+            "ratio": 1.0001402865916842,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 88976612.72222222,
+            "candidate": 88976053.57407407,
+            "ratio": 0.9999937157851817,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:matrix-work": {
+          "cpu_seconds": {
+            "baseline": 0.131058938999999,
+            "candidate": 0.13116121499999878,
+            "ratio": 1.0007803817181808,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 131079753.5,
+            "candidate": 131215860.5,
+            "ratio": 1.0010383525782263,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 2320607678.5,
+            "candidate": 2320604661.5,
+            "ratio": 0.9999986999094987,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:matrix-simd-work": {
+          "cpu_seconds": {
+            "baseline": 0.0033398769655170898,
+            "candidate": 0.0033081860689656416,
+            "ratio": 0.9905113580893415,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 3339806.120689655,
+            "candidate": 3308489.293103448,
+            "ratio": 0.9906231600115337,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 62098906.60344827,
+            "candidate": 62097759.51724137,
+            "ratio": 0.9999815280772297,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:gc-work": {
+          "cpu_seconds": {
+            "baseline": 0.040972631222222354,
+            "candidate": 0.04078686377777806,
+            "ratio": 0.9954660601747358,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 40976850.277777776,
+            "candidate": 40791591.388888896,
+            "ratio": 0.9954789377994396,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 573124820.2777778,
+            "candidate": 573145724.5555556,
+            "ratio": 1.0000364742147576,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:float-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.00036150942249999336,
+            "candidate": 0.0003595974216666657,
+            "ratio": 0.9947110622453341,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 361546.3175,
+            "candidate": 359640.57,
+            "ratio": 0.9947288980477584,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 8061038.980833333,
+            "candidate": 8060784.316666666,
+            "ratio": 0.9999684080219347,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:ffi-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.00047677477916667027,
+            "candidate": 0.00047518571000000045,
+            "ratio": 0.9966670444073252,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 476816.2633333333,
+            "candidate": 475227.20166666666,
+            "ratio": 0.9966673501118485,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 9661035.83,
+            "candidate": 9660770.748333333,
+            "ratio": 0.9999725617758456,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:branch-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.000382598225,
+            "candidate": 0.0003712369733333354,
+            "ratio": 0.9703050068602262,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 382635.08666666667,
+            "candidate": 371284.83666666667,
+            "ratio": 0.9703366199402205,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 8429088.450833334,
+            "candidate": 8428829.21,
+            "ratio": 0.9999692444995868,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:integer-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.00023770452333334193,
+            "candidate": 0.00023834913916666995,
+            "ratio": 1.00271183662931,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 237725.05,
+            "candidate": 238362.89416666667,
+            "ratio": 1.0026831171837662,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 5617974.4175,
+            "candidate": 5617974.42,
+            "ratio": 1.0000000004450003,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:simd-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.0004238734741666642,
+            "candidate": 0.00042287392500000464,
+            "ratio": 0.9976418690303169,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 423910.3725,
+            "candidate": 422896.69833333336,
+            "ratio": 0.9976087535657867,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 8763115.964166667,
+            "candidate": 8762847.684166666,
+            "ratio": 0.999969385318978,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        },
+        "allocator-runtime-comparison:gc-pressure-work": {
+          "cpu_seconds": {
+            "baseline": 0.4690426379999977,
+            "candidate": 0.46644895499999706,
+            "ratio": 0.9944702617846,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "ns": {
+            "baseline": 470218599.5,
+            "candidate": 466501054.0,
+            "ratio": 0.9920940058433397,
+            "samples": [
+              6,
+              6
+            ]
+          },
+          "instructions": {
+            "baseline": 4305662027.5,
+            "candidate": 4305893740.0,
+            "ratio": 1.0000538157659657,
+            "samples": [
+              6,
+              6
+            ]
+          }
+        }
+      },
+      "code": {
+        "baseline": {
+          "float-pressure|0": {
+            "code-bytes": 1264,
+            "spills": 17,
+            "reloads": 17,
+            "copies": 0,
+            "spill-bytes": 136,
+            "frame-bytes": 144,
+            "instructions": 144,
+            "blocks": 5
+          },
+          "ffi-pressure|1": {
+            "code-bytes": 1664,
+            "spills": 34,
+            "reloads": 33,
+            "copies": 0,
+            "spill-bytes": 280,
+            "frame-bytes": 288,
+            "instructions": 180,
+            "blocks": 5
+          },
+          "branch-pressure|2": {
+            "code-bytes": 1888,
+            "spills": 31,
+            "reloads": 31,
+            "copies": 0,
+            "spill-bytes": 248,
+            "frame-bytes": 256,
+            "instructions": 213,
+            "blocks": 10
+          },
+          "integer-pressure|3": {
+            "code-bytes": 672,
+            "spills": 28,
+            "reloads": 28,
+            "copies": 0,
+            "spill-bytes": 224,
+            "frame-bytes": 240,
+            "instructions": 146,
+            "blocks": 3
+          },
+          "simd-pressure|4": {
+            "code-bytes": 1504,
+            "spills": 17,
+            "reloads": 17,
+            "copies": 0,
+            "spill-bytes": 272,
+            "frame-bytes": 288,
+            "instructions": 153,
+            "blocks": 7
+          },
+          "gc-pressure|5": {
+            "code-bytes": 11968,
+            "spills": 223,
+            "reloads": 223,
+            "copies": 0,
+            "spill-bytes": 1784,
+            "frame-bytes": 1792,
+            "instructions": 2239,
+            "blocks": 193
+          },
+          "spectral-norm|6": {
+            "code-bytes": 3104,
+            "spills": 20,
+            "reloads": 20,
+            "copies": 1,
+            "spill-bytes": 128,
+            "frame-bytes": 144,
+            "instructions": 639,
+            "blocks": 151
+          },
+          "nbody|7": {
+            "code-bytes": 2960,
+            "spills": 0,
+            "reloads": 0,
+            "copies": 6,
+            "spill-bytes": 0,
+            "frame-bytes": 16,
+            "instructions": 806,
+            "blocks": 208
+          },
+          "nbody|8": {
+            "code-bytes": 4368,
+            "spills": 36,
+            "reloads": 21,
+            "copies": 0,
+            "spill-bytes": 248,
+            "frame-bytes": 256,
+            "instructions": 595,
+            "blocks": 116
+          },
+          "fannkuch|9": {
+            "code-bytes": 3392,
+            "spills": 1,
+            "reloads": 1,
+            "copies": 0,
+            "spill-bytes": 8,
+            "frame-bytes": 16,
+            "instructions": 937,
+            "blocks": 325
+          },
+          "binary-trees|10": {
+            "code-bytes": 8640,
+            "spills": 12,
+            "reloads": 12,
+            "copies": 10,
+            "spill-bytes": 96,
+            "frame-bytes": 144,
+            "instructions": 2401,
+            "blocks": 902
+          },
+          "struct-arrays-bench|11": {
+            "code-bytes": 1584,
+            "spills": 15,
+            "reloads": 16,
+            "copies": 3,
+            "spill-bytes": 80,
+            "frame-bytes": 96,
+            "instructions": 273,
+            "blocks": 44
+          }
+        },
+        "candidate": {
+          "float-pressure|0": {
+            "code-bytes": 1264,
+            "spills": 17,
+            "reloads": 17,
+            "copies": 0,
+            "spill-bytes": 136,
+            "frame-bytes": 144,
+            "instructions": 144,
+            "blocks": 5
+          },
+          "ffi-pressure|1": {
+            "code-bytes": 1664,
+            "spills": 34,
+            "reloads": 33,
+            "copies": 0,
+            "spill-bytes": 280,
+            "frame-bytes": 288,
+            "instructions": 180,
+            "blocks": 5
+          },
+          "branch-pressure|2": {
+            "code-bytes": 1888,
+            "spills": 31,
+            "reloads": 31,
+            "copies": 0,
+            "spill-bytes": 248,
+            "frame-bytes": 256,
+            "instructions": 213,
+            "blocks": 10
+          },
+          "integer-pressure|3": {
+            "code-bytes": 672,
+            "spills": 28,
+            "reloads": 28,
+            "copies": 0,
+            "spill-bytes": 224,
+            "frame-bytes": 240,
+            "instructions": 146,
+            "blocks": 3
+          },
+          "simd-pressure|4": {
+            "code-bytes": 1504,
+            "spills": 17,
+            "reloads": 17,
+            "copies": 0,
+            "spill-bytes": 272,
+            "frame-bytes": 288,
+            "instructions": 153,
+            "blocks": 7
+          },
+          "gc-pressure|5": {
+            "code-bytes": 11968,
+            "spills": 223,
+            "reloads": 223,
+            "copies": 0,
+            "spill-bytes": 1784,
+            "frame-bytes": 1792,
+            "instructions": 2239,
+            "blocks": 193
+          },
+          "spectral-norm|6": {
+            "code-bytes": 3104,
+            "spills": 20,
+            "reloads": 20,
+            "copies": 1,
+            "spill-bytes": 128,
+            "frame-bytes": 144,
+            "instructions": 639,
+            "blocks": 151
+          },
+          "nbody|7": {
+            "code-bytes": 2960,
+            "spills": 0,
+            "reloads": 0,
+            "copies": 6,
+            "spill-bytes": 0,
+            "frame-bytes": 16,
+            "instructions": 806,
+            "blocks": 208
+          },
+          "nbody|8": {
+            "code-bytes": 4336,
+            "spills": 33,
+            "reloads": 18,
+            "copies": 0,
+            "spill-bytes": 224,
+            "frame-bytes": 240,
+            "instructions": 592,
+            "blocks": 116
+          },
+          "fannkuch|9": {
+            "code-bytes": 3392,
+            "spills": 1,
+            "reloads": 1,
+            "copies": 0,
+            "spill-bytes": 8,
+            "frame-bytes": 16,
+            "instructions": 937,
+            "blocks": 325
+          },
+          "binary-trees|10": {
+            "code-bytes": 8640,
+            "spills": 12,
+            "reloads": 12,
+            "copies": 10,
+            "spill-bytes": 96,
+            "frame-bytes": 144,
+            "instructions": 2401,
+            "blocks": 902
+          },
+          "struct-arrays-bench|11": {
+            "code-bytes": 1584,
+            "spills": 15,
+            "reloads": 16,
+            "copies": 3,
+            "spill-bytes": 80,
+            "frame-bytes": 96,
+            "instructions": 273,
+            "blocks": 44
+          }
+        }
+      },
+      "runtime_geomean": {
+        "cpu_seconds": 0.9905194332583843,
+        "ns": 0.9905154641583293,
+        "instructions": 0.9999881516334863
+      },
+      "runtime_by_round": {
+        "1": {
+          "cpu_seconds": 0.9796402329719477,
+          "ns": 0.9796623050485502,
+          "instructions": 0.9999890740634915
+        },
+        "2": {
+          "cpu_seconds": 1.002083485608271,
+          "ns": 1.0025976108788048,
+          "instructions": 0.9999890672655197
+        }
+      }
+    }
+  }
+}

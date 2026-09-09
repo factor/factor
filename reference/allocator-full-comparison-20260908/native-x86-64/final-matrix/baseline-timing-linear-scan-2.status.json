@@ -1,0 +1,39 @@
+{
+  "source_commit": "f5a6d4739eb6aa5203df67719ad8cfba1410484c",
+  "host_load_before": [
+    2.0,
+    1.708984375,
+    1.27294921875
+  ],
+  "host_load_after": [
+    1.96435546875,
+    1.76611328125,
+    1.32958984375
+  ],
+  "final_value_verifier": false,
+  "exit_code": 0,
+  "seconds": 79.986093044281,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-full-checked-baseline-20260908/factor",
+    "-resource-path=/home/erg/factor-allocator-full-checked-baseline-20260908",
+    "-i=/home/erg/factor-allocator-full-checked-baseline-20260908/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-full-checked-baseline-20260908/reference/allocator-speed-crossarch-20260908/timing.factor",
+    "linear-scan",
+    "timing",
+    "3",
+    "on",
+    "on",
+    "f5a6d4739eb6aa5203df67719ad8cfba1410484c"
+  ],
+  "ok": true,
+  "counts": {
+    "runtime": 104,
+    "scope": 1,
+    "code": 12,
+    "compile": 1
+  }
+}
