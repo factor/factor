@@ -1,1 +1,1 @@
-LLVM-inspired priority, eviction and loop-aware splitting register allocator
+LLVM-style staged greedy allocation with CFG spill placement and recoloring
