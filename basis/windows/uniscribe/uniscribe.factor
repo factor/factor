@@ -112,8 +112,11 @@ PRIVATE>
     ] [ flags ] if ;
 
 : uniscribe-glyph-capacity ( utf16-length -- capacity )
-    ! ScriptStringAnalyse rejects a glyph capacity above the WORD range.
-    1.5 * 16 + >integer 65535 min ;
+    ! The usual 1.5*n recommendation silently substitutes missing glyphs
+    ! for expanding Tibetan and Indic text. Four glyphs per UTF-16 unit
+    ! plus spare space covers these cases; it is not a guarantee for
+    ! arbitrary font substitutions. The native capacity cannot exceed WORD.
+    4 * 16 + 65535 min ;
 
 :: (make-ssa) ( dc string flags tabdef -- ssa )
     string uniscribe-text :> text
