@@ -3,6 +3,7 @@
 USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.live-intervals compiler.cfg.loop-detection compiler.cfg.predecessors
+compiler.cfg.linearization
 compiler.cfg.register-allocation.chordal.spilling.next-use
 compiler.cfg.register-allocation.chordal.spilling.residency
 compiler.cfg.register-allocation.rematerialization compiler.cfg.registers
@@ -89,8 +90,8 @@ ERROR: missing-spill-value value ;
     ] if ;
 
 RENAMING: spill-rename
-    [ dup spill-def-renaming get at or ]
-    [ dup spill-use-renaming get at or ]
+    [ dup spill-def-renaming get at swap or ]
+    [ dup spill-use-renaming get at swap or ]
     [ ]
 
 :: forget-dead-residents ( distances -- )
@@ -302,6 +303,29 @@ RENAMING: spill-rename
         version predecessor phi inputs>> set-at
     ] assoc-each ;
 
+:: remove-unused-spill-phis ( cfg -- )
+    cfg cfg>insns :> instructions
+    instructions [ ##phi? ] filter :> phis
+    H{ } clone :> needed
+    instructions [ ##phi? ] reject
+    [ spill-insn-uses [ needed conjoin ] each ] each
+    t :> changed!
+    [ changed ] [
+        needed assoc-size :> before
+        phis [| phi |
+            phi dst>> needed key? [
+                phi inputs>> values [ needed conjoin ] each
+            ] when
+        ] each
+        needed assoc-size before = not changed!
+    ] while
+    cfg [| bb |
+        bb [ [| insn |
+            insn ##phi? [ insn dst>> needed key? not ] [ f ] if
+            dup [ "dead-phis-removed" spill-stat ] when
+        ] reject ] change-instructions drop
+    ] each-basic-block ;
+
 :: spill-ssa ( cfg available -- fixed-locations statistics )
     available spill-bank namespaces:set
     H{ } clone spill-homes namespaces:set
@@ -310,6 +334,7 @@ RENAMING: spill-rename
     H{ } clone spill-statistics namespaces:set
     H{ } clone spill-def-renaming namespaces:set
     H{ } clone spill-slots namespaces:set
+    cfg remove-unused-spill-phis
     cfg prepare-rematerialization
     cfg compute-next-uses nip :> exits
     cfg reverse-post-order >array :> blocks

@@ -20,6 +20,16 @@ CONSTANT: cycle-graph H{ { 0 { 1 3 } } { 1 { 0 2 } } { 2 { 1 3 } } { 3 { 0 2 } }
 
 { f } [ cycle-graph dup maximum-cardinality-order perfect-order? ] unit-test
 
+! A certified assignment has a finite bank. It cannot silently turn into
+! interval repair when the supplied pressure obligation is impossible.
+[
+    H{ { 0 int-rep } { 1 int-rep } { 2 int-rep } } representations [
+        H{ { 0 { 1 2 } } { 1 { 0 2 } } { 2 { 0 1 } } }
+        { 0 1 2 } H{ { 0 H{ } } { 1 H{ } } { 2 H{ } } }
+        H{ { int-regs { 0 1 } } } preference-guided-colors
+    ] with-variable
+] [ uncolorable-spill-result? ] must-fail-with
+
 ! Compare both optimized graph algorithms to simple independent oracles on
 ! every undirected graph with four vertices, including non-chordal graphs.
 :: scan-cardinality-order ( graph -- order )
@@ -218,10 +228,11 @@ M: small-bank-chordal-allocator allocate-cfg
     40 <iota> [ >float 0.5 float+ ] map =
 ] with-chordal-test ] unit-test
 
-{ t t } [ [
+{ t t t } [ [
     pressure-quotation measure-compilation "procedures" of first
-    [ "allocation" of "repair-assignments" of 0 > ]
-    [ "passes" of last "spills" of 0 > ] bi
+    [ "allocation" of "repair-assignments" of 0 = ]
+    [ "allocation" of "pressure-stores" of 0 > ]
+    [ "passes" of last "spills" of 0 > ] tri
 ] with-chordal-test ] unit-test
 
 :: phi-pressure-quotation ( -- quot )
