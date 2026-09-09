@@ -44,17 +44,19 @@ TUPLE: font name size bold? italic? foreground background ;
     [ foreground>> >>background ]
     [ background>> >>foreground ] bi ;
 
-: derive-font ( base font -- font' )
-    [
-        [ clone ] dip over {
+GENERIC: derive-font ( base font -- font' )
+
+M: f derive-font drop ;
+
+M: font derive-font
+    [ clone ] dip over {
             [ [ name>> ] either? >>name ]
             [ [ size>> ] either? >>size ]
             [ [ bold?>> ] either? >>bold? ]
             [ [ italic?>> ] either? >>italic? ]
             [ [ foreground>> ] either? >>foreground ]
             [ [ background>> ] either? >>background ]
-        } 2cleave
-    ] when* ;
+    } 2cleave ;
 
 : serif-font ( -- font )
     default-serif-font-name <font> ;
