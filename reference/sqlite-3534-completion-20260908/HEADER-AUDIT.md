@@ -13,7 +13,7 @@ optional facility. The layout oracle requires no linked SQLite library.
 
 ## Fail then pass
 
-The baseline is `c40418fff8:basis/db/sqlite/ffi/ffi.factor`. The audit records
+The baseline is `c40418fff8:basis/db/sqlite/ffi/ffi.factor`, retained as `baseline-ffi.factor` so history rebases do not invalidate reproduction. The audit records
 SHA-256 hashes of both binding snapshots and of the official header.
 
 | Check | Baseline | Expanded binding |
@@ -24,7 +24,7 @@ SHA-256 hashes of both binding snapshots and of the official header.
 | Complete record declarations present | 22/23 | 23/23 |
 | Record field/order mismatches | 3 | 0 |
 | Constant value mismatches | 2 | 0 |
-| Owned-return representation mismatches | 2 | 0 |
+| Raw pointer / ownership contract mismatches | 10 | 0 |
 | Records invalidated by later `C-TYPE:` | 1 | 0 |
 | Native layout mismatches/unavailable measurements | 37 | 0 |
 
@@ -39,7 +39,7 @@ expected values. These errors are preserved in `layout-factor-before.log` and
 
 `header-audit-before.json` enumerates all absent declarations, version-value
 mismatches, lost owned pointers (`sqlite3_expanded_sql` and `sqlite3_serialize`),
-and invalidated record. `header-audit.json` and `layout-after.json` contain the
+UTF-16/retained buffers, filename identity, FTS5 iterator pointers, and the invalidated record. `header-audit.json` and `layout-after.json` contain the
 passing results. The `.log` files provide short summaries and raw measurements.
 
 ## Method and limits
@@ -97,8 +97,7 @@ checkout's `-resource-path=/absolute/checkout` arguments. The generated Factor
 probe reloads `db.sqlite.ffi` at parse time. On this host background processes
 required `taskpolicy -B -p <actual Factor.app process ID>` for normal throughput.
 
-For baseline declaration evidence, extract the old binding to a temporary file
-and pass `--binding /path/to/old-ffi.factor --name header-audit-before.json`.
+For baseline declaration evidence, pass `--binding reference/sqlite-3534-completion-20260908/baseline-ffi.factor --name header-audit-before.json`.
 For baseline native layout evidence, run the retained
 `layout-factor-before.factor` in an isolated checkout containing that binding,
 then compare its output with the same native oracle using `--check-layout`.

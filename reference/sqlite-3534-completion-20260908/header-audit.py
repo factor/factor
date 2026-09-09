@@ -223,6 +223,8 @@ def main():
         result['header_sha256'] = expected_hash
         result['binding_sha256'] = hashlib.sha256(args.binding.read_bytes()).hexdigest()
         if args.generate_layout: generate_layout(header, factor, args.output)
+    for value in result.values():
+        if isinstance(value, list): value.sort(key=lambda item: json.dumps(item, sort_keys=True))
     (args.output/args.name).write_text(json.dumps(result, indent=2, sort_keys=True)+'\n')
     if 'coverage' in result:
         for k,v in result['coverage'].items(): print(f'{k}: {v["bound"]}/{v["upstream"]}, {len(v["missing"])} missing')
