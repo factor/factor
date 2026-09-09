@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010, 2011 Joe Groff, Slava Pestov, John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.syntax
-assocs byte-arrays classes classes.private classes.struct
+arrays assocs byte-arrays classes classes.private classes.struct
 classes.struct.prettyprint.private classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 compiler.tree.debugger compiler.units definitions delegate
@@ -16,6 +16,40 @@ SPECIALIZED-ARRAY: char
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: ushort
 IN: classes.struct.tests
+
+STRUCT: struct-test-array-length { data uchar[6] } ;
+TYPEDEF: uchar[6] struct-test-array-alias
+STRUCT: struct-test-array-typedef { data struct-test-array-alias } ;
+
+{ { 1 2 3 4 5 6 } } [
+    struct-test-array-length <struct>
+    B{ 1 2 3 4 5 6 } >>data data>> >array
+] unit-test
+
+[ struct-test-array-length <struct> B{ 1 2 3 4 5 } >>data ]
+[ bad-struct-array-length? ] must-fail-with
+[ struct-test-array-length <struct> B{ 1 2 3 4 5 6 7 } >>data ]
+[ bad-struct-array-length? ] must-fail-with
+
+! Typedefs retain the array field's length constraint.
+[ struct-test-array-typedef <struct> B{ 1 2 3 4 5 } >>data ]
+[ bad-struct-array-length? ] must-fail-with
+
+! Check byte length rather than element count, including constructor writes.
+{ t } [
+    ushort-array{ 1 2 3 } struct-test-array-length <struct-boa>
+    data>> byte-length 6 =
+] unit-test
+[ ushort-array{ 1 2 } struct-test-array-length <struct-boa> ]
+[ bad-struct-array-length? ] must-fail-with
+[ ushort-array{ 1 2 3 4 } struct-test-array-length <struct-boa> ]
+[ bad-struct-array-length? ] must-fail-with
+
+! An alien has no declared extent; retain the explicit pointer interface.
+{ { 1 2 3 4 5 6 } } [
+    struct-test-array-length <struct>
+    1 B{ 0 1 2 3 4 5 6 7 } <displaced-alien> >>data data>> >array
+] unit-test
 
 SYMBOL: struct-test-empty
 

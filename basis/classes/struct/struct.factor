@@ -20,6 +20,8 @@ SPECIALIZED-ARRAY: uchar
 
 ERROR: struct-must-have-slots ;
 
+ERROR: bad-struct-array-length value expected ;
+
 M: struct-must-have-slots summary
     drop "Struct definitions must have slots" ;
 
@@ -107,8 +109,18 @@ M: struct-bit-slot-spec (reader-quot)
 
 GENERIC: (writer-quot) ( slot -- quot: ( value struct -- ) )
 
+: check-struct-array-length ( value expected -- value )
+    over alien? [ drop ] [
+        2dup swap byte-length =
+        [ drop ] [ bad-struct-array-length ] if
+    ] if ; inline
+
 M: struct-slot-spec (writer-quot)
-    [ offset>> ] [ type>> ] bi '[ >c-ptr _ _ set-alien-value ] ;
+    [ offset>> ] [ type>> ] bi
+    [ '[ >c-ptr _ _ set-alien-value ] ] keep
+    dup lookup-c-type array? [
+        heap-size '[ [ _ check-struct-array-length ] dip ] prepose
+    ] [ drop ] if ;
 
 M: struct-bit-slot-spec (writer-quot)
     [ offset>> ] [ bits>> ] bi bit-writer [ >c-ptr ] prepose ;
