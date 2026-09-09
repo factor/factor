@@ -1,13 +1,13 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg
+USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.build-stack-frame compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.numbering
 compiler.cfg.register-allocation compiler.cfg.register-allocation.verifier
 compiler.cfg.registers compiler.cfg.ssa.destruction compiler.cfg.utilities
 compiler.codegen compiler.units cpu.architecture hashtables kernel layouts
-locals make math math.order namespaces sequences sets words ;
+locals make math math.libm math.order math.vectors namespaces sequences sets words ;
 IN: compiler.cfg.register-allocation.validation
 
 ! The wrapper still enters the public dispatcher and its independent checker.
@@ -16,18 +16,67 @@ IN: compiler.cfg.register-allocation.validation
 TUPLE: constrained-allocator delegate registers kernel ;
 ERROR: invalid-validation-register-bank registers ;
 ERROR: invalid-allocation-evidence key value ;
+ERROR: outside-validation-register-bank location rep ;
 
 :: check-validation-register-bank ( graph registers -- )
     graph admissible-registers :> available
+    registers keys available keys set= [ ] [
+        registers invalid-validation-register-bank
+    ] if
     registers [| class bank |
         bank empty? not bank all-unique? and
         bank class available at subset? and
     ] assoc-all? [ ] [ registers invalid-validation-register-bank ] if ;
 
+:: check-validation-location ( location rep registers -- )
+    location spill-slot? [ ] [
+        location rep reg-class-of registers at member? [ ] [
+            location rep outside-validation-register-bank
+        ] if
+    ] if ;
+
+:: check-validation-insn-bank ( insn expected registers -- )
+    insn uses-vregs expected inputs>>
+    [ rep>> registers check-validation-location ] 2each
+    insn defs-vregs expected outputs>>
+    [ rep>> registers check-validation-location ] 2each
+    insn temp-vregs expected temps>> [| location operand |
+        location spill-slot? [ insn invalid-allocation-temporary ] when
+        location operand rep>> registers check-validation-location
+    ] 2each ;
+
+:: check-validation-allocated-bank ( graph registers snapshot -- )
+    graph cfg>insns [| insn |
+        insn snapshot instructions>> at [
+            insn swap registers check-validation-insn-bank
+        ] [
+            insn {
+                { [ dup ##copy? ] [
+                    [ src>> ] [ dst>> ] [ rep>> ] tri :> ( source destination rep )
+                    source rep registers check-validation-location
+                    destination rep registers check-validation-location
+                ] }
+                { [ dup ##spill? ] [
+                    [ src>> ] [ rep>> ] bi registers check-validation-location
+                ] }
+                { [ dup ##reload? ] [
+                    [ dst>> ] [ rep>> ] bi registers check-validation-location
+                ] }
+                { [ dup ##load-reference? ] [
+                    dst>> tagged-rep registers check-validation-location
+                ] }
+                [ drop ]
+            } cond
+        ] if*
+    ] each ;
+
 M:: constrained-allocator allocate-cfg ( graph allocator -- )
     allocator registers>> :> registers
     graph registers check-validation-register-bank
-    graph registers allocator kernel>> call( cfg registers -- ) ;
+    active-value-flow-snapshot get :> snapshot
+    snapshot [ ] [ "active-value-flow-snapshot" f invalid-allocation-evidence ] if
+    graph registers allocator kernel>> call( cfg registers -- )
+    graph registers snapshot check-validation-allocated-bank ;
 
 M: constrained-allocator allocator-statistics
     delegate>> allocator-statistics ;
@@ -170,3 +219,20 @@ M: constrained-allocator allocator-statistics
     graph build-stack-frame
     gensym [ graph generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
+
+! Five independent vectors remain live across a native ABI call. Their bank
+! aliases the scalar result's bank; preserving only scalar spill width loses
+! lanes. Keep this program inline so a typed test quotation allocates it as
+! one CFG, and compare with the separate scalar lane formula below.
+:: validation-vector-program ( a b x -- result )
+    a b v+ :> sum
+    a b v- :> difference
+    a b v* :> product
+    a a v* :> square-a
+    b b v* :> square-b
+    x fsin :> scalar
+    sum difference v+ product v+ square-a v+
+    square-b scalar v*n v+ ; inline
+
+:: validation-vector-lane ( a b x -- result )
+    a 2 * a b * + a a * + b b * x fsin * + ;

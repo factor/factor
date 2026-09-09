@@ -1,7 +1,7 @@
 USING: accessors arrays assocs compiler.cfg
 compiler.cfg.linear-scan.allocation.state compiler.cfg.register-allocation
-compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier
-kernel locals math namespaces sequences tools.test ;
+compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier compiler.test cpu.architecture
+kernel kernel.private locals math math.vectors.simd namespaces sequences tools.test ;
 IN: compiler.cfg.register-allocation.validation.tests
 
 { } [
@@ -57,5 +57,45 @@ IN: compiler.cfg.register-allocation.validation.tests
                 iterations seed validation-cycle-result =
             ] all?
         ] all?
+    ] all?
+] with-scope ] unit-test
+
+! A kernel may not silently widen its reduced bank. This independent final
+! operand audit rejects that even if the kernel checked its own wider bank.
+[
+    1 int-rep H{ { int-regs { 0 } } } check-validation-location
+] [ outside-validation-register-bank? ] must-fail-with
+
+! Missing classes, duplicate registers, and reserved-register substitutes
+! are rejected before invoking an allocator kernel.
+[
+    3 0 <validation-diamond> H{ } check-validation-register-bank
+] [ invalid-validation-register-bank? ] must-fail-with
+
+[
+    [ [let
+        6 0 <validation-diamond> :> graph
+        graph 3 2 validation-register-bank :> reduced
+        linear-scan-allocator reduced [
+            ! Deliberately corrupt the constraint handoff by discarding it.
+            drop dup 999 999 validation-register-bank
+            linear-scan-allocation-with-registers
+        ] constrained-allocator boa
+        graph swap compile-validation-cfg drop
+    ] ] with-scope
+] [ outside-validation-register-bank? ] must-fail-with
+
+
+{ t } [ [
+    0 f <validation-cycle> 8 4 validation-register-bank
+    [ linear-scan-allocator ] dip [ linear-scan-allocation-with-registers ]
+    constrained-allocator boa register-allocator set
+    t check-allocation? set
+    { 0.0 0.5 -0.5 } [| x |
+        double-2{ 2.0 3.0 } double-2{ 5.0 7.0 } x
+        [ { double-2 double-2 float } declare
+          validation-vector-program ] compile-call >array
+        2.0 5.0 x validation-vector-lane
+        3.0 7.0 x validation-vector-lane 2array =
     ] all?
 ] with-scope ] unit-test
