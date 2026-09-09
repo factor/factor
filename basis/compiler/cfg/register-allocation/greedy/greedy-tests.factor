@@ -2,6 +2,7 @@ USING: accessors arrays assocs compiler.test compiler.cfg
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.checker compiler.cfg.linear-scan.live-intervals
 compiler.cfg.register-allocation compiler.cfg.register-allocation.greedy
+compiler.cfg.register-allocation.occupancy
 compiler.cfg.registers cpu.architecture kernel kernel.private libc locals math math.statistics namespaces
 sequences tools.test vectors ;
 IN: compiler.cfg.register-allocation.greedy.tests
@@ -200,4 +201,70 @@ IN: compiler.cfg.register-allocation.greedy.tests
     1 { { 0 20 } } { 0 20 } test-interval
     2 { { 6 10 } } { 6 8 10 } test-interval 2array allocate-test drop
     greedy-costs get [ swap greedy-priority = ] assoc-all?
+] unit-test
+
+! Stages never move backwards, even when a displaced interval is requeued.
+{ 2 } [
+    init-test { } allocate-test drop
+    1 { { 0 2 } } { 0 2 } test-interval
+    dup local-stage advance-stage dup assign-stage advance-stage interval-stage
+] unit-test
+
+! The eviction cascade is a strict partial order; equal/younger victims
+! cannot bounce an interval back to the register it just lost.
+{ { f f t t } } [
+    init-test { } allocate-test drop
+    1 { { 0 2 } } { 0 2 } test-interval
+    2 { { 0 2 } } { 0 2 } test-interval
+    [| incoming victim |
+        2 incoming interval-progress cascade<<
+        { 2 3 1 0 } [ victim interval-progress cascade<< incoming victim cascade-safe? ] map
+    ] call
+] unit-test
+
+: init-recolor-test ( -- )
+    init-test
+    H{ { 1 int-rep } { 2 int-rep } { 3 int-rep } { 4 int-rep } } representations set
+    { } H{ { int-regs { 10 11 } } } greedy-allocate-intervals drop ;
+
+! This requires two recursive moves: B:r10 -> r11 displaces C, then
+! C:r11 -> r10 fits between A's ranges. D is already fixed on r11.
+{ t 10 11 10 11 } [
+    init-recolor-test
+    1 { { 0 2 } { 10 12 } } { 0 2 10 12 } test-interval
+    2 { { 0 6 } } { 0 6 } test-interval
+    3 { { 4 8 } } { 4 8 } test-interval
+    4 { { 10 12 } } { 10 12 } test-interval
+    [| a b c d |
+        b 10 greedy-assign c 11 greedy-assign d 11 greedy-assign
+        a last-chance-recolor
+        a reg>> b reg>> c reg>> d reg>>
+    ] call
+] unit-test
+
+! An impossible recolor restores exact index entries and insertion serials,
+! union order and every physical register, after exploring both candidates.
+{ f t t f 10 11 } [
+    init-recolor-test
+    1 { { 0 10 } } { 0 10 } test-interval
+    2 { { 0 10 } } { 0 10 } test-interval
+    3 { { 0 10 } } { 0 10 } test-interval
+    [| a b c |
+        b 10 greedy-assign c 11 greedy-assign
+        greedy-occupancies get [ clone-occupancy ] assoc-map
+        greedy-unions get [ clone ] assoc-map
+        [| occupancies unions |
+            a last-chance-recolor
+            occupancies greedy-occupancies get =
+            unions greedy-unions get =
+            a reg>> b reg>> c reg>>
+        ] call
+    ] call
+] unit-test
+
+! Physical copy hints affect register choice before eviction/spilling.
+{ { 11 10 } } [
+    init-recolor-test
+    1 { { 0 2 } } { 0 2 } test-interval
+    dup interval-progress 11 >>hint drop allocation-order
 ] unit-test

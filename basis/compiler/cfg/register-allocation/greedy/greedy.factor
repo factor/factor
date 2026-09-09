@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs compiler.cfg.linear-scan
+USING: accessors arrays assocs combinators compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
@@ -8,6 +8,7 @@ compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.ranges
 compiler.cfg.linear-scan.resolve compiler.cfg.utilities
+compiler.cfg.instructions compiler.cfg.ssa.destruction.leaders
 compiler.cfg.linearization compiler.cfg.loop-detection
 compiler.cfg.register-allocation compiler.cfg.ssa.destruction
 compiler.cfg.register-allocation.occupancy hashtables.identity
@@ -19,7 +20,26 @@ IN: compiler.cfg.register-allocation.greedy
 SINGLETON: greedy-allocator
 
 SYMBOLS: greedy-queue greedy-registers greedy-unions greedy-statistics
-greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs ;
+greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs
+ greedy-progress-map greedy-cascade-counter greedy-copy-hints greedy-vreg-unions
+ greedy-recolor-fixed greedy-recolor-budget ;
+
+! Stages advance monotonically. Splits must reduce the number of uses; spill
+! products are minimal and cannot be evicted or split indefinitely.
+CONSTANT: assign-stage 0
+CONSTANT: region-stage 1
+CONSTANT: local-stage 2
+CONSTANT: spill-stage 3
+CONSTANT: done-stage 4
+TUPLE: greedy-progress stage cascade hint ;
+
+: interval-progress ( interval -- progress )
+    greedy-progress-map get [ drop assign-stage 0 f greedy-progress boa ] cache ;
+
+: interval-stage ( interval -- stage ) interval-progress stage>> ;
+
+:: advance-stage ( interval stage -- )
+    interval interval-progress [ stage max ] change-stage drop ;
 
 : greedy-count ( key -- ) greedy-statistics get inc-at ;
 
@@ -45,7 +65,9 @@ greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs ;
 : cached-spill-weight ( interval -- weight ) cached-priority second ;
 
 : greedy-enqueue ( interval -- )
-    f >>reg dup cached-priority greedy-queue get heap-push ;
+    f >>reg dup cached-priority
+    over interval-stage assign-stage = [ 1 ] [ 0 ] if prefix
+    greedy-queue get heap-push ;
 
 : register-union ( interval reg -- intervals )
     [ interval-reg-class ] dip 2array greedy-unions get at ;
@@ -56,25 +78,143 @@ greedy-use-weights greedy-region-boundaries greedy-occupancies greedy-costs ;
 :: register-conflicts ( interval reg -- conflicts )
     interval ranges>> interval reg register-index occupancy-conflicts ;
 
+:: hint-scores ( interval -- scores )
+    H{ } clone :> scores
+    interval interval-progress hint>> [ 1 swap scores set-at ] when*
+    interval vreg>> greedy-copy-hints get at [| hint |
+        hint second interval ranges>> ranges-cover? [
+            hint first greedy-vreg-unions get at [| peer |
+                hint second peer ranges>> ranges-cover? [
+                    hint third peer reg>> scores at 0 or +
+                    peer reg>> scores set-at
+                ] when
+            ] each
+        ] when
+    ] each scores ;
+
+:: hint-score ( interval reg -- score )
+    reg interval hint-scores at 0 or ;
+
+:: allocation-order ( interval -- regs )
+    interval hint-scores :> scores
+    interval interval-reg-class greedy-registers get at
+    [ scores at 0 or neg ] sort-by ;
+
 :: greedy-assign ( interval reg -- )
     interval reg >>reg interval reg register-union push
     interval interval ranges>> interval reg register-index occupy-ranges
+    interval interval vreg>> greedy-vreg-unions get push-at
+    interval reg hint-score 0 > [ "hint-assignments" greedy-count ] when
     "assignments" greedy-count ;
 
+:: greedy-unassign ( interval -- )
+    interval reg>> :> reg
+    interval reg register-union interval swap remove-eq! drop
+    interval interval reg register-index release-ranges
+    interval interval vreg>> greedy-vreg-unions get at remove-eq! drop
+    interval f >>reg drop ;
+
+:: cascade-safe? ( interval victim -- ? )
+    interval interval-progress cascade>> :> cascade
+    victim interval-progress cascade>> :> other
+    cascade 0 = other cascade < or ;
+
+:: evictable-victim? ( interval victim reg -- ? )
+    victim interval-stage done-stage <
+    interval victim cascade-safe? and [
+        interval cached-spill-weight victim cached-spill-weight >
+        interval reg hint-score 0 >
+        victim reg hint-score 0 = and
+        victim interval-stage spill-stage < and or
+    ] [ f ] if ;
+
 :: evictable? ( interval conflicts -- ? )
-    interval cached-spill-weight :> weight
-    conflicts [ cached-spill-weight weight < ] all? ;
+    conflicts [| victim | interval victim victim reg>> evictable-victim? ] all? ;
 
 : eviction-cost ( conflicts -- cost ) [ cached-spill-weight ] map-sum ;
 
+:: candidate-cost ( interval reg conflicts -- cost )
+    conflicts [ reg hint-score ] map-sum
+    interval reg hint-score -
+    conflicts 0 [ cached-spill-weight max ] reduce
+    conflicts eviction-cost 3array ;
+
+:: eviction-cascade ( interval -- cascade )
+    interval interval-progress :> progress
+    progress cascade>> dup 0 = [
+        drop greedy-cascade-counter inc
+        greedy-cascade-counter get dup progress cascade<<
+    ] when ;
+
 :: greedy-evict ( interval reg -- )
+    interval eviction-cascade :> cascade
     interval reg register-conflicts [| victim |
-        victim reg register-union victim swap remove-eq! drop
-        victim victim reg register-index release-ranges
+        victim reg hint-score 0 > [ "broken-hints" greedy-count ] when
+        cascade victim interval-progress cascade<<
+        victim greedy-unassign
         victim greedy-enqueue
         "evictions" greedy-count
     ] each
     interval reg greedy-assign ;
+
+! Last-chance recoloring is a bounded augmenting search. Every failed branch
+! restores complete occupancy state (including stable conflict order), register
+! fields and diagnostics. No interval is split or queued during this search.
+TUPLE: greedy-snapshot unions occupancies vregs fixed statistics ;
+
+: clone-occupancy ( occupancy -- copy )
+    clone [ clone ] change-entries ;
+
+: save-greedy-state ( -- snapshot )
+    greedy-unions get [ clone ] assoc-map
+    greedy-occupancies get [ clone-occupancy ] assoc-map
+    greedy-vreg-unions get [ clone ] assoc-map
+    greedy-recolor-fixed get clone
+    greedy-statistics get clone greedy-snapshot boa ;
+
+:: restore-greedy-state ( snapshot -- )
+    greedy-unions get values [ [ f >>reg drop ] each ] each
+    snapshot unions>> dup greedy-unions set [| key intervals |
+        intervals [ key second >>reg drop ] each
+    ] assoc-each
+    snapshot occupancies>> greedy-occupancies set
+    snapshot vregs>> greedy-vreg-unions set
+    snapshot fixed>> greedy-recolor-fixed set
+    snapshot statistics>> greedy-statistics set ;
+
+DEFER: recolor-interval
+
+:: recolor-on-register ( interval reg depth -- ? )
+    interval reg register-conflicts :> conflicts
+    conflicts empty? [ interval reg greedy-assign t ] [
+        depth 0 > conflicts length 8 <= and
+        conflicts [ greedy-recolor-fixed get key? not ] all? and [
+            save-greedy-state :> saved
+            conflicts [ greedy-unassign ] each
+            interval reg greedy-assign
+            t interval greedy-recolor-fixed get set-at
+            conflicts [ depth 1 - recolor-interval ] all? [
+                t
+            ] [
+                saved restore-greedy-state
+                "recolor-rollbacks" greedy-count f
+            ] if
+        ] [ f ] if
+    ] if ;
+
+:: recolor-interval ( interval depth -- ? )
+    greedy-recolor-budget get 0 > [
+        greedy-recolor-budget dec
+        interval allocation-order [ interval swap depth recolor-on-register ] any?
+        dup [ t interval greedy-recolor-fixed get set-at ] when
+    ] [ f ] if ;
+
+:: last-chance-recolor ( interval -- ? )
+    "recolor-attempts" greedy-count
+    32 <identity-hashtable> greedy-recolor-fixed set
+    64 greedy-recolor-budget set
+    interval 5 recolor-interval
+    dup [ "recolor-successes" greedy-count ] when ;
 
 ! Split at the widest gap between uses. This preserves a cluster of nearby
 ! uses instead of immediately creating a separate reload for every use.
@@ -120,27 +260,54 @@ ERROR: greedy-register-pressure interval ;
         interval use-gap [ interval single-use-split ] unless* position!
     ] if
     position [
-        interval position split-for-spill
-        [ [ greedy-enqueue ] when* ] bi@
+        interval interval-stage 1 + spill-stage min :> stage
+        interval position split-for-spill [
+            [ dup stage advance-stage greedy-enqueue ] when*
+        ] bi@
         "splits" greedy-count
     ] [ interval greedy-register-pressure ] if ;
 
+:: spill-to-minimal-ranges ( interval -- )
+    interval greedy-costs get delete-at
+    interval :> remaining!
+    [ remaining uses>> length 1 > ] [
+        remaining remaining uses>> second n>> 1 - split-for-spill
+        remaining!
+        spill-after dup done-stage advance-stage greedy-enqueue
+        "spill-products" greedy-count
+    ] while
+    remaining spill-after spill-before
+    dup done-stage advance-stage greedy-enqueue
+    "spill-products" greedy-count ;
+
 :: greedy-allocate-one ( interval -- )
     f :> cheapest!
-    interval interval-reg-class greedy-registers get at [| reg |
+    interval allocation-order [| reg |
         interval reg register-conflicts :> conflicts
         conflicts empty? [
             interval reg greedy-assign t
         ] [
-            interval conflicts evictable? [
-                conflicts eviction-cost :> cost
-                cheapest [ cost cheapest second < ] [ t ] if [
-                    reg cost 2array cheapest!
+            interval interval-stage region-stage = [ ] [
+                interval conflicts evictable? [
+                    interval reg conflicts candidate-cost :> cost
+                    cheapest [ cost cheapest second before? ] [ t ] if [
+                        reg cost 2array cheapest!
+                    ] when
                 ] when
-            ] when f
+            ] if f
         ] if
     ] any? [
-        cheapest [ first interval swap greedy-evict ] [ interval greedy-split ] if*
+        cheapest [ first interval swap greedy-evict ] [
+            interval interval-stage {
+                { 0 [
+                    interval region-stage advance-stage
+                    interval greedy-enqueue "stage-deferrals" greedy-count
+                ] }
+                { 4 [ interval last-chance-recolor [ interval greedy-register-pressure ] unless ] }
+                { 3 [ interval last-chance-recolor [ interval spill-to-minimal-ranges ] unless ] }
+                [ drop interval greedy-split ]
+            } case
+        ] if*
     ] unless ;
 
 ! Calls and boxing instructions impose Factor-specific clobbers. Split them
@@ -192,6 +359,9 @@ ERROR: greedy-register-pressure interval ;
     H{ } clone greedy-unions set
     H{ } clone greedy-occupancies set
     32 <identity-hashtable> greedy-costs set
+    32 <identity-hashtable> greedy-progress-map set
+    0 greedy-cascade-counter set
+    H{ } clone greedy-vreg-unions set
     registers [| class regs |
         regs [| reg |
             V{ } clone class reg 2array greedy-unions get set-at
@@ -209,6 +379,7 @@ ERROR: greedy-register-pressure interval ;
 ! so deeply nested loops cannot swamp all other uses through huge integers.
 :: prepare-greedy-regions ( cfg -- )
     cfg needs-loops
+    H{ } clone greedy-copy-hints set
     H{ } clone greedy-use-weights set
     V{ } clone greedy-region-boundaries set
     0 :> previous-depth!
@@ -221,12 +392,19 @@ ERROR: greedy-register-pressure interval ;
         depth previous-depth!
         bb instructions>> [| insn |
             8 depth ^ insn insn#>> greedy-use-weights get set-at
+            insn ##copy? [
+                insn src>> leader :> src
+                insn dst>> leader :> dst
+                src dst = [ ] [
+                    dst insn insn#>> 8 depth ^ 3array src greedy-copy-hints get push-at
+                    src insn insn#>> 8 depth ^ 3array dst greedy-copy-hints get push-at
+                ] if
+            ] when
         ] each
     ] each ;
 
-:: greedy-allocate-and-assign ( cfg -- )
+:: (greedy-allocation-with-registers) ( cfg registers -- )
     cfg prepare-greedy-regions
-    cfg admissible-registers :> registers
     cfg compute-live-intervals :> original-intervals
     check-allocation? get [ original-intervals required-register-uses ] [ f ] if :> required
     original-intervals registers greedy-allocate-intervals :> intervals
@@ -236,6 +414,9 @@ ERROR: greedy-register-pressure interval ;
     ] when
     cfg intervals assign-registers ;
 
+: greedy-allocate-and-assign ( cfg -- )
+    dup admissible-registers (greedy-allocation-with-registers) ;
+
 : greedy ( cfg -- )
     {
         number-instructions
@@ -244,7 +425,18 @@ ERROR: greedy-register-pressure interval ;
         check-numbering
     } apply-passes ;
 
-M: greedy-allocator allocate-cfg drop [ destruct-ssa ] [ greedy ] bi ;
+! Public complete allocator kernel for independently selected legal banks.
+:: greedy-allocation-with-registers ( cfg registers -- )
+    cfg destruct-ssa
+    cfg number-instructions
+    cfg registers (greedy-allocation-with-registers)
+    cfg resolve-data-flow
+    cfg check-numbering ;
+
+M: greedy-allocator allocate-cfg
+    drop dup admissible-registers greedy-allocation-with-registers ;
 
 M: greedy-allocator allocator-statistics
-    drop greedy-statistics get H{ } or clone ;
+    drop greedy-statistics get H{ } or clone
+    "llvm-style-greedy" "algorithm" pick set-at
+    0 "fallback-count" pick set-at ;
