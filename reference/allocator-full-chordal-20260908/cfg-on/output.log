@@ -1,0 +1,5 @@
+SPEED compiler-suite allocator=chordal-allocator rematerialization=t
+SPEED loop-spills=f
+SPEED checks=ssa,intervals,final-value-flow gvn=off
+TEST-FAILURES 0
+SPEED compiler-suite=passed
