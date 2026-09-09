@@ -59,7 +59,8 @@ IN: compiler.cfg.memory-optimization.tests
     { ##set-slot ##set-slot-imm ##set-vm-field ##store-memory
       ##store-memory-imm ##call ##call-gc ##alien-invoke ##alien-indirect
       ##alien-assembly ##allot ##box ##box-long-long ##box-alien
-      ##box-displaced-alien ##write-barrier ##write-barrier-imm ##spill }
+      ##box-displaced-alien ##unbox ##unbox-long-long
+      ##write-barrier ##write-barrier-imm ##spill }
     [| class |
         H{ { { 0 1 0 } 5 } } clone :> facts
         class new facts update-memory-facts
