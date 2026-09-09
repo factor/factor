@@ -1,0 +1,612 @@
+Unit Test: { { 80 } [ "http" f getservbyname port>> ntohs ] }
+Unit Test: {
+    { }
+    [ "http" f getservbyname aliases>> utf8 alien>strings drop ]
+}
+Unit Test: { { "http" } [ 80 htons f getservbyport name>> ] }
+Unit Test: { { 2 } [ \ ioctl def>> 4 swap nth ] }
+--> test failed!
+Unit Test: { { 0 7 } [ unread-pipe-bytes ] }
+--> test failed!
+Unit Test: {
+    { { 2 2 2 2 } }
+    [
+        {
+            curl_easy_setopt_long
+            curl_easy_setopt_string
+            curl_easy_setopt_pointer
+            curl_easy_setopt_curl_off_t
+        } [ def>> 4 swap nth ] map
+    ]
+}
+--> test failed!
+Unit Test: { { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-timeout ] }
+Unit Test: { { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-speed ] }
+--> test failed!
+Unit Test: { { "https://example.invalid/no-transfer" } [ configured-url ] }
+--> test failed!
+Unit Test: { { t } [ configured-pointer ] }
+--> test failed!
+Unit Test: { { 2 } [ \ BIO_printf def>> 4 swap nth ] }
+--> test failed!
+Unit Test: { { 14 "plain BIO text" } [ format-memory-bio ] }
+
+==== resource:basis/openssl/libcrypto/tests/varargs.factor
+
+resource:basis/openssl/libcrypto/tests/varargs.factor: 7
+
+Unit Test: { { 2 } [ \ BIO_printf def>> 4 swap nth ] }
+
+=== Expected:
+2
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        { 2 } [ \ BIO_printf def>> 4 swap nth ] \ (unit-test) 7
+        experiment =>
+        { 14 "plain BIO text" } [ format-memory-bio ] \ (unit-test)
+        20 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+==== resource:basis/unix/ffi/ffi-tests.factor
+
+resource:basis/unix/ffi/ffi-tests.factor: 21
+
+Unit Test: { { 2 } [ \ ioctl def>> 4 swap nth ] }
+
+=== Expected:
+2
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        { 80 } [ "http" f getservbyname port>> ntohs ] \ (unit-test)
+        5 experiment
+        { }
+        [ "http" f getservbyname aliases>> utf8 alien>strings drop ]
+        \ (unit-test) 11 experiment
+        { "http" } [ 80 htons f getservbyport name>> ] \ (unit-test)
+        13 experiment
+        { 2 } [ \ ioctl def>> 4 swap nth ] \ (unit-test) 21
+        experiment =>
+        { 0 7 } [ unread-pipe-bytes ] \ (unit-test) 39 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/unix/ffi/ffi-tests.factor: 39
+
+Unit Test: { { 0 7 } [ unread-pipe-bytes ] }
+
+=== Expected:
+0
+7
+=== Got:
+0
+-1
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+==== resource:extra/curl/ffi/ffi-tests.factor
+
+resource:extra/curl/ffi/ffi-tests.factor: 11
+
+Unit Test: {
+    { { 2 2 2 2 } }
+    [
+        {
+            curl_easy_setopt_long
+            curl_easy_setopt_string
+            curl_easy_setopt_pointer
+            curl_easy_setopt_curl_off_t
+        } [ def>> 4 swap nth ] map
+    ]
+}
+
+=== Expected:
+{ 2 2 2 2 }
+=== Got:
+{ f f f f }
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ~quotation~ map ] \ (unit-test) 11
+        experiment =>
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-timeout ]
+        \ (unit-test) 22 experiment
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-speed ]
+        \ (unit-test) 28 experiment
+        { "https://example.invalid/no-transfer" } [ configured-url ]
+        \ (unit-test) 39 experiment
+        { t } [ configured-pointer ] \ (unit-test) 51 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:extra/curl/ffi/ffi-tests.factor: 28
+
+Unit Test: { { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-speed ] }
+
+=== Expected:
+CURLE_BAD_FUNCTION_ARGUMENT
+=== Got:
+CURLE_OK
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ~quotation~ map ] \ (unit-test) 11
+        experiment
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-timeout ]
+        \ (unit-test) 22 experiment
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-speed ]
+        \ (unit-test) 28 experiment =>
+        { "https://example.invalid/no-transfer" } [ configured-url ]
+        \ (unit-test) 39 experiment
+        { t } [ configured-pointer ] \ (unit-test) 51 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:extra/curl/ffi/ffi-tests.factor: 39
+
+Unit Test: { { "https://example.invalid/no-transfer" } [ configured-url ] }
+
+=== Expected:
+"https://example.invalid/no-transfer"
+=== Got:
+"��D\x04\x01"
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        { ~array~ } [ ~array~ ~quotation~ map ] \ (unit-test) 11
+        experiment
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-timeout ]
+        \ (unit-test) 22 experiment
+        { CURLE_BAD_FUNCTION_ARGUMENT } [ reject-negative-speed ]
+        \ (unit-test) 28 experiment
+        { "https://example.invalid/no-transfer" } [ configured-url ]
+        \ (unit-test) 39 experiment =>
+        { t } [ configured-pointer ] \ (unit-test) 51 experiment
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:extra/curl/ffi/ffi-tests.factor: 51
+
+Unit Test: { { t } [ configured-pointer ] }
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global {
+            "resource:basis/unix/ffi/ffi-tests.factor"
+            "resource:extra/curl/ffi/ffi-tests.factor"
+            "resource:basis/openssl/libcrypto/tests/varargs.factor"
+        } [ run-test-file ] each
+        => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(O) run-test-file
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

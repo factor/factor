@@ -339,16 +339,16 @@ TYPEDEF: int64_t curl_off_t
 FUNCTION: CURL* curl_easy_init ( )
 
 FUNCTION-ALIAS: curl_easy_setopt_long
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, long value )
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, ... long value )
 
 FUNCTION-ALIAS: curl_easy_setopt_string
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, c-string value )
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, ... c-string value )
 
 FUNCTION-ALIAS: curl_easy_setopt_pointer
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, void* value )
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, ... void* value )
 
 FUNCTION-ALIAS: curl_easy_setopt_curl_off_t
-    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, curl_off_t value )
+    CURLcode curl_easy_setopt ( CURL* curl, CURLoption option, ... curl_off_t value )
 
 FUNCTION: CURLcode curl_easy_perform ( CURL* curl )
 

@@ -23,3 +23,5 @@ IN: openssl.libcrypto.tests
         ] bi >string "\r\n" split first
     ] keep BIO_free
 ] unit-test
+
+"resource:basis/openssl/libcrypto/tests/varargs.factor" run-test-file
