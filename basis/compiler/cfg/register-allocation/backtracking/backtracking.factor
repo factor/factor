@@ -8,6 +8,7 @@ compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.ranges compiler.cfg.linear-scan.resolve
 compiler.cfg.utilities compiler.cfg.register-allocation
 compiler.cfg.ssa.destruction compiler.cfg.register-allocation.occupancy
+compiler.cfg.register-allocation.spill-sites
 cpu.architecture heaps kernel locals math
 math.order namespaces sequences vectors ;
 IN: compiler.cfg.register-allocation.backtracking
@@ -34,7 +35,7 @@ SYMBOL: backtracking-splits
     intervals [ interval-size ] map-sum :> size
     intervals intervals length 1 =
     intervals [ minimal-interval? ] all? and [ 1/0. ] [
-        intervals [ uses>> length ] map-sum size /
+        intervals backtracking-use-weight size /
     ] if size
     ! A queued/assigned bundle is immutable. Splitting discards the bundle;
     ! each child receives fresh range and cost metadata when enqueued.
@@ -98,7 +99,7 @@ ERROR: unsatisfiable-register-pressure interval ;
     interval minimal-interval? [ interval unsatisfiable-register-pressure ] when
     backtracking-splits inc
     uses length 1 > [
-        interval uses length 2 /i uses nth n>> 1 - split-for-spill
+        interval dup backtracking-spill-site split-for-spill
         [ enqueue-interval ] bi@
     ] [
         interval spill-after spill-before enqueue-interval
@@ -154,6 +155,7 @@ ERROR: unsatisfiable-register-pressure interval ;
     ] reduce ;
 
 :: backtracking-allocation ( intervals/syncs machine-regs -- intervals )
+    intervals/syncs prepare-cold-spills
     machine-regs registers set
     H{ } clone spill-slots set
     <max-heap> bundle-queue set
@@ -169,9 +171,10 @@ ERROR: unsatisfiable-register-pressure interval ;
     intervals/syncs prepare-bundles [ dup vreg>> groups push-at ] each
     groups values [ <allocation-bundle> enqueue-bundle ] each
     bundle-queue get [ drop process-bundle ] slurp-heap
-    assigned-bundles get [ intervals>> ] map concat ;
+    assigned-bundles get [ intervals>> ] map concat finish-loop-spills ;
 
 :: backtracking-allocate-and-assign ( cfg -- )
+    cfg prepare-spill-sites
     cfg admissible-registers :> machine-regs
     cfg compute-live-intervals :> input
     check-allocation? get [ input required-register-uses ] [ f ] if :> uses
@@ -199,4 +202,8 @@ M: backtracking-allocator allocator-statistics
     drop H{ } clone
     backtracking-evictions get "evictions" pick set-at
     backtracking-splits get "splits" pick set-at
-    assigned-bundles get length "assigned-bundles" pick set-at ;
+    assigned-bundles get length "assigned-bundles" pick set-at
+    backtracking-loop-spills? get [
+        loop-spill-site-count get "loop-spill-sites" pick set-at
+        cold-spill-store-count get "redundant-loop-stores" pick set-at
+    ] when ;
