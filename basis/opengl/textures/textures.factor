@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data arrays assocs colors combinators
-destructors images images.tessellation kernel literals math
+continuations destructors images images.tessellation kernel literals math
 math.statistics math.vectors namespaces opengl
 opengl.capabilities opengl.gl sequences specialized-arrays
 system ;
@@ -306,11 +306,38 @@ TUPLE: multi-texture < disposable grid display-list loc ;
     [ bitmap>> ] tri
     glTexSubImage2D ;
 
+:: copy-texture-edge ( image source-loc loc dim -- )
+    GL_UNPACK_SKIP_PIXELS source-loc first glPixelStorei
+    GL_UNPACK_SKIP_ROWS source-loc second glPixelStorei
+    GL_TEXTURE_2D 0 loc first2 dim first2
+    image image-format nipd image bitmap>> glTexSubImage2D ;
+
+:: pad-texture-edges ( image -- )
+    image dim>> first2 :> ( w h )
+    image dim>> adjust-texture-dim first2 :> ( tw th )
+    ! Fractional screen positions can sample one texel beyond the image.
+    ! Duplicate its edges into the otherwise uninitialized power-of-two
+    ! padding without changing the image's texture coordinates or scale.
+    GL_CLIENT_PIXEL_STORE_BIT glPushClientAttrib
+    [
+        GL_UNPACK_ALIGNMENT 1 glPixelStorei
+        GL_UNPACK_ROW_LENGTH w glPixelStorei
+        w tw < [
+            image w 1 - 0 2array w 0 2array 1 h 2array copy-texture-edge
+        ] when
+        h th < [
+            image 0 h 1 - 2array 0 h 2array w 1 2array copy-texture-edge
+        ] when
+        w tw < h th < and [
+            image w 1 - h 1 - 2array w h 2array { 1 1 } copy-texture-edge
+        ] when
+    ] [ glPopClientAttrib ] finally ;
+
 : init-texture ( -- )
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT glTexParameteri ;
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
 
 : with-texturing ( quot -- )
     GL_TEXTURE_2D [
@@ -464,7 +491,7 @@ PRIVATE>
             GL_TEXTURE_2D swap glBindTexture
             non-power-of-2-textures? get
             [ dup bitmap>> tex-image ]
-            [ [ f tex-image ] [ tex-sub-image ] bi ] if
+            [ [ f tex-image ] [ tex-sub-image ] [ pad-texture-edges ] tri ] if
         ] do-attribs
     ] keep ;
 
