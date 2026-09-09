@@ -30,13 +30,23 @@ SYMBOLS: phi-locations phi-entry-positions scratch-spills ;
         [ compute-live-intervals* ] if
     ] each ;
 
-: compute-ssa-intervals ( cfg -- intervals/sync-points )
+! Fixed memory tokens participate in edge liveness and GC maps, but never
+! require a physical register or a defining register instruction.
+:: ssa-register-intervals ( intervals fixed-locations -- intervals' )
+    fixed-locations [
+        intervals [ vreg>> fixed-locations key? ] reject
+    ] [ intervals ] if ;
+
+:: compute-ssa-intervals-with-locations ( cfg fixed-locations -- intervals/sync-points )
     H{ } clone live-intervals namespaces:set
     H{ } clone phi-entry-positions namespaces:set
-    [
-        linearization-order <reversed> [ compute-ssa-intervals-in-block ] each
-        live-intervals get values dup [ finish-live-interval ] each
-    ] [ cfg>sync-points ] bi append ;
+    cfg linearization-order <reversed> [ compute-ssa-intervals-in-block ] each
+    live-intervals get values fixed-locations ssa-register-intervals
+    dup [ finish-live-interval ] each
+    cfg cfg>sync-points append ;
+
+: compute-ssa-intervals ( cfg -- intervals/sync-points )
+    f compute-ssa-intervals-with-locations ;
 
 ! A rematerialized constant has no initialized spill slot. Use its recipe
 ! at boundaries without resident fragments, just as shared assignment does.
@@ -79,11 +89,26 @@ SYMBOLS: phi-locations phi-entry-positions scratch-spills ;
         ] each
     ] V{ } make ] change-instructions compute-ssa-live-out ;
 
-:: assign-ssa-registers ( cfg intervals -- )
+ERROR: invalid-ssa-fixed-location vreg location ;
+
+:: seed-ssa-fixed-locations ( fixed-locations -- )
+    fixed-locations [
+        fixed-locations [| vreg location |
+            location spill-slot? location constant-recipe? or [
+                location vreg leader pending-interval-assoc get set-at
+            ] [ vreg location invalid-ssa-fixed-location ] if
+        ] assoc-each
+    ] when ;
+
+:: assign-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
     intervals init-assignment
+    fixed-locations seed-ssa-fixed-locations
     H{ } clone phi-locations namespaces:set
     cfg linearization-order [ kill-block?>> ] reject
     [ assign-ssa-block ] each ;
+
+: assign-ssa-registers ( cfg intervals -- )
+    f assign-ssa-registers-with-locations ;
 
 :: ssa-edge-mappings ( bb to -- mappings )
     bb machine-live-out :> outgoing
