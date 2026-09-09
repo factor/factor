@@ -30,7 +30,12 @@ division, checked-overflow branches and literal loads. Thus a zero-trip loop
 may execute a moved integer calculation without adding a trap, memory access,
 or FP status change. No floating-point reassociation or exception reordering is
 claimed. Loops containing kill blocks, calls, allocation, GC-map instructions
-or ABI/boxing boundaries are rejected altogether. This deliberately forgoes
+or ABI/boxing boundaries are rejected altogether. In addition, any CFG with
+`##tagged>integer` or `##unbox-any-c-ptr` is rejected before loop analysis.
+Representation selection may add boxing/GC later, so explicit loop effects
+alone cannot prove an encoded raw pointer remains valid. The whole-CFG seed
+guard also excludes fixnum bitcasts and unrelated pointer conversions; this is
+an intentional conservative limit, not a numeric-provenance inference. This deliberately forgoes
 hoisting in many existing loops, including mutable-local code lowered through
 calls. There is no alias analysis, load hoisting, induction rewriting, physical
 register constraint relaxation, or claim that every loop invariant is found.
