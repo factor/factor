@@ -1,0 +1,5 @@
+{
+  "equal": true,
+  "mandatory_assignments": 161,
+  "method": "Key original interval by immutable ranges and uses; compare physical register at every non-spill-slot def/use. Vreg numbering is ignored."
+}

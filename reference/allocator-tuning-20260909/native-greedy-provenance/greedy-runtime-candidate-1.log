@@ -1,0 +1,24 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: accessors alien.c-types alien.syntax
+allocator-runtime-comparison arrays assocs compiler.cfg.checker
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation
+compiler.cfg.register-allocation.greedy
+compiler.cfg.register-allocation.rematerialization
+compiler.cfg.register-allocation.spill-sites
+compiler.cfg.register-allocation.verifier
+compiler.cfg.register-allocation.verifier.rematerialization
+compiler.cfg.value-numbering compiler.units io json kernel
+locals math memory namespaces prettyprint sequences tools.test
+tools.time vocabs.loader words ;
+IN: allocator-greedy-runtime
+
+CODE-BYTES 688
+{"workload-iterations":600,"trial":-1,"instructions":3409060633,"ns":145464097,"cpu_seconds":0.1454348419999998}
+{"workload-iterations":600,"trial":0,"instructions":3409050902,"ns":145220952,"cpu_seconds":0.14520015200000014}
+{"workload-iterations":600,"trial":1,"instructions":3409050904,"ns":145386461,"cpu_seconds":0.1453703319999997}
+{"workload-iterations":600,"trial":2,"instructions":3409050900,"ns":144850868,"cpu_seconds":0.14485185000000023}

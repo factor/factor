@@ -1,0 +1,41 @@
+{
+  "baseline_source": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "candidate_source": "dca2e6e19a3818e7254c7fd1cf5e14b0b59e6b7f",
+  "samples_per_revision": 6,
+  "kernel_calls_per_sample": 19200000,
+  "removed_machine_stores_per_kernel": 28,
+  "expected_retired_reduction": 537600000,
+  "executed_script_sha256": "e1ba4c49a6f52b22ea39fd1af240aaefb9920e8ed860db621566b40430115e99",
+  "metrics": {
+    "cpu_seconds": {
+      "baseline": 0.1748126685,
+      "candidate": 0.14502600100000018,
+      "ratio": 0.8296080727124201,
+      "reduction": 0.029786667499999808
+    },
+    "instructions": {
+      "baseline": 3946650959.5,
+      "candidate": 3409050902.5,
+      "ratio": 0.8637832272180187,
+      "reduction": 537600057.0
+    },
+    "ns": {
+      "baseline": 174829538.0,
+      "candidate": 145038590.0,
+      "ratio": 0.8296000301733909,
+      "reduction": 29790948.0
+    }
+  },
+  "by_round": {
+    "1": {
+      "cpu_seconds": 0.8304519122404966,
+      "instructions": 0.8637832272007614,
+      "ns": 0.830479018381379
+    },
+    "2": {
+      "cpu_seconds": 0.8289645084379375,
+      "instructions": 0.863783227235276,
+      "ns": 0.8289628269048328
+    }
+  }
+}

@@ -1,0 +1,557 @@
+{
+  "word": "integer-pressure",
+  "original-intervals": 40,
+  "allocated-intervals": 69,
+  "expiry-stores": 57,
+  "final-spills": 57,
+  "final-reloads": 29,
+  "final-instructions": 176,
+  "stores-after-terminal-use-only-fragments": [
+    {
+      "vreg": 6824843,
+      "block": 1,
+      "last-use": 110,
+      "reg": "RCX",
+      "slot": "T{ spill-slot }",
+      "ranges": [
+        [
+          110,
+          111
+        ]
+      ],
+      "original-ranges": [
+        [
+          32,
+          110
+        ]
+      ]
+    },
+    {
+      "vreg": 6824845,
+      "block": 1,
+      "last-use": 112,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 8 } }",
+      "ranges": [
+        [
+          112,
+          113
+        ]
+      ],
+      "original-ranges": [
+        [
+          34,
+          112
+        ]
+      ]
+    },
+    {
+      "vreg": 6824847,
+      "block": 1,
+      "last-use": 114,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 16 } }",
+      "ranges": [
+        [
+          114,
+          115
+        ]
+      ],
+      "original-ranges": [
+        [
+          36,
+          114
+        ]
+      ]
+    },
+    {
+      "vreg": 6824849,
+      "block": 1,
+      "last-use": 116,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 24 } }",
+      "ranges": [
+        [
+          116,
+          117
+        ]
+      ],
+      "original-ranges": [
+        [
+          38,
+          116
+        ]
+      ]
+    },
+    {
+      "vreg": 6824851,
+      "block": 1,
+      "last-use": 118,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 32 } }",
+      "ranges": [
+        [
+          118,
+          119
+        ]
+      ],
+      "original-ranges": [
+        [
+          40,
+          118
+        ]
+      ]
+    },
+    {
+      "vreg": 6824853,
+      "block": 1,
+      "last-use": 120,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 40 } }",
+      "ranges": [
+        [
+          120,
+          121
+        ]
+      ],
+      "original-ranges": [
+        [
+          42,
+          120
+        ]
+      ]
+    },
+    {
+      "vreg": 6824855,
+      "block": 1,
+      "last-use": 122,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 48 } }",
+      "ranges": [
+        [
+          122,
+          123
+        ]
+      ],
+      "original-ranges": [
+        [
+          44,
+          122
+        ]
+      ]
+    },
+    {
+      "vreg": 6824857,
+      "block": 1,
+      "last-use": 124,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 56 } }",
+      "ranges": [
+        [
+          124,
+          125
+        ]
+      ],
+      "original-ranges": [
+        [
+          46,
+          124
+        ]
+      ]
+    },
+    {
+      "vreg": 6824859,
+      "block": 1,
+      "last-use": 126,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 64 } }",
+      "ranges": [
+        [
+          126,
+          127
+        ]
+      ],
+      "original-ranges": [
+        [
+          48,
+          126
+        ]
+      ]
+    },
+    {
+      "vreg": 6824861,
+      "block": 1,
+      "last-use": 128,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 72 } }",
+      "ranges": [
+        [
+          128,
+          129
+        ]
+      ],
+      "original-ranges": [
+        [
+          50,
+          128
+        ]
+      ]
+    },
+    {
+      "vreg": 6824863,
+      "block": 1,
+      "last-use": 130,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 80 } }",
+      "ranges": [
+        [
+          130,
+          131
+        ]
+      ],
+      "original-ranges": [
+        [
+          52,
+          130
+        ]
+      ]
+    },
+    {
+      "vreg": 6824865,
+      "block": 1,
+      "last-use": 132,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 88 } }",
+      "ranges": [
+        [
+          132,
+          133
+        ]
+      ],
+      "original-ranges": [
+        [
+          54,
+          132
+        ]
+      ]
+    },
+    {
+      "vreg": 6824867,
+      "block": 1,
+      "last-use": 134,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 96 } }",
+      "ranges": [
+        [
+          134,
+          135
+        ]
+      ],
+      "original-ranges": [
+        [
+          56,
+          134
+        ]
+      ]
+    },
+    {
+      "vreg": 6824869,
+      "block": 1,
+      "last-use": 136,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 104 } }",
+      "ranges": [
+        [
+          136,
+          137
+        ]
+      ],
+      "original-ranges": [
+        [
+          58,
+          136
+        ]
+      ]
+    },
+    {
+      "vreg": 6824871,
+      "block": 1,
+      "last-use": 138,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 112 } }",
+      "ranges": [
+        [
+          138,
+          139
+        ]
+      ],
+      "original-ranges": [
+        [
+          60,
+          138
+        ]
+      ]
+    },
+    {
+      "vreg": 6824873,
+      "block": 1,
+      "last-use": 140,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 120 } }",
+      "ranges": [
+        [
+          140,
+          141
+        ]
+      ],
+      "original-ranges": [
+        [
+          62,
+          140
+        ]
+      ]
+    },
+    {
+      "vreg": 6824875,
+      "block": 1,
+      "last-use": 142,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 128 } }",
+      "ranges": [
+        [
+          142,
+          143
+        ]
+      ],
+      "original-ranges": [
+        [
+          64,
+          142
+        ]
+      ]
+    },
+    {
+      "vreg": 6824877,
+      "block": 1,
+      "last-use": 144,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 136 } }",
+      "ranges": [
+        [
+          144,
+          145
+        ]
+      ],
+      "original-ranges": [
+        [
+          66,
+          144
+        ]
+      ]
+    },
+    {
+      "vreg": 6824879,
+      "block": 1,
+      "last-use": 146,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 144 } }",
+      "ranges": [
+        [
+          146,
+          147
+        ]
+      ],
+      "original-ranges": [
+        [
+          68,
+          146
+        ]
+      ]
+    },
+    {
+      "vreg": 6824881,
+      "block": 1,
+      "last-use": 148,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 152 } }",
+      "ranges": [
+        [
+          148,
+          149
+        ]
+      ],
+      "original-ranges": [
+        [
+          70,
+          148
+        ]
+      ]
+    },
+    {
+      "vreg": 6824883,
+      "block": 1,
+      "last-use": 150,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 160 } }",
+      "ranges": [
+        [
+          150,
+          151
+        ]
+      ],
+      "original-ranges": [
+        [
+          72,
+          150
+        ]
+      ]
+    },
+    {
+      "vreg": 6824885,
+      "block": 1,
+      "last-use": 152,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 168 } }",
+      "ranges": [
+        [
+          152,
+          153
+        ]
+      ],
+      "original-ranges": [
+        [
+          74,
+          152
+        ]
+      ]
+    },
+    {
+      "vreg": 6824887,
+      "block": 1,
+      "last-use": 154,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 176 } }",
+      "ranges": [
+        [
+          154,
+          155
+        ]
+      ],
+      "original-ranges": [
+        [
+          76,
+          154
+        ]
+      ]
+    },
+    {
+      "vreg": 6824889,
+      "block": 1,
+      "last-use": 156,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 184 } }",
+      "ranges": [
+        [
+          156,
+          157
+        ]
+      ],
+      "original-ranges": [
+        [
+          78,
+          156
+        ]
+      ]
+    },
+    {
+      "vreg": 6824891,
+      "block": 1,
+      "last-use": 158,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 192 } }",
+      "ranges": [
+        [
+          158,
+          159
+        ]
+      ],
+      "original-ranges": [
+        [
+          80,
+          158
+        ]
+      ]
+    },
+    {
+      "vreg": 6824893,
+      "block": 1,
+      "last-use": 160,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 200 } }",
+      "ranges": [
+        [
+          160,
+          161
+        ]
+      ],
+      "original-ranges": [
+        [
+          82,
+          160
+        ]
+      ]
+    },
+    {
+      "vreg": 6824895,
+      "block": 1,
+      "last-use": 162,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 208 } }",
+      "ranges": [
+        [
+          162,
+          163
+        ]
+      ],
+      "original-ranges": [
+        [
+          84,
+          162
+        ]
+      ]
+    },
+    {
+      "vreg": 6824897,
+      "block": 1,
+      "last-use": 164,
+      "reg": "RCX",
+      "slot": "T{ spill-slot { n 216 } }",
+      "ranges": [
+        [
+          164,
+          165
+        ]
+      ],
+      "original-ranges": [
+        [
+          86,
+          164
+        ]
+      ]
+    }
+  ],
+  "allocation": {
+    "stage-deferrals": 29,
+    "stage-local": 29,
+    "evictions": 1,
+    "hint-assignments": 29,
+    "stage-assign": 41,
+    "splits": 29,
+    "assignments": 70,
+    "algorithm": "llvm-style-greedy",
+    "stage-spill": 29,
+    "local-splits": 29,
+    "fallback-count": 0,
+    "stage-region": 29
+  }
+}
