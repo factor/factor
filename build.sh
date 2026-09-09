@@ -256,35 +256,46 @@ check_installed_programs() {
 }
 
 check_library_exists() {
-    GCC_TEST=factor-library-test.c
-    GCC_OUT=factor-library-test.out
+    local probe_dir library
+    local dlflags=()
+    probe_dir=$(mktemp -d) || return 1
+    library="lib$1.so"
+    if [[ $OS = linux ]]; then
+        library="$2"
+        dlflags=(-ldl)
+    fi
     $ECHO -n "Checking for library $1..."
-    $ECHO "int main(){return 0;}" > $GCC_TEST
-    if $CC "$GCC_TEST" -o "$GCC_OUT" -l "$1" 2>&- ; then
+    cat > "$probe_dir/probe.c" <<'EOF'
+#include <dlfcn.h>
+int main(int argc, char **argv) { void *p = dlopen(argv[1], RTLD_NOW | RTLD_LOCAL); if (!p) return 1; return dlclose(p) != 0; }
+EOF
+    local result=1
+    if ! $CC "$probe_dir/probe.c" -o "$probe_dir/probe" "${dlflags[@]}"; then
+        $ECHO "unable to build runtime library probe."
+    elif "$probe_dir/probe" "$library"; then
         $ECHO "found."
+        result=0
     else
         $ECHO "not found."
     fi
-    rm -f "$GCC_TEST"
-    check_ret rm
-    rm -f "$GCC_OUT"
-    check_ret rm
+    rm -rf "$probe_dir"
+    return "$result"
 }
 
 check_X11_libraries() {
-    check_library_exists GL
-    check_library_exists X11
-    check_library_exists pango-1.0
+    check_library_exists GL libGL.so.1
+    check_library_exists X11 libX11.so.6
+    check_library_exists pango-1.0 libpango-1.0.so.0
 }
 
 check_gtk_libraries() {
-    check_library_exists gobject-2.0
-    check_library_exists gdk-3.0
-    check_library_exists gtk-3.0
-    check_library_exists gdk_pixbuf-2.0
-    check_library_exists atk-1.0
-    check_library_exists gio-2.0
-    check_library_exists pango-1.0
+    check_library_exists gobject-2.0 libgobject-2.0.so.0
+    check_library_exists gdk-3.0 libgdk-3.so.0
+    check_library_exists gtk-3.0 libgtk-3.so.0
+    check_library_exists gdk_pixbuf-2.0 libgdk_pixbuf-2.0.so.0
+    check_library_exists atk-1.0 libatk-1.0.so.0
+    check_library_exists gio-2.0 libgio-2.0.so.0
+    check_library_exists pango-1.0 libpango-1.0.so.0
 }
 
 
