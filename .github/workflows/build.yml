@@ -12,6 +12,8 @@ permissions:
 jobs:
   build-linux-intel:
     runs-on: ubuntu-24.04
+    env:
+      FACTOR_GUI_TEST_IMAGE: ${{ github.workspace }}/factor-gui.image
     steps:
     - uses: actions/checkout@v4
     - name: runtime-library-probe
@@ -21,7 +23,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y xvfb libgtk-3-0t64 libgtk2.0-0t64
     - name: bootstrap
-      run: ./build.sh net-bootstrap
+      run: |
+        ./build.sh net-bootstrap
+        ./factor -no-user-init -no-monitors -e='USING: bootstrap.image vocabs.loader ; "bootstrap.image" reload "unix-x86.64" make-image'
+        ./factor -i=boot.unix-x86.64.image -no-user-init -no-monitors -output-image=factor.image
+        cp factor.image factor-gui.image
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
@@ -37,8 +43,9 @@ jobs:
     - name: gtk2-dialogs
       env:
         G_DEBUG: fatal-criticals
+        FACTOR_GUI_TEST_IMAGE: ${{ github.workspace }}/gtk2.image
       run: |
-        ./factor -no-user-init -no-monitors -e='USING: bootstrap.image ; "unix-x86.64" make-image'
+        ./factor -no-user-init -no-monitors -e='USING: bootstrap.image vocabs.loader ; "bootstrap.image" reload "unix-x86.64" make-image'
         ./factor -i=boot.unix-x86.64.image -ui-backend=gtk2 -no-user-init -no-monitors -output-image=gtk2.image
         timeout 60s xvfb-run -a ./factor -i=gtk2.image -no-user-init -no-monitors .github/gtk-tests.factor
     - name: help-lint
