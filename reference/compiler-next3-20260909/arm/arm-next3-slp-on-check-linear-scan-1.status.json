@@ -1,0 +1,55 @@
+{
+  "source_commit": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "feature": "slp",
+  "enabled": "on",
+  "gvn": "off",
+  "rematerialize": "off",
+  "loop_spills": "off",
+  "image_sha256": "2fe3a28e41e9d187ba8937f6584ba5f70ca3e78a8320470c2f92b835f3e4f84a",
+  "vm_sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+  "script_sha256": {
+    "checked-launch.factor": "b40a0e6bf660ccfe7959e62471bebd99d25607dad6b5b1b232a8ace8a91f34d7",
+    "timing.factor": "ff845a5564152f15ee75b5199cf7a09212bb9ac1bab78bcc12cff4328c461833",
+    "drive.py": "86bf821d0ec14f4c9d40ad44eaaadc62471517405eda69d882140ea51c8f0cb2"
+  },
+  "host_load_before": [
+    74.50244140625,
+    81.1376953125,
+    86.57470703125
+  ],
+  "host_load_after": [
+    86.236328125,
+    83.94970703125,
+    86.939453125
+  ],
+  "final_value_verifier": true,
+  "exit_code": 0,
+  "seconds": 133.99700713157654,
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next3-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next3-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-next3-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next3-integration/reference/compiler-next3-20260909/checked-launch.factor",
+    "linear-scan",
+    "check",
+    "3",
+    "off",
+    "off",
+    "020b74ce5d8f8fac9b5df5642afad8787da98896",
+    "off",
+    "slp",
+    "on"
+  ],
+  "ok": true,
+  "counts": {
+    "compile": 1,
+    "code": 16,
+    "runtime": 30,
+    "scope": 1
+  },
+  "taskpolicy": {
+    "exit_code": 0,
+    "stderr": ""
+  }
+}
