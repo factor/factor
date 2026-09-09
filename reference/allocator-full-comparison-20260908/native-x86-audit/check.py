@@ -38,3 +38,16 @@ for row in rows:
         allowed={v: list(range(4)) for v in g}, elimination_order=order,
         clique_size=bound, uniform_register_file=True))
 print('PASS: four concrete backend bodies; nine native pressure CFGs/45 formula answers; all PEOs and 4-register optimal colorings')
+
+remat = [json.loads(line) for line in (HERE / 'remat-probe.log').read_text().splitlines()
+         if line.startswith('{')]
+require(len(remat) == 8, 'missing rematerialization activity evidence')
+for allocator in ('linear-scan', 'greedy', 'backtracking', 'chordal'):
+    selected = [r for r in remat if r['allocator'] == allocator + '-allocator']
+    require(len(selected) == 2, 'duplicate or absent allocator recipe pair')
+    off = next(r for r in selected if r['enabled'] is False)
+    on = next(r for r in selected if r['enabled'] is True)
+    require(off['rematerializations'] == 0 and on['rematerializations'] > 0, 'recipe option not exercised')
+    require(all(off[key] > on[key] for key in ('spills', 'reloads', 'spill-bytes', 'code-bytes')),
+            'enabled recipes did not reduce final memory traffic/frame/code')
+print('PASS: all four native backends emit recipes and reduce final spills/reloads/slot bytes/code bytes')
