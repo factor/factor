@@ -21,6 +21,7 @@ compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.ranges
 compiler.cfg.linear-scan.debugger
+compiler.cfg.register-allocation.rematerialization
 compiler.cfg.utilities ;
 IN: compiler.cfg.linear-scan.tests
 
@@ -54,6 +55,10 @@ check-numbering? on
 ] unit-test
 
 ! Live interval splitting
+! These synthetic intervals start a different allocation problem and reuse
+! vreg numbers with different representations. Recipes from test-live-intervals
+! above belong to that earlier CFG and must not enter this fixture.
+H{ } clone rematerialization-recipes set
 { } insns>cfg [ stack-frame>> 4 >>spill-area-align drop ] keep cfg set
 H{ } spill-slots set
 
