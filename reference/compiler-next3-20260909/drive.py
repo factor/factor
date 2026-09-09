@@ -36,7 +36,7 @@ for r in range(1 if a.mode=='check' else a.rounds):
         final_verifier=False
         if a.mode=='check' and (ROOT/'basis/compiler/cfg/register-allocation/verifier/verifier.factor').exists():
             final_verifier=True
-            setup='USING: parser vocabs.loader ;\n<< "compiler.cfg.register-allocation.verifier" require'
+            setup='USING: parser vocabs vocabs.loader ;\n<< "compiler.cfg.register-allocation.verifier" require'
             if (ROOT/'basis/compiler/cfg/register-allocation/verifier/rematerialization/rematerialization.factor').exists():
                 setup+=' "compiler.cfg.register-allocation.verifier.rematerialization" require'
             setup+=' >>\n"reference/compiler-next3-20260909/timing.factor" run-file\n'

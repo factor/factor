@@ -1,4 +1,4 @@
-USING: parser vocabs.loader vocabs.refresh ;
+USING: parser vocabs vocabs.loader vocabs.refresh ;
 << "compiler.cfg.loop-optimization" require
    "compiler.cfg.memory-optimization" require
    "compiler.cfg.slp" require
