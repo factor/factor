@@ -1,0 +1,11 @@
+functions: 272/364, 92 missing
+constants: 245/523, 278 missing
+typedefs: 40/46, 6 missing
+records: 22/23, 1 missing
+signature_mismatches 0
+field_mismatches 3
+typedef_mismatches 0
+constant_value_mismatches 2
+record_reset_mismatches 1
+ownership_mismatches 2
+FAIL

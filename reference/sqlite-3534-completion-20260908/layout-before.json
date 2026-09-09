@@ -1,0 +1,156 @@
+{
+  "factor_measurements": 208,
+  "mismatches": {
+    "Fts5ExtensionApi.size": {
+      "c": 192,
+      "factor": 160
+    },
+    "Fts5ExtensionApi.xColumnLocale": {
+      "c": 176,
+      "factor": null
+    },
+    "Fts5ExtensionApi.xInstToken": {
+      "c": 168,
+      "factor": null
+    },
+    "Fts5ExtensionApi.xQueryToken": {
+      "c": 160,
+      "factor": null
+    },
+    "Fts5ExtensionApi.xTokenize_v2": {
+      "c": 184,
+      "factor": null
+    },
+    "fts5_api.size": {
+      "c": 48,
+      "factor": 32
+    },
+    "fts5_api.xCreateTokenizer_v2": {
+      "c": 32,
+      "factor": null
+    },
+    "fts5_api.xFindTokenizer_v2": {
+      "c": 40,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.align": {
+      "c": 8,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.iVersion": {
+      "c": 0,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.size": {
+      "c": 32,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.xCreate": {
+      "c": 8,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.xDelete": {
+      "c": 16,
+      "factor": null
+    },
+    "fts5_tokenizer_v2.xTokenize": {
+      "c": 24,
+      "factor": null
+    },
+    "sqlite3_io_methods.align": {
+      "c": 8,
+      "factor": null
+    },
+    "sqlite3_io_methods.iVersion": {
+      "c": 0,
+      "factor": null
+    },
+    "sqlite3_io_methods.size": {
+      "c": 152,
+      "factor": null
+    },
+    "sqlite3_io_methods.xCheckReservedLock": {
+      "c": 72,
+      "factor": null
+    },
+    "sqlite3_io_methods.xClose": {
+      "c": 8,
+      "factor": null
+    },
+    "sqlite3_io_methods.xDeviceCharacteristics": {
+      "c": 96,
+      "factor": null
+    },
+    "sqlite3_io_methods.xFetch": {
+      "c": 136,
+      "factor": null
+    },
+    "sqlite3_io_methods.xFileControl": {
+      "c": 80,
+      "factor": null
+    },
+    "sqlite3_io_methods.xFileSize": {
+      "c": 48,
+      "factor": null
+    },
+    "sqlite3_io_methods.xLock": {
+      "c": 56,
+      "factor": null
+    },
+    "sqlite3_io_methods.xRead": {
+      "c": 16,
+      "factor": null
+    },
+    "sqlite3_io_methods.xSectorSize": {
+      "c": 88,
+      "factor": null
+    },
+    "sqlite3_io_methods.xShmBarrier": {
+      "c": 120,
+      "factor": null
+    },
+    "sqlite3_io_methods.xShmLock": {
+      "c": 112,
+      "factor": null
+    },
+    "sqlite3_io_methods.xShmMap": {
+      "c": 104,
+      "factor": null
+    },
+    "sqlite3_io_methods.xShmUnmap": {
+      "c": 128,
+      "factor": null
+    },
+    "sqlite3_io_methods.xSync": {
+      "c": 40,
+      "factor": null
+    },
+    "sqlite3_io_methods.xTruncate": {
+      "c": 32,
+      "factor": null
+    },
+    "sqlite3_io_methods.xUnfetch": {
+      "c": 144,
+      "factor": null
+    },
+    "sqlite3_io_methods.xUnlock": {
+      "c": 64,
+      "factor": null
+    },
+    "sqlite3_io_methods.xWrite": {
+      "c": 24,
+      "factor": null
+    },
+    "sqlite3_module.size": {
+      "c": 200,
+      "factor": 192
+    },
+    "sqlite3_module.xIntegrity": {
+      "c": 192,
+      "factor": null
+    }
+  },
+  "native_measurements": 242,
+  "native_records": 23,
+  "pass": false
+}
