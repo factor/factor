@@ -146,50 +146,58 @@ bool move_file(const vm_char* path1, const vm_char* path2) {
 
 void factor_vm::init_signals() {}
 
+struct windows_thread_args {
+  void* (*start_routine)(void*);
+  void* args;
+};
+
+static DWORD WINAPI windows_thread_entry(LPVOID arg) {
+  windows_thread_args* args = static_cast<windows_thread_args*>(arg);
+  windows_thread_args start = *args;
+  delete args;
+  start.start_routine(start.args);
+  return 0;
+}
+
 THREADHANDLE start_thread(void* (*start_routine)(void*), void* args) {
-  return (void*)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) start_routine,
-                             args, 0, 0);
+  windows_thread_args* start = new windows_thread_args;
+  start->start_routine = start_routine;
+  start->args = args;
+  HANDLE thread = CreateThread(NULL, 0, windows_thread_entry, start, 0, NULL);
+  if (thread == NULL) {
+    DWORD error = GetLastError();
+    delete start;
+    fatal_error("CreateThread() failed", error);
+  }
+  return thread;
 }
 
 uint64_t nano_count() {
-  static double scale_factor;
+  static const double scale_factor = []() {
+    LARGE_INTEGER frequency;
+    if (!QueryPerformanceFrequency(&frequency))
+      fatal_error("QueryPerformanceFrequency", 0);
+    return 1000000000.0 / frequency.QuadPart;
+  }();
 
-  static uint32_t hi = 0;
-  static uint32_t lo = 0;
-
-  // Note: on older systems QueryPerformanceCounter may be unreliable
-  // until you add /usepmtimer to Boot.ini. I had an issue where two
-  // nano_count calls would show a difference of about 1 second,
-  // while actually about 80 seconds have passed. The /usepmtimer
-  // switch cured the issue on that PC (WinXP Pro SP3 32-bit).
-  // See also http://www.virtualdub.org/blog/pivot/entry.php?id=106
   LARGE_INTEGER count;
   BOOL ret = QueryPerformanceCounter(&count);
   if (ret == 0)
     fatal_error("QueryPerformanceCounter", 0);
 
-  if (scale_factor == 0.0) {
-    LARGE_INTEGER frequency;
-    BOOL frequency_status = QueryPerformanceFrequency(&frequency);
-    if (frequency_status == 0)
-      fatal_error("QueryPerformanceFrequency", 0);
-    scale_factor = (1000000000.0 / frequency.QuadPart);
-  }
-
-#ifdef FACTOR_64
-  hi = count.HighPart;
-#else
-  // On VirtualBox, QueryPerformanceCounter does not increment
-  // the high part every time the low part overflows.  Workaround.
-  if (lo > count.LowPart)
-    hi++;
-#endif
-  lo = count.LowPart;
-
-  return (uint64_t)((((uint64_t)hi << 32) | (uint64_t)lo) * scale_factor);
+  return (uint64_t)(count.QuadPart * scale_factor);
 }
 
-void sleep_nanos(uint64_t nsec) { Sleep((DWORD)(nsec / 1000000)); }
+void sleep_nanos(uint64_t nsec) {
+  uint64_t millis = nsec / 1000000;
+  // INFINITE is reserved by Sleep; larger intervals also cannot be narrowed
+  // to DWORD without wrapping. Split long finite sleeps into finite chunks.
+  while (millis >= INFINITE) {
+    Sleep(INFINITE - 1);
+    millis -= INFINITE - 1;
+  }
+  Sleep((DWORD)millis);
+}
 
 #ifndef EXCEPTION_DISPOSITION
 typedef enum _EXCEPTION_DISPOSITION {
@@ -317,7 +325,7 @@ const int ctrl_break_sleep = 10; /* msec */
 static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
   bool ctrl_break_handled = false;
   factor_vm* vm = static_cast<factor_vm*>(parent_vm);
-  while (vm->stop_on_ctrl_break) {
+  while (atomic::load(&vm->stop_on_ctrl_break)) {
     if (GetAsyncKeyState(VK_CANCEL) >= 0) { /* Ctrl-Break is released. */
       ctrl_break_handled = false;  /* Wait for the next press. */
     } else if (!ctrl_break_handled) {
@@ -335,23 +343,23 @@ static DWORD WINAPI ctrl_break_thread_proc(LPVOID parent_vm) {
 }
 
 void factor_vm::primitive_disable_ctrl_break() {
-  stop_on_ctrl_break = false;
+  atomic::store(&stop_on_ctrl_break, false);
   if (ctrl_break_thread != NULL) {
-    DWORD wait_result = WaitForSingleObject(ctrl_break_thread,
-                                            2 * ctrl_break_sleep);
-    if (wait_result != WAIT_OBJECT_0)
-      TerminateThread(ctrl_break_thread, 0);
+    if (WaitForSingleObject(ctrl_break_thread, INFINITE) != WAIT_OBJECT_0)
+      fatal_error("Waiting for Ctrl-Break thread failed", GetLastError());
     CloseHandle(ctrl_break_thread);
     ctrl_break_thread = NULL;
   }
 }
 
 void factor_vm::primitive_enable_ctrl_break() {
-  stop_on_ctrl_break = true;
+  atomic::store(&stop_on_ctrl_break, true);
   if (ctrl_break_thread == NULL) {
     DisableProcessWindowsGhosting();
     ctrl_break_thread = CreateThread(NULL, 0, factor::ctrl_break_thread_proc,
                                      static_cast<LPVOID>(this), 0, NULL);
+    if (ctrl_break_thread == NULL)
+      fatal_error("Creating Ctrl-Break thread failed", GetLastError());
     SetThreadPriority(ctrl_break_thread, THREAD_PRIORITY_ABOVE_NORMAL);
   }
 }
@@ -364,20 +372,19 @@ void close_console() {}
 
 cell get_thread_pc(THREADHANDLE th) {
   DWORD suscount = SuspendThread(th);
-  FACTOR_ASSERT(suscount == 0);
+  if (suscount == (DWORD)-1)
+    return 0;
 
   CONTEXT context;
   memset((void*)&context, 0, sizeof(CONTEXT));
   context.ContextFlags = CONTEXT_CONTROL;
   BOOL context_ok = GetThreadContext(th, &context);
-  FACTOR_ASSERT(context_ok);
 
   suscount = ResumeThread(th);
-  FACTOR_ASSERT(suscount == 1);
+  if (suscount == (DWORD)-1)
+    fatal_error("ResumeThread() failed", GetLastError());
 
-  (void)suscount, (void)context_ok; // use all variables
-
-  return context.EIP;
+  return context_ok ? context.EIP : 0;
 }
 
 void factor_vm::sampler_thread_loop() {
@@ -390,18 +397,18 @@ void factor_vm::sampler_thread_loop() {
   ok = QueryPerformanceCounter(&counter);
   FACTOR_ASSERT(ok);
 
-  counter.QuadPart *= samples_per_second;
+  // Scale elapsed time only: scaling the absolute QPC value can overflow
+  // after sufficient system uptime. Carry fractional samples between polls.
+  double pending_samples = 0;
   while (atomic::load(&sampling_profiler_p)) {
     SwitchToThread();
     ok = QueryPerformanceCounter(&new_counter);
     FACTOR_ASSERT(ok);
-    new_counter.QuadPart *= samples_per_second;
-    cell sample_count = 0;
-    while (new_counter.QuadPart - counter.QuadPart >
-           units_per_second.QuadPart) {
-      ++sample_count;
-      counter.QuadPart += units_per_second.QuadPart;
-    }
+    pending_samples += (double)(new_counter.QuadPart - counter.QuadPart) /
+                       units_per_second.QuadPart * samples_per_second;
+    counter = new_counter;
+    cell sample_count = (cell)pending_samples;
+    pending_samples -= sample_count;
     if (sample_count == 0)
       continue;
 
@@ -421,14 +428,16 @@ static DWORD WINAPI sampler_thread_entry(LPVOID parent_vm) {
 void factor_vm::start_sampling_profiler_timer() {
   sampler_thread = CreateThread(NULL, 0, &sampler_thread_entry,
                                 static_cast<LPVOID>(this), 0, NULL);
+  if (sampler_thread == NULL)
+    fatal_error("Creating sampler thread failed", GetLastError());
 }
 
 void factor_vm::end_sampling_profiler_timer() {
   atomic::store(&sampling_profiler_p, false);
-  DWORD wait_result =
-      WaitForSingleObject(sampler_thread, 3000 * (DWORD) samples_per_second);
-  if (wait_result != WAIT_OBJECT_0)
-    TerminateThread(sampler_thread, 0);
+  // The sampler must finish its SuspendThread/GetThreadContext/ResumeThread
+  // sequence. Forcibly terminating it can leave the VM thread suspended.
+  if (WaitForSingleObject(sampler_thread, INFINITE) != WAIT_OBJECT_0)
+    fatal_error("Waiting for sampler thread failed", GetLastError());
   CloseHandle(sampler_thread);
   sampler_thread = NULL;
 }
