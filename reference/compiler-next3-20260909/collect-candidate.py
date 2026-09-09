@@ -18,7 +18,7 @@ for p in (P/'initial-import-warning').iterdir():
  if p.is_file():files.append((p,'initial-import-warning/'+p.name))
 for p in (R/'reference/allocator-speed-crossarch-20260908').glob('source-*.json'):files.append((p,'source/'+p.name))
 stage=json.loads((P/'candidate-stage.json').read_text())
-for name in stage['witness_sources']:files.append((R/name,'executed-witness-sources/'+name))
+for name in stage['witness_sources']:files.append((R/name,'staged-witness-sources/'+name))
 for name in ['scalar-code.bin','packed-code.bin']:files.append((R/'reference/compiler-next3-vectorization-20260909'/name,'audits/slp/'+name))
 if (P/'native-loop-code').exists():
  for p in (P/'native-loop-code').iterdir():
