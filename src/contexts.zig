@@ -50,15 +50,21 @@ pub const Context = extern struct {
         ctx.callstack_seg = null;
 
         const ds_seg = try allocator.create(segments.Segment);
+        errdefer allocator.destroy(ds_seg);
         ds_seg.* = try segments.Segment.init(ds_size, false);
+        errdefer ds_seg.deinit();
         ctx.datastack_seg = ds_seg;
 
         const rs_seg = try allocator.create(segments.Segment);
+        errdefer allocator.destroy(rs_seg);
         rs_seg.* = try segments.Segment.init(rs_size, false);
+        errdefer rs_seg.deinit();
         ctx.retainstack_seg = rs_seg;
 
         const cs_seg = try allocator.create(segments.Segment);
+        errdefer allocator.destroy(cs_seg);
         cs_seg.* = try segments.Segment.initWithGuardPages(cs_size, false, segments.Segment.low_guard_pages);
+        errdefer cs_seg.deinit();
         ctx.callstack_seg = cs_seg;
 
         ctx.reset();
@@ -266,4 +272,13 @@ comptime {
     std.debug.assert(@offsetOf(Context, "datastack") == 2 * @sizeOf(Cell));
     std.debug.assert(@offsetOf(Context, "retainstack") == 3 * @sizeOf(Cell));
     std.debug.assert(@offsetOf(Context, "callstack_save") == 4 * @sizeOf(Cell));
+}
+
+fn contextAllocationProbe(allocator: std.mem.Allocator) !void {
+    var ctx = try Context.init(allocator, 4096, 4096, 16384);
+    defer ctx.deinit(allocator);
+}
+
+test "context initialization releases earlier stacks on allocation failure" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, contextAllocationProbe, .{});
 }

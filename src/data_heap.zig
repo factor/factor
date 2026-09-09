@@ -83,11 +83,15 @@ pub const TenuredSpace = struct {
 
     pub fn init(allocator: std.mem.Allocator, start: Cell, size: Cell) !Self {
         const fl = try allocator.create(free_list.FreeListAllocator);
+        errdefer allocator.destroy(fl);
         fl.* = free_list.FreeListAllocator.init(allocator, start, size);
+        errdefer fl.deinit();
+        var marks = try mark_bits.MarkBits.init(allocator, start, size);
+        errdefer marks.deinit();
         return Self{
             .start = start,
             .end = start + size,
-            .marks = try mark_bits.MarkBits.init(allocator, start, size),
+            .marks = marks,
             .size = size,
             .free_list = fl,
             .object_start = try object_start_map.ObjectStartMap.init(allocator, start, size),
@@ -380,6 +384,17 @@ pub const DataHeap = struct {
         );
     }
 };
+
+test "tenured space releases allocations when metadata allocation fails" {
+    var memory: [4096]u8 align(layouts.data_alignment) = undefined;
+    // Creating the free-list allocator and its initial bucket succeeds; fail
+    // each of the following bitmap and object-start-map allocations in turn.
+    for (2..5) |fail_index| {
+        var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = fail_index });
+        try std.testing.expectError(error.OutOfMemory, TenuredSpace.init(failing.allocator(), @intFromPtr(&memory), memory.len));
+        try std.testing.expectEqual(failing.allocated_bytes, failing.freed_bytes);
+    }
+}
 
 test "data_heap basic allocation" {
     const allocator = std.testing.allocator;

@@ -357,23 +357,20 @@ pub const FactorVM = struct {
         // Baseline capacity for the GC root stack. Hot paths that need more
         // (e.g. the JIT's per-nesting-level roots) call ensureUnusedCapacity
         // before their appendAssumeCapacity, but everything else relies on this
-        // reservation, so a failure here is fatal rather than silently ignored:
+        // reservation, so a failure must be propagated rather than ignored:
         // a short root stack turns appendAssumeCapacity into an out-of-bounds
         // write in release builds.
-        vm.data_roots.ensureTotalCapacity(allocator, 256) catch @panic("OOM reserving data_roots");
-        vm.code_roots.ensureTotalCapacity(allocator, 16) catch @panic("OOM reserving code_roots");
+        try vm.data_roots.ensureTotalCapacity(allocator, 256);
+        errdefer vm.data_roots.deinit(allocator);
+        try vm.code_roots.ensureTotalCapacity(allocator, 16);
 
         return vm;
     }
 
     pub fn deinit(self: *Self) void {
-        {
-            var context = self.vm_asm.ctx;
-            context.deinit(self.allocator);
-            self.allocator.destroy(context);
-        }
-        {
-            var context = self.vm_asm.spare_ctx;
+        // The registry owns every live context, including suspended contexts.
+        // ctx/spare_ctx are not initialized until startup creates them.
+        for (self.active_contexts.items) |context| {
             context.deinit(self.allocator);
             self.allocator.destroy(context);
         }
@@ -441,6 +438,7 @@ pub const FactorVM = struct {
             new_ctx = reused_ctx;
         } else {
             const ctx_ptr = try self.allocator.create(contexts.Context);
+            errdefer self.allocator.destroy(ctx_ptr);
             ctx_ptr.* = try contexts.Context.init(
                 self.allocator,
                 self.datastack_size,
@@ -448,6 +446,11 @@ pub const FactorVM = struct {
                 self.callstack_size,
             );
             new_ctx = ctx_ptr;
+        }
+
+        errdefer {
+            new_ctx.deinit(self.allocator);
+            self.allocator.destroy(new_ctx);
         }
 
         try self.addActiveContext(new_ctx);
@@ -1245,4 +1248,17 @@ test "allotAlien roots a movable base across allocation" {
     const live_base = layouts.UNTAG(alien.base);
     try std.testing.expect(live_base >= heap.aging.start and live_base < heap.aging.here);
     try std.testing.expectEqual(live_base + @sizeOf(layouts.ByteArray) + 7, alien.address);
+}
+
+fn vmContextAllocationProbe(allocator: std.mem.Allocator) !void {
+    const vm = try FactorVM.init(allocator);
+    defer vm.deinit();
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    // Suspended contexts must also be reclaimed at VM destruction.
+    _ = try vm.newContext();
+}
+
+test "VM initialization and context registration unwind allocation failures" {
+    try std.testing.checkAllAllocationFailures(std.testing.allocator, vmContextAllocationProbe, .{});
 }

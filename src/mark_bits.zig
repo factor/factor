@@ -22,6 +22,7 @@ pub const MarkBits = struct {
         const cells_needed = (bits_needed + mark_bits_granularity - 1) / mark_bits_granularity;
 
         const marked = try allocator.alloc(Cell, cells_needed);
+        errdefer allocator.free(marked);
         @memset(marked, 0);
 
         const forwarding = try allocator.alloc(Cell, cells_needed);
@@ -254,6 +255,12 @@ pub const MarkBits = struct {
         return count;
     }
 };
+
+test "mark bits releases bitmap when forwarding allocation fails" {
+    var failing = std.testing.FailingAllocator.init(std.testing.allocator, .{ .fail_index = 1 });
+    try std.testing.expectError(error.OutOfMemory, MarkBits.init(failing.allocator(), 0x1000, 4096));
+    try std.testing.expectEqual(failing.allocated_bytes, failing.freed_bytes);
+}
 
 // Tests
 test "mark_bits basic operations" {
