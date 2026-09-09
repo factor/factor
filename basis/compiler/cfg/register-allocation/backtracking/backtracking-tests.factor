@@ -8,7 +8,7 @@ compiler.cfg.linear-scan.assignment compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture layouts generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
+cpu.architecture layouts generalizations kernel kernel.private locals make math math.order quotations math.private namespaces sequences tools.test
 vectors memory continuations hashtables io.sockets io.sockets.private words ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
@@ -534,4 +534,33 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     graph cfg set graph number-instructions graph prepare-backtracking-points
     1 { 0 11 } test-interval { } uncovered-ranges
     1 { 8 11 } gap-interval reload-from>> spill-slot?
+] ] with-scope ] unit-test
+
+! Independent slow complement oracle: scan all allocated original identities
+! and subtract every occupied point, including call/GC/kill-block barriers.
+:: slow-uncovered-points ( interval allocated -- points )
+    allocated [ vreg>> interval vreg>> = ] filter
+    [ ranges>> ] map concat backtracking-barriers get append :> occupied
+    interval ranges>> [ first2 over - 1 + <iota> swap '[ _ + ] map ] map concat
+    [| point | occupied [ point swap first2 between? ] any? not ] filter ;
+
+{ t } [ [ [let
+    init-test-allocation drop
+    V{ { 5 5 } { 20 25 } { 23 29 } } backtracking-barriers set
+    14 <iota> [| seed |
+        1 { 0 40 } test-interval :> original
+        seed 7 >= [ V{ { 0 12 } { 18 40 } } original ranges<< ] when
+        1 { 0 4 } test-interval
+        1 { 8 19 } test-interval
+        1 { 30 40 } test-interval
+        2 { 0 40 } test-interval 4array :> allocated
+        seed 7 mod {
+            { 5 [ original 1array ] }
+            { 6 [ allocated last 1array ] }
+            [ allocated swap head ]
+        } case :> prefix
+        original prefix uncovered-ranges
+        [ first2 over - 1 + <iota> swap '[ _ + ] map ] map concat
+        original prefix slow-uncovered-points sequence=
+    ] all?
 ] ] with-scope ] unit-test
