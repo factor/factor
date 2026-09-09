@@ -1490,7 +1490,13 @@ pub fn saveImage(vm: *vm_mod.FactorVM, temp_path: [:0]const u8, final_path: [:0]
     const file = io_mod.safeFopen(temp_path, "wb") catch {
         return false;
     };
-    defer io_mod.safeFclose(file) catch @panic("fclose failed");
+    var file_open = true;
+    defer if (file_open) {
+        // Preserve the write error for the caller while releasing the stream.
+        const saved_errno = io_mod.getErrno();
+        io_mod.safeFclose(file) catch {};
+        io_mod.setErrno(saved_errno);
+    };
 
     // Write header
     const header_bytes = std.mem.asBytes(&header);
@@ -1513,6 +1519,11 @@ pub fn saveImage(vm: *vm_mod.FactorVM, temp_path: [:0]const u8, final_path: [:0]
             return false;
         };
     }
+
+    // Closing flushes buffered writes and releases Windows' open-file handle.
+    // Do not publish an image whose final buffered write failed.
+    file_open = false;
+    io_mod.safeFclose(file) catch return false;
 
     // Move temp file to final location
     const C = struct {
