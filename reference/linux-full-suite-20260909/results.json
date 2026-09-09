@@ -1,0 +1,156 @@
+{
+  "source-boot": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/seed.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/source-boot.factor"
+    ],
+    "status": 0,
+    "seconds": 1.1155090173706412
+  },
+  "bootstrap": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/boot.unix-x86.64.image",
+      "-output-image=/home/sheeple/factor-workspaces/all-20260909/factor.image"
+    ],
+    "status": 0,
+    "seconds": 129.01069351192564
+  },
+  "load-all-initial": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/factor.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/load-all.factor"
+    ],
+    "status": 1,
+    "seconds": 24.046562299132347
+  },
+  "load-all": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/factor.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/load-all.factor"
+    ],
+    "status": 0,
+    "seconds": 395.7311570663005
+  },
+  "load-all-final": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/factor.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/load-all-final.factor"
+    ],
+    "status": 0,
+    "seconds": 408.90940576046705
+  },
+  "test-all": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/loaded.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/test-all.factor"
+    ],
+    "status": 1,
+    "seconds": 1011.1432973174378,
+    "test_file_events": 1304,
+    "unique_test_files": 1299,
+    "reported_totals": [
+      "TEST FAILURES 13",
+      "COMPILER ERRORS 0"
+    ],
+    "skips": [
+      "FFI-SKIP small reason=unsupported-toolchain-or-cpu"
+    ]
+  },
+  "test-all-final": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/loaded-final.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/test-all-final.factor"
+    ],
+    "status": 0,
+    "seconds": 990.4125774670392,
+    "test_file_events": 1303,
+    "unique_test_files": 1298,
+    "reported_totals": [
+      "TEST FAILURES 0",
+      "COMPILER ERRORS 0"
+    ],
+    "skips": [
+      "FFI-SKIP small reason=unsupported-toolchain-or-cpu"
+    ]
+  },
+  "targeted": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/factor.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/targeted.factor"
+    ],
+    "status": 0,
+    "seconds": 35.759560434147716
+  },
+  "signals": {
+    "command": [
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "-resource-path=/home/sheeple/factor-workspaces/all-20260909",
+      "-no-user-init",
+      "-no-monitors",
+      "-i=/home/sheeple/factor-workspaces/all-20260909/loaded.image",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/signals.factor"
+    ],
+    "status": 0,
+    "seconds": 1.7207677690312266
+  },
+  "sqlite-optional": {
+    "command": [
+      "python3",
+      "reference/sqlite-3534-completion-20260908/optional/run.py",
+      "--vm",
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "--image",
+      "/home/sheeple/factor-workspaces/all-20260909/factor.image",
+      "--library",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/sqlite-optional/libsqlite3-optional.so"
+    ],
+    "status": 0,
+    "seconds": 2.5171565376222134
+  },
+  "sqlite-loaded-image": {
+    "command": [
+      "python3",
+      "reference/sqlite-3534-completion-20260908/optional/run.py",
+      "--vm",
+      "/home/sheeple/factor-workspaces/all-20260909/factor",
+      "--image",
+      "/home/sheeple/factor-workspaces/all-20260909/loaded.image",
+      "--library",
+      "/home/sheeple/factor-workspaces/all-20260909/validation/sqlite-optional/libsqlite3-optional.so"
+    ],
+    "status": 0,
+    "seconds": 9.025238399393857
+  }
+}
