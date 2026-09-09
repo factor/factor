@@ -6,6 +6,16 @@ math.floats.small.c-types math.vectors.simd.intrinsics math.vectors.simd.intrins
 math.vectors math.vectors.simd namespaces sequences specialized-arrays tools.test ;
 IN: math.vectors.simd.intrinsics.tests
 
+! Byte shuffles wrap indices modulo 16 on every backend, including PSHUFB
+! indices with bit 7 set. Run under each SSE cap to cover the fallback too.
+{ t } [
+    256 <iota> [| index |
+        B{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } clone uchar-16 boa
+        16 index <array> >byte-array vshuffle underlying>>
+        [ index 15 bitand = ] all?
+    ] all?
+] unit-test
+
 CONSTANT: all-simd-classes {
     char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2
     float-4 double-2 half-8 bfloat-8
