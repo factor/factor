@@ -8,7 +8,7 @@ compiler.cfg.linearization compiler.cfg.liveness
 compiler.cfg.register-allocation.rematerialization
 compiler.cfg.registers compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-heaps kernel locals make math namespaces sequences ;
+heaps kernel make math namespaces sequences ;
 IN: compiler.cfg.linear-scan.assignment
 QUALIFIED: sets
 
@@ -16,7 +16,6 @@ QUALIFIED: sets
 ! such that start <= insn# <= end is in this set.
 SYMBOL: pending-interval-heap
 SYMBOL: pending-interval-assoc
-SYMBOL: assignment-previous-block
 
 ! Locations choose their transport. Allocators can supply register homes
 ! without duplicating assignment or bypassing the shared move checker.
@@ -104,21 +103,14 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
 : assign-all-registers ( insn -- )
     [ assign-insn-defs ] [ assign-insn-uses ] [ assign-insn-temps ] tri ;
 
-! Interval products ending at the previous terminator must leave the
-! pending map before a new product of the same vreg activates at block-from.
-! A trailing store belongs before that terminator, never in a layout successor
-! that might be reached through a different CFG edge.
-:: spill-at-block-end ( interval bb -- )
-    bb [
-        unclip-last [ [ interval handle-spill ] V{ } make append ] dip suffix
-    ] change-instructions drop ;
-
+! A boundary-ending product must expire before another product of the
+! same vreg activates. Its register was already captured in machine-live-out;
+! resolve-data-flow emits any required store/copy on each actual CFG edge.
+! Emitting its spill here would run in an unrelated layout successor, and
+! moving it before a defining terminator would store the old register value.
 : expire-at-block-entry ( bb -- )
-    block-from pending-interval-heap get [ >= ] with heap-pop-while [
-        [ remove-pending ] [
-            dup spill-to>> [ assignment-previous-block get spill-at-block-end ] [ drop ] if
-        ] bi
-    ] each ;
+    block-from pending-interval-heap get [ >= ] with heap-pop-while
+    [ remove-pending ] each ;
 
 : begin-block ( bb -- )
     {
@@ -187,14 +179,12 @@ M: constant-recipe emit-restore nip swap emit-rematerialization ;
                 [ emit-insn ] tri
             ] each
         ] V{ } make
-    ] change-instructions
-    [ compute-live-out ] [ assignment-previous-block namespaces:set ] bi ;
+    ] change-instructions compute-live-out ;
 
 : live-intervals>min-heap ( live-intervals -- min-heap )
     [ [ live-interval-start ] map ] keep zip >min-heap ;
 
 : init-assignment ( live-intervals -- )
-    f assignment-previous-block namespaces:set
     live-intervals>min-heap unhandled-intervals namespaces:set
     <min-heap> pending-interval-heap namespaces:set
     H{ } clone pending-interval-assoc namespaces:set
