@@ -1,0 +1,41 @@
+{
+  "source_commit": "30a50ab0df1147eb5c7d852b5d6aad2c0835464e",
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-full-final-candidate/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-final-candidate",
+    "-i=/Users/erg/factor.worktrees/allocator-full-final-candidate/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-full-final-candidate/callback-all-allocators.factor"
+  ],
+  "exit_code": 0,
+  "ok": true,
+  "native_abi_assertions": 40,
+  "seconds": 8.203536249988247,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "script_sha256": "1296202cecb46ba3e95997aba6f107d4596bbbff3ecd71a890632e7900137aa0"
+}

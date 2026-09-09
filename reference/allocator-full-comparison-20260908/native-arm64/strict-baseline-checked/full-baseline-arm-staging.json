@@ -1,0 +1,16 @@
+{
+  "native": true,
+  "architecture": "arm64",
+  "seed_source": "Default bootstrap at4daa778a6b; same parent-provided initial image for baseline and final",
+  "source_directory": "/Users/erg/factor.worktrees/allocator-full-integration",
+  "hashes": {
+    "Factor.app/Contents/MacOS/factor": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2",
+    "libfactor.dylib": "a37ddbab96cdcbd030f4ac6681db8b003a5a22230ab013bc59a42eda2cc7830a",
+    "libfactor-ffi-test.dylib": "92ece934ab4c16d340365970c579f7b4c718b1a69baf38fec7a33ec79664cb49",
+    "factor.image": "4271203b7b563ef903d40f735e59ab5bf5980b3daace3f5dc8da5f30e628dfc0"
+  },
+  "prepared": false,
+  "compiler_source_commit": "f5a6d4739eb6aa5203df67719ad8cfba1410484c",
+  "prior_baseline": "c84535b24a0a73d8127e92d4d4683b4754f367bb",
+  "checker_correction": "dfe08fc9bddc3dc068d0e790f85e176de877633a"
+}

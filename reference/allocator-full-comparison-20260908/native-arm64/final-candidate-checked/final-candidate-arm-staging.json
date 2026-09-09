@@ -1,0 +1,18 @@
+{
+  "native": true,
+  "architecture": "arm64",
+  "compiler_source_commit": "30a50ab0df1147eb5c7d852b5d6aad2c0835464e",
+  "seed_source": "Parent-provided default bootstrap4daa image, identical to measured baseline initial image",
+  "hashes": {
+    "Factor.app/Contents/MacOS/factor": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2",
+    "libfactor.dylib": "a37ddbab96cdcbd030f4ac6681db8b003a5a22230ab013bc59a42eda2cc7830a",
+    "libfactor-ffi-test.dylib": "92ece934ab4c16d340365970c579f7b4c718b1a69baf38fec7a33ec79664cb49",
+    "factor.image": "4271203b7b563ef903d40f735e59ab5bf5980b3daace3f5dc8da5f30e628dfc0",
+    "reference/allocator-speed-crossarch-20260908/counters": "78b9d51e25e937ae74d0f75ae06d3202d6fa5be34274c9bbd244e9a7f1023d81"
+  },
+  "prepared": false,
+  "prior_candidate": "cad423bf91",
+  "repair": "0045c5586f",
+  "shared_call_checker": "dfe08fc9bd",
+  "callback_fix": "38003ffe56"
+}

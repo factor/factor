@@ -1,0 +1,11 @@
+{
+  "loadavg": [
+    30.79443359375,
+    44.8212890625,
+    65.73828125
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "logical_cpus": 18,
+  "factor_process_count": 1
+}
