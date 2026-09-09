@@ -5,7 +5,7 @@ IN: classes.struct
 DEFER: struct-slots ! for stack-checker
 DEFER: struct-class? ! for stack-checker
 DEFER: <struct-boa> ! for stack-checker
-USING: accessors alien alien.c-types alien.data alien.parser
+USING: accessors alien alien.arrays alien.c-types alien.data alien.parser
 arrays assocs byte-arrays classes classes.parser classes.private
 classes.struct.bit-accessors classes.tuple classes.tuple.parser
 classes.tuple.private combinators combinators.short-circuit
@@ -118,7 +118,8 @@ GENERIC: (writer-quot) ( slot -- quot: ( value struct -- ) )
 M: struct-slot-spec (writer-quot)
     [ offset>> ] [ type>> ] bi
     [ '[ >c-ptr _ _ set-alien-value ] ] keep
-    dup lookup-c-type array? [
+    ! Encoded C strings also use array descriptors, but store pointers.
+    dup lookup-c-type { [ array? ] [ string-type? not ] } 1&& [
         heap-size '[ [ _ check-struct-array-length ] dip ] prepose
     ] [ drop ] if ;
 
