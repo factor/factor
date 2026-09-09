@@ -1,0 +1,22 @@
+{
+  "source_commit": "04fa5fdbbaafef4ed47445d11679f46f1e177040",
+  "baseline": "1d67bdd034",
+  "sha256": {
+    "basis/compiler/tree/propagation/info/info.factor": "a318a6cd8b5e2f2fe314084052ee2fe5794819411c8048f55748b37d5d3d626c",
+    "basis/compiler/tree/propagation/info/info-tests.factor": "c2e590ad9e11fea6e4c68049b130ce53169c2d5469a200f7b33b968119deacbf",
+    "reference/compiler-next2-info-20260909/check.factor": "8529ca5ac7ed140326c394d89253c7180adbc13982a920c58d8f272b5954156b",
+    "factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "info.factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+  },
+  "command": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/compiler-next2-info/info.factor.image",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next2-info",
+    "-no-user-init",
+    "reference/compiler-next2-info-20260909/check.factor"
+  ],
+  "checks": "tree optimizer, SSA, allocated intervals enabled; propagation subtree and classes.algebra test files",
+  "result": "exit0 CLASS-INFO-FAILURES0",
+  "asset_origin": "VM/libfactor and compiler-next-final.factor.image cloned from compiler-next-integration; refresh-all before tests; root assets untouched"
+}
