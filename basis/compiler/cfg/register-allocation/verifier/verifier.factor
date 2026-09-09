@@ -47,7 +47,7 @@ ERROR: invalid-allocation-operands insn ;
     [ defs-vregs value-flow-operands ]
     [ temp-vregs value-flow-operands ]
     [ dup gc-map-insn? [ gc-map>> gc-roots>> clone ] [ drop f ] if ]
-    [ dup gc-map-insn? [ gc-map>> derived-roots>> clone ] [ drop f ] if ]
+    [ dup gc-map-insn? [ gc-map>> derived-roots>> H{ } assoc-clone-like ] [ drop f ] if ]
     [ dup ##load-integer? [ val>> ] [ drop f ] if ]
     } cleave value-flow-instruction boa ;
 
@@ -63,7 +63,7 @@ ERROR: invalid-allocation-operands insn ;
         t bb blocks set-at
         bb instructions>> [| insn |
             insn ##phi? [
-                insn dst>> insn inputs>> clone 2array bb phis push-at
+                insn dst>> insn inputs>> H{ } assoc-clone-like 2array bb phis push-at
             ] [
                 insn snapshot-value-flow-instruction insn instructions set-at
                 insn value-flow-copy? [

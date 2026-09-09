@@ -428,3 +428,26 @@ CONSTANT: flow-allocators {
         ] each
     ] with-variable
 ] unit-test
+
+! Associations may be represented by mutable arrays of pairs. Cloning only
+! the outer array lets SSA destruction rewrite the checker's original phi
+! inputs. The specification must retain the original vreg and block keys.
+{ 1 } [ [ [let
+    init-flow-reps
+    1 flow-load 1array 0 insns>block :> entry
+    entry 1 2array 1array :> inputs
+    ##phi new 2 >>dst inputs >>inputs 2 flow-use 2array 1 insns>block :> join
+    entry join connect-bbs
+    entry block>cfg snapshot-value-flow :> snapshot
+    99 entry inputs set-at
+    join snapshot phis>> at first second entry swap at
+] ] with-scope ] unit-test
+
+{ 1 } [ [ [let
+    2 1 2array 1array :> derived
+    V{ } clone derived gc-map boa
+    ##call-gc new swap >>gc-map :> insn
+    insn snapshot-value-flow-instruction :> expected
+    99 2 derived set-at
+    2 expected derived>> at
+] ] with-scope ] unit-test
