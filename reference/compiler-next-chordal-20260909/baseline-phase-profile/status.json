@@ -1,0 +1,50 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-chordal",
+    "/Users/erg/factor.worktrees/compiler-next-chordal/reference/compiler-next-chordal-20260909/profile.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-chordal",
+  "source": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {},
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor.image",
+    "sha256": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "exit_code": 0,
+  "seconds": 43.774928624974564,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [],
+  "last_process_usage": {
+    "cpu": 39.43726858333333,
+    "user": 39.12049970833333,
+    "system": 0.31676887499999995,
+    "instructions": 694098832980,
+    "cycles": 167112455454,
+    "rss": 367427584,
+    "background_cpu": 0.03128133333333333,
+    "disk_read_bytes": 9154560,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}
