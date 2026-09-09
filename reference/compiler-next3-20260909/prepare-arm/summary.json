@@ -1,0 +1,17 @@
+{
+  "production_revision": "020b74ce5d8f8fac9b5df5642afad8787da98896",
+  "harness_revision": "67520094ea",
+  "input_image_sha256": "76166829c9dc9a1b57053a9eb8b047de406306632c886067034480511c9570be",
+  "prepared_image_sha256": "2fe3a28e41e9d187ba8937f6584ba5f70ca3e78a8320470c2f92b835f3e4f84a",
+  "scope_count": 27834,
+  "runtime_count": 30,
+  "metric_count": 16,
+  "features": {
+    "representations": false,
+    "memory": false,
+    "loops": false,
+    "slp": false
+  },
+  "preparation_is_not_bootstrap": true,
+  "import_restart_retained": "vocabs was resolved for require before its late USING; preparation completed, exact warning and scripts retained"
+}
