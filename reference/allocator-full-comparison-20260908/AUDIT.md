@@ -4,7 +4,7 @@ The reviewed source now contains distinct allocation policies, not renamed queue
 orders. This assessment covers Factor's whole-register IR contract. It does not
 claim that these ports implement every LLVM target facility or every regalloc2
 API constraint. Performance and general correctness are separate gates; no final
-source is accepted while the callback failure recorded below remains unresolved.
+source is accepted while a checked whole-compiler closure failure remains unresolved.
 
 ## LLVM-style greedy
 
@@ -102,9 +102,23 @@ the same native raw-derived-phi check. Exact final prototype/core source hashes
 are retained independently of Python harness revisions.
 
 Completed source `1c1f8ea479` likewise passes 384 native x86 moving-object pairs.
-It is **not a final accepted freeze**: parent full-compiler chordal/global-ON
-acceptance found a separate callback/alien-large-return `##peek` failure. The
-owner is repairing that case. Earlier successful targeted witnesses remain
-scoped evidence; they do not override the failing full-suite acceptance gate.
+The callback/alien-large-return failure discovered in that source was corrected
+by `036a178ab5`; native x86 passes the real C ABI fixture with both rematerialization
+settings and the final checker. Parent full-compiler acceptance subsequently
+passed candidate `29b4551bb3`.
+
+The larger native x86 frozen closure then rejected `29b4551bb3`: greedy created a
+transparent resident fragment with no local operand uses, and GC assignment could
+not determine its representation while compiling `:SSL=>struct-slot-values`.
+Correction `0045c5586f` preserves the original incoming representation in fragment
+metadata. The exact native method now passes final checked compilation with both
+rematerialization settings. A fresh integrated image and all four full closures
+are still required before accepting the corrected candidate. Failed source29
+records are retained in `native-x86-64/candidate29-rejected`.
+
+The repaired prototype baseline passes all four full checked closures on both
+architectures: 27,289 frozen word objects on x86 and 26,212 on ARM64, with all 26
+outputs independently checked. Earlier successful targeted witnesses remain
+scoped evidence; they do not override a failing whole-closure acceptance gate.
 Final fresh-image checks, the matched two-architecture matrix, and separate
 default bootstrap budget assessment remain required before speed claims.

@@ -1,0 +1,40 @@
+{
+  "source_commit": "c84535b24a0a73d8127e92d4d4683b4754f367bb",
+  "host_load_before": [
+    47.07080078125,
+    59.9697265625,
+    68.38330078125
+  ],
+  "host_load_after": [
+    61.16357421875,
+    61.484375,
+    68.17431640625
+  ],
+  "final_value_verifier": true,
+  "exit_code": 0,
+  "seconds": 82.27264213562012,
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-full-measured-baseline/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-measured-baseline",
+    "-i=/Users/erg/factor.worktrees/allocator-full-measured-baseline/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-full-measured-baseline/reference/allocator-speed-crossarch-20260908/checked-launch.factor",
+    "linear-scan",
+    "check",
+    "3",
+    "on",
+    "on",
+    "c84535b24a0a73d8127e92d4d4683b4754f367bb"
+  ],
+  "ok": true,
+  "counts": {
+    "scope": 1,
+    "compile": 1,
+    "runtime": 26,
+    "code": 12
+  },
+  "taskpolicy": {
+    "exit_code": 0,
+    "stderr": ""
+  }
+}

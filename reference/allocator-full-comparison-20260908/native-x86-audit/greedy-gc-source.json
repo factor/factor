@@ -1,0 +1,8 @@
+{
+  "prior_source": "29b4551bb3",
+  "fix": "0045c5586f",
+  "files": {
+    "basis/compiler/cfg/linear-scan/assignment/assignment.factor": "9c68e025baf9489f362761caab40f43b294460a26535cf4f88e7f7fbcabfe79c",
+    "basis/compiler/cfg/register-allocation/greedy/greedy.factor": "dd6e01a7173599f3704fae368f7ef43435e45cdf51e3a5dfc2662ef9a856e6d0"
+  }
+}
