@@ -79,12 +79,13 @@ SYMBOL: established-cold-spills
         interval first-use :> definition
         definition def-rep>> int-rep eq?
         definition n>> cold-definition-sites get key? and
-        interval live-interval-end definition n>> 1 + = and
+        interval live-interval-end definition n>> dup 1 + between? and
     ] [ f ] if ;
 
 ! Eligibility alone does not establish a slot: mandatory clobber splitting
 ! can place a defining fragment's store inside a bypassed loop. Require an
 ! actual allocated store immediately after the unique cold definition,
+! ending at its phase point or the following transport point. Both expire
 ! before the next instruction in that same block. That store dominates all
 ! uses. Only then can read-only fragments omit their same-slot stores.
 : finish-loop-spills ( intervals -- intervals )

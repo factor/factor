@@ -2,7 +2,7 @@ USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.c
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
 compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
-compiler.cfg.linear-scan.numbering compiler.cfg.utilities
+compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
 compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
@@ -308,7 +308,8 @@ IN: compiler.cfg.register-allocation.backtracking.tests
 
 
 ! Productive cross-vreg copy merging needs distinct early-use/late-def
-! phases. Preserve each original SSA identity while eliminating the moves.
+! phases. The following arithmetic result has different bits but can reuse
+! its dying first input. Preserve every original SSA identity in the bundle.
 { 11 t t } [ [ [let
     init-validation-representations
     [
@@ -321,8 +322,8 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         ##epilogue, ##return,
     ] V{ } make insns>cfg backtracking-allocator compile-validation-cfg :> word
     10 word execute( x -- result )
-    backtracking-merges get 2 >=
-    { 1 2 3 } [ dup leader = ] all?
+    backtracking-merges get 3 >=
+    { 1 2 3 4 } [ dup leader = ] all?
 ] ] with-scope ] unit-test
 
 ! A split between consecutive late/early uses retains both mandatory uses.
@@ -371,3 +372,12 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     backtracking-split-budget-exhaustions get 0 >
     backtracking-minimal-splits get 100 >
 ] ] with-scope ] unit-test
+
+
+{ 8 8 t } [ [
+    H{ { 0 8 } } clone spill-site-weights set
+    H{ { 0 t } } clone cold-definition-sites set
+    prepare-backtracking-phase-weights
+    0 spill-site-weights get at 1 spill-site-weights get at
+    1 cold-definition-sites get key?
+] with-scope ] unit-test

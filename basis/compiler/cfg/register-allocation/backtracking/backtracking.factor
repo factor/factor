@@ -2,6 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators compiler.cfg
 compiler.cfg.instructions compiler.cfg.registers compiler.cfg.linearization
+compiler.cfg.def-use
 compiler.cfg.linear-scan compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.checker
@@ -351,7 +352,7 @@ CONSTANT: backtracking-max-splits 16
         ] [
             conflicts conflict-cost :> cost
             bundle conflicts first-bundle-conflict :> conflict
-            conflict spill-site-weights get at 1 or :> move-cost
+            conflict spill-site-weights get at 1 or cost + :> move-cost
             split-option [
                 move-cost split-option third <
                 move-cost split-option third = conflict split-option second > and or
@@ -591,10 +592,25 @@ M: backtracking-register-home emit-restore
         insn ##phi? [
             insn inputs>> values [ insn dst>> 2array affinities push ] each
         ] [
-            insn ##copy? [ insn src>> insn dst>> 2array affinities push ] when
+            ! Factor's two-operand emitters can reuse the first input. The
+            ! phase ranges prove whether it dies before the result; other
+            ! inputs and def-is-use instructions remain interfering.
+            insn uses-vregs :> inputs
+            insn defs-vregs :> outputs
+            inputs empty? not outputs length 1 = and [
+                inputs first outputs first 2array affinities push
+            ] when
         ] if
     ] each
     affinities backtracking-affinities set ;
+
+: prepare-backtracking-phase-weights ( -- )
+    spill-site-weights get >alist [
+        first2 swap 1 + spill-site-weights get set-at
+    ] each
+    cold-definition-sites get keys [
+        1 + t swap cold-definition-sites get set-at
+    ] each ;
 
 :: backtracking-allocation-with-registers ( cfg machine-regs -- )
     t backtracking-phase-mode? set
@@ -610,6 +626,7 @@ M: backtracking-register-home emit-restore
     backtracking-loop-spills? get :> cold-stores?
     t backtracking-loop-spills? set
     cfg prepare-spill-sites
+    prepare-backtracking-phase-weights
     cold-stores? backtracking-loop-spills? set
     cfg compute-phase-ssa-intervals :> input
     check-allocation? get [ input required-register-uses ] [ f ] if :> uses

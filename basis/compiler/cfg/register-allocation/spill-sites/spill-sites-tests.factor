@@ -188,3 +188,14 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
 
 [ [ f bypass-store-example check-value-flow ] with-scope ]
 [ bad-allocation-value? ] must-fail-with
+
+
+! Early-only and phased definitions may expire at either of these adjacent
+! points. Both stores occur after the definition and before the next insn;
+! retaining the interval through another instruction is not this proof.
+{ t t f } [ [
+    init-site-test cold-interval 1array prepare-cold-spills
+    cold-defining-fragment V{ { 0 0 } } clone >>ranges establishes-cold-spill?
+    cold-defining-fragment establishes-cold-spill?
+    cold-defining-fragment V{ { 0 2 } } clone >>ranges establishes-cold-spill?
+] with-scope ] unit-test
