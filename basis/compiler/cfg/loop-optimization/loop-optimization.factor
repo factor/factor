@@ -134,11 +134,25 @@ SYMBOL: loop-optimization-statistics
         ] when
     ] when ;
 
+! Representation selection can introduce allocation/GC after this pass.
+! Encoded managed-pointer bits (xor/multiply/shift, for example) do not have
+! traceable GC bases. Refuse the entire CFG if either raw-pointer seed is
+! present, rather than relying only on explicit safepoints inside the loop.
+: loop-managed-pointer-seed? ( insn -- ? )
+    dup ##tagged>integer? swap ##unbox-any-c-ptr? or ;
+
+: loop-cfg-has-pointer-seed? ( cfg -- ? )
+    post-order [ instructions>> [ loop-managed-pointer-seed? ] any? ] any? ;
+
 : perform-loop-optimization ( cfg -- )
     H{ } clone loop-optimization-statistics namespaces:set
-    dup needs-loops
-    loops get values [ blocks>> cardinality ] sort-by [ header>> ] map
-    [ optimize-one-loop ] with each ;
+    dup loop-cfg-has-pointer-seed? [
+        drop "pointer-seed-cfgs" count-loop-event
+    ] [
+        dup needs-loops
+        loops get values [ blocks>> cardinality ] sort-by [ header>> ] map
+        [ optimize-one-loop ] with each
+    ] if ;
 
 : optimize-loops ( cfg -- )
     loop-optimization? get [ perform-loop-optimization ] [ drop ] if ;

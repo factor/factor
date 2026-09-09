@@ -14,7 +14,7 @@ IN: compiler.cfg.loop-optimization.tests
     [
         ##prologue,
         0 D: 2 ##peek, 1 D: 1 ##peek, 2 D: 0 ##peek,
-        3 2 ##tagged>integer,
+        3 2 int-rep ##copy,
         4 0 ##load-integer,
         multiple? [ 3 0 cc< ##compare-integer-imm-branch, ] [ ##branch, ] if
     ] { } make 0 insns>block :> entry
@@ -139,3 +139,25 @@ IN: compiler.cfg.loop-optimization.tests
 ;
 
 { 0 } [ test-irreducible-loop ] unit-test
+
+
+! No explicit collection is necessary to trigger the guard: later
+! representation selection may add boxing/GC. Preserve the raw-pointer xor
+! and multiply chain in its original loop even when the seed is outside it.
+:: pointer-seed-loop-unchanged? ( seed-class -- ? )
+    f <licm-loop> :> graph
+    seed-class new 254 >>dst 0 >>src :> seed
+    graph entry>> instructions>> :> entry-insns
+    entry-insns pop :> terminator
+    seed entry-insns push terminator entry-insns push
+    graph cfg>insns [ ##xor? ] find nip 254 >>src1 drop
+    graph cfg>insns clone :> original
+    graph checked-licm drop
+    original graph cfg>insns =
+    "hoisted" loop-optimization-statistics get at 0 or zero? and
+    "pointer-seed-cfgs" loop-optimization-statistics get at 1 = and ;
+
+{ t } [
+    { ##tagged>integer ##unbox-any-c-ptr }
+    [ pointer-seed-loop-unchanged? ] all?
+] unit-test
