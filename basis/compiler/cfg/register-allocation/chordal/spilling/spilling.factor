@@ -8,6 +8,7 @@ compiler.cfg.register-allocation.chordal.spilling.next-use
 compiler.cfg.register-allocation.chordal.spilling.residency
 compiler.cfg.register-allocation.rematerialization compiler.cfg.registers
 compiler.cfg.renaming.functor compiler.cfg.rpo compiler.cfg.utilities compiler.utilities
+compiler.cfg.ssa.destruction.leaders
 cpu.architecture kernel locals math math.order namespaces sequences sets vectors ;
 IN: compiler.cfg.register-allocation.chordal.spilling
 
@@ -335,6 +336,7 @@ RENAMING: spill-rename
     H{ } clone spill-def-renaming namespaces:set
     H{ } clone spill-slots namespaces:set
     cfg remove-unused-spill-phis
+    representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
     cfg prepare-rematerialization
     cfg compute-next-uses nip :> exits
     cfg reverse-post-order >array :> blocks
