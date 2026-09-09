@@ -26,10 +26,16 @@ with zipfile.ZipFile(io.BytesIO(archive)) as source:
 fixture = Path(__file__).with_name("optional.c").resolve()
 flags = ["-O1", *["-DSQLITE_ENABLE_" + option for option in OPTIONS], "-I" + str(out)]
 mac = sys.platform == "darwin"
+# Bind fixture code and data to its SQLite even when another version is loaded.
+link_flags = [] if mac else ["-Wl,-z,defs,-Bsymbolic", "-lm", "-ldl", "-pthread"]
 library = out / ("libsqlite3-optional.dylib" if mac else "libsqlite3-optional.so")
 subprocess.run(["clang", *flags, "-fPIC", "-dynamiclib" if mac else "-shared",
-                str(out / "sqlite3.c"), str(fixture), "-o", str(library)], check=True)
+                str(out / "sqlite3.c"), str(fixture), *link_flags, "-o", str(library)], check=True)
 subprocess.run(["clang", *flags, "-DOPTIONAL_MAIN", str(fixture), str(library),
                 "-o", str(out / "control")], check=True)
 subprocess.run([str(out / "control")], check=True)
+if not mac:
+    loader = out / "loader-control"
+    subprocess.run(["clang", str(fixture.with_name("loader.c")), "-ldl", "-o", str(loader)], check=True)
+    subprocess.run([str(loader), str(library)], check=True)
 print("SQLITE_3534_LIBRARY=" + str(library))
