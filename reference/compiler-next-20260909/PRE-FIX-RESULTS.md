@@ -41,7 +41,8 @@ Its isolated ARM FFI diagnostic removes four stores, two reloads and two blocks
 
 ## Correctness
 
-All four full ARM compiler suites pass at the frozen combined source with
+The loaded compiler-vocabulary suite passes under all four ARM allocators at
+the frozen combined source with
 SSA, interval and final-value-flow checks. Linear scan uses rematerialization
 off; alternative allocator suites use it on. New coverage includes exact
 hint-score/order comparisons across assignment mutations; 240 selector cases
