@@ -3,7 +3,7 @@ compiler.cfg compiler.cfg.gc-checks.private compiler.cfg.instructions
 compiler.cfg.linear-scan compiler.cfg.linear-scan.resolve
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
-compiler.cfg.register-allocation.chordal compiler.cfg.registers
+compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.chordal compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders
 compiler.cfg.utilities compiler.test compiler.utilities cpu.architecture generalizations kernel kernel.private locals make math
 math.bitwise math.functions math.libm math.order math.private memory namespaces quotations
