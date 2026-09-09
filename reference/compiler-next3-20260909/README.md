@@ -1,4 +1,10 @@
-# Round 3 native baseline and diagnostics
+# Compiler follow-up results
+
+Four opt-in improvements are implemented and measured on ARM64 and native x86.
+Read [RESULTS.md](RESULTS.md) for the outcome and [IMPLEMENTATION.md](IMPLEMENTATION.md)
+for flags and worktrees. All defaults are retained.
+
+## Retained baseline and diagnostics
 
 Baseline source is `8780b3c0908ba06be2720c5ac0949e3c68b871e4`. Compared with the measured `ad0fc337de` source, only three validation/test files change; production compiler, VM, and workload sources are identical. `baseline-source-proof.json` records that relationship. The new isolated native root has an exact 1,591-path manifest. It reuses the retained image (SHA256 `358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd`) and capability-bearing native x86 VM (`5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f`). The image's original source marker remains ad0fc; no new bootstrap or preparation is claimed.
 
@@ -25,4 +31,6 @@ Selected observations after representation selection:
 
 These counts do not establish that tags or boxes dominate runtime, nor that repeated loads can legally be merged. The exact CFG sites and alias/representation obligations must justify each transformation. Candidate owners receive the raw blocks for that purpose.
 
-Timing protocol: freeze each candidate first, verify positive emitted transformation and independent outputs, then compare feature off/on in the same candidate source, image, and selected word sequence using balanced B/C/C/B runs. This isolates feature activity from additional helper definitions. Measure accepted combined/default-off infrastructure against 8780 separately if warranted. Keep existing GVN/rematerialization and allocator defaults explicit. No 16-way factorial or long timing queue has started for this round.
+The completed timing protocol uses two balanced rounds of five unique configurations,
+with a shared all-off baseline. Each architecture retains 900 measured batches and
+separate combined-feature correctness gates. See [FEATURE-PROTOCOL.md](FEATURE-PROTOCOL.md).
