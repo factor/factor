@@ -1,0 +1,97 @@
+Unit Test: { { 2 } [ original-template get length ] }
+Unit Test: { { 255 } [ [ va_c_controls ] compile-call ] }
+Unit Test: {
+    { 42 78 42 t t 3 }
+    [
+        [
+            [ 1 + ] ordinary-reader [
+                load-local 41 0 get-local int
+                { int } cdecl alien-indirect
+                [ read-ints ] variadic-reader
+                [ 12 va_call_ints ] with-callback
+                gc 41 0 get-local int
+                { int } cdecl alien-indirect
+                CALLBACK-STUB special-object first
+                original-template get first eq?
+                CALLBACK-STUB special-object second
+                original-template get second eq?
+                CALLBACK-STUB special-object length 1
+                drop-locals
+            ] with-callback
+        ] compile-call
+    ]
+}
+variadic-callback-runtime-required
+
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        CALLBACK-STUB special-object original-template set-global
+        { 2 } [ original-template get length ] \ (unit-test) 16
+        experiment
+        { 255 } [ ~quotation~ compile-call ] \ (unit-test) 17
+        experiment
+        { 42 78 42 t t 3 } [ ~quotation~ compile-call ]
+        \ (unit-test) 30 experiment =>
+        { 78 t } [ ~quotation~ compile-call ] \ (unit-test) 36
+        experiment
+        test-failures get empty? compiler-errors get assoc-empty?
+        and
+        [ "Lazy callback template native tests passed" print 0 ] [
+            :test-failures compiler-errors get values ~quotation~
+            each 1
+        ] if flush exit
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(O) ( gensym )
+(O) callback-xt
+(O) callback-rewind
+(O) check-variadic-callback-runtime
+(O) variadic-callback-runtime-required
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
