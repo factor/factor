@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "source": "020b74ce5d",
+  "same_scope_as_all_off": true,
+  "all_30_outputs_equal_all_off": true,
+  "metric_targets": 16,
+  "all_four_features_enabled": true,
+  "strict_checks": true,
+  "script_sha256": "2d277c79efdeb0645cec601054499056d1643190bc5cc7fe94e9c69783db2319"
+}
