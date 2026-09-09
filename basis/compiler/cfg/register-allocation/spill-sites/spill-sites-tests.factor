@@ -28,6 +28,8 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
     t cold-spill-safe? set
     H{ { 1 int-rep } } clone representations set
     H{ { 0 1 } { 20 8 } } clone spill-site-weights set
+    H{ { 0 t } } clone cold-definition-sites set
+    H{ } clone established-cold-spills set
     0 loop-spill-site-count set
     0 cold-spill-store-count set ;
 
@@ -64,8 +66,15 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
     0 <spill-slot> >>reload-from 0 <spill-slot> >>spill-to
     int-rep >>reload-rep int-rep >>spill-rep ;
 
+: cold-defining-fragment ( -- interval )
+    cold-interval
+    dup uses>> first 1vector >>uses
+    V{ { 0 1 } } clone >>ranges
+    0 >>reg 0 <spill-slot> >>spill-to int-rep >>spill-rep ;
+
 { t f f f } [ [
     init-site-test cold-interval 1array prepare-cold-spills
+    H{ { 1 T{ spill-slot { n 0 } } } } established-cold-spills set
     read-only-fragment redundant-cold-spill?
     read-only-fragment 8 <spill-slot> >>reload-from redundant-cold-spill?
     read-only-fragment double-rep >>spill-rep redundant-cold-spill?
@@ -75,8 +84,28 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
 
 { f 1 } [ [
     init-site-test cold-interval 1array prepare-cold-spills
-    read-only-fragment 1array finish-loop-spills first spill-to>>
+    cold-defining-fragment read-only-fragment 2array
+    finish-loop-spills last spill-to>>
     cold-spill-store-count get
+] with-scope ] unit-test
+
+! A call split can leave the defining fragment's store in a hot body.
+! The zero-iteration edge skips that store and the following reload, and
+! enters the read-only fragment in its middle through a register copy.
+! Its trailing store is still needed to initialize the subsequent reload.
+{ t 0 } [ [
+    init-site-test cold-interval 1array prepare-cold-spills
+    cold-interval 0 >>reg 0 <spill-slot> >>spill-to int-rep >>spill-rep
+    V{ { 0 21 } } >>ranges
+    read-only-fragment 2array finish-loop-spills last spill-to>> spill-slot?
+    cold-spill-store-count get
+] with-scope ] unit-test
+
+{ f f } [ [
+    init-site-test cold-interval 1array prepare-cold-spills
+    cold-defining-fragment f >>spill-to establishes-cold-spill?
+    H{ } clone cold-definition-sites set
+    cold-defining-fragment establishes-cold-spill?
 ] with-scope ] unit-test
 
 
@@ -96,3 +125,21 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
     [| key | key before at key after at > ] all? ;
 
 { t } [ pressure-benefits? ] unit-test
+
+:: clobber-pressure-results? ( nvalues enabled? -- ? )
+    t loop-pressure-clobber? [
+        nvalues 8 5 enabled? loop-pressure-metrics drop :> word
+        nvalues nvalues 1 + * 2 /i :> constant
+        0 word execute( n -- checksum ) constant 5 * =
+        1 word execute( n -- checksum ) constant nvalues + 13 * = and
+        3 word execute( n -- checksum ) constant nvalues 3 * + 13 * = and
+    ] with-variable ;
+
+! An unrelated non-GC clobber is preceded and followed by hot reads, while
+! the zero-iteration path reaches several cold reads without calling it.
+! Allocation/value-flow checks run before any native code is executed.
+{ t } [
+    { 8 16 24 } [| nvalues |
+        { f t } [ nvalues swap clobber-pressure-results? ] all?
+    ] all?
+] unit-test

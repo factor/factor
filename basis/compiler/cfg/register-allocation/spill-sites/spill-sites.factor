@@ -12,18 +12,27 @@ SYMBOL: loop-spill-site-count
 SYMBOL: cold-spill-safe?
 SYMBOL: cold-spill-values
 SYMBOL: cold-spill-store-count
+SYMBOL: cold-definition-sites
+SYMBOL: established-cold-spills
 
 :: prepare-spill-sites ( cfg -- )
     0 loop-spill-site-count set
     0 cold-spill-store-count set
     f cold-spill-safe? set
+    f cold-definition-sites set
     backtracking-loop-spills? get [
+        H{ } clone cold-definition-sites set
         cfg needs-loops
         cfg cfg>insns [ gc-map-insn? ] any? not cold-spill-safe? set
         H{ } clone :> weights
         cfg linearization-order [| bb |
             8 bb loop-nesting-at 3 min ^ :> weight
             bb instructions>> [ insn#>> weight swap weights set-at ] each
+            weight 1 = [
+                bb instructions>> but-last [
+                    insn#>> t swap cold-definition-sites get set-at
+                ] each
+            ] when
         ] each
         weights
     ] [ f ] if spill-site-weights set ;
@@ -54,17 +63,35 @@ SYMBOL: cold-spill-store-count
     ] [ drop f ] if cold-spill-values set ;
 
 :: redundant-cold-spill? ( interval -- ? )
-    interval vreg>> cold-spill-values get key?
+    interval vreg>> established-cold-spills get at
+    interval spill-to>> =
     interval spill-to>> >boolean and
     interval reload-from>> interval spill-to>> = and
     interval reload-rep>> interval spill-rep>> eq? and
     interval uses>> [ def-rep>> ] any? not and ;
 
-! A unique cold definition establishes this private slot. A fragment that
-! only reads the same slot cannot change its bits, so storing its reload
-! back again is redundant. GC-map CFGs and ABI memory values are excluded.
+:: establishes-cold-spill? ( interval -- ? )
+    interval vreg>> cold-spill-values get key?
+    interval spill-to>> spill-slot? and
+    interval reg>> >boolean and
+    interval spill-rep>> int-rep eq? and
+    interval uses>> length 1 = and [
+        interval first-use :> definition
+        definition def-rep>> int-rep eq?
+        definition n>> cold-definition-sites get key? and
+        interval live-interval-end definition n>> 1 + = and
+    ] [ f ] if ;
+
+! Eligibility alone does not establish a slot: mandatory clobber splitting
+! can place a defining fragment's store inside a bypassed loop. Require an
+! actual allocated store immediately after the unique cold definition,
+! before the next instruction in that same block. That store dominates all
+! uses. Only then can read-only fragments omit their same-slot stores.
 : finish-loop-spills ( intervals -- intervals )
     backtracking-loop-spills? get [
+        dup [ establishes-cold-spill? ] filter
+        [ [ vreg>> ] [ spill-to>> ] bi ] H{ } map>assoc
+        established-cold-spills set
         dup [
             dup redundant-cold-spill? [
                 f >>spill-to cold-spill-store-count inc

@@ -9,6 +9,8 @@ compiler.codegen compiler.units cpu.architecture hashtables kernel layouts local
 namespaces sequences tools.test words ;
 IN: compiler.cfg.register-allocation.spill-sites.fixtures
 
+SYMBOL: loop-pressure-clobber?
+
 : fresh-int ( -- vreg ) int-rep next-vreg-rep ;
 
 :: sum-values ( values -- sum )
@@ -71,6 +73,13 @@ IN: compiler.cfg.register-allocation.spill-sites.fixtures
     entry header connect-bbs
     header body connect-bbs header done connect-bbs
     body header connect-bbs
+    loop-pressure-clobber? get [
+        body [
+            hot-count 1 - cut [
+                f { } { } { } { } 0 0 [ ] ##alien-assembly,
+            ] V{ } make swap append append
+        ] change-instructions drop
+    ] when
     entry block>cfg ;
 
 :: <loop-pressure> ( count hot cold -- graph )

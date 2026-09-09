@@ -19,7 +19,12 @@ related decisions:
   is hot, can place its first spill immediately after that definition. A
   subsequent fragment that reloads its same private spill slot, has no
   definitions, and preserves the representation does not store that value
-  back again. The definition count comes from the original unsplit interval,
+  back again **only after an actual cold store has been established**. The
+  final allocated intervals must contain the defining fragment, its real
+  slot store immediately after the definition, and a following instruction
+  in that same cold block. Eligibility or a requested split is insufficient:
+  mandatory clobber splitting can otherwise leave the store in a bypassed
+  hot body. The definition count comes from the original unsplit interval,
   not just equality of coalesced leader IDs or physical registers.
 
 The last transformation rejects ABI memory operands and entire CFGs with
@@ -40,6 +45,9 @@ zero, one, and multiple loop iterations. Native fixtures run interval,
 numbering, and final value-flow checks. The runtime input creates all live
 values, and every arithmetic result contributes to the returned checksum.
 The previous backtracking regression suite also passes.
+Additional native fixtures place an unrelated non-GC clobber between hot
+reads and exercise the zero-iteration bypass, preventing read-only fragments
+entered in their middle from losing a still-required initializing store.
 
 The six-fixture ARM64 sweep and alternating runtime evidence are in
 `reference/allocator-spill-sites-20260908`. Uniform 40-value pressure reduced
