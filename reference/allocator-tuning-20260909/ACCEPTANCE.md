@@ -34,7 +34,17 @@ states, phi source identity, mixed saved homes, and store-before-reload behavior
 The narrow backtracking policy preserves entry/exit and multiblock gaps, including
 register transport across the fast edge around an out-of-line GC block.
 
-Full ARM64/x86 checked workload, callback and moving-GC gates and the broad timing
-matrix are still pending. The diagnostic
+## Cross-architecture gates
+
+Both frozen revisions pass all four checked 26-workload closures on native
+ARM64 and x86-64. Real C ABI callbacks pass for every allocator with
+rematerialization off and on. Raw/tagged phi moving-GC probes pass with the final
+value-flow verifier active. Across both hosts and sources the explicit gates
+cover 160 C ABI assertions and 1,536 fresh object pairs. Exact preparation,
+matched VM/image assets, commands and outcomes are retained in
+[gate acceptance](gates/acceptance.json).
+
+The broad two-round timing matrix and unprofiled saved-image bootstrap remain
+pending. The diagnostic
 [bootstrap profile](bootstrap-profile/README.md) is not an unprofiled bootstrap
 or fresh-image acceptance run.
