@@ -79,7 +79,9 @@ for allocator in ([a.allocator] if a.allocator else original.ALLOCATORS):
     values['code-bytes']+=procedure['code-bytes']
     final=procedure['passes'][-1]
     for k in ('spills','reloads','copies','spill-bytes','frame-bytes','instructions','blocks'):values[k]+=final[k]
-   code[f"{v['input']}|{code_index % 12}"]=dict(values)
+   key=f"{v['input']}|{code_index % 12}"
+   if key in code:assert code[key]==dict(values),(allocator,label,key,"static metrics changed between processes")
+   code[key]=dict(values)
   report['code'][label]=code
  summary['allocators'][allocator]=report
 (a.directory/(a.output_prefix+'.json')).write_text(json.dumps(summary,indent=2)+'\n')

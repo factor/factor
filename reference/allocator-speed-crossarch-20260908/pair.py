@@ -4,14 +4,16 @@ import argparse,subprocess,sys
 from pathlib import Path
 p=argparse.ArgumentParser()
 p.add_argument('baseline',type=Path);p.add_argument('candidate',type=Path)
+p.add_argument('--allocators',nargs='+',choices=['linear-scan','greedy','backtracking','chordal'])
 p.add_argument('--rounds',type=int,default=2);p.add_argument('--samples',type=int,default=3)
 p.add_argument('--candidate-loop-spills',choices=['on','off'],default='off')
 p.add_argument('--linear-scan-remat-attribution',action='store_true')
 p.add_argument('--mode',choices=['check','timing'],default='timing')
 a=p.parse_args()
-allocators=['linear-scan','greedy','backtracking','chordal']
+allocators=a.allocators or ['linear-scan','greedy','backtracking','chordal']
 for r in range(a.rounds if a.mode=='timing' else 1):
- order=allocators[r%4:]+allocators[:r%4]
+ rotation=r%len(allocators)
+ order=allocators[rotation:]+allocators[:rotation]
  roots=[('baseline',a.baseline),('candidate',a.candidate)]
  if r%2:roots.reverse()
  for allocator in order:

@@ -84,6 +84,7 @@ CONSTANT: batch-counts H{
     benchmark-words get-global :> selected
     H{ } clone "scope" "kind" pick set-at
     allocator "allocator" pick set-at
+    command-line get dup length 5 > [ 5 swap nth ] [ drop "unrecorded" ] if "source" pick set-at
     checked "checked" pick set-at
     H{ { "rematerialize_constants" rematerialize }
        { "backtracking_loop_spills" loop-spills } { "gvn" f } } "options" pick set-at
