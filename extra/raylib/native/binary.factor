@@ -1,7 +1,7 @@
 ! Headless native binary-buffer tests; all calls use the real raylib library.
-USING: accessors alien alien.accessors alien.c-types alien.data alien.strings alien.syntax
-arrays byte-arrays compiler.test continuations io.encodings.utf8 kernel locals namespaces
-raylib sequences tools.test ;
+USING: accessors alien alien.accessors alien.c-types alien.data
+alien.strings alien.syntax arrays byte-arrays compiler.test continuations
+io.encodings.utf8 kernel libc locals namespaces raylib sequences tools.test ;
 IN: raylib.tests
 
 SYMBOL: raylib-binary-allocation
@@ -81,4 +81,3 @@ SYMBOL: raylib-binary-allocation
 ! silently mutated a temporary encoding instead of the supplied object.
 [ [ "____" "abc" text-copy ] compile-call ] must-fail
 [ [ "ab__" "c" 2 int <ref> text-append ] compile-call ] must-fail
-
