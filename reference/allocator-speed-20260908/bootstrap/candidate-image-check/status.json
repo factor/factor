@@ -1,0 +1,74 @@
+{
+  "command": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-speed-integration/speed.factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-speed-integration",
+    "reference/allocator-speed-20260908/verify-image.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/allocator-speed-integration",
+  "source": "4daa778a6b79a3ac7a819c509eb2b10a90bce14e",
+  "source_status": "M reference/allocator-speed-20260908/run-command.py",
+  "host": {
+    "system": "Darwin",
+    "node": "Mac",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2",
+    "libfactor.dylib": "a37ddbab96cdcbd030f4ac6681db8b003a5a22230ab013bc59a42eda2cc7830a",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/allocator-speed-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "67f8f4c96bec8dfd2d8758c82639aa5a1acf35fb26fb936ce86bb2f2e3e37ed2"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-speed-integration/speed.factor.image",
+    "sha256": "4271203b7b563ef903d40f735e59ab5bf5980b3daace3f5dc8da5f30e628dfc0"
+  },
+  "exit_code": 0,
+  "seconds": 0.5621419589999999,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [
+    {
+      "kind": "phase",
+      "elapsed": 0.551943584,
+      "snapshot_valid": true,
+      "load": [
+        79.3115234375,
+        71.22412109375,
+        71.11083984375
+      ],
+      "cpu": 0.4676942083333333,
+      "user": 0.41456520833333327,
+      "system": 0.053128999999999996,
+      "instructions": 5564422953,
+      "cycles": 1682068232,
+      "rss": 263192576,
+      "background_cpu": 0.042255375,
+      "disk_read_bytes": 0,
+      "disk_written_bytes": 4096,
+      "text": "SPEED image-verification=passed allocator=linear-scan gvn=off rematerialization=off"
+    }
+  ],
+  "last_process_usage": {
+    "cpu": 0.4676942083333333,
+    "user": 0.41456520833333327,
+    "system": 0.053128999999999996,
+    "instructions": 5564422953,
+    "cycles": 1682068232,
+    "rss": 263192576,
+    "background_cpu": 0.042255375,
+    "disk_read_bytes": 0,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}

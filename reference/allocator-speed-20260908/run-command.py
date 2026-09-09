@@ -43,6 +43,17 @@ def run(args):
         path = cwd / name
         if path.exists():
             status['assets'][name] = digest(path)
+    executable = Path(command[0])
+    if not executable.is_absolute():
+        executable = cwd / executable
+    if executable.is_file():
+        status['executable'] = dict(path=str(executable.resolve()), sha256=digest(executable))
+    for argument in command[1:]:
+        if argument.startswith('-i='):
+            image = Path(argument[3:])
+            if not image.is_absolute():
+                image = cwd / image
+            status['input_image'] = dict(path=str(image.resolve()), sha256=digest(image))
     (output / 'environment.json').write_text(json.dumps(status, indent=2) + '\n')
     started = time.monotonic()
     child = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE,
