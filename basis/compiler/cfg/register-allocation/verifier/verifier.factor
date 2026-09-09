@@ -27,6 +27,7 @@ ERROR: invalid-allocation-gc-root insn value ;
 ERROR: invalid-allocation-derived-root insn derived base ;
 ERROR: overlapping-allocation-gc-roots insn ;
 ERROR: invalid-allocation-operands insn ;
+ERROR: invalid-allocation-operand-constraint insn ;
 
 : value-flow-copy? ( insn -- ? )
     { [ ##copy? ] [ ##tagged>integer? ] } 1|| ;
@@ -154,8 +155,30 @@ ERROR: invalid-allocation-operands insn ;
     insn defs-vregs expected outputs>> [ rep>> value-flow-locations ] 2map concat
     append :> operands
     insn temp-vregs expected temps>> [ rep>> value-flow-locations ] 2map concat :> temps
-    temps all-unique? temps operands intersect empty? and [ ] [
+    insn temp-vregs [ spill-slot? ] any? not
+    temps all-unique? and temps operands intersect empty? and [ ] [
         insn invalid-allocation-temporary
+    ] if ;
+
+! Target two-address lowering may reuse the first source's location. A
+! distinct later source must survive that copy into the destination. ABI
+! clobbers marshal all slot inputs before writing outputs, so their input /
+! output memory reuse follows the separate call contract.
+:: check-value-flow-output-constraints ( insn expected -- )
+    insn defs-vregs expected outputs>>
+    [ rep>> value-flow-locations ] 2map concat :> outputs
+    outputs all-unique? [ ] [ insn invalid-allocation-operand-constraint ] if
+    insn clobber-insn? [ ] [
+        insn uses-vregs expected inputs>>
+        [ rep>> value-flow-locations ] 2map :> inputs
+        inputs empty? [ ] [
+            insn def-is-use-insn?
+            [ inputs concat ]
+            [ inputs rest concat inputs first diff ] if :> late
+            outputs late intersect empty? [ ] [
+                insn invalid-allocation-operand-constraint
+            ] if
+        ] if
     ] if ;
 
 :: check-value-flow-roots ( insn expected state snapshot -- )
@@ -226,6 +249,7 @@ ERROR: invalid-allocation-operands insn ;
         ] when
         insn expected state snapshot check-value-flow-inputs
         insn expected check-value-flow-temps
+        insn expected check-value-flow-output-constraints
         insn expected state snapshot check-value-flow-roots
     ] when
     {

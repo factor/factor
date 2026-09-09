@@ -451,3 +451,38 @@ CONSTANT: flow-allocators {
     99 2 derived set-at
     2 expected derived>> at
 ] ] with-scope ] unit-test
+
+:: late-input-fixture ( destination -- graph snapshot )
+    init-flow-reps
+    1 flow-load :> first-input
+    2 flow-load :> second-input
+    ##add new 3 >>dst 1 >>src1 2 >>src2 :> add
+    first-input second-input add 3array insns>cfg :> graph
+    graph snapshot-value-flow :> snapshot
+    first-input 0 >>dst drop second-input 1 >>dst drop
+    add destination >>dst 0 >>src1 1 >>src2 drop
+    graph snapshot ;
+
+{ } [ 0 late-input-fixture check-value-flow ] unit-test
+[ 1 late-input-fixture check-value-flow ]
+[ invalid-allocation-operand-constraint? ] must-fail-with
+
+[ [let
+    init-flow-reps
+    1 flow-load :> definition
+    ##dispatch new 1 >>src 2 >>temp :> use
+    definition use 2array insns>cfg :> graph
+    graph snapshot-value-flow :> snapshot
+    definition 0 >>dst drop use 0 >>src 0 <spill-slot> >>temp drop
+    graph snapshot check-value-flow
+] ] [ invalid-allocation-temporary? ] must-fail-with
+
+[ [let
+    init-flow-reps tagged-rep 1 set-rep-of
+    ##load-reference new 1 >>dst f >>obj :> definition
+    ##unbox-any-c-ptr new 2 >>dst 1 >>src :> use
+    definition use 2array insns>cfg :> graph
+    graph snapshot-value-flow :> snapshot
+    definition 0 >>dst drop use 0 >>src 0 >>dst drop
+    graph snapshot check-value-flow
+] ] [ invalid-allocation-operand-constraint? ] must-fail-with
