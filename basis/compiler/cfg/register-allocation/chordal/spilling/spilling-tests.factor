@@ -1,10 +1,11 @@
-USING: accessors assocs compiler.cfg compiler.cfg.def-use
+USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.linearization
+compiler.cfg.register-allocation.chordal
 compiler.cfg.register-allocation.chordal.spilling
 compiler.cfg.register-allocation.chordal.bases
 compiler.cfg.register-allocation.validation
 compiler.cfg.register-allocation.rematerialization compiler.cfg.registers
-compiler.cfg.rpo compiler.cfg.utilities cpu.architecture kernel locals math namespaces sequences
+compiler.cfg.rpo compiler.cfg.utilities cpu.architecture kernel layouts locals make math namespaces sequences
 sets tools.test ;
 IN: compiler.cfg.register-allocation.chordal.spilling.tests
 
@@ -74,7 +75,9 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
         dup dup 2 2 validation-register-bank spill-ssa :> ( fixed stats )
         check-rewritten-phis
         "memory-phis" stats at 0 >
-        "edge-blocks" stats at 0 >
+        ! Memory-only phi inputs remain in memory until their actual use;
+        ! their ordinary parallel edge copies are lowered after coloring.
+        "edge-blocks" stats at 0 or zero?
     ] with-cfg
 ] ] unit-test
 
@@ -87,3 +90,48 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
         "reload-definitions" stats at 0 >
     ] with-cfg
 ] ] unit-test
+
+! The first value was saved before a block boundary. Loading it eagerly at
+! the successor entry only evicts it again for the local constant before
+! its actual use. An entry with a known predecessor inherits residency;
+! the saved value gets one reload at its use, not two speculative reloads.
+:: entry-reload-pressure-cfg ( -- graph )
+    init-validation-representations
+    [
+        ##prologue,
+        1 D: 0 ##peek,
+        2 22 tag-fixnum ##load-integer,
+        3 33 tag-fixnum ##load-integer,
+        4 2 3 ##add, ##branch,
+    ] V{ } make 0 insns>block :> entry
+    [
+        5 44 tag-fixnum ##load-integer,
+        6 4 5 ##add,
+        7 6 1 ##add,
+        7 D: 0 ##replace,
+        ##epilogue, ##return,
+    ] V{ } make 1 insns>block :> done
+    entry done connect-bbs entry block>cfg ;
+
+{ { { 1 1 } { 1 1 } } } [
+    { f t } [ [| rematerialize? |
+        rematerialize? rematerialize-constants? namespaces:set
+        entry-reload-pressure-cfg [
+            dup construct-ssa-bases dup compute-ssa-live-sets
+            dup 2 2 validation-register-bank spill-ssa nip
+            [ "pressure-stores" of ] [ "reload-definitions" of ] bi 2array
+        ] with-cfg
+    ] with-scope ] map
+] unit-test
+
+{ { { 110 92 } { 110 92 } } } [
+    { f t } [ [| rematerialize? |
+        rematerialize? rematerialize-constants? namespaces:set
+        entry-reload-pressure-cfg :> graph
+        chordal-allocator graph 2 2 validation-register-bank
+        [ chordal-allocation-with-registers ] constrained-allocator boa
+        graph swap compile-validation-cfg :> word
+        11 word execute( input -- result )
+        -7 word execute( input -- result ) 2array
+    ] with-scope ] map
+] unit-test
