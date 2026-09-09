@@ -200,6 +200,12 @@ RENAMING: spill-rename
     ] [ candidates ] if* ;
 
 :: choose-entry-values ( plan -- values )
+    ! Factor call/prologue/epilogue blocks are not register allocation
+    ! regions. In particular, a callback's hidden raw result pointer can
+    ! remain live across Factor calls in its ABI-created memory home.
+    ! Creating a register repair phi here would both cross the call's
+    ! clobbers and strand an interval in the skipped assignment block.
+    plan bb>> kill-block?>> [ { } ] [
     plan distances>> keys :> candidates
     candidates [| value |
         value plan known-predecessor-residents dup empty?
@@ -209,7 +215,8 @@ RENAMING: spill-rename
         candidates [ register-class class = ] filter
         plan class bank length loop-entry-candidates
         common plan distances>> bank length select-entry-residents
-    ] { } assoc>map concat ;
+    ] { } assoc>map concat
+    ] if ;
 
 :: entry-memory-valid? ( value plan -- ? )
     value plan phi-sources>> key? [ f ] [
