@@ -18,7 +18,7 @@ M: uniscribe-renderer string>image
 
 M: uniscribe-renderer x>offset
     [ 2drop 0 ] [
-        [ gl-scale ] 2dip cached-script-string x>line-offset 0 = [ 1 + ] unless
+        [ gl-scale ] 2dip cached-script-string x>line-offset +
     ] if-empty ;
 
 M: uniscribe-renderer offset>x
@@ -29,7 +29,7 @@ M: uniscribe-renderer font-metrics
 
 M: uniscribe-renderer line-metrics
     [ " " line-metrics 0 >>width ]
-    [ cached-script-string metrics>> clone scale-metrics 50 >>width 10 >>cap-height 10 >>x-height ]
+    [ cached-script-string metrics>> clone scale-metrics ]
     if-empty ;
 
 uniscribe-renderer font-renderer set-global

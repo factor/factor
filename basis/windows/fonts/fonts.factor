@@ -53,4 +53,15 @@ STARTUP-HOOK: [
         [ tmHeight>> >>height ]
         [ tmAscent>> >>ascent ]
         [ tmDescent>> >>descent ]
+        [ tmExternalLeading>> >>leading ]
     } cleave ;
+
+: identity-mat2 ( -- matrix )
+    MAT2 new
+    dup eM11>> 1 >>value drop
+    dup eM22>> 1 >>value drop ;
+
+:: dc-glyph-height ( dc char -- height/f )
+    GLYPHMETRICS new :> metrics
+    dc char GGO_METRICS metrics 0 f identity-mat2 GetGlyphOutline
+    GDI_ERROR = [ f ] [ metrics gmBlackBoxY>> ] if ;

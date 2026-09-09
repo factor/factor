@@ -279,6 +279,23 @@ STRUCT: POINT
     { y LONG } ;
 TYPEDEF: POINT* LPPOINT
 
+STRUCT: FIXED
+    { fract WORD }
+    { value SHORT } ;
+
+STRUCT: MAT2
+    { eM11 FIXED }
+    { eM12 FIXED }
+    { eM21 FIXED }
+    { eM22 FIXED } ;
+
+STRUCT: GLYPHMETRICS
+    { gmBlackBoxX UINT }
+    { gmBlackBoxY UINT }
+    { gmptGlyphOrigin POINT }
+    { gmCellIncX SHORT }
+    { gmCellIncY SHORT } ;
+
 STRUCT: SIZE
     { cx LONG }
     { cy LONG } ;
