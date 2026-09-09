@@ -153,8 +153,11 @@ M: script-string dispose*
 
 SYMBOL: cached-script-strings
 
-: cached-script-string ( font string -- script-string )
-    cached-script-strings get-global [ <script-string> ] 2cache ;
+:: cached-script-string ( font string -- script-string )
+    ! A layout owns native glyph metrics and pixels at its backing scale.
+    font string gl-scale-factor get-global 1.0 or 3array
+    cached-script-strings get-global
+    [ drop font string <script-string> ] cache ;
 
 : script-string>image ( script-string -- image )
     dup image>> [
