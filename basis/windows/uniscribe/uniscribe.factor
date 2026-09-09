@@ -36,6 +36,7 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 PRIVATE>
 
 :: line-offset>x ( n script-string -- x )
+    script-string check-disposed drop
     script-string string>> uniscribe-text :> text
     text empty? [ 0 ] [
         text n >utf16-index :> n-utf16
@@ -45,6 +46,7 @@ PRIVATE>
     ] if ;
 
 :: x>line-offset ( x script-string -- n trailing )
+    script-string check-disposed drop
     script-string string>> uniscribe-text :> str
     str empty? [ 0 0 ] [
         script-string ssa>> x
@@ -207,6 +209,7 @@ PRIVATE>
     24 shift swap 16 shift bitor swap 8 shift bitor bitor ;
 
 :: selection-columns ( script-string -- columns )
+    script-string check-disposed drop
     script-string size>> first <byte-array> :> columns
     script-string string>> :> selection
     selection selection? [
@@ -286,8 +289,33 @@ PRIVATE>
     dc CHAR: H dc-glyph-height >>cap-height
     dc CHAR: x dc-glyph-height >>x-height ;
 
+! Layouts and hash keys must not retain caller-owned mutable inputs.
+: snapshot-color ( color/f -- rgba/f )
+    dup [ >rgba ] when ;
+
+:: snapshot-shaping-options ( options -- copy )
+    options [ :> value :> key
+        key clone
+        key "features" = [
+            value [ [ clone ] dip ] H{ } assoc-map-as
+        ] [ value clone ] if
+    ] H{ } assoc-map-as ;
+
+: snapshot-font ( font -- copy )
+    clone [ clone ] change-name
+    [ snapshot-color ] change-foreground
+    [ snapshot-color ] change-background
+    dup shaped-font? [ [ snapshot-shaping-options ] change-shaping-options ] when ;
+
+: snapshot-text ( string/selection -- copy )
+    clone dup selection? [
+        [ clone ] change-string [ snapshot-color ] change-color
+    ] when ;
+
 ! DC limit is default soft-limited to 10,000 per process.
-:: <script-string> ( font string -- script-string )
+:: <script-string> ( input-font input-string -- script-string )
+    input-font snapshot-font :> font
+    input-string snapshot-text :> string
     gl-scale-factor get-global 1.0 or :> scale
     [ :> dc
         dc font DEFAULT_QUALITY scale cache-font-at-scale SelectObject win32-error=0/f
@@ -309,17 +337,21 @@ PRIVATE>
 PRIVATE>
 
 M: script-string dispose*
-    ssa>> [ void* <ref> ScriptStringFree check-ole32-error ] when* ;
+    [ ssa>> [ void* <ref> ScriptStringFree check-ole32-error ] when* ]
+    [ f >>ssa drop ] bi ;
 
 SYMBOL: cached-script-strings
 
 :: cached-script-string ( font string -- script-string )
     ! A layout owns native glyph metrics and pixels at its backing scale.
-    font string gl-scale-factor get-global 1.0 or 3array
+    ! Keep key snapshots independent from the layout's own snapshots.
+    font snapshot-font string snapshot-text
+    gl-scale-factor get-global 1.0 or 3array
     cached-script-strings get-global
     [ drop font string <script-string> ] cache ;
 
 : script-string>image ( script-string -- image )
+    check-disposed
     dup image>> [
         ! Nonempty zero-advance strings can still contain visible marks.
         dup ssa>> not [

@@ -3,6 +3,18 @@ fonts kernel locals math sequences tools.test windows.fonts
 windows.gdi32 windows.kernel32 windows.types ;
 IN: windows.fonts.tests
 
+:: stable-font-name-key? ( -- ? )
+    "Arial" clone :> name
+    name 37 f f (cache-font) :> handle
+    CHAR: X 0 name set-nth
+    "Arial" 37 f f (cache-font) handle = ;
+
+{ t } [ stable-font-name-key? ] unit-test
+{ t } [
+    "monospace" 19 f f (cache-font)
+    "monospace" windows-font-name 19 f f (cache-font) =
+] unit-test
+
 LIBRARY: gdi32
 FUNCTION: int GetObjectW ( HGDIOBJ object, int size, void* data )
 LIBRARY: user32
