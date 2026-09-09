@@ -47,11 +47,17 @@ pub const Interpreter = struct {
         }
 
         const quot: *const layouts.Quotation = @ptrFromInt(layouts.UNTAG(quot_cell));
-        const arr_cell = quot.array;
+        var arr_cell = quot.array;
 
         if (!layouts.hasTag(arr_cell, .array)) {
             return ExecutionError.InvalidQuotation;
         }
+
+        // A primitive executed below can move the quotation's array and its
+        // elements. Keep the array alive and reload its data after each call.
+        self.vm.data_roots.ensureUnusedCapacity(self.vm.allocator, 1) catch self.vm.memoryError();
+        self.vm.data_roots.appendAssumeCapacity(&arr_cell);
+        defer _ = self.vm.data_roots.pop();
 
         const arr: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
         const len = layouts.untagFixnumUnsigned(arr.capacity);
@@ -68,7 +74,8 @@ pub const Interpreter = struct {
         }
 
         for (0..len) |i| {
-            const elem = data[i];
+            const current_array: *const layouts.Array = @ptrFromInt(layouts.UNTAG(arr_cell));
+            const elem = current_array.data()[i];
             try self.executeElement(elem);
         }
     }
@@ -247,15 +254,9 @@ pub const Interpreter = struct {
         } else if (wordNameEquals(word, "call")) {
             try self.executeQuotation(ctx.pop());
         } else if (wordNameEquals(word, "dip")) {
-            const quot = ctx.pop();
-            const x = ctx.pop();
-            try self.executeQuotation(quot);
-            ctx.push(x);
+            try self.dip();
         } else if (wordNameEquals(word, "keep")) {
-            const quot = ctx.pop();
-            const x = ctx.peek();
-            try self.executeQuotation(quot);
-            ctx.push(x);
+            try self.keep();
         } else if (wordNameEquals(word, "if")) {
             const false_quot = ctx.pop();
             const true_quot = ctx.pop();
@@ -436,4 +437,85 @@ test "interpreter basic literals" {
 
     const result = vm.pop();
     try std.testing.expectEqual(layouts.tagFixnum(42), result);
+}
+
+fn testWord(vm: *FactorVM, name: []const u8) Cell {
+    const name_cell = vm.allotObject(.string, @sizeOf(layouts.String) + name.len).?;
+    const str: *layouts.String = @ptrFromInt(layouts.UNTAG(name_cell));
+    str.length = layouts.tagFixnum(@intCast(name.len));
+    str.aux = layouts.false_object;
+    str.hashcode_field = layouts.false_object;
+    @memcpy(str.data()[0..name.len], name);
+    const cell = vm.allotObject(.word, @sizeOf(layouts.Word)).?;
+    const word: *layouts.Word = @ptrFromInt(layouts.UNTAG(cell));
+    word.* = .{
+        .header = word.header,
+        .hashcode_field = layouts.false_object,
+        .name = name_cell,
+        .vocabulary = layouts.false_object,
+        .def = layouts.false_object,
+        .props = layouts.false_object,
+        .pic_def = layouts.false_object,
+        .pic_tail_def = layouts.false_object,
+        .subprimitive = layouts.false_object,
+        .entry_point = 0,
+    };
+    return cell;
+}
+
+fn testQuotation(vm: *FactorVM, elements: []const Cell) Cell {
+    const array = vm.allotArray(elements.len, layouts.false_object).?;
+    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(array));
+    @memcpy(arr.data()[0..elements.len], elements);
+    const cell = vm.allotObject(.quotation, @sizeOf(layouts.Quotation)).?;
+    const quot: *layouts.Quotation = @ptrFromInt(layouts.UNTAG(cell));
+    quot.* = .{
+        .header = quot.header,
+        .array = array,
+        .cached_effect = layouts.false_object,
+        .cache_counter = layouts.false_object,
+        .entry_point = 0,
+    };
+    return cell;
+}
+
+test "interpreter roots remaining literals and dip values across moving GC" {
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try @import("data_heap.zig").DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    var collector = @import("gc.zig").GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // Construction fits entirely in the nursery. Both byte arrays become
+    // reachable only through interpreter state when do-primitive collects.
+    const do_primitive = testWord(vm, "do-primitive");
+    const dip_word = testWord(vm, "dip");
+    const saved = vm.allotByteArray(8);
+    const literal = vm.allotByteArray(8);
+    const inner = testQuotation(vm, &.{ layouts.tagFixnum(@intFromEnum(primitives.PrimitiveIndex.minor_gc)), do_primitive, literal });
+    const outer = testQuotation(vm, &.{ saved, inner, dip_word });
+    var interp = Interpreter.init(vm);
+    try interp.executeQuotation(outer);
+
+    const restored = vm.pop();
+    const pushed = vm.pop();
+    try std.testing.expect(restored != saved);
+    try std.testing.expect(pushed != literal);
+    for ([_]Cell{ restored, pushed }) |cell| {
+        try std.testing.expect(layouts.hasTag(cell, .byte_array));
+        try std.testing.expect(layouts.UNTAG(cell) >= heap.aging.start);
+        try std.testing.expect(layouts.UNTAG(cell) < heap.aging.here);
+    }
+    try std.testing.expectEqual(@as(usize, 0), vm.data_roots.items.len);
 }

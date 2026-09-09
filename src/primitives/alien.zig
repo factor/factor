@@ -127,7 +127,9 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
     if (layouts.hasTag(rooted_alien, .alien)) {
         const src_alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(rooted_alien));
         new_alien.base = src_alien.base;
-        new_alien.displacement = src_alien.displacement + displacement;
+        // Negative offsets arrive as unsigned cells. Pointer arithmetic wraps
+        // modulo the cell width, just as in the C++ VM.
+        new_alien.displacement = src_alien.displacement +% displacement;
     } else {
         new_alien.base = rooted_alien;
         new_alien.displacement = displacement;
@@ -135,6 +137,30 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
 
     new_alien.updateAddress();
     vm.push(tagged);
+}
+
+test "displaced alien accepts negative offsets from a pinned address" {
+    const vm = try FactorVM.init(std.testing.allocator);
+    const heap = try @import("../data_heap.zig").DataHeap.init(std.testing.allocator, 4096, 4096, 8192);
+    defer heap.deinit();
+    defer vm.deinit();
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    vm.setDataHeap(heap);
+
+    vm.push(layouts.tagFixnum(-1));
+    vm.push(vm.allotAlien(layouts.false_object, 4096));
+    primitive_displaced_alien(&vm.vm_asm);
+    const result: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(vm.pop()));
+    try std.testing.expectEqual(@as(Cell, 4095), result.displacement);
+    try std.testing.expectEqual(@as(Cell, 4095), result.address);
+
+    const base = vm.allotByteArray(8);
+    vm.push(layouts.tagFixnum(-1));
+    vm.push(base);
+    primitive_displaced_alien(&vm.vm_asm);
+    const displaced: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(vm.pop()));
+    try std.testing.expectEqual(layouts.UNTAG(base) + @sizeOf(layouts.ByteArray) - 1, displaced.address);
 }
 
 // Helper to pop alien pointer with offset
