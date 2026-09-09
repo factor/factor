@@ -133,6 +133,6 @@ M: array draw-text
 
 {
     { [ os macos? ] [ "ui.text.core-text" ] }
-    { [ os windows? ] [ "ui.text.uniscribe" ] }
+    { [ os windows? ] [ "ui.text.directwrite" ] }
     { [ os unix? ] [ "ui.text.pango" ] }
 } cond require
