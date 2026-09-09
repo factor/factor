@@ -1,4 +1,4 @@
-USING: compiler-next3.benchmark alien.syntax alien.c-types command-line compiler.units compiler.errors compiler.utilities compiler.cfg.checker compiler.cfg.linear-scan.allocation.state compiler.cfg.value-numbering arrays assocs io json kernel locals math memory namespaces sequences tools.time math.parser words compiler.cfg.metrics ;
+USING: compiler-next3.benchmark alien.syntax alien.c-types command-line compiler.units compiler.errors compiler.utilities compiler.cfg.checker compiler.cfg.linear-scan.allocation.state compiler.cfg.value-numbering arrays assocs io json kernel locals math memory namespaces sequences tools.time math.parser vocabs words compiler.cfg.metrics ;
 IN: allocator-runtime-comparison
 LIBRARY: allocator-counters
 FUNCTION: int compiler_foreground ( )

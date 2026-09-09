@@ -10,7 +10,7 @@ USING: parser vocabs.loader vocabs.refresh ;
 USING: allocator-runtime-comparison assocs compiler-next3.benchmark
 compiler.cfg.register-allocation compiler.cfg.register-allocation.rematerialization
 compiler.cfg.register-allocation.spill-sites compiler.cfg.value-numbering
-compiler.errors kernel locals math.parser memory namespaces sequences words ;
+compiler.errors kernel locals math.parser memory namespaces sequences vocabs words ;
 linear-scan-allocator register-allocator set-global
 f global-value-numbering? set-global
 f rematerialize-constants? set-global

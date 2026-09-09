@@ -1,6 +1,6 @@
 ! Shared configuration and witness registry. No compiler instrumentation.
 USING: accessors allocator-runtime-comparison arrays assocs kernel locals
-namespaces sequences words ;
+namespaces sequences vocabs words ;
 IN: compiler-next3.benchmark
 CONSTANT: feature-options H{
     { "loops" { "compiler.cfg.loop-optimization" "loop-optimization?" } }
