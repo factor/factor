@@ -1,0 +1,348 @@
+{ f 0 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##branch }
+}
+V{
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##branch }
+}
+V{
+    T{ ##xor-imm { dst 6 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 7 } { src1 6 } { src2 4 } }
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 7 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4584814786 4581852706 4584814789 4581852709 }
+        { t t t f }
+    }
+    {
+        { 4584375026 4581870722 4584375029 4581870725 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581870962 4584374405 4581870965 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581871122 4584374405 4581871125 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581871282 4584374405 4581871285 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581871442 4584374405 4581871445 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581871602 4584374405 4581871605 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581871762 4584374405 4581871765 }
+        { t t t f }
+    }
+}
+{ f 1 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##branch }
+}
+V{
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##branch }
+}
+V{
+    T{ ##xor-imm { dst 6 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 7 } { src1 6 } { src2 4 } }
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 7 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4585230722 4581871922 4585230725 4581871925 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581892322 4584374405 4581892325 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581892482 4584374405 4581892485 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581892642 4584374405 4581892645 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581892802 4584374405 4581892805 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581892962 4584374405 4581892965 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581893122 4584374405 4581893125 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581893282 4584374405 4581893285 }
+        { t t t f }
+    }
+}
+{ f 2 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##branch }
+}
+V{
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##branch }
+}
+V{
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4585235202 4581893442 4585235205 4585235205 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581918722 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581918882 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581919042 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581919202 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581919362 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581919522 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581919682 4584374405 4584374405 }
+        { t t f t }
+    }
+}
+{ t 0 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##xor-imm { dst 6 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 7 } { src1 6 } { src2 4 } }
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 7 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4585113442 4581919842 4585113445 4581919845 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581933266 4584374405 4581933269 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581933426 4584374405 4581933429 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581933586 4584374405 4581933589 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581933746 4584374405 4581933749 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581933906 4584374405 4581933909 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581934066 4584374405 4581934069 }
+        { t t t f }
+    }
+    {
+        { 4584374402 4581934226 4584374405 4581934229 }
+        { t t t f }
+    }
+}
+{ t 1 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4585057282 4581934386 4585057285 4585057285 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581945650 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581945810 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581945970 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581946130 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581946290 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581946450 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581946610 4584374405 4584374405 }
+        { t t f t }
+    }
+}
+{ t 2 }
+"optimized"
+V{
+    T{ ##prologue }
+    T{ ##peek { dst 0 } { loc D: 0 } }
+    T{ ##tagged>integer { dst 1 } { src 0 } }
+    T{ ##xor-imm { dst 2 } { src1 1 } { src2 7 } }
+    T{ ##shl-imm { dst 3 } { src1 2 } { src2 4 } }
+    T{ ##save-context { temp1 4 } { temp2 5 } }
+    T{ ##call-gc
+        { gc-map
+            T{ gc-map { gc-roots V{ } } { derived-roots H{ } } }
+        }
+    }
+    T{ ##inc { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 1 } }
+    T{ ##replace { src 3 } { loc D: 0 } }
+    T{ ##epilogue }
+    T{ ##return }
+}
+{
+    {
+        { 4585068866 4581946770 4585068869 4585068869 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958146 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958306 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958466 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958626 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958786 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581958946 4584374405 4584374405 }
+        { t t f t }
+    }
+    {
+        { 4584374402 4581959106 4584374405 4584374405 }
+        { t t f t }
+    }
+}
