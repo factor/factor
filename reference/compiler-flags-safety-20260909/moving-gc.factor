@@ -42,7 +42,6 @@ IN: allocator-derived-phi-gc-probe
         8 H{ { left 5 } { right 7 } } ##phi,
         9 H{ { left 10 } { right 11 } } ##phi,
         14 15 ##save-context,
-        V{ } clone H{ } clone gc-map boa ##call-gc,
         12 8 9 ##sub,
         12 D: 0 ##replace,
         ##epilogue, ##return,
@@ -76,7 +75,6 @@ IN: allocator-derived-phi-gc-probe
         9 H{ { left 10 } { right 11 } } ##phi,
         12 8 ##tagged>integer, 13 12 9 ##add,
         14 15 ##save-context,
-        V{ } clone H{ } clone gc-map boa ##call-gc,
         16 13 9 ##sub, 16 D: 0 ##replace,
         ##epilogue, ##return,
     ] { } make 3 insns>block :> join
@@ -84,9 +82,22 @@ IN: allocator-derived-phi-gc-probe
     left join connect-bbs right join connect-bbs
     entry block>cfg ;
 
+! The save-context marks the insertion point; run GVN before adding the GC
+! call, matching the production optimizer/GC-check ordering. Keep the marker
+! identity through value numbering, then materialize the collector call.
+: insert-moving-collection ( graph -- )
+    [
+        dup instructions>> [
+            dup , ##save-context? [
+                V{ } clone H{ } clone gc-map boa ##call-gc,
+            ] when
+        ] { } make swap >>instructions drop
+    ] each-basic-block ;
+
 :: compile-moving-probe ( graph allocator -- word )
     graph cfg set allocator register-allocator set t check-allocation? set
     graph \ value-numbering checked-ssa-pass
+    graph insert-moving-collection
     graph allocate-registers graph build-stack-frame
     gensym [ graph generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
