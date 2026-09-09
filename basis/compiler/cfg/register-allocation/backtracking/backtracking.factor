@@ -10,11 +10,13 @@ compiler.cfg.linear-scan.ranges compiler.cfg.linear-scan.resolve
 compiler.cfg.utilities compiler.cfg.register-allocation
 compiler.cfg.ssa.destruction.leaders compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.chordal.bases
+compiler.cfg.register-allocation.ssa.phases compiler.cfg.rpo
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.register-allocation.rematerialization
 cpu.architecture heaps kernel locals make math
 math.order namespaces sequences sorting vectors ;
 FROM: sets => members ;
+FROM: compiler.cfg.linear-scan.live-intervals => intervals-intersect? ;
 IN: compiler.cfg.register-allocation.backtracking
 
 ! An interval is a bundle of disjoint ranges already coalesced by SSA
@@ -30,7 +32,8 @@ SYMBOLS: bundle-spillsets spill-home-pool backtracking-affinities
     backtracking-point-blocks backtracking-block-starts backtracking-barriers
     backtracking-second-chance-attempts backtracking-second-chance-assignments
     backtracking-register-transitions backtracking-original-intervals
-    backtracking-local-moves ;
+    backtracking-local-moves backtracking-phase-mode? backtracking-late-points
+    backtracking-cluster-splits backtracking-split-budget-exhaustions ;
 SYMBOL: bundle-occupancy
 SYMBOL: bundle-queue
 SYMBOL: assigned-bundles
@@ -40,12 +43,52 @@ SYMBOL: backtracking-splits
 : interval-size ( interval -- n )
     ranges>> [ first2 swap - 1 + ] map-sum ;
 
-: minimal-interval? ( interval -- ? )
-    dup uses>> empty? [ drop f ] [
-        [ [ first-use n>> ] [ last-use n>> ] bi swap - 1 <= ]
-        [ [ live-interval-start ] [ first-use n>> ] bi = ]
-        [ [ live-interval-end ] [ last-use n>> 1 + ] bi <= ] tri and and
+:: phase-reload-start ( use -- n )
+    use n>> :> n
+    backtracking-phase-mode? get use use-rep>> >boolean and
+    n backtracking-late-points get key? and [ n 1 - ] [ n ] if ;
+
+:: minimal-interval? ( interval -- ? )
+    interval uses>> empty? [ f ] [
+        interval first-use n>> :> first
+        interval last-use n>> :> last
+        backtracking-phase-mode? get [ first 2 /i last 2 /i = ] [ first last = ] if
+        interval live-interval-start interval first-use phase-reload-start = and
+        interval live-interval-end last 1 + <= and
     ] if ;
+
+:: normalize-phase-reload ( interval -- interval/f )
+    interval [
+        backtracking-phase-mode? get interval reload-from>> >boolean and [
+            interval first-use phase-reload-start :> start
+            interval [ start swap fix-lower-bound ] change-ranges drop
+        ] when
+    ] when
+    interval ;
+
+:: phase-spill-before ( interval -- interval/f )
+    interval live-interval-end :> end
+    interval spill-before dup [
+        backtracking-phase-mode? get [
+            dup last-use n>> dup 2 mod zero? [ 1 + ] when end min
+            swap [ fix-upper-bound ] change-ranges
+        ] when
+    ] when ;
+
+! Phase splits retain the last point of the prefix. Unlike sync splitting,
+! no operand at this boundary may be discarded: a late use can immediately
+! precede the next instruction's early use without an unused integer point.
+:: split-for-bundle ( interval position -- before after )
+    backtracking-phase-mode? get [
+        interval clone f >>spill-to :> before
+        interval clone f >>reg f >>reload-from :> after
+        interval uses>> [ n>> position <= ] partition
+        before after [ uses<< ] bi-curry@ bi*
+        interval ranges>> position split-ranges
+        before after [ ranges<< ] bi-curry@ bi*
+        before phase-spill-before
+        after spill-after normalize-phase-reload
+    ] [ interval position split-for-spill ] if ;
 
 :: <allocation-bundle> ( intervals -- bundle )
     intervals [ interval-size ] map-sum :> size
@@ -183,7 +226,14 @@ SYMBOL: backtracking-splits
 
 :: bundle-split-sites ( bundle -- sites )
     bundle intervals>> [ uses>> [ n>> ] map ] map concat members natural-sort
-    [ but-last ] [ rest ] bi zip [ first2 swap - 1 > ] filter [ second 1 - ] map ;
+    [ but-last ] [ rest ] bi zip
+    backtracking-phase-mode? get [
+        [| pair |
+            pair second dup backtracking-late-points get key? [ 1 - ] when
+            1 - :> position
+            pair first position <= [ position ] [ f ] if
+        ] map sift members
+    ] [ [ first2 swap - 1 > ] filter [ second 1 - ] map ] if ;
 
 ERROR: unsatisfiable-register-pressure interval ;
 
@@ -198,9 +248,9 @@ ERROR: unsatisfiable-register-pressure interval ;
     interval 1array <allocation-bundle> bundle-split-sites :> sites
     sites empty? [
         backtracking-minimal-splits inc
-        interval spill-after spill-before enqueue-interval
+        interval spill-after normalize-phase-reload phase-spill-before enqueue-interval
     ] [
-        sites dup length 2 /i swap nth interval swap split-for-spill
+        sites dup length 2 /i swap nth interval swap split-for-bundle
         [ enqueue-interval ] bi@
     ] if ;
 
@@ -217,11 +267,30 @@ ERROR: unsatisfiable-register-pressure interval ;
 :: first-bundle-conflict ( bundle conflicts -- position )
     conflicts [ bundle ranges>> swap ranges>> intersect-ranges ] map sift infimum ;
 
+:: bundle-site-weights ( bundle position -- before after )
+    bundle intervals>> [ uses>> ] map concat [ n>> ] sort-by
+    [ n>> position <= ] partition
+    [ last spill-site-weight ] [ first spill-site-weight ] bi* ;
+
 :: conflict-split-site ( bundle conflict -- site/f )
     bundle bundle-split-sites :> sites
     sites empty? [ f ] [
-        sites [ conflict < ] filter dup empty?
-        [ drop sites first ] [ last ] if
+        sites [ conflict < ] filter :> prefix-sites
+        prefix-sites empty? [ sites first ] [
+            prefix-sites last :> best!
+            bundle best bundle-site-weights + :> cost!
+            ! Preserve the obstruction-free prefix, but cut at a cooler
+            ! loop-depth transition if it avoids transport in a hot cluster.
+            prefix-sites [| site |
+                bundle site bundle-site-weights :> ( before after )
+                before after + :> candidate
+                before after = not candidate cost < and [
+                    site best! candidate cost!
+                ] when
+            ] each
+            best prefix-sites last = [ ] [ backtracking-cluster-splits inc ] if
+            best
+        ] if
     ] if ;
 
 : enqueue-pieces ( intervals -- )
@@ -237,15 +306,40 @@ ERROR: unsatisfiable-register-pressure interval ;
     backtracking-directed-splits inc
     bundle spillset>> [ [ 1 + ] change-splits drop ] when*
     bundle intervals>> [| interval |
-        interval live-interval-end position < [ interval before push ] [
+        interval live-interval-end position
+        backtracking-phase-mode? get [ <= ] [ < ] if [ interval before push ] [
             interval live-interval-start position > [ interval after push ] [
                 interval ensure-interval-home
-                interval position split-for-spill
+                interval position split-for-bundle
                 [ after push ] when* [ before push ] when*
             ] if
         ] if
     ] each
     before enqueue-pieces after enqueue-pieces ;
+
+CONSTANT: backtracking-max-splits 16
+
+! Repeated one-use peeling is finite but can still scan a long use vector
+! quadratically. Bound that work per original spillset, then partition all
+! remaining operands directly into minimal instruction-sized fragments.
+:: split-bundle-minimally ( bundle -- )
+    backtracking-splits inc
+    backtracking-split-budget-exhaustions inc
+    bundle intervals>> [| interval |
+        interval ensure-interval-home
+        H{ } clone :> clusters
+        interval uses>> [| use |
+            use use n>> backtracking-phase-mode? get [ 2 /i ] when clusters push-at
+        ] each
+        clusters values [ [ n>> ] sort-by ] map [ first n>> ] sort-by [| uses |
+            interval clone uses >vector >>uses f >>reload-from f >>spill-to
+            spill-after normalize-phase-reload phase-spill-before enqueue-interval
+            backtracking-minimal-splits inc
+        ] each
+    ] each ;
+
+: split-budget-exhausted? ( bundle -- ? )
+    spillset>> [ splits>> backtracking-max-splits >= ] [ f ] if* ;
 
 :: process-bundle ( bundle -- )
     f :> cheapest!
@@ -272,10 +366,12 @@ ERROR: unsatisfiable-register-pressure interval ;
         cheapest third bundle weight>> < [
             bundle cheapest assign-with-eviction
         ] [
-            bundle split-option second conflict-split-site [| site |
-                bundle spillset>> [ split-option first >>hint drop ] when*
-                bundle site split-bundle-at
-            ] [ bundle split-bundle ] if*
+            bundle split-budget-exhausted? [ bundle split-bundle-minimally ] [
+                bundle split-option second conflict-split-site [| site |
+                    bundle spillset>> [ split-option first >>hint drop ] when*
+                    bundle site split-bundle-at
+                ] [ bundle split-bundle ] if*
+            ] if
         ] if
     ] unless ;
 
@@ -296,7 +392,8 @@ ERROR: unsatisfiable-register-pressure interval ;
         interval live-interval-start interval live-interval-end = [
             { }
         ] [
-            interval sync n>> split-for-spill 2array sift
+            interval sync n>> split-for-spill
+            [ [ phase-spill-before ] ?call ] [ normalize-phase-reload ] bi* 2array sift
         ] if
     ] [ interval 1array ] if ;
 
@@ -317,13 +414,18 @@ M: backtracking-register-home emit-restore
     reg>> swap ##copy, ;
 
 :: prepare-backtracking-points ( cfg -- )
+    H{ } clone backtracking-late-points set
     H{ } clone backtracking-point-blocks set
     H{ } clone backtracking-block-starts set
     V{ } clone backtracking-barriers set
     cfg linearization-order [| bb |
-        bb bb block-from backtracking-point-blocks get set-at
-        t bb block-from backtracking-block-starts get set-at
+        bb backtracking-phase-mode? get [ phase-block-from ] [ block-from ] if :> entry
+        bb entry backtracking-point-blocks get set-at
+        t entry backtracking-block-starts get set-at
         bb instructions>> [| insn |
+            insn phase-split-insn? [
+                t insn insn#>> 1 + backtracking-late-points get set-at
+            ] when
             bb insn insn#>> backtracking-point-blocks get set-at
             bb insn insn#>> 1 + backtracking-point-blocks get set-at
             insn clobber-insn? insn gc-map-insn? or [
@@ -364,7 +466,8 @@ M: backtracking-register-home emit-restore
         start range second 2array 1vector >>ranges
         vreg rep-of >>reload-rep
         vreg rep-of >>spill-rep
-        range second dup backtracking-point-blocks get at block-to = [ ] [
+        range second dup backtracking-point-blocks get at block-to
+        backtracking-phase-mode? get [ 1 + ] when = [ ] [
             vreg dup rep-of assign-spill-slot >>spill-to
         ] if
         start backtracking-block-starts get key? [ ] [
@@ -467,7 +570,9 @@ M: backtracking-register-home emit-restore
     0 backtracking-shared-homes set
     0 backtracking-hint-hits set
     0 backtracking-directed-splits set
+    0 backtracking-cluster-splits set
     0 backtracking-minimal-splits set
+    0 backtracking-split-budget-exhaustions set
     0 backtracking-second-chance-attempts set
     0 backtracking-second-chance-assignments set
     0 backtracking-register-transitions set
@@ -492,6 +597,7 @@ M: backtracking-register-home emit-restore
     affinities backtracking-affinities set ;
 
 :: backtracking-allocation-with-registers ( cfg machine-regs -- )
+    t backtracking-phase-mode? set
     f leader-map set
     cfg construct-ssa-bases
     cfg compute-ssa-live-sets
@@ -505,7 +611,7 @@ M: backtracking-register-home emit-restore
     t backtracking-loop-spills? set
     cfg prepare-spill-sites
     cold-stores? backtracking-loop-spills? set
-    cfg compute-ssa-intervals :> input
+    cfg compute-phase-ssa-intervals :> input
     check-allocation? get [ input required-register-uses ] [ f ] if :> uses
     input machine-regs backtracking-allocation :> intervals
     check-allocation? get [
@@ -513,7 +619,7 @@ M: backtracking-register-home emit-restore
         intervals uses check-register-uses
     ] when
     intervals prepare-backtracking-moves
-    cfg intervals assign-ssa-registers
+    cfg intervals assign-phase-ssa-registers
     cfg insert-backtracking-moves
     cfg resolve-ssa-data-flow
     cfg check-numbering ;
@@ -533,8 +639,10 @@ M: backtracking-allocator allocator-statistics
     backtracking-merges get "bundle-merges" pick set-at
     backtracking-shared-homes get "shared-spill-homes" pick set-at
     backtracking-directed-splits get "conflict-directed-splits" pick set-at
+    backtracking-cluster-splits get "loop-cluster-splits" pick set-at
     backtracking-hint-hits get "register-hint-hits" pick set-at
     backtracking-minimal-splits get "minimal-splits" pick set-at
+    backtracking-split-budget-exhaustions get "split-budget-exhaustions" pick set-at
     backtracking-second-chance-attempts get "second-chance-attempts" pick set-at
     backtracking-second-chance-assignments get "second-chance-assignments" pick set-at
     backtracking-register-transitions get "register-transitions" pick set-at
