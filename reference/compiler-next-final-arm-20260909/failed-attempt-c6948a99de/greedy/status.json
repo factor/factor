@@ -1,0 +1,237 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next-integration/factor",
+    "-i=/Users/erg/factor.worktrees/compiler-next-integration/compiler-next-default.factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/allocator-full-master-integration-20260908/compiler-suite.factor",
+    "greedy",
+    "on",
+    "on"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-integration",
+  "source": "c6948a99de5ebfb7251c322382dba66d6f8050df",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/compiler-next-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/compiler-next-integration/compiler-next-default.factor.image",
+    "sha256": "59a66ef31f466064ccc1975dc8adfc77ab358b29c25ba691afac8d43531e7ff6"
+  },
+  "exit_code": 1,
+  "seconds": 96.605330208,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [
+    {
+      "kind": "phase",
+      "elapsed": 11.605644583,
+      "snapshot_valid": true,
+      "load": [
+        50.00634765625,
+        64.2763671875,
+        71.95703125
+      ],
+      "cpu": 10.24185925,
+      "user": 10.010235624999998,
+      "system": 0.23162362499999997,
+      "instructions": 96818934001,
+      "cycles": 27965439675,
+      "rss": 350584832,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 8286208,
+      "disk_written_bytes": 4096,
+      "text": "SPEED compiler-suite allocator=greedy-allocator rematerialization=t"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 11.605686291,
+      "snapshot_valid": true,
+      "load": [
+        50.00634765625,
+        64.2763671875,
+        71.95703125
+      ],
+      "cpu": 10.24185925,
+      "user": 10.010235624999998,
+      "system": 0.23162362499999997,
+      "instructions": 96818934001,
+      "cycles": 27965439675,
+      "rss": 350584832,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 8286208,
+      "disk_written_bytes": 4096,
+      "text": "SPEED loop-spills=t"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 11.605696,
+      "snapshot_valid": true,
+      "load": [
+        50.00634765625,
+        64.2763671875,
+        71.95703125
+      ],
+      "cpu": 10.24185925,
+      "user": 10.010235624999998,
+      "system": 0.23162362499999997,
+      "instructions": 96818934001,
+      "cycles": 27965439675,
+      "rss": 350584832,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 8286208,
+      "disk_written_bytes": 4096,
+      "text": "SPEED checks=ssa,intervals,final-value-flow gvn=off"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.587466333,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70634854166666,
+      "user": 86.66151724999999,
+      "system": 1.0448312916666667,
+      "instructions": 820445823687,
+      "cycles": 238425398962,
+      "rss": 421888000,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "TEST-FAILURES 1"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.589477291,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70847741666665,
+      "user": 86.66355337499999,
+      "system": 1.0449240416666665,
+      "instructions": 820463774965,
+      "cycles": 238431318306,
+      "rss": 421920768,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "        \"SPEED compiler-suite allocator=\" write"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.589496083,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70847741666665,
+      "user": 86.66355337499999,
+      "system": 1.0449240416666665,
+      "instructions": 820463774965,
+      "cycles": 238431318306,
+      "rss": 421920768,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "        \"SPEED loop-spills=\" write backtracking-loop-spills? get ."
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.589503041,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70847741666665,
+      "user": 86.66355337499999,
+      "system": 1.0449240416666665,
+      "instructions": 820463774965,
+      "cycles": 238431318306,
+      "rss": 421920768,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "        \"SPEED checks=ssa,intervals,final-value-flow gvn=off\" print"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.58950924999999,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70847741666665,
+      "user": 86.66355337499999,
+      "system": 1.0449240416666665,
+      "instructions": 820463774965,
+      "cycles": 238431318306,
+      "rss": 421920768,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "        flush \"compiler\" test => \"TEST-FAILURES \" write"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 96.589518625,
+      "snapshot_valid": true,
+      "load": [
+        55.7060546875,
+        62.97607421875,
+        70.744140625
+      ],
+      "cpu": 87.70847741666665,
+      "user": 86.66355337499999,
+      "system": 1.0449240416666665,
+      "instructions": 820463774965,
+      "cycles": 238431318306,
+      "rss": 421920768,
+      "background_cpu": 0.042178375,
+      "disk_read_bytes": 10461184,
+      "disk_written_bytes": 16384,
+      "text": "            \"SPEED compiler-suite=passed\" print flush 0"
+    }
+  ],
+  "last_process_usage": {
+    "cpu": 87.70847741666665,
+    "user": 86.66355337499999,
+    "system": 1.0449240416666665,
+    "instructions": 820463774965,
+    "cycles": 238431318306,
+    "rss": 421920768,
+    "background_cpu": 0.042178375,
+    "disk_read_bytes": 10461184,
+    "disk_written_bytes": 16384
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}
