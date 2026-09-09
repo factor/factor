@@ -1,8 +1,11 @@
-USING: accessors alien.c-types arrays classes.struct kernel libc
+USING: accessors alien.c-types arrays classes.struct kernel libc unix.ffi
 linux.input-events.ffi sequences tools.test ;
 IN: linux.input-events.ffi.tests
 
-{ t } [ 22 "unsupported" \ libc-error boa unsupported-ioctl? ] unit-test
+{ t } [
+    EINVAL ENOTTY ENOSYS EOPNOTSUPP 4array
+    [ "unsupported" \ libc-error boa unsupported-ioctl? ] all?
+] unit-test
 { f } [ 9 "bad descriptor" \ libc-error boa unsupported-ioctl? ] unit-test
 { f } [ 13 "permission denied" \ libc-error boa unsupported-ioctl? ] unit-test
 { f } [ "not an operating-system error" unsupported-ioctl? ] unit-test
