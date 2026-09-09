@@ -1,0 +1,37 @@
+Refreshing original root image with rebuilt VM
+Refresh completed without compiler errors
+Unit Test: { { 2 } [ original-template get length ] }
+Unit Test: { { 255 } [ [ va_c_controls ] compile-call ] }
+Unit Test: {
+    { 42 78 42 t t 3 }
+    [
+        [
+            [ 1 + ] ordinary-reader [
+                load-local 41 0 get-local int
+                { int } cdecl alien-indirect
+                [ read-ints ] variadic-reader
+                [ 12 va_call_ints ] with-callback
+                gc 41 0 get-local int
+                { int } cdecl alien-indirect
+                CALLBACK-STUB special-object first
+                original-template get first eq?
+                CALLBACK-STUB special-object second
+                original-template get second eq?
+                CALLBACK-STUB special-object length 1
+                drop-locals
+            ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 t }
+    [
+        [
+            CALLBACK-STUB special-object
+            [ read-ints ] variadic-reader
+            [ 12 va_call_ints ] with-callback
+            swap CALLBACK-STUB special-object eq?
+        ] compile-call
+    ]
+}
+Lazy callback template native tests passed
