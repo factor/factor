@@ -3,7 +3,7 @@
 USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.dominance compiler.cfg.instructions compiler.cfg.loop-detection
 compiler.cfg.predecessors compiler.cfg.registers compiler.cfg.rpo
-compiler.cfg.utilities hashtables.identity kernel locals math namespaces
+compiler.cfg.utilities grouping hashtables.identity kernel locals math namespaces
 sequences sets sorting vectors ;
 IN: compiler.cfg.loop-optimization
 
@@ -17,6 +17,10 @@ UNION: loop-speculatable-insn
     ##min ##max ##neg ##not
     ##compare-integer ##compare-integer-imm ##test ##test-imm ;
 
+UNION: loop-call-barrier-insn
+    alien-call-insn ##call ##callback-inputs ##callback-outputs
+    ##unbox ##unbox-long-long ;
+
 SYMBOL: loop-optimization?
 SYMBOL: loop-optimization-statistics
 
@@ -24,7 +28,7 @@ SYMBOL: loop-optimization-statistics
 
 : loop-motion-barrier? ( insn -- ? )
     dup gc-map-insn? [ drop t ] [
-        dup clobber-insn? [ drop t ] [
+        dup loop-call-barrier-insn? [ drop t ] [
             dup allocation-insn? [ drop t ] [ ##call? ] if
         ] if
     ] if ;
@@ -131,7 +135,7 @@ SYMBOL: loop-optimization-statistics
     ] when ;
 
 : perform-loop-optimization ( cfg -- )
-    H{ } clone loop-optimization-statistics set
+    H{ } clone loop-optimization-statistics namespaces:set
     dup needs-loops
     loops get values [ blocks>> cardinality ] sort-by [ header>> ] map
     [ optimize-one-loop ] with each ;

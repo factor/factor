@@ -5,7 +5,7 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.register-allocation.verifier
 compiler.cfg.register-allocation.verifier.rematerialization
 compiler.cfg.register-allocation.rematerialization compiler.cfg.value-numbering
-io kernel namespaces sequences system tools.test ;
+io kernel namespaces prettyprint sequences system tools.test ;
 f restartable-tests? set-global
 t check-ssa? set-global t check-allocation? set-global
 f global-value-numbering? set-global f rematerialize-constants? set-global

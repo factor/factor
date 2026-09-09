@@ -1,9 +1,9 @@
 USING: accessors arrays assocs compiler.cfg compiler.cfg.checker
 compiler.cfg.comparisons compiler.cfg.def-use compiler.cfg.instructions
-compiler.cfg.loop-optimization compiler.cfg.registers compiler.cfg.rpo
+compiler.cfg.loop-optimization compiler.cfg.linearization compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.utilities compiler.cfg.register-allocation
 compiler.cfg.register-allocation.validation compiler.test cpu.architecture
-kernel layouts locals make math math.bitwise namespaces sequences sets
+kernel layouts locals make math math.order math.bitwise namespaces sequences sets
 sorting tools.test vectors ;
 IN: compiler.cfg.loop-optimization.tests
 
@@ -65,7 +65,7 @@ IN: compiler.cfg.loop-optimization.tests
 ! The flag defaults to a true no-op, including no preheader creation.
 { t } [
     f <licm-loop> dup cfg>insns clone
-    [ f loop-optimization? [ optimize-loops ] with-variable ] dip
+    [ dup f loop-optimization? [ optimize-loops ] with-variable ] dip
     swap cfg>insns =
 ] unit-test
 
@@ -89,7 +89,7 @@ IN: compiler.cfg.loop-optimization.tests
 { t } [
     {
         T{ ##add-float } T{ ##div-float } T{ ##slot } T{ ##slot-imm }
-        T{ ##tagged>integer } T{ ##unbox-fixnum } T{ ##fixnum-add }
+        T{ ##tagged>integer } T{ ##unbox-alien } T{ ##fixnum-add }
         T{ ##load-reference } T{ ##alien-invoke } T{ ##call-gc }
     } [ loop-speculatable-insn? not ] all?
 ] unit-test
