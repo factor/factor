@@ -21,7 +21,7 @@ The tests exercise state and generated machine flow as well as diagnostics.
 | --- | --- | --- |
 | Priority advisor / enqueue | Large intervals first, loop-weighted density, stable vreg tie-break; initial assignment tier precedes retry stages | Long sparse interval initially allocated, then displaced by dense interval |
 | RS_Assign, RS_Split, RS_Split2, RS_Spill, RS_Done | `interval-progress`, monotone `advance-stage`; initial failure defers; successive region/local/spill stages; terminal minimal products | Stage regression fixture; eviction/split fixture preserves all required uses |
-| Eviction cascade and hint-aware cost | `cascade-safe?`, `eviction-cascade`, `evictable-victim?`, lexicographic `candidate-cost`; victims inherit cascade | Equal/younger cascade rejection; actual eviction transfers cascade and queues victim; hinted physical register order; hint-only eviction cannot displace an infinite-weight mandatory interval |
+| Eviction cascade and hint-aware cost | `cascade-safe?`, `eviction-cascade`, `evictable-victim?`, lexicographic `candidate-cost`; victims inherit cascade; urgent mandatory uses may break a newer spillable cascade with a cost penalty, but never the same cascade | Equal/younger cascade rejection; actual eviction transfers cascade and queues victim; hinted physical register order; hint-only eviction cannot displace an infinite-weight mandatory interval; actual urgent eviction and the executed 40-constant rematerialization loop |
 | Last-chance recoloring | `last-chance-recolor`, recursive `recolor-interval`; depth 5, max 8 interferers, budget 64; fixed choices; full state rollback | Two-move augmenting chain; impossible coloring restores union order, occupancy serials and register fields; insufficient depth fails and rolls back before a deeper search succeeds |
 | Interference-directed local splitting | `register-free-windows`, `local-split-plan`, `apply-local-split` select weighted use clusters inside actual physical interference windows, including the post-use spill position | A long interference forces selection of the final four uses, independently of the largest use gap |
 | Global region splitting / SpillPlacement | `global-split-plan` constructs a per-register CFG residency network; `greedy.regions:solve-residency` computes a minimum cut; `apply-global-split` assigns resident blocks and sends blocked blocks to local refinement | Hard-interference, transparent-loop, cold-use and exhaustive 32-network minimum-energy tests; `region-lowering-fixture` selects the actual physically free loop, lowers transfers on edges, and passes the original-SSA/final-machine verifier including a zero-iteration bypass |
@@ -37,8 +37,13 @@ queue an LLVM name would not implement those algorithms.
 
 Factor currently exposes whole integer and floating-point register banks.
 Tagged and integer representations alias the integer bank; scalar/SIMD floating
-representations alias the floating bank. The shared live intervals conservatively
+representations alias the floating bank. The shared post-SSA-destruction live intervals conservatively
 encode input/output/temporary interference, clobbers and implicit GC roots.
+Their inclusive instruction positions keep surviving copy operands and outputs
+separate; this limits realizable copy hints and dying-first-input reuse compared
+with LLVM SlotIndex phases. Existing SSA coalescing runs before this allocator.
+Migrating its splitting/mandatory-use endpoints to Factor’s new paired phases
+is a separate optimization, not claimed by this implementation.
 This implementation retains those intervals and the established spill/ABI/GC
 lowering. The public kernel accepts a legal reduced bank for independent tests.
 
@@ -83,3 +88,12 @@ occupancy state directly; no trace collection is enabled in the allocation loop.
 Validation so far is correctness validation on native ARM64 using the matching
 integration VM and image with explicit source reloads. No speed claim or ranking
 is made for this algorithm before the independent frozen-candidate benchmarks.
+
+## Broader validation
+
+The loaded `compiler.cfg` suite also passes with greedy selected and
+`check-allocation?` enabled, including the final original-SSA value-flow hook.
+This includes the existing executed 40-constant diamond, loop and explicit-GC
+fixtures with rematerialization both off and on. That broader loop initially
+exposed the missing urgent-cascade exception; the fix follows the pinned LLVM
+DefaultEvictionAdvisor rule and has a focused state-transition regression.
