@@ -70,6 +70,10 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
+    // Compile cross-target VMs without installing over the host executable.
+    const check_step = b.step("check", "Compile the VM without installing or running it");
+    check_step.dependOn(&exe.step);
+
     // On macOS, also drop the binary into Factor.app/Contents/MacOS/factor and
     // refresh the ./factor symlink, mirroring `make`'s macos.app target. The
     // bundle (Info.plist, Resources, Frameworks) is already in the repo. Running
@@ -138,6 +142,7 @@ pub fn build(b: *std.Build) void {
         }),
     });
     tests.root_module.link_libc = true;
+    tests.root_module.addOptions("build_options", options);
 
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
