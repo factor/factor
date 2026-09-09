@@ -1,6 +1,6 @@
-USING: accessors destructors destructors.private images images.loader
+USING: accessors assocs destructors destructors.private images images.loader
 images.loader.gdiplus.private io.files.temp kernel math memory
-namespaces sequences tools.test ;
+namespaces sequences tools.test windows.com.wrapper.private ;
 IN: images.loader.gdiplus.tests
 
 { } [
@@ -31,6 +31,14 @@ IN: images.loader.gdiplus.tests
     B{ 0 0 0 255 255 255 255 255 } BGRA f test-image
     png-roundtrip drop
     always-destructors get length swap -
+] unit-test
+
+! GDI+ retains the decoder stream until GdipDisposeImage is called.
+! GdipFree alone leaks the image's reference to the wrapped Factor stream.
+{ 0 } [
+    +wrapped-objects+ get-global assoc-size
+    "vocab:ui/tools/error-list/icons/compiler-error.png" load-image drop
+    +wrapped-objects+ get-global assoc-size swap -
 ] unit-test
 
 ! The bottom-up orientation used by Windows text must be respected (#2356).
