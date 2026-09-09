@@ -1,7 +1,9 @@
-USING: accessors alien arrays byte-arrays classes.algebra
+USING: accessors alien arrays byte-arrays classes classes.private classes.algebra classes.algebra.private
+classes.builtin classes.mixin classes.predicate classes.singleton classes.tuple
+classes.union compiler.units continuations locals words
 classes.struct compiler.tree.propagation.copy
 compiler.tree.propagation.info io.encodings.utf8 kernel literals math
-math.intervals namespaces sequences sequences.private tools.test ;
+math.intervals layouts namespaces sequences sequences.private tools.test ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test
@@ -255,4 +257,107 @@ ${
 { t t } [
     integer 3 >bignum [a,a] <class/interval-info> >literal<
     [ fixnum? ] dip
+] unit-test
+
+
+! Preserve an independent invocation of the original constructor rather
+! than comparing two paths through the specialized class-only entrypoint.
+: original-class-info ( class -- info ) f <class/interval-info> ;
+
+PREDICATE: info-even < integer even? ;
+UNION: info-empty ;
+UNION: info-redefined fixnum ;
+MIXIN: info-mixin
+SINGLETON: info-singleton
+
+: named-info-cases ( -- classes )
+    { object null fixnum bignum integer real float number array-capacity
+      integer-array-capacity array byte-array string sequence tuple word
+      test-tuple tup1 tup2 self utf8 info-even info-empty info-mixin
+      info-singleton class builtin-class tuple-class union-class
+      predicate-class mixin-class singleton-class } ;
+
+{ t } [
+    named-info-cases [ [ <class-info> ] [ original-class-info ] bi = ] all?
+] unit-test
+
+! The two bounded intervals are closed, integral and have more than one
+! point. These are the only non-special class-interval results.
+{ t } [
+    { fixnum array-capacity integer-array-capacity } [
+        [ class-interval dup integral-closure = ]
+        [ class-interval interval-length 0 > ] bi and
+    ] all?
+] unit-test
+
+: anonymous-info-cases ( -- classes )
+    { }
+    { integer string } anonymous-union boa suffix
+    { object integer } anonymous-intersection boa suffix
+    { } anonymous-union boa suffix
+    { } anonymous-intersection boa suffix
+    object anonymous-complement boa suffix
+    integer [ even? ] anonymous-predicate boa suffix ;
+
+! Equal anonymous objects can participate in structural cache interning.
+! Prime the old path, then verify a distinct equal input on the new path,
+! including later class-algebra queries on the resulting class descriptor.
+{ t } [
+    anonymous-info-cases [ [ [let
+        init-caches
+        dup original-class-info :> primed
+        clone dup original-class-info :> expected
+        <class-info> :> actual
+        expected actual =
+        primed class>> expected class>> class<=
+        primed class>> actual class>> class<= = and
+        expected class>> primed class>> class<=
+        actual class>> primed class>> class<= = and
+    ] ] with-scope ] all?
+] unit-test
+
+:: class-info-mutation-independent? ( class -- ? )
+    class <class-info> :> first
+    class <class-info> :> second
+    first second eq? not
+    first null >>class empty-interval >>interval
+        123 >>literal t >>literal? { object-info } >>slots drop
+    second class original-class-info = and ;
+
+{ t } [ named-info-cases [ class-info-mutation-independent? ] all? ] unit-test
+
+SYMBOL: redefined-info-input
+
+: redefined-info-agrees? ( -- ? )
+    redefined-info-input get [ <class-info> ] [ original-class-info ] bi = ;
+
+! Named class identity persists across redefinition. Read it dynamically
+! so the test exercises constructor execution instead of a folded literal.
+{ t t t } [ [
+    info-redefined redefined-info-input set
+    [
+        redefined-info-agrees?
+        [ info-redefined { } define-union-class ] with-compilation-unit
+        redefined-info-agrees?
+        redefined-info-input get <class-info> class>> null eq? and
+        [ info-redefined { string integer } define-union-class ] with-compilation-unit
+        redefined-info-agrees?
+        redefined-info-input get <class-info> class>> info-redefined eq? and
+    ] [ [ info-redefined { fixnum } define-union-class ] with-compilation-unit ] finally
+] with-scope ] unit-test
+
+
+! The finite interval tuple has read-only fields but its endpoint arrays
+! are mutable. Preserve the original constructor's independent endpoints.
+:: class-info-interval-independent? ( class -- ? )
+    class <class-info> interval>> :> first
+    class <class-info> interval>> :> second
+    first second eq? not
+    first from>> second from>> eq? not and
+    0 first from>> set-first
+    second class original-class-info interval>> = and ;
+
+{ t } [
+    { fixnum array-capacity integer-array-capacity }
+    [ class-info-interval-independent? ] all?
 ] unit-test
