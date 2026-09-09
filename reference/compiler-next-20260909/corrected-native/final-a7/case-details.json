@@ -1,0 +1,4611 @@
+{
+  "runtime_geomean": {
+    "cpu_seconds": 0.985703819469758,
+    "instructions": 0.9994462378778938,
+    "ns": 0.9857923658243268
+  },
+  "per_round_geomean": [
+    {
+      "cpu_seconds": 0.996769400535726,
+      "instructions": 0.9994444247684828,
+      "ns": 0.996830905479939
+    },
+    {
+      "cpu_seconds": 0.9754323206990019,
+      "instructions": 0.9994480509742355,
+      "ns": 0.9755467438825275
+    }
+  ],
+  "measured_samples_per_case_per_revision": 6,
+  "ordered_cases": [
+    {
+      "index": 0,
+      "word": "allocator-runtime-comparison:norm-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.999589367695766,
+        "instructions": 1.0000002336351594,
+        "ns": 1.0017080037273298
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9999948286209427,
+          "instructions": 1.0000002299206088,
+          "ns": 1.0042008205079287
+        },
+        {
+          "cpu_seconds": 0.999184308787431,
+          "instructions": 1.0000002373497026,
+          "ns": 0.9992176794383619
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 191165293,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364930019,
+              "cpu_seconds": 0.1911529480000027,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 0,
+              "iterations": 14
+            },
+            {
+              "ns": 191233392,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364929424,
+              "cpu_seconds": 0.19122368099999676,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 1,
+              "iterations": 14
+            },
+            {
+              "ns": 191192116,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364929419,
+              "cpu_seconds": 0.19116477199999338,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 2,
+              "iterations": 14
+            }
+          ],
+          [
+            {
+              "ns": 191399367,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364936864,
+              "cpu_seconds": 0.1913738420000044,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 0,
+              "iterations": 14
+            },
+            {
+              "ns": 191458649,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364936254,
+              "cpu_seconds": 0.19144909199999915,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 1,
+              "iterations": 14
+            },
+            {
+              "ns": 191306875,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364936252,
+              "cpu_seconds": 0.19128770100000736,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 2,
+              "iterations": 14
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 191173288,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364934945,
+              "cpu_seconds": 0.19115852800000255,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 0,
+              "iterations": 14
+            },
+            {
+              "ns": 193630351,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364928120,
+              "cpu_seconds": 0.19120960600000103,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 1,
+              "iterations": 14
+            },
+            {
+              "ns": 191196714,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364928118,
+              "cpu_seconds": 0.19117030099999965,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 2,
+              "iterations": 14
+            }
+          ],
+          [
+            {
+              "ns": 191265099,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364942007,
+              "cpu_seconds": 0.19123566199999686,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 0,
+              "iterations": 14
+            },
+            {
+              "ns": 191239181,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364934878,
+              "cpu_seconds": 0.19121038600000873,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 1,
+              "iterations": 14
+            },
+            {
+              "ns": 191211430,
+              "output": "1.2742241159529055\n",
+              "kind": "runtime",
+              "instructions": 3364934881,
+              "cpu_seconds": 0.1911962899999935,
+              "word": "allocator-runtime-comparison:norm-work",
+              "trial": 2,
+              "iterations": 14
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "word": "allocator-runtime-comparison:nbody-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9489594751280597,
+        "instructions": 0.9999159062185156,
+        "ns": 0.948943077526006
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.010434950391714,
+          "instructions": 0.9999159018339304,
+          "ns": 1.0104073324717764
+        },
+        {
+          "cpu_seconds": 0.8948419884347624,
+          "instructions": 0.9999159106030772,
+          "ns": 0.8948308562564026
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 158064059,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564188198,
+              "cpu_seconds": 0.15804203300000097,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 158307404,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564188201,
+              "cpu_seconds": 0.15827764300000524,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 158300122,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564181361,
+              "cpu_seconds": 0.1582787469999971,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 179814939,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564201934,
+              "cpu_seconds": 0.17978976799999913,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 179731584,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564201892,
+              "cpu_seconds": 0.17972497700000645,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 179616990,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2564195047,
+              "cpu_seconds": 0.1796116149999989,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 159857224,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563970267,
+              "cpu_seconds": 0.15983308799999918,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 159921415,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563970284,
+              "cpu_seconds": 0.1599074189999925,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 159833011,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563970279,
+              "cpu_seconds": 0.15981032700000242,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 160326351,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563984406,
+              "cpu_seconds": 0.16030448400000097,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 161591190,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563983796,
+              "cpu_seconds": 0.16159287499999664,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 160542607,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2563983805,
+              "cpu_seconds": 0.1605355450000019,
+              "word": "allocator-runtime-comparison:nbody-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "word": "allocator-runtime-comparison:nbody-simd-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0012574397690253,
+        "instructions": 0.9999494340982616,
+        "ns": 1.004406824897964
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9989199902244144,
+          "instructions": 0.9999481777264195,
+          "ns": 0.9989382492009269
+        },
+        {
+          "cpu_seconds": 1.0036034716456304,
+          "instructions": 0.9999506904687471,
+          "ns": 1.009895659630532
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 129187465,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299661106,
+              "cpu_seconds": 0.1291789360000024,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 0,
+              "iterations": 28
+            },
+            {
+              "ns": 129113257,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299661099,
+              "cpu_seconds": 0.12910428499999682,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 1,
+              "iterations": 28
+            },
+            {
+              "ns": 129202636,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299661095,
+              "cpu_seconds": 0.12919753100000264,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 2,
+              "iterations": 28
+            }
+          ],
+          [
+            {
+              "ns": 128854780,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299663581,
+              "cpu_seconds": 0.12885656200000284,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 0,
+              "iterations": 28
+            },
+            {
+              "ns": 128558646,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299663582,
+              "cpu_seconds": 0.12855234199999188,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 1,
+              "iterations": 28
+            },
+            {
+              "ns": 128659675,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299663587,
+              "cpu_seconds": 0.12865435300000172,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 2,
+              "iterations": 28
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 129020389,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299551312,
+              "cpu_seconds": 0.12901201300000054,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 0,
+              "iterations": 28
+            },
+            {
+              "ns": 128962251,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299537233,
+              "cpu_seconds": 0.12895757199999025,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 1,
+              "iterations": 28
+            },
+            {
+              "ns": 129109286,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299537234,
+              "cpu_seconds": 0.12909268399999974,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 2,
+              "iterations": 28
+            }
+          ],
+          [
+            {
+              "ns": 129167560,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299550184,
+              "cpu_seconds": 0.1291598800000031,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 0,
+              "iterations": 28
+            },
+            {
+              "ns": 129104592,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299550185,
+              "cpu_seconds": 0.1290915930000125,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 1,
+              "iterations": 28
+            },
+            {
+              "ns": 131621397,
+              "output": "-0.16907516382852447\n-0.1690798593916698\n",
+              "kind": "runtime",
+              "instructions": 2299550195,
+              "cpu_seconds": 0.12920295199999998,
+              "word": "allocator-runtime-comparison:nbody-simd-work",
+              "trial": 2,
+              "iterations": 28
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "word": "allocator-runtime-comparison:trees-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.000202918010074,
+        "instructions": 0.9999029927242449,
+        "ns": 1.0002023201444072
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0087519067099762,
+          "instructions": 0.9999446277348141,
+          "ns": 1.0087202673566602
+        },
+        {
+          "cpu_seconds": 0.991873067426478,
+          "instructions": 0.9998613612037588,
+          "ns": 0.9919023825847179
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 118975269,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210602914,
+              "cpu_seconds": 0.118943557999998,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 119182557,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2211157888,
+              "cpu_seconds": 0.1191688310000103,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 119098881,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210602869,
+              "cpu_seconds": 0.11910108499999694,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 121783315,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2211158253,
+              "cpu_seconds": 0.12176379300000661,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 122112421,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210603202,
+              "cpu_seconds": 0.12211439000000723,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 122744826,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2211158225,
+              "cpu_seconds": 0.12273270899999034,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 119900788,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210481794,
+              "cpu_seconds": 0.11989289799999625,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 120557419,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2211034826,
+              "cpu_seconds": 0.12054712300000858,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 119913874,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210479802,
+              "cpu_seconds": 0.11989975199999492,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 120545852,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210481684,
+              "cpu_seconds": 0.12053821700000356,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 121768753,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2211036702,
+              "cpu_seconds": 0.12175168999999642,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 121357042,
+              "output": "stretch tree of depth 15\t check: -1\n32768\t trees of depth 4\t check: -32768\n8192\t trees of depth 6\t check: -8192\n2048\t trees of depth 8\t check: -2048\n512\t trees of depth 10\t check: -512\n128\t trees of depth 12\t check: -128\n32\t trees of depth 14\t check: -32\nlong lived tree of depth 14\t check: -1\n",
+              "kind": "runtime",
+              "instructions": 2210481714,
+              "cpu_seconds": 0.12134156300000143,
+              "word": "allocator-runtime-comparison:trees-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "word": "allocator-runtime-comparison:fannkuch-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9141618177243027,
+        "instructions": 0.999914345859253,
+        "ns": 0.9141724415040501
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0008033164933183,
+          "instructions": 0.999914278346159,
+          "ns": 1.0008571671030957
+        },
+        {
+          "cpu_seconds": 0.8425011316084852,
+          "instructions": 0.9999144133714901,
+          "ns": 0.8424792582883884
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 128145724,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162691449,
+              "cpu_seconds": 0.12813091200000315,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 0,
+              "iterations": 5
+            },
+            {
+              "ns": 127886990,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162682913,
+              "cpu_seconds": 0.12787988099999836,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 1,
+              "iterations": 5
+            },
+            {
+              "ns": 127901759,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162682915,
+              "cpu_seconds": 0.1278951799999959,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 2,
+              "iterations": 5
+            }
+          ],
+          [
+            {
+              "ns": 154726168,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162718953,
+              "cpu_seconds": 0.15472803400000146,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 0,
+              "iterations": 5
+            },
+            {
+              "ns": 154732279,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162710362,
+              "cpu_seconds": 0.154716403000009,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 1,
+              "iterations": 5
+            },
+            {
+              "ns": 154759390,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162710359,
+              "cpu_seconds": 0.1547178630000019,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 2,
+              "iterations": 5
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 128025275,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162505250,
+              "cpu_seconds": 0.1280198939999977,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 0,
+              "iterations": 5
+            },
+            {
+              "ns": 128096660,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162497927,
+              "cpu_seconds": 0.12805104199999562,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 1,
+              "iterations": 5
+            },
+            {
+              "ns": 128141634,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162497933,
+              "cpu_seconds": 0.12814343499999836,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 2,
+              "iterations": 5
+            }
+          ],
+          [
+            {
+              "ns": 130863847,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162533491,
+              "cpu_seconds": 0.13084505700000193,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 0,
+              "iterations": 5
+            },
+            {
+              "ns": 130056496,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162525446,
+              "cpu_seconds": 0.13005049000000213,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 1,
+              "iterations": 5
+            },
+            {
+              "ns": 130173556,
+              "output": "12345678\n12345687\n12345768\n12345786\n12345867\n12345876\n12346578\n12346587\n12346758\n12346785\n12346857\n12346875\n12347568\n12347586\n12347658\n12347685\n12347856\n12347865\n12348567\n12348576\n12348657\n12348675\n12348756\n12348765\n12354678\n12354687\n12354768\n12354786\n12354867\n12354876\nPfannkuchen(8) = 22\n",
+              "kind": "runtime",
+              "instructions": 2162525439,
+              "cpu_seconds": 0.13016171600000348,
+              "word": "allocator-runtime-comparison:fannkuch-work",
+              "trial": 2,
+              "iterations": 5
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "word": "allocator-runtime-comparison:sieve-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9929825712990135,
+        "instructions": 0.9999999986800006,
+        "ns": 0.9930118419970159
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9980199535563724,
+          "instructions": 0.9999999990817395,
+          "ns": 0.9980673636108888
+        },
+        {
+          "cpu_seconds": 0.987972711451848,
+          "instructions": 0.9999999982782615,
+          "ns": 0.9879841675006268
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 117130374,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041458,
+              "cpu_seconds": 0.11712300800000008,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 116651017,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041461,
+              "cpu_seconds": 0.11665263700000139,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 116721168,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041460,
+              "cpu_seconds": 0.11670653800000252,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 117458253,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041458,
+              "cpu_seconds": 0.11745201400000127,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 117657988,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041462,
+              "cpu_seconds": 0.11764657900000941,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 117327670,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041462,
+              "cpu_seconds": 0.117309015999993,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 116425749,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041460,
+              "cpu_seconds": 0.11639803999999998,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 116692870,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041457,
+              "cpu_seconds": 0.11668123900000182,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 116706546,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041454,
+              "cpu_seconds": 0.11670893299999818,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 116060871,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041455,
+              "cpu_seconds": 0.11606264099999919,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 115987835,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041455,
+              "cpu_seconds": 0.11596769499999482,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 116160298,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2904041457,
+              "cpu_seconds": 0.11613876500000231,
+              "word": "allocator-runtime-comparison:sieve-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "word": "allocator-runtime-comparison:pi-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0008346992628683,
+        "instructions": 0.9999367919076579,
+        "ns": 0.9981899465839089
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0002671025366339,
+          "instructions": 0.9999365559550168,
+          "ns": 0.994962124497497
+        },
+        {
+          "cpu_seconds": 1.0014027587498688,
+          "instructions": 0.999937027860248,
+          "ns": 1.00143748744946
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 150803770,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019501,
+              "cpu_seconds": 0.15079607699999542,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 153335473,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019515,
+              "cpu_seconds": 0.1509090790000016,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 150849968,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019516,
+              "cpu_seconds": 0.15084389699998724,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 150857842,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019886,
+              "cpu_seconds": 0.1508452880000064,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 150823277,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019882,
+              "cpu_seconds": 0.1507971590000068,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 150545438,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1708019876,
+              "cpu_seconds": 0.15053794399999276,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 150880162,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707912476,
+              "cpu_seconds": 0.15085948699999818,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 150752793,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707910470,
+              "cpu_seconds": 0.1507446309999949,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 151064077,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707910495,
+              "cpu_seconds": 0.1510658119999988,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 150884616,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707912315,
+              "cpu_seconds": 0.1508697849999976,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 151012516,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707912328,
+              "cpu_seconds": 0.15099255500000197,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 150979495,
+              "output": "3141592653\t:10\n5897932384\t:20\n6264338327\t:30\n9502884197\t:40\n1693993751\t:50\n0582097494\t:60\n4592307816\t:70\n4062862089\t:80\n9862803482\t:90\n5342117067\t:100\n9821480865\t:110\n1328230664\t:120\n7093844609\t:130\n5505822317\t:140\n2535940812\t:150\n8481117450\t:160\n2841027019\t:170\n3852110555\t:180\n9644622948\t:190\n9549303819\t:200\n6442881097\t:210\n5665933446\t:220\n1284756482\t:230\n3378678316\t:240\n5271201909\t:250\n1456485669\t:260\n2346034861\t:270\n0454326648\t:280\n2133936072\t:290\n6024914127\t:300\n3724587006\t:310\n6063155881\t:320\n7488152092\t:330\n0962829254\t:340\n0917153643\t:350\n6789259036\t:360\n0011330530\t:370\n5488204665\t:380\n2138414695\t:390\n1941511609\t:400\n4330572703\t:410\n6575959195\t:420\n3092186117\t:430\n3819326117\t:440\n9310511854\t:450\n8074462379\t:460\n9627495673\t:470\n5188575272\t:480\n4891227938\t:490\n1830119491\t:500\n2983367336\t:510\n2440656643\t:520\n0860213949\t:530\n4639522473\t:540\n7190702179\t:550\n8609437027\t:560\n7053921717\t:570\n6293176752\t:580\n3846748184\t:590\n6766940513\t:600\n2000568127\t:610\n1452635608\t:620\n2778577134\t:630\n2757789609\t:640\n1736371787\t:650\n2146844090\t:660\n1224953430\t:670\n1465495853\t:680\n7105079227\t:690\n9689258923\t:700\n5420199561\t:710\n1212902196\t:720\n0864034418\t:730\n1598136297\t:740\n7477130996\t:750\n0518707211\t:760\n3499999983\t:770\n7297804995\t:780\n1059731732\t:790\n8160963185\t:800\n9502445945\t:810\n5346908302\t:820\n6425223082\t:830\n5334468503\t:840\n5261931188\t:850\n1710100031\t:860\n3783875288\t:870\n6587533208\t:880\n3814206171\t:890\n7766914730\t:900\n3598253490\t:910\n4287554687\t:920\n3115956286\t:930\n3882353787\t:940\n5937519577\t:950\n8185778053\t:960\n2171226806\t:970\n6130019278\t:980\n7661119590\t:990\n9216420198\t:1000\n",
+              "kind": "runtime",
+              "instructions": 1707912328,
+              "cpu_seconds": 0.15095235100000082,
+              "word": "allocator-runtime-comparison:pi-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "word": "allocator-runtime-comparison:md5-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.988652321621229,
+        "instructions": 0.9999973545049586,
+        "ns": 0.9918176783103932
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9839301508649193,
+          "instructions": 0.999995907983482,
+          "ns": 0.9903451733028205
+        },
+        {
+          "cpu_seconds": 0.9933434962005506,
+          "instructions": 0.9999988010173774,
+          "ns": 0.9932804865485989
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 125530827,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071192777,
+              "cpu_seconds": 0.125524218999999,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 125414559,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071179786,
+              "cpu_seconds": 0.12539942499999768,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 125571885,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071189843,
+              "cpu_seconds": 0.12554429600000105,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 126420429,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071205511,
+              "cpu_seconds": 0.12639389800000345,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 126336163,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071192856,
+              "cpu_seconds": 0.12631344800000477,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 126256564,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071202947,
+              "cpu_seconds": 0.1262480450000112,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 123436280,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071175915,
+              "cpu_seconds": 0.12340686299999959,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 123536839,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071170106,
+              "cpu_seconds": 0.12352928100000327,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 125908943,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071190959,
+              "cpu_seconds": 0.12348201300000028,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 125540036,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071196416,
+              "cpu_seconds": 0.1255350190000044,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 125462762,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071187393,
+              "cpu_seconds": 0.12543244600000492,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 125463574,
+              "output": "df4be0b1a9c8dacc947d4f818d487f0b\n",
+              "kind": "runtime",
+              "instructions": 2071210055,
+              "cpu_seconds": 0.12546540799999661,
+              "word": "allocator-runtime-comparison:md5-work",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "word": "allocator-runtime-comparison:sha1-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0030825619346448,
+        "instructions": 0.9999985874807321,
+        "ns": 1.0030793968622882
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9947300786007619,
+          "instructions": 0.9999985934876886,
+          "ns": 0.9947688915900138
+        },
+        {
+          "cpu_seconds": 1.011477139271379,
+          "instructions": 0.9999985814738033,
+          "ns": 1.0114313805018182
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 136070386,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800771956,
+              "cpu_seconds": 0.1360615509999974,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 0,
+              "iterations": 3
+            },
+            {
+              "ns": 135754265,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800795450,
+              "cpu_seconds": 0.1357454190000027,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 1,
+              "iterations": 3
+            },
+            {
+              "ns": 136061371,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800776394,
+              "cpu_seconds": 0.13604294600000344,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 2,
+              "iterations": 3
+            }
+          ],
+          [
+            {
+              "ns": 135430927,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800784804,
+              "cpu_seconds": 0.13540751400000062,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 0,
+              "iterations": 3
+            },
+            {
+              "ns": 135202449,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800805705,
+              "cpu_seconds": 0.13519564800000694,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 1,
+              "iterations": 3
+            },
+            {
+              "ns": 135226966,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800792209,
+              "cpu_seconds": 0.13520162000000369,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 2,
+              "iterations": 3
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 135109864,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800774750,
+              "cpu_seconds": 0.13509596100000465,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 0,
+              "iterations": 3
+            },
+            {
+              "ns": 135344244,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800780994,
+              "cpu_seconds": 0.1353144819999983,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 1,
+              "iterations": 3
+            },
+            {
+              "ns": 135298218,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800776238,
+              "cpu_seconds": 0.13529013599999473,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 2,
+              "iterations": 3
+            }
+          ],
+          [
+            {
+              "ns": 136860439,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800788415,
+              "cpu_seconds": 0.13683333699999878,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 0,
+              "iterations": 3
+            },
+            {
+              "ns": 137061877,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800792746,
+              "cpu_seconds": 0.13704980200000705,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 1,
+              "iterations": 3
+            },
+            {
+              "ns": 136577570,
+              "output": "7f32a7e5944a83eeb5e790127d9dc738f97e4d12\n",
+              "kind": "runtime",
+              "instructions": 2800789638,
+              "cpu_seconds": 0.13657912100001113,
+              "word": "allocator-runtime-comparison:sha1-work",
+              "trial": 2,
+              "iterations": 3
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "word": "allocator-runtime-comparison:base64-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9583629737029598,
+        "instructions": 0.9999991928851438,
+        "ns": 0.9583649617150287
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.001477451125735,
+          "instructions": 0.9999984168959543,
+          "ns": 1.0014545013050582
+        },
+        {
+          "cpu_seconds": 0.9189118079725176,
+          "instructions": 0.9999999688738125,
+          "ns": 0.9189357600264967
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 127684500,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923585825,
+              "cpu_seconds": 0.12767348500000253,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 0,
+              "iterations": 7
+            },
+            {
+              "ns": 127359462,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923578988,
+              "cpu_seconds": 0.12734186300001227,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 1,
+              "iterations": 7
+            },
+            {
+              "ns": 127804096,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923578990,
+              "cpu_seconds": 0.12780611400000907,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 2,
+              "iterations": 7
+            }
+          ],
+          [
+            {
+              "ns": 139609102,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923587794,
+              "cpu_seconds": 0.1396048289999996,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 0,
+              "iterations": 7
+            },
+            {
+              "ns": 139380785,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923580949,
+              "cpu_seconds": 0.13937302600000123,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 1,
+              "iterations": 7
+            },
+            {
+              "ns": 139399171,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923580953,
+              "cpu_seconds": 0.1393912089999958,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 2,
+              "iterations": 7
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 127773644,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923584014,
+              "cpu_seconds": 0.12775840400000504,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 0,
+              "iterations": 7
+            },
+            {
+              "ns": 127735844,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923572945,
+              "cpu_seconds": 0.12773736500000155,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 1,
+              "iterations": 7
+            },
+            {
+              "ns": 127895423,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923572959,
+              "cpu_seconds": 0.12789129300000468,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 2,
+              "iterations": 7
+            }
+          ],
+          [
+            {
+              "ns": 128031994,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923583141,
+              "cpu_seconds": 0.12800817200000125,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 0,
+              "iterations": 7
+            },
+            {
+              "ns": 128250613,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923583135,
+              "cpu_seconds": 0.12824438500000213,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 1,
+              "iterations": 7
+            },
+            {
+              "ns": 128190060,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2923583147,
+              "cpu_seconds": 0.12819171600000345,
+              "word": "allocator-runtime-comparison:base64-work",
+              "trial": 2,
+              "iterations": 7
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "word": "allocator-runtime-comparison:base32-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9712723709484019,
+        "instructions": 0.9999948044678635,
+        "ns": 0.97128678798841
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.023299933199705,
+          "instructions": 0.9999923832443195,
+          "ns": 1.0233235303886108
+        },
+        {
+          "cpu_seconds": 0.9240591795941782,
+          "instructions": 0.9999972256888557,
+          "ns": 0.9240655401449892
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 123200422,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412487872,
+              "cpu_seconds": 0.12318547600000329,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 123222153,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412488324,
+              "cpu_seconds": 0.12322401900000557,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 123736267,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412488456,
+              "cpu_seconds": 0.12372375500000032,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 135843700,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412490298,
+              "cpu_seconds": 0.13583616799999731,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 135762067,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412490734,
+              "cpu_seconds": 0.13575563800000623,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 136300868,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412491247,
+              "cpu_seconds": 0.13628425899999286,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 126407966,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412479282,
+              "cpu_seconds": 0.12640014999999494,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 126067049,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412465162,
+              "cpu_seconds": 0.12606174600000486,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 126317238,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412465082,
+              "cpu_seconds": 0.12629543399999932,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 125484933,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412484299,
+              "cpu_seconds": 0.12547685999999914,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 125906012,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412483697,
+              "cpu_seconds": 0.12590055399999756,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 125541520,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2412484204,
+              "cpu_seconds": 0.12552420800000164,
+              "word": "allocator-runtime-comparison:base32-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 11,
+      "word": "benchmark.csv:csv-benchmark",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9970269734941634,
+        "instructions": 0.9998278191473443,
+        "ns": 0.9970199276844536
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0012619534085794,
+          "instructions": 0.9998144197942451,
+          "ns": 1.001288308640502
+        },
+        {
+          "cpu_seconds": 0.9928056424851199,
+          "instructions": 0.9998412188380889,
+          "ns": 0.9927654215293116
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 276046027,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866556088,
+              "cpu_seconds": 0.2759765409999986,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 272235803,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866321115,
+              "cpu_seconds": 0.27222658600000216,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 275098505,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866215444,
+              "cpu_seconds": 0.2750895500000041,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 275149475,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866449753,
+              "cpu_seconds": 0.27512859299999803,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 274328699,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866188686,
+              "cpu_seconds": 0.27430621199999905,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 276587370,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3866161934,
+              "cpu_seconds": 0.2765198390000023,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 275261853,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865863497,
+              "cpu_seconds": 0.27522693699999934,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 274610073,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865583668,
+              "cpu_seconds": 0.27457170899999994,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 274569177,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865492920,
+              "cpu_seconds": 0.27453298800000425,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 2,
+              "iterations": 4
+            }
+          ],
+          [
+            {
+              "ns": 273316280,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865744354,
+              "cpu_seconds": 0.27330797100000126,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 0,
+              "iterations": 4
+            },
+            {
+              "ns": 274657604,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865486642,
+              "cpu_seconds": 0.27462537999998915,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 1,
+              "iterations": 4
+            },
+            {
+              "ns": 272115424,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3865727706,
+              "cpu_seconds": 0.2720790799999975,
+              "word": "benchmark.csv:csv-benchmark",
+              "trial": 2,
+              "iterations": 4
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 12,
+      "word": "allocator-runtime-comparison:json-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0212172509640154,
+        "instructions": 1.0001888812792732,
+        "ns": 1.0192222064885763
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0437361431673624,
+          "instructions": 1.0001856703624792,
+          "ns": 1.0396383951410977
+        },
+        {
+          "cpu_seconds": 0.9991241904585105,
+          "instructions": 1.0001920916065388,
+          "ns": 0.9991124262633474
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 202945277,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823164466,
+              "cpu_seconds": 0.20293646600000415,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 201939213,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823164477,
+              "cpu_seconds": 0.20194099100000074,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 205208197,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823164473,
+              "cpu_seconds": 0.20274200999999437,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 205910908,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823867708,
+              "cpu_seconds": 0.20590372499999887,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 206346746,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823865966,
+              "cpu_seconds": 0.20631742199999792,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 207130885,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823865943,
+              "cpu_seconds": 0.20710985400000936,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 211416013,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823830787,
+              "cpu_seconds": 0.21137435600000032,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 211203595,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823896086,
+              "cpu_seconds": 0.21117141399999184,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 211656174,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3823896088,
+              "cpu_seconds": 0.21164862899999548,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ],
+          [
+            {
+              "ns": 205853153,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3824621412,
+              "cpu_seconds": 0.20584599699999728,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 0,
+              "iterations": 2
+            },
+            {
+              "ns": 207086573,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3824590900,
+              "cpu_seconds": 0.20706907899999294,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 1,
+              "iterations": 2
+            },
+            {
+              "ns": 205899060,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3824590903,
+              "cpu_seconds": 0.2058735089999999,
+              "word": "allocator-runtime-comparison:json-work",
+              "trial": 2,
+              "iterations": 2
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 13,
+      "word": "benchmark.msgpack:msgpack-benchmark",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0042528818338279,
+        "instructions": 0.9999660103476812,
+        "ns": 1.0042676790694467
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.017412803190452,
+          "instructions": 0.999954602823063,
+          "ns": 1.0174130805193906
+        },
+        {
+          "cpu_seconds": 0.9915570540945358,
+          "instructions": 0.9999774177617441,
+          "ns": 0.9915858016429373
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 583289825,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048965483,
+              "cpu_seconds": 0.5832534579999944,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 582276661,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048965608,
+              "cpu_seconds": 0.5822194999999937,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 582593638,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048965530,
+              "cpu_seconds": 0.5825216449999999,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 603829564,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10049062885,
+              "cpu_seconds": 0.6037540970000066,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 603655239,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10049063018,
+              "cpu_seconds": 0.6035834759999972,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 604570767,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10049062887,
+              "cpu_seconds": 0.6045546470000005,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 593244069,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048880219,
+              "cpu_seconds": 0.5931684320000059,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 592500960,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048323901,
+              "cpu_seconds": 0.5924684829999904,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 592855948,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048323917,
+              "cpu_seconds": 0.5927951740000026,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 599189100,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048836012,
+              "cpu_seconds": 0.599143435000002,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 599271566,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048835998,
+              "cpu_seconds": 0.5991756170000002,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 598347909,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 10048835989,
+              "cpu_seconds": 0.5982754600000106,
+              "word": "benchmark.msgpack:msgpack-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 14,
+      "word": "benchmark.lcs:lcs-benchmark",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0041379899979805,
+        "instructions": 0.9999920167497346,
+        "ns": 1.0040716268745657
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.003501523145341,
+          "instructions": 0.9999902531448569,
+          "ns": 1.0033892953572832
+        },
+        {
+          "cpu_seconds": 1.0047758551216792,
+          "instructions": 0.9999937803519654,
+          "ns": 1.0047555036371913
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 148427430,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641946168,
+              "cpu_seconds": 0.14841957500000547,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 148326051,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641946183,
+              "cpu_seconds": 0.14830751499999906,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 148557075,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641946175,
+              "cpu_seconds": 0.14852457199999947,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 148237164,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641950140,
+              "cpu_seconds": 0.14822391700000281,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 148134281,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641950140,
+              "cpu_seconds": 0.14811743799999988,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 147932915,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641950142,
+              "cpu_seconds": 0.14793426600000714,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 148800517,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641935515,
+              "cpu_seconds": 0.14879532900000214,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 148824953,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641912871,
+              "cpu_seconds": 0.14882658700000206,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 149194375,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641912888,
+              "cpu_seconds": 0.14918880499999432,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 148805192,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641933715,
+              "cpu_seconds": 0.14878962800000295,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 148894771,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641933713,
+              "cpu_seconds": 0.1488888639999999,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 148717288,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2641933698,
+              "cpu_seconds": 0.14871892499999717,
+              "word": "benchmark.lcs:lcs-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 15,
+      "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0091710648649834,
+        "instructions": 0.9999531091881523,
+        "ns": 1.0091845091562548
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0084985531298905,
+          "instructions": 0.9999558677286219,
+          "ns": 1.0085391838898998
+        },
+        {
+          "cpu_seconds": 1.009839005971726,
+          "instructions": 0.9999503506634669,
+          "ns": 1.0098254239875313
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 139289857,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912916198,
+              "cpu_seconds": 0.13929158199999847,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 142452841,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912965529,
+              "cpu_seconds": 0.14242991199999722,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 142281781,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912916163,
+              "cpu_seconds": 0.1422837389999927,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 142401072,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912965871,
+              "cpu_seconds": 0.14239537899999988,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 142575870,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912916329,
+              "cpu_seconds": 0.14256357300000388,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 141965448,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912965694,
+              "cpu_seconds": 0.14194768999999496,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 142297356,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912788308,
+              "cpu_seconds": 0.14229002999999807,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 142643726,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912836651,
+              "cpu_seconds": 0.14263261199999988,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 142704220,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912787268,
+              "cpu_seconds": 0.14268602199999236,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 143372406,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912788234,
+              "cpu_seconds": 0.14336477300000183,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 143713345,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912837584,
+              "cpu_seconds": 0.1437063040000055,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 144051529,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 2912788198,
+              "cpu_seconds": 0.14403590199999883,
+              "word": "benchmark.tuple-arrays:tuple-arrays-benchmark",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 16,
+      "word": "allocator-runtime-comparison:struct-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0132246166971801,
+        "instructions": 1.0045780006228986,
+        "ns": 1.010892706190291
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0142296981067802,
+          "instructions": 1.004576816221893,
+          "ns": 1.014266824855632
+        },
+        {
+          "cpu_seconds": 1.0122183547035775,
+          "instructions": 1.0045791850227028,
+          "ns": 1.0075302961670978
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 171463885,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353822933,
+              "cpu_seconds": 0.17141946599999613,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 0,
+              "iterations": 27
+            },
+            {
+              "ns": 171756244,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353822940,
+              "cpu_seconds": 0.1717513079999975,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 1,
+              "iterations": 27
+            },
+            {
+              "ns": 171536383,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353822937,
+              "cpu_seconds": 0.17153332899999896,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 2,
+              "iterations": 27
+            }
+          ],
+          [
+            {
+              "ns": 173946728,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353825327,
+              "cpu_seconds": 0.17151506500000124,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 0,
+              "iterations": 27
+            },
+            {
+              "ns": 171331160,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353825312,
+              "cpu_seconds": 0.1713272540000048,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 1,
+              "iterations": 27
+            },
+            {
+              "ns": 171271118,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2353825331,
+              "cpu_seconds": 0.17125791400000878,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 2,
+              "iterations": 27
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 173689362,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364605008,
+              "cpu_seconds": 0.17367443199999855,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 0,
+              "iterations": 27
+            },
+            {
+              "ns": 174126342,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364591424,
+              "cpu_seconds": 0.1741080240000059,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 1,
+              "iterations": 27
+            },
+            {
+              "ns": 174284749,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364591423,
+              "cpu_seconds": 0.17424573099999918,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 2,
+              "iterations": 27
+            }
+          ],
+          [
+            {
+              "ns": 173344764,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364603916,
+              "cpu_seconds": 0.17333088899999893,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 0,
+              "iterations": 27
+            },
+            {
+              "ns": 173702605,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364603932,
+              "cpu_seconds": 0.17367746700000453,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 1,
+              "iterations": 27
+            },
+            {
+              "ns": 173391404,
+              "output": "0.8944271802902222, 1.0, 0.4472135901451111\n0.8944271802902222, 1.0, 0.4472135901451111\n",
+              "kind": "runtime",
+              "instructions": 2364603927,
+              "cpu_seconds": 0.17337333599999738,
+              "word": "allocator-runtime-comparison:struct-work",
+              "trial": 2,
+              "iterations": 27
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 17,
+      "word": "allocator-runtime-comparison:matrix-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0005080322332944,
+        "instructions": 0.9999925473243441,
+        "ns": 1.0004889928852239
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9989802679559576,
+          "instructions": 0.9999925034907294,
+          "ns": 0.9989870959407611
+        },
+        {
+          "cpu_seconds": 1.002009075304825,
+          "instructions": 0.9999925911579568,
+          "ns": 1.001964551782188
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 129367643,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011859,
+              "cpu_seconds": 0.12934428600000558,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 130062425,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011856,
+              "cpu_seconds": 0.1300571510000026,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 129726236,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011865,
+              "cpu_seconds": 0.12971450999999945,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 132272711,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011946,
+              "cpu_seconds": 0.13226655999999792,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 132024918,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011960,
+              "cpu_seconds": 0.1320138780000093,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 131804936,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2365011957,
+              "cpu_seconds": 0.13176245700000777,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 129334608,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364994466,
+              "cpu_seconds": 0.12932942799999836,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 129219784,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364993967,
+              "cpu_seconds": 0.12919022699999516,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 130207734,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364993959,
+              "cpu_seconds": 0.1301994980000103,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 131665129,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364994421,
+              "cpu_seconds": 0.1316446049999982,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 132616301,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364994428,
+              "cpu_seconds": 0.1326036720000019,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 132599299,
+              "output": "{\n    { 2.7182818284590455 0.0 0.0 0.0 }\n    { 0.0 2.7182818284590455 0.0 0.0 }\n    { 0.0 0.0 2.7182818284590455 0.0 }\n    { 0.0 0.0 0.0 2.7182818284590455 }\n}\n",
+              "kind": "runtime",
+              "instructions": 2364994448,
+              "cpu_seconds": 0.13259029800001088,
+              "word": "allocator-runtime-comparison:matrix-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "word": "allocator-runtime-comparison:matrix-simd-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9815497896668135,
+        "instructions": 0.9998913360869152,
+        "ns": 0.98158541905055
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9972671564379868,
+          "instructions": 0.9998909456427956,
+          "ns": 0.997304302950025
+        },
+        {
+          "cpu_seconds": 0.9663956386495317,
+          "instructions": 0.9998917264859593,
+          "ns": 0.9664298495265123
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 96438220,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832951364,
+              "cpu_seconds": 0.09642976800000014,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 0,
+              "iterations": 29
+            },
+            {
+              "ns": 96135103,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832951370,
+              "cpu_seconds": 0.0961369290000107,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 1,
+              "iterations": 29
+            },
+            {
+              "ns": 96214321,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832951373,
+              "cpu_seconds": 0.09619809400000179,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 2,
+              "iterations": 29
+            }
+          ],
+          [
+            {
+              "ns": 99726341,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1833163352,
+              "cpu_seconds": 0.09972876899999505,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 0,
+              "iterations": 29
+            },
+            {
+              "ns": 99716072,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1833162825,
+              "cpu_seconds": 0.09969854199999872,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 1,
+              "iterations": 29
+            },
+            {
+              "ns": 100079122,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1833162828,
+              "cpu_seconds": 0.10006964699999799,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 2,
+              "iterations": 29
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 95900888,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832748907,
+              "cpu_seconds": 0.09588883499999667,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 0,
+              "iterations": 29
+            },
+            {
+              "ns": 95907591,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832749318,
+              "cpu_seconds": 0.09589249100000075,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 1,
+              "iterations": 29
+            },
+            {
+              "ns": 96200681,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832756208,
+              "cpu_seconds": 0.09619431599999473,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 2,
+              "iterations": 29
+            }
+          ],
+          [
+            {
+              "ns": 96452957,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832968398,
+              "cpu_seconds": 0.09644668899999687,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 0,
+              "iterations": 29
+            },
+            {
+              "ns": 96645607,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832959125,
+              "cpu_seconds": 0.09663962199999787,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 1,
+              "iterations": 29
+            },
+            {
+              "ns": 96367988,
+              "output": "S{ matrix4\n    { columns\n        float-4-array{\n            float-4{ 2.7182819843292236 0.0 0.0 0.0 }\n            float-4{ 0.0 2.7182819843292236 0.0 0.0 }\n            float-4{ 0.0 0.0 2.7182819843292236 0.0 }\n            float-4{ 0.0 0.0 0.0 2.7182819843292236 }\n        }\n    }\n}\n",
+              "kind": "runtime",
+              "instructions": 1832966033,
+              "cpu_seconds": 0.09634624299999928,
+              "word": "allocator-runtime-comparison:matrix-simd-work",
+              "trial": 2,
+              "iterations": 29
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "word": "allocator-runtime-comparison:gc-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0034260568037265,
+        "instructions": 1.000164657742208,
+        "ns": 1.003426805926552
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.000404117633144,
+          "instructions": 1.0001662594780099,
+          "ns": 1.000376930772856
+        },
+        {
+          "cpu_seconds": 1.0064655143916665,
+          "instructions": 1.0001630560065975,
+          "ns": 1.0064943578741161
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 368334645,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189179095,
+              "cpu_seconds": 0.36830856200000284,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 0,
+              "iterations": 9
+            },
+            {
+              "ns": 370922474,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189192805,
+              "cpu_seconds": 0.37087801699999545,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 1,
+              "iterations": 9
+            },
+            {
+              "ns": 370678790,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189209756,
+              "cpu_seconds": 0.37061651599999834,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 2,
+              "iterations": 9
+            }
+          ],
+          [
+            {
+              "ns": 367389704,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189164582,
+              "cpu_seconds": 0.36733037800000545,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 0,
+              "iterations": 9
+            },
+            {
+              "ns": 366958128,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189206410,
+              "cpu_seconds": 0.3669097530000016,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 1,
+              "iterations": 9
+            },
+            {
+              "ns": 369192062,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5189212521,
+              "cpu_seconds": 0.36916642999999283,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 2,
+              "iterations": 9
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 370789432,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190084844,
+              "cpu_seconds": 0.37073239500000454,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 0,
+              "iterations": 9
+            },
+            {
+              "ns": 370326516,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190037958,
+              "cpu_seconds": 0.37029954300000156,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 1,
+              "iterations": 9
+            },
+            {
+              "ns": 369238330,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190047112,
+              "cpu_seconds": 0.36921964799999785,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 2,
+              "iterations": 9
+            }
+          ],
+          [
+            {
+              "ns": 369991784,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190021013,
+              "cpu_seconds": 0.36995836199999843,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 0,
+              "iterations": 9
+            },
+            {
+              "ns": 370523732,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190042317,
+              "cpu_seconds": 0.37044594500000017,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 1,
+              "iterations": 9
+            },
+            {
+              "ns": 370191161,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5190058571,
+              "cpu_seconds": 0.3701363450000059,
+              "word": "allocator-runtime-comparison:gc-work",
+              "trial": 2,
+              "iterations": 9
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 20,
+      "word": "allocator-runtime-comparison:float-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0073172817034006,
+        "instructions": 0.9999641751273456,
+        "ns": 1.0073050576438678
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.004619005856612,
+          "instructions": 0.9999473595562622,
+          "ns": 1.004591127654342
+        },
+        {
+          "cpu_seconds": 1.0100299525973917,
+          "instructions": 0.9999809905656145,
+          "ns": 1.010033405022229
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 219590943,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894215321,
+              "cpu_seconds": 0.21958522999999275,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 218669809,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894215323,
+              "cpu_seconds": 0.21865510599999993,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 217648477,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894215343,
+              "cpu_seconds": 0.21760576899998796,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 217530863,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894253991,
+              "cpu_seconds": 0.21749858900000163,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 217580066,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894253977,
+              "cpu_seconds": 0.2175674890000039,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 217332283,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894253988,
+              "cpu_seconds": 0.21729971700000306,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 220066856,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4893957697,
+              "cpu_seconds": 0.22006884500000012,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 219325497,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4893957688,
+              "cpu_seconds": 0.21930601600000443,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 219528239,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4893957701,
+              "cpu_seconds": 0.21950060100000712,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 219992095,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894160944,
+              "cpu_seconds": 0.21995040200000204,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 220318718,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894160945,
+              "cpu_seconds": 0.22029052100000968,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 218678626,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4894160956,
+              "cpu_seconds": 0.21866807000000676,
+              "word": "allocator-runtime-comparison:float-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "word": "allocator-runtime-comparison:ffi-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.835568418185504,
+        "instructions": 0.9845355695140716,
+        "ns": 0.8346068316534345
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.8347290187017736,
+          "instructions": 0.9845222891491695,
+          "ns": 0.8347301101197345
+        },
+        {
+          "cpu_seconds": 0.836409856422953,
+          "instructions": 0.98454884979645,
+          "ns": 0.8344835366007962
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 342253829,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219016706,
+              "cpu_seconds": 0.3422193010000001,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 342414391,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219016738,
+              "cpu_seconds": 0.3423583029999975,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 342311190,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219016735,
+              "cpu_seconds": 0.342282651000005,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 341962418,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219055369,
+              "cpu_seconds": 0.3419359720000017,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 343949080,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219055377,
+              "cpu_seconds": 0.3415328960000039,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 340929757,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6219055368,
+              "cpu_seconds": 0.3409033670000099,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 285747803,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122760585,
+              "cpu_seconds": 0.2857233740000069,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 285633470,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122760579,
+              "cpu_seconds": 0.2856030079999954,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 285869363,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122760587,
+              "cpu_seconds": 0.28582367100000283,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 287178815,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122963817,
+              "cpu_seconds": 0.2871267420000052,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 284627648,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122963805,
+              "cpu_seconds": 0.2846230610000049,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 285075659,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 6122963816,
+              "cpu_seconds": 0.2850452310000122,
+              "word": "allocator-runtime-comparison:ffi-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 22,
+      "word": "allocator-runtime-comparison:branch-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9976816381984625,
+        "instructions": 0.9999652885179305,
+        "ns": 0.997676461668366
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.996924251958837,
+          "instructions": 0.9999492625564237,
+          "ns": 0.996916771724523
+        },
+        {
+          "cpu_seconds": 0.9984400754254534,
+          "instructions": 0.9999813143587903,
+          "ns": 0.9984372350499792
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 228257514,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134242390,
+              "cpu_seconds": 0.22820363499999985,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 228133684,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134242380,
+              "cpu_seconds": 0.22811669300000403,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 227695354,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134242386,
+              "cpu_seconds": 0.22767848200000174,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 227611154,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134281030,
+              "cpu_seconds": 0.22758987600001035,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 227761476,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134281029,
+              "cpu_seconds": 0.2277421710000027,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 227739696,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134281053,
+              "cpu_seconds": 0.22771892699999796,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 227328075,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5133981851,
+              "cpu_seconds": 0.22730392200000438,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 227422173,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5133981842,
+              "cpu_seconds": 0.22739901899998927,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 227227109,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5133981968,
+              "cpu_seconds": 0.22719206099999667,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 227456806,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134185095,
+              "cpu_seconds": 0.2274422580000106,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 227256132,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134185104,
+              "cpu_seconds": 0.22722556299999042,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 227331844,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5134185101,
+              "cpu_seconds": 0.2273176449999994,
+              "word": "allocator-runtime-comparison:branch-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 23,
+      "word": "allocator-runtime-comparison:integer-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0107222911122422,
+        "instructions": 1.011263707211281,
+        "ns": 1.0135453193873794
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0078226434253656,
+          "instructions": 1.0112636838963396,
+          "ns": 1.0078912808519602
+        },
+        {
+          "cpu_seconds": 1.0136243097517266,
+          "instructions": 1.0112637305262218,
+          "ns": 1.019203534527023
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 142605236,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186462,
+              "cpu_seconds": 0.1425916360000059,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 142515979,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186464,
+              "cpu_seconds": 0.1425175870000004,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 142467419,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186464,
+              "cpu_seconds": 0.14246299500000248,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 142062479,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186468,
+              "cpu_seconds": 0.14205752399999483,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 142533591,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186466,
+              "cpu_seconds": 0.14251013199999818,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 142676940,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3409186464,
+              "cpu_seconds": 0.14265523499999233,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 143488487,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586460,
+              "cpu_seconds": 0.1434791670000095,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 143852490,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586460,
+              "cpu_seconds": 0.14381428699999788,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 143621879,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586466,
+              "cpu_seconds": 0.1436235090000082,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 146715678,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586940,
+              "cpu_seconds": 0.14430596799999762,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 144347834,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586464,
+              "cpu_seconds": 0.14434220500000094,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 144414650,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 3447586467,
+              "cpu_seconds": 0.14439533499999868,
+              "word": "allocator-runtime-comparison:integer-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 24,
+      "word": "allocator-runtime-comparison:simd-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 0.9752029326298216,
+        "instructions": 0.9855703332226607,
+        "ns": 0.9752184879943366
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 0.9724223421162976,
+          "instructions": 0.9855548530614605,
+          "ns": 0.9724546175511478
+        },
+        {
+          "cpu_seconds": 0.9779910596320731,
+          "instructions": 0.9855858132716745,
+          "ns": 0.9779897855013836
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 272055394,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334662471,
+              "cpu_seconds": 0.2720389739999973,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 271951671,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334662474,
+              "cpu_seconds": 0.271921854999988,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 271900757,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334662483,
+              "cpu_seconds": 0.2718841240000103,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 270806811,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334701130,
+              "cpu_seconds": 0.27078628700000706,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 270908543,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334701130,
+              "cpu_seconds": 0.27085328200000447,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 272005839,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5334701152,
+              "cpu_seconds": 0.2720001020000069,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 264555140,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257602504,
+              "cpu_seconds": 0.2644806130000035,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 264428124,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257602482,
+              "cpu_seconds": 0.26441342800001166,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 264450065,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257602492,
+              "cpu_seconds": 0.26445181900000136,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ],
+          [
+            {
+              "ns": 265244502,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257805750,
+              "cpu_seconds": 0.2652327630000002,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 0,
+              "iterations": 600
+            },
+            {
+              "ns": 265313232,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257805762,
+              "cpu_seconds": 0.26528993000000867,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 1,
+              "iterations": 600
+            },
+            {
+              "ns": 265253281,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 5257805765,
+              "cpu_seconds": 0.2652096309999905,
+              "word": "allocator-runtime-comparison:simd-pressure-work",
+              "trial": 2,
+              "iterations": 600
+            }
+          ]
+        ]
+      }
+    },
+    {
+      "index": 25,
+      "word": "allocator-runtime-comparison:gc-pressure-work",
+      "candidate_over_baseline": {
+        "cpu_seconds": 1.0081110995134757,
+        "instructions": 1.0004346190628388,
+        "ns": 1.0072451076729019
+      },
+      "per_round": [
+        {
+          "cpu_seconds": 1.0110347480557045,
+          "instructions": 1.0004411209396349,
+          "ns": 1.0110185002362337
+        },
+        {
+          "cpu_seconds": 1.0051996494460704,
+          "instructions": 1.0004281172200897,
+          "ns": 1.0034938319335307
+        }
+      ],
+      "samples": {
+        "baseline": [
+          [
+            {
+              "ns": 469177054,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339097133,
+              "cpu_seconds": 0.46912552099999516,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 468241545,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339096097,
+              "cpu_seconds": 0.4681821329999991,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 471955242,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339096325,
+              "cpu_seconds": 0.4718867310000121,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 471966430,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339119597,
+              "cpu_seconds": 0.4718602939999954,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 471057570,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339118944,
+              "cpu_seconds": 0.47101651100000197,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 474659247,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4339119179,
+              "cpu_seconds": 0.4722218619999978,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ],
+        "candidate": [
+          [
+            {
+              "ns": 476116896,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4341010983,
+              "cpu_seconds": 0.4760820939999917,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 475197967,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4341010176,
+              "cpu_seconds": 0.47515174000000115,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 473588164,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4341010595,
+              "cpu_seconds": 0.473510656000002,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ],
+          [
+            {
+              "ns": 473556381,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4340977377,
+              "cpu_seconds": 0.4735014279999916,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 0,
+              "iterations": 1
+            },
+            {
+              "ns": 475810215,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4340976456,
+              "cpu_seconds": 0.47571632000000363,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 1,
+              "iterations": 1
+            },
+            {
+              "ns": 473269798,
+              "output": "",
+              "kind": "runtime",
+              "instructions": 4340976842,
+              "cpu_seconds": 0.47323893600000133,
+              "word": "allocator-runtime-comparison:gc-pressure-work",
+              "trial": 2,
+              "iterations": 1
+            }
+          ]
+        ]
+      }
+    }
+  ],
+  "kernel_metrics": [
+    {
+      "index": 0,
+      "input": "float-pressure",
+      "baseline": [
+        {
+          "code_bytes": 1232,
+          "reloads": 17,
+          "instructions": 144,
+          "pass": "build-stack-frame",
+          "frame-bytes": 144,
+          "spill-bytes": 136,
+          "blocks": 5,
+          "copies": 0,
+          "spills": 17
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 1232,
+          "reloads": 17,
+          "instructions": 144,
+          "pass": "build-stack-frame",
+          "frame-bytes": 144,
+          "spill-bytes": 136,
+          "blocks": 5,
+          "copies": 0,
+          "spills": 17
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 1,
+      "input": "ffi-pressure",
+      "baseline": [
+        {
+          "code_bytes": 2000,
+          "reloads": 51,
+          "instructions": 235,
+          "pass": "build-stack-frame",
+          "frame-bytes": 288,
+          "spill-bytes": 280,
+          "blocks": 8,
+          "copies": 14,
+          "spills": 54
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 1952,
+          "reloads": 49,
+          "instructions": 227,
+          "pass": "build-stack-frame",
+          "frame-bytes": 288,
+          "spill-bytes": 280,
+          "blocks": 6,
+          "copies": 14,
+          "spills": 50
+        }
+      ],
+      "total_delta": {
+        "code_bytes": -48,
+        "spills": -4,
+        "reloads": -2,
+        "copies": 0,
+        "instructions": -8,
+        "blocks": -2
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 2,
+      "input": "branch-pressure",
+      "baseline": [
+        {
+          "code_bytes": 1856,
+          "reloads": 31,
+          "instructions": 212,
+          "pass": "build-stack-frame",
+          "frame-bytes": 256,
+          "spill-bytes": 248,
+          "blocks": 8,
+          "copies": 1,
+          "spills": 31
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 1856,
+          "reloads": 31,
+          "instructions": 212,
+          "pass": "build-stack-frame",
+          "frame-bytes": 256,
+          "spill-bytes": 248,
+          "blocks": 8,
+          "copies": 1,
+          "spills": 31
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 3,
+      "input": "integer-pressure",
+      "baseline": [
+        {
+          "code_bytes": 704,
+          "reloads": 29,
+          "instructions": 148,
+          "pass": "build-stack-frame",
+          "frame-bytes": 240,
+          "spill-bytes": 232,
+          "blocks": 3,
+          "copies": 0,
+          "spills": 29
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 704,
+          "reloads": 29,
+          "instructions": 148,
+          "pass": "build-stack-frame",
+          "frame-bytes": 240,
+          "spill-bytes": 232,
+          "blocks": 3,
+          "copies": 0,
+          "spills": 29
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 4,
+      "input": "simd-pressure",
+      "baseline": [
+        {
+          "code_bytes": 1472,
+          "reloads": 17,
+          "instructions": 153,
+          "pass": "build-stack-frame",
+          "frame-bytes": 288,
+          "spill-bytes": 272,
+          "blocks": 7,
+          "copies": 0,
+          "spills": 17
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 1472,
+          "reloads": 17,
+          "instructions": 153,
+          "pass": "build-stack-frame",
+          "frame-bytes": 288,
+          "spill-bytes": 272,
+          "blocks": 7,
+          "copies": 0,
+          "spills": 17
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 5,
+      "input": "gc-pressure",
+      "baseline": [
+        {
+          "code_bytes": 10704,
+          "reloads": 214,
+          "instructions": 2221,
+          "pass": "build-stack-frame",
+          "frame-bytes": 192,
+          "spill-bytes": 184,
+          "blocks": 193,
+          "copies": 0,
+          "spills": 214
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 10704,
+          "reloads": 214,
+          "instructions": 2221,
+          "pass": "build-stack-frame",
+          "frame-bytes": 192,
+          "spill-bytes": 184,
+          "blocks": 193,
+          "copies": 0,
+          "spills": 214
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 6,
+      "input": "spectral-norm",
+      "baseline": [
+        {
+          "code_bytes": 3152,
+          "reloads": 20,
+          "instructions": 621,
+          "pass": "build-stack-frame",
+          "frame-bytes": 160,
+          "spill-bytes": 144,
+          "blocks": 118,
+          "copies": 1,
+          "spills": 20
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 3152,
+          "reloads": 20,
+          "instructions": 621,
+          "pass": "build-stack-frame",
+          "frame-bytes": 160,
+          "spill-bytes": 144,
+          "blocks": 118,
+          "copies": 1,
+          "spills": 20
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 7,
+      "input": "nbody",
+      "baseline": [
+        {
+          "code_bytes": 2992,
+          "reloads": 0,
+          "instructions": 775,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 0,
+          "blocks": 175,
+          "copies": 6,
+          "spills": 0
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 2992,
+          "reloads": 0,
+          "instructions": 775,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 0,
+          "blocks": 175,
+          "copies": 6,
+          "spills": 0
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 8,
+      "input": "nbody",
+      "baseline": [
+        {
+          "code_bytes": 4256,
+          "reloads": 18,
+          "instructions": 586,
+          "pass": "build-stack-frame",
+          "frame-bytes": 112,
+          "spill-bytes": 104,
+          "blocks": 98,
+          "copies": 0,
+          "spills": 38
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 4256,
+          "reloads": 18,
+          "instructions": 586,
+          "pass": "build-stack-frame",
+          "frame-bytes": 112,
+          "spill-bytes": 104,
+          "blocks": 98,
+          "copies": 0,
+          "spills": 38
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 9,
+      "input": "fannkuch",
+      "baseline": [
+        {
+          "code_bytes": 3424,
+          "reloads": 1,
+          "instructions": 907,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 8,
+          "blocks": 276,
+          "copies": 0,
+          "spills": 1
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 3424,
+          "reloads": 1,
+          "instructions": 907,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 8,
+          "blocks": 276,
+          "copies": 0,
+          "spills": 1
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 10,
+      "input": "binary-trees",
+      "baseline": [
+        {
+          "code_bytes": 5424,
+          "reloads": 0,
+          "instructions": 1459,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 0,
+          "blocks": 482,
+          "copies": 4,
+          "spills": 0
+        },
+        {
+          "code_bytes": 720,
+          "reloads": 3,
+          "instructions": 184,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 57,
+          "copies": 1,
+          "spills": 3
+        },
+        {
+          "code_bytes": 720,
+          "reloads": 3,
+          "instructions": 184,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 57,
+          "copies": 1,
+          "spills": 3
+        },
+        {
+          "code_bytes": 960,
+          "reloads": 3,
+          "instructions": 245,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 83,
+          "copies": 2,
+          "spills": 3
+        },
+        {
+          "code_bytes": 976,
+          "reloads": 3,
+          "instructions": 245,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 83,
+          "copies": 2,
+          "spills": 3
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 5424,
+          "reloads": 0,
+          "instructions": 1459,
+          "pass": "build-stack-frame",
+          "frame-bytes": 16,
+          "spill-bytes": 0,
+          "blocks": 482,
+          "copies": 4,
+          "spills": 0
+        },
+        {
+          "code_bytes": 720,
+          "reloads": 3,
+          "instructions": 184,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 57,
+          "copies": 1,
+          "spills": 3
+        },
+        {
+          "code_bytes": 720,
+          "reloads": 3,
+          "instructions": 184,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 57,
+          "copies": 1,
+          "spills": 3
+        },
+        {
+          "code_bytes": 960,
+          "reloads": 3,
+          "instructions": 245,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 83,
+          "copies": 2,
+          "spills": 3
+        },
+        {
+          "code_bytes": 976,
+          "reloads": 3,
+          "instructions": 245,
+          "pass": "build-stack-frame",
+          "frame-bytes": 32,
+          "spill-bytes": 24,
+          "blocks": 83,
+          "copies": 2,
+          "spills": 3
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    },
+    {
+      "index": 11,
+      "input": "struct-arrays-bench",
+      "baseline": [
+        {
+          "code_bytes": 1680,
+          "reloads": 16,
+          "instructions": 279,
+          "pass": "build-stack-frame",
+          "frame-bytes": 80,
+          "spill-bytes": 72,
+          "blocks": 40,
+          "copies": 8,
+          "spills": 14
+        }
+      ],
+      "candidate": [
+        {
+          "code_bytes": 1680,
+          "reloads": 16,
+          "instructions": 279,
+          "pass": "build-stack-frame",
+          "frame-bytes": 80,
+          "spill-bytes": 72,
+          "blocks": 40,
+          "copies": 8,
+          "spills": 14
+        }
+      ],
+      "total_delta": {
+        "code_bytes": 0,
+        "spills": 0,
+        "reloads": 0,
+        "copies": 0,
+        "instructions": 0,
+        "blocks": 0
+      },
+      "stable_within_revision": true
+    }
+  ],
+  "copy_metric": "Machine-IR ##copy count; equal-register copies may emit no machine instruction."
+}

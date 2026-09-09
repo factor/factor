@@ -1,0 +1,117 @@
+{
+  "allocator-runtime-comparison:base32-work": {
+    "bytes": {
+      "baseline": 1376,
+      "candidate": 1376
+    },
+    "equal": {
+      "code-bytes": false,
+      "relocations": false,
+      "literals": true,
+      "parameters": true,
+      "frame-bytes": true,
+      "physical-instructions": false
+    },
+    "literals": [
+      "<string>",
+      "set-string-nth-slow",
+      ">base32",
+      "base32>",
+      "(clone)",
+      "(byte-array)",
+      "length",
+      "(byte-array)",
+      "length",
+      "integer?",
+      ">fixnum",
+      "set-alien-unsigned-1",
+      "fixnum-overflow",
+      "fixnum>bignum",
+      "bignum-",
+      "(byte-array)",
+      "fixnum>bignum",
+      "bignum<=",
+      "fixnum-overflow",
+      "fixnum>bignum",
+      "bignum-",
+      "nth-unsafe",
+      "fixnum+overflow",
+      "nth-unsafe",
+      "fixnum>bignum",
+      "bignum+",
+      "nth-unsafe",
+      "(byte-array)",
+      "assert=",
+      "integer-length-expected"
+    ],
+    "physical_diff": [
+      "--- \n",
+      "+++ \n",
+      "@@ -335,8 +335,8 @@\n",
+      " T{ ##inc { loc D: 1 } { insn# 702 } }",
+      " T{ ##inc { loc R: 1 } { insn# 704 } }",
+      " T{ ##branch { insn# 706 } }",
+      "-T{ ##tagged>integer { dst RBP } { src RAX } { insn# 710 } }",
+      "-T{ ##store-memory\n    { src RDX }\n    { base RBP }\n    { displacement RCX }\n    { scale 0 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type uchar }\n    { insn# 712 }\n}",
+      "+T{ ##tagged>integer { dst RDX } { src RAX } { insn# 710 } }",
+      "+T{ ##store-memory\n    { src RBP }\n    { base RDX }\n    { displacement RCX }\n    { scale 0 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type uchar }\n    { insn# 712 }\n}",
+      " T{ ##safepoint { insn# 714 } }",
+      " T{ ##inc { loc D: 2 } { insn# 716 } }",
+      " T{ ##inc { loc R: -5 } { insn# 718 } }",
+      "@@ -351,6 +351,8 @@\n",
+      " T{ ##compare-integer-imm-branch\n    { src1 RDX }\n    { src2 127 }\n    { cc cc/<= }\n    { insn# 734 }\n}",
+      " T{ ##inc { loc D: -2 } { insn# 736 } }",
+      " T{ ##branch { insn# 738 } }",
+      "+T{ ##copy { dst RBP } { src RDX } { rep int-rep } }",
+      "+T{ ##branch }",
+      " T{ ##slot-imm\n    { dst RBP }\n    { obj RBX }\n    { slot 2 }\n    { tag 11 }\n    { insn# 740 }\n}",
+      " T{ ##tagged>integer { dst RBP } { src RBP } { insn# 742 } }",
+      " T{ ##load-memory\n    { dst RBP }\n    { base RBP }\n    { displacement RCX }\n    { scale 1 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type ushort }\n    { insn# 744 }\n}",
+      "@@ -358,8 +360,6 @@\n",
+      " T{ ##xor { dst RBP } { src1 RBP } { src2 RDX } { insn# 748 } }",
+      " T{ ##inc { loc D: -2 } { insn# 750 } }",
+      " T{ ##branch { insn# 752 } }",
+      "-T{ ##copy { dst RDX } { src RBP } { rep int-rep } }",
+      "-T{ ##branch }",
+      " T{ ##inc { loc D: -3 } { insn# 754 } }",
+      " T{ ##inc { loc D: 1 } { insn# 756 } }",
+      " T{ ##inc { loc R: -1 } { insn# 758 } }"
+    ]
+  },
+  "allocator-runtime-comparison:integer-pressure": {
+    "bytes": {
+      "baseline": 704,
+      "candidate": 704
+    },
+    "equal": {
+      "code-bytes": true,
+      "relocations": true,
+      "literals": true,
+      "parameters": true,
+      "frame-bytes": true,
+      "physical-instructions": true
+    },
+    "literals": [],
+    "physical_diff": []
+  },
+  "allocator-runtime-comparison:integer-pressure-work": {
+    "bytes": {
+      "baseline": 208,
+      "candidate": 208
+    },
+    "equal": {
+      "code-bytes": true,
+      "relocations": true,
+      "literals": true,
+      "parameters": true,
+      "frame-bytes": true,
+      "physical-instructions": true
+    },
+    "literals": [
+      "integer-pressure",
+      "+",
+      "assert="
+    ],
+    "physical_diff": []
+  }
+}

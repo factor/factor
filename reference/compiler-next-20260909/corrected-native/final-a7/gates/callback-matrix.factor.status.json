@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "seconds": 7.002713572233915,
+  "command": [
+    "taskset",
+    "-c",
+    "6",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-final-c6948-20260909",
+    "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/reference/allocator-tuning-20260909/callback-matrix.factor"
+  ],
+  "host_load_before": [
+    0.7724609375,
+    0.345703125,
+    0.2041015625
+  ],
+  "host_load_after": [
+    0.791015625,
+    0.35693359375,
+    0.20849609375
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [],
+  "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+}

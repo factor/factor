@@ -1,0 +1,124 @@
+{
+  "baseline": {
+    ":fixnum=>+": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        64,
+        64
+      ]
+    },
+    "allocator-runtime-comparison:base32-work": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        1376,
+        1376
+      ]
+    },
+    "allocator-runtime-comparison:integer-pressure": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        704,
+        704
+      ]
+    },
+    "allocator-runtime-comparison:integer-pressure-work": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        208,
+        208
+      ]
+    },
+    "math:+": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        5392,
+        5392
+      ]
+    },
+    "after-install-wrapper-calls": [
+      {
+        "instruction_offset": 110,
+        "target": "allocator-runtime-comparison:integer-pressure",
+        "actual_address": 123788226577248
+      },
+      {
+        "instruction_offset": 115,
+        "target": "math:+",
+        "actual_address": 123788226177744
+      }
+    ],
+    "after-outputs-wrapper-calls": [
+      {
+        "instruction_offset": 110,
+        "target": "allocator-runtime-comparison:integer-pressure",
+        "actual_address": 123788216303248
+      },
+      {
+        "instruction_offset": 115,
+        "target": "math:+",
+        "actual_address": 123788215903744
+      }
+    ]
+  },
+  "candidate": {
+    ":fixnum=>+": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        64,
+        64
+      ]
+    },
+    "allocator-runtime-comparison:base32-work": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        1376,
+        1376
+      ]
+    },
+    "allocator-runtime-comparison:integer-pressure": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        704,
+        704
+      ]
+    },
+    "allocator-runtime-comparison:integer-pressure-work": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        208,
+        208
+      ]
+    },
+    "math:+": {
+      "relocation_masked_code_unchanged": true,
+      "installed_bytes": [
+        5392,
+        5392
+      ]
+    },
+    "after-install-wrapper-calls": [
+      {
+        "instruction_offset": 110,
+        "target": "allocator-runtime-comparison:integer-pressure",
+        "actual_address": 123562180627696
+      },
+      {
+        "instruction_offset": 115,
+        "target": "math:+",
+        "actual_address": 123562180229168
+      }
+    ],
+    "after-outputs-wrapper-calls": [
+      {
+        "instruction_offset": 110,
+        "target": "allocator-runtime-comparison:integer-pressure",
+        "actual_address": 123562170324512
+      },
+      {
+        "instruction_offset": 115,
+        "target": "math:+",
+        "actual_address": 123562169925984
+      }
+    ]
+  }
+}

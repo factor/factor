@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "exit_code": 1,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-final-c6948-20260909",
+    "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/corrected-unit.factor",
+    "backtracking",
+    "on",
+    "on"
+  ],
+  "source_commit": "c6948a99de5ebfb7251c322382dba66d6f8050df",
+  "seconds": 1.7846246175467968,
+  "script_sha256": "7390329733b4e7c0c95e36c4280cfbd4d00886b9921fcd9b7c9fac50639c6f13"
+}

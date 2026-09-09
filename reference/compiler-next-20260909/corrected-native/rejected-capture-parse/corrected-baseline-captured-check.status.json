@@ -1,0 +1,39 @@
+{
+  "ok": false,
+  "exit_code": 1,
+  "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+    "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/capture-checked.factor",
+    "backtracking",
+    "check",
+    "3",
+    "on",
+    "on",
+    "5c848c90f63cea092191b70e1678bec4441e0238"
+  ],
+  "diagnostic_only": true,
+  "final_value_verifier": true,
+  "seconds": 0.7074517458677292,
+  "host_load_before": [
+    0.115234375,
+    0.1201171875,
+    0.0908203125
+  ],
+  "host_load_after": [
+    0.115234375,
+    0.1201171875,
+    0.0908203125
+  ],
+  "counts": {},
+  "script_sha256": {
+    "capture-checked.factor": "e49e620919edc06ba5080d052e309e04eb84d83992b5f85bde0387478bb790c8",
+    "capture-workload-code.factor": "82bf560f4d4046b7b20c8a802d6efef537eaaf0079fd82d4e740538ed4dc2651"
+  }
+}

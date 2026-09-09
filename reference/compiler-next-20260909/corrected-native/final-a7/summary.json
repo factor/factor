@@ -1,0 +1,237 @@
+{
+  "accepted": true,
+  "acceptance_scope": "Measurement/gate integrity; performance decision belongs to parent.",
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "baseline_compiler_snapshot": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "logical_baseline": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "scope_words": {
+    "baseline": 27945,
+    "candidate": 27956
+  },
+  "added_words": [
+    ":invalid-recorded-entry-reload=>instructions>>",
+    ":invalid-recorded-entry-reload=>interval>>",
+    "compiler.cfg.register-allocation.backtracking:backtracking-edge-entry-reloads",
+    "compiler.cfg.register-allocation.backtracking:check-recorded-entry-reload",
+    "compiler.cfg.register-allocation.backtracking:common-entry-home?",
+    "compiler.cfg.register-allocation.backtracking:edge-entry-reload?",
+    "compiler.cfg.register-allocation.backtracking:entry-transport-records",
+    "compiler.cfg.register-allocation.backtracking:invalid-recorded-entry-reload",
+    "compiler.cfg.register-allocation.backtracking:reify-entry-transports",
+    "compiler.cfg.register-allocation.chordal:preferred-free-color",
+    "compiler.cfg.register-allocation.ssa.phases:activate-recorded-entry",
+    "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block-recording",
+    "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers-recording"
+  ],
+  "removed_words": [
+    "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block",
+    "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers"
+  ],
+  "required_helpers": [
+    "classes.algebra:class-and",
+    "classes.algebra:class-or",
+    "compiler.cfg.register-allocation.backtracking:common-entry-home?",
+    "compiler.cfg.register-allocation.backtracking:entry-transport-records",
+    "compiler.cfg.register-allocation.backtracking:check-recorded-entry-reload",
+    "compiler.cfg.register-allocation.backtracking:reify-entry-transports",
+    "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers-recording",
+    "compiler.cfg.register-allocation.ssa.phases:activate-recorded-entry"
+  ],
+  "benchmark_entrypoints": [
+    "allocator-runtime-comparison:base32-work",
+    "allocator-runtime-comparison:base64-work",
+    "allocator-runtime-comparison:branch-pressure-work",
+    "allocator-runtime-comparison:fannkuch-work",
+    "allocator-runtime-comparison:ffi-pressure-work",
+    "allocator-runtime-comparison:float-pressure-work",
+    "allocator-runtime-comparison:gc-pressure-work",
+    "allocator-runtime-comparison:gc-work",
+    "allocator-runtime-comparison:integer-pressure-work",
+    "allocator-runtime-comparison:json-work",
+    "allocator-runtime-comparison:matrix-simd-work",
+    "allocator-runtime-comparison:matrix-work",
+    "allocator-runtime-comparison:md5-work",
+    "allocator-runtime-comparison:nbody-simd-work",
+    "allocator-runtime-comparison:nbody-work",
+    "allocator-runtime-comparison:norm-work",
+    "allocator-runtime-comparison:pi-work",
+    "allocator-runtime-comparison:sha1-work",
+    "allocator-runtime-comparison:sieve-work",
+    "allocator-runtime-comparison:simd-pressure-work",
+    "allocator-runtime-comparison:struct-work",
+    "allocator-runtime-comparison:trees-work",
+    "benchmark.csv:csv-benchmark",
+    "benchmark.lcs:lcs-benchmark",
+    "benchmark.msgpack:msgpack-benchmark",
+    "benchmark.tuple-arrays:tuple-arrays-benchmark"
+  ],
+  "compile": {
+    "baseline": [
+      {
+        "ns": 46930912475,
+        "instructions": 578130585764,
+        "kind": "compile",
+        "cpu_seconds": 46.915594516999995
+      },
+      {
+        "ns": 47635486198,
+        "instructions": 578130291089,
+        "kind": "compile",
+        "cpu_seconds": 47.617366976
+      }
+    ],
+    "candidate": [
+      {
+        "ns": 46430828951,
+        "instructions": 570526414127,
+        "kind": "compile",
+        "cpu_seconds": 46.413151764
+      },
+      {
+        "ns": 46576730710,
+        "instructions": 570527174052,
+        "kind": "compile",
+        "cpu_seconds": 46.559251747000005
+      }
+    ]
+  },
+  "compile_candidate_over_baseline": {
+    "cpu_seconds": 0.9834919169213213,
+    "instructions": 0.986847874058154,
+    "ns": 0.9835159313046244
+  },
+  "code_identity": {
+    "allocator-runtime-comparison:base32-work": {
+      "bytes": {
+        "baseline": 1376,
+        "candidate": 1376
+      },
+      "code_sha256": {
+        "baseline": "a60bbe444912afcda47c9b234f0f2e18f58de33b077641ee2c31f18b429c34e7",
+        "candidate": "92fafb616d654ed9ec2ab04023baca55663097a6d91ee475de02c46f2dbb9fa6"
+      },
+      "equal": {
+        "code-bytes": false,
+        "relocations": false,
+        "parameters": true,
+        "literals": true,
+        "frame-bytes": true,
+        "physical-instructions": false
+      },
+      "physical_diff": [
+        "--- baseline\n",
+        "+++ candidate\n",
+        "@@ -335,8 +335,8 @@\n",
+        " T{ ##inc { loc D: 1 } { insn# 702 } }",
+        " T{ ##inc { loc R: 1 } { insn# 704 } }",
+        " T{ ##branch { insn# 706 } }",
+        "-T{ ##tagged>integer { dst RBP } { src RAX } { insn# 710 } }",
+        "-T{ ##store-memory\n    { src RDX }\n    { base RBP }\n    { displacement RCX }\n    { scale 0 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type uchar }\n    { insn# 712 }\n}",
+        "+T{ ##tagged>integer { dst RDX } { src RAX } { insn# 710 } }",
+        "+T{ ##store-memory\n    { src RBP }\n    { base RDX }\n    { displacement RCX }\n    { scale 0 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type uchar }\n    { insn# 712 }\n}",
+        " T{ ##safepoint { insn# 714 } }",
+        " T{ ##inc { loc D: 2 } { insn# 716 } }",
+        " T{ ##inc { loc R: -5 } { insn# 718 } }",
+        "@@ -351,6 +351,8 @@\n",
+        " T{ ##compare-integer-imm-branch\n    { src1 RDX }\n    { src2 127 }\n    { cc cc/<= }\n    { insn# 734 }\n}",
+        " T{ ##inc { loc D: -2 } { insn# 736 } }",
+        " T{ ##branch { insn# 738 } }",
+        "+T{ ##copy { dst RBP } { src RDX } { rep int-rep } }",
+        "+T{ ##branch }",
+        " T{ ##slot-imm\n    { dst RBP }\n    { obj RBX }\n    { slot 2 }\n    { tag 11 }\n    { insn# 740 }\n}",
+        " T{ ##tagged>integer { dst RBP } { src RBP } { insn# 742 } }",
+        " T{ ##load-memory\n    { dst RBP }\n    { base RBP }\n    { displacement RCX }\n    { scale 1 }\n    { offset 7 }\n    { rep int-rep }\n    { c-type ushort }\n    { insn# 744 }\n}",
+        "@@ -358,8 +360,6 @@\n",
+        " T{ ##xor { dst RBP } { src1 RBP } { src2 RDX } { insn# 748 } }",
+        " T{ ##inc { loc D: -2 } { insn# 750 } }",
+        " T{ ##branch { insn# 752 } }",
+        "-T{ ##copy { dst RDX } { src RBP } { rep int-rep } }",
+        "-T{ ##branch }",
+        " T{ ##inc { loc D: -3 } { insn# 754 } }",
+        " T{ ##inc { loc D: 1 } { insn# 756 } }",
+        " T{ ##inc { loc R: -1 } { insn# 758 } }"
+      ]
+    },
+    "allocator-runtime-comparison:integer-pressure-work": {
+      "bytes": {
+        "baseline": 208,
+        "candidate": 208
+      },
+      "code_sha256": {
+        "baseline": "11002bbc437a530d8d924971c6d43280cd45ca173a54b87d8d51f9538e2bb414",
+        "candidate": "11002bbc437a530d8d924971c6d43280cd45ca173a54b87d8d51f9538e2bb414"
+      },
+      "equal": {
+        "code-bytes": true,
+        "relocations": true,
+        "parameters": true,
+        "literals": true,
+        "frame-bytes": true,
+        "physical-instructions": true
+      },
+      "physical_diff": []
+    }
+  },
+  "chordal_bracket": [
+    {
+      "label": "corrected-chordal-prefix-1",
+      "source": "eccfc0accc5c513b44701f2e59d4a9bafb7515f0",
+      "scope_words": 28493,
+      "compile": {
+        "ns": 58499800294,
+        "instructions": 732154077667,
+        "kind": "compile",
+        "cpu_seconds": 58.48101306
+      }
+    },
+    {
+      "label": "corrected-chordal-final-1",
+      "source": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+      "scope_words": 28500,
+      "compile": {
+        "ns": 58902593237,
+        "instructions": 738141502438,
+        "kind": "compile",
+        "cpu_seconds": 58.880840306
+      }
+    },
+    {
+      "label": "corrected-chordal-prefix-2",
+      "source": "eccfc0accc5c513b44701f2e59d4a9bafb7515f0",
+      "scope_words": 28493,
+      "compile": {
+        "ns": 59010692520,
+        "instructions": 732773064408,
+        "kind": "compile",
+        "cpu_seconds": 58.989199404
+      }
+    }
+  ],
+  "chordal_final_over_bracketing_mean": {
+    "cpu_seconds": 1.0024812089966155,
+    "instructions": 1.007751827701762,
+    "ns": 1.0025078072003872
+  },
+  "preparation": {
+    "command": [
+      "taskset",
+      "-c",
+      "2",
+      "/home/erg/factor-compiler-next-final-c6948-20260909/factor",
+      "-resource-path=/home/erg/factor-compiler-next-final-c6948-20260909",
+      "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared-c6948.image",
+      "-no-user-init",
+      "/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepare-corrected.factor"
+    ],
+    "status": 0,
+    "seconds": 3.000988544896245,
+    "taskpolicy": [],
+    "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+    "initial_image_sha256": "f9b956fecd566b0b63bd5a4c3b11f9ffdaf04bc4a37d0b5bbd7f62af816571c2",
+    "preparation_script_sha256": "62c3e395921b776db6c0bdc391b50d05ae04eae31647160cdf1f07fc01d22aab",
+    "prepared_image_sha256": "9fb6dd169665b96c9c213f918ddf498c375af73da0646c7d5f35cc0291ae079a"
+  },
+  "timing_runs": 4,
+  "measured_runtime_batches": 312,
+  "runtime_samples_per_case_per_revision": 6
+}

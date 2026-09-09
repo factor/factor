@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-final-c6948-20260909",
+    "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/capture-callees-checked.factor",
+    "backtracking",
+    "check",
+    "3",
+    "on",
+    "on",
+    "a7f554b613bd763fb7fbfc520643b75b321a6e16"
+  ],
+  "diagnostic_only": true,
+  "final_value_verifier": true,
+  "seconds": 75.37559960782528,
+  "host_load_before": [
+    0.85986328125,
+    0.49462890625,
+    0.484375
+  ],
+  "host_load_after": [
+    0.96142578125,
+    0.60986328125,
+    0.5283203125
+  ],
+  "counts": {
+    "code": 12,
+    "runtime": 26,
+    "generated-code": 4,
+    "compile": 1,
+    "scope": 1
+  },
+  "script_sha256": {
+    "capture-callees-checked.factor": "91cb25e417631c86684ba1e9ea6f3e3761773434c192dec62be746227b0ae6a5",
+    "capture-workload-code.factor": "33dc074b0a530d152308d837106018d22349b80e8531a767bc4421422861d050"
+  }
+}

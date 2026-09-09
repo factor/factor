@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-final-c6948-20260909",
+    "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/capture-addition-checked.factor",
+    "backtracking",
+    "check",
+    "3",
+    "on",
+    "on",
+    "a7f554b613bd763fb7fbfc520643b75b321a6e16"
+  ],
+  "diagnostic_only": true,
+  "final_value_verifier": true,
+  "seconds": 75.57432559039444,
+  "host_load_before": [
+    0.830078125,
+    0.40771484375,
+    0.4189453125
+  ],
+  "host_load_after": [
+    0.9921875,
+    0.564453125,
+    0.4755859375
+  ],
+  "counts": {
+    "code": 12,
+    "runtime": 26,
+    "scope": 1,
+    "generated-code": 2,
+    "compile": 1
+  },
+  "script_sha256": {
+    "capture-addition-checked.factor": "5713c080529cb72df8fdcf984a00b81951aa5a29468a6a5eb7585f197aac67ce",
+    "capture-workload-code.factor": "33dc074b0a530d152308d837106018d22349b80e8531a767bc4421422861d050"
+  }
+}

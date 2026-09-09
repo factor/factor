@@ -1,0 +1,41 @@
+{
+  "ok": false,
+  "exit_code": 1,
+  "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+    "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/capture-timing-flags.factor",
+    "backtracking",
+    "timing",
+    "0",
+    "on",
+    "on",
+    "5c848c90f63cea092191b70e1678bec4441e0238"
+  ],
+  "diagnostic_only": true,
+  "final_value_verifier": false,
+  "seconds": 0.7840488441288471,
+  "host_load_before": [
+    0.26611328125,
+    0.3505859375,
+    0.40087890625
+  ],
+  "host_load_after": [
+    0.26611328125,
+    0.3505859375,
+    0.40087890625
+  ],
+  "counts": {},
+  "script_sha256": {
+    "capture-timing-flags.factor": "a5088e0eaef3b22e53d61ec037151cdbd4e472ec8b409136df554329971be3b1",
+    "capture-workload-code.factor": "33dc074b0a530d152308d837106018d22349b80e8531a767bc4421422861d050",
+    "capture-installed.factor": "f4517e1f7f782610f78192d1d0bde48f707acc635c0965f64e86af8fa3c64b3c",
+    "capture-timing-flags-body.factor": "47a002f9aa40d9b269cbf664852bbb0815e86e7fd430597ecbcc18ed371293c9"
+  }
+}
