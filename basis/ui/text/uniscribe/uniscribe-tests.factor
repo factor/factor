@@ -21,7 +21,7 @@ IN: ui.text.uniscribe.tests
     [ line-metrics width>> ] [ text-width ] 2bi =
 ] unit-test
 
-{ 0 } [ sans-serif-font "" line-metrics width>> ] unit-test
+{ t } [ sans-serif-font "" line-metrics width>> zero? ] unit-test
 
 ! Cap/x heights must come from the font and scale with its size.
 { t } [

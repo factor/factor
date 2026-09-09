@@ -19,21 +19,24 @@
 - Foreground alpha is honored on opaque backgrounds by compositing the text
   color before GDI applies glyph coverage. Opaque text keeps native antialiasing.
 
-## Confirmed gaps and missing features
+## Follow-up: completed rendering and shaping support
 
-| Area | Evidence and remaining work |
+| Area | Implemented support |
 | --- | --- |
-| Custom selection colors | `selection.color` is not used by this backend. Native probes with red and blue selections produce identical bitmaps. `ScriptStringOut` uses system highlight colors; custom selection backgrounds need their own rendering path. |
-| Translucent backgrounds | The grayscale-mask path discards background color and alpha. A space on a half-transparent blue background currently produces zero-alpha pixels. It needs proper background compositing. |
-| Selection on transparent text images | System-colored selection output is passed through a grayscale coverage conversion. Selection backgrounds and text coverage need separate handling. |
-| Paragraph direction and tabs | `make-ssa` hardcodes flags and passes null control/state/tab definitions. Basic script shaping and fallback exist, but the backend exposes no paragraph base-direction or custom tab-stop controls. |
-| OpenType feature controls | No `ScriptShapeOpenType` pipeline or feature-range bindings exist here. This is missing user control over features, not an absence of basic complex-script shaping. |
-| Color emoji/fonts | The GDI path renders monochrome glyphs or a single foreground-color mask. Layered color-glyph rendering requires a new rendering path, such as DirectWrite. |
+| Custom selection colors | Both Uniscribe and DirectWrite composite `selection.color`, including disjoint visual runs in bidirectional text. |
+| Translucent backgrounds | Both paths preserve background RGBA and composite foreground coverage with source-over alpha. |
+| Selection on transparent text images | Selection backgrounds are composited independently from glyph coverage; native pixel tests check the resulting RGBA. |
+| Paragraph direction and tabs | `fonts.shaping` exposes explicit left-to-right/right-to-left direction and uniform tab intervals through DirectWrite. |
+| OpenType feature controls | DirectWrite applies four-character feature tags and unsigned parameters. Native tests verify that toggling kerning changes the layout. |
+| Color emoji/fonts | DirectWrite/Direct2D renders native color glyphs. Color can be disabled per font. Native tests verify colored pixels, monochrome opt-out, and palette glyph opacity. |
 
-The first three gaps have direct code or native-probe evidence. Paragraph,
-OpenType, and color-font support are larger feature work and were not implemented
-by this audit. Full bidirectional editor navigation, font-fallback ink bounds,
-and all font families were not qualified.
+DirectWrite is now the Windows UI default; the repaired Uniscribe backend remains
+available. Font options survive UI font derivation. Layout caches include DPI;
+bitmap bounds include native glyph overhang, with a corresponding drawing offset.
+Unspecified paragraph direction uses DirectWrite's left-to-right default. Tab
+intervals are uniform, not arbitrary stop lists. Typography options apply to the
+whole font run. Color format support depends on Windows and installed fonts.
+Full bidirectional keyboard navigation and every font family remain unqualified.
 
 API references:
 
@@ -49,6 +52,20 @@ regressions. The metric tests produced five failures before the fix. Tests cover
 surrogate interiors, emoji, combining marks, Devanagari clusters, caret bounds,
 line widths, two font sizes, RGB/alpha packing, GDI text color, and actual raster
 pixels for fully transparent text on an opaque background.
+
+Follow-up validation adds 11 font-option checks, 8 Uniscribe compositing checks,
+19 native DirectWrite layout checks, 5 native color/selection raster checks, and
+2 UI adapter checks. The combined suite also runs the existing text, baseline,
+label, grid, editor, and pane tests with zero failures. Native color emoji
+rendering produced 1,724 colored pixels; disabling color produced none.
+The 1.5-DPI Listener reproduction with a half-physical-pixel translation has
+no stray underlines. A separate UI smoke test displays color emoji, Arabic,
+Hebrew, Indic text, explicit RTL paragraphs, and 100-logical-pixel tabs.
+
+Rendering 100 distinct short labels at size 12 took 20.865 seconds before
+reusing the Direct2D DC render target and 0.200–0.208 seconds afterward in a
+warmed process on this machine. The renderer resets native target state on
+image startup and target errors, and releases the target on shutdown.
 
 Ran `windows.uniscribe`, `ui.text`, `ui.baseline-alignment`, `ui.gadgets.labels`,
 `ui.gadgets.panes`, and `ui.gadgets.grids` after reloading changed dependencies:
