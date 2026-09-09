@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors alien.c-types alien.data arrays assocs
+USING: accessors alien alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
 fonts fonts.shaping generalizations images init io.encodings.string io.encodings.utf16 kernel
 libc literals locals math math.bitwise math.functions math.order namespaces
@@ -186,14 +186,14 @@ PRIVATE>
     right left - :> width bottom top - :> height
     image dim>> first :> source-width
     image dim>> second bottom - :> source-row
-    image bitmap>> uint32_t cast-array :> source
+    image bitmap>> :> source
     width height * 4 * <byte-array> :> bytes
-    bytes uint32_t cast-array :> target
-    target [ :> index drop
-        index width /i source-row + source-width *
-        index width mod left + + source nth
-        index target set-nth
-    ] each-index
+    ! Preserve the bottom-up DIB rows without boxing and copying every pixel.
+    height [ :> row
+        row width * 4 * bytes <displaced-alien>
+        row source-row + source-width * left + 4 * source <displaced-alien>
+        width 4 * memcpy
+    ] each-integer
     image clone bytes >>bitmap width height 2array >>dim ;
 
 :: padded-text-bitmap ( dc ssa script padding -- image origin )
