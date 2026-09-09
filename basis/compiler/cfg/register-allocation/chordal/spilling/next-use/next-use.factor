@@ -39,7 +39,9 @@ CONSTANT: loop-exit-distance 100000
     state ;
 
 :: loop-exit-penalty ( from to -- distance )
-    from loop-nesting-at to loop-nesting-at >
+    loops get values [| loop |
+        from loop blocks>> in? to loop blocks>> in? not and
+    ] any?
     loop-exit-distance 0 ? ;
 
 ! Ordinary live-ins retain their names. Phi uses belong only to their own
@@ -81,7 +83,7 @@ CONSTANT: loop-exit-distance 100000
     entries exits ;
 
 :: instruction-next-uses ( bb exit -- afters )
-    H{ } clone :> afters
+    IH{ } clone :> afters
     exit :> state!
     bb instructions>> <reversed> [| insn |
         state insn afters set-at
