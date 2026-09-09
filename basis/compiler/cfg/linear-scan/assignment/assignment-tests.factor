@@ -1,9 +1,12 @@
-USING: accessors arrays compiler.cfg compiler.cfg.instructions
+USING: accessors arrays compiler.cfg compiler.cfg.instructions compiler.cfg.comparisons
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment
+compiler.cfg.linear-scan.allocation.spilling compiler.cfg.linear-scan.numbering
+compiler.cfg.linear-scan.resolve compiler.cfg.liveness
+compiler.cfg.register-allocation.verifier
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-cpu.architecture cpu.x86.assembler.operands heaps kernel make
+cpu.architecture cpu.x86.assembler.operands heaps kernel locals make
 namespaces sequences sorting tools.test ;
 IN: compiler.cfg.linear-scan.assignment.tests
 
@@ -224,8 +227,8 @@ IN: compiler.cfg.linear-scan.assignment.tests
 ] unit-test
 
 ! The old product expires before its successor activates, even if the
-! physical register is identical. The old store must precede the source
-! branch; a bypass into the destination must not execute that old store.
+! physical register is identical. Boundary stores are left to the resolver;
+! a bypass into the destination must not execute the old product's store.
 { t t t t } [
     {
         T{ live-interval-state
@@ -251,5 +254,43 @@ IN: compiler.cfg.linear-scan.assignment.tests
     [ clone ] map 1 insns>block
     [ assign-registers-in-block ] keep swap
     [ instructions>> dup first src>> RAX = swap [ ##spill? ] any? not ]
-    [ instructions>> dup last ##compare-integer-imm-branch? swap but-last last ##spill? ] bi*
+    [ instructions>> dup last ##compare-integer-imm-branch? swap [ ##spill? ] any? not ] bi*
+] unit-test
+
+! Overflowing arithmetic defines its output in a terminator. Its store must
+! run on outgoing edges after that definition, never before the instruction.
+:: defining-terminator-fixture ( -- cfg snapshot source )
+    H{ { 1 tagged-rep } { 2 tagged-rep } { 3 tagged-rep } } representations set
+    H{ { 1 1 } { 2 2 } { 3 3 } } leader-map set
+    H{ } clone spill-slots set
+    V{ T{ ##load-integer { dst 1 } { val 16 } }
+        T{ ##load-integer { dst 2 } { val 32 } }
+        T{ ##fixnum-add { dst 3 } { src1 1 } { src2 2 } { cc cc/o } } }
+    [ clone ] map 0 insns>block :> source
+    V{ T{ ##replace { src 3 } { loc D: 0 } } T{ ##return } }
+    [ clone ] map 1 insns>block :> left
+    V{ T{ ##replace { src 3 } { loc D: 0 } } T{ ##return } }
+    [ clone ] map 2 insns>block :> right
+    source left connect-bbs source right connect-bbs
+    source block>cfg :> graph
+    graph cfg set
+    graph snapshot-value-flow :> snapshot
+    graph compute-live-sets graph number-instructions
+    graph compute-live-intervals :> original
+    original [ vreg>> 3 = ] partition :> ( outputs inputs )
+    outputs first :> output
+    [
+        output source block-to 1 + split-for-spill :> ( definition uses )
+        uses uses uses>> second n>> 1 - split-for-spill :> ( use1 use2 )
+        definition RCX >>reg drop use1 RDX >>reg drop use2 RDX >>reg drop
+        inputs [ dup vreg>> 1 = [ RAX ] [ RBX ] if >>reg ] map
+        definition use1 use2 3array append :> allocated
+        graph allocated assign-registers graph resolve-data-flow
+    ] call
+    graph snapshot source ;
+
+{ t t } [
+    defining-terminator-fixture [ check-value-flow ] dip
+    [ instructions>> [ ##spill? ] any? not ]
+    [ successors>> [ instructions>> first ##spill? ] all? ] bi
 ] unit-test
