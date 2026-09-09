@@ -1,0 +1,13 @@
+{
+  "loadavg": [
+    29.45263671875,
+    32.96923828125,
+    51.73193359375
+  ],
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "logical_cpus": 18,
+  "existing_factor_process": "35509 S      0.0   0:08.28 /Users/erg/factor/Factor.app/Contents/MacOS/factor",
+  "repeat_snapshot": "35509 S      0.0   0:08.28 /Users/erg/factor/Factor.app/Contents/MacOS/factor",
+  "note": "Unrelated sleeping root Factor process unchanged at 0.0% CPU; retained untouched. Parent and agents have released timing lane."
+}

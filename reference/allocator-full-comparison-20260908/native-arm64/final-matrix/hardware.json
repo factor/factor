@@ -1,0 +1,6 @@
+{
+  "architecture": "arm64",
+  "native": true,
+  "cpu": "Apple M5 Max",
+  "timing_lane_released": true
+}

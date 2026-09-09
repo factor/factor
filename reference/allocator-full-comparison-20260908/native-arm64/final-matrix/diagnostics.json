@@ -1,0 +1,540 @@
+{
+  "host_load_1m_min": 29.45263671875,
+  "host_load_1m_max": 64.1162109375,
+  "host_load_1m_median": 44.865234375,
+  "runs": {
+    "baseline-timing-backtracking-1": {
+      "host_load_before": [
+        48.9375,
+        36.38134765625,
+        44.83251953125
+      ],
+      "host_load_after": [
+        41.208984375,
+        36.77099609375,
+        44.3154296875
+      ],
+      "process_wall_seconds": 71.99918794631958,
+      "compile_cpu_seconds": 45.294833167,
+      "compile_wall_seconds": 46.997144497,
+      "compile_retired": 542884453510,
+      "compile_giga_instructions_per_cpu_second": 11.985571323519608,
+      "runtime_cpu_seconds": 10.397598666000043,
+      "runtime_wall_seconds": 10.251641968,
+      "runtime_retired": 248217709201,
+      "runtime_giga_instructions_per_cpu_second": 23.872599546726818,
+      "runtime_wall_over_cpu": 0.9859624608826921
+    },
+    "baseline-timing-backtracking-2": {
+      "host_load_before": [
+        48.2587890625,
+        45.31982421875,
+        45.49853515625
+      ],
+      "host_load_after": [
+        58.9296875,
+        49.38330078125,
+        47.02880859375
+      ],
+      "process_wall_seconds": 83.69990825653076,
+      "compile_cpu_seconds": 47.687014624999996,
+      "compile_wall_seconds": 49.220926318,
+      "compile_retired": 543555541832,
+      "compile_giga_instructions_per_cpu_second": 11.398397364699782,
+      "runtime_cpu_seconds": 14.992872289000026,
+      "runtime_wall_seconds": 14.936459777,
+      "runtime_retired": 248451157514,
+      "runtime_giga_instructions_per_cpu_second": 16.57128485622356,
+      "runtime_wall_over_cpu": 0.9962373779411557
+    },
+    "baseline-timing-chordal-1": {
+      "host_load_before": [
+        44.865234375,
+        39.7763671875,
+        44.91796875
+      ],
+      "host_load_after": [
+        37.30126953125,
+        38.6328125,
+        44.1455078125
+      ],
+      "process_wall_seconds": 61.36548089981079,
+      "compile_cpu_seconds": 35.148301833,
+      "compile_wall_seconds": 35.023941803,
+      "compile_retired": 522238524733,
+      "compile_giga_instructions_per_cpu_second": 14.858143850428679,
+      "runtime_cpu_seconds": 11.479151880000039,
+      "runtime_wall_seconds": 11.318468774,
+      "runtime_retired": 258401035715,
+      "runtime_giga_instructions_per_cpu_second": 22.510464049631434,
+      "runtime_wall_over_cpu": 0.9860021796314068
+    },
+    "baseline-timing-chordal-2": {
+      "host_load_before": [
+        51.29736328125,
+        50.7802734375,
+        48.06640625
+      ],
+      "host_load_after": [
+        43.1416015625,
+        48.66845703125,
+        47.615234375
+      ],
+      "process_wall_seconds": 114.28094124794006,
+      "compile_cpu_seconds": 65.916894583,
+      "compile_wall_seconds": 69.820461813,
+      "compile_retired": 522438326375,
+      "compile_giga_instructions_per_cpu_second": 7.925712060315067,
+      "runtime_cpu_seconds": 20.17243529599996,
+      "runtime_wall_seconds": 20.403357055,
+      "runtime_retired": 259053874616,
+      "runtime_giga_instructions_per_cpu_second": 12.841973257803355,
+      "runtime_wall_over_cpu": 1.0114473912351987
+    },
+    "baseline-timing-greedy-1": {
+      "host_load_before": [
+        34.1005859375,
+        33.35498046875,
+        46.41650390625
+      ],
+      "host_load_after": [
+        30.55615234375,
+        32.306640625,
+        44.8359375
+      ],
+      "process_wall_seconds": 81.91397404670715,
+      "compile_cpu_seconds": 46.970864917,
+      "compile_wall_seconds": 48.309139536,
+      "compile_retired": 543772670588,
+      "compile_giga_instructions_per_cpu_second": 11.576807698748471,
+      "runtime_cpu_seconds": 14.764629253000031,
+      "runtime_wall_seconds": 14.770504897,
+      "runtime_retired": 248541958982,
+      "runtime_giga_instructions_per_cpu_second": 16.833606501260345,
+      "runtime_wall_over_cpu": 1.0003979540494574
+    },
+    "baseline-timing-greedy-2": {
+      "host_load_before": [
+        49.06591796875,
+        43.91650390625,
+        45.13671875
+      ],
+      "host_load_after": [
+        51.06689453125,
+        46.025390625,
+        45.83056640625
+      ],
+      "process_wall_seconds": 89.54552483558655,
+      "compile_cpu_seconds": 48.165342042000006,
+      "compile_wall_seconds": 48.716890481,
+      "compile_retired": 544152867208,
+      "compile_giga_instructions_per_cpu_second": 11.297602054471048,
+      "runtime_cpu_seconds": 16.671523964999963,
+      "runtime_wall_seconds": 18.518252659,
+      "runtime_retired": 248765643703,
+      "runtime_giga_instructions_per_cpu_second": 14.921589905353356,
+      "runtime_wall_over_cpu": 1.110771438644544
+    },
+    "baseline-timing-linear-scan-1": {
+      "host_load_before": [
+        29.45263671875,
+        32.96923828125,
+        51.73193359375
+      ],
+      "host_load_after": [
+        30.79052734375,
+        32.48974609375,
+        49.66162109375
+      ],
+      "process_wall_seconds": 88.31652474403381,
+      "compile_cpu_seconds": 48.581178791,
+      "compile_wall_seconds": 49.055902343,
+      "compile_retired": 536509021704,
+      "compile_giga_instructions_per_cpu_second": 11.04355709465395,
+      "runtime_cpu_seconds": 18.054970498999914,
+      "runtime_wall_seconds": 18.111706458,
+      "runtime_retired": 248679584854,
+      "runtime_giga_instructions_per_cpu_second": 13.773469464698081,
+      "runtime_wall_over_cpu": 1.0031424010913355
+    },
+    "baseline-timing-linear-scan-2": {
+      "host_load_before": [
+        57.42041015625,
+        51.0791015625,
+        48.572265625
+      ],
+      "host_load_after": [
+        52.88330078125,
+        51.6259765625,
+        49.06591796875
+      ],
+      "process_wall_seconds": 94.3788549900055,
+      "compile_cpu_seconds": 56.408059583000004,
+      "compile_wall_seconds": 57.366662203,
+      "compile_retired": 536411754188,
+      "compile_giga_instructions_per_cpu_second": 9.509487795776993,
+      "runtime_cpu_seconds": 17.341722750000002,
+      "runtime_wall_seconds": 17.244496106,
+      "runtime_retired": 248604190067,
+      "runtime_giga_instructions_per_cpu_second": 14.33561092233469,
+      "runtime_wall_over_cpu": 0.9943934841191021
+    },
+    "candidate-timing-backtracking-1": {
+      "host_load_before": [
+        41.208984375,
+        36.77099609375,
+        44.3154296875
+      ],
+      "host_load_after": [
+        44.865234375,
+        39.7763671875,
+        44.91796875
+      ],
+      "process_wall_seconds": 66.86716413497925,
+      "compile_cpu_seconds": 40.229276542,
+      "compile_wall_seconds": 39.706181942,
+      "compile_retired": 760805773573,
+      "compile_giga_instructions_per_cpu_second": 18.911743858448627,
+      "runtime_cpu_seconds": 12.629640251999987,
+      "runtime_wall_seconds": 12.478413878,
+      "runtime_retired": 256406057670,
+      "runtime_giga_instructions_per_cpu_second": 20.301928839928472,
+      "runtime_wall_over_cpu": 0.9880260742996191
+    },
+    "candidate-timing-backtracking-2": {
+      "host_load_before": [
+        51.3017578125,
+        46.15771484375,
+        45.87841796875
+      ],
+      "host_load_after": [
+        46.9755859375,
+        45.021484375,
+        45.3955078125
+      ],
+      "process_wall_seconds": 98.91799569129944,
+      "compile_cpu_seconds": 61.250188041,
+      "compile_wall_seconds": 63.607672404,
+      "compile_retired": 763151711157,
+      "compile_giga_instructions_per_cpu_second": 12.459581522364585,
+      "runtime_cpu_seconds": 15.486733923999978,
+      "runtime_wall_seconds": 15.745631718,
+      "runtime_retired": 257013174453,
+      "runtime_giga_instructions_per_cpu_second": 16.59569898432255,
+      "runtime_wall_over_cpu": 1.0167173914958794
+    },
+    "candidate-timing-chordal-1": {
+      "host_load_before": [
+        37.30126953125,
+        38.6328125,
+        44.1455078125
+      ],
+      "host_load_after": [
+        48.43017578125,
+        41.7001953125,
+        44.5703125
+      ],
+      "process_wall_seconds": 117.87875699996948,
+      "compile_cpu_seconds": 71.66402012500001,
+      "compile_wall_seconds": 74.042302579,
+      "compile_retired": 771621540676,
+      "compile_giga_instructions_per_cpu_second": 10.767209812261422,
+      "runtime_cpu_seconds": 19.819439543000016,
+      "runtime_wall_seconds": 20.574857349,
+      "runtime_retired": 274399347118,
+      "runtime_giga_instructions_per_cpu_second": 13.844959970874378,
+      "runtime_wall_over_cpu": 1.0381149933307163
+    },
+    "candidate-timing-chordal-2": {
+      "host_load_before": [
+        64.1162109375,
+        50.81640625,
+        47.56494140625
+      ],
+      "host_load_after": [
+        51.29736328125,
+        50.7802734375,
+        48.06640625
+      ],
+      "process_wall_seconds": 141.7125539779663,
+      "compile_cpu_seconds": 82.694047458,
+      "compile_wall_seconds": 89.282977969,
+      "compile_retired": 771901059718,
+      "compile_giga_instructions_per_cpu_second": 9.334421079220313,
+      "runtime_cpu_seconds": 22.375878709999938,
+      "runtime_wall_seconds": 23.570683356,
+      "runtime_retired": 274237833400,
+      "runtime_giga_instructions_per_cpu_second": 12.255958166122932,
+      "runtime_wall_over_cpu": 1.05339699331969
+    },
+    "candidate-timing-greedy-1": {
+      "host_load_before": [
+        30.55615234375,
+        32.306640625,
+        44.8359375
+      ],
+      "host_load_after": [
+        48.9375,
+        36.38134765625,
+        44.83251953125
+      ],
+      "process_wall_seconds": 102.4679708480835,
+      "compile_cpu_seconds": 57.207496708,
+      "compile_wall_seconds": 58.453219029,
+      "compile_retired": 604252135747,
+      "compile_giga_instructions_per_cpu_second": 10.562464196453822,
+      "runtime_cpu_seconds": 18.63441786499996,
+      "runtime_wall_seconds": 20.089410912,
+      "runtime_retired": 252237680271,
+      "runtime_giga_instructions_per_cpu_second": 13.536118063809477,
+      "runtime_wall_over_cpu": 1.0780809498606811
+    },
+    "candidate-timing-greedy-2": {
+      "host_load_before": [
+        48.43017578125,
+        41.7001953125,
+        44.5703125
+      ],
+      "host_load_after": [
+        49.06591796875,
+        43.91650390625,
+        45.13671875
+      ],
+      "process_wall_seconds": 93.24752616882324,
+      "compile_cpu_seconds": 51.228519542,
+      "compile_wall_seconds": 54.470506376,
+      "compile_retired": 601965454032,
+      "compile_giga_instructions_per_cpu_second": 11.750592431984593,
+      "runtime_cpu_seconds": 16.73192607999998,
+      "runtime_wall_seconds": 17.862304852,
+      "runtime_retired": 252393080958,
+      "runtime_giga_instructions_per_cpu_second": 15.084520440219416,
+      "runtime_wall_over_cpu": 1.0675581978186712
+    },
+    "candidate-timing-linear-scan-1": {
+      "host_load_before": [
+        30.79052734375,
+        32.48974609375,
+        49.66162109375
+      ],
+      "host_load_after": [
+        31.68359375,
+        32.47509765625,
+        47.75927734375
+      ],
+      "process_wall_seconds": 102.36563086509705,
+      "compile_cpu_seconds": 62.965379166,
+      "compile_wall_seconds": 63.487348146,
+      "compile_retired": 575309152810,
+      "compile_giga_instructions_per_cpu_second": 9.136912386301567,
+      "runtime_cpu_seconds": 17.00223508399999,
+      "runtime_wall_seconds": 17.150906349,
+      "runtime_retired": 249092992438,
+      "runtime_giga_instructions_per_cpu_second": 14.65060277118564,
+      "runtime_wall_over_cpu": 1.0087442188786058
+    },
+    "candidate-timing-linear-scan-2": {
+      "host_load_before": [
+        39.2265625,
+        45.228515625,
+        46.369140625
+      ],
+      "host_load_after": [
+        57.42041015625,
+        51.0791015625,
+        48.572265625
+      ],
+      "process_wall_seconds": 113.889328956604,
+      "compile_cpu_seconds": 66.87352187500001,
+      "compile_wall_seconds": 70.97923198,
+      "compile_retired": 575801364121,
+      "compile_giga_instructions_per_cpu_second": 8.610304167878102,
+      "runtime_cpu_seconds": 18.40550028300001,
+      "runtime_wall_seconds": 19.056170855,
+      "runtime_retired": 249742925986,
+      "runtime_giga_instructions_per_cpu_second": 13.56892896938377,
+      "runtime_wall_over_cpu": 1.0353519633802606
+    },
+    "remat-off-timing-linear-scan-1": {
+      "host_load_before": [
+        31.38818359375,
+        32.400390625,
+        47.64306640625
+      ],
+      "host_load_after": [
+        34.97998046875,
+        33.51318359375,
+        46.548828125
+      ],
+      "process_wall_seconds": 93.70049595832825,
+      "compile_cpu_seconds": 57.481997417,
+      "compile_wall_seconds": 59.407576029,
+      "compile_retired": 575770995359,
+      "compile_giga_instructions_per_cpu_second": 10.016544678886172,
+      "runtime_cpu_seconds": 14.787305039000032,
+      "runtime_wall_seconds": 14.951597018,
+      "runtime_retired": 248913124407,
+      "runtime_giga_instructions_per_cpu_second": 16.832893062699164,
+      "runtime_wall_over_cpu": 1.0111103394815122
+    },
+    "remat-off-timing-linear-scan-2": {
+      "host_load_before": [
+        43.1416015625,
+        48.66845703125,
+        47.615234375
+      ],
+      "host_load_after": [
+        39.2265625,
+        45.228515625,
+        46.369140625
+      ],
+      "process_wall_seconds": 114.71131587028503,
+      "compile_cpu_seconds": 67.669144334,
+      "compile_wall_seconds": 70.251923263,
+      "compile_retired": 576436629743,
+      "compile_giga_instructions_per_cpu_second": 8.518456017381212,
+      "runtime_cpu_seconds": 18.927880712999993,
+      "runtime_wall_seconds": 19.914890312,
+      "runtime_retired": 249532449637,
+      "runtime_giga_instructions_per_cpu_second": 13.183327463893875,
+      "runtime_wall_over_cpu": 1.0521458061769224
+    }
+  },
+  "final_allocator_over_linear_scan_by_round": {
+    "1": {
+      "linear-scan": {
+        "cpu_seconds": 1.0,
+        "ns": 1.0,
+        "instructions": 1.0
+      },
+      "greedy": {
+        "cpu_seconds": 1.0630272730695645,
+        "ns": 1.0749675362592364,
+        "instructions": 1.0099399841847256
+      },
+      "backtracking": {
+        "cpu_seconds": 0.7001874915436155,
+        "ns": 0.6849483387616443,
+        "instructions": 1.0269769961425508
+      },
+      "chordal": {
+        "cpu_seconds": 1.1162335187658874,
+        "ns": 1.1319911541283159,
+        "instructions": 1.0974614434753993
+      }
+    },
+    "2": {
+      "linear-scan": {
+        "cpu_seconds": 1.0,
+        "ns": 1.0,
+        "instructions": 1.0
+      },
+      "greedy": {
+        "cpu_seconds": 0.9260578039747103,
+        "ns": 0.9169832606312154,
+        "instructions": 1.0080953550453469
+      },
+      "backtracking": {
+        "cpu_seconds": 0.8449065854916558,
+        "ns": 0.8258143464844926,
+        "instructions": 1.0270665984337635
+      },
+      "chordal": {
+        "cpu_seconds": 1.2322570099308798,
+        "ns": 1.2330752118365496,
+        "instructions": 1.0937574751407222
+      }
+    }
+  },
+  "static_12_kernel_totals": {
+    "linear-scan": {
+      "baseline": {
+        "code-bytes": 37968,
+        "spills": 335,
+        "reloads": 320,
+        "copies": 22,
+        "spill-bytes": 2688,
+        "frame-bytes": 3008,
+        "instructions": 8703,
+        "blocks": 1971
+      },
+      "candidate": {
+        "code-bytes": 37968,
+        "spills": 335,
+        "reloads": 320,
+        "copies": 22,
+        "spill-bytes": 2688,
+        "frame-bytes": 3008,
+        "instructions": 8703,
+        "blocks": 1971
+      }
+    },
+    "greedy": {
+      "baseline": {
+        "code-bytes": 37840,
+        "spills": 333,
+        "reloads": 318,
+        "copies": 20,
+        "spill-bytes": 2664,
+        "frame-bytes": 3008,
+        "instructions": 8697,
+        "blocks": 1971
+      },
+      "candidate": {
+        "code-bytes": 38192,
+        "spills": 415,
+        "reloads": 319,
+        "copies": 20,
+        "spill-bytes": 2664,
+        "frame-bytes": 3008,
+        "instructions": 8780,
+        "blocks": 1971
+      }
+    },
+    "backtracking": {
+      "baseline": {
+        "code-bytes": 37920,
+        "spills": 334,
+        "reloads": 319,
+        "copies": 18,
+        "spill-bytes": 2664,
+        "frame-bytes": 3008,
+        "instructions": 8696,
+        "blocks": 1970
+      },
+      "candidate": {
+        "code-bytes": 38640,
+        "spills": 368,
+        "reloads": 347,
+        "copies": 79,
+        "spill-bytes": 1568,
+        "frame-bytes": 1920,
+        "instructions": 8647,
+        "blocks": 1693
+      }
+    },
+    "chordal": {
+      "baseline": {
+        "code-bytes": 38976,
+        "spills": 377,
+        "reloads": 357,
+        "copies": 76,
+        "spill-bytes": 3024,
+        "frame-bytes": 3360,
+        "instructions": 8703,
+        "blocks": 1733
+      },
+      "candidate": {
+        "code-bytes": 40192,
+        "spills": 406,
+        "reloads": 379,
+        "copies": 358,
+        "spill-bytes": 2736,
+        "frame-bytes": 3072,
+        "instructions": 9199,
+        "blocks": 1896
+      }
+    }
+  },
+  "note": "Runtime totals describe execution-rate context, not equally weighted workload rankings. Static counts are sums across twelve separately compiled kernels. Spills, reloads and copies count final machine-IR opcodes, not dynamic events or emitted machine instructions. Equal-register copies can emit no instruction; code-bytes measures actual generated bytes."
+}
