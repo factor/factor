@@ -4,7 +4,7 @@ USING: accessors alien.c-types arrays assocs classes.struct
 combinators compiler.cfg.builder.alien.params compiler.cfg.hats
 compiler.cfg.instructions compiler.cfg.intrinsics.allot
 compiler.cfg.registers cpu.architecture kernel layouts
-locals math namespaces sequences system ;
+locals math math.order namespaces sequences system ;
 QUALIFIED-WITH: alien.c-types c
 IN: compiler.cfg.builder.alien.boxing
 
@@ -121,7 +121,7 @@ M: long-long-type unbox-parameter unbox ;
 
 M: struct-c-type unbox-parameter
     dup value-struct? [ unbox ] [
-        [ nip heap-size cell f ^^local-allot dup ]
+        [ nip [ heap-size ] [ c-type-align cell max ] bi f ^^local-allot dup ]
         [ [ ^^unbox-any-c-ptr ] dip explode-struct keys ] 2bi
         implode-struct
         1array { { int-rep f f } }
