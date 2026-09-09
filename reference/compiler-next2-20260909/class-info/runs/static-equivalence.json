@@ -1,0 +1,4258 @@
+{
+  "scope_objects": 28500,
+  "scope_identical": true,
+  "static_reports_identical": true,
+  "baseline": [
+    {
+      "kind": "code",
+      "report": {
+        "input": "float-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 139,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 104,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 107,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 17,
+                "instructions": 144,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 136,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 17
+              },
+              {
+                "reloads": 17,
+                "instructions": 144,
+                "pass": "build-stack-frame",
+                "frame-bytes": 144,
+                "spill-bytes": 136,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 17
+              }
+            ],
+            "code-bytes": 1264
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "ffi-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 143,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 106,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 109,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 113,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 33,
+                "instructions": 180,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 280,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 34
+              },
+              {
+                "reloads": 33,
+                "instructions": 180,
+                "pass": "build-stack-frame",
+                "frame-bytes": 288,
+                "spill-bytes": 280,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 34
+              }
+            ],
+            "code-bytes": 1664
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "branch-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 193,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 114,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 117,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 120,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 120,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 150,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 150,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 31,
+                "instructions": 213,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 248,
+                "blocks": 10,
+                "copies": 0,
+                "spills": 31
+              },
+              {
+                "reloads": 31,
+                "instructions": 213,
+                "pass": "build-stack-frame",
+                "frame-bytes": 256,
+                "spill-bytes": 248,
+                "blocks": 10,
+                "copies": 0,
+                "spills": 31
+              }
+            ],
+            "code-bytes": 1888
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "integer-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 170,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 88,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 28,
+                "instructions": 146,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 224,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 28
+              },
+              {
+                "reloads": 28,
+                "instructions": 146,
+                "pass": "build-stack-frame",
+                "frame-bytes": 240,
+                "spill-bytes": 224,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 28
+              }
+            ],
+            "code-bytes": 672
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "simd-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 215,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 111,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 116,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 17,
+                "instructions": 153,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 272,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 17
+              },
+              {
+                "reloads": 17,
+                "instructions": 153,
+                "pass": "build-stack-frame",
+                "frame-bytes": 288,
+                "spill-bytes": 272,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 17
+              }
+            ],
+            "code-bytes": 1504
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "gc-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2946,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1697,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1697,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 223,
+                "instructions": 2239,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 1784,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 223
+              },
+              {
+                "reloads": 223,
+                "instructions": 2239,
+                "pass": "build-stack-frame",
+                "frame-bytes": 1792,
+                "spill-bytes": 1784,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 223
+              }
+            ],
+            "code-bytes": 11968
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "spectral-norm",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1019,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 125,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1019,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 125,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1066,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 143,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1026,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 554,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 589,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 610,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 610,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 622,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 622,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 20,
+                "instructions": 639,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 128,
+                "blocks": 151,
+                "copies": 1,
+                "spills": 20
+              },
+              {
+                "reloads": 20,
+                "instructions": 639,
+                "pass": "build-stack-frame",
+                "frame-bytes": 144,
+                "spill-bytes": 128,
+                "blocks": 151,
+                "copies": 1,
+                "spills": 20
+              }
+            ],
+            "code-bytes": 3104
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "nbody",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1423,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 258,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1423,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 258,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1424,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 259,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1330,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 792,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 836,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 842,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 806,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 208,
+                "copies": 6,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 806,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 0,
+                "blocks": 208,
+                "copies": 6,
+                "spills": 0
+              }
+            ],
+            "code-bytes": 2960
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "nbody",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1018,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 466,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 476,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 509,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 509,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 537,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 542,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 21,
+                "instructions": 595,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 248,
+                "blocks": 116,
+                "copies": 0,
+                "spills": 36
+              },
+              {
+                "reloads": 21,
+                "instructions": 595,
+                "pass": "build-stack-frame",
+                "frame-bytes": 256,
+                "spill-bytes": 248,
+                "blocks": 116,
+                "copies": 0,
+                "spills": 36
+              }
+            ],
+            "code-bytes": 4368
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "fannkuch",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1215,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 365,
+                "copies": 254,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1215,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 365,
+                "copies": 254,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1563,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 491,
+                "copies": 312,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1358,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 286,
+                "copies": 312,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 938,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 272,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 940,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 272,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 1,
+                "instructions": 937,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 8,
+                "blocks": 325,
+                "copies": 0,
+                "spills": 1
+              },
+              {
+                "reloads": 1,
+                "instructions": 937,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 8,
+                "blocks": 325,
+                "copies": 0,
+                "spills": 1
+              }
+            ],
+            "code-bytes": 3392
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "binary-trees",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1856,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 583,
+                "copies": 360,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1856,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 583,
+                "copies": 360,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2322,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 766,
+                "copies": 444,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2034,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 444,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1501,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1513,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 574,
+                "copies": 4,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1513,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 0,
+                "blocks": 574,
+                "copies": 4,
+                "spills": 0
+              }
+            ],
+            "code-bytes": 5344
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 263,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 92,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 225,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 704
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 263,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 92,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 225,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 704
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 363,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 130,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 312,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 944
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 363,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 130,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 312,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 944
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "struct-arrays-bench",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 382,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 184,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 215,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 224,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 221,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 241,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 16,
+                "instructions": 273,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 80,
+                "blocks": 44,
+                "copies": 3,
+                "spills": 15
+              },
+              {
+                "reloads": 16,
+                "instructions": 273,
+                "pass": "build-stack-frame",
+                "frame-bytes": 96,
+                "spill-bytes": 80,
+                "blocks": 44,
+                "copies": 3,
+                "spills": 15
+              }
+            ],
+            "code-bytes": 1584
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    }
+  ],
+  "candidate": [
+    {
+      "kind": "code",
+      "report": {
+        "input": "float-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 141,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 139,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 35,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 104,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 107,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 110,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 17,
+                "instructions": 144,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 136,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 17
+              },
+              {
+                "reloads": 17,
+                "instructions": 144,
+                "pass": "build-stack-frame",
+                "frame-bytes": 144,
+                "spill-bytes": 136,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 17
+              }
+            ],
+            "code-bytes": 1264
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "ffi-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 145,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 143,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 106,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 109,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 112,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 113,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 33,
+                "instructions": 180,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 280,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 34
+              },
+              {
+                "reloads": 33,
+                "instructions": 180,
+                "pass": "build-stack-frame",
+                "frame-bytes": 288,
+                "spill-bytes": 280,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 34
+              }
+            ],
+            "code-bytes": 1664
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "branch-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 195,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 193,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 78,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 114,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 117,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 6,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 120,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 120,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 150,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 150,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 31,
+                "instructions": 213,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 248,
+                "blocks": 10,
+                "copies": 0,
+                "spills": 31
+              },
+              {
+                "reloads": 31,
+                "instructions": 213,
+                "pass": "build-stack-frame",
+                "frame-bytes": 256,
+                "spill-bytes": 248,
+                "blocks": 10,
+                "copies": 0,
+                "spills": 31
+              }
+            ],
+            "code-bytes": 1888
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "integer-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 172,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 170,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 42,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 88,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 90,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 28,
+                "instructions": 146,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 224,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 28
+              },
+              {
+                "reloads": 28,
+                "instructions": 146,
+                "pass": "build-stack-frame",
+                "frame-bytes": 240,
+                "spill-bytes": 224,
+                "blocks": 3,
+                "copies": 0,
+                "spills": 28
+              }
+            ],
+            "code-bytes": 672
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "simd-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 218,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 8,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 215,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 38,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 111,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 116,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 5,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 119,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 17,
+                "instructions": 153,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 272,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 17
+              },
+              {
+                "reloads": 17,
+                "instructions": 153,
+                "pass": "build-stack-frame",
+                "frame-bytes": 288,
+                "spill-bytes": 272,
+                "blocks": 7,
+                "copies": 0,
+                "spills": 17
+              }
+            ],
+            "code-bytes": 1504
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "gc-pressure",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 3074,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 257,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2946,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 718,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1697,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1697,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 129,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1793,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 223,
+                "instructions": 2239,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 1784,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 223
+              },
+              {
+                "reloads": 223,
+                "instructions": 2239,
+                "pass": "build-stack-frame",
+                "frame-bytes": 1792,
+                "spill-bytes": 1784,
+                "blocks": 193,
+                "copies": 0,
+                "spills": 223
+              }
+            ],
+            "code-bytes": 11968
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "spectral-norm",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1019,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 125,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1019,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 125,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1066,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 143,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1026,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 393,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 554,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 589,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 103,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 610,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 610,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 622,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 622,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 117,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 20,
+                "instructions": 639,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 128,
+                "blocks": 151,
+                "copies": 1,
+                "spills": 20
+              },
+              {
+                "reloads": 20,
+                "instructions": 639,
+                "pass": "build-stack-frame",
+                "frame-bytes": 144,
+                "spill-bytes": 128,
+                "blocks": 151,
+                "copies": 1,
+                "spills": 20
+              }
+            ],
+            "code-bytes": 3104
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "nbody",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1423,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 258,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1423,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 258,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1424,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 259,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1330,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 499,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 792,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 836,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 165,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 842,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 832,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 169,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 806,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 208,
+                "copies": 6,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 806,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 0,
+                "blocks": 208,
+                "copies": 6,
+                "spills": 0
+              }
+            ],
+            "code-bytes": 2960
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "nbody",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1060,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 118,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1018,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 285,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 466,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 476,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 76,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 509,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 509,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 537,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 542,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 98,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 21,
+                "instructions": 595,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 248,
+                "blocks": 116,
+                "copies": 0,
+                "spills": 36
+              },
+              {
+                "reloads": 21,
+                "instructions": 595,
+                "pass": "build-stack-frame",
+                "frame-bytes": 256,
+                "spill-bytes": 248,
+                "blocks": 116,
+                "copies": 0,
+                "spills": 36
+              }
+            ],
+            "code-bytes": 4368
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "fannkuch",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1215,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 365,
+                "copies": 254,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1215,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 365,
+                "copies": 254,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1563,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 491,
+                "copies": 312,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1358,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 286,
+                "copies": 312,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 938,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 272,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 940,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 272,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 946,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 276,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 1,
+                "instructions": 937,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 8,
+                "blocks": 325,
+                "copies": 0,
+                "spills": 1
+              },
+              {
+                "reloads": 1,
+                "instructions": 937,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 8,
+                "blocks": 325,
+                "copies": 0,
+                "spills": 1
+              }
+            ],
+            "code-bytes": 3392
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "binary-trees",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 1856,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 583,
+                "copies": 360,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1856,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 583,
+                "copies": 360,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2322,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 766,
+                "copies": 444,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 2034,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 444,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1501,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1512,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 478,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1513,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 574,
+                "copies": 4,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 1513,
+                "pass": "build-stack-frame",
+                "frame-bytes": 16,
+                "spill-bytes": 0,
+                "blocks": 574,
+                "copies": 4,
+                "spills": 0
+              }
+            ],
+            "code-bytes": 5344
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 263,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 92,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 225,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 704
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 212,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 71,
+                "copies": 36,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 263,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 92,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 225,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 40,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 178,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 54,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 181,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 182,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 56,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 190,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 66,
+                "copies": 1,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 704
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 363,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 130,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 312,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 944
+          },
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 258,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 88,
+                "copies": 46,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 363,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 130,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 312,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 60,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 237,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 79,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 243,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 81,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              },
+              {
+                "reloads": 3,
+                "instructions": 254,
+                "pass": "build-stack-frame",
+                "frame-bytes": 32,
+                "spill-bytes": 24,
+                "blocks": 98,
+                "copies": 2,
+                "spills": 3
+              }
+            ],
+            "code-bytes": 944
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    },
+    {
+      "kind": "code",
+      "report": {
+        "input": "struct-arrays-bench",
+        "procedures": [
+          {
+            "allocation": {},
+            "passes": [
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "optimize-tail-calls",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "delete-useless-conditionals",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 402,
+                "pass": "split-branches",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 50,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 382,
+                "pass": "join-blocks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 84,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 184,
+                "pass": "optimize-ssa",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 215,
+                "pass": "select-representations",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 30,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 224,
+                "pass": "insert-gc-checks",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 221,
+                "pass": "eliminate-write-barriers",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 240,
+                "pass": "clear-uninitialized",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 0,
+                "instructions": 241,
+                "pass": "insert-save-contexts",
+                "frame-bytes": 0,
+                "spill-bytes": 0,
+                "blocks": 36,
+                "copies": 0,
+                "spills": 0
+              },
+              {
+                "reloads": 16,
+                "instructions": 273,
+                "pass": "allocate-registers",
+                "frame-bytes": 0,
+                "spill-bytes": 80,
+                "blocks": 44,
+                "copies": 3,
+                "spills": 15
+              },
+              {
+                "reloads": 16,
+                "instructions": 273,
+                "pass": "build-stack-frame",
+                "frame-bytes": 96,
+                "spill-bytes": 80,
+                "blocks": 44,
+                "copies": 3,
+                "spills": 15
+              }
+            ],
+            "code-bytes": 1584
+          }
+        ],
+        "allocator": "linear-scan-allocator"
+      }
+    }
+  ],
+  "baseline_checked_record_reused": false
+}

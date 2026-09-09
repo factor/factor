@@ -14,6 +14,7 @@ def fetch(root,names,out):
   else:f.write_bytes(b)
  return files
 labels=['baseline-1','candidate-1','candidate-2','baseline-2'];f=fetch('/home/erg/compiler-next2-'+a.case+'-20260909',[n+e for n in labels+['focused-unit'] for e in ['.jsonl','.log','.status.json']]+['queue.log','static-equivalence.json','run-'+a.case+'.py'],OUT/'runs')
+unit=json.loads(f['focused-unit.status.json']);assert unit['ok'] and unit['exit_code']==0
 rows={};scopes={};cost={}
 for n in labels:
  st=json.loads(f[n+'.status.json']);assert st['ok'] and st['exit_code']==0 and st['nice']==0 and st['command'][:3]==['taskset','-c','2'] and 'cap_perfmon=ep' in st['capability']
@@ -24,11 +25,12 @@ helper=':pressure-victims' if a.case=='residency' else ':<class-info>'
 selected=[w for w in scopes['baseline-1']['words'] if w.split('|')[0].endswith(helper)];assert len(selected)==1
 static=json.loads(f['static-equivalence.json']);assert static['static_reports_identical'] and static['scope_identical']
 for v,root in [('baseline',BASE),('candidate',CAND)]:
- fetch(root+'/'+REL,['source-expected.json','source-manifest.json'],OUT/v/'source')
+ mf=fetch(root+'/'+REL,['source-expected.json','source-manifest.json'],OUT/v/'source');assert json.loads(mf['source-manifest.json'])['all_match']
  checked='corrected-check-chordal-1' if v=='baseline' and a.case=='residency' else a.case+'-check-'+('chordal' if a.case=='residency' else 'linear-scan')+'-1'
  checkedf=fetch(root+'/'+REL,[checked+e for e in ['.log','.jsonl','.status.json']],OUT/v/'checked')
  st=json.loads(checkedf[checked+'.status.json']);assert st['ok'] and st['exit_code']==0
  cr=list(map(json.loads,checkedf[checked+'.jsonl'].splitlines()));assert len([r for r in cr if r['kind']=='runtime'])==26 and next(r for r in cr if r['kind']=='scope')['words']==scopes['baseline-1']['words']
+ cs=next(r for r in cr if r['kind']=='scope');assert cs['checked'] and cs['allocator']==('chordal' if a.case=='residency' else 'linear-scan') and cs['options']==scopes[v+'-1']['options'] and cs['source']==scopes[v+'-1']['source']
  fetch(root+'/'+NEXT,[a.case+'-compile-only.factor'],OUT/v/'scripts')
  if v=='candidate':fetch(root+'/'+NEXT,['prepare-'+a.case+'.factor',a.case+'-prepare.status.json',a.case+'-prepare.log',a.case+'-unit.factor'],OUT/v/'preparation')
 ratios={k:statistics.mean(cost[n][k] for n in ['candidate-1','candidate-2'])/statistics.mean(cost[n][k] for n in ['baseline-1','baseline-2']) for k in ['instructions','cpu_seconds','ns']}
