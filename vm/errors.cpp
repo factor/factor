@@ -16,10 +16,16 @@ void fatal_error(const char* msg, cell tagged) {
 
   factor_vm::fatal_erroring_p = true;
 
+  // Startup and worker-thread failures can happen before a VM is registered.
+  factor_vm* vm = current_vm_p();
+  if (!vm) {
+    fprintf(stderr, "fatal_error: %s: %p\n", msg, (void*)tagged);
+    ::_exit(1);
+  }
+
   std::cout << "fatal_error: " << msg;
   std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
-  factor_vm* vm = current_vm();
   if (vm->data) {
     vm->dump_memory_layout(std::cout);
   }
