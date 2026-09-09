@@ -1,0 +1,55 @@
+--- a/basis/compiler/cfg/register-allocation/backtracking/backtracking.factor
++++ b/basis/compiler/cfg/register-allocation/backtracking/backtracking.factor
+@@ -612,6 +612,8 @@
+         1 + t swap cold-definition-sites get set-at
+     ] each ;
+ 
++ERROR: unconsumed-backtracking-moves mappings ;
++
+ :: backtracking-allocation-with-registers ( cfg machine-regs -- )
+     t backtracking-phase-mode? set
+     f leader-map set
+@@ -635,9 +637,13 @@
+         intervals machine-regs check-allocated-intervals
+         intervals uses check-register-uses
+     ] when
++    cfg intervals check-phase-ssa-transports
+     intervals prepare-backtracking-moves
+-    cfg intervals assign-phase-ssa-registers
+-    cfg insert-backtracking-moves
++    backtracking-local-moves get clone phase-insn-prefixes [
++        cfg intervals assign-phase-ssa-registers
++        phase-insn-prefixes get dup assoc-empty?
++        [ drop ] [ unconsumed-backtracking-moves ] if
++    ] with-variable
+     cfg resolve-ssa-data-flow
+     cfg check-numbering ;
+ 
+--- a/basis/compiler/cfg/register-allocation/ssa/phases/phases.factor
++++ b/basis/compiler/cfg/register-allocation/ssa/phases/phases.factor
+@@ -79,6 +79,17 @@
+         ] when
+     ] each ;
+ 
++! Allocator parallel transitions execute after interval expiry/activation,
++! before any instruction-generated GC saves. Phi pseudo-instructions also
++! own transport points even though their machine instruction is omitted.
++SYMBOL: phase-insn-prefixes
++:: emit-phase-insn-prefix ( insn -- )
++    phase-insn-prefixes get [| prefixes |
++        insn insn#>> prefixes at [
++            % insn insn#>> prefixes delete-at
++        ] when*
++    ] when* ;
++
+ SYMBOL: phase-input-registers
+ 
+ : phase-input>register ( vreg -- reg/slot )
+@@ -88,6 +99,7 @@
+ 
+ :: assign-phase-insn ( insn -- )
+     insn insn#>> prepare-insn
++    insn emit-phase-insn-prefix
+     insn ##phi? [ ] [
+         insn phase-split-insn? [
+             H{ } clone :> inputs

@@ -1,0 +1,8 @@
+{
+  "accepted": true,
+  "checked_compilations": 4,
+  "native_round_trips": 400,
+  "features": "all four loop-spills/rematerialization combinations",
+  "source_manifest": "backtracking-gc-prefix-source.json",
+  "scope": "targeted IPv6 method only; full closure pending"
+}

@@ -1,0 +1,36 @@
+{
+  "source_commit": "cad423bf91+backtracking-prefix-v2",
+  "host_load_before": [
+    0.92626953125,
+    0.384765625,
+    0.7490234375
+  ],
+  "host_load_after": [
+    1.455078125,
+    0.580078125,
+    0.80224609375
+  ],
+  "final_value_verifier": true,
+  "exit_code": 1,
+  "seconds": 35.69206357002258,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-full-backtracking-gc-probe-20260908/factor",
+    "-resource-path=/home/erg/factor-allocator-full-backtracking-gc-probe-20260908",
+    "-i=/home/erg/factor-allocator-full-backtracking-gc-probe-20260908/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-full-backtracking-gc-probe-20260908/reference/allocator-speed-crossarch-20260908/checked-launch.factor",
+    "backtracking",
+    "check",
+    "3",
+    "on",
+    "on",
+    "cad423bf91+backtracking-prefix-v2"
+  ],
+  "ok": false,
+  "counts": {
+    "scope": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "base_source": "cad423bf91",
+  "state": "prefix committed3e38 plus working bounded spill-tail fix",
+  "files": {
+    "basis/compiler/cfg/register-allocation/backtracking/backtracking.factor": "285ac96314c7c1363b9d1264fd2df2b01e621490074786750a36040afa53d738",
+    "basis/compiler/cfg/register-allocation/ssa/phases/phases.factor": "6a1495ee443dc305431e5e0d75e0471747c10ad2e7396143e12a493c454e0714"
+  }
+}

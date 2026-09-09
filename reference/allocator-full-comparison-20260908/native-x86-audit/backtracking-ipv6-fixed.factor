@@ -1,0 +1,23 @@
+USING: parser vocabs.loader ;
+<< "compiler.cfg.register-allocation.ssa.phases" reload
+"compiler.cfg.register-allocation.backtracking" reload
+"compiler.cfg.register-allocation.verifier" require
+"compiler.cfg.register-allocation.verifier.rematerialization" require >>
+USING: arrays compiler compiler.units compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.rematerialization compiler.cfg.register-allocation.spill-sites
+compiler.cfg.value-numbering continuations generic io io.sockets io.sockets.private
+kernel namespaces prettyprint sequences ;
+IN: allocator-backtracking-ipv6-probe
+backtracking-allocator register-allocator set
+t check-allocation? set
+f global-value-numbering? set
+{ { f f } { f t } { t f } { t t } } [
+ dup "flags loop/remat=" write .
+ first2 rematerialize-constants? set backtracking-loop-spills? set
+ [ ipv6 \ make-sockaddr ?lookup-method 1array compile
+   100 [ T{ inet6 f "5:5:5:5:6:6:6:6" 0 12 } clone
+       [ dup make-sockaddr ] keep parse-sockaddr assert= ] times
+   "PASS (100 native address round trips)" print ]
+ [ "FAIL " write . ] recover
+] each
