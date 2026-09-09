@@ -593,7 +593,7 @@ IN: compiler.cfg.register-allocation.backtracking.tests
 ! The join simultaneously swaps two incoming registers on one edge, while
 ! another edge carries the first original value in memory. Delegating entry
 ! reloads must preserve the parallel sources and use each edge's own value.
-:: entry-edge-fixture ( optimize? -- graph snapshot target )
+:: (entry-edge-fixture) ( optimize? common-home? -- graph snapshot target )
     init-test-allocation drop
     t backtracking-phase-mode? set
     int-rep 3 set-rep-of
@@ -615,19 +615,33 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     1 int-rep assign-spill-slot :> home1
     2 int-rep assign-spill-slot :> home2
     target phase-block-from :> entry
-    left block-to right block-to min 1 + :> first-end
+    common-home? [ source block-to 1 + ] [ left block-to right block-to min 1 + ] if :> first-end
     1 <live-interval> 1 first-end 2array 1vector >>ranges bank first >>reg :> before1
-    2 <live-interval> 3 entry 1 - 2array 1vector >>ranges bank second >>reg :> before2
+    2 <live-interval> 3
+        common-home? [ first-end ] [ entry 1 - ] if
+        2array 1vector >>ranges bank second >>reg :> before2
     1 <live-interval> entry dup 2array 1vector >>ranges bank second >>reg
         home1 >>reload-from int-rep >>reload-rep :> after1
     2 <live-interval> entry entry 1 + 2array 1vector >>ranges bank first >>reg
         home2 >>reload-from int-rep >>reload-rep :> after2
     3 <live-interval> entry 1 + entry 2 + 2array 1vector >>ranges bank third >>reg :> result
     before1 before2 after1 after2 result 5 narray :> intervals
-    optimize? [ intervals reify-entry-transports ] when
-    graph intervals assign-phase-ssa-registers
+    optimize? [ intervals entry-transport-records ] [ f ] if :> records
+    graph intervals f records assign-phase-ssa-registers-recording
+    optimize? [ records reify-entry-transports ] when
     graph resolve-ssa-data-flow
     graph snapshot target ;
+
+: entry-edge-fixture ( optimize? -- graph snapshot target )
+    f (entry-edge-fixture) ;
+
+{ t t t } [ [ [let
+    t t (entry-edge-fixture) :> ( graph snapshot target )
+    graph snapshot check-value-flow
+    backtracking-edge-entry-reloads get zero?
+    target instructions>> [ ##reload? ] count 2 =
+    target predecessors>> length 2 =
+] ] with-scope ] unit-test
 
 { t t } [ [ [let
     t entry-edge-fixture :> ( graph snapshot target )
@@ -688,4 +702,58 @@ IN: compiler.cfg.register-allocation.backtracking.tests
             n word execute( x -- y ) n 0 validation-cycle-result =
         ] all?
     ] all?
+] ] with-scope ] unit-test
+
+! Actual edge maps, not interval hulls, decide whether one common successor
+! reload should remain. A structurally equal later reload is a different
+! instruction and must survive delegation of the recorded entry transport.
+:: recorded-entry-case ( sources -- target entry later )
+    init-test-allocation drop
+    H{ } clone machine-live-ins set
+    H{ } clone machine-live-outs set
+    H{ } clone backtracking-point-blocks set
+    machine-registers int-regs swap at first :> reg
+    0 <spill-slot> :> home
+    1 <live-interval> { 10 12 } 1vector >>ranges reg >>reg
+        home >>reload-from int-rep >>reload-rep :> interval
+    ##reload new reg >>dst home >>src int-rep >>rep :> entry
+    entry clone :> later
+    entry later 2array >vector 9 insns>block :> target
+    sources [| source i |
+        V{ T{ ##branch } } clone i insns>block :> predecessor
+        predecessor target connect-bbs
+        H{ } clone :> outgoing
+        source 1 outgoing set-at
+        outgoing predecessor machine-live-outs get set-at
+    ] each-index
+    H{ { 1 f } } clone :> incoming
+    home 1 incoming set-at
+    incoming target machine-live-ins get set-at
+    target 10 backtracking-point-blocks get set-at
+    IH{ } clone :> records
+    entry 1vector interval records set-at
+    records reify-entry-transports
+    target entry later ;
+
+{ t t t } [ [ [let
+    0 <spill-slot> 0 <spill-slot> 2array recorded-entry-case
+        :> ( target entry later )
+    target instructions>> first entry eq?
+    target instructions>> last later eq?
+    backtracking-edge-entry-reloads get zero?
+] ] with-scope ] unit-test
+
+{ t t t } [ [ [let
+    0 <spill-slot> 8 <spill-slot> 2array recorded-entry-case
+        :> ( target entry later )
+    target instructions>> length 1 =
+    target instructions>> first later eq?
+    backtracking-edge-entry-reloads get 1 =
+] ] with-scope ] unit-test
+
+{ t t } [ [ [let
+    0 <spill-slot> machine-registers int-regs swap at first 2array
+        recorded-entry-case :> ( target entry later )
+    target instructions>> first later eq?
+    target machine-live-in 1 swap at later dst>> =
 ] ] with-scope ] unit-test

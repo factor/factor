@@ -81,6 +81,15 @@ mapping. This avoids an edge store followed by a successor reload; it neither
 assumes the spill home is initialized nor equates spillset members. The
 fragment's outgoing store remains intact. Phi, GC, and ABI entry instructions,
 blocks with kill predecessors, and values absent from the original live-in set
-retain their explicit reload. `edge-entry-reloads` counts the delegated
+retain their explicit reload. Assignment records the exact generated entry
+reload objects and leaves them in place until all actual outgoing maps are
+available. If every predecessor already carries the same source spill home,
+the shared successor reload remains; delegating it would only duplicate
+reloads onto edges. Otherwise only the recorded objects are removed by identity
+and the incoming map is changed to the allocated register before ordinary
+parallel resolution. Source, destination, representation and incoming-home
+checks guard this rewrite. The recorder is an explicit optional argument, so
+other allocators retain their original activation path without observer state.
+`edge-entry-reloads` counts the delegated
 transports. Tests exercise a simultaneous register swap and a mixed register /
 memory incoming edge, and reject deleting their required edge copies.

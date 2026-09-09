@@ -138,26 +138,43 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
         ] with-variable
     ] if ;
 
-:: assign-phase-ssa-block ( bb -- )
+! Optional identity-keyed recording lets an allocator decide entry transport
+! after actual outgoing locations are known. It records only instructions
+! emitted by activation, never instruction prefixes or GC saves. Passing the
+! table explicitly avoids persistent observer state across compilations.
+:: activate-recorded-entry ( interval records -- )
+    interval records key? [
+        [ interval activate-interval ] V{ } make
+        dup interval records set-at %
+    ] [ interval activate-interval ] if ;
+
+:: assign-phase-ssa-block-recording ( bb records -- )
     bb expire-at-block-entry
     bb basic-block namespaces:set
     bb [ [
         bb phase-block-from :> entry
         entry unhandled-intervals get [ = ] with heap-pop-while :> entering
         entering [ reload-from>> ] filter :> reloads
-        entering [ activate-interval ] each
+        records [ entering [ records activate-recorded-entry ] each ]
+        [ entering [ activate-interval ] each ] if
         bb reloads record-phase-entry-locations
         [ assign-phase-insn ] each
     ] V{ } make ] change-instructions
     compute-ssa-live-out ;
 
-:: assign-phase-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
+: assign-phase-ssa-block ( bb -- )
+    f assign-phase-ssa-block-recording ;
+
+:: assign-phase-ssa-registers-recording ( cfg intervals fixed-locations records -- )
     cfg intervals check-phase-ssa-transports
     intervals init-assignment
     fixed-locations seed-ssa-fixed-locations
     H{ } clone phi-locations namespaces:set
     cfg linearization-order [ kill-block?>> ] reject
-    [ assign-phase-ssa-block ] each ;
+    [ records assign-phase-ssa-block-recording ] each ;
+
+: assign-phase-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
+    f assign-phase-ssa-registers-recording ;
 
 : assign-phase-ssa-registers ( cfg intervals -- )
     f assign-phase-ssa-registers-with-locations ;

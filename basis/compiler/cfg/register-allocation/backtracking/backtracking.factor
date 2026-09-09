@@ -694,19 +694,48 @@ ERROR: unconsumed-backtracking-moves mappings ;
         interval vreg>> bb live-in key? and
     ] [ f ] if ;
 
-:: reify-entry-transports ( intervals -- )
-    ! Publish the assigned register as the incoming destination and let SSA
-    ! edge resolution supply each predecessor's actual original value. This
-    ! avoids register -> slot -> register round trips at ordinary entries.
-    ! Kill predecessors require the explicit successor reload (no edge map),
-    ! and ABI/GC/phi entries remain on their existing transport path.
+:: entry-transport-records ( intervals -- records )
+    intervals [ edge-entry-reload? ] filter
+    [ f ] IH{ } map>assoc ;
+
+ERROR: invalid-recorded-entry-reload interval instructions incoming ;
+
+:: check-recorded-entry-reload ( interval instructions incoming -- )
+    instructions length 1 = [
+        instructions first :> insn
+        insn ##reload? [
+            insn src>> interval reload-from>> =
+            insn dst>> interval reg>> = and
+            insn rep>> interval reload-rep>> = and
+            interval vreg>> incoming at interval reload-from>> = and
+        ] [ f ] if
+    ] [ f ] if
+    [ ] [ interval instructions incoming invalid-recorded-entry-reload ] if ;
+
+:: common-entry-home? ( interval bb -- ? )
+    bb predecessors>> [| predecessor |
+        interval vreg>> predecessor machine-live-out at
+        interval reload-from>> =
+    ] all? ;
+
+:: reify-entry-transports ( records -- )
+    ! Decide from the actual post-assignment edge maps. When every incoming
+    ! value already occupies the reload home, keep one shared successor load
+    ! rather than duplicating it onto edges. Mixed locations still benefit
+    ! from direct parallel edge transport instead of a memory round trip.
     0 backtracking-edge-entry-reloads set
-    intervals [| interval |
-        interval edge-entry-reload? [
+    records [| interval instructions |
+        interval live-interval-start backtracking-point-blocks get at :> bb
+        bb machine-live-in :> incoming
+        interval instructions incoming check-recorded-entry-reload
+        interval bb common-entry-home? [ ] [
+            bb [ [| insn | instructions [ insn eq? ] any? not ] filter ]
+                change-instructions drop
+            interval reg>> interval vreg>> incoming set-at
             interval f >>reload-from drop
             backtracking-edge-entry-reloads inc
-        ] when
-    ] each ;
+        ] if
+    ] assoc-each ;
 
 :: assign-backtracking-registers ( cfg intervals -- )
     ! Assignment publishes phi/edge locations in this namespace. A dynamic
@@ -714,7 +743,9 @@ ERROR: unconsumed-backtracking-moves mappings ;
     phase-insn-prefixes get :> previous
     backtracking-local-moves get clone phase-insn-prefixes set
     [
-        cfg intervals assign-phase-ssa-registers
+        intervals entry-transport-records :> records
+        cfg intervals f records assign-phase-ssa-registers-recording
+        records reify-entry-transports
         phase-insn-prefixes get dup assoc-empty?
         [ drop ] [ unconsumed-backtracking-moves ] if
     ] [ previous phase-insn-prefixes set ] finally ;
@@ -743,7 +774,6 @@ ERROR: unconsumed-backtracking-moves mappings ;
         intervals uses check-register-uses
     ] when
     cfg intervals check-phase-ssa-transports
-    intervals reify-entry-transports
     intervals prepare-backtracking-moves
     cfg intervals assign-backtracking-registers
     cfg resolve-ssa-data-flow
