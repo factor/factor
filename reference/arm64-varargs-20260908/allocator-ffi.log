@@ -1225,6 +1225,85 @@ Unit Test: {
         library-dll dlsym indirect-varout-mixed
     ]
 }
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
 resource:basis/compiler/tests/alien-varargs-promotions.factor
 Unit Test: {
     { { 1 0 -1 255 65535 -7 65530 } }
@@ -1513,6 +1592,49 @@ Unit Test: {
         [
             [ swap a>> [ a>> sum ] [ b>> sum ] bi + + + ]
             au-vector-typed-cb au-call-vector-typed
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_small_controls ] }
+Unit Test: { { 11.25 } [ au-small <struct> 1.25 >>a 10.0 au_take_small ] }
+Unit Test: { { 12.5 } [ au-bsmall <struct> 2.5 >>a 10.0 au_take_bsmall ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_small a>> ] }
+Unit Test: { { 2.5 } [ 2.5 au_return_bsmall a>> ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-small <struct> 1.25 >>a au-bsmall <struct> 2.5 >>a
+        au-small-pair boa 10.0 au_take_small_pair
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap small-pair-value + ] au-small-pair-cb
+            au_call_small_pair
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-small-pair va-arg
+                small-pair-value 0 get-local double va-arg +
+                -1 get-local + 2 drop-locals
+            ] au-small-dynamic-cb au_call_small_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap small-pair-value + + ] au-small-typed-cb
+            au-call-small-typed
         ] compile-call
     ]
 }
@@ -2743,6 +2865,85 @@ Unit Test: {
         library-dll dlsym indirect-varout-mixed
     ]
 }
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
 resource:basis/compiler/tests/alien-varargs-promotions.factor
 Unit Test: {
     { { 1 0 -1 255 65535 -7 65530 } }
@@ -3031,6 +3232,49 @@ Unit Test: {
         [
             [ swap a>> [ a>> sum ] [ b>> sum ] bi + + + ]
             au-vector-typed-cb au-call-vector-typed
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_small_controls ] }
+Unit Test: { { 11.25 } [ au-small <struct> 1.25 >>a 10.0 au_take_small ] }
+Unit Test: { { 12.5 } [ au-bsmall <struct> 2.5 >>a 10.0 au_take_bsmall ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_small a>> ] }
+Unit Test: { { 2.5 } [ 2.5 au_return_bsmall a>> ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-small <struct> 1.25 >>a au-bsmall <struct> 2.5 >>a
+        au-small-pair boa 10.0 au_take_small_pair
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap small-pair-value + ] au-small-pair-cb
+            au_call_small_pair
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-small-pair va-arg
+                small-pair-value 0 get-local double va-arg +
+                -1 get-local + 2 drop-locals
+            ] au-small-dynamic-cb au_call_small_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap small-pair-value + + ] au-small-typed-cb
+            au-call-small-typed
         ] compile-call
     ]
 }
@@ -4261,6 +4505,85 @@ Unit Test: {
         library-dll dlsym indirect-varout-mixed
     ]
 }
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
 resource:basis/compiler/tests/alien-varargs-promotions.factor
 Unit Test: {
     { { 1 0 -1 255 65535 -7 65530 } }
@@ -4549,6 +4872,49 @@ Unit Test: {
         [
             [ swap a>> [ a>> sum ] [ b>> sum ] bi + + + ]
             au-vector-typed-cb au-call-vector-typed
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_small_controls ] }
+Unit Test: { { 11.25 } [ au-small <struct> 1.25 >>a 10.0 au_take_small ] }
+Unit Test: { { 12.5 } [ au-bsmall <struct> 2.5 >>a 10.0 au_take_bsmall ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_small a>> ] }
+Unit Test: { { 2.5 } [ 2.5 au_return_bsmall a>> ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-small <struct> 1.25 >>a au-bsmall <struct> 2.5 >>a
+        au-small-pair boa 10.0 au_take_small_pair
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap small-pair-value + ] au-small-pair-cb
+            au_call_small_pair
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-small-pair va-arg
+                small-pair-value 0 get-local double va-arg +
+                -1 get-local + 2 drop-locals
+            ] au-small-dynamic-cb au_call_small_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap small-pair-value + + ] au-small-typed-cb
+            au-call-small-typed
         ] compile-call
     ]
 }
@@ -5779,6 +6145,85 @@ Unit Test: {
         library-dll dlsym indirect-varout-mixed
     ]
 }
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
 resource:basis/compiler/tests/alien-varargs-promotions.factor
 Unit Test: {
     { { 1 0 -1 255 65535 -7 65530 } }
@@ -6067,6 +6512,49 @@ Unit Test: {
         [
             [ swap a>> [ a>> sum ] [ b>> sum ] bi + + + ]
             au-vector-typed-cb au-call-vector-typed
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_small_controls ] }
+Unit Test: { { 11.25 } [ au-small <struct> 1.25 >>a 10.0 au_take_small ] }
+Unit Test: { { 12.5 } [ au-bsmall <struct> 2.5 >>a 10.0 au_take_bsmall ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_small a>> ] }
+Unit Test: { { 2.5 } [ 2.5 au_return_bsmall a>> ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-small <struct> 1.25 >>a au-bsmall <struct> 2.5 >>a
+        au-small-pair boa 10.0 au_take_small_pair
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap small-pair-value + ] au-small-pair-cb
+            au_call_small_pair
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-small-pair va-arg
+                small-pair-value 0 get-local double va-arg +
+                -1 get-local + 2 drop-locals
+            ] au-small-dynamic-cb au_call_small_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap small-pair-value + + ] au-small-typed-cb
+            au-call-small-typed
         ] compile-call
     ]
 }

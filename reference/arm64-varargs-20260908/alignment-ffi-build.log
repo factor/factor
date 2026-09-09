@@ -1,0 +1,10 @@
+/opt/homebrew/opt/llvm/bin/clang -c -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/master-candidate-362b54ef29cd5ca1c88c526e72f640fb70108e57"  -O3  -std=c99 -o build-varargs/ffi_test.o vm/ffi_test.c
+In file included from vm/ffi_test.c:431:
+vm/ffi_test_varargs_outgoing.c:114:66: warning: '_Alignof' is a C11 extension [-Wc11-extensions]
+  114 | FACTOR_EXPORT uintptr_t varout_vector_first_align(void) { return _Alignof(struct varout_vector_first); }
+      |                                                                  ^
+vm/ffi_test_varargs_outgoing.c:115:66: warning: '_Alignof' is a C11 extension [-Wc11-extensions]
+  115 | FACTOR_EXPORT uintptr_t varout_vector_union_align(void) { return _Alignof(union varout_vector_union); }
+      |                                                                  ^
+2 warnings generated.
+/opt/homebrew/opt/llvm/bin/clang -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/master-candidate-362b54ef29cd5ca1c88c526e72f640fb70108e57"  -O3  -dynamiclib -o libfactor-ffi-test.dylib build-varargs/ffi_test.o

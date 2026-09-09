@@ -322,37 +322,6 @@ Unit Test: {
         ] with-va-memory
     ]
 }
-Unit Test: {
-    { 6 "7/2.50" 6 "7/2.50" 7 }
-    [
-        [
-            load-local 7 0 get-local 0 set-alien-signed-4
-            2.5 0 get-local 64 set-alien-double
-            7 0 get-local 256 set-alien-signed-4
-            2.5 0 get-local 264 set-alien-double
-            0 get-local os cursor-at load-local
-            32 <byte-array> load-local
-            0 get-local 32 "%d/%.2f" -1 get-local
-            va-test-vsnprintf 0 get-local utf8 alien>string
-            0 get-local 32 "%d/%.2f" -1 get-local
-            va-test-vsnprintf 0 get-local utf8 alien>string
-            -1 get-local int va-arg 3 drop-locals
-        ] with-va-memory
-    ]
-}
-Unit Test: {
-    { 7 7 }
-    [
-        [
-            load-local 7 0 get-local 0 set-alien-signed-4
-            7 0 get-local 256 set-alien-signed-4
-            0 get-local os cursor-at load-local
-            0 get-local cursor>native-va-list
-            native-va-list>cursor int va-arg 0 get-local int
-            va-arg 2 drop-locals
-        ] with-va-memory
-    ]
-}
 Testing cpu.arm.64
 Unit Test: {
     { int-4{ 5 6 7 8 } }
@@ -31079,7 +31048,7 @@ Unit Test: {
 Unit Test: {
     [ { } ]
     [
-        { { 11 8 0 11 5 13 1 2 2 7 0 14 7 0 13 9 } }
+        { { 4 6 3 12 1 11 15 9 5 15 9 2 0 4 3 8 } }
         [
             [
                 \ char-16
@@ -31099,7 +31068,7 @@ Unit Test: {
 Unit Test: {
     [ { } ]
     [
-        { { 11 15 10 13 14 8 6 1 4 4 12 6 10 3 0 10 } }
+        { { 12 4 11 7 9 8 15 5 6 4 10 3 4 15 10 3 } }
         [
             [
                 \ uchar-16
@@ -31339,7 +31308,7 @@ Unit Test: {
 Unit Test: {
     [ { } ]
     [
-        { { 29 10 8 8 18 16 23 27 0 9 6 9 26 20 3 9 } }
+        { { 9 24 0 21 14 24 27 24 12 4 23 0 28 13 29 8 } }
         [
             [
                 \ char-16
@@ -31360,7 +31329,7 @@ Unit Test: {
 Unit Test: {
     [ { } ]
     [
-        { { 16 25 2 1 22 1 12 7 1 19 18 11 5 20 30 22 } }
+        { { 15 24 12 27 17 10 21 1 19 26 8 23 16 1 13 23 } }
         [
             [
                 \ uchar-16
@@ -34888,6 +34857,85 @@ Unit Test: {
     [
         1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing"
         library-dll dlsym indirect-varout-mixed
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
     ]
 }
 Testing resource:basis/compiler/tests/alien-varargs-promotions.factor

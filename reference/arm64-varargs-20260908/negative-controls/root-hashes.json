@@ -1,0 +1,22 @@
+{
+  "libfactor-ffi-test.dylib": {
+    "before": "97e5170cb1ca50158e5cce1e3ea89364fdb52a5bfe4cc1a6e0cf6544598cd8b5",
+    "after": "97e5170cb1ca50158e5cce1e3ea89364fdb52a5bfe4cc1a6e0cf6544598cd8b5"
+  },
+  "vm/ffi_test.c": {
+    "before": "5cd572d363edbf973b4483d9454911316c55247bbdfd0740472b95b8b09f0f04",
+    "after": "5cd572d363edbf973b4483d9454911316c55247bbdfd0740472b95b8b09f0f04"
+  },
+  "vm/ffi_test_varargs.c": {
+    "before": "f5eb0bc727660dcbc011786cc9da7179ca866676ff98ca8d5a3976afd6b32117",
+    "after": "f5eb0bc727660dcbc011786cc9da7179ca866676ff98ca8d5a3976afd6b32117"
+  },
+  "basis/compiler/tests/alien-varargs.factor": {
+    "before": "7ad63f4c2e28098263c5df7ccce69010f4ea3bb3ae554fce263bc32a99af6235",
+    "after": "7ad63f4c2e28098263c5df7ccce69010f4ea3bb3ae554fce263bc32a99af6235"
+  },
+  "basis/compiler/tests/varargs/printf.factor": {
+    "before": "b50429729493f9b8e22406332fda73a2f4542f4a360239175d65a81dd307e3a0",
+    "after": "b50429729493f9b8e22406332fda73a2f4542f4a360239175d65a81dd307e3a0"
+  }
+}
