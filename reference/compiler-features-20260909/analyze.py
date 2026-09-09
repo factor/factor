@@ -76,6 +76,7 @@ def comparison(candidate, baseline):
                            per_case=per_case))
     return dict(rounds=rounds,
                 compile={m: statistics.mean(r['compile'][m] for r in rounds) for m in metrics},
+                compile_geomean={m: geomean(r['compile'][m] for r in rounds) for m in metrics},
                 runtime_geomean={m: geomean(r['runtime_geomean'][m] for r in rounds) for m in metrics},
                 per_case={w: {m: geomean(r['per_case'][w][m] for r in rounds) for m in metrics} for w in outputs})
 
