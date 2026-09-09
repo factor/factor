@@ -366,7 +366,16 @@ ERROR: uncolorable-spill-result vertex neighbors capacity ;
     representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
     available registers namespaces:set
     cfg compute-ssa-live-sets-preserving-gc
-    cfg number-instructions
+    ! Recipe discovery and its counters belong to source spilling. Number
+    ! the rewritten instructions without replacing that provenance/state.
+    cfg linearization-order
+    0 [ instructions>> [ number-instruction ] each ] reduce drop
+    chordal-witness? get [
+        available [ length ] assoc-map "register-capacities" statistics set-at
+        cfg cfg>insns [ ##spill? ] count "source-stores-before-color" statistics set-at
+        cfg cfg>insns [ ##reload? ] count "source-reloads-before-color" statistics set-at
+        fixed assoc-size "fixed-memory-values" statistics set-at
+    ] when
     cfg fixed compute-phase-ssa-intervals-with-locations
     [ live-interval-state? ] filter :> intervals
     intervals cfg available assign-certified-colors
