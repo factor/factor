@@ -28,7 +28,15 @@ struct au_quad { float a, b, c, d; };
 union au_four { struct au_quad quad; float a; };
 struct au_nested { union au_one first; float second; };
 union au_mixed { float a; double b; };
+#ifdef _MSC_VER
+#pragma warning(push)
+/* Padding is intentional: this fixture tests an aligned, non-homogeneous aggregate. */
+#pragma warning(disable: 4324)
+#endif
 struct au_padded { float a; UNION_ALIGN(8) float b; };
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 union au_padded_union { struct au_padded padded; float a[4]; };
 
 UNION_EXPORT UNION_NOINLINE double au_take_one(union au_one v, double tail) { return v.a + tail; }

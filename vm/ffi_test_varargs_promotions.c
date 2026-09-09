@@ -40,7 +40,10 @@ FACTOR_EXPORT int vap_control_integer(int which) {
   switch (which) {
     case 0: return vap_read_integer(0, (bool)true);
     case 1: return vap_read_integer(0, (bool)false);
-    case 2: return vap_read_integer(0, (signed char)255);
+    case 2: {
+      int source = 255;
+      return vap_read_integer(0, (signed char)source);
+    }
     case 3: return vap_read_integer(0, (unsigned char)-1);
     case 4: return vap_read_integer(0, (unsigned short)-1);
     case 5: return vap_read_integer(0, (enum vap_signed_enum)vap_negative);

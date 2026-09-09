@@ -14,7 +14,7 @@ template <typename Type> struct tagged {
   cell type() const { return TAG(value_); }
 
   bool type_p() const {
-    if (Type::type_number == TYPE_COUNT)
+    if constexpr (Type::type_number == TYPE_COUNT)
       return true;
     return type() == Type::type_number;
   }

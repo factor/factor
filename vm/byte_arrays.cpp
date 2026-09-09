@@ -30,9 +30,9 @@ void factor_vm::primitive_resize_byte_array() {
 }
 
 // Allocates memory
-void growable_byte_array::reallot_array(cell count) {
+void growable_byte_array::reallot_array(cell capacity) {
   byte_array *ba_old = elements.untagged();
-  byte_array *ba_new = elements.parent->reallot_array(ba_old, count);
+  byte_array *ba_new = elements.parent->reallot_array(ba_old, capacity);
   elements.set_untagged(ba_new);
 }
 

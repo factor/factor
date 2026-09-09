@@ -105,8 +105,8 @@ context* factor_vm::new_context() {
 }
 
 // Allocates memory
-void factor_vm::init_context(context* ctx) {
-  ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)ctx);
+void factor_vm::init_context(context* new_ctx) {
+  new_ctx->context_objects[OBJ_CONTEXT] = allot_alien((cell)new_ctx);
 }
 
 // Allocates memory (init_context(), but not parent->new_context()
@@ -206,9 +206,9 @@ cell factor_vm::stack_to_array(cell bottom, cell top, vm_error_type error) {
 }
 
 // Allocates memory
-cell factor_vm::datastack_to_array(context* ctx) {
-  return stack_to_array(ctx->datastack_seg->start,
-                        ctx->datastack,
+cell factor_vm::datastack_to_array(context* stack_ctx) {
+  return stack_to_array(stack_ctx->datastack_seg->start,
+                        stack_ctx->datastack,
                         ERROR_DATASTACK_UNDERFLOW);
 }
 
@@ -221,9 +221,9 @@ void factor_vm::primitive_datastack_for() {
 }
 
 // Allocates memory
-cell factor_vm::retainstack_to_array(context* ctx) {
-  return stack_to_array(ctx->retainstack_seg->start,
-                        ctx->retainstack,
+cell factor_vm::retainstack_to_array(context* stack_ctx) {
+  return stack_to_array(stack_ctx->retainstack_seg->start,
+                        stack_ctx->retainstack,
                         ERROR_RETAINSTACK_UNDERFLOW);
 }
 
