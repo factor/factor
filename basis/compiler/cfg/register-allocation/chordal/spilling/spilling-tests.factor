@@ -21,7 +21,7 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
         T{ ##return }
     } clone insns>cfg ;
 
-{ t t t } [ [let
+{ t t t t } [ [let
     f rematerialize-constants? namespaces:set
     H{ { 1 int-rep } { 2 int-rep } { 3 int-rep }
         { 4 int-rep } { 5 int-rep } } clone representations namespaces:set
@@ -32,6 +32,7 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
         instructions [ ##spill? ] any?
         instructions [ ##reload? ] filter [ dst>> 10 >= ] all?
         fixed values [ spill-slot? ] all?
+        instructions [ ##add? ] filter last src2>> 10 >=
     ] with-cfg
 ] ] unit-test
 

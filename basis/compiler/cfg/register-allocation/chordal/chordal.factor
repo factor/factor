@@ -2,8 +2,6 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs compiler.cfg compiler.cfg.def-use
 compiler.cfg.instructions compiler.cfg.linear-scan
-compiler.cfg.linear-scan.allocation
-compiler.cfg.linear-scan.allocation.spilling
 compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
@@ -11,11 +9,15 @@ compiler.cfg.linear-scan.resolve compiler.cfg.linearization
 compiler.cfg.liveness compiler.cfg.predecessors
 compiler.cfg.parallel-copy
 compiler.cfg.register-allocation compiler.cfg.register-allocation.chordal.bases
+compiler.cfg.register-allocation.chordal.spilling
 compiler.cfg.register-allocation.rematerialization
 compiler.cfg.register-allocation.ssa
+compiler.cfg.register-allocation.ssa.liveness
+compiler.cfg.register-allocation.ssa.phases
+compiler.cfg.loop-detection
 compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities compiler.utilities
-cpu.architecture heaps kernel locals make math namespaces sequences
+cpu.architecture heaps kernel locals make math math.functions math.order namespaces sequences
 sets sorting ;
 IN: compiler.cfg.register-allocation.chordal
 
@@ -223,79 +225,123 @@ SINGLETON: chordal-allocator
     ] each-index
     graph ;
 
-SYMBOLS: graph-colors chordal-statistics ;
+SYMBOLS: graph-colors chordal-statistics chordal-witness? ;
+
+ERROR: non-chordal-spill-result graph order ;
+ERROR: uncolorable-spill-result vertex neighbors capacity ;
+
+:: add-weighted-affinity ( a b weight graph affinities -- )
+    a b = a graph key? not or b graph key? not or [ ] [
+        a rep-of reg-class-of b rep-of reg-class-of = [
+            a affinities at b swap [ 0 or weight + ] change-at
+            b affinities at a swap [ 0 or weight + ] change-at
+        ] when
+    ] if ;
+
+:: weighted-ssa-affinities ( cfg graph -- affinities )
+    graph keys [ H{ } clone ] H{ } map>assoc :> affinities
+    cfg needs-loops
+    cfg [| bb |
+        8 bb loop-nesting-at 3 min ^ :> weight
+        bb instructions>> [| insn |
+            insn ##phi? [
+                insn inputs>> values [| source |
+                    insn dst>> source weight graph affinities add-weighted-affinity
+                ] each
+            ] [
+                insn ##copy? insn ##tagged>integer? or [
+                    insn dst>> insn src>> weight graph affinities add-weighted-affinity
+                ] [
+                    ! The portable first-input phase permits result reuse.
+                    ! Favor it weakly: x86 two-operand emission can then omit
+                    ! its preparatory copy, while explicit phi/copy choices
+                    ! retain greater preference weight.
+                    insn phase-split-insn? insn def-is-use-insn? not and
+                    insn defs-vregs length 1 = and
+                    insn uses-vregs empty? not and [
+                        insn defs-vregs first insn uses-vregs first
+                        weight 8 / graph affinities add-weighted-affinity
+                    ] when
+                ] if
+            ] if
+        ] each
+    ] each-basic-block
+    affinities ;
+
+! Chunks share preferences, never interference representatives. Even when
+! two members conflict, their graph edge remains present and authoritative.
+:: affinity-chunks ( affinities -- chunks )
+    H{ } clone :> chunks
+    affinities keys [| root |
+        root chunks key? [ ] [
+            V{ root } clone :> pending
+            V{ } clone :> chunk
+            [ pending empty? not ] [
+                pending pop :> vertex
+                vertex chunks key? [ ] [
+                    chunk vertex chunks set-at
+                    vertex chunk push
+                    vertex affinities at keys pending push-all
+                ] if
+            ] while
+        ] if
+    ] each
+    chunks ;
+
+:: preference-guided-colors ( graph order affinities available -- colors )
+    H{ } clone :> colors
+    graph keys [ H{ } clone ] H{ } map>assoc :> preferences
+    affinities affinity-chunks :> chunks
+    chunks values [ first ] map members
+    [ H{ } clone ] H{ } map>assoc :> chunk-preferences
+    order [| vertex |
+        vertex chunks at first chunk-preferences at :> shared
+        vertex graph at [ colors at ] map sift :> occupied
+        vertex rep-of reg-class-of available at length :> capacity
+        capacity <iota> [ occupied member? not ] filter :> free
+        free empty? [ vertex occupied capacity uncolorable-spill-result ] when
+        free [| color |
+            color vertex preferences at at 0 or
+            color shared at 0 or + neg color 2array
+        ] sort-by first :> chosen
+        chosen vertex colors set-at
+        chosen shared inc-at
+        vertex affinities at [| partner weight |
+            chosen partner preferences at [ 0 or weight 8 * + ] change-at
+        ] assoc-each
+    ] each
+    colors ;
+
+:: assign-certified-colors ( intervals cfg available -- )
+    intervals interference-graph :> graph
+    graph maximum-cardinality-order :> order
+    graph order perfect-order? [ ] [ graph order non-chordal-spill-result ] if
+    cfg graph weighted-ssa-affinities :> weighted
+    graph order weighted available preference-guided-colors :> colors
+    colors graph-colors namespaces:set
+    intervals [| interval |
+        interval vreg>> colors at
+        interval interval-reg-class available at nth interval reg<<
+    ] each
+    "decoupled-ssa-chordal" "algorithm" chordal-statistics get set-at
+    0 "fallback-count" chordal-statistics get set-at
+    0 "repair-assignments" chordal-statistics get set-at
+    intervals length "color-assignments" chordal-statistics get set-at
+    t "post-spill-chordal?" chordal-statistics get set-at
+    t "chordal?" chordal-statistics get set-at
+    graph assoc-size "vertices" chordal-statistics get set-at
+    graph values [ length ] map-sum 2 / "edges" chordal-statistics get set-at
+    chordal-witness? get [
+        order reverse "perfect-elimination-order" chordal-statistics get set-at
+        colors "colors" chordal-statistics get set-at
+        graph "interference-graph" chordal-statistics get set-at
+    ] when ;
 
 :: affinity-misses ( affinities colors -- n )
     affinities >alist [| pair |
         pair first colors at :> color
         pair second [ colors at color = not ] count
     ] map-sum 2 / ;
-
-:: color-ssa-intervals ( intervals cfg -- )
-    intervals interference-graph :> graph
-    graph maximum-cardinality-order :> order
-    cfg cfg-affinities :> affinities
-    graph order affinities affinity-colors :> colors
-    affinities colors affinity-misses :> before
-    graph order affinities colors improve-affinity-colors
-    graph order affinities colors exchange-affinity-colors
-    colors graph-colors namespaces:set
-    graph assoc-size :> vertices
-    graph values [ length ] map-sum 2 / :> edges
-    graph order perfect-order? :> chordal?
-    affinities colors affinity-misses :> after
-    leader-map get keys [ dup leader = not ] count :> aliases
-    H{
-        { "vertices" vertices } { "edges" edges } { "chordal?" chordal? }
-        { "color-assignments" 0 } { "repair-assignments" 0 }
-        { "affinity-misses-before" before }
-        { "affinity-misses-after" after }
-        { "copy-aliases" aliases }
-    }
-    chordal-statistics namespaces:set ;
-
-:: preferred-register ( interval -- reg/f )
-    interval vreg>> graph-colors get at :> color
-    interval interval-reg-class registers get at :> available
-    color [ color available length < [ color available nth ] [ f ] if ] [ f ] if ;
-
-:: preferred-free? ( interval reg -- ? )
-    interval active-intervals-for interval inactive-intervals-for append
-    [| other | other reg>> reg = interval other intervals-intersect? and ] any? not ;
-
-:: color-interval ( interval -- )
-    interval live-interval-start [ deactivate-intervals ] [ activate-intervals ] bi
-    interval preferred-register :> preferred
-    preferred [ interval preferred preferred-free? ] [ f ] if [
-        "color-assignments" chordal-statistics get inc-at
-        interval preferred >>reg add-active
-    ] [
-        ! Excess colors and fragments displaced by spills are repaired
-        ! using the common next-use splitting policy. The graph supplies
-        ! stable physical choices for all other intervals and fragments.
-        "repair-assignments" chordal-statistics get inc-at
-        interval registers get assign-register
-    ] if ;
-
-:: allocate-colored-intervals ( intervals registers -- allocated )
-    intervals registers init-allocator
-    ! An SSA use can precede its definition in linearization order. A
-    ! clobber-only fragment then disappears at a sync point without an
-    ! earlier local definition to allocate its slot. Reserve ABI operand
-    ! slots now; edge resolution supplies their values.
-    intervals [ live-interval-state? ] filter [| interval |
-        interval uses>> [| use |
-            use spill-slot?>>
-            use n>> interval vreg>> phi-entry-positions get at = not and
-        ] filter [| use |
-            interval vreg>> use use-rep>> use def-rep>> or
-            assign-spill-slot drop
-        ] each
-    ] each
-    unhandled-min-heap get [
-        drop dup sync-point? [ handle ] [ color-interval ] if
-    ] slurp-heap
-    gather-intervals ;
 
 ! Exact SSA copies denote the same value on every path dominated by the
 ! copy. Give their intervals one representative before coloring; phis retain
@@ -315,17 +361,19 @@ SYMBOLS: graph-colors chordal-statistics ;
     f leader-map namespaces:set
     cfg construct-ssa-bases
     cfg compute-ssa-live-sets
-    cfg copy-leaders
+    cfg available spill-ssa :> ( fixed statistics )
+    statistics chordal-statistics namespaces:set
+    representations get keys [ dup ] H{ } map>assoc leader-map namespaces:set
+    available registers namespaces:set
+    cfg compute-ssa-live-sets-preserving-gc
     cfg number-instructions
-    cfg compute-ssa-intervals :> intervals
-    intervals [ live-interval-state? ] filter cfg color-ssa-intervals
-    check-allocation? get [ intervals required-register-uses ] [ f ] if :> expected
-    intervals available allocate-colored-intervals :> allocated
+    cfg fixed compute-phase-ssa-intervals-with-locations
+    [ live-interval-state? ] filter :> intervals
+    intervals cfg available assign-certified-colors
     check-allocation? get [
-        allocated available check-allocated-intervals
-        allocated expected check-register-uses
+        intervals available check-allocated-intervals
     ] when
-    cfg allocated assign-ssa-registers
+    cfg intervals fixed assign-phase-ssa-registers-with-locations
     cfg resolve-ssa-data-flow
     cfg check-numbering ;
 
