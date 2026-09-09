@@ -1,0 +1,134 @@
+{
+  "greedy": {
+    "allocator-runtime-comparison:gc-pressure-work": {
+      "cpu_seconds": 1.1097303875850781,
+      "instructions": 1.0016624946044037,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 1.2792845936048411,
+          "instructions": 1.0039533227826067
+        },
+        "2": {
+          "cpu_seconds": 0.9968664332296598,
+          "instructions": 1.0003214341878344
+        }
+      }
+    },
+    "allocator-runtime-comparison:pi-work": {
+      "cpu_seconds": 1.0786131075558034,
+      "instructions": 1.0010535720017135,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 1.1594787674025404,
+          "instructions": 1.002797074586249
+        },
+        "2": {
+          "cpu_seconds": 1.0033991178738977,
+          "instructions": 1.0000438995589616
+        }
+      }
+    }
+  },
+  "backtracking": {
+    "allocator-runtime-comparison:norm-work": {
+      "cpu_seconds": 0.9939308839941032,
+      "instructions": 0.9999279819509042,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 0.9806497102925972,
+          "instructions": 0.999829283062117
+        },
+        "2": {
+          "cpu_seconds": 0.9724307757529832,
+          "instructions": 0.9999981910747899
+        }
+      }
+    },
+    "allocator-runtime-comparison:sieve-work": {
+      "cpu_seconds": 0.9894571942599613,
+      "instructions": 1.0000079546718246,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 1.0427537595593592,
+          "instructions": 0.9995693033231872
+        },
+        "2": {
+          "cpu_seconds": 0.969086931843432,
+          "instructions": 1.000130462755032
+        }
+      }
+    },
+    "allocator-runtime-comparison:trees-work": {
+      "cpu_seconds": 0.9939365761485834,
+      "instructions": 0.9998987050514557,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 1.0564563103356372,
+          "instructions": 0.9997747720418744
+        },
+        "2": {
+          "cpu_seconds": 0.9489104720189623,
+          "instructions": 0.9998720030517543
+        }
+      }
+    },
+    "benchmark.lcs:lcs-benchmark": {
+      "cpu_seconds": 0.989093248964049,
+      "instructions": 0.9999865198481315,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 1.0351100274476062,
+          "instructions": 1.0000519999808677
+        },
+        "2": {
+          "cpu_seconds": 0.9510102657842259,
+          "instructions": 1.0000059391342078
+        }
+      }
+    }
+  },
+  "chordal": {
+    "allocator-runtime-comparison:base64-work": {
+      "cpu_seconds": 0.9904017931097177,
+      "instructions": 1.0001431523327773,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 0.8924593493424291,
+          "instructions": 0.9992977838735444
+        },
+        "2": {
+          "cpu_seconds": 1.0667687332478537,
+          "instructions": 1.0002026756855908
+        }
+      }
+    },
+    "allocator-runtime-comparison:gc-pressure-work": {
+      "cpu_seconds": 1.0005970517861125,
+      "instructions": 1.000231982710128,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 0.968460267121321,
+          "instructions": 0.9999262764421504
+        },
+        "2": {
+          "cpu_seconds": 1.0410038307885559,
+          "instructions": 1.000678924831985
+        }
+      }
+    },
+    "allocator-runtime-comparison:md5-work": {
+      "cpu_seconds": 1.008314357034934,
+      "instructions": 0.999102931341992,
+      "rounds": {
+        "1": {
+          "cpu_seconds": 0.9099282573812348,
+          "instructions": 0.9982758526061682
+        },
+        "2": {
+          "cpu_seconds": 1.0529052419288687,
+          "instructions": 0.9995749123280407
+        }
+      }
+    }
+  }
+}

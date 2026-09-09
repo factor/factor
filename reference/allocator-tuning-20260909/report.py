@@ -32,6 +32,11 @@ lines=[f'# Completed allocator tuning matrix: {a.architecture}', '',
        '## Each allocator versus its own pre-tuning baseline', '',
        '| Allocator | Runtime CPU | Runtime retired | Compile CPU | Compile retired |',
        '|---|---:|---:|---:|---:|']
+if a.architecture=='native-arm64':
+    control=summary['allocators']['linear-scan']['runtime_geomean']
+    bt=diagnostics['final_allocator_over_linear_scan_by_round']
+    lines[4:4]=[
+        f"**ARM CPU rankings are confounded in this run.** The linear-scan control has runtime CPU ratio {control['cpu_seconds']:.4f} despite retired-instruction ratio {control['instructions']:.4f}. All three alternatives reverse their own-baseline CPU direction between rounds. Pooled six-sample medians can also differ materially from the paired-round comparisons: backtracking/final-LS CPU is {rank['allocators']['backtracking']['runtime']['cpu_seconds']:.4f} when pooled, versus {bt['1']['backtracking']['cpu_seconds']:.4f} and {bt['2']['backtracking']['cpu_seconds']:.4f} by round. The apparent pooled CPU advantages do not establish an attributable allocator speedup or support changing the default. Retired counts, generated code and per-round records remain useful evidence.", '']
 for allocator,data in summary['allocators'].items():
     values=[data['runtime_geomean'][m] for m in ['cpu_seconds','instructions']]
     values += [data['compile'][m]['ratio'] for m in ['cpu_seconds','instructions']]

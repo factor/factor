@@ -1,0 +1,31 @@
+{
+  "architecture": "arm64",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "hostname": "dcs-MacBook-Pro.local",
+  "native_isa": true,
+  "load_after_matrix_and_bootstrap": [
+    68.1220703125,
+    73.30322265625,
+    70.94384765625
+  ],
+  "cpu": {
+    "command": [
+      "sysctl",
+      "hw.model",
+      "machdep.cpu.brand_string",
+      "hw.ncpu"
+    ],
+    "exit_code": 0,
+    "stdout": "hw.model: Mac17,6\nmachdep.cpu.brand_string: Apple M5 Max\nhw.ncpu: 18\n",
+    "stderr": ""
+  },
+  "translation": {
+    "command": [
+      "sysctl",
+      "sysctl.proc_translated"
+    ],
+    "exit_code": 0,
+    "stdout": "sysctl.proc_translated: 0\n",
+    "stderr": ""
+  }
+}
