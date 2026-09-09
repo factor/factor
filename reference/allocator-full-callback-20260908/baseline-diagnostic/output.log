@@ -1,0 +1,325 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation
+compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.rematerialization
+compiler.cfg.register-allocation.spill-sites
+compiler.cfg.register-allocation.verifier io kernel namespaces
+parser prettyprint sequences system tools.test vocabs.loader
+vocabs.refresh ;
+IN: chordal.callback.regression
+
+callback rematerialization=t
+CALLBACK ORIGINAL
+T{ ##callback-inputs
+    { reg-outputs
+        V{
+            { 4516981 int-rep X8 }
+            { 4516982 int-rep X0 }
+            { 4516983 int-rep X1 }
+            { 4516984 int-rep X2 }
+            { 4516985 int-rep X3 }
+            { 4516986 int-rep X4 }
+            { 4516987 int-rep X5 }
+            { 4516988 int-rep X6 }
+            { 4516989 int-rep X7 }
+        }
+    }
+    { stack-outputs V{ { 4516990 int-rep 0 8 } } }
+    { insn# 6 }
+}
+HIDDEN ORIGINAL
+T{ live-interval-state
+    { vreg 4516981 }
+    { ranges V{ { 6 1345 } } }
+    { uses
+        V{
+            T{ vreg-use
+                { n 6 }
+                { def-rep int-rep }
+                { spill-slot? t }
+            }
+            T{ vreg-use { n 1341 } { use-rep int-rep } }
+            T{ vreg-use { n 1343 } { use-rep int-rep } }
+            T{ vreg-use { n 1345 } { use-rep int-rep } }
+        }
+    }
+}
+HIDDEN ALLOCATED
+T{ live-interval-state
+    { vreg 4516981 }
+    { reg X3 }
+    { reload-rep int-rep }
+    { ranges V{ { 1340 1345 } } }
+    { uses
+        V{
+            T{ vreg-use { n 1341 } { use-rep int-rep } }
+            T{ vreg-use { n 1343 } { use-rep int-rep } }
+            T{ vreg-use { n 1345 } { use-rep int-rep } }
+        }
+    }
+}
+T{ live-interval-state
+    { vreg 4516981 }
+    { reg X14 }
+    { spill-to T{ spill-slot } }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 8 9 } } }
+}
+T{ live-interval-state
+    { vreg 4516981 }
+    { reg X14 }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 28 129 } } }
+}
+T{ live-interval-state
+    { vreg 4516981 }
+    { reg X14 }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 132 1339 } } }
+}
+KILL BLOCKS
+{ 0 5 }
+{ 56 59 }
+{ 62 65 }
+{ 68 71 }
+{ 74 77 }
+{ 124 127 }
+{ 222 225 }
+{ 272 275 }
+{ 278 281 }
+{ 332 335 }
+{ 346 349 }
+{ 390 393 }
+{ 480 483 }
+{ 510 513 }
+{ 516 519 }
+{ 550 553 }
+{ 564 567 }
+{ 588 591 }
+{ 608 611 }
+{ 626 629 }
+{ 678 681 }
+{ 714 717 }
+{ 720 723 }
+{ 760 763 }
+{ 774 777 }
+{ 804 807 }
+{ 870 873 }
+{ 894 897 }
+{ 900 903 }
+{ 928 931 }
+{ 942 945 }
+{ 960 963 }
+{ 980 983 }
+{ 998 1001 }
+{ 1038 1041 }
+{ 1062 1065 }
+{ 1068 1071 }
+{ 1096 1099 }
+{ 1110 1113 }
+{ 1128 1131 }
+{ 1170 1173 }
+{ 1188 1191 }
+{ 1194 1197 }
+{ 1216 1219 }
+{ 1230 1233 }
+{ 1242 1245 }
+{ 1262 1265 }
+{ 1280 1283 }
+{ 1302 1305 }
+{ 1322 1325 }
+{ 1352 1357 }
+CALLBACK ORIGINAL
+T{ ##callback-inputs
+    { reg-outputs
+        V{
+            { 4517760 int-rep X8 }
+            { 4517761 int-rep X0 }
+            { 4517762 int-rep X1 }
+            { 4517763 int-rep X2 }
+            { 4517764 int-rep X3 }
+            { 4517765 int-rep X4 }
+            { 4517766 int-rep X5 }
+            { 4517767 int-rep X6 }
+            { 4517768 int-rep X7 }
+        }
+    }
+    { stack-outputs V{ { 4517769 int-rep 0 8 } } }
+    { insn# 6 }
+}
+HIDDEN ORIGINAL
+T{ live-interval-state
+    { vreg 4517760 }
+    { ranges V{ { 6 371 } } }
+    { uses
+        V{
+            T{ vreg-use
+                { n 6 }
+                { def-rep int-rep }
+                { spill-slot? t }
+            }
+            T{ vreg-use { n 367 } { use-rep int-rep } }
+            T{ vreg-use { n 369 } { use-rep int-rep } }
+            T{ vreg-use { n 371 } { use-rep int-rep } }
+        }
+    }
+}
+HIDDEN ALLOCATED
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X2 }
+    { reload-rep int-rep }
+    { ranges V{ { 366 371 } } }
+    { uses
+        V{
+            T{ vreg-use { n 367 } { use-rep int-rep } }
+            T{ vreg-use { n 369 } { use-rep int-rep } }
+            T{ vreg-use { n 371 } { use-rep int-rep } }
+        }
+    }
+}
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X8 }
+    { spill-to T{ spill-slot } }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 8 9 } } }
+}
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X8 }
+    { spill-to T{ spill-slot } }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 28 267 } } }
+}
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X8 }
+    { spill-to T{ spill-slot } }
+    { spill-rep int-rep }
+    { reload-rep int-rep }
+    { ranges V{ { 286 287 } } }
+}
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X8 }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 290 291 } } }
+}
+T{ live-interval-state
+    { vreg 4517760 }
+    { reg X8 }
+    { spill-rep int-rep }
+    { reload-from T{ spill-slot } }
+    { reload-rep int-rep }
+    { ranges V{ { 294 365 } } }
+}
+KILL BLOCKS
+{ 0 5 }
+{ 56 59 }
+{ 62 65 }
+{ 68 71 }
+{ 74 77 }
+{ 88 91 }
+{ 130 133 }
+{ 144 147 }
+{ 158 161 }
+{ 172 175 }
+{ 186 189 }
+{ 200 203 }
+{ 214 217 }
+{ 228 231 }
+{ 242 245 }
+{ 328 331 }
+{ 348 351 }
+{ 378 383 }
+Unit Test: {
+    { 6 15 24 }
+    [
+        1 2 3 4 5 6 7 8 9 ffi_test_large_return
+        large-return-values
+    ]
+}
+Unit Test: {
+    { -6 -15 -24 }
+    [
+        -1 -2 -3 -4 -5 -6 -7 -8 -9 ffi_test_large_return
+        large-return-values
+    ]
+}
+Unit Test: {
+    { 6 15 24 }
+    [
+        1 2 3 4 5 6 7 8 9 "ffi_test_large_return"
+        "large-return-test" library-dll dlsym
+        indirect-large-return large-return-values
+    ]
+}
+Unit Test: {
+    { 45 }
+    [
+        large-return-callback
+        [ ffi_test_large_return_callback ] with-callback
+    ]
+}
+Memory protection fault at address 0x180
+You have triggered a bug in Factor. Please report.
+critical_error: The die word was called by the library.: 0
+Starting low level debugger...
+Basic commands:
+  q ^D             -- quit Factor
+  c                -- continue executing Factor - NOT SAFE
+  t                -- throw exception in Factor - NOT SAFE
+  .s .r .c         -- print data, retain, call stacks
+  help             -- full help, including advanced commands
+
+> ==== DATA STACK:
+B{ 6 0 0 0 0 0 0 0 15 0 0 0 0 0 0 0... }
+{ 64199 16 384 f }
+==== RETAIN STACK:
+==== CALL STACK:
+
+frame: 0x11a2dbe10 size 16
+executing: kernel:die
+scan: 1
+word/quot addr: 107a198bc
+word/quot xt: 1144eb140
+return address: 1144eb160
+
+frame: 0x11a2dbe20 size 16
+executing: [ ui:ui-running? [ kernel:dup ui.debugger:error-alert ] [ kernel:dup debugger:print-error io:flush ] kernel:if kernel:die continuations:rethrow ]
+scan: 4
+word/quot addr: 10cfda394
+word/quot xt: 1154a4c90
+return address: 1154a4cd0
+
+frame: 0x11a2dbe30 size 16
+executing: continuations:rethrow
+scan: -1
+word/quot addr: 1077649fc
+word/quot xt: 114280490
+return address: 1142806cc
+
+frame: 0x11a2dbe40 size 432
+executing: kernel.private:signal-handler
+scan: 1
+word/quot addr: 1078f7ecc
+word/quot xt: 1143a8460
+return address: 1143a84b4
