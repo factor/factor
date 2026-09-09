@@ -2,6 +2,17 @@ USING: accessors alien.c-types arrays classes.struct kernel libc
 linux.input-events.ffi sequences tools.test ;
 IN: linux.input-events.ffi.tests
 
+{ t } [ 22 "unsupported" \ libc-error boa unsupported-ioctl? ] unit-test
+{ f } [ 9 "bad descriptor" \ libc-error boa unsupported-ioctl? ] unit-test
+{ f } [ 13 "permission denied" \ libc-error boa unsupported-ioctl? ] unit-test
+{ f } [ "not an operating-system error" unsupported-ioctl? ] unit-test
+[ -1 8 B{ 0 0 0 0 } evdev-get-mt-slots ]
+[ invalid-mt-request-size? ] must-fail-with
+[ -1 0 0 evdev-get-event-mask ]
+[ invalid-event-mask-length? ] must-fail-with
+[ -1 0 4 evdev-get-event-mask ]
+[ dup libc-error? [ errno>> 9 = ] [ drop f ] if ] must-fail-with
+
 { { 0 7 8 15 16 } } [ B{ 129 129 1 } seq>explode-positions >array ] unit-test
 { { 1 128 256 32768 65536 } } [ B{ 129 129 1 } seq>explode-values >array ] unit-test
 { 4 4 } [ input_mt_request_layout heap-size "values" input_mt_request_layout offset-of ] unit-test

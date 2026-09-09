@@ -1,8 +1,8 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.data alien.syntax arrays byte-arrays
-classes.struct combinators continuations io.encodings.string
-io.encodings.utf8 kernel libc math math.vectors sequences
+USING: accessors alien alien.c-types alien.data alien.enums alien.syntax arrays byte-arrays
+classes.struct combinators continuations destructors io.encodings.string
+io.encodings.utf8 kernel libc locals math math.vectors sequences
 splitting unix.ffi unix.types ;
 IN: linux.input-events.ffi
 
@@ -148,6 +148,15 @@ CONSTANT: IOC_DIRSHIFT 30  ! SIZESHIFT + SIZEBITS
 : call-ioctl-out ( handle id bytes -- out )
     [ ioctl io-error ] keep ; inline
 
+! Optional ioctls may be absent on a device/kernel. Never hide bad file
+! descriptors, permissions, memory faults, or Factor programming errors.
+: unsupported-ioctl? ( error -- ? )
+    dup libc-error? [ errno>> { EINVAL ENOTTY ENOSYS EOPNOTSUPP } member? ]
+    [ drop f ] if ;
+
+: optional-ioctl ( quot: ( -- result ) -- result/f )
+    [ dup unsupported-ioctl? [ drop f ] [ rethrow ] if ] recover ; inline
+
 : <0ref> ( type -- ref ) 0 swap <ref> ; inline
 : byte-array-ioctl ( handle id len -- out )
     <byte-array> call-ioctl-out ; inline
@@ -178,15 +187,21 @@ CONSTANT: IOC_DIRSHIFT 30  ! SIZESHIFT + SIZEBITS
 : evdev-get-name ( handle -- name ) CHAR: E 0x06 { char 256 } IOR c-string-ioctl ;
 : evdev-get-physical ( handle -- physical ) CHAR: E 0x07 { char 256 } IOR c-string-ioctl ;
 : evdev-get-unique ( handle -- unique )
-    '[ _ CHAR: E 0x08 { char 512 } IOR c-string-ioctl ] [ drop "" ] recover ;
+    '[ _ CHAR: E 0x08 { char 512 } IOR c-string-ioctl ] [
+        dup libc-error? [ dup errno>> ENOENT = ] [ f ] if
+        [ drop "" ] [ dup unsupported-ioctl? [ drop "" ] [ rethrow ] if ] if
+    ] recover ;
 : evdev-get-prop ( handle -- bytes ) CHAR: E 0x09 256 IOR-size 256 byte-array-ioctl ;
 ! EVIOCGMTSLOTS, size is encoded by IOR
 STRUCT: input_mt_request_layout
     { code __u32 }
     { values __s32[0] } ; ! Inline flexible array, not a pointer.
 ! Pass a buffer containing code followed by the requested slot values.
-: evdev-get-mt-slots ( handle size buffer -- prop )
-    '[ _ CHAR: E 0x0a _ IOR-size _ call-ioctl-out ] [ drop f ] recover ;
+ERROR: invalid-mt-request-size size ;
+:: evdev-get-mt-slots ( handle size buffer -- prop )
+    size 4 < size 0x3fff > or size 4 mod 0 = not or
+    size buffer byte-length = not or [ size invalid-mt-request-size ] when
+    [ handle CHAR: E 0x0a size IOR-size buffer call-ioctl-out ] optional-ioctl ;
 ! EVIOCGKEY EVIOCGLED EVIOCGSND EVIOCGSW EVIOCGABS EVIOCSABS
 : evdev-get-key ( handle -- bytes ) CHAR: E 0x18 256 IOR-size 256 byte-array-ioctl ;
 : evdev-get-led ( handle -- bytes ) CHAR: E 0x19 256 IOR-size 256 byte-array-ioctl ;
@@ -210,8 +225,22 @@ STRUCT: input_mt_request_layout
 : evdev-revoke-device ( handle -- )
     CHAR: E 0x91 4 IOW-size f call-ioctl ;
 ! EVIOCGMASK EVIOCSMASK
-: evdev-get-event-mask ( handle -- int )
-    CHAR: E 0x92 input_mask IOR struct-ioctl ;
+ERROR: invalid-event-mask-length length ;
+:: evdev-get-event-mask ( handle type length -- bytes/f )
+    length 0 <= length 0xffffffff > or [ length invalid-event-mask-length ] when
+    [
+        ! codes_ptr is an integer-valued address in the kernel ABI. Use
+        ! native storage, not a movable Factor byte-array address.
+        length 1 calloc &free :> codes
+        input_mask new
+            type enum>number >>type
+            length >>codes_size
+            codes alien-address >>codes_ptr :> request
+        [
+            handle CHAR: E 0x92 input_mask heap-size IOR-size request call-ioctl
+            codes length memory>byte-array
+        ] optional-ioctl
+    ] with-destructors ;
 : evdev-set-event-mask ( handle event_mask -- int )
     [ CHAR: E 0x93 ] dip IOW call-ioctl-out ;
 ! EVIOCSCLOCKID

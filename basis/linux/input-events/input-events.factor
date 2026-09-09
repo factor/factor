@@ -3,8 +3,8 @@
 USING: accessors alien alien.c-types alien.data alien.enums
 arrays ascii assocs combinators combinators.smart grouping
 hashtables io io.backend io.directories io.encodings.binary
-io.files io.files.links io.pathnames kernel
-linux.input-events.ffi math namespaces pack prettyprint
+io.files io.files.links io.pathnames kernel locals
+linux.input-events.ffi math math.order namespaces pack prettyprint
 sequences splitting unix.time ;
 FROM: io => read ;
 IN: linux.input-events
@@ -46,7 +46,7 @@ IN: linux.input-events
     } case ;
 
 : evdev-explode-bitfield ( handle ev count -- seq )
-    enum>number 8 /mod [ drop 1 + ] unless-zero evdev-get-bytes seq>explode-positions ;
+    [ enum>number ] bi@ 8 /mod [ drop 1 + ] unless-zero evdev-get-bytes seq>explode-positions ;
 
 : evdev-get-syn ( handle -- seq )
     0 EV_CNT evdev-explode-bitfield ;
@@ -82,14 +82,36 @@ IN: linux.input-events
         [ EV>seq ] 2bi 2array
     ] with map >hashtable ;
 
-: evdev-get-all-mt-slots ( handle -- seq )
-    INPUT_ABS enum>values [
-        [ 65 int <c-array> ] dip
-        0 pick set-nth
-        [ byte-length ] keep evdev-get-mt-slots
-        [ 0 = ] trim-tail
-    ] with map sift
-    [ unclip <INPUT_ABS> swap 2array ] map ;
+ERROR: invalid-mt-slot-count count ;
+
+:: <mt-request> ( code count -- buffer )
+    count 1 4094 between? [ count invalid-mt-slot-count ] unless
+    count 1 + int <c-array> :> buffer
+    code 0 buffer set-nth
+    buffer ;
+
+:: evdev-get-all-mt-slots ( handle -- seq )
+    handle EV_ABS ABS_CNT evdev-explode-bitfield :> axes
+    ABS_MT_SLOT enum>number axes member? [
+        handle ABS_MT_SLOT enum>number evdev-get-abs maximum>> 1 + :> count
+        axes [ ABS_MT_TOUCH_MAJOR enum>number ABS_MT_TOOL_Y enum>number between? ] filter
+        [| code |
+            code count <mt-request> :> request
+            handle request byte-length request evdev-get-mt-slots
+            [ rest >array code <INPUT_ABS> swap 2array ] [ f ] if*
+        ] map sift
+    ] [ { } ] if ;
+
+:: evdev-get-event-masks ( handle -- masks )
+    {
+        { EV_SYN EV_CNT } { EV_KEY KEY_CNT } { EV_REL REL_CNT }
+        { EV_ABS ABS_CNT } { EV_MSC MSC_CNT } { EV_SW SW_CNT }
+        { EV_LED LED_CNT } { EV_SND SND_CNT } { EV_FF FF_CNT }
+    } [| entry |
+        entry first2 :> ( type count )
+        handle type count enum>number 7 + -3 shift evdev-get-event-mask
+        [ type swap 2array ] [ f ] if*
+    ] map sift ;
 
 : with-event-device ( ..x path quot: ( ..x path fd -- ..y ) -- ..y )
     [ binary over ] dip '[
@@ -115,7 +137,7 @@ IN: linux.input-events
                 [ evdev-get-sound seq>explode-positions [ <INPUT_SND> ] zip-with "sounds" named ]
                 [ evdev-get-switch seq>explode-positions [ <INPUT_SW> ] zip-with "switches" named ]
                 [ evdev-get-simulataneous-effects "effects" named ]
-                [ evdev-get-event-mask "event-mask" named ]
+                [ evdev-get-event-masks "event-mask" named ]
                 [ evdev-get-all-bits "capabilities" named ]
             } cleave
         ] output>array >hashtable
