@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays calendar.format
+USING: accessors alien.c-types alien.data alien.strings arrays calendar.format
 calendar.parser combinators db db.errors db.sqlite.errors
 db.sqlite.ffi db.types io.backend io.encodings.string
 io.encodings.utf8 kernel math namespaces present sequences
@@ -201,4 +201,4 @@ ERROR: sqlite-error < db-error n string ;
     sqlite3_step sqlite-step-has-more-rows? ;
 
 : current-sqlite-filename ( -- path/f )
-    db-connection get [ handle>> f sqlite3_db_filename ] [ f ] if* ;
+    db-connection get [ handle>> f sqlite3_db_filename utf8 alien>string ] [ f ] if* ;

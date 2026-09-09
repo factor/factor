@@ -47,3 +47,32 @@ HELP: sqlite3_str_vappendf
 { $description "Appends text formatted from a native argument list. On ARM64, forwarding preserves the cursor position. Inspect sqlite3_str_errcode for errors and finish the builder with sqlite3_str_finish." } ;
 
 ABOUT: "sqlite-formatting"
+
+ARTICLE: "sqlite-native-interfaces" "SQLite native interfaces and ownership"
+"The db.sqlite.ffi declarations cover the public sqlite3.h interfaces through SQLite 3.53.4, including the session, Rtree, carray, and FTS5 interfaces. SQLITE_VERSION and SQLITE_VERSION_NUMBER describe this reference header. Use sqlite3_libversion and sqlite3_compileoption_used to inspect the library actually loaded. Optional declarations do not enable their corresponding library features."
+$nl
+"Session requires SQLITE_ENABLE_SESSION and SQLITE_ENABLE_PREUPDATE_HOOK. Other facilities, including carray, FTS5, scanstatus, normalization, snapshots, and column metadata, depend on the linked library's build options. A missing optional symbol is a library capability limitation; applications must select a build containing the features they use."
+$nl
+"Compatibility: sqlite3_expanded_sql now returns an owned char* instead of a copied string. Decode it explicitly and release it with sqlite3_free. sqlite3_serialize now returns a raw uchar* and writes the binary length through piSize. Copy exactly that length when needed; database bytes are not a zero-terminated string. The usual serialization result must be freed with sqlite3_free; SQLITE_SERIALIZE_NOCOPY instead returns a borrowed buffer."
+$nl
+"sqlite3_deserialize takes a raw uchar* buffer that remains valid until the connection closes. The buffer may be modified unless SQLITE_DESERIALIZE_READONLY is specified. FREEONCLOSE and RESIZEABLE require SQLite-allocated memory because SQLite may free or reallocate it, including freeing it after a failed deserialize call. Do not pass a temporary encoded string or movable Factor storage as a retained buffer."
+$nl
+"sqlite3_prepare16 now takes a raw pointer to UTF-16 bytes, consistently with sqlite3_prepare16_v2 and sqlite3_prepare16_v3. Its byte count is measured in bytes."
+$nl
+"sqlite3_filename is a raw char* alias. sqlite3_db_filename and sqlite3_filename_database/journal/wal preserve SQLite filename object identity; decode only when a display string is wanted. sqlite3_create_filename returns an owned filename object released by sqlite3_free_filename. URI lookup functions require the original SQLite filename object. db.sqlite.lib's current-sqlite-filename continues returning a Factor string."
+$nl
+"FTS5 phrase-iterator fields retain raw byte positions. The extended FTS5 API structs and sqlite3_module include all members in the reference header. Respect each interface's iVersion when using older runtimes, and initialize versioned structs consistently with the callbacks supplied."
+$nl
+"The session streaming, changeset-filter/conflict, preupdate, and tokenizer callback types expose raw pointers. Decode text explicitly and honor any accompanying byte length. Keep callback objects and any retained native data alive for as long as SQLite may use them. sqlite3_destructor_type is a typed callback accepting void*; SQLITE_STATIC and SQLITE_TRANSIENT remain valid pointer sentinels where SQLite documents those conventions." ;
+
+HELP: sqlite3_expanded_sql
+{ $values { "pStmt" "a prepared statement" } { "char*" "an owned UTF-8 string pointer, or f" } }
+{ $description "Returns expanded SQL in SQLite-allocated memory. Decode the result explicitly and release it with sqlite3_free." } ;
+
+HELP: sqlite3_serialize
+{ $values { "db" "a database connection" } { "zSchema" "a schema name or f" } { "piSize" "a pointer receiving the byte length" } { "mFlags" "serialization flags" } { "uchar*" "a binary buffer pointer, or f" } }
+{ $description "Returns length-delimited database bytes. With ordinary flags the caller owns the result and must call sqlite3_free. SQLITE_SERIALIZE_NOCOPY instead requests a borrowed buffer. Never decode the database buffer as a C string." } ;
+
+HELP: sqlite3_deserialize
+{ $values { "db" "a database connection" } { "zSchema" "a schema name or f" } { "pData" "a retained native binary buffer" } { "szDb" "database bytes" } { "szBuf" "buffer capacity" } { "mFlags" "deserialization flags" } { "int" "a SQLite result code" } }
+{ $description "Reopens a schema using a buffer that must remain valid until the connection closes. SQLite may write the buffer and, with FREEONCLOSE or RESIZEABLE, free or reallocate it. Those flags require SQLite-allocated memory. See sqlite-native-interfaces for ownership details." } ;
