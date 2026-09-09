@@ -18,7 +18,23 @@ The backtracking index changes how occupied ranges are found, preserving the
 resulting complement and allocation policy; an independent occupied-point
 oracle covers partial/full/empty/holey ranges and clobber barriers.
 
-Further chordal and backtracking transport changes require their own targeted
-checks and final integrated gates before a frozen comparison. The diagnostic
+## Final combined compiler gate
+
+Frozen source `5c848c90f63cea092191b70e1678bec4441e0238` includes greedy terminal
+stores, the backtracking range index and interior-gap policy, and both chordal
+entry-residency and guaranteed-home join changes. The complete compiler suite
+passes with backtracking, rematerialization and loop spilling enabled, GVN off,
+and SSA, interval and final-machine value-flow checks active: zero failures,
+exit 0 in 58.00 seconds. This is validation time, not a benchmark comparison.
+The retained [status](full-compiler-backtracking/status.json) identifies the clean
+source, exact command and unchanged baseline VM and original image.
+
+The independent chordal tests cover known-empty versus unknown predecessor
+states, phi source identity, mixed saved homes, and store-before-reload behavior.
+The narrow backtracking policy preserves entry/exit and multiblock gaps, including
+register transport across the fast edge around an out-of-line GC block.
+
+Full ARM64/x86 checked workload, callback and moving-GC gates and the broad timing
+matrix are still pending. The diagnostic
 [bootstrap profile](bootstrap-profile/README.md) is not an unprofiled bootstrap
 or fresh-image acceptance run.
