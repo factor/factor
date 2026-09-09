@@ -1,0 +1,78 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: io kernel namespaces parser sequences system tools.test
+vocabs vocabs.loader vocabs.refresh ;
+
+CHORDAL SOURCE SHA256 07ad63902e97af2aa99e8796832206e735e7d4c78ad31baa9a644c3f1141eb45
+Unit Test: {
+    { t }
+    [
+        15 <iota> [
+            load-local 4 <iota> 0 get-local [
+                load-local 1 swap shift 0 get-local 1 + bitand
+                0 > 1 drop-locals
+            ] curry filter load-local 16 <iota> 0 get-local [
+                load-local 0 get-local [
+                    load-local load-local 4 <iota> 0 get-local [
+                        load-local 0 get-local [
+                            load-local load-local
+                            0 get-local 0 get-local -1 get-local
+                            + 4 mod 1/8 * 2 drop-locals
+                        ] curry call 1 drop-locals
+                    ] curry H{ } map>assoc load-local
+                    H{ { 0 1/8 } { 2 1/8 } { 99 1000000 } }
+                    load-local
+                    -3 get-local -1 get-local 0 get-local
+                    preferred-free-color
+                    -3 get-local -1 get-local 0 get-local
+                    sorted-preference-color = 4 drop-locals
+                ] curry call 1 drop-locals
+            ] curry all? 2 drop-locals
+        ] all?
+    ]
+}
+Unit Test: {
+    { 0 1 }
+    [
+        { 0 1 3 } H{ } H{ } preferred-free-color
+        { 0 1 3 } H{ { 1 4 } { 3 4 } } H{ } preferred-free-color
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        H{
+            { 0 int-rep }
+            { 1 int-rep }
+            { 2 int-rep }
+            { 3 int-rep }
+        } representations [
+            64 <iota> [
+                load-local
+                0 get-local preference-test-graph load-local
+                { 0 1 7 21 42 63 } 0 get-local [
+                    load-local 0 get-local [
+                        load-local load-local
+                        0 get-local preference-test-affinities
+                        load-local
+                        { { 0 1 2 3 } { 3 2 1 0 } } -2 get-local
+                        0 get-local [
+                            2 load-locals
+                            -1 get-local 0 get-local [
+                                2 load-locals load-local
+                                4 <iota> -2 get-local 0
+                                get-local -1 get-local
+                                ~quotation~ curry curry curry
+                                all? 3 drop-locals
+                            ] curry curry call 2 drop-locals
+                        ] curry curry all? 3 drop-locals
+                    ] curry call 1 drop-locals
+                ] curry all? 2 drop-locals
+            ] all?
+        ] with-variable
+    ]
+}
+INDEPENDENT PREFERENCE ORACLE PASS: 240 selectors, 3072 complete maps/exhaustions
