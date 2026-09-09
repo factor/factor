@@ -1,9 +1,10 @@
 ! Copyright (C) 2010 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.enums alien.strings
-assocs byte-arrays classes.struct destructors grouping images images.loader
-io kernel libc locals math mime.types namespaces sequences specialized-arrays
-system windows.com windows.gdiplus windows.streams windows.types ;
+USING: accessors alien alien.c-types alien.data alien.destructors
+alien.enums alien.strings assocs byte-arrays classes.struct
+destructors grouping images images.loader io kernel libc locals
+math mime.types namespaces sequences specialized-arrays system
+windows.com windows.gdiplus windows.streams windows.types ;
 IN: images.loader.gdiplus
 
 SPECIALIZED-ARRAY: ImageCodecInfo
@@ -20,10 +21,12 @@ os windows? [
 
 C: <GpRect> GpRect
 
+DESTRUCTOR: GdipDisposeImage
+
 : stream>gdi+-bitmap ( stream -- bitmap )
     stream>IStream &com-release
     { void* } [ GdipCreateBitmapFromStream check-gdi+-status ]
-    with-out-parameters &GdipFree ;
+    with-out-parameters &GdipDisposeImage ;
 
 : gdi+-bitmap-width ( bitmap -- w )
     { UINT } [ GdipGetImageWidth check-gdi+-status ]
@@ -89,7 +92,7 @@ ERROR: unsupported-pixel-format component-order ;
     ] [ stride format pixels ] if
     { void* } [
         GdipCreateBitmapFromScan0 check-gdi+-status
-    ] with-out-parameters &GdipFree ;
+    ] with-out-parameters &GdipDisposeImage ;
 
 : image-encoders-size ( -- num size )
     { UINT UINT } [
