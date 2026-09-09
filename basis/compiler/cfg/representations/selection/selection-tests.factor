@@ -3,7 +3,7 @@ compiler.cfg.instructions compiler.cfg.linearization
 compiler.cfg.loop-detection compiler.cfg.optimizer compiler.cfg.registers
 compiler.cfg.representations compiler.cfg.representations.coalescing
 compiler.cfg.representations.selection compiler.cfg.utilities compiler.test
-cpu.architecture disjoint-sets kernel kernel.private locals make math math.libm
+cpu.architecture disjoint-sets kernel kernel.private layouts locals make math math.libm
 math.private memory namespaces quotations sequences sequences.generalizations
 sets tools.test ;
 FROM: namespaces => set ;
@@ -13,6 +13,20 @@ IN: compiler.cfg.representations.selection.tests
     T{ ##load-integer } peephole-optimizable?
     T{ ##shr-imm } peephole-optimizable?
     T{ ##call } peephole-optimizable?
+] unit-test
+
+! Generic integer arithmetic must retain promotion at the fixnum limits;
+! the cost policy must not turn it into wrapping unboxed arithmetic.
+{ t } [
+    { f t } [| enabled? |
+        [
+            enabled? conversion-aware-representation-costs? set
+            most-positive-fixnum [ 1 + dup 2array ] compile-call
+            most-positive-fixnum 1 + dup 2array =
+            most-negative-fixnum [ 1 - dup 2array ] compile-call
+            most-negative-fixnum 1 - dup 2array = and
+        ] with-scope
+    ] all?
 ] unit-test
 
 :: repeated-use-cost ( enabled? -- n )
