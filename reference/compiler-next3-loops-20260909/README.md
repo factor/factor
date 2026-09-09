@@ -47,3 +47,24 @@ compile `invariant-xor-loop`'s `typed-word` property before timing. Its independ
 result is zero for an even nonnegative trip count and `x bitxor y` for an odd
 count. Broad existing-corpus activity and matched native runtime measurements
 are delegated to the parent/native measurement owner. The feature remains off.
+
+
+## Pointer-seed guard before the combined freeze
+
+Independent review identified that pre-representation loop scans cannot see
+all later boxing/GC instructions. Hoisting an xor/multiply/shift encoding of
+a managed raw pointer could therefore extend untraceable bits across future
+collection. Commit `40f7df12d9` conservatively rejects the entire CFG when either
+`##tagged>integer` or `##unbox-any-c-ptr` occurs anywhere, including outside the
+loop. These are the two primitive managed-base seeds recognized by current
+liveness and SSA base construction. No numeric-provenance inference is claimed.
+
+`pointer-guard-unit` passes both outside-loop seed negatives with exact unchanged
+instruction streams, zero hoists, and the existing 216 native pure arithmetic
+answers. Its pure fixture uses an integer copy for its already represented
+trip-count bits, so it does not accidentally declare a managed-pointer seed.
+`pointer-guard-source` passes all 16 settings and 864 ordinary-source answers,
+retaining one hoist in every freshly compiled method. The final helper/test
+hashes are in `pointer-guard-source-hashes.json`; earlier hashes and runs remain
+historical. The reviewer confirmed this guard closes the identified future-GC
+hole and found no other concrete issue in the preheader/dominance mechanics.

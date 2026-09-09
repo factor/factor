@@ -1,0 +1,11 @@
+{
+  "commit": "40f7df12d9f6185406805a111cc3f19e5d8f8399",
+  "sha256": {
+    "basis/compiler/cfg/loop-optimization/loop-optimization.factor": "b7a3e5f2128774bac547130e6b325d31ccb5f05989c7fa4ab9151642181186a1",
+    "basis/compiler/cfg/loop-optimization/README.md": "ba1f5ce6db711c1f7f92e19a21a3bd12f6858ac03fafa21cf73ab849eeadfc0f",
+    "basis/compiler/cfg/loop-optimization/loop-optimization-tests.factor": "65b697b68c649d33f3978ed07dedb2e5fd652047dcc3aa7338bb12f8f9d11028",
+    "reference/compiler-next3-loops-20260909/unit.factor": "c34f48d7f72a78670a3329c271dc293171ac016f3b246bb7775d07e1d2d81e0e",
+    "reference/compiler-next3-loops-20260909/source.factor": "cb3341c9b83a048fbb93467690dba299344a89b4849845a9d54f64dcbd178f1d",
+    "reference/compiler-next3-loops-20260909/workloads.factor": "902ffe01eb16802ce6aaf3a2e59b6658ad9f3a83dd147b015e3afd5b0962c744"
+  }
+}
