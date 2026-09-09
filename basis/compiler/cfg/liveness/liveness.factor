@@ -8,6 +8,11 @@ compiler.cfg.utilities compiler.utilities cpu.architecture
 deques dlists kernel locals namespaces sequences sets ;
 IN: compiler.cfg.liveness
 
+! Immutable per-allocation phi -> tagged-base seeds. Liveness resets only
+! its derived cache; it must retain these SSA value relationships through
+! CSSA copies and cleanup. The dispatcher restores the caller's seed map.
+SYMBOL: initial-base-pointers
+
 SYMBOL: live-ins
 
 : live-in ( bb -- set )
@@ -179,7 +184,8 @@ M: insn visit-insn 2drop ;
     H{ } clone live-ins namespaces:set
     H{ } clone edge-live-ins namespaces:set
     H{ } clone live-outs namespaces:set
-    H{ } clone base-pointers namespaces:set ;
+    initial-base-pointers get [ clone ] [ H{ } clone ] if*
+    base-pointers namespaces:set ;
 
 : compute-live-sets-with-insns ( cfg -- )
     init-liveness

@@ -108,10 +108,13 @@ IN: compiler.cfg.register-allocation.validation.tests
 { t } [ [
     { f t } [| rematerialize? |
         rematerialize? rematerialize-constants? set
-        <validation-moving-tagged-phi> :> graph
-        graph 4 2 validation-register-bank :> bank
-        linear-scan-allocator bank [ linear-scan-allocation-with-registers ]
-        constrained-allocator boa graph swap compile-validation-cfg
-        check-validation-moving-phi
+        { [ <validation-moving-tagged-phi> ] [ <validation-moving-phi> ] }
+        [| constructor |
+            constructor call( -- graph ) :> graph
+            graph 4 2 validation-register-bank :> bank
+            linear-scan-allocator bank [ linear-scan-allocation-with-registers ]
+            constrained-allocator boa graph swap compile-validation-cfg
+            check-validation-moving-phi
+        ] all?
     ] all?
 ] with-scope ] unit-test
