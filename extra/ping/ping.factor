@@ -34,7 +34,7 @@ TUPLE: echo type identifier sequence data ;
 
 :: recv-ping ( addr raw -- echo )
     raw receive addr = [
-        20 tail byte-array>echo
+        os linux? [ ] [ 20 tail ] if byte-array>echo
     ] [
         drop addr raw recv-ping
     ] if ;
@@ -46,6 +46,8 @@ HOOK: <ping-port> os ( inet -- port )
 M: object <ping-port> <raw> ;
 
 M: macos <ping-port> <datagram> ;
+
+M: linux <ping-port> <datagram> ;
 
 : ping ( host -- reply )
     <icmp> resolve-host [ icmp4? ] filter random
