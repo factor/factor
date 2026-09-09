@@ -5,6 +5,7 @@ compiler.cfg.instructions compiler.cfg.registers compiler.cfg.linearization
 compiler.cfg.def-use
 compiler.cfg.linear-scan compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.allocation.spilling
+compiler.cfg.linear-scan.allocation.splitting
 compiler.cfg.linear-scan.assignment compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.linear-scan.ranges compiler.cfg.linear-scan.resolve
@@ -14,7 +15,7 @@ compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.chordal.ba
 compiler.cfg.register-allocation.ssa.phases compiler.cfg.rpo
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.register-allocation.rematerialization
-continuations cpu.architecture heaps kernel locals make math
+continuations cpu.architecture grouping heaps kernel locals make math
 math.order namespaces sequences sorting vectors ;
 FROM: sets => members ;
 FROM: compiler.cfg.linear-scan.live-intervals => intervals-intersect? ;
@@ -68,13 +69,17 @@ SYMBOL: backtracking-splits
     interval ;
 
 :: phase-spill-before ( interval -- interval/f )
-    interval live-interval-end :> end
-    interval spill-before dup [
+    interval uses>> empty? [ f ] [
+        interval last-use n>> :> last
+        ! Cap at this live range, not the interval's final endpoint. A later
+        ! range may follow a hole occupied by an affinity-bundled result.
+        interval ranges>> [ last swap first2 between? ] find nip second :> end
+        interval spill-before
         backtracking-phase-mode? get [
-            dup last-use n>> dup 2 mod zero? [ 1 + ] when end min
+            last dup 2 mod zero? [ 1 + ] when end min
             swap [ fix-upper-bound ] change-ranges
         ] when
-    ] when ;
+    ] if ;
 
 ! Phase splits retain the last point of the prefix. Unlike sync splitting,
 ! no operand at this boundary may be discarded: a late use can immediately
@@ -91,6 +96,14 @@ SYMBOL: backtracking-splits
         after spill-after normalize-phase-reload
     ] [ interval position split-for-spill ] if ;
 
+ERROR: overlapping-backtracking-bundle intervals ;
+
+:: check-backtracking-bundle ( bundle -- )
+    check-allocation? get [
+        bundle ranges>> [ [ second ] [ first ] bi* < ] monotonic?
+        [ ] [ bundle intervals>> overlapping-backtracking-bundle ] if
+    ] when ;
+
 :: <allocation-bundle> ( intervals -- bundle )
     intervals [ interval-size ] map-sum :> size
     intervals intervals length 1 =
@@ -103,7 +116,8 @@ SYMBOL: backtracking-splits
         intervals [ ranges>> ] map concat [ first ] sort-by
     ] if
     intervals first interval-reg-class
-    intervals first vreg>> bundle-spillsets get at allocation-bundle boa ;
+    intervals first vreg>> bundle-spillsets get at allocation-bundle boa
+    dup check-backtracking-bundle ;
 
 :: make-spillset ( intervals -- spillset )
     intervals [ vreg>> ] map members
@@ -393,8 +407,8 @@ CONSTANT: backtracking-max-splits 16
         interval live-interval-start interval live-interval-end = [
             { }
         ] [
-            interval sync n>> split-for-spill
-            [ [ phase-spill-before ] ?call ] [ normalize-phase-reload ] bi* 2array sift
+            interval sync n>> split-interval
+            [ phase-spill-before ] [ spill-after normalize-phase-reload ] bi* 2array sift
         ] if
     ] [ interval 1array ] if ;
 
