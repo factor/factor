@@ -744,9 +744,15 @@ PRIVATE>
 : mismatch ( seq1 seq2 -- i )
     [ min-length ] 2keep mismatch-unsafe ;
 
-M: sequence <=>
+<PRIVATE
+
+: sequence<=> ( seq1 seq2 -- <=> )
     [ mismatch ] 2keep pick
-    [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ;
+    [ 2nth-unsafe <=> ] [ [ length ] compare nip ] if ; inline
+
+PRIVATE>
+
+M: sequence <=> sequence<=> ;
 
 : sequence= ( seq1 seq2 -- ? )
     [ 2length dupd = ] 2check
