@@ -1,0 +1,3 @@
+ioctl(0x80104592): result=-1 errno=25
+ioctl(0x401845c0): result=-1 errno=25
+ioctl(0x40044581): result=-1 errno=25

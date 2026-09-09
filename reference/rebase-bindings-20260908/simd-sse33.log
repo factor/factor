@@ -1,0 +1,1197 @@
+compiler.cfg.intrinsics.simd
+math.vectors.simd.intrinsics
+math.vectors.simd
+Unit Test: {
+    { t }
+    [
+        256 <iota> [
+            load-local
+            B{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } clone
+            uchar-16 boa 16 0 get-local <array>
+            >byte-array vshuffle underlying>> 0 get-local
+            [ load-local 0 get-local 15 bitand = 1 drop-locals ]
+            curry all? 1 drop-locals
+        ] all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            256 <iota> [
+                load-local
+                B{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } clone
+                uchar-16 boa 16 0 get-local <array> >byte-array
+                { uchar-16 byte-array } declare vshuffle
+                underlying>> 0 get-local [
+                    load-local 0 get-local 15 bitand =
+                    1 drop-locals
+                ] curry all? 1 drop-locals
+            ] all?
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ char-16
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ uchar-16
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ short-8
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ ushort-8
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ int-4
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ uint-4
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ longlong-2
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ ulonglong-2
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ float-4
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ double-2
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ half-8
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            1
+            3
+            7
+            15
+            16
+            17
+            255
+            256
+            1000
+            1267650600228229401496703205376
+        }
+        [
+            \ bfloat-8
+            swap
+            [ [ hlshift ] t horizontal-shift-matches? ]
+            [ [ hrshift ] f horizontal-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            char-16{
+                -128
+                127
+                -1
+                1
+                -2
+                2
+                -3
+                3
+                -128
+                127
+                -1
+                1
+                -2
+                2
+                -3
+                3
+            }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            uchar-16{
+                255
+                128
+                127
+                0
+                1
+                2
+                3
+                4
+                255
+                128
+                127
+                0
+                1
+                2
+                3
+                4
+            }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            short-8{ -1 -32768 32767 1 -2 2 -3 3 }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            ushort-8{ 1 65535 32768 32767 2 3 4 5 }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            int-4{ -2147483648 2147483647 -1 1 }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            uint-4{ 4294967295 2147483648 1 0 }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            longlong-2{
+                -9223372036854775808
+                9223372036854775807
+            }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        {
+            0
+            7
+            8
+            15
+            16
+            31
+            32
+            63
+            64
+            255
+            256
+            257
+            1000
+            1267650600228229401496703205376
+            1267650600228229401496703205377
+        }
+        [
+            ulonglong-2{ 18446744073709551615 1 }
+            swap
+            [ [ vlshift ] lane-shift-matches? ]
+            [ [ vrshift ] lane-shift-matches? ]
+            2bi
+            and
+        ]
+        all?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        short-8{
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            32767
+            32767
+            32767
+        } short-8{
+            -32768
+            -32768
+            -32768
+            32767
+            32767
+            -32768
+            32767
+            32767
+        } int-4{ 2147483647 32768 -2147418112 2147352578 }
+        multiply-add-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        short-8{
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+            -32768
+        } dup
+        int-4{ 2147483647 2147483647 2147483647 2147483647 }
+        multiply-add-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        uchar-16{
+            255
+            255
+            255
+            255
+            1
+            2
+            3
+            4
+            255
+            255
+            255
+            255
+            1
+            2
+            3
+            4
+        } uchar-16{
+            127
+            127
+            128
+            128
+            127
+            128
+            127
+            128
+            127
+            127
+            128
+            128
+            127
+            128
+            127
+            128
+        }
+        short-8{ 32767 -32768 -129 -131 32767 -32768 -129 -131 }
+        multiply-add-matches?
+    ]
+}
+Unit Test: {
+    { int-4{ 42 69 13 911 } }
+    [
+        int-4{ 69 42 911 13 }
+        B{ 4 5 6 7 0 1 2 3 12 13 14 15 8 9 10 11 }
+        [ { int-4 byte-array } declare vshuffle ] compile-call
+    ]
+}
+Unit Test: {
+    { int-4{ 42 69 13 911 } }
+    [
+        int-4{ 69 42 911 13 }
+        B{ 4 5 6 7 0 1 2 3 12 13 14 15 8 9 10 11 } t
+        "always-inline-simd-intrinsics" [
+            [ { int-4 byte-array } declare vshuffle ]
+            compile-call
+        ] with-variable
+    ]
+}
+Must Fail With: { [ int-4{ 1 2 3 4 } B{ 0 } vshuffle ] [ bad-simd-vector? ] }
+Must Fail With: {
+    [ int-4{ 1 2 3 4 } 17 <byte-array> vshuffle ]
+    [ bad-simd-vector? ]
+}
+Unit Test: {
+    { t }
+    [
+        \ char-16
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ uchar-16
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ short-8
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ ushort-8
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ int-4
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ uint-4
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ longlong-2
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ ulonglong-2
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ float-4
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ double-2
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ half-8
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        \ bfloat-8
+        new
+        [ drop 100 ]
+        map
+        dup
+        dup
+        length
+        10000
+        *
+        dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        longlong-2{ -9223372036854775808 9223372036854775807 }
+        dup 170141183460469231713240559642174554113 dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        ulonglong-2{ 18446744073709551615 18446744073709551615 }
+        dup 680564733841876926852962238568698216450 dot-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 1.0 2.0 } double-2{ 0/0. 1.0 }
+        add-sub-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 0/0. 1.0 0/0. 1.0 }
+        add-sub-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ -0.0 -0.0 } double-2{ 0.0 -0.0 }
+        add-sub-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ -0.0 -0.0 0.0 0.0 }
+        float-4{ 0.0 -0.0 -0.0 0.0 } add-sub-matches?
+    ]
+}
+Unit Test: { { t } [ vector-reps [ check-rep-array ] all? ] }
+Unit Test: {
+    { t }
+    [
+        [ int-4-rep byte>rep-array first ] final-classes first
+        integer class<=
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ half-8-rep byte>rep-array ] final-classes first half
+        c-array-type =
+    ]
+}
+Unit Test: {
+    { 7 }
+    [
+        16 <byte-array> uint-4-rep byte>rep-array
+        [ 7 0 rot set-nth ] [ underlying>> ] bi
+        [ uint-4-rep byte>rep-array first ] compile-call
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ 1/0. -1/0. -0.0 -0.25 }
+        float-4{ 1/0. -1/0. -0.0 -0.0 } [ vround-to-even ]
+        rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ -0.0 -0.25 -0.5 0.5 }
+        float-4{ -0.0 -0.0 -1.0 1.0 } [ vround ]
+        rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 4503599627370497.0 -4503599627370497.0 }
+        double-2{ 4503599627370497.0 -4503599627370497.0 }
+        [ vround ] rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 0.49999999999999994 -0.49999999999999994 }
+        double-2{ 0.0 -0.0 } [ vround ] rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ 0.5 1.5 -2.5 -3.5 }
+        float-4{ 0.0 2.0 -2.0 -4.0 } [ vround-to-even ]
+        rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        half-8{ -0.0 -0.25 -0.5 0.5 1.5 -2.5 1/0. -1/0. }
+        half-8{ -0.0 -0.0 -0.0 0.0 2.0 -2.0 1/0. -1/0. }
+        [ vround-to-even ] rounding-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ 3.0 1.0 2.0 0/0. } 1.0
+        [ vmin-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ 3.0 1.0 2.0 0/0. } 3.0
+        [ vmax-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ -0.0 0.0 } -0.0
+        [ vmin-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 0.0 -0.0 } 0.0
+        [ vmax-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ -0.0 0.0 0/0. 3.0 }
+        float-4{ 0.0 -0.0 2.0 0/0. }
+        float-4{ -0.0 -0.0 2.0 3.0 } [ vmin ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        float-4{ -0.0 0.0 0/0. 3.0 }
+        float-4{ 0.0 -0.0 2.0 0/0. } float-4{ 0.0 0.0 2.0 3.0 }
+        [ vmax ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ -0.0 0.0 } double-2{ 0.0 -0.0 }
+        double-2{ -0.0 -0.0 } [ vmin ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ -0.0 0.0 } double-2{ 0.0 -0.0 }
+        double-2{ 0.0 0.0 } [ vmax ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 0/0. -1/0. } double-2{ 1/0. 0/0. }
+        double-2{ 1/0. -1/0. } [ vmin ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        double-2{ 0/0. -1/0. } double-2{ 1/0. 0/0. }
+        double-2{ 1/0. -1/0. } [ vmax ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        uint-4{ 2139095041 1065353216 4286578689 1073741824 }
+        float-4-cast
+        uint-4{ 1073741824 2139095041 1077936128 4286578689 }
+        float-4-cast
+        float-4{ 2.0 1.0 3.0 2.0 } [ vmin ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        uint-4{ 2139095041 1065353216 4286578689 1073741824 }
+        float-4-cast
+        uint-4{ 1073741824 2139095041 1077936128 4286578689 }
+        float-4-cast
+        float-4{ 2.0 1.0 3.0 2.0 } [ vmax ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        ulonglong-2{ 9218868437227405313 4607182418800017408 }
+        double-2-cast
+        ulonglong-2{ 4611686018427387904 18442240474082181121 }
+        double-2-cast
+        double-2{ 2.0 1.0 } [ vmin ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        ulonglong-2{ 9218868437227405313 4607182418800017408 }
+        double-2-cast
+        ulonglong-2{ 4611686018427387904 18442240474082181121 }
+        double-2-cast
+        double-2{ 2.0 1.0 } [ vmax ] extrema-match?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        uint-4{ 2139095041 1065353216 4286578689 1073741824 }
+        float-4-cast 1.0 [ vmin-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        uint-4{ 2139095041 1073741824 4286578689 1065353216 }
+        float-4-cast 2.0 [ vmax-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        ulonglong-2{ 4607182418800017408 9218868437227405313 }
+        double-2-cast 1.0 [ vmin-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        ulonglong-2{ 9218868437227405313 4607182418800017408 }
+        double-2-cast 1.0 [ vmax-element ] reduction-matches?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ float-4-rep (simd-vmin) ] [ ##compare-vector? ]
+        contains-insn?
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ double-2-rep (simd-vmax) ] [ ##compare-vector? ]
+        contains-insn?
+    ]
+}
+SIMD integration tests passed

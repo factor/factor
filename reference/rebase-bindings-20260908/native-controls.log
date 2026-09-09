@@ -1,0 +1,18 @@
+endian
+alien.data
+alien.libraries.finder.linux
+linux.input-events.ffi
+linux.input-events
+libudev
+Unit Test: {
+    { t }
+    [
+        "factor-rebase-probe" find-library
+        "libfactor-rebase-probe.so.10" tail?
+    ]
+}
+Unit Test: { { t } [ "factor-rebase-probe" find-library native-library? ] }
+Unit Test: { { f } [ "FACTOR_FINDER_MARKER" os-env file-exists? ] }
+Unit Test: { { t } [ "udev_new" udev-function-available? ] }
+Unit Test: { { t } [ udev_new dup >boolean swap udev_unref ] }
+Native library controls passed
