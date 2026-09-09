@@ -42,6 +42,14 @@ target's most permissive instruction encoding.
   allocator must preserve operand order and the distinction between uses,
   definitions and scratch temporaries.
 
+The current global live-interval builder instead uses closed instruction
+points: inputs and outputs at `n` conservatively interfere. This remains
+correct but can exceed the minimum register pressure permitted by the phase
+convention above. A claim of optimal SSA coloring must identify which pressure
+model it uses. A phase-aware interval extension also needs phased assignment:
+rename incoming uses before expiration, then activate and rename outputs and
+temporaries. Changing overlap endpoints alone would break operand assignment.
+
 ## Calls, ABI slots and collection
 
 - `clobber-insn` inputs are consumed in spill locations, including a value

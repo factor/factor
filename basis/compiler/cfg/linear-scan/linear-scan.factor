@@ -15,8 +15,7 @@ IN: compiler.cfg.linear-scan
         [ [ frame-reg = ] reject ] assoc-map
     ] when ;
 
-:: allocate-and-assign-registers ( cfg -- )
-    cfg admissible-registers :> registers
+:: allocate-and-assign-with-registers ( cfg registers -- )
     cfg compute-live-intervals :> input
     check-allocation? get [ input required-register-uses ] [ f ] if :> uses
     input registers allocate-registers :> intervals
@@ -25,6 +24,15 @@ IN: compiler.cfg.linear-scan
         intervals uses check-register-uses
     ] when
     cfg intervals assign-registers ;
+
+: allocate-and-assign-registers ( cfg -- )
+    dup admissible-registers allocate-and-assign-with-registers ;
+
+:: linear-scan-with-registers ( cfg registers -- )
+    cfg number-instructions
+    cfg registers allocate-and-assign-with-registers
+    cfg resolve-data-flow
+    cfg check-numbering ;
 
 : linear-scan ( cfg -- )
     {
