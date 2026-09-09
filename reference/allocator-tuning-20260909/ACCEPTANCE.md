@@ -53,6 +53,10 @@ The root image hash is unchanged. [Retained bootstrap evidence](default-bootstra
 includes both commands, source/asset hashes, counters and the execution-rate
 limitation when comparing the earlier 2:12 observation.
 
-The broad two-round timing report is pending. The diagnostic
+Both complete two-round matrices pass strict collection: 16 main timing
+processes, eight checked closures, 1,248 measured runtime batches and 208 checked
+outputs per host. [Final comparison](RESULTS.md) reports the speed recovery,
+remaining per-workload losses and ARM execution-rate limitations. Linear scan
+remains the default. The diagnostic
 [bootstrap profile](bootstrap-profile/README.md) is not an unprofiled bootstrap
 or fresh-image acceptance run.

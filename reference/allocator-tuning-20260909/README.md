@@ -1,5 +1,7 @@
 # Allocator regression tuning
 
+Completed [results and default decision](RESULTS.md), [correctness acceptance](ACCEPTANCE.md), and [under-two-minute saved-image bootstrap](default-bootstrap/README.md) are retained with both full architecture matrices. The protocol below describes the recorded experiment.
+
 The compiler baseline is merged source `7b6cd9519a71960a4fb0385bf6ceeaf66097d618`. Completed full-algorithm matrices under `reference/allocator-full-comparison-20260908` remain historical, immutable evidence. This experiment first captures targeted interval, assignment, and emitted-code provenance; full timing begins only after accepted fixes pass correctness gates.
 
 Native x86 runs in a new isolated `agent1` root on CPU 2. The matching baseline VM is built from the merged source, because it includes callback/ABI changes beyond the previously measured `30a50ab0df`. Its original compatible x86 image seed is reused; the complete compiler is refreshed with `refresh-all` before saving a new frozen image. Baseline and candidate must use identical VM/initial seed hashes within each architecture. Parent owns the ARM CPU lane and its matched assets.
