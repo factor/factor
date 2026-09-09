@@ -5,34 +5,54 @@ Reference pinned to bytecodealliance/regalloc2 commit
 [Ion design](https://github.com/bytecodealliance/regalloc2/blob/2fe490bc9dda433f70c54f90f7633ed929f693d9/doc/ION.md),
 [bundle processing](https://github.com/bytecodealliance/regalloc2/blob/2fe490bc9dda433f70c54f90f7633ed929f693d9/src/ion/process.rs).
 
-The earlier implementation is a size-ordered eviction queue over already
-SSA-destroyed intervals. It is not the complete Ion algorithm. This document
-tracks replacement requirements; a row is not complete merely because a
-similarly named counter or helper exists.
+This implementation replaces the former eviction queue over SSA-destroyed
+intervals with SSA bundle backtracking. The table identifies the corresponding
+mechanism and behavioral evidence. It does not claim identical heuristics,
+data structures, instruction numbering or output to regalloc2.
 
-| Reference mechanism | Required Factor behavior | Initial status |
+| Reference mechanism | Factor implementation | Behavioral evidence |
 |---|---|---|
-| SSA range construction, edge operands | Preserve phi inputs and original identities until moves are emitted; derived bases remain separate | Missing in backtracking; shared SSA extraction pending |
-| Bundle merging | Merge distinct noninterfering phi/copy affinity values; reject interference and incompatible representations | Missing: only same-leader fragments grouped |
-| Spillsets and register hints | Descendants share stable membership, hints and typed homes without equating SSA values | Missing |
-| Constraint meet and fixed clobbers | All mandatory uses allocated; stack-only ABI operands isolated; keep-destination exception honored | Stack/clobber splitting exists; refine and test with SSA |
-| Allocation-map probing | Exact holes, full conflict set, maximum conflicting weight, first conflict position | Exact indexed conflicts exist; conflict position missing |
-| Eviction and progress | Strictly higher weight evicts; finite splits reach mandatory minimal intervals; no alternate allocator fallback | Basic protocol exists |
-| Conflict-directed splitting | Split merged bundles at probed obstruction, preserve useful groups, use loop boundary costs | Missing: unbundle then median |
-| Canonical spill bundles | Retain no-use ranges for one second-chance allocation after mandatory bundles | Missing |
-| Spill slot allocation | Reuse homes for nonoverlapping spillsets with compatible storage; all fragments agree | Only per-vreg slots |
-| Move reification | Resolve phi, split, clobber and cycle moves; stack-to-stack safe; final symbolic SSA checker passes | Shared mechanisms exist; SSA integration pending |
+| SSA ranges and edge operands | `compute-phase-ssa-intervals`; identity leaders; phi operands remain edge-specific until transport | Native 40-value distinct phi diamond executes both paths; original value-flow checker |
+| Bundle merging | `prepare-backtracking-affinities`, `coalesce-bundle-groups`; exact representation and full original range disjointness required | Copy chain plus arithmetic merges four distinct SSA values and executes 10→11; interfering affinity rejected; exported bundle witness |
+| Spillsets and hints | `allocation-spillset`; descendants retain members, full original ranges, hint and split count | Split descendants retain one home; native phi merges; hint statistics |
+| Constraint handling | Paired SSA input/output phases; sync splitting removes memory-only operands; keep-destination exception retained; mandatory instruction fragments have infinite weight | Consecutive late→early operand split conserves both uses; call slot test; native branch/loop/FFI/GC validation corpus |
+| Allocation-map probing | Per-register ordered occupancy with inclusive holes; complete conflict set, maximum conflicting weight and first intersection | Indexed occupancy oracle, hole tests and exported exact eviction witness |
+| Eviction and backtracking | Strictly greater requesting weight; release and requeue every conflicting bundle; directly assign the now-free requested register | Sparse/dense pressure forces eviction and retry; exported before/after occupancy and queue |
+| Directed splitting | `first-bundle-conflict`, `conflict-split-site`, `split-bundle-at`; score obstruction with maximum conflict weight plus loop move cost; preserve groups and hints | Obstruction at 12 selects cut 9; initial obstruction peels first use; exported complete split partition |
+| Hot/cold clusters | Cached nesting weights at early and late points; choose cheaper loop transition within the conflict prefix | Five-use fixture selects cut 19 before hot cluster; paired phase-weight test; optional loop-store pressure tests |
+| Bounded progress | At most 16 progressive splits per original spillset, then directly partition remaining mandatory instruction clusters | 400-use alternating pressure triggers budget and >100 minimal fragments while interval/operand checks pass |
+| Canonical spill bundles | Subtract allocated ranges and clobber/GC barriers from original ranges; offer remaining no-use bundle one non-evicting second chance | Required fragments on register 0 with blocked middle; canonical gap assigned register 1, transition reified |
+| Shared spill homes | `ensure-spillset-home` reuses exact-representation storage only for disjoint complete original spillset ranges | Two real pressure allocations share slot 0; exported member/descendant ranges and slots checked independently |
+| Move reification | Local split transitions collected with all simultaneous reloads into parallel mappings; shared SSA edge transport handles phi, cycle and stack moves | Physical register swap passes original-value checker; native pressure and distinct phi branches; no-use second-chance transition |
 
-Factor target constraints differ from regalloc2's client API. At this allocation
-boundary ordinary operands specify representations/register classes, temporary
-operands, memory-only ABI operands and whole-register-file clobbers. Explicit
-per-operand fixed physical registers, early/late operand policy, pinned vregs,
-and regalloc2-style reused-input indices are not represented. Architecture
-lowering owns those fixed-register ABI shuffles. Tests must exercise the actual
-lowered contract rather than fabricate unsupported operand fields.
+Factor ranges use **inclusive** endpoints. Ordinary first inputs occupy early
+point n; later inputs and results occupy n+1. For `def-is-use-insn`, all inputs
+stay live through the result. Input fragments reload at an early point, even
+when their first operand use is late. Temps conflict across both phases.
+Clobber/ABI and explicit GC instructions remain atomic. Implicit derived GC
+bases participate in liveness; shared SSA machinery owns their transport.
 
-Completion requires behavioral fixtures for every applicable row, executed
-branch/loop/FFI/GC pressure with the final value-flow checker, and feature counters
-showing that merging, eviction, directed splitting, second chance and shared
-homes actually occur. The linear-scan default remains unchanged. Broad timing
-comparisons follow correctness and mechanism completion.
+Factor's lowered target contract has register classes, temporary registers,
+whole-file clobbers and memory-only ABI operands. It has no client fields for
+arbitrary fixed physical operands, pinned vregs, explicit arbitrary early/late
+constraints or reused-input indices. Architecture lowering handles ABI register
+shuffles; the first-input affinity models the actual two-operand emitter
+constraint. Those absent client features are not claimed as implementations.
+
+Implementation differences: occupancy uses ordered vectors rather than
+regalloc2's B-tree; intervals use Factor's numbering and inclusive endpoints;
+loop nesting supplies static costs rather than profile frequencies. Strict
+weight eviction immediately assigns after removing the complete conflict set,
+without an additional redundant probe. The split cap bounds repeated peeling;
+it is not a claim that every allocator operation has regalloc2's complexity.
+Initial obstruction splitting guarantees mandatory-piece progress, not an
+already conflict-free first piece. Impossible mandatory pressure raises an
+allocation error. There is no hidden linear-scan or other allocator fallback.
+
+All applicable algorithm mechanisms above are implemented and tested. The
+shared reduced-bank native corpus and full `compiler.cfg` suite pass with SSA,
+interval, mandatory operand and final original-value checks enabled. The
+separate shared derived-phi GC work and cross-architecture validation must be
+integrated before declaring the complete compiler candidate validated.
+Default linear scan remains unchanged. Performance claims require the separate
+frozen-source benchmark run; mechanism counters alone are not performance.
