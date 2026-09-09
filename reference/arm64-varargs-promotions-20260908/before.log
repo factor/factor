@@ -1,0 +1,1352 @@
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+--> test failed!
+15
+0
+
+==== resource:basis/compiler/tests/alien-varargs-promotions.factor
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { 1 } [ [ 0 t vap-bool ] compile-call ] }
+
+Generic word >fixnum does not define a method for the word class.
+Dispatching on object: t
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test =>
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(O) ( gensym )
+(O) M\ object >fixnum
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { 0 } [ [ 0 f vap-bool ] compile-call ] }
+
+Generic word >fixnum does not define a method for the POSTPONE: f class.
+Dispatching on object: f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test =>
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(O) ( gensym )
+(O) M\ object >fixnum
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { 1 }
+    [ [ 0 "non-false Factor object" vap-bool ] compile-call ]
+}
+
+Generic word >fixnum does not define a method for the string class.
+Dispatching on object: "non-false Factor object"
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test =>
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(O) ( gensym )
+(O) M\ object >fixnum
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { -1 } [ [ 0 255 vap-char ] compile-call ] }
+
+=== Expected:
+-1
+=== Got:
+255
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test =>
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { 255 } [ [ 0 -1 vap-uchar ] compile-call ] }
+
+=== Expected:
+255
+=== Got:
+-1
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test =>
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { 65535 } [ [ 0 -1 vap-ushort ] compile-call ] }
+
+=== Expected:
+65535
+=== Got:
+-1
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test =>
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { -7 }
+    [
+        [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ]
+        compile-call
+    ]
+}
+
+=== Expected:
+-7
+=== Got:
+1431655929
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test =>
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { 65530 }
+    [
+        [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ]
+        compile-call
+    ]
+}
+
+=== Expected:
+65530
+=== Got:
+1431699450
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test =>
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { -7 } [ [ 0 -7 vap-signed ] compile-call ] }
+
+=== Expected:
+-7
+=== Got:
+82919161
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test =>
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: { { 65530 } [ [ 0 65530 vap-unsigned ] compile-call ] }
+
+=== Expected:
+65530
+=== Got:
+82968570
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test =>
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { t }
+    [ [ 0 0.1 vap-float vap_control_float = ] compile-call ]
+}
+
+=== Expected:
+t
+=== Got:
+f
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test =>
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { 1 }
+    [
+        [
+            0 t "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-bool
+        ]
+        compile-call
+    ]
+}
+
+Generic word >fixnum does not define a method for the word class.
+Dispatching on object: t
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test =>
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(O) indirect-vap-bool
+(O) M\ object >fixnum
+(O) no-method
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { 65530 }
+    [
+        [
+            0 vap-positive "vap_read_integer"
+            "varargs-promotions" library-dll dlsym
+            indirect-vap-unsigned
+        ]
+        compile-call
+    ]
+}
+
+=== Expected:
+65530
+=== Got:
+88342522
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [ 7 <iota> ~quotation~ map ] promotion-unit-test
+        { 1 } [ 0 t vap-bool ] promotion-unit-test
+        { 0 } [ 0 f vap-bool ] promotion-unit-test
+        { 1 } [ 0 "non-false Factor object" vap-bool ]
+        promotion-unit-test
+        { -7 } [ 0 -7 vap-char ] promotion-unit-test
+        { -1 } [ 0 255 vap-char ] promotion-unit-test
+        { 255 } [ 0 -1 vap-uchar ] promotion-unit-test
+        { 65535 } [ 0 -1 vap-ushort ] promotion-unit-test
+        { -7 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ] promotion-unit-test
+        { 65530 } [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ] promotion-unit-test
+        { -7 } [ 0 -7 vap-signed ] promotion-unit-test
+        { 65530 } [ 0 65530 vap-unsigned ] promotion-unit-test
+        { 0.10000000149011612 } [ vap_control_float ]
+        promotion-unit-test
+        { t } [ 0 0.1 vap-float vap_control_float = ]
+        promotion-unit-test
+        { 1 } [
+            0 t "vap_read_integer" "varargs-promotions" library-dll
+            dlsym indirect-vap-bool
+        ] promotion-unit-test
+        { 65530 } [
+            0 vap-positive "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-unsigned
+        ] promotion-unit-test => cpu arm.64? [
+            ~array~ ~quotation~ promotion-unit-test
+            ~array~ ~quotation~ promotion-unit-test
+        ] when
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { { 1 -7 65530 0.10000000149011612 } }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local bool va-arg 0 get-local
+                vap-signed-enum va-arg 0 get-local
+                vap-unsigned-enum va-arg 0 get-local float
+                va-arg 4array promotion-values set-global
+                0.0 2 drop-locals
+            ] vap-runtime-reader
+            [ vap_call_reader ] with-callback drop
+            promotion-values get
+        ]
+        compile-call
+    ]
+}
+
+=== Expected:
+{ 1 -7 65530 0.10000000149011612 }
+=== Got:
+{ 1 vap-negative vap-positive 0.10000000149011612 }
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(U) [
+        { ~array~ } [
+            ~quotation~ vap-runtime-reader ~quotation~ with-callback
+            drop promotion-values get
+        ] promotion-unit-test =>
+        { ~array~ } [
+            ~quotation~ vap-tail-reader ~quotation~ with-callback
+            drop promotion-values get
+        ] promotion-unit-test
+    ]
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+
+resource:basis/compiler/tests/alien-varargs-promotions.factor: 29
+
+Unit Test: {
+    { { 1 -7 65530 0.10000000149011612 } }
+    [
+        [
+            [
+                5 load-locals -4 get-local drop
+                -3 get-local -2 get-local -1 get-local 0
+                get-local 4array promotion-values set-global
+                0.0 5 drop-locals
+            ] vap-tail-reader [ vap_call_reader ] with-callback
+            drop promotion-values get
+        ]
+        compile-call
+    ]
+}
+
+=== Expected:
+{ 1 -7 65530 0.10000000149011612 }
+=== Got:
+{ 1 vap-negative vap-positive 0.10000000149011612 }
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => flush [ datastack. flush ] with-output>error ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+        run-test-file => test-failures get length .
+        compiler-errors get assoc-size . :test-failures
+    ]
+(O) run-test-file
+(O) promotion-unit-test
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

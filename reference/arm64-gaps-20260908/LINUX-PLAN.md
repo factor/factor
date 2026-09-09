@@ -74,7 +74,7 @@ For every defect, preserve the smallest independent C reproducer and run identic
 
 If a case already passes on the baseline, record it as qualification coverage. Do not manufacture a historical failure. An intentional wrong-offset or missing-capability mutation can demonstrate test sensitivity, but must be labeled as a negative control rather than a discovered bug.
 
-Exercise nested callbacks, callback allocation and GC, large returns under pressure, pointer lifetime, and the runtime's supported thread-entry behavior. For unsupported foreign-thread entry or variadic callbacks, test/document rejection instead of calling through an unsupported interface.
+Exercise nested callbacks, callback allocation and GC, large returns under pressure, pointer lifetime, and the runtime's supported thread-entry behavior. Run the variadic callback and native `va_list` suites, including copying, forwarding, and expired-cursor rejection. Foreign-thread entry must follow the existing runtime's supported entry contract.
 
 Run the full compiler suite with SSA and allocation verification. Repeat the FFI matrix with global value numbering enabled across linear-scan, greedy, backtracking, and chordal allocators, using `final-allocator-ffi.factor` in this directory as the starting harness. Re-run macOS ARM64 and x86 shared-code regressions for changes to parameter metadata, boxing, renaming, or common compiler logic.
 
@@ -110,4 +110,4 @@ Add Linux ABI cases to the shared runner and require coverage assertions in the 
 - CI proves failure propagation and fixture execution; evidence identifies the exact source, binary, image, and toolchain.
 - Unsupported signatures and platform/runtime exclusions are enumerated. The completion claim is Linux AArch64/glibc for that supported surface, not all C types, libcs, or runtimes.
 
-Work in this order. Once the native baseline and fixture split exist, general ABI, reduced types, and runtime checks can proceed independently; combine their results before the final CI acceptance run. Windows ABI work, variadic callback implementation, and SVE/SME remain separate projects.
+Work in this order. Once the native baseline and fixture split exist, general ABI, reduced types, and runtime checks can proceed independently; combine their results before the final CI acceptance run. Variadic calls, callbacks, and native `va_list` interoperability now have shared ARM64 regression suites and per-compiler CI checks. Native Linux qualification must include them. Windows platform qualification and SVE/SME remain separate work.

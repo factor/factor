@@ -1,0 +1,287 @@
+Unit Test: {
+    { -7 3.5 42 }
+    [
+        [
+            load-local -7 0 get-local 256 set-alien-signed-4
+            3.5 0 get-local 264 set-alien-double
+            42 0 get-local 272 set-alien-signed-8
+            0 get-local macos cursor-at load-local
+            0 get-local char va-arg 0 get-local double va-arg 0
+            get-local longlong va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 11 22 22 }
+    [
+        [
+            load-local 11 0 get-local 256 set-alien-signed-4
+            22 0 get-local 264 set-alien-signed-4
+            0 get-local macos cursor-at load-local
+            0 get-local int va-arg 0 get-local va-copy
+            load-local
+            -1 get-local int va-arg 0 get-local int va-arg 3
+            drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 123 2.5 456 }
+    [
+        [
+            load-local 123 0 get-local 0 set-alien-signed-4
+            456 0 get-local 8 set-alien-signed-4
+            2.5 0 get-local 64 set-alien-double
+            0 get-local linux cursor-at load-local
+            0 get-local int va-arg 0 get-local double va-arg 0
+            get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 7 8 }
+    [
+        [
+            load-local 7 0 get-local 56 set-alien-signed-4
+            8 0 get-local 256 set-alien-signed-4
+            0 get-local linux cursor-at -8 >>gr-offs load-local
+            0 get-local int va-arg 0 get-local int va-arg 2
+            drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 17 19 23 }
+    [
+        [
+            load-local 999 0 get-local 56 set-alien-signed-8
+            17 0 get-local 256 set-alien-signed-8
+            19 0 get-local 264 set-alien-signed-8
+            23 0 get-local 272 set-alien-signed-4
+            0 get-local linux cursor-at -8 >>gr-offs load-local
+            0 get-local va-pair va-arg [ x>> ] [ y>> ] bi
+            0 get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 17 19 23 }
+    [
+        [
+            load-local 17 0 get-local 56 set-alien-signed-8
+            19 0 get-local 64 set-alien-signed-8
+            23 0 get-local 72 set-alien-signed-4
+            0 get-local windows cursor-at
+            56 0 get-local <displaced-alien> >>stack load-local
+            0 get-local va-pair va-arg [ x>> ] [ y>> ] bi
+            0 get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.5 2.5 }
+    [
+        [
+            load-local 1.5 0 get-local 64 set-alien-double
+            2.5 0 get-local 80 set-alien-double
+            0 get-local linux cursor-at va-hfa va-arg load-local
+            100.0 -1 get-local 64 set-alien-double 0 get-local
+            [ x>> ] [ y>> ] bi 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-double
+            2.0 0 get-local 80 set-alien-double
+            3.0 0 get-local 96 set-alien-double
+            4.0 0 get-local 112 set-alien-double
+            0 get-local linux cursor-at va-nested-hfa va-arg
+            [ x>> [ x>> ] [ y>> ] bi ]
+            [ y>> [ x>> ] [ y>> ] bi ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 3.0 4.0 5.0 }
+    [
+        [
+            load-local 999.0 0 get-local 176 set-alien-double
+            3.0 0 get-local 256 set-alien-double
+            4.0 0 get-local 264 set-alien-double
+            5.0 0 get-local 272 set-alien-double
+            0 get-local linux cursor-at -16 >>vr-offs load-local
+            0 get-local va-hfa va-arg [ x>> ] [ y>> ] bi
+            0 get-local double va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 11 22 33 }
+    [
+        [
+            load-local 320 0 get-local <displaced-alien>
+            0 get-local 0 set-alien-cell
+            11 0 get-local 320 set-alien-signed-8
+            22 0 get-local 328 set-alien-signed-8
+            33 0 get-local 336 set-alien-signed-8
+            0 get-local linux cursor-at va-triple va-arg
+            [ x>> ] [ y>> ] [ z>> ] tri 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 } }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-double
+            2.0 0 get-local 80 set-alien-double
+            3.0 0 get-local 96 set-alien-double
+            0 get-local linux cursor-at
+            va-array-hfa va-arg values>> >array 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Must Fail With: { [ half c-type-rep ] [ small-float-scalar-abi-unsupported? ] }
+Must Fail With: {
+    [ bfloat c-type-rep ]
+    [ small-float-scalar-abi-unsupported? ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } { 5.0 6.0 7.0 8.0 } }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-float
+            2.0 0 get-local 68 set-alien-float
+            3.0 0 get-local 72 set-alien-float
+            4.0 0 get-local 76 set-alien-float
+            5.0 0 get-local 80 set-alien-float
+            6.0 0 get-local 84 set-alien-float
+            7.0 0 get-local 88 set-alien-float
+            8.0 0 get-local 92 set-alien-float
+            0 get-local linux cursor-at va-hva va-arg
+            [ x>> >array ] [ y>> >array ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } 23 }
+    [
+        [
+            load-local 1.0 0 get-local 272 set-alien-float
+            2.0 0 get-local 276 set-alien-float
+            3.0 0 get-local 280 set-alien-float
+            4.0 0 get-local 284 set-alien-float
+            23 0 get-local 288 set-alien-signed-4
+            0 get-local linux cursor-at 0 >>vr-offs 0 >>gr-offs
+            264 0 get-local <displaced-alien> >>stack load-local
+            0 get-local float-4 va-arg >array 0 get-local int
+            va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } }
+    [
+        [
+            [
+                load-local 1.0 0 get-local 64 set-alien-float
+                2.0 0 get-local 68 set-alien-float
+                3.0 0 get-local 72 set-alien-float
+                4.0 0 get-local 76 set-alien-float
+                0 get-local linux cursor-at
+                float-4 va-arg >array 1 drop-locals
+            ] with-va-memory
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } 23 }
+    [
+        [
+            load-local 1.0 0 get-local 56 set-alien-float
+            2.0 0 get-local 60 set-alien-float
+            3.0 0 get-local 64 set-alien-float
+            4.0 0 get-local 68 set-alien-float
+            23 0 get-local 72 set-alien-signed-4
+            0 get-local windows cursor-at
+            56 0 get-local <displaced-alien> >>stack load-local
+            0 get-local float-4 va-arg >array 0 get-local int
+            va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        [
+            load-local 320 0 get-local <displaced-alien>
+            0 get-local 256 set-alien-cell
+            1.0 0 get-local 320 set-alien-double
+            2.0 0 get-local 328 set-alien-double
+            3.0 0 get-local 336 set-alien-double
+            4.0 0 get-local 344 set-alien-double
+            0 get-local windows cursor-at va-nested-hfa va-arg
+            [ x>> [ x>> ] [ y>> ] bi ]
+            [ y>> [ x>> ] [ y>> ] bi ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { }
+    [
+        [
+            load-local 0 get-local macos cursor-at
+            dup escaped-cursor set-global
+            va-copy escaped-copy set-global 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Must Fail With: { [ escaped-cursor get int va-arg ] [ expired-va-list? ] }
+Must Fail With: { [ escaped-copy get va-copy ] [ expired-va-list? ] }
+Unit Test: {
+    { }
+    [
+        [
+            [
+                load-local 0 get-local macos cursor-at
+                dup escaped-cursor set-global
+                va-copy escaped-copy set-global
+                "scope cleanup test" throw 1 drop-locals
+            ] with-va-memory
+        ] [ drop ] recover
+    ]
+}
+Must Fail With: { [ escaped-cursor get int va-arg ] [ expired-va-list? ] }
+Must Fail With: { [ escaped-copy get int va-arg ] [ expired-va-list? ] }
+Unit Test: {
+    { t }
+    [
+        [
+            load-local 0 get-local macos cursor-at load-local
+            0 get-local [
+                load-local 0 get-local [
+                    load-local 0 get-local va-copy drop
+                    f 1 drop-locals
+                ] curry [ expired-va-list? ] recover
+                1 drop-locals
+            ] curry future ?future 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Must Fail With: {
+    [ f f f 0 0 macos <platform-va-cursor> ]
+    [ va-list-outside-callback-scope? ]
+}
+Unit Test: {
+    { t t f }
+    [
+        va_list native-va-list-type? cpu arm.64? =
+        va_list lookup-c-type native-va-list-type? cpu arm.64? =
+        int native-va-list-type?
+    ]
+}
+0
+0

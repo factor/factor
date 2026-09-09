@@ -1,0 +1,195 @@
+
+File: reference/arm64-varargs-windows-exports-20260908/exports.dll
+Format: COFF-ARM64
+Arch: aarch64
+AddressSize: 64bit
+Export {
+  Ordinal: 1
+  Name: bfloat_bits
+  RVA: 0x1C74
+}
+Export {
+  Ordinal: 2
+  Name: bfloat_callback
+  RVA: 0x1CE0
+}
+Export {
+  Ordinal: 3
+  Name: bfloat_convert
+  RVA: 0x1CAC
+}
+Export {
+  Ordinal: 4
+  Name: bfloat_dirty_result
+  RVA: 0x1F78
+}
+Export {
+  Ordinal: 5
+  Name: bfloat_from_bits
+  RVA: 0x1C90
+}
+Export {
+  Ordinal: 6
+  Name: bfloat_identity
+  RVA: 0x1C60
+}
+Export {
+  Ordinal: 7
+  Name: bfloat_mixed
+  RVA: 0x1D08
+}
+Export {
+  Ordinal: 8
+  Name: bfloat_overflow
+  RVA: 0x1D64
+}
+Export {
+  Ordinal: 9
+  Name: bfloat_overflow_callback
+  RVA: 0x1ED4
+}
+Export {
+  Ordinal: 10
+  Name: bfloat_varargs
+  RVA: 0x1E20
+}
+Export {
+  Ordinal: 11
+  Name: ffi_test_small_floats_available
+  RVA: 0x195C
+}
+Export {
+  Ordinal: 12
+  Name: half_bits
+  RVA: 0x1978
+}
+Export {
+  Ordinal: 13
+  Name: half_callback
+  RVA: 0x19C8
+}
+Export {
+  Ordinal: 14
+  Name: half_convert
+  RVA: 0x19B0
+}
+Export {
+  Ordinal: 15
+  Name: half_dirty_result
+  RVA: 0x1F50
+}
+Export {
+  Ordinal: 16
+  Name: half_from_bits
+  RVA: 0x1994
+}
+Export {
+  Ordinal: 17
+  Name: half_identity
+  RVA: 0x1964
+}
+Export {
+  Ordinal: 18
+  Name: half_mixed
+  RVA: 0x19F0
+}
+Export {
+  Ordinal: 19
+  Name: half_overflow
+  RVA: 0x1A4C
+}
+Export {
+  Ordinal: 20
+  Name: half_overflow_callback
+  RVA: 0x1BEC
+}
+Export {
+  Ordinal: 21
+  Name: half_varargs
+  RVA: 0x1B40
+}
+Export {
+  Ordinal: 22
+  Name: mixed_small_sum
+  RVA: 0x1FA0
+}
+Export {
+  Ordinal: 23
+  Name: vap_call_reader
+  RVA: 0x1920
+}
+Export {
+  Ordinal: 24
+  Name: vap_control_float
+  RVA: 0x1900
+}
+Export {
+  Ordinal: 25
+  Name: vap_control_integer
+  RVA: 0x17F8
+}
+Export {
+  Ordinal: 26
+  Name: vap_poison
+  RVA: 0x17AC
+}
+Export {
+  Ordinal: 27
+  Name: vap_read_float
+  RVA: 0x1760
+}
+Export {
+  Ordinal: 28
+  Name: vap_read_integer
+  RVA: 0x1714
+}
+Export {
+  Ordinal: 29
+  Name: varout_bfloat_bits
+  RVA: 0x1578
+}
+Export {
+  Ordinal: 30
+  Name: varout_control
+  RVA: 0x1380
+}
+Export {
+  Ordinal: 31
+  Name: varout_half_bits
+  RVA: 0x14C0
+}
+Export {
+  Ordinal: 32
+  Name: varout_hfas
+  RVA: 0x1128
+}
+Export {
+  Ordinal: 33
+  Name: varout_mixed
+  RVA: 0x1000
+}
+Export {
+  Ordinal: 34
+  Name: varout_return
+  RVA: 0x12DC
+}
+Export {
+  Ordinal: 35
+  Name: varout_split
+  RVA: 0x1210
+}
+Export {
+  Ordinal: 36
+  Name: varout_split_caller_supported
+  RVA: 0x14B8
+}
+Export {
+  Ordinal: 37
+  Name: varout_split_control
+  RVA: 0x1458
+}
+Export {
+  Ordinal: 38
+  Name: varout_vector_args
+  RVA: 0x1630
+}

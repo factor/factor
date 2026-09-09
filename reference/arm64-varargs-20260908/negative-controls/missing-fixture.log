@@ -1,0 +1,88 @@
++ /opt/homebrew/opt/llvm/bin/clang -std=c11 -O2 -fPIC -dynamiclib vm/ffi_test.c -lm -o /private/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture/libfactor-ffi-test.dylib
++ /opt/homebrew/opt/llvm/bin/clang -std=c11 -O2 -Wall -Wextra -Werror -DFACTOR_VARARGS_CONTROL_MAIN vm/ffi_test_varargs.c -o /var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-y37ncbm9/controls
++ /var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-y37ncbm9/controls
+C HFA spill control: PASS
+C variadic ABI controls: 0xff / 0xff
+C half/BF16 variadic controls: PASS
++ /Users/erg/factor.worktrees/arm64-varargs-entry/Factor.app/Contents/MacOS/factor -i=/Users/erg/factor/reference/arm64-varargs-20260908/current.image -resource-path=/private/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture -no-user-init -no-monitors -require-varargs-small .github/arm64-varargs-tests.factor
+Cannot resolve C library function
+Library: DLL" /private/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/fact..."
+Symbol: va_c_controls
+DlError: dlsym(0x74c9f3a0, va_c_controls): symbol not found
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "resource:.github/arm64-varargs-coverage.factor" run-file =>
+        {
+            "alien.varargs"
+            "raylib"
+            "gobject-introspection.standard-types"
+        } [ ~quotation~ ~quotation~ bi ] each os unix?
+        [ "curses.ffi" ~quotation~ ~quotation~ bi ] when os linux?
+        [ "libudev" ~quotation~ ~quotation~ bi ] when {
+            "resource:basis/compiler/tests/alien-varargs.factor"
+            "resource:basis/compiler/tests/alien-varargs-outgoing.factor"
+            "resource:basis/compiler/tests/alien-varargs-promotions.factor"
+            "resource:basis/compiler/tests/alien-arm64-unions.factor"
+            "resource:basis/compiler/tests/alien-small-floats.factor"
+        } [ dup print flush run-test-file ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and
+        [ "ARM64 varargs tests passed" print flush 0 exit ] [
+            :test-failures compiler-errors get values ~quotation~
+            each flush 1 exit
+        ] if
+    ]
+(U) [
+        cpu arm.64?
+        [ "Varargs qualification requires a native ARM64 VM" throw ]
+        unless va_c_controls => 255 assert=
+        "require-varargs-small" get [
+            va_small_available 1 assert=
+            ffi_test_small_floats_available 1 assert=
+            va_small_controls 1 assert=
+            "ARM64 half/BF16 varargs coverage required and available"
+            print
+        ] when "ARM64 C varargs controls passed: 0xff" print
+    ]
+(O) va_c_controls
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
+Traceback (most recent call last):
+  File "/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture/.github/check-arm64-varargs.py", line 64, in <module>
+    main()
+  File "/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture/.github/check-arm64-varargs.py", line 56, in main
+    run([factor, *flags,
+  File "/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture/.github/check-arm64-varargs.py", line 13, in run
+    subprocess.run(list(map(str, command)), cwd=root, check=True)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/Users/erg/factor.worktrees/arm64-varargs-entry/Factor.app/Contents/MacOS/factor', '-i=/Users/erg/factor/reference/arm64-varargs-20260908/current.image', '-resource-path=/private/var/folders/9s/v10381cs7sd2s_lv0z76bjrr0000gn/T/factor-varargs-negative-z9iay8qb/missing-fixture', '-no-user-init', '-no-monitors', '-require-varargs-small', '.github/arm64-varargs-tests.factor']' returned non-zero exit status 1.

@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /Users/erg/factor.worktrees/arm64-varargs-entry/factor -i=/Users/erg/factor/reference/arm64-varargs-20260908/final.image -resource-path=/Users/erg/factor -no-user-init -no-monitors "$@"

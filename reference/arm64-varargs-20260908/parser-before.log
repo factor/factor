@@ -1,0 +1,25 @@
+1: USING: alien.c-types alien.syntax ; IN: varargs.baseline CALLBACK: int reader ( int count, ... )
+                                                                                                   ^
+varargs-in-function-declaration
+
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) eval-with-stack
+(O) (eval-with-stack)
+(O) parse-string
+(O) (parse-lines)
+(O) (parse-until)
+(O) execute-parsing
+(O) POSTPONE: CALLBACK:
+(O) (CALLBACK:)
+(O) scan-c-args
+(O) varargs-in-function-declaration
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

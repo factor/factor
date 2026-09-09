@@ -1,0 +1,2 @@
+qemu-aarch64 version 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.2)
+Copyright (c) 2003-2025 Fabrice Bellard and the QEMU Project developers

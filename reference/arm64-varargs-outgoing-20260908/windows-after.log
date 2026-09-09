@@ -1,0 +1,43 @@
+alien.c-types.varargs
+compiler.cfg.builder.alien.boxing
+cpu.arm.64
+compiler.cfg.builder.alien
+stack-checker.alien
+Unit Test: { { 285.0 } [ 1 2 3 4 5 6 7 8 9 win_varout_mixed ] }
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 win-small-hfa boa 3 4 5 win-pair boa
+        6 7 8 win-hfa boa 9 win_varout_hfas
+    ]
+}
+Unit Test: {
+    { 317.0 }
+    [ 1 2 3 4 5 6 7 4 5 win-pair boa 10 win_varout_split ]
+}
+Unit Test: {
+    { 16.0 27.0 38.0 }
+    [
+        10 6 7 8 win-hfa boa win_varout_return
+        [ x>> ] [ y>> ] [ z>> ] tri
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 3 4 5 6 7 8 9 "win_varout_mixed"
+        "windows-varargs-oracle" library-dll dlsym
+        indirect-win-mixed
+    ]
+}
+Unit Test: { { 806016 } [ 1 8 2 3 4 5 6 7 8 9 win_varout_half_bits ] }
+Unit Test: { { 745872 } [ 1 8 2 3 4 5 6 7 8 9 win_varout_bfloat_bits ] }
+Unit Test: {
+    { 212.0 }
+    [
+        1
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        float-4{ 9.0 10.0 11.0 12.0 } win-hva boa
+        1 win_varout_vector_args
+    ]
+}

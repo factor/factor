@@ -1,0 +1,33 @@
+Unit Test: { { f } [ "alien-callback-varargs" "alien" lookup-word ] }
+Unit Test: { { 2 } [ CALLBACK-STUB special-object length ] }
+Unit Test: { { t } [ "alien-callback-varargs" "alien" lookup-word word? ] }
+Unit Test: {
+    { t }
+    [
+        "alien-callback-varargs" "alien" lookup-word
+        "declared-effect" word-prop
+        ( return named-parameters abi quot -- alien ) =
+    ]
+}
+Unit Test: { { 3 } [ CALLBACK-STUB special-object length ] }
+Unit Test: {
+    { t }
+    [
+        CALLBACK-STUB special-object 2 head
+        "old-callback-template" get =
+    ]
+}
+Unit Test: {
+    { t t 123 }
+    [
+        "alien-callback-varargs" "alien" lookup-word
+        [ "compat-word" get eq? ]
+        [ def>> "compat-definition" get eq? ]
+        [ "compat-marker" word-prop ] tri
+    ]
+}
+Unit Test: {
+    { t }
+    [ CALLBACK-STUB special-object "upgraded-template" get eq? ]
+}
+Old seed callback interfaces upgraded

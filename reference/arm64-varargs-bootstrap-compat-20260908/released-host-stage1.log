@@ -1,0 +1,93 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: bootstrap.image kernel parser words words.symbol ;
+
+resource:basis/bootstrap/image/image.factor
+
+462:         { PIC-MISS-RESUME-WORD inline-cache-miss-resume }
+                                   ^
+No word named 'PIC-MISS-RESUME-WORD' found in current vocabulary search path
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        "resource:basis/cpu/architecture/architecture.factor"
+        run-file
+        "resource:basis/bootstrap/image/image.factor" run-file
+        => "unix-arm.64" make-image
+    ]
+(O) run-file
+(O) parse-file
+(O) parse-stream
+(O) finish-compilation-unit
+(O) M\ optimizing-compiler recompile
+(O) compile-word
+(O) frontend
+(O) build-tree-with
+(O) M\ word (build-tree)
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) (infer-if)
+(O) M\ callable infer-branch
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) M\ input-parameter infer-call*
+(O) unknown-macro-input
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

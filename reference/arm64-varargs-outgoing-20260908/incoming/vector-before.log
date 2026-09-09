@@ -1,0 +1,303 @@
+Unit Test: {
+    { 285.0 }
+    [
+        [
+            [ gc read-mixed ] incoming-mixed-reader
+            [ incoming_mixed ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        [
+            [
+                9 load-locals -8 get-local -7 get-local 2 * +
+                -6 get-local 3 * + -5 get-local 4 * +
+                -4 get-local 5 * + -3 get-local 6 * +
+                -2 get-local 7 * + -1 get-local 8 * +
+                0 get-local 9 * + 9 drop-locals
+            ] incoming-mixed-tail
+            [ incoming_mixed ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 134.0 }
+    [
+        [
+            [
+                3 load-locals
+                0 get-local inc-hfa va-arg load-local
+                -3 get-local x>> -3 get-local y>> 2 * +
+                -2 get-local 3 * + 0 get-local x>> 4 * +
+                0 get-local y>> 5 * + 0 get-local z>> 6 * +
+                -1 get-local double va-arg 7 * + 4 drop-locals
+            ] incoming-hfa-reader
+            [ 1 incoming_named_hfa ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        [
+            [
+                7 load-locals
+                0 get-local inc-pair va-arg load-local
+                -7 get-local -6 get-local 2 * + -5 get-local 3 *
+                + -4 get-local 4 * + -3 get-local 5 * +
+                -2 get-local 6 * + 0 get-local x>> 7 * +
+                0 get-local y>> 8 * +
+                -1 get-local double va-arg 9 * + 8 drop-locals
+            ] incoming-spill-reader
+            [ 1 incoming_spill ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { -606 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local longlong va-arg 0 get-local longlong
+                va-arg 0 get-local longlong va-arg inc-big boa
+                gc 2 drop-locals
+            ] incoming-big-reader [ incoming_big ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 771.0 }
+    [
+        [
+            [
+                2 load-locals
+                -1 get-local 0 get-local incoming_consume
+                -1 get-local 0 get-local incoming_consume +
+                0 get-local double va-arg + 2 drop-locals
+            ] incoming-list-reader
+            [ incoming_list ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 506.0 }
+    [
+        [
+            [
+                11 load-locals -10 get-local -9 get-local 2 * +
+                -8 get-local 3 * + -7 get-local 4 * +
+                -6 get-local 5 * + -5 get-local 6 * +
+                -4 get-local 7 * + -3 get-local 8 * +
+                -2 get-local 9 * + -1 get-local 10 * +
+                0 get-local 11 * + 11 drop-locals
+            ] incoming-named-spill
+            [ incoming_named_spill ] with-callback
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 224.0 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local float-4 va-arg load-local
+                -1 get-local inc-hva va-arg load-local
+                -3 get-local -1 get-local { 1 2 3 4 } [ * ] 2map
+                sum + 0 get-local a>> { 1 2 3 4 } [ * ] 2map
+                sum + 0 get-local b>> { 1 2 3 4 } [ * ] 2map
+                sum + -2 get-local double va-arg + 4 drop-locals
+            ] incoming-vector-reader
+            [ 1 incoming_vector ] with-callback
+        ]
+        compile-call
+    ]
+}
+--> test failed!
+
+==== /Users/erg/factor.worktrees/arm64-varargs-outgoing/reference/arm64-varargs-outgoing-20260908/incoming/vector.factor
+
+/Users/erg/factor.worktrees/arm64-varargs-outgoing/reference/arm64-varargs-outgoing-20260908/incoming/vector.factor: 6
+
+Unit Test: {
+    { 224.0 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local float-4 va-arg load-local
+                -1 get-local inc-hva va-arg load-local
+                -3 get-local -1 get-local { 1 2 3 4 } [ * ] 2map
+                sum + 0 get-local a>> { 1 2 3 4 } [ * ] 2map
+                sum + 0 get-local b>> { 1 2 3 4 } [ * ] 2map
+                sum + -2 get-local double va-arg + 4 drop-locals
+            ] incoming-vector-reader
+            [ 1 incoming_vector ] with-callback
+        ]
+        compile-call
+    ]
+}
+
+The inline recursive word 'float-4' must be declared recursive
+word float-4
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global
+        "/Users/erg/factor.worktrees/arm64-varargs-outgoing/reference/..."
+        run-file
+        "/Users/erg/factor.worktrees/arm64-varargs-outgoing/reference/..."
+        run-test-file
+        "/Users/erg/factor.worktrees/arm64-varargs-outgoing/reference/..."
+        run-test-file => :test-failures compiler-errors get values
+        [ print-error ] each
+        test-failures get empty? compiler-errors get assoc-empty?
+        and [ 0 ] [ 1 ] if exit
+    ]
+(O) run-test-file
+(O) compiled-unit-test
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(U) [ [ dup infer define-temp ] with-compilation-unit => execute ]
+    compile-call
+(U) [ swap >n call => ndrop ]
+    with-variables
+(U) [ swap >n call => ndrop ]
+    with-variables
+(U) [ [ '[ ~quotation~ dip rethrow ] recover ] keepd => call ]
+    cleanup
+(U) [ 2keep => drop ]
+    keepd
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(U) [ [ '[ ~quotation~ dip rethrow ] recover ] keepd => call ]
+    cleanup
+(U) [ 2keep => drop ]
+    keepd
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(U) [ dup infer => define-temp ]
+(O) infer
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) (infer-alien-callback)
+(O) infer-callback-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) infer-quot-here
+(O) infer-ndip
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot-here
+(O) (infer-if)
+(O) M\ callable infer-branch
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) M\ declared-effect infer-call*
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) infer-quot
+(O) infer-quot-here
+(O) call-recursive-inline-word
+(O) undeclared-recursion-error
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

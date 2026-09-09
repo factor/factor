@@ -1,0 +1,3 @@
+C HFA spill control: PASS
+C variadic ABI controls: 0xff / 0xff
+C half/BF16 variadic controls: PASS

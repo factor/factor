@@ -1,0 +1,345 @@
+Unit Test: { { 3 } [ CALLBACK-STUB special-object length ] }
+Unit Test: {
+    { t }
+    [
+        "alien-callback-varargs" "alien" lookup-word
+        "special" word-prop >boolean
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        "alien-callback-varargs" "alien" lookup-word
+        "no-compile" word-prop
+    ]
+}
+Unit Test: { { 255 } [ [ va_c_controls ] compile-call ] }
+Unit Test: {
+    { 0 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 0 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -1 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 1 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -28 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 7 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ gc read-ints ] int-reader
+            [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 1259.75 }
+    [
+        [
+            double { int double } cdecl
+            [ read-mixed ] alien-callback-varargs
+            [ va_call_mixed ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 86.0 }
+    [
+        [
+            [
+                14 load-locals -13 get-local -12 get-local +
+                -11 get-local + -10 get-local + -9 get-local +
+                -8 get-local + -7 get-local + -6 get-local +
+                -5 get-local + -4 get-local + -3 get-local +
+                -2 get-local 2 * + -1 get-local 3 * +
+                0 get-local 4 * + 14 drop-locals
+            ] named-spill-reader
+            [ va_call_named_spill ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 5.0 }
+    [
+        [
+            [ read-aggregates ] aggregate-reader
+            [ va_call_aggregates ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ [ va_hfa_spill_control ] compile-call ] }
+Unit Test: {
+    { 364.0 }
+    [
+        [
+            [
+                12 load-locals -11 get-local -10 get-local +
+                -9 get-local + -8 get-local + -7 get-local +
+                -6 get-local + -5 get-local + -4 get-local +
+                -3 get-local x>> + -3 get-local y>> 2 * +
+                -2 get-local 3 * +
+                -1 get-local values>> first 4 * +
+                -1 get-local values>> second 5 * +
+                -1 get-local values>> third 6 * +
+                0 get-local 7 * + 12 drop-locals
+            ] hfa-spill-reader
+            [ va_call_hfa_spill ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -15769158013578 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                va-big <struct> 0 get-local longlong va-arg >>x
+                0 get-local longlong va-arg >>y
+                0 get-local longlong va-arg >>z
+                [ gc read-ints ] int-reader
+                [ 12 va_call_ints ] with-callback drop
+                gc 2 drop-locals
+            ] big-reader [ va_call_big_return ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -3.75 }
+    [
+        [
+            [
+                3 load-locals -2 get-local drop
+                va-pair <struct> -1 get-local >>x
+                0 get-local >>y 3 drop-locals
+            ] pair-reader [ va_call_pair_return ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 3 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local int va-arg 0 get-local va-copy int
+                va-arg + 0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 79 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local int va-arg nested-int-callback
+                [ 12 va_call_ints ] with-callback +
+                0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -1 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local outer-args set-global
+                nested-context-callback
+                [ 0 va_call_ints ] with-callback drop
+                0 get-local int va-arg 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Must Fail With: { [ outer-args get int va-arg ] [ expired-va-list? ] }
+Unit Test: {
+    { 0 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local va-copy escaped-args set-global
+                0 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Must Fail With: {
+    [ [ escaped-args get int va-arg ] compile-call ]
+    [ expired-va-list? ]
+}
+Unit Test: {
+    { 0 }
+    [
+        [
+            [ read-ints ] list-reader
+            [ 0 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ read-ints ] list-reader
+            [ 12 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 155 }
+    [
+        [
+            [
+                2 load-locals
+                -1 get-local 0 get-local va_sum_list
+                -1 get-local 0 get-local va_sum_list +
+                0 get-local int va-arg + 2 drop-locals
+            ] list-reader [ 12 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 155 }
+    [
+        [
+            [
+                2 load-locals
+                -1 get-local 0 get-local va_sum_list
+                -1 get-local 0 get-local va_sum_list +
+                0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 30 "value:-42:1.250:-1234567890123" }
+    [ [ 128 formatted ] compile-call ]
+}
+Unit Test: { { 30 "value:-" } [ [ 8 formatted ] compile-call ] }
+Unit Test: { { 30 "" } [ [ 0 formatted ] compile-call ] }
+Unit Test: {
+    { 30 "value:-42:1.250:-1234567890123" }
+    [
+        [
+            [
+                2 load-locals 128 <byte-array> load-local
+                0 get-local 128 -2 get-local -1 get-local
+                va-vsnprintf 0 get-local utf8 alien>string
+                formatted-text set-global 3 drop-locals
+            ] format-list-reader
+            [ va_call_format_list ] with-callback
+            formatted-text get
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 25 ":-42:1.250:-1234567890123" }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local c-string va-arg drop
+                128 <byte-array> load-local
+                0 get-local 128 ":%d:%.*f:%lld" -1 get-local
+                va-vsnprintf 0 get-local utf8 alien>string
+                formatted-text set-global 3 drop-locals
+            ] format-list-reader
+            [ va_call_format_list ] with-callback
+            formatted-text get
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ [ va_small_controls ] compile-call ] }
+Unit Test: {
+    { 384.5 }
+    [
+        [
+            [
+                4 load-locals gc -3 get-local -2 get-local 2 * +
+                -1 get-local + 0 get-local half va-arg +
+                0 get-local bfloat va-arg 2 * +
+                0 get-local half va-arg 3 * +
+                0 get-local bfloat va-arg 4 * +
+                0 get-local half va-arg 5 * +
+                0 get-local bfloat va-arg 6 * +
+                0 get-local half va-arg 7 * +
+                0 get-local bfloat va-arg 8 * +
+                0 get-local half va-arg 9 * +
+                0 get-local bfloat va-arg 10 * + 4 drop-locals
+            ] small-reader [ va_call_small ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 3.75 }
+    [
+        [
+            [
+                3 load-locals -2 get-local drop
+                gc -1 get-local 0 get-local + 3 drop-locals
+            ] small-return-reader
+            [ va_call_small_return ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: { { 30 "value:-42:1.250:-1234567890123" } [ direct-formatted ] }
+Unit Test: { { 570.0 } [ varout_control ] }
+Unit Test: { { 317.0 } [ varout_split_control ] }
+Unit Test: { { 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] }
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 varout-small-hfa boa 3 4 5 varout-pair boa
+        6 7 8 varout-hfa boa 9 varout_hfas
+    ]
+}
+Unit Test: {
+    { 317.0 }
+    [ 1 2 3 4 5 6 7 4 5 varout-pair boa 10 varout_split ]
+}
+Unit Test: {
+    { 16.0 27.0 38.0 }
+    [
+        10 6 7 8 varout-hfa boa varout_return
+        [ x>> ] [ y>> ] [ z>> ] tri
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing"
+        library-dll dlsym indirect-varout-mixed
+    ]
+}
+Old seed full-bootstrap native varargs tests passed

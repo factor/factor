@@ -1,0 +1,21 @@
+
+File: /Users/erg/factor.worktrees/arm64-varargs-cursor/reference/arm64-varargs-cursor-portability-20260908/after.dll
+Format: COFF-ARM64
+Arch: aarch64
+AddressSize: 64bit
+Import {
+  Name: ucrtbase.dll
+  ImportLookupTableRVA: 0x2098
+  ImportAddressTableRVA: 0x20A8
+  Symbol: __stdio_common_vsprintf (0)
+}
+Export {
+  Ordinal: 1
+  Name: indirect_vsnprintf
+  RVA: 0x1044
+}
+Export {
+  Ordinal: 2
+  Name: va_vsnprintf_pointer
+  RVA: 0x1000
+}

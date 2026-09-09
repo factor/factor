@@ -1,0 +1,232 @@
+Unit Test: { { 11.25 } [ au-one <struct> 1.25 >>a 10.0 au_take_one ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-two <struct> 1.25 2.5 au-pair boa >>pair
+        10.0 au_take_two
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        au-four <struct> 1.0 2.0 3.0 4.0 au-quad boa >>quad
+        10.0 au_take_four
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        au-one <struct> 1.25 >>a 2.5 au-nested boa
+        10.0 au_take_nested
+    ]
+}
+Unit Test: { { 13.75 } [ au-mixed <struct> 3.75 >>b 10.0 au_take_mixed ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_one a>> ] }
+Unit Test: {
+    { 1.25 2.5 }
+    [ 1.25 2.5 au_return_two pair>> [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        1.0 2.0 3.0 4.0 au_return_four quad>>
+        { [ a>> ] [ b>> ] [ c>> ] [ d>> ] } cleave
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        7 au-two <struct> 1.25 2.5 au-pair boa >>pair
+        10.0 au_variadic
+    ]
+}
+Unit Test: {
+    { 11.25 }
+    [ [ [ swap a>> + ] au-one-cb au_call_one ] compile-call ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap pair>> [ a>> ] [ b>> 2 * ] bi + + ] au-two-cb
+            au_call_two
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        [
+            [
+                swap quad>>
+                { [ a>> ] [ b>> 2 * ] [ c>> 3 * ] [ d>> 4 * ] }
+                cleave + + + +
+            ] au-four-cb au_call_four
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_c_controls ] }
+Unit Test: { { 16 } [ au-padded heap-size ] }
+Unit Test: { { 16.25 } [ 1.25 2.5 au-padded boa 10.0 au_take_padded ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-padded-union <struct> 1.25 2.5 au-padded boa >>padded
+        10.0 au_take_padded_union
+    ]
+}
+Unit Test: {
+    { 1.25 2.5 }
+    [ 1.25 2.5 au_return_padded [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap [ a>> ] [ b>> 2 * ] bi + + ] au-padded-cb
+            au_call_padded
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 37.25 }
+    [
+        1.0 2.0 3.0 4.0 5.0 6.0 au-two <struct> 1.25 2.5 au-pair
+        boa >>pair 10.0 au_take_spill
+    ]
+}
+Unit Test: {
+    { 37.25 }
+    [
+        [
+            [
+                swap pair>> [ a>> ] [ b>> 2 * ] bi + + + + + + +
+                +
+            ] au-spill-cb au_call_spill
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        au-vector <struct> float-4{ 1.0 2.0 3.0 4.0 } >>a
+        10.0 au_take_vector
+    ]
+}
+Unit Test: {
+    { float-4{ 1.0 2.0 3.0 4.0 } }
+    [ 1.0 2.0 3.0 4.0 au_return_vector a>> ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        [
+            [
+                swap a>> {
+                    [ first ]
+                    [ second 2 * ]
+                    [ third 3 * ]
+                    [ fourth 4 * ]
+                } cleave + + + +
+            ] au-vector-cb au_call_vector
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 46.0 }
+    [
+        au-vector-two <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        au-fvec-pair boa >>a 10.0 au_take_vector_two
+    ]
+}
+Unit Test: {
+    { float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 } }
+    [ au_return_vector_two a>> [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals 0 get-local au-two va-arg pair>>
+                [ a>> ] [ b>> 2 * ] bi +
+                0 get-local double va-arg + -1 get-local +
+                2 drop-locals
+            ] au-dynamic-cb au_call_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap pair>> [ a>> ] [ b>> 2 * ] bi + + + ]
+            au-typed-cb au-call-typed
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 53.0 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-vector-two va-arg a>>
+                [ a>> sum ] [ b>> sum ] bi +
+                0 get-local double va-arg + -1 get-local +
+                2 drop-locals
+            ] au-dynamic-cb au_call_vector_variadic
+        ] compile-call
+    ]
+}
+Memory protection fault at address 0x400000003f800000
+You have triggered a bug in Factor. Please report.
+critical_error: The die word was called by the library.: 0
+Starting low level debugger...
+Basic commands:
+  q ^D             -- quit Factor
+  c                -- continue executing Factor - NOT SAFE
+  t                -- throw exception in Factor - NOT SAFE
+  .s .r .c         -- print data, retain, call stacks
+  help             -- full help, including advanced commands
+
+> ==== DATA STACK:
+7
+#<alien 0x1050a3e50>
+f
+f
+0
+0
+{ 64199 16 #<bignum @ 0x111957185> f }
+==== RETAIN STACK:
+9
+==== CALL STACK:
+
+frame: 0x117d9ff90 size 16
+executing: kernel:die
+scan: 1
+word/quot addr: 1053a879c
+word/quot xt: 111fc9010
+return address: 111fc9030
+
+frame: 0x117d9ffa0 size 16
+executing: [ ui:ui-running? [ kernel:dup ui.debugger:error-alert ] [ kernel:dup debugger:print-error io:flush ] kernel:if kernel:die continuations:rethrow ]
+scan: 4
+word/quot addr: 109f32ae4
+word/quot xt: 112e75c20
+return address: 112e75c60
+
+frame: 0x117d9ffb0 size 16
+executing: continuations:rethrow
+scan: -1
+word/quot addr: 1050e513c
+word/quot xt: 111b21150
+return address: 111b2138c
+
+frame: 0x117d9ffc0 size 48
+executing: ( callback )
+scan: -1
+word/quot addr: 10c739f2c
+word/quot xt: 112ec0ad0
+return address: 112ec109c

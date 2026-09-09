@@ -1,0 +1,77 @@
+Unit Test: {
+    { t }
+    [
+        CALLBACK-STUB special-objects get at 2 head
+        CALLBACK-STUB special-object =
+    ]
+}
+Unit Test: { { 42 } [ exercise ] }
+=== Expected:
+42
+=== Got:
+-1
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        H{ } clone special-objects set H{ } clone sub-primitives set
+        "/Users/erg/factor.worktrees/arm64-varargs-entry/basis/bootstr..."
+        run-file
+        "/Users/erg/factor.worktrees/arm64-varargs-entry/basis/bootstr..."
+        run-file
+        { t } [
+            CALLBACK-STUB special-objects get at 2 head
+            CALLBACK-STUB special-object =
+        ] \ (unit-test) 44 experiment
+        CALLBACK-STUB special-objects get at
+        CALLBACK-STUB set-special-object
+        { 42 } [ exercise ] \ (unit-test) 46 experiment =>
+        { 42 } [ exercise ] \ (unit-test) 47 experiment
+        test-failures get empty?
+        [ "entry capture tests failed" throw ] unless
+        "Native register capture and compacting-GC tests passed"
+        print
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(O) assert-sequence=
+(O) assert-sequence
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]

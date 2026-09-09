@@ -1,0 +1,3 @@
+Windows-target C caller -> Windows-target C va_arg reader
+Expected weighted sum: 385
+Observed: 302.0

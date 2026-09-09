@@ -1,0 +1,7 @@
+factor-assertion: exit 1; expected diagnostic verified
+missing-fixture: exit 1; expected diagnostic verified
+required-small: exit 1; expected diagnostic verified
+printf-return-count: exit 1; expected diagnostic verified
+printf-wrong-bytes: exit 1; expected diagnostic verified
+printf-child-error: exit 1; expected diagnostic verified
+Root fixture source and library SHA-256 values unchanged

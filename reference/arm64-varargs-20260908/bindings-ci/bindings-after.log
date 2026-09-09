@@ -1,0 +1,6 @@
+Unit Test: {
+    { ( logLevel text args -- ) }
+    [ \ TraceLogCallback "callback-effect" word-prop ]
+}
+Unit Test: { { t } [ va_list lookup-c-type va_list lookup-c-type eq? ] }
+Unit Test: { { t } [ va_list lookup-c-type va_list lookup-c-type eq? ] }

@@ -1,0 +1,9 @@
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin25.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+Homebrew clang version 23.1.0
+Target: arm64-apple-darwin25.6.0
+Thread model: posix
+InstalledDir: /opt/homebrew/Cellar/llvm/23.1.0/bin
+Configuration file: /opt/homebrew/Cellar/llvm/23.1.0/etc/clang/arm64-apple-darwin25.cfg

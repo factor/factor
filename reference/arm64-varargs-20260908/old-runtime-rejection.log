@@ -1,0 +1,7 @@
+Must Fail With: {
+    [
+        [ int { int } cdecl [ 2drop 0 ] alien-callback-varargs ]
+        compile-call
+    ]
+    [ variadic-callback-runtime-required? ]
+}

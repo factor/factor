@@ -1,0 +1,4 @@
+Source: https://raw.githubusercontent.com/mingw-w64/mingw-w64/master/mingw-w64-crt/lib-common/ucrtbase-common.def.in
+SHA256: b8cb6de7a5c885bc4f87a9b0b63ca67784d3af0afac8da5ea0d3dace53ef6d87
+vsnprintf: absent
+__stdio_common_vsprintf: present

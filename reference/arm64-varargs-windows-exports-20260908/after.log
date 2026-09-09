@@ -1,0 +1,6 @@
+
+File: reference/arm64-varargs-windows-exports-20260908/after.obj
+Format: COFF-ARM64
+Arch: aarch64
+AddressSize: 64bit
+Directive(s):  /EXPORT:varout_mixed /EXPORT:varout_hfas /EXPORT:varout_split /EXPORT:varout_return /EXPORT:varout_control /EXPORT:varout_split_control /EXPORT:varout_split_caller_supported /EXPORT:varout_half_bits /EXPORT:varout_bfloat_bits /EXPORT:varout_vector_args /EXPORT:vap_read_integer /EXPORT:vap_read_float /EXPORT:vap_poison /EXPORT:vap_control_integer /EXPORT:vap_control_float /EXPORT:vap_call_reader /EXPORT:ffi_test_small_floats_available /EXPORT:half_identity /EXPORT:half_bits /EXPORT:half_from_bits /EXPORT:half_convert /EXPORT:half_callback /EXPORT:half_mixed /EXPORT:half_overflow /EXPORT:half_varargs /EXPORT:half_overflow_callback /EXPORT:bfloat_identity /EXPORT:bfloat_bits /EXPORT:bfloat_from_bits /EXPORT:bfloat_convert /EXPORT:bfloat_callback /EXPORT:bfloat_mixed /EXPORT:bfloat_overflow /EXPORT:bfloat_varargs /EXPORT:bfloat_overflow_callback /EXPORT:half_dirty_result /EXPORT:bfloat_dirty_result /EXPORT:mixed_small_sum
