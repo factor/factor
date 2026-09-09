@@ -1,0 +1,49 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next2-integration/factor",
+    "-i=/Users/erg/factor.worktrees/compiler-features-arm/reference/compiler-features-20260909/prepared.image",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-gvn-verification",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-gvn-verification/reference/compiler-gvn-verification-20260909/activity.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-gvn-verification",
+  "source": "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {},
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/compiler-next2-integration/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/compiler-features-arm/reference/compiler-features-20260909/prepared.image",
+    "sha256": "76166829c9dc9a1b57053a9eb8b047de406306632c886067034480511c9570be"
+  },
+  "exit_code": 0,
+  "seconds": 8.268535375,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [],
+  "last_process_usage": {
+    "cpu": 7.297640041666666,
+    "user": 7.054249041666666,
+    "system": 0.24339099999999997,
+    "instructions": 68975783776,
+    "cycles": 19799176844,
+    "rss": 359383040,
+    "background_cpu": 0.0,
+    "disk_read_bytes": 8941568,
+    "disk_written_bytes": 4096
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}

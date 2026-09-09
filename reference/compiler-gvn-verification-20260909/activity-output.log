@@ -1,0 +1,25 @@
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"branch-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"integer-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"spectral-norm","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"nbody","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"struct-arrays-bench","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":0,"gvn":false,"target":"( typed spectral-norm )","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"branch-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"integer-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"spectral-norm","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"nbody","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"struct-arrays-bench","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":0,"gvn":false,"target":"( typed spectral-norm )","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":1,"gvn":true,"target":"branch-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":false,"calls":1,"gvn":true,"target":"integer-pressure","expressions-eliminated":0}
+{"changed-cfgs":1,"rematerialization":false,"calls":1,"gvn":true,"target":"spectral-norm","expressions-eliminated":16}
+{"changed-cfgs":0,"rematerialization":false,"calls":1,"gvn":true,"target":"nbody","expressions-eliminated":0}
+{"changed-cfgs":1,"rematerialization":false,"calls":1,"gvn":true,"target":"struct-arrays-bench","expressions-eliminated":2}
+{"changed-cfgs":1,"rematerialization":false,"calls":1,"gvn":true,"target":"( typed spectral-norm )","expressions-eliminated":16}
+{"changed-cfgs":0,"rematerialization":true,"calls":1,"gvn":true,"target":"branch-pressure","expressions-eliminated":0}
+{"changed-cfgs":0,"rematerialization":true,"calls":1,"gvn":true,"target":"integer-pressure","expressions-eliminated":0}
+{"changed-cfgs":1,"rematerialization":true,"calls":1,"gvn":true,"target":"spectral-norm","expressions-eliminated":16}
+{"changed-cfgs":0,"rematerialization":true,"calls":1,"gvn":true,"target":"nbody","expressions-eliminated":0}
+{"changed-cfgs":1,"rematerialization":true,"calls":1,"gvn":true,"target":"struct-arrays-bench","expressions-eliminated":2}
+{"changed-cfgs":1,"rematerialization":true,"calls":1,"gvn":true,"target":"( typed spectral-norm )","expressions-eliminated":16}
+GVN BENCHMARK ACTIVITY PASS

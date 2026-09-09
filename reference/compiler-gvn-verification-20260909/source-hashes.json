@@ -1,0 +1,6 @@
+{
+  "basis/compiler/cfg/value-numbering/value-numbering.factor": "a3a4920b24e27d15c6dcaef99dc6b11d09817f1df6f0ac5d427c8a8e263fb6cd",
+  "basis/compiler/cfg/value-numbering/global/global.factor": "7dc0a43226a6585a4cd739e94c131625439695a9ee46e4e83875ef8d41ca2926",
+  "basis/compiler/cfg/value-numbering/global/validation/validation.factor": "292f7dfaf249a20f0eb210150cb91831d7adc6a8c494fee20c4e2bd5cf9fd321",
+  "basis/compiler/cfg/value-numbering/global/validation/validation-tests.factor": "55ef0c8063c5b49ecffd717932dda67e67e265add6c3e0f1674f1ebbadd18a85"
+}
