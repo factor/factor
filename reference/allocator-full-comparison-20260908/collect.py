@@ -17,6 +17,9 @@ for label in ('baseline', 'candidate'):
     runs = [(f'{label}-{mode}-{allocator}-{ordinal}', mode, allocator)
             for mode, ordinals in [('check', (1,)), ('timing', (1, 2))]
             for ordinal in ordinals for allocator in ALLOCATORS]
+    if label == 'candidate':
+        runs += [(f'remat-off-timing-linear-scan-{ordinal}', 'timing', 'linear-scan')
+                 for ordinal in (1, 2)]
     names = [name + suffix for name, _, _ in runs for suffix in ('.jsonl', '.status.json')]
     names += ['source-expected.json', 'source-manifest.json']
     if a.remote_host:
@@ -51,7 +54,9 @@ for label in ('baseline', 'candidate'):
         scopes = [x for x in rows if x['kind'] == 'scope']; assert len(scopes) == 1, name
         scope = scopes[0]
         assert scope['source'] == source and scope['allocator'] == allocator, name
-        assert scope['checked'] == (mode == 'check') and scope['options'] == OPTIONS, name
+        expected_options = dict(OPTIONS)
+        if name.startswith('remat-off-'): expected_options['rematerialize_constants'] = False
+        assert scope['checked'] == (mode == 'check') and scope['options'] == expected_options, name
         if scope_words is None: scope_words = scope['words']
         assert scope_words == scope['words'], (name, 'frozen object sequence changed')
         assert sum(x['kind'] == 'compile' for x in rows) == 1, name
@@ -76,5 +81,6 @@ a.output.mkdir(parents=True, exist_ok=True)
 assert not list(a.output.glob('*.jsonl*')), 'Use an empty matrix artifact directory'
 for name, data in collected.items(): (a.output / name).write_bytes(data)
 (a.output / 'collection.json').write_text(json.dumps(dict(accepted=True, remote_host=a.remote_host,
-    measured_batches=1248, checked_batches=208, sources=provenance), indent=2) + '\n')
-print('Collected 16 timing runs and 8 checked runs; 1,248 measured batches and 208 checked outputs')
+    main_measured_batches=1248, attribution_measured_batches=156, measured_batches=1404,
+    checked_batches=208, sources=provenance), indent=2) + '\n')
+print('Collected 16 main + 2 attribution + 8 checked runs; 1,404 measured batches and 208 checked outputs')

@@ -74,10 +74,16 @@ they establish an order-of-magnitude schedule, not predicted final speed.
 
 After both rounds and final checked runs, use `collect.py` with explicit
 `--baseline-source` and `--candidate-source` commits. Pass `--remote-host agent1`
-for the native Linux roots. It selects exactly 16 timing and eight checked runs,
+for the native Linux roots. It selects exactly 16 main timing, two LS rematerialization attribution, and eight checked runs,
 verifies source and prepared-image markers, rechecks compiler source hashes,
 and rejects stale copied outputs, mismatched flags, missing trials, changed word
 object order, disabled checked verification, or inconsistent answers. Use a fresh
 output directory. Then run `analyze.py --require-complete --min-samples 6` and
 `rank.py` on the collected matrix. Raw per-run host loads remain in collection
 provenance; evaluate CPU, retired instructions, and wall time separately.
+
+The main matrix contains 1,248 measured batches per architecture. The two extra
+LS OFF processes add 156 batches, for 1,404 total measured batches per architecture.
+They are excluded from the main ranking. Produce their separate report with
+`analyze.py MATRIX --baseline remat-off --candidate candidate --allocator linear-scan
+--require-complete --min-samples 6 --output-prefix remat-attribution`.
