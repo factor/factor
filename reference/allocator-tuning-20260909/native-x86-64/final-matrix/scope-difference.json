@@ -1,0 +1,16 @@
+{
+  "baseline_words": 28484,
+  "candidate_words": 28489,
+  "added_named_words": [
+    "compiler.cfg.register-allocation.backtracking:backtracking-interior-gaps-skipped",
+    "compiler.cfg.register-allocation.backtracking:gap-start",
+    "compiler.cfg.register-allocation.backtracking:productive-gap?",
+    "compiler.cfg.register-allocation.backtracking:uncovered-vreg-ranges",
+    "compiler.cfg.register-allocation.chordal.spilling:entry-resident-candidate?",
+    "compiler.cfg.register-allocation.greedy:finish-local-product"
+  ],
+  "removed_named_words": [
+    "compiler.cfg.register-allocation.backtracking:uncovered-ranges"
+  ],
+  "note": "Names omit per-vector ordinal suffixes; full ordered object identities remain in every raw scope record."
+}
