@@ -97,12 +97,34 @@ TUPLE: greedy-progress stage cascade hint ;
     ] each scores ;
 
 :: hint-score ( interval reg -- score )
-    reg interval hint-scores at 0 or ;
+    ! A single-register cost query needs no temporary score association.
+    ! Read current peer assignments: eviction and recoloring can change them.
+    interval interval-progress hint>> :> split-hint
+    split-hint split-hint reg = and [ 1 ] [ 0 ] if :> score!
+    interval vreg>> greedy-copy-hints get at [| hint |
+        hint second interval ranges>> ranges-cover? [
+            hint first greedy-vreg-unions get at [| peer |
+                peer reg>> reg = [
+                    hint second peer ranges>> ranges-cover? [
+                        score hint third + score!
+                    ] when
+                ] when
+            ] each
+        ] when
+    ] each score ;
 
 :: allocation-order ( interval -- regs )
-    interval hint-scores :> scores
-    interval interval-reg-class greedy-registers get at
-    [ scores at 0 or neg ] sort-by ;
+    interval interval-reg-class greedy-registers get at :> available
+    interval interval-progress hint>>
+    interval vreg>> greedy-copy-hints get at or [
+        interval hint-scores :> scores
+        scores assoc-empty? [ available >array ] [
+            available [ scores at 0 or neg ] sort-by
+        ] if
+    ] [
+        ! Stable sorting equal scores preserves the original bank order.
+        available >array
+    ] if ;
 
 :: greedy-assign ( interval reg -- )
     interval reg >>reg interval reg register-union push

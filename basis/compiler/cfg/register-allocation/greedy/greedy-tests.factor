@@ -9,7 +9,7 @@ compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.assignment
 compiler.cfg.linear-scan.resolve compiler.cfg.ssa.destruction
 compiler.cfg.utilities heaps
 compiler.cfg.registers cpu.architecture kernel kernel.private libc locals math math.statistics namespaces
-sequences tools.test vectors ;
+sequences sorting tools.test vectors ;
 IN: compiler.cfg.register-allocation.greedy.tests
 
 :: test-interval ( vreg ranges positions -- interval )
@@ -259,6 +259,74 @@ IN: compiler.cfg.register-allocation.greedy.tests
     1 { { 0 2 } } { 0 2 } test-interval
     dup interval-progress 11 >>hint drop allocation-order
 ] unit-test
+
+! Compare the direct scalar query and bank-order fast path against the
+! unchanged full score-map algorithm, including registers outside the bank.
+:: hint-reference-matches? ( interval -- ? )
+    interval hint-scores :> scores
+    interval interval-reg-class greedy-registers get at :> available
+    available f suffix 12 suffix [| reg |
+        interval reg hint-score reg scores at 0 or =
+    ] all?
+    interval allocation-order available [ scores at 0 or neg ] sort-by = and ;
+
+! A deliberately nonnumeric bank order must survive an all-zero stable sort.
+! Also cover a hint whose register is outside the supplied bank.
+{ { 11 10 } { 11 10 } t } [
+    f greedy-copy-hints [
+        init-recolor-test
+        H{ } clone greedy-copy-hints set
+        H{ { int-regs V{ 11 10 } } } greedy-registers set
+        1 { { 0 4 } } { 0 4 } test-interval [| interval |
+            interval allocation-order
+            12 interval interval-progress hint<<
+            interval allocation-order interval hint-reference-matches?
+        ] call
+    ] with-variable
+] unit-test
+
+! Copy weights add to split hints. Include duplicate hints, both inclusive
+! endpoints, requester and peer holes, and an unassigned peer. Recompute the
+! reference after eviction, reassignment, recoloring/rollback, and replacing
+! one peer by split fragments in different registers.
+{ t } [ f greedy-copy-hints [ [let
+    init-recolor-test
+    H{ { int-regs V{ 11 10 } } } greedy-registers set
+    H{ { 1 { { 2 4 8 } { 2 12 2 } { 3 0 1 } { 3 10 4 }
+             { 4 6 512 } { 2 14 64 } { 3 4 32 } { 9 0 1024 }
+             { 2 4 8 } } } } greedy-copy-hints set
+    1 { { 0 4 } { 10 14 } } { 0 4 10 14 } test-interval :> request
+    2 { { 4 4 } { 12 12 } } { 4 12 } test-interval :> a
+    3 { { 0 0 } { 10 10 } } { 0 10 } test-interval :> b
+    4 { { 6 6 } } { 6 } test-interval :> hole
+    V{ } clone :> results
+    request hint-reference-matches? results push
+    a 10 greedy-assign
+    request hint-reference-matches? results push
+    b 11 greedy-assign hole 10 greedy-assign
+    11 request interval-progress hint<<
+    request 10 hint-score 18 = results push
+    request 11 hint-score 6 = results push
+    request hint-reference-matches? results push
+    a greedy-unassign
+    request hint-reference-matches? results push
+    a 11 greedy-assign
+    request hint-reference-matches? results push
+    H{ } clone greedy-recolor-fixed set 64 greedy-recolor-budget set
+    10 b interval-progress hint<<
+    save-greedy-state :> saved
+    b greedy-unassign b 0 recolor-interval results push
+    request hint-reference-matches? results push
+    saved restore-greedy-state
+    request hint-reference-matches? results push
+    a greedy-unassign
+    2 { { 4 4 } } { 4 } test-interval 10 greedy-assign
+    2 { { 12 12 } } { 12 } test-interval 11 greedy-assign
+    request 10 hint-score 16 = results push
+    request 11 hint-score 8 = results push
+    request hint-reference-matches? results push
+    results [ ] all?
+] ] with-variable ] unit-test
 
 ! The local product is chosen from the free physical window after a long
 ! interference, not by the largest gap between the new interval's uses.
