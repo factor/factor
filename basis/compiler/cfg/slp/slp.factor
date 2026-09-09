@@ -3,33 +3,39 @@
 USING: accessors arrays assocs classes combinators compiler.cfg
 compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.intrinsics.simd.backend compiler.cfg.registers
-compiler.cfg.rpo cpu.architecture kernel locals math namespaces
+compiler.cfg.rpo cpu.architecture kernel layouts locals math namespaces
 sequences sets vectors ;
 IN: compiler.cfg.slp
 
 ! Automatic straight-line superword-level parallelism, not loop widening.
+! Only raw machine-width integer operations are eligible. Checked fixnum
+! arithmetic and all FP operations remain scalar: packing FP chains could
+! change the first enabled exception under with-fp-traps.
 ! No memory instruction, call, allocation, branch, or reduction is moved.
 SYMBOLS: automatic-slp? slp-statistics ;
 TUPLE: slp-tree pair opcode children ;
 
 : slp-vector-op ( insn -- class/f )
     class-of {
-        { ##add-float [ ##add-vector ] }
-        { ##sub-float [ ##sub-vector ] }
-        { ##mul-float [ ##mul-vector ] }
+        { ##add [ ##add-vector ] }
+        { ##sub [ ##sub-vector ] }
+        { ##and [ ##and-vector ] }
+        { ##or [ ##or-vector ] }
+        { ##xor [ ##xor-vector ] }
         [ drop f ]
     } case ;
 
 : slp-arithmetic? ( insn -- ? ) slp-vector-op >boolean ;
 
 : slp-region-insn? ( insn -- ? )
-    dup slp-arithmetic? [ drop t ] [ ##load-reference? ] if ;
+    dup slp-arithmetic? [ drop t ] [ ##load-integer? ] if ;
 
 : slp-supported? ( -- ? )
-    double-2-rep %gather-vector-2-reps member?
-    double-2-rep %shuffle-vector-imm-reps member? and
-    { ##add-vector ##sub-vector ##mul-vector }
-    [ new double-2-rep >>rep insn-available? ] all? and ;
+    cell 8 =
+    ulonglong-2-rep %gather-int-vector-2-reps member? and
+    ulonglong-2-rep %select-vector-reps member? and
+    { ##add-vector ##sub-vector ##and-vector ##or-vector ##xor-vector }
+    [ new ulonglong-2-rep >>rep insn-available? ] all? and ;
 
 :: slp-expandable? ( pair definitions uses root? -- ? )
     pair [ definitions at ] map :> insns
@@ -56,9 +62,10 @@ TUPLE: slp-tree pair opcode children ;
     nodes [ opcode>> >boolean ] filter :> operations
     nodes [ opcode>> not ] filter [ pair>> ] map members :> leaves
     operations [ pair>> ] map concat :> removed
-    ! Each gather costs up to two target instructions. Budget five for the
-    ! two extracts and lane shuffle; count every arithmetic op, never FMA.
-    operations length leaves length 2 * 5 + >
+    ! Each leaf pair budgets two gather instructions and two possible
+    ! tagged-to-integer conversions. Budget five for extracts, result
+    ! tagging, and boundary moves. Only whole-chain savings qualify.
+    operations length leaves length 4 * 5 + >
     leaves concat removed intersects? not and ;
 
 :: emit-slp-tree ( tree emitted output -- vreg )
@@ -67,9 +74,9 @@ TUPLE: slp-tree pair opcode children ;
         tree opcode>> [| opcode |
             tree children>> first emitted output emit-slp-tree
             tree children>> second emitted output emit-slp-tree :> ( a b )
-            opcode new dst >>dst a >>src1 b >>src2 double-2-rep >>rep output push
+            opcode new dst >>dst a >>src1 b >>src2 ulonglong-2-rep >>rep output push
         ] [
-            dst pair first2 double-2-rep ##gather-vector-2 new-insn output push
+            dst pair first2 ulonglong-2-rep ##gather-int-vector-2 new-insn output push
         ] if*
         dst
     ] cache ;
@@ -77,10 +84,8 @@ TUPLE: slp-tree pair opcode children ;
 :: emit-slp ( tree -- insns )
     V{ } clone :> output
     tree H{ } clone output emit-slp-tree :> packed
-    tree pair>> first packed double-2-rep ##vector>scalar new-insn output push
-    next-vreg :> high
-    high packed { 1 1 } double-2-rep ##shuffle-vector-imm new-insn output push
-    tree pair>> second high double-2-rep ##vector>scalar new-insn output push
+    tree pair>> first packed 0 ulonglong-2-rep ##select-vector new-insn output push
+    tree pair>> second packed 1 ulonglong-2-rep ##select-vector new-insn output push
     output ;
 
 :: slp-root-pair? ( a b insns -- ? )

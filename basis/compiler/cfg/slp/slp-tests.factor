@@ -8,8 +8,8 @@ IN: compiler.cfg.slp.tests
     rounds [| i |
         first-id i 2 * + :> product
         product 1 + :> sum
-        product previous scale ##mul-float new-insn insns push
-        sum product bias ##add-float new-insn insns push
+        product previous scale ##xor new-insn insns push
+        sum product bias ##add new-insn insns push
         sum previous!
     ] each-integer
     insns previous ;
@@ -28,15 +28,15 @@ IN: compiler.cfg.slp.tests
     insns [ uses-vregs [ uses inc-at ] each ] each
     insns uses vectorize-slp-block ;
 
-! Two ordinary seven-step affine recurrences save fourteen arithmetic ops,
+! Two ordinary twelve-step integer recurrences save twenty-four arithmetic ops,
 ! enough to pay for three gathers and both scalar outputs. Operator order
-! remains fourteen alternating multiply/add instructions, without FMA.
-{ 7 7 3 2 1 0 } [
-    7 scalar-pair pack-test
-    { [ [ ##mul-vector? ] count ]
+! remains twenty-four alternating xor/add instructions, without reassociation.
+{ 12 12 3 2 0 0 } [
+    12 scalar-pair pack-test
+    { [ [ ##xor-vector? ] count ]
     [ [ ##add-vector? ] count ]
-    [ [ ##gather-vector-2? ] count ]
-    [ [ ##vector>scalar? ] count ]
+    [ [ ##gather-int-vector-2? ] count ]
+    [ [ ##select-vector? ] count ]
     [ [ ##shuffle-vector-imm? ] count ]
     [ [ slp-arithmetic? ] count ] } cleave
 ] unit-test
@@ -47,12 +47,35 @@ IN: compiler.cfg.slp.tests
 ! A side effect splits the scheduling region. Never move arithmetic across
 ! calls, stores, or GC; the same conservative boundary covers ABI changes.
 { t } [
-    7 scalar-pair 14 cut
+    12 scalar-pair 24 cut
     [ T{ ##call } suffix ] dip append dup pack-test =
 ] unit-test
 
 ! A first result consumed before the second chain must not move past its use.
 { t } [
-    7 scalar-pair 14 cut
-    [ 23 D: 2 ##replace new-insn suffix ] dip append dup pack-test =
+    12 scalar-pair 24 cut
+    [ 33 D: 2 ##replace new-insn suffix ] dip append dup pack-test =
+] unit-test
+
+! FP remains scalar even when packing would be profitable. The first enabled
+! FP trap and its accrued flags can depend on scalar evaluation order.
+{ t } [
+    12 scalar-pair [
+        dup ##xor? [ [ dst>> ] [ src1>> ] [ src2>> ] tri ##mul-float new-insn ] when
+        dup ##add? [ [ dst>> ] [ src1>> ] [ src2>> ] tri ##add-float new-insn ] when
+    ] map dup pack-test =
+] unit-test
+
+! Overflow-checking arithmetic carries branches and must remain scalar.
+{ t } [
+    12 scalar-pair [
+        dup ##add? [ [ dst>> ] [ src1>> ] [ src2>> ] tri f ##fixnum-add new-insn ] when
+    ] map dup pack-test =
+] unit-test
+
+! Shared intermediate values retain their original scalar definition, even
+! when the remaining suffix is profitable to pack.
+{ t } [
+    12 scalar-pair 11 D: 2 ##replace new-insn suffix pack-test
+    [ defs-vregs 11 swap member? ] any?
 ] unit-test
