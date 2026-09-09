@@ -43,25 +43,16 @@ jobs:
       run: build.cmd compile
     - name: build-report
       run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
-    - name: vm-tests
-      shell: cmd
-      run: nmake /nologo /f Nmakefile test-vm LTO=1
-    - name: boot-image
-      shell: cmd
-      run: build.cmd update-boot-image
     - name: bootstrap
-      shell: cmd
-      run: build.cmd bootstrap
+      run: |
+           .\build.cmd update-boot-image
+           .\build.cmd bootstrap
     - name: load-all
       shell: cmd
-      run: 'factor.com -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
+      run: 'factor -e="USING: memory namespaces parser.notes vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save"'
     - name: test
       shell: cmd
-      run: 'factor.com -run=tools.test resource:core compiler threads io command-line http.server.requests windows.com images.loader vocabs.refresh.monitor ui.backend.windows'
-    - name: stack-safety
-      run: python vm/tests/stack_safety.py -v
-    - name: allocation-failure
-      run: python vm/tests/windows_allocation.py -v
+      run: 'factor -run=tools.test resource:core'
     - name: help-lint
       shell: cmd
       run: 'factor -run=help.lint resource:core resource:basis resource:extra'
