@@ -19,7 +19,7 @@ MEMO: windows-fonts ( -- fonts )
 : windows-font-name ( string -- string' )
     windows-fonts ?at drop ;
 
-MEMO:: (cache-font) ( name size bold? italic? -- HFONT )
+MEMO:: (cache-font-with-quality) ( name size bold? italic? quality -- HFONT )
     size neg ! nHeight
     0 0 0 ! nWidth, nEscapement, nOrientation
     bold? FW_BOLD FW_NORMAL ? ! fnWeight
@@ -29,22 +29,27 @@ MEMO:: (cache-font) ( name size bold? italic? -- HFONT )
     DEFAULT_CHARSET ! fdwCharSet
     OUT_OUTLINE_PRECIS ! fdwOutputPrecision
     CLIP_DEFAULT_PRECIS ! fdwClipPrecision
-    DEFAULT_QUALITY ! fdwQuality
+    quality ! fdwQuality
     DEFAULT_PITCH ! fdwPitchAndFamily
     name windows-font-name
     CreateFont
     dup win32-error=0/f ;
 
-: cache-font ( font -- HFONT )
-    {
+: (cache-font) ( name size bold? italic? -- HFONT )
+    DEFAULT_QUALITY (cache-font-with-quality) ;
+
+: cache-font-with-quality ( font quality -- HFONT )
+    [ {
         [ name>> ]
         [ size>> gl-scale-factor get-global [ * ] when* ]
         [ bold?>> ]
         [ italic?>> ]
-    } cleave (cache-font) ;
+    } cleave ] dip (cache-font-with-quality) ;
 
+: cache-font ( font -- HFONT )
+    DEFAULT_QUALITY cache-font-with-quality ;
 STARTUP-HOOK: [
-    \ (cache-font) reset-memoized
+    \ (cache-font-with-quality) reset-memoized
     \ windows-fonts reset-memoized
 ]
 

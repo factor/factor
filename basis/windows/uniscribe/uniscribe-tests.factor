@@ -1,5 +1,5 @@
-USING: accessors colors combinators continuations fonts grouping images
-kernel locals math namespaces opengl sequences tools.test
+USING: accessors colors combinators continuations destructors fonts grouping images
+kernel locals math namespaces opengl sequences sets tools.test
 windows.gdi32 windows.offscreen windows.types windows.uniscribe
 windows.uniscribe.private ;
 IN: windows.uniscribe.tests
@@ -28,6 +28,40 @@ IN: windows.uniscribe.tests
         [ 0 >codepoint-index ] [ 1 >codepoint-index ]
         [ 2 >codepoint-index ] [ 3 >codepoint-index ]
     } cleave
+] unit-test
+
+! Empty strings have font height but no native analysis or bitmap pixels.
+{ t t 0 0 0 t } [
+    [ monospace-font "" <script-string> &dispose {
+      [ size>> [ first zero? ] [ second 0 > ] bi ]
+      [ 0 swap line-offset>x ]
+      [ 100 swap x>line-offset ]
+      [ script-string>image bitmap>> empty? ] } cleave
+    ] with-destructors
+] unit-test
+
+{ t } [
+    monospace-font "" 0 0 COLOR: red <selection> cached-script-string
+    script-string>image bitmap>> empty?
+] unit-test
+
+{ t } [
+    monospace-font "\u00200d" cached-script-string
+    script-string>image bitmap>> empty?
+] unit-test
+
+! A selection wrapper must not change caret coordinates or Unicode indexes.
+{ t 0 2 } [
+    monospace-font "a\u000301" 0 2 COLOR: red <selection> cached-script-string
+    [ 2 swap line-offset>x 2 monospace-font "a\u000301" cached-script-string line-offset>x = ]
+    [ dup 2 swap line-offset>x 1 - swap x>line-offset ] bi
+] unit-test
+
+! Failed setup must not register a partially initialized native owner.
+{ t } [
+    disposables get cardinality
+    [ monospace-font "invalid-size" >>size "abc" <script-string> drop ] [ drop ] recover
+    disposables get cardinality =
 ] unit-test
 
 :: cluster-hit ( str -- n trailing )

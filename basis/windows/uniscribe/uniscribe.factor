@@ -18,8 +18,10 @@ TUPLE: script-string < disposable font string metrics ssa size image ;
 
 CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
+: uniscribe-text ( string/selection -- string )
+    dup selection? [ string>> ] when ;
+
 :: >codepoint-index ( str utf16-index -- codepoint-index )
-    ! A hit may lie inside a surrogate pair; do not decode a split prefix.
     ! A native index can split a surrogate pair; keep it at the leading edge.
     0 :> units!
     str [
@@ -33,35 +35,31 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 PRIVATE>
 
 :: line-offset>x ( n script-string -- x )
-    script-string string>> n >utf16-index :> n-utf16
-    script-string ssa>> ! ssa
-    n script-string string>> length = [
-        n-utf16 1 - ! icp
-        TRUE ! fTrailing
-    ] [
-        n-utf16 ! icp
-        FALSE ! fTrailing
-    ] if
-    { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters ;
+    script-string string>> uniscribe-text :> text
+    text empty? [ 0 ] [
+        text n >utf16-index :> n-utf16
+        script-string ssa>>
+        n text length = [ n-utf16 1 - TRUE ] [ n-utf16 FALSE ] if
+        { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters
+    ] if ;
 
 :: x>line-offset ( x script-string -- n trailing )
-    script-string ssa>> ! ssa
-    x ! iX
-    { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
-    :> trailing :> n
-    ! Both outputs use Factor codepoints. Native trailing is a cluster
-    ! length in UTF-16 units, not a boolean and not necessarily one.
-    n 0 < [ n trailing ] [
-        ! Trailing is a UTF-16 cluster length, not a boolean.
-        script-string string>> :> str
-        str n >codepoint-index :> start
-        start str n trailing + >codepoint-index start -
+    script-string string>> uniscribe-text :> str
+    str empty? [ 0 0 ] [
+        script-string ssa>> x
+        { int int } [ ScriptStringXtoCP check-ole32-error ] with-out-parameters
+        :> trailing :> n
+        ! Native trailing is a UTF-16 cluster length, not a boolean.
+        n 0 < [ n trailing ] [
+            str n >codepoint-index :> start
+            start str n trailing + >codepoint-index start -
+        ] if
     ] if ;
 
 <PRIVATE
 
 : make-ssa ( dc script-string -- ssa )
-    dup selection? [ string>> ] when
+    uniscribe-text
     utf16n encode ! pString
     dup length 2 /i ! cString
     dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
@@ -145,8 +143,11 @@ PRIVATE>
     selection selection? [
         selection start>> selection end>> [ min ] [ max ] 2bi
         :> end :> start
-        end start - <iota> [ start + ] map [ :> cp
-            selection string>> cp >utf16-index :> utf16
+        ! Convert the prefix once, then advance by each codepoint's UTF-16
+        ! length. Re-encoding every prefix made long selections quadratic.
+        selection string>> :> str
+        str start >utf16-index :> utf16!
+        start end str subseq [ :> ch
             script-string ssa>> utf16 FALSE { int }
             [ ScriptStringCPtoX check-ole32-error ] with-out-parameters
             script-string ssa>> utf16 TRUE { int }
@@ -155,6 +156,7 @@ PRIVATE>
             right columns length min left 0 max - 0 max <iota> [
                 left 0 max + 1 swap columns set-nth
             ] each
+            utf16 ch 0xffff > [ 2 ] [ 1 ] if + utf16!
         ] each
     ] when columns ;
 
@@ -186,12 +188,17 @@ PRIVATE>
     cache-font SelectObject win32-error=0/f ;
 
 :: configure-script-dc ( script dc -- )
-    dc script font>> set-dc-font
+    ! A single coverage channel is only valid with grayscale smoothing.
+    ! Set quality before analysis so Uniscribe fallback fonts inherit it.
+    script string>> selection?
+    script font>> background>> >rgba alpha>> 1 number= not or
+    ANTIALIASED_QUALITY DEFAULT_QUALITY ? :> quality
+    dc script font>> quality cache-font-with-quality
+    SelectObject win32-error=0/f
     script string>> selection? [
         dc COLOR: black color>RGB SetBkColor drop
         dc COLOR: white color>RGB SetTextColor drop
     ] [ dc script font>> set-dc-colors ] if ;
-
 : ssa-size ( ssa -- dim )
     ScriptString_pSize
     dup win32-error=0/f
@@ -205,22 +212,23 @@ PRIVATE>
     dc CHAR: x dc-glyph-height >>x-height ;
 
 ! DC limit is default soft-limited to 10,000 per process.
-: <script-string> ( font string -- script-string )
-    [ script-string new-disposable ] 2dip
-        [ >>font ] [ >>string ] bi*
-    [
-        {
-            [ over font>> set-dc-font ]
-            [ dc-metrics >>metrics ]
-            [ over string>> make-ssa [ >>ssa ] [ ssa-size >>size ] bi ]
-        } cleave
-    ] with-memory-dc
-    dup [ size>> first ] [ metrics>> ] bi swap >>width drop ;
+:: <script-string> ( font string -- script-string )
+    [ :> dc
+        dc font set-dc-font
+        dc dc-metrics :> metrics
+        ! ScriptStringAnalyse requires at least one UTF-16 character.
+        string uniscribe-text empty? [
+            f 0 metrics height>> 2array
+        ] [ dc string make-ssa dup ssa-size ] if :> size :> ssa
+        ! Register ownership only after all fallible native setup succeeds.
+        script-string new-disposable font >>font string >>string
+            metrics size first >>width >>metrics ssa >>ssa size >>size
+    ] with-memory-dc ;
 
 PRIVATE>
 
 M: script-string dispose*
-    ssa>> void* <ref> ScriptStringFree check-ole32-error ;
+    ssa>> [ void* <ref> ScriptStringFree check-ole32-error ] when* ;
 
 SYMBOL: cached-script-strings
 
@@ -232,7 +240,11 @@ SYMBOL: cached-script-strings
 
 : script-string>image ( script-string -- image )
     dup image>> [
-        [
+        dup size>> [ zero? ] any? [
+            dup size>> <image> swap >>dim B{ } >>bitmap
+                RGBA >>component-order ubyte-components >>component-type
+                t >>upside-down? >>image
+        ] [ [
             {
                 [ 2dup configure-script-dc drop ]
                 [
@@ -241,8 +253,7 @@ SYMBOL: cached-script-strings
                     pick render-image >>image
                 ]
             } cleave
-        ] with-memory-dc
+        ] with-memory-dc ] if
     ] unless image>> ;
 
 STARTUP-HOOK: [ <cache-assoc> cached-script-strings set-global ]
-
