@@ -1,0 +1,61 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "seconds": 8.071919000000001,
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-final-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/allocator-tuning-20260909/callback-matrix.factor"
+  ],
+  "host_load_before": [
+    36.3759765625,
+    51.158203125,
+    54.76123046875
+  ],
+  "host_load_after": [
+    35.3154296875,
+    50.4443359375,
+    54.46533203125
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+}

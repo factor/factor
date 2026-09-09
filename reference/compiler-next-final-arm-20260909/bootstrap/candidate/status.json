@@ -1,0 +1,320 @@
+{
+  "command": [
+    "/usr/sbin/taskpolicy",
+    "-a",
+    "-t",
+    "0",
+    "-l",
+    "0",
+    "/Users/erg/factor.worktrees/compiler-next-integration/factor",
+    "-i=/Users/erg/factor.worktrees/compiler-next-integration/boot.unix-arm.64.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "-output-image=/Users/erg/factor.worktrees/compiler-next-integration/compiler-next-final.factor.image"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next-integration",
+  "source": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/usr/sbin/taskpolicy",
+    "sha256": "86d707692044aefa8f1d67a03c5eadfcb968238ddc1b8b7fca3c42b6ae97f0a3"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/compiler-next-integration/boot.unix-arm.64.image",
+    "sha256": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd"
+  },
+  "exit_code": 0,
+  "seconds": 203.911814334,
+  "timed_out": false,
+  "foreground_refresh_failures": 0,
+  "phase_usage": [
+    {
+      "kind": "phase",
+      "elapsed": 3.3378983339999997,
+      "snapshot_valid": true,
+      "load": [
+        33.6083984375,
+        49.8388671875,
+        54.22802734375
+      ],
+      "cpu": 3.3339709999999996,
+      "user": 3.298052208333333,
+      "system": 0.035918791666666665,
+      "instructions": 26315696610,
+      "cycles": 8939953589,
+      "rss": 141639680,
+      "background_cpu": 0.0,
+      "disk_read_bytes": 40960,
+      "disk_written_bytes": 0,
+      "text": "* Loading the math component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 3.426247042,
+      "snapshot_valid": true,
+      "load": [
+        33.6083984375,
+        49.8388671875,
+        54.22802734375
+      ],
+      "cpu": 3.4223397916666665,
+      "user": 3.386172791666666,
+      "system": 0.036167,
+      "instructions": 26986041629,
+      "cycles": 9167945287,
+      "rss": 141656064,
+      "background_cpu": 0.0,
+      "disk_read_bytes": 40960,
+      "disk_written_bytes": 0,
+      "text": "* Loading the compiler component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 137.750124792,
+      "snapshot_valid": true,
+      "load": [
+        40.47412109375,
+        47.7509765625,
+        52.7763671875
+      ],
+      "cpu": 136.88659154166666,
+      "user": 136.49938583333332,
+      "system": 0.3872057083333333,
+      "instructions": 1149175683228,
+      "cycles": 327923158765,
+      "rss": 339312640,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 135168,
+      "disk_written_bytes": 0,
+      "text": "* Loading the threads component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 137.769771584,
+      "snapshot_valid": true,
+      "load": [
+        40.47412109375,
+        47.7509765625,
+        52.7763671875
+      ],
+      "cpu": 136.90543054166665,
+      "user": 136.51774091666664,
+      "system": 0.387689625,
+      "instructions": 1149298689194,
+      "cycles": 327966337760,
+      "rss": 339312640,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 167936,
+      "disk_written_bytes": 0,
+      "text": "* Loading the io component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 143.449641792,
+      "snapshot_valid": true,
+      "load": [
+        42.59814453125,
+        48.0703125,
+        52.859375
+      ],
+      "cpu": 142.571592875,
+      "user": 142.1633577083333,
+      "system": 0.40823516666666665,
+      "instructions": 1204066942522,
+      "cycles": 340956310259,
+      "rss": 339410944,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 696320,
+      "disk_written_bytes": 0,
+      "text": "* Loading the tools component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 183.11355275,
+      "snapshot_valid": true,
+      "load": [
+        42.658203125,
+        47.47802734375,
+        52.4248046875
+      ],
+      "cpu": 182.16131854166665,
+      "user": 181.61710454166666,
+      "system": 0.544214,
+      "instructions": 1602818335926,
+      "cycles": 433139084021,
+      "rss": 341393408,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 8146944,
+      "disk_written_bytes": 4096,
+      "text": "* Loading the ui component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 190.474809209,
+      "snapshot_valid": true,
+      "load": [
+        40.5234375,
+        46.955078125,
+        52.2109375
+      ],
+      "cpu": 189.4856052083333,
+      "user": 188.9079393333333,
+      "system": 0.577665875,
+      "instructions": 1675886887787,
+      "cycles": 450773235887,
+      "rss": 351322112,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 8933376,
+      "disk_written_bytes": 4096,
+      "text": "* Loading the ui.tools component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 195.298998375,
+      "snapshot_valid": true,
+      "load": [
+        39.8408203125,
+        46.70654296875,
+        52.09228515625
+      ],
+      "cpu": 194.28506549999997,
+      "user": 193.6877414583333,
+      "system": 0.5973240416666666,
+      "instructions": 1725281611365,
+      "cycles": 462775474247,
+      "rss": 351682560,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 9355264,
+      "disk_written_bytes": 4096,
+      "text": "* Loading the unicode component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 195.299574167,
+      "snapshot_valid": true,
+      "load": [
+        39.8408203125,
+        46.70654296875,
+        52.09228515625
+      ],
+      "cpu": 194.28542933333333,
+      "user": 193.68792891666664,
+      "system": 0.5975004166666666,
+      "instructions": 1725283207748,
+      "cycles": 462776308196,
+      "rss": 351682560,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 9363456,
+      "disk_written_bytes": 4096,
+      "text": "* Loading the help component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 198.925121709,
+      "snapshot_valid": true,
+      "load": [
+        39.7734375,
+        46.578125,
+        52.01513671875
+      ],
+      "cpu": 197.81864066666665,
+      "user": 197.13632391666664,
+      "system": 0.6823167499999999,
+      "instructions": 1761013525333,
+      "cycles": 471338588291,
+      "rss": 351830016,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 13496320,
+      "disk_written_bytes": 4096,
+      "text": "* Loading the handbook component"
+    },
+    {
+      "kind": "phase",
+      "elapsed": 203.254286459,
+      "snapshot_valid": true,
+      "load": [
+        44.03564453125,
+        47.3486328125,
+        52.2548828125
+      ],
+      "cpu": 202.13374879166665,
+      "user": 201.43020545833332,
+      "system": 0.7035433333333333,
+      "instructions": 1802499183047,
+      "cycles": 481448576008,
+      "rss": 351944704,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 14008320,
+      "disk_written_bytes": 4096,
+      "text": "Core bootstrap completed in 3 minutes and 19 seconds."
+    },
+    {
+      "kind": "phase",
+      "elapsed": 203.2543255,
+      "snapshot_valid": true,
+      "load": [
+        44.03564453125,
+        47.3486328125,
+        52.2548828125
+      ],
+      "cpu": 202.13374879166665,
+      "user": 201.43020545833332,
+      "system": 0.7035433333333333,
+      "instructions": 1802499183047,
+      "cycles": 481448576008,
+      "rss": 351944704,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 14008320,
+      "disk_written_bytes": 4096,
+      "text": "User bootstrap completed in 3 minutes and 19 seconds."
+    },
+    {
+      "kind": "phase",
+      "elapsed": 203.254339875,
+      "snapshot_valid": true,
+      "load": [
+        44.03564453125,
+        47.3486328125,
+        52.2548828125
+      ],
+      "cpu": 202.13374879166665,
+      "user": 201.43020545833332,
+      "system": 0.7035433333333333,
+      "instructions": 1802499183047,
+      "cycles": 481448576008,
+      "rss": 351944704,
+      "background_cpu": 0.036103874999999994,
+      "disk_read_bytes": 14008320,
+      "disk_written_bytes": 4096,
+      "text": "Bootstrapping is complete."
+    }
+  ],
+  "last_process_usage": {
+    "cpu": 202.50249537499997,
+    "user": 201.60491545833332,
+    "system": 0.8975799166666666,
+    "instructions": 1805150233055,
+    "cycles": 482299979355,
+    "rss": 352174080,
+    "background_cpu": 0.036103874999999994,
+    "disk_read_bytes": 36282368,
+    "disk_written_bytes": 128401408
+  },
+  "counter_note": "PID counters exclude taskpolicy helpers; last valid sample may precede exit."
+}

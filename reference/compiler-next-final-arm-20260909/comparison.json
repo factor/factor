@@ -1,0 +1,330 @@
+{
+  "aggregate": {
+    "compile": {
+      "cpu_seconds": 1.0917368865537491,
+      "instructions": 0.9988183655750706,
+      "ns": 1.14855059629046
+    },
+    "runtime": {
+      "cpu_seconds": 1.054835746501215,
+      "instructions": 0.9992777257363016,
+      "ns": 1.0474746188849866
+    }
+  },
+  "baseline": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "pre_fix_source": "eccfc0accc5c513b44701f2e59d4a9bafb7515f0",
+  "scope": {
+    "candidate": {
+      "added": [
+        ":invalid-recorded-entry-reload=>instructions>>",
+        ":invalid-recorded-entry-reload=>interval>>",
+        "compiler.cfg.register-allocation.backtracking:backtracking-edge-entry-reloads",
+        "compiler.cfg.register-allocation.backtracking:check-recorded-entry-reload",
+        "compiler.cfg.register-allocation.backtracking:common-entry-home?",
+        "compiler.cfg.register-allocation.backtracking:edge-entry-reload?",
+        "compiler.cfg.register-allocation.backtracking:entry-transport-records",
+        "compiler.cfg.register-allocation.backtracking:invalid-recorded-entry-reload",
+        "compiler.cfg.register-allocation.backtracking:reify-entry-transports",
+        "compiler.cfg.register-allocation.chordal:preferred-free-color",
+        "compiler.cfg.register-allocation.ssa.phases:activate-recorded-entry",
+        "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block-recording",
+        "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers-recording"
+      ],
+      "baseline_count": 27356,
+      "candidate_count": 27367,
+      "note": "Semantic identities strip only trailing printed ordinal; exact lists match within each source. Two old phase wrappers leave the dependency closure because backtracking and the shared phase traversal now call recording helpers directly; all 26 runtime entrypoints remain selected.",
+      "removed": [
+        "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block",
+        "compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers"
+      ]
+    }
+  },
+  "source": "a7f554b613bd763fb7fbfc520643b75b321a6e16",
+  "workloads": {
+    "branch": {
+      "final_own_baseline": {
+        "cpu_seconds": 1.0861431776373085,
+        "instructions": 0.9996221959547338
+      },
+      "pre_fix_own_baseline": {
+        "cpu_seconds": 0.8503477003866657,
+        "instructions": 1.0043897743958021
+      },
+      "static": {
+        "baseline": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 85,
+            "bundle-merges": 33,
+            "conflict-directed-splits": 14,
+            "evictions": 5,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 15,
+            "register-transitions": 2,
+            "second-chance-assignments": 1,
+            "second-chance-attempts": 14,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 14
+          },
+          "blocks": 8,
+          "code_bytes": 1264,
+          "copies": 0,
+          "reloads": 31,
+          "spills": 31
+        },
+        "final": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 85,
+            "bundle-merges": 33,
+            "conflict-directed-splits": 14,
+            "edge-entry-reloads": 0,
+            "evictions": 5,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 15,
+            "register-transitions": 2,
+            "second-chance-assignments": 1,
+            "second-chance-attempts": 14,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 14
+          },
+          "blocks": 8,
+          "code_bytes": 1264,
+          "copies": 0,
+          "reloads": 31,
+          "spills": 31
+        },
+        "pre_fix": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 85,
+            "bundle-merges": 33,
+            "conflict-directed-splits": 14,
+            "edge-entry-reloads": 1,
+            "evictions": 5,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 15,
+            "register-transitions": 2,
+            "second-chance-assignments": 1,
+            "second-chance-attempts": 14,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 14
+          },
+          "blocks": 10,
+          "code_bytes": 1280,
+          "copies": 0,
+          "reloads": 32,
+          "spills": 31
+        }
+      }
+    },
+    "ffi": {
+      "final_own_baseline": {
+        "cpu_seconds": 1.0046186796158934,
+        "instructions": 0.9871460390651665
+      },
+      "pre_fix_own_baseline": {
+        "cpu_seconds": 0.8605070616394873,
+        "instructions": 0.9844435267572234
+      },
+      "static": {
+        "baseline": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 95,
+            "bundle-merges": 32,
+            "conflict-directed-splits": 0,
+            "evictions": 0,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 32,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 2,
+            "register-transitions": 20,
+            "second-chance-assignments": 22,
+            "second-chance-attempts": 33,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 0
+          },
+          "blocks": 8,
+          "code_bytes": 1344,
+          "copies": 20,
+          "reloads": 57,
+          "spills": 60
+        },
+        "final": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 95,
+            "bundle-merges": 32,
+            "conflict-directed-splits": 0,
+            "edge-entry-reloads": 2,
+            "evictions": 0,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 32,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 2,
+            "register-transitions": 20,
+            "second-chance-assignments": 22,
+            "second-chance-attempts": 33,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 0
+          },
+          "blocks": 6,
+          "code_bytes": 1312,
+          "copies": 20,
+          "reloads": 55,
+          "spills": 56
+        },
+        "pre_fix": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 95,
+            "bundle-merges": 32,
+            "conflict-directed-splits": 0,
+            "edge-entry-reloads": 2,
+            "evictions": 0,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 32,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 2,
+            "register-transitions": 20,
+            "second-chance-assignments": 22,
+            "second-chance-attempts": 33,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 0
+          },
+          "blocks": 6,
+          "code_bytes": 1312,
+          "copies": 20,
+          "reloads": 55,
+          "spills": 56
+        }
+      }
+    },
+    "integer": {
+      "final_own_baseline": {
+        "cpu_seconds": 1.059686917183373,
+        "instructions": 0.9885490746552986
+      },
+      "pre_fix_own_baseline": {
+        "cpu_seconds": 0.8991111144139935,
+        "instructions": 1.0005687085130444
+      },
+      "static": {
+        "baseline": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 67,
+            "bundle-merges": 40,
+            "conflict-directed-splits": 25,
+            "evictions": 1,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 16,
+            "register-transitions": 0,
+            "second-chance-assignments": 0,
+            "second-chance-attempts": 25,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 25
+          },
+          "blocks": 3,
+          "code_bytes": 576,
+          "copies": 0,
+          "reloads": 25,
+          "spills": 25
+        },
+        "final": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 67,
+            "bundle-merges": 40,
+            "conflict-directed-splits": 25,
+            "edge-entry-reloads": 0,
+            "evictions": 1,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 16,
+            "register-transitions": 0,
+            "second-chance-assignments": 0,
+            "second-chance-attempts": 25,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 25
+          },
+          "blocks": 3,
+          "code_bytes": 576,
+          "copies": 0,
+          "reloads": 25,
+          "spills": 25
+        },
+        "pre_fix": {
+          "allocation": {
+            "algorithm": "ssa-bundle-backtracking",
+            "assigned-bundles": 67,
+            "bundle-merges": 40,
+            "conflict-directed-splits": 25,
+            "edge-entry-reloads": 0,
+            "evictions": 1,
+            "fallback-count": 0,
+            "interior-gaps-skipped": 0,
+            "loop-cluster-splits": 0,
+            "loop-spill-sites": 0,
+            "minimal-splits": 0,
+            "redundant-loop-stores": 0,
+            "register-hint-hits": 16,
+            "register-transitions": 0,
+            "second-chance-assignments": 0,
+            "second-chance-attempts": 25,
+            "shared-spill-homes": 0,
+            "split-budget-exhaustions": 0,
+            "splits": 25
+          },
+          "blocks": 3,
+          "code_bytes": 576,
+          "copies": 0,
+          "reloads": 25,
+          "spills": 25
+        }
+      }
+    }
+  }
+}

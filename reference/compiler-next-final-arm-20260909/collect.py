@@ -88,8 +88,18 @@ if scopes:
  if b is not None and c is not None:
   bn={x.rsplit('|',1)[0] for x in b};cn={x.rsplit('|',1)[0] for x in c}
   added=sorted(cn-bn);removed=sorted(bn-cn)
-  assert not removed,('semantic scope entries removed',removed)
-  audit['scope_differences']={'candidate':{'baseline_count':len(b),'candidate_count':len(c),'removed':removed,'added':added,'note':'Semantic identities strip only trailing printed ordinal; exact lists match within each source.'}}
+  expected_removed=['compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block','compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers']
+  assert removed==expected_removed,('unexpected semantic scope removal',removed)
+  required_new={'compiler.cfg.register-allocation.ssa.phases:activate-recorded-entry','compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-block-recording','compiler.cfg.register-allocation.ssa.phases:assign-phase-ssa-registers-recording','compiler.cfg.register-allocation.backtracking:entry-transport-records','compiler.cfg.register-allocation.backtracking:common-entry-home?'}
+  assert required_new.issubset(cn)
+  assert set(outputs).issubset(bn) and set(outputs).issubset(cn), 'runtime entrypoint absent from selected compiler scope'
+  phase=(ROOTS['candidate']/'basis/compiler/cfg/register-allocation/ssa/phases/phases.factor').read_text()
+  bt=(ROOTS['candidate']/'basis/compiler/cfg/register-allocation/backtracking/backtracking.factor').read_text()
+  assert 'cfg intervals f records assign-phase-ssa-registers-recording' in bt
+  assert ': assign-phase-ssa-block ( bb -- )\n    f assign-phase-ssa-block-recording ;' in phase
+  assert '[ records assign-phase-ssa-block-recording ] each' in phase
+
+  audit['scope_differences']={'candidate':{'baseline_count':len(b),'candidate_count':len(c),'removed':removed,'added':added,'note':'Semantic identities strip only trailing printed ordinal; exact lists match within each source. Two old phase wrappers leave the dependency closure because backtracking and the shared phase traversal now call recording helpers directly; all 26 runtime entrypoints remain selected.'}}
 for allocator in ['backtracking']:
  rounds=[]
  for ordinal in [1,2]:
