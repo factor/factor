@@ -8,6 +8,7 @@ IN: lua
 C-LIBRARY: liblua5.1 {
     { windows "lua5.1.dll" }
     { macos "liblua5.1.dylib" }
+    { linux "liblua5.1.so.0" }
     { unix "liblua5.1.so" }
 }
 

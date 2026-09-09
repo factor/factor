@@ -6,6 +6,7 @@ IN: curl.ffi
 
 C-LIBRARY: curl {
     { macos "libcurl.dylib" }
+    { linux "libcurl.so.4" }
     { unix "libcurl.so" }
 }
 
