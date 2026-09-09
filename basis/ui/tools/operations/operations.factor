@@ -4,7 +4,7 @@ USING: accessors combinators.short-circuit compiler.errors
 compiler.units continuations definitions destructors editors
 help.topics io.pathnames io.styles kernel libc.private
 macros.expander models namespaces parser prettyprint
-prettyprint.config quotations see source-files.errors
+prettyprint.config quotations see sequences source-files.errors
 stack-checker threads tools.annotations tools.crossref
 tools.test tools.time tools.walker ui.clipboards ui.commands
 ui.gestures ui.operations ui.tools.browser ui.tools.deploy
@@ -125,7 +125,11 @@ IN: ui.tools.operations
 
 [ [ annotated? not ] [ word? ] bi and ] \ watch H{ } define-operation
 
-[ annotated? ] \ reset H{ } define-operation
+[
+    { [ word? ]
+      [ { [ annotated? ] [ subwords [ annotated? ] any? ] } 1|| ]
+    } 1&&
+] \ reset H{ } define-operation
 
 [ word? ] \ breakpoint H{ } define-operation
 
