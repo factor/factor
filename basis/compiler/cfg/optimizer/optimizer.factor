@@ -8,6 +8,7 @@ compiler.cfg.checker
 compiler.cfg.copy-prop
 compiler.cfg.dce
 compiler.cfg.loop-optimization
+compiler.cfg.memory-optimization
 compiler.cfg.multiply-negate
 compiler.cfg.slp
 compiler.cfg.ssa.construction
@@ -23,6 +24,7 @@ IN: compiler.cfg.optimizer
     dup \ alias-analysis checked-ssa-pass
     dup \ value-numbering checked-ssa-pass
     dup \ copy-propagation checked-ssa-pass
+    dup \ optimize-memory checked-ssa-pass
     dup \ optimize-loops checked-ssa-pass
     dup \ auto-vectorize checked-ssa-pass
     dup \ fuse-multiply-negate checked-ssa-pass
