@@ -21,7 +21,7 @@ M: unix cd [ chdir ] unix-system-call drop ;
 
 CONSTANT: read-flags flags{ O_RDONLY }
 
-: open-read ( path -- fd ) read-flags file-mode open-file ;
+: open-read ( path -- fd ) read-flags O_NONBLOCK bitor file-mode open-file ;
 
 M: unix (file-reader)
     open-read <fd> init-fd <input-port> ;
@@ -29,7 +29,7 @@ M: unix (file-reader)
 CONSTANT: write-flags flags{ O_WRONLY O_CREAT O_TRUNC }
 
 : open-write ( path -- fd )
-    write-flags file-mode open-file ;
+    write-flags O_NONBLOCK bitor file-mode open-file ;
 
 M: unix (file-writer)
     open-write <fd> init-fd <output-port> ;
@@ -37,7 +37,7 @@ M: unix (file-writer)
 CONSTANT: secure-write-flags flags{ O_WRONLY O_CREAT O_TRUNC O_EXCL }
 
 : open-secure-write ( path -- fd )
-    secure-write-flags file-mode open-file ;
+    secure-write-flags O_NONBLOCK bitor file-mode open-file ;
 
 M: unix (file-writer-secure)
     open-secure-write <fd> init-fd <output-port> ;
@@ -46,8 +46,10 @@ CONSTANT: append-flags flags{ O_WRONLY O_APPEND O_CREAT }
 
 : open-append ( path -- fd )
     [
-        append-flags file-mode open-file |dispose
-        dup 0 SEEK_END [ lseek ] unix-system-call drop
+        append-flags O_NONBLOCK bitor file-mode open-file |dispose
+        [ dup 0 SEEK_END [ lseek ] unix-system-call drop ] [
+            dup errno>> ESPIPE = [ drop ] [ rethrow ] if
+        ] recover
     ] with-destructors ;
 
 M: unix (file-appender)
