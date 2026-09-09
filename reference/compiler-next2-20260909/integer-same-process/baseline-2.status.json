@@ -1,0 +1,46 @@
+{
+  "label": "baseline-2",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+    "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/compiler-next2-integer-20260909/integer-same-process.factor",
+    "backtracking",
+    "timing",
+    "3",
+    "on",
+    "on",
+    "5c848c90f63cea092191b70e1678bec4441e0238"
+  ],
+  "source": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "logical_source": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "probe_sha256": "21c732652fe9bbb848c144493318b8244d1155926cd161842115d2d7b64e586b",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "prepared_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996",
+  "load_before": [
+    0.94775390625,
+    0.49609375,
+    0.3955078125
+  ],
+  "nice": 0,
+  "capability": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep\n",
+  "exit_code": 0,
+  "seconds": 49.961986012756824,
+  "load_after": [
+    1.0400390625,
+    0.591796875,
+    0.43505859375
+  ],
+  "counts": {
+    "runtime": 4,
+    "code": 12,
+    "installed-code": 32,
+    "scope": 1,
+    "compile": 1
+  },
+  "ok": true
+}
