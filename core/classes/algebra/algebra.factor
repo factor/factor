@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.private
 combinators kernel make math math.order namespaces quotations 
-sequences sets sorting vectors ;
+sequences sets sorting vectors words ;
 IN: classes.algebra
 
 DEFER: sort-classes
@@ -110,11 +110,17 @@ PRIVATE>
     [ normalize-class ] bi@
     classes-intersect-cache get [ (classes-intersect?) ] symmetric-class-op ;
 
+! Named classes use identity keys, so identical operands need no cache key.
+! Preserve structural-cache behavior for anonymous classoids.
 : class-and ( first second -- class )
-    class-and-cache get [ (class-and) ] symmetric-class-op ;
+    2dup eq? over word? and [ drop ] [
+        class-and-cache get [ (class-and) ] symmetric-class-op
+    ] if ;
 
 : class-or ( first second -- class )
-    class-or-cache get [ (class-or) ] symmetric-class-op ;
+    2dup eq? over word? and [ drop ] [
+        class-or-cache get [ (class-or) ] symmetric-class-op
+    ] if ;
 
 SYMBOL: +incomparable+
 
