@@ -2,7 +2,10 @@
 
 namespace factor {
 
-static const DWORD arm64_unwind_code_fplr_frame = 0xe3e481e1;
+// end_c; set_fp; save_fplr_x #16; end. These heap fragments do not
+// start at function prologs. The leading end_c marks a phantom prolog,
+// so Windows performs the full unwind even at the fragment's first PC.
+static const DWORD arm64_unwind_code_fplr_frame = 0xe481e1e5;
 static const cell arm64_function_fragment_size = ((1 << 18) - 1) * 4;
 
 struct arm64_unwind_info {
@@ -43,8 +46,10 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
     arm64_unwind_info* unwind = &seh_area->unwind[entry_count];
     RUNTIME_FUNCTION* func = &seh_area->funcs[entry_count];
 
+    // E=1 with epilog index zero points at end_c, describing a fragment
+    // without an epilog as well as without a prolog.
     unwind->header =
-      (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 27));
+      (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 21) | (1 << 27));
     unwind->unwind_codes = arm64_unwind_code_fplr_frame;
     unwind->exception_handler = handler_rva;
 
