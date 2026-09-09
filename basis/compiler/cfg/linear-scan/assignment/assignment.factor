@@ -8,7 +8,7 @@ compiler.cfg.linearization compiler.cfg.liveness
 compiler.cfg.register-allocation.rematerialization
 compiler.cfg.registers compiler.cfg.renaming.functor
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
-heaps kernel make math namespaces sequences ;
+heaps kernel locals make math namespaces sequences ;
 IN: compiler.cfg.linear-scan.assignment
 QUALIFIED: sets
 
@@ -132,8 +132,15 @@ RENAMING: assign [ vreg>reg ] [ vreg>reg ] [ vreg>reg ]
     [ pending-interval-heap get heap-members ] 2dip
     '[ _ _ spill-required? ] filter ;
 
-: rep-at-insn ( n interval -- rep )
-    (find-use) { [ def-rep>> ] [ use-rep>> ] } 1|| ;
+! Region fragments retain their incoming type in reload-rep even when
+! edge transport supplies the register without an explicit reload.
+:: rep-at-insn ( n interval -- rep )
+    n interval (find-use) :> use
+    use [
+        use n>> n > interval reload-rep>> and [
+            interval reload-rep>>
+        ] [ use { [ def-rep>> ] [ use-rep>> ] } 1|| ] if
+    ] [ interval reload-rep>> ] if ;
 
 : spill/reload ( n interval -- {reg,rep,slot} )
     [ rep-at-insn ] keep [ reg>> ] [ vreg>> ] bi

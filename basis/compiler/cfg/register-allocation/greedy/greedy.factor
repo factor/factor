@@ -367,6 +367,11 @@ TUPLE: greedy-region-plan reg blocks resident cost benefit ;
 :: region-fragment ( interval block -- fragment )
     interval clone f >>reg
         block ranges>> clone >>ranges block uses>> clone >>uses :> fragment
+    ! GC can precede the first local use, or occur in a use-free resident
+    ! block. Preserve the original incoming representation for its saves.
+    ! Local definitions update it normally; the leader's rep-of alone can
+    ! differ after a coalesced representation-changing copy elsewhere.
+    fragment fragment live-interval-start interval rep-at-insn >>reload-rep drop
     fragment live-interval-start interval live-interval-start = [ ] [
         fragment f >>reload-from drop
     ] if

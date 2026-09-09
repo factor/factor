@@ -286,14 +286,17 @@ IN: compiler.cfg.register-allocation.greedy.tests
 ! Inspect the actual products and final machine flow of a selected hot
 ! region, including a transparent loop latch. Register/memory transitions
 ! belong to cold edges; neither hot block contains a spill or reload.
-:: region-lowering-fixture ( -- cfg snapshot hot latch )
+:: (region-lowering-fixture) ( collect? -- cfg snapshot hot latch )
     init-recolor-test
     V{ T{ ##load-integer { dst 1 } { val 42 } }
         T{ ##compare-integer-imm-branch { src1 1 } { src2 0 } { cc cc= } } }
     [ clone ] map 0 insns>block :> entry
     V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##branch } }
     [ clone ] map 1 insns>block :> hot
-    V{ T{ ##branch } } [ clone ] map 2 insns>block :> latch
+    collect? [
+        V{ T{ ##call-gc { gc-map T{ gc-map } } } T{ ##branch } }
+    ] [ V{ T{ ##branch } } ] if
+    [ clone ] map 2 insns>block :> latch
     V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##return } }
     [ clone ] map 3 insns>block :> tail
     entry hot connect-bbs hot latch connect-bbs
@@ -320,12 +323,43 @@ IN: compiler.cfg.register-allocation.greedy.tests
     graph resolve-data-flow
     graph snapshot hot latch ;
 
+: region-lowering-fixture ( -- cfg snapshot hot latch )
+    f (region-lowering-fixture) ;
+
 { t t } [
     ! Exercise spill-slot placement independently of constant recipes.
     f rematerialize-constants? [
         region-lowering-fixture [ check-value-flow ] 2dip
         [ instructions>> [ dup ##spill? swap ##reload? or ] any? not ] bi@
     ] with-variable
+] unit-test
+
+! A transparent resident block can collect despite having no operand uses
+! of this interval. Its live-through register still needs a typed save.
+{ t 1 1 } [
+    f rematerialize-constants? [
+        t (region-lowering-fixture) [ check-value-flow ] 2dip
+        [ instructions>> [ dup ##spill? swap ##reload? or ] any? not ]
+        [ instructions>> [ [ ##spill? ] count ] [ [ ##reload? ] count ] bi ] bi*
+    ] with-variable
+] unit-test
+
+! A leader can represent different machine types on either side of a
+! coalesced conversion. GC must use the type at its position, including
+! before a fragment's first local definition and in use-free fragments.
+{ tagged-rep tagged-rep int-rep int-rep } [
+    1 { { 0 30 } } { 0 20 30 } test-interval
+    [| interval |
+        interval uses>> first tagged-rep >>def-rep drop
+        interval uses>> second tagged-rep >>use-rep int-rep >>def-rep drop
+        f V{ { 5 10 } } V{ } 1 greedy-region-block boa
+        interval swap region-fragment 7 swap rep-at-insn
+        f V{ { 15 25 } } interval uses>> second 1vector
+        1 greedy-region-block boa interval swap region-fragment
+        [ 17 swap rep-at-insn ] [ 22 swap rep-at-insn ] bi
+        f V{ { 22 25 } } V{ } 1 greedy-region-block boa
+        interval swap region-fragment 24 swap rep-at-insn
+    ] call
 ] unit-test
 
 ! Run real pressure through the original-SSA/final-machine verifier too.
