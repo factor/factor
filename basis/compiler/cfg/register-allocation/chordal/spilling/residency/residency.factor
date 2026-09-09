@@ -17,9 +17,11 @@ ERROR: impossible-register-pressure demanded capacity ;
     protected length capacity >
     [ protected capacity impossible-register-pressure ] when
     residents protected union length capacity - 0 max :> excess
-    residents protected diff
-    [ distances eviction-priority ] sort-by <reversed>
-    excess head ;
+    excess zero? [ { } ] [
+        residents protected diff
+        [ distances eviction-priority ] sort-by <reversed>
+        excess head
+    ] if ;
 
 ! W records register-resident values; S records values whose home is valid.
 ! Eviction needs a store only for a still-live value absent from S. This is
