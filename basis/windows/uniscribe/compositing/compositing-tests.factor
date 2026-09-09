@@ -65,3 +65,47 @@ IN: windows.uniscribe.compositing.tests
     ] map-index [ ] all? ;
 
 { t } [ bidi-selection-pixels? ] unit-test
+
+:: selected-columns ( str start end -- columns )
+    monospace-font str start end COLOR: red <selection>
+    cached-script-string selection-columns ;
+
+! Selecting any codepoint in a combining/Indic cluster covers its full cell.
+{ t t t t } [
+    "a\u000301" 0 1 selected-columns
+    "a\u000301" 1 2 selected-columns
+    [ = ] [ append [ 1 = ] all? ] 2bi
+    "\u000915\u00093f" 0 1 selected-columns
+    "\u000915\u00093f" 1 2 selected-columns
+    [ = ] [ append [ 1 = ] all? ] 2bi
+] unit-test
+
+! A supplementary codepoint selects both UTF-16 units of the glyph.
+{ t } [ "\u01f600" 0 1 selected-columns [ 1 = ] all? ] unit-test
+
+! Reversing a mixed-direction logical range preserves its disjoint coverage.
+{ t } [
+    "abc \u0005d0\u0005d1\u0005d2 xyz" 1 5 selected-columns
+    "abc \u0005d0\u0005d1\u0005d2 xyz" 5 1 selected-columns =
+] unit-test
+
+{ t } [ "abc" 1 1 selected-columns [ zero? ] all? ] unit-test
+{ t t } [
+    "\u00200d" 0 1 selected-columns empty?
+    "\u00200b" 0 1 selected-columns empty?
+] unit-test
+
+! Compositing a zero-width bitmap must not divide by its zero column count.
+{ t RGBA } [
+    monospace-font "\u00200d" 0 1 COLOR: red <selection>
+    cached-script-string
+    <image> B{ } >>bitmap swap composite-text-image
+    [ bitmap>> empty? ] [ component-order>> ] bi
+] unit-test
+
+! The UTF-16 cursor advances by two units for every supplementary codepoint.
+{ t } [ "\u01f600\u01f600x" 0 3 selected-columns [ 1 = ] all? ] unit-test
+{ t } [
+    "\u01f600x" 1 2 selected-columns [ zero? ] count
+    monospace-font "\u01f600" cached-script-string size>> first =
+] unit-test
