@@ -15,7 +15,9 @@ for distinct incoming stack objects or SSA object identities. No stores are
 removed or forwarded. Arithmetic and representation operations classified as
 foldable, read-only slot operations, stack bookkeeping, phis, and control-flow
 instructions preserve facts. Allocation and GC classifications override the
-foldable classification: several boxing instructions belong to both.
+foldable classification: several boxing instructions belong to both. The
+foldable `##unbox` and `##unbox-long-long` are also barriers because their
+configurable C-type unboxer helper is not assumed to preserve managed memory.
 
 The key includes the tag because it participates in effective addressing.
 Only managed tagged slot loads are candidates; raw/volatile/atomic memory and

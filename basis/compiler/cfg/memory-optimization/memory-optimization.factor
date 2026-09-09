@@ -30,6 +30,8 @@ UNION: memory-transparent-insn
     ] [
         insn memory-transparent-insn?
         insn allocation-insn? insn gc-map-insn? or not and
+        ! C-type unboxers are configurable C helpers, despite being foldable.
+        insn ##unbox? insn ##unbox-long-long? or not and
         [ ] [ facts clear-assoc ] if
     ] if ;
 

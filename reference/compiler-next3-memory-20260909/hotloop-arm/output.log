@@ -1,0 +1,19 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: accessors arrays assocs compiler compiler.cfg.checker
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.memory-optimization
+compiler.cfg.memory-optimization.validation
+compiler.cfg.optimizer compiler.cfg.register-allocation.verifier
+compiler.units io kernel locals math namespaces parser
+prettyprint sequences system tools.test vocabs.refresh words ;
+IN: compiler.cfg.memory-optimization.validation
+
+f
+H{ { "cfgs" 0 } { "eliminated" 0 } }
+t
+H{ { "eliminated" 1 } { "cfgs" 2 } }
+MEMORY HOTLOOP NATIVE PASS

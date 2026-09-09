@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors compiler.units kernel locals math math.bitwise sequences
+USING: accessors combinators compiler.units kernel locals math math.bitwise sequences
 stack-checker typed words ;
 IN: compiler.cfg.memory-optimization.validation
 
@@ -23,6 +23,26 @@ TYPED:: memory-alias-loop ( a: memory-cell b: memory-cell n: fixnum -- result: f
     a value>> :> before
     n [| i | b i >>value drop ] each-integer
     before a value>> bitxor ; inline
+
+! Runtime arguments prevent constructor/constant propagation from deleting
+! the field accesses before the memory pass. Compile the typed body as well
+! as its wrapper when measuring this word.
+TYPED:: memory-loop-work ( cell: memory-cell n: fixnum -- result: fixnum )
+    0 :> checksum!
+    n [| i |
+        cell i 1 bitand zero? memory-branch checksum bitxor checksum!
+    ] each-integer
+    checksum ;
+
+:: memory-loop-answer ( value n -- result )
+    value value 3 bitand bitxor :> even-result
+    value value 1 bitand bitxor :> odd-result
+    n 4 mod {
+        { 0 [ 0 ] }
+        { 1 [ even-result ] }
+        { 2 [ even-result odd-result bitxor ] }
+        { 3 [ odd-result ] }
+    } case ;
 
 : fresh-memory-word ( quot -- word )
     [ dup infer define-temp ] with-compilation-unit ;
