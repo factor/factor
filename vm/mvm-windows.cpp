@@ -5,7 +5,7 @@ namespace factor {
 
 HANDLE boot_thread;
 
-DWORD current_vm_tls_key;
+DWORD current_vm_tls_key = TLS_OUT_OF_INDEXES;
 
 static void allocation_failure() {
   // This can run before a VM exists. Avoid VM state, C++ streams, and
@@ -30,6 +30,8 @@ void register_vm_with_thread(factor_vm* vm) {
 }
 
 factor_vm* current_vm_p() {
+  if (current_vm_tls_key == TLS_OUT_OF_INDEXES)
+    return NULL;
   return (factor_vm*)TlsGetValue(current_vm_tls_key);
 }
 
