@@ -1,0 +1,45 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "seconds": 6.3653915,
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-tuning-final-candidate",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-tuning-20260909/callback-matrix.factor"
+  ],
+  "host_load_before": [
+    54.48388671875,
+    65.89404296875,
+    79.353515625
+  ],
+  "host_load_after": [
+    55.72607421875,
+    65.9619140625,
+    79.29833984375
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+}

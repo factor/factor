@@ -1,0 +1,649 @@
+{
+  "accepted": true,
+  "records": {
+    "native-x86-64/baseline": {
+      "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+      "root": "/home/erg/factor-allocator-tuning-baseline-20260909",
+      "callback_assertions": 40,
+      "moving_gc_fresh_pairs": 384,
+      "prepare": {
+        "command": [
+          "taskset",
+          "-c",
+          "2",
+          "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+          "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+          "-i=/home/erg/factor-allocator-tuning-baseline-20260909/factor.image",
+          "-no-user-init",
+          "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-20260909/prepare.factor"
+        ],
+        "status": 0,
+        "seconds": 54.00498133059591,
+        "taskpolicy": [],
+        "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+        "initial_image_sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e",
+        "preparation_script_sha256": "a716876d6f38c2858fc893df2e27bf84232ddc3906beca7737a1239cf9087af7",
+        "prepared_image_sha256": "0b9cd44cc3876c32244ea90057284c2f65ccc9bf37493b280c975cf1f42e4a36"
+      },
+      "gates": {
+        "callback-matrix.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+          "seconds": 8.001073806546628,
+          "command": [
+            "taskset",
+            "-c",
+            "6",
+            "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+            "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+            "-i=/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-20260909/callback-matrix.factor"
+          ],
+          "host_load_before": [
+            1.90185546875,
+            0.95458984375,
+            0.96826171875
+          ],
+          "host_load_after": [
+            2.0703125,
+            1.00537109375,
+            0.98486328125
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [],
+          "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+        },
+        "moving-gc.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+          "seconds": 2.0007498553022742,
+          "command": [
+            "taskset",
+            "-c",
+            "6",
+            "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+            "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+            "-i=/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-20260909/moving-gc.factor"
+          ],
+          "host_load_before": [
+            2.0703125,
+            1.00537109375,
+            0.98486328125
+          ],
+          "host_load_after": [
+            2.14501953125,
+            1.03857421875,
+            0.99609375
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [],
+          "script_sha256": "e089add3313bac2ede77d5de04c8ac3eff309ec8aac77ad6692dfc86d8d3cc07"
+        }
+      }
+    },
+    "native-x86-64/candidate": {
+      "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+      "root": "/home/erg/factor-allocator-tuning-final-candidate-20260909",
+      "callback_assertions": 40,
+      "moving_gc_fresh_pairs": 384,
+      "prepare": {
+        "command": [
+          "taskset",
+          "-c",
+          "2",
+          "/home/erg/factor-allocator-tuning-final-candidate-20260909/factor",
+          "-resource-path=/home/erg/factor-allocator-tuning-final-candidate-20260909",
+          "-i=/home/erg/factor-allocator-tuning-final-candidate-20260909/factor.image",
+          "-no-user-init",
+          "/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-tuning-20260909/prepare.factor"
+        ],
+        "status": 0,
+        "seconds": 53.0051125343889,
+        "taskpolicy": [],
+        "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+        "initial_image_sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e",
+        "preparation_script_sha256": "a716876d6f38c2858fc893df2e27bf84232ddc3906beca7737a1239cf9087af7",
+        "prepared_image_sha256": "542d992eb62967bf032e4a69dd6a1706d77fd1edc4a3a3c72effe14e59f839e1"
+      },
+      "gates": {
+        "callback-matrix.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+          "seconds": 8.001161705702543,
+          "command": [
+            "taskset",
+            "-c",
+            "12",
+            "/home/erg/factor-allocator-tuning-final-candidate-20260909/factor",
+            "-resource-path=/home/erg/factor-allocator-tuning-final-candidate-20260909",
+            "-i=/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-tuning-20260909/callback-matrix.factor"
+          ],
+          "host_load_before": [
+            2.9501953125,
+            1.26708984375,
+            1.07177734375
+          ],
+          "host_load_after": [
+            3.72705078125,
+            1.4892578125,
+            1.146484375
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [],
+          "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+        },
+        "moving-gc.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+          "seconds": 2.0007471097633243,
+          "command": [
+            "taskset",
+            "-c",
+            "12",
+            "/home/erg/factor-allocator-tuning-final-candidate-20260909/factor",
+            "-resource-path=/home/erg/factor-allocator-tuning-final-candidate-20260909",
+            "-i=/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-tuning-20260909/moving-gc.factor"
+          ],
+          "host_load_before": [
+            3.72705078125,
+            1.4892578125,
+            1.146484375
+          ],
+          "host_load_after": [
+            3.72705078125,
+            1.4892578125,
+            1.146484375
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [],
+          "script_sha256": "e089add3313bac2ede77d5de04c8ac3eff309ec8aac77ad6692dfc86d8d3cc07"
+        }
+      }
+    },
+    "native-arm64/baseline": {
+      "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+      "root": "/Users/erg/factor.worktrees/allocator-full-master-candidate",
+      "callback_assertions": 40,
+      "moving_gc_fresh_pairs": 384,
+      "prepare": {
+        "command": [
+          "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+          "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+          "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/factor.image",
+          "-no-user-init",
+          "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepare.factor"
+        ],
+        "status": 0,
+        "seconds": 45.961746624999996,
+        "taskpolicy": [
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          }
+        ],
+        "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+        "initial_image_sha256": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95",
+        "preparation_script_sha256": "64cad0e75e1aa6a4d4554686436971371047e3dc8a0259dca861ee1b04706e47",
+        "prepared_image_sha256": "b5cc161acf160332117c1a80e1ea1c9cbf4f6a442baf4be1689fe4515b680ff4"
+      },
+      "gates": {
+        "callback-matrix.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+          "seconds": 6.627444084,
+          "command": [
+            "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+            "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+            "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepared.image",
+            "-no-user-init",
+            "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/callback-matrix.factor"
+          ],
+          "host_load_before": [
+            55.63037109375,
+            69.81982421875,
+            81.89306640625
+          ],
+          "host_load_after": [
+            52.53662109375,
+            68.94287109375,
+            81.5126953125
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 70,
+              "stderr": "taskpolicy: setpriority(): No such process\n"
+            }
+          ],
+          "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+        },
+        "moving-gc.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+          "seconds": 3.897222457999998,
+          "command": [
+            "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+            "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+            "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepared.image",
+            "-no-user-init",
+            "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/moving-gc.factor"
+          ],
+          "host_load_before": [
+            52.53662109375,
+            68.94287109375,
+            81.5126953125
+          ],
+          "host_load_after": [
+            54.8955078125,
+            69.1591796875,
+            81.51513671875
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [
+            {
+              "exit_code": 0,
+              "stderr": ""
+            }
+          ],
+          "script_sha256": "e089add3313bac2ede77d5de04c8ac3eff309ec8aac77ad6692dfc86d8d3cc07"
+        }
+      }
+    },
+    "native-arm64/candidate": {
+      "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+      "root": "/Users/erg/factor.worktrees/allocator-tuning-final-candidate",
+      "callback_assertions": 40,
+      "moving_gc_fresh_pairs": 384,
+      "prepare": {
+        "command": [
+          "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+          "-resource-path=/Users/erg/factor.worktrees/allocator-tuning-final-candidate",
+          "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor.image",
+          "-no-user-init",
+          "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-tuning-20260909/prepare.factor"
+        ],
+        "status": 0,
+        "seconds": 37.128645042,
+        "taskpolicy": [
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          },
+          {
+            "status": 0,
+            "stderr": ""
+          }
+        ],
+        "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+        "initial_image_sha256": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95",
+        "preparation_script_sha256": "a716876d6f38c2858fc893df2e27bf84232ddc3906beca7737a1239cf9087af7",
+        "prepared_image_sha256": "608508a38ba66202917cc4b91108e9aca55e24a37684633fbcd4a025a10e4b95"
+      },
+      "gates": {
+        "callback-matrix.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+          "seconds": 6.3653915,
+          "command": [
+            "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+            "-resource-path=/Users/erg/factor.worktrees/allocator-tuning-final-candidate",
+            "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-tuning-20260909/callback-matrix.factor"
+          ],
+          "host_load_before": [
+            54.48388671875,
+            65.89404296875,
+            79.353515625
+          ],
+          "host_load_after": [
+            55.72607421875,
+            65.9619140625,
+            79.29833984375
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 0,
+              "stderr": ""
+            }
+          ],
+          "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+        },
+        "moving-gc.factor": {
+          "ok": true,
+          "exit_code": 0,
+          "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+          "seconds": 4.611304208,
+          "command": [
+            "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/factor",
+            "-resource-path=/Users/erg/factor.worktrees/allocator-tuning-final-candidate",
+            "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-speed-crossarch-20260908/prepared.image",
+            "-no-user-init",
+            "/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-tuning-20260909/moving-gc.factor"
+          ],
+          "host_load_before": [
+            55.72607421875,
+            65.9619140625,
+            79.29833984375
+          ],
+          "host_load_after": [
+            57.66943359375,
+            66.19482421875,
+            79.30224609375
+          ],
+          "final_value_verifier": true,
+          "rematerialization": [
+            false,
+            true
+          ],
+          "gvn": false,
+          "backtracking_loop_spills": true,
+          "taskpolicy": [
+            {
+              "exit_code": 0,
+              "stderr": ""
+            },
+            {
+              "exit_code": 0,
+              "stderr": ""
+            }
+          ],
+          "script_sha256": "e089add3313bac2ede77d5de04c8ac3eff309ec8aac77ad6692dfc86d8d3cc07"
+        }
+      }
+    }
+  }
+}

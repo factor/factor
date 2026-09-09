@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "seconds": 3.897222457999998,
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+    "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/moving-gc.factor"
+  ],
+  "host_load_before": [
+    52.53662109375,
+    68.94287109375,
+    81.5126953125
+  ],
+  "host_load_after": [
+    54.8955078125,
+    69.1591796875,
+    81.51513671875
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [
+    {
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "script_sha256": "e089add3313bac2ede77d5de04c8ac3eff309ec8aac77ad6692dfc86d8d3cc07"
+}

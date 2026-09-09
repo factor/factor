@@ -1,0 +1,19 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-tuning-final-candidate-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-final-candidate-20260909",
+    "-i=/home/erg/factor-allocator-tuning-final-candidate-20260909/factor.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-final-candidate-20260909/reference/allocator-tuning-20260909/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 53.0051125343889,
+  "taskpolicy": [],
+  "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+  "initial_image_sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e",
+  "preparation_script_sha256": "a716876d6f38c2858fc893df2e27bf84232ddc3906beca7737a1239cf9087af7",
+  "prepared_image_sha256": "542d992eb62967bf032e4a69dd6a1706d77fd1edc4a3a3c72effe14e59f839e1"
+}

@@ -1,0 +1,161 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+    "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/factor.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 45.961746624999996,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "initial_image_sha256": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95",
+  "preparation_script_sha256": "64cad0e75e1aa6a4d4554686436971371047e3dc8a0259dca861ee1b04706e47",
+  "prepared_image_sha256": "b5cc161acf160332117c1a80e1ea1c9cbf4f6a442baf4be1689fe4515b680ff4"
+}

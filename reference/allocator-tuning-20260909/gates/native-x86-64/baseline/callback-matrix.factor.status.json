@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "seconds": 8.001073806546628,
+  "command": [
+    "taskset",
+    "-c",
+    "6",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/factor",
+    "-resource-path=/home/erg/factor-allocator-tuning-baseline-20260909",
+    "-i=/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-tuning-baseline-20260909/reference/allocator-tuning-20260909/callback-matrix.factor"
+  ],
+  "host_load_before": [
+    1.90185546875,
+    0.95458984375,
+    0.96826171875
+  ],
+  "host_load_after": [
+    2.0703125,
+    1.00537109375,
+    0.98486328125
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [],
+  "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+}

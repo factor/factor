@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "seconds": 6.627444084,
+  "command": [
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/factor",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+    "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/allocator-full-master-candidate/reference/allocator-tuning-20260909/callback-matrix.factor"
+  ],
+  "host_load_before": [
+    55.63037109375,
+    69.81982421875,
+    81.89306640625
+  ],
+  "host_load_after": [
+    52.53662109375,
+    68.94287109375,
+    81.5126953125
+  ],
+  "final_value_verifier": true,
+  "rematerialization": [
+    false,
+    true
+  ],
+  "gvn": false,
+  "backtracking_loop_spills": true,
+  "taskpolicy": [
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "exit_code": 70,
+      "stderr": "taskpolicy: setpriority(): No such process\n"
+    }
+  ],
+  "script_sha256": "85de2f1aed92a453fb8fa0080453f0ded84b540871957b4fa925e8cac8da4e10"
+}
