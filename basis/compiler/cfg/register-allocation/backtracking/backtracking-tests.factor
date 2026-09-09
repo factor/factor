@@ -437,3 +437,25 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         ] all?
     ] with-variable
 ] unit-test
+
+
+! An early-use fragment may end at 424 and share its dying register with
+! the result at late phase 425. A later range in the original interval must
+! not let spill trimming extend the first range across that liveness hole.
+{ V{ { 424 424 } } } [ [ [let
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    1 { 424 } test-interval
+        V{ { 424 424 } { 500 510 } } >>ranges
+    phase-spill-before ranges>>
+] ] with-scope ] unit-test
+
+! Synchronization splitting must preserve the same bound BEFORE shared
+! spill trimming; trimming twice had already lost the original hole.
+{ V{ { 424 424 } } } [ [ [let
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    1 { 424 510 } test-interval
+        V{ { 424 424 } { 500 510 } } >>ranges
+    T{ sync-point { n 502 } } split-at-sync first ranges>>
+] ] with-scope ] unit-test
