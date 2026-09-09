@@ -113,7 +113,7 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
     bb compute-ssa-live-in
     bb record-phi-locations
     bb [ [ [ assign-phase-insn ] each ] V{ } make ] change-instructions
-    [ compute-ssa-live-out ] [ assignment-previous-block namespaces:set ] bi ;
+    compute-ssa-live-out ;
 
 :: assign-phase-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
     cfg intervals check-phase-ssa-transports

@@ -76,6 +76,7 @@ SYMBOLS: phi-locations phi-entry-positions scratch-spills ;
     ] map bb phi-locations get set-at ;
 
 :: assign-ssa-block ( bb -- )
+    bb expire-at-block-entry
     bb basic-block namespaces:set
     bb block-from unhandled-intervals get activate-new-intervals
     bb compute-ssa-live-in
