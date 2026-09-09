@@ -1,5 +1,5 @@
 USING: accessors arrays assocs compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.def-use compiler.cfg.slp combinators kernel locals math namespaces sequences tools.test vectors ;
+compiler.cfg compiler.cfg.utilities compiler.cfg.def-use compiler.cfg.slp combinators kernel locals math namespaces sequences tools.test vectors ;
 IN: compiler.cfg.slp.tests
 
 :: scalar-chain ( first-id input scale bias rounds -- insns last )
@@ -78,4 +78,19 @@ IN: compiler.cfg.slp.tests
 { t } [
     12 scalar-pair 11 D: 2 ##replace new-insn suffix pack-test
     [ defs-vregs 11 swap member? ] any?
+] unit-test
+
+! Raw pointers may cross GC after the region. A vector extraction would
+! hide the scalar add/sub base chain, so either provenance seed anywhere
+! in the CFG disables packing, including otherwise profitable numeric code.
+{ { { 0 1 } { 0 1 } } } [
+    { T{ ##tagged>integer { dst 200 } { src 201 } }
+      T{ ##unbox-any-c-ptr { dst 200 } { src 201 } } } [| seed |
+        12 scalar-pair seed prefix T{ ##call-gc } suffix insns>cfg :> graph
+        t automatic-slp? [
+            graph auto-vectorize
+            "packs" slp-statistics get at
+            "pointer-cfgs-skipped" slp-statistics get at 2array
+        ] with-variable
+    ] map
 ] unit-test
