@@ -1,6 +1,6 @@
 USING: assocs calendar concurrency.promises continuations kernel
 libc locals namespaces sequences threads tools.test unix.ffi
-unix.signals unix.signals.private ;
+unix.process unix.signals unix.signals.private ;
 IN: unix.signals.tests
 
 :: test-sigusr1 ( delay -- received? registered? )
