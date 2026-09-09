@@ -29,3 +29,28 @@ IN: unix.ffi.tests
 off_t heap-size 8 = [
     { } [ "factor-truncate-" "" [ check-large-truncation ] cleanup-unique-file ] unit-test
 ] when
+
+USING: alien.accessors alien.data byte-arrays system words ;
+QUALIFIED: unix.ffi
+
+! The anonymous pointer must use the variadic ABI, even though this wrapper
+! deliberately accepts exactly one request argument.
+{ 2 } [ \ ioctl def>> 4 swap nth ] unit-test
+
+: unread-count-request ( -- request )
+    ! Linux asm-generic/ioctls.h; BSD sys/filio.h _IOR('f', 127, int).
+    os linux? 0x541b 0x4004667f ? ;
+
+:: unread-pipe-bytes ( -- status count )
+    8 <byte-array> :> descriptors
+    descriptors pipe 0 assert=
+    descriptors 0 alien-signed-4 :> input
+    descriptors 4 alien-signed-4 :> output
+    [
+        output B{ 1 2 3 4 5 6 7 } 7 unix.ffi:write 7 assert=
+        -1 int <ref> :> count
+        input unread-count-request count ioctl
+        count int deref
+    ] [ input unix.ffi:close drop output unix.ffi:close drop ] finally ;
+
+{ 0 7 } [ unread-pipe-bytes ] unit-test

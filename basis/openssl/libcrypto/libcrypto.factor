@@ -94,7 +94,7 @@ TYPEDEF: bio_st BIO
 
 FUNCTION: BIO* BIO_new_file ( c-string filename, c-string mode )
 
-FUNCTION: int BIO_printf ( BIO* bio, c-string format )
+FUNCTION: int BIO_printf ( BIO* bio, c-string format, ... )
 
 FUNCTION: long BIO_ctrl ( void* bio, int cmd, long larg, void* parg )
 
