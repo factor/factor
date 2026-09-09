@@ -810,7 +810,7 @@ SYMBOL: gl3-render-state
     ! glBufferData signature: target size data usage
     GL_ARRAY_BUFFER swap [ byte-length ] keep GL_DYNAMIC_DRAW glBufferData ;
 
-:: gl3-draw-texture ( loc dim texture-id flipped? -- )
+:: gl3-draw-texture-vertices ( vertices texture-id -- )
     bind-texture-state
     ! Use stored projection dimensions for consistency with color shader
     current-projection-dim get-global first2 set-texture-projection
@@ -820,14 +820,17 @@ SYMBOL: gl3-render-state
     GL_TEXTURE_2D texture-id glBindTexture
     gl3-state> tex-sampler-loc>> 0 glUniform1i
     ! Upload vertices and draw
-    flipped? [ loc dim make-textured-quad-vertices-flipped ]
-             [ loc dim make-textured-quad-vertices ] if
-    upload-textured-vertices
+    vertices upload-textured-vertices
     GL_TRIANGLES 0 6 glDrawArrays
     ! Unbind texture
     GL_TEXTURE_2D 0 glBindTexture
     ! Restore color rendering state
     restore-color-state ;
+
+:: gl3-draw-texture ( loc dim texture-id flipped? -- )
+    flipped? [ loc dim make-textured-quad-vertices-flipped ]
+             [ loc dim make-textured-quad-vertices ] if
+    texture-id gl3-draw-texture-vertices ;
 
 ! --- Cleanup ---
 

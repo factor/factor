@@ -4,6 +4,59 @@ ui.gadgets ui.gadgets.grids prettyprint documents ui.gestures
 ui.gadgets.debug models documents.elements ui.gadgets.scrollers
 ui.gadgets.line-support sequences ;
 
+USING: arrays assocs colors continuations fonts locals math namespaces
+opengl math.rectangles sequences.generalizations ui.render ui.text ui.text.private ;
+IN: ui.gadgets.editors.tests
+
+SINGLETON: measurement-test-renderer
+SYMBOL: measurement-count
+
+M: measurement-test-renderer string-dim
+    measurement-count [ 1 + ] change
+    nip length 10 2array ;
+
+:: test-editor-measurement-cache ( -- counts retained )
+    <editor> :> editor
+    sans-serif-font :> font
+    0 measurement-count [
+        measurement-test-renderer font-renderer [
+            font { "a" "bbbb" "a" } editor editor-text-dim { 4 30 } assert=
+            measurement-count get
+            font { "a" "bbbb" "a" } editor editor-text-dim { 4 30 } assert=
+            measurement-count get
+            font { "a" "cc" } editor editor-text-dim { 2 20 } assert=
+            measurement-count get
+            font COLOR: red font-with-foreground
+            { "a" "cc" } editor editor-text-dim { 2 20 } assert=
+            measurement-count get
+            font 24 font-with-size
+            { "a" "cc" } editor editor-text-dim { 2 20 } assert=
+            measurement-count get 5 narray
+            editor text-dim-cache>> dims>> assoc-size
+        ] with-variable
+    ] with-variable ;
+
+{ { 2 2 3 3 5 } 2 } [ test-editor-measurement-cache ] unit-test
+
+:: test-visible-selection ( -- count columns reversed? offscreen-count )
+    <editor> 10 >>line-height :> editor
+    10000 [ "abc" ] replicate editor model>> set-model
+    { 0 0 } editor mark>> set-model
+    { 9999 3 } editor caret>> set-model
+    { 0 0 } origin [
+        { 0 1000 } { 800 400 } <rect> clip [
+            editor compute-selection :> selected
+            selected assoc-size 100 selected at
+            { 9999 3 } editor mark>> set-model
+            { 0 0 } editor caret>> set-model
+            editor compute-selection selected =
+            { 1 0 } editor mark>> set-model
+            editor compute-selection assoc-size
+        ] with-variable
+    ] with-variable ;
+
+{ 41 { 0 3 } t 0 } [ test-visible-selection ] unit-test
+
 { "foo bar" } [
     <editor> "editor" set
     "editor" get [

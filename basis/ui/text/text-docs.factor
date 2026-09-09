@@ -47,6 +47,10 @@ HELP: offset>x
 { $values { "n" integer } { "font" font } { "string" string } { "x" real } }
 { $contract "Outputs the x coordinate of the character at the given index." } ;
 
+HELP: selection-spans
+{ $values { "start" integer } { "end" integer } { "font" font } { "string" string } { "spans" "a sequence of pairs of real numbers" } }
+{ $contract "Outputs the visual x intervals occupied by a logical selection. Each pair contains the left and right edges in logical display coordinates. A bidirectional selection may occupy several disjoint intervals. An empty selection produces a zero-width interval at the caret." } ;
+
 HELP: line-metrics
 { $values { "font" font } { "string" string } { "metrics" line-metrics } }
 { $contract "Outputs a " { $link metrics } " object with text measurements." } ;
