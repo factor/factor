@@ -41,7 +41,7 @@ pub const Segment = struct {
     // Extra low guard pages can be unlocked during GC for stack headroom.
     pub fn initWithGuardPages(size_param: Cell, executable: bool, num_low_guard_pages: usize) !Segment {
         // Page-align size to ensure guard pages work (mprotect requires page alignment)
-        const size = layouts.alignCell(size_param, page_size);
+        const size = (std.math.add(Cell, size_param, page_size - 1) catch return error.OutOfMemory) & ~@as(Cell, page_size - 1);
 
         const prot: std.c.PROT = if (executable)
             .{ .READ = true, .WRITE = true, .EXEC = true }
@@ -49,8 +49,9 @@ pub const Segment = struct {
             .{ .READ = true, .WRITE = true };
 
         // Allocate: [low guard pages][usable memory][high guard page]
-        const low_guard_size = num_low_guard_pages * page_size;
-        const alloc_size = low_guard_size + size + page_size;
+        const low_guard_size = std.math.mul(Cell, num_low_guard_pages, page_size) catch return error.OutOfMemory;
+        const guarded_size = std.math.add(Cell, low_guard_size, size) catch return error.OutOfMemory;
+        const alloc_size = std.math.add(Cell, guarded_size, page_size) catch return error.OutOfMemory;
 
         // On ARM64 macOS, executable memory requires MAP_JIT flag
         const is_arm64_macos = builtin.cpu.arch == .aarch64 and
@@ -152,3 +153,10 @@ pub const Segment = struct {
         if (std.c.mprotect(hi_ptr, page_size, prot) != 0) return error.MprotectFailed;
     }
 };
+
+test "segment rejects overflowing allocation sizes" {
+    try std.testing.expectError(error.OutOfMemory, Segment.init(std.math.maxInt(Cell), false));
+    try std.testing.expectError(error.OutOfMemory, Segment.initWithGuardPages(page_size, false, std.math.maxInt(usize)));
+    const largest_aligned = std.math.maxInt(Cell) & ~@as(Cell, page_size - 1);
+    try std.testing.expectError(error.OutOfMemory, Segment.initWithGuardPages(largest_aligned, false, 0));
+}
