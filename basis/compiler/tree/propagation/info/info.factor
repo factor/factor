@@ -146,7 +146,20 @@ UNION: fixed-length array byte-array string ;
     init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    f <class/interval-info> ; foldable
+    dup word? [
+        ! A class-only info has no literal, slots or supplied interval.
+        ! Keep the dynamic emptiness check, including redefined named unions.
+        ! The only finite class intervals are closed, non-singleton integer
+        ! bounds; literal inference cannot discover a value. Retain integral
+        ! closure so finite intervals keep their fresh endpoint arrays.
+        dup null-class? [ drop null empty-interval ] [
+            [ fix-capacity-class ] [ class-interval integral-closure ] bi
+        ] if
+        f f f value-info-state boa
+    ] [
+        ! Preserve anonymous classoids' structural class-algebra cache path.
+        f <class/interval-info>
+    ] if ; foldable
 
 : <interval-info> ( interval -- info )
     <value-info>
