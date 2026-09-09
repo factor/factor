@@ -69,6 +69,30 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
     } recipe-keys
 ] with-scope ] unit-test
 
+! A numerically cheap integer explicitly listed as a GC root is not a
+! storage-free recipe. Its address-like interpretation belongs to the map.
+{ { } } [ [
+    init-remat-test
+    {
+        T{ ##load-integer { dst 1 } { val 17 } }
+        T{ ##call-gc { gc-map T{ gc-map
+            { gc-roots V{ 1 } } { derived-roots H{ } } } } }
+        T{ ##branch }
+    } recipe-keys
+] with-scope ] unit-test
+
+! Per-CFG preparation must discard recipes and statistics when disabled;
+! toggling an image-global option must not reuse a previous CFG's value.
+{ t f f f } [ [
+    init-remat-test
+    { T{ ##load-integer { dst 1 } { val 17 } } T{ ##branch } }
+    insns>cfg dup prepare-rematerialization
+    1 rematerialization-of constant-recipe? swap
+    f rematerialize-constants? set prepare-rematerialization
+    rematerialization-recipes get rematerialization-statistics get
+    1 rematerialization-of
+] with-scope ] unit-test
+
 { { } } [ [
     init-remat-test
     {
@@ -131,6 +155,14 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
         ##return,
     ] { } make insns>cfg ;
 
+! Include MOVN/sign-extension cases under actual pressure. Values are
+! tagged fixnum bits so the machine result remains an ordinary Factor
+! integer: ten repetitions of (-2048 -1 0 2047) sum to -20.
+: <signed-constant-pressure-cfg> ( -- cfg )
+    <constant-pressure-cfg> dup cfg>insns
+    [ ##load-integer? ] filter
+    [ dup dst>> 4 mod { -32768 -16 0 32752 } nth >>val drop ] each ;
+
 :: pressure-metrics ( allocator enabled? -- metrics )
     [
         enabled? rematerialize-constants? set
@@ -167,6 +199,19 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
     graph build-stack-frame
     gensym [ graph generate ] dip
     [ associate >alist t t modify-code-heap ] keep ;
+
+{ t } [
+    value-flow-verifier-enabled? t assert=
+    { linear-scan-allocator greedy-allocator backtracking-allocator chordal-allocator }
+    [| allocator |
+        { f t } [| enabled? |
+            [
+                <signed-constant-pressure-cfg> allocator enabled? compile-pressure
+                0 swap execute( x -- sum ) -20 =
+            ] with-scope
+        ] all?
+    ] all?
+] unit-test
 
 :: <pressure-diamond> ( -- cfg )
     init-pressure-representations
