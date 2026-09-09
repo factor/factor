@@ -130,9 +130,49 @@ API references:
   white changed from RGB `{255, 64, 64}` to `{255, 127, 127}`; bidi gaps stay white.
   Collapsed selections retain their one-pixel caret rectangle.
 
+### Font aliases, bitmap copying, and glyph expansion
+
+- Uniscribe resolves font aliases before snapshotting layouts and cache keys.
+  Previously, changing an alias from Arial to Courier New after layout changed
+  the deferred raster while retaining Arial's measurements. Existing layouts
+  now keep their resolved family, and subsequent lookups use the updated alias.
+  DirectWrite also snapshots resolved font names in independent layout/cache
+  objects, fixing stale cache hits after alias changes.
+- Bitmap cropping copies contiguous DIB rows instead of reading and writing
+  each pixel through Factor. Twenty crops of a 4,096×256 source bitmap took
+  0.601 seconds before and 0.240 seconds afterward on this machine. This measures
+  the crop operation, not complete text rendering. Exact-byte tests cover row
+  orientation, channel preservation, empty crops, and unchanged source pixels.
+- An additional 672 native comparisons across eight font families, twelve
+  sizes, and seven script samples found no differences between layout and
+  grayscale rendering analyses in dimensions, UTF-16 caret positions, ascent,
+  or descent. Another 189 selection comparisons found matching cluster coverage
+  across combining, Indic, Arabic, emoji, and other samples. Neither audit
+  justified changing the existing metrics or half-open selection geometry.
+
+- The recommended `1.5 * UTF16-length + 16` glyph allowance was insufficient
+  for repeated Tibetan and Kannada characters. Native analysis returned success
+  but substituted glyphs or zero advances, including with fallback disabled.
+  The allowance is now `4 * UTF16-length + 16`, still capped at 65,535, covering
+  the reproduced expansion cases. This is additional headroom, not a guarantee
+  for arbitrary fonts or text beyond native limits. Microsoft's
+  [ScriptShape documentation](https://learn.microsoft.com/en-us/windows/win32/api/usp10/nf-usp10-scriptshape)
+  explains why the usual estimate can be insufficient. Allocating the maximum
+  for every string was rejected after a native probe retained roughly 145 MB
+  for 100 short layouts; fallback remains enabled where it was enabled before.
+
 ## Validation
 
-The latest caret, long-line, and editor-selection pass runs 244 native/UI checks
+The latest alias, crop, and glyph-expansion pass runs 261 native/UI checks and
+six GPU selection checks from the saved image without reloading implementations,
+with zero failures. The old glyph allowance fails nine of eleven new expansion
+regressions; the new allowance passes all eleven, comparing repeated-character
+widths, 1,000-codepoint caret positions, and actual raster bytes against native
+analyses with ample capacity. Local logs are
+`temp/uniscribe-expansion-saved-tests.log`, `temp/uniscribe-expansion-gpu.log`,
+and `temp/uniscribe-expansion-negative.log`.
+
+The earlier caret, long-line, and editor-selection pass ran 244 native/UI checks
 (229 unit tests plus 15 inference/error checks) from the saved image without
 reloading implementations, with zero failures. Six additional hidden-window
 GPU checks pass from that image, including alpha blending, bidi gaps, and
