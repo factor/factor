@@ -434,10 +434,12 @@ M: f sloppy-pick-up*
             ] [
                 dup hand-clicked get-global child? [
                     t >>selecting?
-                    [ hand-clicked set-global ]
-                    [ hand-click-loc get-global move-caret ]
-                    [ caret>mark ]
-                    tri
+                    {
+                        [ hand-clicked set-global ]
+                        [ hand-click-loc get-global move-caret ]
+                        [ caret>mark ]
+                        [ request-focus ]
+                    } cleave
                 ] [ drop ] if
             ] if
         ] [ dup caret>> gadget-at-path scroll>gadget ] bi

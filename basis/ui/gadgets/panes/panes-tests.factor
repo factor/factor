@@ -1,8 +1,9 @@
-USING: accessors colors fonts fry help help.markup help.stylesheet
-help.syntax help.topics inspector io io.streams.string io.styles
-kernel literals math models namespaces prettyprint see sequences
-tools.test ui.gadgets ui.gadgets.debug ui.gadgets.panes
-ui.gadgets.panes.private ui.theme ;
+USING: accessors arrays colors continuations dlists fonts fry help
+help.markup help.stylesheet help.syntax help.topics inspector io
+io.streams.string io.styles kernel literals locals math models
+namespaces prettyprint see sequences tools.test ui.gadgets
+ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
+ui.gadgets.worlds ui.gestures ui.theme ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -125,6 +126,40 @@ ARTICLE: "test-article-2" "This is a test article"
 
 { t } [ <test-pane> dup input>> child? ] unit-test
 { t } [ <test-pane> dup last-line>> child? ] unit-test
+
+:: with-selection-hand-state ( quot -- )
+    hand-loc get-global :> original-loc
+    hand-click-loc get-global :> original-click-loc
+    hand-clicked get-global :> original-clicked
+    [ <dlist> \ gesture-queue quot with-variable ] [
+        original-loc hand-loc set-global
+        original-click-loc hand-click-loc set-global
+        original-clicked hand-clicked set-global
+    ] finally ; inline
+
+! Dragging an output selection must receive keyboard focus before
+! button-up, so Copy is delivered to the pane while the mouse is held.
+{ t f t t } [
+    [
+        <test-pane> "selection-pane" set
+        <world-attributes> "selection-pane" get 1array >>gadgets
+        <world> t >>focused? "selection-world" set
+        "selection-pane" get input>> request-focus
+        { 0 0 } hand-loc set-global
+        { 0 0 } hand-click-loc set-global
+        "selection-pane" get hand-clicked set-global
+        "selection-pane" get begin-selection
+        "selection-pane" get extend-selection
+        "selection-world" get focus-path last
+        "selection-pane" get input>> eq?
+        "selection-pane" get selecting?>>
+        { 20 20 } hand-loc set-global
+        "selection-pane" get extend-selection
+        "selection-pane" get selecting?>>
+        "selection-world" get focus-path last
+        "selection-pane" get eq?
+    ] with-selection-hand-state
+] unit-test
 
 ! smash-line
 ${
