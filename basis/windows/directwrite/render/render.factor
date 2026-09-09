@@ -132,6 +132,7 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
     black RGBA >>component-order ;
 
 :: directwrite-layout>image ( layout -- image )
+    layout check-disposed drop
     layout image>> [
         [ layout font>> font-color-fonts? not text-color-fonts-disabled? set
         layout directwrite-selection-rects

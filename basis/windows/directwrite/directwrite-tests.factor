@@ -1,4 +1,4 @@
-USING: accessors arrays combinators continuations fonts fonts.shaping hashtables kernel locals math math.functions
+USING: accessors arrays combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
 math.order namespaces opengl sequences tools.test windows.directwrite ;
 IN: windows.directwrite.tests
 
@@ -93,3 +93,12 @@ IN: windows.directwrite.tests
     test-font "" 0 0 f <selection> cached-directwrite-layout
     directwrite-selection-rects [ width>> zero? ] all?
 ] unit-test
+
+
+: disposed-layout ( -- layout )
+    test-font "abc" <directwrite-layout> dup dispose ;
+
+{ f } [ disposed-layout pointer>> ] unit-test
+[ 0 disposed-layout directwrite-offset>x ] [ already-disposed? ] must-fail-with
+[ 0 disposed-layout directwrite-x>offset ] [ already-disposed? ] must-fail-with
+[ disposed-layout directwrite-selection-rects ] [ already-disposed? ] must-fail-with
