@@ -1,0 +1,7 @@
+# Cross-block managed-slot load availability
+
+Initial implementation and validation from `8780b3c090`, 2026-09-09. Production vocabulary: `compiler.cfg.memory-optimization`; flag: `memory-optimization?` (default false); stage: `optimize-memory ( cfg -- )`. The parent owns the optimizer hook, planned after existing SSA copy propagation and before LICM. The experimental `native.factor` harness adds the stage after the previous optimize-ssa body in its isolated process; no normal optimizer source is modified here.
+
+The accepted ARM gate exited 0. Structural tests cover dominating reuse, sibling values that cannot supply a join, aliased stores on one incoming path, slot/tag distinction, loop backedge stores, and a transparent loop. An effect table explicitly checks 18 kinds of stores/calls/GC/allocation/barriers/unknown instructions. The native ordinary-source witness reads a mutable typed tuple field across a branch. Compilation with the stage enabled removed one load across the three native helper CFGs; mutation-bearing branch and loop helpers were unchanged. Fresh native words under OFF and ON settings match independent answers and observable mutations with identical as well as distinct object arguments. SSA and final allocation checks were enabled.
+
+No performance conclusion is drawn from this correctness run. Counters and process durations include startup and tests. The longer-lived load result may increase register pressure, so promotion requires measured code/runtime effects.
