@@ -225,6 +225,9 @@ test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe wi
 	.\windows-threads-tests.exe
 	.\windows-io-tests.exe
 
+test-windows: test-vm
+	python -B -m unittest discover -s vm/tests -p windows_*.py
+
 # If we compile factor.exe, run mt.exe, and run factor.exe,
 # then Windows caches the manifest. Even on a recompile without applying
 # the mt.exe tool, if the factor.exe.manifest file is present, the manifest
@@ -278,6 +281,6 @@ clean:
 	if exist libfactor-ffi-test.exp del libfactor-ffi-test.exp
 	if exist libfactor-ffi-test.lib del libfactor-ffi-test.lib
 
-.PHONY: all clean factor.exe.manifest test-vm
+.PHONY: all clean factor.exe.manifest test-vm test-windows
 
 .SUFFIXES: .rs
