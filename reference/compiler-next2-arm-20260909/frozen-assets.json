@@ -1,0 +1,7 @@
+{
+  "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+  "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+  "libfactor-ffi-test.dylib": "3b56aa71e5f176840b5a017c8c46c3b2cc38e5a9cbdb2ace68ec32221f428c30",
+  "boot.unix-arm.64.image": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd",
+  "factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+}

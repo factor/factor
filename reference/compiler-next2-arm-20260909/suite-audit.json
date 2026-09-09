@@ -1,0 +1,138 @@
+[
+  {
+    "allocator": "linear-scan",
+    "state": "passed",
+    "checks": {
+      "exit_zero": true,
+      "not_timed_out": true,
+      "frozen_source": true,
+      "clean_source": true,
+      "zero_test_failures": true,
+      "success_marker": true,
+      "strict_checks": true,
+      "selected_allocator": true,
+      "selected_flags": true,
+      "frozen_assets": true,
+      "frozen_input_image": true,
+      "frozen_vm": true
+    },
+    "source": "87ac3f9b1e19a9bee974a52d263f7abce4b61c34",
+    "seconds": 115.58463120900001,
+    "output_sha256": "4f736065bec3a873b4bdc11820cb8a61c68d6c9dd2a4ed9116a49ce0ca300bf6",
+    "assets": {
+      "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+      "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+      "factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "input_image": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/factor.image",
+      "sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "executable": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/Factor.app/Contents/MacOS/factor",
+      "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+    }
+  },
+  {
+    "allocator": "greedy",
+    "state": "passed",
+    "checks": {
+      "exit_zero": true,
+      "not_timed_out": true,
+      "frozen_source": true,
+      "clean_source": true,
+      "zero_test_failures": true,
+      "success_marker": true,
+      "strict_checks": true,
+      "selected_allocator": true,
+      "selected_flags": true,
+      "frozen_assets": true,
+      "frozen_input_image": true,
+      "frozen_vm": true
+    },
+    "source": "87ac3f9b1e19a9bee974a52d263f7abce4b61c34",
+    "seconds": 120.92756558399999,
+    "output_sha256": "ffcb490b7c0f7ae6105e747f55036abd6a1d4a50cad341df25f40191225981f1",
+    "assets": {
+      "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+      "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+      "factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "input_image": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/factor.image",
+      "sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "executable": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/Factor.app/Contents/MacOS/factor",
+      "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+    }
+  },
+  {
+    "allocator": "backtracking",
+    "state": "passed",
+    "checks": {
+      "exit_zero": true,
+      "not_timed_out": true,
+      "frozen_source": true,
+      "clean_source": true,
+      "zero_test_failures": true,
+      "success_marker": true,
+      "strict_checks": true,
+      "selected_allocator": true,
+      "selected_flags": true,
+      "frozen_assets": true,
+      "frozen_input_image": true,
+      "frozen_vm": true
+    },
+    "source": "87ac3f9b1e19a9bee974a52d263f7abce4b61c34",
+    "seconds": 110.99059408299999,
+    "output_sha256": "75e587d351cdc6965040cade60f86b00a3f9e23e98e120c4c26ec3fdf87cd1b4",
+    "assets": {
+      "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+      "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+      "factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "input_image": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/factor.image",
+      "sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "executable": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/Factor.app/Contents/MacOS/factor",
+      "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+    }
+  },
+  {
+    "allocator": "chordal",
+    "state": "passed",
+    "checks": {
+      "exit_zero": true,
+      "not_timed_out": true,
+      "frozen_source": true,
+      "clean_source": true,
+      "zero_test_failures": true,
+      "success_marker": true,
+      "strict_checks": true,
+      "selected_allocator": true,
+      "selected_flags": true,
+      "frozen_assets": true,
+      "frozen_input_image": true,
+      "frozen_vm": true
+    },
+    "source": "87ac3f9b1e19a9bee974a52d263f7abce4b61c34",
+    "seconds": 118.817095708,
+    "output_sha256": "e60647d58631a75d372377ae82ce1997505722701401ca83b28569cb0fab62e6",
+    "assets": {
+      "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+      "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+      "factor.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "input_image": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/factor.image",
+      "sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+    },
+    "executable": {
+      "path": "/Users/erg/factor.worktrees/compiler-next2-integration/Factor.app/Contents/MacOS/factor",
+      "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+    }
+  }
+]
