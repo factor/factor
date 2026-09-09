@@ -23,6 +23,11 @@ IN: ui.text
 
 SYMBOL: font-renderer
 
+! Backends that rasterize the complete selection must own its background,
+! including alpha and disjoint visual spans in bidirectional text.
+HOOK: draws-selection-background? font-renderer ( -- ? )
+M: object draws-selection-background? f ;
+
 : world-text-handle ( world -- handle )
     dup text-handle>> [ <cache-assoc> >>text-handle ] unless
     text-handle>> ;
@@ -109,8 +114,10 @@ M: object draw-string* draw-string-default ;
 HOOK: draw-selected-string font-renderer ( font selection height -- )
 
 :: draw-selected-string-default ( font selection height -- )
-    selection [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
-    start end font string selection-spans selection color>> 0 height draw-selection-rects
+    draws-selection-background? [
+        selection [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
+        start end font string selection-spans selection color>> 0 height draw-selection-rects
+    ] unless
     font selection draw-string ;
 
 M: object draw-selected-string draw-selected-string-default ;

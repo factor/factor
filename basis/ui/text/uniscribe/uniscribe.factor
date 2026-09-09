@@ -6,6 +6,8 @@ IN: ui.text.uniscribe
 
 SINGLETON: uniscribe-renderer
 
+M: uniscribe-renderer draws-selection-background? t ;
+
 M: uniscribe-renderer string-dim
     cached-script-string size>> scale-dim ;
 

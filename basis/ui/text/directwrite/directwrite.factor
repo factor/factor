@@ -7,6 +7,8 @@ IN: ui.text.directwrite
 
 SINGLETON: directwrite-renderer
 
+M: directwrite-renderer draws-selection-background? t ;
+
 M: directwrite-renderer string-dim
     cached-directwrite-layout metrics>>
     [ width>> ] [ height>> ] bi 2array scale-dim ;

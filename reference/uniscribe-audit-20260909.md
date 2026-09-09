@@ -107,9 +107,41 @@ API references:
   totals. Caret coordinates also survived destruction of the original DC and
   1,000 replacement DC allocations. No changes were justified by those probes.
 
+### Caret indexing, long lines, and editor selections
+
+- Layouts cache codepoint-to-UTF-16 boundaries. Caret-to-x uses direct lookup;
+  x-to-caret uses binary search, preserving native cluster boundaries and
+  flooring surrogate interiors. On this machine, 1,000 queries over a
+  10,000-character ASCII/emoji line dropped from 0.129 to 0.0030 seconds
+  for caret-to-x and from 0.185 to 0.0053 seconds for x-to-caret.
+- A disposed layout found in the Uniscribe cache is replaced with a fresh
+  layout. Direct operations on an already disposed layout still raise an error.
+- Native fallback silently changed Consolas advances on long printable ASCII
+  lines, including a 32,764-character example. Such lines now bypass fallback
+  only after `GetGlyphIndicesW` proves the selected font covers every character.
+  Non-ASCII text, controls, and failed coverage queries retain fallback.
+  Glyph-buffer capacity is capped at 65,535 to avoid native rejection of the
+  previous allocation request for 50,000-character lines. Tests validate exact
+  ASCII advances; they do not establish arbitrary-length complex-script support.
+- Editors let Uniscribe and DirectWrite paint their own selection backgrounds.
+  The old extra rectangle blended translucent highlights twice and filled
+  unselected gaps between bidirectional runs. Hidden-window GPU tests reproduce
+  both defects on both backends and verify the fixes. A 50% red highlight over
+  white changed from RGB `{255, 64, 64}` to `{255, 127, 127}`; bidi gaps stay white.
+  Collapsed selections retain their one-pixel caret rectangle.
+
 ## Validation
 
-The latest input-snapshot and lifetime pass runs 223 checks from the saved image
+The latest caret, long-line, and editor-selection pass runs 244 native/UI checks
+(229 unit tests plus 15 inference/error checks) from the saved image without
+reloading implementations, with zero failures. Six additional hidden-window
+GPU checks pass from that image, including alpha blending, bidi gaps, and
+collapsed carets for both Windows renderers. The default remains DirectWrite.
+The GPU regression is `reference/editor-selection-regression.factor`; local
+saved-image logs are `temp/uniscribe-long-selection-saved-tests.log` and
+`temp/editor-selection-saved.log`.
+
+The earlier input-snapshot and lifetime pass ran 223 checks from the saved image
 without reloading implementations, with zero failures. It includes six snapshot
 regressions, disposed-state checks for both native backends, selected-text UI
 geometry, and mutable-name/alias GDI cache checks.
