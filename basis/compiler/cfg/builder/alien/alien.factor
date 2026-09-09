@@ -253,7 +253,10 @@ SYMBOL: callback-struct-return-area
 
 :: emit-va-cursor-inputs ( layout -- )
     layout first3 :> ( stack-offset gp-left fp-left )
-    ^^callback-stack :> entry-sp
+    ! Refreshing an older image can compile this builder while hats is
+    ! regenerating its words. The instruction constructor is already defined,
+    ! but the new ^^callback-stack helper may not exist until that reload ends.
+    next-vreg dup ##callback-stack, :> entry-sp
     os windows? gp-left 0 > and
     [ entry-sp gp-left 8 * ^^sub-imm ]
     [ entry-sp stack-offset ^^add-imm ] if ^^box-alien ds-push

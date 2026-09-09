@@ -3,11 +3,25 @@ combinators compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.builder.alien.params
 compiler.cfg.builder.blocks compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks compiler.errors
-compiler.test compiler.tree.builder compiler.tree.optimizer
+compiler.test compiler.tree.builder compiler.tree.optimizer compiler.units
+continuations definitions
 cpu.architecture cpu.x86.assembler cpu.x86.assembler.operands
 cpu.arm.64.assembler.registers kernel layouts literals make namespaces
-sequences stack-checker.alien system tools.test words ;
+sequences stack-checker.alien system tools.test vocabs.loader words ;
 IN: compiler.cfg.builder.alien.tests
+
+! During refresh, hats can re-enter the builder before it has generated a
+! newly added instruction helper. Reproduce that state without an old image.
+{ t } [
+    [
+        [
+            "^^callback-stack" "compiler.cfg.hats" lookup-word forget
+            "compiler.cfg.builder.alien" reload
+        ] with-compilation-unit
+        [ { 0 0 0 } emit-va-cursor-inputs ] V{ } make
+        first ##callback-stack?
+    ] [ "compiler.cfg.hats" reload ] finally
+] cfg-unit-test
 
 : dummy-assembly ( -- ass )
     int { } cdecl [
