@@ -1,0 +1,9 @@
+{
+  "source_commit": "f5a6d4739eb6aa5203df67719ad8cfba1410484c",
+  "accepted": true,
+  "allocators": 4,
+  "rematerialization_settings": 2,
+  "native_abi_assertions": 40,
+  "architecture": "native x86-64",
+  "verifier": "dfe08fc9bd ordinary-call invalidation"
+}

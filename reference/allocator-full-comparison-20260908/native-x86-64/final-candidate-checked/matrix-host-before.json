@@ -1,0 +1,8 @@
+{
+  "loadavg": [
+    0.27978515625,
+    0.58642578125,
+    0.50390625
+  ],
+  "factor_processes": "    PID PSR %CPU     ELAPSED COMMAND\n"
+}

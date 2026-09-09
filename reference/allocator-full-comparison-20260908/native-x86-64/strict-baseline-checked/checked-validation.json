@@ -1,0 +1,16 @@
+{
+  "failed_runs": [],
+  "source_commits": {},
+  "options": {
+    "baseline": {
+      "backtracking_loop_spills": true,
+      "gvn": false,
+      "rematerialize_constants": true
+    }
+  },
+  "scope_words": {
+    "baseline": 27289
+  },
+  "correctness": "All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.",
+  "allocators": {}
+}

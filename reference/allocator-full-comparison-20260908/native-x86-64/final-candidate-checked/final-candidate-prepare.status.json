@@ -1,0 +1,18 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-full-final-candidate-20260908/factor",
+    "-resource-path=/home/erg/factor-allocator-full-final-candidate-20260908",
+    "-i=/home/erg/factor-allocator-full-final-candidate-20260908/factor.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-full-final-candidate-20260908/reference/allocator-speed-crossarch-20260908/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 34.00314219575375,
+  "taskpolicy": [],
+  "source_commit": "30a50ab0df1147eb5c7d852b5d6aad2c0835464e",
+  "initial_image_sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e",
+  "prepared_image_sha256": "e4df5daf22d03d0340e95c7f19d29dc8381ceaf5598aae892d9ea9f38771c576"
+}

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-allocator-full-checked-baseline-20260908/factor",
+    "-resource-path=/home/erg/factor-allocator-full-checked-baseline-20260908",
+    "-i=/home/erg/factor-allocator-full-checked-baseline-20260908/factor.image",
+    "-no-user-init",
+    "/home/erg/factor-allocator-full-checked-baseline-20260908/reference/allocator-speed-crossarch-20260908/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 30.00319471117109,
+  "taskpolicy": [],
+  "source_commit": "f5a6d4739eb6aa5203df67719ad8cfba1410484c",
+  "initial_image_sha256": "50d5f6538fcf5ccb39750220f23227296b2a6ba8dbe7ff35aa983b748e6ee86e",
+  "prepared_image_sha256": "99e00b63ff090692a6e676de1a9a05231bb6652a00d682360758b4143d7d2d44"
+}
