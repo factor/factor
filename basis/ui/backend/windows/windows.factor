@@ -179,6 +179,23 @@ DEFER: get-default-device-caps
     detect-scale-factor
     [ 1.0 > ] keep f ? gl-scale-factor set-global ;
 
+: set-window-scale-factor ( hwnd -- )
+    ! System device caps can differ from a per-monitor-aware window's DPI.
+    GetDpiForWindow dup 0 >
+    [ 96 /f [ 1.0 > ] keep f ? gl-scale-factor set-global ]
+    [ drop ] if ;
+
+: invalidate-scale-layout ( gadget -- )
+    dup [ invalidate-scale-layout ] each-child
+    f >>pref-dim \ invalidate* >>layout-state drop ;
+
+: window-scale-changed ( world -- )
+    {
+        [ text-handle>> [ clear-assoc ] when* ]
+        [ images>> [ clear-assoc ] when* ]
+        [ dup invalidate-scale-layout layout-later ]
+    } cleave ;
+
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 CONSTANT: window-control>style
@@ -539,6 +556,14 @@ SYMBOL: nc-buttons
 : handle-wm-dwmcompositionchanged ( hWnd uMsg wParam lParam -- )
     3drop [ window ] keep ?make-glass ;
 
+:: handle-wm-dpichanged ( hwnd msg wParam lParam -- )
+    hwnd window [
+        dup set-gl-context window-scale-changed
+        hwnd f lParam <alien> RECT memory>struct get-RECT-dimensions
+        flags{ SWP_NOZORDER SWP_NOACTIVATE }
+        SetWindowPos win32-error=0/f
+    ] when* ;
+
 SYMBOL: wm-handlers
 
 : add-wm-handler ( quot: ( hWnd Msg wParam lParam -- LRESULT ) wm -- )
@@ -554,7 +579,7 @@ wm-handlers [
         ${ WM_CLOSE [ handle-wm-close 0 ] }
         ! ${ WM_NCCREATE [ [ 3drop EnableNonClientDpiScaling drop ] [ DefWindowProc ] 4bi ] }
         ! ${ WM_GETDPISCALEDSIZE [ DefWindowProc ] }
-        ! ${ WM_DPICHANGED [ DefWindowProc ] }
+        ${ WM_DPICHANGED [ handle-wm-dpichanged 0 ] }
         ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
 
         ${ WM_SIZE [ handle-wm-size 0 ] }
@@ -596,6 +621,8 @@ SYMBOL: trace-messages?
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     LRESULT { HWND UINT WPARAM LPARAM } stdcall [
+        ! Input and size messages use pixels from this window's monitor.
+        [ dup set-window-scale-factor ] 3dip
         pick wm-handlers get-global at*
         [ flush call( hWnd Msg wParam lParam -- result ) ] [ drop DefWindowProc ] if
     ] alien-callback ;
@@ -722,13 +749,20 @@ M: windows-ui-backend (open-window)
         [ [ f f ] dip f f <win> >>handle setup-gl ] 2tri
     ]
     [ dup handle>> hWnd>> register-window ]
-    [ handle>> hWnd>> show-window ] tri ;
+    [
+        dup set-gl-context
+        dup window-scale-changed
+        handle>> hWnd>> show-window
+    ] tri ;
 
 ! https://github.com/factor/factor/issues/2173
 ! ignore timeout (error 258)
 M: win-base select-gl-context
     [ hDC>> ] [ hRC>> ] bi wglMakeCurrent win32-error=0/f-ignore-timeout
     GdiFlush win32-error=0/f ;
+
+M: win select-gl-context
+    dup hWnd>> set-window-scale-factor call-next-method ;
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
