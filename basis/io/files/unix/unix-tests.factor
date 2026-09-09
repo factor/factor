@@ -197,3 +197,5 @@ tools.test unix unix.groups unix.users ;
 os linux? [
     { t } [ "/proc/self/exe" read-symbolic-link string? ] unit-test
 ] when
+
+"resource:basis/io/files/unix/fixtures/append.factor" run-test-file

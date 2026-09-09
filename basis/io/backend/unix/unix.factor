@@ -18,7 +18,8 @@ TUPLE: fd < disposable fd ;
 : init-fd ( fd -- fd )
     [
         |dispose
-        dup fd>> F_SETFL O_NONBLOCK [ fcntl ] unix-system-call drop
+        dup fd>> dup F_GETFL 0 [ fcntl ] unix-system-call
+        O_NONBLOCK bitor F_SETFL swap [ fcntl ] unix-system-call drop
         dup fd>> F_SETFD FD_CLOEXEC [ fcntl ] unix-system-call drop
     ] with-destructors ;
 
