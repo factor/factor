@@ -1,6 +1,7 @@
 USING: accessors arrays assocs compiler.cfg
 compiler.cfg.linear-scan.allocation.state compiler.cfg.register-allocation
-compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier compiler.test cpu.architecture
+compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier
+compiler.cfg.register-allocation.rematerialization compiler.test cpu.architecture
 kernel kernel.private locals math math.vectors.simd namespaces sequences tools.test ;
 IN: compiler.cfg.register-allocation.validation.tests
 
@@ -97,5 +98,20 @@ IN: compiler.cfg.register-allocation.validation.tests
           validation-vector-program ] compile-call >array
         2.0 5.0 x validation-vector-lane
         3.0 7.0 x validation-vector-lane 2array =
+    ] all?
+] with-scope ] unit-test
+
+
+! These are moving heap pointers, not just fixnum bits passing a GC clobber.
+! Both phi predecessors and rematerialization settings execute with a bank
+! small enough to force traffic around the two scratch registers.
+{ t } [ [
+    { f t } [| rematerialize? |
+        rematerialize? rematerialize-constants? set
+        <validation-moving-tagged-phi> :> graph
+        graph 4 2 validation-register-bank :> bank
+        linear-scan-allocator bank [ linear-scan-allocation-with-registers ]
+        constrained-allocator boa graph swap compile-validation-cfg
+        check-validation-moving-phi
     ] all?
 ] with-scope ] unit-test

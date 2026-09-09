@@ -237,3 +237,74 @@ M: constrained-allocator allocator-statistics
 
 :: validation-vector-lane ( a b x -- result )
     a 2 * a b * + a a * + b b * x fsin * + ;
+
+
+! Runtime inputs are fresh heap objects. The chosen derived address and its
+! nonzero byte offset cross a real phi join and collection, then reconstruct
+! the original tagged object. Keeping both objects on the data stack gives
+! the native oracle relocated references independent of allocator GC maps.
+:: <validation-moving-phi> ( -- graph )
+    init-validation-representations
+    tagged-rep 1 set-rep-of tagged-rep 2 set-rep-of
+    [
+        ##prologue,
+        0 D: 2 ##peek, 1 D: 1 ##peek, 2 D: 0 ##peek,
+        3 2 ##tagged>integer,
+        3 0 cc> ##compare-integer-imm-branch,
+    ] { } make 0 insns>block :> entry
+    [
+        4 0 ##tagged>integer, 5 4 16 ##add-imm,
+        10 16 ##load-integer, ##branch,
+    ] { } make 1 insns>block :> left
+    [
+        6 1 ##tagged>integer, 7 6 32 ##add-imm,
+        11 32 ##load-integer, ##branch,
+    ] { } make 2 insns>block :> right
+    [
+        8 H{ { left 5 } { right 7 } } ##phi,
+        9 H{ { left 10 } { right 11 } } ##phi,
+        14 15 ##save-context,
+        V{ } clone H{ } clone gc-map boa ##call-gc,
+        12 8 9 ##sub,
+        12 D: 0 ##replace,
+        ##epilogue, ##return,
+    ] { } make 3 insns>block :> join
+    entry left connect-bbs entry right connect-bbs
+    left join connect-bbs right join connect-bbs
+    entry block>cfg ;
+
+:: check-validation-moving-phi ( word -- ? )
+    12 <iota> [| seed |
+        { -1 1 } [| flag |
+            seed 1array seed 100 + 1array flag
+            word execute( a b flag -- a b result ) :> ( a b result )
+            result flag 0 > a b ? eq?
+        ] all?
+    ] all? ;
+
+! The tagged-base phi is explicit before deriving its interior address.
+! This form also exercises the conventional SSA-destruction path, whose
+! base discovery can follow the post-phi tagged>integer definition.
+:: <validation-moving-tagged-phi> ( -- graph )
+    init-validation-representations
+    tagged-rep 1 set-rep-of tagged-rep 2 set-rep-of tagged-rep 8 set-rep-of
+    [
+        ##prologue,
+        0 D: 2 ##peek, 1 D: 1 ##peek, 2 D: 0 ##peek,
+        3 2 ##tagged>integer,
+        3 0 cc> ##compare-integer-imm-branch,
+    ] { } make 0 insns>block :> entry
+    [ 10 16 ##load-integer, ##branch, ] { } make 1 insns>block :> left
+    [ 11 32 ##load-integer, ##branch, ] { } make 2 insns>block :> right
+    [
+        8 H{ { left 0 } { right 1 } } ##phi,
+        9 H{ { left 10 } { right 11 } } ##phi,
+        12 8 ##tagged>integer, 13 12 9 ##add,
+        14 15 ##save-context,
+        V{ } clone H{ } clone gc-map boa ##call-gc,
+        16 13 9 ##sub, 16 D: 0 ##replace,
+        ##epilogue, ##return,
+    ] { } make 3 insns>block :> join
+    entry left connect-bbs entry right connect-bbs
+    left join connect-bbs right join connect-bbs
+    entry block>cfg ;
