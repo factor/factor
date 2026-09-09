@@ -3,7 +3,8 @@ compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.verifier compiler.cfg.register-allocation.validation
 compiler.cfg.ssa.destruction.leaders compiler.cfg.instructions
 compiler.cfg.checker compiler.cfg.liveness compiler.cfg.linear-scan.numbering compiler.cfg.linearization compiler.cfg.utilities
-compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.phases
+compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.liveness
+compiler.cfg.register-allocation.ssa.phases
 compiler.cfg.linear-scan.assignment compiler.cfg.register-allocation.occupancy
 compiler.cfg.register-allocation.spill-sites
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
@@ -587,4 +588,104 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         [ { 0 3 } { } productive-gap? ]
         [ { 16 19 } { } productive-gap? ]
     } [ call( -- ? ) ] map
+] ] with-scope ] unit-test
+
+! The join simultaneously swaps two incoming registers on one edge, while
+! another edge carries the first original value in memory. Delegating entry
+! reloads must preserve the parallel sources and use each edge's own value.
+:: entry-edge-fixture ( optimize? -- graph snapshot target )
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    int-rep 3 set-rep-of
+    H{ { 1 1 } { 2 2 } { 3 3 } } clone leader-map set
+    [ 1 11 ##load-integer, 2 22 ##load-integer, ##branch, ] V{ } make
+    0 insns>block :> source
+    V{ T{ ##branch } } clone 1 insns>block :> left
+    V{ T{ ##branch } } clone 2 insns>block :> right
+    [ 3 1 2 ##sub, 3 D: 0 ##replace, ##return, ] V{ } make
+    3 insns>block :> target
+    source left connect-bbs source right connect-bbs
+    left target connect-bbs right target connect-bbs
+    source block>cfg :> graph
+    graph cfg set graph snapshot-value-flow :> snapshot
+    graph compute-ssa-live-sets-preserving-gc graph number-instructions
+    graph prepare-backtracking-points
+    machine-registers dup registers set int-regs swap at :> bank
+    H{ } clone spill-slots set
+    1 int-rep assign-spill-slot :> home1
+    2 int-rep assign-spill-slot :> home2
+    target phase-block-from :> entry
+    left block-to right block-to min 1 + :> first-end
+    1 <live-interval> 1 first-end 2array 1vector >>ranges bank first >>reg :> before1
+    2 <live-interval> 3 entry 1 - 2array 1vector >>ranges bank second >>reg :> before2
+    1 <live-interval> entry dup 2array 1vector >>ranges bank second >>reg
+        home1 >>reload-from int-rep >>reload-rep :> after1
+    2 <live-interval> entry entry 1 + 2array 1vector >>ranges bank first >>reg
+        home2 >>reload-from int-rep >>reload-rep :> after2
+    3 <live-interval> entry 1 + entry 2 + 2array 1vector >>ranges bank third >>reg :> result
+    before1 before2 after1 after2 result 5 narray :> intervals
+    optimize? [ intervals reify-entry-transports ] when
+    graph intervals assign-phase-ssa-registers
+    graph resolve-ssa-data-flow
+    graph snapshot target ;
+
+{ t t } [ [ [let
+    t entry-edge-fixture :> ( graph snapshot target )
+    graph snapshot check-value-flow
+    backtracking-edge-entry-reloads get 2 =
+    target instructions>> [ ##reload? ] any? not
+] ] with-scope ] unit-test
+
+! Removing an actual edge copy from the delegated parallel transport must
+! fail the original-value check; merely seeing the optimization counter is
+! insufficient evidence that the join received its two distinct values.
+[ [ [let
+    t entry-edge-fixture :> ( graph snapshot target )
+    graph [ [ [ ##copy? not ] filter ] change-instructions drop ] each-basic-block
+    graph snapshot check-value-flow
+] ] with-scope ] [ bad-allocation-value? ] must-fail-with
+
+! A predecessor with no outgoing physical map still requires the explicit
+! successor reload. A non-live-in or a phi/GC/ABI entry also stays unchanged.
+{ { f f f f f } } [ [ [let
+    init-test-allocation drop
+    H{ { 1 1 } { 2 2 } } clone leader-map set
+    t backtracking-phase-mode? set
+    V{ T{ ##call } } clone 0 insns>block t >>kill-block? :> source
+    V{ T{ ##branch } } clone 1 insns>block :> ordinary
+    V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##return } } clone
+    2 insns>block :> target
+    source ordinary connect-bbs ordinary target connect-bbs
+    source target connect-bbs source block>cfg :> graph
+    graph cfg set graph compute-ssa-live-sets-preserving-gc graph number-instructions
+    graph prepare-backtracking-points
+    1 <live-interval> target phase-block-from dup 2array 1vector >>ranges
+        0 <spill-slot> >>reload-from :> interval
+    interval edge-entry-reload?
+    source f >>kill-block? drop
+    interval 2 >>vreg edge-entry-reload?
+    interval 1 >>vreg drop
+    target V{ T{ ##phi { dst 1 } { inputs H{ } } } } >>instructions drop
+    interval edge-entry-reload?
+    target V{ T{ ##call-gc } } >>instructions drop
+    interval edge-entry-reload?
+    target V{ T{ ##alien-invoke } } >>instructions drop
+    interval edge-entry-reload? 5 narray
+] ] with-scope ] unit-test
+
+! Execute distinct-value loop phis under a reduced bank, including zero
+! iterations and a GC backedge. Entry delegation must preserve the old
+! explicit path at phi/GC entries while ordinary exit edges remain usable.
+{ t } [ [ [let
+    t check-allocation? set t check-ssa? set
+    { f t } [| collect? |
+        0 collect? <validation-cycle> :> graph
+        graph 3 2 validation-register-bank :> bank
+        backtracking-allocator bank [ backtracking-allocation-with-registers ]
+        constrained-allocator boa :> allocator
+        graph allocator compile-validation-cfg :> word
+        { 0 1 2 3 8 17 } [| n |
+            n word execute( x -- y ) n 0 validation-cycle-result =
+        ] all?
+    ] all?
 ] ] with-scope ] unit-test
