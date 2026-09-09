@@ -1,6 +1,6 @@
-USING: accessors assocs compiler.cfg compiler.cfg.instructions
+USING: accessors assocs compiler.cfg compiler.cfg.instructions compiler.cfg.loop-detection
 compiler.cfg.register-allocation.chordal.spilling.next-use
-kernel locals tools.test ;
+kernel locals namespaces tools.test ;
 IN: compiler.cfg.register-allocation.chordal.spilling.next-use.tests
 
 ! Minimum distance across a diamond; a loop-exit route does not displace a
@@ -31,3 +31,11 @@ IN: compiler.cfg.register-allocation.chordal.spilling.next-use.tests
     10 join entries edge-next-use
     11 join entries edge-next-use
 ] ] unit-test
+
+! Equal nesting depth does not make an edge stay inside the same loop.
+{ 100000 0 } [
+    H{
+        { 1 T{ natural-loop { blocks HS{ 1 2 } } } }
+        { 3 T{ natural-loop { blocks HS{ 3 4 } } } }
+    } loops [ 2 3 loop-exit-penalty 1 2 loop-exit-penalty ] with-variable
+] unit-test
