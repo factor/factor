@@ -1,1 +1,0 @@
-printf regression printf.factor failed: exit=0, stdout=b'wrong output\n', stderr=b''

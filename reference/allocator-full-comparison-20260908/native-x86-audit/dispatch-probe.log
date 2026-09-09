@@ -1,8 +1,0 @@
-linear-scan-allocator
-{"policy:linear-scan-choice":2,"method:linear-scan-allocator":1,"policy:linear-scan-engine":1}
-greedy-allocator
-{"policy:greedy":1,"method:greedy-allocator":1}
-backtracking-allocator
-{"method:backtracking-allocator":1,"policy:backtracking":1}
-chordal-allocator
-{"method:chordal-allocator":1,"policy:chordal-colors":1,"policy:chordal-pressure":1}

@@ -1,1 +1,0 @@
-Per-pass compiler timing and register allocation measurements

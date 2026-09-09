@@ -1,4 +1,0 @@
-basis/alien/syntax/syntax.factor:18:    (FUNCTION:) make-var-function define-inline ;
-basis/alien/syntax/syntax.factor:22:    (FUNCTION:) (make-var-function) define-inline ;
-basis/alien/parser/parser.factor:158:: (FUNCTION:) ( -- return function library types names varargs? )
-basis/x11/syntax/syntax.factor:7:    (FUNCTION:) make-var-function

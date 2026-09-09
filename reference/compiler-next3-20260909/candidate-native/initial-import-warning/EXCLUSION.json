@@ -1,6 +1,0 @@
-{
-  "reason": "Untimed initial check passed; excluded from final matching-image gate after explicit harness import correction. No timing ran.",
-  "parent_queue_pid": 2722247,
-  "queue_stopped_after_completed_child": true,
-  "image_sha256": "8ef9b898acb9f5400fa0390c76c9081595ee6a7fe8ad372ff3d98d2d9702e282"
-}

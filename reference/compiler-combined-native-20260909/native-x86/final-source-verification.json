@@ -1,8 +1,0 @@
-{
-  "source": "6b1432897261fd72aa0578afb8e621224cdf629f",
-  "checked_paths": 1603,
-  "command": "cd /home/erg/factor-compiler-combined-20260909 && python3 reference/allocator-speed-crossarch-20260908/source-manifest.py",
-  "exit_code": 0,
-  "stdout": "All 1603 changed compiler-source paths match 6b1432897261fd72aa0578afb8e621224cdf629f\n",
-  "observed_after_timing": true
-}

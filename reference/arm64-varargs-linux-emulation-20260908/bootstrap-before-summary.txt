@@ -1,5 +1,0 @@
-bootstrap.log: ['no-word-error "LIBRARY:"']
-bootstrap-after-parser.log: ['no-word-error "alien-callback-varargs"']
-bootstrap-fresh-image.log: ['no-word-error "require"']
-bootstrap-fresh-final-parser.log: []
-Dependency cycle: classes.struct -> combinators.smart -> stack-checker.alien -> alien.varargs -> classes.struct; struct-c-type used before definition.

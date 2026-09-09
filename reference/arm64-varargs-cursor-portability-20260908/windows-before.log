@@ -1,2 +1,0 @@
-lld-link: error: undefined symbol: vsnprintf
->>> referenced by /Users/erg/factor.worktrees/arm64-varargs-cursor/reference/arm64-varargs-cursor-portability-20260908/before.obj:(direct_vsnprintf)

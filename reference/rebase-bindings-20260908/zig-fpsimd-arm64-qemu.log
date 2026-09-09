@@ -1,3 +1,0 @@
-1/2 linux_arm64_fpsimd.test.find FPSIMD after an unknown record and preserve unrelated state...OK
-2/2 linux_arm64_fpsimd.test.reject missing truncated undersized and nonprogressing records...OK
-All 2 tests passed.

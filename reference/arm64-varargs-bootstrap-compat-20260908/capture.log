@@ -1,4 +1,0 @@
-Must Fail: { [ exercise ] }
-Unit Test: { { 42 } [ exercise ] }
-Unit Test: { { 42 } [ exercise ] }
-Upgraded old seed passes native register capture and compacting GC

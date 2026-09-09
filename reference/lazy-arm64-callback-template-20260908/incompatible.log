@@ -1,8 +1,0 @@
-Unit Test: { { f } [ "arm64_variadic_callbacks_supported" f dlsym ] }
-Unit Test: { { 2 } [ CALLBACK-STUB special-object length ] }
-Must Fail With: {
-    [ check-variadic-callback-runtime ]
-    [ variadic-callback-runtime-required? ]
-}
-Unit Test: { { 2 } [ CALLBACK-STUB special-object length ] }
-Old VM is rejected before template mutation

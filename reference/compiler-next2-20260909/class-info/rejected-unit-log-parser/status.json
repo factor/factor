@@ -1,4 +1,0 @@
-{
-  "accepted": false,
-  "failure": "Diagnostic driver parsed a Factor unit-test literal as JSON; no compiler timing launched."
-}

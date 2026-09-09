@@ -1,9 +1,0 @@
-{
-  "upstream_commit": "b21f5d1611",
-  "files": {
-    "basis/compiler/cfg/liveness/liveness.factor": "d728c367ee2102870b9a3702321a70f0893b1626674d7e91053f8464252e3ded",
-    "basis/compiler/cfg/ssa/destruction/destruction.factor": "e14a7ae2c91decad2584b875fe552aea94c3c8d426210faef7daede24871a789",
-    "basis/compiler/cfg/ssa/interference/live-ranges/live-ranges.factor": "7bec08c4652409cce0fbcb1700b537be27794de2d3cb6d7de4a8c0f89faf1805"
-  },
-  "mode": "native x86-64; mixed prepared source233 VM/image with three original upstream compiler files"
-}

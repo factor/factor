@@ -1,9 +1,0 @@
-{
-  "basis/compiler/cfg/memory-optimization/memory-optimization.factor": "9f157e415358107d2974320133da9ea8cec6c9e16bb6fd5b8db3c7fdc664671c",
-  "basis/compiler/cfg/memory-optimization/memory-optimization-tests.factor": "aa3928a321b56d7e51978a371b3c05c7842327788372cc99a6a82ec413775f80",
-  "basis/compiler/cfg/memory-optimization/validation/validation.factor": "c689e828190e4c2c79f44d424d25ef0636c14ea688f28b6f8da55cd77b4d4c62",
-  "basis/compiler/cfg/memory-optimization/validation/validation-tests.factor": "6500eff9a6f6cf25d7f9455d596186d1a2a6de5ba7f63cb06dc966a2b26c6ebb",
-  "reference/compiler-next3-memory-20260909/integrated.factor": "4e01fa3c908debc5843263a4e398f06db153ad0d80b8efd61286c2262fffb2d2",
-  "installed_optimizer_sha256": "67bc4278c4c84d8183e7937d98f11bf1d8fc3584fce6a4b9292d583ea146d24c",
-  "installed_optimizer_commit": "84f2066b196c5e07e972bfa470364924026106c0"
-}

@@ -1,9 +1,0 @@
-Microsoft win32metadata commit: 29896383c51d9dd6a2ea0ec6304d095baca9418c
-Source: https://raw.githubusercontent.com/microsoft/win32metadata/29896383c51d9dd6a2ea0ec6304d095baca9418c/generation/WinSDK/RecompiledIdlHeaders/um/winnt.h
-
-#define PF_ARM_V82_DP_INSTRUCTIONS_AVAILABLE        43
-#define PF_ARM_SVE_BF16_INSTRUCTIONS_AVAILABLE      52
-#define PF_ARM_SVE_I8MM_INSTRUCTIONS_AVAILABLE      57
-#define PF_ARM_V82_I8MM_INSTRUCTIONS_AVAILABLE      66
-#define PF_ARM_V82_FP16_INSTRUCTIONS_AVAILABLE      67
-#define PF_ARM_V86_BF16_INSTRUCTIONS_AVAILABLE      68

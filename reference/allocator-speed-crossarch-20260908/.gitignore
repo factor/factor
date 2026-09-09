@@ -1,7 +1,0 @@
-*.image
-*.log
-*.jsonl
-counters
-*.so
-*.dylib
-checked-launch.factor

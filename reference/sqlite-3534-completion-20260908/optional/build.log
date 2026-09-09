@@ -1,5 +1,0 @@
-session changeset/apply: PASS (48)
-carray_bind_v2 int64 + distinct destructor context: PASS (1000000042, 1)
-preupdate callback + old/new/count/depth/blobwrite: PASS
-FTS5 API v3 tokenizer v0 layout and tokenization: PASS (48, 32)
-SQLITE_3534_LIBRARY=/private/tmp/sqlite-3534-optional-rebuilt/libsqlite3-optional.dylib

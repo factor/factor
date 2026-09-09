@@ -1,4 +1,0 @@
-Unit Test: {
-    { 3000000000 }
-    [ uint-callback [ ffi_uint_callback ] with-callback ]
-}

@@ -1,6 +1,0 @@
-{
-  "source_commit": "3a41e9713cb5abb26dd06b748d3d423b1bfed356",
-  "observed_sha256": "4c99071bdbdb19da52a47f0c647832374d69c721d895667936bafad7c3a3fa5f",
-  "timed_sha256": "6d7e3099d37823501f3869bae121fa9f517a1ed2b1acbceb488a4ab854996bb6",
-  "changes": "Only remove observer symbol, vector initialization, and per-CFG vector push. Algorithm helper call and normal recolored-vertices statistic remain."
-}

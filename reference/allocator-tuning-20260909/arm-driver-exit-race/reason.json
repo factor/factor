@@ -1,7 +1,0 @@
-{
-  "reason": "taskpolicy target exited between poll and setpriority; driver aborted before status recording",
-  "discard_rule": "rerun invalid orchestration slot regardless of measured values",
-  "accepted_runs_retained": 2,
-  "original_driver_sha256": "9ba308d99fc24508d7446f673c4ca219bcdeab8b560ee82519172e99ab7cffdb",
-  "revised_driver_sha256": "d59e428fdff4d36f9f6b194769b1cad8bf43e4c8e77abc4aba2c55886d7c0fa1"
-}

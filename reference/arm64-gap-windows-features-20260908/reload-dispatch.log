@@ -1,3 +1,0 @@
-Unit Test: { { "fallback" } [ saved-dispatch ] }
-Unit Test: { { f } [ "saved-image-only" detected-arm64-features member? ] }
-Unit Test: { { t } [ detected-arm64-features probe-arm64-features = ] }

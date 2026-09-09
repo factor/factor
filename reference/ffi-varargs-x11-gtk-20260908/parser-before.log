@@ -1,8 +1,0 @@
---> test failed!
-resource:basis/x11/syntax/syntax.factor: 6
-
-Asset: POSTPONE: X-FUNCTION:
-
-Stack effect declaration is wrong
-inferred ( -- x )
-declared ( parsed -- parsed )

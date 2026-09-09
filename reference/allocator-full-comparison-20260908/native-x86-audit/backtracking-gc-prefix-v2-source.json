@@ -1,8 +1,0 @@
-{
-  "base_source": "cad423bf910a88720158c6473641e7d85643ce2d",
-  "state": "owner working tree v2 preserves assignment namespace",
-  "files": {
-    "basis/compiler/cfg/register-allocation/backtracking/backtracking.factor": "8641834ad69000530f3e8fd35419ed6bdb5e4b74c6cb425d932a911e54dcaabd",
-    "basis/compiler/cfg/register-allocation/ssa/phases/phases.factor": "6a1495ee443dc305431e5e0d75e0471747c10ad2e7396143e12a493c454e0714"
-  }
-}

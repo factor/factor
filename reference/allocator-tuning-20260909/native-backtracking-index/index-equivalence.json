@@ -1,6 +1,0 @@
-{
-  "equal": true,
-  "kernels": 12,
-  "outputs": 26,
-  "compared": "All recorded pass metrics, every allocation counter, generated code byte counts; only timing fields removed"
-}

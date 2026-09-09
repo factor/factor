@@ -1,8 +1,0 @@
-{
-  "base_source": "cad423bf91",
-  "state": "Superseded working tree v1: IPv6 target passes, but dynamic scope discards assignment edge maps; v2 corrects that separately.",
-  "files": {
-    "basis/compiler/cfg/register-allocation/backtracking/backtracking.factor": "8002b0eaf6be82f3b18c2f5e26b877ce2b7b0b746d206a2e2b39a6f69983fd7a",
-    "basis/compiler/cfg/register-allocation/ssa/phases/phases.factor": "6a1495ee443dc305431e5e0d75e0471747c10ad2e7396143e12a493c454e0714"
-  }
-}

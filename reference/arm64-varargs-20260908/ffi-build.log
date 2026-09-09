@@ -1,2 +1,0 @@
-/opt/homebrew/opt/llvm/bin/clang -c -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-varargs-x86-233db947df5399d5cd61f8f33bffabcd4486bb28"  -O3  -std=c99 -o build-varargs/ffi_test.o vm/ffi_test.c
-/opt/homebrew/opt/llvm/bin/clang -mmacos-version-min=11.0 -target arm64-apple-darwin  -Wall -Wextra -pedantic -DFACTOR_VERSION="0.102" -DFACTOR_GIT_LABEL="heads/arm64-varargs-x86-233db947df5399d5cd61f8f33bffabcd4486bb28"  -O3  -dynamiclib -o libfactor-ffi-test.dylib build-varargs/ffi_test.o

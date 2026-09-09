@@ -1,5 +1,0 @@
-{
-  "fix": "96ca4b90f23de4a5c871eda1efc689dcc145c324",
-  "file": "basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor",
-  "sha256": "3bc5c4808cb2b1be9b0778b8af23891bad60fc4538706da9a1167065f98fb5ec"
-}

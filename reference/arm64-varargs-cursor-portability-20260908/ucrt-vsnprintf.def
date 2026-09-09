@@ -1,3 +1,0 @@
-LIBRARY "ucrtbase.dll"
-EXPORTS
-__stdio_common_vsprintf
