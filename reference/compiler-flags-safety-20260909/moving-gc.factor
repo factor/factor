@@ -2,7 +2,7 @@
 USING: vocabs.loader vocabs.refresh ;
 << refresh-all >>
 USING: accessors arrays assocs compiler.cfg compiler.cfg.build-stack-frame
-compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.comparisons compiler.cfg.instructions compiler.cfg.rpo
 compiler.cfg.linear-scan.allocation.state compiler.cfg.register-allocation
 compiler.cfg.register-allocation.backtracking compiler.cfg.register-allocation.greedy
 compiler.cfg.register-allocation.chordal compiler.cfg.registers compiler.cfg.utilities
@@ -87,11 +87,11 @@ IN: allocator-derived-phi-gc-probe
 ! identity through value numbering, then materialize the collector call.
 : insert-moving-collection ( graph -- )
     [
-        dup instructions>> [
+        dup instructions>> [ [
             dup , ##save-context? [
                 V{ } clone H{ } clone gc-map boa ##call-gc,
             ] when
-        ] { } make >>instructions drop
+        ] each ] V{ } make >>instructions drop
     ] each-basic-block ;
 
 :: compile-moving-probe ( graph allocator -- word )
