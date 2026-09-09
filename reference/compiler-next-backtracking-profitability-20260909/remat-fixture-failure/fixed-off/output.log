@@ -1,0 +1,703 @@
+Unit Test: {
+    { t t t }
+    [
+        init-test-allocation [
+            1 { 0 100 } test-interval 2
+            { 20 22 24 40 } test-interval 2array
+            swap backtracking-allocation
+        ] keep [ check-allocated-intervals ] 2keep drop
+        [ spill-to>> ] any? backtracking-evictions get 0 >
+        backtracking-splits get 0 >
+    ]
+}
+Unit Test: {
+    { 1 t }
+    [
+        init-test-allocation 1 { 0 10 } test-interval 1
+        { 20 30 } test-interval 2array
+        swap backtracking-allocation
+        assigned-bundles get length swap [ reg>> ] map first2 =
+    ]
+}
+Unit Test: {
+    { 2 t t }
+    [
+        init-test-allocation 1 { 0 40 100 } test-interval
+        T{ sync-point { n 40 } } 2array
+        swap backtracking-allocation
+        [ length ] [ [ spill-to>> ] any? ]
+        [ [ reload-from>> ] any? ] tri
+    ]
+}
+Unit Test: {
+    { 42 }
+    [
+        backtracking-allocator register-allocator
+        [ 19 23 [ { fixnum fixnum } declare + ] compile-call ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { 7.5 }
+    [
+        backtracking-allocator register-allocator
+        [ 1.5 2.0 3.0 [ * + ] compile-call ] with-variable
+    ]
+}
+Unit Test: {
+    { { 1 2 3 } }
+    [
+        backtracking-allocator register-allocator
+        [ { 1 2 3 } [ dup gc drop ] compile-call ] with-variable
+    ]
+}
+Unit Test: {
+    { 4950 }
+    [
+        backtracking-allocator register-allocator
+        [ 100 [ <iota> 0 [ + ] reduce ] compile-call ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [ { fixnum fixnum } declare + ]
+        { linear-scan-allocator backtracking-allocator }
+        compare-allocators
+        [ "procedures" of first "code-bytes" of 0 > ] all?
+    ]
+}
+Unit Test: {
+    { 1220 }
+    [
+        backtracking-allocator register-allocator
+        [ 10 pressure-quotation compile-call ] with-variable
+    ]
+}
+Unit Test: {
+    { t t }
+    [
+        pressure-quotation
+        { linear-scan-allocator backtracking-allocator }
+        compare-allocators [
+            [
+                "procedures" of
+                [ "passes" of last "spills" of ] map-sum 0 >
+            ] all?
+        ] [
+            second "procedures" of first "allocation" of
+            "evictions" of 0 >
+        ] bi
+    ]
+}
+Unit Test: {
+    { t 1 }
+    [
+        init-test-allocation 1 { 40 } test-interval
+        dup uses>> first t >>spill-slot? drop
+        T{ sync-point { n 40 } } 2array
+        swap backtracking-allocation
+        empty? spill-slots get assoc-size
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        init-test-allocation 1 { 0 100 } test-interval 2
+        { 20 22 24 40 } test-interval 2array
+        swap backtracking-allocation drop assigned-bundles get [
+            load-local
+            0 get-local intervals>> first reg>> load-local
+            -1 get-local 0 get-local bundle-conflicts
+            assigned-bundles get 0 get-local -1 get-local [
+                2 load-locals -1 get-local 0 get-local [
+                    2 load-locals load-local
+                    0 get-local intervals>> first reg>> -2
+                    get-local =
+                    0 get-local bundle-reg-class -1 get-local
+                    bundle-reg-class = and
+                    0 get-local -1 get-local bundles-intersect?
+                    and 3 drop-locals
+                ] curry curry call 2 drop-locals
+            ] curry curry filter >array = 2 drop-locals
+        ] all?
+    ]
+}
+Unit Test: {
+    { 1 1 t t }
+    [
+        [
+            { { 1 2 } } backtracking-affinities set
+            init-test-allocation 1 { 0 10 } test-interval 2
+            { 20 30 } test-interval 2array
+            swap backtracking-allocation
+            assigned-bundles get length backtracking-merges get
+            rot [ reg>> ] map first2 = 1 bundle-spillsets get at
+            2 bundle-spillsets get at eq?
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        [
+            { { 1 2 } } backtracking-affinities set
+            init-test-allocation 1 { 0 20 } test-interval 2
+            { 10 30 } test-interval 2array
+            swap backtracking-allocation drop
+            backtracking-merges get
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t 1 1 }
+    [
+        [
+            f backtracking-affinities set init-test-allocation 1
+            { 0 10 } test-interval 2 { 20 30 } test-interval
+            2array swap backtracking-allocation drop
+            1 bundle-spillsets get at ensure-spillset-home
+            2 bundle-spillsets get at ensure-spillset-home
+            1 int-rep lookup-spill-slot
+            2 int-rep lookup-spill-slot =
+            spill-home-pool get length backtracking-shared-homes
+            get
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 9 }
+    [
+        [
+            init-test-allocation drop 1
+            { 0 10 20 30 100 } test-interval
+            1array <allocation-bundle> 12 conflict-split-site
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            init-test-allocation drop int-rep 3 set-rep-of [
+                1 11 ##load-integer, 2 22 ##load-integer,
+                3 1 2 ##sub, ##return,
+            ] V{ } make insns>cfg load-local 0 get-local cfg set
+            0 get-local number-instructions
+            0 get-local snapshot-value-flow load-local
+            int-regs machine-registers at load-local
+            0 get-local first load-local
+            -1 get-local second load-local
+            -2 get-local third load-local 1 { 4 } test-interval
+            -1 get-local >>reg int-rep >>reload-rep
+            -2 get-local backtracking-register-home boa
+            >>reload-from 2 { 4 } test-interval
+            -2 get-local >>reg int-rep >>reload-rep
+            -1 get-local backtracking-register-home boa
+            >>reload-from 2array prepare-backtracking-moves
+            -5 get-local cfg>insns load-local
+            0 get-local first -3 get-local >>dst drop
+            0 get-local second -2 get-local >>dst drop
+            0 get-local third -1 get-local >>dst
+            -2 get-local >>src1 -3 get-local >>src2 drop
+            -6 get-local insert-backtracking-moves ~8 more~
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 920.0 -720.0 }
+    [
+        backtracking-allocator register-allocator [
+            2.5 t backtracking-phi-pressure compile-call
+            2.5 f backtracking-phi-pressure compile-call
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        backtracking-allocator register-allocator [
+            backtracking-phi-pressure measure-compilation
+            "procedures" of first "allocation" of
+            "bundle-merges" of 0 >
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { 1 t t }
+    [
+        [
+            init-test-allocation drop
+            [ 51 [ ##branch, ] times ] V{ } make
+            insns>cfg load-local 0 get-local cfg set
+            0 get-local number-instructions
+            0 get-local prepare-backtracking-points
+            int-regs machine-registers at 2 head load-local
+            int-regs 0 get-local 2array 1array load-local 1
+            { 0 100 } test-interval
+            1array 0 get-local backtracking-allocation drop
+            backtracking-original-intervals get first clone
+            load-local 1 { 0 } test-interval
+            V{ { 0 1 } } clone >>ranges -2 get-local first >>reg
+            int-rep >>spill-rep 1 int-rep assign-spill-slot
+            >>spill-to load-local 1 { 100 } test-interval
+            -3 get-local first >>reg int-rep >>reload-rep
+            1 int-rep assign-spill-slot >>reload-from load-local
+            -2 get-local 1array backtracking-original-intervals
+            set V{ } clone assigned-bundles set -3 get-local
+            [ [ <register-occupancy> ] H{ } map>assoc ]
+            assoc-map bundle-occupancy set
+            -1 get-local 0 get-local 2array
+            <allocation-bundle> -4 get-local first assign-bundle
+            2 ~40 more~
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 11 t t }
+    [
+        [
+            init-validation-representations [
+                ##prologue, 1 D: 0 ##peek, 2 1 int-rep ##copy,
+                3 2 int-rep ##copy, 4 3 1 tag-fixnum ##add-imm,
+                4 D: 0 ##replace, ##epilogue, ##return,
+            ] V{ } make
+            insns>cfg backtracking-allocator
+            compile-validation-cfg load-local
+            10 0 get-local ( x -- result ) execute-effect
+            backtracking-merges get 3 >=
+            { 1 2 3 4 } [ dup leader = ] all? 1 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { { 3 } { 4 } }
+    [
+        [
+            init-test-allocation drop
+            t backtracking-phase-mode? set
+            H{ { 3 t } } backtracking-late-points set
+            H{ } clone spill-slots set 1 { 3 4 } test-interval
+            3 split-for-bundle [ uses>> [ n>> ] map >array ] bi@
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 19 1 }
+    [
+        [
+            init-test-allocation drop
+            H{ { 0 1 } { 40 8 } { 10 1 } { 20 8 } { 30 8 } }
+            spill-site-weights set
+            0 backtracking-cluster-splits set 1
+            { 0 10 20 30 40 } test-interval
+            1array <allocation-bundle> 41 conflict-split-site
+            backtracking-cluster-splits get
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 9 }
+    [
+        [
+            init-test-allocation drop 1
+            { 0 10 20 30 } test-interval
+            1array <allocation-bundle> 0 conflict-split-site
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t }
+    [
+        [
+            init-test-allocation load-local 1 200 <iota>
+            [ 4 * ] map test-interval 2 200 <iota>
+            [ 4 * 2 + ] map test-interval 2array load-local
+            0 get-local required-register-uses load-local
+            -1 get-local -2 get-local backtracking-allocation
+            load-local
+            0 get-local -3 get-local check-allocated-intervals
+            0 get-local -1 get-local check-register-uses
+            backtracking-split-budget-exhaustions get 0 >
+            backtracking-minimal-splits get 100 > 4 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { 8 8 t }
+    [
+        [
+            H{ { 0 8 } } clone spill-site-weights set
+            H{ { 0 t } } clone cold-definition-sites set
+            prepare-backtracking-phase-weights 0
+            spill-site-weights get at
+            1 spill-site-weights get at
+            1 cold-definition-sites get key?
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t }
+    [
+        [
+            init-test-allocation drop 1 { 0 } test-interval
+            1 >>reg int-rep >>reload-rep
+            0 backtracking-register-home boa >>reload-from 2
+            { 0 } test-interval 0 >>reg int-rep >>reload-rep
+            1 backtracking-register-home boa >>reload-from
+            2array prepare-backtracking-moves
+            0 backtracking-local-moves get at load-local
+            { } init-assignment
+            backtracking-local-moves get clone
+            phase-insn-prefixes set
+            [ T{ ##phi { insn# 0 } } assign-phase-insn ] V{ }
+            make 0 get-local sequence=
+            phase-insn-prefixes get assoc-empty? 1 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t t t t }
+    [
+        [
+            init-test-allocation drop tagged-rep 1 set-rep-of
+            H{ { 1 1 } } clone leader-map set 1
+            { 0 2 } test-interval 1 >>reg tagged-rep >>spill-rep
+            dup uses>> [ tagged-rep >>use-rep drop ] each
+            1array init-assignment
+            [ 1 0 tagged-rep ##copy, ] V{ } make load-local
+            0 get-local 0 associate phase-insn-prefixes set [
+                T{ ##call-gc
+                    { gc-map
+                        T{ gc-map
+                            { gc-roots ~array~ }
+                            { derived-roots ~hashtable~ }
+                        }
+                    }
+                    { insn# 0 }
+                } clone assign-phase-insn
+            ] V{ } make load-local
+            0 get-local first ##copy? 0 get-local second
+            ##spill? 0 get-local third ##call-gc? 0 get-local
+            fourth ##reload? phase-insn-prefixes get
+            assoc-empty? 2 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        backtracking-allocator register-allocator [
+            t check-allocation? set t check-ssa? set
+            M\ ipv6 make-sockaddr measure-compilation drop
+            { 0 80 } [
+                load-local "0:0:0:0:0:0:0:1" 0 get-local <inet6>
+                load-local
+                0 get-local M\ ipv6 make-sockaddr def>>
+                compile-call 0 get-local parse-sockaddr
+                0 get-local = 2 drop-locals
+            ] all?
+        ] with-variable
+    ]
+}
+Unit Test: {
+    { V{ { 424 424 } } }
+    [
+        [
+            init-test-allocation drop
+            t backtracking-phase-mode? set 1
+            { 424 } test-interval
+            V{ { 424 424 } { 500 510 } } >>ranges
+            phase-spill-before ranges>>
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { V{ { 424 424 } } }
+    [
+        [
+            init-test-allocation drop
+            t backtracking-phase-mode? set 1
+            { 424 510 } test-interval
+            V{ { 424 424 } { 500 510 } } >>ranges
+            T{ sync-point { n 502 } } split-at-sync
+            first ranges>>
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { }
+    [ [ gc-transition-fixture check-value-flow ] with-scope ]
+}
+Must Fail With: {
+    [
+        [
+            gc-transition-fixture 2 load-locals
+            -1 get-local entry>> instructions>> load-local
+            0 get-local second load-local
+            -1 get-local third 1 -1 get-local set-nth
+            0 get-local 2 -1 get-local set-nth
+            -3 get-local -2 get-local check-value-flow
+            4 drop-locals
+        ] with-scope
+    ]
+    [ invalid-allocation-gc-root? ]
+}
+Unit Test: { { f t t } [ [ f prefix-context-fixture ] with-scope ] }
+Unit Test: { { t t t } [ [ t prefix-context-fixture ] with-scope ] }
+Unit Test: {
+    { V{ { 0 3 } { 8 11 } } t }
+    [
+        [
+            init-test-allocation drop
+            t backtracking-phase-mode? set
+            H{ } clone spill-slots set
+            V{ T{ ##branch } T{ ##branch } } clone 0 insns>block
+            load-local
+            V{ T{ ##call } T{ ##branch } } clone 1 insns>block
+            t >>kill-block? load-local
+            V{ T{ ##branch } T{ ##branch } } clone 2 insns>block
+            load-local -2 get-local -1 get-local connect-bbs
+            -1 get-local 0 get-local connect-bbs
+            -2 get-local 0 get-local connect-bbs
+            -2 get-local block>cfg load-local
+            0 get-local cfg set 0 get-local number-instructions
+            0 get-local prepare-backtracking-points 1
+            { 0 11 } test-interval { } uncovered-ranges 1
+            { 8 11 } gap-interval
+            reload-from>> spill-slot? 4 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            init-test-allocation drop
+            V{ { 5 5 } { 20 25 } { 23 29 } }
+            backtracking-barriers set 14 <iota> [
+                [
+                    load-local 1 { 0 40 } test-interval
+                    load-local -1 get-local 7 >= 0 get-local [
+                        load-local
+                        V{ { 0 12 } { 18 40 } } 0 get-local
+                        ranges<< 1 drop-locals
+                    ] curry when 1 { 0 4 } test-interval 1
+                    { 8 19 } test-interval 1
+                    { 30 40 } test-interval 2
+                    { 0 40 } test-interval 4array load-local
+                    -2 get-local 7 mod dup 5 = -1 get-local [
+                        load-local drop
+                        0 get-local 1array 1 drop-locals
+                    ] curry 0 get-local [
+                        load-local dup 6 = 0 get-local [
+                            load-local drop
+                            0 get-local last 1array 1
+                            drop-locals
+                        ] curry 0 get-local [
+                            load-local 0 get-local swap head
+                            1 drop-locals
+                        ] curry if 1 drop-locals
+                    ] curry if load-local
+                    -2 get-local 0 get-local uncovered-ranges [
+                        first2 over - 1 + <iota> swap
+                        '[ _ + ] map
+                    ] map
+                    concat -2 get-local 0 get-local
+                    slow-uncovered-points sequence=
+                    4 drop-locals
+                ] call
+            ] all?
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { { f f f t t f t t } }
+    [
+        [
+            init-test-allocation drop
+            t backtracking-phase-mode? set
+            [ 10 [ ##branch, ] times ] V{ } make
+            insns>cfg load-local 0 get-local cfg set
+            0 get-local number-instructions
+            0 get-local prepare-backtracking-points 1
+            { 0 3 } test-interval load-local 1
+            { 8 11 } test-interval load-local
+            [ { 4 7 } { } productive-gap? ] -1 get-local [
+                load-local
+                { 4 7 } 0 get-local 1array productive-gap?
+                1 drop-locals
+            ] curry 0 get-local [
+                load-local
+                { 4 7 } 0 get-local 1array productive-gap?
+                1 drop-locals
+            ] curry -1 get-local 0 get-local [
+                2 load-locals
+                { 4 7 } -1 get-local 0 get-local 2array
+                productive-gap? 2 drop-locals
+            ] curry curry -1 get-local 0 get-local [
+                2 load-locals
+                { 3 7 } -1 get-local 0 get-local 2array
+                productive-gap? 2 drop-locals
+            ] curry curry -1 get-local 0 get-local [
+                2 load-locals
+                { 5 7 } -1 get-local 0 get-local 2array
+                productive-gap? 2 drop-locals
+            ] curry curry
+            [ { 0 3 } { } productive-gap? ]
+            [ { 16 19 } { } productive-gap? ] 8 { } new-sequence
+            [ 7 swap set-nth-unsafe ] keep
+            [ 6 swap set-nth-unsafe ] keep
+            [ 5 swap set-nth-unsafe ] keep
+            [ 4 swap set-nth-unsafe ] keep
+            [ 3 swap set-nth-unsafe ] keep
+            [ 2 swap set-nth-unsafe ] keep
+            [ 1 swap set-nth-unsafe ] keep
+            [ 0 swap set-nth-unsafe ] keep { } like { } like
+            [ ( -- ? ) call-effect ] map 3 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t t }
+    [
+        [
+            t t (entry-edge-fixture) 3 load-locals
+            -2 get-local -1 get-local check-value-flow
+            backtracking-edge-entry-reloads get zero? 0
+            get-local instructions>> [ ##reload? ] count 2 =
+            0 get-local predecessors>> length 2 = 3 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t }
+    [
+        [
+            t entry-edge-fixture 3 load-locals
+            -2 get-local -1 get-local check-value-flow
+            backtracking-edge-entry-reloads get 2 =
+            0 get-local instructions>> [ ##reload? ] any?
+            not 3 drop-locals
+        ] with-scope
+    ]
+}
+Must Fail With: {
+    [
+        [
+            t entry-edge-fixture 3 load-locals -2 get-local [
+                [ [ ##copy? not ] filter ] change-instructions
+                drop
+            ] each-basic-block
+            -2 get-local -1 get-local check-value-flow
+            3 drop-locals
+        ] with-scope
+    ]
+    [ bad-allocation-value? ]
+}
+Unit Test: {
+    { { f f f f f } }
+    [
+        [
+            init-test-allocation drop
+            H{ { 1 1 } { 2 2 } } clone leader-map set
+            t backtracking-phase-mode? set
+            V{ T{ ##call } } clone 0 insns>block t >>kill-block?
+            load-local V{ T{ ##branch } } clone 1 insns>block
+            load-local V{
+                T{ ##replace { src 1 } { loc D: 0 } }
+                T{ ##return }
+            } clone 2 insns>block load-local
+            -2 get-local -1 get-local connect-bbs
+            -1 get-local 0 get-local connect-bbs
+            -2 get-local 0 get-local connect-bbs
+            -2 get-local block>cfg load-local
+            0 get-local cfg set
+            0 get-local compute-ssa-live-sets-preserving-gc
+            0 get-local number-instructions
+            0 get-local prepare-backtracking-points
+            1 <live-interval> -1 get-local phase-block-from dup
+            2array 1vector >>ranges 0 <spill-slot> >>reload-from
+            load-local
+            0 get-local edge-entry-reload? -4 get-local f
+            >>kill-block? drop 0 get-local 2 >>vreg
+            edge-entry-reload? 0 get-local 1 >>vreg drop
+            -2 get-local
+            V{ T{ ##phi { dst 1 } { inputs H{ } } } }
+            >>instructions drop
+            0 get-local edge-entry-reload? -2 get-local
+            ~31 more~
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        [
+            t check-allocation? set t check-ssa? set
+            { f t } [
+                [
+                    load-local 0 0 get-local <validation-cycle>
+                    load-local
+                    0 get-local 3 2 validation-register-bank
+                    load-local
+                    backtracking-allocator 0 get-local
+                    [ backtracking-allocation-with-registers ]
+                    constrained-allocator boa load-local
+                    -2 get-local 0 get-local
+                    compile-validation-cfg load-local
+                    { 0 1 2 3 8 17 } 0 get-local [
+                        load-local 0 get-local [
+                            load-local load-local
+                            0 get-local -1 get-local ( x -- y )
+                            execute-effect
+                            0 get-local 0
+                            validation-cycle-result =
+                            2 drop-locals
+                        ] curry call 1 drop-locals
+                    ] curry all? 5 drop-locals
+                ] call
+            ] all?
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t t }
+    [
+        [
+            0 <spill-slot> 0 <spill-slot> 2array
+            recorded-entry-case 3 load-locals
+            -2 get-local instructions>> first -1 get-local eq?
+            -2 get-local instructions>> last 0 get-local eq?
+            backtracking-edge-entry-reloads get zero? 3
+            drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t t }
+    [
+        [
+            0 <spill-slot> 8 <spill-slot> 2array
+            recorded-entry-case 3 load-locals
+            -2 get-local instructions>> length 1 =
+            -2 get-local instructions>> first 0 get-local eq?
+            backtracking-edge-entry-reloads get 1 =
+            3 drop-locals
+        ] with-scope
+    ]
+}
+Unit Test: {
+    { t t }
+    [
+        [
+            0 <spill-slot> machine-registers int-regs swap at
+            first 2array recorded-entry-case 3 load-locals
+            -2 get-local instructions>> first 0 get-local eq?
+            -2 get-local machine-live-in 1 swap at
+            0 get-local dst>> = 3 drop-locals
+        ] with-scope
+    ]
+}
+BT-PROFITABILITY-GATE PASS

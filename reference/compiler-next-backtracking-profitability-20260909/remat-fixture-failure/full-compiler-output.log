@@ -1,0 +1,209 @@
+SPEED compiler-suite allocator=greedy-allocator rematerialization=t
+SPEED loop-spills=t
+SPEED checks=ssa,intervals,final-value-flow gvn=off
+FFI-COVERAGE small executed=24
+FFI-COVERAGE general executed=27
+hi
+( -- )
+16777216001234
+Cannot resolve C library function
+Library: f
+Symbol: this_does_not_exist
+DlError: dlsym(RTLD_DEFAULT, this_does_not_exist): symbol not found
+
+Type :help for debugging help.
+Cannot resolve C library function
+Library: DLL" no_such_library"
+Symbol: no_such_function
+DlError: dlopen(no_such_library, 0x0009): tried: 'no_such_library' (no such file), '/System/Volumes/Preboot/Cryptexes/OSno_such_library' (no such file), '/usr/lib/no_such_library' (no such file, not in dyld cache), 'no_such_library' (no such file)
+
+Type :help for debugging help.
+--> test failed!
+TEST-FAILURES 1
+
+==== resource:basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor
+
+resource:basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor: 644
+
+Unit Test: {
+    { t t t }
+    [
+        [
+            t t (entry-edge-fixture) 3 load-locals
+            -2 get-local -1 get-local check-value-flow
+            backtracking-edge-entry-reloads get zero? 0
+            get-local instructions>> [ ##reload? ] count 2 =
+            0 get-local predecessors>> length 2 = 3 drop-locals
+        ] with-scope
+    ]
+}
+
+unexpected-allocation-instruction
+insn T{ ##load-integer f X0 22 f }
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        f restartable-tests? set-global t silent-tests? set-global
+        t check-allocation? set-global t check-ssa? set-global
+        f global-value-numbering? set-global
+        command-line get second "on" =
+        rematerialize-constants? set-global
+        command-line get third "on" =
+        backtracking-loop-spills? set-global command-line get first
+        { ~array~ ~array~ ~array~ ~array~ } case
+        register-allocator set-global
+        value-flow-verifier-enabled? t assert=
+        rematerialize-constants? get
+        [ rematerialization-observer get >boolean t assert= ] when
+        "SPEED compiler-suite allocator=" write
+        current-register-allocator name>> write
+        " rematerialization=" write rematerialize-constants? get .
+        "SPEED loop-spills=" write backtracking-loop-spills? get .
+        "SPEED checks=ssa,intervals,final-value-flow gvn=off" print
+        flush "compiler" test => "TEST-FAILURES " write
+        test-failures get length . test-failures get empty?
+        [ ] [ :test-failures ] if test-failures get empty? [
+            value-flow-verifier-enabled? t assert=
+            "SPEED compiler-suite=passed" print flush 0
+        ] [ 1 ] if exit
+    ]
+(O) test-vocabs
+(O) test-vocab
+(O) run-test-file
+(U) [
+        { t t t } [
+            init-test-allocation ~quotation~ keep ~quotation~ 2keep
+            drop ~quotation~ any? backtracking-evictions get 0 >
+            backtracking-splits get 0 >
+        ] \ (unit-test) 39 experiment
+        { 1 t } [
+            init-test-allocation 1 ~array~ test-interval
+            1 ~array~ test-interval 2array
+            swap backtracking-allocation
+            assigned-bundles get length swap ~quotation~ map
+            first2 =
+        ] \ (unit-test) 47 experiment
+        { 2 t t } [
+            init-test-allocation 1 ~array~ test-interval
+            ~sync-point~ 2array swap backtracking-allocation
+            ~quotation~ ~quotation~ ~quotation~ tri
+        ] \ (unit-test) 56 experiment
+        { 42 } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 62 experiment
+        { 7.5 } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 68 experiment
+        { ~array~ } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 74 experiment
+        { 4950 } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 80 experiment
+        { t }
+        [ ~quotation~ ~array~ compare-allocators ~quotation~ all? ]
+        \ (unit-test) 87 experiment
+        { 1220 } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 146 experiment
+        { t t } [
+            pressure-quotation ~array~ compare-allocators
+            ~quotation~ ~quotation~ bi
+        ] \ (unit-test) 155 experiment
+        { t 1 } [
+            init-test-allocation 1 ~array~ test-interval
+            dup uses>> first t >>spill-slot? drop
+            ~sync-point~ 2array swap backtracking-allocation
+            empty? spill-slots get assoc-size
+        ] \ (unit-test) 164 experiment
+        { t } [
+            init-test-allocation 1 ~array~ test-interval
+            2 ~array~ test-interval 2array
+            swap backtracking-allocation drop
+            assigned-bundles get ~quotation~ all?
+        ] \ (unit-test) 181 experiment
+        { 1 1 t t } [ ~quotation~ with-scope ] \ (unit-test) 194
+        experiment
+        { 0 } [ ~quotation~ with-scope ] \ (unit-test) 203
+        experiment
+        { t 1 1 } [ ~quotation~ with-scope ] \ (unit-test) 216
+        experiment
+        { 9 } [ ~quotation~ with-scope ] \ (unit-test) 223
+        experiment
+        { t } [ ~quotation~ with-scope ] \ (unit-test) 253
+        experiment
+        { 920.0 -720.0 } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 271 experiment
+        { t } [
+            backtracking-allocator register-allocator ~quotation~
+            with-variable
+        ] \ (unit-test) 279 experiment
+        { 1 t t } [ ~quotation~ with-scope ] \ (unit-test) 309
+        ~132 more~
+    ]
+(U) [
+        2 load-locals -1 get-local <experiment> load-local
+        silent-tests? get 0 get-local
+        [ load-local 0 get-local experiment. 1 drop-locals ] curry
+        unless -2 get-local execute => 0 get-local -1 get-local [
+            2 load-locals -1 get-local 0 get-local ~quotation~ curry
+            curry ~quotation~ if 2 drop-locals
+        ] curry curry [ 2drop "Warning: test skipped!" print ] if
+        3 drop-locals
+    ]
+    experiment
+(O) (unit-test)
+(U) [
+        [ ~quotation~ dip swap ~quotation~ dip ] dip swap
+        [ call get-datastack ] dip => swap [ set-datastack ] dip
+    ]
+(U) [ call => get-datastack ]
+(U) [ swap >n call => ndrop ]
+    with-variables
+(U) [
+        t t (entry-edge-fixture) 3 load-locals
+        -2 get-local -1 get-local check-value-flow
+        => backtracking-edge-entry-reloads get zero? 0 get-local
+        instructions>> [ ##reload? ] count 2 =
+        0 get-local predecessors>> length 2 = 3 drop-locals
+    ]
+(O) check-value-flow
+(O) transfer-value-flow-block
+(O) transfer-value-flow-insn
+(O) unexpected-allocation-instruction
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
