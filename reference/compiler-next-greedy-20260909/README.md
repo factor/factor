@@ -25,7 +25,9 @@ image's 28,489 actual word objects counted:
 counters. Its run time is instrumentation overhead, not a performance
 measurement. Native execution uses global numbering off, rematerialization
 and loop placement on, and allocation checks off. The native agent retains
-the exact executed overlay, launcher, and raw output independently.
+the exact executed overlay, launcher, and raw output independently. As the
+closure includes the instrumented hint words themselves, these are
+diagnostic counts rather than an uninstrumented execution trace.
 
 ## Change and policy preservation
 
@@ -49,7 +51,8 @@ vector-backed bank with deliberately reversed order.
 
 ## Validation
 
-ARM greedy and region subtree tests pass with rematerialization off and on,
+All 75 ARM greedy and region subtree unit-test invocations pass across
+rematerialization off and on,
 including the differential mutation tests and an assertion that scoped
 fixtures restore the caller's enabled rematerialization setting. The run
 used the matching VM and fresh tuning image with `refresh-all`; raw output
