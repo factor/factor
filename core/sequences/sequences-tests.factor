@@ -434,6 +434,20 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { +eq+ } [ { } { } <=> ] unit-test
 { +eq+ } [ { 1 2 3 } { 1 2 3 } <=> ] unit-test
 
+! Specialized sequence comparison must still accept other sequence types.
+{ +eq+ } [ { 97 98 } "ab" <=> ] unit-test
+{ +eq+ } [ "ab" { 97 98 } <=> ] unit-test
+{ +lt+ } [ V{ 97 } "ab" <=> ] unit-test
+{ +gt+ } [ "ab" V{ 97 } <=> ] unit-test
+{ +lt+ } [ V{ 97 } { 97 98 } <=> ] unit-test
+{ +gt+ } [ { 97 98 } V{ 97 } <=> ] unit-test
+{ +lt+ } [ "abc" "abd" <=> ] unit-test
+{ +gt+ } [ "abd" "abc" <=> ] unit-test
+{ +eq+ } [ "" "" <=> ] unit-test
+{ +eq+ } [ "abc" "abc" <=> ] unit-test
+{ +lt+ } [ "abc" "abcd" <=> ] unit-test
+{ +gt+ } [ "abcd" "abc" <=> ] unit-test
+
 { { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } }
 [ { 1 2 } { "a" "b" } cartesian-product ] unit-test
 

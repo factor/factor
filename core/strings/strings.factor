@@ -1,11 +1,14 @@
 ! Copyright (C) 2003, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.accessors byte-arrays kernel
-kernel.private math math.private sequences sequences.private
+kernel.private math math.order math.private sequences sequences.private
 slots.private ;
 IN: strings
 
 BUILTIN: string { length array-capacity read-only initial: 0 } aux ;
+
+! Expose both operand types to the compiler for string comparisons.
+M: string <=> over string? [ sequence<=> ] [ sequence<=> ] if ;
 
 PRIMITIVE: <string> ( n ch -- string )
 PRIMITIVE: resize-string ( n str -- newstr )

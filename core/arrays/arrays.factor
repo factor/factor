@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math sequences sequences.private ;
+USING: accessors kernel math math.order sequences sequences.private ;
 IN: arrays
 
 BUILTIN: array { length array-capacity read-only initial: 0 } ;
@@ -14,6 +14,8 @@ M: array nth-unsafe [ integer>fixnum ] dip array-nth ; inline
 M: array set-nth-unsafe [ integer>fixnum ] dip set-array-nth ; inline
 M: array resize resize-array ; inline
 M: array equal? over array? [ sequence= ] [ 2drop f ] if ;
+! Expose both operand types to the compiler for array comparisons.
+M: array <=> over array? [ sequence<=> ] [ sequence<=> ] if ;
 M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 M: object new-sequence drop 0 <array> ; inline
 M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
