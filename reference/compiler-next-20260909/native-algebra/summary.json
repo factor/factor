@@ -1,0 +1,42 @@
+{
+  "accepted": true,
+  "compile": {
+    "baseline": [
+      {
+        "ns": 47090024992,
+        "instructions": 577510285847,
+        "kind": "compile",
+        "cpu_seconds": 47.07473246
+      },
+      {
+        "ns": 47328000604,
+        "instructions": 577510489368,
+        "kind": "compile",
+        "cpu_seconds": 47.310472589999996
+      }
+    ],
+    "candidate": [
+      {
+        "ns": 46517716341,
+        "instructions": 570674474619,
+        "kind": "compile",
+        "cpu_seconds": 46.500141045999996
+      },
+      {
+        "ns": 46655285006,
+        "instructions": 570459905755,
+        "kind": "compile",
+        "cpu_seconds": 46.640064781
+      }
+    ]
+  },
+  "compile_candidate_over_baseline": {
+    "cpu_seconds": 0.9868093815938581,
+    "instructions": 0.987977363577365,
+    "ns": 0.98681370171489
+  },
+  "scope_words": {
+    "baseline": 28489,
+    "candidate": 28489
+  }
+}

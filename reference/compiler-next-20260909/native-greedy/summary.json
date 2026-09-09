@@ -1,0 +1,43 @@
+{
+  "accepted": true,
+  "compile": {
+    "baseline": [
+      {
+        "ns": 48533065121,
+        "instructions": 596235212170,
+        "kind": "compile",
+        "cpu_seconds": 48.514932953999995
+      },
+      {
+        "ns": 48680216288,
+        "instructions": 596235192908,
+        "kind": "compile",
+        "cpu_seconds": 48.662179779000006
+      }
+    ],
+    "candidate": [
+      {
+        "ns": 48622653073,
+        "instructions": 593366063897,
+        "kind": "compile",
+        "cpu_seconds": 48.604692263000004
+      },
+      {
+        "ns": 48371187186,
+        "instructions": 593789422506,
+        "kind": "compile",
+        "cpu_seconds": 48.353197800000004
+      }
+    ]
+  },
+  "compile_candidate_over_baseline": {
+    "cpu_seconds": 0.9977440915475404,
+    "instructions": 0.9955429345228468,
+    "ns": 0.997742683439758
+  },
+  "identical_scope_words": 28489,
+  "identical_code_reports": 12,
+  "checked_outputs": 52,
+  "measured_batches": 312,
+  "notes": "Four timing processes in B C C B order, three samples each; all static reports and outputs match. Baseline executed 5c848 has identical basis/core/extra/vm trees to logical c1f7e4 baseline."
+}
