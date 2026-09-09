@@ -59,3 +59,28 @@ The fixture vocabulary exposes `loop-pressure-metrics*` with effect
 runs the real backtracking allocator plus code generation. Tests for
 `compiler.cfg.register-allocation.spill-sites` also execute zero-, one-, and
 three-iteration cases and assert a strict spill/code-size improvement.
+
+## Dominating-store proof correction
+
+Commit `e9b04ce995` requires an actual allocated cold defining fragment with
+its real store immediately after the definition in the same block. The old
+eligibility-only rule could wrongly delete an initializing store when a
+non-GC clobber split placed the earlier store in a bypassed hot body.
+
+An exact final-IR checker regression now models this counterexample:
+retaining the cold C1 store passes verification; removing it makes the later
+C2 reload lose its original value on the bypass path and is rejected.
+Native non-GC clobber fixtures also pass both policy modes with zero, one,
+and three iterations for 8, 16, and 24 live values.
+
+`proof-equivalence.factor` compares the former and corrected finishing
+rules on clones of the **same allocated interval records** for all six
+original sweep fixtures. All six full-record equality assertions pass
+(`proof-equivalence.log`). Thus register assignment, edge resolution, and
+code generation receive identical inputs for those fixtures. The earlier
+runtime evidence remains applicable to these unchanged generated programs;
+no new timing result is claimed. This avoids conflating allocator tie/order
+variation with the effect of the store-proof correction.
+
+The comparison intentionally replaces the finishing word inside its owned
+fresh Factor process; it does not edit the compiler source or saved image.

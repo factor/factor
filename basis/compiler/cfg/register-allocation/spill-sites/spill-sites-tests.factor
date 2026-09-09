@@ -143,3 +143,48 @@ IN: compiler.cfg.register-allocation.spill-sites.tests
         { f t } [ nvalues swap clobber-pressure-results? ] all?
     ] all?
 ] unit-test
+
+! Exact symbolic counterexample to the old deletion rule. The body path
+! initializes the slot across a non-GC clobber; the bypass path carries the
+! original value directly in a register. Both enter the read-only fragment
+! at C1. Its store must initialize the later C2 reload on the bypass path.
+:: bypass-store-example ( keep-store? -- graph snapshot )
+    H{ { 1 int-rep } { 2 int-rep } { 3 int-rep }
+        { 4 int-rep } { 5 int-rep } { 6 int-rep } } representations set
+    [
+        1 17 ##load-integer,
+        2 0 ##load-integer,
+        2 0 cc> ##compare-integer-imm-branch,
+    ] V{ } make 0 insns>block :> entry
+    [
+        3 1 1 ##add-imm,
+        f { } { } { } { } 0 0 [ ] ##alien-assembly,
+        4 1 2 ##add-imm,
+        ##branch,
+    ] V{ } make 1 insns>block :> body
+    [ 5 1 3 ##add-imm, 6 1 4 ##add-imm, ##return, ] V{ } make
+    2 insns>block :> done
+    entry body connect-bbs entry done connect-bbs body done connect-bbs
+    entry block>cfg :> graph
+    graph snapshot-value-flow :> snapshot
+    body instructions>> :> body-insns
+    [
+        body-insns first ,
+        1 int-rep 0 <spill-slot> ##spill,
+        body-insns second ,
+        1 int-rep 0 <spill-slot> ##reload,
+        body-insns 2 tail %
+    ] V{ } make body instructions<<
+    done instructions>> :> exit-insns
+    [
+        exit-insns first ,
+        keep-store? [ 1 int-rep 0 <spill-slot> ##spill, ] when
+        1 int-rep 0 <spill-slot> ##reload,
+        exit-insns rest %
+    ] V{ } make done instructions<<
+    graph snapshot ;
+
+{ } [ [ t bypass-store-example check-value-flow ] with-scope ] unit-test
+
+[ [ f bypass-store-example check-value-flow ] with-scope ]
+[ bad-allocation-value? ] must-fail-with
