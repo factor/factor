@@ -1,0 +1,23 @@
+moving GC GVN=f
+moving GC rematerialization=f
+{ linear-scan-allocator t t }
+{ greedy-allocator t t }
+{ backtracking-allocator t t }
+{ chordal-allocator t t }
+moving GC rematerialization=t
+{ linear-scan-allocator t t }
+{ greedy-allocator t t }
+{ backtracking-allocator t t }
+{ chordal-allocator t t }
+moving GC GVN=t
+moving GC rematerialization=f
+{ linear-scan-allocator t t }
+{ greedy-allocator t t }
+{ backtracking-allocator t t }
+{ chordal-allocator t t }
+moving GC rematerialization=t
+{ linear-scan-allocator t t }
+{ greedy-allocator t t }
+{ backtracking-allocator t t }
+{ chordal-allocator t t }
+MOVING-GC-MATRIX-COMPLETE: 16 configurations, 768 native answers

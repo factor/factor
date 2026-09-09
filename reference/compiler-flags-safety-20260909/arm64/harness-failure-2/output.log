@@ -1,0 +1,123 @@
+
+Restarts were invoked adding vocabularies to the search path.
+To avoid doing this in the future, add the following forms
+at the top of the source file:
+
+USING: accessors arrays assocs compiler.cfg
+compiler.cfg.build-stack-frame compiler.cfg.checker
+compiler.cfg.comparisons compiler.cfg.instructions
+compiler.cfg.linear-scan.allocation.state
+compiler.cfg.register-allocation
+compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.chordal
+compiler.cfg.register-allocation.greedy
+compiler.cfg.register-allocation.rematerialization
+compiler.cfg.register-allocation.spill-sites
+compiler.cfg.register-allocation.verifier
+compiler.cfg.register-allocation.verifier.rematerialization
+compiler.cfg.registers compiler.cfg.rpo compiler.cfg.utilities
+compiler.cfg.value-numbering compiler.codegen compiler.units
+cpu.architecture hashtables io kernel locals make math
+namespaces prettyprint sequences system tools.test vocabs.loader
+vocabs.refresh words ;
+IN: allocator-derived-phi-gc-probe
+
+moving GC GVN=f
+moving GC rematerialization=f
+Bad store to specialized slot
+value { ~vector~ }
+class vector
+
+(U) [ c-to-factor => ]
+    c-to-factor
+(U) [ [ (get-catchstack) push ] dip call => (get-catchstack) pop* ]
+(O) command-line-startup
+(O) run-script
+(U) [
+        2dup check-call-effect 2dup [
+            ~quotation~ dip
+            dup terminated?>> ~quotation~ ~quotation~ if
+        ] 2dip => rot [ 2drop ] [ wrong-values ] if
+    ]
+(U) [
+        [ ~quotation~ dip dip ] dip => dup terminated?>>
+        [ 2drop f ]
+        [ dup in>> length swap out>> length check-datastack ] if
+    ]
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ output>array => datastack. ]
+(U) [ [ ~quotation~ ~quotation~ bi ] dip => nsequence ]
+    output>sequence
+(U) [ [ keep ] dip => call ]
+    bi
+(U) [ over [ call ] dip => ]
+    keep
+(U) [
+        t check-allocation? set-global t check-ssa? set-global
+        f restartable-tests? set-global
+        t backtracking-loop-spills? set-global
+        value-flow-verifier-enabled? t assert=
+        { f t } [
+            dup global-value-numbering? set-global
+            "moving GC GVN=" write . ~array~ ~quotation~ each
+        ] each => test-failures get empty? t assert=
+        "MOVING-GC-MATRIX-COMPLETE: 16 configurations, 768 native answers"
+        print 0 exit
+    ]
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [ [ nip call ] 3keep => [ 1 + ] 2dip each-integer-from ]
+(U) [ swap [ 2dip ] dip => ]
+    3dip
+(U) [ swap [ dip ] dip => ]
+    2dip
+(U) [ swap [ call ] dip => ]
+    dip
+(U) [
+        load-local 0 get-local [
+            load-local
+            <validation-moving-tagged-phi> 0 get-local
+            compile-moving-probe
+            check-validation-moving-phi load-local
+            <validation-moving-phi> -1 get-local
+            compile-moving-probe
+            check-validation-moving-phi load-local
+            -2 get-local -1 get-local 0 get-local 3array .
+            -1 get-local 0 get-local and t assert= 3 drop-locals
+        ] curry with-scope => 1 drop-locals
+    ]
+(U) [ swap >n call => ndrop ]
+    with-variables
+(U) [
+        load-local
+        <validation-moving-tagged-phi> 0 get-local
+        compile-moving-probe
+        => check-validation-moving-phi load-local
+        <validation-moving-phi> -1 get-local compile-moving-probe
+        check-validation-moving-phi load-local
+        -2 get-local -1 get-local 0 get-local 3array .
+        -1 get-local 0 get-local and t assert= 3 drop-locals
+    ]
+(O) compile-moving-probe
+(O) insert-moving-collection
+(O) M\ basic-block instructions<<
+(O) bad-slot-value
+(O) M\ object throw
+(U) [
+        OBJ-CURRENT-THREAD special-object error-thread set-global
+        current-continuation => error-continuation set-global
+        [ original-error set-global ] [ rethrow ] bi
+    ]
