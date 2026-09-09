@@ -95,3 +95,24 @@ constant-pressure fixture with recipes off/on: 28/0 spills, 28/0 reloads,
 224/0 spill bytes, 240/0 frame bytes and 736/512 code bytes, with 28 actual
 recipe emissions when enabled. This compares the optional recipe setting
 within the new allocator; it is not a before/after allocator benchmark.
+
+### Callback call-block regression
+
+The final globally selected chordal/rematerialization-on compiler suite exposed a
+real hidden-result callback failure: source splitting inserted register repair
+phis in Factor call blocks, which the physical assignment walk skips. The
+original raw hidden result pointer legitimately stays live in its ABI-created
+memory home across those calls. The source entry policy now selects no register
+residents for call/prologue/epilogue kill blocks, preserving that memory home and
+reloading only in ordinary blocks/edges. It does not allocate registers across
+Factor calls or extend the GC contract for tagged values.
+
+`callback-regression.factor` recompiles and executes the actual
+`compiler/tests/alien-large-return.factor` C ABI fixture with rematerialization
+both off and on and final value-flow checks enabled. Both five-test runs pass,
+including returned payload 45 after compacting GC and the nested C callback.
+It also runs source spilling tests, including a live raw value across a call
+whose rewritten block has neither a repair phi nor an exit register value,
+while its surrounding graph contains the required store and reload.
+`callback-both/` retains the successful ARM64 run (zero test failures; elapsed
+time is correctness-run metadata, not a benchmark).

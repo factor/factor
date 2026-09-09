@@ -36,6 +36,30 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
     ] with-cfg
 ] ] unit-test
 
+! A raw callback result address remains live in a memory home across a
+! Factor call. Such kill blocks must not acquire register repair phis:
+! the physical assignment walk intentionally skips them.
+{ t t t t } [ [let
+    f rematerialize-constants? namespaces:set
+    H{ { 1 int-rep } { 2 int-rep } } clone representations namespaces:set
+    10 vreg-counter namespaces:set
+    V{ T{ ##load-integer { dst 1 } { val 100 } } T{ ##branch } }
+    clone 0 insns>block :> entry
+    V{ T{ ##call } T{ ##branch } } clone 1 insns>block
+    t >>kill-block? :> call-block
+    V{ T{ ##add-imm { dst 2 } { src1 1 } { src2 8 } } T{ ##return } }
+    clone 2 insns>block :> done
+    entry call-block connect-bbs call-block done connect-bbs
+    entry block>cfg [
+        dup H{ { int-regs { 0 1 } } } spill-ssa 2drop
+        cfg>insns :> instructions
+        instructions [ ##spill? ] any?
+        call-block instructions>> [ ##phi? ] any? not
+        call-block spill-plans get at exit-versions>> assoc-empty?
+        instructions [ ##reload? ] any?
+    ] with-cfg
+] ] unit-test
+
 :: check-rewritten-phis ( graph -- ? )
     graph reverse-post-order [| bb |
         bb instructions>> [ ##phi? ] filter [| phi |
