@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 sqlite3 *optional_open(void) {
   sqlite3 *db=0;
@@ -67,6 +69,42 @@ int optional_fts5_verify(fts5_api *api,void *find,fts5_tokenizer_v2 *tok,void *c
 int optional_fts5_api_size(void) { return sizeof(fts5_api); }
 int optional_fts5_tokenizer_size(void) { return sizeof(fts5_tokenizer_v2); }
 
+/* The filename metadata is valid only during xOpen for a journal/WAL file. */
+typedef sqlite3_file *(*optional_filename_callback)(sqlite3_filename);
+static sqlite3_vfs *filename_parent;
+static sqlite3_file *filename_main;
+static optional_filename_callback filename_callback;
+static int filename_seen, filename_bad;
+static int filename_open(sqlite3_vfs *vfs,sqlite3_filename name,sqlite3_file *file,int flags,int *outflags) {
+  (void)vfs;
+  if(flags & SQLITE_OPEN_MAIN_DB) filename_main=file;
+  if(flags & (SQLITE_OPEN_MAIN_JOURNAL|SQLITE_OPEN_WAL)) {
+    assert(name && filename_main && filename_callback);
+    sqlite3_file *actual=filename_callback(name);
+    if(actual!=filename_main) filename_bad++;
+    filename_seen |= (flags & SQLITE_OPEN_WAL) ? 2 : 1;
+  }
+  return filename_parent->xOpen(filename_parent,name,file,flags,outflags);
+}
+int optional_filename_oracle(optional_filename_callback callback) {
+  char path[]="/tmp/factor-sqlite3534-vfs-XXXXXX";
+  int fd=mkstemp(path); assert(fd>=0); assert(close(fd)==0);
+  filename_parent=sqlite3_vfs_find(0); assert(filename_parent);
+  sqlite3_vfs forwarding=*filename_parent;
+  forwarding.zName="factor-sqlite3534-filename-oracle";
+  forwarding.xOpen=filename_open;
+  filename_main=0; filename_callback=callback; filename_seen=filename_bad=0;
+  assert(sqlite3_vfs_register(&forwarding,0)==SQLITE_OK);
+  sqlite3 *db=0;
+  assert(sqlite3_open_v2(path,&db,SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE,forwarding.zName)==SQLITE_OK);
+  assert(sqlite3_exec(db,"CREATE TABLE t(v); INSERT INTO t VALUES(1); PRAGMA journal_mode=WAL; INSERT INTO t VALUES(2)",0,0,0)==SQLITE_OK);
+  assert(sqlite3_close(db)==SQLITE_OK);
+  assert(sqlite3_vfs_unregister(&forwarding)==SQLITE_OK);
+  assert(unlink(path)==0);
+  filename_callback=0; filename_main=0; filename_parent=0;
+  return filename_bad ? 0 : filename_seen;
+}
+
 #ifdef OPTIONAL_MAIN
 int main(void) {
   assert(sqlite3_libversion_number()==3053004);
@@ -94,6 +132,8 @@ int main(void) {
   assert(optional_fts5_verify(api,(void*)api->xFindTokenizer_v2,tok,(void*)tok->xCreate,(void*)tok->xDelete,(void*)tok->xTokenize));
   printf("FTS5 API v%d tokenizer v%d layout and tokenization: PASS (%zu, %zu)\n",api->iVersion,tok->iVersion,sizeof(*api),sizeof(*tok));
   assert(sqlite3_close(a)==SQLITE_OK && sqlite3_close(b)==SQLITE_OK);
+  assert(optional_filename_oracle(sqlite3_database_file_object)==3);
+  puts("VFS original journal + WAL filename to main database file: PASS (3)");
   return 0;
 }
 #endif

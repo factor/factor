@@ -7,10 +7,10 @@ preupdate hooks were absent, and `fts5_api` was 32 bytes instead of the native
 an absent function was successfully called before implementation. `baseline.log`
 records the actual run before the new binding source was copied into this worktree.
 
-With the completed bindings, all **11 Factor checks pass**, including the same
-four checks, four native integration cases, native struct sizes, the exact runtime
+With the completed bindings, all **13 Factor checks pass**, including the same
+four checks, five native integration cases and the filename declaration contract, native struct sizes, the exact runtime
 version, and all eight required compile options. There are **zero compiler errors**.
-The independent C program also passes all four integration controls. No test is
+The independent C program also passes all five integration controls. No test is
 conditionally skipped when a symbol or build option is unavailable.
 
 | Case | Factor calls and native oracle | Result |
@@ -19,11 +19,24 @@ conditionally skipped when a symbol or build option is unavailable.
 | Carray | Bind three signed 64-bit values using `sqlite3_carray_bind_v2`; pass a destructor context distinct from the array pointer | Sum `1000000042`; destructor called once with the correct context |
 | Preupdate | SQLite invokes a Factor callback; Factor calls old/new/count/depth/blobwrite while the hook is active; C independently validates all callback arguments and values | One update; old `11`, new `29`, row IDs `7` |
 | FTS5 | Read the new API and tokenizer struct fields in Factor; native code compares the retrieved function pointers and executes the returned tokenizer | `Hello world` produces `hello`, `world`; struct sizes `48`, `32` |
+| VFS filename | A forwarding VFS invokes Factor inside rollback-journal and WAL `xOpen`; Factor passes the original filename to `sqlite3_database_file_object`; C compares the result to the main file object | Both journal and WAL paths return the exact main file pointer |
 
 The upstream `unicode61` tokenizer returned through `xFindTokenizer_v2` has an
 `iVersion` value of **0** in this release's compatibility wrapper. Both C and Factor
 observe that value; the outer `fts5_api.iVersion` is 3. The test does not assume the
 header comment's value of 2 for this built-in tokenizer.
+
+The additional `vfs-before.log` run preserves the newly added but incorrectly
+`c-string`-typed `sqlite3_database_file_object` argument. Its raw-filename
+contract check fails. The native callback test passes even with that declaration,
+because Factor permits a raw pointer through `c-string` conversion unchanged.
+After changing the declaration to `sqlite3_filename`, both checks pass. We do not
+call SQLite on a copied filename: its hidden metadata would be missing, violating
+the API contract. The VFS test invokes the Factor callback synchronously inside
+`xOpen` only when `SQLITE_OPEN_MAIN_JOURNAL` or `SQLITE_OPEN_WAL` is set, and never
+retains the borrowed filename pointer. The registered forwarding VFS, connections,
+and temporary database are cleaned up before returning. `vfs-build.log` records
+the fifth independent C control using the same valid invocation window.
 
 ## Reproduce
 

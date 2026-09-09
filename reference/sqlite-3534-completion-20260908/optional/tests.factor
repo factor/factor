@@ -82,3 +82,12 @@ IN: db.sqlite.ffi.release-tests.tests
     fts5_api heap-size optional_fts5_api_size =
     fts5_tokenizer_v2 heap-size optional_fts5_tokenizer_size =
 ] unit-test
+
+! SQLite stores metadata adjacent to this filename. Preserve the original pointer.
+{ t } [
+    \ sqlite3_database_file_object def>> fourth first sqlite3_filename =
+] unit-test
+: filename-oracle ( -- mask )
+    [ sqlite3_database_file_object ] optional_filename_callback
+    [ optional_filename_oracle ] with-callback ;
+{ 3 } [ filename-oracle ] unit-test

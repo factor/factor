@@ -48,4 +48,12 @@ Unit Test: {
         =
     ]
 }
+Unit Test: {
+    { t }
+    [
+        \ sqlite3_database_file_object def>> fourth first
+        sqlite3_filename =
+    ]
+}
+Unit Test: { { 3 } [ filename-oracle ] }
 0
