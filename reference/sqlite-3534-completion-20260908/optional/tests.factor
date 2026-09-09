@@ -1,7 +1,10 @@
 USING: accessors alien alien.c-types alien.data arrays classes.struct
 combinators continuations db.sqlite.ffi db.sqlite.ffi.release-tests
-kernel locals sequences tools.test words ;
+kernel locals sequences tools.test vocabs.loader words ;
 IN: db.sqlite.ffi.release-tests.tests
+
+load-sqlite-fixture
+"db.sqlite.ffi.release-tests" reload
 
 ! This suite requires the explicitly built library; missing symbols/options fail.
 { "3.53.4" } [ sqlite3_libversion ] unit-test
