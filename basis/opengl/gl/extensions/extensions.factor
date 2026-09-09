@@ -31,8 +31,13 @@ reset-gl-function-number-counter
 : gl-function-counter ( -- n )
     +gl-function-counter+ counter ;
 
+: gl-function-cache-key ( names -- key )
+    gl-function-context 2array ;
+
 : gl-function-pointer ( names n -- funptr )
-    gl-function-context 2array dup +gl-function-pointers+ get-global at
+    ! Generated numeric IDs can repeat after a vocabulary reload or reset.
+    ! Keep the argument for already compiled GL bindings, but key by names.
+    drop dup gl-function-cache-key dup +gl-function-pointers+ get-global at
     [ 2nip ] [
         [
             [ gl-function-address ] map-find drop
