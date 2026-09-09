@@ -5,14 +5,16 @@ compiler.cfg.def-use compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals compiler.cfg.predecessors
 compiler.cfg.liveness compiler.cfg.ssa.destruction.leaders
 compiler.cfg.register-allocation compiler.cfg.registers compiler.cfg.rpo cpu.architecture
-continuations hashtables.identity kernel locals math namespaces sequences sets ;
+continuations hashtables.identity kernel locals math namespaces sequences sets
+vectors vocabs.loader ;
 IN: compiler.cfg.register-allocation.verifier
 
 ! This checker deliberately does not consult allocated intervals, leaders,
 ! or the resolver's location maps. Its specification is the original SSA.
 TUPLE: value-flow-operand value rep ;
-TUPLE: value-flow-instruction inputs outputs temps roots constant ;
-TUPLE: value-flow-snapshot instructions blocks phis aliases ;
+TUPLE: value-flow-instruction inputs outputs temps roots derived constant ;
+TUPLE: value-flow-snapshot instructions blocks phis aliases reps tagged-values ;
+SINGLETON: value-flow-false
 SYMBOL: active-value-flow-snapshot
 
 ERROR: bad-allocation-value insn operand location available ;
@@ -22,6 +24,9 @@ ERROR: invalid-allocation-edge predecessor successor ;
 ERROR: invalid-allocation-rematerialization original insn ;
 ERROR: invalid-allocation-temporary insn ;
 ERROR: invalid-allocation-gc-root insn value ;
+ERROR: invalid-allocation-derived-root insn derived base ;
+ERROR: overlapping-allocation-gc-roots insn ;
+ERROR: invalid-allocation-operands insn ;
 
 : value-flow-copy? ( insn -- ? )
     { [ ##copy? ] [ ##tagged>integer? ] } 1|| ;
@@ -42,6 +47,7 @@ ERROR: invalid-allocation-gc-root insn value ;
     [ defs-vregs value-flow-operands ]
     [ temp-vregs value-flow-operands ]
     [ dup gc-map-insn? [ gc-map>> gc-roots>> clone ] [ drop f ] if ]
+    [ dup gc-map-insn? [ gc-map>> derived-roots>> clone ] [ drop f ] if ]
     [ dup ##load-integer? [ val>> ] [ drop f ] if ]
     } cleave value-flow-instruction boa ;
 
@@ -66,7 +72,15 @@ ERROR: invalid-allocation-gc-root insn value ;
             ] if
         ] each
     ] each-basic-block
-    instructions blocks phis aliases value-flow-snapshot boa ;
+    H{ } clone :> reps
+    V{ } clone :> tagged-values
+    representations get [| value rep |
+        value aliases value-flow-root :> token
+        token reps at [ rep-size rep rep-size < ] [ t ] if*
+        [ rep token reps set-at ] when
+        rep tagged-rep eq? [ token tagged-values push ] when
+    ] assoc-each
+    instructions blocks phis aliases reps tagged-values members value-flow-snapshot boa ;
 
 ! Allocator-generated recipes must retain the original instruction object.
 ! The caller already controls whether rematerialization is enabled.
@@ -110,6 +124,11 @@ ERROR: invalid-allocation-gc-root insn value ;
     operand value>> snapshot aliases>> value-flow-root ;
 
 :: check-value-flow-inputs ( insn expected state snapshot -- )
+    insn uses-vregs length expected inputs>> length =
+    insn defs-vregs length expected outputs>> length = and
+    insn temp-vregs length expected temps>> length = and [ ] [
+        insn invalid-allocation-operands
+    ] if
     insn uses-vregs expected inputs>> [| location operand |
         location operand rep>> state value-flow-read :> available
         operand snapshot value-flow-token available member? [ ] [
@@ -140,6 +159,16 @@ ERROR: invalid-allocation-gc-root insn value ;
     ] if ;
 
 :: check-value-flow-roots ( insn expected state snapshot -- )
+    insn gc-map-insn? [
+        insn gc-map>> [ gc-roots>> ] [ derived-roots>> keys ] bi
+        intersect empty? [ ] [ insn overlapping-allocation-gc-roots ] if
+        insn gc-map>> gc-roots>> [| slot |
+            slot tagged-rep state value-flow-read [
+                dup value-flow-false eq?
+                [ drop t ] [ snapshot tagged-values>> member? ] if
+            ] any? [ ] [ insn slot invalid-allocation-gc-root ] if
+        ] each
+    ] when
     expected roots>> empty? [ ] [
         insn gc-map>> gc-roots>> [ tagged-rep state value-flow-read ] map concat :> available
         expected roots>> [| value |
@@ -147,11 +176,45 @@ ERROR: invalid-allocation-gc-root insn value ;
                 insn value invalid-allocation-gc-root
             ] if
         ] each
-    ] if ;
+    ] if
+    expected derived>> [| derived base |
+        derived snapshot aliases>> value-flow-root :> value
+        base snapshot aliases>> value-flow-root :> base-value
+        value base-value = [ ] [
+            insn gc-map>> derived-roots>> [| slot base-slot |
+                value slot int-rep state value-flow-read member?
+                base-value base-slot tagged-rep state value-flow-read member? and
+                base-slot insn gc-map>> gc-roots>> member? and
+            ] assoc-find 2nip [ ] [
+                insn derived base invalid-allocation-derived-root
+            ] if
+        ] if
+    ] assoc-each ;
 
-:: transfer-value-flow-copy ( insn state -- )
+! A collection updates only the slots named by its map. An unrooted copy
+! of a pointer becomes stale even when another copy was rooted correctly.
+:: relocate-value-flow-roots ( insn expected state snapshot -- )
+    insn gc-map>> [ gc-roots>> ] [ derived-roots>> keys ] bi append
+    [ tagged-rep value-flow-locations ] map concat :> updated
+    expected roots>> expected derived>> keys append
+    [ snapshot aliases>> value-flow-root ] map :> moving
+    state keys [| location |
+        location updated member? [ ] [
+            location state at moving diff location state set-at
+        ] if
+    ] each ;
+
+:: transfer-value-flow-copy ( insn state snapshot -- )
     insn ##tagged>integer? [ int-rep ] [ insn rep>> ] if :> rep
     insn src>> rep state value-flow-read
+    [| value |
+        value value-flow-false eq? [ rep reg-class-of int-regs eq? ] [
+            value snapshot reps>> at [| original-rep |
+                original-rep rep-size rep rep-size <=
+                original-rep reg-class-of rep reg-class-of = and
+            ] [ f ] if*
+        ] if
+    ] filter
     insn dst>> rep state value-flow-write ;
 
 :: transfer-value-flow-insn ( insn state snapshot checking? -- )
@@ -166,9 +229,10 @@ ERROR: invalid-allocation-gc-root insn value ;
         insn expected state snapshot check-value-flow-roots
     ] when
     {
-        { [ insn value-flow-copy? ] [ insn state transfer-value-flow-copy ] }
-        { [ insn ##spill? insn ##reload? or ] [ insn state transfer-value-flow-copy ] }
+        { [ insn value-flow-copy? ] [ insn state snapshot transfer-value-flow-copy ] }
+        { [ insn ##spill? insn ##reload? or ] [ insn state snapshot transfer-value-flow-copy ] }
         { [ expected >boolean ] [
+            insn gc-map-insn? [ insn expected state snapshot relocate-value-flow-roots ] when
             insn clobber-insn? insn ##call-gc? or [ state value-flow-clobber ] when
             insn expected state forget-value-flow-temps
             insn expected state snapshot define-value-flow-outputs
@@ -177,7 +241,8 @@ ERROR: invalid-allocation-gc-root insn value ;
         ! SSA allocation can introduce false companion bases for derived
         ! pointers. They carry no original value, but do overwrite a register.
         { [ insn ##load-reference? ] [
-            { } insn dst>> tagged-rep state value-flow-write
+            insn obj>> [ insn unexpected-allocation-instruction ] when
+            value-flow-false 1array insn dst>> tagged-rep state value-flow-write
         ] }
         [ insn unexpected-allocation-instruction ]
     } cond ;
@@ -277,3 +342,7 @@ ERROR: invalid-allocation-gc-root insn value ;
     allocation-verifier get >boolean ;
 
 [ allocate-with-value-flow-check ] allocation-verifier set-global
+
+{ "compiler.cfg.register-allocation.verifier"
+  "compiler.cfg.register-allocation.rematerialization" }
+"compiler.cfg.register-allocation.verifier.rematerialization" require-when
