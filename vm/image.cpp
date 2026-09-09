@@ -265,9 +265,11 @@ void factor_vm::fixup_heaps(cell data_offset, cell code_offset) {
 
 bool factor_vm::read_embedded_image_footer(FILE* file,
                                            embedded_image_footer* footer) {
-  safe_fseek(file, -(off_t)sizeof(embedded_image_footer), SEEK_END);
-  safe_fread(footer, (off_t)sizeof(embedded_image_footer), 1, file);
-  return footer->magic == image_magic;
+  // This probe runs before the VM can report Factor I/O errors.
+  if (FSEEK(file, -(file_offset)sizeof(embedded_image_footer), SEEK_END) != 0)
+    return false;
+  return raw_fread(footer, sizeof(embedded_image_footer), 1, file) == 1 &&
+         footer->magic == image_magic;
 }
 
 char *threadsafe_strerror(int errnum) {
@@ -297,7 +299,9 @@ void factor_vm::load_image(vm_parameters* p) {
       std::cout << "No embedded image" << std::endl;
       exit(1);
     }
-    safe_fseek(file, (off_t)footer.image_offset, SEEK_SET);
+    if (footer.image_offset > (cell)std::numeric_limits<file_offset>::max() ||
+        FSEEK(file, (file_offset)footer.image_offset, SEEK_SET) != 0)
+      fatal_error("Cannot seek to embedded image", footer.image_offset);
   }
 
   image_header h;
@@ -351,14 +355,16 @@ bool factor_vm::save_image(const vm_char* saving_filename,
   FILE* file = OPEN_WRITE(saving_filename);
   if (file == NULL)
     return false;
-  if (safe_fwrite(&h, sizeof(image_header), 1, file) != 1)
+  if (raw_fwrite(&h, 1, sizeof(image_header), file) != sizeof(image_header) ||
+      (h.escaped_data_size > 0 &&
+       raw_fwrite((void*)data->tenured->start, 1, h.escaped_data_size, file) != h.escaped_data_size) ||
+      (h.code_size > 0 &&
+       raw_fwrite((void*)code->allocator->start, 1, h.code_size, file) != h.code_size)) {
+    int error = errno;
+    raw_fclose(file);
+    errno = error;
     return false;
-  if (h.escaped_data_size > 0 &&
-      safe_fwrite((void*)data->tenured->start, h.escaped_data_size, 1, file) != 1)
-    return false;
-  if (h.code_size > 0 &&
-      safe_fwrite((void*)code->allocator->start, h.code_size, 1, file) != 1)
-    return false;
+  }
   if (raw_fclose(file) == -1)
     return false;
   if (!move_file(saving_filename, filename))

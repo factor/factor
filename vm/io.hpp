@@ -1,8 +1,15 @@
 namespace factor {
 
+#ifdef WINDOWS
+typedef int64_t file_offset;
+#else
+typedef off_t file_offset;
+#endif
+
 // Safe IO functions that does not throw Factor errors.
 int raw_fclose(FILE* stream);
 size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
+size_t raw_fwrite(void* ptr, size_t size, size_t nitems, FILE* stream);
 
 // Platform specific primitives
 

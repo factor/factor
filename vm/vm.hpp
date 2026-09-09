@@ -544,8 +544,8 @@ struct factor_vm {
   size_t safe_fread(void* ptr, size_t size, size_t nitems, FILE* stream);
   void safe_fputc(int c, FILE* stream);
   size_t safe_fwrite(void* ptr, size_t size, size_t nitems, FILE* stream);
-  off_t safe_ftell(FILE* stream);
-  void safe_fseek(FILE* stream, off_t offset, int whence);
+  file_offset safe_ftell(FILE* stream);
+  void safe_fseek(FILE* stream, file_offset offset, int whence);
   void safe_fflush(FILE* stream);
   void primitive_fopen();
   FILE* pop_file_handle();

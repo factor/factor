@@ -36,8 +36,8 @@ typedef HANDLE THREADHANDLE;
 #define STRDUP _wcsdup
 
 #ifdef _MSC_VER
-#define FTELL ftell
-#define FSEEK fseek
+#define FTELL _ftelli64
+#define FSEEK _fseeki64
 #else
 #define FTELL ftello64
 #define FSEEK fseeko64

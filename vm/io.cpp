@@ -18,7 +18,7 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_read = 0;
 
   do {
-    size_t ret = fread((void*)((int*)ptr + items_read * size), size,
+    size_t ret = fread((char*)ptr + items_read * size, size,
                        nitems - items_read, stream);
     if (ret == 0) {
       if (feof(stream)) {
@@ -28,6 +28,8 @@ size_t raw_fread(void* ptr, size_t size, size_t nitems, FILE* stream) {
         return 0;
       }
     }
+    if (ferror(stream) && errno == EINTR)
+      clearerr(stream);
     items_read += ret;
   } while (items_read != nitems);
 
@@ -93,24 +95,33 @@ void factor_vm::safe_fputc(int c, FILE* stream) {
   }
 }
 
-size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
-                              FILE* stream) {
+size_t raw_fwrite(void* ptr, size_t size, size_t nitems, FILE* stream) {
   size_t items_written = 0;
   size_t ret = 0;
 
   do {
-    ret = fwrite((void*)((int*)ptr + items_written * size), size,
+    ret = fwrite((char*)ptr + items_written * size, size,
                  nitems - items_written, stream);
-    if (ret == 0)
-      io_error_if_not_EINTR();
+    if (ret == 0 && errno != EINTR)
+      return 0;
+    if (ferror(stream) && errno == EINTR)
+      clearerr(stream);
     items_written += ret;
   } while (items_written != nitems);
 
   return items_written;
 }
 
-off_t factor_vm::safe_ftell(FILE* stream) {
-  off_t offset;
+size_t factor_vm::safe_fwrite(void* ptr, size_t size, size_t nitems,
+                              FILE* stream) {
+  size_t ret = raw_fwrite(ptr, size, nitems, stream);
+  if (ret != nitems)
+    io_error_if_not_EINTR();
+  return ret;
+}
+
+file_offset factor_vm::safe_ftell(FILE* stream) {
+  file_offset offset;
   for (;;) {
     if ((offset = FTELL(stream)) == -1)
       io_error_if_not_EINTR();
@@ -120,7 +131,7 @@ off_t factor_vm::safe_ftell(FILE* stream) {
   return offset;
 }
 
-void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
+void factor_vm::safe_fseek(FILE* stream, file_offset offset, int whence) {
   switch (whence) {
     case 0:
       whence = SEEK_SET;
@@ -136,7 +147,7 @@ void factor_vm::safe_fseek(FILE* stream, off_t offset, int whence) {
   }
 
   for (;;) {
-    if (FSEEK(stream, offset, whence) == -1)
+    if (FSEEK(stream, offset, whence) != 0)
       io_error_if_not_EINTR();
     else
       break;
@@ -222,7 +233,7 @@ void factor_vm::primitive_ftell() {
 void factor_vm::primitive_fseek() {
   FILE* file = pop_file_handle();
   int whence = (int)to_fixnum(ctx->pop());
-  off_t offset = (off_t)to_signed_8(ctx->pop());
+  file_offset offset = (file_offset)to_signed_8(ctx->pop());
   safe_fseek(file, offset, whence);
 }
 
