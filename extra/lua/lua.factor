@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types
-alien.libraries alien.syntax classes.struct combinators
+alien.libraries alien.syntax alien.varargs classes.struct combinators
 io.encodings.ascii kernel math system ;
 IN: lua
 
@@ -108,8 +108,8 @@ FUNCTION: void lua_pushnumber ( lua_State* L, lua_Number n )
 FUNCTION: void lua_pushinteger ( lua_State* L, lua_Integer n )
 FUNCTION: void lua_pushlstring ( lua_State* L, char* s, size_t l )
 FUNCTION: void lua_pushstring ( lua_State* L, c-string[ascii] s )
-! FUNCTION: c-string[ascii] lua_pushvfstring ( lua_State* L, c-string[ascii] fmt, va_list argp )
-! FUNCTION: c-string[ascii] lua_pushfstring ( lua_State* L, c-string[ascii] fmt, ... )
+FUNCTION: c-string[ascii] lua_pushvfstring ( lua_State* L, c-string[ascii] fmt, va_list argp )
+FUNCTION: c-string[ascii] lua_pushfstring ( lua_State* L, c-string[ascii] fmt, ... )
 FUNCTION: void lua_pushcclosure ( lua_State* L, lua_CFunction fn, int n )
 FUNCTION: void lua_pushboolean ( lua_State* L, int b )
 FUNCTION: void lua_pushlightuserdata ( lua_State* L, void* p )
@@ -236,7 +236,7 @@ FUNCTION: int luaL_newmetatable ( lua_State* L, c-string[ascii] tname )
 FUNCTION: void* luaL_checkudata ( lua_State* L, int ud, c-string[ascii] tname )
 
 FUNCTION: void luaL_where ( lua_State* L, int lvl )
-! FUNCTION: int luaL_error ( lua_State* L, c-string[ascii] fmt,  ... ) ;
+FUNCTION: int luaL_error ( lua_State* L, c-string[ascii] fmt, ... )
 FUNCTION: int luaL_checkoption ( lua_State* L, int narg, c-string[ascii] def, c-string[ascii] lst )
 
 FUNCTION: int luaL_ref ( lua_State* L, int t )
