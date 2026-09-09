@@ -1,0 +1,1 @@
+Shared SSA companion-base provenance for derived pointers across collection
