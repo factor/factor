@@ -9,9 +9,12 @@ import io,tarfile,gzip,sys,json
 R=Path('/home/erg/factor-compiler-flags-20260909');P=R/'reference/compiler-flags-20260909';A=Path('/home/erg/factor-compiler-flags-audit-20260909/reference/compiler-flags-20260909')
 files=[]
 for p in P.iterdir():
- if '-timing-' in p.name and not (P/(p.name.split('.')[0]+'.status.json')).exists():continue
- if p.is_file() and p.suffix in ['.py','.factor','.json','.jsonl','.log'] and p.name!='timing-queue.log':files.append((p,'matrix/'+p.name))
+ if p.name.startswith('native-') and '-timing-' in p.name and not (P/(p.name.split('.')[0]+'.status.json')).exists():continue
+ if p.is_file() and p.suffix in ['.py','.factor','.json','.jsonl','.log'] and (p.name!='timing-queue.log' or 'NATIVE FLAGS TIMING COMPLETE' in p.read_text()):files.append((p,'matrix/'+p.name))
 for p in (R/'reference/allocator-speed-crossarch-20260908').glob('source-*.json'):files.append((p,'source/'+p.name))
+for name in ['workloads.factor','pressure.factor','counters-linux.c','ffi.c']:
+ p=R/'reference/allocator-speed-crossarch-20260908'/name
+ if p.exists():files.append((p,'support-source/'+name))
 for p in A.rglob('*'):
  if p.is_file() and (p.parent.name=='native-audits' or p.name in ['audit-source.json','run-audits-native.py','audit-queue.log']):files.append((p,'audit/'+str(p.relative_to(A))))
 for overlay in json.loads((A/'audit-source.json').read_text())['overlays']:
