@@ -24,3 +24,6 @@ FUNCTION: void* optional_fts5_tokenizer ( fts5_api* api )
 FUNCTION: int optional_fts5_verify ( fts5_api* api, void* find, void* tokenizer, void* create, void* destroy, void* tokenize )
 FUNCTION: int optional_fts5_api_size ( )
 FUNCTION: int optional_fts5_tokenizer_size ( )
+
+CALLBACK: sqlite3_file* optional_filename_callback ( sqlite3_filename filename )
+FUNCTION: int optional_filename_oracle ( optional_filename_callback callback )
