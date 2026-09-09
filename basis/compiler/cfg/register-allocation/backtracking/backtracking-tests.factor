@@ -1,8 +1,11 @@
 USING: accessors arrays assocs combinators compiler.test compiler.cfg compiler.cfg.metrics
 compiler.cfg.register-allocation compiler.cfg.register-allocation.backtracking
+compiler.cfg.register-allocation.verifier compiler.cfg.instructions
+compiler.cfg.linear-scan.numbering compiler.cfg.utilities
+compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.occupancy
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.registers
-cpu.architecture kernel kernel.private locals math math.private namespaces sequences tools.test
+cpu.architecture generalizations kernel kernel.private locals make math quotations math.private namespaces sequences tools.test
 vectors memory ;
 IN: compiler.cfg.register-allocation.backtracking.tests
 
@@ -12,6 +15,7 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     positions [ <vreg-use> int-rep >>use-rep ] map >vector >>uses ;
 
 : init-test-allocation ( -- registers )
+    f backtracking-point-blocks set
     f f <basic-block> <cfg> cfg set
     H{ { 1 int-rep } { 2 int-rep } } representations set
     int-regs machine-registers int-regs of first 1array 2array 1array ;
@@ -212,3 +216,89 @@ IN: compiler.cfg.register-allocation.backtracking.tests
     1 { 0 10 20 30 100 } test-interval 1array <allocation-bundle>
     12 conflict-split-site
 ] with-scope ] unit-test
+
+
+! Resolve a local split-register cycle in parallel. Sequential activation
+! would duplicate one value; the checker requires both original SSA tokens.
+{ t } [ [ [let
+    init-test-allocation drop
+    int-rep 3 set-rep-of
+    [
+        1 11 ##load-integer,
+        2 22 ##load-integer,
+        3 1 2 ##sub,
+        ##return,
+    ] V{ } make insns>cfg :> graph
+    graph cfg set graph number-instructions
+    graph snapshot-value-flow :> snapshot
+    int-regs machine-registers at :> regs
+    regs first :> r0 regs second :> r1 regs third :> r2
+    1 { 4 } test-interval r1 >>reg int-rep >>reload-rep
+        r0 backtracking-register-home boa >>reload-from
+    2 { 4 } test-interval r0 >>reg int-rep >>reload-rep
+        r1 backtracking-register-home boa >>reload-from
+    2array prepare-backtracking-moves
+    graph cfg>insns :> insns
+    insns first r0 >>dst drop
+    insns second r1 >>dst drop
+    insns third r2 >>dst r1 >>src1 r0 >>src2 drop
+    graph insert-backtracking-moves
+    graph snapshot check-value-flow
+    t
+] ] with-scope ] unit-test
+
+:: backtracking-phi-pressure ( -- quot )
+    40 <iota> [ 1 + >float '[ _ float+ ] ] map :> positive
+    40 <iota> [ 1 + >float '[ _ float- ] ] map :> negative
+    '[ positive cleave ] :> positive-branch
+    '[ negative cleave ] :> negative-branch
+    39 [ \ float+ ] replicate >quotation :> reduction
+    '[ [ { float } declare ] dip
+        positive-branch negative-branch if reduction call ] ;
+
+! These are different values on the two incoming paths, not copies of a
+! leader. Native code exercises shared homes and SSA edge move reification.
+{ 920.0 -720.0 } [
+    backtracking-allocator register-allocator [
+        2.5 t backtracking-phi-pressure compile-call
+        2.5 f backtracking-phi-pressure compile-call
+    ] with-variable
+] unit-test
+
+{ t } [
+    backtracking-allocator register-allocator [
+        backtracking-phi-pressure measure-compilation
+        "procedures" of first "allocation" of
+        "bundle-merges" of 0 >
+    ] with-variable
+] unit-test
+
+
+! A canonical no-use spill bundle gets one non-evicting second chance.
+! Other registers may become free after the main eviction queue splits its
+! occupants. Here the required fragments already have their assignments.
+{ 1 t t } [ [ [let
+    init-test-allocation drop
+    [ 51 [ ##branch, ] times ] V{ } make insns>cfg :> graph
+    graph cfg set graph number-instructions graph prepare-backtracking-points
+    int-regs machine-registers at 2 head :> bank
+    int-regs bank 2array 1array :> available
+    1 { 0 100 } test-interval 1array available backtracking-allocation drop
+    backtracking-original-intervals get first clone :> original
+    1 { 0 } test-interval V{ { 0 1 } } clone >>ranges
+        bank first >>reg int-rep >>spill-rep
+        1 int-rep assign-spill-slot >>spill-to :> before
+    1 { 100 } test-interval bank first >>reg int-rep >>reload-rep
+        1 int-rep assign-spill-slot >>reload-from :> after
+    original 1array backtracking-original-intervals set
+    V{ } clone assigned-bundles set
+    available [ [ <register-occupancy> ] H{ } map>assoc ] assoc-map bundle-occupancy set
+    before after 2array <allocation-bundle> bank first assign-bundle
+    2 { 50 } test-interval V{ { 40 60 } } clone >>ranges
+    1array <allocation-bundle> bank first assign-bundle
+    before after 2array allocate-second-chance :> assigned
+    assigned available check-allocated-intervals
+    backtracking-second-chance-assignments get
+    assigned [ uses>> empty? ] any?
+    before spill-to>> not after reload-from>> backtracking-register-home? and
+] ] with-scope ] unit-test
