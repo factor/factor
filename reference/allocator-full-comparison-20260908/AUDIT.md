@@ -111,14 +111,49 @@ The larger native x86 frozen closure then rejected `29b4551bb3`: greedy created 
 transparent resident fragment with no local operand uses, and GC assignment could
 not determine its representation while compiling `:SSL=>struct-slot-values`.
 Correction `0045c5586f` preserves the original incoming representation in fragment
-metadata. The exact native method now passes final checked compilation with both
-rematerialization settings. A fresh integrated image and all four full closures
-are still required before accepting the corrected candidate. Failed source29
-records are retained in `native-x86-64/candidate29-rejected`.
+metadata. The exact native method passes final checked compilation with both
+rematerialization settings. Failed source29 records are retained in
+`native-x86-64/candidate29-rejected`.
 
-The repaired prototype baseline passes all four full checked closures on both
-architectures: 27,289 frozen word objects on x86 and 26,212 on ARM64, with all 26
-outputs independently checked. Earlier successful targeted witnesses remain
-scoped evidence; they do not override a failing whole-closure acceptance gate.
-Final fresh-image checks, the matched two-architecture matrix, and separate
-default bootstrap budget assessment remain required before speed claims.
+Subsequent whole-closure and native callback checks exposed three backtracking
+transport defects. Local moves inserted after assignment disappeared at removed
+phi positions and ran too late for GC saves. Spill-tail normalization could grow
+a fragment across an original liveness hole into another bundled value. Finally,
+second-chance ranges could span skipped Factor-call blocks, keeping a callback's
+hidden return pointer in a clobbered register. The respective repairs are
+`3e38c333d8`, `0f3c5628ba` and `38003ffe56`. Transitions now execute during phase
+assignment with consumed-point and binding-restoration checks; spill tails stay
+within the original contiguous range; entire call blocks are excluded and their
+successors reload memory homes, including mixed-predecessor joins.
+
+The callback investigation also found a shared verifier omission: ordinary
+`##call` did not invalidate abstract physical registers. Surgical repair
+`dfe08fc9bd` adds that clobber. The valid ABI-slot case passes and both missing-
+reload and stale-store mutations fail; the old verifier accepted both mutations.
+That fix is included in **both** the final prototype baseline `f5a6d4739e` and
+final candidate `30a50ab0df`. The baseline otherwise retains `c84535b24a`'s old
+allocator policies and interval model. Failed intermediate source trees, native
+logs, original/allocated interval dumps and exact patches remain archived.
+
+Both immutable revisions now pass all four freshly prepared, full checked
+benchmark closures on native ARM64 and x86, including all 26 independent output
+oracles. Both revisions also pass the real C ABI callback fixture for all four
+allocators with rematerialization off/on: 40 assertions per revision and
+architecture, with the strengthened verifier active. The final candidate's full
+compiler suite passes with backtracking and both optimization flags enabled,
+SSA/interval/final-flow checks active and GVN off. Selection/greedy help lint
+passes. The exact evidence is in the comparison archives and
+`../allocator-full-integration-20260908/ACCEPTANCE.md`.
+
+The prepared master-candidate merge retains identical allocator, linear-scan
+and liveness sources while preserving the newer target/ABI and VM work. Its full
+compiler suites pass with both linear scan/rematerialization off and
+backtracking/rematerialization on; see
+`../allocator-full-master-integration-20260908/README.md` on the integrated branch.
+That newer VM is not substituted into the frozen performance comparison.
+
+These correctness gates authorize the matched timing matrix; they do not
+establish a performance win. Earlier targeted witnesses remain scoped evidence.
+The separate default bootstrap's last measured 3:11 result misses the requested
+two-minute limit; it is not converted into a passing timing claim by the compiler
+suite or callback results.
