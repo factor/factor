@@ -96,6 +96,8 @@ under `logs/linux-bindings/` (ignored by Git).
 
 ## Remaining coverage and findings
 
+The subsequent [runtime follow-up](../linux-runtime-followup-20260909/README.md) fixes and natively verifies GTK backend selection and save-dialog behavior. The findings below describe the original audit snapshot.
+
 - No native ARM64, 32-bit x86, musl, older-glibc, macOS or FreeBSD execution
   was performed in this binding audit. Platform-specific declarations were
   retained where Linux's signature differs; that is not cross-platform proof.

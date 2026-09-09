@@ -19,6 +19,8 @@ the requested sizes in these checks without backend changes.
 
 ## Existing fixes and remaining reports
 
+Subsequent native fixes for append/FIFO I/O, build library detection, Linux ping and GTK file dialogs are recorded in the [2026-09-09 runtime follow-up](../linux-runtime-followup-20260909/README.md). The table below retains this earlier review's historical dispositions.
+
 This is a triage inventory, not a claim that every report has been reproduced.
 No GitHub issues were modified, commented on, or closed.
 

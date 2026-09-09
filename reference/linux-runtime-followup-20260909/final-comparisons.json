@@ -1,0 +1,178 @@
+[
+  {
+    "case": "append",
+    "version": "default",
+    "workspace": "baseline",
+    "exit": 1,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "append",
+    "version": "default",
+    "workspace": "candidate",
+    "exit": 0,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "fifo",
+    "version": "default",
+    "workspace": "baseline",
+    "exit": 124,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "fifo",
+    "version": "default",
+    "workspace": "candidate",
+    "exit": 0,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "fifo-append",
+    "version": "default",
+    "workspace": "baseline",
+    "exit": 1,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "fifo-append",
+    "version": "default",
+    "workspace": "candidate",
+    "exit": 0,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "ping",
+    "version": "default",
+    "workspace": "baseline",
+    "exit": 1,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "ping",
+    "version": "default",
+    "workspace": "candidate",
+    "exit": 0,
+    "command": [
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "picker",
+    "version": "gtk3",
+    "workspace": "baseline",
+    "exit": 1,
+    "command": [
+      "xvfb-run",
+      "-a",
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "picker",
+    "version": "gtk3",
+    "workspace": "candidate",
+    "exit": 0,
+    "command": [
+      "xvfb-run",
+      "-a",
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/factor.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "picker",
+    "version": "gtk2",
+    "workspace": "baseline",
+    "exit": 124,
+    "command": [
+      "xvfb-run",
+      "-a",
+      "/home/sheeple/factor-workspaces/linux-followup-base/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup-base/gtk2.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup-base",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  },
+  {
+    "case": "picker",
+    "version": "gtk2",
+    "workspace": "candidate",
+    "exit": 124,
+    "command": [
+      "xvfb-run",
+      "-a",
+      "/home/sheeple/factor-workspaces/linux-followup/factor",
+      "-i=/home/sheeple/factor-workspaces/linux-followup/gtk2.image",
+      "-resource-path=/home/sheeple/factor-workspaces/linux-followup",
+      "-no-user-init",
+      "-no-monitors",
+      "/home/sheeple/factor-workspaces/linux-followup/.github/ffi-compare.factor"
+    ]
+  }
+]
