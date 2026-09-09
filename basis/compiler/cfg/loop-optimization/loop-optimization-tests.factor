@@ -121,3 +121,21 @@ IN: compiler.cfg.loop-optimization.tests
         { f t } [ multiple? swap execute-licm-case ] all?
     ] all?
 ] unit-test
+
+! An entry edge into the latch creates an irreducible cycle. Its latch uses
+! only entry values, so the input SSA is valid; header dominance must reject
+! the apparent natural-loop candidate instead of creating a preheader.
+:: test-irreducible-loop ( -- hoisted )
+    f <licm-loop> :> graph
+    graph reverse-post-order [ instructions>> [ ##xor? ] any? ] find nip :> body
+    body instructions>> [| insn |
+        insn ##add? [ 4 insn src1<< ] when
+        insn ##sub-imm? [ 3 insn src1<< ] when
+    ] each
+    graph entry>> body connect-bbs
+    graph cfg-changed graph predecessors-changed
+    graph checked-licm drop
+    "hoisted" loop-optimization-statistics get at 0 or
+;
+
+{ 0 } [ test-irreducible-loop ] unit-test
