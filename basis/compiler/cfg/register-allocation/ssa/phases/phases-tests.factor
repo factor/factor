@@ -2,7 +2,8 @@ USING: accessors arrays assocs compiler.cfg compiler.cfg.instructions
 compiler.cfg.linear-scan.allocation compiler.cfg.linear-scan.checker
 compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.register-allocation compiler.cfg.register-allocation.chordal.bases
-compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.phases
+compiler.cfg.register-allocation.ssa compiler.cfg.register-allocation.ssa.liveness
+compiler.cfg.register-allocation.ssa.phases
 compiler.cfg.register-allocation.validation compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities cpu.architecture
 kernel layouts locals make math namespaces sequences sequences.generalizations tools.test ;
@@ -95,3 +96,22 @@ IN: compiler.cfg.register-allocation.ssa.phases.tests
     0 live-intervals get at uses>> first [ n>> ] [ spill-slot?>> ] bi
     1 live-intervals get at uses>> first [ n>> ] [ spill-slot?>> ] bi
 ] with-scope ] unit-test
+
+
+! Source spilling may introduce memory tokens with no register definition.
+! Exclude them before interval finalization and retain their ABI locations
+! while walking both phases of the rewritten CFG.
+{ { } T{ spill-slot { n 16 } } } [ [ [let
+    init-validation-representations
+    H{ { 70 70 } } clone leader-map set
+    T{ ##callback-outputs { reg-inputs { { 70 int-rep 0 } } } } clone :> call
+    call T{ ##return } 2array insns>cfg :> graph
+    H{ { 70 T{ spill-slot { n 16 } } } } :> fixed
+    graph compute-ssa-live-sets-preserving-gc
+    graph number-instructions
+    graph fixed compute-phase-ssa-intervals-with-locations
+    [ live-interval-state? ] filter :> intervals
+    intervals [ vreg>> ] map
+    graph intervals fixed assign-phase-ssa-registers-with-locations
+    call reg-inputs>> first first
+] ] with-scope ] unit-test

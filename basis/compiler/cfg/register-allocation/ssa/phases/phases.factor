@@ -48,13 +48,16 @@ IN: compiler.cfg.register-allocation.ssa.phases
         ] [ compute-phase-insn-intervals ] if
     ] each ;
 
-: compute-phase-ssa-intervals ( cfg -- intervals/sync-points )
+:: compute-phase-ssa-intervals-with-locations ( cfg fixed-locations -- intervals/sync-points )
     H{ } clone live-intervals namespaces:set
     H{ } clone phi-entry-positions namespaces:set
-    [
-        linearization-order <reversed> [ compute-phase-ssa-block ] each
-        live-intervals get values dup [ finish-live-interval ] each
-    ] [ cfg>sync-points ] bi append ;
+    cfg linearization-order <reversed> [ compute-phase-ssa-block ] each
+    live-intervals get values fixed-locations ssa-register-intervals
+    dup [ finish-live-interval ] each
+    cfg cfg>sync-points append ;
+
+: compute-phase-ssa-intervals ( cfg -- intervals/sync-points )
+    f compute-phase-ssa-intervals-with-locations ;
 
 ! A reload at late n+1 runs before the actual instruction. It may overwrite
 ! a dying early input even though their abstract ranges are disjoint. Final
@@ -104,16 +107,21 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
     ] if ;
 
 :: assign-phase-ssa-block ( bb -- )
+    bb expire-at-block-entry
     bb basic-block namespaces:set
     bb block-from unhandled-intervals get activate-new-intervals
     bb compute-ssa-live-in
     bb record-phi-locations
     bb [ [ [ assign-phase-insn ] each ] V{ } make ] change-instructions
-    compute-ssa-live-out ;
+    [ compute-ssa-live-out ] [ assignment-previous-block namespaces:set ] bi ;
 
-:: assign-phase-ssa-registers ( cfg intervals -- )
+:: assign-phase-ssa-registers-with-locations ( cfg intervals fixed-locations -- )
     cfg intervals check-phase-ssa-transports
     intervals init-assignment
+    fixed-locations seed-ssa-fixed-locations
     H{ } clone phi-locations namespaces:set
     cfg linearization-order [ kill-block?>> ] reject
     [ assign-phase-ssa-block ] each ;
+
+: assign-phase-ssa-registers ( cfg intervals -- )
+    f assign-phase-ssa-registers-with-locations ;
