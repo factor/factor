@@ -1,0 +1,40 @@
+{
+  "source_commit": "eccfc0accc5c513b44701f2e59d4a9bafb7515f0",
+  "host_load_before": [
+    60.69384765625,
+    55.0908203125,
+    39.1083984375
+  ],
+  "host_load_after": [
+    73.84423828125,
+    62.86376953125,
+    44.5576171875
+  ],
+  "final_value_verifier": true,
+  "exit_code": 0,
+  "seconds": 135.3960371017456,
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next-integration/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-integration",
+    "-i=/Users/erg/factor.worktrees/compiler-next-integration/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next-integration/reference/allocator-speed-crossarch-20260908/checked-launch.factor",
+    "chordal",
+    "check",
+    "3",
+    "on",
+    "on",
+    "eccfc0accc5c513b44701f2e59d4a9bafb7515f0"
+  ],
+  "ok": true,
+  "counts": {
+    "compile": 1,
+    "runtime": 26,
+    "code": 12,
+    "scope": 1
+  },
+  "taskpolicy": {
+    "exit_code": 0,
+    "stderr": ""
+  }
+}

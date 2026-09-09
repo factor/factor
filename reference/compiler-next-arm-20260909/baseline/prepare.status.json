@@ -1,0 +1,37 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-next-comparison/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next-comparison",
+    "-i=/Users/erg/factor.worktrees/allocator-tuning-final-candidate/reference/allocator-speed-crossarch-20260908/prepared.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-next-comparison/reference/compiler-next-20260909/prepare-next.factor"
+  ],
+  "status": 0,
+  "seconds": 6.058119625,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "source_commit": "c1f7e4d34cd604bbdf22576b237406b39758896d",
+  "initial_image_sha256": "608508a38ba66202917cc4b91108e9aca55e24a37684633fbcd4a025a10e4b95",
+  "preparation_script_sha256": "dfea439e99dceeb4958589ca2ed2e8b9db66f80de6d762811812b0a7e2911506",
+  "prepared_image_sha256": "809b23bf992f2be10c72758d7d736b0722c3b1bc6065375010976617b20f3119"
+}
