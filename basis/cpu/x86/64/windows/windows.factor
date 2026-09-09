@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel layouts system math alien.c-types sequences
+USING: kernel layouts system math alien.c-types assocs sequences
 compiler.cfg.registers cpu.architecture cpu.x86.assembler
 cpu.x86 cpu.x86.64 cpu.x86.assembler.operands ;
 IN: cpu.x86.64.windows
@@ -26,4 +26,11 @@ M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
 
-M: x86.64 %prepare-var-args drop ;
+! Variadic calls duplicate each FP register argument into the GP register
+! for the same argument position, including named floating-point arguments.
+M: x86.64 %prepare-var-args
+    [ second reg-class-of float-regs? ] filter [
+        third dup {
+            { XMM0 RCX } { XMM1 RDX } { XMM2 R8 } { XMM3 R9 }
+        } at swap MOVD
+    ] each ;
