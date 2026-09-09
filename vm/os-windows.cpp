@@ -64,31 +64,24 @@ BOOL factor_vm::windows_stat(vm_char* path) {
 
 // You must free() this yourself.
 const vm_char* factor_vm::default_image_path() {
-  vm_char full_path[MAX_UNICODE_PATH];
-  vm_char* ptr;
-  vm_char temp_path[MAX_UNICODE_PATH];
-
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
-    fatal_error("GetModuleFileName() failed", 0);
-
-  ptr = wcsrchr(full_path, '.');
-  if (ptr)
-    *ptr = 0;
-
-  wcsncpy(temp_path, full_path, MAX_UNICODE_PATH - 1);
-  size_t full_path_len = wcslen(full_path);
-  if (full_path_len < MAX_UNICODE_PATH - 1)
-    wcsncat(temp_path, L".image", MAX_UNICODE_PATH - full_path_len - 1);
-  temp_path[MAX_UNICODE_PATH - 1] = 0;
-
-  return safe_strdup(temp_path);
+  const vm_char* executable = vm_executable_path();
+  std::wstring path(executable);
+  free((void*)executable);
+  size_t separator = path.find_last_of(L"\\/");
+  size_t extension = path.find_last_of(L'.');
+  if (extension != std::wstring::npos &&
+      (separator == std::wstring::npos || extension > separator))
+    path.resize(extension);
+  path += L".image";
+  return safe_strdup(path.c_str());
 }
 
 // You must free() this yourself.
 const vm_char* factor_vm::vm_executable_path() {
   vm_char full_path[MAX_UNICODE_PATH];
-  if (!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
-    fatal_error("GetModuleFileName() failed", 0);
+  DWORD length = GetModuleFileNameW(NULL, full_path, MAX_UNICODE_PATH);
+  if (!length || length >= MAX_UNICODE_PATH)
+    fatal_error("GetModuleFileNameW() failed or truncated the path", GetLastError());
   return safe_strdup(full_path);
 }
 
@@ -98,11 +91,20 @@ void factor_vm::primitive_existsp() {
 }
 
 segment::segment(cell size_, bool executable_p, cell low_guard_size_) {
+  const cell page_size = getpagesize();
+  const cell max_size = std::numeric_limits<cell>::max();
+  if (size_ == 0 || size_ % page_size != 0 ||
+      low_guard_size_ > max_size - (page_size - 1))
+    fatal_error("Invalid Windows segment size", size_);
   size = size_;
-  low_guard_size = std::max((cell)getpagesize(), align_page(low_guard_size_));
+  low_guard_size = std::max(page_size, align_page(low_guard_size_));
+
+  if (low_guard_size > max_size - page_size ||
+      size > max_size - low_guard_size - page_size)
+    fatal_error("Windows segment size overflow", size);
 
   char* mem;
-  cell alloc_size = low_guard_size + getpagesize() + size;
+  cell alloc_size = low_guard_size + page_size + size;
   if ((mem = (char*)VirtualAlloc(
            NULL, alloc_size, MEM_COMMIT,
            executable_p ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE)) ==
