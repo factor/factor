@@ -1,6 +1,10 @@
 # Backtracking mechanism evidence, 2026-09-08
 
 Allocator code: `90a2b6d590`, following `ec5efcbe68`. Native host ARM64.
+Evidence vocabulary source: `14283004f1`. Final export was rerun at
+`64a90d4abf` (same allocator plus shared derived-phi GC prerequisites),
+using the committed `export.factor`; `export.log` records the successful
+native assertion and `witness-check.log` records independent validation.
 The optional `compiler.cfg.register-allocation.backtracking.evidence` vocabulary
 exports actual allocator state; it is not loaded by normal compilation.
 The algorithm/source/behavioral matrix is in
