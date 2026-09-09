@@ -1,6 +1,26 @@
-USING: arrays classes compiler.test continuations kernel
-kernel.private layouts math sequences tools.test ;
+USING: arrays assocs classes compiler.test
+compiler.tree.propagation.transforms continuations kernel
+kernel.private layouts math sequences tools.test words ;
 IN: compiler.tree.propagation.transforms.tests
+
+! #2141: malformed literal alists must not crash the optimizer itself.
+{ f f f f } [
+    "phones" at-quot
+    { 1 2 3 4 5 } at-quot
+    { { 0 0 } { 1 1 } { 2 2 } { 3 3 } { 4 } } at-quot
+    { { 0 0 } { 1 1 } { 2 2 } { 3 3 } { } } at-quot
+] unit-test
+
+{ t } [
+    { { 0 1 } { 1 2 } { 2 3 } { 3 4 } { 4 5 } }
+    at-quot >boolean
+] unit-test
+
+: malformed-join-phones ( seq -- seq' )
+    [ "phone" over at [ "phones" swap [ ] curry change-at ] when* ] map ;
+
+{ t } [ \ malformed-join-phones word-optimized? ] unit-test
+{ { } } [ { } malformed-join-phones ] unit-test
 
 : unit-remainder ( n -- r ) { integer } declare 1 swap mod ;
 : reference-remainder ( a b -- r ) mod ;

@@ -320,8 +320,15 @@ CONSTANT: lookup-table-at-max 256
         ] [ 2drop f f ] if
     ] ;
 
+: lookup-table-assoc? ( obj -- ? )
+    ! Sequences implement assoc, but malformed alists must not make the
+    ! optimizer execute first2 on a scalar or a short entry (#2141).
+    dup sequence? [
+        [ { [ sequence? ] [ length 2 >= ] } 1&& ] all?
+    ] [ assoc? ] if ;
+
 : at-quot ( assoc -- quot )
-    dup assoc? [
+    dup lookup-table-assoc? [
         dup lookup-table-at? [
             dup fast-lookup-table-at? [
                 fast-lookup-table-quot
