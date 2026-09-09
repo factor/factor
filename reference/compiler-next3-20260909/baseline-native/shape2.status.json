@@ -1,0 +1,20 @@
+{
+  "exit_code": 1,
+  "seconds": 0.6909635066986084,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next3-baseline-20260909/factor",
+    "-i=/home/erg/factor-compiler-next3-baseline-20260909/reference/compiler-flags-20260909/prepared.image",
+    "-no-user-init",
+    "-resource-path=/home/erg/factor-compiler-next3-baseline-20260909",
+    "/home/erg/factor-compiler-next3-baseline-20260909/reference/compiler-next3-20260909/shape-launch.factor"
+  ],
+  "image_sha256": "358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd",
+  "source": "8780b3c0908ba06be2720c5ac0949e3c68b871e4",
+  "script_hashes": {
+    "shape-launch.factor": "7bedc89157bdd0ebb234c3cd02dc20e6508c2f46690c382b5f69449dd5b784e9",
+    "shape-diagnostic.factor": "1a27030fe6de39067f1c0a2de7243d63a78d99bcda79149ad2f64c12ca124287"
+  }
+}
