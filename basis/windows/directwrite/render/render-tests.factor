@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors colors destructors fonts fonts.shaping grouping
-kernel locals math math.functions sequences tools.test windows.directwrite
+USING: accessors arrays colors destructors fonts fonts.shaping grouping
+kernel locals math math.functions sequences strings tools.test windows.directwrite
 windows.directwrite.render ;
 IN: windows.directwrite.render.tests
 
@@ -61,3 +61,55 @@ IN: windows.directwrite.render.tests
     emoji-font "x" <directwrite-layout>
     dup directwrite-layout>image drop dup dispose directwrite-layout>image
 ] [ already-disposed? ] must-fail-with
+
+
+:: tiled-matches-native? ( font text -- ? )
+    font text <directwrite-layout> [ :> layout
+        layout directwrite-layout>image :> tiled
+        [ layout pointer>> layout size>> layout origin>> COLOR: black COLOR: white
+            render-directwrite-tile ] with-destructors :> native
+        tiled dim>> native dim>> = tiled bitmap>> native bitmap>> = and
+    ] with-disposal ;
+
+! Several tiles must reproduce the same pixels as one native surface,
+! including glyphs straddling a tile boundary.
+{ t } [ "Consolas" <font> 1000 CHAR: a <string> tiled-matches-native? ] unit-test
+{ t } [ emoji-font 50 0x1f600 <string> tiled-matches-native? ] unit-test
+{ t } [ "Consolas" <font> 200 [ "a\n" ] replicate concat tiled-matches-native? ] unit-test
+
+:: image-has-ink? ( image -- ? )
+    image bitmap>> 4 group [ first3 255 < swap 255 < or swap 255 < or ] any? ;
+
+:: long-line-renders? ( -- ? )
+    "Consolas" <font> 10000 CHAR: a <string> <directwrite-layout> [ :> layout
+        layout directwrite-layout>image :> image
+        image dim>> layout size>> = image image-has-ink? and
+    ] with-disposal ;
+
+! The original single-surface renderer raises E_INVALIDARG for this line.
+{ t } [ long-line-renders? ] unit-test
+
+:: tail-region-renders? ( -- ? )
+    "Consolas" <font> 10000 CHAR: a <string> <directwrite-layout> [ :> layout
+        layout layout size>> first 128 - 0 2array
+        128 layout size>> second 2array directwrite-layout>region-image
+        image-has-ink? layout image>> not and
+    ] with-disposal ;
+
+! Viewport callers can rasterize the far end without allocating the full
+! line image or populating its full-image cache.
+{ t } [ tail-region-renders? ] unit-test
+
+:: distant-selection-renders? ( -- ? )
+    "Consolas" <font> 0 0 0 0 <rgba> dup [ >>foreground ] dip >>background
+    10000 CHAR: a <string> 5000 5100 COLOR: red <selection>
+    <directwrite-layout> [ :> layout
+        5020 layout directwrite-offset>x layout origin>> first + floor >integer :> x
+        layout x 0 2array 64 layout size>> second 2array directwrite-layout>region-image
+        bitmap>> 4 group [ { 255 0 0 255 } sequence= ] any?
+    ] with-disposal ;
+{ t } [ distant-selection-renders? ] unit-test
+
+[ emoji-font "x" <directwrite-layout> dup dispose
+    { 0 0 } { 8 8 } directwrite-layout>region-image ]
+[ already-disposed? ] must-fail-with

@@ -1,8 +1,8 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data arrays classes.struct colors
+USING: accessors alien alien.c-types alien.data arrays byte-arrays classes.struct colors
 combinators destructors fonts fonts.shaping images init kernel locals
-math math.functions math.order namespaces sequences
+libc math math.functions math.order math.vectors namespaces sequences
 windows.com windows.directwrite windows.directx.d2d1 windows.directx.d2dbasetypes
 windows.directx.dxgiformat windows.offscreen windows.ole32 windows.types ;
 IN: windows.directwrite.render
@@ -117,7 +117,7 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
             y rect second >= y rect second rect fourth + < and and
         ] any? [ text-selection-background get ] [ background ] if
     ] [ background ] if* ;
-:: render-directwrite-image ( pointer dim origin foreground background -- image )
+:: render-directwrite-tile ( pointer dim origin foreground background -- image )
     foreground >rgba alpha>> :> opacity
     foreground >rgba-components drop 1.0 <rgba> :> solid
     pointer dim origin solid COLOR: black render-layout-on :> black
@@ -131,16 +131,54 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
     ] each-integer
     black RGBA >>component-order ;
 
-:: directwrite-layout>image ( layout -- image )
+! Keep native DC surfaces bounded independently of the full line width.
+CONSTANT: directwrite-tile-size 2048
+
+:: copy-text-tile ( tile position dim bitmap -- )
+    tile dim>> first2 :> height :> width
+    tile bitmap>> :> source
+    position first2 :> y :> x
+    height [| row |
+        dim second y - height - row + dim first * x + 4 * bitmap <displaced-alien>
+        row width * 4 * source <displaced-alien>
+        width 4 * memcpy
+    ] each-integer ;
+
+:: render-directwrite-image ( pointer dim origin foreground background -- image )
+    dim [ directwrite-tile-size <= ] all? dim [ 0 > ] all? and [
+        pointer dim origin foreground background render-directwrite-tile
+    ] [
+        dim product 4 * <byte-array> :> bitmap
+        dim second directwrite-tile-size 1 - + directwrite-tile-size /i [| row |
+            row directwrite-tile-size * :> y
+            dim first directwrite-tile-size 1 - + directwrite-tile-size /i [| column |
+                column directwrite-tile-size * :> x
+                x y 2array :> position
+                dim first x - directwrite-tile-size min
+                dim second y - directwrite-tile-size min 2array :> tile-dim
+                pointer tile-dim origin position v- foreground background
+                render-directwrite-tile position dim bitmap copy-text-tile
+            ] each-integer
+        ] each-integer
+        <image> dim >>dim bitmap >>bitmap RGBA >>component-order
+            ubyte-components >>component-type t >>upside-down?
+    ] if ;
+
+:: directwrite-layout>region-image ( layout position dim -- image )
     layout check-disposed drop
-    layout image>> [
-        [ layout font>> font-color-fonts? not text-color-fonts-disabled? set
+    [ layout font>> font-color-fonts? not text-color-fonts-disabled? set
         layout directwrite-selection-rects
         [ { [ left>> ] [ top>> ] [ width>> ] [ height>> ] } cleave 4array ] map
         dup empty? [ drop f ] when text-selection-rects set
         layout string>> dup selection? [ color>> text-selection-color set ] [ drop ] if
-        layout pointer>> layout size>> layout origin>>
+        layout pointer>> dim layout origin>> position v-
         layout font>> [ foreground>> ] [ background>> ] bi
-        render-directwrite-image layout swap >>image drop ] with-scope
+        render-directwrite-image ] with-scope ;
+
+:: directwrite-layout>image ( layout -- image )
+    layout check-disposed drop
+    layout image>> [
+        layout { 0 0 } layout size>> directwrite-layout>region-image
+        layout swap >>image drop
     ] unless
     layout image>> ;
