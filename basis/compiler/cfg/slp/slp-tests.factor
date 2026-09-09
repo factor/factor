@@ -1,5 +1,5 @@
 USING: accessors arrays assocs compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg compiler.cfg.utilities compiler.cfg.def-use compiler.cfg.slp combinators kernel locals math namespaces sequences tools.test vectors ;
+compiler.cfg compiler.cfg.utilities compiler.cfg.def-use compiler.cfg.slp combinators kernel locals math namespaces sequences system tools.test vectors ;
 IN: compiler.cfg.slp.tests
 
 :: scalar-chain ( first-id input scale bias rounds -- insns last )
@@ -83,14 +83,40 @@ IN: compiler.cfg.slp.tests
 ! Raw pointers may cross GC after the region. A vector extraction would
 ! hide the scalar add/sub base chain, so either provenance seed anywhere
 ! in the CFG disables packing, including otherwise profitable numeric code.
-{ { { 0 1 } { 0 1 } } } [
+! Unsupported targets refuse before inspecting pointer provenance.
+{ { { t t t } { t t t } } } [
     { T{ ##tagged>integer { dst 200 } { src 201 } }
       T{ ##unbox-any-c-ptr { dst 200 } { src 201 } } } [| seed |
-        12 scalar-pair seed prefix T{ ##call-gc } suffix insns>cfg :> graph
+        12 scalar-pair seed prefix T{ ##call-gc } suffix :> insns
+        insns insns>cfg :> graph
         t automatic-slp? [
             graph auto-vectorize
-            "packs" slp-statistics get at
-            "pointer-cfgs-skipped" slp-statistics get at 2array
+            graph entry>> instructions>> insns =
+            "packs" slp-statistics get at 0 =
+            "pointer-cfgs-skipped" slp-statistics get at 0 or
+            slp-supported? [ 1 ] [ 0 ] if = 3array
         ] with-variable
     ] map
+] unit-test
+
+! The object backend defaults advertise no SIMD capabilities. Bind only
+! the pure pass/capability queries to this model; never compile or generate
+! code under it. with-variable restores the host binding on unwind too.
+SINGLETON: slp-no-simd-cpu
+
+{ f t 0 0 f t } [
+    \ cpu get :> host-cpu
+    12 scalar-pair :> insns
+    insns insns>cfg :> graph
+    t automatic-slp? [
+        slp-no-simd-cpu \ cpu [
+            slp-supported?
+            graph auto-vectorize
+            graph entry>> instructions>> insns =
+            "packs" slp-statistics get at
+            "vector-operations" slp-statistics get at
+            "pointer-cfgs-skipped" slp-statistics get key?
+        ] with-variable
+    ] with-variable
+    \ cpu get host-cpu eq?
 ] unit-test
