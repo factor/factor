@@ -24,7 +24,7 @@ IN: compiler.tree.propagation.slots
     f prefix ;
 
 : fold-<tuple-boa>? ( values class -- ? )
-    [ rest-slice [ dup [ literal?>> ] when ] all? ]
+    [ rest-slice [ f ] [ [ dup [ literal?>> ] when ] all? ] if-empty ]
     [ identity-tuple class<= not ]
     bi* and ;
 
