@@ -515,3 +515,23 @@ IN: compiler.cfg.register-allocation.backtracking.tests
 ! on both success and an unconsumed-prefix failure.
 { f t t } [ [ f prefix-context-fixture ] with-scope ] unit-test
 { t t t } [ [ t prefix-context-fixture ] with-scope ] unit-test
+
+! The original hidden callback result address can be live across Factor
+! calls in memory. Second-chance residency must exclude every point of a
+! skipped kill block, and a successor entry needs its own memory reload
+! because the call block has no outgoing register assignment map.
+{ V{ { 0 3 } { 8 11 } } t } [ [ [let
+    init-test-allocation drop
+    t backtracking-phase-mode? set
+    H{ } clone spill-slots set
+    V{ T{ ##branch } T{ ##branch } } clone 0 insns>block :> entry
+    V{ T{ ##call } T{ ##branch } } clone 1 insns>block
+    t >>kill-block? :> call-block
+    V{ T{ ##branch } T{ ##branch } } clone 2 insns>block :> done
+    entry call-block connect-bbs call-block done connect-bbs
+    entry done connect-bbs
+    entry block>cfg :> graph
+    graph cfg set graph number-instructions graph prepare-backtracking-points
+    1 { 0 11 } test-interval { } uncovered-ranges
+    1 { 8 11 } gap-interval reload-from>> spill-slot?
+] ] with-scope ] unit-test
