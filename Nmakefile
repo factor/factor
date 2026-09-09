@@ -151,7 +151,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 all: factor.com.manifest factor.exe.manifest factor.dll.lib libfactor-ffi-test.dll
 
 # Shared layouts and inline VM code must not leave stale objects behind.
-$(DLL_OBJS) vm\main-windows.obj vm\tests\gc.obj vm\tests\windows_allocation.obj: vm\*.hpp
+$(DLL_OBJS) vm\main-windows.obj vm\tests\gc.obj vm\tests\windows_allocation.obj vm\tests\windows_services.obj: vm\*.hpp
 
 # batch mode has ::
 .cpp.obj::
@@ -195,8 +195,15 @@ vm\tests\windows_allocation.obj: vm\tests\windows_allocation.cpp
 windows-allocation-tests.exe: vm\tests\windows_allocation.obj $(DLL_OBJS)
 	link $(LINK_FLAGS) /out:windows-allocation-tests.exe /SUBSYSTEM:console vm\tests\windows_allocation.obj $(DLL_OBJS)
 
-test-vm: gc-tests.exe windows-allocation-tests.exe
+vm\tests\windows_services.obj: vm\tests\windows_services.cpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_services.obj /c vm\tests\windows_services.cpp
+
+windows-services-tests.exe: vm\tests\windows_services.obj $(DLL_OBJS)
+	link $(LINK_FLAGS) /out:windows-services-tests.exe /SUBSYSTEM:console vm\tests\windows_services.obj $(DLL_OBJS)
+
+test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe
 	.\gc-tests.exe
+	.\windows-services-tests.exe
 
 # If we compile factor.exe, run mt.exe, and run factor.exe,
 # then Windows caches the manifest. Even on a recompile without applying
@@ -216,6 +223,10 @@ clean:
 	del vm\*.obj
 	if exist vm\tests\gc.obj del vm\tests\gc.obj
 	if exist vm\tests\windows_allocation.obj del vm\tests\windows_allocation.obj
+	if exist vm\tests\windows_services.obj del vm\tests\windows_services.obj
+	if exist windows-services-tests.exe del windows-services-tests.exe
+	if exist windows-services-tests.lib del windows-services-tests.lib
+	if exist windows-services-tests.exp del windows-services-tests.exp
 	if exist gc-tests.exe del gc-tests.exe
 	if exist gc-tests.lib del gc-tests.lib
 	if exist gc-tests.exp del gc-tests.exp
