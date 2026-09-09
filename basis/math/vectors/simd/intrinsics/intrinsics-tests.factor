@@ -16,6 +16,19 @@ IN: math.vectors.simd.intrinsics.tests
     ] all?
 ] unit-test
 
+! Compile the caller explicitly: the generic call above can use an already
+! compiled method from the image and therefore miss a changed native emitter.
+{ t } [
+    [
+        256 <iota> [| index |
+            B{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 } clone uchar-16 boa
+            16 index <array> >byte-array
+            { uchar-16 byte-array } declare vshuffle underlying>>
+            [ index 15 bitand = ] all?
+        ] all?
+    ] compile-call
+] unit-test
+
 CONSTANT: all-simd-classes {
     char-16 uchar-16 short-8 ushort-8 int-4 uint-4 longlong-2 ulonglong-2
     float-4 double-2 half-8 bfloat-8
