@@ -1,9 +1,10 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators compiler.cfg
+USING: accessors arrays assocs combinators compiler.cfg compiler.cfg.def-use
 compiler.cfg.build-stack-frame compiler.cfg.comparisons
 compiler.cfg.instructions compiler.cfg.linear-scan
 compiler.cfg.linear-scan.allocation.state compiler.cfg.linear-scan.numbering
+compiler.cfg.linearization
 compiler.cfg.register-allocation compiler.cfg.register-allocation.verifier
 compiler.cfg.registers compiler.cfg.ssa.destruction compiler.cfg.utilities
 compiler.codegen compiler.units cpu.architecture hashtables kernel layouts
