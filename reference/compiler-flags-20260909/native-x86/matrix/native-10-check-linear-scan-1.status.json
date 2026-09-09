@@ -1,0 +1,50 @@
+{
+  "source_commit": "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+  "gvn": "on",
+  "rematerialize": "off",
+  "loop_spills": "off",
+  "image_sha256": "358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "script_sha256": {
+    "checked-launch.factor": "ba6a53f77b2822d44d461f10a70f38f68c6b4caa9bbdc77fda1883e477058e90",
+    "timing.factor": "102ef7cb1ba652048f03722798404c6ade2feea13b1189b9f51aa22df3f4dee1",
+    "drive.py": "57e96073e760e7df28ef28b3edd1909f86b920493b673720450fea3a97e91059"
+  },
+  "host_load_before": [
+    0.734375,
+    0.2568359375,
+    0.251953125
+  ],
+  "host_load_after": [
+    0.90087890625,
+    0.43359375,
+    0.31640625
+  ],
+  "final_value_verifier": true,
+  "exit_code": 0,
+  "seconds": 78.15051364898682,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-flags-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-flags-20260909",
+    "-i=/home/erg/factor-compiler-flags-20260909/reference/compiler-flags-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-flags-20260909/reference/compiler-flags-20260909/checked-launch.factor",
+    "linear-scan",
+    "check",
+    "3",
+    "off",
+    "off",
+    "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+    "on"
+  ],
+  "ok": true,
+  "counts": {
+    "scope": 1,
+    "code": 12,
+    "compile": 1,
+    "runtime": 26
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "allocators": 4,
+  "positive_emission": true,
+  "strict_reductions": [
+    "code-bytes",
+    "spills",
+    "reloads",
+    "spill-bytes"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "production_source": "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+  "base": "/home/erg/factor-compiler-flags-20260909",
+  "audit_root": "/home/erg/factor-compiler-flags-audit-20260909",
+  "overlays": [
+    {
+      "commit": "02be78253702fcb8499c7389b818e2f02b8a531b",
+      "files": {
+        "basis/compiler/cfg/register-allocation/rematerialization/rematerialization-tests.factor": "553cd2fb018ca6f38c972898f9512470c35f7c3eb9cca62dd44781aec7857ed5"
+      }
+    },
+    {
+      "commit": "666a994e142d3304b9dcb72cd5db3433e4d653e8",
+      "files": {
+        "reference/allocator-flags-rematerialization-20260909/check.factor": "0ad1ed8b62293231558869ef7b18c244ffdf5ead644800d027891047d86089ed",
+        "reference/allocator-flags-rematerialization-20260909/metrics.factor": "f489d281e794dc20641d4781c185a18b64513b686114374a702e5720a9320595",
+        "reference/allocator-flags-rematerialization-20260909/verifier-check.factor": "aae833d1ebe0fd511b365edbeb4a2fd40ad3b37452a795cc7f850da64c2bffe4"
+      }
+    },
+    {
+      "commit": "0c8afbdb551e9213c1d2112decc0e5f59d615ba5",
+      "files": {
+        "basis/compiler/cfg/value-numbering/global/validation/validation-tests.factor": "55ef0c8063c5b49ecffd717932dda67e67e265add6c3e0f1674f1ebbadd18a85",
+        "basis/compiler/cfg/value-numbering/global/validation/validation.factor": "292f7dfaf249a20f0eb210150cb91831d7adc6a8c494fee20c4e2bd5cf9fd321",
+        "reference/compiler-gvn-verification-20260909/check.factor": "44e05a120ef3de10d6215247849e2faf996a27aa15f97d79c17727adae6a4c0c"
+      }
+    },
+    {
+      "commit": "34c98f134ccdf76fb85c1b8c1cea628091986ef9",
+      "files": {
+        "reference/compiler-flags-safety-20260909/callback-matrix.factor": "9839f76ab221f42f957ddfe97a00ca9da412cd5b39e430f6162227bffc2e22a5",
+        "reference/compiler-flags-safety-20260909/moving-gc.factor": "20d3cacb56fd748e0ccb2d13df2d5f466b14d464fcb73ededbd02fc08b0fe1fd",
+        "reference/compiler-flags-safety-20260909/callback-execute.factor": "e680ca0d1e9c5ab3cd84e97c21c539cc9e1f19d2eeba849562146f93024eb900"
+      }
+    }
+  ]
+}

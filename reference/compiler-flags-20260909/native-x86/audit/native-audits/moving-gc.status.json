@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "seconds": 1.2483909130096436,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-flags-audit-20260909/factor",
+    "-i=/home/erg/factor-compiler-flags-20260909/reference/compiler-flags-20260909/prepared.image",
+    "-no-user-init",
+    "-resource-path=/home/erg/factor-compiler-flags-audit-20260909",
+    "/home/erg/factor-compiler-flags-audit-20260909/reference/compiler-flags-safety-20260909/moving-gc.factor"
+  ],
+  "script_sha256": "20d3cacb56fd748e0ccb2d13df2d5f466b14d464fcb73ededbd02fc08b0fe1fd",
+  "image_sha256": "358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "log_sha256": "49bf266b5b4af6cdaa226b0b0c29383e79349dd4cd1ab2286a4f207569b5ceb4"
+}

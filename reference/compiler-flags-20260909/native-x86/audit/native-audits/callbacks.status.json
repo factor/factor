@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "seconds": 20.16011691093445,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-flags-audit-20260909/factor",
+    "-i=/home/erg/factor-compiler-flags-20260909/reference/compiler-flags-20260909/prepared.image",
+    "-no-user-init",
+    "-resource-path=/home/erg/factor-compiler-flags-audit-20260909",
+    "/home/erg/factor-compiler-flags-audit-20260909/reference/compiler-flags-safety-20260909/callback-matrix.factor"
+  ],
+  "script_sha256": "9839f76ab221f42f957ddfe97a00ca9da412cd5b39e430f6162227bffc2e22a5",
+  "image_sha256": "358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "log_sha256": "ab130877a8cbda31843f82057796daed584617dbb93799ba0ae53c2e3b383ef1"
+}

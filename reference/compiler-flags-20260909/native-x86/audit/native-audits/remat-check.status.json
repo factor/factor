@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "seconds": 4.4435975551605225,
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-flags-audit-20260909/factor",
+    "-i=/home/erg/factor-compiler-flags-20260909/reference/compiler-flags-20260909/prepared.image",
+    "-no-user-init",
+    "-resource-path=/home/erg/factor-compiler-flags-audit-20260909",
+    "/home/erg/factor-compiler-flags-audit-20260909/reference/allocator-flags-rematerialization-20260909/check.factor"
+  ],
+  "script_sha256": "0ad1ed8b62293231558869ef7b18c244ffdf5ead644800d027891047d86089ed",
+  "image_sha256": "358139bcf48356b821c3b3e4159ad5df77c56d921e9fbb99ffa2a4a9e5b608fd",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "log_sha256": "9b932894ef1cd3e29db90cb48a84269947c6a4aa36b34df6196ff8fb95d01eb6"
+}
