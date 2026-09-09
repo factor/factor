@@ -288,6 +288,18 @@ ERROR: uncolorable-spill-result vertex neighbors capacity ;
     ] each
     chunks ;
 
+! Free colors are in ascending bank order. A strict improvement retains the
+! smallest color on ties, matching the previous [ -score, color ] ordering
+! without sorting or allocating a comparison pair for every free color.
+:: preferred-free-color ( free preferences shared -- color )
+    free first :> best!
+    best preferences at 0 or best shared at 0 or + :> score!
+    free rest-slice [| color |
+        color preferences at 0 or color shared at 0 or + :> candidate
+        candidate score > [ color best! candidate score! ] when
+    ] each
+    best ;
+
 :: preference-guided-colors ( graph order affinities available -- colors )
     H{ } clone :> colors
     graph keys [ H{ } clone ] H{ } map>assoc :> preferences
@@ -300,10 +312,7 @@ ERROR: uncolorable-spill-result vertex neighbors capacity ;
         vertex rep-of reg-class-of available at length :> capacity
         capacity <iota> [ occupied member? not ] filter :> free
         free empty? [ vertex occupied capacity uncolorable-spill-result ] when
-        free [| color |
-            color vertex preferences at at 0 or
-            color shared at 0 or + neg color 2array
-        ] sort-by first :> chosen
+        free vertex preferences at shared preferred-free-color :> chosen
         chosen vertex colors set-at
         chosen shared inc-at
         vertex affinities at [| partner weight |
