@@ -5,7 +5,11 @@ This extends the completed 20-workload experiment in
 `benchmark/register-allocators` worktree. It preserves the full forward compilation
 closure (source references, recorded dependencies, generic methods and dispatch
 engines), fixed batches, installed code, checked validation, and foreground
-scheduling guards. The source baseline is `233db947df`.
+scheduling guards. The preliminary source baseline is `233db947df`. Final
+comparisons use correctness-repaired baseline `5600f87cbb`: the same source plus
+the SSA edge-slot and moving-GC provenance fixes (including its required import).
+The original baseline has reproduced correctness defects; its separate preliminary
+measurements do not establish the final performance comparison.
 
 Six added workloads create real register pressure: 32 live scalar floats,
 40 live integers, a two-arm branch under float pressure, 32 live SIMD values,
@@ -72,8 +76,9 @@ any default change.
 --linear-scan-remat-attribution` alternates separate source roots and frozen
 images for each allocator. Round 2 reverses revision order and rotates allocator
 order. Baseline flags are disabled (or absent); candidate rematerialization is
-explicitly enabled. Candidate loop-aware spills remain disabled unless explicitly
-requested. Every scope record stores the actual requested flags; requesting an
+explicitly enabled. The final experiment also passes `--candidate-loop-spills on`
+to enable the candidate backtracking policy. Both flags remain opt-in in ordinary
+compiler use; the baseline disables them. Every scope record stores the actual requested flags; requesting an
 enabled flag absent from that compiler fails immediately.
 
 The extra linear-scan attribution runs use candidate source with rematerialization
@@ -96,3 +101,20 @@ checks. Unchecked timing runs disable allocation checks; the driver records
 verifier setup separately from optimization flags. Final analysis reports both
 per-round and aggregate runtime ratios, and status files retain host load before
 and after each process. Host load is observational and does not reserve a core.
+
+Every timed process records its exact compiler revision in the scope and status.
+For isolated source archives, `.allocator-source-commit` supplies that identity;
+`source-manifest.py` independently hashes every compiler source path changed
+between the original baseline and candidate against `source-expected.json`.
+The checked-in baseline/candidate expected manifests identify their revisions.
+Analysis rejects mixed revisions within a label, differing frozen closures within
+a revision, and changing static code metrics across repeated processes. Different
+revisions can have different closure counts because each includes its own newly
+introduced compiler helpers. Workload definitions, batching and output checks
+are held fixed.
+
+`--allocators` allows a paired subset while a separate regression is investigated.
+A partial report must state its completed allocator/round/sample counts and does
+not constitute a full matrix. Final main analysis uses `--require-complete
+--min-samples 6`. The separate LS feature attribution uses `--baseline remat-off
+--candidate candidate --allocator linear-scan --require-complete --min-samples 6`.

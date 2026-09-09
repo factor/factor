@@ -8,6 +8,7 @@ original.pi_digits=functools.lru_cache()(original.pi_digits)
 results=collections.defaultdict(list)
 scopes={}
 options={}
+sources={}
 outputs={}
 failures=[]
 for path in sorted(a.directory.glob('*.jsonl*')):
@@ -22,6 +23,11 @@ for path in sorted(a.directory.glob('*.jsonl*')):
  with (gzip.open(path,'rt') if path.suffix=='.gz' else path.open()) as f: records=[json.loads(line) for line in f]
  for record in records:record['_round']=int(name.removesuffix('.gz').removesuffix('.jsonl').rsplit('-',1)[1])
  scope=next(x for x in records if x['kind']=='scope');allocator=scope['allocator']
+ if not scope['checked'] and scope.get('source','unrecorded')!='unrecorded':
+  source=scope['source']
+  if label in sources:assert sources[label]==source,(name,'source revision changed')
+  sources[label]=source
+  if status_path.exists():assert status.get('source_commit')==source,(name,'scope/status source mismatch')
  # Anonymous words use a frozen object index as well as a label.
  scope_words=scope['words']
  run_options=scope.get('options',{})
@@ -38,7 +44,7 @@ for path in sorted(a.directory.glob('*.jsonl*')):
    outputs[r['word']]=r['output']
  original.independently_check({k:v for k,v in current.items() if k.rsplit(':',1)[-1] in original.WORKLOADS})
  if not scope['checked']:results[(label,allocator)].extend(records)
-summary=dict(failed_runs=failures,options=options,scope_words={k:len(v) for k,v in scopes.items()},correctness='All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.',allocators={})
+summary=dict(failed_runs=failures,source_commits=sources,options=options,scope_words={k:len(v) for k,v in scopes.items()},correctness='All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.',allocators={})
 metrics=('cpu_seconds','ns','instructions')
 for allocator in ([a.allocator] if a.allocator else original.ALLOCATORS):
  b=results[(a.baseline,allocator)];c=results[(a.candidate,allocator)]
