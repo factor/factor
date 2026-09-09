@@ -97,6 +97,7 @@ pub fn registerVmWithThread(vm: *vm_mod.FactorVM) void {
 }
 
 pub fn unregisterVmFromThread() void {
+    g_current_vm = null;
     const pthread_id = std.c.pthread_self();
     const key = pthreadKey(pthread_id);
 
@@ -104,6 +105,11 @@ pub fn unregisterVmFromThread() void {
     defer thread_vm_map_lock.unlock();
 
     _ = thread_vm_map.remove(key);
+    if (thread_vm_map.count() == 0) {
+        if (thread_vm_map_allocator) |allocator| thread_vm_map.deinit(allocator);
+        thread_vm_map = .{};
+        thread_vm_map_allocator = null;
+    }
 }
 
 pub fn setCurrentVM(vm: *vm_mod.FactorVM) void {
@@ -112,6 +118,24 @@ pub fn setCurrentVM(vm: *vm_mod.FactorVM) void {
 
 pub fn getCurrentVM() ?*vm_mod.FactorVM {
     return g_current_vm;
+}
+
+test "unregister clears the current VM and releases the thread map" {
+    const vm = try vm_mod.FactorVM.init(std.testing.allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer vm.deinit();
+
+    registerVmWithThread(vm);
+    try std.testing.expectEqual(vm, getCurrentVM().?);
+    unregisterVmFromThread();
+    try std.testing.expect(getCurrentVM() == null);
+    try std.testing.expect(getVmForThread(std.c.pthread_self()) == null);
+    try std.testing.expect(thread_vm_map_allocator == null);
+    // Teardown can also be reached without a successful registration.
+    unregisterVmFromThread();
+    registerVmWithThread(vm);
+    unregisterVmFromThread();
 }
 
 pub fn getVmForThread(pthread_id: std.c.pthread_t) ?*vm_mod.FactorVM {
