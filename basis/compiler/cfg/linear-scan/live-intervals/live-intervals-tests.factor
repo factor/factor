@@ -27,7 +27,9 @@ IN: compiler.cfg.linear-scan.live-intervals.tests
     }
 } [
     V{
-        T{ ##call-gc }
+        T{ ##call-gc { gc-map T{ gc-map
+            { gc-roots V{ } } { derived-roots H{ } }
+        } } }
         T{ ##callback-inputs }
     } insns>cfg
     [ number-instructions ] [ cfg>sync-points ] bi
