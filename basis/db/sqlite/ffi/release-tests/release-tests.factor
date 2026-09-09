@@ -4,8 +4,9 @@ alien.syntax classes.struct combinators continuations db.sqlite.ffi
 environment kernel locals sequences system ;
 IN: db.sqlite.ffi.release-tests
 
-<< "sqlite-optional" "SQLITE_3534_LIBRARY" os-env
-   [ cdecl add-library ] [ "Set SQLITE_3534_LIBRARY to the enabled 3.53.4 test library" throw ] if* >>
+: load-sqlite-fixture ( -- )
+    "sqlite-optional" "SQLITE_3534_LIBRARY" os-env
+    [ cdecl add-library ] [ "Set SQLITE_3534_LIBRARY to the enabled 3.53.4 test library" throw ] if* ;
 LIBRARY: sqlite-optional
 FUNCTION: sqlite3* optional_open ( )
 FUNCTION: int optional_exec ( sqlite3* db, c-string sql )
