@@ -1,0 +1,269 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-features-arm/factor",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-features-arm",
+    "-i=/Users/erg/factor.worktrees/compiler-features-arm/factor.image",
+    "-no-user-init",
+    "/Users/erg/factor.worktrees/compiler-features-arm/reference/compiler-features-20260909/prepare.factor"
+  ],
+  "status": 0,
+  "seconds": 64.90734275,
+  "taskpolicy": [
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    },
+    {
+      "status": 0,
+      "stderr": ""
+    }
+  ],
+  "source_commit": "ad0fc337de5ce51816f8251fa490f7aee9b74074",
+  "initial_image_sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4",
+  "preparation_script_sha256": "32f438ff5051df7988a944b6edeb6be711f610707b04fb6a7f48322ec7a1e11e",
+  "prepared_image_sha256": "76166829c9dc9a1b57053a9eb8b047de406306632c886067034480511c9570be"
+}
