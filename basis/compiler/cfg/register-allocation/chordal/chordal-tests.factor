@@ -5,9 +5,9 @@ compiler.cfg.linear-scan.live-intervals compiler.cfg.linear-scan.numbering
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.chordal compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders
-compiler.cfg.utilities compiler.test cpu.architecture generalizations kernel kernel.private locals make math
+compiler.cfg.utilities compiler.test compiler.utilities cpu.architecture generalizations kernel kernel.private locals make math
 math.bitwise math.functions math.libm math.order math.private memory namespaces quotations
-sequences sequences.generalizations tools.test words ;
+sequences sequences.generalizations sorting tools.test words ;
 IN: compiler.cfg.register-allocation.chordal.tests
 
 CONSTANT: tree-graph H{ { 0 { 1 2 } } { 1 { 0 3 } } { 2 { 0 } } { 3 { 1 } } }
