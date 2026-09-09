@@ -1,91 +1,119 @@
-This experimental allocator colors the SSA interference graph before lowering
-phis. Select it with `chordal-allocator register-allocator set` after loading
-`compiler.cfg.register-allocation.chordal`.
+# Decoupled SSA chordal allocation
 
-The motivation is Hack's SSA allocation result: strict SSA interference graphs
-are chordal, permitting optimal unconstrained coloring. Maximum-cardinality
-search and greedy coloring follow the approach discussed by Pereira and
-Palsberg. Sources:
+This experimental allocator reduces register pressure in SSA form **before**
+coloring. It then certifies the rewritten interference graph, assigns physical
+registers using copy and phi preferences, and lowers SSA edges into parallel
+physical transfers. Linear scan remains the default allocator.
 
-- Sebastian Hack, [Register Allocation for Programs in SSA Form](https://publikationen.bibliothek.kit.edu/1000007166/6532), chapters 4.1, 4.3, 4.4, and 4.6.
-- Fernando Pereira and Jens Palsberg, [Register Allocation via Coloring of Chordal Graphs](https://web.cs.ucla.edu/~palsberg/paper/aplas05.pdf), APLAS 2005.
+Load `compiler.cfg.register-allocation.chordal` and select it with
+`chordal-allocator register-allocator set`. The public
+`chordal-allocation-with-registers ( cfg registers -- )` kernel accepts an
+explicit admissible bank for constrained validation.
 
-Implementation and limits:
+## Allocation pipeline
 
-- Liveness includes phi operands on incoming edges. Phi definitions occur
-  simultaneously at block entry. Interference intersects full live-range lists,
-  preserving holes, and separates machine register classes. The allocator never
-  invokes `destruct-ssa`, CSSA coalescing, or the linear-scan allocation driver.
-- Maximum-cardinality search supplies the coloring order. The allocator checks
-  that every vertex's earlier neighbors form a clique. `chordal?` reports this
-  certificate for the graph actually allocated, after representation, GC, and
-  context lowering. If false, the same greedy graph coloring remains a valid
-  heuristic; no optimal-coloring claim applies and no alternate allocator is
-  silently selected.
-- Greedy colors select physical registers within each class, respecting the
-  frame-pointer exclusion. Excess colors and fragments displaced by spills use
-  the existing next-use interval splitting primitives for repair. Calls retain
-  the backend's synchronization and operand spill-slot rules. GC roots use the
-  existing spill/reload and derived-root machinery. This is a graph-coloring
-  policy with shared interval repair, not an implementation of Hack's complete
-  pressure-reduction and register-targeting algorithm. The certificate does not
-  assert globally optimal spilling or constrained physical assignment.
-- Phi edges are resolved after assignment, with simultaneous physical moves and
-  spill-slot temporaries for cycles. Phi results can occupy stack slots, so a
-  join with more live phis than registers remains allocatable. Stack-to-stack
-  copies borrow an admissible register, preserving the widest representation
-  used in its class in a separate temporary slot. Identical locations need no
-  move. Exact SSA copies with identical representations share one interval
-  representative; representation changes and phi definitions remain distinct.
-  Initial coloring prefers phi/copy partners, then bounded recoloring revisits
-  late partners. Whole two-color connected components may exchange colors only
-  when this strictly reduces unmatched affinities. These exchanges preserve
-  every interference edge and the color palette. Copy quality can still trail
-  the default allocator's SSA coalescer.
-- Derived-pointer phis receive companion tagged-base phis before liveness.
-  These select the matching GC base on each incoming edge; a plain integer edge
-  selects immutable false. The local liveness pass seeds these relationships so
-  moving GC updates derived values correctly. Provenance uses the existing
-  arithmetic rules, including XOR for the two inputs of addition. Inconsistent
-  cyclic provenance equations raise an explicit error instead of silently
-  omitting a root.
-- SSA uses can occur before their definition in linearized block order. ABI
-  operand slots are reserved before splitting so a use-only call fragment can
-  receive its value through an incoming edge even if synchronization removes
-  its only interval use. Live-through values can likewise lose all local
-  register fragments under pressure before their definition in layout. SSA
-  live-in/live-out mapping reserves those missing stack destinations, and
-  parallel edge resolution fills them from each predecessor.
-- Graph construction sorts intervals by start and stops candidate scans beyond
-  each interval's final endpoint, then intersects complete range lists to keep
-  holes exact. Maximum-cardinality search uses a heap with deterministic vertex
-  tie breaking. Certification checks each earlier neighbor against the latest
-  earlier neighbor, using hashed adjacency. Dense graphs still require quadratic
-  storage and candidate work; this remains an experimental allocator.
+1. **Prepare SSA liveness and GC provenance.** Phi operands are uses on their
+   incoming edges. Derived-pointer phis receive companion tagged-base phis so
+   the selected address and its GC base follow the same edge. Shared allocation
+   preparation runs before the final value-flow verifier's snapshot, and the
+   chordal kernel reuses that context.
+2. **Place spills and repair SSA.** `spilling.next-use` computes CFG-wide next-use
+   distances, translates phi uses per predecessor, and penalizes exits from
+   natural loops. The source spiller tracks register-resident values and valid
+   memory homes separately. It evicts values with distant uses, protects an
+   instruction's required operands and temporaries, and emits actual stores
+   and fresh reload definitions. Block-entry selection accounts for common
+   predecessor residency and loop-local pressure. Register repair phis join
+   incoming versions; memory phis permit more live phi values than registers.
+   Edge coupling emits required stores before reloads. Proven constant recipes
+   can replace stores and reloads when rematerialization is enabled.
+3. **Certify and color the rewritten graph.** Phase-aware intervals describe
+   the resulting SSA program, excluding fixed memory tokens. Graph construction
+   intersects complete range lists, preserving holes and register classes.
+   Maximum-cardinality search produces an order whose earlier-neighbor cliques
+   are checked explicitly; its reverse is a perfect elimination order (PEO).
+   Coloring selects only registers in the supplied bank. A nonchordal graph,
+   impossible mandatory operand demand, or insufficient bank raises an error.
+4. **Prefer matching physical locations.** Copy and phi affinities carry loop
+   weights, with weaker preferences for first-input/result reuse. Affinity
+   groups share color preferences, while every interference edge remains
+   authoritative. This coalesces transfers by choosing equal legal colors;
+   it does not merge graph vertices or discard conflicting edges.
+5. **Apply the chosen assignment and destroy SSA.** Shared `ssa` and
+   `ssa.phases` helpers rename operands and resolve incoming edges. Phi
+   transfers retain simultaneous semantics, including cycles and stack-to-stack
+   copies. Scratch preservation uses the widest representation in the borrowed
+   register class. Transfers whose source and destination are already the same
+   physical location need no move.
 
-`allocator-statistics` returns vertices, edges, `chordal?`, direct physical color
-assignments, repair assignments, exact-copy aliases, and unmatched graph-color
-affinities before/after improvement. Counts include split fragments, making the
-amount of work performed by each policy visible in `compiler.cfg.metrics`.
-`check-allocation?` verifies register classes, range coverage, overlapping
-assignments, and preservation of mandatory register uses across splitting.
+The final coloring is never repaired by interval splitting or another
+allocator. Shared intervals and assignment routines transport the source
+spiller's homes and the certified colors; they do not choose an allocation
+policy. The production path does not call the legacy copy-leader or bounded
+recoloring helpers retained for direct tests.
 
-The tests exercise graph certification (including rejection of a chordless
-cycle), interval holes, branch joins, loop phi swaps, tagged roots across GC,
-FFI calls in loops, and a generated 40-value floating-point pressure case.
-Additional tests execute both paths through a 40-result phi join and check
-scalar scratch copies preserve a live-vector-width register. A native lowered
-CFG carries fresh nursery addresses through an integer phi and explicitly
-collects before returning the selected object. Both exact pointer-identity
-checks pass; disabling companion-base construction makes both fail.
+## ABI, GC, and target constraints
 
-Graph ordering and certification are checked against independent scan/clique
-oracles over all 64 undirected four-vertex graphs. Coalescing tests include a
-blocked phi affinity unlocked by a two-color exchange, an exchange that would
-lose more affinities than it gains, and copy chains whose representation changes
-must remain distinct.
+Clobber instructions end resident register versions and use explicit memory
+homes for ABI operands and live values. GC maps retain both derived pointers
+and their tagged bases after source rewriting; provenance is not reconstructed
+from opaque reloads. A plain integer input to a derived-pointer phi selects an
+immutable false base. The existing arithmetic provenance rules remain in
+force, and inconsistent cyclic provenance raises an error.
 
-An executed regression compiles `update-predecessor-phis` with an eight-register
-bank and checks both replaced and untouched incoming values. Without boundary
-slot reservation this fails with `bad-vreg` during live-in mapping. The same
-failure was independently reproduced and fixed on native x86-64.
+Factor call, prologue, and epilogue kill blocks receive no resident entry values
+or register repair phis. In particular, a callback's raw hidden result pointer
+stays in its ABI-created memory home across Factor calls, with reloads on
+ordinary blocks or edges. This preserves the existing callback contract; it
+does not introduce support for arbitrary tagged virtual values live across
+Factor calls without GC metadata.
+
+The admissible bank excludes reserved and frame registers. Scalar floating
+point and SIMD values share their physical register class. The first ordinary
+input occupies the early instruction phase; other inputs and results occupy
+the late phase. All inputs of `def-is-use-insn` are late, and temporaries span
+both phases. Distinct block-boundary endpoints avoid artificial interference
+between unrelated layout neighbors. Backend-specific two-address moves remain
+necessary.
+
+The certificate establishes chordality of the **actual rewritten graph** and
+legal uniform coloring within each admitted register class. It does not prove
+optimal spill placement, minimum copies, or optimal constrained machine-code
+assignment. Factor has no generic descriptor for arbitrary precolors and tied
+operands, so this implementation does not claim the full register-targeting
+model of the papers. Dense graphs still need quadratic adjacency storage and
+can require quadratic candidate work.
+
+## Diagnostics and validation
+
+`allocator-statistics` reports `algorithm = "decoupled-ssa-chordal"`, zero
+`fallback-count` and `repair-assignments`, source pressure stores, fresh reload
+definitions, repair/memory phis, edge blocks, and certified color assignments.
+`post-spill-chordal?` describes the graph after pressure reduction. Enabling
+`chordal-witness?` also retains that graph, its conventional PEO, color map,
+register capacities, and source store/reload counts immediately before coloring.
+These larger witnesses are omitted during normal compilation.
+
+`check-allocation?` enables interval checks. With
+`compiler.cfg.register-allocation.verifier` loaded, the public allocation
+dispatcher also checks final symbolic value flow, including phi edges, ABI
+operands, GC metadata, and rematerialization provenance. Direct kernel callers
+must use the validation wrapper or invoke snapshot/check operations explicitly.
+
+Tests include independent graph-order/clique oracles, rejection of invalid
+coloring obligations, source stores/reloads under two-register pressure,
+reduced-bank diamonds and cyclic phi permutations, floating-point and SIMD
+constraints, forty-result phi joins, and moving derived roots. The actual
+`compiler/tests/alien-large-return.factor` C fixture also executes compacting-GC
+and nested callbacks with rematerialization off and on. A source regression
+checks that a raw live-through value is saved and reloaded around a kill block
+without inserting register phis there.
+
+See [algorithm-audit.md](algorithm-audit.md) for the primary-paper and pinned
+libFirm source audit and the feature-to-code-to-test matrix. Reproduction
+scripts and retained correctness evidence are in
+[reference/allocator-full-chordal-20260908](../../../../../reference/allocator-full-chordal-20260908/).
+[measurements.md](measurements.md) records the earlier color-first prototype;
+its counts and interval-repair descriptions are historical, not measurements
+of this pipeline. Matched native runtime, code-size, and bootstrap comparisons
+are separate acceptance gates; passing correctness tests is not a speed claim.

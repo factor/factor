@@ -1,3 +1,10 @@
+# Historical color-first prototype measurements
+
+These results precede the decoupled spill-before-color implementation described
+in [README.md](README.md). They retain the earlier algorithms, counters, and
+validation state for comparison; they do not describe the current production
+pipeline or establish its performance.
+
 Native ARM64 measurements, September 8, 2026, using the shared allocator corpus
 at `reference/compiler-allocator-20260908/compare.factor`. The corpus contains
 13 word bodies producing 19 procedures. These are static totals; noisy wall
