@@ -35,8 +35,28 @@ FFI negative tests are retained, alongside the final zero-failure result.
 and is not the provenance of this new freeze. The input image is cloned into the
 integration worktree; the runs refresh changed vocabularies before testing.
 
-## Pending work
+## User-requested stopping point
 
-Combined checked closures, controlled measurements and fresh bootstrap have not
-yet been collected here. This milestone establishes only the four completed
-loaded compiler-vocabulary suites. No performance conclusion is claimed.
+Preparation completed with explicit status 0 in 3.038 seconds. Its status records
+frozen source `87ac3f9b1e19a9bee974a52d263f7abce4b61c34`, input image SHA-256
+`beb3fba75cf0895272c906db69b76c5d320cb9c85c7af07fba676b7de2813224`
+and prepared image SHA-256
+`dd9db27596600af92c5a74d4c2689fbec2c208781779aede97f03a4e089ec4fb`.
+A final taskpolicy retry reported no such process; the preparation's actual exit
+status is 0. Exact scripts, status and source markers are under `preparation/`.
+
+The final linear-scan checked-closure log contains all 40 expected payload rows:
+one checked scope, one compile, twelve code reports and twenty-six runtime output
+records. It reports the frozen source with rematerialization off, loop spills on
+and GVN off. However, the driver never saved its terminal `.status.json` or
+`.jsonl`; disappearance of its child PIDs is not an exit-status proof. This run is
+therefore **incomplete for acceptance**, not a passed closure. The original log,
+separately named archive-derived JSON records, source guard, exact launch/driver,
+and explicit audit are under `stopping-point/`.
+
+At the user's requested stop, subsequent chordal closure, paired ARM default
+compiler measurements, callback/moving-GC gates, fresh bootstrap and image check
+were not run in this pipeline. The retained queue script describes planned work,
+not evidence that every command executed. No combined ARM performance or fresh
+bootstrap claim is made. The four completed loaded compiler-vocabulary suites
+above remain the accepted ARM correctness milestone.

@@ -1,0 +1,30 @@
+{
+  "observed_at_utc": "2026-09-09T16:48:45.607131+00:00",
+  "source_commit": "87ac3f9b1e19a9bee974a52d263f7abce4b61c34",
+  "classification": "incomplete-terminal-status-unavailable",
+  "terminal_status_exists": false,
+  "driver_jsonl_exists": false,
+  "record_counts": {
+    "scope": 1,
+    "compile": 1,
+    "code": 12,
+    "runtime": 26
+  },
+  "scope_word_count": 27367,
+  "checked_scope": true,
+  "options": {
+    "backtracking_loop_spills": true,
+    "gvn": false,
+    "rematerialize_constants": false
+  },
+  "log_sha256": "75c7a85a6c63d089e27564276022d8f2f31e3d22437423dfa3f07e4999532074",
+  "preparation_status": 0,
+  "note": "All expected payload rows observed, but no terminal exit/driver success record. Not accepted as a passed closure. Parsed observed rows are archive-derived, not driver output.",
+  "not_run_after_user_stop": [
+    "chordal checked closure",
+    "ARM paired default compiler measurements",
+    "subsequent callback/moving-GC gates",
+    "fresh bootstrap",
+    "new image check"
+  ]
+}
