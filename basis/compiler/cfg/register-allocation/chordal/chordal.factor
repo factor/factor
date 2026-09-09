@@ -11,6 +11,7 @@ compiler.cfg.linear-scan.resolve compiler.cfg.linearization
 compiler.cfg.liveness compiler.cfg.predecessors
 compiler.cfg.parallel-copy
 compiler.cfg.register-allocation compiler.cfg.register-allocation.chordal.bases
+compiler.cfg.register-allocation.rematerialization
 compiler.cfg.registers compiler.cfg.rpo
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities compiler.utilities
 cpu.architecture heaps kernel locals make math namespaces sequences
@@ -320,9 +321,14 @@ SYMBOLS: graph-colors chordal-statistics phi-locations phi-entry-positions
     ] slurp-heap
     gather-intervals ;
 
-: phi-vreg>location ( vreg -- reg/slot )
+! A rematerialized constant has no initialized spill slot. Use its recipe
+! at boundaries without resident fragments, just as shared assignment does.
+: phi-vreg>location ( vreg -- reg/slot/recipe )
     leader dup pending-interval-assoc get at
-    [ nip ] [ dup rep-of assign-spill-slot ] if* ;
+    [ nip ] [
+        dup rematerialization-of
+        [ nip ] [ dup rep-of assign-spill-slot ] if*
+    ] if* ;
 
 ! A value can cross a block with no local register use. Splitting may then
 ! leave no assigned fragment at that boundary, even if a later-layout SSA

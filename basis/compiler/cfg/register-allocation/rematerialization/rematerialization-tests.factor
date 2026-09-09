@@ -7,7 +7,8 @@ compiler.cfg.linear-scan.resolve compiler.cfg.linearization
 compiler.cfg.metrics compiler.cfg.register-allocation
 compiler.cfg.register-allocation.backtracking
 compiler.cfg.register-allocation.chordal compiler.cfg.register-allocation.greedy
-compiler.cfg.register-allocation.rematerialization compiler.cfg.registers
+compiler.cfg.register-allocation.rematerialization
+compiler.cfg.register-allocation.verifier compiler.cfg.registers
 compiler.cfg.ssa.destruction.leaders compiler.cfg.utilities
 compiler.codegen compiler.test compiler.units cpu.architecture hashtables
 kernel layouts locals make math
@@ -226,7 +227,12 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
     ] change-instructions drop
     graph ;
 
+! Keep final value-flow verification active for these executed fixtures.
+! In particular, the diamond forces chordal to resolve constants at edges
+! without resident fragments; reserving a slot there instead of using the
+! recipe reads uninitialized memory on the second branch.
 { t } [
+    value-flow-verifier-enabled? t assert=
     { linear-scan-allocator greedy-allocator backtracking-allocator chordal-allocator }
     [| allocator |
         { f t } [| enabled? |
