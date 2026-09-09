@@ -5,11 +5,12 @@ USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
 fonts fonts.shaping generalizations images init io.encodings.string io.encodings.utf16 kernel
 libc literals locals math math.bitwise math.functions math.order namespaces
-opengl sequences sequences.generalizations specialized-arrays windows.errors windows.fonts
+opengl sequences sequences.generalizations sets specialized-arrays strings windows.errors windows.fonts
 windows.gdi32 windows.offscreen windows.ole32 windows.types
 windows.usp10 ;
 
 SPECIALIZED-ARRAY: uint32_t
+SPECIALIZED-ARRAY: ushort
 IN: windows.uniscribe
 
 ! Size/metrics are backing-pixel layout bounds; origin locates (0,0) in the bitmap.
@@ -91,11 +92,35 @@ PRIVATE>
             1 >>cTabStops 4 >>iScale interval >>pTabStops 0 >>iTabOrigin
     ] [ f ] if ;
 
+:: selected-font-covers-ascii? ( dc text -- ? )
+    ! Check only distinct characters, keeping the native query small even
+    ! when the paragraph contains tens of thousands of characters.
+    text members >string :> chars
+    chars length ushort <c-array> :> glyphs
+    dc chars utf16n encode chars length glyphs GGI_MARK_NONEXISTING_GLYPHS
+    GetGlyphIndicesW GDI_ERROR = [ f ] [ glyphs [ 0xffff = not ] all? ] if ;
+
+:: uniscribe-long-line-flags ( dc text flags -- flags' )
+    ! Native fallback can replace a fully supported font near 32K ASCII
+    ! characters. This conservative trigger is not an input-size limit.
+    ! Bypass fallback only when the selected font covers every glyph.
+    text length 32000 >= [
+        text [ dup 0x20 >= swap 0x7e <= and ] all? [
+            dc text selected-font-covers-ascii?
+            [ flags SSA_FALLBACK bitnot bitand ] [ flags ] if
+        ] [ flags ] if
+    ] [ flags ] if ;
+
+: uniscribe-glyph-capacity ( utf16-length -- capacity )
+    ! ScriptStringAnalyse rejects a glyph capacity above the WORD range.
+    1.5 * 16 + >integer 65535 min ;
+
 :: (make-ssa) ( dc string flags tabdef -- ssa )
-    dc string uniscribe-text utf16n encode
+    string uniscribe-text :> text
+    dc text utf16n encode
     dup length 2 /i ! cString
-    dup 1.5 * 16 + >integer ! recommended glyph buffer size
-    -1 flags 0 f f f tabdef f
+    dup uniscribe-glyph-capacity
+    -1 dc text flags uniscribe-long-line-flags 0 f f f tabdef f
     f void* <ref>
     [ ScriptStringAnalyse ] keep
     [ check-ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
