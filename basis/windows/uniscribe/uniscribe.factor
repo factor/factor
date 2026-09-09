@@ -13,7 +13,7 @@ SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
 ! Size/metrics are backing-pixel layout bounds; origin locates (0,0) in the bitmap.
-TUPLE: script-string < disposable font string metrics ssa size image origin backing-scale ;
+TUPLE: script-string < disposable font string metrics ssa size image origin backing-scale utf16-boundaries ;
 
 <PRIVATE
 
@@ -33,13 +33,33 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 :: >utf16-index ( str codepoint-index -- utf16-index )
     0 codepoint-index str subseq utf16n encode length 2 /i ;
 
+:: codepoint-boundaries ( str -- boundaries )
+    str length 1 + 0 <array> :> boundaries
+    0 :> units!
+    str [ :> i
+        0xffff > [ 2 ] [ 1 ] if units + units!
+        units i 1 + boundaries set-nth
+    ] each-index
+    boundaries ;
+
+:: boundary>codepoint ( boundaries utf16-index -- codepoint-index )
+    ! Upper bound minus one floors hits inside a surrogate pair. It also
+    ! preserves the old conversion's behavior outside either end of the text.
+    0 :> low! boundaries length :> high!
+    [ low high < ] [
+        low high + 2 /i :> middle
+        middle boundaries nth utf16-index <=
+        [ middle 1 + low! ] [ middle high! ] if
+    ] while
+    low 1 - 0 max ;
+
 PRIVATE>
 
 :: line-offset>x ( n script-string -- x )
     script-string check-disposed drop
     script-string string>> uniscribe-text :> text
     text empty? [ 0 ] [
-        text n >utf16-index :> n-utf16
+        n script-string utf16-boundaries>> nth :> n-utf16
         script-string ssa>>
         n text length = [ n-utf16 1 - TRUE ] [ n-utf16 FALSE ] if
         { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters
@@ -54,8 +74,9 @@ PRIVATE>
         :> trailing :> n
         ! Native trailing is a UTF-16 cluster length, not a boolean.
         n 0 < [ n trailing ] [
-            str n >codepoint-index :> start
-            start str n trailing + >codepoint-index start -
+            script-string utf16-boundaries>> :> boundaries
+            boundaries n boundary>codepoint :> start
+            start boundaries n trailing + boundary>codepoint start -
         ] if
     ] if ;
 
@@ -316,6 +337,7 @@ PRIVATE>
 :: <script-string> ( input-font input-string -- script-string )
     input-font snapshot-font :> font
     input-string snapshot-text :> string
+    string uniscribe-text codepoint-boundaries :> boundaries
     gl-scale-factor get-global 1.0 or :> scale
     [ :> dc
         dc font DEFAULT_QUALITY scale cache-font-at-scale SelectObject win32-error=0/f
@@ -331,7 +353,7 @@ PRIVATE>
         ! Register ownership only after all fallible native setup succeeds.
         script-string new-disposable font >>font string >>string
             metrics size first >>width >>metrics ssa >>ssa size >>size
-            scale >>backing-scale
+            scale >>backing-scale boundaries >>utf16-boundaries
     ] with-memory-dc ;
 
 PRIVATE>
@@ -346,9 +368,13 @@ SYMBOL: cached-script-strings
     ! A layout owns native glyph metrics and pixels at its backing scale.
     ! Keep key snapshots independent from the layout's own snapshots.
     font snapshot-font string snapshot-text
-    gl-scale-factor get-global 1.0 or 3array
-    cached-script-strings get-global
-    [ drop font string <script-string> ] cache ;
+    gl-scale-factor get-global 1.0 or 3array :> key
+    cached-script-strings get-global :> entries
+    key entries [ drop font string <script-string> ] cache
+    dup disposed>> [
+        drop key entries delete-at
+        font string cached-script-string
+    ] when ;
 
 : script-string>image ( script-string -- image )
     check-disposed

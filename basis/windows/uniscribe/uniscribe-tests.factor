@@ -32,6 +32,15 @@ IN: windows.uniscribe.tests
 [ disposed-script selection-columns ] [ already-disposed? ] must-fail-with
 [ disposed-script script-string>image ] [ already-disposed? ] must-fail-with
 
+:: renew-disposed-cache-entry? ( -- fresh? reusable? )
+    monospace-font "released cached analysis" cached-script-string :> old
+    old dispose
+    monospace-font "released cached analysis" cached-script-string :> fresh
+    fresh disposed>> not old fresh eq? not and
+    fresh monospace-font "released cached analysis" cached-script-string eq? ;
+
+{ t t } [ renew-disposed-cache-entry? ] unit-test
+
 ! Rasterization can happen after another window changes the global DPI.
 :: deferred-dpi-image? ( font text from-scale to-scale -- same? )
     gl-scale-factor get-global :> original
