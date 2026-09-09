@@ -577,6 +577,12 @@ unit-test
 
 TUPLE: don't-fold-boa-test-tuple < identity-tuple ;
 
+TUPLE: slotless-prop-test-tuple ;
+
+{ V{ f } }
+[ [ slotless-prop-test-tuple boa ] final-literals ]
+unit-test
+
 { V{ f } }
 [ [ don't-fold-boa-test-tuple boa ] final-literals ]
 unit-test
