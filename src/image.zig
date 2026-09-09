@@ -1171,6 +1171,7 @@ pub const ImageLoader = struct {
 
     pub fn deinit(self: *Self) void {
         if (self.code_free_list) |alloc| {
+            alloc.deinit();
             self.vm.allocator.destroy(alloc);
             self.code_free_list = null;
         }
@@ -1178,6 +1179,12 @@ pub const ImageLoader = struct {
             code.deinit();
             self.vm.allocator.destroy(code);
             self.vm.code = null;
+        }
+
+        if (self.vm.gc) |gc_inst| {
+            gc_inst.deinit();
+            self.vm.allocator.destroy(gc_inst);
+            self.vm.gc = null;
         }
 
         // Free the DataHeap - this handles segment, cards, decks, marks, object_start
@@ -1200,11 +1207,6 @@ pub const ImageLoader = struct {
         self.vm.cards_array = null;
         self.vm.decks_array = null;
 
-        if (self.vm.gc) |gc_inst| {
-            self.vm.allocator.destroy(gc_inst);
-            self.vm.gc = null;
-        }
-
         // Use the full mmap region for munmap
         if (self.code_mmap_region) |region| {
             _ = std.c.munmap(@ptrCast(region.ptr), region.len);
@@ -1224,6 +1226,33 @@ pub const ImageLoader = struct {
         }
     }
 };
+
+test "image loader releases free list and collector allocations" {
+    const allocator = std.testing.allocator;
+    const vm = try vm_mod.FactorVM.init(allocator);
+    defer vm.deinit();
+
+    var loader = ImageLoader.init(vm, std.testing.io, .{});
+    defer loader.deinit();
+
+    var code_storage: [4096]u8 align(layouts.data_alignment) = undefined;
+    const code_allocator = try allocator.create(free_list.FreeListAllocator);
+    code_allocator.* = free_list.FreeListAllocator.init(allocator, @intFromPtr(&code_storage), code_storage.len);
+    loader.code_free_list = code_allocator;
+
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    loader.data_heap_ptr = heap;
+    vm.setDataHeap(heap);
+    const collector = try allocator.create(gc_mod.GarbageCollector);
+    collector.* = gc_mod.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = collector;
+
+    loader.deinit();
+    try std.testing.expect(loader.code_free_list == null);
+    try std.testing.expect(loader.data_heap_ptr == null);
+    try std.testing.expect(vm.gc == null);
+    try std.testing.expect(vm.data == null);
+}
 
 fn objectSize(obj: *layouts.Object, obj_type: layouts.TypeTag, data_offset: Cell) Cell {
     return switch (obj_type) {
