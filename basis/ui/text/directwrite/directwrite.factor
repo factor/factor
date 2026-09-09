@@ -1,13 +1,18 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays cache kernel math.vectors namespaces opengl
-sequences ui.text ui.text.private windows.directwrite
+USING: accessors arrays cache kernel math math.vectors namespaces opengl
+sequences ui.gadgets.worlds ui.text ui.text.private ui.text.directwrite.tiles windows.directwrite
 windows.directwrite.render ;
 IN: ui.text.directwrite
 
 SINGLETON: directwrite-renderer
 
 M: directwrite-renderer draws-selection-background? t ;
+
+M: directwrite-renderer draw-string*
+    2dup cached-directwrite-layout size>> [ 512 > ] any? world get and [
+        cached-directwrite-layout draw-directwrite-tiles
+    ] [ draw-string-default ] if ;
 
 M: directwrite-renderer string-dim
     cached-directwrite-layout metrics>>
