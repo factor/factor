@@ -1,0 +1,4129 @@
+{
+  "constants": {
+    "FTS5_TOKENIZE_AUX": "0x0008",
+    "FTS5_TOKENIZE_DOCUMENT": "0x0004",
+    "FTS5_TOKENIZE_PREFIX": "0x0002",
+    "FTS5_TOKENIZE_QUERY": "0x0001",
+    "FTS5_TOKEN_COLOCATED": "0x0001",
+    "FULLY_WITHIN": "2",
+    "NOT_WITHIN": "0",
+    "PARTLY_WITHIN": "1",
+    "SQLITE_ABORT": "4",
+    "SQLITE_ABORT_ROLLBACK": "(SQLITE_ABORT | (2<<8))",
+    "SQLITE_ACCESS_EXISTS": "0",
+    "SQLITE_ACCESS_READ": "2",
+    "SQLITE_ACCESS_READWRITE": "1",
+    "SQLITE_ALTER_TABLE": "26",
+    "SQLITE_ANALYZE": "28",
+    "SQLITE_ANY": "5",
+    "SQLITE_ATTACH": "24",
+    "SQLITE_AUTH": "23",
+    "SQLITE_AUTH_USER": "(SQLITE_AUTH | (1<<8))",
+    "SQLITE_BLOB": "4",
+    "SQLITE_BUSY": "5",
+    "SQLITE_BUSY_RECOVERY": "(SQLITE_BUSY   |  (1<<8))",
+    "SQLITE_BUSY_SNAPSHOT": "(SQLITE_BUSY   |  (2<<8))",
+    "SQLITE_BUSY_TIMEOUT": "(SQLITE_BUSY   |  (3<<8))",
+    "SQLITE_CANTOPEN": "14",
+    "SQLITE_CANTOPEN_CONVPATH": "(SQLITE_CANTOPEN | (4<<8))",
+    "SQLITE_CANTOPEN_DIRTYWAL": "(SQLITE_CANTOPEN | (5<<8))",
+    "SQLITE_CANTOPEN_FULLPATH": "(SQLITE_CANTOPEN | (3<<8))",
+    "SQLITE_CANTOPEN_ISDIR": "(SQLITE_CANTOPEN | (2<<8))",
+    "SQLITE_CANTOPEN_NOTEMPDIR": "(SQLITE_CANTOPEN | (1<<8))",
+    "SQLITE_CANTOPEN_SYMLINK": "(SQLITE_CANTOPEN | (6<<8))",
+    "SQLITE_CARRAY_BLOB": "4",
+    "SQLITE_CARRAY_DOUBLE": "2",
+    "SQLITE_CARRAY_INT32": "0",
+    "SQLITE_CARRAY_INT64": "1",
+    "SQLITE_CARRAY_TEXT": "3",
+    "SQLITE_CHANGESETAPPLY_FKNOACTION": "0x0008",
+    "SQLITE_CHANGESETAPPLY_IGNORENOOP": "0x0004",
+    "SQLITE_CHANGESETAPPLY_INVERT": "0x0002",
+    "SQLITE_CHANGESETAPPLY_NOSAVEPOINT": "0x0001",
+    "SQLITE_CHANGESETSTART_INVERT": "0x0002",
+    "SQLITE_CHANGESET_ABORT": "2",
+    "SQLITE_CHANGESET_CONFLICT": "3",
+    "SQLITE_CHANGESET_CONSTRAINT": "4",
+    "SQLITE_CHANGESET_DATA": "1",
+    "SQLITE_CHANGESET_FOREIGN_KEY": "5",
+    "SQLITE_CHANGESET_NOTFOUND": "2",
+    "SQLITE_CHANGESET_OMIT": "0",
+    "SQLITE_CHANGESET_REPLACE": "1",
+    "SQLITE_CHECKPOINT_FULL": "1",
+    "SQLITE_CHECKPOINT_NOOP": "-1",
+    "SQLITE_CHECKPOINT_PASSIVE": "0",
+    "SQLITE_CHECKPOINT_RESTART": "2",
+    "SQLITE_CHECKPOINT_TRUNCATE": "3",
+    "SQLITE_CONFIG_COVERING_INDEX_SCAN": "20",
+    "SQLITE_CONFIG_GETMALLOC": "5",
+    "SQLITE_CONFIG_GETMUTEX": "11",
+    "SQLITE_CONFIG_GETPCACHE": "15",
+    "SQLITE_CONFIG_GETPCACHE2": "19",
+    "SQLITE_CONFIG_HEAP": "8",
+    "SQLITE_CONFIG_LOG": "16",
+    "SQLITE_CONFIG_LOOKASIDE": "13",
+    "SQLITE_CONFIG_MALLOC": "4",
+    "SQLITE_CONFIG_MEMDB_MAXSIZE": "29",
+    "SQLITE_CONFIG_MEMSTATUS": "9",
+    "SQLITE_CONFIG_MMAP_SIZE": "22",
+    "SQLITE_CONFIG_MULTITHREAD": "2",
+    "SQLITE_CONFIG_MUTEX": "10",
+    "SQLITE_CONFIG_PAGECACHE": "7",
+    "SQLITE_CONFIG_PCACHE": "14",
+    "SQLITE_CONFIG_PCACHE2": "18",
+    "SQLITE_CONFIG_PCACHE_HDRSZ": "24",
+    "SQLITE_CONFIG_PMASZ": "25",
+    "SQLITE_CONFIG_ROWID_IN_VIEW": "30",
+    "SQLITE_CONFIG_SCRATCH": "6",
+    "SQLITE_CONFIG_SERIALIZED": "3",
+    "SQLITE_CONFIG_SINGLETHREAD": "1",
+    "SQLITE_CONFIG_SMALL_MALLOC": "27",
+    "SQLITE_CONFIG_SORTERREF_SIZE": "28",
+    "SQLITE_CONFIG_SQLLOG": "21",
+    "SQLITE_CONFIG_STMTJRNL_SPILL": "26",
+    "SQLITE_CONFIG_URI": "17",
+    "SQLITE_CONFIG_WIN32_HEAPSIZE": "23",
+    "SQLITE_CONSTRAINT": "19",
+    "SQLITE_CONSTRAINT_CHECK": "(SQLITE_CONSTRAINT | (1<<8))",
+    "SQLITE_CONSTRAINT_COMMITHOOK": "(SQLITE_CONSTRAINT | (2<<8))",
+    "SQLITE_CONSTRAINT_DATATYPE": "(SQLITE_CONSTRAINT |(12<<8))",
+    "SQLITE_CONSTRAINT_FOREIGNKEY": "(SQLITE_CONSTRAINT | (3<<8))",
+    "SQLITE_CONSTRAINT_FUNCTION": "(SQLITE_CONSTRAINT | (4<<8))",
+    "SQLITE_CONSTRAINT_NOTNULL": "(SQLITE_CONSTRAINT | (5<<8))",
+    "SQLITE_CONSTRAINT_PINNED": "(SQLITE_CONSTRAINT |(11<<8))",
+    "SQLITE_CONSTRAINT_PRIMARYKEY": "(SQLITE_CONSTRAINT | (6<<8))",
+    "SQLITE_CONSTRAINT_ROWID": "(SQLITE_CONSTRAINT |(10<<8))",
+    "SQLITE_CONSTRAINT_TRIGGER": "(SQLITE_CONSTRAINT | (7<<8))",
+    "SQLITE_CONSTRAINT_UNIQUE": "(SQLITE_CONSTRAINT | (8<<8))",
+    "SQLITE_CONSTRAINT_VTAB": "(SQLITE_CONSTRAINT | (9<<8))",
+    "SQLITE_COPY": "0",
+    "SQLITE_CORRUPT": "11",
+    "SQLITE_CORRUPT_INDEX": "(SQLITE_CORRUPT | (3<<8))",
+    "SQLITE_CORRUPT_SEQUENCE": "(SQLITE_CORRUPT | (2<<8))",
+    "SQLITE_CORRUPT_VTAB": "(SQLITE_CORRUPT | (1<<8))",
+    "SQLITE_CREATE_INDEX": "1",
+    "SQLITE_CREATE_TABLE": "2",
+    "SQLITE_CREATE_TEMP_INDEX": "3",
+    "SQLITE_CREATE_TEMP_TABLE": "4",
+    "SQLITE_CREATE_TEMP_TRIGGER": "5",
+    "SQLITE_CREATE_TEMP_VIEW": "6",
+    "SQLITE_CREATE_TRIGGER": "7",
+    "SQLITE_CREATE_VIEW": "8",
+    "SQLITE_CREATE_VTABLE": "29",
+    "SQLITE_DBCONFIG_DEFENSIVE": "1010",
+    "SQLITE_DBCONFIG_DQS_DDL": "1014",
+    "SQLITE_DBCONFIG_DQS_DML": "1013",
+    "SQLITE_DBCONFIG_ENABLE_ATTACH_CREATE": "1020",
+    "SQLITE_DBCONFIG_ENABLE_ATTACH_WRITE": "1021",
+    "SQLITE_DBCONFIG_ENABLE_COMMENTS": "1022",
+    "SQLITE_DBCONFIG_ENABLE_FKEY": "1002",
+    "SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER": "1004",
+    "SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION": "1005",
+    "SQLITE_DBCONFIG_ENABLE_QPSG": "1007",
+    "SQLITE_DBCONFIG_ENABLE_TRIGGER": "1003",
+    "SQLITE_DBCONFIG_ENABLE_VIEW": "1015",
+    "SQLITE_DBCONFIG_LEGACY_ALTER_TABLE": "1012",
+    "SQLITE_DBCONFIG_LEGACY_FILE_FORMAT": "1016",
+    "SQLITE_DBCONFIG_LOOKASIDE": "1001",
+    "SQLITE_DBCONFIG_MAINDBNAME": "1000",
+    "SQLITE_DBCONFIG_MAX": "1022",
+    "SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE": "1006",
+    "SQLITE_DBCONFIG_RESET_DATABASE": "1009",
+    "SQLITE_DBCONFIG_REVERSE_SCANORDER": "1019",
+    "SQLITE_DBCONFIG_STMT_SCANSTATUS": "1018",
+    "SQLITE_DBCONFIG_TRIGGER_EQP": "1008",
+    "SQLITE_DBCONFIG_TRUSTED_SCHEMA": "1017",
+    "SQLITE_DBCONFIG_WRITABLE_SCHEMA": "1011",
+    "SQLITE_DBSTATUS_CACHE_HIT": "7",
+    "SQLITE_DBSTATUS_CACHE_MISS": "8",
+    "SQLITE_DBSTATUS_CACHE_SPILL": "12",
+    "SQLITE_DBSTATUS_CACHE_USED": "1",
+    "SQLITE_DBSTATUS_CACHE_USED_SHARED": "11",
+    "SQLITE_DBSTATUS_CACHE_WRITE": "9",
+    "SQLITE_DBSTATUS_DEFERRED_FKS": "10",
+    "SQLITE_DBSTATUS_LOOKASIDE_HIT": "4",
+    "SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL": "6",
+    "SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE": "5",
+    "SQLITE_DBSTATUS_LOOKASIDE_USED": "0",
+    "SQLITE_DBSTATUS_MAX": "13",
+    "SQLITE_DBSTATUS_SCHEMA_USED": "2",
+    "SQLITE_DBSTATUS_STMT_USED": "3",
+    "SQLITE_DBSTATUS_TEMPBUF_SPILL": "13",
+    "SQLITE_DELETE": "9",
+    "SQLITE_DENY": "1",
+    "SQLITE_DESERIALIZE_FREEONCLOSE": "1",
+    "SQLITE_DESERIALIZE_READONLY": "4",
+    "SQLITE_DESERIALIZE_RESIZEABLE": "2",
+    "SQLITE_DETACH": "25",
+    "SQLITE_DETERMINISTIC": "0x000000800",
+    "SQLITE_DIRECTONLY": "0x000080000",
+    "SQLITE_DONE": "101",
+    "SQLITE_DROP_INDEX": "10",
+    "SQLITE_DROP_TABLE": "11",
+    "SQLITE_DROP_TEMP_INDEX": "12",
+    "SQLITE_DROP_TEMP_TABLE": "13",
+    "SQLITE_DROP_TEMP_TRIGGER": "14",
+    "SQLITE_DROP_TEMP_VIEW": "15",
+    "SQLITE_DROP_TRIGGER": "16",
+    "SQLITE_DROP_VIEW": "17",
+    "SQLITE_DROP_VTABLE": "30",
+    "SQLITE_EMPTY": "16",
+    "SQLITE_ERROR": "1",
+    "SQLITE_ERROR_KEY": "(SQLITE_ERROR | (5<<8))",
+    "SQLITE_ERROR_MISSING_COLLSEQ": "(SQLITE_ERROR | (1<<8))",
+    "SQLITE_ERROR_RESERVESIZE": "(SQLITE_ERROR | (4<<8))",
+    "SQLITE_ERROR_RETRY": "(SQLITE_ERROR | (2<<8))",
+    "SQLITE_ERROR_SNAPSHOT": "(SQLITE_ERROR | (3<<8))",
+    "SQLITE_ERROR_UNABLE": "(SQLITE_ERROR | (6<<8))",
+    "SQLITE_FAIL": "3",
+    "SQLITE_FCNTL_BEGIN_ATOMIC_WRITE": "31",
+    "SQLITE_FCNTL_BLOCK_ON_CONNECT": "44",
+    "SQLITE_FCNTL_BUSYHANDLER": "15",
+    "SQLITE_FCNTL_CHUNK_SIZE": "6",
+    "SQLITE_FCNTL_CKPT_DONE": "37",
+    "SQLITE_FCNTL_CKPT_START": "39",
+    "SQLITE_FCNTL_CKSM_FILE": "41",
+    "SQLITE_FCNTL_COMMIT_ATOMIC_WRITE": "32",
+    "SQLITE_FCNTL_COMMIT_PHASETWO": "22",
+    "SQLITE_FCNTL_DATA_VERSION": "35",
+    "SQLITE_FCNTL_EXTERNAL_READER": "40",
+    "SQLITE_FCNTL_FILESTAT": "45",
+    "SQLITE_FCNTL_FILE_POINTER": "7",
+    "SQLITE_FCNTL_GET_LOCKPROXYFILE": "2",
+    "SQLITE_FCNTL_HAS_MOVED": "20",
+    "SQLITE_FCNTL_JOURNAL_POINTER": "28",
+    "SQLITE_FCNTL_LAST_ERRNO": "4",
+    "SQLITE_FCNTL_LOCKSTATE": "1",
+    "SQLITE_FCNTL_LOCK_TIMEOUT": "34",
+    "SQLITE_FCNTL_MMAP_SIZE": "18",
+    "SQLITE_FCNTL_NULL_IO": "43",
+    "SQLITE_FCNTL_OVERWRITE": "11",
+    "SQLITE_FCNTL_PDB": "30",
+    "SQLITE_FCNTL_PERSIST_WAL": "10",
+    "SQLITE_FCNTL_POWERSAFE_OVERWRITE": "13",
+    "SQLITE_FCNTL_PRAGMA": "14",
+    "SQLITE_FCNTL_RBU": "26",
+    "SQLITE_FCNTL_RESERVE_BYTES": "38",
+    "SQLITE_FCNTL_RESET_CACHE": "42",
+    "SQLITE_FCNTL_ROLLBACK_ATOMIC_WRITE": "33",
+    "SQLITE_FCNTL_SET_LOCKPROXYFILE": "3",
+    "SQLITE_FCNTL_SIZE_HINT": "5",
+    "SQLITE_FCNTL_SIZE_LIMIT": "36",
+    "SQLITE_FCNTL_SYNC": "21",
+    "SQLITE_FCNTL_SYNC_OMITTED": "8",
+    "SQLITE_FCNTL_TEMPFILENAME": "16",
+    "SQLITE_FCNTL_TRACE": "19",
+    "SQLITE_FCNTL_VFSNAME": "12",
+    "SQLITE_FCNTL_VFS_POINTER": "27",
+    "SQLITE_FCNTL_WAL_BLOCK": "24",
+    "SQLITE_FCNTL_WIN32_AV_RETRY": "9",
+    "SQLITE_FCNTL_WIN32_GET_HANDLE": "29",
+    "SQLITE_FCNTL_WIN32_SET_HANDLE": "23",
+    "SQLITE_FCNTL_ZIPVFS": "25",
+    "SQLITE_FLOAT": "2",
+    "SQLITE_FORMAT": "24",
+    "SQLITE_FULL": "13",
+    "SQLITE_FUNCTION": "31",
+    "SQLITE_GET_LOCKPROXYFILE": "SQLITE_FCNTL_GET_LOCKPROXYFILE",
+    "SQLITE_IGNORE": "2",
+    "SQLITE_INDEX_CONSTRAINT_EQ": "2",
+    "SQLITE_INDEX_CONSTRAINT_FUNCTION": "150",
+    "SQLITE_INDEX_CONSTRAINT_GE": "32",
+    "SQLITE_INDEX_CONSTRAINT_GLOB": "66",
+    "SQLITE_INDEX_CONSTRAINT_GT": "4",
+    "SQLITE_INDEX_CONSTRAINT_IS": "72",
+    "SQLITE_INDEX_CONSTRAINT_ISNOT": "69",
+    "SQLITE_INDEX_CONSTRAINT_ISNOTNULL": "70",
+    "SQLITE_INDEX_CONSTRAINT_ISNULL": "71",
+    "SQLITE_INDEX_CONSTRAINT_LE": "8",
+    "SQLITE_INDEX_CONSTRAINT_LIKE": "65",
+    "SQLITE_INDEX_CONSTRAINT_LIMIT": "73",
+    "SQLITE_INDEX_CONSTRAINT_LT": "16",
+    "SQLITE_INDEX_CONSTRAINT_MATCH": "64",
+    "SQLITE_INDEX_CONSTRAINT_NE": "68",
+    "SQLITE_INDEX_CONSTRAINT_OFFSET": "74",
+    "SQLITE_INDEX_CONSTRAINT_REGEXP": "67",
+    "SQLITE_INDEX_SCAN_HEX": "0x00000002",
+    "SQLITE_INDEX_SCAN_UNIQUE": "0x00000001",
+    "SQLITE_INNOCUOUS": "0x000200000",
+    "SQLITE_INSERT": "18",
+    "SQLITE_INTEGER": "1",
+    "SQLITE_INTERNAL": "2",
+    "SQLITE_INTERRUPT": "9",
+    "SQLITE_IOCAP_ATOMIC": "0x00000001",
+    "SQLITE_IOCAP_ATOMIC16K": "0x00000040",
+    "SQLITE_IOCAP_ATOMIC1K": "0x00000004",
+    "SQLITE_IOCAP_ATOMIC2K": "0x00000008",
+    "SQLITE_IOCAP_ATOMIC32K": "0x00000080",
+    "SQLITE_IOCAP_ATOMIC4K": "0x00000010",
+    "SQLITE_IOCAP_ATOMIC512": "0x00000002",
+    "SQLITE_IOCAP_ATOMIC64K": "0x00000100",
+    "SQLITE_IOCAP_ATOMIC8K": "0x00000020",
+    "SQLITE_IOCAP_BATCH_ATOMIC": "0x00004000",
+    "SQLITE_IOCAP_IMMUTABLE": "0x00002000",
+    "SQLITE_IOCAP_POWERSAFE_OVERWRITE": "0x00001000",
+    "SQLITE_IOCAP_SAFE_APPEND": "0x00000200",
+    "SQLITE_IOCAP_SEQUENTIAL": "0x00000400",
+    "SQLITE_IOCAP_SUBPAGE_READ": "0x00008000",
+    "SQLITE_IOCAP_UNDELETABLE_WHEN_OPEN": "0x00000800",
+    "SQLITE_IOERR": "10",
+    "SQLITE_IOERR_ACCESS": "(SQLITE_IOERR | (13<<8))",
+    "SQLITE_IOERR_AUTH": "(SQLITE_IOERR | (28<<8))",
+    "SQLITE_IOERR_BADKEY": "(SQLITE_IOERR | (35<<8))",
+    "SQLITE_IOERR_BEGIN_ATOMIC": "(SQLITE_IOERR | (29<<8))",
+    "SQLITE_IOERR_BLOCKED": "(SQLITE_IOERR | (11<<8))",
+    "SQLITE_IOERR_CHECKRESERVEDLOCK": "(SQLITE_IOERR | (14<<8))",
+    "SQLITE_IOERR_CLOSE": "(SQLITE_IOERR | (16<<8))",
+    "SQLITE_IOERR_CODEC": "(SQLITE_IOERR | (36<<8))",
+    "SQLITE_IOERR_COMMIT_ATOMIC": "(SQLITE_IOERR | (30<<8))",
+    "SQLITE_IOERR_CONVPATH": "(SQLITE_IOERR | (26<<8))",
+    "SQLITE_IOERR_CORRUPTFS": "(SQLITE_IOERR | (33<<8))",
+    "SQLITE_IOERR_DATA": "(SQLITE_IOERR | (32<<8))",
+    "SQLITE_IOERR_DELETE": "(SQLITE_IOERR | (10<<8))",
+    "SQLITE_IOERR_DELETE_NOENT": "(SQLITE_IOERR | (23<<8))",
+    "SQLITE_IOERR_DIR_CLOSE": "(SQLITE_IOERR | (17<<8))",
+    "SQLITE_IOERR_DIR_FSYNC": "(SQLITE_IOERR | (5<<8))",
+    "SQLITE_IOERR_FSTAT": "(SQLITE_IOERR | (7<<8))",
+    "SQLITE_IOERR_FSYNC": "(SQLITE_IOERR | (4<<8))",
+    "SQLITE_IOERR_GETTEMPPATH": "(SQLITE_IOERR | (25<<8))",
+    "SQLITE_IOERR_IN_PAGE": "(SQLITE_IOERR | (34<<8))",
+    "SQLITE_IOERR_LOCK": "(SQLITE_IOERR | (15<<8))",
+    "SQLITE_IOERR_MMAP": "(SQLITE_IOERR | (24<<8))",
+    "SQLITE_IOERR_NOMEM": "(SQLITE_IOERR | (12<<8))",
+    "SQLITE_IOERR_RDLOCK": "(SQLITE_IOERR | (9<<8))",
+    "SQLITE_IOERR_READ": "(SQLITE_IOERR | (1<<8))",
+    "SQLITE_IOERR_ROLLBACK_ATOMIC": "(SQLITE_IOERR | (31<<8))",
+    "SQLITE_IOERR_SEEK": "(SQLITE_IOERR | (22<<8))",
+    "SQLITE_IOERR_SHMLOCK": "(SQLITE_IOERR | (20<<8))",
+    "SQLITE_IOERR_SHMMAP": "(SQLITE_IOERR | (21<<8))",
+    "SQLITE_IOERR_SHMOPEN": "(SQLITE_IOERR | (18<<8))",
+    "SQLITE_IOERR_SHMSIZE": "(SQLITE_IOERR | (19<<8))",
+    "SQLITE_IOERR_SHORT_READ": "(SQLITE_IOERR | (2<<8))",
+    "SQLITE_IOERR_TRUNCATE": "(SQLITE_IOERR | (6<<8))",
+    "SQLITE_IOERR_UNLOCK": "(SQLITE_IOERR | (8<<8))",
+    "SQLITE_IOERR_VNODE": "(SQLITE_IOERR | (27<<8))",
+    "SQLITE_IOERR_WRITE": "(SQLITE_IOERR | (3<<8))",
+    "SQLITE_LAST_ERRNO": "SQLITE_FCNTL_LAST_ERRNO",
+    "SQLITE_LIMIT_ATTACHED": "7",
+    "SQLITE_LIMIT_COLUMN": "2",
+    "SQLITE_LIMIT_COMPOUND_SELECT": "4",
+    "SQLITE_LIMIT_EXPR_DEPTH": "3",
+    "SQLITE_LIMIT_FUNCTION_ARG": "6",
+    "SQLITE_LIMIT_LENGTH": "0",
+    "SQLITE_LIMIT_LIKE_PATTERN_LENGTH": "8",
+    "SQLITE_LIMIT_SQL_LENGTH": "1",
+    "SQLITE_LIMIT_TRIGGER_DEPTH": "10",
+    "SQLITE_LIMIT_VARIABLE_NUMBER": "9",
+    "SQLITE_LIMIT_VDBE_OP": "5",
+    "SQLITE_LIMIT_WORKER_THREADS": "11",
+    "SQLITE_LOCKED": "6",
+    "SQLITE_LOCKED_SHAREDCACHE": "(SQLITE_LOCKED |  (1<<8))",
+    "SQLITE_LOCKED_VTAB": "(SQLITE_LOCKED |  (2<<8))",
+    "SQLITE_LOCK_EXCLUSIVE": "4",
+    "SQLITE_LOCK_NONE": "0",
+    "SQLITE_LOCK_PENDING": "3",
+    "SQLITE_LOCK_RESERVED": "2",
+    "SQLITE_LOCK_SHARED": "1",
+    "SQLITE_MISMATCH": "20",
+    "SQLITE_MISUSE": "21",
+    "SQLITE_MUTEX_FAST": "0",
+    "SQLITE_MUTEX_RECURSIVE": "1",
+    "SQLITE_MUTEX_STATIC_APP1": "8",
+    "SQLITE_MUTEX_STATIC_APP2": "9",
+    "SQLITE_MUTEX_STATIC_APP3": "10",
+    "SQLITE_MUTEX_STATIC_LRU": "6",
+    "SQLITE_MUTEX_STATIC_LRU2": "7",
+    "SQLITE_MUTEX_STATIC_MAIN": "2",
+    "SQLITE_MUTEX_STATIC_MASTER": "2",
+    "SQLITE_MUTEX_STATIC_MEM": "3",
+    "SQLITE_MUTEX_STATIC_MEM2": "4",
+    "SQLITE_MUTEX_STATIC_OPEN": "4",
+    "SQLITE_MUTEX_STATIC_PMEM": "7",
+    "SQLITE_MUTEX_STATIC_PRNG": "5",
+    "SQLITE_MUTEX_STATIC_VFS1": "11",
+    "SQLITE_MUTEX_STATIC_VFS2": "12",
+    "SQLITE_MUTEX_STATIC_VFS3": "13",
+    "SQLITE_NOLFS": "22",
+    "SQLITE_NOMEM": "7",
+    "SQLITE_NOTADB": "26",
+    "SQLITE_NOTFOUND": "12",
+    "SQLITE_NOTICE": "27",
+    "SQLITE_NOTICE_RBU": "(SQLITE_NOTICE | (3<<8))",
+    "SQLITE_NOTICE_RECOVER_ROLLBACK": "(SQLITE_NOTICE | (2<<8))",
+    "SQLITE_NOTICE_RECOVER_WAL": "(SQLITE_NOTICE | (1<<8))",
+    "SQLITE_NULL": "5",
+    "SQLITE_OK": "0",
+    "SQLITE_OK_LOAD_PERMANENTLY": "(SQLITE_OK | (1<<8))",
+    "SQLITE_OK_SYMLINK": "(SQLITE_OK | (2<<8))",
+    "SQLITE_OPEN_AUTOPROXY": "0x00000020",
+    "SQLITE_OPEN_CREATE": "0x00000004",
+    "SQLITE_OPEN_DELETEONCLOSE": "0x00000008",
+    "SQLITE_OPEN_EXCLUSIVE": "0x00000010",
+    "SQLITE_OPEN_EXRESCODE": "0x02000000",
+    "SQLITE_OPEN_FULLMUTEX": "0x00010000",
+    "SQLITE_OPEN_MAIN_DB": "0x00000100",
+    "SQLITE_OPEN_MAIN_JOURNAL": "0x00000800",
+    "SQLITE_OPEN_MASTER_JOURNAL": "0x00004000",
+    "SQLITE_OPEN_MEMORY": "0x00000080",
+    "SQLITE_OPEN_NOFOLLOW": "0x01000000",
+    "SQLITE_OPEN_NOMUTEX": "0x00008000",
+    "SQLITE_OPEN_PRIVATECACHE": "0x00040000",
+    "SQLITE_OPEN_READONLY": "0x00000001",
+    "SQLITE_OPEN_READWRITE": "0x00000002",
+    "SQLITE_OPEN_SHAREDCACHE": "0x00020000",
+    "SQLITE_OPEN_SUBJOURNAL": "0x00002000",
+    "SQLITE_OPEN_SUPER_JOURNAL": "0x00004000",
+    "SQLITE_OPEN_TEMP_DB": "0x00000200",
+    "SQLITE_OPEN_TEMP_JOURNAL": "0x00001000",
+    "SQLITE_OPEN_TRANSIENT_DB": "0x00000400",
+    "SQLITE_OPEN_URI": "0x00000040",
+    "SQLITE_OPEN_WAL": "0x00080000",
+    "SQLITE_PERM": "3",
+    "SQLITE_PRAGMA": "19",
+    "SQLITE_PREPARE_DONT_LOG": "0x10",
+    "SQLITE_PREPARE_NORMALIZE": "0x02",
+    "SQLITE_PREPARE_NO_VTAB": "0x04",
+    "SQLITE_PREPARE_PERSISTENT": "0x01",
+    "SQLITE_PROTOCOL": "15",
+    "SQLITE_RANGE": "25",
+    "SQLITE_READ": "20",
+    "SQLITE_READONLY": "8",
+    "SQLITE_READONLY_CANTINIT": "(SQLITE_READONLY | (5<<8))",
+    "SQLITE_READONLY_CANTLOCK": "(SQLITE_READONLY | (2<<8))",
+    "SQLITE_READONLY_DBMOVED": "(SQLITE_READONLY | (4<<8))",
+    "SQLITE_READONLY_DIRECTORY": "(SQLITE_READONLY | (6<<8))",
+    "SQLITE_READONLY_RECOVERY": "(SQLITE_READONLY | (1<<8))",
+    "SQLITE_READONLY_ROLLBACK": "(SQLITE_READONLY | (3<<8))",
+    "SQLITE_RECURSIVE": "33",
+    "SQLITE_REINDEX": "27",
+    "SQLITE_REPLACE": "5",
+    "SQLITE_RESULT_SUBTYPE": "0x001000000",
+    "SQLITE_ROLLBACK": "1",
+    "SQLITE_ROW": "100",
+    "SQLITE_SAVEPOINT": "32",
+    "SQLITE_SCANSTAT_COMPLEX": "0x0001",
+    "SQLITE_SCANSTAT_EST": "2",
+    "SQLITE_SCANSTAT_EXPLAIN": "4",
+    "SQLITE_SCANSTAT_NAME": "3",
+    "SQLITE_SCANSTAT_NCYCLE": "7",
+    "SQLITE_SCANSTAT_NLOOP": "0",
+    "SQLITE_SCANSTAT_NVISIT": "1",
+    "SQLITE_SCANSTAT_PARENTID": "6",
+    "SQLITE_SCANSTAT_SELECTID": "5",
+    "SQLITE_SCHEMA": "17",
+    "SQLITE_SCM_BRANCH": "\"trunk\"",
+    "SQLITE_SCM_DATETIME": "\"2025-11-04T19:38:17.314Z\"",
+    "SQLITE_SCM_TAGS": "\"release major-release version-3.51.0\"",
+    "SQLITE_SELECT": "21",
+    "SQLITE_SELFORDER1": "0x002000000",
+    "SQLITE_SERIALIZE_NOCOPY": "0x001",
+    "SQLITE_SESSION_CONFIG_STRMSIZE": "1",
+    "SQLITE_SESSION_OBJCONFIG_ROWID": "2",
+    "SQLITE_SESSION_OBJCONFIG_SIZE": "1",
+    "SQLITE_SETLK_BLOCK_ON_CONNECT": "0x01",
+    "SQLITE_SET_LOCKPROXYFILE": "SQLITE_FCNTL_SET_LOCKPROXYFILE",
+    "SQLITE_SHM_EXCLUSIVE": "8",
+    "SQLITE_SHM_LOCK": "2",
+    "SQLITE_SHM_NLOCK": "8",
+    "SQLITE_SHM_SHARED": "4",
+    "SQLITE_SHM_UNLOCK": "1",
+    "SQLITE_SOURCE_ID": "\"2025-11-04 19:38:17 fb2c931ae597f8d00a37574ff67aeed3eced4e5547f9120744ae4bfa8e74527b\"",
+    "SQLITE_STATIC": "((sqlite3_destructor_type)0)",
+    "SQLITE_STATUS_MALLOC_COUNT": "9",
+    "SQLITE_STATUS_MALLOC_SIZE": "5",
+    "SQLITE_STATUS_MEMORY_USED": "0",
+    "SQLITE_STATUS_PAGECACHE_OVERFLOW": "2",
+    "SQLITE_STATUS_PAGECACHE_SIZE": "7",
+    "SQLITE_STATUS_PAGECACHE_USED": "1",
+    "SQLITE_STATUS_PARSER_STACK": "6",
+    "SQLITE_STATUS_SCRATCH_OVERFLOW": "4",
+    "SQLITE_STATUS_SCRATCH_SIZE": "8",
+    "SQLITE_STATUS_SCRATCH_USED": "3",
+    "SQLITE_STMTSTATUS_AUTOINDEX": "3",
+    "SQLITE_STMTSTATUS_FILTER_HIT": "8",
+    "SQLITE_STMTSTATUS_FILTER_MISS": "7",
+    "SQLITE_STMTSTATUS_FULLSCAN_STEP": "1",
+    "SQLITE_STMTSTATUS_MEMUSED": "99",
+    "SQLITE_STMTSTATUS_REPREPARE": "5",
+    "SQLITE_STMTSTATUS_RUN": "6",
+    "SQLITE_STMTSTATUS_SORT": "2",
+    "SQLITE_STMTSTATUS_VM_STEP": "4",
+    "SQLITE_SUBTYPE": "0x000100000",
+    "SQLITE_SYNC_DATAONLY": "0x00010",
+    "SQLITE_SYNC_FULL": "0x00003",
+    "SQLITE_SYNC_NORMAL": "0x00002",
+    "SQLITE_TESTCTRL_ALWAYS": "13",
+    "SQLITE_TESTCTRL_ASSERT": "12",
+    "SQLITE_TESTCTRL_BENIGN_MALLOC_HOOKS": "10",
+    "SQLITE_TESTCTRL_BITVEC_TEST": "8",
+    "SQLITE_TESTCTRL_BYTEORDER": "22",
+    "SQLITE_TESTCTRL_EXPLAIN_STMT": "19",
+    "SQLITE_TESTCTRL_EXTRA_SCHEMA_CHECKS": "29",
+    "SQLITE_TESTCTRL_FAULT_INSTALL": "9",
+    "SQLITE_TESTCTRL_FIRST": "5",
+    "SQLITE_TESTCTRL_FK_NO_ACTION": "7",
+    "SQLITE_TESTCTRL_GETOPT": "16",
+    "SQLITE_TESTCTRL_IMPOSTER": "25",
+    "SQLITE_TESTCTRL_INTERNAL_FUNCTIONS": "17",
+    "SQLITE_TESTCTRL_ISINIT": "23",
+    "SQLITE_TESTCTRL_ISKEYWORD": "16",
+    "SQLITE_TESTCTRL_JSON_SELFCHECK": "14",
+    "SQLITE_TESTCTRL_LAST": "34",
+    "SQLITE_TESTCTRL_LOCALTIME_FAULT": "18",
+    "SQLITE_TESTCTRL_LOGEST": "33",
+    "SQLITE_TESTCTRL_NEVER_CORRUPT": "20",
+    "SQLITE_TESTCTRL_ONCE_RESET_THRESHOLD": "19",
+    "SQLITE_TESTCTRL_OPTIMIZATIONS": "15",
+    "SQLITE_TESTCTRL_PARSER_COVERAGE": "26",
+    "SQLITE_TESTCTRL_PENDING_BYTE": "11",
+    "SQLITE_TESTCTRL_PRNG_RESET": "7",
+    "SQLITE_TESTCTRL_PRNG_RESTORE": "6",
+    "SQLITE_TESTCTRL_PRNG_SAVE": "5",
+    "SQLITE_TESTCTRL_PRNG_SEED": "28",
+    "SQLITE_TESTCTRL_RESERVE": "14",
+    "SQLITE_TESTCTRL_RESULT_INTREAL": "27",
+    "SQLITE_TESTCTRL_SCRATCHMALLOC": "17",
+    "SQLITE_TESTCTRL_SEEK_COUNT": "30",
+    "SQLITE_TESTCTRL_SORTER_MMAP": "24",
+    "SQLITE_TESTCTRL_TRACEFLAGS": "31",
+    "SQLITE_TESTCTRL_TUNE": "32",
+    "SQLITE_TESTCTRL_USELONGDOUBLE": "34",
+    "SQLITE_TESTCTRL_VDBE_COVERAGE": "21",
+    "SQLITE_TEXT": "3",
+    "SQLITE_TOOBIG": "18",
+    "SQLITE_TRACE_CLOSE": "0x08",
+    "SQLITE_TRACE_PROFILE": "0x02",
+    "SQLITE_TRACE_ROW": "0x04",
+    "SQLITE_TRACE_STMT": "0x01",
+    "SQLITE_TRANSACTION": "22",
+    "SQLITE_TRANSIENT": "((sqlite3_destructor_type)-1)",
+    "SQLITE_TXN_NONE": "0",
+    "SQLITE_TXN_READ": "1",
+    "SQLITE_TXN_WRITE": "2",
+    "SQLITE_UPDATE": "23",
+    "SQLITE_UTF16": "4",
+    "SQLITE_UTF16BE": "3",
+    "SQLITE_UTF16LE": "2",
+    "SQLITE_UTF16_ALIGNED": "8",
+    "SQLITE_UTF8": "1",
+    "SQLITE_VERSION": "\"3.51.0\"",
+    "SQLITE_VERSION_NUMBER": "3051000",
+    "SQLITE_VTAB_CONSTRAINT_SUPPORT": "1",
+    "SQLITE_VTAB_DIRECTONLY": "3",
+    "SQLITE_VTAB_INNOCUOUS": "2",
+    "SQLITE_VTAB_USES_ALL_SCHEMAS": "4",
+    "SQLITE_WARNING": "28",
+    "SQLITE_WARNING_AUTOINDEX": "(SQLITE_WARNING | (1<<8))",
+    "SQLITE_WIN32_DATA_DIRECTORY_TYPE": "1",
+    "SQLITE_WIN32_TEMP_DIRECTORY_TYPE": "2"
+  },
+  "functions": {
+    "sqlite3_aggregate_context": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int"
+      ],
+      "signature": "void *(sqlite3_context *, int)",
+      "variadic": false
+    },
+    "sqlite3_aggregate_count": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "int (sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_auto_extension": {
+      "category": "core",
+      "params": [
+        "void (*)(void)"
+      ],
+      "signature": "int (void (*)(void))",
+      "variadic": false
+    },
+    "sqlite3_autovacuum_pages": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "unsigned int (*)(void *, const char *, unsigned int, unsigned int, unsigned int)",
+        "void *",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, unsigned int (*)(void *, const char *, unsigned int, unsigned int, unsigned int), void *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_backup_finish": {
+      "category": "core",
+      "params": [
+        "sqlite3_backup *"
+      ],
+      "signature": "int (sqlite3_backup *)",
+      "variadic": false
+    },
+    "sqlite3_backup_init": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "sqlite3_backup *(sqlite3 *, const char *, sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_backup_pagecount": {
+      "category": "core",
+      "params": [
+        "sqlite3_backup *"
+      ],
+      "signature": "int (sqlite3_backup *)",
+      "variadic": false
+    },
+    "sqlite3_backup_remaining": {
+      "category": "core",
+      "params": [
+        "sqlite3_backup *"
+      ],
+      "signature": "int (sqlite3_backup *)",
+      "variadic": false
+    },
+    "sqlite3_backup_step": {
+      "category": "core",
+      "params": [
+        "sqlite3_backup *",
+        "int"
+      ],
+      "signature": "int (sqlite3_backup *, int)",
+      "variadic": false
+    },
+    "sqlite3_bind_blob": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_bind_blob64": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const void *",
+        "sqlite3_uint64",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const void *, sqlite3_uint64, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_bind_double": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "double"
+      ],
+      "signature": "int (sqlite3_stmt *, int, double)",
+      "variadic": false
+    },
+    "sqlite3_bind_int": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_bind_int64": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "sqlite3_int64"
+      ],
+      "signature": "int (sqlite3_stmt *, int, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_bind_null": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_bind_parameter_count": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_bind_parameter_index": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3_stmt *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_bind_parameter_name": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_bind_pointer": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "void *",
+        "const char *",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, void *, const char *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_bind_text": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const char *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const char *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_bind_text16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_bind_text64": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const char *",
+        "sqlite3_uint64",
+        "void (*)(void *)",
+        "unsigned char"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const char *, sqlite3_uint64, void (*)(void *), unsigned char)",
+      "variadic": false
+    },
+    "sqlite3_bind_value": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "const sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_stmt *, int, const sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_bind_zeroblob": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_bind_zeroblob64": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "sqlite3_uint64"
+      ],
+      "signature": "int (sqlite3_stmt *, int, sqlite3_uint64)",
+      "variadic": false
+    },
+    "sqlite3_blob_bytes": {
+      "category": "core",
+      "params": [
+        "sqlite3_blob *"
+      ],
+      "signature": "int (sqlite3_blob *)",
+      "variadic": false
+    },
+    "sqlite3_blob_close": {
+      "category": "core",
+      "params": [
+        "sqlite3_blob *"
+      ],
+      "signature": "int (sqlite3_blob *)",
+      "variadic": false
+    },
+    "sqlite3_blob_open": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "const char *",
+        "const char *",
+        "sqlite3_int64",
+        "int",
+        "sqlite3_blob **"
+      ],
+      "signature": "int (sqlite3 *, const char *, const char *, const char *, sqlite3_int64, int, sqlite3_blob **)",
+      "variadic": false
+    },
+    "sqlite3_blob_read": {
+      "category": "core",
+      "params": [
+        "sqlite3_blob *",
+        "void *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_blob *, void *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_blob_reopen": {
+      "category": "core",
+      "params": [
+        "sqlite3_blob *",
+        "sqlite3_int64"
+      ],
+      "signature": "int (sqlite3_blob *, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_blob_write": {
+      "category": "core",
+      "params": [
+        "sqlite3_blob *",
+        "const void *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_blob *, const void *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_busy_handler": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, int (*)(void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3_busy_timeout": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int)",
+      "variadic": false
+    },
+    "sqlite3_cancel_auto_extension": {
+      "category": "core",
+      "params": [
+        "void (*)(void)"
+      ],
+      "signature": "int (void (*)(void))",
+      "variadic": false
+    },
+    "sqlite3_carray_bind": {
+      "category": "carray",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "void *",
+        "int",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3_stmt *, int, void *, int, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_changes": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_changes64": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_clear_bindings": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_close": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_close_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_collation_needed": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void *",
+        "void (*)(void *, sqlite3 *, int, const char *)"
+      ],
+      "signature": "int (sqlite3 *, void *, void (*)(void *, sqlite3 *, int, const char *))",
+      "variadic": false
+    },
+    "sqlite3_collation_needed16": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void *",
+        "void (*)(void *, sqlite3 *, int, const void *)"
+      ],
+      "signature": "int (sqlite3 *, void *, void (*)(void *, sqlite3 *, int, const void *))",
+      "variadic": false
+    },
+    "sqlite3_column_blob": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_bytes": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_bytes16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_count": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_column_database_name": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_database_name16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_decltype": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_decltype16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_double": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "double (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_int": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_int64": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_name": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_name16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_origin_name": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_origin_name16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_table_name": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_table_name16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_text": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const unsigned char *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_text16": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "const void *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_type": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_column_value": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "sqlite3_value *(sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_commit_hook": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, int (*)(void *), void *)",
+      "variadic": false
+    },
+    "sqlite3_compileoption_get": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "const char *(int)",
+      "variadic": false
+    },
+    "sqlite3_compileoption_used": {
+      "category": "core",
+      "params": [
+        "const char *"
+      ],
+      "signature": "int (const char *)",
+      "variadic": false
+    },
+    "sqlite3_complete": {
+      "category": "core",
+      "params": [
+        "const char *"
+      ],
+      "signature": "int (const char *)",
+      "variadic": false
+    },
+    "sqlite3_complete16": {
+      "category": "core",
+      "params": [
+        "const void *"
+      ],
+      "signature": "int (const void *)",
+      "variadic": false
+    },
+    "sqlite3_config": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "int (int, ...)",
+      "variadic": true
+    },
+    "sqlite3_context_db_handle": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "sqlite3 *(sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_create_collation": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "void *",
+        "int (*)(void *, int, const void *, int, const void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, void *, int (*)(void *, int, const void *, int, const void *))",
+      "variadic": false
+    },
+    "sqlite3_create_collation16": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const void *",
+        "int",
+        "void *",
+        "int (*)(void *, int, const void *, int, const void *)"
+      ],
+      "signature": "int (sqlite3 *, const void *, int, void *, int (*)(void *, int, const void *, int, const void *))",
+      "variadic": false
+    },
+    "sqlite3_create_collation_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "void *",
+        "int (*)(void *, int, const void *, int, const void *)",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, void *, int (*)(void *, int, const void *, int, const void *), void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_create_filename": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "const char *",
+        "const char *",
+        "int",
+        "const char **"
+      ],
+      "signature": "sqlite3_filename (const char *, const char *, const char *, int, const char **)",
+      "variadic": false
+    },
+    "sqlite3_create_function": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "int",
+        "void *",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, int, void *, void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *))",
+      "variadic": false
+    },
+    "sqlite3_create_function16": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const void *",
+        "int",
+        "int",
+        "void *",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *)"
+      ],
+      "signature": "int (sqlite3 *, const void *, int, int, void *, void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *))",
+      "variadic": false
+    },
+    "sqlite3_create_function_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "int",
+        "void *",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *)",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, int, void *, void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *), void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_create_module": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "const sqlite3_module *",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, const char *, const sqlite3_module *, void *)",
+      "variadic": false
+    },
+    "sqlite3_create_module_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "const sqlite3_module *",
+        "void *",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, const sqlite3_module *, void *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_create_window_function": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "int",
+        "void *",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(sqlite3_context *)",
+        "void (*)(sqlite3_context *)",
+        "void (*)(sqlite3_context *, int, sqlite3_value **)",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, int, void *, void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(sqlite3_context *), void (*)(sqlite3_context *), void (*)(sqlite3_context *, int, sqlite3_value **), void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_data_count": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_database_file_object": {
+      "category": "core",
+      "params": [
+        "const char *"
+      ],
+      "signature": "sqlite3_file *(const char *)",
+      "variadic": false
+    },
+    "sqlite3_db_cacheflush": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_db_config": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, ...)",
+      "variadic": true
+    },
+    "sqlite3_db_filename": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "sqlite3_filename (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_db_handle": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "sqlite3 *(sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_db_mutex": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "sqlite3_mutex *(sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_db_name": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3 *, int)",
+      "variadic": false
+    },
+    "sqlite3_db_readonly": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_db_release_memory": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_db_status": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "int *",
+        "int *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, int *, int *, int)",
+      "variadic": false
+    },
+    "sqlite3_db_status64": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "sqlite3_int64 *",
+        "sqlite3_int64 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, sqlite3_int64 *, sqlite3_int64 *, int)",
+      "variadic": false
+    },
+    "sqlite3_declare_vtab": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_deserialize": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "unsigned char *",
+        "sqlite3_int64",
+        "sqlite3_int64",
+        "unsigned int"
+      ],
+      "signature": "int (sqlite3 *, const char *, unsigned char *, sqlite3_int64, sqlite3_int64, unsigned int)",
+      "variadic": false
+    },
+    "sqlite3_drop_modules": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char **"
+      ],
+      "signature": "int (sqlite3 *, const char **)",
+      "variadic": false
+    },
+    "sqlite3_enable_load_extension": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int)",
+      "variadic": false
+    },
+    "sqlite3_enable_shared_cache": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "int (int)",
+      "variadic": false
+    },
+    "sqlite3_errcode": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_errmsg": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "const char *(sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_errmsg16": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "const void *(sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_error_offset": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_errstr": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "const char *(int)",
+      "variadic": false
+    },
+    "sqlite3_exec": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int (*)(void *, int, char **, char **)",
+        "void *",
+        "char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, int (*)(void *, int, char **, char **), void *, char **)",
+      "variadic": false
+    },
+    "sqlite3_expanded_sql": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "char *(sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_expired": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_extended_errcode": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_extended_result_codes": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int)",
+      "variadic": false
+    },
+    "sqlite3_file_control": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, void *)",
+      "variadic": false
+    },
+    "sqlite3_filename_database": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename"
+      ],
+      "signature": "const char *(sqlite3_filename)",
+      "variadic": false
+    },
+    "sqlite3_filename_journal": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename"
+      ],
+      "signature": "const char *(sqlite3_filename)",
+      "variadic": false
+    },
+    "sqlite3_filename_wal": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename"
+      ],
+      "signature": "const char *(sqlite3_filename)",
+      "variadic": false
+    },
+    "sqlite3_finalize": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_free": {
+      "category": "core",
+      "params": [
+        "void *"
+      ],
+      "signature": "void (void *)",
+      "variadic": false
+    },
+    "sqlite3_free_filename": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename"
+      ],
+      "signature": "void (sqlite3_filename)",
+      "variadic": false
+    },
+    "sqlite3_free_table": {
+      "category": "core",
+      "params": [
+        "char **"
+      ],
+      "signature": "void (char **)",
+      "variadic": false
+    },
+    "sqlite3_get_autocommit": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_get_auxdata": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int"
+      ],
+      "signature": "void *(sqlite3_context *, int)",
+      "variadic": false
+    },
+    "sqlite3_get_clientdata": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "void *(sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_get_table": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "char ***",
+        "int *",
+        "int *",
+        "char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, char ***, int *, int *, char **)",
+      "variadic": false
+    },
+    "sqlite3_global_recover": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_hard_heap_limit64": {
+      "category": "core",
+      "params": [
+        "sqlite3_int64"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_initialize": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_interrupt": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "void (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_is_interrupted": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_keyword_check": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "int"
+      ],
+      "signature": "int (const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_keyword_count": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_keyword_name": {
+      "category": "core",
+      "params": [
+        "int",
+        "const char **",
+        "int *"
+      ],
+      "signature": "int (int, const char **, int *)",
+      "variadic": false
+    },
+    "sqlite3_last_insert_rowid": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_libversion": {
+      "category": "core",
+      "params": [],
+      "signature": "const char *(void)",
+      "variadic": false
+    },
+    "sqlite3_libversion_number": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_limit": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_load_extension": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "const char *",
+        "char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, const char *, char **)",
+      "variadic": false
+    },
+    "sqlite3_log": {
+      "category": "core",
+      "params": [
+        "int",
+        "const char *"
+      ],
+      "signature": "void (int, const char *, ...)",
+      "variadic": true
+    },
+    "sqlite3_malloc": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "void *(int)",
+      "variadic": false
+    },
+    "sqlite3_malloc64": {
+      "category": "core",
+      "params": [
+        "sqlite3_uint64"
+      ],
+      "signature": "void *(sqlite3_uint64)",
+      "variadic": false
+    },
+    "sqlite3_memory_alarm": {
+      "category": "core",
+      "params": [
+        "void (*)(void *, sqlite3_int64, int)",
+        "void *",
+        "sqlite3_int64"
+      ],
+      "signature": "int (void (*)(void *, sqlite3_int64, int), void *, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_memory_highwater": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "sqlite3_int64 (int)",
+      "variadic": false
+    },
+    "sqlite3_memory_used": {
+      "category": "core",
+      "params": [],
+      "signature": "sqlite3_int64 (void)",
+      "variadic": false
+    },
+    "sqlite3_mprintf": {
+      "category": "core",
+      "params": [
+        "const char *"
+      ],
+      "signature": "char *(const char *, ...)",
+      "variadic": true
+    },
+    "sqlite3_msize": {
+      "category": "core",
+      "params": [
+        "void *"
+      ],
+      "signature": "sqlite3_uint64 (void *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_alloc": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "sqlite3_mutex *(int)",
+      "variadic": false
+    },
+    "sqlite3_mutex_enter": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "void (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_free": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "void (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_held": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "int (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_leave": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "void (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_notheld": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "int (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_mutex_try": {
+      "category": "core",
+      "params": [
+        "sqlite3_mutex *"
+      ],
+      "signature": "int (sqlite3_mutex *)",
+      "variadic": false
+    },
+    "sqlite3_next_stmt": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "sqlite3_stmt *"
+      ],
+      "signature": "sqlite3_stmt *(sqlite3 *, sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_normalized_sql": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "const char *(sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_open": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "sqlite3 **"
+      ],
+      "signature": "int (const char *, sqlite3 **)",
+      "variadic": false
+    },
+    "sqlite3_open16": {
+      "category": "core",
+      "params": [
+        "const void *",
+        "sqlite3 **"
+      ],
+      "signature": "int (const void *, sqlite3 **)",
+      "variadic": false
+    },
+    "sqlite3_open_v2": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "sqlite3 **",
+        "int",
+        "const char *"
+      ],
+      "signature": "int (const char *, sqlite3 **, int, const char *)",
+      "variadic": false
+    },
+    "sqlite3_os_end": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_os_init": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_overload_function": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_prepare": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "sqlite3_stmt **",
+        "const char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, sqlite3_stmt **, const char **)",
+      "variadic": false
+    },
+    "sqlite3_prepare16": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const void *",
+        "int",
+        "sqlite3_stmt **",
+        "const void **"
+      ],
+      "signature": "int (sqlite3 *, const void *, int, sqlite3_stmt **, const void **)",
+      "variadic": false
+    },
+    "sqlite3_prepare16_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const void *",
+        "int",
+        "sqlite3_stmt **",
+        "const void **"
+      ],
+      "signature": "int (sqlite3 *, const void *, int, sqlite3_stmt **, const void **)",
+      "variadic": false
+    },
+    "sqlite3_prepare16_v3": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const void *",
+        "int",
+        "unsigned int",
+        "sqlite3_stmt **",
+        "const void **"
+      ],
+      "signature": "int (sqlite3 *, const void *, int, unsigned int, sqlite3_stmt **, const void **)",
+      "variadic": false
+    },
+    "sqlite3_prepare_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "sqlite3_stmt **",
+        "const char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, sqlite3_stmt **, const char **)",
+      "variadic": false
+    },
+    "sqlite3_prepare_v3": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "unsigned int",
+        "sqlite3_stmt **",
+        "const char **"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, unsigned int, sqlite3_stmt **, const char **)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_blobwrite": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_count": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_depth": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_hook": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void *, sqlite3 *, int, const char *, const char *, sqlite3_int64, sqlite3_int64)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, void (*)(void *, sqlite3 *, int, const char *, const char *, sqlite3_int64, sqlite3_int64), void *)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_new": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3 *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3_preupdate_old": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3 *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3_profile": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void *, const char *, sqlite3_uint64)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, void (*)(void *, const char *, sqlite3_uint64), void *)",
+      "variadic": false
+    },
+    "sqlite3_progress_handler": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "int (*)(void *)",
+        "void *"
+      ],
+      "signature": "void (sqlite3 *, int, int (*)(void *), void *)",
+      "variadic": false
+    },
+    "sqlite3_randomness": {
+      "category": "core",
+      "params": [
+        "int",
+        "void *"
+      ],
+      "signature": "void (int, void *)",
+      "variadic": false
+    },
+    "sqlite3_realloc": {
+      "category": "core",
+      "params": [
+        "void *",
+        "int"
+      ],
+      "signature": "void *(void *, int)",
+      "variadic": false
+    },
+    "sqlite3_realloc64": {
+      "category": "core",
+      "params": [
+        "void *",
+        "sqlite3_uint64"
+      ],
+      "signature": "void *(void *, sqlite3_uint64)",
+      "variadic": false
+    },
+    "sqlite3_release_memory": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "int (int)",
+      "variadic": false
+    },
+    "sqlite3_reset": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_reset_auto_extension": {
+      "category": "core",
+      "params": [],
+      "signature": "void (void)",
+      "variadic": false
+    },
+    "sqlite3_result_blob": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_blob64": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "sqlite3_uint64",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const void *, sqlite3_uint64, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_double": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "double"
+      ],
+      "signature": "void (sqlite3_context *, double)",
+      "variadic": false
+    },
+    "sqlite3_result_error": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const char *",
+        "int"
+      ],
+      "signature": "void (sqlite3_context *, const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_result_error16": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "int"
+      ],
+      "signature": "void (sqlite3_context *, const void *, int)",
+      "variadic": false
+    },
+    "sqlite3_result_error_code": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int"
+      ],
+      "signature": "void (sqlite3_context *, int)",
+      "variadic": false
+    },
+    "sqlite3_result_error_nomem": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "void (sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_result_error_toobig": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "void (sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_result_int": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int"
+      ],
+      "signature": "void (sqlite3_context *, int)",
+      "variadic": false
+    },
+    "sqlite3_result_int64": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "sqlite3_int64"
+      ],
+      "signature": "void (sqlite3_context *, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_result_null": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "void (sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_result_pointer": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "void *",
+        "const char *",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, void *, const char *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_subtype": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "unsigned int"
+      ],
+      "signature": "void (sqlite3_context *, unsigned int)",
+      "variadic": false
+    },
+    "sqlite3_result_text": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const char *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const char *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_text16": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_text16be": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_text16le": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const void *",
+        "int",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, const void *, int, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_result_text64": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "const char *",
+        "sqlite3_uint64",
+        "void (*)(void *)",
+        "unsigned char"
+      ],
+      "signature": "void (sqlite3_context *, const char *, sqlite3_uint64, void (*)(void *), unsigned char)",
+      "variadic": false
+    },
+    "sqlite3_result_value": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "sqlite3_value *"
+      ],
+      "signature": "void (sqlite3_context *, sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_result_zeroblob": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int"
+      ],
+      "signature": "void (sqlite3_context *, int)",
+      "variadic": false
+    },
+    "sqlite3_result_zeroblob64": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "sqlite3_uint64"
+      ],
+      "signature": "int (sqlite3_context *, sqlite3_uint64)",
+      "variadic": false
+    },
+    "sqlite3_rollback_hook": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void *)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, void (*)(void *), void *)",
+      "variadic": false
+    },
+    "sqlite3_rtree_geometry_callback": {
+      "category": "rtree",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int (*)(sqlite3_rtree_geometry *, int, sqlite3_rtree_dbl *, int *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, const char *, int (*)(sqlite3_rtree_geometry *, int, sqlite3_rtree_dbl *, int *), void *)",
+      "variadic": false
+    },
+    "sqlite3_rtree_query_callback": {
+      "category": "rtree",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int (*)(sqlite3_rtree_query_info *)",
+        "void *",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, int (*)(sqlite3_rtree_query_info *), void *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_serialize": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "sqlite3_int64 *",
+        "unsigned int"
+      ],
+      "signature": "unsigned char *(sqlite3 *, const char *, sqlite3_int64 *, unsigned int)",
+      "variadic": false
+    },
+    "sqlite3_set_authorizer": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, int, const char *, const char *, const char *, const char *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, int (*)(void *, int, const char *, const char *, const char *, const char *), void *)",
+      "variadic": false
+    },
+    "sqlite3_set_auxdata": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *",
+        "int",
+        "void *",
+        "void (*)(void *)"
+      ],
+      "signature": "void (sqlite3_context *, int, void *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_set_clientdata": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "void *",
+        "void (*)(void *)"
+      ],
+      "signature": "int (sqlite3 *, const char *, void *, void (*)(void *))",
+      "variadic": false
+    },
+    "sqlite3_set_errmsg": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, int, const char *)",
+      "variadic": false
+    },
+    "sqlite3_set_last_insert_rowid": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "sqlite3_int64"
+      ],
+      "signature": "void (sqlite3 *, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_setlk_timeout": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_shutdown": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_sleep": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "int (int)",
+      "variadic": false
+    },
+    "sqlite3_snapshot_cmp": {
+      "category": "core",
+      "params": [
+        "sqlite3_snapshot *",
+        "sqlite3_snapshot *"
+      ],
+      "signature": "int (sqlite3_snapshot *, sqlite3_snapshot *)",
+      "variadic": false
+    },
+    "sqlite3_snapshot_free": {
+      "category": "core",
+      "params": [
+        "sqlite3_snapshot *"
+      ],
+      "signature": "void (sqlite3_snapshot *)",
+      "variadic": false
+    },
+    "sqlite3_snapshot_get": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "sqlite3_snapshot **"
+      ],
+      "signature": "int (sqlite3 *, const char *, sqlite3_snapshot **)",
+      "variadic": false
+    },
+    "sqlite3_snapshot_open": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "sqlite3_snapshot *"
+      ],
+      "signature": "int (sqlite3 *, const char *, sqlite3_snapshot *)",
+      "variadic": false
+    },
+    "sqlite3_snapshot_recover": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_snprintf": {
+      "category": "core",
+      "params": [
+        "int",
+        "char *",
+        "const char *"
+      ],
+      "signature": "char *(int, char *, const char *, ...)",
+      "variadic": true
+    },
+    "sqlite3_soft_heap_limit": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "void (int)",
+      "variadic": false
+    },
+    "sqlite3_soft_heap_limit64": {
+      "category": "core",
+      "params": [
+        "sqlite3_int64"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_sourceid": {
+      "category": "core",
+      "params": [],
+      "signature": "const char *(void)",
+      "variadic": false
+    },
+    "sqlite3_sql": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "const char *(sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_status": {
+      "category": "core",
+      "params": [
+        "int",
+        "int *",
+        "int *",
+        "int"
+      ],
+      "signature": "int (int, int *, int *, int)",
+      "variadic": false
+    },
+    "sqlite3_status64": {
+      "category": "core",
+      "params": [
+        "int",
+        "sqlite3_int64 *",
+        "sqlite3_int64 *",
+        "int"
+      ],
+      "signature": "int (int, sqlite3_int64 *, sqlite3_int64 *, int)",
+      "variadic": false
+    },
+    "sqlite3_step": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_busy": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_explain": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int)",
+      "variadic": false
+    },
+    "sqlite3_stmt_isexplain": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_readonly": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_scanstatus": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3_stmt *, int, int, void *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_scanstatus_reset": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *"
+      ],
+      "signature": "void (sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_scanstatus_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "int",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3_stmt *, int, int, int, void *)",
+      "variadic": false
+    },
+    "sqlite3_stmt_status": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_stmt *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_str_append": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *",
+        "const char *",
+        "int"
+      ],
+      "signature": "void (sqlite3_str *, const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_str_appendall": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *",
+        "const char *"
+      ],
+      "signature": "void (sqlite3_str *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_str_appendchar": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *",
+        "int",
+        "char"
+      ],
+      "signature": "void (sqlite3_str *, int, char)",
+      "variadic": false
+    },
+    "sqlite3_str_appendf": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *",
+        "const char *"
+      ],
+      "signature": "void (sqlite3_str *, const char *, ...)",
+      "variadic": true
+    },
+    "sqlite3_str_errcode": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *"
+      ],
+      "signature": "int (sqlite3_str *)",
+      "variadic": false
+    },
+    "sqlite3_str_finish": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *"
+      ],
+      "signature": "char *(sqlite3_str *)",
+      "variadic": false
+    },
+    "sqlite3_str_length": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *"
+      ],
+      "signature": "int (sqlite3_str *)",
+      "variadic": false
+    },
+    "sqlite3_str_new": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "sqlite3_str *(sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_str_reset": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *"
+      ],
+      "signature": "void (sqlite3_str *)",
+      "variadic": false
+    },
+    "sqlite3_str_value": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *"
+      ],
+      "signature": "char *(sqlite3_str *)",
+      "variadic": false
+    },
+    "sqlite3_str_vappendf": {
+      "category": "core",
+      "params": [
+        "sqlite3_str *",
+        "const char *",
+        "va_list"
+      ],
+      "signature": "void (sqlite3_str *, const char *, va_list)",
+      "variadic": false
+    },
+    "sqlite3_strglob": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "const char *"
+      ],
+      "signature": "int (const char *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_stricmp": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "const char *"
+      ],
+      "signature": "int (const char *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_strlike": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "const char *",
+        "unsigned int"
+      ],
+      "signature": "int (const char *, const char *, unsigned int)",
+      "variadic": false
+    },
+    "sqlite3_strnicmp": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "const char *",
+        "int"
+      ],
+      "signature": "int (const char *, const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_system_errno": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_table_column_metadata": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "const char *",
+        "const char *",
+        "const char **",
+        "const char **",
+        "int *",
+        "int *",
+        "int *"
+      ],
+      "signature": "int (sqlite3 *, const char *, const char *, const char *, const char **, const char **, int *, int *, int *)",
+      "variadic": false
+    },
+    "sqlite3_test_control": {
+      "category": "core",
+      "params": [
+        "int"
+      ],
+      "signature": "int (int, ...)",
+      "variadic": true
+    },
+    "sqlite3_thread_cleanup": {
+      "category": "core",
+      "params": [],
+      "signature": "void (void)",
+      "variadic": false
+    },
+    "sqlite3_threadsafe": {
+      "category": "core",
+      "params": [],
+      "signature": "int (void)",
+      "variadic": false
+    },
+    "sqlite3_total_changes": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_total_changes64": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_trace": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void *, const char *)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, void (*)(void *, const char *), void *)",
+      "variadic": false
+    },
+    "sqlite3_trace_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "unsigned int",
+        "int (*)(unsigned int, void *, void *, void *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, unsigned int, int (*)(unsigned int, void *, void *, void *), void *)",
+      "variadic": false
+    },
+    "sqlite3_transfer_bindings": {
+      "category": "core",
+      "params": [
+        "sqlite3_stmt *",
+        "sqlite3_stmt *"
+      ],
+      "signature": "int (sqlite3_stmt *, sqlite3_stmt *)",
+      "variadic": false
+    },
+    "sqlite3_txn_state": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_unlock_notify": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void **, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, void (*)(void **, int), void *)",
+      "variadic": false
+    },
+    "sqlite3_update_hook": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "void (*)(void *, int, const char *, const char *, sqlite3_int64)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, void (*)(void *, int, const char *, const char *, sqlite3_int64), void *)",
+      "variadic": false
+    },
+    "sqlite3_uri_boolean": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename",
+        "const char *",
+        "int"
+      ],
+      "signature": "int (sqlite3_filename, const char *, int)",
+      "variadic": false
+    },
+    "sqlite3_uri_int64": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename",
+        "const char *",
+        "sqlite3_int64"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_filename, const char *, sqlite3_int64)",
+      "variadic": false
+    },
+    "sqlite3_uri_key": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_filename, int)",
+      "variadic": false
+    },
+    "sqlite3_uri_parameter": {
+      "category": "core",
+      "params": [
+        "sqlite3_filename",
+        "const char *"
+      ],
+      "signature": "const char *(sqlite3_filename, const char *)",
+      "variadic": false
+    },
+    "sqlite3_user_data": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "void *(sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_value_blob": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "const void *(sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_bytes": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_bytes16": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_double": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "double (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_dup": {
+      "category": "core",
+      "params": [
+        "const sqlite3_value *"
+      ],
+      "signature": "sqlite3_value *(const sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_encoding": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_free": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "void (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_frombind": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_int": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_int64": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_nochange": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_numeric_type": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_pointer": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *",
+        "const char *"
+      ],
+      "signature": "void *(sqlite3_value *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_value_subtype": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "unsigned int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_text": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "const unsigned char *(sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_text16": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "const void *(sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_text16be": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "const void *(sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_text16le": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "const void *(sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_value_type": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *"
+      ],
+      "signature": "int (sqlite3_value *)",
+      "variadic": false
+    },
+    "sqlite3_vfs_find": {
+      "category": "core",
+      "params": [
+        "const char *"
+      ],
+      "signature": "sqlite3_vfs *(const char *)",
+      "variadic": false
+    },
+    "sqlite3_vfs_register": {
+      "category": "core",
+      "params": [
+        "sqlite3_vfs *",
+        "int"
+      ],
+      "signature": "int (sqlite3_vfs *, int)",
+      "variadic": false
+    },
+    "sqlite3_vfs_unregister": {
+      "category": "core",
+      "params": [
+        "sqlite3_vfs *"
+      ],
+      "signature": "int (sqlite3_vfs *)",
+      "variadic": false
+    },
+    "sqlite3_vmprintf": {
+      "category": "core",
+      "params": [
+        "const char *",
+        "va_list"
+      ],
+      "signature": "char *(const char *, va_list)",
+      "variadic": false
+    },
+    "sqlite3_vsnprintf": {
+      "category": "core",
+      "params": [
+        "int",
+        "char *",
+        "const char *",
+        "va_list"
+      ],
+      "signature": "char *(int, char *, const char *, va_list)",
+      "variadic": false
+    },
+    "sqlite3_vtab_collation": {
+      "category": "core",
+      "params": [
+        "sqlite3_index_info *",
+        "int"
+      ],
+      "signature": "const char *(sqlite3_index_info *, int)",
+      "variadic": false
+    },
+    "sqlite3_vtab_config": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, ...)",
+      "variadic": true
+    },
+    "sqlite3_vtab_distinct": {
+      "category": "core",
+      "params": [
+        "sqlite3_index_info *"
+      ],
+      "signature": "int (sqlite3_index_info *)",
+      "variadic": false
+    },
+    "sqlite3_vtab_in": {
+      "category": "core",
+      "params": [
+        "sqlite3_index_info *",
+        "int",
+        "int"
+      ],
+      "signature": "int (sqlite3_index_info *, int, int)",
+      "variadic": false
+    },
+    "sqlite3_vtab_in_first": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_value *, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3_vtab_in_next": {
+      "category": "core",
+      "params": [
+        "sqlite3_value *",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_value *, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3_vtab_nochange": {
+      "category": "core",
+      "params": [
+        "sqlite3_context *"
+      ],
+      "signature": "int (sqlite3_context *)",
+      "variadic": false
+    },
+    "sqlite3_vtab_on_conflict": {
+      "category": "core",
+      "params": [
+        "sqlite3 *"
+      ],
+      "signature": "int (sqlite3 *)",
+      "variadic": false
+    },
+    "sqlite3_vtab_rhs_value": {
+      "category": "core",
+      "params": [
+        "sqlite3_index_info *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_index_info *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3_wal_autocheckpoint": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int)",
+      "variadic": false
+    },
+    "sqlite3_wal_checkpoint": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3_wal_checkpoint_v2": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "int",
+        "int *",
+        "int *"
+      ],
+      "signature": "int (sqlite3 *, const char *, int, int *, int *)",
+      "variadic": false
+    },
+    "sqlite3_wal_hook": {
+      "category": "core",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, sqlite3 *, const char *, int)",
+        "void *"
+      ],
+      "signature": "void *(sqlite3 *, int (*)(void *, sqlite3 *, const char *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3_win32_set_directory": {
+      "category": "core",
+      "params": [
+        "unsigned long",
+        "void *"
+      ],
+      "signature": "int (unsigned long, void *)",
+      "variadic": false
+    },
+    "sqlite3_win32_set_directory16": {
+      "category": "core",
+      "params": [
+        "unsigned long",
+        "const void *"
+      ],
+      "signature": "int (unsigned long, const void *)",
+      "variadic": false
+    },
+    "sqlite3_win32_set_directory8": {
+      "category": "core",
+      "params": [
+        "unsigned long",
+        "const char *"
+      ],
+      "signature": "int (unsigned long, const char *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_add": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3_changegroup *, int, void *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_add_change": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "sqlite3_changeset_iter *"
+      ],
+      "signature": "int (sqlite3_changegroup *, sqlite3_changeset_iter *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_add_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "int (*)(void *, void *, int *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_changegroup *, int (*)(void *, void *, int *), void *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_delete": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *"
+      ],
+      "signature": "void (sqlite3_changegroup *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_new": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup **"
+      ],
+      "signature": "int (sqlite3_changegroup **)",
+      "variadic": false
+    },
+    "sqlite3changegroup_output": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (sqlite3_changegroup *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3changegroup_output_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_changegroup *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3changegroup_schema": {
+      "category": "session",
+      "params": [
+        "sqlite3_changegroup *",
+        "sqlite3 *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3_changegroup *, sqlite3 *, const char *)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "void *",
+        "int (*)(void *, const char *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, int, void *, int (*)(void *, const char *), int (*)(void *, int, sqlite3_changeset_iter *), void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, const char *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3 *, int (*)(void *, void *, int *), void *, int (*)(void *, const char *), int (*)(void *, int, sqlite3_changeset_iter *), void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply_v2": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "void *",
+        "int (*)(void *, const char *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *",
+        "void **",
+        "int *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, void *, int (*)(void *, const char *), int (*)(void *, int, sqlite3_changeset_iter *), void *, void **, int *, int)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply_v2_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, const char *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *",
+        "void **",
+        "int *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int (*)(void *, void *, int *), void *, int (*)(void *, const char *), int (*)(void *, int, sqlite3_changeset_iter *), void *, void **, int *, int)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply_v3": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int",
+        "void *",
+        "int (*)(void *, sqlite3_changeset_iter *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *",
+        "void **",
+        "int *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int, void *, int (*)(void *, sqlite3_changeset_iter *), int (*)(void *, int, sqlite3_changeset_iter *), void *, void **, int *, int)",
+      "variadic": false
+    },
+    "sqlite3changeset_apply_v3_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, sqlite3_changeset_iter *)",
+        "int (*)(void *, int, sqlite3_changeset_iter *)",
+        "void *",
+        "void **",
+        "int *",
+        "int"
+      ],
+      "signature": "int (sqlite3 *, int (*)(void *, void *, int *), void *, int (*)(void *, sqlite3_changeset_iter *), int (*)(void *, int, sqlite3_changeset_iter *), void *, void **, int *, int)",
+      "variadic": false
+    },
+    "sqlite3changeset_concat": {
+      "category": "session",
+      "params": [
+        "int",
+        "void *",
+        "int",
+        "void *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (int, void *, int, void *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3changeset_concat_strm": {
+      "category": "session",
+      "params": [
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (int (*)(void *, void *, int *), void *, int (*)(void *, void *, int *), void *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_conflict": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3changeset_finalize": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *"
+      ],
+      "signature": "int (sqlite3_changeset_iter *)",
+      "variadic": false
+    },
+    "sqlite3changeset_fk_conflicts": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "int *"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, int *)",
+      "variadic": false
+    },
+    "sqlite3changeset_invert": {
+      "category": "session",
+      "params": [
+        "int",
+        "const void *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (int, const void *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3changeset_invert_strm": {
+      "category": "session",
+      "params": [
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (int (*)(void *, void *, int *), void *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_new": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3changeset_next": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *"
+      ],
+      "signature": "int (sqlite3_changeset_iter *)",
+      "variadic": false
+    },
+    "sqlite3changeset_old": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "int",
+        "sqlite3_value **"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, int, sqlite3_value **)",
+      "variadic": false
+    },
+    "sqlite3changeset_op": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "const char **",
+        "int *",
+        "int *",
+        "int *"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, const char **, int *, int *, int *)",
+      "variadic": false
+    },
+    "sqlite3changeset_pk": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter *",
+        "unsigned char **",
+        "int *"
+      ],
+      "signature": "int (sqlite3_changeset_iter *, unsigned char **, int *)",
+      "variadic": false
+    },
+    "sqlite3changeset_start": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter **",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3_changeset_iter **, int, void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_start_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter **",
+        "int (*)(void *, void *, int *)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_changeset_iter **, int (*)(void *, void *, int *), void *)",
+      "variadic": false
+    },
+    "sqlite3changeset_start_v2": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter **",
+        "int",
+        "void *",
+        "int"
+      ],
+      "signature": "int (sqlite3_changeset_iter **, int, void *, int)",
+      "variadic": false
+    },
+    "sqlite3changeset_start_v2_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_changeset_iter **",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int"
+      ],
+      "signature": "int (sqlite3_changeset_iter **, int (*)(void *, void *, int *), void *, int)",
+      "variadic": false
+    },
+    "sqlite3rebaser_configure": {
+      "category": "session",
+      "params": [
+        "sqlite3_rebaser *",
+        "int",
+        "const void *"
+      ],
+      "signature": "int (sqlite3_rebaser *, int, const void *)",
+      "variadic": false
+    },
+    "sqlite3rebaser_create": {
+      "category": "session",
+      "params": [
+        "sqlite3_rebaser **"
+      ],
+      "signature": "int (sqlite3_rebaser **)",
+      "variadic": false
+    },
+    "sqlite3rebaser_delete": {
+      "category": "session",
+      "params": [
+        "sqlite3_rebaser *"
+      ],
+      "signature": "void (sqlite3_rebaser *)",
+      "variadic": false
+    },
+    "sqlite3rebaser_rebase": {
+      "category": "session",
+      "params": [
+        "sqlite3_rebaser *",
+        "int",
+        "const void *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (sqlite3_rebaser *, int, const void *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3rebaser_rebase_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_rebaser *",
+        "int (*)(void *, void *, int *)",
+        "void *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_rebaser *, int (*)(void *, void *, int *), void *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3session_attach": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "const char *"
+      ],
+      "signature": "int (sqlite3_session *, const char *)",
+      "variadic": false
+    },
+    "sqlite3session_changeset": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (sqlite3_session *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3session_changeset_size": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_session *)",
+      "variadic": false
+    },
+    "sqlite3session_changeset_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_session *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3session_config": {
+      "category": "session",
+      "params": [
+        "int",
+        "void *"
+      ],
+      "signature": "int (int, void *)",
+      "variadic": false
+    },
+    "sqlite3session_create": {
+      "category": "session",
+      "params": [
+        "sqlite3 *",
+        "const char *",
+        "sqlite3_session **"
+      ],
+      "signature": "int (sqlite3 *, const char *, sqlite3_session **)",
+      "variadic": false
+    },
+    "sqlite3session_delete": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *"
+      ],
+      "signature": "void (sqlite3_session *)",
+      "variadic": false
+    },
+    "sqlite3session_diff": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "const char *",
+        "const char *",
+        "char **"
+      ],
+      "signature": "int (sqlite3_session *, const char *, const char *, char **)",
+      "variadic": false
+    },
+    "sqlite3session_enable": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int"
+      ],
+      "signature": "int (sqlite3_session *, int)",
+      "variadic": false
+    },
+    "sqlite3session_indirect": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int"
+      ],
+      "signature": "int (sqlite3_session *, int)",
+      "variadic": false
+    },
+    "sqlite3session_isempty": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *"
+      ],
+      "signature": "int (sqlite3_session *)",
+      "variadic": false
+    },
+    "sqlite3session_memory_used": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *"
+      ],
+      "signature": "sqlite3_int64 (sqlite3_session *)",
+      "variadic": false
+    },
+    "sqlite3session_object_config": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int",
+        "void *"
+      ],
+      "signature": "int (sqlite3_session *, int, void *)",
+      "variadic": false
+    },
+    "sqlite3session_patchset": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int *",
+        "void **"
+      ],
+      "signature": "int (sqlite3_session *, int *, void **)",
+      "variadic": false
+    },
+    "sqlite3session_patchset_strm": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int (*)(void *, const void *, int)",
+        "void *"
+      ],
+      "signature": "int (sqlite3_session *, int (*)(void *, const void *, int), void *)",
+      "variadic": false
+    },
+    "sqlite3session_table_filter": {
+      "category": "session",
+      "params": [
+        "sqlite3_session *",
+        "int (*)(void *, const char *)",
+        "void *"
+      ],
+      "signature": "void (sqlite3_session *, int (*)(void *, const char *), void *)",
+      "variadic": false
+    }
+  },
+  "records": {
+    "Fts5ExtensionApi": {
+      "iVersion": "int",
+      "xColumnCount": "int (*)(Fts5Context *)",
+      "xColumnLocale": "int (*)(Fts5Context *, int, const char **, int *)",
+      "xColumnSize": "int (*)(Fts5Context *, int, int *)",
+      "xColumnText": "int (*)(Fts5Context *, int, const char **, int *)",
+      "xColumnTotalSize": "int (*)(Fts5Context *, int, sqlite3_int64 *)",
+      "xGetAuxdata": "void *(*)(Fts5Context *, int)",
+      "xInst": "int (*)(Fts5Context *, int, int *, int *, int *)",
+      "xInstCount": "int (*)(Fts5Context *, int *)",
+      "xInstToken": "int (*)(Fts5Context *, int, int, const char **, int *)",
+      "xPhraseCount": "int (*)(Fts5Context *)",
+      "xPhraseFirst": "int (*)(Fts5Context *, int, Fts5PhraseIter *, int *, int *)",
+      "xPhraseFirstColumn": "int (*)(Fts5Context *, int, Fts5PhraseIter *, int *)",
+      "xPhraseNext": "void (*)(Fts5Context *, Fts5PhraseIter *, int *, int *)",
+      "xPhraseNextColumn": "void (*)(Fts5Context *, Fts5PhraseIter *, int *)",
+      "xPhraseSize": "int (*)(Fts5Context *, int)",
+      "xQueryPhrase": "int (*)(Fts5Context *, int, void *, int (*)(const Fts5ExtensionApi *, Fts5Context *, void *))",
+      "xQueryToken": "int (*)(Fts5Context *, int, int, const char **, int *)",
+      "xRowCount": "int (*)(Fts5Context *, sqlite3_int64 *)",
+      "xRowid": "sqlite3_int64 (*)(Fts5Context *)",
+      "xSetAuxdata": "int (*)(Fts5Context *, void *, void (*)(void *))",
+      "xTokenize": "int (*)(Fts5Context *, const char *, int, void *, int (*)(void *, int, const char *, int, int, int))",
+      "xTokenize_v2": "int (*)(Fts5Context *, const char *, int, const char *, int, void *, int (*)(void *, int, const char *, int, int, int))",
+      "xUserData": "void *(*)(Fts5Context *)"
+    },
+    "Fts5PhraseIter": {
+      "a": "const unsigned char *",
+      "b": "const unsigned char *"
+    },
+    "fts5_api": {
+      "iVersion": "int",
+      "xCreateFunction": "int (*)(fts5_api *, const char *, void *, fts5_extension_function, void (*)(void *))",
+      "xCreateTokenizer": "int (*)(fts5_api *, const char *, void *, fts5_tokenizer *, void (*)(void *))",
+      "xCreateTokenizer_v2": "int (*)(fts5_api *, const char *, void *, fts5_tokenizer_v2 *, void (*)(void *))",
+      "xFindTokenizer": "int (*)(fts5_api *, const char *, void **, fts5_tokenizer *)",
+      "xFindTokenizer_v2": "int (*)(fts5_api *, const char *, void **, fts5_tokenizer_v2 **)"
+    },
+    "fts5_tokenizer": {
+      "xCreate": "int (*)(void *, const char **, int, Fts5Tokenizer **)",
+      "xDelete": "void (*)(Fts5Tokenizer *)",
+      "xTokenize": "int (*)(Fts5Tokenizer *, void *, int, const char *, int, int (*)(void *, int, const char *, int, int, int))"
+    },
+    "fts5_tokenizer_v2": {
+      "iVersion": "int",
+      "xCreate": "int (*)(void *, const char **, int, Fts5Tokenizer **)",
+      "xDelete": "void (*)(Fts5Tokenizer *)",
+      "xTokenize": "int (*)(Fts5Tokenizer *, void *, int, const char *, int, const char *, int, int (*)(void *, int, const char *, int, int, int))"
+    },
+    "sqlite3_file": {
+      "pMethods": "const struct sqlite3_io_methods *"
+    },
+    "sqlite3_index_constraint": {
+      "iColumn": "int",
+      "iTermOffset": "int",
+      "op": "unsigned char",
+      "usable": "unsigned char"
+    },
+    "sqlite3_index_constraint_usage": {
+      "argvIndex": "int",
+      "omit": "unsigned char"
+    },
+    "sqlite3_index_info": {
+      "aConstraint": "struct sqlite3_index_constraint *",
+      "aConstraintUsage": "struct sqlite3_index_constraint_usage *",
+      "aOrderBy": "struct sqlite3_index_orderby *",
+      "colUsed": "sqlite3_uint64",
+      "estimatedCost": "double",
+      "estimatedRows": "sqlite3_int64",
+      "idxFlags": "int",
+      "idxNum": "int",
+      "idxStr": "char *",
+      "nConstraint": "int",
+      "nOrderBy": "int",
+      "needToFreeIdxStr": "int",
+      "orderByConsumed": "int"
+    },
+    "sqlite3_index_orderby": {
+      "desc": "unsigned char",
+      "iColumn": "int"
+    },
+    "sqlite3_io_methods": {
+      "iVersion": "int",
+      "xCheckReservedLock": "int (*)(sqlite3_file *, int *)",
+      "xClose": "int (*)(sqlite3_file *)",
+      "xDeviceCharacteristics": "int (*)(sqlite3_file *)",
+      "xFetch": "int (*)(sqlite3_file *, sqlite3_int64, int, void **)",
+      "xFileControl": "int (*)(sqlite3_file *, int, void *)",
+      "xFileSize": "int (*)(sqlite3_file *, sqlite3_int64 *)",
+      "xLock": "int (*)(sqlite3_file *, int)",
+      "xRead": "int (*)(sqlite3_file *, void *, int, sqlite3_int64)",
+      "xSectorSize": "int (*)(sqlite3_file *)",
+      "xShmBarrier": "void (*)(sqlite3_file *)",
+      "xShmLock": "int (*)(sqlite3_file *, int, int, int)",
+      "xShmMap": "int (*)(sqlite3_file *, int, int, int, volatile void **)",
+      "xShmUnmap": "int (*)(sqlite3_file *, int)",
+      "xSync": "int (*)(sqlite3_file *, int)",
+      "xTruncate": "int (*)(sqlite3_file *, sqlite3_int64)",
+      "xUnfetch": "int (*)(sqlite3_file *, sqlite3_int64, void *)",
+      "xUnlock": "int (*)(sqlite3_file *, int)",
+      "xWrite": "int (*)(sqlite3_file *, const void *, int, sqlite3_int64)"
+    },
+    "sqlite3_mem_methods": {
+      "pAppData": "void *",
+      "xFree": "void (*)(void *)",
+      "xInit": "int (*)(void *)",
+      "xMalloc": "void *(*)(int)",
+      "xRealloc": "void *(*)(void *, int)",
+      "xRoundup": "int (*)(int)",
+      "xShutdown": "void (*)(void *)",
+      "xSize": "int (*)(void *)"
+    },
+    "sqlite3_module": {
+      "iVersion": "int",
+      "xBegin": "int (*)(sqlite3_vtab *)",
+      "xBestIndex": "int (*)(sqlite3_vtab *, sqlite3_index_info *)",
+      "xClose": "int (*)(sqlite3_vtab_cursor *)",
+      "xColumn": "int (*)(sqlite3_vtab_cursor *, sqlite3_context *, int)",
+      "xCommit": "int (*)(sqlite3_vtab *)",
+      "xConnect": "int (*)(sqlite3 *, void *, int, const char *const *, sqlite3_vtab **, char **)",
+      "xCreate": "int (*)(sqlite3 *, void *, int, const char *const *, sqlite3_vtab **, char **)",
+      "xDestroy": "int (*)(sqlite3_vtab *)",
+      "xDisconnect": "int (*)(sqlite3_vtab *)",
+      "xEof": "int (*)(sqlite3_vtab_cursor *)",
+      "xFilter": "int (*)(sqlite3_vtab_cursor *, int, const char *, int, sqlite3_value **)",
+      "xFindFunction": "int (*)(sqlite3_vtab *, int, const char *, void (**)(sqlite3_context *, int, sqlite3_value **), void **)",
+      "xIntegrity": "int (*)(sqlite3_vtab *, const char *, const char *, int, char **)",
+      "xNext": "int (*)(sqlite3_vtab_cursor *)",
+      "xOpen": "int (*)(sqlite3_vtab *, sqlite3_vtab_cursor **)",
+      "xRelease": "int (*)(sqlite3_vtab *, int)",
+      "xRename": "int (*)(sqlite3_vtab *, const char *)",
+      "xRollback": "int (*)(sqlite3_vtab *)",
+      "xRollbackTo": "int (*)(sqlite3_vtab *, int)",
+      "xRowid": "int (*)(sqlite3_vtab_cursor *, sqlite3_int64 *)",
+      "xSavepoint": "int (*)(sqlite3_vtab *, int)",
+      "xShadowName": "int (*)(const char *)",
+      "xSync": "int (*)(sqlite3_vtab *)",
+      "xUpdate": "int (*)(sqlite3_vtab *, int, sqlite3_value **, sqlite3_int64 *)"
+    },
+    "sqlite3_mutex_methods": {
+      "xMutexAlloc": "sqlite3_mutex *(*)(int)",
+      "xMutexEnd": "int (*)(void)",
+      "xMutexEnter": "void (*)(sqlite3_mutex *)",
+      "xMutexFree": "void (*)(sqlite3_mutex *)",
+      "xMutexHeld": "int (*)(sqlite3_mutex *)",
+      "xMutexInit": "int (*)(void)",
+      "xMutexLeave": "void (*)(sqlite3_mutex *)",
+      "xMutexNotheld": "int (*)(sqlite3_mutex *)",
+      "xMutexTry": "int (*)(sqlite3_mutex *)"
+    },
+    "sqlite3_pcache_methods": {
+      "pArg": "void *",
+      "xCachesize": "void (*)(sqlite3_pcache *, int)",
+      "xCreate": "sqlite3_pcache *(*)(int, int)",
+      "xDestroy": "void (*)(sqlite3_pcache *)",
+      "xFetch": "void *(*)(sqlite3_pcache *, unsigned int, int)",
+      "xInit": "int (*)(void *)",
+      "xPagecount": "int (*)(sqlite3_pcache *)",
+      "xRekey": "void (*)(sqlite3_pcache *, void *, unsigned int, unsigned int)",
+      "xShutdown": "void (*)(void *)",
+      "xTruncate": "void (*)(sqlite3_pcache *, unsigned int)",
+      "xUnpin": "void (*)(sqlite3_pcache *, void *, int)"
+    },
+    "sqlite3_pcache_methods2": {
+      "iVersion": "int",
+      "pArg": "void *",
+      "xCachesize": "void (*)(sqlite3_pcache *, int)",
+      "xCreate": "sqlite3_pcache *(*)(int, int, int)",
+      "xDestroy": "void (*)(sqlite3_pcache *)",
+      "xFetch": "sqlite3_pcache_page *(*)(sqlite3_pcache *, unsigned int, int)",
+      "xInit": "int (*)(void *)",
+      "xPagecount": "int (*)(sqlite3_pcache *)",
+      "xRekey": "void (*)(sqlite3_pcache *, sqlite3_pcache_page *, unsigned int, unsigned int)",
+      "xShrink": "void (*)(sqlite3_pcache *)",
+      "xShutdown": "void (*)(void *)",
+      "xTruncate": "void (*)(sqlite3_pcache *, unsigned int)",
+      "xUnpin": "void (*)(sqlite3_pcache *, sqlite3_pcache_page *, int)"
+    },
+    "sqlite3_pcache_page": {
+      "pBuf": "void *",
+      "pExtra": "void *"
+    },
+    "sqlite3_rtree_geometry": {
+      "aParam": "sqlite3_rtree_dbl *",
+      "nParam": "int",
+      "pContext": "void *",
+      "pUser": "void *",
+      "xDelUser": "void (*)(void *)"
+    },
+    "sqlite3_rtree_query_info": {
+      "aCoord": "sqlite3_rtree_dbl *",
+      "aParam": "sqlite3_rtree_dbl *",
+      "anQueue": "unsigned int *",
+      "apSqlParam": "sqlite3_value **",
+      "eParentWithin": "int",
+      "eWithin": "int",
+      "iLevel": "int",
+      "iRowid": "sqlite3_int64",
+      "mxLevel": "int",
+      "nCoord": "int",
+      "nParam": "int",
+      "pContext": "void *",
+      "pUser": "void *",
+      "rParentScore": "sqlite3_rtree_dbl",
+      "rScore": "sqlite3_rtree_dbl",
+      "xDelUser": "void (*)(void *)"
+    },
+    "sqlite3_snapshot": {
+      "hidden": "unsigned char[48]"
+    },
+    "sqlite3_vfs": {
+      "iVersion": "int",
+      "mxPathname": "int",
+      "pAppData": "void *",
+      "pNext": "sqlite3_vfs *",
+      "szOsFile": "int",
+      "xAccess": "int (*)(sqlite3_vfs *, const char *, int, int *)",
+      "xCurrentTime": "int (*)(sqlite3_vfs *, double *)",
+      "xCurrentTimeInt64": "int (*)(sqlite3_vfs *, sqlite3_int64 *)",
+      "xDelete": "int (*)(sqlite3_vfs *, const char *, int)",
+      "xDlClose": "void (*)(sqlite3_vfs *, void *)",
+      "xDlError": "void (*)(sqlite3_vfs *, int, char *)",
+      "xDlOpen": "void *(*)(sqlite3_vfs *, const char *)",
+      "xDlSym": "void (*(*)(sqlite3_vfs *, void *, const char *))(void)",
+      "xFullPathname": "int (*)(sqlite3_vfs *, const char *, int, char *)",
+      "xGetLastError": "int (*)(sqlite3_vfs *, int, char *)",
+      "xGetSystemCall": "sqlite3_syscall_ptr (*)(sqlite3_vfs *, const char *)",
+      "xNextSystemCall": "const char *(*)(sqlite3_vfs *, const char *)",
+      "xOpen": "int (*)(sqlite3_vfs *, sqlite3_filename, sqlite3_file *, int, int *)",
+      "xRandomness": "int (*)(sqlite3_vfs *, int, char *)",
+      "xSetSystemCall": "int (*)(sqlite3_vfs *, const char *, sqlite3_syscall_ptr)",
+      "xSleep": "int (*)(sqlite3_vfs *, int)",
+      "zName": "const char *"
+    },
+    "sqlite3_vtab": {
+      "nRef": "int",
+      "pModule": "const sqlite3_module *",
+      "zErrMsg": "char *"
+    },
+    "sqlite3_vtab_cursor": {
+      "pVtab": "sqlite3_vtab *"
+    }
+  },
+  "typedefs": {
+    "Fts5Context": "struct Fts5Context",
+    "Fts5ExtensionApi": "struct Fts5ExtensionApi",
+    "Fts5PhraseIter": "struct Fts5PhraseIter",
+    "Fts5Tokenizer": "struct Fts5Tokenizer",
+    "fts5_api": "struct fts5_api",
+    "fts5_extension_function": "void (*)(const Fts5ExtensionApi *, Fts5Context *, sqlite3_context *, int, sqlite3_value **)",
+    "fts5_tokenizer": "struct fts5_tokenizer",
+    "fts5_tokenizer_v2": "struct fts5_tokenizer_v2",
+    "sqlite3": "struct sqlite3",
+    "sqlite3_api_routines": "struct sqlite3_api_routines",
+    "sqlite3_backup": "struct sqlite3_backup",
+    "sqlite3_blob": "struct sqlite3_blob",
+    "sqlite3_callback": "int (*)(void *, int, char **, char **)",
+    "sqlite3_changegroup": "struct sqlite3_changegroup",
+    "sqlite3_changeset_iter": "struct sqlite3_changeset_iter",
+    "sqlite3_context": "struct sqlite3_context",
+    "sqlite3_destructor_type": "void (*)(void *)",
+    "sqlite3_file": "struct sqlite3_file",
+    "sqlite3_filename": "const char *",
+    "sqlite3_index_info": "struct sqlite3_index_info",
+    "sqlite3_int64": "sqlite_int64",
+    "sqlite3_io_methods": "struct sqlite3_io_methods",
+    "sqlite3_mem_methods": "struct sqlite3_mem_methods",
+    "sqlite3_module": "struct sqlite3_module",
+    "sqlite3_mutex": "struct sqlite3_mutex",
+    "sqlite3_mutex_methods": "struct sqlite3_mutex_methods",
+    "sqlite3_pcache": "struct sqlite3_pcache",
+    "sqlite3_pcache_methods": "struct sqlite3_pcache_methods",
+    "sqlite3_pcache_methods2": "struct sqlite3_pcache_methods2",
+    "sqlite3_pcache_page": "struct sqlite3_pcache_page",
+    "sqlite3_rebaser": "struct sqlite3_rebaser",
+    "sqlite3_rtree_dbl": "double",
+    "sqlite3_rtree_geometry": "struct sqlite3_rtree_geometry",
+    "sqlite3_rtree_query_info": "struct sqlite3_rtree_query_info",
+    "sqlite3_session": "struct sqlite3_session",
+    "sqlite3_snapshot": "struct sqlite3_snapshot",
+    "sqlite3_stmt": "struct sqlite3_stmt",
+    "sqlite3_str": "struct sqlite3_str",
+    "sqlite3_syscall_ptr": "void (*)(void)",
+    "sqlite3_uint64": "sqlite_uint64",
+    "sqlite3_value": "struct sqlite3_value",
+    "sqlite3_vfs": "struct sqlite3_vfs",
+    "sqlite3_vtab": "struct sqlite3_vtab",
+    "sqlite3_vtab_cursor": "struct sqlite3_vtab_cursor",
+    "sqlite_int64": "long long",
+    "sqlite_uint64": "unsigned long long"
+  }
+}
