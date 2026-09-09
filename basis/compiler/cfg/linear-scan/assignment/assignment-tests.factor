@@ -222,3 +222,34 @@ IN: compiler.cfg.linear-scan.assignment.tests
     { { 3 7 } { -1 56 } { -1 3 } } >min-heap [ -1 = ] heap-pop-while
     sort
 ] unit-test
+
+! The old product expires before its successor activates, even if the
+! physical register is identical. The old store must precede the source
+! branch; a bypass into the destination must not execute that old store.
+{ t t t t } [
+    {
+        T{ live-interval-state
+            { vreg 37 } { reg RAX }
+            { ranges V{ { 0 3 } } }
+            { spill-to T{ spill-slot { n 0 } } } { spill-rep int-rep }
+            { uses V{ T{ vreg-use { n 2 } { use-rep int-rep } } } }
+        }
+        T{ live-interval-state
+            { vreg 37 } { reg RAX }
+            { ranges V{ { 3 6 } } }
+            { uses V{ T{ vreg-use { n 4 } { use-rep int-rep } } } }
+        }
+    } [ clone ] map init-assignment
+    H{ { 37 37 } } leader-map set
+    H{ { 37 int-rep } } representations set
+    V{ T{ ##peek { dst 37 } { loc D: 0 } { insn# 0 } }
+        T{ ##compare-integer-imm-branch { src1 37 } { src2 0 } { cc cc= } { insn# 2 } } }
+    [ clone ] map 0 insns>block
+    [ assign-registers-in-block ] keep
+    V{ T{ ##replace { src 37 } { loc D: 0 } { insn# 4 } }
+        T{ ##branch { insn# 6 } } }
+    [ clone ] map 1 insns>block
+    [ assign-registers-in-block ] keep swap
+    [ instructions>> dup first src>> RAX = swap [ ##spill? ] any? not ]
+    [ instructions>> dup last ##compare-integer-imm-branch? swap but-last last ##spill? ] bi*
+] unit-test
