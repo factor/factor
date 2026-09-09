@@ -15,6 +15,12 @@ code_heap::code_heap(cell size) {
   if (size > 0x8000000)
     fatal_error("Heap too large", size);
 #endif
+#if defined(WINDOWS) && defined(FACTOR_AMD64)
+  // The Windows x64 function table stores the exclusive heap end as a
+  // 32-bit RVA. Check the rounded allocation size before it can truncate.
+  if (align_page(size) > UINT32_MAX)
+    fatal_error("Heap too large", size);
+#endif
   seg = new segment(align_page(size), true);
   if (!seg)
     fatal_error("Out of memory in code_heap constructor", size);

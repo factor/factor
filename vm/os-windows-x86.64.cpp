@@ -74,6 +74,10 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
   func->EndAddress = (DWORD)(code->seg->end - base);
   func->UnwindData = (DWORD)((cell)&seh_area->unwind_info - base);
 
+  if (!FlushInstructionCache(GetCurrentProcess(), seh_area->handler,
+                             sizeof(seh_area->handler)))
+    fatal_error("FlushInstructionCache() failed", GetLastError());
+
   if (!RtlAddFunctionTable(func, 1, base))
     fatal_error("RtlAddFunctionTable() failed", 0);
 
