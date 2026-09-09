@@ -58,4 +58,6 @@ scalar-word get word-code over - swap <alien> swap memory>byte-array
 packed-word get word-code over - swap <alien> swap memory>byte-array
 [ length "PACKED-CODE-BYTES " write . ] keep
 "reference/compiler-next3-vectorization-20260909/packed-code.bin" binary set-file-contents
+"reference/compiler-next3-vectorization-20260909/edge-check.factor" run-file
+"ARRAY-EDGE-CASES PASS 48" print
 0 exit

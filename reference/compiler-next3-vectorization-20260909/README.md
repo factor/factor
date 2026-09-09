@@ -20,7 +20,11 @@ Two independent expression trees in one arithmetic-only region must have
 matching operators and lane order, with single-use internal definitions.
 The earlier result may not be consumed before the later root. Gather leaves
 may not depend on any removed definition. Global use counts include implicit
-GC-map operands. Calls/stores/GC/branches end the region; no memory operation
+GC-map operands. In addition, the entire CFG is skipped if it contains either
+GC-provenance seed (`##tagged>integer` or `##unbox-any-c-ptr`), even when the
+seed is outside the candidate region. This conservative exclusion keeps
+scalar pointer definitions available to later GC-base analysis; vector lane
+provenance is not implemented. Calls/stores/GC/branches end the region; no memory operation
 is widened or moved and no loop/reduction order changes. The original scalar
 outputs are extracted into their original SSA identities.
 
@@ -29,13 +33,15 @@ operation, gather and extraction. The cost test counts the entire paired
 tree: each unique leaf pair budgets two gather instructions plus two possible
 tagged/integer conversions, and five instructions cover extraction, output
 tagging and moves. The saved arithmetic count must strictly exceed that
-budget. Regions with more than 256 arithmetic definitions are rejected;
+budget. Regions with fewer than 20 or more than 256 arithmetic definitions are rejected;
 currently only one pair is packed per region.
 
 ## Ordinary-source witness
 
 `kernels.factor` defines a two-channel, twelve-round keyed XOR/add mixing
-kernel using only scalar fixnum operations. It contains no vector type or SIMD
+kernel using scalar bitwise XOR and the private unchecked wrapping
+`math.private:fixnum+fast` primitive. This does not claim vectorization of
+generic overflow-checking `+`. It contains no vector type or SIMD
 intrinsic. This additional representative scalar microkernel is **not** a
 claim that an existing 26-workload benchmark was vectorized.
 
@@ -64,4 +70,10 @@ Runtime measurements, existing-corpus coverage, and native x86 confirmation
 remain pending. Code-size reduction and instruction selection alone do not
 establish an execution-time win. Array tails, aliasing and unaligned access
 are structurally unaffected because this pass does not transform memory or
-loop iteration; additional wrapper cases remain to be exercised.
+loop iteration. Forty-eight buffer-wrapper cases additionally match OFF/ON
+for lengths 0, 1, 2, 3, 7, 8, 9 and 31, byte offsets 0, 1 and 7, and distinct
+or coincident lane addresses. The raw memory accesses remain scalar.
+
+`workload.factor` provides a definitions-only timing wrapper with a mutable
+selected-word handle and an exact independently prepared scalar checksum.
+Call `prepare-mixing-oracle` outside timing before invoking `mixing-work`.

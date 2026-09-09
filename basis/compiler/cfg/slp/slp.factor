@@ -99,7 +99,9 @@ TUPLE: slp-tree pair opcode children ;
     H{ } clone :> definitions
     insns [ dup slp-arithmetic? [ dup dst>> definitions set-at ] [ drop ] if ] each
     ! Bound compile work and recursion for unusually large straight-line IR.
-    definitions assoc-size 256 <= [
+    ! A pack needs at least ten paired operations even with only one leaf.
+    ! Fewer than twenty scalar definitions cannot repay boundary costs.
+    definitions assoc-size dup 20 >= swap 256 <= and [
         insns reverse [| b |
             b insns index insns swap head reverse [| a |
                 a b insns slp-root-pair? [
@@ -138,22 +140,34 @@ TUPLE: slp-tree pair opcode children ;
     region uses vectorize-slp-region result push-all
     result ;
 
+! These are the two roots recognized by liveness:lookup-base-pointer*.
+! Reject the whole CFG before packing if either occurs: extracting a packed
+! derived address would hide that provenance from later GC-map construction.
+! This intentionally sacrifices numeric opportunities in mixed pointer CFGs.
+: slp-pointer-source? ( insn -- ? )
+    dup ##tagged>integer? [ drop t ] [ ##unbox-any-c-ptr? ] if ;
+
 :: auto-vectorize ( cfg -- )
     automatic-slp? get [
         H{ { "packs" 0 } { "vector-operations" 0 } } clone slp-statistics namespaces:set
         slp-supported? [
-            H{ } clone :> uses
-            cfg post-order [ instructions>> [| insn |
-                insn uses-vregs [ uses inc-at ] each
-                insn gc-map-insn? [
-                    insn gc-map>> [
-                        [ gc-roots>> ]
-                        [ derived-roots>> [ keys ] [ values ] bi append ] bi append
-                        [ uses inc-at ] each
-                    ] when*
-                ] when
-            ] each ] each
-            cfg [ uses vectorize-slp-block ] simple-optimization
-            cfg cfg-changed
+            cfg post-order :> blocks
+            blocks [ instructions>> [ slp-pointer-source? ] any? ] any? [
+                "pointer-cfgs-skipped" slp-statistics get inc-at
+            ] [
+                H{ } clone :> uses
+                blocks [ instructions>> [| insn |
+                    insn uses-vregs [ uses inc-at ] each
+                    insn gc-map-insn? [
+                        insn gc-map>> [
+                            [ gc-roots>> ]
+                            [ derived-roots>> [ keys ] [ values ] bi append ] bi append
+                            [ uses inc-at ] each
+                        ] when*
+                    ] when
+                ] each ] each
+                cfg [ uses vectorize-slp-block ] simple-optimization
+                cfg cfg-changed
+            ] if
         ] when
     ] when ;

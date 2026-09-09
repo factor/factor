@@ -16,7 +16,17 @@ IN: benchmark.scalar-mixing
         x key increment twelve-rounds y key increment twelve-rounds
     ] call ;
 
-! The oracle uses arbitrary-precision addition and explicitly reduces to the
-! signed fixnum width. It neither shares the unrolled body nor uses SIMD.
+! The oracle uses arbitrary-precision addition. Callers testing wrapping
+! endpoints reduce its result to the signed fixnum width explicitly. It
+! neither shares the unrolled body nor uses SIMD.
 :: scalar-oracle ( x key increment -- y )
     x 12 [ key bitxor increment + ] times ;
+
+USING: namespaces ;
+SYMBOL: selected-mixing-kernel
+\ mixing-pair selected-mixing-kernel set-global
+
+! A mutable word handle prevents callers from inlining a previously compiled
+! scalar copy. The benchmark installer recompiles this same target OFF/ON.
+: invoke-mixing ( x y key increment -- a b )
+    selected-mixing-kernel get execute( x y key increment -- a b ) ;
