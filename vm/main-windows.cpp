@@ -20,8 +20,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   (void)lpCmdLine;
   (void)nCmdShow;
   int argc;
-  wchar_t** argv = CommandLineToArgvW(GetCommandLine(), &argc);
-  wmain(argc, argv);
-
-  return 0;
+  wchar_t** argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+  if (argv == NULL)
+    factor::fatal_error("CommandLineToArgvW() failed", GetLastError());
+  int result = wmain(argc, argv);
+  LocalFree(argv);
+  return result;
 }
