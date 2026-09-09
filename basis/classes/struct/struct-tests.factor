@@ -5,7 +5,7 @@ arrays assocs byte-arrays classes classes.private classes.struct
 classes.struct.prettyprint.private classes.tuple
 classes.tuple.parser classes.tuple.private combinators
 compiler.tree.debugger compiler.units definitions delegate
-destructors eval generic generic.single io.encodings.utf8
+destructors eval generic generic.single io.encodings.utf16 io.encodings.utf8
 io.streams.string kernel layouts lexer libc literals math
 mirrors namespaces parser prettyprint prettyprint.config see
 sequences specialized-arrays specialized-arrays.private stack-checker.dependencies
@@ -193,6 +193,22 @@ UNION-STRUCT: struct-test-float-and-bits
 
 STRUCT: struct-test-string-ptr
     { x c-string } ;
+
+! Encoded string descriptors are pointers, not fixed-length array fields.
+! COM's STATSTG.pwcsName uses a typedef of this form and accepts NULL.
+TYPEDEF: { c-string utf16n } struct-test-wide-string
+STRUCT: struct-test-wide-string-ptr { x struct-test-wide-string } ;
+
+{ f } [ struct-test-string-ptr <struct> f >>x x>> ] unit-test
+{ f } [ struct-test-wide-string-ptr <struct> f >>x x>> ] unit-test
+{ f } [ f struct-test-wide-string-ptr <struct-boa> x>> ] unit-test
+
+{ "hello world" } [
+    [
+        struct-test-wide-string-ptr <struct>
+        "hello world" utf16n malloc-string &free >>x x>>
+    ] with-destructors
+] unit-test
 
 { "hello world" } [
     [
