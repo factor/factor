@@ -158,3 +158,11 @@ new completeness claim. This is a checked CFG pipeline smoke test in a native
 x86 VM, not execution of generated machine code or a performance measurement.
 Its historical script path uses the existing crossarch harness directory on
 agent1; the exact environment and partial-image reload are recorded in the status.
+
+After the existing `analyze.py --require-complete --min-samples 6` produces the
+paired before/after summary, `rank.py SUMMARY.json --output PATH` derives the
+within-final-source comparison against final linear scan. It rejects missing
+allocators, workloads, source identity, rounds or samples. Its unit-test numbers
+are synthetic and do not report any allocator performance. This additional
+report answers a different question from each allocator’s improvement over its
+own prototype baseline; both reports are required.
