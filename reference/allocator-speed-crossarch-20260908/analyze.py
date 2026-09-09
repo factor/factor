@@ -6,6 +6,7 @@ p=argparse.ArgumentParser();p.add_argument('directory',type=Path);p.add_argument
 spec=importlib.util.spec_from_file_location('original',Path(__file__).with_name('original-analysis.py'));original=importlib.util.module_from_spec(spec);spec.loader.exec_module(original)
 results=collections.defaultdict(list)
 scopes={}
+options={}
 outputs={}
 failures=[]
 for path in sorted(a.directory.glob('*.jsonl*')):
@@ -21,6 +22,9 @@ for path in sorted(a.directory.glob('*.jsonl*')):
  scope=next(x for x in records if x['kind']=='scope');allocator=scope['allocator']
  # Anonymous words use a frozen object index as well as a label.
  scope_words=scope['words']
+ run_options=scope.get('options',{})
+ if label in options:assert options[label]==run_options,(name,'feature flags changed')
+ options[label]=run_options
  if label in scopes: assert scopes[label]==scope_words,(name,'scope changed')
  scopes[label]=scope_words
  current={r['word']:r['output'] for r in records if r['kind']=='runtime'}
@@ -32,7 +36,7 @@ for path in sorted(a.directory.glob('*.jsonl*')):
    outputs[r['word']]=r['output']
  original.independently_check({k:v for k,v in current.items() if k.rsplit(':',1)[-1] in original.WORKLOADS})
  if not scope['checked']:results[(label,allocator)].extend(records)
-summary=dict(failed_runs=failures,scope_words={k:len(v) for k,v in scopes.items()},correctness='All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.',allocators={})
+summary=dict(failed_runs=failures,options=options,scope_words={k:len(v) for k,v in scopes.items()},correctness='All captured outputs agree; original independent checks passed and six pressure checks assert in Factor.',allocators={})
 metrics=('cpu_seconds','ns','instructions')
 for allocator in original.ALLOCATORS:
  b=results[(a.baseline,allocator)];c=results[(a.candidate,allocator)]

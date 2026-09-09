@@ -1,0 +1,12 @@
+{
+  "exit_code": 0,
+  "native_architecture": "x86_64",
+  "host": "agent1",
+  "snapshot": "233db947df",
+  "replaced_files": [
+    "basis/compiler/cfg/liveness/liveness.factor",
+    "basis/compiler/cfg/ssa/destruction/destruction.factor",
+    "basis/compiler/cfg/ssa/interference/live-ranges/live-ranges.factor"
+  ],
+  "final_fix_commit": "d1bfcc67b9"
+}

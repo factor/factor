@@ -4,3 +4,4 @@
 counters
 *.so
 *.dylib
+checked-launch.factor

@@ -24,7 +24,17 @@ for r in range(1 if a.mode=='check' else a.rounds):
     for allocator in order:
         name=f'{a.label}-{a.mode}-{allocator}-{ordinal+1}'
         log=OUT/(name+'.log')
-        cmd=[str(ROOT/'factor'),'-resource-path='+str(ROOT),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(OUT/'timing.factor'),allocator,a.mode,str(a.samples),a.rematerialize,a.loop_spills]
+        entry=OUT/'timing.factor'
+        final_verifier=False
+        if a.mode=='check' and (ROOT/'basis/compiler/cfg/register-allocation/verifier/verifier.factor').exists():
+            final_verifier=True
+            setup='USING: parser vocabs.loader ;\n<< "compiler.cfg.register-allocation.verifier" require'
+            if (ROOT/'basis/compiler/cfg/register-allocation/verifier/rematerialization/rematerialization.factor').exists():
+                setup+=' "compiler.cfg.register-allocation.verifier.rematerialization" require'
+            setup+=' >>\n"reference/allocator-speed-crossarch-20260908/timing.factor" run-file\n'
+            entry=OUT/'checked-launch.factor'
+            entry.write_text(setup)
+        cmd=[str(ROOT/'factor'),'-resource-path='+str(ROOT),'-i='+str(Path(a.image).resolve()),'-no-user-init',str(entry),allocator,a.mode,str(a.samples),a.rematerialize,a.loop_spills]
         if platform.system()=='Linux':cmd=['taskset','-c',a.cpu]+cmd
         print('START',name,flush=True)
         start=time.time()
@@ -44,7 +54,7 @@ for r in range(1 if a.mode=='check' else a.rounds):
         kinds=[x['kind'] for x in records]
         expected=26*(1 if a.mode=='check' else a.samples+1)
         ok=code==0 and kinds.count('scope')==1 and kinds.count('compile')==1 and kinds.count('code')==12 and kinds.count('runtime')==expected
-        status=dict(exit_code=code,seconds=time.time()-start,command=cmd,ok=ok,counts={x:kinds.count(x) for x in set(kinds)})
+        status=dict(final_value_verifier=final_verifier,exit_code=code,seconds=time.time()-start,command=cmd,ok=ok,counts={x:kinds.count(x) for x in set(kinds)})
         if policy:status['taskpolicy']=dict(exit_code=policy.returncode,stderr=policy.stderr)
         (OUT/(name+'.status.json')).write_text(json.dumps(status,indent=2)+'\n')
         print('DONE',name,'exit',code,'records',len(records),'seconds',round(time.time()-start,1),'OK',ok,flush=True)
