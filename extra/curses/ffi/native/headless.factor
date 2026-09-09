@@ -1,6 +1,7 @@
 USING: alien.c-types alien.libraries alien.strings alien.syntax
-byte-arrays continuations curses.ffi io io.encodings.utf8 kernel
-locals math sequences tools.test unix.types ;
+arrays byte-arrays continuations curses.ffi environment io
+io.encodings.utf8 io.launcher io.pathnames kernel locals math
+sequences tools.test unix.types ;
 IN: curses.ffi.tests
 
 LIBRARY: libc
@@ -10,7 +11,8 @@ LIBRARY: curses
 FUNCTION: int mvwinnstr ( WINDOW* win, int y, int x, char* text, int count )
 FUNCTION-ALIAS: wprintw-literal int wprintw ( WINDOW* win, c-string fmt, ... )
 FUNCTION-ALIAS: tparm-position c-string tparm ( c-string capability, ... long row, long column )
-FUNCTION-ALIAS: tparm-text c-string tparm ( c-string capability, ... c-string text )
+FUNCTION-ALIAS: test-tigetstr char* tigetstr ( c-string name )
+FUNCTION-ALIAS: tparm-text c-string tparm ( c-string capability, ... long key, c-string text )
 FUNCTION-ALIAS: wprintw-mixed int wprintw ( WINDOW* win, c-string fmt, ... c-string text, double value, int count )
 
 ERROR: curses-test-allocation-failed resource ;
@@ -56,7 +58,7 @@ ERROR: curses-test-allocation-failed resource ;
             "%p1%d:%p9%d" 11 22 33 44 55 66 77 88 99 tparm
         ] unit-test
         { "3:5" } [ "%p1%d:%p2%d" 3 5 tparm-position ] unit-test
-        { "text" } [ "%p1%s" "text" tparm-text ] unit-test
+        { "7:text" } [ "pfkey" test-tigetstr 7 "text" tparm-text ] unit-test
     ] [ window delwin drop ] finally ;
 
 ! Every byte of terminal output goes to a temporary file. No tty is opened.
@@ -65,11 +67,18 @@ ERROR: curses-test-allocation-failed resource ;
     [
         test-tmpfile :> input
         [
-            "dumb" output input newterm :> screen
+            "factor-ffi-test" output input newterm :> screen
             screen [
                 [ quot call ] [ endwin drop screen delscreen ] finally
-            ] [ "Skipping headless curses checks: dumb terminfo entry is unavailable." print ] if
+            ] [ "test terminfo" curses-test-allocation-failed ] if
         ] [ input curses-fclose drop ] finally
     ] [ output curses-fclose drop ] finally ; inline
 
-[ check-headless-printw ] with-headless-screen
+[
+    "tic" "-o" "." absolute-path
+    "resource:extra/curses/ffi/native/factor-test.ti" absolute-path
+    4array try-process
+    "." absolute-path "TERMINFO" [
+        [ check-headless-printw ] with-headless-screen
+    ] with-os-env
+] with-test-directory

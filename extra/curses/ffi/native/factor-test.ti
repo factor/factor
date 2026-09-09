@@ -1,0 +1,3 @@
+factor-ffi-test|Factor FFI test terminal,
+	cols#80, lines#24,
+	pfkey=%p1%d:%p2%s,
