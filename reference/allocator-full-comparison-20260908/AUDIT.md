@@ -91,7 +91,7 @@ option originally failed to discover recipes before identity leaders and lost
 activity counts during numbering; the correction now has a positive native
 recipe/code-reduction gate for every allocator.
 
-## Shared correctness and remaining acceptance
+## Shared correctness and final acceptance
 
 The comparison baseline `c84535b24a` is the corrected prototype: snapshot and
 operand checker repairs, boundary expiration, and shared derived-phi GC base
@@ -152,8 +152,14 @@ backtracking/rematerialization on; see
 `../allocator-full-master-integration-20260908/README.md` on the integrated branch.
 That newer VM is not substituted into the frozen performance comparison.
 
-These correctness gates authorize the matched timing matrix; they do not
-establish a performance win. Earlier targeted witnesses remain scoped evidence.
-The separate default bootstrap's last measured 3:11 result misses the requested
-two-minute limit; it is not converted into a passing timing claim by the compiler
-suite or callback results.
+The complete matched timing matrices now pass on both native architectures.
+Their results do not justify changing the default: x86 favors linear scan, and
+ARM's apparent backtracking CPU advantage is confounded by large changes in
+host execution rate while retired work increases. Earlier targeted witnesses
+remain scoped evidence. See [the final results](RESULTS.md) for the full
+comparison and explicit limits.
+
+The newer merged source's fresh default bootstrap completes in 2:12 with a
+verified saved image. It still misses the requested two-minute budget. Its VM
+and boot seed differ from the earlier frozen candidate's 3:11 run; neither the
+compiler suite nor callback results turn this into a passing timing claim.

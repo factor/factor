@@ -94,3 +94,14 @@ on the same source (4.16 seconds). Neither result is a runtime measurement.
 The final comparison uses immutable source `30a50ab0df` and the same native
 VM/input image as its repaired prototype baseline. Later evidence-only
 commits on this integration branch do not change the measured source.
+
+## Completed comparison and merged bootstrap
+
+Both frozen native timing matrices are now complete and strictly accepted; see
+[final allocator results](../allocator-full-comparison-20260908/RESULTS.md).
+No allocator is promoted. The merged current master-candidate source also passes
+a fresh default bootstrap and saved-image checks with its newer VM and boot seed,
+but the core report is 2:12 and still misses the two-minute budget. This does not
+replace the provenance or timing of the older frozen bootstrap above. Exact
+[merged bootstrap records](../allocator-full-master-integration-20260908/README.md)
+are retained on the integrated branch.
