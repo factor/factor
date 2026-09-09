@@ -1,0 +1,3 @@
+vector two 46; vector variadic 17
+control group 7 failed
+C ARM64 union/padding controls: FAIL; vector=1

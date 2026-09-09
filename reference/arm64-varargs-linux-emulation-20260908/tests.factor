@@ -11,6 +11,8 @@ f restartable-tests? set-global
 "compiler.cfg.builder.alien" test
 "resource:basis/compiler/tests/alien-varargs.factor" run-test-file
 "resource:basis/compiler/tests/alien-varargs-outgoing.factor" run-test-file
+"resource:basis/compiler/tests/alien-varargs-promotions.factor" run-test-file
+"resource:basis/compiler/tests/alien-arm64-unions.factor" run-test-file
 test-failures get empty? compiler-errors get assoc-empty? and
 [ "Linux ARM64 emulated varargs tests passed" print 0 ]
 [ :test-failures compiler-errors get values [ print-error ] each 1 ] if flush exit

@@ -1,0 +1,1481 @@
+ARM64 C varargs controls passed: 0xff
+ARM64 half/BF16 fixture capability explicitly unavailable in this compiler lane
+Unit Test: {
+    { -7 3.5 42 }
+    [
+        [
+            load-local -7 0 get-local 256 set-alien-signed-4
+            3.5 0 get-local 264 set-alien-double
+            42 0 get-local 272 set-alien-signed-8
+            0 get-local macos cursor-at load-local
+            0 get-local char va-arg 0 get-local double va-arg 0
+            get-local longlong va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 11 22 22 }
+    [
+        [
+            load-local 11 0 get-local 256 set-alien-signed-4
+            22 0 get-local 264 set-alien-signed-4
+            0 get-local macos cursor-at load-local
+            0 get-local int va-arg 0 get-local va-copy
+            load-local
+            -1 get-local int va-arg 0 get-local int va-arg 3
+            drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 123 2.5 456 }
+    [
+        [
+            load-local 123 0 get-local 0 set-alien-signed-4
+            456 0 get-local 8 set-alien-signed-4
+            2.5 0 get-local 64 set-alien-double
+            0 get-local linux cursor-at load-local
+            0 get-local int va-arg 0 get-local double va-arg 0
+            get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 7 8 }
+    [
+        [
+            load-local 7 0 get-local 56 set-alien-signed-4
+            8 0 get-local 256 set-alien-signed-4
+            0 get-local linux cursor-at -8 >>gr-offs load-local
+            0 get-local int va-arg 0 get-local int va-arg 2
+            drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 17 19 23 }
+    [
+        [
+            load-local 999 0 get-local 56 set-alien-signed-8
+            17 0 get-local 256 set-alien-signed-8
+            19 0 get-local 264 set-alien-signed-8
+            23 0 get-local 272 set-alien-signed-4
+            0 get-local linux cursor-at -8 >>gr-offs load-local
+            0 get-local va-pair va-arg [ x>> ] [ y>> ] bi
+            0 get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 17 19 23 }
+    [
+        [
+            load-local 17 0 get-local 56 set-alien-signed-8
+            19 0 get-local 64 set-alien-signed-8
+            23 0 get-local 72 set-alien-signed-4
+            0 get-local windows cursor-at
+            56 0 get-local <displaced-alien> >>stack load-local
+            0 get-local va-pair va-arg [ x>> ] [ y>> ] bi
+            0 get-local int va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.5 2.5 }
+    [
+        [
+            load-local 1.5 0 get-local 64 set-alien-double
+            2.5 0 get-local 80 set-alien-double
+            0 get-local linux cursor-at va-hfa va-arg load-local
+            100.0 -1 get-local 64 set-alien-double 0 get-local
+            [ x>> ] [ y>> ] bi 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-double
+            2.0 0 get-local 80 set-alien-double
+            3.0 0 get-local 96 set-alien-double
+            4.0 0 get-local 112 set-alien-double
+            0 get-local linux cursor-at va-nested-hfa va-arg
+            [ x>> [ x>> ] [ y>> ] bi ]
+            [ y>> [ x>> ] [ y>> ] bi ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 3.0 4.0 5.0 }
+    [
+        [
+            load-local 999.0 0 get-local 176 set-alien-double
+            3.0 0 get-local 256 set-alien-double
+            4.0 0 get-local 264 set-alien-double
+            5.0 0 get-local 272 set-alien-double
+            0 get-local linux cursor-at -16 >>vr-offs load-local
+            0 get-local va-hfa va-arg [ x>> ] [ y>> ] bi
+            0 get-local double va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 11 22 33 }
+    [
+        [
+            load-local 320 0 get-local <displaced-alien>
+            0 get-local 0 set-alien-cell
+            11 0 get-local 320 set-alien-signed-8
+            22 0 get-local 328 set-alien-signed-8
+            33 0 get-local 336 set-alien-signed-8
+            0 get-local linux cursor-at va-triple va-arg
+            [ x>> ] [ y>> ] [ z>> ] tri 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 } }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-double
+            2.0 0 get-local 80 set-alien-double
+            3.0 0 get-local 96 set-alien-double
+            0 get-local linux cursor-at
+            va-array-hfa va-arg values>> >array 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.0 2.0 }
+    [
+        [
+            load-local 15360 0 get-local 64 set-alien-unsigned-2
+            16384 0 get-local 80 set-alien-unsigned-2
+            0 get-local linux cursor-at va-small-hfa va-arg
+            [ x>> ] [ y>> ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } { 5.0 6.0 7.0 8.0 } }
+    [
+        [
+            load-local 1.0 0 get-local 64 set-alien-float
+            2.0 0 get-local 68 set-alien-float
+            3.0 0 get-local 72 set-alien-float
+            4.0 0 get-local 76 set-alien-float
+            5.0 0 get-local 80 set-alien-float
+            6.0 0 get-local 84 set-alien-float
+            7.0 0 get-local 88 set-alien-float
+            8.0 0 get-local 92 set-alien-float
+            0 get-local linux cursor-at va-hva va-arg
+            [ x>> >array ] [ y>> >array ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } 23 }
+    [
+        [
+            load-local 1.0 0 get-local 272 set-alien-float
+            2.0 0 get-local 276 set-alien-float
+            3.0 0 get-local 280 set-alien-float
+            4.0 0 get-local 284 set-alien-float
+            23 0 get-local 288 set-alien-signed-4
+            0 get-local linux cursor-at 0 >>vr-offs 0 >>gr-offs
+            264 0 get-local <displaced-alien> >>stack load-local
+            0 get-local float-4 va-arg >array 0 get-local int
+            va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } }
+    [
+        [
+            [
+                load-local 1.0 0 get-local 64 set-alien-float
+                2.0 0 get-local 68 set-alien-float
+                3.0 0 get-local 72 set-alien-float
+                4.0 0 get-local 76 set-alien-float
+                0 get-local linux cursor-at
+                float-4 va-arg >array 1 drop-locals
+            ] with-va-memory
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { { 1.0 2.0 3.0 4.0 } 23 }
+    [
+        [
+            load-local 1.0 0 get-local 56 set-alien-float
+            2.0 0 get-local 60 set-alien-float
+            3.0 0 get-local 64 set-alien-float
+            4.0 0 get-local 68 set-alien-float
+            23 0 get-local 72 set-alien-signed-4
+            0 get-local windows cursor-at
+            56 0 get-local <displaced-alien> >>stack load-local
+            0 get-local float-4 va-arg >array 0 get-local int
+            va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        [
+            load-local 320 0 get-local <displaced-alien>
+            0 get-local 256 set-alien-cell
+            1.0 0 get-local 320 set-alien-double
+            2.0 0 get-local 328 set-alien-double
+            3.0 0 get-local 336 set-alien-double
+            4.0 0 get-local 344 set-alien-double
+            0 get-local windows cursor-at va-nested-hfa va-arg
+            [ x>> [ x>> ] [ y>> ] bi ]
+            [ y>> [ x>> ] [ y>> ] bi ] bi 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { }
+    [
+        [
+            load-local 0 get-local macos cursor-at
+            dup escaped-cursor set-global
+            va-copy escaped-copy set-global 1 drop-locals
+        ] with-va-memory
+    ]
+}
+Must Fail With: { [ escaped-cursor get int va-arg ] [ expired-va-list? ] }
+Must Fail With: { [ escaped-copy get va-copy ] [ expired-va-list? ] }
+Unit Test: {
+    { }
+    [
+        [
+            [
+                load-local 0 get-local macos cursor-at
+                dup escaped-cursor set-global
+                va-copy escaped-copy set-global
+                "scope cleanup test" throw 1 drop-locals
+            ] with-va-memory
+        ] [ drop ] recover
+    ]
+}
+Must Fail With: { [ escaped-cursor get int va-arg ] [ expired-va-list? ] }
+Must Fail With: { [ escaped-copy get int va-arg ] [ expired-va-list? ] }
+Unit Test: {
+    { t }
+    [
+        [
+            load-local 0 get-local macos cursor-at load-local
+            0 get-local [
+                load-local 0 get-local [
+                    load-local 0 get-local va-copy drop
+                    f 1 drop-locals
+                ] curry [ expired-va-list? ] recover
+                1 drop-locals
+            ] curry future ?future 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Must Fail With: {
+    [ f f f 0 0 macos <platform-va-cursor> ]
+    [ va-list-outside-callback-scope? ]
+}
+Unit Test: {
+    { t t f }
+    [
+        va_list native-va-list-type? cpu arm.64? =
+        va_list lookup-c-type native-va-list-type? cpu arm.64? =
+        int native-va-list-type?
+    ]
+}
+Unit Test: {
+    { 6 "7/2.50" 6 "7/2.50" 7 }
+    [
+        [
+            load-local 7 0 get-local 0 set-alien-signed-4
+            2.5 0 get-local 64 set-alien-double
+            7 0 get-local 256 set-alien-signed-4
+            2.5 0 get-local 264 set-alien-double
+            0 get-local os cursor-at load-local
+            32 <byte-array> load-local
+            0 get-local 32 "%d/%.2f" -1 get-local
+            va-test-vsnprintf 0 get-local utf8 alien>string
+            0 get-local 32 "%d/%.2f" -1 get-local
+            va-test-vsnprintf 0 get-local utf8 alien>string
+            -1 get-local int va-arg 3 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { 7 7 }
+    [
+        [
+            load-local 7 0 get-local 0 set-alien-signed-4
+            7 0 get-local 256 set-alien-signed-4
+            0 get-local os cursor-at load-local
+            0 get-local cursor>native-va-list
+            native-va-list>cursor int va-arg 0 get-local int
+            va-arg 2 drop-locals
+        ] with-va-memory
+    ]
+}
+Unit Test: {
+    { "hello" }
+    [ { "hello" } [ CREATE-C-TYPE name>> ] with-parsing ]
+}
+Unit Test: {
+    { 0 }
+    [
+        { } [
+            "hello" current-vocab create-word
+            old-definitions get first adjoin
+            "hello" (CREATE-C-TYPE) drop
+            old-definitions get first cardinality
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { "what-type" }
+    [
+        { } [
+            void "what-type" f { } { } make-callback-type 2drop
+            name>>
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { 1 }
+    [
+        { } [
+            "hello" current-vocab create-word
+            old-definitions get first adjoin void "hello" f
+            { } { } make-callback-type 3drop
+            old-definitions get first cardinality
+        ] with-parsing
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        { "ayae" }
+        [ parse-enum-name new-definitions get first in? ]
+        with-parsing
+    ]
+}
+Unit Test: {
+    {
+        "Cannot define a C type 'hello*' that ends with an asterisk (*)"
+    }
+    [ [ "hello*" validate-c-type-name ] [ ] recover summary ]
+}
+Unit Test: {
+    { { int double int } { "tag" "named" "arg" } 2 }
+    [
+        { "( int tag, double named, ... int arg )" }
+        [ scan-c-args* ] with-parsing
+    ]
+}
+Unit Test: {
+    { { int } { "tag" } f }
+    [ { "( int tag )" } [ scan-c-args* ] with-parsing ]
+}
+Must Fail With: {
+    [
+        { "( int tag, ... ... int arg )" } [ scan-c-args* ]
+        with-parsing
+    ]
+    [ error>> duplicate-varargs-marker? ]
+}
+Must Fail With: {
+    [
+        { "( int tag, ... int arg )" } [ scan-c-args ]
+        with-parsing
+    ]
+    [ error>> varargs-in-function-declaration? ]
+}
+Unit Test: { [ int ] [ "int" parse-c-type ] }
+Unit Test: { [ { int 5 } ] [ "int[5]" parse-c-type ] }
+Unit Test: { [ { int 5 10 11 } ] [ "int[5][10][11]" parse-c-type ] }
+Unit Test: {
+    [ { int 5 10 eleven } ]
+    [ "int[5][10][eleven]" parse-c-type ]
+}
+Unit Test: { [ pointer: void ] [ "void*" parse-c-type ] }
+Unit Test: { [ pointer: int ] [ "int*" parse-c-type ] }
+Unit Test: { [ pointer: pointer: int ] [ "int**" parse-c-type ] }
+Unit Test: { [ pointer: pointer: pointer: int ] [ "int***" parse-c-type ] }
+Unit Test: {
+    [ pointer: pointer: pointer: pointer: int ]
+    [ "int****" parse-c-type ]
+}
+Unit Test: { [ { pointer: int 3 } ] [ "int*[3]" parse-c-type ] }
+Unit Test: { [ { pointer: void 3 } ] [ "void*[3]" parse-c-type ] }
+Unit Test: { [ pointer: { int 3 } ] [ "int[3]*" parse-c-type ] }
+Unit Test: { [ c-string ] [ "c-string" parse-c-type ] }
+Unit Test: { [ char2 ] [ "char2" parse-c-type ] }
+Unit Test: { [ pointer: char2 ] [ "char2*" parse-c-type ] }
+Must Fail: { [ "void[3]" parse-c-type ] }
+Must Fail: { [ "int[3" parse-c-type ] }
+Must Fail: { [ "int[3][4" parse-c-type ] }
+Must Fail With: { [ "not-word" parse-c-type ] [ error>> no-word-error? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ alien-parser-function-effect-test "declared-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ alien-parser-function-effect-test inline? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ (alien-parser-function-effect-test) "declared-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ (alien-parser-function-effect-test) inline? ] }
+Unit Test: {
+    { ( arg1 arg2 -- void* ) }
+    [
+        \ alien-parser-callback-effect-test "callback-effect"
+        word-prop
+    ]
+}
+Unit Test: { { t } [ \ alien-parser-callback-effect-test inline? ] }
+Unit Test: {
+    { ( count args -- int ) }
+    [
+        \ alien-parser-varargs-reader "callback-effect"
+        word-prop
+    ]
+}
+Unit Test: {
+    { 1 }
+    [
+        \ alien-parser-varargs-reader "callback-varargs"
+        word-prop
+    ]
+}
+Unit Test: {
+    { ( tag code value -- double ) }
+    [ \ alien-parser-varargs-tail "callback-effect" word-prop ]
+}
+Unit Test: { { t } [ \ alien-parser-varargs-tail inline? ] }
+Unit Test: {
+    { "OK!" }
+    [
+        [
+            "USE: specialized-arrays SPECIALIZED-ARRAY: alien-parser-test-int"
+            ( -- ) eval "OK!"
+        ] [ :1 ] recover
+    ]
+}
+Unit Test: { { } [ [ ] with-compilation-unit ] }
+Unit Test: {
+    { 7 1 }
+    [
+        alien-callback-params new int >>return
+        { int double } >>parameters t >>varargs? stack-shape
+    ]
+}
+Unit Test: {
+    { V{ 31 32 } { 33 } }
+    [
+        0 inner-d-index set V{ } clone (meta-d) set
+        H{ } clone known-values set V{ } clone literals set
+        30 \ <value> set-global
+        alien-node-params new int >>return
+        { int int } >>parameters inputs/outputs
+    ]
+}
+Unit Test: {
+    { V{ 31 32 33 } { 34 } }
+    [
+        0 inner-d-index set V{ } clone (meta-d) set
+        H{ } clone known-values set V{ } clone literals set
+        30 \ <value> set-global
+        alien-indirect-params new int >>return
+        { int int } >>parameters inputs/outputs
+    ]
+}
+Unit Test: {
+    {
+        [
+            [
+                { fixnum fixnum } declare [ [ ] dip ] dip
+                "hello" >fixnum
+            ] [
+                dup current-callback eq?
+                [ drop ] [ wait-for-callback ] if
+            ] do-callback
+        ]
+    }
+    [
+        int { int int } cdecl f alien-node-params boa
+        [ "hello" ] wrap-callback-quot
+    ]
+}
+Must Fail With: {
+    [
+        alien-invoke-params new { int } >>parameters
+        -1 >>varargs? prepare-varargs
+    ]
+    [ invalid-varargs-count? ]
+}
+Must Fail With: {
+    [
+        alien-invoke-params new { int } >>parameters
+        2 >>varargs? prepare-varargs
+    ]
+    [ invalid-varargs-count? ]
+}
+Unit Test: {
+    { t }
+    [
+        alien-invoke-params new { half bfloat } >>parameters
+        1 >>varargs? prepare-varargs parameters>> length 2 =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        init-cfg-test
+        <basic-block>
+        dup
+        set-basic-block
+        dup
+        \ dummy-assembly
+        build-tree
+        optimize-tree
+        first
+        [ emit-node ]
+        V{ }
+        make
+        drop
+        eq?
+    ]
+}
+Unit Test: {
+    { 2 t }
+    [
+        \ dummy-callback build-tree optimize-tree gensym
+        build-cfg [ length ] [ second frame-pointer?>> ] bi
+    ]
+}
+Unit Test: {
+    {
+        V{
+            T{ ##load-reference { dst 1 } { obj t } }
+            T{ ##load-integer { dst 2 } { val 3 } }
+            T{ ##copy { dst 4 } { src 1 } { rep any-rep } }
+            T{ ##copy { dst 3 } { src 2 } { rep any-rep } }
+            T{ ##inc { loc D: 2 } }
+            T{ ##branch }
+        }
+    }
+    [
+        init-cfg-test
+        <basic-block>
+        dup
+        set-basic-block
+        \ dummy-callback
+        build-tree
+        optimize-tree
+        3
+        swap
+        nth
+        child>>
+        [ emit-callback-body drop ]
+        V{ }
+        make
+    ]
+}
+Unit Test: {
+    { "malloc" f }
+    [
+        f f cdecl f "libc" "malloc" alien-invoke-params boa
+        caller-linkage [ path>> alien>native-string ] ?call
+    ]
+}
+Unit Test: {
+    { t "fdkjlsdflfd" }
+    [
+        begin-stack-analysis \ foo f begin-cfg drop
+        f f cdecl f f "fdkjlsdflfd" alien-invoke-params boa
+        caller-linkage 2drop linkage-errors get foo of error>>
+        [ no-such-symbol? ] [ name>> ] bi
+    ]
+}
+Unit Test: {
+    { { 1 42 } { { int-rep f f } { double-rep f f } } 1 }
+    [
+        init-cfg-test
+        ordinary-struct-result-cpu
+        \ cpu
+        [
+            [
+                { 42 } { { double-rep f f } } indirect-result
+                prepare-struct-caller
+            ] V{ } make drop
+        ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { { 1 } { { int-rep f f } } 1 }
+    [
+        init-cfg-test
+        ordinary-struct-result-cpu
+        \ cpu
+        [
+            [ { } { } indirect-result prepare-struct-caller ]
+            V{ } make drop
+        ]
+        with-variable
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        alien-node-params new long >>return cdecl >>abi
+        25 caller-stack-cleanup
+    ]
+}
+Unit Test: { { } [ "malloc" f check-dlsym ] }
+Unit Test: {
+    { { { 1 int-rep X0 } } { { 2 double-rep V0 } } }
+    [
+        init-cfg-test
+        T{ alien-invoke-params { return int } }
+        prepare-caller-return
+        T{ alien-invoke-params { return double } }
+        prepare-caller-return
+    ]
+}
+Unit Test: {
+    {
+        { 2 3 }
+        { { int-rep f f 8 } { int-rep f f 4 } }
+        V{ T{ ##unbox-any-c-ptr { dst 2 } { src 1 } } }
+    }
+    [
+        init-cfg-test
+        [ { c-string int } unbox-parameters ]
+        V{ }
+        make
+    ]
+}
+Unit Test: {
+    { V{ } V{ } f f }
+    [
+        cdecl
+        [ ] with-param-regs reg-values get stack-values get
+    ]
+}
+Unit Test: {
+    {
+        V{
+            { int-rep X0 }
+            { int-rep X1 }
+            { int-rep X2 }
+            { int-rep X3 }
+        }
+        V{ }
+    }
+    [
+        init-cfg-test
+        { float double half bfloat }
+        windows-vararg-layout
+    ]
+}
+Unit Test: {
+    { V{ { int-rep X0 } { int-rep X1 } { int-rep X2 } } V{ } }
+    [
+        init-cfg-test
+        { windows-vararg-pair windows-vararg-hfa }
+        windows-vararg-layout
+    ]
+}
+Unit Test: {
+    {
+        V{
+            { int-rep X0 }
+            { int-rep X1 }
+            { int-rep X2 }
+            { int-rep X3 }
+            { int-rep X4 }
+            { int-rep X5 }
+            { int-rep X6 }
+            { int-rep X7 }
+        }
+        V{ { int-rep 0 8 } { int-rep 8 8 } }
+    }
+    [
+        init-cfg-test
+        {
+            int
+            int
+            int
+            int
+            int
+            int
+            int
+            windows-vararg-pair
+            double
+        }
+        windows-vararg-layout
+    ]
+}
+Unit Test: {
+    { V{ { int-rep X0 } { int-rep X1 } { int-rep X2 } } V{ } }
+    [ init-cfg-test { int float-4 } windows-vararg-layout ]
+}
+Unit Test: {
+    { { { int-rep f f 8 } } { { int-rep f f 2 } } }
+    [
+        init-cfg-test
+        double
+        base-type
+        flatten-windows-vararg-type
+        half
+        base-type
+        flatten-windows-vararg-type
+    ]
+}
+Unit Test: { { { { int-rep f f 4 } } } [ int base-type flatten-c-type ] }
+Unit Test: {
+    { { { int-rep f f } { int-rep f f } } }
+    [
+        some-struct base-type base-type flatten-c-type
+        [ first3 3array ] map
+    ]
+}
+Unit Test: {
+    { { 20 } { { int-rep f f 4 } } { } }
+    [ reset-vreg-counter [ 20 int base-type unbox ] { } make ]
+}
+Unit Test: {
+    {
+        { 2 3 }
+        { { int-rep f f } { int-rep f f } }
+        {
+            T{ ##unbox-any-c-ptr { dst 1 } { src 20 } }
+            T{ ##load-memory-imm
+                { dst 2 }
+                { base 1 }
+                { offset 0 }
+                { rep int-rep }
+            }
+            T{ ##load-memory-imm
+                { dst 3 }
+                { base 1 }
+                { offset 8 }
+                { rep int-rep }
+            }
+        }
+    }
+    [
+        init-cfg-test
+        [ 20 some-struct base-type unbox [ first3 3array ] map ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    {
+        { 1 }
+        { { int-rep f f 8 } }
+        { T{ ##unbox-any-c-ptr { dst 1 } { src 77 } } }
+    }
+    [
+        init-cfg-test
+        [ 77 c-string base-type unbox-parameter ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    { { 77 } { { int-rep f f 4 } } { } }
+    [
+        init-cfg-test
+        [ 77 int base-type unbox-parameter ]
+        { }
+        make
+    ]
+}
+Unit Test: {
+    { f t V{ } f }
+    [
+        V{ 1 2 3 } clone f reg-class-full? V{ 1 } clone
+        [ t reg-class-full? ] keep V{ 1 2 } t reg-class-full?
+    ]
+}
+Unit Test: { { 255 } [ [ va_c_controls ] compile-call ] }
+Unit Test: {
+    { 0 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 0 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -1 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 1 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -28 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 7 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ read-ints ] int-reader
+            [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ gc read-ints ] int-reader
+            [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 1259.75 }
+    [
+        [
+            double { int double } cdecl
+            [ read-mixed ] alien-callback-varargs
+            [ va_call_mixed ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 86.0 }
+    [
+        [
+            [
+                14 load-locals -13 get-local -12 get-local +
+                -11 get-local + -10 get-local + -9 get-local +
+                -8 get-local + -7 get-local + -6 get-local +
+                -5 get-local + -4 get-local + -3 get-local +
+                -2 get-local 2 * + -1 get-local 3 * +
+                0 get-local 4 * + 14 drop-locals
+            ] named-spill-reader
+            [ va_call_named_spill ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 5.0 }
+    [
+        [
+            [ read-aggregates ] aggregate-reader
+            [ va_call_aggregates ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ [ va_hfa_spill_control ] compile-call ] }
+Unit Test: {
+    { 364.0 }
+    [
+        [
+            [
+                12 load-locals -11 get-local -10 get-local +
+                -9 get-local + -8 get-local + -7 get-local +
+                -6 get-local + -5 get-local + -4 get-local +
+                -3 get-local x>> + -3 get-local y>> 2 * +
+                -2 get-local 3 * +
+                -1 get-local values>> first 4 * +
+                -1 get-local values>> second 5 * +
+                -1 get-local values>> third 6 * +
+                0 get-local 7 * + 12 drop-locals
+            ] hfa-spill-reader
+            [ va_call_hfa_spill ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -15769158013578 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                va-big <struct> 0 get-local longlong va-arg >>x
+                0 get-local longlong va-arg >>y
+                0 get-local longlong va-arg >>z
+                [ gc read-ints ] int-reader
+                [ 12 va_call_ints ] with-callback drop
+                gc 2 drop-locals
+            ] big-reader [ va_call_big_return ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -3.75 }
+    [
+        [
+            [
+                3 load-locals -2 get-local drop
+                va-pair <struct> -1 get-local >>x
+                0 get-local >>y 3 drop-locals
+            ] pair-reader [ va_call_pair_return ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 3 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local int va-arg 0 get-local va-copy int
+                va-arg + 0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 79 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local int va-arg nested-int-callback
+                [ 12 va_call_ints ] with-callback +
+                0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { -1 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local outer-args set-global
+                nested-context-callback
+                [ 0 va_call_ints ] with-callback drop
+                0 get-local int va-arg 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Must Fail With: { [ outer-args get int va-arg ] [ expired-va-list? ] }
+Unit Test: {
+    { 0 }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local va-copy escaped-args set-global
+                0 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Must Fail With: {
+    [ [ escaped-args get int va-arg ] compile-call ]
+    [ expired-va-list? ]
+}
+Unit Test: {
+    { 0 }
+    [
+        [
+            [ read-ints ] list-reader
+            [ 0 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 78 }
+    [
+        [
+            [ read-ints ] list-reader
+            [ 12 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 155 }
+    [
+        [
+            [
+                2 load-locals
+                -1 get-local 0 get-local va_sum_list
+                -1 get-local 0 get-local va_sum_list +
+                0 get-local int va-arg + 2 drop-locals
+            ] list-reader [ 12 va_call_list ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 155 }
+    [
+        [
+            [
+                2 load-locals
+                -1 get-local 0 get-local va_sum_list
+                -1 get-local 0 get-local va_sum_list +
+                0 get-local int va-arg + 2 drop-locals
+            ] int-reader [ 12 va_call_ints ] with-callback
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 30 "value:-42:1.250:-1234567890123" }
+    [ [ 128 formatted ] compile-call ]
+}
+Unit Test: { { 30 "value:-" } [ [ 8 formatted ] compile-call ] }
+Unit Test: { { 30 "" } [ [ 0 formatted ] compile-call ] }
+Unit Test: {
+    { 30 "value:-42:1.250:-1234567890123" }
+    [
+        [
+            [
+                2 load-locals 128 <byte-array> load-local
+                0 get-local 128 -2 get-local -1 get-local
+                va-vsnprintf 0 get-local utf8 alien>string
+                formatted-text set-global 3 drop-locals
+            ] format-list-reader
+            [ va_call_format_list ] with-callback
+            formatted-text get
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 25 ":-42:1.250:-1234567890123" }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local c-string va-arg drop
+                128 <byte-array> load-local
+                0 get-local 128 ":%d:%.*f:%lld" -1 get-local
+                va-vsnprintf 0 get-local utf8 alien>string
+                formatted-text set-global 3 drop-locals
+            ] format-list-reader
+            [ va_call_format_list ] with-callback
+            formatted-text get
+        ] compile-call
+    ]
+}
+Unit Test: { { 30 "value:-42:1.250:-1234567890123" } [ direct-formatted ] }
+Unit Test: { { 570.0 } [ varout_control ] }
+Unit Test: { { 317.0 } [ varout_split_control ] }
+Unit Test: { { 285.0 } [ 1 2 3 4 5 6 7 8 9 varout_mixed ] }
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 varout-small-hfa boa 3 4 5 varout-pair boa
+        6 7 8 varout-hfa boa 9 varout_hfas
+    ]
+}
+Unit Test: {
+    { 317.0 }
+    [ 1 2 3 4 5 6 7 4 5 varout-pair boa 10 varout_split ]
+}
+Unit Test: {
+    { 16.0 27.0 38.0 }
+    [
+        10 6 7 8 varout-hfa boa varout_return
+        [ x>> ] [ y>> ] [ z>> ] tri
+    ]
+}
+Unit Test: {
+    { 285.0 }
+    [
+        1 2 3 4 5 6 7 8 9 "varout_mixed" "varargs-outgoing"
+        library-dll dlsym indirect-varout-mixed
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa 1 varout_hva_alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        align-hva boa
+        1 "varout_hva_alignment" "varargs-outgoing" library-dll
+        dlsym indirect-alignment
+    ]
+}
+Unit Test: {
+    { 0 }
+    [
+        1 2 3 align-prior boa 1 varout_return_alignment
+        alignment>>
+    ]
+}
+Unit Test: {
+    { t }
+    [ align-vector-first heap-size varout_vector_first_size = ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-first c-type-align
+        varout_vector_first_align =
+    ]
+}
+Unit Test: {
+    { t }
+    [
+        align-vector-union c-type-align
+        varout_vector_union_align =
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 float-4{ 1.0 2.0 3.0 4.0 } 3 align-vector-first boa
+        varout_vector_first_after_int
+    ]
+}
+Unit Test: {
+    { 36.0 }
+    [
+        1 2 align-vector-union <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } >>value
+        3 varout_vector_union_after_int
+    ]
+}
+Unit Test: {
+    { 2 30.0 }
+    [
+        64 malloc load-local 0 get-local [
+            load-local 0 get-local [
+                load-local 2 0 get-local 0 set-alien-signed-4
+                1.0 0 get-local 16 set-alien-float
+                2.0 0 get-local 20 set-alien-float
+                3.0 0 get-local 24 set-alien-float
+                4.0 0 get-local 28 set-alien-float
+                0 get-local f f 0 0 macos <platform-va-cursor>
+                load-local
+                0 get-local int va-arg 0 get-local
+                align-vector-union va-arg value>>
+                { 1 2 3 4 } [ * ] 2map sum 2 drop-locals
+            ] curry with-va-scope 1 drop-locals
+        ] curry 0 get-local
+        [ load-local 0 get-local free 1 drop-locals ] curry
+        finally 1 drop-locals
+    ]
+}
+Unit Test: {
+    { { 1 0 -1 255 65535 -7 65530 } }
+    [ [ 7 <iota> [ vap_control_integer ] map ] compile-call ]
+}
+Unit Test: { { 1 } [ [ 0 t vap-bool ] compile-call ] }
+Unit Test: { { 0 } [ [ 0 f vap-bool ] compile-call ] }
+Unit Test: {
+    { 1 }
+    [ [ 0 "non-false Factor object" vap-bool ] compile-call ]
+}
+Unit Test: { { -7 } [ [ 0 -7 vap-char ] compile-call ] }
+Unit Test: { { -1 } [ [ 0 255 vap-char ] compile-call ] }
+Unit Test: { { 255 } [ [ 0 -1 vap-uchar ] compile-call ] }
+Unit Test: { { 65535 } [ [ 0 -1 vap-ushort ] compile-call ] }
+Unit Test: {
+    { -7 }
+    [
+        [
+            0 6148914691236517205 vap_poison drop
+            0 vap-negative vap-signed
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 65530 }
+    [
+        [
+            0 6148914691236517205 vap_poison drop
+            0 vap-positive vap-unsigned
+        ]
+        compile-call
+    ]
+}
+Unit Test: { { -7 } [ [ 0 -7 vap-signed ] compile-call ] }
+Unit Test: { { 65530 } [ [ 0 65530 vap-unsigned ] compile-call ] }
+Unit Test: {
+    { 0.10000000149011612 }
+    [ [ vap_control_float ] compile-call ]
+}
+Unit Test: {
+    { t }
+    [ [ 0 0.1 vap-float vap_control_float = ] compile-call ]
+}
+Unit Test: {
+    { 1 }
+    [
+        [
+            0 t "vap_read_integer" "varargs-promotions"
+            library-dll dlsym indirect-vap-bool
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { 65530 }
+    [
+        [
+            0 vap-positive "vap_read_integer"
+            "varargs-promotions" library-dll dlsym
+            indirect-vap-unsigned
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { { 1 -7 65530 0.10000000149011612 } }
+    [
+        [
+            [
+                2 load-locals -1 get-local drop
+                0 get-local bool va-arg 0 get-local
+                vap-signed-enum va-arg 0 get-local
+                vap-unsigned-enum va-arg 0 get-local float
+                va-arg 4array promotion-values set-global
+                0.0 2 drop-locals
+            ] vap-runtime-reader
+            [ vap_call_reader ] with-callback drop
+            promotion-values get
+        ]
+        compile-call
+    ]
+}
+Unit Test: {
+    { { 1 -7 65530 0.10000000149011612 } }
+    [
+        [
+            [
+                5 load-locals -4 get-local drop
+                -3 get-local -2 get-local -1 get-local 0
+                get-local 4array promotion-values set-global
+                0.0 5 drop-locals
+            ] vap-tail-reader [ vap_call_reader ] with-callback
+            drop promotion-values get
+        ]
+        compile-call
+    ]
+}
+Unit Test: { { 11.25 } [ au-one <struct> 1.25 >>a 10.0 au_take_one ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-two <struct> 1.25 2.5 au-pair boa >>pair
+        10.0 au_take_two
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        au-four <struct> 1.0 2.0 3.0 4.0 au-quad boa >>quad
+        10.0 au_take_four
+    ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        au-one <struct> 1.25 >>a 2.5 au-nested boa
+        10.0 au_take_nested
+    ]
+}
+Unit Test: { { 13.75 } [ au-mixed <struct> 3.75 >>b 10.0 au_take_mixed ] }
+Unit Test: { { 1.25 } [ 1.25 au_return_one a>> ] }
+Unit Test: {
+    { 1.25 2.5 }
+    [ 1.25 2.5 au_return_two pair>> [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 1.0 2.0 3.0 4.0 }
+    [
+        1.0 2.0 3.0 4.0 au_return_four quad>>
+        { [ a>> ] [ b>> ] [ c>> ] [ d>> ] } cleave
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        7 au-two <struct> 1.25 2.5 au-pair boa >>pair
+        10.0 au_variadic
+    ]
+}
+Unit Test: {
+    { 11.25 }
+    [ [ [ swap a>> + ] au-one-cb au_call_one ] compile-call ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap pair>> [ a>> ] [ b>> 2 * ] bi + + ] au-two-cb
+            au_call_two
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        [
+            [
+                swap quad>>
+                { [ a>> ] [ b>> 2 * ] [ c>> 3 * ] [ d>> 4 * ] }
+                cleave + + + +
+            ] au-four-cb au_call_four
+        ] compile-call
+    ]
+}
+Unit Test: { { 1 } [ au_c_controls ] }
+Unit Test: { { 16 } [ au-padded heap-size ] }
+Unit Test: { { 16.25 } [ 1.25 2.5 au-padded boa 10.0 au_take_padded ] }
+Unit Test: {
+    { 16.25 }
+    [
+        au-padded-union <struct> 1.25 2.5 au-padded boa >>padded
+        10.0 au_take_padded_union
+    ]
+}
+Unit Test: {
+    { 1.25 2.5 }
+    [ 1.25 2.5 au_return_padded [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 16.25 }
+    [
+        [
+            [ swap [ a>> ] [ b>> 2 * ] bi + + ] au-padded-cb
+            au_call_padded
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 37.25 }
+    [
+        1.0 2.0 3.0 4.0 5.0 6.0 au-two <struct> 1.25 2.5 au-pair
+        boa >>pair 10.0 au_take_spill
+    ]
+}
+Unit Test: {
+    { 37.25 }
+    [
+        [
+            [
+                swap pair>> [ a>> ] [ b>> 2 * ] bi + + + + + + +
+                +
+            ] au-spill-cb au_call_spill
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        au-vector <struct> float-4{ 1.0 2.0 3.0 4.0 } >>a
+        10.0 au_take_vector
+    ]
+}
+Unit Test: {
+    { float-4{ 1.0 2.0 3.0 4.0 } }
+    [ 1.0 2.0 3.0 4.0 au_return_vector a>> ]
+}
+Unit Test: {
+    { 40.0 }
+    [
+        [
+            [
+                swap a>> {
+                    [ first ]
+                    [ second 2 * ]
+                    [ third 3 * ]
+                    [ fourth 4 * ]
+                } cleave + + + +
+            ] au-vector-cb au_call_vector
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 46.0 }
+    [
+        au-vector-two <struct>
+        float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 }
+        au-fvec-pair boa >>a 10.0 au_take_vector_two
+    ]
+}
+Unit Test: {
+    { float-4{ 1.0 2.0 3.0 4.0 } float-4{ 5.0 6.0 7.0 8.0 } }
+    [ au_return_vector_two a>> [ a>> ] [ b>> ] bi ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [
+                2 load-locals 0 get-local au-two va-arg pair>>
+                [ a>> ] [ b>> 2 * ] bi +
+                0 get-local double va-arg + -1 get-local +
+                2 drop-locals
+            ] au-dynamic-cb au_call_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 23.25 }
+    [
+        [
+            [ swap pair>> [ a>> ] [ b>> 2 * ] bi + + + ]
+            au-typed-cb au-call-typed
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 53.0 }
+    [
+        [
+            [
+                2 load-locals
+                0 get-local au-vector-two va-arg a>>
+                [ a>> sum ] [ b>> sum ] bi +
+                0 get-local double va-arg + -1 get-local +
+                2 drop-locals
+            ] au-dynamic-cb au_call_vector_variadic
+        ] compile-call
+    ]
+}
+Unit Test: {
+    { 53.0 }
+    [
+        [
+            [ swap a>> [ a>> sum ] [ b>> sum ] bi + + + ]
+            au-vector-typed-cb au-call-vector-typed
+        ] compile-call
+    ]
+}
+Half/BF16 homogeneous union C fixtures unavailable on this compiler.
+Linux ARM64 emulated varargs tests passed

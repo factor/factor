@@ -1,0 +1,17 @@
+GCC -O2 exit 1
+vector two 46; vector variadic 17
+control group 7 failed
+C ARM64 union/padding controls: FAIL; vector=1
+GCC -O0 exit 0
+vector two 46; vector variadic 53
+C ARM64 union/padding controls: PASS; vector=1
+GCC -O2 -fno-strict-aliasing exit 0
+vector two 46; vector variadic 53
+C ARM64 union/padding controls: PASS; vector=1
+GCC -O2 volatile local exit 1
+vector two 46; vector variadic 17
+control group 7 failed
+C ARM64 union/padding controls: FAIL; vector=1
+GCC -O2 may_alias union exit 0
+vector two 46; vector variadic 53
+C ARM64 union/padding controls: PASS; vector=1

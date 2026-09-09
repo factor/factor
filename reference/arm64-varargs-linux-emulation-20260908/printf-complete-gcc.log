@@ -1,0 +1,5 @@
+printf.factor [] exit 0 stdout b'value:-42:  1.250:-1234567890123\n' stderr b''
+printf-direct.factor [] exit 0 stdout b'value:-42:  1.250:-1234567890123\n' stderr b''
+printf.factor ['-disable-neon-extensions'] exit 0 stdout b'value:-42:  1.250:-1234567890123\n' stderr b''
+printf-direct.factor ['-disable-neon-extensions'] exit 0 stdout b'value:-42:  1.250:-1234567890123\n' stderr b''
+All four actual printf subprocess checks passed
