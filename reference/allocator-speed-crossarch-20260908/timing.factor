@@ -76,7 +76,7 @@ CONSTANT: batch-counts H{
     command-line get second "check" = :> checked
     allocator select-allocator
     3 "rematerialize-constants?" "compiler.cfg.register-allocation.rematerialization" optional-flag :> rematerialize
-    4 "backtracking-loop-spills?" "compiler.cfg.register-allocation.backtracking" optional-flag :> loop-spills
+    4 "backtracking-loop-spills?" "compiler.cfg.register-allocation.spill-sites" optional-flag :> loop-spills
     checked check-allocation? namespaces:set
     checked check-ssa? namespaces:set
     f global-value-numbering? namespaces:set
