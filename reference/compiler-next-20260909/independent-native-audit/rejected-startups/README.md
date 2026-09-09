@@ -1,0 +1,1 @@
+These two attempts failed before any compiler measurement record. The first inherited a nonzero nice value from the nohup/zsh launch; the second lacked cap_perfmon after copying the executable. Accepted checks use isolated3-algebra. Both failures are retained and excluded based on failed counter/priority guards, never on a measured result.

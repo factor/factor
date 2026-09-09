@@ -1,0 +1,39 @@
+{
+  "machine": "x86_64",
+  "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+  "cpu_count": 32,
+  "load": [
+    0.97021484375,
+    0.98046875,
+    0.68701171875
+  ],
+  "queue_pid": 2599819,
+  "queue_nice": 0,
+  "virtualization": "none",
+  "roots": {
+    "greedy-baseline": {
+      "binary": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+      "binary_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+      "capabilities": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep",
+      "source": "5c848c90f63cea092191b70e1678bec4441e0238"
+    },
+    "greedy-candidate": {
+      "binary": "/home/erg/factor-compiler-next-greedy-candidate-20260909/factor",
+      "binary_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+      "capabilities": "/home/erg/factor-compiler-next-greedy-candidate-20260909/factor cap_perfmon=ep",
+      "source": "c81ec7fefcc2b8dd9f43d979aa4d1ee3afdc31a3"
+    },
+    "algebra": {
+      "binary": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+      "binary_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+      "capabilities": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep",
+      "source": "b16dd3c6f7f0de65d51ed70397eaebf61fb9aabf"
+    },
+    "chordal": {
+      "binary": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+      "binary_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+      "capabilities": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep",
+      "source": "29dec39c55f0f599ea47a93b45a6add9b40da59b"
+    }
+  }
+}

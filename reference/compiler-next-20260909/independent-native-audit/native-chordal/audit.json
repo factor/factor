@@ -1,0 +1,110 @@
+{
+  "accepted": true,
+  "scope_words": {
+    "baseline": 28489,
+    "candidate": 28490
+  },
+  "required_candidate_words": [
+    "classes.algebra:class-and",
+    "classes.algebra:class-or",
+    "compiler.cfg.register-allocation.chordal:preferred-free-color"
+  ],
+  "added_words": [
+    "compiler.cfg.register-allocation.chordal:preferred-free-color"
+  ],
+  "removed_words": [],
+  "identical_scope_sequence": false,
+  "compile": {
+    "baseline": [
+      {
+        "ns": 60820773359,
+        "instructions": 760340980554,
+        "kind": "compile",
+        "cpu_seconds": 60.798997439
+      },
+      {
+        "ns": 60535234716,
+        "instructions": 760341129837,
+        "kind": "compile",
+        "cpu_seconds": 60.513222115000005
+      }
+    ],
+    "candidate": [
+      {
+        "ns": 58768414689,
+        "instructions": 737043402795,
+        "kind": "compile",
+        "cpu_seconds": 58.746628964
+      },
+      {
+        "ns": 58940268186,
+        "instructions": 737043265644,
+        "kind": "compile",
+        "cpu_seconds": 58.918783464
+      }
+    ]
+  },
+  "compile_candidate_over_baseline": {
+    "cpu_seconds": 0.9699386662002611,
+    "instructions": 0.9693588544025028,
+    "ns": 0.9699452440974666
+  },
+  "per_round_compile_candidate_over_baseline": [
+    {
+      "cpu_seconds": 0.966243382926517,
+      "instructions": 0.969359039753421,
+      "ns": 0.9662556301629746
+    },
+    {
+      "cpu_seconds": 0.9736514005489592,
+      "instructions": 0.9693586690516209,
+      "ns": 0.9736522615715829
+    }
+  ],
+  "preparation": {
+    "baseline": {
+      "command": [
+        "taskset",
+        "-c",
+        "2",
+        "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor",
+        "-resource-path=/home/erg/factor-compiler-next-greedy-baseline-20260909",
+        "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/allocator-speed-crossarch-20260908/prepared.image",
+        "-no-user-init",
+        "/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepare-greedy.factor"
+      ],
+      "status": 0,
+      "seconds": 2.0008452301844954,
+      "taskpolicy": [],
+      "source_commit": "5c848c90f63cea092191b70e1678bec4441e0238",
+      "initial_image_sha256": "542d992eb62967bf032e4a69dd6a1706d77fd1edc4a3a3c72effe14e59f839e1",
+      "preparation_script_sha256": "3a34870835f2d69148f0ccbc69b3b74ca20babcc88e11e47a41c14e88ed6543f",
+      "prepared_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996"
+    },
+    "candidate": {
+      "command": [
+        "taskset",
+        "-c",
+        "2",
+        "/home/erg/factor-compiler-next-chordal-20260909/factor",
+        "-resource-path=/home/erg/factor-compiler-next-chordal-20260909",
+        "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+        "-no-user-init",
+        "/home/erg/factor-compiler-next-chordal-20260909/reference/compiler-next-20260909/prepare-next.factor"
+      ],
+      "status": 0,
+      "seconds": 2.0007920637726784,
+      "taskpolicy": [],
+      "source_commit": "29dec39c55f0f599ea47a93b45a6add9b40da59b",
+      "initial_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996",
+      "preparation_script_sha256": "edc941091714b0825876f7fe8938a362133bbf3d71ff86f8cca6f03fa0bdca56",
+      "prepared_image_sha256": "a4bde2e1200aa97c843620f38a552540c4acef350293e939aed089f7db4aaf75"
+    }
+  },
+  "order": [
+    "baseline-1",
+    "candidate-1",
+    "candidate-2",
+    "baseline-2"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "ok": true,
+  "exit_code": 0,
+  "source_commit": "b16dd3c6f7f0de65d51ed70397eaebf61fb9aabf",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-algebra-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-algebra-20260909",
+    "-i=/home/erg/factor-compiler-next-algebra-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-algebra-20260909/reference/compiler-next-20260909/compile-only.factor",
+    "linear-scan",
+    "timing",
+    "0",
+    "on",
+    "on",
+    "b16dd3c6f7f0de65d51ed70397eaebf61fb9aabf"
+  ],
+  "seconds": 46.7848827149719,
+  "load_before": [
+    0.98681640625,
+    0.69580078125,
+    0.412109375
+  ],
+  "load_after": [
+    0.9951171875,
+    0.740234375,
+    0.44287109375
+  ]
+}

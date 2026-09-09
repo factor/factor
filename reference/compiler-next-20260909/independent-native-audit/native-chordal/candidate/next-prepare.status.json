@@ -1,0 +1,19 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next-chordal-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next-chordal-20260909",
+    "-i=/home/erg/factor-compiler-next-greedy-baseline-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next-chordal-20260909/reference/compiler-next-20260909/prepare-next.factor"
+  ],
+  "status": 0,
+  "seconds": 2.0007920637726784,
+  "taskpolicy": [],
+  "source_commit": "29dec39c55f0f599ea47a93b45a6add9b40da59b",
+  "initial_image_sha256": "59ce1db36116048049c5d97e0d711b1eb7c9b7f232fefc667e1943948fb56996",
+  "preparation_script_sha256": "edc941091714b0825876f7fe8938a362133bbf3d71ff86f8cca6f03fa0bdca56",
+  "prepared_image_sha256": "a4bde2e1200aa97c843620f38a552540c4acef350293e939aed089f7db4aaf75"
+}
