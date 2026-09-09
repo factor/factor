@@ -115,7 +115,7 @@ CONSTANT: emulation-map {
     library-search-directories [| directory |
         directory stem append-path :> exact
         exact file-exists? [ exact native-library? ] [ f ] if [ exact ] [
-            directory directory? [
+            directory { [ file-exists? ] [ directory? ] } 1&& [
                 directory directory-files
                 [ stem "." append head? ] filter human-sort reverse
                 [ directory swap append-path dup native-library? [ drop f ] unless ] map-find drop

@@ -13,5 +13,11 @@ IN: alien.libraries.finder.linux.tests
     "" "LD_LIBRARY_PATH" [ library-search-directories first "." = ] with-os-env
 ] unit-test
 
+{ f } [
+    "/factor/nonexistent/runtime/lib" "LD_LIBRARY_PATH" [
+        "libfactor-finder-missing-directory-regression" find-in-library-directories
+    ] with-os-env
+] unit-test
+
 { t } [ "m" find-library "libm.so" subseq-of? ] unit-test
 { t } [ "c" find-library "libc.so" subseq-of? ] unit-test
