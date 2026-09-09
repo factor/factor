@@ -1,0 +1,32 @@
+{
+  "command": [
+    "/Users/erg/factor.worktrees/compiler-features-arm/factor",
+    "-i=/Users/erg/factor.worktrees/compiler-features-arm/factor.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/compiler-next3-loops",
+    "reference/compiler-next3-loops-20260909/source.factor"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/compiler-next3-loops",
+  "source": "d379155c9299139917856a0c3e0f7854c2d295fa",
+  "source_status": "M reference/compiler-next3-loops-20260909/source.factor",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {},
+  "executable": {
+    "path": "/Users/erg/factor.worktrees/compiler-features-arm/Factor.app/Contents/MacOS/factor",
+    "sha256": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/compiler-features-arm/factor.image",
+    "sha256": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4"
+  }
+}
