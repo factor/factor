@@ -1,0 +1,31 @@
+{
+  "source": "7de9c40c98053832965bf4bd36a56b7c415e0f56",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next2-residency-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next2-residency-20260909",
+    "-i=/home/erg/factor-compiler-next2-residency-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next2-residency-20260909/reference/compiler-next-20260909/residency-unit.factor"
+  ],
+  "script_sha256": "c6eedd6afa8c370a239f2c61d0c507727150c3bb1613c6aac8557203787ae6c6",
+  "prepared_image_sha256": "7f434ef152659348c9655fc704b6b52ea0e10fc41cb1af876dccf224bf5c1c55",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "load_before": [
+    0.0244140625,
+    0.2666015625,
+    0.337890625
+  ],
+  "nice": 0,
+  "capability": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep\n",
+  "ok": true,
+  "exit_code": 0,
+  "seconds": 0.19082397129386663,
+  "load_after": [
+    0.0244140625,
+    0.2666015625,
+    0.337890625
+  ]
+}

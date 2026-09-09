@@ -1,0 +1,19 @@
+{
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next2-residency-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next2-residency-20260909",
+    "-i=/home/erg/factor-compiler-next-final-c6948-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next2-residency-20260909/reference/compiler-next-20260909/prepare-residency.factor"
+  ],
+  "status": 0,
+  "seconds": 2.0007957499474287,
+  "taskpolicy": [],
+  "source_commit": "7de9c40c98053832965bf4bd36a56b7c415e0f56",
+  "initial_image_sha256": "9fb6dd169665b96c9c213f918ddf498c375af73da0646c7d5f35cc0291ae079a",
+  "preparation_script_sha256": "04a30f071b8932ccbe22c3fc44ee7c5bf3c3c02956e134103f9678e992505b19",
+  "prepared_image_sha256": "7f434ef152659348c9655fc704b6b52ea0e10fc41cb1af876dccf224bf5c1c55"
+}

@@ -1,0 +1,37 @@
+{
+  "source": "7de9c40c98053832965bf4bd36a56b7c415e0f56",
+  "command": [
+    "taskset",
+    "-c",
+    "2",
+    "/home/erg/factor-compiler-next2-residency-20260909/factor",
+    "-resource-path=/home/erg/factor-compiler-next2-residency-20260909",
+    "-i=/home/erg/factor-compiler-next2-residency-20260909/reference/compiler-next-20260909/prepared.image",
+    "-no-user-init",
+    "/home/erg/factor-compiler-next2-residency-20260909/reference/compiler-next-20260909/residency-compile-only.factor",
+    "chordal",
+    "timing",
+    "0",
+    "on",
+    "on",
+    "7de9c40c98053832965bf4bd36a56b7c415e0f56"
+  ],
+  "script_sha256": "c5d78dbb42e6b050a6edee7e0b28e03213ba3277fcc2889b05f24c3cb5591a0d",
+  "prepared_image_sha256": "7f434ef152659348c9655fc704b6b52ea0e10fc41cb1af876dccf224bf5c1c55",
+  "vm_sha256": "5004b96bf99cc5edeecdadafe01f6ccc8697d3708dfdb04005f70e5c2a79922f",
+  "load_before": [
+    1.01953125,
+    0.6591796875,
+    0.486328125
+  ],
+  "nice": 0,
+  "capability": "/home/erg/factor-compiler-next-greedy-baseline-20260909/factor cap_perfmon=ep\n",
+  "ok": true,
+  "exit_code": 0,
+  "seconds": 57.39928008429706,
+  "load_after": [
+    1.005859375,
+    0.71875,
+    0.5185546875
+  ]
+}
