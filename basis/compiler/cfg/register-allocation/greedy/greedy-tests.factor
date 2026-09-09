@@ -3,6 +3,10 @@ compiler.cfg.linear-scan.allocation.state
 compiler.cfg.linear-scan.checker compiler.cfg.linear-scan.live-intervals
 compiler.cfg.register-allocation compiler.cfg.register-allocation.greedy
 compiler.cfg.register-allocation.occupancy
+compiler.cfg.register-allocation.verifier compiler.cfg.instructions compiler.cfg.comparisons
+compiler.cfg.linear-scan.numbering compiler.cfg.linear-scan.assignment
+compiler.cfg.linear-scan.resolve compiler.cfg.ssa.destruction
+compiler.cfg.utilities heaps
 compiler.cfg.registers cpu.architecture kernel kernel.private libc locals math math.statistics namespaces
 sequences tools.test vectors ;
 IN: compiler.cfg.register-allocation.greedy.tests
@@ -19,7 +23,7 @@ IN: compiler.cfg.register-allocation.greedy.tests
     f f <basic-block> <cfg> cfg set
     H{ { 1 int-rep } { 2 int-rep } { 3 int-rep } } representations set
     H{ } clone greedy-use-weights set
-    { } greedy-region-boundaries set
+    { } greedy-blocks set
     t check-allocation? set ;
 
 :: allocate-test ( intervals -- intervals' )
@@ -68,20 +72,6 @@ IN: compiler.cfg.register-allocation.greedy.tests
     H{ { 6 8 } { 10 8 } } greedy-use-weights set
     1 { { 0 4 } } { 0 4 } test-interval spill-weight
     2 { { 6 10 } } { 6 10 } test-interval spill-weight <
-] unit-test
-
-! A loop boundary is preferred over the widest use gap.
-{ 7 } [
-    init-test { { 7 1 } } greedy-region-boundaries set
-    1 { { 0 40 } } { 0 8 10 40 } test-interval region-split
-] unit-test
-
-! Pressure invokes the loop-boundary splitter and preserves every use.
-{ t } [
-    init-test { { 7 1 } } greedy-region-boundaries set
-    1 { { 0 40 } } { 0 6 12 40 } test-interval
-    2 { { 8 10 } } { 8 10 } test-interval 2array allocate-test drop
-    "region-splits" greedy-statistics get at 0 >
 ] unit-test
 
 ! Forced clobbers create an actual spill/reload pair in a shared slot.
@@ -267,4 +257,110 @@ IN: compiler.cfg.register-allocation.greedy.tests
     init-recolor-test
     1 { { 0 2 } } { 0 2 } test-interval
     dup interval-progress 11 >>hint drop allocation-order
+] unit-test
+
+! The local product is chosen from the free physical window after a long
+! interference, not by the largest gap between the new interval's uses.
+{ { 10 24 30 4 } } [
+    init-test { } allocate-test drop
+    H{ { int-regs { 10 } } } greedy-registers set
+    H{ { { int-regs 10 } V{ } } } clone greedy-unions set
+    <register-occupancy> { int-regs 10 } greedy-occupancies get set-at
+    2 { { 2 22 } } { 2 22 } test-interval 10 greedy-assign
+    1 { { 0 30 } } { 0 4 24 26 28 30 } test-interval local-split-plan
+] unit-test
+
+! A hint alone cannot evict a mandatory atomic victim with infinite weight.
+{ f } [
+    init-recolor-test
+    1 { { 0 100 } } { 0 100 } test-interval
+    2 { { 40 40 } } { 40 } test-interval
+    [| incoming victim |
+        10 incoming interval-progress hint<<
+        victim 10 greedy-assign
+        incoming victim 10 evictable-victim?
+    ] call
+] unit-test
+
+! Inspect the actual products and final machine flow of a selected hot
+! region, including a transparent loop latch. Register/memory transitions
+! belong to cold edges; neither hot block contains a spill or reload.
+:: region-lowering-fixture ( -- cfg snapshot hot latch )
+    init-recolor-test
+    V{ T{ ##load-integer { dst 1 } { val 42 } }
+        T{ ##compare-integer-imm-branch { src1 1 } { src2 0 } { cc cc= } } }
+    [ clone ] map 0 insns>block :> entry
+    V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##branch } }
+    [ clone ] map 1 insns>block :> hot
+    V{ T{ ##branch } } [ clone ] map 2 insns>block :> latch
+    V{ T{ ##replace { src 1 } { loc D: 0 } } T{ ##return } }
+    [ clone ] map 3 insns>block :> tail
+    entry hot connect-bbs hot latch connect-bbs
+    latch hot connect-bbs latch tail connect-bbs entry tail connect-bbs
+    entry block>cfg :> graph
+    graph cfg set
+    graph snapshot-value-flow :> snapshot
+    graph destruct-ssa graph number-instructions graph prepare-greedy-regions
+    graph compute-live-intervals first :> interval
+    interval interval-region-blocks :> blocks
+    2 <live-interval>
+        interval entry ranges-in-block interval tail ranges-in-block append >vector >>ranges
+        interval uses>> clone >>uses :> cold-blocker
+    3 <live-interval> interval ranges>> clone >>ranges
+        interval uses>> clone >>uses :> full-blocker
+    cold-blocker 10 greedy-assign full-blocker 11 greedy-assign
+    interval global-split-plan :> plan
+    cold-blocker greedy-unassign full-blocker greedy-unassign
+    interval plan apply-global-split
+    [ greedy-queue get heap-empty? ] [
+        greedy-queue get heap-pop drop 11 greedy-assign
+    ] until
+    graph greedy-unions get values concat assign-registers
+    graph resolve-data-flow
+    graph snapshot hot latch ;
+
+{ t t } [
+    region-lowering-fixture [ check-value-flow ] 2dip
+    [ instructions>> [ dup ##spill? swap ##reload? or ] any? not ] bi@
+] unit-test
+
+! Run real pressure through the original-SSA/final-machine verifier too.
+{ 5092.0 } [
+    t check-allocation? [
+        greedy-allocator register-allocator [
+            2.5 \ pressure-kernel def>> compile-call
+        ] with-variable
+    ] with-variable
+] unit-test
+
+! Actual eviction transfers cascade ownership and requeues the displaced
+! interval; this checks the state transition rather than only the predicate.
+{ t t t } [
+    init-recolor-test
+    1 { { 0 10 } } { 0 10 } test-interval
+    2 { { 2 4 } } { 2 4 } test-interval
+    [| victim incoming |
+        victim 10 greedy-assign incoming 10 greedy-evict
+        victim interval-progress cascade>> incoming interval-progress cascade>> =
+        victim reg>> not
+        greedy-queue get heap-members first victim eq?
+    ] call
+] unit-test
+
+! Depth limits bound the augmenting search without leaving partial moves.
+{ f t t } [
+    init-recolor-test
+    1 { { 0 2 } { 10 12 } } { 0 2 10 12 } test-interval
+    2 { { 0 6 } } { 0 6 } test-interval
+    3 { { 4 8 } } { 4 8 } test-interval
+    4 { { 10 12 } } { 10 12 } test-interval
+    [| a b c d |
+        b 10 greedy-assign c 11 greedy-assign d 11 greedy-assign
+        H{ } clone greedy-recolor-fixed set 64 greedy-recolor-budget set
+        greedy-occupancies get [ clone-occupancy ] assoc-map
+        [| original |
+            a 0 recolor-interval original greedy-occupancies get =
+            a 2 recolor-interval
+        ] call
+    ] call
 ] unit-test
