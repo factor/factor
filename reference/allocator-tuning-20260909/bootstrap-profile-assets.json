@@ -1,0 +1,10 @@
+{
+  "source": "7b6cd9519a71960a4fb0385bf6ceeaf66097d618",
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95",
+    "boot.unix-arm.64.image": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd"
+  },
+  "profile_note": "Diagnostic stage2 patch enables100Hz sampling around original default load-components; report loading follows sample collection and exits before saving an image. Not a timing candidate."
+}
