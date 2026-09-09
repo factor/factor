@@ -170,3 +170,45 @@ IN: compiler.cfg.register-allocation.backtracking.tests
         ] filter >array =
     ] all?
 ] unit-test
+
+! Different SSA values can share one allocation bundle without becoming
+! leader aliases. The edge affinity requires equal locations, not equal bits.
+{ 1 1 t t } [ [
+    { { 1 2 } } backtracking-affinities set
+    init-test-allocation
+    1 { 0 10 } test-interval
+    2 { 20 30 } test-interval 2array swap backtracking-allocation
+    assigned-bundles get length
+    backtracking-merges get
+    rot [ reg>> ] map first2 =
+    1 bundle-spillsets get at 2 bundle-spillsets get at eq?
+] with-scope ] unit-test
+
+! Interfering values must not merge even if a copy/phi requested affinity.
+{ 0 } [ [
+    { { 1 2 } } backtracking-affinities set
+    init-test-allocation
+    1 { 0 20 } test-interval
+    2 { 10 30 } test-interval 2array swap backtracking-allocation drop
+    backtracking-merges get
+] with-scope ] unit-test
+
+! Distinct spillsets may reuse storage only when their complete original
+! live ranges do not intersect. Their SSA identities stay distinct.
+{ t 1 1 } [ [
+    f backtracking-affinities set
+    init-test-allocation
+    1 { 0 10 } test-interval
+    2 { 20 30 } test-interval 2array swap backtracking-allocation drop
+    1 bundle-spillsets get at ensure-spillset-home
+    2 bundle-spillsets get at ensure-spillset-home
+    1 int-rep lookup-spill-slot 2 int-rep lookup-spill-slot =
+    spill-home-pool get length backtracking-shared-homes get
+] with-scope ] unit-test
+
+! A conflict at 12 selects the preceding legal gap, not the median use.
+{ 9 } [ [
+    init-test-allocation drop
+    1 { 0 10 20 30 100 } test-interval 1array <allocation-bundle>
+    12 conflict-split-site
+] with-scope ] unit-test
