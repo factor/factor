@@ -1,0 +1,42 @@
+{
+  "command": [
+    "/usr/sbin/taskpolicy",
+    "-a",
+    "-t",
+    "0",
+    "-l",
+    "0",
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-full-master-candidate/boot.unix-arm.64.image",
+    "-no-user-init",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-full-master-candidate",
+    "-output-image=/Users/erg/factor.worktrees/allocator-full-master-candidate/full-master-default.factor.image"
+  ],
+  "cwd": "/Users/erg/factor.worktrees/allocator-full-master-candidate",
+  "source": "680ab93773df38835b245a9ac12025572885f1bd",
+  "source_status": "",
+  "host": {
+    "system": "Darwin",
+    "node": "dcs-MacBook-Pro.local",
+    "release": "25.6.0",
+    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:19:08 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6050",
+    "machine": "arm64"
+  },
+  "mach_timebase": {
+    "numer": 125,
+    "denom": 3
+  },
+  "assets": {
+    "Factor.app/Contents/MacOS/factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "factor.image": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "executable": {
+    "path": "/usr/sbin/taskpolicy",
+    "sha256": "86d707692044aefa8f1d67a03c5eadfcb968238ddc1b8b7fca3c42b6ae97f0a3"
+  },
+  "input_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-full-master-candidate/boot.unix-arm.64.image",
+    "sha256": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd"
+  }
+}

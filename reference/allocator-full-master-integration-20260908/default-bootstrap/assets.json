@@ -1,0 +1,23 @@
+{
+  "boot.unix-arm.64.image": {
+    "root": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd",
+    "worktree": "ebb781cb1391d30b679b715939b84f491da1c8014778a5bd31ed64bacc5e78cd"
+  },
+  "factor.image": {
+    "root": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95",
+    "worktree": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+  },
+  "Factor.app/Contents/MacOS/factor": {
+    "root": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "worktree": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18"
+  },
+  "libfactor.dylib": {
+    "root": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "worktree": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164"
+  },
+  "output_image": {
+    "path": "/Users/erg/factor.worktrees/allocator-full-master-candidate/full-master-default.factor.image",
+    "sha256": "39c82d75c4eb54945ad7f5590627d650cedec6e75a939c5829ec0c53c37092a5"
+  },
+  "root_image_after": "2846d741214dae1cd6217273377c4deac6052c8af9710a8a2d7d540a9f2b2e95"
+}

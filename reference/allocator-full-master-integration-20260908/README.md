@@ -23,3 +23,31 @@ loaded the newer ABI boxing definitions. The retained failure is superseded
 by the root project's established `refresh-all` workflow, as used by the
 committed `compiler-suite.factor`. No production change was needed for this
 harness correction. Both passing runs start from the same original image.
+
+## Fresh default bootstrap on the merged source
+
+Source `680ab93773` bootstrapped successfully with the current root VM and boot
+seed. The saved image independently verifies linear scan, GVN off,
+rematerialization off, zero compiler errors and integer/float/loop/moving-GC
+smoke tests. It is saved separately as `full-master-default.factor.image` in
+the integration worktree. The original root image hash is unchanged.
+
+| Measurement | Result |
+| --- | ---: |
+| Core bootstrap report | 2:12 |
+| Whole process | 135.63 s |
+| Final sampled process CPU | 134.61 s |
+| Final sampled retired instructions | 1.802696 T |
+| Final sampled cycles | 484.417 B |
+
+The requested under-two-minute bootstrap budget remains **unmet**. The earlier
+frozen candidate's 3:11 run used a different VM and boot seed, so this is not a
+matched source-only regression comparison. No unrelated process or system power
+setting was changed. The runner adjusted only its own child process's scheduling
+policy and saved exact commands, source/assets and counters. All allocator
+timing processes had finished before this separate bootstrap began.
+
+The [bootstrap records](default-bootstrap/status.json),
+[asset hashes](default-bootstrap/assets.json), and
+[fresh-image verification](default-image-check/status.json) retain the result,
+including the timing miss.
