@@ -104,7 +104,7 @@ IN: compiler.cfg.slp.tests
 ! code under it. with-variable restores the host binding on unwind too.
 SINGLETON: slp-no-simd-cpu
 
-{ f t 0 0 f t } [
+{ f t 0 0 f t } [ [let
     \ cpu get :> host-cpu
     12 scalar-pair :> insns
     insns insns>cfg :> graph
@@ -119,4 +119,4 @@ SINGLETON: slp-no-simd-cpu
         ] with-variable
     ] with-variable
     \ cpu get host-cpu eq?
-] unit-test
+] ] unit-test
