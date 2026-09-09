@@ -58,5 +58,45 @@ fixtures restore the caller's enabled rematerialization setting. The run
 used the matching VM and fresh tuning image with `refresh-all`; raw output
 is retained in `arm-tests.log.gz`.
 
-Paired native compile results are pending. No speedup is claimed by the
-diagnostic counts alone.
+## Native isolated result
+
+Candidate `c81ec7fefc` was compared with logical baseline `c1f7e4d34c`.
+The executed baseline source was `5c848c90f6`, whose basis/core/extra/vm
+trees are identical to that logical baseline. Both used the same retained
+prepared image, identical selective greedy reload/preparation, and the
+same ordered vector of 28,489 actual word objects, including the two
+redefined production words. No diagnostic counters were enabled.
+
+Four fresh timing processes ran in baseline/candidate/candidate/baseline
+order, pinned to native x86-64 CPU 2. Compilation was timed once per
+process; the three samples per process apply to runtime workload batches,
+not to additional compiler measurements.
+
+| Round | Baseline compiler CPU s | Candidate compiler CPU s | Baseline instructions | Candidate instructions |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 48.514933 | 48.604692 | 596,235,212,170 | 593,366,063,897 |
+| 2 (reversed) | 48.662180 | 48.353198 | 596,235,192,908 | 593,789,422,506 |
+
+Aggregate candidate/baseline compiler ratios are **0.995543 retired
+instructions** (0.446% less work) and **0.997744 CPU time** (0.226% lower).
+Instruction reductions agree across rounds: 0.481% and 0.410%. CPU changes
+straddle zero: 0.185% slower and 0.635% faster. Therefore the result supports
+a small compiler-work reduction, with no persuasive CPU-time improvement.
+
+All 26 workload outputs match, including 52 checked outputs before timing
+and every measured batch; all 12 kernels' non-timing code reports match in
+both pairs. This establishes unchanged observed workload behavior/static
+metrics, not bitwise identity of every method in the full compiler closure.
+The two deliberately changed compiler words themselves may generate
+different code.
+
+Exact accepted counters, raw rows/statuses, source manifests, and preparation
+records are in [the native result archive](../compiler-next-20260909/native-greedy/summary.json)
+and its baseline/candidate directories. The independently reproduced audit
+is retained by the comparison worktree at
+`reference/compiler-next-20260909/independent-native-audit/native-greedy/`.
+No allocator default or placement policy changed. Remaining greedy runtime
+pressure differences are outside this cost-only change.
+
+A separate [bootstrap-rate diagnosis](BOOTSTRAP-RATE.md) addresses combined
+candidate timing variability; it is not an isolated greedy measurement.
