@@ -79,6 +79,17 @@ ERROR: unsafe-late-ssa-reload interval ;
         ] when
     ] each ;
 
+! Allocator parallel transitions execute after interval expiry/activation,
+! before any instruction-generated GC saves. Phi pseudo-instructions also
+! own transport points even though their machine instruction is omitted.
+SYMBOL: phase-insn-prefixes
+:: emit-phase-insn-prefix ( insn -- )
+    phase-insn-prefixes get [| prefixes |
+        insn insn#>> prefixes at [
+            % insn insn#>> prefixes delete-at
+        ] when*
+    ] when* ;
+
 SYMBOL: phase-input-registers
 
 : phase-input>register ( vreg -- reg/slot )
@@ -88,6 +99,7 @@ RENAMING: phase-assign [ vreg>reg ] [ phase-input>register ] [ vreg>reg ]
 
 :: assign-phase-insn ( insn -- )
     insn insn#>> prepare-insn
+    insn emit-phase-insn-prefix
     insn ##phi? [ ] [
         insn phase-split-insn? [
             H{ } clone :> inputs
