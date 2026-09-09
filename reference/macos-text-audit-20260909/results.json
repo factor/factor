@@ -1,0 +1,72 @@
+{
+  "1x": {
+    "dimensions": [
+      182,
+      14
+    ],
+    "intermediate_alpha_pixels": 933,
+    "unequal_rgb_pixels": 0,
+    "blend_changed_rgb_pixels": 933,
+    "blend_max_rgb_error": 64,
+    "reference_source_max_error": 0,
+    "half_pixel_changed_rgb_pixels": 1266,
+    "filtered_vs_native_phase_changed_rgb_pixels": 1269
+  },
+  "2x": {
+    "dimensions": [
+      362,
+      26
+    ],
+    "intermediate_alpha_pixels": 1918,
+    "unequal_rgb_pixels": 0,
+    "blend_changed_rgb_pixels": 1918,
+    "blend_max_rgb_error": 64,
+    "reference_source_max_error": 0,
+    "half_pixel_changed_rgb_pixels": 2820,
+    "filtered_vs_native_phase_changed_rgb_pixels": 2834
+  },
+  "bounds-italic-2x": {
+    "clipped_pixels": [
+      {
+        "x": -1,
+        "y": 26,
+        "alpha": 22
+      },
+      {
+        "x": -1,
+        "y": 27,
+        "alpha": 26
+      },
+      {
+        "x": -1,
+        "y": 28,
+        "alpha": 2
+      }
+    ],
+    "interior_mismatches": 0
+  },
+  "bounds-emoji-2x": {
+    "clipped_pixels": [],
+    "interior_mismatches": 0
+  },
+  "spaces-selection": [
+    [
+      2,
+      1
+    ],
+    [
+      38.0,
+      29.0
+    ]
+  ],
+  "long-line": [
+    [
+      16384,
+      19
+    ],
+    [
+      61594.0,
+      29.0
+    ]
+  ]
+}

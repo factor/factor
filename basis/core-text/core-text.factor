@@ -1,15 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs cache classes colors combinators core-foundation
+assocs binary-search cache classes colors combinators core-foundation core-foundation.arrays
 core-foundation.attributed-strings core-foundation.strings
 core-graphics core-graphics.types core-text.fonts destructors
 fonts io.encodings.string io.encodings.utf16 kernel make math
 math.functions math.order math.vectors namespaces opengl sequences
-strings ;
+sorting strings vectors ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
+TYPEDEF: void* CTRunRef
 
 C-GLOBAL: CFStringRef kCTFontAttributeName
 C-GLOBAL: CFStringRef kCTKernAttributeName
@@ -32,6 +33,14 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
 
+FUNCTION: CFIndex CTLineGetGlyphCount ( CTLineRef line )
+FUNCTION: CFArrayRef CTLineGetGlyphRuns ( CTLineRef line )
+FUNCTION: CFRange CTRunGetStringRange ( CTRunRef run )
+FUNCTION: uint32_t CTRunGetStatus ( CTRunRef run )
+CONSTANT: kCTRunStatusRightToLeft 1
+FUNCTION: void CTRunGetPositions ( CTRunRef run, CFRange range, CGPoint* positions )
+FUNCTION: double CTRunGetTypographicBounds ( CTRunRef run, CFRange range, CGFloat* ascent, CGFloat* descent, CGFloat* leading )
+
 MEMO: make-attributes ( open-font color -- hashtable )
     [
         kCTForegroundColorAttributeName ,,
@@ -49,7 +58,7 @@ MEMO: make-attributes ( open-font color -- hashtable )
     ] with-destructors ;
 
 TUPLE: line < disposable font string line metrics image loc dim
-render-loc render-dim render-ext ;
+render-loc render-dim render-ext selection-key selection-spans index-map ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -83,22 +92,99 @@ render-loc render-dim render-ext ;
     [ [ 0 0 ] dip first2 <CGRect> CGContextFillRect ]
     bi-curry* bi ;
 
-: selection-rect ( dim line selection -- rect )
-    [let [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
-        start end [ 0 swap string subseq utf16n encode length 2 /i ] bi@
-    ]
-    [ f CTLineGetOffsetForStringIndex ] bi-curry@ bi
-    [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
+: string-index>utf16 ( n string -- index )
+    swap head utf16n encode length 2 /i ;
+
+: line-string ( line -- string )
+    string>> dup selection? [ string>> ] when ;
+
+! Only supplementary characters change the relationship between Factor and
+! UTF-16 indices. Build a sparse map on the first caret/selection operation;
+! ASCII needs no scan, and layout-only lines need no map at all.
+:: line-index-map ( line -- map )
+    line index-map>> [ ] [
+        line line-string :> string
+        string aux>> [
+            [ string [| ch i | ch 0xffff > [ i , ] when ] each-index ] { } make
+        ] [ { } ] if :> positions
+        positions dup [ + ] map-index 2array
+        dup line index-map<<
+    ] if* ;
+
+:: indices-before ( n positions -- count )
+    n positions natural-search :> ( i value )
+    value [ i value n < [ 1 + ] when ] [ 0 ] if ;
+
+:: line-index>utf16 ( n line -- index )
+    n n line line-index-map first indices-before + ;
+
+:: utf16>line-index ( index line -- n )
+    index 0 max :> clamped
+    clamped clamped line line-index-map second indices-before -
+    line line-string length min ;
+
+: run-x ( run -- x )
+    0 1 <CFRange> { CGPoint } [ CTRunGetPositions ] with-out-parameters x>> ;
+
+! A logical selection can occupy disjoint visual intervals in a bidi line.
+! At run boundaries, primary caret offsets alone refer to the line direction
+! and can choose the opposite edge of the selected run.
+:: run-selection-span ( ctline run start end -- span/f )
+    run CTRunGetStringRange [ location>> ] [ length>> ] bi over + :> ( a b )
+    start a max :> lo
+    end b min :> hi
+    lo hi < [
+        run run-x :> left
+        run 0 0 <CFRange> f f f CTRunGetTypographicBounds left + :> right
+        run CTRunGetStatus kCTRunStatusRightToLeft bitand zero?
+        [ left right ] [ right left ] if :> ( leading trailing )
+        lo a = [ leading ] [ ctline lo f CTLineGetOffsetForStringIndex ] if
+        hi b = [ trailing ] [ ctline hi f CTLineGetOffsetForStringIndex ] if
+        [ min ] [ max ] 2bi 2array
+    ] [ f ] if ;
+
+! Merge touching runs before painting translucent highlights, so fractional
+! run boundaries do not receive antialias coverage twice.
+:: merge-selection-spans ( spans -- merged )
+    V{ } clone :> merged
+    spans [ first ] sort-by [| span |
+        merged empty? [ span merged push ] [
+            merged last :> previous
+            span first previous second <= [
+                previous first previous second span second max 2array
+                merged set-last
+            ] [ span merged push ] if
+        ] if
+    ] each
+    merged >array ;
+
+:: line-selection-spans ( line start end -- spans )
+    start end [ min ] [ max ] 2bi 2array :> key
+    line selection-key>> key = [ line selection-spans>> ] [
+        key [ line line-index>utf16 ] map first2 :> ( a b )
+        line line>> :> ctline
+        a b = [
+            ctline a f CTLineGetOffsetForStringIndex dup 2array 1array
+        ] [
+            ctline CTLineGetGlyphRuns CF>array
+            [ ctline swap a b run-selection-span ] map sift merge-selection-spans
+        ] if :> spans
+        key line selection-key<<
+        spans line selection-spans<<
+        spans
+    ] if ;
 
 : CGRect-translate-x ( CGRect x -- CGRect' )
     [ dup CGRect-x ] dip - over set-CGRect-x ;
 
-:: fill-selection-background ( context loc dim line string -- )
+:: fill-selection-background ( context loc dim line -- )
+    line string>> :> string
     string selection? [
         context string color>> >rgba-components CGContextSetRGBFillColor
-        context dim line string selection-rect
-        loc first CGRect-translate-x
-        CGContextFillRect
+        line string [ start>> ] [ end>> ] bi line-selection-spans [
+            first2 :> ( a b )
+            context a loc first - 0 b a - dim second <CGRect> CGContextFillRect
+        ] each
     ] when ;
 
 : line-rect ( line -- rect )
@@ -123,46 +209,55 @@ render-loc render-dim render-ext ;
         line >>line
     ] with-destructors ;
 
-! Core Graphics has a max surface size limit.
-! Clamp to avoid errors on very long lines.
+! The single-image API is bounded; the UI renders regions of the full line.
 CONSTANT: max-layout-dim 16383
 
-:: render ( line -- line image )
-    line line>> :> ctline
-    line string>> :> string
-    line font>> :> font
-
+:: prepare-render ( line -- )
     line render-loc>> [
-
-        ctline line-rect :> rect
+        line line>> line-rect :> rect
         rect origin>> CGPoint>loc :> (loc)
         rect size>> CGSize>dim :> (dim)
-
-        (loc) vfloor :> loc
-        (loc) loc v- :> frac
-        (dim) frac [ + ceiling max-layout-dim min ] 2map :> dim
-        dim [ >integer 1 + ] map :> ext
-
+        ! Image bounds describe paths, not all antialias coverage. Include
+        ! a guard on every side, and typographic bounds for backgrounds
+        ! (including whitespace) and selections.
+        line string>> selection?
+        line font>> background>> >rgba alpha>> zero? not or [
+            (loc) 0 line metrics>> descent>> neg 2array vmin
+            (loc) (dim) v+ line metrics>>
+            [ width>> ] [ ascent>> ] bi 2array vmax
+        ] [ (loc) (loc) (dim) v+ ] if
+        [ vfloor { 1 1 } v- ] [ vceiling { 1 1 } v+ ] bi* :> ( loc end )
+        end loc v- [ >integer ] map :> ext
+        ext { 1 1 } v- :> dim
         loc line render-loc<<
         dim line render-dim<<
         ext line render-ext<<
-
         line metrics>> loc dim line-loc line loc<<
+    ] unless ;
 
-    ] unless
-
-    line render-loc>> :> loc
-    line render-dim>> :> dim
-    line render-ext>> :> ext
-
-    line ext [
+! Region coordinates are measured from the top-left of the complete image.
+! Keep the original CTLine so shaping, bidi, and ligatures cross tile edges.
+:: render-region ( line offset dim -- image )
+    line prepare-render
+    line render-loc>> offset first
+    line render-ext>> second offset second - dim second - 2array v+ :> loc
+    line font>> :> font
+    line line>> :> ctline
+    dim [
         {
-            [ font ext fill-background ]
-            [ loc first 0 2array dim first ext second 2array ctline string fill-selection-background ]
-            [ loc set-text-position ]
+            [ font dim fill-background ]
+            [ loc dim line fill-selection-background ]
+            ! Keep Core Text's baseline at zero. Moving the text position
+            ! outside a tile changes rasterization of large color emoji.
+            [ loc first2 [ neg ] bi@ CGContextTranslateCTM ]
             [ [ ctline ] dip CTLineDraw ]
         } cleave
     ] make-bitmap-image ;
+
+:: render ( line -- line image )
+    line prepare-render
+    line line { 0 0 } line render-ext>>
+    [ max-layout-dim 1 + min ] map render-region ;
 
 : line>image ( line -- image )
     dup image>> [ render >>image ] unless image>> ;

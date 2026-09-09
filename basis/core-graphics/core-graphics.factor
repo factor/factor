@@ -95,6 +95,8 @@ FUNCTION: void CGContextSetTextPosition (
    CGFloat y
 )
 
+FUNCTION: void CGContextTranslateCTM ( CGContextRef c, CGFloat tx, CGFloat ty )
+
 FUNCTION: void CGContextFillRect (
    CGContextRef c,
    CGRect rect

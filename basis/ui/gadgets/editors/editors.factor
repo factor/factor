@@ -7,7 +7,7 @@ math.vectors models models.arrow namespaces opengl opengl.gl
 ranges sequences sorting splitting system timers
 ui.baseline-alignment ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gestures ui.pens.solid ui.render ui.text
+ui.gadgets.scrollers ui.gestures ui.pens.solid ui.render ui.text ui.text.private
 ui.theme unicode ;
 IN: ui.gadgets.editors
 
@@ -21,7 +21,8 @@ TUPLE: editor < line-gadget
     preedit-selected-start
     preedit-selected-end
     preedit-selection-mode?
-    preedit-underlines ;
+    preedit-underlines
+    text-dim-cache ;
 
 M: editor preedit? preedit-start>> ;
 
@@ -223,32 +224,34 @@ SYMBOL: selected-lines
 
 TUPLE: selected-line start end first? last? ;
 
-: compute-selection ( editor -- assoc )
-    dup gadget-selection? [
-        [ selection-start/end [ [ first ] bi@ [a..b] ] [ ] 2bi ]
-        [ model>> ] bi
-        '[ [ _ _ ] [ _ start/end-on-line ] bi 2array ] H{ } map>assoc
-    ] [ drop f ] if ;
+:: compute-selection ( editor -- assoc )
+    editor gadget-selection? [
+        editor selection-start/end :> ( start end )
+        start first editor first-visible-line max :> first-row
+        end first 1 + editor last-visible-line min first-row max :> last-row
+        first-row last-row [a..b) [| row |
+            row start end row editor model>> start/end-on-line 2array
+        ] H{ } map>assoc
+    ] [ f ] if ;
 
 :: draw-selection ( line pair editor -- )
-    pair [ editor font>> line offset>x gl-round ] map :> pair
     editor selection-color>> gl-color
-    pair first 0 2array
-    pair second pair first - 1 max editor line-height 2array
-    gl-fill-rect ;
+    pair first2 editor font>> line selection-spans [
+        [ gl-round ] map first2 :> ( left right )
+        left 0 2array
+        right left - 1 max editor line-height 2array gl-fill-rect
+    ] each ;
 
 : draw-unselected-line ( line editor -- )
     font>> swap draw-text ;
 
-: draw-selected-line ( line pair editor -- )
-    over all-equal? [
-        [ nip draw-unselected-line ] [ draw-selection ] 3bi
+:: draw-selected-line ( line pair editor -- )
+    pair all-equal? [
+        line editor draw-unselected-line
+        line pair editor draw-selection
     ] [
-        [ draw-selection ]
-        [
-            [ [ first2 ] [ selection-color>> ] bi* <selection> ]
-            [ draw-unselected-line ] bi
-        ] 3bi
+        editor font>> line pair first2 editor selection-color>> <selection>
+        editor line-height draw-selected-string
     ] if ;
 
 : draw-default-text? ( editor -- ? )
@@ -273,12 +276,32 @@ M: editor draw-gadget*
         ] with-variable
     ] if ;
 
+! Keep small measurements independently of the expiring native layout cache.
+! Each reflow retains only current lines, and reshapes only new/edited text.
+TUPLE: editor-text-dims key dims ;
+
+:: editor-text-dim ( font lines editor -- dim )
+    font strip-font-colors gl-scale-factor get-global 2array :> key
+    editor text-dim-cache>> :> previous
+    previous [ previous key>> key = ] [ f ] if
+    [ previous dims>> ] [ H{ } ] if :> old
+    H{ } clone :> current
+    lines { 0 0 } [| total string |
+        string current [
+            dup old at [ nip ] [ font swap text-dim ] if*
+        ] cache total swap combine-text-dim
+    ] reduce :> dim
+    key current editor-text-dims boa editor text-dim-cache<<
+    dim ;
+
 M: editor pref-dim*
     [ call-next-method ] keep ! at least as big as our min-rows/min-cols
     ! Add some space for the caret.
-    [ font>> ] keep dup draw-default-text?
-    [ default-text>> ] [ control-value ] if
-    text-dim { 1 0 } v+ vmax ;
+    dup draw-default-text? [
+        [ font>> ] [ default-text>> ] bi text-dim
+    ] [
+        [ font>> ] [ control-value ] [ ] tri editor-text-dim
+    ] if { 1 0 } v+ vmax ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 

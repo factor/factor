@@ -48,6 +48,12 @@ HOOK: x>offset font-renderer ( x font string -- n )
 
 HOOK: offset>x font-renderer ( n font string -- x )
 
+HOOK: selection-spans font-renderer ( start end font string -- spans )
+
+M:: object selection-spans ( start end font string -- spans )
+    start end [ font string offset>x ] bi@
+    [ min ] [ max ] 2bi 2array 1array ;
+
 GENERIC: text-dim ( font text -- dim )
 
 M: string text-dim string-dim ;
@@ -77,16 +83,37 @@ HOOK: string>image font-renderer ( font string -- image loc )
     loc dim tex-id image upside-down?>> gl3-draw-texture
     tex-id delete-texture ;
 
-: draw-string ( font string -- )
-    dup string-empty? [ 2drop ] [
-        gl3-mode? get-global [
-            draw-string-gl3
-        ] [
-            world get world-text-handle
-            [ string>image <texture> ] 2cache
-            draw-texture
-        ] if
+: draw-string-default ( font string -- )
+    gl3-mode? get-global [
+        draw-string-gl3
+    ] [
+        world get world-text-handle
+        [ string>image <texture> ] 2cache
+        draw-texture
     ] if ;
+
+HOOK: draw-string* font-renderer ( font string -- )
+
+M: object draw-string* draw-string-default ;
+
+: draw-string ( font string -- )
+    dup string-empty? [ 2drop ] [ draw-string* ] if ;
+
+:: draw-selection-rects ( spans color y height -- )
+    color gl-color
+    spans [
+        [ gl-round ] map first2 :> ( left right )
+        left y 2array right left - 1 max height 2array gl-fill-rect
+    ] each ;
+
+HOOK: draw-selected-string font-renderer ( font selection height -- )
+
+:: draw-selected-string-default ( font selection height -- )
+    selection [ start>> ] [ end>> ] [ string>> ] tri :> ( start end string )
+    start end font string selection-spans selection color>> 0 height draw-selection-rects
+    font selection draw-string ;
+
+M: object draw-selected-string draw-selected-string-default ;
 
 PRIVATE>
 
