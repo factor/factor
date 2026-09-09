@@ -83,15 +83,20 @@ M: input-port stream-read-unsafe
         buffer>> buffer-read-until
     ] if ; inline
 
-: read-until-loop ( seps port accum -- sep/f )
-    2over read-until-step over [
-        [ append! ] dip dup [
-            3nip
-        ] [
-            drop read-until-loop
-        ] if
-    ] [
-        4nip
+:: append-buffer-until ( seps buffer accum -- sep/f )
+    seps buffer buffer-find :> end
+    end [ buffer buffer-length ] unless* :> count
+    accum length :> start
+    start count + accum lengthen
+    ! Grow before taking the address of the underlying byte-array.
+    start accum underlying>> <displaced-alien>
+    count buffer buffer-read-unsafe swap memcpy
+    end [ buffer buffer-pop ] [ f ] if ; inline
+
+:: read-until-loop ( seps port accum -- sep/f )
+    port wait-to-read [ f ] [
+        seps port buffer>> accum append-buffer-until
+        dup [ drop seps port accum read-until-loop ] unless
     ] if ; inline recursive
 
 PRIVATE>
