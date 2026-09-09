@@ -12,6 +12,7 @@ const math_mod = @import("fixnum.zig");
 const objects = @import("objects.zig");
 const safepoints = @import("safepoints.zig");
 const vm_mod = @import("vm.zig");
+const linux_arm64_fpsimd = @import("linux_arm64_fpsimd.zig");
 
 const Cell = layouts.Cell;
 
@@ -304,8 +305,8 @@ fn getFPUStatus(ucontext_ptr: *anyopaque) u32 {
                 return fpregs.swd | fpregs.mxcsr;
             }
         } else if (builtin.cpu.arch == .aarch64) {
-            // Linux ARM64: fpsr not easily accessible in ucontext, return 0
-            return 0;
+            const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            return linux_arm64_fpsimd.status(&ucontext.uc_mcontext.reserved);
         }
     }
     return 0;
@@ -337,7 +338,8 @@ fn clearFPUStatus(ucontext_ptr: *anyopaque) void {
                 fpregs.mxcsr &= 0xffffffc0;
             }
         } else if (builtin.cpu.arch == .aarch64) {
-            // Linux ARM64: fpsr not easily accessible in ucontext
+            const ucontext: *Linux_aarch64_ucontext = @ptrCast(@alignCast(ucontext_ptr));
+            linux_arm64_fpsimd.clearStatus(&ucontext.uc_mcontext.reserved);
         }
     }
 }
