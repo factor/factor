@@ -130,6 +130,11 @@ ERROR: variadic-callback-architecture-unsupported ;
 : check-variadic-callback-runtime ( -- )
     "arm64_variadic_callbacks_supported" f dlsym
     [ drop ] [ variadic-callback-runtime-required ] if*
+    ! Live refresh can update the compiler while retaining an older image's
+    ! ordinary callback template. Upgrade lazily, after checking the VM:
+    ! eagerly loading bootstrap assembler code here would create load cycles.
+    CALLBACK-STUB special-object length 3 <
+    [ "bootstrap.compat.arm64" require ] when
     CALLBACK-STUB special-object length 3 <
     [ variadic-callback-runtime-required ] when ;
 
