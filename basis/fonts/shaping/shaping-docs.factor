@@ -3,11 +3,11 @@ IN: fonts.shaping
 
 HELP: font-with-direction
 { $values { "font" "a font" } { "direction/f" "left-to-right, right-to-left, or f" } { "font'" "a new font" } }
-{ $description "Sets paragraph reading direction. A false value uses the backend default (left-to-right on DirectWrite). Bidirectional runs within the paragraph still follow Unicode shaping rules." } ;
+{ $description "Sets paragraph reading direction. A false value uses the backend default (left-to-right on DirectWrite and Uniscribe). Bidirectional runs within the paragraph still follow Unicode shaping rules." } ;
 
 HELP: font-with-tab-width
 { $values { "font" "a font" } { "width/f" "a positive distance in logical pixels, or f" } { "font'" "a new font" } }
-{ $description "Sets a uniform tab-stop interval. A false value restores the backend default." } ;
+{ $description "Sets a uniform tab-stop interval. A false value restores the backend default. DirectWrite and Uniscribe support this option. Uniscribe rounds the scaled interval to whole device pixels, with a minimum of one pixel." } ;
 
 HELP: font-with-features
 { $values { "font" "a font" } { "assoc" "four-character OpenType tags mapped to unsigned 32-bit parameters" } { "font'" "a new font" } }
@@ -23,7 +23,7 @@ HELP: font-with-color-fonts
 { $description "Enables or disables native color glyph rendering. Enabled by default. Available color glyph formats depend on Windows and the installed font." } ;
 
 ARTICLE: "fonts.shaping" "Font shaping options"
-"These immutable font helpers configure the Windows DirectWrite text backend. Other text backends currently ignore these options. Options survive UI font derivation; omitted options inherit from the base font."
+"These immutable font helpers configure the Windows DirectWrite text backend. The legacy Uniscribe backend also supports paragraph direction and uniform tab intervals. OpenType feature, locale, and color-font options require DirectWrite on Windows. Other text backends currently ignore these options. Options survive UI font derivation; omitted options inherit from the base font."
 { $subsections font-with-direction font-with-tab-width font-with-features font-with-locale font-with-color-fonts } ;
 
 ABOUT: "fonts.shaping"

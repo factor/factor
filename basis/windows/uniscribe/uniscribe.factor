@@ -3,8 +3,8 @@
 
 USING: accessors alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
-fonts generalizations images init io.encodings.string io.encodings.utf16 kernel
-literals locals math math.bitwise math.functions math.order namespaces
+fonts fonts.shaping generalizations images init io.encodings.string io.encodings.utf16 kernel
+libc literals locals math math.bitwise math.functions math.order namespaces
 opengl sequences sequences.generalizations specialized-arrays windows.errors windows.fonts
 windows.gdi32 windows.offscreen windows.ole32 windows.types
 windows.usp10 ;
@@ -12,8 +12,8 @@ windows.usp10 ;
 SPECIALIZED-ARRAY: uint32_t
 IN: windows.uniscribe
 
-! Size and metrics remain logical; origin locates (0,0) inside the ink bitmap.
-TUPLE: script-string < disposable font string metrics ssa size image origin ;
+! Size/metrics are backing-pixel layout bounds; origin locates (0,0) in the bitmap.
+TUPLE: script-string < disposable font string metrics ssa size image origin backing-scale ;
 
 <PRIVATE
 
@@ -59,22 +59,37 @@ PRIVATE>
 
 <PRIVATE
 
-: make-ssa ( dc script-string -- ssa )
-    uniscribe-text
-    utf16n encode ! pString
+:: uniscribe-tabdef ( width/f scale -- tabdef/f )
+    width/f [
+        width/f scale * round 1 max :> pixels
+        pixels 0x7fffffff > [ width/f invalid-tab-width ] when
+        pixels >integer int <ref> malloc-byte-array &free :> interval
+        SCRIPT_TABDEF new
+            1 >>cTabStops 4 >>iScale interval >>pTabStops 0 >>iTabOrigin
+    ] [ f ] if ;
+
+:: (make-ssa) ( dc string flags tabdef -- ssa )
+    dc string uniscribe-text utf16n encode
     dup length 2 /i ! cString
-    dup 1.5 * 16 + >integer ! cGlyphs -- MSDN says this is "recommended size"
-    -1 ! iCharset -- Unicode
-    ssa-dwFlags
-    0 ! iReqWidth
-    f ! psControl
-    f ! psState
-    f ! piDx
-    f ! pTabdef
-    f ! pbInClass
-    f void* <ref> ! pssa
+    dup 1.5 * 16 + >integer ! recommended glyph buffer size
+    -1 flags 0 f f f tabdef f
+    f void* <ref>
     [ ScriptStringAnalyse ] keep
     [ check-ole32-error ] [ |ScriptStringFree void* deref ] bi* ;
+
+! Successful analyses belong to the caller. Layout construction registers
+! error-only cleanup; temporary rendering registers unconditional cleanup.
+: make-ssa ( dc string -- ssa )
+    [ ssa-dwFlags f (make-ssa) ] with-destructors ;
+
+:: make-ssa-with-font ( dc string font scale -- ssa )
+    ! Tab-stop storage must remain fixed while native analysis uses it.
+    [
+        font font-tab-width scale uniscribe-tabdef :> tabdef
+        ssa-dwFlags font font-text-direction right-to-left =
+        [ SSA_RTL bitor ] when :> flags
+        dc string flags tabdef (make-ssa)
+    ] with-destructors ;
 
 :: opaque-text-color ( font -- color )
     font foreground>> >rgba-components :> alpha 3array
@@ -253,7 +268,7 @@ PRIVATE>
     script string>> selection?
     script font>> background>> >rgba alpha>> 1 number= not or
     ANTIALIASED_QUALITY DEFAULT_QUALITY ? :> quality
-    dc script font>> quality cache-font-with-quality
+    dc script font>> quality script backing-scale>> cache-font-at-scale
     SelectObject win32-error=0/f
     script string>> selection? [
         dc COLOR: black color>RGB SetBkColor drop
@@ -273,16 +288,22 @@ PRIVATE>
 
 ! DC limit is default soft-limited to 10,000 per process.
 :: <script-string> ( font string -- script-string )
+    gl-scale-factor get-global 1.0 or :> scale
     [ :> dc
-        dc font set-dc-font
+        dc font DEFAULT_QUALITY scale cache-font-at-scale SelectObject win32-error=0/f
         dc dc-metrics :> metrics
         ! ScriptStringAnalyse requires at least one UTF-16 character.
         string uniscribe-text empty? [
             f 0 metrics height>> 2array
-        ] [ dc string make-ssa dup ssa-size ] if :> size :> ssa
+        ] [
+            dc string font scale make-ssa-with-font
+            dup void* <ref> |ScriptStringFree drop
+            dup ssa-size
+        ] if :> size :> ssa
         ! Register ownership only after all fallible native setup succeeds.
         script-string new-disposable font >>font string >>string
             metrics size first >>width >>metrics ssa >>ssa size >>size
+            scale >>backing-scale
     ] with-memory-dc ;
 
 PRIVATE>
@@ -309,7 +330,7 @@ SYMBOL: cached-script-strings
             {
                 [ 2dup configure-script-dc drop ]
                 [
-                    dup pick string>> make-ssa
+                    dup pick [ string>> ] [ font>> ] [ backing-scale>> ] tri make-ssa-with-font
                     dup void* <ref> &ScriptStringFree drop
                     pick render-image >>image
                 ]

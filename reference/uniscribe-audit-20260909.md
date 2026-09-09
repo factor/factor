@@ -26,7 +26,7 @@
 | Custom selection colors | Both Uniscribe and DirectWrite composite `selection.color`, including disjoint visual runs in bidirectional text. |
 | Translucent backgrounds | Both paths preserve background RGBA and composite foreground coverage with source-over alpha. |
 | Selection on transparent text images | Selection backgrounds are composited independently from glyph coverage; native pixel tests check the resulting RGBA. |
-| Paragraph direction and tabs | `fonts.shaping` exposes explicit left-to-right/right-to-left direction and uniform tab intervals through DirectWrite. |
+| Paragraph direction and tabs | `fonts.shaping` exposes explicit left-to-right/right-to-left direction and uniform tab intervals through both DirectWrite and Uniscribe. |
 | OpenType feature controls | DirectWrite applies four-character feature tags and unsigned parameters. Native tests verify that toggling kerning changes the layout. |
 | Color emoji/fonts | DirectWrite/Direct2D renders native color glyphs. Color can be disabled per font. Native tests verify colored pixels, monochrome opt-out, and palette glyph opacity. |
 
@@ -69,6 +69,26 @@ API references:
   exceptions before deleting the temporary DIB. Before the fix, 30 renders on
   one DC increased live GDI objects from 4 to 34; afterward the count stays at 4.
   Bitmap readback also flushes GDI drawing before copying DIB memory.
+
+### DPI and native shaping follow-up
+
+- Deferred rasterization uses the layout's captured backing scale for font
+  selection and shaping. Previously, changing DPI between layout and rendering
+  changed an Arial example from 55×27 to 108×45 pixels. Tests compare dimensions
+  and pixels across scale changes for opaque, transparent, and selected text.
+- The font cache normalizes heights before memoization. A native probe created
+  100 handles for fractional sizes mapping to the same integer height; those
+  requests now reuse one handle. Positive subpixel heights clamp to one pixel,
+  avoiding GDI's zero-height default-font substitution.
+- Uniscribe now honors paragraph direction and uniform tab intervals from
+  `fonts.shaping` during both layout and rendering. Tab intervals round to native
+  pixels after DPI scaling. Native tests cover RTL visual edges and ordering,
+  repeated tab stops, fractional intervals, and signed-integer overflow.
+- Native analysis ownership is explicit at the layout and rendering call sites.
+  Temporary analyses no longer have both unconditional and error-only cleanup
+  registered, avoiding a double free on interrupted rendering.
+- A quality audit across 117 font/size/script combinations found matching layout
+  bounds and caret positions for default and grayscale antialiasing.
 
 ## Validation
 

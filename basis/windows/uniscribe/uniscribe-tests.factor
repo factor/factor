@@ -22,6 +22,30 @@ IN: windows.uniscribe.tests
 
 { t t t } [ test-monitor-font-scales ] unit-test
 
+! Rasterization can happen after another window changes the global DPI.
+:: deferred-dpi-image? ( font text from-scale to-scale -- same? )
+    gl-scale-factor get-global :> original
+    [ [
+        from-scale gl-scale-factor set-global
+        font text <script-string> &dispose :> deferred
+        font text <script-string> &dispose script-string>image :> expected
+        to-scale gl-scale-factor set-global
+        deferred script-string>image :> actual
+        expected actual [ dim>> ] same?
+        expected actual [ bitmap>> ] same? and
+        gl-scale-factor get-global to-scale = and
+    ] with-destructors ] [ original gl-scale-factor set-global ] finally ;
+
+{ t } [ "Arial" <font> 24 font-with-size "Hello" 1.0 2.0 deferred-dpi-image? ] unit-test
+{ t } [
+    "Arial" <font> 24 font-with-size 0 0 0 0 <rgba> font-with-background
+    "a\u000301" 2.0 1.0 deferred-dpi-image?
+] unit-test
+{ t } [
+    monospace-font "abc אבג" 1 5 COLOR: red <selection>
+    1.0 1.5 deferred-dpi-image?
+] unit-test
+
 ! UTF-16 hit positions may identify the interior of a surrogate pair.
 { 0 0 1 2 } [
     "\u01f600x" {

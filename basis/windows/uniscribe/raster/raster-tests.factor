@@ -64,3 +64,21 @@ IN: windows.uniscribe.raster.tests
     ] with-disposal ;
 
 { t } [ opaque-default-quality? ] unit-test
+
+ERROR: interrupted-script-render ;
+
+! A temporary SSA has one owner, even when rendering exits through an error.
+! Registering both error-only and unconditional cleanup double-freed it.
+:: interrupted-render ( shaped? -- )
+    "Arial" <font> "abc" <script-string> [ :> script
+        [ :> dc
+            script dc configure-script-dc
+            shaped? [ dc "abc" script font>> script backing-scale>> make-ssa-with-font ]
+            [ dc "abc" make-ssa ] if
+            void* <ref> &ScriptStringFree drop
+            interrupted-script-render
+        ] with-memory-dc
+    ] with-disposal ;
+
+[ f interrupted-render ] [ interrupted-script-render? ] must-fail-with
+[ t interrupted-render ] [ interrupted-script-render? ] must-fail-with
