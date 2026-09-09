@@ -7,6 +7,7 @@ source/dispatch inspection and native execution remain separate requirements.
 Factor program-point ranges are INCLUSIVE, unlike regalloc2's half-open ranges.
 """
 import argparse
+import itertools
 import json
 from pathlib import Path
 
@@ -154,9 +155,33 @@ def check_rollback(w):
     require(w["before"] == w["after"], "failed search did not restore exact allocation state")
 
 
+def check_placement(w):
+    """Exhaustively check small binary CFG residency problems, not a flow solver."""
+    nodes = w["costs"]
+    require(0 < len(nodes) <= 12, "placement witness exceeds exhaustive bound")
+    require(set(w["resident"]) == set(nodes), "placement omits CFG nodes")
+    for costs in nodes.values():
+        require(len(costs) == 2 and all(isinstance(c, int) and c >= 0 for c in costs),
+                "invalid memory/register unary costs")
+    for left, right, cost in w["edges"]:
+        require(left in nodes and right in nodes and isinstance(cost, int) and cost >= 0,
+                "invalid CFG transition cost")
+    def legal(resident):
+        return all(value in (0, 1) for value in resident.values()) and all(
+            resident[node] == value for node, value in w.get("hard", {}).items())
+    def cost(resident):
+        return sum(nodes[node][value] for node, value in resident.items()) + sum(
+            weight for left, right, weight in w["edges"] if resident[left] != resident[right])
+    require(legal(w["resident"]), "placement violates hard residency constraints")
+    candidates = (dict(zip(nodes, values)) for values in itertools.product((0, 1), repeat=len(nodes)))
+    optimum = min(cost(candidate) for candidate in candidates if legal(candidate))
+    require(cost(w["resident"]) == optimum, "CFG placement is not minimum cost")
+    require(w["cost"] == optimum, "reported placement cost differs")
+
+
 CHECKS = {"coloring": check_coloring, "split": check_split, "bundle": check_bundle,
           "eviction": check_eviction, "spillsets": check_spillsets, "recolor": check_recolor,
-          "rollback": check_rollback}
+          "rollback": check_rollback, "placement": check_placement}
 
 
 def validate(document):

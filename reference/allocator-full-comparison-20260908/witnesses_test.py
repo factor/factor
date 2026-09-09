@@ -74,6 +74,14 @@ class WitnessChecks(unittest.TestCase):
         sample = dict(before=state, after=copy.deepcopy(state))
         self.rejected(audit.check_rollback, sample, lambda x: x["after"].update(serial=4))
 
+    def test_cfg_placement_accounts_for_transparent_block(self):
+        sample = dict(costs={"a": [4, 0], "b": [0, 0], "c": [4, 0]},
+                      edges=[["a", "b", 3], ["b", "c", 3]],
+                      resident={"a": 1, "b": 1, "c": 1}, cost=0)
+        self.rejected(audit.check_placement, sample, lambda x: x["resident"].update(b=0))
+        sample.update(hard={"b": 0}, resident={"a": 1, "b": 0, "c": 1}, cost=6)
+        self.rejected(audit.check_placement, sample, lambda x: x["resident"].update(b=1))
+
 
 if __name__ == "__main__":
     unittest.main()

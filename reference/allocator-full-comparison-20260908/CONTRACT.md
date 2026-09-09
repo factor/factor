@@ -57,10 +57,12 @@ decision participates in the allocation path.
 `witnesses.py` independently checks exported small-fixture facts: inclusive range
 partition and use preservation, distinct-value bundle noninterference, exact
 eviction/requeue sets, compatible nonoverlapping shared homes, perfect elimination
-and coloring, and legal affinity-improving recoloring. It deliberately enumerates
+and coloring, legal affinity-improving/augmenting recoloring, exact failed-search rollback,
+and exhaustive minimum-cost CFG residency for at most 12 blocks. It deliberately enumerates
 bounded ranges instead of sharing production indexes. Its positive and corrupted
 examples in `witnesses_test.py` are synthetic validator tests, not allocator results.
-The script cannot certify that a compiler exported a truthful trace; source and
+The placement oracle enumerates binary states instead of sharing the production
+flow/min-cut algorithm. The script cannot certify that a compiler exported a truthful trace; source and
 dispatch inspection are still required. It also does not replace the CFG checker.
 
 The elimination witness uses a conventional order whose *later* neighbors form
