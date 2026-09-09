@@ -1,0 +1,27 @@
+{
+  "source": "1c1f8ea4794fe3abb9f75fdcc405ca298902f746",
+  "prior_audit_source": "3c3ea3feab",
+  "files": {
+    "basis/compiler/cfg/linear-scan/linear-scan-tests.factor": "be084b2162d9c4dca403c13bb872b0396c4a69cf67d14840aed04c508b314b71",
+    "basis/compiler/cfg/linear-scan/live-intervals/live-intervals-tests.factor": "2a4c1e06a2d9866c4d769428eda8021ebbba99f34454d235266a5a9187ae71fb",
+    "basis/compiler/cfg/liveness/liveness.factor": "1f4f63d59d555202662392b4628f99b06874bb68cd69ddbf48ff3d6b7a394e09",
+    "basis/compiler/cfg/register-allocation/backtracking/ALGORITHM.md": "57fd91b08ab68a3ec46db760a8cdd1afd80fa98c01c45762e66558e5b168ccfc",
+    "basis/compiler/cfg/register-allocation/backtracking/README.md": "2b959c367c4ca3db02a14a2178da1daf707359e604350d072f06fa67cdcbad20",
+    "basis/compiler/cfg/register-allocation/backtracking/backtracking-tests.factor": "2275131546395e8e930d40f0f7c2ec166675f33091a37fe3185251a52525e8f7",
+    "basis/compiler/cfg/register-allocation/backtracking/backtracking.factor": "a02e640a78e0caddb05a0a38ede6f5eb16b1b7ce6875511baae84774f9f11e76",
+    "basis/compiler/cfg/register-allocation/backtracking/evidence/evidence.factor": "4e077d1b12c24a8324541a540d7e260e6094903093e923f6b1ccdc05d060cb23",
+    "basis/compiler/cfg/register-allocation/chordal/bases/bases.factor": "37763ecbbcc44f6ca75b994359d31886127024a78ec8081447014b0c47c11ad7",
+    "basis/compiler/cfg/register-allocation/chordal/chordal.factor": "99b20f1a98f2a4dcffd4cb3c9be1a84ca82f227b7384b1f3590aacce63274974",
+    "basis/compiler/cfg/register-allocation/chordal/spilling/spilling.factor": "c42183342e5dc8beb700a1da9fe835189ef96c652ff1e4557de0b00fb8792906",
+    "basis/compiler/cfg/register-allocation/register-allocation.factor": "8ac97c5f6dc6d278853ca9a02ec9e8e047c471896c24990b9abbb61fa18e8736",
+    "basis/compiler/cfg/register-allocation/spill-sites/spill-sites-tests.factor": "ae8f1fd0d59e440849b8df939ad2110c7a5df33311a5e2ed61407cf816b1c882",
+    "basis/compiler/cfg/register-allocation/spill-sites/spill-sites.factor": "1102167b291938a891479b0a8c6dfd62e666f0b761f80097e971eac4e7d1bf00",
+    "basis/compiler/cfg/register-allocation/ssa/bases/README.md": "320ab36ee08346afca2d5c8ac54cef0e6537fdd7a3b0de4a45521edfd4781b03",
+    "basis/compiler/cfg/register-allocation/ssa/bases/bases-tests.factor": "73eb9f9c5bd21622bcd92667aae78904a679df081a3343b3f83bcb53de8cb203",
+    "basis/compiler/cfg/register-allocation/ssa/bases/bases.factor": "8612c031753f834a17e3f808255c1d707439adefc93ae7e979df875f2ddbacfa",
+    "basis/compiler/cfg/register-allocation/ssa/bases/summary.txt": "3be86bc7d9cf94cb9a651442311a6f493b40f1dda9e7569a5cebe3e1501808b0",
+    "basis/compiler/cfg/register-allocation/validation/validation-tests.factor": "da063eb97063192f3eab465a698db63b90f4fcfb4fc255f60a4d3a1e3e7151f3"
+  },
+  "mode": "Native x86 full-bank public backend dispatch, raw/tagged phi and rematerialization OFF/ON",
+  "timing": false
+}

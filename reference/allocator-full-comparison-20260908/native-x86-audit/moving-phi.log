@@ -1,0 +1,8 @@
+linear-scan-allocator
+native moving raw/tagged phi OFF/ON passed
+greedy-allocator
+native moving raw/tagged phi OFF/ON passed
+backtracking-allocator
+native moving raw/tagged phi OFF/ON passed
+chordal-allocator
+native moving raw/tagged phi OFF/ON passed

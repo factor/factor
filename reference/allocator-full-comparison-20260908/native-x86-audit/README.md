@@ -46,3 +46,17 @@ All four frames shrink from 240 bytes to zero. This targeted feature gate
 is not runtime timing or evidence of an overall allocator ranking. The
 independent retained-output checker requires positive activity and strict
 reduction for every backend.
+
+## Shared moving-GC provenance repair
+
+At exact source `1c1f8ea479`, `moving-phi.factor` checks the ordinary public
+dispatcher for all four completed backends, both rematerialization settings,
+and raw-derived/tagged pointer phis. All 384 fresh moving-object identity
+pairs pass on native x86 with the final verifier enabled. The script is
+self-contained and the oracle compares against independently rooted objects
+on the caller's data stack. Source hashes and raw output are retained.
+
+This source is **not a final benchmark freeze**: subsequent parent full-compiler
+acceptance found a separate chordal callback `##peek` failure with global
+rematerialization enabled. The owner is fixing that case; these passing GC
+results are scoped to the exact source and scenarios above.

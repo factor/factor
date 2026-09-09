@@ -1,0 +1,12 @@
+{
+  "native_arch": "x86-64",
+  "exit_code": 0,
+  "source": "1c1f8ea4794fe3abb9f75fdcc405ca298902f746",
+  "allocators": 4,
+  "rematerialization_settings": 2,
+  "phi_forms": 2,
+  "fresh_object_pairs_per_case": 24,
+  "native_pairs": 384,
+  "final_verifier": true,
+  "timing": false
+}
