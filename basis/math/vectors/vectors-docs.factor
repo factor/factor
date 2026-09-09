@@ -454,7 +454,7 @@ HELP: vshuffle
 { $description "Permutes the elements of a SIMD array. Duplicate entries are allowed in the permutation. The " { $snippet "perm" } " argument can have one of two forms:"
 { $list
 { "A literal array of integers of the same length as the vector. This will perform a static, elementwise shuffle." }
-{ "A byte array or SIMD vector of the same byte length as the vector. This will perform a variable bytewise shuffle." }
+{ "A byte array or SIMD vector of the same byte length as the vector. This will perform a variable bytewise shuffle. Each index wraps modulo the vector's byte length; a high index bit does not request a zero byte." }
 } }
 { $examples
     { $example

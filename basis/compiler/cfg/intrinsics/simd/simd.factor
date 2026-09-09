@@ -5,7 +5,7 @@ combinators combinators.short-circuit compiler.cfg.comparisons
 compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.simd.backend compiler.cfg.stacks
-cpu.architecture kernel layouts math math.order math.vectors
+cpu.architecture kernel layouts locals math math.order math.vectors
 math.vectors.simd.intrinsics math.vectors.simd.intrinsics.private
 sequences specialized-arrays strings ;
 FROM: alien.c-types => heap-size char short int longlong float double ;
@@ -572,7 +572,13 @@ PREDICATE: fixnum-vector-rep < int-vector-rep
 
 : emit-simd-vshuffle-bytes ( node -- )
     {
-        [ ^^shuffle-vector ]
+        [| src indices rep |
+            ! Wrap every index modulo the 16-byte register width. PSHUFB
+            ! would otherwise zero bytes whose index has its high bit set.
+            indices 16 15 <array> >byte-array ^^load-literal
+            uchar-16-rep ^^and-vector :> masked
+            src masked rep ^^shuffle-vector
+        ]
     } emit-vv-vector-op ;
 
 : emit-simd-vmerge-head ( node -- )
