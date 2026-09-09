@@ -1,0 +1,47 @@
+{
+  "source_base": "ad0fc337de",
+  "test_commit": "02be782537",
+  "platform": "native ARM64",
+  "assets_copied_from": "/Users/erg/factor.worktrees/compiler-next2-integration",
+  "explicit_refresh_all": true,
+  "sha256": {
+    "factor": "ab377288c4da6092477daec643d1c65f668d9206f2b8bcb80210572def24af18",
+    "libfactor.dylib": "722f5c9985834e4c76fbdb4042e57185224462f0806cfca96df3f40b10ba7164",
+    "libfactor-ffi-test.dylib": "3b56aa71e5f176840b5a017c8c46c3b2cc38e5a9cbdb2ace68ec32221f428c30",
+    "audit.image": "28bcf6c8c663777624a42413806e642c47fcc59af389ed9584542ba8ac9c7fe4",
+    "basis/compiler/cfg/register-allocation/rematerialization/rematerialization.factor": "f52770203265023e5a292cb15b6c25620e1deabaf39dff8112cfef567a1ab5fe",
+    "basis/compiler/cfg/register-allocation/rematerialization/rematerialization-tests.factor": "553cd2fb018ca6f38c972898f9512470c35f7c3eb9cca62dd44781aec7857ed5"
+  },
+  "runs": {
+    "check.factor": {
+      "exit_code": 0,
+      "markers": [
+        "REMAT-TEST-GVN f",
+        "REMAT-TEST-GVN t",
+        "REMAT-TEST-FAILURES 0"
+      ]
+    },
+    "metrics.factor": {
+      "exit_code": 0,
+      "records": 8
+    },
+    "verifier-check.factor": {
+      "exit_code": 0,
+      "markers": [
+        "REMAT-TEST-FAILURES 0"
+      ]
+    }
+  },
+  "command_template": [
+    "./factor",
+    "-i=/Users/erg/factor.worktrees/allocator-flags-rematerialization/audit.image",
+    "-resource-path=/Users/erg/factor.worktrees/allocator-flags-rematerialization",
+    "-no-user-init",
+    "reference/allocator-flags-rematerialization-20260909/SCRIPT.factor"
+  ],
+  "limitations": [
+    "Direct CFG pressure witness exercises allocator, assignment, codegen, and final verifier; it does not run GVN.",
+    "Pressure counts and code size are not runtime or compiler speed measurements.",
+    "The focused normal source compile-call oracles execute under both GVN values; GVN activity is measured separately by the parent."
+  ]
+}
