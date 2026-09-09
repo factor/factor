@@ -17,6 +17,7 @@ metrics = ['instructions', 'cpu_seconds', 'ns']
 runs = {}
 scope_words = None
 outputs = {}
+provenance = None
 
 def read_text(path):
     if path.exists():
@@ -25,10 +26,15 @@ def read_text(path):
         return stream.read()
 
 def read(config, mode, ordinal):
-    global scope_words
+    global scope_words, provenance
     stem = a.directory / f'{a.prefix}-{config}-{mode}-linear-scan-{ordinal}'
     status = json.loads(stem.with_suffix('.status.json').read_text())
     assert status['ok'] and status['exit_code'] == 0, stem
+    identity = tuple(status[key] for key in ['source_commit', 'image_sha256', 'vm_sha256']) + (
+        status['script_sha256']['timing.factor'], status['script_sha256']['drive.py'])
+    if provenance is None:
+        provenance = identity
+    assert identity == provenance, ('different source/image/VM/harness', stem)
     rows = [json.loads(line) for line in read_text(stem.with_suffix('.jsonl')).splitlines()]
     scope, = [r for r in rows if r['kind'] == 'scope']
     assert scope['options'] == dict(gvn=config[0] == '1', rematerialize_constants=config[1] == '1', backtracking_loop_spills=False)
@@ -73,8 +79,24 @@ def comparison(candidate, baseline):
                 runtime_geomean={m: geomean(r['runtime_geomean'][m] for r in rounds) for m in metrics},
                 per_case={w: {m: geomean(r['per_case'][w][m] for r in rounds) for m in metrics} for w in outputs})
 
+interaction_rounds = []
+for ordinal in range(2):
+    r = {c: runs[c][ordinal] for c in configs}
+    per_case = {w: {m: r['11']['runtime'][w][m] * r['00']['runtime'][w][m] /
+                   (r['10']['runtime'][w][m] * r['01']['runtime'][w][m])
+                   for m in metrics} for w in outputs}
+    interaction_rounds.append(dict(
+        compile={m: r['11']['compile'][m] * r['00']['compile'][m] /
+                 (r['10']['compile'][m] * r['01']['compile'][m]) for m in metrics},
+        runtime_geomean={m: geomean(v[m] for v in per_case.values()) for m in metrics},
+        per_case=per_case))
+
 result = dict(scope_size=len(scope_words), outputs_match=True, cases=len(outputs),
               measured_batches=624,
+              provenance=provenance,
+              interaction=dict(formula='M11 * M00 / (M10 * M01)', rounds=interaction_rounds,
+                               compile={m: geomean(r['compile'][m] for r in interaction_rounds) for m in metrics},
+                               runtime_geomean={m: geomean(r['runtime_geomean'][m] for r in interaction_rounds) for m in metrics}),
               comparisons={f'{c}_vs_{b}': comparison(c, b) for c, b in [('10', '00'), ('01', '00'), ('11', '00'), ('11', '10'), ('11', '01')]},
               observations=runs)
 a.output.write_text(json.dumps(result, indent=2) + '\n')

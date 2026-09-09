@@ -70,6 +70,15 @@ reported separately. The two rounds are a bounded comparison, not a confidence
 interval or a bootstrap measurement. Host-load snapshots are retained; changing
 execution rates can make CPU and wall-time comparisons noisy.
 
+The 624 batches are repeated observations within eight fresh processes, not 624
+independent compiler trials. macOS retired counts use process-wide usage while
+CPU seconds use the current thread; Linux counters measure the current thread
+and exclude kernel instructions. Compare ratios within each architecture, not
+absolute instruction totals between architectures. Priority guards do not prove
+constant CPU frequency. The analysis also retains the per-round multiplicative
+interaction `M11 * M00 / (M10 * M01)` and verifies common source/image/VM/harness
+identity before accepting the records.
+
 Native x86 results and the completed ARM timing interpretation will be added
 after their balanced queues finish. No default promotion is implied by activity
 or correctness alone.
