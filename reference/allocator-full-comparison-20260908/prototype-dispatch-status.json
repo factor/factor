@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "mode": "native x86-64 VM, checked CFG pipeline; no generated-code execution",
+  "source_commit": "0b52875640",
+  "prepared_image_source": "67caf177a7",
+  "explicit_reload": [
+    "compiler.cfg.register-allocation.chordal"
+  ],
+  "verifier_required": [
+    "compiler.cfg.register-allocation.verifier",
+    "compiler.cfg.register-allocation.verifier.rematerialization"
+  ],
+  "host": "agent1",
+  "cpu_affinity": 2,
+  "root": "/home/erg/factor-allocator-candidate-20260908",
+  "saved_image": false,
+  "ranked_timing": false
+}

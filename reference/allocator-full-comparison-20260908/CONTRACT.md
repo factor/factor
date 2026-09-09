@@ -14,7 +14,7 @@ eviction with requeue, progressive region/block/local splitting, and final spill
 handling. Preferences and bounded recoloring need behavioral tests if claimed.
 These are separate mechanisms; a density queue alone is not the algorithm.
 See the [LLVM author's overview](https://blog.llvm.org/2011/09/greedy-register-allocation-in-llvm-30.html)
-and [`RegAllocGreedy.cpp`](https://llvm.org/doxygen/RegAllocGreedy_8cpp_source.html),
+and [`RegAllocGreedy.cpp` at LLVM 9851e4f8979b8b57557d03cd98b54f57287a128f](https://github.com/llvm/llvm-project/blob/9851e4f8979b8b57557d03cd98b54f57287a128f/llvm/lib/CodeGen/RegAllocGreedy.cpp),
 especially `tryRegionSplit`, `tryBlockSplit`, and `tryLastChanceRecoloring`.
 
 The backtracking contract follows regalloc2 commit
@@ -31,7 +31,12 @@ coloring. The uniform-register theorem does not grant optimality for arbitrary
 physical-register constraints. See Hack, Grund, and Goos,
 [Register Allocation for Programs in SSA-Form, sections 3–4](https://compilers.cs.uni-saarland.de/papers/ssara.pdf).
 An SSA coloring preference followed by a different interval allocator does not
-demonstrate this architecture.
+demonstrate this architecture. The owner also targets Braun and Hack’s
+[CFG spilling algorithm](https://pp.ipd.kit.edu/uploads/publikationen/braun09cc.pdf)
+and [preference-guided assignment](https://pp.ipd.kit.edu/uploads/publikationen/braun10cc.pdf).
+Accordingly, audit the actual register-resident/memory-valid block states,
+successor-sensitive next-use decisions, edge coupling and fresh reload SSA
+definitions; a loop-depth weight alone does not demonstrate that spilling pass.
 
 Factor currently exposes representation classes, temporaries, memory-only ABI
 operands and clobbers at the allocation boundary. Fixed ABI shuffles introduced
@@ -136,3 +141,20 @@ lane and per-thread pinned userspace counters; ARM retains externally applied
 foreground policy and Mach priority guards. These shared hosts do not provide
 fixed frequency or reserved cores. Cross-architecture absolute retired counts
 have different counter scope and are not directly comparable.
+
+## Diagnostic body probe
+
+`dispatch.factor` annotates actual method and policy definitions in a disposable
+process. It is intentionally excluded from timed runs. The source audit must
+supply the policy routine names for each frozen implementation; missing names
+fail instead of silently weakening coverage. Neutral shared mechanics do not
+need policy labels, but their bodies must be reviewed before that classification.
+
+`prototype-dispatch-probe.factor` and its retained native log show the mechanism
+on the corrected prototype: one method/engine entry per allocator and two LS
+register-choice entries. Chordal explicitly enters its prototype interval-repair
+engine, illustrating why a method-only selector audit is insufficient for the
+new completeness claim. This is a checked CFG pipeline smoke test in a native
+x86 VM, not execution of generated machine code or a performance measurement.
+Its historical script path uses the existing crossarch harness directory on
+agent1; the exact environment and partial-image reload are recorded in the status.
