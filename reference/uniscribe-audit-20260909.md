@@ -90,9 +90,31 @@ API references:
 - A quality audit across 117 font/size/script combinations found matching layout
   bounds and caret positions for default and grayscale antialiasing.
 
+### Input snapshots and layout lifetime
+
+- Uniscribe snapshots caller-owned font names, text, selections, colors, and
+  shaping options. A native probe previously laid out Arial 12 text at 9×15,
+  then rendered it at 66×45 after the caller changed its font and string. The
+  retained layout and its independent cache key now preserve the original input.
+- The GDI font cache resolves aliases and copies names before memoization, so
+  caller string edits cannot corrupt its keys. Aliases and resolved family names
+  now share the same native handle.
+- Uniscribe and DirectWrite reject caret, selection, and rendering operations on
+  disposed layouts and clear their released native pointers.
+- The Uniscribe UI adapter delegates empty and selected text to the native
+  wrapper, avoiding plain-string sequence operations on selection objects.
+- A 112-case fallback-font probe found consistent logical heights and baseline
+  totals. Caret coordinates also survived destruction of the original DC and
+  1,000 replacement DC allocations. No changes were justified by those probes.
+
 ## Validation
 
-The additional Uniscribe pass finishes with 178 checks from the saved image,
+The latest input-snapshot and lifetime pass runs 223 checks from the saved image
+without reloading implementations, with zero failures. It includes six snapshot
+regressions, disposed-state checks for both native backends, selected-text UI
+geometry, and mutable-name/alias GDI cache checks.
+
+The earlier overhang pass finished with 178 checks from the saved image,
 including nine native overhang regressions and offscreen GDI ownership tests.
 Both source-reload and saved-image runs report zero failures; the saved-image
 run does not reload implementations.

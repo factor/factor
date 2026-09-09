@@ -31,7 +31,7 @@ MEMO:: (cached-gdi-font) ( name size bold? italic? quality -- HFONT )
     CLIP_DEFAULT_PRECIS ! fdwClipPrecision
     quality ! fdwQuality
     DEFAULT_PITCH ! fdwPitchAndFamily
-    name windows-font-name
+    name
     CreateFont
     dup win32-error=0/f ;
 
@@ -39,7 +39,8 @@ MEMO:: (cached-gdi-font) ( name size bold? italic? quality -- HFONT )
     ! GDI accepts integer heights. Normalize before memoization so equivalent
     ! fractional sizes share a handle; positive subpixel sizes must not become
     ! zero, which asks GDI to substitute its default font height.
-    name size dup 0 > [ >integer 1 max ] [ >integer ] if
+    ! Resolve aliases and own the name stored in the memo table.
+    name windows-font-name clone size dup 0 > [ >integer 1 max ] [ >integer ] if
     bold? italic? quality (cached-gdi-font) ;
 
 : (cache-font) ( name size bold? italic? -- HFONT )

@@ -22,6 +22,16 @@ IN: windows.uniscribe.tests
 
 { t t t } [ test-monitor-font-scales ] unit-test
 
+! Released native analyses must never reach a Uniscribe API again.
+: disposed-script ( -- script )
+    monospace-font "abc" <script-string> dup dispose ;
+
+{ f } [ disposed-script ssa>> ] unit-test
+[ 1 disposed-script line-offset>x ] [ already-disposed? ] must-fail-with
+[ 5 disposed-script x>line-offset ] [ already-disposed? ] must-fail-with
+[ disposed-script selection-columns ] [ already-disposed? ] must-fail-with
+[ disposed-script script-string>image ] [ already-disposed? ] must-fail-with
+
 ! Rasterization can happen after another window changes the global DPI.
 :: deferred-dpi-image? ( font text from-scale to-scale -- same? )
     gl-scale-factor get-global :> original
