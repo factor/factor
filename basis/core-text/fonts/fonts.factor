@@ -74,6 +74,7 @@ FUNCTION: CGFloat CTFontGetLeading ( CTFontRef font )
 FUNCTION: CGFloat CTFontGetCapHeight ( CTFontRef font )
 
 FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font )
+FUNCTION: CGRect CTFontGetBoundingBox ( CTFontRef font )
 
 CONSTANT: font-names
     H{
