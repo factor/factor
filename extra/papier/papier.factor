@@ -1,12 +1,12 @@
 ! (c)2010 Joe Groff bsd license
 USING: accessors alien.c-types alien.data.map arrays assocs
-combinators fry game.input game.input.scancodes game.loop
-game.worlds gpu gpu.buffers gpu.framebuffers gpu.render
-gpu.shaders gpu.state gpu.textures hashtables images kernel
-literals math math.matrices.simd math.order math.vectors
-math.vectors.simd papier.map papier.render papier.sprites
-sequences sorting typed ui ui.gadgets ui.gadgets.worlds
-ui.gestures ui.pixel-formats math.functions ;
+combinators fry game.loop game.worlds gpu gpu.buffers
+gpu.framebuffers gpu.render gpu.shaders gpu.state gpu.textures
+hashtables images kernel literals locals math math.functions
+math.matrices.simd math.order math.vectors math.vectors.simd
+papier.map papier.render papier.sprites sequences sets sorting
+typed ui ui.gadgets ui.gadgets.worlds ui.gestures ui.pixel-formats
+unicode ;
 IN: papier
 
 CONSTANT: fov 0.7
@@ -24,7 +24,9 @@ TUPLE: papier-world < game-world
     { slab-images hashtable }
     { atlas image }
     { uniforms papier-uniforms }
-    { renderer papier-renderer } ;
+    { renderer papier-renderer }
+    { held-keys array initial: { } }
+    { pending-keys array initial: { } } ;
 
 : load-slabs ( -- slabs )
     <sprite>
@@ -168,13 +170,50 @@ M: papier-world begin-game-world
 : move-eye ( world amount -- )
     [ uniforms>> ] dip '[ _ v+ ] change-eye drop ; inline
 
-: keyboard-input ( papier-world -- movement/f face/f )
-    read-keyboard keys>> {
-        { [ dup [ key-left-arrow swap nth ] [ key-a swap nth ] bi or ] [ 2drop float-4{ $ move-rate 0 0 0 } vneg float-4{ 0 0 1 0 } ] }
-        { [ dup [ key-right-arrow swap nth ] [ key-d swap nth ] bi or ] [ 2drop float-4{ $ move-rate 0 0 0 }      float-4{ 1 0 0 0 } ] }
-        { [ key-escape      over nth ] [ drop close-window f f ] }
-        [ 2drop f f ]
-    } cond ;
+: papier-key ( gesture -- key/f )
+    dup key-gesture? [
+        sym>> >lower dup { "left" "right" "up" "down" "a" "d" "w" "s" "esc" } member?
+        [ drop f ] unless
+    ] [ drop f ] if ;
+
+:: handle-papier-key ( gesture world key -- )
+    key "esc" = [
+        gesture key-down? [ world close-window ] when
+    ] [
+        gesture key-down? [
+            world
+                [ key 1array union ] change-held-keys
+                [ key 1array union ] change-pending-keys drop
+        ] [ world [ key swap remove ] change-held-keys drop ] if
+    ] if ;
+
+: reset-papier-keys ( world -- )
+    { } >>held-keys { } >>pending-keys drop ;
+
+M: papier-world handle-gesture
+    over papier-key [ handle-papier-key f ] [
+        over lose-focus eq?
+        [ nip reset-papier-keys f ] [ call-next-method ] if
+    ] if* ;
+
+:: key-axis ( keys negative positive -- n )
+    keys positive intersects? 1 0 ?
+    keys negative intersects? 1 0 ? - ;
+
+:: keyboard-input ( world -- movement/f face/f )
+    ! Preserve a tap even if key-up arrives before the next game tick.
+    world [ held-keys>> ] [ pending-keys>> ] bi union :> keys
+    world { } >>pending-keys drop
+    keys { "left" "a" } { "right" "d" } key-axis :> x
+    keys { "up" "w" } { "down" "s" } key-axis :> z
+    x zero? z zero? and [ f f ] [
+        x 0 z 0 float-4-boa normalize move-rate v*n
+        {
+            { [ x 0 < ] [ float-4{ 0 0 1 0 } ] }
+            { [ x 0 > ] [ float-4{ 1 0 0 0 } ] }
+            [ world slabs-by-name>> "marco" swap at orient>> ]
+        } cond
+    ] if ;
 
 : update-slabs ( slabs -- )
     [ inc-sprite drop ] each ;
@@ -210,7 +249,6 @@ GAME: papier-game {
             double-buffered
             T{ depth-bits { value 24 } }
         } }
-        { use-game-input? t }
         { pref-dim { 1024 768 } }
         { tick-interval-nanos $[ 24 fps ] }
     } ;
