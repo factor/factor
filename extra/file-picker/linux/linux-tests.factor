@@ -6,9 +6,11 @@ kernel sequences sequences.generalizations system tools.test ;
     "FILE-PICKER-SKIP reason=no-display" print
 ] [
     { } [
+        ! Saved load-all images need a clean image in FACTOR_GUI_TEST_IMAGE.
         vm-path "-i=" "FACTOR_GUI_TEST_IMAGE" os-env image-path or append
         "-no-user-init" "-no-monitors"
+        "-resource-path=" "" resource-path append
         "resource:extra/file-picker/linux/fixtures/dialog-run.factor" absolute-path
-        5 narray <process> swap >>command 60 seconds >>timeout try-process
+        6 narray <process> swap >>command 60 seconds >>timeout try-process
     ] unit-test
 ] if

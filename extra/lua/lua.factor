@@ -1,14 +1,15 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.c-types
-alien.libraries alien.syntax alien.varargs classes.struct combinators
-io.encodings.ascii kernel math system ;
+alien.libraries alien.libraries.finder alien.syntax alien.varargs
+classes.struct combinators io.encodings.ascii kernel literals math system ;
 IN: lua
 
 C-LIBRARY: liblua5.1 {
     { windows "lua5.1.dll" }
     { macos "liblua5.1.dylib" }
-    { linux "liblua5.1.so.0" }
+    ! Distributions use different sonames for the Lua 5.1 ABI.
+    { linux $[ os linux? [ "lua5.1" find-library ] [ "liblua5.1.so" ] if ] }
     { unix "liblua5.1.so" }
 }
 
