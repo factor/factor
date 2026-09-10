@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays fry kernel make math.order math.parser opengl.gl
-sequences sets splitting strings system ;
+USING: alien.c-types alien.data arrays fry kernel make math.order
+math.parser opengl.gl sequences sets splitting strings system ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )
@@ -9,19 +9,6 @@ IN: opengl.capabilities
 
 : (has-extension?) ( query-extension(s) available-extensions -- ? )
     over string?  [ member? ] [ [ member? ] curry any? ] if ;
-
-: gl-extensions ( -- seq )
-    GL_EXTENSIONS glGetString split-words ;
-: has-gl-extensions? ( extensions -- ? )
-    gl-extensions [ (has-extension?) ] curry all? ;
-: (make-gl-extensions-error) ( required-extensions -- )
-    gl-extensions diff
-    "Required OpenGL extensions not supported:\n" %
-    [ "    " % % "\n" % ] each ;
-: require-gl-extensions ( extensions -- )
-    [ has-gl-extensions? ]
-    [ (make-gl-extensions-error) ]
-    (require-gl) ;
 
 : version-seq ( version-string -- version-seq )
     "." split [ string>number ] map ;
@@ -37,6 +24,23 @@ IN: opengl.capabilities
 
 : has-gl-version? ( version -- ? )
     gl-version [ version-before? ] [ drop f ] if* ;
+
+: gl-extensions ( -- seq )
+    "3.0" has-gl-version? [
+        GL_NUM_EXTENSIONS 0 int <ref>
+        [ glGetIntegerv ] keep int deref <iota>
+        [ GL_EXTENSIONS swap glGetStringi ] map
+    ] [ GL_EXTENSIONS glGetString split-words ] if ;
+: has-gl-extensions? ( extensions -- ? )
+    gl-extensions [ (has-extension?) ] curry all? ;
+: (make-gl-extensions-error) ( required-extensions -- )
+    gl-extensions diff
+    "Required OpenGL extensions not supported:\n" %
+    [ "    " % % "\n" % ] each ;
+: require-gl-extensions ( extensions -- )
+    [ has-gl-extensions? ]
+    [ (make-gl-extensions-error) ]
+    (require-gl) ;
 
 : (make-gl-version-error) ( required-version -- )
     "Required OpenGL version " % % " not supported (" % gl-version "(null)" or % " available)" %

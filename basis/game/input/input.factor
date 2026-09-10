@@ -1,5 +1,5 @@
 USING: accessors combinators continuations init kernel math
-namespaces sequences system vocabs ;
+namespaces sequences system ui.backend vocabs words ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -109,6 +109,9 @@ SYMBOLS: pressed released ;
 {
     { [ os windows? ] [ "game.input.dinput" require ] }
     { [ os macos? ] [ "game.input.iokit" require ] }
-    { [ os linux? ] [ "game.input.gtk2" require ] }
+    { [ os linux? ] [
+        ui-backend get-global dup [ name>> "gtk4-ui-backend" = ] when
+        "game.input.gtk4" "game.input.gtk2" ? require
+    ] }
     [ ]
 } cond

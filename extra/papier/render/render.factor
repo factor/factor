@@ -26,6 +26,7 @@ TUPLE: papier-renderer
 
 : set-papier-state ( -- )
     {
+        T{ depth-state }
         T{ blend-state { rgb-mode T{ blend-mode } } { alpha-mode T{ blend-mode } } }
     } set-gpu-state ;
 
@@ -74,6 +75,9 @@ TYPED: prep-slab-atlas ( slabs images -- atlas-image: image )
     make-atlas-assoc [ update-slabs-for-atlas ] dip ;
 
 TYPED:: draw-slabs ( renderer: papier-renderer uniforms: papier-uniforms slabs -- )
+    ! GtkGLArea enables depth testing when the window has a depth buffer.
+    ! These sprites are drawn in order and do not use depth testing.
+    set-papier-state
     system-framebuffer { { default-attachment { 0.0 0.0 0.0 0.0 } } } clear-framebuffer
 
     renderer uniforms slabs render-slabs-to-buffers
@@ -91,4 +95,3 @@ TYPED:: draw-slabs ( renderer: papier-renderer uniforms: papier-uniforms slabs -
     system-framebuffer
     { default-attachment }
     f render-set boa render ;
-

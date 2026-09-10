@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data arrays byte-arrays
 combinators destructors gpu gpu.buffers gpu.private gpu.textures
-gpu.textures.private images kernel locals math math.rectangles
+gpu.textures.private images kernel locals math math.rectangles namespaces
 opengl opengl.framebuffers opengl.gl opengl.textures sequences
-specialized-arrays typed ui.gadgets.worlds variants ;
+specialized-arrays typed ui.backend ui.gadgets.worlds variants ;
 SPECIALIZED-ARRAY: int
 SPECIALIZED-ARRAY: uint
 IN: gpu.framebuffers
@@ -139,7 +139,8 @@ TYPED: framebuffer-attachment-at ( framebuffer: framebuffer
 
 GENERIC: framebuffer-handle ( framebuffer -- handle )
 
-M: system-framebuffer framebuffer-handle drop 0 ;
+M: system-framebuffer framebuffer-handle
+    drop world get-global [ handle>> window-framebuffer ] [ 0 ] if* ;
 M: framebuffer framebuffer-handle handle>> ;
 
 GENERIC#: allocate-framebuffer-attachment 1 ( framebuffer-attachment dim -- )
@@ -207,7 +208,7 @@ GENERIC: (default-attachment-type) ( framebuffer -- type )
 GENERIC: (default-attachment-image-type) ( framebuffer -- order type )
 
 M: system-framebuffer (default-gl-attachment)
-    drop GL_BACK ;
+    framebuffer-handle 0 = GL_BACK GL_COLOR_ATTACHMENT0 ? ;
 M: framebuffer (default-gl-attachment)
     drop GL_COLOR_ATTACHMENT0 ;
 
