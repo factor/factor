@@ -1,7 +1,9 @@
 USING: accessors arrays assocs compiler.cfg.checker compiler.cfg.instructions
+compiler.cfg.linearization
 compiler.cfg.linear-scan.allocation.state compiler.cfg.register-allocation
 compiler.cfg.register-allocation.rematerialization
 compiler.cfg.register-allocation.verifier compiler.cfg.utilities
+compiler.cfg.registers
 compiler.cfg.value-numbering compiler.cfg.value-numbering.global.validation
 compiler.test cpu.architecture kernel locals math ranges namespaces sequences
 tools.test ;
