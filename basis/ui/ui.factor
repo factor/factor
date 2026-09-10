@@ -60,19 +60,24 @@ SYMBOL: worlds
     [ focus-path f swap focus-gestures ] bi ;
 
 : set-up-window ( world -- )
-    {
+    dup {
         [ set-gl-context ]
         [ [ title>> ] keep set-title ]
         [ begin-world ]
         [ resize-world ]
         [ request-focus ]
-    } cleave gl-init ;
+    } cleave gl-init
+    gl3-state> >>gl-render-state drop ;
 
 : clean-up-broken-window ( world -- )
-    [
-        dup { [ focused?>> ] [ grab-input?>> ] } 1&&
-        [ handle>> (ungrab-input) ] [ drop ] if
-    ] [ handle>> (close-window) ] bi ;
+    {
+        [
+            dup { [ focused?>> ] [ grab-input?>> ] } 1&&
+            [ handle>> (ungrab-input) ] [ drop ] if
+        ]
+        [ dispose-world-render-state ]
+        [ handle>> (close-window) ]
+    } cleave ;
 
 M: world graft*
     [ (open-window) ]
@@ -93,6 +98,7 @@ M: world ungraft*
         [ end-world ]
         [ dispose-window-resources ]
         [ unfocus-world ]
+        [ dispose-world-render-state ]
         [ [ (close-window) f ] change-handle drop ]
         [ promise>> t swap fulfill ]
     } cleave ;

@@ -758,6 +758,8 @@ SYMBOL: gl3-render-state
     do-clip ;
 
 : gl3-draw-init ( dim background-color -- )
+    ! Each window owns a GL context; GPU clients may have used other programs.
+    gl3-state> bind-gl3-state
     GL_SCISSOR_TEST glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     [ first2 gl3-reshape ] [ gl3-clear ] bi* ;
