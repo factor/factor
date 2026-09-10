@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.arrays alien.c-types
 alien.c-types.varargs alien.data alien.private arrays byte-arrays
-classes.struct combinators combinators.short-circuit continuations
+classes.struct combinators combinators.short-circuit compiler.units continuations
 cpu.architecture cpu.arm.64.abi grouping kernel libc locals math math.order
 namespaces sequences system threads words ;
 IN: alien.varargs
@@ -161,14 +161,16 @@ STRUCT: native-va-list-storage
 
 SYMBOL: va_list
 
-cpu arm.64? [
-    os linux? [ native-va-list-storage ] [ void* ] if
-    lookup-c-type clone
-        va-cursor >>boxed-class
-        [ native-va-list>cursor ] >>boxer-quot
-        [ cursor>native-va-list ] >>unboxer-quot
-    va_list typedef
-] [ void* va_list typedef ] if
+[
+    cpu arm.64? [
+        os linux? [ native-va-list-storage ] [ void* ] if
+        lookup-c-type clone
+            va-cursor >>boxed-class
+            [ native-va-list>cursor ] >>boxer-quot
+            [ cursor>native-va-list ] >>unboxer-quot
+        va_list typedef
+    ] [ void* va_list typedef ] if
+] with-compilation-unit
 
 : native-va-list-type? ( type -- ? )
     cpu arm.64? [
