@@ -1,9 +1,11 @@
 USING: accessors arrays colors continuations dlists fonts fry help
 help.markup help.stylesheet help.syntax help.topics inspector io
 io.streams.string io.styles kernel literals locals math models
-namespaces prettyprint see sequences strings tools.test ui.gadgets
+namespaces prettyprint see sequences strings tools.test ui.clipboards ui.gadgets
 ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
-ui.gadgets.worlds ui.gestures ui.theme ;
+ui.gadgets.scrollers ui.gadgets.worlds ui.gestures ui.theme ;
+FROM: sets => in? ;
+FROM: ui.render => selected-children ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -50,6 +52,32 @@ IN: ui.gadgets.panes.tests
     [ text>> text = ] [ style>> style = ] bi ;
 
 { t t } [ formatted-pane-text-test ] unit-test
+
+:: large-pane-copy-test ( -- copied? highlighted? )
+    10,000,000 CHAR: a <string> :> text
+    <pane> :> pane
+    text pane <pane-stream> stream-write
+    pane { 1 0 0 } >>caret { 1 0 0 } >>mark drop
+    <clipboard> :> buffer
+    buffer clipboard [ pane com-copy ] with-variable
+    buffer clipboard-contents text =
+    pane selected-children drop
+    pane current>> find-styled-label swap in? ;
+
+{ t t } [ large-pane-copy-test ] unit-test
+
+! Autoscroll targets a one-pixel pointer rectangle, even on a huge label.
+:: pane-selection-scroll-test ( -- loc dim )
+    <pane> :> pane
+    pane <scroller> :> scroller
+    hand-loc get-global :> previous
+    [
+        { 35 12 } hand-loc set-global
+        pane scroll-selection-pointer
+    ] [ previous hand-loc set-global ] finally
+    scroller follows>> [ loc>> ] [ dim>> ] bi ;
+
+{ { 35.0 12.0 } { 1 1 } } [ pane-selection-scroll-test ] unit-test
 
 { t } [ [ "hello" pprint ] test-gadget-text ] unit-test
 { t } [

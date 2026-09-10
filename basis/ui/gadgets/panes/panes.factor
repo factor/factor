@@ -421,6 +421,12 @@ M: f sloppy-pick-up*
     f >>mark
     drop ;
 
+: scroll-selection-pointer ( pane -- )
+    ! A selected label can be millions of characters wide. Keep the pointer
+    ! visible instead of trying to fit the entire label into the viewport.
+    hand-loc get-global over screen-loc v- { 1 1 } <rect>
+    swap scroll>rect ;
+
 : extend-selection ( pane -- )
     hand-moved? [
         [
@@ -437,7 +443,7 @@ M: f sloppy-pick-up*
                     } cleave
                 ] [ drop ] if
             ] if
-        ] [ dup caret>> gadget-at-path scroll>gadget ] bi
+        ] [ scroll-selection-pointer ] bi
     ] [ drop ] if ;
 
 : end-selection ( pane -- )

@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax arrays
+USING: accessors alien.accessors alien.c-types alien.data alien.syntax arrays byte-arrays
 assocs binary-search cache classes colors combinators core-foundation core-foundation.arrays
 core-foundation.attributed-strings core-foundation.strings
+core-foundation.dictionaries
 core-graphics core-graphics.types core-text.fonts destructors
-fonts io.encodings.string io.encodings.utf16 kernel make math
+fonts io.encodings.string io.encodings.utf16 kernel layouts make math
 math.functions math.order math.vectors namespaces opengl sequences
 sorting strings vectors ;
 IN: core-text
@@ -35,9 +36,15 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context )
 
 FUNCTION: CFIndex CTLineGetGlyphCount ( CTLineRef line )
 FUNCTION: CFArrayRef CTLineGetGlyphRuns ( CTLineRef line )
+FUNCTION: CFIndex CTRunGetGlyphCount ( CTRunRef run )
+FUNCTION: void CTRunDraw ( CTRunRef run, CGContextRef context, CFRange range )
+FUNCTION: CFDictionaryRef CTRunGetAttributes ( CTRunRef run )
+! Use the raw pointer to read coordinates without allocating a CGPoint per glyph.
+FUNCTION: void* CTRunGetPositionsPtr ( CTRunRef run )
 FUNCTION: CFRange CTRunGetStringRange ( CTRunRef run )
 FUNCTION: uint32_t CTRunGetStatus ( CTRunRef run )
 CONSTANT: kCTRunStatusRightToLeft 1
+CONSTANT: kCTRunStatusHasNonIdentityMatrix 4
 FUNCTION: void CTRunGetPositions ( CTRunRef run, CFRange range, CGPoint* positions )
 FUNCTION: double CTRunGetTypographicBounds ( CTRunRef run, CFRange range, CGFloat* ascent, CGFloat* descent, CGFloat* leading )
 
@@ -58,7 +65,7 @@ MEMO: make-attributes ( open-font color -- hashtable )
     ] with-destructors ;
 
 TUPLE: line < disposable font string line metrics image loc dim
-render-loc render-dim render-ext selection-key selection-spans index-map ;
+render-loc render-dim render-ext selection-key selection-spans index-map render-index ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     { CGFloat CGFloat CGFloat }
@@ -237,12 +244,90 @@ CONSTANT: max-layout-dim 16383
 
 ! Region coordinates are measured from the top-left of the complete image.
 ! Keep the original CTLine so shaping, bidi, and ligatures cross tile edges.
+TUPLE: glyph-region run range left right order max-right ;
+
+:: glyph-position-x ( positions i -- x )
+    positions i cell 2 * * cell 8 = [ alien-double ] [ alien-float ] if ; inline
+
+:: <glyph-region> ( run positions start count bounds order -- region )
+    1/0. :> left!
+    -1/0. :> right!
+    count <iota> [| i |
+        positions start i + glyph-position-x :> x
+        x left min left!
+        x right max right!
+    ] each
+    glyph-region new run >>run start count <CFRange> >>range order >>order
+    left bounds CGRect-x + 2 - >>left
+    right bounds CGRect-x + bounds CGRect-w + 2 + >>right ;
+
+:: add-run-regions ( run regions -- )
+    run CTRunGetGlyphCount :> count
+    count zero? [
+        run CTRunGetAttributes kCTFontAttributeName CFDictionaryGetValue
+        CTFontGetBoundingBox :> bounds
+        run CTRunGetStatus kCTRunStatusHasNonIdentityMatrix bitand zero? [
+            run CTRunGetPositionsPtr [ ] [
+                count cell 2 * * <byte-array> :> positions
+                run 0 count <CFRange> positions CTRunGetPositions
+                positions
+            ] if* :> positions
+            count 255 + 256 /i <iota> [| i |
+                run positions i 256 * count i 256 * - 256 min bounds regions length
+                <glyph-region> regions push
+            ] each
+        ] [
+            ! Unusual text matrices retain native drawing without culling.
+            glyph-region new run >>run 0 count <CFRange> >>range
+            -1/0. >>left 1/0. >>right regions length >>order regions push
+        ] if
+    ] unless ;
+
+:: line-render-index ( line -- regions )
+    line render-index>> [ ] [
+        V{ } clone :> regions
+        line line>> CTLineGetGlyphRuns CF>array [ regions add-run-regions ] each
+        regions [ left>> ] sort-by :> sorted
+        -1/0. :> right!
+        sorted [| region |
+            right region right>> max right!
+            right region max-right<<
+        ] each
+        sorted dup line render-index<<
+    ] if* ;
+
+:: visible-glyph-regions ( line left right -- regions )
+    line line-render-index :> regions
+    0 :> lo!
+    regions length :> hi!
+    [ lo hi < ] [
+        lo hi + 2 /i :> mid
+        mid regions nth max-right>> left <
+        [ mid 1 + lo! ] [ mid hi! ] if
+    ] while
+    V{ } clone :> visible
+    [ lo regions length < [ lo regions nth left>> right <= ] [ f ] if ] [
+        lo regions nth :> region
+        region right>> left >= [ region visible push ] when
+        lo 1 + lo!
+    ] while
+    ! Spatial lookup must not change the paint order of overlapping glyphs.
+    visible [ order>> ] sort-by ;
+
+:: draw-line-region ( context line loc dim -- )
+    line line>> CTLineGetGlyphCount 4096 > [
+        line loc first loc first dim first + visible-glyph-regions [| region |
+            context CGContextSaveGState
+            region run>> context region range>> CTRunDraw
+            context CGContextRestoreGState
+        ] each
+    ] [ line line>> context CTLineDraw ] if ;
+
 :: render-region ( line offset dim -- image )
     line prepare-render
     line render-loc>> offset first
     line render-ext>> second offset second - dim second - 2array v+ :> loc
     line font>> :> font
-    line line>> :> ctline
     dim [
         {
             [ font dim fill-background ]
@@ -250,7 +335,7 @@ CONSTANT: max-layout-dim 16383
             ! Keep Core Text's baseline at zero. Moving the text position
             ! outside a tile changes rasterization of large color emoji.
             [ loc first2 [ neg ] bi@ CGContextTranslateCTM ]
-            [ [ ctline ] dip CTLineDraw ]
+            [ line loc dim draw-line-region ]
         } cleave
     ] make-bitmap-image ;
 
