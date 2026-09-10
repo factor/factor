@@ -24,6 +24,10 @@ HOOK: current-gl-context ui-backend ( -- context )
 
 M: object current-gl-context f ;
 
+! The presentation target can be an FBO owned by a toolkit (GtkGLArea).
+GENERIC: window-framebuffer ( handle -- framebuffer )
+M: object window-framebuffer drop 0 ;
+
 GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )

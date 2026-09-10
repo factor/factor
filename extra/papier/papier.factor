@@ -170,8 +170,8 @@ M: papier-world begin-game-world
 
 : keyboard-input ( papier-world -- movement/f face/f )
     read-keyboard keys>> {
-        { [ key-left-arrow  over nth ] [ 2drop float-4{ $ move-rate 0 0 0 } vneg float-4{ 0 0 1 0 } ] }
-        { [ key-right-arrow over nth ] [ 2drop float-4{ $ move-rate 0 0 0 }      float-4{ 1 0 0 0 } ] }
+        { [ dup [ key-left-arrow swap nth ] [ key-a swap nth ] bi or ] [ 2drop float-4{ $ move-rate 0 0 0 } vneg float-4{ 0 0 1 0 } ] }
+        { [ dup [ key-right-arrow swap nth ] [ key-d swap nth ] bi or ] [ 2drop float-4{ $ move-rate 0 0 0 }      float-4{ 1 0 0 0 } ] }
         { [ key-escape      over nth ] [ drop close-window f f ] }
         [ 2drop f f ]
     } cond ;

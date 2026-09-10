@@ -5,8 +5,8 @@ assocs cairo.ffi classes.struct combinators concurrency.promises
 continuations destructors environment gdk4.ffi gio.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk4.ffi io.encodings.string
 io.encodings.utf8 kernel literals locals math math.bitwise math.vectors memoize namespaces
-opengl sequences strings system threads ui ui.backend
-ui.backend.gtk4.input-methods ui.backend.x11.keys ui.clipboards
+opengl opengl.gl sequences strings system threads ui ui.backend
+ui.backend.gtk4.input-methods ui.backend.gtk4.input-state ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render ui.text.pango
 vocabs.loader ;
@@ -14,8 +14,9 @@ IN: ui.backend.gtk4
 
 SINGLETON: gtk4-ui-backend
 
-TUPLE: window-handle window drawable im-context ;
-C: <window-handle> window-handle
+TUPLE: window-handle window drawable im-context { framebuffer integer initial: 0 } ;
+: <window-handle> ( window drawable im-context -- handle )
+    0 window-handle boa ;
 
 ! GTK owns the display's clipboards. Reading text is asynchronous; suspend
 ! the Factor caller while the GLib loop continues servicing the request.
@@ -81,7 +82,7 @@ CONSTANT: gtk4-modifiers
     code>sym [ dup integer? [ gdk_keyval_to_unicode 1string ] when ] dip ;
 
 : on-motion ( controller x y data -- )
-    drop 2array swap controller-world move-hand fire-motion ;
+    drop 2array dup record-motion swap controller-world move-hand fire-motion ;
 
 : on-leave ( controller data -- )
     2drop forget-rollover ;
@@ -89,6 +90,7 @@ CONSTANT: gtk4-modifiers
 :: on-pressed ( gesture count x y data -- )
     gesture gtk_event_controller_get_widget gtk_widget_grab_focus drop
     gesture gtk_gesture_single_get_current_button :> button
+    button t record-button
     button { 8 9 } member? [
         gesture controller-modifiers button <button-down>
         x y 2array gesture controller-world send-button-down
@@ -96,7 +98,7 @@ CONSTANT: gtk4-modifiers
 
 :: on-released ( gesture count x y data -- )
     gesture controller-world :> world
-    gesture gtk_gesture_single_get_current_button {
+    gesture gtk_gesture_single_get_current_button dup f record-button {
         { 8 [ world left-action send-action ] }
         { 9 [ world right-action send-action ] }
         [ gesture controller-modifiers swap <button-up>
@@ -104,7 +106,7 @@ CONSTANT: gtk4-modifiers
     } case ;
 
 : on-scroll ( controller dx dy data -- ? )
-    drop 2array swap controller-world
+    drop 2array dup record-scroll swap controller-world
     [ hand-loc get ] dip send-scroll t ;
 
 ! Input methods receive the current key event before Factor shortcuts.
@@ -123,12 +125,14 @@ CONSTANT: gtk4-modifiers
     ] [ im gtk_im_context_reset f ] if ;
 
 :: on-key-pressed ( controller keyval keycode state data -- ? )
+    keycode t record-key
     controller filter-key [
         state gtk4-modifiers modifier keyval key-sym <key-down>
         controller controller-world propagate-key-gesture
     ] unless t ;
 
 :: on-key-released ( controller keyval keycode state data -- )
+    keycode f record-key
     controller filter-key [
         state gtk4-modifiers modifier keyval key-sym <key-up>
         controller controller-world propagate-key-gesture
@@ -139,6 +143,7 @@ CONSTANT: gtk4-modifiers
     [ handle>> im-context>> gtk_im_context_focus_in ] [ focus-world ] bi ;
 
 : on-focus-out ( controller data -- )
+    clear-input-state
     drop controller-world
     [ handle>> im-context>> [ gtk_im_context_focus_out ]
       [ gtk_im_context_reset ] bi ] [ unfocus-world ] bi ;
@@ -231,8 +236,10 @@ M: gtk4-ui-backend (free-pixel-format) drop ;
 
 M: gtk4-ui-backend current-gl-context gdk_gl_context_get_current ;
 
+M: window-handle window-framebuffer framebuffer>> ;
+
 M: window-handle select-gl-context
-    drawable>>
+    dup drawable>>
     [ gtk_gl_area_make_current ]
     [ gtk_gl_area_get_error [ message>> utf8 alien>string throw ] when* ]
     [
@@ -240,7 +247,9 @@ M: window-handle select-gl-context
         ! Attaching at initial realization otherwise leaves GL_INVALID_OPERATION.
         dup [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi
         [ 0 > ] bi@ and [ gtk_gl_area_attach_buffers ] [ drop ] if
-    ] tri ;
+    ] tri
+    GL_DRAW_FRAMEBUFFER_BINDING 0 int <ref>
+    [ glGetIntegerv ] keep int deref >>framebuffer drop ;
 
 M: window-handle flush-gl-context
     drawable>> gtk_gl_area_queue_render ;
@@ -251,6 +260,10 @@ M:: gtk4-ui-backend (open-window) ( world -- )
     drawable f gtk_gl_area_set_use_es
     drawable 3 3 gtk_gl_area_set_required_version
     drawable f gtk_gl_area_set_auto_render
+    drawable world pixel-format-attributes>> [ depth-bits? ] any?
+    gtk_gl_area_set_has_depth_buffer
+    drawable world pixel-format-attributes>> [ stencil-bits? ] any?
+    gtk_gl_area_set_has_stencil_buffer
     drawable t gtk_widget_set_hexpand
     drawable t gtk_widget_set_vexpand
     drawable t gtk_widget_set_focusable
