@@ -38,6 +38,7 @@ TUPLE: world < track
     layers
     title status status-owner
     text-handle handle images
+    gl-render-state
     window-loc
     pixel-format-attributes
     background-color
@@ -94,7 +95,12 @@ TUPLE: world-attributes
 
 : set-gl-context ( world -- )
     [ world set-global ]
-    [ handle>> select-gl-context ] bi ;
+    [ handle>> select-gl-context ]
+    [ gl-render-state>> gl3-render-state set-global ] tri ;
+
+: dispose-world-render-state ( world -- )
+    dup set-gl-context cleanup-gl3-state
+    f >>gl-render-state drop ;
 
 : with-gl-context ( world quot -- )
     '[ set-gl-context @ ]

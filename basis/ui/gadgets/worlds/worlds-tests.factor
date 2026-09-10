@@ -1,6 +1,32 @@
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel accessors arrays ;
+namespaces models kernel accessors arrays continuations locals
+ui.backend ui.render ;
 IN: ui.gadgets.worlds.tests
+
+! Context selection must restore the window's GL objects, even when another
+! window allocated different program/VAO names in its own context.
+TUPLE: test-gl-context ;
+M: test-gl-context select-gl-context drop ;
+
+:: check-render-state-switching ( -- ? )
+    world get-global :> previous-world
+    gl3-state> :> previous-state
+    [
+        gl3-state new :> state-a
+        gl3-state new :> state-b
+        world new T{ test-gl-context } >>handle state-a >>gl-render-state :> a
+        world new T{ test-gl-context } >>handle state-b >>gl-render-state :> b
+        a set-gl-context gl3-state> state-a eq? :> first-a?
+        b set-gl-context gl3-state> state-b eq? :> then-b?
+        a set-gl-context
+        gl3-state> state-a eq? world get-global a eq? and
+        first-a? then-b? and and
+    ] [
+        previous-world world set-global
+        previous-state gl3-render-state set-global
+    ] finally ;
+
+{ t } [ check-render-state-switching ] unit-test
 
 ! Test focus behavior
 <gadget> "g1" set
