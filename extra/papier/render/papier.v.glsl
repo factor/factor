@@ -1,14 +1,14 @@
-#version 110
+#version 150
 
 uniform mat4 p_matrix;
 uniform vec3 eye;
 
-attribute vec3 vertex;
-attribute vec2 texcoord;
-attribute vec4 color;
+in vec3 vertex;
+in vec2 texcoord;
+in vec4 color;
 
-varying vec2 frag_texcoord;
-varying vec4 frag_color;
+out vec2 frag_texcoord;
+out vec4 frag_color;
 
 void
 main()

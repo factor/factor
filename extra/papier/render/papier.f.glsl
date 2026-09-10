@@ -1,11 +1,13 @@
-#version 110
+#version 150
 
 uniform sampler2D atlas;
 
-varying vec2 frag_texcoord;
-varying vec4 frag_color;
+in vec2 frag_texcoord;
+in vec4 frag_color;
+
+out vec4 fragment_color;
 
 void main()
 {
-    gl_FragColor = frag_color * texture2D(atlas, frag_texcoord);
+    fragment_color = frag_color * texture(atlas, frag_texcoord);
 }
