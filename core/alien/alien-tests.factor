@@ -1,6 +1,6 @@
 USING: accessors alien alien.accessors alien.c-types
-alien.syntax byte-arrays continuations kernel layouts math
-namespaces prettyprint sequences tools.memory tools.test ;
+alien.syntax byte-arrays continuations cpu.architecture kernel layouts locals math memory
+namespaces prettyprint sequences system tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests
 
@@ -130,6 +130,29 @@ SYMBOL: foo
     fill-and-free-callback-heap
     call-cb
 ] unit-test
+
+! ARM64 variadic stubs are larger than ordinary stubs. Exhausting and
+! freeing the ordinary size class must not prevent larger allocations.
+! Keep live stubs pinned across reclamation and code-heap compaction.
+: invoke-test-callback ( callback -- n )
+    [ f f ] dip
+    \ int { pointer: void pointer: void } \ cdecl alien-indirect ;
+
+cpu arm.64? [
+    { 37 t 37 } [
+        <cb-creator> [| live |
+            live invoke-test-callback
+            fill-and-free-callback-heap
+            \ foo -1 <callback> [| large |
+                large alien-address :> address
+                fill-and-free-callback-heap
+                compact-gc
+                large alien-address address =
+                live invoke-test-callback
+            ] with-callback
+        ] with-callback
+    ] unit-test
+] when
 
 [ void { } cdecl [ ] alien-assembly ] [ callsite-not-compiled? ] must-fail-with
 [ void f "flor" { } f alien-invoke ] [ callsite-not-compiled? ] must-fail-with

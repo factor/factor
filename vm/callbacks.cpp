@@ -69,6 +69,34 @@ void callback_heap::update(code_block* stub) {
   stub->flush_icache();
 }
 
+// Unlike ordinary code, callback stubs are pinned and are freed explicitly.
+// The size-segregated allocator does not merge blocks on free. Mixed ordinary
+// and variadic templates can therefore exhaust one size class while most of
+// the heap is free. Rebuild the free lists without moving any live stub.
+static void coalesce_callback_free_blocks(
+    free_list_allocator<code_block>* allocator) {
+  allocator->clear_free_list();
+  cell scan = allocator->start;
+  while (scan < allocator->end) {
+    free_heap_block* block = (free_heap_block*)scan;
+    cell size = block->size();
+    if (block->free_p()) {
+      cell next = scan + size;
+      while (next < allocator->end) {
+        free_heap_block* following = (free_heap_block*)next;
+        if (!following->free_p())
+          break;
+        cell following_size = following->size();
+        size += following_size;
+        next += following_size;
+      }
+      block->make_free(size);
+      allocator->add_to_free_list(block);
+    }
+    scan += size;
+  }
+}
+
 code_block* callback_heap::add(cell owner, cell return_rewind) {
   // Allocates a stub in the MAP_JIT callback heap, memcpy's the template code
   // in and stores its relocations (via update() below).
@@ -90,6 +118,11 @@ code_block* callback_heap::add(cell owner, cell return_rewind) {
 
   cell bump = align(size + sizeof(code_block), data_alignment);
   code_block* stub = allocator->allot(bump);
+  if (!stub) {
+    // This writes only free-block headers, under the existing writable scope.
+    coalesce_callback_free_blocks(allocator);
+    stub = allocator->allot(bump);
+  }
   if (!stub) {
     parent->general_error(ERROR_CALLBACK_SPACE_OVERFLOW,
                           false_object,
