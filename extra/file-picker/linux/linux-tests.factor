@@ -2,7 +2,7 @@ USING: accessors calendar environment io io.launcher io.pathnames
 kernel sequences sequences.generalizations system tools.test ;
 "resource:extra/file-picker/linux/fixtures/varargs.factor" run-test-file
 
-"DISPLAY" os-env empty? [
+"DISPLAY" os-env empty? "WAYLAND_DISPLAY" os-env empty? and [
     "FILE-PICKER-SKIP reason=no-display" print
 ] [
     { } [

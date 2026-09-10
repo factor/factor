@@ -1,5 +1,5 @@
 USING: accessors arrays assocs combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
-math.order namespaces opengl sequences tools.test windows.directwrite windows.fonts ;
+math.order namespaces opengl sequences strings tools.test windows.directwrite windows.fonts ;
 IN: windows.directwrite.tests
 
 : test-font ( -- font ) "Segoe UI" <font> ;
@@ -24,6 +24,26 @@ IN: windows.directwrite.tests
     ] [ original "monospace" windows-fonts set-at ] finally ;
 
 { t t t t } [ directwrite-alias-snapshot? ] unit-test
+
+{ t t } [
+    [let
+        test-font :> font
+        10000 CHAR: a <string> :> text
+        font text cached-directwrite-layout :> plain
+        font text 9000 9010 f <selection> cached-directwrite-layout :> selected
+        plain pointer>> selected pointer>> =
+        selected directwrite-selection-rects selected directwrite-selection-rects eq?
+    ]
+] unit-test
+
+{ t } [
+    [let
+        test-font "selection ownership" cached-directwrite-layout :> plain
+        test-font "selection ownership" 0 4 f <selection> <directwrite-layout>
+        dispose
+        4 plain directwrite-offset>x 0 >
+    ]
+] unit-test
 
 { 0 0 1 2 } [
     "\u01f600x" { [ 0 directwrite-codepoint-index ]

@@ -4,6 +4,8 @@ IN: game.input
 
 ARTICLE: "game-input" "Game controller input"
 "The " { $vocab-link "game.input" } " vocabulary provides cross-platform access to game controller devices such as joysticks and gamepads. It also provides an interface for polling raw keyboard and mouse input." $nl
+
+"On Linux, GTK3 and GTK4 use events from the focused Factor window for keyboard and mouse input. Mouse polling does not warp the pointer. Controllers are polled through evdev; repeated enumeration reuses device handles until they are disconnected or game input is closed." $nl
 "With the GTK4 UI backend, keyboard and mouse state comes from events delivered to Factor windows. Losing keyboard focus clears pressed keys and buttons; mouse motion is relative to the preceding pointer event, without warping the pointer." $nl
 "The game input interface must be initialized before being used:"
 { $subsections
