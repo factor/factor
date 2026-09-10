@@ -168,11 +168,12 @@ M: local sockaddr-size drop sockaddr-un heap-size ;
 M: local empty-sockaddr drop sockaddr-un new ;
 
 M: local make-sockaddr
-    path>> absolute-path
-    dup length 1 + max-un-path > [ "Path too long" throw ] when
+    path>> absolute-path utf8 string>alien
+    dup length max-un-path > [ "Path too long" throw ] when
+    max-un-path 0 pad-tail
     sockaddr-un new
         AF_UNIX >>family
-        swap utf8 string>alien >>path ;
+        swap >>path ;
 
 M: local parse-sockaddr
     drop
