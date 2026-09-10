@@ -11,6 +11,7 @@ IN: gtk4.ffi
 LIBRARY: gtk4
 
 C-LIBRARY: gtk4 {
+    { linux "libgtk-4.so.1" }
     { unix "libgtk-4.so" }
 }
 

@@ -290,10 +290,15 @@ check_X11_libraries() {
 
 check_gtk_libraries() {
     check_library_exists gobject-2.0 libgobject-2.0.so.0
-    check_library_exists gdk-3.0 libgdk-3.so.0
-    check_library_exists gtk-3.0 libgtk-3.so.0
+    if [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]]; then
+        check_library_exists gdk-3 libgdk-3.so.0
+        check_library_exists gtk-3 libgtk-3.so.0
+        check_library_exists atk-1.0 libatk-1.0.so.0
+    else
+        check_library_exists gtk-4 libgtk-4.so.1
+    fi
+    check_library_exists epoxy libepoxy.so.0
     check_library_exists gdk_pixbuf-2.0 libgdk_pixbuf-2.0.so.0
-    check_library_exists atk-1.0 libatk-1.0.so.0
     check_library_exists gio-2.0 libgio-2.0.so.0
     check_library_exists pango-1.0 libpango-1.0.so.0
 }
@@ -757,7 +762,11 @@ info_check_factor_refresh_all_locally() {
 }
 
 bootstrap() {
-    "./$FACTOR_BINARY" -i="$BOOT_IMAGE"
+    local backend_args=()
+    if [[ -n ${FACTOR_UI_BACKEND:-} ]]; then
+        backend_args=("-ui-backend=$FACTOR_UI_BACKEND")
+    fi
+    "./$FACTOR_BINARY" -i="$BOOT_IMAGE" "${backend_args[@]}"
     check_ret "./$FACTOR_BINARY bootstrap failed"
     copy_fresh_image
 }
@@ -802,26 +811,36 @@ make_boot_image() {
 }
 
 install_deps_apt() {
-    sudo apt install --yes libpango1.0-dev libgtk-3-dev wget git rlwrap libssl-dev
+    local gtk_package=libgtk-4-dev
+    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=libgtk-3-dev
+    sudo apt install --yes libpango1.0-dev "$gtk_package" libepoxy-dev wget git rlwrap libssl-dev
     check_ret sudo
 }
 
 install_deps_pacman() {
-    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc gtk3 gdk-pixbuf2
+    local gtk_package=gtk4
+    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3
+    sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc "$gtk_package" libepoxy gdk-pixbuf2
     check_ret sudo
 }
 
 install_deps_dnf() {
-    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils pango-devel gtk3-devel gdk-pixbuf2-devel tmux rlwrap wget
+    local gtk_package=gtk4-devel
+    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3-devel
+    sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils pango-devel "$gtk_package" libepoxy-devel gdk-pixbuf2-devel tmux rlwrap wget
     check_ret sudo
 }
 
 install_deps_pkg() {
-    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake pango cairo vim
+    local gtk_package=gtk4
+    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3
+    sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake pango cairo "$gtk_package" libepoxy vim
 }
 
 install_deps_apk() {
-    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev gtk+3.0-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
+    local gtk_package=gtk4.0-dev
+    [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk+3.0-dev
+    sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev "$gtk_package" libepoxy-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
     check_ret sudo
 }
 
@@ -865,6 +884,12 @@ usage() {
     $ECHO "If you are behind a firewall, invoke as:"
     $ECHO "env GIT_PROTOCOL=http $0 <command>"
     $ECHO ""
+    $ECHO "To select the UI backend from the same boot image (Unix defaults to GTK4):"
+    $ECHO "    $0 bootstrap -ui-backend=gtk4"
+    $ECHO "    $0 bootstrap -ui-backend=gtk3"
+    $ECHO "The same option selects dependencies for deps-* commands."
+    $ECHO "You can also set FACTOR_UI_BACKEND=gtk3 in the environment."
+    $ECHO ""
     $ECHO "To build with musl libc (static linking), invoke as:"
     $ECHO "env MUSL=1 $0 <command>"
     $ECHO ""
@@ -872,6 +897,16 @@ usage() {
     $ECHO "    $0 update macos-x86-32"
     $ECHO "    $0 update windows-arm-64"
 }
+
+# Keep the backend option separate from the optional build target.
+build_args=()
+for build_arg in "$@"; do
+    case "$build_arg" in
+        -ui-backend=*) FACTOR_UI_BACKEND=${build_arg#-ui-backend=} ;;
+        *) build_args+=("$build_arg") ;;
+    esac
+done
+set -- "${build_args[@]}"
 
 MAKE_TARGET=unknown
 

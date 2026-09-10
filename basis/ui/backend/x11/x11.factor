@@ -14,6 +14,8 @@ IN: ui.backend.x11
 
 SINGLETON: x11-ui-backend
 
+M: x11-ui-backend current-gl-context glXGetCurrentContext ;
+
 ! *****************************************************************
 ! * EXTENDED WINDOW MANAGER HINTS
 ! *****************************************************************

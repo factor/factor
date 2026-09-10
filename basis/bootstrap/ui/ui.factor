@@ -12,6 +12,6 @@ IN: bootstrap.ui
     {
         { [ os macos? ] [ "ui.backend.cocoa" ] }
         { [ os windows? ] [ "ui.backend.windows" ] }
-        { [ os unix? ] [ "ui.backend.gtk3" ] }
+        { [ os unix? ] [ "ui.backend.gtk4" ] }
     } cond
 ] if* require

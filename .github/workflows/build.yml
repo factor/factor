@@ -12,10 +12,30 @@ permissions:
 jobs:
   build-linux-intel:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        backend: [default, gtk4, gtk3]
     steps:
     - uses: actions/checkout@v4
+    - name: dependencies
+      run: |
+        sudo apt-get update
+        ./build.sh deps-apt -ui-backend=${{ matrix.backend == 'default' && 'gtk4' || matrix.backend }}
+        sudo apt-get install --yes xvfb libgl1-mesa-dri
     - name: bootstrap
-      run: ./build.sh net-bootstrap
+      run: |
+        if [ "${{ matrix.backend }}" = default ]; then
+          ./build.sh net-bootstrap
+        else
+          ./build.sh net-bootstrap -ui-backend=${{ matrix.backend }}
+        fi
+    - name: GTK4 smoke test
+      if: matrix.backend != 'gtk3'
+      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk4.smoke-test
+    - name: GTK4 tests
+      if: matrix.backend != 'gtk3'
+      run: ./factor -run=tools.test ui.backend.gtk4 opengl.gl.epoxy opengl.gl.extensions
+
     - name: load-all
       run: './factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
     - name: test
@@ -27,6 +47,10 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
     - uses: actions/checkout@v4
+    - name: dependencies
+      run: |
+        sudo apt-get update
+        ./build.sh deps-apt
     - name: bootstrap
       run: ./build.sh net-bootstrap
     - name: load-all

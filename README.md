@@ -123,40 +123,64 @@ This workaround has been tested in clean containers for:
 
 On Debian 12, Ubuntu 22.04, 24.04 and 25.04 `libgtkglext1` is still available in the repositories and no workaround is required.
 
-##### Development branch (GTK3)
+##### Development branch (GTK4, with GTK3 available)
 
-The development branch of Factor has switched from GTK2 to GTK3 for the GUI backend. If you're building or running a binary from the development branch, make sure the GTK3 development library is installed.
+The development branch uses GTK4 by default. Install GTK4 and libepoxy:
 
-If this library is missing, you may see the following error when launching Factor from a terminal:
+* Debian/Ubuntu: `sudo apt install libgtk-4-1 libepoxy0`
+* Fedora: `sudo dnf install gtk4 libepoxy`
+* Arch: `sudo pacman -S gtk4 libepoxy`
 
-```
-DlError: libgtk-3.so: cannot open shared object file: No such file or directory
-```
+On FreeBSD, install `gtk4` and `libepoxy`. GTK4 supports both X11 and
+Wayland; `GDK_BACKEND=x11` or `GDK_BACKEND=wayland` selects the display
+backend. Other UI dependencies, including Pango and GdkPixbuf, are unchanged.
 
-To fix this, install the required package:
-
-* Debian/Ubuntu:
-
-  ```bash
-  sudo apt install libgtk-3-dev
-  ```
-* Fedora:
-
-  ```bash
-  sudo dnf install gtk3-devel
-  ```
-* Arch:
-
-  ```bash
-  sudo pacman -S gtk3
-  ```
-
-If the library is installed but still not found, make sure it is in your `LD_LIBRARY_PATH`, or run `sudo ldconfig`.
+GTK3 remains supported. **Choose the GTK version when bootstrapping an
+image**, since GTK3 and GTK4 cannot be loaded into the same process. For
+example, on Linux x86-64, build both images from the matching boot image:
 
 ```bash
-# Example:
-export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+# Default: GTK4
+./factor -i=boot.unix-x86.64.image
+
+# Explicit choices, using that same boot image:
+./factor -i=boot.unix-x86.64.image -ui-backend=gtk4 -output-image=factor-gtk4.image
+./factor -i=boot.unix-x86.64.image -ui-backend=gtk3 -output-image=factor-gtk3.image
 ```
+
+The build script accepts both explicit choices:
+`./build.sh bootstrap -ui-backend=gtk4` and
+`./build.sh bootstrap -ui-backend=gtk3`. Without that option,
+`./build.sh bootstrap` uses GTK4. You can also set `FACTOR_UI_BACKEND`
+to `gtk4` or `gtk3` in the environment. The same option makes `deps-*` commands
+install the selected GTK version.
+
+Then run the image you want:
+
+```bash
+./factor -i=factor-gtk4.image
+./factor -i=factor-gtk3.image
+```
+
+An ordinary bootstrap without `-ui-backend` creates a GTK4 `factor.image`.
+Existing GTK3 images keep using GTK3 until rebuilt. The `-ui-backend` option
+is a bootstrap option; it does not switch an already-built image. GTK3
+requires `libgtk-3-dev` on Debian/Ubuntu, `gtk3-devel` on Fedora, or `gtk3`
+on Arch.
+
+To check a GTK4 image on a working display:
+
+```bash
+./factor -i=factor-gtk4.image -run=ui.backend.gtk4.smoke-test
+```
+
+This opens two windows and checks rendering setup, independent OpenGL
+contexts, clipboard and primary-selection text, resizing, and clean shutdown.
+
+GTK4 lets the window manager position windows and manage title-bar buttons.
+Captured-input mode focuses the window and hides the pointer, but does not
+confine the pointer; applications requiring a native pointer grab can use
+the GTK3 image.
 
 ### Learning Factor
 

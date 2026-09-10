@@ -71,7 +71,7 @@ ARTICLE: "bootstrap-cli-args" "Command line switches for bootstrap"
     { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
     { { $snippet "-include=" { $emphasis "components..." } } "A list of components to include (see below)." }
     { { $snippet "-exclude=" { $emphasis "components..." } } "A list of components to exclude." }
-    { { $snippet "-ui-backend=" { $emphasis "backend" } } { "One of " { $snippet "x11" } ", " { $snippet "windows" } ", or " { $snippet "cocoa" } ". The default is platform-specific." } }
+    { { $snippet "-ui-backend=" { $emphasis "backend" } } { "Bootstrap only: one of " { $snippet "gtk4" } ", " { $snippet "gtk3" } ", " { $snippet "gtk2" } ", " { $snippet "x11" } ", " { $snippet "windows" } ", or " { $snippet "cocoa" } ". The default is platform-specific (GTK4 on Unix). Build separate images for GTK3 and GTK4." } }
 }
 "Bootstrap can load various optional components:"
 { $table
