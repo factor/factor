@@ -3,7 +3,7 @@ classes.builtin classes.mixin classes.predicate classes.singleton classes.tuple
 classes.union compiler.units continuations locals words
 classes.struct compiler.tree.propagation.copy
 compiler.tree.propagation.info io.encodings.utf8 kernel literals math
-math.intervals layouts namespaces sequences sequences.private tools.test ;
+math.intervals layouts namespaces sequences sequences.private strings threads tools.test ;
 IN: compiler.tree.propagation.info.tests
 
 { f } [ 0.0 -0.0 eql? ] unit-test
