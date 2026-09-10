@@ -152,6 +152,37 @@ IN: core-text.tests
 
 { t } [ test-color-emoji-region ] unit-test
 
+! Compare indexed drawing with Core Text drawing the complete shaped line
+! into the same clipped bitmap. These lines exceed the indexing threshold.
+:: native-region-pixels ( line offset dim -- pixels )
+    line render-loc>> offset first
+    line render-ext>> second offset second - dim second - 2array v+ :> loc
+    dim [
+        {
+            [ line font>> dim fill-background ]
+            [ loc dim line fill-selection-background ]
+            [ loc first2 [ neg ] bi@ CGContextTranslateCTM ]
+            [ [ line line>> ] dip CTLineDraw ]
+        } cleave
+    ] make-bitmap-image bitmap>> ;
+
+:: indexed-region-test ( pattern -- ? )
+    sans-serif-font "Hoefler Text" >>name 32 >>size
+    T{ rgba f 0 0 0 0 } >>background
+    1000 [ pattern ] replicate concat cached-line :> line
+    line line>> CTLineGetGlyphCount 4096 > t assert=
+    line prepare-render
+    512 line render-ext>> second 2array :> dim
+    { 0 512 4096 } [| x |
+        line x 0 2array dim native-region-pixels
+        line x 0 2array dim render-region bitmap>> =
+    ] all? ;
+
+{ t } [
+    { "office ffi ạ́ " "abc אבג العربية " "👩‍💻👍🏽🇺🇸a " }
+    [ indexed-region-test ] all?
+] unit-test
+
 { t } [
     sans-serif-font COLOR: blue >>background "     " cached-line
     dup prepare-render [ render-ext>> ] [ dim>> ] bi [ >= ] 2all?

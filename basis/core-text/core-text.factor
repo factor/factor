@@ -1,11 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.data alien.syntax arrays byte-arrays
-assocs binary-search cache classes colors combinators core-foundation core-foundation.arrays
-core-foundation.attributed-strings core-foundation.strings
-core-foundation.dictionaries
-core-graphics core-graphics.types core-text.fonts destructors
-fonts io.encodings.string io.encodings.utf16 kernel layouts make math
+USING: accessors alien.accessors alien.c-types alien.data alien.syntax
+arrays assocs binary-search byte-arrays cache classes colors combinators
+core-foundation core-foundation.arrays core-foundation.attributed-strings
+core-foundation.dictionaries core-foundation.strings core-graphics
+core-graphics.types core-text.fonts destructors fonts io.encodings.string
+io.encodings.utf16 kernel layouts make math
 math.functions math.order math.vectors namespaces opengl sequences
 sorting strings vectors ;
 IN: core-text
@@ -242,8 +242,10 @@ CONSTANT: max-layout-dim 16383
         line metrics>> loc dim line-loc line loc<<
     ] unless ;
 
-! Region coordinates are measured from the top-left of the complete image.
-! Keep the original CTLine so shaping, bidi, and ligatures cross tile edges.
+! Index already-shaped glyphs so ligatures, bidi order and fallback fonts
+! are preserved. Every glyph position contributes to the bounds, including
+! negative advances, with the run font's bounding box covering overhangs.
+! CTRunGetImageBounds for each block would repeatedly scan the whole run.
 TUPLE: glyph-region run range left right order max-right ;
 
 :: glyph-position-x ( positions i -- x )
@@ -288,6 +290,7 @@ TUPLE: glyph-region run range left right order max-right ;
         V{ } clone :> regions
         line line>> CTLineGetGlyphRuns CF>array [ regions add-run-regions ] each
         regions [ left>> ] sort-by :> sorted
+        ! Prefix maxima account for blocks extending beyond later blocks.
         -1/0. :> right!
         sorted [| region |
             right region right>> max right!
@@ -323,6 +326,7 @@ TUPLE: glyph-region run range left right order max-right ;
         ] each
     ] [ line line>> context CTLineDraw ] if ;
 
+! Region coordinates are measured from the top-left of the complete image.
 :: render-region ( line offset dim -- image )
     line prepare-render
     line render-loc>> offset first
