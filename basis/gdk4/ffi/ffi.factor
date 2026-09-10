@@ -11,6 +11,7 @@ IN: gdk4.ffi
 >>
 
 C-LIBRARY: gdk4 {
+    { linux "libgtk-4.so.1" }
     { unix "libgtk-4.so" }
 }
 

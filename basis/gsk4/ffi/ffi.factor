@@ -11,6 +11,7 @@ IN: gsk4.ffi
 LIBRARY: gsk4
 
 C-LIBRARY: gsk4 {
+    { linux "libgtk-4.so.1" }
     { unix "libgtk-4.so" }
 }
 

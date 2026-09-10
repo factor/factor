@@ -365,6 +365,9 @@ M: gtk3-ui-backend (make-pixel-format) 2drop f ;
 
 M: gtk3-ui-backend (free-pixel-format) drop ;
 
+M: gtk3-ui-backend current-gl-context
+    gdk_gl_context_get_current ;
+
 M: window-handle select-gl-context
     drawable>>
     [ gtk_gl_area_make_current ]

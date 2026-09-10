@@ -10,7 +10,7 @@ ERROR: unknown-gl-platform ;
     { [ os unix? ] [
         ui-backend get [ name>> "gtk2-ui-backend" = ]
         [ "ui-backend" get "gtk2" = ] if*
-        "opengl.gl.gtk2" "opengl.gl.gtk3" ?
+        "opengl.gl.gtk2" "opengl.gl.epoxy" ?
     ] }
     [ unknown-gl-platform ]
 } cond use-vocab >>

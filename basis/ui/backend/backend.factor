@@ -20,6 +20,10 @@ HOOK: (close-window) ui-backend ( handle -- )
 
 HOOK: raise-window* ui-backend ( world -- )
 
+HOOK: current-gl-context ui-backend ( -- context )
+
+M: object current-gl-context f ;
+
 GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )
