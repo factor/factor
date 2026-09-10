@@ -1,7 +1,7 @@
 USING: accessors arrays colors continuations dlists fonts fry help
 help.markup help.stylesheet help.syntax help.topics inspector io
 io.streams.string io.styles kernel literals locals math models
-namespaces prettyprint see sequences tools.test ui.gadgets
+namespaces prettyprint see sequences strings tools.test ui.gadgets
 ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
 ui.gadgets.worlds ui.gestures ui.theme ;
 IN: ui.gadgets.panes.tests
@@ -24,6 +24,33 @@ IN: ui.gadgets.panes.tests
     [ with-string-writer dup print ] bi = ;
 
 { t } [ [ "hello" write ] test-gadget-text ] unit-test
+
+:: pane-written-text ( string -- text )
+    <pane> :> pane
+    string pane <pane-stream> stream-write
+    pane current>> gadget-text ;
+
+! A single large write must not repeatedly copy the growing label.
+{ t } [
+    10,000,000 CHAR: a <string> dup pane-written-text =
+] unit-test
+
+! The old fixed-size splitter made no progress on an oversized grapheme.
+{ t } [
+    "a" 5000 0x0301 <string> append dup pane-written-text =
+] unit-test
+
+! Formatted output follows the same path and preserves its style.
+:: formatted-pane-text-test ( -- text? style? )
+    10,000 CHAR: a <string> :> text
+    H{ { foreground COLOR: red } } :> style
+    <pane> :> pane
+    text style pane <pane-stream> stream-format
+    pane current>> find-styled-label
+    [ text>> text = ] [ style>> style = ] bi ;
+
+{ t t } [ formatted-pane-text-test ] unit-test
+
 { t } [ [ "hello" pprint ] test-gadget-text ] unit-test
 { t } [
     [

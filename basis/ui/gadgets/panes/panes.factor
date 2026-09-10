@@ -10,7 +10,7 @@ ui.gadgets.incremental ui.gadgets.labels ui.gadgets.menus
 ui.gadgets.packs ui.gadgets.paragraphs ui.gadgets.presentations
 ui.gadgets.private ui.gadgets.scrollers ui.gadgets.tracks
 ui.gestures ui.images ui.pens.solid ui.render ui.theme
-ui.traverse unicode ;
+ui.traverse ;
 FROM: io.styles => foreground background ;
 FROM: ui.gadgets.wrappers => <wrapper> ;
 IN: ui.gadgets.panes
@@ -144,18 +144,13 @@ M: pane-stream stream-nl
 M: pane-stream stream-write1
     [ pane-write1 ] do-pane-stream ;
 
-: split-pane ( str quot: ( str -- ) -- )
-    '[
-        dup length 3639 >
-        [ 3639 over last-grapheme-from cut-slice ] [ f ] if
-        swap "" like ?split-lines @ dup
-    ] loop drop ; inline
-
+! Keep each logical line intact. Splitting at a fixed character count only
+! makes pane-text join the chunks again, copying a growing label each time.
 M: pane-stream stream-write
-    [ '[ _ pane-write ] split-pane ] do-pane-stream ;
+    [ [ ?split-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ '[ _ _ pane-format ] split-pane ] do-pane-stream ;
+    [ [ ?split-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose
     dup parent>> [
