@@ -1,11 +1,13 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings arrays
+USING: accessors alien alien.c-types alien.data alien.strings arrays
 assocs cache cairo cairo.ffi classes.struct combinators
-destructors fonts fry gobject.ffi init io.encodings.utf8 kernel
-math math.order math.rectangles math.vectors memoize namespaces
-opengl pango.cairo.ffi pango.ffi sequences ui.text
-ui.text.private ;
+continuations destructors fonts fry gobject.ffi init io.encodings.utf8 kernel locals
+math math.functions math.order math.rectangles math.vectors memoize namespaces
+opengl opengl.gl opengl.textures pango.cairo.ffi pango.ffi ranges sequences
+ui.gadgets.worlds ui.render ui.text ui.text.index-maps
+ui.text.pango.indexed ui.text.private ;
+FROM: destructors.private => register-disposable ;
 IN: ui.text.pango
 
 : pango>float ( n -- x ) PANGO_SCALE /f ; inline
@@ -30,7 +32,7 @@ MEMO:: (cache-font-description) ( name size bold? italic? -- description )
         [ italic?>> ]
     } cleave (cache-font-description) ;
 
-TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image ;
+TUPLE: layout < disposable font string selection layout metrics ink-rect logical-rect image glyph-index index-map ;
 
 SYMBOL: dpi
 
@@ -71,24 +73,28 @@ SYMBOL: dpi
 : first-line ( layout -- line )
     layout>> 0 pango_layout_get_line_readonly ;
 
-: line-offset>x ( layout n -- x )
-    ! n is an index into the UTF8 encoding of the text
-    [ drop first-line ] [ swap string>> >utf8-index ] 2bi
-    f { int } [ pango_layout_line_index_to_x ] with-out-parameters
-    pango>float ;
+:: layout-index-map ( layout -- map )
+    layout index-map>> [ ] [
+        layout string>> <utf8-index-map> dup layout index-map<<
+    ] if* ;
 
-: x>line-offset ( layout x -- n )
-    ! n is an index into the UTF8 encoding of the text
-    [
-        [ first-line ] dip
-        float>pango
-        { int int }
-        [ pango_layout_line_x_to_index drop ] with-out-parameters
-        swap
-    ] [ drop string>> ] 2bi utf8-index> + ;
+:: line-offset>x ( layout n -- x )
+    layout glyph-index>> [ n swap indexed-offset>x ] [
+        layout first-line n layout layout-index-map codepoint>native
+        f { int } [ pango_layout_line_index_to_x ] with-out-parameters pango>float
+    ] if* ;
+
+:: x>line-offset ( layout x -- n )
+    layout glyph-index>> [
+        x 0 layout metrics>> width>> clamp swap indexed-x>offset
+    ] [
+        layout first-line x float>pango
+        { int int } [ pango_layout_line_x_to_index drop ] with-out-parameters
+        swap layout layout-index-map native>codepoint +
+    ] if* ;
 
 : selection-start/end ( selection -- start end )
-    selection>> [ start>> ] [ end>> ] bi ;
+    selection>> [ start>> ] [ end>> ] bi [ min ] [ max ] 2bi ;
 
 : selection-rect ( layout -- rect )
     [ ink-rect>> dim>> ] [ ] [ selection-start/end ] tri [ line-offset>x ] bi-curry@ bi
@@ -110,24 +116,46 @@ SYMBOL: dpi
 : set-text-position ( cr loc -- )
     first2 cairo_move_to ;
 
-! Cairo has a max surface size limit (typically 32767 but varies).
-! Clamp to avoid errors on very long lines.
+! Bound explicit whole-line image previews. On-screen text uses visible
+! tiles below and is never truncated to this surface-size limit.
 CONSTANT: max-layout-dim 16384
 
 : clamp-layout-dim ( dim -- dim' )
     [ max-layout-dim min ] map ;
 
-: draw-layout ( layout -- image )
-    dup ink-rect>> dim>> [ >fixnum ] map clamp-layout-dim [
-        swap {
-            [ layout>> pango_cairo_update_layout ]
-            [ [ font>> ] [ ink-rect>> dim>> clamp-layout-dim ] bi fill-background ]
-            [ fill-selection-background ]
-            [ text-position set-text-position ]
-            [ font>> set-foreground ]
-            [ layout>> pango_cairo_show_layout ]
-        } 2cleave
+:: fill-selection-region ( cr layout offset dim -- )
+    layout selection>> [
+        cr layout selection>> color>> set-source-color
+        layout selection-rect layout ink-rect>> loc>> first rect-translate-x
+        offset dim <rect> rect-intersect
+        [ offset v- ] change-loc cr swap fill-rect
+    ] when ;
+
+! Rasterize a bounded region of the original shaped layout. Do not split
+! the string: shaping, fallback and bidi ordering must span tile boundaries.
+:: draw-layout-region ( layout offset dim -- image )
+    dim [| cr |
+        ! Fill in tile coordinates: a 70-million-pixel Cairo rectangle can
+        ! overflow Cairo's fixed-point geometry even on a tiny surface.
+        cr layout font>> dim fill-background
+        cr layout offset dim fill-selection-region
+        cr offset vneg first2 cairo_translate
+        cr layout font>> set-foreground
+        layout glyph-index>> [| index |
+            cr layout text-position first2 cairo_translate
+            cr index offset first layout text-position first - dim first draw-indexed-region
+        ] [
+            cr layout text-position set-text-position
+            cr layout layout>> pango_cairo_show_layout
+        ] if*
+        cr check-cairo
     ] make-bitmap-image ;
+
+: layout-image-dim ( layout -- dim )
+    ink-rect>> dim>> [ ceiling >integer ] map ;
+
+: draw-layout ( layout -- image )
+    dup layout-image-dim clamp-layout-dim { 0 0 } swap draw-layout-region ;
 
 : escape-nulls ( str -- str' )
     ! Replace nulls with something else since Pango uses null-terminated
@@ -167,7 +195,7 @@ MEMO: missing-font-metrics ( font -- metrics )
         [ logical-rect>> dim>> [ first >>width ] [ second >>height ] bi ] bi
         dup [ height>> ] [ ascent>> ] bi - >>descent ;
 
-: <layout> ( font string -- line )
+: <plain-layout> ( font string -- line )
     [
         layout new-disposable
             swap unpack-selection
@@ -175,14 +203,38 @@ MEMO: missing-font-metrics ( font -- metrics )
             dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
             dup layout-metrics >>metrics
+            ! Keep wide positions in Factor and index the existing glyphs.
+            ! Printable ASCII has monotonic horizontal advances; other text
+            ! retains native Pango hit testing and drawing semantics.
+            dup string>> dup length 4096 > [
+                [ dup 32 >= swap 126 <= and ] all?
+            ] [ drop f ] if [
+                dup [ layout>> ] [ metrics>> ascent>> ] bi <glyph-index> >>glyph-index
+                dup glyph-index>> ink>> >>ink-rect
+                dup [ glyph-index>> width>> ] [ logical-rect>> dim>> second ] bi 2array
+                over logical-rect>> swap >>dim drop
+                dup [ glyph-index>> width>> ] [ metrics>> ] bi swap >>width drop
+            ] when
     ] with-destructors ;
+
+DEFER: cached-layout
+
+:: <layout> ( font text -- layout )
+    text selection? [
+        ! Selection changes must not reshape a multi-million-character row.
+        font text string>> cached-layout dup layout-index-map drop clone
+        dup layout>> g_object_ref drop
+        dup register-disposable
+        text >>selection f >>image
+    ] [ font text <plain-layout> ] if ;
 
 M: layout dispose* layout>> g_object_unref ;
 
 SYMBOL: cached-layouts
 
 : cached-layout ( font string -- layout )
-    cached-layouts get-global [ <layout> ] 2cache ;
+    gl-scale-factor get-global 3array
+    cached-layouts get-global [ first2 <layout> ] cache ;
 
 : cached-line ( font string -- line )
     cached-layout layout>> first-line ;
@@ -215,6 +267,100 @@ M: pango-renderer line-metrics
     [ " " line-metrics 0 >>width ]
     [ cached-layout metrics>> clone scale-metrics ]
     if-empty ;
+
+<PRIVATE
+
+CONSTANT: pango-tile-dim { 512 256 }
+
+TUPLE: pango-tile < disposable texture vao vbo ;
+
+M: pango-tile dispose*
+    [ vao>> [ 1 swap uint <ref> glDeleteVertexArrays ] when* ]
+    [ vbo>> [ 1 swap uint <ref> glDeleteBuffers ] when* ]
+    [ texture>> [ delete-texture ] when* ] tri ;
+
+! Invert the actual text transform, including scrolling within an editor.
+! Unusual transforms conservatively draw every tile.
+:: pango-modelview-clip ( rect matrix -- rect/f )
+    matrix first :> sx
+    5 matrix nth :> sy
+    sx zero? sy zero? or
+    1 matrix nth zero? 4 matrix nth zero? and not or
+    3 matrix nth zero? 7 matrix nth zero? and
+    15 matrix nth 1 number= and not or [ f ] [
+        12 matrix nth 13 matrix nth 2array :> translation
+        sx sy 2array :> scale
+        rect rect-extent [ translation v- scale v/ ] bi@ :> ( a b )
+        a b vmin a b vmax <extent-rect>
+    ] if ;
+
+: pango-text-clip ( -- rect/f )
+    clip get [ current-modelview get-global pango-modelview-clip ] [ f ] if* ;
+
+:: pango-tile-offsets ( layout rect/f -- offsets )
+    { 0 0 } layout layout-image-dim <rect> :> bounds
+    rect/f [
+        rect/f rect-extent [ [ gl-scale ] map layout text-position v+ ] bi@
+        <extent-rect> bounds rect-intersect
+    ] [ bounds ] if :> visible
+    visible dim>> [ 0 <= ] any? [ { } ] [
+        visible rect-extent
+        [ pango-tile-dim v/ [ floor >integer ] map ]
+        [ pango-tile-dim v/ [ ceiling >integer ] map ] bi*
+        [ [a..b) ] 2map first2 cartesian-product concat
+        [ pango-tile-dim v* ] map
+    ] if ;
+
+:: <pango-tile> ( layout offset -- tile )
+    layout layout-image-dim :> ext
+    ext offset v- pango-tile-dim vmin :> dim
+    ! A pixel gutter supports linear filtering without overlapping the drawn
+    ! interiors, which would apply translucent backgrounds twice.
+    offset { 1 1 } v- { 0 0 } vmax :> raster-offset
+    offset dim v+ { 1 1 } v+ ext vmin raster-offset v- :> raster-dim
+    layout raster-offset raster-dim draw-layout-region :> image
+    offset raster-offset v- raster-dim v/ :> uv-loc
+    dim raster-dim v/ :> uv-dim
+    offset layout text-position v- scale-dim dim scale-dim
+    make-textured-quad-vertices :> vertices
+    6 <iota> [| i |
+        i 4 * 2 + vertices [ uv-dim first * uv-loc first + ] change-nth
+        i 4 * 3 + vertices [ uv-dim second * uv-loc second + ] change-nth
+    ] each
+    [
+        pango-tile new-disposable |dispose
+        image make-texture-gl3 >>texture
+        create-gl3-vao >>vao
+        create-gl3-vbo >>vbo
+        dup vao>> glBindVertexArray
+        dup vbo>> GL_ARRAY_BUFFER swap glBindBuffer
+        GL_ARRAY_BUFFER vertices [ byte-length ] keep GL_STATIC_DRAW glBufferData
+        setup-texture-vertex-attributes
+    ] with-destructors ;
+
+: cached-pango-tile ( layout offset -- tile )
+    world get world-text-handle [ <pango-tile> ] 2cache ;
+
+:: draw-pango-tiles ( layout -- )
+    layout pango-text-clip pango-tile-offsets :> offsets
+    offsets empty? [
+        ! Cairo's ARGB32 pixels contain premultiplied alpha.
+        GL_ONE GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+        [
+            [ offsets [
+                layout swap cached-pango-tile
+                [ vao>> ] [ texture>> ] bi gl3-draw-cached-texture
+            ] each ] with-gl3-cached-textures
+        ] [ GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc ] finally
+    ] unless ;
+
+PRIVATE>
+
+M: pango-renderer draw-string*
+    gl3-mode? get-global world get and [
+        2dup cached-layout layout-image-dim [ 512 > ] any?
+        [ cached-layout draw-pango-tiles ] [ draw-string-default ] if
+    ] [ draw-string-default ] if ;
 
 STARTUP-HOOK: [
     \ (cache-font-description) reset-memoized

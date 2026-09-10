@@ -10,7 +10,7 @@ TYPEDEF: int gint
 TYPEDEF: int GtkFileChooserAction
 
 <<
-"resource:extra/file-picker/linux/linux.factor" utf8 file-contents
+"resource:extra/file-picker/linux/gtk/gtk.factor" utf8 file-contents
 "FUNCTION: GtkWidget* gtk_file_chooser_dialog_new" split1 nip ")" split1 drop
 "FUNCTION: GtkWidget* gtk_file_chooser_dialog_new" prepend ")" append
 "USING: alien.syntax alien.c-types file-picker.linux.varargs.tests ; IN: file-picker.linux.varargs.tests LIBRARY: gtk " prepend

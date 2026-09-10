@@ -1,6 +1,6 @@
 ! Copyright (C) 2010, 2011 Anton Gorenko, Philipp Bruschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors alien.c-types alien.strings
+USING: accessors alien.accessors alien.c-types alien.data alien.strings
 arrays assocs cairo.ffi classes.struct combinators continuations
 destructors environment gdk-pixbuf.ffi gdk3.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk3.ffi io io.encodings.binary
@@ -8,7 +8,7 @@ io.encodings.utf8 io.files io.pathnames kernel libc literals
 locals math math.bitwise math.functions math.order math.parser
 math.vectors memoize namespaces opengl opengl.gl opengl.textures
 prettyprint sequences strings system threads ui ui.backend
-ui.backend.gtk3.input-methods ui.backend.x11.keys ui.clipboards
+ui.backend.gtk3.input-methods ui.backend.input-state ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render
 ui.text.pango vocabs.loader ;
@@ -16,10 +16,10 @@ IN: ui.backend.gtk3
 
 SINGLETON: gtk3-ui-backend
 
-TUPLE: window-handle window drawable im-context fullscreen? ;
+TUPLE: window-handle window drawable im-context fullscreen? { framebuffer integer initial: 0 } ;
 
 : <window-handle> ( window drawable im-context -- window-handle )
-    f window-handle boa ;
+    f 0 window-handle boa ;
 
 ! Clipboards
 
@@ -98,15 +98,16 @@ SYMBOL: event-scale-factor
 
 : on-motion ( drawable event user-data -- ? )
     drop swap
-    [ event-loc ] dip gtk_widget_get_toplevel window
+    [ event-loc dup record-motion ] dip gtk_widget_get_toplevel window
     move-hand fire-motion t ;
 
 : on-leave ( drawable event user-data -- ? )
-    3drop forget-rollover t ;
+    3drop forget-pointer-position forget-rollover t ;
 
 :: on-button-press ( drawable event user-data -- ? )
     drawable gtk_widget_get_toplevel window :> world
     event type>> GDK_BUTTON_PRESS = [
+        event button>> t record-button
         event button>> {
             { 8 [ ] }
             { 9 [ ] }
@@ -122,6 +123,7 @@ SYMBOL: event-scale-factor
 :: on-button-release ( drawable event user-data -- ? )
     drawable gtk_widget_get_toplevel window :> world
     event type>> GDK_BUTTON_RELEASE = [
+        event button>> f record-button
         event button>> {
             { 8 [ world left-action send-action ] }
             { 9 [ world right-action send-action ] }
@@ -136,7 +138,7 @@ SYMBOL: event-scale-factor
 
 : on-scroll ( drawable event user-data -- ? )
     drop swap [
-        [ scroll-direction ] [ event-loc ] bi
+        [ scroll-direction dup record-scroll ] [ event-loc ] bi
     ] dip gtk_widget_get_toplevel window send-scroll t ;
 
 : key-sym ( keyval -- string/f action? )
@@ -154,7 +156,7 @@ SYMBOL: event-scale-factor
     2drop gtk_widget_get_toplevel window focus-world f ;
 
 : on-focus-out ( drawable event user-data -- ? )
-    2drop gtk_widget_get_toplevel window unfocus-world f ;
+    clear-input-state 2drop gtk_widget_get_toplevel window unfocus-world f ;
 
 CONSTANT: default-icon-path "resource:misc/icons/icon_128x128.png"
 
@@ -210,7 +212,13 @@ icon-data [ default-icon-data ] initialize
     ] [ 2drop ] if ;
 
 : on-render ( glarea context user-data -- ? )
-    2drop dup gtk_widget_get_toplevel window calc-event-scale-factor f ;
+    2drop dup gtk_widget_get_toplevel window
+    [ calc-event-scale-factor ] keep
+    dup gl-render-state>> [
+        dup draw-world? [
+            [ dup set-gl-context draw-world* gl-error ] [ nip ui-error ] recover
+        ] [ drop ] if
+    ] [ drop ] if t ;
 
 : connect-render-signal ( drawable -- )
     "render" [ on-render yield ]
@@ -275,6 +283,8 @@ icon-data [ default-icon-data ] initialize
 
 ! has to be called before the window signal handler
 :: im-on-key-event ( win event im-context -- ? )
+    ! Record physical keys before the input method can consume the event.
+    event [ hardware_keycode>> ] [ type>> GDK_KEY_PRESS = ] bi record-key
     win window world-focus :> gadget
     gadget support-input-methods? [
         im-context gadget update-cursor-location
@@ -368,11 +378,19 @@ M: gtk3-ui-backend (free-pixel-format) drop ;
 M: gtk3-ui-backend current-gl-context
     gdk_gl_context_get_current ;
 
+! GtkGLArea owns the presentation framebuffer; it is not framebuffer zero.
+M: window-handle window-framebuffer framebuffer>> ;
+
 M: window-handle select-gl-context
-    drawable>>
+    dup drawable>>
     [ gtk_gl_area_make_current ]
-    [ gtk_gl_area_get_error f assert= ]
-    [ gtk_gl_area_attach_buffers ] tri ;
+    [ gtk_gl_area_get_error [ message>> utf8 alien>string throw ] when* ]
+    [
+        dup [ gtk_widget_get_allocated_width ] [ gtk_widget_get_allocated_height ] bi
+        [ 0 > ] bi@ and [ gtk_gl_area_attach_buffers ] [ drop ] if
+    ] tri
+    GL_DRAW_FRAMEBUFFER_BINDING 0 int <ref>
+    [ glGetIntegerv ] keep int deref >>framebuffer drop ;
 
 M: window-handle flush-gl-context
     drawable>> gtk_gl_area_queue_render ;
@@ -389,7 +407,13 @@ M: window-handle flush-gl-context
 M:: gtk3-ui-backend (open-window) ( world -- )
     GTK_WINDOW_TOPLEVEL gtk_window_new :> win
     gtk_gl_area_new :> drawable
+    drawable f gtk_gl_area_set_use_es
+    drawable 3 3 gtk_gl_area_set_required_version
     drawable f gtk_gl_area_set_auto_render
+    drawable world pixel-format-attributes>> [ depth-bits? ] any?
+    gtk_gl_area_set_has_depth_buffer
+    drawable world pixel-format-attributes>> [ stencil-bits? ] any?
+    gtk_gl_area_set_has_stencil_buffer
     drawable 1 gtk_widget_set_hexpand
     drawable 1 gtk_widget_set_vexpand
     drawable GTK_ALIGN_FILL gtk_widget_set_halign
@@ -502,7 +526,7 @@ os { linux freebsd } member? [
 ] when
 
 M: gtk3-ui-backend ui-backend-available?
-    "DISPLAY" os-env empty? not ;
+    "DISPLAY" os-env empty? "WAYLAND_DISPLAY" os-env empty? and not ;
 
 { "ui.backend.gtk3" "ui.gadgets.editors" }
 "ui.backend.gtk3.input-methods.editors" require-when

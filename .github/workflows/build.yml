@@ -35,8 +35,18 @@ jobs:
     - name: GTK4 tests
       if: matrix.backend != 'gtk3'
       run: ./factor -run=tools.test ui.backend.gtk4 game.input.gtk4 opengl.capabilities opengl.gl.epoxy opengl.gl.extensions
+    - name: GTK3 smoke test
+      if: matrix.backend == 'gtk3'
+      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.backend.gtk3.smoke-test
+    - name: Linux text tests
+      run: ./factor -run=tools.test ui.text.pango ui.text.index-maps ui.gadgets.panes
+    - name: Linux game input tests
+      run: ./factor -no-user-init -run=tools.test game.input.gtk game.input.linux
+    - name: Pango long-row smoke test
+      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=ui.text.pango.smoke-test
+    - name: Native file dialog tests
+      run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=tools.test file-picker.linux
     - name: Papier smoke test
-      if: matrix.backend != 'gtk3'
       run: xvfb-run -a env GDK_BACKEND=x11 ./factor -no-user-init -run=papier.smoke-test
 
     - name: load-all
@@ -103,6 +113,9 @@ jobs:
       run: |
            .\build.cmd update-boot-image
            .\build.cmd bootstrap
+    - name: Windows text tests
+      shell: cmd
+      run: 'factor -run=tools.test windows.directwrite ui.text.directwrite.tiles ui.text.index-maps'
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'
@@ -129,6 +142,9 @@ jobs:
       run: |
            .\build.cmd update-boot-image
            .\build.cmd bootstrap
+    - name: Windows text tests
+      shell: cmd
+      run: 'factor -run=tools.test windows.directwrite ui.text.directwrite.tiles ui.text.index-maps'
     - name: load-all
       shell: cmd
       run: 'factor -e="USING: compiler.errors memory namespaces parser.notes syntax vocabs.hierarchy ; parser-quiet? off auto-use? off load-all save compiler-errors get assoc-empty? 0 1 ? exit"'

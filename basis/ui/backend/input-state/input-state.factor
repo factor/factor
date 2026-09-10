@@ -1,9 +1,9 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
 ! Raw input snapshots shared by the UI and the optional game-input backend.
-USING: accessors arrays assocs kernel locals math math.vectors
+USING: accessors arrays assocs init kernel locals math math.vectors
 namespaces sequences ;
-IN: ui.backend.gtk4.input-state
+IN: ui.backend.input-state
 
 TUPLE: input-state keycodes buttons position motion scroll ;
 
@@ -15,6 +15,11 @@ current-input-state [ <input-state> ] initialize
 
 : clear-input-state ( -- )
     <input-state> current-input-state set-global ;
+
+STARTUP-HOOK: clear-input-state
+
+: forget-pointer-position ( -- )
+    current-input-state get-global f >>position drop ;
 
 : record-key ( keycode pressed? -- )
     [ t swap current-input-state get-global keycodes>> set-at ]

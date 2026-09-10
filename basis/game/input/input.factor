@@ -110,8 +110,11 @@ SYMBOLS: pressed released ;
     { [ os windows? ] [ "game.input.dinput" require ] }
     { [ os macos? ] [ "game.input.iokit" require ] }
     { [ os linux? ] [
-        ui-backend get-global dup [ name>> "gtk4-ui-backend" = ] when
-        "game.input.gtk4" "game.input.gtk2" ? require
+        ui-backend get-global [ name>> ] [ "" ] if* {
+            { "gtk4-ui-backend" [ "game.input.gtk4" ] }
+            { "gtk3-ui-backend" [ "game.input.gtk3" ] }
+            [ drop "game.input.gtk2" ]
+        } case require
     ] }
     [ ]
 } cond

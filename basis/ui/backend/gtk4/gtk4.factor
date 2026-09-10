@@ -6,7 +6,7 @@ continuations destructors environment gdk4.ffi gio.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk4.ffi io.encodings.string
 io.encodings.utf8 kernel literals locals math math.bitwise math.vectors memoize namespaces
 opengl opengl.gl sequences strings system threads ui ui.backend
-ui.backend.gtk4.input-methods ui.backend.gtk4.input-state ui.backend.x11.keys ui.clipboards
+ui.backend.gtk4.input-methods ui.backend.input-state ui.backend.x11.keys ui.clipboards
 ui.event-loop ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gestures ui.pixel-formats ui.private ui.render ui.text.pango
 vocabs.loader ;
@@ -85,7 +85,7 @@ CONSTANT: gtk4-modifiers
     drop 2array dup record-motion swap controller-world move-hand fire-motion ;
 
 : on-leave ( controller data -- )
-    2drop forget-rollover ;
+    2drop forget-pointer-position forget-rollover ;
 
 :: on-pressed ( gesture count x y data -- )
     gesture gtk_event_controller_get_widget gtk_widget_grab_focus drop

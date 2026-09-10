@@ -3,12 +3,13 @@
 USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache
 classes.struct destructors fonts fonts.shaping init io.encodings.string
 io.encodings.utf16 kernel locals math math.bitwise math.functions math.order
-namespaces opengl sequences windows.com windows.directx.dwrite
+namespaces opengl sequences ui.text.index-maps windows.com windows.directx.dwrite
 windows.fonts windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
+FROM: destructors.private => register-disposable ;
 IN: windows.directwrite
 
-TUPLE: directwrite-layout < disposable font string pointer metrics size image origin ;
+TUPLE: directwrite-layout < disposable font string pointer metrics size image origin index-map selection-rects ;
 
 : <directwrite-factory> ( -- factory )
     DWRITE_FACTORY_TYPE_SHARED IDWriteFactory-iid
@@ -17,11 +18,16 @@ TUPLE: directwrite-layout < disposable font string pointer metrics size image or
 : directwrite-scale ( -- scale ) gl-scale-factor get-global 1.0 or ;
 
 :: directwrite-utf16-index ( string index -- units )
-    0 index string subseq utf16n encode length 2 /i ;
+    index string <utf16-index-map> codepoint>native ;
 
 :: directwrite-codepoint-index ( string index -- codepoints )
-    0 :> units!
-    string [ 0xffff > [ 2 ] [ 1 ] if units + units! units index <= ] count ;
+    index string <utf16-index-map> native>codepoint string length min ;
+
+:: directwrite-layout-index-map ( layout -- map )
+    layout index-map>> [ ] [
+        layout string>> dup selection? [ string>> ] when
+        <utf16-index-map> dup layout index-map<<
+    ] if* ;
 
 : <directwrite-font-collection> ( factory -- collection )
     f void* <ref> [ FALSE IDWriteFactory::GetSystemFontCollection check-ole32-error ] keep
@@ -106,7 +112,7 @@ ERROR: missing-directwrite-fallback-font ;
 : snapshot-directwrite-font-name ( font -- copy )
     clone [ windows-font-name clone ] change-name ;
 
-:: <directwrite-layout> ( input-font string -- layout )
+:: <plain-directwrite-layout> ( input-font string -- layout )
     input-font snapshot-directwrite-font-name :> font
     [ <directwrite-factory> [ :> factory
         factory font <directwrite-format> [ :> format
@@ -134,13 +140,25 @@ ERROR: missing-directwrite-fallback-font ;
         ] with-com-interface
     ] with-com-interface ] with-destructors ;
 
+DEFER: cached-directwrite-layout
+
+:: <directwrite-layout> ( font text -- layout )
+    text selection? [
+        ! Selection is paint state. Share the native shaped layout instead
+        ! of rebuilding millions of glyphs whenever its endpoints change.
+        font text string>> cached-directwrite-layout
+        dup directwrite-layout-index-map drop clone
+        dup pointer>> IUnknown::AddRef drop
+        dup register-disposable
+        text >>string f >>image f >>selection-rects
+    ] [ font text <plain-directwrite-layout> ] if ;
+
 M: directwrite-layout dispose*
     [ pointer>> com-release ] [ f >>pointer drop ] bi ;
 
 :: directwrite-offset>x ( index layout -- x )
     layout check-disposed drop
-    layout string>> dup selection? [ string>> ] when :> text
-    layout pointer>> text index directwrite-utf16-index FALSE
+    layout pointer>> index layout directwrite-layout-index-map codepoint>native FALSE
     0.0 float <ref> :> x
     0.0 float <ref> :> y
     x y DWRITE_HIT_TEST_METRICS new
@@ -154,9 +172,8 @@ M: directwrite-layout dispose*
     FALSE int <ref> :> inside
     layout pointer>> x 0.0 trailing inside hit
     IDWriteTextLayout::HitTestPoint check-ole32-error
-    layout string>> dup selection? [ string>> ] when
     hit textPosition>> trailing int deref 0 = [ 0 ] [ hit length>> ] if +
-    directwrite-codepoint-index ;
+    layout directwrite-layout-index-map native>codepoint ;
 
 SYMBOL: cached-directwrite-layouts
 
@@ -167,13 +184,13 @@ SYMBOL: cached-directwrite-layouts
 STARTUP-HOOK: [ <cache-assoc> cached-directwrite-layouts set-global ]
 
 ! A logical selection can cover several disjoint visual runs in bidi text.
-:: directwrite-selection-rects ( layout -- rects )
+:: (directwrite-selection-rects) ( layout -- rects )
     layout check-disposed drop
     layout string>> :> selection
     selection selection? [
-        selection string>> :> text
-        text selection [ start>> ] [ end>> ] bi min directwrite-utf16-index :> start
-        text selection [ start>> ] [ end>> ] bi max directwrite-utf16-index start - :> length
+        layout directwrite-layout-index-map :> map
+        selection [ start>> ] [ end>> ] bi min map codepoint>native :> start
+        selection [ start>> ] [ end>> ] bi max map codepoint>native start - :> length
         0 uint <ref> :> count
         layout pointer>> start length 0.0 0.0 f 0 count
         IDWriteTextLayout::HitTestTextRange drop
@@ -184,3 +201,9 @@ STARTUP-HOOK: [ <cache-assoc> cached-directwrite-layouts set-global ]
         n [ DWRITE_HIT_TEST_METRICS heap-size * buffer <displaced-alien>
             DWRITE_HIT_TEST_METRICS memory>struct ] map-integers
     ] [ { } ] if ;
+
+:: directwrite-selection-rects ( layout -- rects )
+    layout check-disposed drop
+    layout selection-rects>> [ ] [
+        layout (directwrite-selection-rects) dup layout selection-rects<<
+    ] if* ;
