@@ -1,6 +1,6 @@
 USING: concurrency.mailboxes concurrency.count-downs concurrency.conditions
 vectors sequences threads tools.test math kernel strings namespaces
-continuations calendar destructors ;
+continuations calendar destructors locals system timers ;
 IN: concurrency.mailboxes.tests
 
 { 1 1 } [ [ integer? ] mailbox-get? ] must-infer-as
@@ -55,3 +55,17 @@ IN: concurrency.mailboxes.tests
 
 { t } [ <mailbox> mailbox-empty? ] unit-test
 { f } [ <mailbox> "foo" over mailbox-put mailbox-empty? ] unit-test
+
+! Unmatched incoming messages must not restart a selective receive's timeout.
+:: selective-receive-deadline-test ( -- ? )
+    <mailbox> :> mailbox
+    [ "unmatched" mailbox mailbox-put ] 10 milliseconds every :> notifier
+    [ notifier stop-timer ] 500 milliseconds later :> stopper
+    nano-count :> started
+    [
+        [ mailbox 30 milliseconds [ drop f ] mailbox-get-timeout? ]
+        [ timed-out-error? ] must-fail-with
+        nano-count started - 250000000 <
+    ] [ notifier stop-timer stopper stop-timer ] finally ;
+
+{ t } [ selective-receive-deadline-test ] unit-test

@@ -24,14 +24,16 @@ M: mailbox mailbox-put
     [ threads>> ] dip "mailbox" wait ; inline
 
 :: block-unless-pred ( ... mailbox timeout pred: ( ... message -- ... ? ) -- ... )
+    timeout >deadline :> deadline
     mailbox data>> pred dlist-any? [
-        mailbox timeout wait-for-mailbox
-        mailbox timeout pred block-unless-pred
+        mailbox deadline wait-for-mailbox
+        mailbox deadline pred block-unless-pred
     ] unless ; inline recursive
 
 TYPED:: block-if-empty ( mailbox: mailbox timeout -- mailbox )
+    timeout >deadline :> deadline
     mailbox data>> '[ _ deque-empty? ]
-    mailbox threads>> '[ _ timeout "mailbox" wait ] while
+    mailbox threads>> '[ _ deadline "mailbox" wait ] while
     mailbox ;
 
 TYPED: mailbox-peek ( mailbox: mailbox -- obj )
@@ -61,6 +63,7 @@ TYPED: mailbox-get-timeout ( mailbox: mailbox timeout -- obj )
     f swap mailbox-get-timeout? ; inline
 
 : wait-for-close-timeout ( mailbox timeout -- )
+    >deadline
     '[
         _ 2dup wait-for-mailbox wait-for-close-timeout
     ] unless-disposed ;

@@ -13,8 +13,8 @@ TUPLE: semaphore count threads ;
     [ threads>> ] dip "semaphore" wait ;
 
 : acquire-timeout ( semaphore timeout -- )
-    over count>> zero?
-    [ dupd wait-to-acquire ] [ drop ] if
+    >deadline
+    [ over count>> zero? ] [ 2dup wait-to-acquire ] while drop
     [ 1 - ] change-count drop ;
 
 : acquire ( semaphore -- )

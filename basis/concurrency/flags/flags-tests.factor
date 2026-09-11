@@ -1,5 +1,5 @@
-USING: tools.test concurrency.flags concurrency.combinators
-kernel threads accessors calendar ;
+USING: tools.test concurrency.flags concurrency.combinators kernel threads
+accessors calendar locals concurrency.futures concurrency.promises ;
 IN: concurrency.flags.tests
 
 :: flag-test-1 ( -- val )
@@ -45,4 +45,14 @@ IN: concurrency.flags.tests
     { 1 2 } <flag>
     [ [ 1 seconds sleep raise-flag ] curry "Flag test" spawn drop ]
     [ [ wait-for-flag drop ] curry parallel-each ] bi
+] unit-test
+
+{ f t } [
+  [let
+    <flag> :> flag
+    [ flag lower-flag t ] future :> waiter
+    yield flag raise-flag flag lower-flag yield
+    waiter promise-fulfilled?
+    flag raise-flag waiter ?future
+  ]
 ] unit-test

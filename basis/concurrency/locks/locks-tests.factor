@@ -3,6 +3,30 @@ concurrency.messaging concurrency.mailboxes kernel
 threads sequences calendar accessors ;
 IN: concurrency.locks.tests
 
+USING: concurrency.futures concurrency.locks.private concurrency.promises ;
+
+{ f t } [
+    <lock> [| lock |
+        lock f acquire-lock
+        [ lock [ t ] with-lock ] future :> waiter
+        yield
+        lock release-lock lock f acquire-lock
+        yield waiter promise-fulfilled?
+        lock release-lock waiter ?future
+    ] call
+] unit-test
+
+{ f t } [
+    <rw-lock> [| lock |
+        lock f acquire-write-lock
+        [ lock [ t ] with-write-lock ] future :> waiter
+        yield
+        lock release-write-lock lock f acquire-read-lock
+        yield waiter promise-fulfilled?
+        lock release-read-lock waiter ?future
+    ] call
+] unit-test
+
 :: lock-test-0 ( -- v )
     V{ } clone :> v
     2 <count-down> :> c
