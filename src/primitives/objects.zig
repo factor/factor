@@ -385,6 +385,9 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     // 8. Active contexts
     for (vm.active_contexts.items) |ctx| {
+        // The current context was visited above. Applying the map twice would
+        // turn simultaneous A -> B, B -> C substitution into A -> C here.
+        if (ctx == vm.vm_asm.ctx) continue;
 
         // Visit context stacks
         if (ctx.datastack_seg) |seg| {
@@ -414,6 +417,11 @@ pub export fn primitive_become(vm_asm: *VMAssemblyFields) callconv(.c) void {
         if (vm.code) |code| {
             slot_visitor.visitLiveCallstackRoots(BecomeFixup, &become_fixup, code, ctx.callstack_top, ctx.callstack_bottom);
         }
+    }
+
+    // Recorded samples are malloc-side GC roots, just as in normal collection.
+    for (vm.profiling_samples.items) |*sample| {
+        become_fixup.visitSlot(&sample.thread);
     }
 
     // Visit all objects in the heap (tenured + aging). Nursery should be empty
@@ -899,4 +907,68 @@ pub export fn primitive_quotation_code(vm_asm: *VMAssemblyFields) callconv(.c) v
         }
     }
     vm.push(math.fromUnsignedCell(vm, entry));
+}
+
+fn testBecomeRoots(profiler_root: bool) !void {
+    const data_heap = @import("../data_heap.zig");
+    const gc = @import("../gc.zig");
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // These small allocations fit in the fresh nursery; become itself collects.
+    const a = vm.allotByteArray(1);
+    const b = vm.allotByteArray(1);
+    const c = vm.allotByteArray(1);
+    for ([_]Cell{ a, b, c }, 1..) |value, marker| {
+        const bytes: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(value));
+        bytes.data()[0] = @intCast(marker);
+    }
+    vm.push(a);
+    try vm.profiling_samples.append(allocator, .{
+        .thread = a,
+        .callstack_begin = 0,
+        .callstack_end = 0,
+        .sample_count = 1,
+        .gc_sample_count = 0,
+        .jit_sample_count = 0,
+        .foreign_sample_count = 0,
+        .foreign_thread_sample_count = 0,
+    });
+
+    const old_values = vm.allotArray(2, a) orelse return error.OutOfMemory;
+    const old_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(old_values));
+    old_array.data()[1] = b;
+    vm.push(old_values);
+    const new_values = vm.allotArray(2, b) orelse return error.OutOfMemory;
+    const new_array: *layouts.Array = @ptrFromInt(layouts.UNTAG(new_values));
+    new_array.data()[1] = c;
+    vm.push(new_values);
+
+    // Simultaneous substitution A -> B, B -> C must map every A root to B.
+    primitive_become(&vm.vm_asm);
+    const result = if (profiler_root) vm.profiling_samples.items[0].thread else vm.peek();
+    const bytes: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(result));
+    try std.testing.expectEqual(@as(u8, 2), bytes.data()[0]);
+}
+
+test "become visits the current context exactly once" {
+    try testBecomeRoots(false);
+}
+
+test "become substitutes recorded profiler roots" {
+    try testBecomeRoots(true);
 }
