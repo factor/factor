@@ -112,7 +112,7 @@ FUNCTION: void* BIO_push ( void* bio, void* append )
 
 FUNCTION: int BIO_read ( BIO* bio, void* buf, int len )
 
-FUNCTION: int BIO_gets ( void* b, c-string buf, int size )
+FUNCTION: int BIO_gets ( void* b, void* buf, int size )
 
 FUNCTION: int BIO_write ( void* b, void* buf, int len )
 
@@ -123,6 +123,9 @@ FUNCTION: ulong ERR_get_error ( )
 FUNCTION: void ERR_clear_error ( )
 
 FUNCTION: c-string ERR_error_string ( ulong e, void* buf )
+FUNCTION: void ERR_error_string_n ( ulong e, void* buf, size_t len )
+
+FUNCTION: void DH_free ( void* dh )
 
 FUNCTION: void* BIO_f_buffer ( )
 
@@ -162,18 +165,18 @@ FUNCTION: void EVP_cleanup ( )
 
 FUNCTION: EVP_MD* EVP_get_digestbyname ( c-string name )
 
-FUNCTION: void EVP_MD_CTX_init ( EVP_MD* ctx )
+FUNCTION: void EVP_MD_CTX_init ( EVP_MD_CTX* ctx )
 
 FUNCTION: int EVP_MD_CTX_cleanup ( EVP_MD_CTX* ctx )
 FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in )
 
 FUNCTION: int EVP_DigestInit_ex ( EVP_MD_CTX* ctx, EVP_MD* type, ENGINE* impl )
 
-FUNCTION: int EVP_DigestUpdate ( EVP_MD_CTX* ctx, void* d, uint cnt )
+FUNCTION: int EVP_DigestUpdate ( EVP_MD_CTX* ctx, void* d, size_t cnt )
 
 FUNCTION: int EVP_DigestFinal_ex ( EVP_MD_CTX* ctx, void* md, uint* s )
 
-FUNCTION: int EVP_Digest ( void* data, uint count, void* md, uint* size, EVP_MD* type, ENGINE* impl )
+FUNCTION: int EVP_Digest ( void* data, size_t count, void* md, uint* size, EVP_MD* type, ENGINE* impl )
 
 FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in )
 
@@ -231,9 +234,9 @@ FUNCTION: void* EC_POINT_new ( void* group )
 
 FUNCTION: void EC_POINT_clear_free ( void* point )
 
-FUNCTION: int EC_POINT_point2oct ( void* group, void* point, int form, void* buf, int len, void* ctx )
+FUNCTION: size_t EC_POINT_point2oct ( void* group, void* point, int form, void* buf, size_t len, void* ctx )
 
-FUNCTION: int EC_POINT_oct2point ( void* group, void* point, void* buf, int len, void* ctx )
+FUNCTION: int EC_POINT_oct2point ( void* group, void* point, void* buf, size_t len, void* ctx )
 
 FUNCTION: void* EC_KEY_new_by_curve_name ( int nid )
 

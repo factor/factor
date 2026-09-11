@@ -1,5 +1,5 @@
 USING: accessors byte-arrays checksums checksums.openssl
-combinators.short-circuit kernel system tools.test ;
+combinators.short-circuit destructors kernel namespaces sets system tools.test ;
 
 {
     B{ 201 238 222 100 92 200 182 188 138 255 129 163 115 88 240 136 }
@@ -25,3 +25,9 @@ combinators.short-circuit kernel system tools.test ;
 must-fail-with
 
 { } [ image-path openssl-sha1 checksum-file drop ] unit-test
+
+{ t } [
+    disposables get cardinality
+    [ B{ } "not-a-digest" <openssl-checksum> checksum-bytes ] must-fail
+    disposables get cardinality =
+] unit-test

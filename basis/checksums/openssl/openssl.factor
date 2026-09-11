@@ -29,7 +29,8 @@ TUPLE: evp-md-context < disposable handle ;
     ssl-new-api? get-global [ EVP_MD_CTX_free ] [ EVP_MD_CTX_destroy ] if ;
 
 : <evp-md-context> ( -- ctx )
-    evp-md-context new-disposable evp-md-ctx-new >>handle ;
+    evp-md-ctx-new dup ssl-error
+    evp-md-context new-disposable swap >>handle ;
 
 M: evp-md-context dispose*
     handle>> evp-md-ctx-free ;
@@ -41,7 +42,9 @@ M: evp-md-context dispose*
     handle>> swap digest-named f EVP_DigestInit_ex ssl-error ;
 
 M: openssl-checksum initialize-checksum-state
-    maybe-init-ssl name>> <evp-md-context> [ set-digest ] keep ;
+    maybe-init-ssl [
+        name>> <evp-md-context> |dispose [ set-digest ] keep
+    ] with-destructors ;
 
 M: evp-md-context add-checksum-bytes
     [ dup handle>> ] dip dup length EVP_DigestUpdate ssl-error ;
