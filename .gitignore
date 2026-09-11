@@ -10,6 +10,7 @@
 *.gch*
 gc-tests
 gc-tests.dSYM/
+unix-signals-tests
 *.image
 factor.image.*
 boot.*.image.*

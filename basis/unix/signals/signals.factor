@@ -1,18 +1,30 @@
 ! Copyright (C) 2011 Joe Groff.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs io kernel math namespaces sequences
+USING: accessors assocs io kernel literals math namespaces sequences
 system threads ;
 IN: unix.signals
 
-CONSTANT: signal-names
-{
-    "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
-    "SIGEMT" "SIGFPE" "SIGKILL" "SIGBUS" "SIGSEGV" "SIGSYS"
-    "SIGPIPE" "SIGALRM" "SIGTERM" "SIGURG" "SIGSTOP" "SIGTSIP"
-    "SIGCONT" "SIGCHLD" "SIGTTIN" "SIGTTOU" "SIGIO" "SIGXCPU"
-    "SIGXFSZ" "SIGVTALRM" "SIGPROF" "SIGWINCH" "SIGINFO"
-    "SIGUSR1" "SIGUSR2"
-}
+CONSTANT: signal-names $[
+    os linux? [
+        {
+            "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
+            "SIGBUS" "SIGFPE" "SIGKILL" "SIGUSR1" "SIGSEGV" "SIGUSR2"
+            "SIGPIPE" "SIGALRM" "SIGTERM" "SIGSTKFLT" "SIGCHLD"
+            "SIGCONT" "SIGSTOP" "SIGTSTP" "SIGTTIN" "SIGTTOU"
+            "SIGURG" "SIGXCPU" "SIGXFSZ" "SIGVTALRM" "SIGPROF"
+            "SIGWINCH" "SIGIO" "SIGPWR" "SIGSYS"
+        }
+    ] [
+        {
+            "SIGHUP" "SIGINT" "SIGQUIT" "SIGILL" "SIGTRAP" "SIGABRT"
+            "SIGEMT" "SIGFPE" "SIGKILL" "SIGBUS" "SIGSEGV" "SIGSYS"
+            "SIGPIPE" "SIGALRM" "SIGTERM" "SIGURG" "SIGSTOP" "SIGTSTP"
+            "SIGCONT" "SIGCHLD" "SIGTTIN" "SIGTTOU" "SIGIO" "SIGXCPU"
+            "SIGXFSZ" "SIGVTALRM" "SIGPROF" "SIGWINCH" "SIGINFO"
+            "SIGUSR1" "SIGUSR2"
+        }
+    ] if
+]
 
 TUPLE: signal n ;
 

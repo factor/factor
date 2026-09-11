@@ -382,6 +382,17 @@ $(BUILD_DIR)/gc-tests$(EXE_EXTENSION): vm/tests/gc.cpp $(DLL_OBJS)
 test-vm: $(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
 	./$(BUILD_DIR)/gc-tests$(EXE_EXTENSION)
 
+ifneq ($(filter $(BUILD_DIR)/os-unix.o,$(DLL_OBJS)),)
+$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION): vm/tests/unix_signals.cpp $(DLL_OBJS)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(DLL_OBJS) $(LIBS)
+
+.PHONY: test-unix-signals
+test-unix-signals: $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
+	./$(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
+
+test-vm: test-unix-signals
+endif
+
 .SUFFIXES: .mm
 
 endif

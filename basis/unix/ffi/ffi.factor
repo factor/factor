@@ -32,9 +32,12 @@ CONSTANT: DT_LNK      10
 CONSTANT: DT_SOCK     12
 CONSTANT: DT_WHT      14
 
-: SIG_EFF ( -- obj ) ALIEN: -1 void* <ref> ; inline
-: SIG_DFL ( -- obj ) ALIEN: 0 void* <ref> ; inline
-: SIG_IGN ( -- obj ) ALIEN: 1 void* <ref> ; inline
+! Construct these at runtime: literal aliens expire when an image is loaded.
+: SIG_ERR ( -- obj ) -1 <alien> ; inline
+! Keep the historical misspelling for existing callers.
+: SIG_EFF ( -- obj ) SIG_ERR ; inline
+: SIG_DFL ( -- obj ) f ; inline
+: SIG_IGN ( -- obj ) 1 <alien> ; inline
 
 ! Possible values for 'ai_flags' in 'addrinfo'.
 CONSTANT: AI_PASSIVE        0x0001

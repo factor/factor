@@ -151,7 +151,7 @@ IN: io.launcher.unix.tests
     ]
 ] unit-test
 
-! Make sure that subprocesses don't inherit our signal mask
+! Make sure that subprocesses don't inherit our ignored signal disposition
 
 ! First, ensure that the Factor VM ignores SIGPIPE
 : send-sigpipe ( pid -- )
@@ -168,6 +168,32 @@ IN: io.launcher.unix.tests
     [ 2 seconds swap set-timeout ]
     [ wait-for-process ]
     tri
+] unit-test
+
+USING: alien.c-types byte-arrays continuations io.launcher.unix
+unix.types ;
+QUALIFIED: unix.ffi
+
+! Check the disposition before exec, which would reset a bogus handler.
+:: test-reset-sigpipe ( -- default? )
+    SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal :> previous
+    [
+        reset-ignored-signals
+        SIGPIPE unix.ffi:SIG_IGN unix.ffi:signal unix.ffi:SIG_DFL =
+    ] [ SIGPIPE previous unix.ffi:signal drop ] finally ;
+
+{ t } [ test-reset-sigpipe ] unit-test
+
+! A sigset_t is opaque; shifting by the signal number also selected SIGALRM.
+{ 1 0 } [
+    posix-spawnattr-init [
+        [
+            reset-ignored-signals*
+            sigset_t heap-size <byte-array>
+            [ posix_spawnattr_getsigdefault check-posix ] keep
+            [ SIGPIPE sigismember ] [ SIGALRM sigismember ] bi
+        ] keep
+    ] [ posix-spawnattr-destroy ] finally
 ] unit-test
 
 ! Test priority

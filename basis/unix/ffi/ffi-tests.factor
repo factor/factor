@@ -30,8 +30,24 @@ off_t heap-size 8 = [
     { } [ "factor-truncate-" "" [ check-large-truncation ] cleanup-unique-file ] unit-test
 ] when
 
-USING: alien.accessors alien.data byte-arrays system words ;
+USING: alien alien.accessors alien.data byte-arrays system words ;
 QUALIFIED: unix.ffi
+
+! signal(2) takes the sentinel itself, not storage containing its address.
+{ f } [ SIG_DFL ] unit-test
+{ t } [ SIG_IGN 1 <alien> = ] unit-test
+{ t } [ SIG_EFF -1 <alien> = ] unit-test
+{ t } [ SIG_ERR -1 <alien> = ] unit-test
+{ t } [ SIGKILL SIG_DFL unix.ffi:signal SIG_ERR = ] unit-test
+
+USING: unix.process ;
+
+:: test-ignore-signal ( -- status )
+    SIGUSR1 SIG_IGN unix.ffi:signal :> previous
+    [ SIGUSR1 raise ]
+    [ SIGUSR1 previous unix.ffi:signal drop ] finally ;
+
+{ 0 } [ test-ignore-signal ] unit-test
 
 ! The anonymous pointer must use the variadic ABI, even though this wrapper
 ! deliberately accepts exactly one request argument.

@@ -1,7 +1,20 @@
-USING: assocs calendar concurrency.promises continuations kernel
+USING: accessors assocs calendar concurrency.promises continuations kernel
 libc locals namespaces sequences threads tools.test unix.ffi
 unix.process unix.signals unix.signals.private ;
+FROM: unix.signals => signal ;
 IN: unix.signals.tests
+
+! Signal numbers are platform-specific, including the two user signals.
+{ "SIGUSR1" } [ SIGUSR1 signal-name ] unit-test
+{ "SIGUSR2" } [ SIGUSR2 signal-name ] unit-test
+{ "SIGCHLD" } [ SIGCHLD signal-name ] unit-test
+{ "SIGCONT" } [ SIGCONT signal-name ] unit-test
+{ "SIGSTOP" } [ SIGSTOP signal-name ] unit-test
+{ "SIGTSTP" } [ SIGTSTP signal-name ] unit-test
+{ "SIGBUS" } [ SIGBUS signal-name ] unit-test
+{ "SIGSYS" } [ SIGSYS signal-name ] unit-test
+{ "SIGUSR1" } [ signal new SIGUSR1 >>n signal-name ] unit-test
+{ f f f } [ -1 signal-name 0 signal-name 1000 signal-name ] unit-test
 
 :: test-sigusr1 ( delay -- received? registered? )
     <promise> :> received
