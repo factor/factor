@@ -36,7 +36,7 @@ GENERIC: new-user ( user provider -- user/f )
 :: claim-ticket ( ticket username provider -- user/f )
     username provider get-user :> user
     user [
-        user ticket>> ticket = [
+        user ticket>> dup empty? [ drop f ] [ ticket = ] if [
             user f >>ticket dup provider update-user
         ] [ f ] if
     ] [ f ] if ;
@@ -44,4 +44,4 @@ GENERIC: new-user ( user provider -- user/f )
 ! For configuration
 
 : add-user ( provider user -- provider )
-    over new-user [ "User exists" throw ] when ;
+    over new-user [ "User exists" throw ] unless ;

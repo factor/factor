@@ -86,10 +86,14 @@ M: user-saver dispose*
 : save-user-after ( user -- )
     <user-saver> &dispose drop ;
 
+: active-user ( user/f -- user/f )
+    dup [ dup deleted>> 1 = [ drop f ] when ] when ;
+
 : init-user ( user -- )
+    active-user
     [ [ logged-in-user namespaces:set ] [ save-user-after ] bi ] when* ;
 
-\ init-user DEBUG add-input-logging
+\ init-user DEBUG add-logging
 
 M: realm call-responder*
     dup realm namespaces:set
@@ -113,7 +117,8 @@ M: realm call-responder*
     [ salt>> encode-password ] [ password>> ] bi = ;
 
 : check-login ( password username -- user/f )
-    users get-user [ valid-login? ] 1guard ;
+    users get-user active-user
+    dup [ [ valid-login? ] 1guard ] [ nip ] if ;
 
 : if-secure-realm ( quot -- )
     realm get secure>> [ if-secure ] [ call ] if ; inline

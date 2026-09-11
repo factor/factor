@@ -37,14 +37,14 @@ M: login-realm modify-form
 : put-permit-cookie ( response -- response' )
     <permit-cookie> put-cookie ;
 
-\ put-permit-cookie DEBUG add-input-logging
+\ put-permit-cookie DEBUG add-logging
 
 : successful-login ( user -- response )
     [ username>> make-permit permit-id set ] [ init-user ] bi
     URL" $realm" end-aside
     put-permit-cookie ;
 
-\ successful-login DEBUG add-input-logging
+\ successful-login DEBUG add-logging
 
 : logout ( -- response )
     permit-id get [ delete-permit ] when*

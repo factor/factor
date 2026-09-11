@@ -67,7 +67,7 @@ M: asides call-responder*
     [ [ data>> params>> params set ] [ url>> url set ] bi ]
     [ url>> path>> split-path asides get responder>> call-responder ] bi ;
 
-\ end-aside-post DEBUG add-input-logging
+\ end-aside-post DEBUG add-logging
 
 ERROR: end-aside-in-get-error ;
 
