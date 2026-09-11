@@ -1,5 +1,7 @@
-USING: help.markup help.syntax math ;
+USING: help help.markup help.syntax kernel math ;
 IN: shuffle
+
+M: shuffle-word word-help* drop { $shuffle } ;
 
 HELP: nreverse
 { $values { "n" integer } }
