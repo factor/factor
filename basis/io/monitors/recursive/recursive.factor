@@ -3,7 +3,7 @@
 USING: accessors assocs combinators concurrency.mailboxes
 concurrency.messaging concurrency.promises continuations
 destructors io.directories io.files.info io.monitors
-io.monitors.private io.pathnames kernel sequences threads ;
+io.monitors.private io.pathnames kernel locals sequences splitting threads ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
@@ -33,8 +33,15 @@ DEFER: add-child-monitor
         ] bi
     ] [ drop ] if ;
 
-: remove-child-monitor ( monitor -- )
-    monitor tget children>> delete-at* [ dispose ] [ drop ] if ;
+:: remove-child-monitor ( path -- )
+    monitor tget children>> :> children
+    ! A removed or moved directory takes all its descendant watches with
+    ! it. Match a path component boundary so siblings keep their watches.
+    children keys [
+        path ?head
+        [ [ t ] [ first path-separator? ] if-empty ] [ drop f ] if
+    ] filter
+    [ children delete-at* drop ] map dispose-each ;
 
 SYMBOL: +stop+
 
@@ -70,7 +77,7 @@ M: recursive-monitor dispose*
 : pump-loop ( -- )
     receive {
         { [ dup +stop+ eq? ] [ drop stop-pump ] }
-        { [ dup monitor-disposed eq? ] [ drop ] }
+        { [ dup monitor-disposed eq? ] [ drop pump-loop ] }
         [
             [ '[ _ update-hierarchy ] ignore-errors ] [ pump-step ] bi
             pump-loop

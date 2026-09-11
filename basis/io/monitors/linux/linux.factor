@@ -55,13 +55,16 @@ M: linux (monitor)
 M: linux-monitor dispose*
     [ [ wd>> ] [ watches>> ] bi delete-at ]
     [
-        dup inotify>> disposed>> [ drop ] [
-            [ inotify>> handle>> handle-fd ] [ wd>> ] bi
-            inotify_rm_watch io-error
-        ] if
-    ]
-    [ call-next-method ]
-    tri ;
+        [
+            dup inotify>> disposed>> [ ] [
+                dup [ inotify>> handle>> handle-fd ] [ wd>> ] bi
+                inotify_rm_watch 0 < [
+                    ! The kernel may already have removed this watch.
+                    errno dup EINVAL = [ drop ] [ (throw-errno) ] if
+                ] when
+            ] if
+        ] [ call-next-method ] finally
+    ] bi ;
 
 : ignore-flags? ( mask -- ? )
     flags{
@@ -105,10 +108,16 @@ M: linux-monitor dispose*
     len>> inotify-event heap-size +
     swap [ + ] dip ;
 
+: handle-notify ( event -- )
+    dup wd>> wd>monitor [
+        over mask>> IN_IGNORED bitand zero? [
+            [ parse-file-notify ] dip queue-change
+        ] [ nip dispose ] if
+    ] [ drop ] if* ;
+
 : parse-file-notifications ( i buffer -- )
     2dup events-exhausted? [ 2drop ] [
-        2dup inotify-event@ dup wd>> wd>monitor
-        [ parse-file-notify ] dip queue-change
+        2dup inotify-event@ handle-notify
         next-event parse-file-notifications
     ] if ;
 

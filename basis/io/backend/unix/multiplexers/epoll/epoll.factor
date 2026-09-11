@@ -17,7 +17,7 @@ CONSTANT: max-events 256
     [
         epoll-mx new-mx |dispose
             max-events <epoll-event-array> >>events
-            max-events epoll_create dup io-error >>fd
+            EPOLL_CLOEXEC epoll_create1 dup io-error >>fd
     ] with-destructors ;
 
 M: epoll-mx dispose* fd>> [ close-file ] when* ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Doug Coleman, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
-destructors io.backend io.files.info kernel math system vocabs ;
+destructors io.backend io.files.info kernel locals math system vocabs ;
 IN: io.mmap
 
 TUPLE: mapped-file < disposable address handle length ;
@@ -13,12 +13,15 @@ ERROR: bad-mmap-size n ;
 HOOK: (mapped-file-reader) os ( path length -- address handle )
 HOOK: (mapped-file-r/w) os ( path length -- address handle )
 
-: prepare-mapped-file ( path quot -- mapped-file path' length )
-    [
-        [ normalize-path ] [ file-info size>> ] bi
-        [ dup 0 <= [ bad-mmap-size ] [ 2drop ] if ]
-        [ nip mapped-file new-disposable swap >>length ]
-    ] dip 2tri [ >>address ] [ >>handle ] bi* ; inline
+:: prepare-mapped-file ( path quot -- mapped-file )
+    path normalize-path :> path'
+    path' file-info size>> :> length
+    length 0 <= [ length bad-mmap-size ] when
+    path' length quot call :> ( address handle )
+    mapped-file new-disposable
+        address >>address
+        handle >>handle
+        length >>length ; inline
 
 PRIVATE>
 

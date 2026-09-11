@@ -1,11 +1,16 @@
-USING: alien.c-types alien.data compiler.tree.debugger
-io.encodings.ascii io.files io.mmap kernel locals math sequences
-sequences.private specialized-arrays tools.test ;
+USING: alien.c-types alien.data compiler.tree.debugger destructors
+io.encodings.ascii io.files io.mmap kernel locals math namespaces
+sequences sequences.private sets specialized-arrays tools.test ;
 
 SPECIALIZED-ARRAY: uint
 
 [| path |
     "12345" path ascii set-file-contents
+    { t } [
+        disposables get cardinality
+        10 [ path [ drop ] with-mapped-file-reader ] times
+        disposables get cardinality =
+    ] unit-test
     { } [ path [ char <mapped-array> CHAR: 2 0 pick set-nth drop ] with-mapped-file ] unit-test
     { 5 } [ path [ char <mapped-array> length ] with-mapped-file ] unit-test
     { 5 } [ path [ char <mapped-array> length ] with-mapped-file-reader ] unit-test

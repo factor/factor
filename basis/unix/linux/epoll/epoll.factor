@@ -5,6 +5,9 @@ classes.parser combinators kernel math system ;
 IN: unix.linux.epoll
 
 FUNCTION: int epoll_create ( int size )
+FUNCTION: int epoll_create1 ( int flags )
+
+CONSTANT: EPOLL_CLOEXEC 0o2000000
 
 <<
 UNION-STRUCT: epoll-data

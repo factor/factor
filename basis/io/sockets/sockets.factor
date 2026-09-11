@@ -362,19 +362,19 @@ SYMBOL: remote-address
 : <datagram> ( addrspec -- datagram )
     [
         [ (datagram) |dispose ] keep
-        [ drop datagram-port <port> ] [ get-local-address ] 2bi
+        [ drop datagram-port <port> |dispose ] [ get-local-address ] 2bi
         >>addr
     ] with-destructors ;
 
 : <raw> ( addrspec -- datagram )
     [
         [ (raw) |dispose ] keep
-        [ drop raw-port <port> ] [ get-local-address ] 2bi
+        [ drop raw-port <port> |dispose ] [ get-local-address ] 2bi
         >>addr
     ] with-destructors ;
 
 : <broadcast> ( addrspec -- datagram )
-    <datagram> (broadcast) ;
+    [ <datagram> |dispose (broadcast) ] with-destructors ;
 
 : receive-unsafe ( n buf datagram -- count addrspec )
     check-receive
@@ -418,7 +418,7 @@ M:: string resolve-host ( host -- seq )
             dup addrinfo-error-string host addrinfo-error
         ] unless-zero
     ] keep void* deref addrinfo memory>struct
-    [ parse-addrinfo-list ] keep freeaddrinfo ;
+    [ [ parse-addrinfo-list ] keep ] [ freeaddrinfo ] finally ;
 
 M: string with-port <inet> ;
 

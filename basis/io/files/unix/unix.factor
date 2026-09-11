@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays continuations destructors environment
-io.backend.unix io.files io.files.private io.pathnames io.ports kernel
-libc literals math system unix unix.ffi ;
+USING: accessors alien.destructors byte-arrays continuations
+destructors environment io.backend.unix io.files io.files.private
+io.pathnames io.ports kernel libc literals math system unix unix.ffi ;
 IN: io.files.unix
 
 : (cwd) ( bufsiz -- path )
@@ -44,9 +44,11 @@ M: unix (file-writer-secure)
 
 CONSTANT: append-flags flags{ O_WRONLY O_APPEND O_CREAT }
 
+DESTRUCTOR: close-file
+
 : open-append ( path -- fd )
     [
-        append-flags O_NONBLOCK bitor file-mode open-file |dispose
+        append-flags O_NONBLOCK bitor file-mode open-file |close-file
         [ dup 0 SEEK_END [ lseek ] unix-system-call drop ] [
             dup errno>> ESPIPE = [ drop ] [ rethrow ] if
         ] recover
