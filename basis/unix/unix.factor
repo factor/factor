@@ -19,18 +19,20 @@ MACRO:: unix-system-call ( quot -- quot )
     quot inputs :> n
     quot first :> word
     0 :> ret!
+    0 :> error!
     f :> failed!
     [
         [
             n ndup quot call ret!
+            errno error!
             ret {
                 [ unix-call-failed? dup failed! ]
-                [ drop errno EINTR = ]
+                [ drop error EINTR = ]
             } 1&&
         ] loop
         failed [
             n narray
-            errno dup strerror
+            error dup strerror
             word unix-system-call-error
         ] [
             n ndrop
@@ -42,20 +44,21 @@ MACRO:: unix-system-call-allow-eintr ( quot -- quot )
     quot inputs :> n
     quot first :> word
     0 :> ret!
+    0 :> error!
     [
         n ndup quot call ret!
+        errno error!
         ret unix-call-failed? [
             ! Bug #908
             ! Allow EINTR for close(2)
-            errno EINTR = [
+            error EINTR = [
                 n narray
-                errno dup strerror
+                error dup strerror
                 word unix-system-call-error
             ] unless
-        ] [
-            n ndrop
-            ret
-        ] if
+        ] when
+        n ndrop
+        ret
     ] ;
 
 HOOK: open-file os ( path flags mode -- fd )
