@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: calendar db db.tuples furnace.asides
+USING: calendar continuations db db.tuples furnace.asides
 furnace.auth.login.permits furnace.auth.providers furnace.cache
-furnace.conversations furnace.db furnace.sessions kernel
+furnace.conversations furnace.db furnace.sessions kernel logging
 sequences timers ;
 IN: furnace.alloy
 
@@ -21,7 +21,15 @@ CONSTANT: state-classes { session aside conversation permit }
     ] dip
     <db-persistence> ;
 
+<PRIVATE
+
+: expire-sessions ( db -- )
+    "furnace.alloy" [
+        [ [ state-classes [ expire-state ] each ] with-db ]
+        [ nip \ expire-sessions log-error ] recover
+    ] with-logging ;
+
+PRIVATE>
+
 : start-expiring ( db -- )
-    '[
-        _ [ state-classes [ expire-state ] each ] with-db
-    ] 5 minutes every drop ;
+    '[ _ expire-sessions ] 5 minutes every drop ;

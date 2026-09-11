@@ -21,7 +21,10 @@ IN: io.sockets.unix
     [ handle-fd ] 2dip 1 int <ref> dup byte-length setsockopt io-error ;
 
 M: unix addrinfo-error-string
-    gai_strerror ;
+    dup EAI_SYSTEM = [
+        ! Capture errno before gai_strerror or string allocation can change it.
+        errno [ gai_strerror ] dip strerror ": " glue
+    ] [ gai_strerror ] if ;
 
 M: unix sockaddr-of-family
     {

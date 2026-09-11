@@ -1,7 +1,32 @@
-USING: accessors arrays concurrency.flags fry io
-io.encodings.ascii io.encodings.utf8 io.servers
-io.servers.private io.sockets kernel namespaces sequences sets
-threads tools.test ;
+USING: accessors arrays calendar concurrency.conditions
+concurrency.flags concurrency.mailboxes destructors fry io
+io.encodings.ascii io.encodings.utf8 io.servers io.servers.private
+io.sockets kernel locals namespaces sequences sets threads tools.test ;
+
+! A slot belongs to the live handler, including stream cleanup.
+{ t } [
+    <mailbox> [| started |
+        ascii <threaded-server>
+            1 >>max-connections
+            "127.0.0.1" 0 <inet4> >>insecure
+            [
+                t started mailbox-put
+                read1 CHAR: x = [ "test handler failure" throw ] when
+            ] >>handler
+        [
+            [
+                insecure-addr ascii <client> drop &dispose :> first-client
+                started 5 seconds mailbox-get-timeout drop
+                insecure-addr ascii <client> drop &dispose drop
+                [ started 100 milliseconds mailbox-get-timeout drop ]
+                [ timed-out-error? ] must-fail-with
+                CHAR: x first-client stream-write1
+                first-client stream-flush
+                started 5 seconds mailbox-get-timeout
+            ] with-destructors
+        ] with-threaded-server
+    ] call
+] unit-test
 
 { t } [ ascii <threaded-server> listen-on empty? ] unit-test
 

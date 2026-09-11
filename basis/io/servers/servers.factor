@@ -3,7 +3,7 @@
 USING: accessors arrays calendar concurrency.flags
 concurrency.semaphores continuations destructors io io.sockets
 io.sockets.secure io.streams.duplex io.styles io.timeouts kernel
-logging make math namespaces present prettyprint random
+locals logging make math namespaces present prettyprint random
 sequences sets strings threads ;
 IN: io.servers
 
@@ -111,15 +111,20 @@ M: threaded-server handle-client* handler>> call( -- ) ;
 
 : (accept-connection) ( server -- )
     [ accept ] [ addr>> ] bi
-    [ '[ _ _ _ handle-client ] ]
+    [ '[
+        [ _ _ _ handle-client ]
+        [ threaded-server get semaphore>> [ release ] when* ] finally
+    ] ]
     [ drop client-thread-name ] 2bi
     spawn drop ;
 
-: accept-connection ( server -- )
-    threaded-server get semaphore>>
-    [ [ (accept-connection) ] with-semaphore ]
-    [ (accept-connection) ]
-    if* ;
+:: accept-connection ( server -- )
+    threaded-server get semaphore>> :> semaphore
+    semaphore [
+        semaphore acquire
+        ! The client thread releases the slot after closing its stream.
+        [ server (accept-connection) ] [ ] [ semaphore release ] cleanup
+    ] [ server (accept-connection) ] if ;
 
 : with-existing-secure-context ( threaded-server quot -- )
     [ secure-context>> secure-context ] dip with-variable ; inline

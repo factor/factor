@@ -3,6 +3,8 @@ classes.struct combinators kernel system unix unix.time
 unix.types vocabs vocabs.loader ;
 IN: unix.ffi
 
+CONSTANT: EAI_SYSTEM 11
+
 FUNCTION: int getgrouplist ( c-string name, int basegid, int* groups, int* ngroups )
 FUNCTION: int setgroups ( int ngroups, gid_t* gidset )
 

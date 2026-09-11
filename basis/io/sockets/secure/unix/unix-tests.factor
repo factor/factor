@@ -2,13 +2,38 @@ USING: accessors bootstrap.image.download calendar classes
 concurrency.conditions concurrency.mailboxes
 concurrency.promises continuations destructors io
 io.backend.unix io.encodings.ascii io.files.temp io.sockets
-io.sockets.secure io.sockets.secure.debug io.streams.duplex
-io.timeouts kernel namespaces sequences system threads
-tools.test ;
+io.sockets.secure io.sockets.secure.debug io.sockets.secure.openssl
+io.streams.duplex io.timeouts kernel namespaces sequences sets
+openssl.libcrypto strings system threads tools.test ;
+FROM: namespaces => set ;
 QUALIFIED-WITH: concurrency.messaging qm
 IN: io.sockets.secure.tests
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
+
+! A queued OpenSSL error must retain its native diagnostic.
+[
+    [
+        ERR_clear_error
+        "missing/file.pem" "r" BIO_new_file drop
+        ssl-handle new ssl-error-syscall
+    ] with-test-directory
+] [ string? ] must-fail-with
+
+! SNI setup can fail after allocating SSL and its socket BIO.
+! The failed constructor must release both the SSL handle and the fd.
+{ t } [
+    <secure-config> [
+        disposables get cardinality
+        [
+            [
+                "127.0.0.1" 0 <inet4> <datagram> &dispose
+                handle>> 256 CHAR: x <string> <ssl-socket> dispose
+            ] with-destructors
+        ] must-fail
+        disposables get cardinality =
+    ] with-secure-context
+] unit-test
 
 :: server-test ( quot: ( remote -- ) -- )
     [
@@ -100,4 +125,3 @@ IN: io.sockets.secure.tests
 { } [
     [ download-my-image ] with-temp-directory
 ] unit-test
-

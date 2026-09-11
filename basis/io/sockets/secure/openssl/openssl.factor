@@ -246,10 +246,9 @@ SYMBOL: default-secure-context
 
 : <ssl-handle> ( fd -- ssl )
     [
-        ssl-handle new-disposable |dispose
+        ssl-handle new-disposable swap >>file |dispose
         current-secure-context handle>> SSL_new
         dup ssl-error >>handle
-        swap >>file
         set-secure-cipher-list-only
     ] with-destructors ;
 
@@ -298,18 +297,21 @@ SYMBOL: default-secure-context
 PRIVATE>
 
 :: <ssl-socket> ( winsock hostname -- ssl )
-    winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
-    winsock <ssl-handle> :> handle
-    handle handle>> :> native-handle
-    current-secure-context config>> alpn-supported-protocols>>
-    [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
-    unless-empty
-    hostname [
-        utf8 string>alien
-        native-handle swap SSL_set_tlsext_host_name ssl-error
-    ] when*
-    native-handle bio bio SSL_set_bio
-    handle ;
+    [
+        winsock |dispose <ssl-handle> |dispose :> handle
+        handle handle>> :> native-handle
+        winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
+        ! Transfer the BIO to SSL before any further fallible setup.
+        native-handle bio bio SSL_set_bio
+        current-secure-context config>> alpn-supported-protocols>>
+        [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
+        unless-empty
+        hostname [
+            utf8 string>alien
+            native-handle swap SSL_set_tlsext_host_name ssl-error
+        ] when*
+        handle
+    ] with-destructors ;
 
 : ssl-error-syscall ( ssl-handle -- event/f )
     f >>connected
@@ -322,6 +324,7 @@ PRIVATE>
         ! https://stackoverflow.com/questions/13686398/ssl-read-failing-with-ssl-error-syscall-error
         ! 0 means EOF
         { 0 [ f ] }
+        [ (ssl-error-string) throw ]
     } case ;
 
 : check-ssl-error ( ssl-handle ret -- event/f )
