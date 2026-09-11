@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs byte-arrays combinators hashtables
 http http.parsers io io.encodings.binary io.files io.files.temp
-io.files.unique io.streams.string kernel math quoting sequences
+io.files.unique io.streams.string kernel math math.order quoting sequences
 splitting ;
 IN: mime.multipart
 
@@ -49,10 +49,13 @@ ERROR: mime-decoding-ran-out-of-bytes ;
         [ mime-write ]
         [ swap length tail-slice >>bytes ] bi*
     ] [
-        tuck swap 2length - 1 - cut-slice
+        ! A short read may contain less than one separator. Keep it all
+        ! until the next read instead of constructing a negative slice.
+        tuck swap 2length - 1 - 0 max cut-slice
         [ mime-write ]
         [ >>bytes ] bi* fill-bytes
-        dup end-of-stream?>> [ dump-until-separator ] unless
+        dup end-of-stream?>> [ mime-decoding-ran-out-of-bytes ] when
+        dump-until-separator
     ] if* ;
 
 : dump-string ( multipart separator -- multipart string )

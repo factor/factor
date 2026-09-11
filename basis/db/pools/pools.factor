@@ -7,6 +7,8 @@ TUPLE: db-pool < pool db ;
 
 : <db-pool> ( db -- pool )
     db-pool <pool>
+        ! Do not retain every connection from a traffic burst indefinitely.
+        16 >>max-idle
         swap >>db ;
 
 : with-db-pool ( db quot -- )

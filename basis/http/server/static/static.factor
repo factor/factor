@@ -3,7 +3,7 @@
 IN: http.server.static
 DEFER: file-responder ! necessary for cgi-docs
 DEFER: <static> ! necessary for cgi-docs
-USING: accessors assocs calendar.parser combinators destructors
+USING: accessors assocs calendar.parser combinators continuations destructors
 html html.templates.fhtml http http.server
 http.server.redirection http.server.responses io.directories
 io.encodings.binary io.files io.files.info io.pathnames kernel
@@ -15,7 +15,8 @@ TUPLE: file-responder root hook special index-names allow-listings ;
 
 : modified-since ( request -- date )
     "if-modified-since" header ";" split1 drop
-    dup [ rfc822>timestamp ] when ;
+    ! An invalid conditional date must be ignored, not fail the request.
+    dup [ [ rfc822>timestamp ] [ 2drop f ] recover ] when ;
 
 : modified-since? ( filename -- ? )
     request get modified-since dup

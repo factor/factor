@@ -1,6 +1,14 @@
-USING: furnace.utilities io.encodings.utf8 io.files io.files.temp kernel
-multiline parser tools.test webapps.counter ;
+USING: accessors furnace.utilities http io.encodings.utf8 io.files io.files.temp kernel
+multiline namespaces parser tools.test webapps.counter ;
 IN: furnace.utilities.tests
+
+{ f } [
+    <request> "OPTIONS" >>method request [ "__s" client-state ] with-variable
+] unit-test
+
+{ f } [
+    <request> "DELETE" >>method request [ "__s" client-state ] with-variable
+] unit-test
 
 <<
 STRING: dummy-vocab

@@ -85,7 +85,8 @@ HELP: resolve-word-path
 
 HELP: exit-with
 { $values { "value" object } }
-{ $description "Exits from an outer " { $link with-exit-continuation } "." } ;
+{ $description "Exits from an outer " { $link with-exit-continuation } "." }
+{ $warning "This is a continuation jump, not an exception. Cleanup in intervening finally, with-disposal, with-destructors, and with-db scopes is skipped. Perform validation and authorization that can exit before entering resource scopes." } ;
 
 HELP: with-exit-continuation
 { $values { "quot" { $quotation ( -- value ) } } { "value" "a value returned by the quotation or an " { $link exit-with } " invocation" } }

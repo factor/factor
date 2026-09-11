@@ -7,6 +7,25 @@ kernel ranges mime.multipart multiline namespaces random
 sequences sorting strings threads tools.test ;
 IN: mime.multipart.tests
 
+! Truncated headers and bodies should report a decoding error, even
+! when the remaining input is shorter than the separator.
+[
+    "--boundary\r\n" [ "boundary" parse-multipart ] with-string-reader
+] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
+
+[
+    "--boundary\r\nContent-Disposition: form-data; name=\"x\"\r\n\r\na"
+    [ "boundary" parse-multipart ] with-string-reader
+] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
+
+! A separator split across reads must preserve the short first chunk.
+{ "x" } [
+    "\nrest" [
+        "unused" <multipart> "x\r" >>bytes
+        "\r\n" dump-string nip
+    ] with-string-reader
+] unit-test
+
 CONSTANT: separator1 "----WebKitFormBoundary6odjpVPXIighAE2L"
 
 CONSTANT: upload1 "------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file1\"; filename=\"up.txt\"\r\nContent-Type: text/plain\r\n\r\nuploaded!\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file2\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"file3\"; filename=\"\"\r\n\r\n\r\n------WebKitFormBoundary6odjpVPXIighAE2L\r\nContent-Disposition: form-data; name=\"text1\"\r\n\r\nlol\r\n------WebKitFormBoundary6odjpVPXIighAE2L--\r\n"
@@ -84,4 +103,3 @@ SYMBOL: mime-test-server
         "\r\n\r\n" parse-multipart
     ] with-input-stream
 ] [ mime-decoding-ran-out-of-bytes? ] must-fail-with
-

@@ -170,12 +170,14 @@ HELP: sql-row-typed
 HELP: with-db
 { $values
     { "db" "a database configuration object" } { "quot" quotation } }
-{ $description "Calls the quotation with a database bound to the " { $link db-connection } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." } ;
+{ $description "Calls the quotation with a database bound to the " { $link db-connection } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." }
+{ $notes "Direct continuation jumps out of the quotation bypass connection disposal. Keep validation or other nonlocal exits outside this scope. See " { $link "destructors-continuations" } "." } ;
 
 HELP: with-transaction
 { $values
     { "quot" quotation } }
-{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." } ;
+{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." }
+{ $notes "Direct continuation jumps out of the quotation bypass both commit and rollback. See " { $link "destructors-continuations" } "." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
