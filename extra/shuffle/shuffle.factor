@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs combinators combinators.short-circuit
-definitions effects effects.parser generalizations help
-help.markup kernel math parser ranges sequences
-sequences.generalizations stack-checker.backend
-stack-checker.known-words stack-checker.values words ;
+definitions effects effects.parser generalizations kernel math
+parser ranges sequences sequences.generalizations
+stack-checker.backend stack-checker.known-words
+stack-checker.values words ;
 
 IN: shuffle
 
@@ -26,7 +26,6 @@ SYNTAX: SHUFFLE:
     scan-new-word scan-effect {
         [ [ '[ _ shuffle-effect ] ] keep define-declared ]
         [ "shuffle" set-word-prop ]
-        [ drop { $shuffle } swap set-word-help ]
     } 2cleave ;
 
 PREDICATE: shuffle-word < word
