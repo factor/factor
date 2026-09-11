@@ -8,7 +8,9 @@ HELP: <directwrite-layout>
     $nl
     "Long left-to-right printable ASCII lines retain an index of native shaped glyphs. Viewport rendering visits only intersecting glyph blocks. Glyph positions, width, carets, and selection rectangles all use double-precision advances across native run boundaries, avoiding overlaps caused by single-precision accumulation. The initial layout avoids a redundant width-dependent layout pass and extra ASCII-to-UTF-16 copies. Complex scripts continue to use native layout rendering. Equal output strings share a layout; repeated lookups of the same string object avoid comparing the whole string again."
     $nl
-    "The Windows UI stress test can be run with -run=ui.text.directwrite.stress-test. It prints twenty separate ten-million-character rows, verifies distant rendering, and reports horizontal and vertical scrolling times." } ;
+    "The Windows UI retains double-precision translations and rebases visible tiles before uploading their geometry to OpenGL. This avoids uneven spacing from single-precision coordinates near the ends of very long lines."
+    $nl
+    "The Windows UI stress test can be run with -run=ui.text.directwrite.stress-test. It prints twenty separate ten-million-character rows, compares framebuffer pixels near both ends of the line at several scroll positions, and reports horizontal and vertical scrolling times." } ;
 
 HELP: directwrite-offset>x
 { $values { "index" "a Factor codepoint index" } { "layout" "a DirectWrite layout" } { "x" "a backing-pixel coordinate" } }

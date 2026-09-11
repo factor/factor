@@ -5,7 +5,7 @@ USING: accessors alien.c-types alien.data arrays assocs byte-arrays
 calendar continuations debugger fonts io kernel locals math math.functions namespaces
 opengl opengl.gl prettyprint sequences sets strings system threads
 tools.time ui ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.worlds ui.private windows.directwrite
+ui.gadgets.worlds ui.private ui.render ui.text.directwrite.transforms windows.directwrite
 windows.directwrite.indexed windows.directwrite.render ;
 IN: ui.text.directwrite.stress-test
 
@@ -37,6 +37,45 @@ IN: ui.text.directwrite.stress-test
     scroller world near-x 0 scroll-frame 512 framebuffer-strip :> near
     scroller world far-x 0 scroll-frame 512 framebuffer-strip near assert= ;
 
+:: check-distant-tiles ( line scroller world -- )
+    ! Compare identical glyph phases near both ends of the actual 10M line.
+    ! Large GPU vertices/modelview translations used to lose whole pixels.
+    1024 line directwrite-offset>x floor 128 - gl-unscale :> near-x
+    { 32768 8960000 9999360 } [| offset |
+        offset line directwrite-offset>x floor 128 - gl-unscale :> far-x
+        { 0 1 127 255 } [| delta |
+            scroller world near-x delta gl-unscale + 0 scroll-frame
+            512 framebuffer-strip :> near
+            near members length 8 > t assert=
+            scroller world far-x delta gl-unscale + 0 scroll-frame
+            512 framebuffer-strip near assert=
+        ] each
+    ] each ;
+
+:: check-transform-scopes ( world -- )
+    world set-gl-context world gl-draw-init
+    native-directwrite-transform :> original
+    { -59114872.75 7 } [
+        current-directwrite-transform :> outer
+        { 1.25 2 } [
+            current-directwrite-transform
+            outer { 1.25 2 } translate-directwrite-transform assert=
+        ] with-translation
+        current-directwrite-transform outer assert=
+        [
+            1.25 1.5 gl-scale-2d
+            current-directwrite-transform
+            outer { 1.25 0 0 0 0 1.5 0 0 0 0 1 0 0 0 0 1 }
+            multiply-directwrite-transforms assert=
+        ] with-matrix
+        current-directwrite-transform outer assert=
+        [ [ "transform test" throw ] with-matrix ] [ drop ] recover
+        current-directwrite-transform outer assert=
+    ] with-translation
+    native-directwrite-transform original assert=
+    directwrite-transform get f assert=
+    gl-error ;
+
 :: exercise-output ( pane scroller world -- )
     500 milliseconds sleep
     "Printing 20 separate 10,000,000-character rows" print flush
@@ -51,6 +90,8 @@ IN: ui.text.directwrite.stress-test
     line line size>> first 64 - 0 2array { 64 15 }
     directwrite-layout>region-image bitmap>> members length 8 > t assert=
     line scroller world check-run-boundary
+    line scroller world check-distant-tiles
+    world check-transform-scopes
     scroller world 0 0 scroll-frame
     "Uncached horizontal and vertical scrolling" print
     20 [| i |
