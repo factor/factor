@@ -36,8 +36,9 @@ HELP: group-name
 HELP: group-struct
 { $values
     { "obj" object }
-    { "group/f" "a group struct or f" } }
-{ $description "Returns an alien group struct to be turned into a group tuple by calling subsequent words." } ;
+    { "group/f" "a group tuple or f" } }
+{ $description "Looks up a group by name or id and returns a managed " { $link group } " snapshot, or " { $link f } " if it is absent. All strings and member names are copied before releasing the native lookup buffer, so the result remains valid across garbage collections and subsequent lookups." }
+{ $notes "Earlier versions returned an alien struct pointing into a temporary buffer. Use the id, name, passwd, and members slots of the returned group tuple." } ;
 
 HELP: real-group-id
 { $values { "id" integer } }

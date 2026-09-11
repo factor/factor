@@ -2,9 +2,9 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien.c-types alien.data alien.utilities assocs
-byte-arrays classes.struct combinators continuations grouping
-io.encodings.utf8 kernel math math.parser namespaces sequences
-strings unix unix.ffi unix.users ;
+byte-arrays classes.struct combinators continuations destructors grouping
+io.encodings.utf8 kernel libc locals math math.parser namespaces sequences
+strings unix unix.ffi unix.types unix.users ;
 
 IN: unix.groups
 
@@ -19,23 +19,6 @@ GENERIC: group-struct ( obj -- group/f )
 : group-members ( group-struct -- seq )
     gr_mem>> utf8 alien>strings ;
 
-: (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    [ unix.ffi:group new ] dip over 4096
-    [ <byte-array> ] keep f void* <ref> ;
-
-: check-group-struct ( group-struct ptr -- group-struct/f )
-    void* deref and* ;
-
-M: integer group-struct
-    (group-struct)
-    [ [ unix.ffi:getgrgid_r ] unix-system-call drop ] keep
-    check-group-struct ;
-
-M: string group-struct
-    (group-struct)
-    [ [ unix.ffi:getgrnam_r ] unix-system-call drop ] keep
-    check-group-struct ;
-
 : group-struct>group ( group-struct -- group )
     [ \ group new ] dip
     {
@@ -45,6 +28,31 @@ M: string group-struct
         [ group-members >>members ]
     } cleave ;
 
+:: lookup-group ( key quot: ( key entry buffer size result -- error ) -- group/f )
+    4096 :> size!
+    f :> found!
+    [
+        [
+            unix.ffi:group new :> entry
+            size malloc &free :> buffer
+            f void* <ref> :> result
+            key entry buffer size result quot call :> error
+            error zero? [
+                result void* deref [ entry group-struct>group ] [ f ] if found!
+            ] when
+            error
+        ] with-destructors {
+            { 0 [ f ] }
+            { EINTR [ t ] }
+            { ERANGE [ size 2 * size! t ] }
+            [ (throw-errno) ]
+        } case
+    ] loop found ; inline
+
+M: integer group-struct [ unix.ffi:getgrgid_r ] lookup-group ;
+
+M: string group-struct [ unix.ffi:getgrnam_r ] lookup-group ;
+
 PRIVATE>
 
 : group-name ( id -- string )
@@ -52,28 +60,48 @@ PRIVATE>
         group-cache get [
             ?at [ name>> ] [ number>string ] if
         ] [
-            group-struct [ gr_name>> ] [ f ] if*
+            group-struct [ name>> ] [ f ] if*
         ] if*
     ] [ number>string ] ?unless ;
 
 : group-id ( string -- id/f )
-    group-struct dup [ gr_gid>> ] when ;
+    group-struct dup [ id>> ] when ;
 
 ERROR: no-group string ;
 
 : ?group-id ( string -- id )
-    dup group-struct [ nip gr_gid>> ] [ no-group ] if* ;
+    dup group-struct [ nip id>> ] [ no-group ] if* ;
 
 <PRIVATE
 
 : >groups ( byte-array n -- groups )
-    [ 4 grouping:group ] dip head-slice [ uint deref group-name ] map ;
+    [ gid_t heap-size grouping:group ] dip head-slice
+    [ gid_t deref group-name ] map ;
+
+ERROR: group-list-error name errno ;
+
+:: group-list ( name gid -- groups )
+    64 :> capacity!
+    f :> groups!
+    [
+        capacity gid_t heap-size * <byte-array> :> buffer
+        capacity int <ref> :> count
+        clear-errno
+        name gid buffer count unix.ffi:getgrouplist :> status
+        errno :> error
+        count int deref :> required
+        status 0 < [
+            required capacity > [ required capacity! t ] [
+                error EINTR = [ t ] [ name error group-list-error ] if
+            ] if
+        ] [
+            buffer required >groups groups! f
+        ] if
+    ] loop groups ;
 
 : (user-groups) ( string -- seq )
     dup user-passwd [
-        gid>> 64 [ 4 * <byte-array> ] keep
-        int <ref> [ [ unix.ffi:getgrouplist ] unix-system-call drop ] 2keep
-        int deref >groups
+        gid>> group-list
     ] [
         drop { }
     ] if* ;
@@ -89,8 +117,8 @@ M: integer user-groups
     user-name (user-groups) ;
 
 : all-groups ( -- seq )
-    [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip
-    endgrent ;
+    [ [ unix.ffi:getgrent dup ] [ group-struct>group ] produce nip ]
+    [ endgrent ] finally ;
 
 : all-group-names ( -- seq )
     all-groups [ name>> ] map ;
