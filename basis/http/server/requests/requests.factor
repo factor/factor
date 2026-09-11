@@ -1,8 +1,9 @@
-USING: accessors ascii combinators continuations http http.parsers io
-io.crlf io.encodings io.encodings.binary io.streams.limited
-kernel math.order math.parser namespaces sequences splitting strings
-urls urls.encoding ;
-FROM: mime.multipart => parse-multipart ;
+USING: accessors arrays ascii combinators combinators.short-circuit continuations
+http http.parsers io io.crlf io.encodings io.encodings.binary
+io.streams.limited kernel math.order math.parser namespaces peg peg.parsers
+sequences splitting strings urls urls.encoding ;
+FROM: mime.multipart => parse-multipart mime-decoding-ran-out-of-bytes?
+no-content-disposition? unknown-content-disposition? ;
 IN: http.server.requests
 
 ERROR: request-error ;
@@ -17,11 +18,28 @@ ERROR: content-length-missing < request-error ;
 
 ERROR: bad-request-line < request-error parse-error ;
 
+ERROR: bad-request-header < request-error error ;
+
+ERROR: bad-request-body < request-error error ;
+
+ERROR: incomplete-request < request-error ;
+
+ERROR: malformed-request < request-error error ;
+
+ERROR: unsupported-transfer-encoding < request-error transfer-encoding ;
+
 : check-absolute ( url -- )
     path>> dup "/" head? [ drop ] [ invalid-path ] if ; inline
 
+<PRIVATE
+
+PARTIAL-PEG: parse-server-request-line ( string -- triple )
+    full-request-parser simple-request-parser 2array choice just ;
+
+PRIVATE>
+
 : parse-request-line-safe ( string -- triple )
-    [ parse-request-line ] [ nip bad-request-line ] recover ;
+    [ parse-server-request-line ] [ nip bad-request-line ] recover ;
 
 <PRIVATE
 
@@ -51,7 +69,9 @@ PRIVATE>
     [ >>method ] [ >url dup check-absolute >>url ] [ >>version ] tri* ;
 
 : read-request-header ( request -- request )
-    read-header >>header ;
+    [ read-?crlf [ incomplete-request ] unless* dup empty? not ]
+    [ [ parse-header-line ] [ nip bad-request-header ] recover ]
+    produce nip process-header >>header ;
 
 SYMBOL: upload-limit
 
@@ -59,14 +79,32 @@ upload-limit [ 200,000,000 ] initialize
 
 : parse-multipart-form-data ( string -- separator )
     ";" split1 nip
-    "=" split1 nip [ no-boundary ] unless* ;
+    [ av-pairs-parser parse-fully ] [ 2drop no-boundary ] recover
+    [ first >lower "boundary" = ] find nip
+    [ second ] [ no-boundary ] if*
+    dup empty? [ no-boundary ] when ;
 
 : maybe-limit-input ( content-length -- )
-    unlimited-input upload-limit get [ min ] when* limited-input ;
+    input-stream get dup decoder? [ stream>> ] when
+    limited-stream? [ unlimited-input ] when
+    upload-limit get [ min ] when* limited-input ;
 
 : read-multipart-data ( request content-length -- mime-parts )
     maybe-limit-input binary decode-input
-    "content-type" header parse-multipart-form-data parse-multipart ;
+    "content-type" header parse-multipart-form-data
+    [ parse-multipart ] [
+        nip dup {
+            [ mime-decoding-ran-out-of-bytes? ]
+            [ no-content-disposition? ]
+            [ unknown-content-disposition? ]
+            [ assert-sequence? ]
+            [ parse-error? ]
+        } 1|| [ bad-request-body ] [ rethrow ] if
+    ] recover ;
+
+: read-content ( content-length -- content )
+    dup maybe-limit-input
+    [ read ] keep over length = [ incomplete-request ] unless ;
 
 : parse-content-length-safe ( request -- content-length )
     "content-length" header [
@@ -83,19 +121,23 @@ upload-limit [ 200,000,000 ] initialize
     {
         { "multipart/form-data" [ read-multipart-data >>params ] }
         { "application/x-www-form-urlencoded" [
-            nip read query>assoc >>params
+            nip read-content query>assoc >>params
         ] }
-        [ drop nip read >>data ]
+        [ drop nip read-content >>data ]
     } case ;
 
 : read-request-data ( request -- request )
+    dup "transfer-encoding" header
+    [ unsupported-transfer-encoding ] when*
     dup method>> { "POST" "PUT" "PATCH" } member? [
         dup dup "content-type" header
         ";" split1 drop parse-content >>data
     ] when ;
 
 : extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
+    [ ] [ url>> ] [
+        "host" header [ parse-host ] [ nip bad-request-header ] recover
+    ] tri
     [ >>host ] [ >>port ] bi*
     drop ;
 
@@ -103,9 +145,14 @@ upload-limit [ 200,000,000 ] initialize
     dup "cookie" header [ parse-cookie >>cookies ] when* ;
 
 : read-request ( -- request )
-    <request>
-    read-request-line
-    read-request-header
-    read-request-data
-    extract-host
-    extract-cookies ;
+    [
+        <request>
+        read-request-line
+        read-request-header
+        read-request-data
+        extract-host
+        extract-cookies
+    ] [
+        dup { [ assert? ] [ parse-error? ] } 1||
+        [ malformed-request ] [ rethrow ] if
+    ] recover ;

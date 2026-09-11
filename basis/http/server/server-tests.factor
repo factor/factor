@@ -1,7 +1,36 @@
 USING: accessors assocs continuations http http.server
-http.server.requests io.encodings.utf8 io.encodings.binary
+http.server.requests http.server.responses io.encodings.utf8 io.encodings.binary
 io.streams.string kernel math peg sequences tools.test urls
 splitting ;
+FROM: http.server => <500> ;
+
+! Bodyless status codes and HEAD must not invoke a response template.
+! Both numeric and string status codes are used by response constructors.
+{ t } [
+    { 100 101 199 204 205 304 "100" "204" "205" "304" } [
+        <response> swap >>code "Test" >>message
+        [ "Body must not be called" throw ] >>body
+        <request> "GET" >>method swap
+        [ write-full-response ] with-string-writer
+        "\r\n\r\n" split1 nip empty?
+    ] all?
+] unit-test
+
+{ "" } [
+    <request> "HEAD" >>method
+    [ "Body must not be called" throw ] <text-content>
+    [ write-full-response ] with-string-writer "\r\n\r\n" split1 nip
+] unit-test
+
+{ "body" } [
+    <request> "GET" >>method "body" <text-content>
+    [ write-full-response ] with-string-writer "\r\n\r\n" split1 nip
+] unit-test
+
+{ "" } [
+    <request> "GET" >>method <304>
+    [ write-full-response ] with-string-writer "\r\n\r\n" split1 nip
+] unit-test
 
 { t } [ [ \ + first ] [ <500> ] recover response? ] unit-test
 
@@ -39,6 +68,7 @@ splitting ;
         "connection: close"
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
+        "" ""
     } [ join-lines ] [ "\r\n" join ] bi
     [ [ read-request ] with-string-reader ] same?
 ] unit-test
