@@ -17,8 +17,9 @@ TUPLE: lock threads owner reentrant? ;
 <PRIVATE
 
 : acquire-lock ( lock timeout -- )
-    over owner>>
-    [ 2dup [ threads>> ] dip "lock" wait ] when drop
+    >deadline
+    [ over owner>> ]
+    [ 2dup [ threads>> ] dip "lock" wait ] while drop
     self >>owner drop ;
 
 : release-lock ( lock -- )
@@ -60,8 +61,9 @@ TUPLE: rw-lock readers writers reader# writer ;
     [ 1 + ] change-reader# drop ;
 
 : acquire-read-lock ( lock timeout -- )
-    over writer>>
-    [ 2dup [ readers>> ] dip "read lock" wait ] when drop
+    >deadline
+    [ over writer>> ]
+    [ 2dup [ readers>> ] dip "read lock" wait ] while drop
     add-reader ;
 
 : notify-writer ( lock -- )
@@ -75,8 +77,9 @@ TUPLE: rw-lock readers writers reader# writer ;
     dup reader#>> zero? [ notify-writer ] [ drop ] if ;
 
 : acquire-write-lock ( lock timeout -- )
-    over writer>> pick reader#>> 0 > or
-    [ 2dup [ writers>> ] dip "write lock" wait ] when drop
+    >deadline
+    [ over [ writer>> ] [ reader#>> 0 > ] bi or ]
+    [ 2dup [ writers>> ] dip "write lock" wait ] while drop
     self >>writer drop ;
 
 : release-write-lock ( lock -- )

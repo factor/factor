@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors calendar kernel math quotations system threads ;
+USING: accessors calendar continuations kernel math quotations system threads ;
 
 IN: timers
 
@@ -33,17 +33,19 @@ M: duration >nanoseconds duration>nanoseconds >integer ;
 : run-timer ( timer -- timer )
     dup interval-nanos >>next-nanos
     t >>quotation-running?
-    dup quot>> call( -- )
-    f >>quotation-running? ;
+    [ dup quot>> call( -- ) ]
+    [ f >>quotation-running? ] finally ;
 
 : timer-loop ( timer -- )
-    [ next-nanos ] [
-        dup nano-count <= [
-            drop run-timer yield
-        ] [
-            sleep-until
-        ] if
-    ] while* dup thread>> self eq? [ f >>thread ] when drop ;
+    [
+        [ next-nanos ] [
+            dup nano-count <= [
+                drop run-timer yield
+            ] [
+                sleep-until
+            ] if
+        ] while*
+    ] [ dup thread>> self eq? [ f >>thread ] when drop ] finally ;
 
 : ?interrupt ( thread timer -- )
     quotation-running?>> [ drop ] [ [ interrupt ] when* ] if ;

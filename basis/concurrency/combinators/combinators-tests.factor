@@ -59,3 +59,9 @@ IN: concurrency.combinators.tests
         [ 1 - ] [ 2 + ] bi*
     ] parallel-assoc-map
 ] unit-test
+
+! Predicates can complete in a different order; preserve sequence order and type.
+{ { 1 2 3 } } [
+    { 1 2 3 } [ 4 swap - 1000000 * sleep t ] parallel-filter
+] unit-test
+{ "ac" } [ "abc" [ CHAR: b = not ] parallel-filter ] unit-test

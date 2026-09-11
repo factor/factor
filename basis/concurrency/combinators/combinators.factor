@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators concurrency.count-downs
-concurrency.futures generalizations kernel sequences
+concurrency.futures generalizations kernel locals sequences
 sequences.private sequences.product ;
 IN: concurrency.combinators
 
@@ -27,17 +27,20 @@ PRIVATE>
 : parallel-cartesian-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
     [ 2array ] dip [ first2-unsafe ] prepose parallel-product-each ;
 
-: parallel-filter ( seq quot: ( elt -- ? ) -- newseq )
-    over [ selector [ parallel-each ] dip ] dip like ; inline
-
 : parallel-map-as ( seq quot: ( elt -- newelt ) exemplar -- newseq )
     [
-        over [ length ] keep new-sequence
+        over length f <array>
         [ '[ _ dip _ set-nth ] parallel-each-index ] keep
     ] dip like ; inline
 
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     over parallel-map-as ; inline
+
+:: parallel-filter ( seq quot: ( elt -- ? ) -- newseq )
+    seq quot { } parallel-map-as :> matches
+    V{ } clone :> result
+    seq matches [ [ result push ] [ drop ] if ] 2each
+    result seq like ; inline
 
 : parallel-assoc-map-as ( assoc quot: ( key value -- newkey newvalue ) exemplar -- newassoc )
     [ >alist ] [ '[ first2 @ 2array ] parallel-map ] [ assoc-like ] tri* ; inline

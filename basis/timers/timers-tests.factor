@@ -2,6 +2,17 @@ USING: accessors calendar combinators concurrency.count-downs
 concurrency.promises fry kernel math math.order sequences
 threads timers tools.test tools.time ;
 
+USING: continuations locals timers.private ;
+
+{ f f } [
+    [ "timer failed" throw ] f f <timer>
+        self >>thread 0 >>next-nanos
+    [| timer |
+        [ timer timer-loop ] [ drop ] recover
+        timer thread>> timer quotation-running?>>
+    ] call
+] unit-test
+
 { } [
     1 <count-down>
     { f } clone 2dup

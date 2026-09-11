@@ -11,7 +11,9 @@ TUPLE: flag value threads ;
     dup value>> [ drop ] [ t >>value threads>> notify-all ] if ;
 
 : wait-for-flag-timeout ( flag timeout -- )
-    over value>> [ 2drop ] [ [ threads>> ] dip "flag" wait ] if ;
+    >deadline
+    [ over value>> ]
+    [ 2dup [ threads>> ] dip "flag" wait ] until 2drop ;
 
 : wait-for-flag ( flag -- )
     f wait-for-flag-timeout ;

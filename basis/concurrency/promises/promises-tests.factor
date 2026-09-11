@@ -18,3 +18,11 @@ IN: concurrency.promises.tests
 { t } [
     5 <promise> [ fulfill ] keep promise-fulfilled?
 ] unit-test 
+
+! Several linked stages may fail after the first error has fulfilled the promise.
+{ "first" } [
+    <promise>
+    "first" over send-linked-error
+    "second" over send-linked-error
+    ?promise
+] unit-test

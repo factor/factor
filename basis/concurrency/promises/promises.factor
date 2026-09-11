@@ -22,8 +22,9 @@ TYPED: fulfill ( value promise: promise -- )
     ] if ;
 
 TYPED:: block-if-empty ( promise: promise timeout -- promise )
+    timeout >deadline :> deadline
     promise box>> '[ _ occupied>> ]
-    promise threads>> '[ _ timeout "promise" wait ] until
+    promise threads>> '[ _ deadline "promise" wait ] until
     promise ;
 
 TYPED: ?promise-timeout ( promise: promise timeout -- result )
@@ -32,4 +33,5 @@ TYPED: ?promise-timeout ( promise: promise timeout -- result )
 : ?promise ( promise -- result )
     f ?promise-timeout ;
 
-M: promise send-linked-error fulfill ;
+M: promise send-linked-error
+    dup promise-fulfilled? [ 2drop ] [ fulfill ] if ;
