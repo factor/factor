@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors ascii assocs byte-arrays combinators hashtables
 http http.parsers io io.encodings.binary io.files io.files.temp
-io.files.unique io.streams.string kernel math math.order quoting sequences
+io.files.unique io.streams.string kernel locals math math.order quoting sequences
 splitting ;
 IN: mime.multipart
 
@@ -62,9 +62,26 @@ ERROR: mime-decoding-ran-out-of-bytes ;
     >>current-separator
     [ dump-until-separator ] with-string-writer ;
 
+:: ensure-mime-bytes ( multipart n -- multipart )
+    multipart bytes>> length n < [
+        multipart end-of-stream?>> [ mime-decoding-ran-out-of-bytes ] when
+        multipart fill-bytes n ensure-mime-bytes
+    ] [ multipart ] if ;
+
+: finish-multipart ( multipart -- multipart )
+    [ [ " \t" member? ] trim-head ] change-bytes
+    dup bytes>> empty? [
+        dup end-of-stream?>> [ fill-bytes finish-multipart ] unless
+    ] [
+        2 ensure-mime-bytes
+        dup bytes>> 2 head "\r\n" assert-sequence=
+    ] if
+    t >>end-of-stream? ;
+
 : read-header ( multipart -- multipart )
-    dup bytes>> "--\r\n" sequence= [
-        t >>end-of-stream?
+    2 ensure-mime-bytes
+    dup bytes>> 2 head "--" sequence= [
+        [ 2 tail ] change-bytes finish-multipart
     ] [
         "\r\n\r\n" dump-string parse-headers >>header
     ] if ;

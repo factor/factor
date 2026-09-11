@@ -25,6 +25,22 @@ Follow-up to the descriptor-leak investigation, 2026-09-11.
   and transmit body templates. They now suppress the body, as HEAD already
   did. Both string and numeric status codes are covered.
 
+The completion review found and fixed three remaining cases:
+
+- Multipart uploads now enforce the complete HTTP Content-Length, including
+  any MIME epilogue, rather than accepting an early transport EOF after a
+  valid MIME closing marker. The additional length checking uses bounded
+  reads rather than copying the entire upload.
+- The server now parses complete header values without removing quotes or
+  dropping trailing content. Invalid Content-Length values such as
+  `"3"junk`, embedded control characters, whitespace before the colon, and
+  obsolete folded headers are rejected. Legal leading/trailing whitespace
+  and quoted header values are preserved appropriately.
+- Multipart closing markers can cross the parser's 65,536-byte buffer
+  boundary. The parser also accepts valid closing padding, an omitted final
+  CRLF, and an epilogue, while rejecting garbage on the closing line. See
+  [RFC 2046, section 5.1.1](https://www.rfc-editor.org/rfc/rfc2046.html#section-5.1.1).
+
 The framing checks follow [RFC 9112, section 6.3](https://www.rfc-editor.org/rfc/rfc9112.html#section-6.3).
 The additional prohibition on 205 content is specified in
 [RFC 9110, section 15.3.6](https://www.rfc-editor.org/rfc/rfc9110.html#section-15.3.6).
@@ -67,12 +83,14 @@ separate from the owning session's deadline.
 
 ## Verification
 
-- The full `http` test tree, including localhost integration tests.
+- The full `http` and `mime.multipart` test trees, including localhost
+  integration tests and multipart buffer-boundary regressions.
 - The full `furnace` test tree, including new SQLite permit tests, provider
   tests, deactivation tests, captured authentication logging, and malformed
   Basic authentication dispatch.
 - A separate localhost socket harness: intact 70,000-byte plain and
-  URL-encoded payloads; 50 malformed requests returning 400; HEAD and 304 without a body;
+  URL-encoded payloads; 18 multipart boundary/tail cases; 85 malformed
+  requests returning 400; HEAD and 304 without a body;
   descriptors stable at 20 before and after the requests.
 - Before-fix reproducers confirmed the HTTP truncation and parsing defects,
   expired permit acceptance, missing persisted renewal, reversed user
@@ -82,6 +100,7 @@ Commands:
 
 ```sh
 ./factor -no-user-init -run=tools.test http
+./factor -no-user-init -run=tools.test mime.multipart
 ./factor -no-user-init -run=tools.test furnace
 python3 /tmp/factor-http-audit-wire.py
 ```

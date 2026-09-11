@@ -129,7 +129,7 @@ GET nested HTTP/1.0
 
 STRING: read-request-test-4
 GET /blah HTTP/1.0
-Host: "www.amazon.com"
+Host: www.amazon.com
 
 
 ;

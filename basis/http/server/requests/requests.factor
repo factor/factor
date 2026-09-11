@@ -1,6 +1,7 @@
 USING: accessors arrays ascii combinators combinators.short-circuit continuations
 http http.parsers io io.crlf io.encodings io.encodings.binary
-io.streams.limited kernel math.order math.parser namespaces peg peg.parsers
+io.streams.limited io.streams.throwing kernel make math.order math.parser
+namespaces peg peg.parsers
 sequences splitting strings urls urls.encoding ;
 FROM: mime.multipart => parse-multipart mime-decoding-ran-out-of-bytes?
 no-content-disposition? unknown-content-disposition? ;
@@ -36,6 +37,15 @@ ERROR: unsupported-transfer-encoding < request-error transfer-encoding ;
 PARTIAL-PEG: parse-server-request-line ( string -- triple )
     full-request-parser simple-request-parser 2array choice just ;
 
+PARTIAL-PEG: parse-server-header-line ( string -- pair )
+    [
+        field-name-parser ,
+        ":" token hide ,
+        space-parser ,
+        [ dup CHAR: \t = swap control? not or ] satisfy repeat0
+        case-sensitive [ [ blank? ] trim-tail ] action ,
+    ] seq* just ;
+
 PRIVATE>
 
 : parse-request-line-safe ( string -- triple )
@@ -70,7 +80,7 @@ PRIVATE>
 
 : read-request-header ( request -- request )
     [ read-?crlf [ incomplete-request ] unless* dup empty? not ]
-    [ [ parse-header-line ] [ nip bad-request-header ] recover ]
+    [ [ parse-server-header-line ] [ nip bad-request-header ] recover ]
     produce nip process-header >>header ;
 
 SYMBOL: upload-limit
@@ -91,9 +101,18 @@ upload-limit [ 200,000,000 ] initialize
 
 : read-multipart-data ( request content-length -- mime-parts )
     maybe-limit-input binary decode-input
+    ! Keep the throwing stream inside the length limit: reaching the
+    ! declared end is normal, but earlier transport EOF is an error.
+    input-stream [ [ <throws-on-eof-stream> ] change-stream ] change
     "content-type" header parse-multipart-form-data
-    [ parse-multipart ] [
-        nip dup {
+    [
+        parse-multipart
+        ! Read the MIME epilogue using full reads: limited-stream counts
+        ! requested bytes, so partial reads cannot verify Content-Length.
+        [ 65536 read ] [ drop ] while*
+    ] [
+        nip dup stream-exhausted? [ drop incomplete-request ] when
+        dup {
             [ mime-decoding-ran-out-of-bytes? ]
             [ no-content-disposition? ]
             [ unknown-content-disposition? ]
