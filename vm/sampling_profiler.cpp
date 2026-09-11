@@ -37,10 +37,11 @@ void factor_vm::growarr_add(array *growarr_, cell elt_) {
 }
 
 profiling_sample profiling_sample::record_counts() volatile {
-  atomic::fence();
-  profiling_sample returned(sample_count, gc_sample_count,
-                            jit_sample_count, foreign_sample_count,
-                            foreign_thread_sample_count);
+  profiling_sample returned(atomic::load(&sample_count),
+                            atomic::load(&gc_sample_count),
+                            atomic::load(&jit_sample_count),
+                            atomic::load(&foreign_sample_count),
+                            atomic::load(&foreign_thread_sample_count));
   atomic::fetch_subtract(&sample_count, returned.sample_count);
   atomic::fetch_subtract(&gc_sample_count, returned.gc_sample_count);
   atomic::fetch_subtract(&jit_sample_count, returned.jit_sample_count);
@@ -51,12 +52,11 @@ profiling_sample profiling_sample::record_counts() volatile {
 }
 
 void profiling_sample::clear_counts() volatile {
-  sample_count = 0;
-  gc_sample_count = 0;
-  jit_sample_count = 0;
-  foreign_sample_count = 0;
-  foreign_thread_sample_count = 0;
-  atomic::fence();
+  atomic::store(&sample_count, fixnum(0));
+  atomic::store(&gc_sample_count, fixnum(0));
+  atomic::store(&jit_sample_count, fixnum(0));
+  atomic::store(&foreign_sample_count, fixnum(0));
+  atomic::store(&foreign_thread_sample_count, fixnum(0));
 }
 
 // Allocates memory

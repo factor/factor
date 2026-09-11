@@ -507,11 +507,11 @@ void handle_ctrl_c() {
 }
 
 void factor_vm::primitive_disable_ctrl_break() {
-  stop_on_ctrl_break = false;
+  atomic::store(&stop_on_ctrl_break, false);
 }
 
 void factor_vm::primitive_enable_ctrl_break() {
-  stop_on_ctrl_break = true;
+  atomic::store(&stop_on_ctrl_break, true);
 }
 
 void abort() {
