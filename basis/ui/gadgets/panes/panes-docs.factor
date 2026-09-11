@@ -51,7 +51,8 @@ HELP: <pane-control>
 { $description "Creates a new control delegating to a " { $link pane } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 HELP: pane-stream
-{ $class-description "Pane streams implement the portion of the " { $link "stream-protocol" } " responsible for output of text, including full support for " { $link "styles" } ". Pane streams also support direct output of gadgets via " { $link write-gadget } " and " { $link print-gadget } ". Pane streams are created by calling " { $link <pane-stream> } "." } ;
+{ $class-description "Pane streams implement the portion of the " { $link "stream-protocol" } " responsible for output of text, including full support for " { $link "styles" } ". Pane streams also support direct output of gadgets via " { $link write-gadget } " and " { $link print-gadget } ". Pane streams are created by calling " { $link <pane-stream> } "." }
+{ $notes "Long ASCII strings without control characters use a simpler line-splitting path. Output remains a snapshot of the supplied string. Unicode and newline handling are the same on all UI backends." } ;
 
 HELP: <pane-stream>
 { $values { "pane" pane } { "pane-stream" "a new " { $link pane-stream } } }

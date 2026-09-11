@@ -1,4 +1,4 @@
-USING: accessors arrays colors continuations dlists fonts fry help
+USING: accessors arrays colors continuations dlists documents.private fonts fry help
 help.markup help.stylesheet help.syntax help.topics inspector io
 io.streams.string io.styles kernel literals locals math models
 namespaces prettyprint see sequences strings tools.test ui.clipboards ui.gadgets
@@ -35,6 +35,25 @@ IN: ui.gadgets.panes.tests
 ! A single large write must not repeatedly copy the growing label.
 { t } [
     10,000,000 CHAR: a <string> dup pane-written-text =
+] unit-test
+
+! The ASCII shortcut must retain split-lines semantics on every backend,
+! including all supported separators, CRLF pairs, and trailing empties.
+{ t } [
+    [let
+        5000 CHAR: a <string> :> prefix
+        { "" "\n" "\r" "\r\n" "\v" "\f" "\x1c" "\x1d" "\x1e"
+          "\u000085" "\u002028" "\u002029" "λ" "\u01f600" } [| suffix |
+            prefix suffix append [ pane-lines ] [ ?split-lines ] bi =
+            prefix suffix append "tail" append [ pane-lines ] [ ?split-lines ] bi = and
+        ] all?
+    ]
+] unit-test
+
+! Printed output remains a snapshot if the caller mutates its string.
+{ CHAR: a } [
+    5000 CHAR: a <string> dup pane-lines first
+    [ CHAR: b 0 rot set-nth ] dip first
 ] unit-test
 
 ! The old fixed-size splitter made no progress on an oversized grapheme.

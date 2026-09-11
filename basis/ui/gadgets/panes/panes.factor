@@ -146,11 +146,18 @@ M: pane-stream stream-write1
 
 ! Keep each logical line intact. Splitting at a fixed character count only
 ! makes pane-text join the chunks again, copying a growing label each time.
+: pane-lines ( string -- lines )
+    dup string? [
+        dup length 4096 > over aux>> not and [
+            dup [ 32 < ] any? [ ?split-lines ] [ clone 1array ] if
+        ] [ ?split-lines ] if
+    ] [ ?split-lines ] if ;
+
 M: pane-stream stream-write
-    [ [ ?split-lines ] dip pane-write ] do-pane-stream ;
+    [ [ pane-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ [ ?split-lines ] 2dip pane-format ] do-pane-stream ;
+    [ [ pane-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose
     dup parent>> [
