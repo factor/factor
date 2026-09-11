@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 ! Run in a Windows UI image: -run=ui.text.directwrite.stress-test
 USING: accessors alien.c-types alien.data arrays assocs byte-arrays
-calendar continuations debugger fonts io kernel locals math namespaces
+calendar continuations debugger fonts io kernel locals math math.functions namespaces
 opengl opengl.gl prettyprint sequences sets strings system threads
 tools.time ui ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.worlds ui.private windows.directwrite
@@ -20,11 +20,22 @@ IN: ui.text.directwrite.stress-test
     [ sum 20 /f "Mean frame ms: " write . ]
     [ supremum "Maximum frame ms: " write . ] bi flush ;
 
-:: check-framebuffer ( -- )
+:: framebuffer-strip ( width -- pixels )
     GL_VIEWPORT 4 int <c-array> [ glGetIntegerv ] keep fourth :> height
-    128 32 * 4 * <byte-array> :> pixels
-    0 height 32 - 128 32 GL_RGBA GL_UNSIGNED_BYTE pixels glReadPixels
-    gl-error pixels members length 8 > t assert= ;
+    width 32 * 4 * <byte-array> :> pixels
+    0 height 32 - width 32 GL_RGBA GL_UNSIGNED_BYTE pixels glReadPixels
+    gl-error pixels ;
+
+: check-framebuffer ( -- )
+    128 framebuffer-strip members length 8 > t assert= ;
+
+:: check-run-boundary ( line scroller world -- )
+    ! These two offsets have the same glyph phase. The far strip crosses
+    ! a native 16K run boundary, which used to overlap by about 24 pixels.
+    256 line directwrite-offset>x floor 128 - gl-unscale :> near-x
+    32000 line directwrite-offset>x floor 128 - gl-unscale :> far-x
+    scroller world near-x 0 scroll-frame 512 framebuffer-strip :> near
+    scroller world far-x 0 scroll-frame 512 framebuffer-strip near assert= ;
 
 :: exercise-output ( pane scroller world -- )
     500 milliseconds sleep
@@ -39,6 +50,7 @@ IN: ui.text.directwrite.stress-test
     line size>> first index width>> - 4 < t assert=
     line line size>> first 64 - 0 2array { 64 15 }
     directwrite-layout>region-image bitmap>> members length 8 > t assert=
+    line scroller world check-run-boundary
     scroller world 0 0 scroll-frame
     "Uncached horizontal and vertical scrolling" print
     20 [| i |

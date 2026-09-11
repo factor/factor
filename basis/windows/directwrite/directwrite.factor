@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache
 classes.struct destructors fonts fonts.shaping hashtables.identity.private init io.encodings.string
-io.encodings.utf16 kernel locals math math.bitwise math.functions math.order
+io.encodings.utf16 io.encodings.utf16.private kernel locals math math.bitwise math.functions math.order
 namespaces opengl sequences ui.text.index-maps windows.com windows.directx.dwrite
 windows.directwrite.indexed windows.fonts windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
@@ -112,24 +112,33 @@ ERROR: missing-directwrite-fallback-font ;
 : snapshot-directwrite-font-name ( font -- copy )
     clone [ windows-font-name clone ] change-name ;
 
+:: indexable-directwrite-text? ( font text -- ? )
+    text length 4096 > font font-text-direction right-to-left = not and [
+        text [ dup 32 >= swap 126 <= and ] all?
+    ] [ f ] if ;
+
+: directwrite-encode ( text -- encoded )
+    dup aux>> [ utf16n encode ] [ 0 swap ascii-string>utf16-byte-array ] if ;
+
 :: <plain-directwrite-layout> ( input-font string -- layout )
     input-font snapshot-directwrite-font-name :> font
     [ <directwrite-factory> [ :> factory
         factory font <directwrite-format> [ :> format
             string dup selection? [ string>> ] when :> text
-            text utf16n encode :> encoded
+            font text indexable-directwrite-text? :> indexed?
+            text directwrite-encode :> encoded
             factory encoded encoded length 2 /i format 1000000.0 1000000.0
             { void* } [ IDWriteFactory::CreateTextLayout check-ole32-error ] with-out-parameters |com-release :> pointer
             pointer factory font font-features encoded length 2 /i set-directwrite-features
             pointer directwrite-text-metrics widthIncludingTrailingWhitespace>> 1.0 max :> width
-            pointer width IDWriteTextLayout::SetMaxWidth check-ole32-error
+            indexed? [ pointer width IDWriteTextLayout::SetMaxWidth check-ole32-error ] unless
             pointer directwrite-line-metrics :> metrics
             factory font directwrite-font-metrics :> native
             font size>> directwrite-scale * native designUnitsPerEm>> / :> scale
             metrics native capHeight>> scale * >>cap-height
                 native xHeight>> scale * >>x-height drop
-            pointer DWRITE_OVERHANG_METRICS new
-            [ IDWriteTextLayout::GetOverhangMetrics check-ole32-error ] keep :> ink
+            DWRITE_OVERHANG_METRICS new :> ink
+            indexed? [ pointer ink IDWriteTextLayout::GetOverhangMetrics check-ole32-error ] unless
             ink [ left>> ] [ top>> ] bi 2array [ 0 max ceiling >integer ] map :> origin
             directwrite-layout new-disposable
                 font >>font string >>string pointer >>pointer metrics >>metrics
@@ -144,17 +153,18 @@ DEFER: cached-directwrite-layout
 
 :: index-directwrite-layout ( layout -- layout )
     layout string>> :> text
-    text length 4096 > layout font>> font-text-direction right-to-left = not and [
-        text [ dup 32 >= swap 126 <= and ] all? [
-            layout pointer>> <directwrite-glyph-index> :> index
-            layout index >>glyph-index drop
-            ! GetMetrics accumulates advances in single precision and can
-            ! overestimate a ten-million-character row by millions of pixels.
-            layout metrics>> index width>> >>width drop
-            index width>> layout origin>> first +
-            index regions>> [ right>> ] [ max ] map-reduce max ceiling >integer
-            0 layout size>> set-nth
-        ] when
+    layout font>> text indexable-directwrite-text? [
+        layout pointer>> <directwrite-glyph-index> :> index
+        layout index >>glyph-index drop
+        ! Native FLOAT accumulation loses both intra-run and inter-run
+        ! precision. Use the same double-precision advances everywhere.
+        layout metrics>> index width>> >>width drop
+        index [ left>> neg ] [ top>> neg ] bi 2array
+        [ 0 max ceiling >integer ] map :> origin
+        layout origin >>origin
+            index width>> index right>> max origin first +
+            layout metrics>> height>> index bottom>> max origin second +
+            2array [ ceiling >integer ] map >>size drop
     ] when
     layout ;
 
@@ -177,7 +187,7 @@ M: directwrite-layout dispose*
     [ glyph-index>> [ release-glyph-index ] when* ]
     [ f >>pointer f >>glyph-index drop ] tri ;
 
-:: directwrite-offset>x ( index layout -- x )
+:: native-directwrite-offset>x ( index layout -- x )
     layout check-disposed drop
     layout pointer>> index layout directwrite-layout-index-map codepoint>native FALSE
     0.0 float <ref> :> x
@@ -186,7 +196,7 @@ M: directwrite-layout dispose*
     IDWriteTextLayout::HitTestTextPosition check-ole32-error
     x float deref ;
 
-:: directwrite-x>offset ( x layout -- index )
+:: native-directwrite-x>offset ( x layout -- index )
     layout check-disposed drop
     DWRITE_HIT_TEST_METRICS new :> hit
     FALSE int <ref> :> trailing
@@ -195,6 +205,16 @@ M: directwrite-layout dispose*
     IDWriteTextLayout::HitTestPoint check-ole32-error
     hit textPosition>> trailing int deref 0 = [ 0 ] [ hit length>> ] if +
     layout directwrite-layout-index-map native>codepoint ;
+
+:: directwrite-offset>x ( index layout -- x )
+    layout check-disposed drop
+    layout glyph-index>> [ index swap directwrite-indexed-offset>x ]
+    [ index layout native-directwrite-offset>x ] if* ;
+
+:: directwrite-x>offset ( x layout -- index )
+    layout check-disposed drop
+    layout glyph-index>> [ x swap directwrite-indexed-x>offset ]
+    [ x layout native-directwrite-x>offset ] if* ;
 
 SYMBOL: cached-directwrite-layouts
 SYMBOL: directwrite-layout-aliases
@@ -248,15 +268,23 @@ STARTUP-HOOK: [
         layout directwrite-layout-index-map :> map
         selection [ start>> ] [ end>> ] bi min map codepoint>native :> start
         selection [ start>> ] [ end>> ] bi max map codepoint>native start - :> length
-        0 uint <ref> :> count
-        layout pointer>> start length 0.0 0.0 f 0 count
-        IDWriteTextLayout::HitTestTextRange drop
-        count uint deref :> n
-        n DWRITE_HIT_TEST_METRICS heap-size * <byte-array> :> buffer
-        layout pointer>> start length 0.0 0.0 buffer n count
-        IDWriteTextLayout::HitTestTextRange check-ole32-error
-        n [ DWRITE_HIT_TEST_METRICS heap-size * buffer <displaced-alien>
-            DWRITE_HIT_TEST_METRICS memory>struct ] map-integers
+        layout glyph-index>> [
+            start layout directwrite-offset>x :> left
+            start length + layout directwrite-offset>x :> right
+            DWRITE_HIT_TEST_METRICS new start >>textPosition length >>length
+                left >>left 0 >>top right left - >>width
+                layout metrics>> height>> >>height TRUE >>isText 1array
+        ] [
+            0 uint <ref> :> count
+            layout pointer>> start length 0.0 0.0 f 0 count
+            IDWriteTextLayout::HitTestTextRange drop
+            count uint deref :> n
+            n DWRITE_HIT_TEST_METRICS heap-size * <byte-array> :> buffer
+            layout pointer>> start length 0.0 0.0 buffer n count
+            IDWriteTextLayout::HitTestTextRange check-ole32-error
+            n [ DWRITE_HIT_TEST_METRICS heap-size * buffer <displaced-alien>
+                DWRITE_HIT_TEST_METRICS memory>struct ] map-integers
+        ] if
     ] [ { } ] if ;
 
 :: directwrite-selection-rects ( layout -- rects )

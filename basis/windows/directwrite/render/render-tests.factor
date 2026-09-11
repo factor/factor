@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors destructors fonts fonts.shaping grouping
-kernel locals math math.functions math.vectors sequences strings tools.test windows.directwrite
+USING: accessors arrays colors continuations destructors fonts fonts.shaping grouping
+kernel locals math math.functions math.vectors namespaces opengl sequences strings tools.test windows.directwrite
 windows.directwrite.render ;
 IN: windows.directwrite.render.tests
 
@@ -131,6 +131,27 @@ IN: windows.directwrite.render.tests
     "Segoe UI" <font> t >>italic?
     1000 [ "office affine " ] replicate concat 512 indexed-region-matches-native?
 ] unit-test
+
+! Compare both sides of a native 16K-run boundary with the same glyph
+! phase near the start. Formerly each boundary overlapped by about 24px.
+:: run-boundary-pixels-match? ( font -- ? )
+    font 100000 CHAR: a <string> <directwrite-layout> [ :> layout
+        256 layout directwrite-offset>x floor >integer 128 - layout origin>> first + :> near-x
+        32000 layout directwrite-offset>x floor >integer 128 - layout origin>> first + :> far-x
+        512 layout size>> second 2array :> dim
+        layout near-x 0 2array dim directwrite-layout>region-image bitmap>>
+        layout far-x 0 2array dim directwrite-layout>region-image bitmap>> =
+    ] with-disposal ;
+
+{ t } [ "Consolas" <font> run-boundary-pixels-match? ] unit-test
+{ t } [ "Consolas" <font> t >>italic? run-boundary-pixels-match? ] unit-test
+
+:: scaled-run-boundary-pixels-match? ( scale -- ? )
+    gl-scale-factor get-global :> original
+    [ scale gl-scale-factor set-global "Consolas" <font> run-boundary-pixels-match? ]
+    [ original gl-scale-factor set-global ] finally ;
+
+{ t } [ { 1.0 1.25 1.5 2.0 } [ scaled-run-boundary-pixels-match? ] all? ] unit-test
 
 [ emoji-font "x" <directwrite-layout> dup dispose
     { 0 0 } { 8 8 } directwrite-layout>region-image ]

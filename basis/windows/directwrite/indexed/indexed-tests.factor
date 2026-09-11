@@ -1,5 +1,5 @@
 USING: accessors arrays assocs cache destructors fonts fonts.shaping kernel locals
-math namespaces sequences strings tools.test windows.directwrite
+math math.functions namespaces opengl sequences strings tools.test windows.directwrite
 windows.directwrite.indexed windows.directwrite.render ;
 IN: windows.directwrite.indexed.tests
 
@@ -24,6 +24,33 @@ IN: windows.directwrite.indexed.tests
         monospace-font right-to-left font-with-direction
         5000 CHAR: a <string> <directwrite-layout> &dispose glyph-index>>
     ] with-destructors
+] unit-test
+
+{ t t } [
+    [ [let
+        monospace-font :> font
+        100000 CHAR: a <string> :> text
+        font text 31995 32005 font foreground>> <selection> <directwrite-layout> &dispose :> layout
+        layout directwrite-selection-rects first :> rect
+        1 layout directwrite-offset>x :> advance
+        ! The public hit-test structure stores its final coordinates as FLOAT.
+        rect left>> advance 31995 * 0.01 ~
+        rect width>> advance 10 * 0.00001 ~
+    ] ] with-destructors
+] unit-test
+
+! Runs arrive with rounded native baselines. Accumulate advances across
+! every run, and use those same positions for width and caret hit testing.
+{ t t t } [
+    [ [let
+        monospace-font 100000 CHAR: a <string> <directwrite-layout> &dispose :> layout
+        layout glyph-index>> :> index
+        index logical>> dup rest [ but-last ] dip
+        [ [ end-x>> ] [ x>> ] bi* = ] 2all?
+        1 layout directwrite-offset>x 100000 * index width>> 0.00001 ~
+        { 0 15999 16000 16001 32000 64000 99999 100000 }
+        [ dup layout directwrite-offset>x layout directwrite-x>offset = ] all?
+    ] ] with-destructors
 ] unit-test
 
 ! A selected layout owns a reference to the same captured glyphs and can
