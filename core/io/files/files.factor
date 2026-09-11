@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.strings arrays io io.backend io.encodings
+USING: alien.strings arrays destructors io io.backend io.encodings
 io.pathnames kernel kernel.private math namespaces sequences
 splitting strings system vectors ;
 IN: io.files
@@ -35,16 +35,28 @@ HOOK: (file-writer-secure) io-backend ( path -- stream )
 HOOK: (file-appender) io-backend ( path -- stream )
 
 : <file-reader> ( path encoding -- stream )
-    [ normalize-path (file-reader) { file-reader } declare ] dip <decoder> ; inline
+    [
+        [ normalize-path (file-reader) { file-reader } declare |dispose ] dip
+        <decoder>
+    ] with-destructors ; inline
 
 : <file-writer> ( path encoding -- stream )
-    [ normalize-path (file-writer) { file-writer } declare ] dip <encoder> ; inline
+    [
+        [ normalize-path (file-writer) { file-writer } declare |dispose ] dip
+        <encoder>
+    ] with-destructors ; inline
 
 : <file-writer-secure> ( path encoding -- stream )
-    [ normalize-path (file-writer-secure) { file-writer } declare ] dip <encoder> ; inline
+    [
+        [ normalize-path (file-writer-secure) { file-writer } declare |dispose ] dip
+        <encoder>
+    ] with-destructors ; inline
 
 : <file-appender> ( path encoding -- stream )
-    [ normalize-path (file-appender) { file-writer } declare ] dip <encoder> ; inline
+    [
+        [ normalize-path (file-appender) { file-writer } declare |dispose ] dip
+        <encoder>
+    ] with-destructors ; inline
 
 : file-lines ( path encoding -- seq )
     <file-reader> stream-lines ;

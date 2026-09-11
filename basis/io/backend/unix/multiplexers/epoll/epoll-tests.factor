@@ -1,7 +1,14 @@
 USING: accessors assocs destructors io.backend.unix
 io.backend.unix.multiplexers io.backend.unix.multiplexers.epoll
-io.sockets kernel locals sequences threads tools.test ;
+io.sockets kernel locals math sequences threads tools.test unix unix.ffi ;
 IN: io.backend.unix.multiplexers.epoll.tests
+
+! Event-loop descriptors must not be inherited by executed children.
+{ t } [
+    <epoll-mx> [
+        fd>> F_GETFD 0 [ fcntl ] unix-system-call FD_CLOEXEC bitand 0 >
+    ] with-disposal
+] unit-test
 
 ! The same fd can have multiple readers and a writer. Cancelling readers
 ! must keep the write registration in the kernel, and vice versa.

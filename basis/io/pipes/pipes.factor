@@ -20,15 +20,18 @@ HOOK: (pipe) io-backend ( -- pipe )
     [
         [
             (pipe) |dispose
-            [ in>> <input-port> ] [ out>> <output-port> ] bi
+            [ in>> <input-port> |dispose ] [ out>> <output-port> |dispose ] bi
         ] dip <encoder-duplex>
     ] with-destructors ;
 
 :: <connected-pair> ( encoding -- stream stream )
-    encoding <pipe> :> x encoding <pipe> :> y
-    x in>> :> xin y in>> :> yin
-    yin x in<< xin y in<<
-    x y ;
+    [
+        encoding <pipe> |dispose :> x
+        encoding <pipe> |dispose :> y
+        x in>> :> xin y in>> :> yin
+        yin x in<< xin y in<<
+        x y
+    ] with-destructors ;
 
 <PRIVATE
 

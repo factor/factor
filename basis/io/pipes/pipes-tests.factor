@@ -1,7 +1,40 @@
 USING: accessors calendar concurrency.count-downs continuations
 destructors fry io io.encodings io.encodings.binary
 io.encodings.utf8 io.pipes io.streams.duplex io.streams.string
-io.timeouts kernel math namespaces threads tools.test ;
+io.timeouts kernel math namespaces sets threads tools.test ;
+FROM: namespaces => set ;
+IN: io.pipes.tests
+
+SINGLETON: failing-pipe-encoding
+
+M: failing-pipe-encoding <encoder>
+    2drop "pipe encoder failed" throw ;
+
+! The ports as well as their handles must be disposed on wrapping errors.
+{ t } [
+    disposables get cardinality
+    [ failing-pipe-encoding <pipe> dispose ]
+    [ "pipe encoder failed" = ] must-fail-with
+    disposables get cardinality =
+] unit-test
+
+SINGLETON: failing-second-pipe-encoding
+SYMBOL: pipe-encoding-count
+TUPLE: pipe-encoding-counter n ;
+
+M: failing-second-pipe-encoding <encoder>
+    pipe-encoding-count get [ 1 + ] change-n n>> 2 = [
+        2drop "second pipe encoder failed" throw
+    ] [ drop binary <encoder> ] if ;
+
+{ t } [
+    0 pipe-encoding-counter boa pipe-encoding-count [
+        disposables get cardinality
+        [ failing-second-pipe-encoding <connected-pair> [ dispose ] bi@ ]
+        [ "second pipe encoder failed" = ] must-fail-with
+        disposables get cardinality =
+    ] with-variable
+] unit-test
 
 { "Hello" } [
     utf8 <pipe> [

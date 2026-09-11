@@ -3,10 +3,41 @@ compiler.units continuations destructors generic.single io
 io.backend io.directories io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.latin1 io.encodings.string
 io.encodings.utf16 io.encodings.utf8 io.files io.files.private
-io.pathnames kernel locals make math namespaces sequences
+io.pathnames kernel locals make math namespaces sequences sets
 specialized-arrays system threads tools.test vocabs ;
 FROM: specialized-arrays.private => specialized-array-vocab ;
+FROM: namespaces => set ;
 IN: io.files.tests
+
+! UTF-16 reads its BOM in <decoder>, after the file has already opened.
+! A missing BOM must release the reader, buffer, and native handle.
+{ t } [
+    [| path |
+        "no BOM" path ascii set-file-contents
+        disposables get cardinality
+        [ path utf16 <file-reader> dispose ] [ missing-bom? ] must-fail-with
+        disposables get cardinality =
+    ] with-test-file
+] unit-test
+
+SINGLETON: failing-file-encoding
+
+M: failing-file-encoding <encoder>
+    2drop "file encoder failed" throw ;
+
+:: file-constructor-cleans-up? ( quot -- ? )
+    [| path |
+        path delete-file
+        disposables get cardinality
+        [ path failing-file-encoding quot call( path encoding -- stream ) dispose ]
+        [ "file encoder failed" = ] must-fail-with
+        disposables get cardinality =
+    ] with-test-file ;
+
+{ { t t t } } [
+    { [ <file-writer> ] [ <file-writer-secure> ] [ <file-appender> ] }
+    [ file-constructor-cleans-up? ] map
+] unit-test
 
 :: rewrite-file-lines ( text encoding quot -- text' )
     [| path |

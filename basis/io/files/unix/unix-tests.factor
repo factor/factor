@@ -1,7 +1,10 @@
-USING: accessors arrays calendar grouping io.files.info
-io.files.info.unix io.files.unix io.launcher io.pathnames kernel literals
-locals math math.bitwise math.functions sequences sequences.generalizations strings system
-tools.test unix unix.groups unix.users ;
+USING: accessors arrays calendar destructors grouping io.directories
+io.encodings.utf16 io.files io.files.info io.files.info.unix
+io.files.unix io.launcher io.pathnames io.ports kernel libc literals
+locals math math.bitwise math.functions namespaces sequences
+sequences.generalizations strings system tools.test unix unix.ffi
+unix.groups unix.users ;
+FROM: math.functions => truncate ;
 
 { "/usr/libexec/" } [ "/usr/libexec/awk/" parent-directory ] unit-test
 { "/etc/" } [ "/etc/passwd" parent-directory ] unit-test
@@ -196,6 +199,28 @@ tools.test unix unix.groups unix.users ;
 
 os linux? [
     { t } [ "/proc/self/exe" read-symbolic-link string? ] unit-test
+
+    ! This file can be opened for writing but rejects SEEK_END. Do not
+    ! write any bytes; verify the failing append constructor closes it.
+    { t } [
+        "/proc/self/fd" directory-files length
+        [ "/proc/self/mem" open-append close-file ]
+        [ dup unix-system-call-error? [ errno>> EINVAL = ] [ drop f ] if ]
+        must-fail-with
+        "/proc/self/fd" directory-files length =
+    ] unit-test
+
+    ! UTF-16 writes a two-byte BOM in <encoder>. A one-byte output
+    ! buffer forces a write during construction; /dev/full rejects it.
+    { t } [
+        "/proc/self/fd" directory-files length
+        [
+            1 default-buffer-size [
+                "/dev/full" utf16 <file-appender> dispose
+            ] with-variable
+        ] [ dup libc-error? [ errno>> ENOSPC = ] [ drop f ] if ] must-fail-with
+        "/proc/self/fd" directory-files length =
+    ] unit-test
 ] when
 
 "resource:basis/io/files/unix/fixtures/append.factor" run-test-file

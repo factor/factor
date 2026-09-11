@@ -138,8 +138,14 @@ M: unix (broadcast)
     recvfrom sockaddr ; inline
 
 : (receive-loop) ( n buf datagram -- count sockaddr )
-    3dup do-receive over 0 > [ 3nipd ] [
-        2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
+    3dup do-receive over 0 >= [ 3nipd ] [
+        errno {
+            { EINTR [ 2drop (receive-loop) ] }
+            { EAGAIN [
+                2drop [ +input+ wait-for-port ] [ (receive-loop) ] bi
+            ] }
+            [ (throw-errno) ]
+        } case
     ] if ; inline recursive
 
 M: unix (receive-unsafe)
