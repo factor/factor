@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.syntax classes
-classes.struct combinators destructors destructors.private fry
-io.backend io.backend.unix.multiplexers io.buffers io.files
-io.ports io.timeouts kernel kernel.private libc locals make math
-namespaces sequences summary system threads unix unix.ffi
-unix.signals unix.stat unix.types ;
+classes.struct combinators continuations destructors destructors.private fry
+io.backend io.backend.unix.multiplexers io.buffers io.files io.ports
+io.timeouts kernel kernel.private libc locals make math namespaces sequences
+summary system threads unix unix.ffi unix.signals unix.stat unix.types ;
 QUALIFIED: io
 IN: io.backend.unix
 
@@ -28,12 +27,10 @@ TUPLE: fd < disposable fd ;
 
 M: fd dispose
     [
-        {
-            [ cancel-operation ]
-            [ t >>disposed drop ]
-            [ unregister-disposable ]
-            [ fd>> close-file ]
-        } cleave
+        [ dup cancel-operation ] [
+            t >>disposed
+            [ dup unregister-disposable ] [ fd>> close-file ] finally
+        ] finally
     ] unless-disposed ;
 
 M: fd handle-fd check-disposed fd>> ;
@@ -42,9 +39,9 @@ M: fd cancel-operation
     [
         fd>>
         mx get-global
-        [ remove-input-callbacks [ t swap resume-with ] each ]
+        [ 2dup remove-input-callbacks [ t swap resume-with ] each ]
         [ remove-output-callbacks [ t swap resume-with ] each ]
-        2bi
+        finally
     ] unless-disposed ;
 
 M: unix tell-handle

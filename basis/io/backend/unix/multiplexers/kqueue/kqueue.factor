@@ -14,11 +14,13 @@ TUPLE: kqueue-mx < mx events ;
 CONSTANT: max-events 256
 
 : <kqueue-mx> ( -- mx )
-    kqueue-mx new-mx
-        kqueue dup io-error >>fd
-        max-events \ kevent <c-array> >>events ;
+    [
+        kqueue-mx new-mx |dispose
+            max-events \ kevent <c-array> >>events
+            kqueue dup io-error >>fd
+    ] with-destructors ;
 
-M: kqueue-mx dispose* fd>> close-file ;
+M: kqueue-mx dispose* fd>> [ close-file ] when* ;
 
 : make-kevent ( fd filter flags -- event )
     \ kevent new
@@ -30,16 +32,16 @@ M: kqueue-mx dispose* fd>> close-file ;
     fd>> swap 1 f 0 f kevent-func io-error ;
 
 M: kqueue-mx add-input-callback
-    [ call-next-method ] [
+    [
         [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
-    ] 2bi ;
+    ] [ call-next-method ] 2bi ;
 
 M: kqueue-mx add-output-callback
-    [ call-next-method ] [
+    [
         [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
-    ] 2bi ;
+    ] [ call-next-method ] 2bi ;
 
 M: kqueue-mx remove-input-callbacks
     2dup reads>> key? [
