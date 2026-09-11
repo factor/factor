@@ -7,6 +7,8 @@ namespace factor {
 void enqueue_signal_handler(int, siginfo_t*, void*);
 void fep_signal_handler(int, siginfo_t*, void*);
 void sample_signal_handler(int, siginfo_t*, void*);
+VM_C_API void factor_begin_ignore_console_signals();
+VM_C_API void factor_end_ignore_console_signals();
 }
 
 static void check(bool condition, const char* message) {
@@ -141,6 +143,40 @@ static void test_foreign_alarm_profiling() {
         "late alarm sampled a stopped profiler");
 }
 
+static volatile sig_atomic_t interrupts = 0;
+
+static void count_interrupt(int, siginfo_t*, void*) { interrupts++; }
+
+static void test_waiting_shell_signals() {
+  struct sigaction action = {}, before, after;
+  sigemptyset(&action.sa_mask);
+  sigaddset(&action.sa_mask, SIGUSR1);
+  action.sa_sigaction = count_interrupt;
+  action.sa_flags = SA_SIGINFO | SA_RESTART | SA_ONSTACK;
+  check(sigaction(SIGINT, &action, NULL) == 0, "sigaction failed");
+  check(sigaction(SIGINT, NULL, &before) == 0, "sigaction query failed");
+  factor_begin_ignore_console_signals();
+  factor_begin_ignore_console_signals();
+  factor_end_ignore_console_signals();
+  check(raise(SIGINT) == 0 && interrupts == 0, "nested suppression ended early");
+  pid_t pid = fork();
+  check(pid >= 0, "fork failed");
+  if (pid == 0) {
+    execl("/bin/sh", "sh", "-c", "kill -INT $$; exit 17", (char*)NULL);
+    _exit(99);
+  }
+  int status;
+  check(waitpid(pid, &status, 0) == pid, "waitpid failed");
+  check(WIFSIGNALED(status) && WTERMSIG(status) == SIGINT,
+        "exec child inherited ignored SIGINT");
+  factor_end_ignore_console_signals();
+  check(sigaction(SIGINT, NULL, &after) == 0, "sigaction query failed");
+  check(after.sa_sigaction == before.sa_sigaction && after.sa_flags == before.sa_flags &&
+            sigismember(&after.sa_mask, SIGUSR1) == 1,
+        "shell did not restore the complete sigaction");
+  check(raise(SIGINT) == 0 && interrupts == 1, "restored handler did not run");
+}
+
 // Each test owns its process, handlers, timers, and descriptors. A regression
 // that crashes a signal handler must not prevent the other checks from running.
 static bool run_test(const char* name, void (*test)()) {
@@ -171,5 +207,6 @@ int main() {
   passed &= run_test("profiler above timer resolution", []() { test_timer(1000001, 0, 1); });
   passed &= run_test("SIGALRM on a foreign thread without a VM", test_foreign_alarm_without_vm);
   passed &= run_test("foreign samples reach the active profiler", test_foreign_alarm_profiling);
+  passed &= run_test("waiting shell signal suppression", test_waiting_shell_signals);
   return passed ? 0 : 1;
 }
