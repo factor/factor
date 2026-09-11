@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings
-alien.utilities assocs combinators continuations environment fry
+alien.utilities assocs byte-arrays combinators continuations environment fry
 io.backend io.backend.unix io.encodings.utf8 io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc math namespaces sequences simple-tokenizer
@@ -79,7 +79,7 @@ IN: io.launcher.unix
 
 ! Ignored signals are not reset to the default handler.
 : reset-ignored-signals ( -- )
-    SIGPIPE SIG_DFL signal drop ;
+    SIGPIPE SIG_DFL signal SIG_ERR = [ throw-errno ] when ;
 
 : fork-process ( process -- pid )
     [ reset-ignored-signals ] [ 2drop 248 _exit ] recover
@@ -97,7 +97,9 @@ IN: io.launcher.unix
     posix-spawn-file-actions-addchdir ;
 
 : reset-ignored-signals* ( attrp -- attrp' )
-    dup SIGPIPE 2^ sigset_t <ref>
+    dup sigset_t heap-size <byte-array>
+    dup sigemptyset io-error
+    dup SIGPIPE sigaddset io-error
     posix_spawnattr_setsigdefault check-posix ;
 
 : setup-process-group* ( attrp argv flags process -- attrp' argv flags' )

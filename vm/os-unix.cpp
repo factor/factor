@@ -126,19 +126,36 @@ segment::~segment() {
     fatal_error("Segment deallocation failed", 0);
 }
 
+// ITIMER_REAL belongs to the process. A signal may arrive on a foreign
+// thread, so publish its owner without consulting the mutable VM map.
+static factor_vm* volatile sampling_profiler_vm = NULL;
+
 void factor_vm::start_sampling_profiler_timer() {
   struct itimerval timer;
   memset((void*)&timer, 0, sizeof(struct itimerval));
-  timer.it_value.tv_usec = 1000000 / samples_per_second;
-  timer.it_interval.tv_usec = 1000000 / samples_per_second;
-  setitimer(ITIMER_REAL, &timer, NULL);
+  fixnum interval = std::max(fixnum(1), fixnum(1000000) / samples_per_second);
+  timer.it_value.tv_sec = interval / 1000000;
+  timer.it_value.tv_usec = interval % 1000000;
+  timer.it_interval = timer.it_value;
+  atomic::store(&sampling_profiler_vm, this);
+  if (setitimer(ITIMER_REAL, &timer, NULL) < 0)
+    fatal_error("setitimer failed", errno);
 }
 
 void factor_vm::end_sampling_profiler_timer() {
   struct itimerval timer;
   memset((void*)&timer, 0, sizeof(struct itimerval));
-  setitimer(ITIMER_REAL, &timer, NULL);
+  if (setitimer(ITIMER_REAL, &timer, NULL) < 0)
+    fatal_error("setitimer failed", errno);
+  atomic::store(&sampling_profiler_vm, (factor_vm*)NULL);
 }
+
+// Signal delivery must not change the interrupted code's syscall result.
+struct signal_handler_scope {
+  int saved_errno;
+  signal_handler_scope() : saved_errno(errno) {}
+  ~signal_handler_scope() { errno = saved_errno; }
+};
 
 void factor_vm::dispatch_signal(void* uap, void(handler)()) {
   dispatch_signal_handler((cell*)&UAP_STACK_POINTER(uap),
@@ -147,6 +164,7 @@ void factor_vm::dispatch_signal(void* uap, void(handler)()) {
 }
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   (void) signal;
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
@@ -156,6 +174,7 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   (void) siginfo;
   if (factor_vm::fatal_erroring_p)
     return;
@@ -167,14 +186,27 @@ void synchronous_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   vm->dispatch_signal(uap, factor::synchronous_signal_handler_impl);
 }
 
-void safe_write_nonblock(int fd, void* data, ssize_t size);
-
 static void enqueue_signal(factor_vm* vm, int signal) {
-  if (vm->signal_pipe_output != 0)
-    safe_write_nonblock(vm->signal_pipe_output, &signal, sizeof(int));
+  if (vm->signal_pipe_output < 0)
+    return;
+  ssize_t written;
+  do {
+    // A single int fits within PIPE_BUF: the nonblocking write is atomic.
+    written = write(vm->signal_pipe_output, &signal, sizeof(signal));
+  } while (written < 0 && errno == EINTR);
+  if (written < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+    return;
+  if (written != sizeof(signal)) {
+    // fatal_error uses stdio and other functions unsafe in a signal handler.
+    static const char message[] = "Factor signal pipe write failed\n";
+    ssize_t ignored = write(STDERR_FILENO, message, sizeof(message) - 1);
+    (void)ignored;
+    _exit(1);
+  }
 }
 
 void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   (void) siginfo;
   (void) uap;
   if (factor_vm::fatal_erroring_p)
@@ -186,6 +218,7 @@ void enqueue_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   (void) siginfo;
   (void) uap;
   if (factor_vm::fatal_erroring_p)
@@ -200,16 +233,15 @@ void fep_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void sample_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   (void) siginfo;
   factor_vm* vm = current_vm_p();
-  bool foreign_thread = false;
-  if (vm == NULL) {
-    foreign_thread = true;
-    vm = thread_vms.begin()->second;
-  }
-  if (atomic::load(&vm->sampling_profiler_p))
-    vm->enqueue_samples(1, (cell)UAP_PROGRAM_COUNTER(uap), foreign_thread);
-  else if (!foreign_thread)
+  factor_vm* owner = atomic::load(&sampling_profiler_vm);
+  if (owner && atomic::load(&owner->sampling_profiler_p)) {
+    bool foreign_thread = vm != owner;
+    owner->enqueue_samples(1, foreign_thread ? 0 : (cell)UAP_PROGRAM_COUNTER(uap),
+                           foreign_thread);
+  } else if (vm)
     enqueue_signal(vm, signal);
 }
 
@@ -220,6 +252,7 @@ void ignore_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 }
 
 void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
+  signal_handler_scope scope;
   factor_vm* vm = current_vm();
   vm->signal_number = signal;
   vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
@@ -334,7 +367,7 @@ void factor_vm::unix_init_signals() {
     sigaction_safe(SIGALRM, &sample_sigaction, NULL);
   }
 
-  // We don't use SA_IGN here because then the ignore action is inherited
+  // We don't use SIG_IGN here because then the ignore action is inherited
   // by subprocesses, which we don't want. There is a unit test in
   // io.launcher.unix for this.
   {
@@ -385,11 +418,6 @@ bool check_write(int fd, void* data, ssize_t size) {
 
 void safe_write(int fd, void* data, ssize_t size) {
   if (!check_write(fd, data, size))
-    fatal_error("error writing fd", errno);
-}
-
-void safe_write_nonblock(int fd, void* data, ssize_t size) {
-  if (!check_write(fd, data, size) && errno != EAGAIN)
     fatal_error("error writing fd", errno);
 }
 

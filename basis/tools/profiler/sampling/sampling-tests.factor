@@ -1,4 +1,4 @@
-USING: assocs byte-arrays calendar kernel kernel.private math
+USING: assocs byte-arrays calendar continuations kernel kernel.private math
 memory namespaces parser random sequences threads
 tools.profiler.sampling tools.profiler.sampling.private
 tools.test ;
@@ -58,4 +58,11 @@ gc
     ! because it runs so quickly. On x86.32, one spurious sample is
     ! sometimes generated for some unknown reason.
     gc [ ] profile get-samples length 1 <=
+] unit-test
+
+! On Unix this used to put 1,000,000 in tv_usec, silently disabling the timer.
+{ t } [
+    1 set-profiling
+    [ 2 seconds sleep ] [ 0 set-profiling ] finally
+    get-samples >boolean
 ] unit-test
