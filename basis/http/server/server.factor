@@ -49,6 +49,11 @@ GENERIC: write-full-response ( request response -- )
 : write-response-body ( response -- response )
     dup body>> call-template ;
 
+: response-body? ( request response -- ? )
+    [ method>> "HEAD" = ]
+    [ code>> present dup "1" head? swap { "204" "205" "304" } member? or ] bi*
+    or not ;
+
 M: response write-response
     write-response-line
     write-response-header
@@ -57,11 +62,11 @@ M: response write-response
 
 M: response write-full-response
     dup write-response
-    swap method>> "HEAD" = [
+    [ response-body? ] keep swap [
         [ content-encoding>> encode-output ]
         [ write-response-body ]
         bi
-    ] unless drop ;
+    ] when drop ;
 
 M: raw-response write-response
     write-response-line

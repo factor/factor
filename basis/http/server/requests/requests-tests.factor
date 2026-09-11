@@ -1,8 +1,8 @@
-USING: accessors assocs continuations http http.client
+USING: accessors arrays assocs continuations http http.client
 http.client.private http.server http.server.requests io io.crlf
 io.streams.limited io.streams.string linked-assocs kernel math
 math.parser multiline namespaces peg sequences splitting
-tools.test urls ;
+strings tools.test urls ;
 IN: http.server.requests.tests
 
 : request>string ( request -- string )
@@ -26,11 +26,102 @@ IN: http.server.requests.tests
     [ data>> data>> ] [ header>> "content-length" of ] bi
 ] unit-test
 
-! Incorrect content-length works fine
-{ LH{ { "foo" "bar" } } } [
+! A truncated request must never reach an action with partial form data.
+[
     { { "foo" "bar" } } "localhost" <post-request> request>string
-    "7" "190" replace string>request data>> params>>
+    "7" "190" replace string>request
+] [ incomplete-request? ] must-fail-with
+
+! The request-header budget must not silently truncate ordinary bodies.
+{ 70000 } [
+    70000 CHAR: a <string> "localhost" <post-request>
+    request>string string>request data>> data>> length
 ] unit-test
+
+{ 70000 } [
+    "foo" 70000 CHAR: a <string> 2array 1array "localhost" <post-request>
+    request>string string>request data>> params>> "foo" of length
+] unit-test
+
+! Content-Length also bounds reads when more data follows the body.
+{ "abc" "extra" } [
+    "POST / HTTP/1.1\r\nContent-Length: 3\r\n\r\nabcextra" [
+        request-limit get limited-input read-request data>> data>>
+        unlimited-input 5 read
+    ] with-string-reader
+] unit-test
+
+[
+    "POST / HTTP/1.1\r\nContent-Length: 10\r\n\r\nabc" string>request
+] [ incomplete-request? ] must-fail-with
+
+! An HTTP/1.1 request line cannot be parsed as a valid prefix or
+! downgraded to a simple request when its version is malformed.
+[
+    "GET / HTTP/1.1 trailing-garbage\r\n\r\n" string>request
+] [ bad-request-line? ] must-fail-with
+
+[
+    "GET / HTTP/2.0\r\n\r\n" string>request
+] [ bad-request-line? ] must-fail-with
+
+! EOF (including the header size limit) is not an empty header line.
+[
+    "GET / HTTP/1.1\r\nHost: localhost" string>request
+] [ incomplete-request? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\r\nX-Large: " 70000 CHAR: a <string>
+    "\r\n\r\n" 3append string>request
+] [ incomplete-request? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\r\nBadHeader\r\n\r\n" string>request
+] [ bad-request-header? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\r\nHost: localhost:garbage\r\n\r\n" string>request
+] [ bad-request-header? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\rX" string>request
+] [ malformed-request? ] must-fail-with
+
+[
+    "POST / HTTP/1.1\r\nContent-Length: 12\r\nContent-Type: multipart/form-data; boundary=xyz\r\n\r\n--xyz\r\nshort"
+    string>request
+] [ bad-request-body? ] must-fail-with
+
+! Chunked requests are unsupported; never interpret them using a
+! conflicting Content-Length or ignore the coding on a GET request.
+[
+    "POST / HTTP/1.1\r\nTransfer-Encoding: chunked\r\nContent-Length: 3\r\n\r\nabc"
+    string>request
+] [ unsupported-transfer-encoding? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"
+    string>request
+] [ unsupported-transfer-encoding? ] must-fail-with
+
+! A boundary is a named MIME parameter, and can be quoted or follow
+! other parameters.
+{ "xyz" } [
+    "multipart/form-data; boundary=\"xyz\"" parse-multipart-form-data
+] unit-test
+
+{ "xyz" } [
+    "multipart/form-data; charset=UTF-8; Boundary=xyz"
+    parse-multipart-form-data
+] unit-test
+
+[
+    "multipart/form-data; boundary=\"\"" parse-multipart-form-data
+] [ no-boundary? ] must-fail-with
+
+[
+    "multipart/form-data; charset=UTF-8" parse-multipart-form-data
+] [ no-boundary? ] must-fail-with
 
 { LH{ { "name" "John Smith" } } } [
     { { "name" "John Smith" } } "localhost" <post-request> request>string
@@ -64,6 +155,14 @@ hello
 } [
     test-multipart/form-data lf>crlf string>request
     data>> params>> "text" of [ filename>> ] [ headers>> ] bi
+] unit-test
+
+! Exercise quoted boundary extraction through the complete HTTP parser.
+{ "upload.txt" } [
+    test-multipart/form-data lf>crlf
+    "boundary=768de80194d942619886d23f1337aa15"
+    "charset=UTF-8; boundary=\"768de80194d942619886d23f1337aa15\""
+    replace string>request data>> params>> "text" of filename>>
 ] unit-test
 
 ! Error handling
@@ -194,6 +293,7 @@ M: incomplete-tls-stream stream-read-until
         "connection: close"
         "host: 127.0.0.1:55532"
         "user-agent: Factor http.client"
+        "" ""
     } [ join-lines ] [ "\r\n" join ] bi
     [ string>request ] same?
 ] unit-test

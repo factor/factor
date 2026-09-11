@@ -80,6 +80,7 @@ STRING: read-request-test-2
 HEAD  /bar   HTTP/1.1
 Host: www.sex.com
 
+
 ;
 
 {
@@ -101,6 +102,7 @@ Host: www.sex.com
 STRING: read-request-test-2'
 HEAD  /bar   HTTP/1.1
 Host: www.sex.com:101
+
 
 ;
 
@@ -128,6 +130,8 @@ GET nested HTTP/1.0
 STRING: read-request-test-4
 GET /blah HTTP/1.0
 Host: "www.amazon.com"
+
+
 ;
 
 { "www.amazon.com" }
