@@ -118,7 +118,8 @@ void factor_vm::primitive_become() {
     auto code_block_become_func = [&](code_block* compiled, cell size) {
       (void)size;
       visitor.visit_code_block_objects(compiled);
-      visitor.visit_embedded_literals(compiled);
+      if (visitor.visit_embedded_literals(compiled))
+        compiled->flush_icache();
       code->write_barrier(compiled);
     };
     each_code_block(code_block_become_func);
