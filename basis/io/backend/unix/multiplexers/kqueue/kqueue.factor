@@ -27,19 +27,20 @@ M: kqueue-mx dispose* fd>> close-file ;
         swap >>ident ;
 
 : register-kevent ( kevent mx -- )
-    fd>> swap 1 f 0 f kevent-func io-error ;
+    ! The changelist has already been applied if kevent returns EINTR (#505).
+    fd>> swap 1 f 0 f [ kevent-func ] unix-system-call-allow-eintr drop ;
 
 M: kqueue-mx add-input-callback
-    [ call-next-method ] [
+    [
         [ EVFILT_READ flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
-    ] 2bi ;
+    ] [ call-next-method ] 2bi ;
 
 M: kqueue-mx add-output-callback
-    [ call-next-method ] [
+    [
         [ EVFILT_WRITE flags{ EV_ADD EV_ONESHOT } make-kevent ] dip
         register-kevent
-    ] 2bi ;
+    ] [ call-next-method ] 2bi ;
 
 M: kqueue-mx remove-input-callbacks
     2dup reads>> key? [
