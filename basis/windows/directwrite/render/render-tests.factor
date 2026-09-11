@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors destructors fonts fonts.shaping grouping
-kernel locals math math.functions sequences strings tools.test windows.directwrite
+kernel locals math math.functions math.vectors sequences strings tools.test windows.directwrite
 windows.directwrite.render ;
 IN: windows.directwrite.render.tests
 
@@ -109,6 +109,28 @@ IN: windows.directwrite.render.tests
         bitmap>> 4 group [ { 255 0 0 255 } sequence= ] any?
     ] with-disposal ;
 { t } [ distant-selection-renders? ] unit-test
+
+! Compare indexed glyph painting with native painting at tile boundaries
+! and well into a line, including ligatures and italic overhang.
+:: indexed-region-matches-native? ( font text x -- ? )
+    font text <directwrite-layout> [ :> layout
+        x 0 2array :> offset
+        256 layout size>> second 2array :> dim
+        layout offset dim directwrite-layout>region-image bitmap>>
+        [ layout pointer>> dim layout origin>> offset v-
+          font foreground>> font background>> render-directwrite-tile bitmap>> ] with-destructors =
+    ] with-disposal ;
+
+{ t } [
+    { 0 256 512 30000 } [
+        "Consolas" <font> 6000 CHAR: a <string> rot indexed-region-matches-native?
+    ] all?
+] unit-test
+
+{ t } [
+    "Segoe UI" <font> t >>italic?
+    1000 [ "office affine " ] replicate concat 512 indexed-region-matches-native?
+] unit-test
 
 [ emoji-font "x" <directwrite-layout> dup dispose
     { 0 0 } { 8 8 } directwrite-layout>region-image ]

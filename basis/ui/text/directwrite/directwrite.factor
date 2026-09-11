@@ -19,7 +19,8 @@ M: directwrite-renderer string-dim
     [ width>> ] [ height>> ] bi 2array scale-dim ;
 
 M: directwrite-renderer flush-layout-cache
-    cached-directwrite-layouts get-global purge-cache ;
+    cached-directwrite-layouts get-global purge-cache
+    directwrite-layout-aliases get-global purge-cache ;
 
 M: directwrite-renderer string>image
     cached-directwrite-layout

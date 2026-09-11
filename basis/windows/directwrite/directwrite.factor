@@ -1,15 +1,15 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache
-classes.struct destructors fonts fonts.shaping init io.encodings.string
+classes.struct destructors fonts fonts.shaping hashtables.identity.private init io.encodings.string
 io.encodings.utf16 kernel locals math math.bitwise math.functions math.order
 namespaces opengl sequences ui.text.index-maps windows.com windows.directx.dwrite
-windows.fonts windows.ole32 windows.types ;
+windows.directwrite.indexed windows.fonts windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
 FROM: destructors.private => register-disposable ;
 IN: windows.directwrite
 
-TUPLE: directwrite-layout < disposable font string pointer metrics size image origin index-map selection-rects ;
+TUPLE: directwrite-layout < disposable font string pointer metrics size image origin index-map selection-rects glyph-index ;
 
 : <directwrite-factory> ( -- factory )
     DWRITE_FACTORY_TYPE_SHARED IDWriteFactory-iid
@@ -142,6 +142,22 @@ ERROR: missing-directwrite-fallback-font ;
 
 DEFER: cached-directwrite-layout
 
+:: index-directwrite-layout ( layout -- layout )
+    layout string>> :> text
+    text length 4096 > layout font>> font-text-direction right-to-left = not and [
+        text [ dup 32 >= swap 126 <= and ] all? [
+            layout pointer>> <directwrite-glyph-index> :> index
+            layout index >>glyph-index drop
+            ! GetMetrics accumulates advances in single precision and can
+            ! overestimate a ten-million-character row by millions of pixels.
+            layout metrics>> index width>> >>width drop
+            index width>> layout origin>> first +
+            index regions>> [ right>> ] [ max ] map-reduce max ceiling >integer
+            0 layout size>> set-nth
+        ] when
+    ] when
+    layout ;
+
 :: <directwrite-layout> ( font text -- layout )
     text selection? [
         ! Selection is paint state. Share the native shaped layout instead
@@ -150,11 +166,16 @@ DEFER: cached-directwrite-layout
         dup directwrite-layout-index-map drop clone
         dup pointer>> IUnknown::AddRef drop
         dup register-disposable
+        dup glyph-index>> [ retain-glyph-index drop ] when*
         text >>string f >>image f >>selection-rects
-    ] [ font text <plain-directwrite-layout> ] if ;
+    ] [
+        [ font text <plain-directwrite-layout> |dispose index-directwrite-layout ] with-destructors
+    ] if ;
 
 M: directwrite-layout dispose*
-    [ pointer>> com-release ] [ f >>pointer drop ] bi ;
+    [ pointer>> com-release ]
+    [ glyph-index>> [ release-glyph-index ] when* ]
+    [ f >>pointer f >>glyph-index drop ] tri ;
 
 :: directwrite-offset>x ( index layout -- x )
     layout check-disposed drop
@@ -176,12 +197,48 @@ M: directwrite-layout dispose*
     layout directwrite-layout-index-map native>codepoint ;
 
 SYMBOL: cached-directwrite-layouts
+SYMBOL: directwrite-layout-aliases
+directwrite-layout-aliases [ <cache-assoc> ] initialize
+
+! Equal output rows share one native layout, but comparing distinct 10MB
+! strings on every repaint is still linear work. Remember each object's
+! canonical cache key, and touch the owning cache on every alias hit.
+TUPLE: directwrite-layout-alias < disposable key ;
+M: directwrite-layout-alias dispose* drop ;
+
+:: directwrite-layout-key ( font string -- key )
+    font snapshot-directwrite-font-name string directwrite-scale 3array ;
+
+:: directwrite-aliased-layout ( font string -- layout )
+    font snapshot-directwrite-font-name string <identity-wrapper>
+    string hashcode directwrite-scale 4array :> alias-key
+    alias-key directwrite-layout-aliases get-global [
+        drop font string directwrite-layout-key cached-directwrite-layouts get-global
+        [ drop font string <directwrite-layout> ] cache :> layout
+        directwrite-layout-alias new-disposable
+            layout font>> layout string>> directwrite-layout-key >>key
+    ] cache :> alias
+    ! The canonical string may have been edited through another reference.
+    alias key>> second hashcode string hashcode = [
+        alias key>> cached-directwrite-layouts get-global
+        [ first2 <directwrite-layout> ] cache
+    ] [
+        alias-key directwrite-layout-aliases get-global delete-at
+        font string directwrite-aliased-layout
+    ] if ;
 
 :: cached-directwrite-layout ( font string -- layout )
-    font snapshot-directwrite-font-name string directwrite-scale 3array cached-directwrite-layouts get-global
-    [ drop font string <directwrite-layout> ] cache ;
+    string dup selection? [ string>> ] when length 4096 > [
+        font string directwrite-aliased-layout
+    ] [
+        font string directwrite-layout-key cached-directwrite-layouts get-global
+        [ drop font string <directwrite-layout> ] cache
+    ] if ;
 
-STARTUP-HOOK: [ <cache-assoc> cached-directwrite-layouts set-global ]
+STARTUP-HOOK: [
+    <cache-assoc> cached-directwrite-layouts set-global
+    <cache-assoc> directwrite-layout-aliases set-global
+]
 
 ! A logical selection can cover several disjoint visual runs in bidi text.
 :: (directwrite-selection-rects) ( layout -- rects )
