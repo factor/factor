@@ -1,5 +1,5 @@
 USING: accessors arrays byte-arrays effects kernel
-kernel.private math memory namespaces quotations sequences
+kernel.private locals math memory namespaces quotations sequences
 tools.test words ;
 FROM: tools.memory => data-room code-room ;
 IN: memory.tests
@@ -25,6 +25,20 @@ IN: memory.tests
 { "replacer" } [
     "original" dup 1array { "replacer" } become
 ] unit-test
+
+:: check-become-compiled-literal ( -- )
+    "before-become" clone :> before
+    "after-become" clone :> after
+    before 1quotation :> quot
+    ! Compile and execute the literal before replacing it, warming the code.
+    quot call( -- obj ) before eq? t assert=
+    before 1array after 1array become
+    quot call( -- obj ) after eq? t assert=
+    minor-gc quot call( -- obj ) after eq? t assert=
+    gc quot call( -- obj ) after eq? t assert=
+    compact-gc quot call( -- obj ) after eq? t assert= ;
+
+{ } [ check-become-compiled-literal ] unit-test
 
 ! Nested in aging
 { "replacer" } [
