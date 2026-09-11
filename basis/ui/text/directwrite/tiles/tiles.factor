@@ -4,7 +4,8 @@ USING: accessors alien.c-types alien.data arrays assocs cache
 destructors kernel locals math math.functions math.order math.rectangles
 math.vectors namespaces opengl opengl.gl opengl.textures
 opengl.textures.private ranges sequences ui.gadgets.worlds ui.render
-ui.text.private windows.directwrite windows.directwrite.render ;
+ui.text.directwrite.transforms ui.text.private windows.directwrite
+windows.directwrite.render ;
 IN: ui.text.directwrite.tiles
 
 CONSTANT: directwrite-tile-dim { 256 256 }
@@ -28,11 +29,10 @@ M: directwrite-tile dispose* texture>> [ delete-texture ] when* ;
 
 : directwrite-modelview ( -- matrix )
     gl3-mode? get-global [ current-modelview get-global ] [
-        16 alien.c-types:float <c-array>
-        [ GL_MODELVIEW_MATRIX swap glGetFloatv ] keep
-        16 alien.c-types:float <c-array>
-        [ GL_PROJECTION_MATRIX swap glGetFloatv ] keep
-        swap mat4-multiply
+        current-directwrite-transform
+        16 double <c-array>
+        [ GL_PROJECTION_MATRIX swap glGetDoublev ] keep
+        swap multiply-directwrite-transforms
     ] if ;
 
 :: directwrite-viewport-clip ( rect viewport-dim -- rect' )
@@ -105,7 +105,11 @@ M: directwrite-tile dispose* texture>> [ delete-texture ] when* ;
         [
             GL_TEXTURE_2D tile texture>> glBindTexture
             init-texture tile coords>> gl-texture-coord-pointer
-            tile loc>> tile dim>> gl-fill-rect
+            [
+                current-directwrite-transform tile loc>> translate-directwrite-transform
+                double >c-array glLoadMatrixd
+                { 0 0 } tile dim>> gl-fill-rect
+            ] do-matrix
             GL_TEXTURE_2D 0 glBindTexture
         ] with-texturing
     ] if ;

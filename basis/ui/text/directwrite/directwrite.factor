@@ -1,7 +1,8 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays cache kernel math math.vectors namespaces opengl
-sequences ui.gadgets.worlds ui.text ui.text.private ui.text.directwrite.tiles windows.directwrite
+sequences ui.gadgets.worlds ui.text ui.text.private ui.text.directwrite.tiles
+ui.text.directwrite.transforms windows.directwrite
 windows.directwrite.render ;
 IN: ui.text.directwrite
 
@@ -43,3 +44,4 @@ M: directwrite-renderer line-metrics
     cached-directwrite-layout metrics>> clone scale-metrics ;
 
 directwrite-renderer font-renderer set-global
+install-directwrite-transforms
