@@ -434,7 +434,7 @@ void factor_vm::factorbug() {
     exit(1);
   }
 
-  if (sampling_profiler_p)
+  if (atomic::load(&sampling_profiler_p))
     end_sampling_profiler();
 
   fep_p = true;

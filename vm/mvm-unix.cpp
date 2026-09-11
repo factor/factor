@@ -10,7 +10,8 @@ void init_mvm() {
 }
 
 void register_vm_with_thread(factor_vm* vm) {
-  pthread_setspecific(current_vm_tls_key, vm);
+  if (pthread_setspecific(current_vm_tls_key, vm) != 0)
+    fatal_error("pthread_setspecific() failed", 0);
 }
 
 factor_vm* current_vm_p() {

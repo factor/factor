@@ -39,7 +39,7 @@ void factor_vm::handle_safepoint(cell pc) {
     if (atomic::load(&sampling_profiler_p))
       end_sampling_profiler();
     std::cout << "Interrupted\n";
-    if (stop_on_ctrl_break) {
+    if (atomic::load(&stop_on_ctrl_break)) {
       /* Ctrl-Break throws an exception, interrupting the main thread, same
          as the "t" command in the factorbug debugger. But for Ctrl-Break to
          work we don't require the debugger to be activated, or even enabled. */
