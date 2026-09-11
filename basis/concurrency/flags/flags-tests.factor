@@ -1,4 +1,4 @@
-USING: tools.test concurrency.flags concurrency.combinators kernel threads
+USING: continuations tools.test concurrency.flags concurrency.combinators kernel threads
 accessors calendar locals concurrency.futures concurrency.promises ;
 IN: concurrency.flags.tests
 
@@ -54,5 +54,16 @@ IN: concurrency.flags.tests
     yield flag raise-flag flag lower-flag yield
     waiter promise-fulfilled?
     flag raise-flag waiter ?future
+  ]
+] unit-test
+
+! Notification remains a broadcast even if another thread lowers the flag
+! before an already-notified waiter is scheduled.
+{ t } [
+  [let
+    <flag> :> flag
+    [ flag wait-for-flag t ] future :> waiter
+    yield flag raise-flag flag lower-flag
+    [ waiter 100 milliseconds ?future-timeout ] [ flag raise-flag ] finally
   ]
 ] unit-test

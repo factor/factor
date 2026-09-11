@@ -63,7 +63,6 @@ TYPED: mailbox-get-timeout ( mailbox: mailbox timeout -- obj )
     f swap mailbox-get-timeout? ; inline
 
 : wait-for-close-timeout ( mailbox timeout -- )
-    >deadline
     '[
         _ 2dup wait-for-mailbox wait-for-close-timeout
     ] unless-disposed ;

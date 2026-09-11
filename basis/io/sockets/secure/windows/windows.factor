@@ -1,10 +1,9 @@
-USING: accessors alien alien.c-types alien.data alien.destructors
-alien.strings byte-arrays calendar continuations combinators
-combinators.short-circuit destructors io io.encodings.utf8 io.ports
-io.sockets.private io.sockets.secure io.sockets.secure.openssl
-io.sockets.windows kernel libc locals math math.order openssl
-openssl.libcrypto openssl.libssl system windows.crypt32 windows.errors
-windows.time windows.winsock ;
+USING: accessors alien alien.c-types alien.data alien.strings
+calendar combinators combinators.short-circuit destructors io
+io.encodings.utf8 io.ports io.sockets.private io.sockets.secure
+io.sockets.secure.openssl io.sockets.windows kernel libc locals
+math math.order openssl openssl.libcrypto openssl.libssl system
+windows.crypt32 windows.errors windows.time windows.winsock ;
 IN: io.sockets.secure.windows
 
 M: openssl ssl-supported? t ;
@@ -13,15 +12,13 @@ M: openssl ssl-certificate-verification-supported? f ;
 : close-windows-cert-store ( HCERTSTORE -- )
     0 CertCloseStore win32-error=0/f ;
 
-DESTRUCTOR: close-windows-cert-store
-
 : load-windows-cert-store ( string -- HCERTSTORE )
     [ f ] dip CertOpenSystemStore
     [ win32-error f ] when-zero ;
 
 : X509-NAME. ( X509_NAME -- )
-    1024 <byte-array> 1024 X509_NAME_oneline
-    dup ssl-error utf8 alien>string print ;
+    f 0 X509_NAME_oneline
+    [ utf8 alien>string print ] [ (free) ] bi ;
 
 : X509. ( X509 -- )
     {
@@ -34,22 +31,22 @@ DESTRUCTOR: close-windows-cert-store
 
 :: set-windows-certs-for ( name -- )
     [
-        name load-windows-cert-store &close-windows-cert-store :> cs
-        X509_STORE_new dup ssl-error &X509_STORE_free :> x509-store
+        name load-windows-cert-store :> cs
+        X509_STORE_new :> x509-store
         f :> ctx!
+        [ ctx ]
         [
-            [ ctx ] [
-                cs ctx CertEnumCertificatesInStore ctx!
-                ctx [
-                    [
-                        f ctx [ pbCertEncoded>> void* <ref> ]
-                        [ cbCertEncoded>> ] bi d2i_X509
-                        dup ssl-error &X509_free
-                        x509-store swap X509_STORE_add_cert ssl-error
-                    ] with-destructors
-                ] when
-            ] do while
-        ] [ ctx [ CertFreeCertificateContext drop ] when* ] finally
+            cs ctx CertEnumCertificatesInStore ctx!
+            ctx [
+                f ctx [ pbCertEncoded>> void* <ref> ]
+                [ cbCertEncoded>> ] bi d2i_X509
+                {
+                    [ ssl-error ]
+                    ! [ X509. ]
+                    [ x509-store swap X509_STORE_add_cert ssl-error ]
+                } cleave
+            ] when
+        ] do while
     ] with-destructors ;
 
 ! XXX: the MSFT cert is in "CA" twice, and throws an error

@@ -1,4 +1,4 @@
-USING: destructors kernel math namespaces openssl openssl.libssl
+USING: alien.strings io.encodings.utf8 alien.libraries destructors kernel math namespaces openssl openssl.libcrypto openssl.libssl
 sequences tools.test ;
 IN: openssl.libssl.tests
 
@@ -67,16 +67,45 @@ maybe-init-ssl
     ] with-destructors
 ] unit-test
 
-{ 0x0303 0x0304 0x0303 0x0304 } [
+ssl-new-api? get-global [
+{ 0x0302 0x0303 0x0302 0x0303 } [
     [
         new-tls-ctx
-        dup TLS1_2_VERSION SSL_CTX_set_min_proto_version ssl-error
-        dup TLS1_3_VERSION SSL_CTX_set_max_proto_version ssl-error
+        dup TLS1_1_VERSION SSL_CTX_set_min_proto_version ssl-error
+        dup TLS1_2_VERSION SSL_CTX_set_max_proto_version ssl-error
         [ SSL_CTX_get_min_proto_version ]
         [ SSL_CTX_get_max_proto_version ]
         [ new-ssl
-          dup TLS1_2_VERSION SSL_set_min_proto_version ssl-error
-          dup TLS1_3_VERSION SSL_set_max_proto_version ssl-error
+          dup TLS1_1_VERSION SSL_set_min_proto_version ssl-error
+          dup TLS1_2_VERSION SSL_set_max_proto_version ssl-error
           [ SSL_get_min_proto_version ] [ SSL_get_max_proto_version ] bi ] tri
     ] with-destructors
+] unit-test
+] when
+
+! These calls return values that callers need to check or retain.
+"SSL_CTX_set_ciphersuites" "libssl" dlsym? [
+{ 1 } [
+    [ new-tls-ctx "TLS_AES_128_GCM_SHA256" utf8 string>alien SSL_CTX_set_ciphersuites ]
+    with-destructors
+] unit-test
+] when
+
+{ t } [
+    [
+        new-tls-ctx new-ssl
+        new-tls-ctx [ SSL_set_SSL_CTX ] keep =
+    ] with-destructors
+] unit-test
+
+! Both RSA key-file APIs take the filename as well as the file type.
+{ 0 0 } [
+    [
+        new-tls-ctx
+        dup "no-such-rsa-private-key.pem" SSL_FILETYPE_PEM
+        SSL_CTX_use_RSAPrivateKey_file
+        swap new-ssl "no-such-rsa-private-key.pem" SSL_FILETYPE_PEM
+        SSL_use_RSAPrivateKey_file
+    ] with-destructors
+    ERR_clear_error
 ] unit-test

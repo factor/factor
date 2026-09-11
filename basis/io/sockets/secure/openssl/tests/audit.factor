@@ -1,8 +1,8 @@
-USING: accessors alien alien.c-types arrays alien.data alien.strings
-byte-arrays destructors io.encodings.utf8 io.sockets.secure
-io.sockets.secure.openssl io.sockets.secure.openssl.private kernel libc
-locals math namespaces classes.struct openssl openssl.libcrypto
-openssl.libssl sequences strings tools.test ;
+USING: accessors alien alien.c-types alien.data alien.strings arrays
+byte-arrays classes.struct destructors io.encodings.string io.encodings.utf8
+io.sockets.secure io.sockets.secure.openssl
+io.sockets.secure.openssl.private kernel libc locals math namespaces openssl
+openssl.libcrypto openssl.libssl sequences strings tools.test ;
 IN: io.sockets.secure.openssl.audit-tests
 
 : with-identity-certificate ( quot -- )
@@ -37,7 +37,7 @@ IN: io.sockets.secure.openssl.audit-tests
 : call-alpn-callback ( ssl out outlen in inlen arg callback -- result )
     int { void* void* void* void* uint void* } cdecl alien-indirect ;
 
-! Selected ALPN data must point inside the native peer buffer.
+! Selected ALPN data must point inside a native buffer that outlives the call.
 { t 2 0 } [
   [ [let
     alpn_select_cb_func :> callback
@@ -49,7 +49,7 @@ IN: io.sockets.secure.openssl.audit-tests
     f selected selected-length peer 3 protocols callback
     call-alpn-callback :> result
     selected void* deref alien-address
-    peer alien-address 1 + =
+    configured alien-address 1 + =
     selected-length uchar deref result
   ] ] with-destructors
 ] unit-test
@@ -87,3 +87,28 @@ M: audit-file dispose* drop ;
       ]
     ] with-destructors
 ] unit-test
+
+:: select-test-alpn ( server-protocols client-protocols -- selected result )
+    [
+        server-protocols alpn-wire-format :> server-wire
+        server-wire malloc-byte-array &free :> server
+        alpn-protocols malloc-struct &free
+            server >>data server-wire length >>length :> protocols
+        client-protocols alpn-wire-format :> client-wire
+        client-wire malloc-byte-array &free :> client
+        f void* <ref> :> selected
+        0 uchar <ref> :> selected-length
+        f selected selected-length client client-wire length protocols
+        alpn_select_cb_func call-alpn-callback :> result
+        result SSL_TLSEXT_ERR_OK = [
+            selected void* deref selected-length uchar deref
+            memory>byte-array utf8 decode
+        ] [ f ] if
+        result
+    ] with-destructors ;
+
+! Preserve server preference when the peer lists the same protocols differently.
+{ "h2" 0 } [
+    { "h2" "http/1.1" } { "http/1.1" "h2" } select-test-alpn
+] unit-test
+{ f 2 } [ { "h2" } { "http/1.1" } select-test-alpn ] unit-test
