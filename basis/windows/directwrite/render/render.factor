@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.data arrays byte-arrays classes.struct colors
 combinators destructors fonts fonts.shaping images init kernel locals
 libc math math.functions math.order math.vectors namespaces sequences
-windows.com windows.directwrite windows.directx.d2d1 windows.directx.d2dbasetypes
+windows.com windows.directwrite windows.directwrite.indexed windows.directx.d2d1 windows.directx.d2dbasetypes
 windows.directx.dxgiformat windows.offscreen windows.ole32 windows.types ;
 IN: windows.directwrite.render
 SYMBOL: text-color-fonts-disabled?
@@ -11,6 +11,7 @@ SYMBOL: text-selection-rects
 SYMBOL: text-selection-color
 SYMBOL: text-selection-background
 SYMBOL: cached-text-dc-target
+SYMBOL: text-glyph-index
 
 CONSTANT: D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT 4
 
@@ -66,9 +67,13 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
     target foreground <text-brush> :> brush
     target ID2D1RenderTarget::BeginDraw
     target background color>d2d ID2D1RenderTarget::Clear
-    target D2D_POINT_2F new origin first >>x origin second >>y pointer brush
-    text-color-fonts-disabled? get [ 0 ] [ D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT ] if
-    ID2D1RenderTarget::DrawTextLayout
+    text-glyph-index get [| index |
+        target index origin dim first brush draw-directwrite-regions
+    ] [
+        target D2D_POINT_2F new origin first >>x origin second >>y pointer brush
+        text-color-fonts-disabled? get [ 0 ] [ D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT ] if
+        ID2D1RenderTarget::DrawTextLayout
+    ] if*
     target f f ID2D1RenderTarget::EndDraw check-text-target-error ;
 
 :: render-layout-on ( pointer dim origin foreground background -- image )
@@ -167,6 +172,7 @@ CONSTANT: directwrite-tile-size 2048
 :: directwrite-layout>region-image ( layout position dim -- image )
     layout check-disposed drop
     [ layout font>> font-color-fonts? not text-color-fonts-disabled? set
+        layout glyph-index>> text-glyph-index set
         layout directwrite-selection-rects
         [ { [ left>> ] [ top>> ] [ width>> ] [ height>> ] } cleave 4array ] map
         dup empty? [ drop f ] when text-selection-rects set
