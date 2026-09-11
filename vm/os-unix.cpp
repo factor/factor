@@ -284,6 +284,34 @@ static void init_sigaction_with_handler(struct sigaction* act,
   act->sa_flags = SA_SIGINFO | SA_ONSTACK;
 }
 
+// Interactive shells share the terminal's foreground process group with
+// their child. Suppress interruptions in waiting shells without installing
+// SIG_IGN: a caught handler is reset to SIG_DFL by exec in the child (#1595).
+static pthread_mutex_t console_signal_mutex = PTHREAD_MUTEX_INITIALIZER;
+static unsigned console_signal_suppression = 0;
+static struct sigaction saved_sigint, saved_sigquit;
+
+VM_C_API void factor_begin_ignore_console_signals() {
+  pthread_mutex_lock(&console_signal_mutex);
+  if (console_signal_suppression++ == 0) {
+    struct sigaction action;
+    init_sigaction_with_handler(&action, ignore_signal_handler);
+    sigaction_safe(SIGINT, &action, &saved_sigint);
+    sigaction_safe(SIGQUIT, &action, &saved_sigquit);
+  }
+  pthread_mutex_unlock(&console_signal_mutex);
+}
+
+VM_C_API void factor_end_ignore_console_signals() {
+  pthread_mutex_lock(&console_signal_mutex);
+  FACTOR_ASSERT(console_signal_suppression > 0);
+  if (--console_signal_suppression == 0) {
+    sigaction_safe(SIGQUIT, &saved_sigquit, NULL);
+    sigaction_safe(SIGINT, &saved_sigint, NULL);
+  }
+  pthread_mutex_unlock(&console_signal_mutex);
+}
+
 static void safe_pipe(int* in, int* out) {
   int filedes[2];
 

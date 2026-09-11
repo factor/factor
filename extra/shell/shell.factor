@@ -1,7 +1,7 @@
-USING: accessors continuations debugger environment eval globs
+USING: accessors continuations debugger environment eval fry globs
 io io.directories io.encodings.utf8 io.launcher io.pathnames
 io.pipes kernel namespaces sequences sequences.deep shell.parser
-splitting words ;
+splitting system vocabs words ;
 IN: shell
 
 : cd ( args -- )
@@ -38,8 +38,13 @@ M: back-quoted-expr expand
     command>> expansion unclip
     "shell" lookup-word execute( arguments -- ) ;
 
+HOOK: with-foreground-interrupts os ( quot -- )
+
+M: object with-foreground-interrupts call( -- ) ;
+
 : run-foreground ( process -- )
-    [ try-process ] [ print-error drop ] recover ;
+    [ '[ _ try-process ] with-foreground-interrupts ]
+    [ print-error drop ] recover ;
 
 : run-background ( process -- )
     run-detached drop ;
@@ -57,7 +62,7 @@ M: back-quoted-expr expand
     [ run-sword ] [ run-basic-expr ] if ;
 
 : pipeline-chant ( pipeline-chant -- )
-    commands>> run-pipeline drop ;
+    commands>> '[ _ run-pipeline drop ] with-foreground-interrupts ;
 
 : chant ( obj -- )
     dup basic-expr? [ basic-chant ] [ pipeline-chant ] if ;
@@ -80,5 +85,7 @@ DEFER: shell
     prompt readln handle ;
 
 : ix ( -- ) shell ;
+
+os unix? [ "shell.unix" require ] when
 
 MAIN: ix
