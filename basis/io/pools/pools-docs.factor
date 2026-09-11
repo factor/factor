@@ -2,7 +2,7 @@ IN: io.pools
 USING: help.markup help.syntax destructors quotations ;
 
 HELP: pool
-{ $class-description "A connection pool. Instances of this class are not intended to be instantiated directly, only subclasses should be instantiated, for example " { $link datagram-pool } "." } ;
+{ $class-description "A connection pool. Instances of this class are not intended to be instantiated directly, only subclasses should be instantiated, for example " { $link datagram-pool } ". The max-idle slot limits the number of idle connections retained, or is f for no limit. It does not limit connections currently in use. A limit of zero disables retention." } ;
 
 HELP: <pool>
 { $values { "class" "a subclass of " { $link pool } } { "pool" pool } }
@@ -19,7 +19,7 @@ HELP: acquire-connection
 
 HELP: return-connection
 { $values { "conn" "a connection" } { "pool" pool } }
-{ $description "Returns a connection to the pool." } ;
+{ $description "Returns a connection to the pool. If the pool has been disposed of or its idle connection limit has been reached, disposes of the connection instead." } ;
 
 HELP: with-pooled-connection
 { $values { "pool" pool } { "quot" { $quotation ( conn -- ) } } }

@@ -1,8 +1,41 @@
-USING: accessors assocs calendar combinators concurrency.promises
+USING: accessors assocs calendar combinators concurrency.messaging concurrency.promises
 continuations fry io.sockets io.sockets.secure io.streams.string
-kernel namespaces sequences smtp smtp.private smtp.server
-sorting system tools.test ;
+kernel locals logging namespaces sequences smtp smtp.private smtp.server
+sorting system threads tools.test ;
+FROM: concurrency.messaging => receive ;
 IN: smtp.tests
+
+! Redaction must not change the authentication bytes sent to the server.
+{ "AUTH PLAIN AHVzZXIAcGFzcw==\r\n" } [
+    "235 authenticated\r\n" [
+        [ "user" "pass" <plain-auth> send-auth ] with-string-writer
+    ] with-string-reader
+] unit-test
+
+:: capture-auth-log ( auth responses n -- messages )
+    self "log-server" [
+        "smtp-auth-test" [
+            auth responses [ [ send-auth ] with-string-writer drop ] with-string-reader
+        ] with-logging
+        n [ receive ] replicate
+        [ third "command" = ] filter [ second ] map
+    ] with-variable ;
+
+{ { { "<authentication redacted>" } } } [
+    "user" "pass" <plain-auth> "235 authenticated\r\n" 2 capture-auth-log
+] unit-test
+
+{ { { "AUTH LOGIN" } { "<authentication redacted>" } { "<authentication redacted>" } } } [
+    "user" "pass" <login-auth>
+    "334 username\r\n334 password\r\n235 authenticated\r\n"
+    6 capture-auth-log
+] unit-test
+
+{ "AUTH LOGIN\r\ndXNlcg==\r\ncGFzcw==\r\n" } [
+    "334 username\r\n334 password\r\n235 authenticated\r\n" [
+        [ "user" "pass" <login-auth> send-auth ] with-string-writer
+    ] with-string-reader
+] unit-test
 
 : with-test-smtp-config ( quot -- )
     [

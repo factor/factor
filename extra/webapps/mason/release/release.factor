@@ -11,8 +11,9 @@ IN: webapps.mason.release
 : <download-release-action> ( -- action )
     <page-action>
     [
+        ! Validation exits through a continuation, bypassing with-db cleanup.
+        validate-os/cpu
         [
-            validate-os/cpu
             "os" value "cpu" value (platform) "platform" set-value
             current-release [
                 [ release-link "release" set-value ]

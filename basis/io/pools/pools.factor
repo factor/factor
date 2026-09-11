@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien continuations destructors io.sockets
-kernel namespaces sequences ;
+kernel math namespaces sequences ;
 IN: io.pools
 
-TUPLE: pool connections disposed expired ;
+TUPLE: pool connections disposed expired max-idle ;
 
 : check-pool ( pool -- )
     check-disposed
@@ -26,7 +26,13 @@ M: pool dispose* connections>> dispose-each ;
 TUPLE: return-connection-state conn pool ;
 
 : return-connection ( conn pool -- )
-    dup check-pool connections>> push ;
+    dup disposed>> [
+        drop dispose
+    ] [
+        dup check-pool
+        dup max-idle>> [ over connections>> length <= ] [ f ] if*
+        [ drop dispose ] [ connections>> push ] if
+    ] if ;
 
 GENERIC: make-connection ( pool -- conn )
 
@@ -35,8 +41,8 @@ GENERIC: make-connection ( pool -- conn )
 
 : acquire-connection ( pool -- conn )
     dup check-pool
-    [ dup connections>> empty? ] [ dup new-connection ] while
-    connections>> pop ;
+    dup connections>> empty?
+    [ make-connection ] [ connections>> pop ] if ;
 
 : (with-pooled-connection) ( conn pool quot -- )
     [ nip call ] [ drop return-connection ] 3bi ; inline

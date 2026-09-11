@@ -59,9 +59,15 @@ TUPLE: email
 
 <PRIVATE
 
-: command ( string -- ) write crlf flush ;
+: (command) ( string -- ) write crlf flush ;
+
+: command ( string -- ) (command) ;
 
 \ command DEBUG add-input-logging
+
+: auth-command ( string -- )
+    "<authentication redacted>" \ command DEBUG log-message
+    (command) ;
 
 : helo ( -- ) "EHLO " host-name append command ;
 
@@ -160,12 +166,12 @@ M: no-auth send-auth drop ;
 
 M: plain-auth send-auth
     [ username>> ] [ password>> ] bi plain-auth-string
-    "AUTH PLAIN " prepend command get-ok ;
+    "AUTH PLAIN " prepend auth-command get-ok ;
 
 M: login-auth send-auth
     "AUTH LOGIN" command get-ok
-    [ username>> >smtp-base64 command get-ok ]
-    [ password>> >smtp-base64 command get-ok ] bi ;
+    [ username>> >smtp-base64 auth-command get-ok ]
+    [ password>> >smtp-base64 auth-command get-ok ] bi ;
 
 : auth ( -- ) smtp-config get auth>> send-auth ;
 

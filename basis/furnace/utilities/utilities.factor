@@ -121,6 +121,9 @@ CONSTANT: nested-forms-key "__n"
         { "GET" [ cookie-client-state ] }
         { "HEAD" [ cookie-client-state ] }
         { "POST" [ post-client-state ] }
+        ! Let the responder reject unsupported methods instead of throwing
+        ! during session lookup. Do not accept client state for these methods.
+        [ 3drop f ]
     } case ;
 
 SYMBOL: exit-continuation

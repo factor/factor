@@ -6,10 +6,10 @@ HELP: <db-persistence>
     { "responder" "a responder" } { "db" "a database descriptor" }
     { "responder'" db-persistence }
 }
-{ $description "Wraps a responder with database persistence support. The responder's " { $link call-responder* } " method will run in a " { $link with-db } " scope." } ;
+{ $description "Wraps a responder with database persistence support. The responder uses a pooled connection bound to " { $link db-connection } ". The connection is returned when the enclosing HTTP request's destructor scope completes, including after an action exits early during validation or authorization." } ;
 
 ARTICLE: "furnace.db" "Furnace database support"
-"The " { $vocab-link "furnace.db" } " vocabulary implements a responder which maintains a database connection pool and runs each request in a " { $link with-db } " scope."
+"The " { $vocab-link "furnace.db" } " vocabulary implements a responder which maintains a database connection pool. Connections are returned by the enclosing HTTP request's destructor scope."
 { $subsections <db-persistence> }
 "The " { $vocab-link "furnace.alloy" } " vocabulary combines database persistence with several other features." ;
 
