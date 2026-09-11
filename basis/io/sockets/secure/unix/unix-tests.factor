@@ -140,16 +140,27 @@ IN: io.sockets.secure.tests
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with
 
-! Exercise the ALPN callback in a real nonblocking handshake.
+! Exercise server preference and userdata lifetime in a real handshake,
+! even when the context owner is disposed before the lazy server handshake.
 { "h2" } [
     <promise> "port" set
-    [ drop "hi" write ]
+    [ drop secure-context get dispose "hi" write ]
     <test-secure-config> { "h2" "http/1.1" } >>alpn-supported-protocols
     server-test-with-config
-    <secure-config> f >>verify { "h2" } >>alpn-supported-protocols [
+    <secure-config> f >>verify { "http/1.1" "h2" } >>alpn-supported-protocols [
         "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii
         <client> drop [
             in>> underlying-port handle>> handle>> get_alpn_selected_wrapper
         ] with-disposal
     ] with-secure-context
 ] unit-test
+
+! EOF before any TLS handshake must not produce a connected client stream.
+[
+    <promise> "port" set
+    [ drop ] server-test
+    <secure-config> f >>verify [
+        "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii
+        <client> drop [ dispose ] ignore-errors
+    ] with-secure-context
+] must-fail

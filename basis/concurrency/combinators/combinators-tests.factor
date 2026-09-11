@@ -1,6 +1,6 @@
 USING: concurrency.combinators tools.test random kernel math
 concurrency.mailboxes threads sequences accessors arrays
-math.parser ;
+math.parser strings ;
 IN: concurrency.combinators.tests
 
 [ [ drop ] parallel-each ] must-infer
@@ -65,3 +65,6 @@ IN: concurrency.combinators.tests
     { 1 2 3 } [ 4 swap - 1000000 * sleep t ] parallel-filter
 ] unit-test
 { "ac" } [ "abc" [ CHAR: b = not ] parallel-filter ] unit-test
+
+! The exemplar, not the input string, determines the result element type.
+{ { "a" "b" "c" } } [ "abc" [ 1string ] { } parallel-map-as ] unit-test

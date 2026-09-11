@@ -1,4 +1,4 @@
-USING: accessors arrays calendar concurrency.conditions
+USING: concurrency.semaphores accessors arrays calendar concurrency.conditions
 concurrency.flags concurrency.mailboxes destructors fry io
 io.encodings.ascii io.encodings.utf8 io.servers io.servers.private
 io.sockets kernel locals namespaces sequences sets threads tools.test ;
@@ -103,3 +103,26 @@ ipv6-supported? [
     ascii <threaded-server> <flag> >>server-stopped
     stop-server
 ] [ server-not-running? ] must-fail-with
+
+! A handler owns the semaphore it acquired, even if the server is restarted
+! with a different semaphore before that handler finishes.
+{ } [
+  [let
+    <mailbox> :> started
+    ascii <threaded-server> 1 >>max-connections
+        "127.0.0.1" 0 <inet4> >>insecure
+        [ t started mailbox-put read1 drop ] >>handler
+    [
+        [
+            insecure-addr ascii <client> drop &dispose :> client
+            started 5 seconds mailbox-get-timeout drop
+            threaded-server get semaphore>> :> original-semaphore
+            threaded-server get stop-server
+            threaded-server get 0 <semaphore> >>semaphore drop
+            client dispose
+            original-semaphore 500 milliseconds acquire-timeout
+            original-semaphore release
+        ] with-destructors
+    ] with-threaded-server
+  ]
+] unit-test

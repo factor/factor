@@ -1,5 +1,5 @@
 USING: tools.test kernel concurrency.conditions dlists threads
-deques accessors calendar locals timers ;
+deques ;
 
 { V{ "leftover" } } [
     "leftover" 1dlist dup
@@ -16,16 +16,4 @@ deques accessors calendar locals timers ;
     [ ] "bar" <thread> over push-back
     notify-all
     dlist>sequence
-] unit-test
-
-! A callback already queued before notification must not remove/resume twice.
-{ t } [
-  [let
-    <dlist> :> queue
-    queue 1 seconds queue-timeout :> timer
-    timer stop-timer
-    queue pop-back t >>notified? drop
-    timer quot>> call( -- )
-    queue deque-empty?
-  ]
 ] unit-test

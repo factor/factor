@@ -1,5 +1,5 @@
-USING: accessors continuations destructors io.backend.unix
-io.sockets kernel locals namespaces tools.test ;
+USING: accessors continuations destructors io.backend.unix io.sockets
+io.timeouts kernel locals namespaces tools.test ;
 QUALIFIED-WITH: unix.ffi unix
 IN: io.backend.unix.cleanup-tests
 

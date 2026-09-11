@@ -34,7 +34,8 @@ been exercised.
 * Configure ALPN once per context. Use binary buffers and counted lengths in the
   FFI; copy negotiated protocol data by length. Callback userdata is unmanaged
   memory retained until the final SSL handle releases the context. Selected
-  protocol pointers refer to the native peer buffer, not movable Factor memory.
+  protocol pointers refer to native context/peer buffers, not movable Factor
+  memory. Selection preserves the server's protocol preference.
 * Bound the session cache to 256 entries, free replaced/evicted references, and
   include the secure hostname in Unix cache keys.
 * Return the number of password bytes actually copied into OpenSSL's buffer.
@@ -49,30 +50,28 @@ been exercised.
   and context-switch return types, and protocol-limit macro wrappers. Bind
   crypto APIs to the configured libcrypto instead of a hard-coded Windows DLL;
   restore libssl selection for subsequent SSL functions.
-* Release Windows certificate enumeration/store objects on success and failure;
-  use a caller-owned buffer for certificate name printing.
 
 ### Scheduling and I/O
 
 * Cancel I/O timeout timers in `finally`, including when an operation throws.
   Clear timer running/thread state when callbacks fail or loops exit.
-* Give timed condition waits a notification token, preventing an already queued
-  timeout callback from deleting/resuming a waiter after notification won.
-* Recheck lock, reader/writer lock, semaphore, and flag predicates after waking.
-  A runnable thread can acquire a resource before an earlier waiter resumes.
+* Recheck lock, reader/writer lock, semaphore, and lower-flag predicates after
+  waking. A runnable thread can acquire a resource before an earlier waiter
+  resumes. Ordinary flag waits retain broadcast notification semantics.
 * Preserve a single monotonic deadline across wakeups in locks, semaphores,
-  flags, promises, and mailbox receives/close waits. Unmatched mailbox messages
+  and mailbox receives. Unmatched mailbox messages
   no longer extend a selective receive's timeout indefinitely.
 * Make parallel-filter collect predicate results independently, then assemble
-  the result in input order. Parallel-map uses generic intermediate storage so
-  predicates/results need not fit the input sequence's element type.
+  the result in input order. Parallel-map allocates storage from the output
+  exemplar so results need not fit the input sequence's element type.
 * Preserve the first linked promise error when several supervised stages fail.
 * Merge epoll registrations with EPOLL_CTL_MOD when a descriptor already has
   readers or writers. Removing one direction preserves the other registration.
-  Protect epoll/kqueue construction, and publish kqueue callbacks only after
-  native registration succeeds.
+  Protect epoll construction.
 * Close and unregister Unix descriptors even if cancellation raises an error;
   attempt cancellation of both input and output callbacks.
+* Release the semaphore actually acquired by a server handler, including when
+  that server is stopped/reinitialized before the old handler finishes.
 
 ### Native VM preparation
 
@@ -82,7 +81,7 @@ been exercised.
   accesses to the affected flags now use these operations consistently.
 * Check pthread_setspecific failure rather than silently losing the current VM.
 
-These changes retain cooperative Factor threads. The waiter tokens, caches,
+These changes retain cooperative Factor threads. The wait queues, caches,
 reference counters, and container mutations still rely on that execution model.
 
 ## Validation
@@ -101,10 +100,11 @@ reference counters, and container mutations still rely on that execution model.
   existing socket/server tests and added Unix cancellation/epoll regressions.
 * Certificate fixtures cover SAN precedence, IPv4/IPv6, wildcard boundaries,
   and NUL rejection. ALPN tests check exact wire bytes, invalid lengths, native
-  pointer ownership, and a real local nonblocking handshake. Callback tests
+  pointer ownership, and a real local nonblocking handshake after the server
+  context owner has been disposed. STARTTLS checks SNI at the peer. Callback tests
   check password buffer boundaries and context disposal with a live SSL handle.
 * Deterministic lock/semaphore/flag barging tests; selective mailbox timeout
-  under repeated unmatched messages; notification-versus-timeout regression.
+  under repeated unmatched messages; preserved flag broadcast behavior.
 * Initial FD regression: 200 failed client encoding constructors leaked 200
   descriptors before the first fix and zero afterward.
 
@@ -113,7 +113,83 @@ refreshed temporary image, the repository resource path, no user init, and a
 writable temporary directory. Deliberate failed-connection/thread tests emit
 expected background errors; the test failure collection is the pass/fail gate.
 Windows, macOS/kqueue, older OpenSSL/LibreSSL, and MSVC execution were not available
-for this run. Cross-platform changes require their normal platform CI coverage.
+for this run. The Windows certificate-helper and kqueue rewrites were reverted
+in the second pass and deferred. Shared binding/VM changes still require their
+normal platform CI coverage. Optional newer OpenSSL tests check API availability.
+
+## Second-pass review and evidence
+
+The follow-up review checked whether the regressions actually detect removal of
+the fixes, not merely whether they pass on the changed tree. Old definitions were
+loaded in isolated Factor processes after requiring the affected vocabulary, then
+the committed regression files were run. Requiring the vocabulary first matters:
+otherwise a test's USING: can reload the current implementation and invalidate a
+mutation check. The baseline was `2d59e4e38c`; the three review regressions below
+also tested the first audit's behavior (`84215f2d78`). No baseline files were
+written over the working tree.
+
+Three behavior/lifecycle problems in the first pass were corrected:
+
+* ALPN had unintentionally preferred client order. A reversed-order test got
+  `http/1.1` instead of the server's preferred `h2`. Context-owned native storage
+  permits preserving server preference safely; the corrected test passes.
+* Rechecking ordinary flag waits lost an already-delivered broadcast when a
+  different consumer lowered the flag. That test timed out. The recheck now
+  applies only to `lower-flag`, and both broadcast and consumer tests pass.
+* A finishing server handler looked up the server's current semaphore rather
+  than its acquired one. Replacing the semaphore during shutdown left the old
+  permit unavailable. Capturing that semaphore fixes the failing lifecycle test.
+
+Changes narrowed or deferred:
+
+* Removed condition-waiter tokens and their artificial stopped-callback test.
+  The test did not establish an interleaving through the cooperative scheduler;
+  native waits need an atomic queue/suspend/cancellation design, not this token.
+* Removed speculative deadline conversions for one-shot promises and the unused
+  mailbox close-wait helper. Kept conversions for resource/receive loops with
+  actual repeated-wakeup cases. The linked-promise error fix remains.
+* Removed the unexecuted Windows certificate-helper and kqueue rewrites. Their
+  findings remain documented below rather than being claimed as validated fixes.
+* Allocated parallel-map results using the requested exemplar, avoiding the
+  unnecessary generic intermediate introduced in the first pass. String-to-array
+  mapping and string filtering both pass.
+
+| Retained change | Failure with old code / evidence | Regression location |
+| --- | --- | --- |
+| Client, server, accept construction cleanup | Three resource-count failures | `io.sockets.unix` |
+| SQLite failed-open cleanup | Native SQLite allocation count grows | `db.sqlite.lib` |
+| SQLite failed-step result cleanup | Disposable count grows after UNIQUE failure | `db.sqlite.lib` |
+| Resolver diagnostics | EAI_SYSTEM omits the injected EMFILE diagnostic | `io.sockets.unix` |
+| Maintenance recovery | Expiry and planet tasks fail to reach a second iteration | `furnace.alloy`, `webapps.planet` |
+| Server connection limits | Second handler starts while the only permit is occupied | `io.servers` |
+| Unix close after cancellation failure | Native descriptor remains usable instead of returning EBADF | `io.backend.unix/tests/cleanup.factor` |
+| Duplex epoll registrations | EEXIST when adding another direction/reader | `io.backend.unix.multiplexers.epoll` |
+| Lock / reader-writer lock / semaphore rechecks | Waiters proceed after a different thread acquires the resource | `concurrency.locks`, `concurrency.semaphores` |
+| Receive deadlines | Unmatched messages extend the deadline | `concurrency.mailboxes` |
+| Failed operation timeout cleanup | Timer cancels a later operation | `io.timeouts` |
+| Timer exit state | Failed callback leaves thread/running state set | `timers` |
+| Parallel result ordering | Delayed predicates return elements in completion order | `concurrency.combinators` |
+| Linked promise errors | Second linked error throws instead of preserving the first | `concurrency.promises` |
+| Checksum constructor cleanup | Unknown digest leaves a registered native context | `checksums.openssl` |
+| Session replacement and cache bound | Old: 0 early frees, 301 cached, 301 total frees; fixed: 1, 256, 302 | `io.sockets.secure.openssl/tests/sessions.factor` |
+| Terminal TLS handshake | EOF returns a client stream instead of failing construction | `io.sockets.secure.unix` |
+| STARTTLS identity | Server receives no SNI; fixed receives `localhost` | `io.sockets.secure.unix/tests/starttls.factor` |
+| Native atomics | ThreadSanitizer reports a byte load/store race; same stress test is clean with the fix | `vm/tests/atomic.cpp` |
+
+The session test uses OpenSSL ex_data free callbacks to count real native frees,
+including replacement, eviction, and final context disposal. It does not infer
+native cleanup from Factor registry counts. Its callback index is released after
+the test. TLS lifetime tests exercise a handshake after context disposal, not
+just the reference-count slots. Binding tests call the protocol-limit wrappers,
+cipher-suite setter, SSL context switch, and both RSA key-file APIs. ECDSA tests
+exercise the EC buffer bindings. Width/signature corrections additionally rely
+on the installed OpenSSL headers; large (>4 GiB) buffers and every legacy ABI
+have not been exercised.
+
+The final validation uses a freshly saved temporary image containing the
+reviewed source, so the Unix backend's subprocess test also executes that code.
+The retained platform-specific MSVC atomic branch and shared code on other OSes
+remain explicit platform-CI requirements; Linux results do not establish them.
 
 ## Remaining work before native Factor threads
 
@@ -152,10 +228,14 @@ for this run. Cross-platform changes require their normal platform CI coverage.
 * Windows still reports certificate verification unsupported and defaults to
   `verify = f`. The certificate-store helper builds a store but does not install
   it into an SSL_CTX. A tested Windows trust-store integration and a verified
-  default are required; cleanup and DLL binding fixes do not establish trust.
+  default are required; DLL binding fixes do not establish trust. The helper
+  also leaks store/certificate references and uses the wrong allocator for a
+  printed name. Its cleanup rewrite was deferred pending Windows tests.
 * The existing cipher compatibility list, TLS minimum defaults, and
   IGNORE_UNEXPECTED_EOF behavior remain policy decisions. Strict truncation
   detection and a modern protocol baseline need interoperability tests.
+* kqueue construction and failed-registration cleanup need macOS/BSD regression
+  coverage before adopting the proposed ownership changes.
 * Legacy public structure layouts and version-sensitive bindings remain in the
   bindings vocabulary. OpenSSL option widths differ across releases/platforms;
   a versioned binding strategy is preferable to assuming one ABI everywhere.

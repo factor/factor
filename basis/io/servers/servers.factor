@@ -109,11 +109,12 @@ M: threaded-server handle-client* handler>> call( -- ) ;
     [ threaded-server get name>> ] dip
     unparse-short " connection from " glue ;
 
-: (accept-connection) ( server -- )
-    [ accept ] [ addr>> ] bi
+:: (accept-connection) ( server semaphore -- )
+    ! Capture the permit acquired by this accept loop, not mutable server state.
+    server [ accept ] [ addr>> ] bi
     [ '[
         [ _ _ _ handle-client ]
-        [ threaded-server get semaphore>> [ release ] when* ] finally
+        [ semaphore [ release ] when* ] finally
     ] ]
     [ drop client-thread-name ] 2bi
     spawn drop ;
@@ -123,8 +124,8 @@ M: threaded-server handle-client* handler>> call( -- ) ;
     semaphore [
         semaphore acquire
         ! The client thread releases the slot after closing its stream.
-        [ server (accept-connection) ] [ ] [ semaphore release ] cleanup
-    ] [ server (accept-connection) ] if ;
+        [ server semaphore (accept-connection) ] [ ] [ semaphore release ] cleanup
+    ] [ server f (accept-connection) ] if ;
 
 : with-existing-secure-context ( threaded-server quot -- )
     [ secure-context>> secure-context ] dip with-variable ; inline

@@ -250,12 +250,15 @@ SYMBOL: default-secure-context
 : get-session ( addrspec -- session/f )
     current-secure-context sessions>> at ;
 
+! Limit retained native session references for clients visiting many hosts.
+CONSTANT: max-cached-sessions 256
+
 :: save-session ( session addrspec -- )
     current-secure-context sessions>> :> sessions
     addrspec sessions delete-at* [ SSL_SESSION_free ] [ drop ] if
     session [
         ! Bound the cache and release the reference replaced by a racing connect.
-        sessions assoc-size 256 >= [
+        sessions assoc-size max-cached-sessions >= [
             sessions keys first sessions delete-at* drop SSL_SESSION_free
         ] when
         session addrspec sessions set-at
@@ -289,10 +292,11 @@ STRUCT: alpn-protocols
 
 : alpn_select_cb_func ( -- alien )
     [| ssl out outlen in inlen arg |
-        ! Prefer the peer's order so a match points into its native buffer.
-        ! Context-owned userdata stays alive until the last SSL is freed.
-        out outlen in inlen
+        ! Preserve server preference. Both candidate buffers are native;
+        ! context userdata stays alive until the last SSL is freed.
+        out outlen
         arg alpn-protocols memory>struct [ data>> ] [ length>> ] bi
+        in inlen
         SSL_select_next_proto OPENSSL_NPN_NEGOTIATED =
         [ SSL_TLSEXT_ERR_OK ] [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
     ] SSL_CTX_alpn_select_cb_func ;

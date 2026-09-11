@@ -27,11 +27,10 @@ PRIVATE>
 : parallel-cartesian-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
     [ 2array ] dip [ first2-unsafe ] prepose parallel-product-each ;
 
-: parallel-map-as ( seq quot: ( elt -- newelt ) exemplar -- newseq )
-    [
-        over length f <array>
-        [ '[ _ dip _ set-nth ] parallel-each-index ] keep
-    ] dip like ; inline
+:: parallel-map-as ( seq quot: ( elt -- newelt ) exemplar -- newseq )
+    seq length exemplar new-sequence :> result
+    seq [| elt index | elt quot call index result set-nth ] parallel-each-index
+    result exemplar like ; inline
 
 : parallel-map ( seq quot: ( elt -- newelt ) -- newseq )
     over parallel-map-as ; inline

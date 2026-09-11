@@ -11,12 +11,12 @@ TUPLE: flag value threads ;
     dup value>> [ drop ] [ t >>value threads>> notify-all ] if ;
 
 : wait-for-flag-timeout ( flag timeout -- )
-    >deadline
-    [ over value>> ]
-    [ 2dup [ threads>> ] dip "flag" wait ] until 2drop ;
+    over value>> [ 2drop ] [ [ threads>> ] dip "flag" wait ] if ;
 
 : wait-for-flag ( flag -- )
     f wait-for-flag-timeout ;
 
 : lower-flag ( flag -- )
-    [ wait-for-flag ] [ f >>value drop ] bi ;
+    ! A notification does not reserve the raised flag for this consumer.
+    [ dup value>> ] [ dup wait-for-flag ] until
+    f >>value drop ;
