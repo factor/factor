@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors calendar db.tuples db.types http.server.filters
-kernel math.intervals random ;
+kernel math math.intervals random ;
 IN: furnace.cache
 
 TUPLE: server-state id expires ;
@@ -16,7 +16,8 @@ server-state f
 } define-persistent
 
 : get-state ( id class -- state )
-    new-server-state select-tuple ;
+    new-server-state select-tuple
+    dup [ dup expires>> now timestamp>micros > and* ] when ;
 
 : expire-state ( class -- )
     new

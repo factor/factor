@@ -16,7 +16,7 @@ permit "PERMITS" {
     permit get-state {
         [ ]
         [ session>> session get id>> = ]
-        [ [ touch-permit ] [ uid>> ] bi ]
+        [ [ touch-permit ] [ update-tuple ] [ uid>> ] tri ]
     } 1&& ;
 
 : make-permit ( uid -- id )
