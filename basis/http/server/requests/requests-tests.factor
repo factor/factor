@@ -79,6 +79,33 @@ IN: http.server.requests.tests
     "GET / HTTP/1.1\r\nBadHeader\r\n\r\n" string>request
 ] [ bad-request-header? ] must-fail-with
 
+! Values must be parsed in full without stripping semantic quotes.
+{ "\"v1\", \"v2\"" } [
+    "GET / HTTP/1.1\r\nIf-None-Match: \"v1\", \"v2\"\r\n\r\n"
+    string>request "if-none-match" header
+] unit-test
+
+{ "abc" } [
+    "POST / HTTP/1.1\r\nContent-Length: \t3 \t\r\n\r\nabc"
+    string>request data>> data>>
+] unit-test
+
+[
+    "POST / HTTP/1.1\r\nContent-Length: \"3\"junk\r\n\r\nabc" string>request
+] [ invalid-content-length? ] must-fail-with
+
+[
+    "POST / HTTP/1.1\r\nContent-Length: 3\0junk\r\n\r\nabc" string>request
+] [ bad-request-header? ] must-fail-with
+
+[
+    "POST / HTTP/1.1\r\nContent-Length : 3\r\n\r\nabc" string>request
+] [ bad-request-header? ] must-fail-with
+
+[
+    "GET / HTTP/1.1\r\nX-Test: value\r\n continuation\r\n\r\n" string>request
+] [ bad-request-header? ] must-fail-with
+
 [
     "GET / HTTP/1.1\r\nHost: localhost:garbage\r\n\r\n" string>request
 ] [ bad-request-header? ] must-fail-with
@@ -187,6 +214,39 @@ hello
 ;
 [ test-multipart/form-data-missing-boundary string>request ]
 [ no-boundary? ] must-fail-with
+
+! A complete MIME delimiter does not excuse missing HTTP body bytes.
+[
+    test-multipart/form-data lf>crlf
+    "Content-Length: 151" "Content-Length: 251" replace string>request
+] [ incomplete-request? ] must-fail-with
+
+: sized-multipart-request ( n suffix -- request )
+    [
+        "--x\r\nContent-Disposition: form-data; name=\"v\"\r\n\r\n"
+        swap CHAR: a <string> append "\r\n--x--" append
+    ] dip append
+    dup length number>string
+    "POST / HTTP/1.1\r\nContent-Type: multipart/form-data; boundary=x\r\nContent-Length: "
+    swap append "\r\n\r\n" append swap append string>request ;
+
+! Exercise every position of the closing marker around a buffer boundary.
+{ t } [
+    { 65480 65481 65482 65483 65484 65485 65486 } [
+        dup "\r\n" sized-multipart-request data>> params>> "v" of length =
+    ] all?
+] unit-test
+
+{ 5 5 5 } [
+    5 "" sized-multipart-request data>> params>> "v" of length
+    5 " \t\r\nepilogue" sized-multipart-request data>> params>> "v" of length
+    5 "\r\n" 70000 CHAR: e <string> append sized-multipart-request
+    data>> params>> "v" of length
+] unit-test
+
+[
+    5 "junk" sized-multipart-request
+] [ bad-request-body? ] must-fail-with
 
 ! Relative urls are invalid.
 [ "GET foo HTTP/1.1" string>request ] [ path>> "foo" = ] must-fail-with
