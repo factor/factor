@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien.libraries kernel math namespaces openssl.libcrypto
-openssl.libssl sequences ;
+USING: alien.libraries alien.strings byte-arrays io.encodings.utf8
+kernel math namespaces openssl.libcrypto openssl.libssl sequences ;
 IN: openssl
 
 ! This code is based on https://www.rtfm.com/openssl-examples/
@@ -11,7 +11,8 @@ SYMBOLS: ssl-initialized? ssl-new-api? ;
 SINGLETON: openssl
 
 : (ssl-error-string) ( n -- string )
-    ERR_clear_error f ERR_error_string ;
+    ERR_clear_error 256 <byte-array>
+    [ 256 ERR_error_string_n ] keep utf8 alien>string ;
 
 : ssl-error-string ( -- string )
     ERR_get_error (ssl-error-string) ;
@@ -30,7 +31,7 @@ SINGLETON: openssl
 : init-new-api ( -- )
     0 f OPENSSL_init_ssl ssl-error
     OPENSSL_INIT_LOAD_SSL_STRINGS
-    OPENSSL_INIT_LOAD_CRYPTO_STRINGS bitand
+    OPENSSL_INIT_LOAD_CRYPTO_STRINGS bitor
     f OPENSSL_init_ssl ssl-error
     OPENSSL_INIT_ADD_ALL_DIGESTS f OPENSSL_init_ssl ssl-error ;
 

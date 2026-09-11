@@ -66,8 +66,17 @@ M: secure (server) addrspec>> (server) ;
 
 CONSULT: inet secure addrspec>> ;
 
+! Local sockets have no implicit certificate identity; callers can supply one.
+GENERIC: secure-hostname ( addrspec -- hostname/f )
+M: object secure-hostname drop f ;
+M: inet secure-hostname host>> ;
+M: inet4 secure-hostname host>> ;
+M: inet6 secure-hostname host>> ;
+M: secure secure-hostname
+    [ hostname>> ] [ addrspec>> secure-hostname ] bi or ;
+
 M: secure resolve-host
-    [ addrspec>> resolve-host ] [ hostname>> ] bi
+    [ addrspec>> resolve-host ] [ secure-hostname ] bi
     [ <secure> ] curry map ;
 
 HOOK: check-certificate secure-socket-backend ( host handle -- )
@@ -76,10 +85,13 @@ PREDICATE: secure-inet < secure addrspec>> inet? ;
 
 <PRIVATE
 
-M: secure-inet (client)
+M: secure-inet (client) resolve-host (client) ;
+
+M: secure (client)
     [
-        [ resolve-host (client) [ |dispose ] dip ] keep
-        addrspec>> host>> pick handle>> check-certificate
+        [ call-next-method [ [ |dispose ] bi@ ] dip ] keep
+        secure-hostname
+        dup [ pick handle>> check-certificate ] [ drop ] if
     ] with-destructors ;
 
 PRIVATE>

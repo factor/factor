@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors destructors io.backend.unix io.files
 io.sockets.private io.sockets.secure io.sockets.secure.openssl
-io.timeouts kernel openssl openssl.libcrypto openssl.libssl
+io.timeouts kernel math openssl openssl.libcrypto openssl.libssl
 system ;
 FROM: io.ports => shutdown ;
 IN: io.sockets.secure.unix
@@ -15,14 +15,14 @@ M: ssl-handle handle-fd file>> handle-fd ;
 M: unix socket-handle fd>> ;
 
 M: secure remote>handle
-    [ addrspec>> remote>handle ] [ hostname>> ] bi <ssl-socket> ;
+    [ addrspec>> remote>handle ] [ secure-hostname ] bi <ssl-socket> ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
 M: secure (get-local-address) addrspec>> (get-local-address) ;
 
 M: secure establish-connection
-    addrspec>> [ establish-connection ] [ secure-connection ] 2bi ;
+    [ addrspec>> establish-connection ] [ secure-connection ] 2bi ;
 
 M: secure (accept)
     [
@@ -31,7 +31,8 @@ M: secure (accept)
 
 : (shutdown) ( ssl-handle -- )
     dup dup handle>>
-    ERR_clear_error SSL_shutdown check-ssl-error
+    ERR_clear_error SSL_shutdown dup 0 >=
+    [ 2drop f ] [ check-ssl-error ] if
     [ dupd wait-for-fd (shutdown) ] [ drop ] if* ;
 
 M: ssl-handle shutdown

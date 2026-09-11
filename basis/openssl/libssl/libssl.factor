@@ -316,7 +316,7 @@ ENUM: OSSL_HANDSHAKE_STATE
 C-TYPE: SSL_CTX
 C-TYPE: SSL_SESSION
 
-LIBRARY: libssl
+LIBRARY: libcrypto
 
 ! ===============================================
 ! stack.h
@@ -497,6 +497,8 @@ CONSTANT: OPENSSL_INIT_NO_ADD_ALL_CIPHERS     0x00000010
 CONSTANT: OPENSSL_INIT_NO_ADD_ALL_DIGESTS     0x00000020
 
 
+LIBRARY: libssl
+
 FUNCTION: int OPENSSL_init_ssl ( uint64_t opts, void* settings )
 ! ------------------------------------------------------------------------------
 ! API < 1.1.0, removed in new versions
@@ -536,20 +538,12 @@ CONSTANT: TLS1_3_VERSION 0x0304
 CONSTANT: DTLS1_VERSION 0xfeff
 CONSTANT: DTLS1_2_VERSION 0xfefd
 
-FUNCTION: int SSL_CTX_set_min_proto_version ( SSL_CTX* ctx, uint16_t version )
-FUNCTION: int SSL_CTX_set_max_proto_version ( SSL_CTX* ctx, uint16_t version )
-FUNCTION: uint16_t SSL_CTX_get_min_proto_version ( SSL_CTX* ctx )
-FUNCTION: uint16_t SSL_CTX_get_max_proto_version ( SSL_CTX* ctx )
-
-FUNCTION: int SSL_set_min_proto_version ( SSL* ssl, uint16_t version )
-FUNCTION: int SSL_set_max_proto_version ( SSL* ssl, uint16_t version )
-FUNCTION: uint16_t SSL_get_min_proto_version ( SSL* ssl )
-FUNCTION: uint16_t SSL_get_max_proto_version ( SSL* ssl )
-
 FUNCTION: int SSL_version ( SSL *ssl )
 
 FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses )
+LIBRARY: libcrypto
 FUNCTION: void RAND_seed ( void* buf, int num )
+LIBRARY: libssl
 FUNCTION: void* BIO_f_ssl ( )
 
 ! ------------------------------------------------------------------------------
@@ -599,7 +593,7 @@ FUNCTION: X509* SSL_get1_peer_certificate ( SSL* ssl )
     [ SSL_get1_peer_certificate ] [ SSL_get_peer_certificate ] if ; inline
 
 FUNCTION: int SSL_set_cipher_list ( SSL* ssl, c-string str )
-FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str )
+FUNCTION: int SSL_use_RSAPrivateKey_file ( SSL* ssl, c-string str, int type )
 FUNCTION: int SSL_use_certificate_file ( SSL* ssl, c-string str, int type )
 
 FUNCTION: SSL* SSL_load_client_CA_file ( c-string file )
@@ -623,7 +617,7 @@ FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx )
 FUNCTION: int SSL_CTX_set_session_id_context ( SSL_CTX* ctx,
                                                c-string sid_ctx,
                                                uint len )
-FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, int type )
+FUNCTION: int SSL_CTX_use_RSAPrivateKey_file ( SSL_CTX* ctx, c-string file, int type )
 FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx,
                                               c-string CAfile,
                                               c-string CApath )
@@ -633,6 +627,24 @@ FUNCTION: void SSL_CTX_set_client_CA_list ( SSL_CTX* ctx, SSL* list )
 ! Used to manipulate settings of the SSL_CTX and SSL objects.
 ! This function should never be called directly
 FUNCTION: long SSL_CTX_ctrl ( SSL_CTX* ctx, int cmd, long larg, void* parg )
+
+! Protocol limits are C macros, not exported functions.
+: SSL_CTX_set_min_proto_version ( ssl version -- result )
+    SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_CTX_ctrl ;
+: SSL_CTX_set_max_proto_version ( ssl version -- result )
+    SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_CTX_ctrl ;
+: SSL_CTX_get_min_proto_version ( ssl -- version )
+    SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_CTX_ctrl ;
+: SSL_CTX_get_max_proto_version ( ssl -- version )
+    SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_CTX_ctrl ;
+: SSL_set_min_proto_version ( ssl version -- result )
+    SSL_CTRL_SET_MIN_PROTO_VERSION swap f SSL_ctrl ;
+: SSL_set_max_proto_version ( ssl version -- result )
+    SSL_CTRL_SET_MAX_PROTO_VERSION swap f SSL_ctrl ;
+: SSL_get_min_proto_version ( ssl -- version )
+    SSL_CTRL_GET_MIN_PROTO_VERSION 0 f SSL_ctrl ;
+: SSL_get_max_proto_version ( ssl -- version )
+    SSL_CTRL_GET_MAX_PROTO_VERSION 0 f SSL_ctrl ;
 
 FUNCTION: void SSL_CTX_set_default_passwd_cb ( SSL_CTX* ctx, void* cb )
 
@@ -680,15 +692,17 @@ CONSTANT: OPENSSL_NPN_NO_OVERLAP 2
 ! unsigned c-string* out, uchar* outlen, const unsigned c-string
 ! in, uint inlen, void* arg )
 CALLBACK: int SSL_CTX_alpn_select_cb_func ( SSL* ssl,
-c-string* out, uchar* outlen, c-string in, uint inlen, void* arg )
+void** out, uchar* outlen, void* in, uint inlen, void* arg )
 FUNCTION: void SSL_CTX_set_alpn_select_cb ( SSL_CTX* ctx,
 SSL_CTX_alpn_select_cb_func cb, void* arg )
-FUNCTION: int SSL_select_next_proto ( c-string* out, uchar*
-outlen, c-string server, uint server_len, c-string client, uint
+FUNCTION: int SSL_select_next_proto ( void** out, uchar*
+outlen, void* server, uint server_len, void* client, uint
 client_len )
 
+FUNCTION: int SSL_CTX_set_alpn_protos ( SSL_CTX* ctx, void* protos, uint len )
+
 FUNCTION: void SSL_get0_alpn_selected ( SSL* s,
-c-string* data, uint* len )
+void** data, uint* len )
 
 ! ------------------------------------------------------------------------------
 ! Misc
@@ -762,14 +776,8 @@ CONSTANT: NID_commonName        13
 CONSTANT: NID_subject_alt_name  85
 CONSTANT: NID_issuer_alt_name   86
 
-! ===============================================
-! On Windows, some of the functions making up libressl
-! are placed in libcrypto-37.dll
-! ===============================================
-<< os windows? [
-    "libssl-windows"
-    [ "libcrypto-37.dll" cdecl add-library ] [ current-library set ] bi
-] when >>
+! Certificate and ASN.1 APIs are exported by the configured libcrypto.
+LIBRARY: libcrypto
 
 ! ===============================================
 ! x509.h
@@ -788,12 +796,19 @@ FUNCTION: int X509_check_trust ( X509* a, int id, int flags )
 FUNCTION: X509_EXTENSION* X509_get_ext ( X509* a, int loc )
 FUNCTION: void X509_free ( X509* a )
 DESTRUCTOR: X509_free
-FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, int len )
+FUNCTION: int X509_check_host ( X509* cert, c-string name, size_t namelen, uint flags, void* peername )
+FUNCTION: int X509_check_ip_asc ( X509* cert, c-string ip, uint flags )
+CONSTANT: X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS 4
+FUNCTION: void GENERAL_NAMES_free ( void* names )
+FUNCTION: X509* PEM_read_bio_X509 ( void* bio, void* cert, void* cb, void* userdata )
+FUNCTION: X509* d2i_X509 ( X509** px, uchar** in, long len )
 FUNCTION: int i2d_X509 ( X509* x, uchar** out )
 FUNCTION: int i2d_re_X509_tbs ( X509* x, uchar** out )
 
 C-TYPE: X509_STORE
 FUNCTION: X509_STORE* X509_STORE_new ( )
+FUNCTION: void X509_STORE_free ( X509_STORE* store )
+DESTRUCTOR: X509_STORE_free
 FUNCTION: int X509_STORE_add_cert ( X509_STORE* ctx, X509* x )
 
 ! ------------------------------------------------------------------------------
@@ -810,10 +825,12 @@ FUNCTION: void* sk_value ( _STACK* s, int v )
 
 ! ------------------------------------------------------------------------------
 
+LIBRARY: libssl
+
 ! For TLSv1.3
-FUNCTION: void SSL_CTX_set_ciphersuites ( SSL_CTX *ctx, char *ciphersuites )
+FUNCTION: int SSL_CTX_set_ciphersuites ( SSL_CTX *ctx, char *ciphersuites )
 FUNCTION: int SSL_set_ciphersuites ( SSL *ssl, char *ciphersuites )
-FUNCTION: void SSL_set_SSL_CTX ( SSL *ssl, SSL_CTX *ctx )
+FUNCTION: SSL_CTX* SSL_set_SSL_CTX ( SSL *ssl, SSL_CTX *ctx )
 FUNCTION: int SSL_set1_host ( SSL *ssl, char *hostname )
 FUNCTION: int SSL_do_handshake ( SSL *ssl )
 

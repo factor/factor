@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
 alien.libraries.finder alien.strings assocs byte-arrays
-classes.struct combinators combinators.short-circuit destructors
+classes.struct combinators combinators.short-circuit continuations destructors
 endian io io.backend io.buffers io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.pathnames
 io.ports io.sockets io.sockets.secure io.timeouts kernel libc
@@ -66,7 +66,8 @@ MEMO: make-cipher-list ( -- string )
     weak-ciphers-for-compatibility append
     ":" join ;
 
-TUPLE: openssl-context < secure-context aliens sessions ;
+TUPLE: openssl-context < secure-context aliens sessions
+    { users integer initial: 0 } ;
 
 <PRIVATE
 
@@ -123,8 +124,8 @@ ERROR: file-expected path ;
     [| buf size rwflag password! |
         password [ B{ 0 } password! ] unless
 
-        password strlen :> len
-        buf password len 1 + size min memcpy
+        password strlen size 0 max min :> len
+        buf password len memcpy
         len
     ] alien-callback ;
 
@@ -183,7 +184,7 @@ M: bio dispose* handle>> BIO_free ssl-error ;
     [
         [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
         handle>> f f f PEM_read_bio_DHparams dup ssl-error
-        SSL_CTX_set_tmp_dh ssl-error
+        dup '[ _ DH_free ] [ SSL_CTX_set_tmp_dh ssl-error ] swap finally
     ] [ drop ] 1if ;
 
 ! Attempt to set ecdh. If it fails, ignore...?
@@ -196,6 +197,8 @@ M: bio dispose* handle>> BIO_free ssl-error ;
         swap >>config
         V{ } clone >>aliens
         H{ } clone >>sessions ;
+
+DEFER: configure-alpn
 
 M: openssl <secure-context>
     maybe-init-ssl
@@ -211,12 +214,13 @@ M: openssl <secure-context>
             [ set-verify-depth ]
             [ load-dh-params ]
             [ set-ecdh-params ]
+            [ configure-alpn ]
             [ os macos? [ drop ] [ ignore-unexpected-eof ] if ]
             [ ]
         } cleave
     ] with-destructors ;
 
-M: openssl-context dispose*
+: free-context ( ctx -- )
     [
         [ aliens>> [ &free drop ] each ]
         [ sessions>> values [ SSL_SESSION_free ] each ]
@@ -224,7 +228,15 @@ M: openssl-context dispose*
         tri
     ] with-destructors ;
 
-TUPLE: ssl-handle < disposable file handle connected terminated ;
+M: openssl-context dispose*
+    dup users>> zero? [ free-context ] [ drop ] if ;
+
+: release-context ( ctx -- )
+    [ 1 - ] change-users
+    dup [ disposed>> ] [ users>> zero? ] bi and
+    [ free-context ] [ drop ] if ;
+
+TUPLE: ssl-handle < disposable file handle connected terminated context ;
 
 SYMBOL: default-secure-context
 
@@ -238,8 +250,16 @@ SYMBOL: default-secure-context
 : get-session ( addrspec -- session/f )
     current-secure-context sessions>> at ;
 
-: save-session ( session addrspec -- )
-    current-secure-context sessions>> set-at ;
+:: save-session ( session addrspec -- )
+    current-secure-context sessions>> :> sessions
+    addrspec sessions delete-at* [ SSL_SESSION_free ] [ drop ] if
+    session [
+        ! Bound the cache and release the reference replaced by a racing connect.
+        sessions assoc-size 256 >= [
+            sessions keys first sessions delete-at* drop SSL_SESSION_free
+        ] when
+        session addrspec sessions set-at
+    ] when ;
 
 : set-secure-cipher-list-only ( ssl -- ssl )
     dup handle>> make-cipher-list SSL_set_cipher_list ssl-error ;
@@ -247,54 +267,54 @@ SYMBOL: default-secure-context
 : <ssl-handle> ( fd -- ssl )
     [
         ssl-handle new-disposable swap >>file |dispose
-        current-secure-context handle>> SSL_new
+        current-secure-context check-disposed [ 1 + ] change-users
+        >>context dup context>> handle>> SSL_new
         dup ssl-error >>handle
         set-secure-cipher-list-only
     ] with-destructors ;
 
 <PRIVATE
 
-: alpn_select_cb_func ( -- alien )
-    [|  ssl out outlen in inlen arg |
-        ! if alpn-protocols is empty return err noack
+ERROR: invalid-alpn-protocol protocol ;
 
-        ! current-secure-context relies on secure-context
-        ! variable being set. if this is not set in a callback,
-        ! we need some other way of accessing it (probably
-        ! passing it as arg to SSL_CTX_set_alpn_select_cb, but
-        ! need to make sure that stays defined as long as the
-        ! callback can be called)
-        current-secure-context config>> alpn-supported-protocols>>
-        [ SSL_TLSEXT_ERR_NOACK ]
-        [ [ out outlen ] dip
-          ! convert alpn-protocols from list of strings to
-          ! c-string in wire format and length.
-          ! see https://www.openssl.org/docs/manmaster/man3/SSL_set_alpn_protos.html
-          [ utf8 encode dup length prefix ] map
-          concat dup length
-          in inlen SSL_select_next_proto
-          ! the function returns OPENSSL_NPN_NO_OVERLAP when no
-          ! match is found, otherwise OPENSSL_NPN_NEGOTIATED
-          OPENSSL_NPN_NEGOTIATED =
-          [ ! DOUBLECHECK: The value in out is already copied
-            ! from the original, so we can just leave it and
-            ! return... otherwise this detail needs to be ironed
-            ! out, probably by finding the entry in in that out
-            ! is identical to. (out needs to point directly into
-            ! in, or a buffer that will outlive the tls
-            ! handshake.)
-            SSL_TLSEXT_ERR_OK ]
-          [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
-        ] if-empty
+: alpn-wire-format ( protocols -- bytes )
+    [
+        utf8 encode dup length dup 1 255 between?
+        [ prefix ] [ drop invalid-alpn-protocol ] if
+    ] map B{ } concat-as ;
+
+STRUCT: alpn-protocols
+    { data void* }
+    { length uint } ;
+
+: alpn_select_cb_func ( -- alien )
+    [| ssl out outlen in inlen arg |
+        ! Prefer the peer's order so a match points into its native buffer.
+        ! Context-owned userdata stays alive until the last SSL is freed.
+        out outlen in inlen
+        arg alpn-protocols memory>struct [ data>> ] [ length>> ] bi
+        SSL_select_next_proto OPENSSL_NPN_NEGOTIATED =
+        [ SSL_TLSEXT_ERR_OK ] [ SSL_TLSEXT_ERR_ALERT_FATAL ] if
     ] SSL_CTX_alpn_select_cb_func ;
 
 : get_alpn_selected_wrapper ( ssl* -- alpn_string/f )
-    { c-string int } [ SSL_get0_alpn_selected ] with-out-parameters
-    drop ! how do we unbox the c-string?
-    ! also, the string is not null-terminated, is that problematic?
-    ;
+    { void* uint } [ SSL_get0_alpn_selected ] with-out-parameters
+    dup zero? [ 2drop f ] [ memory>byte-array utf8 decode ] if ;
 
 PRIVATE>
+
+:: configure-alpn ( ctx -- )
+    ctx config>> alpn-supported-protocols>> dup empty? [ drop ] [
+        alpn-wire-format :> wire
+        ctx handle>> wire dup length SSL_CTX_set_alpn_protos
+        zero? [ throw-ssl-error ] unless
+        wire malloc-byte-array dup ctx aliens>> push :> data
+        alpn-protocols malloc-struct dup ctx aliens>> push
+        data >>data wire length >>length :> protocols
+        ctx handle>> alpn_select_cb_func protocols SSL_CTX_set_alpn_select_cb
+    ] if ;
+
+DEFER: ip-host?
 
 :: <ssl-socket> ( winsock hostname -- ssl )
     [
@@ -303,47 +323,52 @@ PRIVATE>
         winsock socket-handle BIO_NOCLOSE BIO_new_socket dup ssl-error :> bio
         ! Transfer the BIO to SSL before any further fallible setup.
         native-handle bio bio SSL_set_bio
-        current-secure-context config>> alpn-supported-protocols>>
-        [ drop native-handle ctx>> alpn_select_cb_func f SSL_CTX_set_alpn_select_cb ]
-        unless-empty
         hostname [
-            utf8 string>alien
-            native-handle swap SSL_set_tlsext_host_name ssl-error
+            dup ip-host? [ drop ] [
+                utf8 string>alien
+                native-handle swap SSL_set_tlsext_host_name ssl-error
+            ] if
         ] when*
         handle
     ] with-destructors ;
 
-: ssl-error-syscall ( ssl-handle -- event/f )
-    f >>connected
-    t >>terminated drop
-    ERR_get_error {
-        { -1 [
-            errno ECONNRESET =
-            [ premature-close-error ] [ throw-errno ] if f
-        ] }
-        ! https://stackoverflow.com/questions/13686398/ssl-read-failing-with-ssl-error-syscall-error
-        ! 0 means EOF
-        { 0 [ f ] }
-        [ (ssl-error-string) throw ]
-    } case ;
+:: (ssl-error-syscall) ( ssl-handle ret system-error -- event/f )
+    ssl-handle f >>connected t >>terminated drop
+    ERR_get_error dup zero? [
+        drop ret zero? [ f ] [
+            system-error dup ECONNRESET = [ drop premature-close-error ]
+            [ dup zero? [ drop premature-close-error ] [ (throw-errno) ] if ] if
+        ] if
+    ] [ (ssl-error-string) throw ] if ;
 
-: check-ssl-error ( ssl-handle ret -- event/f )
-    [ drop ] [ [ handle>> ] dip SSL_get_error ] 2bi
-    {
-        { SSL_ERROR_NONE [ drop f ] }
-        { SSL_ERROR_WANT_READ [ drop +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ ssl-error-syscall ] }
-        { SSL_ERROR_SSL [ drop throw-ssl-error ] }
-        ! https://stackoverflow.com/questions/50223224/ssl-read-returns-ssl-error-zero-return-but-err-get-error-is-0
-        ! there are no more bytes to read
-        { SSL_ERROR_ZERO_RETURN [ drop f ] }
-        { SSL_ERROR_WANT_ACCEPT [ drop +input+ ] }
+: ssl-error-syscall ( ssl-handle -- event/f )
+    -1 errno (ssl-error-syscall) ;
+
+:: check-ssl-error ( ssl-handle ret -- event/f )
+    errno :> system-error
+    ssl-handle handle>> ret SSL_get_error {
+        { SSL_ERROR_NONE [ f ] }
+        { SSL_ERROR_WANT_READ [ +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ +output+ ] }
+        { SSL_ERROR_SYSCALL [ ssl-handle ret system-error (ssl-error-syscall) ] }
+        { SSL_ERROR_SSL [
+            ssl-handle f >>connected t >>terminated drop throw-ssl-error
+        ] }
+        { SSL_ERROR_ZERO_RETURN [ f ] }
+        { SSL_ERROR_WANT_ACCEPT [ +input+ ] }
+        { SSL_ERROR_WANT_CONNECT [ +output+ ] }
     } case ;
 
 ! Accept
+: check-handshake-result ( ssl-handle ret -- event/f )
+    over [ check-ssl-error ] dip over [ drop ] [
+        f >>connected t >>terminated drop
+        premature-close-error
+    ] if ;
+
 : do-ssl-accept-once ( ssl-handle -- event/f )
-    dup handle>> SSL_accept check-ssl-error ;
+    dup handle>> ERR_clear_error SSL_accept
+    dup 1 = [ 2drop f ] [ check-handshake-result ] if ;
 
 : do-ssl-accept ( ssl-handle -- )
     dup do-ssl-accept-once
@@ -381,7 +406,8 @@ M: ssl-handle drain
 
 ! Connect
 : do-ssl-connect-once ( ssl-handle -- event/f )
-    dup handle>> SSL_connect check-ssl-error ;
+    dup handle>> ERR_clear_error SSL_connect
+    dup 1 = [ 2drop f ] [ check-handshake-result ] if ;
 
 : do-ssl-connect ( ssl-handle -- )
     dup do-ssl-connect-once
@@ -416,7 +442,10 @@ M: ssl-handle dispose*
     [
         ! Free file>> after SSL_free
         [ file>> &dispose drop ]
-        [ handle>> SSL_free ] bi
+        [
+            [ handle>> SSL_free ]
+            [ context>> [ release-context ] when* ] bi
+        ] bi
     ] with-destructors ;
 
 : check-verify-result ( ssl-handle -- )
@@ -447,33 +476,53 @@ M: ssl-handle dispose*
 
 : alternative-dns-names ( certificate -- dns-names )
     NID_subject_alt_name f f X509_get_ext_d2i
-    [ name-stack>sequence ] [ f ] if*
-    [ type>> GEN_DNS = ] filter
-    [ d>> dNSName>> data>> utf8 alien>string ] map ;
+    [
+        [
+            name-stack>sequence [ type>> GEN_DNS = ] filter
+            [ d>> dNSName>> [ data>> ] [ length>> ] bi
+              memory>byte-array utf8 decode ] map
+        ] over '[ _ GENERAL_NAMES_free ] finally
+    ] [ { } ] if* ;
 
-! *.foo.com matches: foo.com, www.foo.com, a.foo.com
-! *.bar.foo.com matches: bar.foo.com, www.bar.foo.com, b.bar.foo.com
+! A wildcard matches exactly one nonempty DNS label.
 : subject-names-match? ( name pattern -- ? )
     [ >lower ] bi@
     "*." ?head [
         {
-            [ tail? ]
-            [ [ [ CHAR: . = ] count ] bi@ - 1 <= ]
+            [ "." prepend tail? ]
+            [ [ [ CHAR: . = ] count ] bi@ - 1 = ]
+            [ [ length ] bi@ - 1 > ]
         } 2&&
     ] [
         =
     ] if ;
 
-: check-subject-name ( host ssl-handle -- )
-    get-ssl-peer-certificate [
-        [ alternative-dns-names ]
-        [ subject-name ] bi suffix members
-        2dup [ subject-names-match? ] with any?
-        [ 2drop ] [ subject-name-verify-error ] if
-    ] [ certificate-missing-error ] if* ;
+: ip-host? ( host -- ? )
+    dup ":" swap subseq? [ drop t ] [
+        [ <ipv4> drop t ] [ 2drop f ] recover
+    ] if ;
+
+:: certificate-matches? ( host certificate -- ? )
+    CHAR: \0 host member? [ f ] [
+        host ip-host? [
+            certificate host 0 X509_check_ip_asc
+        ] [
+            certificate host host utf8 encode length
+            X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS f X509_check_host
+        ] if 1 =
+    ] if ;
+
+:: check-subject-name ( host ssl-handle -- )
+    [
+        ssl-handle get-ssl-peer-certificate
+        [ &X509_free ] [ certificate-missing-error ] if* :> certificate
+        host certificate certificate-matches? [
+            host certificate subject-name subject-name-verify-error
+        ] unless
+    ] with-destructors ;
 
 M: openssl check-certificate
-    current-secure-context config>> verify>> [
+    dup context>> config>> verify>> [
         handle>>
         [ nip check-verify-result ]
         [ check-subject-name ]
@@ -488,10 +537,15 @@ M: openssl check-certificate
     [ get underlying-port check-buffer ] bi@
     2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
 
-: make-input/output-secure ( input output -- )
-    dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
-    [ f <ssl-socket> ] change-handle
+: (make-input/output-secure) ( input output hostname -- )
+    [
+        dup handle>> non-ssl-socket? [ upgrade-on-non-socket ] unless
+    ] dip
+    '[ _ <ssl-socket> ] change-handle
     handle>> >>handle drop ;
+
+: make-input/output-secure ( input output -- )
+    f (make-input/output-secure) ;
 
 : (send-secure-handshake) ( output -- )
     remote-address get [ upgrade-on-non-socket ] unless*
@@ -499,11 +553,11 @@ M: openssl check-certificate
 
 M: openssl send-secure-handshake
     input/output-ports
-    [ make-input/output-secure ]
+    [ remote-address get secure-hostname (make-input/output-secure) ]
     [ nip (send-secure-handshake) ]
     [
-        nip remote-address get dup inet? [
-            host>> swap handle>> check-certificate
+        nip remote-address get secure-hostname dup [
+            swap handle>> check-certificate
         ] [ 2drop ] if
     ] 2tri ;
 

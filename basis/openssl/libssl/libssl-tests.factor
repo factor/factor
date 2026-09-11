@@ -66,3 +66,17 @@ maybe-init-ssl
         new-tls-ctx new-ssl get-ssl-peer-certificate
     ] with-destructors
 ] unit-test
+
+{ 0x0303 0x0304 0x0303 0x0304 } [
+    [
+        new-tls-ctx
+        dup TLS1_2_VERSION SSL_CTX_set_min_proto_version ssl-error
+        dup TLS1_3_VERSION SSL_CTX_set_max_proto_version ssl-error
+        [ SSL_CTX_get_min_proto_version ]
+        [ SSL_CTX_get_max_proto_version ]
+        [ new-ssl
+          dup TLS1_2_VERSION SSL_set_min_proto_version ssl-error
+          dup TLS1_3_VERSION SSL_set_max_proto_version ssl-error
+          [ SSL_get_min_proto_version ] [ SSL_get_max_proto_version ] bi ] tri
+    ] with-destructors
+] unit-test

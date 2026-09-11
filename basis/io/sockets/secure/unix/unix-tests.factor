@@ -3,10 +3,11 @@ concurrency.conditions concurrency.mailboxes
 concurrency.promises continuations destructors io
 io.backend.unix io.encodings.ascii io.files.temp io.sockets
 io.sockets.secure io.sockets.secure.debug io.sockets.secure.openssl
-io.streams.duplex io.timeouts kernel namespaces sequences sets
-openssl.libcrypto strings system threads tools.test ;
+io.streams.duplex io.timeouts io.ports kernel namespaces sequences sets
+openssl.libcrypto openssl.libssl strings system threads tools.test ;
 FROM: namespaces => set ;
 QUALIFIED-WITH: concurrency.messaging qm
+USE: io.sockets.secure.openssl.private
 IN: io.sockets.secure.tests
 
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
@@ -35,21 +36,24 @@ IN: io.sockets.secure.tests
     ] with-secure-context
 ] unit-test
 
-:: server-test ( quot: ( remote -- ) -- )
+:: server-test-with-config ( quot: ( remote -- ) config -- )
     [
-        [
+        config [
             "127.0.0.1" 0 <inet4> f <secure> ascii <server> [
                 dup addr>> addrspec>> port>> "port" get fulfill
                 accept quot curry with-stream
             ] with-disposal
-        ] with-test-context
+        ] with-secure-context
     ] "SSL server test" spawn drop ;
+
+: server-test ( quot: ( remote -- ) -- )
+    <test-secure-config> server-test-with-config ;
 
 : ?promise-test ( mailbox -- obj )
     500 milliseconds ?promise-timeout ;
 
 : client-test ( -- string )
-    <secure-config> [
+    <secure-config> f >>verify [
         "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii <client> drop
         1 seconds
         [ stream-contents ] with-timeout*
@@ -124,4 +128,28 @@ IN: io.sockets.secure.tests
 
 { } [
     [ download-my-image ] with-temp-directory
+] unit-test
+
+! Numeric endpoints must validate certificates too.
+[
+    <promise> "port" set
+    [ drop "hi" write ] server-test
+    <secure-config> [
+        "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii
+        <client> drop dispose
+    ] with-secure-context
+] [ certificate-verify-error? ] must-fail-with
+
+! Exercise the ALPN callback in a real nonblocking handshake.
+{ "h2" } [
+    <promise> "port" set
+    [ drop "hi" write ]
+    <test-secure-config> { "h2" "http/1.1" } >>alpn-supported-protocols
+    server-test-with-config
+    <secure-config> f >>verify { "h2" } >>alpn-supported-protocols [
+        "127.0.0.1" "port" get ?promise-test <inet4> f <secure> ascii
+        <client> drop [
+            in>> underlying-port handle>> handle>> get_alpn_selected_wrapper
+        ] with-disposal
+    ] with-secure-context
 ] unit-test
