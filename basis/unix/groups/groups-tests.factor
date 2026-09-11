@@ -86,7 +86,7 @@ SYMBOL: enumeration-ended?
         [
             \ group-struct>group [ drop [ drop "group-copy-failed" throw ] ] annotate
             \ unix.ffi:endgrent
-            [ [ t enumeration-ended? set ] compose ] annotate
+            [ [ t enumeration-ended? namespaces:set ] compose ] annotate
             [ all-groups ] [ "group-copy-failed" = ] must-fail-with
             enumeration-ended? get
         ] [
