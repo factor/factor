@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors calendar concurrency.combinators db db.tuples
+USING: accessors calendar concurrency.combinators continuations db db.tuples
 db.types fry furnace.actions furnace.auth furnace.boilerplate
 furnace.redirection furnace.syndication html.components
 html.forms http.server.dispatchers http.server.static kernel
@@ -185,8 +185,15 @@ posting "POSTINGS"
     <boilerplate>
         { planet "planet-common" } >>template ;
 
+<PRIVATE
+
+: update-planet ( db -- )
+    "webapps.planet" [
+        [ [ update-cached-postings ] with-db ]
+        [ nip \ update-planet log-error ] recover
+    ] with-logging ;
+
+PRIVATE>
+
 : start-update-task ( db -- )
-    '[
-        "webapps.planet"
-        [ _ [ update-cached-postings ] with-db ] with-logging
-    ] 10 minutes every drop ;
+    '[ _ update-planet ] 10 minutes every drop ;

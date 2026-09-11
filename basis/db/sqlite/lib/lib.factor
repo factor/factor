@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.strings arrays calendar.format
-calendar.parser combinators db db.errors db.sqlite.errors
+calendar.parser combinators continuations db db.errors db.sqlite.errors
 db.sqlite.ffi db.types io.backend io.encodings.string
 io.encodings.utf8 kernel math namespaces present sequences
 serialize urls ;
@@ -30,8 +30,9 @@ ERROR: sqlite-error < db-error n string ;
 
 : sqlite-open ( path -- db )
     normalize-path
-    { void* } [ sqlite3_open sqlite-check-result ]
-    with-out-parameters ;
+    { void* } [ sqlite3_open ] with-out-parameters
+    ! Even a failed open can return a handle which must be closed.
+    [ [ sqlite-check-result ] dip ] [ ] [ nip sqlite3_close drop ] cleanup ;
 
 : sqlite-close ( db -- )
     sqlite3_close sqlite-check-result ;

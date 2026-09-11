@@ -118,9 +118,11 @@ M: sqlite-result-set more-rows?
     has-more?>> ;
 
 M: sqlite-statement query-results
-    sqlite-maybe-prepare
-    dup handle>> sqlite-result-set new-result-set
-    dup advance-row ;
+    [
+        sqlite-maybe-prepare
+        dup handle>> sqlite-result-set new-result-set |dispose
+        dup advance-row
+    ] with-destructors ;
 
 M: sqlite-db-connection <insert-db-assigned-statement>
     [

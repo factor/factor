@@ -91,6 +91,8 @@ ALIAS: PF_INET6 AF_INET6
 CONSTANT: IPPROTO_TCP 6
 CONSTANT: IPPROTO_UDP 17
 
+CONSTANT: EAI_SYSTEM -11
+
 ! Flags only valid in gnu libcs' getaddrinfo
 CONSTANT: AI_IDN                        0x0040
 CONSTANT: AI_CANONIDN                   0x0080

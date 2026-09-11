@@ -4,6 +4,8 @@ USING: alien.c-types alien.syntax classes.struct combinators
 system unix.types vocabs.loader ;
 IN: unix.ffi
 
+CONSTANT: EAI_SYSTEM 11
+
 CONSTANT: MAXPATHLEN 1024
 
 CONSTANT: O_RDONLY   0x0000

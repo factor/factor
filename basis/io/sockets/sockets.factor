@@ -315,7 +315,10 @@ HOOK: addrinfo-error-string io-backend ( n -- string )
 PRIVATE>
 
 : <client> ( remote encoding -- stream local )
-    [ (client) ] dip swap [ <encoder-duplex> ] dip ;
+    [
+        [ (client) [ [ |dispose ] bi@ ] dip ] dip
+        swap [ <encoder-duplex> ] dip
+    ] with-destructors ;
 
 SYMBOL: local-address
 
@@ -339,18 +342,22 @@ SYMBOL: remote-address
 
 : <server> ( addrspec encoding -- server )
     [
-        [ (server) ] keep
-        [ drop server-port <port> ] [ get-local-address ] 2bi
-        >>addr
-    ] dip >>encoding ;
+        [
+            [ (server) |dispose ] keep
+            [ drop server-port <port> |dispose ] [ get-local-address ] 2bi
+            >>addr
+        ] dip >>encoding
+    ] with-destructors ;
 
 : accept ( server -- client remote )
     [
-        dup addr>>
-        [ (accept) ] keep
-        parse-sockaddr swap
-        <ports>
-    ] [ encoding>> ] bi <encoder-duplex> swap ;
+        [
+            dup addr>>
+            [ (accept) [ |dispose ] dip ] keep
+            parse-sockaddr swap
+            <ports> [ |dispose ] bi@
+        ] [ encoding>> ] bi <encoder-duplex> swap
+    ] with-destructors ;
 
 : <datagram> ( addrspec -- datagram )
     [
