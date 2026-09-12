@@ -52,7 +52,7 @@ HELP: watch-vars
 
 HELP: add-timing
 { $values { "word" word } }
-{ $description "Adds timing code to a word, which records its total running time, including that of words it calls, on every invocation." }
+{ $description "Adds timing code to a word, recording its invocation count and total running time, including that of words it calls. Recursive invocations in the same thread are counted individually, but their overlapping running time is recorded only once. Invocations that throw errors are also counted and timed." }
 { $see-also "timing" "tools.profiler.sampling" } ;
 
 HELP: reset-word-timing

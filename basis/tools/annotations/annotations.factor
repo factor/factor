@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-compiler.units effects generalizations generic inspector io
+compiler.units continuations effects generalizations generic inspector io
 kernel math namespaces parser prettyprint quotations sequences
 sequences.deep sequences.generalizations sorting summary
-tools.time vocabs words ;
+system threads vocabs words ;
 IN: tools.annotations
 
 SYMBOL: override-annotations?
@@ -137,14 +137,21 @@ word-timing [ H{ } clone ] initialize
 
 <PRIVATE
 
-: (add-timing) ( def word -- def' )
-    '[
-        _ benchmark _ word-timing get [
-            [
-                [ 0 swap [ + ] change-nth ] keep
-                [ 1 swap [ 1 + ] change-nth ] keep
-            ] [ 1 2array ] if*
-        ] change-at
+:: (add-timing) ( def word -- def' )
+    gensym :> active
+    [
+        word word-timing get [ drop { 0 0 } clone ] cache :> entry
+        1 entry [ 1 + ] change-nth
+        active get self eq? [ def call ] [
+            ! Count recursive calls, but charge their elapsed time only once.
+            ! A spawned thread inherits bindings, so include the thread identity.
+            self active [
+                nano-count :> start
+                def [
+                    nano-count start - 0 entry [ + ] change-nth
+                ] finally
+            ] with-variable
+        ] if
     ] ;
 
 PRIVATE>
