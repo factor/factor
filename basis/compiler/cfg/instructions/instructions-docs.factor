@@ -232,7 +232,7 @@ HELP: ##return
 { $class-description "Instruction that returns from a procedure call." } ;
 
 HELP: ##safepoint
-{ $class-description "Instruction that inserts a safe point in the generated code." } ;
+{ $class-description "Instruction that inserts a safe point in the generated code. Sampling can allocate and trigger garbage collection here, so live roots are described by its GC map and live registers are preserved around the poll." } ;
 
 HELP: ##save-context
 { $class-description "The ##save-context instructions saves the state of the data, retain and callstacks in the threads " { $link context } " struct." }
@@ -392,7 +392,10 @@ HELP: foldable-insn
   "Instructions which are referentially transparent; used for value numbering." } ;
 
 HELP: gc-map-insn
-{ $class-description "Union class of all instructions that contain subroutine calls to functions which allocate memory. Each of the instances has a " { $snippet "gc-map" } " slot." } ;
+{ $class-description "Union class of instructions which may trigger garbage collection, including safepoints and calls to allocating functions. Each instance has a " { $snippet "gc-map" } " slot." } ;
+
+HELP: gc-check-insn
+{ $class-description "GC calls and safepoint polls. Register allocation preserves live values around these instructions, including tagged roots, derived pointers and floating-point values." } ;
 
 HELP: gc-map
 { $class-description "A tuple that holds info necessary for a gc cycle to figure out where the gc root pointers are. It has the following slots:"

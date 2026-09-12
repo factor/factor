@@ -288,7 +288,7 @@ RENAMING: spill-rename
             [ insn spill-output get push ] if
         ] [
             insn plan afters>> at :> distances
-            insn clobber-insn? insn ##call-gc? or
+            insn clobber-insn? insn gc-check-insn? or
             [ insn distances rewrite-clobber-insn ]
             [ insn distances rewrite-ordinary-insn ] if
         ] if

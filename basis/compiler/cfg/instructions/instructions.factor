@@ -76,7 +76,8 @@ INSN: ##epilogue ;
 
 INSN: ##return ;
 
-INSN: ##safepoint ;
+INSN: ##safepoint
+literal: gc-map ;
 
 INSN: ##no-tco ;
 
@@ -893,8 +894,11 @@ UNION: alien-call-insn
     ##alien-indirect
     ##alien-invoke ;
 
+! Both can enter the VM and collect without an ordinary call instruction.
+UNION: gc-check-insn ##call-gc ##safepoint ;
+
 UNION: gc-map-insn
-    ##call-gc
+    gc-check-insn
     ##box
     ##box-long-long
     ##alien-indirect

@@ -58,7 +58,7 @@ M: ##replace visit-insn live-location ;
 M: ##call visit-insn ( state insn -- state' )
     drop dup ensure-no-vacant ;
 
-M: ##call-gc visit-insn ( state insn -- state' )
+M: gc-check-insn visit-insn ( state insn -- state' )
     drop all-live ;
 
 M: gc-map-insn visit-insn ( state insn -- state' )

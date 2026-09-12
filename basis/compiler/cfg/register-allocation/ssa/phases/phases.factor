@@ -12,7 +12,7 @@ IN: compiler.cfg.register-allocation.ssa.phases
 ! all-operands-at-once assignment pass. Instruction numbers remain even.
 ! Calls retain the existing indivisible ABI/synchronization point.
 : phase-split-insn? ( insn -- ? )
-    dup clobber-insn? swap ##call-gc? or not ;
+    dup clobber-insn? swap gc-check-insn? or not ;
 
 :: ssa-input-phase ( insn index -- n )
     insn insn#>>
