@@ -1,5 +1,9 @@
 # GC re-audit — 2026-09-11
 
+Follow-up: the [profiler issue audit](PROFILER-ISSUES-AUDIT.md) subsequently
+exposed a compiler safepoint bug under sampling-triggered collection. That
+failure, its fix, and the required image recompilation are documented there.
+
 Reviewed nursery and aging collection, promotion retries, full marking and
 sweeping, data/code compaction, heap growth, remembered cards, native root
 lifetimes, callstack/derived roots, and compiler GC maps/write barriers.
