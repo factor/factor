@@ -1,11 +1,24 @@
 USING: accessors arrays calendar combinators.short-circuit
 concurrency.promises continuations documents io io.directories
-io.encodings.utf8 io.files io.pathnames kernel lexer
+io.encodings.utf8 io.files io.pathnames io.streams.string kernel lexer
 listener math namespaces parser quotations sequences threads
-tools.test ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
-ui.gestures ui.tools.common ui.tools.listener ui.tools.listener.private
+tools.test tools.time ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
+ui.gestures ui.operations ui.tools.common ui.tools.listener ui.tools.listener.private
 vocabs.parser ;
 IN: ui.tools.listener.tests
+
+! Quotation commands retain the source input as well as the command name (#363).
+{ "2 2 +\nCommand: time\n" } [
+    <interactor> "2 2 +" over set-editor-string
+    [ ] \ time <operation> listener-operation-command
+    [ (print-input) ] with-string-writer
+] unit-test
+
+! Operations on other objects do not echo unrelated listener editor contents.
+{ "Command: time\n" } [
+    [ 2 2 + ] [ ] \ time <operation> listener-operation-command
+    [ (print-input) ] with-string-writer
+] unit-test
 
 ! Both Enter keys retain Shift's editor newline behavior.
 { "\n" "\n" } [

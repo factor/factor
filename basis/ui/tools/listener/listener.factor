@@ -127,6 +127,20 @@ M: input (print-input)
 M: word (print-input)
     "Command: " listener-word-style get-global format . ;
 
+<PRIVATE
+
+TUPLE: listener-input-command input command ;
+
+M: listener-input-command (print-input)
+    [ input>> (print-input) ] [ command>> (print-input) ] bi ;
+
+: listener-operation-command ( target operation -- command )
+    command>> over interactor? [
+        [ editor-string <input> ] dip listener-input-command boa
+    ] [ nip ] if ;
+
+PRIVATE>
+
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
 
@@ -307,7 +321,7 @@ M: listener-command invoke-command
     [ command-quot ] [ nip ] 2bi call-listener ;
 
 M: listener-operation invoke-command
-    [ operation-quot ] [ nip command>> ] 2bi call-listener ;
+    [ operation-quot ] [ listener-operation-command ] 2bi call-listener ;
 
 : eval-listener ( string -- )
     get-listener input>> [ set-editor-string ] keep
