@@ -32,8 +32,8 @@ HELP: compute-live-in
 { $see-also machine-live-ins } ;
 
 HELP: emit-##call-gc
-{ $values { "insn" ##call-gc } }
-{ $description "Emits a " { $link ##call-gc } " instruction and the " { $link ##reload } " and " { $link ##spill } " instructions it requires. ##call-gc aren't counted as sync points, so the instruction requires special handling." } ;
+{ $values { "insn" gc-check-insn } }
+{ $description "Emits a GC call or safepoint poll and the " { $link ##reload } " and " { $link ##spill } " instructions it requires. These instructions are not counted as ordinary sync points, so they require special handling." } ;
 
 HELP: expire-old-intervals
 { $values { "n" integer } { "pending-heap" min-heap } }

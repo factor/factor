@@ -3,6 +3,21 @@ compiler.cfg.registers compiler.cfg.stacks.clearing compiler.cfg.utilities
 kernel tools.test ;
 IN: compiler.cfg.stacks.clearing.tests
 
+! Profiling may collect at a loop poll before pending stack slots are written.
+{
+    V{
+        T{ ##inc { loc D: 2 } { insn# 0 } }
+        T{ ##clear { loc T{ ds-loc { n 1 } } } }
+        T{ ##clear { loc T{ ds-loc } } }
+        T{ ##safepoint { gc-map T{ gc-map } } { insn# 1 } }
+    }
+} [
+    {
+        T{ ##inc f D: 2 }
+        T{ ##safepoint { gc-map T{ gc-map } } }
+    } insns>cfg dup clear-uninitialized cfg>insns
+] unit-test
+
 ! clear-uninitialized
 {
     V{

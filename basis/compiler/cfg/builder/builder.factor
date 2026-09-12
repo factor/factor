@@ -41,7 +41,7 @@ GENERIC: emit-node ( block node -- block' )
 
 : begin-word ( block -- block' )
     t >>kill-block?
-    ##safepoint, ##prologue, ##branch,
+    <gc-map> ##safepoint, ##prologue, ##branch,
     begin-basic-block ;
 
 : (build-cfg) ( nodes word label -- )
@@ -55,7 +55,7 @@ GENERIC: emit-node ( block node -- block' )
     ] keep ;
 
 : emit-loop-call ( successor-block current-block -- )
-    ##safepoint, ##branch,
+    <gc-map> ##safepoint, ##branch,
     [ swap connect-bbs ] [ end-basic-block ] bi ;
 
 : emit-call ( block word height -- block' )
@@ -169,7 +169,7 @@ M: #shuffle emit-node
 : end-word ( block -- block' )
     ##branch, begin-basic-block
     t >>kill-block?
-    ##safepoint, ##epilogue, ##return, ;
+    <gc-map> ##safepoint, ##epilogue, ##return, ;
 
 M: #return emit-node
     drop end-word ;

@@ -1,4 +1,4 @@
-USING: assocs byte-arrays calendar continuations io.streams.string
+USING: arrays assocs byte-arrays calendar continuations io.streams.string
 kernel kernel.private math math.parser memory namespaces parser
 random sequences splitting threads
 tools.profiler.sampling tools.profiler.sampling.private
@@ -42,6 +42,17 @@ CONSTANT: report-samples {
 ] unit-test
 
 ! Make sure the profiler doesn't blow up the VM
+
+! Keep an array and an unboxed floating-point accumulator live across polls.
+: sampled-sum ( array -- sum )
+    0.0 swap [ { float } declare + ] each ;
+
+{ } [
+    [
+        50 [ 100000 1.25 <array> sampled-sum 125000.0 assert= ] times
+    ] profile
+] unit-test
+
 { } [ 10 [ [ ] profile ] times ] unit-test
 TUPLE: boom ;
 [ 10 [ [ boom new throw ] profile ] times ] [ boom? ] must-fail-with

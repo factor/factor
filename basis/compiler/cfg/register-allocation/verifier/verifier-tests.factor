@@ -232,10 +232,9 @@ IN: compiler.cfg.register-allocation.verifier.tests
     cfg snapshot check-value-flow
 ] ] [ lost-allocation-instruction? ] must-fail-with
 
-:: gc-fixture ( -- cfg snapshot )
+:: gc-fixture* ( gc -- cfg snapshot )
     init-flow-reps tagged-rep 1 set-rep-of
     ##load-reference new 1 >>dst { 1 2 3 } >>obj :> definition
-    ##call-gc new <gc-map> >>gc-map :> gc
     1 flow-use :> use
     definition gc use 3array insns>cfg :> cfg
     cfg snapshot-value-flow :> snapshot
@@ -245,6 +244,27 @@ IN: compiler.cfg.register-allocation.verifier.tests
     0 0 flow-reload tagged-rep >>rep use 5 narray >vector
     cfg entry>> instructions<<
     cfg snapshot ;
+
+: gc-fixture ( -- cfg snapshot )
+    ##call-gc new <gc-map> >>gc-map gc-fixture* ;
+
+: safepoint-fixture ( -- cfg snapshot )
+    ##safepoint new <gc-map> >>gc-map gc-fixture* ;
+
+! Safepoints relocate roots and invalidate register copies just like GC calls.
+{ } [ safepoint-fixture check-value-flow ] unit-test
+
+[ [let
+    safepoint-fixture :> ( cfg snapshot )
+    cfg entry>> [ [ ##spill? ] reject ] change-instructions drop
+    cfg snapshot check-value-flow
+] ] [ invalid-allocation-gc-root? ] must-fail-with
+
+[ [let
+    safepoint-fixture :> ( cfg snapshot )
+    cfg entry>> [ [ ##reload? ] reject ] change-instructions drop
+    cfg snapshot check-value-flow
+] ] [ bad-allocation-value? ] must-fail-with
 
 { } [ gc-fixture check-value-flow ] unit-test
 

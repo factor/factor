@@ -261,7 +261,7 @@ ERROR: invalid-allocation-operand-constraint insn ;
             ! do not themselves invalidate physical registers. In particular,
             ! a callback's raw result pointer must survive these calls in
             ! memory, never in an allocator register.
-            insn clobber-insn? insn ##call-gc? or insn ##call? or
+            insn clobber-insn? insn gc-check-insn? or insn ##call? or
             [ state value-flow-clobber ] when
             insn expected state forget-value-flow-temps
             insn expected state snapshot define-value-flow-outputs

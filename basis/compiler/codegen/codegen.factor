@@ -137,7 +137,8 @@ CODEGEN: ##inc %inc
 CODEGEN: ##call %call
 CODEGEN: ##jump %jump
 CODEGEN: ##return %return
-CODEGEN: ##safepoint %safepoint
+! A fault resumes at the poll itself, so its map precedes the instruction.
+M: ##safepoint generate-insn gc-map>> gc-map-here %safepoint ;
 CODEGEN: ##slot %slot
 CODEGEN: ##slot-imm %slot-imm
 CODEGEN: ##set-slot %set-slot

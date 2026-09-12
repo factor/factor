@@ -39,7 +39,7 @@ M: ##parallel-copy record-insn
 M: vreg-insn record-insn
     [ 2 * ] dip [ record-defs ] [ record-uses ] 2bi ;
 
-M: ##call-gc record-insn
+M: gc-check-insn record-insn
     [ 2 * ] dip record-uses ;
 
 M: insn record-insn

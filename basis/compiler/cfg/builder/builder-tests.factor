@@ -397,7 +397,7 @@ SYMBOL: foo
 ! end-word
 {
     V{
-        T{ ##safepoint }
+        T{ ##safepoint { gc-map T{ gc-map } } }
         T{ ##epilogue }
         T{ ##return }
     }

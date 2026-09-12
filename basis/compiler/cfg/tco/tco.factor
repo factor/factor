@@ -30,7 +30,7 @@ IN: compiler.cfg.tco
     '[
         instructions>>
         [ pop* ] [ pop ] [ ] tri
-        [ [ ##safepoint new-insn ] dip push ]
+        [ [ <gc-map> ##safepoint new-insn ] dip push ]
         [ [ ##epilogue new-insn ] dip push ]
         [ _ dip push ] tri
     ]
@@ -50,7 +50,7 @@ IN: compiler.cfg.tco
         instructions>> {
             [ pop* ]
             [ pop* ]
-            [ [ ##safepoint new-insn ] dip push ]
+            [ [ <gc-map> ##safepoint new-insn ] dip push ]
             [ [ ##branch new-insn ] dip push ]
         } cleave
     ]

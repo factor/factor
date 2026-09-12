@@ -158,7 +158,7 @@ M: constant-recipe emit-restore nip swap emit-rematerialization ;
 : spill/reloads ( n intervals -- spill/reloads )
     [ spill/reload ] with map ;
 
-: spill/reloads-for-call-gc ( ##call-gc -- spill-seq )
+: spill/reloads-for-call-gc ( insn -- spill-seq )
     [ gc-map>> gc-roots>> ] [ insn#>> ] bi
     [ spill-intervals ] 1check spill/reloads ;
 
@@ -170,7 +170,7 @@ M: constant-recipe emit-restore nip swap emit-rematerialization ;
 
 : emit-gc-map-insn ( gc-map-insn -- )
     [ [ leader ] change-insn-gc-roots ]
-    [ dup ##call-gc? [ emit-##call-gc ] [ , ] if ]
+    [ dup gc-check-insn? [ emit-##call-gc ] [ , ] if ]
     [ [ vreg>spill-slot ] change-insn-gc-roots ] tri ;
 
 : emit-insn ( insn -- )

@@ -1,7 +1,7 @@
 USING: accessors alien.c-types arrays bit-arrays byte-arrays
 classes.struct compiler.cfg compiler.cfg.instructions
 compiler.cfg.stack-frame compiler.cfg.utilities
-compiler.codegen.gc-maps compiler.codegen.relocation
+compiler.codegen compiler.codegen.gc-maps compiler.codegen.relocation
 cpu.architecture kernel layouts make math namespaces sequences
 specialized-arrays system tools.test ;
 QUALIFIED: vm
@@ -13,6 +13,21 @@ SINGLETON: fake-cpu
 fake-cpu \ cpu set
 
 M: fake-cpu gc-root-offset ;
+
+M: fake-cpu %safepoint B{ 0 0 0 0 } % ;
+
+! A fault resumes at the poll, unlike a call which resumes after it.
+{ V{ 8 } 12 } [
+    [
+        init-relocation
+        V{ } clone return-addresses set
+        V{ } clone gc-maps set
+        8 <byte-array> %
+        T{ ##safepoint { gc-map T{ gc-map { gc-roots { 1 } } } } }
+        generate-insn
+        return-addresses get compiled-offset
+    ] B{ } make drop
+] unit-test
 
 [
     init-relocation
