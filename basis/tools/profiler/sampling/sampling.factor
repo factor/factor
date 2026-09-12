@@ -16,6 +16,10 @@ SYMBOL: samples-per-second
 
 samples-per-second [ 1,000 ] initialize
 
+SYMBOL: profile-minimum-percent
+
+profile-minimum-percent [ 0 ] initialize
+
 <PRIVATE
 SYMBOL: raw-profile-data
 CONSTANT: ignore-words
@@ -197,6 +201,8 @@ PRIVATE>
 
 <PRIVATE
 
+SYMBOL: report-total-time
+
 : depth. ( depth -- )
     H{ } [ "  " <repetition> concat ] cache write ;
 
@@ -206,8 +212,15 @@ PRIVATE>
 : duration. ( duration -- )
     1000 * "%9.1f" printf ;
 
+: time-percentage ( num denom -- percentage )
+    dup zero? [ 2drop 0.0 ] [ [ 100 * ] dip /f ] if ;
+
 : percentage. ( num denom -- )
-    [ 100 * ] dip /f "%6.2f" printf ;
+    time-percentage "%6.2f" printf ;
+
+: visible-node? ( node -- ? )
+    total-time>> report-total-time get time-percentage
+    profile-minimum-percent get >= ;
 
 DEFER: profile-depth.
 
@@ -216,6 +229,7 @@ DEFER: profile-depth.
         node {
             [ depth>> number>string 4 CHAR: \s pad-head write bl ]
             [ total-time>> duration. bl ]
+            [ total-time>> report-total-time get percentage. bl ]
             [ [ gc-time>> ] [ total-time>> ] bi percentage. bl ]
             [ [ jit-time>> ] [ total-time>> ] bi percentage. bl ]
             [ [ foreign-time>> ] [ total-time>> ] bi percentage. bl ]
@@ -230,13 +244,15 @@ DEFER: profile-depth.
     node children>> depth 1 + profile-depth. ;
 
 : profile-depth. ( nodes depth -- )
-    [ by-total-time ] dip '[ _ profile-node. ] assoc-each ;
+    [ [ visible-node? ] filter-values by-total-time ] dip
+    '[ _ profile-node. ] assoc-each ;
 
 : profile-heading. ( -- )
-    "depth   time ms  GC %  JIT %  FFI %   FT %" print ;
-   ! NNNN XXXXXXX.X XXXX.X XXXX.X XXXX.X XXXX.X | | foo
+    "depth   time ms time %   GC %  JIT %  FFI %   FT %" print ;
 
 PRIVATE>
 
 : profile. ( tree -- )
-    profile-heading. [ 0 profile-node. ] assoc-each ;
+    dup values [ total-time>> ] map-sum report-total-time [
+        profile-heading. 0 profile-depth.
+    ] with-variable ;
