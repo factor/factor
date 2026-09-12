@@ -15,7 +15,8 @@ IN: compiler.test
     dup def>> 2array 1array t t modify-code-heap ;
 
 : recompile-all ( -- )
-    all-words compile ;
+    ! Methods and generated dispatch words are not in the vocabulary dictionary.
+    all-words dup [ subwords ] map concat append compile ;
 
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
