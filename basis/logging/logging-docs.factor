@@ -107,6 +107,8 @@ HELP: with-logging
 
 ARTICLE: "logging.rotation" "Log rotation"
 "Log files should be rotated periodically to prevent unbounded growth."
+$nl
+"The log server also rotates individual services when their active file reaches " { $link max-log-size } ", independently of report delivery."
 { $subsections
     rotate-logs
     close-logs
