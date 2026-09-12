@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs io io.styles kernel logging
-logging.parser math namespaces prettyprint sequences sorting
+USING: accessors arrays assocs io io.files io.styles kernel logging
+logging.parser logging.server math namespaces prettyprint sequences sorting
 splitting ;
 IN: logging.analysis
 
@@ -9,6 +9,9 @@ SYMBOL: word-names
 SYMBOL: errors
 SYMBOL: word-histogram
 SYMBOL: message-histogram
+
+SYMBOL: log-report-limit
+log-report-limit [ 1,048,576 ] initialize
 
 : analyze-entry ( entry -- )
     dup level>> { ERROR CRITICAL } member-eq? [ dup errors get push ] when
@@ -69,5 +72,13 @@ SYMBOL: message-histogram
 : analyze-log ( lines word-names -- )
     [ parse-log ] dip analyze-entries analysis. ;
 
-: analyze-log-file ( service word-names -- )
-    [ parse-log-file ] dip analyze-entries analysis. ;
+:: analyze-log-file ( service word-names -- )
+    service log-path 1 log# :> path
+    path file-exists? [
+        path log-report-limit get log-file-tail :> ( lines omitted )
+        omitted 0 > [
+            "Partial log report: omitted " write omitted pprint
+            " bytes from the beginning of the log; counts cover only the retained tail." print nl
+        ] when
+        lines word-names analyze-log
+    ] [ f word-names analyze-entries analysis. ] if ;
