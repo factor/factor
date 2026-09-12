@@ -1,6 +1,13 @@
 USING: help.markup help.syntax assocs logging ;
 IN: logging.analysis
 
+HELP: log-report-limit
+{ $var-description "Maximum bytes read from the end of a log by " { $link analyze-log-file } ". Defaults to 1 MiB. The limit must be a positive integer. A partial first line is discarded, and the report announces omitted bytes. Counts describe only the retained entries. This also bounds input from oversized individual log lines." } ;
+
+HELP: analyze-log-file
+{ $values { "service" "a log service name" } { "word-names" "a sequence of strings" } }
+{ $description "Prints a report for the active log file of a service. Reads at most " { $link log-report-limit } " bytes, so an accumulated backlog cannot make a report load the entire file into memory." } ;
+
 HELP: analyze-entries
 { $values { "entries" "a sequence of log entries" } { "word-names" "a sequence of strings" } { "errors" "a sequence of log entries" } { "word-histogram" assoc } { "message-histogram" assoc } }
 { $description "Analyzes log entries:"

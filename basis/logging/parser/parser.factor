@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs calendar calendar.format calendar.parser
-combinators io io.encodings.utf8 io.files kernel logging
-logging.server make namespaces peg peg.parsers prettyprint
+combinators io io.encodings.binary io.encodings.string
+io.encodings.utf8 io.files kernel logging
+logging.server make math math.order namespaces peg peg.parsers prettyprint
 sequences splitting strings vectors words ;
 IN: logging.parser
 
@@ -56,7 +57,7 @@ PEG: parse-log-line ( string -- entry ) log-line-parser ;
     level>> malformed eq? ;
 
 : multiline? ( line -- ? )
-    level>> multiline eq? ;
+    date>> multiline eq? ;
 
 : malformed-line ( line -- )
     "Warning: malformed log line:" print
@@ -83,6 +84,27 @@ PEG: parse-log-line ( string -- entry ) log-line-parser ;
 : parse-log-file ( service -- entries )
     log-path 1 log# dup file-exists?
     [ utf8 file-lines parse-log ] [ drop f ] if ;
+
+ERROR: invalid-log-tail-limit limit ;
+
+! Bound the raw read, including a single oversized or unterminated line.
+! Discard a partial first line before decoding, since it may split UTF-8.
+:: log-file-tail ( path limit -- lines omitted-bytes )
+    limit integer? [ limit 0 > ] [ f ] if
+    [ limit invalid-log-tail-limit ] unless
+    path binary [
+        input-stream get stream-length 0 or limit - 0 max :> start
+        start 0 > [
+            start 1 - seek-absolute seek-input
+            read1 CHAR: \n =
+        ] [ t ] if :> line-boundary?
+        limit read B{ } or :> bytes
+        line-boundary? [ 0 ] [
+            CHAR: \n bytes index [ 1 + ] [ bytes length ] if*
+        ] if :> partial
+        bytes partial tail utf8 decode split-lines
+        start partial +
+    ] with-file-reader ;
 
 GENERIC: log-timestamp. ( date -- )
 
