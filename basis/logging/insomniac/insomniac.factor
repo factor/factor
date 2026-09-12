@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors calendar io.streams.string kernel logging
+USING: accessors calendar continuations io.streams.string kernel logging
 logging.analysis make namespaces smtp timers ;
 QUALIFIED: io.sockets
 IN: logging.insomniac
@@ -26,6 +26,13 @@ SYMBOL: insomniac-recipients
 : email-log-report ( service word-names -- )
     "logging.insomniac" [ (email-log-report) ] with-logging ;
 
+<PRIVATE
+
+: with-log-rotation ( quot -- )
+    [ rotate-logs ] finally ; inline
+
+PRIVATE>
+
 : schedule-insomniac ( service word-names -- )
-    [ email-log-report rotate-logs ] 2curry
+    [ [ email-log-report ] with-log-rotation ] 2curry
     1 days every drop ;

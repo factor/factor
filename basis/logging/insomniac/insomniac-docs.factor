@@ -13,7 +13,7 @@ HELP: email-log-report
 
 HELP: schedule-insomniac
 { $values { "service" "a log service name" } { "word-names" "a sequence of strings" } }
-{ $description "Starts a thread which e-mails log reports and rotates logs daily." } ;
+{ $description "Starts a thread which e-mails a log report immediately and then daily. File reports respect " { $link log-report-limit } ". Logs are rotated after each attempt, including when reporting fails." } ;
 
 ARTICLE: "logging.insomniac" "Automated log analysis"
 "The " { $vocab-link "logging.insomniac" } " vocabulary builds on the " { $vocab-link "logging.analysis" } " vocabulary. It provides support for e-mailing log reports and rotating logs on a daily basis. E-mails are sent using the " { $vocab-link "smtp" } " vocabulary."

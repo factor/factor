@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: assocs calendar calendar.format combinators
+USING: accessors assocs calendar calendar.format combinators
 concurrency.messaging continuations debugger destructors init io
 io.directories io.encodings.utf8 io.files io.pathnames kernel
 math math.parser ranges namespaces sequences strings threads ;
@@ -17,13 +17,13 @@ IN: logging.server
 
 SYMBOL: log-files
 
+SYMBOL: max-log-size
+max-log-size [ 10,485,760 ] initialize
+
 : open-log-stream ( service -- stream )
     log-path
     [ make-directories ]
     [ 1 log# utf8 <file-appender> ] bi ;
-
-: log-stream ( service -- stream )
-    log-files get [ open-log-stream ] cache ;
 
 : close-log-streams ( -- )
     log-files get [ values dispose-each ] [ clear-assoc ] bi ;
@@ -49,10 +49,6 @@ SYMBOL: log-files
         [ level write bl word-name write ": " write print ]
         interleave
     ] unless-empty ;
-
-: (log-message) ( msg -- )
-    ! msg: { msg word-name level service }
-    first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( obj -- )
     [ dispose ] curry [ error. ] recover ;
@@ -80,6 +76,18 @@ CONSTANT: keep-logs 10
         [ delete-oldest ]
         [ keep-logs 1 [a..b] [ advance-log ] with each ] bi
     ] bi ;
+
+:: log-stream ( service -- stream )
+    service log-files get [ open-log-stream ] cache :> stream
+    max-log-size get-global :> limit
+    limit [ stream stream>> stream-length 0 or limit >= ] [ f ] if [
+        service rotate-log
+        service log-files get [ open-log-stream ] cache
+    ] [ stream ] if ;
+
+: (log-message) ( msg -- )
+    ! msg: { msg word-name level service }
+    first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : (rotate-logs) ( -- )
     (close-logs)
