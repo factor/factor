@@ -25,14 +25,15 @@ IN: io.sockets.secure.tests
 ! The failed constructor must release both the SSL handle and the fd.
 { t } [
     <secure-config> [
-        disposables get cardinality
-        [
+        HS{ } clone disposables [
             [
-                "127.0.0.1" 0 <inet4> <datagram> &dispose
-                handle>> 256 CHAR: x <string> <ssl-socket> dispose
-            ] with-destructors
-        ] must-fail
-        disposables get cardinality =
+                [
+                    "127.0.0.1" 0 <inet4> <datagram> &dispose
+                    handle>> 256 CHAR: x <string> <ssl-socket> dispose
+                ] with-destructors f
+            ] [ drop t ] recover
+            disposables get null? and
+        ] with-variable
     ] with-secure-context
 ] unit-test
 
