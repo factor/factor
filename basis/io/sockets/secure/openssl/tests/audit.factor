@@ -21,6 +21,20 @@ IN: io.sockets.secure.openssl.audit-tests
     ] with-identity-certificate
 ] unit-test
 
+! Exercise the compatibility path even when native identity checks exist.
+{ { t f t f f t f t t f } } [
+    [
+        { "GOOD.EXAMPLE" "cn-only.example" "a.wild.example"
+          "wild.example" "a.b.wild.example" "127.0.0.1"
+          "127.0.0.2" "::1" "0:0:0:0:0:0:0:1" "::2" }
+        swap [ certificate-matches-legacy? ] curry map
+    ] with-identity-certificate
+] unit-test
+
+{ "cn-only.example" } [
+    [ subject-name ] with-identity-certificate
+] unit-test
+
 { { "good.example" "*.wild.example" } } [
     [ alternative-dns-names ] with-identity-certificate
 ] unit-test

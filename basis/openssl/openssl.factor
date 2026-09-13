@@ -6,7 +6,7 @@ IN: openssl
 
 ! This code is based on https://www.rtfm.com/openssl-examples/
 
-SYMBOLS: ssl-initialized? ssl-new-api? ;
+SYMBOLS: ssl-initialized? ssl-new-api? ssl-native-identity-checks? ;
 
 SINGLETON: openssl
 
@@ -38,7 +38,10 @@ SINGLETON: openssl
 : init-ssl ( -- )
     "OPENSSL_init_ssl" "libssl" dlsym? >boolean
     [ ssl-new-api? set-global ]
-    [ [ init-new-api ] [ init-old-api ] if ] bi ;
+    [ [ init-new-api ] [ init-old-api ] if ] bi
+    "X509_check_host" "libcrypto" dlsym?
+    "X509_check_ip_asc" "libcrypto" dlsym? and >boolean
+    ssl-native-identity-checks? set-global ;
 
 : maybe-init-ssl ( -- )
     ssl-initialized? get-global [
