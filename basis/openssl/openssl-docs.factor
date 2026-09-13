@@ -11,8 +11,11 @@ HELP: ssl-initialized?
 HELP: ssl-new-api?
 { $var-description "Boolean that is " { $link t } " if the detected libssl version is 1.1.0 or greater." } ;
 
+HELP: ssl-native-identity-checks?
+{ $var-description "Boolean that is " { $link t } " when the initialized SSL library provides both native certificate hostname and IP address checks." } ;
+
 ARTICLE: "openssl" "OpenSSL Binding"
 "The " { $vocab-link "openssl" } " vocab and its subvocabs implements bindings for the libssl and libcrypto SSL libraries. Variables:"
-{ $subsections ssl-initialized? ssl-new-api? } ;
+{ $subsections ssl-initialized? ssl-new-api? ssl-native-identity-checks? } ;
 
 ABOUT: "openssl"

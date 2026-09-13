@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.libraries.finder alien.strings assocs byte-arrays
+alien.libraries.finder alien.strings arrays assocs byte-arrays
 classes.struct combinators combinators.short-circuit continuations destructors
 endian io io.backend io.buffers io.encodings.latin1
 io.encodings.string io.encodings.utf8 io.files io.pathnames
-io.ports io.sockets io.sockets.secure io.timeouts kernel libc
+io.ports io.sockets io.sockets.private io.sockets.secure io.timeouts kernel libc
 math math.functions math.order math.parser namespaces openssl
 openssl.libcrypto openssl.libssl random sequences sets splitting
 system unicode ;
@@ -456,10 +456,14 @@ M: ssl-handle dispose*
     SSL_get_verify_result X509_V_ERROR number>enum dup X509_V_ERR_OK =
     [ drop ] [ certificate-verify-error ] if ;
 
-: x509name>string ( x509name -- string )
-    NID_commonName 256 <byte-array>
-    [ 256 X509_NAME_get_text_by_NID ] keep
-    swap -1 = [ drop f ] [ latin1 alien>string ] if ;
+:: x509name>string ( x509name -- string )
+    x509name NID_commonName f 0 X509_NAME_get_text_by_NID :> len
+    len -1 = [ f ] [
+        len 1 + <byte-array> :> buffer
+        x509name NID_commonName buffer buffer length
+        X509_NAME_get_text_by_NID drop
+        buffer len head latin1 decode
+    ] if ;
 
 : subject-name ( certificate -- host )
     X509_get_subject_name x509name>string ;
@@ -478,15 +482,22 @@ M: ssl-handle dispose*
         sk-value GENERAL_NAME_st memory>struct
     ] with map ;
 
-: alternative-dns-names ( certificate -- dns-names )
-    NID_subject_alt_name f f X509_get_ext_d2i
+<PRIVATE
+
+:: alternative-names ( certificate type -- names )
+    certificate NID_subject_alt_name f f X509_get_ext_d2i
     [
         [
-            name-stack>sequence [ type>> GEN_DNS = ] filter
+            name-stack>sequence [ type>> type = ] filter
             [ d>> dNSName>> [ data>> ] [ length>> ] bi
-              memory>byte-array utf8 decode ] map
+              memory>byte-array ] map
         ] over '[ _ GENERAL_NAMES_free ] finally
     ] [ { } ] if* ;
+
+PRIVATE>
+
+: alternative-dns-names ( certificate -- dns-names )
+    GEN_DNS alternative-names [ utf8 decode ] map ;
 
 ! A wildcard matches exactly one nonempty DNS label.
 : subject-names-match? ( name pattern -- ? )
@@ -506,14 +517,32 @@ M: ssl-handle dispose*
         [ <ipv4> drop t ] [ 2drop f ] recover
     ] if ;
 
+<PRIVATE
+
+! Older macOS libcrypto versions do not export X509_check_host/ip_asc.
+:: certificate-matches-legacy? ( host certificate -- ? )
+    host ip-host? [
+        host dup ":" swap subseq? ipv6 ipv4 ? new inet-pton
+        certificate GEN_IPADD alternative-names member?
+    ] [
+        certificate alternative-dns-names dup empty? [
+            drop certificate subject-name [ 1array ] [ { } ] if*
+        ] when
+        [ host swap subject-names-match? ] any?
+    ] if ;
+
+PRIVATE>
+
 :: certificate-matches? ( host certificate -- ? )
     CHAR: \0 host member? [ f ] [
-        host ip-host? [
-            certificate host 0 X509_check_ip_asc
-        ] [
-            certificate host host utf8 encode length
-            X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS f X509_check_host
-        ] if 1 =
+        ssl-native-identity-checks? get-global [
+            host ip-host? [
+                certificate host 0 X509_check_ip_asc
+            ] [
+                certificate host host utf8 encode length
+                X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS f X509_check_host
+            ] if 1 =
+        ] [ host certificate certificate-matches-legacy? ] if
     ] if ;
 
 :: check-subject-name ( host ssl-handle -- )

@@ -20,6 +20,10 @@ HELP: alternative-dns-names
 { $values { "certificate" "an SSL peer certificate" } { "dns-names" sequence } }
 { $description "Alternative subject names for the certificate." } ;
 
+HELP: certificate-matches?
+{ $values { "host" string } { "certificate" "an SSL peer certificate" } { "?" boolean } }
+{ $description "Checks the certificate identity against a DNS name or IP address. DNS subject alternative names take precedence over the common name, and a wildcard matches one nonempty label. IP addresses must match an IP subject alternative name. Host names containing a null character are rejected. Uses equivalent local checks when the SSL library lacks native identity checking functions." } ;
+
 HELP: do-ssl-connect
 { $values { "ssl-handle" ssl-handle } }
 { $description "Connects the SSL handle to the remote server. Blocks until the connection is established or an error is thrown." } ;
