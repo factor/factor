@@ -300,22 +300,20 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     // Allocate array for argument aliens
     var args_array = vm.allotArray(argc, layouts.false_object) orelse return;
 
-    // CRITICAL: Store in special_objects BEFORE allocating aliens.
-    // This makes the array a GC root so it won't become a stale pointer if GC runs.
-    // We'll update the slots below, and the array is already in place as a root.
+    // Store the array in special_objects BEFORE allocating the aliens so the
+    // collector keeps it alive and updates that slot if it moves the array.
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)] = args_array;
 
-    // Create an alien for each argument string
-    // NOTE: allotAlien can trigger GC, but args_array is now a GC root via special_objects
     for (args, 0..) |arg, i| {
-        // Re-fetch array pointer after potential GC (special_objects is scanned by GC)
+        // Create alien pointing to the C string (null-terminated)
+        const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
+
+        // Re-fetch array pointer after potential GC
         args_array = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.args)];
         const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(args_array));
         const data = arr.data();
-
-        // Create alien pointing to the C string (null-terminated)
-        const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
         data[i] = alien;
+        vm.writeBarrierKnownHeapWithValue(&data[i], alien);
     }
 }
 
@@ -609,3 +607,58 @@ pub fn keepPrimitives() void {
 
 // Export primitive table
 pub export var primitive_table: [primitives.primitive_count]primitives.PrimitiveFn = primitives.getAllPrimitives();
+
+test "passArgsToFactor stores the alien into the array that survived a collection" {
+    const allocator = std.testing.allocator;
+    const vm = try vm_mod.FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 64 * 1024, 64 * 1024, 256 * 1024);
+    vm.setDataHeap(heap);
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // Fill the nursery so that a one-element array still fits but the alien
+    // allocated right after it does not: that allocation collects the nursery
+    // and promotes the array (a root via special_objects) to aging. The alien
+    // must then be stored into the promoted array, with a write barrier.
+    const array_bytes = layouts.alignCell(@sizeOf(layouts.Array) + @sizeOf(layouts.Cell), layouts.data_alignment);
+    const free_bytes = vm.vm_asm.nursery.end - vm.vm_asm.nursery.here;
+    _ = vm.allotByteArray(free_bytes - array_bytes - @sizeOf(layouts.ByteArray));
+    try std.testing.expectEqual(array_bytes, vm.vm_asm.nursery.end - vm.vm_asm.nursery.here);
+
+    const arg: [:0]const u8 = "hello";
+    const args = [_][:0]const u8{arg};
+    passArgsToFactor(vm, &args);
+
+    const args_index = @intFromEnum(objects.SpecialObject.args);
+    const args_cell = vm.vm_asm.special_objects[args_index];
+    try std.testing.expect(layouts.hasTag(args_cell, .array));
+    const arr: *layouts.Array = @ptrFromInt(layouts.UNTAG(args_cell));
+    try std.testing.expect(!vm.vm_asm.nursery.contains(@ptrCast(arr)));
+
+    // The slot holds the alien, and its card is marked because the alien is young.
+    const slot = arr.data()[0];
+    try std.testing.expect(layouts.hasTag(slot, .alien));
+    const slot_addr = @intFromPtr(&arr.data()[0]);
+    const card_ptr: *u8 = @ptrFromInt(vm.vm_asm.cards_offset +% (slot_addr >> @intCast(vm_mod.card_bits)));
+    try std.testing.expect(card_ptr.* & vm_mod.card_mark_mask != 0);
+
+    // After another nursery collection the slot follows the alien.
+    vm.minorGc();
+    const arr2: *layouts.Array = @ptrFromInt(layouts.UNTAG(vm.vm_asm.special_objects[args_index]));
+    const moved = arr2.data()[0];
+    try std.testing.expect(layouts.hasTag(moved, .alien));
+    const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(moved));
+    try std.testing.expect(!vm.vm_asm.nursery.contains(@ptrCast(@constCast(alien))));
+    try std.testing.expectEqual(layouts.false_object, alien.base);
+    try std.testing.expectEqual(@intFromPtr(arg.ptr), alien.address);
+}
