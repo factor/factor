@@ -214,13 +214,13 @@ pub fn resetTenuredCards(gc: *GC) void {
     const first_card = tenured.start >> @intCast(vm_mod.card_bits);
     const last_card = (tenured.end + vm_mod.card_size - 1) >> @intCast(vm_mod.card_bits);
     const card_count = last_card - first_card;
-    const card_ptr: [*]u8 = @ptrFromInt(cards_offset + first_card);
+    const card_ptr: [*]u8 = @ptrFromInt(cards_offset +% first_card);
     @memset(card_ptr[0..card_count], 0);
 
     const first_deck = tenured.start >> @intCast(vm_mod.deck_bits);
     const last_deck = (tenured.end + vm_mod.deck_size - 1) >> @intCast(vm_mod.deck_bits);
     const deck_count = last_deck - first_deck;
-    const deck_ptr: [*]u8 = @ptrFromInt(decks_offset + first_deck);
+    const deck_ptr: [*]u8 = @ptrFromInt(decks_offset +% first_deck);
     @memset(deck_ptr[0..deck_count], 0);
 }
 
