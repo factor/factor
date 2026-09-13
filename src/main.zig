@@ -316,6 +316,7 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
         // Create alien pointing to the C string (null-terminated)
         const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
         data[i] = alien;
+        vm.writeBarrierKnownHeapWithValue(&data[i], alien);
     }
 }
 
