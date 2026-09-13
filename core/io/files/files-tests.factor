@@ -11,12 +11,14 @@ IN: io.files.tests
 
 ! UTF-16 reads its BOM in <decoder>, after the file has already opened.
 ! A missing BOM must release the reader, buffer, and native handle.
+! Track only test resources; UI rendering can change the global registry.
 { t } [
     [| path |
         "no BOM" path ascii set-file-contents
-        disposables get cardinality
-        [ path utf16 <file-reader> dispose ] [ missing-bom? ] must-fail-with
-        disposables get cardinality =
+        HS{ } clone disposables [
+            [ path utf16 <file-reader> dispose f ] [ missing-bom? ] recover
+            disposables get null? and
+        ] with-variable
     ] with-test-file
 ] unit-test
 
@@ -28,10 +30,11 @@ M: failing-file-encoding <encoder>
 :: file-constructor-cleans-up? ( quot -- ? )
     [| path |
         path delete-file
-        disposables get cardinality
-        [ path failing-file-encoding quot call( path encoding -- stream ) dispose ]
-        [ "file encoder failed" = ] must-fail-with
-        disposables get cardinality =
+        HS{ } clone disposables [
+            [ path failing-file-encoding quot call( path encoding -- stream ) dispose f ]
+            [ "file encoder failed" = ] recover
+            disposables get null? and
+        ] with-variable
     ] with-test-file ;
 
 { { t t t } } [

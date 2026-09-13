@@ -18,9 +18,10 @@ TUPLE: pipe-init-counter n ;
     [
         \ init-fd [ [ check-pipe-init ] swap compose ] annotate
         0 pipe-init-counter boa pipe-init-count [
-            disposables get cardinality
-            [ (pipe) dispose ] [ "pipe initialization failed" = ] must-fail-with
-            disposables get cardinality =
+            HS{ } clone disposables [
+                [ (pipe) dispose f ] [ "pipe initialization failed" = ] recover
+                disposables get null? and
+            ] with-variable
         ] with-variable
     ] [ \ init-fd reset ] finally
 ] unit-test
