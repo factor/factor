@@ -111,8 +111,8 @@ FACTOR_EXPORT VAROUT_NOINLINE struct varout_aligned_result varout_return_alignme
 struct varout_vector_first { varout_vector value; uintptr_t tail; };
 union varout_vector_union { varout_vector value; long long integer; };
 FACTOR_EXPORT uintptr_t varout_vector_first_size(void) { return sizeof(struct varout_vector_first); }
-FACTOR_EXPORT uintptr_t varout_vector_first_align(void) { return _Alignof(struct varout_vector_first); }
-FACTOR_EXPORT uintptr_t varout_vector_union_align(void) { return _Alignof(union varout_vector_union); }
+FACTOR_EXPORT uintptr_t varout_vector_first_align(void) { return __alignof__(struct varout_vector_first); }
+FACTOR_EXPORT uintptr_t varout_vector_union_align(void) { return __alignof__(union varout_vector_union); }
 FACTOR_EXPORT double varout_vector_first_after_int(int tag, ...) {
   va_list ap; va_start(ap, tag);
   int prefix = va_arg(ap, int);
