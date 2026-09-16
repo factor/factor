@@ -7,6 +7,7 @@ IN: alien.data.tests
 { -1 } [ -1 c:char <ref> c:char deref ] unit-test
 { -1 } [ -1 c:short <ref> c:short deref ] unit-test
 { -1 } [ -1 c:int <ref> c:int deref ] unit-test
+{ -1 } [ -1 c:longlong <ref> c:longlong deref ] unit-test
 
 ! Boxing signed minima must not negate them in the signed C++ type.
 { -2147483648 } [ -2147483648 c:int <ref> c:int deref ] unit-test

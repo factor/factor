@@ -97,7 +97,9 @@ pub fn toBignum(vm: *FactorVM, n: Fixnum) !*layouts.Bignum {
     }
 
     const negative = n < 0;
-    const abs_n: Cell = if (negative) @bitCast(-n) else @bitCast(n);
+    // Wrapping negate: -n overflows for the most negative fixnum-typed value,
+    // whose magnitude 2^63 still fits the unsigned cell.
+    const abs_n: Cell = if (negative) @bitCast(-%n) else @bitCast(n);
 
     if (abs_n < bignum.RADIX) {
         // Single digit - fast path
@@ -191,4 +193,46 @@ test "fixnum shifts" {
     try std.testing.expectEqual(FixnumResult{ .fixnum = 8 }, shiftLeft(2, 2));
     try std.testing.expectEqual(@as(Fixnum, 2), shiftRight(8, 2));
     try std.testing.expectEqual(@as(Fixnum, -1), shiftRight(-1, 10)); // Sign extension
+}
+
+test "toBignum, bignum.fromFixnum and from_signed_8 accept the most negative i64" {
+    const data_heap_mod = @import("data_heap.zig");
+    const c_api = @import("c_api.zig");
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer {
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+    }
+    // vm.gc stays null, so the nursery must hold every allocation below.
+    const heap = try data_heap_mod.DataHeap.init(allocator, 256 * 1024, 64 * 1024, 64 * 1024);
+    defer heap.deinit();
+    vm.setDataHeap(heap);
+
+    const min = std.math.minInt(i64);
+    const max = std.math.maxInt(i64);
+
+    // Negating minInt(i64) to take its magnitude used to overflow (a panic in
+    // Debug, undefined behaviour in release). The magnitude 2^63 needs two
+    // 62-bit digits, like the other values here.
+    for ([_]i64{ min, min + 1, -(@as(i64, 1) << 62), max }) |n| {
+        const bn = try toBignum(vm, n);
+        try testing.expectEqual(n < 0, bn.isNegative());
+        try testing.expectEqual(@as(Cell, 2), bn.length());
+        try testing.expectEqual(n, bignum.toInt64(bn));
+
+        const bn2 = try bignum.fromFixnum(vm, n);
+        try testing.expect(bignum.equal(bn, bn2));
+
+        // The FFI return-value path for signed 64-bit C results.
+        const tagged = c_api.from_signed_8(n, &vm.vm_asm);
+        try testing.expect(layouts.hasTag(tagged, .bignum));
+        const bn3: *const bignum.Bignum = @ptrFromInt(layouts.UNTAG(tagged));
+        try testing.expectEqual(n, bignum.toInt64(bn3));
+    }
 }

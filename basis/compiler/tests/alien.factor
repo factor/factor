@@ -686,6 +686,8 @@ FUNCTION: ulonglong ffi_test_60 ( ulonglong x )
 
 { -1 } [ -1 ffi_test_59 ] unit-test
 { -1 } [ 0xffffffffffffffff ffi_test_59 ] unit-test
+{ -9223372036854775808 } [ -9223372036854775808 ffi_test_59 ] unit-test
+{ 9223372036854775807 } [ 9223372036854775807 ffi_test_59 ] unit-test
 { 0xffffffffffffffff } [ -1 ffi_test_60 ] unit-test
 { 0xffffffffffffffff } [ 0xffffffffffffffff ffi_test_60 ] unit-test
 
