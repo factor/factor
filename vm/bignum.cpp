@@ -1573,8 +1573,8 @@ bignum* factor_vm::bignum_posneg_bitwise_op(int op, bignum* arg1_,
   char neg_p = op == IOR_OP || op == XOR_OP;
 
   max_length =
-      (BIGNUM_LENGTH(arg1) > BIGNUM_LENGTH(arg2) + 1) ? BIGNUM_LENGTH(arg1)
-                                                      : BIGNUM_LENGTH(arg2) + 1;
+      (BIGNUM_LENGTH(arg1) > BIGNUM_LENGTH(arg2)) ? BIGNUM_LENGTH(arg1) + 1
+                                                  : BIGNUM_LENGTH(arg2) + 1;
 
   bignum* result = allot_bignum(max_length, neg_p);
 

@@ -159,6 +159,13 @@ IN: math.integers.tests
 { -1 } [ 123 >bignum dup bitnot bitxor ] unit-test
 { -1 } [ 123 dup bitnot >bignum bitxor ] unit-test
 { -1 } [ 123 dup bitnot bitxor >bignum ] unit-test
+
+! (2^n - 1) bitxor -1 = -2^n needs one more bignum digit than either operand.
+{ -4611686018427387904 } [ 2 62 ^ 1 - -1 bitxor ] unit-test
+{ -21267647932558653966460912964485513216 } [ 2 124 ^ 1 - -1 bitxor ] unit-test
+{ -21267647932558653966460912964485513216 } [ -1 2 124 ^ 1 - bitxor ] unit-test
+{ -98079714615416886934934209737619787751599303819750539264 } [ 2 186 ^ 1 - -1 bitxor ] unit-test
+{ -21267647932558653966460912964485513215 } [ 2 124 ^ 1 - -2 bitxor ] unit-test
 { 4 } [ 4 7 bitand ] unit-test
 
 { 256 } [ 65536 -8 shift ] unit-test
