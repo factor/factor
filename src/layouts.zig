@@ -362,10 +362,6 @@ pub const Callstack = extern struct {
         return @intFromPtr(self) + @sizeOf(Callstack);
     }
 
-    pub fn bottom(self: *const Callstack) Cell {
-        return @intFromPtr(self) + @sizeOf(Callstack) + untagFixnum(self.length);
-    }
-
     pub fn data(self: *const Callstack) [*]const Cell {
         const base: [*]const u8 = @ptrCast(self);
         return @ptrCast(@alignCast(base + @sizeOf(Callstack)));
@@ -406,10 +402,6 @@ pub fn tupleCapacity(layout: *const TupleLayout) Cell {
 
 pub fn tupleSize(layout: *const TupleLayout) Cell {
     return @sizeOf(Tuple) + tupleCapacity(layout) * @sizeOf(Cell);
-}
-
-pub fn stringCapacity(str: *const String) Cell {
-    return untagFixnum(str.length);
 }
 
 pub const ObjectVisitInfo = struct {
