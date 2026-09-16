@@ -386,7 +386,8 @@ pub fn fromFixnum(vm: *FactorVM, n: Fixnum) !*Bignum {
     }
 
     const negative = n < 0;
-    var abs_n: Cell = if (negative) @bitCast(-n) else @bitCast(n);
+    // Wrapping negate: -n overflows for minInt(Fixnum), see fromInt64.
+    var abs_n: Cell = if (negative) @bitCast(-%n) else @bitCast(n);
 
     if (abs_n < RADIX) {
         // Single digit
