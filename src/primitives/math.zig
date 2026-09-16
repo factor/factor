@@ -1,7 +1,6 @@
 // primitives/math.zig - Number type conversions, fixnum/bignum/float arithmetic
 
 const std = @import("std");
-const builtin = @import("builtin");
 const bignum = @import("../bignum.zig");
 const float_mod = @import("../float.zig");
 const layouts = @import("../layouts.zig");
@@ -843,13 +842,8 @@ extern "c" fn newlocale(category_mask: c_int, locale: [*c]const u8, base: ?*anyo
 extern "c" fn uselocale(loc: ?*anyopaque) ?*anyopaque;
 extern "c" fn freelocale(loc: ?*anyopaque) c_int;
 
-// LC_ALL_MASK is libc-specific: BSD/macOS has 6 categories (bits 0..5), glibc
-// has 12 (bits 0..11). Only used to validate the locale name, matching the way
-// std::locale(name) throws on an unknown locale.
-const lc_all_mask: c_int = switch (builtin.os.tag) {
-    .linux => 0xFFF,
-    else => 0x3F,
-};
+const locale_h = @cImport(@cInclude("locale.h"));
+const lc_all_mask: c_int = locale_h.LC_ALL_MASK;
 
 pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
@@ -1010,4 +1004,81 @@ test "bignum arithmetic normalizes small results without changing explicit conve
     ctx.push(layouts.tagFixnum(3));
     primitive_fixnum_to_bignum(&vm.vm_asm);
     try std.testing.expect(layouts.hasTag(ctx.pop(), .bignum));
+}
+
+test "format_float reproduces printf-style fixed/scientific/general formatting" {
+    const data_heap_mod = @import("../data_heap.zig");
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer {
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+    }
+    // vm.gc stays null, so the nursery must hold every allocation below.
+    const heap = try data_heap_mod.DataHeap.init(allocator, 256 * 1024, 64 * 1024, 64 * 1024);
+    defer heap.deinit();
+    vm.setDataHeap(heap);
+
+    const H = struct {
+        // Byte array holding `s` plus a terminating NUL, as the Factor side
+        // (formatting.factor's pad-null) hands to the primitive.
+        fn cString(v: *FactorVM, s: []const u8) Cell {
+            const tagged = v.allotByteArray(s.len + 1);
+            const ba: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(tagged));
+            @memcpy(ba.data()[0..s.len], s);
+            return tagged;
+        }
+    };
+
+    const Case = struct { n: f64, fill: []const u8, width: Fixnum, precision: Fixnum, format: []const u8, locale: []const u8, expected: []const u8 };
+    const cases = [_]Case{
+        // fixed / scientific / general, mirroring vm/math.cpp's std::fixed,
+        // std::scientific and the stream default.
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = 2, .format = "f", .locale = "C", .expected = "3.14" },
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = 2, .format = "e", .locale = "C", .expected = "3.14e+00" },
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = 3, .format = "g", .locale = "C", .expected = "3.14" },
+        .{ .n = 123456789.0, .fill = "", .width = 0, .precision = 3, .format = "x", .locale = "C", .expected = "1.23e+08" },
+        // An uppercase format char selects std::uppercase. Only lowercase 'f'
+        // and 'e' pick fixed/scientific, so 'E' is uppercase general format.
+        .{ .n = 123456789.0, .fill = "", .width = 0, .precision = 3, .format = "G", .locale = "C", .expected = "1.23E+08" },
+        .{ .n = 123456789.0, .fill = "", .width = 0, .precision = 3, .format = "E", .locale = "C", .expected = "1.23E+08" },
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = 2, .format = "E", .locale = "C", .expected = "3.1" },
+        // A negative precision means the stream default of 6.
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = -1, .format = "f", .locale = "C", .expected = "3.141590" },
+        // Round half to even, like printf.
+        .{ .n = 2.5, .fill = "", .width = 0, .precision = 0, .format = "f", .locale = "C", .expected = "2" },
+        .{ .n = 3.5, .fill = "", .width = 0, .precision = 0, .format = "f", .locale = "C", .expected = "4" },
+        .{ .n = -0.5, .fill = "", .width = 0, .precision = 1, .format = "f", .locale = "C", .expected = "-0.5" },
+        // std::setw + std::setfill: right-justify, default fill is a space,
+        // and a width narrower than the text is ignored.
+        .{ .n = 3.14159, .fill = "*", .width = 8, .precision = 2, .format = "f", .locale = "C", .expected = "****3.14" },
+        .{ .n = 3.14159, .fill = "", .width = 8, .precision = 2, .format = "f", .locale = "C", .expected = "    3.14" },
+        .{ .n = 3.14159, .fill = "*", .width = 3, .precision = 2, .format = "f", .locale = "C", .expected = "3.14" },
+        // An unknown locale yields an empty byte array, like std::locale throwing.
+        .{ .n = 3.14159, .fill = "", .width = 0, .precision = 2, .format = "f", .locale = "no_such_locale.XYZ", .expected = "" },
+    };
+
+    const stack_base = vm.vm_asm.ctx.datastack;
+    for (cases) |c| {
+        const boxed = try float_mod.allocBoxedFloat(vm, c.n);
+        vm.push(layouts.tagFloat(boxed));
+        vm.push(H.cString(vm, c.fill));
+        vm.push(layouts.tagFixnum(c.width));
+        vm.push(layouts.tagFixnum(c.precision));
+        vm.push(H.cString(vm, c.format));
+        vm.push(H.cString(vm, c.locale));
+        primitive_format_float(&vm.vm_asm);
+
+        const result = vm.pop();
+        try testing.expect(layouts.hasTag(result, .byte_array));
+        const ba: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(result));
+        const len: usize = @intCast(layouts.untagFixnum(ba.capacity));
+        try testing.expectEqualStrings(c.expected, ba.data()[0..len]);
+    }
+    try testing.expectEqual(stack_base, vm.vm_asm.ctx.datastack);
 }
