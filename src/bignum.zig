@@ -788,7 +788,7 @@ fn bignumPosNegOp(vm: *FactorVM, arg1_in: *const Bignum, arg2_in: *const Bignum,
     const arg1_len = arg1_in.length();
     const arg2_len = arg2_in.length();
     const neg_p = (op == .or_op or op == .xor_op);
-    const max_len = if (arg1_len > arg2_len + 1) arg1_len else arg2_len + 1;
+    const max_len = (if (arg1_len > arg2_len) arg1_len else arg2_len) + 1;
 
     const bn = try allocBignum(vm, max_len, neg_p);
 
@@ -2403,4 +2403,71 @@ fn trim(vm: *FactorVM, bn: *Bignum) !*Bignum {
     const rooted_bn: *const Bignum = @ptrFromInt(layouts.UNTAG(bn_cell));
     @memcpy(new_bn.digits()[0..new_len], rooted_bn.digits()[0..new_len]);
     return new_bn;
+}
+
+test "bitwise ops between a positive and a negative bignum keep the top digit" {
+    const data_heap_mod = @import("data_heap.zig");
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer {
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+    }
+    // vm.gc stays null, so the nursery must hold every allocation below.
+    const heap = try data_heap_mod.DataHeap.init(allocator, 256 * 1024, 64 * 1024, 64 * 1024);
+    defer heap.deinit();
+    vm.setDataHeap(heap);
+
+    const H = struct {
+        // 2^(DIGIT_BITS * len) - 1: `len` digits of all ones.
+        fn allOnes(v: *FactorVM, len: Cell, negative: bool) !*Bignum {
+            const bn = try allocBignum(v, len, negative);
+            @memset(bn.digits()[0..len], DIGIT_MASK);
+            return bn;
+        }
+        // ±2^(DIGIT_BITS * len): a single one digit above `len` zero digits.
+        fn powerOfDigit(v: *FactorVM, len: Cell, negative: bool) !*Bignum {
+            const bn = try allocBignumZeroed(v, len + 1, negative);
+            bn.setDigit(len, 1);
+            return bn;
+        }
+    };
+
+    // (2^(62n) - 1) xor -1 = -2^(62n) needs n + 1 digits, one more than
+    // either operand. Before the fix the result was sized to n digits and
+    // came out as zero.
+    for ([_]Cell{ 1, 2, 3 }) |n| {
+        const ones = try H.allOnes(vm, n, false);
+        const minus_one = try fromInt64(vm, -1);
+        const expected = try H.powerOfDigit(vm, n, true);
+
+        try testing.expect(equal(expected, try bitXor(vm, ones, minus_one)));
+        try testing.expect(equal(expected, try bitXor(vm, minus_one, ones)));
+
+        // The same operands through the other ops, whose results fit.
+        try testing.expect(equal(ones, try bitAnd(vm, ones, minus_one)));
+        try testing.expect(equal(minus_one, try bitOr(vm, ones, minus_one)));
+    }
+
+    // (2^124 - 1) xor -2 = -(2^124 - 1)
+    {
+        const ones = try H.allOnes(vm, 2, false);
+        const minus_two = try fromInt64(vm, -2);
+        const expected = try H.allOnes(vm, 2, true);
+        try testing.expect(equal(expected, try bitXor(vm, ones, minus_two)));
+    }
+
+    // A case that already fit: (2^124 - 2^62) xor -2^62 = -2^124.
+    {
+        const x = try allocBignumZeroed(vm, 2, false);
+        x.setDigit(1, DIGIT_MASK);
+        const y = try H.powerOfDigit(vm, 1, true);
+        const expected = try H.powerOfDigit(vm, 2, true);
+        try testing.expect(equal(expected, try bitXor(vm, x, y)));
+    }
 }
