@@ -243,8 +243,9 @@ pub export fn primitive_fgetc(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_fputc(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( ch file -- )
-    const file = popFileHandle(vm) orelse return;
+    const maybe_file = popFileHandle(vm);
     const ch = layouts.untagFixnum(vm.pop());
+    const file = maybe_file orelse return;
     io_mod.safeFputc(@intCast(ch), file) catch {
         const errno_val: Fixnum = @intCast(std.c._errno().*);
         vm.ioError(errno_val);
@@ -254,13 +255,13 @@ pub export fn primitive_fputc(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_fread(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( n buf alien -- count )
-    const file = popFileHandle(vm) orelse {
+    const maybe_file = popFileHandle(vm);
+    const buf_cell = vm.pop();
+    const size_cell = vm.pop();
+    const file = maybe_file orelse {
         vm.push(layouts.tagFixnum(0));
         return;
     };
-
-    const buf_cell = vm.pop();
-    const size_cell = vm.pop();
 
     const size = layouts.untagFixnum(size_cell);
     if (size <= 0) {
@@ -312,9 +313,10 @@ pub export fn primitive_fread(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_fwrite(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( buf length file -- )
-    const file = popFileHandle(vm) orelse return;
+    const maybe_file = popFileHandle(vm);
     const length_cell = vm.pop();
     const buf_cell = vm.pop();
+    const file = maybe_file orelse return;
 
     const length = layouts.untagFixnum(length_cell);
     if (length <= 0) return;
@@ -365,9 +367,10 @@ pub export fn primitive_ftell(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn primitive_fseek(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( offset whence file -- )
-    const file = popFileHandle(vm) orelse return;
+    const maybe_file = popFileHandle(vm);
     const whence = layouts.untagFixnum(vm.pop());
     const offset = math.toSignedCell(vm, vm.pop());
+    const file = maybe_file orelse return;
 
     io_mod.safeFseek(file, offset, @intCast(whence)) catch {
         const errno_val: Fixnum = @intCast(std.c._errno().*);
@@ -396,4 +399,59 @@ pub export fn primitive_existsp(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const result = S.stat(path_data, &stat_buf);
 
     vm.push(vm.tagBoolean(result >= 0));
+}
+
+// --- Tests ---
+
+test "file primitives with a null handle pop all their operands" {
+    // Each primitive returns early when the file alien's address is 0. That
+    // must not change its stack effect: the remaining operands have to be
+    // popped as well, as the C++ VM does before it touches the handle.
+    const data_heap_mod = @import("../data_heap.zig");
+    const testing = std.testing;
+    const allocator = testing.allocator;
+
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    defer {
+        vm.cards_array = null;
+        vm.decks_array = null;
+        vm.deinit();
+    }
+    const heap = try data_heap_mod.DataHeap.init(allocator, 256 * 1024, 64 * 1024, 64 * 1024);
+    defer heap.deinit();
+    vm.setDataHeap(heap);
+
+    const null_file = vm.allotAlien(layouts.false_object, 0);
+    const buffer = vm.allotByteArray(8);
+    const base = vm.vm_asm.ctx.datastack;
+
+    // ( n buf file -- count )
+    vm.push(layouts.tagFixnum(8));
+    vm.push(buffer);
+    vm.push(null_file);
+    primitive_fread(&vm.vm_asm);
+    try testing.expectEqual(layouts.tagFixnum(0), vm.pop());
+    try testing.expectEqual(base, vm.vm_asm.ctx.datastack);
+
+    // ( buf length file -- )
+    vm.push(buffer);
+    vm.push(layouts.tagFixnum(8));
+    vm.push(null_file);
+    primitive_fwrite(&vm.vm_asm);
+    try testing.expectEqual(base, vm.vm_asm.ctx.datastack);
+
+    // ( ch file -- )
+    vm.push(layouts.tagFixnum('x'));
+    vm.push(null_file);
+    primitive_fputc(&vm.vm_asm);
+    try testing.expectEqual(base, vm.vm_asm.ctx.datastack);
+
+    // ( offset whence file -- )
+    vm.push(layouts.tagFixnum(0));
+    vm.push(layouts.tagFixnum(0));
+    vm.push(null_file);
+    primitive_fseek(&vm.vm_asm);
+    try testing.expectEqual(base, vm.vm_asm.ctx.datastack);
 }
