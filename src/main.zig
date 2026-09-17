@@ -22,6 +22,7 @@ const math = @import("fixnum.zig");
 const object_start_map = @import("object_start_map.zig");
 const objects = @import("objects.zig");
 const primitives = @import("primitives.zig");
+const primitives_io = @import("primitives/io.zig");
 const primitives_ffi = @import("primitives/alien.zig");
 const segments = @import("segments.zig");
 const signals = @import("signals.zig");
@@ -612,6 +613,7 @@ test {
     _ = gc;
     _ = math;
     _ = primitives;
+    _ = primitives_io;
     _ = execution;
     _ = code_blocks;
     _ = callbacks;
