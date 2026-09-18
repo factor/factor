@@ -30,6 +30,16 @@ void factor_vm::enqueue_samples(cell sample_count,
   code->set_safepoint_guard(true);
 }
 
+// A debugger interrupt that arrived while the sample was recorded also
+// armed the page; keep it. Check after disarming so the interrupt cannot
+// be lost.
+void factor_vm::disarm_safepoint_after_sample() {
+  code->set_safepoint_guard(false);
+
+  if (atomic::load(&safepoint_fep_p))
+    code->set_safepoint_guard(true);
+}
+
 // Allocates memory (record_sample)
 void factor_vm::handle_safepoint(cell pc) {
   code->set_safepoint_guard(false);
@@ -55,6 +65,10 @@ void factor_vm::handle_safepoint(cell pc) {
     bool prolog_p = block->entry_point() == pc;
 
     record_sample(prolog_p);
+
+    // The timer may have already re-armed. Avoid immediately sampling again
+    // at the same safepoint.
+    disarm_safepoint_after_sample();
   }
 }
 
