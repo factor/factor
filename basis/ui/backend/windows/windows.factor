@@ -8,7 +8,7 @@ io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
 libc literals make math math.bitwise math.order math.parser namespaces opengl
 sequences sets specialized-arrays strings threads ui ui.backend
 ui.clipboards ui.event-loop ui.gadgets ui.gadgets.private
-ui.gadgets.worlds ui.gestures ui.pixel-formats ui.private ui.theme
+ui.gadgets.worlds ui.gestures ui.pixel-formats ui.private ui.render ui.theme
 ui.theme.switching windows.advapi32 windows.dwmapi
 windows.errors windows.gdi32 windows.kernel32 windows.messages
 windows.offscreen windows.ole32 windows.opengl32
@@ -764,6 +764,7 @@ M: windows-ui-backend set-title
 
 M: windows-ui-backend (with-ui)
     [
+        setup-gl3-hooks
         init-clipboard
         init-scale-factor
         init-win32-ui
