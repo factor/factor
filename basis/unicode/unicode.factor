@@ -211,11 +211,25 @@ PRIVATE>
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
+<PRIVATE
+
+! Identical-level tie-breaker: code point order, except that U+FFFE
+! gets the minimal unique weight so that "a\uFFFEb" sorts as the
+! merged sort keys of "a" and "b" (UCA 18.0, Reserved Weights).
+: identical-weight ( char -- weight )
+    dup 0xFFFE = [ drop 0 ] [ 1 + ] if ; inline
+
+: collation-key/identical ( string -- key identical )
+    collation-key/nfd [ identical-weight ] { } map-as ;
+
+PRIVATE>
+
 : sort-strings ( strings -- sorted )
-    [ collation-key/nfd 2array ] map sort values ;
+    [ [ collation-key/identical 2array ] keep ] map>alist
+    sort-keys values ;
 
 : string<=> ( str1 str2 -- <=> )
-    [ collation-key/nfd 2array ] compare ;
+    [ collation-key/identical 2array ] compare ;
 
 : upper-surrogate? ( ch -- ? ) 0xD800 0xDBFF between? ; inline
 
@@ -229,4 +243,4 @@ CONSTANT: unicode-unsupported {
     "bidi"
 }
 
-CONSTANT: unicode-version "15.1.0"
+CONSTANT: unicode-version "18.0.0"

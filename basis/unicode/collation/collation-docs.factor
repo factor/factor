@@ -21,7 +21,7 @@ ABOUT: "unicode.collation"
 
 HELP: sort-strings
 { $values { "strings" "a sequence of strings" } { "sorted" "the strings in lexicographical order" } }
-{ $description "This word takes a sequence of strings and sorts them according to the Unicode Collation Algorithm with the default collation order described in the DUCET. It uses code point order as a tie-breaker." } ;
+{ $description "This word takes a sequence of strings and sorts them according to the Unicode Collation Algorithm with the default collation order described in the DUCET. It uses code point order as a tie-breaker, except that U+FFFE sorts lowest so it can be used as a field separator." } ;
 
 HELP: collation-key/nfd
 { $values { "string" string } { "key" byte-array } { "nfd" object } }
@@ -29,7 +29,7 @@ HELP: collation-key/nfd
 
 HELP: string<=>
 { $values { "str1" string } { "str2" string } { "<=>" "one of +lt+, +gt+ or +eq+" } }
-{ $description "This word takes two strings and compares them using the UCA with the DUCET, using code point order as a tie-breaker." } ;
+{ $description "This word takes two strings and compares them using the UCA with the DUCET, using code point order as a tie-breaker, except that U+FFFE sorts lowest so it can be used as a field separator." } ;
 
 HELP: primary=
 { $values { "str1" string } { "str2" string } { "?" boolean } }

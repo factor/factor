@@ -32,176 +32,6 @@ TUPLE: weight-levels primary secondary tertiary ignorable? ;
 
 "vocab:unicode/allkeys.txt" parse-ducet ducet set-global
 
-! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
-! WF5 - Well-formedness 5 condition:
-! https://www.unicode.org/reports/tr10/tr10-41.html#WF5
-!    { "0CC6" "0CC2" "0CD5" } ! 0CD5 is not a non-starter, don't add 2-gram "0CC6" "0CC2"to ducet
-!    { "0DD9" "0DCF" "0DCA" } ! already in allkeys.txt file
-!    { "0FB2" "0F71" "0F80" } ! added below
-!    { "0FB3" "0F71" "0F80" } ! added below
-! This breaks the unicode tests that ship in CollationTest_SHIFTED.txt
-! but it's supposedly more correct.
-: fixup-ducet-for-tibetan ( -- )
-    {
-        {
-            { 0x0FB2 0x0F71 } ! CE(0FB2) CE(0F71)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F71 } ! CE(0FB3) CE(0F71)
-            {
-                T{ weight-levels
-                    { primary 12722 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12741 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-
-        {
-            { 0x0FB2 0x0F71 0x0F72 } ! CE(0FB2) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12743 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F73        } ! CE(0FB2) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12743 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F71 0x0F74 } ! CE(0FB2) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12747 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB2 0x0F75        } ! CE(0FB2) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12719 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12747 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F71 0x0F72 } ! CE(0FB3) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12722 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12743 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F73        } ! CE(0FB3) CE(0F71 0F72)
-            {
-                T{ weight-levels
-                    { primary 12722 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12743 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F71 0x0F74 } ! CE(0FB3) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12722 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12747 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-        {
-            { 0x0FB3 0x0F75        } ! CE(0FB3) CE(0F71 0F74)
-            {
-                T{ weight-levels
-                    { primary 12722 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-                T{ weight-levels
-                    { primary 12747 }
-                    { secondary 32 }
-                    { tertiary 2 }
-                }
-            }
-        }
-    } ducet get-global '[ swap >string _ set-at ] assoc-each ;
-
-! These values actually break the collation unit tests in CollationTest_SHIFTED.txt
-! So we disable those tests in favor of supposedly better collation for Tibetan.
-! https://www.unicode.org/reports/tr10/tr10-41.html#Well_Formed_DUCET
-
-fixup-ducet-for-tibetan
-
 : tangut-block? ( char -- ? )
     {
         [ 0x17000 0x187FF between? ]
@@ -220,15 +50,20 @@ fixup-ducet-for-tibetan
 : khitan-block? ( char -- ? )
     0x18B00 0x18CFF between? ; inline
 
+: jurchen-block? ( char -- ? )
+    0x18E00 0x191DF between? ; inline
+
+: seal-block? ( char -- ? )
+    0x3D000 0x3FC3F between? ; inline
+
 ! https://wiki.computercraft.cc/Module:Unicode_data
 ! Unicode TR10 - Computing Implicit Weights
 : base ( char -- base )
     {
         { [ dup 0x03400 0x04DBF between? ] [ drop 0xFB80 ] } ! Extension A
         { [ dup 0x20000 0x2A6DF between? ] [ drop 0xFB80 ] } ! Extension B
-        { [ dup 0x2A700 0x2B739 between? ] [ drop 0xFB80 ] } ! Extension C
-        { [ dup 0x2A73A 0x2B73F between? ] [ drop 0xFB80 ] } ! Extension C
-        { [ dup 0x2B740 0x2B81D between? ] [ drop 0xFB80 ] } ! Extension D
+        { [ dup 0x2A700 0x2B73F between? ] [ drop 0xFB80 ] } ! Extension C
+        { [ dup 0x2B740 0x2B81E between? ] [ drop 0xFB80 ] } ! Extension D
         { [ dup 0x2B820 0x2CEAD between? ] [ drop 0xFB80 ] } ! Extension E
         { [ dup 0x2CEB0 0x2EBE0 between? ] [ drop 0xFB80 ] } ! Extension F
         { [ dup 0x30000 0x3134A between? ] [ drop 0xFB80 ] } ! Extension G
@@ -265,6 +100,18 @@ fixup-ducet-for-tibetan
 : khitan-BBBB ( char -- weight-levels )
     0x18b00 - 0x8000 bitor 0 0 <weight-levels> ; inline
 
+: jurchen-AAAA ( char -- weight-levels )
+    drop 0xfb04 0x0020 0x0002 <weight-levels> ; inline
+
+: jurchen-BBBB ( char -- weight-levels )
+    0x18E00 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
+: seal-AAAA ( char -- weight-levels )
+    drop 0xfb05 0x0020 0x0002 <weight-levels> ; inline
+
+: seal-BBBB ( char -- weight-levels )
+    0x3D000 - 0x8000 bitor 0 0 <weight-levels> ; inline
+
 : AAAA ( char -- weight-levels )
     [ base ] [ -15 shift ] bi + 0x0020 0x0002 <weight-levels> ; inline
 
@@ -278,6 +125,8 @@ fixup-ducet-for-tibetan
         { [ dup tangut-components-block? ] [ [ tangut-components-AAAA ] [ tangut-components-BBBB ] bi 2array ] }
         { [ dup nushu-block? ] [ [ nushu-AAAA ] [ nushu-BBBB ] bi 2array ] }
         { [ dup khitan-block? ] [ [ khitan-AAAA ] [ khitan-BBBB ] bi 2array ] }
+        { [ dup jurchen-block? ] [ [ jurchen-AAAA ] [ jurchen-BBBB ] bi 2array ] }
+        { [ dup seal-block? ] [ [ seal-AAAA ] [ seal-BBBB ] bi 2array ] }
         [ [ AAAA ] [ BBBB ] bi 2array ]
     } cond ;
 
@@ -323,8 +172,15 @@ fixup-ducet-for-tibetan
     [ [ ignorable?>> ] reject ] dip
     map [ zero? ] reject ; inline
 
+! U+FFFE has the reserved lowest primary weight 0200, is never
+! variable, and gets a minimal unique weight on the identical level.
+! https://www.unicode.org/reports/tr10/#Reserved_Weights
+CONSTANT: fffe-primary 0x0200
+
 : variable-weight ( weight-levels -- obj )
-    dup ignorable?>> [ primary>> ] [ drop 0xFFFF ] if ;
+    dup ignorable?>> [ primary>> ] [
+        primary>> fffe-primary = 0x0001 0xFFFF ?
+    ] if ;
 
 : weights>bytes ( weights -- array )
     [
