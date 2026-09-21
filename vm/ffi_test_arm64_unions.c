@@ -1,3 +1,4 @@
+#include "ffi_test_features.h"
 /* Independent C compiler oracle for overlapping homogeneous union members. */
 #ifdef UNION_ORACLE
 typedef __builtin_va_list au_va_list;
@@ -107,7 +108,7 @@ UNION_EXPORT int au_vector_available(void) {
     return 0;
 #endif
 }
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 UNION_EXPORT int au_small_controls(void);
 #endif
 UNION_EXPORT int au_c_controls(void) {
@@ -129,7 +130,7 @@ UNION_EXPORT int au_c_controls(void) {
     if (au_take_vector_two(au_return_vector_two(),10)!=46 || au_call_vector_variadic(au_vector_variadic_control)!=53) return 0;
     if (au_take_vector(vector,10)!=40 || au_return_vector(1,2,3,4).a[3]!=4 || au_call_vector(au_take_vector)!=40) return 0;
 #endif
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
     if (!au_small_controls()) return 0;
 #endif
     return 1;
@@ -145,7 +146,7 @@ int main(void) {
 
 /* Half and BF16 use one fundamental ABI type, but the register carrier must
    still be a concrete 16-bit representation, not the representation union. */
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 union au_small { _Float16 a; __bf16 b; };
 union au_bsmall { __bf16 a; _Float16 b; };
 struct au_small_pair { union au_small first; union au_bsmall second; };

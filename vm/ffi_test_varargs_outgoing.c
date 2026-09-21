@@ -1,3 +1,4 @@
+#include "ffi_test_features.h"
 /* Independent C varargs callees, shared by all native test platforms. */
 #include <stdarg.h>
 #include <stdint.h>
@@ -61,7 +62,7 @@ FACTOR_EXPORT int varout_split_caller_supported(void) {
 #endif
 }
 
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 #define VAROUT_SMALL(T, name) \
 FACTOR_EXPORT unsigned long long name(T named, int count, ...) { \
   va_list ap; va_start(ap, count); \

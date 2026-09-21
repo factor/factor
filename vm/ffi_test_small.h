@@ -1,11 +1,12 @@
+#include "ffi_test_features.h"
 /* Copyright (C) 2026 Doug Coleman. BSD license: https://factorcode.org/license.txt */
 /* Independent scalar ABI oracle. Keep unsupported toolchains buildable.
- * Clang 18+ AArch64 supplies arithmetic _Float16 and __bf16. A successful
- * capability query is required before the Factor tests bind these exports.
+ * The shared feature guard excludes toolchains with broken BF16 lowering. A
+ * successful capability query is required before the Factor tests bind these exports.
  */
 #include <stdint.h>
 FACTOR_EXPORT int ffi_test_small_floats_available(void);
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 int ffi_test_small_floats_available(void) { return 1; }
 #define DEFINE(T,N) \
 FACTOR_EXPORT T N##_identity(T x) { return x; } \

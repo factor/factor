@@ -1,7 +1,8 @@
+#include "../ffi_test_features.h"
 #include <stdint.h>
 #include <stdio.h>
 int ffi_test_small_floats_available(void);
-#if defined(__aarch64__) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 #define DECLARE(T,N) \
 T N##_from_bits(uint16_t); uint16_t N##_bits(T); \
 T N##_overflow(T,T,T,T,T,T,T,T,T,T); \

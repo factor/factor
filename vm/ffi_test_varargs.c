@@ -1,3 +1,4 @@
+#include "ffi_test_features.h"
 #include "ffi_test_varargs.h"
 #include <stdio.h>
 #include <string.h>
@@ -173,7 +174,7 @@ unsigned int va_c_controls(void) {
     return ok;
 }
 VARARGS_EXPORT int va_small_available(void);
-#if (defined(__aarch64__) || defined(_M_ARM64)) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
 int va_small_available(void) { return 1; }
 typedef double (*va_small_callback)(_Float16,__bf16,int,...);
 typedef _Float16 (*va_half_result_callback)(int,...);
@@ -220,7 +221,7 @@ int main(void) {
     puts("C HFA spill control: PASS");
     printf("C variadic ABI controls: 0x%02x / 0xff\n",mask);
     if (va_small_available()) {
-#if (defined(__aarch64__) || defined(_M_ARM64)) && defined(__clang__) && __clang_major__ >= 18
+#if FACTOR_TEST_SMALL_FLOATS
         int small=va_small_controls();
         printf("C half/BF16 variadic controls: %s\n",small ? "PASS" : "FAIL");
         if (!small) return 1;
