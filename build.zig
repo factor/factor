@@ -41,6 +41,10 @@ pub fn build(b: *std.Build) void {
     // This is equivalent to -rdynamic in GCC
     exe.rdynamic = true;
 
+    if (target.result.abi.isMusl()) {
+        exe.linkage = .dynamic;
+    }
+
     // Platform-specific library linking
     if (target.result.os.tag == .macos) {
         // Link macOS frameworks (like the C++ Factor VM does)
