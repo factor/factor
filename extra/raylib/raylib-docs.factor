@@ -2774,7 +2774,7 @@ HELP: load-file-data
 { $values
     fileName: c-string
     bytesRead: { "a " { $link pointer } " to a " { $link int } }
-    pointer: c-ptr }
+    uchar*: c-ptr }
 { $description
     "Returns the original native binary allocation and writes its byte count to bytesRead. Release the pointer with unload-file-data. The data may contain NUL and non-UTF8 bytes; it is not a C string. Use load-file-data-bytes for an owned Factor byte array." } ;
 
@@ -2805,7 +2805,7 @@ HELP: export-data-as-code
 HELP: load-file-text
 { $values
     fileName: c-string
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Returns an owned Factor string (or f on failure), copying and releasing the native allocation. Use load-file-text-raw when native ownership is needed." } ;
 
@@ -3049,7 +3049,7 @@ HELP: encode-data-base64
     data: { "a " { $link pointer } " to a " { $link uchar } }
     dataLength: int
     outputLength: { "a " { $link pointer } " to a " { $link int } }
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Returns an owned Factor Base64 string, copying and releasing the native allocation. outputLength includes the C terminating NUL. Use encode-data-base64-raw when native ownership is needed." } ;
 
@@ -5186,7 +5186,7 @@ HELP: load-utf8
 { $values
     codepoints: { "a " { $link pointer } " to a " { $link int } }
     length: int
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Returns an owned Factor string encoded from codepoints, copying and releasing the native allocation. Use load-utf8-raw when native ownership is needed." } ;
 
@@ -5343,7 +5343,7 @@ HELP: text-replace-alloc
     text: c-string
     search: c-string
     replacement: c-string
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Replace text string with new string"
     "Returns an owned Factor string, copying and releasing the native allocation. Use text-replace-alloc-raw to retain the native pointer and release it with mem-free." } ;
@@ -5364,7 +5364,7 @@ HELP: text-replace-between-alloc
     begin: c-string
     end: c-string
     replacement: c-string
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Replace text between two specific strings"
     "Returns an owned Factor string, copying and releasing the native allocation. Use text-replace-between-alloc-raw to retain the native pointer and release it with mem-free." } ;
@@ -5384,7 +5384,7 @@ HELP: text-insert-alloc
     text: c-string
     insert: c-string
     position: int
-    c-string: c-string }
+    { "string/f" { $maybe string } } }
 { $description
     "Insert text in a defined byte position"
     "Returns an owned Factor string, copying and releasing the native allocation. Use text-insert-alloc-raw to retain the native pointer and release it with mem-free." } ;
@@ -6611,14 +6611,14 @@ ABOUT: "raylib"
 HELP: load-file-text-raw
 { $values
     fileName: c-string
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link unload-file-text } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: load-utf8-raw
 { $values
     codepoints: c-ptr
     length: int
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link unload-utf8 } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: encode-data-base64-raw
@@ -6626,7 +6626,7 @@ HELP: encode-data-base64-raw
     data: c-ptr
     dataLength: int
     outputLength: c-ptr
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link mem-free } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: text-replace-alloc-raw
@@ -6634,7 +6634,7 @@ HELP: text-replace-alloc-raw
     text: c-string
     search: c-string
     replacement: c-string
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link mem-free } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: text-replace-between-alloc-raw
@@ -6643,7 +6643,7 @@ HELP: text-replace-between-alloc-raw
     begin: c-string
     end: c-string
     replacement: c-string
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link mem-free } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: text-insert-alloc-raw
@@ -6651,7 +6651,7 @@ HELP: text-insert-alloc-raw
     text: c-string
     insert: c-string
     position: int
-    pointer: c-ptr }
+    char*: c-ptr }
 { $description "Returns the original native allocation (or f). Release it with " { $link mem-free } ". The version without -raw copies the text into a Factor string and releases this allocation automatically." } ;
 
 HELP: load-file-data-bytes
@@ -6663,9 +6663,11 @@ HELP: ModelAnimPose
 
 ARTICLE: "raylib-memory-ownership" "Raylib memory ownership"
 "Binary file and memory APIs use native pointers with explicit lengths. load-file-data returns a native allocation; load-file-data-bytes copies the exact byte count and releases it."
+$nl
 "Allocating text APIs expose -raw words for native ownership. Their existing string-returning conveniences copy and release the native text automatically, even if decoding fails."
 { $subsections load-file-data load-file-data-bytes load-file-text-raw load-utf8-raw encode-data-base64-raw text-replace-alloc-raw text-replace-between-alloc-raw text-insert-alloc-raw }
 "TextReplace, TextReplaceBetween, TextInsert, GetTextBetween, TextJoin, TextTo* and TextSplit use static storage in Raylib 6.0. Their copied Factor strings require no native release; do not free static Raylib pointers. LoadTextLines is different: release its original char** and count together with unload-text-lines."
+$nl
 "Native file-loader callbacks must return mem-alloc-compatible foreign storage because Raylib's unloaders release their results. Factor-managed strings and byte arrays cannot transfer ownership to C."
 { $url "https://github.com/raysan5/raylib/blob/6.0/src/raylib.h" } ;
 
