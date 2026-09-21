@@ -626,8 +626,8 @@ make_clean_factor() {
 }
 
 current_git_branch() {
-    # git rev-parse --abbrev-ref HEAD # outputs HEAD for detached head
-    # outputs nothing for detached HEAD, which is fine for ``git fetch``
+    local branch
+    branch=$(git symbolic-ref --short -q HEAD) && { echo "heads/$branch"; return; }
     git describe --all --exact-match 2>/dev/null
 }
 
