@@ -49,6 +49,49 @@ pub const CallbackHeap = struct {
         }
     }
 
+    // Callback addresses escape to native code, so live stubs cannot move.
+    // Rebuild only the free lists when mixed template sizes exhaust a bucket.
+    // The caller must hold a writable JIT scope while updating free headers.
+    fn coalesceFreeBlocks(self: *Self, requested_size: Cell) void {
+        self.free_list.reset();
+        var scan = self.free_list.start;
+        while (scan < self.free_list.end) {
+            const block: *free_list.FreeBlock = @ptrFromInt(scan);
+            var size = block.size();
+            if (block.isFree()) {
+                var next = scan + size;
+                while (next < self.free_list.end) {
+                    const following: *const free_list.FreeBlock = @ptrFromInt(next);
+                    if (!following.isFree()) break;
+                    const following_size = following.size();
+                    size += following_size;
+                    next += following_size;
+                }
+                // Zig's small buckets are exact-fit: even a merged 512-byte
+                // block cannot satisfy a 128-byte request. Split small spans
+                // for this retry; the allocator already splits large spans.
+                var remainder = size;
+                var address = scan;
+                if (size <= free_list.free_list_count * free_list.block_granularity) {
+                    while (remainder >= requested_size) {
+                        self.free_list.addFreeBlock(address, requested_size);
+                        address += requested_size;
+                        remainder -= requested_size;
+                    }
+                }
+                self.free_list.addFreeBlock(address, remainder);
+            }
+            scan += size;
+        }
+    }
+
+    fn allocateStub(self: *Self, size: Cell) ?Cell {
+        return self.free_list.allocate(size) orelse retry: {
+            self.coalesceFreeBlocks(size);
+            break :retry self.free_list.allocate(size);
+        };
+    }
+
     pub fn add(self: *Self, owner: Cell, return_rewind: Cell, vm_ptr: Cell, vm: *const @import("vm.zig").FactorVM) ?*code_blocks.CodeBlock {
         var jit_scope = jit_protect.Scope.init();
         defer jit_scope.deinit();
@@ -75,7 +118,7 @@ pub const CallbackHeap = struct {
         const code_size = layouts.untagFixnumUnsigned(insns.capacity);
 
         const total_size = layouts.alignCell(@sizeOf(code_blocks.CodeBlock) + code_size, layouts.data_alignment);
-        const addr = self.free_list.allocate(total_size) orelse return null;
+        const addr = self.allocateStub(total_size) orelse return null;
         const stub: *code_blocks.CodeBlock = @ptrFromInt(addr);
 
         // low 3 bits are clear (not free, type bits 0).
@@ -275,4 +318,114 @@ test "callback heap basic" {
 
     const room_info = heap.room();
     try std.testing.expect(room_info.size == 64 * 1024);
+}
+
+test "callback heap retries mixed sizes across pinned blocks" {
+    // Test the allocation path on every architecture, independently of the
+    // ARM64-only variadic ABI. Use ordinary memory rather than executable code.
+    var storage: [2048]u8 align(layouts.data_alignment) = undefined;
+    var heap = CallbackHeap{
+        .segment = null,
+        .allocator = std.testing.allocator,
+        .free_list = .init(std.testing.allocator, @intFromPtr(&storage), storage.len),
+    };
+    defer heap.deinit();
+    var scope = jit_protect.Scope.init();
+    defer scope.deinit();
+
+    const pinned = heap.allocateStub(256).?;
+    const pinned_header: *Cell = @ptrFromInt(pinned);
+    pinned_header.* = 256;
+    const pinned_bytes: [*]u8 = @ptrFromInt(pinned + @sizeOf(Cell));
+    @memset(pinned_bytes[0 .. 256 - @sizeOf(Cell)], 0x5a);
+
+    var stubs: [16]Cell = undefined;
+    for (0..6) |round| {
+        const size: Cell = if (round % 2 == 0) 128 else 256;
+        var count: usize = 0;
+        while (heap.allocateStub(size)) |address| {
+            try std.testing.expect(count < stubs.len);
+            const header: *Cell = @ptrFromInt(address);
+            header.* = size;
+            stubs[count] = address;
+            count += 1;
+        }
+        try std.testing.expectEqual((storage.len - 256) / size, count);
+        try std.testing.expectEqual(@as(Cell, 0), heap.free_list.freeBytes());
+        for (stubs[0..count]) |address| heap.free(@ptrFromInt(address));
+        try std.testing.expectEqual(@as(Cell, storage.len - 256), heap.free_list.freeBytes());
+        try std.testing.expectEqual(@as(Cell, 256), pinned_header.*);
+        for (pinned_bytes[0 .. 256 - @sizeOf(Cell)]) |byte| try std.testing.expectEqual(@as(u8, 0x5a), byte);
+    }
+    heap.free(@ptrFromInt(pinned));
+    try std.testing.expectEqual(@as(Cell, storage.len), heap.free_list.freeBytes());
+    // Once the last pinned block is gone the whole region is reusable.
+    try std.testing.expectEqual(@intFromPtr(&storage), heap.allocateStub(storage.len).?);
+}
+
+test "callback heap alternates template sizes without moving live stubs" {
+    if (builtin.cpu.arch != .aarch64) return error.SkipZigTest;
+
+    // Synthetic templates exercise add/free and template selection without
+    // executing native code. No relocation table is needed for these stubs.
+    const OrdinaryCode = extern struct {
+        header: layouts.ByteArray,
+        bytes: [128 - @sizeOf(code_blocks.CodeBlock)]u8,
+    };
+    const VariadicCode = extern struct {
+        header: layouts.ByteArray,
+        bytes: [256 - @sizeOf(code_blocks.CodeBlock)]u8,
+    };
+    var ordinary: OrdinaryCode align(16) = .{
+        .header = .{ .header = 0, .capacity = layouts.tagFixnum(128 - @sizeOf(code_blocks.CodeBlock)) },
+        .bytes = @splat(0x35),
+    };
+    var variadic: VariadicCode align(16) = .{
+        .header = .{ .header = 0, .capacity = layouts.tagFixnum(256 - @sizeOf(code_blocks.CodeBlock)) },
+        .bytes = @splat(0x79),
+    };
+    var variadic_template: extern struct { header: layouts.Array, items: [2]Cell } align(16) = .{
+        .header = .{ .header = 0, .capacity = layouts.tagFixnum(2) },
+        .items = .{ layouts.false_object, layouts.retag(@intFromPtr(&variadic), .byte_array) },
+    };
+    var templates: extern struct { header: layouts.Array, items: [3]Cell } align(16) = .{
+        .header = .{ .header = 0, .capacity = layouts.tagFixnum(3) },
+        .items = .{ layouts.false_object, layouts.retag(@intFromPtr(&ordinary), .byte_array), layouts.retag(@intFromPtr(&variadic_template), .array) },
+    };
+    // add only reads this special object and code when owner is false.
+    var vm: @import("vm.zig").FactorVM = undefined;
+    vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.callback_stub)] = layouts.retag(@intFromPtr(&templates), .array);
+    vm.code = null;
+
+    var heap = try CallbackHeap.init(std.testing.allocator, 16 * 1024);
+    defer heap.deinit();
+    // Pin a larger stub so the free spans on either side are multiples of
+    // both sizes; otherwise unmergeable 128-byte tails are legitimate.
+    const pinned = heap.add(layouts.false_object, std.math.maxInt(Cell), 0, &vm).?;
+    const pinned_entry = pinned.entryPoint();
+    var stubs: [128]*code_blocks.CodeBlock = undefined;
+
+    for (0..6) |round| {
+        const is_variadic = round % 2 == 1;
+        const rewind: Cell = if (is_variadic) std.math.maxInt(Cell) else 0;
+        const size: Cell = if (is_variadic) 256 else 128;
+        var count: usize = 0;
+        while (heap.add(layouts.false_object, rewind, 0, &vm)) |stub| {
+            try std.testing.expect(count < stubs.len);
+            stubs[count] = stub;
+            count += 1;
+            try std.testing.expectEqual(size, stub.size());
+            try std.testing.expectEqual(if (is_variadic) layouts.tagFixnum(1) else layouts.false_object, stub.parameters);
+        }
+        // A failure is legitimate only when less than one stub is free.
+        try std.testing.expectEqual((16 * 1024 - 256) / size, count);
+        try std.testing.expect(heap.room().total_free < size);
+        for (stubs[0..count]) |stub| heap.free(stub);
+        try std.testing.expectEqual(@as(Cell, 256), heap.room().occupied_space);
+        try std.testing.expectEqual(pinned_entry, pinned.entryPoint());
+        const bytes: [*]const u8 = @ptrFromInt(pinned_entry);
+        try std.testing.expectEqualSlices(u8, &variadic.bytes, bytes[0..variadic.bytes.len]);
+    }
+    heap.free(pinned);
+    try std.testing.expectEqual(@as(Cell, 16 * 1024), heap.room().total_free);
 }
