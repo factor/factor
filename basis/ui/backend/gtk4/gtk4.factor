@@ -219,7 +219,10 @@ CONSTANT: gtk4-modifiers
     ] [ 2drop ] if ;
 
 : on-map ( win data -- )
-    drop window relayout ;
+    ! Mapping makes the world drawable. Initial GLArea resize notifications
+    ! can arrive before it has a positive allocation; do not depend on a
+    ! later resize to activate an otherwise mapped window.
+    drop window t >>active? relayout ;
 
 : on-close ( win data -- ? )
     drop window ungraft t ;
