@@ -99,6 +99,8 @@ FUNCTION: void CGContextTranslateCTM ( CGContextRef c, CGFloat tx, CGFloat ty )
 FUNCTION: void CGContextSaveGState ( CGContextRef c )
 FUNCTION: void CGContextRestoreGState ( CGContextRef c )
 
+FUNCTION: void CGContextClipToRect ( CGContextRef c, CGRect rect )
+
 FUNCTION: void CGContextFillRect (
    CGContextRef c,
    CGRect rect

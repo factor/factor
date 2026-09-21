@@ -188,6 +188,41 @@ IN: core-text.tests
     dup prepare-render [ render-ext>> ] [ dim>> ] bi [ >= ] 2all?
 ] unit-test
 
+! Opaque text and selection backgrounds must leave raster guards transparent;
+! otherwise the next line's bitmap paints over the previous presentation.
+:: background-within-line? ( line offset dim -- ? )
+    line offset dim render-region bitmap>> :> pixels
+    line loc>> offset v+ first2 :> ( left top )
+    line dim>> first2 :> ( width height )
+    dim first :> stride
+    pixels length 4 /i <iota> [| i |
+        i stride mod left + :> x
+        i stride /i top + :> y
+        x 0 >= x width < and y 0 >= and y height < and
+        i 4 * 3 + pixels nth swap
+        [ drop t ] [ zero? ] if
+    ] all?
+    pixels [ zero? not ] any? and ;
+
+:: test-background-guards ( -- ? )
+    gl-scale-factor get-global :> previous
+    [
+        { 1.0 2.0 } [| scale |
+            scale gl-scale-factor set-global
+            monospace-font COLOR: blue >>background "     " cached-line
+            monospace-font T{ rgba f 0 0 0 0 } >>background
+            "     " 0 5 COLOR: blue <selection> cached-line
+            2array [| line |
+                line prepare-render
+                { { 0 0 } { 1 1 } } [| offset |
+                    line offset line render-ext>> offset v- background-within-line?
+                ] all?
+            ] all?
+        ] all?
+    ] [ previous gl-scale-factor set-global ] finally ;
+
+{ t } [ test-background-guards ] unit-test
+
 :: test-index-map ( string -- correct? reused? )
     sans-serif-font string cached-line :> line
     string length 1 + <iota> [| n |

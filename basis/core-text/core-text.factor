@@ -326,16 +326,25 @@ TUPLE: glyph-region run range left right order max-right ;
         ] each
     ] [ line line>> context CTLineDraw ] if ;
 
+:: fill-line-backgrounds ( context line offset dim loc -- )
+    ! The raster has guards for glyph overhangs. Backgrounds must not paint
+    ! those guards over neighboring lines or presentation borders.
+    line loc>> offset v+ first2 :> ( x y )
+    line dim>> first2 :> ( w h )
+    context CGContextSaveGState
+    context x neg dim second y + h - w h <CGRect> CGContextClipToRect
+    context line font>> dim fill-background
+    context loc dim line fill-selection-background
+    context CGContextRestoreGState ;
+
 ! Region coordinates are measured from the top-left of the complete image.
 :: render-region ( line offset dim -- image )
     line prepare-render
     line render-loc>> offset first
     line render-ext>> second offset second - dim second - 2array v+ :> loc
-    line font>> :> font
     dim [
         {
-            [ font dim fill-background ]
-            [ loc dim line fill-selection-background ]
+            [ line offset dim loc fill-line-backgrounds ]
             ! Keep Core Text's baseline at zero. Moving the text position
             ! outside a tile changes rasterization of large color emoji.
             [ loc first2 [ neg ] bi@ CGContextTranslateCTM ]
