@@ -60,6 +60,8 @@ FUNCTION: double call_struct ( void* cb )
 FUNCTION: double abi_hfa_boundary ( float a, float b, float c, float d, float e, float f, float g, pair h, float i )
 FUNCTION: double call_hfa_boundary ( void* cb )
 { 64.0 } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 <pair> 10.0 abi_hfa_boundary general-abi-case ] unit-test
+: indirect-hfa-boundary ( a b c d e f g h i ptr -- result ) double { float float float float float float float pair float } cdecl alien-indirect ;
+{ 64.0 } [ 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 <pair> 10.0 "abi_hfa_boundary" "gap-abi" library-dll dlsym indirect-hfa-boundary general-abi-case ] unit-test
 : hfa-callback ( -- cb ) double { float float float float float float float pair float } cdecl [| a b c d e f g h i | a b + c + d + e + f + g + h x>> + h y>> 2 * + i + ] alien-callback ;
 { 64.0 } [ hfa-callback [ call_hfa_boundary ] with-callback general-abi-case ] unit-test
 USING: specialized-arrays sequences ;
@@ -85,6 +87,8 @@ FUNCTION: double call_int_boundary ( void* cb )
 { 64.0 } [ int-callback [ call_int_boundary ] with-callback general-abi-case ] unit-test
 FUNCTION: double abi_hfa_stack ( longlong a, longlong b, longlong c, longlong d, longlong e, longlong f, longlong g, longlong h, float a0, float a1, float a2, float a3, float a4, float a5, float a6, float a7, char i, pair j, float k )
 { 107.0 } [ 1 2 3 4 5 6 7 8 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 -9 10.0 11.0 <pair> 12.0 abi_hfa_stack general-abi-case ] unit-test
+: indirect-hfa-stack ( a b c d e f g h a0 a1 a2 a3 a4 a5 a6 a7 i j k ptr -- result ) double { longlong longlong longlong longlong longlong longlong longlong longlong float float float float float float float float char pair float } cdecl alien-indirect ;
+{ 107.0 } [ 1 2 3 4 5 6 7 8 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 -9 10.0 11.0 <pair> 12.0 "abi_hfa_stack" "gap-abi" library-dll dlsym indirect-hfa-stack general-abi-case ] unit-test
 
 "general" general-abi-cases get report-ffi-coverage
-general-abi-cases get 27 >= [ "General ABI coverage incomplete" throw ] unless
+general-abi-cases get 29 >= [ "General ABI coverage incomplete" throw ] unless

@@ -14,6 +14,7 @@ IN: compiler.cfg.builder.alien
     '[
         param-regs init-regs
         0 stack-params set
+        0 stack-group-remaining set
         V{ } clone reg-values set
         V{ } clone stack-values set
         0 int-reg-reps set

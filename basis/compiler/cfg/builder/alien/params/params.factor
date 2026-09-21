@@ -8,6 +8,8 @@ SYMBOL: stack-params
 
 SYMBOL: compact-stack-params?
 
+SYMBOLS: stack-group-offset stack-group-remaining ;
+
 : param-natural-size ( rep-tuple -- size )
     dup length 3 > [ fourth ] [ first rep-size ] if ;
 
@@ -70,13 +72,31 @@ SYMBOLS: stack-values reg-values ;
 :: prepare-parameter-group ( rep-tuple -- )
     rep-tuple length 4 > [
         rep-tuple first reg-class-of get :> regs
-        4 rep-tuple nth regs length > [ regs delete-all ] when
+        4 rep-tuple nth :> count
+        count regs length > [
+            regs delete-all
+            compact-stack-params? get [
+                ! A spilled aggregate retains its in-memory member layout.
+                ! Round the whole argument, not each float member, to a cell.
+                rep-tuple param-natural-size :> size
+                stack-params get size cell max align :> offset
+                offset stack-group-offset set
+                count stack-group-remaining set
+                offset count size * cell align + stack-params set
+            ] unless
+        ] when
     ] when ;
+
+: alloc-parameter-stack-slot ( rep size -- n )
+    stack-group-remaining get 0 or 0 > [
+        nip stack-group-offset get swap stack-group-offset +@
+        -1 stack-group-remaining +@
+    ] [ alloc-stack-param ] if ;
 
 :: next-parameter ( vreg rep on-stack? odd-register? size -- )
     vreg rep on-stack?
     [ dup dup reg-class-of get odd-register? reg-class-full? ] dip or
-    [ size alloc-stack-param size 4array stack-values ]
+    [ size alloc-parameter-stack-slot size 4array stack-values ]
     [ odd-register? swap next-reg-param 3array reg-values ]
     if get push ;
 
