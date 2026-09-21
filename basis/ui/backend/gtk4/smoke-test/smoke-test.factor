@@ -17,14 +17,18 @@ ERROR: gtk4-smoke-check-failed check actual expected ;
     actual expected = [ check actual expected gtk4-smoke-check-failed ] unless ;
 
 : native-dim ( world -- dim )
-    handle>> drawable>> [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi 2array ;
+    handle>> [
+        drawable>> [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi 2array
+    ] [ { 0 0 } ] if* ;
 
 : window-ready? ( world -- ? )
     ! Factor's preferred dimensions can be positive before GTK allocates the
     ! GLArea. select-gl-context cannot attach its framebuffer until then.
-    [ draw-world? ]
-    [ handle>> drawable>> gtk_widget_get_mapped ]
-    [ native-dim [ 0 > ] all? ] tri and and ;
+    ! open-window* queues grafting; the native handle may not exist yet.
+    dup draw-world? [
+        [ handle>> drawable>> gtk_widget_get_mapped ]
+        [ native-dim [ 0 > ] all? ] bi and
+    ] [ drop f ] if ;
 
 :: wait-for-window ( world -- )
     nano-count 10,000,000,000 + :> deadline
