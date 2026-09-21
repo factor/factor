@@ -1,12 +1,26 @@
 USING: accessors arrays colors continuations dlists documents.private fonts fry help
 help.markup help.stylesheet help.syntax help.topics inspector io
-io.streams.string io.styles kernel literals locals math models
+io.streams.string io.styles kernel literals locals math models models.range
 namespaces prettyprint see sequences strings tools.test ui.clipboards ui.gadgets
 ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
 ui.gadgets.scrollers ui.gadgets.worlds ui.gestures ui.theme ;
 FROM: sets => in? ;
 FROM: ui.render => selected-children ;
 IN: ui.gadgets.panes.tests
+
+! Fractional bottom limits must use the same rounding as range-value.
+{ t } [ 900.75 100 0 1000.75 1 <range> range-at-bottom? ] unit-test
+{ t } [ 900 100 0 1000.75 1 <range> range-at-bottom? ] unit-test
+{ f } [ 899 100 0 1000.75 1 <range> range-at-bottom? ] unit-test
+{ t } [ 900 100 0 1000 1 <range> range-at-bottom? ] unit-test
+{ f } [ 899 100 0 1000 1 <range> range-at-bottom? ] unit-test
+! A fractional page can put the limit just below an integer.
+{ t } [ 899 100.25 0 1000 1 <range> range-at-bottom? ] unit-test
+{ f } [ 898 100.25 0 1000 1 <range> range-at-bottom? ] unit-test
+! Content fitting in the viewport and non-unit scroll steps.
+{ t } [ 0 100 0 50 1 <range> range-at-bottom? ] unit-test
+{ t } [ 898 100 0 999 2 <range> range-at-bottom? ] unit-test
+{ f } [ 896 100 0 999 2 <range> range-at-bottom? ] unit-test
 
 : #children ( -- n ) "pane" get children>> length ;
 

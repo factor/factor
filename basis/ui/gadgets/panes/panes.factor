@@ -120,15 +120,16 @@ GENERIC: pane-line ( str style gadget -- )
 : pane-write1 ( char pane -- )
     [ 1string H{ } ] dip current>> pane-line ;
 
+: range-at-bottom? ( range -- ? )
+    ! Compare reachable positions: range-value floors to the scroll step.
+    [ range-value ]
+    [ [ range-max-value ] [ clamp-value ] [ step-value ] tri ] bi >= ;
+
 :: do-pane-stream ( pane-stream quot -- )
     pane-stream pane>> :> pane
     pane find-scroller :> scroller
     scroller [
-        model>> dependencies>> second {
-            [ range-value ]
-            [ range-page-value + ]
-            [ range-max-value >= ]
-        } cleave
+        model>> dependencies>> second range-at-bottom?
     ] [ f ] if* :> bottom?
     pane quot call
     pane scrolls?>> bottom? and scroller and [
