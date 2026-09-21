@@ -3,7 +3,7 @@ help.markup help.stylesheet help.syntax help.topics inspector io
 io.streams.string io.styles kernel literals locals math models models.range
 namespaces prettyprint see sequences strings tools.test ui.clipboards ui.gadgets
 ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
-ui.gadgets.scrollers ui.gadgets.worlds ui.gestures ui.theme ;
+ui.gadgets.scrollers ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.theme ;
 FROM: sets => in? ;
 FROM: ui.render => selected-children ;
 IN: ui.gadgets.panes.tests
@@ -21,6 +21,30 @@ IN: ui.gadgets.panes.tests
 { t } [ 0 100 0 50 1 <range> range-at-bottom? ] unit-test
 { t } [ 898 100 0 999 2 <range> range-at-bottom? ] unit-test
 { f } [ 896 100 0 999 2 <range> range-at-bottom? ] unit-test
+
+! A write larger than the viewport must target the new content height.
+:: pane-bulk-scroll-test ( scrolls? position -- first? laid-out? next? x y )
+    <pane> scrolls? >>scrolls? :> pane
+    pane <pane-stream> :> stream
+    <gadget> { 500 1000 } >>dim stream write-gadget
+    stream stream-nl
+    pane <scroller> { 200 100 } >>dim :> scroller
+    scroller layout
+    position scroller set-scroll-position
+    scroller model>> dependencies>> second :> range
+    100 [ "line\n" ] replicate concat stream stream-write
+    range range-at-bottom?
+    scroller layout
+    range range-at-bottom?
+    "next\n" stream stream-write
+    scroller layout
+    range range-at-bottom?
+    scroller scroll-position first2 ;
+
+{ t t t 20 } [ t { 20 100000 } pane-bulk-scroll-test drop ] unit-test
+! Preserve horizontal scrolling and respect a reader who has scrolled up.
+{ f f f 20 30 } [ t { 20 30 } pane-bulk-scroll-test ] unit-test
+{ f f f 20 30 } [ f { 20 30 } pane-bulk-scroll-test ] unit-test
 
 : #children ( -- n ) "pane" get children>> length ;
 

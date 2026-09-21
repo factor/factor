@@ -134,7 +134,11 @@ GENERIC: pane-line ( str style gadget -- )
     pane quot call
     pane scrolls?>> bottom? and scroller and [
         scroller {
-            [ model>> dependencies>> first2 [ range-value ] [ range-max-value ] bi* 2array ]
+            ! The range still describes the content before this write.
+            [
+                [ model>> dependencies>> first range-value ]
+                [ viewport>> gadget-child pref-dim second ] bi 2array
+            ]
             [ set-scroll-position ]
         } cleave
     ] when ; inline
