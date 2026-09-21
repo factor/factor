@@ -1,20 +1,21 @@
 ! Copyright (C) 2026 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
 
-USING: accessors colors definitions.icons fonts io kernel math
-math.rectangles models models.arrow models.range prettyprint
-sequences splitting ui ui.baseline-alignment ui.commands
-ui.gadgets ui.gadgets.books ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.editors ui.gadgets.frames
+USING: accessors arrays colors definitions.icons fonts io kernel
+math math.functions math.order math.rectangles models models.arrow
+models.product models.range namespaces prettyprint sequences
+sequences.generalizations splitting ui ui.baseline-alignment ui.commands
+ui.gadgets ui.gadgets.books ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.comboboxes ui.gadgets.editors ui.gadgets.frames
 ui.gadgets.glass ui.gadgets.grids ui.gadgets.icons
 ui.gadgets.labeled ui.gadgets.labels ui.gadgets.menus
 ui.gadgets.packs ui.gadgets.panes ui.gadgets.paragraphs
-ui.gadgets.scrollers ui.gadgets.sliders ui.gadgets.tabbed
+ui.gadgets.scrollers ui.gadgets.search-tables ui.gadgets.sliders ui.gadgets.tabbed
 ui.gadgets.tabbed.private ui.gadgets.tables ui.gadgets.toolbar
 ui.gadgets.tracks ui.gestures ui.images ui.pens.gradient
 ui.pens.polygon ui.pens.rounded ui.pens.solid ui.theme ;
 FROM: models => change-model set-model ;
-FROM: io.styles => foreground font-style bold with-style ;
+FROM: io.styles => background foreground font-style bold with-style ;
 IN: ui-demo
 
 ! --- Helpers ---
@@ -73,6 +74,64 @@ CONSTANT: text-width 520
     content-background <solid> >>interior
     field-border-color <solid> >>boundary ;
 
+! A preview rebuilds only its sample when the controls change.
+TUPLE: demo-preview < border builder ;
+
+M: demo-preview model-changed
+    nip dup clear-gadget
+    dup model>> dependencies>> [ value>> ] map
+    over builder>> call( values -- gadget ) add-gadget relayout ;
+
+:: <demo-preview> ( models builder -- gadget )
+    demo-preview new { 0 0 } >>align
+        models <product> >>model builder >>builder
+        dup f swap model-changed ;
+
+TUPLE: demo-stage < border stage-dim ;
+M: demo-stage pref-dim* stage-dim>> ;
+
+: <stage> ( gadget dim -- gadget )
+    [ demo-stage new-border { 1 1 } >>fill t >>clipped?
+      field-border-color <solid> >>boundary ] dip >>stage-dim ;
+
+: <demo-range> ( value min max -- range )
+    [ 0 ] 2dip 1 <range> ;
+
+:: <range-row> ( title range -- gadget )
+    <shelf-of>
+        title <label> add-gadget
+        range horizontal <slider>
+        { 0 0 } <filled-border> { 200 18 } >>min-dim add-gadget
+        range range-model <readout> add-gadget ;
+
+:: <layout-controls> ( width gap align fill -- gadget )
+    <section>
+        "Width" width <range-row> add-gadget
+        "Gap" gap <range-row> add-gadget
+        align { { 0 "Start" } { 1/2 "Center" } { 1 "End" } }
+        <radio-buttons> add-gadget
+        "Alignment:" align <readout> <labeled-row> add-gadget
+        fill "Fill available space" <checkbox> add-gadget
+        "Fill:" fill <readout> <labeled-row> add-gadget ;
+
+CONSTANT: text-samples
+"Mixed scripts: English · العربية · עברית\nEmoji: 👩‍💻 👍🏽 🇺🇸\nCombining: é ạ́ ö\nLongUnbrokenText_ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789"
+
+: <text-samples> ( -- gadget )
+    <section>
+        <shelf-of>
+            "Small" <label> [ clone 10 >>size ] change-font add-gadget
+            "Large" <label> [ clone 28 >>size ] change-font add-gadget
+            "Italic é 👩‍💻" <label> [ clone t >>italic? ] change-font add-gadget
+        add-gadget
+        text-samples <label> add-gadget
+        [
+            H{ { background COLOR: LightPink } }
+            [ "Pink background: é العربية" print ] with-style
+            H{ { background COLOR: LightBlue } }
+            [ "Blue background: 👩‍💻 עברית" print ] with-style
+        ] make-pane add-gadget ;
+
 ! --- Labels ---
 
 :: <labels-section> ( -- gadget )
@@ -90,6 +149,9 @@ CONSTANT: text-width 520
             text <model-field> 20 >>min-cols add-gadget
             text <label-control> add-gadget
         add-gadget
+        "Mixed fonts, scripts and backgrounds:" <heading> add-gadget
+        <text-samples> add-gadget
+        "Drag across the colored output to select and copy it." <note> add-gadget
     <page> ;
 
 ! --- Buttons ---
@@ -113,10 +175,18 @@ CONSTANT: text-width 520
 :: <checkboxes-section> ( -- gadget )
     f <model> :> notify
     t <model> :> advanced
+    f <model> :> diagnostics
+    3 0 10 <demo-range> :> retries
     <section>
         "A checkbox toggles a boolean model." <prose> add-gadget
         notify "Send notifications" <checkbox> add-gadget
         advanced "Show advanced options" <checkbox> add-gadget
+        advanced 1array [ first [
+            <section>
+                "Advanced options" <heading> add-gadget
+                diagnostics "Include diagnostic details" <checkbox> add-gadget
+                "Retry count" retries <range-row> add-gadget
+        ] [ <gadget> ] if ] <demo-preview> add-gadget
         "Notifications:" notify <readout> <labeled-row> add-gadget
         "Advanced:" advanced <readout> <labeled-row> add-gadget
     <page> ;
@@ -140,6 +210,8 @@ CONSTANT: text-width 520
 :: <editors-section> ( -- gadget )
     "edit me" <model> :> bound
     f <model> :> submitted
+    <editor> :> sample-editor
+    text-samples sample-editor set-editor-string
     <section>
         "An editor is a multi-line text area with a caret, selection and undo. A field wraps one line of it in a border." <prose> add-gadget
         "Model field, bound in both directions:" <heading> add-gadget
@@ -152,6 +224,15 @@ CONSTANT: text-width 520
         "Plain editor:" <heading> add-gadget
         <editor> "Several lines fit here." >>default-text
         <framed> { 0 90 } >>min-dim add-gadget
+        "Unicode, selection and long lines:" <heading> add-gadget
+        sample-editor <scroller> <framed> { 0 150 } >>min-dim add-gadget
+        <shelf-of>
+            "Select all" [ drop sample-editor select-all sample-editor request-focus ] <border-button> add-gadget
+            "Reset text" [ drop text-samples sample-editor set-editor-string ] <border-button> add-gadget
+        add-gadget
+        "Try editing, selecting, copying and undoing across scripts." <note> add-gadget
+        "Baseline and background reference:" <heading> add-gadget
+        <text-samples> add-gadget
     <page> ;
 
 ! --- Sliders ---
@@ -182,18 +263,22 @@ CONSTANT: text-width 520
     [ COLOR: DodgerBlue { 70 30 } <color-box> ] dip <border>
     field-border-color <solid> >>boundary ;
 
-: <borders-section> ( -- gadget )
+:: <borders-section> ( -- gadget )
+    400 280 560 <demo-range> :> width
+    12 0 40 <demo-range> :> gap
+    1/2 <model> :> align
+    f <model> :> fill
     <section>
-        "A border pads a single child. The gap is an { x y } pair." <prose> add-gadget
-        <shelf-of>
-            { 0 0 } <bordered-box> add-gadget
-            { 8 8 } <bordered-box> add-gadget
-            { 24 12 } <bordered-box> add-gadget
-        add-gadget
-        "{ 0 0 }, { 8 8 } and { 24 12 }" <note> add-gadget
-        "A filled border stretches its child instead of centering it:" <heading> add-gadget
-        COLOR: MediumSeaGreen { 70 30 } <color-box> { 8 8 } <filled-border>
-        field-border-color <solid> >>boundary add-gadget
+        "Adjust padding, alignment and fill inside a fixed-height preview. The outline marks the available space." <prose> add-gadget
+        width gap align fill <layout-controls> add-gadget
+        width range-model gap range-model align fill 4array [
+            first4 :> ( w g a f? )
+            COLOR: DodgerBlue { 70 30 } <color-box>
+            g dup 2array <border>
+            a dup 2array >>align
+            f? { 1 1 } { 0 0 } ? >>fill
+            w 160 2array <stage>
+        ] <demo-preview> add-gadget
     <page> ;
 
 ! --- Packs ---
@@ -204,34 +289,44 @@ CONSTANT: text-width 520
         COLOR: MediumSeaGreen { 90 25 } <color-box> add-gadget
         COLOR: chocolate1 { 45 25 } <color-box> add-gadget ;
 
-: <packs-section> ( -- gadget )
+:: <packs-section> ( -- gadget )
+    400 280 560 <demo-range> :> width
+    8 0 24 <demo-range> :> gap
+    0 <model> :> align
+    f <model> :> fill
+    horizontal <model> :> axis
     <section>
-        "A pack lays its children out along one axis, each at its preferred size." <prose> add-gadget
-        "Shelf, horizontal:" <heading> add-gadget
-        <shelf> <three-boxes> add-gadget
-        "Pile, vertical:" <heading> add-gadget
-        <pile> <three-boxes> add-gadget
-        "Filled pile, children stretched across:" <heading> add-gadget
-        <filled-pile> <three-boxes> add-gadget
+        "Switch between a shelf and a pile. Alignment and fill act across the packing direction; gap separates children." <prose> add-gadget
+        axis { { { 1 0 } "Shelf" } { { 0 1 } "Pile" } } <radio-buttons> add-gadget
+        width gap align fill <layout-controls> add-gadget
+        width range-model gap range-model align fill axis 5 narray [
+            [ first4 ] [ 4 swap nth ] bi :> ( w g a f? axis )
+            axis <pack> <three-boxes>
+            g dup 2array >>gap a >>align f? 1 0 ? >>fill
+            w 170 2array <stage>
+        ] <demo-preview> add-gadget
     <page> ;
 
 ! --- Tracks ---
 
-: <tracks-section> ( -- gadget )
+:: <tracks-section> ( -- gadget )
+    400 280 560 <demo-range> :> width
+    4 0 24 <demo-range> :> gap
+    0 <model> :> align
+    t <model> :> fill
+    2 1 6 <demo-range> :> share
     <section>
-        "A track divides space along one axis. Every child is added with a constraint: f for its preferred size, or a share of whatever is left over." <prose> add-gadget
-        "Horizontal, f | 1 | f:" <heading> add-gadget
-        horizontal <track> { 3 3 } >>gap
-            COLOR: DodgerBlue { 60 30 } <color-box> f track-add
-            COLOR: MediumSeaGreen { 0 30 } <color-box> 1 track-add
-            COLOR: chocolate1 { 60 30 } <color-box> f track-add
-        add-gadget
-        "Vertical, 1 | 2 | 1:" <heading> add-gadget
-        vertical <track> { 3 3 } >>gap
-            COLOR: DodgerBlue { 0 0 } <color-box> 1 track-add
-            COLOR: MediumSeaGreen { 0 0 } <color-box> 2 track-add
-            COLOR: chocolate1 { 0 0 } <color-box> 1 track-add
-        { 0 0 } <filled-border> { 0 140 } >>min-dim add-gadget
+        "The outer cells each receive one share. Change the middle cell's share to see how a track divides the available width." <prose> add-gadget
+        width gap align fill <layout-controls> add-gadget
+        "Middle share (1 : n : 1)" share <range-row> add-gadget
+        width range-model gap range-model align fill share range-model 5 narray [
+            [ first4 ] [ 4 swap nth ] bi :> ( w g a f? share )
+            horizontal <track> g dup 2array >>gap a >>align f? 1 0 ? >>fill
+                COLOR: DodgerBlue { 0 30 } <color-box> 1 track-add
+                COLOR: MediumSeaGreen { 0 50 } <color-box> share track-add
+                COLOR: chocolate1 { 0 30 } <color-box> 1 track-add
+            w 160 2array <stage>
+        ] <demo-preview> add-gadget
     <page> ;
 
 ! --- Frames ---
@@ -349,14 +444,81 @@ CONSTANT: people {
 }
 
 :: <tables-section> ( -- gadget )
-    people <model> person-renderer <table>
+    people clone <model> :> rows
+    0 <model> :> added
+    rows person-renderer <table>
         t >>selection-required?
         12 >>gap :> table
     <section>
         "A table renders rows through a renderer, which says what the columns are and how to pull them out of a row." <prose> add-gadget
         table <scroller> <framed> add-gadget
+        <shelf-of>
+            "Add row" [
+                drop added [ 1 + ] change-model
+                "Guest " added value>> unparse append "Visitor" "Active" 3array
+                rows [ swap suffix ] change-model
+            ] <border-button> add-gadget
+            "Remove selected" [
+                drop table selection-index>> value>> [| index |
+                    rows [ index swap remove-nth ] change-model
+                ] when*
+            ] <border-button> add-gadget
+            "Reset rows" [ drop people clone rows set-model ] <border-button> add-gadget
+        add-gadget
         "Selected:" table selection>> <readout> <labeled-row> add-gadget
+        "Row index:" table selection-index>> <readout> <labeled-row> add-gadget
+        "Adding rows preserves selection. Removing the selected row selects the first remaining row; an empty table has no selection." <prose> add-gadget
         "Rows whose status is Away are dimmed by the renderer's row-color." <note> add-gadget
+    <page> ;
+
+:: <search-tables-section> ( -- gadget )
+    people <model> person-renderer [ " " join ] <search-table> :> search
+    <section>
+        "Search across names, roles and statuses. Use the arrow keys to move through matching rows, or clear the search to restore all rows." <prose> add-gadget
+        search <framed> { 0 220 } >>min-dim add-gadget
+        "Selected:" search table>> selection>> <readout> <labeled-row> add-gadget
+    <page> ;
+
+:: <comboboxes-section> ( -- gadget )
+    { "Small" "Medium" "Large" } <combobox> :> combo
+    <section>
+        "Click the dropdown and choose an option. The model below shows the combobox's displayed value, including its dropdown marker." <prose> add-gadget
+        combo <pref-width> add-gadget
+        "Displayed value:" combo model>> <readout> <labeled-row> add-gadget
+    <page> ;
+
+! A draggable divider built from a track and the standard gesture protocol.
+TUPLE: demo-split < track ;
+TUPLE: demo-divider < gadget split ;
+
+M:: demo-split model-changed ( model split -- )
+    model value>> 100 / :> share
+    split share f 1 share - 3array >>sizes relayout ;
+
+:: move-divider ( divider -- )
+    divider split>> :> split
+    hand-loc get-global first split screen-loc first - 4 -
+    split dim>> first 8 - 1 max / 100 * round 10 90 clamp
+    split model>> set-model ;
+
+demo-divider H{
+    { T{ button-down } [ move-divider ] }
+    { T{ drag { # 1 } } [ move-divider ] }
+} set-gestures
+
+:: <split-panes-section> ( -- gadget )
+    50 <model> :> ratio
+    horizontal demo-split new-track ratio >>model :> split
+    split
+        "Left pane" <label> <framed> 1 track-add
+        demo-divider new split >>split { 8 0 } >>dim
+        toolbar-background <solid> >>interior f track-add
+        "Right pane" <label> <framed> 1 track-add drop
+    <section>
+        "Drag the divider to resize the two panes. This example composes a track with a draggable gadget; the split is kept between 10% and 90%." <prose> add-gadget
+        split { 520 180 } <stage> add-gadget
+        "Left share (%):" ratio <readout> <labeled-row> add-gadget
+        "Reset split" [ drop 50 ratio set-model ] <border-button> <pref-width> add-gadget
     <page> ;
 
 ! --- Panes ---
@@ -386,13 +548,18 @@ CONSTANT: lorem
         <label> add-gadget " " <word-break-gadget> add-gadget
     ] each ;
 
-: <paragraphs-section> ( -- gadget )
+:: <paragraphs-section> ( -- gadget )
+    400 180 560 <demo-range> :> width
     <section>
-        "A paragraph wraps its children onto as many lines as its width allows, breaking at word-break gadgets. The width is the argument to <paragraph>." <prose> add-gadget
-        "Wrapped at 500 pixels:" <heading> add-gadget
-        500 <lorem-paragraph> add-gadget
-        "Wrapped at 240 pixels:" <heading> add-gadget
-        240 <lorem-paragraph> add-gadget
+        "Move the width slider to rewrap the paragraph. Word-break gadgets determine where wrapping is allowed." <prose> add-gadget
+        "Wrap width" width <range-row> add-gadget
+        width range-model 1array [ first <lorem-paragraph> <framed> ] <demo-preview> add-gadget
+        "An unbroken word can exceed the wrap width:" <heading> add-gadget
+        width range-model 1array [
+            first <paragraph>
+            "LongUnbrokenText_ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789" <label> add-gadget
+            <framed>
+        ] <demo-preview> add-gadget
     <page> ;
 
 ! --- Pens ---
@@ -469,12 +636,12 @@ counter "toolbar" f {
 : popup-below ( owner child -- )
     over [ { 0 0 } ] dip dim>> <rect> show-glass ;
 
-: <confirm-dialog> ( -- gadget )
+:: <confirm-dialog> ( result -- gadget )
     <filled-pile> { 8 8 } >>gap
         "Are you sure?" <heading> add-gadget
         <shelf-of>
-            "Cancel" [ hide-glass ] <border-button> add-gadget
-            "OK" [ hide-glass ] <border-button> add-gadget
+            "Cancel" [ "Cancelled" result set-model hide-glass ] <border-button> add-gadget
+            "OK" [ "Confirmed" result set-model hide-glass ] <border-button> add-gadget
         add-gadget
     { 12 12 } <border>
     content-background <solid> >>interior
@@ -482,16 +649,18 @@ counter "toolbar" f {
 
 :: <popups-section> ( -- gadget )
     <counter> :> counter
+    "No choice yet" <model> :> result
     <section>
         "Glass layers float above the rest of the window and go away when you click outside them." <prose> add-gadget
         <shelf-of>
-            "Dialog" [ <confirm-dialog> popup-below ] <border-button> add-gadget
+            "Dialog" [ result <confirm-dialog> popup-below ] <border-button> add-gadget
             "Menu" [
                 drop counter
                 { com-increment com-decrement ---- com-reset }
                 show-commands-menu
             ] <border-button> add-gadget
         add-gadget
+        "Last dialog choice:" result <readout> <labeled-row> add-gadget
         "The menu drives the counter below, using the command map from the previous page." <prose> add-gadget
         counter add-gadget
     <page> ;
@@ -514,6 +683,9 @@ CONSTANT: sections {
     { "Labeled" [ <labeled-section> ] }
     { "Tabs" [ <tabs-section> ] }
     { "Tables" [ <tables-section> ] }
+    { "Search Tables" [ <search-tables-section> ] }
+    { "Combo Boxes" [ <comboboxes-section> ] }
+    { "Split Panes" [ <split-panes-section> ] }
     { "Panes" [ <panes-section> ] }
     { "Paragraphs" [ <paragraphs-section> ] }
     { "Pens" [ <pens-section> ] }
