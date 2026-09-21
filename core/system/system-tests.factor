@@ -20,7 +20,9 @@ IN: system.tests
                 "-e=USING: vocabs.loader ; \"system\" reload " code append ,
             ] { } make >>command
             "stdout" >>stdout "stderr" >>stderr +closed+ >>stdin
-            10 seconds >>timeout
+            ! Includes image startup and reloading system on slower CI hosts,
+            ! not just the exit call whose output and status we check below.
+            60 seconds >>timeout
         run-process wait-for-process
         [ "stdout" utf8 file-contents "stderr" utf8 file-contents ] dip
     ] with-test-directory ;
