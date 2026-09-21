@@ -56,6 +56,18 @@ IN: ui.text.pango.tests
     ]
 ] unit-test
 
+! A tile spanning two indexed chunks must composite overlapping glyph ink
+! in the same operation as Pango's native run.
+{ t } [
+    f [ [let
+        monospace-font 20000 CHAR: X <string> cached-layout :> indexed
+        indexed glyph-index>> regions>> second x>> 32 - 0 2array :> offset
+        indexed clone f >>glyph-index :> native
+        indexed offset { 64 20 } draw-layout-region bitmap>>
+        native offset { 64 20 } draw-layout-region bitmap>> =
+    ] ] with-text-scale
+] unit-test
+
 { { { 19968 0 } { 20480 0 } { 20992 0 } } } [
     2.0 [ test-layout { 10000 0 } { 550 15 } <rect> pango-tile-offsets ] with-text-scale
 ] unit-test
@@ -74,13 +86,16 @@ IN: ui.text.pango.tests
     { 1 0.5 0 0 0 1 0 0 0 0 1 0 0 0 0 1 } pango-modelview-clip
 ] unit-test
 
-! Compare a far-away region with the same glyphs near the beginning. This
-! exceeds both the former 16384-pixel clamp and Cairo's surface-size limit.
+! Compare two interior regions so both include ink from preceding glyphs.
+! Comparing against the start of the line depends on the font's overhang.
+! The far-away region exceeds both the former 16384-pixel clamp and
+! Cairo's surface-size limit.
 { t } [
     f [ [let
         monospace-font 20000 CHAR: X <string> cached-layout :> line
+        100 monospace-font line string>> offset>x :> near-x
         10000 monospace-font line string>> offset>x :> x
-        line { 0 0 } { 64 8 } draw-layout-region bitmap>>
+        line near-x 0 2array { 64 8 } draw-layout-region bitmap>>
         line x 0 2array { 64 8 } draw-layout-region bitmap>> =
     ] ] with-text-scale
 ] unit-test

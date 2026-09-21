@@ -3,7 +3,7 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.syntax arrays classes.struct destructors kernel libc locals math
 math.bitwise math.order math.rectangles math.vectors pango.ffi
-pango.cairo.ffi cairo.ffi sequences sorting vectors ;
+pango.cairo.ffi cairo.ffi sequences sorting splitting.monotonic vectors ;
 IN: ui.text.pango.indexed
 
 ! Public Pango ABI structures. Keep these names separate from the opaque
@@ -130,10 +130,20 @@ TUPLE: glyph-index regions logical spatial width ink ;
     ] while
     visible [ order>> ] sort-by ;
 
+:: adjacent-glyph-regions? ( a b -- ? )
+    a analysis>> >c-ptr b analysis>> >c-ptr =
+    a order>> 1 + b order>> = and ;
+
 :: draw-indexed-region ( cr index x width -- )
-    index x width visible-glyph-regions [| region |
+    ! Keep overlapping glyphs in one Cairo operation. Separate operations
+    ! composite their antialiased edges differently from the native run.
+    index x width visible-glyph-regions
+    [ adjacent-glyph-regions? ] monotonic-split-slice [| regions |
+        regions first :> region
+        regions 0 [ glyphs>> num-glyphs>> + ] reduce :> count
+        region glyphs>> clone count >>num-glyphs :> glyphs
         cr region x>> region y>> cairo_move_to
-        cr region font>> region glyphs>> pango_cairo_show_glyph_string
+        cr region font>> glyphs pango_cairo_show_glyph_string
     ] each ;
 
 :: region-at-offset ( offset regions -- region )
