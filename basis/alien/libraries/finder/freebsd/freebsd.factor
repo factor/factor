@@ -23,5 +23,4 @@ PRIVATE>
 
 M: freebsd find-library*
     "l" prepend load-ldconfig-cache
-    [ name-matches? ] with find nip ?first [ ".so" append ] ?call ;
-
+    [ name-matches? ] with find nip ?second "/" split ?last ;
