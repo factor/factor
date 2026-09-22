@@ -25,7 +25,7 @@ ABOUT: "tools.crossref"
 HELP: uses
 { $values { "defspec" "a definition specifier" } { "seq" "a sequence of definition specifiers" } }
 { $description "Outputs a sequence of definitions called by the given definition." }
-{ $notes "The sequence might include the definition itself, if it is a recursive word." }
+{ $notes "The sequence might include the definition itself, if it is a recursive word. References inside literal vectors and hashtables (including wrapped hashtables) are traversed, as are the definitions of uninterned words." }
 { $examples
     "We can ask the " { $link sq } " word to produce a list of words it calls:"
     { $unchecked-example "\\ sq uses ." "{ dup * }" }

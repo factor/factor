@@ -2,10 +2,10 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
 combinators.smart compiler.units fry generic generic.single
-hash-sets.identity hashtables help help.crossref help.markup
+hash-sets.identity hashtables hashtables.wrapped help help.crossref help.markup
 help.topics init io io.pathnames io.styles kernel namespaces
 quotations see sequences sets sorting source-files threads
-vocabs words ;
+vectors vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -20,8 +20,6 @@ GENERIC#: quot-uses 1 ( obj set -- )
 
 M: object quot-uses 2drop ;
 
-M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
-
 : seq-uses ( seq set -- )
     over visited get ?adjoin [
         [ quot-uses ] curry each
@@ -32,9 +30,18 @@ M: word quot-uses over crossref? [ adjoin ] [ 2drop ] if ;
         [ quot-uses ] curry [ bi@ ] curry assoc-each
     ] [ 2drop ] if ; inline
 
+M: word quot-uses
+    over vocabulary>> [
+        over crossref? [ adjoin ] [ 2drop ] if
+    ] [
+        [ def>> ] dip seq-uses
+    ] if ;
+
 M: array quot-uses seq-uses ;
+M: vector quot-uses seq-uses ;
 
 M: hashtable quot-uses assoc-uses ;
+M: wrapped-hashtable quot-uses assoc-uses ;
 
 M: callable quot-uses seq-uses ;
 

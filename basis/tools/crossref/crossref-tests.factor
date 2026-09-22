@@ -1,4 +1,5 @@
-USING: fry math kernel sequences io.files io.pathnames
+USING: arrays quotations vectors hashtables.identity
+hashtables.numbers hashtables.sequences fry math kernel sequences io.files io.pathnames
 tools.crossref tools.crossref.private tools.test parser
 namespaces source-files generic definitions words accessors
 compiler.units classes ;
@@ -73,3 +74,24 @@ M: sequence generic-forget-test-2 = ;
     \ = usage [ word? ] filter
     [ name>> "sequence=>generic-forget-test-2" = ] any?
 ] unit-test
+
+! #2832: quotation literals can contain vectors and uninterned words.
+: literal-target ( -- ) ;
+{ t } [ \ literal-target [ V{ [ literal-target ] } ] uses member? ] unit-test
+
+{ t } [
+    [ gensym dup [ literal-target ] define ] with-compilation-unit
+    1quotation uses \ literal-target swap member?
+] unit-test
+
+! Self-referential vectors must not make the traversal loop forever.
+{ t } [
+    V{ } clone dup dup push
+    [ literal-target ] over push
+    1quotation uses \ literal-target swap member?
+] unit-test
+
+{ t } [ \ literal-target [ IH{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ NH{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ SH{ { { 0 } [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ IH{ { [ literal-target ] 0 } } ] uses member? ] unit-test
