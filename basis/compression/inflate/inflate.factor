@@ -29,23 +29,24 @@ ERROR: bad-gzip-header ;
 : read-until-terminated ( data -- data ) 
     [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
-:: interpret-flag ( flg data -- )
+:: interpret-flag ( flg start data -- )
     flg 0xe0 bitand zero? [ bad-gzip-header ] unless
     48 data bs:seek ! MTIME, XFL, OS
     flg 4 bitand zero? [ 16 data bs:read 8 * data bs:seek ] unless
     flg 8 bitand zero? [ data read-until-terminated drop ] unless
     flg 16 bitand zero? [ data read-until-terminated drop ] unless
     flg 2 bitand zero? [
-        data [ bytes>> ] [ byte-pos>> ] bi head
+        start data byte-pos>> data bytes>> subseq
         crc32 checksum-bytes be> 0xffff bitand
         16 data bs:read assert=
     ] unless ;
 
 :: check-gzip-header ( data -- )
+    data byte-pos>> :> start
     8 data bs:read 31 assert=   ! ID 1
     8 data bs:read 139 assert=  ! ID 2 
     8 data bs:read 8 assert=    ! compression method: deflate
-    8 data bs:read data interpret-flag
+    8 data bs:read start data interpret-flag
     ;
 
 
@@ -194,11 +195,21 @@ PRIVATE>
     [ check-zlib-header ] [ inflate-loop ] bi
     inflate-lz77 ;
 
-:: gzip-inflate ( bytes -- bytes' )
-    bytes bs:<lsb0-bit-reader> :> data
+<PRIVATE
+
+:: (gzip-member) ( data -- decoded )
     data check-gzip-header
     data inflate-loop inflate-lz77 :> decoded
     8 data bs:align
     decoded crc32 checksum-bytes be> 32 data bs:read assert=
     decoded length 0xffffffff bitand 32 data bs:read assert=
     decoded ;
+
+
+PRIVATE>
+
+:: gzip-inflate ( bytes -- bytes' )
+    bytes empty? [ bad-gzip-header ] when
+    bytes bs:<lsb0-bit-reader> :> data
+    [ data byte-pos>> bytes length < ]
+    [ data (gzip-member) ] produce concat >byte-array ;

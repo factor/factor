@@ -154,3 +154,21 @@ B{
 [
     B{ 31 139 8 2 0 0 0 0 0 255 145 201 203 72 205 201 201 7 0 134 166 16 54 5 0 0 0 } gzip-inflate
 ] must-fail
+
+! Gzip streams may contain multiple independently checksummed members.
+{ B{ 111 110 101 116 119 111 } } [
+    B{ 31 139 8 0 0 0 0 0 2 255 203 207 75 5 0 241 134 108 122 3 0 0 0 31 139 8 0 0 0 0 0
+        2 255 43 41 207 7 0 102 138 202 17 3 0 0 0 } gzip-inflate
+] unit-test
+
+! Header checksums are relative to each member, not the whole stream.
+{ B{ 111 110 101 116 119 111 } } [
+    B{ 31 139 8 0 0 0 0 0 2 255 203 207 75 5 0 241 134 108 122 3 0 0 0 31 139 8 2 0 0 0 0
+        0 255 144 201 43 41 207 7 0 102 138 202 17 3 0 0 0 } gzip-inflate
+] unit-test
+
+! A corrupt later member must not be silently ignored.
+[
+    B{ 31 139 8 0 0 0 0 0 2 255 203 207 75 5 0 241 134 108 122 3 0 0 0 31 139 8 2 0 0 0 0
+        0 255 144 201 43 41 207 7 0 103 138 202 17 3 0 0 0 } gzip-inflate
+] must-fail
