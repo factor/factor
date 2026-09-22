@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Joe Groff, Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.singleton
-combinators delegate hashtables kernel math parser sequences words ;
+combinators delegate hashtables kernel math parser sequences
+stack-checker.dependencies words ;
 IN: alien.enums
 
 <PRIVATE
@@ -27,11 +28,18 @@ M: word enum>number "enum-value" word-prop ;
     ] if ;
 PRIVATE>
 
+! Expansion callers must track the generator and use its new definition
+! while a compilation unit is still installing replacement code.
 MACRO: number>enum ( enum-c-type -- quot )
-    lookup-c-type members>> enum-boxer ;
+    lookup-c-type members>>
+    \ enum-boxer dup +definition+ depends-on
+    def>> call( members -- quot ) ;
 
 M: enum-c-type c-type-boxed-class drop object ;
-M: enum-c-type c-type-boxer-quot members>> enum-boxer ;
+M: enum-c-type c-type-boxer-quot
+    members>>
+    \ enum-boxer dup +definition+ depends-on
+    def>> call( members -- quot ) ;
 M: enum-c-type c-type-unboxer-quot drop [ enum>number ] ;
 M: enum-c-type c-type-setter
     [ enum>number ] swap base-type>> c-type-setter '[ _ 2dip @ ] ;

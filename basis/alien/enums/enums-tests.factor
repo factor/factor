@@ -1,7 +1,8 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.enums alien.enums.private
-alien.syntax kernel sequences tools.test words ;
+USING: accessors alien.c-types alien.data alien.enums
+alien.enums.private alien.syntax compiler.units continuations
+kernel locals sequences tools.test words ;
 IN: alien.enums.tests
 
 ENUM: color_t red { green 3 } blue ;
@@ -64,3 +65,21 @@ ENUM: large-enum
 { t } [
     33 <iota> dup [ <large-enum> enum>number ] map sequence=
 ] unit-test
+
+! Macro-generated callers must be rebuilt when the boxer generator changes.
+: enum-reload-fixture ( n -- enum ) large-enum number>enum ;
+: enum-ref-reload-fixture ( ref -- enum ) large-enum deref ;
+
+:: check-boxer-reload ( -- before before-ref changed changed-ref restored restored-ref )
+    \ enum-boxer def>> :> saved
+    1 large-enum <ref> :> ref
+    1 enum-reload-fixture ref enum-ref-reload-fixture
+    [
+        [ \ enum-boxer [ drop [ drop f ] ] define ] with-compilation-unit
+        1 enum-reload-fixture ref enum-ref-reload-fixture
+    ] [
+        [ \ enum-boxer saved define ] with-compilation-unit
+    ] finally
+    1 enum-reload-fixture ref enum-ref-reload-fixture ;
+
+{ e01 e01 f f e01 e01 } [ check-boxer-reload ] unit-test
