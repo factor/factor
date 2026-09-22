@@ -333,11 +333,17 @@ TUPLE: multi-texture < disposable grid display-list loc ;
         ] when
     ] [ glPopClientAttrib ] finally ;
 
+: texture-wrap-mode ( -- mode )
+    "1.2" has-gl-version? [ GL_CLAMP_TO_EDGE ] [
+        { { "GL_EXT_texture_edge_clamp" "GL_SGIS_texture_edge_clamp" } }
+        has-gl-extensions? GL_CLAMP_TO_EDGE GL_CLAMP ?
+    ] if ;
+
 : init-texture ( -- )
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S texture-wrap-mode glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T texture-wrap-mode glTexParameteri ;
 
 : with-texturing ( quot -- )
     GL_TEXTURE_2D [
