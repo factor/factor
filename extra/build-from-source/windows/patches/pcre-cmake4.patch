@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,7 +77,7 @@ PROJECT(PCRE C CXX)
+ # CMP0026 to avoid warnings for the use of LOCATION in GET_TARGET_PROPERTY.
+
+ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.5)
+-CMAKE_POLICY(SET CMP0026 OLD)
++CMAKE_POLICY(SET CMP0026 NEW)
+
+ # For FindReadline.cmake. This was changed to allow setting CMAKE_MODULE_PATH
+ # on the command line.
