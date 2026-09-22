@@ -61,9 +61,9 @@ FUNCTION: c-string class_getName ( Class cls )
 
 FUNCTION: Boolean class_isMetaClass ( Class cls )
 
-FUNCTION: Method class_getInstanceVariable ( Class class, c-string str )
+FUNCTION: Ivar class_getInstanceVariable ( Class class, c-string str )
 
-FUNCTION: Method class_getClassVariable ( Class class, c-string str )
+FUNCTION: Ivar class_getClassVariable ( Class class, c-string str )
 
 FUNCTION: uint8_t* class_getIvarLayout ( Class class )
 
