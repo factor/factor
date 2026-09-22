@@ -222,3 +222,11 @@ TUPLE: person first-name last-name ;
         [ "test20" test-template call-template ] run-template
     ] with-variable
 ] unit-test
+
+{ "<iframe src=\"x\"></iframe>" } [
+    [ "test22" test-template call-template ] run-template
+] unit-test
+
+{ "<col span=\"2\" /><wbr />" } [
+    [ "test23" test-template call-template ] run-template
+] unit-test
