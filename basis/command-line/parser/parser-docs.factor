@@ -25,6 +25,12 @@ Some variables control certain aspects of the parsing:
     { { $link program-epilog } { "Some text to include in the help display after the options." } }
 }
 
+Option values can follow the option as a separate argument, as in
+{ $snippet "--host localhost" } , or be attached with an equals sign, as in
+{ $snippet "--host=localhost" } . The attached form also accepts empty values
+and values starting with a dash. Options that take no arguments and negated
+options do not accept attached values.
+
 In the case that you want to pass an option lookalike as a positional argument,
 for example { $snippet "--foo" } then you can pass it after { $snippet "--" }
 to indicate that the remaining arguments should be interpreted as positional

@@ -298,3 +298,56 @@ TUPLE: foo ;
         { "-n" "1" "--" "2" "3" }
     } [ (parse-options) ] with map
 ] unit-test
+
+! GitHub issue #2994: values attached with an equals sign.
+{ H{ { "foo" "" } { "bar" { "-a" "b" } } { "flag" t } } } [
+    {
+        T{ option { name "--foo" } { #args "?" } { const "default" } }
+        T{ option { name "--bar" } { #args "+" } }
+        T{ option { name "--flag" } { const t } }
+    } { "--foo=" "--bar=-a" "b" "--flag" } (parse-options)
+] unit-test
+
+[
+    { T{ option { name "--port" } { type integer } } }
+    { "--port=abc" } (parse-options)
+] [ invalid-value? ] must-fail-with
+
+{ H{ { "host" "localhost" } { "port" -42 } { "rest" "tail" } } } [
+    {
+        T{ option { name "--host" } }
+        T{ option { name "--port" } { type integer } }
+        T{ option { name "rest" } }
+    } { "--host=localhost" "--port=-42" "tail" } (parse-options)
+] unit-test
+
+{ { H{ { "host" "" } } H{ { "host" "a=b=c" } } } } [
+    { T{ option { name "--host" } } }
+    { { "--host=" } { "--host=a=b=c" } }
+    [ (parse-options) ] with map
+] unit-test
+
+{ H{ { "pair" { "a" "b" } } } } [
+    { T{ option { name "--pair" } { #args 2 } } }
+    { "--pair=a" "b" } (parse-options)
+] unit-test
+
+{ H{ { "host" "localhost" } } } [
+    { T{ option { name "--host" } } }
+    { "--hos=localhost" } (parse-options)
+] unit-test
+
+{ H{ { "host" "--host=a=b" } } } [
+    { T{ option { name "--host" } } T{ option { name "host" } } }
+    { "--" "--host=a=b" } (parse-options)
+] unit-test
+
+[
+    { T{ option { name "--flag" } { const t } } }
+    { "--flag=value" } (parse-options)
+] [ invalid-value? ] must-fail-with
+
+[
+    { T{ option { name "--flag" } { const t } } }
+    { "--no-flag=value" } (parse-options)
+] [ invalid-value? ] must-fail-with

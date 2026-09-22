@@ -255,10 +255,17 @@ M: usage-error error. options>> print-help ;
     [ [ option-variable ] [ default>> ] bi ] H{ } map>assoc ;
 
 :: parse-optional ( options command-line -- command-line' )
-    command-line unclip [ CHAR: - = ] trim-head
-    "no-" ?head [ options find-option ] dip
-    [ f swap ] [ [ option-value ] keep ] if
-    option-variable set ;
+    command-line unclip :> ( args arg )
+    arg [ CHAR: - = ] trim-head "=" split1 :> ( name value )
+    name "no-" ?head :> ( positive-name negated? )
+    positive-name options find-option :> option
+    value [
+        negated? option option-#args { f 0 } member? or
+        [ option value invalid-value ] when
+    ] when
+    args value [ prefix ] when*
+    negated? [ f ] [ option option-value ] if
+    option option-variable set ;
 
 : parse-positional ( option command-line -- command-line' )
     swap [ option-value ] [ option-variable set ] bi ;
