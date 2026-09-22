@@ -104,19 +104,31 @@ IN: mason.test
     user-init-errors get-global assoc-empty?
     [ f ] [ :user-init-errors t ] if ;
 
+: mason-phase. ( name -- )
+    "Mason phase: " write print-timestamp ;
+
 : do-all ( -- )
     f parser-quiet? set-global
     f restartable-tests? set-global
     ".." [
+        "user init" mason-phase.
         run-mason-rc check-user-init-errors [ 1 exit ] when
         bootstrap-time get boot-time-file to-file
+        "check boot image" mason-phase.
         check-boot-image [ 1 exit ] when
+        "load-all" mason-phase.
         [ do-load ] benchmark load-time-file to-file
+        "generate-help" mason-phase.
         [ generate-help ] benchmark html-help-time-file to-file
+        "test-all" mason-phase.
         [ do-tests ] benchmark test-time-file to-file
+        "help-lint" mason-phase.
         [ do-help-lint ] benchmark help-lint-time-file to-file
+        "benchmarks" mason-phase.
         [ do-benchmarks ] benchmark benchmark-time-file to-file
+        "compiler errors" mason-phase.
         do-compile-errors
+        "complete" mason-phase.
     ] with-directory ;
 
 MAIN: do-all

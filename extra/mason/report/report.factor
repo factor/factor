@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators.smart debugger formatting
 io.encodings.utf8 io.files io.streams.string kernel literals
-mason.common mason.config mason.disk math namespaces prettyprint
+mason.common mason.config mason.disk math math.order namespaces prettyprint
 sequences sets splitting xml.syntax xml.writer ;
 IN: mason.report
 
@@ -44,13 +44,37 @@ IN: mason.report
 : file-tail ( file encoding lines -- seq )
     [ file-lines ] dip index-or-length tail* join-lines ;
 
+! A VM memory-layout dump can be much longer than the log tail.
+! Keep the fatal error and the test output immediately before it too.
+: crash-line? ( line -- ? )
+    { "fatal_error:" "critical_error:" "assertion \"" }
+    [ head? ] with any? ;
+
+:: failure-excerpt ( lines -- string )
+    lines length 400 - 0 max :> tail-start
+    lines [ crash-line? ] find-last drop :> crash
+    crash [ crash tail-start < ] [ f ] if [
+        crash 41 + tail-start min :> context-end
+        crash 100 - 0 max context-end lines subseq
+        context-end tail-start < [
+            { "... (log lines omitted; last 400 log lines follow) ..." }
+            append
+        ] when
+        lines tail-start tail append
+    ] [
+        lines tail-start tail
+    ] if join-lines ;
+
 :: failed-report ( error file what -- status )
     [
         error [ error. ] with-string-writer :> error
-        file utf8 400 file-tail :> output
+        file utf8 file-lines :> lines
+        lines failure-excerpt :> output
+        lines [ "Mason phase: " head? ] find-last nip :> phase
 
         [XML
         <h2><-what-></h2>
+        <pre><-phase-></pre>
         Build output:
         <pre><-output-></pre>
         Launcher error:

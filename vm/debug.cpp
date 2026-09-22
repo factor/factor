@@ -278,15 +278,20 @@ void dump_generation(ostream& out, const char* name, Generation* gen) {
   dump_memory_range(out, name, 10, gen->start, gen->end);
 }
 
-void factor_vm::dump_memory_layout(ostream& out) {
+void factor_vm::dump_memory_layout(ostream& out, bool full) {
   dump_generation(out, "Nursery", data->nursery);
   dump_generation(out, "Aging", data->aging);
   dump_generation(out, "Tenured", data->tenured);
   dump_memory_range(out, "Cards", 10, (cell)data->cards, (cell)data->cards_end);
 
-  out << endl << "Contexts:" << endl << endl;
+  out << endl << "Contexts: " << active_contexts.size() << endl;
+  if (!full)
+    out << "Only the current context's stacks are shown." << endl;
+  out << endl;
   FACTOR_FOR_EACH(active_contexts) {
     context* the_ctx = *iter;
+    if (!full && the_ctx != ctx)
+      continue;
     segment* ds = the_ctx->datastack_seg;
     segment* rs = the_ctx->retainstack_seg;
     segment* cs = the_ctx->callstack_seg;

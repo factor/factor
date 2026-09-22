@@ -389,7 +389,7 @@ struct factor_vm {
   void print_callstack_object(ostream& out, callstack* obj);
   void dump_cell(ostream& out, cell x);
   void dump_memory(ostream& out, cell from, cell to);
-  void dump_memory_layout(ostream& out);
+  void dump_memory_layout(ostream& out, bool full = true);
   void dump_objects(ostream& out, cell type);
   void dump_edges(ostream& out);
   void find_data_references(ostream& out, cell look_for_);

@@ -27,7 +27,10 @@ void fatal_error(const char* msg, cell tagged) {
   std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
   if (vm->data) {
-    vm->dump_memory_layout(std::cout);
+    // Mason reports only the last 400 log lines. Dumping every suspended
+    // context can hide both this error and the test that triggered it.
+    // The low-level debugger still offers the full memory layout.
+    vm->dump_memory_layout(std::cout, false);
   }
   abort();
 }
