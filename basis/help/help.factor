@@ -67,7 +67,14 @@ M: word word-help* stack-effect effect-help ;
 
 M: predicate word-help* \ $predicate swap 2array 1array ;
 
-M: class word-help* drop f ;
+M: class word-help*
+    "enum-value" word-prop [
+        [
+            \ $description ,
+            "An enumeration member with value " ,
+            \ $snippet swap unparse 2array , "." ,
+        ] { } make 1array
+    ] [ f ] if* ;
 
 M: alias word-help*
     [

@@ -1,4 +1,4 @@
-USING: accessors effects help help.markup help.syntax help.topics kernel
+USING: accessors alien.syntax effects help help.markup help.syntax help.topics kernel
 sequences tools.test words ;
 IN: help.tests
 
@@ -24,4 +24,13 @@ CONSTANT: undocumented-constant 42
 { { "value" } } [ \ documented-constant stack-effect out>> ] unit-test
 { { { $outputs { "value" object } } } } [
     \ $outputs \ undocumented-constant word-help elements
+] unit-test
+
+! #2193: enumeration members should expose their numeric value in help.
+ENUM: help-enum { help-enum-zero 0 } { help-enum-negative -10 } ;
+{ { { $description "An enumeration member with value " { $snippet "0" } "." } } } [
+    \ help-enum-zero word-help
+] unit-test
+{ { { $description "An enumeration member with value " { $snippet "-10" } "." } } } [
+    \ help-enum-negative word-help
 ] unit-test

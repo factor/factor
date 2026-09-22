@@ -132,6 +132,7 @@ ARTICLE: "help-impl" "Help system implementation"
     word-help*
 }
 "A constant's documented output name is used in its help title and output section, without changing its declared stack effect."
+"Enumeration members without explicit help display their numeric value."
 "Help article implementation:"
 { $subsections
     lookup-article
