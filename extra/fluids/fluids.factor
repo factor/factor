@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.data classes.struct destructors game.loop
 game.worlds gpu gpu.effects.blur gpu.effects.step gpu.state
-gpu.textures gpu.util images.loader kernel literals make math
+gpu.textures gpu.util images.loader images.pgm images.ppm kernel literals make math
 math.vectors namespaces sequences specialized-arrays
 ui.gadgets.worlds ui.gestures ui.pixel-formats ;
 FROM: alien.c-types => float ;
