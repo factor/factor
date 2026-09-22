@@ -814,6 +814,7 @@ TUPLE: action-field < field quot ;
 
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }
+    { T{ key-down f f "ENTER" } [ invoke-action-field ] }
 } set-gestures
 
 : readline-bindings ( editor-class -- )

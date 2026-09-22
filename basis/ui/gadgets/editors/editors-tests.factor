@@ -118,3 +118,18 @@ M: measurement-test-renderer string-dim
     dup pref-viewport-dim >>dim
     visible-lines
 ] unit-test
+
+! #2742: keypad Enter submits an action field just like Return.
+SYMBOL: submitted-action-text
+:: test-action-field-key ( gesture -- handled submitted remaining )
+    f submitted-action-text [
+        [ submitted-action-text set ] <action-field> :> field
+        "query" field editor>> set-editor-string
+        gesture field handle-gesture not
+        submitted-action-text get
+        field editor>> editor-string
+    ] with-variable ;
+
+{ t "query" "" } [ T{ key-down f f "RET" } test-action-field-key ] unit-test
+{ t "query" "" } [ T{ key-down f f "ENTER" } test-action-field-key ] unit-test
+{ f f "query" } [ T{ key-down f { S+ } "ENTER" } test-action-field-key ] unit-test
