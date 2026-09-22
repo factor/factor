@@ -137,7 +137,7 @@ require-when-table [ V{ } clone ] initialize
 PRIVATE>
 
 : require-when ( if then -- )
-    over [ lookup-vocab ] all? [
+    over [ lookup-vocab dup [ source-loaded?>> +done+ = ] when ] all? [
         require drop
     ] [
         [ drop require-when-vocabs get adjoin-all ]

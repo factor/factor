@@ -1,5 +1,5 @@
 USING: accessors combinators continuations init kernel math
-namespaces sequences system ui.backend vocabs words ;
+namespaces sequences system ui.backend vocabs vocabs.loader words ;
 IN: game.input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -114,7 +114,13 @@ SYMBOLS: pressed released ;
             { "gtk4-ui-backend" [ "game.input.gtk4" ] }
             { "gtk3-ui-backend" [ "game.input.gtk3" ] }
             [ drop "game.input.gtk2" ]
-        } case require
+        } case dup "game.input.gtk2" = [ require ] [
+            ! Shared support may itself be the vocabulary being loaded.
+            ! Wait for its definitions before registering the selected backend.
+            { "game.input" "game.input.linux" } "game.input.gtk" require-when
+            { "game.input" "game.input.gtk" } swap require-when
+            "game.input.linux" require
+        ] if
     ] }
     [ ]
 } cond

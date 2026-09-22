@@ -200,3 +200,18 @@ forget-junk
 { t } [ "kernel" vocab-exists? >boolean ] unit-test
 { f } [ "foobar" vocab-exists? ] unit-test
 { f } [ "invalid:/\\ \"" vocab-exists? ] unit-test
+
+! Conditional dependencies must wait until the prerequisite finishes
+! parsing, even when its vocabulary object already exists.
+[
+    "vocabs.loader.test.q" forget-vocab
+    "vocabs.loader.test.r" forget-vocab
+] with-compilation-unit
+{ } [ "vocabs.loader.test.q" require ] unit-test
+{ 42 } [
+    "USING: vocabs.loader.test.r ; uses-completed-vocab" eval( -- n )
+] unit-test
+[
+    "vocabs.loader.test.q" forget-vocab
+    "vocabs.loader.test.r" forget-vocab
+] with-compilation-unit
