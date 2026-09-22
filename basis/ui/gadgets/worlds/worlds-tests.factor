@@ -8,6 +8,20 @@ IN: ui.gadgets.worlds.tests
 TUPLE: test-gl-context ;
 M: test-gl-context select-gl-context drop ;
 
+TUPLE: test-drawable-handle ready? ;
+M: test-drawable-handle window-drawable? ready?>> ;
+
+! A mapped world can have preferred dimensions before its native drawing
+! surface has been allocated. Defer drawing until that surface is ready.
+{ f t } [
+    T{ world
+        { active? t } { dim { 640 360 } }
+        { handle T{ test-drawable-handle } }
+    } clone
+    dup draw-world? swap
+    T{ test-drawable-handle { ready? t } } >>handle draw-world?
+] unit-test
+
 :: check-render-state-switching ( -- ? )
     world get-global :> previous-world
     gl3-state> :> previous-state

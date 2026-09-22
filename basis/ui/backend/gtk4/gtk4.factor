@@ -1,7 +1,7 @@
 ! Copyright (C) 2026 Factor contributors.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings arrays
-assocs cairo.ffi classes.struct combinators concurrency.promises
+assocs cairo.ffi classes.struct combinators combinators.short-circuit concurrency.promises
 continuations destructors environment gdk4.ffi gio.ffi glib.backend
 glib.ffi gobject gobject.ffi gtk4.ffi io.encodings.string
 io.encodings.utf8 kernel literals locals math math.bitwise math.vectors memoize namespaces
@@ -241,6 +241,15 @@ M: gtk4-ui-backend current-gl-context gdk_gl_context_get_current ;
 
 M: window-handle window-framebuffer framebuffer>> ;
 
+M: window-handle window-drawable?
+    drawable>> {
+        [ gtk_widget_get_mapped ]
+        [ gtk_widget_get_width 0 > ]
+        [ gtk_widget_get_height 0 > ]
+    } 1&& ;
+
+ERROR: gtk4-incomplete-framebuffer framebuffer status ;
+
 M: window-handle select-gl-context
     dup drawable>>
     [ gtk_gl_area_make_current ]
@@ -249,7 +258,15 @@ M: window-handle select-gl-context
         ! The area has no framebuffer until GTK gives it a positive size.
         ! Attaching at initial realization otherwise leaves GL_INVALID_OPERATION.
         dup [ gtk_widget_get_width ] [ gtk_widget_get_height ] bi
-        [ 0 > ] bi@ and [ gtk_gl_area_attach_buffers ] [ drop ] if
+        [ 0 > ] bi@ and [
+            gtk_gl_area_attach_buffers
+            GL_FRAMEBUFFER glCheckFramebufferStatus
+            dup GL_FRAMEBUFFER_COMPLETE = [ drop ] [
+                GL_DRAW_FRAMEBUFFER_BINDING { int }
+                [ glGetIntegerv ] with-out-parameters
+                swap gtk4-incomplete-framebuffer
+            ] if
+        ] [ drop ] if
     ] tri
     GL_DRAW_FRAMEBUFFER_BINDING 0 int <ref>
     [ glGetIntegerv ] keep int deref >>framebuffer drop ;

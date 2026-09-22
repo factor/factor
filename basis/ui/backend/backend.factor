@@ -28,6 +28,10 @@ M: object current-gl-context f ;
 GENERIC: window-framebuffer ( handle -- framebuffer )
 M: object window-framebuffer drop 0 ;
 
+! Toolkit allocation can lag behind the world's preferred dimensions.
+GENERIC: window-drawable? ( handle -- ? )
+M: object window-drawable? drop t ;
+
 GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )
