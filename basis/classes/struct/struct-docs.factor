@@ -163,6 +163,7 @@ ARTICLE: "classes.struct.create" "Creating instances of structs"
     memory>struct
 }
 "Fixed-length array fields require a source buffer with exactly the field's byte length, both in constructors and slot setters. A mismatched buffer throws " { $link bad-struct-array-length } ". Raw " { $link alien } " pointers have no declared length and are copied without this check."
+$nl
 "When the contents of a struct will be immediately reset, faster primitive words are available that will create a struct without initializing its contents:"
 { $subsections
     (struct)

@@ -20,6 +20,7 @@ ARTICLE: "compiler.cfg.register-allocation" "Selecting a register allocator"
         "linear-scan-allocator register-allocator"
         "[ [ + ] measure-compilation . ] with-variable" }
 "Allocator implementations receive the CFG before SSA destruction so that SSA-based algorithms can use their required invariants. Each implementation must produce a fully allocated CFG."
+$nl
 "Three experimental alternatives are available:"
 { $list
     { { $vocab-link "compiler.cfg.register-allocation.greedy" } ": LLVM-inspired priority allocation with eviction, CFG region placement, local splitting and bounded last-chance recoloring." }

@@ -25,6 +25,7 @@ ARTICLE: "unix.signals:allowed-signals" "Signals that can be handled by Factor"
 
 ARTICLE: "unix.signals" "Signal handlers"
 "The " { $vocab-link "unix.signals" } " vocabulary allows Factor applications to handle a limited subset of Unix signals."
+$nl
 "Delivery is not a reliable event counter: Unix can coalesce pending standard signals, and Factor drops notifications when its nonblocking signal pipe is full."
 { $subsection "unix.signals:allowed-signals" }
 "Factor signal handlers are composable. Adding a signal handler does not replace signal handlers installed by other libraries. Individual signal handlers are added and removed independently with the following words:"
