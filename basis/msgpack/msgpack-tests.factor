@@ -1,4 +1,4 @@
-USING: io.encodings.binary io.streams.byte-array
+USING: byte-arrays io.encodings.binary io.streams.byte-array
 io.streams.string kernel linked-assocs math msgpack sequences
 tools.test ;
 
@@ -68,4 +68,24 @@ tools.test ;
     { "hello" "world" 1234 }
     dup [ >msgpack ] map concat
     binary [ read-msgpacks ] with-byte-reader =
+] unit-test
+
+! All four string headers share UTF-8 decoding, including non-ASCII text.
+{ { "é" "é" "é" "é" } } [
+    {
+        B{ 0xa2 0xc3 0xa9 }
+        B{ 0xd9 2 0xc3 0xa9 }
+        B{ 0xda 0 2 0xc3 0xa9 }
+        B{ 0xdb 0 0 0 2 0xc3 0xa9 }
+    } [ msgpack> ] map
+] unit-test
+
+{ { "" "" "" "" } } [
+    { B{ 0xa0 } B{ 0xd9 0 } B{ 0xda 0 0 } B{ 0xdb 0 0 0 0 } }
+    [ msgpack> ] map
+] unit-test
+
+{ { "é" 42 "" } } [
+    B{ 0xd9 2 0xc3 0xa9 42 0xa0 }
+    binary [ read-msgpacks ] with-byte-reader
 ] unit-test

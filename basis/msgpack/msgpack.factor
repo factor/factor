@@ -30,6 +30,9 @@ ERROR: unknown-format n ;
 
 <PRIVATE
 
+: read-msgpack-string ( n -- str )
+    read utf8 decode ;
+
 : (read-msgpack) ( n -- obj )
     {
         { [ dup 0xc0 = ] [ drop +msgpack-nil+ ] }
@@ -47,10 +50,10 @@ ERROR: unknown-format n ;
         { [ dup 0xd3 = ] [ drop 8 read signed-be> ] }
         { [ dup 0xca = ] [ drop 4 read be> bits>float ] }
         { [ dup 0xcb = ] [ drop 8 read be> bits>double ] }
-        { [ dup 0xe0 mask 0xa0 = ] [ 0x1f mask read utf8 decode ] }
-        { [ dup 0xd9 = ] [ drop read1 read utf8 decode ] }
-        { [ dup 0xda = ] [ drop 2 read be> read utf8 decode ] }
-        { [ dup 0xdb = ] [ drop 4 read be> read utf8 decode ] }
+        { [ dup 0xe0 mask 0xa0 = ] [ 0x1f mask read-msgpack-string ] }
+        { [ dup 0xd9 = ] [ drop read1 read-msgpack-string ] }
+        { [ dup 0xda = ] [ drop 2 read be> read-msgpack-string ] }
+        { [ dup 0xdb = ] [ drop 4 read be> read-msgpack-string ] }
         { [ dup 0xc4 = ] [ drop read1 read B{ } like ] }
         { [ dup 0xc5 = ] [ drop 2 read be> read B{ } like ] }
         { [ dup 0xc6 = ] [ drop 4 read be> read B{ } like ] }
