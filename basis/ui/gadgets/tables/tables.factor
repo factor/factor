@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators
+USING: accessors arrays classes colors combinators
 combinators.short-circuit fonts kernel math math.functions
 math.order math.rectangles math.vectors models namespaces opengl
 sequences splitting strings ui.commands ui.gadgets
@@ -53,6 +53,7 @@ focused?
 rows ;
 
 : new-table ( rows renderer class -- table )
+    [ model check-instance ] 2dip
     new-line-gadget
         swap >>renderer
         swap >>model

@@ -1,6 +1,6 @@
 IN: ui.gadgets.tables.tests
 USING: ui.gadgets.tables ui.gadgets.scrollers ui.gadgets.debug accessors
-models namespaces tools.test kernel combinators prettyprint arrays ;
+models namespaces tools.test kernel combinators prettyprint arrays classes ;
 
 SINGLETON: test-renderer
 
@@ -59,4 +59,18 @@ M: silly-renderer column-titles drop { "Foo" } ;
     test-table dup [
         selected-row
     ] with-grafted-gadget
+] unit-test
+
+! GitHub issue #1269: reject invalid models before grafting a table.
+[
+    { 1 2 } trivial-renderer <table>
+] [ not-an-instance? ] must-fail-with
+
+[
+    { 1 2 } trivial-renderer table new-table
+] [ not-an-instance? ] must-fail-with
+
+{ t } [
+    { { "1" "2" } } <model>
+    dup trivial-renderer <table> model>> eq?
 ] unit-test
