@@ -612,10 +612,13 @@ CONSTANT: re-recent-weather R/ ((\w{2})?[BE]\d{2,4}((\w{2})?[BE]\d{2,4})?)+/
     [ blank? ] split-when { "RMK" } split1
     [ metar-body ] [ metar-remarks ] bi* ;
 
+: row-value. ( value -- )
+    [ 65 wrap-string write ] when* ;
+
 : row. ( name quot -- )
     '[
         [ _ write ] with-cell
-        [ @ [ 65 wrap-string write ] when* ] with-cell
+        [ @ row-value. ] with-cell
     ] with-row ; inline
 
 : calc-humidity ( report -- humidity/f )

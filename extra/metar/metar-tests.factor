@@ -1,4 +1,4 @@
-USING: metar.private tools.test ;
+USING: io.streams.string io.styles metar.private sequences tools.test ;
 
 { { "RAB05" "E30" "SNB20" "E55" } }
 [ "RAB05E30SNB20E55" split-recent-weather ] unit-test
@@ -16,3 +16,19 @@ USING: metar.private tools.test ;
 { "5km" } [ "5000" parse-visibility ] unit-test
 { "more than 10km" } [ "9999" parse-visibility ] unit-test
 { "more than 10km north" } [ "9999N" parse-visibility ] unit-test
+
+{ "Label value" } [
+    [ standard-table-style [ "Label" [ "value" ] row. ] tabular-output ]
+    with-string-writer
+] unit-test
+
+{ "Empty " } [
+    [ standard-table-style [ "Empty" [ f ] row. ] tabular-output ]
+    with-string-writer
+] unit-test
+
+{ "Long abcdefghij abcdefghij abcdefghij abcdefghij abcdefghij abcdefghij\n     abcdefghij abcdefghij" } [
+    [ standard-table-style [
+        "Long" [ 8 "abcdefghij " <repetition> concat ] row.
+    ] tabular-output ] with-string-writer
+] unit-test
