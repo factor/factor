@@ -4,6 +4,10 @@ IN: prettyprint.config
 
 ABOUT: "prettyprint-variables"
 
+HELP: with-default-pprint-config
+{ $values { "quot" quotation } }
+{ $description "Calls a quotation in a new dynamic scope with the default prettyprinter settings. The caller's settings are restored afterward, including when the quotation throws an error. The quotation can override settings within its own scope." } ;
+
 HELP: tab-size
 { $var-description "Prettyprinter tab size. Indent nesting is always a multiple of the tab size." } ;
 

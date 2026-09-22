@@ -25,6 +25,21 @@ t string-limit? set-global
 f has-limits? set-global
 f qualified-names? set-global
 
+: with-default-pprint-config ( quot -- )
+    H{
+        { tab-size 4 }
+        { margin 64 }
+        { nesting-limit 15 }
+        { length-limit 100 }
+        { line-limit f }
+        { number-base 10 }
+        { string-limit? t }
+        { boa-tuples? f }
+        { c-object-pointers? f }
+        { has-limits? f }
+        { qualified-names? f }
+    } clone swap with-variables ; inline
+
 : (with-short-limits) ( quot -- )
     H{
         { line-limit 1 }

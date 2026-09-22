@@ -39,6 +39,8 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 }
 "The default limits are meant to strike a balance between readability, and not producing too much output when large structures are given. There are two combinators that override the defaults:"
 { $subsections with-short-limits without-limits }
+"To run code with all prettyprinter settings reset to their defaults:"
+{ $subsections with-default-pprint-config }
 "That the " { $link short. } " and " { $link pprint-short } " words wrap calls to " { $link . } " and " { $link pprint } " in " { $link with-short-limits } ". Code that uses the prettyprinter for serialization should use " { $link without-limits } " to avoid producing unreadable output." ;
 
 ARTICLE: "prettyprint-limitations" "Prettyprinter limitations"

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects generalizations io
 io.files.temp io.files.unique kernel lexer math math.functions
-math.vectors namespaces parser prettyprint quotations sequences
+math.vectors namespaces parser prettyprint prettyprint.config quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
 system tools.errors tools.time unicode vocabs vocabs.files
@@ -158,7 +158,7 @@ PRIVATE>
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
-        '[ _ run-file ] [
+        '[ _ [ run-file ] with-default-pprint-config ] [
             restartable-tests? get
             [ dup compute-restarts empty? not ] [ f ] if
             [ rethrow ] [ notify-test-file-failed ] if

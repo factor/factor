@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes classes.struct
 classes.tuple combinators combinators.short-circuit debugger
 definitions effects eval formatting grouping help help.markup
 help.topics io io.streams.string kernel macros math
-math.statistics namespaces prettyprint sequences sequences.deep
+math.statistics namespaces prettyprint prettyprint.config sequences sequences.deep
 sets splitting strings summary tools.destructors unicode vocabs
 vocabs.loader words words.constant words.symbol ;
 IN: help.lint.checks
@@ -43,7 +43,7 @@ SYMBOL: vocab-articles
         '[
             _ rest [
                 but-last join-lines
-                (eval-with-stack>string)
+                [ (eval-with-stack>string) ] with-default-pprint-config
                 "\n" ?tail drop
             ] keep
             last assert=

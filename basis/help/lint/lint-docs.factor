@@ -22,7 +22,7 @@ $nl
 $nl
 "Help lint performs the following checks:"
 { $list
-    "ensures examples run and produce stated output"
+    "ensures examples run and produce stated output using default prettyprinter settings; examples can override these settings explicitly"
     { "ensures " { $link $see-also } " elements don't contain duplicate entries" }
     { "ensures " { $link $vocab-link } " elements point to modules which actually exist" }
     { "ensures that " { $link $values } " match the stack effect declaration" }
