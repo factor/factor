@@ -71,3 +71,41 @@ USING: accessors arrays.shaped kernel math sequences tools.test ;
 { 4 } [ { 2 3 4 5 } zeros shaped-array>array ndim ] unit-test
 { 4 } [ { 2 3 4 5 } zeros ndim ] unit-test
 { 1 } [ { } ndim ] unit-test
+
+! Rectangular strides and complete coordinate validation.
+{ 5 } [ { 1 2 } { 2 3 } increasing get-shaped-row-major ] unit-test
+{ 23 } [ { 1 2 3 } { 2 3 4 } increasing get-shaped-row-major ] unit-test
+{ 17 } [ { 1 1 1 } { 2 3 4 } increasing get-shaped-row-major ] unit-test
+{ 9 } [ { 1 1 1 } { 2 3 4 } increasing get-shaped-column-major ] unit-test
+{ 99 } [
+    { 2 3 } increasing 99 { 1 2 } pick set-shaped-row-major
+    underlying>> last
+] unit-test
+[ { 1 } { 2 3 } increasing get-shaped-row-major ]
+[ shaped-bounds-error? ] must-fail-with
+[ { 0 0 0 } { 2 3 } increasing get-shaped-row-major ]
+[ shaped-bounds-error? ] must-fail-with
+[ { -1 0 } { 2 3 } increasing get-shaped-row-major ]
+[ shaped-bounds-error? ] must-fail-with
+[ { 0.5 0 } { 2 3 } increasing get-shaped-row-major ]
+[ shaped-bounds-error? ] must-fail-with
+[ { 0 0 } { 2 0 } zeros get-shaped-row-major ]
+[ shaped-bounds-error? ] must-fail-with
+
+! Broadcasting aligns trailing axes, including zero-sized axes.
+{ t } [ { 2 3 } zeros { 3 } zeros broadcastable? ] unit-test
+{ t } [ { 2 1 } zeros { 1 3 } zeros broadcastable? ] unit-test
+{ t } [ { 0 3 } zeros { 1 3 } zeros broadcastable? ] unit-test
+{ f } [ { 2 3 } zeros { 2 } zeros broadcastable? ] unit-test
+{ f } [ { 0 3 } zeros { 2 3 } zeros broadcastable? ] unit-test
+{ { 2 3 } } [ { 2 1 } zeros { 3 } zeros output-shape ] unit-test
+{ { 0 3 } } [ { 0 3 } zeros { 1 3 } zeros output-shape ] unit-test
+[ { 2 3 } zeros { 2 } zeros output-shape ]
+[ shape-mismatch? ] must-fail-with
+
+! Empty inner dimensions retain their outer structure.
+{ { { } { } } } [ { 2 0 } zeros shaped-array>array ] unit-test
+{ { { { } { } { } } { { } { } { } } } }
+[ { 2 3 0 } zeros shaped-array>array ] unit-test
+{ { { } { } } } [ { 2 0 3 } zeros shaped-array>array ] unit-test
+{ { } } [ { 0 3 } zeros shaped-array>array ] unit-test

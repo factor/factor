@@ -1,7 +1,7 @@
 ! Copyright (C) 2012 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-grouping kernel math math.functions math.order math.vectors
+grouping kernel locals math math.functions math.order math.vectors
 parser prettyprint.custom sequences sequences.deep
 sequences.private ;
 IN: arrays.shaped
@@ -157,13 +157,22 @@ M: sequence >col-array
 : shaped-cos ( a -- b ) [ [ cos ] map ] shaped-unary-op ;
 : shaped-sin ( a -- b ) [ [ sin ] map ] shaped-unary-op ;
 
-: shaped-array>array ( shaped-array -- array )
-    [ underlying>> ] [ shape>> ] bi
-    dup [ zero? ] any? [
-        2drop { }
-    ] [
-        [ rest-slice reverse [ group ] each ] unless-empty
+<PRIVATE
+
+:: nest-shaped ( underlying shape -- array )
+    shape length 1 <= [ underlying >array ] [
+        shape rest :> tail
+        tail product :> width
+        shape first <iota> [| i |
+            i width * dup width + underlying subseq
+            tail nest-shaped
+        ] map
     ] if ;
+
+PRIVATE>
+
+: shaped-array>array ( shaped-array -- array )
+    [ underlying>> ] [ shape>> ] bi nest-shaped ;
 
 : reshape ( shaped-array shape -- array )
     check-underlying-shape
@@ -214,12 +223,17 @@ M: shaped-array pprint-narrow? drop f ;
 
 ERROR: shaped-bounds-error seq shape ;
 
-: shaped-bounds-check ( seq shaped -- seq shaped )
-    2dup shape [ < ] 2all? [ shaped-bounds-error ] unless ;
+:: shaped-bounds-check ( seq shaped -- seq shaped )
+    shaped shape :> dimensions
+    seq length dimensions length = [
+        seq dimensions [| index size |
+            index integer? [ index 0 >= index size < and ] [ f ] if
+        ] 2all?
+    ] [ f ] if [ seq shaped shaped-bounds-error ] unless
+    seq shaped ;
 
-! Inefficient
 : calculate-row-major-index ( seq shape -- i )
-    1 [ * ] accumulate nip reverse vdot ;
+    reverse 1 [ * ] accumulate nip reverse vdot ;
 
 : calculate-column-major-index ( seq shape -- i )
     1 [ * ] accumulate nip vdot ;
@@ -266,19 +280,29 @@ ERROR: 2d-expected shaped ;
     2dup longer length '[ _ 1 pad-head ] bi@
     [ shaped-like ] bi-curry@ bi* ;
 
-: output-shape ( sa0 sa1 -- shape )
-    [ shape>> ] bi@
-    [ 2dup [ zero? ] either? [ max ] [ 2drop 0 ] if ] 2map ;
+<PRIVATE
 
-: broadcast-shape-matches? ( sa broadcast-shape -- ? )
-    [
-        { [ drop 1 = ] [ = ] } 2||
-    ] 2all? ;
+:: aligned-shapes ( sa0 sa1 -- shape0 shape1 )
+    sa0 shape>> :> shape0
+    sa1 shape>> :> shape1
+    shape0 length shape1 length max :> rank
+    shape0 rank 1 pad-head shape1 rank 1 pad-head ;
+
+: compatible-dimensions? ( a b -- ? )
+    { [ = ] [ drop 1 = ] [ nip 1 = ] } 2|| ;
+
+PRIVATE>
 
 : broadcastable? ( sa0 sa1 -- ? )
-    pad-shapes
-    [ [ shape>> ] bi@ ] [ output-shape ] 2bi
-    '[ _ broadcast-shape-matches? ] both? ;
+    aligned-shapes [ compatible-dimensions? ] 2all? ;
+
+:: output-shape ( sa0 sa1 -- shape )
+    sa0 sa1 broadcastable? [
+        sa0 sa1 aligned-shapes [ over 1 = [ nip ] [ drop ] if ] 2map
+    ] [ sa0 sa1 shape-mismatch ] if ;
+
+: broadcast-shape-matches? ( sa broadcast-shape -- ? )
+    [ { [ drop 1 = ] [ = ] } 2|| ] 2all? ;
 
 TUPLE: block-array shaped shape ;
 
