@@ -61,7 +61,12 @@ ERROR: not-persistent class ;
 : user-assigned-id-spec? ( specs -- ? )
     [ primary-key>> +user-assigned-id+? ] any? ;
 
+ERROR: primary-key-policy-required spec ;
+
 : normalize-spec ( spec -- )
+    dup [ type>> ] [ modifiers>> ] bi 2array
+    [ \ +primary-key+ eq? ] deep-any?
+    [ primary-key-policy-required ] when
     dup type>> dup +primary-key+? [
         >>primary-key drop
     ] [

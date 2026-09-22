@@ -19,7 +19,7 @@ HELP: +null+
 { $description "Allows a column to be null." } ;
 
 HELP: +primary-key+
-{ $description "Makes a column a primary key. Only one column may be a primary key." } ;
+{ $description "The union of the concrete primary-key assignment policies. Do not use this class directly in a persistent column specification. Choose " { $link +user-assigned-id+ } ", " { $link +db-assigned-id+ } ", or " { $link +random-id+ } " instead." } ;
 
 HELP: +random-id+
 { $description "Factor chooses a random number and tries to insert the tuple into the database with this number as its primary key. The default number of retries to find a unique random number is 10, though in practice it will almost certainly succeed on the first try." } ;
@@ -188,3 +188,7 @@ ARTICLE: "db.types" "Database types"
 { $subsections URL } ;
 
 ABOUT: "db.types"
+
+HELP: primary-key-policy-required
+{ $values { "spec" sql-spec } }
+{ $description "Thrown when a column specification uses the abstract primary-key class instead of a concrete assignment policy." } ;
