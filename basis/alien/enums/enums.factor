@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Joe Groff, Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays assocs classes.singleton
-combinators delegate kernel math parser sequences words ;
+combinators delegate hashtables kernel math parser sequences words ;
 IN: alien.enums
 
 <PRIVATE
@@ -17,8 +17,14 @@ M: word enum>number "enum-value" word-prop ;
 
 <PRIVATE
 : enum-boxer ( members -- quot )
-    [ first2 swap '[ _ ] 2array ]
-    { } map-as [ ] suffix '[ _ case ] ;
+    dup length 32 > [
+        ! Reverse to preserve the first declared alias.
+        <reversed> [ first2 swap 2array ] map >hashtable
+        '[ _ ?at drop ]
+    ] [
+        [ first2 swap '[ _ ] 2array ]
+        { } map-as [ ] suffix '[ _ case ]
+    ] if ;
 PRIVATE>
 
 MACRO: number>enum ( enum-c-type -- quot )
@@ -64,4 +70,3 @@ PREDICATE: enum-c-type-word < c-type-word
 
 : values>enum ( values enum -- seq )
     '[ _ number>enum ] map ; inline
-

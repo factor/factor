@@ -21,7 +21,7 @@ HELP: number>enum
     { "number" "an enum number" } { "enum-c-type" "an enum type" }
     { "enum" "the corresponding enum word" }
 }
-{ $description "Convert a number to an enum." } ;
+{ $description "Convert a number to an enum. If multiple members have the same value, returns the first declared member. Numbers with no matching member are returned unchanged." } ;
 
 { POSTPONE: ENUM: define-enum enum>number number>enum } related-words
 

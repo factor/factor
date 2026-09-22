@@ -1,11 +1,13 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.syntax
-classes.struct combinators io.directories io.pathnames kernel
-sequences sorting.human system ;
+accessors classes.struct combinators io.directories io.pathnames kernel
+sequences sorting.human system vocabs words ;
 IN: libclang.ffi
 
 LIBRARY: clang
+
+! Enum values and function signatures checked against LLVM 21 clang-c headers.
 
 <<
 : latest-libclang ( -- path/f )
@@ -44,6 +46,12 @@ TYPEDEF: void* CXRemapping
 TYPEDEF: void* CXTargetInfo
 TYPEDEF: void* CXTranslationUnit
 
+TYPEDEF: longlong clang-time-t
+<< os unix? [
+    "unix.types" require
+    "time_t" "unix.types" lookup-word \ clang-time-t typedef
+] when >>
+
 STRUCT: CXToken
 { int_data uint[4] }
 { ptr_data void* } ;
@@ -66,7 +74,8 @@ ENUM: CXBinaryOperatorKind
 { CXBinaryOperator_DivAssign 24 } { CXBinaryOperator_RemAssign 25 } { CXBinaryOperator_AddAssign 26 }
 { CXBinaryOperator_SubAssign 27 } { CXBinaryOperator_ShlAssign 28 } { CXBinaryOperator_ShrAssign 29 }
 { CXBinaryOperator_AndAssign 30 } { CXBinaryOperator_XorAssign 31 } { CXBinaryOperator_OrAssign 32 }
-{ CXBinaryOperator_Comma 33 } ;
+{ CXBinaryOperator_Comma 33 }
+{ CXBinaryOperator_Last 33 } ;
 
 ENUM: CXCallingConv
 { CXCallingConv_Default 0 }
@@ -90,7 +99,22 @@ ENUM: CXCallingConv
 { CXCallingConv_Invalid 100 }
 { CXCallingConv_Unexposed 200 }
 { CXCallingConv_SwiftAsync 17 }
-{ CXCallingConv_AArch64SVEPCS 18 } ;
+{ CXCallingConv_AArch64SVEPCS 18 }
+{ CXCallingConv_M68kRTD 19 }
+{ CXCallingConv_PreserveNone 20 }
+{ CXCallingConv_RISCVVectorCall 21 }
+{ CXCallingConv_RISCVVLSCall_32 22 }
+{ CXCallingConv_RISCVVLSCall_64 23 }
+{ CXCallingConv_RISCVVLSCall_128 24 }
+{ CXCallingConv_RISCVVLSCall_256 25 }
+{ CXCallingConv_RISCVVLSCall_512 26 }
+{ CXCallingConv_RISCVVLSCall_1024 27 }
+{ CXCallingConv_RISCVVLSCall_2048 28 }
+{ CXCallingConv_RISCVVLSCall_4096 29 }
+{ CXCallingConv_RISCVVLSCall_8192 30 }
+{ CXCallingConv_RISCVVLSCall_16384 31 }
+{ CXCallingConv_RISCVVLSCall_32768 32 }
+{ CXCallingConv_RISCVVLSCall_65536 33 } ;
 
 ENUM: CXChildVisitResult
 { CXChildVisit_Break 0 }
@@ -106,7 +130,8 @@ ENUM: CXCommentInlineCommandRenderKind
 { CXCommentInlineCommandRenderKind_Normal 0 }
 { CXCommentInlineCommandRenderKind_Bold 1 }
 { CXCommentInlineCommandRenderKind_Monospaced 2 }
-{ CXCommentInlineCommandRenderKind_Emphasized 3 } ;
+{ CXCommentInlineCommandRenderKind_Emphasized 3 }
+{ CXCommentInlineCommandRenderKind_Anchor 4 } ;
 
 ENUM: CXCommentKind
 { CXComment_Null 0 }
@@ -184,7 +209,7 @@ ENUM: CXCursorKind
 { CXCursor_ObjCSelectorExpr 139 } { CXCursor_ObjCProtocolExpr 140 } { CXCursor_ObjCBridgedCastExpr 141 } { CXCursor_PackExpansionExpr 142 }
 { CXCursor_SizeOfPackExpr 143 } { CXCursor_LambdaExpr 144 } { CXCursor_ObjCBoolLiteralExpr 145 } { CXCursor_ObjCSelfExpr 146 }
 { CXCursor_OMPArraySectionExpr 147 } { CXCursor_ObjCAvailabilityCheckExpr 148 } { CXCursor_FixedPointLiteral 149 } { CXCursor_OMPArrayShapingExpr 150 }
-{ CXCursor_OMPIteratorExpr 151 } { CXCursor_CXXAddrspaceCastExpr 152 } { CXCursor_LastExpr CXCursor_CXXAddrspaceCastExpr } { CXCursor_FirstStmt 200 }
+{ CXCursor_OMPIteratorExpr 151 } { CXCursor_CXXAddrspaceCastExpr 152 } { CXCursor_LastExpr 156 } { CXCursor_FirstStmt 200 }
 { CXCursor_UnexposedStmt 200 } { CXCursor_LabelStmt 201 } { CXCursor_CompoundStmt 202 } { CXCursor_CaseStmt 203 }
 { CXCursor_DefaultStmt 204 } { CXCursor_IfStmt 205 } { CXCursor_SwitchStmt 206 } { CXCursor_WhileStmt 207 }
 { CXCursor_DoStmt 208 } { CXCursor_ForStmt 209 } { CXCursor_GotoStmt 210 } { CXCursor_IndirectGotoStmt 211 }
@@ -209,7 +234,7 @@ ENUM: CXCursorKind
 { CXCursor_OMPMasterTaskLoopSimdDirective 283 } { CXCursor_OMPParallelMasterTaskLoopSimdDirective 284 } { CXCursor_OMPParallelMasterDirective 285 } { CXCursor_OMPDepobjDirective 286 }
 { CXCursor_OMPScanDirective 287 } { CXCursor_OMPTileDirective 288 } { CXCursor_OMPCanonicalLoop 289 } { CXCursor_OMPInteropDirective 290 }
 { CXCursor_OMPDispatchDirective 291 } { CXCursor_OMPMaskedDirective 292 } { CXCursor_OMPUnrollDirective 293 } { CXCursor_OMPMetaDirective 294 }
-{ CXCursor_OMPGenericLoopDirective 295 } { CXCursor_LastStmt CXCursor_OMPGenericLoopDirective } { CXCursor_TranslationUnit 300 } { CXCursor_FirstAttr 400 }
+{ CXCursor_OMPGenericLoopDirective 295 } { CXCursor_LastStmt 333 } { CXCursor_TranslationUnit 350 } { CXCursor_FirstAttr 400 }
 { CXCursor_UnexposedAttr 400 } { CXCursor_IBActionAttr 401 } { CXCursor_IBOutletAttr 402 } { CXCursor_IBOutletCollectionAttr 403 }
 { CXCursor_CXXFinalAttr 404 } { CXCursor_CXXOverrideAttr 405 } { CXCursor_AnnotateAttr 406 } { CXCursor_AsmLabelAttr 407 }
 { CXCursor_PackedAttr 408 } { CXCursor_PureAttr 409 } { CXCursor_ConstAttr 410 } { CXCursor_NoDuplicateAttr 411 }
@@ -223,8 +248,43 @@ ENUM: CXCursorKind
 { CXCursor_WarnUnusedResultAttr 440 } { CXCursor_AlignedAttr 441 } { CXCursor_LastAttr CXCursor_AlignedAttr } { CXCursor_PreprocessingDirective 500 }
 { CXCursor_MacroDefinition 501 } { CXCursor_MacroExpansion 502 } { CXCursor_MacroInstantiation CXCursor_MacroExpansion } { CXCursor_InclusionDirective 503 }
 { CXCursor_FirstPreprocessing CXCursor_PreprocessingDirective } { CXCursor_LastPreprocessing CXCursor_InclusionDirective } { CXCursor_ModuleImportDecl 600 } { CXCursor_TypeAliasTemplateDecl 601 }
-{ CXCursor_StaticAssert 602 } { CXCursor_FriendDecl 603 } { CXCursor_FirstExtraDecl CXCursor_ModuleImportDecl } { CXCursor_LastExtraDecl CXCursor_FriendDecl }
-{ CXCursor_OverloadCandidate 700 } ;
+{ CXCursor_StaticAssert 602 } { CXCursor_FriendDecl 603 } { CXCursor_FirstExtraDecl CXCursor_ModuleImportDecl } { CXCursor_LastExtraDecl 604 }
+{ CXCursor_OverloadCandidate 700 }
+{ CXCursor_ArraySectionExpr 147 }
+{ CXCursor_ConceptSpecializationExpr 153 }
+{ CXCursor_RequiresExpr 154 }
+{ CXCursor_CXXParenListInitExpr 155 }
+{ CXCursor_PackIndexingExpr 156 }
+{ CXCursor_OMPTeamsGenericLoopDirective 296 }
+{ CXCursor_OMPTargetTeamsGenericLoopDirective 297 }
+{ CXCursor_OMPParallelGenericLoopDirective 298 }
+{ CXCursor_OMPTargetParallelGenericLoopDirective 299 }
+{ CXCursor_OMPParallelMaskedDirective 300 }
+{ CXCursor_OMPMaskedTaskLoopDirective 301 }
+{ CXCursor_OMPMaskedTaskLoopSimdDirective 302 }
+{ CXCursor_OMPParallelMaskedTaskLoopDirective 303 }
+{ CXCursor_OMPParallelMaskedTaskLoopSimdDirective 304 }
+{ CXCursor_OMPErrorDirective 305 }
+{ CXCursor_OMPScopeDirective 306 }
+{ CXCursor_OMPReverseDirective 307 }
+{ CXCursor_OMPInterchangeDirective 308 }
+{ CXCursor_OMPAssumeDirective 309 }
+{ CXCursor_OMPStripeDirective 310 }
+{ CXCursor_OpenACCComputeConstruct 320 }
+{ CXCursor_OpenACCLoopConstruct 321 }
+{ CXCursor_OpenACCCombinedConstruct 322 }
+{ CXCursor_OpenACCDataConstruct 323 }
+{ CXCursor_OpenACCEnterDataConstruct 324 }
+{ CXCursor_OpenACCExitDataConstruct 325 }
+{ CXCursor_OpenACCHostDataConstruct 326 }
+{ CXCursor_OpenACCWaitConstruct 327 }
+{ CXCursor_OpenACCInitConstruct 328 }
+{ CXCursor_OpenACCShutdownConstruct 329 }
+{ CXCursor_OpenACCSetConstruct 330 }
+{ CXCursor_OpenACCUpdateConstruct 331 }
+{ CXCursor_OpenACCAtomicConstruct 332 }
+{ CXCursor_OpenACCCacheConstruct 333 }
+{ CXCursor_ConceptDecl 604 } ;
 
 ENUM: CXCursor_ExceptionSpecificationKind
 { CXCursor_ExceptionSpecificationKind_None 0 }
@@ -346,7 +406,8 @@ ENUM: CXPrintingPolicyProperty
 { CXPrintingPolicy_MSVCFormatting 22 }
 { CXPrintingPolicy_ConstantsAsWritten 23 }
 { CXPrintingPolicy_SuppressImplicitBase 24 }
-{ CXPrintingPolicy_FullyQualifiedName 25 } ;
+{ CXPrintingPolicy_FullyQualifiedName 25 }
+{ CXPrintingPolicy_LastProperty 25 } ;
 
 ENUM: CXRefQualifierKind
 { CXRefQualifier_None 0 }
@@ -383,7 +444,11 @@ ENUM: CXTUResourceUsageKind
 { CXTUResourceUsage_Preprocessor 11 }
 { CXTUResourceUsage_PreprocessingRecord 12 }
 { CXTUResourceUsage_SourceManager_DataStructures 13 }
-{ CXTUResourceUsage_Preprocessor_HeaderSearch 14 } ;
+{ CXTUResourceUsage_Preprocessor_HeaderSearch 14 }
+{ CXTUResourceUsage_MEMORY_IN_BYTES_BEGIN 1 }
+{ CXTUResourceUsage_MEMORY_IN_BYTES_END 14 }
+{ CXTUResourceUsage_First 1 }
+{ CXTUResourceUsage_Last 14 } ;
 
 ENUM: CXTemplateArgumentKind
 { CXTemplateArgumentKind_Null 0 }
@@ -436,7 +501,14 @@ ENUM: CXTypeKind { CXType_Invalid 0 } { CXType_Unexposed 1 } { CXType_Void 2 } {
 { CXType_OCLIntelSubgroupAVCSicResult 171 } { CXType_OCLIntelSubgroupAVCImeResultSingleRefStreamout 172 }
 { CXType_OCLIntelSubgroupAVCImeResultDualRefStreamout 173 } { CXType_OCLIntelSubgroupAVCImeSingleRefStreamin 174 }
 { CXType_OCLIntelSubgroupAVCImeDualRefStreamin 175 } { CXType_ExtVector 176 } { CXType_Atomic 177 }
-{ CXType_BTFTagAttributed 178 } ;
+{ CXType_BTFTagAttributed 178 }
+{ CXType_OCLIntelSubgroupAVCImeResultSingleReferenceStreamout 172 }
+{ CXType_OCLIntelSubgroupAVCImeResultDualReferenceStreamout 173 }
+{ CXType_OCLIntelSubgroupAVCImeSingleReferenceStreamin 174 }
+{ CXType_OCLIntelSubgroupAVCImeDualReferenceStreamin 175 }
+{ CXType_HLSLResource 179 }
+{ CXType_HLSLAttributedResource 180 }
+{ CXType_HLSLInlineSpirv 181 } ;
 
 ENUM: CXTypeLayoutError
 { CXTypeLayoutError_Invalid -1 }
@@ -553,7 +625,13 @@ ENUM: CXIndexOptFlags
 { CXIndexOptIndexFunctionLocalSymbols 2 }
 { CXIndexOptIndexImplicitTemplateInstantiations 4 }
 { CXIndexOptSuppressWarnings 8 }
-{ CXIndexOptSkipParsedBodiesInSession 16 } ;
+{ CXIndexOptSkipParsedBodiesInSession 16 }
+{ CXIndexOpt_None 0 }
+{ CXIndexOpt_SuppressRedundantRefs 1 }
+{ CXIndexOpt_IndexFunctionLocalSymbols 2 }
+{ CXIndexOpt_IndexImplicitTemplateInstantiations 4 }
+{ CXIndexOpt_SuppressWarnings 8 }
+{ CXIndexOpt_SkipParsedBodiesInSession 16 } ;
 
 ENUM: CXNameRefFlags
 { CXNameRange_WantQualifier 1 }
@@ -639,9 +717,13 @@ STRUCT: CXCursor
 { xdata int }
 { data void*[3] } ;
 
+C-TYPE: CXSourceRange
+CALLBACK: CXVisitorResult CXCursorAndRangeVisitor-visit (
+    void* context, CXCursor cursor, CXSourceRange range )
+
 STRUCT: CXCursorAndRangeVisitor
 { context void* }
-{ visit void* } ;
+{ visit CXCursorAndRangeVisitor-visit } ;
 
 STRUCT: CXFileUniqueID
 { data ulonglong[3] } ;
@@ -660,7 +742,7 @@ STRUCT: CXType
     { data void*[2] } ;
 
 STRUCT: CXString
-    { data c-string }
+    { data void* }
     { private_flags uint } ;
 
 STRUCT: CXStringSet
@@ -712,7 +794,8 @@ FUNCTION: void clang_getDefinitionSpellingAndExtent (
     uint *startColumn, uint *endLine, uint *endColumn
 )
 FUNCTION: void clang_enableStackTraces ( )
-FUNCTION: void clang_executeOnThread ( void* fn, void *user_data, uint stack_size )
+CALLBACK: void CXThreadRoutine ( void* user_data )
+FUNCTION: void clang_executeOnThread ( CXThreadRoutine fn, void *user_data, uint stack_size )
 
 
 FUNCTION: CXString clang_getCursorSpelling ( CXCursor C )
@@ -722,19 +805,17 @@ FUNCTION: CXType clang_getCanonicalType ( CXType T )
 FUNCTION: CXType clang_getPointeeType ( CXType T )
 FUNCTION: CXType clang_getResultType ( CXType T )
 FUNCTION: CXType clang_getCursorResultType ( CXCursor C )
-FUNCTION: CXType clang_getCursorReceiverType ( CXCursor C )
 FUNCTION: CXType clang_getTypedefDeclUnderlyingType ( CXCursor C )
 FUNCTION: CXType clang_getEnumDeclIntegerType ( CXCursor C )
 FUNCTION: longlong clang_getEnumConstantDeclValue ( CXCursor C )
 FUNCTION: ulonglong clang_getEnumConstantDeclUnsignedValue ( CXCursor C )
 FUNCTION: CXType clang_getArrayElementType ( CXType T )
-FUNCTION: uint clang_getArraySize ( CXType T )
+FUNCTION: longlong clang_getArraySize ( CXType T )
 FUNCTION: CXType clang_Type_getObjCObjectBaseType ( CXType T )
 FUNCTION: CXType clang_getIBOutletCollectionType ( CXCursor C )
-FUNCTION: CXType clang_getCursorReferenceQualifier ( CXCursor C )
+FUNCTION: CXRefQualifierKind clang_Type_getCXXRefQualifier ( CXType T )
 FUNCTION: CXType clang_Cursor_getReceiverType ( CXCursor C )
 
-FUNCTION: CXTypeKind clang_getTypeKind ( CXType CT )
 FUNCTION: CXString clang_getTypeSpelling ( CXType CT )
 FUNCTION: CXString clang_getTypeKindSpelling ( CXTypeKind K )
 
@@ -744,7 +825,7 @@ FUNCTION: CXCursor clang_Cursor_getArgument ( CXCursor C, uint i )
 
 FUNCTION: CXFile clang_getFile ( CXTranslationUnit tu, c-string file_name )
 FUNCTION: CXString clang_getFileName ( CXFile SFile )
-FUNCTION: uint clang_getFileTime ( CXFile SFile )
+FUNCTION: clang-time-t clang_getFileTime ( CXFile SFile )
 FUNCTION: CXSourceLocation clang_getLocation ( CXTranslationUnit tu, CXFile file, uint line, uint column )
 FUNCTION: CXSourceLocation clang_getNullLocation ( )
 FUNCTION: uint clang_equalLocations ( CXSourceLocation loc1, CXSourceLocation loc2 )
@@ -752,7 +833,7 @@ FUNCTION: CXSourceLocation clang_getLocationForOffset ( CXTranslationUnit tu, CX
 FUNCTION: int clang_Location_isInSystemHeader ( CXSourceLocation location )
 FUNCTION: int clang_Location_isFromMainFile ( CXSourceLocation location )
 FUNCTION: CXSourceRange clang_getNullRange ( )
-FUNCTION: int clang_equalRanges ( CXSourceRange range1, CXSourceRange range2 )
+FUNCTION: uint clang_equalRanges ( CXSourceRange range1, CXSourceRange range2 )
 FUNCTION: int clang_Range_isNull ( CXSourceRange range )
 FUNCTION: void clang_getExpansionLocation (
     CXSourceLocation location, CXFile *file, uint *line,
@@ -784,6 +865,12 @@ FUNCTION: CXSourceRangeList* clang_getSkippedRanges ( CXTranslationUnit tu, CXFi
 FUNCTION: CXSourceRangeList* clang_getAllSkippedRanges ( CXTranslationUnit tu )
 FUNCTION: void clang_disposeSourceRangeList ( CXSourceRangeList *ranges )
 FUNCTION: CXDiagnosticSet clang_getDiagnosticSetFromTU ( CXTranslationUnit Unit )
+FUNCTION: void clang_disposeDiagnosticSet ( CXDiagnosticSet Diags )
+FUNCTION: uint clang_getNumDiagnostics ( CXTranslationUnit Unit )
+FUNCTION: CXDiagnostic clang_getDiagnostic ( CXTranslationUnit Unit, uint Index )
+FUNCTION: void clang_disposeDiagnostic ( CXDiagnostic Diagnostic )
+FUNCTION: CXDiagnosticSeverity clang_getDiagnosticSeverity ( CXDiagnostic Diagnostic )
+FUNCTION: CXString clang_getDiagnosticSpelling ( CXDiagnostic Diagnostic )
 
 FUNCTION: void clang_tokenize ( CXTranslationUnit tu, CXSourceRange range, CXToken **tokens, uint *numTokens )
 FUNCTION: void clang_disposeTokens ( CXTranslationUnit tu, CXToken *tokens, uint numTokens )
@@ -803,24 +890,24 @@ FUNCTION: CXString clang_constructUSR_ObjCMethod ( char *name, uint isInstanceMe
 FUNCTION: CXString clang_constructUSR_ObjCProperty ( char *property, CXString classUSR )
 
 FUNCTION: CXCursor clang_getTypeDeclaration ( CXType T )
-FUNCTION: uint clang_getNumFields ( CXType T )
-FUNCTION: CXCursor clang_getFieldDecl ( CXType T, uint i )
-FUNCTION: uint clang_Cursor_getNumTemplateArguments ( CXCursor C )
+CALLBACK: CXVisitorResult CXFieldVisitor ( CXCursor C, CXClientData client_data )
+FUNCTION: uint clang_Type_visitFields ( CXType T, CXFieldVisitor visitor, CXClientData client_data )
+FUNCTION: int clang_Cursor_getNumTemplateArguments ( CXCursor C )
+FUNCTION: CXTemplateArgumentKind clang_Cursor_getTemplateArgumentKind ( CXCursor C, uint i )
 FUNCTION: CXType clang_Cursor_getTemplateArgumentType ( CXCursor C, uint i )
-FUNCTION: int clang_Cursor_getTemplateArgumentValue ( CXCursor C, uint i )
-FUNCTION: CXCursor clang_Cursor_getTemplateArgumentCursor ( CXCursor C, uint i )
-FUNCTION: uint clang_Cursor_getNumSpecializations ( CXCursor C )
-FUNCTION: CXCursor clang_Cursor_getSpecialization ( CXCursor C, uint i )
+FUNCTION: longlong clang_Cursor_getTemplateArgumentValue ( CXCursor C, uint i )
+FUNCTION: ulonglong clang_Cursor_getTemplateArgumentUnsignedValue ( CXCursor C, uint i )
+FUNCTION: CXCursor clang_getSpecializedCursorTemplate ( CXCursor C )
 FUNCTION: CXSourceRange clang_Cursor_getCommentRange ( CXCursor C )
 FUNCTION: CXString clang_Cursor_getRawCommentText ( CXCursor C )
 FUNCTION: CXString clang_Cursor_getBriefCommentText ( CXCursor C )
 FUNCTION: CXString clang_Cursor_getMangling ( CXCursor C )
-FUNCTION: CXString clang_Cursor_getCXXManglings ( CXCursor C )
+FUNCTION: CXStringSet* clang_Cursor_getCXXManglings ( CXCursor C )
 FUNCTION: CXStringSet* clang_Cursor_getObjCManglings ( CXCursor C )
-FUNCTION: CXString clang_Cursor_getObjCSelectorIndexName ( CXCursor C )
+FUNCTION: int clang_Cursor_getObjCSelectorIndex ( CXCursor C )
 FUNCTION: CXString clang_Cursor_getObjCPropertyGetterName ( CXCursor C )
 FUNCTION: CXString clang_Cursor_getObjCPropertySetterName ( CXCursor C )
-FUNCTION: CXString clang_Cursor_getObjCDeclQualifiers ( CXCursor C )
+FUNCTION: uint clang_Cursor_getObjCDeclQualifiers ( CXCursor C )
 FUNCTION: CXTranslationUnit clang_Cursor_getTranslationUnit ( CXCursor C )
 FUNCTION: uint clang_Cursor_isObjCOptional ( CXCursor C )
 FUNCTION: uint clang_Cursor_isVariadic ( CXCursor C )
@@ -830,7 +917,7 @@ FUNCTION: CXCursor clang_getCursorLexicalParent ( CXCursor cursor )
 FUNCTION: void clang_getOverriddenCursors ( CXCursor cursor, CXCursor **overridden, uint *num_overridden )
 FUNCTION: void clang_disposeOverriddenCursors ( CXCursor *overridden )
 FUNCTION: uint clang_getNumOverloadedDecls ( CXCursor cursor )
-FUNCTION: void clang_getOverloadedDecl ( CXCursor cursor, uint index )
+FUNCTION: CXCursor clang_getOverloadedDecl ( CXCursor cursor, uint index )
 
 FUNCTION: CXString clang_getClangVersion ( )
 FUNCTION: CXSourceRange clang_getRange ( CXSourceLocation begin, CXSourceLocation end )
@@ -843,3 +930,554 @@ FUNCTION: uint clang_visitChildren (
     CXCursorVisitor visitor,
     CXClientData client_data
 )
+
+ENUM: CX_BinaryOperatorKind
+    { CX_BO_Invalid 0 }
+    { CX_BO_PtrMemD 1 }
+    { CX_BO_PtrMemI 2 }
+    { CX_BO_Mul 3 }
+    { CX_BO_Div 4 }
+    { CX_BO_Rem 5 }
+    { CX_BO_Add 6 }
+    { CX_BO_Sub 7 }
+    { CX_BO_Shl 8 }
+    { CX_BO_Shr 9 }
+    { CX_BO_Cmp 10 }
+    { CX_BO_LT 11 }
+    { CX_BO_GT 12 }
+    { CX_BO_LE 13 }
+    { CX_BO_GE 14 }
+    { CX_BO_EQ 15 }
+    { CX_BO_NE 16 }
+    { CX_BO_And 17 }
+    { CX_BO_Xor 18 }
+    { CX_BO_Or 19 }
+    { CX_BO_LAnd 20 }
+    { CX_BO_LOr 21 }
+    { CX_BO_Assign 22 }
+    { CX_BO_MulAssign 23 }
+    { CX_BO_DivAssign 24 }
+    { CX_BO_RemAssign 25 }
+    { CX_BO_AddAssign 26 }
+    { CX_BO_SubAssign 27 }
+    { CX_BO_ShlAssign 28 }
+    { CX_BO_ShrAssign 29 }
+    { CX_BO_AndAssign 30 }
+    { CX_BO_XorAssign 31 }
+    { CX_BO_OrAssign 32 }
+    { CX_BO_Comma 33 }
+    { CX_BO_LAST 33 } ;
+
+C-TYPE: CXVersion
+C-TYPE: CXIndexOptions
+C-TYPE: CXTUResourceUsageEntry
+C-TYPE: CXTUResourceUsage
+C-TYPE: CXPlatformAvailability
+C-TYPE: CXIdxIncludedFileInfo
+C-TYPE: CXIdxImportedASTFileInfo
+C-TYPE: CXIdxEntityInfo
+C-TYPE: CXIdxContainerInfo
+C-TYPE: CXIdxIBOutletCollectionAttrInfo
+C-TYPE: CXIdxDeclInfo
+C-TYPE: CXIdxObjCContainerDeclInfo
+C-TYPE: CXIdxBaseClassInfo
+C-TYPE: CXIdxObjCProtocolRefInfo
+C-TYPE: CXIdxObjCProtocolRefListInfo
+C-TYPE: CXIdxObjCInterfaceDeclInfo
+C-TYPE: CXIdxObjCCategoryDeclInfo
+C-TYPE: CXIdxObjCPropertyDeclInfo
+C-TYPE: CXIdxCXXClassDeclInfo
+C-TYPE: CXIdxEntityRefInfo
+C-TYPE: IndexerCallbacks
+
+TYPEDEF: void* CXVirtualFileOverlay
+TYPEDEF: void* CXModuleMapDescriptor
+TYPEDEF: void* CXCursorVisitorBlock
+TYPEDEF: void* CXCursorAndRangeVisitorBlock
+TYPEDEF: void* CXAPISet
+TYPEDEF: void* CXRewriter
+
+CALLBACK: void CXInclusionVisitor ( CXFile arg0, CXSourceLocation* arg1, uint arg2, CXClientData arg3 )
+CALLBACK: int IndexerCallbacks-abortQuery ( CXClientData arg0, void* arg1 )
+CALLBACK: void IndexerCallbacks-diagnostic ( CXClientData arg0, CXDiagnosticSet arg1, void* arg2 )
+CALLBACK: CXIdxClientFile IndexerCallbacks-enteredMainFile ( CXClientData arg0, CXFile arg1, void* arg2 )
+CALLBACK: CXIdxClientFile IndexerCallbacks-ppIncludedFile ( CXClientData arg0, CXIdxIncludedFileInfo* arg1 )
+CALLBACK: CXIdxClientASTFile IndexerCallbacks-importedASTFile ( CXClientData arg0, CXIdxImportedASTFileInfo* arg1 )
+CALLBACK: CXIdxClientContainer IndexerCallbacks-startedTranslationUnit ( CXClientData arg0, void* arg1 )
+CALLBACK: void IndexerCallbacks-indexDeclaration ( CXClientData arg0, CXIdxDeclInfo* arg1 )
+CALLBACK: void IndexerCallbacks-indexEntityReference ( CXClientData arg0, CXIdxEntityRefInfo* arg1 )
+
+STRUCT: CXVersion
+    { Major int }
+    { Minor int }
+    { Subminor int } ;
+
+STRUCT: CXIndexOptions
+    { Size uint }
+    { ThreadBackgroundPriorityForIndexing uchar }
+    { ThreadBackgroundPriorityForEditing uchar }
+    { ExcludeDeclarationsFromPCH uint bits: 1 }
+    { DisplayDiagnostics uint bits: 1 }
+    { StorePreamblesInMemory uint bits: 1 }
+    { reserved6 uint bits: 13 }
+    { PreambleStoragePath char* }
+    { InvocationEmissionPath char* } ;
+
+! MSVC aligns the bitfield group to four bytes and reserves a whole uint.
+<< os windows? [
+    \ CXIndexOptions {
+        { "Size" uint { } }
+        { "ThreadBackgroundPriorityForIndexing" uchar { } }
+        { "ThreadBackgroundPriorityForEditing" uchar { } }
+        { "reserved-alignment" ushort { } }
+        { "ExcludeDeclarationsFromPCH" uint { bits: 1 } }
+        { "DisplayDiagnostics" uint { bits: 1 } }
+        { "StorePreamblesInMemory" uint { bits: 1 } }
+        { "reserved6" uint { bits: 29 } }
+        { "PreambleStoragePath" pointer: char { } }
+        { "InvocationEmissionPath" pointer: char { } }
+    } [ first3 <struct-slot-spec> ] map define-struct-class
+] when >>
+
+: <CXIndexOptions> ( -- options )
+    CXIndexOptions <struct> CXIndexOptions heap-size >>Size ;
+
+STRUCT: CXTUResourceUsageEntry
+    { kind CXTUResourceUsageKind }
+    { amount ulong } ;
+
+STRUCT: CXTUResourceUsage
+    { data void* }
+    { numEntries uint }
+    { entries CXTUResourceUsageEntry* } ;
+
+STRUCT: CXPlatformAvailability
+    { Platform CXString }
+    { Introduced CXVersion }
+    { Deprecated CXVersion }
+    { Obsoleted CXVersion }
+    { Unavailable int }
+    { Message CXString } ;
+
+STRUCT: CXIdxIncludedFileInfo
+    { hashLoc CXIdxLoc }
+    { filename char* }
+    { file CXFile }
+    { isImport int }
+    { isAngled int }
+    { isModuleImport int } ;
+
+STRUCT: CXIdxImportedASTFileInfo
+    { file CXFile }
+    { module CXModule }
+    { loc CXIdxLoc }
+    { isImplicit int } ;
+
+STRUCT: CXIdxEntityInfo
+    { kind CXIdxEntityKind }
+    { templateKind CXIdxEntityCXXTemplateKind }
+    { lang CXIdxEntityLanguage }
+    { name char* }
+    { USR char* }
+    { cursor CXCursor }
+    { attributes CXIdxAttrInfo** }
+    { numAttributes uint } ;
+
+STRUCT: CXIdxContainerInfo
+    { cursor CXCursor } ;
+
+STRUCT: CXIdxIBOutletCollectionAttrInfo
+    { attrInfo CXIdxAttrInfo* }
+    { objcClass CXIdxEntityInfo* }
+    { classCursor CXCursor }
+    { classLoc CXIdxLoc } ;
+
+STRUCT: CXIdxDeclInfo
+    { entityInfo CXIdxEntityInfo* }
+    { cursor CXCursor }
+    { loc CXIdxLoc }
+    { semanticContainer CXIdxContainerInfo* }
+    { lexicalContainer CXIdxContainerInfo* }
+    { isRedeclaration int }
+    { isDefinition int }
+    { isContainer int }
+    { declAsContainer CXIdxContainerInfo* }
+    { isImplicit int }
+    { attributes CXIdxAttrInfo** }
+    { numAttributes uint }
+    { flags uint } ;
+
+STRUCT: CXIdxObjCContainerDeclInfo
+    { declInfo CXIdxDeclInfo* }
+    { kind CXIdxObjCContainerKind } ;
+
+STRUCT: CXIdxBaseClassInfo
+    { base CXIdxEntityInfo* }
+    { cursor CXCursor }
+    { loc CXIdxLoc } ;
+
+STRUCT: CXIdxObjCProtocolRefInfo
+    { protocol CXIdxEntityInfo* }
+    { cursor CXCursor }
+    { loc CXIdxLoc } ;
+
+STRUCT: CXIdxObjCProtocolRefListInfo
+    { protocols CXIdxObjCProtocolRefInfo** }
+    { numProtocols uint } ;
+
+STRUCT: CXIdxObjCInterfaceDeclInfo
+    { containerInfo CXIdxObjCContainerDeclInfo* }
+    { superInfo CXIdxBaseClassInfo* }
+    { protocols CXIdxObjCProtocolRefListInfo* } ;
+
+STRUCT: CXIdxObjCCategoryDeclInfo
+    { containerInfo CXIdxObjCContainerDeclInfo* }
+    { objcClass CXIdxEntityInfo* }
+    { classCursor CXCursor }
+    { classLoc CXIdxLoc }
+    { protocols CXIdxObjCProtocolRefListInfo* } ;
+
+STRUCT: CXIdxObjCPropertyDeclInfo
+    { declInfo CXIdxDeclInfo* }
+    { getter CXIdxEntityInfo* }
+    { setter CXIdxEntityInfo* } ;
+
+STRUCT: CXIdxCXXClassDeclInfo
+    { declInfo CXIdxDeclInfo* }
+    { bases CXIdxBaseClassInfo** }
+    { numBases uint } ;
+
+STRUCT: CXIdxEntityRefInfo
+    { kind CXIdxEntityRefKind }
+    { cursor CXCursor }
+    { loc CXIdxLoc }
+    { referencedEntity CXIdxEntityInfo* }
+    { parentEntity CXIdxEntityInfo* }
+    { container CXIdxContainerInfo* }
+    { role CXSymbolRole } ;
+
+STRUCT: IndexerCallbacks
+    { abortQuery IndexerCallbacks-abortQuery }
+    { diagnostic IndexerCallbacks-diagnostic }
+    { enteredMainFile IndexerCallbacks-enteredMainFile }
+    { ppIncludedFile IndexerCallbacks-ppIncludedFile }
+    { importedASTFile IndexerCallbacks-importedASTFile }
+    { startedTranslationUnit IndexerCallbacks-startedTranslationUnit }
+    { indexDeclaration IndexerCallbacks-indexDeclaration }
+    { indexEntityReference IndexerCallbacks-indexEntityReference } ;
+
+FUNCTION: ulonglong clang_getBuildSessionTimestamp (  )
+FUNCTION: CXVirtualFileOverlay clang_VirtualFileOverlay_create ( uint options )
+FUNCTION: CXErrorCode clang_VirtualFileOverlay_addFileMapping ( CXVirtualFileOverlay arg0, c-string virtualPath, c-string realPath )
+FUNCTION: CXErrorCode clang_VirtualFileOverlay_setCaseSensitivity ( CXVirtualFileOverlay arg0, int caseSensitive )
+FUNCTION: CXErrorCode clang_VirtualFileOverlay_writeToBuffer ( CXVirtualFileOverlay arg0, uint options, char** out_buffer_ptr, uint* out_buffer_size )
+FUNCTION: void clang_free ( void* buffer )
+FUNCTION: void clang_VirtualFileOverlay_dispose ( CXVirtualFileOverlay arg0 )
+FUNCTION: CXModuleMapDescriptor clang_ModuleMapDescriptor_create ( uint options )
+FUNCTION: CXErrorCode clang_ModuleMapDescriptor_setFrameworkModuleName ( CXModuleMapDescriptor arg0, c-string name )
+FUNCTION: CXErrorCode clang_ModuleMapDescriptor_setUmbrellaHeader ( CXModuleMapDescriptor arg0, c-string name )
+FUNCTION: CXErrorCode clang_ModuleMapDescriptor_writeToBuffer ( CXModuleMapDescriptor arg0, uint options, char** out_buffer_ptr, uint* out_buffer_size )
+FUNCTION: void clang_ModuleMapDescriptor_dispose ( CXModuleMapDescriptor arg0 )
+FUNCTION: int clang_getFileUniqueID ( CXFile file, CXFileUniqueID* outID )
+FUNCTION: int clang_File_isEqual ( CXFile file1, CXFile file2 )
+FUNCTION: CXString clang_File_tryGetRealPathName ( CXFile file )
+FUNCTION: uint clang_isBeforeInTranslationUnit ( CXSourceLocation loc1, CXSourceLocation loc2 )
+FUNCTION: uint clang_getNumDiagnosticsInSet ( CXDiagnosticSet Diags )
+FUNCTION: CXDiagnostic clang_getDiagnosticInSet ( CXDiagnosticSet Diags, uint Index )
+FUNCTION: CXDiagnosticSet clang_loadDiagnostics ( c-string file, CXLoadDiag_Error* error, CXString* errorString )
+FUNCTION: CXDiagnosticSet clang_getChildDiagnostics ( CXDiagnostic D )
+FUNCTION: CXString clang_formatDiagnostic ( CXDiagnostic Diagnostic, uint Options )
+FUNCTION: uint clang_defaultDiagnosticDisplayOptions (  )
+FUNCTION: CXSourceLocation clang_getDiagnosticLocation ( CXDiagnostic arg0 )
+FUNCTION: CXString clang_getDiagnosticOption ( CXDiagnostic Diag, CXString* Disable )
+FUNCTION: uint clang_getDiagnosticCategory ( CXDiagnostic arg0 )
+FUNCTION: CXString clang_getDiagnosticCategoryName ( uint Category )
+FUNCTION: CXString clang_getDiagnosticCategoryText ( CXDiagnostic arg0 )
+FUNCTION: uint clang_getDiagnosticNumRanges ( CXDiagnostic arg0 )
+FUNCTION: CXSourceRange clang_getDiagnosticRange ( CXDiagnostic Diagnostic, uint Range )
+FUNCTION: uint clang_getDiagnosticNumFixIts ( CXDiagnostic Diagnostic )
+FUNCTION: CXString clang_getDiagnosticFixIt ( CXDiagnostic Diagnostic, uint FixIt, CXSourceRange* ReplacementRange )
+FUNCTION: CXIndex clang_createIndexWithOptions ( CXIndexOptions* options )
+FUNCTION: void clang_CXIndex_setGlobalOptions ( CXIndex arg0, uint options )
+FUNCTION: uint clang_CXIndex_getGlobalOptions ( CXIndex arg0 )
+FUNCTION: void clang_CXIndex_setInvocationEmissionPathOption ( CXIndex arg0, c-string Path )
+FUNCTION: uint clang_isFileMultipleIncludeGuarded ( CXTranslationUnit tu, CXFile file )
+FUNCTION: char* clang_getFileContents ( CXTranslationUnit tu, CXFile file, size_t* size )
+FUNCTION: CXString clang_getTranslationUnitSpelling ( CXTranslationUnit CTUnit )
+FUNCTION: CXTranslationUnit clang_createTranslationUnitFromSourceFile ( CXIndex CIdx, c-string source_filename, int num_clang_command_line_args, char** clang_command_line_args, uint num_unsaved_files, CXUnsavedFile* unsaved_files )
+FUNCTION: CXTranslationUnit clang_createTranslationUnit ( CXIndex CIdx, c-string ast_filename )
+FUNCTION: CXErrorCode clang_createTranslationUnit2 ( CXIndex CIdx, c-string ast_filename, CXTranslationUnit* out_TU )
+FUNCTION: uint clang_defaultEditingTranslationUnitOptions (  )
+FUNCTION: CXErrorCode clang_parseTranslationUnit2 ( CXIndex CIdx, c-string source_filename, char** command_line_args, int num_command_line_args, CXUnsavedFile* unsaved_files, uint num_unsaved_files, uint options, CXTranslationUnit* out_TU )
+FUNCTION: CXErrorCode clang_parseTranslationUnit2FullArgv ( CXIndex CIdx, c-string source_filename, char** command_line_args, int num_command_line_args, CXUnsavedFile* unsaved_files, uint num_unsaved_files, uint options, CXTranslationUnit* out_TU )
+FUNCTION: uint clang_defaultSaveOptions ( CXTranslationUnit TU )
+FUNCTION: int clang_saveTranslationUnit ( CXTranslationUnit TU, c-string FileName, uint options )
+FUNCTION: uint clang_suspendTranslationUnit ( CXTranslationUnit arg0 )
+FUNCTION: uint clang_defaultReparseOptions ( CXTranslationUnit TU )
+FUNCTION: int clang_reparseTranslationUnit ( CXTranslationUnit TU, uint num_unsaved_files, CXUnsavedFile* unsaved_files, uint options )
+FUNCTION: char* clang_getTUResourceUsageName ( CXTUResourceUsageKind kind )
+FUNCTION: CXTUResourceUsage clang_getCXTUResourceUsage ( CXTranslationUnit TU )
+FUNCTION: void clang_disposeCXTUResourceUsage ( CXTUResourceUsage usage )
+FUNCTION: CXTargetInfo clang_getTranslationUnitTargetInfo ( CXTranslationUnit CTUnit )
+FUNCTION: void clang_TargetInfo_dispose ( CXTargetInfo Info )
+FUNCTION: CXString clang_TargetInfo_getTriple ( CXTargetInfo Info )
+FUNCTION: int clang_TargetInfo_getPointerWidth ( CXTargetInfo Info )
+FUNCTION: CXCursor clang_getNullCursor (  )
+FUNCTION: uint clang_equalCursors ( CXCursor arg0, CXCursor arg1 )
+FUNCTION: int clang_Cursor_isNull ( CXCursor cursor )
+FUNCTION: uint clang_hashCursor ( CXCursor arg0 )
+FUNCTION: uint clang_isDeclaration ( CXCursorKind arg0 )
+FUNCTION: uint clang_isInvalidDeclaration ( CXCursor arg0 )
+FUNCTION: uint clang_isReference ( CXCursorKind arg0 )
+FUNCTION: uint clang_isExpression ( CXCursorKind arg0 )
+FUNCTION: uint clang_isStatement ( CXCursorKind arg0 )
+FUNCTION: uint clang_isAttribute ( CXCursorKind arg0 )
+FUNCTION: uint clang_Cursor_hasAttrs ( CXCursor C )
+FUNCTION: uint clang_isInvalid ( CXCursorKind arg0 )
+FUNCTION: uint clang_isTranslationUnit ( CXCursorKind arg0 )
+FUNCTION: uint clang_isPreprocessing ( CXCursorKind arg0 )
+FUNCTION: uint clang_isUnexposed ( CXCursorKind arg0 )
+FUNCTION: CXLinkageKind clang_getCursorLinkage ( CXCursor cursor )
+FUNCTION: CXVisibilityKind clang_getCursorVisibility ( CXCursor cursor )
+FUNCTION: CXAvailabilityKind clang_getCursorAvailability ( CXCursor cursor )
+FUNCTION: int clang_getCursorPlatformAvailability ( CXCursor cursor, int* always_deprecated, CXString* deprecated_message, int* always_unavailable, CXString* unavailable_message, CXPlatformAvailability* availability, int availability_size )
+FUNCTION: void clang_disposeCXPlatformAvailability ( CXPlatformAvailability* availability )
+FUNCTION: CXCursor clang_Cursor_getVarDeclInitializer ( CXCursor cursor )
+FUNCTION: int clang_Cursor_hasVarDeclGlobalStorage ( CXCursor cursor )
+FUNCTION: int clang_Cursor_hasVarDeclExternalStorage ( CXCursor cursor )
+FUNCTION: CXLanguageKind clang_getCursorLanguage ( CXCursor cursor )
+FUNCTION: CXTLSKind clang_getCursorTLSKind ( CXCursor cursor )
+FUNCTION: CXCursorSet clang_createCXCursorSet (  )
+FUNCTION: void clang_disposeCXCursorSet ( CXCursorSet cset )
+FUNCTION: uint clang_CXCursorSet_contains ( CXCursorSet cset, CXCursor cursor )
+FUNCTION: uint clang_CXCursorSet_insert ( CXCursorSet cset, CXCursor cursor )
+FUNCTION: CXCursor clang_getCursor ( CXTranslationUnit arg0, CXSourceLocation arg1 )
+FUNCTION: uint clang_Cursor_isBitField ( CXCursor C )
+FUNCTION: int clang_getFieldDeclBitWidth ( CXCursor C )
+FUNCTION: uint clang_equalTypes ( CXType A, CXType B )
+FUNCTION: uint clang_isConstQualifiedType ( CXType T )
+FUNCTION: uint clang_Cursor_isMacroFunctionLike ( CXCursor C )
+FUNCTION: uint clang_Cursor_isMacroBuiltin ( CXCursor C )
+FUNCTION: uint clang_Cursor_isFunctionInlined ( CXCursor C )
+FUNCTION: uint clang_isVolatileQualifiedType ( CXType T )
+FUNCTION: uint clang_isRestrictQualifiedType ( CXType T )
+FUNCTION: uint clang_getAddressSpace ( CXType T )
+FUNCTION: CXString clang_getTypedefName ( CXType CT )
+FUNCTION: CXType clang_getUnqualifiedType ( CXType CT )
+FUNCTION: CXType clang_getNonReferenceType ( CXType CT )
+FUNCTION: CXString clang_getDeclObjCTypeEncoding ( CXCursor C )
+FUNCTION: CXString clang_Type_getObjCEncoding ( CXType type )
+FUNCTION: CXCallingConv clang_getFunctionTypeCallingConv ( CXType T )
+FUNCTION: int clang_getExceptionSpecificationType ( CXType T )
+FUNCTION: int clang_getNumArgTypes ( CXType T )
+FUNCTION: uint clang_Type_getNumObjCProtocolRefs ( CXType T )
+FUNCTION: CXCursor clang_Type_getObjCProtocolDecl ( CXType T, uint i )
+FUNCTION: uint clang_Type_getNumObjCTypeArgs ( CXType T )
+FUNCTION: CXType clang_Type_getObjCTypeArg ( CXType T, uint i )
+FUNCTION: uint clang_isFunctionTypeVariadic ( CXType T )
+FUNCTION: int clang_getCursorExceptionSpecificationType ( CXCursor C )
+FUNCTION: uint clang_isPODType ( CXType T )
+FUNCTION: CXType clang_getElementType ( CXType T )
+FUNCTION: longlong clang_getNumElements ( CXType T )
+FUNCTION: CXType clang_Type_getNamedType ( CXType T )
+FUNCTION: uint clang_Type_isTransparentTagTypedef ( CXType T )
+FUNCTION: CXTypeNullabilityKind clang_Type_getNullability ( CXType T )
+FUNCTION: longlong clang_Type_getAlignOf ( CXType T )
+FUNCTION: CXType clang_Type_getClassType ( CXType T )
+FUNCTION: longlong clang_Type_getSizeOf ( CXType T )
+FUNCTION: longlong clang_Type_getOffsetOf ( CXType T, c-string S )
+FUNCTION: CXType clang_Type_getModifiedType ( CXType T )
+FUNCTION: CXType clang_Type_getValueType ( CXType CT )
+FUNCTION: longlong clang_Cursor_getOffsetOfField ( CXCursor C )
+FUNCTION: uint clang_Cursor_isAnonymous ( CXCursor C )
+FUNCTION: uint clang_Cursor_isAnonymousRecordDecl ( CXCursor C )
+FUNCTION: uint clang_Cursor_isInlineNamespace ( CXCursor C )
+FUNCTION: int clang_Type_getNumTemplateArguments ( CXType T )
+FUNCTION: CXType clang_Type_getTemplateArgumentAsType ( CXType T, uint i )
+FUNCTION: uint clang_isVirtualBase ( CXCursor arg0 )
+FUNCTION: longlong clang_getOffsetOfBase ( CXCursor Parent, CXCursor Base )
+FUNCTION: CX_CXXAccessSpecifier clang_getCXXAccessSpecifier ( CXCursor arg0 )
+FUNCTION: CX_BinaryOperatorKind clang_Cursor_getBinaryOpcode ( CXCursor C )
+FUNCTION: CXString clang_Cursor_getBinaryOpcodeStr ( CX_BinaryOperatorKind Op )
+FUNCTION: CX_StorageClass clang_Cursor_getStorageClass ( CXCursor arg0 )
+FUNCTION: uint clang_visitChildrenWithBlock ( CXCursor parent, CXCursorVisitorBlock block )
+FUNCTION: CXSourceRange clang_Cursor_getSpellingNameRange ( CXCursor arg0, uint pieceIndex, uint options )
+FUNCTION: uint clang_PrintingPolicy_getProperty ( CXPrintingPolicy Policy, CXPrintingPolicyProperty Property )
+FUNCTION: void clang_PrintingPolicy_setProperty ( CXPrintingPolicy Policy, CXPrintingPolicyProperty Property, uint Value )
+FUNCTION: CXPrintingPolicy clang_getCursorPrintingPolicy ( CXCursor arg0 )
+FUNCTION: void clang_PrintingPolicy_dispose ( CXPrintingPolicy Policy )
+FUNCTION: CXString clang_getCursorPrettyPrinted ( CXCursor Cursor, CXPrintingPolicy Policy )
+FUNCTION: CXString clang_getTypePrettyPrinted ( CXType CT, CXPrintingPolicy cxPolicy )
+FUNCTION: CXString clang_getFullyQualifiedName ( CXType CT, CXPrintingPolicy Policy, uint WithGlobalNsPrefix )
+FUNCTION: CXCursor clang_getCursorReferenced ( CXCursor arg0 )
+FUNCTION: CXCursor clang_getCursorDefinition ( CXCursor arg0 )
+FUNCTION: uint clang_isCursorDefinition ( CXCursor arg0 )
+FUNCTION: CXCursor clang_getCanonicalCursor ( CXCursor arg0 )
+FUNCTION: int clang_Cursor_isDynamicCall ( CXCursor C )
+FUNCTION: uint clang_Cursor_getObjCPropertyAttributes ( CXCursor C, uint reserved )
+FUNCTION: uint clang_Cursor_isExternalSymbol ( CXCursor C, CXString* language, CXString* definedIn, uint* isGenerated )
+FUNCTION: CXString clang_Cursor_getGCCAssemblyTemplate ( CXCursor arg0 )
+FUNCTION: uint clang_Cursor_isGCCAssemblyHasGoto ( CXCursor arg0 )
+FUNCTION: uint clang_Cursor_getGCCAssemblyNumOutputs ( CXCursor arg0 )
+FUNCTION: uint clang_Cursor_getGCCAssemblyNumInputs ( CXCursor arg0 )
+FUNCTION: uint clang_Cursor_getGCCAssemblyInput ( CXCursor Cursor, uint Index, CXString* Constraint, CXCursor* Expr )
+FUNCTION: uint clang_Cursor_getGCCAssemblyOutput ( CXCursor Cursor, uint Index, CXString* Constraint, CXCursor* Expr )
+FUNCTION: uint clang_Cursor_getGCCAssemblyNumClobbers ( CXCursor Cursor )
+FUNCTION: CXString clang_Cursor_getGCCAssemblyClobber ( CXCursor Cursor, uint Index )
+FUNCTION: uint clang_Cursor_isGCCAssemblyVolatile ( CXCursor Cursor )
+FUNCTION: CXModule clang_Cursor_getModule ( CXCursor C )
+FUNCTION: CXModule clang_getModuleForFile ( CXTranslationUnit arg0, CXFile arg1 )
+FUNCTION: CXFile clang_Module_getASTFile ( CXModule Module )
+FUNCTION: CXModule clang_Module_getParent ( CXModule Module )
+FUNCTION: CXString clang_Module_getName ( CXModule Module )
+FUNCTION: CXString clang_Module_getFullName ( CXModule Module )
+FUNCTION: int clang_Module_isSystem ( CXModule Module )
+FUNCTION: uint clang_Module_getNumTopLevelHeaders ( CXTranslationUnit arg0, CXModule Module )
+FUNCTION: CXFile clang_Module_getTopLevelHeader ( CXTranslationUnit arg0, CXModule Module, uint Index )
+FUNCTION: uint clang_CXXConstructor_isConvertingConstructor ( CXCursor C )
+FUNCTION: uint clang_CXXConstructor_isCopyConstructor ( CXCursor C )
+FUNCTION: uint clang_CXXConstructor_isDefaultConstructor ( CXCursor C )
+FUNCTION: uint clang_CXXConstructor_isMoveConstructor ( CXCursor C )
+FUNCTION: uint clang_CXXField_isMutable ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isDefaulted ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isDeleted ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isPureVirtual ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isStatic ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isVirtual ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isCopyAssignmentOperator ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isMoveAssignmentOperator ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isExplicit ( CXCursor C )
+FUNCTION: uint clang_CXXRecord_isAbstract ( CXCursor C )
+FUNCTION: uint clang_EnumDecl_isScoped ( CXCursor C )
+FUNCTION: uint clang_CXXMethod_isConst ( CXCursor C )
+FUNCTION: CXCursorKind clang_getTemplateCursorKind ( CXCursor C )
+FUNCTION: CXSourceRange clang_getCursorReferenceNameRange ( CXCursor C, uint NameFlags, uint PieceIndex )
+FUNCTION: CXCompletionChunkKind clang_getCompletionChunkKind ( CXCompletionString completion_string, uint chunk_number )
+FUNCTION: CXString clang_getCompletionChunkText ( CXCompletionString completion_string, uint chunk_number )
+FUNCTION: CXCompletionString clang_getCompletionChunkCompletionString ( CXCompletionString completion_string, uint chunk_number )
+FUNCTION: uint clang_getNumCompletionChunks ( CXCompletionString completion_string )
+FUNCTION: uint clang_getCompletionPriority ( CXCompletionString completion_string )
+FUNCTION: CXAvailabilityKind clang_getCompletionAvailability ( CXCompletionString completion_string )
+FUNCTION: uint clang_getCompletionNumAnnotations ( CXCompletionString completion_string )
+FUNCTION: CXString clang_getCompletionAnnotation ( CXCompletionString completion_string, uint annotation_number )
+FUNCTION: CXString clang_getCompletionParent ( CXCompletionString completion_string, CXCursorKind* kind )
+FUNCTION: CXString clang_getCompletionBriefComment ( CXCompletionString completion_string )
+FUNCTION: CXCompletionString clang_getCursorCompletionString ( CXCursor cursor )
+FUNCTION: uint clang_getCompletionNumFixIts ( CXCodeCompleteResults* results, uint completion_index )
+FUNCTION: CXString clang_getCompletionFixIt ( CXCodeCompleteResults* results, uint completion_index, uint fixit_index, CXSourceRange* replacement_range )
+FUNCTION: uint clang_defaultCodeCompleteOptions (  )
+FUNCTION: CXCodeCompleteResults* clang_codeCompleteAt ( CXTranslationUnit TU, c-string complete_filename, uint complete_line, uint complete_column, CXUnsavedFile* unsaved_files, uint num_unsaved_files, uint options )
+FUNCTION: void clang_sortCodeCompletionResults ( CXCompletionResult* Results, uint NumResults )
+FUNCTION: void clang_disposeCodeCompleteResults ( CXCodeCompleteResults* Results )
+FUNCTION: uint clang_codeCompleteGetNumDiagnostics ( CXCodeCompleteResults* Results )
+FUNCTION: CXDiagnostic clang_codeCompleteGetDiagnostic ( CXCodeCompleteResults* Results, uint Index )
+FUNCTION: ulonglong clang_codeCompleteGetContexts ( CXCodeCompleteResults* Results )
+FUNCTION: CXCursorKind clang_codeCompleteGetContainerKind ( CXCodeCompleteResults* Results, uint* IsIncomplete )
+FUNCTION: CXString clang_codeCompleteGetContainerUSR ( CXCodeCompleteResults* Results )
+FUNCTION: CXString clang_codeCompleteGetObjCSelector ( CXCodeCompleteResults* Results )
+FUNCTION: void clang_toggleCrashRecovery ( uint isEnabled )
+FUNCTION: void clang_getInclusions ( CXTranslationUnit tu, CXInclusionVisitor visitor, CXClientData client_data )
+FUNCTION: CXEvalResult clang_Cursor_Evaluate ( CXCursor C )
+FUNCTION: CXEvalResultKind clang_EvalResult_getKind ( CXEvalResult E )
+FUNCTION: int clang_EvalResult_getAsInt ( CXEvalResult E )
+FUNCTION: longlong clang_EvalResult_getAsLongLong ( CXEvalResult E )
+FUNCTION: uint clang_EvalResult_isUnsignedInt ( CXEvalResult E )
+FUNCTION: ulonglong clang_EvalResult_getAsUnsigned ( CXEvalResult E )
+FUNCTION: double clang_EvalResult_getAsDouble ( CXEvalResult E )
+FUNCTION: char* clang_EvalResult_getAsStr ( CXEvalResult E )
+FUNCTION: void clang_EvalResult_dispose ( CXEvalResult E )
+FUNCTION: CXResult clang_findReferencesInFile ( CXCursor cursor, CXFile file, CXCursorAndRangeVisitor visitor )
+FUNCTION: CXResult clang_findIncludesInFile ( CXTranslationUnit TU, CXFile file, CXCursorAndRangeVisitor visitor )
+FUNCTION: CXResult clang_findReferencesInFileWithBlock ( CXCursor arg0, CXFile arg1, CXCursorAndRangeVisitorBlock arg2 )
+FUNCTION: CXResult clang_findIncludesInFileWithBlock ( CXTranslationUnit arg0, CXFile arg1, CXCursorAndRangeVisitorBlock arg2 )
+FUNCTION: int clang_index_isEntityObjCContainerKind ( CXIdxEntityKind arg0 )
+FUNCTION: CXIdxObjCContainerDeclInfo* clang_index_getObjCContainerDeclInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxObjCInterfaceDeclInfo* clang_index_getObjCInterfaceDeclInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxObjCCategoryDeclInfo* clang_index_getObjCCategoryDeclInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxObjCProtocolRefListInfo* clang_index_getObjCProtocolRefListInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxObjCPropertyDeclInfo* clang_index_getObjCPropertyDeclInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxIBOutletCollectionAttrInfo* clang_index_getIBOutletCollectionAttrInfo ( CXIdxAttrInfo* arg0 )
+FUNCTION: CXIdxCXXClassDeclInfo* clang_index_getCXXClassDeclInfo ( CXIdxDeclInfo* arg0 )
+FUNCTION: CXIdxClientContainer clang_index_getClientContainer ( CXIdxContainerInfo* arg0 )
+FUNCTION: void clang_index_setClientContainer ( CXIdxContainerInfo* arg0, CXIdxClientContainer arg1 )
+FUNCTION: CXIdxClientEntity clang_index_getClientEntity ( CXIdxEntityInfo* arg0 )
+FUNCTION: void clang_index_setClientEntity ( CXIdxEntityInfo* arg0, CXIdxClientEntity arg1 )
+FUNCTION: CXIndexAction clang_IndexAction_create ( CXIndex CIdx )
+FUNCTION: void clang_IndexAction_dispose ( CXIndexAction arg0 )
+FUNCTION: int clang_indexSourceFile ( CXIndexAction arg0, CXClientData client_data, IndexerCallbacks* index_callbacks, uint index_callbacks_size, uint index_options, c-string source_filename, char** command_line_args, int num_command_line_args, CXUnsavedFile* unsaved_files, uint num_unsaved_files, CXTranslationUnit* out_TU, uint TU_options )
+FUNCTION: int clang_indexSourceFileFullArgv ( CXIndexAction arg0, CXClientData client_data, IndexerCallbacks* index_callbacks, uint index_callbacks_size, uint index_options, c-string source_filename, char** command_line_args, int num_command_line_args, CXUnsavedFile* unsaved_files, uint num_unsaved_files, CXTranslationUnit* out_TU, uint TU_options )
+FUNCTION: int clang_indexTranslationUnit ( CXIndexAction arg0, CXClientData client_data, IndexerCallbacks* index_callbacks, uint index_callbacks_size, uint index_options, CXTranslationUnit arg5 )
+FUNCTION: void clang_indexLoc_getFileLocation ( CXIdxLoc loc, CXIdxClientFile* indexFile, CXFile* file, uint* line, uint* column, uint* offset )
+FUNCTION: CXSourceLocation clang_indexLoc_getCXSourceLocation ( CXIdxLoc loc )
+FUNCTION: uint clang_visitCXXBaseClasses ( CXType T, CXFieldVisitor visitor, CXClientData client_data )
+FUNCTION: uint clang_visitCXXMethods ( CXType T, CXFieldVisitor visitor, CXClientData client_data )
+FUNCTION: CXString clang_getBinaryOperatorKindSpelling ( CXBinaryOperatorKind kind )
+FUNCTION: CXBinaryOperatorKind clang_getCursorBinaryOperatorKind ( CXCursor cursor )
+FUNCTION: CXString clang_getUnaryOperatorKindSpelling ( CXUnaryOperatorKind kind )
+FUNCTION: CXUnaryOperatorKind clang_getCursorUnaryOperatorKind ( CXCursor cursor )
+FUNCTION: CXRemapping clang_getRemappings ( c-string arg0 )
+FUNCTION: CXRemapping clang_getRemappingsFromFileList ( char** arg0, uint arg1 )
+FUNCTION: uint clang_remap_getNumFiles ( CXRemapping arg0 )
+FUNCTION: void clang_remap_getFilenames ( CXRemapping arg0, uint arg1, CXString* arg2, CXString* arg3 )
+FUNCTION: void clang_remap_dispose ( CXRemapping arg0 )
+FUNCTION: CXComment clang_Cursor_getParsedComment ( CXCursor C )
+FUNCTION: CXCommentKind clang_Comment_getKind ( CXComment Comment )
+FUNCTION: uint clang_Comment_getNumChildren ( CXComment Comment )
+FUNCTION: CXComment clang_Comment_getChild ( CXComment Comment, uint ChildIdx )
+FUNCTION: uint clang_Comment_isWhitespace ( CXComment Comment )
+FUNCTION: uint clang_InlineContentComment_hasTrailingNewline ( CXComment Comment )
+FUNCTION: CXString clang_TextComment_getText ( CXComment Comment )
+FUNCTION: CXString clang_InlineCommandComment_getCommandName ( CXComment Comment )
+FUNCTION: CXCommentInlineCommandRenderKind clang_InlineCommandComment_getRenderKind ( CXComment Comment )
+FUNCTION: uint clang_InlineCommandComment_getNumArgs ( CXComment Comment )
+FUNCTION: CXString clang_InlineCommandComment_getArgText ( CXComment Comment, uint ArgIdx )
+FUNCTION: CXString clang_HTMLTagComment_getTagName ( CXComment Comment )
+FUNCTION: uint clang_HTMLStartTagComment_isSelfClosing ( CXComment Comment )
+FUNCTION: uint clang_HTMLStartTag_getNumAttrs ( CXComment Comment )
+FUNCTION: CXString clang_HTMLStartTag_getAttrName ( CXComment Comment, uint AttrIdx )
+FUNCTION: CXString clang_HTMLStartTag_getAttrValue ( CXComment Comment, uint AttrIdx )
+FUNCTION: CXString clang_BlockCommandComment_getCommandName ( CXComment Comment )
+FUNCTION: uint clang_BlockCommandComment_getNumArgs ( CXComment Comment )
+FUNCTION: CXString clang_BlockCommandComment_getArgText ( CXComment Comment, uint ArgIdx )
+FUNCTION: CXComment clang_BlockCommandComment_getParagraph ( CXComment Comment )
+FUNCTION: CXString clang_ParamCommandComment_getParamName ( CXComment Comment )
+FUNCTION: uint clang_ParamCommandComment_isParamIndexValid ( CXComment Comment )
+FUNCTION: uint clang_ParamCommandComment_getParamIndex ( CXComment Comment )
+FUNCTION: uint clang_ParamCommandComment_isDirectionExplicit ( CXComment Comment )
+FUNCTION: CXCommentParamPassDirection clang_ParamCommandComment_getDirection ( CXComment Comment )
+FUNCTION: CXString clang_TParamCommandComment_getParamName ( CXComment Comment )
+FUNCTION: uint clang_TParamCommandComment_isParamPositionValid ( CXComment Comment )
+FUNCTION: uint clang_TParamCommandComment_getDepth ( CXComment Comment )
+FUNCTION: uint clang_TParamCommandComment_getIndex ( CXComment Comment, uint Depth )
+FUNCTION: CXString clang_VerbatimBlockLineComment_getText ( CXComment Comment )
+FUNCTION: CXString clang_VerbatimLineComment_getText ( CXComment Comment )
+FUNCTION: CXString clang_HTMLTagComment_getAsString ( CXComment Comment )
+FUNCTION: CXString clang_FullComment_getAsHTML ( CXComment Comment )
+FUNCTION: CXString clang_FullComment_getAsXML ( CXComment Comment )
+FUNCTION: CXErrorCode clang_createAPISet ( CXTranslationUnit tu, CXAPISet* out_api )
+FUNCTION: void clang_disposeAPISet ( CXAPISet api )
+FUNCTION: CXString clang_getSymbolGraphForUSR ( c-string usr, CXAPISet api )
+FUNCTION: CXString clang_getSymbolGraphForCursor ( CXCursor cursor )
+FUNCTION: CXCompilationDatabase clang_CompilationDatabase_fromDirectory ( c-string BuildDir, CXCompilationDatabase_Error* ErrorCode )
+FUNCTION: void clang_CompilationDatabase_dispose ( CXCompilationDatabase arg0 )
+FUNCTION: CXCompileCommands clang_CompilationDatabase_getCompileCommands ( CXCompilationDatabase arg0, c-string CompleteFileName )
+FUNCTION: CXCompileCommands clang_CompilationDatabase_getAllCompileCommands ( CXCompilationDatabase arg0 )
+FUNCTION: void clang_CompileCommands_dispose ( CXCompileCommands arg0 )
+FUNCTION: uint clang_CompileCommands_getSize ( CXCompileCommands arg0 )
+FUNCTION: CXCompileCommand clang_CompileCommands_getCommand ( CXCompileCommands arg0, uint I )
+FUNCTION: CXString clang_CompileCommand_getDirectory ( CXCompileCommand arg0 )
+FUNCTION: CXString clang_CompileCommand_getFilename ( CXCompileCommand arg0 )
+FUNCTION: uint clang_CompileCommand_getNumArgs ( CXCompileCommand arg0 )
+FUNCTION: CXString clang_CompileCommand_getArg ( CXCompileCommand arg0, uint I )
+FUNCTION: uint clang_CompileCommand_getNumMappedSources ( CXCompileCommand arg0 )
+FUNCTION: CXString clang_CompileCommand_getMappedSourcePath ( CXCompileCommand arg0, uint I )
+FUNCTION: CXString clang_CompileCommand_getMappedSourceContent ( CXCompileCommand arg0, uint I )
+FUNCTION: CXRewriter clang_CXRewriter_create ( CXTranslationUnit TU )
+FUNCTION: void clang_CXRewriter_insertTextBefore ( CXRewriter Rew, CXSourceLocation Loc, c-string Insert )
+FUNCTION: void clang_CXRewriter_replaceText ( CXRewriter Rew, CXSourceRange ToBeReplaced, c-string Replacement )
+FUNCTION: void clang_CXRewriter_removeText ( CXRewriter Rew, CXSourceRange ToBeRemoved )
+FUNCTION: int clang_CXRewriter_overwriteChangedFiles ( CXRewriter Rew )
+FUNCTION: void clang_CXRewriter_writeMainFileToStdOut ( CXRewriter Rew )
+FUNCTION: void clang_CXRewriter_dispose ( CXRewriter Rew )
+FUNCTION: void clang_install_aborting_llvm_fatal_error_handler (  )
+FUNCTION: void clang_uninstall_llvm_fatal_error_handler (  )

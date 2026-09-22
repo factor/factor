@@ -126,7 +126,10 @@ M: hashtable at*
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;
 
 M: hashtable clear-assoc
-    [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi ;
+    ! count includes tombstones; zero means every slot is already empty.
+    dup count>> zero? [ drop ] [
+        [ init-hash ] [ array>> [ drop +empty+ ] map! drop ] bi
+    ] if ;
 
 M: hashtable delete-at
     [ nip ] [ key@ ] 2bi [

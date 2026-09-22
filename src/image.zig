@@ -132,7 +132,7 @@ pub const VMParameters = struct {
     young_size: Cell = 2 * 1024 * 1024, // 2MB  (cell/4 MB on 64-bit)
     aging_size: Cell = 4 * 1024 * 1024, // 4MB  (cell/2 MB on 64-bit)
     tenured_size: Cell = 192 * 1024 * 1024, // 192MB (24*cell MB on 64-bit)
-    code_size: Cell = 96 * 1024 * 1024, // 96MB
+    code_size: Cell = 128 * 1024 * 1024, // 128MB
     fep: bool = false,
     console: bool = true,
     signals: bool = true,
@@ -511,7 +511,7 @@ pub const ImageLoader = struct {
         // 3. Callback trampolines
 
         // Heap capacity comes from -codeheap=N (megabytes) via VMParameters,
-        // matching C++ load_code_heap(p->code_size). Default is 96MB.
+        // matching C++ load_code_heap(p->code_size). Default is 128MB.
         const page_size = std.heap.page_size_min;
         const heap_size = layouts.alignCell(self.params.code_size, page_size);
 

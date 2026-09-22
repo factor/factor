@@ -1,4 +1,4 @@
-USING: accessors assocs continuations hashtables kernel make
+USING: accessors assocs continuations hashtables hashtables.private kernel make
 math namespaces sequences tools.test ;
 
 { H{ } } [ { } [ dup ] H{ } map>assoc ] unit-test
@@ -111,6 +111,18 @@ H{ } clone "counting" set
 "rehash" get clear-assoc
 
 { 0 } [ "rehash" get assoc-size ] unit-test
+
+{ 0 0 t } [
+    H{ { "deleted-key" "deleted-value" } } clone
+    [ "deleted-key" swap delete-at ] keep
+    dup clear-assoc
+    [ count>> ] [ deleted>> ] [ array>> [ +empty+ eq? ] all? ] tri
+] unit-test
+
+{ 1 } [
+    10000 <hashtable> dup clear-assoc dup clear-assoc
+    [ 123 "new-key" rot set-at ] keep assoc-size
+] unit-test
 
 {
     3

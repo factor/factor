@@ -1,12 +1,11 @@
 ! Copyright (C) 2022 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.enums
-alien.strings ascii assocs byte-arrays classes classes.struct
-combinators combinators.extras combinators.short-circuit
-combinators.smart discord io io.backend io.directories
-io.encodings.utf8 io.files.info kernel layouts libc libclang.ffi
-make math math.parser multiline namespaces prettyprint sequences
-sequences.private sets sorting splitting strings ;
+alien.strings ascii assocs classes combinators combinators.short-circuit
+combinators.smart continuations io io.backend io.directories
+io.encodings.utf8 io.files.info kernel layouts libclang.ffi
+math math.parser namespaces sequences sequences.private sets sorting
+splitting strings ;
 IN: libclang
 
 SYMBOL: clang-state
@@ -19,7 +18,7 @@ TUPLE: libclang-state
     unnamed-counter unnamed-table
     typedefs
     out-forms-counter out-forms out-forms-by-name
-    out-forms-written out-form-names-written ;
+    out-forms-written out-form-names-written out-form-orders-written ;
 
 : <libclang-state> ( -- state )
     libclang-state new
@@ -35,7 +34,8 @@ TUPLE: libclang-state
         H{ } clone >>out-forms
         H{ } clone >>out-forms-by-name
         HS{ } clone >>out-forms-written
-        HS{ } clone >>out-form-names-written ;
+        HS{ } clone >>out-form-names-written
+        HS{ } clone >>out-form-orders-written ;
 
 : next-defs-counter ( libclang-state -- n ) [ dup 1 + ] change-defs-counter drop ;
 : next-unnamed-counter ( libclang-state -- n ) [ dup 1 + ] change-unnamed-counter drop ;
@@ -72,14 +72,20 @@ GENERIC: def>out-form ( obj -- string )
     ] if ;
 
 ! some forms must be defined out of order, e.g. anonymous unions/structs
+SLOT: order
+
 : def>out-forms ( obj -- )
-    [ def>out-form ] keep save-out-form ;
+    dup order>> clang-state> out-form-orders-written>> in? [
+        drop
+    ] [
+        [ [ def>out-form ] keep save-out-form ]
+        [ order>> clang-state> out-form-orders-written>> adjoin ] bi
+    ] if ;
 
 : peek-current-form ( -- n )
     clang-state> c-forms>> ?last ; inline
 
 SLOT: parent-order
-SLOT: order
 
 : push-child-form ( form -- )
     ! dup order>> c-defs-by-order get-global set-at ; inline
@@ -113,7 +119,6 @@ M: object print-deferred
     ] [
         [ clang-state> next-unnamed-counter number>string append ] dip
         " " split1-last nip
-        ! "RECORDING: " gwrite dup g... gflush
         [ clang-state> unnamed-table>> set-at ] keepd
     ] if ; inline
 
@@ -309,8 +314,9 @@ M: object def>out-form
         [ type>> ] [ name>> ] bi clang-state> typedefs>> set-at
     ] if ;
 
-: clang-get-cstring ( CXString -- string )
-    clang_getCString [ utf8 alien>string ] [ clang_disposeString ] bi ;
+:: clang-get-cstring ( CXString -- string )
+    [ CXString clang_getCString utf8 alien>string ]
+    [ CXString clang_disposeString ] finally ;
 
 : trim-blanks ( string -- string' )
     [ blank? ] trim ; inline
@@ -321,7 +327,7 @@ M: object def>out-form
     cell-bits 8 /i ; inline
 
 : get-tokens ( tokens ntokens -- tokens )
-    <iota> cell-bytes '[
+    <iota> CXToken heap-size '[
         _ * swap <displaced-alien>
         clang_getTokenKind
     ] with { } map-as ;
@@ -351,23 +357,40 @@ M: object def>out-form
 :: with-cursor-tokens ( cursor quot: ( tu token -- obj ) -- seq )
     cursor clang_Cursor_getTranslationUnit :> tu
     tu cursor clang_getCursorExtent clang-tokenize :> ( tokens ntokens )
-    tu
-    tokens CXToken ntokens ptr-array>array
-    [ clang_getTokenSpelling clang-get-cstring ] with map
-    tu tokens ntokens clang_disposeTokens ; inline
+    [
+        tokens CXToken ntokens ptr-array>array
+        [ tu swap quot call ] map
+    ] [ tu tokens ntokens clang_disposeTokens ] finally ; inline
 
 DEFER: cursor>c-struct
 DEFER: cursor>c-union
 
-:: cursor-type ( cursor -- string )
-    cursor clang_getCursorType clang_getTypeSpelling clang-get-cstring
+: c-type-prefixes ( -- assoc )
+    {
+        { "int8_t" "char" } { "int16_t" "short" }
+        { "int32_t" "int" } { "int64_t" "longlong" }
+        { "uint8_t" "uchar" } { "uint16_t" "ushort" }
+        { "uint32_t" "uint" } { "uint64_t" "ulonglong" }
+        { "signed char" "char" } { "signed short" "short" }
+        { "signed int" "int" } { "signed long" "long" }
+        { "unsigned char" "uchar" } { "unsigned short" "ushort" }
+        { "unsigned int" "uint" } { "unsigned long" "ulong" }
+    } ;
+
+:: normalize-c-type-prefix ( string -- string' )
+    c-type-prefixes [ drop string swap head? ] assoc-find [
+        [ string swap ?head drop trim-blanks ] dip prepend
+    ] [
+        2drop string dup "(*)" swap subseq? [ drop "void*" ] when
+    ] if ;
+
+: c-type-name>factor ( string -- string' )
 
     "const" ?head drop
 
     [ CHAR: * = ] cut-tail
     [ [ trim-blanks ] dip append ] when*
 
-    dup :> type
     {
         { [ dup "struct " head? ] [
             " " split1-last nip
@@ -382,25 +405,12 @@ DEFER: cursor>c-union
             clang-state> unnamed-table>> ?at or
         ] }
         { [ dup "_Bool" = ] [ drop "bool" ] }
-        { [ "int8_t" ?head ] [ trim-blanks "char" prepend ] }
-        { [ "int16_t" ?head ] [ trim-blanks "short" prepend ] }
-        { [ "int32_t" ?head ] [ trim-blanks "int" prepend ] }
-        { [ "int64_t" ?head ] [ trim-blanks "longlong" prepend ] }
-        { [ "uint8_t" ?head ] [ trim-blanks "uchar" prepend ] }
-        { [ "uint16_t" ?head ] [ trim-blanks "ushort" prepend ] }
-        { [ "uint32_t" ?head ] [ trim-blanks "uint" prepend ] }
-        { [ "uint64_t" ?head ] [ trim-blanks "ulonglong" prepend ] }
-        { [ "signed char" ?head ] [ trim-blanks "char" prepend ] }
-        { [ "signed short" ?head ] [ trim-blanks "short" prepend ] }
-        { [ "signed int" ?head ] [ trim-blanks "int" prepend ] }
-        { [ "signed long" ?head ] [ trim-blanks "long" prepend ] }
-        { [ "unsigned char" ?head ] [ trim-blanks "uchar" prepend ] }
-        { [ "unsigned short" ?head ] [ trim-blanks "ushort" prepend ] }
-        { [ "unsigned int" ?head ] [ trim-blanks "uint" prepend ] }
-        { [ "unsigned long" ?head ] [ trim-blanks "ulong" prepend ] }
-        { [ dup "(*)" swap subseq? ] [ drop "void*" ] }
-        [ ]
+        [ normalize-c-type-prefix ]
     } cond ;
+
+: cursor-type ( cursor -- string )
+    clang_getCursorType clang_getTypeSpelling clang-get-cstring
+    c-type-name>factor ;
 
 : cursor-name ( cursor -- string )
     clang_getCursorSpelling clang-get-cstring "Enum" ?unnamed drop ;
@@ -500,7 +510,6 @@ DEFER: cursor-visitor
     [
         2drop
         dup clang_getCursorKind
-        ! dup "cursor-visitor got: " gwrite g... gflush
         {
             { CXCursor_Namespace [ drop CXChildVisit_Recurse ] }
             { CXCursor_FunctionDecl [ cursor>c-function CXChildVisit_Continue ] }
@@ -514,32 +523,27 @@ DEFER: cursor-visitor
                 cursor>c-field CXChildVisit_Continue
             ] }
             { CXCursor_EnumConstantDecl [
-                [
-                    [
-                        clang_getTokenSpelling clang-get-cstring
-                    ] with-cursor-tokens
-                    first
-                ] [
+                [ cursor-name ] [
                     clang_getEnumConstantDeclUnsignedValue number>string
                 ] bi
                 <c-field> push-child-form
                 CXChildVisit_Continue
             ] }
             { CXCursor_UnexposedDecl [ drop CXChildVisit_Continue ] }
-            [
-                "cursor-visitor unhandled: " gwrite dup g... gflush
-                2drop CXChildVisit_Recurse
-            ]
+            [ 2drop CXChildVisit_Recurse ]
         } case
-    ] CXCursorVisitor
-    gflush ;
+    ] CXCursorVisitor ;
 
 : with-clang-index ( quot: ( index -- ) -- )
-    [ 0 0 clang_createIndex ] dip keep clang_disposeIndex ; inline
+    [ 0 0 clang_createIndex ] dip
+    over [ clang_disposeIndex ] curry finally ; inline
+
+ERROR: clang-parse-error ;
 
 : with-clang-translation-unit ( idx source-file command-line-args nargs unsaved-files nunsaved-files options quot: ( tu -- ) -- )
     [ enum>number clang_parseTranslationUnit ] dip
-    keep clang_disposeTranslationUnit ; inline
+    over [ clang-parse-error ] unless
+    over [ clang_disposeTranslationUnit ] curry finally ; inline
 
 : with-clang-default-translation-unit ( path quot: ( tu path -- ) -- )
     dupd '[
@@ -548,19 +552,23 @@ DEFER: cursor-visitor
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
-: with-clang-cursor ( path quot: ( tu path cursor -- ) -- )
-    dupd '[
-        _ f 0 f 0 CXTranslationUnit_None [
-            _ over clang_getTranslationUnitCursor @
+:: with-clang-cursor-options ( path options quot: ( tu path cursor -- ) -- )
+    [| idx |
+        idx path f 0 f 0 options [| tu |
+            tu path tu clang_getTranslationUnitCursor quot call
         ] with-clang-translation-unit
     ] with-clang-index ; inline
 
+: with-clang-cursor ( path quot: ( tu path cursor -- ) -- )
+    CXTranslationUnit_None swap with-clang-cursor-options ; inline
+
 : parse-c-exports ( path -- )
+    CXTranslationUnit_SkipFunctionBodies
     [
         2nip cursor-visitor f clang_visitChildren drop
-    ] with-clang-cursor ;
+    ] with-clang-cursor-options ;
 
-: write-c-defs ( clang-state -- )
+: (write-c-defs) ( clang-state -- )
     [
         c-defs-by-order>>
         sort-keys values
@@ -573,13 +581,16 @@ DEFER: cursor-visitor
         sort-keys values write-lines
     ] bi ;
 
+:: write-c-defs ( state -- )
+    clang-state> :> previous
+    state clang-state set-global
+    [ state (write-c-defs) ]
+    [ previous clang-state set-global ] finally ;
+
 : parse-include ( path -- libclang-state )
-    <libclang-state> clang-state [
-        normalize-path
-        parse-c-exports
-    ] with-output-global-variable
-    ! dup write-c-defs
-    ;
+    <libclang-state> clang-state set-global
+    normalize-path parse-c-exports
+    clang-state> ;
 
 : parse-hpp-files ( path -- assoc )
     ?qualified-directory-files

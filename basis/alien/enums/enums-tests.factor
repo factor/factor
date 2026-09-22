@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Erik Charlebois.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.enums alien.enums.private
-alien.syntax sequences tools.test words ;
+alien.syntax kernel sequences tools.test words ;
 IN: alien.enums.tests
 
 ENUM: color_t red { green 3 } blue ;
@@ -49,3 +49,18 @@ SYMBOLS: couleurs rouge vert bleu jaune azure ;
 } define-enum >>
 
 { { 0 3 4 14 4 } } [ { rouge vert bleu jaune azure } [ enum>number ] map ] unit-test
+
+ENUM: large-enum
+    e00 e01 e02 e03 e04 e05 e06 e07 e08 e09
+    e10 e11 e12 e13 e14 e15 e16 e17 e18 e19
+    e20 e21 e22 e23 e24 e25 e26 e27 e28 e29
+    e30 e31 e32 { e00-alias e00 } { e01-alias e01 } ;
+
+{ e00 e01 e32 -1 33 } [
+    0 <large-enum> 1 <large-enum> 32 <large-enum>
+    -1 <large-enum> 33 <large-enum>
+] unit-test
+
+{ t } [
+    33 <iota> dup [ <large-enum> enum>number ] map sequence=
+] unit-test
