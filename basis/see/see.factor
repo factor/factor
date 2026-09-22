@@ -128,7 +128,7 @@ M: word declarations.
 
 M: object see*
     [
-        12 nesting-limit namespaces:set
+        f nesting-limit namespaces:set
         100 length-limit namespaces:set
         <colon dup synopsis*
         <block dup definition pprint-elements block>
