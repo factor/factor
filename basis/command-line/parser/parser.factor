@@ -5,8 +5,9 @@ USING: accessors arrays assocs classes combinators
 combinators.short-circuit command-line continuations debugger
 formatting generic.math io io.pathnames io.sockets kernel lexer
 math math.parser namespaces parser prettyprint quotations random
-sequences splitting strings strings.tables.private
+sequences sets splitting strings strings.tables.private
 tools.completion unicode vocabs.parser ;
+FROM: namespaces => set ;
 
 IN: command-line.parser
 
@@ -26,7 +27,7 @@ SYMBOL: program-prolog
 SYMBOL: program-epilog
 
 TUPLE: option name type help variable default convert validate
-    const required? meta #args ;
+    const required? meta #args { aliases initial: { } } ;
 
 <PRIVATE
 
@@ -38,6 +39,10 @@ M: option >option ;
     {
         [ name>> ] [ variable>> dup string? [ name>> ] unless ]
     } 1|| [ CHAR: - = ] trim-head ;
+
+: option-names ( option -- names )
+    [ aliases>> [ [ CHAR: - = ] trim-head ] map ]
+    [ option-name ] bi prefix members ;
 
 :: option-#args ( option -- #args )
     option #args>> [ option const>> 1 xor ] unless* ;
@@ -191,14 +196,11 @@ M: class argvalid? instance? ;
 : print-program-name ( -- )
     get-program-name "    " write write " [options] [arguments]" print ;
 
-: option-argument ( option -- argument )
-    [ option-name ]
-    [
-        dup positional? [ drop ] [
-            [ "--" prepend ]
-            [ option-meta [ " " glue ] when* ] bi*
-        ] if
-    ] bi ;
+:: option-argument ( option -- argument )
+    option positional? [ option option-name ] [
+        option aliases>> option option-name "--" prepend prefix
+        ", " join option option-meta [ " " glue ] when*
+    ] if ;
 
 : print-arguments ( options -- )
     [ bl ] [ option-argument "[" "]" surround write ] interleave ;
@@ -237,10 +239,11 @@ ERROR: usage-error < option-error options ;
 M: usage-error error. options>> print-help ;
 
 :: find-option ( arg options -- option )
-    options [ option-name arg = ] find nip [
+    options [ option-names arg swap member? ] find nip [
         allow-abbrev? get [
-            arg options [ dup option-name ] map>alist
-            completions keys dup length {
+            arg options [| option |
+                option option-names [ option swap 2array ] map
+            ] gather completions keys members dup length {
                 { 0 [ arg unknown-option ] }
                 { 1 [ first ] }
                 [ drop arg swap ambiguous-option ]

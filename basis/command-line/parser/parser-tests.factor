@@ -351,3 +351,62 @@ TUPLE: foo ;
     { T{ option { name "--flag" } { const t } } }
     { "--no-flag=value" } (parse-options)
 ] [ invalid-value? ] must-fail-with
+
+! GitHub #2994: aliases share one canonical option and its validation.
+{ { H{ { "host" "local" } } H{ { "host" "local" } } } } [
+    { T{ option { name "--host" } { aliases { "-H" "--hostname" } } { required? t } } }
+    { { "-H" "local" } { "--hostname=local" } }
+    [ (parse-options) ] with map
+] unit-test
+
+! Exact short aliases disambiguate otherwise matching long names.
+{ H{ { "helpful" t } } } [
+    {
+        T{ option { name "--helpful" } { aliases { "-h" } } { const t } }
+        T{ option { name "--host" } }
+    } { "-h" } (parse-options)
+] unit-test
+
+! Multiple fuzzy matches for the same option are not ambiguous.
+{ H{ { "host" "local" } } } [
+    { T{ option { name "--host" } { aliases { "--hostname" } } } }
+    { "--hos" "local" } (parse-options)
+] unit-test
+
+{ H{ { "host" "local" } } } [
+    f allow-abbrev? [
+        { T{ option { name "--host" } { aliases { "-H" } } } }
+        { "-H" "local" } (parse-options)
+    ] with-variable
+] unit-test
+
+[
+    { T{ option { name "--port" } { aliases { "-p" } } { type integer } } }
+    { "-p=invalid" } (parse-options)
+] [ invalid-value? ] must-fail-with
+
+{ H{ { "verbose" f } } } [
+    { T{ option { name "--verbose" } { aliases { "-v" } } { const t } } }
+    { "--no-v" } (parse-options)
+] unit-test
+
+{ "--host, -H, --hostname HOST" } [
+    T{ option { name "--host" } { aliases { "-H" "--hostname" } } }
+    option-argument
+] unit-test
+
+{ { H{ { "server" "fallback" } } H{ { "server" "local" } } } } [
+    {
+        T{ option
+            { name "--host" } { aliases { "--hostname" } }
+            { variable "server" } { default "fallback" }
+        }
+    } { { } { "--hostname=local" } } [ (parse-options) ] with map
+] unit-test
+
+[
+    {
+        T{ option { name "--alpha" } { aliases { "--shared-one" } } }
+        T{ option { name "--beta" } { aliases { "--shared-two" } } }
+    } { "--shared" "value" } (parse-options)
+] [ ambiguous-option? ] must-fail-with
