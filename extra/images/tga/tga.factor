@@ -63,23 +63,25 @@ ERROR: bad-tga-unsupported ;
 : read-image-data ( width height depth -- image-data )
     8 align 8 / * * read ; inline
 
+! Keep optional footer parsers out of line to avoid duplicating their
+! bodies in the main image reader.
 : read-extension-area-offset ( -- offset )
-    4 read le> ; inline
+    4 read le> ;
 
 : read-developer-directory-offset ( -- offset )
-    4 read le> ; inline
+    4 read le> ;
 
 : read-signature ( -- )
-    18 read ascii decode "TRUEVISION-XFILE.\0" = [ bad-tga-footer ] unless ; inline
+    18 read ascii decode "TRUEVISION-XFILE.\0" = [ bad-tga-footer ] unless ;
 
 : read-extension-size ( -- )
-    2 read le> 495 = [ bad-tga-extension-size ] unless ; inline
+    2 read le> 495 = [ bad-tga-extension-size ] unless ;
 
 : read-author-name ( -- string )
-    41 read ascii decode [ 0 = ] trim ; inline
+    41 read ascii decode [ 0 = ] trim ;
 
 : read-author-comments ( -- string )
-    4 <iota> [ drop 81 read ascii decode [ 0 = ] trim ] map concat ; inline
+    4 <iota> [ drop 81 read ascii decode [ 0 = ] trim ] map concat ;
 
 : read-date-timestamp ( -- timestamp )
     timestamp new
@@ -88,54 +90,54 @@ ERROR: bad-tga-unsupported ;
     2 read le>                                                   >>year
     2 read le> dup 23 [0..b] member? [ bad-tga-timestamp ] unless >>hour
     2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ;
 
 : read-job-name ( -- string )
-    41 read ascii decode [ 0 = ] trim ; inline
+    41 read ascii decode [ 0 = ] trim ;
 
 : read-job-time ( -- duration )
     duration new
     2 read le>                                                   >>hour
     2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>minute
-    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ; inline
+    2 read le> dup 59 [0..b] member? [ bad-tga-timestamp ] unless >>second ;
 
 : read-software-id ( -- string )
-    41 read ascii decode [ 0 = ] trim ; inline
+    41 read ascii decode [ 0 = ] trim ;
 
 : read-software-version ( -- string )
     2 read le> 100 /f number>string
-    1 read ascii decode append [ " " = ] trim ; inline
+    1 read ascii decode append [ " " = ] trim ;
 
 :: read-key-color ( -- color )
     1 read le> 255 /f :> alpha
     1 read le> 255 /f
     1 read le> 255 /f
     1 read le> 255 /f
-    alpha <rgba> ; inline
+    alpha <rgba> ;
 
 : read-pixel-aspect-ratio ( -- aspect-ratio )
-    2 read le> 2 read le> /f ; inline
+    2 read le> 2 read le> /f ;
 
 : read-gamma-value ( -- gamma-value )
-    2 read le> 2 read le> /f ; inline
+    2 read le> 2 read le> /f ;
 
 : read-color-correction-offset ( -- offset )
-    4 read le> ; inline
+    4 read le> ;
 
 : read-postage-stamp-offset ( -- offset )
-    4 read le> ; inline
+    4 read le> ;
 
 : read-scan-line-offset ( -- offset )
-    4 read le> ; inline
+    4 read le> ;
 
 : read-premultiplied-alpha ( -- boolean )
-    1 read le> 4 = ; inline
+    1 read le> 4 = ;
 
 : read-scan-line-table ( height -- scan-offsets )
-    <iota> [ drop 4 read le> ] map ; inline
+    <iota> [ drop 4 read le> ] map ;
 
 : read-postage-stamp-image ( depth -- postage-data )
-    8 align 8 / 1 read le> 1 read le> * * read ; inline
+    8 align 8 / 1 read le> 1 read le> * * read ;
 
 :: read-color-correction-table ( -- correction-table )
     256 <iota>
@@ -150,7 +152,7 @@ ERROR: bad-tga-unsupported ;
             2 read le> 65535 /f
             alpha <rgba>
         ] map
-    ] map ; inline
+    ] map ;
 
 : read-developer-directory ( -- developer-directory )
     2 read le> <iota>
@@ -160,13 +162,13 @@ ERROR: bad-tga-unsupported ;
         4 read le>
         4 read le>
         3array
-    ] map ; inline
+    ] map ;
 
 : read-developer-areas ( developer-directory -- developer-area-map )
     [
         [ first ]
         [ dup third second seek-absolute seek-input read ] bi 2array
-    ] map >hashtable ; inline
+    ] map >hashtable ;
 
 :: read-tga ( -- image )
     ! Read header
