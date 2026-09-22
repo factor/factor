@@ -6,13 +6,15 @@ HELP: ->
 { $syntax "-> selector" }
 { $values { "selector" "an Objective C method name" } }
 { $description "A sugared form of the following:" }
-{ $code "\"selector\" send" } ;
+{ $code "\"selector\" send" }
+{ $notes "If imported classes use this selector with different signatures, qualify it as " { $snippet "Class.selector" } "." } ;
 
 HELP: SUPER->
-{ $syntax "-> selector" }
+{ $syntax "SUPER-> selector" }
 { $values { "selector" "an Objective C method name" } }
 { $description "A sugared form of the following:" }
-{ $code "\"selector\" send-super" } ;
+{ $code "\"selector\" super-send" }
+{ $notes "If imported classes use this selector with different signatures, qualify it as " { $snippet "Class.selector" } "." } ;
 
 { send super-send POSTPONE: -> POSTPONE: SUPER-> } related-words
 

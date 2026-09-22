@@ -62,15 +62,20 @@ MEMO: <selector> ( name -- sel )
     <selector> selector ;
 
 SYMBOL: objc-methods
+SYMBOL: ambiguous-objc-methods
 
 objc-methods [ H{ } clone ] initialize
+ambiguous-objc-methods [ HS{ } clone ] initialize
 
 ERROR: no-objc-method name ;
+ERROR: ambiguous-objc-method name ;
 
 : ?lookup-objc-method ( name -- signature/f )
     objc-methods get at ;
 
 : lookup-objc-method ( name -- signature )
+    dup ambiguous-objc-methods get in?
+    [ ambiguous-objc-method ] when
     [ ?lookup-objc-method ] [ no-objc-method ] ?unless ;
 
 MEMO: make-prepare-send ( selector signature super? -- quot )
@@ -246,6 +251,8 @@ ERROR: no-objc-type name ;
     classname "." name 3append :> fullname
     signature first [
         signature cache-stubs
+        name objc-methods get at
+        [ signature = not [ name ambiguous-objc-methods get adjoin ] when ] when*
         signature name objc-methods get set-at
         signature fullname objc-methods get set-at
     ] [

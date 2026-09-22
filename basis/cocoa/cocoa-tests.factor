@@ -1,6 +1,6 @@
-USING: alien.c-types cocoa cocoa.classes cocoa.subclassing
-cocoa.types compiler.test core-graphics.types kernel math memory
-namespaces tools.test ;
+USING: alien.c-types cocoa cocoa.classes cocoa.messages cocoa.runtime
+cocoa.subclassing cocoa.types compiler.test core-graphics.types kernel
+math memory namespaces tools.test ;
 IN: cocoa.tests
 
 <CLASS: Foo < NSObject
@@ -71,3 +71,32 @@ IN: cocoa.tests
 
 { 1 } [ FactorSubclassAuditParent subclass-audit-value ] unit-test
 { 2 } [ FactorSubclassAuditChild subclass-audit-value ] unit-test
+
+<CLASS: FactorSelectorAuditInt < NSObject
+    METHOD: int selectorAuditValue [ 3 ] ;
+;CLASS>
+
+<CLASS: FactorSelectorAuditDouble < NSObject
+    METHOD: double selectorAuditValue [ 4.5 ] ;
+;CLASS>
+
+[ "selectorAuditValue" lookup-objc-method ]
+[ ambiguous-objc-method? ] must-fail-with
+
+{ { int { id SEL } } }
+[ "FactorSelectorAuditInt.selectorAuditValue" lookup-objc-method ] unit-test
+
+{ { double { id SEL } } }
+[ "FactorSelectorAuditDouble.selectorAuditValue" lookup-objc-method ] unit-test
+
+{ 3 } [
+    FactorSelectorAuditInt -> alloc -> init
+    dup -> FactorSelectorAuditInt.selectorAuditValue
+    swap -> release
+] unit-test
+
+{ 4.5 } [
+    FactorSelectorAuditDouble -> alloc -> init
+    dup -> FactorSelectorAuditDouble.selectorAuditValue
+    swap -> release
+] unit-test
