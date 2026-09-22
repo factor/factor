@@ -1,4 +1,4 @@
-USING: help.markup help.syntax make math strings vectors ;
+USING: assocs help.markup help.syntax make math strings vectors ;
 IN: tools.completion
 
 ARTICLE: "tools.completion" "Fuzzy completion"
@@ -55,3 +55,7 @@ HELP: completion,
 HELP: completions
 { $values { "short" string } { "candidates" "a sequence of pairs of the shape " { $snippet "{ obj full }" } } { "seq" "a sequence of pairs of the shape " { $snippet "{ score obj }" } } }
 { $description "Calls " { $link completion } " to produce a sequence of " { $snippet "{ score obj }" } " pairs, then calls " { $link rank-completions } " to sort them and discard the low 33%." } ;
+
+HELP: paths-matching
+{ $values { "str" string } { "seq" assoc } }
+{ $description "Returns fuzzy pathname completions. Relative input is resolved against the current directory, including filename prefixes without a directory separator. An optional leading P\" is preserved in completion strings." } ;

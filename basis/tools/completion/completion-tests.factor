@@ -1,4 +1,5 @@
-USING: assocs kernel sequences tools.completion tools.test ;
+USING: assocs io.directories io.files io.files.unique kernel
+sequences tools.completion tools.test ;
 
 { f } [ "abc" "def" fuzzy ] unit-test
 { V{ 4 5 6 } } [ "set-nth" "nth" fuzzy ] unit-test
@@ -41,3 +42,23 @@ USING: assocs kernel sequences tools.completion tools.test ;
 { t } [ { "P\"" "~/" } complete-pathname? ] unit-test
 { f } [ { "P\"~/\"" "" } complete-pathname? ] unit-test
 { f } [ { "P\"~/\"" "asdf" } complete-pathname? ] unit-test
+
+! #2733: an unqualified filename prefix is relative to current-directory.
+{ { "P\"issue-2733-file" } } [
+    [
+        "issue-2733-file" touch-file
+        "P\"issue-2733" paths-matching keys
+    ] with-test-directory
+] unit-test
+{ { "issue-2733-file" } } [
+    [
+        "issue-2733-file" touch-file
+        "issue-2733" paths-matching keys
+    ] with-test-directory
+] unit-test
+{ { "P\"sub/issue-2733-file" } } [
+    [
+        "sub" make-directory "sub/issue-2733-file" touch-file
+        "P\"sub/issue-2733" paths-matching keys
+    ] with-test-directory
+] unit-test

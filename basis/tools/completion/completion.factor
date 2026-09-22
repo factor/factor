@@ -123,7 +123,7 @@ PRIVATE>
 
 : paths-matching ( str -- seq )
     "P\"" ?head [
-        dup last-path-separator [ 1 + cut ] [ drop "" ] if swap
+        dup last-path-separator [ 1 + cut ] [ drop "" swap ] if swap
         dup { [ file-exists? ] [ file-info directory? ] } 1&&
         [ directory-paths completions ] [ 2drop { } ] if
     ] dip [ [ [ "P\"" prepend ] dip ] assoc-map ] when ;
