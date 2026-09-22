@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: kernel strings io.files assocs
 splitting sequences io namespaces sets
-io.encodings.ascii io.encodings.utf8 io.encodings.utf16 ;
+io.encodings.ascii io.encodings.utf8 io.encodings.utf16 unicode ;
 IN: io.encodings.iana
 
 <PRIVATE
@@ -12,7 +12,7 @@ SYMBOL: aliases
 PRIVATE>
 
 : name>encoding ( name -- encoding )
-    n>e-table get-global at ;
+    dup [ >lower ] when n>e-table get-global at ;
 
 : encoding>name ( encoding -- name )
     e>n-table get-global at ;
@@ -47,10 +47,13 @@ make-aliases aliases set-global
 n>e-table [ initial-n>e ] initialize
 e>n-table [ initial-e>n ] initialize
 
+! Normalize existing registrations when reloading an image.
+n>e-table get-global [ [ >lower ] dip ] assoc-map n>e-table set-global
+
 : register-encoding ( descriptor name -- )
     [
         aliases get at [
-            [ n>e-table get-global set-at ] with each
+            [ >lower n>e-table get-global set-at ] with each
         ] [ "Bad encoding registration" throw ] if*
     ] [ swap e>n-table get-global set-at ] 2bi ;
 

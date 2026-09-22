@@ -15,7 +15,7 @@ ARTICLE: "io.encodings.iana" "IANA-registered encoding names"
 
 HELP: name>encoding
 { $values { "name" "an encoding name" } { "encoding" "an encoding descriptor" } }
-{ $description "Given an IANA-registered encoding name, find the encoding descriptor that represents it, or " { $snippet "f" } " if it is not found (either not implemented in Factor or not registered)." } ;
+{ $description "Given an IANA-registered encoding name, find the encoding descriptor that represents it, or " { $snippet "f" } " if it is not found (either not implemented in Factor or not registered). Names and aliases are matched case-insensitively." } ;
 
 HELP: encoding>name
 { $values { "encoding" "an encoding descriptor" } { "name" "an encoding name" } }

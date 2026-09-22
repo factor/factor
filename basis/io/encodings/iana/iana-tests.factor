@@ -1,5 +1,5 @@
 USING: io.encodings.iana io.encodings.iana.private
-io.encodings.utf8 tools.test assocs namespaces ;
+io.encodings.utf8 io.encodings.latin1 tools.test assocs namespaces ;
 IN: io.encodings.iana.tests
 
 { utf8 } [ "UTF-8" name>encoding ] unit-test
@@ -15,8 +15,8 @@ ebcdic-fisea "EBCDIC-FI-SE-A" register-encoding
 
 ! Clean up after myself
 { } [
-    "EBCDIC-FI-SE-A" n>e-table get delete-at
-    "csEBCDICFISEA" n>e-table get delete-at
+    "ebcdic-fi-se-a" n>e-table get delete-at
+    "csebcdicfisea" n>e-table get delete-at
     ebcdic-fisea e>n-table get delete-at
 ] unit-test
 { f } [ "EBCDIC-FI-SE-A" name>encoding ] unit-test
@@ -26,3 +26,10 @@ ebcdic-fisea "EBCDIC-FI-SE-A" register-encoding
 [ ebcdic-fisea "foobar" register-encoding ] must-fail
 { f } [ "foobar" name>encoding ] unit-test
 { f } [ ebcdic-fisea encoding>name ] unit-test
+
+! HTTP charset names are case-insensitive.
+{ latin1 } [ "iso-8859-1" name>encoding ] unit-test
+{ latin1 } [ "iSo-8859-1" name>encoding ] unit-test
+{ latin1 } [ "CsIsOlAtIn1" name>encoding ] unit-test
+{ utf8 } [ "uTf-8" name>encoding ] unit-test
+{ f } [ f name>encoding ] unit-test
