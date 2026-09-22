@@ -79,11 +79,19 @@ M: failing-connectionless-backend (broadcast)
 
 SINGLETON: failing-socket-encoding
 
-M: failing-socket-encoding <encoder>
-    2drop "socket encoder failed" throw ;
+SYMBOL: failed-socket-handle
 
-: open-socket-fds ( -- n )
-    disposables get members [ fd? ] count ;
+M: failing-socket-encoding <encoder>
+    drop underlying-handle failed-socket-handle set-global
+    "socket encoder failed" throw ;
+
+: failed-socket-closed? ( -- ? )
+    [
+        failed-socket-handle get
+        [ disposed>> ]
+        [ disposables get in? not ]
+        [ fd>> F_GETFD 0 fcntl -1 = errno EBADF = and ] tri and and
+    ] preserve-errno ;
 
 TUPLE: failing-server-address address ;
 
@@ -126,21 +134,20 @@ M: failing-datagram-address (get-local-address)
 ! Failure to wrap connected or accepted sockets must close their fd.
 { t } [
     "127.0.0.1" 0 <inet4> binary <server> [| server |
-        open-socket-fds
         [ server addr>> failing-socket-encoding <client> 2drop ]
         [ "socket encoder failed" = ] must-fail-with
+        failed-socket-closed?
         server accept drop dispose
-        open-socket-fds =
     ] with-disposal
 ] unit-test
 
 { t } [
     "127.0.0.1" 0 <inet4> failing-socket-encoding <server> [| server |
         server addr>> binary <client> drop [
-            drop open-socket-fds
+            drop
             [ server accept 2drop ]
             [ "socket encoder failed" = ] must-fail-with
-            open-socket-fds =
+            failed-socket-closed?
         ] with-disposal
     ] with-disposal
 ] unit-test

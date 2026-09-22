@@ -45,6 +45,7 @@ GENERIC: run-pipeline-element ( input-fd output-fd obj -- result )
 
 M: callable run-pipeline-element
     [
+        [ [ dup [ &dispose drop ] when* ] bi@ ] dip
         [ [ ?reader ] [ ?writer ] bi* ] dip
         '[ _ call( -- result ) ] with-streams*
     ] with-destructors ;

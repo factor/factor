@@ -208,15 +208,12 @@ M: process cancel-operation kill-process ;
 
 M: object run-pipeline-element
     [
+        [ [ dup [ &dispose drop ] when* ] bi@ ] dip
         >process
             swap >>stdout
             swap >>stdin
         run-detached
-    ] [
-        [
-            drop [ [ &dispose drop ] when* ] bi@
-        ] with-destructors
-    ] 3bi wait-for-process ;
+    ] with-destructors wait-for-process ;
 
 <PRIVATE
 

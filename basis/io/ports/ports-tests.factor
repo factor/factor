@@ -1,7 +1,25 @@
-USING: accessors alien.c-types alien.data destructors io
-io.encodings.ascii io.encodings.binary io.encodings.string
+USING: accessors alien.c-types alien.data continuations destructors io
+io.buffers io.encodings.ascii io.encodings.binary io.encodings.string
 io.encodings.utf8 io.files io.pipes io.ports io.sockets kernel libc
-locals math namespaces sequences tools.test ;
+locals math namespaces sequences sets tools.annotations tools.test ;
+IN: io.ports.tests
+
+TUPLE: allocation-test-handle < disposable ;
+M: allocation-test-handle dispose* drop ;
+
+{ t t } [
+    [
+        \ <buffer> [ drop [ drop "buffer allocation failed" throw ] ] annotate
+        { input-port output-port } [| class |
+            HS{ } clone disposables [
+                allocation-test-handle new-disposable :> handle
+                [ handle class <buffered-port> dispose ]
+                [ "buffer allocation failed" = ] must-fail-with
+                handle disposed>> disposables get null? and
+            ] with-variable
+        ] map first2
+    ] [ \ <buffer> reset ] finally
+] unit-test
 
 ! Make sure that writing malloced storage to a file works, and
 ! also make sure that writes larger than the buffer size work

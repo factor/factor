@@ -21,8 +21,11 @@ M: port set-timeout timeout<< ;
 TUPLE: buffered-port < port { buffer buffer } ;
 
 : <buffered-port> ( handle class -- port )
-    <port>
-        default-buffer-size get <buffer> >>buffer ; inline
+    [
+        [ |dispose ] dip
+        default-buffer-size get <buffer> |dispose
+        [ <port> ] dip >>buffer
+    ] with-destructors ; inline
 
 TUPLE: input-port < buffered-port ;
 INSTANCE: input-port input-stream
