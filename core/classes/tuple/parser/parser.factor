@@ -89,7 +89,8 @@ ERROR: bad-slot-name class slot ;
     } case ;
 
 : parse-slot-values ( class slots -- values )
-    [ (parse-slot-values) ] { } make ;
+    [ (parse-slot-values) ] { } make
+    dup check-duplicate-slots ;
 
 GENERIC#: boa>object 1 ( class slots -- tuple )
 

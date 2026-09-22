@@ -97,6 +97,11 @@ TUPLE: syntax-test bar baz ;
 { T{ syntax-test f { 2 3 } { 4 { 5 } } } }
 [ T{ syntax-test { bar { 2 3 } } { baz { 4 { 5 } } } } ] unit-test
 
+[
+    "USE: classes.tuple.parser.tests T{ syntax-test { bar 1 } { bar 2 } }"
+    eval( -- tuple )
+] [ error>> duplicate-slot-names? ] must-fail-with
+
 ! Corner case
 TUPLE: parsing-corner-case x ;
 
