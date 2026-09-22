@@ -4,17 +4,25 @@ USING: accessors arrays assocs classes classes.error combinators
 combinators.short-circuit continuations debugger effects fry
 generic help.crossref help.markup help.stylesheet help.topics io
 io.styles kernel make namespaces prettyprint sequences sets
-sorting vocabs words words.alias words.symbol ;
+sorting vocabs words words.alias words.constant words.symbol ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
 
 <PRIVATE
 
+: help-effect ( word -- effect )
+    dup stack-effect swap dup constant? [
+        "help" word-prop \ $values swap elements ?first [
+            rest [ first ] map dup length 1 =
+            [ [ in>> ] dip <effect> ] [ drop ] if
+        ] when*
+    ] [ drop ] if ;
+
 : inputs-and-outputs ( content word -- content' word )
    over [ dup array? [ { $values } head? ] [ drop f ] if ] find drop [
         '[ _ cut unclip rest ] dip [
-            stack-effect [ in>> ] [ out>> ] bi
+            help-effect [ in>> ] [ out>> ] bi
             [ [ dup pair? [ first ] when ] map ] bi@
             [ '[ ?first _ member? ] filter ] bi-curry@
             \ $inputs \ $outputs
@@ -99,7 +107,7 @@ M: word article-title
         name>>
     ] [
         [ unparse ]
-        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
+        [ help-effect [ effect>string " " prepend ] [ "" ] if* ] bi
         append
     ] if ;
 

@@ -131,6 +131,7 @@ ARTICLE: "help-impl" "Help system implementation"
     word-help
     word-help*
 }
+"A constant's documented output name is used in its help title and output section, without changing its declared stack effect."
 "Help article implementation:"
 { $subsections
     lookup-article
