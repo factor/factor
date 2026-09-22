@@ -48,6 +48,11 @@ tools.test vocabs.loader ;
 
 { 0.75 } [ "tools.coverage.testvocab.child" [ reload ] [ %coverage ] bi ] unit-test
 
+! #3203: the total must count the same method quotations as the annotations.
+{ 0.0 } [
+    "tools.coverage.generic-testvocab" [ reload ] [ %coverage ] bi
+] unit-test
+
 {
   {
     {

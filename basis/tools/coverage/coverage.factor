@@ -1,7 +1,7 @@
 ! Copyright (C) 2011 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators.short-circuit
-continuations io kernel math namespaces prettyprint quotations
+continuations generic io kernel math namespaces prettyprint quotations
 sequences sequences.deep splitting strings tools.annotations
 tools.test.private vocabs words words.symbol ;
 IN: tools.coverage
@@ -111,6 +111,9 @@ GENERIC: count-callables ( object -- n )
 
 M: string count-callables
     [ count-callables ] map-words sum ;
+
+M: generic count-callables
+    "methods" word-prop values [ count-callables ] map-sum ;
 
 M: word count-callables
     def>> 0 [ quotation-like? [ 1 + ] when ] deep-reduce ;

@@ -48,7 +48,7 @@ HELP: %coverage
     { "string" string }
     { "x" double }
 }
-{ $description "Returns a fraction representing the number of quotations called compared to the number of quotations that exist in a vocabulary or word." } ;
+{ $description "Returns a fraction representing the number of quotations called compared to the number of quotations that exist in a vocabulary. Generic words contribute the quotations in their methods, matching the coverage annotations." } ;
 
 HELP: add-coverage
 { $values
