@@ -47,7 +47,8 @@ GENERIC: shape ( array -- shape )
 
 M: sequence shape array-replace wrap-shape ;
 
-: ndim ( array -- n ) shape length ;
+: ndim ( array -- n )
+    shape dup uniform-shape? [ shape>> ] when length ;
 
 ERROR: no-negative-shape-components shape ;
 

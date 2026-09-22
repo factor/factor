@@ -65,3 +65,9 @@ USING: accessors arrays.shaped kernel math sequences tools.test ;
 [
     { { { 1 } { 2 3 } } { { 4 } { 5 6 } } } >shaped-array
 ] [ no-abnormally-shaped-arrays? ] must-fail-with
+
+! Follow-up to #2378: dimension queries must also unwrap ordinary array shapes.
+{ 3 } [ { { { 1 2 } { 3 4 } } } ndim ] unit-test
+{ 4 } [ { 2 3 4 5 } zeros shaped-array>array ndim ] unit-test
+{ 4 } [ { 2 3 4 5 } zeros ndim ] unit-test
+{ 1 } [ { } ndim ] unit-test
