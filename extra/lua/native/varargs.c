@@ -3,12 +3,27 @@
 #include <stdarg.h>
 #include <lua.h>
 #include <lauxlib.h>
+#include <stddef.h>
 
 #if defined(_WIN32)
 #define EXPORT __declspec(dllexport)
 #else
 #define EXPORT __attribute__((visibility("default")))
 #endif
+
+/* Header-derived layout checks, including fields changed in Lua 5.5. */
+EXPORT long long factor_lua_abi_layout(int index) {
+    const long long layout[] = {
+        sizeof(lua_Integer), sizeof(lua_Unsigned), sizeof(lua_KContext),
+        sizeof(lua_Debug), offsetof(lua_Debug, srclen),
+        offsetof(lua_Debug, nups), offsetof(lua_Debug, extraargs),
+        offsetof(lua_Debug, ftransfer), offsetof(lua_Debug, short_src),
+        offsetof(lua_Debug, i_ci), sizeof(luaL_Buffer), _Alignof(luaL_Buffer),
+        offsetof(luaL_Buffer, init), LUAL_BUFFERSIZE,
+        LUA_REGISTRYINDEX, LUA_RIDX_MAINTHREAD
+    };
+    return layout[index];
+}
 
 typedef int (*lua_list_reader)(lua_State *, const char *, va_list);
 typedef int (*lua_error_function)(lua_State *, const char *, ...);
@@ -65,7 +80,7 @@ int main(void) {
     assert(factor_lua_protected_error(L, luaL_error) == LUA_ERRRUN);
     assert(strcmp(lua_tostring(L, -1), "failure lua/-37/2.5") == 0);
     lua_close(L);
-    puts("Lua 5.1 C controls: formatted call, native va_list, protected error passed");
+    puts("Lua 5.5 C controls: formatted call, native va_list, protected error passed");
     return 0;
 }
 #endif

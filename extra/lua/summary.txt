@@ -1,1 +1,1 @@
-FFI bindings to the Lua programming language.
+FFI bindings to Lua 5.5.

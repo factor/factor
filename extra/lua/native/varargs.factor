@@ -1,6 +1,6 @@
 ! Explicit native integration suite; see README.md for fixture build and run.
 USING: alien alien.c-types alien.libraries alien.syntax alien.varargs
-arrays compiler.test io.encodings.ascii kernel locals lua lua.tests namespaces sequences sequences.generalizations tools.test ;
+arrays classes.struct compiler.test io.encodings.ascii kernel locals lua lua.tests namespaces sequences sequences.generalizations tools.test ;
 IN: lua.tests
 
 LIBRARY: lua-varargs-fixture
@@ -9,8 +9,21 @@ FUNCTION: int factor_lua_call_list ( lua_State* L, lua-list-reader reader )
 FUNCTION: c-string[ascii] factor_lua_format_control ( lua_State* L )
 FUNCTION: c-string[ascii] factor_lua_pointer_control ( lua_State* L, void* value )
 FUNCTION: int factor_lua_protected_error ( lua_State* L, void* error )
+FUNCTION: longlong factor_lua_abi_layout ( int index )
 
-LIBRARY: liblua5.1
+{ t } [
+    lua_Integer heap-size lua_Unsigned heap-size lua_KContext heap-size
+    lua_Debug heap-size
+    "srclen" lua_Debug offset-of "nups" lua_Debug offset-of
+    "extraargs" lua_Debug offset-of "ftransfer" lua_Debug offset-of
+    "short_src" lua_Debug offset-of "i_ci" lua_Debug offset-of
+    luaL_Buffer heap-size luaL_Buffer c-type-align
+    "init" luaL_Buffer offset-of LUAL_BUFFERSIZE
+    LUA_REGISTRYINDEX LUA_RIDX_MAINTHREAD 16 narray
+    16 <iota> [ factor_lua_abi_layout ] map =
+] unit-test
+
+LIBRARY: liblua5.5
 FUNCTION-ALIAS: lua-push-pointer c-string[ascii] lua_pushfstring
     ( lua_State* L, c-string[ascii] fmt, ... void* value )
 
@@ -31,7 +44,7 @@ SYMBOL: lua-escaped-list
 ! The real exported error function runs only below a pure C protected frame.
 { 2 "failure lua/-37/2.5" 1 } [
     [| state |
-        state "luaL_error" "liblua5.1" address-of factor_lua_protected_error
+        state "luaL_error" "liblua5.5" address-of factor_lua_protected_error
         state -1 f lua_tolstring
         state lua_gettop
     ] with-lua-test-state
