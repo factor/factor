@@ -359,6 +359,13 @@ ERROR: bad-small-ifd-type n ;
         [ type>> ] tri offset-bytes>obj
     ] if ;
 
+<PRIVATE
+
+: decode-ascii-tag ( bytes -- string )
+    ascii decode ;
+
+PRIVATE>
+
 : process-ifd-entry ( ifd-entry -- value class )
     [ ifd-entry-value ] [ tag>> ] bi {
         { 254 [ new-subfile-type ] }
@@ -372,10 +379,10 @@ ERROR: bad-small-ifd-type n ;
         { 264 [ cell-width ] }
         { 265 [ cell-length ] }
         { 266 [ fill-order ] }
-        { 269 [ ascii decode document-name ] }
-        { 270 [ ascii decode image-description ] }
-        { 271 [ ascii decode tiff-make ] }
-        { 272 [ ascii decode tiff-model ] }
+        { 269 [ decode-ascii-tag document-name ] }
+        { 270 [ decode-ascii-tag image-description ] }
+        { 271 [ decode-ascii-tag tiff-make ] }
+        { 272 [ decode-ascii-tag tiff-model ] }
         { 273 [ strip-offsets ] }
         { 274 [ orientation ] }
         { 277 [ samples-per-pixel ] }
@@ -396,10 +403,10 @@ ERROR: bad-small-ifd-type n ;
         { 292 [ t4-options ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
         { 297 [ page-number ] }
-        { 305 [ ascii decode software ] }
-        { 306 [ ascii decode date-time ] }
-        { 315 [ ascii decode artist ] }
-        { 316 [ ascii decode host-computer ] }
+        { 305 [ decode-ascii-tag software ] }
+        { 306 [ decode-ascii-tag date-time ] }
+        { 315 [ decode-ascii-tag artist ] }
+        { 316 [ decode-ascii-tag host-computer ] }
         { 317 [ lookup-predictor predictor ] }
         { 320 [ color-map ] }
         { 321 [ halftone-hints ] }
