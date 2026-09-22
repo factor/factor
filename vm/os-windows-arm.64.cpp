@@ -2,10 +2,12 @@
 
 namespace factor {
 
-// end_c; set_fp; save_fplr_x #16; end. These heap fragments do not
-// start at function prologs. The leading end_c marks a phantom prolog,
-// so Windows performs the full unwind even at the fragment's first PC.
-static const DWORD arm64_unwind_code_fplr_frame = 0xe481e1e5;
+// end_c; end; nop; nop. Register a handler without walking a frame:
+// a heap fragment contains many words, including frameless words and
+// partially executed prologs. There is no single FP/LR layout for it.
+// Factor's exception handler redirects execution and restores its own stacks.
+// end_c keeps the handler visible even at a fragment's first/last PC.
+static const DWORD arm64_unwind_code_handler_only = 0xe3e3e4e5;
 static const cell arm64_function_fragment_size = ((1 << 18) - 1) * 4;
 
 struct arm64_unwind_info {
@@ -50,7 +52,7 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
     // without an epilog as well as without a prolog.
     unwind->header =
       (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 21) | (1 << 27));
-    unwind->unwind_codes = arm64_unwind_code_fplr_frame;
+    unwind->unwind_codes = arm64_unwind_code_handler_only;
     unwind->exception_handler = handler_rva;
 
     func->BeginAddress = (DWORD)(fragment_start - base);

@@ -22,7 +22,12 @@ struct factor_vm {
   void c_to_factor_toplevel(cell quot);
   void c_to_factor(cell quot);
 };
-static LONG exception_handler(PEXCEPTION_RECORD, void*, PCONTEXT, void*) {
+static unsigned handled_faults;
+static LONG exception_handler(PEXCEPTION_RECORD record, void*, PCONTEXT context, void*) {
+  if (record->ExceptionCode != EXCEPTION_ACCESS_VIOLATION)
+    abort();
+  ++handled_faults;
+  context->Pc += 4; // Skip the probe's faulting LDR and execute RET.
   return 0;
 }
 static void fatal_error(const char* message, cell) {
@@ -53,14 +58,12 @@ void factor::factor_vm::c_to_factor(cell) {
     DWORD64 base = 0;
     PRUNTIME_FUNCTION function = RtlLookupFunctionEntry(start + offset, &base, NULL);
     check(function != NULL, "Missing function entry");
-    // Outgoing argument space below FP must not affect the restored frame.
+    // A frameless word need not have a readable FP. Handler lookup must
+    // not dereference it, or change SP as if every word had the same frame.
     alignas(16) DWORD64 stack[8] = {};
-    DWORD64* frame = &stack[4];
-    frame[0] = 0x12340000;
-    frame[1] = 0x56780000;
     CONTEXT context = {};
     context.Sp = (DWORD64)&stack[0];
-    context.Fp = (DWORD64)frame;
+    context.Fp = 0;
     context.Lr = 0xdead0000;
     context.Pc = start + offset;
     PVOID handler_data = NULL;
@@ -70,10 +73,24 @@ void factor::factor_vm::c_to_factor(cell) {
         &handler_data, &establisher_frame, NULL);
     arm64_seh_data* seh = (arm64_seh_data*)code->seh_area;
     check((void*)handler == (void*)seh->handler, "Fragment PC lost exception handler");
-    check(context.Sp == (DWORD64)(frame + 2), "Incorrect restored SP");
-    check(context.Fp == frame[0], "Incorrect restored FP");
-    check(context.Pc == frame[1], "Incorrect restored PC");
+    check(context.Sp == (DWORD64)&stack[0], "Handler lookup changed SP");
+    check(context.Fp == 0, "Handler lookup changed FP");
+    check(context.Pc == 0xdead0000, "Incorrect leaf return PC");
   }
+
+  // Exercise actual exception dispatch as well as RtlVirtualUnwind.
+  // Include an instruction at a fragment boundary and a return in the next
+  // fragment; these boundaries are unrelated to generated word boundaries.
+  cell fault_offsets[] = {0, 64, arm64_function_fragment_size - 4,
+                          arm64_function_fragment_size};
+  for (cell offset : fault_offsets) {
+    DWORD* instructions = (DWORD*)(start + offset);
+    instructions[0] = 0xf9400000; // ldr x0, [x0]
+    instructions[1] = 0xd65f03c0; // ret
+    flush_icache((cell)instructions, 2 * sizeof(DWORD));
+    ((void (*)(void*))instructions)(NULL);
+  }
+  check(handled_faults == 4, "Native access violations did not reach the handler");
 }
 
 int main() {

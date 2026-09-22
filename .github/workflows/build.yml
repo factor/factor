@@ -138,6 +138,12 @@ jobs:
       run: build.cmd compile
     - name: build-report
       run: 'Foreach ($f in Get-ChildItem  *.exe,*.com,*.dll) { "{0} {1}" -f (Split-Path -Path $f -Leaf),$f.Length }'
+    - name: ARM64 exception dispatch probe
+      shell: cmd
+      run: |
+        cl /EHsc /Fe:windows-arm64-unwind-tests.exe vm\tests\windows_arm64_unwind.cpp
+        if errorlevel 1 exit /b 1
+        .\windows-arm64-unwind-tests.exe
     - name: bootstrap
       run: |
            .\build.cmd update-boot-image
