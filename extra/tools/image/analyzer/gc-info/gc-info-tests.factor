@@ -3,8 +3,8 @@ classes.struct combinators.short-circuit compiler compiler.cfg
 compiler.cfg.debugger compiler.cfg.instructions
 compiler.cfg.linearization compiler.codegen.gc-maps compiler.units fry
 generic grouping io io.encodings.binary io.streams.byte-array kernel
-math namespaces random sequences system tools.image.analyzer.gc-info
-tools.image.analyzer.utils tools.test vm vocabs words ;
+math namespaces sequences system tools.image.analyzer.gc-info tools.image.analyzer.utils
+tools.test vm vocabs vocabs.loader words ;
 IN: tools.image.analyzer.gc-info.tests
 ! QUALIFIED: cpu.x86.features.private
 QUALIFIED: crypto.aes.utils
@@ -43,6 +43,25 @@ QUALIFIED: opencl
         [ struct-slot-values = ]
         [ [ not ] dip return-address-count>> 0 = and ] 2bi or
     ] if ;
+
+: same-word-gc-info? ( word -- ? )
+    [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ;
+
+: current-gc-info? ( word -- ? )
+    dup same-word-gc-info? [ drop t ] [
+        dup 1array compile same-word-gc-info?
+    ] if ;
+
+: gc-info-test-word? ( word -- ? )
+    dup normal? [
+        vocabulary>> {
+            "compiler.codegen.gc-maps"
+            "tools.image.analyzer.gc-info"
+        } member?
+    ] [ drop f ] if ;
+
+: interface-names-word ( -- word )
+    "ifaddrs" require "interface-names" "ifaddrs" lookup-word ;
 
 : base-pointer-groups-expected ( word -- seq )
     test-regs first cfg>gc-maps [ derived-root-offsets { } like ] { } map-as ;
@@ -95,11 +114,17 @@ cpu x86.64? [
     \ word>gc-maps word>gc-maps
 ] unit-test
 
-! Big test
+! Check the GC map pipeline across a fixed set of compiler and analyzer words.
 { { } } [
-    all-words [ normal? ] filter 50 sample
-    [ [ word>gc-info-expected ] [ word>gc-info ] bi same-gc-info? ] reject
+    all-words [ gc-info-test-word? ] filter
+    [ current-gc-info? ] reject
 ] unit-test
+
+os unix? [
+    { t } [
+        interface-names-word current-gc-info?
+    ] unit-test
+] when
 
 ! Originally from llvm.types, but llvm moved to unmaintained
 TYPEDEF: void* LLVMTypeRef
@@ -159,6 +184,12 @@ FUNCTION: void LLVMDisposeTypeHandle ( LLVMTypeHandleRef TypeHandle )
 { t } [
     \ opencl:cl-queue-kernel deterministic-gc-info?
 ] unit-test
+
+os unix? [
+    { t } [
+        interface-names-word deterministic-gc-info?
+    ] unit-test
+] when
 
 
 

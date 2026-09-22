@@ -3,7 +3,7 @@
 USING: accessors assocs classes classes.algebra combinators
 combinators.short-circuit compiler.cfg compiler.cfg.builder
 compiler.cfg.builder.alien compiler.cfg.finalization
-compiler.cfg.optimizer compiler.codegen compiler.crossref
+compiler.cfg.optimizer compiler.cfg.registers compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions
 generic generic.single io kernel macros make namespaces
@@ -128,6 +128,8 @@ M: word combinator? inline? ;
 : compile-word ( word -- )
     ! We return early if the word has breakpoints or if it
     ! failed to infer.
+    ! Start each CFG with the same virtual register numbers.
+    reset-vreg-counter
     '[
         _ {
             [ start-compilation ]
