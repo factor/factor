@@ -650,3 +650,11 @@ unit-test
         0x43f3632af22edbe1 0xc3f3632af22edbe1
     } [ dup bits>double number>string string>number double>bits = ] all?
 ] unit-test
+
+! Decimal radix dispatch preserves signs and finite boundary values.
+{
+    { "0.0" "-0.0" "1.25" "-1.25" "5e-324" "1.7976931348623157e+308" }
+} [
+    { 0.0 -0.0 1.25 -1.25 5.0e-324 1.7976931348623157e308 }
+    [ 10 >base ] map
+] unit-test

@@ -1039,7 +1039,8 @@ CONSTANT: lookup-table {
         [ exponential-format ] [ decimal-format ] if
     ] (format) ; inline
 
-: float>dec ( n -- str ) >float< dragonbox general-format ; inline
+! Share decimal conversion while keeping its arithmetic stages specialized.
+: float>dec ( n -- str ) >float< dragonbox general-format ;
 
 : float>base ( n radix -- str )
     {
