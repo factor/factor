@@ -221,7 +221,9 @@ icon-data [ default-icon-data ] initialize
     ] [ drop ] if t ;
 
 : connect-render-signal ( drawable -- )
-    "render" [ on-render yield ]
+    ! GTK still uses the drawable after this callback returns. Yielding here
+    ! lets another Factor thread close the window during GTK's paint cycle.
+    "render" [ on-render ]
     GtkGLArea:render connect-signal ;
 
 : on-resize ( glarea width height user-data -- )
@@ -229,7 +231,8 @@ icon-data [ default-icon-data ] initialize
     dup active?>> [ swap >>dim relayout ] [ 2drop ] if ;
 
 : connect-resize-signal ( drawable -- )
-    "resize" [ on-resize yield ]
+    ! Resize is also emitted during painting; leave scheduling to with-timer.
+    "resize" [ on-resize ]
     GtkGLArea:resize connect-signal ;
 
 ! Window state events
