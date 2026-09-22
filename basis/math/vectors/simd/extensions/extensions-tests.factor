@@ -4,6 +4,16 @@ math.vectors.simd math.vectors.simd.extensions namespaces random
 sequences tools.test tools.test.fuzz ;
 IN: math.vectors.simd.extensions.tests
 
+! Broadcast and boa accept numeric small floats, not raw storage integers.
+{ half-8{ 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 } }
+[ 0.5 half-8-with ] unit-test
+{ bfloat-8{ 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 } }
+[ 0.5 bfloat-8-with ] unit-test
+{ half-8{ 0.5 -0.5 1 2 3 4 5 6 } }
+[ 0.5 -0.5 1 2 3 4 5 6 half-8-boa ] unit-test
+{ bfloat-8{ 0.5 -0.5 1 2 3 4 5 6 } }
+[ 0.5 -0.5 1 2 3 4 5 6 bfloat-8-boa ] unit-test
+
 <PRIVATE
 : same-dispatch? ( quot: ( -- vector ) -- ? )
     [ call underlying>> ]

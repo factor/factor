@@ -283,7 +283,10 @@ A{     DEFINES       ${T}{
 
 ELT     [ A-rep rep-component-type ]
 N       [ A-rep rep-length ]
-COERCER [ ELT c:c-type-class "coercer" word-prop [ ] or ]
+! Small floats use integers for raw storage, but constructors take numbers.
+COERCER [ ELT dup c:lookup-c-type c:small-float-c-type?
+          [ c:c-type-boxed-class ] [ c:c-type-class ] if
+          "coercer" word-prop [ ] or ]
 
 BOA-EFFECT [ N "n" <array> { "v" } <effect> ]
 
