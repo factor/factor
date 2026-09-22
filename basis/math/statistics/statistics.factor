@@ -282,11 +282,8 @@ PRIVATE>
     [ quartile ] [ minmax ] bi [ prefix ] [ suffix ] bi* ;
 
 : var-ddof ( seq n -- x )
-    2dup [ length ] dip - 0 <= [
-        2drop 0
-    ] [
-        [ [ sum-of-squared-errors ] [ length ] bi ] dip - /
-    ] if ; inline
+    [ [ sum-of-squared-errors ] [ length ] bi ] dip -
+    dup 0 <= [ 2drop 0 ] [ / ] if ; inline
 
 : population-var ( seq -- x ) 0 var-ddof ; inline
 

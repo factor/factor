@@ -68,7 +68,7 @@ HELP: sample-ste
 HELP: sample-var
 { $values { "seq" sequence } { "x" "a non-negative real number" } }
 { $description "Computes the variance of " { $snippet "seq" } ". It's a measurement of the spread of values in a sequence." }
-{ $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0." }
+{ $notes "If the number of elements in " { $snippet "seq" } " is 1 or less, it outputs 0. Elements must still be numeric." }
 { $examples
   { $example "USING: math.statistics prettyprint ;" "{ 1 } sample-var ." "0" }
   { $example "USING: math.statistics prettyprint ;" "{ 1 2 3 } sample-var ." "1" }

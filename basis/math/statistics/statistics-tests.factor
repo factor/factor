@@ -261,3 +261,9 @@ IN: math.statistics
 
 { t } [ { 3 2 3 0 1 2 } dcg 6.861126688593501 1e-6 ~ ] unit-test
 { t } [ { 3 2 3 0 1 2 } ndcg 0.9608081943360615 1e-6 ~ ] unit-test
+
+! #916: an exhausted degrees-of-freedom denominator must not hide bad data.
+[ { - } std ] must-fail
+[ { 1 "bad" } 2 var-ddof ] must-fail
+{ 0 } [ { } sample-var ] unit-test
+{ 0 } [ { 2 4 } 3 var-ddof ] unit-test
