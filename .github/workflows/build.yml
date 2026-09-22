@@ -141,7 +141,7 @@ jobs:
     - name: ARM64 exception dispatch probe
       shell: cmd
       run: |
-        cl /EHsc /Fe:windows-arm64-unwind-tests.exe vm\tests\windows_arm64_unwind.cpp
+        cl /EHsc /Fe:windows-arm64-unwind-tests.exe vm\tests\windows_arm64_unwind.cpp vm\cpu-arm.64-trampoline.obj
         if errorlevel 1 exit /b 1
         .\windows-arm64-unwind-tests.exe
     - name: bootstrap

@@ -2,12 +2,16 @@
 
 namespace factor {
 
-// end_c; end; nop; nop. Register a handler without walking a frame:
+// end_c; alloc_s 16; end; nop. Register a handler without reading a frame:
 // a heap fragment contains many words, including frameless words and
 // partially executed prologs. There is no single FP/LR layout for it.
 // Factor's exception handler redirects execution and restores its own stacks.
 // end_c describes a zero-length prolog; the header declares no epilogs.
-static const DWORD arm64_unwind_code_handler_only = 0xe3e3e4e5;
+// Advance the virtual SP so dispatch makes progress even when LR == PC
+// (a fault at a call's return address). No actual stack frame is unwound:
+// our handler resumes using the original exception context, not this virtual
+// caller. Without this advance Windows can skip the handler as a cycle.
+static const DWORD arm64_unwind_code_handler_only = 0xe3e401e5;
 static const cell arm64_function_fragment_size = ((1 << 18) - 1) * 4;
 
 struct arm64_unwind_info {

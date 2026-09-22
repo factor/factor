@@ -1,4 +1,4 @@
-// Standalone native ARM64 probe: cl /EHsc windows_arm64_unwind.cpp
+// Link with vm/cpu-arm.64-trampoline.obj to check native call boundaries too.
 // Include the production table generator with only its small VM interface.
 #define NOMINMAX
 #include <windows.h>
@@ -41,6 +41,17 @@ static void flush_icache(cell start, cell size) {
 }
 #include "../os-windows-arm.64.cpp"
 
+extern "C" void trampoline();
+extern "C" void trampoline2();
+extern "C" LONG exception_handler(PEXCEPTION_RECORD record, void* frame,
+                                  PCONTEXT context, void* dispatch) {
+  return factor::exception_handler(record, frame, context, dispatch);
+}
+
+__declspec(noinline) static uintptr_t native_fault(volatile uintptr_t* address) {
+  return *address;
+}
+
 static void check(bool condition, const char* message) {
   if (!condition) {
     fprintf(stderr, "%s\n", message);
@@ -62,7 +73,8 @@ void factor::factor_vm::c_to_factor(cell) {
     PRUNTIME_FUNCTION function = RtlLookupFunctionEntry(start + offset, &base, NULL);
     check(function != NULL, "Missing function entry");
     // A frameless word need not have a readable FP. Handler lookup must
-    // not dereference it, or change SP as if every word had the same frame.
+    // not dereference it. The synthetic caller advances SP by one slot
+    // solely to ensure exception dispatch progresses when PC equals LR.
     alignas(16) DWORD64 stack[8] = {};
     CONTEXT context = {};
     context.Sp = (DWORD64)&stack[0];
@@ -84,7 +96,7 @@ void factor::factor_vm::c_to_factor(cell) {
               (void*)handler, (void*)seh->handler);
     }
     check((void*)handler == (void*)seh->handler, "Fragment PC lost exception handler");
-    check(context.Sp == (DWORD64)&stack[0], "Handler lookup changed SP");
+    check(context.Sp == (DWORD64)&stack[2], "Incorrect virtual caller SP");
     check(context.Fp == 0, "Handler lookup changed FP");
     check(context.Pc == 0xdead0000, "Incorrect leaf return PC");
   }
@@ -105,6 +117,56 @@ void factor::factor_vm::c_to_factor(cell) {
     ((void (*)(void*))instructions)(NULL);
   }
   check(handled_faults == 4, "Native access violations did not reach the handler");
+
+  // A returning call leaves LR pointing at the faulting instruction. A
+  // zero-sized virtual frame would make Windows reject this as a cycle.
+  puts("Checking access violation with PC equal to LR");
+  fflush(stdout);
+  DWORD return_fault[] = {
+    0xa9bf7bfd, // stp fp, lr, [sp, #-16]!
+    0x94000004, // bl to the final ret
+    0xf9400000, // ldr x0, [x0] (LR == PC here)
+    0xa8c17bfd, // ldp fp, lr, [sp], #16
+    0xd65f03c0, // ret
+    0xd65f03c0  // ret
+  };
+  memcpy((void*)(start + 128), return_fault, sizeof(return_fault));
+  flush_icache(start + 128, sizeof(return_fault));
+  ((void (*)(void*))(start + 128))(NULL);
+  check(handled_faults == 5, "Fault at return address missed the handler");
+
+  // Both native trampolines must dispatch an exception raised in their
+  // callee, then resume it with the original registers and stack intact.
+  // The bridge preserves X20, which Factor uses as its context pointer.
+  DWORD bridge[] = {
+    0xa9bc7bfd, // stp fp, lr, [sp, #-64]!
+    0xa90153f3, // stp x19, x20, [sp, #16]
+    0x910003fd, // mov fp, sp
+    0xaa0003f4, // mov x20, x0
+    0xaa0103f0, // mov x16, x1
+    0xaa1f03e0, // mov x0, xzr (fault address)
+    0x910083f1, // add x17, sp, #32 (trampoline2 frame)
+    0xd63f0040, // blr x2
+    0xa94153f3, // ldp x19, x20, [sp, #16]
+    0xa8c47bfd, // ldp fp, lr, [sp], #64
+    0xd65f03c0  // ret
+  };
+  cell bridge_start = start + 256;
+  memcpy((void*)bridge_start, bridge, sizeof(bridge));
+  flush_icache(bridge_start, sizeof(bridge));
+  typedef void (*bridge_type)(cell*, void*, void (*)());
+  for (auto entry : {trampoline, trampoline2}) {
+    printf("Checking native fault through %s\n",
+           entry == trampoline ? "trampoline" : "trampoline2");
+    fflush(stdout);
+    DWORD64 base = 0;
+    check(RtlLookupFunctionEntry((DWORD64)entry + 12, &base, NULL) != NULL,
+          "Native trampoline has no unwind entry");
+    cell frame = 0;
+    ((bridge_type)bridge_start)(&frame, (void*)native_fault, entry);
+    check(frame != 0, "Trampoline did not publish its frame");
+  }
+  check(handled_faults == 7, "Native trampoline faults did not reach the handler");
 }
 
 int main() {
@@ -117,7 +179,7 @@ int main() {
   factor::factor_vm vm = {&heap};
   vm.c_to_factor_toplevel(0);
   check(VirtualFree(memory, 0, MEM_RELEASE) != 0, "VirtualFree failed");
-  puts("ARM64 fragment unwind checks passed");
+  puts("ARM64 fragment and trampoline unwind checks passed");
 }
 #else
 int main() { return 77; }

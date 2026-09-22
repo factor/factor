@@ -160,7 +160,7 @@ $(DLL_OBJS) vm\main-windows.obj vm\tests\gc.obj vm\tests\windows_allocation.obj 
 .c.obj::
 	cl /EHsc $(CL_FLAGS) /MP /Fovm/ /c $<
 
-vm\cpu-arm.64-trampoline.obj:
+vm\cpu-arm.64-trampoline.obj: vm\cpu-arm.64-trampoline.asm
 	armasm64 -nologo vm\cpu-arm.64-trampoline.asm $@
 
 .asm.obj:
