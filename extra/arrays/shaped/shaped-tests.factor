@@ -109,3 +109,40 @@ USING: accessors arrays.shaped kernel math sequences tools.test ;
 [ { 2 3 0 } zeros shaped-array>array ] unit-test
 { { { } { } } } [ { 2 0 3 } zeros shaped-array>array ] unit-test
 { { } } [ { 0 3 } zeros shaped-array>array ] unit-test
+
+! Elementwise arithmetic broadcasts trailing axes without mutating inputs.
+{ sa{ { 10 21 32 } { 13 24 35 } } } [
+    { 2 3 } increasing { 10 20 30 } shaped+
+] unit-test
+{ sa{ { 11 21 31 } { 12 22 32 } } } [
+    { { 1 } { 2 } } { 10 20 30 } shaped+
+] unit-test
+{ sa{ { -9 -19 -29 } { -8 -18 -28 } } } [
+    { { 1 } { 2 } } { 10 20 30 } shaped-
+] unit-test
+{ sa{ { 10 20 30 } { 20 40 60 } } } [
+    { { 1 } { 2 } } { 10 20 30 } shaped*.
+] unit-test
+{ { 2 3 4 } { 0 1 2 3 1 2 3 4 2 3 4 5 1 2 3 4 2 3 4 5 3 4 5 6 } } [
+    { 2 1 1 } increasing { 1 3 1 } increasing shaped+
+    { 4 } increasing shaped+ [ shape>> ] [ underlying>> ] bi
+] unit-test
+{ { 0 3 } { } } [
+    { 0 3 } zeros { 1 3 } ones shaped+ [ shape>> ] [ underlying>> ] bi
+] unit-test
+{ { 2 0 3 } { } } [
+    { 2 0 3 } zeros { 3 } ones shaped*. [ shape>> ] [ underlying>> ] bi
+] unit-test
+[ { 2 3 } zeros { 2 } zeros shaped+ ]
+[ shape-mismatch? ] must-fail-with
+{ sa{ { 0 1 2 } { 3 4 5 } } } [
+    { 2 3 } increasing dup { 3 } ones shaped+
+    99 { 0 0 } rot set-shaped-row-major
+] unit-test
+{ { } { 42 } } [
+    { 6 } { } <shaped-array> { 7 } { } <shaped-array> shaped*.
+    [ shape>> ] [ underlying>> ] bi
+] unit-test
+{ sa{ { 6 7 8 } { 9 10 11 } } } [
+    { 6 } { } <shaped-array> { 2 3 } increasing shaped+
+] unit-test

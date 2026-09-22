@@ -147,9 +147,6 @@ M: sequence >col-array
     [ [ underlying>> ] bi@ ] prepose
     [ drop shape>> clone ] 2bi shaped-array boa ; inline
 
-: shaped+ ( a b -- c ) [ v+ ] shaped-shaped-binary-op ;
-: shaped- ( a b -- c ) [ v- ] shaped-shaped-binary-op ;
-: shaped*. ( a b -- c ) [ v* ] shaped-shaped-binary-op ;
 
 : shaped*n ( a b -- c ) [ v*n ] curry shaped-unary-op ;
 : n*shaped ( a b -- c ) swap shaped*n ;
@@ -300,6 +297,37 @@ PRIVATE>
     sa0 sa1 broadcastable? [
         sa0 sa1 aligned-shapes [ over 1 = [ nip ] [ drop ] if ] 2map
     ] [ sa0 sa1 shape-mismatch ] if ;
+
+<PRIVATE
+
+: row-major-strides ( shape -- strides )
+    reverse 1 [ * ] accumulate nip reverse ;
+
+:: broadcast-strides ( shape rank -- strides )
+    shape rank 1 pad-head dup row-major-strides
+    [ swap 1 = [ drop 0 ] when ] 2map ;
+
+:: broadcast-binary-op ( a b quot -- c )
+    a >shaped-array :> left
+    b >shaped-array :> right
+    left right output-shape :> dimensions
+    dimensions row-major-strides :> strides
+    left shape>> dimensions length broadcast-strides :> left-strides
+    right shape>> dimensions length broadcast-strides :> right-strides
+    dimensions product <iota> [| index |
+        strides dimensions [| stride dimension |
+            index stride /i dimension mod
+        ] 2map :> coordinate
+        coordinate left-strides [ * ] 2map sum left underlying>> nth
+        coordinate right-strides [ * ] 2map sum right underlying>> nth
+        quot call
+    ] map dimensions <shaped-array> ; inline
+
+PRIVATE>
+
+: shaped+ ( a b -- c ) [ + ] broadcast-binary-op ;
+: shaped- ( a b -- c ) [ - ] broadcast-binary-op ;
+: shaped*. ( a b -- c ) [ * ] broadcast-binary-op ;
 
 : broadcast-shape-matches? ( sa broadcast-shape -- ? )
     [ { [ drop 1 = ] [ = ] } 2|| ] 2all? ;
