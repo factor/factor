@@ -2,6 +2,17 @@ USING: help.markup help.syntax sequences ;
 
 IN: math.matrices.elimination
 
+HELP: nullspace
+{ $values { "matrix" sequence } { "seq" sequence } }
+{ $description "Computes a basis for the nullspace of a matrix. Each returned vector has one element per column and its product with the matrix is zero. A matrix with linearly independent columns has an empty nullspace basis, as does an empty matrix. The input matrix is modified during elimination." }
+{ $examples
+    { $example
+        "USING: math.matrices.elimination prettyprint ;"
+        "{ { 1 2 } } nullspace ."
+        "{ { -2 1 } }"
+    }
+} ;
+
 HELP: inverse
 { $values { "matrix" sequence } }
 { $description "Computes the multiplicative inverse of a matrix. Assuming the matrix is invertible." }
@@ -17,7 +28,7 @@ HELP: inverse
 
 HELP: echelon
 { $values { "matrix" sequence } { "matrix'" sequence } }
-{ $description "Computes the reduced row-echelon form of the matrix." } ;
+{ $description "Computes a row-echelon form of the matrix. An empty matrix is returned unchanged. The input matrix is modified during elimination." } ;
 
 HELP: nonzero-rows
 { $values { "matrix" sequence } { "matrix'" sequence } }

@@ -18,7 +18,7 @@ SYMBOL: matrix
 
 : rows ( -- n ) matrix get length ;
 
-: cols ( -- n ) 0 nth-row length ;
+: cols ( -- n ) matrix get dup empty? [ length ] [ first length ] if ;
 
 : skip ( i seq quot -- n )
     over [ find-from drop ] dip swap or? [ length ] unless ; inline
@@ -89,7 +89,7 @@ SYMBOL: matrix
     row clone :> row'
     col# row' nth neg recip :> a
     0 col# row' set-nth
-    a row n*v col# matrix get set-nth ;
+    a row' n*v col# matrix get set-nth ;
 
 : nullspace ( matrix -- seq )
     echelon reduced dup empty? [
