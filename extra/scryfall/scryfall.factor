@@ -382,14 +382,19 @@ MEMO: scryfall-rulings-json ( -- json )
 : reject-cmc> ( seq n -- seq' ) >float '[ "cmc" of _ > ] reject ;
 : reject-cmc>= ( seq n -- seq' ) >float '[ "cmc" of _ >= ] reject ;
 
+<PRIVATE
+
+: parse-type-words ( string/f -- array )
+    [ " " split ] ?call >array ;
+
+: parse-type-face ( string -- pair )
+    " — " split1 [ parse-type-words ] bi@ 2array ;
+
+PRIVATE>
+
 : parse-type-line ( string -- pairs )
     " // " split1
-    [
-        [
-            " — " split1
-            [ [ " " split ] ?call >array ] bi@ 2array
-        ] ?call
-    ] bi@ 2array sift ;
+    [ [ parse-type-face ] ?call ] bi@ 2array sift ;
 
 : type-line-of ( assoc -- string ) "type_line" of parse-type-line ;
 
