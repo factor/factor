@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double, Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math sequences
+USING: help.markup help.syntax kernel math peg sequences
 unicode strings ;
 IN: peg.parsers
 
@@ -21,7 +21,8 @@ HELP: list-of
     { "parser" "a parser" }
 } { $description
     "Returns a parser that returns a list of items separated by the separator parser. Hides the separators and matches a list of one or more items."
-} { $notes "Use " { $link list-of-many } " to ensure a list contains two or more items." }
+} { $notes "Item AST values equal to " { $link ignore } " are omitted. Hidden items still count toward the minimum number of matches, so the result may be empty."
+    $nl "Use " { $link list-of-many } " to require two or more item matches." }
 { $examples
     { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" }" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
@@ -34,7 +35,8 @@ HELP: list-of-many
     { "parser" "a parser" }
 } { $description
     "Returns a parser that returns a list of items separated by the separator parser. Hides the separators and matches a list of two or more items."
-} { $notes "Use " { $link list-of } " to return a list of only one item."
+} { $notes "Item AST values equal to " { $link ignore } " are omitted. The minimum of two items counts matches, not retained AST values, so the result may be empty."
+    $nl "Use " { $link list-of } " to allow a single item match."
 } { $examples
     { $code "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of-many parse => exception" }
     { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of-many parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }

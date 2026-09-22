@@ -12,6 +12,22 @@ IN: peg.parsers.tests
 { V{ "a" "a" "a" "a" } }
 [ "a,a,a,a" "a" token "," token list-of-many parse ] unit-test
 
+! Hidden items count toward the minimum number of matches.
+{ V{ } } [ "a" "a" token hide "," token list-of parse-fully ] unit-test
+{ V{ } } [ "a,a" "a" token hide "," token list-of parse-fully ] unit-test
+{ V{ } } [ "a,a" "a" token hide "," token list-of-many parse-fully ] unit-test
+[ "" "a" token hide "," token list-of parse-fully ] must-fail
+[ "a" "a" token hide "," token list-of-many parse-fully ] must-fail
+[ "a," "a" token hide "," token list-of-many parse-fully ] must-fail
+
+{ V{ "b" } } [
+    "a,b" "a" token hide "b" token 2choice "," token list-of-many parse-fully
+] unit-test
+
+{ V{ "b" } } [
+    "b,a" "a" token hide "b" token 2choice "," token list-of-many parse-fully
+] unit-test
+
 [ "aaa" "a" token 4 exactly-n parse ] must-fail
 
 { V{ "a" "a" "a" "a" } }

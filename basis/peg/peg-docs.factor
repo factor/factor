@@ -78,8 +78,8 @@ HELP: repeat0
 }
 { $description
     "Returns a parser that parses 0 or more instances of the " { $snippet "parser" } ". The AST produced is "
-    "an array of the AST produced by the " { $snippet "parser" } ". An empty array indicates 0 instances were "
-    "parsed." } ;
+    "an array of the AST values produced by the " { $snippet "parser" } ", excluding " { $link ignore } " values. "
+    "An empty array can mean that no instances matched or that every matched instance produced " { $link ignore } "." } ;
 
 HELP: repeat1
 { $values
@@ -87,7 +87,11 @@ HELP: repeat1
 }
 { $description
     "Returns a parser that parses 1 or more instances of the " { $snippet "parser" } ". The AST produced is "
-    "an array of the AST produced by the " { $snippet "parser" } "." } ;
+    "an array of the AST values produced by the " { $snippet "parser" } ", excluding " { $link ignore } " values. "
+    "The parser must match at least once, but the resulting array may be empty if every match produces " { $link ignore } "." }
+{ $examples
+    { $example "USING: peg prettyprint ;" "\"aaa\" \"a\" token hide repeat1 parse-fully ." "V{ }" }
+} ;
 
 HELP: optional
 { $values

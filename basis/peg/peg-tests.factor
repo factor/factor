@@ -83,6 +83,30 @@ IN: peg.tests
     "aaab" "a" token repeat1 parse
 ] unit-test
 
+! Repetition counts matches, while omitting hidden AST values.
+{ V{ } } [ "aaa" "a" token hide repeat0 parse-fully ] unit-test
+{ V{ } } [ "aaa" "a" token hide repeat1 parse-fully ] unit-test
+{ V{ } } [ "" "a" token hide repeat0 parse-fully ] unit-test
+[ "" "a" token hide repeat1 parse-fully ] must-fail
+[ "b" "a" token hide repeat1 parse-fully ] must-fail
+
+{ V{ "b" "b" } } [
+    "ababa" "a" token hide "b" token 2choice repeat0 parse-fully
+] unit-test
+
+{ V{ "b" "b" } } [
+    "ababa" "a" token hide "b" token 2choice repeat1 parse-fully
+] unit-test
+
+! Only ignore is omitted; f is a valid AST value.
+{ V{ f f } } [
+    "aa" "a" token [ drop f ] action repeat0 parse-fully
+] unit-test
+
+{ V{ f f } } [
+    "aa" "a" token [ drop f ] action repeat1 parse-fully
+] unit-test
+
 { V{ "a" "b" } } [
     "ab" "a" token optional "b" token 2array seq parse
 ] unit-test
