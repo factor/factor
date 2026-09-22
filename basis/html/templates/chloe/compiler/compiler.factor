@@ -83,9 +83,9 @@ CONSTANT: self-closing-tags {
         "area"
         "base"
         "br"
+        "col"
         "embed"
         "hr"
-        "iframe"
         "img"
         "input"
         "link"
@@ -93,6 +93,7 @@ CONSTANT: self-closing-tags {
         "param"
         "source"
         "track"
+        "wbr"
     }
 
 : check-tag ( -- )
