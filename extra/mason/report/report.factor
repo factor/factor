@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators.smart debugger formatting
-io.encodings.utf8 io.files io.streams.string kernel literals
-mason.common mason.config mason.disk math math.order namespaces prettyprint
+io.encodings.utf8 io.files io.streams.string kernel literals logging.parser
+mason.common mason.config mason.disk math namespaces prettyprint
 sequences sets splitting xml.syntax xml.writer ;
 IN: mason.report
 
@@ -41,40 +41,19 @@ IN: mason.report
         write-xml
     ] with-file-writer ; inline
 
-: file-tail ( file encoding lines -- seq )
-    [ file-lines ] dip index-or-length tail* join-lines ;
-
-! A VM memory-layout dump can be much longer than the log tail.
-! Keep the fatal error and the test output immediately before it too.
-: crash-line? ( line -- ? )
-    { "fatal_error:" "critical_error:" "assertion \"" }
-    [ head? ] with any? ;
-
-:: failure-excerpt ( lines -- string )
-    lines length 400 - 0 max :> tail-start
-    lines [ crash-line? ] find-last drop :> crash
-    crash [ crash tail-start < ] [ f ] if [
-        crash 41 + tail-start min :> context-end
-        crash 100 - 0 max context-end lines subseq
-        context-end tail-start < [
-            { "... (log lines omitted; last 400 log lines follow) ..." }
-            append
-        ] when
-        lines tail-start tail append
-    ] [
-        lines tail-start tail
-    ] if join-lines ;
+! Bound both I/O and memory, even for a huge unterminated line.
+: file-tail ( file -- string )
+    65536 log-file-tail
+    [ 400 index-or-length tail* join-lines ] dip
+    0 > [ "... (earlier log bytes omitted) ...\n" prepend ] when ;
 
 :: failed-report ( error file what -- status )
     [
         error [ error. ] with-string-writer :> error
-        file utf8 file-lines :> lines
-        lines failure-excerpt :> output
-        lines [ "Mason phase: " head? ] find-last nip :> phase
+        file file-tail :> output
 
         [XML
         <h2><-what-></h2>
-        <pre><-phase-></pre>
         Build output:
         <pre><-output-></pre>
         Launcher error:

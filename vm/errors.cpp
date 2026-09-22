@@ -1,5 +1,9 @@
 #include "master.hpp"
 
+#if defined(__APPLE__) || defined(__GLIBC__)
+#include <execinfo.h>
+#endif
+
 namespace factor {
 
 bool factor_vm::fatal_erroring_p;
@@ -8,6 +12,25 @@ static inline void fa_diddly_atal_error() {
   printf("fatal_error in fatal_error!\n");
   breakpoint();
   ::_exit(86);
+}
+
+// Best effort: native unwinding may stop at JIT code or a damaged stack.
+static void print_native_backtrace() {
+  fputs("Native backtrace (up to 32 frames):\n", stderr);
+  fflush(stderr);
+#if defined(WINDOWS)
+  void* frames[32];
+  USHORT count = CaptureStackBackTrace(0, 32, frames, NULL);
+  for (USHORT i = 0; i < count; ++i)
+    fprintf(stderr, "  %p\n", frames[i]);
+#elif defined(__APPLE__) || defined(__GLIBC__)
+  void* frames[32];
+  int count = backtrace(frames, 32);
+  backtrace_symbols_fd(frames, count, STDERR_FILENO);
+#else
+  fputs("  Native unwinding unavailable on this platform.\n", stderr);
+#endif
+  fflush(stderr);
 }
 
 void fatal_error(const char* msg, cell tagged) {
@@ -20,16 +43,16 @@ void fatal_error(const char* msg, cell tagged) {
   factor_vm* vm = current_vm_p();
   if (!vm) {
     fprintf(stderr, "fatal_error: %s: %p\n", msg, (void*)tagged);
+    print_native_backtrace();
     ::_exit(1);
   }
 
   std::cout << "fatal_error: " << msg;
   std::cout << ": " << (void*)tagged;
   std::cout << std::endl << std::endl;
+  print_native_backtrace();
   if (vm->data) {
-    // Mason reports only the last 400 log lines. Dumping every suspended
-    // context can hide both this error and the test that triggered it.
-    // The low-level debugger still offers the full memory layout.
+    // Keep the fatal error and preceding test output in Mason's log tail.
     vm->dump_memory_layout(std::cout, false);
   }
   abort();
