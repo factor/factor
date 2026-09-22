@@ -40,4 +40,4 @@ HELP: link
 
 HELP: related-words
 { $values { "seq" "a sequence of words" } }
-{ $description "Defines a set of related words. Each word's documentation will contain links to all other words in the set." } ;
+{ $description "Defines a set of related words. Each word's documentation will contain links to all other words in the set. Duplicate words are ignored, and words are not related to themselves. This replaces existing relations for the words in the set, removing obsolete reciprocal links." } ;

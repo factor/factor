@@ -102,3 +102,26 @@ SYMBOLS:
     2foo word-related-words
     2bar word-related-words
 ] unit-test
+
+! GitHub issue #1935: store only distinct other words as related.
+SYMBOLS: related-a related-b related-c related-d ;
+
+{ { } } [
+    { related-a related-a } related-words
+    related-a "related" word-prop
+] unit-test
+
+{ { related-b related-c } { related-a related-c } } [
+    { related-a related-b related-b related-c related-c } related-words
+    related-a "related" word-prop
+    related-b "related" word-prop
+] unit-test
+
+! Replacing a group also removes obsolete reciprocal links.
+{ { related-d } { related-c } { related-b } { related-a } } [
+    { related-a related-d } related-words
+    related-a "related" word-prop
+    related-b "related" word-prop
+    related-c "related" word-prop
+    related-d "related" word-prop
+] unit-test

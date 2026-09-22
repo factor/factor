@@ -299,7 +299,7 @@ PRIVATE>
 <PRIVATE
 :: update-related-words ( words -- affected-words )
     words words [| affected word |
-        word "related" [ affected union words ] change-word-prop
+        word "related" [ affected union word words remove ] change-word-prop
     ] reduce ;
 
 :: clear-unrelated-words ( words affected-words -- )
@@ -312,7 +312,7 @@ PRIVATE>
 PRIVATE>
 
 : related-words ( seq -- )
-    dup update-related-words
+    members dup update-related-words
     [ clear-unrelated-words ] [ notify-related-words ] bi ;
 
 : $related ( element -- )
