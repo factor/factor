@@ -253,7 +253,7 @@ ERROR: unexpected-terminator n string slice ;
     } 1&& ;
 
 : read-til-semicolon ( n string slice -- n' string semi )
-    dup '[ but-last ";" append ";" 2array { "--" ")" } append lex-colon-until ] dip
+    dup '[ but-last ";" append ";" 2array { "--" ")" "]" "}" } append lex-colon-until ] dip
     swap
     ! What ended the FOO: .. ; form?
     ! Remove the ; from the payload if present

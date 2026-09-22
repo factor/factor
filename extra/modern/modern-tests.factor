@@ -241,3 +241,11 @@ IN: modern.tests
         { "<BAR" { } "BAR>" }
     }
 } [ "foo:: <FOO FOO> [ 0 ] [ 1 ] [ 2 ] [ 3 ] <BAR BAR>" string>literals >strings ] unit-test
+
+! #2872: a colon form must leave the surrounding delimiter for its reader.
+{ { { "[" { { "CHAR:" { "a" } } } "]" } "tail" } } [
+    "[ CHAR: a ] tail" string>literals >strings
+] unit-test
+{ { { "{" { { "CHAR:" { "a" } } } "}" } "tail" } } [
+    "{ CHAR: a } tail" string>literals >strings
+] unit-test
