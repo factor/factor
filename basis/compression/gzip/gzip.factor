@@ -1,7 +1,7 @@
 ! Copyright (C) 2020 Jacob Fischer, Abtin Molavi.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs bit-arrays byte-arrays
-combinators compression.huffman kernel math math.bits math.order
+USING: accessors arrays assocs bit-arrays byte-arrays checksums checksums.crc32
+combinators compression.huffman endian kernel math math.bits math.order
 namespaces ranges sequences sequences.deep splitting vectors ;
 IN: compression.gzip
 
@@ -31,10 +31,14 @@ SYMBOL: lit-vec
     [ dup array? [ first ] [ drop 1 ] if ] map-sum ;
 
 :: compress-lz77 ( seq -- vec )
-    0 seq create-pair seq length <vector> ?push [ dup sum-vec seq length < ] [ dup sum-vec seq create-pair swap ?push ] while ;
+    seq empty? [ V{ } clone ] [
+        0 seq create-pair seq length <vector> ?push
+        [ dup sum-vec seq length < ]
+        [ dup sum-vec seq create-pair swap ?push ] while
+    ] if ;
 
 : gzip-header ( -- header )
-    { 31 139 8 0 0 0 255 } >byte-array ;
+    B{ 31 139 8 0 0 0 0 0 0 255 } ;
 
 ! Huffman Coding
 
@@ -139,7 +143,8 @@ SYMBOL: lit-vec
     285 [0..b] [ lit-dict get at length ] map [ zero? ] trim-tail ;
 
 : dist-code-lens ( -- len-seq )
-    31 [0..b] [ dist-dict get at length ] map [ zero? ] trim-tail ;
+    31 [0..b] [ dist-dict get at length ] map [ zero? ] trim-tail
+    dup empty? [ drop { 0 } ] when ;
 
 :: replace-0-single ( m len-seq -- new-len-seq )
     m 11 < [ len-seq m 0 <array> 17 m 3 - 3 <bits> >bit-array 2array 1array replace ]
@@ -230,10 +235,21 @@ TUPLE: deflate-block
 : flatten-blocks ( blocks -- byte-array )
     [ flatten-block ] map unclip-last [ [ ?{ f } prepend ] map ] dip ?{ t } prepend suffix concat ;
 
+:: wrap-gzip ( bytes compressed -- gzip )
+    gzip-header compressed
+    bytes crc32 checksum-bytes reverse
+    bytes length 0xffffffff bitand 4 >le
+    append 3append ;
+
 PRIVATE>
 
-: compress-dynamic ( byte-array -- byte-array )
-    (compress-dynamic) [ deflate-block? ] deep-filter flatten-blocks underlying>> gzip-header prepend B{ 0 0 } append ;
+: compress-fixed ( byte-array -- byte-array' )
+    dup (compress-fixed) [ flatten-pair ] map
+    256 (lit-to-bits) suffix concat ?{ t t f } prepend
+    underlying>> wrap-gzip ;
 
-: compress-fixed ( byte-array -- byte-array )
-    (compress-fixed) [ flatten-pair ] map concat ?{ t t f } prepend underlying>> gzip-header prepend B{ 0 0 } append ;
+: compress-dynamic ( byte-array -- byte-array' )
+    dup empty? [ compress-fixed ] [
+        dup (compress-dynamic) [ deflate-block? ] deep-filter
+        flatten-blocks underlying>> wrap-gzip
+    ] if ;

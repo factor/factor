@@ -1,4 +1,4 @@
-USING: compression.gzip compression.inflate tools.test ;
+USING: compression.gzip compression.inflate kernel math sequences tools.test ;
 
 { B{
     1 255 255 255 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
@@ -223,3 +223,20 @@ USING: compression.gzip compression.inflate tools.test ;
     }
     compress-fixed gzip-inflate 
 ] unit-test 
+
+! Fixed Huffman member independently generated with Python zlib.
+{ B{ 31 139 8 0 0 0 0 0 0 255 203 72 205 201 201 7 0 134 166 16 54 5 0 0 0 } } [
+    B{ 104 101 108 108 111 } compress-fixed
+] unit-test
+
+! Literal-only blocks still need one (unused) distance-code length.
+{ 0 } [
+    B{ 104 101 108 108 111 } compress-dynamic 11 swap nth 31 bitand
+] unit-test
+
+{ B{ 104 101 108 108 111 } } [
+    B{ 104 101 108 108 111 } compress-dynamic gzip-inflate
+] unit-test
+
+{ B{ } } [ B{ } compress-fixed gzip-inflate ] unit-test
+{ B{ } } [ B{ } compress-dynamic gzip-inflate ] unit-test

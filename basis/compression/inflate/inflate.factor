@@ -1,7 +1,7 @@
 ! Copyright (C) 2009, 2020 Marc Fauconneau, Abtin Molavi, Jacob Fischer.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs bitstreams byte-arrays
-byte-vectors combinators combinators.short-circuit
+byte-vectors checksums checksums.crc32 combinators combinators.short-circuit
 combinators.smart compression.huffman endian kernel math
 math.bitwise ranges sequences sorting ;
 QUALIFIED-WITH: bitstreams bs
@@ -11,6 +11,7 @@ IN: compression.inflate
 
 ERROR: bad-zlib-data ;
 ERROR: bad-zlib-header ;
+ERROR: bad-gzip-header ;
 
 
 :: check-zlib-header ( data -- )
@@ -29,18 +30,22 @@ ERROR: bad-zlib-header ;
     [ dup 8 swap bs:read 0 =  ] [  ]  until ;
 
 :: interpret-flag ( flg data -- )
-    27 data bs:seek 
-    flg first 1 = [ 8 data bs:read data bs:seek  ] when
-    flg second 1 = [ data read-until-terminated drop ] when
-    flg fourth 1 = [ data read-until-terminated drop ] when
-    flg second 1 = [ 1 data bs:read drop  ] when ;
+    flg 0xe0 bitand zero? [ bad-gzip-header ] unless
+    48 data bs:seek ! MTIME, XFL, OS
+    flg 4 bitand zero? [ 16 data bs:read 8 * data bs:seek ] unless
+    flg 8 bitand zero? [ data read-until-terminated drop ] unless
+    flg 16 bitand zero? [ data read-until-terminated drop ] unless
+    flg 2 bitand zero? [
+        data [ bytes>> ] [ byte-pos>> ] bi head
+        crc32 checksum-bytes be> 0xffff bitand
+        16 data bs:read assert=
+    ] unless ;
 
 :: check-gzip-header ( data -- )
     8 data bs:read 31 assert=   ! ID 1
     8 data bs:read 139 assert=  ! ID 2 
     8 data bs:read 8 assert=    ! compression method: deflate
-    1 data bs:seek ! ignore textbit
-    1 data bs:read 1 data bs:read 1 data bs:read 1 data bs:read 4array data interpret-flag
+    8 data bs:read data interpret-flag
     ;
 
 
@@ -189,7 +194,11 @@ PRIVATE>
     [ check-zlib-header ] [ inflate-loop ] bi
     inflate-lz77 ;
 
-: gzip-inflate ( bytes -- bytes )
-    bs:<lsb0-bit-reader>
-    [ check-gzip-header ] [ inflate-loop ] bi
-    inflate-lz77 ;
+:: gzip-inflate ( bytes -- bytes' )
+    bytes bs:<lsb0-bit-reader> :> data
+    data check-gzip-header
+    data inflate-loop inflate-lz77 :> decoded
+    8 data bs:align
+    decoded crc32 checksum-bytes be> 32 data bs:read assert=
+    decoded length 0xffffffff bitand 32 data bs:read assert=
+    decoded ;
