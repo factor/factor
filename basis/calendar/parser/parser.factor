@@ -116,14 +116,20 @@ CONSTANT: rfc822-named-zones H{
     { [ day-abbreviations3 member? ] [ day-names member? ] } 1||
     check-timestamp drop ;
 
+: read-cookie-gmt-offset ( -- dt )
+    " " read-until drop dup empty?
+    [ drop instant ] [ parse-rfc822-gmt-offset ] if ;
+
 : read-cookie-string-1 ( -- timestamp )
     "," read-token check-day-name
     read1 CHAR: \s assert=
     "-" read-token checked-number
     "-" read-token month-abbreviations index 1 + check-timestamp
     read-sp checked-number spin
-    read-hh:mm:ss
-    " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
+    ":" read-token checked-number
+    ":" read-token checked-number
+    " " read-until drop checked-number
+    read-cookie-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-1 ( str -- timestamp )
     [ read-cookie-string-1 ] with-string-reader ;
@@ -133,8 +139,8 @@ CONSTANT: rfc822-named-zones H{
     read-sp month-abbreviations index 1 + check-timestamp
     read-sp checked-number
     read-hh:mm:ss
-    [ read-sp checked-number ] 5 ndip
-    " " read-until drop parse-rfc822-gmt-offset <timestamp> ;
+    [ " " read-until drop checked-number ] 5 ndip
+    read-cookie-gmt-offset <timestamp> ;
 
 : cookie-string>timestamp-2 ( str -- timestamp )
     [ read-cookie-string-2 ] with-string-reader ;

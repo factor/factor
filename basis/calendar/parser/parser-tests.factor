@@ -171,3 +171,20 @@ io.streams.string kernel math.order tools.test ;
 
 [ "Wed, 29 Feb 2017 10:20:30 GMT" rfc822>timestamp ]
 [ not-in-interval? ] must-fail-with
+
+! #1304: legacy cookie dates without a timezone are interpreted as GMT.
+{ "20151014153035" } [
+    "Wed Oct 14 15:30:35 2015" cookie-string>timestamp timestamp>mdtm
+] unit-test
+{ "20151014153035" } [
+    "Wednesday, 14-Oct-2015 15:30:35" cookie-string>timestamp timestamp>mdtm
+] unit-test
+{ t } [
+    "Wed Oct 14 15:30:35 2015" cookie-string>timestamp gmt-offset>> instant =
+] unit-test
+{ f } [ "Wed Oct 14 15:30:35 2015 nonsense" cookie-string>timestamp ] unit-test
+
+{ t } [
+    "Wed Oct 14 15:30:35 2015 +0200" cookie-string>timestamp
+    gmt-offset>> 2 hours =
+] unit-test
