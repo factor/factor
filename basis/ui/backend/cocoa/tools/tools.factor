@@ -6,7 +6,7 @@ cocoa.subclassing core-foundation.strings eval kernel listener
 locals memory namespaces parser system ui.backend.cocoa
 ui.theme.switching ui.tools.browser ui.tools.listener
 vocabs.refresh ;
-FROM: alien.c-types => int void ;
+FROM: alien.c-types => char int void ;
 IN: ui.backend.cocoa.tools
 
 : finder-run-files ( alien -- )
@@ -25,7 +25,7 @@ IN: ui.backend.cocoa.tools
 
     METHOD: void application: id app openFiles: id files [ files finder-run-files ] ;
 
-    METHOD: int applicationShouldHandleReopen: id app hasVisibleWindows: int flag [ flag 0 = [ show-listener ] when 1 ] ;
+    METHOD: char applicationShouldHandleReopen: id app hasVisibleWindows: char flag [ flag 0 = [ show-listener ] when 1 ] ;
 
     METHOD: id showFactorListener: id app [ show-listener f ] ;
 

@@ -32,7 +32,7 @@ CONSTANT: CLS_GROW_CACHE   0x40
 CONSTANT: CLS_NEED_BIND    0x80
 CONSTANT: CLS_METHOD_ARRAY 0x100
 
-FUNCTION: int objc_getClassList ( void* buffer, int bufferLen )
+FUNCTION: int objc_getClassList ( Class* buffer, int bufferLen )
 
 FUNCTION: Class objc_getClass ( c-string class )
 
@@ -43,11 +43,11 @@ FUNCTION: Protocol objc_getProtocol ( c-string class )
 FUNCTION: Class objc_allocateClassPair ( Class superclass, c-string name, size_t extraBytes )
 FUNCTION: void objc_registerClassPair ( Class cls )
 
-FUNCTION: void* objc_getAssociatedObject ( void* obj, void* key )
+FUNCTION: id objc_getAssociatedObject ( id obj, void* key )
 
-FUNCTION: id class_createInstance ( Class class, uint additionalByteCount )
+FUNCTION: id class_createInstance ( Class class, size_t additionalByteCount )
 
-FUNCTION: id class_createInstanceFromZone ( Class class, uint additionalByteCount, void* zone )
+FUNCTION: id class_createInstanceFromZone ( Class class, size_t additionalByteCount, void* zone )
 
 FUNCTION: Method class_getInstanceMethod ( Class class, SEL selector )
 
@@ -86,5 +86,4 @@ FUNCTION: void* method_getImplementation ( Method method )
 
 FUNCTION: Class object_getClass ( id object )
 
-FUNCTION: void* object_getIvar ( Class class, Ivar ivar )
-
+FUNCTION: id object_getIvar ( id obj, Ivar ivar )

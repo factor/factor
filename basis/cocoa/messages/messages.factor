@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types alien.data alien.strings
 arrays assocs classes.struct cocoa.runtime cocoa.types
 combinators continuations core-graphics.types destructors
 generalizations io io.encodings.utf8 kernel layouts libc make math
-math.parser namespaces sequences sets specialized-arrays
+math.order math.parser namespaces sequences sets specialized-arrays
 splitting stack-checker strings system words ;
 QUALIFIED-WITH: alien.c-types c
 IN: cocoa.messages
@@ -171,6 +171,7 @@ cell {
         { NSRect     "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
         { NSSize     "{_NSSize=ff}" }
         { NSRange    "{_NSRange=II}" }
+        { NSRangePointer "^{_NSRange=II}" }
         { NSInteger  "i" }
         { NSUInteger "I" }
         { CGFloat    "f" }
@@ -180,6 +181,7 @@ cell {
         { NSRect     "{CGRect={CGPoint=dd}{CGSize=dd}}" }
         { NSSize     "{CGSize=dd}" }
         { NSRange    "{_NSRange=QQ}" }
+        { NSRangePointer "^{_NSRange=QQ}" }
         { NSInteger  "q" }
         { NSUInteger "Q" }
         { CGFloat    "d" }
@@ -295,6 +297,6 @@ ERROR: no-objc-type name ;
     [
         f 0 objc_getClassList
         [ Class heap-size * malloc &free ] keep
-        dupd objc_getClassList void* <c-direct-array>
+        2dup objc_getClassList min void* <c-direct-array>
         [ class_getName ] { } map-as
     ] with-destructors ;

@@ -51,11 +51,11 @@ IN: cocoa.subclassing
 :: (redefine-objc-method) ( class method -- )
     method init-method :> ( sel imp types )
 
-    class sel class_getInstanceMethod [
+    ! class_getInstanceMethod may return an inherited method.
+    class sel imp types class_addMethod 0 = [
+        class sel class_getInstanceMethod
         imp method_setImplementation drop
-    ] [
-        class sel imp types add-method
-    ] if* ;
+    ] when ;
 
 : redefine-objc-methods ( methods name -- )
     dup class-exists? [

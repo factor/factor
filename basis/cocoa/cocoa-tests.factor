@@ -52,3 +52,22 @@ IN: cocoa.tests
         swap -> release
     ] compile-call
 ] unit-test
+
+! Redefining a subclass must not replace an inherited implementation.
+<CLASS: FactorSubclassAuditParent < NSObject
+    METHOD: int subclassAuditValue [ 1 ] ;
+;CLASS>
+
+<CLASS: FactorSubclassAuditChild < FactorSubclassAuditParent
+;CLASS>
+
+<CLASS: FactorSubclassAuditChild < FactorSubclassAuditParent
+    METHOD: int subclassAuditValue [ 2 ] ;
+;CLASS>
+
+: subclass-audit-value ( class -- n )
+    -> alloc -> init
+    dup -> subclassAuditValue swap -> release ;
+
+{ 1 } [ FactorSubclassAuditParent subclass-audit-value ] unit-test
+{ 2 } [ FactorSubclassAuditChild subclass-audit-value ] unit-test

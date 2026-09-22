@@ -632,12 +632,12 @@ PRIVATE>
     ] ;
 
     METHOD: id attributedSubstringForProposedRange: NSRange aRange
-                                       actualRange: id actualRange [ f ] ;
+                                       actualRange: NSRangePointer actualRange [ f ] ;
 
     METHOD: NSUInteger characterIndexForPoint: NSPoint point [ 0 ] ;
 
     METHOD: NSRect firstRectForCharacterRange: NSRange aRange
-                                  actualRange: NSRange actualRange [
+                                  actualRange: NSRangePointer actualRange [
         self window :> window
         window [
             window world-focus :> gadget

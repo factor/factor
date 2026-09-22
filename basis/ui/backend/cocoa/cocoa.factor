@@ -215,6 +215,8 @@ M: cocoa-ui-backend system-alert
     METHOD: char applicationShouldTerminateAfterLastWindowClosed: id app [
         ui-stop-after-last-window? get 1 0 ?
     ] ;
+
+    METHOD: char applicationSupportsSecureRestorableState: id app [ 1 ] ;
 ;CLASS>
 
 : install-app-delegate ( -- )
