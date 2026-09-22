@@ -13,7 +13,7 @@ HELP: synopsis*
 
 HELP: see
 { $values { "defspec" "a definition specifier" } }
-{ $contract "Prettyprints a definition without truncating nested quotations." }
+{ $contract "Prettyprints a definition without truncating nested quotations or long sequences." }
 { $examples
   "A word:" { $code "\\ append see" }
   "A method:" { $code "USE: arrays" "M\\ array length see" }

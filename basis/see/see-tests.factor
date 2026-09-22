@@ -1,5 +1,5 @@
-USING: combinators io.encodings.utf8 io.streams.string kernel math
-see sequences summary tools.test words ;
+USING: arrays combinators io.encodings.utf8 io.streams.string
+kernel literals math see sequences summary tools.test words ;
 IN: see.tests
 
 CONSTANT: test-const 10
@@ -35,4 +35,11 @@ ALIAS: test-alias +
     [ "~quotation~" swap subseq? ]
     [ "utf8" swap subseq? ]
     [ "io.encodings.utf8" swap subseq? ] tri
+] unit-test
+
+! #1561: long literal sequences in definitions must be visible in full.
+CONSTANT: long-definition $[ 200 <iota> >array ]
+{ f t } [
+    [ \ long-definition see ] with-string-writer
+    [ " more~" swap subseq? ] [ "199" swap subseq? ] bi
 ] unit-test

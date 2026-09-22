@@ -129,7 +129,7 @@ M: word declarations.
 M: object see*
     [
         f nesting-limit namespaces:set
-        100 length-limit namespaces:set
+        f length-limit namespaces:set
         <colon dup synopsis*
         <block dup definition pprint-elements block>
         dup definer nip [ pprint-word ] when* declarations.
