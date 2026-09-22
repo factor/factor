@@ -1,5 +1,12 @@
-USING: concurrency.futures kernel tools.test threads ;
+USING: concurrency.futures kernel namespaces tools.test threads ;
 IN: concurrency.futures.tests
+
+SYMBOL: future-scope
+
+! #3156: the inherited scope survives after the parent's binding ends.
+{ 42 } [
+    42 future-scope [ [ future-scope get ] future ] with-variable ?future
+] unit-test
 
 { 50 } [
     [ 50 ] future ?future
