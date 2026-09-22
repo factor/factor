@@ -136,7 +136,6 @@ pub export fn primitive_check_datastack(vm_asm: *VMAssemblyFields) callconv(.c) 
     // This validates that the preserved portion of the stack hasn't changed
     const out = layouts.untagFixnum(vm.pop());
     const in = layouts.untagFixnum(vm.pop());
-    const height = out - in;
     const saved_datastack = vm.pop();
 
     {
@@ -155,8 +154,9 @@ pub export fn primitive_check_datastack(vm_asm: *VMAssemblyFields) callconv(.c) 
             else
                 0;
 
-            // Verify current height matches expected height after effect
-            if (current_height - height != saved_height) {
+            if (in < 0 or out < 0 or in > saved_height or out > current_height or
+                current_height - out != saved_height - in)
+            {
                 vm.push(layouts.false_object);
                 return;
             }
