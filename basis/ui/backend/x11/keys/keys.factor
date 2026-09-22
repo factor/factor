@@ -72,7 +72,33 @@ CONSTANT: codes
         { $ XK_Hyper_R f }
     }
 
+<PRIVATE
+
+CONSTANT: keypad-characters H{
+    { $ XK_KP_0 CHAR: 0 }
+    { $ XK_KP_1 CHAR: 1 }
+    { $ XK_KP_2 CHAR: 2 }
+    { $ XK_KP_3 CHAR: 3 }
+    { $ XK_KP_4 CHAR: 4 }
+    { $ XK_KP_5 CHAR: 5 }
+    { $ XK_KP_6 CHAR: 6 }
+    { $ XK_KP_7 CHAR: 7 }
+    { $ XK_KP_8 CHAR: 8 }
+    { $ XK_KP_9 CHAR: 9 }
+    { $ XK_KP_Multiply CHAR: * }
+    { $ XK_KP_Add CHAR: + }
+    { $ XK_KP_Separator CHAR: , }
+    { $ XK_KP_Subtract CHAR: - }
+    { $ XK_KP_Decimal CHAR: . }
+    { $ XK_KP_Divide CHAR: / }
+    { $ XK_KP_Equal CHAR: = }
+    { $ XK_KP_Space CHAR: \s }
+}
+
+PRIVATE>
+
 : code>sym ( code -- name/code/f action? )
+    dup keypad-characters at* [ nip ] [ drop ] if
     dup codes at* [ nip dup t and ] when ;
 
 : event-modifiers ( event -- seq )
