@@ -55,6 +55,9 @@ void factor::factor_vm::c_to_factor(cell) {
                     arm64_function_fragment_size + 4,
                     code->seg->end - start - 4};
   for (cell offset : offsets) {
+    printf("Checking handler at heap code offset 0x%llx\n",
+           (unsigned long long)offset);
+    fflush(stdout);
     DWORD64 base = 0;
     PRUNTIME_FUNCTION function = RtlLookupFunctionEntry(start + offset, &base, NULL);
     check(function != NULL, "Missing function entry");
@@ -72,6 +75,14 @@ void factor::factor_vm::c_to_factor(cell) {
         UNW_FLAG_EHANDLER, base, context.Pc, function, &context,
         &handler_data, &establisher_frame, NULL);
     arm64_seh_data* seh = (arm64_seh_data*)code->seh_area;
+    if ((void*)handler != (void*)seh->handler) {
+      fprintf(stderr,
+              "offset=0x%llx begin_rva=0x%lx unwind_rva=0x%lx "
+              "handler=%p expected=%p\n",
+              (unsigned long long)offset, (unsigned long)function->BeginAddress,
+              (unsigned long)function->UnwindData,
+              (void*)handler, (void*)seh->handler);
+    }
     check((void*)handler == (void*)seh->handler, "Fragment PC lost exception handler");
     check(context.Sp == (DWORD64)&stack[0], "Handler lookup changed SP");
     check(context.Fp == 0, "Handler lookup changed FP");
@@ -84,6 +95,9 @@ void factor::factor_vm::c_to_factor(cell) {
   cell fault_offsets[] = {0, 64, arm64_function_fragment_size - 4,
                           arm64_function_fragment_size};
   for (cell offset : fault_offsets) {
+    printf("Checking access violation at heap code offset 0x%llx\n",
+           (unsigned long long)offset);
+    fflush(stdout);
     DWORD* instructions = (DWORD*)(start + offset);
     instructions[0] = 0xf9400000; // ldr x0, [x0]
     instructions[1] = 0xd65f03c0; // ret

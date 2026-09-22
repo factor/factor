@@ -6,7 +6,7 @@ namespace factor {
 // a heap fragment contains many words, including frameless words and
 // partially executed prologs. There is no single FP/LR layout for it.
 // Factor's exception handler redirects execution and restores its own stacks.
-// end_c keeps the handler visible even at a fragment's first/last PC.
+// end_c describes a zero-length prolog; the header declares no epilogs.
 static const DWORD arm64_unwind_code_handler_only = 0xe3e3e4e5;
 static const cell arm64_function_fragment_size = ((1 << 18) - 1) * 4;
 
@@ -48,10 +48,11 @@ void factor_vm::c_to_factor_toplevel(cell quot) {
     arm64_unwind_info* unwind = &seh_area->unwind[entry_count];
     RUNTIME_FUNCTION* func = &seh_area->funcs[entry_count];
 
-    // E=1 with epilog index zero points at end_c, describing a fragment
-    // without an epilog as well as without a prolog.
+    // E=0 and EpilogCount=0: no epilog scopes. E=1 would make Windows
+    // treat the fragment's last instruction as an epilog and suppress
+    // its exception handler there, even with end_c at unwind index zero.
     unwind->header =
-      (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 21) | (1 << 27));
+      (DWORD)((fragment_size >> 2) | (1 << 20) | (1 << 27));
     unwind->unwind_codes = arm64_unwind_code_handler_only;
     unwind->exception_handler = handler_rva;
 
