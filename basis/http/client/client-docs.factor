@@ -4,6 +4,9 @@ io.encodings.binary io.encodings.latin1 io.pathnames kernel
 sequences strings urls urls.encoding ;
 IN: http.client
 
+HELP: unsupported-content-encoding
+{ $error-description "Thrown when a nonempty response body uses a content coding that the buffered HTTP client cannot decode. The " { $slot "encoding" } " slot identifies the coding. Use " { $link with-http-request } " to receive encoded bytes for custom decoding." } ;
+
 HELP: download-failed
 { $error-description "Thrown by " { $link http-request } " if the server returns a status code other than 200. The " { $slot "response" } " slot can be inspected for the underlying cause of the problem." } ;
 
@@ -138,7 +141,8 @@ HELP: http-request
 
 HELP: http-request*
 { $values { "request" request } { "response" response } { "content" sequence } }
-{ $description "Sends an HTTP request to an HTTP server, and reads the response." } ;
+{ $description "Sends an HTTP request to an HTTP server, and reads the response. Gzip content coding (including x-gzip) is decompressed before character decoding. Stacked gzip codings are decoded in reverse order, and concatenated gzip members are supported. The response body contains the decoded content; response headers retain their original wire values." }
+{ $errors "Throws an error for malformed gzip data or unsupported content codings." } ;
 
 HELP: read-response-header
 { $values { "response" response } }
@@ -146,7 +150,7 @@ HELP: read-response-header
 
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation ( chunk -- ) } } { "response/stream" "a response or a stream" } }
-{ $description "A variant of " { $link do-http-request } " that checks that the response was successful." } ;
+{ $description "A variant of " { $link do-http-request } " that checks that the response was successful. The quotation receives bytes after transfer decoding, but before content decompression or character decoding." } ;
 
 { http-request http-request* with-http-request } related-words
 

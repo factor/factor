@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ascii assocs calendar combinators
-combinators.short-circuit continuations destructors effects
+combinators.short-circuit compression.inflate continuations destructors effects
 environment hashtables http http.client.post-data http.parsers
 http.websockets io io.crlf io.encodings io.encodings.ascii
 io.encodings.binary io.encodings.iana io.encodings.string
@@ -13,6 +13,7 @@ IN: http.client
 
 ERROR: too-many-redirects ;
 ERROR: invalid-proxy proxy ;
+ERROR: unsupported-content-encoding encoding ;
 
 : success? ( code -- ? ) 200 299 between? ;
 
@@ -276,9 +277,31 @@ SYMBOL: request-socket
 : with-http-request ( request quot: ( chunk -- ) -- response/stream )
     do-http-request check-response ; inline
 
+<PRIVATE
+
+:: decode-content-codings ( response bytes -- decoded )
+    bytes
+    response "content-encoding" header [
+        "," split reverse [
+            [ blank? ] trim >lower {
+                { "" [ ] }
+                { "identity" [ ] }
+                { "gzip" [ gzip-inflate ] }
+                { "x-gzip" [ gzip-inflate ] }
+                [ unsupported-content-encoding ]
+            } case
+        ] each
+    ] when* ;
+
+: decode-response-body ( response bytes -- response content )
+    dup empty? [ [ dup ] dip decode-content-codings ] unless
+    over content-encoding>> decode [ >>body ] keep ;
+
+PRIVATE>
+
 : http-request* ( request -- response content )
     BV{ } clone [ '[ _ push-all ] do-http-request ] keep
-    B{ } like over content-encoding>> decode [ >>body ] keep ;
+    B{ } like decode-response-body ;
 
 : http-request ( request -- response content )
     http-request* [ check-response ] dip ;

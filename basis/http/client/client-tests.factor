@@ -1,5 +1,5 @@
 USING: accessors http http.client http.client.private
-io.streams.string kernel namespaces sequences splitting
+io.encodings.binary io.encodings.utf8 io.streams.string kernel namespaces sequences splitting
 tools.test urls ;
 IN: http.client.tests
 
@@ -232,3 +232,45 @@ CONSTANT: classic-proxy-settings H{
 
 ! This one is not fixable, leave it as it is
 { T{ url } } [ "" request-url ] unit-test
+
+{ "héllo" "héllo" } [
+    <response> utf8 >>content-encoding
+    "gzip" "content-encoding" set-header
+    B{ 31 139 8 0 0 0 0 0 2 255 203 56 188 50 39 39 31 0 54 130 59 158 6 0 0 0 } decode-response-body
+    [ body>> ] dip
+] unit-test
+
+{ "héllo" "héllo" } [
+    <response> utf8 >>content-encoding
+    " X-GZip " "content-encoding" set-header
+    B{ 31 139 8 0 0 0 0 0 2 255 203 56 188 50 39 39 31 0 54 130 59 158 6 0 0 0 } decode-response-body
+    [ body>> ] dip
+] unit-test
+
+{ "héllo" "héllo" } [
+    <response> utf8 >>content-encoding
+    "gzip, gzip" "content-encoding" set-header
+    B{ 31 139 8 0 0 0 0 0 2 255 147 239 230 96 0 1 166 255 167 45 246 24 169 171 203 51
+        152 53 89 207 99 3 138 0 0 170 27 152 209 26 0 0 0 } decode-response-body
+    [ body>> ] dip
+] unit-test
+
+{ B{ 0 255 } } [
+    <response> binary >>content-encoding "gzip" "content-encoding" set-header
+    B{ 31 139 8 0 0 0 0 0 2 255 99 248 15 0 114 253 219 108 2 0 0 0 } decode-response-body nip
+] unit-test
+
+{ "" } [
+    <response> utf8 >>content-encoding "gzip" "content-encoding" set-header
+    B{ } decode-response-body nip
+] unit-test
+
+{ "plain" } [
+    <response> utf8 >>content-encoding
+    B{ 112 108 97 105 110 } decode-response-body nip
+] unit-test
+
+[
+    <response> "br" "content-encoding" set-header
+    B{ 1 2 3 } decode-response-body
+] [ unsupported-content-encoding? ] must-fail-with
