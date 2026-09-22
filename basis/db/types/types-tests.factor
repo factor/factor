@@ -25,10 +25,10 @@ primary-key-test "KEY_TEST" {
 } define-persistent
 
 { "Earth" } [
-    ":memory:" <sqlite-db> [
+    [ "keys.db" <sqlite-db> [
         primary-key-test create-table
         "Hello" "World" primary-key-test boa insert-tuple
         "Hello" "Earth" primary-key-test boa update-tuple
         "Hello" f primary-key-test boa select-tuple value>>
-    ] with-db
+    ] with-db ] with-test-directory
 ] unit-test
