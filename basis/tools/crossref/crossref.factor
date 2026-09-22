@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
-combinators.smart compiler.units fry generic generic.single
+combinators.smart compiler.units dlists fry generic generic.single
 hash-sets.identity hashtables hashtables.wrapped help help.crossref help.markup
-help.topics init io io.pathnames io.styles kernel namespaces
+help.topics init io io.pathnames io.styles kernel lists namespaces
+persistent.hashtables persistent.vectors
 quotations see sequences sets sorting source-files threads
-vectors vocabs words ;
+vectors vlists vocabs words ;
 IN: tools.crossref
 
 SYMBOL: crossref
@@ -39,6 +40,31 @@ M: word quot-uses
 
 M: array quot-uses seq-uses ;
 M: vector quot-uses seq-uses ;
+M: vlist quot-uses seq-uses ;
+M: persistent-vector quot-uses seq-uses ;
+
+! Sequences implement assoc and set too, but their protocols have different
+! meanings. Only traverse the finite literal sequence classes above.
+PREDICATE: non-sequence-assoc < assoc sequence? not ;
+PREDICATE: non-sequence-set < sets:set sequence? not ;
+
+M: non-sequence-assoc quot-uses assoc-uses ;
+M: persistent-hash quot-uses assoc-uses ;
+
+M: non-sequence-set quot-uses
+    over visited get ?adjoin [
+        [ members ] dip [ quot-uses ] curry each
+    ] [ 2drop ] if ;
+
+M: cons-state quot-uses
+    over visited get ?adjoin [
+        [ [ car>> ] [ cdr>> ] bi ] dip [ quot-uses ] curry bi@
+    ] [ 2drop ] if ;
+
+M: dlist quot-uses
+    over visited get ?adjoin [
+        [ quot-uses ] curry dlist-each
+    ] [ 2drop ] if ;
 
 M: hashtable quot-uses assoc-uses ;
 M: wrapped-hashtable quot-uses assoc-uses ;

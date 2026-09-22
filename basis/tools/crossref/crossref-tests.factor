@@ -1,4 +1,6 @@
-USING: arrays quotations vectors hashtables.identity
+USING: assocs deques dlists hash-sets hash-sets.identity
+hash-sets.sequences linked-assocs lists persistent.hashtables
+persistent.vectors sets trees trees.avl trees.splay vlists arrays quotations vectors hashtables.identity
 hashtables.numbers hashtables.sequences fry math kernel sequences io.files io.pathnames
 tools.crossref tools.crossref.private tools.test parser
 namespaces source-files generic definitions words accessors
@@ -95,3 +97,41 @@ M: sequence generic-forget-test-2 = ;
 { t } [ \ literal-target [ NH{ { 0 [ literal-target ] } } ] uses member? ] unit-test
 { t } [ \ literal-target [ SH{ { { 0 } [ literal-target ] } } ] uses member? ] unit-test
 { t } [ \ literal-target [ IH{ { [ literal-target ] 0 } } ] uses member? ] unit-test
+
+! #2832: other literal collections must also retain their word references.
+{ t } [ \ literal-target [ L{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ VL{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ VA{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ PH{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ PV{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ LH{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ DL{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ HS{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ IHS{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ SHS{ [ literal-target ] } ] uses member? ] unit-test
+{ t } [ \ literal-target [ AVL{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ TREE{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+{ t } [ \ literal-target [ SPLAY{ { 0 [ literal-target ] } } ] uses member? ] unit-test
+
+{ t } [
+    IH{ } clone dup "self" pick set-at
+    [ literal-target ] "ref" pick set-at
+    1quotation uses \ literal-target swap member?
+] unit-test
+{ t } [
+    IHS{ } clone dup dup adjoin
+    [ literal-target ] over adjoin
+    1quotation uses \ literal-target swap member?
+] unit-test
+{ t } [
+    <dlist> dup dup push-back
+    [ literal-target ] over push-back
+    1quotation uses \ literal-target swap member?
+] unit-test
+
+! Do not expand arbitrary virtual sequences while indexing literal objects.
+TUPLE: nonliteral-sequence ;
+INSTANCE: nonliteral-sequence sequence
+M: nonliteral-sequence length drop 1 ;
+M: nonliteral-sequence nth 2drop "Unexpected virtual sequence traversal" throw ;
+{ t } [ [ T{ nonliteral-sequence } ] uses empty? ] unit-test
