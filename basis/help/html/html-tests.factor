@@ -1,5 +1,5 @@
-USING: help.html help.vocabs tools.test help.topics kernel sequences vocabs
-math ;
+USING: help.html help.topics help.vocabs io.encodings.utf8 io.files
+kernel math sequences tools.test vocabs ;
 
 { } [ [ "xml" >link help>html drop ] with-test-directory ] unit-test
 
@@ -29,6 +29,16 @@ math ;
 { t } [ all-vocabs-really [ vocab-spec? ] all? ] unit-test
 
 { t } [ all-vocabs-really [ vocab-name "sequences" = ] any? ] unit-test
+
+{ t } [ all-vocabs-really [ vocab-name "bootstrap" = ] any? ] unit-test
+
+{ t } [
+    [
+        "bootstrap" >vocab-link generate-help-file
+        "vocab-bootstrap.html" utf8 file-contents
+        "vocab-bootstrap.image.html" subseq-of?
+    ] with-test-directory
+] unit-test
 
 { f } [ all-vocabs-really [ vocab-name "sequences.private" = ] any? ] unit-test
 

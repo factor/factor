@@ -281,7 +281,8 @@ M: pathname url-of
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
-    all-disk-vocabs-recursive filter-vocabs
+    all-disk-vocabs-recursive no-roots
+    [ dup vocab-prefix? [ vocab-name >vocab-link ] when ] map members
     [ vocab-name "scratchpad" = ] reject ;
 
 : all-topics ( -- topics )
