@@ -9,8 +9,11 @@ SINGLETON: x11-game-input-backend
 
 x11-game-input-backend game-input-backend set-global
 
+: get-dpy ( -- dpy )
+    dpy get check-display ;
+
 M: x11-game-input-backend (open-game-input)
-    ;
+    get-dpy drop ;
 
 M: x11-game-input-backend (close-game-input)
     ;
@@ -83,11 +86,11 @@ M: linux x>hid-bit-order
     256 <bit-array> swap [ t swap pick set-nth ] each ;
 
 M: x11-game-input-backend read-keyboard
-    dpy get 256 <bit-array> [ XQueryKeymap drop ] keep
+    get-dpy 256 <bit-array> [ XQueryKeymap drop ] keep
     x-bits>hid-bits keyboard-state boa ;
 
 : query-pointer ( -- x y buttons )
-    dpy get dup XDefaultRootWindow
+    get-dpy dup XDefaultRootWindow
     { Window Window int int int int uint }
     [ XQueryPointer drop ] with-out-parameters
     [ 4drop ] 3dip ;
@@ -104,5 +107,5 @@ M: x11-game-input-backend read-mouse
     0 >>scroll-dy 0 >>scroll-dx ;
 
 M: x11-game-input-backend reset-mouse
-    dpy get dup XDefaultRootWindow dup
+    get-dpy dup XDefaultRootWindow dup
     0 0 0 0 400 400 XWarpPointer drop t mouse-reset? set-global ;
