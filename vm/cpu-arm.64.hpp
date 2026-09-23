@@ -2,7 +2,7 @@ namespace factor {
 
 #define FACTOR_CPU_STRING "arm.64"
 
-#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - 16)
+#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - 32)
 
 inline static unsigned int call_site_opcode(cell return_address) {
   return *(unsigned int*)(return_address - 4);

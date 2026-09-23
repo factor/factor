@@ -14,8 +14,10 @@
 #define FACTOR_ASSERT assert
 namespace factor {
 typedef uintptr_t cell;
+typedef intptr_t fixnum;
 const cell seh_area_size = 4096;
 struct segment { cell start; cell end; };
+struct context { segment* callstack_seg; };
 struct code_heap { char* seh_area; segment* seg; };
 struct factor_vm {
   code_heap* code;
@@ -39,6 +41,7 @@ static void flush_icache(cell start, cell size) {
     abort();
 }
 }
+#include "../cpu-arm.64.hpp"
 #include "../os-windows-arm.64.cpp"
 
 extern "C" void trampoline();
@@ -167,6 +170,35 @@ void factor::factor_vm::c_to_factor(cell) {
     check(frame != 0, "Trampoline did not publish its frame");
   }
   check(handled_faults == 7, "Native trampoline faults did not reach the handler");
+
+  puts("Checking access violation at the callback entry stack pointer");
+  fflush(stdout);
+  const SIZE_T stack_size = 1024 * 1024;
+  void* stack = VirtualAlloc(NULL, stack_size, MEM_RESERVE | MEM_COMMIT,
+                             PAGE_READWRITE);
+  check(stack != NULL, "VirtualAlloc failed");
+  segment callstack_seg = {(cell)stack, (cell)stack + stack_size};
+  context ctx = {&callstack_seg};
+  DWORD entry_fault[] = {
+    0x910003e9, // mov x9, sp
+    0x9100003f, // mov sp, x1
+    0xf9400000, // ldr x0, [x0]
+    0x9100013f, // mov sp, x9
+    0xd65f03c0  // ret
+  };
+  cell entry_start = start + 512;
+  memcpy((void*)entry_start, entry_fault, sizeof(entry_fault));
+  flush_icache(entry_start, sizeof(entry_fault));
+  NT_TIB* tib = (NT_TIB*)NtCurrentTeb();
+  PVOID stack_base = tib->StackBase;
+  PVOID stack_limit = tib->StackLimit;
+  tib->StackBase = (PVOID)callstack_seg.end;
+  tib->StackLimit = (PVOID)callstack_seg.start;
+  ((void (*)(void*, cell))entry_start)(NULL, CALLSTACK_BOTTOM(&ctx) + 16);
+  tib->StackBase = stack_base;
+  tib->StackLimit = stack_limit;
+  check(handled_faults == 8, "Fault at the callback entry SP missed the handler");
+  check(VirtualFree(stack, 0, MEM_RELEASE) != 0, "VirtualFree failed");
 }
 
 int main() {
