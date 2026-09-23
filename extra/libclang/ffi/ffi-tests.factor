@@ -1,16 +1,22 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
 alien.enums alien.libraries alien.libraries.finder arrays assocs
 classes.struct continuations io.backend io.directories io.pathnames
-kernel layouts libclang libclang.ffi locals math namespaces sequences
-system tools.test vocabs words ;
+kernel layouts libclang libclang.ffi locals math math.parser
+namespaces sequences splitting system tools.test vocabs words ;
 IN: libclang.ffi.tests
 
 SYMBOL: test-cursors
 
-{ t } [
-    "libclang.ffi" vocab-words [ name>> "clang_" head? ] filter
-    [ name>> "clang" dlsym? >boolean ] all?
-] unit-test
+: libclang-major-version ( -- n )
+    clang_getClangVersion clang-get-cstring
+    "version " split1 nip "." split1 drop string>number ;
+
+libclang-major-version 21 >= [
+    { t } [
+        "libclang.ffi" vocab-words [ name>> "clang_" head? ] filter
+        [ name>> "clang" dlsym? >boolean ] all?
+    ] unit-test
+] when
 
 { t t } [
     [
