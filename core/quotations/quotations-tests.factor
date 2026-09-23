@@ -1,4 +1,4 @@
-USING: combinators kernel kernel.private literals math
+USING: arrays combinators kernel kernel.private literals math
 quotations.private sequences stack-checker stack-checker.errors
 tools.test words ;
 IN: quotations
@@ -54,3 +54,6 @@ IN: quotations
 [ 42 jit-compile ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
 [ "abc" clone jit-compile ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
 [ 42 quotation-code ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
+
+[ 1500000 [ 1 \ drop 2array ] replicate concat >quotation jit-compile ]
+[ 2 head ${ KERNEL-ERROR ERROR-ARRAY-SIZE } = ] must-fail-with

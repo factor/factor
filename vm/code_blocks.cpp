@@ -378,6 +378,10 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   data_root<array> literals(literals_, this);
 
   cell code_length = array_capacity(instructions.untagged());
+  cell code_length_max = code_block_size_max - sizeof(code_block);
+  if (code_length > code_length_max)
+    general_error(ERROR_ARRAY_SIZE, tag_fixnum(code_length),
+                  tag_fixnum(code_length_max + 1));
 
   // Everything below writes into the MAP_JIT code heap: allot_code_block writes
   // the block header (and may run a compacting GC, which flips for itself and
