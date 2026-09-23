@@ -773,6 +773,8 @@ M:: arm.64 %box-alien ( DST SRC TEMP -- )
 :: %box-displaced-alien/alien ( DST DISP BASE TEMP -- )
     temp BASE 1 alien@ LDR
     temp DST  1 alien@ STR
+    temp BASE 2 alien@ LDR
+    temp DST  2 alien@ STR
     temp BASE 3 alien@ LDR
     temp dup DISP ADD
     temp DST  3 alien@ STR

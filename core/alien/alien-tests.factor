@@ -1,5 +1,5 @@
 USING: accessors alien alien.accessors alien.c-types
-alien.syntax byte-arrays continuations cpu.architecture kernel layouts locals math memory
+alien.syntax byte-arrays continuations cpu.architecture kernel kernel.private layouts locals math memory
 namespaces prettyprint sequences system tools.memory tools.test ;
 QUALIFIED: sets
 IN: alien.tests
@@ -156,3 +156,11 @@ cpu arm.64? [
 
 [ void { } cdecl [ ] alien-assembly ] [ callsite-not-compiled? ] must-fail-with
 [ void f "flor" { } f alien-invoke ] [ callsite-not-compiled? ] must-fail-with
+
+{ t } [ 4 <bad-alien> <displaced-alien> expired? ] unit-test
+
+: displace-4-alien ( alien -- alien' ) { alien } declare 4 swap <displaced-alien> ;
+: displace-4 ( c-ptr -- alien ) { c-ptr } declare 4 swap <displaced-alien> ;
+
+{ t } [ <bad-alien> displace-4-alien expired? ] unit-test
+{ t } [ <bad-alien> displace-4 expired? ] unit-test

@@ -35,11 +35,13 @@ cell factor_vm::allot_alien(cell delegate_, cell displacement) {
     tagged<alien> delegate_alien = delegate.as<alien>();
     displacement += delegate_alien->displacement;
     new_alien->base = delegate_alien->base;
-  } else
+    new_alien->expired = delegate_alien->expired;
+  } else {
     new_alien->base = delegate.value();
+    new_alien->expired = false_object;
+  }
 
   new_alien->displacement = displacement;
-  new_alien->expired = false_object;
   new_alien->update_address();
 
   return new_alien.value();

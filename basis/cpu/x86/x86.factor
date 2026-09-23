@@ -240,6 +240,9 @@ M:: x86 %box-alien ( dst src temp -- )
     temp base 1 alien@ MOV
     dst 1 alien@ temp MOV
 
+    temp base 2 alien@ MOV
+    dst 2 alien@ temp MOV
+
     ! Compute displacement
     temp base 3 alien@ MOV
     temp displacement ADD

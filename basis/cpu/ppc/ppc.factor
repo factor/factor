@@ -583,6 +583,10 @@ M:: ppc %box-alien ( dst src temp -- )
     temp base scratch-reg %load-cell-x
     temp dst scratch-reg %store-cell-x
 
+    scratch-reg 2 alien@ LI
+    temp base scratch-reg %load-cell-x
+    temp dst scratch-reg %store-cell-x
+
     ! Compute displacement
     scratch-reg 3 alien@ LI
     temp base scratch-reg %load-cell-x
