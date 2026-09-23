@@ -13,16 +13,13 @@ object_start_map::object_start_map(cell size, cell start)
 object_start_map::~object_start_map() { delete[] object_start_offsets; }
 
 cell object_start_map::find_object_containing_card(cell card_index) {
-  if (card_index == 0)
-    return start;
-  card_index--;
-
-  while (object_start_offsets[card_index] == card_starts_inside_object) {
-    // First card should start with an object
-    FACTOR_ASSERT(card_index > 0);
+  while (card_index > 0) {
     card_index--;
+    card offset = object_start_offsets[card_index];
+    if (offset != card_starts_inside_object)
+      return start + card_index * card_size + offset;
   }
-  return start + card_index * card_size + object_start_offsets[card_index];
+  return start;
 }
 
 // we need to remember the first object allocated in the card

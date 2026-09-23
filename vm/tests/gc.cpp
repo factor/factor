@@ -197,6 +197,28 @@ static void test_code_blocks_retry() {
   vm.gc(COLLECT_AGING_OP, 0);
 }
 
+static void test_card_scan_after_dead_tenured_prefix() {
+  test_vm vm;
+  tenured_bytes(vm);
+  data_root<factor::array> survivor(vm.allot_array(1, false_object), &vm);
+  vm.gc(COLLECT_FULL_OP, 0);
+  tenured_space* tenured = vm.data->tenured;
+  check(tenured->contains_p(survivor.untagged()),
+        "full collection did not promote the survivor");
+  cell card = ((cell)survivor.untagged() - tenured->start) / card_size;
+  check(card > 0, "survivor was not placed after the dead prefix");
+  check(tenured->starts.find_object_containing_card(card) == tenured->start,
+        "object start lookup walked below the first tenured card");
+
+  data_root<byte_array> young(vm.allot_byte_array(16), &vm);
+  young->data<uint8_t>()[0] = 42;
+  vm.set_array_nth(survivor.untagged(), 0, young.value());
+  vm.gc(COLLECT_NURSERY_OP, 0);
+  byte_array* referent = untag<byte_array>(survivor->data()[0]);
+  check(referent == young.untagged() && referent->data<uint8_t>()[0] == 42,
+        "card scan lost the survivor's young referent");
+}
+
 static void test_stack_frame_size_header() {
   code_block block;
   for (cell frame_size : {(cell)0xFF0, (cell)0x1000, (cell)0x1010,
@@ -266,5 +288,7 @@ int main(int argc, char** argv) {
     test_gc_events();
   if (argc == 1 || strcmp(argv[1], "code-blocks") == 0)
     test_code_blocks_retry();
+  if (argc == 1 || strcmp(argv[1], "card-scan") == 0)
+    test_card_scan_after_dead_tenured_prefix();
   std::cout << "GC tests passed" << std::endl;
 }
