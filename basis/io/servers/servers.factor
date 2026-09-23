@@ -131,7 +131,7 @@ M: threaded-server handle-client* handler>> call( -- ) ;
     [ secure-context>> secure-context ] dip with-variable ; inline
 
 : accept-loop ( server -- )
-    [ accept-connection ] [ accept-loop ] bi ;
+    dup disposed>> [ drop ] [ [ accept-connection ] [ accept-loop ] bi ] if ;
 
 : start-accept-loop ( threaded-server server -- )
     '[ _ accept-loop ] with-existing-secure-context ;
