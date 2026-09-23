@@ -73,7 +73,7 @@ HELP: 4array
 
 HELP: resize-array
 { $values { "n" "a non-negative integer" } { "array" array } { "new-array" array } }
-{ $description "Resizes the array to have a length of " { $snippet "n" } " elements. When making the array shorter, this word may either create a new array or modify the existing array in place. When making the array longer, this word always allocates a new array, filling remaining space with " { $link f } "." }
+{ $description "Resizes the array to have a length of " { $snippet "n" } " elements. When making the array shorter, this word may either create a new array or modify the existing array in place. When making the array longer, this word always allocates a new array, filling remaining space with " { $snippet "0" } "." }
 { $side-effects "array" } ;
 
 HELP: pair

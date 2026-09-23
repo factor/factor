@@ -217,7 +217,7 @@ HELP: delete-all
 
 HELP: resize
 { $values { "n" "a non-negative integer" } { "seq" sequence } { "newseq" "a new sequence" } }
-{ $description "Creates a new sequence of the same type as " { $snippet "seq" } " with " { $snippet "n" } " elements, and copies the contents of " { $snippet "seq" } " into the new sequence. If " { $snippet "n" } " exceeds the length of " { $snippet "seq" } ", the remaining elements are filled with a default value; " { $link f } " for arrays and 0 for strings." }
+{ $description "Creates a new sequence of the same type as " { $snippet "seq" } " with " { $snippet "n" } " elements, and copies the contents of " { $snippet "seq" } " into the new sequence. If " { $snippet "n" } " exceeds the length of " { $snippet "seq" } ", the remaining elements are filled with 0." }
 { $notes "This generic word is only implemented for strings and arrays." } ;
 
 HELP: first

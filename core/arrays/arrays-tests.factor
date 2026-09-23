@@ -27,3 +27,5 @@ math sequences tools.test vectors ;
 { t } [
     1 2 2array pair?
 ] unit-test
+
+{ { 1 0 0 } } [ 3 { 1 } resize-array ] unit-test
