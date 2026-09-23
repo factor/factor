@@ -82,7 +82,7 @@ M: sequence generic-forget-test-2 = ;
 { t } [ \ literal-target [ V{ [ literal-target ] } ] uses member? ] unit-test
 
 { t } [
-    [ gensym dup [ literal-target ] define ] with-compilation-unit
+    [ gensym dup [ literal-target ] ( -- ) define-declared ] with-compilation-unit
     1quotation uses \ literal-target swap member?
 ] unit-test
 
