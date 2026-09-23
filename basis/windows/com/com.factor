@@ -15,10 +15,10 @@ C-TYPE: IEnumSTATDATA
 C-TYPE: IStorage
 
 COM-INTERFACE: IEnumFORMATETC IUnknown {00000103-0000-0000-C000-000000000046}
-    HRESULT Clone ( IEnumFORMATETC **ppenum )
     HRESULT Next ( ULONG celt, FORMATETC *rgelt, ULONG* pceltFetched )
+    HRESULT Skip ( ULONG celt )
     HRESULT Reset ( )
-    HRESULT Skip ( ULONG celt ) ;
+    HRESULT Clone ( IEnumFORMATETC **ppenum ) ;
 
 COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT GetData ( FORMATETC* pFormatetc, STGMEDIUM* pmedium )
@@ -32,8 +32,8 @@ COM-INTERFACE: IDataObject IUnknown {0000010E-0000-0000-C000-000000000046}
     HRESULT EnumDAdvise ( IEnumSTATDATA** ppenumAdvise ) ;
 
 COM-INTERFACE: IDropSource IUnknown {00000121-0000-0000-C000-000000000046}
-    HRESULT GiveFeedback ( DWORD dwEffect )
-    HRESULT QueryContinueDrag ( BOOL  fEscapePressed, DWORD grfKeyState ) ;
+    HRESULT QueryContinueDrag ( BOOL  fEscapePressed, DWORD grfKeyState )
+    HRESULT GiveFeedback ( DWORD dwEffect ) ;
 
 COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT DragEnter ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect )
@@ -57,19 +57,19 @@ STRUCT: STATSTG
 
 C-TYPE: IStream
 COM-INTERFACE: IStorage IUnknown {0000000B-0000-0000-C000-000000000046}
-    HRESULT Commit ( DWORD grfCommitFlags )
-    HRESULT CopyTo ( DWORD ciidExclude, IID *rgiidExclude, SNB snbExclude, IStorage *pstgDest )
-    HRESULT CreateStorage ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStorage **ppstg )
     HRESULT CreateStream ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStream **ppstm )
-    HRESULT DestroyElement ( OLECHAR *pwcsName )
-    HRESULT EnumElements ( DWORD reserved1, void *reserved2, DWORD reserved3, IEnumSTATSTG **ppenum )
-    HRESULT MoveElementTo ( OLECHAR *pwcsName, IStorage *pstgDest, OLECHAR *pwcsNewName, DWORD grfFlags )
-    HRESULT OpenStorage ( OLECHAR *pwcsName, IStorage *pstgPriority, DWORD grfMode, SNB snbExclude, DWORD reserved, IStorage **ppstg )
     HRESULT OpenStream ( OLECHAR *pwcsName, void *reserved1, DWORD grfMode, DWORD reserved2, IStream **ppstm )
-    HRESULT RenameElement ( OLECHAR *pwcsOldName, OLECHAR *pwcsNewName )
+    HRESULT CreateStorage ( OLECHAR *pwcsName, DWORD grfMode, DWORD reserved1, DWORD reserved2, IStorage **ppstg )
+    HRESULT OpenStorage ( OLECHAR *pwcsName, IStorage *pstgPriority, DWORD grfMode, SNB snbExclude, DWORD reserved, IStorage **ppstg )
+    HRESULT CopyTo ( DWORD ciidExclude, IID *rgiidExclude, SNB snbExclude, IStorage *pstgDest )
+    HRESULT MoveElementTo ( OLECHAR *pwcsName, IStorage *pstgDest, OLECHAR *pwcsNewName, DWORD grfFlags )
+    HRESULT Commit ( DWORD grfCommitFlags )
     HRESULT Revert ( )
-    HRESULT SetClass ( REFCLSID clsid )
+    HRESULT EnumElements ( DWORD reserved1, void *reserved2, DWORD reserved3, IEnumSTATSTG **ppenum )
+    HRESULT DestroyElement ( OLECHAR *pwcsName )
+    HRESULT RenameElement ( OLECHAR *pwcsOldName, OLECHAR *pwcsNewName )
     HRESULT SetElementTimes ( OLECHAR  *pwcsName, FILETIME *pctime, FILETIME *patime, FILETIME *pmtime )
+    HRESULT SetClass ( REFCLSID clsid )
     HRESULT SetStateBits ( DWORD grfStateBits, DWORD grfMask )
     HRESULT Stat ( STATSTG *pstatstg, DWORD grfStatFlag ) ;
 

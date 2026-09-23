@@ -1,4 +1,4 @@
-USING: alien.c-types alien.syntax classes.struct kernel
+USING: alien alien.c-types alien.syntax classes.struct kernel
 literals math math.bitwise windows.kernel32 windows.types ;
 IN: windows.advapi32
 
@@ -336,15 +336,16 @@ CONSTANT: TOKEN_ALL_ACCESS
         TOKEN_ADJUST_DEFAULT
     }
 
-CONSTANT: HKEY_CLASSES_ROOT        0x80000000
-CONSTANT: HKEY_CURRENT_USER        0x80000001
-CONSTANT: HKEY_LOCAL_MACHINE       0x80000002
-CONSTANT: HKEY_USERS               0x80000003
-CONSTANT: HKEY_PERFORMANCE_DATA    0x80000004
-CONSTANT: HKEY_CURRENT_CONFIG      0x80000005
-CONSTANT: HKEY_DYN_DATA            0x80000006
-CONSTANT: HKEY_PERFORMANCE_TEXT    0x80000050
-CONSTANT: HKEY_PERFORMANCE_NLSTEXT 0x80000060
+! SDK: (HKEY)(ULONG_PTR)(LONG)value. Sign-extend before widening.
+: HKEY_CLASSES_ROOT ( -- hkey )        0x80000000 32 >signed <alien> ; inline
+: HKEY_CURRENT_USER ( -- hkey )        0x80000001 32 >signed <alien> ; inline
+: HKEY_LOCAL_MACHINE ( -- hkey )       0x80000002 32 >signed <alien> ; inline
+: HKEY_USERS ( -- hkey )               0x80000003 32 >signed <alien> ; inline
+: HKEY_PERFORMANCE_DATA ( -- hkey )    0x80000004 32 >signed <alien> ; inline
+: HKEY_CURRENT_CONFIG ( -- hkey )      0x80000005 32 >signed <alien> ; inline
+: HKEY_DYN_DATA ( -- hkey )            0x80000006 32 >signed <alien> ; inline
+: HKEY_PERFORMANCE_TEXT ( -- hkey )    0x80000050 32 >signed <alien> ; inline
+: HKEY_PERFORMANCE_NLSTEXT ( -- hkey ) 0x80000060 32 >signed <alien> ; inline
 
 CONSTANT: KEY_QUERY_VALUE         0x0001
 CONSTANT: KEY_SET_VALUE           0x0002
@@ -792,8 +793,8 @@ STRUCT: PUBLICKEYSTRUC
     { aiKeyAlg ALG_ID } ;
 
 TYPEDEF: PUBLICKEYSTRUC BLOBHEADER
-TYPEDEF: LONG HCRYPTHASH
-TYPEDEF: LONG HCRYPTKEY
+TYPEDEF: ULONG_PTR HCRYPTHASH
+TYPEDEF: ULONG_PTR HCRYPTKEY
 TYPEDEF: DWORD REGSAM
 
 ! : I_ScGetCurrentGroupStateW ;
@@ -1090,9 +1091,9 @@ ALIAS: GetNamedSecurityInfo GetNamedSecurityInfoW
 FUNCTION: BOOL GetSecurityDescriptorControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSECURITY_DESCRIPTOR_CONTROL pControl, LPDWORD lpdwRevision )
 FUNCTION: BOOL GetSecurityDescriptorDacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbDaclPresent, PACL* pDacl, LPBOOL lpDaclDefaulted )
 FUNCTION: BOOL GetSecurityDescriptorGroup ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pGroup, LPBOOL lpGroupDefaulted )
-FUNCTION: BOOL GetSecurityDescriptorLength ( PSECURITY_DESCRIPTOR pSecurityDescriptor )
+FUNCTION: DWORD GetSecurityDescriptorLength ( PSECURITY_DESCRIPTOR pSecurityDescriptor )
 FUNCTION: BOOL GetSecurityDescriptorOwner ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PSID* pOwner, LPBOOL lpOwnerDefaulted )
-FUNCTION: BOOL GetSecurityDescriptorRMControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PUCHAR RMControl )
+FUNCTION: DWORD GetSecurityDescriptorRMControl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, PUCHAR RMControl )
 FUNCTION: BOOL GetSecurityDescriptorSacl ( PSECURITY_DESCRIPTOR pSecurityDescriptor, LPBOOL lpbSaclPresent, PACL* pSacl, LPBOOL lpSaclDefaulted )
 ! : GetSecurityInfo ;
 ! : GetSecurityInfoExA ;
@@ -1303,16 +1304,7 @@ ALIAS: RegCreateKeyEx RegCreateKeyExW
 ! : RegDeleteKeyW ;
 
 FUNCTION: LONG RegDeleteKeyExW (
-        HKEY hKey,
-        LPCTSTR lpSubKey,
-        DWORD Reserved,
-        LPTSTR lpClass,
-        DWORD dwOptions,
-        REGSAM samDesired,
-        LPSECURITY_ATTRIBUTES lpSecurityAttributes,
-        PHKEY phkResult,
-        LPDWORD lpdwDisposition
-    )
+        HKEY hKey, LPCWSTR lpSubKey, REGSAM samDesired, DWORD Reserved )
 
 ALIAS: RegDeleteKeyEx RegDeleteKeyExW
 

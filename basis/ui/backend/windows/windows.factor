@@ -21,7 +21,7 @@ IN: ui.backend.windows
 SINGLETON: windows-ui-backend
 
 TUPLE: win-base hDC hRC ;
-TUPLE: win < win-base hWnd world title ;
+TUPLE: win < win-base hWnd world title pending-surrogate ;
 C: <win> win
 
 <PRIVATE
@@ -131,7 +131,7 @@ PRIVATE>
     produce 2nip ;
 
 : with-clipboard ( quot -- )
-    f OpenClipboard win32-error=0/f
+    GetActiveWindow OpenClipboard win32-error=0/f
     [ CloseClipboard win32-error=0/f ] finally ; inline
 
 : paste ( -- str )
@@ -147,17 +147,23 @@ PRIVATE>
     ] with-clipboard
     crlf>lf ;
 
-: copy ( str -- )
-    lf>crlf [
-        native-string>alien
-        EmptyClipboard win32-error=0/f
-        GMEM_MOVEABLE over length 1 + GlobalAlloc
-            dup win32-error=0/f
+:: clipboard-text-handle ( str -- handle )
+    str lf>crlf native-string>alien :> bytes
+    GMEM_MOVEABLE bytes length GlobalAlloc dup win32-error=0/f :> handle
+    [
+        handle GlobalLock dup win32-error=0/f :> pointer
+        [ pointer bytes bytes length memcpy ]
+        [ handle GlobalUnlock win32-error=0/f ] finally
+        handle
+    ] [ handle GlobalFree drop rethrow ] recover ;
 
-        dup GlobalLock dup win32-error=0/f
-        rot binary-object memcpy
-        dup GlobalUnlock win32-error=0/f
-        CF_UNICODETEXT swap SetClipboardData win32-error=0/f
+:: copy ( str -- )
+    [
+        str clipboard-text-handle :> handle
+        [
+            EmptyClipboard win32-error=0/f
+            CF_UNICODETEXT handle SetClipboardData win32-error=0/f
+        ] [ handle GlobalFree drop rethrow ] recover
     ] with-clipboard ;
 
 TUPLE: pasteboard ;
@@ -254,7 +260,7 @@ CONSTANT: window-control>ex-style
     3drop window [ t >>active? relayout-1 yield ] when* ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
-    2nip >lo-hi [ gl-unscale ] map
+    2nip [ 16 bits ] [ -16 shift 16 bits ] bi 2array [ gl-unscale ] map
     dup { 0 0 } = [ 2drop ] [ swap window [ dim<< ] [ drop ] if* ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
@@ -292,7 +298,7 @@ CONSTANT: wm-keydown-codes
     }
 
 : key-state-down? ( key -- ? )
-    GetKeyState 16 bit? ;
+    GetKeyState 15 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;
 : left-ctrl? ( -- ? ) VK_LCONTROL key-state-down? ;
@@ -303,7 +309,7 @@ CONSTANT: wm-keydown-codes
 : shift? ( -- ? ) left-shift? right-shift? or ;
 : ctrl? ( -- ? ) left-ctrl? right-ctrl? or ;
 : alt? ( -- ? ) left-alt? right-alt? or ;
-: caps-lock? ( -- ? ) VK_CAPITAL GetKeyState zero? not ;
+: caps-lock? ( -- ? ) VK_CAPITAL GetKeyState 0 bit? ;
 
 : key-modifiers ( -- seq )
     [
@@ -374,25 +380,28 @@ CONSTANT: exclude-keys-wm-char
 : handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     \ send-key-down (handle-wm-keydown/up) ;
 
-SYMBOL: upper-surrogate-wm-char
+:: wm-char>string ( code-unit handle -- string/f )
+    code-unit upper-surrogate? [
+        code-unit handle pending-surrogate<< f
+    ] [
+        handle pending-surrogate>> :> high
+        f handle pending-surrogate<<
+        code-unit under-surrogate? [
+            high [
+                high 0xD800 - 10 shift code-unit 0xDC00 - +
+                0x10000 + 1string
+            ] [ f ] if
+        ] [ code-unit 1string ] if
+    ] if ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-char? [
         ctrl? alt? xor [ ! enable AltGr combination inputs
-            wParam {
-                { [ dup upper-surrogate? ] [
-                      upper-surrogate-wm-char set-global
-                ] }
-                { [ dup under-surrogate? ] [
-                    drop
-                    upper-surrogate-wm-char get-global [
-                        wParam "" 2sequence
-                        utf16n encode utf16n decode hWnd window user-input
-                    ] when*
-                ] }
-                [ 1string hWnd window user-input
-                  f upper-surrogate-wm-char set-global ]
-            } cond
+            hWnd window :> target
+            target [
+                wParam target handle>> wm-char>string
+                [ target user-input ] when*
+            ] when
         ] unless
     ] unless ;
 
@@ -429,7 +438,9 @@ M: windows-ui-backend (close-window)
     3drop window [ focus-world ] when* ;
 
 : handle-wm-kill-focus ( hWnd uMsg wParam lParam -- )
-    3drop window [ unfocus-world ] when* ;
+    3drop window [
+        dup handle>> f >>pending-surrogate drop unfocus-world
+    ] when* ;
 
 : message>button ( uMsg -- button down? )
     {
@@ -638,9 +649,8 @@ M: windows-ui-backend do-events
     ] if ;
 
 :: register-window-class ( class-name-ptr -- )
-    WNDCLASSEX new f GetModuleHandle
+    WNDCLASSEX new WNDCLASSEX c:heap-size >>cbSize f GetModuleHandle
     class-name-ptr pick GetClassInfoEx 0 = [
-        WNDCLASSEX c:heap-size >>cbSize
         flags{ CS_HREDRAW CS_VREDRAW CS_OWNDC } >>style
         ui-wndproc >>lpfnWndProc
         0 >>cbClsExtra
@@ -682,10 +692,10 @@ M: windows-ui-backend do-events
         dup
     ] change-global ;
 
-: get-device-caps ( handle -- x y )
-    GetDC
-    [ LOGPIXELSX GetDeviceCaps ]
-    [ LOGPIXELSY GetDeviceCaps ] bi ;
+:: get-device-caps ( hwnd -- x y )
+    hwnd GetDC dup win32-error=0/f :> dc
+    [ dc LOGPIXELSX GetDeviceCaps dc LOGPIXELSY GetDeviceCaps ]
+    [ hwnd dc ReleaseDC drop ] finally ;
 
 : get-default-device-caps ( -- x y )
     f get-device-caps ;
@@ -747,7 +757,7 @@ M: windows-ui-backend (open-window)
         [ ] [ world>style ] [ world>ex-style ] tri create-window
         [ ?make-glass ]
         [ ?disable-close-button ]
-        [ [ f f ] dip f f <win> >>handle setup-gl ] 2tri
+        [ [ f f ] dip f f f <win> >>handle setup-gl ] 2tri
     ]
     [ dup handle>> hWnd>> register-window ]
     [
@@ -839,6 +849,10 @@ M: windows-ui-backend (ungrab-input)
 
 CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 
+: set-window-style ( hwnd style -- )
+    ! Zero can be the previous style; only a nonzero last error means failure.
+    0 SetLastError [ GWL_STYLE ] dip SetWindowLong win32-error=0/f ;
+
 : enter-fullscreen ( world -- )
     handle>> hWnd>>
     {
@@ -846,20 +860,20 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
             GWL_STYLE GetWindowLong
             fullscreen-flags unmask
         ]
-        [ GWL_STYLE rot SetWindowLong win32-error=0/f ]
+        [ swap set-window-style ]
         [
             HWND_TOP
             over hwnd>RECT get-RECT-dimensions
             SWP_FRAMECHANGED
             SetWindowPos win32-error=0/f
         ]
-        [ SW_MAXIMIZE ShowWindow win32-error=0/f ]
+        [ SW_MAXIMIZE ShowWindow drop ]
     } cleave ;
 
 : exit-fullscreen ( world -- )
     [ handle>> hWnd>> ] [ world>style ] bi
     {
-        [ [ GWL_STYLE ] dip SetWindowLong win32-error=0/f ]
+        [ set-window-style ]
         [
             drop
             f
@@ -867,7 +881,7 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
             flags{ SWP_NOMOVE SWP_NOSIZE SWP_NOZORDER SWP_FRAMECHANGED }
             SetWindowPos win32-error=0/f
         ]
-        [ drop SW_RESTORE ShowWindow win32-error=0/f ]
+        [ drop SW_RESTORE ShowWindow drop ]
     } 2cleave ;
 
 : ensure-null-terminated ( str -- str' )
@@ -881,7 +895,7 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
         NIF_TIP NIF_ICON bitor >>uFlags
         world get handle>> hWnd>> >>hWnd
         f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
-        rot ensure-null-terminated utf8 encode >>szTip
+        rot swap set-notify-icon-tip
         Shell_NotifyIcon win32-error=0/f ;
 
 : remove-tray-icon ( -- )

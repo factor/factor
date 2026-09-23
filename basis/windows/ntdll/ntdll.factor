@@ -5,7 +5,7 @@ IN: windows.ntdll
 
 LIBRARY: ntdll
 
-TYPEDEF: uint NTSTATUS
+TYPEDEF: LONG NTSTATUS
 
 ! Buffer is a PWSTR
 STRUCT: LSA_UNICODE_STRING

@@ -14,7 +14,8 @@ cpu x86.32? "windows.winsock.32" "windows.winsock.64" ? use-vocab
 TYPEDEF: int* SOCKET
 
 : <wsadata> ( -- byte-array )
-    0x190 <byte-array> ;
+    ! WSADATA has different field ordering and padding on Win32/Win64.
+    cpu x86.32? 400 408 ? <byte-array> ;
 
 CONSTANT: SOCK_STREAM    1
 CONSTANT: SOCK_DGRAM     2
@@ -28,6 +29,9 @@ CONSTANT: SO_REUSEADDR   0x4
 CONSTANT: SO_KEEPALIVE   0x8
 CONSTANT: SO_DONTROUTE   0x10
 CONSTANT: SO_BROADCAST   0x20
+
+CONSTANT: SO_UPDATE_ACCEPT_CONTEXT  0x700B
+CONSTANT: SO_UPDATE_CONNECT_CONTEXT 0x7010
 CONSTANT: SO_USELOOPBACK 0x40
 CONSTANT: SO_LINGER      0x80
 CONSTANT: SO_OOBINLINE   0x100
@@ -349,7 +353,7 @@ FUNCTION: SOCKET WSAAccept ( SOCKET s,
                              sockaddr* addr,
                              LPINT addrlen,
                              LPCONDITIONPROC lpfnCondition,
-                             DWORD dwCallbackData )
+                             DWORD_PTR dwCallbackData )
 
 ! FUNCTION: INT WSAAddressToString ( LPSOCKADDR lpsaAddress, DWORD dwAddressLength, LPWSAPROTOCOL_INFO lpProtocolInfo, LPTSTR lpszAddressString, LPDWORD lpdwAddressStringLength ) ;
 
@@ -414,7 +418,7 @@ FUNCTION: int WSASend ( SOCKET s,
                         LPWSABUF lpBuffers,
                         DWORD dwBufferCount,
                         LPDWORD lpNumberOfBytesSent,
-                        LPDWORD lpFlags,
+                        DWORD dwFlags,
                         LPWSAOVERLAPPED lpOverlapped,
                  LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine )
 

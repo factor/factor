@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel windows.types
-math multiline classes.struct alien.data arrays literals ;
+math multiline classes.struct alien.data arrays literals continuations locals ;
 QUALIFIED-WITH: alien.c-types c
 IN: windows.kernel32
 
@@ -317,6 +317,15 @@ STRUCT: STARTUPINFO
     { hStdError HANDLE } ;
 
 TYPEDEF: void* LPSTARTUPINFO
+
+C-TYPE: PROC_THREAD_ATTRIBUTE_LIST
+TYPEDEF: PROC_THREAD_ATTRIBUTE_LIST* LPPROC_THREAD_ATTRIBUTE_LIST
+
+STRUCT: STARTUPINFOEX
+    { StartupInfo STARTUPINFO }
+    { lpAttributeList LPPROC_THREAD_ATTRIBUTE_LIST } ;
+
+CONSTANT: EXTENDED_STARTUPINFO_PRESENT 0x00080000
 
 STRUCT: PROCESS_INFORMATION
     { hProcess HANDLE }
@@ -713,7 +722,7 @@ TYPEDEF: LUID_AND_ATTRIBUTES* PLUID_AND_ATTRIBUTES
 
 STRUCT: TOKEN_PRIVILEGES
     { PrivilegeCount DWORD }
-    { Privileges LUID_AND_ATTRIBUTES* } ;
+    { Privileges LUID_AND_ATTRIBUTES[1] } ;
 TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 STRUCT: WIN32_FILE_ATTRIBUTE_DATA
@@ -965,6 +974,10 @@ TYPEDEF: THREADENTRY32* LPTHREADENTRY32
 : RT_MANIFEST     ( -- id ) 24 MAKEINTRESOURCE ; inline
 
 LIBRARY: kernel32
+
+FUNCTION: BOOL InitializeProcThreadAttributeList ( LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList, DWORD dwAttributeCount, DWORD dwFlags, PSIZE_T lpSize )
+FUNCTION: BOOL UpdateProcThreadAttribute ( LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList, DWORD dwFlags, DWORD_PTR Attribute, PVOID lpValue, SIZE_T cbSize, PVOID lpPreviousValue, PSIZE_T lpReturnSize )
+FUNCTION: void DeleteProcThreadAttributeList ( LPPROC_THREAD_ATTRIBUTE_LIST lpAttributeList )
 ! FUNCTION: _hread
 ! FUNCTION: _hwrite
 ! FUNCTION: _lclose
@@ -1014,6 +1027,7 @@ ALIAS: BeginUpdateResource BeginUpdateResourceW
 ! FUNCTION: CallNamedPipeW
 ! FUNCTION: CancelDeviceWakeupRequest
 FUNCTION: BOOL CancelIo ( HANDLE h )
+FUNCTION: BOOL CancelIoEx ( HANDLE hFile, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: CancelTimerQueueTimer
 ! FUNCTION: CancelWaitableTimer
 ! FUNCTION: ChangeTimerQueueTimer
@@ -1045,7 +1059,9 @@ FUNCTION: BOOL CopyFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName, BO
 ALIAS: CopyFile CopyFileW
 ! FUNCTION: CopyLZFile
 
-FUNCTION: void CopyMemory ( PVOID Destination, VOID* Source, SIZE_T Length )
+! CopyMemory is an SDK macro, not a kernel32 export.
+FUNCTION: void RtlMoveMemory ( PVOID Destination, LPCVOID Source, SIZE_T Length )
+ALIAS: CopyMemory RtlMoveMemory
 ! FUNCTION: CreateActCtxA
 ! FUNCTION: CreateActCtxW
 ! FUNCTION: CreateConsoleScreenBuffer
@@ -1277,7 +1293,7 @@ ENUM: STREAM_INFO_LEVELS
 
 STRUCT: WIN32_FIND_STREAM_DATA
     { StreamSize LARGE_INTEGER }
-    { cStreamName WCHAR[292] } ;
+    { cStreamName WCHAR[296] } ;
 
 TYPEDEF: WIN32_FIND_STREAM_DATA* PWIN32_FIND_STREAM_DATA
 
@@ -1431,7 +1447,7 @@ FUNCTION: HWND GetConsoleWindow ( )
 ! FUNCTION: GetCurrentActCtx
 ! FUNCTION: GetCurrentConsoleFont
 ! FUNCTION: GetCurrentDirectoryA
-FUNCTION: BOOL GetCurrentDirectoryW ( DWORD len, LPTSTR buf )
+FUNCTION: DWORD GetCurrentDirectoryW ( DWORD len, LPTSTR buf )
 ALIAS: GetCurrentDirectory GetCurrentDirectoryW
 FUNCTION: HANDLE GetCurrentProcess ( )
 FUNCTION: DWORD GetCurrentProcessId ( )
@@ -1545,7 +1561,7 @@ FUNCTION: DWORD GetPriorityClass ( HANDLE hProcess )
 ! FUNCTION: GetPrivateProfileStructW
 FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName )
 ! FUNCTION: GetProcessAffinityMask
-! FUNCTION: GetProcessHandleCount
+FUNCTION: BOOL GetProcessHandleCount ( HANDLE hProcess, PDWORD pdwHandleCount )
 ! FUNCTION: GetProcessHeap
 ! FUNCTION: GetProcessHeaps
 ! FUNCTION: GetProcessId
@@ -1561,7 +1577,15 @@ FUNCTION: LPVOID GetProcAddress ( HMODULE hModule, c-string lpProcName )
 ! FUNCTION: GetProfileSectionW
 ! FUNCTION: GetProfileStringA
 ! FUNCTION: GetProfileStringW
-FUNCTION: BOOL GetQueuedCompletionStatus ( HANDLE hCompletionPort, LPDWORD lpNumberOfBytes, void* lpCompletionKey, LPOVERLAPPED lpOverlapped, DWORD dwMilliseconds )
+FUNCTION: BOOL GetQueuedCompletionStatus ( HANDLE hCompletionPort, LPDWORD lpNumberOfBytes, PULONG_PTR lpCompletionKey, LPOVERLAPPED* lpOverlapped, DWORD dwMilliseconds )
+
+STRUCT: OVERLAPPED_ENTRY
+    { lpCompletionKey ULONG_PTR }
+    { lpOverlapped LPOVERLAPPED }
+    { Internal ULONG_PTR }
+    { dwNumberOfBytesTransferred DWORD } ;
+
+FUNCTION: BOOL GetQueuedCompletionStatusEx ( HANDLE CompletionPort, OVERLAPPED_ENTRY* lpCompletionPortEntries, ULONG ulCount, PULONG ulNumEntriesRemoved, DWORD dwMilliseconds, BOOL fAlertable )
 ! FUNCTION: GetShortPathNameA
 ! FUNCTION: GetShortPathNameW
 ! FUNCTION: GetStartupInfoA
@@ -1790,7 +1814,7 @@ FUNCTION: BOOL Module32FirstW ( HANDLE hSnapshot, LPMODULEENTRY32W lpme )
 FUNCTION: BOOL Module32NextW ( HANDLE hSnapshot, LPMODULEENTRY32W lpme )
 ! FUNCTION: MoveFileA
 ! FUNCTION: MoveFileExA
-FUNCTION: BOOL MoveFileExW ( LPCSTR lpExistingFile, LPCSTR lpNewFileName, DWORD dwFlags )
+FUNCTION: BOOL MoveFileExW ( LPCWSTR lpExistingFile, LPCWSTR lpNewFileName, DWORD dwFlags )
 ALIAS: MoveFileEx MoveFileExW
 FUNCTION: BOOL MoveFileW ( LPCTSTR lpExistingFileName, LPCTSTR lpNewFileName )
 ALIAS: MoveFile MoveFileW
@@ -1847,6 +1871,7 @@ ALIAS: Process32Next Process32NextW
 ! FUNCTION: QueryDosDeviceW
 CONSTANT: PROCESS_NAME_NATIVE 1
 FUNCTION: BOOL QueryFullProcessImageNameA ( HANDLE hProcess, DWORD dwFlags, LPSTR lpExeName, PDWORD lpdwSize )
+FUNCTION: BOOL QueryFullProcessImageNameW ( HANDLE hProcess, DWORD dwFlags, LPWSTR lpExeName, PDWORD lpdwSize )
 ! FUNCTION: QueryInformationJobObject
 ! FUNCTION: QueryMemoryResourceNotification
 FUNCTION: BOOL QueryPerformanceCounter ( LARGE_INTEGER* lpPerformanceCount )
@@ -1871,7 +1896,7 @@ FUNCTION: BOOL ReadFile ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToR
 ! FUNCTION: BOOL ReadFile ( HANDLE hFile, LPCVOID lpBuffer, DWORD nNumberOfBytesToRead, LPDWORD lpNumberOfBytesRead, LPOVERLAPPED lpOverlapped ) ;
 FUNCTION: BOOL ReadFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytesToRead, LPOVERLAPPED lpOverlapped, LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine )
 ! FUNCTION: ReadFileScatter
-FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesRead )
+FUNCTION: BOOL ReadProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesRead )
 ! FUNCTION: RegisterConsoleIME
 ! FUNCTION: RegisterConsoleOS2
 ! FUNCTION: RegisterConsoleVDM
@@ -1957,7 +1982,7 @@ ALIAS: SetConsoleTitle SetConsoleTitleW
 FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory )
 ALIAS: SetCurrentDirectory SetCurrentDirectoryW
 ! FUNCTION: SetDefaultCommConfigA
-FUNCTION: BOOL SetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize )
+FUNCTION: BOOL SetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, DWORD dwSize )
 ALIAS: SetDefaultCommConfig SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA
 ! FUNCTION: SetDllDirectoryW
@@ -1973,7 +1998,7 @@ ALIAS: SetEnvironmentVariable SetEnvironmentVariableW
 FUNCTION: BOOL SetFileAttributesW ( LPCTSTR lpFileName, DWORD dwFileAttributes )
 ALIAS: SetFileAttributes SetFileAttributesW
 FUNCTION: DWORD SetFilePointer ( HANDLE hFile, LONG lDistanceToMove, PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod )
-FUNCTION: DWORD SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod )
+FUNCTION: BOOL SetFilePointerEx ( HANDLE hFile, LARGE_INTEGER lDistanceToMove, PLARGE_INTEGER lpDistanceToMoveHigh, DWORD dwMoveMethod )
 ! FUNCTION: SetFileShortNameA
 ! FUNCTION: SetFileShortNameW
 FUNCTION: BOOL SetFileTime ( HANDLE hFile, FILETIME* lpCreationTime, FILETIME* lpLastAccessTime, FILETIME* lpLastWriteTime )
@@ -2074,21 +2099,21 @@ ALIAS: UpdateResource UpdateResourceW
 ! FUNCTION: VerLanguageNameW
 ! FUNCTION: VerSetConditionMask
 ! FUNCTION: VirtualAlloc
-FUNCTION: HANDLE VirtualAllocEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD flAllocationType, DWORD flProtect )
+FUNCTION: HANDLE VirtualAllocEx ( HANDLE hProcess, void* lpAddress, SIZE_T dwSize, DWORD flAllocationType, DWORD flProtect )
 ! FUNCTION: VirtualBufferExceptionHandler
 ! FUNCTION: VirtualFree
-FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, long dwSize, DWORD dwFreeType )
+FUNCTION: BOOL VirtualFreeEx ( HANDLE hProcess, void* lpAddress, SIZE_T dwSize, DWORD dwFreeType )
 ! FUNCTION: VirtualLock
 ! FUNCTION: VirtualProtect
 ! FUNCTION: VirtualProtectEx
 ! FUNCTION: VirtualQuery
-FUNCTION: BOOL VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, SIZE_T dwLength )
+FUNCTION: SIZE_T VirtualQueryEx ( HANDLE hProcess, void* lpAddress, MEMORY_BASIC_INFORMATION* lpBuffer, SIZE_T dwLength )
 ! FUNCTION: VirtualUnlock
 ! FUNCTION: WaitCommEvent
 ! FUNCTION: WaitForDebugEvent
 FUNCTION: DWORD WaitForMultipleObjects ( DWORD nCount, HANDLE* lpHandles, BOOL bWaitAll, DWORD dwMilliseconds )
 ! FUNCTION: WaitForMultipleObjectsEx
-FUNCTION: BOOL WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds )
+FUNCTION: DWORD WaitForSingleObject ( HANDLE hHandle, DWORD dwMilliseconds )
 ! FUNCTION: WaitForSingleObjectEx
 ! FUNCTION: WaitNamedPipeA
 ! FUNCTION: WaitNamedPipeW
@@ -2114,7 +2139,7 @@ FUNCTION: BOOL WriteFileEx ( HANDLE hFile, LPVOID lpBuffer, DWORD nNumberOfBytes
 ! FUNCTION: WritePrivateProfileStringW
 ! FUNCTION: WritePrivateProfileStructA
 ! FUNCTION: WritePrivateProfileStructW
-FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, long nSize, long* lpNumberOfBytesWritten )
+FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* lpBuffer, SIZE_T nSize, SIZE_T* lpNumberOfBytesWritten )
 ! FUNCTION: WriteProfileSectionA
 ! FUNCTION: WriteProfileSectionW
 ! FUNCTION: WriteProfileStringA
@@ -2123,5 +2148,6 @@ FUNCTION: BOOL WriteProcessMemory ( HANDLE hProcess, void* lpBaseAddress, void* 
 ! FUNCTION: WTSGetActiveConsoleSessionId
 ! FUNCTION: ZombifyActCtx
 
-: with-global-lock ( HGLOBAL quot -- )
-    swap [ GlobalLock swap call ] keep GlobalUnlock drop ; inline
+:: with-global-lock ( ..a handle quot: ( ..a pointer -- ..b ) -- ..b )
+    [ handle GlobalLock quot call ]
+    [ handle GlobalUnlock drop ] finally ; inline

@@ -34,15 +34,15 @@ TYPEDEF: int D3D10_DEVICE_STATE_TYPES
 STRUCT: D3D10_STATE_BLOCK_MASK
     { VS                  BYTE    }
     { VSSamplers          BYTE[2] }
-    { VSShaderResources   BYTE[8] }
+    { VSShaderResources   BYTE[16] }
     { VSConstantBuffers   BYTE[2] }
     { GS                  BYTE    }
     { GSSamplers          BYTE[2] }
-    { GSShaderResources   BYTE[8] }
+    { GSShaderResources   BYTE[16] }
     { GSConstantBuffers   BYTE[2] }
     { PS                  BYTE    }
     { PSSamplers          BYTE[2] }
-    { PSShaderResources   BYTE[8] }
+    { PSShaderResources   BYTE[16] }
     { PSConstantBuffers   BYTE[2] }
     { IAVertexBuffers     BYTE[2] }
     { IAIndexBuffer       BYTE    }

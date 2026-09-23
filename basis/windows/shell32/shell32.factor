@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax assocs classes.struct io.backend kernel literals
-math sequences vocabs windows windows.com windows.com.syntax
+alien.syntax assocs classes.struct io.backend io.encodings.string
+io.encodings.utf16 kernel literals locals math math.order sequences unicode
+vocabs windows windows.com windows.com.syntax
 windows.kernel32 windows.messages windows.ole32 windows.types ;
 IN: windows.shell32
 
@@ -376,7 +377,7 @@ STRUCT: NOTIFYICONDATA
     { uFlags UINT }
     { uCallbackMessage UINT }
     { hIcon HICON }
-    { szTip TCHAR[64] }
+    { szTip TCHAR[128] }
     { dwState DWORD }
     { dwStateMask DWORD }
     { szInfo TCHAR[256] }
@@ -388,7 +389,17 @@ STRUCT: NOTIFYICONDATA
 
 TYPEDEF: NOTIFYICONDATA* PNOTIFYICONDATA
 
-FUNCTION: BOOL Shell_NotifyIcon ( DWORD dwMessage, PNOTIFYICONDATA lpdata )
+FUNCTION: BOOL Shell_NotifyIconW ( DWORD dwMessage, PNOTIFYICONDATA lpdata )
+ALIAS: Shell_NotifyIcon Shell_NotifyIconW
+
+:: set-notify-icon-tip ( title data -- data )
+    data szTip>> :> buffer
+    buffer [ drop 0 ] map! drop
+    title utf16n encode ushort cast-array
+    dup length 127 min head
+    dup ?last [ upper-surrogate? [ but-last ] when ] when*
+    0 buffer copy
+    data ;
 
 TYPEDEF: HRESULT SHSTDAPI
 

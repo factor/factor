@@ -15,7 +15,7 @@ samDesired lpSecurityAttributes phkResult lpdwDisposition ;
 CONSTANT: registry-value-max-length 16384
 
 :: open-key ( key subkey mode -- hkey )
-    key subkey 0 mode 0 HKEY <ref>
+    key subkey 0 mode f HKEY <ref>
     [
         RegOpenKeyEx dup ERROR_SUCCESS = [
             drop
@@ -28,7 +28,7 @@ CONSTANT: registry-value-max-length 16384
 :: create-key* ( hKey lpSubKey lpClass dwOptions samDesired lpSecurityAttributes -- hkey new? )
     f :> ret!
     hKey lpSubKey 0 lpClass dwOptions samDesired lpSecurityAttributes
-    0 HKEY <ref>
+    f HKEY <ref>
     0 DWORD <ref>
     [ RegCreateKeyEx ret! ] 2keep
     [ HKEY deref ]

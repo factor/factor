@@ -7,7 +7,7 @@ IN: windows.powrprof
 
 LIBRARY: powrprof
 
-TYPEDEF: UINT NTSTATUS
+TYPEDEF: LONG NTSTATUS
 TYPEDEF: void* PHPOWERNOTIFY
 
 CONSTANT: STATUS_SUCCESS 0
@@ -355,4 +355,3 @@ ERROR: win32-powrprof-error n ;
 
 : get-system-power-policy-dc ( -- struct )
     SystemPowerPolicyDc SYSTEM_POWER_POLICY simple-call-nt-power-information ;
-

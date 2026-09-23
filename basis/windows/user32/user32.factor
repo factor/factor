@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.syntax classes.struct
 generalizations kernel literals math math.bitwise namespaces
 parser system windows.com.syntax windows.kernel32 windows.ole32
-windows.types ;
+windows.types words.alias ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -1423,10 +1423,10 @@ FUNCTION: HWND CreateWindowExW (
                 LPCTSTR lpClassName,
                 LPCTSTR lpWindowName,
                 DWORD dwStyle,
-                uint X,
-                uint Y,
-                uint nWidth,
-                uint nHeight,
+                int X,
+                int Y,
+                int nWidth,
+                int nHeight,
                 HWND hWndParent,
                 HMENU hMenu,
                 HINSTANCE hInstance,
@@ -1500,7 +1500,7 @@ FUNCTION: BOOL DestroyWindow ( HWND hWnd )
 ! FUNCTION: DialogBoxParamW
 ! FUNCTION: DisableProcessWindowsGhosting
 
-FUNCTION: LONG DispatchMessageW ( MSG* lpMsg )
+FUNCTION: LRESULT DispatchMessageW ( MSG* lpMsg )
 ALIAS: DispatchMessage DispatchMessageW
 
 ! FUNCTION: DisplayExitWindowsWarnings
@@ -1601,7 +1601,7 @@ ALIAS: FindWindowEx FindWindowExW
 ! FUNCTION: FlashWindowEx
 ! FUNCTION: FrameRect
 ! FUNCTION: FreeDDElParam
-! FUNCTION: GetActiveWindow
+FUNCTION: HWND GetActiveWindow ( )
 ! FUNCTION: GetAltTabInfo
 ! FUNCTION: GetAltTabInfoA
 ! FUNCTION: GetAltTabInfoW
@@ -1618,9 +1618,11 @@ ALIAS: GetClassInfo GetClassInfoW
 FUNCTION: BOOL GetClassInfoExW ( HINSTANCE hInst, LPCWSTR lpszClass, LPWNDCLASSEX lpwcx )
 ALIAS: GetClassInfoEx GetClassInfoExW
 
-FUNCTION: ULONG_PTR GetClassLongW ( HWND hWnd, int nIndex )
+FUNCTION: DWORD GetClassLongW ( HWND hWnd, int nIndex )
 ALIAS: GetClassLong GetClassLongW
-ALIAS: GetClassLongPtr GetClassLongW
+FUNCTION: ULONG_PTR GetClassLongPtrW ( HWND hWnd, int nIndex )
+<< cpu x86.32? [ \ GetClassLongPtrW \ GetClassLongW define-alias ] when >>
+ALIAS: GetClassLongPtr GetClassLongPtrW
 
 
 ! FUNCTION: GetClassNameA
@@ -1750,10 +1752,11 @@ FUNCTION: HWND GetWindow ( HWND hWnd, UINT uCmd )
 ! FUNCTION: GetWindowInfo
 ! FUNCTION: GetWindowLongA
 ! FUNCTION: GetWindowLongW
-FUNCTION: LONG_PTR GetWindowLongW ( HANDLE hWnd, int index )
+FUNCTION: LONG GetWindowLongW ( HWND hWnd, int index )
 ALIAS: GetWindowLong GetWindowLongW
 
 FUNCTION: LONG_PTR GetWindowLongPtrW ( HWND hWnd, int nIndex )
+<< cpu x86.32? [ \ GetWindowLongPtrW \ GetWindowLongW define-alias ] when >>
 ALIAS: GetWindowLongPtr GetWindowLongPtrW
 ! FUNCTION: GetWindowModuleFileName
 ! FUNCTION: GetWindowModuleFileNameA
@@ -2036,8 +2039,10 @@ FUNCTION: HWND SetCapture ( HWND hWnd )
 ! FUNCTION: SetCaretBlinkTime
 ! FUNCTION: SetCaretPos
 
-FUNCTION: ULONG_PTR SetClassLongW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong )
-ALIAS: SetClassLongPtr SetClassLongW
+FUNCTION: DWORD SetClassLongW ( HWND hWnd, int nIndex, LONG dwNewLong )
+FUNCTION: ULONG_PTR SetClassLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong )
+<< cpu x86.32? [ \ SetClassLongPtrW \ SetClassLongW define-alias ] when >>
+ALIAS: SetClassLongPtr SetClassLongPtrW
 ALIAS: SetClassLong SetClassLongW
 
 ! FUNCTION: SetClassWord
@@ -2098,12 +2103,13 @@ FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType )
 ! FUNCTION: SetWindowContextHelpId
 ! FUNCTION: SetWindowLongA
 ! FUNCTION: SetWindowLongW
-FUNCTION: LONG_PTR SetWindowLongW ( HANDLE hWnd, int index, LONG_PTR dwNewLong )
+FUNCTION: LONG SetWindowLongW ( HWND hWnd, int index, LONG dwNewLong )
 ALIAS: SetWindowLong SetWindowLongW
 ! FUNCTION: SetWindowPlacement
 FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags )
 
 FUNCTION: LONG_PTR SetWindowLongPtrW ( HWND hWnd, int nIndex, LONG_PTR dwNewLong )
+<< cpu x86.32? [ \ SetWindowLongPtrW \ SetWindowLongW define-alias ] when >>
 ALIAS: SetWindowLongPtr SetWindowLongPtrW
 
 : HWND_BOTTOM ( -- alien ) 1 <alien> ;

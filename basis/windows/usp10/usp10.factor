@@ -138,8 +138,7 @@ FUNCTION: HRESULT ScriptCPtoX (
 )
 
 FUNCTION: HRESULT ScriptXtoCP (
-    int iCP,
-    BOOL fTrailing,
+    int iX,
     int cChars,
     int cGlyphs,
     WORD* pwLogClust,

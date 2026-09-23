@@ -1,5 +1,5 @@
 USING: accessors alien alien.syntax arrays assocs continuations
-kernel layouts locals namespaces sequences tools.test
+kernel layouts locals namespaces sequences tools.test alien.strings windows.kernel32
 ui.backend.windows ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.private windows.types ;
 USING: calendar concurrency.promises math threads windows.errors
@@ -60,3 +60,28 @@ IN: ui.backend.windows.tests
     ] with-variable ;
 
 { t t f t } [ test-monitor-layout-invalidation ] unit-test
+
+! UTF-16 WM_CHAR state belongs to one window and each pair is consumed once.
+{ f f "😀" f } [
+    win new win new [| first-window second-window |
+        0xD83D first-window wm-char>string
+        0xDE00 second-window wm-char>string
+        0xDE00 first-window wm-char>string
+        0xDE00 first-window wm-char>string
+    ] call
+] unit-test
+
+! Exercise native UTF-16 allocation without changing the user's clipboard.
+{ "a\r\n😀" } [| |
+    "a\n😀" clipboard-text-handle :> handle
+    [ handle [ alien>native-string ] with-global-lock ]
+    [ handle GlobalFree drop ] finally
+] unit-test
+
+{ f "a" f } [
+    win new [| handle |
+        0xD83D handle wm-char>string
+        CHAR: a handle wm-char>string
+        0xDE00 handle wm-char>string
+    ] call
+] unit-test

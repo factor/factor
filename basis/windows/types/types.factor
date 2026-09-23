@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.syntax classes.struct colors
 io.encodings.utf16 io.encodings.utf8 kernel math math.bitwise
-math.functions math.vectors sequences ;
+math.functions math.vectors sequences system ;
 FROM: alien.c-types => float short ;
 IN: windows.types
 
@@ -45,10 +45,14 @@ TYPEDEF: void*               LPCVOID
 
 TYPEDEF: float               FLOAT
 
-TYPEDEF: intptr_t    HALF_PTR
-TYPEDEF: intptr_t    UHALF_PTR
+TYPEDEF: int         HALF_PTR
+TYPEDEF: uint        UHALF_PTR
+<< cpu x86.32? [
+    short HALF_PTR typedef
+    ushort UHALF_PTR typedef
+] when >>
 TYPEDEF: intptr_t    INT_PTR
-TYPEDEF: intptr_t    UINT_PTR
+TYPEDEF: uintptr_t   UINT_PTR
 
 TYPEDEF: int         INT32
 TYPEDEF: uint        UINT32
@@ -71,7 +75,9 @@ TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
 TYPEDEF: size_t SIZE_T
 TYPEDEF: ptrdiff_t SSIZE_T
 
-TYPEDEF: { c-string utf16n } LPCSTR
+! Narrow strings follow the same UTF-8 convention as LPSTR.
+! ANSI APIs needing another code page can be passed an encoded buffer.
+TYPEDEF: { c-string utf8 } LPCSTR
 TYPEDEF: { c-string utf16n } LPTCSTR
 
 TYPEDEF: { c-string utf16n } LPWSTR
@@ -104,7 +110,7 @@ TYPEDEF: HANDLE              HGDIOBJ
 TYPEDEF: HANDLE              HGLOBAL
 TYPEDEF: HANDLE              HHOOK
 TYPEDEF: HANDLE              HINSTANCE
-TYPEDEF: DWORD               HKEY
+TYPEDEF: HANDLE              HKEY
 TYPEDEF: HANDLE              HKL
 TYPEDEF: HANDLE              HLOCAL
 TYPEDEF: HANDLE              HMENU
@@ -137,8 +143,8 @@ TYPEDEF: { c-string utf8 } LPSTR
 TYPEDEF: { c-string utf16n } LPCTSTR
 TYPEDEF: { c-string utf16n } LPWTSTR
 TYPEDEF: { c-string utf16n } LPTSTR
-TYPEDEF: LPCSTR      PCTSTR
-TYPEDEF: LPSTR       PTSTR
+TYPEDEF: LPCTSTR     PCTSTR
+TYPEDEF: LPTSTR      PTSTR
 
 TYPEDEF: DWORD*              LPDWORD
 TYPEDEF: HANDLE*             LPHANDLE

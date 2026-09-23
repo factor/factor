@@ -33,10 +33,9 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 :: make-token-privileges ( name enabled? -- obj )
     TOKEN_PRIVILEGES new
         1 >>PrivilegeCount
-        LUID_AND_ATTRIBUTES malloc-struct &free
+        dup Privileges>> first
             enabled? [ SE_PRIVILEGE_ENABLED >>Attributes ] when
-            name lookup-privilege >>Luid
-        >>Privileges ;
+            name lookup-privilege >>Luid drop ;
 
 : set-privilege ( name ? -- )
     '[
