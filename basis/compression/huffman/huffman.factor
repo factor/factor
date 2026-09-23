@@ -94,7 +94,9 @@ TUPLE: huffman-tree
         [ H{ } clone ]
         [ H{ } clone leaf-table set
         <min-heap> node-heap set
-        build-tree heap-pop swap (generate-codes) nip ]
+        build-tree heap-pop swap
+        dup leaf? [ f <huffman-internal> ] when
+        (generate-codes) nip ]
         if-empty
     ] with-scope ;
 

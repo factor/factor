@@ -240,3 +240,7 @@ USING: compression.gzip compression.inflate kernel math sequences tools.test ;
 
 { B{ } } [ B{ } compress-fixed gzip-inflate ] unit-test
 { B{ } } [ B{ } compress-dynamic gzip-inflate ] unit-test
+
+{ B{ 104 101 108 108 111 32 104 101 108 108 111 } } [
+    B{ 104 101 108 108 111 32 104 101 108 108 111 } compress-dynamic gzip-inflate
+] unit-test
