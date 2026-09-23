@@ -221,6 +221,16 @@ static void test_card_scan_after_dead_tenured_prefix() {
         "card scan lost the survivor's young referent");
 }
 
+#ifdef __APPLE__
+static void test_nano_count_timebase() {
+  uint64_t before = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+  uint64_t nanos = nano_count();
+  uint64_t after = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+  check(nanos + 1000 >= before && nanos <= after + 1000,
+        "nano_count does not follow the Mach timebase");
+}
+#endif
+
 static void test_thread_vm_registry() {
   init_mvm();
   const size_t count = 16;
@@ -317,5 +327,9 @@ int main(int argc, char** argv) {
     test_card_scan_after_dead_tenured_prefix();
   if (argc == 1 || strcmp(argv[1], "thread-vms") == 0)
     test_thread_vm_registry();
+#ifdef __APPLE__
+  if (argc == 1 || strcmp(argv[1], "nano-count") == 0)
+    test_nano_count_timebase();
+#endif
   std::cout << "GC tests passed" << std::endl;
 }

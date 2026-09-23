@@ -105,19 +105,19 @@ Protocol* objc_getProtocol(char* name) {
     return nil;
 }
 
+static mach_timebase_info_data_t mach_timebase() {
+  mach_timebase_info_data_t info;
+  kern_return_t ret = mach_timebase_info(&info);
+  if (ret != 0)
+    fatal_error("mach_timebase_info failed", ret);
+  return info;
+}
+
 uint64_t nano_count() {
+  static const mach_timebase_info_data_t timebase = mach_timebase();
   uint64_t time = mach_absolute_time();
-
-  static uint64_t scaling_factor = 0;
-  if (!scaling_factor) {
-    mach_timebase_info_data_t info;
-    kern_return_t ret = mach_timebase_info(&info);
-    if (ret != 0)
-      fatal_error("mach_timebase_info failed", ret);
-    scaling_factor = info.numer / info.denom;
-  }
-
-  return time * scaling_factor;
+  return time / timebase.denom * timebase.numer +
+         time % timebase.denom * timebase.numer / timebase.denom;
 }
 
 }
