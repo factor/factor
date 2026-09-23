@@ -1,11 +1,12 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors boxes concurrency.promises kernel threads ;
+USING: accessors boxes concurrency.promises
+concurrency.promises.private kernel threads ;
 IN: concurrency.futures
 
 : future ( quot -- future )
     <promise> [
-        [ '[ @ _ fulfill ] "Future" ] keep
+        [ '[ @ _ (fulfill) ] "Future" ] keep
         spawn-linked-to drop
     ] keep ; inline
 

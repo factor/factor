@@ -14,12 +14,21 @@ TYPED: promise-fulfilled? ( promise: promise -- ? )
 
 ERROR: promise-already-fulfilled promise ;
 
-TYPED: fulfill ( value promise: promise -- )
+<PRIVATE
+
+! Terminal thread notifications must not yield before the thread stops:
+! queued workers would otherwise each retain a native context.
+TYPED: (fulfill) ( value promise: promise -- )
     [ box>> ] keep over occupied>> [
         promise-already-fulfilled
     ] [
-        [ >box ] [ threads>> notify-all ] bi* yield
+        [ >box ] [ threads>> notify-all ] bi*
     ] if ;
+
+PRIVATE>
+
+: fulfill ( value promise -- )
+    (fulfill) yield ;
 
 TYPED:: block-if-empty ( promise: promise timeout -- promise )
     promise box>> '[ _ occupied>> ]
@@ -33,4 +42,4 @@ TYPED: ?promise-timeout ( promise: promise timeout -- result )
     f ?promise-timeout ;
 
 M: promise send-linked-error
-    dup promise-fulfilled? [ 2drop ] [ fulfill ] if ;
+    dup promise-fulfilled? [ 2drop ] [ (fulfill) ] if ;

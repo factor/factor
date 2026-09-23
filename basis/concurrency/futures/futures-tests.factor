@@ -1,4 +1,5 @@
-USING: concurrency.futures kernel namespaces tools.test threads ;
+USING: accessors concurrency.futures continuations kernel namespaces
+sequences tools.test threads ;
 IN: concurrency.futures.tests
 
 SYMBOL: future-scope
@@ -29,4 +30,17 @@ SYMBOL: future-scope
 ! Another race
 { 3 } [
     [ 3 yield ] future ?future
+] unit-test
+
+! Publishing a result must let its worker stop before starting the next
+! future. Otherwise a batch retains one set of native stacks per result.
+{ f } [
+    128 [ [ self ] future ] replicate
+    [ ?future ] map [ thread-registered? ] any?
+] unit-test
+
+{ f } [
+    128 [ [ self throw ] future ] replicate
+    [ [ ?future ] [ nip error>> ] recover ] map
+    [ thread-registered? ] any?
 ] unit-test
