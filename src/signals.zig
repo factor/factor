@@ -400,7 +400,7 @@ fn memorySignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext
     const vm = g_current_vm orelse {
         fatalError("Foreign thread received signal", @intFromEnum(sig));
     };
-    const ucontext = ucontext_ptr orelse std.process.abort();
+    const ucontext = ucontext_ptr orelse abort();
 
     // Get fault address - structure varies by platform
     const fault_addr: Cell = if (builtin.os.tag == .linux)
@@ -479,8 +479,8 @@ test "memory fault on a foreign thread without a VM is a fatal error" {
 
 // Floating point exception handler (SIGFPE)
 fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
-    const vm = g_current_vm orelse std.process.abort();
-    const ucontext = ucontext_ptr orelse std.process.abort();
+    const vm = g_current_vm orelse abort();
+    const ucontext = ucontext_ptr orelse abort();
 
     vm.signal_number = @intFromEnum(sig);
     vm.signal_fpu_status = processFPUStatus(getFPUStatus(ucontext));
@@ -511,7 +511,7 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
 
     vm.signal_number = @intFromEnum(sig);
 
-    const ucontext = ucontext_ptr orelse std.process.abort();
+    const ucontext = ucontext_ptr orelse abort();
     const sp_ptr = getStackPointer(ucontext);
     const pc_ptr = getProgramCounter(ucontext);
 
@@ -991,12 +991,31 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
     } else @compileError("Unsupported architecture for unwindNativeFrames");
 
     // If we get here, something went wrong - the unwind word should never return
-    std.process.abort();
+    abort();
 }
 
 // Helper functions - use layouts.tagFixnum for consistency
 fn tagFixnum(n: anytype) Cell {
     return layouts.tagFixnum(@intCast(n));
+}
+
+fn restoreDefaultAbort() void {
+    const act = std.posix.Sigaction{
+        .handler = .{ .handler = std.posix.SIG.DFL },
+        .mask = std.posix.sigemptyset(),
+        .flags = 0,
+    };
+    sigactionInt(std.c.SIG.ABRT, &act, null);
+}
+
+pub fn abort() noreturn {
+    restoreDefaultAbort();
+    std.process.abort();
+}
+
+pub fn panic(msg: []const u8, first_trace_addr: ?usize) noreturn {
+    restoreDefaultAbort();
+    std.debug.defaultPanic(msg, first_trace_addr);
 }
 
 fn fatalError(msg: []const u8, value: Cell) noreturn {
@@ -1008,6 +1027,34 @@ fn fatalError(msg: []const u8, value: Cell) noreturn {
 fn fatalErrorInFatalError() noreturn {
     std.debug.print("fatal_error in fatal_error!\n", .{});
     std.c._exit(1);
+}
+
+fn exitOnAbort(_: std.posix.SIG) callconv(.c) void {
+    std.c._exit(0);
+}
+
+fn waitForChild(pid: std.c.pid_t) !u32 {
+    var status: c_int = 0;
+    try std.testing.expectEqual(pid, std.c.waitpid(pid, &status, 0));
+    return @bitCast(status);
+}
+
+test "the VM's abort is not caught by an installed SIGABRT handler" {
+    const pid = std.c.fork();
+    try std.testing.expect(pid >= 0);
+    if (pid == 0) {
+        const act = std.posix.Sigaction{
+            .handler = .{ .handler = exitOnAbort },
+            .mask = std.posix.sigemptyset(),
+            .flags = 0,
+        };
+        sigactionInt(std.c.SIG.ABRT, &act, null);
+        _ = std.c.alarm(10);
+        abort();
+    }
+    const status = try waitForChild(pid);
+    try std.testing.expect(std.posix.W.IFSIGNALED(status));
+    try std.testing.expectEqual(@as(u32, @intFromEnum(std.posix.SIG.ABRT)), @as(u32, @intFromEnum(std.posix.W.TERMSIG(status))));
 }
 
 const sigstksz: Cell = if (builtin.os.tag == .linux) std.os.linux.SIGSTKSZ else std.c.SIGSTKSZ;

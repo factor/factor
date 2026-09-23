@@ -521,7 +521,7 @@ pub export fn full_gc(vm_asm: *VMAssemblyFields) callconv(.c) void {
 pub export fn undefined_symbol() callconv(.c) void {
     const vm = global_vm orelse {
         std.debug.print("\nFATAL: undefined_symbol called with no global VM\n", .{});
-        std.process.abort();
+        @import("signals.zig").abort();
     };
 
     const ctx = vm.vm_asm.ctx;
@@ -547,7 +547,7 @@ pub export fn undefined_symbol() callconv(.c) void {
         std.debug.print("\nFATAL: Cannot find RT_DLSYM at return address 0x{x}\n", .{return_address});
         std.debug.print("Entering low-level debugger (factorbug)...\n", .{});
         vm.factorbug();
-        std.process.abort();
+        @import("signals.zig").abort();
     }
 
     // Print what symbol is missing

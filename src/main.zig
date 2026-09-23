@@ -26,6 +26,8 @@ const primitives_io = @import("primitives/io.zig");
 const primitives_ffi = @import("primitives/alien.zig");
 const segments = @import("segments.zig");
 const signals = @import("signals.zig");
+
+pub const panic = std.debug.FullPanic(signals.panic);
 const slot_visitor = @import("slot_visitor.zig");
 const vm_mod = @import("vm.zig");
 
