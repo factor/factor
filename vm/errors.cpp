@@ -9,8 +9,7 @@ namespace factor {
 bool factor_vm::fatal_erroring_p;
 
 static inline void fa_diddly_atal_error() {
-  printf("fatal_error in fatal_error!\n");
-  breakpoint();
+  fputs("fatal_error in fatal_error!\n", stderr);
   ::_exit(86);
 }
 

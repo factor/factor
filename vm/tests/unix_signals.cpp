@@ -5,6 +5,7 @@ using namespace factor;
 
 namespace factor {
 void memory_signal_handler(int, siginfo_t*, void*);
+void synchronous_signal_handler(int, siginfo_t*, void*);
 void enqueue_signal_handler(int, siginfo_t*, void*);
 void fep_signal_handler(int, siginfo_t*, void*);
 void sample_signal_handler(int, siginfo_t*, void*);
@@ -198,6 +199,22 @@ static void test_foreign_fault_without_vm() {
         "foreign thread fault did not end in fatal_error");
 }
 
+static void fatal_error_while_fatal_erroring() {
+  test_vm vm;
+  install_handler(SIGTRAP, memory_signal_handler);
+  install_handler(SIGSEGV, memory_signal_handler);
+  install_handler(SIGBUS, memory_signal_handler);
+  install_handler(SIGILL, synchronous_signal_handler);
+  factor_vm::fatal_erroring_p = true;
+  fatal_error("fatal error while fatal erroring", 0);
+}
+
+static void test_fatal_error_reentry() {
+  int status = status_within(10, fatal_error_while_fatal_erroring);
+  check(WIFEXITED(status) && WEXITSTATUS(status) == 86,
+        "re-entered fatal_error did not exit with status 86");
+}
+
 static volatile sig_atomic_t interrupts = 0;
 
 static void count_interrupt(int, siginfo_t*, void*) { interrupts++; }
@@ -264,5 +281,6 @@ int main() {
   passed &= run_test("foreign samples reach the active profiler", test_foreign_alarm_profiling);
   passed &= run_test("waiting shell signal suppression", test_waiting_shell_signals);
   passed &= run_test("fault on a foreign thread without a VM", test_foreign_fault_without_vm);
+  passed &= run_test("fatal error while fatal erroring", test_fatal_error_reentry);
   return passed ? 0 : 1;
 }
