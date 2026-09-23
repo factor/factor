@@ -554,30 +554,32 @@ pub const ImageLoader = struct {
         const region_bytes: [*]align(std.heap.page_size_min) u8 = @ptrCast(@alignCast(full_region));
         self.code_mmap_region = region_bytes[0..total_size];
 
-        // Safepoint guard page: a dedicated, NON-executable mapping. It must live
-        // outside the code heap because the code heap is mapped MAP_JIT on Apple
-        // Silicon, and arm/disarm uses mprotect(), which the kernel rejects
-        // (EACCES) on JIT memory. The C++ VM does the same: a separate
-        // non-executable safepoint segment (vm/code_heap.cpp:16).
-        const safepoint_region = std.c.mmap(
-            null,
-            page_size,
-            .{ .READ = true, .WRITE = true },
-            .{ .TYPE = .PRIVATE, .ANONYMOUS = true },
-            -1,
-            0,
-        );
-        if (safepoint_region == std.c.MAP_FAILED) {
-            _ = std.c.munmap(@ptrCast(region_bytes), total_size);
-            self.code_mmap_region = null;
-            return ImageError.OutOfMemory;
-        }
-        const safepoint_bytes: [*]align(std.heap.page_size_min) u8 = @ptrCast(@alignCast(safepoint_region));
-        self.safepoint_mmap_region = safepoint_bytes[0..page_size];
-        const safepoint_page = @intFromPtr(safepoint_region);
+        const safepoint_page = if (builtin.cpu.arch == .x86_64) @intFromPtr(region_bytes) else blk: {
+            // Safepoint guard page: a dedicated, NON-executable mapping. It must live
+            // outside the code heap because the code heap is mapped MAP_JIT on Apple
+            // Silicon, and arm/disarm uses mprotect(), which the kernel rejects
+            // (EACCES) on JIT memory. The C++ VM does the same: a separate
+            // non-executable safepoint segment (vm/code_heap.cpp).
+            const safepoint_region = std.c.mmap(
+                null,
+                page_size,
+                .{ .READ = true, .WRITE = true },
+                .{ .TYPE = .PRIVATE, .ANONYMOUS = true },
+                -1,
+                0,
+            );
+            if (safepoint_region == std.c.MAP_FAILED) {
+                _ = std.c.munmap(@ptrCast(region_bytes), total_size);
+                self.code_mmap_region = null;
+                return ImageError.OutOfMemory;
+            }
+            const safepoint_bytes: [*]align(std.heap.page_size_min) u8 = @ptrCast(@alignCast(safepoint_region));
+            self.safepoint_mmap_region = safepoint_bytes[0..page_size];
+            break :blk @intFromPtr(safepoint_region);
+        };
 
-        // The leading page of the code region is left unused as padding; code
-        // starts one page in (keeps prior code_start/relocation layout stable).
+        // The leading page of the code region is the safepoint page on x86-64 and
+        // unused padding elsewhere; code starts one page in.
         const code_start = region_bytes + page_size;
 
         // On Apple Silicon (ARM64), MAP_JIT memory is write-protected by default.
@@ -1252,6 +1254,23 @@ test "image loader releases free list and collector allocations" {
     try std.testing.expect(loader.data_heap_ptr == null);
     try std.testing.expect(vm.gc == null);
     try std.testing.expect(vm.data == null);
+}
+
+test "x86-64 safepoint page is within RIP-relative reach of the code heap" {
+    if (builtin.cpu.arch != .x86_64) return error.SkipZigTest;
+    const vm = try vm_mod.FactorVM.init(std.testing.allocator);
+    defer vm.deinit();
+
+    var loader = ImageLoader.init(vm, std.testing.io, .{ .code_size = (1 << 31) - std.heap.page_size_min });
+    defer loader.deinit();
+    loader.header.code_size = 0;
+    try loader.loadCodeHeap(undefined);
+
+    const code = vm.code.?;
+    for ([_]Cell{ code.code_start, code.code_start + code.code_size }) |addr| {
+        const displacement = @as(i64, @bitCast(code.safepoint_page)) - @as(i64, @bitCast(addr));
+        try std.testing.expect(std.math.cast(i32, displacement) != null);
+    }
 }
 
 fn objectSize(obj: *layouts.Object, obj_type: layouts.TypeTag, data_offset: Cell) Cell {
