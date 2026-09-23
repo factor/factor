@@ -205,11 +205,12 @@ PRIVATE>
     decoded length 0xffffffff bitand 32 data bs:read assert=
     decoded ;
 
+: more-members? ( data -- ? )
+    [ bytes>> ] [ byte-pos>> ] bi tail-slice [ zero? ] all? not ;
 
 PRIVATE>
 
 :: gzip-inflate ( bytes -- bytes' )
-    bytes empty? [ bad-gzip-header ] when
     bytes bs:<lsb0-bit-reader> :> data
-    [ data byte-pos>> bytes length < ]
-    [ data (gzip-member) ] produce concat >byte-array ;
+    data more-members? [ bad-gzip-header ] unless
+    [ data more-members? ] [ data (gzip-member) ] produce concat >byte-array ;
