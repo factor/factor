@@ -9,6 +9,11 @@ TUPLE: fake-break < gadget ;
 
 INSTANCE: fake-break word-break
 
+USE: ui.test
+
+! Expected geometry below uses unscaled pixels.
+f [
+
 100 <paragraph>
 <gadget> { 40 30 } >>dim dup "a" set add-gadget
 <fake-break> add-gadget
@@ -17,19 +22,19 @@ INSTANCE: fake-break word-break
 <gadget> { 50 20 } >>dim dup "c" set add-gadget
 "p" set
 
-{ { 4 1 } } [ "p" get wrap-paragraph [ words>> length ] map ] unit-test
+{ { 4 1 } } [ "p" get wrap-paragraph [ words>> length ] map ] unscaled-ui-test unit-test
 
-{ { 85 50 } } [ "p" get pref-dim ] unit-test
+{ { 85 50 } } [ "p" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "p" get prefer ] unit-test
+{ } [ "p" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "p" get layout ] unit-test
+{ } [ "p" get layout ] unscaled-ui-test unit-test
 
-{ { 0 0 } } [ "a" get loc>> ] unit-test
+{ { 0 0 } } [ "a" get loc>> ] unscaled-ui-test unit-test
 
-{ { 45 7 } } [ "b" get loc>> ] unit-test
+{ { 45 7 } } [ "b" get loc>> ] unscaled-ui-test unit-test
 
-{ { 0 30 } } [ "c" get loc>> ] unit-test
+{ { 0 30 } } [ "c" get loc>> ] unscaled-ui-test unit-test
 
 100 <paragraph>
 15 15 { 40 30 } <baseline-gadget> dup "a" set add-gadget
@@ -39,14 +44,15 @@ INSTANCE: fake-break word-break
 20 20 { 40 30 } <baseline-gadget> dup "c" set add-gadget
 "p" set
 
-{ { 85 65.0 } } [ "p" get pref-dim ] unit-test
+{ { 85 65.0 } } [ "p" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "p" get prefer ] unit-test
+{ } [ "p" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "p" get layout ] unit-test
+{ } [ "p" get layout ] unscaled-ui-test unit-test
 
-{ { 0 0 } } [ "a" get loc>> ] unit-test
+{ { 0 0 } } [ "a" get loc>> ] unscaled-ui-test unit-test
 
-{ { 45 5 } } [ "b" get loc>> ] unit-test
+{ { 45 5 } } [ "b" get loc>> ] unscaled-ui-test unit-test
 
-{ { 0 35.0 } } [ "c" get loc>> ] unit-test
+{ { 0 35.0 } } [ "c" get loc>> ] unscaled-ui-test unit-test
+] with-ui-test-scale

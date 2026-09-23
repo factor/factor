@@ -2,6 +2,11 @@ USING: ui.gadgets.packs ui.gadgets.packs.private
 ui.gadgets.labels ui.gadgets ui.gadgets.debug ui.render
 ui.baseline-alignment kernel namespaces tools.test math.parser
 sequences math.rectangles accessors math ;
+USE: ui.test
+
+! Expected geometry below uses unscaled pixels.
+f [
+
 
 { t } [
     { 0 0 } { 100 100 } <rect> clip set
@@ -11,14 +16,14 @@ sequences math.rectangles accessors math ;
     dup layout
 
     visible-children [ label? ] all?
-] unit-test
+] unscaled-ui-test unit-test
 
 { { { 10.0 30.0 } } } [
     { { 10 20 } }
     { { 100 30 } }
     <gadget> vertical >>orientation
     orient
-] unit-test
+] unscaled-ui-test unit-test
 
 ! Test baseline alignment
 <shelf> +baseline+ >>align
@@ -26,15 +31,15 @@ sequences math.rectangles accessors math ;
     10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ { 20 15.0 } } [ "g" get dim>> ] unit-test
+{ { 20 15.0 } } [ "g" get dim>> ] unscaled-ui-test unit-test
 
 { V{ { 0.0 5.0 } { 10.0 0.0 } } } [
     "g" get
     dup layout
     children>> [ loc>> ] map
-] unit-test
+] unscaled-ui-test unit-test
 
 ! Test mixed baseline and ordinary alignment
 <shelf> +baseline+ >>align
@@ -42,54 +47,54 @@ sequences math.rectangles accessors math ;
     10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 30 20.0 } } [ "g" get pref-dim ] unit-test
+{ { 30 20.0 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 0.0 } { 20.0 5.0 } } } [
     "g" get children>> [ loc>> ] map
-] unit-test
+] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
     <gadget> { 15 15 } >>dim add-gadget
     5 5 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 25 15.0 } } [ "g" get pref-dim ] unit-test
+{ { 25 15.0 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 0.0 } { 15.0 5.0 } } } [
     "g" get children>> [ loc>> ] map
-] unit-test
+] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
     <gadget> { 20 20 } >>dim add-gadget
     30 30 { 10 50 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 30 50.0 } } [ "g" get pref-dim ] unit-test
+{ { 30 50.0 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 5.0 } { 20.0 0.0 } } } [
     "g" get children>> [ loc>> ] map
-] unit-test
+] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
     <gadget> { 30 30 } >>dim add-gadget
     30 4 { 30 30 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 60 43.0 } } [ "g" get pref-dim ] unit-test
+{ { 60 43.0 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 ! Baseline alignment without any text gadgets should behave like align=1/2
 <shelf> +baseline+ >>align
@@ -97,42 +102,43 @@ sequences math.rectangles accessors math ;
     <gadget> { 30 20 } >>dim add-gadget
 "g" set
 
-{ { 60 30 } } [ "g" get pref-dim ] unit-test
+{ { 60 30 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 0.0 } { 30.0 5.0 } } }
-[ "g" get children>> [ loc>> ] map ] unit-test
+[ "g" get children>> [ loc>> ] map ] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
 <gadget> { 30 30 } >>dim add-gadget
 10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 0.0 } { 30.0 10.0 } } }
-[ "g" get children>> [ loc>> ] map ] unit-test
+[ "g" get children>> [ loc>> ] map ] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
 <shelf> <gadget> { 30 30 } >>dim add-gadget add-gadget
 10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
-{ } [ "g" get prefer ] unit-test
+{ } [ "g" get prefer ] unscaled-ui-test unit-test
 
-{ } [ "g" get layout ] unit-test
+{ } [ "g" get layout ] unscaled-ui-test unit-test
 
 { V{ { 0.0 0.0 } { 30.0 10.0 } } }
-[ "g" get children>> [ loc>> ] map ] unit-test
+[ "g" get children>> [ loc>> ] map ] unscaled-ui-test unit-test
 
 <shelf> +baseline+ >>align
 <gadget> { 24 24 } >>dim add-gadget
 12 9 { 15 15 } <baseline-gadget> add-gadget
 "g" set
 
-{ { 39 24.0 } } [ "g" get pref-dim ] unit-test
+{ { 39 24.0 } } [ "g" get pref-dim ] unscaled-ui-test unit-test
+] with-ui-test-scale

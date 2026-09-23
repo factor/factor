@@ -5,6 +5,11 @@ IN: ui.gadgets.grid-lines.tests
 : 100x100 ( -- gadget )
     <gadget> { 100 100 } >>dim ;
 
+USE: ui.test
+
+! Expected geometry below uses unscaled pixels.
+f [
+
 {
     {
         { { 0.0 0.0 } { 0.0 100.0 } }
@@ -18,7 +23,7 @@ IN: ui.gadgets.grid-lines.tests
     <grid>
     { 100 100 } >>dim
     compute-grid-lines sort
-] unit-test
+] unscaled-ui-test unit-test
 
 {
     {
@@ -34,7 +39,7 @@ IN: ui.gadgets.grid-lines.tests
     { 10 10 } >>gap
     dup prefer
     compute-grid-lines sort
-] unit-test
+] unscaled-ui-test unit-test
 
 {
     {
@@ -52,7 +57,7 @@ IN: ui.gadgets.grid-lines.tests
     <grid>
     { 200.0 200 } >>dim
     compute-grid-lines sort
-] unit-test
+] unscaled-ui-test unit-test
 
 {
     {
@@ -66,4 +71,5 @@ IN: ui.gadgets.grid-lines.tests
     1array 1array <grid> { 1 1 } >>gap
     dup prefer
     compute-grid-lines
-] unit-test
+] unscaled-ui-test unit-test
+] with-ui-test-scale
