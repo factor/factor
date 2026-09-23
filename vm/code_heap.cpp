@@ -25,17 +25,22 @@ code_heap::code_heap(cell size) {
   if (!seg)
     fatal_error("Out of memory in code_heap constructor", size);
 
+#ifdef FACTOR_AMD64
+  safepoint_seg = NULL;
+  safepoint_page = seg->start;
+  seh_area = (char*)seg->start + getpagesize();
+#else
   safepoint_seg = new segment(align_page(getpagesize()), false);
   if (!safepoint_seg)
     fatal_error("Out of memory in code_heap constructor", size);
-
-  cell start = seg->start + seh_area_size;
-
-  allocator = new free_list_allocator<code_block>(seg->end - start, start);
-
-  // See os-windows-*.64.cpp for seh_area usage
   safepoint_page = safepoint_seg->start;
   seh_area = (char*)seg->start;
+#endif
+
+  // See os-windows-*.64.cpp for seh_area usage
+  cell start = (cell)seh_area + seh_area_size;
+
+  allocator = new free_list_allocator<code_block>(seg->end - start, start);
 }
 
 code_heap::~code_heap() {

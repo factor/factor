@@ -231,6 +231,17 @@ static void test_nano_count_timebase() {
 }
 #endif
 
+#if defined(FACTOR_AMD64) && !defined(WINDOWS)
+static void test_safepoint_page_reach() {
+  code_heap code((cell)1 << 31);
+  for (cell addr : {code.allocator->start, code.seg->end}) {
+    fixnum displacement = (fixnum)code.safepoint_page - (fixnum)addr;
+    check(displacement == (int32_t)displacement,
+          "safepoint page is out of RIP-relative reach of the code heap");
+  }
+}
+#endif
+
 static void test_thread_vm_registry() {
   init_mvm();
   const size_t count = 16;
@@ -327,6 +338,10 @@ int main(int argc, char** argv) {
     test_card_scan_after_dead_tenured_prefix();
   if (argc == 1 || strcmp(argv[1], "thread-vms") == 0)
     test_thread_vm_registry();
+#if defined(FACTOR_AMD64) && !defined(WINDOWS)
+  if (argc == 1 || strcmp(argv[1], "safepoint-reach") == 0)
+    test_safepoint_page_reach();
+#endif
 #ifdef __APPLE__
   if (argc == 1 || strcmp(argv[1], "nano-count") == 0)
     test_nano_count_timebase();
