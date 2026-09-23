@@ -199,7 +199,6 @@ void factor_vm::primitive_modify_code_heap() {
 
     switch (definition.type()) {
       case QUOTATION_TYPE:
-      case TUPLE_TYPE: // for curry/compose, see issue #2763
         jit_compile_word(word.value(), definition.value(), false);
         break;
       case ARRAY_TYPE: {
@@ -218,7 +217,7 @@ void factor_vm::primitive_modify_code_heap() {
         word->entry_point = compiled->entry_point();
       } break;
       default:
-        critical_error("Expected a quotation or an array", definition.value());
+        type_error(QUOTATION_TYPE, definition.value());
         break;
     }
   }

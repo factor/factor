@@ -1,7 +1,7 @@
 USING: arrays compiler compiler.units compiler.units.private
 continuations definitions eval fry
-kernel math namespaces quotations sequences tools.test
-vocabs.loader words ;
+kernel kernel.private literals math namespaces quotations sequences
+tools.test vocabs.loader words ;
 IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
@@ -12,6 +12,10 @@ IN: compiler.units.tests
     "A" <uninterned-word> [ [ [ 1 ] dip ] 2array 1array t t modify-code-heap ] keep
     1 swap execute
 ] unit-test
+
+[
+    "A" <uninterned-word> 5 [ 1 + ] curry 2array 1array t t modify-code-heap
+] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
 
 { "A" "B" } [
     disable-optimizer
