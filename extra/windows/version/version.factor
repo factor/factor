@@ -38,7 +38,7 @@ FUNCTION: BOOL VerQueryValueA (
     PUINT   puLen )
 FUNCTION: BOOL VerQueryValueW (
     LPCVOID pBlock,
-    LPCSTR  lpSubBlock,
+    LPCWSTR lpSubBlock,
     LPVOID  *lplpBuffer,
     PUINT   puLen )
 ALIAS: VerQueryValue VerQueryValueW
@@ -59,8 +59,8 @@ ALIAS: VerQueryValue VerQueryValueW
     ] [ f ] if ;
 
 :: query-str ( data query -- string/f )
-    f LPCSTR <ref> :> result
-    data query result f VerQueryValue [ result LPCSTR deref ] [ f ] if ;
+    f LPCWSTR <ref> :> result
+    data query result f VerQueryValue [ result LPCWSTR deref ] [ f ] if ;
 
 : first-translation ( data -- integer/f )
     "\\VarFileInfo\\Translation" query-dword ;
