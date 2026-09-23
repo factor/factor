@@ -31,6 +31,7 @@ pub const DataHeap = data_heap.DataHeap;
 pub const CodeBlock = code_blocks_mod.CodeBlock;
 
 pub const CodeHeap = @import("code_heap.zig").CodeHeap;
+const JitBuffers = @import("jit.zig").JitBuffers;
 
 pub const CodeRoot = struct {
     value: Cell,
@@ -261,8 +262,7 @@ pub const FactorVM = struct {
     current_gc: ?*GCState,
     current_gc_p: bool,
     current_jit_count: Fixnum,
-    jit_code_spare: std.ArrayList(u8),
-    jit_relocation_spare: std.ArrayList(u8),
+    jit_buffers: std.ArrayList(*JitBuffers),
     gc_events: ?*std.ArrayList(GCEvent),
     gc: ?*gc.GarbageCollector,
     data_roots: DataRootStack,
@@ -331,8 +331,7 @@ pub const FactorVM = struct {
             .current_gc = null,
             .current_gc_p = false,
             .current_jit_count = 0,
-            .jit_code_spare = .empty,
-            .jit_relocation_spare = .empty,
+            .jit_buffers = .empty,
             .gc_events = null,
             .gc = null, // Initialized later when data heap is ready
             .data_roots = .empty,
@@ -390,8 +389,12 @@ pub const FactorVM = struct {
         self.data_roots.deinit(self.allocator);
         self.code_roots.deinit(self.allocator);
         self.callback_ids.deinit(self.allocator);
-        self.jit_code_spare.deinit(self.allocator);
-        self.jit_relocation_spare.deinit(self.allocator);
+        for (self.jit_buffers.items) |buffers| {
+            buffers.code.deinit(self.allocator);
+            buffers.relocation.deinit(self.allocator);
+            self.allocator.destroy(buffers);
+        }
+        self.jit_buffers.deinit(self.allocator);
 
         if (self.data == null) {
             if (self.cards_array) |cards| {

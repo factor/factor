@@ -237,45 +237,60 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
     }
 }
 
-fn keepLargerBuffer(allocator: std.mem.Allocator, spare: *std.ArrayList(u8), buffer: *std.ArrayList(u8)) void {
-    if (buffer.capacity > spare.capacity) std.mem.swap(std.ArrayList(u8), spare, buffer);
-    buffer.deinit(allocator);
-    buffer.* = .empty;
-    spare.clearRetainingCapacity();
+pub const JitBuffers = struct {
+    code: std.ArrayList(u8) = .empty,
+    relocation: std.ArrayList(u8) = .empty,
+};
+
+fn borrowBuffers(vm: *FactorVM, depth: usize) *JitBuffers {
+    if (depth == vm.jit_buffers.items.len) {
+        vm.jit_buffers.ensureUnusedCapacity(vm.allocator, 1) catch vm.memoryError();
+        const buffers = vm.allocator.create(JitBuffers) catch vm.memoryError();
+        buffers.* = .{};
+        vm.jit_buffers.appendAssumeCapacity(buffers);
+    }
+    const buffers = vm.jit_buffers.items[depth];
+    buffers.code.clearRetainingCapacity();
+    buffers.relocation.clearRetainingCapacity();
+    return buffers;
 }
 
-test "JIT buffers keep the larger allocation for reuse" {
-    const allocator = std.testing.allocator;
-    var spare: std.ArrayList(u8) = .empty;
-    defer spare.deinit(allocator);
+test "unwinding out of a nested JIT does not strand its buffers" {
+    const data_heap = @import("data_heap.zig");
+    var debug_allocator: std.heap.DebugAllocator(.{ .enable_memory_limit = true }) = .init;
+    defer _ = debug_allocator.deinit();
+    const allocator = debug_allocator.allocator();
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 4096);
+    vm.setDataHeap(heap);
+    defer {
+        vm.deinit();
+        heap.deinit();
+    }
 
-    var small: std.ArrayList(u8) = .empty;
-    try small.appendNTimes(allocator, 1, 16);
-    keepLargerBuffer(allocator, &spare, &small);
-    try std.testing.expect(spare.capacity >= 16);
-    try std.testing.expectEqual(@as(usize, 0), spare.items.len);
-
-    var large: std.ArrayList(u8) = .empty;
-    try large.appendNTimes(allocator, 2, 4096);
-    const large_ptr = large.items.ptr;
-    keepLargerBuffer(allocator, &spare, &large);
-    try std.testing.expectEqual(large_ptr, spare.items.ptr);
-    try std.testing.expectEqual(@as(usize, 0), spare.items.len);
-
-    var reused = spare;
-    spare = .empty;
-    try reused.appendNTimes(allocator, 3, 4096);
-    try std.testing.expectEqual(large_ptr, reused.items.ptr);
-    keepLargerBuffer(allocator, &spare, &reused);
-    try std.testing.expectEqual(large_ptr, spare.items.ptr);
+    var retained: usize = 0;
+    for (0..4) |i| {
+        var outer = Jit.init(vm, layouts.false_object);
+        outer.registerRoot();
+        var nested = Jit.init(vm, layouts.false_object);
+        nested.registerRoot();
+        try nested.code.appendNTimes(allocator, 0, 1 << 20);
+        nested.deinit();
+        vm.data_roots.clearRetainingCapacity();
+        vm.current_jit_count = 0;
+        if (i == 0) retained = debug_allocator.total_requested_bytes;
+        try std.testing.expectEqual(retained, debug_allocator.total_requested_bytes);
+    }
 }
 
 // Base JIT compiler
 pub const Jit = struct {
     vm: *FactorVM,
     owner: Cell, // Tagged pointer to word or quotation
-    code: std.ArrayList(u8),
-    relocation: std.ArrayList(u8),
+    code: *std.ArrayList(u8),
+    relocation: *std.ArrayList(u8),
     parameters: growable.GrowableArray,
     literals: growable.GrowableArray,
     label_manager: LabelManager,
@@ -289,6 +304,7 @@ pub const Jit = struct {
 
     pub fn init(vm: *FactorVM, owner: Cell) Self {
         std.debug.assert(vm.current_jit_count >= 0);
+        const buffers = borrowBuffers(vm, @intCast(vm.current_jit_count));
         vm.current_jit_count += 1;
 
         // Pre-ensure nursery space for BOTH GrowableArray backing arrays.
@@ -312,16 +328,11 @@ pub const Jit = struct {
         // NOTE: We do NOT register the owner as a GC root here because in Zig,
         // returning Self by value copies the struct. The caller MUST call
         // registerRoot() after the struct is in its final location.
-        const code = vm.jit_code_spare;
-        vm.jit_code_spare = .empty;
-        const relocation = vm.jit_relocation_spare;
-        vm.jit_relocation_spare = .empty;
-
         return Self{
             .vm = vm,
             .owner = owner,
-            .code = code,
-            .relocation = relocation,
+            .code = &buffers.code,
+            .relocation = &buffers.relocation,
             .parameters = parameters,
             .literals = literals,
             .label_manager = LabelManager.init(vm.allocator),
@@ -345,8 +356,6 @@ pub const Jit = struct {
         _ = self.vm.data_roots.pop();
         _ = self.vm.data_roots.pop();
 
-        keepLargerBuffer(self.vm.allocator, &self.vm.jit_code_spare, &self.code);
-        keepLargerBuffer(self.vm.allocator, &self.vm.jit_relocation_spare, &self.relocation);
         self.label_manager.deinit();
 
         std.debug.assert(self.vm.current_jit_count >= 1);
