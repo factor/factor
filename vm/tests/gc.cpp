@@ -197,6 +197,21 @@ static void test_code_blocks_retry() {
   vm.gc(COLLECT_AGING_OP, 0);
 }
 
+static void test_stack_frame_size_header() {
+  code_block block;
+  for (cell frame_size : {(cell)0xFF0, (cell)0x1000, (cell)0x1010,
+                          stack_frame_size_max}) {
+    if (frame_size > stack_frame_size_max)
+      continue;
+    block.header = code_block_size_max;
+    block.set_stack_frame_size(frame_size);
+    check(block.stack_frame_size() == frame_size,
+          "code block header truncated the stack frame size");
+    check(block.size() == code_block_size_max,
+          "stack frame size clobbered the code block size");
+  }
+}
+
 static void test_arm64_relocations() {
   struct {
     code_block block;
@@ -230,6 +245,8 @@ static void test_arm64_relocations() {
 int main(int argc, char** argv) {
   if (argc == 1 || strcmp(argv[1], "arm64-relocations") == 0)
     test_arm64_relocations();
+  if (argc == 1 || strcmp(argv[1], "stack-frame-size") == 0)
+    test_stack_frame_size_header();
   if (argc == 1 || strcmp(argv[1], "alien") == 0)
     test_compact_alien();
   if (argc == 1 || strcmp(argv[1], "become") == 0)

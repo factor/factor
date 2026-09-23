@@ -1,8 +1,9 @@
 ! Copyright (C) 2008, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors compiler.cfg.instructions
-compiler.cfg.linearization cpu.architecture kernel layouts math
-math.order namespaces sequences ;
+compiler.cfg.linearization compiler.cfg.stack-frame
+cpu.architecture kernel layouts math math.order namespaces
+sequences ;
 IN: compiler.cfg.build-stack-frame
 
 SYMBOLS: param-area-size allot-area-size allot-area-align ;
@@ -48,10 +49,17 @@ M: insn compute-stack-frame* drop f ;
     [ allot-area-size>> + ]
     [ spill-area-align>> ] tri align ;
 
+ERROR: stack-frame-too-large size max ;
+
+: check-stack-frame-size ( n -- n )
+    dup max-stack-frame-size > [
+        dup max-stack-frame-size stack-frame-too-large
+    ] when ;
+
 : finalize-stack-frame ( stack-frame -- stack-frame )
     dup calculate-allot-area-base >>allot-area-base
     dup calculate-spill-area-base >>spill-area-base
-    dup stack-frame-size >>total-size ;
+    dup stack-frame-size check-stack-frame-size >>total-size ;
 
 : compute-stack-frame ( cfg -- stack-frame/f )
     dup cfg>insns f [ compute-stack-frame* or ] reduce [

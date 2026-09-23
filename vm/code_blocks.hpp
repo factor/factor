@@ -1,5 +1,8 @@
 namespace factor {
 
+static const cell code_block_size_max = 0xFFFFF0;
+static const cell stack_frame_size_max = (~(cell)0 >> 24) << 4;
+
 // The compiled code heap is structured into blocks.
 struct code_block {
   // header format (bits indexed with least significant as zero):
@@ -7,7 +10,7 @@ struct code_block {
   // bits  1-2: type (as a code_block_type)
   // if not free:
   //   bits  3-23: code size / 8
-  //   bits 24-31: stack frame size / 16
+  //   bits 24-end: stack frame size / 16
   // if free:
   //   bits  3-end: code size / 8
   cell header;
@@ -40,7 +43,7 @@ struct code_block {
   cell stack_frame_size() const {
     if (free_p())
       return 0;
-    return (header >> 20) & 0xFF0;
+    return (header >> 20) & ~(cell)0xF;
   }
 
   cell stack_frame_size_for_address(cell addr) const {
@@ -58,7 +61,7 @@ struct code_block {
     FACTOR_ASSERT(size() < 0xFFFFFF);
     FACTOR_ASSERT(!free_p());
     FACTOR_ASSERT(frame_size % 16 == 0);
-    FACTOR_ASSERT(frame_size <= 0xFF0);
+    FACTOR_ASSERT(frame_size <= stack_frame_size_max);
     header = (header & 0xFFFFFF) | (frame_size << 20);
   }
 

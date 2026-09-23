@@ -1,5 +1,5 @@
 USING: assocs compiler.cfg compiler.cfg.instructions compiler.cfg.stack-frame
-help.markup help.syntax kernel ;
+help.markup help.syntax kernel math ;
 IN: compiler.cfg.build-stack-frame
 
 HELP: build-stack-frame
@@ -21,7 +21,12 @@ HELP: param-area-size
 
 HELP: finalize-stack-frame
 { $values { "stack-frame" stack-frame } }
-{ $description "Calculates and stores the " { $slot "allot-area-base" } ", " { $slot "spill-area-base" } " and " { $slot "total-size" } " slots of a stack frame." } ;
+{ $description "Calculates and stores the " { $slot "allot-area-base" } ", " { $slot "spill-area-base" } " and " { $slot "total-size" } " slots of a stack frame." }
+{ $errors "Throws " { $link stack-frame-too-large } " if the total size exceeds " { $link max-stack-frame-size } "." } ;
+
+HELP: stack-frame-too-large
+{ $values { "size" integer } { "max" integer } }
+{ $description "Throws an error indicating that a word needs a stack frame of " { $snippet "size" } " bytes, larger than the " { $snippet "max" } " bytes the VM can record in a code block header." } ;
 
 ARTICLE: "compiler.cfg.build-stack-frame" "Computing stack frame size and layout"
 "The " { $vocab-link "compiler.cfg.build-stack-frame" } " vocab builds stack frames for cfg:s."

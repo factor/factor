@@ -1,6 +1,6 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces ;
+USING: accessors kernel layouts math namespaces ;
 IN: compiler.cfg.stack-frame
 
 TUPLE: stack-frame
@@ -15,3 +15,6 @@ TUPLE: stack-frame
 
 : (stack-frame-size) ( stack-frame -- n )
     [ spill-area-base>> ] [ spill-area-size>> ] bi + ;
+
+: max-stack-frame-size ( -- n )
+    cell-bits 24 - 2^ 1 - 16 * ;

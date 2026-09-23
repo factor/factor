@@ -19,3 +19,8 @@ IN: compiler.cfg.build-stack-frame.tests
         T{ ##local-allot { dst 1 } { size 32 } { align 8 } }
     } insns>cfg dup build-stack-frame cfg>insns last offset>>
 ] unit-test
+
+[
+    T{ stack-frame { allot-area-align 16 } { spill-area-align 16 } }
+    max-stack-frame-size >>spill-area-size finalize-stack-frame
+] [ stack-frame-too-large? ] must-fail-with
