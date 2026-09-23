@@ -1,6 +1,6 @@
 USING: tools.test cocoa.plists colors kernel hashtables
 core-foundation.utilities core-foundation destructors
-assocs cocoa.enumeration vocabs.loader ;
+assocs cocoa.enumeration vocabs vocabs.loader ;
 IN: cocoa.plists.tests
 
 [

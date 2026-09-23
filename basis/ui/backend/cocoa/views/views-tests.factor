@@ -2,7 +2,7 @@ IN: ui.backend.cocoa.views.tests
 USING: accessors arrays assocs continuations kernel locals math.rectangles
 namespaces opengl sequences tools.test ui.backend
 ui.backend.cocoa.views ui.backend.cocoa.views.private ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.private vectors
+ui.gadgets.private ui.gadgets.worlds ui.private vectors vocabs
 vocabs.loader ;
 
 ! #2379: unbound control keys must not insert invisible characters.
