@@ -1,6 +1,6 @@
 USING: arrays assocs byte-arrays calendar continuations io.streams.string
 kernel kernel.private math math.parser math.private memory namespaces parser
-random sequences splitting threads
+quotations quotations.private random sequences splitting threads
 tools.profiler.sampling tools.profiler.sampling.private
 tools.test ;
 IN: tools.profiler.sampling.tests
@@ -63,6 +63,14 @@ CONSTANT: report-samples {
         sample-callstack
         { leaf-signal-handler frameless-increment frameless-increments } head?
     ] any?
+] unit-test
+
+{ t } [
+    1500000 [ 1 \ drop 2array ] replicate concat >quotation
+    [ jit-compile ] [ 2drop ] recover
+    [ 100,000,000 frameless-increments ] profile
+    most-recent-profile-data
+    [ [ jit-sample-count ] map-sum 2 * ] [ [ first ] map-sum ] bi <
 ] unit-test
 
 { } [ 10 [ [ ] profile ] times ] unit-test
