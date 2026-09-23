@@ -75,6 +75,7 @@ CONSTANT: WS_EX_RIGHTSCROLLBAR    0x00000000
 CONSTANT: WS_EX_CONTROLPARENT     0x00010000
 CONSTANT: WS_EX_STATICEDGE        0x00020000
 CONSTANT: WS_EX_APPWINDOW         0x00040000
+CONSTANT: WS_EX_NOACTIVATE        0x08000000
 
 CONSTANT: WS_EX_OVERLAPPEDWINDOW
     flags{ WS_EX_WINDOWEDGE WS_EX_CLIENTEDGE }
@@ -1736,7 +1737,7 @@ FUNCTION: HDESK GetThreadDesktop ( DWORD dwThreadId )
 
 
 FUNCTION: HWND GetTopWindow ( HWND hWnd )
-! FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase )
+FUNCTION: BOOL GetUpdateRect ( HWND hWnd, LPRECT lpRect, BOOL bErase )
 FUNCTION: int GetUpdateRgn ( HWND hWnd, HRGN hRgn, BOOL bErase )
 
 
@@ -1792,7 +1793,7 @@ FUNCTION: DWORD GetWindowThreadProcessId ( HWND hWnd, void* lpdwProcessId )
 ! FUNCTION: InsertMenuW
 ! FUNCTION: InternalGetWindowText
 ! FUNCTION: IntersectRect
-! FUNCTION: InvalidateRect
+FUNCTION: BOOL InvalidateRect ( HWND hWnd, RECT* lpRect, BOOL bErase )
 ! FUNCTION: InvalidateRgn
 ! FUNCTION: InvertRect
 ! FUNCTION: IsCharAlphaA

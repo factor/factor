@@ -248,9 +248,10 @@ CONSTANT: window-control>ex-style
     [ get-RECT-top-left ] [ get-RECT-width/height ] bi ;
 
 : handle-wm-paint ( hWnd uMsg wParam lParam -- )
-    ! wParam and lParam are unused
-    ! only paint if width/height both > 0
-    3drop window t >>active? relayout-1 yield ;
+    ! Validate before yielding: otherwise another message pump can receive
+    ! WM_PAINT again while this callback is suspended during a move/resize.
+    4dup DefWindowProc drop
+    3drop window [ t >>active? relayout-1 yield ] when* ;
 
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip >lo-hi [ gl-unscale ] map
@@ -580,7 +581,7 @@ wm-handlers [
         ! ${ WM_NCCREATE [ [ 3drop EnableNonClientDpiScaling drop ] [ DefWindowProc ] 4bi ] }
         ! ${ WM_GETDPISCALEDSIZE [ DefWindowProc ] }
         ${ WM_DPICHANGED [ handle-wm-dpichanged 0 ] }
-        ${ WM_PAINT [ 4dup handle-wm-paint DefWindowProc ] }
+        ${ WM_PAINT [ handle-wm-paint 0 ] }
 
         ${ WM_SIZE [ handle-wm-size 0 ] }
         ${ WM_MOVE [ handle-wm-move 0 ] }

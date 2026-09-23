@@ -2,7 +2,31 @@ USING: accessors alien alien.syntax arrays assocs continuations
 kernel layouts locals namespaces sequences tools.test
 ui.backend.windows ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.private windows.types ;
+USING: calendar concurrency.promises math threads windows.errors
+windows.messages windows.user32 ;
 IN: ui.backend.windows.tests
+
+! A pending paint must be validated before the handler yields to another
+! Factor thread. Use a nonactivating tool window positioned offscreen.
+{ t t } [| |
+    WS_EX_NOACTIVATE WS_EX_TOOLWINDOW bitor "STATIC" "paint-regression"
+    WS_POPUP WS_VISIBLE bitor -32000 -32000 100 100 f f f f
+    CreateWindowEx dup win32-error=0/f :> hwnd
+    [
+        world new \ invalidate* >>layout-state :> test-world
+        test-world hwnd register-window
+        hwnd f FALSE InvalidateRect win32-error=0/f
+        hwnd f FALSE GetUpdateRect zero? not
+        <promise> :> validated
+        [ hwnd f FALSE GetUpdateRect zero? validated fulfill ]
+        "paint validation observer" spawn drop
+        hwnd WM_PAINT 0 0 handle-wm-paint
+        validated 5 seconds ?promise-timeout
+    ] [
+        hwnd unregister-window
+        hwnd DestroyWindow drop
+    ] finally
+] unit-test
 
 :: window-callback-result ( result -- returned )
     wm-handlers get-global :> original-handlers
