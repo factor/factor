@@ -2,7 +2,8 @@ IN: ui.backend.cocoa.views.tests
 USING: accessors arrays assocs continuations kernel locals math.rectangles
 namespaces opengl sequences tools.test ui.backend
 ui.backend.cocoa.views ui.backend.cocoa.views.private ui.gadgets
-ui.gadgets.private ui.gadgets.worlds ui.private vectors ;
+ui.gadgets.private ui.gadgets.worlds ui.private vectors
+vocabs.loader ;
 
 ! #2379: unbound control keys must not insert invisible characters.
 { f } [ "\x05" cocoa-input-text ] unit-test
@@ -79,3 +80,7 @@ M: scale-layout-probe layout*
     ] finally ;
 
 { 1.0 2.0 } [ test-mixed-scale-layout ] unit-test
+
+{ } [
+    "cocoa.statusbar" require "ui.backend.cocoa.views" reload
+] unit-test

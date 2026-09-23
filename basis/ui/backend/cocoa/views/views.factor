@@ -213,7 +213,7 @@ IMPORT: NSAttributedString
 :: make-preedit-underlines ( gadget text range -- underlines )
     f gadget preedit-selection-mode?<<
     { } clone :> underlines!
-    text -> length :> text-length
+    text -> NSAttributedString.length :> text-length
     0 0 <NSRange> :> effective-range
     text -> string CF>string :> str
     str utf16n encode :> byte-16n

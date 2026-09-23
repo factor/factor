@@ -23,7 +23,7 @@ DEFER: plist>
     [ -> longLongValue ] [ -> doubleValue ] if ;
 
 : (plist-NSData>) ( NSData -- byte-array )
-    dup -> length <byte-array> [ -> getBytes: ] keep ;
+    dup -> NSData.length <byte-array> [ -> getBytes: ] keep ;
 
 : (plist-NSArray>) ( NSArray -- vector )
     [ plist> ] NSFastEnumeration-map ;

@@ -1,6 +1,6 @@
 USING: tools.test cocoa.plists colors kernel hashtables
 core-foundation.utilities core-foundation destructors
-assocs cocoa.enumeration ;
+assocs cocoa.enumeration vocabs.loader ;
 IN: cocoa.plists.tests
 
 [
@@ -38,3 +38,9 @@ IN: cocoa.plists.tests
         3.5 >cf &CFRelease plist>
     ] unit-test
 ] with-destructors
+
+{ } [ "cocoa.statusbar" require "cocoa.plists" reload ] unit-test
+
+{ B{ 1 2 3 } } [
+    [ B{ 1 2 3 } >cf &CFRelease plist> ] with-destructors
+] unit-test
