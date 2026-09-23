@@ -651,21 +651,16 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
     vm.vm_asm.signal_handler_addr = handler;
 
     if (builtin.cpu.arch == .aarch64) {
-        // Match C++ dispatch_resumable_signal (vm/cpu-arm.64.cpp). Build an
-        // arm64 fake frame below the interrupted SP. The signal-handler
-        // subprimitive resumes via `LDR IP0, [SP, 8] ; ADD SP, SP, 16 ;
-        // BR IP0` — only the PC slot is read on exit (X29/X30 are restored
-        // from the subprimitive's own register saves; the old `LDP FP, LR,
-        // [SP], 16 ; RET` exit poisoned LR wherever it was live, e.g. entry
-        // safepoints and frameless words, making the resumed word "return"
-        // into its own safepoint). The FP slot is unused; old SP is stored
-        // for C++ parity. Always uses signal_handler_word — there is no leaf
-        // variant / alignment delta on arm64 (those are x86-only).
-        @as(*Cell, @ptrFromInt(sp.* - 16)).* = sp.*; // old SP -> [new_sp+0] (unused)
-        @as(*Cell, @ptrFromInt(sp.* - 8)).* = pc.*; // old PC -> [new_sp+8] (resume target)
-        sp.* -= 16;
+        // Match C++ dispatch_resumable_signal (vm/cpu-arm.64.cpp).
+        const code_heap = vm.code orelse fatalError("Signal without code heap", 0);
+        const block = code_heap.codeBlockForAddress(pc.*) orelse
+            fatalError("Signal outside a code block", pc.*);
+        const frameless = block.stackFrameSize() == 0 or pc.* == block.entryPoint();
+        const word_object: objects.SpecialObject = if (frameless) .leaf_signal_handler_word else .signal_handler_word;
+        sp.* -= if (frameless) 16 + code_blocks.CodeBlock.LEAF_FRAME_SIZE else 16;
+        @as(*Cell, @ptrFromInt(sp.* + 8)).* = pc.*;
 
-        const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.signal_handler_word)];
+        const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(word_object)];
         if (!layouts.hasTag(handler_word_cell, .word)) {
             fatalError("Signal handler word not initialized", handler_word_cell);
         }

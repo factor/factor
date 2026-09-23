@@ -201,11 +201,7 @@ pub fn handleSafepoint(vm: *vm_mod.FactorVM, pc: Cell) !void {
 
 // Hard cap on recorded callstack entries per profiling session. The contents
 // array is fully pre-allocated at startSamplingProfiler so that
-// sampleCallstacksAdd NEVER allocates: recordSample runs inside the safepoint
-// handler, and a GC there is unsafe on arm64 — at entry/frameless safepoints
-// the caller's return address lives only in LR (nothing on the callstack
-// references its call-site GC map), so a GC would skip the caller's spill
-// slots and leave stale pointers behind. No allocation => no GC => no hole.
+// sampleCallstacksAdd never allocates inside the safepoint handler.
 // On overflow further entries are dropped (counted in dropped_callstack_entries).
 const MAX_SAMPLE_CALLSTACK_ENTRIES: Cell = 2 * 1024 * 1024; // 16MB of cells
 pub var dropped_callstack_entries: std.atomic.Value(u64) = std.atomic.Value(u64).init(0);
