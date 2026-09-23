@@ -646,6 +646,13 @@ pub fn dispatchSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell)
     vm.code_roots.clearRetainingCapacity();
 }
 
+fn leafSignalHandlerAvailable(vm: *vm_mod.FactorVM) bool {
+    const handler_word_cell = vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.leaf_signal_handler_word)];
+    if (!layouts.hasTag(handler_word_cell, .word)) return false;
+    const handler_word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(handler_word_cell));
+    return handler_word.subprimitive != layouts.false_object;
+}
+
 // Dispatch resumable signal (fault in Factor code with good stack)
 fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: Cell) void {
     vm.vm_asm.signal_handler_addr = handler;
@@ -655,7 +662,8 @@ fn dispatchResumableSignal(vm: *vm_mod.FactorVM, sp: *Cell, pc: *Cell, handler: 
         const code_heap = vm.code orelse fatalError("Signal without code heap", 0);
         const block = code_heap.codeBlockForAddress(pc.*) orelse
             fatalError("Signal outside a code block", pc.*);
-        const frameless = block.stackFrameSize() == 0 or pc.* == block.entryPoint();
+        const frameless = (block.stackFrameSize() == 0 or pc.* == block.entryPoint()) and
+            leafSignalHandlerAvailable(vm);
         const word_object: objects.SpecialObject = if (frameless) .leaf_signal_handler_word else .signal_handler_word;
         sp.* -= if (frameless) 16 + code_blocks.CodeBlock.LEAF_FRAME_SIZE else 16;
         @as(*Cell, @ptrFromInt(sp.* + 8)).* = pc.*;
