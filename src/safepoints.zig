@@ -415,17 +415,12 @@ pub fn startSamplingProfiler(vm: *vm_mod.FactorVM, samples_per_second: Cell) !vo
     sampling_profiler_p.store(true, .monotonic);
 
     // Set up timer to fire at the specified rate
-    const interval_usec: i64 = @intCast(1_000_000 / samples_per_second);
-    const timer = itimerval{
-        .it_value = .{
-            .sec = 0,
-            .usec = @intCast(interval_usec),
-        },
-        .it_interval = .{
-            .sec = 0,
-            .usec = @intCast(interval_usec),
-        },
+    const interval_usec = @max(1, 1_000_000 / samples_per_second);
+    const interval = std.posix.timeval{
+        .sec = @intCast(interval_usec / 1_000_000),
+        .usec = @intCast(interval_usec % 1_000_000),
     };
+    const timer = itimerval{ .it_value = interval, .it_interval = interval };
 
     const result = setitimer(ITIMER_REAL, &timer, null);
     if (result != 0) {
