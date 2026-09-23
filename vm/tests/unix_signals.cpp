@@ -215,6 +215,15 @@ static void test_fatal_error_reentry() {
         "re-entered fatal_error did not exit with status 86");
 }
 
+static void test_small_callstack_signal_stack() {
+  test_vm vm;
+  vm.callstack_size = getpagesize();
+  vm.unix_init_signals();
+  stack_t stack;
+  check(sigaltstack(NULL, &stack) == 0, "sigaltstack query failed");
+  check(stack.ss_size >= (size_t)SIGSTKSZ, "signal stack is below SIGSTKSZ");
+}
+
 static volatile sig_atomic_t interrupts = 0;
 
 static void count_interrupt(int, siginfo_t*, void*) { interrupts++; }
@@ -282,5 +291,6 @@ int main() {
   passed &= run_test("waiting shell signal suppression", test_waiting_shell_signals);
   passed &= run_test("fault on a foreign thread without a VM", test_foreign_fault_without_vm);
   passed &= run_test("fatal error while fatal erroring", test_fatal_error_reentry);
+  passed &= run_test("signal stack with a small callstack", test_small_callstack_signal_stack);
   return passed ? 0 : 1;
 }

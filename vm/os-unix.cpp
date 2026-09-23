@@ -343,7 +343,9 @@ static void init_signal_pipe(factor_vm* vm) {
 void factor_vm::unix_init_signals() {
   init_signal_pipe(this);
 
-  signal_callstack_seg = new segment(callstack_size, false);
+  cell signal_callstack_size =
+      std::max(callstack_size, align_page((cell)SIGSTKSZ));
+  signal_callstack_seg = new segment(signal_callstack_size, false);
 
   stack_t signal_callstack;
   signal_callstack.ss_sp = (char*)signal_callstack_seg->start;
