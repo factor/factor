@@ -1,5 +1,5 @@
 USING: classes definitions generic help.markup help.syntax
-prettyprint.sections sequences strings words ;
+prettyprint.config prettyprint.sections sequences strings words ;
 IN: see
 
 HELP: synopsis
@@ -13,11 +13,12 @@ HELP: synopsis*
 
 HELP: see
 { $values { "defspec" "a definition specifier" } }
-{ $contract "Prettyprints a definition without truncating nested quotations or long sequences." }
+{ $contract "Prettyprints a definition. Long sequences and deeply nested quotations are truncated unless " { $link see } " is called inside " { $link without-limits } "." }
 { $examples
   "A word:" { $code "\\ append see" }
   "A method:" { $code "USE: arrays" "M\\ array length see" }
   "A help article:" { $code "USE: help.topics" "\"help\" >link see" }
+  "A word without truncation:" { $code "USE: prettyprint.config" "[ \\ append see ] without-limits" }
 } ;
 
 HELP: see-methods

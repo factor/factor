@@ -128,8 +128,10 @@ M: word declarations.
 
 M: object see*
     [
-        f nesting-limit namespaces:set
-        f length-limit namespaces:set
+        has-limits? get [
+            12 nesting-limit namespaces:set
+            100 length-limit namespaces:set
+        ] unless
         <colon dup synopsis*
         <block dup definition pprint-elements block>
         dup definer nip [ pprint-word ] when* declarations.

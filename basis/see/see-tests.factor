@@ -1,5 +1,5 @@
-USING: arrays combinators io.encodings.utf8 io.streams.string
-kernel literals math see sequences summary tools.test words ;
+USING: arrays io.encodings.utf8 io.streams.string kernel literals
+math prettyprint.config see sequences summary tools.test words ;
 IN: see.tests
 
 CONSTANT: test-const 10
@@ -26,20 +26,29 @@ ALIAS: test-alias +
 { "IN: see.tests\n: fry-definition ( x -- quot ) '[ _ ] ;\n" }
 [ [ \ fry-definition see ] with-string-writer ] unit-test
 
-! #2858: deep definitions must retain their contents and vocabulary uses.
+! #1561
+CONSTANT: long-definition $[ 200 <iota> >array ]
+
+{ t f } [
+    [ \ long-definition see ] with-string-writer
+    [ " more~" subseq-of? ] [ "199" subseq-of? ] bi
+] unit-test
+
+{ f t } [
+    [ [ \ long-definition see ] without-limits ] with-string-writer
+    [ " more~" subseq-of? ] [ "199" subseq-of? ] bi
+] unit-test
+
+! #2858
 : deeply-nested-definition ( -- quot )
     [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ [ utf8 ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ;
 
-{ f t t } [
+{ t f } [
     [ \ deeply-nested-definition see ] with-string-writer
-    [ "~quotation~" swap subseq? ]
-    [ "utf8" swap subseq? ]
-    [ "io.encodings.utf8" swap subseq? ] tri
+    [ "~quotation~" subseq-of? ] [ "io.encodings.utf8" subseq-of? ] bi
 ] unit-test
 
-! #1561: long literal sequences in definitions must be visible in full.
-CONSTANT: long-definition $[ 200 <iota> >array ]
 { f t } [
-    [ \ long-definition see ] with-string-writer
-    [ " more~" swap subseq? ] [ "199" swap subseq? ] bi
+    [ [ \ deeply-nested-definition see ] without-limits ] with-string-writer
+    [ "~quotation~" subseq-of? ] [ "io.encodings.utf8" subseq-of? ] bi
 ] unit-test
