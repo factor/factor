@@ -297,14 +297,19 @@ SYMBOL: request-socket
     dup empty? [ [ dup ] dip decode-content-codings ] unless
     over content-encoding>> decode [ >>body ] keep ;
 
+: (http-request) ( request -- response bytes )
+    BV{ } clone [ '[ _ push-all ] do-http-request ] keep
+    B{ } like ;
+
 PRIVATE>
 
 : http-request* ( request -- response content )
-    BV{ } clone [ '[ _ push-all ] do-http-request ] keep
-    B{ } like decode-response-body ;
+    (http-request) decode-response-body ;
 
 : http-request ( request -- response content )
-    http-request* [ check-response ] dip ;
+    (http-request) [ decode-response-body ] [
+        [ drop check-response drop ] dip rethrow
+    ] recover [ check-response ] dip ;
 
 : <rest-request-with-body> ( body url method -- request )
     <request>

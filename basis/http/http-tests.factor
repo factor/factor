@@ -506,3 +506,20 @@ test-db <db-persistence> [
     [ ] [ stop-test-httpd ] unit-test
 
 ] test-with-dispatcher
+
+<dispatcher>
+    add-quit-action
+    <action> [ <404> "br" "content-encoding" set-header ] >>display
+    "br" add-responder [
+
+    [ "http://localhost/br" add-addr http-get nip ] [ 404? ] must-fail-with
+
+    [ "http://localhost/br" add-addr http-get* nip ]
+    [ unsupported-content-encoding? ] must-fail-with
+
+    [ "http://localhost/missing" add-addr http-get nip ]
+    [ { [ 404? ] [ response>> body>> "Not Found" subseq-of? ] } 1&& ] must-fail-with
+
+    [ ] [ stop-test-httpd ] unit-test
+
+] test-with-dispatcher

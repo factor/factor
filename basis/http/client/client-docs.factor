@@ -137,7 +137,7 @@ HELP: http-trace*
 HELP: http-request
 { $values { "request" request } { "response" response } { "content" sequence } }
 { $description "A variant of " { $link http-request* } " that checks that the response was successful." }
-{ $errors "Throws an error if the HTTP request fails." } ;
+{ $errors "Throws an error if the HTTP request fails. An unsuccessful status throws " { $link download-failed } ", even when the response body cannot be decoded." } ;
 
 HELP: http-request*
 { $values { "request" request } { "response" response } { "content" sequence } }
