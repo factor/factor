@@ -1,6 +1,9 @@
 #include "../master.hpp"
 #include <atomic>
 #include <thread>
+#ifndef WINDOWS
+#include <sys/wait.h>
+#endif
 
 using namespace factor;
 
@@ -242,6 +245,61 @@ static void test_safepoint_page_reach() {
 }
 #endif
 
+#ifndef WINDOWS
+static FILE* code_heap_image(cell size) {
+  FILE* file = tmpfile();
+  check(file != NULL, "tmpfile failed");
+  std::vector<cell> image(size / sizeof(cell));
+  ((free_heap_block*)image.data())->make_free(size);
+  check(fwrite(image.data(), 1, size, file) == size, "image write failed");
+  rewind(file);
+  return file;
+}
+
+static void test_image_code_heap_capacity() {
+  jit_writable_scope writable;
+  vm_parameters p;
+  p.code_size = 4 * (cell)getpagesize();
+  cell capacity = code_heap(p.code_size).allocator->size;
+  image_header h = {};
+
+  h.code_size = h.compressed_code_size = capacity;
+  FILE* file = code_heap_image(h.code_size);
+  {
+    test_vm vm;
+    delete vm.code;
+    vm.load_code_heap(file, &h, &p);
+    check(vm.code->allocator->occupied_space() == capacity,
+          "image did not fill the code heap");
+  }
+  fclose(file);
+
+  h.code_size = h.compressed_code_size = capacity + data_alignment;
+  file = code_heap_image(h.code_size);
+  FILE* log = tmpfile();
+  check(log != NULL, "tmpfile failed");
+  pid_t pid = fork();
+  check(pid >= 0, "fork failed");
+  if (pid == 0) {
+    dup2(fileno(log), STDERR_FILENO);
+    init_mvm();
+    test_vm vm;
+    delete vm.code;
+    vm.load_code_heap(file, &h, &p);
+    _exit(0);
+  }
+  int status;
+  check(waitpid(pid, &status, 0) == pid, "waitpid failed");
+  char line[128];
+  rewind(log);
+  check(fgets(line, sizeof(line), log) &&
+            strstr(line, "Code heap too small to fit image"),
+        "code heap image larger than the allocator was not rejected");
+  fclose(log);
+  fclose(file);
+}
+#endif
+
 static void test_thread_vm_registry() {
   init_mvm();
   const size_t count = 16;
@@ -360,6 +418,10 @@ int main(int argc, char** argv) {
 #if defined(FACTOR_AMD64) && !defined(WINDOWS)
   if (argc == 1 || strcmp(argv[1], "safepoint-reach") == 0)
     test_safepoint_page_reach();
+#endif
+#ifndef WINDOWS
+  if (argc == 1 || strcmp(argv[1], "image-code-heap") == 0)
+    test_image_code_heap_capacity();
 #endif
 #ifdef WINDOWS
   if (argc == 1 || strcmp(argv[1], "windows-exceptions") == 0)

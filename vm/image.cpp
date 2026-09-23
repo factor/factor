@@ -135,10 +135,10 @@ void factor_vm::load_data_heap(FILE* file, image_header* h, vm_parameters* p) {
 }
 
 void factor_vm::load_code_heap(FILE* file, image_header* h, vm_parameters* p) {
-  if (h->code_size > p->code_size)
-    fatal_error("Code heap too small to fit image", h->code_size);
-
   code = new code_heap(p->code_size);
+
+  if (h->code_size > code->allocator->size)
+    fatal_error("Code heap too small to fit image", h->code_size);
 
   if (h->code_size != 0) {
     auto uncompress = h->code_size != h->compressed_code_size;
