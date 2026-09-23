@@ -31,6 +31,12 @@ IN: concurrency.messaging.tests
     receive
 ] [ error>> "crash" = ] must-fail-with
 
+{ f } [
+    128 [ [ "crash" throw ] "Linked test" spawn-linked ] replicate
+    128 [ [ receive drop ] [ drop ] recover ] times
+    [ thread-registered? ] any?
+] unit-test
+
 MATCH-VARS: ?from ?to ?value ;
 SYMBOL: increment
 SYMBOL: decrement

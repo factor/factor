@@ -16,9 +16,15 @@ TYPED: mailbox-empty? ( mailbox: mailbox -- bool )
 
 GENERIC: mailbox-put ( obj mailbox -- )
 
-M: mailbox mailbox-put
+<PRIVATE
+
+TYPED: (mailbox-put) ( obj mailbox: mailbox -- )
     [ data>> push-front ]
-    [ threads>> notify-all ] bi yield ;
+    [ threads>> notify-all ] bi ;
+
+PRIVATE>
+
+M: mailbox mailbox-put (mailbox-put) yield ;
 
 : wait-for-mailbox ( mailbox timeout -- )
     [ threads>> ] dip "mailbox" wait ; inline
@@ -70,4 +76,4 @@ TYPED: mailbox-get-timeout ( mailbox: mailbox timeout -- obj )
 : wait-for-close ( mailbox -- )
     f wait-for-close-timeout ;
 
-M: mailbox send-linked-error mailbox-put ;
+M: mailbox send-linked-error (mailbox-put) ;
