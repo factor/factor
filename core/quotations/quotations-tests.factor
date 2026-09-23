@@ -1,5 +1,6 @@
-USING: combinators kernel math quotations.private sequences
-stack-checker stack-checker.errors tools.test words ;
+USING: combinators kernel kernel.private literals math
+quotations.private sequences stack-checker stack-checker.errors
+tools.test words ;
 IN: quotations
 
 { [ 3 ] } [ 3 [ ] curry ] unit-test
@@ -49,3 +50,7 @@ IN: quotations
 
 { [ ] } [ { } compose-all ] unit-test
 { [ 1 + 2 - ] } [ { [ 1 + ] [ 2 - ] } compose-all ] unit-test
+
+[ 42 jit-compile ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
+[ "abc" clone jit-compile ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
+[ 42 quotation-code ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with

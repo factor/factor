@@ -315,7 +315,9 @@ void factor_vm::jit_compile_quotation(cell quot_, bool relocating) {
 
 // Allocates memory
 void factor_vm::primitive_jit_compile() {
-  jit_compile_quotation(ctx->pop(), true);
+  data_root<quotation> quot(ctx->pop(), this);
+  check_tagged(quot);
+  jit_compile_quotation(quot.value(), true);
 }
 
 cell factor_vm::lazy_jit_compile_entry_point() {
@@ -338,6 +340,7 @@ void factor_vm::primitive_array_to_quotation() {
 // Allocates memory (from_unsigned_cell)
 void factor_vm::primitive_quotation_code() {
   data_root<quotation> quot(ctx->pop(), this);
+  check_tagged(quot);
 
   ctx->push(from_unsigned_cell(quot->entry_point));
   ctx->push(from_unsigned_cell((cell)quot->code() + quot->code()->size()));
