@@ -1520,8 +1520,8 @@ FUNCTION: DWORD GetLastError ( )
 ! FUNCTION: GetLocaleInfoW
 ! FUNCTION: GetLocalTime
 FUNCTION: DWORD GetLogicalDrives ( )
-FUNCTION: DWORD GetLogicalDriveStringsA ( DWORD dwBufferLength, LPWSTR lpBuffer )
-FUNCTION: DWORD GetLogicalDriveStringsW ( DWORD dwBufferLength, LPSTR lpBuffer )
+FUNCTION: DWORD GetLogicalDriveStringsA ( DWORD dwBufferLength, LPSTR lpBuffer )
+FUNCTION: DWORD GetLogicalDriveStringsW ( DWORD dwBufferLength, LPWSTR lpBuffer )
 ALIAS: GetLogicalDriveStrings GetLogicalDriveStringsW
 ! FUNCTION: GetLongPathNameA
 ! FUNCTION: GetLongPathNameW
