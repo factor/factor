@@ -552,11 +552,12 @@ pub const Jit = struct {
             var entry: code_blocks.RelocationEntry = @bitCast(entry_bytes[0..4].*);
 
             // Adjust offset to account for code already emitted
-            const new_offset = entry.getOffset() + @as(u24, @intCast(current_offset));
+            const new_offset = current_offset + entry.getOffset();
+            if (new_offset > code_blocks.code_length_max) continue;
             entry = code_blocks.RelocationEntry.init(
                 entry.getType(),
                 entry.getClass(),
-                new_offset,
+                @intCast(new_offset),
             );
 
             const entry_u32: u32 = @bitCast(entry);
@@ -628,6 +629,7 @@ pub const Jit = struct {
         }
         // Append dummy GC info (4 bytes of zeros)
         try self.code.appendSlice(self.vm.allocator, &[_]u8{ 0, 0, 0, 0 });
+        if (self.code.items.len > code_blocks.code_length_max) return error.CodeTooLarge;
 
         if (!self.parameters.trim()) @panic("OOM trimming parameters");
         if (!self.literals.trim()) @panic("OOM trimming literals");

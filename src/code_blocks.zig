@@ -77,6 +77,7 @@ pub const CodeBlockType = enum(u2) {
 
 pub const code_block_size_max: Cell = 0xFFFFF0;
 pub const stack_frame_size_max: Cell = (~@as(Cell, 0) >> 24) << 4;
+pub const code_length_max: Cell = code_block_size_max - @sizeOf(CodeBlock);
 
 pub const CodeBlock = extern struct {
     header: Cell,

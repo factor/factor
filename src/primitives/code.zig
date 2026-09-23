@@ -151,6 +151,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 
                 const code_bytes_pre: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes_cell));
                 const code_len = layouts.untagFixnumUnsigned(code_bytes_pre.capacity);
+                vm.checkCodeLength(code_len);
 
                 // Allocate code block (triggers compaction if code heap is full)
                 const header_size = @sizeOf(code_blocks.CodeBlock);

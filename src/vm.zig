@@ -1015,6 +1015,15 @@ pub const FactorVM = struct {
         @panic("Out of memory in allot_code_block");
     }
 
+    pub fn checkCodeLength(self: *Self, code_length: Cell) void {
+        if (code_length > code_blocks_mod.code_length_max) self.codeLengthError(code_length);
+    }
+
+    pub fn codeLengthError(self: *Self, code_length: Cell) noreturn {
+        const code_length_max = code_blocks_mod.code_length_max;
+        self.generalError(.array_size, layouts.tagFixnum(@intCast(code_length)), layouts.tagFixnum(code_length_max + 1));
+    }
+
     pub fn setDataHeap(self: *Self, heap: *DataHeap) void {
         self.data = heap;
 
@@ -1113,6 +1122,11 @@ pub const FactorVM = struct {
 
         const frame_size = compiler.wordStackFrameSize(owner);
         const compiled = compiler.toCodeBlock(frame_size) catch |err| {
+            if (err == error.CodeTooLarge) {
+                const code_length = compiler.jit.code.items.len;
+                compiler.deinit();
+                self.codeLengthError(code_length);
+            }
             std.debug.print("[jitCompileQuotationWithOwner] toCodeBlock FAILED: {} owner=0x{x} quot=0x{x}\n", .{ err, owner, quot_cell });
             return null;
         };
