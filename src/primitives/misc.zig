@@ -28,6 +28,16 @@ pub export fn primitive_exit(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
 // --- Nano Count ---
 
+fn machTicksToNanos(ticks: u64, numer: u64, denom: u64) u64 {
+    return ticks / denom * numer + ticks % denom * numer / denom;
+}
+
+test "mach tick conversion keeps the fractional part of the timebase ratio" {
+    try std.testing.expectEqual(@as(u64, 1_000_000_000), machTicksToNanos(24_000_000, 125, 3));
+    try std.testing.expectEqual(@as(u64, 41), machTicksToNanos(1, 125, 3));
+    try std.testing.expectEqual(@as(u64, 123_456_789), machTicksToNanos(123_456_789, 1, 1));
+}
+
 pub fn nanoCountMonotonic() u64 {
     // macOS: mach_absolute_time() scaled to nanoseconds
     // Linux: clock_gettime(CLOCK_MONOTONIC)
@@ -39,14 +49,12 @@ pub fn nanoCountMonotonic() u64 {
                 numer: u32,
                 denom: u32,
             };
-            var scaling_factor: u64 = 0;
+            var timebase: MachTimebaseInfo = .{ .numer = 0, .denom = 0 };
         };
-        if (mach.scaling_factor == 0) {
-            var info: mach.MachTimebaseInfo = undefined;
-            _ = mach.mach_timebase_info(&info);
-            mach.scaling_factor = @as(u64, info.numer) / @as(u64, info.denom);
+        if (mach.timebase.denom == 0) {
+            if (mach.mach_timebase_info(&mach.timebase) != 0) @panic("mach_timebase_info failed");
         }
-        return mach.mach_absolute_time() * mach.scaling_factor;
+        return machTicksToNanos(mach.mach_absolute_time(), mach.timebase.numer, mach.timebase.denom);
     } else {
         // Linux/generic: use CLOCK_MONOTONIC via C library
         var ts: std.c.timespec = undefined;
