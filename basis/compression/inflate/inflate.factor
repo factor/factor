@@ -186,7 +186,7 @@ CONSTANT: dist-table
             { 2 [ inflate-dynamic ] }
             { 3 [ bad-zlib-data f ] }
         } case
-    ] [ produce ] keep call suffix concat ;
+    ] [ produce ] keep call suffix { } concat-as ;
 
 PRIVATE>
 
