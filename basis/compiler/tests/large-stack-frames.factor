@@ -1,6 +1,7 @@
-USING: alien.c-types alien.data arrays compiler.units grouping
-kernel layouts memory quotations ranges sequences
-specialized-arrays stack-checker tools.test words ;
+USING: alien.c-types alien.data arrays compiler.cfg.stack-frame
+compiler.errors compiler.units grouping kernel layouts memory
+quotations ranges sequences specialized-arrays stack-checker
+tools.test words ;
 SPECIALIZED-ARRAY: char
 IN: compiler.tests.large-stack-frames
 
@@ -18,6 +19,9 @@ IN: compiler.tests.large-stack-frames
 : call-large-frame ( word -- obj ) execute( -- obj ) frame-barrier ;
 
 : large-frame-sizes ( -- seq ) 4032 4112 16 <range> 65536 suffix ;
+
+[ max-stack-frame-size [ drop ] large-frame-word execute( -- ) ]
+[ not-compiled? ] must-fail-with
 
 64-bit? [
     { t } [

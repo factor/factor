@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.algebra combinators
-combinators.short-circuit compiler.cfg compiler.cfg.builder
-compiler.cfg.builder.alien compiler.cfg.finalization
+combinators.short-circuit compiler.cfg compiler.cfg.build-stack-frame
+compiler.cfg.builder compiler.cfg.builder.alien compiler.cfg.finalization
 compiler.cfg.optimizer compiler.cfg.registers compiler.codegen compiler.crossref
 compiler.errors compiler.tree.builder compiler.tree.optimizer
 compiler.units compiler.utilities continuations definitions
@@ -115,7 +115,7 @@ M: word combinator? inline? ;
         contains-breakpoints? [ nip deoptimize* ] [ drop ] if
     ] [ deoptimize* ] if ;
 
-: backend ( tree word -- )
+: (backend) ( tree word -- )
     build-cfg [
         [
             [ optimize-cfg ]
@@ -124,6 +124,11 @@ M: word combinator? inline? ;
             tri
         ] with-cfg
     ] each ;
+
+: backend ( tree word -- )
+    [ (backend) ] [
+        dup stack-frame-too-large? [ rot drop remember-error ] [ rethrow ] if
+    ] recover ;
 
 : compile-word ( word -- )
     ! We return early if the word has breakpoints or if it
