@@ -75,18 +75,17 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 : valid-handle? ( handle -- boolean )
     INVALID_HANDLE_VALUE = not ; inline
 
-: open-read-handle ( path -- handle/f )
+: open-read-handle ( path flags -- handle/f )
     ! Parameters of CreateFileW here should match those in open-read.
-    GENERIC_READ share-mode f
-    OPEN_EXISTING 0 CreateFile-flags f
+    [ GENERIC_READ share-mode f OPEN_EXISTING ] dip CreateFile-flags f
     CreateFileW [ valid-handle? ] keep f ? ;
 
 : find-first-file-fallback? ( n -- ? )
     ${ ERROR_SHARING_VIOLATION ERROR_ACCESS_DENIED ERROR_CANT_ACCESS_FILE }
     member? ;
 
-: get-file-information-stat ( path -- file-info )
-    dup open-read-handle dup [
+: get-file-information-stat ( path flags -- file-info )
+    dupd open-read-handle dup [
         nip
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] [
@@ -97,11 +96,13 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
 
 M: windows file-info
     normalize-path
-    [ get-file-information-stat ]
+    [ 0 get-file-information-stat ]
     [ set-windows-size-on-disk ] bi ;
 
 M: windows link-info
-    file-info ;
+    normalize-path
+    [ FILE_FLAG_OPEN_REPARSE_POINT get-file-information-stat ]
+    [ set-windows-size-on-disk ] bi ;
 
 : file-executable-type ( path -- executable/f )
     normalize-path dup
@@ -254,7 +255,7 @@ M: windows file-systems
     [ f f ] dip set-file-times ;
 
 M: windows file-readable?
-    normalize-path open-read-handle
+    normalize-path 0 open-read-handle
     dup [ CloseHandle win32-error=0/f ] when* >boolean ;
 
 M: windows file-writable? file-info attributes>> +read-only+ swap member? not ;

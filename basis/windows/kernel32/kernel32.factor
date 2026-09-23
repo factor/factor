@@ -1155,6 +1155,10 @@ FUNCTION: HANDLE CreateRemoteThread ( HANDLE hProcess,
 ! FUNCTION: CreateSemaphoreA
 ! FUNCTION: CreateSemaphoreW
 ! FUNCTION: CreateSocketHandle
+CONSTANT: SYMBOLIC_LINK_FLAG_DIRECTORY 1
+CONSTANT: SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE 2
+FUNCTION: BOOLEAN CreateSymbolicLinkW ( LPCTSTR lpSymlinkFileName, LPCTSTR lpTargetFileName, DWORD dwFlags )
+ALIAS: CreateSymbolicLink CreateSymbolicLinkW
 ! FUNCTION: CreateTapePartition
 ! FUNCTION: CreateThread
 ! FUNCTION: CreateTimerQueue
