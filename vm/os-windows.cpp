@@ -49,6 +49,10 @@ BOOL factor_vm::windows_stat(vm_char* path) {
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
   if (h == INVALID_HANDLE_VALUE) {
+    DWORD error = GetLastError();
+    if (error != ERROR_SHARING_VIOLATION && error != ERROR_ACCESS_DENIED &&
+        error != ERROR_CANT_ACCESS_FILE)
+      return false;
     // FindFirstFile is the only call that can stat c:\pagefile.sys
     WIN32_FIND_DATA st;
     h = FindFirstFile(path, &st);

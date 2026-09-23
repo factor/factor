@@ -114,6 +114,19 @@ int main() {
   require(vm->read_embedded_image_footer(file, &actual), "Valid footer rejected");
   require(actual.image_offset == 123, "Footer offset changed");
   require(fclose(file) == 0, "Cannot close temporary file");
+
+  wchar_t windows_directory[MAX_PATH];
+  UINT length = GetWindowsDirectoryW(windows_directory, MAX_PATH);
+  require(length > 0 && length < MAX_PATH, "Cannot find the Windows directory");
+  std::wstring directory(windows_directory);
+  std::wstring wildcard = directory + L"\\*";
+  std::wstring single_wildcard = directory + L"\\notepad.ex?";
+  require(vm->windows_stat((vm_char*)directory.c_str()),
+          "Windows directory does not exist");
+  require(!vm->windows_stat((vm_char*)wildcard.c_str()),
+          "A wildcard path exists");
+  require(!vm->windows_stat((vm_char*)single_wildcard.c_str()),
+          "A single-character wildcard path exists");
   puts("Windows VM I/O tests passed");
   return 0;
 }
