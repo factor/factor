@@ -200,7 +200,14 @@ GENERIC: reshape-storage ( storage -- storage' )
 M: sequence reshape-storage ;
 M: virtual-sequence reshape-storage >array ;
 
+GENERIC: clone-storage ( storage -- storage' )
+M: sequence clone-storage clone ;
+M: virtual-sequence clone-storage >array ;
+
 PRIVATE>
+
+M: shaped-array clone
+    (clone) [ clone-storage ] change-underlying [ clone ] change-shape ;
 
 :: reshape ( array shape -- result )
     array >shaped-array underlying>> :> storage

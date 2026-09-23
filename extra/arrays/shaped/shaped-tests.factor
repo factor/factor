@@ -228,6 +228,20 @@ USING: accessors arrays arrays.shaped eval kernel math prettyprint sequences too
 [ { 3 } zeros { 3 } shaped-slice-view ]
 [ invalid-shaped-axis? ] must-fail-with
 
+{ { 0 1 2 } } [
+    { 3 } increasing dup clone [ 10 * ] shaped-map! drop underlying>>
+] unit-test
+{ { 3 } } [
+    { 3 } increasing dup clone shape>> 4 0 rot set-nth shape>>
+] unit-test
+{ { 3 2 } { 0 3 1 4 2 5 } } [
+    { 2 3 } increasing shaped-transpose clone [ shape>> ] [ underlying>> ] bi
+] unit-test
+{ { 0 1 2 3 4 5 } } [
+    { 2 3 } increasing dup shaped-transpose clone
+    [ 1 + ] shaped-map! drop underlying>>
+] unit-test
+
 ! Axis reductions, including zero-sized axes and scalar outputs.
 { { } { 15 } } [ { 2 3 } increasing f f shaped-sum [ shape>> ] [ underlying>> ] bi ] unit-test
 { { 3 } { 3 5 7 } } [ { 2 3 } increasing 0 f shaped-sum [ shape>> ] [ underlying>> ] bi ] unit-test
