@@ -1006,6 +1006,27 @@ fn fatalErrorInFatalError() noreturn {
     std.c._exit(1);
 }
 
+const sigstksz: Cell = if (builtin.os.tag == .linux) std.os.linux.SIGSTKSZ else std.c.SIGSTKSZ;
+
+fn signalStackSize(callstack_size: Cell) Cell {
+    return @max(callstack_size, sigstksz);
+}
+
+test "signal stack is never smaller than SIGSTKSZ" {
+    try std.testing.expectEqual(sigstksz, signalStackSize(1024));
+    try std.testing.expectEqual(@as(Cell, 1024 * 1024), signalStackSize(1024 * 1024));
+    var seg = try @import("segments.zig").Segment.init(signalStackSize(16 * 1024), false);
+    defer seg.deinit();
+    var stack = std.posix.stack_t{
+        .sp = @ptrFromInt(seg.start),
+        .flags = 0,
+        .size = @intCast(seg.size),
+    };
+    var old: std.posix.stack_t = undefined;
+    try std.posix.sigaltstack(&stack, &old);
+    try std.posix.sigaltstack(&old, null);
+}
+
 // Initialize signal handlers
 pub fn initSignals(vm: *vm_mod.FactorVM) !void {
     setCurrentVM(vm);
@@ -1025,7 +1046,7 @@ pub fn initSignals(vm: *vm_mod.FactorVM) !void {
     // drift-prone second copy of the fault logic.
 
     // Allocate alternate signal stack
-    vm.signal_callstack_seg = try @import("segments.zig").Segment.init(vm.callstack_size, false);
+    vm.signal_callstack_seg = try @import("segments.zig").Segment.init(signalStackSize(vm.callstack_size), false);
 
     var signal_stack = std.posix.stack_t{
         .sp = @ptrFromInt(vm.signal_callstack_seg.?.start),
