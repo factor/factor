@@ -1,4 +1,4 @@
-USING: arrays compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
+USING: accessors arrays compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
 ranges sequences system tools.memory tools.test ;
 IN: math.integers.tests
