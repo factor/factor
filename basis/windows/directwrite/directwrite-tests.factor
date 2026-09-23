@@ -1,8 +1,16 @@
 USING: accessors arrays assocs combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
-math.order namespaces opengl sequences strings tools.test windows.directwrite windows.fonts ;
+math.order namespaces opengl sequences sets strings tools.test windows.directwrite windows.fonts ;
 IN: windows.directwrite.tests
 
 : test-font ( -- font ) "Segoe UI" <font> ;
+
+! Cached layouts outlive the dynamic disposable scope that first draws them.
+{ t f } [
+    HS{ } clone disposables [
+        test-font "DirectWrite scoped disposable registry" cached-directwrite-layout
+        [ disposables get-global in? ] [ disposables get in? ] bi
+    ] with-variable
+] unit-test
 
 :: directwrite-alias-snapshot? ( -- pinned? new-entry? new-width? restored-entry? )
     "monospace" windows-fonts at :> original

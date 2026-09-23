@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays cache kernel math math.vectors namespaces opengl
+USING: accessors arrays cache destructors kernel math math.vectors namespaces opengl
 sequences ui.gadgets.worlds ui.text ui.text.private ui.text.directwrite.tiles
 ui.text.directwrite.transforms windows.directwrite
 windows.directwrite.render ;
@@ -20,8 +20,10 @@ M: directwrite-renderer string-dim
     [ width>> ] [ height>> ] bi 2array scale-dim ;
 
 M: directwrite-renderer flush-layout-cache
-    cached-directwrite-layouts get-global purge-cache
-    directwrite-layout-aliases get-global purge-cache ;
+    disposables get-global disposables [
+        cached-directwrite-layouts get-global purge-cache
+        directwrite-layout-aliases get-global purge-cache
+    ] with-variable ;
 
 M: directwrite-renderer string>image
     cached-directwrite-layout

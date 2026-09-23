@@ -248,12 +248,14 @@ M: directwrite-layout-alias dispose* drop ;
     ] if ;
 
 :: cached-directwrite-layout ( font string -- layout )
-    string dup selection? [ string>> ] when length 4096 > [
-        font string directwrite-aliased-layout
-    ] [
-        font string directwrite-layout-key cached-directwrite-layouts get-global
-        [ drop font string <directwrite-layout> ] cache
-    ] if ;
+    disposables get-global disposables [
+        string dup selection? [ string>> ] when length 4096 > [
+            font string directwrite-aliased-layout
+        ] [
+            font string directwrite-layout-key cached-directwrite-layouts get-global
+            [ drop font string <directwrite-layout> ] cache
+        ] if
+    ] with-variable ;
 
 STARTUP-HOOK: [
     <cache-assoc> cached-directwrite-layouts set-global
