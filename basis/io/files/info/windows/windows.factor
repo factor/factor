@@ -81,12 +81,18 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
     OPEN_EXISTING 0 CreateFile-flags f
     CreateFileW [ valid-handle? ] keep f ? ;
 
+: find-first-file-fallback? ( n -- ? )
+    ${ ERROR_SHARING_VIOLATION ERROR_ACCESS_DENIED ERROR_CANT_ACCESS_FILE }
+    member? ;
+
 : get-file-information-stat ( path -- file-info )
     dup open-read-handle dup [
         nip
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] [
-        drop find-first-file-stat WIN32_FIND_DATA>file-info
+        drop GetLastError dup find-first-file-fallback?
+        [ drop ] [ n>win32-error-check ] if
+        find-first-file-stat WIN32_FIND_DATA>file-info
     ] if ;
 
 M: windows file-info
