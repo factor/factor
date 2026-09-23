@@ -1019,6 +1019,8 @@ pub fn panic(msg: []const u8, first_trace_addr: ?usize) noreturn {
 }
 
 fn fatalError(msg: []const u8, value: Cell) noreturn {
+    if (vm_mod.g_fatal_erroring_p) fatalErrorInFatalError();
+    vm_mod.g_fatal_erroring_p = true;
     std.debug.print("fatal_error: {s}: 0x{x}\n", .{ msg, value });
     // Use _exit to avoid atexit handlers and re-triggering signal handlers
     std.c._exit(1);
@@ -1026,7 +1028,7 @@ fn fatalError(msg: []const u8, value: Cell) noreturn {
 
 fn fatalErrorInFatalError() noreturn {
     std.debug.print("fatal_error in fatal_error!\n", .{});
-    std.c._exit(1);
+    std.c._exit(86);
 }
 
 fn exitOnAbort(_: std.posix.SIG) callconv(.c) void {
@@ -1055,6 +1057,21 @@ test "the VM's abort is not caught by an installed SIGABRT handler" {
     const status = try waitForChild(pid);
     try std.testing.expect(std.posix.W.IFSIGNALED(status));
     try std.testing.expectEqual(@as(u32, @intFromEnum(std.posix.SIG.ABRT)), @as(u32, @intFromEnum(std.posix.W.TERMSIG(status))));
+}
+
+test "a fatal error raised while fatal erroring exits with status 86" {
+    const pid = std.c.fork();
+    try std.testing.expect(pid >= 0);
+    if (pid == 0) {
+        const dev_null = std.c.open("/dev/null", .{ .ACCMODE = .WRONLY });
+        _ = std.c.dup2(dev_null, std.posix.STDERR_FILENO);
+        _ = std.c.alarm(10);
+        vm_mod.g_fatal_erroring_p = true;
+        fatalError("fatal error while fatal erroring", 0);
+    }
+    const status = try waitForChild(pid);
+    try std.testing.expect(std.posix.W.IFEXITED(status));
+    try std.testing.expectEqual(@as(u8, 86), std.posix.W.EXITSTATUS(status));
 }
 
 const sigstksz: Cell = if (builtin.os.tag == .linux) std.os.linux.SIGSTKSZ else std.c.SIGSTKSZ;
