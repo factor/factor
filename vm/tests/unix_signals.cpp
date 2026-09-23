@@ -4,6 +4,7 @@
 using namespace factor;
 
 namespace factor {
+void memory_signal_handler(int, siginfo_t*, void*);
 void enqueue_signal_handler(int, siginfo_t*, void*);
 void fep_signal_handler(int, siginfo_t*, void*);
 void sample_signal_handler(int, siginfo_t*, void*);
@@ -159,6 +160,44 @@ static void test_foreign_alarm_profiling() {
         "late alarm sampled a stopped profiler");
 }
 
+static int status_within(unsigned seconds, void (*body)()) {
+  pid_t pid = fork();
+  check(pid >= 0, "fork failed");
+  if (pid == 0) {
+    alarm(seconds);
+    body();
+    _exit(0);
+  }
+  int status;
+  check(waitpid(pid, &status, 0) == pid, "waitpid failed");
+  return status;
+}
+
+static int* volatile unmapped_address = NULL;
+
+static void* fault_without_vm(void*) {
+  *unmapped_address = 0;
+  return NULL;
+}
+
+static void fault_on_foreign_thread() {
+  install_handler(SIGSEGV, memory_signal_handler);
+  install_handler(SIGBUS, memory_signal_handler);
+#ifdef __APPLE__
+  mach_initialize();
+#endif
+  pthread_t thread;
+  check(pthread_create(&thread, NULL, fault_without_vm, NULL) == 0,
+        "pthread_create failed");
+  pthread_join(thread, NULL);
+}
+
+static void test_foreign_fault_without_vm() {
+  int status = status_within(10, fault_on_foreign_thread);
+  check(WIFEXITED(status) && WEXITSTATUS(status) == 1,
+        "foreign thread fault did not end in fatal_error");
+}
+
 static volatile sig_atomic_t interrupts = 0;
 
 static void count_interrupt(int, siginfo_t*, void*) { interrupts++; }
@@ -224,5 +263,6 @@ int main() {
   passed &= run_test("SIGALRM on a foreign thread without a VM", test_foreign_alarm_without_vm);
   passed &= run_test("foreign samples reach the active profiler", test_foreign_alarm_profiling);
   passed &= run_test("waiting shell signal suppression", test_waiting_shell_signals);
+  passed &= run_test("fault on a foreign thread without a VM", test_foreign_fault_without_vm);
   return passed ? 0 : 1;
 }

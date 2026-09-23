@@ -165,10 +165,11 @@ void factor_vm::dispatch_signal(void* uap, void(handler)()) {
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   signal_handler_scope scope;
-  (void) signal;
   cell fault_addr = (cell)siginfo->si_addr;
   cell fault_pc = (cell)UAP_PROGRAM_COUNTER(uap);
-  factor_vm* vm = current_vm();
+  factor_vm* vm = current_vm_p();
+  if (!vm)
+    fatal_error("Foreign thread received signal", signal);
   vm->set_memory_protection_error(fault_addr, fault_pc);
   vm->dispatch_signal(uap, factor::memory_signal_handler_impl);
 }
@@ -253,7 +254,9 @@ void ignore_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
 
 void fpe_signal_handler(int signal, siginfo_t* siginfo, void* uap) {
   signal_handler_scope scope;
-  factor_vm* vm = current_vm();
+  factor_vm* vm = current_vm_p();
+  if (!vm)
+    fatal_error("Foreign thread received signal", signal);
   vm->signal_number = signal;
   vm->signal_fpu_status = fpu_status(uap_fpu_status(uap));
   uap_clear_fpu_status(uap);

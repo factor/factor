@@ -72,7 +72,7 @@ void factor_vm::call_fault_handler(exception_type_t exception,
                           (cell)handler);
 }
 
-static void call_fault_handler(mach_port_t thread, exception_type_t exception,
+static bool call_fault_handler(mach_port_t thread, exception_type_t exception,
                                exception_data_type_t code,
                                MACH_EXC_STATE_TYPE* exc_state,
                                MACH_THREAD_STATE_TYPE* thread_state,
@@ -80,23 +80,20 @@ static void call_fault_handler(mach_port_t thread, exception_type_t exception,
   // Look up the VM instance involved
   THREADHANDLE thread_id = pthread_from_mach_thread_np(thread);
   FACTOR_ASSERT(thread_id);
-  std::map<THREADHANDLE, factor_vm*>::const_iterator vm =
-      thread_vms.find(thread_id);
+  factor_vm* vm = thread_vm(thread_id);
+  if (!vm)
+    return false;
 
-  // Handle the exception
-  if (vm != thread_vms.end())
-    vm->second->call_fault_handler(exception, code, exc_state, thread_state,
-                                   float_state);
+  vm->call_fault_handler(exception, code, exc_state, thread_state,
+                         float_state);
+  return true;
 }
 
 // Handle an exception by invoking the user's fault handler and/or forwarding
 // the duty to the previously installed handlers.
-extern "C" kern_return_t catch_exception_raise(
-    mach_port_t exception_port, mach_port_t thread, mach_port_t task,
-    exception_type_t exception, exception_data_t code,
-    mach_msg_type_number_t code_count) {
-  (void) exception_port;
-  (void) code_count;
+static kern_return_t handle_exception(mach_port_t thread, mach_port_t task,
+                                      exception_type_t exception,
+                                      exception_data_t code) {
   // 10.6 likes to report exceptions from child processes too. Ignore those
   if (task != mach_task_self())
     return KERN_FAILURE;
@@ -145,8 +142,9 @@ extern "C" kern_return_t catch_exception_raise(
 
   // Modify registers so to have the thread resume executing the
   // fault handler
-  call_fault_handler(thread, exception, code[0], &exc_state, &thread_state,
-                     &float_state);
+  if (!call_fault_handler(thread, exception, code[0], &exc_state,
+                          &thread_state, &float_state))
+    return KERN_FAILURE;
 
   // Set the faulting thread's register contents..
   // See http://web.mit.edu/darwin/src/modules/xnu/osfmk/man/thread_set_state.html.
@@ -164,6 +162,18 @@ extern "C" kern_return_t catch_exception_raise(
   }
 
   return KERN_SUCCESS;
+}
+
+extern "C" kern_return_t catch_exception_raise(
+    mach_port_t exception_port, mach_port_t thread, mach_port_t task,
+    exception_type_t exception, exception_data_t code,
+    mach_msg_type_number_t code_count) {
+  (void) exception_port;
+  (void) code_count;
+  kern_return_t result = handle_exception(thread, task, exception, code);
+  mach_port_deallocate(mach_task_self(), thread);
+  mach_port_deallocate(mach_task_self(), task);
+  return result;
 }
 
 // The main function of the thread listening for exceptions.
