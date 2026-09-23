@@ -1131,6 +1131,7 @@ pub const FactorVM = struct {
             if (err == error.CodeTooLarge) {
                 const code_length = compiler.jit.code.items.len;
                 compiler.deinit();
+                self.initializeUninitializedBlocks();
                 self.codeLengthError(code_length);
             }
             std.debug.print("[jitCompileQuotationWithOwner] toCodeBlock FAILED: {} owner=0x{x} quot=0x{x}\n", .{ err, owner, quot_cell });
@@ -1184,6 +1185,16 @@ pub const FactorVM = struct {
             code_heap.writeBarrier(block) catch @panic("OOM");
             code_heap.updateScanFlags(self.allocator, block);
         }
+    }
+
+    pub fn initializeUninitializedBlocks(self: *Self) void {
+        const code_heap = self.code orelse return;
+        var iter = code_heap.uninitialized_blocks.iterator();
+        while (iter.next()) |entry| {
+            const block: *code_blocks_mod.CodeBlock = @ptrFromInt(entry.key_ptr.*);
+            self.initializeCodeBlock(block, entry.value_ptr.*);
+        }
+        code_heap.clearUninitializedBlocks();
     }
 
     pub fn initializeCodeBlockFromMap(self: *Self, block: *code_blocks_mod.CodeBlock) void {

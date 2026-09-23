@@ -40,6 +40,27 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
 
     if (count == 0) return;
 
+    for (0..count) |i| {
+        const alist: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_alist));
+        const pair_cell = alist.data()[i];
+        if (!layouts.hasTag(pair_cell, .array)) continue;
+        const pair: *const layouts.Array = @ptrFromInt(layouts.UNTAG(pair_cell));
+        if (layouts.untagFixnumUnsigned(pair.capacity) < 2) continue;
+        const definition = pair.data()[1];
+        switch (layouts.typeTag(definition)) {
+            .quotation => {},
+            .array => {
+                const compiled: *const layouts.Array = @ptrFromInt(layouts.UNTAG(definition));
+                if (layouts.untagFixnumUnsigned(compiled.capacity) < 5) continue;
+                const code_bytes = compiled.data()[4];
+                if (!layouts.hasTag(code_bytes, .byte_array)) continue;
+                const bytes: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes));
+                vm.checkCodeLength(layouts.untagFixnumUnsigned(bytes.capacity));
+            },
+            else => vm.typeError(.quotation, definition),
+        }
+    }
+
     // Process each (word, code) pair
     for (0..count) |i| {
         // CRITICAL: Re-derive alist from rooted_alist each iteration because
@@ -251,14 +272,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
         updateCodeHeapWords(vm, reset_inline_caches != layouts.false_object, &rooted_alist);
     }
     if (update_existing_words == layouts.false_object) {
-        if (vm.code) |code_heap| {
-            var iter = code_heap.uninitialized_blocks.iterator();
-            while (iter.next()) |entry| {
-                const block: *code_blocks.CodeBlock = @ptrFromInt(entry.key_ptr.*);
-                vm.initializeCodeBlock(block, entry.value_ptr.*);
-            }
-            code_heap.clearUninitializedBlocks();
-        }
+        vm.initializeUninitializedBlocks();
     }
 }
 
