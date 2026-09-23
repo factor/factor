@@ -706,6 +706,7 @@ pub export fn primitive_resize_string(vm_asm: *VMAssemblyFields) callconv(.c) vo
     if (in_nursery and aux_in_nursery and new_length <= old_length) {
         const str_mut: *layouts.String = @ptrFromInt(layouts.UNTAG(str_cell));
         str_mut.length = layouts.tagFixnum(@intCast(new_length));
+        str_mut.hashcode_field = layouts.false_object;
 
         if (has_aux) {
             const aux: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(str_mut.aux));
