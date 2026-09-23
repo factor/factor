@@ -1147,15 +1147,15 @@ M: repetition sum [ elt>> ] [ length>> ] bi * ; inline
 
 GENERIC: minimum ( seq -- elt )
 M: sequence minimum [ ] [ min ] map-reduce ; inline
-M: iota minimum drop 0 ; inline
+M: iota minimum first ; inline
 M: reversed minimum seq>> minimum ; inline
-M: repetition minimum elt>> ; inline
+M: repetition minimum first ; inline
 
 GENERIC: maximum ( seq -- elt )
 M: sequence maximum [ ] [ max ] map-reduce ; inline
-M: iota maximum n>> 1 - ; inline
+M: iota maximum last ; inline
 M: reversed maximum seq>> maximum ; inline
-M: repetition maximum elt>> ; inline
+M: repetition maximum first ; inline
 
 ALIAS: infimum minimum deprecated
 ALIAS: supremum maximum deprecated
