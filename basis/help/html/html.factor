@@ -280,8 +280,16 @@ M: pathname url-of
 : generate-help-file ( topic -- )
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
+: vocabs-beneath? ( prefix vocabs -- ? )
+    [ vocab-name ] dip [ vocab-name child-vocab? ] with any? ;
+
+: reject-empty-prefixes ( seq -- seq' )
+    dup no-prefixes '[
+        dup vocab-prefix? [ _ vocabs-beneath? ] [ drop t ] if
+    ] filter ;
+
 : all-vocabs-really ( -- seq )
-    all-disk-vocabs-recursive no-roots
+    all-disk-vocabs-recursive no-roots reject-empty-prefixes
     [ dup vocab-prefix? [ vocab-name >vocab-link ] when ] map members
     [ vocab-name "scratchpad" = ] reject ;
 

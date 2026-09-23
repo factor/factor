@@ -32,6 +32,11 @@ kernel math sequences tools.test vocabs ;
 
 { t } [ all-vocabs-really [ vocab-name "bootstrap" = ] any? ] unit-test
 
+{ f } [
+    all-vocabs-really
+    [ vocab-name "xml.tests.xmltest.valid.sa.out" = ] any?
+] unit-test
+
 { t } [
     [
         "bootstrap" >vocab-link generate-help-file
