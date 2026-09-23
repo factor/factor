@@ -75,10 +75,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
         const code_tag = layouts.typeTag(rooted_code);
 
         switch (code_tag) {
-            .quotation, .tuple => {
-                // Quotation or tuple (curry/compose) case: JIT compile and update
-                // QUOTATION_TYPE and TUPLE_TYPE (see issue #2763).
-
+            .quotation => {
                 // because quotation-compiled? depends on the identity of its code block.
                 // Without this, recompiling lazy-jit-compile changes the sentinel
                 // entry_point, causing all quotations with the OLD sentinel to appear
@@ -242,10 +239,7 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
                 const word_after: *layouts.Word = @ptrFromInt(layouts.UNTAG(rooted_word));
                 word_after.entry_point = block.entryPoint();
             },
-            else => {
-                vm.criticalError("Expected a quotation or an array", rooted_code);
-                return;
-            },
+            else => vm.typeError(.quotation, rooted_code),
         }
     }
 
