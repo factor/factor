@@ -5,11 +5,16 @@ game.input.scancodes kernel namespaces sequences tools.test
 ui.backend.input-state ;
 IN: game.input.gtk.tests
 
+SINGLETON: test-gtk-game-input-backend
+INSTANCE: test-gtk-game-input-backend gtk-game-input-backend
+
 ! Closing a consumer must not erase keys still held in the focused window.
 { t t } [
     clear-input-state 38 t record-key
-    [ read-keyboard keys>> key-a swap nth ] with-game-input
-    [ read-keyboard keys>> key-a swap nth ] with-game-input
+    test-gtk-game-input-backend game-input-backend [
+        [ read-keyboard keys>> key-a swap nth ] with-game-input
+        [ read-keyboard keys>> key-a swap nth ] with-game-input
+    ] with-variable
     clear-input-state
 ] unit-test
 
