@@ -274,3 +274,14 @@ CONSTANT: classic-proxy-settings H{
     <response> "br" "content-encoding" set-header
     B{ 1 2 3 } decode-response-body
 ] [ unsupported-content-encoding? ] must-fail-with
+
+{ "hello" } [
+    {
+        "HTTP/1.1 200 OK"
+        "content-type: text/plain; charset=UTF-8"
+        "content-encoding: gzip"
+        "content-encoding: identity"
+    } "\r\n" join [ read-response ] with-string-reader
+    B{ 31 139 8 0 0 0 0 0 0 255 203 72 205 201 201 7 0 134 166 16 54 5 0 0 0 }
+    decode-response-body nip
+] unit-test

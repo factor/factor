@@ -282,7 +282,7 @@ SYMBOL: request-socket
 :: decode-content-codings ( response bytes -- decoded )
     bytes
     response "content-encoding" header [
-        "," split reverse [
+        ",;" split reverse [
             [ blank? ] trim >lower {
                 { "" [ ] }
                 { "identity" [ ] }
