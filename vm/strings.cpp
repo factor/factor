@@ -66,6 +66,7 @@ string* factor_vm::reallot_string(string* str_, cell capacity) {
 
   if (reallot_string_in_place_p(str.untagged(), capacity)) {
     str->length = tag_fixnum(capacity);
+    str->hashcode = false_object;
 
     if (to_boolean(str->aux)) {
       byte_array* aux = untag<byte_array>(str->aux);

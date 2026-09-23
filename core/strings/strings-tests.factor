@@ -145,3 +145,5 @@ unit-test
 
 { } [ -1 0 "s" get set-nth ] unit-test
 { 0x7fffff } [ 0 "s" get nth ] unit-test
+
+{ t } [ "abcdef" clone dup hashcode drop 3 swap resize-string "abc" = ] unit-test
