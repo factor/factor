@@ -1,7 +1,10 @@
-USING: kernel sequences system tools.test windows.winsock ;
+USING: assocs kernel sequences system tools.test windows.winsock ;
 IN: windows.winsock.tests
 
-{ t } [ <wsadata> length cpu x86.32? 400 408 ? = ] unit-test
+{ t } [
+    <wsadata> length
+    { { x86.32 400 } { x86.64 408 } { arm.64 408 } } cpu of =
+] unit-test
 
 ! WSASend takes flags by value; an invalid socket exercises argument marshalling.
 { -1 } [ INVALID_SOCKET f 0 f 0 f f WSASend ] unit-test
