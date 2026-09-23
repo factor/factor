@@ -1,7 +1,8 @@
 USING: accessors alien alien.accessors alien.c-types alien.data
-alien.enums alien.libraries arrays assocs classes.struct continuations
-io.backend kernel layouts libclang libclang.ffi locals math
-namespaces sequences system tools.test vocabs words ;
+alien.enums alien.libraries alien.libraries.finder arrays assocs
+classes.struct continuations io.backend io.directories io.pathnames
+kernel layouts libclang libclang.ffi locals math namespaces sequences
+system tools.test vocabs words ;
 IN: libclang.ffi.tests
 
 SYMBOL: test-cursors
@@ -9,6 +10,17 @@ SYMBOL: test-cursors
 { t } [
     "libclang.ffi" vocab-words [ name>> "clang_" head? ] filter
     [ name>> "clang" dlsym? >boolean ] all?
+] unit-test
+
+{ t t } [
+    [
+        current-directory get latest-libclang "clang" find-library =
+        "llvm-9/lib" make-directories
+        "llvm-9/lib/libclang.so" touch-file
+        "llvm-18/lib" make-directories
+        current-directory get latest-libclang
+        "llvm-9/lib/libclang.so" absolute-path =
+    ] with-test-directory
 ] unit-test
 
 SYMBOL: visited-fields

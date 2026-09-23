@@ -1,8 +1,8 @@
 ! Copyright (C) 2023 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.libraries alien.syntax
-accessors classes.struct combinators io.directories io.pathnames kernel
-sequences sorting.human system vocabs words ;
+USING: alien alien.c-types alien.libraries alien.libraries.finder
+alien.syntax accessors classes.struct combinators io.directories io.files
+io.pathnames kernel sequences sorting.human system vocabs words ;
 IN: libclang.ffi
 
 LIBRARY: clang
@@ -10,16 +10,17 @@ LIBRARY: clang
 ! Enum values and function signatures checked against LLVM 21 clang-c headers.
 
 <<
-: latest-libclang ( -- path/f )
-    "/usr/lib/" ?qualified-directory-files
+: latest-libclang ( directory -- path )
+    ?qualified-directory-files
     [ file-name "llvm-" head? ] filter
-    human-sort <reversed> ?first ;
+    [ "lib/libclang.so" append-path ] map [ file-exists? ] filter
+    human-sort <reversed> ?first [ "clang" find-library ] unless* ;
 >>
 
 << "clang" {
     { [ os windows? ] [ "libclang.dll" ] }
     { [ os macos? ] [ "/Library/Developer/CommandLineTools/usr/lib/libclang.dylib" ] }
-    { [ os unix? ] [ latest-libclang "lib/libclang.so" append-path ] }
+    { [ os unix? ] [ "/usr/lib/" latest-libclang ] }
 } cond cdecl add-library >>
 
 CONSTANT: UINT_MAX 4294967295
