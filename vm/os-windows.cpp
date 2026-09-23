@@ -218,6 +218,9 @@ LONG factor_vm::exception_handler(PEXCEPTION_RECORD e, void* frame, PCONTEXT c,
                                   void* dispatch) {
   (void)frame;
   (void)dispatch;
+  if (e->ExceptionFlags &
+      (EXCEPTION_NONCONTINUABLE | EXCEPTION_UNWINDING | EXCEPTION_EXIT_UNWIND))
+    return ExceptionContinueSearch;
   switch (e->ExceptionCode) {
     case EXCEPTION_STACK_OVERFLOW:
       // Unlike access violations, stack overflows do not promise fault

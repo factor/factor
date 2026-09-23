@@ -265,6 +265,25 @@ static void test_thread_vm_registry() {
   check(thread_vms.empty(), "deleted VMs are still registered to their threads");
 }
 
+#ifdef WINDOWS
+static void test_windows_exceptions_the_handler_cannot_resume() {
+  test_vm vm;
+  init_mvm();
+  register_vm_with_thread(&vm);
+  for (DWORD flags : {(DWORD)EXCEPTION_NONCONTINUABLE, (DWORD)EXCEPTION_UNWINDING,
+                      (DWORD)EXCEPTION_EXIT_UNWIND}) {
+    EXCEPTION_RECORD record = {};
+    record.ExceptionCode = 0xe06d7363;
+    record.ExceptionFlags = flags;
+    CONTEXT context = {};
+    check(exception_handler(&record, NULL, &context, NULL) ==
+              ExceptionContinueSearch,
+          "Windows handler redirected an exception it cannot resume");
+  }
+  register_vm_with_thread(NULL);
+}
+#endif
+
 static void test_stack_frame_size_header() {
   code_block block;
   for (cell frame_size : {(cell)0xFF0, (cell)0x1000, (cell)0x1010,
@@ -341,6 +360,10 @@ int main(int argc, char** argv) {
 #if defined(FACTOR_AMD64) && !defined(WINDOWS)
   if (argc == 1 || strcmp(argv[1], "safepoint-reach") == 0)
     test_safepoint_page_reach();
+#endif
+#ifdef WINDOWS
+  if (argc == 1 || strcmp(argv[1], "windows-exceptions") == 0)
+    test_windows_exceptions_the_handler_cannot_resume();
 #endif
 #ifdef __APPLE__
   if (argc == 1 || strcmp(argv[1], "nano-count") == 0)
