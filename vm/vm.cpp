@@ -39,6 +39,7 @@ factor_vm::factor_vm(THREADHANDLE thread)
 }
 
 factor_vm::~factor_vm() {
+  unregister_thread_vm(this);
   free(alien_offset(special_objects[OBJ_EXECUTABLE]));
   free(alien_offset(special_objects[OBJ_IMAGE]));
   close_console();

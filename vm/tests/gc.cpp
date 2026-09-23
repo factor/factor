@@ -1,4 +1,6 @@
 #include "../master.hpp"
+#include <atomic>
+#include <thread>
 
 using namespace factor;
 
@@ -219,6 +221,29 @@ static void test_card_scan_after_dead_tenured_prefix() {
         "card scan lost the survivor's young referent");
 }
 
+static void test_thread_vm_registry() {
+  init_mvm();
+  const size_t count = 16;
+  std::atomic<bool> start(false);
+  std::vector<factor_vm*> vms(count);
+  std::vector<std::thread> threads;
+  for (size_t i = 0; i < count; i++)
+    threads.emplace_back([&, i]() {
+      while (!start) {}
+      vms[i] = new_factor_vm();
+    });
+  start = true;
+  for (std::thread& thread : threads)
+    thread.join();
+  check(thread_vms.size() == count, "concurrent VM registration lost an entry");
+  for (factor_vm* vm : vms) {
+    std::fill(vm->special_objects, vm->special_objects + special_object_count,
+              false_object);
+    delete vm;
+  }
+  check(thread_vms.empty(), "deleted VMs are still registered to their threads");
+}
+
 static void test_stack_frame_size_header() {
   code_block block;
   for (cell frame_size : {(cell)0xFF0, (cell)0x1000, (cell)0x1010,
@@ -290,5 +315,7 @@ int main(int argc, char** argv) {
     test_code_blocks_retry();
   if (argc == 1 || strcmp(argv[1], "card-scan") == 0)
     test_card_scan_after_dead_tenured_prefix();
+  if (argc == 1 || strcmp(argv[1], "thread-vms") == 0)
+    test_thread_vm_registry();
   std::cout << "GC tests passed" << std::endl;
 }

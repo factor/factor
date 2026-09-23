@@ -191,7 +191,7 @@ factor_vm* new_factor_vm() {
   THREADHANDLE thread = thread_id();
   factor_vm* newvm = new factor_vm(thread);
   register_vm_with_thread(newvm);
-  thread_vms[thread] = newvm;
+  register_thread_vm(thread, newvm);
 
   return newvm;
 }
