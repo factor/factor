@@ -2,7 +2,7 @@ USING: kernel windows.com windows.com.syntax windows.ole32
 windows.types alien alien.data alien.syntax tools.test libc
 alien.c-types namespaces arrays continuations accessors math
 windows.com.wrapper windows.com.wrapper.private destructors
-effects compiler.units ;
+effects compiler.units classes.struct ;
 USE: sequences
 FROM: windows.com.syntax.private => find-com-interface-definition ;
 IN: windows.com.tests
@@ -124,3 +124,43 @@ C: <test-implementation> test-implementation
 
 ! Ensure that we freed +guinea-pig-implementation
 +orig-wrapped-objects+ get-global 1array [ +wrapped-objects+ get-global ] unit-test
+
+{ 0 0 70000 } [
+    [
+        f 1 f void* <ref> [ CreateStreamOnHGlobal check-ole32-error ] keep void* deref
+        [| stream |
+            STATSTG malloc-struct &free :> stat
+            stream 70000 IStream::SetSize
+            stream stat 1 IStream::Stat
+            stat cbSize>>
+        ] with-com-interface
+    ] with-destructors
+] unit-test
+
+TUPLE: sized-stream size ;
+
+{ 0 0x123456789ABCDEF0 } [
+    [
+        {
+            { IStream {
+                [ 4drop E_NOTIMPL ]
+                [ 4drop E_NOTIMPL ]
+                [ 4drop E_NOTIMPL ]
+                [ >>size drop S_OK ]
+                [ 5drop E_NOTIMPL ]
+                [ 2drop E_NOTIMPL ]
+                [ drop E_NOTIMPL ]
+                [ 4drop E_NOTIMPL ]
+                [ 4drop E_NOTIMPL ]
+                [ 3drop E_NOTIMPL ]
+                [ 2drop E_NOTIMPL ]
+            } }
+        } <com-wrapper>
+    ] with-compilation-unit [| wrapper |
+        sized-stream new :> stream
+        stream wrapper com-wrap [
+            0x123456789ABCDEF0 IStream::SetSize
+        ] with-com-interface
+        stream size>>
+    ] with-disposal
+] unit-test
