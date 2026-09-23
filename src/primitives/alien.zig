@@ -121,17 +121,18 @@ pub export fn primitive_displaced_alien(vm_asm: *VMAssemblyFields) callconv(.c) 
     const tagged = vm.allotObject(.alien, @sizeOf(layouts.Alien)) orelse
         vm.memoryError();
     const new_alien: *layouts.Alien = @ptrFromInt(layouts.UNTAG(tagged));
-    new_alien.expired = layouts.false_object;
 
     // Use rooted_alien which may have been updated by GC
     if (layouts.hasTag(rooted_alien, .alien)) {
         const src_alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(rooted_alien));
         new_alien.base = src_alien.base;
+        new_alien.expired = src_alien.expired;
         // Negative offsets arrive as unsigned cells. Pointer arithmetic wraps
         // modulo the cell width, just as in the C++ VM.
         new_alien.displacement = src_alien.displacement +% displacement;
     } else {
         new_alien.base = rooted_alien;
+        new_alien.expired = layouts.false_object;
         new_alien.displacement = displacement;
     }
 
