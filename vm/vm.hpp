@@ -691,6 +691,7 @@ struct factor_vm {
   void handle_safepoint(cell pc);
   void enqueue_samples(cell sample_count, cell pc, bool foreign_thread_p);
   void enqueue_fep();
+  void disarm_safepoint_after_sample();
 
   // factor
   void prepare_boot_image();

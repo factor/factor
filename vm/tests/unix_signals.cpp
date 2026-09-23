@@ -1,4 +1,5 @@
 #include "../master.hpp"
+#include <setjmp.h>
 #include <sys/wait.h>
 
 using namespace factor;
@@ -177,6 +178,48 @@ static void test_waiting_shell_signals() {
   check(raise(SIGINT) == 0 && interrupts == 1, "restored handler did not run");
 }
 
+// Probe the safepoint page: true if touching it faults (the page is armed).
+static sigjmp_buf probe_env;
+static void probe_segv_handler(int, siginfo_t*, void*) {
+  siglongjmp(probe_env, 1);
+}
+
+static bool safepoint_armed(factor_vm& vm) {
+  install_handler(SIGSEGV, probe_segv_handler);
+  install_handler(SIGBUS, probe_segv_handler);
+  bool faulted = sigsetjmp(probe_env, 1) != 0;
+  if (!faulted)
+    *(volatile cell*)vm.code->safepoint_page = 0;
+  signal(SIGSEGV, SIG_DFL);
+  signal(SIGBUS, SIG_DFL);
+  return faulted;
+}
+
+// After a sample is recorded the safepoint is disarmed so the program makes
+// progress even when recording outlasts the timer interval. A debugger
+// interrupt that arrived meanwhile has armed the same page and must survive.
+static void test_disarm_safepoint_after_sample() {
+  test_vm vm;
+  vm.code = new code_heap(deck_size);
+  atomic::store(&vm.sampling_profiler_p, true);
+  vm.code->set_safepoint_guard(false);
+  check(!safepoint_armed(vm), "safepoint page starts disarmed");
+
+  // A timer tick during the sample re-armed the page: disarm it.
+  vm.enqueue_samples(1, 0, false);
+  check(safepoint_armed(vm), "enqueue_samples did not arm the safepoint");
+  vm.disarm_safepoint_after_sample();
+  check(!safepoint_armed(vm), "disarm kept the profiler's arming");
+
+  // Ctrl-C during the sample: the page must stay armed.
+  vm.enqueue_samples(1, 0, false);
+  vm.enqueue_fep();
+  vm.disarm_safepoint_after_sample();
+  check(safepoint_armed(vm), "disarm lost a pending debugger interrupt");
+  check(atomic::load(&vm.safepoint_fep_p), "disarm cleared safepoint_fep_p");
+  vm.code->set_safepoint_guard(false);
+}
+
 // Each test owns its process, handlers, timers, and descriptors. A regression
 // that crashes a signal handler must not prevent the other checks from running.
 static bool run_test(const char* name, void (*test)()) {
@@ -208,5 +251,6 @@ int main() {
   passed &= run_test("SIGALRM on a foreign thread without a VM", test_foreign_alarm_without_vm);
   passed &= run_test("foreign samples reach the active profiler", test_foreign_alarm_profiling);
   passed &= run_test("waiting shell signal suppression", test_waiting_shell_signals);
+  passed &= run_test("disarming after a sample keeps a debugger interrupt", test_disarm_safepoint_after_sample);
   return passed ? 0 : 1;
 }
