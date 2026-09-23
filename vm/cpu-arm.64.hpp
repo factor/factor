@@ -54,8 +54,6 @@ inline static bool tail_call_site_p(cell return_address) {
 
 static const unsigned JIT_FRAME_SIZE = 16;
 
-// Must match the stack frame built by the signal-handler sub-primitive in
-// basis/bootstrap/assembler/arm.64.factor
 static const unsigned SIGNAL_HANDLER_STACK_FRAME_SIZE = 288;
 
 static const unsigned FRAME_RETURN_ADDRESS = 8;
