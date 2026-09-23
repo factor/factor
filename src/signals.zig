@@ -396,8 +396,10 @@ const SiginfoType = std.posix.siginfo_t;
 
 // Memory signal handler (SIGSEGV, SIGBUS, SIGTRAP)
 // This handles both safepoint checks and actual memory errors
-fn memorySignalHandler(_: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
-    const vm = g_current_vm orelse std.process.abort();
+fn memorySignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
+    const vm = g_current_vm orelse {
+        fatalError("Foreign thread received signal", @intFromEnum(sig));
+    };
     const ucontext = ucontext_ptr orelse std.process.abort();
 
     // Get fault address - structure varies by platform
@@ -443,6 +445,36 @@ fn memorySignalHandler(_: std.posix.SIG, siginfo: *const SiginfoType, ucontext_p
     // Dispatch to signal handler
     const sp_ptr = getStackPointer(ucontext);
     dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&memory_signal_handler_impl));
+}
+
+fn faultWithoutVm() void {
+    const unmapped: *allowzero volatile u8 = @ptrFromInt(0);
+    unmapped.* = 0;
+}
+
+test "memory fault on a foreign thread without a VM is a fatal error" {
+    const pid = std.c.fork();
+    try std.testing.expect(pid >= 0);
+    if (pid == 0) {
+        const act = std.posix.Sigaction{
+            .handler = .{ .sigaction = memorySignalHandler },
+            .mask = std.posix.sigemptyset(),
+            .flags = std.posix.SA.SIGINFO,
+        };
+        sigactionInt(std.c.SIG.SEGV, &act, null);
+        sigactionInt(std.c.SIG.BUS, &act, null);
+        const dev_null = std.c.open("/dev/null", .{ .ACCMODE = .WRONLY });
+        _ = std.c.dup2(dev_null, std.posix.STDERR_FILENO);
+        _ = std.c.alarm(10);
+        const thread = std.Thread.spawn(.{}, faultWithoutVm, .{}) catch std.c._exit(2);
+        thread.join();
+        std.c._exit(0);
+    }
+    var status: c_int = 0;
+    try std.testing.expectEqual(pid, std.c.waitpid(pid, &status, 0));
+    const wait_status: u32 = @bitCast(status);
+    try std.testing.expect(std.posix.W.IFEXITED(wait_status));
+    try std.testing.expectEqual(@as(u8, 1), std.posix.W.EXITSTATUS(wait_status));
 }
 
 // Floating point exception handler (SIGFPE)
