@@ -1,5 +1,5 @@
-USING: arrays byte-arrays compiler compiler.units
-compiler.units.private continuations definitions eval fry
+USING: accessors arrays byte-arrays compiler compiler.units
+compiler.units.private continuations definitions eval fry generic
 kernel kernel.private literals math namespaces quotations sequences
 tools.test vocabs.loader words ;
 IN: compiler.units.tests
@@ -12,6 +12,28 @@ IN: compiler.units.tests
     "A" <uninterned-word> [ [ [ 1 ] dip ] 2array 1array t t modify-code-heap ] keep
     1 swap execute
 ] unit-test
+
+! A suspended compiler can install a snapshot after another unit rebuilds
+! a generic. The newer PICs must not expose its still-uncompiled engines.
+PREDICATE: positive-pic-number < integer 0 > ;
+GENERIC: pending-pic-test ( n -- n )
+M: object pending-pic-test drop 0 ;
+M: positive-pic-number pending-pic-test drop 1 ;
+
+: call-with-pending-pic ( quot -- n )
+    [
+        \ pending-pic-test make-generic
+        \ pending-pic-test "engines" word-prop
+        \ pending-pic-test prefix recompile
+        \ pending-pic-test make-generic
+        t t modify-code-heap
+        [ [ ( n -- n ) define-temp ] with-compilation-unit ] without-optimizer
+        3 swap execute( n -- n )
+    ] with-compilation-unit ;
+
+! Exercise both the tail and non-tail inline-cache entry points.
+{ 1 } [ [ pending-pic-test ] call-with-pending-pic ] unit-test
+{ 2 } [ [ pending-pic-test 1 + ] call-with-pending-pic ] unit-test
 
 [
     "A" <uninterned-word> 5 [ 1 + ] curry 2array 1array t t modify-code-heap

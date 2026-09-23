@@ -18,10 +18,16 @@ void factor_vm::jit_compile_word(cell word_, cell def_, bool relocating) {
       jit_compile_quotation(word.value(), def.value(), relocating);
   word->entry_point = compiled->entry_point();
 
-  if (to_boolean(word->pic_def))
-    jit_compile_quotation(word->pic_def, relocating);
-  if (to_boolean(word->pic_tail_def))
-    jit_compile_quotation(word->pic_tail_def, relocating);
+  // Compilation can yield while another unit rebuilds this generic. Its
+  // current PIC definitions can then refer to predicate engines that are
+  // not part of the batch being installed. Only compile PICs belonging to
+  // this definition; uncompiled PICs fall back to the installed word body.
+  if (def.value() == word->def) {
+    if (to_boolean(word->pic_def))
+      jit_compile_quotation(word->pic_def, relocating);
+    if (to_boolean(word->pic_tail_def))
+      jit_compile_quotation(word->pic_tail_def, relocating);
+  }
 }
 
 // Allocates memory
