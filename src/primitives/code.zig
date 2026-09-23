@@ -669,6 +669,7 @@ pub export fn primitive_jit_compile(vm_asm: *VMAssemblyFields) callconv(.c) void
     const vm = vm_asm.getVM();
     // ( quot -- )
     const quot_cell = vm.pop();
+    vm.checkTag(quot_cell, .quotation);
     vm.jitCompileQuotation(quot_cell, true);
 }
 
