@@ -479,7 +479,9 @@ test "memory fault on a foreign thread without a VM is a fatal error" {
 
 // Floating point exception handler (SIGFPE)
 fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_ptr: ?*anyopaque) callconv(.c) void {
-    const vm = g_current_vm orelse abort();
+    const vm = g_current_vm orelse {
+        fatalError("Foreign thread received signal", @intFromEnum(sig));
+    };
     const ucontext = ucontext_ptr orelse abort();
 
     vm.signal_number = @intFromEnum(sig);
@@ -499,6 +501,32 @@ fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_pt
         @intFromPtr(&fp_signal_handler_impl);
 
     dispatchSignal(vm, sp_ptr, pc_ptr, handler);
+}
+
+fn raiseFpeWithoutVm() void {
+    _ = std.c.raise(.FPE);
+}
+
+test "SIGFPE on a foreign thread without a VM is a fatal error" {
+    const pid = std.c.fork();
+    try std.testing.expect(pid >= 0);
+    if (pid == 0) {
+        const act = std.posix.Sigaction{
+            .handler = .{ .sigaction = fpeSignalHandler },
+            .mask = std.posix.sigemptyset(),
+            .flags = std.posix.SA.SIGINFO,
+        };
+        sigactionInt(std.c.SIG.FPE, &act, null);
+        const dev_null = std.c.open("/dev/null", .{ .ACCMODE = .WRONLY });
+        _ = std.c.dup2(dev_null, std.posix.STDERR_FILENO);
+        _ = std.c.alarm(10);
+        const thread = std.Thread.spawn(.{}, raiseFpeWithoutVm, .{}) catch std.c._exit(2);
+        thread.join();
+        std.c._exit(0);
+    }
+    const status = try waitForChild(pid);
+    try std.testing.expect(std.posix.W.IFEXITED(status));
+    try std.testing.expectEqual(@as(u8, 1), std.posix.W.EXITSTATUS(status));
 }
 
 // Synchronous signal handler (SIGILL, etc.)
