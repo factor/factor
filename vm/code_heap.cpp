@@ -187,6 +187,24 @@ void factor_vm::primitive_modify_code_heap() {
   if (count == 0)
     return;
 
+  for (cell i = 0; i < count; i++) {
+    array* pair = untag<array>(array_nth(alist.untagged(), i));
+    tagged<object> definition(array_nth(pair, 1));
+    switch (definition.type()) {
+      case QUOTATION_TYPE:
+        break;
+      case ARRAY_TYPE: {
+        cell instructions = array_nth(definition.as<array>().untagged(), 4);
+        cell code_length = array_capacity(untag<byte_array>(instructions));
+        if (code_length > code_length_max)
+          code_length_error(code_length);
+      } break;
+      default:
+        type_error(QUOTATION_TYPE, definition.value());
+        break;
+    }
+  }
+
   // Compiles and patches many blocks; hold one writable region across the
   // whole unit so the per-block funnel scopes below are flip-free no-ops.
   jit_writable_scope jit_writable;
@@ -234,10 +252,7 @@ void factor_vm::primitive_modify_code_heap() {
     update_code_heap_words(reset_inline_caches, &redefined_words);
   } else {
     // Fast path for compilation units that only define new words.
-    FACTOR_FOR_EACH(code->uninitialized_blocks) {
-      initialize_code_block(iter->first, iter->second);
-    }
-    code->uninitialized_blocks.clear();
+    initialize_uninitialized_code_blocks();
   }
   FACTOR_ASSERT(code->uninitialized_blocks.size() == 0);
 }

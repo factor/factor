@@ -581,6 +581,8 @@ struct factor_vm {
   code_block* add_code_block(code_block_type type, cell code_, cell labels_,
                              cell owner_, cell relocation_, cell parameters_,
                              cell literals_, cell frame_size_untagged);
+  void code_length_error(cell code_length);
+  void initialize_uninitialized_code_blocks();
 
   //code heap
   template <typename Iterator> void each_code_block(Iterator& iter) {

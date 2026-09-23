@@ -1,5 +1,5 @@
-USING: arrays compiler compiler.units compiler.units.private
-continuations definitions eval fry
+USING: arrays byte-arrays compiler compiler.units
+compiler.units.private continuations definitions eval fry
 kernel kernel.private literals math namespaces quotations sequences
 tools.test vocabs.loader words ;
 IN: compiler.units.tests
@@ -16,6 +16,27 @@ IN: compiler.units.tests
 [
     "A" <uninterned-word> 5 [ 1 + ] curry 2array 1array t t modify-code-heap
 ] [ 2 head ${ KERNEL-ERROR ERROR-TYPE } = ] must-fail-with
+
+: redefine-and-fail ( word definition -- )
+    [ [ 43 ] 2array ] [ "B" <uninterned-word> swap 2array ] bi* 2array
+    t t modify-code-heap ;
+
+: call-after-failed-batch ( definition -- x )
+    [ [ 42 ] ( -- x ) define-temp ] with-compilation-unit
+    [ swap [ redefine-and-fail ] [ 3drop ] recover ] keep
+    execute( -- x ) ;
+
+{ 42 } [ 5 [ 1 + ] curry call-after-failed-batch ] unit-test
+
+{ 42 } [
+    { { } { } B{ } f } 16777200 <byte-array> suffix 0 suffix
+    call-after-failed-batch
+] unit-test
+
+{ 43 } [
+    1500000 [ 1 \ drop 2array ] replicate concat >quotation
+    call-after-failed-batch
+] unit-test
 
 { "A" "B" } [
     disable-optimizer

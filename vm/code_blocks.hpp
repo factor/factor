@@ -102,6 +102,8 @@ struct code_block {
   cell owner_quot() const;
 };
 
+static const cell code_length_max = code_block_size_max - sizeof(code_block);
+
 VM_C_API void undefined_symbol(void);
 
 inline code_block* word::code() const {

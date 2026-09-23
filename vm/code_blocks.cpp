@@ -363,6 +363,18 @@ void factor_vm::fixup_labels(array* labels, code_block* compiled) {
   }
 }
 
+void factor_vm::code_length_error(cell code_length) {
+  general_error(ERROR_ARRAY_SIZE, tag_fixnum(code_length),
+                tag_fixnum(code_length_max + 1));
+}
+
+void factor_vm::initialize_uninitialized_code_blocks() {
+  FACTOR_FOR_EACH(code->uninitialized_blocks) {
+    initialize_code_block(iter->first, iter->second);
+  }
+  code->uninitialized_blocks.clear();
+}
+
 // Might GC
 // Allocates memory
 code_block* factor_vm::add_code_block(code_block_type type, cell code_,
@@ -378,10 +390,10 @@ code_block* factor_vm::add_code_block(code_block_type type, cell code_,
   data_root<array> literals(literals_, this);
 
   cell code_length = array_capacity(instructions.untagged());
-  cell code_length_max = code_block_size_max - sizeof(code_block);
-  if (code_length > code_length_max)
-    general_error(ERROR_ARRAY_SIZE, tag_fixnum(code_length),
-                  tag_fixnum(code_length_max + 1));
+  if (code_length > code_length_max) {
+    initialize_uninitialized_code_blocks();
+    code_length_error(code_length);
+  }
 
   // Everything below writes into the MAP_JIT code heap: allot_code_block writes
   // the block header (and may run a compacting GC, which flips for itself and
