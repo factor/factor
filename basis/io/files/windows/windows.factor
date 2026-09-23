@@ -213,7 +213,7 @@ M: windows (wait-to-read)
     [ dupd wait-for-port (wait-to-read) ] [ drop ] if* ;
 
 : make-fd-set ( socket -- fd_set )
-    fd_set new swap 1array void* >c-array >>fd_array 1 >>fd_count ;
+    fd_set new [ fd_array>> 0 swap set-nth ] keep 1 >>fd_count ;
 
 : select-sets ( socket event -- read-fds write-fds except-fds )
     [ make-fd-set ] dip +input+ = [ f f ] [ f swap f ] if ;
