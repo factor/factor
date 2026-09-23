@@ -261,6 +261,8 @@ pub const FactorVM = struct {
     current_gc: ?*GCState,
     current_gc_p: bool,
     current_jit_count: Fixnum,
+    jit_code_spare: std.ArrayList(u8),
+    jit_relocation_spare: std.ArrayList(u8),
     gc_events: ?*std.ArrayList(GCEvent),
     gc: ?*gc.GarbageCollector,
     data_roots: DataRootStack,
@@ -329,6 +331,8 @@ pub const FactorVM = struct {
             .current_gc = null,
             .current_gc_p = false,
             .current_jit_count = 0,
+            .jit_code_spare = .empty,
+            .jit_relocation_spare = .empty,
             .gc_events = null,
             .gc = null, // Initialized later when data heap is ready
             .data_roots = .empty,
@@ -386,6 +390,8 @@ pub const FactorVM = struct {
         self.data_roots.deinit(self.allocator);
         self.code_roots.deinit(self.allocator);
         self.callback_ids.deinit(self.allocator);
+        self.jit_code_spare.deinit(self.allocator);
+        self.jit_relocation_spare.deinit(self.allocator);
 
         if (self.data == null) {
             if (self.cards_array) |cards| {

@@ -237,6 +237,39 @@ fn patchRelativeJump(code_buffer: []u8, patch_offset: usize, target_pos: usize) 
     }
 }
 
+fn keepLargerBuffer(allocator: std.mem.Allocator, spare: *std.ArrayList(u8), buffer: *std.ArrayList(u8)) void {
+    if (buffer.capacity > spare.capacity) std.mem.swap(std.ArrayList(u8), spare, buffer);
+    buffer.deinit(allocator);
+    buffer.* = .empty;
+    spare.clearRetainingCapacity();
+}
+
+test "JIT buffers keep the larger allocation for reuse" {
+    const allocator = std.testing.allocator;
+    var spare: std.ArrayList(u8) = .empty;
+    defer spare.deinit(allocator);
+
+    var small: std.ArrayList(u8) = .empty;
+    try small.appendNTimes(allocator, 1, 16);
+    keepLargerBuffer(allocator, &spare, &small);
+    try std.testing.expect(spare.capacity >= 16);
+    try std.testing.expectEqual(@as(usize, 0), spare.items.len);
+
+    var large: std.ArrayList(u8) = .empty;
+    try large.appendNTimes(allocator, 2, 4096);
+    const large_ptr = large.items.ptr;
+    keepLargerBuffer(allocator, &spare, &large);
+    try std.testing.expectEqual(large_ptr, spare.items.ptr);
+    try std.testing.expectEqual(@as(usize, 0), spare.items.len);
+
+    var reused = spare;
+    spare = .empty;
+    try reused.appendNTimes(allocator, 3, 4096);
+    try std.testing.expectEqual(large_ptr, reused.items.ptr);
+    keepLargerBuffer(allocator, &spare, &reused);
+    try std.testing.expectEqual(large_ptr, spare.items.ptr);
+}
+
 // Base JIT compiler
 pub const Jit = struct {
     vm: *FactorVM,
@@ -279,11 +312,16 @@ pub const Jit = struct {
         // NOTE: We do NOT register the owner as a GC root here because in Zig,
         // returning Self by value copies the struct. The caller MUST call
         // registerRoot() after the struct is in its final location.
+        const code = vm.jit_code_spare;
+        vm.jit_code_spare = .empty;
+        const relocation = vm.jit_relocation_spare;
+        vm.jit_relocation_spare = .empty;
+
         return Self{
             .vm = vm,
             .owner = owner,
-            .code = .empty,
-            .relocation = .empty,
+            .code = code,
+            .relocation = relocation,
             .parameters = parameters,
             .literals = literals,
             .label_manager = LabelManager.init(vm.allocator),
@@ -307,8 +345,8 @@ pub const Jit = struct {
         _ = self.vm.data_roots.pop();
         _ = self.vm.data_roots.pop();
 
-        self.code.deinit(self.vm.allocator);
-        self.relocation.deinit(self.vm.allocator);
+        keepLargerBuffer(self.vm.allocator, &self.vm.jit_code_spare, &self.code);
+        keepLargerBuffer(self.vm.allocator, &self.vm.jit_relocation_spare, &self.relocation);
         self.label_manager.deinit();
 
         std.debug.assert(self.vm.current_jit_count >= 1);
