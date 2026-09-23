@@ -178,7 +178,8 @@ void factor::factor_vm::c_to_factor(cell) {
                              PAGE_READWRITE);
   check(stack != NULL, "VirtualAlloc failed");
   segment callstack_seg = {(cell)stack, (cell)stack + stack_size};
-  context ctx = {&callstack_seg};
+  context entry_ctx = {&callstack_seg};
+  context* ctx = &entry_ctx;
   DWORD entry_fault[] = {
     0x910003e9, // mov x9, sp
     0x9100003f, // mov sp, x1
@@ -194,7 +195,7 @@ void factor::factor_vm::c_to_factor(cell) {
   PVOID stack_limit = tib->StackLimit;
   tib->StackBase = (PVOID)callstack_seg.end;
   tib->StackLimit = (PVOID)callstack_seg.start;
-  ((void (*)(void*, cell))entry_start)(NULL, CALLSTACK_BOTTOM(&ctx) + 16);
+  ((void (*)(void*, cell))entry_start)(NULL, CALLSTACK_BOTTOM(ctx) + 16);
   tib->StackBase = stack_base;
   tib->StackLimit = stack_limit;
   check(handled_faults == 8, "Fault at the callback entry SP missed the handler");
