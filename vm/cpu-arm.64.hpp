@@ -2,7 +2,13 @@ namespace factor {
 
 #define FACTOR_CPU_STRING "arm.64"
 
+// Windows' handler-only unwind adds 16 to the callback entry SP. Keep the
+// resulting frame strictly below StackBase.
+#if defined(WINDOWS)
+#define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - 48)
+#else
 #define CALLSTACK_BOTTOM(ctx) (ctx->callstack_seg->end - 32)
+#endif
 
 inline static unsigned int call_site_opcode(cell return_address) {
   return *(unsigned int*)(return_address - 4);

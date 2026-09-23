@@ -11,6 +11,7 @@
 
 #if defined(_M_ARM64) || defined(__aarch64__)
 #define __FACTOR_MASTER_H__
+#define WINDOWS
 #define FACTOR_ASSERT assert
 namespace factor {
 typedef uintptr_t cell;
@@ -190,6 +191,24 @@ void factor::factor_vm::c_to_factor(cell) {
   cell entry_start = start + 512;
   memcpy((void*)entry_start, entry_fault, sizeof(entry_fault));
   flush_icache(entry_start, sizeof(entry_fault));
+  // Windows rejects an establisher frame equal to StackBase. Check the
+  // virtual caller before dispatching a fault on the callback stack.
+  DWORD64 entry_base = 0;
+  PRUNTIME_FUNCTION entry_function =
+      RtlLookupFunctionEntry(entry_start + 8, &entry_base, NULL);
+  check(entry_function != NULL, "Callback entry has no unwind entry");
+  CONTEXT entry_context = {};
+  entry_context.Sp = CALLSTACK_BOTTOM(ctx) + 16;
+  entry_context.Lr = entry_start + 12;
+  entry_context.Pc = entry_start + 8;
+  PVOID entry_handler_data = NULL;
+  DWORD64 entry_frame = 0;
+  PEXCEPTION_ROUTINE entry_handler = RtlVirtualUnwind(
+      UNW_FLAG_EHANDLER, entry_base, entry_context.Pc, entry_function,
+      &entry_context, &entry_handler_data, &entry_frame, NULL);
+  check(entry_handler != NULL, "Callback entry lost exception handler");
+  check(entry_frame >= callstack_seg.start && entry_frame < callstack_seg.end,
+        "Callback entry unwind frame must be strictly below StackBase");
   NT_TIB* tib = (NT_TIB*)NtCurrentTeb();
   PVOID stack_base = tib->StackBase;
   PVOID stack_limit = tib->StackLimit;
