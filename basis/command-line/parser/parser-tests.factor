@@ -418,3 +418,22 @@ TUPLE: foo ;
         }
     } { { "--no-cache" } { "--no-skip-cache" } } [ (parse-options) ] with map
 ] unit-test
+
+[
+    {
+        T{ option { name "--host" } }
+        T{ option { name "--server" } { aliases { "--host" } } }
+    } { } (parse-options)
+] [ duplicate-option-name? ] must-fail-with
+
+[
+    { T{ option { name "--hint" } { aliases { "--help" } } { const t } } }
+    { } (parse-options)
+] [ duplicate-option-name? ] must-fail-with
+
+{ H{ { "hint" t } } } [
+    f default-help? [
+        { T{ option { name "--hint" } { aliases { "--help" } } { const t } } }
+        { "--help" } (parse-options)
+    ] with-variable
+] unit-test

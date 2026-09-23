@@ -111,6 +111,14 @@ M: cannot-convert-value error.
     "Unable to convert value '" write dup str>> write
     "' with converter '" write converter>> pprint "'" print ;
 
+ERROR: duplicate-option-name name options ;
+
+M: duplicate-option-name error.
+    "The option name '" write dup name>> write
+    "' is used by more than one option (" write
+    options>> [ ", " write ] [ option-name write ] interleave
+    ")" print ;
+
 : argconvert ( str/f converter -- val )
     dup quotation? [ call( str -- val ) ] [
         {
@@ -241,6 +249,13 @@ M: usage-error error. options>> print-help ;
 : exact-option ( name options -- option/f )
     [ option-names member? ] with find nip ;
 
+:: check-option-names ( options -- options )
+    options [ optional? ] filter :> optional
+    optional [ option-names ] map concat duplicates [
+        first dup optional [ option-names member? ] with filter
+        duplicate-option-name
+    ] unless-empty options ;
+
 :: find-option ( arg options -- option )
     arg options exact-option [
         allow-abbrev? get [
@@ -298,7 +313,7 @@ M: usage-error error. options>> print-help ;
     ] until drop nip ;
 
 : parse-arguments ( options command-line -- arguments )
-    [ dup [ optional? ] partition ] dip { "--" } split1
+    [ check-option-names dup [ optional? ] partition ] dip { "--" } split1
     [ (parse-arguments) f swap ] dip (parse-arguments)
     [ #args>> { "*" "?" } member? ] reject
     [ required-options ] unless-empty
