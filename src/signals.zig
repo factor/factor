@@ -876,6 +876,7 @@ pub fn generalError(vm: *vm_mod.FactorVM, error_type: VMError, arg1: Cell, arg2:
         // Clear data roots (we're about to unwind, so root references become invalid)
         vm.data_roots.clearRetainingCapacity();
         vm.code_roots.clearRetainingCapacity();
+        vm.current_jit_count = 0;
 
         // Re-read error handler quotation from special_objects in case GC moved it
         // (allotUninitializedArray above can trigger GC which updates special_objects)
