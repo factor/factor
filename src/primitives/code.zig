@@ -43,17 +43,34 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     for (0..count) |i| {
         const alist: *const layouts.Array = @ptrFromInt(layouts.UNTAG(rooted_alist));
         const pair_cell = alist.data()[i];
-        if (!layouts.hasTag(pair_cell, .array)) continue;
+        if (!layouts.hasTag(pair_cell, .array)) {
+            vm.criticalError("modify_code_heap: expected pair array", pair_cell);
+            return;
+        }
         const pair: *const layouts.Array = @ptrFromInt(layouts.UNTAG(pair_cell));
-        if (layouts.untagFixnumUnsigned(pair.capacity) < 2) continue;
+        if (layouts.untagFixnumUnsigned(pair.capacity) < 2) {
+            vm.criticalError("modify_code_heap: pair must have word and payload", pair_cell);
+            return;
+        }
+        const word = pair.data()[0];
+        if (!layouts.hasTag(word, .word)) {
+            vm.criticalError("modify_code_heap: expected word", word);
+            return;
+        }
         const definition = pair.data()[1];
         switch (layouts.typeTag(definition)) {
             .quotation => {},
             .array => {
                 const compiled: *const layouts.Array = @ptrFromInt(layouts.UNTAG(definition));
-                if (layouts.untagFixnumUnsigned(compiled.capacity) < 5) continue;
+                if (layouts.untagFixnumUnsigned(compiled.capacity) < 6) {
+                    vm.criticalError("modify_code_heap: optimized code payload too small", definition);
+                    return;
+                }
                 const code_bytes = compiled.data()[4];
-                if (!layouts.hasTag(code_bytes, .byte_array)) continue;
+                if (!layouts.hasTag(code_bytes, .byte_array)) {
+                    vm.criticalError("modify_code_heap: expected code bytes byte-array", code_bytes);
+                    return;
+                }
                 const bytes: *const layouts.ByteArray = @ptrFromInt(layouts.UNTAG(code_bytes));
                 vm.checkCodeLength(layouts.untagFixnumUnsigned(bytes.capacity));
             },
@@ -273,6 +290,101 @@ pub export fn primitive_modify_code_heap(vm_asm: *VMAssemblyFields) callconv(.c)
     }
     if (update_existing_words == layouts.false_object) {
         vm.initializeUninitializedBlocks();
+    }
+}
+
+const MalformedEntry = enum { pair, short_pair, word, short_payload, code_bytes };
+
+var modified_word: Cell = layouts.false_object;
+
+extern "c" fn atexit(function: *const fn () callconv(.c) void) c_int;
+
+fn exitWithModifiedWordStatus() callconv(.c) void {
+    const word: *const layouts.Word = @ptrFromInt(layouts.UNTAG(modified_word));
+    std.c._exit(if (word.entry_point == 0) 0 else 3);
+}
+
+fn testArray(vm: *FactorVM, cells: []const Cell) !Cell {
+    const array_cell = vm.allotUninitializedArray(cells.len) orelse return error.OutOfMemory;
+    const array: *layouts.Array = @ptrFromInt(layouts.UNTAG(array_cell));
+    @memcpy(array.data()[0..cells.len], cells);
+    return array_cell;
+}
+
+fn modifyCodeHeapWithMalformedEntry(malformed: MalformedEntry) !void {
+    const data_heap = @import("../data_heap.zig");
+    const free_list = @import("../free_list.zig");
+    const segments = @import("../segments.zig");
+    const write_barrier = @import("../write_barrier.zig");
+    const allocator = std.testing.allocator;
+    const f = layouts.false_object;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    vm.fep_disabled = true;
+    vm.setDataHeap(try data_heap.DataHeap.init(allocator, 4096, 4096, 4096));
+    var segment = try segments.Segment.init(segments.page_size, false);
+    var code_allocator = free_list.FreeListAllocator.init(allocator, segment.start, segment.size);
+    var code_heap = vm_mod.CodeHeap{
+        .seg = &segment,
+        .safepoint_page = 0,
+        .code_start = segment.start,
+        .code_size = segment.size,
+        .allocator = allocator,
+        .free_list = &code_allocator,
+        .remembered_sets = write_barrier.CodeHeapRememberedSets.init(allocator),
+    };
+    vm.code = &code_heap;
+    try code_heap.ensureMarks(allocator);
+
+    const word_cell = vm.allotObject(.word, @sizeOf(layouts.Word)) orelse return error.OutOfMemory;
+    const word: *layouts.Word = @ptrFromInt(layouts.UNTAG(word_cell));
+    word.* = .{
+        .header = @as(Cell, @intFromEnum(layouts.TypeTag.word)) << 2,
+        .hashcode_field = layouts.tagFixnum(0),
+        .name = f,
+        .vocabulary = f,
+        .def = f,
+        .props = f,
+        .pic_def = f,
+        .pic_tail_def = f,
+        .subprimitive = f,
+        .entry_point = 0,
+    };
+    const code_bytes = vm.allotByteArray(16);
+    const compiled = try testArray(vm, &.{ f, f, f, f, code_bytes, layouts.tagFixnum(0) });
+    const malformed_pair = switch (malformed) {
+        .pair => f,
+        .short_pair => try testArray(vm, &.{word_cell}),
+        .word => try testArray(vm, &.{ f, compiled }),
+        .short_payload => try testArray(vm, &.{ word_cell, try testArray(vm, &.{ f, f, f, f, code_bytes }) }),
+        .code_bytes => try testArray(vm, &.{ word_cell, try testArray(vm, &.{ f, f, f, f, f, layouts.tagFixnum(0) }) }),
+    };
+    vm.push(try testArray(vm, &.{ try testArray(vm, &.{ word_cell, compiled }), malformed_pair }));
+    vm.push(f);
+    vm.push(f);
+
+    modified_word = word_cell;
+    _ = atexit(exitWithModifiedWordStatus);
+    primitive_modify_code_heap(&vm.vm_asm);
+}
+
+test "modify_code_heap rejects a malformed entry before changing any word" {
+    for (std.enums.values(MalformedEntry)) |malformed| {
+        const pid = std.c.fork();
+        try std.testing.expect(pid >= 0);
+        if (pid == 0) {
+            const dev_null = std.c.open("/dev/null", .{ .ACCMODE = .WRONLY });
+            _ = std.c.dup2(dev_null, std.posix.STDERR_FILENO);
+            _ = std.c.alarm(10);
+            modifyCodeHeapWithMalformedEntry(malformed) catch std.c._exit(2);
+            std.c._exit(4);
+        }
+        var status: c_int = 0;
+        try std.testing.expectEqual(pid, std.c.waitpid(pid, &status, 0));
+        const wait_status: u32 = @bitCast(status);
+        try std.testing.expect(std.posix.W.IFEXITED(wait_status));
+        try std.testing.expectEqual(@as(u8, 0), std.posix.W.EXITSTATUS(wait_status));
     }
 }
 
