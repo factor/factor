@@ -1,25 +1,26 @@
 ! Copyright (C) 2008, 2009 Joe Groff, Slava Pestov.
 ! Copyright (C) 2017-2018 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors classes.struct kernel
+USING: accessors alien.accessors classes.struct kernel continuations locals
 namespaces sequences ui.backend.windows ui.gadgets.worlds
 ui.gestures windows.com windows.com.wrapper windows.dropfiles
 windows.kernel32 windows.ole32 windows.user32 ;
 IN: windows.dragdrop-listener
 
-: handle-data-object ( handler:  ( hdrop -- x ) data-object -- filenames )
+:: handle-data-object ( handler: ( hdrop -- x ) data-object -- filenames )
     FORMATETC new
         CF_HDROP         >>cfFormat
         f                >>ptd
         DVASPECT_CONTENT >>dwAspect
         -1               >>lindex
         TYMED_HGLOBAL    >>tymed
-    STGMEDIUM new
-    [ IDataObject::GetData ] 1check succeeded? [
-        dup data>>
-        [ rot execute( hdrop -- x ) ] with-global-lock
-        swap ReleaseStgMedium
-    ] [ 2drop f ] if ;
+    :> format
+    STGMEDIUM new :> medium
+    data-object format medium IDataObject::GetData succeeded? [
+        ! DragQueryFile takes the HGLOBAL/HDROP itself, not its locked address.
+        [ medium data>> handler execute( hdrop -- x ) ]
+        [ medium ReleaseStgMedium ] finally
+    ] [ f ] if ;
 
 : filenames-from-data-object ( data-object -- filenames )
     \ filenames-from-hdrop swap handle-data-object ;

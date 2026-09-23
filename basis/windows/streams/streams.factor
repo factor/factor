@@ -1,6 +1,6 @@
 USING: accessors alien.c-types alien.data classes.struct
-combinators continuations io kernel libc literals locals
-sequences specialized-arrays windows.com memoize
+combinators continuations destructors io kernel libc literals locals
+sequences specialized-arrays windows.com memoize math math.order
 windows.com.wrapper windows.kernel32 windows.ole32
 windows.types ;
 IN: windows.streams
@@ -50,15 +50,32 @@ SPECIALIZED-ARRAY: uchar
 
 :: IStream-copy-to ( stream other-stream cb out-read out-written -- hresult )
     [
-        cb stream stream-read :> buf
-        buf length :> bytes
-        out-read [ bytes out-read 0 ULONG set-alien-value ] when
-
-        other-stream buf bytes out-written IStream::Write
+        0 :> read-total!
+        0 :> written-total!
+        S_OK :> status!
+        f :> eof!
+        [ read-total cb < eof not and status succeeded? and ] [
+            cb read-total - 65536 min stream stream-read :> buf
+            buf length :> count
+            read-total count + read-total!
+            count zero? [ t eof! ] [
+                [
+                    0 ULONG <ref> malloc-byte-array &free :> written
+                    buf malloc-byte-array &free :> buffer
+                    other-stream buffer count written IStream::Write status!
+                    written ULONG deref :> actual
+                    written-total actual + written-total!
+                    status succeeded? actual count = not and [ E_FAIL status! ] when
+                ] with-destructors
+            ] if
+        ] while
+        out-read [ read-total out-read 0 ULARGE_INTEGER set-alien-value ] when
+        out-written [ written-total out-written 0 ULARGE_INTEGER set-alien-value ] when
+        status
     ] with-hresult ; inline
 
 :: IStream-commit ( stream flags -- hresult )
-    stream stream-flush S_OK ;
+    [ stream stream-flush S_OK ] with-hresult ;
 
 :: IStream-revert ( stream -- hresult )
     STG_E_INVALIDFUNCTION ;

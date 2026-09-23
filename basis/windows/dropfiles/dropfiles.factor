@@ -1,7 +1,7 @@
 ! Copyright (C) 2017-2018 Alexander Ilin.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.data alien.libraries alien.strings
-init io.encodings.utf16 kernel literals math namespaces
+init io.encodings.utf16 kernel literals math namespaces continuations locals
 sequences ui.backend.windows ui.gadgets.worlds
 ui.gestures windows.errors windows.messages windows.shell32
 windows.types windows.user32 ;
@@ -22,8 +22,10 @@ IN: windows.dropfiles
 ! : point-from-hdrop ( hdrop -- loc )
 !    POINT new [ DragQueryPoint drop ] keep [ x>> ] [ y>> ] bi 2array ;
 
-: handle-wm-dropfiles ( hdrop -- )
-    <alien> [ filenames-from-hdrop dropped-files set-global ] [ DragFinish ] bi
+:: handle-wm-dropfiles ( hdrop -- )
+    hdrop <alien> :> handle
+    [ handle filenames-from-hdrop dropped-files set-global ]
+    [ handle DragFinish ] finally
     key-modifiers <file-drop> hand-gadget get-global propagate-gesture ;
 
 ! The ChangeWindowMessageFilter has a global per-process effect, and so is the
