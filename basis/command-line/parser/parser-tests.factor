@@ -410,3 +410,11 @@ TUPLE: foo ;
         T{ option { name "--beta" } { aliases { "--shared-two" } } }
     } { "--shared" "value" } (parse-options)
 ] [ ambiguous-option? ] must-fail-with
+
+{ { H{ { "skip-cache" t } } H{ { "skip-cache" f } } } } [
+    {
+        T{ option
+            { name "--skip-cache" } { aliases { "--no-cache" } } { const t }
+        }
+    } { { "--no-cache" } { "--no-skip-cache" } } [ (parse-options) ] with map
+] unit-test

@@ -44,7 +44,7 @@ HELP: option
 { $class-description "An option that can be specified on the command-line. It has the following slots:"
     { $slots
         { "name" { "The name of the argument (prefixed by dashes " { $snippet "\"-\"" } " if optional)." } }
-        { "aliases" { "Additional names for an optional argument, such as " { $snippet "{ \"-H\" \"--hostname\" }" } ". Aliases share the canonical option's variable, default, validation and required status. Exact aliases take precedence over abbreviations, and aliases are included in help output." } }
+        { "aliases" { "Additional names for an optional argument, such as " { $snippet "{ \"-H\" \"--hostname\" }" } ". Aliases share the canonical option's variable, default, validation and required status. Exact names and aliases take precedence over abbreviations and " { $snippet "no-" } " negation, and aliases are included in help output." } }
         { "type" { "The " { $link class } " type of the argument." } }
         { "help" "Some help text to display." }
         { "variable" "An optional variable used to set a parsed value." }

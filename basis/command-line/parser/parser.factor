@@ -238,8 +238,11 @@ ERROR: usage-error < option-error options ;
 
 M: usage-error error. options>> print-help ;
 
+: exact-option ( name options -- option/f )
+    [ option-names member? ] with find nip ;
+
 :: find-option ( arg options -- option )
-    options [ option-names arg swap member? ] find nip [
+    arg options exact-option [
         allow-abbrev? get [
             arg options [| option |
                 option option-names [ option swap 2array ] map
@@ -257,10 +260,13 @@ M: usage-error error. options>> print-help ;
     [ default>> ] filter
     [ [ option-variable ] [ default>> ] bi ] H{ } map>assoc ;
 
+: split-negation ( name options -- name' negated? )
+    dupd exact-option [ f ] [ "no-" ?head ] if ;
+
 :: parse-optional ( options command-line -- command-line' )
     command-line unclip :> ( args arg )
     arg [ CHAR: - = ] trim-head "=" split1 :> ( name value )
-    name "no-" ?head :> ( positive-name negated? )
+    name options split-negation :> ( positive-name negated? )
     positive-name options find-option :> option
     value [
         negated? option option-#args { f 0 } member? or
