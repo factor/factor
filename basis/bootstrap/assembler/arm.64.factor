@@ -289,6 +289,46 @@ CALLBACK-STUB special-objects get set-at
     [ ds-0 temp1 temp2 ] dip CSEL
     ds-0 DS [] STR ;
 
+: jit-signal-handler ( -- )
+    X0  X1   SP -16 [pre] STP
+    X2  X3   SP -16 [pre] STP
+    X4  X5   SP -16 [pre] STP
+    X6  X7   SP -16 [pre] STP
+    X8  X9   SP -16 [pre] STP
+    X10 X11  SP -16 [pre] STP
+    X12 X13  SP -16 [pre] STP
+    X14 X15  SP -16 [pre] STP
+    X16 X17  SP -16 [pre] STP
+    X18 X19  SP -16 [pre] STP
+    X20 X21  SP -16 [pre] STP
+    X22 X23  SP -16 [pre] STP
+    X24 X25  SP -16 [pre] STP
+    X26 X27  SP -16 [pre] STP
+    X28 X29  SP -16 [pre] STP
+    temp NZCV MRS
+    X30 temp SP -16 [pre] STP
+    FP CTX context-callstack-top-offset [+] STR
+    DS RS CTX context-datastack-offset [+] STP
+    IP0 VM vm-signal-handler-addr-offset [+] LDR
+    TRAMPOLINE BLR
+    X30 temp SP 16 [post] LDP
+    NZCV temp MSR
+    X28 X29  SP 16 [post] LDP
+    X26 X27  SP 16 [post] LDP
+    X24 X25  SP 16 [post] LDP
+    X22 X23  SP 16 [post] LDP
+    X20 X21  SP 16 [post] LDP
+    X18 X19  SP 16 [post] LDP
+    X16 X17  SP 16 [post] LDP
+    X14 X15  SP 16 [post] LDP
+    X12 X13  SP 16 [post] LDP
+    X10 X11  SP 16 [post] LDP
+    X8  X9   SP 16 [post] LDP
+    X6  X7   SP 16 [post] LDP
+    X4  X5   SP 16 [post] LDP
+    X2  X3   SP 16 [post] LDP
+    X0  X1   SP 16 [post] LDP ;
+
 {
     { c-to-factor [
         arg2 arg1 MOV
@@ -329,56 +369,30 @@ CALLBACK-STUB special-objects get set-at
     ] }
     { fpu-state [ FPSR XZR MSR ] }
     { set-fpu-state [ ] }
+    { leaf-signal-handler [
+        FP LR SP 16 [+] STP
+        FP SP 16 ADD
+        FP SP [] STR
+        FP SP MOV
+        jit-signal-handler
+        ! Resume the interrupted instruction WITHOUT RET: a safepoint
+        ! can interrupt code whose live LR is saved nowhere yet (entry
+        ! safepoints run before the prologue; frameless words never save
+        ! it), so a `LDP FP, LR, [SP], 16 ; RET` resume would hand the
+        ! resumed word a poisoned LR (= its own safepoint address) and it
+        ! would "return" into itself, re-executing its body. Pop the
+        ! { link, PC } resume record and the { FP, LR } record stored
+        ! above and jump through IP0 instead. Contract: IP0 is scratch
+        ! across safepoints.
+        FP IP0 SP 16 [post] LDP
+        FP LR SP 16 [post] LDP
+        IP0 BR
+    ] }
     { signal-handler [
-        X0  X1   SP -16 [pre] STP
-        X2  X3   SP -16 [pre] STP
-        X4  X5   SP -16 [pre] STP
-        X6  X7   SP -16 [pre] STP
-        X8  X9   SP -16 [pre] STP
-        X10 X11  SP -16 [pre] STP
-        X12 X13  SP -16 [pre] STP
-        X14 X15  SP -16 [pre] STP
-        X16 X17  SP -16 [pre] STP
-        X18 X19  SP -16 [pre] STP
-        X20 X21  SP -16 [pre] STP
-        X22 X23  SP -16 [pre] STP
-        X24 X25  SP -16 [pre] STP
-        X26 X27  SP -16 [pre] STP
-        X28 X29  SP -16 [pre] STP
-        temp NZCV MRS
-        X30 temp SP -16 [pre] STP
-        FP CTX context-callstack-top-offset [+] STR
-        DS RS CTX context-datastack-offset [+] STP
-        IP0 VM vm-signal-handler-addr-offset [+] LDR
-        TRAMPOLINE BLR
-        X30 temp SP 16 [post] LDP
-        NZCV temp MSR
-        X28 X29  SP 16 [post] LDP
-        X26 X27  SP 16 [post] LDP
-        X24 X25  SP 16 [post] LDP
-        X22 X23  SP 16 [post] LDP
-        X20 X21  SP 16 [post] LDP
-        X18 X19  SP 16 [post] LDP
-        X16 X17  SP 16 [post] LDP
-        X14 X15  SP 16 [post] LDP
-        X12 X13  SP 16 [post] LDP
-        X10 X11  SP 16 [post] LDP
-        X8  X9   SP 16 [post] LDP
-        X6  X7   SP 16 [post] LDP
-        X4  X5   SP 16 [post] LDP
-        X2  X3   SP 16 [post] LDP
-        X0  X1   SP 16 [post] LDP
-        ! Resume the interrupted instruction WITHOUT touching FP/LR: a
-        ! safepoint can interrupt code whose live LR is saved nowhere yet
-        ! (entry safepoints run before the prologue; frameless words never
-        ! save it), so a `LDP FP, LR, [SP], 16 ; RET` resume would hand
-        ! the resumed word a poisoned LR (= its own safepoint address)
-        ! and it would "return" into itself, re-executing its body.
-        ! X29/X30 were already restored from their save slots above; pop
-        ! the dispatch-pushed { old SP, old PC } frame and jump through
-        ! IP0 instead. Contract: IP0 is scratch across safepoints.
-        IP0 SP 8 [+] LDR
-        SP SP 16 ADD
+        FP SP [] STR
+        FP SP MOV
+        jit-signal-handler
+        FP IP0 SP 16 [post] LDP
         IP0 BR
     ] }
 

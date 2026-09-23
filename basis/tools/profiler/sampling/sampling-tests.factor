@@ -1,5 +1,5 @@
 USING: arrays assocs byte-arrays calendar continuations io.streams.string
-kernel kernel.private math math.parser memory namespaces parser
+kernel kernel.private math math.parser math.private memory namespaces parser
 random sequences splitting threads
 tools.profiler.sampling tools.profiler.sampling.private
 tools.test ;
@@ -51,6 +51,18 @@ CONSTANT: report-samples {
     [
         50 [ 100000 1.25 <array> sampled-sum 125000.0 assert= ] times
     ] profile
+] unit-test
+
+: frameless-increment ( n -- n' ) { fixnum } declare 1 fixnum+fast ;
+
+: frameless-increments ( n -- ) [ frameless-increment drop ] each-integer ;
+
+{ t } [
+    [ 100,000,000 frameless-increments ] profile
+    most-recent-profile-data [
+        sample-callstack
+        { leaf-signal-handler frameless-increment frameless-increments } head?
+    ] any?
 ] unit-test
 
 { } [ 10 [ [ ] profile ] times ] unit-test

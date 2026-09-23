@@ -21,10 +21,18 @@ void factor_vm::dispatch_non_resumable_signal(cell* sp, cell* pc, cell handler, 
 
 void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
   signal_handler_addr = handler;
-  *(cell*)(*sp - 16) = *sp;
-  *(cell*)(*sp - 8) = *pc;
-  *sp -= 16;
-  *pc = untag<word>(special_objects[SIGNAL_HANDLER_WORD])->entry_point;
+
+  cell index = SIGNAL_HANDLER_WORD;
+  cell delta = 16;
+  code_block* block = code->code_block_for_address(*pc);
+  if (block->stack_frame_size() == 0 || *pc == block->entry_point()) {
+    index = LEAF_SIGNAL_HANDLER_WORD;
+    delta += LEAF_FRAME_SIZE;
+  }
+
+  *sp -= delta;
+  *(cell*)(*sp + FRAME_RETURN_ADDRESS) = *pc;
+  *pc = untag<word>(special_objects[index])->entry_point;
 }
 
 void factor_vm::dispatch_signal_handler(cell* sp, cell* pc, cell handler) {
