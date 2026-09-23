@@ -36,7 +36,10 @@ static void install_handler(int signal, void (*handler)(int, siginfo_t*, void*))
 
 static void test_signal_pipe_errno() {
   test_vm vm;
-  vm.code = new code_heap(deck_size);
+  {
+    jit_writable_scope writable;
+    vm.code = new code_heap(deck_size);
+  }
   int fds[2];
   check(pipe(fds) == 0, "pipe failed");
   check(fcntl(fds[1], F_SETFL, O_NONBLOCK) == 0, "fcntl failed");
@@ -53,7 +56,7 @@ static void test_signal_pipe_errno() {
     check(result == 0, "raise failed");
     check(saved_errno == EDOM, "full signal pipe overwrote errno");
   }
-  check(atomic::load(&vm.safepoint_fep_p), "full pipe lost debugger interrupt");
+  check(factor::atomic::load(&vm.safepoint_fep_p), "full pipe lost debugger interrupt");
   check(read(fds[0], &signal, sizeof(signal)) == sizeof(signal), "read failed");
   close(fds[0]);
   close(fds[1]);
@@ -77,6 +80,17 @@ static void test_signal_pipe_fd_zero() {
   close(STDIN_FILENO);
 }
 
+static bool alarm_pending_soon() {
+  sigset_t pending;
+  for (int i = 0; i < 1000; i++) {
+    check(sigpending(&pending) == 0, "sigpending failed");
+    if (sigismember(&pending, SIGALRM) == 1)
+      return true;
+    usleep(100);
+  }
+  return false;
+}
+
 static void test_timer(fixnum rate, long seconds, long microseconds) {
   test_vm vm;
   // Block timer delivery while inspecting even a one-microsecond interval.
@@ -88,17 +102,16 @@ static void test_timer(fixnum rate, long seconds, long microseconds) {
   vm.start_sampling_profiler_timer();
   struct itimerval timer;
   check(getitimer(ITIMER_REAL, &timer) == 0, "getitimer failed");
-  sigset_t pending;
-  check(sigpending(&pending) == 0, "sigpending failed");
+  // Linux may defer rearming an expired timer until its pending signal is
+  // delivered, and macOS may not have posted it yet. The one-microsecond
+  // case can already be pending here.
+  bool armed = timer.it_value.tv_sec != 0 || timer.it_value.tv_usec != 0 ||
+               alarm_pending_soon();
   vm.end_sampling_profiler_timer();
   check(timer.it_interval.tv_sec == seconds &&
             timer.it_interval.tv_usec == microseconds,
         "incorrect profiler timer interval");
-  // Linux may defer rearming an expired timer until its pending signal is
-  // delivered. The one-microsecond case can already be pending here.
-  check(timer.it_value.tv_sec != 0 || timer.it_value.tv_usec != 0 ||
-            sigismember(&pending, SIGALRM) == 1,
-        "profiler timer was not armed");
+  check(armed, "profiler timer was not armed");
   check(getitimer(ITIMER_REAL, &timer) == 0, "getitimer failed");
   check(timer.it_value.tv_sec == 0 && timer.it_value.tv_usec == 0,
         "profiler timer did not stop");
@@ -123,23 +136,26 @@ static void test_foreign_alarm_without_vm() {
 
 static void test_foreign_alarm_profiling() {
   test_vm vm;
-  vm.code = new code_heap(deck_size);
+  {
+    jit_writable_scope writable;
+    vm.code = new code_heap(deck_size);
+  }
   vm.samples_per_second = 1;
-  atomic::store(&vm.sampling_profiler_p, true);
+  factor::atomic::store(&vm.sampling_profiler_p, true);
   install_handler(SIGALRM, sample_signal_handler);
   vm.start_sampling_profiler_timer();
   pthread_t thread;
   check(pthread_create(&thread, NULL, raise_alarm, NULL) == 0, "pthread_create failed");
   check(pthread_join(thread, NULL) == 0, "pthread_join failed");
-  atomic::store(&vm.sampling_profiler_p, false);
+  factor::atomic::store(&vm.sampling_profiler_p, false);
   vm.end_sampling_profiler_timer();
-  check(atomic::load(&vm.current_sample.foreign_thread_sample_count) >= 1,
+  check(factor::atomic::load(&vm.current_sample.foreign_thread_sample_count) >= 1,
         "foreign sample did not reach the timer's VM");
-  fixnum samples = atomic::load(&vm.current_sample.sample_count);
+  fixnum samples = factor::atomic::load(&vm.current_sample.sample_count);
   // A late alarm after profiling stops must not keep sampling the old owner.
   check(pthread_create(&thread, NULL, raise_alarm, NULL) == 0, "pthread_create failed");
   check(pthread_join(thread, NULL) == 0, "pthread_join failed");
-  check(atomic::load(&vm.current_sample.sample_count) == samples,
+  check(factor::atomic::load(&vm.current_sample.sample_count) == samples,
         "late alarm sampled a stopped profiler");
 }
 
