@@ -618,7 +618,7 @@ pub const Jit = struct {
     }
 
     // Compile to a code block
-    // frame_size: Stack frame size (must be multiple of 16, max 0xFF0)
+    // frame_size: Stack frame size (must be multiple of 16)
     pub fn toCodeBlock(self: *Self, block_type: code_blocks.CodeBlockType, frame_size: Cell) !?*code_blocks.CodeBlock {
         // Add GC info padding (dummy for non-optimizing compiler)
         const alignment = layouts.data_alignment;

@@ -75,6 +75,9 @@ pub const CodeBlockType = enum(u2) {
     pic = 2, // Polymorphic inline cache
 };
 
+pub const code_block_size_max: Cell = 0xFFFFF0;
+pub const stack_frame_size_max: Cell = (~@as(Cell, 0) >> 24) << 4;
+
 pub const CodeBlock = extern struct {
     header: Cell,
     owner: Cell, // Tagged pointer: word, quotation, or f
@@ -102,7 +105,7 @@ pub const CodeBlock = extern struct {
         if (self.isFree()) {
             return 0;
         }
-        return (self.header >> 20) & 0xFF0;
+        return (self.header >> 20) & ~@as(Cell, 0xF);
     }
 
     pub fn stackFrameSizeForAddress(self: *const Self, addr: Cell) Cell {
@@ -132,9 +135,10 @@ pub const CodeBlock = extern struct {
         std.debug.assert(total_size >= @sizeOf(Self));
         std.debug.assert(total_size % 8 == 0);
         std.debug.assert(frame_size % 16 == 0);
+        std.debug.assert(frame_size <= stack_frame_size_max);
         const type_bits = @as(Cell, @intFromEnum(block_type)) << 1;
         const size_bits = total_size & 0xFFFFF8;
-        const frame_bits = (frame_size & 0xFF0) << 20;
+        const frame_bits = frame_size << 20;
         self.header = type_bits | size_bits | frame_bits;
         self.owner = layouts.false_object;
         self.parameters = layouts.false_object;
@@ -145,7 +149,7 @@ pub const CodeBlock = extern struct {
         std.debug.assert(self.size() < 0xFFFFFF);
         std.debug.assert(!self.isFree());
         std.debug.assert(frame_size % 16 == 0);
-        std.debug.assert(frame_size <= 0xFF0);
+        std.debug.assert(frame_size <= stack_frame_size_max);
         self.header = (self.header & 0xFFFFFF) | (frame_size << 20);
     }
 
@@ -1017,6 +1021,19 @@ test "code block header encoding" {
     try std.testing.expectEqual(CodeBlockType.unoptimized, block.blockType());
     try std.testing.expectEqual(@as(Cell, 64), block.size());
     try std.testing.expectEqual(@as(Cell, 32), block.stackFrameSize());
+}
+
+test "code block header keeps stack frames of 4096 bytes and larger" {
+    var block: CodeBlock = undefined;
+    for ([_]Cell{ 0xFF0, 0x1000, 0x1010, stack_frame_size_max }) |frame_size| {
+        if (frame_size > stack_frame_size_max) continue;
+        block.initialize(.optimized, code_block_size_max, frame_size);
+        try std.testing.expectEqual(frame_size, block.stackFrameSize());
+        try std.testing.expectEqual(code_block_size_max, block.size());
+        block.setStackFrameSize(frame_size);
+        try std.testing.expectEqual(frame_size, block.stackFrameSize());
+        try std.testing.expectEqual(code_block_size_max, block.size());
+    }
 }
 
 test "code block free marking" {
