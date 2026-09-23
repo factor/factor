@@ -3,28 +3,32 @@
 namespace factor {
 
 std::map<THREADHANDLE, factor_vm*> thread_vms;
-static std::mutex thread_vms_mutex;
+
+struct thread_vms_lock {
+  thread_vms_lock() { lock_thread_vms(); }
+  ~thread_vms_lock() { unlock_thread_vms(); }
+};
 
 void register_thread_vm(THREADHANDLE thread, factor_vm* vm) {
-  std::lock_guard<std::mutex> lock(thread_vms_mutex);
+  thread_vms_lock lock;
   thread_vms[thread] = vm;
 }
 
 void unregister_thread_vm(factor_vm* vm) {
-  std::lock_guard<std::mutex> lock(thread_vms_mutex);
+  thread_vms_lock lock;
   auto iter = thread_vms.find(vm->thread);
   if (iter != thread_vms.end() && iter->second == vm)
     thread_vms.erase(iter);
 }
 
 factor_vm* thread_vm(THREADHANDLE thread) {
-  std::lock_guard<std::mutex> lock(thread_vms_mutex);
+  thread_vms_lock lock;
   auto iter = thread_vms.find(thread);
   return iter == thread_vms.end() ? NULL : iter->second;
 }
 
 factor_vm* first_thread_vm() {
-  std::lock_guard<std::mutex> lock(thread_vms_mutex);
+  thread_vms_lock lock;
   FACTOR_ASSERT(thread_vms.size() == 1);
   return thread_vms.begin()->second;
 }

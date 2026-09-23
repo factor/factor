@@ -18,4 +18,10 @@ factor_vm* current_vm_p() {
   return (factor_vm*)pthread_getspecific(current_vm_tls_key);
 }
 
+static pthread_mutex_t thread_vms_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void lock_thread_vms() { pthread_mutex_lock(&thread_vms_mutex); }
+
+void unlock_thread_vms() { pthread_mutex_unlock(&thread_vms_mutex); }
+
 }

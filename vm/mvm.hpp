@@ -15,6 +15,9 @@ VM_C_API THREADHANDLE start_standalone_factor_in_new_thread(int argc,
 
 extern std::map<THREADHANDLE, factor_vm*> thread_vms;
 
+void lock_thread_vms();
+void unlock_thread_vms();
+
 void register_thread_vm(THREADHANDLE thread, factor_vm* vm);
 void unregister_thread_vm(factor_vm* vm);
 factor_vm* thread_vm(THREADHANDLE thread);

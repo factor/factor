@@ -35,4 +35,10 @@ factor_vm* current_vm_p() {
   return (factor_vm*)TlsGetValue(current_vm_tls_key);
 }
 
+static SRWLOCK thread_vms_mutex = SRWLOCK_INIT;
+
+void lock_thread_vms() { AcquireSRWLockExclusive(&thread_vms_mutex); }
+
+void unlock_thread_vms() { ReleaseSRWLockExclusive(&thread_vms_mutex); }
+
 }
