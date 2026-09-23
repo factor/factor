@@ -836,7 +836,7 @@ pub const FactorVM = struct {
         @memcpy(new_data[0..to_copy], old_data[0..to_copy]);
 
         if (new_capacity > to_copy) {
-            @memset(new_data[to_copy..new_capacity], layouts.false_object);
+            @memset(new_data[to_copy..new_capacity], 0);
         }
 
         return new_array;
