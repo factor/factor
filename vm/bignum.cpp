@@ -825,9 +825,9 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
     }
   }
 
+  data_root<bignum> q(false_object, this);
   if (quotient != NULL) {
-    bignum *q_ = allot_bignum(length_n - length_d, q_negative_p);
-    data_root<bignum> q(q_, this);
+    q.set_untagged(allot_bignum(length_n - length_d, q_negative_p));
 
     if (shift == 0) {
       bignum_destructive_copy(numerator.untagged(), u.untagged());
@@ -847,7 +847,6 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
     }
 
     q.set_untagged(bignum_trim(q.untagged()));
-    *quotient = q.untagged();
   } else {
 
     if (shift == 0) {
@@ -871,6 +870,8 @@ void factor_vm::bignum_divide_unsigned_large_denominator(
   }
 
   u.set_untagged(bignum_trim(u.untagged()));
+  if (quotient != NULL)
+    *quotient = q.untagged();
   if (remainder != NULL)
     *remainder = u.untagged();
 }

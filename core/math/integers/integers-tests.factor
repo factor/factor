@@ -1,6 +1,6 @@
 USING: arrays compiler.test continuations kernel kernel.private layouts literals math math.functions math.order
 math.private namespaces prettyprint prettyprint.config random
-sequences system tools.test ;
+ranges sequences system tools.memory tools.test ;
 IN: math.integers.tests
 
 ! x86 IDIV traps become OS signal errors; VM primitives and ARM64's explicit
@@ -451,3 +451,15 @@ IN: math.integers.tests
 { 3 t } [ 3 >bignum normalized-shift-zero dup fixnum? ] unit-test
 { 3 t } [ 3 >bignum normalized-mask dup fixnum? ] unit-test
 { 0 t } [ 3 >bignum normalized-zero-mask dup fixnum? ] unit-test
+
+: nursery-sized-bignum ( digit-delta -- n )
+    data-room nursery>> size>> cell /i + cell-bits 2 - * 2^ 1 - ;
+
+:: division-identities? ( x y -- ? )
+    x y /mod swap y * + x =
+    x y /i y * x y mod + x = and ;
+
+{ t } [
+    123 2^ 12345 + -8 0 [a..b]
+    [ nursery-sized-bignum swap division-identities? ] with all?
+] unit-test
