@@ -315,10 +315,10 @@ USING: accessors arrays arrays.shaped eval kernel math prettyprint sequences too
 
 ! Scalar and empty shapes must survive printing and parsing.
 { { } { 7 } } [
-    7 >shaped-array unparse eval( -- shaped ) [ shape>> ] [ underlying>> ] bi
+    7 >shaped-array unparse-use eval( -- shaped ) [ shape>> ] [ underlying>> ] bi
 ] unit-test
 { { 2 0 3 } { } } [
-    { 2 0 3 } zeros unparse eval( -- shaped ) [ shape>> ] [ underlying>> ] bi
+    { 2 0 3 } zeros unparse-use eval( -- shaped ) [ shape>> ] [ underlying>> ] bi
 ] unit-test
 { { 7 } } [
     7 >shaped-array shaped-transpose underlying>> >array
