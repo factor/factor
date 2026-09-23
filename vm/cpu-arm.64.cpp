@@ -25,7 +25,9 @@ void factor_vm::dispatch_resumable_signal(cell* sp, cell* pc, cell handler) {
   cell index = SIGNAL_HANDLER_WORD;
   cell delta = 16;
   code_block* block = code->code_block_for_address(*pc);
-  if (block->stack_frame_size() == 0 || *pc == block->entry_point()) {
+  tagged<word> leaf_handler(special_objects[LEAF_SIGNAL_HANDLER_WORD]);
+  if ((block->stack_frame_size() == 0 || *pc == block->entry_point()) &&
+      leaf_handler.type_p() && to_boolean(leaf_handler->subprimitive)) {
     index = LEAF_SIGNAL_HANDLER_WORD;
     delta += LEAF_FRAME_SIZE;
   }
