@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.short-circuit
+USING: accessors arrays assocs combinators combinators.short-circuit
 combinators.smart compiler.units dlists fry generic generic.single
 hash-sets.identity hashtables hashtables.wrapped help help.crossref help.markup
 help.topics init io io.pathnames io.styles kernel lists namespaces
@@ -32,11 +32,11 @@ M: object quot-uses 2drop ;
     ] [ 2drop ] if ; inline
 
 M: word quot-uses
-    over vocabulary>> [
-        over crossref? [ adjoin ] [ 2drop ] if
-    ] [
-        [ def>> ] dip seq-uses
-    ] if ;
+    {
+        { [ over crossref? ] [ adjoin ] }
+        { [ over vocabulary>> ] [ 2drop ] }
+        [ [ def>> ] dip seq-uses ]
+    } cond ;
 
 M: array quot-uses seq-uses ;
 M: vector quot-uses seq-uses ;

@@ -135,3 +135,18 @@ INSTANCE: nonliteral-sequence sequence
 M: nonliteral-sequence length drop 1 ;
 M: nonliteral-sequence nth 2drop "Unexpected virtual sequence traversal" throw ;
 { t } [ [ T{ nonliteral-sequence } ] uses empty? ] unit-test
+
+GENERIC: method-literal-target ( x -- y )
+M: integer method-literal-target 1 + ;
+: method-literal-user ( x -- y )
+    M\ integer method-literal-target execute( x -- y ) ;
+
+{ t } [
+    M\ integer method-literal-target
+    \ method-literal-user uses member?
+] unit-test
+{ f } [ \ + \ method-literal-user uses member? ] unit-test
+{ t } [
+    \ method-literal-user
+    M\ integer method-literal-target usage member?
+] unit-test
