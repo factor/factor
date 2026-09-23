@@ -28,7 +28,7 @@ SYMBOL: benchmarks-disabled?
 <PRIVATE
 
 : write-header ( str -- )
-    "=== %s\n" printf ;
+    "=== %s\n" printf flush ;
 
 : run-benchmark ( vocab quot: ( vocab -- res ) -- result ok? )
     over write-header '[ _ @ t ] [
