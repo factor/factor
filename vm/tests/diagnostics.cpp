@@ -44,6 +44,15 @@ int main(int argc, char** argv) {
   check(brief_text.find("Nursery") != std::string::npos &&
             brief_text.find("Tenured") != std::string::npos,
         "Fatal memory layout lost the heap ranges");
+
+  byte_array* bytes = vm.allot_byte_array(2);
+  bytes->data<uint8_t>()[0] = 1;
+  bytes->data<uint8_t>()[1] = 2;
+  std::ostringstream printed_bytes;
+  vm.print_obj(printed_bytes, tag<byte_array>(bytes));
+  check(printed_bytes.str() == "B{ 1 2 }",
+        "Debugger printed bytes past the end of a byte array");
+
   vm.ctx = NULL;
   std::cout << "Diagnostic tests passed" << std::endl;
 }
