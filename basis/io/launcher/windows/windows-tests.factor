@@ -5,6 +5,8 @@ io.encodings.utf8 io.files io.files.temp io.files.unique
 io.launcher io.launcher.private io.launcher.windows
 io.pathnames kernel math namespaces parser sequences
 splitting strings system tools.test ;
+USING: alien alien.data classes.struct destructors io.backend io.encodings.string io.encodings.utf16
+io.files.windows locals windows.errors windows.kernel32 ;
 IN: io.launcher.windows.tests
 
 : console-vm-path ( -- path )
@@ -15,6 +17,37 @@ IN: io.launcher.windows.tests
 { H{ { "PATH" "new" } { "OTHER" "keep" } } } [
     { { "Path" "old" } { "OTHER" "keep" } }
     { { "PATH" "new" } } environment-union >hashtable
+] unit-test
+
+! Environment values must encode supplementary characters as surrogate pairs.
+{ "FACE=😀\0\0" } [
+    <process> +replace-environment+ >>environment-mode
+    { { "FACE" "😀" } } >>environment
+    CreateProcess-args new fill-lpEnvironment nip lpEnvironment>>
+    binary-object memory>byte-array utf16n decode
+] unit-test
+
+! DUPLICATE_SAME_ACCESS belongs in dwOptions, not dwDesiredAccess.
+{ } [
+    [| path |
+        path touch-file
+        [
+            path normalize-path open-read &dispose duplicate-handle
+            handle>> BY_HANDLE_FILE_INFORMATION new
+            GetFileInformationByHandle win32-error=0/f
+        ] with-destructors
+    ] with-test-file
+] unit-test
+
+! More than MAXIMUM_WAIT_OBJECTS children require multiple native wait calls.
+{ t } [
+    65 [
+        <process>
+            "cmd.exe /d /c exit 0" >>command
+            t >>hidden
+        run-detached
+    ] replicate
+    [ wait-for-process ] map [ 0 = ] all?
 ] unit-test
 
 { H{ { "Ä" "new" } { "SS" "distinct" } { "ß" "sharp" } } } [

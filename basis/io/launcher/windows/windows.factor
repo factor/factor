@@ -2,10 +2,11 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings arrays assocs
 classes classes.struct combinators combinators.short-circuit
-concurrency.flags continuations debugger destructors init io
+concurrency.flags continuations debugger destructors grouping init io
 io.backend io.backend.windows io.files io.files.private
 io.files.windows io.launcher io.launcher.private io.pathnames
-io.pipes io.pipes.windows io.ports io.standard-paths kernel libc literals locals
+io.pipes io.pipes.windows io.ports io.standard-paths io.encodings.string
+io.encodings.utf16 kernel libc literals locals
 make math math.order namespaces prettyprint sequences sorting specialized-arrays
 splitting splitting.monotonic strings system threads windows
 windows.errors windows.handles windows.kernel32 windows.types
@@ -217,7 +218,7 @@ M:: windows environment-union ( assoc1 assoc2 -- assoc )
                 [ swap % "=" % % "\0" % ] assoc-each
                 "\0" %
             ] if
-        ] ushort-array{ } make
+        ] "" make utf16n encode ushort cast-array
         >>lpEnvironment
     ] when ;
 
@@ -268,22 +269,26 @@ M: windows (kill-process)
     over handle>> dispose-process
     notify-exit ;
 
-M: windows (wait-for-processes)
-    processes get keys dup
+: wait-for-process-chunk ( processes -- ? )
+    dup
     [ handle>> hProcess>> ] void*-array{ } map-as
     [ length ] keep 0 0
     WaitForMultipleObjects
     dup 0xffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;
 
+M: windows (wait-for-processes)
+    processes get keys MAXIMUM_WAIT_OBJECTS group
+    [ wait-for-process-chunk ] all? ;
+
 : duplicate-handle ( handle -- handle' )
     GetCurrentProcess ! source process
     swap handle>> ! handle
     GetCurrentProcess ! target process
     f void* <ref> [ ! target handle
-        DUPLICATE_SAME_ACCESS ! desired access
+        0 ! desired access (ignored with DUPLICATE_SAME_ACCESS)
         TRUE ! inherit handle
-        0 ! options
+        DUPLICATE_SAME_ACCESS ! options
         DuplicateHandle win32-error=0/f
     ] keep void* deref <win32-handle> &dispose ;
 

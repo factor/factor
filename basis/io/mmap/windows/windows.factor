@@ -1,4 +1,4 @@
-USING: accessors destructors windows.privileges
+USING: accessors destructors
 io.files.windows io.mmap io.mmap.private kernel literals
 math math.bitwise system windows.errors windows.handles
 windows.kernel32 ;
@@ -13,11 +13,11 @@ IN: io.mmap.windows
 :: mmap-open ( path length access-mode create-mode protect access -- handle handle address )
     length 32 bits :> lo
     length -32 shift 32 bits :> hi
-    { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
-        path access-mode create-mode 0 open-file |dispose
-        dup handle>> f protect hi lo f create-file-mapping |dispose
-        dup handle>> access 0 0 0 map-view-of-file
-    ] with-privileges ;
+    ! Unnamed, ordinary file mappings require neither global-object nor
+    ! large-page privileges. Do not change the process token here.
+    path access-mode create-mode 0 open-file |dispose
+    dup handle>> f protect hi lo f create-file-mapping |dispose
+    dup handle>> access 0 0 0 map-view-of-file ;
 
 TUPLE: win32-mapped-file file mapping ;
 

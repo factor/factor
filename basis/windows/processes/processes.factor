@@ -1,6 +1,6 @@
 ! Copyright (C) 2021 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data arrays
+USING: accessors alien alien.c-types alien.data alien.strings arrays
 classes.struct destructors endian kernel literals sequences
 strings windows windows.errors windows.handles windows.kernel32
 windows.types ;
@@ -14,7 +14,7 @@ IN: windows.processes
     [ PROCESS_ALL_ACCESS FALSE ] 2dip with-open-process ; inline
 
 : with-create-toolhelp32-snapshot ( flags processId quot: ( alien -- alien ) -- )
-    [ CreateToolhelp32Snapshot dup win32-error=0/f ] dip
+    [ CreateToolhelp32Snapshot check-invalid-handle ] dip
     '[
         _ [ <win32-handle> &dispose drop ] keep @
     ] with-destructors ; inline
@@ -115,11 +115,11 @@ IN: windows.processes
         ] if
     ] with-create-toolhelp32-snapshot-heaplists ;
 
-: get-process-image-name ( processId -- string )
+: get-process-image-name ( process-handle -- string )
     0 MAX_UNICODE_PATH
-    [ uchar <c-array> ] [ DWORD <ref> ] bi
-    [ QueryFullProcessImageNameA win32-error=0/f ] 2keep
-    le> head >string ;
+    [ WCHAR <c-array> ] [ DWORD <ref> ] bi
+    [ QueryFullProcessImageNameW win32-error=0/f ] 2keep
+    drop alien>native-string ;
 
 : get-my-process-image-name ( -- string )
     GetCurrentProcess get-process-image-name ;

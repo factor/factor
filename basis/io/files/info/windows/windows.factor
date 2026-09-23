@@ -66,11 +66,11 @@ TUPLE: windows-file-info < file-info-tuple attributes ;
         ! ]
     } cleave ;
 
-: get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
+:: get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
-        BY_HANDLE_FILE_INFORMATION new
+        handle BY_HANDLE_FILE_INFORMATION new
         [ GetFileInformationByHandle win32-error=0/f ] keep
-    ] keep CloseHandle win32-error=0/f ;
+    ] [ handle CloseHandle drop ] finally ;
 
 : valid-handle? ( handle -- boolean )
     INVALID_HANDLE_VALUE = not ; inline
@@ -181,7 +181,7 @@ CONSTANT: names-buf-length 16384
 
 : find-first-volume ( -- string handle )
     { { ushort path-length } }
-    [ path-length FindFirstVolume dup win32-error=0/f ]
+    [ path-length FindFirstVolume check-invalid-handle ]
     with-out-parameters alien>native-string swap ;
 
 : find-next-volume ( handle -- string/f )

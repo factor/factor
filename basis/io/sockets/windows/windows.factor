@@ -84,7 +84,7 @@ M: object remote>handle
 M: object (server)
     [
         SOCK_STREAM server-socket
-        dup handle>> listen-backlog listen winsock-return-check
+        dup handle>> listen-backlog listen socket-error
     ] with-destructors ;
 
 M: windows (datagram)
@@ -143,8 +143,10 @@ TUPLE: ConnectEx-args port
     } cleave
     int
     { SOCKET void* int PVOID DWORD LPDWORD void* }
-    stdcall alien-indirect drop
-    winsock-error ; inline
+    stdcall alien-indirect winsock-error=0/f ; inline
+
+: update-connect-context ( ConnectEx -- )
+    s>> SOL_SOCKET SO_UPDATE_CONNECT_CONTEXT f 0 setsockopt socket-error ;
 
 M: object establish-connection
     make-sockaddr/size-outgoing <ConnectEx-args>
@@ -152,7 +154,7 @@ M: object establish-connection
         dup port>> handle>> handle>> >>s
         dup s>> get-ConnectEx-ptr >>ptr
         dup call-ConnectEx
-        wait-for-socket drop ;
+        [ wait-for-socket drop ] [ update-connect-context ] bi ;
 
 TUPLE: AcceptEx-args port
     sListenSocket sAcceptSocket lpOutputBuffer dwReceiveDataLength
@@ -174,7 +176,6 @@ TUPLE: AcceptEx-args port
         f >>lpdwBytesReceived
         (make-overlapped) >>lpOverlapped ; inline
 
-! AcceptEx return value is useless
 : call-AcceptEx ( AcceptEx -- )
     {
         [ sListenSocket>> ]
@@ -185,7 +186,12 @@ TUPLE: AcceptEx-args port
         [ dwRemoteAddressLength>> ]
         [ lpdwBytesReceived>> ]
         [ lpOverlapped>> ]
-    } cleave AcceptEx drop winsock-error ; inline
+    } cleave AcceptEx winsock-error=0/f ; inline
+
+:: update-accept-context ( args -- )
+    args sAcceptSocket>> SOL_SOCKET SO_UPDATE_ACCEPT_CONTEXT
+    args sListenSocket>> SOCKET <ref> SOCKET heap-size
+    setsockopt socket-error ;
 
 : (extract-remote-address) ( lpOutputBuffer dwReceiveDataLength dwLocalAddressLength dwRemoteAddressLength -- sockaddr )
     f void* <ref> 0 int <ref> f void* <ref>
@@ -201,7 +207,8 @@ TUPLE: AcceptEx-args port
         } cleave
         (extract-remote-address)
     ] [ port>> addr>> protocol-family ] bi
-    sockaddr-of-family ; inline
+    ! The AcceptEx output buffer is freed when (accept) returns.
+    sockaddr-of-family clone ; inline
 
 M: object (accept)
     [
@@ -209,6 +216,7 @@ M: object (accept)
         {
             [ call-AcceptEx ]
             [ wait-for-socket drop ]
+            [ update-accept-context ]
             [ sAcceptSocket>> <win32-socket> ]
             [ extract-remote-address ]
         } cleave
@@ -293,7 +301,7 @@ TUPLE: WSASendTo-args port
         swap make-send-buffer >>lpBuffers
         1 >>dwBufferCount
         0 >>dwFlags
-        0 uint <ref> >>lpNumberOfBytesSent
+        f >>lpNumberOfBytesSent
         (make-overlapped) >>lpOverlapped ; inline
 
 : call-WSASendTo ( WSASendTo -- )

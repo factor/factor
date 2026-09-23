@@ -83,7 +83,7 @@ SYMBOL: master-completion-port
 :: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
     nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
     master-completion-port get-global
-    { int void* pointer: OVERLAPPED }
+    { DWORD ULONG_PTR pointer: OVERLAPPED }
     [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
     :> ( error? bytes key overlapped )
     bytes overlapped error? ;
@@ -271,7 +271,7 @@ PRIVATE>
     INVALID_SET_FILE_POINTER = [ win32-error ] when ;
 
 : set-end-of-file ( win32-file -- )
-    handle>> SetEndOfFile [ win32-error ] unless ;
+    handle>> SetEndOfFile win32-error=0/f ;
 
 M: windows (file-reader)
     open-read <input-port> ;
@@ -405,17 +405,12 @@ M: windows home
         pick push file-streams-rest
     ] if ;
 
-: file-streams ( path -- streams )
-    normalize-path
-    FindStreamInfoStandard
-    WIN32_FIND_STREAM_DATA new
-    0
-    [ FindFirstStream ] keepd
-    over INVALID_HANDLE_VALUE = [
-        2drop win32-error f
-    ] [
-        1vector swap file-streams-rest
-    ] if ;
+:: file-streams ( path -- streams )
+    WIN32_FIND_STREAM_DATA new :> first-stream
+    path normalize-path FindStreamInfoStandard first-stream 0
+    FindFirstStream check-invalid-handle :> search
+    [ first-stream 1vector search file-streams-rest ]
+    [ search FindClose win32-error=0/f ] finally ;
 
 : alternate-file-streams ( path -- streams )
     file-streams [ cStreamName>> alien>native-string "::$DATA" = ] reject ;

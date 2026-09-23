@@ -4,6 +4,8 @@ USING: combinators continuations io.backend io.directories io.files
 io.files.temp io.files.windows io.pathnames kernel kernel.private libc
 literals memory sequences splitting tools.test windows.kernel32
 io.files.unique destructors ;
+USING: accessors alien.c-types alien.data locals math windows.errors windows.types ;
+IN: io.files.windows.tests
 
 { f } [ "\\foo" absolute-path? ] unit-test
 { t } [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
@@ -45,6 +47,25 @@ io.files.unique destructors ;
 { "\\\\?\\C:\\builds\\factor\\log.txt" } [
     "C:\\builds\\factor\\12345\\"
     "..\\log.txt" append-path normalize-path
+] unit-test
+
+! A Win32 BOOL of zero is truthy in Factor and must be checked numerically.
+[ win32-file new INVALID_HANDLE_VALUE >>handle set-end-of-file ]
+[ windows-error? ] must-fail-with
+
+: test-process-handle-count ( -- count )
+    GetCurrentProcess 0 DWORD <ref>
+    [ GetProcessHandleCount win32-error=0/f ] keep DWORD deref ;
+
+! FindFirstStream search handles must be closed after every enumeration.
+{ t } [
+    [| path |
+        path touch-file
+        path file-streams drop
+        test-process-handle-count :> before
+        20 [ path file-streams drop ] times
+        test-process-handle-count before =
+    ] with-test-file
 ] unit-test
 
 { "\\\\?\\C:\\builds\\" } [
