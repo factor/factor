@@ -48,8 +48,8 @@ TYPEDEF: float               FLOAT
 TYPEDEF: int         HALF_PTR
 TYPEDEF: uint        UHALF_PTR
 << cpu x86.32? [
-    short HALF_PTR typedef
-    ushort UHALF_PTR typedef
+    short \ HALF_PTR typedef
+    ushort \ UHALF_PTR typedef
 ] when >>
 TYPEDEF: intptr_t    INT_PTR
 TYPEDEF: uintptr_t   UINT_PTR
