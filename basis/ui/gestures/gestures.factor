@@ -310,7 +310,7 @@ SYMBOL: drag-timer
 
 : send-scroll ( direction loc world -- )
     move-hand
-    scroll-direction set-global
+    [ 3 * ] map scroll-direction set-global
     mouse-scroll hand-gadget get-global propagate-gesture ;
 
 : send-action ( world gesture -- )
