@@ -1,12 +1,15 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays continuations kernel
-kernel.private libc math memory sequences tools.memory
+kernel.private layouts libc math memory sequences tools.memory
 tools.profiler.sampling tools.profiler.sampling.private tools.test
 unix.process ;
 IN: compiler.tests.safepoints
 
-: nursery-filler-size ( -- n ) data-room nursery>> size>> 96 - ;
+! Leave one alignment unit after the first array and byte-array header.
+! The next three-element array then forces a collection on either cell size.
+: nursery-filler-size ( -- n )
+    data-room nursery>> size>> 5 cells 16 align - 32 - ;
 
 : with-sampling ( quot -- )
     1 set-profiling [ 0 set-profiling ] finally ; inline

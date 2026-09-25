@@ -439,6 +439,12 @@ IN: math.integers.tests
 { f } [ 1 >bignum 32 2^ checked-bit? ] unit-test
 { t } [ -13 -1 checked-bit? ] unit-test
 { f } [ 13 -1 checked-bit? ] unit-test
+{ f } [ 1 32 checked-bit? ] unit-test
+{ f } [ 1 64 checked-bit? ] unit-test
+{ f } [ 1 128 checked-bit? ] unit-test
+{ t } [ -2 32 checked-bit? ] unit-test
+{ t } [ -2 64 checked-bit? ] unit-test
+{ t } [ -2 128 checked-bit? ] unit-test
 
 ! Optimizer identities and mask shortcuts must also normalize the result.
 : normalized-add-zero ( x -- y ) { bignum } declare 0 + ;

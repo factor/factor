@@ -62,36 +62,52 @@ IN: bootstrap.image.tests
     bootstrapping-image get
 ] unit-test
 
+! Test target cell widths independently of the host architecture.
+: with-image-cell-sizes ( quot: ( -- value ) -- values )
+    [ { 4 8 } ] dip '[ \ cell _ with-variable ] map ; inline
+
+! An empty buffer starts 93 cells before the heap base. Clearing the low
+! four bits rounds down to -96 cells on 32-bit targets and -94 on 64-bit.
 ! emit-object
-{ -94 } [
-    V{ } clone bootstrapping-image set array [ ] emit-object
-    data-base - 15 unmask bootstrap-cell /
+{ { -96 -94 } } [
+    [
+        V{ } clone bootstrapping-image set array [ ] emit-object
+        data-base - 15 unmask bootstrap-cell /
+    ] with-image-cell-sizes
 ] unit-test
 
 ! heap-size 10 header + 83 special objects
-{ -93 } [
-    V{ } clone bootstrapping-image set heap-size
-    bootstrap-cell /
+{ { -93 -93 } } [
+    [
+        V{ } clone bootstrapping-image set heap-size
+        bootstrap-cell /
+    ] with-image-cell-sizes
 ] unit-test
 
 ! here
-{ -93 } [
-    V{ } clone bootstrapping-image set here
-    data-base - bootstrap-cell /
+{ { -93 -93 } } [
+    [
+        V{ } clone bootstrapping-image set here
+        data-base - bootstrap-cell /
+    ] with-image-cell-sizes
 ] unit-test
 
 ! here-as
-{ -94 } [
-    V{ } clone bootstrapping-image set array type-number here-as
-    data-base - 15 unmask bootstrap-cell /
+{ { -96 -94 } } [
+    [
+        V{ } clone bootstrapping-image set array type-number here-as
+        data-base - 15 unmask bootstrap-cell /
+    ] with-image-cell-sizes
 ] unit-test
 
 ! prepare-object
-{ -94 } [
-    V{ } clone bootstrapping-image set
-    H{ } clone objects set
-    55 >bignum prepare-object
-    data-base - 15 unmask bootstrap-cell /
+{ { -96 -94 } } [
+    [
+        V{ } clone bootstrapping-image set
+        H{ } clone objects set
+        55 >bignum prepare-object
+        data-base - 15 unmask bootstrap-cell /
+    ] with-image-cell-sizes
 ] unit-test
 
 ! The serialized cells use the target width and byte order, including

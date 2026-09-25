@@ -71,7 +71,11 @@ M: fixnum bitnot fixnum-bitnot ; inline
 : bit-count ( n -- n' )
     dup fixnum? [ bignum-bit-count ] unless ; inline
 
-M: fixnum bit? bit-count fixnum-bit? ; inline
+! The machine bit-test instruction wraps counts at the cell width.
+! Outside the fixnum's bits, the result is its sign extension.
+M: fixnum bit?
+    bit-count dup 0 fixnum-bits between?
+    [ fixnum-bit? ] [ drop 0 < ] if ; inline
 
 : fixnum-log2 ( x -- n )
     { fixnum } declare
