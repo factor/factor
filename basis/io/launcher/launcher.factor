@@ -83,7 +83,7 @@ SYMBOL: wait-delay
     ] [
         (wait-for-processes) [
             wait-delay [
-                [ milliseconds sleep ] [ 5 + 100 max ] bi
+                [ milliseconds sleep ] [ 5 + 100 min ] bi
             ] change-global
         ] when
     ] if ;
