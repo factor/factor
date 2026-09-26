@@ -11,4 +11,5 @@ HELP: ydec-file
 { $notes "For a multipart envelope, decodes one part and checks its range, part number, size and required pcrc32. The ypart begin and end fields are included in the returned header as one-based, inclusive byte offsets. Separate parts are not assembled automatically. A whole-file crc32 is returned but can only be checked when the part covers the entire file. " { $link yenc-file } " produces single-part envelopes." } ;
 
 HELP: invalid-yenc
+{ $values { "reason" string } }
 { $description "Thrown when a yEnc envelope is missing required size, part or marker information, or fails size, range or CRC32 validation." } ;
