@@ -1,6 +1,6 @@
 ! Copyright (C) 2024 Dmitry Matveyev.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel raylib multiline ;
+USING: continuations help.markup help.syntax kernel raylib multiline ;
 FROM: vocabs.refresh => refresh-all ;
 IN: raylib.live-coding
 
@@ -16,9 +16,9 @@ HELP: on-key-reload-code
 
 HELP: until-window-should-close-with-live-coding
 { $values
-    { "game-loop-quot" "main game loop that must recurse until the game is closed" }
+    { "game-loop-quot" "a quotation drawing one frame" }
 }
-{ $description "Combines both an unending iteration of the supplised game loop quotation as well as inserts pauses for " { $link lc-sleep-duration } " giving control to the Listener." } ;
+{ $description "Repeats the supplied quotation until the window closes, inserting pauses of " { $link lc-sleep-duration } " to give control to the Listener. Call this after initializing the Raylib window; its native OpenGL context is captured and restored before each frame." } ;
 
 HELP: with-live-coding
 { $values
@@ -37,6 +37,8 @@ $list
 "Inspect and change the environment right from the Listener"
 "Choose whether to close the game or continue if there's an error during execution"
 } $nl
+
+"Context switching uses native OpenGL APIs: Cocoa on macOS, WGL on Windows, and GLX or EGL on Linux and FreeBSD. It does not require a separately installed GLFW library or exported GLFW functions in Raylib. Keep the Raylib window alive throughout the loop, and close it in a cleanup quotation using " { $link finally } "." $nl
 
 "See the demo "
 { $vocab-link "raylib.demo.live-coding" } " for a usual set up. In the demo try to do the following: " {

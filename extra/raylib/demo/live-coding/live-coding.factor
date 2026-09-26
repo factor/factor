@@ -1,6 +1,6 @@
 ! Copyright (C) 2024 Dmitry Matveyev.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces raylib raylib.live-coding math.parser
+USING: continuations kernel namespaces raylib raylib.live-coding math.parser
 accessors ;
 IN: raylib.demo.live-coding
 
@@ -25,11 +25,12 @@ TUPLE: my-color color ;
 
 : main ( -- )
     800 640 "Raylib Live Coding Demo" init-window
-    60 set-target-fps
-    0 counter set
-    BLACK my-color boa text-color set
-    [ game-loop ] until-window-should-close-with-live-coding
-    close-window ;
+    [
+        60 set-target-fps
+        0 counter set
+        BLACK my-color boa text-color set
+        [ game-loop ] until-window-should-close-with-live-coding
+    ] [ close-window ] finally ;
 
 : dev ( -- )
     [ main ] with-live-coding ;
