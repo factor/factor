@@ -1,6 +1,7 @@
 // primitives/math.zig - Number type conversions, fixnum/bignum/float arithmetic
 
 const std = @import("std");
+const builtin = @import("builtin");
 const bignum = @import("../bignum.zig");
 const float_mod = @import("../float.zig");
 const layouts = @import("../layouts.zig");
@@ -843,7 +844,18 @@ extern "c" fn uselocale(loc: ?*anyopaque) ?*anyopaque;
 extern "c" fn freelocale(loc: ?*anyopaque) c_int;
 
 const locale_h = @cImport(@cInclude("locale.h"));
-const lc_all_mask: c_int = locale_h.LC_ALL_MASK;
+const lc_all_mask: c_int = if (builtin.os.tag == .windows) locale_h.LC_ALL else locale_h.LC_ALL_MASK;
+extern "c" fn _create_locale(c_int, [*c]const u8) ?*anyopaque;
+extern "c" fn _free_locale(*anyopaque) void;
+extern "c" fn factor_windows_format_float([*c]u8, usize, [*c]const u8, *anyopaque, c_int, f64) c_int;
+fn createLocale(name: [*c]const u8) ?*anyopaque {
+    return if (builtin.os.tag == .windows) _create_locale(lc_all_mask, name) else newlocale(lc_all_mask, name, null);
+}
+fn freeLocale(loc: *anyopaque) void {
+    if (builtin.os.tag == .windows) _free_locale(loc) else {
+        _ = freelocale(loc);
+    }
+}
 
 pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
@@ -872,11 +884,11 @@ pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) voi
         ctx.replace(vm.allotByteArray(0));
         return;
     });
-    const loc = newlocale(lc_all_mask, locale_ptr, null) orelse {
+    const loc = createLocale(locale_ptr) orelse {
         ctx.replace(vm.allotByteArray(0));
         return;
     };
-    defer _ = freelocale(loc);
+    defer freeLocale(loc);
 
     // Map the format char to a printf conversion, mirroring vm/math.cpp:
     //   'f' -> std::fixed       -> %f   (precision = digits after the point)
@@ -900,9 +912,13 @@ pub export fn primitive_format_float(vm_asm: *VMAssemblyFields) callconv(.c) voi
     const fmt_buf = [_]u8{ '%', '.', '*', conv, 0 };
 
     var buf: [256]u8 = undefined;
-    const old_loc = uselocale(loc);
-    const written = snprintf(&buf, buf.len, &fmt_buf, prec_arg, value);
-    _ = uselocale(old_loc);
+    const written = if (builtin.os.tag == .windows)
+        factor_windows_format_float(&buf, buf.len, &fmt_buf, loc, prec_arg, value)
+    else blk: {
+        const old_loc = uselocale(loc);
+        defer _ = uselocale(old_loc);
+        break :blk snprintf(&buf, buf.len, &fmt_buf, prec_arg, value);
+    };
 
     if (written < 0 or @as(usize, @intCast(written)) >= buf.len) {
         ctx.replace(vm.allotByteArray(0));

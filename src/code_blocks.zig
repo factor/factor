@@ -1,4 +1,5 @@
 const std = @import("std");
+const platform = @import("platform.zig");
 const builtin = @import("builtin");
 
 const alien = @import("primitives/alien.zig");
@@ -844,7 +845,7 @@ pub fn computeDlsymAddress(parameters: *const layouts.Array, index: Cell) Cell {
         if (dlsym_cache.get(key)) |cached| return cached;
     }
 
-    const sym_addr = std.c.dlsym(handle, name_ptr);
+    const sym_addr = platform.dlsym(handle, name_ptr);
     if (sym_addr) |addr| {
         const value: Cell = @intFromPtr(addr);
         if (cacheable and dlsym_cache.count() < dlsym_cache_entries_max) {

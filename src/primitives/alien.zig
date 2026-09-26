@@ -1,4 +1,6 @@
 const std = @import("std");
+const builtin = @import("builtin");
+const platform = @import("../platform.zig");
 
 const bignum = @import("../bignum.zig");
 const code_blocks = @import("../code_blocks.zig");
@@ -29,16 +31,16 @@ fn toFixnum(vm: *FactorVM, tagged: Cell) Fixnum {
 pub var null_dll: ?*anyopaque = null;
 
 pub fn initFfi() void {
-    var rtld_mode: std.c.RTLD = .{};
+    var rtld_mode: platform.RTLD = .{};
     rtld_mode.LAZY = true;
 
     // Pre-load libm so dlsym(NULL, "pow") etc. work at runtime.
     // Zig statically resolves math builtins, so libm isn't in NEEDED — load it explicitly.
     var global_mode = rtld_mode;
     global_mode.GLOBAL = true;
-    _ = std.c.dlopen("libm.so.6", global_mode);
+    if (builtin.os.tag == .linux) _ = platform.dlopen("libm.so.6", global_mode);
 
-    null_dll = std.c.dlopen(null, rtld_mode);
+    null_dll = platform.dlopen(null, rtld_mode);
 }
 
 // --- Alien/FFI Primitives ---
@@ -405,7 +407,7 @@ pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const capacity = layouts.untagFixnumUnsigned(path_ba.capacity);
     const path_data = path_ba.data();
 
-    var path_buf: [1024]u8 = undefined;
+    var path_buf: [1024]u8 align(2) = undefined;
     if (capacity >= path_buf.len) {
         vm.push(layouts.false_object);
         return;
@@ -413,10 +415,10 @@ pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     @memcpy(path_buf[0..capacity], path_data[0..capacity]);
     path_buf[capacity] = 0;
 
-    var rtld_mode: std.c.RTLD = .{};
+    var rtld_mode: platform.RTLD = .{};
     rtld_mode.LAZY = true;
     rtld_mode.GLOBAL = true;
-    const handle = std.c.dlopen(@ptrCast(&path_buf), rtld_mode);
+    const handle = platform.dlopen(@ptrCast(&path_buf), rtld_mode);
 
     // A newly opened RTLD_GLOBAL library can change what a symbol resolves to.
     if (handle != null) code_blocks.clearDlsymCache();
@@ -431,7 +433,7 @@ pub export fn primitive_dlopen(vm_asm: *VMAssemblyFields) callconv(.c) void {
     defer _ = vm.data_roots.pop();
 
     const tagged = vm.allotObject(.dll, @sizeOf(layouts.Dll)) orelse {
-        if (handle) |h| _ = std.c.dlclose(h);
+        if (handle) |h| _ = platform.dlclose(h);
         vm.memoryError();
     };
     const dll: *layouts.Dll = @ptrFromInt(layouts.UNTAG(tagged));
@@ -461,12 +463,12 @@ pub export fn primitive_dlsym(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     const sym_addr: ?*anyopaque = blk: {
         if (library_cell == layouts.false_object) {
-            break :blk std.c.dlsym(null_dll, @ptrCast(&name_buf));
+            break :blk platform.dlsym(null_dll, @ptrCast(&name_buf));
         }
         vm.checkTag(library_cell, .dll);
         const dll: *const layouts.Dll = @ptrFromInt(layouts.UNTAG(library_cell));
         if (dll.handle == null) break :blk null;
-        break :blk std.c.dlsym(dll.handle, @ptrCast(&name_buf));
+        break :blk platform.dlsym(dll.handle, @ptrCast(&name_buf));
     };
 
     if (sym_addr) |addr| {
@@ -492,7 +494,7 @@ pub export fn primitive_dlclose(vm_asm: *VMAssemblyFields) callconv(.c) void {
 
     const dll: *layouts.Dll = @ptrFromInt(layouts.UNTAG(dll_cell));
     if (dll.handle) |handle| {
-        _ = std.c.dlclose(handle);
+        _ = platform.dlclose(handle);
         dll.handle = null;
         // Cached addresses into the closed library are now dangling.
         code_blocks.clearDlsymCache();

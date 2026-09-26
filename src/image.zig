@@ -2,6 +2,7 @@
 // Image format documentation
 
 const std = @import("std");
+const platform = @import("platform.zig");
 const builtin = @import("builtin");
 
 const bump_allocator = @import("bump_allocator.zig");
@@ -50,7 +51,7 @@ fn mapDummyMemoryIfNeeded(address: Cell, allocator: std.mem.Allocator) void {
     }
 
     // Try to mmap at this specific address
-    const result = std.c.mmap(
+    const result = platform.mmap(
         @ptrFromInt(page_addr),
         page_size,
         .{ .READ = true, .WRITE = true },
@@ -59,7 +60,7 @@ fn mapDummyMemoryIfNeeded(address: Cell, allocator: std.mem.Allocator) void {
         0,
     );
 
-    if (result != std.c.MAP_FAILED) {
+    if (result != platform.MAP_FAILED) {
         // Workaround tracking: if put fails, worst case is a redundant mmap next call
         mapped_pages.put(page_addr, {}) catch {};
     }
@@ -534,11 +535,11 @@ pub const ImageLoader = struct {
         // use ordinary executable anonymous mappings.
         const is_arm64 = builtin.cpu.arch == .aarch64;
         const needs_map_jit = builtin.os.tag == .macos and is_arm64;
-        const map_flags: std.c.MAP = if (needs_map_jit)
+        const map_flags: platform.MAP = if (needs_map_jit)
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true, .JIT = true }
         else
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true };
-        const full_region = std.c.mmap(
+        const full_region = platform.mmap(
             null,
             total_size,
             .{ .READ = true, .WRITE = true, .EXEC = true },
@@ -546,7 +547,7 @@ pub const ImageLoader = struct {
             -1,
             0,
         );
-        if (full_region == std.c.MAP_FAILED) {
+        if (full_region == platform.MAP_FAILED) {
             return ImageError.OutOfMemory;
         }
 
@@ -560,7 +561,7 @@ pub const ImageLoader = struct {
             // Silicon, and arm/disarm uses mprotect(), which the kernel rejects
             // (EACCES) on JIT memory. The C++ VM does the same: a separate
             // non-executable safepoint segment (vm/code_heap.cpp).
-            const safepoint_region = std.c.mmap(
+            const safepoint_region = platform.mmap(
                 null,
                 page_size,
                 .{ .READ = true, .WRITE = true },
@@ -568,8 +569,8 @@ pub const ImageLoader = struct {
                 -1,
                 0,
             );
-            if (safepoint_region == std.c.MAP_FAILED) {
-                _ = std.c.munmap(@ptrCast(region_bytes), total_size);
+            if (safepoint_region == platform.MAP_FAILED) {
+                _ = platform.munmap(@ptrCast(region_bytes), total_size);
                 self.code_mmap_region = null;
                 return ImageError.OutOfMemory;
             }
@@ -668,7 +669,7 @@ pub const ImageLoader = struct {
             } else {
                 // The mmap already requested RWX, but call mprotect to be sure
                 const code_page_ptr: *align(std.heap.page_size_min) anyopaque = @ptrCast(@alignCast(cr.ptr));
-                _ = std.c.mprotect(code_page_ptr, aligned_code_size, .{ .READ = true, .WRITE = true, .EXEC = true });
+                _ = platform.mprotect(code_page_ptr, aligned_code_size, .{ .READ = true, .WRITE = true, .EXEC = true });
             }
         }
     }
@@ -849,13 +850,13 @@ pub const ImageLoader = struct {
                     const path_data = path_ba.data();
 
                     // Create null-terminated path
-                    var path_buf: [1024]u8 = undefined;
+                    var path_buf: [1024]u8 align(2) = undefined;
                     if (path_len < path_buf.len) {
                         @memcpy(path_buf[0..path_len], path_data[0..path_len]);
                         path_buf[path_len] = 0;
 
                         // Try to load the DLL
-                        d.handle = std.c.dlopen(@ptrCast(&path_buf), .{ .LAZY = true, .GLOBAL = true });
+                        d.handle = platform.dlopen(@ptrCast(&path_buf), .{ .LAZY = true, .GLOBAL = true });
                     }
                 }
             },
@@ -1211,14 +1212,14 @@ pub const ImageLoader = struct {
 
         // Use the full mmap region for munmap
         if (self.code_mmap_region) |region| {
-            _ = std.c.munmap(@ptrCast(region.ptr), region.len);
+            _ = platform.munmap(@ptrCast(region.ptr), region.len);
             self.code_mmap_region = null;
             self.code_region = null; // code_region is a slice of code_mmap_region
         }
 
         // Free the separate safepoint guard page mapping.
         if (self.safepoint_mmap_region) |region| {
-            _ = std.c.munmap(@ptrCast(region.ptr), region.len);
+            _ = platform.munmap(@ptrCast(region.ptr), region.len);
             self.safepoint_mmap_region = null;
         }
 

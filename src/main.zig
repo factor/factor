@@ -47,23 +47,43 @@ comptime {
 // On both macOS and Linux, stdin/stdout/stderr are global variables of type
 // FILE*. @extern gives us the address of the variable itself, so we need
 // *const *FILE (pointer to the variable) and dereference to get the FILE*.
+extern "c" fn __acrt_iob_func(c_uint) *std.c.FILE;
+
 fn getCStdin() *std.c.FILE {
+    if (builtin.os.tag == .windows) return __acrt_iob_func(0);
     const name = if (builtin.os.tag == .macos) "__stdinp" else "stdin";
     return @extern(*const *std.c.FILE, .{ .name = name }).*;
 }
 
 fn getCStdout() *std.c.FILE {
+    if (builtin.os.tag == .windows) return __acrt_iob_func(1);
     const name = if (builtin.os.tag == .macos) "__stdoutp" else "stdout";
     return @extern(*const *std.c.FILE, .{ .name = name }).*;
 }
 
 fn getCStderr() *std.c.FILE {
+    if (builtin.os.tag == .windows) return __acrt_iob_func(2);
     const name = if (builtin.os.tag == .macos) "__stderrp" else "stderr";
     return @extern(*const *std.c.FILE, .{ .name = name }).*;
 }
 
-extern "c" fn realpath(path: [*:0]const u8, resolved: ?[*:0]u8) ?[*:0]u8;
-extern "c" fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int;
+const posix_paths = struct {
+    extern "c" fn realpath(path: [*:0]const u8, resolved: ?[*:0]u8) ?[*:0]u8;
+    extern "c" fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int;
+};
+extern "c" fn _fullpath(?[*:0]u8, [*:0]const u8, usize) ?[*:0]u8;
+extern "c" fn _access([*:0]const u8, c_int) c_int;
+extern "c" fn _putenv_s([*:0]const u8, [*:0]const u8) c_int;
+fn realpath(path: [*:0]const u8, resolved: ?[*:0]u8) ?[*:0]u8 {
+    if (builtin.os.tag != .windows) return posix_paths.realpath(path, resolved);
+    if (_access(path, 0) != 0) return null;
+    return _fullpath(resolved, path, if (resolved == null) 0 else 4096);
+}
+fn setenv(name: [*:0]const u8, value: [*:0]const u8, overwrite: c_int) c_int {
+    if (builtin.os.tag != .windows) return posix_paths.setenv(name, value, overwrite);
+    if (overwrite == 0 and std.c.getenv(name) != null) return 0;
+    return _putenv_s(name, value);
+}
 extern "c" fn free(ptr: ?*anyopaque) void;
 
 // macOS: locate factor.image relative to a .app bundle, independent of cwd.
@@ -225,6 +245,17 @@ fn prepareBootImage(vm: *vm_mod.FactorVM) void {
     std.debug.print("done\n", .{});
 }
 
+fn nativeStringAlien(vm: *vm_mod.FactorVM, text: []const u8) layouts.Cell {
+    if (builtin.os.tag != .windows) return vm.allotAlien(layouts.false_object, @intFromPtr(text.ptr));
+    const wide = std.unicode.utf8ToUtf16LeAllocZ(vm.allocator, text) catch vm.memoryError();
+    defer vm.allocator.free(wide);
+    const bytes = std.mem.sliceAsBytes(wide[0 .. wide.len + 1]);
+    const base = vm.allotUninitializedByteArray(bytes.len);
+    const array: *layouts.ByteArray = @ptrFromInt(layouts.UNTAG(base));
+    @memcpy(array.data()[0..bytes.len], bytes);
+    return vm.allotAlien(base, 0);
+}
+
 // Initialize special objects for stdin/stdout/stderr file handles
 fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_path: []const u8) void {
     const stdin_ptr = getCStdin();
@@ -265,11 +296,11 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.os)] = os_alien;
 
     // OBJ_EXECUTABLE = 14 (runtime executable path)
-    const executable_alien = vm.allotAlien(layouts.false_object, @intFromPtr(executable_path.ptr));
+    const executable_alien = nativeStringAlien(vm, executable_path);
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.executable)] = executable_alien;
 
     // OBJ_IMAGE = 13 (image path)
-    const image_alien = vm.allotAlien(layouts.false_object, @intFromPtr(image_path.ptr));
+    const image_alien = nativeStringAlien(vm, image_path);
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.image)] = image_alien;
 
     // OBJ_VM_COMPILE_TIME = 75
@@ -287,6 +318,10 @@ fn initSpecialObjects(vm: *vm_mod.FactorVM, image_path: []const u8, executable_p
     // OBJ_VM_VERSION = 76
     const version_alien = vm.allotAlien(layouts.false_object, @intFromPtr(FACTOR_VM_VERSION.ptr));
     vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.vm_version)] = version_alien;
+    if (builtin.os.tag == .windows) {
+        const handler_alien = vm.allotAlien(layouts.false_object, @intFromPtr(&@import("windows_signals.zig").exception_handler));
+        vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.win_exception_handler)] = handler_alien;
+    }
 }
 
 // Pass command line arguments to Factor via OBJ_ARGS special object
@@ -304,7 +339,7 @@ fn passArgsToFactor(vm: *vm_mod.FactorVM, args: []const [:0]const u8) void {
     // Create an alien for each argument string
     // NOTE: allotAlien can trigger GC, but args_array is a GC root via special_objects.
     for (args, 0..) |arg, i| {
-        const alien = vm.allotAlien(layouts.false_object, @intFromPtr(arg.ptr));
+        const alien = nativeStringAlien(vm, arg);
 
         // Re-fetch the array pointer AFTER the allocation. It may have moved,
         // and after its first promotion this old->young store also needs the
@@ -327,7 +362,8 @@ pub fn main(init: std.process.Init) !void {
     // Collect command line arguments into a slice
     var args_list: std.ArrayList([:0]const u8) = .empty;
     defer args_list.deinit(allocator);
-    var args_iter = init.minimal.args.iterate();
+    var args_iter = try init.minimal.args.iterateAllocator(allocator);
+    defer args_iter.deinit();
     while (args_iter.next()) |arg| {
         try args_list.append(allocator, arg);
     }
@@ -599,8 +635,16 @@ test "passArgsToFactor survives repeated nursery collections" {
     for (args_array.data()[0..arg_count]) |alien_cell| {
         try std.testing.expect(layouts.hasTag(alien_cell, .alien));
         const alien: *const layouts.Alien = @ptrFromInt(layouts.UNTAG(alien_cell));
-        try std.testing.expectEqual(layouts.false_object, alien.base);
-        try std.testing.expectEqual(@intFromPtr(args[0].ptr), alien.address);
+        if (builtin.os.tag == .windows) {
+            try std.testing.expect(layouts.hasTag(alien.base, .byte_array));
+            const wide: [*:0]const u16 = @ptrFromInt(alien.address);
+            const expected = try std.unicode.utf8ToUtf16LeAllocZ(std.testing.allocator, args[0]);
+            defer std.testing.allocator.free(expected);
+            try std.testing.expectEqualSlices(u16, expected, std.mem.span(wide));
+        } else {
+            try std.testing.expectEqual(layouts.false_object, alien.base);
+            try std.testing.expectEqual(@intFromPtr(args[0].ptr), alien.address);
+        }
     }
 }
 
@@ -628,6 +672,9 @@ test {
 // Force linker to keep exported symbols by referencing them
 comptime {
     // C API exports
+    if (builtin.os.tag == .windows) {
+        _ = @import("windows_process_wait.zig");
+    }
     _ = &c_api.begin_callback;
     _ = &c_api.end_callback;
     _ = &c_api.inline_cache_miss;

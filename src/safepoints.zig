@@ -1,4 +1,6 @@
 const std = @import("std");
+const builtin = @import("builtin");
+const platform = @import("platform.zig");
 
 const callstack = @import("callstack.zig");
 const code_blocks_mod = @import("code_blocks.zig");
@@ -75,12 +77,12 @@ pub fn setSafepointGuard(vm: *vm_mod.FactorVM, locked: bool) !void {
     const page_size = segments.page_size;
     const ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(safepoint_page);
 
-    const prot: std.c.PROT = if (locked)
+    const prot: platform.PROT = if (locked)
         .{}
     else
         .{ .READ = true, .WRITE = true };
 
-    if (std.c.mprotect(ptr, page_size, prot) != 0) return error.MprotectFailed;
+    if (platform.mprotect(ptr, page_size, prot) != 0) return error.MprotectFailed;
 }
 
 // Arm the safepoint - protect the page so access will fault
@@ -410,6 +412,8 @@ pub fn startSamplingProfiler(vm: *vm_mod.FactorVM, samples_per_second: Cell) !vo
     vm.sampling_profiler_p = true;
     sampling_profiler_p.store(true, .monotonic);
 
+    if (builtin.os.tag == .windows) return @import("windows_signals.zig").startSampling(vm, samples_per_second);
+
     // Set up timer to fire at the specified rate
     const interval_usec = @max(1, 1_000_000 / samples_per_second);
     const interval = std.posix.timeval{
@@ -428,6 +432,12 @@ pub fn startSamplingProfiler(vm: *vm_mod.FactorVM, samples_per_second: Cell) !vo
 pub fn endSamplingProfiler(vm: *vm_mod.FactorVM) void {
     vm.sampling_profiler_p = false;
     sampling_profiler_p.store(false, .monotonic);
+
+    if (builtin.os.tag == .windows) {
+        @import("windows_signals.zig").stopSampling();
+        recordSample(vm, false);
+        return;
+    }
 
     // Stop the timer
     const timer = itimerval{
@@ -475,7 +485,7 @@ test "safepoint page protection" {
     // Mirror image.zig: the safepoint page is a dedicated non-executable
     // mapping because macOS rejects mprotect() on MAP_JIT memory.
     const page_size = segments.page_size;
-    const safepoint_region = std.c.mmap(
+    const safepoint_region = platform.mmap(
         null,
         page_size,
         .{ .READ = true, .WRITE = true },
@@ -483,9 +493,9 @@ test "safepoint page protection" {
         -1,
         0,
     );
-    if (safepoint_region == std.c.MAP_FAILED) return error.OutOfMemory;
+    if (safepoint_region == platform.MAP_FAILED) return error.OutOfMemory;
     const safepoint_ptr: *align(std.heap.page_size_min) anyopaque = @alignCast(safepoint_region);
-    defer _ = std.c.munmap(safepoint_ptr, page_size);
+    defer _ = platform.munmap(safepoint_ptr, page_size);
 
     // Create a CodeHeap with safepoint page at segment start
     const code_heap = try std.testing.allocator.create(vm_mod.CodeHeap);

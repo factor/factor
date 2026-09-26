@@ -1,4 +1,5 @@
 const std = @import("std");
+const platform = @import("platform.zig");
 const builtin = @import("builtin");
 
 const code_blocks = @import("code_blocks.zig");
@@ -792,7 +793,7 @@ pub const GarbageCollector = struct {
         } else {
             const seg_ptr: [*]align(std.heap.page_size_min) u8 = @ptrFromInt(old_heap.segment.start);
             const seg_slice: []align(std.heap.page_size_min) u8 = seg_ptr[0..@intCast(old_heap.segment.size)];
-            _ = std.c.munmap(@ptrCast(seg_slice.ptr), seg_slice.len);
+            _ = platform.munmap(@ptrCast(seg_slice.ptr), seg_slice.len);
         }
 
         const aging_in_seg = old_heap.aging.start >= seg_start and old_heap.aging.start < seg_end;
@@ -803,21 +804,21 @@ pub const GarbageCollector = struct {
                 const total = old_heap.aging.size * 2;
                 const aging_ptr: [*]align(std.heap.page_size_min) u8 = @ptrFromInt(old_heap.aging.start);
                 const slice: []align(std.heap.page_size_min) u8 = aging_ptr[0..@intCast(total)];
-                _ = std.c.munmap(@ptrCast(slice.ptr), slice.len);
+                _ = platform.munmap(@ptrCast(slice.ptr), slice.len);
             } else {
                 const aging_ptr1: [*]align(std.heap.page_size_min) u8 = @ptrFromInt(old_heap.aging.start);
                 const slice1: []align(std.heap.page_size_min) u8 = aging_ptr1[0..@intCast(old_heap.aging.size)];
                 const aging_ptr2: [*]align(std.heap.page_size_min) u8 = @ptrFromInt(old_heap.aging_semispace.start);
                 const slice2: []align(std.heap.page_size_min) u8 = aging_ptr2[0..@intCast(old_heap.aging_semispace.size)];
-                _ = std.c.munmap(@ptrCast(slice1.ptr), slice1.len);
-                _ = std.c.munmap(@ptrCast(slice2.ptr), slice2.len);
+                _ = platform.munmap(@ptrCast(slice1.ptr), slice1.len);
+                _ = platform.munmap(@ptrCast(slice2.ptr), slice2.len);
             }
         }
 
         if (!nursery_in_seg) {
             const nursery_ptr: [*]align(std.heap.page_size_min) u8 = @ptrFromInt(old_heap.nursery.start);
             const slice: []align(std.heap.page_size_min) u8 = nursery_ptr[0..@intCast(old_heap.nursery.size)];
-            _ = std.c.munmap(@ptrCast(slice.ptr), slice.len);
+            _ = platform.munmap(@ptrCast(slice.ptr), slice.len);
         }
 
         old_heap.allocator.destroy(old_heap);

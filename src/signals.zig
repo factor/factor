@@ -71,6 +71,11 @@ const SpinMutex = @import("mutex.zig").SpinMutex;
 var thread_vm_map_lock: SpinMutex = .{};
 var thread_vm_map_allocator: ?std.mem.Allocator = null;
 
+fn currentThreadKey() usize {
+    if (builtin.os.tag == .windows) return @import("platform.zig").win.GetCurrentThreadId();
+    return pthreadKey(std.c.pthread_self());
+}
+
 fn pthreadKey(pthread_id: std.c.pthread_t) usize {
     return switch (@typeInfo(std.c.pthread_t)) {
         .pointer => @intFromPtr(pthread_id),
@@ -82,8 +87,7 @@ fn pthreadKey(pthread_id: std.c.pthread_t) usize {
 pub fn registerVmWithThread(vm: *vm_mod.FactorVM) void {
     g_current_vm = vm;
 
-    const pthread_id = std.c.pthread_self();
-    const key = pthreadKey(pthread_id);
+    const key = currentThreadKey();
 
     thread_vm_map_lock.lock();
     defer thread_vm_map_lock.unlock();
@@ -98,8 +102,7 @@ pub fn registerVmWithThread(vm: *vm_mod.FactorVM) void {
 
 pub fn unregisterVmFromThread() void {
     g_current_vm = null;
-    const pthread_id = std.c.pthread_self();
-    const key = pthreadKey(pthread_id);
+    const key = currentThreadKey();
 
     thread_vm_map_lock.lock();
     defer thread_vm_map_lock.unlock();
@@ -130,7 +133,7 @@ test "unregister clears the current VM and releases the thread map" {
     try std.testing.expectEqual(vm, getCurrentVM().?);
     unregisterVmFromThread();
     try std.testing.expect(getCurrentVM() == null);
-    try std.testing.expect(getVmForThread(std.c.pthread_self()) == null);
+    try std.testing.expect(thread_vm_map.get(currentThreadKey()) == null);
     try std.testing.expect(thread_vm_map_allocator == null);
     // Teardown can also be reached without a successful registration.
     unregisterVmFromThread();
@@ -453,6 +456,7 @@ fn faultWithoutVm() void {
 }
 
 test "memory fault on a foreign thread without a VM is a fatal error" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
     const pid = std.c.fork();
     try std.testing.expect(pid >= 0);
     if (pid == 0) {
@@ -508,6 +512,7 @@ fn raiseFpeWithoutVm() void {
 }
 
 test "SIGFPE on a foreign thread without a VM is a fatal error" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
     const pid = std.c.fork();
     try std.testing.expect(pid >= 0);
     if (pid == 0) {
@@ -1028,6 +1033,7 @@ fn tagFixnum(n: anytype) Cell {
 }
 
 fn restoreDefaultAbort() void {
+    if (builtin.os.tag == .windows) return;
     const act = std.posix.Sigaction{
         .handler = .{ .handler = std.posix.SIG.DFL },
         .mask = std.posix.sigemptyset(),
@@ -1070,6 +1076,7 @@ fn waitForChild(pid: std.c.pid_t) !u32 {
 }
 
 test "the VM's abort is not caught by an installed SIGABRT handler" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
     const pid = std.c.fork();
     try std.testing.expect(pid >= 0);
     if (pid == 0) {
@@ -1088,6 +1095,7 @@ test "the VM's abort is not caught by an installed SIGABRT handler" {
 }
 
 test "a fatal error raised while fatal erroring exits with status 86" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
     const pid = std.c.fork();
     try std.testing.expect(pid >= 0);
     if (pid == 0) {
@@ -1109,6 +1117,7 @@ fn signalStackSize(callstack_size: Cell) Cell {
 }
 
 test "signal stack is never smaller than SIGSTKSZ" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
     try std.testing.expectEqual(sigstksz, signalStackSize(1024));
     try std.testing.expectEqual(@as(Cell, 1024 * 1024), signalStackSize(1024 * 1024));
     var seg = try @import("segments.zig").Segment.init(signalStackSize(16 * 1024), false);
@@ -1129,6 +1138,7 @@ pub fn initSignals(vm: *vm_mod.FactorVM) !void {
 
     // Initialize handler addresses for naked wrappers
     initHandlerAddress();
+    if (builtin.os.tag == .windows) return @import("windows_signals.zig").init(vm);
 
     // Create signal pipe for async signal delivery (uses io.zig helper)
     try io.initSignalPipe(vm);
@@ -1259,6 +1269,7 @@ pub fn initSignals(vm: *vm_mod.FactorVM) !void {
 
 // Set SIGINT to default handler (used while in factorbug debugger)
 pub fn ignoreCtrlC() void {
+    if (builtin.os.tag == .windows) return @import("windows_signals.zig").ignoreCtrlC();
     const act = std.posix.Sigaction{
         .handler = .{ .handler = std.c.SIG.DFL },
         .mask = std.posix.sigemptyset(),
@@ -1269,6 +1280,7 @@ pub fn ignoreCtrlC() void {
 
 // Re-register SIGINT handler for safepoint-based Ctrl-C (used when leaving factorbug)
 pub fn handleCtrlC() void {
+    if (builtin.os.tag == .windows) return @import("windows_signals.zig").handleCtrlC();
     const act = std.posix.Sigaction{
         .handler = .{ .sigaction = fepSignalHandler },
         .mask = std.posix.sigemptyset(),
@@ -1279,6 +1291,11 @@ pub fn handleCtrlC() void {
 
 // Cleanup signal handlers
 pub fn deinitSignals(vm: *vm_mod.FactorVM) void {
+    if (builtin.os.tag == .windows) {
+        @import("windows_signals.zig").deinit(vm);
+        unregisterVmFromThread();
+        return;
+    }
     if (vm.signal_pipe_input != -1) {
         _ = std.c.close(vm.signal_pipe_input);
         vm.signal_pipe_input = -1;

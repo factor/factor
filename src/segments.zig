@@ -1,6 +1,7 @@
 // segments.zig - Memory segment management
 
 const std = @import("std");
+const platform = @import("platform.zig");
 const builtin = @import("builtin");
 const layouts = @import("layouts.zig");
 const Cell = layouts.Cell;
@@ -43,7 +44,7 @@ pub const Segment = struct {
         // Page-align size to ensure guard pages work (mprotect requires page alignment)
         const size = (std.math.add(Cell, size_param, page_size - 1) catch return error.OutOfMemory) & ~@as(Cell, page_size - 1);
 
-        const prot: std.c.PROT = if (executable)
+        const prot: platform.PROT = if (executable)
             .{ .READ = true, .WRITE = true, .EXEC = true }
         else
             .{ .READ = true, .WRITE = true };
@@ -57,12 +58,12 @@ pub const Segment = struct {
         const is_arm64_macos = builtin.cpu.arch == .aarch64 and
             (builtin.os.tag == .macos or builtin.os.tag == .ios);
 
-        const map_flags: std.c.MAP = if (executable and is_arm64_macos)
+        const map_flags: platform.MAP = if (executable and is_arm64_macos)
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true, .JIT = true }
         else
             .{ .TYPE = .PRIVATE, .ANONYMOUS = true };
 
-        const ptr = std.c.mmap(
+        const ptr = platform.mmap(
             null,
             alloc_size,
             prot,
@@ -70,7 +71,7 @@ pub const Segment = struct {
             -1,
             0,
         );
-        if (ptr == std.c.MAP_FAILED) return error.OutOfMemory;
+        if (ptr == platform.MAP_FAILED) return error.OutOfMemory;
 
         // On ARM64 macOS with MAP_JIT, need to disable write protection for initial writes
         if (executable and is_arm64_macos) {
@@ -100,7 +101,7 @@ pub const Segment = struct {
         if (!(executable and is_arm64_macos)) {
             seg.setBorderLocked(true) catch {
                 // Cleanup on failure
-                _ = std.c.munmap(@ptrFromInt(alloc_base), alloc_size);
+                _ = platform.munmap(@ptrFromInt(alloc_base), alloc_size);
                 return error.MprotectFailed;
             };
         }
@@ -110,7 +111,7 @@ pub const Segment = struct {
 
     pub fn deinit(self: *Segment) void {
         if (self.alloc_size > 0) {
-            _ = std.c.munmap(@ptrFromInt(self.alloc_base), self.alloc_size);
+            _ = platform.munmap(@ptrFromInt(self.alloc_base), self.alloc_size);
         }
         self.start = 0;
         self.size = 0;
@@ -135,7 +136,7 @@ pub const Segment = struct {
 
     // Locks/unlocks ALL low guard pages (alloc_base to start) and the high guard page.
     pub fn setBorderLocked(self: *Segment, locked: bool) !void {
-        const prot: std.c.PROT = if (locked)
+        const prot: platform.PROT = if (locked)
             .{}
         else
             .{ .READ = true, .WRITE = true };
@@ -144,13 +145,13 @@ pub const Segment = struct {
         const lo_size = self.start - self.alloc_base;
         if (lo_size > 0) {
             const lo_ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(self.alloc_base);
-            if (std.c.mprotect(lo_ptr, lo_size, prot) != 0) return error.MprotectFailed;
+            if (platform.mprotect(lo_ptr, lo_size, prot) != 0) return error.MprotectFailed;
         }
 
         // High guard page
         const hi = self.end;
         const hi_ptr: *align(std.heap.page_size_min) anyopaque = @ptrFromInt(hi);
-        if (std.c.mprotect(hi_ptr, page_size, prot) != 0) return error.MprotectFailed;
+        if (platform.mprotect(hi_ptr, page_size, prot) != 0) return error.MprotectFailed;
     }
 };
 

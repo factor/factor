@@ -17,6 +17,11 @@ const Cell = layouts.Cell;
 /// Flush instruction cache for a memory range
 /// This ensures that modified code is visible to the instruction fetch unit
 pub fn flushICache(start: Cell, size: Cell) void {
+    if (builtin.os.tag == .windows) {
+        const win = @import("platform.zig").win;
+        if (win.FlushInstructionCache(win.GetCurrentProcess(), @ptrFromInt(start), size) == 0) @panic("FlushInstructionCache failed");
+        return;
+    }
     const end = start + size;
 
     switch (builtin.cpu.arch) {

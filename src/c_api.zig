@@ -168,6 +168,7 @@ fn safePipe() ?[2]c_int {
 
 /// Initialize stdin handling pipes
 pub export fn open_console() callconv(.c) void {
+    if (builtin.os.tag == .windows) return @import("windows_signals.zig").handleCtrlC();
     if (stdin_thread_initialized_p) return;
 
     const control_pipe = safePipe() orelse return;
@@ -216,6 +217,7 @@ pub export fn open_console() callconv(.c) void {
 
 /// Close stdin handling pipes and stop the thread
 pub export fn close_console() callconv(.c) void {
+    if (builtin.os.tag == .windows) return;
     if (!stdin_thread_initialized_p) return;
 
     // Signal thread to stop
@@ -255,6 +257,7 @@ pub export fn close_console() callconv(.c) void {
 
 /// Lock the console - used by FEP (debugger) to interrupt stdin reads
 pub export fn lock_console() callconv(.c) void {
+    if (builtin.os.tag == .windows) return;
     if (!stdin_thread_initialized_p) return;
     stdin_mutex.lock();
     _ = std.c.pthread_kill(stdin_pthread, .USR2);
@@ -262,6 +265,7 @@ pub export fn lock_console() callconv(.c) void {
 
 /// Unlock the console - allows stdin reads to resume
 pub export fn unlock_console() callconv(.c) void {
+    if (builtin.os.tag == .windows) return;
     if (!stdin_thread_initialized_p) return;
     stdin_mutex.unlock();
 }

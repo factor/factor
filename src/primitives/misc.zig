@@ -39,6 +39,13 @@ test "mach tick conversion keeps the fractional part of the timebase ratio" {
 }
 
 pub fn nanoCountMonotonic() u64 {
+    if (builtin.os.tag == .windows) {
+        const win = @import("../platform.zig").win;
+        var frequency: win.LARGE_INTEGER = undefined;
+        var ticks: win.LARGE_INTEGER = undefined;
+        if (win.QueryPerformanceFrequency(&frequency) == 0 or win.QueryPerformanceCounter(&ticks) == 0) @panic("QueryPerformanceCounter failed");
+        return @intCast(@as(u128, @intCast(ticks.QuadPart)) * 1_000_000_000 / @as(u64, @intCast(frequency.QuadPart)));
+    }
     // macOS: mach_absolute_time() scaled to nanoseconds
     // Linux: clock_gettime(CLOCK_MONOTONIC)
     if (comptime builtin.os.tag == .macos) {
@@ -82,6 +89,15 @@ pub export fn primitive_sleep(vm_asm: *VMAssemblyFields) callconv(.c) void {
     const vm = vm_asm.getVM();
     // ( nanos -- )
     const nanos = layouts.untagFixnum(vm.pop());
+    if (builtin.os.tag == .windows) {
+        var millis: u64 = @intCast(@divFloor(@max(nanos, 0), 1_000_000));
+        while (millis >= 0xffffffff) {
+            @import("../platform.zig").win.Sleep(0xfffffffe);
+            millis -= 0xfffffffe;
+        }
+        @import("../platform.zig").win.Sleep(@intCast(millis));
+        return;
+    }
     const secs = @divFloor(nanos, 1_000_000_000);
     const nsecs = @mod(nanos, 1_000_000_000);
     const ts = std.c.timespec{ .sec = @intCast(secs), .nsec = @intCast(nsecs) };

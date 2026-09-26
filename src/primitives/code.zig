@@ -370,6 +370,7 @@ fn modifyCodeHeapWithMalformedEntry(malformed: MalformedEntry) !void {
 }
 
 test "modify_code_heap rejects a malformed entry before changing any word" {
+    if (@import("builtin").os.tag == .windows) return error.SkipZigTest;
     for (std.enums.values(MalformedEntry)) |malformed| {
         const pid = std.c.fork();
         try std.testing.expect(pid >= 0);

@@ -3,6 +3,7 @@
 // heap walking, and object inspection.
 
 const std = @import("std");
+const platform = @import("platform.zig");
 
 const code_blocks = @import("code_blocks.zig");
 const layouts = @import("layouts.zig");
@@ -852,7 +853,7 @@ pub fn factorbug(vm: *FactorVM) void {
     signals.ignoreCtrlC();
 
     const stdin_fd = 0;
-    if (std.c.isatty(stdin_fd) == 0) {
+    if (platform.isatty(stdin_fd) == 0) {
         std.debug.print("(stdin is not a terminal - printing stacks and exiting)\n", .{});
         printDatastack(vm);
         printRetainstack(vm);
@@ -870,7 +871,7 @@ pub fn factorbug(vm: *FactorVM) void {
         std.debug.print("> ", .{});
 
         var buf: [1024]u8 = undefined;
-        const read_result = std.c.read(stdin_fd, &buf, buf.len);
+        const read_result = platform.read(stdin_fd, &buf, buf.len);
         if (read_result < 0) {
             if (!seen_command) {
                 vm.fep_disabled = true;

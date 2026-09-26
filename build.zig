@@ -36,6 +36,9 @@ pub fn build(b: *std.Build) void {
 
     // Link libc for system calls
     exe.root_module.link_libc = true;
+    if (target.result.os.tag == .windows) {
+        exe.root_module.addCSourceFile(.{ .file = b.path("src/windows_format.c") });
+    }
 
     // Export dynamic symbols so Factor runtime can find primitives via dlsym
     // This is equivalent to -rdynamic in GCC
@@ -75,7 +78,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(exe);
 
     // Compile cross-target VMs without installing over the host executable.
-    const check_step = b.step("check", "Compile the VM without installing or running it");
+    const check_step = b.step("check", "Compile the VM and tests without installing or running them");
     check_step.dependOn(&exe.step);
 
     // On macOS, also drop the binary into Factor.app/Contents/MacOS/factor and
@@ -146,11 +149,31 @@ pub fn build(b: *std.Build) void {
         }),
     });
     tests.root_module.link_libc = true;
+    if (target.result.os.tag == .windows) {
+        tests.root_module.addCSourceFile(.{ .file = b.path("src/windows_format.c") });
+    }
     tests.root_module.addOptions("build_options", options);
 
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_tests.step);
+
+    // Keep the native notification tests independently runnable on Windows,
+    // without requiring the rest of the VM to bootstrap first.
+    const process_wait_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/windows_process_wait.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+    const run_process_wait_tests = b.addRunArtifact(process_wait_tests);
+    const process_wait_test_step = b.step("test-process-wait", "Test Windows process notifications");
+    process_wait_test_step.dependOn(&run_process_wait_tests.step);
+    if (target.result.os.tag == .windows) test_step.dependOn(&run_process_wait_tests.step);
+
+    check_step.dependOn(&tests.step);
+    check_step.dependOn(&process_wait_tests.step);
 
     const docs_step = b.step("docs", "Build docs");
     const docs = b.addObject(.{
