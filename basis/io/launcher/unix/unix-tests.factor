@@ -40,6 +40,15 @@ IN: io.launcher.unix.tests
     { "./second/launcher-path-test" } [ "./second/launcher-path-test" spawn-executable ] unit-test
 ] with-test-directory
 
+! Fast exits and coalesced SIGCHLD notifications must not strand any waiters.
+{ } [
+    5 [
+        100 [
+            <process> { "true" } >>command 5 seconds >>timeout run-detached
+        ] replicate wait-for-success
+    ] times
+] unit-test
+
 ! Temporary C strings must be released on success and on an exception.
 { t } [
     disposables get cardinality

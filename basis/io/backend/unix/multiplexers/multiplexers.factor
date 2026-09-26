@@ -28,6 +28,10 @@ M: mx remove-output-callbacks writes>> delete-at* drop ;
 
 GENERIC: wait-for-events ( nanos mx -- )
 
+! Optional persistent signal notifications; unsupported backends can poll.
+GENERIC: add-signal-callback ( quot signal mx -- supported? )
+M: object add-signal-callback 3drop f ;
+
 : input-available ( fd mx -- )
     reads>> delete-at* drop [ resume ] each ;
 

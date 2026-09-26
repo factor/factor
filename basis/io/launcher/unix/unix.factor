@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data alien.destructors alien.strings
-alien.utilities assocs byte-arrays combinators continuations destructors
+alien.utilities assocs byte-arrays combinators concurrency.flags continuations destructors
 environment environment.unix fry
-io.backend io.backend.unix
+io.backend io.backend.unix io.backend.unix.multiplexers
 io.encodings.utf8 io.files.info io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc locals math namespaces sequences simple-tokenizer
@@ -241,6 +241,12 @@ DESTRUCTOR: posix-spawnattr-destroy
     f spawn-null-fd [ [ (spawn-process) ] with-destructors ] with-variable ;
 
 M: unix (current-process) getpid ;
+
+M: unix (process-notifications?)
+    [
+        [ wait-flag get-global raise-flag ] SIGCHLD
+        mx get-global add-signal-callback
+    ] [ drop f ] recover ;
 
 M: unix (run-process)
     os macos? cpu arm.64? and

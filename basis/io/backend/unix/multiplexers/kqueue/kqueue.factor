@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.data combinators
-destructors io.backend.unix libc kernel math.bitwise sequences
+destructors io.backend.unix libc kernel locals math.bitwise sequences
 specialized-arrays unix unix.kqueue unix.time assocs
 io.backend.unix.multiplexers classes.struct literals ;
 SPECIALIZED-ARRAY: kevent
 IN: io.backend.unix.multiplexers.kqueue
 
-TUPLE: kqueue-mx < mx events ;
+TUPLE: kqueue-mx < mx events signals ;
 
 ! We read up to 256 events at a time. This is an arbitrary
 ! constant...
@@ -16,6 +16,7 @@ CONSTANT: max-events 256
 : <kqueue-mx> ( -- mx )
     kqueue-mx new-mx
         kqueue dup io-error >>fd
+        H{ } clone >>signals
         max-events \ kevent <c-array> >>events ;
 
 M: kqueue-mx dispose* fd>> close-file ;
@@ -29,6 +30,17 @@ M: kqueue-mx dispose* fd>> close-file ;
 : register-kevent ( kevent mx -- )
     ! The changelist has already been applied if kevent returns EINTR (#505).
     fd>> swap 1 f 0 f [ kevent-func ] unix-system-call-allow-eintr drop ;
+
+M:: kqueue-mx add-signal-callback ( quot signal mx -- supported? )
+    mx signals>> [ ] [ H{ } clone dup mx signals<< ] if* :> callbacks
+    signal callbacks key? [ ] [
+        signal EVFILT_SIGNAL flags{ EV_ADD EV_CLEAR } make-kevent
+        mx register-kevent
+    ] if
+    quot signal callbacks set-at t ;
+
+: signal-available ( signal mx -- )
+    signals>> at [ call( -- ) ] when* ;
 
 M: kqueue-mx add-input-callback
     [
@@ -68,6 +80,7 @@ M: kqueue-mx remove-output-callbacks
     [ ident>> swap ] [ filter>> ] bi {
         { EVFILT_READ [ input-available ] }
         { EVFILT_WRITE [ output-available ] }
+        { EVFILT_SIGNAL [ signal-available ] }
     } case ;
 
 : handle-kevents ( mx n -- )

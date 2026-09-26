@@ -27,6 +27,7 @@ TUPLE: run-loop-mx kqueue-mx ;
 
 M: run-loop-mx add-input-callback kqueue-mx>> add-input-callback ;
 M: run-loop-mx add-output-callback kqueue-mx>> add-output-callback ;
+M: run-loop-mx add-signal-callback kqueue-mx>> add-signal-callback ;
 M: run-loop-mx remove-input-callbacks kqueue-mx>> remove-input-callbacks ;
 M: run-loop-mx remove-output-callbacks kqueue-mx>> remove-output-callbacks ;
 

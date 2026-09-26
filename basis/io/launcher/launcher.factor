@@ -71,6 +71,9 @@ SYMBOL: processes
 
 HOOK: (wait-for-processes) io-backend ( -- ? )
 
+HOOK: (process-notifications?) io-backend ( -- ? )
+M: object (process-notifications?) f ;
+
 <PRIVATE
 
 SYMBOL: wait-flag
@@ -82,9 +85,15 @@ SYMBOL: wait-delay
         wait-flag get-global lower-flag
     ] [
         (wait-for-processes) [
-            wait-delay [
-                [ milliseconds sleep ] [ 5 + 100 min ] bi
-            ] change-global
+            (process-notifications?) [
+                ! Recheck after registration: a child may have exited before
+                ! the notification source was installed.
+                (wait-for-processes) [ wait-flag get-global lower-flag ] when
+            ] [
+                wait-delay [
+                    [ milliseconds sleep ] [ 5 + 100 min ] bi
+                ] change-global
+            ] if
         ] when
     ] if ;
 
