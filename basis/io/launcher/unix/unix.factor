@@ -4,10 +4,10 @@ USING: accessors alien.c-types alien.data alien.destructors alien.strings
 alien.utilities assocs byte-arrays combinators continuations destructors
 environment environment.unix fry
 io.backend io.backend.unix
-io.encodings.utf8 io.files.private
+io.encodings.utf8 io.files.info io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
-io.ports kernel libc math namespaces sequences simple-tokenizer
-strings system unix unix.ffi unix.process unix.types ;
+io.ports kernel libc locals math namespaces sequences simple-tokenizer
+splitting strings system unix unix.ffi unix.process unix.types ;
 QUALIFIED-WITH: unix.signals sig
 IN: io.launcher.unix
 
@@ -187,12 +187,39 @@ DESTRUCTOR: posix-spawnattr-destroy
     [ get-environment assoc>env spawn-strings ]
     [ drop environ void* deref ] if ;
 
+! Probe PATH entries before spawning: on macOS, unsuccessful spawnp attempts
+! are much more expensive than checking whether an executable exists.
+: spawn-candidate? ( path -- ? )
+    [ dup X_OK access 0 = [ directory? not ] [ drop f ] if ]
+    [ 2drop f ] recover ;
+
+:: spawn-executable ( command -- path/f )
+    CHAR: / command member? [ command ] [
+        "PATH" os-env [
+            ":" split [
+                command append-path normalize-path
+                dup spawn-candidate?
+                [ drop f ] unless
+            ] map-find drop
+        ] [ f ] if*
+    ] if ;
+
+:: spawn-command ( pid command actions attr argv env -- error )
+    command spawn-executable [| path |
+        pid path actions attr argv env posix_spawn
+        dup 0 = [ ] [
+            ! Let libc preserve search errors and executable-format behavior
+            ! if a candidate changed or could not actually be executed.
+            drop pid command actions attr argv env posix_spawnp
+        ] if
+    ] [ pid command actions attr argv env posix_spawnp ] if* ;
+
 : (spawn-process) ( process -- pid )
     {
         [
             [ 0 pid_t <ref> dup ] dip
             get-arguments [
-                first utf8 string>alien
+                first
                 posix-spawn-file-actions-init &posix-spawn-file-actions-destroy
                 setup-working-directory
                 posix-spawnattr-init &posix-spawnattr-destroy reset-ignored-signals*
@@ -205,7 +232,7 @@ DESTRUCTOR: posix-spawnattr-destroy
         [ setup-redirection* ]
         [
             spawn-environment
-            posix_spawnp check-posix pid_t deref
+            spawn-command check-posix pid_t deref
         ]
         [ setup-priority* ]
     } cleave ;

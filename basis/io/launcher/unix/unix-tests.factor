@@ -1,11 +1,44 @@
 USING: accessors alien.c-types byte-arrays calendar concurrency.promises
 continuations destructors environment io
 io.backend.unix io.directories io.encodings.ascii
-io.encodings.binary io.encodings.utf8 io.files
-io.launcher io.launcher.unix
+io.encodings.binary io.encodings.utf8 io.files io.files.info.unix
+io.launcher io.launcher.unix io.pathnames
 io.streams.duplex io.timeouts kernel libc locals math namespaces
 sequences sets threads tools.test unix.process unix.signals unix.types ;
 IN: io.launcher.unix.tests
+
+! PATH is resolved against Factor's child directory and read afresh each time.
+[
+    "first" make-directory "second" make-directory
+    "#!/bin/sh\nprintf first" "first/launcher-path-test" utf8 set-file-contents
+    "#!/bin/sh\nprintf second" "second/launcher-path-test" utf8 set-file-contents
+    "first/launcher-path-test" 0o755 set-file-permissions
+    "second/launcher-path-test" 0o755 set-file-permissions
+
+    { "first" "second" } [
+        "first:second" "PATH" [ { "launcher-path-test" } process-contents ] with-os-env
+        "second:first" "PATH" [ { "launcher-path-test" } process-contents ] with-os-env
+    ] unit-test
+
+    ! A directory with the command's name cannot shadow a later executable.
+    "first/launcher-path-test" delete-file
+    "first/launcher-path-test" make-directory
+    { "second" } [
+        "first:second" "PATH" [ { "launcher-path-test" } process-contents ] with-os-env
+    ] unit-test
+
+    { "second" } [
+        "second" [
+            ":/nonexistent-factor-path" "PATH"
+            [ { "launcher-path-test" } process-contents ] with-os-env
+        ] with-directory
+    ] unit-test
+
+    ! Non-executable candidates are skipped; a slash bypasses PATH lookup.
+    "second/launcher-path-test" 0o644 set-file-permissions
+    { f } [ "second" "PATH" [ "launcher-path-test" spawn-executable ] with-os-env ] unit-test
+    { "./second/launcher-path-test" } [ "./second/launcher-path-test" spawn-executable ] unit-test
+] with-test-directory
 
 ! Temporary C strings must be released on success and on an exception.
 { t } [
