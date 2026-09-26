@@ -1,7 +1,7 @@
 ! Copyright (C) 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar calendar.format combinators
-furnace.actions grouping.extras html.forms kernel mason.report
+furnace.actions grouping.extras html.forms kernel locals mason.report
 math.order sequences sorting sorting.specification
 webapps.mason.backend webapps.mason.utils xml.syntax ;
 IN: webapps.mason.downloads
@@ -41,16 +41,28 @@ CONSTANT: BROKEN
            <-></table> XML] ]
     if-empty ;
 
+: builder-report ( builder -- xml )
+    dup [ last-report>> ] [ last-timestamp>> ] bi and [
+        [ report-url ] [ last-timestamp>> timestamp>ymdhms ] bi link
+    ] [ drop "No report yet" ] if ;
+
+:: builder-duration ( builder -- string )
+    builder start-timestamp>> :> start
+    builder last-timestamp>> :> end
+    start [
+        end [ end start before? [ now ] [ end ] if ] [ now ] if
+        start time- duration>hms
+    ] [ "—" ] if ;
+
 : builder-list ( seq -- xml )
     [ os/cpu ] sort-by
     [
         { [ os/cpu ]
           [ last-git-id>> git-short-link ]
-          [ report-url ]
-          [ last-timestamp>> timestamp>ymdhms ]
-          [ [ last-timestamp>> ] [ start-timestamp>> ] bi 2dup before? [ nip now swap ] when time- duration>hms ]
+          [ builder-report ]
+          [ builder-duration ]
           [ builder-status ] } cleave
-        [XML <tr><td><-></td><td><-></td><td><a href=<->><-></a></td><td><-></td><td><-></td></tr> XML]
+        [XML <tr><td><-></td><td><-></td><td><-></td><td><-></td><td><-></td></tr> XML]
     ] map
     [ [XML <p>No machines.</p> XML] ]
     [ [XML <table><tr>

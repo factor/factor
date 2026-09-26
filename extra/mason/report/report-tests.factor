@@ -5,6 +5,16 @@ IN: mason.report.tests
 
 { 0 0 } [ [ ] with-report ] must-infer-as
 
+{ "—" "—" } [ f git-short-link "" git-short-link ] unit-test
+
+{ "<a href=\"https://github.com/factor/factor/commit/abc\">abc</a>" } [
+    "abc" git-short-link xml>string
+] unit-test
+
+{ "<a href=\"https://github.com/factor/factor/commit/1234567890\">12345678…</a>" } [
+    "1234567890" git-short-link xml>string
+] unit-test
+
 ! Exercise empty, short, exact-capacity, and long tails from disk.
 { t } [
     [

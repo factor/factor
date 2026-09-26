@@ -90,7 +90,7 @@ counter "COUNTER" {
     builder new select-tuples ; inline
 
 : offline? ( builder -- ? )
-    heartbeat-timestamp>> 30 minutes ago before? ;
+    heartbeat-timestamp>> [ 30 minutes ago before? ] [ t ] if* ;
 
 : broken? ( builder -- ? )
     [ clean-git-id>> ] [ last-git-id>> ] bi = not ;

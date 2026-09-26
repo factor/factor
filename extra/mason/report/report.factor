@@ -10,7 +10,11 @@ IN: mason.report
     "https://github.com/factor/factor/commit/" "" prepend-as ; inline
 
 : git-short-link ( id -- short-link )
-    [ git-id>url ] keep 8 head "…" append [XML <a href=<->><-></a> XML] ;
+    dup empty? [ drop "—" ] [
+        [ git-id>url ] keep
+        dup length 8 > [ 8 head "…" append ] when
+        [XML <a href=<->><-></a> XML]
+    ] if ;
 
 : git-link ( id -- link )
     [ git-id>url ] keep [XML <a href=<->><-></a> XML] ;
