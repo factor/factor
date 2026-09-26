@@ -1,8 +1,10 @@
 ! Copyright (C) 2007, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.strings
-alien.utilities assocs byte-arrays combinators continuations environment fry
-io.backend io.backend.unix io.encodings.utf8 io.files.private
+USING: accessors alien.c-types alien.data alien.destructors alien.strings
+alien.utilities assocs byte-arrays combinators continuations destructors
+environment environment.unix fry
+io.backend io.backend.unix
+io.encodings.utf8 io.files.private
 io.files.unix io.launcher io.launcher.private io.pathnames
 io.ports kernel libc math namespaces sequences simple-tokenizer
 strings system unix unix.ffi unix.process unix.types ;
@@ -129,8 +131,21 @@ IN: io.launcher.unix
     -rot drop path>> normalize-path append-flags file-mode
     posix_spawn_file_actions_addopen check-posix ;
 
+SYMBOL: spawn-null-fd
+
+: open-spawn-null ( -- fd )
+    "/dev/null" O_RDWR file-mode open-file &close-file
+    dup F_SETFD FD_CLOEXEC fcntl io-error ;
+
+: spawn-null ( -- fd )
+    spawn-null-fd get [
+        ! Keep the source above stdio, even if the parent has closed stdio.
+        open-spawn-null [ dup 3 < ] [ drop open-spawn-null ] while
+        dup spawn-null-fd set
+    ] unless* ;
+
 : redirect-closed* ( actions obj flags fd -- )
-    [ drop "/dev/null" ] 2dip redirect-file* ;
+    [ 2drop spawn-null ] dip redirect-fd* ;
 
 : redirect* ( actions obj flags fd -- )
     {
@@ -144,12 +159,12 @@ IN: io.launcher.unix
 
 : setup-redirection* ( actions attrp argv process -- actions' attrp argv )
     pickd
-    [ stdin>> ?closed read-flags 0 redirect* ]
-    [ stdout>> ?closed write-flags 1 redirect* ]
+    [ stdin>> read-flags 0 redirect* ]
+    [ stdout>> write-flags 1 redirect* ]
     [
         stderr>> dup +stdout+ eq?
         [ drop 1 2 posix_spawn_file_actions_adddup2 check-posix ]
-        [ ?closed write-flags 2 redirect* ] if
+        [ write-flags 2 redirect* ] if
     ] 2tri ;
 
 : setup-priority* ( pid process -- pid )
@@ -160,15 +175,28 @@ IN: io.launcher.unix
         ] keepd
     ] when* ;
 
-: spawn-process ( process -- pid )
+DESTRUCTOR: posix-spawn-file-actions-destroy
+DESTRUCTOR: posix-spawnattr-destroy
+
+! argv and custom envp strings only need to live until posix_spawnp returns.
+: spawn-strings ( strings -- argv )
+    [ utf8 malloc-string &free ] map f suffix void* >c-array ;
+
+: spawn-environment ( process -- envp )
+    dup pass-environment?
+    [ get-environment assoc>env spawn-strings ]
+    [ drop environ void* deref ] if ;
+
+: (spawn-process) ( process -- pid )
     {
         [
             [ 0 pid_t <ref> dup ] dip
             get-arguments [
                 first utf8 string>alien
-                posix-spawn-file-actions-init setup-working-directory
-                posix-spawnattr-init reset-ignored-signals*
-            ] keep utf8 strings>alien POSIX_SPAWN_SETSIGDEF
+                posix-spawn-file-actions-init &posix-spawn-file-actions-destroy
+                setup-working-directory
+                posix-spawnattr-init &posix-spawnattr-destroy reset-ignored-signals*
+            ] keep spawn-strings POSIX_SPAWN_SETSIGDEF
         ]
         [
             setup-process-group*
@@ -176,11 +204,14 @@ IN: io.launcher.unix
         ]
         [ setup-redirection* ]
         [
-            get-environment assoc>env utf8 strings>alien
+            spawn-environment
             posix_spawnp check-posix pid_t deref
         ]
         [ setup-priority* ]
     } cleave ;
+
+: spawn-process ( process -- pid )
+    f spawn-null-fd [ [ (spawn-process) ] with-destructors ] with-variable ;
 
 M: unix (current-process) getpid ;
 

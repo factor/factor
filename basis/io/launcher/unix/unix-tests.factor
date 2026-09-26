@@ -1,9 +1,51 @@
-USING: accessors calendar concurrency.promises destructors io
+USING: accessors alien.c-types byte-arrays calendar concurrency.promises
+continuations destructors environment io
 io.backend.unix io.directories io.encodings.ascii
-io.encodings.binary io.encodings.utf8 io.files io.launcher
+io.encodings.binary io.encodings.utf8 io.files
+io.launcher io.launcher.unix
 io.streams.duplex io.timeouts kernel libc locals math namespaces
-sequences threads tools.test unix.process unix.signals ;
+sequences sets threads tools.test unix.process unix.signals unix.types ;
 IN: io.launcher.unix.tests
+
+! Temporary C strings must be released on success and on an exception.
+{ t } [
+    disposables get cardinality
+    [ { "cat" "test argument" } spawn-strings drop ] with-destructors
+    disposables get cardinality =
+] unit-test
+
+! The discarded streams share a temporary descriptor, not an inherited one.
+{ } [
+    <process> { "cat" } >>command
+    +closed+ >>stdin +closed+ >>stdout +closed+ >>stderr try-process
+] unit-test
+
+{ t } [
+    disposables get cardinality
+    [
+        <process> { "/nonexistent-factor-spawn-test" } >>command
+        +closed+ >>stdin +closed+ >>stdout +closed+ >>stderr
+        run-detached drop
+    ] ignore-errors
+    disposables get cardinality =
+] unit-test
+
+{ t } [
+    disposables get cardinality
+    [ [ { "cat" "test argument" } spawn-strings drop
+        "spawn setup failed" throw ] with-destructors ] ignore-errors
+    disposables get cardinality =
+] unit-test
+
+! Inheritance reads the live environment rather than a cached snapshot.
+{ "first" "second" } [
+    "first" "FACTOR_SPAWN_TEST" [
+        { "sh" "-c" "printf %s \"$FACTOR_SPAWN_TEST\"" } process-contents
+    ] with-os-env
+    "second" "FACTOR_SPAWN_TEST" [
+        { "sh" "-c" "printf %s \"$FACTOR_SPAWN_TEST\"" } process-contents
+    ] with-os-env
+] unit-test
 
 [
     { } [ { "touch" "launcher-test-1" } try-process ] unit-test
