@@ -270,7 +270,9 @@ HELP: with-process-writer
 
 HELP: wait-for-process
 { $values { "process" process } { "status" object } }
-{ $description "If the process is still running, waits for it to exit, otherwise outputs the status code immediately. Can be called multiple times on the same process." }
+{ $description "If the process is still running, waits for it to exit, otherwise outputs the status code immediately. Can be called multiple times on the same process."
+$nl
+"Process exits wake the scheduler through kqueue on BSD and macOS, pidfds with epoll on Linux, or native waits with I/O completion packets on Windows. If notification registration is unavailable or fails, the launcher falls back to polling. Linux pidfd notifications require kernel and C library support for " { $snippet "pidfd_open" } "." }
 { $notes "The status code is operating system specific; it may be an integer, or another object (the latter is the case on Unix if the process was killed by a signal). However, one cross-platform behavior code can rely on is that a status code of 0 indicates success." } ;
 
 ARTICLE: "io.launcher.descriptors" "Launch descriptors"

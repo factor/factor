@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors assocs calendar combinators concurrency.flags
-debugger destructors environment fry init io io.backend
+continuations debugger destructors environment fry init io io.backend
 io.encodings io.encodings.utf8 io.pipes io.pipes.private
 io.ports io.streams.duplex io.timeouts kernel math math.order
 namespaces prettyprint sequences strings system threads vocabs ;
@@ -27,7 +27,7 @@ group
 
 timeout
 
-handle status
+handle status exit-monitor
 killed
 
 pipe ;
@@ -74,10 +74,29 @@ HOOK: (wait-for-processes) io-backend ( -- ? )
 HOOK: (process-notifications?) io-backend ( -- ? )
 M: object (process-notifications?) f ;
 
+! A backend may instead install one disposable notification source per child.
+HOOK: (monitor-process) io-backend ( process -- monitor/f )
+M: object (monitor-process) drop f ;
+
 <PRIVATE
 
 SYMBOL: wait-flag
 SYMBOL: wait-delay
+
+: wake-process-waiter ( -- )
+    wait-flag get-global raise-flag ;
+
+: ensure-process-monitor ( process -- ? )
+    dup exit-monitor>> [ drop t ] [
+        [ dup (monitor-process) >>exit-monitor exit-monitor>> >boolean ]
+        [ 2drop f ] recover
+    ] if ;
+
+: process-monitors? ( -- ? )
+    processes get keys [ ensure-process-monitor ] all? ;
+
+: dispose-process-monitor ( process -- )
+    dup exit-monitor>> [ dispose ] when* f >>exit-monitor drop ;
 
 : wait-loop ( -- )
     processes get assoc-empty? [
@@ -114,6 +133,7 @@ STARTUP-HOOK: [
 
 : notify-exit ( process status -- )
     >>status
+    dup dispose-process-monitor
     [ processes get delete-at* drop [ resume ] each ] keep
     f >>handle drop ;
 
@@ -335,6 +355,7 @@ M: output-process-error error.
     0 = [ 2drop ] [ output-process-error ] if ;
 
 {
+    { [ os linux? ] [ "io.launcher.unix.linux" require ] }
     { [ os unix? ] [ "io.launcher.unix" require ] }
     { [ os windows? ] [ "io.launcher.windows" require ] }
 } cond

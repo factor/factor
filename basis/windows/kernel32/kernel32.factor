@@ -1856,7 +1856,7 @@ FUNCTION: HANDLE OpenProcess ( DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD
 ! FUNCTION: PeekConsoleInputA
 ! FUNCTION: PeekConsoleInputW
 ! FUNCTION: PeekNamedPipe
-! FUNCTION: PostQueuedCompletionStatus
+FUNCTION: BOOL PostQueuedCompletionStatus ( HANDLE CompletionPort, DWORD dwNumberOfBytesTransferred, ULONG_PTR dwCompletionKey, LPOVERLAPPED lpOverlapped )
 ! FUNCTION: PrepareTape
 ! FUNCTION: PrivCopyFileExW
 ! FUNCTION: PrivMoveFileIdentityW

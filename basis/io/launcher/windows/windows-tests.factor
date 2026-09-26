@@ -39,16 +39,37 @@ IN: io.launcher.windows.tests
     ] with-test-file
 ] unit-test
 
-! More than MAXIMUM_WAIT_OBJECTS children require multiple native wait calls.
+! More than MAXIMUM_WAIT_OBJECTS children must not strand any waiters.
 { t } [
     65 [
         <process>
             "cmd.exe /d /c exit 0" >>command
             t >>hidden
+            10 seconds >>timeout
         run-detached
     ] replicate
     [ wait-for-process ] map [ 0 = ] all?
 ] unit-test
+
+! Late completion packets for a reaped child must not resume an I/O waiter.
+{ t } [
+    [ "stale completion called" throw ] add-completion-action
+    dup remove-completion-action
+    master-completion-port get-global 0 rot f PostQueuedCompletionStatus
+    win32-error=0/f
+    0 handle-overlapped
+] unit-test
+
+! An actual child exit must wake the scheduler and release its native wait.
+{ t 0 f } [ [let
+    <process>
+        console-vm-path "-no-user-init"
+        "-e=USING: calendar threads ; 1 seconds sleep" 3array >>command
+        t >>hidden 20 seconds >>timeout run-detached :> process
+    process ensure-process-monitor
+    process wait-for-process
+    process exit-monitor>>
+] ] unit-test
 
 { H{ { "Ä" "new" } { "SS" "distinct" } { "ß" "sharp" } } } [
     { { "ä" "old" } { "SS" "distinct" } }

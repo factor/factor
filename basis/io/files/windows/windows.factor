@@ -58,6 +58,18 @@ C: <io-callback> io-callback
 
 SYMBOL: master-completion-port
 
+! Nonzero completion keys are reserved for native wait notifications.
+SYMBOL: completion-actions
+SYMBOL: next-completion-key
+
+: add-completion-action ( quot -- key )
+    next-completion-key [ 1 + ] change-global
+    next-completion-key get-global
+    [ completion-actions get-global set-at ] keep ;
+
+: remove-completion-action ( key -- )
+    completion-actions get-global delete-at ;
+
 : add-completion ( win32-handle -- win32-handle )
     dup handle>> master-completion-port get-global <completion-port> drop ;
 
@@ -80,23 +92,31 @@ SYMBOL: master-completion-port
         } cond
     ] with-timeout ;
 
-:: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? )
+:: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? key )
     nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
     master-completion-port get-global
     { DWORD ULONG_PTR pointer: OVERLAPPED }
     [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
     :> ( error? bytes key overlapped )
-    bytes overlapped error? ;
+    ! The completion key is undefined when no packet was dequeued.
+    bytes overlapped error? error? overlapped not and [ 0 ] [ key ] if ;
 
 : resume-callback ( result overlapped -- )
     >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
 
 : handle-overlapped ( nanos -- ? )
-    wait-for-overlapped [
-        [
-            [ drop GetLastError 1array ] dip resume-callback t
-        ] [ drop f ] if*
-    ] [ resume-callback t ] if ;
+    wait-for-overlapped dup zero? [
+        drop [
+            [
+                [ drop GetLastError 1array ] dip resume-callback t
+            ] [ drop f ] if*
+        ] [ resume-callback t ] if
+    ] [
+        ! A child can be reaped before its queued notification is consumed.
+        ! Keys are never reused, so stale packets are harmless.
+        [ 3drop ] dip completion-actions get-global at
+        [ call( -- ) ] when* t
+    ] if ;
 
 M: win32-handle cancel-operation
     [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
@@ -106,6 +126,8 @@ M: windows io-multiplex
 
 M: windows init-io
     <master-completion-port> master-completion-port set-global
+    H{ } clone completion-actions set-global
+    0 next-completion-key set-global
     H{ } clone pending-overlapped set-global ;
 
 : (handle>file-size) ( handle -- n/f )

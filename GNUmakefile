@@ -402,6 +402,17 @@ test-unix-signals: $(BUILD_DIR)/unix-signals-tests$(EXE_EXTENSION)
 test-vm: test-unix-signals
 endif
 
+ifneq ($(filter $(BUILD_DIR)/os-windows.o,$(DLL_OBJS)),)
+$(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSION): vm/tests/windows_process_wait.cpp vm/windows_process_wait.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+.PHONY: test-windows-process-wait
+test-windows-process-wait: $(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSION)
+
+test-vm: test-windows-process-wait
+endif
+
 .SUFFIXES: .mm
 
 endif

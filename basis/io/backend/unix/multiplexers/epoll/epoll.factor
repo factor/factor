@@ -7,7 +7,7 @@ io.backend.unix io.backend.unix.multiplexers ;
 SPECIALIZED-ARRAY: epoll-event
 IN: io.backend.unix.multiplexers.epoll
 
-TUPLE: epoll-mx < mx events ;
+TUPLE: epoll-mx < mx events callbacks ;
 
 ! We read up to 256 events at a time. This is an arbitrary
 ! constant...
@@ -16,6 +16,7 @@ CONSTANT: max-events 256
 : <epoll-mx> ( -- mx )
     [
         epoll-mx new-mx |dispose
+            H{ } clone >>callbacks
             max-events <epoll-event-array> >>events
             EPOLL_CLOEXEC epoll_create1 dup io-error >>fd
     ] with-destructors ;
@@ -69,8 +70,12 @@ M: epoll-mx remove-output-callbacks
 
 : handle-event ( event mx -- )
     [ data>> fd>> ] dip
-    [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
-    [ input-available ] [ output-available ] 2tri ;
+    2dup callbacks>> at [
+        [ 2drop ] dip call( -- )
+    ] [
+        [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
+        [ input-available ] [ output-available ] 2tri
+    ] if* ;
 
 : handle-events ( mx n -- )
     [ dup events>> ] dip head-slice swap '[ _ handle-event ] each ;

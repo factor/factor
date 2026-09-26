@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2010 Doug Coleman, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings arrays assocs
+USING: accessors alien alien.c-types alien.data alien.libraries alien.strings alien.syntax arrays assocs
 classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors grouping init io
 io.backend io.backend.windows io.files io.files.private
@@ -14,6 +14,29 @@ windows.user32 unicode ;
 SPECIALIZED-ARRAY: ushort
 SPECIALIZED-ARRAY: void*
 IN: io.launcher.windows
+
+LIBRARY: factor
+FUNCTION: void* factor_register_process_wait ( HANDLE process, HANDLE port, ULONG_PTR key )
+FUNCTION: BOOL factor_unregister_process_wait ( void* wait )
+
+TUPLE: process-wait < disposable wait key ;
+
+M: process-wait dispose*
+    [ wait>> factor_unregister_process_wait win32-error=0/f ]
+    [ key>> remove-completion-action ] bi ;
+
+M:: windows (monitor-process) ( process -- monitor/f )
+    [ wake-process-waiter ] add-completion-action :> key
+    [
+        process handle>> hProcess>> master-completion-port get-global key
+        factor_register_process_wait dup win32-error=0/f
+    ] [ key remove-completion-action rethrow ] recover
+    process-wait new-disposable swap >>wait key >>key ;
+
+M: windows (process-notifications?)
+    "factor_register_process_wait" "factor" dlsym?
+    "factor_unregister_process_wait" "factor" dlsym? and
+    [ process-monitors? ] [ f ] if ;
 
 TUPLE: CreateProcess-args
        lpApplicationName
@@ -265,6 +288,8 @@ M: windows (kill-process)
     swap win32-error=0/f ;
 
 : process-exited ( process -- )
+    ! Stop the native wait before closing the process handle.
+    dup dispose-process-monitor
     dup handle>> exit-code
     over handle>> dispose-process
     notify-exit ;

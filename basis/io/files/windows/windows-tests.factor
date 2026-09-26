@@ -4,8 +4,24 @@ USING: combinators continuations io.backend io.directories io.files
 io.files.temp io.files.windows io.pathnames kernel kernel.private libc
 literals memory sequences splitting tools.test windows.kernel32
 io.files.unique destructors ;
-USING: accessors alien.c-types alien.data locals math windows.errors windows.types ;
+USING: accessors alien alien.c-types alien.data locals math namespaces
+tools.annotations windows.errors windows.types ;
 IN: io.files.windows.tests
+
+! A failed dequeue leaves the completion key undefined. It must not be
+! mistaken for a native process notification (or cause an infinite drain).
+:: empty-completion ( port bytes key overlapped timeout -- result )
+    123 key 0 ULONG_PTR set-alien-value
+    0 bytes 0 DWORD set-alien-value
+    f overlapped 0 void* set-alien-value
+    0 ;
+
+{ f } [
+    [
+        \ GetQueuedCompletionStatus [ drop [ empty-completion ] ] annotate
+        0 handle-overlapped
+    ] [ \ GetQueuedCompletionStatus reset ] finally
+] unit-test
 
 { f } [ "\\foo" absolute-path? ] unit-test
 { t } [ "\\\\?\\c:\\foo" absolute-path? ] unit-test

@@ -1,7 +1,19 @@
 USING: accessors assocs destructors io.backend.unix
 io.backend.unix.multiplexers io.backend.unix.multiplexers.epoll
 io.sockets kernel locals math sequences threads tools.test unix unix.ffi ;
+USING: namespaces unix.linux.epoll ;
 IN: io.backend.unix.multiplexers.epoll.tests
+
+SYMBOL: callback-called?
+
+{ t } [
+    f callback-called? [
+        epoll-mx new H{ } clone >>callbacks
+        [ [ t callback-called? set ] 42 rot callbacks>> set-at ] keep
+        [ 42 EPOLLIN make-event ] dip handle-event
+        callback-called? get
+    ] with-variable
+] unit-test
 
 ! Event-loop descriptors must not be inherited by executed children.
 { t } [

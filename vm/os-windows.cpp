@@ -1,6 +1,16 @@
 #include "master.hpp"
+#include "windows_process_wait.hpp"
 
 namespace factor {
+
+VM_C_API void* factor_register_process_wait(HANDLE process, HANDLE port,
+                                           ULONG_PTR key) {
+  return register_process_wait(process, port, key);
+}
+
+VM_C_API BOOL factor_unregister_process_wait(void* wait) {
+  return unregister_process_wait(static_cast<factor_process_wait*>(wait));
+}
 
 HMODULE hFactorDll;
 
