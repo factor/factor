@@ -1,4 +1,7 @@
-USING: math.transforms.fft math.vectors tools.test ;
+USING: kernel math math.functions math.transforms.fft
+math.transforms.fft.private math.vectors sequences tools.test
+vectors ;
+IN: math.transforms.fft.tests
 
 ! even lengths
 
@@ -28,3 +31,35 @@ USING: math.transforms.fft math.vectors tools.test ;
     { C{ 0.05 0.0 } C{ 0.05 0.0 } C{ 0.05 0.0 } C{ 0.05 0.0 } }
     { 0.1 0.1 0.1 0.1 } { 0.2 0.1 0.1 0.1 } correlate 1e-12 v~
 ] unit-test
+
+! Exercise odd subproblems at different recursion depths, with complex input.
+: fft-test-input ( n -- seq )
+    <iota> [ dup 0.17 * sin swap 0.31 * cos rect> ] map ;
+
+{ t } [
+    { 1 2 3 6 10 12 18 30 32 64 100 1000 } [
+        fft-test-input [ fft ] [ f (slow-fft) ] bi 1e-8 v~
+    ] all?
+] unit-test
+
+{ t } [
+    { 1 2 3 6 10 12 18 30 32 64 100 1000 } [
+        fft-test-input [ ifft ] [ t (slow-fft) ] bi 1e-8 v~
+    ] all?
+] unit-test
+
+{ t } [
+    { 1 2 3 6 10 12 18 30 32 64 100 1000 } [
+        fft-test-input dup fft ifft 1e-8 v~
+    ] all?
+] unit-test
+
+! Preserve the input and the power-of-two vector result type.
+{ t } [
+    12 fft-test-input dup clone [ dup fft drop ] dip =
+] unit-test
+
+{ t } [ 16 fft-test-input >vector fft vector? ] unit-test
+
+[ { } fft ] [ not-enough-data? ] must-fail-with
+[ { } ifft ] [ not-enough-data? ] must-fail-with

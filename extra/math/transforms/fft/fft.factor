@@ -1,6 +1,6 @@
 ! Copyright (c) 2012 John Benediktsson
 ! See https://factorcode.org/license.txt for BSD license.
-USING: kernel math math.constants math.functions
+USING: kernel locals math math.constants math.functions
 math.vectors sequences sequences.extras ;
 IN: math.transforms.fft
 
@@ -20,19 +20,24 @@ DEFER: (fft)
 ! Cooley–Tukey Algorithm
 :: (fast-fft) ( seq inverse? -- seq' )
     seq length :> N
-    N 1 = [ seq ] [
-        seq even-indices inverse? (fast-fft)
-        seq odd-indices inverse? (fast-fft)
-        inverse? 1 -1 ? 2pi * N /
-        [ * cis * ] curry map-index!
-        [ [ + inverse? [ 2 / ] when ] 2map ]
-        [ [ - inverse? [ 2 / ] when ] 2map ]
-        2bi append
-    ] if ; inline recursive
+    seq even-indices inverse? (fft) :> evens
+    seq odd-indices inverse? (fft) :> odds
+    inverse? 1 -1 ? 2pi * N / :> angle
+    N 2/ :> half
+    N evens [| output |
+        evens [| even k |
+            k odds nth k angle * cis * :> odd
+            even odd + inverse? [ 2 / ] when k output set-nth
+            even odd - inverse? [ 2 / ] when k half + output set-nth
+        ] each-index
+        output
+    ] new-like ; inline
 
 : (fft) ( seq inverse? -- seq' )
-    over length power-of-2?
-    [ (fast-fft) ] [ (slow-fft) ] if ; inline
+    over length 1 = [ drop ] [
+        over length even?
+        [ (fast-fft) ] [ (slow-fft) ] if
+    ] if ; inline recursive
 
 PRIVATE>
 
