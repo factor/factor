@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-arrays byte-arrays classes.struct combinators kernel math
+arrays classes.struct combinators kernel math
 namespaces sequences specialized-arrays system
 system-info vocabs.loader windows windows.advapi32
 windows.errors windows.kernel32 windows.powrprof words ;
@@ -100,12 +100,13 @@ M: windows total-virtual-mem
 M: windows available-virtual-mem
     memory-status ullAvailVirtual>> ;
 
+! These wide-character APIs measure buffer capacity in UTF-16 code units.
 M: windows computer-name
     MAX_COMPUTERNAME_LENGTH 1 +
-    [ <byte-array> dup ] keep uint <ref>
+    [ ushort <c-array> dup ] keep uint <ref>
     GetComputerName win32-error=0/f alien>native-string ;
 
 M: windows username ( -- string )
     UNLEN 1 +
-    [ <byte-array> dup ] keep uint <ref>
+    [ ushort <c-array> dup ] keep uint <ref>
     GetUserName win32-error=0/f alien>native-string ;
