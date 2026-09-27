@@ -303,6 +303,16 @@ check_gtk_libraries() {
     check_library_exists pango-1.0 libpango-1.0.so.0
 }
 
+select_ui_backend() {
+    find_os
+    find_architecture
+    find_word_size
+    # GTK4 is unavailable on 32-bit x86 Linux.
+    if [[ $OS = linux && $ARCH = x86 && $WORD = 32 ]]; then
+        FACTOR_UI_BACKEND=gtk3
+    fi
+}
+
 
 check_libraries() {
     case $OS in
@@ -509,6 +519,7 @@ prepare_build_info() {
     set_cc
     set_cc_versions
     find_word_size
+    select_ui_backend
     set_current_branch
     set_factor_binary
     set_factor_library
@@ -812,6 +823,7 @@ make_boot_image() {
 }
 
 install_deps_apt() {
+    select_ui_backend
     local gtk_package=libgtk-4-dev
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=libgtk-3-dev
     sudo apt install --yes libpango1.0-dev "$gtk_package" libepoxy-dev wget git rlwrap libssl-dev
@@ -819,6 +831,7 @@ install_deps_apt() {
 }
 
 install_deps_pacman() {
+    select_ui_backend
     local gtk_package=gtk4
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3
     sudo pacman --noconfirm -Syu gcc clang make rlwrap git wget pango glibc "$gtk_package" libepoxy gdk-pixbuf2
@@ -826,6 +839,7 @@ install_deps_pacman() {
 }
 
 install_deps_dnf() {
+    select_ui_backend
     local gtk_package=gtk4-devel
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3-devel
     sudo dnf --assumeyes install gcc gcc-c++ glibc-devel binutils pango-devel "$gtk_package" libepoxy-devel gdk-pixbuf2-devel tmux rlwrap wget
@@ -833,12 +847,14 @@ install_deps_dnf() {
 }
 
 install_deps_pkg() {
+    select_ui_backend
     local gtk_package=gtk4
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk3
     sudo pkg install --yes bash git gmake gcc rlwrap ripgrep curl gmake pango cairo "$gtk_package" libepoxy vim
 }
 
 install_deps_apk() {
+    select_ui_backend
     local gtk_package=gtk4.0-dev
     [[ ${FACTOR_UI_BACKEND:-gtk4} = gtk3 ]] && gtk_package=gtk+3.0-dev
     sudo apk add --no-cache bash git make gcc g++ libc-dev musl-dev pango-dev "$gtk_package" libepoxy-dev wget rlwrap clang tmux screen openssl-dev glu-dev mesa-dev
