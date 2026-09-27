@@ -112,7 +112,9 @@ M: constrained-allocator allocator-statistics
     H{ } clone representations namespaces:set
     256 <iota> [ int-rep swap set-rep-of ] each
     tagged-rep 0 set-rep-of
-    256 vreg-counter namespaces:set ;
+    ! next-vreg uses a global counter, even inside a validation scope.
+    ! Reserve the fixture IDs before SSA destruction creates fresh vregs.
+    256 vreg-counter set-global ;
 
 :: emit-validation-sum ( values -- result )
     values first :> result!

@@ -1,9 +1,18 @@
 USING: accessors arrays assocs compiler.cfg
 compiler.cfg.linear-scan.allocation.state compiler.cfg.register-allocation
 compiler.cfg.register-allocation.validation compiler.cfg.register-allocation.verifier
-compiler.cfg.register-allocation.rematerialization compiler.test cpu.architecture
+compiler.cfg.register-allocation.rematerialization compiler.cfg.registers
+compiler.test cpu.architecture
 kernel kernel.private locals math math.vectors.simd namespaces sequences tools.test ;
 IN: compiler.cfg.register-allocation.validation.tests
+
+! A previous compilation can leave the global counter below the fixture's
+! hard-coded IDs. A local binding does not reserve those IDs for next-vreg.
+{ 257 } [ [
+    reset-vreg-counter
+    init-validation-representations
+    next-vreg
+] with-scope ] unit-test
 
 { } [
     H{ { "algorithm" "test-policy" } { "fallback-count" 0 }

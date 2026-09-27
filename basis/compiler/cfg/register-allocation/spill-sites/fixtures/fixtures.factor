@@ -37,7 +37,7 @@ SYMBOL: loop-pressure-clobber?
 ! arithmetic result contributes to the returned checksum.
 :: <mixed-loop-pressure> ( count hot-count hot cold -- graph )
     H{ } clone representations set
-    0 vreg-counter set
+    0 vreg-counter set-global
     fresh-int :> input
     fresh-int :> counter
     fresh-int :> next-counter

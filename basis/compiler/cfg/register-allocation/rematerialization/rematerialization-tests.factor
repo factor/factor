@@ -135,7 +135,7 @@ IN: compiler.cfg.register-allocation.rematerialization.tests
 : init-pressure-representations ( -- )
     H{ } clone representations set
     200 <iota> [ int-rep swap set-rep-of ] each
-    200 vreg-counter set ;
+    200 vreg-counter set-global ;
 
 : emit-pressure-constants ( -- )
     40 <iota> [ dup 1 + tag-fixnum ##load-integer, ] each ;

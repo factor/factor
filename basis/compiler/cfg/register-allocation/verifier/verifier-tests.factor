@@ -403,7 +403,7 @@ CONSTANT: flow-allocators {
 :: compile-moving-root ( allocator -- word )
     H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep } { 3 int-rep } }
     clone representations set
-    4 vreg-counter set
+    4 vreg-counter set-global
     {
         T{ ##prologue }
         T{ ##peek { dst 0 } { loc D: 0 } }
@@ -425,7 +425,7 @@ CONSTANT: flow-allocators {
     H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep }
        { 3 int-rep } { 4 int-rep } { 5 int-rep } }
     clone representations set
-    6 vreg-counter set
+    6 vreg-counter set-global
     {
         T{ ##prologue }
         T{ ##peek { dst 0 } { loc D: 0 } }

@@ -26,7 +26,7 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
     f rematerialize-constants? namespaces:set
     H{ { 1 int-rep } { 2 int-rep } { 3 int-rep }
         { 4 int-rep } { 5 int-rep } } clone representations namespaces:set
-    10 vreg-counter namespaces:set
+    10 vreg-counter set-global
     pressure-cfg [
         dup H{ { int-regs { 0 1 } } } spill-ssa :> ( fixed stats )
         cfg>insns :> instructions
@@ -43,7 +43,7 @@ IN: compiler.cfg.register-allocation.chordal.spilling.tests
 { t t t t } [ [let
     f rematerialize-constants? namespaces:set
     H{ { 1 int-rep } { 2 int-rep } } clone representations namespaces:set
-    10 vreg-counter namespaces:set
+    10 vreg-counter set-global
     V{ T{ ##load-integer { dst 1 } { val 100 } } T{ ##branch } }
     clone 0 insns>block :> entry
     V{ T{ ##call } T{ ##branch } } clone 1 insns>block

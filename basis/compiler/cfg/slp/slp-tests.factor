@@ -22,7 +22,7 @@ IN: compiler.cfg.slp.tests
     b D: 1 ##replace new-insn suffix ;
 
 :: pack-test ( insns -- insns' )
-    1000 vreg-counter namespaces:set
+    1000 vreg-counter set-global
     H{ { "packs" 0 } { "vector-operations" 0 } } clone slp-statistics namespaces:set
     H{ } clone :> uses
     insns [ uses-vregs [ uses inc-at ] each ] each

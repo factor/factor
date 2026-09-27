@@ -11,7 +11,7 @@ IN: compiler.cfg.register-allocation.chordal.bases.tests
 :: derived-diamond ( mixed? -- cfg join call )
     H{ { 0 tagged-rep } { 1 tagged-rep } { 2 int-rep } { 3 int-rep } { 4 int-rep } }
     representations set
-    5 vreg-counter set
+    5 vreg-counter set-global
     f leader-map set
     {
         T{ ##load-reference { dst 0 } { obj "left" } }
@@ -53,7 +53,7 @@ IN: compiler.cfg.register-allocation.chordal.bases.tests
 :: derived-loop ( derived? -- cfg header body call )
     H{ { 0 tagged-rep } { 1 int-rep } { 2 int-rep } { 3 int-rep } }
     representations set
-    4 vreg-counter set
+    4 vreg-counter set-global
     f leader-map set
     {
         T{ ##load-reference { dst 0 } { obj "base" } }
@@ -104,7 +104,7 @@ IN: compiler.cfg.register-allocation.chordal.bases.tests
 :: executable-derived-cfg ( -- cfg )
     f derived-diamond :> ( cfg join call )
     tagged-rep 6 set-rep-of
-    7 vreg-counter set
+    7 vreg-counter set-global
     {
         T{ ##prologue }
         T{ ##peek { dst 0 } { loc D: 2 } }

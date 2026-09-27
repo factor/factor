@@ -14,7 +14,7 @@ IN: compiler.cfg.register-allocation.validation.entry-residency.tests
 :: entry-fixture ( -- left right join plan )
     H{ { 1 int-rep } { 2 int-rep } { 10 int-rep } }
         clone representations namespaces:set
-    100 vreg-counter namespaces:set
+    100 vreg-counter set-global
     H{ } clone loops namespaces:set
     H{ { int-regs { 0 } } } spill-bank namespaces:set
     H{ } clone spill-plans namespaces:set

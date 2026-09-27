@@ -32,6 +32,14 @@ ifdef CONFIG
 
 	include $(CONFIG)
 
+	# Aligned FFI fixtures use the current ABI for both callers and callees.
+	# Suppress GCC's historical i386 ABI transition notes for this library.
+	ifeq ($(IS_CLANG),0)
+		ifneq ($(filter -m32,$(ARCHITECTURE_FLAG)),)
+			FFI_TEST_CFLAGS += -Wno-psabi
+		endif
+	endif
+
 	COMMON_FLAGS := -Wall \
 		-Wextra \
 		-pedantic \
