@@ -3,16 +3,14 @@
 USING: accessors combinators kernel system tools.test unix.linux.proc ;
 IN: unix.linux.proc.tests
 
-os linux? [
-    [ parse-proc-cmdline ] must-not-fail
-    [ parse-proc-cpuinfo ] must-not-fail
-    [ parse-proc-loadavg ] must-not-fail
-    [ parse-proc-meminfo ] must-not-fail
-    [ parse-proc-partitions ] must-not-fail
-    [ parse-proc-stat ] must-not-fail
-    [ parse-proc-swaps ] must-not-fail
-    [ parse-proc-uptime ] must-not-fail
-] when
+[ parse-proc-cmdline ] must-not-fail
+[ parse-proc-cpuinfo ] must-not-fail
+[ parse-proc-loadavg ] must-not-fail
+[ parse-proc-meminfo ] must-not-fail
+[ parse-proc-partitions ] must-not-fail
+[ parse-proc-stat ] must-not-fail
+[ parse-proc-swaps ] must-not-fail
+[ parse-proc-uptime ] must-not-fail
 
 { 42 "(worker name))" "S" 7 0 } [
     "42 (worker name)) S 7 8 9" string>pid-stat
