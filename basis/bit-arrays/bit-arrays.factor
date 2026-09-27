@@ -47,7 +47,7 @@ PRIVATE>
 ERROR: bad-array-length n ;
 
 : <bit-array> ( n -- bit-array )
-    dup 0 < [ bad-array-length ] when
+    dup integer-array-capacity? [ bad-array-length ] unless
     dup bits>bytes <byte-array>
     bit-array boa ; inline
 
@@ -88,6 +88,7 @@ M: bit-array equal?
     ] [ 2drop f ] if ;
 
 M: bit-array resize
+    over integer-array-capacity? [ over bad-array-length ] unless
     dupd [ bits>bytes ] [ underlying>> ] bi*
     resize-byte-array bit-array boa zero-end-bits ; inline
 

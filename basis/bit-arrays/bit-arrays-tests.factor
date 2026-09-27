@@ -1,7 +1,14 @@
-USING: alien arrays bit-arrays kernel math random sequences
+USING: alien arrays bit-arrays kernel layouts math random sequences
 sequences.private tools.test ;
 
 [ -1 <bit-array> ] [ T{ bad-array-length f -1 } = ] must-fail-with
+
+! Reject lengths that would be truncated by the array-capacity tuple slot
+! before allocating the backing bytes (#1566).
+[ max-array-capacity 1 + <bit-array> ] [ bad-array-length? ] must-fail-with
+[ most-positive-fixnum 1 + <bit-array> ] [ bad-array-length? ] must-fail-with
+[ -1 ?{ t } resize ] [ bad-array-length? ] must-fail-with
+[ max-array-capacity 1 + ?{ t } resize ] [ bad-array-length? ] must-fail-with
 
 { 100 } [ 100 <bit-array> length ] unit-test
 

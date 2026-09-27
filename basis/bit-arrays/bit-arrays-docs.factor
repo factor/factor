@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math sequences ;
+USING: help.markup help.syntax layouts math sequences ;
 IN: bit-arrays
 
 ARTICLE: "bit-arrays" "Bit arrays"
@@ -44,7 +44,8 @@ HELP: bit-array
 
 HELP: <bit-array>
 { $values { "n" "a non-negative integer" } { "bit-array" "a new " { $link bit-array } } }
-{ $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." } ;
+{ $description "Creates a new bit array with the given length and all elements initially set to " { $link f } "." }
+{ $errors "Throws " { $link bad-array-length } " unless the length is an integer between zero and " { $link max-array-capacity } ", inclusive." } ;
 
 HELP: >bit-array
 { $values { "seq" sequence } { "bit-array" bit-array } }
