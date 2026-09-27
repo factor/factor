@@ -1,6 +1,7 @@
 USING: accessors arrays euler.b-rep.examples
 euler.b-rep.triangulation math.vectors.simd.cords sequences
-tools.test gml kernel ;
+tools.test gml gml.b-rep gml.core gml.coremath gml.geometry
+gml.modeling kernel ;
 IN: euler.b-rep.triangulation.tests
 
 : triangle-vx-positions ( triangles -- positions )
