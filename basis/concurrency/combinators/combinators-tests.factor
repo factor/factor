@@ -1,6 +1,6 @@
 USING: concurrency.combinators tools.test random kernel math
 concurrency.mailboxes threads sequences accessors arrays
-math.parser strings ;
+math.parser strings locals ;
 IN: concurrency.combinators.tests
 
 [ [ drop ] parallel-each ] must-infer
@@ -8,6 +8,19 @@ IN: concurrency.combinators.tests
 [ [ ] parallel-map ] must-infer
 { 2 1 } [ [ 2array ] 2parallel-map ] must-infer-as
 [ [ ] parallel-filter ] must-infer
+
+{ } [ { } [ drop ] parallel-each ] unit-test
+{ } [ { } [ 2drop ] parallel-each-index ] unit-test
+{ } [ { 1 } { } [ 2drop ] 2parallel-each ] unit-test
+
+:: parallel-index-test ( -- result )
+    3 f <array> :> result
+    { 10 20 30 } [| elt index |
+        yield elt index + index result set-nth
+    ] parallel-each-index
+    result ;
+
+{ { 10 21 32 } } [ parallel-index-test ] unit-test
 
 { { 1 4 9 } } [ { 1 2 3 } [ sq ] parallel-map ] unit-test
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators concurrency.count-downs
+USING: accessors arrays assocs combinators concurrency.count-downs
 concurrency.futures generalizations kernel locals sequences
-sequences.private sequences.product ;
+sequences.private sequences.product threads ;
 IN: concurrency.combinators
 
 <PRIVATE
@@ -10,16 +10,26 @@ IN: concurrency.combinators
 : parallel ( n quot -- )
     [ <count-down> ] dip keep await ; inline
 
+! Share the completion wrapper across the group, then bind each task's inputs.
+: stage-quot ( quot count-down -- quot' promise )
+    [ '[ @ _ count-down ] ] [ promise>> ] bi ; inline
+
 PRIVATE>
 
 : parallel-each ( seq quot: ( elt -- ) -- )
-    over length [ '[ _ curry _ spawn-stage ] each ] parallel ; inline
+    over length [
+        stage-quot '[ _ curry "Count down stage" _ spawn-linked-to drop ] each
+    ] parallel ; inline
 
 : parallel-each-index ( seq quot: ( elt index -- ) -- )
-    over length [ '[ _ 2curry _ spawn-stage ] each-index ] parallel ; inline
+    over length [
+        stage-quot '[ _ 2curry "Count down stage" _ spawn-linked-to drop ] each-index
+    ] parallel ; inline
 
 : 2parallel-each ( seq1 seq2 quot: ( elt1 elt2 -- ) -- )
-    2over min-length [ '[ _ 2curry _ spawn-stage ] 2each ] parallel ; inline
+    2over min-length [
+        stage-quot '[ _ 2curry "Count down stage" _ spawn-linked-to drop ] 2each
+    ] parallel ; inline
 
 : parallel-product-each ( seq quot: ( elt -- ) -- )
     [ <product-sequence> ] dip parallel-each ;
