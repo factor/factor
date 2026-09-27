@@ -10,6 +10,8 @@ FROM: cpu.arm.64.assembler => B ;
 FROM: cpu.arm.64.assembler.registers => cache ;
 IN: bootstrap.assembler.arm
 
+8 \ cell set
+
 big-endian off
 
 ! SDIV returns zero for a zero divisor instead of raising an exception.
