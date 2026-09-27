@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs benchmark bootstrap.stage2 calendar
+USING: accessors arrays assocs benchmark bootstrap.stage2 calendar
 command-line compiler.errors continuations debugger help.html
-help.lint io io.directories io.encodings.utf8 io.files io.styles
+help.lint io io.directories io.encodings.utf8 io.files io.files.unique io.styles
 kernel mason.common math memory namespaces parser.notes
 sequences sets sorting source-files.errors system threads
 tools.errors tools.test tools.time vocabs
@@ -72,12 +72,29 @@ IN: mason.test
     help-lint-errors-file
     do-step ;
 
-: do-benchmarks ( -- )
-    run-timing-benchmarks
-    [ benchmarks-file to-file ] [
-        [ keys benchmark-error-vocabs-file to-file ]
-        [ benchmark-error-messages-file utf8 [ benchmark-errors. ] with-file-writer ] bi
+! Publish each checkpoint atomically so a killed child cannot truncate it.
+: save-benchmark-results ( results errors -- )
+    [ benchmarks-file [ to-file ] safe-overwrite-file ] [
+        [ keys benchmark-error-vocabs-file [ to-file ] safe-overwrite-file ]
+        [
+            benchmark-error-messages-file [
+                utf8 [ benchmark-errors. ] with-file-writer
+            ] safe-overwrite-file
+        ] bi
     ] bi* ;
+
+:: run-mason-benchmarks ( vocabs quot: ( vocab -- time ) -- )
+    V{ } clone :> results
+    V{ } clone :> errors
+    results errors save-benchmark-results
+    vocabs [
+        1array quot run-benchmarks
+        [ results push-all ] [ errors push-all ] bi*
+        results errors save-benchmark-results
+    ] each ; inline
+
+: do-benchmarks ( -- )
+    find-benchmark-vocabs [ run-timing-benchmark ] run-mason-benchmarks ;
 
 : do-compile-errors ( -- )
     compiler-errors get values

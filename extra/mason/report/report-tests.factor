@@ -77,5 +77,27 @@ IN: mason.report.tests
         ] unit-test
         verify-report
 
+        ! Preserve completed work when later phases never produced files.
+        [ status-error ] [
+            benchmark-time-file delete-file
+            compiler-errors-file delete-file
+            123000000000 load-time-file to-file
+            { { "benchmark.completed" 1500000000 } } benchmarks-file to-file
+            { "example.failed" } test-all-vocabs-file to-file
+            "saved test failure" test-all-errors-file utf8 set-file-contents
+            ! A killed writer can also leave an unreadable phase file.
+            "" help-lint-time-file utf8 set-file-contents
+            1238 test-failed
+        ] unit-test
+        { t } [
+            "report" utf8 file-contents
+            {
+                "Incomplete test run" "00:02:03" "Not available"
+                "benchmark.completed" "1.500" "saved test failure"
+                "Mason phase: test-all" "Launcher error"
+            } [ subseq-of? ] with all?
+        ] unit-test
+        verify-report
+
     ] with-temp-directory
 ] with-variable

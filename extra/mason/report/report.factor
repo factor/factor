@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2010 Eduardo Cavazos, Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators.smart debugger formatting
-io.encodings.utf8 io.files io.streams.string kernel literals logging.parser
+USING: arrays assocs combinators.smart continuations debugger formatting
+fry io.encodings.utf8 io.files io.streams.string kernel literals logging.parser
 mason.common mason.config mason.disk math namespaces prettyprint
 sequences sets splitting xml.syntax xml.writer ;
 IN: mason.report
@@ -51,20 +51,20 @@ IN: mason.report
     [ 400 index-or-length tail* join-lines ] dip
     0 > [ "... (earlier log bytes omitted) ...\n" prepend ] when ;
 
-:: failed-report ( error file what -- status )
-    [
-        error [ error. ] with-string-writer :> error
-        file file-tail :> output
+:: failure-details ( error file what -- xml )
+    error [ error. ] with-string-writer :> error
+    file file-tail :> output
 
-        [XML
-        <h2><-what-></h2>
-        Build output:
-        <pre><-output-></pre>
-        Launcher error:
-        <pre><-error-></pre>
-        XML]
-    ] with-report
-    status-error ;
+    [XML
+    <h2><-what-></h2>
+    Build output:
+    <pre><-output-></pre>
+    Launcher error:
+    <pre><-error-></pre>
+    XML] ;
+
+: failed-report ( error file what -- status )
+    [ failure-details ] 3curry with-report status-error ;
 
 : compile-failed ( error -- status )
     "compile-log" "VM compilation failed" failed-report ;
@@ -72,10 +72,7 @@ IN: mason.report
 : boot-failed ( error -- status )
     "boot-log" "Bootstrap failed" failed-report ;
 
-: test-failed ( error -- status )
-    "test-log" "Tests failed" failed-report ;
-
-: timings-table ( -- xml )
+: (timings-table) ( quot: ( file -- time ) -- xml )
     ${
         boot-time-file
         load-time-file
@@ -83,10 +80,13 @@ IN: mason.report
         help-lint-time-file
         benchmark-time-file
         html-help-time-file
-    } [
-        dup eval-file nanos>time
+    } swap '[
+        dup @
         [XML <tr><td><-></td><td><-></td></tr> XML]
-    ] map [XML <h2>Timings</h2> <table><-></table> XML] ;
+    ] map [XML <h2>Timings</h2> <table><-></table> XML] ; inline
+
+: timings-table ( -- xml )
+    [ eval-file nanos>time ] (timings-table) ;
 
 : error-dump ( heading vocabs-file messages-file -- xml )
     [ eval-file ] dip over empty? [ 3drop f ] [
@@ -143,6 +143,38 @@ IN: mason.report
             benchmarks-file eval-file benchmarks-table
         ] output>array sift
     ] with-report ;
+
+! A timeout may leave phase files absent or unfinished. Keep the remaining
+! sections readable even when one section cannot be recovered.
+: available-report-section ( quot: ( -- xml ) -- xml/f )
+    '[ _ call( -- xml ) ] [ drop f ] recover ;
+
+: partial-results ( -- xml )
+    [
+        [XML <p>Incomplete test run. Only saved results are shown;
+        missing results do not indicate success.</p> XML]
+        [
+            [ eval-file nanos>time ] [ 2drop "Not available" ] recover
+        ] (timings-table)
+        [ "Load failures" load-all-vocabs-file load-all-errors-file error-dump ]
+        available-report-section
+        [ "Compiler errors" compiler-errors-file compiler-error-messages-file error-dump ]
+        available-report-section
+        [ "Unit test failures" test-all-vocabs-file test-all-errors-file error-dump ]
+        available-report-section
+        [ "Help lint failures" help-lint-vocabs-file help-lint-errors-file error-dump ]
+        available-report-section
+        [ "Benchmark errors" benchmark-error-vocabs-file benchmark-error-messages-file error-dump ]
+        available-report-section
+        [ benchmarks-file eval-file benchmarks-table ] available-report-section
+    ] output>array sift ;
+
+: test-failed ( error -- status )
+    '[
+        partial-results
+        _ "test-log" "Tests failed" failure-details
+        2array
+    ] with-report status-error ;
 
 : benchmark-results ( -- assoc )
     ${
