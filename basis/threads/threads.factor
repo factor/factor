@@ -59,7 +59,7 @@ TUPLE: thread
     state
     runnable
     mailbox
-    { variables hashtable }
+    { variables maybe{ hashtable } }
     sleep-entry ;
 
 : self ( -- thread )
@@ -69,11 +69,14 @@ TUPLE: thread
     context>> check-box value>> continuation-for ;
 
 ! Thread-local storage
+! Most threads never use thread-local variables. Allocate on namespace access,
+! but allow reads of missing variables without creating a hashtable.
 : tnamespace ( -- assoc )
-    self variables>> ; inline
+    self dup variables>>
+    [ nip ] [ H{ } clone >>variables variables>> ] if* ; inline
 
 : tget ( key -- value )
-    tnamespace at ;
+    self variables>> at ;
 
 : tset ( value key -- )
     tnamespace set-at ;
@@ -114,7 +117,6 @@ PRIVATE>
         swap >>name
         swap >>quot
         \ thread counter >>id
-        H{ } clone >>variables
         <box> >>context ; inline
 
 : <thread> ( quot name -- thread )

@@ -1,6 +1,6 @@
 USING: io memory namespaces tools.test threads threads.private kernel
 concurrency.combinators concurrency.promises locals math
-words calendar sequences fry ;
+words calendar sequences fry accessors arrays assocs ;
 IN: threads.tests
 
 ! Bug #1319
@@ -67,6 +67,26 @@ yield
 { } [ 0.1 seconds sleep ] unit-test
 
 ! Test thread-local variables
+! Reading an unset variable must not allocate a namespace.
+{ { f f f } } [
+    { f } [
+        drop self variables>> "unset-variable" tget self variables>> 3array
+    ] parallel-map first
+] unit-test
+
+! The lazily created namespace remains the mutable thread-local association.
+:: lazy-namespace-test ( -- result )
+    tnamespace :> ns
+    42 "lazy-variable" ns set-at
+    yield
+    "lazy-variable" tget :> before
+    43 "lazy-variable" tset
+    ns tnamespace eq? before "lazy-variable" ns at 3array ;
+
+{ { t 42 43 } } [
+    { f } [ drop lazy-namespace-test ] parallel-map first
+] unit-test
+
 <promise> "p" set
 
 5 "x" tset

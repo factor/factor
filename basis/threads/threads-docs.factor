@@ -212,7 +212,7 @@ HELP: init-threads
 
 HELP: tnamespace
 { $values { "assoc" assoc } }
-{ $description "Outputs the current thread's set of thread-local variables." } ;
+{ $description "Outputs the current thread's set of thread-local variables, allocating the association on first use." } ;
 
 HELP: tget
 { $values { "key" object } { "value" object } }
