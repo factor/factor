@@ -116,7 +116,9 @@ IN: io.launcher.unix
 
 : reset-fd* ( actions fd -- )
     dup F_SETFL 0 fcntl io-error
-    posix_spawn_file_actions_addinherit_np check-posix ;
+    ! glibc clears FD_CLOEXEC when dup2's source and target match.
+    os macos? [ posix_spawn_file_actions_addinherit_np ]
+    [ dup posix_spawn_file_actions_adddup2 ] if check-posix ;
 
 : redirect-fd* ( actions oldfd fd -- )
     2dup =
@@ -248,8 +250,10 @@ M: unix (process-notifications?)
         mx get-global add-signal-callback
     ] [ drop f ] recover ;
 
+! fork() copies the page tables of the whole image, which makes it
+! much slower than posix_spawn() for large heaps.
 M: unix (run-process)
-    os macos? cpu arm.64? and
+    os linux? os macos? cpu arm.64? and or
     [ spawn-process ] [ '[ _ fork-process ] [ ] with-fork ] if ;
 
 M: unix (kill-process)
