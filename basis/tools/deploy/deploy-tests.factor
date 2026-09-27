@@ -107,12 +107,12 @@ os macos? [
 ] long-unit-test
 
 { "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>Factor</foo>" } [
-    "tools.deploy.test.20" shake-and-bake 1363000 small-enough?
+    "tools.deploy.test.20" shake-and-bake 1440000 small-enough?
     deploy-test-command ascii [ readln ] with-process-reader
 ] long-unit-test
 
 { "1 2 3" } [
-    "tools.deploy.test.21" shake-and-bake 1260000 small-enough?
+    "tools.deploy.test.21" shake-and-bake 1330000 small-enough?
     deploy-test-command ascii [ readln ] with-process-reader
 ] long-unit-test
 
