@@ -282,7 +282,10 @@ INSTANCE: code-blocks immutable-sequence
         [ \ code-blocks set ]
         [ first entry-point>> code-heap-start set ]
         [ last [ entry-point>> ] [ size>> ] bi + code-heap-end set ] tri
-        call
+        ! Error continuations retain this namespace. Release the temporary
+        ! heap snapshot even when the caller throws, rather than retaining
+        ! one snapshot per failed disassembly or inspection.
+        [ call ] [ f \ code-blocks set ] finally
     ] with-scope ; inline
 
 : lookup-return-address ( addr -- code-block )

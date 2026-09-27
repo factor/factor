@@ -1,4 +1,4 @@
-USING: arrays assocs kernel layouts literals math memory
+USING: accessors arrays assocs continuations kernel layouts literals math memory
 namespaces parser sequences tools.memory tools.memory.private
 tools.test tools.time vm ;
 
@@ -24,3 +24,19 @@ tools.test tools.time vm ;
 ] unit-test
 
 ${ 64-bit? 80 64 ? } [ "hello \u{snowman}" total-size ] unit-test
+
+! A retained failure must not keep the full code-heap snapshot alive.
+{ f } [
+    [ [ "code-block snapshot test" throw ] with-code-blocks ] [
+        drop error-continuation get name>>
+        [ \ code-blocks swap at code-blocks? ] any?
+    ] recover
+] unit-test
+
+! Nested inspections restore the outer snapshot after their own cleanup.
+{ t t } [
+    [
+        [ \ code-blocks get code-blocks? ] with-code-blocks
+        \ code-blocks get code-blocks?
+    ] with-code-blocks
+] unit-test

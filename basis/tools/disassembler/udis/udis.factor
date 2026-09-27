@@ -52,7 +52,9 @@ FUNCTION: c-string ud_lookup_mnemonic ( int c )
     dup UD_SYN_INTEL ud_set_syntax ;
 
 : with-ud ( ..a quot: ( ..a ud -- ..b ) -- ..b )
-    [ [ [ <ud> ] dip call ] with-destructors ] with-code-blocks ; inline
+    ! Resolve and initialize udis86 before snapshotting the code heap. A
+    ! missing library must not retain a snapshot in each error continuation.
+    [ [ <ud> ] dip with-code-blocks ] with-destructors ; inline
 
 SINGLETON: udis-disassembler
 
