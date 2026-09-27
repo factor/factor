@@ -62,8 +62,27 @@ CONSTANT: emulation-map {
     ]
     [ dup libc-error? [ drop f ] [ rethrow ] if ] recover ;
 
+: library-version? ( string -- ? )
+    "." split [
+        dup empty? [ drop f ] [ [ "0123456789" member? ] all? ] if
+    ] all? ;
+
+! Some libraries put their version before .so (libSDL-1.2.so.0).
+! Only accept numeric extensions, not unrelated names such as SDL_image.
+:: library-name-matches? ( name filename -- ? )
+    filename ".so" split1 :> ( base suffix )
+    suffix [
+        suffix empty? suffix ?first CHAR: . = or
+        base name ?head [
+            dup empty? [ drop t ] [
+                unclip { CHAR: - CHAR: . } member?
+                swap library-version? and
+            ] if
+        ] [ drop f ] if and
+    ] [ f ] if ;
+
 : name-matches? ( lib triple -- ? )
-    first swap ?head [ ?first CHAR: . = ] [ drop f ] if ;
+    first library-name-matches? ;
 
 : arch-matches? ( lib triple -- ? )
     nip third native-library? ;
@@ -71,8 +90,9 @@ CONSTANT: emulation-map {
 : ldconfig-matches? ( lib triple -- ? )
     { [ name-matches? ] [ arch-matches? ] } 2&& ;
 
-: find-ldconfig ( name -- path/f )
-    load-ldconfig-cache [ ldconfig-matches? ] with find nip ?last ;
+:: find-ldconfig ( name -- path/f )
+    load-ldconfig-cache [ name swap ldconfig-matches? ] filter
+    [ first name ".so" append head? ] partition append ?first ?last ;
 
 :: find-ld ( name -- path/f )
     "ld" find-in-path :> linker
@@ -117,7 +137,9 @@ CONSTANT: emulation-map {
         exact file-exists? [ exact native-library? ] [ f ] if [ exact ] [
             directory { [ file-exists? ] [ directory? ] } 1&& [
                 directory directory-files
-                [ stem "." append head? ] filter human-sort reverse
+                [ name swap library-name-matches? ] filter
+                [ stem "." append head? ] partition
+                [ human-sort reverse ] bi@ append
                 [ directory swap append-path dup native-library? [ drop f ] unless ] map-find drop
             ] [ f ] if
         ] if
