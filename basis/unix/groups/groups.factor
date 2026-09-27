@@ -43,6 +43,9 @@ GENERIC: group-struct ( obj -- group/f )
             error
         ] with-destructors {
             { 0 [ f ] }
+            ! NSS backends can report a missing group using either errno.
+            { ENOENT [ f ] }
+            { ESRCH [ f ] }
             { EINTR [ t ] }
             { ERANGE [ size 2 * size! t ] }
             [ (throw-errno) ]

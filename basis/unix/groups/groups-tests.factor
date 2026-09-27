@@ -56,6 +56,8 @@ SYMBOL: current-group-probe
     current-group-probe get [ 1 + ] change-calls :> probe
     probe mode>> {
         { "error" [ EIO ] }
+        { "missing" [ ESRCH ] }
+        { "absent" [ ENOENT ] }
         { "interrupt" [ probe calls>> 1 = EINTR f ? ] }
         { "grow" [ size 8192 < ERANGE f ? ] }
     } case :> forced
@@ -108,11 +110,11 @@ SYMBOL: enumeration-ended?
 
 ! Native lookup buffers must be released even when lookup fails.
 { t } [
-    disposables get cardinality
     \ unix.ffi:getgrnam_r "error" [
-        [ "root" group-id drop f ] [ errno>> EIO = ] recover
-    ] with-group-fault 1 assert= t assert=
-    disposables get cardinality =
+        disposables get cardinality
+        [ "root" group-id drop f ] [ errno>> EIO = ] recover t assert=
+        disposables get cardinality =
+    ] with-group-fault 1 assert=
 ] unit-test
 
 ! A returned entry owns its strings, including after its buffer is released.
@@ -136,4 +138,13 @@ SYMBOL: enumeration-ended?
         \ unix.ffi:getgrouplist [ drop [ many-groups ] ] annotate
         "root" user-groups length
     ] [ \ unix.ffi:getgrouplist reset ] finally
+] unit-test
+
+! Missing entries are not lookup failures, including NSS errno variants.
+{ f 1 } [
+    \ unix.ffi:getgrnam_r "missing" [ "missing-group" group-struct ] with-group-fault
+] unit-test
+
+{ f 1 } [
+    \ unix.ffi:getgrgid_r "absent" [ 12345 group-struct ] with-group-fault
 ] unit-test
