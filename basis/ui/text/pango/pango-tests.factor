@@ -130,3 +130,14 @@ IN: ui.text.pango.tests
         backward offset { 64 8 } draw-layout-region bitmap>> =
     ] ] with-text-scale
 ] unit-test
+
+USING: alien classes.struct pango.ffi tools.annotations ;
+
+! Pre-1.50 PangoGlyphItem allocations end after the two pointers.
+{ 0 0 0 } [
+    [
+        \ pango_version [ drop [ 14600 ] ] annotate
+        legacy-glyph-item new >c-ptr read-glyph-item
+        [ y-offset>> ] [ start-x-offset>> ] [ end-x-offset>> ] tri
+    ] [ \ pango_version reset ] finally
+] unit-test

@@ -17,6 +17,10 @@ STRUCT: indexed-item
     { analysis indexed-analysis } ;
 STRUCT: indexed-glyph-string
     { num-glyphs int } { glyphs void* } { log-clusters void* } { space int } ;
+! Pango added the three run offsets in 1.50. Older allocations contain
+! only these two pointers; never read the extended struct from them.
+STRUCT: legacy-glyph-item
+    { item indexed-item* } { glyphs indexed-glyph-string* } ;
 STRUCT: indexed-glyph-item
     { item indexed-item* } { glyphs indexed-glyph-string* }
     { y-offset int } { start-x-offset int } { end-x-offset int } ;
@@ -35,6 +39,13 @@ FUNCTION-ALIAS: glyph-x-to-index void pango_glyph_string_x_to_index
 
 TUPLE: glyph-region glyphs cluster-offset font analysis text start length x width y ink order max-right ;
 TUPLE: glyph-index regions logical spatial width ink ;
+
+:: read-glyph-item ( ptr -- run )
+    pango_version 15000 < [
+        ptr legacy-glyph-item memory>struct :> old
+        indexed-glyph-item new
+            old item>> >>item old glyphs>> >>glyphs
+    ] [ ptr indexed-glyph-item memory>struct ] if ;
 
 :: cluster-at ( glyphs i -- offset )
     glyphs log-clusters>> i int heap-size * alien-signed-4 ; inline
@@ -73,7 +84,7 @@ TUPLE: glyph-index regions logical spatial width ink ;
     0 :> x!
     line runs>> :> node!
     [ node ] [
-        node 0 alien-cell indexed-glyph-item memory>struct :> run
+        node 0 alien-cell read-glyph-item :> run
         x run start-x-offset>> + x!
         run glyphs>> :> glyphs
         0 :> start!
