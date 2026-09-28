@@ -216,7 +216,10 @@ icon-data [ default-icon-data ] initialize
     [ calc-event-scale-factor ] keep
     dup gl-render-state>> [
         dup draw-world? [
-            [ dup set-gl-context draw-world* gl-error ] [ nip ui-error ] recover
+            [
+                dup set-gl-context framebuffer-ready?
+                [ draw-world* gl-error ] [ drop ] if
+            ] [ nip ui-error ] recover
         ] [ drop ] if
     ] [ drop ] if t ;
 
