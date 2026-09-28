@@ -1,6 +1,6 @@
 USING: accessors alien alien.c-types alien.strings alien.syntax
 combinators continuations destructors file-picker glib.ffi gobject.ffi gobject-introspection.standard-types
-io.encodings.utf8 io.pathnames kernel locals math namespaces
+io io.encodings.utf8 io.pathnames kernel locals math namespaces
 sequences tools.test ui.backend ui.gadgets.worlds vocabs.parser ;
 <<
 ui-backend get name>> {
@@ -48,14 +48,15 @@ SYMBOLS: observed-action observed-name inspection-attempts ;
         world new picker-parent new >>handle world _ with-variable
     ] with-callback ; inline
 
-f f gtk_init_check [ "GTK init failed" throw ] unless
-
-{ f t } [
-    [ "nonexistent-new-file.txt" save-file-dialog ] with-picker-inspection
-    observed-action get GTK_FILE_CHOOSER_ACTION_SAVE =
-] unit-test
-{ "nonexistent-new-file.txt" } [ observed-name get ] unit-test
-{ f t } [
-    [ open-file-dialog ] with-picker-inspection
-    observed-action get GTK_FILE_CHOOSER_ACTION_OPEN =
-] unit-test
+! A display variable may be stale or point to an unauthorized X server.
+f f gtk_init_check [
+    { f t } [
+        [ "nonexistent-new-file.txt" save-file-dialog ] with-picker-inspection
+        observed-action get GTK_FILE_CHOOSER_ACTION_SAVE =
+    ] unit-test
+    { "nonexistent-new-file.txt" } [ observed-name get ] unit-test
+    { f t } [
+        [ open-file-dialog ] with-picker-inspection
+        observed-action get GTK_FILE_CHOOSER_ACTION_OPEN =
+    ] unit-test
+] [ "FILE-PICKER-SKIP reason=display-unavailable" print ] if

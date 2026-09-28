@@ -2,13 +2,15 @@
 USING: accessors alien alien.strings arrays assocs calendar continuations
 debugger destructors environment file-picker file-picker.linux.gtk4.private gio.ffi
 glib.ffi gobject.ffi gtk4.ffi io io.encodings.utf8 io.pathnames kernel
-locals math namespaces sequences system threads tools.test ui ui.gadgets.labels
+locals math namespaces sequences system threads tools.test ui ui.backend.gtk4 ui.gadgets.labels
 ui.gadgets.worlds ;
 IN: file-picker.linux.gtk4.tests
 
 ! Inspect GTK's in-process dialogs regardless of the desktop portal service.
 ! Production leaves portal selection to GTK and the desktop.
-"no-portals" "GDK_DEBUG" set-os-env
+4 10 0 gtk_check_version
+[ "0" "GTK_USE_PORTAL" set-os-env ]
+[ "no-portals" "GDK_DEBUG" set-os-env ] if
 
 { t t f } [
     "gtk-dialog-error-quark" GTK_DIALOG_ERROR_DISMISSED "cancelled" \ g-error boa picker-cancelled?
@@ -102,7 +104,10 @@ SYMBOLS: observed-action observed-name observed-parent picker-test-parent ;
     close-all-windows ;
 
 [ picker-error ] ui-error-hook set-global
-[
-    "Native file picker tests" <label> "File picker tests" open-window*
-    '[ _ [ run-picker-tests ] [ picker-error ] recover ] "File picker tests" spawn drop
-] with-ui
+! A display variable may be stale or point to an unauthorized X server.
+init-gtk4 [
+    [
+        "Native file picker tests" <label> "File picker tests" open-window*
+        '[ _ [ run-picker-tests ] [ picker-error ] recover ] "File picker tests" spawn drop
+    ] with-ui
+] [ "FILE-PICKER-SKIP reason=display-unavailable" print ] if

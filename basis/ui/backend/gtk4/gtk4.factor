@@ -139,14 +139,17 @@ CONSTANT: gtk4-modifiers
     ] unless ;
 
 : on-focus-in ( controller data -- )
-    drop controller-world
-    [ handle>> im-context>> gtk_im_context_focus_in ] [ focus-world ] bi ;
+    drop controller-world [
+        [ handle>> im-context>> gtk_im_context_focus_in ] [ focus-world ] bi
+    ] when* ;
 
 : on-focus-out ( controller data -- )
     clear-input-state
-    drop controller-world
-    [ handle>> im-context>> [ gtk_im_context_focus_out ]
-      [ gtk_im_context_reset ] bi ] [ unfocus-world ] bi ;
+    ! GTK may deliver focus changes after the world has been unregistered.
+    drop controller-world [
+        [ handle>> im-context>> [ gtk_im_context_focus_out ]
+          [ gtk_im_context_reset ] bi ] [ unfocus-world ] bi
+    ] when* ;
 
 :: connect-user-input ( drawable -- )
     gtk_event_controller_motion_new :> motion
@@ -365,13 +368,21 @@ M:: gtk4-ui-backend system-alert ( caption text -- )
     dialog "response" [ 2drop gtk_window_destroy ] GtkDialog:response connect-signal
     dialog gtk_window_present ;
 
-M: gtk4-ui-backend (with-ui)
+: init-gtk4 ( -- ? )
     ! Factor's GLSL shaders require desktop GL. GDK's shared context must
     ! use the same API (not its default GLES choice on some drivers).
-    "GDK_DEBUG" os-env dup empty?
-    [ drop "gl-prefer-gl" ] [ ",gl-prefer-gl" append ] if
-    "GDK_DEBUG" set-os-env
-    gtk_init_check [ "Unable to initialize GTK4" throw ] unless
+    ! gl-prefer-gl was introduced in GTK 4.14.
+    gtk_is_initialized [ t ] [
+        4 14 0 gtk_check_version [
+            "GDK_DEBUG" os-env dup empty?
+            [ drop "gl-prefer-gl" ] [ ",gl-prefer-gl" append ] if
+            "GDK_DEBUG" set-os-env
+        ] unless
+        gtk_init_check
+    ] if ;
+
+M: gtk4-ui-backend (with-ui)
+    init-gtk4 [ "Unable to initialize GTK4" throw ] unless
     setup-gl3-hooks init-clipboard
     f f g_main_loop_new main-loop set-global
     [

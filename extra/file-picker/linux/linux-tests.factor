@@ -1,4 +1,4 @@
-USING: accessors calendar environment io io.launcher io.pathnames
+USING: accessors calendar environment io io.encodings.utf8 io.launcher io.pathnames
 kernel sequences sequences.generalizations system tools.test ;
 "resource:extra/file-picker/linux/fixtures/varargs.factor" run-test-file
 
@@ -11,6 +11,9 @@ kernel sequences sequences.generalizations system tools.test ;
         "-no-user-init" "-no-monitors"
         "-resource-path=" "" resource-path append
         "resource:extra/file-picker/linux/fixtures/dialog-run.factor" absolute-path
-        6 narray <process> swap >>command 60 seconds >>timeout try-output-process
+        6 narray <process> swap >>command 60 seconds >>timeout
+        +closed+ >>stdin +stdout+ >>stderr
+        utf8 [ read-contents ] with-process-reader*
+        0 = [ drop write ] [ output-process-error ] if
     ] unit-test
 ] if
