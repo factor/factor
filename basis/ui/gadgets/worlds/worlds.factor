@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors combinators
 combinators.short-circuit concurrency.promises continuations
-destructors kernel literals math models namespaces opengl
+destructors kernel literals math models namespaces opengl opengl.gl
 sequences strings ui.backend ui.gadgets ui.gadgets.tracks
 ui.gestures ui.pixel-formats ui.render ;
 IN: ui.gadgets.worlds
@@ -219,11 +219,22 @@ SYMBOL: ui-error-hook ! ( error -- )
 
 ui-error-hook [ [ rethrow ] ] initialize
 
+: framebuffer-ready? ( -- ? )
+    ! A window's framebuffer can be undefined or incomplete until the
+    ! window system attaches a drawing surface to its GL context. Drawing
+    ! then raises GL_INVALID_FRAMEBUFFER_OPERATION, so skip that frame; the
+    ! system asks for a redraw once the surface exists. GL contexts older
+    ! than 3.0 cannot check, so assume they are ready.
+    [ GL_FRAMEBUFFER glCheckFramebufferStatus GL_FRAMEBUFFER_COMPLETE = ]
+    [ drop t ] recover ;
+
 : draw-world ( world -- )
     dup draw-world? [
         [
-            dup [ draw-world* ] with-gl-context
-            flush-layout-cache-hook get call( -- )
+            dup set-gl-context framebuffer-ready? [
+                dup [ draw-world* ] with-gl-context
+                flush-layout-cache-hook get call( -- )
+            ] [ drop ] if
         ] [
             swap f >>active? <world-error> rethrow
         ] recover
