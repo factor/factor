@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.libraries alien.libraries.finder
 alien.syntax accessors classes.struct combinators io.directories io.files
-io.pathnames kernel sequences sorting.human system vocabs words ;
+io.pathnames kernel regexp sequences sorting.human system vocabs words ;
 IN: libclang.ffi
 
 LIBRARY: clang
@@ -10,11 +10,16 @@ LIBRARY: clang
 ! Enum values and function signatures checked against LLVM 21 clang-c headers.
 
 <<
+: libclang-libraries ( directory -- paths )
+    "lib" append-path ?qualified-directory-files
+    [ file-name R/ libclang(-[0-9.]+)?\.so(\.[0-9.]+)?/ matches? ] filter
+    [ file-exists? ] filter human-sort reverse ;
+
 : latest-libclang ( directory -- path )
     ?qualified-directory-files
-    [ file-name "llvm-" head? ] filter
-    [ "lib/libclang.so" append-path ] map [ file-exists? ] filter
-    human-sort <reversed> ?first [ "clang" find-library ] unless* ;
+    [ file-name "llvm-" head? ] filter human-sort reverse
+    [ libclang-libraries ?first ] map-find drop
+    [ "clang" find-library ] unless* ;
 >>
 
 << "clang" {

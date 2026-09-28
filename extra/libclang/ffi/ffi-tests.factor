@@ -18,7 +18,7 @@ libclang-major-version 21 >= [
     ] unit-test
 ] when
 
-{ t t } [
+{ t t t t } [
     [
         current-directory get latest-libclang "clang" find-library =
         "llvm-9/lib" make-directories
@@ -26,6 +26,14 @@ libclang-major-version 21 >= [
         "llvm-18/lib" make-directories
         current-directory get latest-libclang
         "llvm-9/lib/libclang.so" absolute-path =
+        "llvm-18/lib/libclang-18.so.1" touch-file
+        current-directory get latest-libclang
+        "llvm-18/lib/libclang-18.so.1" absolute-path =
+        "llvm-19/lib" make-directories
+        "llvm-19/lib/libclang.so.1" touch-file
+        "llvm-19/lib/libclang-cpp.so.19" touch-file
+        current-directory get latest-libclang
+        "llvm-19/lib/libclang.so.1" absolute-path =
     ] with-test-directory
 ] unit-test
 
@@ -84,10 +92,13 @@ SYMBOL: visited-fields
     [ >c-ptr os windows? 8 6 ? alien-unsigned-2 ] bi
 ] unit-test
 
-{ t } [
-    <CXIndexOptions> clang_createIndexWithOptions
-    [ >boolean ] [ clang_disposeIndex ] bi
-] unit-test
+! Older libclang versions still support the ordinary index API.
+"clang_createIndexWithOptions" "clang" dlsym? [
+    { t } [
+        <CXIndexOptions> clang_createIndexWithOptions
+        [ >boolean ] [ clang_disposeIndex ] bi
+    ] unit-test
+] when
 
 { CXError_Success t } [
     [| index |

@@ -1,6 +1,6 @@
 USING: accessors alien alien.c-types alien.data alien.libraries alien.syntax alien.varargs
 classes.struct compiler.test compiler.units continuations destructors
-io.encodings.ascii kernel libc locals lua math sequences stack-checker
+io io.encodings.ascii kernel libc locals lua math sequences stack-checker
 strings tools.test words ;
 FROM: alien.c-types => float ;
 IN: lua.tests
@@ -15,7 +15,13 @@ FUNCTION-ALIAS: lua-error-mixed int luaL_error
     ( lua_State* L, c-string[ascii] fmt, ... c-string[ascii] text,
       int number, double real )
 
-: lua-unit-test ( expected quot -- ) [ compile-call ] curry unit-test ;
+: lua-unit-test ( expected quot -- )
+    "liblua5.5" library-dll dll-valid?
+    [ [ compile-call ] curry unit-test ] [ 2drop ] if ;
+
+"liblua5.5" library-dll dll-valid? [
+    "Lua 5.5 runtime tests unavailable: shared library not installed." print
+] unless
 
 :: with-lua-test-state ( quot -- )
     luaL_newstate :> state

@@ -11,6 +11,6 @@ kernel sequences sequences.generalizations system tools.test ;
         "-no-user-init" "-no-monitors"
         "-resource-path=" "" resource-path append
         "resource:extra/file-picker/linux/fixtures/dialog-run.factor" absolute-path
-        6 narray <process> swap >>command 60 seconds >>timeout try-process
+        6 narray <process> swap >>command 60 seconds >>timeout try-output-process
     ] unit-test
 ] if

@@ -1,5 +1,10 @@
 # Lua 5.5 native integration tests
 
+The binding requires Lua 5.5 (`liblua5.5.so.0` on Linux); Lua 5.4 and
+earlier are not ABI-compatible replacements. When the shared library is
+missing, ordinary tests print an availability notice and run only the
+checks that do not execute Lua.
+
 Use matching Lua 5.5 headers and a library built with the default numeric
 configuration. These tests compare Factor's struct layouts with the C headers,
 forward native `va_list` arguments through Factor callbacks, and exercise Lua
