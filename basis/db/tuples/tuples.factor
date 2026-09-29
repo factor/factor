@@ -1,5 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.tuple
 combinators.short-circuit continuations db db.errors db.types
@@ -129,20 +130,26 @@ ERROR: no-defined-persistent object ;
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
 
 : insert-tuple ( tuple -- )
-    dup class-of ensure-defined-persistent db-assigned?
-    [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
+    [
+        dup class-of ensure-defined-persistent db-assigned?
+        [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if
+    ] curry serialize-transaction ;
 
 : update-tuple ( tuple -- )
-    dup class-of ensure-defined-persistent
-    db-connection get update-statements>> [ <update-tuple-statement> ] cache
-    [ bind-tuple ] keep execute-statement ;
+    [
+        dup class-of ensure-defined-persistent
+        db-connection get update-statements>> [ <update-tuple-statement> ] cache
+        [ bind-tuple ] keep execute-statement
+    ] curry serialize-transaction ;
 
 : delete-tuples ( tuple -- )
-    dup
-    dup class-of ensure-defined-persistent
-    <delete-tuples-statement> [
-        [ bind-tuple ] keep execute-statement
-    ] with-disposal ;
+    [
+        dup
+        dup class-of ensure-defined-persistent
+        <delete-tuples-statement> [
+            [ bind-tuple ] keep execute-statement
+        ] with-disposal
+    ] curry serialize-transaction ;
 
 : select-tuples ( query/tuple -- tuples )
     >query [ tuple>> ] [ query>statement ] bi do-select ;

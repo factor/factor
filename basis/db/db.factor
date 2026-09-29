@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs continuations destructors kernel
-namespaces sequences strings ;
+USING: accessors assocs concurrency.locks continuations destructors
+kernel namespaces sequences strings ;
 IN: db
 
 TUPLE: db-connection < disposable
@@ -142,18 +143,39 @@ HOOK: begin-transaction db-connection ( -- )
 HOOK: commit-transaction db-connection ( -- )
 HOOK: rollback-transaction db-connection ( -- )
 
+! The lock held while one unit of write work runs: a complete transaction
+! (from with-transaction) or a single autocommit write (from insert-tuple,
+! update-tuple, delete-tuples). Backends that need to serialize concurrent
+! writers specialize this to return a lock. The default returns f, since
+! database servers like PostgreSQL handle concurrency themselves.
+HOOK: db-write-lock db-connection ( -- lock/f )
+
 M: db-connection begin-transaction "BEGIN" sql-command ;
 M: db-connection commit-transaction "COMMIT" sql-command ;
 M: db-connection rollback-transaction "ROLLBACK" sql-command ;
+M: db-connection db-write-lock f ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
+
+! Runs the quotation holding the backend's write lock, if it has one. This is
+! inline so a caller's stack effect passes through unchanged; a generic word
+! would pin it to ( quot -- ).
+: serialize-transaction ( quot -- )
+    db-write-lock [ swap with-lock ] [ call ] if* ; inline
+
+<PRIVATE
+
+: (with-transaction) ( quot -- )
+    t in-transaction [
+        begin-transaction
+        [ ] [ rollback-transaction ] cleanup commit-transaction
+    ] with-variable ; inline
+
+PRIVATE>
 
 : with-transaction ( quot -- )
     in-transaction? [
         call
     ] [
-        t in-transaction [
-            begin-transaction
-            [ ] [ rollback-transaction ] cleanup commit-transaction
-        ] with-variable
+        [ (with-transaction) ] curry serialize-transaction
     ] if ; inline

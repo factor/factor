@@ -1,6 +1,7 @@
-USING: accessors arrays db db.errors db.sqlite db.tuples
-db.types io.directories io.files.temp kernel layouts literals
-math.parser namespaces sequences sorting splitting tools.test ;
+USING: accessors arrays concurrency.count-downs continuations db
+db.errors db.sqlite db.tuples db.types fry io.directories
+io.files.temp kernel layouts literals math.parser namespaces
+sequences sorting splitting threads tools.test ;
 
 IN: db.sqlite.tests
 
@@ -52,6 +53,9 @@ ${
 : test.db ( -- sqlite-db ) db-path <sqlite-db> ;
 
 db-path ?delete-file
+! WAL mode also writes -wal and -shm files; remove them too for a clean slate.
+db-path "-wal" append ?delete-file
+db-path "-shm" append ?delete-file
 
 { } [
     test.db [
@@ -254,3 +258,68 @@ watch "WATCH" {
     no-table "NO_TABLE" { { "name" "NAME" VARCHAR } } define-persistent
     test.db [ no-table new select-tuple ] with-db
 ] [ sql-table-missing? ] must-fail-with
+
+! Concurrent writers to a single SQLite file must not raise SQLITE_BUSY
+! ("database is locked"). SQLite permits only one writer per file; the
+! per-file write lock installed by serialize-transaction makes the second
+! writer wait cooperatively rather than collide. Without the lock these
+! writers would race and intermittently raise "database is locked".
+
+! Autocommit tuple writes (the path begin-session takes).
+! Each thread opens its own connection and inserts one tuple. insert-tuple
+! dispatches through serialize-transaction, so every insert is serialized
+! per file.
+TUPLE: concurrent-row n ;
+
+concurrent-row "CONCURRENT_ROWS" {
+    { "n" "N" INTEGER +not-null+ }
+} define-persistent
+
+: spawn-inserter ( n count-down -- )
+    '[
+        [ test.db [ _ concurrent-row boa insert-tuple ] with-db ]
+        [ drop ] recover
+        _ count-down
+    ] "concurrent insert" spawn drop ;
+
+: concurrent-insert-test ( -- n )
+    test.db [ concurrent-row ensure-table ] with-db
+    20 <count-down>
+    [ 20 <iota> ] dip
+    [ '[ _ spawn-inserter ] each ] keep
+    await
+    test.db [ concurrent-row new select-tuples length ] with-db ;
+
+{ 20 } [ concurrent-insert-test ] unit-test
+
+! Explicit multi-statement transactions.
+! Each thread runs a with-transaction containing two raw writes. The lock is
+! held across BEGIN IMMEDIATE..COMMIT, so transactions never interleave at
+! the SQLite level and none receives SQLITE_BUSY.
+: spawn-txn-writer ( n count-down -- )
+    '[
+        [
+            test.db [
+                [
+                    "INSERT INTO CONCURRENT_TXN(N) VALUES(" _ number>string
+                    ")" 3append sql-command
+                    "UPDATE CONCURRENT_TXN SET N = N WHERE N < 0" sql-command
+                ] with-transaction
+            ] with-db
+        ] [ drop ] recover
+        _ count-down
+    ] "concurrent txn" spawn drop ;
+
+: concurrent-transaction-test ( -- n )
+    test.db [
+        "CREATE TABLE IF NOT EXISTS CONCURRENT_TXN (N INTEGER)" sql-command
+    ] with-db
+    10 <count-down>
+    [ 10 <iota> ] dip
+    [ '[ _ spawn-txn-writer ] each ] keep
+    await
+    test.db [
+        "SELECT COUNT(*) FROM CONCURRENT_TXN" sql-query first first string>number
+    ] with-db ;
+
+{ 10 } [ concurrent-transaction-test ] unit-test
