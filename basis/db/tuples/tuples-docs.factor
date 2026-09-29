@@ -1,5 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! Copyright (C) 2018 Alexander Ilin.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
 USING: classes db db.tuples.private db.types help.markup
 help.syntax kernel math quotations sequences strings ;
@@ -115,13 +116,13 @@ HELP: drop-table
 HELP: insert-tuple
 { $values
     { "tuple" tuple } }
-{ $description "Inserts a tuple into a database if a relation has been defined with " { $link define-persistent } ". If a mapping states that the database assigns a primary key to the tuple, this value will be set after this word runs." }
+{ $description "Inserts a tuple into a database if a relation has been defined with " { $link define-persistent } ". If a mapping states that the database assigns a primary key to the tuple, this value will be set after this word runs. Writes are run through " { $link serialize-transaction } ", so on backends like SQLite they participate in write serialization; on other backends they remain ordinary autocommit writes." }
 { $notes "Objects should only be inserted into a database once per object. To store the object after the initial insert, call " { $link update-tuple } "." } ;
 
 HELP: update-tuple
 { $values
     { "tuple" tuple } }
-{ $description "Updates a tuple that has already been inserted into a database. The tuple must have a primary key that has been set by " { $link insert-tuple } " or that is user-defined." } ;
+{ $description "Updates a tuple that has already been inserted into a database. The tuple must have a primary key that has been set by " { $link insert-tuple } " or that is user-defined. Writes are run through " { $link serialize-transaction } "." } ;
 
 HELP: update-tuples
 { $values
@@ -136,7 +137,7 @@ $nl
 HELP: delete-tuples
 { $values
     { "tuple" tuple } }
-{ $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples." }
+{ $description "Uses the " { $snippet "tuple" } " as an exemplar object and deletes any objects that have the same slots set. If a slot is not " { $link f } ", then it is used to generate an SQL statement that deletes tuples. Writes are run through " { $link serialize-transaction } "." }
 { $warning "This word will delete your data." } ;
 
 HELP: reject-tuples

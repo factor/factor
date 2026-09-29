@@ -1,9 +1,11 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors classes.tuple combinators db db.private db.queries
-db.sqlite.errors db.sqlite.ffi db.sqlite.lib db.tuples
-db.tuples.private db.types destructors interpolate kernel math
-math.parser namespaces nmake random sequences sequences.deep ;
+USING: accessors assocs classes.tuple combinators concurrency.locks
+db db.private db.queries db.sqlite.errors db.sqlite.ffi
+db.sqlite.lib db.tuples db.tuples.private db.types destructors
+interpolate io.backend kernel math math.parser namespaces nmake
+random sequences sequences.deep ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -14,18 +16,50 @@ TUPLE: sqlite-db path ;
 
 <PRIVATE
 
-TUPLE: sqlite-db-connection < db-connection ;
+! One write lock per database file. SQLite permits only a single writer per
+! file, so concurrent writes from the same process must be serialized;
+! otherwise the loser receives SQLITE_BUSY ("database is locked").
+! We cannot use sqlite3_busy_timeout here: it sleeps inside a blocking FFI
+! call, which stalls Factor's cooperative scheduler and prevents the lock
+! holder from ever running to commit. A Factor-level lock yields properly.
+! The lock is reentrant so a tuple write nested inside an explicit
+! with-transaction (which already holds the lock) does not deadlock.
+SYMBOL: sqlite-write-locks
+sqlite-write-locks [ H{ } clone ] initialize
 
-: <sqlite-db-connection> ( handle -- db-connection )
+: sqlite-write-lock ( path -- lock )
+    ! Key on the canonical path so two sqlite-db objects pointing at the
+    ! same file share one lock. normalize-path matches what sqlite-open uses.
+    normalize-path sqlite-write-locks get-global
+    [ drop <reentrant-lock> ] cache ;
+
+TUPLE: sqlite-db-connection < db-connection write-lock ;
+
+: <sqlite-db-connection> ( handle lock -- db-connection )
     sqlite-db-connection new-db-connection
+        swap >>write-lock
         swap >>handle ;
 
 PRIVATE>
 
 M: sqlite-db db-open
-    path>> sqlite-open <sqlite-db-connection> ;
+    path>>
+    [ sqlite-open ] [ sqlite-write-lock ] bi <sqlite-db-connection>
+    ! WAL lets readers and the single writer proceed concurrently. It is a
+    ! persistent property of the file, so re-setting it on later opens is
+    ! harmless.
+    dup db-connection [ "PRAGMA journal_mode=WAL" sql-command ] with-variable ;
 
 M: sqlite-db-connection db-close sqlite-close ;
+
+! The per-file write lock, held while one unit of write work runs, so at most
+! one writer per file is ever active, whether that is a full BEGIN..COMMIT
+! transaction or a single autocommit tuple write.
+M: sqlite-db-connection db-write-lock db-connection get write-lock>> ;
+
+! BEGIN IMMEDIATE takes SQLite's write lock up front rather than lazily on
+! the first write, so contention surfaces deterministically at BEGIN.
+M: sqlite-db-connection begin-transaction "BEGIN IMMEDIATE" sql-command ;
 
 TUPLE: sqlite-statement < statement ;
 

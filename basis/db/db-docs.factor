@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2026 Zoltán Kéri <z@zolk3ri.name>
 ! See https://factorcode.org/license.txt for BSD license.
 USING: alien assocs classes db.private help.markup help.syntax
 kernel math quotations sequences strings ;
@@ -140,6 +141,30 @@ HELP: query-map
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
 
+HELP: db-write-lock
+{ $values
+    { "lock/f" "a lock or " { $link f } } }
+{ $description "Outputs the lock held while one unit of write work runs, or " { $link f } " if the backend needs no application-level serialization. Backends that permit only one writer at a time specialize this word; the default method outputs " { $link f } "." }
+{ $notes "The SQLite backend outputs a reentrant per-file lock, since SQLite permits only a single writer per file. Database servers such as PostgreSQL handle concurrency themselves and use the default method, so their writes are unchanged." } ;
+
+HELP: serialize-transaction
+{ $values
+    { "quot" quotation } }
+{ $description "Calls " { $snippet "quot" } ", which performs one unit of write work: either a complete transaction (from " { $link with-transaction } ") or a single autocommit write (from " { $snippet "insert-tuple" } ", " { $snippet "update-tuple" } ", or " { $snippet "delete-tuples" } "), holding " { $link db-write-lock } " for the duration of the call. When the backend has no write lock the quotation is called directly." }
+{ $notes "This word is " { $link POSTPONE: inline } ", so the stack effect of " { $snippet "quot" } " passes through unchanged. Operations not routed through it automatically, such as DDL (Data Definition Language) or a bare " { $link sql-command } ", can be serialized by wrapping them in " { $link with-transaction } " or by calling this word directly." }
+{ $examples
+    "On SQLite, route a one-off DDL statement (which is not serialized "
+    "automatically) through the per-file write lock by calling this word "
+    "directly. CREATE TABLE IF NOT EXISTS keeps the snippet repeatable:"
+    { $code
+        "USING: db db.sqlite ;"
+        "\"/tmp/example.db\" <sqlite-db> ["
+        "    [ \"CREATE TABLE IF NOT EXISTS items (n INTEGER)\" sql-command ]"
+        "    serialize-transaction"
+        "] with-db"
+    }
+} ;
+
 HELP: sql-command
 { $values
     { "sql" string } }
@@ -176,8 +201,8 @@ HELP: with-db
 HELP: with-transaction
 { $values
     { "quot" quotation } }
-{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." }
-{ $notes "Direct continuation jumps out of the quotation bypass both commit and rollback. See " { $link "destructors-continuations" } "." } ;
+{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted. Nested calls run directly inside the enclosing transaction rather than starting a new one." }
+{ $notes "Direct continuation jumps out of the quotation bypass both commit and rollback. See " { $link "destructors-continuations" } ". Top-level transactions are run through " { $link serialize-transaction } ", which holds the backend's " { $link db-write-lock } " if it has one." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
