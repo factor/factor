@@ -1,0 +1,1 @@
+Poly1305 message authentication code (RFC 8439).
