@@ -21,7 +21,7 @@ AC,altocumulus/air carrier
 ACA,Arctic Control Area
 ACARS,Aircraft Communication Addressing & Reporting System
 ACAS,Airborne Collision Avoidance System
-ACC,altocumulus castellanus/air control center
+ACC,altocumulus castellanus
 ACCAS,altocumulus castellanus
 ACCUM,accumulate
 ACFT,aircraft
@@ -34,7 +34,7 @@ ACPT,accept
 ACR,air carrier
 ACRBT,acrobatic
 ACRS,across
-ACSL,standing lenticular altocumulus
+ACSL,altocumulus standing lenticular
 ACT,active/activated/activity
 ACTG,acting
 ACTV,active
@@ -82,6 +82,7 @@ ALA,authorized landing area
 ALF,aloft/auxiliary landing field
 ALG,along
 ALGHNY,Allegheny
+ALL,all
 ALNMT,alignment
 ALP,aircraft location point
 ALQDS,all quadrants
@@ -101,7 +102,9 @@ ALWF,actual wind factor
 AM,ante meridiem
 AMA,Area Minimum Altitude
 AMB,amber
-AMD,amended
+AMD,amended forecast
+AMD LTD TO,amendments limited to
+AMD NOT SKED,amendments not scheduled
 AMDT,amendment
 AMGR,airport manager
 AMOS,Automatic Meteorological Observing System
@@ -113,12 +116,14 @@ AND,and
 ANGB,Air National Guard Base
 ANLYS,analysis
 AO1,station without a precipitation discriminator
+AO1A,automated station without precipitation discriminator; augmented report
 AO2,station with a precipitation discriminator
+AO2A,automated station with precipitation discriminator; augmented report
 AOA,at or above
 AOB,at or below
 AOE,airport of entry
-AP LGT,airport lights
 AP,airport
+AP LGT,airport lights
 APAPI,Abbreviated Precision Approach Path Indicator
 APC,Area Positive Control
 APCH,approach
@@ -149,6 +154,7 @@ ASOS,Automated Surface Observing System
 ASPH,asphalt
 ASR,Airport Surveillance Radar
 ASSOCD,associated
+AT,at
 ATA,actual time of arrival
 ATC,Air Traffic Control
 ATCAA,Air Traffic Control Assigned Airspace
@@ -164,7 +170,7 @@ ATS,Air Traffic Service
 ATZ,airport traffic zone
 AURBO,Aurora Borealis
 AUTH,authorized
-AUTO,automated report
+AUTO,automated report without human intervention
 AUW,all-up weight
 AUX,auxiliary
 AVBL,available
@@ -181,7 +187,7 @@ BA,braking action
 BACLIN,Baroclinic
 BAJA,Baja California
 BATROP,Barotropic
-BC,British Columbia
+BC,patches/British Columbia
 BCH,beach
 BCKG,backing
 BCM,become
@@ -201,8 +207,8 @@ BGNG,beginning
 BGNS,begins
 BHND,behind
 BINOVC,breaks in overcast
-BKN,broken
-BL,between layers
+BKN,broken clouds (5 to 7 oktas)
+BL,blowing/between layers
 BLD,build
 BLDG,building
 BLDS,builds
@@ -225,7 +231,7 @@ BNK,bank
 BNTH,beneath
 BOOTHEEL,Bootheel
 BOVC,base of overcast
-BR,branch
+BR,mist/branch
 BRF,brief
 BRG,branching/bearing
 BRK,break
@@ -242,7 +248,7 @@ BTN,between
 BTWN,between
 BYD,by day/beyond
 C,center
-CA,California
+CA,cloud-to-air lightning
 CAA,cold air advection
 CAAS,Class A Airspace
 CADIS,Canadian Air Defense Identification Zone
@@ -251,20 +257,20 @@ CARIB,Caribbean
 CARS,Community Airport Radio Station
 CASCDS,Cascades
 CAT,clear air turbulence/category
-CAVOK,ceiling and visibility OK
+CAVOK,visibility 10 km or more; no significant weather; no cloud below 5000 ft or the minimum sector altitude; no cumulonimbus or towering cumulus
 CAVU,ceiling and visibility unlimited
 CAWS,common aviation weather sub-system
-CB,cumulonimbus cloud
+CB,cumulonimbus
 CBAS,Class B Airspace
 CBMAM,cumulonimbus mammatus cloud
 CBS,cumulonimbi
 CBSA,Class B Surface Area
-CC,cirrocumulus cloud
+CC,cloud-to-cloud lightning
 CCAS,Class C Airspace
 CCLDS,clear of clouds
 CCLKWS,counter-clockwise
 CCSA,Class C Surface Area
-CCSL,cirrocumulus standing lenticular cloud
+CCSL,cirrocumulus standing lenticular
 CD,Clearance Delivery
 CDAS,Class D Airspace
 CDFNT,cold front
@@ -277,7 +283,7 @@ CEIL,ceiling
 CESA,Class E Surface Area
 CFP,cold front passage
 CFR,Code of Federal Regulations
-CG,cloud-to-ground
+CG,cloud-to-ground lightning
 CGAS,Class G Airspace
 CGL,Circling Guidance Lights
 CH,channel/critical height
@@ -290,7 +296,7 @@ CHGD,changed
 CHGG,changing
 CHGS,changes
 CHI,cloud-height indicator
-CHINO,sky condition at secondary location not available
+CHINO,cloud height indicator unavailable
 CHSPK,Chesapeake
 CI,cirrus
 CIG,ceiling
@@ -301,7 +307,8 @@ CLD,cloud
 CLDNS,cloudiness
 CLDS,clouds
 CLKWS,clockwise
-CLR,clear sky/clearance/clear(s)/cleared to
+CLR,no cloud detected below 12000 ft
+CLRD,runway cleared
 CLRG,clearing
 CLRS,clears
 CLSD,closed
@@ -316,7 +323,7 @@ CNCLS,cancels
 CNDN,Canadian
 CNF,Computer Navigation Fix
 CNFDC,confidence
-CNL,cancel
+CNL,forecast cancelled
 CNTR,center
 CNTRD,centered
 CNTRL,central
@@ -353,7 +360,7 @@ CONTS,continues
 CONUS,Continental U.S.
 COORD,coordinate(s)
 COP,Change Over Point
-COR,correction to a previously disseminated observation
+COR,corrected report
 CORR,corridor
 CP,Command Post
 CPBL,capable
@@ -467,12 +474,14 @@ DPNG,deepening
 DPNS,deepens
 DPR,deeper
 DPTH,depth
+DR,low drifting
 DRFT,drift/snowbank(s) caused by wind action
 DRFTD,drifted
 DRFTG,drifting
 DRFTS,drifts
 DRY,dry
 DRZL,drizzle
+DS,duststorm
 DSCNT,descent
 DSIPT,dissipate
 DSIPTD,dissipated
@@ -496,6 +505,7 @@ DTRT,deteriorate
 DTRTD,deteriorated
 DTRTG,deteriorating
 DTRTS,deteriorates
+DU,widespread dust
 DURC,during climb
 DURD,during decent
 DURG,during
@@ -515,6 +525,7 @@ DWNDFTS,downdrafts
 DWPNT,dewpoint
 DWPNTS,dewpoints
 DX,duplex
+DZ,drizzle
 E,east
 EAT,Expected Approach Time
 EBND,east bound
@@ -546,10 +557,12 @@ ENHNCG,enhancing
 ENHNCMNT,enhancement
 ENHNCS,enhances
 ENRT,en-route
+ENSO,El Nino/Southern Oscillation
 ENTR,entire
 EOBT,Estimated Off-Block Time
 EOF,expected operations forecast
 ERN,eastern
+ERS,Earth Resources Satellite
 ERY,early
 ERYR,earlier
 ESE,east-southeast
@@ -597,6 +610,7 @@ FAH,Farenheit
 FAM,familiar
 FAP,Final Approach Point
 FAR,Federal Aviation Regulation
+FC,funnel cloud
 FCP,Final Control Point
 FCST,forecast
 FCSTD,forecasted
@@ -604,7 +618,8 @@ FCSTG,forecasting
 FCSTR,forecaster
 FCSTS,forecasts
 FDC,Flight Data Center
-FEW,few
+FEW,few clouds (1 to 2 oktas)
+FG,fog
 FI/P,Flight Inspection Permanent
 FI/T,Flight Inspection Temporary
 FIBI,filed but impracticable to transmit
@@ -614,7 +629,7 @@ FILG,filling
 FINO,weather report will not be filed for transmission
 FIR,Flight Information Region
 FIRAV,first available
-FIRST,first observation after a break in coverage at manual station
+FIRST,first
 FIS,Flight Information Service
 FL,Florida/flight level
 FLD,field/flood
@@ -665,13 +680,15 @@ FSS,Flight Service Station
 FT,feet
 FTHR,further
 FTS,Flexible Track System
+FU,smoke
 FULYR,smoke layer aloft
 FUOCTY,smoke over city
 FVRBL,favorable
 FWC,fleet weather central
 FWD,forward
 FYI,for your information
-FZRANO,freezing rain sensor not available
+FZ,freezing
+FZRANO,freezing rain sensor unavailable
 G,gust
 G/S,ground speed
 GA,Georgia/general aviation
@@ -699,6 +716,7 @@ GNSS,Global Navigation Satellite System
 GOVT,government
 GP,glidepath
 GPS,Global Positioning System
+GR,hail
 GRAD,gradient
 GRBNKS,Grand Banks
 GRDL,gradual
@@ -710,12 +728,13 @@ GRTLY,greatly
 GRTR,greater
 GRTST,greatest
 GRVL,gravel
-GS,glide slope
+GS,small hail and/or snow pellets
 GSTS,gusts
 GSTY,gusty
 GTS,Global Telecommunications System
 GV,ground visibility
 GWT,gross weight
+H,high
 H24,24 hour service
 HAA,height above airport
 HAS,height above site
@@ -772,13 +791,13 @@ HVYST,heaviest
 HWVR,however
 HWY,highway
 HX,high index
-HZ,hertz
+HZ,haze/hertz
 IA,Iowa
 IAF,Initial Approach Fix
 IAP,Instrument Approach Procedure
 IAS,Indicated Airspeed
 IBN,Identification Beacon
-IC,ice
+IC,ice crystals/in-cloud lightning
 ICAO,International Civil Aviation Organization
 ICG,icing
 ICGIC,icing in clouds
@@ -846,7 +865,7 @@ IOVC,in overcast
 IP,ice pellets
 IPV,improve
 IPVG,improving
-IR,ice on runway(s)
+IR,infrared/ice on runways
 IS,islands
 ISOL,isolated
 ISOLD,isolated
@@ -855,6 +874,7 @@ ITWS,Integrated Terminal Weather System
 JAA,JOint Aviation Authorities
 JCTN,junction
 JTSTR,jetstream
+K,kelvin
 KFRST,killing frost
 KGS,kilograms
 KHZ,kilohertz
@@ -867,14 +887,15 @@ KS,Kansas
 KT,knots
 KTAS,knots true airspeed
 KY,Kentucky
-L,left
+L,low/left
 LA,Louisiana
 LAA,Local Airport Advisory
 LABRDR,Labrador
 LACFT,large aircraft
+LAG,lag
 LAHSO,land and hold short operations
 LAM,Limited Area model
-LAST,last observation before a break in coverage at a manual station
+LAST,last
 LAT,latitude
 LAWRS,Limited Aviation Weather Reporting Station
 LB,pound(s)
@@ -1008,7 +1029,7 @@ MEX,Mexico
 MHA,minimum holding altitude
 MHKVLY,Mohawk Valley
 MHZ,megahertz
-MI,Michigan/medium intensity
+MI,shallow/Michigan/medium intensity
 MIALS,Medium Intensity Approach Light System
 MID,middle
 MIDN,midnight
@@ -1029,7 +1050,7 @@ MNLY,mainly
 MNM,minimum
 MNPS,Minimum Navigation Performance Specifications
 MNT,monitor/monitoring/monitored
-MO,Missouri
+MO,Met Office/Missouri
 MOA,Military Operation Area
 MOC,Minimum Obstruction Clearance
 MOCA,Minimum Obstruction Clearance Altitude
@@ -1039,7 +1060,7 @@ MON,monday
 MONTR,monitor
 MORA,minimu off route altitude
 MOS,Model Output Statistics
-MOV,move
+MOV,moving
 MOVD,moved
 MOVG,moving
 MOVMT,movement
@@ -1059,7 +1080,6 @@ MSG,message
 MSHP,mishap
 MSL,mean sea level
 MSLP,mean sea level pressure
-MST,most
 MST,mountain standard time
 MSTLY,mostly
 MSTR,moisture
@@ -1098,12 +1118,13 @@ NBND,northbound
 NBRHD,neighborhood
 NC,North Carolina
 NCA,northern control area
-NCD,clear sky
+NCD,no cloud detected
 NCDC,National Climatic Data Center
 NCRP,non compulsory reporting point
 NCWX,no change in weather
 ND,North Dakota
 NDB,Non-Directional Beacon
+NDV,no directional visibility variation available
 NE,northeast
 NEB,Nebraska
 NEC,necessary
@@ -1117,7 +1138,7 @@ NFLD,Newfoundland
 NGM,Nested Grid Model
 NGT,night
 NH,New Hampshire
-NIL,none
+NIL,report unavailable
 NJ,New Jersey
 NL,no layers
 NLC,noctilucent cloud
@@ -1147,7 +1168,7 @@ NOPAC,Northern Pacific
 NOPT,no procedure turn
 NORPI,no pilot balloon observation will be filed
 NOS,National Ocean Survey
-NOSIG,no significant change is expected in next 2 hours
+NOSIG,no significant change expected during the next two hours
 NOSPECI,no SPECI reports are taken at the station
 NOSPL,no special observations taken
 NOTAM,Notice to Airmen
@@ -1156,8 +1177,8 @@ NR,number/near
 NRLY,nearly
 NRN,northern
 NRW,narrow
-NS,Nova Scotia/nimbostratus
-NSC,clear sky
+NS,nimbostratus/Nova Scotia
+NSC,no significant cloud
 NSCSWD,no small craft or storm warning are being displayed
 NSW,no significant weather
 NTAP,notice to airmen publication
@@ -1169,6 +1190,7 @@ NW,northwest
 NWC,Naval Weapons Center
 NWD,northward
 NWLY,northwesterly
+NWP,numerical weather prediction
 NWRN,northwestern
 NWS,National Weather Service
 NXT,next
@@ -1179,7 +1201,7 @@ O/T,other times
 OAC,oceanic area control
 OAT,outside air temperature
 OBND,outbound
-OBS,observed
+OBS,observation
 OBSC,obscured/obscure/obscuring
 OBSCD,obscured
 OBSCG,obscuring
@@ -1223,12 +1245,11 @@ OSV,ocean station vessel
 OTAS,on top and smooth
 OTLK,outlook
 OTP,on top
-OTR,oceanic transitions routes
 OTR,other
 OTRW,otherwise
 OTS,out of service
 OUTFLO,outflow
-OVC,overcast
+OVC,overcast clouds (8 oktas)
 OVHD,overhead
 OVNGT,overnight
 OVR,over
@@ -1272,8 +1293,9 @@ PISO,no pilot balloon observations due to snow
 PISTON,piston aircraft
 PIWI,no pilot balloon observations due to high, or gusty, surface wind
 PJE,parachute jumping exercise
-PK WND,peak wind
 PK,peak
+PK WND,peak wind
+PL,ice pellets
 PLA,practice low approach
 PLASI,pulsating visual approach slope indicator
 PLNS,plains
@@ -1283,7 +1305,8 @@ PLW,plow/plowed
 PM,post meridian
 PN,prior notice required
 PNHDL,pandhandle
-PNO,precipitation amount not available
+PNO,precipitation amount unavailable
+PO,dust or sand whirls
 POS,positive
 POSLY,positively
 PPI,Plan Position Indicator
@@ -1295,6 +1318,7 @@ PPIOM,radar weather report equipment inoperative due to maintenance
 PPO,prior permission only
 PPR,prior permission required
 PPSN,present position
+PR,partial
 PRA,precision radar approach
 PRBL,probable
 PRBLTY,probability
@@ -1313,6 +1337,8 @@ PRJMP,pressure jump
 PRM,precision radar monitor
 PRN,psuedo random noise
 PROB,probability
+PROB30,30 percent probability
+PROB40,40 percent probability
 PROC,procedure
 PROCS,procedures
 PROD,produce
@@ -1338,7 +1364,6 @@ PSBLY,possibly
 PSG,passage/passing
 PSN,position
 PSND,positioned
-PSP,pacific standard time
 PSP,pierced steel planking
 PSR,packed snow on runway(s)
 PTCHY,patchy
@@ -1355,8 +1380,9 @@ PVLG,prevailing
 PVLS,prevails
 PVLT,prevalent
 PVT,private operator or private
-PWINO,precipitation identifier sensor not available
+PWINO,precipitation identification sensor unavailable
 PWR,power
+PY,spray
 QBO,quasi-biennial oscillation
 QDM,magnetic bearing to facility
 QDR,manetci bearing from facility
@@ -1370,7 +1396,7 @@ QTR,quarter
 QUAD,quadrant
 QUE,Quebec
 R,right
-RA,radio altimeter
+RA,rain/radio altimeter
 RABA,no RAWIN observation (no balloons available)
 RABAL,radiosonde balloon wind data
 RABAR,radiosonde balloon release
@@ -1429,7 +1455,7 @@ RDVLP,redevelop
 RDVLPG,redeveloping
 RDVLPMT,redevelopment
 RDWND,radar dome wind
-RE,regard
+RE,recent/regarding
 REC,receive/receiver
 RECON,reconnaissance
 RED,red
@@ -1437,7 +1463,6 @@ REF,reference
 REIL,runway end identifier lights
 RELC,relocated
 RENL,runway end identifier lights
-REP,ram entrance point
 REP,reporting point
 REPL,replace
 REPLD,replaced
@@ -1491,7 +1516,6 @@ RPRT,report
 RPRTD,reported
 RPRTG,reporting
 RPRTS,reports
-RPT,regular public transport
 RPT,repeat
 RPTG,repeating
 RPTS,repeats
@@ -1512,7 +1536,7 @@ RSTRG,restricting
 RSTRS,restricts
 RSVN,reservation
 RT,right turn
-RTD,Routine Delayed (late) observation
+RTD,delayed report
 RTE,route
 RTR,remote transmitter/receiver
 RTRN,return
@@ -1524,8 +1548,8 @@ RUF,rough
 RUFLY,roughly
 RV,reportable value
 RVR,runway visual range
-RVRM,runway visual range midpoint
-RVRNO,RVR system values not available
+RVRM,runway visual range missing
+RVRNO,runway visual range unavailable
 RVRR,runway visual range rollout
 RVRT,runway visual range touchdown
 RVS,revise
@@ -1536,10 +1560,10 @@ RVSS,revises
 RVV,runway visbility values
 RW,rain shower
 RWY,runway
+RWYS,runways
 RY,runway
 S,south
-SA,sand, sanded
-SA,surface observation
+SA,sand/surface observation
 SALR,saturated adiabatic lapse rate
 SALS,short approach light system
 SALSF,short approach light wystem with sequeced flashing lights
@@ -1563,14 +1587,14 @@ SCA,southern control area
 SCND,second
 SCNDRY,secondary
 SCOB,scattered clouds or better
-SCSL,stratocumulus standing lenticular cloud
-SCT,scattered
+SCSL,stratocumulus standing lenticular
+SCT,scattered clouds (3 to 4 oktas)
 SCTD,scattered
 SCTR,sector
 SD,South Dakota
 SDF,simplified directional facility
 SE,southeast
-SEC,second
+SEAS,sea state
 SEC,seconds
 SELCAL,selective call system
 SELS,severe local storms
@@ -1589,6 +1613,7 @@ SG,snow grains
 SGD,solar-geophysical data
 SGFNT,significant
 SGFNTLY,significantly
+SH,showers
 SHFT,shift
 SHFTD,shifted
 SHFTG,shifting
@@ -1607,14 +1632,11 @@ SID,standard instrument departure
 SIERNEV,Sierra Nevada
 SIG,signature
 SIGMET,significant meteorological information
-SIMUL,simultaneous
 SIMUL,simultaneous or simultaneously
-SIR,packed or compacted snow and ice on runway(s)
 SIR,snow and ice on runway(s)
 SIWL,single isolated wheel load
-SKC,clear sky
+SKC,sky clear
 SKD,scheduled
-SKED,schedule
 SKED,scheduled
 SLD,solid
 SLGT,slight
@@ -1623,13 +1645,11 @@ SLO,slow
 SLOLY,slowly
 SLOR,slower
 SLP,sea-level pressure
-SLP,speed limiting point
 SLPG,sloping
-SLPNO,sea-level pressure not available
+SLPNO,sea-level pressure unavailable
 SLR,slush on runway(s)
 SLT,sleet
 SLY,southerly
-SM,statute mile(s)
 SM,statute miles
 SMGCS,surface movement guidance and control system
 SMK,smoke
@@ -1643,13 +1663,13 @@ SMTHST,smoothest
 SMTM,sometime
 SMWHT,somewhat
 SN,snow
-SNBNK,snow bank
 SNBNK,snowbank(s) caused by plowing
 SND,sand
 SNFLK,snow flake
 SNGL,single
 SNINCR,snow increasing rapidly
 SNO,snow
+SNOCLO,aerodrome closed due to snow
 SNOINCR,snow increase
 SNOINCRG,snow increasing
 SNOW,snow
@@ -1673,11 +1693,11 @@ SPRD,spread
 SPRDG,spreading
 SPRDS,spreads
 SPRL,spiral
+SQ,squalls
 SQAL,squall
 SQLN,squall line
 SR,sunrise
 SR-SS,sunrise-to-sunset
-SRA,special rules area
 SRA,surveillance radar approach
 SRE,surveillance radar element
 SRN,southern
@@ -1685,7 +1705,7 @@ SRND,surround
 SRNDD,surrounded
 SRNDG,surrounding
 SRNDS,surrounds
-SS,sunset
+SS,sandstorm/sunset
 SSALF,simplified short approach light system with sequenced flashing lights
 SSALR,simplified short approach light system with runway alignment indicator lights
 SSALS,simplified short approach light system
@@ -1744,11 +1764,11 @@ SVG,serving
 SVN,satellite vehicle number
 SVR,severe
 SVRL,several
-SW+,heavy snow shower
-SW,single wheel landing gear
 SW,southwest
+SW+,heavy snow shower
 SW-,light snow shower
 SWD,southward
+SWE,snow water equivalent
 SWEPT,swept or broom/broomed
 SWLG,swelling
 SWLY,southwesterly
@@ -1765,7 +1785,7 @@ T,thunder
 TA,transition altitude
 TAA,terminal arrival area
 TACAN,tactical air navigation
-TAF,Terminal Aerodrome Forecast
+TAF,terminal aerodrome forecast
 TAR,terminal area surveillance radar
 TAS,true air speed
 TBJT,turbojet
@@ -1773,16 +1793,15 @@ TCAS,traffic alert and collision avoidance system
 TCH,threshold crossing height
 TCNTL,transcontinental
 TCTA,transcontinental control area
-TCU,towering cumulus cloud
+TCU,towering cumulus
 TDA,today
 TDWR,terminal doppler weather radar
-TDZ,lgt     touchdown zone lights
 TDZ,touchdown zone
 TDZE,thouchdown zone elevation
-TEMP,temperature
 TEMP,temporary
-TEMPO,temporary/temporarily
+TEMPO,temporary fluctuations
 TERPS,us standard for terminal instrument precedure
+TESTM,non-commissioned automated surface observation report
 TFC,traffic
 TFR,temporary flight restriction
 TGL,touch and go landings
@@ -1813,7 +1832,7 @@ THU,thursday
 TIBA,traffic information broadcast by aircraft
 TIL,until
 TKOF,takeoff
-TL,transition level
+TL,until
 TM,traffic management
 TMA,terminal control area
 TML,terminal
@@ -1822,7 +1841,7 @@ TMPA,traffic management program alert
 TMPRY,temporary
 TMPRYLY,temporarilly
 TMW,tomorrow
-TN,Tennessee
+TN,minimum temperature/Tennessee
 TNDCY,tendency
 TNDCYS,tendencies
 TNGT,tonight
@@ -1836,7 +1855,6 @@ TORA,take off run available
 TOVC,top of overcast
 TPG,topping
 TRACON,terminal radar approach control
-TRANS,alt   transitiion altitude
 TRANS,lev   transition level
 TRBL,trouble
 TRCV,tri color visual approach slope indicator
@@ -1858,23 +1876,23 @@ TRPCL,tropical
 TRPLYR,trapping layer
 TRRN,terrain
 TRSN,transition
-TRW+,thunderstorm with heavy rain shower
 TRW,thunderstorm
+TRW+,thunderstorm with heavy rain shower
+TS,thunderstorm
 TS+,thunderstorm with heavy snow
-TS,thunderstorm with snow
 TSFR,transfer
 TSFRD,transfered
 TSFRG,transfering
 TSFRS,transfers
 TSHWR,thundershower
 TSHWRS,thundershowers
-TSNO,thunderstorm information not available
+TSNO,thunderstorm sensor unavailable
 TSNT,transient
 TSQLS,thundersqualls
 TSTM,thunderstorm
 TSTMS,thunderstorms
-TSW+,thunderstorm with heavy snow showers
 TSW,thunderstorm with snow showers
+TSW+,thunderstorm with heavy snow showers
 TUE,tuesday
 TURB,turbulence
 TURBC,turbulence
@@ -1888,7 +1906,7 @@ TWIP,terminal weather information for pilots
 TWR,tower
 TWRG,towering
 TWY,taxiway
-TX,Texas
+TX,maximum temperature/Texas
 UA,routine pilot report
 UAG,upper atmosphere geophysics
 UAV,unmanned air vehicles
@@ -1917,6 +1935,7 @@ UNSTDY,unsteady
 UNSTL,unsettle
 UNSTLD,unsettled
 UNUSBL,unusable
+UP,unknown precipitation
 UPDFTS,updrafts
 UPR,upper
 UPSLP,upslope
@@ -1934,20 +1953,21 @@ UV,ultra-violet
 UVV,upward vertical velocity
 UVVS,upward vertical velocities
 UWNDS,upper winds
-V,varying/variable
+V,variable
 V/V,vertical velocity
-VA,Virginia
+VA,volcanic ash/Virginia
 VAR,magnetic variation
 VARN,variation
 VASI,visual approach slope indicator
-VC,(in the) vicinity
+VC,in the vicinity
 VCNTY,vicinity
 VCOT,VFR conditions on top
+VCSH,showers in the vicinity
 VCTR,vector
+VCTS,thunderstorms in the vicinity
 VDP,visual descent point
 VDUC,VAS Data Utilization Center (NSSFC)
 VE,visual exempted
-VFR,VFR
 VFR,visual flight rules
 VFY,verify
 VFYD,verified
@@ -1958,10 +1978,9 @@ VHA,volcanic hazard area
 VHF,very high frequency
 VIA,by way of
 VICE,instead/versus
-VIRGA,virga
-VIS,visible/visibility
+VIRGA,precipitation evaporating before reaching the ground
 VIS,visiblility
-VISNO,visibility at secondary location not available
+VISNO,visibility sensor unavailable
 VLCTY,velocity
 VLCTYS,velocities
 VLNT,violent
@@ -1992,7 +2011,7 @@ VSBYDR,visibility decreasing rapidly
 VSBYIR,visibility increasing rapidly
 VT,Vermont
 VV,vertical visibility
-W,west
+W,sea-surface temperature
 W/O,without
 W/P,area navigation
 WA,Washington
@@ -2012,14 +2031,12 @@ WFP,warm front passage
 WG/AOS,Working Group for Atmospheric Observing Systems
 WG/SO,Working Group for Surface Observations
 WHT,white
-WI,Wisconsin
 WI,within
 WIBIS,will be issued
 WINT,winter
 WK,weak
 WKDAY,weekday
 WKDAYS,monday through friday
-WKEND,saturday and sunday
 WKEND,weekend
 WKN,weaken
 WKNG,weakening
@@ -2068,12 +2085,13 @@ WTRS,waters
 WTSPT,waterspout
 WTSPTS,waterspouts
 WUD,would
-WV,West Virginia/wave
+WV,water vapour/West Virginia/wave
 WVS,waves
 WW,Severe Weather Watch
 WWAMKC,Status Report
 WWD,westward
 WWS,Severe Weather Watches
+WWW,World Weather Watch
 WX,weather
 WXCON,weather reconnaissance flight pilot report
 WY,Wyoming
