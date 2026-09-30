@@ -15,8 +15,9 @@ STRUCT: va-small-hfa { x half } { y bfloat } ;
 STRUCT: va-hva { x float-4 } { y float-4 } ;
 
 :: with-va-memory ( quot -- )
-    512 malloc :> memory
-    [ [ memory quot call ] with-va-scope ] [ memory free ] finally ; inline
+    528 malloc :> raw
+    raw alien-address 16 align <alien> :> memory
+    [ [ memory quot call ] with-va-scope ] [ raw free ] finally ; inline
 
 :: cursor-at ( memory platform -- cursor )
     256 memory <displaced-alien>
