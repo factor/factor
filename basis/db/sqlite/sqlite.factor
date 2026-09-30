@@ -43,12 +43,13 @@ TUPLE: sqlite-db-connection < db-connection write-lock ;
 PRIVATE>
 
 M: sqlite-db db-open
-    path>>
-    [ sqlite-open ] [ sqlite-write-lock ] bi <sqlite-db-connection>
-    ! WAL lets readers and the single writer proceed concurrently. It is a
-    ! persistent property of the file, so re-setting it on later opens is
-    ! harmless.
-    dup db-connection [ "PRAGMA journal_mode=WAL" sql-command ] with-variable ;
+    [
+        path>>
+        [ sqlite-open ] [ sqlite-write-lock ] bi <sqlite-db-connection> |dispose
+        ! WAL lets readers and the single writer proceed concurrently. If
+        ! enabling it fails, close the connection before propagating the error.
+        dup db-connection [ "PRAGMA journal_mode=WAL" sql-command ] with-variable
+    ] with-destructors ;
 
 M: sqlite-db-connection db-close sqlite-close ;
 

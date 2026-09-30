@@ -1,7 +1,8 @@
 USING: accessors arrays concurrency.count-downs continuations db
-db.errors db.sqlite db.tuples db.types fry io.directories
-io.files.temp kernel layouts literals math.parser namespaces
-sequences sorting splitting threads tools.test ;
+db.errors db.sqlite db.sqlite.lib db.tuples db.types destructors
+fry io.directories io.files.temp kernel layouts literals
+math.parser namespaces sequences sets sorting splitting threads
+tools.test ;
 
 IN: db.sqlite.tests
 
@@ -263,10 +264,11 @@ watch "WATCH" {
 ! ("database is locked"). SQLite permits only one writer per file; the
 ! per-file write lock installed by serialize-transaction makes the second
 ! writer wait cooperatively rather than collide. Without the lock these
-! writers would race and intermittently raise "database is locked".
+! yielding writers below would raise "database is locked".
 
 ! Autocommit tuple writes (the path begin-session takes).
-! Each thread opens its own connection and inserts one tuple. insert-tuple
+! Each thread opens its own connection and inserts one tuple while another
+! connection holds a write transaction open. insert-tuple
 ! dispatches through serialize-transaction, so every insert is serialized
 ! per file.
 TUPLE: concurrent-row n ;
@@ -276,15 +278,20 @@ concurrent-row "CONCURRENT_ROWS" {
 } define-persistent
 
 : spawn-inserter ( n count-down -- )
-    '[
-        [ test.db [ _ concurrent-row boa insert-tuple ] with-db ]
-        [ drop ] recover
-        _ count-down
-    ] "concurrent insert" spawn drop ;
+    [ '[ test.db [ _ concurrent-row boa insert-tuple ] with-db ] ] dip
+    spawn-stage ;
 
 : concurrent-insert-test ( -- n )
     test.db [ concurrent-row ensure-table ] with-db
-    20 <count-down>
+    21 <count-down>
+    ! Queue the lock holder first. Its yield runs the inserters while the
+    ! SQLite transaction is still open, forcing them to wait for the lock.
+    dup [
+        test.db [
+            [ "UPDATE CONCURRENT_ROWS SET N = N" sql-command yield ]
+            with-transaction
+        ] with-db
+    ] swap spawn-stage
     [ 20 <iota> ] dip
     [ '[ _ spawn-inserter ] each ] keep
     await
@@ -297,18 +304,18 @@ concurrent-row "CONCURRENT_ROWS" {
 ! held across BEGIN IMMEDIATE..COMMIT, so transactions never interleave at
 ! the SQLite level and none receives SQLITE_BUSY.
 : spawn-txn-writer ( n count-down -- )
-    '[
-        [
-            test.db [
-                [
-                    "INSERT INTO CONCURRENT_TXN(N) VALUES(" _ number>string
-                    ")" 3append sql-command
-                    "UPDATE CONCURRENT_TXN SET N = N WHERE N < 0" sql-command
-                ] with-transaction
-            ] with-db
-        ] [ drop ] recover
-        _ count-down
-    ] "concurrent txn" spawn drop ;
+    [ '[
+        test.db [
+            [
+                "INSERT INTO CONCURRENT_TXN(N) VALUES(" _ number>string
+                ")" 3append sql-command
+                ! Let queued writers attempt BEGIN while this transaction
+                ! owns SQLite's write lock.
+                yield
+                "UPDATE CONCURRENT_TXN SET N = N WHERE N < 0" sql-command
+            ] with-transaction
+        ] with-db
+    ] ] dip spawn-stage ;
 
 : concurrent-transaction-test ( -- n )
     test.db [
@@ -323,3 +330,17 @@ concurrent-row "CONCURRENT_ROWS" {
     ] with-db ;
 
 { 10 } [ concurrent-transaction-test ] unit-test
+
+! db-open must release a connection when WAL initialization fails. A writer
+! in rollback-journal mode prevents a second connection from enabling WAL.
+{ t } [
+    test.db [
+        "PRAGMA journal_mode=DELETE" sql-command
+        "BEGIN IMMEDIATE" sql-command
+        [
+            disposables get cardinality
+            [ test.db db-open dispose ] [ sqlite-error? ] must-fail-with
+            disposables get cardinality =
+        ] [ "ROLLBACK" sql-command ] finally
+    ] with-db
+] unit-test
