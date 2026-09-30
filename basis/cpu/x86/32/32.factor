@@ -224,6 +224,8 @@ M: x86.32 flatten-struct-type
 
 M: x86.32 struct-return-on-stack? os linux? not ;
 
+M: x86.32 return-struct-pointer? os windows? ;
+
 M: x86.32 (cpuid)
     void { uint uint void* } cdecl [
         ! Save ds-reg, rs-reg
