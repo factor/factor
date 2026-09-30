@@ -1,14 +1,18 @@
 ! Copyright (C) 2026 John Benediktsson.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io.backend io.launcher io.pathnames kernel math sequences ;
+USING: accessors io.backend io.launcher kernel math sequences
+system ;
 
 IN: benchmark.spawn-cat
 
 ! Like Jarred Sumner's spawning-cat benchmark: 100 concurrent children per
 ! batch, no shell, all standard streams discarded, and every exit awaited.
+: cat-command ( path -- command )
+    os windows? { "cmd.exe" "/c" "type" } { "cat" } ? swap suffix ;
+
 : spawn-cat-batch ( path -- )
     '[
-        <process> "cat" _ 2array >>command
+        <process> _ cat-command >>command
         +closed+ >>stdin +closed+ >>stdout +closed+ >>stderr run-detached
     ] 100 swap replicate wait-for-success ;
 
