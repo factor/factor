@@ -6,6 +6,9 @@ USING: calendar concurrency.promises math threads windows.errors
 windows.messages windows.user32 ;
 IN: ui.backend.windows.tests
 
+! Native menus can cancel input when Factor holds no mouse capture.
+{ f } [ release-capture mouse-captured get ] unit-test
+
 ! A pending paint must be validated before the handler yields to another
 ! Factor thread. Use a nonactivating tool window positioned offscreen.
 { t t } [| |

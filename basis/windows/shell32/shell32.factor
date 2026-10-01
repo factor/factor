@@ -353,6 +353,7 @@ CONSTANT: NIIF_ERROR 0x3
 CONSTANT: NIIF_USER 0x4
 CONSTANT: NIIF_ICON_MASK 0xF
 CONSTANT: NIIF_NOSOUND 0x10
+CONSTANT: NIIF_RESPECT_QUIET_TIME 0x80
 
 CONSTANT: NIS_HIDDEN 1
 CONSTANT: NIS_SHAREDICON 2
@@ -392,14 +393,21 @@ TYPEDEF: NOTIFYICONDATA* PNOTIFYICONDATA
 FUNCTION: BOOL Shell_NotifyIconW ( DWORD dwMessage, PNOTIFYICONDATA lpdata )
 ALIAS: Shell_NotifyIcon Shell_NotifyIconW
 
-:: set-notify-icon-tip ( title data -- data )
-    data szTip>> :> buffer
+:: set-notify-icon-string ( text buffer -- )
     buffer [ drop 0 ] map! drop
-    title utf16n encode ushort cast-array
-    dup length 127 min head
+    text utf16n encode ushort cast-array
+    dup length buffer length 1 - min head
     dup ?last [ upper-surrogate? [ but-last ] when ] when*
-    0 buffer copy
-    data ;
+    0 buffer copy ;
+
+: set-notify-icon-tip ( title data -- data )
+    [ szTip>> set-notify-icon-string ] keep ;
+
+: set-notify-icon-info ( text data -- data )
+    [ szInfo>> set-notify-icon-string ] keep ;
+
+: set-notify-icon-info-title ( title data -- data )
+    [ szInfoTitle>> set-notify-icon-string ] keep ;
 
 TYPEDEF: HRESULT SHSTDAPI
 

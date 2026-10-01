@@ -602,6 +602,10 @@ CONSTANT: MF_HELP            0x4000
 CONSTANT: MF_RIGHTJUSTIFY    0x4000
 CONSTANT: MF_MOUSESELECT     0x8000
 
+CONSTANT: TPM_RIGHTBUTTON 0x0002
+CONSTANT: TPM_NONOTIFY 0x0080
+CONSTANT: TPM_RETURNCMD 0x0100
+
 CONSTANT: SPI_GETBEEP               1
 CONSTANT: SPI_SETBEEP               2
 CONSTANT: SPI_GETMOUSE              3
@@ -1315,7 +1319,8 @@ FUNCTION: BOOL AdjustWindowRectEx ( LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DW
 FUNCTION: BOOL AnyPopup ( )
 
 ! FUNCTION: AppendMenuA
-! FUNCTION: AppendMenuW
+FUNCTION: BOOL AppendMenuW ( HMENU hMenu, UINT uFlags, UINT_PTR uIDNewItem, LPCWSTR lpNewItem )
+ALIAS: AppendMenu AppendMenuW
 ! FUNCTION: ArrangeIconicWindows
 ! FUNCTION: AttachThreadInput
 ! FUNCTION: BeginDeferWindowPos
@@ -1415,7 +1420,7 @@ ALIAS: CreateDesktop CreateDesktopW
 ! FUNCTION: CreateMDIWindowA
 ! FUNCTION: CreateMDIWindowW
 ! FUNCTION: CreateMenu
-! FUNCTION: CreatePopupMenu
+FUNCTION: HMENU CreatePopupMenu ( )
 ! FUNCTION: CreateSystemThreads
 
 FUNCTION: HWND CreateWindowExW (
@@ -1489,7 +1494,7 @@ FUNCTION: BOOL DestroyAcceleratorTable ( HACCEL hAccel )
 ! FUNCTION: DestroyCaret
 ! FUNCTION: DestroyCursor
 ! FUNCTION: DestroyIcon
-! FUNCTION: DestroyMenu
+FUNCTION: BOOL DestroyMenu ( HMENU hMenu )
 ! FUNCTION: DestroyReasons
 FUNCTION: BOOL DestroyWindow ( HWND hWnd )
 ! FUNCTION: DeviceEventWorker
@@ -1961,7 +1966,8 @@ FUNCTION: BOOL PeekMessageW ( LPMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT w
 ALIAS: PeekMessage PeekMessageW
 
 ! FUNCTION: PostMessageA
-! FUNCTION: PostMessageW
+FUNCTION: BOOL PostMessageW ( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
+ALIAS: PostMessage PostMessageW
 FUNCTION: void PostQuitMessage ( int nExitCode )
 ! FUNCTION: PostThreadMessageA
 ! FUNCTION: PostThreadMessageW
@@ -2007,7 +2013,8 @@ FUNCTION: BOOL RegisterRawInputDevices ( PCRAWINPUTDEVICE pRawInputDevices, UINT
 ! FUNCTION: RegisterTasklist
 ! FUNCTION: RegisterUserApiHook
 ! FUNCTION: RegisterWindowMessageA
-! FUNCTION: RegisterWindowMessageW
+FUNCTION: UINT RegisterWindowMessageW ( LPCWSTR lpString )
+ALIAS: RegisterWindowMessage RegisterWindowMessageW
 FUNCTION: BOOL ReleaseCapture ( )
 FUNCTION: int ReleaseDC ( HWND hWnd, HDC hDC )
 ! FUNCTION: RemoveMenu
@@ -2159,7 +2166,7 @@ ALIAS: SystemParametersInfo SystemParametersInfoW
 FUNCTION: int ToUnicode ( UINT wVirtKey, UINT wScanCode, BYTE *lpKeyState, LPWSTR pwszBuff, int cchBuff, UINT wFlags )
 ! FUNCTION: ToUnicodeEx
 FUNCTION: BOOL TrackMouseEvent ( LPTRACKMOUSEEVENT lpEventTrack )
-! FUNCTION: TrackPopupMenu
+FUNCTION: BOOL TrackPopupMenu ( HMENU hMenu, UINT uFlags, int x, int y, int nReserved, HWND hWnd, RECT* prcRect )
 ! FUNCTION: TrackPopupMenuEx
 ! FUNCTION: TranslateAccelerator
 ! FUNCTION: TranslateAcceleratorA

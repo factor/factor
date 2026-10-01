@@ -3,7 +3,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
 arrays ascii assocs assocs.extras byte-arrays calendar classes
-classes.struct colors combinators continuations environment io io.crlf
+classes.struct colors combinators continuations destructors environment io io.crlf
 io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel
 libc literals make math math.bitwise math.order math.parser namespaces opengl
 sequences sets specialized-arrays strings threads ui ui.backend
@@ -12,7 +12,7 @@ ui.gadgets.worlds ui.gestures ui.pixel-formats ui.private ui.theme
 ui.theme.switching windows.advapi32 windows.dwmapi
 windows.errors windows.gdi32 windows.kernel32 windows.messages
 windows.offscreen windows.ole32 windows.opengl32
-windows.registry windows.shell32 windows.types windows.user32 ;
+windows.registry windows.shell32 windows.tray windows.types windows.user32 ;
 FROM: unicode => upper-surrogate? under-surrogate? ;
 SPECIALIZED-ARRAY: POINT
 QUALIFIED-WITH: alien.c-types c
@@ -23,6 +23,9 @@ SINGLETON: windows-ui-backend
 TUPLE: win-base hDC hRC ;
 TUPLE: win < win-base hWnd world title pending-surrogate ;
 C: <win> win
+
+SYMBOL: world-tray-icons
+world-tray-icons [ H{ } clone ] initialize
 
 <PRIVATE
 
@@ -427,6 +430,8 @@ CONSTANT: exclude-keys-wm-char
     dup hWnd>> swap hDC>> ReleaseDC win32-error=0/f ;
 
 M: windows-ui-backend (close-window)
+    dup hWnd>> dispose-window-tray-icons
+    dup hWnd>> alien-address world-tray-icons get-global delete-at
     dup hWnd>> unregister-window
     dup cleanup-window
     hWnd>> DestroyWindow win32-error=0/f ;
@@ -498,7 +503,7 @@ SYMBOL: nc-buttons
     ] if ;
 
 : release-capture ( -- )
-    ReleaseCapture win32-error=0/f
+    GetCapture [ ReleaseCapture win32-error=0/f ] when
     mouse-captured off ;
 
 : handle-app-command ( hWnd uMsg wParam lParam -- )
@@ -547,7 +552,7 @@ SYMBOL: nc-buttons
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     ! message sent if windows needs application to stop dragging
-    4drop release-capture ;
+    4drop mouse-captured get [ release-capture ] when ;
 
 : handle-wm-mouseleave ( hWnd uMsg wParam lParam -- )
     ! message sent if mouse leaves main application
@@ -623,10 +628,24 @@ wm-handlers [
         ${ WM_MOUSEMOVE [ handle-wm-mousemove 0 ] }
         ${ WM_MOUSEWHEEL [ handle-wm-mousewheel 0 ] }
         ${ WM_MOUSEHWHEEL [ handle-wm-mousehwheel 0 ] }
-        ${ WM_CANCELMODE [ handle-wm-cancelmode 0 ] }
         ${ WM_MOUSELEAVE [ handle-wm-mouseleave 0 ] }
     } expand-keys-set-at
 ] initialize
+
+[ [ drop ] 2dip handle-tray-event 0 ] WM_FACTOR_TRAYICON add-wm-handler
+[ 4dup handle-wm-cancelmode DefWindowProc ] WM_CANCELMODE add-wm-handler
+
+[
+    [
+        dup dispose-window-tray-icons
+        dup alien-address world-tray-icons get-global delete-at
+    ] 3dip DefWindowProc
+] WM_NCDESTROY add-wm-handler
+
+STARTUP-HOOK: [
+    "TaskbarCreated" RegisterWindowMessage dup win32-error=0/f
+    [ 4drop restore-tray-icons 0 ] swap add-wm-handler
+]
 
 SYMBOL: trace-messages?
 
@@ -887,23 +906,18 @@ CONSTANT: fullscreen-flags flags{ WS_CAPTION WS_BORDER WS_THICKFRAME }
 : ensure-null-terminated ( str -- str' )
     dup ?last 0 = [ "\0" append ] unless ; inline
 
-: add-tray-icon ( title -- )
-    NIM_ADD
-    NOTIFYICONDATA new
-        NOTIFYICONDATA heap-size >>cbSize
-        NOTIFYICON_VERSION_4 over timeout-version>> uVersion<<
-        NIF_TIP NIF_ICON bitor >>uFlags
-        world get handle>> hWnd>> >>hWnd
-        f GetModuleHandle "APPICON" native-string>alien LoadIcon >>hIcon
-        rot swap set-notify-icon-tip
-        Shell_NotifyIcon win32-error=0/f ;
+: current-tray-icon ( -- icon/f )
+    world get handle>> hWnd>> alien-address world-tray-icons get-global at ;
 
 : remove-tray-icon ( -- )
-    NIM_DELETE
-    NOTIFYICONDATA new
-        NOTIFYICONDATA heap-size >>cbSize
-        world get handle>> hWnd>> >>hWnd
-    Shell_NotifyIcon win32-error=0/f ;
+    world get handle>> hWnd>> alien-address
+    world-tray-icons get-global delete-at* drop [ dispose ] when* ;
+
+: add-tray-icon ( title -- )
+    remove-tray-icon
+    world get handle>> hWnd>> <tray-icon>
+    world get '[ _ raise-window ] >>action
+    world get handle>> hWnd>> alien-address world-tray-icons get-global set-at ;
 
 M: windows-ui-backend (set-fullscreen)
     [ enter-fullscreen ] [ exit-fullscreen ] if ;
