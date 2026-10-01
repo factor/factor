@@ -11,17 +11,10 @@ IN: benchmark.spawn-cat
 : cat-command ( path -- command )
     os windows? { "cmd.exe" "/c" "type" } { "cat" } ? swap suffix ;
 
-: cat-redirection ( -- redirection )
-    ! On Windows +closed+ uses broken pipes, so writes fail instead of
-    ! being discarded. Use an explicit null device path.
-    os windows? "\\\\.\\NUL" +closed+ ? ;
-
 : spawn-cat-batch ( path -- )
     '[
         <process> _ cat-command >>command
-        cat-redirection >>stdin
-        cat-redirection >>stdout
-        cat-redirection >>stderr run-detached
+        +closed+ >>stdin +closed+ >>stdout +closed+ >>stderr run-detached
     ] 100 swap replicate wait-for-success ;
 
 : spawn-cat ( path batches -- )

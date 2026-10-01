@@ -39,7 +39,7 @@ $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list
     { { $link f } " - default value; the stream is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
-    { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fail" }
+    { { $link +closed+ } " - the stream is redirected to the null device; reads return end of file and writes are discarded" }
     { { $link +stdout+ } " - a special value for the " { $snippet "stderr" } " slot only, indicating that the standard output and standard error streams should be merged" }
     { "a path name - the stream is sent to the given file, which must exist for input and is created automatically on output" }
     { "an " { $link appender } " wrapping a path name - output is sent to the end of the given file, as with " { $link <file-appender> } }
@@ -67,7 +67,7 @@ ARTICLE: "io.launcher.priority" "Setting process priority"
 "The default value is " { $link f } ", which denotes that the child process should inherit the current process priority." ;
 
 HELP: +closed+
-{ $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } "." } ;
+{ $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } ". Redirects the stream to the platform's null device: reads return end of file and writes succeed with their output discarded." } ;
 
 HELP: +stdout+
 { $description "Possible value for the " { $snippet "stderr" } " slot of a " { $link process } "." } ;

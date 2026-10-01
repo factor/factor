@@ -12,6 +12,19 @@ IN: io.launcher.windows.tests
 : console-vm-path ( -- path )
     vm-path ".exe" ?tail [ ".com" append ] when ;
 
+! Discarding output must not give the child a broken pipe. Check both
+! separate stderr redirection and stderr merged into discarded stdout.
+{ +closed+ +stdout+ } [
+    [
+        <process> swap >>stderr
+            console-vm-path "-no-user-init"
+            "vocab:io/launcher/windows/test/closed.factor" 3array >>command
+            +closed+ >>stdin +closed+ >>stdout
+            t >>hidden 10 seconds >>timeout
+        try-process
+    ] curry { } swap unit-test
+] each
+
 ! Windows environment names are case-insensitive, including non-ASCII
 ! names. Later entries win without leaving duplicate keys in the block.
 { H{ { "PATH" "new" } { "OTHER" "keep" } } } [

@@ -5,7 +5,7 @@ classes classes.struct combinators combinators.short-circuit
 concurrency.flags continuations debugger destructors grouping init io
 io.backend io.backend.windows io.files io.files.private
 io.files.windows io.launcher io.launcher.private io.pathnames
-io.pipes io.pipes.windows io.ports io.standard-paths io.encodings.string
+io.ports io.standard-paths io.encodings.string
 io.encodings.utf16 kernel libc literals locals
 make math math.order namespaces prettyprint sequences sorting specialized-arrays
 splitting splitting.monotonic strings system threads windows
@@ -317,27 +317,11 @@ M: windows (wait-for-processes)
         DuplicateHandle win32-error=0/f
     ] keep void* deref <win32-handle> &dispose ;
 
-! /dev/null simulation
-: null-input ( -- pipe )
-    (pipe) [ in>> &dispose ] [ out>> dispose ] bi ;
-
-: null-output ( -- pipe )
-    (pipe) [ out>> &dispose ] [ in>> dispose ] bi ;
-
-: null-pipe ( mode -- pipe )
-    {
-        { GENERIC_READ [ null-input ] }
-        { GENERIC_WRITE [ null-output ] }
-    } case ;
-
 ! The below code is based on the example given in
 ! https://msdn2.microsoft.com/en-us/library/ms682499.aspx
 
 : redirect-default ( obj access-mode create-mode -- handle )
     3drop f ;
-
-: redirect-closed ( obj access-mode create-mode -- handle )
-    drop nip null-pipe ;
 
 :: redirect-file ( path access-mode create-mode -- handle )
     path normalize-path
@@ -348,6 +332,11 @@ M: windows (wait-for-processes)
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
     CreateFile check-invalid-handle <win32-file> &dispose ;
+
+: redirect-closed ( obj access-mode create-mode -- handle )
+    ! Use the device namespace so path normalization cannot turn NUL
+    ! into an ordinary file. Match Unix /dev/null redirection.
+    [ drop "\\\\.\\NUL" ] 2dip drop OPEN_EXISTING redirect-file ;
 
 : redirect-append ( path access-mode create-mode -- handle )
     [ path>> ] 2dip
