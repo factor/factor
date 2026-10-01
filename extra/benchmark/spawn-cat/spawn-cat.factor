@@ -6,14 +6,22 @@ system ;
 IN: benchmark.spawn-cat
 
 ! Like Jarred Sumner's spawning-cat benchmark: 100 concurrent children per
-! batch, no shell, all standard streams discarded, and every exit awaited.
+! batch, all standard streams discarded, and every exit awaited.
+! Windows uses the shell's built-in type command instead of cat.
 : cat-command ( path -- command )
     os windows? { "cmd.exe" "/c" "type" } { "cat" } ? swap suffix ;
+
+: cat-redirection ( -- redirection )
+    ! On Windows +closed+ uses broken pipes, so writes fail instead of
+    ! being discarded. Use an explicit null device path.
+    os windows? "\\\\.\\NUL" +closed+ ? ;
 
 : spawn-cat-batch ( path -- )
     '[
         <process> _ cat-command >>command
-        +closed+ >>stdin +closed+ >>stdout +closed+ >>stderr run-detached
+        cat-redirection >>stdin
+        cat-redirection >>stdout
+        cat-redirection >>stderr run-detached
     ] 100 swap replicate wait-for-success ;
 
 : spawn-cat ( path batches -- )

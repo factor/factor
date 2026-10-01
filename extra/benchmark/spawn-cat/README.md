@@ -1,7 +1,7 @@
 # Spawning cat
 
 Based on [Jarred Sumner's benchmark](https://gist.github.com/Jarred-Sumner/54990c8de079b90f5eca797c3894480b).
-Each batch starts 100 children without a shell, discards all standard streams,
+Each batch starts 100 children (using `cmd.exe /c type` on Windows), discards all standard streams,
 and waits for every child to exit successfully. Both versions read the same file.
 The original runs 1,001 batches and prints RSS; these timing runs use five warmup
 batches followed by three rounds of 100 batches, excluding runtime startup and
