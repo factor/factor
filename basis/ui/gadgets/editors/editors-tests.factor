@@ -6,7 +6,50 @@ ui.gadgets.line-support sequences ;
 
 USING: arrays assocs colors continuations fonts locals math namespaces
 opengl math.rectangles sequences.generalizations ui.render ui.text ui.text.private ;
+USING: calendar io.encodings.utf8 io.launcher system
+ui.gadgets.worlds ;
+FROM: ui.gadgets.private => layout-queue ;
+FROM: sets => cardinality ;
 IN: ui.gadgets.editors.tests
+
+! Without a retained scene, blinking must still request a normal redraw.
+{ t f } [
+    V{ } clone \ layout-queue [
+        <editor> dup blink-caret [ blink>> ] [ request-caret-redraw ] bi
+    ] with-variable
+] unit-test
+
+! A retained scene queues the world without laying out the editor again.
+{ t t 1 } [| |
+    caret-redraw-queue get-global :> previous-queue
+    [
+        HS{ } clone caret-redraw-queue set-global
+        <editor> :> editor
+        <world-attributes> editor 1array >>gadgets <world>
+        caret-scene new { 100 100 } >>dim >>caret-scene :> window
+        editor f >>layout-state drop
+        editor blink-caret
+        editor blink>>
+        editor layout-state>> f =
+        editor blink-caret
+        caret-redraw-queue get-global cardinality
+    ] [ previous-queue caret-redraw-queue set-global ] finally
+] unit-test
+
+! Native OpenGL pixels, clipping, edits and resizing, in isolated processes.
+os windows? [
+    { "legacy" "gl3" } [| mode |
+        { t } [
+            <process>
+                vm-path "-no-user-init"
+                "resource:basis/ui/gadgets/editors/fixtures/caret.factor" mode 4array >>command
+                t >>hidden 20 seconds >>timeout
+                +closed+ >>stdin +stdout+ >>stderr
+            utf8 [ read-contents ] with-process-reader*
+            0 = [ drop "CARET-PASS" subseq-of? ] [ output-process-error ] if
+        ] unit-test
+    ] each
+] when
 
 SINGLETON: measurement-test-renderer
 SYMBOL: measurement-count

@@ -2,11 +2,11 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data arrays colors
-combinators combinators.smart continuations kernel math
-math.constants math.functions math.rectangles math.vectors
+combinators combinators.smart continuations destructors kernel
+locals math math.constants math.functions math.rectangles math.vectors
 namespaces opengl opengl.capabilities opengl.gl opengl.shaders
-opengl.textures sequences sets specialized-arrays splitting
-ui.gadgets ui.pens ;
+opengl.textures opengl.textures.private sequences sets
+specialized-arrays splitting ui.gadgets ui.pens ;
 SPECIALIZED-ARRAY: alien.c-types:float
 IN: ui.render
 
@@ -925,3 +925,92 @@ M: multi-texture draw-texture-gl3
     [ make-texture-gl3 ] make-texture-hook set-global
     [ draw-texture-gl3 ] draw-texture-hook set-global
     t gl3-mode? set-global ;
+
+! Retain the scene without the blinking caret. This avoids traversing and
+! rendering all gadgets when only the caret's visibility changes.
+GENERIC: caret-cache-gadget? ( gadget -- ? )
+M: gadget caret-cache-gadget? drop f ;
+
+SYMBOL: caret-overlays
+TUPLE: caret-overlay clip modelview action ;
+TUPLE: caret-scene < disposable texture dim overlays ;
+
+: <caret-scene> ( -- scene )
+    caret-scene new-disposable gen-texture >>texture ;
+
+M: caret-scene dispose* texture>> delete-texture ;
+
+:: draw-caret-overlay ( action: ( -- ) -- )
+    caret-overlays get [| overlays |
+        clip get
+        gl3-mode? get-global [ current-modelview get-global clone ] [
+            16 <float-array> [ GL_MODELVIEW_MATRIX swap glGetFloatv ] keep
+        ] if action caret-overlay boa
+        overlays push
+    ] [ action call ] if* ; inline
+
+:: draw-caret-overlays ( overlays -- )
+    overlays [| overlay |
+        overlay clip>> clip [
+            do-clip
+            [
+                overlay modelview>> gl3-mode? get-global
+                [ [ current-modelview set-global ] [ set-gl3-modelview ] bi ]
+                [ glLoadMatrixf ] if
+                overlay action>> call( -- )
+            ] with-matrix
+        ] with-variable
+    ] each do-clip ;
+
+: caret-scene-dim ( world -- dim )
+    dim>> [ gl-scale >fixnum ] map ;
+
+: gl-integer ( parameter -- n )
+    { int } [ glGetIntegerv ] with-out-parameters ;
+
+:: capture-caret-scene ( world overlays scene -- )
+    world caret-scene-dim :> dim
+    GL_READ_FRAMEBUFFER_BINDING gl-integer :> previous-read
+    GL_DRAW_FRAMEBUFFER_BINDING gl-integer :> target
+    GL_DRAW_BUFFER0 gl-integer :> buffer
+    GL_TEXTURE_BINDING_2D gl-integer :> previous-texture
+    [
+        GL_READ_FRAMEBUFFER target glBindFramebuffer
+        GL_READ_BUFFER gl-integer :> previous-buffer
+        [
+            buffer glReadBuffer
+            GL_TEXTURE_2D scene texture>> glBindTexture
+            GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
+            GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
+            GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
+            GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri
+            scene dim>> dim = [
+                GL_TEXTURE_2D 0 0 0 0 0 dim first2 glCopyTexSubImage2D
+            ] [
+                GL_TEXTURE_2D 0 GL_RGBA8 0 0 dim first2 0 glCopyTexImage2D
+            ] if
+            gl-error
+            scene dim >>dim overlays >>overlays drop
+        ] [ previous-buffer glReadBuffer ] finally
+    ] [
+        GL_TEXTURE_2D previous-texture glBindTexture
+        GL_READ_FRAMEBUFFER previous-read glBindFramebuffer
+    ] finally ;
+
+:: draw-caret-scene ( world scene -- )
+    world gl-draw-init
+    ! Copy the retained pixels exactly, including transparent backgrounds.
+    GL_BLEND glDisable
+    [
+        gl3-mode? get-global [
+            { 0 0 } world dim>> scene texture>> t gl3-draw-texture
+        ] [
+            [
+                GL_TEXTURE_2D scene texture>> glBindTexture
+                float-array{ 0 1 1 1 1 0 0 0 } gl-texture-coord-pointer
+                { 0 0 } world dim>> gl-fill-rect
+            ] with-texturing
+        ] if
+    ]
+    [ GL_BLEND glEnable ] finally
+    scene overlays>> draw-caret-overlays ;

@@ -7,8 +7,8 @@ math.vectors models models.arrow namespaces opengl opengl.gl
 ranges sequences sorting splitting system timers
 ui.baseline-alignment ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.line-support ui.gadgets.menus
-ui.gadgets.scrollers ui.gestures ui.pens.solid ui.render ui.text ui.text.private
-ui.theme unicode ;
+ui.gadgets.scrollers ui.gadgets.worlds ui.gestures ui.pens.solid
+ui.render ui.text ui.text.private ui.theme unicode ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
@@ -52,6 +52,8 @@ PRIVATE>
 : <editor> ( -- editor )
     editor new-editor ;
 
+M: editor caret-cache-gadget? focused?>> ;
+
 <PRIVATE
 
 : activate-editor-model ( editor model -- )
@@ -65,7 +67,8 @@ PRIVATE>
     [ swap model>> remove-loc ] 2tri ;
 
 : blink-caret ( editor -- )
-    [ not ] change-blink relayout-1 ;
+    [ not ] change-blink dup request-caret-redraw
+    [ drop ] [ relayout-1 ] if ;
 
 SYMBOL: blink-interval
 
@@ -194,11 +197,14 @@ M: editor ungraft*
         [ drop  draw-caret-line ]
     } case ;
 
-: draw-caret ( editor -- )
+: draw-caret-now ( editor -- )
     dup draw-caret? [
         [ editor-caret-color gl-color ] dip
         draw-caret-shape
     ] [ drop ] if ;
+
+: draw-caret ( editor -- )
+    dup focused?>> [ '[ _ draw-caret-now ] draw-caret-overlay ] [ drop ] if ;
 
 :: draw-preedit-underlines ( editor -- )
     editor [ preedit? ] [ preedit-underlines>> ] bi and [

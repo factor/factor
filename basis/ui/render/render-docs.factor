@@ -34,6 +34,14 @@ HELP: gl-draw-init
 { $values { "world" world } }
 { $description "Does some OpenGL setup that is required each time the world is to be redrawn." } ;
 
+HELP: caret-cache-gadget?
+{ $values { "gadget" gadget } { "?" "a boolean" } }
+{ $contract "Indicates whether a focused gadget benefits from retaining the world's scene for caret blinking. The default method returns false; focused editors return true." } ;
+
+HELP: draw-caret-overlay
+{ $values { "action" "a quotation with stack effect ( -- )" } }
+{ $description "Draws a caret immediately during ordinary rendering. When retaining a scene, records the quotation with the current clipping rectangle and modelview matrix, then draws it after capturing the scene. The quotation must read the current caret visibility each time it runs." } ;
+
 ARTICLE: "ui-paint" "Customizing gadget appearance"
 "The UI carries out the following steps when drawing a gadget:"
 { $list

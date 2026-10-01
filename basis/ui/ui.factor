@@ -111,6 +111,7 @@ M: world ungraft*
     f world set-global
     <dlist> \ graft-queue set-global
     100 <vector> \ layout-queue set-global
+    HS{ } clone caret-redraw-queue set-global
     <dlist> \ gesture-queue set-global
     V{ } clone worlds set-global ;
 
@@ -144,7 +145,8 @@ M: world ungraft*
 : update-ui ( -- )
     notify-queued
     layout-queued
-    redraw-worlds
+    dup redraw-worlds
+    redraw-caret-worlds
     send-queued-gestures ;
 
 SYMBOL: ui-running

@@ -84,6 +84,10 @@ HELP: world
         { "a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
     }
     {
+        "caret-scene"
+        { "an internal GPU snapshot used to redraw blinking editor carets without rendering the other gadgets again. It uses approximately four bytes per device pixel while an editor has focus, and is released when retention is no longer applicable or the window closes. Retention requires OpenGL 3.0, a non-multisampled framebuffer and no popup layers. World subclasses and unsupported configurations use ordinary redraws." }
+    }
+    {
         "window-loc"
         { "the on-screen location of the native window containing the world. The coordinate system here is backend-specific." }
     }
@@ -106,6 +110,10 @@ HELP: draw-world
 { $values { "world" world } }
 { $description "Redraws a world." }
 { $notes "This word should only be called by the UI backend. To force a gadget to redraw from user code, call " { $link relayout-1 } "." } ;
+
+HELP: request-caret-redraw
+{ $values { "gadget" gadget } { "handled?" "a boolean" } }
+{ $description "Queues the containing world's retained scene for repainting its caret overlays. Returns false when no snapshot is available; the caller must then request an ordinary redraw. Multiple requests for the same world are combined, and an ordinary redraw in the same UI update takes precedence." } ;
 
 HELP: find-gl-context
 { $values { "gadget" gadget } }

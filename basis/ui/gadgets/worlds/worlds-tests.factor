@@ -1,6 +1,7 @@
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel accessors arrays continuations locals
 ui.backend ui.render ;
+FROM: sets => adjoin cardinality ;
 IN: ui.gadgets.worlds.tests
 
 ! Context selection must restore the window's GL objects, even when another
@@ -41,6 +42,21 @@ M: test-drawable-handle window-drawable? ready?>> ;
     ] finally ;
 
 { t } [ check-render-state-switching ] unit-test
+
+! An ordinary redraw wins over a queued blink. This handle deliberately has
+! no GL context, so attempting an additional caret draw would fail.
+{ t } [| |
+    caret-redraw-queue get-global :> previous-queue
+    [
+        HS{ } clone caret-redraw-queue set-global
+        world new t >>active? { 100 100 } >>dim
+            T{ test-drawable-handle { ready? t } } >>handle
+            caret-scene new { 100 100 } >>dim >>caret-scene :> window
+        window caret-redraw-queue get-global adjoin
+        window 1array redraw-caret-worlds
+        caret-redraw-queue get-global cardinality 0 =
+    ] [ previous-queue caret-redraw-queue set-global ] finally
+] unit-test
 
 ! Test focus behavior
 <gadget> "g1" set

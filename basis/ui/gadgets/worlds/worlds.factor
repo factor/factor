@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache colors combinators
+USING: accessors assocs cache classes colors combinators
 combinators.short-circuit concurrency.promises continuations
-destructors kernel literals math models namespaces opengl opengl.gl
-sequences strings ui.backend ui.gadgets ui.gadgets.tracks
-ui.gestures ui.pixel-formats ui.render ;
+destructors kernel literals locals math models namespaces opengl
+opengl.capabilities opengl.gl sequences sets strings ui.backend
+ui.gadgets ui.gadgets.private ui.gadgets.tracks ui.gestures
+ui.pixel-formats ui.render ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -39,6 +40,7 @@ TUPLE: world < track
     title status status-owner
     text-handle handle images
     gl-render-state
+    caret-scene
     window-loc
     pixel-format-attributes
     background-color
@@ -99,7 +101,9 @@ TUPLE: world-attributes
     [ gl-render-state>> gl3-render-state set-global ] tri ;
 
 : dispose-world-render-state ( world -- )
-    dup set-gl-context cleanup-gl3-state
+    dup set-gl-context
+    dup [ [ dispose ] when* f ] change-caret-scene drop
+    cleanup-gl3-state
     f >>gl-render-state drop ;
 
 : with-gl-context ( world quot -- )
@@ -208,6 +212,46 @@ M: world draw-world*
     { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ]
       [ handle>> window-drawable? ] } 1&& ;
 
+SYMBOL: caret-redraw-queue
+caret-redraw-queue [ HS{ } clone ] initialize
+
+:: request-caret-redraw ( gadget -- handled? )
+    gadget find-world :> window
+    window [
+        window caret-scene>> [ dim>> >boolean ] [ f ] if*
+        dup [
+            window caret-redraw-queue get-global adjoin
+            notify-ui-thread
+        ] when
+    ] [ f ] if ;
+
+<PRIVATE
+
+: caret-scene-supported? ( world -- ? )
+    { [ class-of world eq? ]
+      [ focus-path [ caret-cache-gadget? ] any? ]
+      [ layers>> [ empty? ] [ t ] if* ]
+      [ drop "3.0" has-gl-version? ]
+      [ drop GL_SAMPLES gl-integer zero? ]
+      [ caret-scene-dim GL_MAX_TEXTURE_SIZE gl-integer
+        [ <= ] curry all? ] } 1&& ;
+
+:: render-world ( world -- )
+    world caret-scene-supported? [
+        world caret-scene>> [ ] [ <caret-scene> dup world caret-scene<< ] if* :> scene
+        V{ } clone :> overlays
+        overlays caret-overlays [
+            world draw-world*
+            world overlays scene capture-caret-scene
+            overlays draw-caret-overlays
+        ] with-variable
+    ] [
+        world [ [ dispose ] when* f ] change-caret-scene drop
+        world draw-world*
+    ] if ;
+
+PRIVATE>
+
 TUPLE: world-error error world ;
 
 C: <world-error> world-error
@@ -232,13 +276,35 @@ ui-error-hook [ [ rethrow ] ] initialize
     dup draw-world? [
         [
             dup set-gl-context framebuffer-ready? [
-                dup [ draw-world* ] with-gl-context
+                dup [ render-world ] with-gl-context
                 flush-layout-cache-hook get call( -- )
             ] [ drop ] if
         ] [
             swap f >>active? <world-error> rethrow
         ] recover
     ] [ drop ] if ;
+
+:: draw-world-caret ( world -- )
+    world caret-scene>> :> scene
+    [
+        scene [
+            world draw-world? [
+                world set-gl-context
+                scene dim>> world caret-scene-dim = [
+                    framebuffer-ready? [
+                        world [ world scene draw-caret-scene ] with-gl-context
+                    ] when
+                ] [ world draw-world ] if
+            ] when
+        ] [ world draw-world ] if
+    ] [
+        dup world-error? [ rethrow ] [ world f >>active? <world-error> rethrow ] if
+    ] recover ;
+
+: redraw-caret-worlds ( drawn-worlds -- )
+    caret-redraw-queue get-global members swap diff
+    HS{ } clone caret-redraw-queue set-global
+    [ draw-world-caret ] each ;
 
 world
 action-gestures [
