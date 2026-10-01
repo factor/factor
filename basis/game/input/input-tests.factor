@@ -1,12 +1,17 @@
 USING: ui game.input tools.test kernel system threads calendar
-combinators.short-circuit ;
+combinators.short-circuit continuations locals namespaces opengl ;
 
-! os { [ windows? ] [ macos? ] } 1|| [
-! This test only works if a mouse is present. Issue #1844
-os { [ macos? ] } 1|| [
-    [ ] [ open-game-input ] unit-test
-    [ ] [ 1 seconds sleep ] unit-test
-    [ ] [ close-game-input ] unit-test
+! Windows can initialize even when no mouse is attached (#1844).
+os { [ windows? ] [ macos? ] } 1|| [
+    { } [ [let
+        ! The native notification window discovers DPI. Restore it so
+        ! running input tests cannot change later text-rendering tests.
+        gl-scale-factor get-global :> scale
+        [
+            open-game-input
+            [ 1 seconds sleep ] [ close-game-input ] finally
+        ] [ scale gl-scale-factor set-global ] finally
+    ] ] unit-test
 ] when
 
 { f        } [ t t button-delta ] unit-test

@@ -1,11 +1,11 @@
-USING: accessors alien alien.c-types alien.data alien.strings
+USING: accessors alien alien.accessors alien.c-types alien.data alien.strings
 arrays assocs byte-arrays classes.struct combinators
 combinators.short-circuit game.input
 game.input.dinput.keys-array kernel math math.bitwise
-math.rectangles namespaces sequences specialized-arrays
+locals math.rectangles namespaces sequences specialized-arrays
 ui.backend.windows vectors windows.com windows.directx.dinput
 windows.directx.dinput.constants windows.errors windows.kernel32
-windows.messages windows.ole32 windows.user32 ;
+windows.messages windows.ole32 windows.types windows.user32 ;
 SPECIALIZED-ARRAY: DIDEVICEOBJECTDATA
 IN: game.input.dinput
 
@@ -69,11 +69,29 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     256 <byte-array> 256 <keys-array> keyboard-state boa
     +keyboard-state+ set-global ;
 
-: find-mouse ( -- )
-    GUID_SysMouse device-for-guid
-    [ configure-mouse ] [ +mouse-device+ set-global ] bi
-    0 0 0 0 8 f <array> mouse-state boa +mouse-state+ set-global
-    MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <c-array> +mouse-buffer+ set-global ;
+: (mark-attached-device) ( instance found -- BOOL )
+    nip TRUE swap 0 set-alien-unsigned-4 DIENUM_STOP ;
+
+:: mouse-present? ( -- ? )
+    0 BOOL <ref> :> found
+    +dinput+ get-global DI8DEVTYPE_MOUSE
+    [ (mark-attached-device) ] LPDIENUMDEVICESCALLBACKW
+    found DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices check-ole32-error
+    found BOOL deref zero? not ;
+
+: (find-mouse) ( present? -- )
+    [
+        GUID_SysMouse device-for-guid
+        [ configure-mouse ] [ +mouse-device+ set-global ] bi
+        0 0 0 0 8 f <array> mouse-state boa +mouse-state+ set-global
+        MOUSE-BUFFER-SIZE DIDEVICEOBJECTDATA <c-array> +mouse-buffer+ set-global
+    ] [
+        f +mouse-device+ set-global
+        f +mouse-state+ set-global
+        f +mouse-buffer+ set-global
+    ] if ;
+
+: find-mouse ( -- ) mouse-present? (find-mouse) ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     DIDEVICEINSTANCEW new
@@ -223,8 +241,9 @@ TUPLE: window-rect < rect window-loc ;
     f +keyboard-state+ set-global ;
 
 : release-mouse ( -- )
-    +mouse-device+ [ com-release f ] change-global
-    f +mouse-state+ set-global ;
+    +mouse-device+ [ [ com-release ] when* f ] change-global
+    f +mouse-state+ set-global
+    f +mouse-buffer+ set-global ;
 
 M: dinput-game-input-backend (open-game-input)
     create-dinput
@@ -248,6 +267,7 @@ M: dinput-game-input-backend (reset-game-input)
             +dinput+ +keyboard-device+ +keyboard-state+
             +controller-devices+ +controller-guids+
             +device-change-window+ +device-change-handle+
+            +mouse-device+ +mouse-state+ +mouse-buffer+
         } [ off ] each
     ] with-global ;
 
@@ -344,9 +364,10 @@ M: dinput-game-input-backend read-mouse
 M: dinput-game-input-backend reset-mouse
     +mouse-device+ get-global [ f MOUSE-BUFFER-SIZE read-device-buffer ]
     [ 2drop ] [ ] with-acquisition
-    +mouse-state+ get-global
+    +mouse-state+ get-global [
         0 >>dx
         0 >>dy
         0 >>scroll-dx
         0 >>scroll-dy
-        drop ;
+        drop
+    ] when* ;
