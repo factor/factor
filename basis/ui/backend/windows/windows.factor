@@ -21,7 +21,7 @@ IN: ui.backend.windows
 SINGLETON: windows-ui-backend
 
 TUPLE: win-base hDC hRC ;
-TUPLE: win < win-base hWnd world title pending-surrogate ;
+TUPLE: win < win-base hWnd world title pending-surrogate initial-cloak? ;
 C: <win> win
 
 SYMBOL: world-tray-icons
@@ -736,6 +736,32 @@ M: windows-ui-backend do-events
     dup SetForegroundWindow drop
     SetFocus drop ;
 
+: set-dwm-window-flag ( hwnd attribute enabled? -- supported? )
+    1 0 ? BOOL <ref> BOOL c:heap-size DwmSetWindowAttribute zero? ;
+
+: dark-window-theme? ( -- ? )
+    content-background >rgba
+    [ red>> 0.2126 * ] [ green>> 0.7152 * ] [ blue>> 0.0722 * ] tri
+    + + 0.5 < ;
+
+: prepare-window-frame ( handle -- handle )
+    dup hWnd>> DWMWA_USE_IMMERSIVE_DARK_MODE dark-window-theme?
+    set-dwm-window-flag drop
+    ! DWM keeps composing a cloaked window, so OpenGL can prepare its first
+    ! frame without exposing a blank native surface to the user.
+    dup hWnd>> DWMWA_CLOAK t set-dwm-window-flag >>initial-cloak? ;
+
+: uncloak-window ( handle -- )
+    dup hWnd>> DWMWA_CLOAK f set-dwm-window-flag drop
+    f >>initial-cloak? drop ;
+
+: show-initial-window ( handle -- )
+    dup initial-cloak?>> [
+        dup hWnd>> SW_SHOWNOACTIVATE ShowWindow drop
+        ! A minimized launch has no first paint; leave its taskbar entry usable.
+        dup hWnd>> IsIconic zero? [ drop ] [ uncloak-window ] if
+    ] [ hWnd>> show-window ] if ;
+
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
     MSG malloc-struct msg-obj set-global
@@ -776,13 +802,13 @@ M: windows-ui-backend (open-window)
         [ ] [ world>style ] [ world>ex-style ] tri create-window
         [ ?make-glass ]
         [ ?disable-close-button ]
-        [ [ f f ] dip f f f <win> >>handle setup-gl ] 2tri
+        [ [ f f ] dip f f f f <win> prepare-window-frame >>handle setup-gl ] 2tri
     ]
     [ dup handle>> hWnd>> register-window ]
     [
         dup set-gl-context
         dup window-scale-changed
-        handle>> hWnd>> show-window
+        handle>> show-initial-window
     ] tri ;
 
 ! https://github.com/factor/factor/issues/2173
@@ -796,6 +822,13 @@ M: win select-gl-context
 
 M: win-base flush-gl-context
     hDC>> SwapBuffers win32-error=0/f ;
+
+M: win flush-gl-context
+    [ call-next-method ] [
+        dup initial-cloak?>> [
+            dup uncloak-window hWnd>> show-window
+        ] [ drop ] if
+    ] bi ;
 
 ! Windows 32-bit bitmaps don't actually use the alpha byte of
 ! each pixel; it's left as zero

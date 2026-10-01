@@ -5,7 +5,35 @@ kernel locals math math.functions math.vectors namespaces opengl sequences strin
 windows.directwrite.render ;
 IN: windows.directwrite.render.tests
 
-: emoji-font ( -- font ) "Segoe UI Emoji" <font> 48 >>size ;
+: render-test-font ( name -- font )
+    <font> COLOR: black >>foreground COLOR: white >>background ;
+
+:: opaque-render-matches-coverage? ( font text -- ? )
+    [ font text <directwrite-layout> &dispose :> layout
+      layout directwrite-layout>image :> native
+      native component-order>> BGRX assert=
+      layout pointer>> layout size>> layout origin>>
+      font foreground>> font background>> render-transparent-directwrite-tile :> coverage
+      native bitmap>> 4 group [| pixel |
+          pixel third pixel second pixel first 255 4array
+      ] map concat
+      coverage bitmap>> [ - abs 1 <= ] 2all?
+    ] with-destructors ;
+
+! Opaque rendering must preserve color glyphs and custom text colors.
+{ t } [
+    "Segoe UI Emoji" render-test-font 28 >>size
+    "Unicode: Ω 日本 😀" opaque-render-matches-coverage?
+] unit-test
+
+{ t } [
+    "Segoe UI" render-test-font 28 >>size
+    0.1 0.3 0.9 1.0 <rgba> >>foreground
+    0.2 0.4 0.1 1.0 <rgba> >>background
+    "Translucent text" opaque-render-matches-coverage?
+] unit-test
+
+: emoji-font ( -- font ) "Segoe UI Emoji" render-test-font 48 >>size ;
 
 : emoji-pixels ( font -- pixels )
     [ "\u01f600" <directwrite-layout> &dispose
@@ -21,6 +49,13 @@ IN: windows.directwrite.render.tests
     emoji-font 0.0 0.0 0.0 0.5 <rgba> >>foreground
     0.0 0.0 0.0 0.0 <rgba> >>background
     emoji-pixels [ fourth ] map supremum
+] unit-test
+
+! An opaque background must not bypass opacity for palette glyphs.
+{ t } [
+    emoji-font 0.0 0.0 0.0 0.5 <rgba> >>foreground emoji-pixels
+    [ [ dup 3 head [ 127 >= ] all? swap fourth 255 = and ] all? ]
+    [ [ 3 head [ 255 < ] any? ] any? ] bi and
 ] unit-test
 
 :: selection-center-pixel ( layout rectangle -- rgba )
@@ -66,7 +101,7 @@ IN: windows.directwrite.render.tests
 :: tiled-matches-native? ( font text -- ? )
     font text <directwrite-layout> [ :> layout
         layout directwrite-layout>image :> tiled
-        [ layout pointer>> layout size>> layout origin>> COLOR: black COLOR: white
+        [ layout pointer>> layout size>> layout origin>> font foreground>> font background>>
             render-directwrite-tile ] with-destructors :> native
         tiled dim>> native dim>> = tiled bitmap>> native bitmap>> = and
     ] with-disposal ;

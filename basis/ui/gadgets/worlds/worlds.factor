@@ -5,7 +5,7 @@ combinators.short-circuit concurrency.promises continuations
 destructors kernel literals locals math models namespaces opengl
 opengl.capabilities opengl.gl sequences sets strings ui.backend
 ui.gadgets ui.gadgets.private ui.gadgets.tracks ui.gestures
-ui.pixel-formats ui.render ;
+ui.pixel-formats ui.render ui.theme ;
 IN: ui.gadgets.worlds
 
 SYMBOLS:
@@ -137,7 +137,7 @@ M: world request-focus-on
 : initial-background-color ( attributes -- color )
     window-controls>> textured-background swap member-eq?
     [ T{ rgba f 0.0 0.0 0.0 0.0 } ]
-    [ T{ rgba f 1.0 1.0 1.0 1.0 } ] if ;
+    [ content-background ] if ;
 
 GENERIC#: apply-world-attributes 1 ( world attributes -- world )
 

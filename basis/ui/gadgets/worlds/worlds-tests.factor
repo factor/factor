@@ -1,8 +1,17 @@
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
 namespaces models kernel accessors arrays continuations locals
-ui.backend ui.render ;
+ui.backend ui.render colors ui.theme ;
 FROM: sets => adjoin cardinality ;
 IN: ui.gadgets.worlds.tests
+
+{ t t } [
+    light-theme theme [
+        <world-attributes> initial-background-color COLOR: white color=
+    ] with-variable
+    dark-theme theme [
+        <world-attributes> initial-background-color content-background color=
+    ] with-variable
+] unit-test
 
 ! Context selection must restore the window's GL objects, even when another
 ! window allocated different program/VAO names in its own context.

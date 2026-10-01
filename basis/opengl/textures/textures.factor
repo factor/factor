@@ -147,10 +147,11 @@ M: BGR fix-internal-component-order drop RGB ;
 M: BGRA fix-internal-component-order drop RGBA ;
 M: ARGB fix-internal-component-order drop RGBA ;
 M: ABGR fix-internal-component-order drop RGBA ;
-M: RGBX fix-internal-component-order drop RGBA ;
-M: BGRX fix-internal-component-order drop RGBA ;
-M: XRGB fix-internal-component-order drop RGBA ;
-M: XBGR fix-internal-component-order drop RGBA ;
+! X is padding, not alpha. Discard it so shaders sample opaque pixels.
+M: RGBX fix-internal-component-order drop RGB ;
+M: BGRX fix-internal-component-order drop RGB ;
+M: XRGB fix-internal-component-order drop RGB ;
+M: XBGR fix-internal-component-order drop RGB ;
 
 : image-internal-format ( component-order component-type -- internal-format )
     2dup

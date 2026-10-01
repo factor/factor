@@ -29,6 +29,12 @@ LIBRARY: dwmapi
 FUNCTION: HRESULT DwmExtendFrameIntoClientArea ( HWND hWnd, MARGINS* pMarInset )
 FUNCTION: HRESULT DwmEnableBlurBehindWindow ( HWND hWnd, DWM_BLURBEHIND* pBlurBehind )
 FUNCTION: HRESULT DwmIsCompositionEnabled ( BOOL* pfEnabled )
+FUNCTION: HRESULT DwmSetWindowAttribute ( HWND hwnd, DWORD attribute, void* value, DWORD size )
+FUNCTION: HRESULT DwmGetWindowAttribute ( HWND hwnd, DWORD attribute, void* value, DWORD size )
+
+CONSTANT: DWMWA_CLOAK 13
+CONSTANT: DWMWA_CLOAKED 14
+CONSTANT: DWMWA_USE_IMMERSIVE_DARK_MODE 20
 
 CONSTANT: WM_DWMCOMPOSITIONCHANGED 0x31E
 

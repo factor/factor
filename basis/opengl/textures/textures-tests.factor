@@ -23,6 +23,18 @@ ${ GL_RGBA8 GL_RGBA GL_UNSIGNED_BYTE }
 ${ GL_RGBA8 GL_BGRA GL_UNSIGNED_BYTE }
 [ BGRA ubyte-components (image-format) ] unit-test
 
+${ GL_RGB8 GL_BGRA GL_UNSIGNED_BYTE }
+[ BGRX ubyte-components (image-format) ] unit-test
+
+${ GL_RGB8 GL_RGBA GL_UNSIGNED_BYTE }
+[ RGBX ubyte-components (image-format) ] unit-test
+
+${ GL_RGB8 GL_BGRA GL_UNSIGNED_INT_8_8_8_8_REV }
+[ XRGB ubyte-components (image-format) ] unit-test
+
+${ GL_RGB8 GL_RGBA GL_UNSIGNED_INT_8_8_8_8_REV }
+[ XBGR ubyte-components (image-format) ] unit-test
+
 ${ GL_RGBA8 GL_BGRA GL_UNSIGNED_INT_8_8_8_8_REV }
 [ ARGB ubyte-components (image-format) ] unit-test
 
@@ -66,4 +78,3 @@ ${ GL_R11F_G11F_B10F GL_RGB GL_UNSIGNED_INT_10F_11F_11F_REV }
 [   { { { 256 256 } { 128 256 } }
       { { 256 128 } { 128 128 } } } accumulate-divisions-to-grid ] unit-test
 ! and new locations of each single texture can be calculated by accumulating along each axis
-

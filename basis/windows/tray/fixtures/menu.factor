@@ -2,6 +2,7 @@ USING: parser vocabs ;
 <<
 "resource:basis/windows/user32/user32.factor" run-file
 "resource:basis/windows/shell32/shell32.factor" run-file
+"resource:basis/windows/dwmapi/dwmapi.factor" run-file
 "windows.tray" require
 "resource:basis/ui/backend/windows/windows.factor" run-file
 >>

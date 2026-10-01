@@ -88,6 +88,10 @@ HELP: world
         { "an internal GPU snapshot used to redraw blinking editor carets without rendering the other gadgets again. It uses approximately four bytes per device pixel while an editor has focus, and is released when retention is no longer applicable or the window closes. Retention requires OpenGL 3.0, a non-multisampled framebuffer and no popup layers. World subclasses and unsupported configurations use ordinary redraws." }
     }
     {
+        "background-color"
+        { "the OpenGL clear color. Ordinary windows start with the current theme's content background; windows with a textured background start transparent." }
+    }
+    {
         "window-loc"
         { "the on-screen location of the native window containing the world. The coordinate system here is backend-specific." }
     }

@@ -122,7 +122,7 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
             y rect second >= y rect second rect fourth + < and and
         ] any? [ text-selection-background get ] [ background ] if
     ] [ background ] if* ;
-:: render-directwrite-tile ( pointer dim origin foreground background -- image )
+:: render-transparent-directwrite-tile ( pointer dim origin foreground background -- image )
     foreground >rgba alpha>> :> opacity
     foreground >rgba-components drop 1.0 <rgba> :> solid
     pointer dim origin solid COLOR: black render-layout-on :> black
@@ -135,6 +135,21 @@ SHUTDOWN-HOOK: [ release-text-dc-target ]
         opacity composite-bitmap-pixel
     ] each-integer
     black RGBA >>component-order ;
+
+: opaque-text-render? ( foreground background -- ? )
+    ! Palette glyphs do not inherit a translucent brush's alpha. Keep the
+    ! coverage renderer for translucent foregrounds as well as backgrounds.
+    [ opaque? ] bi@ and text-selection-rects get not and ;
+
+:: render-directwrite-tile ( pointer dim origin foreground background -- image )
+    foreground background opaque-text-render? [
+        ! Most UI text has an opaque background. One native render already
+        ! produces the final pixels; retain its BGRX format without computing
+        ! coverage from two renders and compositing every pixel in Factor.
+        pointer dim origin foreground background render-layout-on
+    ] [
+        pointer dim origin foreground background render-transparent-directwrite-tile
+    ] if ;
 
 ! Keep native DC surfaces bounded independently of the full line width.
 CONSTANT: directwrite-tile-size 2048
@@ -165,7 +180,8 @@ CONSTANT: directwrite-tile-size 2048
                 render-directwrite-tile position dim bitmap copy-text-tile
             ] each-integer
         ] each-integer
-        <image> dim >>dim bitmap >>bitmap RGBA >>component-order
+        <image> dim >>dim bitmap >>bitmap
+            foreground background opaque-text-render? BGRX RGBA ? >>component-order
             ubyte-components >>component-type t >>upside-down?
     ] if ;
 

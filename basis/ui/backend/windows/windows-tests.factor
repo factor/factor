@@ -2,9 +2,26 @@ USING: accessors alien alien.syntax arrays assocs continuations
 kernel layouts locals namespaces sequences tools.test alien.strings windows.kernel32
 ui.backend.windows ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.private windows.types ;
-USING: calendar concurrency.promises math threads windows.errors
-windows.messages windows.user32 ;
+USING: calendar concurrency.promises io io.encodings.utf8 io.launcher
+math system threads ui.theme windows.errors windows.messages windows.user32 ;
 IN: ui.backend.windows.tests
+
+{ f t } [
+    light-theme theme [ dark-window-theme? ] with-variable
+    dark-theme theme [ dark-window-theme? ] with-variable
+] unit-test
+
+! The first frame is composed before the native window is revealed.
+{ "legacy" "gl3" } [| mode |
+    { t } [
+        <process> vm-path "-no-user-init"
+            "resource:basis/ui/backend/windows/fixtures/startup.factor" mode 4array >>command
+            t >>hidden 20 seconds >>timeout
+            +closed+ >>stdin +stdout+ >>stderr
+        utf8 [ read-contents ] with-process-reader*
+        0 = [ drop "STARTUP-PASS" subseq-of? ] [ output-process-error ] if
+    ] unit-test
+] each
 
 ! Native menus can cancel input when Factor holds no mouse capture.
 { f } [ release-capture mouse-captured get ] unit-test

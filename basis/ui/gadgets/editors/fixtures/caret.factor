@@ -1,9 +1,13 @@
 USING: parser ;
 <<
+"resource:basis/windows/dwmapi/dwmapi.factor" run-file
+"resource:basis/opengl/textures/textures.factor" run-file
 "resource:basis/ui/render/render.factor" run-file
 "resource:basis/ui/gadgets/worlds/worlds.factor" run-file
 "resource:basis/ui/gadgets/editors/editors.factor" run-file
 "resource:basis/ui/ui.factor" run-file
+"resource:basis/ui/backend/windows/windows.factor" run-file
+"resource:basis/windows/directwrite/render/render.factor" run-file
 >>
 USING: accessors alien.c-types alien.data arrays byte-arrays classes
 colors command-line continuations destructors io kernel locals math
