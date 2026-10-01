@@ -29,7 +29,7 @@ M: image cached-image ;
 <PRIVATE
 
 : image-texture-cache ( world -- texture-cache )
-    [ [ <cache-assoc> ] unless* ] change-images images>> ;
+    [ [ <timed-cache-assoc> ] unless* ] change-images images>> ;
 
 PRIVATE>
 

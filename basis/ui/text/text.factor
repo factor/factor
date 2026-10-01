@@ -29,7 +29,7 @@ HOOK: draws-selection-background? font-renderer ( -- ? )
 M: object draws-selection-background? f ;
 
 : world-text-handle ( world -- handle )
-    dup text-handle>> [ <cache-assoc> >>text-handle ] unless
+    dup text-handle>> [ <timed-cache-assoc> >>text-handle ] unless
     text-handle>> ;
 
 HOOK: flush-layout-cache font-renderer ( -- )

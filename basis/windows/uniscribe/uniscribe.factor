@@ -424,4 +424,4 @@ SYMBOL: cached-script-strings
         ] with-memory-dc ] if
     ] unless image>> ;
 
-STARTUP-HOOK: [ <cache-assoc> cached-script-strings set-global ]
+STARTUP-HOOK: [ <timed-cache-assoc> cached-script-strings set-global ]

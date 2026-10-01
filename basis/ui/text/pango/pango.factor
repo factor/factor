@@ -365,7 +365,7 @@ M: pango-renderer draw-string*
 STARTUP-HOOK: [
     \ (cache-font-description) reset-memoized
     \ missing-font-metrics reset-memoized
-    <cache-assoc> cached-layouts set-global
+    <timed-cache-assoc> cached-layouts set-global
 ]
 
 pango-renderer font-renderer set-global

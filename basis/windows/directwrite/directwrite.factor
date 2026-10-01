@@ -218,7 +218,7 @@ M: directwrite-layout dispose*
 
 SYMBOL: cached-directwrite-layouts
 SYMBOL: directwrite-layout-aliases
-directwrite-layout-aliases [ <cache-assoc> ] initialize
+directwrite-layout-aliases [ <timed-cache-assoc> ] initialize
 
 ! Equal output rows share one native layout, but comparing distinct 10MB
 ! strings on every repaint is still linear work. Remember each object's
@@ -258,8 +258,8 @@ M: directwrite-layout-alias dispose* drop ;
     ] with-variable ;
 
 STARTUP-HOOK: [
-    <cache-assoc> cached-directwrite-layouts set-global
-    <cache-assoc> directwrite-layout-aliases set-global
+    <timed-cache-assoc> cached-directwrite-layouts set-global
+    <timed-cache-assoc> directwrite-layout-aliases set-global
 ]
 
 ! A logical selection can cover several disjoint visual runs in bidi text.

@@ -1,4 +1,4 @@
-USING: accessors assocs cache destructors kernel namespaces
+USING: accessors assocs cache destructors kernel locals math namespaces
 tools.test ;
 IN: cache.tests
 
@@ -48,3 +48,36 @@ M: mock-disposable dispose* drop ;
 { } [ "cache" get clear-assoc ] unit-test
 
 { t } [ "b" get disposed>> ] unit-test
+
+SYMBOL: test-clock
+
+! Drawing additional frames must not evict a recently used native object.
+! Reads refresh its idle timer, and expiry still releases the resource.
+{ t t f t 0 } [ [let
+    0 test-clock set
+    <timed-cache-assoc> 100 >>max-age [ test-clock get ] >>clock :> cache
+    1 <mock-disposable> :> value
+    value "key" cache set-at
+    1000 [ cache purge-cache ] times
+    "key" cache key?
+    99 test-clock set
+    "key" cache at value eq?
+    100 test-clock set cache purge-cache
+    value disposed>>
+    199 test-clock set cache purge-cache
+    value disposed>>
+    cache assoc-size
+    cache dispose
+] ] unit-test
+
+! A missing key must not create or revive an expired entry.
+{ f f t } [ [let
+    0 test-clock set
+    <timed-cache-assoc> 100 >>max-age [ test-clock get ] >>clock :> cache
+    "missing" cache at*
+    1 <mock-disposable> :> value
+    value "key" cache set-at
+    100 test-clock set cache purge-cache
+    value disposed>>
+    cache dispose
+] ] unit-test

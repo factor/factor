@@ -368,4 +368,4 @@ SYMBOL: cached-lines
     gl-scale-factor get-global 3array
     cached-lines get-global [ first2 <line> ] cache ;
 
-STARTUP-HOOK: [ <cache-assoc> cached-lines set-global ]
+STARTUP-HOOK: [ <timed-cache-assoc> cached-lines set-global ]
