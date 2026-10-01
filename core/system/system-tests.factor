@@ -54,3 +54,20 @@ IN: system.tests
      [ \"local error output\" write 0 exit ] with-output>error"
     run-exit-test
 ] unit-test
+
+! Invalid exit calls must be recoverable before shutdown hooks run.
+{ "caughtcontinuedhook" "" 0 } [
+    "USING: continuations eval init io kernel system ;
+     [ \"hook\" write ] \"exit-test\" add-shutdown-hook
+     [ \"exit\" eval( -- * ) ] [ drop \"caught\" write ] recover
+     \"continued\" write 0 exit"
+    run-exit-test
+] unit-test
+
+{ "caughtcontinuedhook" "" 0 } [
+    "USING: continuations init io kernel system ;
+     [ \"hook\" write ] \"exit-test\" add-shutdown-hook
+     [ \"invalid\" exit ] [ drop \"caught\" write ] recover
+     \"continued\" write 0 exit"
+    run-exit-test
+] unit-test

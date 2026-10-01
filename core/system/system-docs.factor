@@ -81,7 +81,7 @@ HELP: embedded?
 
 HELP: exit
 { $values { "n" "an integer exit code" } }
-{ $description "Flushes the current and global output and error streams, runs all " { $link shutdown-hooks } ", flushes the streams again, and then exits the Factor process. Flush errors are ignored so an unavailable stream does not prevent shutdown or flushing the other streams. If an error occurs when the shutdown hooks run, or when the process is about to terminate, the error is ignored and the process exits with status 255." } ;
+{ $description "Validates the integer exit code, flushes the current and global output and error streams, runs all " { $link shutdown-hooks } ", flushes the streams again, and then exits the Factor process. A missing or invalid exit code raises an error before shutdown begins. Flush errors are ignored so an unavailable stream does not prevent shutdown or flushing the other streams. If an error occurs when the shutdown hooks run, or when the process is about to terminate, the error is ignored and the process exits with status 255." } ;
 
 HELP: quit
 { $description "Calls " { $link exit } " with a 0 exit code." } ;

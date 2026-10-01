@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2010 slava pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors assocs continuations init io kernel
-kernel.private make math.parser namespaces sequences splitting ;
+kernel.private make math math.parser namespaces sequences splitting ;
 IN: system
 
 PRIMITIVE: (exit) ( n -- * )
@@ -90,6 +90,8 @@ PRIVATE>
 PRIVATE>
 
 : exit ( n -- * )
+    ! Validate before shutdown begins, outside the handler for hook errors.
+    integer>fixnum
     [
         flush-exit-streams
         do-shutdown-hooks
