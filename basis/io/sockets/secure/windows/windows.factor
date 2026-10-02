@@ -1,5 +1,5 @@
 USING: accessors alien alien.c-types alien.data alien.strings
-calendar combinators combinators.short-circuit destructors io
+calendar combinators combinators.short-circuit continuations destructors io
 io.encodings.utf8 io.ports io.sockets.private io.sockets.secure
 io.sockets.secure.openssl io.sockets.windows kernel libc locals
 math math.order openssl openssl.libcrypto openssl.libssl system
@@ -59,9 +59,12 @@ M: windows socket-handle
     ! Set nonblocking mode before OpenSSL can perform a handshake or read.
     dup socket-readiness-for drop handle>> alien-address ;
 
+HOOK: <windows-secure-socket> secure-socket-backend ( socket hostname -- handle )
+M: openssl <windows-secure-socket> <ssl-socket> ;
+
 M: secure remote>handle
-    [ addrspec>> remote>handle dup FIONBIO 1 set-ioctl-socket ]
-    [ secure-hostname ] bi <ssl-socket> ;
+    [ addrspec>> remote>handle ]
+    [ secure-hostname ] bi <windows-secure-socket> ;
 
 GENERIC: windows-socket-handle ( obj -- handle )
 M: ssl-handle windows-socket-handle file>> ;
@@ -74,12 +77,17 @@ M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
 
 M: secure (accept)
     [
-        addrspec>> (accept) [ |dispose f <ssl-socket> ] dip
+        addrspec>> (accept) [ |dispose f <windows-secure-socket> ] dip
     ] with-destructors ;
 
-M: secure establish-connection
-    [
-        [ handle>> file>> <output-port> ] [ addrspec>> ] bi* establish-connection
-    ] [ secure-connection ] 2bi ;
+HOOK: establish-secure-connection secure-socket-backend ( output addrspec -- )
+M: openssl establish-secure-connection secure-connection ;
+
+M:: secure establish-connection ( output remote -- )
+    output handle>> :> tls
+    tls windows-socket-handle output handle<<
+    [ output remote addrspec>> establish-connection ]
+    [ tls output handle<< ] finally
+    output remote establish-secure-connection ;
 
 M: windows non-ssl-socket? win32-socket? ;

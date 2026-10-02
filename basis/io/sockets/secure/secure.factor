@@ -40,9 +40,12 @@ dh-file
 ephemeral-key-bits 
 alpn-supported-protocols ;
 
+HOOK: default-tls-method secure-socket-backend ( -- method )
+M: object default-tls-method best-tls-method ;
+
 : <secure-config> ( -- config )
     secure-config new
-        best-tls-method >>method
+        default-tls-method >>method
         1024 >>ephemeral-key-bits
         ssl-certificate-verification-supported? >>verify ;
 
