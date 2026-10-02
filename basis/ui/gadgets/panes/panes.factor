@@ -277,10 +277,14 @@ MEMO:: specified-font ( name style size foreground background -- font )
 : apply-background-style ( style gadget -- style gadget )
     background [ <solid> >>interior ] apply-style ;
 
+: apply-inset-style ( style gadget -- style gadget )
+    inset [ <border> ] apply-style ;
+
 : apply-character-style ( style gadget -- gadget )
     apply-font-style
     apply-background-style
     apply-image-style
+    apply-inset-style
     apply-presentation-style
     nip ; inline
 
@@ -297,9 +301,6 @@ MEMO:: specified-font ( name style size foreground background -- font )
 
 : apply-page-color-style ( style gadget -- style gadget )
     page-color [ <solid> >>interior ] apply-style ;
-
-: apply-inset-style ( style gadget -- style gadget )
-    inset [ <border> ] apply-style ;
 
 : apply-paragraph-style ( style pane -- pane )
     apply-inset-style
@@ -371,6 +372,7 @@ TUPLE: styled-label < label style ;
     apply-font-style
     apply-background-style
     apply-image-style
+    apply-inset-style
     apply-presentation-style
     nip ;
 

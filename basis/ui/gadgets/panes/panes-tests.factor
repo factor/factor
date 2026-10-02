@@ -2,7 +2,7 @@ USING: accessors arrays colors continuations dlists documents.private fonts fry 
 help.markup help.stylesheet help.syntax help.topics inspector io
 io.streams.string io.styles kernel literals locals math models models.range
 namespaces prettyprint see sequences strings tools.test ui.clipboards ui.gadgets
-ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
+ui.gadgets.borders ui.gadgets.debug ui.gadgets.panes ui.gadgets.panes.private
 ui.gadgets.scrollers ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.theme ;
 FROM: sets => in? ;
 FROM: ui.render => selected-children ;
@@ -109,6 +109,41 @@ IN: ui.gadgets.panes.tests
     [ text>> text = ] [ style>> style = ] bi ;
 
 { t t } [ formatted-pane-text-test ] unit-test
+
+! #2520: styled spans retain insets, including after adjacent writes merge.
+{ t t t t } [
+    [let
+        <pane> :> pane
+        H{ { inset { 10 5 } } { foreground COLOR: red } } :> style
+        "hello" style pane <pane-stream> stream-format
+        " world" style pane <pane-stream> stream-format
+        pane current>> gadget-child :> span
+        span border?
+        span size>> { 10 5 } =
+        span find-styled-label
+        [ text>> "hello world" = ] [ style>> style = ] bi
+    ]
+] unit-test
+
+! Block styles already consume paragraph insets; do not apply them twice.
+{ t t } [
+    [let
+        H{ { inset { 10 5 } } } [ "hello" write ] make-styled-pane :> block
+        block border?
+        block gadget-child border? not
+    ]
+] unit-test
+
+! An unstyled append creates a separate run outside the inset border.
+{ t t } [
+    [let
+        <pane> :> pane
+        "first" H{ { inset { 10 5 } } } pane <pane-stream> stream-format
+        " second" pane <pane-stream> stream-write
+        pane current>> children>>
+        [ length 2 = ] [ second border? not ] bi
+    ]
+] unit-test
 
 :: large-pane-copy-test ( -- copied? highlighted? )
     10,000,000 CHAR: a <string> :> text
