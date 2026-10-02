@@ -130,7 +130,7 @@ M: none-type return-type>c-type drop void ;
 : error-parameter ( -- parameter )
     parameter new
         "error" >>name
-        "in" >>direction
+        "out" >>direction
         "none" >>transfer-ownership
         simple-type new "GLib.Error" >>name >>type ;
 

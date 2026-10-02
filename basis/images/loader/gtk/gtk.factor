@@ -1,9 +1,9 @@
 ! Copyright (C) 2010 Philipp Brüschweiler.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.data alien.syntax arrays
-assocs combinators gdk-pixbuf.ffi glib.ffi gobject.ffi
-grouping images images.loader io kernel math sequences specialized-arrays
-system unicode ;
+USING: accessors alien.c-types alien.data alien.strings alien.syntax arrays
+assocs combinators destructors gdk-pixbuf.ffi glib.ffi gobject.ffi
+grouping images images.loader io io.encodings.utf8 kernel math
+sequences specialized-arrays system unicode ;
 IN: images.loader.gtk
 SPECIALIZED-ARRAY: uchar
 
@@ -68,12 +68,16 @@ CONSTANT: bits>components {
     } cleave f f gdk_pixbuf_new_from_data ;
 
 : GdkPixbuf>byte-array ( GdkPixbuf type -- byte-array )
-    { void* size_t } [
-        rot f f
-        { { pointer: GError initial: f } } [
-            gdk_pixbuf_save_to_bufferv drop
-        ] with-out-parameters
-    ] with-out-parameters rot handle-GError memory>byte-array ;
+    [
+        utf8 string>alien
+        { void* size_t } [
+            rot f f
+            { { pointer: GError initial: f } } [
+                gdk_pixbuf_save_to_bufferv drop
+            ] with-out-parameters
+        ] with-out-parameters rot handle-GError
+        [ &g_free ] dip memory>byte-array
+    ] with-destructors ;
 
 ! The type parameter is almost always the same as the file extension,
 ! except for in the jpg -> jpeg and tif -> tiff cases.

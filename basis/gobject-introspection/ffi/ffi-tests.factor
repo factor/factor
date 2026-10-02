@@ -1,6 +1,6 @@
-USING: accessors alien.c-types compiler.units
+USING: accessors alien.c-types compiler.units glib.ffi
 gobject-introspection.ffi gobject-introspection.repository kernel
-tools.test ;
+sequences tools.test ;
 IN: gobject-introspection.ffi.tests
 
 ! callback
@@ -32,3 +32,19 @@ IN: gobject-introspection.ffi.tests
 ] unit-test
 
 >>
+
+! GIR's throws flag adds a return location for an error, not an error object.
+{ t } [
+    error-parameter parameter-c-type GError <pointer> <pointer> =
+] unit-test
+
+{ 1 "error" "out" } [
+    function new { } >>parameters t >>throws?
+    ?suffix-parameters-with-error
+    [ length ] [ first [ name>> ] [ direction>> ] bi ] bi
+] unit-test
+
+{ { } } [
+    function new { } >>parameters f >>throws?
+    ?suffix-parameters-with-error
+] unit-test
