@@ -1,5 +1,5 @@
-USING: accessors colors combinators continuations destructors fonts grouping images
-kernel locals math namespaces opengl sequences sets tools.test
+USING: accessors arrays colors combinators continuations destructors fonts grouping images
+kernel locals math namespaces opengl sequences sets sorting tools.test unicode vectors
 windows.gdi32 windows.offscreen windows.types windows.uniscribe
 windows.uniscribe.private ;
 IN: windows.uniscribe.tests
@@ -46,6 +46,80 @@ IN: windows.uniscribe.tests
 [ 5 disposed-script x>line-offset ] [ already-disposed? ] must-fail-with
 [ disposed-script selection-columns ] [ already-disposed? ] must-fail-with
 [ disposed-script script-string>image ] [ already-disposed? ] must-fail-with
+[ 1 t disposed-script line-caret>x ] [ already-disposed? ] must-fail-with
+[ 5 disposed-script x>line-caret ] [ already-disposed? ] must-fail-with
+[ disposed-script uniscribe-selection-spans ] [ already-disposed? ] must-fail-with
+
+! Caret affinity selects either side of a logical bidi boundary.
+{ t t } [
+    [let
+        "Segoe UI" <font> 32 >>size "abc \u0005d0\u0005d1\u0005d2 xyz"
+        cached-script-string :> script
+        4 t script line-caret>x :> trailing
+        4 f script line-caret>x trailing = not
+        trailing 1 - script x>line-caret script line-caret>x trailing =
+    ]
+] unit-test
+
+! Integer GDI hit positions never leak a caret inside a Unicode grapheme.
+{ 0 5 } [
+    "\u01f469\u00200d\u01f469\u00200d\u01f466"
+    [ 2 f rot uniscribe-snap-caret ] [ 2 t rot uniscribe-snap-caret ] bi
+] unit-test
+
+{ t t 0 f 3 f } [
+    [let
+        monospace-font "abc" cached-script-string :> script
+        -10 t script line-caret>x 0 script line-offset>x =
+        10 f script line-caret>x 3 script line-offset>x =
+        -100 script x>line-caret
+        10000 script x>line-caret
+    ]
+] unit-test
+
+{ 0 0 f 0 t f t } [
+    [let
+        monospace-font "" cached-script-string :> script
+        0 t script line-caret>x
+        1 script x>line-caret
+        0 t 1 script uniscribe-visual-step
+        script uniscribe-selection-spans empty?
+    ]
+] unit-test
+
+:: visual-walk-pixels ( script direction -- pixels )
+    direction 0 > [ -1 ] [ script size>> first 1 + ] if
+    script x>line-caret :> ( n! affinity! )
+    V{ } clone :> pixels
+    script string>> length 2 * 4 + [
+        n affinity script line-caret>x pixels push
+        n affinity direction script uniscribe-visual-step drop affinity! n!
+    ] times
+    pixels members sort ;
+
+:: complete-visual-walk? ( size text -- ? )
+    "Segoe UI" <font> size >>size text cached-script-string :> script
+    text length 1 + <iota> [ dup f text uniscribe-snap-caret = ] filter
+    [ :> n n f script line-caret>x n t script line-caret>x 2array ] map
+    concat members sort :> expected
+    script 1 visual-walk-pixels expected =
+    script -1 visual-walk-pixels expected = and ;
+
+! Every visual stop is reachable in either direction, including mixed
+! lines whose native out-of-bounds sentinel points into a different run.
+{ t } [
+    { 8 12 24 32 } [| size |
+        {
+            "abc \u0005d0\u0005d1\u0005d2 xyz"
+            "\u000633\u000644\u000627\u000645"
+            "\u000633\u000644\u000627\u000645\" xyz"
+            "\u01f469\u00200d\u01f469\u00200d\u01f466"
+            "a\u000301bc"
+            "\u000915\u00093f\u000928\u00093e"
+            "abc\u00200bdef"
+        } [ size swap complete-visual-walk? ] all?
+    ] all?
+] unit-test
 
 :: renew-disposed-cache-entry? ( -- fresh? reusable? )
     monospace-font "released cached analysis" cached-script-string :> old

@@ -5,7 +5,7 @@ USING: accessors alien alien.c-types alien.data arrays assocs
 byte-arrays cache classes.struct colors combinators destructors
 fonts fonts.shaping generalizations images init io.encodings.string io.encodings.utf16 kernel
 libc literals locals math math.bitwise math.functions math.order namespaces
-opengl sequences sequences.generalizations sets specialized-arrays strings windows.errors windows.fonts
+opengl sequences sequences.generalizations sets sorting specialized-arrays strings unicode vectors windows.errors windows.fonts
 windows.gdi32 windows.offscreen windows.ole32 windows.types
 windows.usp10 ;
 
@@ -14,7 +14,7 @@ SPECIALIZED-ARRAY: ushort
 IN: windows.uniscribe
 
 ! Size/metrics are backing-pixel layout bounds; origin locates (0,0) in the bitmap.
-TUPLE: script-string < disposable font string metrics ssa size image origin backing-scale utf16-boundaries ;
+TUPLE: script-string < disposable font string metrics ssa size image origin backing-scale utf16-boundaries selection-spans ;
 
 <PRIVATE
 
@@ -56,15 +56,19 @@ CONSTANT: ssa-dwFlags flags{ SSA_GLYPHS SSA_FALLBACK SSA_TAB }
 
 PRIVATE>
 
-:: line-offset>x ( n script-string -- x )
+:: line-caret>x ( n trailing? script-string -- x )
     script-string check-disposed drop
     script-string string>> uniscribe-text :> text
     text empty? [ 0 ] [
-        n script-string utf16-boundaries>> nth :> n-utf16
+        n 0 text length clamp :> index
+        index script-string utf16-boundaries>> nth :> n-utf16
         script-string ssa>>
-        n text length = [ n-utf16 1 - TRUE ] [ n-utf16 FALSE ] if
+        index text length = trailing? index 0 > and or
+        [ n-utf16 1 - TRUE ] [ n-utf16 FALSE ] if
         { int } [ ScriptStringCPtoX check-ole32-error ] with-out-parameters
     ] if ;
+
+: line-offset>x ( n script-string -- x ) f swap line-caret>x ;
 
 :: x>line-offset ( x script-string -- n trailing )
     script-string check-disposed drop
@@ -80,6 +84,52 @@ PRIVATE>
             start boundaries n trailing + boundary>codepoint start -
         ] if
     ] if ;
+
+:: uniscribe-snap-caret ( n trailing? text -- boundary )
+    n 0 text length clamp :> index
+    index zero? [ 0 ] [
+        index text last-grapheme-from :> before
+        before text first-grapheme-from :> after
+        index after = [ index ] [ trailing? after before ? ] if
+    ] if ;
+
+:: x>line-caret ( x script-string -- n trailing? )
+    script-string check-disposed drop
+    script-string string>> uniscribe-text :> text
+    script-string size>> first :> width
+    x round >integer 0 width clamp :> pixel
+    ! At either bound the native sentinel can describe a logical end in
+    ! another bidi run. Inspect just inside, then take the visual edge.
+    pixel zero? [ 1 width min ] [
+        pixel width = [ width 1 - 0 max ] [ pixel ] if
+    ] if script-string x>line-offset :> ( n trailing )
+    trailing 0 > n 0 >= and :> affinity
+    n trailing + affinity text uniscribe-snap-caret :> index
+    pixel zero? pixel width = or [
+        index zero? [ index ] [ index text last-grapheme-from ] if
+        index
+        index text length = [ index ] [ index text first-grapheme-from ] if
+        3array [ :> boundary boundary f 2array boundary t 2array 2array ] map concat
+        [ first2 script-string line-caret>x pixel - abs ] sort-by first first2
+    ] [ index affinity ] if ;
+
+:: uniscribe-visual-step ( n trailing? direction script-string -- next affinity moved? )
+    script-string string>> uniscribe-text :> text
+    n trailing? script-string line-caret>x :> x
+    ! Native hit testing uses integer pixels. Inspect the adjacent pixel,
+    ! then choose the nearest cluster edge in the requested direction.
+    x direction + script-string x>line-offset :> ( start trailing )
+    start 0 text length clamp :> index
+    index f text uniscribe-snap-caret :> leading
+    trailing 0 > [ start trailing + ] [
+        index text length < [ index text first-grapheme-from ] [ index ] if
+    ] if t text uniscribe-snap-caret :> end
+    leading f 2array end t 2array 2array [ :> candidate
+        candidate first2 script-string line-caret>x x - direction * 0 >
+    ] filter [ :> candidate
+        candidate first2 script-string line-caret>x x - abs
+    ] sort-by :> candidates
+    candidates empty? [ n trailing? f ] [ candidates first first2 t ] if ;
 
 <PRIVATE
 
@@ -257,9 +307,8 @@ PRIVATE>
     >rgba-components [ 255 * round >integer ] 4 napply
     24 shift swap 16 shift bitor swap 8 shift bitor bitor ;
 
-:: selection-columns ( script-string -- columns )
-    script-string check-disposed drop
-    script-string size>> first <byte-array> :> columns
+:: compute-selection-spans ( script-string -- spans )
+    V{ } clone :> spans
     script-string string>> :> selection
     selection selection? [
         selection start>> selection end>> [ min ] [ max ] 2bi
@@ -274,12 +323,42 @@ PRIVATE>
             script-string ssa>> utf16 TRUE { int }
             [ ScriptStringCPtoX check-ole32-error ] with-out-parameters
             [ min ] [ max ] 2bi :> right :> left
-            right columns length min left 0 max - 0 max <iota> [
-                left 0 max + 1 swap columns set-nth
-            ] each
+            left 0 max :> clipped-left
+            right script-string size>> first min :> clipped-right
+            clipped-left clipped-right < [
+                clipped-left clipped-right 2array spans push
+            ] when
             utf16 ch 0xffff > [ 2 ] [ 1 ] if + utf16!
         ] each
-    ] when columns ;
+    ] when
+    V{ } clone :> merged
+    spans [ first ] sort-by [ :> span
+        merged empty? [ span merged push ] [
+            merged last :> previous
+            span first previous second <= [
+                span second previous second max 1 previous set-nth
+            ] [ span merged push ] if
+        ] if
+    ] each
+    merged ;
+
+PRIVATE>
+
+:: uniscribe-selection-spans ( script-string -- spans )
+    script-string check-disposed drop
+    script-string selection-spans>> [ ] [
+        script-string compute-selection-spans :> spans
+        script-string spans >>selection-spans drop spans
+    ] if* ;
+
+<PRIVATE
+
+:: selection-columns ( script-string -- columns )
+    script-string check-disposed drop
+    script-string size>> first <byte-array> :> columns
+    script-string uniscribe-selection-spans [ first2 :> ( left right )
+        right left - <iota> [ left + 1 swap columns set-nth ] each
+    ] each columns ;
 
 :: composite-text-image ( image script-string -- image )
     script-string font>> :> font
