@@ -30,6 +30,51 @@ IN: prettyprint.tests
 { "0o1.1p4" } [ 8 number-base [ 18.0 unparse ] with-variable ] unit-test
 { "0x1.2p4" } [ 16 number-base [ 18.0 unparse ] with-variable ] unit-test
 { "1267650600228229401496703205376" } [ 1 100 shift unparse ] unit-test
+
+! #824: short previews must not expand enormous integers into every digit.
+{ "~integer with 100001 bits~" } [ 1 100000 shift unparse-short ] unit-test
+{ "~negative integer with 100001 bits~" } [ 1 100000 shift neg unparse-short ] unit-test
+
+! Ordinary printing remains exact, and explicitly unlimited previews do too.
+{ "1267650600228229401496703205376" } [
+    t has-limits? [ f length-limit [ 1 100 shift unparse-short ] with-variable ] with-variable
+] unit-test
+{ "1267650600228229401496703205376" } [
+    [ 1 100 shift unparse-short ] without-limits
+] unit-test
+
+! Count digits in the selected radix, without including sign or radix prefix.
+{ "999" "~integer with 10 bits~" "-999" "~negative integer with 10 bits~" } [
+    t has-limits? [ 3 length-limit [
+        999 unparse-short 1000 unparse-short
+        -999 unparse-short -1000 unparse-short
+    ] with-variable ] with-variable
+] unit-test
+
+{ "0b111" "~integer with 4 bits~" } [
+    t has-limits? [ 3 length-limit [ 2 number-base [
+        7 unparse-short 8 unparse-short
+    ] with-variable ] with-variable ] with-variable
+] unit-test
+
+{ "0o777" "~integer with 10 bits~" } [
+    t has-limits? [ 3 length-limit [ 8 number-base [
+        511 unparse-short 512 unparse-short
+    ] with-variable ] with-variable ] with-variable
+] unit-test
+
+{ "0xfff" "~integer with 13 bits~" } [
+    t has-limits? [ 3 length-limit [ 16 number-base [
+        4095 unparse-short 4096 unparse-short
+    ] with-variable ] with-variable ] with-variable
+] unit-test
+
+{ "0" "~integer with 101 bits~" } [
+    t has-limits? [ 0 length-limit [
+        0 unparse-short 1 100 shift unparse-short
+    ] with-variable ] with-variable
+] unit-test
+
 { "1/0." } [ 1/0. unparse ] unit-test
 { "-1/0." } [ -1/0. unparse ] unit-test
 { "0/0." } [ 0/0. unparse ] unit-test

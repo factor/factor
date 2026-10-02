@@ -18,7 +18,7 @@ HELP: nesting-limit
 { $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). A value of " { $link f } " denotes no limit." } ;
 
 HELP: length-limit
-{ $var-description "The maximum printed sequence length, defaulting to 100. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. Strings also obey this limit when " { $link string-limit? } " is set. A value of " { $link f } " denotes no limit." } ;
+{ $var-description "The maximum printed sequence length, defaulting to 100. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. Strings also obey this limit when " { $link string-limit? } " is set. When " { $link has-limits? } " is set, integers exceeding this many digits in " { $link number-base } " are represented by a sign and bit-count summary. A value of " { $link f } " denotes no limit." } ;
 
 HELP: line-limit
 { $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". A value of " { $link f } " denotes no limit." } ;

@@ -4,7 +4,7 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
 classes.tuple combinators combinators.short-circuit
 continuations effects fry generic hash-sets hashtables io.pathnames
-io.styles kernel lists locals make math math.order math.parser
+io.styles kernel lists locals make math math.functions math.order math.parser
 namespaces prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.stylesheet quotations sbufs
 sequences strings vectors words ;
@@ -159,6 +159,31 @@ M: pathname pprint*
 
 : present-text ( str obj -- )
     presented associate styled-text ;
+
+! Avoid converting an entire enormous integer just to display a short preview.
+! Comparing against a bounded radix power preserves exact digit boundaries.
+:: integer-preview-limit? ( n -- ? )
+    length-limit get :> limit
+    has-limits? get limit and [
+        number-base get :> base
+        base { 2 8 10 16 } member? [
+            n abs :> magnitude
+            limit 0 max :> digits
+            digits magnitude bit-length < [
+                magnitude base digits ^ >=
+            ] [ f ] if
+        ] [ f ] if
+    ] [ f ] if ;
+
+: integer-preview ( n -- str )
+    [ neg? "negative integer with " "integer with " ? ]
+    [ abs bit-length number>string ] bi
+    " bits" 3append "~" 1surround ;
+
+M: integer pprint*
+    dup integer-preview-limit?
+    [ [ integer-preview ] keep present-text ]
+    [ call-next-method ] if ;
 
 : check-recursion ( obj quot: ( obj -- ) -- )
     nesting-limit? [
