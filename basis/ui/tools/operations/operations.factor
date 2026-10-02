@@ -5,7 +5,7 @@ compiler.units continuations definitions destructors editors
 help.topics io.pathnames io.styles kernel libc.private
 macros.expander models namespaces parser prettyprint
 prettyprint.config quotations see sequences source-files.errors
-stack-checker threads tools.annotations tools.crossref
+splitting stack-checker strings threads tools.annotations tools.crossref
 tools.test tools.time tools.walker ui.clipboards ui.commands
 ui.gestures ui.operations ui.operations.syntax ui.tools.browser ui.tools.deploy
 ui.tools.inspector ui.tools.listener ui.tools.traceback vocabs
@@ -56,6 +56,30 @@ OPERATION: com-input [ input? ] H{
 OPERATION: continue-restart [ restart? ] H{
     { +primary+ t }
     { +secondary+ t }
+    { +listener+ t }
+}
+
+: restart-edit-target ( restart -- target/f )
+    dup obj>> dup {
+        [ pathname? ] [ { [ word? ] [ boolean? not ] } 1&& ] [ vocab-spec? ]
+    } 1|| [
+        nip
+    ] [
+        drop name>> "Load " ?head [
+            " again" ?tail [ <pathname> ] [ drop f ] if
+        ] [ drop f ] if
+    ] if ;
+
+: com-edit-restart ( restart -- )
+    restart-edit-target [
+        dup pathname? [ edit-file ] [
+            dup word? [
+                dup where [ edit ] [ vocabulary>> edit-vocab ] if
+            ] [ edit ] if
+        ] if
+    ] when* ;
+
+OPERATION: com-edit-restart [ { [ restart? ] [ restart-edit-target ] } 1&& ] H{
     { +listener+ t }
 }
 
