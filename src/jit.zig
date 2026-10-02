@@ -274,15 +274,52 @@ test "unwinding out of a nested JIT does not strand its buffers" {
     for (0..4) |i| {
         var outer = Jit.init(vm, layouts.false_object);
         outer.registerRoot();
+        try outer.code.appendNTimes(allocator, 1, 16);
+        try outer.relocation.appendNTimes(allocator, 2, 16);
         var nested = Jit.init(vm, layouts.false_object);
         nested.registerRoot();
         try nested.code.appendNTimes(allocator, 0, 1 << 20);
+        try nested.relocation.appendNTimes(allocator, 0, 4096);
         nested.deinit();
         vm.data_roots.clearRetainingCapacity();
         vm.current_jit_count = 0;
         if (i == 0) retained = debug_allocator.total_requested_bytes;
         try std.testing.expectEqual(retained, debug_allocator.total_requested_bytes);
     }
+}
+
+test "JIT initialization roots its owner before nursery collection" {
+    const data_heap = @import("data_heap.zig");
+    const gc = @import("gc.zig");
+    const allocator = std.testing.allocator;
+    const vm = try FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.deinit();
+        heap.deinit();
+    }
+
+    // The owner is the only live reference; leave too little nursery space
+    // for initialization's two backing arrays so it must move during init.
+    const payload_size = heap.nursery.size - @sizeOf(layouts.ByteArray) - layouts.data_alignment;
+    const old_owner = vm.allotByteArray(payload_size);
+    layouts.untag(layouts.ByteArray, old_owner).data()[0] = 42;
+    var compiler = Jit.init(vm, old_owner);
+    compiler.registerRoot();
+    defer compiler.deinit();
+
+    try std.testing.expectEqual(@as(Cell, 1), heap.nursery_collections);
+    try std.testing.expect(compiler.owner != old_owner);
+    const live_owner = layouts.UNTAG(compiler.owner);
+    try std.testing.expect(live_owner >= heap.aging.start and live_owner < heap.aging.here);
+    try std.testing.expectEqual(@as(u8, 42), layouts.untag(layouts.ByteArray, compiler.owner).data()[0]);
 }
 
 // Base JIT compiler
@@ -303,6 +340,13 @@ pub const Jit = struct {
     const Self = @This();
 
     pub fn init(vm: *FactorVM, owner: Cell) Self {
+        // Initialization can collect before the returned Jit is in its final
+        // location. Root the local owner now and reserve its final root slots.
+        vm.data_roots.ensureUnusedCapacity(vm.allocator, 4) catch vm.memoryError();
+        var rooted_owner = owner;
+        vm.data_roots.appendAssumeCapacity(&rooted_owner);
+        defer _ = vm.data_roots.pop();
+
         std.debug.assert(vm.current_jit_count >= 0);
         const buffers = borrowBuffers(vm, @intCast(vm.current_jit_count));
         vm.current_jit_count += 1;
@@ -311,12 +355,11 @@ pub const Jit = struct {
         // Without this, the second allotUninitializedArray could trigger GC,
         // moving the first array before it can be rooted (the struct is
         // returned by value, so registerRoot() happens only after init).
-        // immediately after allocation; Zig can't do RAII, so we pre-reserve.
         const array_size = layouts.alignCell(
             layouts.arraySize(layouts.Array, 10),
             layouts.data_alignment,
         );
-        _ = vm.ensureNurserySpace(array_size * 2);
+        if (!vm.ensureNurserySpace(array_size * 2)) vm.memoryError();
 
         const parameters = growable.GrowableArray.init(vm, 10) orelse {
             @panic("JIT.init: failed to allocate parameters growable array");
@@ -325,12 +368,12 @@ pub const Jit = struct {
             @panic("JIT.init: failed to allocate literals growable array");
         };
 
-        // NOTE: We do NOT register the owner as a GC root here because in Zig,
-        // returning Self by value copies the struct. The caller MUST call
-        // registerRoot() after the struct is in its final location.
+        // Returning Self by value copies the struct, so its fields cannot stay
+        // registered here. The caller MUST call registerRoot() once the Jit
+        // is in its final location, replacing the temporary owner root.
         return Self{
             .vm = vm,
-            .owner = owner,
+            .owner = rooted_owner,
             .code = &buffers.code,
             .relocation = &buffers.relocation,
             .parameters = parameters,
@@ -773,7 +816,7 @@ pub const QuotationJit = struct {
     /// struct is in its final location.
     pub fn registerRoot(self: *Self) void {
         // 4 roots: owner, literals.elements, parameters.elements, elements.
-        // Capacity is guaranteed by emitQuotation's ensureUnusedCapacity(8).
+        // Capacity is reserved by Jit.init().
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.owner);
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.literals.elements);
         self.jit.vm.data_roots.appendAssumeCapacity(&self.jit.parameters.elements);

@@ -221,7 +221,8 @@ pub const CodeBlock = extern struct {
         var compiler = jit_mod.QuotationJit.init(vm, quot_cell, false, false);
         compiler.registerRoot();
         defer compiler.deinit();
-        compiler.initQuotation(quot_cell);
+        // init() may collect; its rooted owner is the live quotation.
+        compiler.initQuotation(compiler.jit.owner);
         compiler.jit.computePosition(offset_val);
         compiler.iterateQuotation() catch {
             return 0;
@@ -1015,6 +1016,40 @@ comptime {
 }
 
 // Tests
+test "quotation source mapping survives collection during JIT initialization" {
+    const vm_mod = @import("vm.zig");
+    const data_heap = @import("data_heap.zig");
+    const gc = @import("gc.zig");
+    const allocator = std.testing.allocator;
+    const vm = try vm_mod.FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    vm.vm_asm.spare_ctx = try vm.newContext();
+    const heap = try data_heap.DataHeap.init(allocator, 4096, 4096, 8192);
+    vm.setDataHeap(heap);
+    var collector = gc.GarbageCollector.init(allocator, vm, heap);
+    vm.gc = &collector;
+    defer {
+        vm.gc = null;
+        collector.deinit();
+        vm.deinit();
+        heap.deinit();
+    }
+
+    const elements = vm.allotArray(1, layouts.tagFixnum(42)) orelse return error.OutOfMemory;
+    const quot_cell = vm.allotObject(.quotation, @sizeOf(layouts.Quotation)) orelse return error.OutOfMemory;
+    const quot = layouts.untag(layouts.Quotation, quot_cell);
+    quot.array = elements;
+    quot.cached_effect = layouts.false_object;
+    quot.cache_counter = layouts.false_object;
+    quot.entry_point = 0;
+    const remaining = vm.vm_asm.nursery.end - vm.vm_asm.nursery.here;
+    _ = vm.allotByteArray(remaining - @sizeOf(layouts.ByteArray) - layouts.data_alignment);
+
+    // No templates are installed, so replay reaches the quotation's end.
+    try std.testing.expectEqual(@as(layouts.Fixnum, 1), CodeBlock.quotCodeOffsetToScan(vm, quot_cell, 0));
+    try std.testing.expectEqual(@as(Cell, 1), heap.nursery_collections);
+}
+
 test "code block header encoding" {
     var block: CodeBlock = undefined;
     block.initialize(.unoptimized, 64, 32);
