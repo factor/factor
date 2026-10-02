@@ -1,6 +1,6 @@
 USING: alien alien.accessors alien.c-types alien.libraries alien.syntax
 arrays destructors environment io io.pathnames kernel locals math memory
-namespaces prettyprint sequences tools.test ;
+namespaces prettyprint sequences tools.test tools.test.ffi ;
 IN: compiler.tests.alien-linux-runtime
 << "linux-runtime" "FACTOR_REPRO_LIBRARY" os-env [ ] [
     "resource:libfactor-ffi-test.so" absolute-path
@@ -27,4 +27,4 @@ FUNCTION: int abi_pointer_gc ( void* cb )
 { 1 } [ pointer-callback [ abi_pointer_gc ] with-callback runtime-callback-case ] unit-test
 
 "resource:basis/compiler/tests/fixtures/fp-status.factor" run-test-file
-"FFI-COVERAGE runtime-callbacks executed=" write "runtime-callback-cases" get .
+"runtime-callbacks" "runtime-callback-cases" get report-ffi-coverage

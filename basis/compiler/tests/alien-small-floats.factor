@@ -19,7 +19,7 @@ FUNCTION: int ffi_test_small_floats_available ( )
 ffi_test_small_floats_available 0 > cpu arm.64? and [
     "resource:basis/compiler/tests/small-floats/cases.factor" run-test-file
 ] [
-    "FFI-SKIP small reason=unsupported-toolchain-or-cpu" print
+    "small" "unsupported-toolchain-or-cpu" report-ffi-skip
     required-small-floats? [ "Required half/BF16 fixtures unavailable" throw ] when
 ] if
 
