@@ -6,6 +6,10 @@ compiler.tree.propagation.info io.encodings.utf8 kernel literals math
 math.intervals layouts namespaces sequences sequences.private strings threads tools.test ;
 IN: compiler.tree.propagation.info.tests
 
+{ true } [ t literal-class ] unit-test
+{ false } [ f literal-class ] unit-test
+{ true t t } [ t <literal-info> [ class>> ] [ literal>> ] [ literal?>> ] tri ] unit-test
+
 { f } [ 0.0 -0.0 eql? ] unit-test
 
 ! value-info-intersect
@@ -66,7 +70,7 @@ TUPLE: test-tuple { x read-only } ;
     f <literal-info>
     fixnum 0 40 [a,b] <class/interval-info>
     value-info-union
-    \ f class-not <class-info>
+    false class-not <class-info>
     value-info-intersect
     [ class>> fixnum class= ]
     [ interval>> 0 40 [a,b] = ] bi
@@ -271,7 +275,7 @@ MIXIN: info-mixin
 SINGLETON: info-singleton
 
 : named-info-cases ( -- classes )
-    { object null fixnum bignum integer real float number array-capacity
+    { object null false true fixnum bignum integer real float number array-capacity
       integer-array-capacity array byte-array string sequence tuple word
       test-tuple tup1 tup2 self utf8 info-even info-empty info-mixin
       info-singleton class builtin-class tuple-class union-class

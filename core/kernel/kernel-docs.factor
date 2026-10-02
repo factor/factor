@@ -193,7 +193,26 @@ HELP: ?
 } ;
 
 HELP: boolean
-{ $class-description "A union of the " { $link POSTPONE: t } " and " { $link POSTPONE: f } " classes." } ;
+{ $class-description "A union of the " { $link true } " and " { $link false } " classes, containing exactly " { $link t } " and " { $link f } "." } ;
+
+HELP: false
+{ $class-description "The built-in class whose sole instance is the false value " { $link f } ". The class word is distinct from the " { $link f } " parsing word." }
+{ $examples { $example "USING: classes kernel prettyprint ;" "f class-of ." "false" } }
+{ $see-also false? boolean not } ;
+
+HELP: false?
+{ $values { "object" object } { "?" boolean } }
+{ $description "Tests whether the object is " { $link f } ". Equivalent to " { $link not } "." } ;
+
+HELP: true
+{ $class-description "The predicate class whose sole instance is the canonical true value " { $link t } ". It is a subclass of " { $link word } ". Unlike the " { $link false } " class, it is not a built-in class: " { $snippet "t class-of" } " returns " { $link word } "." }
+{ $notes "This class contains only " { $link t } ", rather than every object that has a true value." }
+{ $see-also true? false boolean } ;
+
+HELP: true?
+{ $values { "object" object } { "?" boolean } }
+{ $description "Tests whether the object is the canonical true value " { $link t } "." }
+{ $examples { $example "USING: kernel prettyprint ;" "t true? .\n1 true? ." "t\nf" } } ;
 
 HELP: >boolean
 { $values { "obj" "a generalized boolean" } { "?" boolean } }

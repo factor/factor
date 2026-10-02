@@ -102,11 +102,11 @@ M: sequence set-nth-unsafe set-nth ; inline
 PRIVATE>
 
 ! The f object supports the sequence protocol trivially
-M: f length drop 0 ; inline
-M: f nth-unsafe nip ; inline
-M: f like drop [ f ] when-empty ; inline
+M: false length drop 0 ; inline
+M: false nth-unsafe nip ; inline
+M: false like drop [ f ] when-empty ; inline
 
-INSTANCE: f immutable-sequence
+INSTANCE: false immutable-sequence
 
 ! Integer sequences
 TUPLE: iota { n integer read-only } ;

@@ -200,10 +200,10 @@ GENERIC#: stream-write-json 1 ( obj stream -- )
     ! Returns a string representing the factor object in JSON format
     [ write-json ] with-string-writer ;
 
-M: f stream-write-json
+M: false stream-write-json
     [ drop "false" ] [ stream-write ] bi* ;
 
-M: t stream-write-json
+M: true stream-write-json
     [ drop "true" ] [ stream-write ] bi* ;
 
 M: json-null stream-write-json
@@ -290,8 +290,8 @@ M: sequence stream-write-json
 TR: json-friendly "-" "_" ;
 
 GENERIC: json-coerce ( obj -- str )
-M: f json-coerce drop "false" ;
-M: t json-coerce drop "true" ;
+M: false json-coerce drop "false" ;
+M: true json-coerce drop "true" ;
 M: json-null json-coerce drop "null" ;
 M: string json-coerce ;
 M: integer json-coerce number>string ;

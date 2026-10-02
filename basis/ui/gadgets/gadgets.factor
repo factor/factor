@@ -395,7 +395,7 @@ GENERIC: request-focus-on ( child gadget -- )
 
 M: gadget request-focus-on parent>> request-focus-on ;
 
-M: f request-focus-on 2drop ;
+M: false request-focus-on 2drop ;
 
 : request-focus ( gadget -- )
     [ focusable-child ] keep request-focus-on ;

@@ -87,13 +87,13 @@ M: viewport pref-dim* gadget-child pref-viewport-dim ;
 
 GENERIC: update-scroller ( scroller follows -- )
 
-M: t update-scroller drop (scroll>bottom) ;
+M: true update-scroller drop (scroll>bottom) ;
 
 M: gadget update-scroller swap (scroll>gadget) ;
 
 M: rect update-scroller swap (scroll>rect) ;
 
-M: f update-scroller drop (update-scroller) ;
+M: false update-scroller drop (update-scroller) ;
 
 M: scroller layout*
     {

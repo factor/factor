@@ -36,7 +36,7 @@ M: string summary
     dup length "code points" container-summary ;
 
 ! Override sequence => integer instance
-M: f summary object-summary ;
+M: false summary object-summary ;
 
 M: integer summary object-summary ;
 

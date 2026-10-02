@@ -65,7 +65,7 @@ SYMBOL: serialized
         [ CHAR: o write1 serialize-cell drop ]
     ] dip if* ; inline
 
-M: f (serialize)
+M: false (serialize)
     drop CHAR: n write1 ;
 
 M: integer (serialize)

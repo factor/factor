@@ -41,7 +41,7 @@ M: string print-element [ write ] ($span) ;
 M: array print-element unclip execute( arg -- ) ;
 M: word print-element { } swap execute( arg -- ) ;
 M: effect print-element effect>string print-element ;
-M: f print-element drop ;
+M: false print-element drop ;
 
 : print-element* ( element style -- )
     [ print-element ] with-style ;
@@ -361,7 +361,7 @@ M: string ($instance) write ;
 
 M: array ($instance) print-element ;
 
-M: f ($instance) ($link) ;
+M: false ($instance) ($link) ;
 
 : $instance ( element -- ) first ($instance) ;
 

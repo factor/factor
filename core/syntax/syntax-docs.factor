@@ -338,13 +338,13 @@ HELP: flushable
 HELP: t
 { $syntax "t" }
 { $values { "t" "the canonical truth value" } }
-{ $class-description "The canonical truth value, which is an instance of itself." } ;
+{ $description "Pushes the canonical true value. This value is a word and is the sole instance of the " { $link true } " predicate class; it is not itself a class." } ;
 
 HELP: f
 { $syntax "f" }
 { $values { "f" "the singleton false value" } }
-{ $description "The " { $link f } " parsing word adds the " { $link f } " object to the parse tree, and is also the class whose sole instance is the " { $link f } " object. The " { $link f } " object is the singleton false value, the only object that is not true. The " { $link f } " object is not equal to the " { $link f } " class word, which can be pushed on the stack using word wrapper syntax:"
-{ $code "f    ! the singleton f object denoting falsity\n\\ f  ! the f class word" } } ;
+{ $description "Adds the singleton false value to the parse tree. This is the only object that is not true. Its class is " { $link false } ", which can be pushed on the stack directly:"
+{ $code "f             ! the singleton false value\nfalse  ! the class of the false value\n\\ f           ! the parsing word for the false literal" } } ;
 
 HELP: [
 { $syntax "[ elements... ]" }

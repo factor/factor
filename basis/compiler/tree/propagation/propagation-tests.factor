@@ -101,7 +101,7 @@ IN: compiler.tree.propagation.tests
     [ 3 "123" resize-string ] { resize-string } inlined?
 ] unit-test
 
-{ V{ t } } [
+{ V{ true } } [
     [ { string } declare string? ] final-classes
 ] unit-test
 
@@ -629,7 +629,7 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
 { V{ number } } [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
 { V{ number } } [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ false } } [
     [ dup 1.0 <= [ drop f ] [ 0 number= ] if ] final-classes
 ] unit-test
 
@@ -768,11 +768,11 @@ M: array iterate first t ; inline
     ] final-info drop
 ] unit-test
 
-{ V{ t } } [
+{ V{ true } } [
     [ { hashtable } declare hashtable instance? ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ false } } [
     [ { vector } declare hashtable instance? ] final-classes
 ] unit-test
 
@@ -780,7 +780,7 @@ M: array iterate first t ; inline
     [ { assoc } declare hashtable instance? ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ false } } [
     [ 3 string? ] final-classes
 ] unit-test
 
@@ -840,7 +840,7 @@ MIXIN: empty-mixin
     ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ false } } [
     [ { float } declare 0 eq? ] final-classes
 ] unit-test
 
@@ -920,11 +920,11 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 ] final-classes
 ] unit-test
 
-{ V{ t } } [
+{ V{ true } } [
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 
-{ V{ POSTPONE: f } } [
+{ V{ false } } [
     [ { word object } declare equal? ] final-classes
 ] unit-test
 
@@ -1006,7 +1006,7 @@ M: number whatever drop foo ; inline
 
 GENERIC: whatever2 ( x -- y )
 M: number whatever2 drop H{ { 1 1 } { 2 2 } { 3 3 } { 4 4 } { 5 6 } } ; inline
-M: f whatever2 ; inline
+M: false whatever2 ; inline
 
 { t } [ [ 1 whatever2 at ] { at* hashcode* } inlined? ] unit-test
 { f } [ [ whatever2 at ] { at* hashcode* } inlined? ] unit-test
@@ -1127,8 +1127,8 @@ M: tuple-with-read-only-slot clone
 ] unit-test
 
 { t } [
-    [ { POSTPONE: f } declare <displaced-alien> ] final-classes
-    first \ f alien class-or class=
+    [ { false } declare <displaced-alien> ] final-classes
+    first false alien class-or class=
 ] unit-test
 
 { V{ alien } } [
@@ -1152,7 +1152,7 @@ TUPLE: inline-please a ;
 GENERIC: derp ( obj -- obj' )
 
 M: integer derp 5 + ;
-M: f derp drop t ;
+M: false derp drop t ;
 
 { t }
 [

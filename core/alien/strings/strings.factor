@@ -16,7 +16,7 @@ M: c-ptr alien>string
 M: object alien>string
     [ underlying>> ] dip alien>string ;
 
-M: f alien>string
+M: false alien>string
     drop ;
 
 ERROR: invalid-c-string string ;

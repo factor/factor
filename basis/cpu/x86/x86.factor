@@ -65,7 +65,7 @@ M: x86 %load-immediate
 
 M: x86 %load-reference
     [ swap 0 MOV rc-absolute-cell rel-literal ]
-    [ \ f type-number MOV ]
+    [ false type-number MOV ]
     if* ;
 
 HOOK: ds-reg cpu ( -- reg )
@@ -85,7 +85,7 @@ M: x86 %replace loc>operand swap MOV ;
 M: x86 %replace-imm
     loc>operand swap
     {
-        { [ dup not ] [ drop \ f type-number MOV ] }
+        { [ dup not ] [ drop false type-number MOV ] }
         { [ dup fixnum? ] [ tag-fixnum MOV ] }
         [ [ 0 MOV ] dip rc-absolute rel-literal ]
     } cond ;
@@ -202,7 +202,7 @@ M:: x86 %unbox-any-c-ptr ( dst src -- )
     <label> :> end
     dst dst XOR
     ! Is the object f?
-    src \ f type-number CMP
+    src false type-number CMP
     end JE
     ! Compute tag in dst register
     dst src MOV
@@ -220,18 +220,18 @@ M:: x86 %unbox-any-c-ptr ( dst src -- )
 
 M:: x86 %box-alien ( dst src temp -- )
     <label> :> end
-    dst \ f type-number MOV
+    dst false type-number MOV
     src src TEST
     end JE
     dst 5 cells alien temp %allot
-    dst 1 alien@ \ f type-number MOV ! base
-    dst 2 alien@ \ f type-number MOV ! expired
+    dst 1 alien@ false type-number MOV ! base
+    dst 2 alien@ false type-number MOV ! expired
     dst 3 alien@ src MOV ! displacement
     dst 4 alien@ src MOV ! address
     end resolve-label ;
 
 :: %box-displaced-alien/f ( dst displacement -- )
-    dst 1 alien@ \ f type-number MOV
+    dst 1 alien@ false type-number MOV
     dst 3 alien@ displacement MOV
     dst 4 alien@ displacement MOV ;
 
@@ -268,7 +268,7 @@ M:: x86 %box-alien ( dst src temp -- )
     temp tag-mask get AND
 
     ! Is base f?
-    temp \ f type-number CMP
+    temp false type-number CMP
     not-f JNE
 
     ! Yes, it is f. Fill in new object
@@ -305,11 +305,11 @@ M:: x86 %box-displaced-alien ( dst displacement base temp base-class -- )
     dst 5 cells alien temp %allot
 
     ! Set expired to f
-    dst 2 alien@ \ f type-number MOV
+    dst 2 alien@ false type-number MOV
 
     dst displacement base temp
     {
-        { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+        { [ base-class false class<= ] [ 2drop %box-displaced-alien/f ] }
         { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
         { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
         [ end %box-displaced-alien/dynamic ]
@@ -525,7 +525,7 @@ M: x86 %prologue cell - decr-stack-reg ;
 M: x86 %epilogue cell - incr-stack-reg ;
 
 :: (%boolean) ( dst temp insn -- )
-    dst \ f type-number MOV
+    dst false type-number MOV
     temp 0 MOV \ t rc-absolute-cell rel-literal
     dst temp insn execute ; inline
 
@@ -561,7 +561,7 @@ M:: x86 %test-imm ( dst src1 src2 cc temp -- )
 : (%compare-imm) ( src1 src2 -- )
     {
         { [ dup fixnum? ] [ tag-fixnum CMP ] }
-        { [ dup not ] [ drop \ f type-number CMP ] }
+        { [ dup not ] [ drop false type-number CMP ] }
         [ (%compare-tagged) ]
     } cond ;
 

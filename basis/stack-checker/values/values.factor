@@ -121,11 +121,11 @@ M: declared-effect (literal-value?) known>> (literal-value?) ;
 M: declared-effect (literal) known>> (literal) ;
 
 ! Computed values
-M: f (input-value?) drop f ;
+M: false (input-value?) drop f ;
 
-M: f (literal-value?) drop f ;
+M: false (literal-value?) drop f ;
 
-M: f (literal) current-word get bad-macro-input ;
+M: false (literal) current-word get bad-macro-input ;
 
 GENERIC: known>callable ( known -- quot )
 

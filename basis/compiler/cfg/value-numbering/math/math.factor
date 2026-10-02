@@ -17,7 +17,7 @@ IN: compiler.cfg.value-numbering.math
 M: ##tagged>integer rewrite
     [ dst>> ] [ src>> vreg>insn ] bi {
         { [ dup ##load-integer? ] [ val>> tag-fixnum ##load-integer new-insn ] }
-        { [ dup f-insn? ] [ drop \ f type-number ##load-integer new-insn ] }
+        { [ dup f-insn? ] [ drop false type-number ##load-integer new-insn ] }
         [ 2drop f ]
     } cond ;
 

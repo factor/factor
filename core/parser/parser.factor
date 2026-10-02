@@ -108,7 +108,7 @@ ERROR: staging-violation word ;
 ERROR: classoid-expected object ;
 
 : scan-class ( -- class )
-    scan-object \ f or
+    scan-object
     dup classoid? [ classoid-expected ] unless ;
 
 : (parse-until) ( accum end -- accum )
@@ -129,7 +129,7 @@ SYMBOL: quotation-parser
 
 HOOK: parse-quotation quotation-parser ( -- quot )
 
-M: f parse-quotation \ ] parse-until >quotation ;
+M: false parse-quotation \ ] parse-until >quotation ;
 
 : (parse-lines) ( lexer -- quot )
     [ f parse-until >quotation ] with-lexer ;

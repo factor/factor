@@ -106,7 +106,7 @@ CONSULT: slot-protocol-test-5 slot-protocol-test-4 x>> ;
 
 GENERIC: do-me ( x -- )
 
-M: f do-me drop ;
+M: false do-me drop ;
 
 { } [ f do-me ] unit-test
 

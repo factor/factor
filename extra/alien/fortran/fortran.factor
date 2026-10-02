@@ -114,7 +114,7 @@ MACRO: size-case-type ( cases -- quot )
 
 GENERIC: (fortran-type>c-type) ( type -- c-type )
 
-M: f (fortran-type>c-type) drop c:void ;
+M: false (fortran-type>c-type) drop c:void ;
 
 M: integer-type (fortran-type>c-type)
     {
@@ -184,7 +184,7 @@ M: character-type added-c-args fix-character-type single-char? [ { } ] [ { c:lon
 
 GENERIC: returns-by-value? ( type -- ? )
 
-M: f returns-by-value? drop t ;
+M: false returns-by-value? drop t ;
 M: fortran-type returns-by-value? drop f ;
 M: number-type returns-by-value? dims>> not ;
 M: character-type returns-by-value? fix-character-type single-char? ;
@@ -193,7 +193,7 @@ M: complex-type returns-by-value?
 
 GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 
-M: f (fortran-ret-type>c-type) drop c:void ;
+M: false (fortran-ret-type>c-type) drop c:void ;
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
 M: real-type (fortran-ret-type>c-type)
     drop real-functions-return-double? [ c:double ] [ c:float ] if ;

@@ -91,7 +91,7 @@ GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;
 M: array >label <label> ;
 M: object >label ;
-M: f >label drop <gadget> ;
+M: false >label drop <gadget> ;
 
 <PRIVATE
 

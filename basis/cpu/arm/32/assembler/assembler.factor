@@ -44,7 +44,7 @@ ALIAS: SP R13 ALIAS: LR R14 ALIAS: PC R15
 
 GENERIC: register ( register -- n )
 M: word register "register" word-prop ;
-M: f register drop 0 ;
+M: false register drop 0 ;
 
 PREDICATE: register-class < word register >boolean ;
 

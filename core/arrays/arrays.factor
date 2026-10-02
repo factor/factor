@@ -18,7 +18,7 @@ M: array equal? over array? [ sequence= ] [ 2drop f ] if ;
 M: array <=> over array? [ sequence<=> ] [ sequence<=> ] if ;
 M: array hashcode* [ sequence-hashcode ] recursive-hashcode ;
 M: object new-sequence drop 0 <array> ; inline
-M: f new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
+M: false new-sequence drop [ f ] [ 0 <array> ] if-zero ; inline
 
 INSTANCE: array sequence
 

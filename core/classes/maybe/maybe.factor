@@ -15,7 +15,7 @@ M: maybe instance?
     over [ class>> instance? ] [ 2drop t ] if ;
 
 : maybe-class-or ( maybe -- classoid )
-    class>> \ f class-or ;
+    class>> false class-or ;
 
 M: maybe normalize-class
     maybe-class-or ;

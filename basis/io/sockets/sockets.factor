@@ -52,7 +52,7 @@ M: object make-sockaddr-outgoing make-sockaddr ;
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
-M: f parse-sockaddr nip ;
+M: false parse-sockaddr nip ;
 
 HOOK: sockaddr-of-family os ( alien af -- sockaddr )
 
@@ -437,7 +437,7 @@ M: inet6 resolve-host 1array ;
 
 M: local resolve-host 1array ;
 
-M: f resolve-host
+M: false resolve-host
     drop resolve-localhost ;
 
 M: object resolve-localhost

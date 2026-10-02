@@ -7,7 +7,7 @@ IN: concurrency.conditions
 ! Keep one deadline across predicate rechecks and unrelated wakeups.
 TUPLE: deadline nanos ;
 GENERIC: >deadline ( timeout -- deadline/f )
-M: f >deadline ;
+M: false >deadline ;
 M: deadline >deadline ;
 M: real >deadline nano-count + deadline boa ;
 M: duration >deadline duration>nanoseconds >deadline ;

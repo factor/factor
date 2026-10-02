@@ -67,6 +67,16 @@ unit-test
 { "Hello" } [ "! This calls until-eol.\n\"Hello\"" eval( -- string ) ] unit-test
 
 { word } [ \ f class-of ] unit-test
+{ false } [ "USE: kernel false" eval( -- class ) ] unit-test
+{ { f false } } [ "USE: kernel { f false }" eval( -- array ) ] unit-test
+{ true } [ "USE: kernel true" eval( -- class ) ] unit-test
+{ { t true } } [ "USE: kernel { t true }" eval( -- array ) ] unit-test
+
+[ "IN: parser.tests GENERIC: false-literal-method ( x -- x ) M: f false-literal-method ;" eval( -- ) ]
+[ error>> classoid-expected? ] must-fail-with
+
+[ "IN: parser.tests GENERIC: true-literal-method ( x -- x ) M: t true-literal-method ;" eval( -- ) ]
+[ error>> classoid-expected? ] must-fail-with
 
 ! Test stack effect parsing
 
@@ -373,7 +383,7 @@ DEFER: foo
     ] unit-test
 
     [ ] [
-        "IN: parser.tests M: f foo ;"
+        "IN: parser.tests USE: kernel M: false foo ;"
         <string-reader> "redefining-a-class-6" parse-stream drop
     ] unit-test
 

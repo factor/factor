@@ -81,7 +81,7 @@ INSTANCE: union-with-one-member mixin-with-one-member
 
 { f } [ growable assoc class-and tuple class<= ] unit-test
 
-{ t } [ object \ f \ f class-not class-or class<= ] unit-test
+{ t } [ object false false class-not class-or class<= ] unit-test
 
 { t } [ fixnum class-not integer class-and bignum class= ] unit-test
 
@@ -105,16 +105,16 @@ INSTANCE: union-with-one-member mixin-with-one-member
 
 { t } [ object empty-intersection class<= ] unit-test
 { t } [ empty-intersection object class<= ] unit-test
-{ t } [ \ f class-not empty-intersection class<= ] unit-test
-{ f } [ empty-intersection \ f class-not class<= ] unit-test
+{ t } [ false class-not empty-intersection class<= ] unit-test
+{ f } [ empty-intersection false class-not class<= ] unit-test
 { t } [ \ number empty-intersection class<= ] unit-test
 { t } [ empty-intersection class-not null class<= ] unit-test
 { t } [ null empty-intersection class-not class<= ] unit-test
 
-{ t } [ \ f class-not \ f class-or empty-intersection class<= ] unit-test
-{ t } [ empty-intersection \ f class-not \ f class-or class<= ] unit-test
+{ t } [ false class-not false class-or empty-intersection class<= ] unit-test
+{ t } [ empty-intersection false class-not false class-or class<= ] unit-test
 
-{ t } [ object \ f class-not \ f class-or class<= ] unit-test
+{ t } [ object false class-not false class-or class<= ] unit-test
 
 { t } [
     fixnum class-not
@@ -158,7 +158,7 @@ MIXIN: empty-mixin
 { t } [ number    object   number class-and* ] unit-test
 { t } [ object    number   number class-and* ] unit-test
 { t } [ slice     reversed null   class-and* ] unit-test
-{ t } [ \ f class-not \ f      null   class-and* ] unit-test
+{ t } [ false class-not false      null   class-and* ] unit-test
 
 { t } [ vector array class-not vector class-and* ] unit-test
 
@@ -168,7 +168,7 @@ MIXIN: empty-mixin
 ! class-or
 : class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
 
-{ t } [ \ f class-not \ f      object class-or*  ] unit-test
+{ t } [ false class-not false      object class-or*  ] unit-test
 
 { object } [ object empty-mixin class-not class-or ] unit-test
 { object } [ empty-mixin class-not object class-or ] unit-test

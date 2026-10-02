@@ -136,7 +136,7 @@ M: ppc.64 %load-immediate
 
 M: ppc %load-reference
     [ [ 0 %load-cell-imm ] [ %load-cell-imm-rc rel-literal ] bi* ]
-    [ \ f type-number LI ]
+    [ false type-number LI ]
     if* ;
 
 M:: ppc %load-float ( dst val -- )
@@ -169,7 +169,7 @@ M:: ppc %replace-imm ( src loc -- )
     loc n>> cells neg :> offset
     src {
         { [ dup not ] [
-            drop scratch-reg \ f type-number LI ] }
+            drop scratch-reg false type-number LI ] }
         { [ dup fixnum? ] [
             [ scratch-reg ] dip tag-fixnum LI ] }
         [ scratch-reg 0 LI rc-absolute rel-literal ]
@@ -517,7 +517,7 @@ M:: ppc %unbox-any-c-ptr ( dst src -- )
     <label> :> end
     ! Is the object f?
     dst 0 LI
-    0 src \ f type-number %compare-cell-imm
+    0 src false type-number %compare-cell-imm
     0 end BEQ
 
     ! Is the object an alien?
@@ -550,13 +550,13 @@ M:: ppc %box-alien ( dst src temp -- )
     <label> :> f-label
 
     ! Is the object f?
-    dst \ f type-number LI
+    dst false type-number LI
     0 src 0 %compare-cell-imm
     0 f-label BEQ
 
     ! Allocate and initialize an alien object.
     dst 5 cells alien temp %allot
-    temp \ f type-number LI
+    temp false type-number LI
     scratch-reg dst %clear-tag-bits
     temp scratch-reg 1 cells %store-cell
     temp scratch-reg 2 cells %store-cell
@@ -621,7 +621,7 @@ M:: ppc %box-alien ( dst src temp -- )
     <label> :> not-alien
 
     ! Is base f?
-    0 base \ f type-number %compare-cell-imm
+    0 base false type-number %compare-cell-imm
     0 not-f BNE
     dst displacement base box-displaced-alien/f
     end B
@@ -665,13 +665,13 @@ M:: ppc %box-displaced-alien ( dst displacement base temp base-class -- )
     dst 5 cells alien temp %allot
 
     ! Set expired to f
-    temp \ f type-number %load-immediate
+    temp false type-number %load-immediate
     scratch-reg 2 alien@ LI
     temp dst scratch-reg %store-cell-x
 
     dst displacement base temp
     {
-        { [ base-class \ f class<= ] [ drop box-displaced-alien/f ] }
+        { [ base-class false class<= ] [ drop box-displaced-alien/f ] }
         { [ base-class \ alien class<= ] [ box-displaced-alien/alien ] }
         { [ base-class \ byte-array class<= ] [ box-displaced-alien/byte-array ] }
         [ end box-displaced-alien/dynamic ]
@@ -932,7 +932,7 @@ M:: ppc %epilogue ( stack-size -- )
 
 :: (%boolean) ( dst temp branch1 branch2 -- )
     "end" define-label
-    dst \ f type-number %load-immediate
+    dst false type-number %load-immediate
     0 "end" get branch1 execute( n addr -- )
     branch2 [ 0 "end" get branch2 execute( n addr -- ) ] when
     dst \ t %load-reference
@@ -954,7 +954,7 @@ M:: ppc %epilogue ( stack-size -- )
     [ 0 ] 2dip %compare-cell-imm ; inline
 
 : (%compare-imm) ( src1 src2 -- )
-    [ tag-fixnum ] [ \ f type-number ] if* (%compare-integer-imm) ; inline
+    [ tag-fixnum ] [ false type-number ] if* (%compare-integer-imm) ; inline
 
 : (%compare-float-unordered) ( src1 src2 -- )
     [ 0 ] 2dip FCMPU ; inline

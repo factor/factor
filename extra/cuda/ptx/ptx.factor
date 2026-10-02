@@ -378,7 +378,7 @@ GENERIC: (write-ptx-element) ( elt -- )
 : write-ptx-symbol ( symbol/f -- )
     [ name>> write ] when* ;
 
-M: f (write-ptx-element)
+M: false (write-ptx-element)
     drop ;
 
 M: word (write-ptx-element)

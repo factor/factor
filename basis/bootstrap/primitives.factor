@@ -3,7 +3,7 @@
 USING: arrays assocs bootstrap.image.primitives
 bootstrap.image.private classes classes.builtin
 classes.intersection classes.predicate classes.private
-classes.singleton classes.tuple classes.tuple.private
+classes.tuple classes.tuple.private
 classes.union combinators compiler.units io kernel
 kernel.private layouts make math math.private memoize namespaces
 parser quotations sequences slots source-files splitting vocabs
@@ -138,6 +138,7 @@ call( -- ) ! syntax-quot
     { "byte-array" "byte-arrays" }
     { "callstack" "kernel" }
     { "dll" "alien" }
+    { "false" "kernel" }
     { "fixnum" "math" }
     { "float" "math" }
     { "quotation" "quotations" }
@@ -147,20 +148,17 @@ call( -- ) ! syntax-quot
     { "wrapper" "kernel" }
 } [ create-word register-builtin ] assoc-each
 
-"f" "syntax" lookup-word register-builtin
-
 ! We need this before defining c-ptr below
-"f" "syntax" lookup-word { } define-builtin
+"false" "kernel" lookup-word { } define-builtin
 
-"f" "syntax" create-word [ not ] "predicate" set-word-prop
-"f?" "syntax" vocab-words-assoc delete-at
-
-"t" "syntax" lookup-word define-singleton-class
+"true" "kernel" create-word
+"word" "words" lookup-word
+[ t eq? ] define-predicate-class
 
 ! Some unions
 "c-ptr" "alien" create-word [
     "alien" "alien" lookup-word ,
-    "f" "syntax" lookup-word ,
+    "false" "kernel" lookup-word ,
     "byte-array" "byte-arrays" lookup-word ,
 ] { } make define-union-class
 

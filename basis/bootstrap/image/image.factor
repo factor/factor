@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.accessors arrays assocs byte-arrays classes
-classes.builtin classes.private classes.tuple
+USING: accessors alien.accessors arrays assocs bootstrap.compat
+byte-arrays classes classes.builtin classes.private classes.tuple
 classes.tuple.private combinators combinators.short-circuit
 combinators.smart command-line compiler.codegen.relocation
 compiler.units endian endian.private generic generic.single.private
@@ -261,7 +261,7 @@ M: float prepare-object
 ! Special objects
 
 ! Padded with fixnums for 8-byte alignment
-M: f prepare-object drop \ f type-number ;
+M: false prepare-object drop false type-number ;
 
 ! Words
 

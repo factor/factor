@@ -10,8 +10,8 @@ IN: core-foundation.utilities
 GENERIC: (>cf) ( obj -- cf )
 
 M: number (>cf) <CFNumber> ;
-M: t (>cf) <CFNumber> ;
-M: f (>cf) <CFNumber> ;
+M: true (>cf) <CFNumber> ;
+M: false (>cf) <CFNumber> ;
 M: string (>cf) <CFString> ;
 M: byte-array (>cf) <CFData> ;
 M: hashtable (>cf) [ [ (>cf) &CFRelease ] bi@ ] assoc-map <CFDictionary> ;

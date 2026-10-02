@@ -89,16 +89,16 @@ PRIVATE>
     members [ word? ] filter ;
 
 ! Non-optimizing compiler
-M: f update-call-sites
+M: false update-call-sites
     2drop { } ;
 
-M: f to-recompile
+M: false to-recompile
     changed-definitions get filter-word-defs ;
 
-M: f recompile
+M: false recompile
     [ def>> ] zip-with ;
 
-M: f process-forgotten-words drop ;
+M: false process-forgotten-words drop ;
 
 : without-optimizer ( quot -- )
     [ f compiler-impl ] dip with-variable ; inline

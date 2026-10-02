@@ -115,7 +115,7 @@ VARIANT: non-color-attachment-ref
 UNION: attachment-ref
     color-attachment-ref
     non-color-attachment-ref
-    POSTPONE: f ;
+    false ;
 
 TUPLE: framebuffer-rect
     { framebuffer any-framebuffer read-only initial: system-framebuffer }

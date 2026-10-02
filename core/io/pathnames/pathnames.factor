@@ -182,7 +182,7 @@ M: string absolute-path
 M: object normalize-path
     absolute-path ;
 
-M: f absolute-path ;
+M: false absolute-path ;
 
 : root-path* ( path -- path' )
     dup absolute-path? [

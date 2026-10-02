@@ -106,9 +106,9 @@ GENERIC: write-cbor ( obj -- )
 
 <PRIVATE
 
-M: f write-cbor drop 0xf4 write1 ;
+M: false write-cbor drop 0xf4 write1 ;
 
-M: t write-cbor drop 0xf5 write1 ;
+M: true write-cbor drop 0xf5 write1 ;
 
 M: +cbor-nil+ write-cbor drop 0xf6 write1 ;
 

@@ -67,7 +67,7 @@ PRIVATE>
 
 GENERIC: >post-data ( object -- post-data )
 
-M: f >post-data ;
+M: false >post-data ;
 
 M: post-data >post-data ;
 

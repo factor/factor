@@ -187,7 +187,7 @@ M: hashtable hashcode*
 ! Default method
 M: assoc new-assoc drop <hashtable> ; inline
 
-M: f new-assoc drop <hashtable> ; inline
+M: false new-assoc drop <hashtable> ; inline
 
 : >hashtable ( assoc -- hashtable )
     [ >alist ] [ assoc-size <hashtable> ] bi [ (rehash) ] keep ;

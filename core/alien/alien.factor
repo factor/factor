@@ -20,7 +20,7 @@ PRIVATE>
 
 PREDICATE: pinned-alien < alien underlying>> not ;
 
-UNION: pinned-c-ptr pinned-alien POSTPONE: f ;
+UNION: pinned-c-ptr pinned-alien false ;
 
 GENERIC: element-size ( seq -- n ) flushable
 
@@ -30,7 +30,7 @@ M: byte-vector element-size drop 1 ; inline
 
 M: slice element-size seq>> element-size ; inline
 
-M: f element-size drop 1 ; inline
+M: false element-size drop 1 ; inline
 
 GENERIC: byte-length ( obj -- n ) flushable
 
@@ -55,7 +55,7 @@ GENERIC: expired? ( c-ptr -- ? ) flushable
 
 M: alien expired? expired>> ;
 
-M: f expired? drop t ;
+M: false expired? drop t ;
 
 : <alien> ( address -- alien )
     f <displaced-alien> { pinned-c-ptr } declare ; inline

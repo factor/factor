@@ -411,7 +411,7 @@ M: pack sloppy-pick-up*
 M: gadget sloppy-pick-up*
     children>> [ contains-point? ] with find-last drop ;
 
-M: f sloppy-pick-up*
+M: false sloppy-pick-up*
     2drop f ;
 
 : wet-and-sloppy ( loc gadget n -- newloc newgadget )

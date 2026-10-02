@@ -11,7 +11,7 @@ IN: multi-methods
 
 ! PART I: Converting hook specializers
 : canonicalize-specializer-0 ( specializer -- specializer' )
-    [ \ f or ] map ;
+    [ false or ] map ;
 
 SYMBOL: args
 
@@ -192,7 +192,7 @@ M: method-body crossref?
     ] if ;
 
 : niceify-method ( seq -- seq )
-    [ dup \ f eq? [ drop f ] when ] map ;
+    [ dup false eq? [ drop f ] when ] map ;
 
 M: no-method error.
     "Type check error" print

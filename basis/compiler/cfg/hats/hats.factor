@@ -56,7 +56,7 @@ insn-classes get [
 
 : ^^unbox-c-ptr ( src class -- dst )
     {
-        { [ dup \ f class<= ] [ drop ^^unbox-f ] }
+        { [ dup false class<= ] [ drop ^^unbox-f ] }
         { [ dup alien class<= ] [ drop ^^unbox-alien ] }
         { [ dup byte-array class<= ] [ drop ^^unbox-byte-array ] }
         [ drop ^^unbox-any-c-ptr ]

@@ -250,7 +250,7 @@ M: predicate-engine compile-engine
 
 M: word compile-engine ;
 
-M: f compile-engine ;
+M: false compile-engine ;
 
 : build-decision-tree ( generic -- methods )
     [ "engines" word-prop forget-all ]

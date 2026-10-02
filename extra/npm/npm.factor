@@ -28,7 +28,7 @@ M: string deps get-npm-json deps ;
 GENERIC: dev-deps ( obj -- seq )
 M: hashtable dev-deps "devDependencies" of { } or ;
 M: string dev-deps get-npm-json dev-deps ;
-M: f dev-deps drop { } ;
+M: false dev-deps drop { } ;
 
 : npm-versions ( name -- version ) get-npm-json "versions" of ;
 : npm-time ( name -- version ) get-npm-json "time" of ;

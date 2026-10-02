@@ -337,7 +337,7 @@ generic-comparison-ops [
 ] each
 
 \ alien-cell [
-    2drop alien \ f class-or <class-info>
+    2drop alien false class-or <class-info>
 ] "outputs" set-word-prop
 
 \ <displaced-alien> [

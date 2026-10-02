@@ -19,7 +19,7 @@ TUPLE: self-pointer { next maybe{ self-pointer } } ;
 { T{ self-pointer { next T{ self-pointer } } } }
 [ self-pointer new self-pointer new >>next ] unit-test
 
-{ t } [ f maybe{ POSTPONE: f } instance? ] unit-test
+{ t } [ f maybe{ false } instance? ] unit-test
 
 PREDICATE: natural < maybe{ integer }
     0 > ;
@@ -32,7 +32,7 @@ PREDICATE: natural < maybe{ integer }
 { t } [ 3 maybe{ maybe{ integer } } instance? ] unit-test
 { f } [ 3.03 maybe{ maybe{ integer } } instance? ] unit-test
 
-INTERSECTION: only-f maybe{ integer } POSTPONE: f ;
+INTERSECTION: only-f maybe{ integer } false ;
 
 { t } [ f only-f instance? ] unit-test
 { f } [ t only-f instance? ] unit-test
@@ -56,7 +56,7 @@ M: maybe{ foo } lol drop "lol" ;
 TUPLE: foo2 a ;
 GENERIC: lol2 ( obj -- string )
 M: maybe{ foo } lol2 drop "lol2" ;
-M: f lol2 drop "lol22" ;
+M: false lol2 drop "lol22" ;
 
 { "lol2" } [ foo new lol2 ] unit-test
 { "lol22" } [ f lol2 ] unit-test

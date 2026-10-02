@@ -2202,7 +2202,7 @@ cell 8 = [
 {
     {
         T{ ##load-reference f 1 f }
-        T{ ##load-integer f 2 $[ \ f type-number ] }
+        T{ ##load-integer f 2 $[ false type-number ] }
         T{ ##copy f 3 2 any-rep }
     }
 } [

@@ -45,7 +45,7 @@ IN: pdf.layout
 
 GENERIC: pdf-render ( canvas obj -- remain/f )
 
-M: f pdf-render 2drop f ;
+M: false pdf-render 2drop f ;
 
 GENERIC: pdf-width ( canvas obj -- n )
 

@@ -7,7 +7,6 @@ $nl
 "When it comes to predicates, the exceptional classes are:"
 { $table
     { "Class" "Predicate" "Explanation" }
-    { { $link f } { $snippet "[ not ]" } { "The conventional name for a word which outputs true when given false is " { $link not } "; " { $snippet "f?" } " would be confusing." } }
     { { $link object } { $snippet "[ drop t ]" } { "All objects are instances of " { $link object } } }
     { { $link null } { $snippet "[ drop f ]" } { "No object is an instance of " { $link null } } }
 }
@@ -122,8 +121,8 @@ HELP: superclass-of
 { $values { "class" class } { "super" class } }
 { $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
 { $examples
-    { $example "USING: classes prettyprint ;"
-               "t superclass-of ."
+    { $example "USING: classes kernel prettyprint ;"
+               "true superclass-of ."
                "word"
     }
 } ;
@@ -134,9 +133,9 @@ HELP: superclasses-of
     { "supers" sequence } }
 { $description "Outputs a sequence of superclasses of a class along with the class itself." }
 { $examples
-    { $example "USING: classes prettyprint ;"
-               "t superclasses-of ."
-               "{ word t }"
+    { $example "USING: classes kernel prettyprint ;"
+               "true superclasses-of ."
+               "{ word true }"
     }
 } ;
 

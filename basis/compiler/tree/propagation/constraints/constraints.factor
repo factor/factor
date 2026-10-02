@@ -10,7 +10,7 @@ SYMBOL: constraints
 GENERIC: assume* ( constraint -- )
 GENERIC: satisfied? ( constraint -- ? )
 
-M: f assume* drop ;
+M: false assume* drop ;
 
 M: object satisfied? drop f ;
 
@@ -24,7 +24,7 @@ TUPLE: true-constraint value ;
     constraints get assoc-stack [ assume ] when* ;
 
 M: true-constraint assume*
-    [ \ f class-not <class-info> swap value>> refine-value-info ]
+    [ false class-not <class-info> swap value>> refine-value-info ]
     [ follow-implications ]
     bi ;
 
@@ -37,7 +37,7 @@ TUPLE: false-constraint value ;
 : =f ( value -- constraint ) resolve-copy false-constraint boa ;
 
 M: false-constraint assume*
-    [ \ f <class-info> swap value>> refine-value-info ]
+    [ false <class-info> swap value>> refine-value-info ]
     [ follow-implications ]
     bi ;
 

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math kernel.private classes
+USING: help.markup help.syntax math kernel kernel.private classes
 classes.builtin ;
 IN: layouts
 
@@ -84,7 +84,7 @@ ARTICLE: "layouts-types" "Type numbers"
 { $see-also "builtin-classes" } ;
 
 ARTICLE: "layouts-tags" "Tagged pointers"
-"Every pointer stored on the stack or in the heap has a " { $emphasis "tag" } ", which is a small integer identifying the type of the pointer. If the tag is not equal to one of the two special tags, the remaining bits contain the memory address of a heap-allocated object. The two special tags are the " { $link fixnum } " tag and the " { $link f } " tag."
+"Every pointer stored on the stack or in the heap has a " { $emphasis "tag" } ", which is a small integer identifying the type of the pointer. If the tag is not equal to one of the two special tags, the remaining bits contain the memory address of a heap-allocated object. The two special tags are the " { $link fixnum } " tag and the " { $link false } " tag."
 $nl
 "Words for working with tagged pointers:"
 { $subsections

@@ -137,7 +137,7 @@ IN: compiler.cfg.builder.tests
 {
     byte-array
     alien
-    POSTPONE: f
+    false
 } [| class |
     {
         alien-signed-1

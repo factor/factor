@@ -14,7 +14,7 @@ quotations strings words ;
 !   vm/layouts.hpp
 H{
     { fixnum 0 }
-    { POSTPONE: f 1 }
+    { false 1 }
     { array 2 }
     { float 3 }
     { quotation 4 }

@@ -8,9 +8,9 @@ math.intervals namespaces sequences sequences.private strings
 words ;
 IN: compiler.tree.propagation.info
 
-: false-class? ( class -- ? ) \ f class<= ;
+: false-class? ( class -- ? ) false class<= ;
 
-: true-class? ( class -- ? ) \ f class-not class<= ;
+: true-class? ( class -- ? ) false class-not class<= ;
 
 : null-class? ( class -- ? ) null class<= ;
 
@@ -58,11 +58,13 @@ DEFER: <literal-info>
 UNION: fixed-length array byte-array string ;
 
 : literal-class ( obj -- class )
-    dup singleton-class? [
-        class-of dup class? [
-            drop tuple
+    dup t eq? [ drop true ] [
+        dup singleton-class? [
+            class-of dup class? [
+                drop tuple
+            ] unless
         ] unless
-    ] unless ;
+    ] if ;
 
 : (slots-with-length) ( length class -- slots )
     "slots" word-prop length 1 - f <array> swap prefix ;

@@ -38,7 +38,7 @@ ERROR: malformed-port string ;
 
 GENERIC: >url ( obj -- url )
 
-M: f >url drop <url> ;
+M: false >url drop <url> ;
 
 M: url >url ;
 

@@ -41,7 +41,7 @@ HOOK: editor-command editor-class ( file line -- command )
         [ unclip-last [ [ write-pprint ] each ] [ print-pprint ] bi* ] if
     ] unless-empty ; inline
 
-M: f editor-command
+M: false editor-command
     "Select an editor" editor-restarts throw-restarts
     [ set-editor ]
     [

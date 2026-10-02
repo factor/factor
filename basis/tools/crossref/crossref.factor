@@ -136,7 +136,7 @@ M: object smart-usage usage [ irrelevant? ] reject ;
 
 M: method smart-usage "method-generic" word-prop smart-usage ;
 
-M: f smart-usage drop \ f smart-usage ;
+M: false smart-usage drop \ f smart-usage ;
 
 : synopsis-alist ( definitions -- alist )
     [ [ synopsis ] keep ] map>alist ;

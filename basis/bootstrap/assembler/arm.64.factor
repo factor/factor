@@ -48,7 +48,7 @@ big-endian off
 
 [
     ds-0 DS -8 [post] LDR
-    ds-0 \ f type-number CMP
+    ds-0 false type-number CMP
     [ BEQ ] [
         0 B f rc-relative-arm-b rel-word
     ] jit-conditional*
@@ -285,7 +285,7 @@ CALLBACK-STUB special-objects get set-at
 
 : jit-compare ( cond -- )
     t temp1 (LDR=) rel-literal
-    temp2 \ f type-number MOV
+    temp2 false type-number MOV
     ds-1 ds-0 DS -8 [pre] LDP
     ds-1 ds-0 CMP
     [ ds-0 temp1 temp2 ] dip CSEL
@@ -510,7 +510,7 @@ CALLBACK-STUB special-objects get set-at
         ds-0 dup ds-1 ORR
         ds-0 tag-mask get TST
         temp1 1 tag-fixnum MOV
-        temp2 \ f type-number MOV
+        temp2 false type-number MOV
         ds-0 temp1 temp2 EQ CSEL
         ds-0 DS [] STR
     ] }

@@ -45,7 +45,7 @@ SYMBOL: forgotten-definitions
 : forget ( defspec -- )
     [ forgotten-definition ] [ forget* ] bi ;
 
-M: f forget* drop ;
+M: false forget* drop ;
 
 M: wrapper forget* wrapped>> forget ;
 

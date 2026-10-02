@@ -79,7 +79,7 @@ M: rule match-position drop position get ;
 
 GENERIC: text-matches? ( string text -- match-count/f )
 
-M: f text-matches?
+M: false text-matches?
     2drop f ;
 
 M: string-matcher text-matches?

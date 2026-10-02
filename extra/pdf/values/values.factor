@@ -27,9 +27,9 @@ GENERIC: pdf-value ( obj -- str )
 
 M: number pdf-value number>string ;
 
-M: t pdf-value drop "true" ;
+M: true pdf-value drop "true" ;
 
-M: f pdf-value drop "false" ;
+M: false pdf-value drop "false" ;
 
 M: color pdf-value
     >rgba-components drop "%f %f %f" sprintf ;

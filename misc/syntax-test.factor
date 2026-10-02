@@ -160,7 +160,7 @@ PRIVATE>
 
 { ALIEN: 1234 } [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
 { ALIEN: 1234 } [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
-{ f } [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
+{ f } [ f [ { false } declare void* <ref> ] compile-call void* deref ] unit-test
 
 ! Symbols and literals
 

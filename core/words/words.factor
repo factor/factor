@@ -271,3 +271,11 @@ M: word hashcode*
 M: word literalize <wrapper> ;
 
 INSTANCE: word definition-mixin
+
+! Define the true class after word to avoid a kernel/words bootstrap cycle.
+USE: words
+IN: kernel
+
+PREDICATE: true < word t eq? ;
+
+true t "initial-value" set-word-prop

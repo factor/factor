@@ -333,7 +333,7 @@ M: version-control-merge-conflict summary
 
 GENERIC: expected>string ( obj -- str )
 
-M: f expected>string drop "end of input" ;
+M: false expected>string drop "end of input" ;
 M: word expected>string name>> ;
 M: string expected>string ;
 

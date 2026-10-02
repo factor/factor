@@ -41,10 +41,10 @@ M: integer <CFNumber>
 M: float <CFNumber>
     [ f kCFNumberDoubleType ] dip double <ref> CFNumberCreate ;
 
-M: t <CFNumber>
+M: true <CFNumber>
     drop f kCFNumberIntType 1 int <ref> CFNumberCreate ;
 
-M: f <CFNumber>
+M: false <CFNumber>
     drop f kCFNumberIntType 0 int <ref> CFNumberCreate ;
 
 ERROR: unsupported-number-type type ;

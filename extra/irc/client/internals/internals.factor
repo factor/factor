@@ -124,7 +124,7 @@ M: irc-message handle-outgoing-irc irc-message>string irc-print t ;
 
 GENERIC: handle-input ( line/f -- ? )
 M: string handle-input string>irc-message handle-reader-message t ;
-M: f      handle-input handle-disconnect ;
+M: false      handle-input handle-disconnect ;
 
 : (reader-loop) ( -- ? )
     stream> [ |dispose stream-readln handle-input ] with-destructors ;

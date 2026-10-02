@@ -252,14 +252,14 @@ M: output-stream stream-nl CHAR: \n swap stream-write1 ; inline
 M: output-stream stream-seekable? drop f ; inline
 M: output-stream stream-length drop f ; inline
 
-M: f stream-read1 drop f ; inline
-M: f stream-read-unsafe 3drop 0 ; inline
-M: f stream-read-until 2drop f f ; inline
-M: f stream-read-partial-unsafe 3drop 0 ; inline
-M: f stream-readln drop f ; inline
-M: f stream-contents* drop f ; inline
+M: false stream-read1 drop f ; inline
+M: false stream-read-unsafe 3drop 0 ; inline
+M: false stream-read-until 2drop f f ; inline
+M: false stream-read-partial-unsafe 3drop 0 ; inline
+M: false stream-readln drop f ; inline
+M: false stream-contents* drop f ; inline
 
-M: f stream-write1 2drop ; inline
-M: f stream-write 2drop ; inline
-M: f stream-flush drop ; inline
-M: f stream-nl drop ; inline
+M: false stream-write1 2drop ; inline
+M: false stream-write 2drop ; inline
+M: false stream-flush drop ; inline
+M: false stream-nl drop ; inline

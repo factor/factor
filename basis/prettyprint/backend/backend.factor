@@ -52,7 +52,7 @@ GENERIC: pprint-class ( obj -- )
 
 M: classoid pprint-class pprint* ;
 
-M: class pprint-class \ f or pprint-word ;
+M: class pprint-class pprint-word ;
 
 M: word pprint-class pprint-word ;
 
@@ -104,7 +104,7 @@ M: float pprint*
         [ call-next-method ]
     } cond ;
 
-M: f pprint* drop \ f pprint-word ;
+M: false pprint* drop \ f pprint-word ;
 
 : pprint-effect ( effect -- )
     [ effect>string ] [ effect-style ] bi styled-text ;

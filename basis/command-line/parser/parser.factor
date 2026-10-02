@@ -148,7 +148,7 @@ M: duplicate-option-name error.
 
 GENERIC: argvalid? ( val validater -- ? )
 
-M: f argvalid? 2drop t ;
+M: false argvalid? 2drop t ;
 
 M: quotation argvalid? call( val -- ? ) ;
 

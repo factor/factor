@@ -77,7 +77,7 @@ M: hashtable >py
 M: vector >py
     [ >py ] map vector>py-list ;
 
-M: f >py
+M: false >py
     drop <none> ;
 
 ! Data marshalling to Factor

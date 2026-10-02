@@ -12,6 +12,19 @@ TUPLE: decl-test { foo array } ;
 
 [ decl-test new "" >>foo ] [ bad-slot-value? ] must-fail-with
 
+TUPLE: false-slot-test { foo false } ;
+
+{ f } [ false-slot-test new foo>> ] unit-test
+{ f } [ false-slot-test new f >>foo foo>> ] unit-test
+[ false-slot-test new t >>foo ] [ bad-slot-value? ] must-fail-with
+
+TUPLE: true-slot-test { foo true } ;
+
+{ t } [ true-slot-test new foo>> ] unit-test
+{ t } [ true-slot-test new t >>foo foo>> ] unit-test
+[ true-slot-test new f >>foo ] [ bad-slot-value? ] must-fail-with
+[ true-slot-test new true >>foo ] [ bad-slot-value? ] must-fail-with
+
 TUPLE: hello length ;
 
 { 3 } [ "xyz" length>> ] unit-test

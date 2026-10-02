@@ -170,7 +170,7 @@ IN: bootstrap.assembler.ppc
 [
     3 ds-reg 0 jit-load-cell
     ds-reg dup cell-size SUBI
-    0 3 \ f type-number jit-compare-cell-imm
+    0 3 false type-number jit-compare-cell-imm
     [ 0 swap BEQ ] [ 0 B rc-relative-ppc-3-pc rt-entry-point jit-rel ] jit-conditional*
     0 B rc-relative-ppc-3-pc rt-entry-point jit-rel
 ] JIT-IF jit-define
@@ -402,7 +402,7 @@ IN: bootstrap.assembler.ppc
     5 ds-reg cell-size neg jit-load-cell-update
     0 5 4 jit-compare-cell
     [ 0 8 ] dip execute( cr offset -- )
-    3 \ f type-number LI
+    3 false type-number LI
     3 ds-reg 0 jit-save-cell ;
 
 : jit-math ( insn -- )
@@ -604,7 +604,7 @@ IN: bootstrap.assembler.ppc
         4 ds-reg 0 jit-load-cell
         3 3 4 OR
         3 3 tag-mask get ANDI.
-        4 \ f type-number LI
+        4 false type-number LI
         0 3 0 jit-compare-cell-imm
         [ 0 swap BNE ] [ 4 1 tag-fixnum LI ] jit-conditional*
         4 ds-reg 0 jit-save-cell

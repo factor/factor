@@ -115,4 +115,4 @@ M: word invoke-command
 
 M: word command-word ;
 
-M: f invoke-command 2drop ;
+M: false invoke-command 2drop ;

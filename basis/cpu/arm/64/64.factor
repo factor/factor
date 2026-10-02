@@ -64,7 +64,7 @@ M: arm.64 %load-immediate
     [ MOVbi ] [ (%load-immediate) ] if ;
 
 M: arm.64 %load-reference
-    [ swap (LDR=) rel-literal ] [ \ f type-number MOV ] if* ;
+    [ swap (LDR=) rel-literal ] [ false type-number MOV ] if* ;
 
 M: arm.64 %load-float
     [ >S 0 LDR ] [
@@ -129,7 +129,7 @@ M: arm.64 %replace-imm
             ] dip
         ] }
         { [ swap not ] [
-            temp2 \ f type-number MOV
+            temp2 false type-number MOV
             [ temp2 ] dip
         ] }
     } cond %replace ;
@@ -213,7 +213,7 @@ M:: arm.64 %bit-count ( DST SRC -- )
     DST fp-temp >D FMOV ;
 
 :: (%boolean) ( DST TEMP -- )
-    DST \ f type-number MOV
+    DST false type-number MOV
     t TEMP (LDR=) rel-literal ;
 
 :: %boolean ( DST cc TEMP -- )
@@ -741,7 +741,7 @@ M: arm.64 %unbox-alien alien-offset [+] LDR ;
 M:: arm.64 %unbox-any-c-ptr ( DST SRC -- )
     <label> :> end
     DST XZR MOV
-    SRC \ f type-number CMP
+    SRC false type-number CMP
     end BEQ
     DST SRC tag-mask get AND
     DST alien type-number CMP
@@ -754,10 +754,10 @@ M:: arm.64 %unbox-any-c-ptr ( DST SRC -- )
 
 M:: arm.64 %box-alien ( DST SRC TEMP -- )
     <label> :> end
-    DST \ f type-number MOV
+    DST false type-number MOV
     SRC end CBZ
     DST 5 cells alien TEMP %allot
-    temp \ f type-number MOV
+    temp false type-number MOV
     temp DST 1 alien@ STR
     temp DST 2 alien@ STR
     SRC  DST 3 alien@ STR
@@ -765,7 +765,7 @@ M:: arm.64 %box-alien ( DST SRC TEMP -- )
     end resolve-label ;
 
 :: %box-displaced-alien/f ( DST DISP -- )
-    temp \ f type-number MOV
+    temp false type-number MOV
     temp DST 1 alien@ STR
     DISP DST 3 alien@ STR
     DISP DST 4 alien@ STR ;
@@ -793,7 +793,7 @@ M:: arm.64 %box-alien ( DST SRC TEMP -- )
     <label> :> not-f
     <label> :> not-alien
     temp BASE tag-mask get AND
-    temp \ f type-number CMP
+    temp false type-number CMP
     not-f BNE
     DST DISP %box-displaced-alien/f
     end B
@@ -810,10 +810,10 @@ M:: arm.64 %box-displaced-alien ( DST DISP BASE TEMP base-class -- )
     DST BASE MOV
     DISP end CBZ
     DST 5 cells alien TEMP %allot
-    temp \ f type-number MOV
+    temp false type-number MOV
     temp DST 2 alien@ STR
     DST DISP BASE TEMP {
-        { [ base-class \ f class<= ] [ 2drop %box-displaced-alien/f ] }
+        { [ base-class false class<= ] [ 2drop %box-displaced-alien/f ] }
         { [ base-class \ alien class<= ] [ %box-displaced-alien/alien ] }
         { [ base-class \ byte-array class<= ] [ %box-displaced-alien/byte-array ] }
         [ end %box-displaced-alien/dynamic ]
@@ -900,7 +900,7 @@ M: arm.64 %safepoint SAFEPOINT dup [] STR ;
 
 M: arm.64 %compare [ CMP ] [ cc>cond ] [ %boolean ] tri* ;
 
-: (%compare-imm) ( SRC1 src2 -- ) [ tag-fixnum ] [ \ f type-number ] if* CMP ;
+: (%compare-imm) ( SRC1 src2 -- ) [ tag-fixnum ] [ false type-number ] if* CMP ;
 
 M: arm.64 %compare-imm [ (%compare-imm) ] [ cc>cond ] [ %boolean ] tri* ;
 M: arm.64 %compare-integer-imm %compare ;

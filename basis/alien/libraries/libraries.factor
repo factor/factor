@@ -35,7 +35,7 @@ C: <library> library
 
 GENERIC: library-dll ( obj -- dll )
 
-M: f library-dll ;
+M: false library-dll ;
 
 M: library library-dll
     [ dll>> ] ?call ;

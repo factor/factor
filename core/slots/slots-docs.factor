@@ -66,7 +66,7 @@ ARTICLE: "slot-initial-values" "Initial values of slots"
 $nl
 "The following classes have default initial values:"
 { $table
-    { { { $link f } } { $link f } }
+    { { { $link false } } { $link f } }
     { { { $link fixnum } } { $snippet "0" } }
     { { { $link float } } { $snippet "0.0" } }
     { { { $link string } } { $snippet "\"\"" } }

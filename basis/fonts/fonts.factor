@@ -46,7 +46,7 @@ TUPLE: font name size bold? italic? foreground background ;
 
 GENERIC: derive-font ( base font -- font' )
 
-M: f derive-font drop ;
+M: false derive-font drop ;
 
 M: font derive-font
     [ clone ] dip over {

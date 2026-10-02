@@ -64,7 +64,7 @@ M: vocab vocab-words-assoc words>> ;
 
 M: object vocab-words-assoc lookup-vocab vocab-words-assoc ;
 
-M: f vocab-words-assoc ;
+M: false vocab-words-assoc ;
 
 GENERIC: vocab-help ( vocab-spec -- help )
 
@@ -72,7 +72,7 @@ M: vocab vocab-help help>> ;
 
 M: object vocab-help lookup-vocab vocab-help ;
 
-M: f vocab-help ;
+M: false vocab-help ;
 
 GENERIC: vocab-main ( vocab-spec -- main )
 
@@ -80,7 +80,7 @@ M: vocab vocab-main main>> ;
 
 M: object vocab-main lookup-vocab vocab-main ;
 
-M: f vocab-main ;
+M: false vocab-main ;
 
 PREDICATE: runnable-vocab < vocab
     vocab-main >boolean ;

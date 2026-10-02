@@ -195,7 +195,7 @@ M: anonymous-intersection initial-value*
     {
         { [ dup only-classoid? ] [ dup initial-value* ] }
         { [ dup "initial-value" word-prop ] [ dup "initial-value" word-prop t ] }
-        { [ \ f bootstrap-word over class<= ] [ f t ] }
+        { [ false bootstrap-word over class<= ] [ f t ] }
         { [ \ array-capacity bootstrap-word over class<= ] [ 0 t ] }
         { [ \ integer-array-capacity bootstrap-word over class<= ] [ 0 t ] }
         { [ bignum bootstrap-word over class<= ] [ 0 >bignum t ] }

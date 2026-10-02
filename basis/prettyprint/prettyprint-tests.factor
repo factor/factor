@@ -300,10 +300,10 @@ M: class-see-layout class-see-layout ;
 
 GENERIC: generic-see-test-with-f ( obj -- obj )
 
-M: f generic-see-test-with-f ;
+M: false generic-see-test-with-f ;
 
-{ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" } [
-    [ M\ f generic-see-test-with-f see ] with-string-writer
+{ "USING: kernel prettyprint.tests ;\nM: false generic-see-test-with-f ;\n" } [
+    [ M\ false generic-see-test-with-f see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;

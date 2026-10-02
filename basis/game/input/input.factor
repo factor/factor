@@ -31,7 +31,7 @@ HOOK: reset-mouse game-input-backend ( -- )
 
 <PRIVATE
 
-M: f (reset-game-input) ;
+M: false (reset-game-input) ;
 
 : reset-game-input ( -- )
     (reset-game-input) ;

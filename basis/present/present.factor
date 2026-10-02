@@ -24,7 +24,7 @@ M: vocab-spec present name>> ;
 
 M: effect present effect>string ;
 
-M: f present drop "" ;
+M: false present drop "" ;
 
 M: pathname present string>> ;
 

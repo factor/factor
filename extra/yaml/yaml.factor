@@ -434,7 +434,7 @@ M:: yaml-alias emit-value ( emitter event unused obj -- )
 : emit-set-body ( emitter event set -- )
     [ members ] [ cardinality f <array> ] bi zip concat emit-sequence-body ;
 
-M: f emit-value ( emitter event anchor f -- ) emit-scalar ;
+M: false emit-value ( emitter event anchor f -- ) emit-scalar ;
 
 M: string emit-value ( emitter event anchor string -- ) emit-scalar ;
 

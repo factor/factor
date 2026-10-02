@@ -128,7 +128,7 @@ big-endian off
     ! pop boolean
     ds-reg bootstrap-cell SUB
     ! compare boolean with f
-    temp0 \ f type-number CMP
+    temp0 false type-number CMP
     ! jump to true branch if not equal
     0 JNE f rc-relative rel-word
     ! jump to false branch if equal
@@ -305,7 +305,7 @@ big-endian off
     ! load t
     temp3 0 MOV t rc-absolute-cell rel-literal
     ! load f
-    temp1 \ f type-number MOV
+    temp1 false type-number MOV
     ! load first value
     temp0 ds-reg [] MOV
     ! adjust stack pointer
@@ -385,7 +385,7 @@ big-endian off
         ds-reg bootstrap-cell SUB
         temp0 ds-reg [] OR
         temp0 tag-mask get TEST
-        temp0 \ f type-number MOV
+        temp0 false type-number MOV
         temp1 1 tag-fixnum MOV
         temp0 temp1 CMOVE
         ds-reg [] temp0 MOV

@@ -18,7 +18,7 @@ GENERIC: get-tftp-host ( server -- host )
 M: string get-tftp-host resolve-host random host>> 69 <inet4> ;
 M: integer get-tftp-host "127.0.0.1" swap <inet4> ;
 M: inet4 get-tftp-host ;
-M: f get-tftp-host drop "127.0.0.1" 69 <inet4> ;
+M: false get-tftp-host drop "127.0.0.1" 69 <inet4> ;
 
 : tftp-get ( filename encoding server -- bytes )
     '[

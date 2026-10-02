@@ -20,7 +20,7 @@ GENERIC: pprint-json* ( obj -- )
 
 M: object pprint-json* write-json ;
 M: string pprint-json* write-json ;
-M: f pprint-json* write-json ;
+M: false pprint-json* write-json ;
 
 M: sequence pprint-json*
     [

@@ -579,7 +579,7 @@ M: buffer-ptr bind-transform-feedback-output
 
 PRIVATE>
 
-UNION: transform-feedback-output buffer buffer-range POSTPONE: f ;
+UNION: transform-feedback-output buffer buffer-range false ;
 
 TUPLE: render-set
     { primitive-mode primitive-mode read-only }

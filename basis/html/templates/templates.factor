@@ -108,7 +108,7 @@ SYMBOL: next-template
 : call-next-template ( -- )
     next-template get write ;
 
-M: f call-template* drop call-next-template ;
+M: false call-template* drop call-next-template ;
 
 : with-boilerplate ( child master -- )
     [

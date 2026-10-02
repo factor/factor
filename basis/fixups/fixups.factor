@@ -104,7 +104,7 @@ M: object compute-fixups
     "error" over ?offset-of-slot
     [ slot compute-fixups ] [ 2drop { } ] if* ;
 
-M: f compute-fixups 2drop { } ;
+M: false compute-fixups 2drop { } ;
 
 M: no-vocab compute-fixups
     [ name>> vocab-renames compute-assoc-fixups ] [ drop { } ] if* ;

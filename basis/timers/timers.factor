@@ -16,7 +16,7 @@ TUPLE: timer
 <PRIVATE
 
 GENERIC: >nanoseconds ( obj -- duration/f )
-M: f >nanoseconds ;
+M: false >nanoseconds ;
 M: real >nanoseconds >integer ;
 M: duration >nanoseconds duration>nanoseconds >integer ;
 

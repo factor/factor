@@ -54,7 +54,7 @@ M: word-link topic>filename* name>> topic>filename* ;
 M: vocab-spec topic>filename* vocab-name "vocab" ;
 M: vocab-tag topic>filename* name>> "tag" ;
 M: vocab-author topic>filename* name>> "author" ;
-M: f topic>filename* drop \ f topic>filename* ;
+M: false topic>filename* drop \ f topic>filename* ;
 
 : topic>filename ( topic -- filename )
     topic>filename* [

@@ -13,8 +13,8 @@ SYMBOL: backwards?
 
 <PRIVATE
 
-M: t question>quot drop [ 2drop t ] ;
-M: f question>quot drop [ 2drop f ] ;
+M: true question>quot drop [ 2drop t ] ;
+M: false question>quot drop [ 2drop f ] ;
 
 M: beginning-of-input question>quot
     drop [ drop zero? ] ;

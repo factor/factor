@@ -226,7 +226,7 @@ GENERIC: sleep-until ( n/f -- )
 M: integer sleep-until
     [ self ] dip schedule-sleep "sleep" suspend drop ;
 
-M: f sleep-until
+M: false sleep-until
     drop "standby" suspend drop ;
 
 GENERIC: sleep ( dt -- )

@@ -36,13 +36,13 @@ IN: compiler.tree.cleanup.tests
 
 GENERIC: mynot ( x -- y )
 
-M: f mynot drop t ; inline
+M: false mynot drop t ; inline
 
 M: object mynot drop f ; inline
 
 GENERIC: detect-f ( x -- y )
 
-M: f detect-f ; inline
+M: false detect-f ; inline
 
 { t } [
     [ dup [ mynot ] [ ] if detect-f ] \ detect-f inlined?
@@ -573,7 +573,7 @@ MIXIN: foo-mix
                     { class
                       intersection{
                           not{
-                              POSTPONE: f
+                              false
                           }
                           not{ foo-mix }
                       }
@@ -586,7 +586,7 @@ MIXIN: foo-mix
              {
                  8815405
                  T{ value-info-state
-                    { class POSTPONE: f }
+                    { class false }
                     { interval
                       empty-interval
                     }

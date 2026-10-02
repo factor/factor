@@ -11,7 +11,7 @@ TUPLE: node value key hashcode left right ;
 
 GENERIC: lookup ( key node -- value/f )
 
-M: f lookup nip ;
+M: false lookup nip ;
 
 : decide ( key node -- key node ? )
     over hashcode over hashcode>> <= ; inline
@@ -23,7 +23,7 @@ M: node lookup
 
 GENERIC: store ( value key node -- node' )
 
-M: f store drop dup hashcode f f node boa ;
+M: false store drop dup hashcode f f node boa ;
 
 M: node store
     clone decide

@@ -9,7 +9,7 @@ CONSTANT: unroll-factor 32
 <PRIVATE
 
 MIXIN: ?node
-INSTANCE: f ?node
+INSTANCE: false ?node
 TUPLE: node { data array } { prev ?node } { next ?node } ;
 INSTANCE: node ?node
 

@@ -15,7 +15,7 @@ M: string prepend-command
     swap " " glue ;
 
 GENERIC: failed-process? ( process -- ? )
-M: f failed-process? not ;
+M: false failed-process? not ;
 M: fixnum failed-process? -1 = ;
 M: process failed-process? status>> zero? not ;
 

@@ -99,4 +99,4 @@ M: real >integer
     dup most-negative-fixnum most-positive-fixnum between?
     [ >fixnum ] [ >bignum ] if ; inline
 
-UNION: immediate fixnum POSTPONE: f ;
+UNION: immediate fixnum false ;

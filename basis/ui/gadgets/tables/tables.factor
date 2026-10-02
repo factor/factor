@@ -70,8 +70,8 @@ rows ;
 GENERIC: cell-dim ( font cell -- width height padding )
 GENERIC: draw-cell ( font cell -- )
 
-M: f cell-dim 2drop 0 0 0 ;
-M: f draw-cell 2drop ;
+M: false cell-dim 2drop 0 0 0 ;
+M: false draw-cell 2drop ;
 
 : single-line ( str -- str' )
     dup [ "\r\n" member? ] any? [ split-lines join-words ] when ;

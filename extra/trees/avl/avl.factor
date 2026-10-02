@@ -133,7 +133,7 @@ M: avl set-at ( value key node -- )
 
 GENERIC: avl-delete ( key node -- node shorter? deleted? )
 
-M: f avl-delete ( key f -- f f f ) nip f f ;
+M: false avl-delete ( key f -- f f f ) nip f f ;
 
 : (avl-delete) ( key node -- node shorter? deleted? )
     tuck node-link avl-delete [

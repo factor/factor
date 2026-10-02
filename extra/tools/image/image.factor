@@ -51,7 +51,7 @@ UNION-STRUCT: image-header.union { b32 image-header.32 } { b64 image-header.64 }
 UNION-STRUCT: image-footer.union { b32 image-footer.32 } { b64 image-footer.64 } ;
 
 UNION: image-header image-header.32 image-header.64 ;
-UNION: image-footer image-footer.32 image-footer.64 POSTPONE: f ;
+UNION: image-footer image-footer.32 image-footer.64 false ;
 
 TUPLE: image
   { footer maybe{ image-footer } } ! located at the end of a file in case of embedded images

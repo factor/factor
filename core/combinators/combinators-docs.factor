@@ -122,7 +122,7 @@ $nl
 ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
 { $subsections f t }
-"A union class of the above:"
+"The class containing both canonical boolean values:"
 { $subsections boolean }
 "There are some logical operations on booleans:"
 { $subsections
@@ -133,24 +133,24 @@ ARTICLE: "booleans" "Booleans"
     xor
 }
 "Boolean values are most frequently used for " { $link "conditionals" } "."
-{ $heading "The f object and f class" }
-"The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link POSTPONE: POSTPONE: } " or " { $link POSTPONE: \ } " to prevent the parsing word from executing."
+{ $heading "The false value and its class" }
+"The " { $link f } " object is the unique instance of the " { $link false } " class; the two are distinct objects. The " { $link f } " parsing word adds the false value to the parse tree. The class word " { $link false } " can be used directly."
 $nl
 "Here is the " { $link f } " object:"
 { $example "f ." "f" }
-"Here is the " { $link f } " class:"
-{ $example "\\ f ." "POSTPONE: f" }
+"Here is the class of the false value:"
+{ $example "false ." "false" }
 "They are not equal:"
-{ $example "f \\ f = ." "f" }
+{ $example "f false = ." "f" }
 "Here is an array containing the " { $link f } " object:"
 { $example "{ f } ." "{ f }" }
-"Here is an array containing the " { $link f } " class:"
-{ $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
-"The " { $link f } " object is an instance of the " { $link f } " class:"
-{ $example "USE: classes" "f class-of ." "POSTPONE: f" }
-"The " { $link f } " class is an instance of " { $link word } ":"
-{ $example "USE: classes" "\\ f class-of ." "word" }
-"On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
+"Here is an array containing the class:"
+{ $example "{ false } ." "{ false }" }
+"The false value is an instance of " { $link false } ":"
+{ $example "USE: classes" "f class-of ." "false" }
+"The " { $link false } " class is an instance of " { $link word } ":"
+{ $example "USE: classes" "false class-of ." "word" }
+"The canonical true value " { $link t } " is a word and the sole instance of the " { $link true } " predicate class. Like " { $link f } ", it is distinct from its class."
 { $example "t \\ t eq? ." "t" }
 "Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is important, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 

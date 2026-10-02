@@ -222,7 +222,7 @@ M: bignum tag-and-f 2 ;
 
 M: float tag-and-f 3 ;
 
-M: f tag-and-f 4 ;
+M: false tag-and-f 4 ;
 
 { f 4 } [ f tag-and-f ] unit-test
 
@@ -231,13 +231,13 @@ M: f tag-and-f 4 ;
 ! Issues with forget
 GENERIC: generic-forget-test ( a -- b )
 
-M: f generic-forget-test ;
+M: false generic-forget-test ;
 
-{ } [ \ f \ generic-forget-test lookup-method "m" set ] unit-test
+{ } [ false \ generic-forget-test lookup-method "m" set ] unit-test
 
 { } [ [ "m" get forget ] with-compilation-unit ] unit-test
 
-{ } [ "IN: generic.standard.tests M: f generic-forget-test ;" eval( -- ) ] unit-test
+{ } [ "IN: generic.standard.tests USE: kernel M: false generic-forget-test ;" eval( -- ) ] unit-test
 
 { } [ [ "m" get forget ] with-compilation-unit ] unit-test
 

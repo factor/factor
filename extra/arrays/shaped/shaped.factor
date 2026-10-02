@@ -10,7 +10,7 @@ IN: arrays.shaped
 
 GENERIC: array-replace ( object -- shape )
 
-M: f array-replace ;
+M: false array-replace ;
 
 M: object array-replace drop f ;
 

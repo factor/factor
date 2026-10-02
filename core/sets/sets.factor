@@ -26,13 +26,13 @@ GENERIC: null? ( set -- ? )
 GENERIC: cardinality ( set -- n )
 GENERIC: clear-set ( set -- )
 
-M: f members drop f ;
+M: false members drop f ;
 
-M: f cardinality drop 0 ;
+M: false cardinality drop 0 ;
 
-M: f delete 2drop ;
+M: false delete 2drop ;
 
-M: f clear-set drop ; inline
+M: false clear-set drop ; inline
 
 ! Defaults for some methods.
 ! Override them for efficiency

@@ -162,9 +162,9 @@ M: object write-edn edn-error ;
 M: word write-edn
     dup null eq? [ drop "nil" write ] [ name>> write ] if ;
 
-M: t write-edn drop "true" write ;
+M: true write-edn drop "true" write ;
 
-M: f write-edn drop "false" write ;
+M: false write-edn drop "false" write ;
 
 M: integer write-edn number>string write ;
 

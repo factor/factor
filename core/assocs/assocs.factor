@@ -285,13 +285,13 @@ M: sequence assoc-like
 M: sequence >alist ; inline
 
 ! Override sequence => assoc instance for f
-M: f at* 2drop f f ; inline
+M: false at* 2drop f f ; inline
 
-M: f assoc-size drop 0 ; inline
+M: false assoc-size drop 0 ; inline
 
-M: f clear-assoc drop ; inline
+M: false clear-assoc drop ; inline
 
-M: f assoc-like drop dup assoc-empty? [ drop f ] when ; inline
+M: false assoc-like drop dup assoc-empty? [ drop f ] when ; inline
 
 INSTANCE: sequence assoc
 

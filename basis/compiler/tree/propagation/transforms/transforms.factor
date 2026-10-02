@@ -376,7 +376,7 @@ M\ sets:set intersects? [ intersects?-quot ] 1 define-partial-eval
 ] "custom-inlining" set-word-prop
 
 : custom-inline-fixnum ( #call method -- y )
-    [ in-d>> first value-info class>> fixnum \ f class-or class<= ] dip
+    [ in-d>> first value-info class>> fixnum false class-or class<= ] dip
     '[ [ dup [ _ no-method ] unless ] ] [ f ] if ;
 
 ! Speeds up fasta benchmark

@@ -7,7 +7,7 @@ SYMBOL: cell-format
 
 HOOK: cell-length cell-format ( str -- n )
 
-M: f cell-length length ;
+M: false cell-length length ;
 
 <PRIVATE
 

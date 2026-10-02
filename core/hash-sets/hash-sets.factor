@@ -208,7 +208,7 @@ M: hash-set hashcode*
 
 ! Default methods
 
-M: f fast-set drop 0 <hash-set> ;
+M: false fast-set drop 0 <hash-set> ;
 
 M: sequence fast-set >hash-set ;
 

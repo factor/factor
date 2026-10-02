@@ -13,7 +13,7 @@ M: fixnum churn drop 0 ;
 M: float churn drop 1 ;
 M: string churn drop 2 ;
 M: array churn drop 3 ;
-M: f churn drop 4 ;
+M: false churn drop 4 ;
 
 : churn-tail-site ( obj -- n ) churn ;
 

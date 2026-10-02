@@ -6,6 +6,7 @@ USE: math.private
 IN: kernel
 
 BUILTIN: callstack ;
+BUILTIN: false ;
 BUILTIN: tuple ;
 BUILTIN: wrapper { wrapped read-only } ;
 
@@ -276,7 +277,7 @@ PRIVATE>
 : tri-curry@ ( x y z q -- p' q' r' ) currier tri@ ; inline
 
 ! Booleans
-UNION: boolean POSTPONE: t POSTPONE: f ;
+UNION: boolean true false ;
 
 : >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 
@@ -370,7 +371,7 @@ GENERIC: hashcode* ( depth obj -- code ) flushable
 
 M: object hashcode* 2drop 0 ; inline
 
-M: f hashcode* 2drop 31337 ; inline
+M: false hashcode* 2drop 31337 ; inline
 
 : hashcode ( obj -- code ) 3 swap hashcode* ; inline
 

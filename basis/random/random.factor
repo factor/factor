@@ -46,9 +46,9 @@ ERROR: no-random-number-generator ;
 M: no-random-number-generator summary
     drop "Random number generator is not defined" ;
 
-M: f random-bytes* no-random-number-generator ;
+M: false random-bytes* no-random-number-generator ;
 
-M: f random-32* no-random-number-generator ;
+M: false random-32* no-random-number-generator ;
 
 : random-32 ( -- n )
     random-generator get random-32* ;

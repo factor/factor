@@ -205,7 +205,7 @@ DEFER: countdown-b
 GENERIC: single-combination-test ( obj1 obj2 -- obj )
 
 M: object single-combination-test drop ;
-M: f single-combination-test nip ;
+M: false single-combination-test nip ;
 M: array single-combination-test drop ;
 M: integer single-combination-test drop ;
 
@@ -223,7 +223,7 @@ DEFER: single-combination-test-2
 
 GENERIC: single-combination-test-2 ( obj -- obj )
 M: object single-combination-test-2 single-combination-test-3 ;
-M: f single-combination-test-2 single-combination-test-4 ;
+M: false single-combination-test-2 single-combination-test-4 ;
 
 { 3 } [ t single-combination-test-2 ] unit-test
 { 3 } [ 3 single-combination-test-2 ] unit-test

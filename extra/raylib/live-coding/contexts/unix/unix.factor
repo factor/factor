@@ -83,7 +83,7 @@ ERROR: context-switch-failed api error ;
     glx-current-context [ display>> 0 0 f glXMakeContextCurrent check-glx ] when* ;
 
 GENERIC: restore-context ( context -- )
-M: f restore-context drop ;
+M: false restore-context drop ;
 M: glx-context restore-context
     { [ display>> ] [ draw>> ] [ read>> ] [ handle>> ] } cleave
     glXMakeContextCurrent check-glx ;

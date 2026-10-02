@@ -93,9 +93,9 @@ GENERIC: write-msgpack ( obj -- )
 
 M: +msgpack-nil+ write-msgpack drop 0xc0 write1 ;
 
-M: f write-msgpack drop 0xc2 write1 ;
+M: false write-msgpack drop 0xc2 write1 ;
 
-M: t write-msgpack drop 0xc3 write1 ;
+M: true write-msgpack drop 0xc3 write1 ;
 
 M: integer write-msgpack
     dup 0 >= [

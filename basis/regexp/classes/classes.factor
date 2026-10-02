@@ -32,7 +32,7 @@ C: <script-class> script-class
 
 GENERIC: class-member? ( obj class -- ? )
 
-M: t class-member? 2drop t ; inline
+M: true class-member? 2drop t ; inline
 
 M: integer class-member? = ; inline
 
@@ -99,7 +99,7 @@ M: unmatchable-class class-member?
 M: terminator-class class-member?
     drop "\r\n\u000085\u002029\u002028" member? ; inline
 
-M: f class-member? 2drop f ; inline
+M: false class-member? 2drop f ; inline
 
 M: script-class class-member?
     [ script-of ] [ script>> ] bi* = ; inline
@@ -249,8 +249,8 @@ M: and-class <not-class>
 M: or-class <not-class>
     seq>> [ <not-class> ] map <and-class> ;
 
-M: t <not-class> drop f ;
-M: f <not-class> drop t ;
+M: true <not-class> drop f ;
+M: false <not-class> drop t ;
 
 : <minus-class> ( a b -- a-b )
     <not-class> 2array <and-class> ;

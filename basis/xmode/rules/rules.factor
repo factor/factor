@@ -94,7 +94,7 @@ ERROR: text-required ;
 
 GENERIC: text-hash-char ( text -- ch )
 
-M: f text-hash-char ;
+M: false text-hash-char ;
 
 M: string-matcher text-hash-char string>> [ text-required ] [ first ] if-empty ;
 

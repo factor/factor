@@ -236,7 +236,7 @@ GENERIC: bind-vertex-format ( program-instance buffer-ptr format -- )
 
 GENERIC: link-feedback-format ( program-handle format -- )
 
-M: f link-feedback-format
+M: false link-feedback-format
     2drop ;
 
 : link-vertex-formats ( program-handle formats -- )
@@ -257,7 +257,7 @@ M: geometry-shader-vertices-out link-geometry-shader-parameter
 
 GENERIC: (verify-feedback-format) ( program-instance format -- )
 
-M: f (verify-feedback-format)
+M: false (verify-feedback-format)
     2drop ;
 
 : verify-feedback-format ( program-instance -- )

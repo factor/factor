@@ -453,7 +453,7 @@ ERROR: bug-in-fixnum* x y a b ;
 
 { ALIEN: 1234 } [ ALIEN: 1234 [ { alien } declare void* <ref> ] compile-call void* deref ] unit-test
 { ALIEN: 1234 } [ ALIEN: 1234 [ { c-ptr } declare void* <ref> ] compile-call void* deref ] unit-test
-{ f } [ f [ { POSTPONE: f } declare void* <ref> ] compile-call void* deref ] unit-test
+{ f } [ f [ { false } declare void* <ref> ] compile-call void* deref ] unit-test
 
 { 252 } [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 { -4 } [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test

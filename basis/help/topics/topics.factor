@@ -19,7 +19,7 @@ M: link >link ;
 M: wrapper >link wrapped>> >link ;
 M: vocab-spec >link ;
 M: object >link link boa ;
-M: f >link drop \ f >link ;
+M: false >link drop \ f >link ;
 
 PREDICATE: word-link < link name>> word? ;
 
@@ -77,8 +77,8 @@ M: link article-parent name>> article-parent ;
 M: link set-article-parent name>> set-article-parent ;
 
 ! Special case: f help
-M: f valid-article? drop t ;
-M: f article-title drop \ f article-title ;
-M: f article-content drop \ f article-content ;
-M: f article-parent drop \ f article-parent ;
-M: f set-article-parent drop \ f set-article-parent ;
+M: false valid-article? drop t ;
+M: false article-title drop \ f article-title ;
+M: false article-content drop \ f article-content ;
+M: false article-parent drop \ f article-parent ;
+M: false set-article-parent drop \ f set-article-parent ;

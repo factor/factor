@@ -23,7 +23,7 @@ GENERIC: item-check ( node -- n )
 M: tree-node item-check
     [ item>> ] [ left>> ] [ right>> ] tri [ item-check ] bi@ - + ;
 
-M: f item-check drop 0 ;
+M: false item-check drop 0 ;
 
 CONSTANT: min-depth 4
 

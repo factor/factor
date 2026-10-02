@@ -68,7 +68,7 @@ M: local >insecure 1array ;
 M: integer >insecure internet-server 1array ;
 M: string >insecure internet-server 1array ;
 M: array >insecure [ >insecure ] map concat ;
-M: f >insecure ;
+M: false >insecure ;
 
 : >secure ( addrspec -- addrspec' )
     >insecure [ dup secure? [ f <secure> ] unless ] map ;
