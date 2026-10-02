@@ -846,15 +846,22 @@ TUPLE: model-field < field field-model ;
         swap >>field-model ;
 
 M: model-field graft*
+    [ dup field-model>> add-connection ]
     [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
     [ dup editor>> model>> add-connection ]
-    bi ;
+    tri ;
 
 M: model-field ungraft*
-    dup editor>> model>> remove-connection ;
+    [ dup field-model>> remove-connection ]
+    [ dup editor>> model>> remove-connection ] bi ;
 
 M: model-field model-changed
-    nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
+    2dup field-model>> eq? [
+        [ value>> ] [ editor>> ] bi*
+        2dup editor-string = [ 2drop ] [ set-editor-string ] if
+    ] [
+        nip [ editor>> editor-string ] [ field-model>> ] bi ?set-model
+    ] if ;
 
 TUPLE: action-field < field quot ;
 

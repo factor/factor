@@ -8,6 +8,7 @@ USING: arrays assocs colors continuations fonts locals math namespaces
 opengl math.rectangles sequences.generalizations ui.render ui.text ui.text.private ;
 USING: calendar io.encodings.utf8 io.launcher system
 ui.gadgets.worlds ;
+USING: models.arrow unicode ;
 FROM: ui.gadgets.private => layout-queue ;
 FROM: sets => cardinality ;
 IN: ui.gadgets.editors.tests
@@ -142,6 +143,62 @@ M: measurement-test-renderer string-dim
 "field" get [
     [ "hello" ] [ "field" get field-model>> value>> ] unit-test
 ] with-grafted-gadget
+
+! #1266: model fields must also observe changes made outside their editor.
+{ "external" } [| |
+    "initial" <model> :> model
+    model <model-field> :> field
+    field [
+        "external" model set-model
+        field editor>> editor-string
+    ] with-grafted-gadget
+] unit-test
+
+! A derived string model must activate before its initial value is read.
+{ "FIRST" "SECOND" } [| |
+    "first" <model> :> model
+    model [ >upper ] <arrow> <model-field> :> field
+    field [
+        field editor>> editor-string
+        "second" model set-model
+        field editor>> editor-string
+    ] with-grafted-gadget
+] unit-test
+
+{ "edited" "edited" { 0 2 } { 0 1 } } [| |
+    "initial" <model> :> model
+    model <model-field> :> first
+    model <model-field> :> second
+    first [ second [
+        "edited" first editor>> set-editor-string
+        { 0 2 } first editor>> set-caret
+        { 0 1 } first editor>> set-mark
+        "edited" model set-model
+        model value>>
+        second editor>> editor-string
+        first editor>> editor-caret
+        first editor>> editor-mark
+    ] with-grafted-gadget ] with-grafted-gadget
+] unit-test
+
+! Ungrafting removes both subscriptions; regrafting reads the latest value.
+{ 1 0 0 "initial" "detached" "detached" 1 0 0 } [| |
+    "initial" <model> :> model
+    model <model-field> :> field
+    field [ model connections>> length ] with-grafted-gadget
+    model connections>> length
+    field editor>> model>> connections>> length
+    "detached" model set-model
+    field editor>> editor-string
+    "ungrafted edit" field editor>> set-editor-string
+    model value>>
+    field [
+        field editor>> editor-string
+        model connections>> length
+    ] with-grafted-gadget
+    model connections>> length
+    field editor>> model>> connections>> length
+] unit-test
 
 { "Hello world." } [ "Hello    \n    world." join-lines ] unit-test
 { "  Hello world.  " } [ "  Hello    \n    world.  " join-lines ] unit-test

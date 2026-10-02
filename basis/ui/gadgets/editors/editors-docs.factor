@@ -79,8 +79,8 @@ HELP: remove-selection
 { $description "Removes currently selected text from the editor's " { $link document } "." } ;
 
 HELP: <model-field>
-{ $values { "model" model } { "gadget" editor } }
-{ $description "Creates an editor gadget which targets the specified model. The model must contain a string, or another item with a defined " { $link length } ", as this will be checked during layout." } ;
+{ $values { "model" model } { "gadget" model-field } }
+{ $description "Creates a single-line field for a string model. While the field is grafted, edits update the model and changes to the model update the field. Equal values preserve the caret and selection. The field releases its model connections when ungrafted." } ;
 
 HELP: <action-field>
 { $values { "quot" { $quotation ( string -- ) } } { "gadget" editor } }
