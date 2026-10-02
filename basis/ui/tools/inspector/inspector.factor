@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes combinators fonts
+USING: accessors arrays assocs classes combinators dlists fonts
 formatting hashtables inspector io io.styles kernel locals math
 math.order math.parser math.vectors mirrors models models.arrow namespaces
 prettyprint sequences sorting strings ui ui.commands ui.gadgets

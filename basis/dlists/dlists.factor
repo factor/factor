@@ -213,3 +213,4 @@ INSTANCE: dlist deque
 SYNTAX: DL{ \ } [ >dlist ] parse-literal ;
 
 { "dlists" "prettyprint" } "dlists.prettyprint" require-when
+{ "dlists" "mirrors" } "dlists.mirrors" require-when
