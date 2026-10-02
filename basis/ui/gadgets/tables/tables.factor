@@ -50,7 +50,8 @@ selection
 mouse-index
 { takes-focus? initial: t }
 focused?
-rows row-heights row-offsets row-metrics-font row-metrics-rows row-metrics-minimum ;
+rows row-heights row-offsets row-metrics-font row-metrics-rows row-metrics-minimum
+row-metrics-scale ;
 
 : update-table-rows ( table -- )
     [
@@ -145,6 +146,7 @@ M: table compute-column-widths
     heights 0 [ + ] accumulate swap suffix table row-offsets<<
     font clone table row-metrics-font<<
     minimum table row-metrics-minimum<<
+    gl-scale-factor get-global table row-metrics-scale<<
     table rows>> table row-metrics-rows<< ;
 
 : ensure-row-metrics ( table -- table )
@@ -153,6 +155,7 @@ M: table compute-column-widths
         [ [ font>> ] [ row-metrics-font>> ] bi = ]
         [ [ rows>> ] [ row-metrics-rows>> ] bi eq? ]
         [ [ line-height ] [ row-metrics-minimum>> ] bi = ]
+        [ row-metrics-scale>> gl-scale-factor get-global = ]
     } 1&& [ ] [ dup update-row-metrics ] if ;
 
 : row-height ( row table -- height )

@@ -3,7 +3,7 @@ USING: ui.gadgets.tables ui.gadgets.scrollers ui.gadgets.debug accessors
 models namespaces tools.test kernel combinators prettyprint arrays classes
 locals math math.rectangles sequences ui.gadgets ui.gadgets.line-support
 ui.gadgets.tables.private ui.gestures ;
-USING: calendar io io.encodings.utf8 io.launcher system ;
+USING: calendar continuations io io.encodings.utf8 io.launcher opengl system ;
 
 SINGLETON: test-renderer
 
@@ -124,32 +124,48 @@ M: measured-height-cell cell-dim
     3array <model> trivial-renderer <table>
     10 >>line-height { 100 60 } >>dim ;
 
+! Keep exact geometry checks independent of the host monitor's DPI.
+:: with-table-scale ( ..a scale quot: ( ..a -- ..b ) -- ..b )
+    gl-scale-factor get-global :> previous
+    [ scale gl-scale-factor set-global quot call ]
+    [ previous gl-scale-factor set-global ] finally ; inline
+
 ! Actual cell height and padding determine row geometry, rather than prototypes.
 { { 10.0 30.0 20.0 } { 0 10.0 40.0 60.0 } 60.0 } [
-    variable-table ensure-row-metrics
-    [ row-heights>> ] [ row-offsets>> ] [ pref-dim second ] tri
+    1.0 [
+        variable-table ensure-row-metrics
+        [ row-heights>> ] [ row-offsets>> ] [ pref-dim second ] tri
+    ] with-table-scale
 ] unit-test
 
 { { -1 0 0 1 1 2 2 3 } } [
-    variable-table
-    { -1 0 9 10 39 40 59 60 } [ over y>line ] map nip
+    1.0 [
+        variable-table
+        { -1 0 9 10 39 40 59 60 } [ over y>line ] map nip
+    ] with-table-scale
 ] unit-test
 
-{ { 0 10.0 } { 100 30.0 } } [ variable-table 1 row-bounds ] unit-test
+{ { 0 10.0 } { 100 30.0 } } [
+    1.0 [ variable-table 1 row-bounds ] with-table-scale
+] unit-test
 
 ! Model updates invalidate height measurements and keep selection within range.
 { { 0 20.0 } 0 } [
-    variable-table t >>selection-required? dup [
-        dup 2 select-row
-        8 20 0 <height-cell> 1array 1array over model>> set-model
-        ensure-row-metrics [ row-offsets>> ] [ selection-index>> value>> ] bi
-    ] with-grafted-gadget
+    1.0 [
+        variable-table t >>selection-required? dup [
+            dup 2 select-row
+            8 20 0 <height-cell> 1array 1array over model>> set-model
+            ensure-row-metrics [ row-offsets>> ] [ selection-index>> value>> ] bi
+        ] with-grafted-gadget
+    ] with-table-scale
 ] unit-test
 
 ! Changing the minimum height must rebuild a previously populated cache.
 { { 0 25.0 55.0 80.0 } } [
-    variable-table ensure-row-metrics 25 >>line-height
-    ensure-row-metrics row-offsets>>
+    1.0 [
+        variable-table ensure-row-metrics 25 >>line-height
+        ensure-row-metrics row-offsets>>
+    ] with-table-scale
 ] unit-test
 
 { { 0 } { 0 0 } } [
@@ -159,17 +175,34 @@ M: measured-height-cell cell-dim
 
 ! Padding and empty columns are included without collapsing rows to zero height.
 { { 0 10.0 35.0 } } [
-    { } 3 5 20 <height-cell> 1array 2array
-    <model> trivial-renderer <table> 10 >>line-height
-    ensure-row-metrics row-offsets>>
+    1.0 [
+        { } 3 5 20 <height-cell> 1array 2array
+        <model> trivial-renderer <table> 10 >>line-height
+        ensure-row-metrics row-offsets>>
+    ] with-table-scale
+] unit-test
+
+! Moving a table between display scales must refresh pixel-rounded heights,
+! even when its font, rows, and minimum line height are unchanged.
+{ { 0 25.0 } { 0 25.6 } { 0 25.2 } { 0 25.0 } } [
+    1.0 [| |
+        8 25 0 <height-cell> 1array 1array
+        <model> trivial-renderer <table> 10 >>line-height :> table
+        table ensure-row-metrics row-offsets>>
+        1.25 [ table ensure-row-metrics row-offsets>> ] with-table-scale
+        2.5 [ table ensure-row-metrics row-offsets>> ] with-table-scale
+        table ensure-row-metrics row-offsets>>
+    ] with-table-scale
 ] unit-test
 
 ! Page movement follows pixel distance and still advances past a very tall row.
 { 1 2 1 0 } [
-    variable-table { 100 25 } >>dim t >>selection-required? dup [
-        dup next-page dup selection-index>> value>> swap
-        dup next-page dup selection-index>> value>> swap
-        dup previous-page dup selection-index>> value>> swap
-        dup previous-page selection-index>> value>>
-    ] with-grafted-gadget
+    1.0 [
+        variable-table { 100 25 } >>dim t >>selection-required? dup [
+            dup next-page dup selection-index>> value>> swap
+            dup next-page dup selection-index>> value>> swap
+            dup previous-page dup selection-index>> value>> swap
+            dup previous-page selection-index>> value>>
+        ] with-grafted-gadget
+    ] with-table-scale
 ] unit-test
