@@ -23,6 +23,16 @@ IN: ui.backend.windows.tests
     ] unit-test
 ] each
 
+! Failed demo startup must not leave a destroyed GL context in queued work.
+{ t } [
+    <process> vm-path "-no-user-init"
+        "resource:basis/ui/backend/windows/fixtures/startup-failure.factor" 3array >>command
+        t >>hidden 20 seconds >>timeout
+        +closed+ >>stdin +stdout+ >>stderr
+    utf8 [ read-contents ] with-process-reader*
+    0 = [ drop "STARTUP-FAILURE-PASS" subseq-of? ] [ output-process-error ] if
+] unit-test
+
 ! Native menus can cancel input when Factor holds no mouse capture.
 { f } [ release-capture mouse-captured get ] unit-test
 

@@ -69,15 +69,34 @@ SYMBOL: worlds
     } cleave gl-init
     gl3-state> >>gl-render-state drop ;
 
-: clean-up-broken-window ( world -- )
-    {
+:: discard-window-layout ( window -- )
+    layout-queue [ [ find-world window eq? ] reject! drop ] when* ;
+
+:: close-world-window ( window -- )
+    window handle>> :> handle
+    f window handle<<
+    [
+        ! Native destruction can invoke callbacks. Stop those callbacks and
+        ! later layout work from selecting a context that is being destroyed.
+        handle (close-window)
+    ] [ window discard-window-layout ] finally ;
+
+: cancel-window-graft ( world -- )
+    ! notify has already marked the world grafted before calling graft*.
+    ! Its children are still queued: cancel them instead of grafting them
+    ! into a window whose startup failed.
+    { f f } >>graft-state
+    dup ungraft
+    promise>> t swap fulfill ;
+
+:: clean-up-broken-window ( window -- )
+    [
         [
-            dup { [ focused?>> ] [ grab-input?>> ] } 1&&
+            window dup { [ focused?>> ] [ grab-input?>> ] } 1&&
             [ handle>> (ungrab-input) ] [ drop ] if
-        ]
-        [ dispose-world-render-state ]
-        [ handle>> (close-window) ]
-    } cleave ;
+            window dispose-world-render-state
+        ] [ window close-world-window ] finally
+    ] [ window cancel-window-graft ] finally ;
 
 M: world graft*
     [ (open-window) ]
@@ -99,7 +118,7 @@ M: world ungraft*
         [ dispose-window-resources ]
         [ unfocus-world ]
         [ dispose-world-render-state ]
-        [ [ (close-window) f ] change-handle drop ]
+        [ close-world-window ]
         [ promise>> t swap fulfill ]
     } cleave ;
 
