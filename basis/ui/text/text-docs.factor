@@ -47,6 +47,26 @@ HELP: offset>x
 { $values { "n" integer } { "font" font } { "string" string } { "x" real } }
 { $contract "Outputs the x coordinate of the character at the given index." } ;
 
+HELP: caret>x
+{ $values { "n" integer } { "trailing?" boolean } { "font" font } { "string" string } { "x" real } }
+{ $description "Maps a logical insertion point to its visual x coordinate. Trailing affinity attaches it to the preceding cluster; leading affinity attaches it to the following cluster. These positions may differ at a bidirectional run boundary." } ;
+
+HELP: x>caret
+{ $values { "x" real } { "font" font } { "string" string } { "n" integer } { "trailing?" boolean } }
+{ $description "Hit-tests an insertion point, retaining its leading or trailing affinity." } ;
+
+HELP: visual-caret-step
+{ $values { "n" integer } { "trailing?" boolean } { "direction" integer } { "font" font } { "string" string } { "next" integer } { "affinity" boolean } { "moved?" boolean } }
+{ $description "Moves to the adjacent visual caret stop. Direction is -1 for left or 1 for right. At a visual line edge, returns the original insertion point and a false moved flag. Backends without visual navigation use logical grapheme movement." } ;
+
+HELP: visual-caret-edge
+{ $values { "right?" boolean } { "font" font } { "string" string } { "n" integer } { "trailing?" boolean } }
+{ $description "Finds the insertion point at the left or right visual edge of a line." } ;
+
+HELP: selection-caret
+{ $values { "start" integer } { "end" integer } { "right?" boolean } { "font" font } { "string" string } { "n" integer } { "trailing?" boolean } }
+{ $description "Finds the insertion point at the requested visual edge of a logical selection." } ;
+
 HELP: selection-spans
 { $values { "start" integer } { "end" integer } { "font" font } { "string" string } { "spans" "a sequence of pairs of real numbers" } }
 { $contract "Outputs the visual x intervals occupied by a logical selection. Each pair contains the left and right edges in logical display coordinates. A bidirectional selection may occupy several disjoint intervals. An empty selection produces a zero-width interval at the caret." } ;

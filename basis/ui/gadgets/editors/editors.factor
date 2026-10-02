@@ -13,6 +13,7 @@ IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget
     caret mark
+    caret-affinity
     caret-shape
     focused? blink blink-timer
     default-text
@@ -36,7 +37,7 @@ SYMBOL: caret-style
 
 : init-editor-locs ( editor -- editor )
     <loc> >>caret
-    <loc> >>mark ; inline
+    <loc> >>mark t >>caret-affinity ; inline
 
 : editor-theme ( editor -- editor )
     monospace-font >>font ; inline
@@ -109,10 +110,15 @@ M: editor ungraft*
 : editor-mark ( editor -- loc ) mark>> value>> ;
 
 : set-caret ( loc editor -- )
+    t >>caret-affinity
     [ model>> validate-loc ] [ caret>> ] bi set-model ;
 
 : set-mark ( loc editor -- )
     [ model>> validate-loc ] [ mark>> ] bi set-model ;
+
+:: set-visual-caret ( loc affinity editor -- )
+    editor affinity >>caret-affinity drop
+    loc editor [ model>> validate-loc ] [ caret>> ] bi set-model ;
 
 : change-caret ( editor quot: ( loc document -- newloc ) -- )
     [ [ [ editor-caret ] [ model>> ] bi ] dip call ] keepd set-caret ; inline
@@ -125,24 +131,28 @@ M: editor ungraft*
 
 : editor-line ( n editor -- str ) control-value nth ;
 
-:: point>loc ( point editor -- loc )
+:: point>caret ( point editor -- loc affinity )
     point second editor y>line {
-        { [ dup 0 < ] [ drop { 0 0 } ] }
-        { [ dup editor model>> last-line# > ] [ drop editor model>> doc-end ] }
+        { [ dup 0 < ] [ drop { 0 0 } f ] }
+        { [ dup editor model>> last-line# > ] [ drop editor model>> doc-end t ] }
         [| n |
-            n
             point first
             editor font>>
             n editor editor-line
-            x>offset 2array
+            x>caret :> ( col affinity )
+            n col 2array affinity
         ]
     } cond ;
+
+: point>loc ( point editor -- loc ) point>caret drop ;
 
 : clicked-loc ( editor -- loc )
     [ hand-rel ] keep point>loc ;
 
-: click-loc ( editor model -- )
-    [ clicked-loc ] dip set-model ;
+:: click-loc ( editor model -- )
+    editor hand-rel editor point>caret :> ( loc affinity )
+    model editor caret>> eq? [ editor affinity >>caret-affinity drop ] when
+    loc model set-model ;
 
 : focus-editor ( editor -- )
     [ start-blinking ] [ t >>focused? relayout-1 ] bi ;
@@ -156,8 +166,10 @@ M: editor ungraft*
 : loc>point ( loc editor -- loc )
     [ loc>x ] [ [ first ] dip line>y gl-ceiling ] 2bi 2array ;
 
-: caret-loc ( editor -- loc )
-    [ editor-caret ] keep loc>point ;
+:: caret-loc ( editor -- loc )
+    editor editor-caret first2 :> ( row col )
+    col editor caret-affinity>> editor font>> row editor editor-line caret>x gl-round
+    row editor line>y gl-ceiling 2array ;
 
 : caret-dim ( editor -- dim )
     [ 0 ] dip line-height 2array ;
@@ -215,10 +227,9 @@ M: editor ungraft*
             GL_LINE_BIT [
                 dup second glLineWidth
                 first editor preedit-start>> second dup 2array v+ first2
-                [ row swap 2array editor loc>x 1.0 + y 2array ]
-                [ row swap 2array editor loc>x 1.0 - y 2array ]
-                bi*
-                gl-line
+                editor font>> row editor editor-line selection-spans [
+                    first2 [ 1.0 + y 2array ] [ 1.0 - y 2array ] bi* gl-line
+                ] each
             ] do-attribs
         ] each
     ] when ;
@@ -316,6 +327,8 @@ M: editor cap-height font>> font-metrics cap-height>> ;
 <PRIVATE
 
 : contents-changed ( model editor -- )
+    ! After an edit the insertion point belongs to the text just inserted.
+    t >>caret-affinity
     [ caret>> swap '[ _ validate-loc ] (change-model) ]
     [ mark>> swap '[ _ validate-loc ] (change-model) ]
     [ nip relayout ] 2tri ;
@@ -402,9 +415,14 @@ M: editor gadget-text* editor-string % ;
     [ drag-selection-mark ] 3bi ;
 
 : drag-selection ( editor -- )
-    [ drag-caret&mark ]
-    [ mark>> set-model ]
-    [ caret>> set-model ] tri ;
+    mouse-elt one-char-elt = [
+        dup caret>> click-loc
+    ] [
+        t >>caret-affinity
+        [ drag-caret&mark ]
+        [ mark>> set-model ]
+        [ caret>> set-model ] tri
+    ] if ;
 
 : editor-cut ( editor clipboard -- )
     [ gadget-copy ] [ drop remove-selection ] 2bi ;
@@ -437,7 +455,7 @@ M: editor gadget-text* editor-string % ;
     dupd editor-select-next mark>caret ;
 
 : editor-select ( from to editor -- )
-    [ mark>> set-model ] [ caret>> set-model ] bi-curry bi* ;
+    [ set-mark ] [ set-caret ] bi-curry bi* ;
 
 : select-elt ( editor elt -- )
     [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] keepd editor-select ;
@@ -515,29 +533,51 @@ os macos? [
 ] unless
 define-command-map
 
+:: select-visual-character ( editor direction -- )
+    editor editor-caret first2 :> ( row col )
+    col editor caret-affinity>> direction editor font>> row editor editor-line
+    visual-caret-step :> ( next affinity moved? )
+    moved? [ row next 2array affinity editor set-visual-caret ] [
+        row direction + :> next-row
+        next-row editor valid-line? [
+            direction 0 < editor font>> next-row editor editor-line
+            visual-caret-edge :> ( edge side )
+            next-row edge 2array side editor set-visual-caret
+        ] when
+    ] if ;
+
+:: collapse-visual-selection ( editor right? -- )
+    editor selection-start/end :> ( start end )
+    right? [ end first ] [ start first ] if :> row
+    row editor editor-line :> line
+    row start first = [ start second ] [ 0 ] if
+    row end first = [ end second ] [ line length ] if
+    right? editor font>> line selection-caret :> ( col affinity )
+    row col 2array affinity editor set-visual-caret
+    editor mark>caret ;
+
 : previous-character ( editor -- )
-    dup gadget-selection? [
-        dup selection-start/end drop
-        over set-caret mark>caret
-    ] [
-        char-elt editor-prev
+    dup gadget-selection? [ f collapse-visual-selection ] [
+        dup -1 select-visual-character mark>caret
     ] if ;
 
 : next-character ( editor -- )
-    dup gadget-selection? [
-        dup selection-start/end nip
-        over set-caret mark>caret
-    ] [
-        char-elt editor-next
+    dup gadget-selection? [ t collapse-visual-selection ] [
+        dup 1 select-visual-character mark>caret
     ] if ;
 
 : previous-word ( editor -- ) word-elt editor-prev ;
 
 : next-word ( editor -- ) word-elt editor-next ;
 
-: start-of-line ( editor -- ) one-line-elt editor-prev ;
+:: select-visual-line-edge ( editor right? -- )
+    editor editor-caret first :> row
+    right? editor font>> row editor editor-line visual-caret-edge :> ( col affinity )
+    row col 2array affinity editor set-visual-caret ;
 
-: end-of-line ( editor -- ) one-line-elt editor-next ;
+: start-of-line ( editor -- ) dup f select-visual-line-edge mark>caret ;
+
+: end-of-line ( editor -- ) dup t select-visual-line-edge mark>caret ;
 
 : start-of-paragraph ( editor -- ) paragraph-elt editor-prev ;
 
@@ -579,10 +619,10 @@ editor "caret-motion" f {
     gadget-selection ;
 
 : select-previous-character ( editor -- )
-    char-elt editor-select-prev ;
+    -1 select-visual-character ;
 
 : select-next-character ( editor -- )
-    char-elt editor-select-next ;
+    1 select-visual-character ;
 
 : select-previous-word ( editor -- )
     word-elt editor-select-prev ;
@@ -591,10 +631,10 @@ editor "caret-motion" f {
     word-elt editor-select-next ;
 
 : select-start-of-line ( editor -- )
-    one-line-elt editor-select-prev ;
+    f select-visual-line-edge ;
 
 : select-end-of-line ( editor -- )
-    one-line-elt editor-select-next ;
+    t select-visual-line-edge ;
 
 : select-start-of-paragraph ( editor -- )
     paragraph-elt editor-select-prev ;
@@ -657,9 +697,21 @@ TUPLE: multiline-editor < editor ;
 : <multiline-editor> ( -- editor )
     multiline-editor new-editor ;
 
-: previous-line ( editor -- ) line-elt editor-prev ;
+:: select-visual-lines ( editor delta -- )
+    editor editor-caret first delta + :> row
+    row 0 < [ { 0 0 } f editor set-visual-caret ] [
+        row editor model>> last-line# > [
+            editor model>> doc-end t editor set-visual-caret
+        ] [
+            editor caret-loc first editor font>> row editor editor-line
+            x>caret :> ( col affinity )
+            row col 2array affinity editor set-visual-caret
+        ] if
+    ] if ;
 
-: next-line ( editor -- ) line-elt editor-next ;
+: previous-line ( editor -- ) dup -1 select-visual-lines mark>caret ;
+
+: next-line ( editor -- ) dup 1 select-visual-lines mark>caret ;
 
 <PRIVATE
 
@@ -674,17 +726,17 @@ TUPLE: multiline-editor < editor ;
 
 PRIVATE>
 
-: previous-page ( editor -- ) prev-page-elt editor-prev ;
+: previous-page ( editor -- ) dup prev-page-elt #lines>> neg select-visual-lines mark>caret ;
 
-: next-page ( editor -- ) next-page-elt editor-next ;
+: next-page ( editor -- ) dup next-page-elt #lines>> select-visual-lines mark>caret ;
 
-: select-previous-line ( editor -- ) line-elt editor-select-prev ;
+: select-previous-line ( editor -- ) -1 select-visual-lines ;
 
-: select-next-line ( editor -- ) line-elt editor-select-next ;
+: select-next-line ( editor -- ) 1 select-visual-lines ;
 
-: select-previous-page ( editor -- ) prev-page-elt editor-select-prev ;
+: select-previous-page ( editor -- ) prev-page-elt #lines>> neg select-visual-lines ;
 
-: select-next-page ( editor -- ) next-page-elt editor-select-next ;
+: select-next-page ( editor -- ) next-page-elt #lines>> select-visual-lines ;
 
 : insert-newline ( editor -- )
     "\n" swap user-input* drop ;

@@ -3,13 +3,13 @@
 USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache colors
 classes.struct destructors fonts fonts.shaping hashtables.identity.private init io.encodings.string
 io.encodings.utf16 io.encodings.utf16.private kernel locals math math.bitwise math.functions math.order
-namespaces opengl sequences ui.text.index-maps windows.com windows.directx.dwrite
+namespaces opengl sequences ui.text.index-maps unicode windows.com windows.directx.dwrite
 windows.directwrite.indexed windows.fonts windows.ole32 windows.types ;
 FROM: alien.c-types => float ;
 FROM: destructors.private => register-disposable ;
 IN: windows.directwrite
 
-TUPLE: directwrite-layout < disposable font string pointer metrics size image origin index-map selection-rects glyph-index ;
+TUPLE: directwrite-layout < disposable font string pointer metrics size image origin index-map selection-rects glyph-index bidi? ;
 
 : <directwrite-factory> ( -- factory )
     DWRITE_FACTORY_TYPE_SHARED IDWriteFactory-iid
@@ -66,6 +66,16 @@ ERROR: missing-directwrite-fallback-font ;
 
 : directwrite-text-metrics ( pointer -- metrics )
     DWRITE_TEXT_METRICS new [ IDWriteTextLayout::GetMetrics check-ole32-error ] keep ;
+
+:: directwrite-range-metrics ( pointer start length -- rects )
+    0 uint <ref> :> count
+    pointer start length 0.0 0.0 f 0 count IDWriteTextLayout::HitTestTextRange drop
+    count uint deref :> n
+    n DWRITE_HIT_TEST_METRICS heap-size * <byte-array> :> buffer
+    pointer start length 0.0 0.0 buffer n count
+    IDWriteTextLayout::HitTestTextRange check-ole32-error
+    n [ DWRITE_HIT_TEST_METRICS heap-size * buffer <displaced-alien>
+        DWRITE_HIT_TEST_METRICS memory>struct ] map-integers ;
 
 :: directwrite-line-metrics ( pointer -- metrics )
     pointer directwrite-text-metrics :> text
@@ -153,8 +163,14 @@ ERROR: missing-directwrite-fallback-font ;
             factory encoded encoded length 2 /i format 1000000.0 1000000.0
             { void* } [ IDWriteFactory::CreateTextLayout check-ole32-error ] with-out-parameters |com-release :> pointer
             pointer factory font font-features encoded length 2 /i set-directwrite-features
-            pointer directwrite-text-metrics widthIncludingTrailingWhitespace>> 1.0 max :> width
+            pointer directwrite-text-metrics :> text-metrics
+            text-metrics widthIncludingTrailingWhitespace>> 1.0 max :> width
             indexed? [ pointer width IDWriteTextLayout::SetMaxWidth check-ole32-error ] unless
+            font font-text-direction right-to-left =
+            text aux>> [
+                pointer 0 encoded length 2 /i directwrite-range-metrics
+                [ bidiLevel>> odd? ] any?
+            ] [ f ] if or :> bidi?
             pointer directwrite-line-metrics :> metrics
             factory font directwrite-font-metrics :> native
             font size>> directwrite-scale * native designUnitsPerEm>> / :> scale
@@ -165,6 +181,7 @@ ERROR: missing-directwrite-fallback-font ;
             ink [ left>> ] [ top>> ] bi 2array [ 0 max ceiling >integer ] map :> origin
             directwrite-layout new-disposable
                 font >>font string >>string pointer >>pointer metrics >>metrics
+                bidi? >>bidi?
                 origin >>origin
                 metrics width>> origin first + ink right>> 0 max +
                 metrics height>> origin second + ink bottom>> 0 max +
@@ -214,24 +231,70 @@ M: directwrite-layout dispose*
     [ glyph-index>> [ release-glyph-index ] when* ]
     [ f >>pointer f >>glyph-index drop ] tri ;
 
-:: native-directwrite-offset>x ( index layout -- x )
+:: native-directwrite-caret>x ( index trailing? layout -- x )
     layout check-disposed drop
-    layout pointer>> index layout directwrite-layout-index-map codepoint>native FALSE
+    index layout directwrite-layout-index-map codepoint>native :> position
+    trailing? position 0 > and :> use-trailing?
+    layout pointer>> position use-trailing? [ 1 - ] when
+    use-trailing? TRUE FALSE ?
     0.0 float <ref> :> x
     0.0 float <ref> :> y
     x y DWRITE_HIT_TEST_METRICS new
     IDWriteTextLayout::HitTestTextPosition check-ole32-error
     x float deref ;
 
-:: native-directwrite-x>offset ( x layout -- index )
+:: directwrite-hit-test ( x layout -- hit trailing? )
     layout check-disposed drop
     DWRITE_HIT_TEST_METRICS new :> hit
     FALSE int <ref> :> trailing
     FALSE int <ref> :> inside
     layout pointer>> x 0.0 trailing inside hit
     IDWriteTextLayout::HitTestPoint check-ole32-error
-    hit textPosition>> trailing int deref 0 = [ 0 ] [ hit length>> ] if +
-    layout directwrite-layout-index-map native>codepoint ;
+    hit trailing int deref zero? not ;
+
+:: directwrite-snap-caret ( n trailing? text -- boundary )
+    n 0 text length clamp :> index
+    index zero? [ 0 ] [
+        index text last-grapheme-from :> before
+        before text first-grapheme-from :> after
+        index after = [ index ] [ trailing? after before ? ] if
+    ] if ;
+
+:: directwrite-hit-caret ( hit trailing? layout -- n trailing? )
+    hit textPosition>> trailing? [ hit length>> + ] when
+    layout directwrite-layout-index-map native>codepoint
+    trailing? layout string>> dup selection? [ string>> ] when
+    directwrite-snap-caret trailing? ;
+
+:: native-directwrite-x>caret ( x layout -- n trailing? )
+    x layout directwrite-hit-test layout directwrite-hit-caret ;
+
+: native-directwrite-offset>x ( index layout -- x )
+    f swap native-directwrite-caret>x ;
+
+: native-directwrite-x>offset ( x layout -- index )
+    native-directwrite-x>caret drop ;
+
+:: directwrite-caret>x ( n trailing? layout -- x )
+    layout check-disposed drop
+    layout glyph-index>> [ n swap directwrite-indexed-offset>x ]
+    [ n trailing? layout native-directwrite-caret>x ] if* ;
+
+:: directwrite-x>caret ( x layout -- n trailing? )
+    layout check-disposed drop
+    layout glyph-index>> [ x swap directwrite-indexed-x>offset dup 0 > ]
+    [ x layout native-directwrite-x>caret ] if* ;
+
+:: directwrite-visual-step ( n trailing? direction layout -- next affinity moved? )
+    n trailing? layout directwrite-caret>x :> x
+    ! Inspect the adjacent visual cluster, then take its far edge. This
+    ! stays constant time even in large RTL paragraphs; no caret table.
+    x direction 0.01 * + layout directwrite-hit-test drop :> hit
+    direction 0 > hit bidiLevel>> odd? xor :> affinity
+    hit affinity layout directwrite-hit-caret drop :> next
+    next affinity layout directwrite-caret>x x - direction * 0 > [
+        next affinity t
+    ] [ n trailing? f ] if ;
 
 :: directwrite-offset>x ( index layout -- x )
     layout check-disposed drop
@@ -314,15 +377,7 @@ STARTUP-HOOK: [
                 left >>left 0 >>top right left - >>width
                 layout metrics>> height>> >>height TRUE >>isText 1array
         ] [
-            0 uint <ref> :> count
-            layout pointer>> start length 0.0 0.0 f 0 count
-            IDWriteTextLayout::HitTestTextRange drop
-            count uint deref :> n
-            n DWRITE_HIT_TEST_METRICS heap-size * <byte-array> :> buffer
-            layout pointer>> start length 0.0 0.0 buffer n count
-            IDWriteTextLayout::HitTestTextRange check-ole32-error
-            n [ DWRITE_HIT_TEST_METRICS heap-size * buffer <displaced-alien>
-                DWRITE_HIT_TEST_METRICS memory>struct ] map-integers
+            layout pointer>> start length directwrite-range-metrics
         ] if
     ] [ { } ] if ;
 

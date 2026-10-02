@@ -2,7 +2,7 @@
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs cache combinators fonts kernel
 locals math math.order namespaces opengl opengl.gl opengl.textures
-sequences strings system ui.gadgets.worlds ui.render vocabs ;
+sequences strings system ui.gadgets.worlds ui.render unicode vocabs ;
 IN: ui.text
 
 <PRIVATE
@@ -52,6 +52,32 @@ PRIVATE>
 HOOK: x>offset font-renderer ( x font string -- n )
 
 HOOK: offset>x font-renderer ( n font string -- x )
+
+! Affinity distinguishes the two visual sides of a logical bidi boundary.
+! Trailing affinity attaches an insertion point to the preceding cluster.
+HOOK: caret>x font-renderer ( n trailing? font string -- x )
+M: object caret>x [ drop ] 2dip offset>x ;
+
+HOOK: x>caret font-renderer ( x font string -- n trailing? )
+M: object x>caret x>offset f ;
+
+:: logical-caret-step ( n trailing? direction string -- next affinity moved? )
+    direction 0 < [
+        n zero? [ n trailing? f ] [ n string last-grapheme-from f t ] if
+    ] [
+        n string length = [ n trailing? f ] [ n string first-grapheme-from t t ] if
+    ] if ;
+
+HOOK: visual-caret-step font-renderer ( n trailing? direction font string -- next affinity moved? )
+M: object visual-caret-step [ drop ] dip logical-caret-step ;
+
+HOOK: visual-caret-edge font-renderer ( right? font string -- n trailing? )
+M:: object visual-caret-edge ( right? font string -- n trailing? )
+    font drop right? [ string length t ] [ 0 f ] if ;
+
+HOOK: selection-caret font-renderer ( start end right? font string -- n trailing? )
+M:: object selection-caret ( start end right? font string -- n trailing? )
+    font string 2drop right? [ end t ] [ start f ] if ;
 
 HOOK: selection-spans font-renderer ( start end font string -- spans )
 
