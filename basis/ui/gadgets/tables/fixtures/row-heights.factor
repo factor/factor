@@ -1,15 +1,18 @@
-USING: parser ;
+USING: kernel parser sequences vocabs.refresh ;
 <<
-"resource:basis/windows/dwmapi/dwmapi.factor" run-file
-"resource:basis/opengl/textures/textures.factor" run-file
-"resource:basis/ui/gestures/gestures.factor" run-file
-"resource:basis/ui/text/text.factor" run-file
-"resource:basis/ui/render/render.factor" run-file
-"resource:basis/ui/gadgets/worlds/worlds.factor" run-file
-"resource:basis/ui/gadgets/line-support/line-support.factor" run-file
-"resource:basis/ui/gadgets/tables/tables.factor" run-file
-"resource:basis/ui/ui.factor" run-file
-"resource:basis/ui/backend/windows/windows.factor" run-file
+! Test changed checkout sources without recompiling unchanged image definitions.
+{
+    "resource:basis/windows/dwmapi/dwmapi.factor"
+    "resource:basis/opengl/textures/textures.factor"
+    "resource:basis/ui/gestures/gestures.factor"
+    "resource:basis/ui/text/text.factor"
+    "resource:basis/ui/render/render.factor"
+    "resource:basis/ui/gadgets/worlds/worlds.factor"
+    "resource:basis/ui/gadgets/line-support/line-support.factor"
+    "resource:basis/ui/gadgets/tables/tables.factor"
+    "resource:basis/ui/ui.factor"
+    "resource:basis/ui/backend/windows/windows.factor"
+} [ dup source-modified? [ run-file ] [ drop ] if ] each
 >>
 USING: accessors arrays byte-arrays colors command-line continuations
 io kernel locals math math.vectors models namespaces opengl

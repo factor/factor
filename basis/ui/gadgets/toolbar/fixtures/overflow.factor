@@ -1,5 +1,7 @@
-USING: parser ;
-<< "resource:basis/ui/gadgets/toolbar/toolbar.factor" run-file >>
+USING: kernel parser vocabs.refresh ;
+! Test changed checkout sources without recompiling unchanged image definitions.
+<< "resource:basis/ui/gadgets/toolbar/toolbar.factor"
+dup source-modified? [ run-file ] [ drop ] if >>
 USING: accessors arrays continuations io kernel locals math
 math.vectors namespaces sequences system tools.test ui ui.backend
 ui.backend.windows ui.commands ui.gadgets ui.gadgets.buttons
