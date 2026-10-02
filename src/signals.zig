@@ -495,16 +495,36 @@ fn fpeSignalHandler(sig: std.posix.SIG, siginfo: *const SiginfoType, ucontext_pt
     const sp_ptr = getStackPointer(ucontext);
     const pc_ptr = getProgramCounter(ucontext);
 
-    // Check if it's integer division (FPE_INTDIV=1 or FPE_INTOVF=2)
-    const FPE_INTDIV: c_int = 1;
-    const FPE_INTOVF: c_int = 2;
-    const si_code = siginfo.code;
-    const handler = if (si_code == FPE_INTDIV or si_code == FPE_INTOVF)
+    dispatchSignal(vm, sp_ptr, pc_ptr, fpeHandlerAddress(siginfo.code));
+}
+
+fn fpeHandlerAddress(si_code: c_int) Cell {
+    const darwin = builtin.os.tag == .macos or builtin.os.tag == .ios;
+    const FPE_INTDIV: c_int = if (darwin) 7 else 1;
+    const FPE_INTOVF: c_int = if (darwin) 8 else 2;
+    return if (si_code == FPE_INTDIV or si_code == FPE_INTOVF)
         @intFromPtr(&synchronous_signal_handler_impl)
     else
         @intFromPtr(&fp_signal_handler_impl);
+}
 
-    dispatchSignal(vm, sp_ptr, pc_ptr, handler);
+test "SIGFPE distinguishes native integer and floating point si_code values" {
+    if (builtin.os.tag == .windows) return error.SkipZigTest;
+    const integer_handler = @intFromPtr(&synchronous_signal_handler_impl);
+    const fp_handler = @intFromPtr(&fp_signal_handler_impl);
+    if (builtin.os.tag == .macos or builtin.os.tag == .ios) {
+        // Darwin sys/signal.h: FLTDIV=1, FLTOVF=2, INTDIV=7, INTOVF=8.
+        try std.testing.expectEqual(fp_handler, fpeHandlerAddress(1));
+        try std.testing.expectEqual(fp_handler, fpeHandlerAddress(2));
+        try std.testing.expectEqual(integer_handler, fpeHandlerAddress(7));
+        try std.testing.expectEqual(integer_handler, fpeHandlerAddress(8));
+    } else {
+        // Linux: INTDIV=1, INTOVF=2, FLTDIV=3, FLTOVF=4.
+        try std.testing.expectEqual(integer_handler, fpeHandlerAddress(1));
+        try std.testing.expectEqual(integer_handler, fpeHandlerAddress(2));
+        try std.testing.expectEqual(fp_handler, fpeHandlerAddress(3));
+        try std.testing.expectEqual(fp_handler, fpeHandlerAddress(4));
+    }
 }
 
 fn raiseFpeWithoutVm() void {
@@ -569,6 +589,52 @@ fn synchronousSignalHandler(sig: std.posix.SIG, _: *const SiginfoType, ucontext_
     }
 
     dispatchSignal(vm, sp_ptr, pc_ptr, @intFromPtr(&synchronous_signal_handler_impl));
+}
+
+test "macOS ARM64 SIGILL uses ESR rather than stale FPSR flags" {
+    if (builtin.os.tag != .macos or builtin.cpu.arch != .aarch64) return error.SkipZigTest;
+    const allocator = std.testing.allocator;
+    const vm = try vm_mod.FactorVM.init(allocator);
+    vm.vm_asm.ctx = try vm.newContext();
+    defer vm.deinit();
+    var code_heap: vm_mod.CodeHeap = .{
+        .seg = null,
+        .safepoint_page = 0,
+        .allocator = allocator,
+        .remembered_sets = @import("write_barrier.zig").CodeHeapRememberedSets.init(allocator),
+    };
+    defer code_heap.deinit();
+    vm.code = &code_heap;
+    registerVmWithThread(vm);
+    defer unregisterVmFromThread();
+
+    var mc: [816]u8 align(16) = @splat(0);
+    var uc: MacOS_ucontext_t = undefined;
+    uc.uc_mcontext = &mc;
+    const cases = [_]struct { esr: u32, fp_status: ?u32 }{
+        .{ .esr = 0x02000000, .fp_status = null }, // Undefined instruction.
+        .{ .esr = 0xb2800002, .fp_status = FP_TRAP_ZERO_DIVIDE },
+        .{ .esr = 0x2c << 26, .fp_status = 0 }, // A trap even without cause bits.
+    };
+    for (cases) |case| {
+        std.mem.writeInt(u32, mc[8..][0..4], case.esr, .little);
+        std.mem.writeInt(u32, mc[800..][0..4], 1, .little); // Old invalid-operation flag.
+        vm.signal_fpu_status = 0;
+        var siginfo: SiginfoType = undefined;
+        synchronousSignalHandler(.ILL, &siginfo, &uc);
+        const expected_handler = if (case.fp_status != null)
+            @intFromPtr(&fp_signal_handler_impl)
+        else
+            @intFromPtr(&synchronous_signal_handler_impl);
+        try std.testing.expectEqual(expected_handler, getProgramCounter(&uc).*);
+        try std.testing.expectEqual(@as(c_int, @intFromEnum(std.posix.SIG.ILL)), vm.signal_number);
+        if (case.fp_status) |status| {
+            try std.testing.expectEqual(status, vm.signal_fpu_status);
+            try std.testing.expectEqual(@as(u32, 0), getFPUStatus(&uc));
+        } else {
+            try std.testing.expectEqual(@as(u32, 1), getFPUStatus(&uc));
+        }
+    }
 }
 
 // FEP (Factor Error Protocol) signal handler for SIGINT (Ctrl-C)
@@ -798,6 +864,47 @@ fn initHandlerAddress() void {
     // No-op - address is passed through inline assembly input
 }
 
+const Arm64UnwindProbe = struct {
+    fn entry() callconv(.naked) void {
+        asm volatile (
+            \\cmp x29, #0x123
+            \\b.ne 1f
+            \\cmp x30, #0x456
+            \\b.ne 1f
+            \\sub x0, sp, x1
+            \\cmp x0, #16
+            \\b.ne 1f
+            \\mov x0, #0
+            \\b 2f
+            \\1: mov x0, #1
+            \\2:
+        );
+        asm volatile (if (builtin.os.tag == .macos) "b __exit" else "b _exit");
+    }
+};
+
+test "ARM64 error unwind restores the saved frame before entering Factor" {
+    if (builtin.cpu.arch != .aarch64 or builtin.os.tag == .windows) return error.SkipZigTest;
+    const pid = std.c.fork();
+    try std.testing.expect(pid >= 0);
+    if (pid == 0) {
+        _ = std.c.alarm(10);
+        const vm = vm_mod.FactorVM.init(std.heap.page_allocator) catch std.c._exit(2);
+        vm.vm_asm.ctx = vm.newContext() catch std.c._exit(2);
+        const to = vm.vm_asm.ctx.callstack_bottom - 16;
+        @as(*Cell, @ptrFromInt(to)).* = 0x123;
+        @as(*Cell, @ptrFromInt(to + 8)).* = 0x456;
+        var word: layouts.Word align(layouts.data_alignment) = undefined;
+        vm.vm_asm.special_objects[@intFromEnum(objects.SpecialObject.unwind_native_frames_word)] = layouts.tag(layouts.Word, &word);
+        var quot: layouts.Quotation align(layouts.data_alignment) = undefined;
+        quot.entry_point = @intFromPtr(&Arm64UnwindProbe.entry);
+        unwindNativeFrames(vm, layouts.tag(layouts.Quotation, &quot), to);
+    }
+    const status = try waitForChild(pid);
+    try std.testing.expect(std.posix.W.IFEXITED(status));
+    try std.testing.expectEqual(@as(u8, 0), std.posix.W.EXITSTATUS(status));
+}
+
 // This function raises a Factor-level error that Factor's error handling can catch,
 // semantics to transfer control to Factor's error handler.
 pub fn memory_signal_handler_impl() callconv(.c) void {
@@ -997,9 +1104,12 @@ fn unwindNativeFrames(vm: *vm_mod.FactorVM, quot: Cell, to: Cell) noreturn {
         const tramp2_val: Cell = @intFromPtr(&trampolines.trampoline2);
         const cachemiss_val: Cell = @intFromPtr(&c_api.inline_cache_miss);
         const megahits_val: Cell = @intFromPtr(&vm.dispatch_stats.megamorphic_cache_hits);
+        // Match unwind-native-frames: restore FP/LR and pop the saved frame
+        // before entering Factor, abandoning the native function's frame.
         // x16 (IP0 scratch) holds entry to avoid conflicts with x19-x22.
         asm volatile (
             \\mov sp, x1
+            \\ldp x29, x30, [sp], #16
             \\mov x19, x2
             \\ldr x20, [x19]
             \\ldr x21, [x20, #0x10]
