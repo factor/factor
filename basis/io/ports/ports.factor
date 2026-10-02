@@ -20,6 +20,12 @@ M: port set-timeout timeout<< ;
 
 TUPLE: buffered-port < port { buffer buffer } ;
 
+HOOK: prepare-port-buffer io-backend ( count port -- )
+M: object prepare-port-buffer 2drop ;
+
+HOOK: read-port-direct io-backend ( dst count port partial? -- count/f )
+M: object read-port-direct 2drop 2drop f ;
+
 : <buffered-port> ( handle class -- port )
     [
         [ |dispose ] dip
@@ -51,6 +57,7 @@ M: input-port stream-read1
 <PRIVATE
 
 : read-step ( count port -- count ptr/f )
+    2dup prepare-port-buffer
     {
         { [ over 0 = ] [ 2drop 0 f ] }
         { [ dup wait-to-read ] [ 2drop 0 f ] }
@@ -72,12 +79,19 @@ M: input-port stream-read1
 
 PRIVATE>
 
-M: input-port stream-read-partial-unsafe
-    [ c-ptr check-instance swap ] dip prepare-read read-step
-    [ swap [ memcpy ] keep ] [ 2drop 0 ] if* ;
+M:: input-port stream-read-partial-unsafe ( count dst port -- n )
+    dst c-ptr check-instance drop
+    count port prepare-read :> ( count' port' )
+    dst count' port' t read-port-direct [ ] [
+        count' port' read-step
+        [ dst -rot swap [ memcpy ] keep ] [ drop 0 ] if*
+    ] if* ;
 
-M: input-port stream-read-unsafe
-    [ c-ptr check-instance swap ] dip prepare-read 0 read-loop ;
+M:: input-port stream-read-unsafe ( count dst port -- n )
+    dst c-ptr check-instance drop
+    count port prepare-read :> ( count' port' )
+    dst count' port' f read-port-direct
+    [ ] [ dst count' port' 0 read-loop ] if* ;
 
 <PRIVATE
 
@@ -148,6 +162,7 @@ M: output-port stream-write1
 <PRIVATE
 
 :: port-write ( src n-remaining port n-write  -- )
+    n-remaining port prepare-port-buffer
     port buffer>> :> buffer
     n-remaining buffer size>> min :> n-chunk
 

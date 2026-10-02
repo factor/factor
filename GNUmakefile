@@ -419,6 +419,15 @@ test-windows-process-wait: $(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSIO
 	$(BUILD_DIR)/windows-process-wait-tests$(EXE_EXTENSION)
 
 test-vm: test-windows-process-wait
+
+$(BUILD_DIR)/windows-file-copy-tests$(EXE_EXTENSION): vm/tests/windows_file_copy.cpp vm/windows_file_copy.hpp | $(BUILD_DIR)
+	$(TOOLCHAIN_PREFIX)$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $< $(LIBS)
+
+.PHONY: test-windows-file-copy
+test-windows-file-copy: $(BUILD_DIR)/windows-file-copy-tests$(EXE_EXTENSION)
+	$(BUILD_DIR)/windows-file-copy-tests$(EXE_EXTENSION)
+
+test-vm: test-windows-file-copy
 endif
 
 .SUFFIXES: .mm

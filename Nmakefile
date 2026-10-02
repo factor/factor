@@ -225,12 +225,19 @@ vm\tests\windows_process_wait.obj: vm\tests\windows_process_wait.cpp vm\windows_
 windows-process-wait-tests.exe: vm\tests\windows_process_wait.obj
 	link $(LINK_FLAGS) /out:windows-process-wait-tests.exe /SUBSYSTEM:console vm\tests\windows_process_wait.obj
 
-test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe windows-threads-tests.exe windows-io-tests.exe windows-code-heap-tests.exe windows-process-wait-tests.exe
+vm\tests\windows_file_copy.obj: vm\tests\windows_file_copy.cpp vm\windows_file_copy.hpp
+	cl /EHsc $(CL_FLAGS) /Fovm\tests\windows_file_copy.obj /c vm\tests\windows_file_copy.cpp
+
+windows-file-copy-tests.exe: vm\tests\windows_file_copy.obj
+	link $(LINK_FLAGS) /out:windows-file-copy-tests.exe /SUBSYSTEM:console vm\tests\windows_file_copy.obj
+
+test-vm: gc-tests.exe windows-allocation-tests.exe windows-services-tests.exe windows-threads-tests.exe windows-io-tests.exe windows-code-heap-tests.exe windows-process-wait-tests.exe windows-file-copy-tests.exe
 	.\gc-tests.exe
 	.\windows-services-tests.exe
 	.\windows-threads-tests.exe
 	.\windows-io-tests.exe
 	.\windows-process-wait-tests.exe
+	.\windows-file-copy-tests.exe
 
 test-windows: test-vm
 	python -B -m unittest discover -s vm/tests -p windows_*.py
@@ -267,7 +274,9 @@ clean:
 	if exist vm\tests\windows_allocation.obj del vm\tests\windows_allocation.obj
 	if exist vm\tests\windows_services.obj del vm\tests\windows_services.obj
 	if exist vm\tests\windows_process_wait.obj del vm\tests\windows_process_wait.obj
+	if exist vm\tests\windows_file_copy.obj del vm\tests\windows_file_copy.obj
 	if exist windows-process-wait-tests.exe del windows-process-wait-tests.exe
+	if exist windows-file-copy-tests.exe del windows-file-copy-tests.exe
 	if exist windows-services-tests.exe del windows-services-tests.exe
 	if exist windows-services-tests.lib del windows-services-tests.lib
 	if exist windows-services-tests.exp del windows-services-tests.exp

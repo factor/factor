@@ -2,13 +2,14 @@
 ! See https://factorcode.org/license.txt for BSD license.
 
 USING: accessors alien alien.c-types alien.data alien.strings
-byte-arrays classes.struct combinators destructors io.backend
-io.encodings.ascii io.files.windows io.ports io.sockets
-io.sockets.icmp io.sockets.private kernel libc locals math
-sequences system windows.errors windows.handles windows.kernel32
-windows.types windows.winsock ;
+arrays assocs byte-arrays classes.struct combinators continuations
+destructors io.backend
+io.encodings.ascii io.files io.files.windows io.ports io.sockets
+io.sockets.icmp io.sockets.private io.timeouts kernel libc literals
+locals math math.bitwise sequences system threads windows.errors
+windows.handles windows.kernel32 windows.types windows.wait windows.winsock ;
 
-FROM: namespaces => get ;
+FROM: namespaces => get get-global ;
 IN: io.sockets.windows
 
 : set-socket-option ( handle level opt -- )
@@ -34,7 +35,95 @@ M: windows addrspec-of-family
         [ drop f ]
     } case ;
 
-TUPLE: win32-socket < win32-file ;
+TUPLE: win32-socket < win32-file readiness ;
+
+TUPLE: socket-readiness < disposable socket event wait key waiters closed ;
+
+:: stop-socket-wait ( state -- )
+    state wait>> [ unregister-handle-wait win32-error=0/f ] when*
+    state f >>wait drop ;
+
+:: wake-socket-waiters ( error state -- )
+    state waiters>> keys [ error swap resume-with ] each
+    state waiters>> clear-assoc ;
+
+M:: socket-readiness dispose* ( state -- )
+    state stop-socket-wait
+    state key>> [ remove-completion-action ] when*
+    state socket>> handle>> f 0 WSAEventSelect socket-error
+    state event>> [ WSACloseEvent win32-error=0/f ] when*
+    ERROR_OPERATION_ABORTED state wake-socket-waiters ;
+
+DEFER: arm-socket-wait
+
+:: socket-event-error ( events bit -- error/f )
+    bit events iErrorCode>> nth dup zero? [ drop f ] when ;
+
+:: dispatch-socket-events ( state -- )
+    state stop-socket-wait
+    WSANETWORKEVENTS new :> events
+    state socket>> handle>> state event>> events WSAEnumNetworkEvents
+    SOCKET_ERROR = [ WSAGetLastError state wake-socket-waiters ] [
+        events lNetworkEvents>> :> mask
+        mask FD_CLOSE mask? [ state t >>closed drop ] when
+        state waiters>> >alist [| pair |
+            pair first2 :> ( thread event )
+            event +input+ = FD_READ FD_WRITE ? :> flag
+            state closed>> mask flag mask? or [
+                events FD_CLOSE_BIT socket-event-error
+                [
+                    events event +input+ = FD_READ_BIT FD_WRITE_BIT ?
+                    socket-event-error
+                ] unless*
+                thread resume-with
+                thread state waiters>> delete-at
+            ] when
+        ] each
+        state arm-socket-wait
+    ] if ;
+
+:: arm-socket-wait ( state -- )
+    state wait>> not state waiters>> assoc-empty? not and [
+        state event>> master-completion-port get-global state key>>
+        register-handle-wait dup win32-error=0/f state wait<<
+    ] when ;
+
+:: <socket-readiness> ( socket -- state )
+    [
+        socket-readiness new-disposable socket >>socket
+        H{ } clone >>waiters |dispose :> state
+        WSACreateEvent dup win32-error=0/f state event<<
+        socket handle>> state event>> flags{ FD_READ FD_WRITE FD_CLOSE }
+        WSAEventSelect socket-error
+        [ state dispatch-socket-events ] add-completion-action state key<<
+        state
+    ] with-destructors ;
+
+:: socket-readiness-for ( socket -- state )
+    socket check-disposed drop
+    socket readiness>> [
+        socket <socket-readiness> dup socket readiness<<
+    ] unless* ;
+
+M:: win32-socket wait-for-socket-event ( socket event -- )
+    socket socket-readiness-for :> state
+    ! SSL can request another write after partial progress while still writable.
+    ! A zero-time check also covers readiness recorded before wait registration.
+    1 socket handle>> event select-sets timeval new select
+    dup socket-error 0 > state closed>> or [ yield ] [
+        event self state waiters>> set-at
+        [
+            state arm-socket-wait
+            "socket readiness" suspend [ throw-windows-error ] when*
+        ] [
+            self state waiters>> delete-at
+            state waiters>> assoc-empty? [ state stop-socket-wait ] when
+        ] finally
+    ] if ;
+
+M: win32-socket cancel-operation
+    [ dup readiness>> [ dispose f >>readiness ] when* drop ]
+    [ call-next-method ] bi ;
 
 : <win32-socket> ( handle -- win32-socket )
     win32-socket new-win32-handle ;
@@ -156,11 +245,12 @@ M: object establish-connection
         dup call-ConnectEx
         [ wait-for-socket drop ] [ update-connect-context ] bi ;
 
-TUPLE: AcceptEx-args port
+TUPLE: AcceptEx-args port family
     sListenSocket sAcceptSocket lpOutputBuffer dwReceiveDataLength
     dwLocalAddressLength dwRemoteAddressLength lpdwBytesReceived lpOverlapped ;
 
 : init-accept-buffer ( addr AcceptEx -- )
+    over protocol-family >>family
     swap sockaddr-size 16 +
         [ >>dwLocalAddressLength ] [ >>dwRemoteAddressLength ] bi
         dup dwLocalAddressLength>> 2 * malloc &free >>lpOutputBuffer
@@ -206,7 +296,7 @@ TUPLE: AcceptEx-args port
             [ dwRemoteAddressLength>> ]
         } cleave
         (extract-remote-address)
-    ] [ port>> addr>> protocol-family ] bi
+    ] [ family>> ] bi
     ! The AcceptEx output buffer is freed when (accept) returns.
     sockaddr-of-family clone ; inline
 

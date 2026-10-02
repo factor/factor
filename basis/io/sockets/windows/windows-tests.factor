@@ -1,9 +1,70 @@
-USING: accessors continuations destructors io.sockets io.sockets.windows
-kernel sequences tools.test urls windows.winsock ;
-USING: alien alien.data byte-arrays calendar concurrency.promises io
-io.encodings.binary io.ports io.sockets.private io.timeouts locals
-namespaces threads ;
+USING: accessors alien alien.c-types alien.data byte-arrays calendar
+concurrency.promises continuations destructors io io.backend
+io.encodings.binary io.files io.files.windows io.ports io.sockets
+io.sockets.private io.sockets.windows io.streams.duplex io.timeouts
+kernel libc locals math namespaces sequences threads tools.test urls
+windows.errors windows.types windows.winsock ;
 IN: io.sockets.windows.tests
+
+:: with-readiness-sockets ( quot -- )
+    [
+        "127.0.0.1" 0 <inet4> binary <server> &dispose :> server
+        <promise> :> client
+        <promise> :> finish
+        <promise> :> done
+        [
+            [
+                server addr>> binary [
+                    input-stream get underlying-handle client fulfill
+                    finish ?promise drop
+                ] with-client t
+            ] [ ] recover done fulfill
+        ] "Windows readiness peer" spawn drop
+        server accept drop &dispose :> peer
+        client 5 seconds ?promise-timeout :> socket
+        [ socket peer quot call ]
+        [ t finish fulfill done 5 seconds ?promise-timeout t assert= ] finally
+    ] with-destructors ; inline
+
+{ } [
+    [| socket peer |
+        socket +output+ wait-for-fd
+    ] with-readiness-sockets
+] unit-test
+
+! The scheduler can run the sender while the reader waits, repeatedly.
+{ B{ 7 7 } } [
+    [| socket peer |
+        2 malloc &free :> bytes
+        2 [| i |
+            [
+                20 milliseconds sleep
+                B{ 7 } peer out>> stream-write peer out>> stream-flush
+            ] "Windows readiness sender" spawn drop
+            socket +input+ wait-for-fd
+            socket handle>> i bytes <displaced-alien> 1 0 recv 1 assert=
+        ] each-integer
+        bytes 2 memory>byte-array
+    ] with-readiness-sockets
+] unit-test
+
+! Socket cancellation must wake readiness waiters, not only overlapped I/O.
+{ t } [
+    [| socket peer |
+        [ 20 milliseconds sleep socket cancel-operation ]
+        "Windows readiness cancellation" spawn drop
+        [ socket +input+ wait-for-fd f ]
+        [ windows-error? ] recover
+    ] with-readiness-sockets
+] unit-test
+
+{ } [
+    [| socket peer |
+        [ 20 milliseconds sleep peer dispose ]
+        "Windows readiness close" spawn drop
+        socket +input+ wait-for-fd
+    ] with-readiness-sockets
+] unit-test
 
 ! Accepted addresses must own their bytes after the AcceptEx buffer is freed.
 ! Both sides must support getpeername after their context update.

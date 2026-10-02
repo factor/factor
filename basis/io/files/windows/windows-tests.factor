@@ -1,26 +1,102 @@
 ! Copyright (C) 2010 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: combinators continuations io.backend io.directories io.files
-io.files.temp io.files.windows io.pathnames kernel kernel.private libc
-literals memory sequences splitting tools.test windows.kernel32
-io.files.unique destructors ;
-USING: accessors alien alien.c-types alien.data locals math namespaces
-tools.annotations windows.errors windows.types ;
+USING: accessors alien alien.c-types alien.data calendar combinators
+concurrency.promises continuations destructors io io.backend io.buffers
+io.directories io.encodings.binary io.files io.files.temp io.files.unique
+io.files.windows io.pathnames io.pipes io.ports kernel kernel.private
+libc literals locals math memory namespaces sequences splitting threads
+tools.annotations tools.test vectors windows.errors windows.kernel32
+windows.types windows.user32 ;
 IN: io.files.windows.tests
 
-! A failed dequeue leaves the completion key undefined. It must not be
-! mistaken for a native process notification (or cause an infinite drain).
-:: empty-completion ( port bytes key overlapped timeout -- result )
-    123 key 0 ULONG_PTR set-alien-value
-    0 bytes 0 DWORD set-alien-value
-    f overlapped 0 void* set-alien-value
+! A failed dequeue leaves output storage undefined. Ignore it on timeout.
+:: empty-completion ( port entries capacity count timeout alertable -- result )
+    123 count 0 ULONG set-alien-value
+    WAIT_TIMEOUT SetLastError
     0 ;
 
 { f } [
     [
-        \ GetQueuedCompletionStatus [ drop [ empty-completion ] ] annotate
+        \ GetQueuedCompletionStatusEx [ drop [ empty-completion ] ] annotate
         0 handle-overlapped
-    ] [ \ GetQueuedCompletionStatus reset ] finally
+    ] [ \ GetQueuedCompletionStatusEx reset ] finally
+] unit-test
+
+! Native destinations bypass the staging buffer. Cover partial reads, an
+! already buffered prefix, seeking, several direct requests, and EOF.
+{ t 65535 131072 t 600000 0 } [| |
+    [| path |
+        600000 [ 256 mod ] B{ } map-integers-as :> contents
+        contents path binary set-file-contents
+        [
+            path binary <file-reader> &dispose :> input
+            700000 malloc &free :> dst
+            input stream-read1 0 =
+            131072 dst input stream-read-partial-unsafe
+            0 seek-absolute input stream-seek
+            131072 dst input stream-read-partial-unsafe
+            0 seek-absolute input stream-seek
+            700000 dst input stream-read-unsafe 600000 assert=
+            dst 600000 memory>byte-array contents =
+            input stream-tell
+            65536 dst input stream-read-unsafe
+        ] with-destructors
+    ] with-test-file
+] unit-test
+
+! Closing an input port with a pending ReadFile must leave its native buffer
+! alive until the cancellation packet has been consumed.
+{ 1 t 0 } [| |
+    [
+        (pipe) &dispose :> pipe
+        pipe in>> <input-port> &dispose :> input
+        pipe out>> <output-port> &dispose drop
+        <promise> :> started
+        <promise> :> finished
+        [
+            t started fulfill
+            [ input stream-read1 drop f ] [ drop t ] recover finished fulfill
+        ] "Windows pending read close" spawn drop
+        started 5 seconds ?promise-timeout drop
+        10 [ input buffer>> users>> zero? [ yield ] when ] times
+        input buffer>> users>>
+        input dispose
+        finished 5 seconds ?promise-timeout
+        input buffer>> users>>
+    ] with-destructors
+] unit-test
+
+! A burst is handled in bounded batches, including notifications whose owner
+! was disposed before the queued packet was consumed.
+{ 64 128 130 } [| |
+    master-completion-port get-global :> original
+    <master-completion-port> :> port
+    V{ } clone :> received
+    130 [| i | [ i received push ] add-completion-action ] map-integers :> keys
+    [
+        port master-completion-port set-global
+        keys [| key | port 0 key f PostQueuedCompletionStatus win32-error=0/f ] each
+        0 handle-overlapped drop received length
+        0 handle-overlapped drop received length
+        0 handle-overlapped drop received length
+        [ ] add-completion-action :> stale
+        stale remove-completion-action
+        port 0 stale f PostQueuedCompletionStatus win32-error=0/f
+        0 handle-overlapped t assert=
+        [ "completion action failed" throw ] add-completion-action :> failed
+        [ 130 received push ] add-completion-action :> following
+        [
+            port 0 failed f PostQueuedCompletionStatus win32-error=0/f
+            port 0 following f PostQueuedCompletionStatus win32-error=0/f
+            [ 0 handle-overlapped drop ]
+            [ "completion action failed" = ] must-fail-with
+            received length 131 assert=
+        ] [ failed remove-completion-action following remove-completion-action ] finally
+    ] [
+        original master-completion-port set-global
+        keys [ remove-completion-action ] each
+        port CloseHandle win32-error=0/f
+    ] finally
 ] unit-test
 
 { f } [ "\\foo" absolute-path? ] unit-test

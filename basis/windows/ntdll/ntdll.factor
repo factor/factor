@@ -7,6 +7,8 @@ LIBRARY: ntdll
 
 TYPEDEF: LONG NTSTATUS
 
+FUNCTION: ULONG RtlNtStatusToDosError ( NTSTATUS status )
+
 ! Buffer is a PWSTR
 STRUCT: LSA_UNICODE_STRING
     { Length USHORT }

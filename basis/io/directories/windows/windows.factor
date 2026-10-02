@@ -1,11 +1,34 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: system io.directories alien.strings
-io.pathnames io.backend io.files.windows literals destructors
-kernel accessors calendar windows windows.errors
-windows.kernel32 alien.c-types sequences splitting
-fry continuations classes.struct windows.time ;
+USING: accessors alien.c-types alien.strings alien.syntax calendar
+classes.struct continuations destructors fry io.backend
+io.directories io.files.windows io.pathnames kernel literals
+locals math namespaces sequences splitting system threads windows
+windows.errors windows.kernel32 windows.time windows.types ;
 IN: io.directories.windows
+
+LIBRARY: factor
+FUNCTION: void* factor_begin_file_copy
+    ( LPCWSTR source, LPCWSTR destination, HANDLE port, ULONG_PTR key )
+FUNCTION: DWORD factor_finish_file_copy ( void* copy )
+
+M:: windows copy-file ( from to -- )
+    to make-parent-directories drop
+    self :> thread
+    [ thread resume ] add-completion-action :> key
+    f :> copy!
+    [
+        from normalize-path to normalize-path
+        master-completion-port get-global key
+        factor_begin_file_copy dup win32-error=0/f copy!
+        "file copy" suspend drop
+    ] [
+        key remove-completion-action
+        copy [
+            factor_finish_file_copy
+            dup zero? [ drop ] [ throw-windows-error ] if
+        ] when*
+    ] finally ;
 
 M: windows touch-file
     normalize-path maybe-create-file '[

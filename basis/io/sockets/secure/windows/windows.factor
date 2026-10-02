@@ -55,7 +55,9 @@ M: openssl ssl-certificate-verification-supported? f ;
     ! "CA" set-windows-certs-for
     "ROOT" set-windows-certs-for ;
 
-M: windows socket-handle handle>> alien-address ;
+M: windows socket-handle
+    ! Set nonblocking mode before OpenSSL can perform a handshake or read.
+    dup socket-readiness-for drop handle>> alien-address ;
 
 M: secure remote>handle
     [ addrspec>> remote>handle dup FIONBIO 1 set-ioctl-socket ]
@@ -69,6 +71,11 @@ M: secure (get-local-address)
     [ windows-socket-handle ] [ addrspec>> ] bi* (get-local-address) ;
 
 M: secure parse-sockaddr addrspec>> parse-sockaddr f <secure> ;
+
+M: secure (accept)
+    [
+        addrspec>> (accept) [ |dispose f <ssl-socket> ] dip
+    ] with-destructors ;
 
 M: secure establish-connection
     [

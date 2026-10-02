@@ -9,6 +9,7 @@ PLAF_DLL_OBJS += $(BUILD_DIR)/os-windows.o $(BUILD_DIR)/mvm-windows.o
 PLAF_EXE_OBJS += $(BUILD_DIR)/resources.o $(BUILD_DIR)/main-windows.o
 PLAF_MASTER_HEADERS += vm/os-windows.hpp
 PLAF_MASTER_HEADERS += vm/windows_process_wait.hpp
+PLAF_MASTER_HEADERS += vm/windows_file_copy.hpp
 
 EXE_SUFFIX=
 EXE_EXTENSION=.exe

@@ -1,15 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.data alien.strings
-alien.syntax arrays ascii assocs classes.struct combinators
-combinators.short-circuit continuations destructors environment
+alien.syntax arrays ascii assocs byte-arrays classes.struct
+combinators combinators.short-circuit continuations destructors environment
 io io.backend io.buffers io.files io.files.private
 io.files.types io.pathnames io.pathnames.private io.ports
 io.streams.c io.streams.null io.timeouts kernel libc literals
-locals math math.bitwise namespaces sequences specialized-arrays
-system threads tr vectors windows windows.errors windows.handles
-windows.kernel32 windows.shell32 windows.time windows.types
-windows.winsock splitting ;
+locals math math.bitwise math.order namespaces sequences specialized-arrays
+splitting system threads tr vectors windows windows.errors windows.handles
+windows.kernel32 windows.ntdll windows.shell32 windows.time
+windows.types windows.winsock ;
 SPECIALIZED-ARRAY: ushort
 IN: io.files.windows
 
@@ -62,6 +62,11 @@ SYMBOL: master-completion-port
 SYMBOL: completion-actions
 SYMBOL: next-completion-key
 
+CONSTANT: completion-batch-size 64
+SYMBOL: completion-batch
+SYMBOL: file-args-pool
+file-args-pool [ V{ } clone ] initialize
+
 : add-completion-action ( quot -- key )
     next-completion-key [ 1 + ] change-global
     next-completion-key get-global
@@ -92,42 +97,64 @@ SYMBOL: next-completion-key
         } cond
     ] with-timeout ;
 
-:: wait-for-overlapped ( nanos -- bytes-transferred overlapped error? key )
-    nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
-    master-completion-port get-global
-    { DWORD ULONG_PTR pointer: OVERLAPPED }
-    [ timeout GetQueuedCompletionStatus zero? ] with-out-parameters
-    :> ( error? bytes key overlapped )
-    ! The completion key is undefined when no packet was dequeued.
-    bytes overlapped error? error? overlapped not and [ 0 ] [ key ] if ;
-
 : resume-callback ( result overlapped -- )
     >c-ptr pending-overlapped get-global delete-at* drop resume-with ;
 
-: handle-overlapped ( nanos -- ? )
-    wait-for-overlapped dup zero? [
-        drop [
-            [
-                [ drop GetLastError 1array ] dip resume-callback t
-            ] [ drop f ] if*
-        ] [ resume-callback t ] if
+:: dispatch-completion ( entry -- error/f )
+    entry lpCompletionKey>> dup zero? [
+        drop
+        entry lpOverlapped>> [| overlapped |
+            entry Internal>> dup zero?
+            [ drop entry dwNumberOfBytesTransferred>> ]
+            [ 32 bits RtlNtStatusToDosError 1array ] if
+            overlapped resume-callback
+        ] when*
+        f
     ] [
-        ! A child can be reaped before its queued notification is consumed.
-        ! Keys are never reused, so stale packets are harmless.
-        [ 3drop ] dip completion-actions get-global at
-        [ call( -- ) ] when* t
+        ! Keys are never reused; notifications queued before disposal are harmless.
+        completion-actions get-global at
+        [| action | [ action call( -- ) f ] [ ] recover ] [ f ] if*
     ] if ;
+
+:: dequeue-completions ( nanos entries -- count )
+    nanos [ 1,000,000 /i ] [ INFINITE ] if* :> timeout
+    master-completion-port get-global entries completion-batch-size
+    { ULONG } [ timeout FALSE GetQueuedCompletionStatusEx ] with-out-parameters
+    swap zero? [
+        drop GetLastError dup WAIT_TIMEOUT =
+        [ drop 0 ] [ throw-windows-error ] if
+    ] when ;
+
+:: handle-overlapped ( nanos -- ? )
+    ! Take ownership of scratch storage so nested dispatch cannot overwrite it.
+    completion-batch get-global
+    [ OVERLAPPED_ENTRY heap-size completion-batch-size * <byte-array> ] unless*
+    :> entries
+    f completion-batch set-global
+    f :> error!
+    [
+        nanos entries dequeue-completions dup [| i |
+            i OVERLAPPED_ENTRY heap-size * entries <displaced-alien>
+            OVERLAPPED_ENTRY memory>struct dispatch-completion
+            [ error [ drop ] [ error! ] if ] when*
+        ] each-integer zero? not
+        ! All packets have left the OS queue; dispatch the rest before throwing.
+        error [ rethrow ] when*
+    ] [ entries completion-batch set-global ] finally ;
 
 M: win32-handle cancel-operation
     [ handle>> CancelIo win32-error=0/f ] unless-disposed ;
 
 M: windows io-multiplex
-    handle-overlapped [ 0 io-multiplex ] when ;
+    ! Bound each pass so runnable threads get a turn during sustained traffic.
+    handle-overlapped drop ;
 
 M: windows init-io
     <master-completion-port> master-completion-port set-global
     H{ } clone completion-actions set-global
     0 next-completion-key set-global
+    f completion-batch set-global
+    V{ } clone file-args-pool set-global
     H{ } clone pending-overlapped set-global ;
 
 : (handle>file-size) ( handle -- n/f )
@@ -192,6 +219,74 @@ M: windows handle-length
         [ buffer>> dup buffer-length 0 DWORD <ref> ] dip make-overlapped
     ] 2bi <FileArgs> ;
 
+CONSTANT: bulk-buffer-size 262144
+
+M:: windows prepare-port-buffer ( count port -- )
+    port buffer>> :> buffer
+    ! Grow standard buffers only; retain alternate configured sizes.
+    buffer size>> 65536 >= buffer size>> bulk-buffer-size < and
+    default-buffer-size get 65536 = and
+    buffer buffer-empty? and count buffer size>> > and [
+        count bulk-buffer-size min buffer grow-buffer
+    ] when ;
+
+: <pooled-FileArgs> ( -- args )
+    [
+        FileArgs new
+            DWORD heap-size malloc |free >>lpNumberOfBytesRet
+            OVERLAPPED malloc-struct |free >>lpOverlapped
+    ] with-destructors ;
+
+:: acquire-file-args ( port handle -- args )
+    handle check-disposed drop
+    file-args-pool get-global dup empty?
+    [ drop <pooled-FileArgs> ] [ pop ] if :> args
+    args lpOverlapped>> :> overlapped
+    overlapped >c-ptr 0 OVERLAPPED heap-size memset
+    handle ptr>> [| offset |
+        overlapped offset 32 bits >>offset offset -32 shift >>offset-high drop
+    ] when*
+    args handle handle>> >>hFile port buffer>> >>lpBuffer ;
+
+:: release-file-args ( args -- )
+    args f >>lpBuffer f >>hFile drop
+    file-args-pool get-global :> pool
+    pool length completion-batch-size < [ args pool push ] [
+        args lpOverlapped>> free
+        args lpNumberOfBytesRet>> free
+    ] if ;
+
+:: with-file-args ( ..a port handle quot: ( ..a args -- ..b ) -- ..b )
+    port handle acquire-file-args :> args
+    port buffer>> :> buffer
+    buffer retain-buffer
+    [ args quot call ]
+    [ buffer release-buffer args release-file-args ] finally ; inline
+
+:: read-direct-chunk ( dst count port -- n )
+    port port handle>> [| args |
+        args args hFile>> dst count
+        args lpNumberOfBytesRet>> args lpOverlapped>>
+        ReadFile port wait-for-file :> n
+        port check-disposed drop
+        n port update-file-ptr n
+    ] with-file-args ;
+
+:: read-direct-loop ( dst count port partial? total -- n )
+    total dst <displaced-alien>
+    count bulk-buffer-size min port read-direct-chunk :> n
+    partial? n zero? or n count = or [ total n + ] [
+        dst count n - port partial? total n + read-direct-loop
+    ] if ; recursive
+
+M:: windows read-port-direct ( dst count port partial? -- count/f )
+    ! Only externally owned storage can remain stable while Factor runs a GC.
+    dst pinned-alien? port handle>> win32-file? and
+    count 65536 >= and port buffer>> buffer-empty? and
+    default-buffer-size get 65536 = and [
+        dst count port partial? 0 read-direct-loop
+    ] [ f ] if ;
+
 : setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
     {
         [ hFile>> ]
@@ -203,11 +298,10 @@ M: windows handle-length
 : finish-write ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
-M: object drain
-    [
-        [ make-FileArgs dup setup-write WriteFile ]
-        [ drop [ wait-for-file ] [ finish-write ] bi ] 2bi f
-    ] with-destructors ;
+M:: object drain ( port handle -- event )
+    port handle [| args |
+        args dup setup-write WriteFile port wait-for-file port finish-write
+    ] with-file-args f ;
 
 : setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
     {
@@ -220,11 +314,11 @@ M: object drain
 : finish-read ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer+ ] 2bi ;
 
-M: object refill
-    [
-        [ make-FileArgs dup setup-read ReadFile ]
-        [ drop [ wait-for-file ] [ finish-read ] bi ] 2bi f
-    ] with-destructors ;
+M:: object refill ( port handle -- event )
+    port handle [| args |
+        args dup setup-read ReadFile port wait-for-file
+        port check-disposed finish-read
+    ] with-file-args f ;
 
 M: windows (wait-to-write)
     dup dup handle>> drain
@@ -240,11 +334,10 @@ M: windows (wait-to-read)
 : select-sets ( socket event -- read-fds write-fds except-fds )
     [ make-fd-set ] dip +input+ = [ f f ] [ f swap f ] if ;
 
-CONSTANT: select-timeval S{ timeval { sec 0 } { usec 1000 } }
+GENERIC#: wait-for-socket-event 1 ( socket event -- )
 
 M: windows wait-for-fd
-    [ file>> handle>> 1 swap ] dip select-sets select-timeval
-    select drop yield ;
+    [ dup win32-file? [ file>> ] unless ] dip wait-for-socket-event ;
 
 : console-app? ( -- ? ) GetConsoleWindow >boolean ;
 

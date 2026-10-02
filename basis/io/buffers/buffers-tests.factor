@@ -1,6 +1,6 @@
 IN: io.buffers.tests
 USING: accessors alien alien.data arrays byte-arrays destructors
-io.buffers kernel libc namespaces sequences strings tools.test ;
+io.buffers kernel libc locals namespaces sequences strings tools.test ;
 
 : buffer-set ( string buffer -- )
     [ ptr>> swap >byte-array binary-object memcpy ]
@@ -12,6 +12,25 @@ io.buffers kernel libc namespaces sequences strings tools.test ;
 
 : buffer-read-all ( buffer -- byte-array )
     [ buffer@ ] [ buffer-length ] bi memory>byte-array ;
+
+! Closing a buffer must defer freeing storage borrowed by pending I/O.
+{ "abc" 0 } [| |
+    "abc" string>buffer :> buffer
+    buffer retain-buffer
+    buffer dispose
+    buffer buffer-read-all >string
+    buffer release-buffer
+    buffer users>>
+] unit-test
+
+{ "abcdef" 32 } [| |
+    "abcdef" string>buffer :> buffer
+    2 buffer buffer-consume
+    32 buffer grow-buffer
+    buffer ptr>> 6 memory>byte-array >string
+    buffer size>>
+    buffer dispose
+] unit-test
 
 { B{ } 65536 } [
     65536 <buffer>

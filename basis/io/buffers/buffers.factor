@@ -2,8 +2,8 @@
 ! Copyright (C) 2006, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors alien.data byte-arrays
-combinators destructors kernel libc math math.order math.private
-sequences sequences.private typed ;
+combinators continuations destructors kernel libc locals math
+math.order math.private sequences sequences.private typed ;
 IN: io.buffers
 
 TUPLE: buffer
@@ -11,12 +11,32 @@ TUPLE: buffer
 { ptr alien }
 { fill fixnum }
 { pos fixnum }
+{ users fixnum }
 disposed ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 f buffer boa ; inline
+    dup malloc 0 0 0 f buffer boa ; inline
 
-M: buffer dispose* ptr>> free ; inline
+M: buffer dispose*
+    dup users>> zero? [ ptr>> free ] [ drop ] if ; inline
+
+! Pending native I/O owns the storage until its completion is consumed.
+: retain-buffer ( buffer -- )
+    [ 1 + ] change-users drop ; inline
+
+: release-buffer ( buffer -- )
+    [ 1 - ] change-users
+    dup [ users>> zero? ] [ disposed>> ] bi and
+    [ ptr>> free ] [ drop ] if ; inline
+
+:: grow-buffer ( size buffer -- )
+    buffer check-disposed drop
+    size buffer size>> > [
+        buffer users>> zero? [
+            buffer ptr>> size realloc buffer ptr<<
+            size buffer size<<
+        ] [ "Cannot resize a buffer with pending I/O" throw ] if
+    ] when ;
 
 TYPED: buffer-reset ( n: fixnum buffer: buffer -- )
     swap >>fill 0 >>pos drop ; inline

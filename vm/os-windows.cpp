@@ -1,5 +1,6 @@
 #include "master.hpp"
 #include "windows_process_wait.hpp"
+#include "windows_file_copy.hpp"
 
 namespace factor {
 
@@ -10,6 +11,16 @@ VM_C_API void* factor_register_process_wait(HANDLE process, HANDLE port,
 
 VM_C_API BOOL factor_unregister_process_wait(void* wait) {
   return unregister_process_wait(static_cast<factor_process_wait*>(wait));
+}
+
+VM_C_API void* factor_begin_file_copy(const wchar_t* source,
+                                    const wchar_t* destination,
+                                    HANDLE port, ULONG_PTR key) {
+  return begin_file_copy(source, destination, port, key);
+}
+
+VM_C_API DWORD factor_finish_file_copy(void* copy) {
+  return finish_file_copy(static_cast<factor_file_copy*>(copy));
 }
 
 HMODULE hFactorDll;
