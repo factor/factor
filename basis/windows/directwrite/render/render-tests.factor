@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors continuations destructors fonts fonts.shaping grouping
+USING: accessors arrays colors continuations destructors fonts fonts.shaping grouping images
 kernel locals math math.functions math.vectors namespaces opengl sequences strings tools.test windows.directwrite
 windows.directwrite.render ;
 IN: windows.directwrite.render.tests

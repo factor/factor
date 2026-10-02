@@ -68,7 +68,9 @@ IN: windows.uniscribe.overhang.tests
 
 ! Opaque text retains the native GDI pixels, including italic overhang.
 :: opaque-pixels? ( -- equal? order )
-    "Arial" <font> 48 >>size t >>italic? "f" cached-script-string :> script
+    "Arial" <font> 48 >>size t >>italic?
+    COLOR: black >>foreground COLOR: white >>background
+    "f" cached-script-string :> script
     script wide-reference :> reference
     reference 0xffffff script size>> 256 bitmap-ink-bounds :> bounds
     reference bounds crop-text-bitmap bitmap>>

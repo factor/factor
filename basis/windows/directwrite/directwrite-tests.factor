@@ -1,4 +1,4 @@
-USING: accessors arrays assocs combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
+USING: accessors arrays assocs colors combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
 math.order namespaces opengl sequences sets strings tools.test windows.directwrite windows.fonts ;
 IN: windows.directwrite.tests
 
@@ -33,7 +33,71 @@ IN: windows.directwrite.tests
 
 { t t t t } [ directwrite-alias-snapshot? ] unit-test
 
-{ t t } [
+! Editing a caller-owned feature map must neither change an existing
+! layout nor corrupt its cache key. Restoring the input reuses that layout.
+:: feature-snapshot? ( -- pinned? changed? restored? )
+    "Cambria" <font> H{ { "kern" 0 } } font-with-features :> font
+    font "AVATAR mutable features" cached-directwrite-layout :> before
+    1 "kern" font font-features set-at
+    font "AVATAR mutable features" cached-directwrite-layout :> after
+    before font>> font-features "kern" of 0 =
+    before metrics>> width>> after metrics>> width>> = not
+    0 "kern" font font-features set-at
+    font "AVATAR mutable features" cached-directwrite-layout before eq? ;
+
+{ t t t } [ feature-snapshot? ] unit-test
+
+{ t t t } [
+    [let
+        "kern" clone :> tag
+        "en-us" clone :> locale
+        "Cambria" <font> tag 1 2array 1array >hashtable font-with-features
+        locale font-with-locale :> font
+        font "mutable feature tags and locale" cached-directwrite-layout :> layout
+        CHAR: X 0 tag set-nth
+        CHAR: X 0 locale set-nth
+        layout font>> font-features "kern" of 1 =
+        layout font>> font-locale "en-us" =
+        CHAR: k 0 tag set-nth
+        CHAR: e 0 locale set-nth
+        ! Changes through the layout also cannot mutate the memo key.
+        0 "kern" layout font>> font-features set-at
+        font "mutable feature tags and locale" cached-directwrite-layout layout eq?
+    ]
+] unit-test
+
+:: text-snapshot? ( length -- pinned? changed? restored? )
+    test-font :> font
+    length CHAR: i <string> :> text
+    font text cached-directwrite-layout :> before
+    CHAR: W 0 text set-nth
+    font text cached-directwrite-layout :> after
+    before string>> first CHAR: i =
+    before metrics>> width>> after metrics>> width>> = not
+    CHAR: i 0 text set-nth
+    font text cached-directwrite-layout before eq? ;
+
+{ t t t } [ 30 text-snapshot? ] unit-test
+{ t t t } [ 5000 text-snapshot? ] unit-test
+
+! Deferred rasterization keeps its original colors and selection range.
+{ t t t t } [
+    [let
+        0.2 0.3 0.4 1 <rgba> :> foreground
+        test-font foreground >>foreground :> font
+        "mutable selection" clone 0 3 foreground <selection> :> selection
+        font selection cached-directwrite-layout :> layout
+        font 0.9 0.3 0.4 1 <rgba> >>foreground drop
+        selection 4 >>start drop
+        CHAR: X 0 selection string>> set-nth
+        layout font>> foreground>> red>> 0.2 =
+        layout string>> color>> red>> 0.2 =
+        layout string>> start>> 0 =
+        layout string>> string>> "mutable selection" =
+    ]
+] unit-test
+
+{ t t t } [
     [let
         test-font :> font
         10000 CHAR: a <string> :> text
@@ -41,6 +105,7 @@ IN: windows.directwrite.tests
         font text 9000 9010 f <selection> cached-directwrite-layout :> selected
         plain pointer>> selected pointer>> =
         selected directwrite-selection-rects selected directwrite-selection-rects eq?
+        selected string>> string>> plain string>> eq?
     ]
 ] unit-test
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2026 Doug Coleman.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache
+USING: accessors alien alien.c-types alien.data alien.strings arrays assocs byte-arrays cache colors
 classes.struct destructors fonts fonts.shaping hashtables.identity.private init io.encodings.string
 io.encodings.utf16 io.encodings.utf16.private kernel locals math math.bitwise math.functions math.order
 namespaces opengl sequences ui.text.index-maps windows.com windows.directx.dwrite
@@ -109,8 +109,30 @@ ERROR: missing-directwrite-fallback-font ;
         ] with-com-interface
     ] with-com-interface ;
 
+:: snapshot-directwrite-shaping-options ( options -- copy )
+    options [ :> value :> key
+        key clone
+        key "features" = [
+            value [ [ clone ] dip ] H{ } assoc-map-as
+        ] [ value clone ] if
+    ] H{ } assoc-map-as ;
+
+: snapshot-directwrite-color ( color/f -- rgba/f )
+    dup [ >rgba ] when ;
+
+! Native layouts and memo keys must own independent snapshots of inputs.
 : snapshot-directwrite-font-name ( font -- copy )
-    clone [ windows-font-name clone ] change-name ;
+    clone [ windows-font-name clone ] change-name
+    [ snapshot-directwrite-color ] change-foreground
+    [ snapshot-directwrite-color ] change-background
+    dup shaped-font? [
+        [ snapshot-directwrite-shaping-options ] change-shaping-options
+    ] when ;
+
+: snapshot-directwrite-text ( string/selection -- copy )
+    clone dup selection? [
+        [ clone ] change-string [ snapshot-directwrite-color ] change-color
+    ] when ;
 
 :: indexable-directwrite-text? ( font text -- ? )
     text length 4096 > font font-text-direction right-to-left = not and [
@@ -120,8 +142,9 @@ ERROR: missing-directwrite-fallback-font ;
 : directwrite-encode ( text -- encoded )
     dup aux>> [ utf16n encode ] [ 0 swap ascii-string>utf16-byte-array ] if ;
 
-:: <plain-directwrite-layout> ( input-font string -- layout )
+:: <plain-directwrite-layout> ( input-font input-string -- layout )
     input-font snapshot-directwrite-font-name :> font
+    input-string snapshot-directwrite-text :> string
     [ <directwrite-factory> [ :> factory
         factory font <directwrite-format> [ :> format
             string dup selection? [ string>> ] when :> text
@@ -177,7 +200,11 @@ DEFER: cached-directwrite-layout
         dup pointer>> IUnknown::AddRef drop
         dup register-disposable
         dup glyph-index>> [ retain-glyph-index drop ] when*
-        text >>string f >>image f >>selection-rects
+        ! The plain layout already owns a text snapshot. Reuse it here;
+        ! moving a selection must not copy an entire long output line.
+        dup string>> text clone swap >>string
+        [ snapshot-directwrite-color ] change-color
+        >>string f >>image f >>selection-rects
     ] [
         [ font text <plain-directwrite-layout> |dispose index-directwrite-layout ] with-destructors
     ] if ;
@@ -227,7 +254,7 @@ TUPLE: directwrite-layout-alias < disposable key ;
 M: directwrite-layout-alias dispose* drop ;
 
 :: directwrite-layout-key ( font string -- key )
-    font snapshot-directwrite-font-name string directwrite-scale 3array ;
+    font snapshot-directwrite-font-name string snapshot-directwrite-text directwrite-scale 3array ;
 
 :: directwrite-aliased-layout ( font string -- layout )
     font snapshot-directwrite-font-name string <identity-wrapper>
@@ -249,11 +276,21 @@ M: directwrite-layout-alias dispose* drop ;
 
 :: cached-directwrite-layout ( font string -- layout )
     disposables get-global disposables [
-        string dup selection? [ string>> ] when length 4096 > [
-            font string directwrite-aliased-layout
-        ] [
-            font string directwrite-layout-key cached-directwrite-layouts get-global
+        string selection? [
+            ! Paint state belongs to a particular shaped layout. Key it by
+            ! that layout's identity to avoid copying long text each time
+            ! the selection moves, while still snapshotting mutable inputs.
+            font string string>> cached-directwrite-layout <identity-wrapper>
+            string start>> string end>> string color>> snapshot-directwrite-color
+            4array cached-directwrite-layouts get-global
             [ drop font string <directwrite-layout> ] cache
+        ] [
+            string length 4096 > [
+                font string directwrite-aliased-layout
+            ] [
+                font string directwrite-layout-key cached-directwrite-layouts get-global
+                [ drop font string <directwrite-layout> ] cache
+            ] if
         ] if
     ] with-variable ;
 
