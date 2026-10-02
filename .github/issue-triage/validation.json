@@ -1,0 +1,44 @@
+{
+  "recorded_at": "2026-10-02T00:00:34.754Z",
+  "source_head": "ba536b41731191e255543c2be78e8ef2ad56f533",
+  "platform": "Windows x86-64",
+  "command": "factor.com -no-user-init .github/issue-triage/verify.factor",
+  "exit_code": 0,
+  "checks": 519,
+  "success_marker": "CLOSURE-CHECKS-PASS",
+  "log_sha256": "07801c941333cedaaeea1436729a899a8e6011be057716df020454e0607ed244",
+  "factor_exe_sha256": "fe24e95257680b2a5e92d2fee4c864f3d5008587f6f847b333ed5b86eb9d3b98",
+  "factor_image_bytes": 167672184,
+  "suites": [
+    "classes.struct",
+    "bit-arrays",
+    "arrays.shaped",
+    "prettyprint",
+    "math.floats.env",
+    "images.loader.gdiplus",
+    "game.input.dinput",
+    "cache",
+    "ui.gadgets.glass",
+    "ui.gadgets.panes",
+    "ui.tools.listener",
+    "ui.tools.operations",
+    "tools.annotations",
+    "alien.varargs"
+  ],
+  "standalone_fixtures": [
+    "compiler/tests/slotless-tuples.factor",
+    "compiler/tests/alien-varargs.factor",
+    "compiler/tests/alien-varargs-promotions.factor",
+    "compiler/tests/alien-varargs-outgoing.factor"
+  ],
+  "probes": [
+    "windows.iphlpapi reloads from source",
+    "generic tag/author definition icons",
+    "virtual zip-index ordering"
+  ],
+  "limitations": [
+    "Native macOS/Linux verification was not performed.",
+    "The generic Reset regression does not reproduce the separate dispose breakpoint hang, so #2748 is not closed.",
+    "Existing GitHub closures are recorded without re-verifying every historical implementation."
+  ]
+}
