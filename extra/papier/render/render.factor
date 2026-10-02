@@ -53,9 +53,10 @@ TYPED:: <papier-renderer> ( -- renderer: papier-renderer )
     4 * { [ ] [ 1 + ] [ 2 + ] [ 2 + ] [ 1 + ] [ 3 + ] } cleave ; inline
 
 : order-slabs ( slabs eye -- slabs' )
-    ! NO
-    ! '[ center>> _ v- norm-sq ] inv-sort-by ; inline
-    drop ;
+    ! Paint scenery first, then characters from back to front. The camera
+    ! looks along -Z, so horizontal movement must not affect draw order.
+    drop [ name>> { "backdrop" "ground" } member? ] partition
+    [ center>> third ] sort-by append ;
 
 : render-slabs ( slabs -- vertices indexes )
     dup length <iota> [

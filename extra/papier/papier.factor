@@ -218,9 +218,24 @@ M: papier-world handle-gesture
 : update-slabs ( slabs -- )
     [ inc-sprite drop ] each ;
 
-: move-player ( world move face -- )
-    [ slabs-by-name>> "marco" swap at dup animations>> second switch-animation ] 2dip
-    [ '[ _ v+ ] change-center ] [ >>orient ] bi* update-slab-matrix ;
+:: keep-player-on-ground ( player ground -- )
+    ground center>> :> origin
+    ground size>> :> extent
+    player size>> :> size
+    player center>> :> position
+    ! The ground is a horizontal slab: its local Y extent becomes depth.
+    extent first size first - 0.0 max :> width
+    position first origin first width - origin first width + clamp
+    origin second size second +
+    position third origin third extent second - origin third extent second + clamp
+    1.0 float-4-boa player center<< ;
+
+:: move-player ( world move face -- )
+    world slabs-by-name>> "marco" swap at :> player
+    player dup animations>> second switch-animation
+        move '[ _ v+ ] change-center face >>orient drop
+    player world slabs-by-name>> "ground" swap at keep-player-on-ground
+    player update-slab-matrix ;
 
 : stop-player ( world -- )
     slabs-by-name>> "marco" swap at dup animations>> first switch-animation drop ;
