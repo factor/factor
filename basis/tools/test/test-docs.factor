@@ -46,6 +46,8 @@ $nl
 { $subsections :test-failures }
 "Test failures are reported using the " { $link "tools.errors" } " mechanism and are shown in the " { $link "ui.tools.error-list" } "."
 $nl
+"Normal runs print a start line and a summary of tests run, skipped tests, and pending failures. Loading messages and successful test quotations are omitted. Set " { $link verbose-tests? } " to enable detailed output, or " { $link silent-tests? } " to suppress routine progress and summaries. Failures and skipped-test warnings remain visible. The command-line runner accepts " { $snippet "--verbose" } " and " { $snippet "--quiet" } "."
+$nl
 "Unit test failures are instances of a class, and are stored in a global variable:"
 { $subsections
     test-failure
@@ -84,6 +86,12 @@ HELP: test
 
 HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
+
+HELP: verbose-tests?
+{ $var-description "Enables loading messages and full test quotations. Disabled by default. This setting does not affect which tests execute or the details available through " { $link :test-failures } "." } ;
+
+HELP: silent-tests?
+{ $var-description "Suppresses routine test progress, summaries, and verbose diagnostics. Failures and a summary of skipped tests remain visible." } ;
 
 HELP: refresh-and-test
 { $values { "prefix" string } }

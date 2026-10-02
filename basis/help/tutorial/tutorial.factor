@@ -98,9 +98,8 @@ $nl
 "It should report that all your tests have been run and there were no test failures, displaying the following output:"
 $nl
 { $snippet "\
-Unit Test: { { f } [ \"hello\" palindrome? ] }
-
-Unit Test: { { t } [ \"racecar\" palindrome? ] }" }
+Testing palindrome...
+2 tests run, 0 skipped, 0 pending failures." }
 $nl
 "Now you can read about " { $link "first-program-extend" } "." ;
 

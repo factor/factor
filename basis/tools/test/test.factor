@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators command-line
 compiler.units continuations debugger effects generalizations io
 io.files.temp io.files.unique kernel lexer math math.functions
-math.vectors namespaces parser prettyprint prettyprint.config quotations sequences
+math.vectors namespaces parser parser.notes prettyprint prettyprint.config quotations sequences
 sequences.generalizations source-files source-files.errors
 source-files.errors.debugger splitting stack-checker summary
 system tools.errors tools.time unicode vocabs vocabs.files
@@ -33,7 +33,7 @@ SYMBOL: silent-tests?
 f silent-tests? set-global
 
 SYMBOL: verbose-tests?
-t verbose-tests? set-global
+f verbose-tests? set-global
 
 SYMBOL: restartable-tests?
 t restartable-tests? set-global
@@ -54,9 +54,25 @@ long-unit-tests-enabled? [ t ] initialize
 
 <PRIVATE
 
-: notify-test-failed ( error experiment path line# -- )
-    "--> test failed!" print
-    <test-failure> test-failures get push
+TUPLE: test-results executed skipped ;
+C: <test-results> test-results
+SYMBOL: current-test-results
+SYMBOL: fake-test?
+
+: test-executed ( -- )
+    current-test-results get [ [ 1 + ] change-executed drop ] when* ;
+
+: test-skipped ( -- )
+    current-test-results get
+    [ [ 1 + ] change-skipped drop ]
+    [ "Warning: test skipped!" print ] if* ;
+
+:: notify-test-failed ( error experiment path line# -- )
+    fake-test? get [
+        path write ":" write line# pprint ": test failed: " write
+        error summary print flush
+    ] unless
+    error experiment path line# <test-failure> test-failures get push
     notify-error-observers ;
 
 SYMBOL: current-test-file
@@ -121,14 +137,15 @@ MACRO: <experiment> ( word -- quot )
 
 :: experiment ( word: ( -- error/f failed? tested? ) line# -- )
     word <experiment> :> e
-    silent-tests? get [ e experiment. ] unless
+    silent-tests? get not verbose-tests? get and [ e experiment. ] when
     word execute [
+        test-executed
         [
             current-test-file get [
                 e current-test-file get line# notify-test-failed
             ] [ rethrow ] if
         ] [ drop ] if
-    ] [ 2drop "Warning: test skipped!" print ] if ; inline
+    ] [ 2drop test-skipped ] if ; inline
 
 : parse-test ( accum word -- accum )
     literalize suffix!
@@ -148,6 +165,7 @@ SYNTAX: DEFINE-TEST-WORD:
 : fake-unit-test ( quot -- test-failures )
     [
         "fake" current-test-file set
+        t fake-test? set
         V{ } clone test-failures set
         call
         test-failures get
@@ -155,14 +173,24 @@ SYNTAX: DEFINE-TEST-WORD:
 
 PRIVATE>
 
+<PRIVATE
+
+: with-test-output ( ..a quot: ( ..a -- ..b ) -- ..b )
+    verbose-tests? get silent-tests? get not and not
+    parser-quiet? [ call ] with-variable ; inline
+
+PRIVATE>
+
 : run-test-file ( path -- )
     dup current-test-file [
         test-failures get current-test-file get +test-failure+ delete-file-errors
-        '[ _ [ run-file ] with-default-pprint-config ] [
-            restartable-tests? get
-            [ dup compute-restarts empty? not ] [ f ] if
-            [ rethrow ] [ notify-test-file-failed ] if
-        ] recover
+        [
+            '[ _ [ run-file ] with-default-pprint-config ] [
+                restartable-tests? get
+                [ dup compute-restarts empty? not ] [ f ] if
+                [ rethrow ] [ notify-test-file-failed ] if
+            ] recover
+        ] with-test-output
     ] with-variable ;
 
 SYMBOL: forget-tests?
@@ -197,6 +225,26 @@ SYMBOL: forget-tests?
 : test-vocabs ( vocabs -- )
     [ don't-test? ] reject [ test-vocab ] each ;
 
+:: test-results. ( -- )
+    current-test-results get skipped>> :> skipped
+    silent-tests? get [
+        skipped 0 > [ skipped pprint " tests skipped." print ] when
+    ] [
+        current-test-results get executed>> pprint " tests run, " write
+        skipped pprint " skipped, " write
+        test-failures get length pprint " pending failures." print
+    ] if flush ;
+
+:: with-test-run ( label quot: ( -- ) -- )
+    0 0 <test-results> current-test-results [
+        silent-tests? get [
+            "Testing " write label empty? [ "all loaded vocabularies" ] [ label ] if
+            write "..." print flush
+        ] unless
+        [ quot call ] with-test-output
+        test-results.
+    ] with-variable ;
+
 PRIVATE>
 
 : with-test-file ( ..a quot: ( ..a path -- ..b ) -- ..b )
@@ -219,20 +267,23 @@ DEFINE-TEST-WORD: must-not-fail
 M: test-failure error. ( error -- )
     {
         [ error-location print nl ]
-        [ asset>> [ experiment. nl ] when* ]
+        [ asset>> [ t verbose-tests? [ experiment. nl ] with-variable ] when* ]
         [ error>> error. ]
         [ continuation>> call>> callstack. ]
     } cleave ;
 
 : :test-failures ( -- ) test-failures get errors. ;
 
-: test ( prefix -- ) loaded-child-vocab-names test-vocabs ;
+: test ( prefix -- )
+    dup '[ _ loaded-child-vocab-names test-vocabs ] with-test-run ;
 
 : test-all ( -- ) "" test ;
 
-: test-root ( root -- ) "" vocabs-to-load test-vocabs ;
+: test-root ( root -- )
+    dup '[ _ "" vocabs-to-load test-vocabs ] with-test-run ;
 
-: refresh-and-test ( prefix -- ) to-refresh [ do-refresh ] keepdd test-vocabs ;
+: refresh-and-test ( prefix -- )
+    dup '[ _ to-refresh [ do-refresh ] keepdd test-vocabs ] with-test-run ;
 
 : refresh-and-test-all ( -- ) "" refresh-and-test ;
 
@@ -240,13 +291,19 @@ M: test-failure error. ( error -- )
     command-line get
     "--fast" swap [ member? ] [ remove ] 2bi swap
     [ f long-unit-tests-enabled? set-global ] when
+    "--verbose" swap [ member? ] [ remove ] 2bi swap
+    [ t verbose-tests? set-global f silent-tests? set-global ] when
+    "--quiet" swap [ member? ] [ remove ] 2bi swap
+    [ t silent-tests? set-global ] when
     [
-        dup vocab-roots get member? [
-            [ load-root ] [ test-root ] bi
-        ] [
-            [ load ] [ test ] bi
-        ] if
-    ] each
+        [
+            dup vocab-roots get member? [
+                [ load-root ] [ test-root ] bi
+            ] [
+                [ load ] [ test ] bi
+            ] if
+        ] each
+    ] with-test-output
     test-failures get empty?
     [ [ "==== FAILING TESTS" print flush :test-failures ] unless ]
     [ 0 1 ? exit ] bi ;
