@@ -168,7 +168,7 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
     vm.data_roots.appendAssumeCapacity(&generic_word);
     defer _ = vm.data_roots.pop();
 
-    if (comptime builtin.mode == .Debug) {
+    if (comptime builtin.mode == .debug) {
         std.debug.assert(layouts.hasTag(index_tagged, .fixnum));
         std.debug.assert(layouts.hasTag(generic_word, .word));
     }
@@ -195,14 +195,14 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
     var xt: Cell = generic.entry_point;
 
     if (pic_size < vm.max_pic_size) {
-        if (comptime builtin.mode == .Debug) {
+        if (comptime builtin.mode == .debug) {
             std.debug.assert(layouts.TAG(obj) < layouts.type_count);
         }
 
         const method_lookup = dispatch.lookupMethodAndClass(obj, methods);
 
         if (method_lookup.method != layouts.false_object) {
-            if (comptime builtin.mode == .Debug) {
+            if (comptime builtin.mode == .debug) {
                 const method_tag = layouts.typeTag(method_lookup.method);
                 std.debug.assert(method_tag == .word or method_tag == .quotation);
             }
@@ -224,7 +224,7 @@ pub fn inlineCacheMiss(vm: *FactorVM, return_address: Cell) Cell {
 
     // Patch the call site
     if (return_root.valid and return_root.value != 0 and xt != 0) {
-        if (comptime builtin.mode == .Debug) {
+        if (comptime builtin.mode == .debug) {
             std.debug.assert(CallSitePatcher.isValidCallSite(return_root.value));
         }
         const current_target = CallSitePatcher.getCallTarget(return_root.value);
@@ -248,7 +248,7 @@ fn updatePicTransitions(vm: *FactorVM, pic_size: Cell) void {
 }
 
 fn deallocateInlineCache(vm: *FactorVM, return_address: Cell) void {
-    const old_entry_point = if (comptime builtin.mode == .Debug) blk: {
+    const old_entry_point = if (comptime builtin.mode == .debug) blk: {
         break :blk CallSitePatcher.getCallTarget(return_address);
     } else blk: {
         break :blk CallSitePatcher.getCallTargetUnchecked(return_address);

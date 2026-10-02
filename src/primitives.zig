@@ -194,7 +194,7 @@ pub const PrimitiveIndex = enum(u16) {
     float_unordered_greatereq = 156,
 };
 
-pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".fields.len;
+pub const primitive_count = @typeInfo(PrimitiveIndex).@"enum".field_names.len;
 
 // --- Dispatch table ---
 
@@ -381,7 +381,7 @@ fn init_primitives() [primitive_count]PrimitiveFn {
 
 // Call a primitive by index
 pub fn callPrimitive(vm: *FactorVM, index: u16) void {
-    if (comptime builtin.mode == .Debug or builtin.mode == .ReleaseSafe) {
+    if (comptime builtin.mode == .debug or builtin.mode == .safe) {
         if (index >= primitive_count) return;
     }
     primitives[index](&vm.vm_asm);

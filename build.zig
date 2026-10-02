@@ -1,4 +1,5 @@
 const std = @import("std");
+const Translator = @import("translate_c").Translator;
 
 fn runCommand(b: *std.Build, argv: []const []const u8) []const u8 {
     return std.mem.trimEnd(u8, b.run(argv), "\n\r ");
@@ -19,6 +20,18 @@ pub fn build(b: *std.Build) void {
     options.addOption([]const u8, "git_label", if (git_label.len > 0) git_label else "zig-vm");
     options.addOption([]const u8, "compile_time", if (compile_time.len > 0) compile_time else "");
 
+    const translate_c = b.dependency("translate_c", .{});
+    const locale_c = Translator.init(translate_c, .{
+        .c_source_file = b.path("src/locale.h"),
+        .target = target,
+        .optimize = optimize,
+    }).mod;
+    const windows_c = if (target.result.os.tag == .windows) Translator.init(translate_c, .{
+        .c_source_file = b.path("src/windows.h"),
+        .target = target,
+        .optimize = optimize,
+    }).mod else null;
+
     // Main Factor VM executable
     const exe = b.addExecutable(.{
         .name = "factor",
@@ -28,11 +41,13 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
             // Strip debug symbols in release builds to reduce binary size (~6x smaller)
-            .strip = if (optimize != .Debug and !keep_symbols) true else null,
+            .strip = if (optimize != .debug and !keep_symbols) true else null,
         }),
     });
 
     exe.root_module.addOptions("build_options", options);
+    exe.root_module.addImport("locale_c", locale_c);
+    if (windows_c) |module| exe.root_module.addImport("windows_c", module);
 
     // Link libc for system calls
     exe.root_module.link_libc = true;
@@ -133,9 +148,7 @@ pub fn build(b: *std.Build) void {
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
 
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
-    }
+    run_cmd.addPassthruArgs();
 
     const run_step = b.step("run", "Run the Factor VM");
     run_step.dependOn(&run_cmd.step);
@@ -153,6 +166,8 @@ pub fn build(b: *std.Build) void {
         tests.root_module.addCSourceFile(.{ .file = b.path("src/windows_format.c") });
     }
     tests.root_module.addOptions("build_options", options);
+    tests.root_module.addImport("locale_c", locale_c);
+    if (windows_c) |module| tests.root_module.addImport("windows_c", module);
 
     const run_tests = b.addRunArtifact(tests);
     const test_step = b.step("test", "Run tests");
@@ -185,6 +200,8 @@ pub fn build(b: *std.Build) void {
         }),
     });
     docs.root_module.addOptions("build_options", options);
+    docs.root_module.addImport("locale_c", locale_c);
+    if (windows_c) |module| docs.root_module.addImport("windows_c", module);
     const install_docs = b.addInstallDirectory(.{
         .source_dir = docs.getEmittedDocs(),
         .install_dir = .prefix,

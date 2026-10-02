@@ -57,7 +57,7 @@ contributors.
 More information on [building factor](https://concatenative.org/wiki/view/Factor/Building%20Factor)
 and [system requirements](https://concatenative.org/wiki/view/Factor/Requirements).
 
-The experimental Zig VM requires Zig 0.16. Use `zig build` to build it and
+The experimental Zig VM requires Zig 0.17.0. Use `zig build` to build it and
 `zig build test` to run its native tests. To compile the VM and tests for
 Windows without running them, use `zig build check -Dtarget=x86_64-windows-gnu`
 or `zig build check -Dtarget=aarch64-windows-gnu`. On Windows,

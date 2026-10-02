@@ -1,8 +1,14 @@
 .{
     .name = .factor,
     .version = "0.102.0",
+    .dependencies = .{
+        .translate_c = .{
+            .url = "git+https://codeberg.org/ziglang/translate-c#875969d3493e245e01bf5d7860f792d8f3eb9ef5",
+            .hash = "translate_c-0.0.0-Q_BUWoFOBwAhz77Zd15HCVuhTKzdUKc94kezmCeJ7IC_",
+        },
+    },
     .fingerprint = 0xed38ec00cf62a92c,
-    .minimum_zig_version = "0.16.0",
+    .minimum_zig_version = "0.17.0",
     .paths = .{
         "build.zig",
         "build.zig.zon",

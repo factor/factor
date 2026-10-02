@@ -38,7 +38,7 @@ pub fn clearStatus(records: []u8) void {
 }
 
 test "find FPSIMD after an unknown record and preserve unrelated state" {
-    var records = [_]u8{0} ** 576;
+    var records: [576]u8 = @splat(0);
     std.mem.writeInt(u32, records[0..4], 0x12345678, endian);
     std.mem.writeInt(u32, records[4..8], 16, endian);
     std.mem.writeInt(u32, records[16..20], fpsimd_magic, endian);
@@ -54,7 +54,7 @@ test "find FPSIMD after an unknown record and preserve unrelated state" {
 }
 
 test "reject missing truncated undersized and nonprogressing records" {
-    var records = [_]u8{0} ** 544;
+    var records: [544]u8 = @splat(0);
     try std.testing.expect(findFPSR(&records) == null);
     try std.testing.expect(findFPSR(records[0..7]) == null);
     std.mem.writeInt(u32, records[0..4], fpsimd_magic, endian);

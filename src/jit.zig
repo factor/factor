@@ -639,7 +639,7 @@ pub const Jit = struct {
         // Adjust relocation offsets and append
         for (0..entry_count) |i| {
             const entry_bytes = reloc_data[i * 4 .. (i + 1) * 4];
-            var entry: code_blocks.RelocationEntry = @bitCast(entry_bytes[0..4].*);
+            var entry: code_blocks.RelocationEntry = .{ .value = @bitCast(entry_bytes[0..4].*) };
 
             // Adjust offset to account for code already emitted
             const new_offset = current_offset + entry.getOffset();
@@ -650,7 +650,7 @@ pub const Jit = struct {
                 @intCast(new_offset),
             );
 
-            const entry_u32: u32 = @bitCast(entry);
+            const entry_u32: u32 = entry.value;
             try self.relocation.appendSlice(self.vm.allocator, std.mem.asBytes(&entry_u32));
         }
     }

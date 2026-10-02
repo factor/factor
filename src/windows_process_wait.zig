@@ -90,7 +90,7 @@ test "process waits deliver once beyond MAXIMUM_WAIT_OBJECTS" {
         count += 1;
         try std.testing.expect(SetEvent(event) != 0);
     }
-    var seen = [_]bool{false} ** events.len;
+    var seen: [events.len]bool = @splat(false);
     var bytes: u32 = undefined;
     var key: usize = undefined;
     var overlapped: ?*anyopaque = undefined;

@@ -608,7 +608,7 @@ pub fn applyRelocations(block: *CodeBlock, ctx: *const RelocationContext) void {
                 const tag = layouts.typeTag(lit);
                 std.debug.assert(tag == .word or tag == .quotation);
                 const ep = computeEntryPoint(lit);
-                if (comptime builtin.mode == .Debug) {
+                if (comptime builtin.mode == .debug) {
                     if (tag == .quotation and (ep == ctx.lazy_jit_compile_ep or ep == 0)) {
                         std.debug.print("[STALE RELOC] block=0x{x} owner=0x{x} quot=0x{x} ep=0x{x} lazy_ep=0x{x}\n", .{
                             @intFromPtr(block), block.owner, lit, ep, ctx.lazy_jit_compile_ep,
@@ -931,7 +931,7 @@ pub fn updateWordReferences(block: *CodeBlock, reset_inline_caches: bool, select
                     const owner = dest.owner;
                     if (owner != layouts.false_object) {
                         const new_ep = computeEntryPoint(owner);
-                        if (comptime builtin.mode == .Debug) {
+                        if (comptime builtin.mode == .debug) {
                             if (new_ep == lazy_jit_ep) {
                                 const S = struct {
                                     var count: u64 = 0;

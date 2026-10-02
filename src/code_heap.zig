@@ -354,7 +354,7 @@ pub const CodeHeap = struct {
     // Verify that all live code blocks in the heap are present in all_blocks_sorted.
     // Catches missed inserts/removes or stale entries.
     pub fn verifyAllBlocksSet(self: *const Self) void {
-        if (comptime builtin.mode != .Debug) return;
+        if (comptime builtin.mode != .debug) return;
         if (self.code_start == 0 or self.code_size == 0) return;
 
         const code_end = self.code_start + self.code_size;

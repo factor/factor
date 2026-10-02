@@ -2,11 +2,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 pub const windows = builtin.os.tag == .windows;
-pub const win = if (windows) @cImport({
-    @cDefine("WIN32_LEAN_AND_MEAN", "1");
-    @cInclude("windows.h");
-    @cInclude("io.h");
-}) else struct {};
+pub const win = if (windows) @import("windows_c") else struct {};
 
 pub const PROT = if (windows) struct { READ: bool = false, WRITE: bool = false, EXEC: bool = false } else std.c.PROT;
 pub const MAP = if (windows) struct {

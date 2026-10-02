@@ -239,7 +239,7 @@ pub const GarbageCollector = struct {
         nursery.flush();
         self.vm.vm_asm.nursery.here = nursery.here;
         self.heap.nursery_collections += 1;
-        if (@import("builtin").mode == .Debug) {
+        if (@import("builtin").mode == .debug) {
             self.fillUnusedStacks();
         }
 
@@ -684,7 +684,7 @@ pub const GarbageCollector = struct {
                     Visit.slot(slot, destination);
                 }
             }
-            if (comptime builtin.mode == .Debug) {
+            if (comptime builtin.mode == .debug) {
                 contexts.fillStackSeg(ctx.datastack, seg, 0xbaadbadd);
             }
         }
@@ -701,7 +701,7 @@ pub const GarbageCollector = struct {
                     Visit.slot(slot, destination);
                 }
             }
-            if (comptime builtin.mode == .Debug) {
+            if (comptime builtin.mode == .debug) {
                 contexts.fillStackSeg(ctx.retainstack, seg, 0xdaabdabb);
             }
         }

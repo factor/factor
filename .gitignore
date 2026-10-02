@@ -45,3 +45,6 @@ git-id
 tags
 .zig-cache
 zig-out
+
+# Zig package downloads
+/zig-pkg/

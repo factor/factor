@@ -92,7 +92,7 @@ pub fn hasEmbeddedImage(path: [*:0]const u8) bool {
     const items_read = io_mod.safeFread(@ptrCast(&footer_bytes), 1, footer_size, file) catch return false;
     if (items_read != footer_size) return false;
 
-    const footer: EmbeddedImageFooter = @bitCast(footer_bytes);
+    const footer: EmbeddedImageFooter = std.mem.bytesToValue(EmbeddedImageFooter, &footer_bytes);
     return footer.magic == image_magic;
 }
 
@@ -284,7 +284,7 @@ pub const ImageLoader = struct {
 
         if (items_read != footer_size) return false;
 
-        footer.* = @bitCast(footer_bytes);
+        footer.* = std.mem.bytesToValue(EmbeddedImageFooter, &footer_bytes);
         return true;
     }
 
@@ -326,7 +326,7 @@ pub const ImageLoader = struct {
         if (header_read != @sizeOf(ImageHeader)) {
             return ImageError.ReadError;
         }
-        self.header = @bitCast(header_bytes);
+        self.header = std.mem.bytesToValue(ImageHeader, &header_bytes);
 
         // Validate magic number
         if (self.header.magic != image_magic) {
@@ -410,7 +410,7 @@ pub const ImageLoader = struct {
         // Now make code heap executable
         self.makeCodeExecutable();
 
-        if (comptime @import("builtin").mode == .Debug) {
+        if (comptime @import("builtin").mode == .debug) {
             self.validateHeapSetup();
         }
     }

@@ -255,7 +255,7 @@ pub const Context = extern struct {
 
 // Fill unused stack memory with a pattern for debugging.
 pub fn fillStackSeg(top_ptr: Cell, seg: *segments.Segment, pattern: Cell) void {
-    if (comptime @import("builtin").mode == .Debug) {
+    if (comptime @import("builtin").mode == .debug) {
         const clear_start = top_ptr + @sizeOf(Cell);
         const clear_size = seg.end - clear_start;
         if (clear_size > 0 and clear_start < seg.end) {

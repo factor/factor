@@ -405,7 +405,7 @@ pub const FreeListAllocator = struct {
 
     // Validate free list (debug-only, O(n) over all free blocks)
     pub fn validateFreeList(self: *const Self) void {
-        if (comptime @import("builtin").mode != .Debug) return;
+        if (comptime @import("builtin").mode != .debug) return;
         var total_free: Cell = 0;
         var block_count: Cell = 0;
 

@@ -843,7 +843,7 @@ extern "c" fn newlocale(category_mask: c_int, locale: [*c]const u8, base: ?*anyo
 extern "c" fn uselocale(loc: ?*anyopaque) ?*anyopaque;
 extern "c" fn freelocale(loc: ?*anyopaque) c_int;
 
-const locale_h = @cImport(@cInclude("locale.h"));
+const locale_h = @import("locale_c");
 const lc_all_mask: c_int = if (builtin.os.tag == .windows) locale_h.LC_ALL else locale_h.LC_ALL_MASK;
 extern "c" fn _create_locale(c_int, [*c]const u8) ?*anyopaque;
 extern "c" fn _free_locale(*anyopaque) void;
