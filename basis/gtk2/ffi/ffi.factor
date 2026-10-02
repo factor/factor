@@ -14,7 +14,7 @@ IN: gtk2.ffi
 LIBRARY: gtk2
 
 <<
-"gtk" {
+"gtk2" {
     { [ os windows? ] [ "libgtk-win32-2.0-0.dll" cdecl add-library ] }
     { [ os linux? ] [ "libgtk-x11-2.0.so.0" cdecl add-library ] }
     [ drop ]

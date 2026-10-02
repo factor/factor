@@ -93,6 +93,7 @@ CONSTANT: type-tags
     [ parameter new ] dip {
         [ "name" attr >>name ]
         [ "direction" attr dup "in" ? >>direction ]
+        [ "caller-allocates" attr "1" = >>caller-allocates? ]
         [ "allow-none" attr "1" = >>allow-none? ]
         [ child-type-tag xml>type >>type ]
         [ "transfer-ownership" attr >>transfer-ownership ]

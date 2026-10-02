@@ -23,7 +23,12 @@ LIBRARY: gdk2
 } cond
 >>
 
+IMPLEMENT-STRUCTS: GdkRectangle ;
+
 GIR: vocab:gir/Gdk-2.0.gir
+
+! GdkNativeWindow is a HANDLE on Windows and a 32-bit ID on X11.
+<< os windows? [ gpointer ] [ guint32 ] if \ GdkNativeWindow typedef >>
 
 DESTRUCTOR: gdk_cursor_unref
 
@@ -89,4 +94,3 @@ STRUCT: GdkEventScroll
     { device GdkDevice* }
     { x_root gdouble }
     { y_root gdouble } ;
-

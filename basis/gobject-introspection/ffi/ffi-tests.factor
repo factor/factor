@@ -33,6 +33,14 @@ IN: gobject-introspection.ffi.tests
 
 >>
 
+! An output struct supplied by the caller needs one pointer, not two.
+{ t } [
+    parameter new
+        simple-type new "GLib.Error" >>name >>type
+        "out" >>direction t >>caller-allocates?
+    parameter-c-type GError <pointer> =
+] unit-test
+
 ! GIR's throws flag adds a return location for an error, not an error object.
 { t } [
     error-parameter parameter-c-type GError <pointer> <pointer> =

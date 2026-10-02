@@ -1,6 +1,6 @@
 ! Copyright (C) 2010 Anton Gorenko.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types alien.parser arrays ascii
+USING: accessors alien alien.c-types alien.parser arrays ascii
 classes.parser classes.struct combinators
 combinators.short-circuit gobject-introspection.repository
 gobject-introspection.types kernel make math.parser namespaces
@@ -85,12 +85,18 @@ M: atomic-type parse-const-value
 
 M: utf8-type parse-const-value drop ;
 
+! Some headers define sentinel pointers such as GDK_NO_BG.
+M: class-type parse-const-value drop string>number ;
+
 : const-value ( const -- value )
     [ value>> ] [ type>> ] bi parse-const-value ;
 
 : def-const ( const -- )
-    [ c-identifier>> create-function ] [ const-value ] bi
-    define-constant ;
+    [ c-identifier>> create-function ]
+    [ const-value ]
+    [ type>> class-type? ] tri
+    [ [ <alien> ] curry ( -- value ) define-inline ]
+    [ define-constant ] if ;
 
 : def-consts ( consts -- )
     [ def-const ] each ;
@@ -113,7 +119,8 @@ M: varargs-type parameter-type>c-type drop void* ;
 
 : parameter-c-type ( parameter -- c-type )
     [ type>> parameter-type>c-type ] keep
-    direction>> "in" = [ <pointer> ] unless ;
+    [ direction>> "in" = ] [ caller-allocates?>> ] bi or
+    [ <pointer> ] unless ;
 
 GENERIC: return-type>c-type ( data-type -- c-type )
 
