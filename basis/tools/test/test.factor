@@ -33,7 +33,7 @@ SYMBOL: silent-tests?
 f silent-tests? set-global
 
 SYMBOL: verbose-tests?
-f verbose-tests? set-global
+t verbose-tests? set-global
 
 SYMBOL: restartable-tests?
 t restartable-tests? set-global

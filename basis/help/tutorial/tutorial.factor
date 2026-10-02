@@ -99,6 +99,8 @@ $nl
 $nl
 { $snippet "\
 Testing palindrome...
+Unit Test: { { f } [ \"hello\" palindrome? ] }
+Unit Test: { { t } [ \"racecar\" palindrome? ] }
 2 tests run, 0 skipped, 0 pending failures." }
 $nl
 "Now you can read about " { $link "first-program-extend" } "." ;
