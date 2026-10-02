@@ -1,7 +1,7 @@
 USING: accessors arrays classes.intersection classes.maybe
 classes.union compiler.units continuations definitions effects
 eval generic generic.standard hashtables io io.streams.duplex
-io.streams.string io.styles kernel listener make math namespaces parser
+io.streams.string io.styles kernel listener locals make math namespaces parser
 prettyprint prettyprint.backend prettyprint.config prettyprint.private
 prettyprint.sections quotations see sequences splitting
 strings system tools.continuations tools.continuations.private
@@ -485,6 +485,22 @@ TUPLE: fo { a intersection{ integer fixnum } initial: 0 } ;
     [
         [ CHAR: a <string> text "b" text ] with-pprint
     ] with-string-writer ;
+
+! #2091: line wrapping and string truncation are independent settings.
+:: limited-string ( text wrap limit -- string )
+    limit length-limit [ wrap margin [ text unparse ] with-variable ] with-variable ;
+
+{ "\"abcdefghij\"" } [ "abcdefghij" 4 f limited-string ] unit-test
+{ "\"ab...\"" } [ "abcdefghij" 100 5 limited-string ] unit-test
+{ "\"ab...\"" } [ "abcdefghij" 2 5 limited-string ] unit-test
+{ "\"abcde\"" } [ "abcde" 2 5 limited-string ] unit-test
+{ "\"...\"" } [ "abcdefghij" 1 0 limited-string ] unit-test
+{ "\"...\"" } [ "abcdefghij" 1 2 limited-string ] unit-test
+{ "\"\"" } [ "" 1 0 limited-string ] unit-test
+{ "\"\u01f600\u0003bb...\"" } [ "\u01f600\u0003bbabcde" 1 5 limited-string ] unit-test
+{ "\"abcdefghij\"" } [
+    f string-limit? [ "abcdefghij" 1 5 limited-string ] with-variable
+] unit-test
 
 {
 "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa b"

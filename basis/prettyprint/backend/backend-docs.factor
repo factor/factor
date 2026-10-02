@@ -19,7 +19,7 @@ HELP: unparse-ch
 
 HELP: do-string-limit
 { $values { "str" string } { "trimmed" "a possibly trimmed string" } }
-{ $description "If " { $link string-limit? } " is on, trims the string such that it does not exceed the margin, appending \"...\" if trimming took place." } ;
+{ $description "If " { $link string-limit? } " is on and " { $link length-limit } " is set, trims the string to that limit, appending \"...\" if trimming took place. Limits below three print just the ellipsis. The wrapping margin does not truncate strings." } ;
 
 HELP: pprint-string
 { $values { "obj" object } { "str" string } { "prefix" string } { "suffix" string } }

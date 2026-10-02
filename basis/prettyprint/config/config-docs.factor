@@ -18,7 +18,7 @@ HELP: nesting-limit
 { $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). A value of " { $link f } " denotes no limit." } ;
 
 HELP: length-limit
-{ $var-description "The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. A value of " { $link f } " denotes no limit." } ;
+{ $var-description "The maximum printed sequence length, defaulting to 100. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. Strings also obey this limit when " { $link string-limit? } " is set. A value of " { $link f } " denotes no limit." } ;
 
 HELP: line-limit
 { $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". A value of " { $link f } " denotes no limit." } ;
@@ -27,7 +27,7 @@ HELP: number-base
 { $var-description "The number base in which the prettyprinter will output numeric literals. A value of " { $snippet "2" } " will print integers and ratios in binary with " { $snippet "0b" } ". A value of " { $snippet "8" } " will print them in octal with " { $snippet "0o" } ". A value of " { $snippet "16" } " will print all integers, ratios, and floating-point values in hexadecimal with " { $snippet "0x" } ". Other values of " { $snippet "number-base" } " will print numbers in decimal, which is the default." } ;
 
 HELP: string-limit?
-{ $var-description "Toggles whether printed strings are truncated to the margin." } ;
+{ $var-description "Toggles whether printed strings are truncated to " { $link length-limit } ". If that limit is " { $link f } ", strings are not truncated." } ;
 
 HELP: boa-tuples?
 { $var-description "Toggles whether tuples and structs print in BOA-form or assoc-form." }

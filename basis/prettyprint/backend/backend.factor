@@ -4,7 +4,7 @@ USING: accessors arrays assocs byte-arrays byte-vectors classes
 classes.algebra.private classes.maybe classes.private
 classes.tuple combinators combinators.short-circuit
 continuations effects fry generic hash-sets hashtables io.pathnames
-io.styles kernel lists make math math.order math.parser
+io.styles kernel lists locals make math math.order math.parser
 namespaces prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.stylesheet quotations sbufs
 sequences strings vectors words ;
@@ -130,12 +130,13 @@ M: f pprint* drop \ f pprint-word ;
         dup 32 < [ dup 16 < "\\x0" "\\x" ? % >hex % ] [ , ] if
     ] if ;
 
-: do-string-limit ( str -- trimmed )
-    string-limit? get [
-        dup length margin get > [
-            margin get 3 - head "..." append
-        ] when
-    ] when ;
+:: do-string-limit ( str -- trimmed )
+    length-limit get :> limit
+    string-limit? get limit and [
+        str length limit > [
+            str limit 3 - 0 max head "..." append
+        ] [ str ] if
+    ] [ str ] if ;
 
 : unparse-string ( str prefix suffix -- str )
     [ [ % do-string-limit [ unparse-ch ] each ] dip % ] "" make ;

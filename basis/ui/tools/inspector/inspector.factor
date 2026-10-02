@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators fonts
-formatting hashtables inspector io io.styles kernel math
-math.parser math.vectors mirrors models models.arrow namespaces
+formatting hashtables inspector io io.styles kernel locals math
+math.order math.parser math.vectors mirrors models models.arrow namespaces
 prettyprint sequences sorting strings ui ui.commands ui.gadgets
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables
 ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.operations ui.theme ui.tools.browser
+ui.gestures ui.operations ui.text ui.theme ui.tools.browser
 ui.tools.common ui.tools.inspector.slots unicode ;
 IN: ui.tools.inspector
 
@@ -95,13 +95,24 @@ M: hashtable make-slot-descriptions
 
 TUPLE: inspector-table < table ;
 
-! Improve performance for big arrays or large hashtables by
-! only calculating column width for the longest key.
+:: inspector-column-width ( font strings -- width )
+    ! Monospace ASCII needs only one native measurement. Combining marks
+    ! and fallback glyphs can change the widest string, regardless of length.
+    strings [ aux>> ] any? [
+        strings [ font swap text-width ] map supremum
+    ] [ font strings longest text-width ] if ;
+
+:: inspector-row-widths ( table rows -- widths )
+    table font>> :> font
+    font rows keys inspector-column-width
+    font rows values inspector-column-width 2array ;
+
+! Measure both displayed columns so long values remain scrollable.
 M: inspector-table compute-column-widths
     dup rows>> [ drop 0 { } ] [
         [ drop gap>> ]
         [ initial-widths ]
-        [ keys longest "" 2array row-column-widths ] 2tri
+        [ inspector-row-widths ] 2tri
         vmax [ compute-total-width ] keep
     ] if-empty ;
 
