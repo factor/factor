@@ -4,12 +4,14 @@ io.sockets.secure io.sockets.secure.openssl io.timeouts kernel
 math math.parser sequences strings tools.test ;
 IN: io.sockets.secure.openssl.tests
 
-{ 200 } [ "https://www.google.se" http-get drop code>> ] unit-test
+{ 200 } [
+    [ "https://www.google.se" http-get drop code>> ] with-openssl
+] unit-test
 
-[ "https://factorcode.org:80" http-get ] must-fail
+[ [ "https://factorcode.org:80" http-get ] with-openssl ] must-fail
 
 : tls-request-error ( url -- error/f )
-    [ http-get 2drop f ] [ nip ] recover ;
+    [ [ http-get 2drop f ] with-openssl ] [ nip ] recover ;
 
 ! TLS on a plain HTTP socket must fail promptly, including on Windows.
 ! Use an assigned port so concurrent test processes cannot collide.
@@ -25,7 +27,7 @@ IN: io.sockets.secure.openssl.tests
     ] must-fail-with
 ] times
 
-[ "test" 33 <ssl-handle> handle>> check-subject-name ]
+[ [ "test" 33 <ssl-handle> handle>> check-subject-name ] with-openssl ]
 [ certificate-missing-error? ] must-fail-with
 
 { f } [ "badssl.com" "*.badssl.com" subject-names-match? ] unit-test
@@ -38,5 +40,7 @@ TUPLE: fake-fd fd ;
 M: fake-fd cancel-operation ( obj -- ) drop ;
 
 { f } [
-    33 fake-fd boa <ssl-handle> [ maybe-handshake ] ignore-errors connected>>
+    [
+        33 fake-fd boa <ssl-handle> [ maybe-handshake ] ignore-errors connected>>
+    ] with-openssl
 ] unit-test

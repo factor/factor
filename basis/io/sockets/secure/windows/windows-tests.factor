@@ -23,11 +23,13 @@ IN: io.sockets.secure.windows.tests
                     ] with-stream t
                 ] [ ] recover done fulfill
             ] "Windows TLS echo" spawn drop
-            server addr>> binary [
-                5 seconds input-stream get set-timeout
-                5 seconds output-stream get set-timeout
-                contents write flush contents length read contents =
-            ] with-client
+            <secure-config> f >>verify [
+                server addr>> binary [
+                    5 seconds input-stream get set-timeout
+                    5 seconds output-stream get set-timeout
+                    contents write flush contents length read contents =
+                ] with-client
+            ] with-secure-context
             done 5 seconds ?promise-timeout t =
         ] with-destructors
     ] with-test-context

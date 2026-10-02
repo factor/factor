@@ -421,3 +421,5 @@ M: schannel accept-secure-handshake
 ! Dynamic selection keeps existing sockets bound to their original backend.
 : with-schannel ( quot -- )
     schannel secure-socket-backend rot with-variable ; inline
+
+secure-socket-backend [ schannel ] initialize

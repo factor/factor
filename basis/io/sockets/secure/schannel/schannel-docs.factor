@@ -2,8 +2,8 @@ USING: help.markup help.syntax io.sockets.secure namespaces quotations ;
 IN: io.sockets.secure.schannel
 
 HELP: schannel
-{ $description "The optional native Windows TLS backend. Set "
-  { $link secure-socket-backend } " to this singleton before creating secure contexts or sockets to select Schannel. OpenSSL remains the default. Requires Windows 10 version 1809 or later."
+{ $description "The default secure socket backend on Windows. Uses native Windows TLS and requires Windows 10 version 1809 or later. The OpenSSL backend remains available through "
+  { $vocab-link "io.sockets.secure.openssl" } "."
   $nl
   "The " { $snippet "TLS" } " method enables TLS 1.2 and newer, subject to Windows policy; "
   { $snippet "TLSv1.2" } " restricts negotiation to TLS 1.2. TLS 1.3 requires a Windows version that supports it."
@@ -33,7 +33,7 @@ HELP: schannel-alpn-protocol
 { $description "Returns the ALPN protocol selected during the completed handshake, or f if no protocol was negotiated." } ;
 
 ARTICLE: "io.sockets.secure.schannel" "Native Windows TLS"
-"Schannel is an optional backend for Factor's secure socket API."
+"Schannel is the default Windows backend for Factor's secure socket API."
 { $subsections schannel with-schannel schannel-alpn-protocol } ;
 
 ABOUT: "io.sockets.secure.schannel"

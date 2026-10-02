@@ -3,7 +3,7 @@ calendar combinators combinators.short-circuit continuations destructors io
 io.encodings.utf8 io.ports io.sockets.private io.sockets.secure
 io.sockets.secure.openssl io.sockets.windows kernel libc locals
 math math.order openssl openssl.libcrypto openssl.libssl system
-windows.crypt32 windows.errors windows.time windows.winsock ;
+vocabs.loader windows.crypt32 windows.errors windows.time windows.winsock ;
 IN: io.sockets.secure.windows
 
 M: openssl ssl-supported? t ;
@@ -91,3 +91,7 @@ M:: secure establish-connection ( output remote -- )
     output remote establish-secure-connection ;
 
 M: windows non-ssl-socket? win32-socket? ;
+
+! Wait until both vocabularies are loaded, including when OpenSSL is required first.
+{ "io.sockets.secure.windows" "io.sockets.secure.openssl" }
+"io.sockets.secure.schannel" require-when

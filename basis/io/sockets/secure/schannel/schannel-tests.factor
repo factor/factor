@@ -1,6 +1,7 @@
 USING: accessors byte-arrays calendar concurrency.promises
 continuations destructors io io.buffers io.encodings.ascii io.encodings.binary
-io.ports io.sockets io.sockets.secure io.sockets.secure.schannel
+io.ports io.sockets io.sockets.secure io.sockets.secure.openssl
+io.sockets.secure.schannel
 io.sockets.secure.windows
 io.streams.duplex io.timeouts kernel locals math namespaces openssl sequences
 threads tools.test windows.errors windows.schannel ;
@@ -66,6 +67,27 @@ IN: io.sockets.secure.schannel.tests
 { t } [ schannel schannel TLSv1.2 tls-echo ] unit-test
 { t } [ openssl schannel TLS tls-echo ] unit-test
 { t } [ schannel openssl TLS tls-echo ] unit-test
+
+! The process default is native TLS, with certificate verification enabled.
+{ t TLS t } [
+    secure-socket-backend get-global schannel =
+    <secure-config> [ method>> ] [ verify>> ] bi
+] unit-test
+
+! OpenSSL remains selectable without changing the process default.
+{ t t t } [
+    [
+        secure-socket-backend get openssl =
+        ssl-supported?
+        <secure-config> method>> TLS =
+    ] with-openssl
+] unit-test
+
+{ t } [
+    secure-socket-backend get
+    [ [ "OpenSSL selection test" throw ] with-openssl ] ignore-errors
+    secure-socket-backend get =
+] unit-test
 
 { t TLS t } [
     [

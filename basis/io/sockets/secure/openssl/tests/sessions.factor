@@ -25,24 +25,25 @@ FUNCTION: int SSL_SESSION_set_ex_data ( SSL_SESSION* session, int index, void* d
     [ ] [ session SSL_SESSION_free ] cleanup ;
 
 "CRYPTO_free_ex_index" "libcrypto" dlsym? [
-{ 1 256 302 } [
-    [
-      [let
-        maybe-init-ssl
-        0 uint <ref> malloc-byte-array &free :> counter
-        2 0 f f f count-freed-session CRYPTO_get_ex_new_index :> index
+    { 1 256 302 } [
         [
-        <secure-config> [
-            index counter tracked-session "same-host" save-session
-            index counter tracked-session "same-host" save-session
-            counter uint deref
-            300 [ index counter tracked-session swap save-session ] each-integer
-            current-secure-context sessions>> assoc-size
-        ] with-secure-context
-        counter uint deref
-        ] [ 2 index CRYPTO_free_ex_index drop ] finally
-      ]
-    ] with-destructors
-] unit-test
-
+            [
+              [let
+                maybe-init-ssl
+                0 uint <ref> malloc-byte-array &free :> counter
+                2 0 f f f count-freed-session CRYPTO_get_ex_new_index :> index
+                [
+                    <secure-config> [
+                        index counter tracked-session "same-host" save-session
+                        index counter tracked-session "same-host" save-session
+                        counter uint deref
+                        300 [ index counter tracked-session swap save-session ] each-integer
+                        current-secure-context sessions>> assoc-size
+                    ] with-secure-context
+                    counter uint deref
+                ] [ 2 index CRYPTO_free_ex_index drop ] finally
+              ]
+            ] with-destructors
+        ] with-openssl
+    ] unit-test
 ] when

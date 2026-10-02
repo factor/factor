@@ -4,6 +4,11 @@ IN: io.sockets.secure
 HELP: secure-socket-timeout
 { $var-description "Timeout for operations not associated with a constructed port instance, such as SSL handshake and shutdown. Represented as a " { $link duration } "." } ;
 
+HELP: secure-socket-backend
+{ $var-description "Selects the backend for new secure contexts and sockets. Defaults to Schannel on Windows and OpenSSL on Unix. The "
+  { $snippet "with-openssl" } " and " { $snippet "with-schannel" }
+  " words select a backend within a dynamic scope; create explicit contexts inside that scope. Existing sockets retain their backend." } ;
+
 HELP: TLS
 { $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
 $nl
@@ -42,12 +47,14 @@ HELP: <secure-config>
 { $description "Creates a new secure socket configuration with default values." } ;
 
 ARTICLE: "ssl-key-file" "The key file and password"
-"The " { $snippet "key-file" } " and " { $snippet "password" } " slots of a " { $link secure-config } " can be set to a private key file in PEM format. These slots are required for secure servers, and also for clients when client-side authentication is used." ;
+"The " { $snippet "key-file" } " and " { $snippet "password" } " slots of a " { $link secure-config } " specify a certificate and private key. OpenSSL uses PEM files; Schannel uses PKCS#12 (.pfx/.p12) files. These slots are required for secure servers, and also for clients when client-side authentication is used." ;
 
 ARTICLE: "ssl-ca-file" "The CA file and path"
 "The " { $snippet "ca-file" } " slot of a " { $link secure-config } " can contain the path of a file with a list of trusted certificates in PEM format. The " { $snippet "ca-path" } " slot can contain the path of a directory of trusted certifications."
 $nl
-"One of these slots are required to be specified so that secure client sockets can verify server certificates."
+"OpenSSL uses these slots to configure trusted certificate authorities for server certificate verification."
+$nl
+"These settings apply to OpenSSL. Schannel verifies certificates using the Windows trust store and rejects custom CA files and paths."
 $nl
 "See " { $url "http://www.openssl.org/docs/ssl/SSL_CTX_load_verify_locations.html" } " for details." ;
 
@@ -153,9 +160,11 @@ ARTICLE: "ssl-errors" "Secure socket errors"
 } ;
 
 ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
-"The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
+"The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using native Schannel on Windows and OpenSSL on Unix."
 $nl
-"On Windows make sure you have the appropriate DLLs available, e.g. libcrypto-37.dll and libssl-38.dll."
+"Schannel requires Windows 10 version 1809 or later and verifies server certificates by default using Windows trust and peer-name validation. OpenSSL remains selectable on Windows through "
+{ $snippet "with-openssl" } " in " { $vocab-link "io.sockets.secure.openssl" }
+"; its native libraries must be installed."
 $nl
 "This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)."
 { $subsections

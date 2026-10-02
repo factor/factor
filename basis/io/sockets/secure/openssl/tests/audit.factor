@@ -91,15 +91,17 @@ M: audit-file dispose* drop ;
 ! Disposing a context cannot release callback userdata while an SSL uses it.
 { 1 0 } [
     [
-      [let
-        <secure-config> { "h2" } >>alpn-supported-protocols
-        <secure-context> &dispose :> context
-        context [ audit-file new-disposable <ssl-handle> &dispose ]
-        with-test-context-variable :> handle
-        context dispose context users>>
-        handle dispose context users>>
-      ]
-    ] with-destructors
+        [
+          [let
+            <secure-config> { "h2" } >>alpn-supported-protocols
+            <secure-context> &dispose :> context
+            context [ audit-file new-disposable <ssl-handle> &dispose ]
+            with-test-context-variable :> handle
+            context dispose context users>>
+            handle dispose context users>>
+          ]
+        ] with-destructors
+    ] with-openssl
 ] unit-test
 
 :: select-test-alpn ( server-protocols client-protocols -- selected result )

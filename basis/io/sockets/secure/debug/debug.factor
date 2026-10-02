@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors io.sockets.secure kernel ;
+USING: accessors io.sockets.secure kernel vocabs.loader ;
 IN: io.sockets.secure.debug
 
 GENERIC: <test-secure-config>* ( obj -- config )
@@ -17,9 +17,14 @@ M: object <test-secure-config>*
         "vocab:openssl/test-1.2/dh2048.pem" >>dh-file
         "password" >>password ;
 
-: <test-secure-config> ( -- config )
-    best-tls-method <test-secure-config>* ;
+HOOK: <test-secure-config> secure-socket-backend ( -- config )
+
+M: object <test-secure-config>
+    default-tls-method <test-secure-config>* ;
 
 : with-test-context ( quot -- )
     <test-secure-config>
     swap with-secure-context ; inline
+
+{ "io.sockets.secure.debug" "io.sockets.secure.schannel" }
+"io.sockets.secure.debug.schannel" require-when

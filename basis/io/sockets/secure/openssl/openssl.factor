@@ -598,4 +598,8 @@ M: openssl accept-secure-handshake
     input/output-ports
     make-input/output-secure ;
 
-openssl secure-socket-backend set-global
+: with-openssl ( quot -- )
+    openssl secure-socket-backend rot with-variable ; inline
+
+! Windows initializes its native backend after the socket plumbing is loaded.
+os windows? [ secure-socket-backend [ openssl ] initialize ] unless

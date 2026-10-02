@@ -1,6 +1,17 @@
-USING: help.markup help.syntax io.files io.buffers kernel openssl.libssl
-strings sequences ;
+USING: help.markup help.syntax io.files io.buffers io.sockets.secure
+kernel openssl.libssl quotations strings sequences ;
 IN: io.sockets.secure.openssl
+
+HELP: with-openssl
+{ $values { "quot" quotation } }
+{ $description "Runs a quotation with OpenSSL selected as the secure socket backend. Create any explicit secure context inside the quotation. Restores the previous backend when the quotation returns or throws." }
+{ $code
+  "USING: http.client io.sockets.secure.openssl ;"
+  "[ \"https://example.com/\" http-get ] with-openssl"
+}
+{ $notes "For persistent selection, use "
+  { $snippet "openssl secure-socket-backend set-global" }
+  ". Existing sockets retain their backend. OpenSSL requires its native libraries to be installed." } ;
 
 HELP: subject-name
 { $values { "certificate" "an SSL peer certificate" } { "host" string } }
