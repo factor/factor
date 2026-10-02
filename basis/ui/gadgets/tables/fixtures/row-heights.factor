@@ -3,6 +3,7 @@ USING: parser ;
 "resource:basis/windows/dwmapi/dwmapi.factor" run-file
 "resource:basis/opengl/textures/textures.factor" run-file
 "resource:basis/ui/gestures/gestures.factor" run-file
+"resource:basis/ui/text/text.factor" run-file
 "resource:basis/ui/render/render.factor" run-file
 "resource:basis/ui/gadgets/worlds/worlds.factor" run-file
 "resource:basis/ui/gadgets/line-support/line-support.factor" run-file

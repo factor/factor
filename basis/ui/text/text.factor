@@ -38,6 +38,10 @@ HOOK: flush-layout-cache font-renderer ( -- )
 
 HOOK: string-dim font-renderer ( font string -- dim )
 
+! Bulk sizing must not retain native layouts for every off-screen row.
+HOOK: measure-string-dim font-renderer ( font string -- dim )
+M: object measure-string-dim string-dim ;
+
 : string-width ( font string -- w ) string-dim first ; inline
 
 : string-height ( font string -- h ) string-dim second ; inline

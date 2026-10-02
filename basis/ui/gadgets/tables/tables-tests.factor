@@ -104,6 +104,10 @@ TUPLE: measured-height-cell < height-cell ;
 M: measured-height-cell cell-dim
     height-measurements [ 1 + ] change call-next-method ;
 
+SINGLETON: height-text-renderer
+M: height-text-renderer measure-string-dim
+    2drop height-measurements [ 1 + ] change { 5 20 } ;
+
 ! Repeated pointer lookups reuse metrics; changing the font invalidates them.
 { 3 3 6 } [
     [let
@@ -129,6 +133,21 @@ M: measured-height-cell cell-dim
     gl-scale-factor get-global :> previous
     [ scale gl-scale-factor set-global quot call ]
     [ previous gl-scale-factor set-global ] finally ; inline
+
+! Share scalar heights during a sizing pass without retaining native layouts.
+{ 2 { 20.0 20.0 20.0 } } [
+    1.0 [
+        height-text-renderer font-renderer [
+            [let
+                0 height-measurements set
+                { { "same" "same" } { "other" "same" } { "other" "other" } }
+                <model> trivial-renderer <table> 10 >>line-height :> table
+                table ensure-row-metrics drop
+                height-measurements get table row-heights>>
+            ]
+        ] with-variable
+    ] with-table-scale
+] unit-test
 
 SYMBOL: width-computations
 TUPLE: counted-width-table < table ;

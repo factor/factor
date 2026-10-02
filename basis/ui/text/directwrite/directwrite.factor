@@ -19,6 +19,13 @@ M: directwrite-renderer string-dim
     cached-directwrite-layout metrics>>
     [ width>> ] [ height>> ] bi 2array scale-dim ;
 
+M: directwrite-renderer measure-string-dim
+    [
+        dup selection? [ string>> ] when
+        <directwrite-layout> &dispose metrics>>
+        [ width>> ] [ height>> ] bi 2array scale-dim
+    ] with-destructors ;
+
 M: directwrite-renderer flush-layout-cache
     disposables get-global disposables [
         cached-directwrite-layouts get-global purge-cache

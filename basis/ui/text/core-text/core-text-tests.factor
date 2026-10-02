@@ -4,6 +4,13 @@ sequences sets tools.test ui.render ui.text ui.text.core-text
 ui.text.core-text.private ui.text.private ;
 IN: ui.text.core-text.tests
 
+{ t } [
+    { "" "ASCII 123" "a\u000301" "\u01f600" "\u000633\u000644\u000627\u000645" } [| text |
+        monospace-font text text-dim
+        monospace-font text measure-string-dim =
+    ] all?
+] unit-test
+
 : test-line ( -- line )
     line new { 0 0 } >>render-loc { 0 0 } >>loc
     { 100000 30 } >>render-ext ;

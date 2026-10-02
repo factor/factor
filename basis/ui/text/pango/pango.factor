@@ -248,6 +248,12 @@ M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-layout logical-rect>> dim>> scale-dim v>integer ] if-empty ;
 
+M: pango-renderer measure-string-dim
+    [ " " measure-string-dim { 0 1 } v* ]
+    [
+        [ <layout> &dispose logical-rect>> dim>> scale-dim v>integer ] with-destructors
+    ] if-empty ;
+
 M: pango-renderer flush-layout-cache
     cached-layouts get-global purge-cache ;
 

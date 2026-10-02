@@ -15,6 +15,10 @@ M: core-text-renderer string-dim
     [ cached-line dim>> scale-dim ]
     if-empty ;
 
+M: core-text-renderer measure-string-dim
+    [ " " measure-string-dim { 0 1 } v* ]
+    [ [ <line> &dispose dim>> scale-dim ] with-destructors ] if-empty ;
+
 M: core-text-renderer flush-layout-cache
     cached-lines get-global purge-cache ;
 

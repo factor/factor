@@ -1,7 +1,24 @@
-USING: accessors colors fonts fonts.shaping kernel locals math namespaces
+USING: accessors assocs colors fonts fonts.shaping kernel locals math namespaces
 opengl sequences tools.test ui.gadgets ui.gadgets.debug ui.gadgets.editors ui.gadgets.editors.private
-ui.text ui.text.private ui.text.uniscribe ;
+ui.text ui.text.private ui.text.uniscribe windows.uniscribe ;
 IN: ui.text.uniscribe.tests
+
+{ t } [
+    uniscribe-renderer font-renderer [
+        { "" "ASCII 123" "a\u000301" "\u01f600" "\u000633\u000644\u000627\u000645" } [| text |
+            monospace-font text text-dim
+            monospace-font text measure-string-dim =
+        ] all?
+    ] with-variable
+] unit-test
+
+{ t } [
+    uniscribe-renderer font-renderer [
+        cached-script-strings get-global assoc-size
+        monospace-font "transient Uniscribe measurement 695" measure-string-dim drop
+        cached-script-strings get-global assoc-size =
+    ] with-variable
+] unit-test
 
 ! Line width must describe the shaped string, not a placeholder value.
 { t } [

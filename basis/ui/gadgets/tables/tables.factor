@@ -77,7 +77,10 @@ row-metrics-scale column-metrics ;
 <PRIVATE
 
 GENERIC: cell-dim ( font cell -- width height padding )
+GENERIC: measure-cell-dim ( font cell -- width height padding )
 GENERIC: draw-cell ( font cell -- )
+
+M: object measure-cell-dim cell-dim ;
 
 M: f cell-dim 2drop 0 0 0 ;
 M: f draw-cell 2drop ;
@@ -86,6 +89,7 @@ M: f draw-cell 2drop ;
     dup [ "\r\n" member? ] any? [ split-lines join-words ] when ;
 
 M: string cell-dim single-line text-dim first2 gl-ceiling 0 ;
+M: string measure-cell-dim single-line measure-string-dim first2 gl-ceiling 0 ;
 M: string draw-cell single-line draw-text ;
 
 CONSTANT: image-padding 2
@@ -106,7 +110,7 @@ M: image-name draw-cell nip draw-image ;
     if ;
 
 : row-column-widths ( table row -- widths )
-    [ font>> ] dip [ cell-dim nip + ] with map ;
+    [ font>> ] dip [ measure-cell-dim nip + ] with map ;
 
 : compute-total-width ( gap widths -- total )
     swap [ column-offsets drop ] keep - ;
@@ -166,11 +170,17 @@ TUPLE: table-column-metrics font rows renderer gap scale text-renderer total wid
     2dup empty? not and
     [ [ + ] change-nth ] [ 3drop ] if ;
 
+:: measured-cell-height ( font cell heights -- height )
+    cell string? [
+        cell heights [ font swap measure-cell-dim + nip ] cache
+    ] [ font cell measure-cell-dim + nip ] if ;
+
 :: update-row-metrics ( table -- )
     table line-height :> minimum
     table font>> :> font
+    H{ } clone :> string-heights
     table rows>> [
-        [ 0 ] [ [ font swap cell-dim + nip ] [ max ] map-reduce ] if-empty
+        [ 0 ] [ [ font swap string-heights measured-cell-height ] [ max ] map-reduce ] if-empty
         minimum max 1 max gl-ceiling
     ] map :> heights
     heights table row-heights<<

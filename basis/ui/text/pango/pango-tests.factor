@@ -5,6 +5,13 @@ locals math math.rectangles namespaces opengl sequences strings tools.test
 ui.render ui.text ui.text.pango ui.text.pango.indexed ui.text.pango.private ;
 IN: ui.text.pango.tests
 
+{ t } [
+    { "" "ASCII 123" "a\u000301" "\u01f600" "\u000633\u000644\u000627\u000645" } [| text |
+        monospace-font text text-dim
+        monospace-font text measure-string-dim =
+    ] all?
+] unit-test
+
 :: with-text-scale ( scale quot -- )
     gl-scale-factor get-global :> previous
     [ scale gl-scale-factor set-global quot call ]

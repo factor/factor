@@ -1,11 +1,24 @@
-USING: accessors arrays assocs dlists fonts hashtables kernel locals math math.order models namespaces
-prettyprint.config sequences strings threads tools.test ui.gadgets ui.gadgets.debug ui.gadgets.tables.private
+USING: accessors arrays assocs destructors dlists fonts hashtables kernel locals math math.order models namespaces
+prettyprint.config sequences sets strings threads tools.test ui.gadgets ui.gadgets.debug ui.gadgets.tables.private
 ui.text ui.tools.inspector ;
 
 { } [ \ + <model> <inspector-gadget> com-edit-slot ] unit-test
 
 ! Make sure we can click around in the inspector; map-index regression
 { } [ "abcdefg" make-slot-descriptions drop ] unit-test
+
+! #695: sizing a large inspector must not retain a native layout per row.
+{ t 1000 } [
+    [let
+        disposables get-global cardinality :> before
+        1000 <iota> >array <model> <inspector-table> :> table
+        table [
+            table pref-dim drop
+            disposables get-global cardinality before - 16 <=
+            table row-heights>> length
+        ] with-grafted-gadget
+    ]
+] unit-test
 
 ! #2772: inspect deque entries, rather than its front/back link slots.
 { { 0 1 2 } { "first" f "last" } } [

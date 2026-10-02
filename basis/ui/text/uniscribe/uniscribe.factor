@@ -1,8 +1,9 @@
 ! Copyright (C) 2009, 2010 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors cache fonts fonts.shaping kernel locals math
+USING: accessors cache destructors fonts fonts.shaping kernel locals math
 math.order math.vectors namespaces opengl sequences ui.text
 ui.text.private windows.uniscribe ;
+FROM: windows.uniscribe.private => <script-string> ;
 IN: ui.text.uniscribe
 
 SINGLETON: uniscribe-renderer
@@ -11,6 +12,9 @@ M: uniscribe-renderer draws-selection-background? t ;
 
 M: uniscribe-renderer string-dim
     cached-script-string size>> scale-dim ;
+
+M: uniscribe-renderer measure-string-dim
+    [ <script-string> &dispose size>> scale-dim ] with-destructors ;
 
 M: uniscribe-renderer flush-layout-cache
     cached-script-strings get-global purge-cache ;

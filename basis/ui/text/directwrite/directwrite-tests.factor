@@ -1,7 +1,29 @@
-USING: accessors arrays continuations fonts fonts.shaping kernel locals math math.functions
+USING: accessors arrays assocs continuations fonts fonts.shaping kernel locals math math.functions
 models namespaces opengl sequences tools.test ui.gadgets ui.gadgets.debug ui.gadgets.editors
 ui.gadgets.editors.private ui.text ui.text.directwrite ui.text.private windows.directwrite ;
 IN: ui.text.directwrite.tests
+
+! Bulk measurements preserve shaping without filling the rendering cache.
+{ t } [
+    directwrite-renderer font-renderer [
+        { "" "ASCII 123" "a\u000301" "\u01f600" "\u000633\u000644\u000627\u000645" } [| text |
+            monospace-font text text-dim
+            monospace-font text measure-string-dim =
+        ] all?
+    ] with-variable
+] unit-test
+
+{ t t } [
+    directwrite-renderer font-renderer [
+        [let
+            cached-directwrite-layouts get-global assoc-size :> layouts
+            directwrite-layout-aliases get-global assoc-size :> aliases
+            monospace-font "transient DirectWrite measurement 695" measure-string-dim drop
+            cached-directwrite-layouts get-global assoc-size layouts =
+            directwrite-layout-aliases get-global assoc-size aliases =
+        ]
+    ] with-variable
+] unit-test
 
 ! UI coordinates stay logical as native layouts change backing scale.
 :: scaled-tab-caret ( -- x index )

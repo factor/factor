@@ -7,7 +7,7 @@ prettyprint sequences sorting strings ui ui.commands ui.gadgets
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tables
 ui.gadgets.tables.private ui.gadgets.toolbar ui.gadgets.tracks
-ui.gestures ui.operations ui.text ui.theme ui.tools.browser
+ui.gestures ui.operations ui.text ui.text.private ui.theme ui.tools.browser
 ui.tools.common ui.tools.inspector.slots unicode ;
 IN: ui.tools.inspector
 
@@ -99,8 +99,8 @@ TUPLE: inspector-table < table ;
     ! Monospace ASCII needs only one native measurement. Combining marks
     ! and fallback glyphs can change the widest string, regardless of length.
     strings [ aux>> ] any? [
-        strings [ font swap text-width ] map supremum
-    ] [ font strings longest text-width ] if ;
+        strings [ font swap measure-string-dim first ] map supremum
+    ] [ font strings longest measure-string-dim first ] if ;
 
 :: inspector-row-widths ( table rows -- widths )
     table font>> :> font
