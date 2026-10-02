@@ -143,6 +143,8 @@ TUPLE: error-display < track ;
 : com-edit ( error-display -- )
     control-value [ edit-error ] when* ;
 
+\ com-edit H{ { +listener+ t } } define-command
+
 error-display "toolbar" f {
     { f com-inspect }
     { f com-help }
