@@ -152,11 +152,14 @@ menu H{
 : show-commands-menu ( target commands -- )
     [ dup [ ] ] dip <commands-menu> show-menu ;
 
-: <operations-menu> ( target hook -- menu )
-    over object-operations
+: operations-menu-commands ( target -- commands )
+    object-operations
     [ primary-operation? ] partition
     [ reverse ] [ [ command-name ] sort-by ] bi*
-    { ---- } glue <commands-menu> ;
+    { ---- } glue ;
+
+: <operations-menu> ( target hook -- menu )
+    over operations-menu-commands <commands-menu> ;
 
 : show-operations-menu ( gadget target hook -- )
     <operations-menu> show-menu ;

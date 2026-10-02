@@ -175,4 +175,5 @@ SYMBOL: submitted-action-text
 
 { t "query" "" } [ T{ key-down f f "RET" } test-action-field-key ] unit-test
 { t "query" "" } [ T{ key-down f f "ENTER" } test-action-field-key ] unit-test
-{ f f "query" } [ T{ key-down f { S+ } "ENTER" } test-action-field-key ] unit-test
+! #1657: unbound modifiers fall back to the action field's Enter action.
+{ t "query" "" } [ T{ key-down f { S+ } "ENTER" } test-action-field-key ] unit-test

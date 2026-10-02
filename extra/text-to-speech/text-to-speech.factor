@@ -3,7 +3,7 @@
 
 USING: combinators command-line generic io kernel math
 math.text.english namespaces present sequences splitting
-strings system ui.operations vocabs ;
+strings system ui.operations ui.operations.syntax vocabs ;
 
 IN: text-to-speech
 
@@ -26,7 +26,7 @@ M: object speak present speak-text ;
 
 M: integer speak number>text speak-text ;
 
-[ \ present ?lookup-method ] \ speak H{ } define-operation
+OPERATION: speak [ \ present ?lookup-method ] H{ }
 
 : speak-main ( -- )
     command-line get [

@@ -80,7 +80,12 @@ HELP: ?set-model
 { $values { "value" object } { "model" model } }
 { $description "Similar to " { $link set-model } ", but only sets the value if the new value is different." } ;
 
-{ set-model ?set-model change-model change-model* (change-model) push-model pop-model } related-words
+HELP: touch-model
+{ $values { "model" model } }
+{ $description "Calls " { $link update-model } " and notifies connected observers without replacing the model's value. Use this after mutating an object held by the model." }
+{ $notes "Uses the same locking protocol as " { $link set-model } ". Recursive notifications of a locked model are ignored, and the lock is released if a hook throws." } ;
+
+{ set-model ?set-model touch-model change-model change-model* (change-model) push-model pop-model } related-words
 
 HELP: change-model
 { $values { "model" model } { "quot" { $quotation ( ..a obj -- ..b newobj ) } } }

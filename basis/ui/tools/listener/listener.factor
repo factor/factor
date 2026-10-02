@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar combinators
 combinators.short-circuit concurrency.flags
 concurrency.mailboxes continuations destructors documents
 documents.elements fonts hashtables help help.markup help.tips
-io io.directories io.files.info io.pathnames io.styles kernel lexer
+io io.directories io.files.info io.pathnames io.streams.string io.styles kernel lexer
 listener literals math math.vectors models models.arrow models.delay
 namespaces parser prettyprint
 sequences source-files.errors splitting strings system threads
@@ -19,12 +19,18 @@ vocabs.loader vocabs.parser vocabs.refresh words ;
 IN: ui.tools.listener
 
 TUPLE: interactor < source-editor
-    output history flag mailbox thread waiting token-model word-model popup ;
+    output history flag mailbox thread waiting token-model word-model popup
+    input-buffer input-eof? ;
+
+TUPLE: interactor-input-chunk text ;
+C: <interactor-input-chunk> interactor-input-chunk
 
 INSTANCE: interactor input-stream
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
+    f >>input-buffer
+    f >>input-eof?
     self >>thread
     drop ;
 
@@ -155,6 +161,9 @@ PRIVATE>
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
+        dup editor-string [ ] [
+            <interactor-input-chunk> over interactor-continue
+        ] if-empty
         f over interactor-continue
     ] unless drop ;
 
@@ -176,8 +185,24 @@ PRIVATE>
 : interactor-read ( interactor -- lines )
     [ interactor-yield ] [ interactor-finish ] bi ;
 
-M: interactor stream-readln
-    interactor-read ?first ;
+:: interactor-input ( interactor -- reader/f )
+    interactor thread>> self eq? interactor input-eof?>> not and [
+        interactor input-buffer>> :> reader
+        reader [ reader stream-tell reader stream-length < ] [ f ] if [
+            reader
+        ] [
+            interactor interactor-read [
+                dup interactor-input-chunk? [ text>> ] [ join-lines CHAR: \n suffix ] if
+                <string-reader>
+                dup interactor input-buffer<<
+            ] [ f interactor input-buffer<< t interactor input-eof?<< f ] if*
+        ] if
+    ] [ f ] if ;
+
+M: interactor stream-read1
+    interactor-input stream-read1 ;
+
+M: interactor stream-readln call-next-method ;
 
 : (call-listener) ( quot command listener -- )
     input>> dup interactor-busy? [ 3drop ] [
@@ -186,29 +211,17 @@ M: interactor stream-readln
         3bi
     ] if ;
 
-M:: interactor stream-read-unsafe ( n buf interactor -- count )
-    n [ 0 ] [
-        drop
-        interactor interactor-read dup [ join-lines ] when
-        n index-or-length [ head-slice 0 buf copy ] keep
-    ] if-zero ;
+:: interactor-read-into ( n buf offset interactor -- count )
+    offset n < [
+        interactor interactor-input [
+            n offset - buf offset tail-slice rot stream-read-unsafe
+            offset + :> next
+            n buf next interactor interactor-read-into
+        ] [ offset ] if*
+    ] [ offset ] if ;
 
-M: interactor stream-read1
-    dup interactor-read {
-        { [ dup not ] [ 2drop f ] }
-        { [ dup empty? ] [ drop stream-read1 ] }
-        { [ dup first empty? ] [ 2drop CHAR: \n ] }
-        [ nip first first ]
-    } cond ;
-
-M: interactor stream-read-until
-    swap '[
-        _ interactor-read [
-            join-lines CHAR: \n suffix
-            [ _ member? ] dupd find
-            [ [ head ] when* ] dip dup not
-        ] [ f f f ] if*
-    ] [ drop ] produce swap [ concat "" prepend-as ] dip ;
+M: interactor stream-read-unsafe 0 swap interactor-read-into ;
+M: interactor stream-read-until call-next-method ;
 
 M: interactor dispose drop ;
 
@@ -400,9 +413,23 @@ M: object accept-completion-hook 2drop ;
 : try-parse ( lines -- quot/f )
     [ parse-lines-interactive ] [ nip '[ _ rethrow ] ] recover ;
 
+:: interactor-quot-input ( interactor -- obj )
+    interactor thread>> self eq? [
+        f interactor input-eof?<<
+        interactor input-buffer>> :> reader
+        reader [ reader stream-tell reader stream-length < ] [ f ] if [
+            f interactor input-buffer<<
+            reader stream-contents split-lines
+        ] [
+            interactor interactor-yield
+            dup interactor-input-chunk? [ text>> split-lines ] when
+            dup array? [ interactor interactor-finish ] when
+        ] if
+    ] [ f ] if ;
+
 M: interactor stream-read-quot
-    dup interactor-yield dup array? [
-        over interactor-finish try-parse
+    dup interactor-quot-input dup array? [
+        try-parse
         or? [ stream-read-quot ] unless
     ] [ nip ] if ;
 
@@ -423,7 +450,7 @@ M: interactor handle-gesture
     } cond ;
 
 : delete-next-character/eof ( interactor -- )
-    dup model>> doc-string empty?
+    dup [ editor-caret ] [ model>> doc-end ] bi =
     [ interactor-eof ] [ delete-next-character ] if ;
 
 interactor "interactor" f {

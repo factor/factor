@@ -4,6 +4,7 @@ USING: parser ;
 "resource:basis/opengl/textures/textures.factor" run-file
 "resource:basis/ui/render/render.factor" run-file
 "resource:basis/ui/gadgets/worlds/worlds.factor" run-file
+"resource:basis/ui/gadgets/line-support/line-support.factor" run-file
 "resource:basis/ui/gadgets/editors/editors.factor" run-file
 "resource:basis/ui/ui.factor" run-file
 "resource:basis/ui/backend/windows/windows.factor" run-file

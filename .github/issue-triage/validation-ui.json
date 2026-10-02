@@ -1,0 +1,68 @@
+{
+  "recorded_at": "2026-10-02T00:50:56.720Z",
+  "source_head": "9e2f08e193311bb8a58571dc530ed44d154289be",
+  "platform": "Windows x86-64",
+  "command": "factor.com -no-user-init .github/issue-triage/verify-ui.factor",
+  "exit_code": 0,
+  "checks": 417,
+  "success_marker": "UI-FIXES-PASS",
+  "log_sha256": "fa892c0c09b69b10d83f1f874d8174ac6ac48d74470fc6d407c667da9e6bcf9c",
+  "issues": [
+    1267,
+    1281,
+    1657,
+    2556,
+    2566,
+    2667
+  ],
+  "native_graphics_modes": [
+    "legacy",
+    "gl3"
+  ],
+  "native_fixtures": [
+    "table row heights and mouse selection",
+    "editor caret rendering",
+    "first window frame"
+  ],
+  "cold_image_smoke": [
+    "Enter handling",
+    "model notification",
+    "named operations registry"
+  ],
+  "factor_image_sha256": "7e6e94e1d31e6e6e2e2807b137fa39cc690c56ca2bad6c5f21f070c35fc3b81b",
+  "source_file_sha256": {
+    "basis/models/models-docs.factor": "5f2feb23051d6aa4676adff10b463e4f95d5ebd5aa035137760892834e212327",
+    "basis/models/models-tests.factor": "2e9c7d5194ae6c2f64cea74a067252c9c3831eb45705878b7fc3db323c5b4b6f",
+    "basis/models/models.factor": "62390f8204bdf1d3910442a82629cc9f61b2014c4eda8f8c51a568bb14b6641a",
+    "basis/ui/backend/windows/fixtures/startup.factor": "0281f6ddc46fd15d6ea96b79a3d982ade9e9ca5153f95665818082f36bcd5aed",
+    "basis/ui/gadgets/editors/editors-tests.factor": "ba5616558aae0ebe2854c6e69a77b810344c4ce8cbfd49f528b118a4d6d9cd80",
+    "basis/ui/gadgets/editors/fixtures/caret.factor": "c60a98bc89ac1967df00ae943c457874fe6eb41484eb1aded13d657e8ab64fd3",
+    "basis/ui/gadgets/line-support/line-support.factor": "fa7a08ec44c3b12441c35234ee2c8031a9341bac62ebe0e7adfeec6acc90b029",
+    "basis/ui/gadgets/menus/menus.factor": "aee11eac963e80667dabfc1aa88f03f417dd7bf865938b2e08dc194765e1b043",
+    "basis/ui/gadgets/presentations/presentations-tests.factor": "2b221aa9d86ce396ea8a247f217576771dd94caa18ead76092d6af1ffd6902a2",
+    "basis/ui/gadgets/presentations/presentations.factor": "fafb7f0621f9e365b6a4f62e2e6ba121d01cb08a429192fcd836883402e66e7b",
+    "basis/ui/gadgets/tables/tables-docs.factor": "b0904f7687c84f61abc6ef0da1d9e8d04cef1a3626aca08b30a34abbd4797a75",
+    "basis/ui/gadgets/tables/tables-tests.factor": "6c5e24911752e1cfc5a742a64b30e2d54aa13a0ef13f790388c16da6c933ea7a",
+    "basis/ui/gadgets/tables/tables.factor": "22d38a6cc85a5441d1c8225b85414e212e58daee60d19bb772a3556b5ac86bf5",
+    "basis/ui/gestures/gestures-docs.factor": "c9708181baf018fa8d546c432bdf04ac2d2449b9695c0c9144e3c8d65d3f94ea",
+    "basis/ui/gestures/gestures.factor": "e4af682949e4991e2eeda0b1e224572a53066bc13c246c71aa66a5566e82a85e",
+    "basis/ui/operations/operations-docs.factor": "de1eea38796ce32f7d85ed439ed764ea288c88998def121dca7d94c620ea37ff",
+    "basis/ui/operations/operations-tests.factor": "211f472ba13f97d127815b65a113c1648c1d5b97d701f96b87d36ee00360f193",
+    "basis/ui/operations/operations.factor": "da0b55dc5f0b642c63b375a952a0a3968d7fb9fbec6684e3b4d9c88178ba796b",
+    "basis/ui/tools/listener/listener-docs.factor": "7350304bb6dc886e51a6d8d3a69a61494466ed2fd75ab510b1682ce5a326c627",
+    "basis/ui/tools/listener/listener-tests.factor": "f3cf7a00013f7da2a22a75ad7e5517e65f38bec44cfac79a752906b1c9f91dc8",
+    "basis/ui/tools/listener/listener.factor": "a60c321030b047242c65e62c517f20ba6cea3958e82b6e1c0fb6487418a5b5e0",
+    "basis/ui/tools/operations/operations.factor": "94308cf2db9444cfeaf78e669e4084d1c2c9d26009fd95acd93b00bd8107b55e",
+    "extra/file-picker/operations/operations.factor": "f237d15fca6b15f4e7dd1ccb79f6d717e72fa387846e7f9d3b0d673ee9812bfd",
+    "extra/gemini/ui/ui.factor": "92c02e4a80479d897233644a118bd5d3aeee1327a4306741785c8acc4a2181d5",
+    "extra/gopher/ui/ui.factor": "3e5f569c1f6e2c7ce1ca253214ac83a15dc6987a264709010d6756f264687117",
+    "extra/text-to-speech/text-to-speech.factor": "99c6e98fdafa6c8e364f439d6ea9ae160353496e17e971b27660155576795083",
+    "basis/ui/gestures/gestures-tests.factor": "def2c951cb3a0fdea79818f90e3e06459d5f7ab137c8d7afe89249f78d39df9b",
+    "basis/ui/operations/syntax/syntax.factor": "b27ad6e97fd3078a435ed0592443a60ff848fc536afc218a552b037c5b360d30",
+    "basis/ui/operations/syntax/syntax-docs.factor": "0cab7e97737ccd7a344d9be1eef3fcce601f7e46cda252ad2cfa62737ca947de",
+    "basis/ui/gadgets/tables/fixtures/row-heights.factor": "d19a874927736f5c71e7bbb7ee2cece25b9709fd5800118ac0eca53ddb8ee6f3"
+  },
+  "limitations": [
+    "Native macOS/Linux execution was not performed; shared behavior has Windows regression coverage."
+  ]
+}

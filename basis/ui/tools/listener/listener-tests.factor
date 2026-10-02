@@ -1,11 +1,89 @@
-USING: accessors arrays calendar combinators.short-circuit
-concurrency.promises continuations documents io io.directories
+USING: accessors arrays calendar combinators.extras combinators.short-circuit
+concurrency.mailboxes concurrency.promises continuations documents io io.directories
 io.encodings.utf8 io.files io.pathnames io.streams.string kernel lexer
-listener math namespaces parser quotations sequences threads
-tools.test tools.time ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
+listener locals math namespaces parser quotations sequences splitting threads
+tools.test tools.time ui.gadgets ui.gadgets.debug ui.gadgets.editors ui.gadgets.panes
 ui.gestures ui.operations ui.tools.common ui.tools.listener ui.tools.listener.private
 vocabs.parser ;
 IN: ui.tools.listener.tests
+
+:: queued-interactor ( text -- interactor )
+    <interactor> <pane> <pane-stream> >>output :> interactor
+    interactor register-self
+    text interactor set-editor-string
+    interactor control-value interactor mailbox>> mailbox-put
+    f interactor mailbox>> mailbox-put
+    interactor ;
+
+! #1281: one read must retain every unused line and character for later reads.
+{ "Line1" "Line2" f } [
+    "Line1\nLine2" queued-interactor
+    [ stream-readln ] [ stream-readln ] [ stream-readln ] tri
+] unit-test
+
+{ CHAR: α "β" "γδ" f } [
+    "αβ\nγδ" queued-interactor
+    [ stream-read1 ] [ stream-readln ] [ stream-readln ] [ stream-readln ] quad
+] unit-test
+
+{ "ab" "c" 10 "de" CHAR: f 10 f } [
+    [let
+        "abc\ndef" queued-interactor :> interactor
+        2 interactor stream-read
+        "\n" interactor stream-read-until
+        2 interactor stream-read
+        interactor stream-read1
+        interactor stream-read1
+        interactor stream-read1
+    ]
+] unit-test
+
+{ "" "middle" "" f } [
+    "\nmiddle\n" queued-interactor
+    [ stream-readln ] [ stream-readln ] [ stream-readln ] [ stream-readln ] quad
+] unit-test
+
+{ f "abc\n" } [
+    "abc" queued-interactor [ 0 swap stream-read ] [ 100 swap stream-read ] bi
+] unit-test
+
+! A quotation read also consumes pending input rather than losing it.
+{ "data" [ 3 4 + ] } [
+    "data\n3 4 +" queued-interactor
+    [ stream-readln ]
+    [ [ "math" use-vocab stream-read-quot ] with-manifest ] bi
+] unit-test
+
+! EOF remains observable after a partial block, so stream-contents can finish.
+{ "abc\n" f f } [
+    "abc" queued-interactor
+    [ 100 swap stream-read ] [ stream-readln ] [ stream-read1 ] tri
+] unit-test
+
+! Ctrl-D at the end of nonempty input supplies the remaining text without a newline.
+{ "partial" f f } [
+    [let
+        <interactor> <pane> <pane-stream> >>output :> interactor
+        interactor register-self
+        "partial" interactor set-editor-string
+        t interactor waiting<<
+        interactor interactor-eof
+        "\n" interactor stream-read-until
+        interactor stream-read1
+    ]
+] unit-test
+
+! A different thread cannot consume the owning listener's pending input.
+{ CHAR: a f "bc" } [
+    [let
+        "abc" queued-interactor :> interactor
+        interactor stream-read1
+        <promise> :> result
+        [ interactor stream-read-quot result fulfill ] in-thread
+        result 5 seconds ?promise-timeout
+        interactor stream-readln
+    ]
+] unit-test
 
 ! Quotation commands retain the source input as well as the command name (#363).
 { "2 2 +\nCommand: time\n" } [
@@ -126,10 +204,11 @@ IN: ui.tools.listener.tests
 
     [ { "Hello" 10 } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 
+    [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
     [ ] [ <promise> "promise" set ] unit-test
 
     [
-        self "interactor" get thread<<
+        "interactor" get register-self
         "C\n" "interactor" get stream-read-until 2array "promise" get fulfill
     ] "Interactor test" spawn drop
 
@@ -141,10 +220,11 @@ IN: ui.tools.listener.tests
 
     [ { "AB" 67 } ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 
+    [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
     [ ] [ <promise> "promise" set ] unit-test
 
     [
-        self "interactor" get thread<<
+        "interactor" get register-self
         "Z" "interactor" get stream-read-until 2array "promise" get fulfill
     ] "Interactor test" spawn drop
 
@@ -195,7 +275,8 @@ CONSTANT: text "Hello world.\nThis is a test."
 
 { } [ "interactor" get interactor-eof ] unit-test
 
-{ t } [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
+! Submitting a batch terminates its last line, as in the console listener.
+{ t } [ "promise" get 2 seconds ?promise-timeout text "\n" append = ] unit-test
 
 { } [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 

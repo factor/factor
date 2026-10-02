@@ -4,7 +4,8 @@ IN: ui.gestures
 
 HELP: set-gestures
 { $values { "class" "a class word" } { "hash" hashtable } }
-{ $description "Sets the gestures a gadget class responds to. The hashtable maps gestures to quotations with stack effect " { $snippet "( gadget -- )" } "." } ;
+{ $description "Sets the gestures a gadget class responds to. The hashtable maps gestures to quotations with stack effect " { $snippet "( gadget -- )" } "." }
+{ $notes "Return and keypad Enter key-down gestures fall back to each other's handlers. If no handler matches their modifiers, unmodified Enter handlers are tried. Explicit bindings, such as Shift+Enter to insert a newline, take precedence." } ;
 
 HELP: handle-gesture
 { $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" boolean } }

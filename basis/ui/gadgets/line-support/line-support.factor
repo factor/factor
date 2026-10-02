@@ -43,9 +43,11 @@ M: line-gadget line-height
         [ drop ] [ dupd line-height<< ] if
     ] ?unless ;
 
-: y>line ( y gadget -- n ) line-height /i ;
+GENERIC: y>line ( y gadget -- n )
+M: line-gadget y>line line-height /i ;
 
-: line>y ( n gadget -- y ) line-height * gl-round ;
+GENERIC: line>y ( n gadget -- y )
+M: line-gadget line>y line-height * gl-round ;
 
 : validate-line ( m gadget -- n )
     control-value [ drop f ] [ length 1 - min 0 max ] if-empty ;
@@ -70,16 +72,11 @@ M: line-gadget line-height
 
 GENERIC: draw-line ( line index gadget -- )
 
-: draw-lines ( gadget -- )
-    {
-        [ first-visible-line ]
-        [ last-visible-line ]
-        [ control-value ]
-        [ line-height ]
-        [ ]
-    } cleave '[
-        0 over _ * gl-round 2array -rot
-        [ _ draw-line ] 2curry with-translation
+:: draw-lines ( gadget -- )
+    gadget first-visible-line gadget last-visible-line gadget control-value
+    [| line index |
+        0 index gadget line>y 2array
+        [ line index gadget draw-line ] with-translation
     ] each-slice-index ;
 
 <PRIVATE
@@ -112,5 +109,6 @@ M: line-gadget pref-viewport-dim
 
 M: line-gadget pref-dim* { 0 0 } swap line-gadget-dim ;
 
-: visible-lines ( gadget -- n )
+GENERIC: visible-lines ( gadget -- n )
+M: line-gadget visible-lines
     [ visible-dim second ] [ line-height ] bi /i ;

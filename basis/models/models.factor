@@ -99,6 +99,11 @@ M: model update-model drop ;
         ] with-locked-model
     ] if ;
 
+: touch-model ( model -- )
+    dup locked?>> [ drop ] [
+        [ [ update-model ] [ notify-connections ] bi ] with-locked-model
+    ] if ;
+
 : ?set-model ( value model -- )
     2dup value>> = [ 2drop ] [ set-model ] if ;
 

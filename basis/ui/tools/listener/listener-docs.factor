@@ -25,8 +25,8 @@ HELP: interactor-busy?
 { $description "We're busy if there's no thread to resume." } ;
 
 HELP: interactor-read
-{ $values { "interactor" interactor } { "lines" sequence } }
-{ $description "Implements the " { $link stream-readln } " generic for the interactor." } ;
+{ $values { "interactor" interactor } { "lines" object } }
+{ $description "Waits for one submitted input batch, records it in history, echoes it and clears the editor. Stream reads keep unused characters and lines in the interactor's input buffer." } ;
 
 HELP: wait-for-listener
 { $values { "listener" listener-gadget } }
@@ -36,6 +36,8 @@ ARTICLE: "ui-listener" "UI listener"
 "The graphical listener adds input history and word and vocabulary completion. A summary with any outstanding error conditions is displayed before every prompt (see " { $link "ui.tools.error-list" } " for details)."
 $nl
 "Return and keypad Enter submit input. Holding Shift with either key inserts a newline."
+$nl
+"Pasted multiline input is buffered across successive stream reads. Submitting input terminates its last line. Control-D at the end of the editor supplies any remaining text without adding a newline, then signals end of input; within the text it deletes the next character."
 $nl
 "If the file " { $snippet "~/.factor-history" } " exists, input history is made persistent by appending history once the graphical listener closes and reading it back in upon (re)starting."
 $nl

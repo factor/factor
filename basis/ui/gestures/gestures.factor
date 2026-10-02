@@ -6,8 +6,10 @@ math.order math.parser math.vectors namespaces sequences sets system
 timers ui.gadgets ui.gadgets.private words ;
 IN: ui.gestures
 
-: get-gesture-handler ( gesture gadget -- quot )
+: (get-gesture-handler) ( gesture gadget -- quot )
     class-of superclasses-of [ "gestures" word-prop ] map assoc-stack ;
+
+DEFER: get-gesture-handler
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
@@ -142,6 +144,20 @@ TUPLE: key-up < key-gesture ;
 
 : <key-up> ( mods sym action? -- key-up )
     key-up new-key-gesture ;
+
+:: get-gesture-handler ( gesture gadget -- quot/f )
+    gesture gadget (get-gesture-handler) [
+        gesture key-down? [
+            gesture sym>> { "RET" "ENTER" } member? [
+                gesture clone
+                    gesture sym>> "RET" = [ "ENTER" ] [ "RET" ] if >>sym
+                :> alternate
+                alternate gadget (get-gesture-handler)
+                [ gesture clone f >>mods gadget (get-gesture-handler) ] unless*
+                [ alternate f >>mods gadget (get-gesture-handler) ] unless*
+            ] [ f ] if
+        ] [ f ] if
+    ] unless* ;
 
 ! Hand state
 

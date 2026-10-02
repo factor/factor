@@ -37,7 +37,7 @@ HELP: operation-gesture
 { $description "Outputs the keyboard gesture associated with the operation." } ;
 
 HELP: operations
-{ $var-description "Global variable holding a vector of " { $link operation } " instances. New operations can be added with " { $link define-operation } "." } ;
+{ $var-description "Global variable holding an ordered association of operation definitions to " { $link operation } " instances." } ;
 
 HELP: object-operations
 { $values { "obj" object } { "operations" "a sequence of " { $link operation } " instances" } }
@@ -61,7 +61,8 @@ HELP: define-operation
         { { $link +secondary+ } " - if set to a true value, the operation will be output by " { $link secondary-operation } " when applied to an object satisfying the predicate" }
         { { $link +keyboard+ } " - can be set to a keyboard gesture; the gesture will be used by " { $link define-operation-map } }
     }
-} ;
+}
+{ $notes "For source definitions, use OPERATION: from ui.operations.syntax so changing a predicate replaces the previous definition and removing it from a file forgets the operation. This word remains available for dynamically registering multiple predicates for one command." } ;
 
 HELP: define-operation-map
 { $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "object" object } { "translator" { $quotation ( obj -- newobj ) } ", or " { $link f } } }

@@ -7,135 +7,135 @@ macros.expander models namespaces parser prettyprint
 prettyprint.config quotations see sequences source-files.errors
 stack-checker threads tools.annotations tools.crossref
 tools.test tools.time tools.walker ui.clipboards ui.commands
-ui.gestures ui.operations ui.tools.browser ui.tools.deploy
+ui.gestures ui.operations ui.operations.syntax ui.tools.browser ui.tools.deploy
 ui.tools.inspector ui.tools.listener ui.tools.traceback vocabs
 vocabs.loader vocabs.parser words ;
 IN: ui.tools.operations
 
 ! Objects
-[ drop t ] \ inspector H{
+OPERATION: inspector [ drop t ] H{
     { +primary+ t }
-} define-operation
+}
 
 : com-prettyprint ( obj -- ) ... ;
 
-[ drop t ] \ com-prettyprint H{
+OPERATION: com-prettyprint [ drop t ] H{
     { +listener+ t }
-} define-operation
+}
 
 : com-push ( obj -- obj ) ;
 
-[ drop t ] \ com-push H{
+OPERATION: com-push [ drop t ] H{
     { +listener+ t }
-} define-operation
+}
 
 : com-unparse ( obj -- )
     [ unparse ] without-limits listener-input ;
 
-[ drop t ] \ com-unparse H{ } define-operation
+OPERATION: com-unparse [ drop t ] H{ }
 
 : com-copy-object ( obj -- )
     [ unparse ] without-limits clipboard get set-clipboard-contents ;
 
-[ drop t ] \ com-copy-object H{ } define-operation
+OPERATION: com-copy-object [ drop t ] H{ }
 
 ! Models
-[ { [ model? ] [ ref>> ] } 1&& ] \ inspect-model H{
+OPERATION: inspect-model [ { [ model? ] [ ref>> ] } 1&& ] H{
     { +primary+ t }
-} define-operation
+}
 
 ! Input
 : com-input ( obj -- ) string>> listener-input ;
 
-[ input? ] \ com-input H{
+OPERATION: com-input [ input? ] H{
     { +primary+ t }
     { +secondary+ t }
-} define-operation
+}
 
 ! Restart
-[ restart? ] \ continue-restart H{
+OPERATION: continue-restart [ restart? ] H{
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
-} define-operation
+}
 
 ! Continuation
-[ continuation? ] \ traceback-window H{
+OPERATION: traceback-window [ continuation? ] H{
     { +primary+ t }
     { +secondary+ t }
-} define-operation
+}
 
 ! Thread
 : com-thread-traceback-window ( thread -- )
     thread-continuation traceback-window ;
 
-[ thread? ] \ com-thread-traceback-window H{
+OPERATION: com-thread-traceback-window [ thread? ] H{
     { +primary+ t }
     { +secondary+ t }
-} define-operation
+}
 
-[ pathname? ] \ edit-file H{
+OPERATION: edit-file [ pathname? ] H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
-} define-operation
+}
 
-[ definition-mixin? ] \ edit H{
+OPERATION: edit [ definition-mixin? ] H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }
-} define-operation
+}
 
 ! Source file error
-[ source-file-error? ] \ edit-error H{
+OPERATION: edit-error [ source-file-error? ] H{
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
-} define-operation
+}
 
 : com-reload ( error -- )
     path>> run-file ;
 
-[ compiler-error? ] \ com-reload H{
+OPERATION: com-reload [ compiler-error? ] H{
     { +listener+ t }
-} define-operation
+}
 
 ! Definitions
 : com-forget ( defspec -- )
     [ forget ] with-compilation-unit ;
 
-[ definition-mixin? ] \ com-forget H{ } define-operation
+OPERATION: com-forget [ definition-mixin? ] H{ }
 
-[ topic? ] \ com-browse H{
+OPERATION: com-browse [ topic? ] H{
     { +keyboard+ T{ key-down f { C+ } "h" } }
     { +primary+ t }
-} define-operation
+}
 
-[ topic? ] \ com-browse-new H{ } define-operation
+OPERATION: com-browse-new [ topic? ] H{ }
 
-[ word? ] \ usage. H{
+OPERATION: usage. [ word? ] H{
     { +keyboard+ T{ key-down f { C+ } "u" } }
     { +listener+ t }
-} define-operation
+}
 
-[ word? ] \ fix H{
+OPERATION: fix [ word? ] H{
     { +keyboard+ T{ key-down f { C+ } "f" } }
     { +listener+ t }
-} define-operation
+}
 
-[ [ annotated? not ] [ word? ] bi and ] \ watch H{ } define-operation
+OPERATION: watch [ [ annotated? not ] [ word? ] bi and ] H{ }
 
-[
+OPERATION: reset [
     { [ word? ]
       [ { [ annotated? ] [ subwords [ annotated? ] any? ] } 1|| ]
     } 1&&
-] \ reset H{ } define-operation
+] H{ }
 
-[ word? ] \ breakpoint H{ } define-operation
+OPERATION: breakpoint [ word? ] H{ }
 
-[ word? ] \ see H{
+OPERATION: see [ word? ] H{
     { +listener+ t }
-} define-operation
+}
 
 GENERIC: com-stack-effect ( obj -- )
 
@@ -145,52 +145,52 @@ M: word com-stack-effect 1quotation com-stack-effect ;
 
 : com-enter-in ( vocab -- ) vocab-name set-current-vocab ;
 
-[ vocab? ] \ com-enter-in H{
+OPERATION: com-enter-in [ vocab? ] H{
     { +listener+ t }
-} define-operation
+}
 
 : com-use-vocab ( vocab -- ) vocab-name use-vocab ;
 
-[ vocab-spec? ] \ com-use-vocab H{
+OPERATION: com-use-vocab [ vocab-spec? ] H{
     { +secondary+ t }
     { +listener+ t }
-} define-operation
+}
 
-[ vocab-spec? ] \ run H{
+OPERATION: run [ vocab-spec? ] H{
     { +listener+ t }
-} define-operation
+}
 
-[ vocab? ] \ test H{
+OPERATION: test [ vocab? ] H{
     { +listener+ t }
-} define-operation
+}
 
-[ vocab-spec? ] \ deploy-tool H{ } define-operation
+OPERATION: deploy-tool [ vocab-spec? ] H{ }
 
 ! Quotations
-[ quotation? ] \ com-stack-effect H{
+OPERATION: com-stack-effect [ quotation? ] H{
     { +keyboard+ T{ key-down f { C+ } "i" } }
     { +listener+ t }
-} define-operation
+}
 
-[ quotation? ] \ walk H{
+OPERATION: walk [ quotation? ] H{
     { +keyboard+ T{ key-down f { C+ } "w" } }
     { +listener+ t }
-} define-operation
+}
 
-[ quotation? ] \ time H{
+OPERATION: time [ quotation? ] H{
     { +keyboard+ T{ key-down f { C+ } "t" } }
     { +listener+ t }
-} define-operation
+}
 
 : com-expand-macros ( quot -- ) expand-macros . ;
 
-[ quotation? ] \ com-expand-macros H{
+OPERATION: com-expand-macros [ quotation? ] H{
     { +keyboard+ T{ key-down f { C+ } "m" } }
     { +listener+ t }
-} define-operation
+}
 
 ! Disposables
-[ disposable? ] \ dispose H{ } define-operation
+OPERATION: dispose [ disposable? ] H{ }
 
 ! Disposables with a continuation
 PREDICATE: tracked-disposable < disposable
@@ -202,13 +202,9 @@ PREDICATE: tracked-malloc-ptr < malloc-ptr
 : com-creation-traceback ( disposable -- )
     continuation>> traceback-window ;
 
-[ tracked-disposable? ] \ com-creation-traceback H{
+OPERATION: com-creation-traceback [ { [ tracked-disposable? ] [ tracked-malloc-ptr? ] } 1|| ] H{
     { +primary+ t }
-} define-operation
-
-[ tracked-malloc-ptr? ] \ com-creation-traceback H{
-    { +primary+ t }
-} define-operation
+}
 
 ! Operations -> commands
 interactor

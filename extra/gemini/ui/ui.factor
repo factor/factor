@@ -5,7 +5,7 @@ USING: accessors arrays debugger fonts gemini kernel
 math.vectors models present sequences splitting ui ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.toolbar
-ui.gadgets.tracks ui.gadgets.viewports ui.gestures ui.operations
+ui.gadgets.tracks ui.gadgets.viewports ui.gestures ui.operations ui.operations.syntax
 ui.tools.browser ui.tools.browser.history ui.tools.common urls
 webbrowser ;
 
@@ -109,7 +109,7 @@ gemini-gadget "scrolling" f {
     { T{ key-down f f "PAGE_DOWN" } com-page-down }
 } define-command-map
 
-[ dup url? [ protocol>> "gemini" = ] [ drop f ] if ] \ com-gemini H{ { +primary+ t } } define-operation
+OPERATION: com-gemini [ dup url? [ protocol>> "gemini" = ] [ drop f ] if ] H{ { +primary+ t } }
 
 : gemini-main ( -- )
     [ "gemini.circumlunar.space" open-gemini-window ] with-ui ;

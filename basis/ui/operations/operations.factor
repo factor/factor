@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit kernel
-linked-assocs namespaces sequences ui.commands words ;
+definitions linked-assocs namespaces parser sequences ui.commands words ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -71,6 +71,38 @@ operations [ <linked-hash> ] initialize
     default-flags swap assoc-union
     dupd define-command <operation>
     (define-operation) ;
+
+! A named definition has a stable key independent of its predicate quotation.
+TUPLE: operation-definition command ;
+C: <operation-definition> operation-definition
+INSTANCE: operation-definition definition-mixin
+
+M: operation-definition where command>> "operation-loc" word-prop ;
+M: operation-definition set-where command>> swap "operation-loc" set-word-prop ;
+M: operation-definition forget*
+    [ operations get delete-at ]
+    [ command>> "operation-loc" remove-word-prop ] bi ;
+
+M: operation-definition definition
+    operations get at [
+        [ predicate>> ]
+        [
+            command>> props>>
+            { +keyboard+ +primary+ +secondary+ +listener+ +description+ +nullary+ }
+            swap extract-keys sift-values
+        ] bi 2array
+    ] [ { } ] if* ;
+
+:: define-named-operation ( pred command flags -- )
+    command <operation-definition> :> definition
+    definition save-location
+    ! Replace entries from the pre-OPERATION: source when updating a live image.
+    operations get keys [
+        dup array? [ first command eq? ] [ drop f ] if
+    ] filter [ operations get delete-at ] each
+    default-flags flags assoc-union
+    command over define-command drop
+    pred command <operation> definition operations get set-at ;
 
 : modify-operation ( translator operation -- operation )
     clone

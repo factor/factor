@@ -5,7 +5,7 @@ combinators.short-circuit fonts kernel math math.functions
 math.order math.rectangles math.vectors models namespaces opengl
 sequences splitting strings ui.commands ui.gadgets
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.worlds ui.gestures ui.images
+ui.gadgets.status-bar ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.images
 ui.pens.solid ui.render ui.text ui.theme ;
 IN: ui.gadgets.tables
 
@@ -50,7 +50,14 @@ selection
 mouse-index
 { takes-focus? initial: t }
 focused?
-rows ;
+rows row-heights row-offsets row-metrics-font row-metrics-rows row-metrics-minimum ;
+
+: update-table-rows ( table -- )
+    [
+        [ control-value ] [ renderer>> ] bi
+        '[ _ row-columns ] map
+    ]
+    [ rows<< ] bi ; inline
 
 : new-table ( rows renderer class -- table )
     [ model check-instance ] 2dip
@@ -61,7 +68,8 @@ rows ;
         focus-border-color >>focus-border-color
         transparent >>column-line-color
         f <model> >>selection-index
-        f <model> >>selection ;
+        f <model> >>selection
+        dup update-table-rows ;
 
 : <table> ( rows renderer -- table ) table new-table ;
 
@@ -126,12 +134,54 @@ M: table compute-column-widths
     2dup empty? not and
     [ [ + ] change-nth ] [ 3drop ] if ;
 
+:: update-row-metrics ( table -- )
+    table line-height :> minimum
+    table font>> :> font
+    table rows>> [
+        [ 0 ] [ [ font swap cell-dim + nip ] [ max ] map-reduce ] if-empty
+        minimum max 1 max gl-ceiling
+    ] map :> heights
+    heights table row-heights<<
+    heights 0 [ + ] accumulate swap suffix table row-offsets<<
+    font clone table row-metrics-font<<
+    minimum table row-metrics-minimum<<
+    table rows>> table row-metrics-rows<< ;
+
+: ensure-row-metrics ( table -- table )
+    dup {
+        [ row-offsets>> ]
+        [ [ font>> ] [ row-metrics-font>> ] bi = ]
+        [ [ rows>> ] [ row-metrics-rows>> ] bi eq? ]
+        [ [ line-height ] [ row-metrics-minimum>> ] bi = ]
+    } 1&& [ ] [ dup update-row-metrics ] if ;
+
+: row-height ( row table -- height )
+    ensure-row-metrics row-heights>> nth ;
+
+M: table line>y ensure-row-metrics row-offsets>> nth ;
+
+M:: table y>line ( y table -- row )
+    table ensure-row-metrics row-offsets>> :> offsets
+    0 :> lo!
+    offsets length :> hi!
+    [ lo hi < ] [
+        lo hi + 2 /i :> mid
+        mid offsets nth y <=
+        [ mid 1 + lo! ] [ mid hi! ] if
+    ] while
+    lo 1 - ;
+
+M: table visible-lines
+    [ first-visible-line ] [ last-visible-line ] bi swap - ;
+
 M: table layout*
-    [ update-cached-widths ] [ update-filled-column ] bi ;
+    [ update-cached-widths ] [ update-filled-column ]
+    [ ensure-row-metrics drop ] tri ;
 
 : row-rect ( table row -- rect )
-    [ [ line-height ] dip * gl-ceiling 0 swap 2array ]
-    [ drop [ dim>> first ] [ line-height ] bi 2array ] 2bi <rect> ;
+    [ swap line>y 0 swap 2array ]
+    [ [ drop dim>> first ] [ swap row-height ] 2bi 2array ]
+    2bi <rect> ;
 
 : row-bounds ( table row -- loc dim )
     row-rect rect-bounds ; inline
@@ -199,12 +249,14 @@ M: table layout*
     '[ [ _ ] 3dip _ draw-column ] 3each ;
 
 M:: table draw-line ( row index table -- )
-    row table renderer>> row-columns
-    table column-widths>>
-    table table-column-alignment
-    row index table row-font
-    table gap>>
-    draw-columns ;
+    index table row-height \ line-height [
+        row table renderer>> row-columns
+        table column-widths>>
+        table table-column-alignment
+        row index table row-font
+        table gap>>
+        draw-columns
+    ] with-variable ;
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
@@ -225,7 +277,7 @@ M: table line-height*
 
 M: table pref-dim*
     [ compute-column-widths drop ] keep
-    [ line-height ] [ control-value length ] bi * 2array ;
+    ensure-row-metrics row-offsets>> last 2array ;
 
 : nth-row ( index table -- value/f ? )
     over [ control-value nth t ] [ 2drop f f ] if ;
@@ -275,13 +327,6 @@ PRIVATE>
 : find-row-index ( value table -- n/f )
     [ control-value ] [ renderer>> ] bi
     '[ _ row-value? ] with find drop ;
-
-: update-table-rows ( table -- )
-    [
-        [ control-value ] [ renderer>> ] bi
-        '[ _ row-columns ] map
-    ]
-    [ rows<< ] bi ; inline
 
 : update-selection ( table -- )
     [
@@ -367,8 +412,12 @@ PRIVATE>
 : last-row ( table -- )
     dup control-value length 1 - select-row ;
 
-: prev/next-page ( table n -- )
-    over visible-lines 1 - * prev/next-row ;
+:: prev/next-page ( table n -- )
+    table selection-index>> value>> 0 or :> current
+    current table line>y
+    table visible-dim second n * + table y>line
+    n 0 > [ current 1 + max ] [ current 1 - min ] if
+    table swap select-row ;
 
 : previous-page ( table -- )
     -1 prev/next-page ;

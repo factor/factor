@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors kernel memoize namespaces ui.commands ui.gadgets
+USING: accessors kernel memoize namespaces sequences ui.clipboards ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.buttons ui.gadgets.buttons.private
 ui.gadgets.glass ui.gadgets.menus ui.gadgets.status-bar
 ui.gadgets.worlds ui.gestures ui.operations ui.pens.solid ui.theme ;
@@ -43,8 +43,18 @@ MEMO: selected-pen-boundary ( -- button-pen )
     selected-pen-boundary >>boundary ;
 PRIVATE>
 
+:: presentation-menu-items ( presentation target hook -- items )
+    target operations-menu-commands
+    [ target hook rot <menu-item> ] map :> items
+    presentation [ gadget-selection? ] find-parent :> selection
+    selection [
+        items target hook ---- <menu-item> suffix
+        selection [ ] \ com-copy <menu-item> suffix
+    ] [ items ] if ;
+
 : <presentation-menu> ( presentation target hook -- menu )
-    <operations-menu> presentation-menu new-border
+    [ presentation-menu-items <menu> ] 3keep 2drop
+    swap presentation-menu new-border
         swap >>presentation
         { 0 0 } >>size ;
 

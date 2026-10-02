@@ -1,4 +1,4 @@
-USING: accessors arrays assocs generic kernel math models models.arrow
+USING: accessors arrays assocs continuations generic kernel locals math models models.arrow
 models.product namespaces sequences tools.test ;
 IN: models.tests
 
@@ -47,3 +47,40 @@ T{ model-tester f f } "tester" set
 { f } [ 46 <model> [ 1 + ] <arrow> value>> ] unit-test
 { 47 } [ 46 <model> [ 1 + ] <arrow> compute-model ] unit-test
 { 0 } [ 46 <model> [ 1 + ] <arrow> [ compute-model drop ] keep ref>> ] unit-test
+
+TUPLE: touch-test-model < model updates ;
+M: touch-test-model update-model
+    [ 1 + ] change-updates drop ;
+
+TUPLE: touch-observer hits ;
+M: touch-observer model-changed
+    [ 1 + ] change-hits drop touch-model ;
+
+! In-place mutation keeps object identity and runs both hooks exactly once.
+{ t 1 1 f } [
+    [let
+        V{ 1 } clone :> value
+        value touch-test-model new-model 0 >>updates :> model
+        0 touch-observer boa model add-connection
+        2 value push
+        model touch-model
+        model value>> value eq?
+        model updates>>
+        model connections>> first hits>>
+        model locked?>>
+    ]
+] unit-test
+
+! An already locked model neither updates nor notifies.
+{ 0 } [
+    1 touch-test-model new-model 0 >>updates t >>locked?
+    [ touch-model ] keep updates>>
+] unit-test
+
+TUPLE: failing-touch-model < model ;
+M: failing-touch-model update-model drop "touch failed" throw ;
+
+{ f } [
+    1 failing-touch-model new-model
+    [ [ touch-model ] [ 2drop ] recover ] keep locked?>>
+] unit-test
