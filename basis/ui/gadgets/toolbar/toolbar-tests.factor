@@ -1,6 +1,6 @@
 USING: accessors arrays kernel locals math namespaces sequences
 tools.test ui.commands ui.gadgets ui.gadgets.buttons ui.gadgets.menus
-ui.gadgets.toolbar ui.gadgets.toolbar.private ui.gadgets.tracks ;
+ui.gadgets.toolbar ui.gadgets.toolbar.private ui.gadgets.tracks ui.test ;
 FROM: ui.gadgets.private => in-layout? ;
 USING: calendar io io.encodings.utf8 io.launcher system ;
 IN: ui.gadgets.toolbar.tests
@@ -34,12 +34,13 @@ T{ foo-gadget } <toolbar> "t" set
 ! Natural preferred size does not reserve space for the hidden overflow button.
 { 105 } [ 80 test-toolbar pref-dim first ] unit-test
 
+! Exact geometry uses unscaled pixels, independent of the listener display.
 { { t f } t { 45.0 0.0 } } [
     80 test-toolbar
     [ toolbar-command-buttons [ visible?>> ] map >array ]
     [ overflow-button>> visible?>> ]
     [ overflow-button>> loc>> ] tri
-] unit-test
+] unscaled-ui-test unit-test
 
 { { t t } f 0 } [
     105 test-toolbar
@@ -70,7 +71,7 @@ T{ foo-gadget } <toolbar> "t" set
     [ toolbar-command-buttons [ visible?>> ] map >array ]
     [ overflow-button>> visible?>> ] bi
     extra [ loc>> ] [ dim>> ] bi
-] unit-test
+] unscaled-ui-test unit-test
 
 SYMBOL: overflow-target
 TUPLE: command-target ;
@@ -119,7 +120,7 @@ empty-toolbar-target "toolbar" f { } define-command-map
     <gadget> { 35 30 } >>dim :> extra
     toolbar extra 1 track-add layout-toolbar drop
     extra dim>>
-] unit-test
+] unscaled-ui-test unit-test
 
 ! Verify rendering, popup lifecycle, dispatch and resize in a native window.
 os windows? [
