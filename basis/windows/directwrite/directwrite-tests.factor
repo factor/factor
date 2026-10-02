@@ -1,8 +1,32 @@
-USING: accessors arrays assocs colors combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
-math.order namespaces opengl sequences sets strings tools.test windows.directwrite windows.fonts ;
+USING: accessors alien.c-types alien.data arrays assocs colors combinators continuations destructors fonts fonts.shaping hashtables kernel locals math math.functions
+math.order namespaces opengl sequences sets strings tools.test windows.directwrite windows.directwrite.indexed windows.fonts ;
 IN: windows.directwrite.tests
 
 : test-font ( -- font ) "Segoe UI" <font> ;
+
+! #2569: inspect actual shaped glyph indices, including native fallback.
+! The collector's ASCII geometry is irrelevant here; only the glyph IDs
+! from native Draw callbacks are examined, without using it for rendering.
+:: missing-native-glyphs ( font text -- count )
+    [
+        font text <directwrite-layout> &dispose pointer>>
+        <directwrite-glyph-index> &dispose runs>> [
+            [ glyphIndices>> ] [ glyphCount>> ] bi
+            2 * memory>byte-array ushort cast-array [ zero? ] count
+        ] map-sum
+    ] with-destructors ;
+
+{ 0 } [
+    "Consolas" <font>
+    "\u002308\u002309\u00230a\u00230b\u0027e6\u0027e7\u0027e8\u0027e9\u002985\u002986\u0029fc\u0029fd"
+    missing-native-glyphs
+] unit-test
+
+{ 0 } [
+    "Consolas" <font>
+    "\u002264\u002265\u002260\u00221a\u00221b\u00221c\u002208\u002209\u002205\u002200\u002203"
+    missing-native-glyphs
+] unit-test
 
 ! Cached layouts outlive the dynamic disposable scope that first draws them.
 { t f } [

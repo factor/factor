@@ -4,6 +4,21 @@ windows.gdi32 windows.offscreen windows.types windows.uniscribe
 windows.uniscribe.private ;
 IN: windows.uniscribe.tests
 
+! #2062: supplementary emoji must retain a positive advance, correctly
+! indexed end caret, and raster ink with opaque or translucent backgrounds.
+:: emoji-width-regression ( alpha -- positive? end? pixels? )
+    [
+        "monospace" <font> 12 >>size COLOR: black >>foreground
+        0.5 0.5 0.5 alpha <rgba> >>background
+        "he\u01f346llo" <script-string> &dispose :> script
+        script size>> first 0 >
+        6 script line-offset>x script size>> first =
+        script script-string>image bitmap>> empty? not
+    ] with-destructors ;
+
+{ t t t } [ 1.0 emoji-width-regression ] unit-test
+{ t t t } [ 0.99 emoji-width-regression ] unit-test
+
 ! Layouts must not reuse the raster size from a different monitor.
 :: test-monitor-font-scales ( -- distinct? larger? reused? )
     monospace-font :> font
