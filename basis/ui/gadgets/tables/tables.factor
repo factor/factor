@@ -1,12 +1,12 @@
 ! Copyright (C) 2008, 2011 Slava Pestov.
 ! See https://factorcode.org/license.txt for BSD license.
-USING: accessors arrays classes colors combinators
-combinators.short-circuit fonts kernel math math.functions
+USING: accessors arrays assocs classes colors combinators
+combinators.short-circuit fonts fonts.shaping kernel math math.functions
 math.order math.rectangles math.vectors models namespaces opengl
 sequences splitting strings ui.commands ui.gadgets
 ui.gadgets.line-support ui.gadgets.menus ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.viewports ui.gadgets.worlds ui.gestures ui.images
-ui.pens.solid ui.render ui.text ui.theme ;
+ui.pens.solid ui.render ui.text ui.text.private ui.theme ;
 IN: ui.gadgets.tables
 
 ! Row renderer protocol
@@ -51,7 +51,7 @@ mouse-index
 { takes-focus? initial: t }
 focused?
 rows row-heights row-offsets row-metrics-font row-metrics-rows row-metrics-minimum
-row-metrics-scale ;
+row-metrics-scale column-metrics ;
 
 : update-table-rows ( table -- )
     [
@@ -120,8 +120,39 @@ M: table compute-column-widths
         [ compute-total-width ] keep
     ] if-empty ;
 
+TUPLE: table-column-metrics font rows renderer gap scale text-renderer total widths ;
+
+:: snapshot-table-font ( font -- copy )
+    font strip-font-colors [ clone ] change-name :> copy
+    font shaped-font? [
+        font shaping-options>> [ :> value :> key
+            key clone key "features" = [
+                value [ [ clone ] dip ] H{ } assoc-map-as
+            ] [ value clone ] if
+        ] H{ } assoc-map-as copy shaping-options<<
+    ] when copy ;
+
+:: cached-column-widths ( table -- total widths )
+    table column-metrics>> :> previous
+    previous [
+        table {
+            [ font>> strip-font-colors previous font>> = ]
+            [ rows>> previous rows>> eq? ]
+            [ renderer>> previous renderer>> eq? ]
+            [ gap>> previous gap>> = ]
+            [ drop gl-scale-factor get-global previous scale>> = ]
+            [ drop font-renderer get previous text-renderer>> eq? ]
+        } 1&&
+    ] [ f ] if [ previous ] [
+        table compute-column-widths :> ( total widths )
+        table font>> snapshot-table-font table rows>> table renderer>>
+        table gap>> gl-scale-factor get-global font-renderer get total widths
+        table-column-metrics boa
+        dup table column-metrics<<
+    ] if [ total>> ] [ widths>> ] bi ;
+
 : update-cached-widths ( table -- )
-    dup compute-column-widths
+    dup cached-column-widths clone
     [ >>total-width ] [ >>column-widths ] bi*
     drop ;
 
@@ -279,7 +310,7 @@ M: table line-height*
     [ cell-dim + nip ] with [ max ] map-reduce ;
 
 M: table pref-dim*
-    [ compute-column-widths drop ] keep
+    [ cached-column-widths drop ] keep
     ensure-row-metrics row-offsets>> last 2array ;
 
 : nth-row ( index table -- value/f ? )

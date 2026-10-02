@@ -2,8 +2,8 @@ IN: ui.gadgets.tables.tests
 USING: ui.gadgets.tables ui.gadgets.scrollers ui.gadgets.debug accessors
 models namespaces tools.test kernel combinators prettyprint arrays classes
 locals math math.rectangles sequences ui.gadgets ui.gadgets.line-support
-ui.gadgets.tables.private ui.gestures ;
-USING: calendar continuations io io.encodings.utf8 io.launcher opengl system ;
+ui.gadgets.tables.private ui.gestures ui.text.private ;
+USING: assocs calendar continuations fonts fonts.shaping io io.encodings.utf8 io.launcher opengl system ;
 
 SINGLETON: test-renderer
 
@@ -129,6 +129,100 @@ M: measured-height-cell cell-dim
     gl-scale-factor get-global :> previous
     [ scale gl-scale-factor set-global quot call ]
     [ previous gl-scale-factor set-global ] finally ; inline
+
+SYMBOL: width-computations
+TUPLE: counted-width-table < table ;
+M: counted-width-table compute-column-widths
+    width-computations [ 1 + ] change call-next-method ;
+
+: <counted-width-table> ( -- table )
+    { { "a" "b" } { "c" "d" } } <model> trivial-renderer counted-width-table new-table
+    10 >>line-height ;
+
+! #689: repeated preferred-size and layout requests measure columns once.
+{ 1 2 3 4 5 } [
+    [let
+        0 width-computations set
+        <counted-width-table> :> table
+        table [
+            table f >>column-metrics drop 0 width-computations set
+            10 [ table pref-dim* drop ] times
+            table layout* width-computations get
+            table font>> dup size>> 1 + >>size drop
+            table pref-dim* drop width-computations get
+            table 3 >>gap drop table pref-dim* drop width-computations get
+            table test-renderer >>renderer drop
+            table pref-dim* drop width-computations get
+            table model>> touch-model
+            table pref-dim* drop width-computations get
+        ] with-grafted-gadget
+    ]
+] unit-test
+
+! Backing scale affects native widths independently of model/font identity.
+{ 1 2 3 } [
+    1.0 [
+        [let
+            0 width-computations set <counted-width-table> :> table
+            table pref-dim* drop width-computations get
+            1.25 [ table pref-dim* drop width-computations get ] with-table-scale
+            table pref-dim* drop width-computations get
+        ]
+    ] with-table-scale
+] unit-test
+
+! Font keys own mutable names and shaping options, rather than sharing
+! their storage with the caller and silently accepting stale dimensions.
+{ 1 2 3 } [
+    [let
+        0 width-computations set
+        <counted-width-table> "Consolas" clone <font>
+        H{ { "kern" 0 } } font-with-features >>font :> table
+        table pref-dim* drop width-computations get
+        CHAR: c 0 table font>> name>> set-nth
+        table pref-dim* drop width-computations get
+        1 "kern" table font>> font-features set-at
+        table pref-dim* drop width-computations get
+    ]
+] unit-test
+
+SINGLETON: width-test-text-renderer
+
+! Switching text backends must not reuse dimensions from another renderer.
+{ 1 2 2 t } [
+    [let
+        0 width-computations set
+        8 30 0 <height-cell> 1array 1array <model> trivial-renderer
+        counted-width-table new-table 10 >>line-height :> table
+        table pref-dim* drop width-computations get
+        width-test-text-renderer font-renderer [
+            table pref-dim* drop width-computations get
+            table column-metrics>>
+        ] with-variable :> temporary-metrics
+        ! The counter in with-variable belongs to its temporary namespace.
+        table pref-dim* drop width-computations get
+        table column-metrics>> temporary-metrics eq? not
+    ]
+] unit-test
+
+SINGLETON: filled-width-renderer
+M: filled-width-renderer row-columns drop ;
+M: filled-width-renderer filled-column drop 0 ;
+
+! Layout may stretch a column, but must leave intrinsic cached widths
+! intact for later preferred-size requests and window resizes.
+{ 8.0 100.0 8.0 200.0 8.0 1 } [
+    [let
+        0 width-computations set
+        8 30 0 <height-cell> 1array 1array <model> filled-width-renderer
+        counted-width-table new-table 10 >>line-height { 100 60 } >>dim :> table
+        table pref-dim* first
+        table layout* table column-widths>> first
+        table pref-dim* first
+        table { 200 60 } >>dim layout* table column-widths>> first
+        table pref-dim* first width-computations get
+    ]
+] unit-test
 
 ! Actual cell height and padding determine row geometry, rather than prototypes.
 { { 10.0 30.0 20.0 } { 0 10.0 40.0 60.0 } 60.0 } [
